@@ -3,7 +3,7 @@
    STDOPT: #"-eva @EVA_CONFIG@ -main test_successive_runs -eva-domains-function octagon:need_symbolic_locations,symbolic-locations:need_octagon -then -eva-domains-function symbolic-locations:need_symbolic_locations,octagon:need_octagon"
 */
 
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 
 /* Tests the -eva-domains-function option that enables a domain for the given
    functions. This test uses the symbolic locations domain to store the value

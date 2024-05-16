@@ -26,7 +26,7 @@
   function memchr: precondition 'danglingness' got status unknown.
 [eva] FRAMAC_SHARE/libc/string.h:78: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
-[eva] FRAMAC_SHARE/libc/string.h:85: 
+[eva] FRAMAC_SHARE/libc/string.h:86: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
 [eva] Recording results for memchr_bug
 [eva] Done for function memchr_bug

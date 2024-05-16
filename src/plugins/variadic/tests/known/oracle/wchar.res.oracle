@@ -1,14 +1,14 @@
-[variadic] FRAMAC_SHARE/libc/wchar.h:272: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:294: 
   Declaration of variadic function fwprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:274: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:296: 
   Declaration of variadic function swprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:276: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:298: 
   Declaration of variadic function wprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:279: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:301: 
   Declaration of variadic function wscanf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:281: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:303: 
   Declaration of variadic function fwscanf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:283: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:305: 
   Declaration of variadic function swscanf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:207: 
   Declaration of variadic function fprintf.
@@ -84,6 +84,7 @@
 #include "errno.h"
 #include "signal.h"
 #include "stdarg.h"
+#include "stddef.h"
 #include "stdio.h"
 #include "string.h"
 #include "strings.h"

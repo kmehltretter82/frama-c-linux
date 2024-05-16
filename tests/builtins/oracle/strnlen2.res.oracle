@@ -93,7 +93,7 @@
   Called from strnlen2.c:144.
 [eva] strnlen2.c:138: Call to builtin memset
 [eva] strnlen2.c:138: function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:151: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet

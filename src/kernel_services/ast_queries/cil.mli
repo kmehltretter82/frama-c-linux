@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (** CIL main API.
@@ -729,7 +730,7 @@ val combineAttributes : combineWhat -> attribute list -> attributes -> attribute
     recursive definition.
 
     @since 28.0-Nickel
-    @before Frama-C+dev [strictReturnTypes] was not named and [strictInteger]
+    @before 29.0-Copper [strictReturnTypes] was not named and [strictInteger]
     not present in {!typ_combine}.
 *)
 type combineFunction =
@@ -769,7 +770,7 @@ type combineFunction =
     @raise Cannot_combine with an explanation when the type cannot be combined.
 
     @since 28.0-Nickel
-    @before Frama-C+dev [strictInteger (true)] and [strictReturnTypes (false)]
+    @before 29.0-Copper [strictInteger (true)] and [strictReturnTypes (false)]
             were optional
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
@@ -780,7 +781,7 @@ val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
     global symbols are equal, then they are the same object.
 
     @since 28.0-Nickel
-    @before Frama-C+dev [strictInteger (true)] was not present and left with its
+    @before 29.0-Copper [strictInteger (true)] was not present and left with its
     default value in combineTypesGen.
 *)
 val combineTypes : ?strictInteger:bool -> ?strictReturnTypes:bool ->
@@ -1079,7 +1080,7 @@ val constFoldToInt: ?machdep:bool -> exp -> Integer.t option
 val constFoldTermNodeAtTop:  term_node -> term_node
 
 (** Do constant folding on an term.
-    @before Frama-C+Dev takes a boolean [machdep] to decide if we actually do
+    @before 29.0-Copper takes a boolean [machdep] to decide if we actually do
             the fold or not. *)
 val constFoldTerm: term -> term
 

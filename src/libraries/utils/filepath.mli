@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -78,7 +78,7 @@ module Normalized: sig
       [file] ^ [ext]. Note that it does not introduce a dot.
       The resulting path must respect [existence].
 
-      @since Frama-C+dev
+      @since 29.0-Copper
   *)
   val extend: ?existence:existence -> t -> string -> t
 

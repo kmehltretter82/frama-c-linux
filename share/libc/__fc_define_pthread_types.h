@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -44,14 +44,7 @@ typedef struct __fc_pthread_once_t { int _fc; } pthread_once_t;
 typedef struct __fc_pthread_rwlock_t { int _fc; } pthread_rwlock_t;
 typedef struct __fc_pthread_rwlockattr_t { int _fc; } pthread_rwlockattr_t;
 typedef struct __fc_pthread_spinlock_t { int _fc; } pthread_spinlock_t;
-
-#ifdef __FC_PTHREAD_T_IS_SCALAR
-// Some non-portable code assumes pthread_t as a scalar; this allows
-// such code to be parsed.
 typedef unsigned long pthread_t;
-#else
-typedef struct __fc_pthread_t { unsigned long _fc; } pthread_t;
-#endif
 __END_DECLS
 __POP_FC_STDLIB
 #endif

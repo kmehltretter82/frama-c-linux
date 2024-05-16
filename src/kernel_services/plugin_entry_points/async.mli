@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 (** Module dedicated to asynchronous actions.
-    @since Frama-C+dev
-    @before Frama-C+dev these features were in a module named Db
+    @since 29.0-Copper
+    @before 29.0-Copper these features were in a module named Db
 *)
 
 (** Registered daemon on progress. *)

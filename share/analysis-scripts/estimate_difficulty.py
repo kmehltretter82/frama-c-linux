@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -25,20 +25,24 @@
 """This script uses several heuristics to try and estimate the difficulty
 of analyzing a new code base with Frama-C."""
 
-from __future__ import annotations
 import argparse
+import glob
 import json
+import logging
 import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
+from typing import Iterable
 
 import build_callgraph
+import external_tool
+import fclog
 import source_filter
 
 # TODO : avoid relativizing paths when introducing too many ".." ;
-# TODO : accept directory as argument (--full-tree), and then do glob **/*.{c,i} inside
 # TODO : try to check the presence of compiler builtins
 # TODO : try to check for pragmas
 # TODO : detect absence of 'main' function (library)
@@ -48,34 +52,81 @@ parser = argparse.ArgumentParser(
 Estimates the difficulty of analyzing a given code base"""
 )
 parser.add_argument(
-    "--header-dirs",
-    "-d",
-    metavar="DIR",
+    "paths",
     nargs="+",
-    help="directories containing headers (default: .frama-c)",
+    help="source files and directories. \
+If a directory <dir> is specified, it is recursively explored, as if '<dir>/**/*.[ci]' \
+had been specified.",
+    type=Path,
 )
-parser.add_argument("files", nargs="+", help="source files")
-args = vars(parser.parse_args())
-
-header_dirs = args["header_dirs"]
-if not header_dirs:
-    header_dirs = []
-files = args["files"]
+parser.add_argument(
+    "--debug",
+    metavar="FILE",
+    help="enable debug mode and redirect output to the specified file",
+)
+parser.add_argument(
+    "--verbose",
+    action="store_true",
+    help="enable verbose output; if --debug is set, output is redirected to the same file.",
+)
+parser.add_argument(
+    "--no-cloc",
+    action="store_true",
+    help="disable usage of external tool 'cloc', even if available.",
+)
+args = parser.parse_args()
+paths = args.paths
+debug = args.debug
+no_cloc = args.no_cloc
+verbose = args.verbose
 
 under_test = os.getenv("PTESTS_TESTING")
 
-# gather information from several sources
+fclog.init(debug, verbose)
+
+### Auxiliary functions #######################################################
+
+
+def get_dir(path):
+    """Similar to dirname, but returns the path itself if it refers to a directory"""
+    if path.is_dir():
+        return path
+    else:
+        return path.parent
+
+
+def collect_files_and_local_dirs(paths) -> tuple[set[Path], set[Path]]:
+    """Returns the list of files and directories (and their subdirectories) containing
+    the specified paths. Note that this also includes subdirectories which do not
+    themselves contain any .c files, but which may contain .h files."""
+    dirs: set[Path] = set()
+    files: set[Path] = set()
+    for p in paths:
+        if p.is_dir():
+            files = files.union([Path(p) for p in glob.glob(f"{p}/**/*.[chi]", recursive=True)])
+            dirs.add(p)
+        else:
+            files.add(p)
+            dirs.add(p.parent)
+    local_dirs = {Path(s[0]) for d in dirs for s in os.walk(d)}
+    if not files:
+        sys.exit(
+            "error: no source files (.c/.i) found in provided paths: "
+            + " ".join([str(p) for p in paths])
+        )
+    return files, local_dirs
 
 
 def extract_keys(l):
     return [list(key.keys())[0] for key in l]
 
 
-def get_framac_libc_function_statuses(framac, framac_share):
+def get_framac_libc_function_statuses(
+    framac: Path | None, framac_share: Path
+) -> tuple[list[str], list[str]]:
     if framac:
         (_handler, metrics_tmpfile) = tempfile.mkstemp(prefix="fc_script_est_diff", suffix=".json")
-        if debug:
-            print("metrics_tmpfile: %s", metrics_tmpfile)
+        logging.debug("metrics_tmpfile: %s", metrics_tmpfile)
         fc_runtime = framac_share / "libc" / "__fc_runtime.c"
         fc_libc_headers = framac_share / "libc" / "__fc_libc.h"
         subprocess.run(
@@ -105,10 +156,8 @@ def get_framac_libc_function_statuses(framac, framac_share):
     return (defined, spec_only)
 
 
-re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
-
-
-def grep_includes_in_file(filename):
+def grep_includes_in_file(filename: Path):
+    re_include = re.compile(r'\s*#\s*include\s*("|<)([^">]+)("|>)')
     file_content = source_filter.open_and_filter(filename, not under_test)
     i = 0
     for line in file_content.splitlines():
@@ -120,9 +169,9 @@ def grep_includes_in_file(filename):
             yield (i, kind, header)
 
 
-def get_includes(files):
-    quote_includes = {}
-    chevron_includes = {}
+def get_includes(files: set[Path]):
+    quote_includes: dict[Path, list[tuple[Path, int]]] = {}
+    chevron_includes: dict[Path, list[tuple[Path, int]]] = {}
     for filename in files:
         for line, kind, header in grep_includes_in_file(filename):
             if kind == "<":
@@ -137,13 +186,64 @@ def get_includes(files):
     return chevron_includes, quote_includes
 
 
+def is_local_header(local_dirs, header):
+    for d in local_dirs:
+        path = Path(d)
+        if Path(path / header).exists():
+            return True
+    return False
+
+
+def grep_keywords(keywords: Iterable[str], filename: Path) -> dict[str, int]:
+    with open(filename, "r") as f:
+        found: dict[str, int] = {}
+        for line in f:
+            if any(x in line for x in keywords):
+                # found one or more keywords; count them
+                for kw in keywords:
+                    if kw in line:
+                        if kw in found:
+                            found[kw] += 1
+                        else:
+                            found[kw] = 1
+        return found
+
+
+def pretty_unsupported_keywords(
+    file: Path, unsupported_keywords: dict[str, str], found: dict[str, int]
+) -> str:
+    res = f"unsupported keyword(s) in {file}: "
+    descriptions: list[str] = []
+    for kw, count in sorted(found.items()):
+        if descriptions:  # not first occurrence
+            res += ", "
+        res += f" {kw} ({count} line{'s' if count > 1 else ''})"
+        descriptions.append(f"{kw} is a {unsupported_keywords[kw]}")
+    res += "\n - " + "\n - ".join(descriptions)
+    return res
+
+
+### End of auxiliary functions ################################################
+
 debug = os.getenv("DEBUG")
 verbose = False
 
+files, local_dirs = collect_files_and_local_dirs(paths)
+
+score = {
+    "recursion": 0,
+    "libc": 0,
+    "includes": 0,
+    "malloc": 0,
+    "keywords": 0,
+    "asm": 0,
+}
+
 framac_bin = os.getenv("FRAMAC_BIN")
 if not framac_bin:
-    print(
-        "Running script in no-Frama-C mode (set FRAMAC_BIN to the directory containing frama-c if you want to use it)."
+    logging.info(
+        "Running script in no-Frama-C mode (set FRAMAC_BIN to the directory"
+        + " containing frama-c if you want to use it)."
     )
     framac = None
     script_dir = os.path.dirname(os.path.realpath(__file__))
@@ -154,10 +254,27 @@ else:
         subprocess.check_output([framac, "-no-autoload-plugins", "-print-share-path"]).decode()
     )
 
-print("Building callgraph...")
+
+if not no_cloc:
+    cloc = external_tool.get_command("cloc", "CLOC")
+    if cloc:
+        data = external_tool.run_and_check(
+            [cloc, "--hide-rate", "--progress-rate=0", "--csv"] + list(str(f) for f in files), ""
+        )
+        data = data.splitlines()
+        [nfiles, _sum, nblank, ncomment, ncode] = data[-1].split(",")
+        nlines = int(nblank) + int(ncomment) + int(ncode)
+        logging.info(
+            "Processing %d file(s), approx. %d lines of code (out of %d lines)",
+            int(nfiles),
+            int(ncode),
+            nlines,
+        )
+
+logging.info("Building callgraph...")
 cg = build_callgraph.compute(files)
 
-print("Computing data about libc/POSIX functions...")
+logging.info("Computing data about libc/POSIX functions...")
 libc_defined_functions, libc_specified_functions = get_framac_libc_function_statuses(
     framac, framac_share
 )
@@ -186,16 +303,23 @@ for cycle_start_loc, cycle in recursive_cycles:
         continue
     reported_recursive_pairs.add(cycle[-1])
     (filename, line) = cycle_start_loc
-    (x, y) = cycle[0]
-    pretty_cycle = f"{x} -> {y}"
-    for x, y in cycle[1:]:
-        pretty_cycle += f" -> {y}"
-    print(f"[recursion] found recursive cycle near {filename}:{line}: {pretty_cycle}")
+
+    def pretty_cycle(cycle):
+        (x, y) = cycle[0]
+        res = f"{x} -> {y}"
+        for x, y in cycle[1:]:
+            res += f" -> {y}"
+        return res
+
+    logging.info(
+        "[recursion] found recursive cycle near %s:%d: %s", filename, line, pretty_cycle(cycle)
+    )
+    score["recursion"] += 1
 
 callees_list = [callee for (_, callee) in list(cg.edges.keys())]
 callees = set(callees_list)
 used_headers = set()
-print(f"Estimating difficulty for {len(callees)} function calls...")
+logging.info("Estimating difficulty for %d function calls...", len(callees))
 warnings = 0
 
 for callee in sorted(callees):
@@ -204,8 +328,10 @@ for callee in sorted(callees):
         global warnings
         if status == "warning":
             warnings += 1
-        if verbose or debug or status == "warning":
-            print(f"- {status}: {callee} ({standard}) {reason}")
+        if status == "warning":
+            logging.warning("%s (%s) %s", callee, standard, reason)
+        else:
+            logging.log(fclog.VERBOSE, "%s: %s (%s) %s", status, callee, standard, reason)
 
     try:
         is_problematic = posix_identifiers[callee]["notes"]["fc-support"] == "problematic"
@@ -259,84 +385,83 @@ for callee in sorted(callees):
             if not status_emitted:
                 callee_status("warning", standard, "has neither code nor spec in Frama-C's libc")
 
-print(f"Function-related warnings: {warnings}")
+logging.info("Function-related warnings: %d", warnings)
+score["libc"] = warnings
 
-if (verbose or debug) and used_headers:
-    print("used headers:")
-    for header in sorted(used_headers):
-        print(f"  <{header}>")
+logging.log(
+    fclog.VERBOSE,
+    "Used POSIX headers:\n%s",
+    "\n".join([f"  <{header}>" for header in sorted(used_headers)]),
+)
 
 (chevron_includes, quote_includes) = get_includes(files)
 
-
-def is_local_header(header_dirs, header):
-    for d in header_dirs:
-        path = Path(d)
-        if Path(path / header).exists():
-            return True
-    return False
-
-
-print(f"Estimating difficulty for {len(chevron_includes)} '#include <header>' directives...")
+logging.info(
+    "Estimating difficulty for %d '#include <header>' directives...", len(chevron_includes)
+)
 non_posix_headers = []
 header_warnings = 0
 for header in sorted(chevron_includes, key=str.casefold):
+    if not header.lower().endswith(".h"):
+        continue  # ignore included non-header files
     if header in posix_headers:
         fc_support = posix_headers[header]["fc-support"]
         if fc_support == "unsupported":
             header_warnings += 1
-            print(f"- WARNING: included header <{header}> is explicitly unsupported by Frama-C")
+            logging.warning("included header <%s> is explicitly unsupported by Frama-C", header)
         else:
-            if verbose or debug:
-                c11_or_posix = "C11" if header in c11_headers else "POSIX"
-                print(f"- note: included {c11_or_posix} header ")
+            logging.log(
+                fclog.VERBOSE,
+                "included %s header %s",
+                "C11" if header in c11_headers else "POSIX",
+                header,
+            )
     else:
-        if is_local_header(header_dirs, header):
-            if verbose or debug:
-                print(f"- ok: included header <{header}> seems to be available locally")
+        if is_local_header(local_dirs, header):
+            logging.log(
+                fclog.VERBOSE, "ok: included header <%s> seems to be available locally", header
+            )
         else:
             non_posix_headers.append(header)
             header_warnings += 1
-            print(f"- warning: included non-POSIX header <{header}>")
-print(f"Header-related warnings: {header_warnings}")
-
+            logging.warning("included non-POSIX header <%s>", header)
+logging.info("Header-related warnings: %d", header_warnings)
+score["includes"] = header_warnings
 
 # dynamic allocation
 
 dynalloc_functions = set(["malloc", "calloc", "free", "realloc", "alloca", "mmap"])
 dyncallees = dynalloc_functions.intersection(callees)
 if dyncallees:
-    print(f"- note: calls to dynamic allocation functions: {', '.join(sorted(dyncallees))}")
-
+    logging.info("Calls to dynamic allocation functions: %s", ", ".join(sorted(dyncallees)))
+    score["malloc"] = len(dyncallees)
 
 # unsupported C11 or non-standard specific features
 
-unsupported_keywords = [
-    ("_Alignas", "C11 construct"),
-    ("_Alignof", "C11 construct"),
-    ("_Complex", "C11 construct"),
-    ("_Imaginary", "C11 construct"),
-    ("alignas", "C11 construct"),
-    ("alignof", "C11 construct"),  # stdalign.h may use these symbols
-    ("__int128", "non-standard construct (GNU extension)"),
-    ("__uint128_t", "non-standard construct (GNU extension)"),
-]
+unsupported_keywords = {
+    "_Alignas": "C11 construct",
+    "_Alignof": "C11 construct",
+    "_Complex": "C11 construct",
+    "_Imaginary": "C11 construct",
+    "alignas": "C11 construct",
+    "alignof": "C11 construct",  # stdalign.h may use these symbols
+    "__int128": "non-standard construct (GNU extension)",
+    "__uint128_t": "non-standard construct (GNU extension)",
+}
 
-for keyword, message in unsupported_keywords:
-    out = subprocess.Popen(
-        ["grep", "-n", "\\b" + keyword + "\\b"] + files + ["/dev/null"],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-    )
-    lines = out.communicate()[0].decode("utf-8").splitlines()
-    if lines:
-        n = len(lines)
-        print(
-            f"- warning: found {n} line{'s' if n > 1 else ''} with occurrences of "
-            f"unsupported {message} '{keyword}'"
-        )
+for ff in files:
+    found = grep_keywords(unsupported_keywords.keys(), ff)
+    if found:
+        logging.warning(pretty_unsupported_keywords(ff, unsupported_keywords, found))
+    score["keywords"] += len(found)
 
 # assembly code
 
 if "asm" in callees or "__asm" in callees or "__asm__" in callees:
-    print("- warning: code seems to contain inline assembly ('asm(...)')")
+    logging.warning("code seems to contain inline assembly ('asm(...)')")
+    score["asm"] = 1
+
+logging.info(
+    "Overall difficulty score:\n%s",
+    "\n".join([k + ": " + str(v) for (k, v) in sorted(score.items())]),
+)

@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -46,7 +46,7 @@ Ivette.registerView({
   layout: {
     'A': 'fc.eva.summary',
     'B': 'fc.eva.coverage',
-    'CD': 'ivette.messages',
+    'CD': 'fc.kernel.messages',
   },
 });
 

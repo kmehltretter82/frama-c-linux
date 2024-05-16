@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -74,6 +74,7 @@ int glob(const char *pattern, int flags,
     pglob->gl_pathv[reserve_offs + prev_len + i] = (char*)"glob result";
   }
   pglob->gl_pathv[prev_len + reserve_offs + pglob->gl_pathc] = 0; // terminator
+  pglob->gl_flags = flags | (Frama_C_nondet(0, GLOB_MAGCHAR));
   if (Frama_C_nondet(0, 1)) { // simulate "no error"
     return 0;
   } else {

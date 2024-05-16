@@ -2,9 +2,9 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 1995-2023                                               */
+/*  Copyright (C) 1995-2021                                               */
 /*    Free Software Foundation, Inc.                                      */
-/*  Copyright (C) 2021-2023                                               */
+/*  Copyright (C) 2021-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -43,6 +43,12 @@ void argz_stringify (char *argz, size_t len, int sep) {
     }
 }
 
+/*@
+  assigns *to \from *to, indirect:*to_len, indirect:buf_len;
+  assigns *to_len \from *to_len, buf_len;
+  assigns *to[0 .. \old(*to_len) + buf_len]
+    \from *to[0 .. \old(*to_len)], buf[0 .. buf_len];
+ */
 static void str_append (char **to, size_t *to_len, const char *buf,
                         const size_t buf_len) {
   size_t new_len = *to_len + buf_len;

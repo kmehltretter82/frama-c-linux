@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -203,7 +203,7 @@ function filterMessage(
 // --------------------------------------------------------------------------
 
 function Section(p: Forms.SectionProps): JSX.Element {
-  const settings = `ivette.messages.filter.${p.label}`;
+  const settings = `fc.kernel.messages.filter.${p.label}`;
   return (
     <Forms.Section label={p.label} unfold settings={settings}>
       {p.children}
@@ -469,7 +469,7 @@ export function RenderMessages(): JSX.Element {
   );
 
   const [showFilter, flipFilter] =
-    Dome.useFlipSettings('ivette.messages.showFilter', true);
+    Dome.useFlipSettings('fc.kernel.messages.showFilter', true);
 
   const MessagePanel = (
     <Vbox style={{ height: '100%' }}>
@@ -497,12 +497,12 @@ export function RenderMessages(): JSX.Element {
         />
       </TitleBar>
       <RSplit
-        settings="ivette.messages.filterSplit"
+        settings="fc.kernel.messages.filterSplit"
         defaultPosition={225}
         unfold={showFilter}
       >
         <BSplit
-          settings="ivette.messages.messageSplit"
+          settings="fc.kernel.messages.messageSplit"
           defaultPosition={90}
           unfold={text !== ''}
         >
@@ -511,7 +511,7 @@ export function RenderMessages(): JSX.Element {
             sorting={model}
             selection={selectedMsg?.key}
             onSelection={onMessageSelection}
-            settings="ivette.messages.table"
+            settings="fc.kernel.messages.table"
           >
             <MessageColumns />
           </Table>
@@ -551,7 +551,7 @@ States.onSyncArray(Kernel.message, () => {
   const many = errors > 0 ? 's' : '';
   if (errors) {
     Display.showError(`Frama-C/${from} Error${many}`);
-    Display.alertComponent('ivette.messages');
+    Display.alertComponent('fc.kernel.messages');
   }
 });
 

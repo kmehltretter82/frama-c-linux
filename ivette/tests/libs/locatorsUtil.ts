@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -53,13 +53,6 @@ export function getShutDownServerButton(window: Page): Locator {
  */
 export function getConsoleComponent(window: Page): Locator {
   return window.locator(".cm-global-box");
-}
-
-/**
- * Locator to select the Functions side bar when loading a file
- */
-export function getFunctionsSideBar(window: Page): Locator {
-  return window.getByText("AST").first();
 }
 
 export function getMainFunction(window: Page): Locator {

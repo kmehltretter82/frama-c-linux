@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -129,20 +129,16 @@ let load_module m =
   let base,ext = split_ext m in
   match ext with
   | ".ml" ->
-    Klog.error "Script loading has been deprecated in favor of the load of script libraries (see section \"Loading Single OCaml Files as Plug-ins\" in the Frama-C user manual for an alternative)."
+    Klog.error "Script loading has been removed; see section \"Loading Single OCaml Files as Plug-ins\" in the Frama-C user manual for an alternative."
   | _ ->
     begin
       (* load object or compile script or find package *)
       match is_object base with
       | Some file -> dynlib_module (Filename.basename base) file
       | None ->
-        match is_file base ".ml" with
-        | Some _ ->
-          Klog.error "Script loading has been deprecated in favor of the command frama-c-init-plugin"
-        | None ->
-          if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
-          else
-            load_plugin m
+        if is_package m && Dune_site_plugins.V1.available m then load_packages [m]
+        else
+          load_plugin m
     end
 
 let () = Printexc.register_printer (function

@@ -4,7 +4,8 @@
 [kernel] very_large_integers.c:87: Warning: 
   ignoring invalid aligned attribute: __aligned__((9223372036854775808)+
                                                    (9223372036854775808) )
-[kernel] very_large_integers.c:107: User Error: Array length is too large.
+[kernel:too-large-array] very_large_integers.c:107: Warning: 
+  Array length is too large.
 [kernel] very_large_integers.c:114: User Error: 
   array length too large: 7205759403792794
   112   // Previously caused Out of memory

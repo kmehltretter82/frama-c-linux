@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -93,6 +93,10 @@ struct __fc_gethostbyname {
 
 struct __fc_gethostbyname __fc_ghbn;
 
+/*@
+  assigns answer[0 .. anslen-1], \result
+    \from indirect:anslen, Frama_C_entropy_source;
+*/
 static int res_search(const char *dname, int rec_class, int type,
                char *answer, int anslen) {
   for (int i = 0; i < anslen-1; i++) {

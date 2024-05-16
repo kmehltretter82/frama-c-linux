@@ -6,7 +6,7 @@
 /* The first run emits alarms on left shifts on negative values;
    the second run emits alarms on right shifts on negative values. */
 
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 
 volatile int rand;
 

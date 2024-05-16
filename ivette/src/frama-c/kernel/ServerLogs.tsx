@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -536,13 +536,13 @@ function computeDelta(log?: Log): void {
 // -------------------------------------------------------------------------
 
 export function RecordingLogs(): JSX.Element {
-  const { active } = Display.useComponentStatus('fc.kernel.serverlogs');
+  const { active } = Display.useComponentStatus('fc.server.serverlogs');
   const [isRecording] = useGlobalState(RECORDING);
   const onClick = (): void => RECORDING.setValue(!isRecording);
   return (
     <IconButton
-      kind={isRecording ? 'negative' : 'warning'}
-      icon={isRecording ? 'MEDIA.STOP' : 'MEDIA.PAUSE'}
+      kind={isRecording ? 'negative' : 'default'}
+      icon="MEDIA.HALT"
       display={active}
       onClick={onClick}
       title='Stop recording logs'

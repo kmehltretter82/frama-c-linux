@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,11 +26,13 @@ let show main_ui =
     "Thibaud Antignac";
     "Gergö Barany";
     "Patrick Baudin";
+    "Nicolas Bellec";
     "Thibaut Benjamin";
     "Allan Blanchard";
     "Lionel Blatter";
     "François Bobot";
     "Richard Bonichon";
+    "Vincent Botbol";
     "Quentin Bouillaguet";
     "David Bühler";
     "Zakaria Chihani";
@@ -44,6 +46,7 @@ let show main_ui =
     "Maxime Jacquemin";
     "Florent Kirchner";
     "Alexander Kogtenkov";
+    "Remi Lazarini";
     "Tristan Le Gall";
     "Jean-Christophe Léchenet";
     "Matthieu Lemerre";

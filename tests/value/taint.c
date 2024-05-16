@@ -2,7 +2,7 @@
    STDOPT: +" -eva-domains taint -eva-msg-key=d-taint,-d-cvalue -eva-auto-loop-unroll 10"
 */
 
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 
 volatile int undet;
 int tainted;

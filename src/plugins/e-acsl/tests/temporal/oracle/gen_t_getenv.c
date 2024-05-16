@@ -12,16 +12,24 @@ char *__gen_e_acsl_literal_string;
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@ requires valid_name: valid_read_string(name);
-    ensures null_or_valid_result: \result == \null || \valid(\result);
+    ensures
+      null_or_valid_result:
+        \result == \null || (\valid(\result) && valid_read_string(\result));
     assigns \result;
-    assigns \result \from __fc_env[0 ..], (indirect: name), *(name + (0 ..));
+    assigns \result
+      \from __fc_env[0 ..], (indirect: name),
+            (indirect: *(name + (0 .. strlen{Old}(name))));
  */
 char *__gen_e_acsl_getenv(char const *name);
 
 /*@ requires valid_name: valid_read_string(name);
-    ensures null_or_valid_result: \result == \null || \valid(\result);
+    ensures
+      null_or_valid_result:
+        \result == \null || (\valid(\result) && valid_read_string(\result));
     assigns \result;
-    assigns \result \from __fc_env[0 ..], (indirect: name), *(name + (0 ..));
+    assigns \result
+      \from __fc_env[0 ..], (indirect: name),
+            (indirect: *(name + (0 .. strlen{Old}(name))));
  */
 char *__gen_e_acsl_getenv(char const *name)
 {
@@ -31,39 +39,9 @@ char *__gen_e_acsl_getenv(char const *name)
   __e_acsl_temporal_reset_return();
   __retres = getenv(name);
   __e_acsl_temporal_store_nblock((void *)(& __retres),(void *)*(& __retres));
-  {
-    int __gen_e_acsl_or;
-    __e_acsl_temporal_save_return((void *)(& __retres));
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
-      {.values = (void *)0};
-    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"\\result",
-                                 (void *)__retres);
-    if (__retres == (char *)0) __gen_e_acsl_or = 1;
-    else {
-      int __gen_e_acsl_valid;
-      __gen_e_acsl_valid = __e_acsl_valid((void *)__retres,sizeof(char),
-                                          (void *)__retres,
-                                          (void *)(& __retres));
-      __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"\\result",
-                                   (void *)__retres);
-      __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
-                                     "sizeof(char)",0,sizeof(char));
-      __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                   "\\valid(\\result)",0,__gen_e_acsl_valid);
-      __gen_e_acsl_or = __gen_e_acsl_valid;
-    }
-    __gen_e_acsl_assert_data_2.blocking = 1;
-    __gen_e_acsl_assert_data_2.kind = "Postcondition";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\result == \\null || \\valid(\\result)";
-    __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/stdlib.h";
-    __gen_e_acsl_assert_data_2.fct = "getenv";
-    __gen_e_acsl_assert_data_2.line = 524;
-    __gen_e_acsl_assert_data_2.name = "null_or_valid_result";
-    __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
-    __e_acsl_delete_block((void *)(& __retres));
-    return __retres;
-  }
+  __e_acsl_temporal_save_return((void *)(& __retres));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
 }
 
 void __e_acsl_globals_init(void)

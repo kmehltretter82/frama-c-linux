@@ -1,3 +1,8 @@
+/* run.config
+   NOFRAMAC: testing frama-c-script, not frama-c itself
+   EXECNOW: LOG @PTEST_NAME@.res LOG @PTEST_NAME@.err PTESTS_TESTING=1 %{bin:frama-c-script} estimate-difficulty --no-cloc @PTEST_FILE@ > @PTEST_NAME@.res 2> @PTEST_NAME@.err
+*/
+
 // these includes are not actually used by the compiler
 // (this is a preprocessed file), but analyzed by the script
 #include <sys/socket.h>
@@ -20,7 +25,11 @@ int main() {
   strlen(); // no warning
   ccosl(); // warning: neither code nor spec
   dprintf(); // no warning: neither code nor spec, but handled by Variadic
+  __asm__("xor ax, ax");
+  malloc(2);
+  alignof(char*);
+  _Complex cc;
 }
 
 __int128 large_int;
-_Complex complex;
+_Complex complex2;

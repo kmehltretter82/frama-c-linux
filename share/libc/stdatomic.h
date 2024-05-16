@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -101,41 +101,78 @@ typedef _Atomic uintmax_t atomic_uintmax_t;
 // NOTE: The stubs below serve only to help parsing succeed and do not
 //       match expected concurrence semantics.
 
+/*@ assigns \nothing; */
+void __fc_atomic_init_marker(void *obj, unsigned long long value);
 #define atomic_init(obj, value)                                         \
   do { __fc_atomic_init_marker(obj, value); *obj = value; } while (0)
 
 #define kill_dependency(y) (y)
 
+/*@
+  assigns \nothing;
+*/
 extern void atomic_thread_fence(memory_order order);
+
+/*@
+  assigns \nothing;
+*/
 extern void atomic_signal_fence(memory_order order);
 
-_Bool __fc_atomic_is_lock_free(void *obj);
-#define atomic_is_lock_free(obj) __fc_atomic_is_lock_free(obj)
+/*@
+  assigns \result \from indirect:obj, indirect:obj_size; // in reality, should be '\from typeof(obj)'
+*/
+_Bool __fc_atomic_is_lock_free(void *obj, size_t obj_size);
+#define atomic_is_lock_free(obj) __fc_atomic_is_lock_free(obj, sizeof(obj))
 
-void __fc_atomic_store_marker(void *object, unsigned long long desired);
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)) \from desired;
+*/
+void __fc_atomic_store_marker(void *object, unsigned long long desired,
+                              size_t obj_size);
 #define atomic_store(obj, value)                                        \
-  do { __fc_atomic_store_marker(obj, value); *obj = value; } while (0)
+  do { __fc_atomic_store_marker(obj, value, sizeof(obj)); *obj = value; \
+  } while (0)
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)) \from desired, indirect:order;
+*/
 void __fc_atomic_store_explicit_marker(void *object, unsigned long long desired,
-                                       memory_order order);
+                                       memory_order order, size_t obj_size);
 #define atomic_store_explicit(obj, value, order)                        \
-  do { __fc_atomic_store_explicit_marker(obj, value, order); *obj = value; } \
+  do { __fc_atomic_store_explicit_marker(obj, value, order, sizeof(obj)); \
+    *obj = value; }                                                     \
   while (0)
 
+/*@
+  assigns \result \from *((char*)object+(0 .. obj_size-1)), indirect:obj_size;
+*/
 unsigned long long __fc_atomic_load(void *object, size_t obj_size);
 #define atomic_load(obj) __fc_atomic_load(obj, sizeof(*obj))
 
+/*@
+  assigns \result \from *((char*)object+(0 .. obj_size-1)), indirect:order,
+                        indirect:obj_size;
+*/
 unsigned long long __fc_atomic_load_explicit(void *object, memory_order order,
                                              size_t obj_size);
 #define atomic_load_explicit(obj, order)                \
   __fc_atomic_load_explicit(obj, order, sizeof(*obj))
 
+/*@
+  assigns \result, *((char*)object+(0 .. obj_size-1))
+    \from *((char*)object+(0 .. obj_size-1)), desired, indirect:obj_size;
+*/
 unsigned long long __fc_atomic_exchange(void *object,
                                         unsigned long long desired,
                                         size_t obj_size);
 #define atomic_exchange(obj, desired)                   \
   __fc_atomic_exchange(obj, desired, sizeof(*obj))
 
+/*@
+  assigns \result, *((char*)object+(0 .. obj_size-1))
+    \from *((char*)object+(0 .. obj_size-1)), desired, indirect:order,
+    indirect:obj_size;
+*/
 unsigned long long __fc_atomic_exchange_explicit(void *object,
                                                  unsigned long long desired,
                                                  memory_order order,
@@ -143,12 +180,32 @@ unsigned long long __fc_atomic_exchange_explicit(void *object,
 #define atomic_exchange_explicit(obj, desired, order)                   \
   __fc_atomic_exchange_explicit(obj, desired, order, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1))
+    \from *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1)), desired, indirect:obj_size;
+  assigns \result \from indirect:*((char*)object+(0 .. obj_size-1)),
+                        indirect:*((char*)expected+(0 .. obj_size-1)),
+                        indirect:obj_size;
+*/
 _Bool __fc_atomic_compare_exchange_strong(void *object, void *expected,
                                           unsigned long long desired,
                                           size_t obj_size);
 #define atomic_compare_exchange_strong(obj, desired, expected)          \
   __fc_atomic_compare_exchange_strong(obj, desired, expected, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1))
+    \from *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1)),
+          desired, indirect:success, indirect:failure, indirect:obj_size;
+  assigns \result \from indirect:*((char*)object+(0 .. obj_size-1)),
+                        indirect:*((char*)expected+(0 .. obj_size-1)),
+                        indirect:success, indirect:failure,
+                        indirect:obj_size;
+*/
 _Bool __fc_atomic_compare_exchange_strong_explicit(void *object, void *expected,
                                                    unsigned long long desired,
                                                    memory_order success,
@@ -159,12 +216,32 @@ _Bool __fc_atomic_compare_exchange_strong_explicit(void *object, void *expected,
   __fc_atomic_compare_exchange_strong_explicit(obj, desired, expected,  \
                                                success, failure, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1))
+    \from *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1)), desired, indirect:obj_size;
+  assigns \result \from indirect:*((char*)object+(0 .. obj_size-1)),
+                        indirect:*((char*)expected+(0 .. obj_size-1)),
+                        indirect:desired, indirect:obj_size;
+*/
 _Bool __fc_atomic_compare_exchange_weak(void *object, void *expected,
                                         unsigned long long desired,
                                         size_t obj_size);
 #define atomic_compare_exchange_weak(obj, desired, expected) \
   __fc_atomic_compare_exchange_weak(obj, desired, expected, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1))
+    \from *((char*)object+(0 .. obj_size-1)),
+          *((char*)expected+(0 .. obj_size-1)),
+          desired, indirect:success, indirect:failure, indirect:obj_size;
+  assigns \result \from indirect:*((char*)object+(0 .. obj_size-1)),
+                        indirect:*((char*)expected+(0 .. obj_size-1)),
+                        indirect:desired, indirect:success, indirect:failure,
+                        indirect:obj_size;
+*/
 _Bool __fc_atomic_compare_exchange_weak_explicit(void *object, void *expected,
                                                  unsigned long long desired,
                                                  memory_order success,
@@ -175,12 +252,21 @@ _Bool __fc_atomic_compare_exchange_weak_explicit(void *object, void *expected,
   __fc_atomic_compare_exchange_weak_explicit(obj, desired, expected, success, \
                                              failure, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_add(void *object,
                                          unsigned long long operand,
                                          size_t obj_size);
 #define atomic_fetch_add(obj, operand)                  \
   __fc_atomic_fetch_add(obj, operand, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:order,
+          indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_add_explicit(void *object,
                                                   unsigned long long operand,
                                                   memory_order order,
@@ -188,12 +274,21 @@ unsigned long long __fc_atomic_fetch_add_explicit(void *object,
 #define atomic_fetch_add_explicit(obj, operand, order)                  \
   __fc_atomic_fetch_add_explicit(obj, operand, order, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_sub(void *object,
                                          unsigned long long operand,
                                          size_t obj_size);
 #define atomic_fetch_sub(obj, operand)                  \
   __fc_atomic_fetch_sub(obj, operand, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:order,
+          indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_sub_explicit(void *object,
                                                   unsigned long long operand,
                                                   memory_order order,
@@ -201,12 +296,21 @@ unsigned long long __fc_atomic_fetch_sub_explicit(void *object,
 #define atomic_fetch_sub_explicit(obj, operand, order)                  \
   __fc_atomic_fetch_sub_explicit(obj, operand, order, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_or(void *object,
                                         unsigned long long operand,
                                         size_t obj_size);
 #define atomic_fetch_or(obj, operand)                   \
   __fc_atomic_fetch_or(obj, operand, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:order,
+          indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_or_explicit(void *object,
                                                  unsigned long long operand,
                                                  memory_order order,
@@ -214,12 +318,21 @@ unsigned long long __fc_atomic_fetch_or_explicit(void *object,
 #define atomic_fetch_or_explicit(obj, operand, order)                   \
   __fc_atomic_fetch_or_explicit(obj, operand, order, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_xor(void *object,
                                          unsigned long long operand,
                                          size_t obj_size);
 #define atomic_fetch_xor(obj, operand)                  \
   __fc_atomic_fetch_xor(obj, operand, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:order,
+          indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_xor_explicit(void *object,
                                                   unsigned long long operand,
                                                   memory_order order,
@@ -227,12 +340,21 @@ unsigned long long __fc_atomic_fetch_xor_explicit(void *object,
 #define atomic_fetch_xor_explicit(obj, operand, order)                  \
   __fc_atomic_fetch_xor_explicit(obj, operand, order, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_and(void *object,
                                          unsigned long long operand,
                                          size_t obj_size);
 #define atomic_fetch_and(obj, operand)                  \
   __fc_atomic_fetch_and(obj, operand, sizeof(*obj))
 
+/*@
+  assigns *((char*)object+(0 .. obj_size-1)), \result
+    \from *((char*)object+(0 .. obj_size-1)), operand, indirect:order,
+          indirect:obj_size;
+*/
 unsigned long long __fc_atomic_fetch_and_explicit(void *object,
                                                   unsigned long long operand,
                                                   memory_order order,
@@ -240,10 +362,27 @@ unsigned long long __fc_atomic_fetch_and_explicit(void *object,
 #define atomic_fetch_and_explicit(obj, operand, order)                  \
   __fc_atomic_fetch_and_explicit(obj, operand, order, sizeof(*obj))
 
+/*@
+  assigns *object \from *object;
+  assigns \result \from indirect:object;
+*/
 extern _Bool atomic_flag_test_and_set(volatile atomic_flag *object);
+
+/*@
+  assigns *object \from *object, indirect:order;
+  assigns \result \from indirect:object, indirect:order;
+*/
 extern _Bool atomic_flag_test_and_set_explicit(volatile atomic_flag *object,
                                                memory_order order);
+
+/*@
+  assigns *object \from *object;
+*/
 extern void atomic_flag_clear(volatile atomic_flag *object);
+
+/*@
+  assigns *object \from *object, indirect:order;
+*/
 extern void atomic_flag_clear_explicit(volatile atomic_flag *object,
                                        memory_order order);
 

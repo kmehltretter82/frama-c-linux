@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -24,8 +24,8 @@
 """This script finds files containing likely declarations and definitions
 for a given function name, via heuristic syntactic matching."""
 
-from __future__ import annotations
 import os
+from pathlib import Path
 import sys
 
 import function_finder
@@ -70,7 +70,7 @@ class Callgraph:
         return f"Callgraph({self.succs}, {self.edges})"
 
 
-def compute(files):
+def compute(files: set[Path]):
     cg = Callgraph()
     for f in files:
         file_content = source_filter.open_and_filter(f, not under_test)

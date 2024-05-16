@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -119,7 +119,8 @@ let add_fun_task model pool ~kf ?infos ?bhvs ?target () =
   end
 
 let notyet prop =
-  Wp_parameters.warning ~once:true
+  let source = fst (Property.location prop) in
+  Wp_parameters.warning ~once:true ~source
     "Not yet implemented wp for '%a'" Property.pretty prop
 
 (* -------------------------------------------------------------------------- *)

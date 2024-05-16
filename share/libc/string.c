@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -172,6 +172,9 @@ int memcmp(const void *s1, const void *s2, size_t n)
 
 // NOTE: strcasecmp is in POSIX's strings.h but not in C99
 // auxiliary function for strcasecmp
+/*@
+  assigns \result \from c1, c2;
+*/
 static int char_equal_ignore_case(char c1, char c2)
 {
   if (c1 >= 'A' && c1 <= 'Z') c1 -= ('A' - 'a');

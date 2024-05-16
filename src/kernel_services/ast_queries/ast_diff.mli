@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -116,6 +116,24 @@ module Kernel_function:
 module Fundec:
   Correspondence_table
   with type key = fundec and type data = fundec correspondence
+
+(** map of symbols currently under comparison,
+    with their correspondence status so far *)
+type is_same_env
+
+val is_same_list:
+  ('a -> 'a -> is_same_env -> bool) -> 'a list -> 'a list -> is_same_env -> bool
+
+val is_same_term: term -> term -> is_same_env -> bool
+
+val is_same_predicate: predicate -> predicate -> is_same_env -> bool
+
+(** access custom comparison functions for ACSL extensions *)
+val set_extension_diff:
+  is_same_ext:
+    (string ->
+     acsl_extension_kind -> acsl_extension_kind -> is_same_env -> bool)
+  -> unit
 
 (** performs a comparison of AST between the current and the original
     project, which must have been set beforehand.

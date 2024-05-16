@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -232,7 +232,7 @@ module Function: sig
   val get_id: cil_function -> int
 
   val get_statics: fundec -> varinfo list
-  (** @since Frama-C+dev *)
+  (** @since 29.0-Copper *)
 
 end
 
@@ -242,43 +242,43 @@ end
 
 val start_with_frama_c: string -> bool
 (** @return true if the given string starts with ["Frama_C_"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val is_show_each_builtin: string -> bool
 (** @return true if the given string starts with ["Frama_C_show_each"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val is_domain_show_each_builtin: string -> bool
 (** @return true if the given string starts with ["Frama_C_domain_show_each"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val is_dump_each_builtin: string -> bool
 (** @return true if the given string starts with ["Frama_C_dump_each"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val is_dump_file_builtin: string -> bool
 (** @return true if the given string starts with ["Frama_C_dump_each_file"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val is_split_builtin: string -> bool
 (** @return true if the given string starts with ["Frama_C_builtin_split"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val start_with_frama_c_builtin: string -> bool
 (** @return true if the given string starts with ["Frama_C_"].
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val is_frama_c_builtin: varinfo -> bool
 (** @return true if {!start_with_frama_c_builtin} or
     {!Cil_builtins.has_fc_builtin_attr} are true.
-    @before Frama-C+dev Behave like {!start_with_frama_c_builtin}.
+    @before 29.0-Copper Behave like {!start_with_frama_c_builtin}.
 *)
 
 (*

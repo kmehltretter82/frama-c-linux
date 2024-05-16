@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -126,7 +126,7 @@ function ProverItem(props : ProverItemProps): JSX.Element
   );
   const enabled = !inactive && (play || running);
   const icon =
-    inactive ? 'LOCK' : running ? 'MEDIA.PAUSE' : 'MEDIA.PLAY';
+    inactive ? 'LOCK' : running ? 'MEDIA.STOP' : 'MEDIA.PLAY';
   const title =
     inactive ? undefined :
     running ? 'Interrupt Prover' : 'Run Prover';
@@ -466,7 +466,7 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
         />
         <IconButton
           key='play'
-          icon={running ? 'MEDIA.PAUSE' : 'MEDIA.PLAY'}
+          icon={running ? 'MEDIA.STOP' : 'MEDIA.PLAY'}
           kind={running ? 'warning' : 'positive'}
           title={running ? 'Interrupt Prover' : 'Run Prover'}
           enabled={enabled}

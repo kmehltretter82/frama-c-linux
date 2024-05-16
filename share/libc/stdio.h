@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -581,14 +581,15 @@ extern int pclose(FILE *stream);
 // This file may be included by non-POSIX machdeps, which do not define
 // ssize_t, so we must check it
 #ifdef __FC_POSIX_VERSION
-// No specification given; include "stdio.c" to use Frama-C's implementation
-ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+/*@ assigns (*lineptr)[0 .. *n-1], *n, *stream, \result \from *stream; */
+extern ssize_t getline(char **lineptr, size_t *n, FILE *stream);
 #endif
 
 // POSIX extension
 /*@
   requires valid_or_null_buff: buf == \null || \valid((char*)buf + (0 .. size-1));
   requires valid_mode: valid_read_string(mode);
+  allocates buf;
   assigns __fc_errno \from indirect: buf, indirect: size,
                            indirect: mode[0..strlen(mode)];
   assigns \result \from __fc_p_fopen,
@@ -598,7 +599,6 @@ ssize_t getline(char **lineptr, size_t *n, FILE *stream);
   ensures errno_set:
     __fc_errno == \old(errno) ||
     __fc_errno \in {EINVAL, EMFILE, ENOMEM};
-  allocates buf;
 */
 extern FILE *fmemopen(void *restrict buf, size_t size,
                       const char *restrict mode);
@@ -610,14 +610,29 @@ extern FILE *fmemopen(void *restrict buf, size_t size,
 /*@
   requires valid_strp: \valid(strp);
   requires valid_fmt: valid_read_string(fmt);
+  allocates *strp;
   assigns __fc_heap_status \from indirect:fmt[0 ..], __fc_heap_status;
   assigns \result \from indirect:fmt[0 ..], indirect:__fc_heap_status;
   assigns *strp \from fmt[0 ..], indirect:__fc_heap_status;
   //missing: variadic arguments
-  ensures result_error_or_written_byes: \result == -1 || \result >= 0;
-  allocates *strp;
+  ensures result_error_or_written_bytes: \result == -1 || \result >= 0;
 */
-int asprintf(char **strp, const char *fmt, ...);
+extern int asprintf(char **strp, const char *fmt, ...);
+
+// GNU extension
+/*@
+  requires valid_strp: \valid(strp);
+  requires valid_fmt: valid_read_string(fmt);
+  allocates *strp;
+  assigns __fc_heap_status
+    \from indirect:fmt[0 ..], indirect:ap, __fc_heap_status;
+  assigns \result \from indirect:fmt[0 ..], indirect:__fc_heap_status;
+  assigns *strp \from fmt[0 ..], ap, indirect:__fc_heap_status;
+  //missing: variadic arguments
+  ensures result_error_or_written_bytes: \result == -1 || \result >= 0;
+*/
+extern int vasprintf(char **restrict strp, const char *restrict fmt,
+                     va_list ap);
 
 __END_DECLS
 

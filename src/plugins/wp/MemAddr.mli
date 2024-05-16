@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -26,7 +26,7 @@ open Lang.F
     symbols. Types indicates in the documentation are Why3 types, not OCaml
     types.
 
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 
 val t_addr : Lang.tau

@@ -17,9 +17,11 @@
   \return(getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
   \return(realpath) == 0 (auto)
+  \return(canonicalize_file_name) == 0 (auto)
   \return(getcwd) == 0 (auto)
   \return(ttyname) == 0 (auto)
   \return(memchr) == 0 (auto)
+  \return(memrchr) == 0 (auto)
   \return(memcpy) == 0 (auto)
   \return(mempcpy) == 0 (auto)
   \return(memmove) == 0 (auto)
@@ -39,8 +41,10 @@
   \return(stpcpy) == 0 (auto)
   \return(strcat) == 0 (auto)
   \return(strncat) == 0 (auto)
+  \return(memmem) == 0 (auto)
   \return(strdup) == 0 (auto)
   \return(strndup) == 0 (auto)
+  \return(stpncpy) == 0 (auto)
   \return(strsignal) == 0 (auto)
   \return(bind) == 0 (auto)
   \return(socket) == -1 (auto)
@@ -48,12 +52,12 @@
   \return(inet_addr) == 4294967295 (auto)
   \return(inet_ntoa) == 0 (auto)
   \return(inet_ntop) == 0 (auto)
-  \return(gai_strerror) == 0 (auto)
-  \return(getaddrinfo) == 0 (auto)
-  \return(gethostbyname) == 0 (auto)
   \return(Frama_C_nondet) == 0 (auto)
   \return(Frama_C_nondet_ptr) == 0 (auto)
   \return(Frama_C_malloc_fresh) == 0 (auto)
+  \return(gai_strerror) == 0 (auto)
+  \return(getaddrinfo) == 0 (auto)
+  \return(gethostbyname) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -61,7 +65,7 @@
   
 [eva] netdb_c.c:25: Call to builtin memset
 [eva] netdb_c.c:25: function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:151: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] computing for function getaddrinfo <- main.
   Called from netdb_c.c:34.
@@ -140,7 +144,7 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva] FRAMAC_SHARE/libc/netdb.c:74: 
   function strcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:373: 
+[eva] FRAMAC_SHARE/libc/string.h:425: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcpy
 [eva] Recording results for getaddrinfo
@@ -196,76 +200,76 @@
 [eva] computing for function gethostbyname <- main.
   Called from netdb_c.c:63.
 [eva] computing for function res_search <- gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:141.
+  Called from FRAMAC_SHARE/libc/netdb.c:145.
 [eva] computing for function Frama_C_char_interval <- res_search <- 
                           gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
 [eva] using specification for function Frama_C_char_interval
-[eva] FRAMAC_SHARE/libc/netdb.c:99: 
+[eva] FRAMAC_SHARE/libc/netdb.c:103: 
   function Frama_C_char_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_char_interval
 [eva] computing for function Frama_C_char_interval <- res_search <- 
                           gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
 [eva] Done for function Frama_C_char_interval
 [eva] computing for function Frama_C_char_interval <- res_search <- 
                           gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
 [eva] Done for function Frama_C_char_interval
-[eva] FRAMAC_SHARE/libc/netdb.c:98: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/netdb.c:102: starting to merge loop iterations
 [eva] computing for function Frama_C_char_interval <- res_search <- 
                           gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
-[eva] Done for function Frama_C_char_interval
-[eva] computing for function Frama_C_char_interval <- res_search <- 
-                          gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
 [eva] Done for function Frama_C_char_interval
 [eva] computing for function Frama_C_char_interval <- res_search <- 
                           gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
 [eva] Done for function Frama_C_char_interval
 [eva] computing for function Frama_C_char_interval <- res_search <- 
                           gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:99.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
+[eva] Done for function Frama_C_char_interval
+[eva] computing for function Frama_C_char_interval <- res_search <- 
+                          gethostbyname <- main.
+  Called from FRAMAC_SHARE/libc/netdb.c:103.
 [eva] Done for function Frama_C_char_interval
 [eva] computing for function Frama_C_interval <- res_search <- gethostbyname <- 
                           main.
-  Called from FRAMAC_SHARE/libc/netdb.c:102.
-[eva] FRAMAC_SHARE/libc/netdb.c:102: 
+  Called from FRAMAC_SHARE/libc/netdb.c:106.
+[eva] FRAMAC_SHARE/libc/netdb.c:106: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for res_search
 [eva] Done for function res_search
 [eva] computing for function Frama_C_nondet <- gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:144.
+  Called from FRAMAC_SHARE/libc/netdb.c:148.
 [eva] using specification for function Frama_C_nondet
 [eva] Done for function Frama_C_nondet
 [eva] computing for function inet_addr <- gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:147.
+  Called from FRAMAC_SHARE/libc/netdb.c:151.
 [eva] using specification for function inet_addr
-[eva] FRAMAC_SHARE/libc/netdb.c:147: 
+[eva] FRAMAC_SHARE/libc/netdb.c:151: 
   function inet_addr: precondition 'valid_arg' got status valid.
 [eva] Done for function inet_addr
-[eva] FRAMAC_SHARE/libc/netdb.c:148: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/netdb.c:148: 
+[eva] FRAMAC_SHARE/libc/netdb.c:152: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/netdb.c:152: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/netdb.c:148: 
+[eva] FRAMAC_SHARE/libc/netdb.c:152: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/netdb.c:148: 
+[eva] FRAMAC_SHARE/libc/netdb.c:152: 
   function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:101: 
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] computing for function strncpy <- gethostbyname <- main.
-  Called from FRAMAC_SHARE/libc/netdb.c:149.
+  Called from FRAMAC_SHARE/libc/netdb.c:153.
 [eva] using specification for function strncpy
-[eva] FRAMAC_SHARE/libc/netdb.c:149: 
+[eva] FRAMAC_SHARE/libc/netdb.c:153: 
   function strncpy: precondition 'valid_nstring_src' got status valid.
-[eva] FRAMAC_SHARE/libc/netdb.c:149: 
+[eva] FRAMAC_SHARE/libc/netdb.c:153: 
   function strncpy: precondition 'room_nstring' got status valid.
-[eva] FRAMAC_SHARE/libc/netdb.c:149: 
+[eva] FRAMAC_SHARE/libc/netdb.c:153: 
   function strncpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:389: 
+[eva] FRAMAC_SHARE/libc/string.h:441: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strncpy
 [eva] Recording results for gethostbyname

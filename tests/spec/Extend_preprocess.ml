@@ -36,13 +36,13 @@ let preprocess_foo_ptree_element kind = function
 
 let preprocess_foo_ptree kind = List.map (preprocess_foo_ptree_element kind)
 
-let register registration ?visitor ?printer ?short_printer kind =
+let register registration ?visitor ?printer ?short_printer ?is_same_ext kind =
   let registration ?preprocessor typer =
     registration
-      (kind ^ "_foo") ?preprocessor typer ?visitor ?printer ?short_printer false
+      (kind ^ "_foo")
+      ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext false
   in
   registration ~preprocessor:(preprocess_foo_ptree kind) (ext_typing kind)
-
 
 let () =
   let open Acsl_extension in

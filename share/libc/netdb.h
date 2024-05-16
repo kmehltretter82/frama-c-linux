@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -28,6 +28,7 @@ __PUSH_FC_STDLIB
 #include "netinet/in.h"
 #include "sys/socket.h"
 #include "inttypes.h"
+#include "__fc_builtin.h"
 #include "__fc_string_axiomatic.h"
 
 __BEGIN_DECLS
@@ -123,8 +124,8 @@ extern void endnetent(void);
 extern void endprotoent(void);
 extern void endservent(void);
 /*@ requires addrinfo_valid: \valid(addrinfo);
-  assigns \nothing;
   frees addrinfo;
+  assigns \nothing;
   ensures allocation: \allocable(addrinfo);
 */
 extern void freeaddrinfo(struct addrinfo * addrinfo);
@@ -143,11 +144,11 @@ extern const char *gai_strerror(int errcode);
     requires hints_option: hints == \null || \valid_read(hints);
     requires valid_res: \valid(res);
 
+    allocates *res;
+
     assigns *res \from indirect:nodename, indirect:servname, indirect:hints;
     assigns \result \from indirect:nodename, indirect:servname,indirect:hints;
     assigns errno \from indirect:nodename, indirect:servname, indirect:hints;
-
-    allocates *res;
 
     behavior empty_request:
       assumes empty: nodename == \null && servname == \null;
@@ -178,7 +179,14 @@ extern int getaddrinfo(
   struct addrinfo **restrict res);
 
 extern struct hostent *gethostbyaddr(const void *, socklen_t, int);
-extern struct hostent *gethostbyname(const char *);
+
+/*@
+  allocates \result;
+  assigns *\result \from name[0 .. strlen(name)], Frama_C_entropy_source;
+  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+*/
+extern struct hostent *gethostbyname(const char *name);
+
 extern struct hostent *gethostent(void);
 extern int getnameinfo(const struct sockaddr *restrict, socklen_t,
  char *restrict, socklen_t, char *restrict,
