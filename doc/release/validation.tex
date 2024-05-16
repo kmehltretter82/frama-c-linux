@@ -100,8 +100,9 @@ git ls-files -z | \
 parallel -0 -n1 git blame --line-porcelain | \
 sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
 \end{verbatim}
-This requires to install the package \texttt{parallel} (source for the command:
-\url{https://gist.github.com/amitchhajer/4461043}).
+
+\textbf{Note:} This requires to install the package \texttt{parallel}. Source
+for the command: \url{https://gist.github.com/amitchhajer/4461043}.
 
 \subsection{Commit}
 
@@ -196,10 +197,11 @@ expected format is:
 \end{lstlisting}
 
 It should only list main changes, that will be displayed on the event section of
-the website and the wiki page. Make sure to use markdown code formating
-\verb+``+ if the texte contains things that could be affected by markdown
-formatting (for example \verb+\word1_word2+ will be displayed as
-\verb+word2+ without code formatting.
+the website and the wiki page.
+
+\textbf{Note:} Make sure to use markdown code formating \verb+``+ if the texte
+contains things that could be affected by markdown formatting (for example
+\verb+\word1_word2+ will be displayed as \verb+word2+ without code formatting.
 
 Create the version commit, tag it using \texttt{git tag \$(cat VERSION | sed -e "s/\textasciitilde /-/")}
 and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/\textasciitilde/-/")}).
