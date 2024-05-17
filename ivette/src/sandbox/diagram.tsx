@@ -25,15 +25,40 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
-import { Diagram } from 'dome/graph/diagram';
+import { Scroll } from 'dome/layout/boxes';
+import { HSplit } from 'dome/layout/splitters';
+import { Diagram, Node, Edge } from 'dome/graph/diagram';
 import { registerSandbox } from 'ivette';
 
 // --------------------------------------------------------------------------
 // --- Init functions for nodes and edges
 // --------------------------------------------------------------------------
 
+const nodes : Node[] = [
+  { id: 'A' },
+  { id: 'B' },
+];
+
+const edges : Edge[] = [
+  { source: 'A', target: 'B' }
+];
+
 function DiagramSample(): JSX.Element {
-  return <Diagram nodes={[]} edges={[]} />;
+  const [model, setModel] = React.useState('');
+  return (
+    <HSplit settings='sandbox.diagram.split'>
+      <Scroll>
+        <pre>
+          {model}
+        </pre>
+      </Scroll>
+      <Diagram
+        nodes={nodes}
+        edges={edges}
+        onModelChanged={setModel}
+      />
+    </HSplit >
+  );
 }
 
 /* -------------------------------------------------------------------------- */

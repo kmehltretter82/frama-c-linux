@@ -69,29 +69,69 @@ export interface DiagramProps {
   /** Styling the Graph main div element. */
   className?: string;
 
-  /** Prints the DOT specification instead of the graph (only in DEV) */
-  debug?: boolean;
+  /** Debug the generated DotModel */
+  onModelChanged?: (model: string) => void;
+
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- Dot Model                                                          --- */
 /* -------------------------------------------------------------------------- */
 
-type edgeSpec = { source : string, target : string };
-const edgeKey = (e: edgeSpec):string => `${e.source} -> ${e.target}`;
+type edgeSpec = { source: string, target: string };
+const edgeKey = (e: edgeSpec): string => `${e.source} -> ${e.target}`;
 
 class DotModel {
-  private spec = 'digraph {';
-  print(...text: string []): DotModel {
+
+  // --- Basics
+  private spec = 'digraph {\n';
+  print(...text: string[]): DotModel {
     this.spec = this.spec.concat(...text);
     return this;
   }
-  println(...text: string []): DotModel {
+  println(...text: string[]): DotModel {
     this.spec = this.spec.concat(...text).concat('\n');
     return this;
   }
   flush(): string { return this.spec.concat('}'); }
+
+  // --- Graph
+  rankdir(d: Direction): DotModel {
+    return this.println('  rankdir="', d, '";');
+  }
+
+  // --- Special
+  quoted(a: string): DotModel { return this.print('"', a, '"'); }
+
+  // --- Node
+  node(n: Node): void {
+    this
+      .print('  ')
+      .quoted(n.id)
+      .print(' [')
+      .println('];');
+  }
+
+  // --- Edge
+  edge(e: Edge): void {
+    this
+      .print('  ')
+      .quoted(e.source)
+      .print(' -> ')
+      .quoted(e.target)
+      .print(' [')
+      .println('];');
+  }
 }
+
+const byStr = (a: string, b: string): number => {
+  if (a < b) return -1;
+  if (a > b) return +1;
+  return 0;
+}
+
+const byNode = (a: Node, b: Node): number => byStr(a.id, b.id);
+const byEdge = (a: Edge, b: Edge): number => byStr(edgeKey(a), edgeKey(b));
 
 /* -------------------------------------------------------------------------- */
 /* --- d3-Graphviz Component                                              --- */
@@ -100,17 +140,27 @@ class DotModel {
 interface GraphvizProps extends DiagramProps { size: Size }
 
 function Graphviz(props: GraphvizProps): JSX.Element {
-  const { nodes, edges, size } = props;
+  // --- Model Generation
+  const { direction = 'LR', nodes, edges } = props;
   const model = React.useMemo(() => {
     const dot = new DotModel();
+    dot.rankdir(direction);
+    nodes.concat().sort(byNode).forEach(n => dot.node(n));
+    edges.concat().sort(byEdge).forEach(e => dot.edge(e));
     return dot.flush();
   }, [nodes, edges]);
+  // --- Model Update Callback
+  const { onModelChanged } = props;
+  React.useEffect(() => {
+    if (onModelChanged) onModelChanged(model);
+  }, [model, onModelChanged]);
+  // --- Rendering
   return (
-    <Scroll style={size}>
-      <pre>
+    <div style={props.size}>
+      <pre style={{background: 'red'}}>
         {model}
       </pre>
-    </Scroll>
+    </div>
   );
 }
 
