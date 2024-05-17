@@ -35,6 +35,7 @@ DOME_DEV_PACKAGES= \
 	@types/react-dom@^18 \
 	@types/react-virtualized@^9.21.8 \
 	@types/diff@^5 \
+	@types/d3-graphviz\
 	typescript@^5
 
 DOME_APP_PACKAGES= \
@@ -54,6 +55,7 @@ DOME_APP_PACKAGES= \
 	@lezer/cpp@^1 \
 	react-virtualized-auto-sizer@^1.0.22\
 	react-force-graph-2d@^1.25.4\
-	react-force-graph-3d@^1.24.2
+	react-force-graph-3d@^1.24.2\
+	d3-graphviz
 
 # --------------------------------------------------------------------------

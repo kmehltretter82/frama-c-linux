@@ -21,8 +21,9 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { Scroll } from 'dome/layout/boxes';
+import { Catch } from 'dome/errors';
 import { Size } from 'react-virtualized';
+import * as d3 from 'd3-graphviz';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 /* -------------------------------------------------------------------------- */
@@ -89,10 +90,12 @@ class DotModel {
     this.spec = this.spec.concat(...text);
     return this;
   }
+
   println(...text: string[]): DotModel {
     this.spec = this.spec.concat(...text).concat('\n');
     return this;
   }
+
   flush(): string { return this.spec.concat('}'); }
 
   // --- Graph
@@ -128,7 +131,7 @@ const byStr = (a: string, b: string): number => {
   if (a < b) return -1;
   if (a > b) return +1;
   return 0;
-}
+};
 
 const byNode = (a: Node, b: Node): number => byStr(a.id, b.id);
 const byEdge = (a: Edge, b: Edge): number => byStr(edgeKey(a), edgeKey(b));
@@ -137,9 +140,12 @@ const byEdge = (a: Edge, b: Edge): number => byStr(edgeKey(a), edgeKey(b));
 /* --- d3-Graphviz Component                                              --- */
 /* -------------------------------------------------------------------------- */
 
+let divId = 0;
+const newDivId = (): string => `dome_d3gv_${++divId}`;
+
 interface GraphvizProps extends DiagramProps { size: Size }
 
-function Graphviz(props: GraphvizProps): JSX.Element {
+function GraphvizView(props: GraphvizProps): JSX.Element {
   // --- Model Generation
   const { direction = 'LR', nodes, edges } = props;
   const model = React.useMemo(() => {
@@ -148,19 +154,24 @@ function Graphviz(props: GraphvizProps): JSX.Element {
     nodes.concat().sort(byNode).forEach(n => dot.node(n));
     edges.concat().sort(byEdge).forEach(e => dot.edge(e));
     return dot.flush();
-  }, [nodes, edges]);
+  }, [direction, nodes, edges]);
   // --- Model Update Callback
   const { onModelChanged } = props;
   React.useEffect(() => {
     if (onModelChanged) onModelChanged(model);
   }, [model, onModelChanged]);
   // --- Rendering
+  const id = React.useMemo(newDivId, []);
+  const { width, height } = props.size;
+  React.useEffect(() => {
+    d3.graphviz(`#${id}`, {
+      fit: false, zoom: false, width, height,
+    }).renderDot(model);
+  }, [id, model, width, height]);
   return (
-    <div style={props.size}>
-      <pre style={{background: 'red'}}>
-        {model}
-      </pre>
-    </div>
+    <Catch label='Graphviz Error'>
+      <div id={id} className={props.className} />
+    </Catch>
   );
 }
 
@@ -176,7 +187,7 @@ export function Diagram(props: DiagramProps): JSX.Element {
         <AutoSizer>
           {(size: Size) => (
             <div className={props.className}>
-              <Graphviz size={size} {...props} />
+              <GraphvizView size={size} {...props} />
             </div>
           )}
         </AutoSizer>

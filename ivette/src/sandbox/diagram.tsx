@@ -34,12 +34,12 @@ import { registerSandbox } from 'ivette';
 // --- Init functions for nodes and edges
 // --------------------------------------------------------------------------
 
-const nodes : Node[] = [
+const nodes: Node[] = [
   { id: 'A' },
   { id: 'B' },
 ];
 
-const edges : Edge[] = [
+const edges: Edge[] = [
   { source: 'A', target: 'B' }
 ];
 
