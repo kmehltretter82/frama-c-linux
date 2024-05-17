@@ -101,21 +101,17 @@ let pp_lvs fmt (lvs : C.logic_var list) =
         Cpp.pp_logic_var lv Cpp.pp_logic_type lv.lv_type
     ) lvs;
 
-  (* let pp_id_path  (id : W.Ident.ident) =
-     Format.printf "@ %s " @@ construct_acsl_name id in
-     assert false *)
-
-  (* -------------------------------------------------------------------------- *)
-  (* ---    Types                                                           --- *)
-  (* -------------------------------------------------------------------------- *)
+  (* -------------------------------------------------------------------------*)
+  (* ---    Types                                                           - *)
+  (* -------------------------------------------------------------------------*)
 
 
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
   paths : string list;
-  _types : C.logic_type_info list;
-  _logics : C.logic_info list;
+  types : C.logic_type_info list;
+  logics : C.logic_info list;
 }
 
 type env = {
@@ -124,7 +120,7 @@ type env = {
   lenv : C.logic_info W.Term.Hls.t;
   lils : W.Term.lsymbol Logic_info.Hashtbl.t;
   ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
-  _menv : why3module Datatype.String.Hashtbl.t
+  menv : why3module Datatype.String.Hashtbl.t
 }
 
 
@@ -191,6 +187,9 @@ and lti_of_ts (env : env) (ts : W.Ty.tysymbol) : C.logic_type_info =
       }
     in W.Ty.Hts.add env.tenv ts lti ;
     Logic_type_info.Hashtbl.add env.ltits lti ts;
+    let cwmod = Datatype.String.Hashtbl.find env.menv @@ recover_module ts.ts_name in
+    Datatype.String.Hashtbl.replace env.menv (recover_module ts.ts_name)
+      {cwmod with types = cwmod.types @ [lti]};
     lti
 
 
@@ -226,10 +225,9 @@ let li_of_ls (env:env) (ls : W.Term.lsymbol)  : C.logic_info =
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
   Logic_info.Hashtbl.add env.lils li ls;
-  L.debug ~level:0 "Module is : %s" @@ recover_module ls.ls_name;
-  let o = Datatype.String.Hashtbl.find env._menv @@ recover_module ls.ls_name in
-  Datatype.String.Hashtbl.replace env._menv (recover_module ls.ls_name)
-    {o with _logics = o._logics @ [li]};
+  let cwmod = Datatype.String.Hashtbl.find env.menv @@ recover_module ls.ls_name in
+  Datatype.String.Hashtbl.replace env.menv (recover_module ls.ls_name)
+    {cwmod with logics = cwmod.logics @ [li]};
   li
 
 
@@ -240,8 +238,8 @@ let li_of_ls (env:env) (ls : W.Term.lsymbol)  : C.logic_info =
 let import_theory (env : env) thname =
   let theory_name, theory_path = extract_path thname in
   try
-    Datatype.String.Hashtbl.add env._menv thname
-      { _logics = []; _types = []; paths = theory_path};
+    Datatype.String.Hashtbl.add env.menv thname
+      { logics = []; types = []; paths = theory_path};
     let theory = W.Env.read_theory env.wenv theory_path theory_name in
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
@@ -296,8 +294,8 @@ let () =
           let lenv  = W.Term.Hls.create 0 in
           let lils  = Logic_info.Hashtbl.create 0 in
           let ltits  = Logic_type_info.Hashtbl.create 0 in
-          let _menv  = Datatype.String.Hashtbl.create 0 in
-          let env : env = { wenv; tenv; lenv; lils; ltits; _menv } in
+          let menv  = Datatype.String.Hashtbl.create 0 in
+          let env : env = { wenv; tenv; lenv; lils; ltits; menv } in
           add_builtins env;
           List.iter (import_theory env) @@ imports;
           W.Ty.Hts.iter (fun (tys) (lti) ->
@@ -310,11 +308,14 @@ let () =
               L.result "Associated parameters : @[<hov2>%a@]" pp_lvs li.l_profile;
             ) env.lenv;
           Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
-              L.result "Encoutered %s at %s" s (String.concat "::" why3mod.paths);
+              L.result "@[Module %s at %s@]" s (String.concat "::" why3mod.paths);
               List.iter (fun (li) ->
-                  L.result "%a" pp_li li)
-                why3mod._logics;
-            ) env._menv
+                  L.result "Logic : @[<hov2>%a@]" pp_li li)
+                why3mod.logics;
+              List.iter (fun (lti) ->
+                  L.result "Type : @[<hov2>%a@]" pp_lti lti)
+                why3mod.types;
+            ) env.menv
         end
 
     end
