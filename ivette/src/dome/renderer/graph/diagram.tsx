@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
-
+import { Scroll } from 'dome/layout/boxes';
 import { Size } from 'react-virtualized';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
@@ -68,6 +68,29 @@ export interface DiagramProps {
 
   /** Styling the Graph main div element. */
   className?: string;
+
+  /** Prints the DOT specification instead of the graph (only in DEV) */
+  debug?: boolean;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Dot Model                                                          --- */
+/* -------------------------------------------------------------------------- */
+
+type edgeSpec = { source : string, target : string };
+const edgeKey = (e: edgeSpec):string => `${e.source} -> ${e.target}`;
+
+class DotModel {
+  private spec = 'digraph {';
+  print(...text: string []): DotModel {
+    this.spec = this.spec.concat(...text);
+    return this;
+  }
+  println(...text: string []): DotModel {
+    this.spec = this.spec.concat(...text).concat('\n');
+    return this;
+  }
+  flush(): string { return this.spec.concat('}'); }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -76,8 +99,19 @@ export interface DiagramProps {
 
 interface GraphvizProps extends DiagramProps { size: Size }
 
-function Graphviz(_props: GraphvizProps): JSX.Element {
-  return <></>;
+function Graphviz(props: GraphvizProps): JSX.Element {
+  const { nodes, edges, size } = props;
+  const model = React.useMemo(() => {
+    const dot = new DotModel();
+    return dot.flush();
+  }, [nodes, edges]);
+  return (
+    <Scroll style={size}>
+      <pre>
+        {model}
+      </pre>
+    </Scroll>
+  );
 }
 
 /* -------------------------------------------------------------------------- */
@@ -86,7 +120,6 @@ function Graphviz(_props: GraphvizProps): JSX.Element {
 
 export function Diagram(props: DiagramProps): JSX.Element {
   const { display = true } = props;
-
   return (
     <>
       {display && (

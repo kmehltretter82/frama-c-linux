@@ -25,6 +25,7 @@
 /* -------------------------------------------------------------------------- */
 
 import React from 'react';
+import { Diagram } from 'dome/graph/diagram';
 import { registerSandbox } from 'ivette';
 
 // --------------------------------------------------------------------------
@@ -32,7 +33,7 @@ import { registerSandbox } from 'ivette';
 // --------------------------------------------------------------------------
 
 function DiagramSample(): JSX.Element {
-  return <></>;
+  return <Diagram nodes={[]} edges={[]} />;
 }
 
 /* -------------------------------------------------------------------------- */
