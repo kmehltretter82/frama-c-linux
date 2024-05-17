@@ -220,6 +220,9 @@ val wkey_parser_unsupported: warn_category
 val wkey_parser_unsupported_attributes: warn_category
 (** Warning related to unsupported attributes during parsing. *)
 
+val wkey_parser_unsupported_pragma: warn_category
+(** Warning related to unsupported _Pragma's during parsing. *)
+
 val wkey_asm: warn_category
 (** Warnings related to assembly code. *)
 
