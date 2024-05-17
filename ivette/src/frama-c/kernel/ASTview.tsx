@@ -433,20 +433,27 @@ function createPropertiesNodes(): Editor.Aspect<Property[]> {
 }
 
 // Bullet colors.
-function getBulletColor(status: States.Tag): string {
+function getBulletColors(status: States.Tag): [string, string] {
+  const yellow = '#FFE62E';
+  const red = '#FF0000';
+  const blue = '#73bbbb';
+  const green = '#499E00';
+  const black = '#000000';
+  const white = '#FFFFFF';
+  const magenta = '#FF00FF';
   switch (status.name) {
-    case 'unknown': return '#FFE62E';
-    case 'invalid':
-    case 'invalid_under_hyp': return '#FF0000';
-    case 'valid':
-    case 'valid_under_hyp': return '#499E00';
-    case 'considered_valid': return '#73bbbb';
-    case 'invalid_but_dead':
-    case 'valid_but_dead':
-    case 'unknown_but_dead': return '#000000';
-    case 'never_tried': return '#FFFFFF';
-    case 'inconsistent': return '#FF00FF';
-    default: return '#FFE62E';
+    case 'unknown': return [yellow, yellow];
+    case 'invalid': return [red, red];
+    case 'invalid_under_hyp': return [red, yellow];
+    case 'valid': return [green, green];
+    case 'valid_under_hyp': return [green, yellow];
+    case 'considered_valid': return [green, blue];
+    case 'invalid_but_dead': return [red, black];
+    case 'valid_but_dead': return [green, black];
+    case 'unknown_but_dead': return [yellow, black];
+    case 'never_tried': return [white, white];
+    case 'inconsistent': return [magenta, magenta];
+    default: return [yellow, yellow];
   }
 }
 
@@ -457,11 +464,20 @@ class PropertyBullet extends Editor.GutterMarker {
   constructor(status?: States.Tag) {
     super();
     this.bullet = document.createElement('div');
-    this.bullet.innerHTML = '⬤';
+    this.bullet.innerHTML = ' ';
     if (status) {
-      this.bullet.style.color = getBulletColor(status);
+      const [bulletColorLeft, bulletColorRight] = getBulletColors(status);
+      this.bullet.style.width = "60%";
+      this.bullet.style.aspectRatio = "1 / 1";
       this.bullet.style.textAlign = 'center';
-      this.bullet.style.webkitTextStroke = 'thin black';
+      const bulletGradient =
+        bulletColorLeft + ' 49%, ' + bulletColorRight + ' 51%';
+      this.bullet.style.background =
+        'linear-gradient(to right, ' + bulletGradient + ')';
+      this.bullet.style.borderRadius = '50%';
+      this.bullet.style.border = '0.5px solid rgba(0, 0, 0, 0.5)';
+      this.bullet.style.marginLeft = '20%';
+      this.bullet.style.marginTop = '25%';
       if (status.descr) this.bullet.title = status.descr;
     }
   }
