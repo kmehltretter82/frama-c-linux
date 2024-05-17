@@ -64,6 +64,9 @@ let construct_acsl_name (id : W.Ident.ident) =
     String.concat "::" (paths @ name :: List.rev_append q [of_infix t])
   | [] -> ""
 
+let recover_module (id : W.Ident.ident) =
+  let (paths,name,_) = T.restore_path id in
+  String.concat "." paths ^ "." ^ name
 
 (* For debug only*)
 let pp_id fmt (id: W.Ident.ident) =
@@ -98,6 +101,10 @@ let pp_lvs fmt (lvs : C.logic_var list) =
         Cpp.pp_logic_var lv Cpp.pp_logic_type lv.lv_type
     ) lvs;
 
+  (* let pp_id_path  (id : W.Ident.ident) =
+     Format.printf "@ %s " @@ construct_acsl_name id in
+     assert false *)
+
   (* -------------------------------------------------------------------------- *)
   (* ---    Types                                                           --- *)
   (* -------------------------------------------------------------------------- *)
@@ -106,7 +113,7 @@ let pp_lvs fmt (lvs : C.logic_var list) =
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
-  _paths : string list;
+  paths : string list;
   _types : C.logic_type_info list;
   _logics : C.logic_info list;
 }
@@ -219,7 +226,10 @@ let li_of_ls (env:env) (ls : W.Term.lsymbol)  : C.logic_info =
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
   Logic_info.Hashtbl.add env.lils li ls;
-
+  L.debug ~level:0 "Module is : %s" @@ recover_module ls.ls_name;
+  let o = Datatype.String.Hashtbl.find env._menv @@ recover_module ls.ls_name in
+  Datatype.String.Hashtbl.replace env._menv (recover_module ls.ls_name)
+    {o with _logics = o._logics @ [li]};
   li
 
 
@@ -231,7 +241,7 @@ let import_theory (env : env) thname =
   let theory_name, theory_path = extract_path thname in
   try
     Datatype.String.Hashtbl.add env._menv thname
-      { _logics = []; _types = []; _paths = theory_path};
+      { _logics = []; _types = []; paths = theory_path};
     let theory = W.Env.read_theory env.wenv theory_path theory_name in
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
@@ -300,7 +310,10 @@ let () =
               L.result "Associated parameters : @[<hov2>%a@]" pp_lvs li.l_profile;
             ) env.lenv;
           Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
-              L.result "Encoutered %s at %s" s (String.concat "::" why3mod._paths)
+              L.result "Encoutered %s at %s" s (String.concat "::" why3mod.paths);
+              List.iter (fun (li) ->
+                  L.result "%a" pp_li li)
+                why3mod._logics;
             ) env._menv
         end
 
