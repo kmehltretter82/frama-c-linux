@@ -29,7 +29,7 @@
   function memchr: precondition 'danglingness' got status unknown.
 [eva] FRAMAC_SHARE/libc/string.h:78: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
-[eva] FRAMAC_SHARE/libc/string.h:85: 
+[eva] FRAMAC_SHARE/libc/string.h:86: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
 [eva] memchr.c:90: Frama_C_show_each_mymemchr: {3}
 [eva] memchr.c:91: assertion got status valid.
@@ -141,7 +141,7 @@
   Called from memchr.c:201.
 [eva] memchr.c:193: Call to builtin memset
 [eva] memchr.c:193: function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:151: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Recording results for init_array_nondet
 [eva] Done for function init_array_nondet

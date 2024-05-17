@@ -80,6 +80,10 @@ char *__fc_env[ARG_MAX];
 #define __FC_INITENV_LEN 64
 static char __fc_env_strings[__FC_INITENV_LEN];
 
+/*@
+  assigns __fc_env_strings[0 .. __FC_INITENV_LEN-1], __fc_env[0 .. ARG_MAX - 1]
+    \from Frama_C_entropy_source;
+*/
 static void __fc_initenv() {
   static char init;
   if (!init) {
@@ -124,7 +128,7 @@ int putenv(char *string)
   // 2. key in string found in env ==> modify an existing entry
   if (Frama_C_nondet(0, 1)) {
     if (Frama_C_nondet(0, 1)) {
-      //TODO: errno = ENOMEM;
+      errno = ENOMEM;
       return Frama_C_interval(INT_MIN, INT_MAX); // return a non-zero value
     }
     __fc_env[Frama_C_interval(0, ARG_MAX-1)] = string;
@@ -135,12 +139,12 @@ int putenv(char *string)
 int setenv(const char *name, const char *value, int overwrite)
 {
   if (strchr(name, '=')) {
-    //TODO: errno = EINVAL;
+    errno = EINVAL;
     return -1;
   }
   size_t namelen = strlen(name);
   if (namelen == 0) {
-    //TODO: errno = EINVAL;
+    errno = EINVAL;
     return -1;
   }
 
@@ -151,7 +155,7 @@ int setenv(const char *name, const char *value, int overwrite)
   // 2. found 'name' but will not overwrite
   // 3. did not find name and has available memory
   if (Frama_C_nondet(0, 1)) {
-    //TODO: errno = ENOMEM;
+    errno = ENOMEM;
     return -1;
   } else {
     if (Frama_C_nondet(0, 1)) {
@@ -165,12 +169,12 @@ int setenv(const char *name, const char *value, int overwrite)
 int unsetenv(const char *name)
 {
   if (strchr(name, '=')) {
-    //TODO: errno = EINVAL;
+    errno = EINVAL;
     return -1;
   }
   size_t namelen = strlen(name);
   if (namelen == 0) {
-    //TODO: errno = EINVAL;
+    errno = EINVAL;
     return -1;
   }
 

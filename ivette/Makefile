@@ -279,7 +279,6 @@ endif
 # --------------------------------------------------------------------------
 
 tests: dist
-	@cp -r out/renderer/* out/main/
 	@echo "[Ivette] running tests"
 	@dune exec -- yarn playwright test
 

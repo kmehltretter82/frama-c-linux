@@ -265,7 +265,7 @@
 <      "output.\n"[bits 0 to 71]
 ---
 >     idct_init; idct_mc1[0..7][0..7]; idct_mc2[0..7][0..7]
-3909,3931d3743
+3963,3985d3797
 < [    -    ] Assertion 'Eva,initialization' (file idct.c, line 129)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
@@ -289,7 +289,7 @@
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
 <              - Assertion 'Eva,initialization' (file idct.c, line 145)
-3935,3957d3746
+3989,4011d3800
 < [    -    ] Assertion 'Eva,initialization' (file idct.c, line 163)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
@@ -313,11 +313,11 @@
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             By RedundantAlarms, with pending:
 <              - Assertion 'Eva,initialization' (file idct.c, line 180)
-3979,3981d3767
+4033,4035d3821
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 109)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-3985,4018d3770
+4039,4072d3824
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 116)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
@@ -352,11 +352,11 @@
 < [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 124)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
-4039,4041d3790
+4093,4095d3844
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 150)
 <             assert Eva: initialization: \initialized(&tmp1[i][j]);
 <             tried with Eva.
-4045,4078d3793
+4099,4132d3847
 < [    -    ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 157)
 <             assert Eva: initialization: \initialized(&tmp2[i][j]);
 <             tried with Eva.
@@ -391,7 +391,7 @@
 < [    -    ] Assertion 'Eva,float_to_int' (file ieee_1180_1990.c, line 165)
 <             assert Eva: float_to_int: tmp2[i][j] - 0.5 < 2147483648;
 <             tried with Eva.
-4178,4194c3893,3899
+4232,4248c3947,3953
 < [ Partial ] Assertion 'Eva,initialization' (file ieee_1180_1990.c, line 358)
 <             assert Eva: initialization: \initialized(&res[i].pmse[j][k]);
 <             By RedundantAlarms, with pending:
@@ -417,7 +417,7 @@
 >             reachability of stmt line 196 in main
 >             by Eva.
 > [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 211)' at call 'printf_va_1' (file ieee_1180_1990.c, line 195)
-4198,4199c3903,3906
+4252,4253c3957,3960
 <             by Eva.
 < [  Valid  ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 211)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
 ---
@@ -425,22 +425,22 @@
 >             By Eva because:
 >              - Unreachable call 'printf_va_1' (file ieee_1180_1990.c, line 195)
 > [  Dead   ] Instance of 'Pre-condition (file FRAMAC_SHARE/libc/stdio.h, line 211)' at call 'printf_va_2' (file ieee_1180_1990.c, line 196)
-4203c3910,3912
+4257c3964,3966
 <             by Eva.
 ---
 >             Locally valid, but unreachable.
 >             By Eva because:
 >              - Unreachable call 'printf_va_2' (file ieee_1180_1990.c, line 196)
-4260,4261c3969
-<    194 Completely validated
+4314,4315c4023
+<    196 Completely validated
 <     16 Locally validated
 ---
->    192 Completely validated
-4263,4264c3971,3974
+>    194 Completely validated
+4317,4318c4025,4028
 <     56 To be validated
-<    836 Total
+<    849 Total
 ---
 >     32 To be validated
 >      2 Dead properties
 >      2 Unreachable
->    798 Total
+>    811 Total

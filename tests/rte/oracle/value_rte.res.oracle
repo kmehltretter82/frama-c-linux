@@ -901,6 +901,23 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'getline'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'fmemopen'
 --------------------------------------------------------------------------------
 
@@ -908,34 +925,53 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'errno_set'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 592)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 593)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 592)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 593)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 594)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 595)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 601) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 592) 
             Unverifiable but considered Valid.
 
 --------------------------------------------------------------------------------
 --- Properties of Function 'asprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition 'result_error_or_written_byes'
+[ Extern  ] Post-condition 'result_error_or_written_bytes'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 613)
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 613)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 614)
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 614)
             Unverifiable but considered Valid.
 [ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 615)
             Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 616)
+            Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 618) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 613) 
+            Unverifiable but considered Valid.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'vasprintf'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_error_or_written_bytes'
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 627)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 627)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 629)
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 630)
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 626) 
             Unverifiable but considered Valid.
 
 --------------------------------------------------------------------------------
@@ -952,8 +988,8 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-    77 Completely validated
-   228 Considered valid
+    79 Completely validated
+   239 Considered valid
      1 To be validated
-   306 Total
+   319 Total
 --------------------------------------------------------------------------------

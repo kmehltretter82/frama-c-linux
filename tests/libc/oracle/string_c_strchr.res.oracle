@@ -10,10 +10,8 @@
   Called from string_c_strchr.c:62.
 [eva] string_c_strchr.c:62: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:184: 
+[eva] FRAMAC_SHARE/libc/string.h:205: 
   function strchr, behavior not_found: postcondition 'result_null' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:187: 
-  function strchr, behavior default: postcondition 'result_null_or_same_base' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
@@ -44,7 +42,7 @@
   Called from string_c_strchr.c:67.
 [eva] string_c_strchr.c:67: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:255: 
+[eva] FRAMAC_SHARE/libc/string.c:258: 
   Trace partitioning superposing up to 100 states
 [eva] Recording results for strchr
 [eva] Done for function strchr
@@ -58,18 +56,18 @@
   Called from string_c_strchr.c:70.
 [eva] string_c_strchr.c:70: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:177: 
-  function strchr, behavior found: postcondition 'result_char' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:178: 
-  function strchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:179: 
-  function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:180: 
+[eva] FRAMAC_SHARE/libc/string.h:197: 
   function strchr, behavior found: postcondition 'result_valid_string' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:181: 
+[eva] FRAMAC_SHARE/libc/string.h:198: 
+  function strchr, behavior found: postcondition 'result_char' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:199: 
+  function strchr, behavior found: postcondition 'result_same_base' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:200: 
+  function strchr, behavior found: postcondition 'result_in_length' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:202: 
   cannot evaluate ACSL term, unsupported logic var p
-[eva:alarm] FRAMAC_SHARE/libc/string.h:181: Warning: 
-  function strchr, behavior found: postcondition 'result_first_occur' got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:202: Warning: 
+  function strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.
 [eva] Recording results for strchr
 [eva] Done for function strchr
 [eva] computing for function strchr <- main.
@@ -172,7 +170,7 @@
   Called from string_c_strchr.c:87.
 [eva] string_c_strchr.c:87: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:255: 
+[eva] FRAMAC_SHARE/libc/string.c:258: 
   Trace partitioning superposing up to 200 states
 [eva] Recording results for strchr
 [eva] Done for function strchr

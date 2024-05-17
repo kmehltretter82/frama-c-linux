@@ -23,133 +23,133 @@
 [eva] computing for function getpwuid_r <- main.
   Called from pwd_c.c:14.
 [eva] computing for function __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:102.
+  Called from FRAMAC_SHARE/libc/pwd.c:107.
 [eva] computing for function Frama_C_make_unknown <- __fc_getpw_r <- getpwuid_r <- 
                           main.
-  Called from FRAMAC_SHARE/libc/pwd.c:56.
+  Called from FRAMAC_SHARE/libc/pwd.c:61.
 [eva] using specification for function Frama_C_make_unknown
-[eva] FRAMAC_SHARE/libc/pwd.c:56: 
+[eva] FRAMAC_SHARE/libc/pwd.c:61: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- __fc_getpw_r <- getpwuid_r <- 
                           main.
-  Called from FRAMAC_SHARE/libc/pwd.c:58.
-[eva] FRAMAC_SHARE/libc/pwd.c:58: 
+  Called from FRAMAC_SHARE/libc/pwd.c:63.
+[eva] FRAMAC_SHARE/libc/pwd.c:63: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- __fc_getpw_r <- getpwuid_r <- 
                           main.
-  Called from FRAMAC_SHARE/libc/pwd.c:60.
-[eva] FRAMAC_SHARE/libc/pwd.c:60: 
+  Called from FRAMAC_SHARE/libc/pwd.c:65.
+[eva] FRAMAC_SHARE/libc/pwd.c:65: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- __fc_getpw_r <- getpwuid_r <- 
                           main.
-  Called from FRAMAC_SHARE/libc/pwd.c:62.
-[eva] FRAMAC_SHARE/libc/pwd.c:62: 
+  Called from FRAMAC_SHARE/libc/pwd.c:67.
+[eva] FRAMAC_SHARE/libc/pwd.c:67: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_make_unknown <- __fc_getpw_r <- getpwuid_r <- 
                           main.
-  Called from FRAMAC_SHARE/libc/pwd.c:64.
-[eva] FRAMAC_SHARE/libc/pwd.c:64: 
-  function Frama_C_make_unknown: precondition 'valid_p' got status valid.
-[eva] Done for function Frama_C_make_unknown
-[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
   Called from FRAMAC_SHARE/libc/pwd.c:69.
-[eva] using specification for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/pwd.c:69: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:72.
-[eva] FRAMAC_SHARE/libc/pwd.c:72: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:73.
-[eva] FRAMAC_SHARE/libc/pwd.c:73: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
+  function Frama_C_make_unknown: precondition 'valid_p' got status valid.
+[eva] Done for function Frama_C_make_unknown
 [eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
   Called from FRAMAC_SHARE/libc/pwd.c:74.
+[eva] using specification for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/pwd.c:74: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/pwd.c:82: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/pwd.c:82: 
+[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
+  Called from FRAMAC_SHARE/libc/pwd.c:77.
+[eva] FRAMAC_SHARE/libc/pwd.c:77: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
+  Called from FRAMAC_SHARE/libc/pwd.c:78.
+[eva] FRAMAC_SHARE/libc/pwd.c:78: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwuid_r <- main.
+  Called from FRAMAC_SHARE/libc/pwd.c:79.
+[eva] FRAMAC_SHARE/libc/pwd.c:79: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] FRAMAC_SHARE/libc/pwd.c:87: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:87: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:82.
+  Called from FRAMAC_SHARE/libc/pwd.c:87.
 [eva] using specification for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:82: 
+[eva] FRAMAC_SHARE/libc/pwd.c:87: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:82: 
+[eva] FRAMAC_SHARE/libc/pwd.c:87: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:82: 
+[eva] FRAMAC_SHARE/libc/pwd.c:87: 
   function strcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:373: 
+[eva] FRAMAC_SHARE/libc/string.h:425: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:83: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/pwd.c:83: 
+[eva] FRAMAC_SHARE/libc/pwd.c:88: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:88: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:83.
-[eva] FRAMAC_SHARE/libc/pwd.c:83: 
+  Called from FRAMAC_SHARE/libc/pwd.c:88.
+[eva] FRAMAC_SHARE/libc/pwd.c:88: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:83: 
+[eva] FRAMAC_SHARE/libc/pwd.c:88: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:83: 
+[eva] FRAMAC_SHARE/libc/pwd.c:88: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:84: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/pwd.c:84: 
+[eva] FRAMAC_SHARE/libc/pwd.c:89: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:89: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:84.
-[eva] FRAMAC_SHARE/libc/pwd.c:84: 
+  Called from FRAMAC_SHARE/libc/pwd.c:89.
+[eva] FRAMAC_SHARE/libc/pwd.c:89: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:84: 
+[eva] FRAMAC_SHARE/libc/pwd.c:89: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:84: 
+[eva] FRAMAC_SHARE/libc/pwd.c:89: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:85: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/pwd.c:85: 
+[eva] FRAMAC_SHARE/libc/pwd.c:90: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:90: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:85.
-[eva] FRAMAC_SHARE/libc/pwd.c:85: 
+  Called from FRAMAC_SHARE/libc/pwd.c:90.
+[eva] FRAMAC_SHARE/libc/pwd.c:90: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:85: 
+[eva] FRAMAC_SHARE/libc/pwd.c:90: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:85: 
+[eva] FRAMAC_SHARE/libc/pwd.c:90: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:86: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/pwd.c:86: 
+[eva] FRAMAC_SHARE/libc/pwd.c:91: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:91: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:86.
-[eva] FRAMAC_SHARE/libc/pwd.c:86: 
+  Called from FRAMAC_SHARE/libc/pwd.c:91.
+[eva] FRAMAC_SHARE/libc/pwd.c:91: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:86: 
+[eva] FRAMAC_SHARE/libc/pwd.c:91: 
   function strcpy: precondition 'room_string' got status valid.
-[eva] FRAMAC_SHARE/libc/pwd.c:86: 
+[eva] FRAMAC_SHARE/libc/pwd.c:91: 
   function strcpy: precondition 'separation' got status valid.
 [eva] Done for function strcpy
 [eva] computing for function Frama_C_unsigned_int_interval <- __fc_getpw_r <- 
                           getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:87.
+  Called from FRAMAC_SHARE/libc/pwd.c:92.
 [eva] using specification for function Frama_C_unsigned_int_interval
-[eva] FRAMAC_SHARE/libc/pwd.c:87: 
+[eva] FRAMAC_SHARE/libc/pwd.c:92: 
   function Frama_C_unsigned_int_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_int_interval
 [eva] computing for function Frama_C_unsigned_int_interval <- __fc_getpw_r <- 
                           getpwuid_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:88.
-[eva] FRAMAC_SHARE/libc/pwd.c:88: 
+  Called from FRAMAC_SHARE/libc/pwd.c:93.
+[eva] FRAMAC_SHARE/libc/pwd.c:93: 
   function Frama_C_unsigned_int_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_int_interval
 [eva] Recording results for __fc_getpw_r
@@ -165,48 +165,48 @@
 [eva:alarm] pwd_c.c:23: Warning: assertion got status unknown.
 [eva] computing for function getpwnam_r <- main.
   Called from pwd_c.c:27.
-[eva] FRAMAC_SHARE/libc/pwd.c:96: assertion got status valid.
+[eva] FRAMAC_SHARE/libc/pwd.c:101: assertion got status valid.
 [eva] computing for function __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:97.
-[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:69.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:72.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:73.
-[eva] Done for function Frama_C_interval
+  Called from FRAMAC_SHARE/libc/pwd.c:102.
 [eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
   Called from FRAMAC_SHARE/libc/pwd.c:74.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/pwd.c:82: Call to builtin strlen
+[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
+  Called from FRAMAC_SHARE/libc/pwd.c:77.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
+  Called from FRAMAC_SHARE/libc/pwd.c:78.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_interval <- __fc_getpw_r <- getpwnam_r <- main.
+  Called from FRAMAC_SHARE/libc/pwd.c:79.
+[eva] Done for function Frama_C_interval
+[eva] FRAMAC_SHARE/libc/pwd.c:87: Call to builtin strlen
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:82.
+  Called from FRAMAC_SHARE/libc/pwd.c:87.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:83: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:88: Call to builtin strlen
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:83.
+  Called from FRAMAC_SHARE/libc/pwd.c:88.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:84: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:89: Call to builtin strlen
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:84.
+  Called from FRAMAC_SHARE/libc/pwd.c:89.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:85: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:90: Call to builtin strlen
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:85.
+  Called from FRAMAC_SHARE/libc/pwd.c:90.
 [eva] Done for function strcpy
-[eva] FRAMAC_SHARE/libc/pwd.c:86: Call to builtin strlen
+[eva] FRAMAC_SHARE/libc/pwd.c:91: Call to builtin strlen
 [eva] computing for function strcpy <- __fc_getpw_r <- getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:86.
+  Called from FRAMAC_SHARE/libc/pwd.c:91.
 [eva] Done for function strcpy
 [eva] computing for function Frama_C_unsigned_int_interval <- __fc_getpw_r <- 
                           getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:87.
+  Called from FRAMAC_SHARE/libc/pwd.c:92.
 [eva] Done for function Frama_C_unsigned_int_interval
 [eva] computing for function Frama_C_unsigned_int_interval <- __fc_getpw_r <- 
                           getpwnam_r <- main.
-  Called from FRAMAC_SHARE/libc/pwd.c:88.
+  Called from FRAMAC_SHARE/libc/pwd.c:93.
 [eva] Done for function Frama_C_unsigned_int_interval
 [eva] Recording results for __fc_getpw_r
 [eva] Done for function __fc_getpw_r
