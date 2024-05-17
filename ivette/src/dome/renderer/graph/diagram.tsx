@@ -137,7 +137,7 @@ const byNode = (a: Node, b: Node): number => byStr(a.id, b.id);
 const byEdge = (a: Edge, b: Edge): number => byStr(edgeKey(a), edgeKey(b));
 
 /* -------------------------------------------------------------------------- */
-/* --- d3-Graphviz Component                                              --- */
+/* --- d3-Graphviz view                                                   --- */
 /* -------------------------------------------------------------------------- */
 
 let divId = 0;
@@ -146,6 +146,7 @@ const newDivId = (): string => `dome_d3gv_${++divId}`;
 interface GraphvizProps extends DiagramProps { size: Size }
 
 function GraphvizView(props: GraphvizProps): JSX.Element {
+
   // --- Model Generation
   const { direction = 'LR', nodes, edges } = props;
   const model = React.useMemo(() => {
@@ -155,19 +156,22 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     edges.concat().sort(byEdge).forEach(e => dot.edge(e));
     return dot.flush();
   }, [direction, nodes, edges]);
+
   // --- Model Update Callback
   const { onModelChanged } = props;
   React.useEffect(() => {
     if (onModelChanged) onModelChanged(model);
   }, [model, onModelChanged]);
-  // --- Rendering
+
+  // --- Rendering & Remote
   const id = React.useMemo(newDivId, []);
   const { width, height } = props.size;
   React.useEffect(() => {
     d3.graphviz(`#${id}`, {
-      fit: false, zoom: false, width, height,
+      fit: false, zoom: true, width, height,
     }).renderDot(model);
   }, [id, model, width, height]);
+
   return (
     <Catch label='Graphviz Error'>
       <div id={id} className={props.className} />
