@@ -189,7 +189,7 @@ module Make_Dataflow
   let vertex_stmt (v : vertex) : stmt option * bool =
     (* also returns if the vertex is a loop head*)
     match v.vertex_info with
-    | LoopHead stmt -> Some stmt, true
+    | LoopHead { stmt } -> Some stmt, true
     | NoneInfo -> v.vertex_start_of, false
   let default_vertex_store (v : vertex) () : store =
     let stmt, is_loop_head = vertex_stmt v in
@@ -417,7 +417,7 @@ module Make_Dataflow
     (* Loop transitions *)
     let loop_stmt v =
       match v.vertex_info with
-      | LoopHead stmt-> stmt
+      | LoopHead { stmt } -> stmt
       | _ -> Option.get v.vertex_start_of
     in
     let enter_loop f v =
@@ -478,7 +478,7 @@ module Make_Dataflow
     Option.iter (fun stmt -> current_ki := Kstmt stmt) v.vertex_start_of;
     let current_stmt =
       match v.vertex_info with
-      | LoopHead stmt -> Some stmt
+      | LoopHead { stmt } -> Some stmt
       | NoneInfo -> v.vertex_start_of
     in
     let curent_location = Option.map Cil_datatype.Stmt.loc current_stmt in

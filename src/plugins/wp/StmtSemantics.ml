@@ -501,7 +501,7 @@ struct
     | NoneInfo, NoneInfo -> 0
     | NoneInfo, _ -> -1
     | _ , NoneInfo -> 1
-    | LoopHead (_, i), LoopHead (_, j) -> Stdlib.compare j i
+    | LoopHead { level = i }, LoopHead { level = j } -> Stdlib.compare j i
 
   module Automata = Interpreted_automata.UnrollUnnatural.Version
   type nodes = {

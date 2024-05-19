@@ -579,7 +579,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let loop = Graph.find_loop kf vertex in
       let stmt =
         match vertex.vertex_info with
-        | LoopHead stmt-> stmt
+        | LoopHead { stmt } -> stmt
         | NoneInfo -> Option.get vertex.vertex_start_of
       in
       if is_bounded_loop kf stmt loop { from_domains } state max_unroll

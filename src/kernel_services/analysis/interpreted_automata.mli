@@ -38,7 +38,7 @@ open Cil_types
 
 type info =
   | NoneInfo
-  | LoopHead of stmt * int (* level *)
+  | LoopHead of { stmt : stmt; level : int }
 
 (** Control flow informations for outgoing edges, if any. *)
 type 'a control =

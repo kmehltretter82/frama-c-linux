@@ -28,7 +28,7 @@ open Cil_types
 
 type info =
   | NoneInfo
-  | LoopHead of stmt * int (* level *)
+  | LoopHead of { stmt : stmt; level : int }
 
 type 'a control =
   | Edges (* control flow is only given by vertex edges *)
@@ -551,7 +551,7 @@ let build_automaton kf =
                  we can't separate loop_entry from loop_current *)
             let loop_head_point = add_vertex () in
             add_edge control.src loop_head_point kinstr Skip loc;
-            loop_head_point.vertex_info <- LoopHead (stmt, !loop_level);
+            loop_head_point.vertex_info <- LoopHead {stmt; level = !loop_level};
             let labels =
               LabelMap.(add_builtin LoopEntry control.src
                           (add_builtin LoopCurrent loop_head_point labels))
@@ -938,7 +938,7 @@ module Compute = struct
       | NoneInfo, NoneInfo -> 0
       | NoneInfo, _ -> -1
       | _ , NoneInfo -> 1
-      | LoopHead (_, i), LoopHead (_, j) -> - (compare i j)
+      | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
     in
     build_wto ~pref automaton
 
@@ -1013,7 +1013,7 @@ let default_pref v1 v2 =
   (* If there is a loop statement in the Cil representation, use the
      LoopCurrent labelled vertex as the loop head. Use the outermost
      (lowest level) loop first in case of nested loops. *)
-  | LoopHead (_, i), LoopHead (_, j) -> - (compare i j)
+  | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
   | NoneInfo, LoopHead _ -> -1
   | LoopHead _ , NoneInfo -> 1
   | NoneInfo, NoneInfo ->

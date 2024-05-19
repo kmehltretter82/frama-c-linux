@@ -30,7 +30,7 @@ open Eva_ast
 
 type info =
   | NoneInfo
-  | LoopHead of stmt
+  | LoopHead of { stmt : stmt; level : int }
 
 type vertex = private {
   vertex_kf : kernel_function;

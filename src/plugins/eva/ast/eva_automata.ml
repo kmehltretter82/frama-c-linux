@@ -25,9 +25,9 @@ open Eva_ast
 
 (* --- Vertices and Edges types --- *)
 
-type info =
+type info = Interpreted_automata.info =
   | NoneInfo
-  | LoopHead of stmt
+  | LoopHead of { stmt : stmt; level : int }
 
 type vertex = {
   vertex_kf : kernel_function;
@@ -228,10 +228,6 @@ let translate_transition transition =
   | Leave block ->
     Leave block
 
-let translate_info : Interpreted_automata.info -> info = function
-  | NoneInfo -> NoneInfo
-  | LoopHead (stmt,_) -> LoopHead stmt
-
 (* Fill the wto index of the vertices *)
 let build_wto_index wto =
   let rec iter_wto index w =
@@ -277,7 +273,7 @@ let translate_automaton kf =
       vertex_kf = kf;
       vertex_key = v.vertex_key;
       vertex_start_of = v.vertex_start_of;
-      vertex_info = translate_info v.vertex_info;
+      vertex_info = v.vertex_info;
       vertex_wto_index = [];
     }
     in
