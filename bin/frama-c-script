@@ -22,7 +22,7 @@
 ##########################################################################
 
 usage() {
-   echo "usage: $0 cmd [args]"
+   echo "usage: frama-c-script cmd [args]"
    echo ""
    echo "  where cmd is:"
    echo ""
@@ -39,9 +39,9 @@ usage() {
    echo "      (run 'frama-c -machdep help' to get the list of machdeps)."
    echo ""
    echo "  - creduce [[file] args]"
-   echo "      Use the external tool C-Reduce to minimize C files when"
-   echo "      debugging crashes and fatal errors. Run without arguments for"
-   echo "      more details."
+   echo "      Uses the external tool C-Reduce to minimize C files when"
+   echo "      debugging crashes and fatal errors."
+   echo "      Run 'frama-c-script c-reduce' without arguments for more details."
    echo ""
    echo "  - estimate-difficulty file..."
    echo "      Applies several heuristics to try and estimate the difficulty"
@@ -72,7 +72,7 @@ usage() {
    echo ""
    echo "  - heuristic-print-callgraph [--dot outfile] file..."
    echo "      Prints a heuristic, syntactic-based, callgraph for the"
-   echo "      specified files. Use --dot outfile to print it in DOT"
+   echo "      specified files. Use '--dot outfile' to print it in DOT"
    echo "      (Graphviz) format, to [outfile]. If [outfile] is '-',"
    echo "      prints to stdout."
    echo ""
@@ -85,11 +85,11 @@ usage() {
    echo "  - list-functions [files] [Frama-C options]"
    echo "      Parses all sources in [files] and lists all function"
    echo "      definitions, with source location and number of statements."
-   echo "      Accepts Frama-C options (e.g. -cpp-extra-args for parsing)."
+   echo "      Accepts Frama-C options (e.g. '-cpp-extra-args' for parsing)."
    echo ""
    echo "  - make-machdep [--compiler=<cc>] [--cpp-arch-flags=<flags>]"
    echo "      Creates a new machdep definition for a specific target."
-   echo "      Use $0 make-machdep --help for more information"
+   echo "      Use 'frama-c-script make-machdep --help' for more information."
    echo ""
    echo "  - make-wrapper [target] [arg...]"
    echo "      Runs 'make target arg...', parsing the output to suggest"
@@ -103,7 +103,7 @@ usage() {
    echo "  - summary [options]"
    echo "      Monitors and summarizes multiple analyses dispatched by a Makefile"
    echo "      in the current PWD."
-   echo "      Use $0 summary --help for more information."
+   echo "      Use 'frama-c-script summary --help' for more information."
    exit "$1"
 }
 
