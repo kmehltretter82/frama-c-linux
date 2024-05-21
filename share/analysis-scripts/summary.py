@@ -122,10 +122,10 @@ def terminate_process(process):
 
 
 def smart_rename(target):
-    target = re.sub("^\./", "", target)
-    target = re.sub("main\.eva$", "", target)
-    target = re.sub("\.eva$", "", target)
-    target = re.sub("\.frama-c/", "", target)
+    target = re.sub(r"^\./", "", target)
+    target = re.sub(r"main\.eva$", "", target)
+    target = re.sub(r"\.eva$", "", target)
+    target = re.sub(r"\.frama-c/", "", target)
     return target
 
 
