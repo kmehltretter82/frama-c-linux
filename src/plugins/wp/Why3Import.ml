@@ -154,7 +154,6 @@ let add_builtins env =
 (* -------------------------------------------------------------------------- *)
 
 let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
-  L.debug ~level:3 "Called tvars_of_txs";
   List.iter (fun (tv: W.Ty.tvsymbol) ->
       L.debug ~level:3 "Name of : %a" pp_id tv.tv_name) txs;
   List.fold_right
@@ -186,11 +185,17 @@ and lti_of_ts (env : env) (ts : W.Ty.tysymbol) : C.logic_type_info =
         lt_attr = [];
       }
     in W.Ty.Hts.add env.tenv ts lti ;
-    Logic_type_info.Hashtbl.add env.ltits lti ts;
+
+
+
+
     let cwmod = Datatype.String.Hashtbl.find env.menv @@ recover_module ts.ts_name in
     Datatype.String.Hashtbl.replace env.menv (recover_module ts.ts_name)
       {cwmod with types = cwmod.types @ [lti]};
-    lti
+    try begin let _ = (Logic_type_info.Hashtbl.find env.ltits lti)
+      in lti end with Not_found ->
+      Logic_type_info.Hashtbl.add env.ltits lti ts;
+      lti
 
 
 (* -------------------------------------------------------------------------- *)
@@ -228,7 +233,10 @@ let li_of_ls (env:env) (ls : W.Term.lsymbol)  : C.logic_info =
   let cwmod = Datatype.String.Hashtbl.find env.menv @@ recover_module ls.ls_name in
   Datatype.String.Hashtbl.replace env.menv (recover_module ls.ls_name)
     {cwmod with logics = cwmod.logics @ [li]};
-  li
+  try begin let _ = (Logic_info.Hashtbl.find env.lils li)
+    in li end with Not_found ->
+    Logic_info.Hashtbl.add env.lils li ls;
+    li
 
 
 (* -------------------------------------------------------------------------- *)
@@ -310,12 +318,20 @@ let () =
           Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
               L.result "@[Module %s at %s@]" s (String.concat "::" why3mod.paths);
               List.iter (fun (li) ->
-                  L.result "Logic : @[<hov2>%a@]" pp_li li)
+                  L.result "Logic : @[<hov1>%a@]" pp_li li)
                 why3mod.logics;
               List.iter (fun (lti) ->
-                  L.result "Type : @[<hov2>%a@]" pp_lti lti)
+                  L.result "Type : @[<hov1>%a@]" pp_lti lti)
                 why3mod.types;
-            ) env.menv
+            ) env.menv;
+          Logic_type_info.Hashtbl.iter ( fun (lti) (ts) ->
+              L.result "Logic type info : %a is associated to ts : %a "
+                pp_lti lti pp_tys ts )
+            env.ltits;
+          Logic_info.Hashtbl.iter ( fun (li) (ls) ->
+              L.result "Logic info %a is associated to ls : %a "
+                pp_li li pp_ls ls )
+            env.lils;
         end
 
     end
