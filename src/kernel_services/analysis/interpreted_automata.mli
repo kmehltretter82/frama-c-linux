@@ -189,21 +189,20 @@ module WTOIndex : sig
   val diff : wto_index -> wto_index -> vertex list * vertex list
 
   (** @return the wto_index for a statement. Uses the memoized wto. *)
-  val get : Cil_types.kernel_function -> vertex -> wto_index
+  val get : vertex -> wto_index
 
   (** @return the components left and the components entered when going from
       one vertex to another. Uses the memoized wto. *)
-  val get_diff :
-    Cil_types.kernel_function -> vertex -> vertex -> vertex list * vertex list
+  val get_diff : vertex -> vertex -> vertex list * vertex list
 
   (** @return wether [v] is a component head or not. Uses the memoized wto. *)
-  val is_head : Cil_types.kernel_function -> vertex -> bool
+  val is_head : vertex -> bool
 
   (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
       is a wto head of any component where v2 is included. This assumes that
       (v1,v2) is actually an edge present in the control flow graph. Uses the
       memoized wto. *)
-  val is_back_edge : Cil_types.kernel_function -> vertex * vertex -> bool
+  val is_back_edge : vertex * vertex -> bool
 
   module Table : sig
     type t = wto_index Vertex.Hashtbl.t

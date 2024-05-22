@@ -993,9 +993,6 @@ struct
       | v' :: _ -> Vertex.equal v v'
       | [] -> false
 
-    let diff table stmt1 stmt2 =
-      diff (find table stmt1) (find table stmt2)
-
     let is_back_edge table (v1,v2) =
       List.exists (Vertex.equal v2) (find table v1)
   end
@@ -1012,10 +1009,10 @@ struct
       end)
 
   let get_table = State.memo (fun kf -> Table.build (get_wto kf))
-  let get kf = Table.find (get_table kf)
-  let get_diff kf = Table.diff (get_table kf)
-  let is_head kf = Table.is_head (get_table kf)
-  let is_back_edge kf = Table.is_back_edge (get_table kf)
+  let get v = Table.find (get_table v.vertex_kf) v
+  let get_diff v1 v2 = diff (get v1) (get v2)
+  let is_head v = Table.is_head (get_table v.vertex_kf) v
+  let is_back_edge (v1,v2) = Table.is_back_edge (get_table v1.vertex_kf) (v1,v2)
 end
 
 
