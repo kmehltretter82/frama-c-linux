@@ -557,7 +557,7 @@ struct
   let rec get_invariants g n (l:Automata.t Wto.partition) =
     let open Interpreted_automata in
     let open Interpreted_automata.UnrollUnnatural in
-    match l, G.succ_e g n with
+    match l, succ_e g n with
     | (Wto.Node a)::l,
       [(_,{edge_transition =
              (Prop({kind=Assert|Invariant|Assume|Check},_) | Skip) as t},b)]
@@ -581,7 +581,7 @@ struct
     let binder = M.configure_ia a in
     let bind = binder.bind in
     let wto = WTO.partition ~pref ~init:a.entry_point ~succs:(G.succ a.graph) in
-    let index = Compute.build_wto_index_table wto in
+    let index = WTOIndex.Table.build wto in
 
     (*
     let cout = open_out "/tmp/automata.dot" in
@@ -590,19 +590,19 @@ struct
     *)
 
     let open UnrollUnnatural in
-    let g = unroll_unnatural_loop a wto index in
+    let g = build a wto index in
 
     let here = (a.entry_point,Vertex.Set.empty) in
     let next = (a.return_point,Vertex.Set.empty) in
     let wto =
       WTO.partition
         ~pref:(fun _ _ -> 0) (* natural loops keep their heads *)
-        ~succs:(UnrollUnnatural.G.succ g)
+        ~succs:(UnrollUnnatural.succ g)
         ~init:here in
 
     let do_node nodes v paths =
       let n = get_node nodes v in
-      let l,paths = G.fold_succ_e (fun (_,e,v2) (l,paths) ->
+      let l,paths = fold_succ_e (fun (_,e,v2) (l,paths) ->
           let n2' = Cfg.node () in
           let n2 = get_node nodes v2 in
           (n2'::l, transition (env @* [Clabels.here,n2';Clabels.next,n2]) nodes e.edge_transition
@@ -757,7 +757,7 @@ struct
 
   let compute_kf kf =
     let open Interpreted_automata in
-    let autom = Compute.get_automaton kf in
+    let autom = build_automaton kf in
     (* let cout = open_out (Format.sprintf "/tmp/cfg_automata_%s.dot" (Kernel_function.get_name kf)) in
      * Interpreted_automata.Compute.output_to_dot cout autom;
      * close_out cout; *)

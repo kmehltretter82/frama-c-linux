@@ -57,6 +57,17 @@ let flatten wto =
   in
   List.rev (f [] wto)
 
+module type S = sig
+  type node
+
+  type pref = node -> node -> int
+  val partition: pref:pref -> init:node -> succs:(node -> node list) -> node partition
+  val pretty_partition: Format.formatter -> node partition -> unit
+  val pretty_component: Format.formatter -> node component -> unit
+  val equal_component: node component -> node component -> bool
+  val equal_partition: node partition -> node partition -> bool
+end
+
 (* Bourdoncle's WTO algorithm builds on Tarjan's SCC algorithm. In Tarjan:
 
    - We visit every node once, starting from root, by following the
@@ -92,6 +103,8 @@ module Make(N:sig
     val pretty: Format.formatter -> t -> unit
     (* val succ: t -> t list *)
   end) = struct
+
+  type node = N.t
 
   let rec equal_component (x:N.t component) (y:N.t component) =
     match x,y with

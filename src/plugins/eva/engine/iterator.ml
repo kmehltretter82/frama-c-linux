@@ -596,7 +596,7 @@ module Make_Dataflow
         | ExitIteration ->
           Self.debug ~dkey
             "propagating descending values through exit paths";
-          Wto.flatten (exit_strategy graph component)
+          Wto.flatten (exit_strategy automaton component)
         | FullIteration ->
           Self.debug ~dkey
             "propagating descending values through the loop";

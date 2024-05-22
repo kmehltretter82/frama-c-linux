@@ -88,7 +88,7 @@ val output_to_dot : out_channel -> automaton -> unit
 
 (* Wto related functions *)
 
-val exit_strategy : graph -> vertex Wto.component -> wto
+val exit_strategy : automaton -> vertex Wto.component -> wto
 val wto_index_diff : vertex -> vertex -> vertex list * vertex list
 val is_wto_head : vertex -> bool
 val is_back_edge : vertex * vertex -> bool
