@@ -22,6 +22,7 @@
 
 import React from 'react';
 import { Catch } from 'dome/errors';
+import { classes } from 'dome/misc/utils';
 import { Size } from 'react-virtualized';
 import * as d3 from 'd3-graphviz';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -32,16 +33,40 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 
 export type Direction = 'LR' | 'TD';
 
+export type Cell = string | { label: string, port: string };
+
+export type Shape =
+  | 'point' | 'box'
+  | 'diamond' | 'hexagon'
+  | 'circle' | 'ellipse'
+  | 'note' | 'tab' | 'folder';
+export type Box = Cell | Box[];
+
 export interface Node {
   /** Node identifier (unique). */
   id: string;
-  /** Node label (optional). */
+  /** Node label */
   label?: string;
+  /** Node tooltip */
+  title?: string;
+  /**
+   * Shape. Box shapes alternate LR and TD directions.
+   * Initial direction is orthogonal to the graph direction. */
+  shape?: Shape | Box[];
 }
 
+/**
+ *  Edge properties.
+ *  Alternative syntax `id:port` is also supported for port names.
+ */
 export interface Edge {
-  source: string /** Source node identifier */;
-  target: string /** Target node identifier */;
+  /** Source node identifier */
+  source: string;
+  /** Source port (provided source node has box shape) */
+  sourcePort?: string;
+  target: string;
+  /** Target port (provided target node has box shape) */
+  targetPort?: string;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -86,6 +111,7 @@ class DotModel {
 
   // --- Basics
   private spec = 'digraph {\n';
+
   print(...text: string[]): DotModel {
     this.spec = this.spec.concat(...text);
     return this;
@@ -98,20 +124,56 @@ class DotModel {
 
   flush(): string { return this.spec.concat('}'); }
 
-  // --- Graph
-  rankdir(d: Direction): DotModel {
-    return this.println('  rankdir="', d, '";');
+  // --- Attributes
+  value(a: string | number): DotModel {
+    if (typeof a === 'string')
+      return this.print('"', a, '"');
+    else
+      return this.print(`${a}`);
   }
 
-  // --- Special
-  quoted(a: string): DotModel { return this.print('"', a, '"'); }
+  attr(a: string, v: string | number | undefined): DotModel {
+    return v ? this.print(' ', a, '=').value(v).print('; ') : this;
+  }
+
+  // --- Node Table Shape
+
+  port(id: string, port?: string): DotModel {
+    this.print(id);
+    if (port) this.print(':', port);
+    return this;
+  }
+
+  record(r: Box, nested = false): DotModel {
+    if (Array.isArray(r)) {
+      if (nested) this.print('{');
+      r.forEach((c, k) => {
+        if (k > 0) this.print('|');
+        this.record(c, true);
+      });
+      if (nested) this.print('}');
+      return this;
+    } else if (typeof r === 'string') {
+      return this.print(r);
+    } else {
+      return this.print('<', r.port, '> ', r.label);
+    }
+  }
 
   // --- Node
   node(n: Node): void {
+    this.print('  ', n.id, ' [');
+    if (typeof n.shape === 'object') {
+      this
+        .attr('shape', 'record')
+        .print(' label="').record(n.shape).print('"; ');
+    } else {
+      this
+        .attr('label', n.label)
+        .attr('shape', n.shape);
+    }
     this
-      .print('  ')
-      .quoted(n.id)
-      .print(' [')
+      .attr('tooltip', n.title)
       .println('];');
   }
 
@@ -119,9 +181,9 @@ class DotModel {
   edge(e: Edge): void {
     this
       .print('  ')
-      .quoted(e.source)
+      .port(e.source, e.sourcePort)
       .print(' -> ')
-      .quoted(e.target)
+      .port(e.target, e.targetPort)
       .print(' [')
       .println('];');
   }
@@ -151,7 +213,11 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
   const { direction = 'LR', nodes, edges } = props;
   const model = React.useMemo(() => {
     const dot = new DotModel();
-    dot.rankdir(direction);
+    dot
+      .attr('rankdir', direction)
+      .attr('bgcolor', 'none')
+      .attr('width', 0.5)
+      .println();
     nodes.concat().sort(byNode).forEach(n => dot.node(n));
     edges.concat().sort(byEdge).forEach(e => dot.edge(e));
     return dot.flush();
@@ -168,6 +234,7 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
   const { width, height } = props.size;
   React.useEffect(() => {
     d3.graphviz(`#${id}`, {
+      useWorker: false,
       fit: false, zoom: true, width, height,
     }).renderDot(model);
   }, [id, model, width, height]);
@@ -185,12 +252,13 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
 
 export function Diagram(props: DiagramProps): JSX.Element {
   const { display = true } = props;
+  const className = classes('dome-xDiagram', props.className);
   return (
     <>
       {display && (
         <AutoSizer>
           {(size: Size) => (
-            <div className={props.className}>
+            <div className={className}>
               <GraphvizView size={size} {...props} />
             </div>
           )}

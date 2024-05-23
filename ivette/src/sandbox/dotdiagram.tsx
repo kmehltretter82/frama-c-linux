@@ -36,11 +36,19 @@ import { registerSandbox } from 'ivette';
 
 const nodes: Node[] = [
   { id: 'A' },
-  { id: 'B' },
+  { id: 'B', shape: 'diamond' },
+  { id: 'R',
+    shape: [
+      { label: 'C', port: 'c' },
+      [ 'D1', 'D2'],
+      { label: 'E', port: 'e' },
+    ]
+  }
 ];
 
 const edges: Edge[] = [
-  { source: 'A', target: 'B' }
+  { source: 'A', target: 'R', targetPort: 'c' },
+  { source: 'R', target: 'B', sourcePort: 'e' },
 ];
 
 function DiagramSample(): JSX.Element {
