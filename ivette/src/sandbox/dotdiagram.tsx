@@ -37,18 +37,37 @@ import { registerSandbox } from 'ivette';
 const nodes: Node[] = [
   { id: 'A' },
   { id: 'B', shape: 'diamond' },
-  { id: 'R',
+  {
+    id: 'R',
     shape: [
       { label: 'C', port: 'c' },
-      [ 'D1', 'D2'],
+      ['D1', 'D2'],
       { label: 'E', port: 'e' },
     ]
-  }
+  },
+  { id: 'white', color: 'white' },
+  { id: 'grey', color: 'grey' },
+  { id: 'dark', color: 'dark' },
+  { id: 'primary', color: 'primary' },
+  { id: 'selected', color: 'selected' },
+  { id: 'green', color: 'green' },
+  { id: 'orange', color: 'orange' },
+  { id: 'red', color: 'red' },
+  { id: 'yellow', color: 'yellow' },
+  { id: 'blue', color: 'blue' },
+  { id: 'pink', color: 'pink' },
 ];
 
 const edges: Edge[] = [
   { source: 'A', target: 'R', targetPort: 'c' },
   { source: 'R', target: 'B', sourcePort: 'e' },
+  { source: 'primary', target: 'selected' },
+  { source: 'white', target: 'grey' },
+  { source: 'grey', target: 'dark' },
+  { source: 'green', target: 'orange' },
+  { source: 'orange', target: 'red' },
+  { source: 'yellow', target: 'pink' },
+  { source: 'pink', target: 'blue' }
 ];
 
 function DiagramSample(): JSX.Element {

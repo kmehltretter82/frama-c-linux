@@ -26,6 +26,7 @@ import { classes } from 'dome/misc/utils';
 import { Size } from 'react-virtualized';
 import * as d3 from 'd3-graphviz';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import './style.css';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
@@ -33,13 +34,27 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 
 export type Direction = 'LR' | 'TD';
 
-export type Cell = string | { label: string, port: string };
+export type Color =
+  | 'white'
+  | 'grey'
+  | 'dark'
+  | 'primary'
+  | 'selected'
+  | 'green'
+  | 'orange'
+  | 'red'
+  | 'yellow'
+  | 'blue'
+  | 'pink';
 
 export type Shape =
   | 'point' | 'box'
   | 'diamond' | 'hexagon'
   | 'circle' | 'ellipse'
   | 'note' | 'tab' | 'folder';
+
+export type Cell = string | { label: string, port: string };
+
 export type Box = Cell | Box[];
 
 export interface Node {
@@ -49,9 +64,12 @@ export interface Node {
   label?: string;
   /** Node tooltip */
   title?: string;
+  /** Node color (filled background) */
+  color?: Color;
   /**
-   * Shape. Box shapes alternate LR and TD directions.
-   * Initial direction is orthogonal to the graph direction. */
+   * Shape. Nested boxes alternate LR and TD directions. Initial direction is
+   * orthogonal to the graph direction. Node label is ignored for box layout.
+   */
   shape?: Shape | Box[];
 }
 
@@ -99,6 +117,38 @@ export interface DiagramProps {
   onModelChanged?: (model: string) => void;
 
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Color Model                                                        --- */
+/* -------------------------------------------------------------------------- */
+
+const BGCOLOR = {
+  'white': '#fff',
+  'grey': '#ccc',
+  'dark': '#666',
+  'primary': 'dodgerblue',
+  'selected': 'deepskyblue',
+  'green': 'lime',
+  'orange': '#ffa700',
+  'red': 'red',
+  'yellow': 'yellow',
+  'blue': 'cyan',
+  'pink': 'hotpink',
+};
+
+const FGCOLOR = {
+  'white': 'black',
+  'grey': 'black',
+  'dark': 'white',
+  'primary': 'white',
+  'selected': 'black',
+  'green': 'black',
+  'orange': 'black',
+  'red': 'white',
+  'yellow': 'black',
+  'blue': 'black',
+  'pink': 'white',
+};
 
 /* -------------------------------------------------------------------------- */
 /* --- Dot Model                                                          --- */
@@ -172,8 +222,11 @@ class DotModel {
         .attr('label', n.label)
         .attr('shape', n.shape);
     }
+    const color = n.color ?? 'white';
     this
       .attr('tooltip', n.title)
+      .attr('fontcolor', FGCOLOR[color])
+      .attr('fillcolor', BGCOLOR[color])
       .println('];');
   }
 
@@ -210,14 +263,16 @@ interface GraphvizProps extends DiagramProps { size: Size }
 function GraphvizView(props: GraphvizProps): JSX.Element {
 
   // --- Model Generation
-  const { direction = 'LR', nodes, edges } = props;
+  const {
+    direction = 'LR', nodes, edges
+  } = props;
   const model = React.useMemo(() => {
     const dot = new DotModel();
     dot
       .attr('rankdir', direction)
       .attr('bgcolor', 'none')
       .attr('width', 0.5)
-      .println();
+      .println('node [ style="filled" ];');
     nodes.concat().sort(byNode).forEach(n => dot.node(n));
     edges.concat().sort(byEdge).forEach(e => dot.edge(e));
     return dot.flush();
@@ -235,7 +290,7 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
   React.useEffect(() => {
     d3.graphviz(`#${id}`, {
       useWorker: false,
-      fit: false, zoom: true, width, height,
+      fit: true, zoom: true, width, height,
     }).renderDot(model);
   }, [id, model, width, height]);
 
@@ -258,7 +313,7 @@ export function Diagram(props: DiagramProps): JSX.Element {
       {display && (
         <AutoSizer>
           {(size: Size) => (
-            <div className={className}>
+            <div className={className} style={size}>
               <GraphvizView size={size} {...props} />
             </div>
           )}
