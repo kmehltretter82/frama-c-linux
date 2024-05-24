@@ -40,9 +40,9 @@ const nodes: Node[] = [
   {
     id: 'R',
     shape: [
-      { label: 'C', port: 'c' },
+      { label: 'Dotted (c)', port: 'c' },
       ['D1', 'D2'],
-      { label: 'E', port: 'e' },
+      { label: 'Dashed (e)', port: 'e' },
     ]
   },
   { id: 'white', color: 'white' },
@@ -56,18 +56,35 @@ const nodes: Node[] = [
   { id: 'yellow', color: 'yellow' },
   { id: 'blue', color: 'blue' },
   { id: 'pink', color: 'pink' },
+  { id: 'X' }, { id: 'Y' }
 ];
 
 const edges: Edge[] = [
-  { source: 'A', target: 'R', targetPort: 'c' },
-  { source: 'R', target: 'B', sourcePort: 'e' },
+  { source: 'A', target: 'R', targetPort: 'c', headLabel: 'c', line: 'dotted' },
+  { source: 'R', target: 'B', sourcePort: 'e', tailLabel: 'e', line: 'dashed' },
   { source: 'primary', target: 'selected' },
   { source: 'white', target: 'grey' },
   { source: 'grey', target: 'dark' },
   { source: 'green', target: 'orange' },
   { source: 'orange', target: 'red' },
   { source: 'yellow', target: 'pink' },
-  { source: 'pink', target: 'blue' }
+  { source: 'pink', target: 'blue' },
+  { source: 'white', target: 'white', color: 'white' },
+  { source: 'grey', target: 'grey', color: 'grey' },
+  { source: 'dark', target: 'dark', color: 'dark' },
+  { source: 'primary', target: 'primary', color: 'primary' },
+  { source: 'selected', target: 'selected', color: 'selected' },
+  { source: 'green', target: 'green', color: 'green' },
+  { source: 'orange', target: 'orange', color: 'orange' },
+  { source: 'red', target: 'red', color: 'red' },
+  { source: 'yellow', target: 'yellow', color: 'yellow' },
+  { source: 'blue', target: 'blue', color: 'blue' },
+  { source: 'pink', target: 'pink', color: 'pink' },
+  {
+    source: 'X', target: 'Y',
+    tail: 'box', head: 'dot',
+    label: '*', title: 'box to dot'
+  },
 ];
 
 function DiagramSample(): JSX.Element {

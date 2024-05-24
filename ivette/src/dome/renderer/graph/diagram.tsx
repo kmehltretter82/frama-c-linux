@@ -36,23 +36,20 @@ import './style.css';
 export type Direction = 'LR' | 'TD';
 
 export type Color =
-  | 'white'
-  | 'grey'
-  | 'dark'
-  | 'primary'
-  | 'selected'
-  | 'green'
-  | 'orange'
-  | 'red'
-  | 'yellow'
-  | 'blue'
-  | 'pink';
+  | 'white' | 'grey' | 'dark'
+  | 'primary' | 'selected'
+  | 'green' | 'orange' | 'red'
+  | 'yellow' | 'blue' | 'pink';
 
 export type Shape =
   | 'point' | 'box'
   | 'diamond' | 'hexagon'
   | 'circle' | 'ellipse'
   | 'note' | 'tab' | 'folder';
+
+export type Arrow = 'none' | 'arrow' | 'tee' | 'box' | 'dot';
+
+export type Line = 'solid' | 'dashed' | 'dotted';
 
 export type Cell = string | { label: string, port: string };
 
@@ -83,9 +80,26 @@ export interface Edge {
   source: string;
   /** Source port (provided source node has box shape) */
   sourcePort?: string;
+  /** Target node identifier */
   target: string;
   /** Target port (provided target node has box shape) */
   targetPort?: string;
+  /** Default is `solid` */
+  line?: Line;
+  /** Default is `dark` */
+  color?: Color;
+  /** Default is `arrow` */
+  head?: Arrow;
+  /** Default is `none` */
+  tail?: Arrow;
+  /** Label */
+  label?: string;
+  /** Tooltip */
+  title?: string;
+  /** Head label */
+  headLabel?: string,
+  /** Tail label */
+  tailLabel?: string,
 }
 
 /* -------------------------------------------------------------------------- */
@@ -150,6 +164,29 @@ const FGCOLOR = {
   'blue': 'black',
   'pink': 'white',
 };
+
+const EDCOLOR = {
+  'white': '#ccc',
+  'grey': '#888',
+  'dark': 'black',
+  'primary': 'dodgerblue',
+  'selected': 'deepskyblue',
+  'green': 'green',
+  'orange': 'orange',
+  'red': 'red',
+  'yellow': '#e5e100',
+  'blue': 'deepskyblue',
+  'pink': 'palevioletred1',
+};
+
+/* -------------------------------------------------------------------------- */
+/* --- Edge Model                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+const DIR = (h: Arrow, t: Arrow): string | undefined =>
+  h === 'none'
+    ? (t === 'none' ? 'none' : 'back')
+    : (t === 'none' ? undefined : 'both');
 
 /* -------------------------------------------------------------------------- */
 /* --- Dot Model                                                          --- */
@@ -235,12 +272,22 @@ class DotModel {
 
   // --- Edge
   edge(e: Edge): void {
+    const { line = 'solid', head = 'arrow', tail = 'none' } = e;
     this
       .print('  ')
       .port(e.source, e.sourcePort)
       .print(' -> ')
       .port(e.target, e.targetPort)
       .print(' [')
+      .attr('label', e.label)
+      .attr('headlabel', e.headLabel)
+      .attr('taillabel', e.tailLabel)
+      .attr('labeltooltip', e.title)
+      .attr('dir', DIR(head, tail))
+      .attr('color', e.color ? EDCOLOR[e.color] : undefined)
+      .attr('style', line === 'solid' ? undefined : line)
+      .attr('arrowhead', head === 'arrow' ? undefined : head)
+      .attr('arrowtail', tail === 'arrow' ? undefined : tail)
       .println('];');
   }
 }
