@@ -288,10 +288,11 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
 
   // --- Rendering & Remote
   const id = React.useMemo(newDivId, []);
+  const href = `#${id}`;
   const { onSelection } = props;
   const { width, height } = props.size;
   React.useEffect(() => {
-    graphviz(`#${id}`, {
+    graphviz(href, {
       useWorker: false,
       fit: true, zoom: true, width, height,
     }).renderDot(model).on('end', function () {
@@ -306,15 +307,29 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
           });
       }
     });
-  }, [id, model, width, height, onSelection]);
+  }, [href, model, width, height, onSelection]);
 
   const onClick = React.useCallback((): void => {
     if (onSelection) onSelection(undefined);
   }, [onSelection]);
 
+  const onKey = React.useCallback((evt: React.KeyboardEvent): void => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      graphviz(href).resetZoom();
+      if (onSelection) onSelection(undefined);
+    }
+  }, [href, onSelection]);
+
   return (
     <Catch label='Graphviz Error'>
-      <div id={id} className={props.className} onClick={onClick} />
+      <div
+        id={id}
+        tabIndex={-1}
+        style={{ outline: 'none' }}
+        className={props.className}
+        onKeyDown={onKey}
+        onClick={onClick} />
     </Catch>
   );
 }
