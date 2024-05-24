@@ -26,6 +26,7 @@
 [eva] fc_libc.c:227: assertion got status valid.
 [eva] fc_libc.c:228: assertion got status valid.
 [eva] fc_libc.c:229: assertion got status valid.
+[eva] fc_libc.c:230: assertion got status valid.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -171,6 +172,7 @@ void main(void)
   /*@ assert __fc_p_getlogin ≡ (char *)__fc_getlogin; */ ;
   /*@ assert __fc_p_getpass ≡ (char *)__fc_getpass; */ ;
   /*@ assert __fc_p_pwd ≡ &__fc_pwd; */ ;
+  /*@ assert __fc_p_search_entry ≡ &__fc_search_entry; */ ;
   /*@ assert __fc_p_sigaction ≡ (struct sigaction *)__fc_sigaction; */ ;
   return;
 }
@@ -178,6 +180,12 @@ void main(void)
 
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
+[eva:initial-state] 
+  creating variable S_data_0_S___fc_search_tbl with imprecise size (type void)
+[eva:initial-state] 
+  creating variable S_data_1_S___fc_search_tbl with imprecise size (type void)
+[eva:initial-state] 
+  creating variable S_data___fc_search_entry with imprecise size (type void)
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   

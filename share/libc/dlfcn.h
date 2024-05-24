@@ -29,10 +29,30 @@ __PUSH_FC_STDLIB
 #define RTLD_GLOBAL 3
 #define RTLD_LOCAL 4
 __BEGIN_DECLS
-extern void  *dlopen(const char *, int);
-extern void  *dlsym(void *, const char *);
-extern int    dlclose(void *);
-extern char  *dlerror(void);
+
+/*@
+  assigns \result \from indirect:file[0..], indirect:mode; //missing: from 'filesystem';
+*/
+extern void *dlopen(const char *file, int mode);
+
+/*@
+  assigns \result \from handle, indirect:name[0..]; //missing: from 'filesystem';
+*/
+extern void *dlsym(void *handle, const char *name);
+
+/*@
+  assigns \result \from indirect:handle; //missing: from 'filesystem';
+*/
+extern int dlclose(void *handle);
+
+extern char __fc_dlerror[64];
+char * const __fc_p_dlerror = __fc_dlerror;
+
+/*@
+  assigns \result \from __fc_p_dlerror; //missing: from 'filesystem';
+*/
+extern char *dlerror(void);
+
 __END_DECLS
 __POP_FC_STDLIB
 #endif

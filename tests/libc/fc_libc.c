@@ -226,5 +226,6 @@ void main() {
   //@ assert __fc_p_getlogin == __fc_getlogin;
   //@ assert __fc_p_getpass == __fc_getpass;
   //@ assert __fc_p_pwd == &__fc_pwd;
+  //@ assert __fc_p_search_entry == &__fc_search_entry;
   //@ assert __fc_p_sigaction == __fc_sigaction;
 }

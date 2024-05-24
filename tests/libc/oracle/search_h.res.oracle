@@ -35,17 +35,33 @@
 [eva] Done for function strcpy
 [eva:alarm] search_h.c:32: Warning: 
   out of bounds write. assert \valid(&elementptr->count);
-[kernel:annot:missing-spec] search_h.c:34: Warning: 
-  Neither code nor specification for function tsearch,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function tsearch <- main.
   Called from search_h.c:34.
 [eva] using specification for function tsearch
-[eva:assigns:invalid-location] search_h.c:34: 
-  Completely invalid destination for assigns clause *compar. Ignoring.
+[eva:garbled-mix:assigns] search_h.c:34: 
+  The specification of function tsearch
+  has generated a garbled mix of addresses for assigns clause *rootp.
 [eva] Done for function tsearch
+[eva:alarm] search_h.c:35: Warning: 
+  pointer comparison. assert \pointer_comparable(node, (void *)0);
+[eva:alarm] search_h.c:40: Warning: 
+  accessing uninitialized left-value.
+  assert \initialized((struct element **)node);
 [eva:alarm] search_h.c:40: Warning: 
   out of bounds read. assert \valid_read((struct element **)node);
+[eva:alarm] search_h.c:40: Warning: 
+  pointer comparison.
+  assert
+  \pointer_comparable((void *)*((struct element **)node), (void *)elementptr);
+[eva:alarm] search_h.c:42: Warning: 
+  accessing uninitialized left-value.
+  assert \initialized((struct element **)node);
+[eva:alarm] search_h.c:42: Warning: 
+  out of bounds read. assert \valid_read((struct element **)node);
+[eva:alarm] search_h.c:42: Warning: 
+  out of bounds write. assert \valid(&(*((struct element **)node))->count);
+[kernel] search_h.c:42: Warning: 
+  all target addresses were invalid. This path is assumed to be dead.
 [eva] computing for function fprintf_va_1 <- main.
   Called from search_h.c:36.
 [eva] using specification for function fprintf
@@ -55,22 +71,23 @@
   Called from search_h.c:38.
 [eva] using specification for function exit
 [eva] Done for function exit
-[kernel:annot:missing-spec] search_h.c:46: Warning: 
-  Neither code nor specification for function twalk,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function twalk <- main.
   Called from search_h.c:46.
 [eva] using specification for function twalk
-[eva:assigns:invalid-location] search_h.c:46: 
-  Completely invalid destination for assigns clause *action. Ignoring.
 [eva] Done for function twalk
 [eva] Recording results for main
 [eva] Done for function main
-[eva] search_h.c:40: assertion 'Eva,mem_access' got final status invalid.
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    search_h.c:34: assigns clause on addresses
+      (read in 2 statements, propagated through 1 statement)
+      garbled mix of &{__malloc_main_l30}
+[scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   __fc_errno ∈ [--..--]
+  root ∈ {0}
   str[0..2048] ∈ [--..--] or UNINITIALIZED
   length ∈ {0}
   elementptr ∈ UNINITIALIZED

@@ -26,14 +26,45 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
+#include "errno.h"
 #include "sys/socket.h"
 
 struct if_nameidx {unsigned if_index; char *if_name;};
 #define IF_NAMESIZE 16
-extern unsigned              if_nametoindex(const char * name);
-extern char                 *if_indextoname(unsigned index, char *name);
-extern struct if_nameindex  *if_nameindex(void);
-extern void                  if_freenameindex(struct if_nameindex *ni);
+
+// represents the state of 'system hardware interfaces'
+extern volatile int __fc_net_if;
+
+/*@
+  assigns __fc_net_if \from __fc_net_if;
+  assigns \result \from indirect:name[0..], __fc_net_if;
+*/
+extern unsigned if_nametoindex(const char *name);
+
+/*@
+  assigns name[0 .. IF_NAMESIZE-1] \from indirect:index,
+    indirect:__fc_net_if;
+  assigns __fc_net_if \from __fc_net_if;
+  assigns \result \from name;
+  assigns errno \from indirect:index, indirect:__fc_net_if;
+*/
+extern char *if_indextoname(unsigned index, char *name);
+
+/*@
+  // missing: assigns \from 'system hardware';
+  allocates \result;
+  assigns __fc_net_if \from __fc_net_if;
+  assigns \result \from indirect:__fc_net_if;
+  assigns errno \from indirect:__fc_net_if;
+ */
+extern struct if_nameindex *if_nameindex(void);
+
+/*@
+  frees ni;
+  assigns *ni \from *ni;
+*/
+extern void if_freenameindex(struct if_nameindex *ni);
+
 #define	IFF_UP		0x1		/* interface is up		*/
 #define	IFF_BROADCAST	0x2		/* broadcast address valid	*/
 #define	IFF_DEBUG	0x4		/* turn on debugging		*/
