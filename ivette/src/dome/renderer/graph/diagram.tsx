@@ -24,7 +24,8 @@ import React from 'react';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
 import { Size } from 'react-virtualized';
-import * as d3 from 'd3-graphviz';
+import { select, selectAll } from 'd3-selection';
+import { graphviz } from 'd3-graphviz';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import './style.css';
 
@@ -97,7 +98,7 @@ export interface DiagramProps {
 
   /**
      Element to focus on.
-     The graph is scrolled to make this node visible if necessary.
+     The default color for this element is `'selected'`.
    */
   selected?: string;
 
@@ -105,7 +106,7 @@ export interface DiagramProps {
   direction?: Direction;
 
   /** Invoked when a node is selected. */
-  onSelection?: (node: string, evt: MouseEvent) => void;
+  onSelection?: (node: string | undefined) => void;
 
   /** Whether the Graph shall be displayed or not (defaults to true). */
   display?: boolean;
@@ -158,9 +159,10 @@ type edgeSpec = { source: string, target: string };
 const edgeKey = (e: edgeSpec): string => `${e.source} -> ${e.target}`;
 
 class DotModel {
-
-  // --- Basics
+  private selected: string | undefined;
   private spec = 'digraph {\n';
+
+  constructor(s: string | undefined) { this.selected = s; }
 
   print(...text: string[]): DotModel {
     this.spec = this.spec.concat(...text);
@@ -222,8 +224,9 @@ class DotModel {
         .attr('label', n.label)
         .attr('shape', n.shape);
     }
-    const color = n.color ?? 'white';
+    const color = n.color ?? (n.id === this.selected ? 'selected' : 'white');
     this
+      .attr('id', n.id)
       .attr('tooltip', n.title)
       .attr('fontcolor', FGCOLOR[color])
       .attr('fillcolor', BGCOLOR[color])
@@ -256,18 +259,16 @@ const byEdge = (a: Edge, b: Edge): number => byStr(edgeKey(a), edgeKey(b));
 /* -------------------------------------------------------------------------- */
 
 let divId = 0;
-const newDivId = (): string => `dome_d3gv_${++divId}`;
+const newDivId = (): string => `dome_xDiagram_g${++divId}`;
 
 interface GraphvizProps extends DiagramProps { size: Size }
 
 function GraphvizView(props: GraphvizProps): JSX.Element {
 
   // --- Model Generation
-  const {
-    direction = 'LR', nodes, edges
-  } = props;
+  const { direction = 'LR', nodes, edges, selected } = props;
   const model = React.useMemo(() => {
-    const dot = new DotModel();
+    const dot = new DotModel(selected);
     dot
       .attr('rankdir', direction)
       .attr('bgcolor', 'none')
@@ -276,7 +277,7 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     nodes.concat().sort(byNode).forEach(n => dot.node(n));
     edges.concat().sort(byEdge).forEach(e => dot.edge(e));
     return dot.flush();
-  }, [direction, nodes, edges]);
+  }, [direction, nodes, edges, selected]);
 
   // --- Model Update Callback
   const { onModelChanged } = props;
@@ -284,19 +285,36 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     if (onModelChanged) onModelChanged(model);
   }, [model, onModelChanged]);
 
+
   // --- Rendering & Remote
   const id = React.useMemo(newDivId, []);
+  const { onSelection } = props;
   const { width, height } = props.size;
   React.useEffect(() => {
-    d3.graphviz(`#${id}`, {
+    graphviz(`#${id}`, {
       useWorker: false,
       fit: true, zoom: true, width, height,
-    }).renderDot(model);
-  }, [id, model, width, height]);
+    }).renderDot(model).on('end', function () {
+      if (onSelection) {
+        selectAll('.node')
+          .on('click', function (evt: PointerEvent) {
+            const s = select(this).attr('id');
+            if (s) {
+              evt.stopPropagation();
+              onSelection(s);
+            }
+          });
+      }
+    });
+  }, [id, model, width, height, onSelection]);
+
+  const onClick = React.useCallback((): void => {
+    if (onSelection) onSelection(undefined);
+  }, [onSelection]);
 
   return (
     <Catch label='Graphviz Error'>
-      <div id={id} className={props.className} />
+      <div id={id} className={props.className} onClick={onClick} />
     </Catch>
   );
 }

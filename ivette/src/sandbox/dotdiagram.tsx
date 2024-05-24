@@ -72,9 +72,11 @@ const edges: Edge[] = [
 
 function DiagramSample(): JSX.Element {
   const [model, setModel] = React.useState('');
+  const [selected, setSelected] = React.useState<string>();
   return (
     <HSplit settings='sandbox.diagram.split'>
       <Scroll>
+        <pre>Selected: {selected}</pre>
         <pre>
           {model}
         </pre>
@@ -82,7 +84,9 @@ function DiagramSample(): JSX.Element {
       <Diagram
         nodes={nodes}
         edges={edges}
+        selected={selected}
         onModelChanged={setModel}
+        onSelection={setSelected}
       />
     </HSplit >
   );

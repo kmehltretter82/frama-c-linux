@@ -943,6 +943,11 @@
   resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-1.4.6.tgz#3e6056117b19d8bb6c729c872ca7234622099fb6"
   integrity sha512-0MhJ/LzJe6/vQVxiYJnvNq5CD/MF6Qy0dLp4BEQ6Dz8oOaB0EMXfx1GGeBFSW+3VzgjaUrxK6uECDQj9VLa/Mg==
 
+"@types/d3-selection@^3.0.10":
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-3.0.10.tgz#98cdcf986d0986de6912b5892e7c015a95ca27fe"
+  integrity sha512-cuHoUgS/V3hLdjJOLTT691+G2QoqAjCVLmr4kJXR4ha56w1Zdu8UUQ5TxLRqudgNjwXeQxKMq4j+lyf9sWuslg==
+
 "@types/d3-transition@^1":
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/@types/d3-transition/-/d3-transition-1.3.5.tgz#5ef69ea917d6935b0a1db895a7e5698ba7a08af1"
@@ -2271,7 +2276,7 @@ d3-drag@^1.0.4:
   resolved "https://registry.npmjs.org/d3-format/-/d3-format-3.1.0.tgz"
   integrity sha512-YyUI6AEuY/Wpt8KWLgZHsIU86atmikuoOmCfommt0LYHiQSPjvX2AcFc38PX0CBpr2RCyZhjex+NS/LPOv6YqA==
 
-d3-graphviz@^5.4.0:
+d3-graphviz@^5:
   version "5.4.0"
   resolved "https://registry.yarnpkg.com/d3-graphviz/-/d3-graphviz-5.4.0.tgz#a63ecb4345ff31aacb8813c74533fdd1ec4304ed"
   integrity sha512-e/kvvdfIfARiB4bF9/vDgY6WwvLxGCny2tS6ozUaOwgbL/CfaBWT7EwvCH5PiDQuvdx+xscnxjCsoUjw2CR86A==
@@ -2336,7 +2341,7 @@ d3-selection@1:
   resolved "https://registry.npmjs.org/d3-selection/-/d3-selection-1.4.2.tgz"
   integrity sha512-SJ0BqYihzOjDnnlfyeHT0e30k0K1+5sR3d5fNueCNeuhZTnGw4M4o8mqJchSwgKMXCNFo+e2VTChiSJ0vYtXkg==
 
-"d3-selection@2 - 3", d3-selection@3:
+"d3-selection@2 - 3", d3-selection@3, d3-selection@^3:
   version "3.0.0"
   resolved "https://registry.npmjs.org/d3-selection/-/d3-selection-3.0.0.tgz"
   integrity sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==
