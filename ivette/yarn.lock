@@ -613,6 +613,13 @@
   resolved "https://registry.yarnpkg.com/@gar/promisify/-/promisify-1.1.3.tgz#555193ab2e3bb3b6adc3d551c9c030d9e860daf6"
   integrity sha512-k2Ty1JcVojjJFwrg/ThKi2ujJ7XNLYaFGNB/bWT9wGR+oSMJHMa5w+CUq6p/pVrKeNNgA7pCqEcjSnHVoqJQFw==
 
+"@hpcc-js/wasm@^2.16.2":
+  version "2.16.2"
+  resolved "https://registry.yarnpkg.com/@hpcc-js/wasm/-/wasm-2.16.2.tgz#20a086356b9b0e3c5035bdc3c68eb04b3c0b43a6"
+  integrity sha512-THiidUMYR8/cIfFT3MVcWuRE7bQKh295nrFBxGvUNc4Nq8e2uU1LtiplHs7AUkJ0GxgvZoR+8TQ1/E3Qb/uE2g==
+  dependencies:
+    yargs "17.7.2"
+
 "@humanwhocodes/config-array@^0.11.14":
   version "0.11.14"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.14.tgz#d78e481a039f7566ecc9660b4ea7fe6b1fec442b"
@@ -910,6 +917,52 @@
   resolved "https://registry.yarnpkg.com/@types/cytoscape/-/cytoscape-3.19.16.tgz#c54ad4ff5c53a0046f42d1b08a11e730ad83dcc1"
   integrity sha512-A3zkjaZ6cOGyqEvrVuC1YUgiRSJhDZOj8Qhd1ALH2/+YxH2za1BOmR4RWQsKYHsc+aMP/IWoqg1COuUbZ39t/g==
 
+"@types/d3-color@^1":
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/@types/d3-color/-/d3-color-1.4.5.tgz#23bb1afda325549c6314ab60aa2aa28c4c6b1c37"
+  integrity sha512-5sNP3DmtSnSozxcjqmzQKsDOuVJXZkceo1KJScDc1982kk/TS9mTPc6lpli1gTu1MIBF1YWutpHpjucNWcIj5g==
+
+"@types/d3-graphviz@^2.6.10":
+  version "2.6.10"
+  resolved "https://registry.yarnpkg.com/@types/d3-graphviz/-/d3-graphviz-2.6.10.tgz#eb2c8284db768c6880ff9bb13db81689121dcece"
+  integrity sha512-YsCRqNqS8QLlsKtF0FGIz42Z47B0sBIxMMn7L4ZdqZcrdk4foJOEPwwMH50Qe2PuZmSSZcWbdgUnj5W68xK0Qw==
+  dependencies:
+    "@types/d3-selection" "^1"
+    "@types/d3-transition" "^1"
+    "@types/d3-zoom" "^1"
+
+"@types/d3-interpolate@^1":
+  version "1.4.5"
+  resolved "https://registry.yarnpkg.com/@types/d3-interpolate/-/d3-interpolate-1.4.5.tgz#7964699575ec9c594a9a7aaea411a812ce6cd674"
+  integrity sha512-k9L18hXXv7OvK4PqW1kSFYIzasGOvfhPUWmHFkoZ8/ci99EAmY4HoF6zMefrHl0SGV7XYc7Qq2MNh8dK3edg5A==
+  dependencies:
+    "@types/d3-color" "^1"
+
+"@types/d3-selection@^1":
+  version "1.4.6"
+  resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-1.4.6.tgz#3e6056117b19d8bb6c729c872ca7234622099fb6"
+  integrity sha512-0MhJ/LzJe6/vQVxiYJnvNq5CD/MF6Qy0dLp4BEQ6Dz8oOaB0EMXfx1GGeBFSW+3VzgjaUrxK6uECDQj9VLa/Mg==
+
+"@types/d3-selection@^3.0.10":
+  version "3.0.10"
+  resolved "https://registry.yarnpkg.com/@types/d3-selection/-/d3-selection-3.0.10.tgz#98cdcf986d0986de6912b5892e7c015a95ca27fe"
+  integrity sha512-cuHoUgS/V3hLdjJOLTT691+G2QoqAjCVLmr4kJXR4ha56w1Zdu8UUQ5TxLRqudgNjwXeQxKMq4j+lyf9sWuslg==
+
+"@types/d3-transition@^1":
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/@types/d3-transition/-/d3-transition-1.3.5.tgz#5ef69ea917d6935b0a1db895a7e5698ba7a08af1"
+  integrity sha512-gVj9AXXkoj0yKr1jsPJFkKoYTEmSdaYh8W7XBeRIhcspFX9b3MSwLxTerVHeEPXer9kYLvZfAINk8HcjWhwZSQ==
+  dependencies:
+    "@types/d3-selection" "^1"
+
+"@types/d3-zoom@^1":
+  version "1.8.7"
+  resolved "https://registry.yarnpkg.com/@types/d3-zoom/-/d3-zoom-1.8.7.tgz#0afdcf771e6ea518f3a4b634bbb4c8e8979c65b1"
+  integrity sha512-HJWci3jXwFIuFKDqGn5PmuwrhZvuFdrnUmtSKCLXFAWyf2lAIUKMKh1/lHOkWBl/f4KVupGricJiqkQy+cVTog==
+  dependencies:
+    "@types/d3-interpolate" "^1"
+    "@types/d3-selection" "^1"
+
 "@types/debug@^4.1.6":
   version "4.1.7"
   resolved "https://registry.npmjs.org/@types/debug/-/debug-4.1.7.tgz"
@@ -917,10 +970,10 @@
   dependencies:
     "@types/ms" "*"
 
-"@types/diff@^5.0.9":
-  version "5.0.9"
-  resolved "https://registry.yarnpkg.com/@types/diff/-/diff-5.0.9.tgz#31977962175079c2048315febeb8fd5f520192c6"
-  integrity sha512-RWVEhh/zGXpAVF/ZChwNnv7r4rvqzJ7lYNSmZSVTxjV0PBLf6Qu7RNg+SUtkpzxmiNkjCx0Xn2tPp7FIkshJwQ==
+"@types/diff@^5":
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/@types/diff/-/diff-5.2.1.tgz#cceae9c4b2dae5c6b8ab1ce1263601c255d87fb3"
+  integrity sha512-uxpcuwWJGhe2AR1g8hD9F5OYGCqjqWnBUQFD8gMZsDbv8oPHzxJF6iMO6n8Tk0AdzlxoaaoQhOYlIg/PukVU8g==
 
 "@types/estree@1.0.5":
   version "1.0.5"
@@ -956,10 +1009,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/lodash@^4.17.0":
-  version "4.17.0"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.0.tgz#d774355e41f372d5350a4d0714abb48194a489c3"
-  integrity sha512-t7dhREVv6dbNj0q17X12j7yDG4bD/DHYX7o5/DbDxobP0HnGPgpRz2Ej77aL7TZT3DSw13fqUTj8J4mMnqa7WA==
+"@types/lodash@^4":
+  version "4.17.4"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.17.4.tgz#0303b64958ee070059e3a7184048a55159fe20b7"
+  integrity sha512-wYCP26ZLxaT3R39kiN2+HcJ4kTd3U1waI/cY7ivWYqFP6pW3ZNpvi6Wd6PHZx7T/t8z0vlkXMg3QYLa7DZ/IJQ==
 
 "@types/ms@*":
   version "0.7.31"
@@ -973,17 +1026,17 @@
   dependencies:
     undici-types "~5.26.4"
 
+"@types/node@^18":
+  version "18.19.33"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.33.tgz#98cd286a1b8a5e11aa06623210240bcc28e95c48"
+  integrity sha512-NR9+KrpSajr2qBVp/Yt5TU/rp+b5Mayi3+OlMlcg2cVCfRmcG5PWZ7S4+MG9PZ5gWBoc9Pd0BKSRViuBCRPu0A==
+  dependencies:
+    undici-types "~5.26.4"
+
 "@types/node@^18.11.18":
   version "18.18.13"
   resolved "https://registry.npmjs.org/@types/node/-/node-18.18.13.tgz"
   integrity sha512-vXYZGRrSCreZmq1rEjMRLXJhiy8MrIeVasx+PCVlP414N7CJLHnMf+juVvjdprHyH+XRy3zKZLHeNueOpJCn0g==
-  dependencies:
-    undici-types "~5.26.4"
-
-"@types/node@^18.19.9":
-  version "18.19.26"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.19.26.tgz#18991279d0a0e53675285e8cf4a0823766349729"
-  integrity sha512-+wiMJsIwLOYCvUqSdKTrfkS8mpTp+MPINe6+Np4TAGFWWRWiBQ5kSq9nZGCSPkzx9mvT+uEukzpX4MOSCydcvw==
   dependencies:
     undici-types "~5.26.4"
 
@@ -2181,7 +2234,7 @@ d3-dispatch@1, d3-dispatch@^1.0.3:
   resolved "https://registry.npmjs.org/d3-dispatch/-/d3-dispatch-1.0.6.tgz"
   integrity sha512-fVjoElzjhCEy+Hbn8KygnmMS7Or0a9sI2UzGwoB7cCtvI1XpVN9GpoYlnb3xt2YV66oXYb1fLJ8GMvP4hdU1RA==
 
-"d3-dispatch@1 - 3":
+"d3-dispatch@1 - 3", d3-dispatch@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/d3-dispatch/-/d3-dispatch-3.0.1.tgz"
   integrity sha512-rzUyPU/S7rwUflMyLc1ETDeBj0NRuHKKAcvukozwhshr6g6c5d8zh4c2gQjY2bZ0dXeGLWc1PF174P2tVvKhfg==
@@ -2218,12 +2271,26 @@ d3-drag@^1.0.4:
     d3-quadtree "1 - 3"
     d3-timer "1 - 3"
 
-"d3-format@1 - 3":
+"d3-format@1 - 3", d3-format@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/d3-format/-/d3-format-3.1.0.tgz"
   integrity sha512-YyUI6AEuY/Wpt8KWLgZHsIU86atmikuoOmCfommt0LYHiQSPjvX2AcFc38PX0CBpr2RCyZhjex+NS/LPOv6YqA==
 
-"d3-interpolate@1 - 3", "d3-interpolate@1.2.0 - 3":
+d3-graphviz@^5:
+  version "5.4.0"
+  resolved "https://registry.yarnpkg.com/d3-graphviz/-/d3-graphviz-5.4.0.tgz#a63ecb4345ff31aacb8813c74533fdd1ec4304ed"
+  integrity sha512-e/kvvdfIfARiB4bF9/vDgY6WwvLxGCny2tS6ozUaOwgbL/CfaBWT7EwvCH5PiDQuvdx+xscnxjCsoUjw2CR86A==
+  dependencies:
+    "@hpcc-js/wasm" "^2.16.2"
+    d3-dispatch "^3.0.1"
+    d3-format "^3.1.0"
+    d3-interpolate "^3.0.1"
+    d3-path "^3.1.0"
+    d3-timer "^3.0.1"
+    d3-transition "^3.0.1"
+    d3-zoom "^3.0.0"
+
+"d3-interpolate@1 - 3", "d3-interpolate@1.2.0 - 3", d3-interpolate@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz"
   integrity sha512-3bYs1rOD33uo8aqJfKP3JWPAibgw8Zm2+L9vBKEHJ2Rg+viTR7o5Mmv5mZcieN+FRYaAOWX5SJATX6k1PWz72g==
@@ -2239,6 +2306,11 @@ d3-path@1:
   version "1.0.9"
   resolved "https://registry.npmjs.org/d3-path/-/d3-path-1.0.9.tgz"
   integrity sha512-VLaYcn81dtHVTjEHd8B+pbe9yHWpXKZUC87PzoFmsFrJqgFwDe/qxfp5MlfsfM1V5E/iVt0MmEbWQ7FVIXh/bg==
+
+d3-path@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/d3-path/-/d3-path-3.1.0.tgz#22df939032fb5a71ae8b1800d61ddb7851c42526"
+  integrity sha512-p3KP5HCf/bvjBSSKuXid6Zqijx7wIfNW+J/maPs+iwR35at5JCbLUT0LzF1cnjbCHWhqzQTIN2Jpe8pRebIEFQ==
 
 "d3-quadtree@1 - 3":
   version "3.0.1"
@@ -2269,7 +2341,7 @@ d3-selection@1:
   resolved "https://registry.npmjs.org/d3-selection/-/d3-selection-1.4.2.tgz"
   integrity sha512-SJ0BqYihzOjDnnlfyeHT0e30k0K1+5sR3d5fNueCNeuhZTnGw4M4o8mqJchSwgKMXCNFo+e2VTChiSJ0vYtXkg==
 
-"d3-selection@2 - 3", d3-selection@3:
+"d3-selection@2 - 3", d3-selection@3, d3-selection@^3:
   version "3.0.0"
   resolved "https://registry.npmjs.org/d3-selection/-/d3-selection-3.0.0.tgz"
   integrity sha512-fmTRWbNMmsmWq6xJV8D19U/gw/bwrHfNXxrIN+HfZgnzqTHp9jOmKMhsTUjXOJnZOdZY9Q28y4yebKzqDKlxlQ==
@@ -2295,7 +2367,7 @@ d3-shape@^1.3.5:
   dependencies:
     d3-array "2 - 3"
 
-"d3-timer@1 - 3":
+"d3-timer@1 - 3", d3-timer@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz"
   integrity sha512-ndfJ/JxxMd3nw31uyKoY2naivF+r29V+Lc0svZxe1JvvIRmi8hUsrMvdOwgS1o6uBHmiz91geQ0ylPP0aj1VUA==
@@ -2305,7 +2377,7 @@ d3-timer@^1.0.5:
   resolved "https://registry.npmjs.org/d3-timer/-/d3-timer-1.0.10.tgz"
   integrity sha512-B1JDm0XDaQC+uvo4DT79H0XmBskgS3l6Ve+1SBCfxgmtIb1AVrPIoqd+nPSv+loMX8szQ0sVUhGngL7D5QPiXw==
 
-"d3-transition@2 - 3":
+"d3-transition@2 - 3", d3-transition@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/d3-transition/-/d3-transition-3.0.1.tgz"
   integrity sha512-ApKvfjsSR6tg06xrL434C0WydLr7JewBB3V+/39RMHsaXTOG0zmt/OAXeng5M5LBm0ojmxJrpomQVZ1aPvBL4w==
@@ -2316,7 +2388,7 @@ d3-timer@^1.0.5:
     d3-interpolate "1 - 3"
     d3-timer "1 - 3"
 
-"d3-zoom@2 - 3":
+"d3-zoom@2 - 3", d3-zoom@^3.0.0:
   version "3.0.0"
   resolved "https://registry.npmjs.org/d3-zoom/-/d3-zoom-3.0.0.tgz"
   integrity sha512-b8AmV3kfQaqWAuacbPuNbL6vahnOJflOhexLzMMNLga62+/nh0JzvJ0aO/5a5MVgUFGS7Hu1P9P03o3fJkDCyw==
@@ -2566,7 +2638,7 @@ electron-builder@^24:
 
 electron-devtools-installer@^3.2.0:
   version "3.2.0"
-  resolved "https://registry.npmjs.org/electron-devtools-installer/-/electron-devtools-installer-3.2.0.tgz"
+  resolved "https://registry.yarnpkg.com/electron-devtools-installer/-/electron-devtools-installer-3.2.0.tgz#acc48d24eb7033fe5af284a19667e73b78d406d0"
   integrity sha512-t3UczsYugm4OAbqvdImMCImIMVdFzJAHgbwHpkl5jmfu1izVgUcP/mnrPqJIpEeCK1uZGpt+yHgWEN+9EwoYhQ==
   dependencies:
     rimraf "^3.0.2"
@@ -5773,10 +5845,10 @@ typescript@^4.0.2:
   resolved "https://registry.npmjs.org/typescript/-/typescript-4.9.5.tgz"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
-typescript@^5.3.3:
-  version "5.4.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.3.tgz#5c6fedd4c87bee01cd7a528a30145521f8e0feff"
-  integrity sha512-KrPd3PKaCLr78MalgiwJnA25Nm8HAmdwN3mYUYZgG/wizIo9EainNVQI9/yDavtVFRN2h3k8uf3GLHuhDMgEHg==
+typescript@^5:
+  version "5.4.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.5.tgz#42ccef2c571fdbd0f6718b1d1f5e6e5ef006f611"
+  integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==
 
 unbox-primitive@^1.0.1:
   version "1.0.1"
@@ -6025,7 +6097,7 @@ yargs-parser@^21.1.1:
   resolved "https://registry.npmjs.org/yargs-parser/-/yargs-parser-21.1.1.tgz"
   integrity sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==
 
-yargs@^17.0.1, yargs@^17.6.2:
+yargs@17.7.2, yargs@^17.0.1, yargs@^17.6.2:
   version "17.7.2"
   resolved "https://registry.npmjs.org/yargs/-/yargs-17.7.2.tgz"
   integrity sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==
