@@ -24,7 +24,8 @@ RUN /init/install.sh \
   patch \
   tar \
   unzip \
-  wget
+  wget \
+  which
 
 RUN bash -c "yes '' | sh <(curl -fsSL https://raw.githubusercontent.com/ocaml/opam/master/shell/install.sh)" --version 2.1.5
 
@@ -169,8 +170,8 @@ ARG OCAML_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Transfers ownership of /home/opam to user opam
-# Note: Fedora does not recognize --disabled-password, but it does not need it
-RUN adduser --disabled-password opam 2>/dev/null || adduser opam
+# Note: Debian and Fedora have 'useradd', but Alpine has 'adduser'
+RUN useradd opam || adduser --disabled-password opam
 
 COPY --from=frama-c /bin /bin/
 COPY --from=frama-c /etc /etc/
@@ -207,7 +208,8 @@ ARG OCAML_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Transfers ownership of /home/opam to user opam
-RUN adduser --disabled-password opam 2>/dev/null || adduser opam
+# Note: Debian and Fedora have 'useradd', but Alpine has 'adduser'
+RUN useradd opam || adduser --disabled-password opam
 
 COPY --from=frama-c-gui /bin /bin/
 COPY --from=frama-c-gui /etc /etc/
@@ -305,7 +307,8 @@ ARG OCAML_VERSION
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Transfers ownership of /home/opam to user opam
-RUN adduser --disabled-password opam 2>/dev/null || adduser opam
+# Note: Debian and Fedora have 'useradd', but Alpine has 'adduser'
+RUN useradd opam || adduser --disabled-password opam
 
 COPY --from=frama-c-stripped-prepare /bin /bin/
 COPY --from=frama-c-stripped-prepare /etc /etc/
