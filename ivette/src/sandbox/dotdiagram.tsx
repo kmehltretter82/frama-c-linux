@@ -40,9 +40,9 @@ const nodes: Node[] = [
   {
     id: 'R',
     shape: [
-      { label: 'Dotted (c)', port: 'c' },
+      { label: 'Dotted "c"', port: 'c' },
       ['D1', 'D2'],
-      { label: 'Dashed (e)', port: 'e' },
+      { label: 'Dashed "e"', port: 'e' },
     ]
   },
   { id: 'white', color: 'white' },

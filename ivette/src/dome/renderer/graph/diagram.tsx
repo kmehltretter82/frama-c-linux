@@ -192,48 +192,78 @@ const DIR = (h: Arrow, t: Arrow): string | undefined =>
 /* --- Dot Model                                                          --- */
 /* -------------------------------------------------------------------------- */
 
-type edgeSpec = { source: string, target: string };
-const edgeKey = (e: edgeSpec): string => `${e.source} -> ${e.target}`;
+class Builder {
 
-class DotModel {
   private selected: string | undefined;
-  private spec = 'digraph {\n';
+  private spec = '';
 
-  constructor(s: string | undefined) { this.selected = s; }
+  private kid = 0;
+  private imap = new Map<string, string>();
+  private rmap = new Map<string, string>();
 
-  print(...text: string[]): DotModel {
-    this.spec = this.spec.concat(...text);
+  index(id: string): string {
+    const n = this.imap.get(id);
+    if (n !== undefined) return n;
+    const m = `n${this.kid++}`;
+    this.imap.set(id, m);
+    this.rmap.set(m, id);
+    return m;
+  }
+
+  nodeId(n: string): string {
+    return this.rmap.get(n) ?? n;
+  }
+
+  init(): Builder {
+    this.spec = 'digraph {\n';
+    this.selected = undefined;
+    // Keep node index to fade in & out
     return this;
   }
 
-  println(...text: string[]): DotModel {
-    this.spec = this.spec.concat(...text).concat('\n');
+  select(selected: string | undefined): Builder {
+    this.selected = selected;
     return this;
   }
 
   flush(): string { return this.spec.concat('}'); }
 
+  print(...text: string[]): Builder {
+    this.spec = this.spec.concat(...text);
+    return this;
+  }
+
+  println(...text: string[]): Builder {
+    this.spec = this.spec.concat(...text).concat('\n');
+    return this;
+  }
+
   // --- Attributes
-  value(a: string | number): DotModel {
+
+  escaped(a: string): Builder {
+    return this.print(a.split('"').join('\\"'));
+  }
+
+  value(a: string | number): Builder {
     if (typeof a === 'string')
-      return this.print('"', a, '"');
+      return this.print('"').escaped(a).print('"');
     else
       return this.print(`${a}`);
   }
 
-  attr(a: string, v: string | number | undefined): DotModel {
+  attr(a: string, v: string | number | undefined): Builder {
     return v ? this.print(' ', a, '=').value(v).print('; ') : this;
   }
 
   // --- Node Table Shape
 
-  port(id: string, port?: string): DotModel {
-    this.print(id);
-    if (port) this.print(':', port);
+  port(id: string, port?: string): Builder {
+    this.print(this.index(id));
+    if (port) this.print(':', this.index(port));
     return this;
   }
 
-  record(r: Box, nested = false): DotModel {
+  record(r: Box, nested = false): Builder {
     if (Array.isArray(r)) {
       if (nested) this.print('{');
       r.forEach((c, k) => {
@@ -243,22 +273,24 @@ class DotModel {
       if (nested) this.print('}');
       return this;
     } else if (typeof r === 'string') {
-      return this.print(r);
+      return this.escaped(r);
     } else {
-      return this.print('<', r.port, '> ', r.label);
+      return this.print('<').port(r.port).print('> ').escaped(r.label);
     }
   }
 
   // --- Node
   node(n: Node): void {
-    this.print('  ', n.id, ' [');
+    this.print('  ').port(n.id).print(' [');
     if (typeof n.shape === 'object') {
       this
         .attr('shape', 'record')
-        .print(' label="').record(n.shape).print('"; ');
+        .print(' label="')
+        .record(n.shape)
+        .print('"; ');
     } else {
       this
-        .attr('label', n.label)
+        .attr('label', n.label ?? n.id)
         .attr('shape', n.shape);
     }
     const color = n.color ?? (n.id === this.selected ? 'selected' : 'white');
@@ -268,6 +300,11 @@ class DotModel {
       .attr('fontcolor', FGCOLOR[color])
       .attr('fillcolor', BGCOLOR[color])
       .println('];');
+  }
+
+  nodes(ns: readonly Node[]): Builder {
+    ns.forEach(n => this.node(n));
+    return this;
   }
 
   // --- Edge
@@ -290,16 +327,13 @@ class DotModel {
       .attr('arrowtail', tail === 'arrow' ? undefined : tail)
       .println('];');
   }
+
+  edges(es: readonly Edge[]): Builder {
+    es.forEach(e => this.edge(e));
+    return this;
+  }
+
 }
-
-const byStr = (a: string, b: string): number => {
-  if (a < b) return -1;
-  if (a > b) return +1;
-  return 0;
-};
-
-const byNode = (a: Node, b: Node): number => byStr(a.id, b.id);
-const byEdge = (a: Edge, b: Edge): number => byStr(edgeKey(a), edgeKey(b));
 
 /* -------------------------------------------------------------------------- */
 /* --- d3-Graphviz view                                                   --- */
@@ -312,19 +346,24 @@ interface GraphvizProps extends DiagramProps { size: Size }
 
 function GraphvizView(props: GraphvizProps): JSX.Element {
 
+  // --- Builder Instance (unique)
+  const builder = React.useMemo(() => new Builder, []);
+
   // --- Model Generation
   const { direction = 'LR', nodes, edges, selected } = props;
-  const model = React.useMemo(() => {
-    const dot = new DotModel(selected);
-    dot
+  const model = React.useMemo(() =>
+    builder
+      .init()
+      .select(selected)
       .attr('rankdir', direction)
       .attr('bgcolor', 'none')
       .attr('width', 0.5)
-      .println('node [ style="filled" ];');
-    nodes.concat().sort(byNode).forEach(n => dot.node(n));
-    edges.concat().sort(byEdge).forEach(e => dot.edge(e));
-    return dot.flush();
-  }, [direction, nodes, edges, selected]);
+      .println('node [ style="filled" ];')
+      .nodes(nodes)
+      .edges(edges)
+      .flush()
+    , [builder, direction, nodes, edges, selected]
+  );
 
   // --- Model Update Callback
   const { onModelChanged } = props;
@@ -334,27 +373,30 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
 
 
   // --- Rendering & Remote
+  const [error, setError] = React.useState<string>();
   const id = React.useMemo(newDivId, []);
   const href = `#${id}`;
   const { onSelection } = props;
   const { width, height } = props.size;
   React.useEffect(() => {
+    setError(undefined);
     graphviz(href, {
       useWorker: false,
       fit: true, zoom: true, width, height,
-    }).renderDot(model).on('end', function () {
-      if (onSelection) {
-        selectAll('.node')
-          .on('click', function (evt: PointerEvent) {
-            const s = select(this).attr('id');
-            if (s) {
-              evt.stopPropagation();
-              onSelection(s);
-            }
-          });
-      }
-    });
-  }, [href, model, width, height, onSelection]);
+    }).onerror(setError)
+      .renderDot(model).on('end', function () {
+        if (onSelection) {
+          selectAll('.node')
+            .on('click', function (evt: PointerEvent) {
+              const s = select(this).attr('id');
+              if (s) {
+                evt.stopPropagation();
+                onSelection(builder.nodeId(s));
+              }
+            });
+        }
+      });
+  }, [href, model, width, height, builder, onSelection, setError]);
 
   const onClick = React.useCallback((): void => {
     if (onSelection) onSelection(undefined);
@@ -368,16 +410,16 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     }
   }, [href, onSelection]);
 
+  if (error !== undefined) throw (error);
+
   return (
-    <Catch label='Graphviz Error'>
-      <div
-        id={id}
-        tabIndex={-1}
-        style={{ outline: 'none' }}
-        className={props.className}
-        onKeyDown={onKey}
-        onClick={onClick} />
-    </Catch>
+    <div
+      id={id}
+      tabIndex={-1}
+      style={{ outline: 'none' }}
+      className={props.className}
+      onKeyDown={onKey}
+      onClick={onClick} />
   );
 }
 
@@ -394,11 +436,14 @@ export function Diagram(props: DiagramProps): JSX.Element {
         <AutoSizer>
           {(size: Size) => (
             <div className={className} style={size}>
-              <GraphvizView size={size} {...props} />
+              <Catch label='Graphviz Error'>
+                <GraphvizView size={size} {...props} />
+              </Catch>
             </div>
           )}
-        </AutoSizer>
-      )}
+        </AutoSizer >
+      )
+      }
     </>
   );
 }
