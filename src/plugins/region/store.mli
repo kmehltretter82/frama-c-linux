@@ -20,30 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+include UnionFind.STORE
 
-type node
+(** Global unique identifier *)
+val id : 'a rref -> int
 
-type layout =
-  | Blob
-  | Atom
-  | AtomPtr of node
-  | Compound of node Ranges.t
+(** Unordered union *)
+val bag: 'a list -> 'a list -> 'a list
 
-type region = private {
-  parents: node list ;
-  roots: varinfo list ;
-  size: int64 ;
-  layout: layout ;
-}
-
-type map
-
-val create : unit -> map
-val copy : map -> map
-
-val root : map -> Cil_types.varinfo -> node
-val node : map -> node -> node
-val nodes : map -> node list -> node list
-val region : map -> node -> region
-val merge : map -> node -> node -> node
+(** Sorted, unique *)
+val list : 'a rref list -> 'a rref list

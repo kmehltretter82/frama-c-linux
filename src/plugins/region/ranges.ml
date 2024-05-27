@@ -23,6 +23,11 @@
 let (+.) = Int64.add
 let (-.) = Int64.sub
 
+let rec gcd a b =
+  if a = Int64.zero then b else
+  if b = Int64.zero then a else
+    gcd b (Int64.rem a b)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Range Maps                                                         --- *)
 (* -------------------------------------------------------------------------- *)
@@ -36,6 +41,13 @@ type 'a range = {
 type 'a t = R of 'a range list (* sorted, no-overlap *)
 
 let empty = R []
+
+let rec find (k: int64) = function
+  | [] -> raise Not_found
+  | ({ offset ; length } as r) :: rs ->
+    if offset <= k && k <= offset +. length then r else find k rs
+
+let find k (R rs) = find k rs
 
 let rec merge f ra rb =
   match ra, rb with
@@ -53,15 +65,13 @@ let rec merge f ra rb =
       let length = max a' b' -. offset in
       let data = f a.data b.data in
       let r = { offset ; length ; data } in
-      merge f (r::ra) rb
+      if a' < b'
+      then merge f ra (r::rb)
+      else merge f (r::ra) rb
 
 let merge f (R x) (R y) = R (merge f x y)
 
-let rec find (k: int64) = function
-  | [] -> raise Not_found
-  | ({ offset ; length } as r) :: rs ->
-    if offset <= k && k <= offset +. length then r else find k rs
-
-let find k (R rs) = find k rs
+let iteri f (R xs) = List.iter f xs
+let iter f (R xs) = List.iter (fun r -> f r.data) xs
 
 (* -------------------------------------------------------------------------- *)

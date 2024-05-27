@@ -20,30 +20,30 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+(* -------------------------------------------------------------------------- *)
+(* --- UnionFind Store with explicit integer keys                         --- *)
+(* -------------------------------------------------------------------------- *)
 
-type node
+module Imap = Map.Make(Int)
 
-type layout =
-  | Blob
-  | Atom
-  | AtomPtr of node
-  | Compound of node Ranges.t
+type 'a rref = int
+type 'a store = 'a Imap.t ref
 
-type region = private {
-  parents: node list ;
-  roots: varinfo list ;
-  size: int64 ;
-  layout: layout ;
-}
+let new_store () = ref Imap.empty
+let copy r = ref !r
+let rid = ref 0
+let make s v =
+  let k = incr rid ; !rid in
+  s := Imap.add k v !s ; k
 
-type map
+let get s k = Imap.find k !s
+let set s k v = s := Imap.add k v !s
 
-val create : unit -> map
-val copy : map -> map
+let eq _s i j = (i == j)
 
-val root : map -> Cil_types.varinfo -> node
-val node : map -> node -> node
-val nodes : map -> node list -> node list
-val region : map -> node -> region
-val merge : map -> node -> node -> node
+let id x = x
+let list = List.sort_uniq Int.compare
+let rec bag a b =
+  match a, b with
+  | [], c | c, [] -> c
+  | x::xs, y::ys -> x :: y :: bag xs ys
