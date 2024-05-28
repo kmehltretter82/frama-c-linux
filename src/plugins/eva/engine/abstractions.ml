@@ -599,7 +599,7 @@ module Domain = struct
     | Unit _ -> Self.fatal "The built domain cannot be unit."
     | State structured -> structured
 
-  module type Typ = sig type t end
+  module type Typ = sig type t [@@warning "-34"] end
   type 't typ = (module Typ with type t = 't)
 
   type ('internal, 'extended) conversion =
