@@ -220,19 +220,27 @@ let merge (m: map) (a: node) (b: node) : node =
 (* --- Access                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+let access (m:map) (a:node) (ty: typ) =
+  let sr = sizeof (region m a).layout in
+  let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
+  if sr <> size then ignore (merge m a (cell m ~size ()))
+
 let points_to (m: map) (a: node) (b: node) =
   ignore @@ merge m a @@ cell m ~ptr:b ()
 
 let read (m: map) (a: node) from =
   let r = region m a in
-  Ufind.set m.store a { r with reads = Access.Set.add from r.reads }
+  Ufind.set m.store a { r with reads = Access.Set.add from r.reads } ;
+  access m a (Access.typeof from)
 
 let write (m: map) (a: node) from =
   let r = region m a in
-  Ufind.set m.store a { r with writes = Access.Set.add from r.writes }
+  Ufind.set m.store a { r with writes = Access.Set.add from r.writes } ;
+  access m a (Access.typeof from)
 
 let shift (m: map) (a: node) from =
   let r = region m a in
   Ufind.set m.store a { r with shifts = Access.Set.add from r.shifts }
+(* no access *)
 
 (* -------------------------------------------------------------------------- *)

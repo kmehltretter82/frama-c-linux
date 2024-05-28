@@ -19,3 +19,11 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+open Cil_types
+open Memory
+
+val lval : map -> stmt -> lval -> node
+val ptr : map -> stmt -> exp -> node
+val exp : map -> stmt -> exp -> node option
+val instr : map -> stmt -> instr -> unit
