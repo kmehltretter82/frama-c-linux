@@ -417,7 +417,7 @@ module Offsm
   let assume_pointer v = `Unknown v
   let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
-  let constant _ e _c =
+  let constant _context e _c =
     if store_redundant then
       match Cil.constFoldToInt e with
       | Some i -> inject_int (Cil.typeOf e) i
@@ -452,17 +452,18 @@ module Offsm
     in
     `Value o'
 
-  let backward_binop _ ~input_type:_ ~resulting_type:_ _op ~left:_ ~right:_ ~result:_ =
+  let backward_binop _context ~input_type:_ ~resulting_type:_
+      _op ~left:_ ~right:_ ~result:_ =
     `Value (None, None)
 
-  let backward_unop _ ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
+  let backward_unop _context ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
 
-  let backward_cast _ ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+  let backward_cast _context ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
     `Value None
 
-  let rewrap_integer _ _range o = o
+  let rewrap_integer _context _range o = o
 
-  let forward_cast _ ~src_type ~dst_type o =
+  let forward_cast _context ~src_type ~dst_type o =
     let open Eval_typ in
     match o, src_type, dst_type with
     | O o, (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->

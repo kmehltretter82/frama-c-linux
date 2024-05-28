@@ -24,6 +24,7 @@ open Cil_types
 
 module CVal = struct
   include Cvalue.V
+
   type context = unit
   let context = Abstract_context.Leaf (module Unit_context)
 
@@ -49,7 +50,7 @@ module CVal = struct
   let assume_pointer = Cvalue_forward.assume_pointer
   let assume_comparable = Cvalue_forward.assume_comparable
 
-  let constant _ exp = function
+  let constant _context exp = function
     | CInt64 (i,_k,_s) -> Cvalue.V.inject_int i
     | CChr c           -> Cvalue.V.inject_int (Cil.charConstToInt c)
     | CWStr _ | CStr _ -> Cvalue.V.inject (Base.of_string_exp exp) Ival.zero
@@ -74,16 +75,16 @@ module CVal = struct
     then `Bottom
     else `Value value
 
-  let rewrap_integer _ = Cvalue_forward.rewrap_integer
+  let rewrap_integer _context = Cvalue_forward.rewrap_integer
 
   let forward_cast _context ~src_type ~dst_type v =
     let v = Cvalue_forward.forward_cast ~src_type ~dst_type v in
     if Cvalue.V.is_bottom v then `Bottom else `Value v
 
-  let backward_binop _ ~input_type ~resulting_type binop ~left ~right ~result =
+  let backward_binop _ctx ~input_type ~resulting_type op ~left ~right ~result =
     let reduction =
       Cvalue_backward.backward_binop
-        ~typ_res:resulting_type ~res_value:result ~typ_e1:input_type left binop right
+        ~typ_res:resulting_type ~res_value:result ~typ_e1:input_type left op right
     in
     match reduction with
     | None -> `Value (None, None)
@@ -92,7 +93,7 @@ module CVal = struct
       then `Bottom
       else `Value (Some v1, Some v2)
 
-  let backward_unop _ ~typ_arg op ~arg ~res =
+  let backward_unop _context ~typ_arg op ~arg ~res =
     let reduction = Cvalue_backward.backward_unop ~typ_arg op ~arg ~res in
     match reduction with
     | None -> `Value None
@@ -101,7 +102,7 @@ module CVal = struct
       then `Bottom
       else `Value r
 
-  let backward_cast _ ~src_typ ~dst_typ ~src_val ~dst_val =
+  let backward_cast _context ~src_typ ~dst_typ ~src_val ~dst_val =
     let reduction =
       Cvalue_backward.backward_cast ~src_typ ~dst_typ ~src_val ~dst_val
     in
