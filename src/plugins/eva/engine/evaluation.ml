@@ -1120,11 +1120,15 @@ module Make
           `Value value, alarms
     else fun _ -> fuel_consumed := true; `Value Value.top, Alarmset.all
 
+  (* Context from state [state]. *)
+  let get_context state =
+    let+ from_domains = Domain.return_context state in
+    Abstract_value.{ from_domains }
+
   (* Environment for the forward evaluation of a root expression in state [state]
      with maximal precision. *)
   let root_environment ?subdivnb state =
-    let+ from_domains = Domain.return_context state in
-    let context = Abstract_value.{ from_domains } in
+    let+ context = get_context state in
     let subdivided = false and root = true in
     let remaining_fuel = root_fuel () in
     (* By default, use the number of subdivision defined by the global option
@@ -1137,8 +1141,7 @@ module Make
      no subdivisions, no calls to the oracle, and the expression is not
      considered as a "root" expression. *)
   let fast_eval_environment state =
-    let+ from_domains = Domain.return_context state in
-    let context = Abstract_value.{ from_domains } in
+    let+ context = get_context state in
     let remaining_fuel = no_fuel and root = false in
     let subdivision = 0 and subdivided = false in
     { state; context; root; subdivision; subdivided; remaining_fuel; oracle }
@@ -1510,8 +1513,8 @@ module Make
         let* valuation, value = eval in
         cache := valuation;
         let fuel = backward_fuel () in
-        let* env = root_environment ?subdivnb state in
-        let+ () = backward_eval fuel env.context state expr None in
+        let* context = get_context state in
+        let+ () = backward_eval fuel context state expr None in
         !cache, value
       else eval
     in
@@ -1594,9 +1597,9 @@ module Make
 
   let assume ?valuation:(valuation=Cache.empty) state expr value =
     cache := valuation;
-    let* env = root_environment ~subdivnb:0 state in
     let fuel = backward_fuel () in
-    let+ () = backward_eval fuel env.context state expr (Some value) in
+    let* context = get_context state in
+    let+ () = backward_eval fuel context state expr (Some value) in
     !cache
 
 
