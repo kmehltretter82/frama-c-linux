@@ -37,8 +37,8 @@ type node = region Ufind.rref
 
 and layout =
   | Blob
-  | Cell of int64 * node option
-  | Compound of int64 * node Ranges.t
+  | Cell of int * node option
+  | Compound of int * node Ranges.t
 
 and region = {
   parents: node list ;
@@ -70,11 +70,7 @@ let copy m = {
   index = m.index ;
 }
 
-let sizeof_ptr () = Int64.of_int @@ Cil.bitsSizeOf Cil.voidPtrType
-let sizeof_typ ty = Int64.of_int @@ Cil.bitsSizeOf ty
-
-let sizeof_layout = function
-  | Blob -> Int64.zero | Cell(s,_) | Compound(s,_) -> s
+let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_) -> s
 
 let empty = {
   parents = [] ;
@@ -88,9 +84,16 @@ let empty = {
 let cell (m: map) ?size ?ptr () =
   let layout = match size, ptr with
     | None, None -> Blob
-    | None, Some _ -> Cell(sizeof_ptr (),ptr)
+    | None, Some _ -> Cell(Cil.bitsSizeOf Cil.voidPtrType,ptr)
     | Some s, _ -> Cell(s,ptr)
   in Ufind.make m.store { empty with layout }
+
+let range (m: map) ~size ~offset ~length ~data : node =
+  let last = offset + length in
+  if not (0 <= offset && offset < last && last <= size) then
+    raise (Invalid_argument "Region.Memory.range") ;
+  let layout = Compound(size, Ranges.singleton { offset ; length ; data }) in
+  Ufind.make m.store { empty with layout }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Map                                                                --- *)
@@ -117,13 +120,14 @@ let root (m: map) v =
 
 type queue = (node * node) Queue.t
 
+let ranges ~size = function
+  | None -> Ranges.empty
+  | Some r -> Ranges.range ~length:size r
+
 let merge_node (m: map) (q: queue) (a: node) (b: node) : node =
   if not @@ Ufind.eq m.store a b then Queue.push (a,b) q ; min a b
 
-let merge_inode (m: map) (q: queue) (a: node) (b: node) : unit =
-  ignore @@ merge_node m q a b
-
-let merge_ptr (m: map) (q: queue)
+let merge_opt (m: map) (q: queue)
     (pa : node option) (pb : node option) : node option =
   match pa, pb with
   | None, p | p, None -> p
@@ -132,40 +136,44 @@ let merge_ptr (m: map) (q: queue)
 let merge_range (m: map) (q: queue) (ra : range) (rb : range) : node =
   let na = ra.data in
   let nb = rb.data in
-  let ma = Ranges.( ra.offset +. ra.length ) in
-  let mb = Ranges.( rb.offset +. rb.length ) in
-  let dp = Ranges.( ra.offset -. rb.offset ) in
-  let dq = Ranges.( ma -. mb ) in
-  let sa = sizeof_layout (region m na).layout in
-  let sb = sizeof_layout (region m nb).layout in
+  let ma = ra.offset + ra.length in
+  let mb = rb.offset + rb.length in
+  let dp = ra.offset - rb.offset in
+  let dq = ma - mb in
+  let sa = sizeof (region m na).layout in
+  let sb = sizeof (region m nb).layout in
   let size = Ranges.(sa %. sb %. dp %. dq) in
   let data = merge_node m q na nb in
   if size = sa && size = sb then data else
     merge_node m q (cell m ~size ()) data
 
 let merge_ranges (m: map) (q: queue)
-    (sa : int64) (wa : node Ranges.t)
-    (sb : int64) (wb : node Ranges.t)
+    (sa : int) (wa : node Ranges.t)
+    (sb : int) (wb : node Ranges.t)
   : layout =
   if sa = sb then
     Compound(sa, Ranges.merge (merge_range m q) wa wb)
   else
     let size = Ranges.gcd sa sb in
-    let r = cell m ~size () in
-    Ranges.iter (merge_inode m q r) wa ;
-    Ranges.iter (merge_inode m q r) wb ;
-    let rg = Ranges.{ offset = Int64.zero ; length = size ; data = r } in
-    Compound(size, Ranges.singleton rg )
+    let ra = Ranges.squash (merge_node m q) wa in
+    let rb = Ranges.squash (merge_node m q) wb in
+    Compound(size, ranges ~size @@ merge_opt m q ra rb)
 
 let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
   match a, b with
   | Blob, c | c, Blob -> c
-  | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_ptr m q pa pb)
+
+  | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_opt m q pa pb)
+
   | Compound(sa,wa), Compound(sb,wb) -> merge_ranges m q sa wa sb wb
-  | Compound(sr,wr), Cell(sx,px)
-  | Cell(sx,px), Compound(sr,wr) ->
-    let data = cell m ~size:sx ?ptr:px () in
-    let wx = Ranges.singleton { offset = Int64.zero ; length = sx ; data } in
+
+  | Compound(sr,wr), Cell(sx,None) | Cell(sx,None), Compound(sr,wr) ->
+    let size = Ranges.gcd sx sr in
+    Compound(size, ranges ~size @@ Ranges.squash (merge_node m q) wr)
+
+  | Compound(sr,wr), Cell(sx,Some ptr) | Cell(sx,Some ptr), Compound(sr,wr) ->
+    let rp = cell m ~size:sx ~ptr () in
+    let wx = Ranges.range ~length:sx rp in
     merge_ranges m q sx wx sr wr
 
 let merge_region (m: map) (q: queue) (a : region) (b : region) : region = {

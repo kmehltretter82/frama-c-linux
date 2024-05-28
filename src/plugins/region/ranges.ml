@@ -21,12 +21,10 @@
 (**************************************************************************)
 
 let rec gcd a b =
-  if a = Int64.zero then Int64.abs b else
-  if b = Int64.zero then Int64.abs a else
-    gcd b (Int64.rem a b)
+  if a = 0 then abs b else
+  if b = 0 then abs a else
+    gcd b (a mod b)
 
-let (+.) = Int64.add
-let (-.) = Int64.sub
 let (%.) = gcd
 
 (* -------------------------------------------------------------------------- *)
@@ -34,8 +32,8 @@ let (%.) = gcd
 (* -------------------------------------------------------------------------- *)
 
 type 'a range = {
-  offset: int64 ;
-  length: int64 ;
+  offset: int ;
+  length: int ;
   data: 'a ;
 }
 
@@ -43,12 +41,17 @@ type 'a t = R of 'a range list (* sorted, no-overlap *)
 
 let empty = R []
 
-let singleton r = R [r]
+let singleton r =
+  if not (0 <= r.offset && 0 < r.length) then
+    raise (Invalid_argument "Region.Ranges.singleton") ;
+  R [r]
 
-let rec find (k: int64) = function
+let range ?(offset=0) ?(length=1) data = singleton { offset ; length ; data }
+
+let rec find (k: int) = function
   | [] -> raise Not_found
   | ({ offset ; length } as r) :: rs ->
-    if offset <= k && k <= offset +. length then r else find k rs
+    if offset <= k && k <= offset + length then r else find k rs
 
 let find k (R rs) = find k rs
 
@@ -56,8 +59,8 @@ let rec merge f ra rb =
   match ra, rb with
   | [], rs | rs, [] -> rs
   | a :: wa, b :: wb ->
-    let a' = a.offset +. a.length in
-    let b' = b.offset +. b.length in
+    let a' = a.offset + a.length in
+    let b' = b.offset + b.length in
     if a' <= b.offset then
       a :: merge f wa rb
     else
@@ -65,7 +68,7 @@ let rec merge f ra rb =
       b :: merge f ra wb
     else
       let offset = min a.offset b.offset in
-      let length = max a' b' -. offset in
+      let length = max a' b' - offset in
       let data = f a b in
       let r = { offset ; length ; data } in
       if a' < b'
@@ -73,6 +76,10 @@ let rec merge f ra rb =
       else merge f (r::ra) rb
 
 let merge f (R x) (R y) = R (merge f x y)
+
+let squash f = function
+  | R [] -> None
+  | R (x::xs) -> Some (List.fold_left (fun w r -> f w r.data) x.data xs)
 
 let iteri f (R xs) = List.iter f xs
 let iter f (R xs) = List.iter (fun r -> f r.data) xs

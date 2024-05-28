@@ -26,8 +26,8 @@ type node
 
 and layout =
   | Blob
-  | Cell of int64 * node option
-  | Compound of int64 * node Ranges.t
+  | Cell of int * node option
+  | Compound of int * node Ranges.t
 
 type region = private {
   parents: node list ;
@@ -44,7 +44,9 @@ val create : unit -> map
 val copy : map -> map
 
 val root : map -> Cil_types.varinfo -> node
-val cell : map -> ?size:int64 -> ?ptr:node -> unit -> node
+val cell : map -> ?size:int -> ?ptr:node -> unit -> node
+val range : map -> size:int -> offset:int -> length:int -> data:node -> node
+
 val node : map -> node -> node
 val nodes : map -> node list -> node list
 val region : map -> node -> region
@@ -53,7 +55,4 @@ val read : map -> node -> Access.acs -> unit
 val write : map -> node -> Access.acs -> unit
 val shift : map -> node -> Access.acs -> unit
 val points_to : map -> node -> node -> unit
-
-val sizeof_ptr : unit -> int64
-val sizeof_typ : Cil_types.typ -> int64
-val sizeof_layout : layout -> int64
+val sizeof : layout -> int
