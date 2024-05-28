@@ -1520,7 +1520,7 @@ module Make
   let copy_lvalue ?(valuation=Cache.empty) ?subdivnb state lval =
     let open Evaluated.Operators in
     let expr = Eva_utils.lval_to_exp lval in
-    let* env = root_environment ?subdivnb state, Alarmset.all in
+    let* env = root_environment ?subdivnb state, Alarmset.none in
     try
       let record, report = Cache.find' valuation expr in
       if less_fuel_than env.remaining_fuel report.fuel
