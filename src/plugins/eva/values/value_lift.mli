@@ -23,8 +23,6 @@
 module type Conversion = sig
   type extended
   type internal
-  val extend : internal -> extended
-  val replace : internal -> extended -> extended
   val restrict : extended -> internal
 end
 
