@@ -37,6 +37,12 @@ type 'a range = {
   data: 'a ;
 }
 
+let pp_range fmt r =
+  Format.fprintf fmt "%04d..%04d" r.offset (r.offset + r.length - 1)
+
+let pp_offset fmt r =
+  Format.fprintf fmt "%04d:%04d" r.offset r.length
+
 type 'a t = R of 'a range list (* sorted, no-overlap *)
 
 let empty = R []

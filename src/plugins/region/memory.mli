@@ -38,6 +38,11 @@ type region = private {
   layout: layout ;
 }
 
+val sizeof : layout -> int
+
+val pp_node : Format.formatter -> node -> unit
+val pp_layout : Format.formatter -> layout -> unit
+
 type map
 
 val create : unit -> map
@@ -55,4 +60,3 @@ val read : map -> node -> Access.acs -> unit
 val write : map -> node -> Access.acs -> unit
 val shift : map -> node -> Access.acs -> unit
 val points_to : map -> node -> node -> unit
-val sizeof : layout -> int

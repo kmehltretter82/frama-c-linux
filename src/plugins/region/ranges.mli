@@ -26,6 +26,12 @@ val (%.) : int -> int -> int (** gcd *)
 type 'a range = { offset : int; length : int; data : 'a; }
 type 'a t = private R of 'a range list (* sorted, no overlap *)
 
+(** Prints [offset..last] formatted with [%04d] *)
+val pp_range : Format.formatter -> 'a range -> unit
+
+(** Prints [offset:length] formatted with [%04d] *)
+val pp_offset : Format.formatter -> 'a range -> unit
+
 val empty : 'a t
 val singleton : 'a range -> 'a t
 val range : ?offset:int -> ?length:int -> 'a -> 'a t

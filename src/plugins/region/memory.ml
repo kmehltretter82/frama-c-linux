@@ -29,8 +29,6 @@ module Vmap = Varinfo.Map
 (* --- Region Maps                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-[@@@ warning "-37"]
-
 (* All offsets in bits *)
 
 type node = region Ufind.rref
@@ -55,6 +53,20 @@ type map = {
   store: region Ufind.store ;
   mutable index: node Vmap.t ;
 }
+
+let pp_node fmt (n : node) = Format.fprintf fmt "R%04x" @@ Store.id n
+
+let pp_layout fmt = function
+  | Blob -> Format.pp_print_string fmt "<blob>"
+  | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
+  | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
+  | Compound(s,rg) ->
+    Format.fprintf fmt "@[<hov 2>{%04d" s ;
+    Ranges.iteri
+      (fun (rg : range) ->
+         Format.fprintf fmt "@ | %a: %a" Ranges.pp_range rg pp_node rg.data
+      ) rg ;
+    Format.fprintf fmt " }@]"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constructors                                                       --- *)
