@@ -24,16 +24,17 @@ open Cil_types
 
 type node
 
-type layout =
+and layout =
   | Blob
-  | Atom
-  | AtomPtr of node
-  | Compound of node Ranges.t
+  | Cell of int64 * node option
+  | Compound of int64 * node Ranges.t
 
 type region = private {
   parents: node list ;
   roots: varinfo list ;
-  size: int64 ;
+  reads: Access.Set.t ;
+  writes: Access.Set.t ;
+  shifts: Access.Set.t ;
   layout: layout ;
 }
 
@@ -43,7 +44,16 @@ val create : unit -> map
 val copy : map -> map
 
 val root : map -> Cil_types.varinfo -> node
+val cell : map -> ?size:int64 -> ?ptr:node -> unit -> node
 val node : map -> node -> node
 val nodes : map -> node list -> node list
 val region : map -> node -> region
 val merge : map -> node -> node -> node
+val read : map -> node -> Access.acs -> unit
+val write : map -> node -> Access.acs -> unit
+val shift : map -> node -> Access.acs -> unit
+val points_to : map -> node -> node -> unit
+
+val sizeof_ptr : unit -> int64
+val sizeof_typ : Cil_types.typ -> int64
+val sizeof_layout : layout -> int64

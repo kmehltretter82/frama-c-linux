@@ -20,15 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
 type acs =
-  | Lval of stmt * lval
-  | Term of logic_label * term_lval
+  | Lval of Cil_types.stmt * Cil_types.lval
+  | Term of Property.t * Cil_types.term_lval
 
 val compare : acs -> acs -> int
-val pstmt : Format.formatter -> Cil_types.stmt -> unit
-val plabel : Format.formatter -> Cil_types.logic_label -> unit
 val pretty : Format.formatter -> acs -> unit
 
 module Set : Set.S with type elt = acs

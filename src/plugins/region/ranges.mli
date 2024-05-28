@@ -20,15 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+val gcd : int64 -> int64 -> int64
+
 val ( +. ) : int64 -> int64 -> int64
 val ( -. ) : int64 -> int64 -> int64
-val gcd : int64 -> int64 -> int64
+val ( %. ) : int64 -> int64 -> int64 (** gcd *)
 
 type 'a range = { offset : int64; length : int64; data : 'a; }
 type 'a t = private R of 'a range list (* sorted, no overlap *)
 
 val empty : 'a t
+val singleton : 'a range -> 'a t
+val merge : ('a range -> 'a range -> 'a) -> 'a t -> 'a t -> 'a t
+
 val find : int64 -> 'a t -> 'a range
-val merge : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 val iter : ('a -> unit) -> 'a t -> unit
 val iteri : ('a range -> unit) -> 'a t -> unit

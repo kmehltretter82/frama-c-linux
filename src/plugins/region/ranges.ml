@@ -20,13 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
+let rec gcd a b =
+  if a = Int64.zero then Int64.abs b else
+  if b = Int64.zero then Int64.abs a else
+    gcd b (Int64.rem a b)
+
 let (+.) = Int64.add
 let (-.) = Int64.sub
-
-let rec gcd a b =
-  if a = Int64.zero then b else
-  if b = Int64.zero then a else
-    gcd b (Int64.rem a b)
+let (%.) = gcd
 
 (* -------------------------------------------------------------------------- *)
 (* --- Range Maps                                                         --- *)
@@ -41,6 +42,8 @@ type 'a range = {
 type 'a t = R of 'a range list (* sorted, no-overlap *)
 
 let empty = R []
+
+let singleton r = R [r]
 
 let rec find (k: int64) = function
   | [] -> raise Not_found
@@ -63,7 +66,7 @@ let rec merge f ra rb =
     else
       let offset = min a.offset b.offset in
       let length = max a' b' -. offset in
-      let data = f a.data b.data in
+      let data = f a b in
       let r = { offset ; length ; data } in
       if a' < b'
       then merge f ra (r::rb)

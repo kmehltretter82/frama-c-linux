@@ -24,8 +24,8 @@ open Cil_types
 open Cil_datatype
 
 type acs =
-  | Lval of stmt * lval
-  | Term of logic_label * term_lval
+  | Lval of Stmt.t * lval
+  | Term of Property.t * term_lval
 
 let compare (a : acs) (b : acs) : int =
   match a, b with
@@ -33,7 +33,7 @@ let compare (a : acs) (b : acs) : int =
     let cmp = Stmt.compare sa sb in
     if cmp <> 0 then cmp else Lval.compare la lb
   | Term(sa,ta), Term(sb,tb) ->
-    let cmp = Logic_label.compare sa sb in
+    let cmp = Property.compare sa sb in
     if cmp <> 0 then cmp else Term_lval.compare ta tb
   | Lval _ , Term _ -> (-1)
   | Term _ , Lval _ -> (+1)
@@ -45,14 +45,11 @@ let pstmt fmt (s : stmt) =
     let loc, _ = Stmt.loc s in
     Format.fprintf fmt "L%d" loc.pos_lnum
 
-let plabel fmt (l : logic_label) =
-  match l with
-  | StmtLabel s -> pstmt fmt !s
-  | FormalLabel a -> Format.pp_print_string fmt a
-  | BuiltinLabel _ -> Logic_label.pretty fmt l
-
 let pretty fmt = function
-  | Lval(s,l) -> Format.fprintf fmt "%a@%a" Lval.pretty l pstmt s
-  | Term(s,l) -> Format.fprintf fmt "%a@%a" Term_lval.pretty l plabel s
+  | Lval(s,l) ->
+    Format.fprintf fmt "%a@%a" Lval.pretty l pstmt s
+  | Term(s,l) ->
+    Format.fprintf fmt "%a@%s" Term_lval.pretty l
+      (Property.Names.get_prop_name_id s)
 
 module Set = Set.Make(struct type t = acs let compare = compare end)
