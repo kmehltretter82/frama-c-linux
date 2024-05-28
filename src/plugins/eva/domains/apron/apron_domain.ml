@@ -428,7 +428,6 @@ module Make (Man : Input) = struct
     let s = Abstract1.meet man s1 s2 in
     if Abstract1.is_bottom man s then `Bottom else `Value s
 
-  include Domain_builder.No_context
   include Domain_builder.Complete
       (struct
         include D

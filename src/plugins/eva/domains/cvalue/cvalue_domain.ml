@@ -32,7 +32,10 @@ module State = struct
 
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
-  include Domain_builder.No_context
+
+  type context = unit
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
+  let return_context _ = `Value ()
 
   let log_category = Self.dkey_cvalue_domain
 

@@ -310,7 +310,6 @@ module Domain = struct
            end)
 
   include Domain_builder.Complete (LatticeTaint)
-  include Domain_builder.No_context
 
   include QueriesTaint
 

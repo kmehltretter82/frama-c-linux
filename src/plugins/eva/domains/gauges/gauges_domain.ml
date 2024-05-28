@@ -1125,7 +1125,6 @@ module D : Abstract_domain.Leaf
 
   include G
   include Domain_builder.Complete (struct include G let top = empty end)
-  include Domain_builder.No_context
 
   let log_category = dkey
 

@@ -472,7 +472,6 @@ module D : Abstract_domain.Leaf
            end)
 
   include Domain_builder.Complete (Memory)
-  include Domain_builder.No_context
 
   let log_category = dkey
 

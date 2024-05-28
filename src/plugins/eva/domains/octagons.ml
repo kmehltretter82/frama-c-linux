@@ -1600,7 +1600,6 @@ module Domain = struct
 
   include State
   include Domain_builder.Complete (State)
-  include Domain_builder.No_context
 
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location

@@ -188,7 +188,6 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   include M
 
   include Domain_builder.Complete (M)
-  include Domain_builder.No_context
 
   type state = t
   type value = Value.t

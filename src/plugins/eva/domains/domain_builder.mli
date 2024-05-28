@@ -40,6 +40,10 @@ end
 module type LeafDomain = sig
   type t
 
+  type context = unit
+  val context_dependencies: context Abstract_context.dependencies
+  val return_context: t -> context or_bottom
+
   val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
 
@@ -69,31 +73,23 @@ module type LeafDomain = sig
   val key: t Abstract_domain.key
 end
 
-module No_context : sig
-  type context = unit
-  val context_dependencies : context Abstract_context.dependencies
-  val return_context : 'a -> context Eval.or_bottom
-end
-
 (** Automatically builds some functions of an abstract domain. *)
 module Complete (Domain: InputDomain) : LeafDomain with type t := Domain.t
 
 module Complete_Minimal
-    (Context : Abstract_context.Leaf)
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
-  : Abstract_domain.Leaf with type context = Context.t
+  : Abstract_domain.Leaf with type context = unit
                           and type value = Value.t
                           and type location = Location.location
                           and type state = Domain.t
 
 module Complete_Minimal_with_datatype
-    (Context : Abstract_context.Leaf)
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal_with_datatype)
-  : Abstract_domain.Leaf with type context = Context.t
+  : Abstract_domain.Leaf with type context = unit
                           and type value = Value.t
                           and type location = Location.location
                           and type state = Domain.t

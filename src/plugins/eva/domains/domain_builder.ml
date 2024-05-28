@@ -36,6 +36,10 @@ end
 module type LeafDomain = sig
   type t
 
+  type context = unit
+  val context_dependencies: context Abstract_context.dependencies
+  val return_context: t -> context or_bottom
+
   val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
 
@@ -66,16 +70,11 @@ module type LeafDomain = sig
 end
 
 
+module Complete (Domain: InputDomain) = struct
 
-module No_context = struct
   type context = unit
   let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let return_context _ = `Value ()
-end
-
-
-
-module Complete (Domain: InputDomain) = struct
 
   let backward_location _state _lval _typ loc value = `Value (loc, value)
   let reduce_further _state _expr _value = []
@@ -119,7 +118,6 @@ let simplify_call call =
 
 
 module Make_Minimal
-    (Context : Abstract_context.Leaf)
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
@@ -129,14 +127,11 @@ module Make_Minimal
 
   let log_category = Self.register_category ("d-" ^ name)
 
-  type context = Context.t
   type value = Value.t
   type location = Location.location
   type state = Domain.t
   type origin
 
-  let return_context _ = `Value Context.top
-  let context_dependencies = Abstract_context.Leaf (module Context)
   let value_dependencies = Abstract_value.Leaf (module Value)
   let location_dependencies = Abstract_location.Leaf (module Location)
 
@@ -181,14 +176,13 @@ end
 
 
 module Complete_Minimal
-    (Context : Abstract_context.Leaf)
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
 = struct
 
   module D = struct
-    include Make_Minimal (Context) (Value) (Location) (Domain)
+    include Make_Minimal (Value) (Location) (Domain)
 
     include
       (Datatype.Make_with_collections
@@ -213,7 +207,6 @@ end
 
 
 module Complete_Minimal_with_datatype
-    (Context : Abstract_context.Leaf)
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Minimal_with_datatype)
@@ -221,7 +214,7 @@ module Complete_Minimal_with_datatype
 
   module D = struct
 
-    include Make_Minimal (Context) (Value) (Location) (Domain)
+    include Make_Minimal (Value) (Location) (Domain)
 
     include
       (Datatype.With_collections
@@ -253,8 +246,6 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     type location = Precise_locs.precise_location
     type state = Domain.t
     type origin
-
-    include No_context
 
     let value_dependencies = Abstract_value.Leaf (module Main_values.CVal)
     let location_dependencies = Abstract_location.Leaf (module Main_locations.PLoc)

@@ -1089,7 +1089,6 @@ module D = struct
   type location = Precise_locs.precise_location
   type origin
 
-  include Domain_builder.No_context
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 

@@ -664,7 +664,6 @@ module Domain =
 struct
   include DomainLattice
   include Domain_builder.Complete (DomainLattice)
-  include Domain_builder.No_context
 
   (* Eva Queries *)
 

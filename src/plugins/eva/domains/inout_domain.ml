@@ -220,7 +220,6 @@ module Domain = struct
            end)
 
   include Domain_builder.Complete (LatticeInout)
-  include Domain_builder.No_context
 
   let log_category = Self.register_category "d-inout"
 
