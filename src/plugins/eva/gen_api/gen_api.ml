@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let usage_msg = Sys.argv.(0) ^ "<file1.mli> [<file2.mli>] ..."
+let usage_msg = Sys.argv.(0) ^ " <file1.mli> [<file2.mli>] ..."
 
 let fail =
   Printf.kfprintf (fun _ -> exit 1) stderr
@@ -67,7 +67,7 @@ let generate_api input_files =
       Printf.fprintf mli_out "end\n";
       Printf.fprintf ml_out "module %s = %s\n" module_name module_name;
     | extension ->
-      fail "unrocognized extension: %s" extension
+      fail "unrecognized extension: %s\n" extension
   in
   List.iter add_file input_files;
   close_out mli_out;
