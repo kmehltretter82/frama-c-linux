@@ -121,7 +121,7 @@ module Make
       (Right.reduce_further right expr value)
 
   let build_context (left, right) =
-    let open Eval.Bottom.Operators in
+    let open Lattice_bounds.Bottom.Operators in
     let* left  = Left.build_context  left  in
     let* right = Right.build_context right in
     Context.narrow left right

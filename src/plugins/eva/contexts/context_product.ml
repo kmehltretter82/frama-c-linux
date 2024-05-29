@@ -23,5 +23,6 @@
 module Make (L : Abstract_context.S) (R : Abstract_context.S) = struct
   type t = L.t * R.t
   let top = (L.top, R.top)
-  let narrow (l, r) (l', r') = Eval.Bottom.zip (L.narrow l l') (R.narrow r r')
+  let narrow (l, r) (l', r') =
+    Lattice_bounds.Bottom.zip (L.narrow l l') (R.narrow r r')
 end
