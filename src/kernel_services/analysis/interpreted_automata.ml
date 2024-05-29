@@ -880,8 +880,21 @@ let build_automaton kf =
   in
   List.iter remove_unreachable unreachables;
 
+  (* Build the record *)
+  let automaton = {graph = g; entry_point; return_point; stmt_table = table} in
+
+  (* Debug output *)
+  if Kernel.DebugInterpretedAutomata.get () then begin
+    let function_name = Kernel_function.get_name kf in
+    let file_name, file_out = Filename.open_temp_file function_name ".dot" in
+    Kernel.result "Output the interpreted automaton for %s into %s"
+      function_name file_name;
+    output_to_dot file_out automaton;
+    close_out file_out
+  end;
+
   (* Return the result *)
-  {graph = g; entry_point; return_point; stmt_table = table}
+  automaton
 
 
 module AutomatonState = Kernel_function.Make_Table (Automaton)
