@@ -75,9 +75,9 @@ module Make
     let list = Domain.reduce_further state expr (Val.restrict value) in
     List.map (fun (e, v) -> e, Val.extend v) list
 
-  let return_context state =
+  let build_context state =
     let open Bottom.Operators in
-    let+ context = Domain.return_context state in
+    let+ context = Domain.build_context state in
     Ctx.extend context
 
   let lift_left left = { left with lloc = Loc.restrict left.lloc }

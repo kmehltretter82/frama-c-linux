@@ -1122,7 +1122,7 @@ module Make
 
   (* Context from state [state]. *)
   let get_context state =
-    let+ from_domains = Domain.return_context state in
+    let+ from_domains = Domain.build_context state in
     Abstract_value.{ from_domains }
 
   (* Environment for the forward evaluation of a root expression in state [state]

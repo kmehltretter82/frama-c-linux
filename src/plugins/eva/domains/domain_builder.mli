@@ -42,7 +42,7 @@ module type LeafDomain = sig
 
   type context = unit
   val context_dependencies: context Abstract_context.dependencies
-  val return_context: t -> context or_bottom
+  val build_context: t -> context or_bottom
 
   val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list

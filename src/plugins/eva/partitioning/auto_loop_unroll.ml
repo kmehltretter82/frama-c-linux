@@ -580,7 +580,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      with a maximum limit. Returns None for no automatic loop unrolling. *)
   let compute ~max_unroll state stmt =
     let open Option.Operators in
-    let* from_domains = Dom.return_context state |> Bottom.to_option in
+    let* from_domains = Dom.build_context state |> Bottom.to_option in
     try
       let kf = Kernel_function.find_englobing_kf stmt in
       let loop = Graph.find_loop kf stmt in

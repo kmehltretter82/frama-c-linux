@@ -35,7 +35,6 @@ module State = struct
 
   type context = unit
   let context_dependencies = Abstract_context.Leaf (module Unit_context)
-  let return_context _ = `Value ()
 
   let log_category = Self.dkey_cvalue_domain
 
@@ -86,6 +85,8 @@ module State = struct
 
   let reduce_further (state, _) expr value =
     Cvalue_queries.reduce_further state expr value
+
+  let build_context (state, _) = Cvalue_queries.build_context state
 
   (* ------------------------------------------------------------------------ *)
   (*                            Transfer Functions                            *)

@@ -159,7 +159,7 @@ module Queries = struct
       `Value (Precise_locs.make_precise_loc loc ~size, value)
 
   let reduce_further _state _expr _value = []
-  let return_context _ = `Value ()
+  let build_context _ = `Value ()
 end
 
 include Queries

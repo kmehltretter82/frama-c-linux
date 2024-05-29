@@ -38,7 +38,7 @@ module type LeafDomain = sig
 
   type context = unit
   val context_dependencies: context Abstract_context.dependencies
-  val return_context: t -> context or_bottom
+  val build_context: t -> context or_bottom
 
   val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
@@ -74,7 +74,7 @@ module Complete (Domain: InputDomain) = struct
 
   type context = unit
   let context_dependencies = Abstract_context.Leaf (module Unit_context)
-  let return_context _ = `Value ()
+  let build_context _ = `Value ()
 
   let backward_location _state _lval _typ loc value = `Value (loc, value)
   let reduce_further _state _expr _value = []
@@ -374,9 +374,9 @@ module Restrict
   type location = Domain.location
   type origin = Domain.origin
 
-  let return_context = function
+  let build_context = function
     | None -> `Value Context.top
-    | Some (state, _mode) -> Domain.return_context state
+    | Some (state, _mode) -> Domain.build_context state
 
   let get_state = function
     | None -> Domain.top

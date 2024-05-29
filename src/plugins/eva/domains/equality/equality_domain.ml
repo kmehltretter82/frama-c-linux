@@ -192,7 +192,7 @@ struct
   type location = Precise_locs.precise_location
   type origin
 
-  let return_context _ = `Value Context.top
+  let build_context _ = `Value Context.top
 
   let reduce_further (equalities, _, _) expr value =
     let atom = HCE.of_exp expr in
