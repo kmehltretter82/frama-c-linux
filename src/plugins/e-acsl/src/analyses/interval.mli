@@ -81,7 +81,7 @@ val joins_from_profile: profile:Profile.t -> term list -> t
 val joins: logic_env:Logic_env.t -> term list -> t
 val join_plus_one: profile:Profile.t -> term -> term -> t
 
-val get_ival: logic_env:Logic_env.t -> term -> Ival.t
+val get_ival: logic_env:Logic_env.t -> term -> Ival.t option
 
 
 (*****************************************************************************)

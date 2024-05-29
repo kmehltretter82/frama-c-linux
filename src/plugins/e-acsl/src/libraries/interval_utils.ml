@@ -218,8 +218,8 @@ let is_singleton_int = function
 (* ********************************************************************* *)
 
 let extract_ival = function
-  | Ival iv -> iv
-  | Float _ | Rational | Real | Nan -> assert false
+  | Ival iv -> Some iv
+  | _ -> None
 
 let bottom = Ival Ival.bottom
 let top_ival = Ival (Ival.inject_range None None)

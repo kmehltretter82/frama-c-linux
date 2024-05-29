@@ -658,11 +658,11 @@ and compute_logic_env_if_branches logic_env t =
   let get_res = Error.map (fun x -> x) in
   let ival v = infer ~force:false ~logic_env v in
   let add_ub logic_env x v =
-    let max = Ival.max_int (Error.map extract_ival (ival v)) in
+    let max = Option.bind (Error.map extract_ival @@ ival v) Ival.max_int in
     Logic_env.refine logic_env x (Ival (Ival.inject_range None max))
   in
   let add_lb logic_env x v =
-    let min = Ival.min_int (Error.map extract_ival (ival v)) in
+    let min = Option.bind (Error.map extract_ival @@ ival v) Ival.min_int in
     Logic_env.refine logic_env x (Ival (Ival.inject_range min None))
   in
   let add_eq logic_env x v = Logic_env.refine logic_env x (get_res (ival v)) in
@@ -748,22 +748,29 @@ and infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
           let i = meet i ity in
           (* We can now update the bounds in the preprocessed form
              that come from the meet of the two intervals *)
-          let min, max = Misc.finite_min_and_max (extract_ival i) in
-          let t1 = Logic_const.tint ~loc min in
-          let t2 = Logic_const.tint ~loc max in
-          t1, t2, i
-        end else
+          match extract_ival i with
+          | None -> t1, t2, i
+          | Some ival ->
+            let min, max = Misc.finite_min_and_max ival in
+            let t1 = Logic_const.tint ~loc min in
+            let t2 = Logic_const.tint ~loc max in
+            t1, t2, i
+        end
+      else
         (* case 3 *)
-        let min, max = Misc.finite_min_and_max (extract_ival ity) in
-        let guard_lower = Logic_const.tint ~loc min in
-        let guard_upper = Logic_const.tint ~loc max in
-        let lv_term = Logic_const.tvar ~loc lv in
-        let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
-        let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
-        let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
-        ignore (infer_predicate ~logic_env guard);
-        Bound_variables.add_guard_for_small_type lv guard;
-        t1, t2, i
+        match extract_ival ity with
+        | None -> t1, t2, i
+        | Some ival ->
+          let min, max = Misc.finite_min_and_max ival in
+          let guard_lower = Logic_const.tint ~loc min in
+          let guard_upper = Logic_const.tint ~loc max in
+          let lv_term = Logic_const.tvar ~loc lv in
+          let guard_lower = Logic_const.prel ~loc (Rle, guard_lower, lv_term) in
+          let guard_upper = Logic_const.prel ~loc (Rlt, lv_term, guard_upper) in
+          let guard = Logic_const.pand ~loc (guard_lower, guard_upper) in
+          ignore (infer_predicate ~logic_env guard);
+          Bound_variables.add_guard_for_small_type lv guard;
+          t1, t2, i
   in
   ignore (infer ~force:false ~logic_env t1);
   ignore (infer ~force:false ~logic_env t2);
