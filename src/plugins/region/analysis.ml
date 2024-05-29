@@ -22,27 +22,20 @@
 
 open Cil_datatype
 
-type domain = {
-  pre: Memory.map ;
-  post: Memory.map ;
-  exit: Memory.map ;
-  stmt: Memory.map Stmt.Map.t ;
-}
-
 (* -------------------------------------------------------------------------- *)
 (* ---  Projectification                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-module DOMAIN : Datatype.S with type t = domain =
+module DOMAIN : Datatype.S with type t = Code.domain =
   Datatype.Make
     (struct
-      type t = domain
+      type t = Code.domain
       include Datatype.Undefined
       let name = "Region.Analysis.MEMORY"
       let mem_project = Datatype.never_any_project
       let reprs =
         let m = Memory.create () in
-        [{ pre = m; post = m; exit = m; stmt = Stmt.Map.empty }]
+        Code.[{ map = m; body = Stmt.Map.empty ; spec = Property.Map.empty }]
     end)
 
 module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(DOMAIN)
@@ -56,6 +49,12 @@ module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(DOMAIN)
 (* ---  Memoized Access                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get kf = STATE.find kf
+let domain kf =
+  try STATE.find kf with Not_found ->
+    Options.feedback ~ontty:`Transient "Function %a" Kernel_function.pretty kf ;
+    let domain = Code.domain kf in
+    STATE.add kf domain ; domain
+
+let compute kf = ignore (domain kf)
 
 (* -------------------------------------------------------------------------- *)

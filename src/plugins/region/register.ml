@@ -31,11 +31,7 @@ let main () =
     begin
       Ast.compute () ;
       R.feedback "Analyzing regions" ;
-      Globals.Functions.iter
-        begin fun (kf: Kernel_function.t) ->
-          R.feedback ~ontty:`Transient
-            "Function %a" Kernel_function.pretty kf
-        end ;
+      Globals.Functions.iter Analysis.compute ;
     end
 
 let () = Boot.Main.extend main

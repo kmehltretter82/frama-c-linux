@@ -28,3 +28,11 @@ val lval : map -> stmt -> lval -> node
 val exp : map -> stmt -> exp -> node option
 val instr : map -> stmt -> instr -> unit
 val stmt : map Stmt.Map.t ref -> map -> stmt -> unit
+
+type domain = {
+  map : map ;
+  body : map Stmt.Map.t ;
+  spec : map Property.Map.t ;
+}
+
+val domain : kernel_function -> domain

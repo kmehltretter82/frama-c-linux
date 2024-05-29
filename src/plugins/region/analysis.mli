@@ -21,13 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
-type domain = {
-  pre: Memory.map ;
-  post: Memory.map ;
-  exit: Memory.map ;
-  stmt: Memory.map Stmt.Map.t ;
-}
+(** Memoized *)
+val domain : kernel_function -> Code.domain
 
-val get : kernel_function -> domain
+(** Memoized *)
+val compute : kernel_function -> unit

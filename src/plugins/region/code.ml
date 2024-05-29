@@ -208,3 +208,27 @@ and block (r:rmap) (m:map) (b:block) =
   List.iter (stmt r m) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
+(* --- Function                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+type domain = {
+  map : map ;
+  body : map Stmt.Map.t ;
+  spec : map Property.Map.t ;
+}
+
+let domain kf =
+  let m = Memory.create () in
+  let r = ref Stmt.Map.empty in
+  begin
+    try
+      let fundec = Kernel_function.get_definition kf in
+      block r m fundec.sbody ;
+    with Kernel_function.No_Definition -> ()
+  end ; {
+    map = m ;
+    body = !r ;
+    spec = Property.Map.empty ;
+  }
+
+(* -------------------------------------------------------------------------- *)
