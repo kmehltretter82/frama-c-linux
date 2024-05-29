@@ -21,9 +21,10 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
 open Memory
 
 val lval : map -> stmt -> lval -> node
-val ptr : map -> stmt -> exp -> node
 val exp : map -> stmt -> exp -> node option
 val instr : map -> stmt -> instr -> unit
+val stmt : map Stmt.Map.t ref -> map -> stmt -> unit

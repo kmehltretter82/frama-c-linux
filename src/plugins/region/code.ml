@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
 open Memory
 
 let typeof_array_elt ty =
@@ -38,7 +39,7 @@ let rec lval (m:map) (s:stmt) (lv:lval) : node =
 
 and lhost (m:map) (s:stmt) = function
   | Var x -> Memory.root m x
-  | Mem e -> ptr m s e
+  | Mem e -> pointer m s e
 
 and loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | NoOffset -> r
@@ -55,8 +56,9 @@ and loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
     let rc = Memory.range m ~size ~offset:0 ~length:size ~data in
     ignore @@ Memory.merge m r rc ; loffset m s data te ofs
 
-and ptr m s e =
-  match exp m s e with None -> cell m () | Some r -> r
+and pointer m s e = match exp m s e with None -> cell m () | Some r -> r
+
+and value m s e = ignore (exp m s e)
 
 and exp (m: map) (s:stmt) (e:exp) : node option =
   match e.enode with
@@ -76,24 +78,24 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
       None
 
   | UnOp(_,e,_) ->
-    ignore (exp m s e) ; None
+    value m s e ; None
 
   | BinOp((PlusPI|MinusPI),p,k,_) ->
-    ignore (exp m s k) ;
-    let r = ptr m s p in
+    value m s k ;
+    let r = pointer m s p in
     Memory.shift m r (Exp(s,e)) ;
     Some r
 
   | BinOp(_,a,b,_) ->
-    ignore (exp m s a) ;
-    ignore (exp m s b) ;
+    value m s a ;
+    value m s b ;
     None
 
   | CastE(ty,p) ->
     if Cil.isPointerType ty then
-      Some (ptr m s p)
+      Some (pointer m s p)
     else
-      (ignore (exp m s e) ; None)
+      (value m s e ; None)
 
   | Const _
   | SizeOf _ | SizeOfE _ | SizeOfStr _
@@ -137,14 +139,72 @@ let instr (m:map) (s:stmt) (instr:instr) =
     let acs = Access.Init(s,x) in
     init m s acs (Var x,NoOffset) iv
 
-  | Call _ ->
-    assert false
+  | Call(lr,e,es,_) ->
+    value m s e ;
+    List.iter (value m s) es ;
+    Option.iter
+      (fun lv ->
+         let r = lval m s lv in
+         Memory.write m r (Lval(s,lv))
+      ) lr ;
+    Options.warning ~source:(fst @@ Stmt.loc s) "Incomplete call analysis"
 
   | Local_init(_,ConsInit _,_) ->
-    Options.warning ~source:(fst @@ Cil_datatype.Stmt.loc s)
+    Options.warning ~source:(fst @@ Stmt.loc s)
       "Constructor init not yet implemented"
   | Asm _ ->
-    Options.warning ~source:(fst @@ Cil_datatype.Stmt.loc s)
+    Options.warning ~source:(fst @@ Stmt.loc s)
       "Inline assembly not supported (ignored)"
+
+(* -------------------------------------------------------------------------- *)
+(* --- Statements                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+type rmap = Memory.map Stmt.Map.t ref
+
+let store rmap m s =
+  rmap := Stmt.Map.add s (Memory.copy m) !rmap
+
+let rec stmt (r:rmap) (m:map) (s:stmt) =
+
+  let annots = Annotations.code_annot s in
+  if annots <> [] then
+    Options.warning ~source:(fst @@ Stmt.loc s)
+      "Annotations not analyzed" ;
+  match s.skind with
+  | Instr ki -> instr m s ki ; store r m s
+  | Return(Some e,_) -> value  m s e ; store r m s
+  | Goto _ | Break _ | Continue _ | Return(None,_) -> store r m s
+  | If(e,st,se,_) ->
+    value  m s e ;
+    store r m s ;
+    block r m st ;
+    block r m se ;
+  | Switch(e,b,_,_) ->
+    value  m s e ;
+    store r m s ;
+    block r m b ;
+  | Block b | Loop(_,b,_,_,_) -> block r m b
+  | UnspecifiedSequence s -> block r m @@ Cil.block_from_unspecified_sequence s
+  | Throw(exn,_) -> Option.iter (fun (e,_) -> value  m s e) exn
+  | TryCatch(b,hs,_)  ->
+    block r m b ;
+    List.iter (fun (c,b) -> catch r m c ; block r m b) hs ;
+  | TryExcept(a,(ks,e),b,_) ->
+    block r m a ;
+    List.iter (instr m s) ks ;
+    value  m s e ;
+    block r m b ;
+  | TryFinally(a,b,_) ->
+    block r m a ;
+    block r m b ;
+
+and catch (r:rmap) (m:map) (c:catch_binder) =
+  match c with
+  | Catch_all -> ()
+  | Catch_exn(_,xbs) -> List.iter (fun (_,b) -> block r m b) xbs
+
+and block (r:rmap) (m:map) (b:block) =
+  List.iter (stmt r m) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
