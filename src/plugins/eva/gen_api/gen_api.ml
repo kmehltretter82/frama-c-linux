@@ -56,7 +56,9 @@ let generate_api input_files =
     match Filename.extension filename with
     | ".header" ->
       output_string mli_out contents;
+      output_string mli_out "(* This file is generated. Do not edit. *)\n";
       output_string ml_out contents;
+      output_string ml_out "(* This file is generated. Do not edit. *)\n\n";
     | ".mli" ->
       let module_name =
         String.capitalize_ascii Filename.(basename filename |> chop_extension)
