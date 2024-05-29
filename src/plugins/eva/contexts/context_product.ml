@@ -21,9 +21,7 @@
 (**************************************************************************)
 
 module Make (L : Abstract_context.S) (R : Abstract_context.S) = struct
-  include Datatype.Pair (L) (R)
+  type t = L.t * R.t
   let top = (L.top, R.top)
-  let join (l, r) (l', r') = (L.join l l', R.join r r')
-  let is_included (l, r) (l', r') = L.is_included l l' && R.is_included r r'
   let narrow (l, r) (l', r') = Eval.Bottom.zip (L.narrow l l') (R.narrow r r')
 end

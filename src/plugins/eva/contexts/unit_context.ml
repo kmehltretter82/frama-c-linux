@@ -20,9 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Datatype.Unit
+type t = unit
 let top = ()
-let is_included () () = true
-let join () () = ()
 let narrow () () = `Value ()
 let key = Structure.Key_Context.create_key "Unit context"

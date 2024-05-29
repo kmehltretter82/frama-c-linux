@@ -46,12 +46,21 @@ type bound = Int of Integer.t | Float of float * fkind
 
 type pointer_comparison = Equality | Relation | Subtraction
 
+(** Enriched context.
+    This record could easily be extended to contain more information about the
+    context in which an evaluation takes place, if the need arises. *)
 type 'a enriched = { from_domains : 'a }
 
 (** Signature of abstract numerical values. *)
 module type S = sig
   include Datatype.S
 
+  (** A numerical value abstraction can optionally require some context from
+      abstract domains. Most transfer functions take the context as argument;
+      it is provided by the abstract state in which operations are performed.
+      See {!Abstract_context} for more details about contexts.
+      For values that don't need context, this type can be defined as unit
+      and the context argument can be safely ignored. *)
   type context
 
   val pretty_typ: typ option -> t Pretty_utils.formatter
