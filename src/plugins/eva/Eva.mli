@@ -113,7 +113,6 @@ module Analysis: sig
 end
 
 module Callstack: sig
-
   (** A call is identified by the function called and the call statement *)
   type call = Cil_types.kernel_function * Cil_types.stmt
 
@@ -175,11 +174,9 @@ module Callstack: sig
   (** Gives the list of call from the bottom to the top of the callstack
       (i.e. reverse order of the call stack). *)
   val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
-
 end
 
 module Deps: sig
-
   (** Memory dependencies of an expression. *)
   type t = {
     data: Locations.Zone.t;
@@ -221,7 +218,6 @@ module Deps: sig
 end
 
 module Results: sig
-
   (** Eva's result API is a new interface to access the results of an analysis,
       once it is completed. It may slightly change in the future.
 
@@ -538,11 +534,9 @@ module Results: sig
       Raises [Stdlib.Invalid_argument] if the statement is not a [Call]
       instruction or a [Local_init] with [ConsInit] initializer. *)
   val callee : Cil_types.stmt -> Kernel_function.t list
-
 end
 
 module Parameters: sig
-
   (** Configuration of the analysis. *)
 
   (** Returns the list (name, descr) of currently enabled abstract domains. *)
@@ -559,7 +553,6 @@ module Parameters: sig
 end
 
 module Eva_annotations: sig
-
   (** Register special annotations to locally guide the Eva analysis:
 
       - slevel annotations: "slevel default", "slevel merge" and "slevel i"
@@ -623,7 +616,6 @@ module Eva_annotations: sig
 end
 
 module Eval: sig
-
   (** Can the results of a function call be cached with memexec? *)
   type cacheable =
     | Cacheable      (** Functions whose result can be safely cached. *)
@@ -635,7 +627,6 @@ module Eval: sig
 end
 
 module Assigns: sig
-
   module DepsOrUnassigned : sig
 
     type t =
@@ -688,11 +679,9 @@ module Assigns: sig
 
   val top : t
   val join : t -> t -> t
-
 end
 
 module Builtins: sig
-
   (** Eva analysis builtins for the cvalue domain, more efficient than their
       equivalent in C. *)
 
@@ -756,7 +745,6 @@ module Builtins: sig
 end
 
 module Cvalue_callbacks: sig
-
   (** Register actions to performed during the Eva analysis,
       with access to the states of the cvalue domain.
       This API is for internal use only, and may be modified or removed
@@ -815,11 +803,9 @@ module Cvalue_callbacks: sig
   (** Registers a function to be applied at the end of the analysis of each
       function call. *)
   val register_call_results_hook: call_results_hook -> unit
-
 end
 
 module Logic_inout: sig
-
   (** Functions used by the Inout and From plugins to interpret predicate
       and assigns clauses. This API may change according to these plugins
       development. *)
@@ -873,11 +859,9 @@ module Logic_inout: sig
       - a formal or local of [kf] and the corresponding argument is [true]. *)
   val accept_base:
     formals:bool -> locals:bool -> Kernel_function.t -> Base.t -> bool
-
 end
 
 module Eva_results: sig
-
   (** Internal temporary API: please do not use it, as it should be removed in a
       future version. *)
 
@@ -916,11 +900,9 @@ module Eva_results: sig
   val eval_tlval_as_location :
     ?result:Cil_types.varinfo ->
     Cvalue.Model.t ->  Cil_types.term -> Locations.location
-
 end
 
 module Unit_tests: sig
-
   (** Currently tested by this module:
       - semantics of sign values. *)
 

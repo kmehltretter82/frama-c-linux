@@ -107,14 +107,21 @@
   (libraries frama-c-eva.apron.core)
   (site (frama-c plugins)))
 
+(subdir gen_api
+ (include_subdirs no)
+ (executable
+  (name gen_api)
+  (modules gen_api)
+  (libraries str)))
+
 (rule
  (targets Eva.ml Eva.mli)
  (mode (promote (only Eva.mli)))
  (deps
-  gen-api.sh Eva.header
+  gen_api/Eva.header
   engine/analysis.mli types/callstack.mli types/deps.mli utils/results.mli parameters.mli
   utils/eva_annotations.mli eval.mli types/assigns.mli
   domains/cvalue/builtins.mli utils/cvalue_callbacks.mli legacy/logic_inout.mli
   utils/eva_results.mli
   utils/unit_tests.mli)
- (action (run bash %{deps})))
+ (action (run ./gen_api/gen_api.exe %{deps})))
