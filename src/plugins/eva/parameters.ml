@@ -1275,13 +1275,35 @@ module MallocLevel =
   Int
     (struct
       let option_name = "-eva-mlevel"
-      let default = 0
+      let default = 1
       let arg_name = "m"
       let help = "Set to [m] the number of precise dynamic allocations \
-                  besides the initial one, for each callstack (defaults to 0)"
+                  when set to 1, the first allocation is imprecise (defaults to 1)"
     end)
 let () = MallocLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep MallocLevel.parameter
+
+
+let () = Parameter_customize.set_group malloc
+module CacheAllocation=
+  Bool 
+    (struct
+      let option_name = "-eva-cache-allocation"
+      let help = "Cache the results of functions where dynamic allocation \
+                  occurs, only malloc is supported for now."
+      let default = true 
+    end)
+let () = add_precision_dep CacheAllocation.parameter
+
+let () = Parameter_customize.set_group malloc
+module CallstackNoStmt =
+  Bool 
+    (struct
+      let option_name = "-eva-callstack-no-stmt"
+      let help = "Remove stmt from the callstack saved in allocation sites"
+      let default = false 
+    end)
+let () = add_precision_dep CallstackNoStmt.parameter
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated options and aliases                                     --- *)

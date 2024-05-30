@@ -40,6 +40,7 @@ module Make
     type call_result = {
       return_flow: (Partition.key * Domain.t) list;
       cacheable: Eval.cacheable;
+      allocated_bases: Base.Hptset.t;
     }
 
     (** [store_computed_call kf init_state args call_results] memoizes the fact

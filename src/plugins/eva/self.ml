@@ -76,6 +76,7 @@ let is_computed () =
 let dkey_initial_state = register_category "initial-state"
 let dkey_final_states = register_category "final-states"
 let dkey_summary = register_category "summary"
+let dkey_alloc_summary = register_category "alloc-summary"
 let dkey_pointer_comparison = register_category "pointer-comparison"
 let dkey_cvalue_domain = register_category "d-cvalue"
 let dkey_incompatible_states = register_category "incompatible-states"

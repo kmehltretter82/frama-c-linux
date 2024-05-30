@@ -22,6 +22,7 @@
 
 let stat_hits_summaries = Statistics.register_function_stat "memexec-hits-summaries"
 let stat_misses_summaries = Statistics.register_function_stat "memexec-misses-summaries"
+let stat_misses_allocated_bases = Statistics.register_function_stat "memexec-misses-allocated-bases"
 let stat_misses_entry_state = Statistics.register_function_stat "memexec-misses-entry-state"
 let stat_misses_input_relation = Statistics.register_function_stat "memexec-misses-input-relation"
 let stat_misses_import_kf = Statistics.register_function_stat "memexec-miss-import-kf"
@@ -60,6 +61,7 @@ let load_time_wrapper stat_key f =
   end
 
 let dkey = Self.dkey_memexec
+let dkey_malloc = Self.register_category "memexec-malloc"
 
 module SaveCounter =
   State_builder.SharedCounter(struct let name = "Mem_exec.save_counter" end)
@@ -103,13 +105,17 @@ module Make
       (CallOutput)   (* The resulting states of the call. *)
       (Datatype.Int) (* Call number, for plugins *)
 
+  module AllocatedBasesToResults =
+    Base.Hptset.Hashtbl.Make (StoredResult)
+
   type call_result = {
     return_flow: (Partition.key * Domain.t) list;
     cacheable: Eval.cacheable;
+    allocated_bases: Base.Hptset.t;
   }
 
   (* Map from input states to outputs (summary and state). *)
-  module CallEffect = Domain.Hashtbl.Make (StoredResult)
+  module CallEffect = Domain.Hashtbl.Make (AllocatedBasesToResults)
 
   (* Map from useful input bases to call effects. *)
   module InputBasesToCallEffect = Base.Hptset.Hashtbl.Make (CallEffect)
@@ -248,7 +254,11 @@ module Make
 
 
   let store_results_kf inout kf input_state args (call_result: call_result) = 
+    let allocated_bases = call_result.allocated_bases in 
     let input_bases, reduced_input_state, all_output_bases = extract_bases kf inout input_state in
+    let all_output_bases = 
+      Base.Hptset.union all_output_bases allocated_bases
+    in
     let outputs, call_number = process_outputs kf all_output_bases call_result in
     let map_args_to_input_bases =
       try PreviousCalls.find kf
@@ -262,15 +272,22 @@ module Make
         PreviousCalls.replace kf map_a;
         h
     in
-    let htbl_input_state_to_stored_results =
-      try 
-        Base.Hptset.Hashtbl.find htbl_input_bases_to_input_state input_bases
+    let htbl_input_state_to_allocated_bases =
+      try Base.Hptset.Hashtbl.find htbl_input_bases_to_input_state input_bases
       with Not_found ->
         let h = Domain.Hashtbl.create 11 in
         Base.Hptset.Hashtbl.add htbl_input_bases_to_input_state input_bases h;
         h
     in
-    Domain.Hashtbl.add htbl_input_state_to_stored_results reduced_input_state (all_output_bases, outputs, call_number)
+    (* We only keep the last set of allocated bases (More efficient, More precise) *)
+    let htbl_allocated_bases_to_results =
+      (* try Domain.Hashtbl.find htbl_input_state_to_allocated_bases reduced_input_state
+         with Not_found -> *)
+      let h = Base.Hptset.Hashtbl.create 11 in
+      Domain.Hashtbl.add htbl_input_state_to_allocated_bases reduced_input_state h;
+      h
+    in
+    Base.Hptset.Hashtbl.add htbl_allocated_bases_to_results allocated_bases (all_output_bases, outputs, call_number)
 
 
   let store_computed_call kf input_state args (call_result: call_result) =
@@ -289,9 +306,52 @@ module Make
 
   exception Result_found of call_result * int
 
+  (* We try to reuse only previously allocated bases when the current callstack is similar to the callstack 
+     where the bases where allocated in order to preserve maximal precision
+     Similarity is defined as having the same prefix of callstacks, 
+     i.e the current callstack is prefix of the callstack where the bases were allocated
+  *)
+  let is_similar_callstack bases (callstack: Callstack.t) = 
+    let call_list_from_memexec = Callstack.to_call_list callstack in
+    let aux_similar base =
+      let cs = Builtins_malloc.get_base_allocation_site base in
+      let call_list_from_builtins = Callstack.to_call_list cs in
+      let rec left_compare s s' =
+        match s ,s' with
+        | [], _ -> true
+        | _ , [] -> false 
+        | hd::tl, hd'::tl' -> 
+          let (kf, _) = hd in
+          let (kf', _) = hd' in
+          if Kernel_function.equal kf kf' 
+          then left_compare tl tl'
+          else false
+      in left_compare call_list_from_memexec call_list_from_builtins
+    in Base.Hptset.for_all aux_similar bases
+
+
+  (* We can reuse a set of allocated bases for the current call iff:
+     - the set of bases is not in the current cvalue_model
+     - the current callstack is similar to the callstack where the bases were allocated 
+  *)
+  let _can_reuse bases cvalue_model callstack = 
+    not (Base.Hptset.exists (fun base -> 
+        try
+          ignore (Cvalue.Model.find_base base cvalue_model);
+          true
+        with Not_found -> false) bases)
+    && 
+    is_similar_callstack bases callstack
+
+
+  let fail_if_not_reusable _bases _cvalue_model _callstack =
+    if not (Base.Hptset.is_empty _bases) && not (_can_reuse _bases _cvalue_model _callstack) then
+      raise Not_found
+
   (** Find a previous execution in [map_inputs] that matches [st].
       raise [Result_found] when this execution exists, or do nothing. *)
   let find_match_in_previous kf state args = 
+    let cvalue_model = get_cvalue_or_top state in
     let stored_args = PreviousCalls.find kf in
     let map_inputs = ActualArgs.Map.find args stored_args in
     let aux_previous_call binputs hstates =
@@ -300,24 +360,48 @@ module Make
       then 
         ignore(Statistics.incr stat_misses_input_relation kf)
       else
-        let st_filtered = Domain.filter (`Pre kf) binputs state in
-        let (bases, outputs, i) =
-          try 
-            Domain.Hashtbl.find hstates st_filtered 
-          with Not_found -> 
-            Statistics.incr stat_misses_entry_state kf;
-            raise Not_found
-        in
-        let process bases_to_substitute (key,output) =
-          key,
-          Domain.reuse kf bases_to_substitute ~current_input:state ~previous_output:output
-        in
-        let outputs = List.map (process bases) outputs in
-        raise (
-          Result_found({ 
-              return_flow=outputs;
-              cacheable=Eval.Cacheable;
-            }, i))
+        try
+          let st_filtered = Domain.filter (`Pre kf) binputs state in
+          let htbl_allocated_bases_to_results = 
+            try 
+              Domain.Hashtbl.find hstates st_filtered 
+            with Not_found -> 
+              Statistics.incr stat_misses_entry_state kf;
+              raise Not_found
+          in
+          let aux_previous_results allocated (bases, outputs, i) =
+            try
+              let cacheable = match Base.Hptset.is_empty allocated with
+                | true -> Eval.Cacheable
+                | false -> Eval.MallocedCall
+              in
+              let callstack = Eva_utils.current_call_stack () in
+              let _ = try 
+                  fail_if_not_reusable allocated cvalue_model callstack
+                with Not_found -> 
+                  Statistics.incr stat_misses_allocated_bases kf; 
+                  raise Not_found
+              in
+              let _ = 
+                if not (Base.Hptset.is_empty allocated) then
+                  Self.debug ~dkey: dkey_malloc
+                    "--- Reused allocated bases %a for KF %a at callstack %a @." Base.Hptset.pretty allocated Kernel_function.pretty kf Callstack.pretty (Eva_utils.current_call_stack ()) in
+              let process bases_to_substitute (key,output) =
+                key,
+                Domain.reuse kf bases_to_substitute ~current_input:state ~previous_output:output
+              in
+              let bases_to_substitute = Base.Hptset.union bases allocated in
+              let outputs = List.map (process bases_to_substitute) outputs in
+              raise (
+                Result_found({ 
+                    return_flow=outputs;
+                    cacheable=cacheable;
+                    allocated_bases=allocated;
+                  }, i))
+            with Not_found -> ()
+          in
+          Base.Hptset.Hashtbl.iter aux_previous_results htbl_allocated_bases_to_results 
+        with Not_found -> ()
     in
     Base.Hptset.Hashtbl.iter aux_previous_call map_inputs
 
@@ -343,21 +427,26 @@ module Make
   (*              Reload caches from another Frama-C project                  *)
   (* ------------------------------------------------------------------------ *)
 
-  let import_stored_results (bases, outputs, i) =
-    let all_bases = Eva_diff.import_bases bases in
-    let outputs =
-      List.map (fun (key, state) -> key, Domain.import state) outputs
-    in
-    (all_bases, outputs, i)
-
+  let import_stored_results (tbl: AllocatedBasesToResults.t) =
+    let new_tbl = Base.Hptset.Hashtbl.(create (length tbl)) in
+    let add allocated (bases, outputs, i) =
+      let all_bases = Eva_diff.import_bases bases in
+      let allocated = Eva_diff.import_bases allocated in
+      let outputs =
+        List.map (fun (key, state) -> key, Domain.import state) outputs
+      in
+      Base.Hptset.Hashtbl.add new_tbl allocated (all_bases, outputs, i)
+    in 
+    Base.Hptset.Hashtbl.iter add tbl;
+    new_tbl
 
   let import_call_effect (tbl: CallEffect.t) =
     let new_tbl = Domain.Hashtbl.(create (length tbl)) in
-    let add entry_state stored_results =
+    let add entry_state allocated_tbl =
       try
         let entry_state = Domain.import entry_state in
-        let stored_results = import_stored_results stored_results in
-        Domain.Hashtbl.add new_tbl entry_state stored_results
+        let allocated_tbl = import_stored_results allocated_tbl in
+        Domain.Hashtbl.add new_tbl entry_state allocated_tbl
       with Not_found ->
         ()
     in

@@ -51,7 +51,7 @@ module Computer
     val compute:
       save_results:bool ->
       kernel_function -> kinstr -> Abstract.Dom.t ->
-      (Partition.key * Abstract.Dom.t) list * Eval.cacheable
+      (Partition.key * Abstract.Dom.t) list * Eval.cacheable * Base.Hptset.t
 
   end
 

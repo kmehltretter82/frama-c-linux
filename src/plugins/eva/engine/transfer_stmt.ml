@@ -41,6 +41,7 @@ module type S = sig
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
+    allocated_bases: Base.Hptset.t;
   }
   val compute_call_ref:
     (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
@@ -294,6 +295,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: cacheable;
+    allocated_bases: Base.Hptset.t;
   }
 
   (* Forward reference to [Eval_funs.compute_call] *)
@@ -315,7 +317,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           Domain.Store.register_initial_state callstack call.kf state;
           !compute_call_ref stmt call recursion state
         | `Bottom ->
-          { states = []; cacheable = Cacheable; }
+          { states = []; cacheable = Cacheable;  allocated_bases = Base.Hptset.empty }
       in
       Eva_utils.pop_call_stack ();
       res

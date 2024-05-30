@@ -727,7 +727,9 @@ module Computer
         Eva_utils.warning_once_current
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;
-      results, !Dataflow.cacheable
+      let allocated_bases = Builtins_malloc.get_kf_allocated_bases kf in
+      let _  = Builtins_malloc.clear_kf_allocated_bases kf in
+      results, !Dataflow.cacheable, allocated_bases
     in
     let cleanup () =
       Dataflow.mark_degeneration ();

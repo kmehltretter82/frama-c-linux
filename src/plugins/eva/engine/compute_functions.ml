@@ -24,6 +24,10 @@ open Cil_types
 open Eval
 
 let dkey = Self.register_category "callbacks"
+let _dkey_compute_time = Self.register_category "compute-time"
+
+let stat_uncacheable = Statistics.register_global_stat "function-uncacheable"
+let stat_cacheable = Statistics.register_global_stat "function-cacheable"
 
 (* Clear Eva's various caches. Some operations of Eva depend on parameters,
    such as -ilevel or -plevel, so clearing those caches ensures that those
@@ -189,17 +193,21 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let result = compute kinstr call init_state in
       let () =
         let cacheable = result.Transfer.cacheable in
-        if (cacheable = Eval.Cacheable)
+        if (cacheable = Eval.Cacheable) || (Parameters.CacheAllocation.get () && cacheable = Eval.MallocedCall)
         then
           let call_result = MemExec.{
               return_flow = result.Transfer.states;
               cacheable = result.Transfer.cacheable;
+              allocated_bases = result.Transfer.allocated_bases;
             }
           in
-          MemExec.store_computed_call call.kf init_state args call_result
+          MemExec.store_computed_call call.kf init_state args call_result;
+          Statistics.incr stat_cacheable ()
+        else
+          Statistics.incr stat_uncacheable ()
       in
-      call_result
-    | Some (states, i) ->
+      result
+    | Some (call_result, i) ->
       apply_call_hooks call init_state `Reuse;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
@@ -220,8 +228,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
       Transfer.{ 
-        states = states.return_flow; 
+        states = call_result.return_flow; 
         cacheable = Cacheable; 
+        allocated_bases = call_result.allocated_bases;
       }
   (* ----- Body or specification analysis ----------------------------------- *)
 
@@ -247,7 +256,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     let cvalue_states = List.map (fun (_, s) -> get_cvalue_or_top s) states in
     apply_call_results_hooks call state (`Spec cvalue_states);
-    states, Eval.Cacheable
+    states, Eval.Cacheable, Base.Hptset.empty
 
   (* Interprets a [call] at callsite [kinstr] in state [state], using its
      specification or body according to [target]. If [-eva-show-progress] is
@@ -270,11 +279,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         compute_using_spec funspec, `Spec
     in
     apply_call_hooks call state kind;
-    let resulting_states, cacheable = compute kinstr call state in
+    let resulting_states, cacheable, allocated_bases = compute kinstr call state in
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Transfer.{ states = resulting_states; cacheable;}
+    Transfer.{ states = resulting_states; cacheable; allocated_bases;}
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -311,7 +320,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      Transfer.{ states; cacheable = Eval.Cacheable;}
+      Transfer.{ states; cacheable = Eval.Cacheable; allocated_bases = Base.Hptset.empty}
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
@@ -324,7 +333,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
       let states = List.map insert cvalue_states in
-      Transfer.{ states; cacheable; }
+      Transfer.{ states; cacheable; allocated_bases = Base.Hptset.empty }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
      use the called function specification. *)

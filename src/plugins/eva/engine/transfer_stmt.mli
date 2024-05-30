@@ -51,6 +51,7 @@ module type S = sig
   type call_result = {
     states: (Partition.key * state) list;
     cacheable: Eval.cacheable;
+    allocated_bases: Base.Hptset.t;
   }
 
   val compute_call_ref:

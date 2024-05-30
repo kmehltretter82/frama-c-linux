@@ -44,6 +44,7 @@ val dkey_summary : category
 
 (** {2 Debug categories.} *)
 
+val dkey_alloc_summary: category
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
 val dkey_incompatible_states: category
