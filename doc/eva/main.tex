@@ -1337,8 +1337,20 @@ some of these approximations.
 Most origins are of the form \lstinline|Cause L|, where \lstinline|L|
 is an (optional) line or the application indicating where the approximation
 took place. Origin causes are one of the following:
+
+\subsubsection{Arithmetic operation}
+The origin \lstinline$Arithmetic L$ denotes arithmetic operations over
+addresses, whose result cannot be precisely represented by the analyzer.
+\csource{examples/ari.c}
+In this example, the return value for \lstinline|f| is:
+
+\begin{logs}
+{{ garbled mix of &{x; y} (origin: Arithmetic {ari.c:4}) }}
+\end{logs}
+
 \subsubsection{Misaligned read}
-The origin \lstinline$Misaligned L$ indicates that
+
+The origin \lstinline$Misaligned read L$ indicates that
 misaligned reads prevented the computation to be precise.
 A misaligned read is a memory read-access where the bits read were not
 previously written as a single write that modified the whole set of
@@ -1347,7 +1359,7 @@ bits exactly.
 An example of a program leading to a misaligned read is the following:
 \csource{examples/misa.c}
 The value returned by the function \lstinline|main| is\\
-\lstinline|{{ garbled mix of &{ x; y } (origin: Misaligned { misa.c:6 }) }}|.\\
+\lstinline|{{ garbled mix of &{x; y} (origin: Misaligned read {misa.c:6}) }}|.\\
 The analyzer is by default configured for a 64-bit architecture,
 and that consequently the read memory access is not an out-of-bound access.
 If it was, an alarm would be emitted, and the
@@ -1358,6 +1370,21 @@ within the bounds of array \lstinline|t|,
 but due to the offset of six bytes,
 the 32-bit word read is made of the last two bytes from \lstinline|t[0]|
 and the first two bytes from \lstinline|t[1]|.
+
+\subsubsection{Misaligned writes}
+
+The origin \lstinline$Misaligned write L$ indicates that the interpretation of
+a misaligned write to an imprecise location has created a garbled mix at this
+memory location.
+
+An example of a program where a misaligned write creates a garbled mix
+is the following:
+\csource{examples/misa_write.c}
+
+The interpretation of the last assignment by the analysis writes
+the imprecise value
+\lstinline|{{ garbled mix of &{x} (origin: Misaligned write {misa.c:6}) }}|
+into the array \lstinline|t|.
 
 \subsubsection{Call to an unknown function}
 The origin \lstinline$Library function L$ arises from the interpretation
@@ -1401,18 +1428,6 @@ called well values.
 
 Computations that are imprecise because of a well value are marked
 as \lstinline|origin: Well|.
-
-\subsubsection{Arithmetic operation}
-The origin \lstinline$Arithmetic L$
-indicates that arithmetic operations
-take place without the analyzer being able to represent the result
-precisely.
-\csource{examples/ari.c}
-In this example, the return value for \lstinline|f| is:
-
-\begin{logs}
-{{ garbled mix of &{ x; y } (origin: Arithmetic { ari.c:4 }) }}
-\end{logs}
 
 \section{What is checked by \Eva{}}\label{obligations}
 
