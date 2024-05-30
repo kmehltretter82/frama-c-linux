@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Script used to generate the interface file Eva.mli from other .mli files,
+   given as argument of this script. *)
+
 let usage_msg = Sys.argv.(0) ^ " <file1.mli> [<file2.mli>] ..."
 
 let fail =
