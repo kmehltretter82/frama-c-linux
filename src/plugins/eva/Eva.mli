@@ -632,6 +632,7 @@ module Eval: sig
                          functions printing something during the analysis. *)
     | NoCacheCallers (** Functions for which neither the call, neither the
                          callers, can be cached. *)
+    | MallocedCall  (** Functions that call malloc, and for which the result should be cached differently. *)
 end
 
 module Assigns: sig
@@ -705,7 +706,7 @@ module Builtins: sig
   type builtin_type = unit -> typ * typ list
 
   (** Can the results of a builtin be cached? See {!Eval} for more details.*)
-  type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
+  type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers | MallocedCall
 
   type full_result = {
     c_values: (Cvalue.V.t option * Cvalue.Model.t) list;

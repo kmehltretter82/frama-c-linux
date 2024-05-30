@@ -34,11 +34,21 @@ let () = Self.set_warn_status wkey_weak_alloc Log.Winactive
 let wkey_imprecise_alloc = Self.register_warn_category
     "malloc:imprecise"
 
+(* Allocation sites are the keys used to partition the sets allocated bases *)
+module AllocSite = struct
+  include Callstack
+end
+
+(* Call sites are the statements used in the callstack *)
+module CallSite = struct 
+  include Cil_datatype.Stmt
+end
+
 (* ---------------------- Dynamically allocated bases ----------------------- *)
 
 module Base_hptmap = Hptmap.Make
     (Base.Base)
-    (Callstack)
+    (AllocSite)
     (Hptmap.Comp_unused)
     (struct let v = [ [ ] ] end)
     (struct let l = [ Ast.self ] end)
@@ -53,6 +63,71 @@ module Dynamic_Alloc_Bases =
       let default () = Base_hptmap.empty
     end)
 let () = Ast.add_monotonic_state Dynamic_Alloc_Bases.self
+
+(* 
+We save a pair of sets of bases for each function:
+  - the first set contains the bases that are currently allocated for the analyzed function, it is erased at the end of the function
+  - the second set contains all the bases that have been allocated in the analyzed function, it is kept for the whole analysis   
+*)
+module Kf_Alloc_Bases = struct
+  include Cil_state_builder.Kernel_function_hashtbl
+      (Datatype.Pair (Base.Hptset) (Base.Hptset))
+      (struct
+        let size = 97
+        let name = "Value.Builtins_malloc.Kf_Alloc_Bases"
+        let dependencies = [ Ast.self ]
+      end)
+
+  let get_cur_alloc_bases kf =
+    let (b, _) = try find kf
+      with Not_found -> (Base.Hptset.empty, Base.Hptset.empty) in
+    b
+
+  let get_all_alloc_bases kf =
+    let (_, b') = try find kf
+      with Not_found -> (Base.Hptset.empty, Base.Hptset.empty) in
+    b'
+
+  let clear_cur_alloc_bases kf =
+    match find_opt kf with
+    | None -> ()
+    | Some (_, b') -> replace kf (Base.Hptset.empty, b')
+
+  let update_alloc_bases kf base =
+    let (b, b') = try find kf
+      with Not_found -> (Base.Hptset.empty, Base.Hptset.empty) in
+    replace kf (Base.Hptset.add base b, Base.Hptset.add base b')
+
+end
+let () = Ast.add_monotonic_state Kf_Alloc_Bases.self
+
+
+(* We save a set of call site for each function
+   - They are used to keep track of the call sites where the malloc function is called   
+*)
+module Kf_Call_Sites =
+  Cil_state_builder.Kernel_function_hashtbl
+    (Cil_datatype.Stmt.Set)
+    (struct
+      let size = 97
+      let name = "Value.Builtins_malloc.Kf_Call_Sites"
+      let dependencies = [ Ast.self ]
+    end)
+let () = Ast.add_monotonic_state Kf_Call_Sites.self
+
+
+(* We save a set of alloc sites for each function
+   - They are used to keep track of the alloc sites where the malloc function is called
+*)
+module Kf_Alloc_Sites =
+  Cil_state_builder.Kernel_function_hashtbl
+    (AllocSite.Set)
+    (struct
+      let size = 97
+      let name = "Value.Builtins_malloc.Kf_Alloc_Sites"
+      let dependencies = [ Ast.self ]
+    end)
+let () = Ast.add_monotonic_state Kf_Alloc_Sites.self
 
 (* -------------------------- Auxiliary functions  -------------------------- *)
 
@@ -79,12 +154,65 @@ let call_stack_no_wrappers () =
   in
   { cs with stack = bottom_filter cs.stack }
 
+(* Our current allocation site key is the callstack of the call to malloc
+   - We can remove the stmts from the callstack to be able to import more allocation sites when the stmts have changed inside the function   
+*)
+let get_allocation_site_key () = 
+  let remove_stmt_from_callstack (cs: Callstack.t) =
+    let map (kf, _stmt) = (kf, Cil.dummyStmt) in
+    { cs with stack = List.map map cs.stack }
+  in
+  let cs = call_stack_no_wrappers () in
+  match Parameters.CallstackNoStmt.get () with
+  | true -> 
+    Self.warning ~once:true
+      "Using callstack without stmts for allocation site partitionning";
+    remove_stmt_from_callstack cs
+  | false -> cs
+
 let register_malloced_base ~stack b =
   let stack_without_top =
     Option.value ~default:stack (Callstack.pop stack)
   in
   Dynamic_Alloc_Bases.set
     (Base_hptmap.add b stack_without_top (Dynamic_Alloc_Bases.get ()))
+
+(* Update all functions in callstack to keep track of new allocation informations 
+   - Add generated base, alloc_key (callstack) and alloc_key_without_top (callstack without top) to all functions in callstack 
+*)
+let update_kf_malloced_base (alloc_key: AllocSite.t) (base: Base.t) = 
+  let cs = Eva_utils.current_call_stack () in
+  (* We intend to use it at callsite, not inside the function *)
+  let stmt_list = Callstack.to_stmt_list cs in
+  let kf_list = Callstack.to_kf_list cs in
+  let call_list = List.map (fun stmt -> 
+      let kf = Kernel_function.find_englobing_kf stmt in
+      (kf, stmt)) stmt_list in
+  let alloc_key_without_top =
+    Option.value ~default:alloc_key (Callstack.pop alloc_key)
+  in
+  begin
+    List.iter (fun kf ->
+        (* Add base to all kfs *)
+        let _ = Kf_Alloc_Bases.update_alloc_bases kf base in
+        let call_sites = 
+          try 
+            Kf_Alloc_Sites.find kf 
+          with Not_found -> 
+            AllocSite.Set.empty in
+        (* Add alloc key to all kfs .... For MallocedByStack *)
+        let call_sites = AllocSite.Set.add alloc_key call_sites in
+        (* Add alloc key without top to all kfs .... For Dynamic_Alloc_Bases*) 
+        let call_sites = AllocSite.Set.add alloc_key_without_top call_sites in
+        Kf_Alloc_Sites.replace kf call_sites) kf_list;
+
+    (* Add call_sites to all kfs *)
+    List.iter (fun (kf, stmt) -> 
+        let stmt_set = try Kf_Call_Sites.find kf 
+          with Not_found -> CallSite.Set.empty in
+        let stmt_set = CallSite.Set.add stmt stmt_set in
+        Kf_Call_Sites.replace kf stmt_set) call_list;
+  end
 
 let fold_dynamic_bases (f: Base.t -> Callstack.t -> 'a -> 'a) init =
   Base_hptmap.fold f (Dynamic_Alloc_Bases.get ()) init
@@ -315,7 +443,7 @@ let pp_validity fmt (v1, v2) =
    Note that [_state] is not used, but it is present to ensure a compatible
    signature with [alloc_by_stack]. *)
 let alloc_fresh weak deallocation prefix sizev _state =
-  let stack = call_stack_no_wrappers () in
+  let stack = get_allocation_site_key () in
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let typ = type_from_nb_elems tsize in
   let name = create_new_variable_name stack prefix weak in
@@ -400,7 +528,7 @@ let alloc_weakest_base region =
    stack. Currently, the callstacks are truncated according to
    [-eva-alloc-functions]. *)
 module MallocedByStack = (* varinfo list Callstack.hashtbl *)
-  State_builder.Hashtbl (Callstack.Hashtbl)
+  State_builder.Hashtbl (AllocSite.Hashtbl)
     (Datatype.List (Base))
     (struct
       let name = "Value.Builtins_malloc.MallocedByStack"
@@ -437,8 +565,35 @@ let update_variable_validity ?(make_weak=false) base sizev =
     base, max_valid_bits
   | _ -> Self.fatal "base is not Allocated: %a" Base.pretty base
 
+(* Checks if we should allocate a new base.
+   We should allocate new base when the number of allocated bases on the allocation site
+   is less than or equal to the threshold [mlevel] *)
+let must_allocate_new_variable nb max_level =
+  nb <= max_level
+
+(* Checks if we should reuse the weak base.
+   It should be the last allocated variable when 
+   the threshold [mlevel] is reached  *)
+let must_reuse_weak_variable nb max_level =
+  nb = max_level
+
+(* Returns the type of the new variable to be allocated *)
+let new_variable_type nb max_level =
+  if nb = max_level || (max_level <= 1) then Weak else Strong
+
+(* A previously allocated strong variable [b] can be reused if it is not present in the [state] anymore.
+   Which should be the case when a strong free has been performed on it. 
+*)
+let can_reuse_strong_variable b state =
+  try
+    ignore (Model.find_base b state);
+    false
+  with Not_found -> true
+
+(* Allocates a new variable for the given region, prefix and size. *)
+
 let alloc_by_stack region prefix sizev state =
-  let stack = call_stack_no_wrappers () in
+  let stack = get_allocation_site_key () in
   let max_level = Parameters.MallocLevel.get () in
   let all_vars =
     try MallocedByStack.find stack
@@ -447,17 +602,25 @@ let alloc_by_stack region prefix sizev state =
   let rec aux nb vars =
     match vars with
     | [] -> (* must allocate a new variable *)
-      let b, _ as r = alloc_fresh Strong region prefix sizev state in
+      assert (must_allocate_new_variable nb max_level);
+      let v = new_variable_type nb max_level in
+      let b, _ as r = alloc_fresh v region prefix sizev state in
+      let _ = update_kf_malloced_base stack b in
       MallocedByStack.replace stack (all_vars @ [b]);
       r
     | b :: q ->
-      try
-        ignore (Model.find_base b state);
-        if nb = max_level then begin (* variable already used *)
-          update_variable_validity ~make_weak:true b sizev
-        end
+      match can_reuse_strong_variable b state with
+      | false -> 
+        if must_reuse_weak_variable nb max_level then 
+          begin (* variable already used and should be weak *)
+            assert (Base.is_weak b);
+            let _ = update_kf_malloced_base stack b in
+            update_variable_validity ~make_weak:false b sizev
+          end
         else aux (nb+1) q
-      with Not_found -> (* Can reuse this (strong) variable *)
+      | true ->
+        (* Can reuse this (strong) variable *)
+        let _ = update_kf_malloced_base stack b in
         update_variable_validity ~make_weak:false b sizev
   in
   aux 0 all_vars
@@ -470,7 +633,7 @@ let choose_base_allocation () =
   | By_stack -> alloc_by_stack
   | Imprecise -> fun region _ _ _ -> alloc_weakest_base region
 
-let register_malloc ?replace name ?returns_null prefix region =
+let register_malloc ?replace name ?returns_null prefix region cacheable =
   let builtin state args =
     let size = match args with
       | [ _, size ] -> size
@@ -486,13 +649,13 @@ let register_malloc ?replace name ?returns_null prefix region =
   in
   let name = "Frama_C_" ^ name in
   let typ () = Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf] in
-  Builtins.register_builtin ?replace name NoCacheCallers builtin ~typ
+  Builtins.register_builtin ?replace name cacheable builtin ~typ
 
 let () =
-  register_malloc ~replace:"malloc" "malloc" "malloc" Base.Malloc;
-  register_malloc ~replace:"__fc_vla_alloc" "vla_alloc" "malloc" Base.VLA
+  register_malloc ~replace:"malloc" "malloc" "malloc" Base.Malloc Eval.MallocedCall;
+  register_malloc ~replace:"__fc_vla_alloc" "vla_alloc" "malloc" Base.VLA Eval.NoCacheCallers
     ~returns_null:false;
-  register_malloc ~replace:"alloca" "alloca" "alloca" Base.Alloca
+  register_malloc ~replace:"alloca" "alloca" "alloca" Base.Alloca Eval.NoCacheCallers
     ~returns_null:false
 
 (* --------------------------------- Calloc --------------------------------- *)
@@ -914,6 +1077,63 @@ let () =
     check_leaked_malloced_bases
 
 
+
+(* ----------------------------- Memexec utils ----------------------------- *)
+let get_kf_allocated_bases kf =
+  Kf_Alloc_Bases.get_cur_alloc_bases kf
+
+let clear_kf_allocated_bases kf =
+  Kf_Alloc_Bases.clear_cur_alloc_bases kf
+
+let register_reused_base _stack _b =
+  let kfs = Callstack.to_kf_list _stack in 
+  List.iter (fun kf -> 
+      Kf_Alloc_Bases.update_alloc_bases kf _b) kfs
+
+let get_base_allocation_site base =
+  let bases = Dynamic_Alloc_Bases.get () in
+  try Base_hptmap.find base bases
+  with Not_found -> assert false
+
+let print_summary fmt  = 
+  let kfs = Kf_Alloc_Sites.fold (fun kf _ acc -> kf::acc) [] in
+  let print_allocated_bases kf = 
+    let bases = Kf_Alloc_Bases.get_all_alloc_bases kf in
+    Format.fprintf fmt "All allocated bases: %a@." Base.Hptset.pretty bases
+  in
+  let print_alloc_sites kf =
+    let stmts = match Kf_Alloc_Sites.find_opt kf with
+      | None -> AllocSite.Set.empty
+      | Some stmts -> stmts in
+    Format.fprintf fmt "Allocation sites: %a@." AllocSite.Set.pretty stmts
+  in
+  let print_call_sites kf = 
+    let call_sites = try Kf_Call_Sites.find kf 
+      with Not_found -> CallSite.Set.empty in
+    Format.fprintf fmt "Call sites: %a@." CallSite.Set.pretty call_sites
+  in
+  let print_dynamic_alloc_bases () = 
+    let bases = Dynamic_Alloc_Bases.get () in
+    Format.fprintf fmt "Dynamic allocated bases: %a@." Base_hptmap.pretty bases
+  in
+  let print_malloced_by_stack () = 
+    MallocedByStack.iter (fun cs bases -> 
+        Format.fprintf fmt "Malloced by stack: %a -> %a@." Callstack.pretty cs (Pretty_utils.pp_list ~sep:", " Base.pretty) bases)
+  in
+  let print fmt kf = 
+    Format.fprintf fmt "Kernel function: %a@." Kernel_function.pretty kf;
+    print_allocated_bases kf;
+    print_alloc_sites kf;
+    print_call_sites kf;
+    Format.fprintf fmt "@."
+  in List.iter (print fmt) kfs;
+  print_dynamic_alloc_bases ();
+  print_malloced_by_stack ()
+
+let print_summary () =
+  let dkey = Self.dkey_alloc_summary in
+  let header fmt = Format.fprintf fmt " ====== DYNAMIC ALLOCATION SUMMARY ======" in
+  Self.printf ~header ~dkey ~level:1 "  @[<v>%t@]" print_summary
 (*
 Local Variables:
 compile-command: "make -C ../../../../.."

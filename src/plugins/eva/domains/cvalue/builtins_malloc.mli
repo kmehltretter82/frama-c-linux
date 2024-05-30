@@ -44,3 +44,19 @@ val freeable: Cvalue.V.t -> Abstract_interp.truth
     value points to an allocated memory block that can be safely released using
     the C function free. Note that \freeable(\null) does not hold, despite NULL
     being a valid argument to the C function free. *)
+
+val get_kf_allocated_bases : Kernel_function.t -> Base.Hptset.t
+(** Returns the set of bases allocated by a given function *)
+
+val clear_kf_allocated_bases : Kernel_function.t -> unit
+(** Clears the set of bases allocated by a given function *)
+
+val register_reused_base : Callstack.t -> Base.t -> unit
+(** Register the base as being malloced by the current stack. *)
+(* Used when reusing memexec calls *)
+
+val print_summary : unit -> unit
+(** Print the summary of the dynamic allocation analysis. *)
+
+val get_base_allocation_site: Base.t -> Callstack.t
+(** Returns the allocation site of the base *)

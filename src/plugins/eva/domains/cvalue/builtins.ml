@@ -26,7 +26,7 @@ exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
 type builtin_type = unit -> typ * typ list
-type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
+type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers | MallocedCall
 
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;

@@ -270,6 +270,7 @@ type cacheable =
                        functions printing something during the analysis. *)
   | NoCacheCallers (** Functions for which neither the call, neither the
                        callers, can be cached. *)
+  | MallocedCall  (** Functions that call malloc, and for which the result should be cached differently. *)
 [@@@ api_end]
 (*
 Local Variables:

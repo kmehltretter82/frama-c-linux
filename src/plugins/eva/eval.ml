@@ -255,7 +255,7 @@ type recursion = {
   base_withdrawal: Base.Hptset.t;
 }
 
-type cacheable = Cacheable | NoCache | NoCacheCallers
+type cacheable = Cacheable | NoCache | NoCacheCallers | MallocedCall
 
 (*
 Local Variables:

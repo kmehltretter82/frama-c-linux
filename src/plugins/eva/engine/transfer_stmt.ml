@@ -751,7 +751,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
             in
             (* If needed, propagate that callers cannot be cached. *)
             if c = NoCacheCallers then
-              cacheable := NoCacheCallers;
+              cacheable := NoCacheCallers
+            else if c = MallocedCall then 
+              cacheable := MallocedCall;
             states
           in
           Bottom.list_of_bot states

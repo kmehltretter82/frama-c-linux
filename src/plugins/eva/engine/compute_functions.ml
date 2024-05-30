@@ -374,6 +374,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       Abstract.Dom.post_analysis final_state;
       Summary.print_summary ();
       Statistics.export_as_csv ();
+      Builtins_malloc.print_summary ();
       restore_signals ()
     in
     let cleanup () =

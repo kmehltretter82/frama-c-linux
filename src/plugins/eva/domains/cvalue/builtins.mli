@@ -34,7 +34,7 @@ exception Outside_builtin_possibilities
 type builtin_type = unit -> typ * typ list
 
 (** Can the results of a builtin be cached? See {!Eval} for more details.*)
-type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
+type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers | MallocedCall
 
 type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
