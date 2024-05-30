@@ -71,8 +71,12 @@ let import_zone zone =
       try Int_Intervals.(inject (project_set itv))
       with Abstract_interp.Error_Top -> Int_Intervals.top
     in
-    let zone = Locations.Zone.inject (import_base base) itv in
-    Locations.Zone.join acc zone
+    try
+      let zone =
+        Locations.Zone.inject (import_base base) itv in
+      Locations.Zone.join acc zone
+    with Not_found -> 
+      Locations.Zone.top
   in
   try Locations.Zone.(fold_i import zone bottom)
   with Abstract_interp.Error_Top ->
