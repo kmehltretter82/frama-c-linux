@@ -15,7 +15,7 @@ DEFAULT_SUITES= rte rte_manual scope slicing sparecode
 ### Tests of EVA
 
 DEFAULT_SUITES= value/numerors value/traces
-DEFAULT_SUITES= value builtins float idct
+DEFAULT_SUITES= value builtins float idct incremental
 
 ### Tests of EVA domains
 

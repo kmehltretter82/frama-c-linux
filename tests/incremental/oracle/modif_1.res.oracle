@@ -1,0 +1,24 @@
+[kernel] Parsing modif_2.c (with preprocessing)
+[eva] Loading previous session from save file modif_1.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file modif_1.sav
+[eva] In save file modif_1.sav, 3 saved calls for 3 functions
+[eva] In current session, 1 saved calls for 1 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] computing for function f1 <- main.
+  Called from modif_2.c:15.
+[eva] Recording results for f1
+[eva] Done for function f1
+[eva] modif_2.c:16: Reusing old results for call to f2
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function f1:
+  
+[eva:final-states] Values at end of function main:
+  

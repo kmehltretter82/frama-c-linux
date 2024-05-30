@@ -1,0 +1,14 @@
+[kernel] Parsing no_modif.c (with preprocessing)
+[eva] Loading previous session from save file no_modif.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file no_modif.sav
+[eva] In save file no_modif.sav, 2 saved calls for 2 functions
+[eva] In current session, 2 saved calls for 2 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] :0: Reusing old results for call to main
+[eva] ====== VALUES COMPUTED ======
