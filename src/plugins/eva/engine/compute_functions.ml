@@ -186,12 +186,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     match MemExec.reuse_previous_call call.kf init_state args with
     | None ->
-      let call_result = compute kinstr call init_state in
+      let result = compute kinstr call init_state in
       let () =
-        if call_result.Transfer.cacheable = Eval.Cacheable
+        let cacheable = result.Transfer.cacheable in
+        if (cacheable = Eval.Cacheable)
         then
-          let final_states = call_result.Transfer.states in
-          MemExec.store_computed_call call.kf init_state args final_states
+          let call_result = MemExec.{
+              return_flow = result.Transfer.states;
+              cacheable = result.Transfer.cacheable;
+            }
+          in
+          MemExec.store_computed_call call.kf init_state args call_result
       in
       call_result
     | Some (states, i) ->
@@ -214,8 +219,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       end;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
-      Transfer.{ states; cacheable = Cacheable; }
-
+      Transfer.{ 
+        states = states.return_flow; 
+        cacheable = Cacheable; 
+      }
   (* ----- Body or specification analysis ----------------------------------- *)
 
   (* Interprets a [call] at callsite [kinstr] in the state [state] by analyzing
@@ -267,7 +274,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Transfer.{ states = resulting_states; cacheable; }
+    Transfer.{ states = resulting_states; cacheable;}
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -304,7 +311,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      Transfer.{ states; cacheable = Eval.Cacheable; }
+      Transfer.{ states; cacheable = Eval.Cacheable;}
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in

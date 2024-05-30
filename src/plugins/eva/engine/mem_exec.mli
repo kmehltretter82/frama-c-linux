@@ -34,8 +34,13 @@ val cleanup_results: unit -> unit
 
 module Make
     (Value : Abstract_value.S)
-    (Domain : Abstract_domain.S)
+    (Domain :  Abstract.Domain.External)
   : sig
+
+    type call_result = {
+      return_flow: (Partition.key * Domain.t) list;
+      cacheable: Eval.cacheable;
+    }
 
     (** [store_computed_call kf init_state args call_results] memoizes the fact
         that calling [kf] with initial state [init_state] and arguments [args]
@@ -43,7 +48,7 @@ module Make
         to be reused in subsequent calls *)
     val store_computed_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
-      (Partition.key * Domain.t) list ->
+      call_result ->
       unit
 
     (** [reuse_previous_call kf init_state args] searches amongst the previous
@@ -54,7 +59,7 @@ module Make
         by the plugins that have registered Value callbacks.) *)
     val reuse_previous_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
-      ((Partition.key * Domain.t) list * int) option
+      (call_result * int) option
 
     (** Prepare the analysis cache for a new analysis: if option -eva-load
         is set, import the cache of a previous analysis from the given file. *)
