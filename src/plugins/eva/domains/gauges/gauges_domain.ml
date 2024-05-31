@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Eva_ast
 open Eval
 
 type function_calls =

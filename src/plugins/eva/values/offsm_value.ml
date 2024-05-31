@@ -419,7 +419,7 @@ module Offsm
 
   let constant _context e _c =
     if store_redundant then
-      match Evast.fold_to_integer e with
+      match Eva_ast.fold_to_integer e with
       | Some i -> inject_int e.typ i
       | None -> Top
     else Top
@@ -433,7 +433,7 @@ module Offsm
 
   let forward_unop _context _typ op o =
     let o' = match o, op with
-      | Top, _ | _, (Evast.Neg | LNot) -> Top
+      | Top, _ | _, (Eva_ast.Neg | LNot) -> Top
       | O o, BNot -> O (bnot o)
     in
     `Value o'
@@ -441,7 +441,7 @@ module Offsm
   let forward_binop _context _typ op o1 o2 =
     let o' =
       match o1, o2, op with
-      | O _o1, O _o2, (Evast.Shiftlt | Shiftrt) ->
+      | O _o1, O _o2, (Eva_ast.Shiftlt | Shiftrt) ->
         (* It is inconvenient to handle shift here, because we need a
            constant for o2 *)
         Top
@@ -523,7 +523,7 @@ let () = Abstractions.Hooks.register @@ fun (module Abstraction) ->
 
       let forward_unop context typ op t =
         match op with
-        | Evast.BNot ->
+        | Eva_ast.BNot ->
           let t = strengthen_offsm typ t in
           let* t = forward_unop context typ op t in
           strengthen_v typ t
@@ -531,7 +531,7 @@ let () = Abstractions.Hooks.register @@ fun (module Abstraction) ->
 
       let forward_binop context typ op l r =
         match op with
-        | Evast.BAnd | BOr | BXor ->
+        | Eva_ast.BAnd | BOr | BXor ->
           let l = strengthen_offsm typ l
           and r = strengthen_offsm typ r in
           let* t = forward_binop context typ op l r in

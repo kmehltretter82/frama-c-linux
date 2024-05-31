@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast_types
+open Eva_ast_types
 
 module Precedence =
 struct

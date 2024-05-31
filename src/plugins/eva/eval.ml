@@ -22,8 +22,8 @@
 
 open Cil_types
 
-type lval = Evast.lval
-type exp = Evast.exp
+type lval = Eva_ast.lval
+type exp = Eva_ast.exp
 
 (** *)
 
@@ -155,7 +155,7 @@ let compute_englobing_subexpr ~subexpr ~expr =
      [subexpr], apart [subexpr] itself, or [None] if [subexpr] does not appear
      in [expr]. *)
   let rec compute expr =
-    if Evast.Exp.equal expr subexpr
+    if Eva_ast.Exp.equal expr subexpr
     then Some []
     else
       let sublist = match expr.node with
@@ -181,9 +181,9 @@ let compute_englobing_subexpr ~subexpr ~expr =
   Option.value ~default:[] (compute expr)
 
 module Englobing =
-  Datatype.Pair_with_collections (Evast.Exp) (Evast.Exp)
+  Datatype.Pair_with_collections (Eva_ast.Exp) (Eva_ast.Exp)
     (struct  let module_name = "Subexpressions" end)
-module SubExprs = Datatype.List (Evast.Exp)
+module SubExprs = Datatype.List (Eva_ast.Exp)
 
 module EnglobingSubexpr =
   State_builder.Hashtbl (Englobing.Hashtbl) (SubExprs)

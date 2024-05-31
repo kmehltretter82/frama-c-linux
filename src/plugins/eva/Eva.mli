@@ -217,7 +217,7 @@ module Deps: sig
   val narrow : t -> t -> t
 end
 
-module Evast: sig
+module Eva_ast: sig
   (** Eva Syntax Tree. *)
 
   type origin =
@@ -658,7 +658,7 @@ module Results: sig
 
   (** Returns the list of expressions which have been inferred to be equal to
       the given expression by the Equality domain. *)
-  val equality_class : Evast.exp -> request -> Evast.exp list result
+  val equality_class : Eva_ast.exp -> request -> Eva_ast.exp list result
 
   (** Returns the Cvalue state. Error cases are converted into the bottom or top
       cvalue state accordingly. *)
@@ -1000,7 +1000,7 @@ module Builtins: sig
   (** Eva analysis builtins for the cvalue domain, more efficient than their
       equivalent in C. *)
 
-  open Evast
+  open Eva_ast
 
   exception Invalid_nb_of_args of int
   exception Outside_builtin_possibilities

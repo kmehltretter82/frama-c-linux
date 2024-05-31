@@ -71,19 +71,19 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
 
   let pp_arg fmt arg =
     Format.fprintf fmt "%a = %a"
-      Evast.pp_exp arg.concrete
+      Eva_ast.pp_exp arg.concrete
       pp_cvalue_assigned arg.avalue
 
   let assign _kinstr loc exp cvalue_assigned _valuation state =
     feedback "assign %a with %a = %a"
-      Evast.pp_lval loc.lval
-      Evast.pp_exp exp
+      Eva_ast.pp_lval loc.lval
+      Eva_ast.pp_exp exp
       pp_cvalue_assigned cvalue_assigned;
     `Value state
 
   let assume _stmt exp truth _valuation state =
     feedback "assume %a is %b"
-      Evast.pp_exp exp
+      Eva_ast.pp_exp exp
       truth;
     `Value state
 
@@ -112,7 +112,7 @@ module Simple : Simpler_domains.Simple_Cvalue = struct
 
   let initialize_variable lval ~initialized:_ init state =
     feedback "initialize_variable %a with %a"
-      Evast.pp_lval lval
+      Eva_ast.pp_lval lval
       pp_init_val init;
     state
 

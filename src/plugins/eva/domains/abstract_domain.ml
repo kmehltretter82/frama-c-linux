@@ -79,8 +79,8 @@
 (* The types of the Cil AST. *)
 open Cil_types
 
-type exp = Evast.exp
-type lval = Evast.lval
+type exp = Eva_ast.exp
+type lval = Eva_ast.lval
 
 (* Definition of the types frequently used in Eva. *)
 open Eval

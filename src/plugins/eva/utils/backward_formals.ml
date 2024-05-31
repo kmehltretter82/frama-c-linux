@@ -29,7 +29,7 @@ open Cil_types
    be changed by the callee. *)
 let safe_argument expr =
   let exception Unsafe in
-  let f (lv : Evast.lval) =
+  let f (lv : Eva_ast.lval) =
     match lv.node with
     | Var vi, NoOffset ->
       if vi.vaddrof || Cil.typeHasQualifier "volatile" vi.vtype || vi.vglob
@@ -37,7 +37,7 @@ let safe_argument expr =
     | _, _ -> raise Unsafe
   in
   try
-    Evast.iter_lvals f expr;
+    Eva_ast.iter_lvals f expr;
     true
   with Unsafe -> false
 

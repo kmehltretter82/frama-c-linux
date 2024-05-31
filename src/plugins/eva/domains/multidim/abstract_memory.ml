@@ -157,7 +157,7 @@ end
 
 type size = Integer.t
 type side = Left | Right
-type oracle = Evast.exp -> Int_val.t
+type oracle = Eva_ast.exp -> Int_val.t
 type bioracle = side -> oracle
 
 module type ProtoMemory =
@@ -190,5 +190,5 @@ sig
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
     t -> t
   val add_segmentation_bounds : oracle:oracle -> typ:Cil_types.typ ->
-    Evast.exp list -> t -> t
+    Eva_ast.exp list -> t -> t
 end

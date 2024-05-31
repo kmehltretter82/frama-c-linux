@@ -118,7 +118,7 @@ module Set : sig
 
   (** [remove lval set] remove any expression [e] such that [lval] belongs to
       [syntactic_lval e] from the set of equalities [set]. *)
-  val remove : Hcexprs.kill_type -> Evast.lval -> t -> t
+  val remove : Hcexprs.kill_type -> Eva_ast.lval -> t -> t
 
   (** [unite (a, a_set) (b, b_set) map] unites [a] and [b] in [map].
       [a_set] must be equal to [syntactic_lval a],

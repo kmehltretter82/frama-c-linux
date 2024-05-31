@@ -45,7 +45,7 @@ module Queries = struct
     let status =
       if Cvalue.V.is_bottom (get_v v) then Alarmset.False else Alarmset.Unknown
     in
-    let lval = Evast.to_cil_lval lval in
+    let lval = Eva_ast.to_cil_lval lval in
     match v with
     | C_uninit_noesc _ -> Alarmset.singleton ~status (Alarms.Uninitialized lval)
     | C_init_esc _     -> Alarmset.singleton ~status (Alarms.Dangling lval)
@@ -118,7 +118,7 @@ module Queries = struct
         v, alarms
 
   let extract_lval ~oracle:_ _context state lval loc =
-    if Cil.isArithmeticOrPointerType lval.Evast.typ
+    if Cil.isArithmeticOrPointerType lval.Eva_ast.typ
     then extract_scalar_lval state lval loc
     else extract_aggregate_lval state lval loc
 
@@ -128,7 +128,7 @@ module Queries = struct
     let loc = Precise_locs.imprecise_location precise_loc in
     let eval_one_loc single_loc =
       let v = Cvalue.Model.find state single_loc in
-      let v = Cvalue_forward.make_volatile ~typ:lval.Evast.typ v in
+      let v = Cvalue_forward.make_volatile ~typ:lval.Eva_ast.typ v in
       Cvalue_forward.reinterpret lval.typ v
     in
     let process_ival base ival (acc_loc, acc_val as acc) =

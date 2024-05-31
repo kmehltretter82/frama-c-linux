@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Eval
-open Evast
+open Eva_ast
 
 type value = Main_values.CVal.t
 type origin = value

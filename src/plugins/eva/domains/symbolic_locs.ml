@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Eval
-open Evast
+open Eva_ast
 open Locations
 
 let dkey = Self.register_category "d-symblocs"
@@ -146,10 +146,10 @@ let vars_to_bases vi_set =
   |> Base.Set.of_seq
 
 let vars_lv lv =
-  vars_to_bases (Evast.vars_in_lval lv)
+  vars_to_bases (Eva_ast.vars_in_lval lv)
 
 let vars_exp (e: exp) =
-  vars_to_bases (Evast.vars_in_exp e)
+  vars_to_bases (Eva_ast.vars_in_exp e)
 
 (* Legacy names *)
 module B2K = K.BaseToHCESet
@@ -367,12 +367,12 @@ module Memory = struct
   (* Add the the mapping [lv --> v] to [state] when possible.
      [get_z] is a function that computes dependencies. *)
   let add_lv state get_z lv v  =
-    if Evast.lval_contains_volatile lv then
+    if Eva_ast.lval_contains_volatile lv then
       state
     else
       let k = K.HCE.of_lval lv in
       let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect = Evast.indirect_zone_of_lval get_z lv in
+      let z_lv_indirect = Eva_ast.indirect_zone_of_lval get_z lv in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
@@ -384,11 +384,11 @@ module Memory = struct
   (* Add the mapping [e --> v] to [state] when possible and useful.
      [get_z] is a function that computes dependencies. *)
   let add_exp state get_z e v =
-    if Evast.exp_contains_volatile e then
+    if Eva_ast.exp_contains_volatile e then
       state
     else
       let k = K.HCE.of_exp e in
-      let z = Evast.zone_of_exp get_z e in
+      let z = Eva_ast.zone_of_exp get_z e in
       add_key k v z state
 
   let find k state =
@@ -485,7 +485,7 @@ module D : Abstract_domain.Leaf
       | `Value loc -> loc.Eval.loc
     in
     if Precise_locs.(equal_loc loc_top r) then
-      Self.fatal "Unknown location for %a" Evast.pp_lval lv
+      Self.fatal "Unknown location for %a" Eva_ast.pp_lval lv
     else r
 
   let get_val valuation = fun lv ->

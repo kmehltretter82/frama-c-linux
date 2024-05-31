@@ -25,7 +25,7 @@
 (** Eva analysis builtins for the cvalue domain, more efficient than their
     equivalent in C. *)
 
-open Evast
+open Eva_ast
 
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities

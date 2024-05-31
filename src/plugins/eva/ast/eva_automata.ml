@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
-open Evast
+open Eva_ast
 
 (* --- Vertices and Edges types --- *)
 
@@ -88,9 +88,9 @@ module Transition = Datatype.Make (struct
       function
       | Skip -> ()
       | Return (None,_) -> fprintf fmt "return"
-      | Return (Some exp,_) -> fprintf fmt "return %a" Evast.pp_exp exp
-      | Guard (exp,Then,_) -> Evast.pp_exp fmt exp
-      | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Evast.pp_exp exp
+      | Return (Some exp,_) -> fprintf fmt "return %a" Eva_ast.pp_exp exp
+      | Guard (exp,Then,_) -> Eva_ast.pp_exp fmt exp
+      | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Eva_ast.pp_exp exp
       | Assign (_,_,stmt)
       | Call (_,_,_,stmt)
       | Init (_,_,stmt)

@@ -22,7 +22,7 @@
 
 (** Hash-consed expressions and lvalues. *)
 
-type unhashconsed_exprs = private E of Evast.exp | LV of Evast.lval
+type unhashconsed_exprs = private E of Eva_ast.exp | LV of Eva_ast.lval
 (** lvalues are never stored under a constructor [E], only [LV] *)
 
 (** Raised when the replacement of an lvalue in an expression is impossible. *)
@@ -46,18 +46,18 @@ module HCE: sig
 
   (** Conversions between type [t] and Cil lvalues and expressions. *)
 
-  val of_lval: Evast.lval -> t
-  val of_exp: Evast.exp -> t
+  val of_lval: Eva_ast.lval -> t
+  val of_exp: Eva_ast.exp -> t
 
   val get: t -> unhashconsed_exprs
-  val to_exp: t -> Evast.exp
-  val to_lval: t -> Evast.lval option
+  val to_exp: t -> Eva_ast.exp
+  val to_lval: t -> Eva_ast.lval option
   val is_lval: t -> bool
   val type_of: t -> Cil_types.typ
 
   (** Replaces all occurrences of the lvalue [late] by the expression [heir].
       @raise NonExchangeable if the replacement is not feasible. *)
-  val replace: kill_type -> late:Evast.lval -> heir:Evast.exp -> t -> t
+  val replace: kill_type -> late:Eva_ast.lval -> heir:Eva_ast.exp -> t -> t
 end
 
 
@@ -82,7 +82,7 @@ val empty_lvalues: lvalues
     removed. This function only computes the first lvalues of the expression,
     and does not go through the lvalues (for the expression t[i]+1, only the
     lvalue t[i] is returned). *)
-val syntactic_lvalues: Evast.exp -> lvalues
+val syntactic_lvalues: Eva_ast.exp -> lvalues
 
 
 (** Maps from symbolic expressions to their memory dependencies, expressed as a

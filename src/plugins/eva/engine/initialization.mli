@@ -22,7 +22,7 @@
 
 (** Creation of the initial state of abstract domain. *)
 
-open Evast
+open Eva_ast
 open Lattice_bounds
 
 module type S = sig

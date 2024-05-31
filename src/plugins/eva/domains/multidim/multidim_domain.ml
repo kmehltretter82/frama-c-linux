@@ -177,9 +177,9 @@ struct
   let of_lval oracle (lval : lval) : t or_top =
     let (host,offset) = lval.node in
     let oracle' = convert_oracle oracle in
-    let base_typ = Evast.type_of_lhost host in
+    let base_typ = Eva_ast.type_of_lhost host in
     let offset =
-      if Evast.lval_contains_volatile lval then
+      if Eva_ast.lval_contains_volatile lval then
         `Top
       else
         Offset.of_evast_offset oracle' base_typ offset in
@@ -413,19 +413,19 @@ struct
       state referees
 
   let update_var_references ~oracle (dst : Cil_types.varinfo)
-      (src : Evast.exp option) (base_map,tracked : t) =
+      (src : Eva_ast.exp option) (base_map,tracked : t) =
     let incr = Option.bind src (fun expr ->
-        let is_dst (exp : Evast.exp) = match exp.node with
+        let is_dst (exp : Eva_ast.exp) = match exp.node with
           | Lval { node = Var v, NoOffset } -> Cil_datatype.Varinfo.equal dst v
           | _ -> false
         in
         match expr.node with
         | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e1 ->
-          Evast.fold_to_integer e2
+          Eva_ast.fold_to_integer e2
         | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e2 ->
-          Evast.fold_to_integer e1
+          Eva_ast.fold_to_integer e1
         | BinOp ((MinusA|MinusPI), e1, e2, _typ) when is_dst e1 ->
-          Option.map Integer.neg (Evast.fold_to_integer e2)
+          Option.map Integer.neg (Eva_ast.fold_to_integer e2)
         | _ -> None)
     in
     (* [oracle] must be the oracle before the (non-invertible)
@@ -454,7 +454,7 @@ struct
     base_map, tracked
 
   let update_references ~oracle (dst : mdlocation)
-      (src : Evast.exp option) (state : t) =
+      (src : Eva_ast.exp option) (state : t) =
     let remove_references b state =
       match Base.to_varinfo b with
       | exception Base.Not_a_C_variable -> state (* only references to variables are kept *)
@@ -485,10 +485,10 @@ struct
     let oracle = convert_oracle oracle in
     read (Memory.get ~oracle) Value_or_Uninitialized.join state src
 
-  let mk_oracle (state : state) : Evast.exp -> value =
+  let mk_oracle (state : state) : Eva_ast.exp -> value =
     (* Until Eva gives access to good oracles, we use this poor stupid oracle
        instead *)
-    let rec oracle (exp : Evast.exp) =
+    let rec oracle (exp : Eva_ast.exp) =
       match exp.node with
       | Lval lval ->
         begin match Location.of_lval oracle lval with
@@ -516,9 +516,9 @@ struct
       | _ ->
         Self.fatal
           "This type of array index expression is not supported: %a"
-          Evast.pp_exp exp
+          Eva_ast.pp_exp exp
     in
-    fun exp -> oracle (Evast.const_fold exp)
+    fun exp -> oracle (Eva_ast.const_fold exp)
 
   let mk_bioracle s1 s2 =
     let oracle_left = mk_oracle s1
@@ -673,7 +673,7 @@ struct
     `Value (Value.top, None), Alarmset.all
 
   let extract_lval ~oracle _context state lv _loc =
-    if Cil.isScalarType lv.Evast.typ then
+    if Cil.isScalarType lv.Eva_ast.typ then
       let oracle = fun exp ->
         match oracle exp with
         | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
@@ -689,7 +689,7 @@ struct
           Value_or_Uninitialized.get_v_normalized v >>-: (fun v -> v, None),
           if Value_or_Uninitialized.is_initialized v
           then
-            let origin = Evast.to_cil_lval lv in
+            let origin = Eva_ast.to_cil_lval lv in
             Alarmset.(set (Alarms.Uninitialized origin) True all)
           else Alarmset.all
     else
@@ -698,7 +698,7 @@ struct
 
   (* Eva Transfer *)
 
-  let valuation_to_oracle state valuation : Evast.exp -> value = fun exp ->
+  let valuation_to_oracle state valuation : Eva_ast.exp -> value = fun exp ->
     let multidim_oracle = mk_oracle state in
     match valuation.Abstract_domain.find exp with
     | `Top -> multidim_oracle exp
@@ -708,7 +708,7 @@ struct
   let assume_exp valuation expr record state' =
     let* state = state' in
     let oracle = valuation_to_oracle state valuation in
-    match (expr : Evast.exp).node with
+    match (expr : Eva_ast.exp).node with
     | Lval lv when Cil.isScalarType lv.typ ->
       let value = Value_or_Uninitialized.from_flagged record.value in
       if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
@@ -771,7 +771,7 @@ struct
     let oracle = valuation_to_oracle state valuation in
     let bind state arg =
       state >>-:
-      assign' ~oracle ~value:arg.avalue (Evast.Build.var arg.formal) (Some arg.concrete)
+      assign' ~oracle ~value:arg.avalue (Eva_ast.Build.var arg.formal) (Some arg.concrete)
     in
     List.fold_left bind (`Value state) call.arguments
 
@@ -782,11 +782,11 @@ struct
       let args = List.map (fun arg -> arg.avalue) call.arguments in
       let+ assigned_result = f args in
       let oracle = mk_oracle post in
-      let dst = Evast.Build.var return in
+      let dst = Eva_ast.Build.var return in
       assign' ~oracle ~value:assigned_result dst None post
 
   let show_expr valuation state fmt expr =
-    match (expr : Evast.exp).node with
+    match (expr : Eva_ast.exp).node with
     | Lval lval | StartOf lval ->
       let oracle = valuation_to_oracle state valuation in
       begin match Location.of_lval oracle lval with
@@ -856,8 +856,8 @@ struct
       let annotation = Eva_annotations.read_array_segmentation extension in
       let vi,offset,bounds = annotation in
       (* Update the segmentation *)
-      let bounds = List.map Evast.translate_exp bounds in
-      let lval = Evast.translate_lval (Var vi, offset) in
+      let bounds = List.map Eva_ast.translate_exp bounds in
+      let lval = Eva_ast.translate_lval (Var vi, offset) in
       let oracle = mk_oracle state in
       begin match Location.of_lval oracle lval with
         | `Top -> state
@@ -869,7 +869,7 @@ struct
           let state = write update state loc in
           (* Update the references *)
           let add acc e =
-            let r = Evast.vars_in_exp e in
+            let r = Eva_ast.vars_in_exp e in
             (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc
           in
           let references = List.fold_left add [] bounds in
@@ -905,7 +905,7 @@ struct
       erase ~oracle state dst d
 
   let initialize_variable_using_type _kind vi state =
-    let lval = Evast.Build.var vi in
+    let lval = Eva_ast.Build.var vi in
     let oracle = mk_oracle state in
     match Location.of_lval oracle lval with
     | `Top -> top

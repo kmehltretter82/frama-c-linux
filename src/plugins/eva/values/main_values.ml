@@ -49,7 +49,7 @@ module CVal = struct
   let assume_comparable = Cvalue_forward.assume_comparable
 
   let constant _context _exp = function
-    | Evast.CTopInt _ -> Cvalue.V.top_int
+    | Eva_ast.CTopInt _ -> Cvalue.V.top_int
     | CInt64 (i,_k,_s) -> Cvalue.V.inject_int i
     | CChr c           -> Cvalue.V.inject_int (Cil.charConstToInt c)
     | CString base ->

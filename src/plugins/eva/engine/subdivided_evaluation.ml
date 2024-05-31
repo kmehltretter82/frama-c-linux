@@ -26,8 +26,8 @@ let dkey = Self.register_category "nonlin"
 
 (* ----------------- Occurrences of lvalues in expressions ------------------ *)
 
-module LvalMap = Evast.Lval.Map
-module LvalSet = Evast.Lval.Set
+module LvalMap = Eva_ast.Lval.Map
+module LvalSet = Eva_ast.Lval.Set
 
 (* An expression [e] is non-linear on [x] if [x] appears multiple times in [e].
    When evaluating such an expression, a disjunction over the possible values of
@@ -87,7 +87,7 @@ let union expr depth map1 map2 =
    If a lvalue is bound to itself, then it appears only once in [expr].
    Otherwise, we say that the expression is non linear on this lvalue. *)
 let gather_non_linear expr =
-  let rec compute depth (expr : Evast.exp) =
+  let rec compute depth (expr : Eva_ast.exp) =
     match expr.node with
     | Lval ({ node = host, offset } as lv) ->
       let d = succ depth in
@@ -117,7 +117,7 @@ let gather_non_linear expr =
 
 (* Map from subexpressions to the list of their non-linear lvalues. *)
 module ExpMap = struct
-  include Evast.Exp.Map
+  include Eva_ast.Exp.Map
   let add expr lv map =
     try
       let list = find expr map in
@@ -138,8 +138,8 @@ module DepthMap = struct
     add depth expmap map
 end
 
-let same lval (expr : Evast.exp) = match expr.node with
-  | Lval lv -> Evast.Lval.equal lv lval
+let same lval (expr : Eva_ast.exp) = match expr.node with
+  | Lval lv -> Eva_ast.Lval.equal lv lval
   | _ -> false
 
 (* Converts a map from lvalues to expressions and depth into an association
@@ -155,12 +155,12 @@ let reverse_map map =
   DepthMap.fold concat depthmap []
 
 
-module LvalList = Datatype.List (Evast.Lval)
-module NonLinear = Datatype.Pair (Evast.Exp) (LvalList)
+module LvalList = Datatype.List (Eva_ast.Lval)
+module NonLinear = Datatype.Pair (Eva_ast.Exp) (LvalList)
 module NonLinears = Datatype.List (NonLinear)
 
 module Non_linear_expressions =
-  State_builder.Hashtbl (Evast.Exp.Hashtbl) (NonLinears)
+  State_builder.Hashtbl (Eva_ast.Exp.Hashtbl) (NonLinears)
     (struct
       let name = "Value.Subdivided_evaluation.Non_linear_expressions"
       let size = 16
@@ -179,8 +179,8 @@ let compute_non_linear expr =
     List.iter
       (fun (e, lval) ->
          Self.result ~current:true ~once:true ~dkey
-           "non-linear '%a', lv '%a'" Evast.pp_exp e
-           (Pretty_utils.pp_list ~sep:", " Evast.pp_lval) lval)
+           "non-linear '%a', lv '%a'" Eva_ast.pp_exp e
+           (Pretty_utils.pp_list ~sep:", " Eva_ast.pp_lval) lval)
       list;
     Non_linear_expressions.replace expr list;
     list
@@ -655,7 +655,7 @@ module Make
       Clear.clear_englobing_exprs valuation ~expr ~subexpr:lv_info.lv_expr
     in
     let cleared_valuation = Hypotheses.fold clear variables valuation in
-    let eq_equal_subexpr = Evast.Exp.equal expr subexpr in
+    let eq_equal_subexpr = Eva_ast.Exp.equal expr subexpr in
     (* Computes a disjunct from subvalues for [lvals]. *)
     let compute subvalues =
       (* Updates [variables] with their new [subvalues]. *)
@@ -705,7 +705,7 @@ module Make
 
   (* Builds the information for an lvalue. *)
   let get_info environment valuation lval =
-    let lv_expr = Evast.Build.lval lval in
+    let lv_expr = Eva_ast.Build.lval lval in
     (* Reevaluates the lvalue in the initial state, as its value could have
        been reduced in the evaluation of the complete expression, and we cannot
        omit the alarms for the removed values. *)
@@ -770,7 +770,7 @@ module Make
             in
             Self.result ~current:true ~once:true ~dkey
               "subdividing on %a"
-              (Pretty_utils.pp_list ~sep:", " Evast.pp_lval) lvals;
+              (Pretty_utils.pp_list ~sep:", " Eva_ast.pp_lval) lvals;
             let subdivide =
               subdivide_lvals environment valuation subdivnb lvals_info
             in
@@ -846,7 +846,7 @@ module Make
   (* Find locations on which it is interesting to proceed by case disjunction
      to evaluate the expression: locations which are singletons (on which the
      cvalue domain can reduce) and has an enumerable value. *)
-  let rec get_influential_vars valuation (exp : Evast.exp) acc =
+  let rec get_influential_vars valuation (exp : Eva_ast.exp) acc =
     match exp.node with
     | Lval ({ node = host, off } as lval)  ->
       if Cil.typeHasQualifier "volatile" lval.typ then `Value acc
@@ -873,11 +873,11 @@ module Make
     | CastE (_, exp) -> get_influential_vars valuation exp acc
     | _ -> `Value acc
 
-  and get_vars_host valuation (host : Evast.lhost) acc = match host with
+  and get_vars_host valuation (host : Eva_ast.lhost) acc = match host with
     | Var _v -> `Value acc
     | Mem e -> get_influential_vars valuation e acc
 
-  and get_vars_offset valuation (offset : Evast.offset) acc = match offset with
+  and get_vars_offset valuation (offset : Eva_ast.offset) acc = match offset with
     | NoOffset         -> `Value acc
     | Field (_, off)   -> get_vars_offset valuation off acc
     | Index (ind, off) ->

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast
+open Eva_ast
 open Abstract_interp
 open Cvalue
 
@@ -95,16 +95,16 @@ let split_v ~warn lv state max_card =
           V.fold_enum aux_v v []
         with Not_less_than ->
           warning warn "Location %a points to too many values (%a). \
-                        Cannot split." Evast.pp_lval lv V.pretty v;
+                        Cannot split." Eva_ast.pp_lval lv V.pretty v;
           [state]
     else begin
       warning warn "Location %a is not a singleton (%a). Cannot split."
-        Evast.pp_lval lv Locations.pretty loc;
+        Eva_ast.pp_lval lv Locations.pretty loc;
       [state]
     end
   else begin
     warning warn "Cannot split on lvalue %a of non-arithmetic type"
-      Evast.pp_lval lv;
+      Eva_ast.pp_lval lv;
     [state]
   end
 
@@ -114,7 +114,7 @@ let split_pointer ~warn lv state max_card =
   match lv.node with
   | (Mem {node = Lval lv}, _) -> split_v ~warn lv state max_card
   | _ ->
-    warning warn "cannot split on non-pointer %a" Evast.pp_lval lv;
+    warning warn "cannot split on non-pointer %a" Eva_ast.pp_lval lv;
     [state]
 
 (** The three functions below gather all lvalues with integral type that appear

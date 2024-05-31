@@ -204,14 +204,14 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
      corresponding to [_lv], so that it may be used by the engine during
      evaluation. *)
   let extract_lval ~oracle:_ _context state lv loc =
-    let v = find loc lv.Evast.typ state in
+    let v = find loc lv.Eva_ast.typ state in
     `Value (v, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr =
     `Value (Value.top, None), Alarmset.all
 
   let backward_location state lval loc _value =
-    let new_value = find loc lval.Evast.typ state in
+    let new_value = find loc lval.Eva_ast.typ state in
     `Value (loc, new_value)
 
   (* This function binds [loc] to [v], of type [typ], in [state].
@@ -229,7 +229,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
      location with the result of the evaluation of [exp]. Both the value and
      the location are found in the [valuation]. *)
   let assume_exp valuation expr record state =
-    match (expr : Evast.exp).node with
+    match (expr : Eva_ast.exp).node with
     | Lval lv -> begin
         match valuation.Abstract_domain.find_loc lv with
         | `Top -> state
@@ -308,7 +308,7 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
         bind_loc return_loc return.vtype (`Value result) post
 
   let show_expr valuation state fmt expr =
-    match (expr : Evast.exp).node with
+    match (expr : Eva_ast.exp).node with
     | Lval lval ->
       begin
         match valuation.Abstract_domain.find_loc lval with

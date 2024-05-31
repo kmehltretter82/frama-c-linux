@@ -103,15 +103,15 @@ struct
   module Var = Cil_datatype.Varinfo
   module Exp =
   struct
-    include Evast.Exp
+    include Eva_ast.Exp
     let equal e1 e2 =
       if e1 == e2 then true else equal e1 e2
   end
 
   type t =
     | Const of Integer.t
-    | Exp of Evast.exp * Integer.t (* x + c *)
-    | Ptroffset of Evast.exp * Cil_types.offset * Integer.t (* (x - &b.offset) + c *)
+    | Exp of Eva_ast.exp * Integer.t (* x + c *)
+    | Ptroffset of Eva_ast.exp * Cil_types.offset * Integer.t (* (x - &b.offset) + c *)
 
   let pretty fmt : t -> unit = function
     | Const i -> Integer.pretty fmt i
@@ -153,7 +153,7 @@ struct
   exception NonLinear
 
   (* Find a coefficient before vi in exp *)
-  let rec linearity vi (exp : Evast.exp) =
+  let rec linearity vi (exp : Eva_ast.exp) =
     match exp.node with
     | Const _
     | AddrOf _ | StartOf _ -> Integer.zero
@@ -182,21 +182,21 @@ struct
     (* Check that the linearity of any variable is not hidden into a mem access *)
     ignore (linearity Var.dummy exp)
 
-  let of_exp (exp : Evast.exp) =
+  let of_exp (exp : Eva_ast.exp) =
     check_support exp;
     (* Normalizes x + c, c + x and x - c *)
-    match Evast.fold_to_integer exp with
+    match Eva_ast.fold_to_integer exp with
     | Some i -> Const i
     | None ->
       match exp.node with
       | BinOp ((PlusA|PlusPI), e1, e2, _typ) ->
-        begin match Evast.(fold_to_integer e1, fold_to_integer e2) with
+        begin match Eva_ast.(fold_to_integer e1, fold_to_integer e2) with
           | None, Some i -> Exp (e1, i)
           | Some i, None -> Exp (e2, i)
           | _ -> Exp (exp, Integer.zero)
         end
       | BinOp ((MinusA|MinusPI), e1, e2, _typ) ->
-        begin match Evast.fold_to_integer e2 with
+        begin match Eva_ast.fold_to_integer e2 with
           | Some i -> Exp (e1, Integer.neg i)
           | None -> Exp (exp, Integer.zero)
         end

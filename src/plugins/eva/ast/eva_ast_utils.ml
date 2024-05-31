@@ -20,18 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast_types
-open Evast_builder
+open Eva_ast_types
+open Eva_ast_builder
 
 
 (* --- Conversion to Cil --- *)
 
 module ConversionToCil =
   State_builder.Hashtbl
-    (Evast_datatype.Exp.Hashtbl)
+    (Eva_ast_datatype.Exp.Hashtbl)
     (Cil_datatype.Exp)
     (struct
-      let name = "Value.Evast_utils.ConversionToCil"
+      let name = "Value.Eva_ast_utils.ConversionToCil"
       let size = 16
       let dependencies = [ Ast.self ]
     end)
@@ -130,7 +130,7 @@ let is_mutable (lval : lval) : bool =
     | _typ, Index _ ->
       invalid_arg "Index on a non-array type"
   in
-  aux false (Evast_typing.type_of_lhost lhost) offset
+  aux false (Eva_ast_typing.type_of_lhost lhost) offset
 
 let rec is_initialized_exp (on_same_obj : bool) (exp : exp) =
   match exp.node with
@@ -177,7 +177,7 @@ and height_offset = function
 (* --- Specialized visitors --- *)
 
 let iter_lvals f =
-  let open Evast_visitor.Fold in
+  let open Eva_ast_visitor.Fold in
   let neutral = () and combine () () = () in
   visit_exp ~neutral ~combine {
     default with
@@ -185,7 +185,7 @@ let iter_lvals f =
   }
 
 let exp_contains_volatile, lval_contains_volatile =
-  let open Evast_visitor.Fold in
+  let open Eva_ast_visitor.Fold in
   let neutral = false and combine b1 b2 = b1 || b2 in
   let fold_lval ~visitor lval =
     Cil.isVolatileType (lval.typ) || default.fold_lval ~visitor lval
@@ -195,7 +195,7 @@ let exp_contains_volatile, lval_contains_volatile =
 
 let vars_in_exp, vars_in_lval =
   let module VarSet = Cil_datatype.Varinfo.Set in
-  let open Evast_visitor.Fold in
+  let open Eva_ast_visitor.Fold in
   let neutral = VarSet.empty and combine = VarSet.union in
   let fold_lval ~visitor lval =
     let set =

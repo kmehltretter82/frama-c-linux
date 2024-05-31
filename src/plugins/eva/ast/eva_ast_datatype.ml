@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast_types
+open Eva_ast_types
 
 module Typ = Cil_datatype.Typ
 module Varinfo = Cil_datatype.Varinfo
@@ -69,59 +69,59 @@ module Lval =
   Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = lval
-    let name = "Evast_datatype.Lval"
+    let name = "Eva_ast_datatype.Lval"
     let compare = compare_lval
     let equal = equal_lval
     let hash = hash_lval
     let reprs =
       reprs_tag (List.map (fun v -> Var v, NoOffset) Cil_datatype.Varinfo.reprs)
-    let pretty = Evast_printer.pp_lval
+    let pretty = Eva_ast_printer.pp_lval
   end)
 
 module Lhost =
   Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = lhost
-    let name = "Evast_datatype.Lhost"
+    let name = "Eva_ast_datatype.Lhost"
     let compare = compare_lhost
     let equal = equal_lhost
     let hash = hash_lhost
     let reprs = List.map (fun v -> Var v) Cil_datatype.Varinfo.reprs
     let pretty fmt h =
-      let lv = Evast_builder.mk_lval (h, NoOffset) in
-      Evast_printer.pp_lval fmt lv
+      let lv = Eva_ast_builder.mk_lval (h, NoOffset) in
+      Eva_ast_printer.pp_lval fmt lv
   end)
 
 module Offset = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = offset
-    let name = "Evast_datatype.Offset"
+    let name = "Eva_ast_datatype.Offset"
     let compare = compare_offset
     let equal = equal_offset
     let hash = hash_offset
     let reprs = [NoOffset]
-    let pretty = Evast_printer.pp_offset
+    let pretty = Eva_ast_printer.pp_offset
   end)
 
 module Exp = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = exp
-    let name = "Evast_datatype.Exp"
+    let name = "Eva_ast_datatype.Exp"
     let compare = compare_exp
     let equal = equal_exp
     let hash = hash_exp
     let reprs =
-      List.map (fun e -> Evast_builder.translate_exp e) Cil_datatype.Exp.reprs
-    let pretty = Evast_printer.pp_exp
+      List.map (fun e -> Eva_ast_builder.translate_exp e) Cil_datatype.Exp.reprs
+    let pretty = Eva_ast_printer.pp_exp
   end)
 
 module Constant = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = constant
-    let name = "Evast_datatype.Constant"
+    let name = "Eva_ast_datatype.Constant"
     let compare = compare_constant
     let equal = equal_constant
     let hash = hash_constant
     let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
-    let pretty = Evast_printer.pp_constant
+    let pretty = Eva_ast_printer.pp_constant
   end)

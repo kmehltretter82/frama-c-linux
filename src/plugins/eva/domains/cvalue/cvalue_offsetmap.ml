@@ -32,4 +32,4 @@ let offsetmap_of_assignment state expr = function
   | Copy (lv, _value) ->
     Bottom.non_bottom (Eval_op.offsetmap_of_loc lv.lloc state)
   | Assign value ->
-    offsetmap_of_v ~typ:expr.Evast.typ value
+    offsetmap_of_v ~typ:expr.Eva_ast.typ value

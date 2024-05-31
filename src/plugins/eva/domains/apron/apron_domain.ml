@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Eval
-open Evast
+open Eva_ast
 open Apron
 
 let dkey = Self.register_category "d-apron"
@@ -287,7 +287,7 @@ let rec constraint_expr eval oracle env expr positive =
     let typ = translate_typ (Cil.unrollType typ) in
     let e = Texpr1.Binop (Texpr1.Sub, e1'', e2'', typ, round) in
     let expr = Texpr1.of_expr env e in
-    let binop = Evast.conv_relation binop in
+    let binop = Eva_ast.conv_relation binop in
     let binop = if positive then binop else Abstract_interp.Comp.inv  binop in
     translate_relation expr typ binop
   | _ -> raise (Out_of_Scope "constraint_expr not handled")
@@ -495,7 +495,7 @@ module Make (Man : Input) = struct
     compute state expr
 
   let extract_lval ~oracle:_ _context state lval _loc =
-    let expr = Evast.Build.lval lval in
+    let expr = Eva_ast.Build.lval lval in
     compute state expr
 
   let maybe_bottom state =

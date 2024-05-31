@@ -36,7 +36,7 @@ let show_aorai_variable state fmt var_name =
 
 let show_val fmt (expr, v) =
   Format.fprintf fmt "%a in %a"
-    Eva.Evast.pp_exp expr
+    Eva.Eva_ast.pp_exp expr
     (Cvalue.V.pretty_typ (Some expr.typ)) v
 
 let show_non_det_state fmt state =

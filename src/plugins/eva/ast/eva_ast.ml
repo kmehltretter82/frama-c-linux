@@ -20,51 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast_types
-
-let type_of node =
-  node.typ
-
-let type_of_const : constant -> typ = function
-  | CTopInt t -> t
-  | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
-  | CChr _ -> Cil.intType
-  | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType
-  | CString (String (_, Base.CSWstring _)) -> TPtr (Cil.theMachine.wcharType, [])
-  | CString (_) -> assert false (* it must be a String base*)
-  | CReal (_, fk, _) -> TFloat (fk, [])
-  | CEnum (_ei, e) -> e.typ
-
-let rec type_of_offset (basetyp : typ) : offset -> typ = function
-  | NoOffset -> basetyp
-  | Index (_, o) ->
-    type_of_offset (Cil.typeOf_array_elem basetyp) o
-  | Field (fi, o) ->
-    let base_attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs basetyp) in
-    let base_attrs =
-      if Cil.hasAttribute Cil.frama_c_mutable fi.fattr then
-        Cil.dropAttribute "const" base_attrs
-      else
-        base_attrs
-    in
-    type_of_offset (Cil.typeAddAttributes base_attrs fi.ftype) o
-
-let type_of_lhost : lhost -> typ = function
-  | Var vi -> vi.vtype
-  | Mem addr -> Cil.typeOf_pointed addr.typ
-
-let type_of_lval_node (host, offset : lval_node) : typ =
-  let basetyp = type_of_lhost host in
-  type_of_offset basetyp offset
-
-let type_of_exp_node : exp_node -> typ = function
-  | Const c -> type_of_const c
-  | Lval lv -> Cil.type_remove_qualifier_attributes lv.typ
-  | UnOp (_, _, t) -> t
-  | BinOp (_, _, _, t) -> t
-  | CastE (t, _) -> t
-  | AddrOf (lv) -> TPtr (lv.typ, [])
-  | StartOf (lv) ->
-    match Cil.unrollType (lv.typ) with
-    | TArray (t,_,attrs) -> TPtr(t, attrs)
-    | _ ->  assert false
+include Eva_ast_types
+include Eva_ast_typing
+include Eva_ast_printer
+include Eva_ast_datatype
+include Eva_ast_builder
+include Eva_ast_utils
+include Eva_ast_visitor

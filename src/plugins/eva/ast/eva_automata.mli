@@ -26,7 +26,7 @@
     vertex, edge and transitions types. *)
 
 open Cil_types
-open Evast
+open Eva_ast
 
 type vertex = private {
   vertex_key : int;

@@ -28,9 +28,9 @@ open Bottom.Operators
 type split_kind = Eva_annotations.split_kind = Static | Dynamic
 [@@deriving eq,ord]
 
-(* Same as Eva_annotations.split_term but with Evast. *)
+(* Same as Eva_annotations.split_term but with Eva_ast. *)
 type split_term =
-  | Expression of Evast.Exp.t
+  | Expression of Eva_ast.Exp.t
   | Predicate of (Cil_datatype.Predicate.t
                   [@compare Logic_utils.compare_predicate]
                   [@equal Datatype.from_compare])
@@ -40,7 +40,7 @@ let translate_split_term
     (term : Eva_annotations.split_term) : split_term * Cil_types.location =
   match term with
   | Expression cil_exp ->
-    Expression (Evast.translate_exp cil_exp), cil_exp.eloc
+    Expression (Eva_ast.translate_exp cil_exp), cil_exp.eloc
   | Predicate pred ->
     Predicate pred, pred.pred_loc
 
@@ -69,7 +69,7 @@ let new_monitor
 module SplitTerm = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
 
-    module Exp = Evast.Exp
+    module Exp = Eva_ast.Exp
     module Predicate = Cil_datatype.PredicateStructEq
 
     type t = split_term [@@deriving eq, ord]
@@ -81,7 +81,7 @@ module SplitTerm = Datatype.Make_with_collections (struct
       Stdlib.List.map (fun p -> Predicate p) Predicate.reprs
 
     let pretty fmt = function
-      | Expression e -> Evast.pp_exp fmt e
+      | Expression e -> Eva_ast.pp_exp fmt e
       | Predicate p -> Printer.pp_predicate fmt p
 
     let hash = function
@@ -99,7 +99,7 @@ module SplitMonitor = Datatype.Make_with_collections (
     let name = "Partition.SplitMonitor"
 
     let reprs = [{
-        split_term = Expression (List.hd Evast.Exp.reprs);
+        split_term = Expression (List.hd Eva_ast.Exp.reprs);
         split_kind = Static;
         split_loc = Cil_datatype.Location.unknown;
         split_limit = 0;
@@ -326,7 +326,7 @@ type action =
   | Incr_loop
   | Branch of branch * int
   | Ration of rationing
-  | Restrict of Evast.exp * Integer.t list
+  | Restrict of Eva_ast.exp * Integer.t list
   | Split of split_monitor
   | Merge of Eva_annotations.split_term
   | Update_dynamic_splits
@@ -507,7 +507,7 @@ struct
   let stamp_by_value = match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ _ _ -> None
     | Some get -> fun expr expected_values state ->
-      let typ = expr.Evast.typ in
+      let typ = expr.Eva_ast.typ in
       let make stamp i = stamp, i, Abstract.Val.inject_int typ i in
       let expected_values = List.mapi make expected_values in
       match fst (evaluate state expr) with
@@ -584,7 +584,7 @@ struct
         | Enter_loop limit_kind -> fun k x ->
           let limit = try match limit_kind with
             | ExpLimit cil_exp ->
-              let exp = Evast.translate_exp cil_exp
+              let exp = Eva_ast.translate_exp cil_exp
               and source = fst cil_exp.eloc in
               eval_exp_to_int ~source x exp
             | IntLimit i -> i

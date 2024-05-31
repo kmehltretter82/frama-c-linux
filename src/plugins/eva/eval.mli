@@ -22,8 +22,8 @@
 
 open Cil_types
 
-type lval = Evast.lval
-type exp = Evast.exp
+type lval = Eva_ast.lval
+type exp = Eva_ast.exp
 
 (** Types and functions related to evaluations.
     Heavily used by abstract values and domains, evaluation of expressions,

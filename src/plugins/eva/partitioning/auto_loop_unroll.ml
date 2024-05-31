@@ -142,7 +142,7 @@ module Graph = struct
      expression must be zero or not-zero to exit the loop. *)
   module Condition = struct
     module Info = struct let module_name = "Condition" end
-    include Datatype.Pair_with_collections (Evast.Exp) (Datatype.Bool) (Info)
+    include Datatype.Pair_with_collections (Eva_ast.Exp) (Datatype.Bool) (Info)
   end
 
   (* Returns a list of loop exit conditions. *)
@@ -170,7 +170,7 @@ let add_written_var vi effect =
   let written_vars = Cil_datatype.Varinfo.Set.add vi effect.written_vars in
   { effect with written_vars }
 
-let is_frama_c_builtin (exp : Evast.exp) =
+let is_frama_c_builtin (exp : Eva_ast.exp) =
   match exp.node with
   | Lval { node = Var vi, NoOffset } ->
     Ast_info.start_with_frama_c_builtin vi.vname
@@ -212,16 +212,16 @@ type var_status =
                  in the loop. *)
   | Unsuitable (* Cannot be used for the heuristic. *)
 
-let is_integer lval = Cil.isIntegralType lval.Evast.typ
+let is_integer lval = Cil.isIntegralType lval.Eva_ast.typ
 
 (* Computes the status of a lvalue for the heuristic, according to the
    loop effects. Uses [eval_ptr] to compute the bases pointed by pointer
    expressions. *)
-let classify eval_ptr loop_effect (lval : Evast.lval) =
+let classify eval_ptr loop_effect (lval : Eva_ast.lval) =
   let is_written varinfo =
     Cil_datatype.Varinfo.Set.mem varinfo loop_effect.written_vars
   in
-  let rec is_const_expr (expr : Evast.exp) =
+  let rec is_const_expr (expr : Eva_ast.exp) =
     match expr.node with
     | Lval lval -> classify_lval lval = Constant
     | UnOp (_, e, _) | CastE (_, e) -> is_const_expr e
@@ -256,7 +256,7 @@ let classify eval_ptr loop_effect (lval : Evast.lval) =
   classify_lval lval
 
 (* Returns the list of all lvalues appearing in an expression. *)
-let rec get_lvalues (expr : Evast.exp) =
+let rec get_lvalues (expr : Eva_ast.exp) =
   match expr.node with
   | Lval lval -> [ lval ]
   | UnOp (_, e, _) | CastE (_, e) -> get_lvalues e
@@ -283,25 +283,25 @@ let find_lonely_candidate eval_ptr loop_effect expr =
    - to the value of an expression [expr], it applies [f expr acc];
    - to a function call, or if [inner_loop] is true, it raises [exn]. *)
 let transfer_assign lval exn f ~inner_loop acc transition =
-  let is_lval = Evast.Lval.equal lval in
+  let is_lval = Eva_ast.Lval.equal lval in
   match transition with
   | Eva_automata.Assign (lv, expr, _loc)
     when is_lval lv ->
     if inner_loop then raise exn else f expr acc
   | Init (vi, SingleInit (expr, _loc), _loc')
-    when is_lval (Evast.Build.var vi) && not inner_loop ->
+    when is_lval (Eva_ast.Build.var vi) && not inner_loop ->
     f expr acc
-  | Init (vi, _, _) when is_lval (Evast.Build.var vi) -> raise exn
+  | Init (vi, _, _) when is_lval (Eva_ast.Build.var vi) -> raise exn
   | Call (Some lv, _, _, _) when is_lval lv ->
     raise exn
   | _ -> acc
 
 (* If in the [loop], [lval] is always assigned to the value of another
    lvalue, returns this new lvalue. Otherwise, returns [lval]. *)
-let cross_equality loop (lval : Evast.lval) =
+let cross_equality loop (lval : Eva_ast.lval) =
   (* If no such single equality can be found, return [lval] unchanged. *)
   let exception No_equality in
-  let find_lval (expr : Evast.exp) _x =
+  let find_lval (expr : Eva_ast.exp) _x =
     match expr.node with
     | Lval lval -> lval
     | _ -> raise No_equality
@@ -310,7 +310,7 @@ let cross_equality loop (lval : Evast.lval) =
     transfer_assign lval No_equality find_lval ~inner_loop lval transition
   in
   let join lv1 lv2 =
-    if Evast.Lval.equal lv1 lv2 then lv1 else raise No_equality
+    if Eva_ast.Lval.equal lv1 lv2 then lv1 else raise No_equality
   in
   match Graph.compute ~backward:true loop transfer join lval with
   | Some lval -> lval
@@ -342,9 +342,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Adds or subtracts the integer value of [expr] to the current increment
      [acc.delta], according to [binop] which can be PlusA or MinusA.
      Raises NoIncrement if [expr] is not a constant integer expression. *)
-  let add_to_delta context binop acc (expr : Evast.exp) =
+  let add_to_delta context binop acc (expr : Eva_ast.exp) =
     let typ = expr.typ in
-    match Evast.fold_to_integer expr with
+    match Eva_ast.fold_to_integer expr with
     | None -> raise NoIncrement
     | Some i ->
       let inject i = Val.inject_int typ i in
@@ -355,12 +355,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      of [expr]. Raises NoIncrement if this is not an increment of [lval]. *)
   let rec delta_assign context lval expr acc =
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
-    let rec is_lval (e : Evast.exp) = match e.node with
-      | Lval lv -> Evast.Lval.equal lval lv
+    let rec is_lval (e : Eva_ast.exp) = match e.node with
+      | Lval lv -> Eva_ast.Lval.equal lval lv
       | CastE (typ, e) -> Cil.isIntegralType typ && is_lval e
       | _ -> false
     in
-    match Evast.fold_to_integer expr with
+    match Eva_ast.fold_to_integer expr with
     | Some i ->
       let v = Val.inject_int expr.typ i in
       { value = `Value v; delta = `Bottom; }
@@ -448,7 +448,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* If [lval] is a varinfo out-of-scope at statement [stmt] of function [kf],
      introduces it to the [state]. *)
-  let enter_scope state kf stmt (lval : Evast.lval) =
+  let enter_scope state kf stmt (lval : Eva_ast.lval) =
     match lval.node with
     | Var vi, _ ->
       let state =
@@ -469,7 +469,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     (* If [lval] is not in scope at [stmt], introduces it into [state] so that
        the [condition] can be properly evaluated in [state]. *)
     let state = enter_scope state kf stmt lval in
-    let expr = Evast.Build.lval lval in
+    let expr = Eva_ast.Build.lval lval in
     (* Evaluate the [condition] in the given [state]. *)
     fst (Eval.evaluate state condition) >> fun (valuation, _v) ->
     (* In the resulting valuation, replace the value of [expr] by [top_int]

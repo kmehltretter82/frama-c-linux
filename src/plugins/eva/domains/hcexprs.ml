@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Exp = Evast.Exp
-module Lval = Evast.Lval
+module Exp = Eva_ast.Exp
+module Lval = Eva_ast.Lval
 
 (* lvalues are never stored under a constructor [E]. *)
 type unhashconsed_exprs = E of Exp.t | LV of Lval.t
@@ -70,8 +70,8 @@ module E = struct
     end)
 
   let replace kind ~late ~heir =
-    let open Evast.Rewrite in
-    let rewrite_exp ~visitor (exp : Evast.exp) =
+    let open Eva_ast.Rewrite in
+    let rewrite_exp ~visitor (exp : Eva_ast.exp) =
       match exp.node with
       | Lval lval ->
         if Lval.equal lval late then heir else exp
@@ -82,7 +82,7 @@ module E = struct
       | _ -> default.rewrite_exp ~visitor exp
     in
     let rewriter = { default with rewrite_exp } in
-    Evast.Rewrite.visit_exp rewriter
+    Eva_ast.Rewrite.visit_exp rewriter
 end
 
 module HCE = struct
@@ -100,14 +100,14 @@ module HCE = struct
 
   let of_lval lv = hashcons (LV lv)
 
-  let of_exp (exp : Evast.exp) =
+  let of_exp (exp : Eva_ast.exp) =
     match exp.node with
     | Lval lv -> of_lval lv
     | _ -> hashcons (E exp)
 
   let to_exp h = match get h with
     | E e -> e
-    | LV lv -> Evast.Build.lval lv
+    | LV lv -> Eva_ast.Build.lval lv
 
   let to_lval h = match get h with
     | E _ -> None
@@ -124,7 +124,7 @@ module HCE = struct
   let replace kind ~late ~heir h = match get h with
     | E e ->
       let e = E.replace kind ~late ~heir e in
-      if Evast.height_exp e > height_limit
+      if Eva_ast.height_exp e > height_limit
       then raise NonExchangeable
       else of_exp e
     | LV lval -> if Lval.equal lval late then of_exp heir else h
@@ -141,7 +141,7 @@ type lvalues = {
 let empty_lvalues = { read = HCESet.empty; addr = HCESet.empty; }
 
 let syntactic_lvalues expr =
-  let rec gather (expr : Evast.exp) lvalues =
+  let rec gather (expr : Eva_ast.exp) lvalues =
     match expr.node with
     | Lval lv ->
       { lvalues with read = HCESet.add (HCE.of_lval lv) lvalues.read }

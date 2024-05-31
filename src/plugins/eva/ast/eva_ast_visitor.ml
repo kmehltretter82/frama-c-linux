@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast_types
+open Eva_ast_types
 
 module Rewrite =
 struct
@@ -50,7 +50,7 @@ struct
 
   let rewrite_exp ~visitor exp =
     let replace_if condition node =
-      if condition then Evast_builder.mk_exp node else exp
+      if condition then Eva_ast_builder.mk_exp node else exp
     in
     match exp.node with
     | Lval lv ->
@@ -87,7 +87,7 @@ struct
         if e' != e then Mem e' else lhost
     and offset' = visitor.offset offset in
     if lhost' != lhost || offset' != offset
-    then Evast_builder.mk_lval (lhost', offset')
+    then Eva_ast_builder.mk_lval (lhost', offset')
     else lval
 
   let rewrite_offset ~visitor offset =

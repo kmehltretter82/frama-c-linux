@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Eval
-open Evast
+open Eva_ast
 open Numerors_utils
 
 module I = Numerors_interval

@@ -173,7 +173,7 @@ struct
 
   let empty_rationing = new_rationing ~limit:0 ~merge:false
 
-  let split_return (flow : flow) (return_exp : Evast.exp option) : flow =
+  let split_return (flow : flow) (return_exp : Eva_ast.exp option) : flow =
     let strategy = Split_return.kf_strategy kf in
     if strategy = Split_strategy.FullSplit
     then flow

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Evast_types
+open Eva_ast_types
 
 (* --- Constructors --- *)
 
@@ -29,11 +29,11 @@ let value_or f x = function
   | None -> f x
 
 let mk_exp ?(origin=Built) ?typ node =
-  let typ = typ |> value_or Evast_typing.type_of_exp_node node in
+  let typ = typ |> value_or Eva_ast_typing.type_of_exp_node node in
   { node ; origin ; typ }
 
 let mk_lval ?(origin=Built) ?typ node =
-  let typ = typ |> value_or Evast_typing.type_of_lval_node node in
+  let typ = typ |> value_or Eva_ast_typing.type_of_lval_node node in
   { node ; origin ; typ }
 
 
