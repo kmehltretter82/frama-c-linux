@@ -533,7 +533,7 @@ let to_varinfo t = match t with
 
 module LiteralStrings =
   State_builder.Hashtbl
-    (Datatype.Int.Hashtbl)
+    (Cil_datatype.Exp.Hashtbl)
     (Base)
     (struct
       let name = "literal strings"
@@ -548,10 +548,7 @@ let of_string_exp e =
     | Const (CWStr s) -> CSWstring s
     | _ -> assert false
   in
-  LiteralStrings.memo (fun _ -> String (Cil_const.new_raw_id (), cstring)) e.eid
-
-let of_string_id id cstring =
-  LiteralStrings.memo (fun _ -> String (Cil_const.new_raw_id (), cstring)) id
+  LiteralStrings.memo (fun _ -> String (Cil_const.new_raw_id (), cstring)) e
 
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
@@ -565,6 +562,27 @@ type substitution = base Hptshape.map
 let substitution_from_list list =
   let add map (key, elt) = BMap.add key elt map in
   List.fold_left add BMap.empty list
+
+let clear () = 
+  LiteralStrings.clear ()
+
+let import import_base project =
+  let _ = clear () in
+  let gather () = LiteralStrings.fold (fun exp base acc ->(exp, base) :: acc) [] in
+  let list = Project.on project gather () in
+  let import (exp, base) =
+    try
+      let base = import_base base in
+      let exp = match Ast_diff.Exp.find exp with
+        | `Same exp' -> exp'
+        | _ -> raise Not_found in
+      LiteralStrings.add exp base
+    with Not_found -> ()
+  in
+  List.iter import list;
+
+
+
 
 (*
 Local Variables:

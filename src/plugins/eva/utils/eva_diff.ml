@@ -29,18 +29,19 @@ let import_varinfo = import Ast_diff.Varinfo.find
 let import_logic_var = import Ast_diff.Logic_var.find
 
 let literal_strings = Datatype.Int.Hashtbl.create 17
-let last_literal_strings = ref 0
+
+let last_string_id = ref 0
 
 let import_base = function
   | Base.Var (vi, _validity) -> Base.of_varinfo (import_varinfo vi)
   | CLogic_Var (lvi, _, _) -> Base.of_c_logic_var (import_logic_var lvi)
   | Allocated (vi, _, _) -> Base.of_varinfo (import_varinfo vi)
   | Null -> Base.null
-  | String (id, cstring) ->
+  | String (id, _cstring) as b ->
     Datatype.Int.Hashtbl.memo literal_strings id
       (fun _ ->
-         decr last_literal_strings;
-         Base.of_string_id !last_literal_strings cstring)
+         decr last_string_id;
+         b)
 
 let import_bases bases =
   Base.Hptset.(fold (fun b acc -> add (import_base b) acc) bases empty)

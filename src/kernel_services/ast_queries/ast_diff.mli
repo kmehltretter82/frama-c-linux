@@ -117,6 +117,10 @@ module Fundec:
   Correspondence_table
   with type key = fundec and type data = fundec correspondence
 
+module Exp:
+  Correspondence_table
+  with type key = exp and type data = exp correspondence
+
 (** performs a comparison of AST between the current and the original
     project, which must have been set beforehand.
 *)

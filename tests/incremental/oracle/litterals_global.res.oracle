@@ -1,0 +1,18 @@
+[kernel] Parsing litterals_global.c (with preprocessing)
+[eva] Loading previous session from save file litterals_global.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file litterals_global.sav
+[eva] In save file litterals_global.sav, 1 saved calls for 1 functions
+[eva:memexec] Importing summaries for function main
+[eva] In current session, 1 saved calls for 1 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  s1 ∈ {{ "Hello" }}
+  s2 ∈ {{ "World" }}
+  S___fc_stdout[0..1] ∈ [--..--]
+  S___fc_stdin[0..1] ∈ [--..--]
+[eva] :0: Reusing old results for call to main
+[eva] ====== VALUES COMPUTED ======

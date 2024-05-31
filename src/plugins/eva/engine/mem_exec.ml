@@ -569,6 +569,7 @@ module Make
       let special_variables () =
         Special_variables.import saved in
       load_time_wrapper stat_special_variables_load_time special_variables;
+      Base.import Eva_diff.import_base saved;
       Self.feedback "Copying Eva analysis cache from save file %s" name;
       import_cached_calls_from name saved;
       (* Inout wrapped *)

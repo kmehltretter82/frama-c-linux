@@ -248,6 +248,8 @@ module Kernel_function = Build_code_correspondence(Kernel_function)
 
 module Fundec = Build_correspondence(Cil_datatype.Fundec)
 
+module Exp = Build_correspondence(Cil_datatype.Exp)
+
 let make_correspondence candidate has_same_spec code_corres =
   match has_same_spec, code_corres with
   | false, `Body_changed -> `Not_present
@@ -952,24 +954,28 @@ and is_same_constant c c' env =
     Cil_datatype.Constant.equal c c'
 
 and is_same_exp e e' env =
-  match e.enode, e'.enode with
-  | Const c, Const c' -> is_same_constant c c' env
-  | Lval lv, Lval lv' -> is_same_lval lv lv' env
-  | SizeOf t, SizeOf t' -> is_same_type t t' env
-  | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
-  | SizeOfStr s, SizeOfStr s' -> String.length s = String.length s'
-  | AlignOf t, AlignOf t' -> is_same_type t t' env
-  | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
-  | UnOp(op,e,t), UnOp(op',e',t') ->
-    equal_unop op op' && is_same_exp e e' env && is_same_type t t' env
-  | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->
-    equal_binop op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
-    && is_same_type t t' env
-  | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
-  | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
-  | StartOf lv, StartOf lv' -> is_same_lval lv lv' env
-  | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-    | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _),_-> false
+  let _is_same_exp = match e.enode, e'.enode with
+    | Const c, Const c' -> is_same_constant c c' env
+    | Lval lv, Lval lv' -> is_same_lval lv lv' env
+    | SizeOf t, SizeOf t' -> is_same_type t t' env
+    | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
+    | SizeOfStr s, SizeOfStr s' -> String.length s = String.length s'
+    | AlignOf t, AlignOf t' -> is_same_type t t' env
+    | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
+    | UnOp(op,e,t), UnOp(op',e',t') ->
+      equal_unop op op' && is_same_exp e e' env && is_same_type t t' env
+    | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->
+      equal_binop op op' && is_same_exp e1 e1' env && is_same_exp e2 e2' env
+      && is_same_type t t' env
+    | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
+    | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
+    | StartOf lv, StartOf lv' -> is_same_lval lv lv' env
+    | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+      | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _),_-> false
+  in match _is_same_exp with
+  | true -> Exp.add e (`Same e'); true
+  | false -> false
+
 
 and is_same_lval lv lv' env =
   is_same_pair is_same_lhost is_same_offset lv lv' env
