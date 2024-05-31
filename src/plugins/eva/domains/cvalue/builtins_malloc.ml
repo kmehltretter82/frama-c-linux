@@ -1211,6 +1211,14 @@ let import project =
   let _ = import_kf_alloc_bases project not_imported_kf in
   not_imported_kf
 
+
+(* For reimporting call sites with AST Diff *)
+let () = 
+  let f kf () = match Kf_Call_Sites.find_opt kf with
+    | None -> None
+    | Some call_site_set -> Some (CallSite.Set.elements call_site_set) in
+  Ast_diff.call_sites_ref := f
+
 let print_summary fmt  = 
   let kfs = Kf_Alloc_Sites.fold (fun kf _ acc -> kf::acc) [] in
   let print_allocated_bases kf = 

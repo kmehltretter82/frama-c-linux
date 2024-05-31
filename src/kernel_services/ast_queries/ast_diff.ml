@@ -25,6 +25,9 @@ open Cil_types
 let eval_callee_ref : (stmt -> exp -> kernel_function list option) ref =
   ref (fun _ _ -> None)
 
+let call_sites_ref: (kernel_function -> unit -> stmt list option) ref = 
+  ref (fun _ _ -> None)
+
 module Orig_project =
   State_builder.Option_ref(Project.Datatype)(
   struct
