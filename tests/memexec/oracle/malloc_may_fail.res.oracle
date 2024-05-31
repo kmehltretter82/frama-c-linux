@@ -71,10 +71,12 @@
 [eva] Done for function alloc
 [eva] malloc_may_fail.c:34: Call to builtin free
 [eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_1} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:42 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] Recording results for alloc
+[eva] Done for function alloc
 [eva] malloc_may_fail.c:34: Call to builtin free
 [eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
 [eva:memexec-malloc] 
@@ -106,10 +108,12 @@
 [eva] Done for function alloc
 [eva] malloc_may_fail.c:34: Call to builtin free
 [eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_2} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:43 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] Recording results for alloc
+[eva] Done for function alloc
 [eva] malloc_may_fail.c:34: Call to builtin free
 [eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
 [eva:memexec-malloc] 
@@ -141,10 +145,12 @@
 [eva] Done for function alloc
 [eva] malloc_may_fail.c:34: Call to builtin free
 [eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_3} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:44 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] Recording results for alloc
+[eva] Done for function alloc
 [eva] malloc_may_fail.c:34: Call to builtin free
 [eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
 [eva:memexec-malloc] 
