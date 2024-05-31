@@ -294,8 +294,28 @@ let add_locals f f' env =
 
 (* local static variables are in fact global. As soon as we have determined
    that they have a correspondence, we add them to the global bindings *)
+(* Add also init if they exists  *)
 let add_statics l l' =
-  let add_one v v' = Varinfo.add v (`Same v') in
+  let selection = State_selection.singleton Globals.Vars.self in
+  let add_exp e e' = Exp.add e (`Same e') in
+  let rec add_init i i' = 
+    match i, i' with
+    | SingleInit e, SingleInit e' -> add_exp e e'
+    | CompoundInit (_, l), CompoundInit (_, l') -> 
+      List.iter2 (fun (_, i) (_, i') -> add_init i i') l l'
+    | _, _ -> ()
+  in
+  let add_one v v' = 
+    try
+      let i = Project.on ~selection (Orig_project.get()) Globals.Vars.find v in
+      let i' = Globals.Vars.find v' in
+      match i.init, i'.init with
+      | Some init, Some init' -> 
+        add_init init init'
+      | _, _ -> ();
+        Varinfo.add v (`Same v')
+    with Not_found -> ()
+  in
   List.iter2 add_one l l'
 
 let add_logic_vars p p' env =
