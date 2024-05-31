@@ -1,0 +1,73 @@
+[kernel] Parsing malloc_same_stack_multiple.c (with preprocessing)
+[eva] Loading previous session from save file malloc_same_stack_multiple.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file malloc_same_stack_multiple.sav
+[eva] In save file malloc_same_stack_multiple.sav, 2 saved calls for 2 functions
+[eva:memexec] Importing summaries for function foo
+[eva:memexec] Importing summaries for function main
+[eva] In current session, 2 saved calls for 2 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_foo_l14, __malloc_w_foo_l14,
+                              __malloc_foo_l14_0, __malloc_foo_l10} for KF main at callstack 
+  main
+[eva] :0: Reusing old results for call to main
+[eva] ====== VALUES COMPUTED ======
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: foo
+All allocated bases: {__malloc_foo_l14, __malloc_w_foo_l14,
+                      __malloc_foo_l14_0, __malloc_foo_l10}
+Allocation sites: {
+                    malloc :: malloc_same_stack_multiple.c:10 <-
+                    foo :: malloc_same_stack_multiple.c:28 <-
+                    main;
+                    malloc :: malloc_same_stack_multiple.c:14 <-
+                    foo :: malloc_same_stack_multiple.c:28 <-
+                    main; foo :: malloc_same_stack_multiple.c:28 <- main }
+Call sites: { int **p = malloc(sizeof(int *) * (unsigned long)3);;
+              *(p + i) = (int *)malloc(sizeof(int)); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_foo_l14, __malloc_w_foo_l14,
+                      __malloc_foo_l14_0, __malloc_foo_l10}
+Allocation sites: {
+                    malloc :: malloc_same_stack_multiple.c:10 <-
+                    foo :: malloc_same_stack_multiple.c:28 <-
+                    main;
+                    malloc :: malloc_same_stack_multiple.c:14 <-
+                    foo :: malloc_same_stack_multiple.c:28 <-
+                    main; foo :: malloc_same_stack_multiple.c:28 <- main }
+Call sites: {  }
+
+Kernel function: main
+All allocated bases: {__malloc_foo_l14, __malloc_w_foo_l14,
+                      __malloc_foo_l14_0, __malloc_foo_l10}
+Allocation sites: {
+                    malloc :: malloc_same_stack_multiple.c:10 <-
+                    foo :: malloc_same_stack_multiple.c:28 <-
+                    main;
+                    malloc :: malloc_same_stack_multiple.c:14 <-
+                    foo :: malloc_same_stack_multiple.c:28 <-
+                    main; foo :: malloc_same_stack_multiple.c:28 <- main }
+Call sites: { foo(); }
+
+Dynamic allocated bases: {[ __malloc_foo_l14 -> foo :: malloc_same_stack_multiple.c:28 <-
+                                                main
+                            __malloc_w_foo_l14 -> foo :: malloc_same_stack_multiple.c:28 <-
+                                                  main
+                            __malloc_foo_l14_0 -> foo :: malloc_same_stack_multiple.c:28 <-
+                                                  main
+                            __malloc_foo_l10 -> foo :: malloc_same_stack_multiple.c:28 <-
+                                                main ]}
+Malloced by stack: malloc :: malloc_same_stack_multiple.c:14 <-
+                   foo :: malloc_same_stack_multiple.c:28 <-
+                   main -> __malloc_foo_l14, __malloc_foo_l14_0, __malloc_w_foo_l14
+Malloced by stack: malloc :: malloc_same_stack_multiple.c:10 <-
+                   foo :: malloc_same_stack_multiple.c:28 <-
+                   main -> __malloc_foo_l10
