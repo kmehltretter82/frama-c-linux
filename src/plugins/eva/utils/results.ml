@@ -292,7 +292,7 @@ struct
     | None ->
       Result.error DisabledDomain
     | Some extract ->
-      let hce = Hcexprs.HCE.of_exp exp in
+      let hce = Hcexprs.HCE.of_exp (Eva_ast.translate_exp exp) in
       let extract' state =
         let equalities = Equality_domain.project (extract state) in
         try NonTrivial (Set.find hce equalities)
@@ -306,8 +306,9 @@ struct
         | (`Top | `Bottom) as r -> r
         | `Value Trivial -> `Top
         | `Value (NonTrivial e) ->
-          let l = Equality.elements e in
-          `Value (List.map Hcexprs.HCE.to_exp l)
+          let list = Equality.elements e in
+          let to_cil hce = Hcexprs.HCE.to_exp hce |> Eva_ast.to_cil_exp in
+          `Value (List.map to_cil list)
       in
       convert r
 

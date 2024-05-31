@@ -217,18 +217,6 @@ module Deps: sig
   val narrow : t -> t -> t
 end
 
-module Eva_ast: sig
-  (** Eva Syntax Tree. *)
-
-  include module type of Eva_ast_types
-  include module type of Eva_ast_typing
-  include module type of Eva_ast_printer
-  include module type of Eva_ast_datatype
-  include module type of Eva_ast_builder
-  include module type of Eva_ast_utils
-  include module type of Eva_ast_visitor
-end
-
 module Results: sig
   (** Eva's result API is a new interface to access the results of an analysis,
       once it is completed. It may slightly change in the future.
@@ -356,7 +344,7 @@ module Results: sig
 
   (** Returns the list of expressions which have been inferred to be equal to
       the given expression by the Equality domain. *)
-  val equality_class : Eva_ast.exp -> request -> Eva_ast.exp list result
+  val equality_class : Cil_types.exp -> request -> Cil_types.exp list result
 
   (** Returns the Cvalue state. Error cases are converted into the bottom or top
       cvalue state accordingly. *)
@@ -692,6 +680,18 @@ module Assigns: sig
 
   val top : t
   val join : t -> t -> t
+end
+
+module Eva_ast: sig
+  (** Eva Syntax Tree. *)
+
+  include module type of Eva_ast_types
+  include module type of Eva_ast_typing
+  include module type of Eva_ast_printer
+  include module type of Eva_ast_datatype
+  include module type of Eva_ast_builder
+  include module type of Eva_ast_utils
+  include module type of Eva_ast_visitor
 end
 
 module Builtins: sig
