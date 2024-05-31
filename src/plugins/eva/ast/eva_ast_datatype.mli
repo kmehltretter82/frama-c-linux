@@ -20,16 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
+open Eva_ast_types
 
-(** Eva Syntax Tree. *)
-
-include module type of Eva_ast_types
-include module type of Eva_ast_typing
-include module type of Eva_ast_printer
-include module type of Eva_ast_datatype
-include module type of Eva_ast_builder
-include module type of Eva_ast_utils
-include module type of Eva_ast_visitor
-
-[@@@ api_end]
+module Lhost : Datatype.S_with_collections with type t = lhost
+module Offset : Datatype.S_with_collections with type t = offset
+module Lval : Datatype.S_with_collections with type t = lval
+module Exp : Datatype.S_with_collections with type t = exp
+module Constant : Datatype.S_with_collections with type t = constant

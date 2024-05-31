@@ -22,6 +22,8 @@
 
 open Eva_ast_types
 
+[@@@alert "-eva_ast_builder"]
+
 (* --- Constructors --- *)
 
 let value_or f x = function
@@ -30,11 +32,11 @@ let value_or f x = function
 
 let mk_exp ?(origin=Built) ?typ node =
   let typ = typ |> value_or Eva_ast_typing.type_of_exp_node node in
-  { node ; origin ; typ }
+  mk_tag ~node ~typ ~origin
 
 let mk_lval ?(origin=Built) ?typ node =
   let typ = typ |> value_or Eva_ast_typing.type_of_lval_node node in
-  { node ; origin ; typ }
+  mk_tag ~node ~typ ~origin
 
 
 (* --- Translation from Cil --- *)
@@ -241,7 +243,7 @@ struct
   let var vi = mk_lval (Var vi, NoOffset)
   let var_exp vi = mk_exp (Lval (var vi))
 
-  let lval lv = { lv with node=Lval lv }
+  let lval lv = mk_tag ~node:(Lval lv) ~typ:lv.typ ~origin:lv.origin
 end
 
 

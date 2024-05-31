@@ -20,16 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
+open Eva_ast_types
 
-(** Eva Syntax Tree. *)
-
-include module type of Eva_ast_types
-include module type of Eva_ast_typing
-include module type of Eva_ast_printer
-include module type of Eva_ast_datatype
-include module type of Eva_ast_builder
-include module type of Eva_ast_utils
-include module type of Eva_ast_visitor
-
-[@@@ api_end]
+val type_of : 'a tag -> typ
+val type_of_exp_node : exp_node -> typ
+val type_of_lval_node : lval_node -> typ
+val type_of_lhost : lhost -> typ

@@ -58,11 +58,6 @@ and hash_constant c =
   | CEnum (ei, _) -> Hashtbl.hash (5, ei.einame)
 
 
-(* Tag utility *)
-
-let reprs_tag = List.map (fun node -> {node; typ=Cil.voidType; origin=Built})
-
-
 (* Exported modules *)
 
 module Lval =
@@ -73,8 +68,7 @@ module Lval =
     let compare = compare_lval
     let equal = equal_lval
     let hash = hash_lval
-    let reprs =
-      reprs_tag (List.map (fun v -> Var v, NoOffset) Cil_datatype.Varinfo.reprs)
+    let reprs = List.map Eva_ast_builder.translate_lval Cil_datatype.Lval.reprs
     let pretty = Eva_ast_printer.pp_lval
   end)
 
@@ -110,8 +104,7 @@ module Exp = Datatype.Make_with_collections (struct
     let compare = compare_exp
     let equal = equal_exp
     let hash = hash_exp
-    let reprs =
-      List.map (fun e -> Eva_ast_builder.translate_exp e) Cil_datatype.Exp.reprs
+    let reprs = List.map Eva_ast_builder.translate_exp Cil_datatype.Exp.reprs
     let pretty = Eva_ast_printer.pp_exp
   end)
 

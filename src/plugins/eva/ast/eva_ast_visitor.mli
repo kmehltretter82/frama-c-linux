@@ -20,16 +20,55 @@
 (*                                                                        *)
 (**************************************************************************)
 
-[@@@ api_start]
+open Eva_ast_types
 
-(** Eva Syntax Tree. *)
+(** Rewriting visitor *)
 
-include module type of Eva_ast_types
-include module type of Eva_ast_typing
-include module type of Eva_ast_printer
-include module type of Eva_ast_datatype
-include module type of Eva_ast_builder
-include module type of Eva_ast_utils
-include module type of Eva_ast_visitor
+module Rewrite :
+sig
+  type visitor = {
+    exp : exp -> exp;
+    lval : lval -> lval;
+    varinfo : varinfo -> varinfo;
+    offset : offset -> offset;
+  }
 
-[@@@ api_end]
+  type rewriter = {
+    rewrite_exp : visitor:visitor -> exp -> exp;
+    rewrite_lval : visitor:visitor -> lval -> lval;
+    rewrite_varinfo : visitor:visitor -> varinfo -> varinfo;
+    rewrite_offset : visitor:visitor -> offset -> offset;
+  }
+
+  val default : rewriter
+  val visit_exp : rewriter -> exp -> exp
+  val visit_lval : rewriter -> lval -> lval
+end
+
+
+(** Folding visitor *)
+
+module Fold :
+sig
+  type 'a visitor = {
+    neutral : 'a;
+    combine : 'a -> 'a -> 'a;
+    exp : exp -> 'a;
+    lval : lval -> 'a;
+    varinfo : varinfo -> 'a;
+    offset : offset -> 'a;
+  }
+
+  type 'a folder = {
+    fold_exp : visitor:'a visitor -> exp -> 'a;
+    fold_lval : visitor:'a visitor -> lval -> 'a;
+    fold_varinfo : visitor:'a visitor -> varinfo -> 'a;
+    fold_offset : visitor:'a visitor -> offset -> 'a;
+  }
+
+  val default : 'a folder
+  val visit_exp : neutral:'a -> combine:('a -> 'a -> 'a) ->
+    'a folder -> exp -> 'a
+  val visit_lval : neutral:'a -> combine:('a -> 'a -> 'a) ->
+    'a folder -> lval -> 'a
+end
