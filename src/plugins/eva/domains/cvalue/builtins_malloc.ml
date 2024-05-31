@@ -1095,6 +1095,122 @@ let get_base_allocation_site base =
   try Base_hptmap.find base bases
   with Not_found -> assert false
 
+(* Incremental analysis utils *)
+
+let import_kf kf =
+  match Ast_diff.Kernel_function.find kf with
+  | `Same kf' | `Partial(kf', _) -> kf'
+  | _ -> raise Not_found
+
+let import_stmt stmt = 
+  match Ast_diff.Stmt.find stmt with
+  | `Same stmt -> stmt
+  | _ -> raise Not_found
+
+let import_dynamic_bases project =
+  let gather () = Base_hptmap.fold (fun base cs acc -> (base, cs) :: acc) (Dynamic_Alloc_Bases.get ()) []
+  in
+  let list = Project.on project gather () in
+  let import (base, cs) = 
+    try
+      let base = Eva_diff.import_base base in
+      let cs = AllocSite.import cs in
+      let new_map = Base_hptmap.add base cs (Dynamic_Alloc_Bases.get ()) in
+      Dynamic_Alloc_Bases.set new_map
+    with Not_found -> 
+      ()
+  in
+  List.iter import list
+
+let import_malloced_by_stack project =
+  let gather () = MallocedByStack.fold (fun cs bases acc -> (cs, bases) :: acc) []
+  in
+  let list = Project.on project gather () in
+  let import (cs, bases) = 
+    try
+      let cs = AllocSite.import cs in
+      let bases = List.map Eva_diff.import_base bases in
+      MallocedByStack.add cs bases
+    with Not_found -> 
+      ()
+  in
+  List.iter import list
+
+
+let import_kf_alloc_sites project tbl =
+  let gather () = Kf_Alloc_Sites.fold (fun kf stmts acc -> (kf, stmts) :: acc) [] in
+  let list = Project.on project gather () in
+  let import (kf, stmts) = 
+    try
+      let kf = import_kf kf in
+      let sites = AllocSite.Set.fold (fun site acc -> 
+          let site = AllocSite.import site in
+          AllocSite.Set.add site acc)
+          stmts AllocSite.Set.empty in
+      Kf_Alloc_Sites.add kf sites
+    with Not_found ->
+      Kernel_function.Hashtbl.add tbl kf ()
+  in
+  List.iter import list
+
+let import_kf_call_sites project tbl =
+  let gather () = Kf_Call_Sites.fold (fun kf call_sites acc -> (kf, call_sites) :: acc) [] in
+  let list = Project.on project gather () in
+  let import (kf, call_sites) = 
+    try
+      let kf = import_kf kf in
+      let call_sites = CallSite.Set.fold (fun stmt acc -> 
+          let stmt = import_stmt stmt in
+          CallSite.Set.add stmt acc)
+          call_sites CallSite.Set.empty in
+      Kf_Call_Sites.add kf call_sites
+    with Not_found ->
+      Kernel_function.Hashtbl.add tbl kf ()
+  in
+  List.iter import list
+
+
+let import_kf_alloc_bases project tbl =
+  let gather () = Kf_Alloc_Bases.fold (fun kf bases acc -> (kf, bases) :: acc) [] in
+  let list = Project.on project gather () in
+  let import_bases bases =
+    Base.Hptset.fold (fun base acc -> 
+        let base = Eva_diff.import_base base in
+        Base.Hptset.add base acc)
+      bases Base.Hptset.empty
+  in
+  let import (kf, (_, b')) = 
+    try
+      let kf = import_kf kf in
+      (* Fst should always be empty after an analysis *)
+      let bases = 
+        Base.Hptset.empty, import_bases b' in
+      Kf_Alloc_Bases.add kf bases
+    with Not_found ->
+      Kernel_function.Hashtbl.add tbl kf ()
+  in
+  List.iter import list
+
+let clear () = 
+  begin 
+    Kf_Alloc_Bases.clear (); 
+    Kf_Alloc_Sites.clear ();
+    Kf_Call_Sites.clear ();
+    MallocedByStack.clear ();
+    Dynamic_Alloc_Bases.clear ();
+  end
+
+
+let import project =
+  let _ = clear () in
+  let not_imported_kf = Kernel_function.Hashtbl.create 1 in
+  let _ = import_dynamic_bases project in
+  let _ = import_malloced_by_stack project in
+  let _ = import_kf_alloc_sites project not_imported_kf in
+  let _ = import_kf_call_sites project not_imported_kf in
+  let _ = import_kf_alloc_bases project not_imported_kf in
+  not_imported_kf
+
 let print_summary fmt  = 
   let kfs = Kf_Alloc_Sites.fold (fun kf _ acc -> kf::acc) [] in
   let print_allocated_bases kf = 

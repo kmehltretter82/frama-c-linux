@@ -54,6 +54,7 @@ val clear_kf_allocated_bases : Kernel_function.t -> unit
 val register_reused_base : Callstack.t -> Base.t -> unit
 (** Register the base as being malloced by the current stack. *)
 (* Used when reusing memexec calls *)
+val import: Project.t -> unit Kernel_function.Hashtbl.t 
 
 val print_summary : unit -> unit
 (** Print the summary of the dynamic allocation analysis. *)

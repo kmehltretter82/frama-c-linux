@@ -1,0 +1,118 @@
+[kernel] Parsing malloc_no_modif.c (with preprocessing)
+[eva] Loading previous session from save file malloc_no_modif.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file malloc_no_modif.sav
+[eva] In save file malloc_no_modif.sav, 5 saved calls for 4 functions
+[eva:memexec] Importing summaries for function foo
+[eva:memexec] Importing summaries for function alloc
+[eva:memexec] Importing summaries for function main
+[eva:memexec] Importing summaries for function bar
+[eva] In current session, 5 saved calls for 4 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l10_0, __malloc_alloc_l10} for KF main at callstack 
+  main
+[eva] :0: Reusing old results for call to main
+[eva] ====== VALUES COMPUTED ======
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: foo
+All allocated bases: {__malloc_alloc_l10}
+Allocation sites: {
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main }
+Call sites: { alloc(); }
+
+Kernel function: alloc
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10}
+Allocation sites: {
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main;
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main }
+Call sites: { int *p = malloc(sizeof(int)); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10}
+Allocation sites: {
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main;
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main }
+Call sites: {  }
+
+Kernel function: main
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10}
+Allocation sites: {
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main;
+                    alloc :: malloc_no_modif.c:16 <-
+                    foo :: malloc_no_modif.c:26 <-
+                    main;
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main }
+Call sites: { foo();; bar(); }
+
+Kernel function: bar
+All allocated bases: {__malloc_alloc_l10_0}
+Allocation sites: {
+                    malloc :: malloc_no_modif.c:10 <-
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main;
+                    alloc :: malloc_no_modif.c:21 <-
+                    bar :: malloc_no_modif.c:28 <-
+                    main }
+Call sites: { alloc(); }
+
+Dynamic allocated bases: {[ __malloc_alloc_l10_0 -> alloc :: malloc_no_modif.c:21 <-
+                                                    bar :: malloc_no_modif.c:28 <-
+                                                    main
+                            __malloc_alloc_l10 -> alloc :: malloc_no_modif.c:16 <-
+                                                  foo :: malloc_no_modif.c:26 <-
+                                                  main ]}
+Malloced by stack: malloc :: malloc_no_modif.c:10 <-
+                   alloc :: malloc_no_modif.c:16 <-
+                   foo :: malloc_no_modif.c:26 <-
+                   main -> __malloc_alloc_l10
+Malloced by stack: malloc :: malloc_no_modif.c:10 <-
+                   alloc :: malloc_no_modif.c:21 <-
+                   bar :: malloc_no_modif.c:28 <-
+                   main -> __malloc_alloc_l10_0

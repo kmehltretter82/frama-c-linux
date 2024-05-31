@@ -40,6 +40,8 @@ let stat_inout_load_time = Statistics.register_global_stat
     "time-inout-import"
 let stat_check_saved_project = Statistics.register_global_stat
     "time-check-saved-project"
+let stat_builtin_malloc_load_time = Statistics.register_global_stat
+    "time-builtin-malloc-import"
 let stat_function_summaries_load_time = Statistics.register_global_stat
     "time-function-summaries-import"
 let stat_gather_load_time = Statistics.register_global_stat
@@ -477,17 +479,23 @@ module Make
     in
     ActualArgs.Map.fold add map ActualArgs.Map.empty
 
-  let import_cache_summaries (old_kf, old_data) =
+  let import_cache_summaries not_imported_kf (old_kf, old_data) =
     match Ast_diff.Kernel_function.find old_kf with
     | `Same kf ->
       begin
-        try
-          let _ = Self.debug ~dkey "Importing summaries for function %a@." Kernel_function.pretty old_kf in
-          let data = import_calls old_data in
-          PreviousCalls.replace kf data
-        with Not_found ->
-          Self.debug ~dkey "Cannot import cache for function %a@."
-            Kernel_function.pretty kf
+        if Kernel_function.Hashtbl.mem not_imported_kf old_kf then
+          begin
+            Self.debug ~dkey "Function %a has no syntax diff but cannot imported due to dynalloc data import failure @." Kernel_function.pretty old_kf;
+            Statistics.incr stat_misses_import_kf kf
+          end
+        else
+          try
+            let _ = Self.debug ~dkey "Importing summaries for function %a@." Kernel_function.pretty old_kf in
+            let data = import_calls old_data in
+            PreviousCalls.replace kf data
+          with Not_found ->
+            Self.debug ~dkey "Cannot import summaries for function %a@."
+              Kernel_function.pretty kf
       end
     | `Partial _ as diff ->
       Self.debug ~dkey "Function %a has been modified: %a"
@@ -521,9 +529,16 @@ module Make
     (* Gather time wrapped *)
     let list, counter =
       load_time_wrapper stat_gather_load_time gather in
+    (* Builtin malloc wrapped *)
+    let import_builtin_malloc () =
+      if (Parameters.CacheAllocation.get ()) 
+      then
+        Builtins_malloc.import project
+      else Kernel_function.Hashtbl.create 1 in
+    let not_imported_kf = load_time_wrapper stat_builtin_malloc_load_time import_builtin_malloc in
     (* Summaries wrapped *)
     let import_function_summaries () =
-      List.iter import_cache_summaries list in
+      List.iter (import_cache_summaries not_imported_kf) list in
     load_time_wrapper stat_function_summaries_load_time import_function_summaries;
     SaveCounter.set counter
 

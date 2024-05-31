@@ -183,3 +183,42 @@ let pretty fmt callstack =
   Format.fprintf fmt "@[<hv>%a" pretty_hash callstack;
   pretty fmt callstack;
   Format.fprintf fmt "@]"
+
+
+let import_kf elt =
+  match Ast_diff.Kernel_function.find elt with
+  | `Same x -> x
+  | `Partial (x, _) -> x
+  | _ -> raise Not_found
+
+let import_stmt elt = 
+  match Ast_diff.Stmt.find elt with
+  | `Same x -> x
+  | _ -> raise Not_found
+
+let import callstack =
+  try
+    let thread = callstack.thread in
+    let entry_point = import_kf callstack.entry_point in
+    let import_call (kf, stmt) =
+      let kf = 
+        try 
+          import_kf kf
+        with Not_found ->
+          Self.debug ~dkey:dkey_callstack "Kernel function not found: %a @." Kernel_function.pretty kf;
+          raise Not_found;
+      in
+      let stmt = try 
+          if (Cil_datatype.Stmt.equal stmt Cil.dummyStmt)
+          then Cil.dummyStmt
+          else
+            import_stmt stmt
+        with Not_found ->
+          Self.debug ~dkey:dkey_callstack "Statement not found: %a @." Cil_datatype.Stmt.pretty stmt;
+          raise Not_found;
+      in kf, stmt
+    in 
+    { thread; entry_point; stack = List.map import_call callstack.stack } 
+  with Not_found -> 
+    Self.debug ~dkey:dkey_callstack "Callstack import failed: %a @." pretty callstack;
+    raise Not_found
