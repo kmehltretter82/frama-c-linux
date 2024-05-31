@@ -1,0 +1,202 @@
+[kernel] Parsing malloc_diff_stack_1.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva:memexec] No previous call found for main
+[eva:memexec] No previous call found for alloc
+[eva] computing for function alloc <- main.
+  Called from malloc_diff_stack_1.c:17.
+[eva] malloc_diff_stack_1.c:9: Call to builtin malloc
+[eva] malloc_diff_stack_1.c:9: allocating variable __malloc_alloc_l9
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- main.
+  Called from malloc_diff_stack_1.c:18.
+[eva] malloc_diff_stack_1.c:9: Call to builtin malloc
+[eva] malloc_diff_stack_1.c:9: allocating variable __malloc_alloc_l9_0
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- main.
+  Called from malloc_diff_stack_1.c:19.
+[eva] malloc_diff_stack_1.c:9: Call to builtin malloc
+[eva] malloc_diff_stack_1.c:9: allocating variable __malloc_alloc_l9_1
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_diff_stack_1.c:20: Call to builtin free
+[eva] malloc_diff_stack_1.c:20: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_diff_stack_1.c:20: strong free on bases: {__malloc_alloc_l9}
+[eva] malloc_diff_stack_1.c:21: Call to builtin free
+[eva] malloc_diff_stack_1.c:21: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_diff_stack_1.c:21: 
+  strong free on bases: {__malloc_alloc_l9_0}
+[eva] malloc_diff_stack_1.c:22: Call to builtin free
+[eva] malloc_diff_stack_1.c:22: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_diff_stack_1.c:22: 
+  strong free on bases: {__malloc_alloc_l9_1}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l9_1} for KF alloc at callstack 
+  alloc :: malloc_diff_stack_1.c:23 <- main
+[eva] malloc_diff_stack_1.c:23: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- main.
+  Called from malloc_diff_stack_1.c:24.
+[eva] malloc_diff_stack_1.c:9: Call to builtin malloc
+[eva] malloc_diff_stack_1.c:9: allocating variable __malloc_alloc_l9_2
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- main.
+  Called from malloc_diff_stack_1.c:25.
+[eva] malloc_diff_stack_1.c:9: Call to builtin malloc
+[eva] malloc_diff_stack_1.c:9: allocating variable __malloc_alloc_l9_3
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_diff_stack_1.c:26: Call to builtin free
+[eva] malloc_diff_stack_1.c:26: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_diff_stack_1.c:26: 
+  strong free on bases: {__malloc_alloc_l9_1}
+[eva] malloc_diff_stack_1.c:27: Call to builtin free
+[eva] malloc_diff_stack_1.c:27: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_diff_stack_1.c:27: 
+  strong free on bases: {__malloc_alloc_l9_2}
+[eva] malloc_diff_stack_1.c:28: Call to builtin free
+[eva] malloc_diff_stack_1.c:28: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_diff_stack_1.c:28: 
+  strong free on bases: {__malloc_alloc_l9_3}
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function alloc:
+  __fc_heap_status ∈ [--..--]
+  p ∈
+   {{ &__malloc_alloc_l9 ; &__malloc_alloc_l9_0 ; &__malloc_alloc_l9_1 ;
+      &__malloc_alloc_l9_2 ; &__malloc_alloc_l9_3 }}
+  __malloc_alloc_l9 ∈ {42}
+  __malloc_alloc_l9_0 ∈ {42}
+  __malloc_alloc_l9_1 ∈ {42}
+  __malloc_alloc_l9_2 ∈ {42}
+  __malloc_alloc_l9_3 ∈ {42}
+[eva:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+  a ∈ ESCAPINGADDR
+  b ∈ ESCAPINGADDR
+  c ∈ ESCAPINGADDR
+  d ∈ ESCAPINGADDR
+  e ∈ ESCAPINGADDR
+  f ∈ ESCAPINGADDR
+  __retres ∈ {0}
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: main
+All allocated bases: {__malloc_alloc_l9, __malloc_alloc_l9_0,
+                      __malloc_alloc_l9_1, __malloc_alloc_l9_2,
+                      __malloc_alloc_l9_3}
+Allocation sites: {
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:17 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:18 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:19 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:24 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:25 <-
+                    main; alloc :: malloc_diff_stack_1.c:17 <- main;
+                    alloc :: malloc_diff_stack_1.c:18 <- main;
+                    alloc :: malloc_diff_stack_1.c:19 <- main;
+                    alloc :: malloc_diff_stack_1.c:24 <- main;
+                    alloc :: malloc_diff_stack_1.c:25 <- main }
+Call sites: { int *a = alloc();; int *b = alloc();; int *c = alloc();;
+              int *e = alloc();; int *f = alloc(); }
+
+Kernel function: alloc
+All allocated bases: {__malloc_alloc_l9, __malloc_alloc_l9_0,
+                      __malloc_alloc_l9_1, __malloc_alloc_l9_2,
+                      __malloc_alloc_l9_3}
+Allocation sites: {
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:17 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:18 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:19 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:24 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:25 <-
+                    main; alloc :: malloc_diff_stack_1.c:17 <- main;
+                    alloc :: malloc_diff_stack_1.c:18 <- main;
+                    alloc :: malloc_diff_stack_1.c:19 <- main;
+                    alloc :: malloc_diff_stack_1.c:24 <- main;
+                    alloc :: malloc_diff_stack_1.c:25 <- main }
+Call sites: { int *p = malloc(sizeof(int)); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_alloc_l9, __malloc_alloc_l9_0,
+                      __malloc_alloc_l9_1, __malloc_alloc_l9_2,
+                      __malloc_alloc_l9_3}
+Allocation sites: {
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:17 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:18 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:19 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:24 <-
+                    main;
+                    malloc :: malloc_diff_stack_1.c:9 <-
+                    alloc :: malloc_diff_stack_1.c:25 <-
+                    main; alloc :: malloc_diff_stack_1.c:17 <- main;
+                    alloc :: malloc_diff_stack_1.c:18 <- main;
+                    alloc :: malloc_diff_stack_1.c:19 <- main;
+                    alloc :: malloc_diff_stack_1.c:24 <- main;
+                    alloc :: malloc_diff_stack_1.c:25 <- main }
+Call sites: {  }
+
+Dynamic allocated bases: {[ __malloc_alloc_l9 -> alloc :: malloc_diff_stack_1.c:17 <-
+                                                 main
+                            __malloc_alloc_l9_0 -> alloc :: malloc_diff_stack_1.c:18 <-
+                                                   main
+                            __malloc_alloc_l9_1 -> alloc :: malloc_diff_stack_1.c:19 <-
+                                                   main
+                            __malloc_alloc_l9_2 -> alloc :: malloc_diff_stack_1.c:24 <-
+                                                   main
+                            __malloc_alloc_l9_3 -> alloc :: malloc_diff_stack_1.c:25 <-
+                                                   main ]}
+Malloced by stack: malloc :: malloc_diff_stack_1.c:9 <-
+                   alloc :: malloc_diff_stack_1.c:19 <-
+                   main -> __malloc_alloc_l9_1
+Malloced by stack: malloc :: malloc_diff_stack_1.c:9 <-
+                   alloc :: malloc_diff_stack_1.c:25 <-
+                   main -> __malloc_alloc_l9_3
+Malloced by stack: malloc :: malloc_diff_stack_1.c:9 <-
+                   alloc :: malloc_diff_stack_1.c:18 <-
+                   main -> __malloc_alloc_l9_0
+Malloced by stack: malloc :: malloc_diff_stack_1.c:9 <-
+                   alloc :: malloc_diff_stack_1.c:17 <-
+                   main -> __malloc_alloc_l9
+Malloced by stack: malloc :: malloc_diff_stack_1.c:9 <-
+                   alloc :: malloc_diff_stack_1.c:24 <-
+                   main -> __malloc_alloc_l9_2

@@ -1,0 +1,410 @@
+[kernel] Parsing malloc_may_fail.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva:memexec] No previous call found for main
+[eva:memexec] No previous call found for foo
+[eva] computing for function foo <- main.
+  Called from malloc_may_fail.c:41.
+[eva] computing for function Frama_C_interval <- foo <- main.
+  Called from malloc_may_fail.c:26.
+[eva] using specification for function Frama_C_interval
+[eva] malloc_may_fail.c:26: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:memexec] No previous call found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:27.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_0
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva:alarm] malloc_may_fail.c:33: Warning: 
+  out of bounds write. assert \valid(q);
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva] malloc_may_fail.c:34: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_0}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:41 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_0}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:41 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_0}
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva] malloc_may_fail.c:36: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16}
+[eva] Recording results for foo
+[eva] Done for function foo
+[eva:memexec] No previous call found for foo
+[eva] computing for function foo <- main.
+  Called from malloc_may_fail.c:42.
+[eva] computing for function Frama_C_interval <- foo <- main.
+  Called from malloc_may_fail.c:26.
+[eva] Done for function Frama_C_interval
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:42 <- main
+[eva] malloc_may_fail.c:27: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_1
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_1} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:42 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_1} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:42 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16_0}
+[eva] Recording results for foo
+[eva] Done for function foo
+[eva:memexec] No previous call found for foo
+[eva] computing for function foo <- main.
+  Called from malloc_may_fail.c:43.
+[eva] computing for function Frama_C_interval <- foo <- main.
+  Called from malloc_may_fail.c:26.
+[eva] Done for function Frama_C_interval
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_1} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:43 <- main
+[eva] malloc_may_fail.c:27: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_2
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_2} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:43 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_2} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:43 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16_1}
+[eva] Recording results for foo
+[eva] Done for function foo
+[eva:memexec] No previous saved state found for foo
+[eva] computing for function foo <- main.
+  Called from malloc_may_fail.c:44.
+[eva] computing for function Frama_C_interval <- foo <- main.
+  Called from malloc_may_fail.c:26.
+[eva] Done for function Frama_C_interval
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_2} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:44 <- main
+[eva] malloc_may_fail.c:27: Reusing old results for call to alloc
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:32.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_3
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_3} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:44 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_3} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:44 <- main
+[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: Call to builtin free
+[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16_2}
+[eva] Recording results for foo
+[eva] Done for function foo
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function alloc:
+  __fc_heap_status ∈ [--..--]
+  buf ∈
+     {{ (void *)&__malloc_alloc_l16 ; (void *)&__malloc_alloc_l16_0 ;
+        (void *)&__malloc_alloc_l16_1 ; (void *)&__malloc_alloc_l16_2 ;
+        (void *)&__malloc_alloc_l16_3 }} or UNINITIALIZED
+  __retres ∈
+          {{ NULL ; (void *)&__malloc_alloc_l16 ;
+             (void *)&__malloc_alloc_l16_0 ; (void *)&__malloc_alloc_l16_1 ;
+             (void *)&__malloc_alloc_l16_2 ; (void *)&__malloc_alloc_l16_3 }}
+[eva:final-states] Values at end of function foo:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  size ∈ {0; 1}
+  p ∈
+   {{ NULL ; (int *)&__malloc_alloc_l16 ; (int *)&__malloc_alloc_l16_0 ;
+      (int *)&__malloc_alloc_l16_1 ; (int *)&__malloc_alloc_l16_2 }} or ESCAPINGADDR
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_1[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_2[0..3] ∈ UNINITIALIZED
+[eva:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  __retres ∈ {0}
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_1[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_2[0..3] ∈ UNINITIALIZED
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: main
+All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
+                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
+                      __malloc_alloc_l16_3}
+Allocation sites: {
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main;
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main }
+Call sites: { foo(1);; foo(2);; foo(3);; foo(2); }
+
+Kernel function: foo
+All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
+                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
+                      __malloc_alloc_l16_3}
+Allocation sites: {
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main;
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main }
+Call sites: { int *p = alloc(sizeof(int) * (unsigned int)size);;
+              int *q = alloc(sizeof(int) * (unsigned int)size); }
+
+Kernel function: alloc
+All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
+                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
+                      __malloc_alloc_l16_3}
+Allocation sites: {
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main;
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main }
+Call sites: { void *buf = malloc(size); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
+                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
+                      __malloc_alloc_l16_3}
+Allocation sites: {
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    malloc :: malloc_may_fail.c:16 <-
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main;
+                    alloc :: malloc_may_fail.c:27 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:41 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:42 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:43 <-
+                    main;
+                    alloc :: malloc_may_fail.c:32 <-
+                    foo :: malloc_may_fail.c:44 <-
+                    main }
+Call sites: {  }
+
+Dynamic allocated bases: {[ __malloc_alloc_l16 -> alloc :: malloc_may_fail.c:27 <-
+                                                  foo :: malloc_may_fail.c:41 <-
+                                                  main
+                            __malloc_alloc_l16_0 -> alloc :: malloc_may_fail.c:32 <-
+                                                    foo :: malloc_may_fail.c:41 <-
+                                                    main
+                            __malloc_alloc_l16_1 -> alloc :: malloc_may_fail.c:32 <-
+                                                    foo :: malloc_may_fail.c:42 <-
+                                                    main
+                            __malloc_alloc_l16_2 -> alloc :: malloc_may_fail.c:32 <-
+                                                    foo :: malloc_may_fail.c:43 <-
+                                                    main
+                            __malloc_alloc_l16_3 -> alloc :: malloc_may_fail.c:32 <-
+                                                    foo :: malloc_may_fail.c:44 <-
+                                                    main ]}
+Malloced by stack: malloc :: malloc_may_fail.c:16 <-
+                   alloc :: malloc_may_fail.c:27 <-
+                   foo :: malloc_may_fail.c:41 <-
+                   main -> __malloc_alloc_l16
+Malloced by stack: malloc :: malloc_may_fail.c:16 <-
+                   alloc :: malloc_may_fail.c:32 <-
+                   foo :: malloc_may_fail.c:44 <-
+                   main -> __malloc_alloc_l16_3
+Malloced by stack: malloc :: malloc_may_fail.c:16 <-
+                   alloc :: malloc_may_fail.c:32 <-
+                   foo :: malloc_may_fail.c:41 <-
+                   main -> __malloc_alloc_l16_0
+Malloced by stack: malloc :: malloc_may_fail.c:16 <-
+                   alloc :: malloc_may_fail.c:32 <-
+                   foo :: malloc_may_fail.c:42 <-
+                   main -> __malloc_alloc_l16_1
+Malloced by stack: malloc :: malloc_may_fail.c:16 <-
+                   alloc :: malloc_may_fail.c:32 <-
+                   foo :: malloc_may_fail.c:43 <-
+                   main -> __malloc_alloc_l16_2
+[inout] Out (external) for function alloc:
+    __fc_heap_status
+[inout] Inputs for function alloc:
+    __fc_heap_status
+[inout] Out (external) for function foo:
+    __fc_heap_status; Frama_C_entropy_source; __malloc_alloc_l16_0[0..3];
+    __malloc_alloc_l16_1[0..3]; __malloc_alloc_l16_2[0..3];
+    __malloc_alloc_l16_3[0..3]
+[inout] Inputs for function foo:
+    __fc_heap_status; Frama_C_entropy_source
+[inout] Out (external) for function main:
+    __fc_heap_status; Frama_C_entropy_source; __malloc_alloc_l16_0[0..3];
+    __malloc_alloc_l16_1[0..3]; __malloc_alloc_l16_2[0..3];
+    __malloc_alloc_l16_3[0..3]
+[inout] Inputs for function main:
+    __fc_heap_status; Frama_C_entropy_source

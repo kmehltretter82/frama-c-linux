@@ -1,0 +1,144 @@
+[kernel] Parsing malloc_function_pointer.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva:memexec] No previous call found for main
+[eva:memexec] No previous call found for test
+[eva] computing for function test <- main.
+  Called from malloc_function_pointer.c:28.
+[eva:memexec] No previous call found for foo
+[eva] computing for function foo <- test <- main.
+  Called from malloc_function_pointer.c:20.
+[eva:memexec] No previous call found for alloc
+[eva] computing for function alloc <- foo <- test <- main.
+  Called from malloc_function_pointer.c:15.
+[eva] malloc_function_pointer.c:9: Call to builtin malloc
+[eva] malloc_function_pointer.c:9: allocating variable __malloc_alloc_l9
+[eva] malloc_function_pointer.c:10: Call to builtin free
+[eva] malloc_function_pointer.c:10: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_function_pointer.c:10: 
+  strong free on bases: {__malloc_alloc_l9}
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] Recording results for foo
+[eva] Done for function foo
+[eva] Recording results for test
+[eva] Done for function test
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l9} for KF test at callstack 
+  test :: malloc_function_pointer.c:29 <- main
+[eva] malloc_function_pointer.c:29: Reusing old results for call to test
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function alloc:
+  __fc_heap_status ∈ [--..--]
+  p ∈ ESCAPINGADDR
+[eva:final-states] Values at end of function foo:
+  __fc_heap_status ∈ [--..--]
+[eva:final-states] Values at end of function test:
+  __fc_heap_status ∈ [--..--]
+[eva:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+  f ∈ {{ &foo }}
+  g ∈ {{ &foo }}
+  __retres ∈ {0}
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: foo
+All allocated bases: {__malloc_alloc_l9}
+Allocation sites: {
+                    malloc :: malloc_function_pointer.c:9 <-
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main;
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main }
+Call sites: { alloc(); }
+
+Kernel function: alloc
+All allocated bases: {__malloc_alloc_l9}
+Allocation sites: {
+                    malloc :: malloc_function_pointer.c:9 <-
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main;
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main }
+Call sites: { int *p = malloc(sizeof(int)); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_alloc_l9}
+Allocation sites: {
+                    malloc :: malloc_function_pointer.c:9 <-
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main;
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main }
+Call sites: {  }
+
+Kernel function: main
+All allocated bases: {__malloc_alloc_l9}
+Allocation sites: {
+                    malloc :: malloc_function_pointer.c:9 <-
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main;
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main }
+Call sites: { test(f); }
+
+Kernel function: test
+All allocated bases: {__malloc_alloc_l9}
+Allocation sites: {
+                    malloc :: malloc_function_pointer.c:9 <-
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main;
+                    alloc :: malloc_function_pointer.c:15 <-
+                    foo :: malloc_function_pointer.c:20 <-
+                    test :: malloc_function_pointer.c:28 <-
+                    main }
+Call sites: { (*f)(); }
+
+Dynamic allocated bases: {[ __malloc_alloc_l9 -> alloc :: malloc_function_pointer.c:15 <-
+                                                 foo :: malloc_function_pointer.c:20 <-
+                                                 test :: malloc_function_pointer.c:28 <-
+                                                 main ]}
+Malloced by stack: malloc :: malloc_function_pointer.c:9 <-
+                   alloc :: malloc_function_pointer.c:15 <-
+                   foo :: malloc_function_pointer.c:20 <-
+                   test :: malloc_function_pointer.c:28 <-
+                   main -> __malloc_alloc_l9
+[inout] Out (external) for function alloc:
+    __fc_heap_status
+[inout] Inputs for function alloc:
+    __fc_heap_status
+[inout] Out (external) for function foo:
+    __fc_heap_status
+[inout] Inputs for function foo:
+    __fc_heap_status
+[inout] Out (external) for function test:
+    __fc_heap_status
+[inout] Inputs for function test:
+    __fc_heap_status
+[inout] Out (external) for function main:
+    __fc_heap_status
+[inout] Inputs for function main:
+    __fc_heap_status
