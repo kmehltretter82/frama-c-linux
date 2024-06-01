@@ -1247,6 +1247,56 @@ and is_same_binder b b' env =
   | Catch_all, Catch_all -> `Same_body, env
   | (Catch_exn _ | Catch_all), _ -> `Body_changed, env
 
+
+and find_candidate_call_site_stmt stmt f = 
+  let is_same_stmt stmt stmt' = 
+    let str = Format.asprintf "%a" Printer.pp_stmt stmt in
+    let str' = Format.asprintf "%a" Printer.pp_stmt stmt' in
+    str = str' 
+  in
+  let fdec = Kf.get_definition f in
+  let candidates = List.find_all (fun stmt' -> is_same_stmt stmt stmt') fdec.sallstmts in
+  if List.length candidates = 1 then
+    Some (List.hd candidates)
+  else if List.length candidates > 1 then
+    begin
+      (* Multiple candidates found, failing for safety *)
+      Kernel.warning "Multiple candidates found for call site %a" Printer.pp_stmt stmt;
+      None
+    end
+  else None
+
+
+and alloc_site_correspondence f f' _env = 
+  let is_same_instr i i' = 
+    let str = Format.asprintf "%a" Printer.pp_instr i in
+    let str' = Format.asprintf "%a" Printer.pp_instr i' in
+    str = str'
+  in
+  match Project.on (Orig_project.get ()) (!call_sites_ref f) ()  with
+  | None ->
+    ()
+  | Some (call_sites: stmt list) ->
+    List.iter (fun stmt -> 
+        begin
+          match find_candidate_call_site_stmt stmt f' with
+          | None -> ()
+          | Some stmt' -> 
+            begin
+              (* All allocation sites are Instr ? *)
+              match stmt.skind, stmt'.skind with
+              | Instr i, Instr i' ->
+                begin
+                  if is_same_instr i i' then
+                    Stmt.add stmt (`Same stmt')
+                  else
+                    Stmt.add stmt (`Not_present)
+                end
+              | _ -> ()
+            end
+        end
+      ) call_sites
+
 (* correspondence of formals is supposed to have already been checked,
    and formals mapping to have been put in the local env
 *)
@@ -1458,6 +1508,9 @@ and gfun_correspondence ?loc vi env =
         (match res with
          | `Not_present -> ()
          | `Same _ | `Partial _ -> formals_correspondence formals formals');
+        (match res with 
+         | `Same _ -> ()
+         | `Not_present | `Partial _ -> alloc_site_correspondence kf kf' env);
         res
       end else begin
         (* signatures do not match, we consider that pointers
