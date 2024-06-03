@@ -1,0 +1,151 @@
+[kernel] Parsing malloc_no-cache-allocation.c (with preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva:memexec] No previous call found for main
+[eva:memexec] No previous call found for f1
+[eva] computing for function f1 <- main.
+  Called from malloc_no-cache-allocation.c:25.
+[eva:memexec] No previous call found for alloc
+[eva] computing for function alloc <- f1 <- main.
+  Called from malloc_no-cache-allocation.c:14.
+[eva] malloc_no-cache-allocation.c:8: Call to builtin malloc
+[eva] malloc_no-cache-allocation.c:8: allocating variable __malloc_alloc_l8
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_no-cache-allocation.c:15: Call to builtin free
+[eva] malloc_no-cache-allocation.c:15: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_no-cache-allocation.c:15: 
+  strong free on bases: {__malloc_alloc_l8}
+[eva] Recording results for f1
+[eva] Done for function f1
+[eva:memexec] No previous call found for f1
+[eva] computing for function f1 <- main.
+  Called from malloc_no-cache-allocation.c:26.
+[eva:memexec] No previous call found for alloc
+[eva] computing for function alloc <- f1 <- main.
+  Called from malloc_no-cache-allocation.c:14.
+[eva] malloc_no-cache-allocation.c:8: Call to builtin malloc
+[eva] malloc_no-cache-allocation.c:8: allocating variable __malloc_alloc_l8_0
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_no-cache-allocation.c:15: Call to builtin free
+[eva:malloc] malloc_no-cache-allocation.c:15: 
+  strong free on bases: {__malloc_alloc_l8_0}
+[eva] Recording results for f1
+[eva] Done for function f1
+[eva:memexec] No previous call found for f2
+[eva] computing for function f2 <- main.
+  Called from malloc_no-cache-allocation.c:27.
+[eva] Recording results for f2
+[eva] Done for function f2
+[eva] malloc_no-cache-allocation.c:28: Reusing old results for call to f2
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function f2:
+  a ∈ {0}
+[eva:final-states] Values at end of function alloc:
+  __fc_heap_status ∈ [--..--]
+  p ∈ {{ &__malloc_alloc_l8 ; &__malloc_alloc_l8_0 }}
+  __retres ∈
+          {{ (void *)&__malloc_alloc_l8 ; (void *)&__malloc_alloc_l8_0 }}
+[eva:final-states] Values at end of function f1:
+  __fc_heap_status ∈ [--..--]
+  p ∈ ESCAPINGADDR
+[eva:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: f1
+All allocated bases: {__malloc_alloc_l8, __malloc_alloc_l8_0}
+Allocation sites: {
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main }
+Call sites: { void *p = alloc(); }
+
+Kernel function: alloc
+All allocated bases: {__malloc_alloc_l8, __malloc_alloc_l8_0}
+Allocation sites: {
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main }
+Call sites: { int *p = malloc(sizeof(int)); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_alloc_l8, __malloc_alloc_l8_0}
+Allocation sites: {
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main }
+Call sites: {  }
+
+Kernel function: main
+All allocated bases: {__malloc_alloc_l8, __malloc_alloc_l8_0}
+Allocation sites: {
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    malloc :: malloc_no-cache-allocation.c:8 <-
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:25 <-
+                    main;
+                    alloc :: malloc_no-cache-allocation.c:14 <-
+                    f1 :: malloc_no-cache-allocation.c:26 <-
+                    main }
+Call sites: { f1();; f1(); }
+
+Dynamic allocated bases: {[ __malloc_alloc_l8 -> alloc :: malloc_no-cache-allocation.c:14 <-
+                                                 f1 :: malloc_no-cache-allocation.c:25 <-
+                                                 main
+                            __malloc_alloc_l8_0 -> alloc :: malloc_no-cache-allocation.c:14 <-
+                                                   f1 :: malloc_no-cache-allocation.c:26 <-
+                                                   main ]}
+Malloced by stack: malloc :: malloc_no-cache-allocation.c:8 <-
+                   alloc :: malloc_no-cache-allocation.c:14 <-
+                   f1 :: malloc_no-cache-allocation.c:25 <-
+                   main -> __malloc_alloc_l8
+Malloced by stack: malloc :: malloc_no-cache-allocation.c:8 <-
+                   alloc :: malloc_no-cache-allocation.c:14 <-
+                   f1 :: malloc_no-cache-allocation.c:26 <-
+                   main -> __malloc_alloc_l8_0

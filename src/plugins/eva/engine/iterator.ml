@@ -294,9 +294,10 @@ module Make_Dataflow
     let result, call_cacheable =
       Transfer.call stmt dest callee args state
     in
-    if call_cacheable = Eval.NoCacheCallers then
-      (* Propagate info that the current call cannot be cached either *)
-      cacheable := Eval.NoCacheCallers;
+    if call_cacheable = NoCacheCallers then
+      cacheable := NoCacheCallers
+    else if call_cacheable = MallocedCall then 
+      cacheable := MallocedCall;
     (* Recombine callee partitioning keys with caller key *)
     Partitioning.call_return ~caller:key result
 

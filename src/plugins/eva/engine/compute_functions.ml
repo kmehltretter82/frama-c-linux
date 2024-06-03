@@ -230,7 +230,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       (* call can be cached since it was cached once *) 
       Transfer.{ 
         states = call_result.return_flow; 
-        cacheable = Cacheable; 
+        cacheable = call_result.cacheable; 
         allocated_bases = call_result.allocated_bases;
       }
   (* ----- Body or specification analysis ----------------------------------- *)
