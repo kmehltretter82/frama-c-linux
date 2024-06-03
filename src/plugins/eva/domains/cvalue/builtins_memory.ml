@@ -465,13 +465,11 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
     (* Now, try to find a type that matches [size]. *)
     let typ =
       (* If [exp_size] is a sizeof, use this type. *)
-      let rec find_sizeof e = match e.origin with
-        | Exp { enode = SizeOf typ } -> Some typ
-        | Exp { enode = SizeOfE e } -> Some (Cil.typeOf e)
-        | _ ->
-          match e.node with
-          | CastE (_, e) -> find_sizeof e
-          | _ -> None
+      let rec find_sizeof e = match e with
+        | { origin = Exp { enode = SizeOf typ } } -> Some typ
+        | { origin = Exp { enode = SizeOfE e } } -> Some (Cil.typeOf e)
+        | { node = CastE (_, e) } -> find_sizeof e
+        | _ -> None
       in
       match find_sizeof exp_size with
       | Some typ -> typ
