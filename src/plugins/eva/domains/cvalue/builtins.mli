@@ -25,13 +25,11 @@
 (** Eva analysis builtins for the cvalue domain, more efficient than their
     equivalent in C. *)
 
-open Eva_ast
-
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
 (* Signature of a builtin: type of the result, and type of the arguments. *)
-type builtin_type = unit -> typ * typ list
+type builtin_type = unit -> Eva_ast.typ * Eva_ast.typ list
 
 (** Can the results of a builtin be cached? See {!Eval} for more details.*)
 type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
@@ -68,7 +66,7 @@ type call_result =
 (** Type of a cvalue builtin, whose arguments are:
     - the memory state at the beginning of the function call;
     - the list of arguments of the function call. *)
-type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
+type builtin = Cvalue.Model.t -> (Eva_ast.exp * Cvalue.V.t) list -> call_result
 
 (** [register_builtin name ?replace ?typ cacheable f] registers the function [f]
     as a builtin to be used instead of the C function of name [name].

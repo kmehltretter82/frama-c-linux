@@ -20,12 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Eva_ast
-
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
-type builtin_type = unit -> typ * typ list
+type builtin_type = unit -> Eva_ast.typ * Eva_ast.typ list
 type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 
 type full_result = {
@@ -39,7 +37,7 @@ type call_result =
   | Result of Cvalue.V.t list
   | Full of full_result
 
-type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
+type builtin = Cvalue.Model.t -> (Eva_ast.exp * Cvalue.V.t) list -> call_result
 
 (* Table of all registered builtins; filled by [register_builtin] calls.  *)
 let table = Hashtbl.create 17
