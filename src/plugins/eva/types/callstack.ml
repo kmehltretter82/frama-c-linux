@@ -194,6 +194,7 @@ let import_kf elt =
 let import_stmt elt = 
   match Ast_diff.Stmt.find elt with
   | `Same x -> x
+  | `Partial (x, _) -> x 
   | _ -> raise Not_found
 
 let import callstack =

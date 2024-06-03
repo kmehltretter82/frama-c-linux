@@ -1104,7 +1104,7 @@ let import_kf kf =
 
 let import_stmt stmt = 
   match Ast_diff.Stmt.find stmt with
-  | `Same stmt -> stmt
+  | `Same stmt | `Partial (stmt, _) -> stmt
   | _ -> raise Not_found
 
 let import_dynamic_bases project =
