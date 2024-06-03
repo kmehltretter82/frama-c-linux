@@ -24,6 +24,16 @@ open Cil_datatype
 
 (** Eva AST. *)
 
+(* The equality and comparison functions generated in this file compare all
+   arguments of a type, including the textual representation of floating-point
+   constants — meaning that two constants representing the same value are not
+   equal if their textual representations differ.
+   This is required when option -eva-all-rounding-modes-constants is enabled,
+   as the evaluation of floating-point constants may depend on their textual
+   representation: when the constant is not exactly representable in the
+   floating-point type, an interval is used instead of the nearest singleton
+   value. *)
+
 type origin =
   | Lval of Cil_types.lval
   | Exp of Cil_types.exp
