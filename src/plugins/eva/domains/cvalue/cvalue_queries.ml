@@ -23,6 +23,7 @@
 module Queries = struct
 
   type state = Cvalue.Model.t
+  type context = unit
   type value = Main_values.CVal.t
   type location = Main_locations.PLoc.location
 
@@ -158,6 +159,7 @@ module Queries = struct
       `Value (Precise_locs.make_precise_loc loc ~size, value)
 
   let reduce_further _state _expr _value = []
+  let build_context _ = `Value ()
 end
 
 include Queries
@@ -181,7 +183,7 @@ module Domain = struct
   include Queries
 end
 
-include Evaluation.Make (Value) (Main_locations.PLoc) (Domain)
+include Evaluation.Make (Unit_context) (Value) (Main_locations.PLoc) (Domain)
 
 let lval_to_loc state lval =
   let eval, _alarms = lvaluate ~for_writing:false state lval in

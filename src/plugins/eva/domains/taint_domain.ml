@@ -585,6 +585,7 @@ let interpret_taint_logic
     end
     in
     (module struct
+      module Ctx = Abstract.Ctx
       module Val = Abstract.Val
       module Loc = Abstract.Loc
       module Dom = Dom

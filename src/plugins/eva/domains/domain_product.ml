@@ -27,14 +27,22 @@ let counter = ref 0
 let product_category = Self.register_category "domain_product"
 
 module Make
-    (Value: Abstract_value.S)
-    (Left:  Abstract.Domain.Internal with type value = Value.t)
-    (Right: Abstract.Domain.Internal with type value = Left.value
-                                      and type location = Left.location)
+    (Context  : Abstract_context.S)
+    (Value    : Abstract_value.S with type context = Context.t)
+    (Location : Abstract_location.S with type value = Value.t)
+    (Left  : Abstract.Domain.Internal
+     with type context = Context.t
+      and type value = Value.t
+      and type location = Location.location)
+    (Right : Abstract.Domain.Internal
+     with type context = Context.t
+      and type value = Value.t
+      and type location = Location.location)
 = struct
 
-  type value = Left.value
-  type location = Left.location
+  type context = Context.t
+  type value = Value.t
+  type location = Location.location
 
   type origin = {
     left:  reductness * Left.origin option;
@@ -111,6 +119,12 @@ module Make
     List.append
       (Left.reduce_further left expr value)
       (Right.reduce_further right expr value)
+
+  let build_context (left, right) =
+    let open Lattice_bounds.Bottom.Operators in
+    let* left  = Left.build_context  left  in
+    let* right = Right.build_context right in
+    Context.narrow left right
 
   let lift_record side record =
     let origin = Option.map side record.origin in

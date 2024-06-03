@@ -68,6 +68,9 @@ include Datatype.Make(struct
 let pretty_debug = pretty
 let pretty_typ _ = pretty
 
+type context = unit
+let context = Abstract_context.Leaf (module Unit_context)
+
 (* Inclusion: test inclusion of each field. *)
 let is_included v1 v2 =
   let bincl b1 b2 = (not b1) || b2 in
@@ -99,7 +102,7 @@ let inject_int _ i =
   else if Integer.gt i Integer.zero then pos
   else zero
 
-let constant _ = function
+let constant _context _expr = function
   | CInt64 (i, _, _) -> inject_int () i
   | _ -> top
 
@@ -144,7 +147,7 @@ let bitwise_not typ v =
 
 let logical_not v = { pos = v.zero; neg = false; zero = v.pos || v.neg }
 
-let forward_unop typ op v =
+let forward_unop _context typ op v =
   match op with
   | Neg -> `Value (neg_unop v)
   | BNot -> `Value (bitwise_not typ v)
@@ -223,7 +226,7 @@ let logical_or v1 v2 =
   let zero = v1.zero && v2.zero in
   { pos; neg; zero }
 
-let forward_binop _ op v1 v2 =
+let forward_binop _context _typ op v1 v2 =
   match op with
   | PlusA  -> `Value (plus v1 v2)
   | MinusA -> `Value (plus v1 (neg_unop v2))
@@ -236,13 +239,13 @@ let forward_binop _ op v1 v2 =
   | LOr -> `Value (logical_or v1 v2)
   | _      -> `Value top
 
-let rewrap_integer range v =
+let rewrap_integer _context range v =
   if equal v zero then v
   else if range.Eval_typ.i_signed then top else pos_or_zero
 
 (* Casts from type [src_typ] to type [dst_typ]. As downcasting can wrap,
    we only handle upcasts precisely *)
-let forward_cast ~src_type ~dst_type v =
+let forward_cast _context ~src_type ~dst_type v =
   let open Eval_typ in
   match src_type, dst_type with
   | TSInt range_src, TSInt range_dst ->
@@ -312,7 +315,7 @@ let backward_comp_right op ~left ~right =
 (* This functions must reduce the values [left] and [right], assuming
    that [left op right == result] holds. Currently, it is only implemented
    for comparison operators. *)
-let backward_binop ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
+let backward_binop _ctx ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
   match op with
   | Ne | Eq | Le | Lt | Ge | Gt ->
     let op = Eva_utils.conv_comp op in
@@ -334,9 +337,12 @@ let backward_binop ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
   | _ -> `Value (None, None)
 
 (* Not implemented precisely *)
-let backward_unop ~typ_arg:_ _op ~arg:_ ~res:_ = `Value None
+let backward_unop _context ~typ_arg:_ _op ~arg:_ ~res:_ =
+  `Value None
+
 (* Not implemented precisely *)
-let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ = `Value None
+let backward_cast _context ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+  `Value None
 
 (* Eva boilerplate, used to retrieve the domain. *)
 let key = Structure.Key_Value.create_key "sign_values"

@@ -23,7 +23,8 @@
 module Make
     (Value: Abstract_value.S)
     (Loc: Abstract_location.S)
-  : Abstract.Domain.Internal with type state = unit
+  : Abstract.Domain.Internal with type context = unit
+                              and type state = unit
                               and type value = Value.t
                               and type location = Loc.location
 

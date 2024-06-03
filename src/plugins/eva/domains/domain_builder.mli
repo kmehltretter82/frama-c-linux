@@ -40,6 +40,10 @@ end
 module type LeafDomain = sig
   type t
 
+  type context = unit
+  val context_dependencies: context Abstract_context.dependencies
+  val build_context: t -> context or_bottom
+
   val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
 
@@ -76,7 +80,8 @@ module Complete_Minimal
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal)
-  : Abstract_domain.Leaf with type value = Value.t
+  : Abstract_domain.Leaf with type context = unit
+                          and type value = Value.t
                           and type location = Location.location
                           and type state = Domain.t
 
@@ -84,13 +89,15 @@ module Complete_Minimal_with_datatype
     (Value: Abstract_value.Leaf)
     (Location: Abstract_location.Leaf)
     (Domain: Simpler_domains.Minimal_with_datatype)
-  : Abstract_domain.Leaf with type value = Value.t
+  : Abstract_domain.Leaf with type context = unit
+                          and type value = Value.t
                           and type location = Location.location
                           and type state = Domain.t
 
 module Complete_Simple_Cvalue
     (Domain: Simpler_domains.Simple_Cvalue)
-  : Abstract_domain.Leaf with type value = Cvalue.V.t
+  : Abstract_domain.Leaf with type context = unit
+                          and type value = Cvalue.V.t
                           and type location = Precise_locs.precise_location
                           and type state = Domain.t
 
@@ -100,8 +107,13 @@ module Complete_Simple_Cvalue
    in the current function and in all functions called from it.
    See {!Domain_mode} for more details. *)
 module Restrict
-    (Value: Abstract_value.S)
-    (Domain: Abstract.Domain.Internal with type value = Value.t)
+    (Context: Abstract_context.S)
+    (Value: Abstract_value.S with type context = Context.t)
+    (Domain: Abstract.Domain.Internal
+     with type context = Context.t
+      and type value = Value.t)
     (_: sig val functions: Domain_mode.function_mode list end)
-  : Abstract.Domain.Internal with type value = Value.t
-                              and type location = Domain.location
+  : Abstract.Domain.Internal
+    with type context = Context.t
+     and type value = Value.t
+     and type location = Domain.location

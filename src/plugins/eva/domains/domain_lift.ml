@@ -36,6 +36,7 @@ end
 
 module Make
     (Domain: Input_Domain)
+    (Ctx: Conversion with type internal := Domain.context)
     (Val: Conversion with type internal := Domain.value)
     (Loc: Conversion with type internal := Domain.location)
 = struct
@@ -47,6 +48,7 @@ module Make
 
   let log_category = Domain.log_category
 
+  type context = Ctx.extended
   type value = Val.extended
   type location = Loc.extended
   type origin = Domain.origin
@@ -73,6 +75,10 @@ module Make
     let list = Domain.reduce_further state expr (Val.restrict value) in
     List.map (fun (e, v) -> e, Val.extend v) list
 
+  let build_context state =
+    let open Bottom.Operators in
+    let+ context = Domain.build_context state in
+    Ctx.extend context
 
   let lift_left left = { left with lloc = Loc.restrict left.lloc }
   let lift_flagged_value value =

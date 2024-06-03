@@ -33,6 +33,26 @@
     Note that their behavior is undefined if an abstraction contains
     several times the same leaf module. *)
 
+(** Key and structure for abstract contexts.
+    See {!Structure} for more details. *)
+module Context : sig
+  include Structure.Shape
+    with type 'a key = 'a Structure.Key_Context.key
+     and type 'a data = (module Abstract_context.S with type t = 'a)
+
+  module type Internal = sig
+    include Abstract_context.S
+    val structure: t structure
+  end
+
+  module type External = sig
+    include Internal
+    include Structure.External with type t := t
+                                and type 'a key := 'a key
+                                and type 'a data := 'a data
+  end
+end
+
 (** Key and structure for abstract values.
     See {!Structure} for more details. *)
 module Value : sig

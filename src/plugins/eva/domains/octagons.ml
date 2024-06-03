@@ -1604,7 +1604,6 @@ module Domain = struct
   type value = Cvalue.V.t
   type location = Precise_locs.precise_location
   type origin
-
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 

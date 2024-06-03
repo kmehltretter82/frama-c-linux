@@ -94,8 +94,9 @@ module Sign = struct
 
   let test_unop unop typ values =
     let test (cval, sign) =
-      let cval_res = Cval.forward_unop typ unop cval in
-      let sign_res = Sign.forward_unop typ unop sign in
+      let context = Abstract_value.{ from_domains = Unit_context.top } in
+      let cval_res = Cval.forward_unop context typ unop cval in
+      let sign_res = Sign.forward_unop context typ unop sign in
       let bug = not (Bottom.is_included is_included cval_res sign_res) in
       report bug "%a %a = %a  while  %a %a = %a"
         Printer.pp_unop unop Cval.pretty cval (Bottom.pretty Cval.pretty) cval_res
@@ -105,8 +106,9 @@ module Sign = struct
 
   let test_binop binop typ values =
     let test (cval1, sign1) (cval2, sign2) =
-      let cval_res = Cval.forward_binop typ binop cval1 cval2 in
-      let sign_res = Sign.forward_binop typ binop sign1 sign2 in
+      let context = Abstract_value.{ from_domains = Unit_context.top } in
+      let cval_res = Cval.forward_binop context typ binop cval1 cval2 in
+      let sign_res = Sign.forward_binop context typ binop sign1 sign2 in
       let bug = not (Bottom.is_included is_included cval_res sign_res) in
       report bug "%a %a %a = %a  while  %a %a %a = %a"
         Cval.pretty cval1 Printer.pp_binop binop Cval.pretty cval2

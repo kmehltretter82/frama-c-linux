@@ -116,6 +116,9 @@ include Datatype.Make(T)
 let pretty_debug = pretty
 let pretty_typ _ = pretty
 
+type context = unit
+let context = Abstract_context.Leaf (module Unit_context)
+
 
 (*-----------------------------------------------------------------------------
  *                            Constructors
@@ -156,7 +159,7 @@ module Rel_Err  = Arith.Rel_Err
 (*-----------------------------------------------------------------------------
  *                      Numerors value of a constant
  *---------------------------------------------------------------------------*)
-let constant _ = function
+let constant _ _ = function
   | CReal (r, fkind, opt) ->
     let prec = Precisions.of_fkind fkind in
     let exact =
@@ -177,7 +180,7 @@ let constant _ = function
 (*-----------------------------------------------------------------------------
  *              Forward unary operations on Numerors value
  *---------------------------------------------------------------------------*)
-let forward_unop _typ op v =
+let forward_unop _context _typ op v =
   match v, op with
   | Elt v, Neg ->
     let exact  , approx  = Exact.Forward.neg   v, Approx.Forward.neg  v in
@@ -194,7 +197,7 @@ let forward_unop _typ op v =
  * The cast of integers into floats is actually handled by the Numerors
  * domain in the module <MakeNumerorsCValuesProduct>.
  *---------------------------------------------------------------------------*)
-let forward_cast ~src_type ~dst_type = function
+let forward_cast _context ~src_type ~dst_type = function
   | Top   -> `Value Top
   | Zero  -> `Value Zero
   | Elt t ->
@@ -207,7 +210,7 @@ let forward_cast ~src_type ~dst_type = function
 (*-----------------------------------------------------------------------------
  *             Forward binary operations on Numerors values
  *---------------------------------------------------------------------------*)
-let forward_binop _typ op x y =
+let forward_binop _context _typ op x y =
   match x, y, op with
   | Elt x, Elt y, PlusA  ->
     let exact  , approx  = Exact.Forward.add   x y, Approx.Forward.add  x y in
@@ -234,7 +237,7 @@ let forward_binop _typ op x y =
 (*-----------------------------------------------------------------------------
  *            Backward unary operations on Numerors values
  *---------------------------------------------------------------------------*)
-let backward_unop ~typ_arg:_ op ~arg ~res =
+let backward_unop _context ~typ_arg:_ op ~arg ~res =
   match arg, res, op with
   | Elt x, Elt r, Neg ->
     Exact.Backward.neg   x r >>- fun exact   ->
@@ -248,7 +251,7 @@ let backward_unop ~typ_arg:_ op ~arg ~res =
 (*-----------------------------------------------------------------------------
  *            Backward binary operations on Numerors values
  *---------------------------------------------------------------------------*)
-let backward_binop ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
+let backward_binop _ ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
   match left, right, result, op with
   | Elt x, Elt y, Elt r, PlusA ->
     Exact.Backward.add   x y r >>- fun (x_exact   , y_exact   ) ->
@@ -313,8 +316,8 @@ let assume_not_nan ~assume_finite:_ _fkind v = `Unknown v
 let assume_pointer v = `Unknown v
 let assume_comparable _cmp v1 v2 = `Unknown (v1, v2)
 
-let rewrap_integer _ _ = top
-let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ = `Value None
+let rewrap_integer _ _ _ = top
+let backward_cast _ ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ = `Value None
 let resolve_functions _ = `Top, true
 let replace_base _substitution t = t
 

@@ -127,6 +127,11 @@ module type Queries = sig
   (** Domain state. *)
   type state
 
+  (** Domains can optionally provide a context to be used by value abstractions
+      when evaluating expressions. This can be safely ignored for most domains.
+      Defined as unit (no context) by {!Domain_builder.Complete}. *)
+  type context
+
   (** Numerical values to which the expressions are evaluated. *)
   type value
 
@@ -187,6 +192,11 @@ module type Queries = sig
       be performed.
       Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_further : state -> exp -> value -> (exp * value) list
+
+  (** Returns the current context to be used by value abstractions for the
+      evaluation of expressions or lvalues.
+      Defined by {!Domain_builder.Complete} with no context. *)
+  val build_context : state -> context or_bottom
 
 end
 
@@ -510,6 +520,11 @@ module type Leaf = sig
   (** The key identifies the domain and the type [t] of its states.
       Automatically created by {!Domain_builder.Complete}. *)
   val key: t key
+
+  (** The abstract context used by the domain.
+      It carries the [context] type used by the domain.
+      Defined by {!Domain_builder.Complete} for the unit context. *)
+  val context_dependencies : context Abstract_context.dependencies
 
   (** The abstract value used by the domain.
       It carries the [value] type used by the domain.

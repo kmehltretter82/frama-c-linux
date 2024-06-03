@@ -45,82 +45,90 @@ let narrow_truth_pair x y =
   narrow_any_truth combine x y
 
 module Make
-    (Left: Abstract_value.S)
-    (Right: Abstract_value.S)
+    (Context : Abstract_context.S)
+    (Left  : Abstract.Value.Internal with type context = Context.t)
+    (Right : Abstract.Value.Internal with type context = Context.t)
 = struct
 
   include Datatype.Pair (Left) (Right)
+  type context = Context.t
+  let structure = Abstract.Value.Node (Left.structure, Right.structure)
 
   let pretty_typ typ =
     Pretty_utils.pp_pair ~pre:"@[" ~sep:",@ " ~suf:"@]"
       (Left.pretty_typ typ) (Right.pretty_typ typ)
 
   let top = Left.top, Right.top
+
   let is_included (l1, r1) (l2, r2) =
     Left.is_included l1 l2 && Right.is_included r1 r2
+
   let join (l1, r1) (l2, r2) =
     Left.join l1 l2, Right.join r1 r2
+
   let narrow (l1, r1) (l2, r2) =
-    Left.narrow l1 l2 >>- fun left ->
-    Right.narrow r1 r2 >>-: fun right ->
+    let+ left  = Left.narrow  l1 l2
+    and+ right = Right.narrow r1 r2 in
     left, right
 
   let zero = Left.zero, Right.zero
-  let one = Left.one, Right.one
+  let one  = Left.one , Right.one
   let top_int = Left.top_int, Right.top_int
   let inject_int typ i = Left.inject_int typ i, Right.inject_int typ i
 
   let assume_non_zero (left, right) =
-    let left_truth = Left.assume_non_zero left
+    let left_truth  = Left.assume_non_zero  left
     and right_truth = Right.assume_non_zero right in
     narrow_truth (left, left_truth) (right, right_truth)
 
   let assume_bounded kind bound (left, right) =
-    let left_truth = Left.assume_bounded kind bound left
+    let left_truth  = Left.assume_bounded  kind bound left
     and right_truth = Right.assume_bounded kind bound right in
     narrow_truth (left, left_truth) (right, right_truth)
 
   let assume_not_nan ~assume_finite fkind (left, right) =
-    let left_truth = Left.assume_not_nan ~assume_finite fkind left
+    let left_truth  = Left.assume_not_nan  ~assume_finite fkind left
     and right_truth = Right.assume_not_nan ~assume_finite fkind right in
     narrow_truth (left, left_truth) (right, right_truth)
 
   let assume_pointer (left, right) =
-    let left_truth = Left.assume_pointer left
+    let left_truth  = Left.assume_pointer  left
     and right_truth = Right.assume_pointer right in
     narrow_truth (left, left_truth) (right, right_truth)
 
   let assume_comparable op (l1, r1) (l2, r2) =
-    let left_truth = Left.assume_comparable op l1 l2
+    let left_truth  = Left.assume_comparable  op l1 l2
     and right_truth = Right.assume_comparable op r1 r2 in
     narrow_truth_pair ((l1, l2), left_truth) ((r1, r2), right_truth)
 
-  let constant expr constant =
-    let left = Left.constant expr constant
-    and right = Right.constant expr constant in
+  let constant context expr constant =
+    let left  = Left.constant  context expr constant
+    and right = Right.constant context expr constant in
     left, right
 
-  let forward_unop typ unop (left, right) =
-    Left.forward_unop typ unop left >>- fun left ->
-    Right.forward_unop typ unop right >>-: fun right ->
+  let forward_unop context typ unop (left, right) =
+    let+ left  = Left.forward_unop  context typ unop left
+    and+ right = Right.forward_unop context typ unop right in
     left, right
 
-  let forward_binop typ binop (l1, r1) (l2, r2) =
-    Left.forward_binop typ binop l1 l2 >>- fun left ->
-    Right.forward_binop typ binop r1 r2 >>-: fun right ->
+  let forward_binop context typ binop (l1, r1) (l2, r2) =
+    let+ left  = Left.forward_binop  context typ binop l1 l2
+    and+ right = Right.forward_binop context typ binop r1 r2 in
     left, right
 
-  let rewrap_integer range (left, right) =
-    Left.rewrap_integer range left, Right.rewrap_integer range right
+  let rewrap_integer context range (left, right) =
+    let left  = Left.rewrap_integer  context range left
+    and right = Right.rewrap_integer context range right in
+    left, right
 
-  let forward_cast ~src_type ~dst_type (left, right) =
-    Left.forward_cast ~src_type ~dst_type left >>- fun left ->
-    Right.forward_cast ~src_type ~dst_type right >>-: fun right ->
+  let forward_cast context ~src_type ~dst_type (left, right) =
+    let+ left  = Left.forward_cast context  ~src_type ~dst_type left
+    and+ right = Right.forward_cast context ~src_type ~dst_type right in
     left, right
 
   let resolve_functions (left, right) =
-    let list1, b1 = Left.resolve_functions left
-    and list2, b2 = Right.resolve_functions right in
+    let list1, b1 = Left.resolve_functions  left  in
+    let list2, b2 = Right.resolve_functions right in
     let list = match list1, list2 with
       | `Top, _ -> list2
       | _, `Top -> list1
@@ -129,8 +137,7 @@ module Make
     list, b1 && b2
 
   let replace_base substitution (left, right) =
-    Left.replace_base substitution left,
-    Right.replace_base substitution right
+    Left.replace_base substitution left, Right.replace_base substitution right
 
   let reduce (orig_left, orig_right) left right = match left, right with
     | None, None            -> None
@@ -138,25 +145,25 @@ module Make
     | None, Some right      -> Some (orig_left, right)
     | Some left, Some right -> Some (left, right)
 
-  let backward_unop ~typ_arg unop ~arg:(arg_l, arg_r as arg) ~res:(res_l, res_r) =
-    Left.backward_unop ~typ_arg unop ~arg:arg_l ~res:res_l >>- fun left ->
-    Right.backward_unop ~typ_arg unop ~arg:arg_r ~res:res_r >>-: fun right ->
+  let backward_unop context ~typ_arg unop ~arg ~res =
+    let on_left  = Left.backward_unop  context ~typ_arg unop in
+    let on_right = Right.backward_unop context ~typ_arg unop in
+    let+ left  = on_left  ~arg:(fst arg) ~res:(fst res)
+    and+ right = on_right ~arg:(snd arg) ~res:(snd res) in
     reduce arg left right
 
-  let backward_binop ~input_type ~resulting_type binop ~left ~right ~result =
-    let l1, r1 = left and l2, r2 = right and l3, r3 = result in
-    Left.backward_binop ~input_type ~resulting_type
-      binop ~left:l1 ~right:l2 ~result:l3
-    >>- fun (l1, l2) ->
-    Right.backward_binop ~input_type ~resulting_type
-      binop ~left:r1 ~right:r2 ~result:r3
-    >>-: fun (r1, r2) ->
+  let backward_binop ctx ~input_type ~resulting_type binop ~left ~right ~result:res =
+    let on_left  = Left.backward_binop  ctx ~input_type ~resulting_type binop in
+    let on_right = Right.backward_binop ctx ~input_type ~resulting_type binop in
+    let+ l1, l2 = on_left  ~left:(fst left) ~right:(fst right) ~result:(fst res)
+    and+ r1, r2 = on_right ~left:(snd left) ~right:(snd right) ~result:(snd res) in
     reduce left l1 r1, reduce right l2 r2
 
-  let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
-    let l1, r1 = src_val and l2, r2 = dst_val in
-    Left.backward_cast ~src_typ ~dst_typ ~src_val:l1 ~dst_val:l2 >>- fun left ->
-    Right.backward_cast ~src_typ ~dst_typ ~src_val:r1 ~dst_val:r2 >>-: fun right ->
+  let backward_cast context ~src_typ ~dst_typ ~src_val ~dst_val =
+    let on_left  = Left.backward_cast  context ~src_typ ~dst_typ in
+    let on_right = Right.backward_cast context ~src_typ ~dst_typ in
+    let+ left  = on_left  ~src_val:(fst src_val) ~dst_val:(fst dst_val)
+    and+ right = on_right ~src_val:(snd src_val) ~dst_val:(snd dst_val) in
     reduce src_val left right
 
 end

@@ -23,14 +23,22 @@
 open Cil_types
 open Eval
 
+
+
 module type InputDomain = sig
   include Datatype.S
   val top: t
   val join: t -> t -> t
 end
 
+
+
 module type LeafDomain = sig
   type t
+
+  type context = unit
+  val context_dependencies: context Abstract_context.dependencies
+  val build_context: t -> context or_bottom
 
   val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
@@ -61,7 +69,12 @@ module type LeafDomain = sig
   val key: t Abstract_domain.key
 end
 
+
 module Complete (Domain: InputDomain) = struct
+
+  type context = unit
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
+  let build_context _ = `Value ()
 
   let backward_location _state _lval _typ loc value = `Value (loc, value)
   let reduce_further _state _expr _value = []
@@ -88,6 +101,8 @@ module Complete (Domain: InputDomain) = struct
     Structure.Key_Domain.create_key Domain.name
 end
 
+
+
 open Simpler_domains
 
 let simplify_argument argument =
@@ -99,6 +114,8 @@ let simplify_call call =
     arguments = List.map simplify_argument call.Eval.arguments;
     rest = List.map fst call.Eval.rest;
     return = call.Eval.return; }
+
+
 
 module Make_Minimal
     (Value: Abstract_value.Leaf)
@@ -155,6 +172,7 @@ module Make_Minimal
 
   let relate _kf _bases _state = Base.SetLattice.top
 end
+
 
 
 module Complete_Minimal
@@ -298,8 +316,11 @@ let unique_name =
     name ^ string_of_int !counter
 
 module Restrict
-    (Value: Abstract_value.S)
-    (Domain: Abstract.Domain.Internal with type value = Value.t)
+    (Context: Abstract_context.S)
+    (Value: Abstract_value.S with type context = Context.t)
+    (Domain: Abstract.Domain.Internal
+     with type context = Context.t
+      and type value = Value.t)
     (Scope: sig val functions: Domain_mode.function_mode list end)
 = struct
 
@@ -348,9 +369,14 @@ module Restrict
     Abstract.Domain.(Option ((Node (Domain.structure, Void)), default))
 
   type state = t
+  type context = Domain.context
   type value = Domain.value
   type location = Domain.location
   type origin = Domain.origin
+
+  let build_context = function
+    | None -> `Value Context.top
+    | Some (state, _mode) -> Domain.build_context state
 
   let get_state = function
     | None -> Domain.top

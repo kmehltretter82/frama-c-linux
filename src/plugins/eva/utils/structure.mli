@@ -44,6 +44,9 @@ end
 
 module Make () : Key
 
+(** Keys module for the abstract contexts of Eva. *)
+module Key_Context : Key
+
 (** Keys module for the abstract values of Eva. *)
 module Key_Value : Key
 
