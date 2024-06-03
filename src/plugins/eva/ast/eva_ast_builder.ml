@@ -86,7 +86,7 @@ let rec translate_exp e =
     | Cil_types.(SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _) ->
       match (Cil.constFold true e).enode with
       | Const c -> Const (translate_constant c)
-      | _ -> Const (CTopInt Cil.theMachine.typeOfSizeOf)
+      | _ -> Const (CTopInt Cil.theMachine.kindOfSizeOf)
   in
   mk_exp ~origin:(Exp e) node
 

@@ -26,7 +26,7 @@ let type_of node =
   node.typ
 
 let type_of_const : constant -> typ = function
-  | CTopInt t -> t
+  | CTopInt ik -> Cil_types.TInt (ik, [])
   | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
   | CChr _ -> Cil.intType
   | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType

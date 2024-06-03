@@ -47,9 +47,10 @@ and exp_node =
   | AddrOf     of lval
   | StartOf    of lval
 
-(** Literal constants *)
+(** Constants *)
 and constant =
-  | CTopInt of typ (* an unknown integer; currently introduced when sizeof/alignof cannot be evaluated as a constant *)
+  | CTopInt of ikind (* an unknown integer; currently introduced when
+                        sizeof/alignof cannot be evaluated as a constant *)
   | CInt64 of Integer.t * ikind * string option
   | CString of Base.t (* the base must be [Base.String _] *)
   | CChr of char

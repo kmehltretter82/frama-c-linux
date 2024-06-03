@@ -51,10 +51,10 @@ and hash_exp e =
   | StartOf lv -> Hashtbl.hash (12, hash_lval lv)
 and hash_constant c =
   match c with
-  | CTopInt t -> Hashtbl.hash (1, Typ.hash t)
+  | CTopInt ikind -> Hashtbl.hash (1, ikind)
   | CString _ | CChr _ -> Hashtbl.hash (2, c)
   | CReal (fn, fk, _) -> Hashtbl.hash (3, fn, fk)
-  | CInt64 (n, k, _) -> Hashtbl.hash (4, n, k )
+  | CInt64 (n, k, _) -> Hashtbl.hash (4, n, k)
   | CEnum (ei, _) -> Hashtbl.hash (5, ei.einame)
 
 
