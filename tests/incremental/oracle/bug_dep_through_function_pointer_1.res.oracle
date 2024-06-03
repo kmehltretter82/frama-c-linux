@@ -5,10 +5,10 @@
 [eva] In save file bug_dep_through_function_pointer_1.1.sav, 7 saved calls for 5 functions
 [eva:memexec] Importing summaries for function foo
 [eva:memexec] Importing summaries for function alloc
-[eva:memexec] Importing summaries for function main
-[eva:memexec] Importing summaries for function test
+[eva:memexec] Function main has been modified: -> main (callees changed)
+[eva:memexec] Function test has been modified: -> test (callees changed)
 [eva:memexec] Function bar has been modified: -> bar (body changed)
-[eva] In current session, 6 saved calls for 4 functions
+[eva] In current session, 3 saved calls for 2 functions
 [kernel] Warning: clearing dangling project pointers in project "default"
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -16,11 +16,55 @@
 [eva:initial-state] Values of globals at initialization
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
+[eva:memexec] No previous call found for main
+[eva:memexec] No previous call found for test
+[eva] computing for function <ndoL> test <- main.
+  Called from bug_dep_through_function_pointer_2.c:38.
 [eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l11, __malloc_alloc_l11_0} for KF main at callstack 
-  <A5r5> main
-[eva] :0: Reusing old results for call to main
+  --- Reused allocated bases {__malloc_alloc_l11} for KF foo at callstack 
+  <6AtS> foo :: bug_dep_through_function_pointer_2.c:30 <-
+         test :: bug_dep_through_function_pointer_2.c:38 <-
+         main
+[eva] bug_dep_through_function_pointer_2.c:30: 
+  Reusing old results for call to foo
+[eva] Recording results for test
+[eva] Done for function test
+[eva:memexec] No previous call found for test
+[eva] computing for function <jWdv> test <- main.
+  Called from bug_dep_through_function_pointer_2.c:39.
+[eva:memexec] No previous call found for bar
+[eva] computing for function <fnKN> bar <- test <- main.
+  Called from bug_dep_through_function_pointer_2.c:30.
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l11_0} for KF alloc at callstack 
+  <1dxz> alloc :: bug_dep_through_function_pointer_2.c:23 <-
+         bar :: bug_dep_through_function_pointer_2.c:30 <-
+         test :: bug_dep_through_function_pointer_2.c:39 <-
+         main
+[eva] bug_dep_through_function_pointer_2.c:23: 
+  Reusing old results for call to alloc
+[eva] bug_dep_through_function_pointer_2.c:25: Call to builtin free
+[eva] bug_dep_through_function_pointer_2.c:25: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] bug_dep_through_function_pointer_2.c:25: 
+  strong free on bases: {__malloc_alloc_l11_0}
+[eva] Recording results for bar
+[eva] Done for function bar
+[eva] Recording results for test
+[eva] Done for function test
+[eva] Recording results for main
+[eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function bar:
+  __fc_heap_status ∈ [--..--]
+  q ∈ ESCAPINGADDR
+  a ∈ {0}
+[eva:final-states] Values at end of function test:
+  __fc_heap_status ∈ [--..--]
+[eva:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+  f ∈ {{ &foo }}
+  g ∈ {{ &bar }}
 [eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
   Kernel function: foo
 All allocated bases: {__malloc_alloc_l11}
