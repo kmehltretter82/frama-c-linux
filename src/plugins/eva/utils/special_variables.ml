@@ -177,20 +177,25 @@ let import_retres project =
 let import_created project =
   let get_info name vi =
     let base = Base.of_varinfo vi in
+    let loc = vi.vdecl in
     let validity = Base.validity base in
     let deallocation =
       match base with
       | Allocated (_, deallocation, _) -> Some deallocation
       | _ -> None
     in
-    (name, vi, validity, deallocation)
+    (name, vi, validity, deallocation, loc)
   in
   let gather () =
     CreatedVars.fold (fun name vi acc -> get_info name vi :: acc) []
   in
   let list = Project.on project gather () in
-  let import (name, vi, validity, alloc) =
+  let import (name, vi, validity, alloc, loc) =
     let new_vi, _base = register name vi.vtype validity alloc in
+    let _ = 
+      match _base with
+      | Base.Allocated _ ->  Cabs2cil.register_var_name name loc
+      | _ -> ()  in
     Ast_diff.Varinfo.add vi (`Same new_vi)
   in
   List.iter import list

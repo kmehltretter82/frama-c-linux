@@ -1000,6 +1000,12 @@ let alphaTable : location Alpha.alphaTable = H.create 307
 (* vars and enum tags. For composite types we have names like "struct
  * foo" or "union bar" *)
 
+
+(* Register variable base name reused from a previous analysis *)
+let register_var_name lookupname loc = 
+  Alpha.registerAlphaName ~alphaTable ~lookupname ~data:loc
+
+
 let fresh_global lookupname =
   fst (Alpha.newAlphaName ~alphaTable ~undolist:None ~lookupname
          ~data:(Current_loc.get ()))

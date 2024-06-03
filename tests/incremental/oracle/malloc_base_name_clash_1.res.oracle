@@ -1,0 +1,166 @@
+[kernel] Parsing malloc_base_name_clash_2.c (with preprocessing)
+[eva] Loading previous session from save file malloc_base_name_clash_1.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file malloc_base_name_clash_1.sav
+[eva] In save file malloc_base_name_clash_1.sav, 5 saved calls for 4 functions
+[eva:callstack] Statement not found: alloc(2);
+[eva:callstack] 
+  Callstack import failed: <acB2> alloc :: malloc_base_name_clash_1.c:21 <-
+                                  bar :: malloc_base_name_clash_1.c:27 <-
+                                  main
+[eva:callstack] Statement not found: alloc(2);
+[eva:callstack] 
+  Callstack import failed: <KjPK> malloc :: malloc_base_name_clash_1.c:10 <-
+                                  alloc :: malloc_base_name_clash_1.c:21 <-
+                                  bar :: malloc_base_name_clash_1.c:27 <-
+                                  main
+[eva:callstack] Statement not found: alloc(2);
+[eva:callstack] 
+  Callstack import failed: <KjPK> malloc :: malloc_base_name_clash_1.c:10 <-
+                                  alloc :: malloc_base_name_clash_1.c:21 <-
+                                  bar :: malloc_base_name_clash_1.c:27 <-
+                                  main
+[eva:callstack] Statement not found: alloc(2);
+[eva:callstack] 
+  Callstack import failed: <KjPK> malloc :: malloc_base_name_clash_1.c:10 <-
+                                  alloc :: malloc_base_name_clash_1.c:21 <-
+                                  bar :: malloc_base_name_clash_1.c:27 <-
+                                  main
+[eva:callstack] Statement not found: alloc(2);
+[eva:callstack] 
+  Callstack import failed: <KjPK> malloc :: malloc_base_name_clash_1.c:10 <-
+                                  alloc :: malloc_base_name_clash_1.c:21 <-
+                                  bar :: malloc_base_name_clash_1.c:27 <-
+                                  main
+[eva:callstack] Statement not found: alloc(2);
+[eva:callstack] 
+  Callstack import failed: <KjPK> malloc :: malloc_base_name_clash_1.c:10 <-
+                                  alloc :: malloc_base_name_clash_1.c:21 <-
+                                  bar :: malloc_base_name_clash_1.c:27 <-
+                                  main
+[eva:memexec] 
+  Function alloc has no syntax diff but cannot imported due to dynalloc data import failure
+[eva:memexec] Function main has been modified: -> main (callees changed)
+[eva:memexec] Function bar has been modified: -> bar (body changed)
+[eva:memexec] Importing summaries for function foo
+[eva] In current session, 1 saved calls for 1 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+[eva:memexec] No previous call found for main
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l10} for KF foo at callstack 
+  <H3FJ> foo :: malloc_base_name_clash_2.c:26 <- main
+[eva] malloc_base_name_clash_2.c:26: Reusing old results for call to foo
+[eva:memexec] No previous call found for bar
+[eva] computing for function <Rjvt> bar <- main.
+  Called from malloc_base_name_clash_2.c:27.
+[eva:memexec] No previous call found for alloc
+[eva] computing for function <FwDJ> alloc <- bar <- main.
+  Called from malloc_base_name_clash_2.c:21.
+[eva] malloc_base_name_clash_2.c:10: Call to builtin malloc
+[eva] malloc_base_name_clash_2.c:10: allocating variable __malloc_alloc_l10_1
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] Recording results for bar
+[eva] Done for function bar
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function alloc:
+  __fc_heap_status ∈ [--..--]
+  p ∈ {{ &__malloc_alloc_l10_1[0] }}
+  __malloc_alloc_l10_1[0] ∈ {0}
+                      [1..2] ∈ UNINITIALIZED
+[eva:final-states] Values at end of function bar:
+  __fc_heap_status ∈ [--..--]
+  __malloc_alloc_l10_1[0] ∈ {0}
+                      [1..2] ∈ UNINITIALIZED
+[eva:final-states] Values at end of function main:
+  __fc_heap_status ∈ [--..--]
+  __retres ∈ {0}
+  __malloc_alloc_l10 ∈ {0}
+  __malloc_alloc_l10_1[0] ∈ {0}
+                      [1..2] ∈ UNINITIALIZED
+[eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
+  Kernel function: alloc
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10,
+                      __malloc_alloc_l10_1}
+Allocation sites: {
+                    malloc :: malloc_base_name_clash_2.c:10 <-
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main;
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main }
+Call sites: { int *p = malloc(sizeof(int) * (unsigned long)size); }
+
+Kernel function: malloc
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10,
+                      __malloc_alloc_l10_1}
+Allocation sites: {
+                    malloc :: malloc_base_name_clash_2.c:10 <-
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main;
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main }
+Call sites: {  }
+
+Kernel function: main
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10,
+                      __malloc_alloc_l10_1}
+Allocation sites: {
+                    malloc :: malloc_base_name_clash_2.c:10 <-
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main;
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main }
+Call sites: { foo();; bar(); }
+
+Kernel function: bar
+All allocated bases: {__malloc_alloc_l10_0, __malloc_alloc_l10_1}
+Allocation sites: {
+                    malloc :: malloc_base_name_clash_2.c:10 <-
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main;
+                    alloc :: malloc_base_name_clash_2.c:21 <-
+                    bar :: malloc_base_name_clash_2.c:27 <-
+                    main }
+Call sites: { alloc(3); }
+
+Kernel function: foo
+All allocated bases: {__malloc_alloc_l10}
+Allocation sites: {
+                    malloc :: malloc_base_name_clash_2.c:10 <-
+                    alloc :: malloc_base_name_clash_2.c:16 <-
+                    foo :: malloc_base_name_clash_2.c:26 <-
+                    main;
+                    alloc :: malloc_base_name_clash_2.c:16 <-
+                    foo :: malloc_base_name_clash_2.c:26 <-
+                    main }
+Call sites: { alloc(1); }
+
+Dynamic allocated bases: {[ __malloc_alloc_l10 -> <nVeq> alloc :: malloc_base_name_clash_2.c:16 <-
+                                                         foo :: malloc_base_name_clash_2.c:26 <-
+                                                         main
+                            __malloc_alloc_l10_1 -> <FwDJ> alloc :: malloc_base_name_clash_2.c:21 <-
+                                                           bar :: malloc_base_name_clash_2.c:27 <-
+                                                           main ]}
+Malloced by stack: <RG3Z> malloc :: malloc_base_name_clash_2.c:10 <-
+                          alloc :: malloc_base_name_clash_2.c:21 <-
+                          bar :: malloc_base_name_clash_2.c:27 <-
+                          main -> __malloc_alloc_l10_1
+Malloced by stack: <dPb6> malloc :: malloc_base_name_clash_2.c:10 <-
+                          alloc :: malloc_base_name_clash_2.c:16 <-
+                          foo :: malloc_base_name_clash_2.c:26 <-
+                          main -> __malloc_alloc_l10

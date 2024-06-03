@@ -263,6 +263,8 @@ val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
 *)
 val func_locs : unit -> (Filepath.position * Filepath.position * string) list
 
+val register_var_name : string -> Cil_types.location -> unit
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."
