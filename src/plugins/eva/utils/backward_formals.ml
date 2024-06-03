@@ -28,19 +28,15 @@ open Cil_types
    lvalues that are unreferenced locals or formals, because they cannot
    be changed by the callee. *)
 let safe_argument expr =
-  let exception Unsafe in
-  let f (lv : Eva_ast.lval) =
-    match lv.node with
+  let is_safe_lval ~visitor:_ (lval : Eva_ast.lval) =
+    match lval.node with
     | Var vi, NoOffset ->
-      if vi.vaddrof || Cil.typeHasQualifier "volatile" vi.vtype || vi.vglob
-      then raise Unsafe
-    | _, _ -> raise Unsafe
+      not (vi.vaddrof || Cil.typeHasQualifier "volatile" vi.vtype || vi.vglob)
+    | _, _ -> false
   in
-  try
-    Eva_ast.iter_lvals f expr;
-    true
-  with Unsafe -> false
-
+  let open Eva_ast_visitor.Fold in
+  let folder = { default with fold_lval = is_safe_lval } in
+  visit_exp ~neutral:true ~combine:(&&) folder expr
 
 let written_formals kf =
   let module S = Cil_datatype.Varinfo.Set in

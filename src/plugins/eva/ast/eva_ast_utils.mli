@@ -46,9 +46,6 @@ val height_lval : lval -> int
 
 (** Specialized visitors *)
 
-(** [iter_lvals f exp] calls [f] from every lvalue contained in [exp] *)
-val iter_lvals : (lval -> unit) -> exp -> unit
-
 (** [exp_contains_volatile e] (resp. [lval_contains_volatile lv] is true
     whenever one l-value contained inside the expression [e] (resp. the lvalue
     [lv]) has volatile qualifier. Relational analyses should not learn

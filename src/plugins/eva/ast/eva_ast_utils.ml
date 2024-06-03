@@ -176,14 +176,6 @@ and height_offset = function
 
 (* --- Specialized visitors --- *)
 
-let iter_lvals f =
-  let open Eva_ast_visitor.Fold in
-  let neutral = () and combine () () = () in
-  visit_exp ~neutral ~combine {
-    default with
-    fold_lval = fun ~visitor lval -> f lval; default.fold_lval ~visitor lval
-  }
-
 let exp_contains_volatile, lval_contains_volatile =
   let open Eva_ast_visitor.Fold in
   let neutral = false and combine b1 b2 = b1 || b2 in
