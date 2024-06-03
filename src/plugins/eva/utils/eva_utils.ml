@@ -178,17 +178,6 @@ let postconditions_mention_result spec =
     false
   with Exit -> true
 
-let conv_comp op =
-  let module C = Abstract_interp.Comp in
-  match op with
-  | Eq -> C.Eq
-  | Ne -> C.Ne
-  | Le -> C.Le
-  | Lt -> C.Lt
-  | Ge -> C.Ge
-  | Gt -> C.Gt
-  | _ -> assert false
-
 let conv_relation rel =
   let module C = Abstract_interp.Comp in
   match rel with

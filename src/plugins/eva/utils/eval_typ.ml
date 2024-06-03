@@ -133,38 +133,6 @@ let compatible_functions typ_pointer ?args kfs =
   in
   List.fold_left check_pointer ([], false) kfs
 
-
-(* Does the expr contains a lval having a volatile part ? *)
-let rec expr_contains_volatile expr =
-  let rec aux expr = match expr.enode with
-    | Lval lval -> lval_contains_volatile lval
-    | UnOp (_, e, _) | CastE (_, e) -> aux e
-    | AddrOf lv | StartOf lv -> lval_contains_volatile lv
-    | BinOp (_, e1, e2, _) -> aux e1 || aux e2
-    | _ -> false
-  in
-  aux expr
-
-(* Does the lval (or sub expr) has a volatile part ? *)
-and lval_contains_volatile lval =
-  Cil.isVolatileLval lval ||
-  expr_in_lval_contains_volatile lval
-
-and expr_in_lval_contains_volatile (lhost, offset) =
-  expr_in_host_contains_volatile lhost ||
-  expr_in_offset_contains_volatile offset
-
-and expr_in_host_contains_volatile = function
-  | Var _ -> false
-  | Mem e ->
-    expr_contains_volatile e
-
-and expr_in_offset_contains_volatile = function
-  | NoOffset -> false
-  | Field (_, o) -> expr_in_offset_contains_volatile o
-  | Index (e, o) ->
-    expr_in_offset_contains_volatile o || expr_contains_volatile e
-
 (* Scalar types *)
 
 type integer_range = { i_bits: int; i_signed: bool }

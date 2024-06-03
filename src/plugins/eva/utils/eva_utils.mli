@@ -97,7 +97,6 @@ val find_return_var: kernel_function -> varinfo option
 val postconditions_mention_result: Cil_types.funspec -> bool
 (** Does the post-conditions of this specification mention [\result]? *)
 
-val conv_comp: binop -> Abstract_interp.Comp.t
 val conv_relation: relation -> Abstract_interp.Comp.t
 
 val lval_to_exp: lval -> exp

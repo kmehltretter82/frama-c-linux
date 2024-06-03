@@ -57,13 +57,6 @@ val compatible_functions:
   typ -> ?args:typ list -> Kernel_function.t list ->
   Kernel_function.t list * bool
 
-val expr_contains_volatile: exp -> bool
-val lval_contains_volatile: lval -> bool
-(** Those two expressions indicate that one l-value contained inside
-    the arguments (and the l-value itself for [lval_contains_volatile]) has
-    volatile qualifier. Relational analyses should not learn anything on
-    such values. *)
-
 (** Abstraction of an integer type, more convenient than an [ikind] because
     it can also be used for bitfields. *)
 type integer_range = { i_bits: int; i_signed: bool }
