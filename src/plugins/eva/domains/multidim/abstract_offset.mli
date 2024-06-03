@@ -30,7 +30,7 @@ type t =
 val pretty : Format.formatter -> t -> unit
 
 val of_var_address : Cil_types.varinfo -> t
-val of_evast_offset : (Eva_ast.exp -> Int_val.t) ->
+val of_eva_offset : (Eva_ast.exp -> Int_val.t) ->
   Cil_types.typ -> Eva_ast.offset -> t or_top
 val of_ival : base_typ:Cil_types.typ -> typ:Cil_types.typ -> Ival.t -> t or_top
 val of_term_offset : Cil_types.typ -> Cil_types.term_offset -> t or_top

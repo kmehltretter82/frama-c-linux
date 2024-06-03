@@ -499,8 +499,7 @@ module Rewriting = struct
   (* Evaluates the Cil expression [expr], by rewriting it into octagonal
      constraints using [evaluate_expr] to evaluate sub-expressions, and
      then using [evaluate_octagon] to evaluate the octagons. *)
-  let evaluate_through_octagons (eval : evaluator) evaluate_octagon env
-      (expr : Eva_ast.exp) =
+  let evaluate_through_octagons (eval : evaluator) evaluate_octagon env expr =
     let evaluate_octagon acc (sign, octagon) =
       match evaluate_octagon octagon with
       | None -> acc
@@ -1658,8 +1657,7 @@ module Domain = struct
 
   let reduce_further state expr value =
     match expr.node with
-    | Lval lval
-      when Cil.(isIntegralOrPointerType lval.typ) ->
+    | Lval lval when Cil.(isIntegralOrPointerType lval.typ) ->
       begin
         try
           let x_ival = Cvalue.V.project_ival value in

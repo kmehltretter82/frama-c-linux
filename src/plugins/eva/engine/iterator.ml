@@ -385,12 +385,11 @@ module Make_Dataflow
     (* Check unspecified sequences *)
     match stmt.skind with
     | UnspecifiedSequence seq when Kernel.UnspecifiedAccess.get () ->
-      let seq = List.map (fun (stmt, modified, writes, reads, refs) ->
-          stmt,
-          List.map Eva_ast.translate_lval modified,
-          List.map Eva_ast.translate_lval writes,
-          List.map Eva_ast.translate_lval reads,
-          refs) seq in
+      let translate = List.map Eva_ast.translate_lval in
+      let translate_elt (stmt, modified, writes, reads, refs) =
+        stmt, translate modified, translate writes, translate reads, refs
+      in
+      let seq = List.map translate_elt seq in
       let check s =
         Transfer.check_unspecified_sequence stmt s seq = `Value ()
       in

@@ -126,9 +126,9 @@ module Make
     let init_value = Abstract_domain.Top in
     Domain.initialize_variable lval location ~initialized:true init_value state
 
-  (* Applies a single Cil initializer, using the standard transfer function on
+  (* Applies a single initializer, using the standard transfer function on
      assignments. Warns if the results is bottom. *)
-  let apply_evast_single_initializer ~source kinstr state lval expr =
+  let apply_eva_single_initializer ~source kinstr state lval expr =
     match Transfer.assign state kinstr lval expr with
     | `Bottom ->
       if kinstr = Kglobal then
@@ -140,18 +140,18 @@ module Make
   (* Applies an initializer. If [top_volatile] is true, sets volatile locations
      to top without applying the initializer. Otherwise, lets the standard
      transfer function on assignments handle volatile locations. *)
-  let rec apply_evast_initializer ~top_volatile kinstr lval init state =
+  let rec apply_eva_initializer ~top_volatile kinstr lval init state =
     if top_volatile && Cil.typeHasQualifier "volatile" lval.typ
     then initialize_top_volatile lval state
     else
       match init with
       | SingleInit (exp, loc) ->
         let source = fst loc in
-        apply_evast_single_initializer ~source kinstr state lval exp
+        apply_eva_single_initializer ~source kinstr state lval exp
       | CompoundInit (_typ, l) ->
         let doinit state (off, init) =
           let lval = Eva_ast.add_offset lval off in
-          apply_evast_initializer ~top_volatile kinstr lval init state
+          apply_eva_initializer ~top_volatile kinstr lval init state
         in
         List.fold_left doinit state l
 
@@ -161,7 +161,7 @@ module Make
     let loc = Cil_datatype.Location.unknown in
     let init = Eva_ast.translate_init (Cil.makeZeroInit ~loc vi.vtype) in
     let lval = Eva_ast.Build.var vi in
-    apply_evast_initializer ~top_volatile:true kinstr lval init state
+    apply_eva_initializer ~top_volatile:true kinstr lval init state
 
   (* ----------------------- Non Lib-entry mode ----------------------------- *)
 
@@ -191,7 +191,7 @@ module Make
     match init with
     | None -> state
     | Some init ->
-      apply_evast_initializer ~top_volatile:false kinstr lval init state
+      apply_eva_initializer ~top_volatile:false kinstr lval init state
 
 
   (* --------------------------- Lib-entry mode ----------------------------- *)
@@ -208,7 +208,7 @@ module Make
         let lval = Eva_ast.translate_lval lval
         and exp = Eva_ast.translate_exp exp
         and source = fst exp.eloc in
-        apply_evast_single_initializer ~source kinstr state lval exp
+        apply_eva_single_initializer ~source kinstr state lval exp
       else state
     | CompoundInit (typ, l) ->
       if Cil.typeHasQualifier "volatile" typ || not (Cil.isConstType typ)
@@ -326,21 +326,14 @@ module Make
     let open Current_loc.Operators in
     let<> UpdatedCurrentLoc = vi.vdecl in
     let state = Domain.enter_scope Abstract_domain.Global [vi] state in
-    let state = if vi.vsource then
-        let initialize =
-          if lib_entry || (vi.vstorage = Extern)
-          then
-            initialize_var_lib_entry
-          else
-            fun ki vi init state ->
-              let init = Option.map Eva_ast.translate_init init in
-              initialize_var_not_lib_entry ki ~local:false vi init state
-        in
-        initialize Kglobal vi init.init state
-      else state
-    in
-    state
-
+    if vi.vsource then
+      if lib_entry || (vi.vstorage = Extern)
+      then
+        initialize_var_lib_entry Kglobal vi init.init state
+      else
+        let init = Option.map Eva_ast.translate_init init.init in
+        initialize_var_not_lib_entry ~local:false Kglobal vi init state
+    else state
 
 
   (* Compute the initial state with all global variable initialized. *)

@@ -75,9 +75,9 @@ and constant =
   | CReal of float * fkind * string option
   | CEnum of Enumitem.t * exp (* the translated expression that this enumitem refers to *)
 
-and lval_node = lhost * offset
-
 and lval = lval_node tag
+
+and lval_node = lhost * offset
 
 and lhost =
   | Var of varinfo

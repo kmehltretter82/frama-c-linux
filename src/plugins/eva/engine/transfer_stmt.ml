@@ -162,20 +162,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   let evaluate_and_check ?valuation ~subdivnb state expr =
     let res = Eval.evaluate ?valuation ~subdivnb state expr in
-    report_unreachability state res "the expression %a"
-      Eva_ast.pp_exp expr;
+    report_unreachability state res "the expression %a" Eva_ast.pp_exp expr;
     res
 
   let lvaluate_and_check ?valuation ~subdivnb ~for_writing state lval =
     let res = Eval.lvaluate ?valuation ~subdivnb ~for_writing state lval in
-    report_unreachability state res "the lvalue %a"
-      Eva_ast.pp_lval lval;
+    report_unreachability state res "the lvalue %a" Eva_ast.pp_lval lval;
     res
 
   let copy_lvalue_and_check ?valuation ~subdivnb state lval =
     let res = Eval.copy_lvalue ?valuation ~subdivnb state lval in
-    report_unreachability state res "the copy of %a"
-      Eva_ast.pp_lval lval;
+    report_unreachability state res "the copy of %a" Eva_ast.pp_lval lval;
     res
 
   (* ------------------------------------------------------------------------ *)

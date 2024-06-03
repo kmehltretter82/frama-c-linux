@@ -116,20 +116,20 @@ let assert_valid_index idx size =
 let of_var_address vi =
   NoOffset vi.Cil_types.vtype
 
-let rec of_evast_offset (oracle : Eva_ast.exp -> Int_val.t) base_typ = function
+let rec of_eva_offset (oracle : Eva_ast.exp -> Int_val.t) base_typ = function
   | Eva_ast.NoOffset -> `Value (NoOffset base_typ)
   | Field (fi, sub) ->
     if Cil.typeHasQualifier "volatile" fi.ftype then
       `Top
     else
-      let+ sub' = of_evast_offset oracle fi.ftype sub in
+      let+ sub' = of_eva_offset oracle fi.ftype sub in
       Field (fi, sub')
   | Index (exp, sub) ->
     match Cil.unrollType base_typ with
     | TArray (elem_typ, array_size, _) ->
       let idx = oracle exp in
       let+ () = assert_valid_index idx array_size
-      and+ sub' = of_evast_offset oracle elem_typ sub in
+      and+ sub' = of_eva_offset oracle elem_typ sub in
       Index (Some exp, idx, elem_typ, sub')
     | _ -> assert false
 

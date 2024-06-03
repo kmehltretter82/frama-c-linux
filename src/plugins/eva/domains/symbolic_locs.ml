@@ -115,8 +115,7 @@ end
    Otherwise, the value should be inferred by the cvalue domain, or can be
    precisely computed from values inferred by the cvalue domain. *)
 let interesting_exp get_locs get_val e =
-  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false
-  in
+  let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false in
   let rec has_lvalue e =
     match e.node with
     | Lval _ ->

@@ -25,8 +25,6 @@
 open Cil_types
 open Eval
 
-type constant = Eva_ast.constant
-
 (** Type for the truth value of an assertion in a value abstraction. The two
     last tags should be used only for a product of value abstractions. *)
 type 'v truth =
@@ -135,7 +133,7 @@ module type S = sig
 
   (** Embeds C constants into value abstractions: returns an abstract value
       for the given constant. The constant cannot be an enumeration constant. *)
-  val constant : context enriched -> exp -> constant -> t
+  val constant : context enriched -> Eva_ast.exp -> Eva_ast.constant -> t
 
   (** [forward_unop typ unop v] evaluates the value [unop v], resulting from the
       application of the unary operator [unop] to the value [v].  [typ] is the

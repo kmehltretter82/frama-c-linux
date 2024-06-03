@@ -393,10 +393,6 @@ module Make
     | `Value record -> record
     | `Top -> assert false
 
-  let _find_loc valuation lval = match Valuation.find_loc valuation lval with
-    | `Value record -> record
-    | `Top -> assert false
-
   (* --------------------- Types for the subdivision ------------------------ *)
 
   (* Information about a subdivided lvalue: the lvalue expression, its record

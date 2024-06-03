@@ -284,16 +284,14 @@ let find_lonely_candidate eval_ptr loop_effect expr =
    - to a function call, or if [inner_loop] is true, it raises [exn]. *)
 let transfer_assign lval exn f ~inner_loop acc transition =
   let is_lval = Eva_ast.Lval.equal lval in
+  let is_lval_var vi = is_lval (Eva_ast.Build.var vi) in
   match transition with
-  | Eva_automata.Assign (lv, expr, _loc)
-    when is_lval lv ->
+  | Eva_automata.Assign (lv, expr, _stmt) when is_lval lv ->
     if inner_loop then raise exn else f expr acc
-  | Init (vi, SingleInit (expr, _loc), _loc')
-    when is_lval (Eva_ast.Build.var vi) && not inner_loop ->
+  | Init (vi, SingleInit (expr, _), _) when is_lval_var vi && not inner_loop ->
     f expr acc
-  | Init (vi, _, _) when is_lval (Eva_ast.Build.var vi) -> raise exn
-  | Call (Some lv, _, _, _) when is_lval lv ->
-    raise exn
+  | Init (vi, _, _) when is_lval_var vi -> raise exn
+  | Call (Some lv, _, _, _) when is_lval lv -> raise exn
   | _ -> acc
 
 (* If in the [loop], [lval] is always assigned to the value of another
@@ -343,10 +341,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      [acc.delta], according to [binop] which can be PlusA or MinusA.
      Raises NoIncrement if [expr] is not a constant integer expression. *)
   let add_to_delta context binop acc (expr : Eva_ast.exp) =
-    let typ = expr.typ in
     match Eva_ast.fold_to_integer expr with
     | None -> raise NoIncrement
     | Some i ->
+      let typ = expr.typ in
       let inject i = Val.inject_int typ i in
       let add v = let* v in Val.forward_binop context typ binop v (inject i) in
       { value = add acc.value; delta = add acc.delta; }

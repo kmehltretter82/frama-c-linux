@@ -93,9 +93,7 @@ struct
         try
           match Logic_utils.constFoldTermToInt t with
           | Some n -> Partition.IntLimit (Integer.to_int_exn n)
-          | None   ->
-            let cil_exp = Logic_to_c.term_to_exp t in
-            Partition.ExpLimit (cil_exp)
+          | None   -> Partition.ExpLimit (Logic_to_c.term_to_exp t)
         with Z.Overflow | Logic_to_c.No_conversion ->
           warn "invalid loop unrolling parameter; ignoring";
           default

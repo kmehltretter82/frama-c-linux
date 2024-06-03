@@ -169,11 +169,6 @@ let rec signed_counterpart typ =
   | TPtr _ -> signed_counterpart Cil.(theMachine.upointType)
   | _ -> assert false
 
-let exp_alarm_signed_converted_downcast exp =
-  let src_typ = exp.typ in
-  let signed_typ = signed_counterpart src_typ in
-  Eva_ast.Build.(cast signed_typ exp)
-
 let return t = `Value t, Alarmset.none
 
 (* Intersects [alarms] with the only possible alarms from the dereference of
@@ -394,7 +389,8 @@ module Make
 
   let truncate_bound overflow_kind bound bound_kind expr value =
     let alarm () =
-      let cil_expr = Eva_ast.to_cil_exp expr in (* The expression does not necessary come from the original program *)
+      (* The expression does not necessary come from the original program *)
+      let cil_expr = Eva_ast.to_cil_exp expr in
       Alarms.Overflow (overflow_kind, cil_expr, bound, bound_kind)
     in
     let bound = Abstract_value.Int bound in
@@ -657,7 +653,8 @@ module Make
       if not src.i_signed then
         let signed_src = { src with i_signed = true } in
         let signed_v = Value.rewrap_integer context signed_src value in
-        let signed_exp = exp_alarm_signed_converted_downcast expr in
+        let signed_typ = signed_counterpart expr.typ in
+        let signed_exp = Eva_ast.Build.cast signed_typ expr in
         signed_exp, signed_src, signed_v
       else expr, src, value
     in
@@ -1676,7 +1673,7 @@ module Make
             else Alarmset.True
           in
           let cil_v = Eva_ast.to_cil_exp v in
-          let cil_args = Option.map (List.map (Eva_ast.to_cil_exp)) args in
+          let cil_args = Option.map (List.map Eva_ast.to_cil_exp) args in
           let alarm = Alarms.Function_pointer (cil_v, cil_args) in
           let alarms = Alarmset.singleton ~status alarm in
           Bottom.bot_of_list list, alarms

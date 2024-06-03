@@ -22,9 +22,6 @@
 
 open Eva_ast_types
 
-let type_of node =
-  node.typ
-
 let type_of_const : constant -> typ = function
   | CTopInt ik -> Cil_types.TInt (ik, [])
   | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
@@ -64,8 +61,8 @@ let type_of_exp_node : exp_node -> typ = function
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
-  | AddrOf (lv) -> TPtr (lv.typ, [])
-  | StartOf (lv) ->
-    match Cil.unrollType (lv.typ) with
-    | TArray (t,_,attrs) -> TPtr(t, attrs)
+  | AddrOf lv -> TPtr (lv.typ, [])
+  | StartOf lv ->
+    match Cil.unrollType lv.typ with
+    | TArray (t, _, attrs) -> TPtr (t, attrs)
     | _ ->  assert false

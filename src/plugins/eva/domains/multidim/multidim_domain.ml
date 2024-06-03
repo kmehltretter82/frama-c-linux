@@ -182,7 +182,7 @@ struct
       if Eva_ast.lval_contains_volatile lval then
         `Top
       else
-        Offset.of_evast_offset oracle' base_typ offset in
+        Offset.of_eva_offset oracle' base_typ offset in
     match host with
     | Var vi ->
       `Value (Map.singleton (Base.of_varinfo vi) offset)
