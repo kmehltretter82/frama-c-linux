@@ -219,9 +219,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if Cil.isStructOrUnionType typ
     then
       let truth = Location.assume_no_overlap ~partial:true loc right_loc in
-      let lval' = Eva_ast.to_cil_lval lval in
-      let right_lval' = Eva_ast.to_cil_lval right_lval in
-      let alarm () = Alarms.Overlap (lval', right_lval') in
+      let alarm () =
+        let cil_lval = Eva_ast.to_cil_lval lval in
+        let cil_right_lval = Eva_ast.to_cil_lval right_lval in
+        Alarms.Overlap (cil_lval, cil_right_lval)
+      in
       Eval.interpret_truth ~alarm (loc, right_loc) truth
     else `Value (loc, right_loc), Alarmset.none
 
@@ -797,9 +799,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let list2, _ = eval_list valuation lvs2 in
     let check acc (lval1, loc1) (lval2, loc2) =
       let truth = Location.assume_no_overlap ~partial:false loc1 loc2 in
-      let lval1' = Eva_ast.to_cil_lval lval1
-      and lval2' = Eva_ast.to_cil_lval lval2 in
-      let alarm () = Alarms.Not_separated (lval1', lval2') in
+      let alarm () =
+        let cil_lval1 = Eva_ast.to_cil_lval lval1
+        and cil_lval2 = Eva_ast.to_cil_lval lval2 in
+        Alarms.Not_separated (cil_lval1, cil_lval2)
+      in
       let alarm = process_truth ~alarm truth in
       Alarmset.combine alarm acc
     in

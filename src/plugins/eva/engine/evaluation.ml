@@ -453,8 +453,7 @@ module Make
     let+ value =
       if Kernel.InvalidPointer.get () then
         let truth = Value.assume_pointer value in
-        let cil_expr = Eva_ast.to_cil_exp expr in
-        let alarm () = Alarms.Invalid_pointer cil_expr in
+        let alarm () = Alarms.Invalid_pointer (Eva_ast.to_cil_exp expr) in
         interpret_truth ~alarm value truth
       else return value
     in
@@ -535,12 +534,13 @@ module Make
     let open Evaluated.Operators in
     let size_int = Abstract_value.Int (Integer.pred size) in
     let zero_int = Abstract_value.Int Integer.zero in
-    let alarm_index_expr () = Eva_ast.to_cil_exp index_expr in
-    let alarm () = Alarms.Index_out_of_bound (alarm_index_expr (), None) in
+    let alarm () =
+      Alarms.Index_out_of_bound (Eva_ast.to_cil_exp index_expr, None)
+    in
     let truth = Value.assume_bounded Alarms.Lower_bound zero_int value in
     let* value = reduce_by_truth ~alarm (index_expr, value) truth in
     let alarm () =
-      Alarms.Index_out_of_bound (alarm_index_expr (), Some size_expr)
+      Alarms.Index_out_of_bound (Eva_ast.to_cil_exp index_expr, Some size_expr)
     in
     let truth = Value.assume_bounded Alarms.Upper_bound size_int value in
     reduce_by_truth ~alarm (index_expr, value) truth
@@ -564,9 +564,7 @@ module Make
         let kind = Abstract_value.Subtraction in
         let truth = Value.assume_comparable kind v1 v2 in
         let alarm () =
-          Alarms.Differing_blocks (
-            Eva_ast.to_cil_exp e1,
-            Eva_ast.to_cil_exp e2)
+          Alarms.Differing_blocks (Eva_ast.to_cil_exp e1, Eva_ast.to_cil_exp e2)
         in
         let arg1 = Some e1, v1 in
         reduce_by_double_truth ~alarm arg1 arg2 truth
@@ -584,9 +582,9 @@ module Make
   let forward_comparison ~compute typ kind (e1, v1) (e2, v2) =
     let truth = Value.assume_comparable kind v1 v2 in
     let alarm () =
-      Alarms.Pointer_comparison (
-        Option.map Eva_ast.to_cil_exp e1,
-        Eva_ast.to_cil_exp e2)
+      let cil_e1 = Option.map Eva_ast.to_cil_exp e1
+      and cil_e2 = Eva_ast.to_cil_exp e2 in
+      Alarms.Pointer_comparison (cil_e1, cil_e2)
     in
     let propagate_all = propagate_all_pointer_comparison typ in
     let args, alarms =
@@ -711,8 +709,9 @@ module Make
       then prev_float (Fval.kind fkind) fbound
       else fbound
     in
-    let cil_expr = Eva_ast.to_cil_exp expr in
-    let alarm () = Alarms.Float_to_int (cil_expr, bound, bound_kind) in
+    let alarm () =
+      Alarms.Float_to_int (Eva_ast.to_cil_exp expr, bound, bound_kind)
+    in
     let bound = Abstract_value.Float (float_bound, fkind) in
     let truth = Value.assume_bounded bound_kind bound value in
     reduce_by_truth ~alarm (expr, value) truth
@@ -976,8 +975,7 @@ module Make
       let bitfield = Eva_ast.is_bitfield lval in
       let truth = Loc.assume_valid_location ~for_writing ~bitfield loc in
       let access = Alarms.(if for_writing then For_writing else For_reading) in
-      let cil_lval = Eva_ast.to_cil_lval lval in
-      let alarm () = Alarms.Memory_access (cil_lval, access) in
+      let alarm () = Alarms.Memory_access (Eva_ast.to_cil_lval lval, access) in
       let+ valid_loc = interpret_truth ~alarm loc truth in
       let reduction = if Loc.equal_loc valid_loc loc then Neither else Forward in
       valid_loc, reduction, volatile
