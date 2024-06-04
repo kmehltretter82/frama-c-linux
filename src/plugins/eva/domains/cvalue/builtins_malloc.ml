@@ -1097,16 +1097,6 @@ let get_base_allocation_site base =
 
 (* Incremental analysis utils *)
 
-let import_kf kf =
-  match Ast_diff.Kernel_function.find kf with
-  | `Same kf' | `Partial(kf', _) -> kf'
-  | _ -> raise Not_found
-
-let import_stmt stmt = 
-  match Ast_diff.Stmt.find stmt with
-  | `Same stmt | `Partial (stmt, _) -> stmt
-  | _ -> raise Not_found
-
 let import_dynamic_bases project =
   let gather () = Base_hptmap.fold (fun base cs acc -> (base, cs) :: acc) (Dynamic_Alloc_Bases.get ()) []
   in
@@ -1142,7 +1132,7 @@ let import_kf_alloc_sites project tbl =
   let list = Project.on project gather () in
   let import (kf, stmts) = 
     try
-      let kf = import_kf kf in
+      let kf = Eva_diff.import_callsite_kf kf in
       let sites = AllocSite.Set.fold (fun site acc -> 
           let site = AllocSite.import site in
           AllocSite.Set.add site acc)
@@ -1158,9 +1148,9 @@ let import_kf_call_sites project tbl =
   let list = Project.on project gather () in
   let import (kf, call_sites) = 
     try
-      let kf = import_kf kf in
+      let kf = Eva_diff.import_callsite_kf kf in
       let call_sites = CallSite.Set.fold (fun stmt acc -> 
-          let stmt = import_stmt stmt in
+          let stmt = Eva_diff.import_callsite_stmt stmt in
           CallSite.Set.add stmt acc)
           call_sites CallSite.Set.empty in
       Kf_Call_Sites.add kf call_sites
@@ -1181,7 +1171,7 @@ let import_kf_alloc_bases project tbl =
   in
   let import (kf, (_, b')) = 
     try
-      let kf = import_kf kf in
+      let kf = Eva_diff.import_callsite_kf kf in
       (* Fst should always be empty after an analysis *)
       let bases = 
         Base.Hptset.empty, import_bases b' in

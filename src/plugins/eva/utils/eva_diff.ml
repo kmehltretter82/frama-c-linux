@@ -125,3 +125,18 @@ end
 
 let import_expr expr = Visitor.visitFramacExpr (import_visitor ()) expr
 let import_lval lval = Visitor.visitFramacLval (import_visitor ()) lval
+
+
+let import_callsite_kf kf = match Ast_diff.Kernel_function.find kf with
+  | `Same kf | `Partial (kf, _) -> kf
+  | `Not_present -> raise Not_found
+
+let import_callsite_stmt stmt = match Ast_diff.Stmt.find stmt with
+  | `Same stmt -> stmt
+  | `Partial (stmt, diff)->
+    begin
+      match diff with
+      | `Body_changed -> raise Not_found
+      | _ -> stmt
+    end
+  | `Not_present -> raise Not_found
