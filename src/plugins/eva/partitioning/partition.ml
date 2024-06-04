@@ -31,9 +31,7 @@ type split_kind = Eva_annotations.split_kind = Static | Dynamic
 (* Same as Eva_annotations.split_term but with Eva_ast. *)
 type split_term =
   | Expression of Eva_ast.Exp.t
-  | Predicate of (Cil_datatype.Predicate.t
-                  [@compare Logic_utils.compare_predicate]
-                  [@equal Datatype.from_compare])
+  | Predicate of Cil_datatype.PredicateStructEq.t
 [@@deriving eq, ord]
 
 let translate_split_term
@@ -85,8 +83,8 @@ module SplitTerm = Datatype.Make_with_collections (struct
       | Predicate p -> Printer.pp_predicate fmt p
 
     let hash = function
-      | Expression e -> FCHashtbl.hash (1, Exp.hash e)
-      | Predicate p -> FCHashtbl.hash (2, Predicate.hash p)
+      | Expression e -> Hashtbl.hash (1, Exp.hash e)
+      | Predicate p -> Hashtbl.hash (2, Predicate.hash p)
   end)
 
 module SplitMonitor = Datatype.Make_with_collections (

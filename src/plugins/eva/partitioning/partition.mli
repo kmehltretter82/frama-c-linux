@@ -153,12 +153,12 @@ type action =
       Previous rationing is erased and replaced by this new stamping.
       Implementation of the option -eva-split-return. *)
   | Split of split_monitor
-  (** If [monitor] has been built as [new_monitor ~split_limit exp] then
-      [Split (monitor)] tries to separate states such as the [exp]
-      evaluates to a singleton value in each state in the flow. If necessary and
-      possible, splits states into multiple states. States in which the [exp]
+  (** If [monitor] has been built as [new_monitor ~limit ~kind ~term] then
+      [Split monitor] tries to separate states such as the [term] evaluates
+      to a singleton value in each state in the flow. If necessary and
+      possible, splits states into multiple states. States in which the [term]
       evaluates to different values will be kept separate. Gives up the split
-      if [exp] evaluates to more than [split_limit] values. A same monitor can
+      if [term] evaluates to more than [limit] values. A same monitor can
       be used for successive splits on different flows. *)
   | Merge of Eva_annotations.split_term
   (** Forgets the split of an expression: states that were kept separate only
