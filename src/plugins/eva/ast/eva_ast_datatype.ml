@@ -29,33 +29,37 @@ module Varinfo = Cil_datatype.Varinfo
 (** Hashing functions  *)
 
 let rec hash_lval lv =
-  let (h,o) = lv.node in
+  let (h, o) = lv.node in
   Hashtbl.hash (hash_lhost h, hash_offset o)
+
 and hash_lhost = function
   | Var v -> Hashtbl.hash (1, Varinfo.hash v)
   | Mem e -> Hashtbl.hash (2, hash_exp e)
+
 and hash_offset = function
-  | NoOffset -> Hashtbl.hash (1, ())
+  | NoOffset -> Hashtbl.hash 1
   | Index (e, o) -> Hashtbl.hash (2, hash_exp e, hash_offset o)
   | Field (f, o) -> Hashtbl.hash (3, f.forder, hash_offset o)
+
 and hash_exp e =
   match e.node with
   | Const c -> Hashtbl.hash (1, hash_constant c)
   | Lval lv -> Hashtbl.hash (2, hash_lval lv)
-  | UnOp (op, e, ty) ->
-    Hashtbl.hash (8, op, hash_exp e, Typ.hash ty)
-  | BinOp (op, e1, e2, ty) ->
-    Hashtbl.hash (9, op, hash_exp e1, hash_exp e2, Typ.hash ty)
-  | CastE (ty, e) -> Hashtbl.hash (10, Typ.hash ty, hash_exp e)
-  | AddrOf lv -> Hashtbl.hash (11, hash_lval lv)
-  | StartOf lv -> Hashtbl.hash (12, hash_lval lv)
+  | UnOp (op, e, typ) -> Hashtbl.hash (3, op, hash_exp e, Typ.hash typ)
+  | BinOp (op, e1, e2, typ) ->
+    Hashtbl.hash (4, op, hash_exp e1, hash_exp e2, Typ.hash typ)
+  | CastE (typ, e) -> Hashtbl.hash (5, Typ.hash typ, hash_exp e)
+  | AddrOf lv -> Hashtbl.hash (6, hash_lval lv)
+  | StartOf lv -> Hashtbl.hash (7, hash_lval lv)
+
 and hash_constant c =
   match c with
   | CTopInt ikind -> Hashtbl.hash (1, ikind)
-  | CString _ | CChr _ -> Hashtbl.hash (2, c)
-  | CReal (fn, fk, _) -> Hashtbl.hash (3, fn, fk)
-  | CInt64 (n, k, _) -> Hashtbl.hash (4, n, k)
-  | CEnum (ei, _) -> Hashtbl.hash (5, ei.einame)
+  | CString base -> Hashtbl.hash (2, Base.hash base)
+  | CChr c -> Hashtbl.hash (3, c)
+  | CReal (fn, fk, _) -> Hashtbl.hash (4, fn, fk)
+  | CInt64 (n, k, _) -> Hashtbl.hash (5, n, k)
+  | CEnum (ei, _) -> Hashtbl.hash (6, ei.einame)
 
 
 (* Exported modules *)
@@ -115,6 +119,6 @@ module Constant = Datatype.Make_with_collections (struct
     let compare = compare_constant
     let equal = equal_constant
     let hash = hash_constant
-    let reprs = [ CInt64(Integer.zero, IInt, Some "0") ]
+    let reprs = [ CInt64 (Integer.zero, IInt, None) ]
     let pretty = Eva_ast_printer.pp_constant
   end)
