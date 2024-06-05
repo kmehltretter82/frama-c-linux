@@ -40,7 +40,8 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | Index (_, o) ->
     type_of_offset (Cil.typeOf_array_elem basetyp) o
   | Field (fi, o) ->
-    let base_attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs basetyp) in
+    let base_attrs = Cil.typeAttr (Cil.unrollType basetyp) in
+    let base_attrs = Cil.filter_qualifier_attributes base_attrs in
     let base_attrs =
       if Cil.hasAttribute Cil.frama_c_mutable fi.fattr then
         Cil.dropAttribute "const" base_attrs
