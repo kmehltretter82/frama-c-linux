@@ -20,6 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
+open Cil_datatype
 open Server
 module Md = Markdown
 
@@ -91,4 +92,56 @@ module Regions = Data.Jlist(Region)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Server API                                                         --- *)
+(* -------------------------------------------------------------------------- *)
+
+let regions map =
+  let pool = ref [] in
+  Memory.iter map (fun _ r -> pool := r :: !pool) ;
+  List.rev !pool
+
+let map_of_localizable (loc : Printer_tag.localizable) =
+  let open Printer_tag in
+  match kf_of_localizable loc with
+  | None -> raise Not_found
+  | Some kf ->
+    let domain = Analysis.find kf in
+    match ki_of_localizable loc with
+    | Kglobal -> domain.map
+    | Kstmt s -> Stmt.Map.find s domain.body
+
+let map_of_declaration (decl : Printer_tag.declaration) =
+  match decl with
+  | SFunction kf -> (Analysis.find kf).map
+  | _ -> raise Not_found
+
+let () =
+  Request.register
+    ~package ~kind:`EXEC ~name:"compute"
+    ~descr:(Md.plain "Compute region domain for the given declaration")
+    ~input:(module Kernel_ast.Decl)
+    ~output:(module Data.Junit)
+    (function SFunction kf -> Analysis.compute kf | _ -> ())
+
+let () =
+  Request.register
+    ~package ~kind:`GET ~name:"regions"
+    ~descr:(Md.plain "Compute regions for the given declaration")
+    ~input:(module Kernel_ast.Decl)
+    ~output:(module Regions)
+    begin fun decl ->
+      try regions @@ map_of_declaration decl
+      with Not_found -> []
+    end
+
+let () =
+  Request.register
+    ~package ~kind:`GET ~name:"regionsAt"
+    ~descr:(Md.plain "Compute regions at the given marker position")
+    ~input:(module Kernel_ast.Marker)
+    ~output:(module Regions)
+    begin fun loc ->
+      try regions @@ map_of_localizable loc
+      with Not_found -> []
+    end
+
 (* -------------------------------------------------------------------------- *)

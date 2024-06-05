@@ -49,12 +49,14 @@ module STATE = State_builder.Hashtbl(Kernel_function.Hashtbl)(DOMAIN)
 (* ---  Memoized Access                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-let domain kf =
+let find = STATE.find
+
+let get kf =
   try STATE.find kf with Not_found ->
     Options.feedback ~ontty:`Transient "Function %a" Kernel_function.pretty kf ;
     let domain = Code.domain kf in
     STATE.add kf domain ; domain
 
-let compute kf = ignore (domain kf)
+let compute kf = ignore @@ get kf
 
 (* -------------------------------------------------------------------------- *)

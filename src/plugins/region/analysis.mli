@@ -22,8 +22,11 @@
 
 open Cil_types
 
+(** @raises Not_found *)
+val find : kernel_function -> Code.domain
+
 (** Memoized *)
-val domain : kernel_function -> Code.domain
+val get : kernel_function -> Code.domain
 
 (** Memoized *)
 val compute : kernel_function -> unit

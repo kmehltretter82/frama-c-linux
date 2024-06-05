@@ -28,3 +28,6 @@ val package : Package.package
 module Node : Data.S with type t = Memory.node
 module Range : Output with type t = Memory.node Ranges.range
 module Region : Output with type t = Memory.region
+
+(** @raises Not_found *)
+val map_of_localizable : Printer_tag.localizable -> Memory.map
