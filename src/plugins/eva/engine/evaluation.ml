@@ -482,7 +482,7 @@ module Make
   let assume_valid_value context lval res =
     let open Evaluated.Operators in
     let* value, origin = res in
-    match lval.typ with
+    match Cil.unrollType lval.typ with
     | TFloat (fkind, _) ->
       let expr = Eva_ast.Build.lval lval in
       let+ new_value = remove_special_float expr fkind value in
