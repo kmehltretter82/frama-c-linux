@@ -1,5 +1,5 @@
 int x,y;
-char t[8];
+char t[10];
 
 int main(int c)
 {

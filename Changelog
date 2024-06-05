@@ -22,16 +22,28 @@ Open Source Release <next-release>
 Open Source Release 29.0 (Copper)
 ###############################################################################
 
+-   Ivette    [2024-05-03] Fix performance issues on large codebases.
 -   Kernel    [2024-04-30] new warning category too-large-array, allowing to
               use array > SIZE_MAX by changing its status (default is error).
+-   Eva       [2024-04-26] Improve builtins memcpy, memmove and memset when
+              arguments are imprecise.
 o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in
               the user manual about how to manually replace it.
 -!  Kernel    [2024-04-19] Change format of custom_defs field in machdep schema
               and allow #undefining builtin macros in the command-line.
+-   Eva       [2024-04-18] Remove support for deprecated WIDEN_HINTS loop pragma.
+              Use ACSL extension "widen_hints" instead.
 o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
 -   Alias     [2024-04-16] Fix analysis results in the presence of structures.
               Complete rework of the API. Improved documentation. Fix stack
               overflow in case of a cyclic graph.
+-   Eva       [2024-04-10] Reduce pointer values according to ACSL predicate
+              \base_addr.
+-*  Eva       [2024-04-10] Fix a crash when running successive analyses using
+              the -eva-domains-function parameter.
+-   Ivette    [2024-04-09] New notifications at the bottom-right of the main
+              window. Some components are highlighted in the bottom bar when
+              they are updated but are not currently visible.
 -   Kernel    [2024-04-04] Avoid ambiguous pretty-printing when C labels match
               the name of an ACSL built-in label (fix #@1359)
 -!  Kernel    [2024-04-02] Systematically abort when a function is redeclared
@@ -41,13 +53,31 @@ o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
 o   Kernel    [2024-04-02] Annotations.{fold,iter}_behaviors now pass full
               behaviors to the iterated function. To iter on fragments split by
               behavior and emitter, use {fold,iter}_behaviors_by_emitter.
+-   Eva       [2024-03-29] Reduce pointer values according to ACSL predicate
+              valid_string and valid_read_string.
 o!  Kernel    [2024-03-29] Refactor current location handling mechanism
+o   Ivette    [2024-03-29] Upgrade to node 20 and electron 28. Use vite instead
+              of webpack. Upgrade many dependencies.
+-   Ivette    [2024-03-28] In the Eva values table, show values before/after
+              statements with annotation, as values can be reduced after them.
+-   Ivette    [2024-03-26] Add feedback when the user requests the evaluation
+              of a custom term.
 -   Kernel    [2024-03-26] Introduce \plugin:: prefix for ACSL extensions,
               unknown extensions can be safely ignored when the plug-in that
               handles them is not available
+-   Ivette    [2024-03-20] Add shortcut to select next/previous tab.
+-   Ivette    [2024-03-14] Complete redesign of the main view. Components and
+              views can be selected in the left sidebar (the right sidebar has
+              been removed). The top bar contains tabs of the currently selected
+              views. Components can be docked in the bottom bar, to be shown or
+              hidden on a simple click.
 -*  Variadic  [2024-03-07] Make sure that generated functions have fresh names
 o!  Kernel    [2024-03-07] More coherent naming of functions determining if a
               symbol is a Frama-C built-in.
+-   Eva       [2024-03-04] Better reporting of imprecise "garbled mix" values
+              (resulting from imprecise or unsupported operations on addresses)
+              through more relevant messages and a compact summary at the end of
+              the analysis, enabled by default.
 -*  Kernel    [2024-03-04] Accept conditional expr whose 2d and 3d operands
               have type void, as per C11 6.5.15§3
 -*  Kernel    [2024-02-22] When an array is declared with a fixed length l,
@@ -57,6 +87,8 @@ o!  Kernel    [2024-01-29] Db is now mostly empty, the only remaining value is
               Db.Main.extend which is deprecated and replaced by
               Boot.Main.extend. Features related to asynchronous interactions
               are now handled in module Async
+-   Ivette    [2023-11-24] Global variables and types are listed in the sidebar.
+              Global variables can be filtered according to some criteria.
 
 ###############################################################################
 Open Source Release 28.1 (Nickel)
