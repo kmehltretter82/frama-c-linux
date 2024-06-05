@@ -30,7 +30,7 @@
 */
 
 import React, { ReactNode } from 'react';
-import { Debug } from 'dome';
+import { DEVEL, Debug } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { Button } from 'dome/controls/buttons';
 
@@ -53,7 +53,6 @@ export interface CatchProps {
   label?: string;
   /** Alternative renderer callback in case of errors. */
   onError?: JSX.Element | ErrorRenderer;
-
   children: ReactNode;
 }
 
@@ -62,25 +61,34 @@ interface CatchState {
   info?: unknown;
 }
 
+/* eslint-disable react/prop-types */
+
 /**
    React Error Boundaries.
  */
 export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
-  constructor(private p: CatchProps) {
-    super(p);
+  constructor(props: CatchProps) {
+    super(props);
     this.state = {};
     this.logerr = this.logerr.bind(this);
     this.reload = this.reload.bind(this);
   }
 
   componentDidCatch(error: unknown, info: unknown): void {
-    this.setState({ error, info });
+    if (DEVEL) {
+      const { label='Error' } = this.props;
+      D.error(label, ': ', error, info);
+    }
+  }
+
+  static getDerivedStateFromError(error: unknown, info: unknown): CatchState {
+    return { error, info };
   }
 
   logerr(): void {
     const { error, info } = this.state;
-    D.error('catched error:', error, info);
+    D.error('Catched error:', error, info);
   }
 
   reload(): void {
@@ -89,7 +97,7 @@ export class Catch extends React.Component<CatchProps, CatchState, unknown> {
 
   render(): JSX.Element {
     const { error, info } = this.state;
-    const { onError, label = 'Error' } = this.p;
+    const { onError, label = 'Error' } = this.props;
     if (error) {
       if (typeof onError === 'function')
         return onError(error, info, this.reload);
@@ -106,7 +114,7 @@ export class Catch extends React.Component<CatchProps, CatchState, unknown> {
         </div>
       );
     }
-    return (<>{this.p.children}</>);
+    return (<>{this.props.children}</>);
   }
 }
 

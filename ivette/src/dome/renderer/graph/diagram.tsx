@@ -58,6 +58,8 @@ export type Box = Cell | Box[];
 export interface Node {
   /** Node identifier (unique). */
   id: string;
+  /** Cluster identifier */
+  cluster?: string;
   /** Node label */
   label?: string;
   /** Node tooltip */
@@ -102,13 +104,25 @@ export interface Edge {
   tailLabel?: string,
 }
 
+export interface Cluster {
+  /** Identifier */
+  id: string;
+  /** Label (default is none) */
+  label?: string;
+  /** Title (default is none) */
+  title?: string;
+  /** Background color (default is grey) */
+  color?: Color;
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Graph Component Properties                                         --- */
 /* -------------------------------------------------------------------------- */
 
 export interface DiagramProps {
-  nodes: readonly Node[];
-  edges: readonly Edge[];
+  nodes?: readonly Node[];
+  edges?: readonly Edge[];
+  clusters?: readonly Cluster[];
 
   /**
      Element to focus on.
@@ -137,6 +151,7 @@ export interface DiagramProps {
 /* --- Color Model                                                        --- */
 /* -------------------------------------------------------------------------- */
 
+// node background colors
 const BGCOLOR = {
   'white': '#fff',
   'grey': '#ccc',
@@ -151,6 +166,22 @@ const BGCOLOR = {
   'pink': 'hotpink',
 };
 
+// cluster background colors
+const SGCOLOR = {
+  'white': '#eee',
+  'grey': '#ccc',
+  'dark': '#aaa',
+  'primary': '#4fc3f7',
+  'selected': '#90caf9',
+  'green': '#AED581',
+  'orange': '#FFCC80',
+  'red': '#ff6e6e',
+  'yellow': '#fff59d',
+  'blue': '#bbdefb',
+  'pink': '#f8bbd0',
+};
+
+// foreground colors
 const FGCOLOR = {
   'white': 'black',
   'grey': 'black',
@@ -165,6 +196,7 @@ const FGCOLOR = {
   'pink': 'white',
 };
 
+// edge colors
 const EDCOLOR = {
   'white': '#ccc',
   'grey': '#888',
@@ -192,6 +224,8 @@ const DIR = (h: Arrow, t: Arrow): string | undefined =>
 /* --- Dot Model                                                          --- */
 /* -------------------------------------------------------------------------- */
 
+type cluster = { props: Cluster; nodes: Node[]; }
+
 class Builder {
 
   private selected: string | undefined;
@@ -200,6 +234,7 @@ class Builder {
   private kid = 0;
   private imap = new Map<string, string>();
   private rmap = new Map<string, string>();
+  private cmap = new Map<string, cluster>();
 
   index(id: string): string {
     const n = this.imap.get(id);
@@ -210,6 +245,25 @@ class Builder {
     return m;
   }
 
+  findCluster(id: string): cluster {
+    const c = this.cmap.get(id);
+    if (c !== undefined) return c;
+    const d = { props: { id }, nodes: [] };
+    this.cmap.set(id, d);
+    return d;
+  }
+
+  addClusterNode(n: Node): void {
+    if (n.cluster !== undefined) {
+      this.findCluster(n.cluster).nodes.push(n);
+    }
+  }
+
+  setClusterProps(props: Cluster): void {
+    const c = this.findCluster(props.id);
+    c.props = props;
+  }
+
   nodeId(n: string): string {
     return this.rmap.get(n) ?? n;
   }
@@ -217,6 +271,7 @@ class Builder {
   init(): Builder {
     this.spec = 'digraph {\n';
     this.selected = undefined;
+    this.cmap.clear();
     // Keep node index to fade in & out
     return this;
   }
@@ -244,15 +299,15 @@ class Builder {
     return this.print(a.split('"').join('\\"'));
   }
 
-  value(a: string | number): Builder {
+  value(a: string | number | boolean): Builder {
     if (typeof a === 'string')
       return this.print('"').escaped(a).print('"');
     else
       return this.print(`${a}`);
   }
 
-  attr(a: string, v: string | number | undefined): Builder {
-    return v ? this.print(' ', a, '=').value(v).print('; ') : this;
+  attr(a: string, v: string | number | boolean | undefined): Builder {
+    return v ? this.print(' ', a, '=').value(v).print(';') : this;
   }
 
   // --- Node Table Shape
@@ -281,28 +336,54 @@ class Builder {
 
   // --- Node
   node(n: Node): void {
-    this.print('  ').port(n.id).print(' [');
+    this
+      .print('  ')
+      .port(n.id)
+      .print(' [')
+      .attr('id', n.id);
     if (typeof n.shape === 'object') {
       this
         .attr('shape', 'record')
         .print(' label="')
         .record(n.shape)
-        .print('"; ');
+        .print('";')
+        .attr('tooltip', n.title ?? n.id);
     } else {
       this
         .attr('label', n.label ?? n.id)
-        .attr('shape', n.shape);
+        .attr('shape', n.shape)
+        .attr('tooltip', n.title ?? n.label ?? n.id);
     }
     const color = n.color ?? (n.id === this.selected ? 'selected' : 'white');
     this
-      .attr('id', n.id)
-      .attr('tooltip', n.title)
       .attr('fontcolor', FGCOLOR[color])
       .attr('fillcolor', BGCOLOR[color])
-      .println('];');
+      .println(' ];');
+  }
+
+  cluster(c: cluster): void {
+    const { props: s, nodes } = c;
+    const { color = 'grey' } = s;
+    this
+      .print('  subgraph cluster_', this.index(s.id), ' {\n   ')
+      .attr('style', 'filled')
+      .attr('label', s.label)
+      .attr('tooltip', s.title ?? s.id)
+      .attr('fontcolor', FGCOLOR[color])
+      .attr('fillcolor', SGCOLOR[color])
+      .print('\n   ');
+    nodes.forEach(n => this.print(' ', this.index(n.id), ';'));
+    this.println('\n  }');
+  }
+
+  clusters(cs: readonly Cluster[]): Builder {
+    cs.forEach(c => this.setClusterProps(c));
+    return this;
   }
 
   nodes(ns: readonly Node[]): Builder {
+    ns.forEach(n => this.addClusterNode(n));
+    this.cmap.forEach(c => this.cluster(c));
     ns.forEach(n => this.node(n));
     return this;
   }
@@ -310,6 +391,7 @@ class Builder {
   // --- Edge
   edge(e: Edge): void {
     const { line = 'solid', head = 'arrow', tail = 'none' } = e;
+    const tooltip = e.title ?? e.label ?? `${e.source} -> ${e.target}`;
     this
       .print('  ')
       .port(e.source, e.sourcePort)
@@ -319,7 +401,10 @@ class Builder {
       .attr('label', e.label)
       .attr('headlabel', e.headLabel)
       .attr('taillabel', e.tailLabel)
-      .attr('labeltooltip', e.title)
+      .attr('labeltooltip', e.label ? tooltip : undefined)
+      .attr('headtooltip', e.headLabel ? tooltip : undefined)
+      .attr('tailtooltip', e.tailLabel ? tooltip : undefined)
+      .attr('tooltip', tooltip)
       .attr('dir', DIR(head, tail))
       .attr('color', e.color ? EDCOLOR[e.color] : undefined)
       .attr('style', line === 'solid' ? undefined : line)
@@ -350,19 +435,28 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
   const builder = React.useMemo(() => new Builder, []);
 
   // --- Model Generation
-  const { direction = 'LR', nodes, edges, selected } = props;
+  const {
+    direction = 'LR',
+    clusters = [],
+    nodes = [],
+    edges = [],
+    selected
+  } = props;
+
   const model = React.useMemo(() =>
     builder
       .init()
       .select(selected)
+      .print(' ')
       .attr('rankdir', direction)
       .attr('bgcolor', 'none')
       .attr('width', 0.5)
       .println('node [ style="filled" ];')
+      .clusters(clusters)
       .nodes(nodes)
       .edges(edges)
       .flush()
-    , [builder, direction, nodes, edges, selected]
+    , [builder, direction, clusters, nodes, edges, selected]
   );
 
   // --- Model Update Callback
@@ -442,8 +536,7 @@ export function Diagram(props: DiagramProps): JSX.Element {
             </div>
           )}
         </AutoSizer >
-      )
-      }
+      )}
     </>
   );
 }
