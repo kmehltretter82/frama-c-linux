@@ -220,7 +220,7 @@ function computeFcts(
     const ef = eva.getData(kf.key);
     arr.push({ ...ef, ...kf });
   });
-  return arr.sort((f, g) => alpha(f.name, g.name));
+  return arr;
 }
 
 type FunctionProps = InfiniteScrollableListProps
@@ -300,6 +300,7 @@ export function Functions(props: FunctionProps): JSX.Element {
   const items =
     fcts
       .filter(showFunction)
+      .sort((f, g) => alpha(f.name, g.name))
       .map((fct) => <FctItem key={fct.key} fct={fct} current={current} />);
 
   return (
@@ -399,6 +400,7 @@ export function Variables(props: VariablesProps): JSX.Element {
   const items =
     variables
       .filter(showVariable)
+      .sort((v1, v2) => alpha(v1.name, v2.name))
       .map((v) => makeVarItem(scope, v));
 
   return (
@@ -451,6 +453,7 @@ export function Declarations(props: DeclarationsProps): JSX.Element {
     () =>
       data
         .filter(filter)
+        .sort((d1, d2) => alpha(d1.name, d2.name))
         .map((d) => makeItem(scope, d))
     , [scope, data, filter]
   );
