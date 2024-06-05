@@ -49,7 +49,7 @@ val create : unit -> map
 val copy : map -> map
 
 val root : map -> Cil_types.varinfo -> node
-val cell : map -> ?size:int -> ?ptr:node -> unit -> node
+val cell : map -> ?size:int -> ?ptr:node -> ?root:varinfo -> unit -> node
 val range : map -> size:int -> offset:int -> length:int -> data:node -> node
 
 val node : map -> node -> node

@@ -93,20 +93,6 @@ let empty = {
   layout = Blob ;
 }
 
-let cell (m: map) ?size ?ptr () =
-  let layout = match size, ptr with
-    | None, None -> Blob
-    | None, Some _ -> Cell(Cil.bitsSizeOf Cil.voidPtrType,ptr)
-    | Some s, _ -> Cell(s,ptr)
-  in Ufind.make m.store { empty with layout }
-
-let range (m: map) ~size ~offset ~length ~data : node =
-  let last = offset + length in
-  if not (0 <= offset && offset < last && last <= size) then
-    raise (Invalid_argument "Region.Memory.range") ;
-  let layout = Compound(size, Ranges.singleton { offset ; length ; data }) in
-  Ufind.make m.store { empty with layout }
-
 (* -------------------------------------------------------------------------- *)
 (* --- Map                                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -117,14 +103,37 @@ let node map node =
 
 let nodes map ns = Store.list @@ List.map (node map) ns
 
+(* -------------------------------------------------------------------------- *)
+(* --- Constructors                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
 let region map node =
   try Ufind.get map.store node
   with Not_found -> empty
 
+let cell (m: map) ?size ?ptr ?root () =
+  let layout = match size, ptr with
+    | None, None -> Blob
+    | None, Some _ -> Cell(Cil.bitsSizeOf Cil.voidPtrType,ptr)
+    | Some s, _ -> Cell(s,ptr) in
+  let roots = match root with None -> [] | Some v -> [v] in
+  Ufind.make m.store { empty with layout ; roots }
+
+let update (m: map) (n: node) (f: region -> region) =
+  let r = region m n in Ufind.set m.store n (f r)
+
+let range (m: map) ~size ~offset ~length ~data : node =
+  let last = offset + length in
+  if not (0 <= offset && offset < last && last <= size) then
+    raise (Invalid_argument "Region.Memory.range") ;
+  let layout = Compound(size, Ranges.singleton { offset ; length ; data }) in
+  let n = Ufind.make m.store { empty with layout } in
+  update m data (fun r -> { r with parents = n :: r.parents }) ; n
+
 let root (m: map) v =
   try Vmap.find v m.index with Not_found ->
-    let r = cell m () in
-    m.index <- Vmap.add v r m.index ; r
+    let n = cell m ~root:v () in
+    m.index <- Vmap.add v n m.index ; n
 
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
