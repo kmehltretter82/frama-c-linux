@@ -27,7 +27,7 @@
 import React from 'react';
 import { Scroll } from 'dome/layout/boxes';
 import { HSplit } from 'dome/layout/splitters';
-import { Diagram, Node, Edge } from 'dome/graph/diagram';
+import { Diagram, Node, Edge, Cluster } from 'dome/graph/diagram';
 import { registerSandbox } from 'ivette';
 
 // --------------------------------------------------------------------------
@@ -45,17 +45,17 @@ const nodes: Node[] = [
       { label: 'Dashed "e"', port: 'e' },
     ]
   },
-  { id: 'white', color: 'white' },
-  { id: 'grey', color: 'grey' },
-  { id: 'dark', color: 'dark' },
-  { id: 'primary', color: 'primary' },
-  { id: 'selected', color: 'selected' },
-  { id: 'green', color: 'green' },
-  { id: 'orange', color: 'orange' },
-  { id: 'red', color: 'red' },
-  { id: 'yellow', color: 'yellow' },
-  { id: 'blue', color: 'blue' },
-  { id: 'pink', color: 'pink' },
+  { id: 'white', color: 'white', cluster: 'BG' },
+  { id: 'grey', color: 'grey', cluster: 'BG' },
+  { id: 'dark', color: 'dark', cluster: 'BG' },
+  { id: 'primary', color: 'primary', cluster: 'BG' },
+  { id: 'selected', color: 'selected', cluster: 'BG' },
+  { id: 'green', color: 'green', cluster: 'BG' },
+  { id: 'orange', color: 'orange', cluster: 'BG' },
+  { id: 'red', color: 'red', cluster: 'BG' },
+  { id: 'yellow', color: 'yellow', cluster: 'BG' },
+  { id: 'blue', color: 'blue', cluster: 'BG' },
+  { id: 'pink', color: 'pink', cluster: 'BG' },
   { id: 'X' }, { id: 'Y' }
 ];
 
@@ -87,9 +87,15 @@ const edges: Edge[] = [
   },
 ];
 
+function makeCluster(s: string | undefined): Cluster {
+  const color = nodes.find(n => n.id === s)?.color;
+  return { id: 'BG', title: 'Background Cluster', color };
+}
+
 function DiagramSample(): JSX.Element {
   const [model, setModel] = React.useState('');
   const [selected, setSelected] = React.useState<string>();
+  const clusters = React.useMemo(() => [makeCluster(selected)], [selected]);
   return (
     <HSplit settings='sandbox.diagram.split'>
       <Scroll>
@@ -101,6 +107,7 @@ function DiagramSample(): JSX.Element {
       <Diagram
         nodes={nodes}
         edges={edges}
+        clusters={clusters}
         selected={selected}
         onModelChanged={setModel}
         onSelection={setSelected}
