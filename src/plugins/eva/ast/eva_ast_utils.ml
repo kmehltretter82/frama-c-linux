@@ -26,12 +26,13 @@ open Eva_ast_builder
 
 (* --- Conversion to Cil --- *)
 
+(* Memoization to avoid creating too many expressions. *)
 module ConversionToCil =
   State_builder.Hashtbl
     (Eva_ast_datatype.Exp.Hashtbl)
     (Cil_datatype.Exp)
     (struct
-      let name = "Value.Eva_ast_utils.ConversionToCil"
+      let name = "Eva.Eva_ast_utils.ConversionToCil"
       let size = 16
       let dependencies = [ Ast.self ]
     end)
@@ -39,30 +40,29 @@ module ConversionToCil =
 let rec to_cil_exp exp =
   match exp.origin with
   | Exp e -> e
-  | _ -> ConversionToCil.memo (fun e -> build_cil_exp e.node) exp
+  | _ -> ConversionToCil.memo build_cil_exp exp
 
-and build_cil_exp node =
-  let exp_node = match node with
-    | Const c -> Cil_types.Const (to_cil_const c)
+and build_cil_exp exp =
+  let exp_node : Cil_types.exp_node =
+    match exp.node with
+    | Const c -> Const (to_cil_const c)
     | Lval lv -> Lval (to_cil_lval lv)
     | UnOp (op, e, t) -> UnOp (to_cil_unop op, to_cil_exp e, t)
     | BinOp (op, e1, e2, t) ->
       BinOp (to_cil_binop op, to_cil_exp e1, to_cil_exp e2, t)
     | CastE (t, e) -> CastE (t, to_cil_exp e)
-    | AddrOf (lv) -> AddrOf (to_cil_lval lv)
-    | StartOf (lv) -> StartOf (to_cil_lval lv)
+    | AddrOf lv -> AddrOf (to_cil_lval lv)
+    | StartOf lv -> StartOf (to_cil_lval lv)
   in
   Cil.new_exp ~loc:Cil_datatype.Location.unknown exp_node
 
-and to_cil_unop op =
-  match op with
-  | Neg -> Cil_types.Neg
+and to_cil_unop : Eva_ast_types.unop -> Cil_types.unop = function
+  | Neg -> Neg
   | BNot -> BNot
   | LNot -> LNot
 
-and to_cil_binop op =
-  match op with
-  | PlusA -> Cil_types.PlusA
+and to_cil_binop : Eva_ast_types.binop -> Cil_types.binop = function
+  | PlusA -> PlusA
   | PlusPI -> PlusPI
   | MinusA -> MinusA
   | MinusPI -> MinusPI
@@ -88,31 +88,26 @@ and to_cil_lval lval =
   match lval.origin with
   | Lval lv -> lv
   | _ ->
-    let (lh, off) = lval.node in
-    to_cil_lh lh, to_cil_offset off
+    let (lhost, offset) = lval.node in
+    to_cil_lhost lhost, to_cil_offset offset
 
-and to_cil_lh lhost =
-  match lhost with
-  | Var vi -> Cil_types.Var (vi)
+and to_cil_lhost : Eva_ast_types.lhost -> Cil_types.lhost = function
+  | Var vi -> Var vi
   | Mem e -> Mem (to_cil_exp e)
 
-and to_cil_offset offset =
-  match offset with
-  | NoOffset -> Cil_types.NoOffset
+and to_cil_offset : Eva_ast_types.offset -> Cil_types.offset = function
+  | NoOffset -> NoOffset
   | Field (fi, off) -> Field (fi, to_cil_offset off)
   | Index (e, off) -> Index (to_cil_exp e, to_cil_offset off)
 
-and to_cil_const const =
-  match const with
-  | CTopInt _ -> to_cil_fail ()
-  | CInt64 (i, ik, s) -> Cil_types.CInt64 (i, ik, s)
-  | CString (_base) -> to_cil_fail ()
-  | CChr (c) -> CChr (c)
+and to_cil_const : Eva_ast_types.constant -> Cil_types.constant = function
+  | CInt64 (i, ik, s) -> CInt64 (i, ik, s)
+  | CChr c -> CChr c
   | CReal (f, fk, s) -> CReal (f, fk, s)
-  | CEnum (ei, _) -> CEnum (ei)
-
-and to_cil_fail () =
-  invalid_arg "this AST cannot be converted to cil"
+  | CEnum (ei, _) -> CEnum ei
+  | CTopInt _ | CString _ as constant ->
+    Self.fatal "The Eva constant %a cannot be converted to cil"
+      Eva_ast_printer.pp_constant constant
 
 
 (* --- Queries --- *)
@@ -127,8 +122,8 @@ let is_mutable (lval : lval) : bool =
       let base_mutable = base_mutable || Cil.(hasAttribute frama_c_mutable fi.fattr) in
       aux base_mutable fi.ftype off
     | TArray(typ, _, _), Index(_, off) -> aux base_mutable typ off
-    | _typ, Index _ ->
-      invalid_arg "Index on a non-array type"
+    | typ, Index _ ->
+      Self.fatal "Index on non-array type %a" Printer.pp_typ typ
   in
   aux false (Eva_ast_typing.type_of_lhost lhost) offset
 
@@ -180,7 +175,7 @@ let exp_contains_volatile, lval_contains_volatile =
   let open Eva_ast_visitor.Fold in
   let neutral = false and combine b1 b2 = b1 || b2 in
   let fold_lval ~visitor lval =
-    Cil.isVolatileType (lval.typ) || default.fold_lval ~visitor lval
+    Cil.isVolatileType lval.typ || default.fold_lval ~visitor lval
   in
   let folder = { default with fold_lval } in
   visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
@@ -190,12 +185,10 @@ let vars_in_exp, vars_in_lval =
   let open Eva_ast_visitor.Fold in
   let neutral = VarSet.empty and combine = VarSet.union in
   let fold_lval ~visitor lval =
-    let set =
-      match lval.node with
-      | Var vi, _ -> VarSet.singleton vi
-      | Mem e, _ -> visitor.exp e
-    in
-    VarSet.union set (default.fold_lval ~visitor lval)
+    let vars = default.fold_lval ~visitor lval in
+    match fst lval.node with
+    | Var vi -> VarSet.add vi vars
+    | Mem _ -> vars
   in
   let folder = { default with fold_lval } in
   visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
