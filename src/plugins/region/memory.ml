@@ -54,6 +54,26 @@ type map = {
   mutable index: node Vmap.t ;
 }
 
+(* -------------------------------------------------------------------------- *)
+(* --- Accessors                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_) -> s
+let points_to = function Blob | Compound _ -> None | Cell(_,p) -> p
+let ranges = function Blob | Cell _ -> [] | Compound(_,R rs) -> rs
+
+let types (m : region) : typ list =
+  let pool = ref Typ.Set.empty in
+  let add acs =
+    pool := Typ.Set.add (Cil.unrollType @@ Access.typeof acs) !pool in
+  Access.Set.iter add m.reads ;
+  Access.Set.iter add m.writes ;
+  Typ.Set.elements !pool
+
+(* -------------------------------------------------------------------------- *)
+(* --- Printers                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
 let pp_node fmt (n : node) = Format.fprintf fmt "R%04x" @@ Store.id n
 
 let pp_layout fmt = function
@@ -61,12 +81,28 @@ let pp_layout fmt = function
   | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
   | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
   | Compound(s,rg) ->
-    Format.fprintf fmt "@[<hov 2>{%04d" s ;
+    Format.fprintf fmt "@[<hv 0>{%04d" s ;
     Ranges.iteri
       (fun (rg : range) ->
          Format.fprintf fmt "@ | %a: %a" Ranges.pp_range rg pp_node rg.data
       ) rg ;
-    Format.fprintf fmt " }@]"
+    Format.fprintf fmt "@ }@]"
+
+let pp_region fmt (n: node) (m: region) =
+  begin
+    let acs r s = if Access.Set.is_empty s then '-' else r in
+    Format.fprintf fmt "@[<hov 2>%a: %c%c%c" pp_node n
+      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
+    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (types m) ;
+    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.roots ;
+    if Options.debug_atleast 1 then
+      begin
+        Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
+        Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
+        Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
+      end ;
+    Format.fprintf fmt "@ %a ;@]" pp_layout m.layout ;
+  end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Constructors                                                       --- *)
@@ -81,10 +117,6 @@ let copy m = {
   store = Ufind.copy m.store ;
   index = m.index ;
 }
-
-let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_) -> s
-let points_to = function Blob | Compound _ -> None | Cell(_,p) -> p
-let ranges = function Blob | Cell _ -> [] | Compound(_,R rs) -> rs
 
 let empty = {
   parents = [] ;
@@ -242,8 +274,8 @@ let merge_region (m: map) (q: queue) (a : region) (b : region) : region = {
   parents = nodes m (Store.bag a.parents b.parents) ;
   roots = Store.bag a.roots b.roots ;
   reads = Access.Set.union a.reads b.reads ;
-  writes = Access.Set.union a.reads b.writes ;
-  shifts = Access.Set.union a.reads b.shifts ;
+  writes = Access.Set.union a.writes b.writes ;
+  shifts = Access.Set.union a.shifts b.shifts ;
   layout = merge_layout m q a.layout b.layout ;
 }
 

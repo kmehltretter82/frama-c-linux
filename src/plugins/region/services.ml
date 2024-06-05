@@ -71,11 +71,18 @@ struct
       "sizeof", Jnumber ;
       "ranges", Ranges.jtype ;
       "pointsTo", NodeOpt.jtype ;
+      "reads", Jboolean ;
+      "writes", Jboolean ;
+      "shifts", Jboolean ;
+      "types", Jarray Kernel_ast.Marker.jtype ;
     ]
 
   let roots_to_json vs =
     let open Cil_types in
     Json.of_list @@ List.map (fun v -> Json.of_string v.vname) vs
+
+  let typ_to_json typ =
+    Kernel_ast.Marker.to_json @@ Printer_tag.PType typ
 
   let to_json (m: Memory.region) =
     Json.of_fields [
@@ -84,6 +91,10 @@ struct
       "sizeof", Json.of_int @@ Memory.sizeof m.layout ;
       "ranges", Ranges.to_json @@ Memory.ranges m.layout ;
       "pointsTo", NodeOpt.to_json @@ Memory.points_to m.layout ;
+      "reads", Json.of_bool @@ not @@ Access.Set.is_empty m.reads ;
+      "writes", Json.of_bool @@ not @@ Access.Set.is_empty m.writes ;
+      "shifts", Json.of_bool @@ not @@ Access.Set.is_empty m.shifts ;
+      "types", Json.of_list @@ List.map typ_to_json @@ Memory.types m ;
     ]
   let of_json _ = failwith "Region.Layout.of_json"
 end

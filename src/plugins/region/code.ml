@@ -83,7 +83,7 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     value m s k ;
     let r = pointer m s p in
-    Memory.shift m r (Exp(s,e)) ;
+    Memory.shift m r (Exp(s,p)) ;
     Some r
 
   | BinOp(_,a,b,_) ->

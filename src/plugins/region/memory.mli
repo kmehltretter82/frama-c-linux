@@ -41,9 +41,11 @@ type region = private {
 val sizeof : layout -> int
 val points_to : layout -> node option
 val ranges : layout -> node Ranges.range list
+val types : region -> typ list
 
 val pp_node : Format.formatter -> node -> unit
 val pp_layout : Format.formatter -> layout -> unit
+val pp_region : Format.formatter -> node -> region -> unit
 
 type map
 

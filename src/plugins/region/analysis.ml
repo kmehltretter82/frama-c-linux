@@ -53,9 +53,19 @@ let find = STATE.find
 
 let get kf =
   try STATE.find kf with Not_found ->
-    Options.feedback ~ontty:`Transient "Function %a" Kernel_function.pretty kf ;
+    Options.feedback ~ontty:`Transient "Function %a…" Kernel_function.pretty kf ;
     let domain = Code.domain kf in
-    STATE.add kf domain ; domain
+    STATE.add kf domain ;
+    Options.result "@[<v 2>Function %a:%t@]@."
+      Kernel_function.pretty kf
+      begin fun fmt ->
+        Memory.iter domain.map
+          begin fun r m ->
+            Format.pp_print_newline fmt () ;
+            Memory.pp_region fmt r m ;
+          end
+      end ;
+    domain
 
 let compute kf = ignore @@ get kf
 
