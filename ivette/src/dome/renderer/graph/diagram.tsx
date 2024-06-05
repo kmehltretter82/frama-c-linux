@@ -151,6 +151,7 @@ export interface DiagramProps {
 /* --- Color Model                                                        --- */
 /* -------------------------------------------------------------------------- */
 
+// node background colors
 const BGCOLOR = {
   'white': '#fff',
   'grey': '#ccc',
@@ -165,6 +166,22 @@ const BGCOLOR = {
   'pink': 'hotpink',
 };
 
+// cluster background colors
+const SGCOLOR = {
+  'white': '#eee',
+  'grey': '#ccc',
+  'dark': '#aaa',
+  'primary': '#4fc3f7',
+  'selected': '#90caf9',
+  'green': '#AED581',
+  'orange': '#FFCC80',
+  'red': '#ff6e6e',
+  'yellow': '#fff59d',
+  'blue': '#bbdefb',
+  'pink': '#f8bbd0',
+};
+
+// foreground colors
 const FGCOLOR = {
   'white': 'black',
   'grey': 'black',
@@ -179,6 +196,7 @@ const FGCOLOR = {
   'pink': 'white',
 };
 
+// edge colors
 const EDCOLOR = {
   'white': '#ccc',
   'grey': '#888',
@@ -352,7 +370,7 @@ class Builder {
       .attr('label', s.label)
       .attr('tooltip', s.title ?? s.id)
       .attr('fontcolor', FGCOLOR[color])
-      .attr('fillcolor', BGCOLOR[color])
+      .attr('fillcolor', SGCOLOR[color])
       .print('\n   ');
     nodes.forEach(n => this.print(' ', this.index(n.id), ';'));
     this.println('\n  }');
