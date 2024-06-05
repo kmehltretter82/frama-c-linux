@@ -42,6 +42,7 @@ let set s k v = s := Imap.add k v !s
 let eq _s i j = (i == j)
 
 let id x = x
+let forge x = x
 let list = List.sort_uniq Int.compare
 let rec bag a b =
   match a, b with

@@ -30,3 +30,6 @@ val bag: 'a list -> 'a list -> 'a list
 
 (** Sorted, unique *)
 val list : 'a rref list -> 'a rref list
+
+(**/**)
+val forge : int -> 'a rref

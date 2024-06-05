@@ -39,5 +39,6 @@ val merge : ('a range -> 'a range -> 'a) -> 'a t -> 'a t -> 'a t
 val squash : ('a -> 'a -> 'a) -> 'a t -> 'a option
 
 val find : int -> 'a t -> 'a range
+val map : ('a -> 'b) -> 'a t -> 'b t
 val iter : ('a -> unit) -> 'a t -> unit
 val iteri : ('a range -> unit) -> 'a t -> unit

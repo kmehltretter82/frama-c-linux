@@ -21,24 +21,31 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (rule
-  (alias frama-c-configure)
-  (deps (universe))
-  (action (progn
-            (echo "Region:" %{lib-available:frama-c-region.core} "\n")
-            (echo " - Frama-C:" %{lib-available:frama-c.kernel} "\n"))))
+ (alias frama-c-configure)
+ (deps (universe))
+ (action
+  (progn
+   (echo "Region:" %{lib-available:frama-c-region.core} "\n")
+   (echo "  - Server:" %{lib-available:frama-c-server.core} "\n")
+   (echo "  - UnionFind:" %{lib-available:unionFind} "\n"))))
 
-(env (release (flags -noassert)))
+(env
+ (release
+  (flags -noassert)))
 
 (library
-  (name Region)
-  (public_name frama-c-region.core)
-  (flags -open Frama_c_kernel :standard -w -9)
-  (libraries frama-c.kernel unionFind)
-  (instrumentation (backend landmarks))
-  (instrumentation (backend bisect_ppx)))
+ (name Region)
+ (public_name frama-c-region.core)
+ (flags -open Frama_c_kernel :standard -w -9)
+ (libraries frama-c.kernel frama-c-server.core unionFind)
+ (instrumentation
+  (backend landmarks))
+ (instrumentation
+  (backend bisect_ppx)))
 
 (plugin
-  (optional)
-  (name region)
-  (libraries frama-c-region.core)
-  (site (frama-c plugins)))
+ (optional)
+ (name region)
+ (libraries frama-c-region.core)
+ (site
+  (frama-c plugins)))

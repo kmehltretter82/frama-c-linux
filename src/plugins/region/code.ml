@@ -72,7 +72,7 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
     Memory.read m rv (Lval(s,lv)) ;
     if Cil.isPointerType @@ Cil.typeOfLval lv then
       let rp = cell m () in
-      Memory.points_to m rv rp ;
+      Memory.pointer m rv rp ;
       Some rp
     else
       None
@@ -112,7 +112,7 @@ let rec init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
   | SingleInit e ->
     let r = lval m s lv in
     Memory.write m r acs ;
-    Option.iter (Memory.points_to m r) (exp m s e)
+    Option.iter (Memory.pointer m r) (exp m s e)
 
   | CompoundInit(_,fvs) ->
     List.iter
@@ -133,7 +133,7 @@ let instr (m:map) (s:stmt) (instr:instr) =
     let r = lval m s lv in
     let v = exp m s e in
     Memory.write m r (Lval(s,lv)) ;
-    Option.iter (Memory.points_to m r) v
+    Option.iter (Memory.pointer m r) v
 
   | Local_init(x,AssignInit iv,_) ->
     let acs = Access.Init(s,x) in

@@ -83,6 +83,8 @@ let copy m = {
 }
 
 let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_) -> s
+let points_to = function Blob | Compound _ -> None | Cell(_,p) -> p
+let ranges = function Blob | Cell _ -> [] | Compound(_,R rs) -> rs
 
 let empty = {
   parents = [] ;
@@ -97,19 +99,22 @@ let empty = {
 (* --- Map                                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+let id = Store.id
+let forge = Store.forge
+
 let node map node =
   try Ufind.find map.store node
   with Not_found -> node
 
 let nodes map ns = Store.list @@ List.map (node map) ns
 
+let get map node =
+  try Ufind.get map.store node
+  with Not_found -> empty
+
 (* -------------------------------------------------------------------------- *)
 (* --- Constructors                                                       --- *)
 (* -------------------------------------------------------------------------- *)
-
-let region map node =
-  try Ufind.get map.store node
-  with Not_found -> empty
 
 let cell (m: map) ?size ?ptr ?root () =
   let layout = match size, ptr with
@@ -120,7 +125,8 @@ let cell (m: map) ?size ?ptr ?root () =
   Ufind.make m.store { empty with layout ; roots }
 
 let update (m: map) (n: node) (f: region -> region) =
-  let r = region m n in Ufind.set m.store n (f r)
+  let r = get m n in
+  Ufind.set m.store n (f r)
 
 let range (m: map) ~size ~offset ~length ~data : node =
   let last = offset + length in
@@ -128,7 +134,7 @@ let range (m: map) ~size ~offset ~length ~data : node =
     raise (Invalid_argument "Region.Memory.range") ;
   let layout = Compound(size, Ranges.singleton { offset ; length ; data }) in
   let n = Ufind.make m.store { empty with layout } in
-  update m data (fun r -> { r with parents = n :: r.parents }) ; n
+  update m data (fun r -> { r with parents = nodes m @@ n :: r.parents }) ; n
 
 let root (m: map) v =
   try Vmap.find v m.index with Not_found ->
@@ -136,12 +142,47 @@ let root (m: map) v =
     m.index <- Vmap.add v n m.index ; n
 
 (* -------------------------------------------------------------------------- *)
+(* --- Iterator                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let normalize map r = {
+  parents = nodes map r.parents ;
+  roots = r.roots ;
+  reads = r.reads ;
+  writes = r.writes ;
+  shifts = r.shifts ;
+  layout =
+    match r.layout with
+    | Blob -> Blob
+    | Cell(s,p) -> Cell(s,Option.map (node map) p)
+    | Compound(s,rg) -> Compound(s,Ranges.map (node map) rg)
+}
+
+let region map n = normalize map (get map n)
+
+let rec walk h m f n =
+  let n = Ufind.find m.store n in
+  let id = Store.id n in
+  try Hashtbl.find h id with Not_found ->
+    Hashtbl.add h id () ;
+    let r = Ufind.get m.store n in
+    f n (normalize m r) ;
+    match r.layout with
+    | Blob -> ()
+    | Cell(_,p) -> Option.iter (walk h m f) p
+    | Compound(_,rg) -> Ranges.iter (walk h m f) rg
+
+let iter (m:map) (f: node -> region -> unit) =
+  let h = Hashtbl.create 0 in
+  Vmap.iter (fun _ n -> walk h m f n) m.index
+
+(* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
 type queue = (node * node) Queue.t
 
-let ranges ~size = function
+let singleton ~size = function
   | None -> Ranges.empty
   | Some r -> Ranges.range ~length:size r
 
@@ -161,8 +202,8 @@ let merge_range (m: map) (q: queue) (ra : range) (rb : range) : node =
   let mb = rb.offset + rb.length in
   let dp = ra.offset - rb.offset in
   let dq = ma - mb in
-  let sa = sizeof (region m na).layout in
-  let sb = sizeof (region m nb).layout in
+  let sa = sizeof (get m na).layout in
+  let sb = sizeof (get m nb).layout in
   let size = Ranges.(sa %. sb %. dp %. dq) in
   let data = merge_node m q na nb in
   if size = sa && size = sb then data else
@@ -178,7 +219,7 @@ let merge_ranges (m: map) (q: queue)
     let size = Ranges.gcd sa sb in
     let ra = Ranges.squash (merge_node m q) wa in
     let rb = Ranges.squash (merge_node m q) wb in
-    Compound(size, ranges ~size @@ merge_opt m q ra rb)
+    Compound(size, singleton ~size @@ merge_opt m q ra rb)
 
 let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
   match a, b with
@@ -190,7 +231,7 @@ let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
 
   | Compound(sr,wr), Cell(sx,None) | Cell(sx,None), Compound(sr,wr) ->
     let size = Ranges.gcd sx sr in
-    Compound(size, ranges ~size @@ Ranges.squash (merge_node m q) wr)
+    Compound(size, singleton ~size @@ Ranges.squash (merge_node m q) wr)
 
   | Compound(sr,wr), Cell(sx,Some ptr) | Cell(sx,Some ptr), Compound(sr,wr) ->
     let rp = cell m ~size:sx ~ptr () in
@@ -230,25 +271,25 @@ let merge (m: map) (a: node) (b: node) : node =
 (* -------------------------------------------------------------------------- *)
 
 let access (m:map) (a:node) (ty: typ) =
-  let sr = sizeof (region m a).layout in
+  let sr = sizeof (get m a).layout in
   let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
   if sr <> size then ignore (merge m a (cell m ~size ()))
 
-let points_to (m: map) (a: node) (b: node) =
+let pointer (m: map) (a: node) (b : node) =
   ignore @@ merge m a @@ cell m ~ptr:b ()
 
 let read (m: map) (a: node) from =
-  let r = region m a in
+  let r = get m a in
   Ufind.set m.store a { r with reads = Access.Set.add from r.reads } ;
   access m a (Access.typeof from)
 
 let write (m: map) (a: node) from =
-  let r = region m a in
+  let r = get m a in
   Ufind.set m.store a { r with writes = Access.Set.add from r.writes } ;
   access m a (Access.typeof from)
 
 let shift (m: map) (a: node) from =
-  let r = region m a in
+  let r = get m a in
   Ufind.set m.store a { r with shifts = Access.Set.add from r.shifts }
 (* no access *)
 

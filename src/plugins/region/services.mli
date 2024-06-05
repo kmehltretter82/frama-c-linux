@@ -20,49 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+open Server
+open Request
 
-type node
+val package : Package.package
 
-and layout =
-  | Blob
-  | Cell of int * node option
-  | Compound of int * node Ranges.t
-
-type region = private {
-  parents: node list ;
-  roots: varinfo list ;
-  reads: Access.Set.t ;
-  writes: Access.Set.t ;
-  shifts: Access.Set.t ;
-  layout: layout ;
-}
-
-val sizeof : layout -> int
-val points_to : layout -> node option
-val ranges : layout -> node Ranges.range list
-
-val pp_node : Format.formatter -> node -> unit
-val pp_layout : Format.formatter -> layout -> unit
-
-type map
-
-val create : unit -> map
-val copy : map -> map
-
-val root : map -> Cil_types.varinfo -> node
-val cell : map -> ?size:int -> ?ptr:node -> ?root:varinfo -> unit -> node
-val range : map -> size:int -> offset:int -> length:int -> data:node -> node
-
-val id : node -> int
-val forge : int -> node
-val node : map -> node -> node
-val nodes : map -> node list -> node list
-val region : map -> node -> region
-val iter : map -> (node -> region -> unit) -> unit
-
-val merge : map -> node -> node -> node
-val read : map -> node -> Access.acs -> unit
-val write : map -> node -> Access.acs -> unit
-val shift : map -> node -> Access.acs -> unit
-val pointer : map -> node -> node -> unit
+module Node : Data.S with type t = Memory.node
+module Range : Output with type t = Memory.node Ranges.range
+module Region : Output with type t = Memory.region

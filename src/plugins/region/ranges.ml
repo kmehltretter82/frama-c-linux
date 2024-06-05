@@ -89,5 +89,6 @@ let squash f = function
 
 let iteri f (R xs) = List.iter f xs
 let iter f (R xs) = List.iter (fun r -> f r.data) xs
+let map f (R xs) = R (List.map (fun r -> { r with data = f r.data }) xs)
 
 (* -------------------------------------------------------------------------- *)
