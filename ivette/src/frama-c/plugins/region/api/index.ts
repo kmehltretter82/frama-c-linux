@@ -1,0 +1,158 @@
+/* ************************************************************************ */
+/*                                                                          */
+/*   This file is part of Frama-C.                                          */
+/*                                                                          */
+/*   Copyright (C) 2007-2024                                                */
+/*     CEA (Commissariat à l'énergie atomique et aux énergies               */
+/*          alternatives)                                                   */
+/*                                                                          */
+/*   you can redistribute it and/or modify it under the terms of the GNU    */
+/*   Lesser General Public License as published by the Free Software        */
+/*   Foundation, version 2.1.                                               */
+/*                                                                          */
+/*   It is distributed in the hope that it will be useful,                  */
+/*   but WITHOUT ANY WARRANTY; without even the implied warranty of         */
+/*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the          */
+/*   GNU Lesser General Public License for more details.                    */
+/*                                                                          */
+/*   See the GNU Lesser General Public License version 2.1                  */
+/*   for more details (enclosed in the file licenses/LGPLv2.1).             */
+/*                                                                          */
+/* ************************************************************************ */
+
+/* --- Generated Frama-C Server API --- */
+
+/**
+   Region Analysis
+   @packageDocumentation
+   @module frama-c/plugins/region/api
+*/
+
+//@ts-ignore
+import * as Json from 'dome/data/json';
+//@ts-ignore
+import * as Compare from 'dome/data/compare';
+//@ts-ignore
+import * as Server from 'frama-c/server';
+//@ts-ignore
+import * as State from 'frama-c/states';
+
+//@ts-ignore
+import { byDecl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { byMarker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { decl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { declDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jDecl } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { jMarker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { marker } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { markerDefault } from 'frama-c/kernel/api/ast';
+
+export type node = Json.index<'#node'>;
+
+/** Decoder for `node` */
+export const jNode: Json.Decoder<node> = Json.jIndex<'#node'>('#node');
+
+/** Natural order for `node` */
+export const byNode: Compare.Order<node> = Compare.number;
+
+/** Default value for `node` */
+export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
+
+export type range = { offset: number, length: number, data: node };
+
+/** Decoder for `range` */
+export const jRange: Json.Decoder<range> =
+  Json.jObject({ offset: Json.jNumber, length: Json.jNumber, data: jNode,});
+
+/** Natural order for `range` */
+export const byRange: Compare.Order<range> =
+  Compare.byFields
+    <{ offset: number, length: number, data: node }>({
+    offset: Compare.number,
+    length: Compare.number,
+    data: byNode,
+  });
+
+/** Default value for `range` */
+export const rangeDefault: range =
+  { offset: 0, length: 0, data: nodeDefault };
+
+export type region =
+  { roots: string[], parents: node[], sizeof: number, ranges: range[],
+    pointsTo?: node, reads: boolean, writes: boolean, shifts: boolean,
+    types: marker[] };
+
+/** Decoder for `region` */
+export const jRegion: Json.Decoder<region> =
+  Json.jObject({
+    roots: Json.jArray(Json.jString),
+    parents: Json.jArray(jNode),
+    sizeof: Json.jNumber,
+    ranges: Json.jArray(jRange),
+    pointsTo: Json.jOption(jNode),
+    reads: Json.jBoolean,
+    writes: Json.jBoolean,
+    shifts: Json.jBoolean,
+    types: Json.jArray(jMarker),
+  });
+
+/** Natural order for `region` */
+export const byRegion: Compare.Order<region> =
+  Compare.byFields
+    <{ roots: string[], parents: node[], sizeof: number, ranges: range[],
+       pointsTo?: node, reads: boolean, writes: boolean, shifts: boolean,
+       types: marker[] }>({
+    roots: Compare.array(Compare.alpha),
+    parents: Compare.array(byNode),
+    sizeof: Compare.number,
+    ranges: Compare.array(byRange),
+    pointsTo: Compare.defined(byNode),
+    reads: Compare.boolean,
+    writes: Compare.boolean,
+    shifts: Compare.boolean,
+    types: Compare.array(byMarker),
+  });
+
+/** Default value for `region` */
+export const regionDefault: region =
+  { roots: [], parents: [], sizeof: 0, ranges: [], pointsTo: undefined,
+    reads: false, writes: false, shifts: false, types: [] };
+
+const compute_internal: Server.ExecRequest<decl,null> = {
+  kind: Server.RqKind.EXEC,
+  name: 'plugins.region.compute',
+  input: jDecl,
+  output: Json.jNull,
+  signals: [],
+};
+/** Compute region domain for the given declaration */
+export const compute: Server.ExecRequest<decl,null>= compute_internal;
+
+const regions_internal: Server.GetRequest<decl,region[]> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.region.regions',
+  input: jDecl,
+  output: Json.jArray(jRegion),
+  signals: [],
+};
+/** Compute regions for the given declaration */
+export const regions: Server.GetRequest<decl,region[]>= regions_internal;
+
+const regionsAt_internal: Server.GetRequest<marker,region[]> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.region.regionsAt',
+  input: jMarker,
+  output: Json.jArray(jRegion),
+  signals: [],
+};
+/** Compute regions at the given marker position */
+export const regionsAt: Server.GetRequest<marker,region[]>= regionsAt_internal;
+
+/* ------------------------------------- */
