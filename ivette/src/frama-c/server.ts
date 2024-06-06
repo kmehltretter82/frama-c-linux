@@ -880,7 +880,10 @@ client.onKilled((id: string) => {
 client.onRejected((id: string) => {
   const p = pending.get(id);
   if (p) {
-    p.reject('rejected');
+    const err =
+     'Request rejected by Frama-C: the related plugin may not be loaded, ' +
+     'or the Frama-C version is incompatible.';
+    p.reject(err);
     _resolved(id);
     logModel.registerRequest(
       { rid: id, statut: statutLog.REJECTED }

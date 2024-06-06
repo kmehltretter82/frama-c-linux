@@ -279,6 +279,7 @@ let process_request (server : 'a server) (request : 'a request) : unit =
     begin
       match find request with
       | None ->
+        Senv.warning ~once:true "Unknown request %s" request ;
         Senv.debug "Rejected %a" server.pretty id ;
         Queue.push (`Rejected id) server.q_out
       | Some( kind , handler ) ->
