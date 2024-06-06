@@ -78,8 +78,8 @@ let rec merge f ra rb =
       let data = f a b in
       let r = { offset ; length ; data } in
       if a' < b'
-      then merge f ra (r::rb)
-      else merge f (r::ra) rb
+      then merge f wa (r::wb)
+      else merge f (r::wa) wb
 
 let merge f (R x) (R y) = R (merge f x y)
 

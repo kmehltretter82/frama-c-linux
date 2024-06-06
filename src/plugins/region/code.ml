@@ -83,6 +83,7 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     value m s k ;
     let r = pointer m s p in
+    (*TODO: move the 'A' access on the source of the pointed region *)
     Memory.shift m r (Exp(s,p)) ;
     Some r
 
@@ -176,7 +177,7 @@ let rec stmt (r:rmap) (m:map) (s:stmt) =
   | Return(Some e,_) -> value  m s e ; store r m s
   | Goto _ | Break _ | Continue _ | Return(None,_) -> store r m s
   | If(e,st,se,_) ->
-    value  m s e ;
+    value m s e ;
     store r m s ;
     block r m st ;
     block r m se ;

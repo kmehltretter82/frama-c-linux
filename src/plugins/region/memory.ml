@@ -219,7 +219,8 @@ let singleton ~size = function
   | Some r -> Ranges.range ~length:size r
 
 let merge_node (m: map) (q: queue) (a: node) (b: node) : node =
-  if not @@ Ufind.eq m.store a b then Queue.push (a,b) q ; min a b
+  if not @@ Ufind.eq m.store a b then Queue.push (a,b) q ;
+  Ufind.find m.store (min a b)
 
 let merge_opt (m: map) (q: queue)
     (pa : node option) (pb : node option) : node option =
@@ -271,8 +272,8 @@ let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
     merge_ranges m q sx wx sr wr
 
 let merge_region (m: map) (q: queue) (a : region) (b : region) : region = {
-  parents = nodes m (Store.bag a.parents b.parents) ;
-  roots = Store.bag a.roots b.roots ;
+  parents = nodes m @@ Store.bag a.parents b.parents ;
+  roots = List.sort_uniq Varinfo.compare @@ Store.bag a.roots b.roots ;
   reads = Access.Set.union a.reads b.reads ;
   writes = Access.Set.union a.writes b.writes ;
   shifts = Access.Set.union a.shifts b.shifts ;
