@@ -21,6 +21,7 @@ help:
 	@echo "fc-estimate-difficulty           : Linux/macOS version (depending on host system)"
 	@echo "fc-estimate-difficulty.exe       : Windows cross-compiled version (from Linux)"
 	@echo "clean                            : Erase working directory"
+	@echo "distclean                        : Clean and erase generated files"
 	@echo "test-fc-estimate-difficulty      : Test Linux/macOS version"
 	@echo "test-fc-estimate-difficulty.exe  : Test Windows version"
 
@@ -60,15 +61,6 @@ PY_DEPS := \
 COMPLIANCE := $(wildcard ../compliance/*.json)
 TOOLS := $(workdir)/scc $(workdir)/astyle
 COMMON_DEPS := $(PY_DEPS) $(COMPLIANCE) libc_metrics.json
-
-fc-estimate-difficulty: EXE=
-fc-estimate-difficulty.exe: EXE=".exe"
-
-fc-estimate-difficulty: WINE=
-fc-estimate-difficulty.exe: WINE="/home/andr/git/wine/wine"
-
-fc-estimate-difficulty: PSEP=:
-fc-estimate-difficulty.exe: PSEP=;
 
 fc-estimate-difficulty: $(COMMON_DEPS) $(TOOLS)
 fc-estimate-difficulty.exe: \
@@ -136,7 +128,7 @@ $(workdir)/astyle_3.1:
 	touch $@
 
 clean:
-	rm -rf $(workdir) $(distdir) fc-estimate-difficulty.spec fc-estimate-difficulty.exe.spec
+	rm -rf build $(workdir) $(distdir) fc-estimate-difficulty.spec fc-estimate-difficulty.exe.spec
 
 distclean: clean
 	rm -f fc-estimate-difficulty fc-estimate-difficulty.exe libc_metrics.json
