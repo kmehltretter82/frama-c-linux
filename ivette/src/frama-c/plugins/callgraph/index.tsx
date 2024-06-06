@@ -120,9 +120,7 @@ function Callgraph() : JSX.Element {
   const graph = States.useSyncValue(CgAPI.callgraph);
   const [cy, setCy] = React.useState<Cy.Core>();
   const [cs] = useGlobalState(CallstackState);
-  const callstack = States.useRequest(
-    ValuesAPI.getCallstackInfo, cs, { onError: [] }
-  );
+  const callstack = States.useRequestValue(ValuesAPI.getCallstackInfo, cs);
   const scope = States.useCurrentScope();
   const layout = { name: 'cola', nodeSpacing: 32 };
   const computedStyle = getComputedStyle(document.documentElement);
@@ -142,7 +140,7 @@ function Callgraph() : JSX.Element {
 
   // Callstack selection
   React.useEffect(() => {
-    cy && selectCallstack(cy, callstack ?? []);
+    cy && selectCallstack(cy, callstack);
   }, [cy, callstack]);
 
   // Click on graph

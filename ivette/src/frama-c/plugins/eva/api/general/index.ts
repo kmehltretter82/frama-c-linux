@@ -96,6 +96,7 @@ const getComputationState_internal: Server.GetRequest<
   name: 'plugins.eva.general.getComputationState',
   input: Json.jNull,
   output: jComputationStateType,
+  fallback: computationStateTypeDefault,
   signals: [],
 };
 /** Getter for state [`computationState`](#computationstate)  */
@@ -136,6 +137,7 @@ const getCallers_internal: Server.GetRequest<decl,CallSite[]> = {
   name: 'plugins.eva.general.getCallers',
   input: jDecl,
   output: Json.jArray(jCallSite),
+  fallback: [],
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the list of call sites for a function */
@@ -146,6 +148,7 @@ const getCallees_internal: Server.GetRequest<marker,decl[]> = {
   name: 'plugins.eva.general.getCallees',
   input: jMarker,
   output: Json.jArray(jDecl),
+  fallback: [],
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Return the functions pointed to by a function pointer */
@@ -184,6 +187,7 @@ const reloadFunctions_internal: Server.GetRequest<null,null> = {
   name: 'plugins.eva.general.reloadFunctions',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`functions`](#functions)  */
@@ -203,6 +207,7 @@ const fetchFunctions_internal: Server.GetRequest<
             updated: Json.jArray(jFunctionsData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
@@ -263,6 +268,7 @@ const getDeadCode_internal: Server.GetRequest<decl,deadCode | undefined> = {
   name: 'plugins.eva.general.getDeadCode',
   input: jDecl,
   output: Json.jOption(jDeadCode),
+  fallback: undefined,
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the lists of unreachable and of non terminating statements in a function */
@@ -304,6 +310,7 @@ const taintStatusTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.eva.general.taintStatusTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -338,6 +345,7 @@ const taintedLvalues_internal: Server.GetRequest<decl,LvalueTaints[]> = {
   name: 'plugins.eva.general.taintedLvalues',
   input: jDecl,
   output: Json.jArray(jLvalueTaints),
+  fallback: [],
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the tainted lvalues of a given function */
@@ -377,6 +385,7 @@ const reloadProperties_internal: Server.GetRequest<null,null> = {
   name: 'plugins.eva.general.reloadProperties',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`properties`](#properties)  */
@@ -396,6 +405,7 @@ const fetchProperties_internal: Server.GetRequest<
             updated: Json.jArray(jPropertiesData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`properties`](#properties)  */
@@ -461,6 +471,7 @@ const alarmCategoryTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.eva.general.alarmCategoryTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -598,6 +609,7 @@ const getProgramStats_internal: Server.GetRequest<null,programStatsType> = {
   name: 'plugins.eva.general.getProgramStats',
   input: Json.jNull,
   output: jProgramStatsType,
+  fallback: programStatsTypeDefault,
   signals: [],
 };
 /** Getter for state [`programStats`](#programstats)  */
@@ -662,6 +674,7 @@ const reloadFunctionStats_internal: Server.GetRequest<null,null> = {
   name: 'plugins.eva.general.reloadFunctionStats',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`functionStats`](#functionstats)  */
@@ -681,6 +694,7 @@ const fetchFunctionStats_internal: Server.GetRequest<
             updated: Json.jArray(jFunctionStatsData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`functionStats`](#functionstats)  */
@@ -715,6 +729,7 @@ const getStates_internal: Server.GetRequest<
   input: Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jArray(
             Json.jTriple( Json.jString, Json.jString, Json.jString,)),
+  fallback: [],
   signals: [ { name: 'plugins.eva.general.signalComputationState' } ],
 };
 /** Get the domain states about the given marker */

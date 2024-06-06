@@ -212,6 +212,7 @@ const nodeKindTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.dive.nodeKindTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -241,6 +242,7 @@ const taintTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.dive.taintTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -272,6 +274,7 @@ const explorationTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.dive.explorationTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -304,6 +307,7 @@ const nodeSpecialRangeTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.dive.nodeSpecialRangeTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -478,6 +482,7 @@ const reloadGraph_internal: Server.GetRequest<null,null> = {
   name: 'plugins.dive.reloadGraph',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`graph`](#graph)  */
@@ -497,6 +502,7 @@ const fetchGraph_internal: Server.GetRequest<
             updated: Json.jArray(jGraphData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`graph`](#graph)  */
@@ -526,6 +532,7 @@ const window_internal: Server.SetRequest<explorationWindow,null> = {
   name: 'plugins.dive.window',
   input: jExplorationWindow,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Set the exploration window */
@@ -536,6 +543,7 @@ const clear_internal: Server.ExecRequest<null,null> = {
   name: 'plugins.dive.clear',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Erase the graph and start over with an empty one */
@@ -546,6 +554,7 @@ const add_internal: Server.ExecRequest<marker,nodeId | undefined> = {
   name: 'plugins.dive.add',
   input: jMarker,
   output: Json.jOption(jNodeId),
+  fallback: undefined,
   signals: [],
 };
 /** Add a node to the graph */
@@ -556,6 +565,7 @@ const explore_internal: Server.ExecRequest<nodeId,null> = {
   name: 'plugins.dive.explore',
   input: jNodeId,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Explore the graph starting from an existing vertex */
@@ -566,6 +576,7 @@ const show_internal: Server.ExecRequest<nodeId,null> = {
   name: 'plugins.dive.show',
   input: jNodeId,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Show the dependencies of an existing vertex */
@@ -576,6 +587,7 @@ const hide_internal: Server.ExecRequest<nodeId,null> = {
   name: 'plugins.dive.hide',
   input: jNodeId,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Hide the dependencies of an existing vertex */

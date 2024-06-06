@@ -51,6 +51,7 @@ const compute_internal: Server.ExecRequest<null,null> = {
   name: 'kernel.ast.compute',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Ensures that AST is computed */
@@ -186,6 +187,7 @@ const reloadDeclAttributes_internal: Server.GetRequest<null,null> = {
   name: 'kernel.ast.reloadDeclAttributes',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`declAttributes`](#declattributes)  */
@@ -205,6 +207,7 @@ const fetchDeclAttributes_internal: Server.GetRequest<
             updated: Json.jArray(jDeclAttributesData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`declAttributes`](#declattributes)  */
@@ -235,6 +238,7 @@ const printDeclaration_internal: Server.GetRequest<decl,text> = {
   name: 'kernel.ast.printDeclaration',
   input: jDecl,
   output: jText,
+  fallback: textDefault,
   signals: [ { name: 'kernel.ast.changed' } ],
 };
 /** Prints an AST Declaration */
@@ -335,6 +339,7 @@ const reloadMarkerAttributes_internal: Server.GetRequest<null,null> = {
   name: 'kernel.ast.reloadMarkerAttributes',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`markerAttributes`](#markerattributes)  */
@@ -354,6 +359,7 @@ const fetchMarkerAttributes_internal: Server.GetRequest<
             updated: Json.jArray(jMarkerAttributesData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`markerAttributes`](#markerattributes)  */
@@ -385,6 +391,7 @@ const getMainFunction_internal: Server.GetRequest<null,decl | undefined> = {
   name: 'kernel.ast.getMainFunction',
   input: Json.jNull,
   output: Json.jOption(jDecl),
+  fallback: undefined,
   signals: [],
 };
 /** Get the current 'main' function. */
@@ -395,6 +402,7 @@ const getFunctions_internal: Server.GetRequest<null,decl[]> = {
   name: 'kernel.ast.getFunctions',
   input: Json.jNull,
   output: Json.jArray(jDecl),
+  fallback: [],
   signals: [],
 };
 /** Collect all functions in the AST */
@@ -467,6 +475,7 @@ const reloadFunctions_internal: Server.GetRequest<null,null> = {
   name: 'kernel.ast.reloadFunctions',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`functions`](#functions)  */
@@ -486,6 +495,7 @@ const fetchFunctions_internal: Server.GetRequest<
             updated: Json.jArray(jFunctionsData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`functions`](#functions)  */
@@ -588,6 +598,7 @@ const reloadGlobals_internal: Server.GetRequest<null,null> = {
   name: 'kernel.ast.reloadGlobals',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`globals`](#globals)  */
@@ -607,6 +618,7 @@ const fetchGlobals_internal: Server.GetRequest<
             updated: Json.jArray(jGlobalsData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`globals`](#globals)  */
@@ -654,6 +666,7 @@ const getInformation_internal: Server.GetRequest<
               descr: Json.jString,
               text: jText,
             })),
+  fallback: [],
   signals: [ { name: 'kernel.ast.getInformationUpdate' } ],
 };
 /** Get available information about markers. When no marker is given, returns all kinds of information (with empty `descr` field). */
@@ -676,6 +689,7 @@ const getMarkerAt_internal: Server.GetRequest<
            column: Json.jNumber,
          }),
   output: Json.jOption(jMarker),
+  fallback: undefined,
   signals: [ { name: 'kernel.ast.changed' } ],
 };
 /** Returns the marker and function at a source file position, if any. Input: file path, line and column. File can be empty, in case no marker is returned. */
@@ -690,6 +704,7 @@ const getFiles_internal: Server.GetRequest<null,string[]> = {
   name: 'kernel.ast.getFiles',
   input: Json.jNull,
   output: Json.jArray(Json.jString),
+  fallback: [],
   signals: [],
 };
 /** Get the currently analyzed source file names */
@@ -700,6 +715,7 @@ const setFiles_internal: Server.SetRequest<string[],null> = {
   name: 'kernel.ast.setFiles',
   input: Json.jArray(Json.jString),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Set the source file names to analyze. */
@@ -713,6 +729,7 @@ const parseExpr_internal: Server.GetRequest<
   name: 'kernel.ast.parseExpr',
   input: Json.jObject({ stmt: jMarker, term: Json.jString,}),
   output: jMarker,
+  fallback: markerDefault,
   signals: [],
 };
 /** Parse a C expression and returns the associated marker */
@@ -729,6 +746,7 @@ const parseLval_internal: Server.GetRequest<
   name: 'kernel.ast.parseLval',
   input: Json.jObject({ stmt: jMarker, term: Json.jString,}),
   output: jMarker,
+  fallback: markerDefault,
   signals: [],
 };
 /** Parse a C lvalue and returns the associated marker */

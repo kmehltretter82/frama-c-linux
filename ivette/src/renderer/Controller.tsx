@@ -443,7 +443,9 @@ export const Status = (): JSX.Element => {
       led = 'active';
       blink = pending > 0;
       running = 'ON';
-      title = 'Server is running';
+      title = pending > 0
+        ? `Server running (${pending} pending requests)`
+        : 'Server running (idle)';
       break;
     case Server.Status.CMD:
       led = 'positive';
@@ -473,7 +475,7 @@ export const Status = (): JSX.Element => {
 
   return (
     <>
-      <LED status={led} blink={blink} />
+      <LED status={led} title={title} blink={blink} />
       <Code label={running} title={title} />
     </>
   );

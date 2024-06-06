@@ -62,6 +62,7 @@ const getPivotState_internal: Server.GetRequest<null,tableStateType> = {
   name: 'plugins.pivot.general.getPivotState',
   input: Json.jNull,
   output: jTableStateType,
+  fallback: tableStateTypeDefault,
   signals: [],
 };
 /** Getter for state [`pivotState`](#pivotstate)  */
@@ -80,6 +81,7 @@ const compute_internal: Server.ExecRequest<null,null> = {
   name: 'plugins.pivot.general.compute',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Computes the pivot table. */

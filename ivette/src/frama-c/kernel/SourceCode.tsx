@@ -198,7 +198,7 @@ export default function SourceCode(): JSX.Element {
   const selectedMarkerLine = floc?.line ?? 0;
   const source = useSourceFileContents(file);
   const [cursor, setCursor] = React.useState<SourceCursor>(noCursor);
-  const markerAtCursor = States.useRequest(Ast.getMarkerAt, cursor);
+  const markerAtCursor = States.useRequestResponse(Ast.getMarkerAt, cursor);
   const { sloc: slocAtCursor } = States.useMarker(markerAtCursor);
 
   const openFile = React.useCallback(() => {

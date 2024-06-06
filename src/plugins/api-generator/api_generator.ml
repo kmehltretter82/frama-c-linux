@@ -353,14 +353,16 @@ let makeDeclaration fmt names d =
     let prefix = String.capitalize_ascii (String.lowercase_ascii kind) in
     let input = typeOfParam rq.rq_input in
     let output = typeOfParam rq.rq_output in
-    let makeParam fmt js = makeDecoder ~names fmt js in
+    let makeSignature fmt ty = makeDecoder ~names fmt ty in
+    let makeFallback fmt ty = makeDefault ~names fmt ty in
     Format.fprintf fmt
       "@[<hv 2>const %s_internal: Server.%sRequest<@,%a,@,%a@,>@] = {@\n"
       self.name prefix jtype input jtype output ;
     Format.fprintf fmt "  kind: Server.RqKind.%s,@\n" kind ;
     Format.fprintf fmt "  name: '%s',@\n" (Pkg.name_of_ident d.d_ident) ;
-    Format.fprintf fmt "  input: %a,@\n" makeParam input ;
-    Format.fprintf fmt "  output: %a,@\n" makeParam output ;
+    Format.fprintf fmt "  input: %a,@\n" makeSignature input ;
+    Format.fprintf fmt "  output: %a,@\n" makeSignature output ;
+    Format.fprintf fmt "  fallback: %a,@\n" makeFallback output ;
     Format.fprintf fmt "  signals: %a,@\n"
       (Pretty_utils.pp_list
          ~empty:"[]" ~pre:"@[<hov 2>[ " ~sep:",@ " ~suf:"@ ]@]"

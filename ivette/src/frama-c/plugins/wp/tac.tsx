@@ -162,9 +162,7 @@ export interface ProverSelection {
 
 export function Provers(props: ProverSelection): JSX.Element {
   const { node, selected, setSelected } = props;
-  const { results=[] } = States.useRequest(
-    TIP.getNodeInfos, node, { pending: null, onError: null }
-  ) ?? {};
+  const { results=[] } = States.useRequestStable(TIP.getNodeInfos, node);
   const [ provers=[], setProvers ] = States.useSyncState(WP.provers);
   const setItems = (prvs: string[]): void => setProvers(prvs.map(WP.jProver));
   const children = [...provers].sort().map((prover) => {
@@ -380,9 +378,7 @@ function Parameter(props: ParameterProps): JSX.Element | null
 export function ConfigureProver(props: ProverSelection): JSX.Element {
   const { node, selected: prover, setSelected } = props;
   const { descr } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
-  const result = States.useRequest(
-    TIP.getResult, { node, prover }, { pending: null, onError: null }
-  ) ?? WP.resultDefault;
+  const result = States.useRequestStable(TIP.getResult, { node, prover });
   const [process = 1, setProcess] = States.useSyncState(WP.process);
   const [timeout = 1, setTimeout] = States.useSyncState(WP.timeout);
   const { icon, kind, clear=true, running=false, play=false, forward=0 } =
@@ -530,7 +526,7 @@ function getStatusDescription(tactical: TAC.tacticalData): StatusDescr {
 export function ConfigureTactic(props: TacticSelection): JSX.Element {
   const { node, locked, selected: tactic, setSelected } = props;
   const tactical = useTactic(tactic);
-  States.useRequest(TAC.configureTactics, node, { onError: null });
+  const { pending } = States.useRequestStatus(TAC.configureTactics, node);
   const { status, label, title, params } = tactical;
   const isReady = !locked && status==='Applicable';
   const display = !!tactic && (locked || status !== 'NotApplicable');
@@ -558,7 +554,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
     >
       <Item
         key='tactic'
-        icon='TUNINGS'
+        icon={ pending ? 'EXECUTE' : 'TUNINGS' }
         title='Selected Tactic Configuration'
         className="wp-config-tactic"
         label={label} />
