@@ -34,16 +34,15 @@ The tasks listed in this section are performed by the Release Manager.
 
 \subsection{Versions in documentation files}
 
-Change version and codename in the following files:
+For final release only, remove \texttt{\textasciitilde{}beta} and
+\texttt{-beta} mentions in the following files :
 \begin{itemize}
-  \item \texttt{ALL\_VERSIONS} (non-beta only)
-  \item \texttt{VERSION} (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
+  \item \texttt{VERSION}
   \item \texttt{opam}
-  \begin{itemize}
-     \item change version (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
-     \item change doc link: \texttt{…/download/user-manual-<version>-<codename>.pdf}
-           (with \texttt{-beta} in version for beta releases, not \texttt{\textasciitilde{}beta})
-  \end{itemize}
+    \begin{itemize}
+      \item in version field
+      \item in the doc link
+    \end{itemize}
 \end{itemize}
 
 \subsection{Versions in source: API documentation}

@@ -75,15 +75,14 @@ one.
 
 On the new \texttt{stable} branch, execute the script:
 \begin{verbatim}
-./dev/set-version.sh NN.M # to be replaced with actual major/minor version
+# to be replaced with actual major/minor version
+# Add suffix ~beta for beta releases only
+./dev/set-version.sh NN.M
 \end{verbatim}
-
-\textbf{Do not add \texttt{\textasciitilde{}beta} here, this will be done
-manually in section~\ref{sec:validation:version}.}
 
 This will:
 \begin{itemize}
-  \item update the \texttt{Changelog}s
+  \item update the \texttt{Changelog}
   \item update the changes in the manuals \textbf{(excluding ACSL and E-ACSL references)}
   \item update the \texttt{VERSION} and \texttt{VERSION\_CODENAME} files
   \item update the \texttt{opam} files (Frama-C, lint, hdrck)
@@ -91,6 +90,10 @@ This will:
   \item update the Frama-C build script
   \item update the reference configuration
 \end{itemize}
+
+For beta releases, update manually the doc link in opam file to add
+\texttt{-beta} (not \texttt{\textasciitilde{}beta}) :
+\texttt{http://frama-c.com/download/user-manual-<NN.M>-beta-<Codename>.pdf}\\
 
 Merge the \texttt{stable} branch in the \texttt{master} branch.
 
