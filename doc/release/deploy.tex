@@ -32,6 +32,13 @@ following:
   on \texttt{pub} (it must be started manually and requires the branch).
 \end{description}
 
+After running \texttt{release-branch} and \texttt{release-create}, either the
+tag indicates a beta release and then this tag is pushed on the public GitLab
+repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
+release and the release should be available in
+\url{https://git.frama-c.com/pub/frama-c/-/releases}, as well as the tag of the
+version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
+
 \section{Check the website}
 
 Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}.
@@ -113,16 +120,6 @@ Open the generated wiki page (visible in the public website activity). Check the
 links (files are available only once the website has been put online). If
 everything is fine, edit the main wiki page and the sidebar with a link to the
 page (\url{https://git.frama-c.com/pub/frama-c/-/wikis/home}).
-
-In the release pipeline, run the job \texttt{release - release-branch}. It will
-push the stable branch on the public repository.
-
-Then, run the job \texttt{release - release-create}. After this, either the
-tag indicates a beta release and then this tag is pushed on the public GitLab
-repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
-release and the release should be available in
-\url{https://git.frama-c.com/pub/frama-c/-/releases}, as well as the tag of the
-version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
 
 \section{Announcements}
 
