@@ -25,14 +25,19 @@
 // --------------------------------------------------------------------------
 
 import React from 'react';
-import * as Ivette from 'ivette';
-import { MemoryView } from './memory';
+import * as Dot from 'dome/graph/diagram';
+import * as States from 'frama-c/states';
+import * as Region from './api';
 
-Ivette.registerComponent({
-  id: 'fc.region.main',
-  label: 'Region Analysis',
-  preferredPosition: 'B',
-  children: <MemoryView />,
-});
+function makeDiagram(_regions: Region.region[]) : Dot.DiagramProps {
+  const nodes: Dot.Node[] = [];
+  const edges: Dot.Edge[] = [];
+  return { nodes, edges };
+}
 
-// --------------------------------------------------------------------------
+export function MemoryView(): JSX.Element {
+  const scope = States.useCurrentScope();
+  const regions = States.useRequest(Region.regions, scope) ?? [];
+  const diagram = React.useMemo(() => makeDiagram(regions), [regions]);
+  return <Dot.Diagram display={regions.length > 0} {...diagram} />;
+}
