@@ -34,16 +34,12 @@ function makeDiagram(regions: Region.region[]): Dot.DiagramProps {
   const edges: Dot.Edge[] = [];
   regions.forEach(r => {
     const id = `n${r.node}`;
-    const ht = r.types.length;
     const color =
-      ht > 1 ? 'red' :
+      r.bytes ? 'red' :
         r.pointed !== undefined
           ? (r.writes ? 'orange' : 'yellow')
           : (r.writes && r.reads) ? 'green' :
             r.writes ? 'pink' : r.reads ? 'grey' : 'white';
-    const label =
-      (r.reads ? 'R' : '') + (r.writes ? 'W' : '') +
-      (r.pointed !== undefined ? '*' : '');
     const cells =
       r.ranges.map((rg, i): Dot.Cell => {
         const port = `r${i}`;
@@ -55,7 +51,7 @@ function makeDiagram(regions: Region.region[]): Dot.DiagramProps {
         });
       });
     const shape = cells.length > 0 ? cells : undefined;
-    nodes.push({ id: id, color, label, shape });
+    nodes.push({ id: id, color, label: r.label, title: r.title, shape });
     r.roots.forEach(x => {
       const xid = `X${x}`;
       nodes.push({ id: xid, label: x, shape: 'folder', color: 'blue' });

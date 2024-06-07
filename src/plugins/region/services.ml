@@ -66,6 +66,73 @@ module Ranges = Data.Jlist(Range)
 module Region: Data.S with type t = Memory.region =
 struct
   type t = Memory.region
+
+  let roots_to_json vs =
+    let open Cil_types in
+    Json.of_list @@ List.map (fun v -> Json.of_string v.vname) vs
+
+  let ikind_to_char (ikind : Cil_types.ikind) =
+    match ikind with
+    | IBool | IUChar -> 'b'
+    | IChar | ISChar -> 'c'
+    | IInt -> 'i'
+    | IUInt -> 'u'
+    | IShort -> 's'
+    | IUShort -> 'r'
+    | ILong | ILongLong -> 'l'
+    | IULong | IULongLong -> 'w'
+
+  let fkind_to_char (fkind : Cil_types.fkind) =
+    match fkind with
+    | FFloat -> 'f'
+    | FDouble | FLongDouble -> 'd'
+
+  let typ_to_char (ty: Cil_types.typ) =
+    match ty with
+    | TVoid _ -> 'b'
+    | TPtr _ -> 'p'
+    | TInt(ik,_) -> ikind_to_char ik
+    | TFloat(fk,_) -> fkind_to_char fk
+    | TComp({ cstruct }, _) -> if cstruct then 'S' else 'U'
+    | TArray _ -> 'A'
+    | TNamed _ -> 'T'
+    | TEnum _ -> 'E'
+    | TFun _ -> 'F'
+    | TBuiltin_va_list _ -> 'x'
+
+  let typs_to_char (typs : Cil_types.typ list) =
+    match typs with
+    | [] -> '-'
+    | [ty] -> typ_to_char ty
+    | _ -> 'x'
+
+  let label (m: Memory.region) =
+    let buffer = Buffer.create 4 in
+    if m.reads <> [] then Buffer.add_char buffer 'R' ;
+    if m.writes <> [] then Buffer.add_char buffer 'W' ;
+    if m.pointed <> None then Buffer.add_char buffer '*'
+    else if m.reads <> [] || m.writes <> [] then
+      Buffer.add_char buffer @@ typs_to_char m.types ;
+    Buffer.contents buffer
+
+  let pp_typ_layout s0 fmt ty =
+    let s = Cil.bitsSizeOf ty in
+    if s <> s0 then
+      Format.fprintf fmt "(%a)%%%db" Typ.pretty ty s
+    else
+      Typ.pretty fmt ty
+
+  let title (m: Memory.region) =
+    Format.asprintf "%t (%db)"
+      begin fun fmt ->
+        match m.types with
+        | [] -> Format.pp_print_string fmt "void"
+        | [ty] -> pp_typ_layout m.sizeof fmt ty ;
+        | ty::ts ->
+          pp_typ_layout 0 fmt ty ;
+          List.iter (Format.fprintf fmt ", %a" (pp_typ_layout 0)) ts ;
+      end m.sizeof
+
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
       "node", Node.jtype ;
@@ -76,16 +143,10 @@ struct
       "pointed", NodeOpt.jtype ;
       "reads", Jboolean ;
       "writes", Jboolean ;
-      "shifts", Jboolean ;
-      "types", Jarray Kernel_ast.Marker.jtype ;
+      "bytes", Jboolean ;
+      "label", Jstring ;
+      "title", Jstring ;
     ]
-
-  let roots_to_json vs =
-    let open Cil_types in
-    Json.of_list @@ List.map (fun v -> Json.of_string v.vname) vs
-
-  let typ_to_json typ =
-    Kernel_ast.Marker.to_json @@ Printer_tag.PType typ
 
   let to_json (m: Memory.region) =
     Json.of_fields [
@@ -97,9 +158,11 @@ struct
       "pointed", NodeOpt.to_json @@ m.pointed ;
       "reads", Json.of_bool (m.reads <> []) ;
       "writes", Json.of_bool (m.writes <> []) ;
-      "shifts", Json.of_bool (m.shifts <> []) ;
-      "types", Json.of_list @@ List.map typ_to_json @@ m.types ;
+      "bytes", Json.of_bool (List.length m.types > 1) ;
+      "label", Json.of_string @@ label m ;
+      "title", Json.of_string @@ title m ;
     ]
+
   let of_json _ = failwith "Region.Layout.of_json"
 end
 

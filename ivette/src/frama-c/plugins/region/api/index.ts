@@ -94,7 +94,7 @@ export const rangeDefault: range =
 export type region =
   { node: node, roots: string[], parents: node[], sizeof: number,
     ranges: range[], pointed?: node, reads: boolean, writes: boolean,
-    shifts: boolean, types: marker[] };
+    bytes: boolean, label: string, title: string };
 
 /** Decoder for `region` */
 export const jRegion: Json.Decoder<region> =
@@ -107,8 +107,9 @@ export const jRegion: Json.Decoder<region> =
     pointed: Json.jOption(jNode),
     reads: Json.jBoolean,
     writes: Json.jBoolean,
-    shifts: Json.jBoolean,
-    types: Json.jArray(jMarker),
+    bytes: Json.jBoolean,
+    label: Json.jString,
+    title: Json.jString,
   });
 
 /** Natural order for `region` */
@@ -116,7 +117,7 @@ export const byRegion: Compare.Order<region> =
   Compare.byFields
     <{ node: node, roots: string[], parents: node[], sizeof: number,
        ranges: range[], pointed?: node, reads: boolean, writes: boolean,
-       shifts: boolean, types: marker[] }>({
+       bytes: boolean, label: string, title: string }>({
     node: byNode,
     roots: Compare.array(Compare.alpha),
     parents: Compare.array(byNode),
@@ -125,15 +126,16 @@ export const byRegion: Compare.Order<region> =
     pointed: Compare.defined(byNode),
     reads: Compare.boolean,
     writes: Compare.boolean,
-    shifts: Compare.boolean,
-    types: Compare.array(byMarker),
+    bytes: Compare.boolean,
+    label: Compare.string,
+    title: Compare.string,
   });
 
 /** Default value for `region` */
 export const regionDefault: region =
   { node: nodeDefault, roots: [], parents: [], sizeof: 0, ranges: [],
-    pointed: undefined, reads: false, writes: false, shifts: false, types: []
-    };
+    pointed: undefined, reads: false, writes: false, bytes: false, label: '',
+    title: '' };
 
 const compute_internal: Server.ExecRequest<decl,null> = {
   kind: Server.RqKind.EXEC,
