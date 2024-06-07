@@ -41,19 +41,21 @@ end
 module NodeOpt = Data.Joption(Node)
 module NodeList = Data.Jlist(Node)
 
-module Range : Data.S with type t = Memory.node Ranges.range =
+module Range : Data.S with type t = Memory.range =
 struct
-  type t = Memory.node Ranges.range
+  type t = Memory.range
   let jtype = Data.declare ~package ~name:"range" @@
     Jrecord [
       "offset", Jnumber ;
       "length", Jnumber ;
+      "cells", Jnumber ;
       "data", Node.jtype ;
     ]
-  let to_json (rg : Memory.node Ranges.range) =
+  let to_json (rg : Memory.range) =
     Json.of_fields [
       "offset", Json.of_int rg.offset ;
       "length", Json.of_int rg.length ;
+      "cells", Json.of_int rg.cells ;
       "data", Node.to_json rg.data ;
     ]
   let of_json _ = failwith "Region.Range.of_json"
@@ -66,11 +68,12 @@ struct
   type t = Memory.region
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
+      "node", Node.jtype ;
       "roots", Jarray Jalpha ;
       "parents", NodeList.jtype ;
       "sizeof", Jnumber ;
       "ranges", Ranges.jtype ;
-      "pointsTo", NodeOpt.jtype ;
+      "pointed", NodeOpt.jtype ;
       "reads", Jboolean ;
       "writes", Jboolean ;
       "shifts", Jboolean ;
@@ -86,15 +89,16 @@ struct
 
   let to_json (m: Memory.region) =
     Json.of_fields [
+      "node", Node.to_json m.node ;
       "roots", roots_to_json m.roots ;
       "parents", NodeList.to_json m.parents ;
-      "sizeof", Json.of_int @@ Memory.sizeof m.layout ;
-      "ranges", Ranges.to_json @@ Memory.ranges m.layout ;
-      "pointsTo", NodeOpt.to_json @@ Memory.points_to m.layout ;
-      "reads", Json.of_bool @@ not @@ Access.Set.is_empty m.reads ;
-      "writes", Json.of_bool @@ not @@ Access.Set.is_empty m.writes ;
-      "shifts", Json.of_bool @@ not @@ Access.Set.is_empty m.shifts ;
-      "types", Json.of_list @@ List.map typ_to_json @@ Memory.types m ;
+      "sizeof", Json.of_int @@ m.sizeof ;
+      "ranges", Ranges.to_json @@ m.ranges ;
+      "pointed", NodeOpt.to_json @@ m.pointed ;
+      "reads", Json.of_bool (m.reads <> []) ;
+      "writes", Json.of_bool (m.writes <> []) ;
+      "shifts", Json.of_bool (m.shifts <> []) ;
+      "types", Json.of_list @@ List.map typ_to_json @@ m.types ;
     ]
   let of_json _ = failwith "Region.Layout.of_json"
 end
@@ -107,7 +111,7 @@ module Regions = Data.Jlist(Region)
 
 let regions map =
   let pool = ref [] in
-  Memory.iter map (fun _ r -> pool := r :: !pool) ;
+  Memory.iter map (fun r -> pool := r :: !pool) ;
   List.rev !pool
 
 let map_of_localizable (loc : Printer_tag.localizable) =

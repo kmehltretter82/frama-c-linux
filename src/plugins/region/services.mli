@@ -26,7 +26,7 @@ open Request
 val package : Package.package
 
 module Node : Data.S with type t = Memory.node
-module Range : Output with type t = Memory.node Ranges.range
+module Range : Output with type t = Memory.range
 module Region : Output with type t = Memory.region
 
 (** @raises Not_found *)

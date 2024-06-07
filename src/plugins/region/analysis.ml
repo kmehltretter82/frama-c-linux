@@ -60,9 +60,9 @@ let get kf =
       Kernel_function.pretty kf
       begin fun fmt ->
         Memory.iter domain.map
-          begin fun r m ->
+          begin fun r ->
             Format.pp_print_newline fmt () ;
-            Memory.pp_region fmt r m ;
+            Memory.pp_region fmt r ;
           end
       end ;
     domain

@@ -65,38 +65,46 @@ export const byNode: Compare.Order<node> = Compare.number;
 /** Default value for `node` */
 export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
 
-export type range = { offset: number, length: number, data: node };
+export type range =
+  { offset: number, length: number, cells: number, data: node };
 
 /** Decoder for `range` */
 export const jRange: Json.Decoder<range> =
-  Json.jObject({ offset: Json.jNumber, length: Json.jNumber, data: jNode,});
+  Json.jObject({
+    offset: Json.jNumber,
+    length: Json.jNumber,
+    cells: Json.jNumber,
+    data: jNode,
+  });
 
 /** Natural order for `range` */
 export const byRange: Compare.Order<range> =
   Compare.byFields
-    <{ offset: number, length: number, data: node }>({
+    <{ offset: number, length: number, cells: number, data: node }>({
     offset: Compare.number,
     length: Compare.number,
+    cells: Compare.number,
     data: byNode,
   });
 
 /** Default value for `range` */
 export const rangeDefault: range =
-  { offset: 0, length: 0, data: nodeDefault };
+  { offset: 0, length: 0, cells: 0, data: nodeDefault };
 
 export type region =
-  { roots: string[], parents: node[], sizeof: number, ranges: range[],
-    pointsTo?: node, reads: boolean, writes: boolean, shifts: boolean,
-    types: marker[] };
+  { node: node, roots: string[], parents: node[], sizeof: number,
+    ranges: range[], pointed?: node, reads: boolean, writes: boolean,
+    shifts: boolean, types: marker[] };
 
 /** Decoder for `region` */
 export const jRegion: Json.Decoder<region> =
   Json.jObject({
+    node: jNode,
     roots: Json.jArray(Json.jString),
     parents: Json.jArray(jNode),
     sizeof: Json.jNumber,
     ranges: Json.jArray(jRange),
-    pointsTo: Json.jOption(jNode),
+    pointed: Json.jOption(jNode),
     reads: Json.jBoolean,
     writes: Json.jBoolean,
     shifts: Json.jBoolean,
@@ -106,14 +114,15 @@ export const jRegion: Json.Decoder<region> =
 /** Natural order for `region` */
 export const byRegion: Compare.Order<region> =
   Compare.byFields
-    <{ roots: string[], parents: node[], sizeof: number, ranges: range[],
-       pointsTo?: node, reads: boolean, writes: boolean, shifts: boolean,
-       types: marker[] }>({
+    <{ node: node, roots: string[], parents: node[], sizeof: number,
+       ranges: range[], pointed?: node, reads: boolean, writes: boolean,
+       shifts: boolean, types: marker[] }>({
+    node: byNode,
     roots: Compare.array(Compare.alpha),
     parents: Compare.array(byNode),
     sizeof: Compare.number,
     ranges: Compare.array(byRange),
-    pointsTo: Compare.defined(byNode),
+    pointed: Compare.defined(byNode),
     reads: Compare.boolean,
     writes: Compare.boolean,
     shifts: Compare.boolean,
@@ -122,8 +131,9 @@ export const byRegion: Compare.Order<region> =
 
 /** Default value for `region` */
 export const regionDefault: region =
-  { roots: [], parents: [], sizeof: 0, ranges: [], pointsTo: undefined,
-    reads: false, writes: false, shifts: false, types: [] };
+  { node: nodeDefault, roots: [], parents: [], sizeof: 0, ranges: [],
+    pointed: undefined, reads: false, writes: false, shifts: false, types: []
+    };
 
 const compute_internal: Server.ExecRequest<decl,null> = {
   kind: Server.RqKind.EXEC,

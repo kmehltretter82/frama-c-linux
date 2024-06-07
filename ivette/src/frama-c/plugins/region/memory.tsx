@@ -29,14 +29,49 @@ import * as Dot from 'dome/graph/diagram';
 import * as States from 'frama-c/states';
 import * as Region from './api';
 
-function makeDiagram(_regions: Region.region[]) : Dot.DiagramProps {
+function makeDiagram(regions: Region.region[]): Dot.DiagramProps {
   const nodes: Dot.Node[] = [];
   const edges: Dot.Edge[] = [];
+  regions.forEach(r => {
+    const id = `n${r.node}`;
+    const ht = r.types.length;
+    const color =
+      ht > 1 ? 'red' :
+        r.pointed !== undefined
+          ? (r.writes ? 'orange' : 'yellow')
+          : (r.writes && r.reads) ? 'green' :
+            r.writes ? 'pink' : r.reads ? 'grey' : 'white';
+    const label =
+      (r.reads ? 'R' : '') + (r.writes ? 'W' : '') +
+      (r.pointed !== undefined ? '*' : '');
+    const cells =
+      r.ranges.map((rg, i): Dot.Cell => {
+        const port = `r${i}`;
+        const target = `n${rg.data}`;
+        edges.push({ source: id, sourcePort: port, target });
+        return ({
+          label: `${rg.offset}..${rg.offset + rg.length - 1} [${rg.cells}]`,
+          port,
+        });
+      });
+    const shape = cells.length > 0 ? cells : undefined;
+    nodes.push({ id: id, color, label, shape });
+    r.roots.forEach(x => {
+      const xid = `X${x}`;
+      nodes.push({ id: xid, label: x, shape: 'folder', color: 'blue' });
+      edges.push({ source: xid, target: id });
+    });
+    if (r.pointed !== undefined) {
+      const pid = `n${r.pointed}`;
+      edges.push({ source: id, target: pid, head: 'dot', color: 'orange' });
+    }
+  });
   return { nodes, edges };
 }
 
 export function MemoryView(): JSX.Element {
   const scope = States.useCurrentScope();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const regions = States.useRequest(Region.regions, scope) ?? [];
   const diagram = React.useMemo(() => makeDiagram(regions), [regions]);
   return <Dot.Diagram display={regions.length > 0} {...diagram} />;

@@ -31,26 +31,26 @@ module Vmap = Varinfo.Map
 
 (* All offsets in bits *)
 
-type node = region Ufind.rref
+type node = chunk Ufind.rref
 
 and layout =
   | Blob
   | Cell of int * node option
   | Compound of int * node Ranges.t
 
-and region = {
-  parents: node list ;
-  roots: varinfo list ;
-  reads: Access.Set.t ;
-  writes: Access.Set.t ;
-  shifts: Access.Set.t ;
-  layout: layout ;
+and chunk = {
+  cparents: node list ;
+  croots: varinfo list ;
+  creads: Access.Set.t ;
+  cwrites: Access.Set.t ;
+  cshifts: Access.Set.t ;
+  clayout: layout ;
 }
 
-type range = node Ranges.range
+type rg = node Ranges.range
 
 type map = {
-  store: region Ufind.store ;
+  store: chunk Ufind.store ;
   mutable index: node Vmap.t ;
 }
 
@@ -59,15 +59,15 @@ type map = {
 (* -------------------------------------------------------------------------- *)
 
 let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_) -> s
-let points_to = function Blob | Compound _ -> None | Cell(_,p) -> p
 let ranges = function Blob | Cell _ -> [] | Compound(_,R rs) -> rs
+let pointed = function Blob | Compound _ -> None | Cell(_,p) -> p
 
-let types (m : region) : typ list =
+let types (m : chunk) : typ list =
   let pool = ref Typ.Set.empty in
   let add acs =
     pool := Typ.Set.add (Cil.unrollType @@ Access.typeof acs) !pool in
-  Access.Set.iter add m.reads ;
-  Access.Set.iter add m.writes ;
+  Access.Set.iter add m.creads ;
+  Access.Set.iter add m.cwrites ;
   Typ.Set.elements !pool
 
 (* -------------------------------------------------------------------------- *)
@@ -83,29 +83,30 @@ let pp_layout fmt = function
   | Compound(s,rg) ->
     Format.fprintf fmt "@[<hv 0>{%04d" s ;
     Ranges.iteri
-      (fun (rg : range) ->
+      (fun (rg : rg) ->
          Format.fprintf fmt "@ | %a: %a" Ranges.pp_range rg pp_node rg.data
       ) rg ;
     Format.fprintf fmt "@ }@]"
 
-let pp_region fmt (n: node) (m: region) =
+let pp_chunk fmt (n: node) (m: chunk) =
   begin
     let acs r s = if Access.Set.is_empty s then '-' else r in
     Format.fprintf fmt "@[<hov 2>%a: %c%c%c" pp_node n
-      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
+      (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (types m) ;
-    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.roots ;
+    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.croots ;
     if Options.debug_atleast 1 then
       begin
-        Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
-        Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
-        Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
+        Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
+        Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
+        Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
       end ;
-    Format.fprintf fmt "@ %a ;@]" pp_layout m.layout ;
+    Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
   end
+[@@ warning "-32"]
 
 (* -------------------------------------------------------------------------- *)
-(* --- Constructors                                                       --- *)
+(* --- Map Constructors                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
 let create () = {
@@ -119,12 +120,12 @@ let copy m = {
 }
 
 let empty = {
-  parents = [] ;
-  roots = [] ;
-  reads = Access.Set.empty ;
-  writes = Access.Set.empty ;
-  shifts = Access.Set.empty ;
-  layout = Blob ;
+  cparents = [] ;
+  croots = [] ;
+  creads = Access.Set.empty ;
+  cwrites = Access.Set.empty ;
+  cshifts = Access.Set.empty ;
+  clayout = Blob ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -145,18 +146,18 @@ let get map node =
   with Not_found -> empty
 
 (* -------------------------------------------------------------------------- *)
-(* --- Constructors                                                       --- *)
+(* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
 let cell (m: map) ?size ?ptr ?root () =
-  let layout = match size, ptr with
+  let clayout = match size, ptr with
     | None, None -> Blob
     | None, Some _ -> Cell(Cil.bitsSizeOf Cil.voidPtrType,ptr)
     | Some s, _ -> Cell(s,ptr) in
-  let roots = match root with None -> [] | Some v -> [v] in
-  Ufind.make m.store { empty with layout ; roots }
+  let croots = match root with None -> [] | Some v -> [v] in
+  Ufind.make m.store { empty with clayout ; croots }
 
-let update (m: map) (n: node) (f: region -> region) =
+let update (m: map) (n: node) (f: chunk -> chunk) =
   let r = get m n in
   Ufind.set m.store n (f r)
 
@@ -164,9 +165,9 @@ let range (m: map) ~size ~offset ~length ~data : node =
   let last = offset + length in
   if not (0 <= offset && offset < last && last <= size) then
     raise (Invalid_argument "Region.Memory.range") ;
-  let layout = Compound(size, Ranges.singleton { offset ; length ; data }) in
-  let n = Ufind.make m.store { empty with layout } in
-  update m data (fun r -> { r with parents = nodes m @@ n :: r.parents }) ; n
+  let clayout = Compound(size, Ranges.singleton { offset ; length ; data }) in
+  let n = Ufind.make m.store { empty with clayout } in
+  update m data (fun r -> { r with cparents = nodes m @@ n :: r.cparents }) ; n
 
 let root (m: map) v =
   try Vmap.find v m.index with Not_found ->
@@ -177,20 +178,73 @@ let root (m: map) v =
 (* --- Iterator                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let normalize map r = {
-  parents = nodes map r.parents ;
-  roots = r.roots ;
-  reads = r.reads ;
-  writes = r.writes ;
-  shifts = r.shifts ;
-  layout =
-    match r.layout with
-    | Blob -> Blob
-    | Cell(s,p) -> Cell(s,Option.map (node map) p)
-    | Compound(s,rg) -> Compound(s,Ranges.map (node map) rg)
+type range = {
+  offset: int ;
+  length: int ;
+  cells: int ;
+  data: node ;
 }
 
-let region map n = normalize map (get map n)
+type region = {
+  node: node ;
+  parents: node list ;
+  roots: varinfo list ;
+  types: typ list ;
+  reads: Access.acs list ;
+  writes: Access.acs list ;
+  shifts: Access.acs list ;
+  sizeof: int ;
+  ranges: range list ;
+  pointed: node option ;
+}
+
+let pp_range fmt (r: range) =
+  Format.fprintf fmt "%d..%d [%d]: %a"
+    r.offset (r.offset + r.length) r.cells pp_node r.data
+
+let pp_region fmt (m: region) =
+  begin
+    let acs r s = if s = [] then '-' else r in
+    Format.fprintf fmt "@[<hov 2>%a: %c%c%c"
+      pp_node m.node
+      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
+    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
+    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.roots ;
+    Format.fprintf fmt "@ %db" m.sizeof ;
+    Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
+    Format.fprintf fmt "@[<hv 0>]" ;
+    List.iter (Format.fprintf fmt "@ %a" pp_range) m.ranges ;
+    Format.fprintf fmt "@]" ;
+    if Options.debug_atleast 1 then
+      begin
+        List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
+        List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
+        List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
+      end ;
+    Format.fprintf fmt " ;@]" ;
+  end
+
+let make_range (m: map) (rg: rg) : range = {
+  offset = rg.offset ;
+  length = rg.length ;
+  cells = rg.length / sizeof (get m rg.data).clayout ;
+  data = node m rg.data ;
+}
+
+let make_region (m: map) (n: node) (r: chunk) : region = {
+  node = n ;
+  parents = nodes m r.cparents ;
+  roots = r.croots ;
+  reads = Access.Set.elements r.creads ;
+  writes = Access.Set.elements r.cwrites ;
+  shifts = Access.Set.elements r.cshifts ;
+  types = types r ;
+  sizeof = sizeof r.clayout ;
+  ranges = List.map (make_range m) @@ ranges r.clayout ;
+  pointed = Option.map (node m) (pointed r.clayout) ;
+}
+
+let region map n = make_region map n (get map n)
 
 let rec walk h m f n =
   let n = Ufind.find m.store n in
@@ -198,15 +252,15 @@ let rec walk h m f n =
   try Hashtbl.find h id with Not_found ->
     Hashtbl.add h id () ;
     let r = Ufind.get m.store n in
-    f n (normalize m r) ;
-    match r.layout with
+    f (make_region m n r) ;
+    match r.clayout with
     | Blob -> ()
     | Cell(_,p) -> Option.iter (walk h m f) p
     | Compound(_,rg) -> Ranges.iter (walk h m f) rg
 
-let iter (m:map) (f: node -> region -> unit) =
+let iter (m:map) (f: region -> unit) =
   let h = Hashtbl.create 0 in
-  Vmap.iter (fun _ n -> walk h m f n) m.index
+  Vmap.iter (fun _x n -> walk h m f n) m.index
 
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
@@ -228,15 +282,15 @@ let merge_opt (m: map) (q: queue)
   | None, p | p, None -> p
   | Some pa, Some pb -> Some (merge_node m q pa pb)
 
-let merge_range (m: map) (q: queue) (ra : range) (rb : range) : node =
+let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
   let na = ra.data in
   let nb = rb.data in
   let ma = ra.offset + ra.length in
   let mb = rb.offset + rb.length in
   let dp = ra.offset - rb.offset in
   let dq = ma - mb in
-  let sa = sizeof (get m na).layout in
-  let sb = sizeof (get m nb).layout in
+  let sa = sizeof (get m na).clayout in
+  let sb = sizeof (get m nb).clayout in
   let size = Ranges.(sa %. sb %. dp %. dq) in
   let data = merge_node m q na nb in
   if size = sa && size = sb then data else
@@ -271,13 +325,13 @@ let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
     let wx = Ranges.range ~length:sx rp in
     merge_ranges m q sx wx sr wr
 
-let merge_region (m: map) (q: queue) (a : region) (b : region) : region = {
-  parents = nodes m @@ Store.bag a.parents b.parents ;
-  roots = List.sort_uniq Varinfo.compare @@ Store.bag a.roots b.roots ;
-  reads = Access.Set.union a.reads b.reads ;
-  writes = Access.Set.union a.writes b.writes ;
-  shifts = Access.Set.union a.shifts b.shifts ;
-  layout = merge_layout m q a.layout b.layout ;
+let merge_region (m: map) (q: queue) (a : chunk) (b : chunk) : chunk = {
+  cparents = nodes m @@ Store.bag a.cparents b.cparents ;
+  croots = List.sort_uniq Varinfo.compare @@ Store.bag a.croots b.croots ;
+  creads = Access.Set.union a.creads b.creads ;
+  cwrites = Access.Set.union a.cwrites b.cwrites ;
+  cshifts = Access.Set.union a.cshifts b.cshifts ;
+  clayout = merge_layout m q a.clayout b.clayout ;
 }
 
 let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
@@ -304,26 +358,26 @@ let merge (m: map) (a: node) (b: node) : node =
 (* -------------------------------------------------------------------------- *)
 
 let access (m:map) (a:node) (ty: typ) =
-  let sr = sizeof (get m a).layout in
+  let sr = sizeof (get m a).clayout in
   let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
   if sr <> size then ignore (merge m a (cell m ~size ()))
 
-let pointer (m: map) (a: node) (b : node) =
+let points_to (m: map) (a: node) (b : node) =
   ignore @@ merge m a @@ cell m ~ptr:b ()
 
 let read (m: map) (a: node) from =
   let r = get m a in
-  Ufind.set m.store a { r with reads = Access.Set.add from r.reads } ;
+  Ufind.set m.store a { r with creads = Access.Set.add from r.creads } ;
   access m a (Access.typeof from)
 
 let write (m: map) (a: node) from =
   let r = get m a in
-  Ufind.set m.store a { r with writes = Access.Set.add from r.writes } ;
+  Ufind.set m.store a { r with cwrites = Access.Set.add from r.cwrites } ;
   access m a (Access.typeof from)
 
 let shift (m: map) (a: node) from =
   let r = get m a in
-  Ufind.set m.store a { r with shifts = Access.Set.add from r.shifts }
+  Ufind.set m.store a { r with cshifts = Access.Set.add from r.cshifts }
 (* no access *)
 
 (* -------------------------------------------------------------------------- *)
