@@ -32,7 +32,6 @@ function makeRecord(
   edges: Dot.Edge[],
   source: string,
   sizeof: number,
-  padding: boolean,
   ranges: Region.range[]
 ): Dot.Cell[] {
   if (ranges.length === 0) return [];
@@ -42,23 +41,20 @@ function makeRecord(
     const port = `r${i}`;
     const target = `n${rg.data}`;
     edges.push({ source, sourcePort: port, target });
-    if (padding && offset !== rg.offset)
-      cells.push(`${offset}..${rg.offset-1} ##`);
+    if (offset !== rg.offset)
+      cells.push(`${offset}..${rg.offset - 1} ##`);
     offset = rg.offset + rg.length;
     cells.push({
       label: `${rg.offset}..${offset - 1} [${rg.cells}]`,
       port,
     });
   });
-  if (padding && offset !== sizeof)
-    cells.push(`${offset}..${sizeof-1} ##`);
+  if (offset !== sizeof)
+    cells.push(`${offset}..${sizeof - 1} ##`);
   return cells;
 }
 
-function makeDiagram(
-  regions: readonly Region.region[],
-  padding: boolean,
-): Dot.DiagramProps {
+function makeDiagram(regions: readonly Region.region[]): Dot.DiagramProps {
   const nodes: Dot.Node[] = [];
   const edges: Dot.Edge[] = [];
   regions.forEach(r => {
@@ -71,13 +67,15 @@ function makeDiagram(
           : (r.writes && r.reads) ? 'green' :
             r.writes ? 'pink' : r.reads ? 'grey' : 'white';
     // --- Shape
-    const cells = makeRecord(edges, id, r.sizeof, padding, r.ranges);
+    const font = r.ranges.length > 0 ? 'mono' : 'sans';
+    const cells = makeRecord(edges, id, r.sizeof, r.ranges);
     const shape = cells.length > 0 ? cells : undefined;
-    nodes.push({ id: id, color, label: r.label, title: r.title, shape });
+    nodes.push({ id, font, color, label: r.label, title: r.title, shape });
     // --- Roots
+    const R: Dot.Node = { id: '', shape: 'cds', font: 'mono', color: 'blue' };
     r.roots.forEach(x => {
       const xid = `X${x}`;
-      nodes.push({ id: xid, label: x, shape: 'folder', color: 'blue' });
+      nodes.push({ ...R, id: xid, label: x });
       edges.push({ source: xid, target: id });
     });
     // --- Pointed
@@ -91,14 +89,10 @@ function makeDiagram(
 
 export interface MemoryViewProps {
   regions: readonly Region.region[];
-  padding?: boolean;
 }
 
 export function MemoryView(props: MemoryViewProps): JSX.Element {
-  const { regions, padding=true } = props;
-  const diagram = React.useMemo(
-    () => makeDiagram(regions, padding),
-    [regions, padding]
-  );
+  const { regions } = props;
+  const diagram = React.useMemo(() => makeDiagram(regions), [regions]);
   return <Dot.Diagram {...diagram} />;
 }
