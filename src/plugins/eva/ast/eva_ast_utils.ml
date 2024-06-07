@@ -289,12 +289,11 @@ let rec const_fold (exp: exp) : exp =
 
 and const_fold_cast (t : typ) (e : exp) : exp  =
   let e' = const_fold e in
-  let t' = Cil.(type_remove_attributes_for_c_cast (unrollType t)) in
   let default () = mk_exp (CastE (t, e')) in
-  match e'.node, t' with
+  match e'.node, Cil.unrollType t with
   (* integer -> integer *)
   | Const (CInt64 (i,_k,_)), (TInt (ik, a) | TEnum ({ekind = ik}, a))
-    when a = [] ->
+    when !Cil_datatype.drop_fc_internal_attributes a = [] ->
     Build.integer ~kind:ik i
   (* real -> integer *)
   | Const (CReal (f,_,_)), (TInt(kind, a) | TEnum ({ekind = kind}, a))
