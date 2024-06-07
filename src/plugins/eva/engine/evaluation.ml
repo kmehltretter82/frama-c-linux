@@ -1642,7 +1642,7 @@ module Make
   let backward_function_pointer valuation state expr kf =
     (* Builds the expression [exp_f != &f], and assumes it is false. *)
     let vi_f = Kernel_function.get_vi kf in
-    let expr = Eva_ast.Build.(ne expr (addr (var vi_f))) in
+    let expr = Eva_ast.Build.(ne expr (var_addr vi_f)) in
     fst (reduce ~valuation state expr false)
 
   let eval_function_exp ?subdivnb funcexp ?args state =

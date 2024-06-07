@@ -78,10 +78,11 @@ sig
 
   val index: lval -> exp -> lval (* x[y] *)
   val field: lval -> Cil_types.fieldinfo -> lval (* x.field *)
-  val addr: lval -> exp (* &x *)
   val mem: exp -> lval (* *x *)
 
   val var: Cil_types.varinfo -> lval
   val var_exp: Cil_types.varinfo -> exp
+  val var_addr: Cil_types.varinfo -> exp (* &vi *)
+
   val lval: lval -> exp
 end

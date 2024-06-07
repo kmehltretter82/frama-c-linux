@@ -218,9 +218,6 @@ struct
     assert (field_belongs_to_typ field base.typ);
     add_offset base (Field (field, NoOffset))
 
-  let addr (lval : lval) : exp =
-    mk_exp (AddrOf lval)
-
   let mem (exp : exp) : lval =
     match exp.node with
     | AddrOf lv -> lv
@@ -229,6 +226,7 @@ struct
 
   let var vi = mk_lval (Var vi, NoOffset)
   let var_exp vi = mk_exp (Lval (var vi))
+  let var_addr vi = mk_exp (AddrOf (var vi))
 
   let lval lv =
     Eva_ast_types.mk_tag ~node:(Lval lv) ~typ:lv.typ ~origin:lv.origin
