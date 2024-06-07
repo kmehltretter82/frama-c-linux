@@ -42,6 +42,7 @@ function RegionAnalys(): JSX.Element {
   const [kfName, setName] = React.useState<string>();
   const [pinned, setPinned] = React.useState(false);
   const [running, setRunning] = React.useState(false);
+  const [padding, setPadding] = React.useState(true);
   const setComputing = Dome.useProtected(setRunning);
   const scope = States.useCurrentScope();
   const { kind, name } = States.useDeclaration(scope);
@@ -83,8 +84,15 @@ function RegionAnalys(): JSX.Element {
           selected={pinned}
           onClick={() => setPinned(!pinned)}
         />
+        <Tools.Filler />
+        <Tools.Button
+          icon='ITEMS.LIST'
+          title='Show non-accessed ranges in compounds'
+          selected={padding}
+          onClick={() => setPadding(!padding)}
+        />
       </Tools.ToolBar>
-      <MemoryView regions={regions} />
+      <MemoryView padding={padding} regions={regions} />
     </>
   );
 }

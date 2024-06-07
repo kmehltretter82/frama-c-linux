@@ -126,7 +126,7 @@ struct
     Format.asprintf "%t (%db)"
       begin fun fmt ->
         match m.types with
-        | [] -> Format.pp_print_string fmt "void"
+        | [] -> Format.pp_print_string fmt "Compound"
         | [ty] -> pp_typ_layout m.sizeof fmt ty ;
         | ty::ts ->
           pp_typ_layout 0 fmt ty ;
