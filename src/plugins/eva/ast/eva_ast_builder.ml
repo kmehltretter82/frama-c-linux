@@ -26,95 +26,91 @@ open Eva_ast_types
 
 (* --- Constructors --- *)
 
-let value_or f x = function
-  | Some v -> v
-  | None -> f x
+let mk_exp ?(origin=Built) node =
+  let typ = Eva_ast_typing.type_of_exp_node node in
+  Eva_ast_types.mk_tag ~node ~typ ~origin
 
-let mk_exp ?(origin=Built) ?typ node =
-  let typ = typ |> value_or Eva_ast_typing.type_of_exp_node node in
-  mk_tag ~node ~typ ~origin
-
-let mk_lval ?(origin=Built) ?typ node =
-  let typ = typ |> value_or Eva_ast_typing.type_of_lval_node node in
-  mk_tag ~node ~typ ~origin
+let mk_lval ?(origin=Built) node =
+  let typ = Eva_ast_typing.type_of_lval_node node in
+  Eva_ast_types.mk_tag ~node ~typ ~origin
 
 
 (* --- Translation from Cil --- *)
 
-let translate_unop = function
-  | Cil_types.Neg -> Neg
-  | Cil_types.BNot -> BNot
-  | Cil_types.LNot -> LNot
+let translate_unop : Cil_types.unop -> Eva_ast_types.unop = function
+  | Neg -> Neg
+  | BNot -> BNot
+  | LNot -> LNot
 
-let translate_binop = function
-  | Cil_types.PlusA -> PlusA
-  | Cil_types.PlusPI -> PlusPI
-  | Cil_types.MinusA -> MinusA
-  | Cil_types.MinusPI -> MinusPI
-  | Cil_types.MinusPP -> MinusPP
-  | Cil_types.Mult -> Mult
-  | Cil_types.Div -> Div
-  | Cil_types.Mod -> Mod
-  | Cil_types.Shiftlt -> Shiftlt
-  | Cil_types.Shiftrt -> Shiftrt
-  | Cil_types.Lt -> Lt
-  | Cil_types.Gt -> Gt
-  | Cil_types.Le -> Le
-  | Cil_types.Ge -> Ge
-  | Cil_types.Eq -> Eq
-  | Cil_types.Ne -> Ne
-  | Cil_types.BAnd -> BAnd
-  | Cil_types.BXor -> BXor
-  | Cil_types.BOr -> BOr
-  | Cil_types.LAnd -> LAnd
-  | Cil_types.LOr -> LOr
+let translate_binop : Cil_types.binop -> Eva_ast_types.binop = function
+  | PlusA -> PlusA
+  | PlusPI -> PlusPI
+  | MinusA -> MinusA
+  | MinusPI -> MinusPI
+  | MinusPP -> MinusPP
+  | Mult -> Mult
+  | Div -> Div
+  | Mod -> Mod
+  | Shiftlt -> Shiftlt
+  | Shiftrt -> Shiftrt
+  | Lt -> Lt
+  | Gt -> Gt
+  | Le -> Le
+  | Ge -> Ge
+  | Eq -> Eq
+  | Ne -> Ne
+  | BAnd -> BAnd
+  | BXor -> BXor
+  | BOr -> BOr
+  | LAnd -> LAnd
+  | LOr -> LOr
 
 
-let rec translate_exp e =
-  let node = match e.Cil_types.enode with
-    | Cil_types.Const (Cil_types.CStr _ | Cil_types.CWStr _) ->
+let rec translate_exp (e : Cil_types.exp) =
+  let node = match e.enode with
+    | Const (CStr _ | CWStr _) ->
       Const (CString (Base.of_string_exp e))
-    | Cil_types.Const cst -> Const (translate_constant cst)
-    | Cil_types.Lval lval -> Lval (translate_lval lval)
-    | Cil_types.UnOp (unop, expr, typ) ->
+    | Const cst -> Const (translate_constant cst)
+    | Lval lval -> Lval (translate_lval lval)
+    | UnOp (unop, expr, typ) ->
       UnOp (translate_unop unop, translate_exp expr, typ)
-    | Cil_types.BinOp (binop, e1, e2, typ) ->
+    | BinOp (binop, e1, e2, typ) ->
       BinOp (translate_binop binop, translate_exp e1, translate_exp e2, typ)
-    | Cil_types.CastE (typ, expr) -> CastE (typ, translate_exp expr)
-    | Cil_types.AddrOf lval -> AddrOf (translate_lval lval)
-    | Cil_types.StartOf lval -> StartOf (translate_lval lval)
-    | Cil_types.(SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _) ->
+    | CastE (typ, expr) -> CastE (typ, translate_exp expr)
+    | AddrOf lval -> AddrOf (translate_lval lval)
+    | StartOf lval -> StartOf (translate_lval lval)
+    | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
       match (Cil.constFold true e).enode with
       | Const c -> Const (translate_constant c)
       | _ -> Const (CTopInt Cil.theMachine.kindOfSizeOf)
   in
   mk_exp ~origin:(Exp e) node
 
-and translate_host = function
-  | Cil_types.Var vi -> Var vi
-  | Cil_types.Mem e -> Mem (translate_exp e)
+and translate_host : Cil_types.lhost -> Eva_ast_types.lhost = function
+  | Var vi -> Var vi
+  | Mem e -> Mem (translate_exp e)
 
-and translate_offset = function
-  | Cil_types.NoOffset -> NoOffset
-  | Cil_types.Index (expr, offset) ->
+and translate_offset : Cil_types.offset -> Eva_ast_types.offset = function
+  | NoOffset -> NoOffset
+  | Index (expr, offset) ->
     Index (translate_exp expr, translate_offset offset)
-  | Cil_types.Field (fieldinfo, offset) ->
+  | Field (fieldinfo, offset) ->
     Field (fieldinfo, translate_offset offset)
 
 and translate_lval (host, offset as lval) =
   let node = translate_host host, translate_offset offset in
   mk_lval ~origin:(Lval lval) node
 
-and translate_constant = function
-  | Cil_types.CStr _ | Cil_types.CWStr _ -> assert false (* Handled at higher level by translate_expr *)
-  | Cil_types.CInt64 (cst, ikind, str) -> CInt64 (cst, ikind, str)
-  | Cil_types.CChr chr -> CChr chr
-  | Cil_types.CReal (float, fkind, str) -> CReal (float, fkind, str)
-  | Cil_types.CEnum ei -> CEnum (ei, translate_exp ei.eival)
+and translate_constant : Cil_types.constant -> Eva_ast_types.constant = function
+  | CStr _ | CWStr _ -> assert false (* Handled at higher level by translate_expr *)
+  | CInt64 (cst, ikind, str) -> CInt64 (cst, ikind, str)
+  | CChr chr -> CChr chr
+  | CReal (float, fkind, str) -> CReal (float, fkind, str)
+  | CEnum ei -> CEnum (ei, translate_exp ei.eival)
 
-let rec translate_init = function
-  | Cil_types.SingleInit e -> SingleInit (translate_exp e, e.eloc)
-  | Cil_types.CompoundInit (t, l) ->
+let rec translate_init : Cil_types.init -> Eva_ast_types.init = function
+  | SingleInit e -> SingleInit (translate_exp e, e.eloc)
+  | CompoundInit (t, l) ->
     let translate_field_init (o, i) =
       translate_offset o, translate_init i
     in
@@ -132,8 +128,7 @@ let invert_relation : binop -> binop = function
   | Ne -> Eq
   | _ -> invalid_arg "invert_relation: must be given a comparison operator"
 
-let conv_relation : binop -> Abstract_interp.Comp.t =
-  function
+let conv_relation : binop -> Abstract_interp.Comp.t = function
   | Eq -> Eq
   | Ne -> Ne
   | Le -> Le
@@ -148,8 +143,8 @@ let conv_relation : binop -> Abstract_interp.Comp.t =
 let rec concat_offset (o1 : offset) (o2 : offset) : offset =
   match o1 with
   | NoOffset -> o2
-  | Field (fid, o1') -> Field(fid, concat_offset o1' o2)
-  | Index (e, o1') -> Index(e, concat_offset o1' o2)
+  | Field (fid, o1') -> Field (fid, concat_offset o1' o2)
+  | Index (e, o1') -> Index (e, concat_offset o1' o2)
 
 let add_offset (lval : lval) (offset : offset) : lval =
   let (lval_host, lval_offset) = lval.node in
@@ -219,7 +214,7 @@ struct
   let ne = binop Ne
 
   let index (base : lval) (index : exp) : lval =
-    assert(Cil.isArrayType base.typ);
+    assert (Cil.isArrayType base.typ);
     add_offset base (Index (index, NoOffset))
 
   let field (base : lval) (field : Cil_types.fieldinfo) : lval =
@@ -228,7 +223,7 @@ struct
       | Cil_types.TComp (ci,_attr) -> ci == fi.Cil_types.fcomp
       | _ -> false
     in
-    assert(field_belongs_to_typ field base.typ);
+    assert (field_belongs_to_typ field base.typ);
     add_offset base (Field (field, NoOffset))
 
   let addr (lval : lval) : exp =
@@ -243,7 +238,8 @@ struct
   let var vi = mk_lval (Var vi, NoOffset)
   let var_exp vi = mk_exp (Lval (var vi))
 
-  let lval lv = mk_tag ~node:(Lval lv) ~typ:lv.typ ~origin:lv.origin
+  let lval lv =
+    Eva_ast_types.mk_tag ~node:(Lval lv) ~typ:lv.typ ~origin:lv.origin
 end
 
 
@@ -278,5 +274,5 @@ let rec normalize_condition exp positive =
 
 (* --- Hide mk optional paremeters --- *)
 
-let mk_exp = mk_exp ~origin:Built ?typ:None
-let mk_lval = mk_lval ~origin:Built ?typ:None
+let mk_exp = mk_exp ~origin:Built
+let mk_lval = mk_lval ~origin:Built
