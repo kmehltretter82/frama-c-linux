@@ -35,6 +35,8 @@ import './style.css';
 
 export type Direction = 'LR' | 'TD';
 
+export type Font = 'serif' | 'sans' | 'mono';
+
 export type Color =
   | 'white' | 'grey' | 'dark'
   | 'primary' | 'selected'
@@ -45,7 +47,7 @@ export type Shape =
   | 'point' | 'box'
   | 'diamond' | 'hexagon'
   | 'circle' | 'ellipse'
-  | 'note' | 'tab' | 'folder';
+  | 'note' | 'tab' | 'folder' | 'cds';
 
 export type Arrow = 'none' | 'arrow' | 'tee' | 'box' | 'dot';
 
@@ -64,6 +66,8 @@ export interface Node {
   label?: string;
   /** Node tooltip */
   title?: string;
+  /** Node font (label) */
+  font?: Font;
   /** Node color (filled background) */
   color?: Color;
   /**
@@ -94,6 +98,8 @@ export interface Edge {
   head?: Arrow;
   /** Default is `none` */
   tail?: Arrow;
+  /** Label font */
+  font?: Font;
   /** Label */
   label?: string;
   /** Tooltip */
@@ -148,8 +154,14 @@ export interface DiagramProps {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Color Model                                                        --- */
+/* --- CSS Model                                                          --- */
 /* -------------------------------------------------------------------------- */
+
+const FONTNAME = {
+  'serif': 'Times',
+  'sans': 'sans-serif',
+  'mono': 'Courier',
+};
 
 // node background colors
 const BGCOLOR = {
@@ -340,7 +352,8 @@ class Builder {
       .print('  ')
       .port(n.id)
       .print(' [')
-      .attr('id', n.id);
+      .attr('id', n.id)
+      .attr('fontname', n.font ? FONTNAME[n.font] : undefined);
     if (typeof n.shape === 'object') {
       this
         .attr('shape', 'record')
@@ -399,6 +412,7 @@ class Builder {
       .port(e.target, e.targetPort)
       .print(' [')
       .attr('label', e.label)
+      .attr('fontname', e.font ? FONTNAME[e.font] : undefined)
       .attr('headlabel', e.headLabel)
       .attr('taillabel', e.tailLabel)
       .attr('labeltooltip', e.label ? tooltip : undefined)
@@ -476,7 +490,7 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     setError(undefined);
     graphviz(href, {
       useWorker: false,
-      fit: true, zoom: true, width, height,
+      fit: false, zoom: true, width, height,
     }).onerror(setError)
       .renderDot(model).on('end', function () {
         if (onSelection) {
