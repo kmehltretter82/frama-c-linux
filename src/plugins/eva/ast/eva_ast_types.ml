@@ -121,3 +121,10 @@ and binop =
 type init =
   | SingleInit of (exp * Cil_types.location)
   | CompoundInit of typ * (offset * init) list
+
+
+(* Optimization of comparaison functions on lvalues and expressions. *)
+let compare_exp e1 e2 = if e1 == e2 then 0 else compare_exp e1 e2
+let compare_lval lv1 lv2 = if lv1 == lv2 then 0 else compare_lval lv1 lv2
+let equal_exp e1 e2 = e1 == e2 || equal_exp e1 e2
+let equal_lval lv1 lv2 = lv1 == lv2 || equal_lval lv1 lv2
