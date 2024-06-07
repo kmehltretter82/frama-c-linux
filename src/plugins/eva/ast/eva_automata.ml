@@ -78,7 +78,7 @@ module Vertex = Datatype.Make_with_collections (struct
 module Transition = Datatype.Make (struct
     include Datatype.Serializable_undefined
     type t = transition
-    let name = "Eva_automaton.Transition"
+    let name = "Eva_automata.Transition"
     let reprs = [Skip]
     let pretty fmt =
       let open Format in
@@ -110,7 +110,7 @@ struct
         let compare e1 e2 = e1.edge_key - e2.edge_key
         let hash e = e.edge_key
         let equal e1 e2 = e1.edge_key = e2.edge_key
-        let pretty fmt e = Format.pp_print_int fmt e.edge_key
+        let pretty fmt e = Transition.pretty fmt e.edge_transition
       end)
   let default = dummy_edge
 end
