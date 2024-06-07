@@ -59,7 +59,8 @@ struct
 
   type widening_state = {
     mutable widened_state : state option;
-    mutable previous_state : state;
+    mutable previous_state : state option;
+    mutable saved_state : state option;
     mutable widening_counter : int;
     mutable widening_steps : int; (* count the number of successive widenings *)
   }
@@ -124,6 +125,30 @@ struct
 
   let pretty_flow (fmt : Format.formatter) (flow : flow) =
     Flow.iter (fun _ -> Domain.pretty fmt) flow
+
+  let pretty_widening (fmt: Format.formatter) (w: widening): unit =
+    let print_stmt () = 
+      let loc = Cil_datatype.Stmt.loc w.widening_stmt in
+      Format.fprintf fmt "Stmt loc: %a @." Cil_datatype.Location.pretty loc 
+    in
+    let print_pair = 
+      Pretty_utils.pp_pair Partition.Key.pretty Domain.pretty
+    in
+    let print_binding fmt (key, w_state) = 
+      match w_state.saved_state with
+      | None -> Partition.Key.pretty fmt key
+      | Some state -> print_pair fmt (key, state)
+    in
+    let print_widening () =
+      Pretty_utils.pp_iter 
+        (fun f ->Partition.iter (fun k v -> f (k, v))) 
+        print_binding fmt w.widening_partition in
+    begin
+      print_stmt ();
+      Format.fprintf fmt "Widened states: @.";
+      print_widening ()
+    end
+
 
 
   (* Accessors *)
@@ -326,43 +351,55 @@ struct
       try
         (* Search for an already existing widening state *)
         let w = Partition.find key w.widening_partition in
-        let previous_state = w.previous_state in
-        (* Update the widening state *)
-        w.previous_state <- curr;
-        w.widening_counter <- w.widening_counter - 1;
-        (* Propagated state decreases, stop propagating *)
-        if Domain.is_included curr previous_state then
-          None
-          (* Widening is delayed *)
-        else if w.widening_counter >= 0 then
-          Some curr
-          (* Apply widening *)
-        else begin
-          Self.feedback ~level:1 ~once:true ~current:true
-            ~dkey:Self.dkey_widening
-            "applying a widening at this point";
-          (* We join the previous widening state with the previous iteration
-             state so as to allow the intermediate(s) iteration(s) (between
-             two widenings) to stabilize at least a part of the state. *)
-          let prev = match w.widened_state with
-            | Some v -> Domain.join previous_state v
-            | None -> previous_state
-          in
-          let next = Domain.widen kf stmt prev (Domain.join prev curr) in
-          w.previous_state <- next;
-          w.widened_state <- Some next;
-          w.widening_counter <- widening_period - 1;
-          w.widening_steps <- w.widening_steps + 1;
-          Statistics.grow stat_max_widenings stmt w.widening_steps;
+        match w.saved_state with
+        (* If it is a reused widenings, propagate  *)
+        | Some saved_state -> 
+          let next = Domain.join curr saved_state in
+          w.previous_state <- Some next;
+          w.widened_state <- None;
+          w.saved_state <- None;
+          Self.debug ~dkey:Self.dkey_widening "Reusing previous widened state @."; 
           Some next
-        end
+        | None -> 
+          (* Update the widening state *)
+          let previous_state = Option.get w.previous_state in 
+          w.previous_state <- Some curr;
+          w.widening_counter <- w.widening_counter - 1;
+          (* Propagated state decreases, stop propagating *)
+          if Domain.is_included curr previous_state then
+            None
+            (* Widening is delayed *)
+          else if w.widening_counter >= 0 then
+            Some curr
+            (* Apply widening *)
+          else begin
+            Self.feedback ~level:1 ~once:true ~current:true
+              ~dkey:Self.dkey_widening
+              "applying a widening at this point";
+            (* We join the previous widening state with the previous iteration
+               state so as to allow the intermediate(s) iteration(s) (between
+               two widenings) to stabilize at least a part of the state. *)
+            let prev = match w.widened_state with
+              | Some v -> Domain.join previous_state v
+              | None -> previous_state
+            in
+            let next = Domain.widen kf stmt prev (Domain.join prev curr) in
+            w.previous_state <- Some next;
+            w.widened_state <- Some next;
+            w.saved_state <- None;
+            w.widening_counter <- widening_period - 1;
+            w.widening_steps <- w.widening_steps + 1;
+            Statistics.grow stat_max_widenings stmt w.widening_steps;
+            Some next
+          end
       with Not_found ->
         (* The key is not in the widening state; add the state if slevel is
            exceeded. *)
         if Key.exceed_rationing key then begin
           let ws =
             { widened_state = None;
-              previous_state = curr;
+              previous_state = Some curr;
+              saved_state = None;
               widening_counter = widening_delay - 1;
               widening_steps = 0
             }
@@ -373,4 +410,21 @@ struct
     in
     let flow = Flow.join_duplicate_keys flow in
     Flow.filter_map widen_one flow
+
+  let import_widening (stmt : Cil_types.stmt) (p : state partition) =
+    {
+      widening_stmt = stmt;
+      widening_partition = p |> Partition.map (fun state -> {
+            widened_state = None;
+            previous_state = None;
+            saved_state = Some state;
+            widening_counter = widening_delay;
+            widening_steps = 0
+          })
+    }
+
+  let export_widening (w: widening) =
+    w.widening_stmt,
+    w.widening_partition |>
+    Partition.filter_map (fun _k w_state -> w_state.widened_state)
 end

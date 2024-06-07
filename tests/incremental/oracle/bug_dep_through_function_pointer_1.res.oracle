@@ -3,12 +3,14 @@
 [eva] Computing AST differences between saved file and current session
 [eva] Copying Eva analysis cache from save file bug_dep_through_function_pointer_1.1.sav
 [eva] In save file bug_dep_through_function_pointer_1.1.sav, 7 saved calls for 5 functions
+[eva] In save file bug_dep_through_function_pointer_1.1.sav, 0 saved widenings for 0 functions
 [eva:memexec] Importing summaries for function foo
 [eva:memexec] Importing summaries for function alloc
 [eva:memexec] Function main has been modified: -> main (callees changed)
 [eva:memexec] Function test has been modified: -> test (callees changed)
 [eva:memexec] Function bar has been modified: -> bar (body changed)
 [eva] In current session, 3 saved calls for 2 functions
+[eva] In current session, 0 saved widenings for 0 functions
 [kernel] Warning: clearing dangling project pointers in project "default"
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

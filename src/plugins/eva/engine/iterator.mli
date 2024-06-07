@@ -30,6 +30,8 @@ val signal_abort: unit -> unit
     evaluated to true (resp. false) at least once during the analysis. *)
 val condition_truth_value: stmt -> bool * bool
 
+val import: Project.t -> unit
+
 module Computer
     (* Abstractions with the evaluator. *)
     (Abstract: Abstractions.S_with_evaluation)
@@ -50,8 +52,9 @@ module Computer
 
     val compute:
       save_results:bool ->
+      widenings: (Abstract.Dom.t Partition.partition) Cil_datatype.Stmt.Map.t option ->
       kernel_function -> kinstr -> Abstract.Dom.t ->
-      (Partition.key * Abstract.Dom.t) list * Eval.cacheable * Base.Hptset.t
+      Abstract.Dom.t Transfer_stmt.call_result
 
   end
 

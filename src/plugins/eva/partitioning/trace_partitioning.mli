@@ -53,6 +53,7 @@ sig
 
   val pretty_store : Format.formatter -> store -> unit
   val pretty_flow : Format.formatter -> flow -> unit
+  val pretty_widening : Format.formatter ->  widening -> unit
 
   (* --- Accessors --- *)
 
@@ -124,4 +125,7 @@ sig
       and previous propagated states to ensure termination. *)
   val widen : widening -> flow -> flow
 
+  val import_widening : Cil_types.stmt -> state Partition.partition -> widening
+  
+  val export_widening : widening -> Cil_types.stmt * state Partition.partition
 end

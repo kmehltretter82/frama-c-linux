@@ -131,6 +131,10 @@ let import_callsite_kf kf = match Ast_diff.Kernel_function.find kf with
   | `Same kf | `Partial (kf, _) -> kf
   | `Not_present -> raise Not_found
 
+let import_widening_kf kf = match Ast_diff.Kernel_function.find kf with
+  | `Same kf | `Partial (kf, _) -> kf
+  | `Not_present -> raise Not_found
+
 let import_callsite_stmt stmt = match Ast_diff.Stmt.find stmt with
   | `Same stmt -> stmt
   | `Partial (stmt, diff)->
@@ -139,4 +143,8 @@ let import_callsite_stmt stmt = match Ast_diff.Stmt.find stmt with
       | `Body_changed -> raise Not_found
       | _ -> stmt
     end
+  | `Not_present -> raise Not_found
+
+let import_widening_stmt stmt = match Ast_diff.Stmt.find stmt with
+  | `Same stmt | `Partial (stmt, _) -> stmt
   | `Not_present -> raise Not_found

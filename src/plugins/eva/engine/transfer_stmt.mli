@@ -25,6 +25,13 @@ open Eval
 
 val current_kf_inout: unit -> Inout_type.t option
 
+type 'state call_result = {
+  states: (Partition.key * 'state) list;
+  cacheable: Eval.cacheable;
+  allocated_bases: Base.Hptset.t;
+  widenings: ('state Partition.partition) Cil_datatype.Stmt.Map.t
+}
+
 module type S = sig
 
   type state
@@ -48,14 +55,8 @@ module type S = sig
 
   val enter_scope: kernel_function -> varinfo list -> state -> state
 
-  type call_result = {
-    states: (Partition.key * state) list;
-    cacheable: Eval.cacheable;
-    allocated_bases: Base.Hptset.t;
-  }
-
   val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
+    (stmt -> (loc, value) call -> recursion option -> state -> state call_result) ref
 end
 
 module Make (Abstract: Abstractions.S_with_evaluation)

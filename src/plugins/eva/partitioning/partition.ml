@@ -292,6 +292,7 @@ let size = KMap.cardinal
 let iter = KMap.iter
 let map = KMap.map
 let filter = KMap.filter
+let filter_map = KMap.filter_map
 let merge = KMap.merge
 
 let to_list (p : 'a partition) : (key * 'a) list =

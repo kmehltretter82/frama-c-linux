@@ -3,7 +3,9 @@
 [eva] Computing AST differences between saved file and current session
 [eva] Copying Eva analysis cache from save file inout_import_1.sav
 [eva] In save file inout_import_1.sav, 3 saved calls for 3 functions
+[eva] In save file inout_import_1.sav, 0 saved widenings for 3 functions
 [eva] In current session, 1 saved calls for 1 functions
+[eva] In current session, 0 saved widenings for 3 functions
 [kernel] Warning: clearing dangling project pointers in project "default"
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

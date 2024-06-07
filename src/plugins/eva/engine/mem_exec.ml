@@ -44,6 +44,8 @@ let stat_builtin_malloc_load_time = Statistics.register_global_stat
     "time-builtin-malloc-import"
 let stat_function_summaries_load_time = Statistics.register_global_stat
     "time-function-summaries-import"
+let stat_loop_widenings_load_time = Statistics.register_global_stat
+    "time-loop-widenings-import"
 let stat_gather_load_time = Statistics.register_global_stat
     "time-gather-import"
 
@@ -101,6 +103,10 @@ module Make
 
   module CallOutput = Datatype.List (Datatype.Pair (Partition.Key) (Domain))
 
+  module Partitions = Partition.Key.Map.Make (Domain)
+
+  module Widenings = Cil_datatype.Stmt.Map.Make (Partitions)
+
   module StoredResult =
     Datatype.Triple
       (Base.Hptset)  (* Set of bases possibly read or written by the call. *)
@@ -109,6 +115,8 @@ module Make
 
   module AllocatedBasesToResults =
     Base.Hptset.Hashtbl.Make (StoredResult)
+
+  type widenings = (Domain.t Partition.partition) Cil_datatype.Stmt.Map.t
 
   type call_result = {
     return_flow: (Partition.key * Domain.t) list;
@@ -132,8 +140,12 @@ module Make
   (* Map from the arguments of a call to stored results. *)
   module ArgsToStoredCalls = ActualArgs.Map.Make (InputBasesToCallEffect)
 
-  let name = "Mem_exec.PreviousCalls(" ^ Value.name ^ ", " ^ Domain.name ^")"
-  let unique_name = State.unique_name_from_name name
+  module ArgsToWidenings = ActualArgs.Map.Make (Widenings)
+
+  let previous_calls_name = "Mem_exec.PreviousCalls(" ^ Value.name ^ ", " ^ Domain.name ^")"
+  let previous_widenings_name = "Mem_exec.PreviousWidenings(" ^ Value.name ^ ", " ^ Domain.name ^")"
+
+  let unique_name = State.unique_name_from_name
 
   module PreviousCalls =
     Kernel_function.Make_Table
@@ -141,11 +153,21 @@ module Make
       (struct
         let size = 17
         let dependencies = cache_dependencies
-        let name = unique_name
+        let name = unique_name previous_calls_name
+      end)
+
+
+  module PreviousWidenings = 
+    Kernel_function.Make_Table
+      (ArgsToWidenings)
+      (struct
+        let size = 17
+        let dependencies = cache_dependencies
+        let name = unique_name previous_widenings_name
       end)
 
   let cleanup = !cleanup_ref
-  let () = cleanup_ref := fun () -> cleanup (); PreviousCalls.clear ()
+  let () = cleanup_ref := fun () -> cleanup (); PreviousCalls.clear (); PreviousWidenings.clear ()
 
   (** [diff_base_full_zone bases zones] remove from the set of bases [bases]
       those of which all bits are present in [zones] *)
@@ -246,18 +268,18 @@ module Make
       | Base.SetLattice.Top -> raise TooImprecise
       | Base.SetLattice.Set bases -> bases
     in
-    let reduced_input_state = Domain.filter (`Pre kf) input_bases input_state in
     (* Outputs bases, that is bases that are copy-pasted, also include
        input bases. Indeed, those may get reduced during the call. *)
     let all_output_bases =
       Base.Hptset.union input_bases output_bases
     in 
-    (input_bases, reduced_input_state, all_output_bases)
+    (input_bases, all_output_bases)
 
 
   let store_results_kf inout kf input_state args (call_result: call_result) = 
     let allocated_bases = call_result.allocated_bases in 
-    let input_bases, reduced_input_state, all_output_bases = extract_bases kf inout input_state in
+    let input_bases, all_output_bases = extract_bases kf inout input_state in
+    let reduced_input_state = Domain.filter (`Pre kf) input_bases input_state in
     let all_output_bases = 
       Base.Hptset.union all_output_bases allocated_bases
     in
@@ -304,6 +326,58 @@ module Make
       | TooImprecise
       | Kernel_function.No_Statement
       | Not_found -> ()
+
+
+  let merge_widenings old_ws new_ws = 
+    let join_same _ m1 m2 = 
+      match m1, m2 with
+      | Some x, None -> Some x
+      | None, Some x -> Some x
+      | None, None -> None
+      | Some x, Some y -> Some (Domain.join x y)
+    in
+    Partition.Key.Map.merge join_same old_ws new_ws
+
+  let merge_statements old_stmt new_stmt =
+    let join_same _ s1 s2 =
+      match s1, s2 with
+      | Some x, None | None, Some x -> Some x
+      | None, None -> None
+      | Some x, Some y -> Some (merge_widenings x y)
+    in
+    Cil_datatype.Stmt.Map.merge join_same old_stmt new_stmt
+
+  let reduce_widenings inout kf (partitions: Partitions.t) =
+    let output_bases = bases inout.Inout_type.over_outputs_if_termination in
+    let filter widened_state =
+      Domain.filter (`Post kf) output_bases widened_state
+    in Partition.Key.Map.map filter partitions
+
+  let store_widenings_kf inout kf args _callstack widenings =
+    let map_args =
+      try PreviousWidenings.find kf 
+      with Not_found ->
+        ActualArgs.Map.empty
+    in
+    let old_widenings = 
+      try ActualArgs.Map.find args map_args 
+      with Not_found ->
+        Cil_datatype.Stmt.Map.empty
+    in
+    let reduced_widenings = 
+      let f = reduce_widenings inout kf in
+      Cil_datatype.Stmt.Map.map f widenings in
+    let merged = merge_statements old_widenings reduced_widenings in 
+    let new_map_args = ActualArgs.Map.add args merged map_args in 
+    PreviousWidenings.replace kf new_map_args
+
+
+  let store_widenings kf args callstack widenings = 
+    match Transfer_stmt.current_kf_inout () with
+    | None -> ()
+    | Some inout ->
+      let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
+      store_widenings_kf inout kf args callstack widenings
 
 
   exception Result_found of call_result * int
@@ -425,6 +499,16 @@ module Make
       let call_result = outputs in
       Some (call_result, i)
 
+
+  let reuse_previous_widenings kf args _callstack =
+    try
+      let map_args = PreviousWidenings.find kf in
+      let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
+      let widenings = ActualArgs.Map.find args map_args in
+      Some widenings
+    with Not_found ->
+      None
+
   (* ------------------------------------------------------------------------ *)
   (*              Reload caches from another Frama-C project                  *)
   (* ------------------------------------------------------------------------ *)
@@ -505,6 +589,57 @@ module Make
     | `Not_present
     | exception Not_found -> ()
 
+  let import_partition (map: Partitions.t) =
+    let add key state acc =
+      try
+        let state = Domain.import state in
+        Partition.Key.Map.add key state acc
+      with Not_found ->
+        acc
+    in
+    Partition.Key.Map.fold add map Partition.Key.Map.empty
+
+  let import_widenings (map: Widenings.t) =
+    let add stmt partition_map acc =
+      try
+        let stmt = Eva_diff.import_widening_stmt stmt in
+        let partition_map = import_partition partition_map in
+        Cil_datatype.Stmt.Map.add stmt partition_map acc
+      with Not_found ->
+        acc
+    in
+    Cil_datatype.Stmt.Map.fold add map Cil_datatype.Stmt.Map.empty
+
+
+  let import_args (map: ArgsToWidenings.t) =
+    let add key data acc =
+      try
+        let key = List.map (Option.map Value.import) key in
+        let data = import_widenings data in
+        ActualArgs.Map.add key data acc
+      with Not_found ->
+        acc
+    in
+    let new_map = ActualArgs.Map.fold add map ActualArgs.Map.empty in
+    new_map
+
+  let import_cache_widenings (old_kf, old_data) =
+    match Ast_diff.Kernel_function.find old_kf with
+    | `Same kf | `Partial (kf, _) ->
+      begin
+        try
+          Self.debug ~dkey "Importing widenings for function %a from function %a@."
+            Kernel_function.pretty kf Kernel_function.pretty old_kf;
+          let data = import_args old_data in
+          PreviousWidenings.replace kf data
+        with Not_found ->
+          Self.debug ~dkey "Cannot import widenings for function %a@."
+            Kernel_function.pretty kf
+      end
+    | `Not_present
+    | exception Not_found -> ()
+
+
   let print_cache_size prefix_msg =
     let kf_nb = PreviousCalls.length () in
     let call_nb =
@@ -516,18 +651,27 @@ module Make
             map acc)
         0
     in
-    Self.feedback "%s, %i saved calls for %i functions" prefix_msg call_nb kf_nb
+    Self.feedback "%s, %i saved calls for %i functions" prefix_msg call_nb kf_nb;
+    let kf_nb = PreviousWidenings.length () in
+    let call_nb =
+      PreviousWidenings.fold (fun _ map acc ->
+          ActualArgs.Map.fold ( fun _ widenings acc ->
+              Cil_datatype.Stmt.Map.cardinal widenings + acc
+            ) map acc) 0
+    in
+    Self.feedback "%s, %i saved widenings for %i functions" prefix_msg call_nb kf_nb
 
   let import_cached_calls_from name project =
     let aux_gather () =
       print_cache_size ("In save file " ^ name);
       PreviousCalls.fold (fun kf data acc -> (kf, data) :: acc) [],
+      PreviousWidenings.fold (fun kf data acc -> (kf, data) :: acc) [],
       SaveCounter.get ()
     in
     let gather () =
       Project.on project aux_gather () in
     (* Gather time wrapped *)
-    let list, counter =
+    let list, list', counter =
       load_time_wrapper stat_gather_load_time gather in
     (* Builtin malloc wrapped *)
     let import_builtin_malloc () =
@@ -540,6 +684,9 @@ module Make
     let import_function_summaries () =
       List.iter (import_cache_summaries not_imported_kf) list in
     load_time_wrapper stat_function_summaries_load_time import_function_summaries;
+    let import_loop_widenings () = 
+      List.iter import_cache_widenings list' in
+    load_time_wrapper stat_loop_widenings_load_time import_loop_widenings;
     SaveCounter.set counter
 
 
@@ -602,6 +749,7 @@ module Make
     let clear () = 
       begin 
         PreviousCalls.clear ();
+        PreviousWidenings.clear ();
       end in
     let prepare () =
       begin

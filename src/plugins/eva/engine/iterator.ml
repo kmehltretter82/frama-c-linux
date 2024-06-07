@@ -69,6 +69,38 @@ let record_fireable edge =
     Conditions_table.replace stmt new_status
   | _ -> ()
 
+module Kf_Widening_Stmts = 
+  Kernel_function.Make_Table
+    (Cil_datatype.Stmt.Set)
+    (struct
+      let size = 97
+      let name = "Value.Iterator.Kf_Widening_Stmts"
+      let dependencies = [ Ast.self ]
+    end)
+let () = Ast.add_monotonic_state Kf_Widening_Stmts.self
+
+let () =
+  let f kf () = match Kf_Widening_Stmts.find_opt kf with
+    | None -> None
+    | Some stmts_set -> Some (Cil_datatype.Stmt.Set.elements stmts_set) in
+  Ast_diff.widening_stmts_ref := f
+
+let import project =
+  let gather () = Kf_Widening_Stmts.fold (fun kf stmts acc -> (kf, stmts) :: acc) [] in
+  let list = Project.on project gather () in
+  let import (kf, stmts) = 
+    try
+      let kf = Eva_diff.import_widening_kf kf in
+      let stmts = Cil_datatype.Stmt.Set.fold (fun stmt acc -> 
+          let stmt = Eva_diff.import_widening_stmt stmt in
+          Cil_datatype.Stmt.Set.add stmt acc)
+          stmts Cil_datatype.Stmt.Set.empty in
+      Kf_Widening_Stmts.add kf stmts
+    with Not_found ->
+      () 
+  in
+  List.iter import list
+
 
 module Make_Dataflow
     (Abstract : Abstractions.S_with_evaluation)
@@ -550,6 +582,30 @@ module Make_Dataflow
     in
     List.iter reset_vertex vertex_list
 
+  let import_widenings ~widenings wto =
+    match widenings with
+    | None -> ()
+    | Some widenings ->
+      let import widenings (vertex: vertex) = 
+        match vertex.vertex_start_of with
+        | None -> () 
+        | Some stmt ->
+          try
+            match stmt.skind with
+            | Loop _ ->
+              let saved_widening = Cil_datatype.Stmt.Map.find stmt widenings in
+              let widening = Partitioning.import_widening stmt saved_widening in
+              let _ = Self.debug ~dkey:Self.dkey_widening "Re-importing widening @.%a" Partitioning.pretty_widening widening in
+              VertexTable.replace w_table vertex widening
+            | _ -> raise Not_found
+          with Not_found ->
+            ()
+      in
+      let iterate_wto =
+        import widenings
+      in
+      List.iter iterate_wto (Wto.flatten wto)
+
   let rec iterate_list (l : wto) =
     List.iter iterate_element l
   and iterate_element = function
@@ -609,16 +665,42 @@ module Make_Dataflow
     ignore (Logic.check_fct_postconditions kf active_behaviors Normal
               ~pre_state:initial_state ~post_states:States.empty ~result:None)
 
-  let compute () : (key * state) list =
+  let compute ~widenings () : state Transfer_stmt.call_result =
     if interpreter_mode then
       simulate automaton.entry_point (get_initial_flow ())
     else begin
       let wto = Interpreted_automata.get_wto kf in
+      let _ = import_widenings ~widenings wto in
       iterate_list wto
     end;
     if not !post_conditions then mark_postconds_as_true ();
     let final_store = get_vertex_store automaton.return_point in
-    Partitioning.expanded final_store
+    let states = Partitioning.expanded final_store in
+    let widenings = VertexTable.to_seq w_table |>
+                    Seq.map (fun (_, w) -> Partitioning.export_widening w) |>
+                    Cil_datatype.Stmt.Map.of_seq
+    in
+    let _ = 
+      let stmts = 
+        try 
+          Kf_Widening_Stmts.find kf 
+        with Not_found ->
+          Cil_datatype.Stmt.Set.empty
+      in
+      let stmts = Cil_datatype.Stmt.Map.fold (fun stmt _ acc -> 
+          Cil_datatype.Stmt.Set.add stmt acc
+        ) widenings stmts in
+      Kf_Widening_Stmts.replace kf stmts
+    in
+    let allocated_bases = Builtins_malloc.get_kf_allocated_bases kf in
+    let _  = Builtins_malloc.clear_kf_allocated_bases kf in
+    Transfer_stmt.{
+      states = states;
+      widenings = widenings;
+      cacheable = !cacheable;
+      allocated_bases = allocated_bases;
+    }
+
 
 
   (* --- Results conversion --- *)
@@ -706,7 +788,7 @@ module Computer
      end)
 = struct
 
-  let compute ~save_results kf call_kinstr state =
+  let compute ~save_results ~widenings kf call_kinstr state =
     let module Dataflow =
       Make_Dataflow
         (Abstract) (States) (Transfer) (Init) (Logic) (Spec)
@@ -718,19 +800,17 @@ module Computer
         ()
     in
     let compute () =
-      let results = Dataflow.compute () in
+      let results = Dataflow.compute ~widenings () in
       if Parameters.ValShowProgress.get () then
         Self.feedback "Recording results for %a"
           Kernel_function.pretty kf;
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in
-      if Cil.hasAttribute "noreturn" f.svar.vattr && results <> [] then
+      if Cil.hasAttribute "noreturn" f.svar.vattr && results.states <> [] then
         Eva_utils.warning_once_current
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;
-      let allocated_bases = Builtins_malloc.get_kf_allocated_bases kf in
-      let _  = Builtins_malloc.clear_kf_allocated_bases kf in
-      results, !Dataflow.cacheable, allocated_bases
+      results
     in
     let cleanup () =
       Dataflow.mark_degeneration ();

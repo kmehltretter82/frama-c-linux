@@ -59,7 +59,7 @@ module Key : sig
 end
 
 (** Collection of states, each identified by a unique key. *)
-type 'state partition
+type 'state partition = 'state Key.Map.t
 
 val empty : 'a partition
 val is_empty : 'a partition -> bool
@@ -71,7 +71,8 @@ val merge : (key -> 'a option -> 'b option -> 'c option) -> 'a partition ->
   'b partition -> 'c partition
 val iter : (key -> 'a -> unit) -> 'a partition -> unit
 val filter : (key -> 'a -> bool) -> 'a partition -> 'a partition
-val map : ('a  -> 'a) -> 'a partition -> 'a partition
+val filter_map : (key -> 'a -> 'b option) -> 'a partition -> 'b partition
+val map : ('a  -> 'b) -> 'a partition -> 'b partition
 
 
 (** {2 Partitioning actions.} *)

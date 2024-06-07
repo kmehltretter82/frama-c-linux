@@ -3,9 +3,13 @@
 [eva] Computing AST differences between saved file and current session
 [eva] Copying Eva analysis cache from save file litterals_static.sav
 [eva] In save file litterals_static.sav, 2 saved calls for 2 functions
+[eva] In save file litterals_static.sav, 0 saved widenings for 2 functions
 [eva:memexec] Importing summaries for function main
 [eva:memexec] Importing summaries for function foo
+[eva:memexec] Importing widenings for function main from function main
+[eva:memexec] Importing widenings for function foo from function foo
 [eva] In current session, 2 saved calls for 2 functions
+[eva] In current session, 0 saved widenings for 2 functions
 [kernel] Warning: clearing dangling project pointers in project "default"
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

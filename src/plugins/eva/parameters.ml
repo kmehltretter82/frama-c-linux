@@ -399,6 +399,25 @@ module JoinResults =
     end)
 
 let () = Parameter_customize.set_group performance
+
+module ReuseWidenings = 
+  Bool
+    ( struct
+      let option_name = "-eva-reuse-widenings"
+      let help = "Reuse previously saved widening invariants to accelerate the convergence of loops at widening points"
+      let default = true 
+    end)
+let () = Parameter_customize.set_group performance
+
+module SaveWidenings = 
+  Bool
+    ( struct
+      let option_name = "-eva-save-widenings"
+      let help = "Save widening invariants at the end of analysis of each function"
+      let default = true 
+    end)
+let () = Parameter_customize.set_group performance
+
 let () = Parameter_customize.is_invisible ()
 module Load =
   Filepath

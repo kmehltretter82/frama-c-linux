@@ -134,3 +134,5 @@ val compare_from_prj: Project.t -> unit
 val eval_callee_ref: (stmt -> exp -> kernel_function list option) ref
 
 val call_sites_ref: (kernel_function -> unit -> stmt list option) ref 
+
+val widening_stmts_ref: (kernel_function -> unit -> stmt list option) ref 

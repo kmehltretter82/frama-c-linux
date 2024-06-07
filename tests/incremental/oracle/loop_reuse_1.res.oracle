@@ -1,0 +1,44 @@
+[kernel] Parsing loop_reuse_2.c (with preprocessing)
+[eva] Loading previous session from save file loop_reuse_1.sav
+[eva] Computing AST differences between saved file and current session
+[eva] Copying Eva analysis cache from save file loop_reuse_1.sav
+[eva] In save file loop_reuse_1.sav, 2 saved calls for 2 functions
+[eva] In save file loop_reuse_1.sav, 1 saved widenings for 2 functions
+[eva:memexec] Function main has been modified: -> main (callees changed)
+[eva:memexec] Function loop has been modified: -> loop (body changed)
+[eva:memexec] Importing widenings for function main from function main
+[eva:memexec] Importing widenings for function loop from function loop
+[eva] In current session, 0 saved calls for 0 functions
+[eva] In current session, 1 saved widenings for 2 functions
+[kernel] Warning: clearing dangling project pointers in project "default"
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  a ∈ {0}
+[eva:memexec] No previous call found for main
+[eva:memexec] No previous call found for loop
+[eva] computing for function loop <- main.
+  Called from loop_reuse_2.c:18.
+[eva:widening] 
+  Re-importing widening 
+  Stmt loc: loop_reuse_2.c:10 
+  Widened states: 
+  (0),a ∈ [0..2147483647]
+      i ∈ [0..10]
+[eva:widening] Reusing previous widened state
+[eva:alarm] loop_reuse_2.c:12: Warning: 
+  signed overflow. assert a + 1 ≤ 2147483647;
+[eva] loop_reuse_2.c:10: starting to merge loop iterations
+[eva:widening] loop_reuse_2.c:10: applying a widening at this point
+[eva] Recording results for loop
+[eva] Done for function loop
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function loop:
+  a ∈ [0..2147483647]
+  i ∈ {15}
+[eva:final-states] Values at end of function main:
+  a ∈ [0..2147483647]
+  __retres ∈ {0}

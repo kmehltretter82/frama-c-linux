@@ -37,6 +37,8 @@ module Make
     (Domain :  Abstract.Domain.External)
   : sig
 
+    type widenings = (Domain.t Partition.partition) Cil_datatype.Stmt.Map.t
+
     type call_result = {
       return_flow: (Partition.key * Domain.t) list;
       cacheable: Eval.cacheable;
@@ -52,6 +54,10 @@ module Make
       call_result ->
       unit
 
+    (* FIXME: doc *)
+    val store_widenings:
+      kernel_function -> Value.t or_bottom list -> Callstack.t -> widenings -> unit
+
     (** [reuse_previous_call kf init_state args] searches amongst the previous
         analyzes of [kf] one that matches the initial state [init_state] and the
         values of arguments [args]. If none is found, [None] is returned.
@@ -61,6 +67,11 @@ module Make
     val reuse_previous_call:
       kernel_function -> Domain.t -> Value.t or_bottom list ->
       (call_result * int) option
+
+
+    (* FIXME: doc *)
+    val reuse_previous_widenings:
+      kernel_function -> Value.t or_bottom list ->  Callstack.t -> widenings option
 
     (** Prepare the analysis cache for a new analysis: if option -eva-load
         is set, import the cache of a previous analysis from the given file. *)

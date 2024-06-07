@@ -37,6 +37,8 @@ val import_expr: exp -> exp
 val import_lval: lval -> lval
 
 val import_callsite_kf: Kernel_function.t -> Kernel_function.t
+val import_widening_kf: Kernel_function.t -> Kernel_function.t
 val import_callsite_stmt:  Cil_datatype.Stmt.t -> Cil_datatype.Stmt.t
+val import_widening_stmt:  Cil_datatype.Stmt.t -> Cil_datatype.Stmt.t
 
 val import_inout: Inout_type.t -> Inout_type.t
