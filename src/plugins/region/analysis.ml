@@ -69,4 +69,6 @@ let get kf =
 
 let compute kf = ignore @@ get kf
 
+let add_hook f = STATE.add_hook_on_change (fun _ -> f())
+
 (* -------------------------------------------------------------------------- *)

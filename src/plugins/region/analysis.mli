@@ -30,3 +30,6 @@ val get : kernel_function -> Code.domain
 
 (** Memoized *)
 val compute : kernel_function -> unit
+
+(** Hook on update *)
+val add_hook : (unit -> unit) -> unit

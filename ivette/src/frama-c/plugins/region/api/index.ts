@@ -137,6 +137,11 @@ export const regionDefault: region =
     pointed: undefined, reads: false, writes: false, bytes: false, label: '',
     title: '' };
 
+/** Region Analysis Updated */
+export const updated: Server.Signal = {
+  name: 'plugins.region.updated',
+};
+
 const compute_internal: Server.ExecRequest<decl,null> = {
   kind: Server.RqKind.EXEC,
   name: 'plugins.region.compute',
@@ -152,7 +157,7 @@ const regions_internal: Server.GetRequest<decl,region[]> = {
   name: 'plugins.region.regions',
   input: jDecl,
   output: Json.jArray(jRegion),
-  signals: [],
+  signals: [ { name: 'plugins.region.updated' } ],
 };
 /** Compute regions for the given declaration */
 export const regions: Server.GetRequest<decl,region[]>= regions_internal;
@@ -162,7 +167,7 @@ const regionsAt_internal: Server.GetRequest<marker,region[]> = {
   name: 'plugins.region.regionsAt',
   input: jMarker,
   output: Json.jArray(jRegion),
-  signals: [],
+  signals: [ { name: 'plugins.region.updated' } ],
 };
 /** Compute regions at the given marker position */
 export const regionsAt: Server.GetRequest<marker,region[]>= regionsAt_internal;

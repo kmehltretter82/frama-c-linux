@@ -26,10 +26,9 @@
 
 import React from 'react';
 import * as Dot from 'dome/graph/diagram';
-import * as States from 'frama-c/states';
 import * as Region from './api';
 
-function makeDiagram(regions: Region.region[]): Dot.DiagramProps {
+function makeDiagram(regions: readonly Region.region[]): Dot.DiagramProps {
   const nodes: Dot.Node[] = [];
   const edges: Dot.Edge[] = [];
   regions.forEach(r => {
@@ -65,10 +64,12 @@ function makeDiagram(regions: Region.region[]): Dot.DiagramProps {
   return { nodes, edges };
 }
 
-export function MemoryView(): JSX.Element {
-  const scope = States.useCurrentScope();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const regions = States.useRequest(Region.regions, scope) ?? [];
+export interface MemoryViewProps {
+  regions: readonly Region.region[];
+}
+
+export function MemoryView(props: MemoryViewProps): JSX.Element {
+  const { regions } = props;
   const diagram = React.useMemo(() => makeDiagram(regions), [regions]);
-  return <Dot.Diagram display={regions.length > 0} {...diagram} />;
+  return <Dot.Diagram {...diagram} />;
 }

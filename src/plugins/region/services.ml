@@ -192,6 +192,11 @@ let map_of_declaration (decl : Printer_tag.declaration) =
   | SFunction kf -> (Analysis.find kf).map
   | _ -> raise Not_found
 
+let signal = Request.signal ~package ~name:"updated"
+    ~descr:(Md.plain "Region Analysis Updated")
+
+let () = Analysis.add_hook (fun () -> Request.emit signal)
+
 let () =
   Request.register
     ~package ~kind:`EXEC ~name:"compute"
@@ -206,6 +211,7 @@ let () =
     ~descr:(Md.plain "Compute regions for the given declaration")
     ~input:(module Kernel_ast.Decl)
     ~output:(module Regions)
+    ~signals:[signal]
     begin fun decl ->
       try regions @@ map_of_declaration decl
       with Not_found -> []
@@ -217,6 +223,7 @@ let () =
     ~descr:(Md.plain "Compute regions at the given marker position")
     ~input:(module Kernel_ast.Marker)
     ~output:(module Regions)
+    ~signals:[signal]
     begin fun loc ->
       try regions @@ map_of_localizable loc
       with Not_found -> []
