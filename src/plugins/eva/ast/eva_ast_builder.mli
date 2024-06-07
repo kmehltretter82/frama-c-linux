@@ -72,7 +72,6 @@ sig
   val bool: bool -> exp (* convert booleans to an expression 0 or 1 *)
 
   val cast: typ -> exp -> exp (* (typ)x *)
-  val binop: binop -> exp -> exp -> exp (* x op y *)
   val add: exp -> exp -> exp (* x + y *)
   val eq: exp -> exp -> exp (* x == y *)
   val ne: exp -> exp -> exp (* x != y *)
