@@ -61,7 +61,7 @@ let add_index oracle base exp =
       let idx' = Int_val.add i (oracle exp) in
       let e = match e with (* If i is singleton, we can use this as the index expression *)
         | None when Int_val.is_singleton i ->
-          Some (Eva_ast.Build.integer (Int_val.project_int i))
+          Some (Eva_ast.Build.integer ~ikind:IInt (Int_val.project_int i))
         | e -> e
       in
       let e' = Option.map (fun e -> Eva_ast.Build.(add e exp)) e in

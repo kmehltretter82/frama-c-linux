@@ -277,7 +277,7 @@ let is_zero_ptr exp =
 (* These functions are largely based on Cil.constFold. See there for details. *)
 let rec const_fold (exp: exp) : exp =
   match exp.node with
-  | Const (CChr c) -> Build.integer (Cil.charConstToInt c)
+  | Const (CChr c) -> Build.integer ~ikind:IInt (Cil.charConstToInt c)
   | Const (CEnum(_ei, e)) -> const_fold e
   | Const (CTopInt _ | CReal _ | CString _ | CInt64 _) -> exp
   | Lval lv -> mk_exp (Lval (const_fold_lval lv))
@@ -292,27 +292,27 @@ and const_fold_cast (t : typ) (e : exp) : exp  =
   let default () = mk_exp (CastE (t, e')) in
   match e'.node, Cil.unrollType t with
   (* integer -> integer *)
-  | Const (CInt64 (i,_k,_)), (TInt (ik, a) | TEnum ({ekind = ik}, a))
+  | Const (CInt64 (i,_k,_)), (TInt (ikind, a) | TEnum ({ekind = ikind}, a))
     when !Cil_datatype.drop_fc_internal_attributes a = [] ->
-    Build.integer ~kind:ik i
+    Build.integer ~ikind i
   (* real -> integer *)
-  | Const (CReal (f,_,_)), (TInt(kind, a) | TEnum ({ekind = kind}, a))
+  | Const (CReal (f,_,_)), (TInt(ikind, a) | TEnum ({ekind = ikind}, a))
     when a = [] ->
     begin try
         let i = Floating_point.truncate_to_integer f in
-        if Cil.fitsInInt kind i
-        then Build.integer ~kind i
+        if Cil.fitsInInt ikind i
+        then Build.integer ~ikind i
         else default ()
       with Floating_point.Float_Non_representable_as_Int64 _ ->
         default ()
     end
   (* real -> float *)
-  | Const (CReal (f,_,_)), TFloat (kind, a) when a = [] ->
-    Build.float ~kind f
+  | Const (CReal (f,_,_)), TFloat (fkind, a) when a = [] ->
+    Build.float ~fkind f
   (* int -> float *)
-  | Const (CInt64(i,_,_)), (TFloat (kind, a)) when a = [] ->
+  | Const (CInt64(i,_,_)), (TFloat (fkind, a)) when a = [] ->
     let f = Integer.to_float i in
-    Build.float ~kind f
+    Build.float ~fkind f
   | _, _ -> default ()
 
 and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
@@ -320,11 +320,11 @@ and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
   let default () = mk_exp (UnOp (op, e', t)) in
   match e'.node, Cil.unrollType t with
   (* Integer operations *)
-  | Const (CInt64 (i,_ik,_repr)), (TInt (ik, _) | TEnum ({ekind=ik},_)) ->
+  | Const (CInt64 (i,_ik,_repr)), (TInt (ikind, _) | TEnum ({ekind=ikind},_)) ->
     begin match op with
-      | Neg -> Build.integer ~kind:ik (Integer.neg i)
-      | BNot -> Build.integer ~kind:ik (Integer.lognot i)
-      | LNot -> if Integer.(equal i zero) then Build.int 1 else Build.int 0
+      | Neg -> Build.integer ~ikind (Integer.neg i)
+      | BNot -> Build.integer ~ikind (Integer.lognot i)
+      | LNot -> if Integer.(equal i zero) then Build.one else Build.zero
     end
   (* Float operations*)
   | Const (CReal(f,_,_)), TFloat (fk,_) ->
@@ -354,52 +354,52 @@ and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
   in
   match Cil.unrollType t with
   (* Integer operations *)
-  | TInt (kind, _) | TEnum ({ekind=kind},_) ->
+  | TInt (ikind, _) | TEnum ({ekind=ikind},_) ->
     begin match op, to_integer e1', to_integer e2' with
       | PlusA, Some z, _ when Integer.is_zero z -> e2'
       | (PlusA | MinusA), _, Some z when Integer.is_zero z -> e1'
       | PlusPI, _, Some z when Integer.is_zero z -> e1'
       | MinusPI, _, Some z when Integer.is_zero z -> e1'
       | PlusA, Some i1, Some i2 ->
-        Build.integer ~kind (Integer.add i1 i2)
+        Build.integer ~ikind (Integer.add i1 i2)
       | MinusA, Some i1, Some i2 ->
-        Build.integer ~kind (Integer.sub i1 i2)
+        Build.integer ~ikind (Integer.sub i1 i2)
       | Mult, Some i1, Some i2 ->
-        Build.integer ~kind (Integer.mul i1 i2)
+        Build.integer ~ikind (Integer.mul i1 i2)
       | Mult, Some z, _ when Integer.is_zero z -> e1'
       | Mult, Some i1, _ when Integer.is_one i1 -> e2'
       | Mult, _, Some z when Integer.is_zero z -> e2'
       | Mult, _, Some i2 when Integer.is_one i2 -> e1'
       | Div, Some i1, Some i2  ->
         begin
-          try Build.integer ~kind (Integer.c_div i1 i2)
+          try Build.integer ~ikind (Integer.c_div i1 i2)
           with Division_by_zero -> default ()
         end
       | Div, _, Some i2 when Integer.is_one i2 -> e1'
       | Mod, Some i1, Some i2 ->
         begin
-          try Build.integer ~kind (Integer.c_rem i1 i2)
+          try Build.integer ~ikind (Integer.c_rem i1 i2)
           with Division_by_zero -> default ()
         end
       | BAnd, Some i1, Some i2 ->
-        Build.integer ~kind (Integer.logand i1 i2)
+        Build.integer ~ikind (Integer.logand i1 i2)
       | BAnd, Some z, _ when Integer.is_zero z -> e1'
       | BAnd, _, Some z when Integer.is_zero z -> e2'
       | BOr, Some i1, Some i2 ->
-        Build.integer ~kind (Integer.logor i1 i2)
+        Build.integer ~ikind (Integer.logor i1 i2)
       | BOr, Some z, _ when Integer.is_zero z -> e2'
       | BOr, _, Some z when Integer.is_zero z -> e1'
       | BXor, Some i1, Some i2 ->
-        Build.integer ~kind (Integer.logxor i1 i2)
+        Build.integer ~ikind (Integer.logxor i1 i2)
       | Shiftlt, Some i1, Some i2 when shift_in_bounds i2 ->
-        Build.integer ~kind (Integer.shift_left i1 i2)
+        Build.integer ~ikind (Integer.shift_left i1 i2)
       | Shiftlt, Some z, _ when Integer.is_zero z -> e1'
       | Shiftlt, _, Some z when Integer.is_zero z -> e1'
       | Shiftrt, Some i1, Some i2 when shift_in_bounds i2 ->
-        if Cil.isSigned kind then
-          Build.integer ~kind (Integer.shift_right i1 i2)
+        if Cil.isSigned ikind then
+          Build.integer ~ikind (Integer.shift_right i1 i2)
         else
-          Build.integer ~kind (Integer.shift_right_logical i1 i2)
+          Build.integer ~ikind (Integer.shift_right_logical i1 i2)
       | Shiftrt, Some z, _ when Integer.is_zero z -> e1'
       | Shiftrt, _, Some z when Integer.is_zero z -> e1'
       | Eq, Some i1, Some i2 ->
@@ -425,16 +425,16 @@ and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
       | _ -> default ()
     end
   (* Floating-point operation *)
-  | TFloat (fk, _) ->
+  | TFloat (fkind, _) ->
     begin match op, to_float e1', to_float e2' with
       | PlusA, Some f1, Some f2 ->
-        Build.float ~kind:fk (f1 +. f2)
+        Build.float ~fkind (f1 +. f2)
       | MinusA, Some f1, Some f2 ->
-        Build.float ~kind:fk (f1 -. f2)
+        Build.float ~fkind (f1 -. f2)
       | Mult, Some f1, Some f2 ->
-        Build.float ~kind:fk (f1 *. f2)
+        Build.float ~fkind (f1 *. f2)
       | Div, Some f1, Some f2 ->
-        Build.float ~kind:fk (f1 /. f2)
+        Build.float ~fkind (f1 /. f2)
       | _ -> default ()
     end
   | _ -> default ()

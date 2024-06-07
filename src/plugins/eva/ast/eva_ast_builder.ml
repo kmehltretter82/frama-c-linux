@@ -155,31 +155,23 @@ let add_offset (lval : lval) (offset : offset) : lval =
 
 module Build =
 struct
-  let integer ?kind i = (* TODO: mathematical unbounded integer *)
-    let kind = match kind with
-      | Some k -> k
-      | None ->
-        if Cil.fitsInInt IInt i
-        then Cil_types.IInt
-        else Cil.intKindForValue i false
-    in
-    let i', _truncated = Cil.truncateInteger64 kind i in
-    mk_exp (Const (CInt64 (i', kind, None)))
+  let integer ~ikind i =
+    let i', _truncated = Cil.truncateInteger64 ikind i in
+    mk_exp (Const (CInt64 (i', ikind, None)))
 
-  let int ?kind i =
-    integer ?kind (Integer.of_int i)
+  let int ~ikind i = integer ~ikind (Integer.of_int i)
 
-  let zero = int 0
-  let one = int 1
+  let zero = int ~ikind:IInt 0
+  let one = int ~ikind:IInt 1
   let bool = function false -> zero | true -> one
 
-  let float ~kind f =
+  let float ~fkind f =
     let f =
-      if kind = Cil_types.FFloat
+      if fkind = Cil_types.FFloat
       then Floating_point.round_to_single_precision_float f
       else f
     in
-    mk_exp (Const (CReal(f,kind,None)))
+    mk_exp (Const (CReal (f, fkind, None)))
 
   let cast typ exp =
     if Cil.need_cast exp.typ typ
