@@ -3,11 +3,13 @@
 [eva] Computing AST differences between saved file and current session
 [eva] Copying Eva analysis cache from save file malloc_modif_1.sav
 [eva] In save file malloc_modif_1.sav, 5 saved calls for 4 functions
+[eva] In save file malloc_modif_1.sav, 0 saved widenings for 0 functions
 [eva:memexec] Function foo has been modified: -> foo (body changed)
 [eva:memexec] Importing summaries for function alloc
 [eva:memexec] Function main has been modified: -> main (callees changed)
 [eva:memexec] Importing summaries for function bar
 [eva] In current session, 3 saved calls for 2 functions
+[eva] In current session, 0 saved widenings for 0 functions
 [kernel] Warning: clearing dangling project pointers in project "default"
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

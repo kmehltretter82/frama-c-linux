@@ -190,15 +190,25 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     match MemExec.reuse_previous_call call.kf init_state args with
     | None ->
-      let result = compute kinstr call init_state in
+      let widenings = match Parameters.ReuseWidenings.get () with
+        | false -> None
+        | true -> 
+          MemExec.reuse_previous_widenings call.kf args call.callstack 
+      in
+      let result = compute ~widenings kinstr call init_state in
+      let cacheable = result.Transfer_stmt.cacheable in
+      let _widenings = match Parameters.SaveWidenings.get () && cacheable = Eval.Cacheable with
+        | false -> ()
+        | true -> 
+          MemExec.store_widenings call.kf args call.callstack result.Transfer_stmt.widenings 
+      in
       let () =
-        let cacheable = result.Transfer.cacheable in
         if (cacheable = Eval.Cacheable) || (Parameters.CacheAllocation.get () && cacheable = Eval.MallocedCall)
         then
           let call_result = MemExec.{
-              return_flow = result.Transfer.states;
-              cacheable = result.Transfer.cacheable;
-              allocated_bases = result.Transfer.allocated_bases;
+              return_flow = result.Transfer_stmt.states;
+              cacheable = result.Transfer_stmt.cacheable;
+              allocated_bases = result.Transfer_stmt.allocated_bases;
             }
           in
           MemExec.store_computed_call call.kf init_state args call_result;
@@ -228,17 +238,18 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       apply_call_results_hooks call init_state (`Reuse i);
       Base.Hptset.iter (fun base -> Builtins_malloc.register_reused_base call.callstack base) call_result.allocated_bases;
       (* call can be cached since it was cached once *) 
-      Transfer.{ 
+      Transfer_stmt.{ 
         states = call_result.return_flow; 
         cacheable = call_result.cacheable; 
         allocated_bases = call_result.allocated_bases;
+        widenings = Cil_datatype.Stmt.Map.empty;
       }
   (* ----- Body or specification analysis ----------------------------------- *)
 
   (* Interprets a [call] at callsite [kinstr] in the state [state] by analyzing
      the body of the called function. *)
-  let compute_using_body fundec ~save_results kinstr call state =
-    let result = Computer.compute ~save_results call.kf kinstr state in
+  let compute_using_body fundec ~save_results ~widenings kinstr call state =
+    let result = Computer.compute ~save_results ~widenings call.kf kinstr state in
     Summary.FunctionStats.recompute @@ Globals.Functions.get fundec.svar ;
     result
 
@@ -257,12 +268,18 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     let cvalue_states = List.map (fun (_, s) -> get_cvalue_or_top s) states in
     apply_call_results_hooks call state (`Spec cvalue_states);
-    states, Eval.Cacheable, Base.Hptset.empty
+    Transfer_stmt.{
+      states = states;
+      cacheable = Eval.Cacheable;
+      allocated_bases = Base.Hptset.empty;
+      widenings = Cil_datatype.Stmt.Map.empty;
+    }
+
 
   (* Interprets a [call] at callsite [kinstr] in state [state], using its
      specification or body according to [target]. If [-eva-show-progress] is
      true, the callstack and additional information are printed. *)
-  let compute_using_spec_or_body target kinstr call state =
+  let compute_using_spec_or_body ~widenings target kinstr call state =
     begin
       match kinstr with
       | Kstmt stmt when Parameters.ValShowProgress.get () ->
@@ -275,16 +292,16 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let compute, kind =
       match target with
       | `Body (fundec, save_results) ->
-        compute_using_body fundec ~save_results, `Body
+        compute_using_body fundec ~save_results ~widenings, `Body
       | `Spec funspec ->
         compute_using_spec funspec, `Spec
     in
     apply_call_hooks call state kind;
-    let resulting_states, cacheable, allocated_bases = compute kinstr call state in
+    let call_result = compute kinstr call state in
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Transfer.{ states = resulting_states; cacheable; allocated_bases;}
+    call_result
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -321,7 +338,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      Transfer.{ states; cacheable = Eval.Cacheable; allocated_bases = Base.Hptset.empty}
+      Transfer_stmt.{ states; cacheable = Eval.Cacheable; allocated_bases = Base.Hptset.empty; widenings = Cil_datatype.Stmt.Map.empty}
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
@@ -334,7 +351,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
       let states = List.map insert cvalue_states in
-      Transfer.{ states; cacheable; allocated_bases = Base.Hptset.empty }
+      Transfer_stmt.{ states; cacheable; allocated_bases = Base.Hptset.empty; widenings = Cil_datatype.Stmt.Map.empty }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
      use the called function specification. *)
@@ -343,7 +360,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     && Abstract.Val.mem Main_values.CVal.key
     && Abstract.Loc.mem Main_locations.PLoc.key
     then compute_builtin
-    else fun (_, _, _, spec) -> compute_using_spec_or_body (`Spec spec)
+    else fun (_, _, _, spec) -> compute_using_spec_or_body ~widenings:None (`Spec spec)
 
   (* ----- Call computation ------------------------------------------------- *)
 
@@ -357,12 +374,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     match target with
     | `Builtin builtin_info -> compute_builtin builtin_info kinstr call state
-    | `Spec _ as spec -> compute_using_spec_or_body spec kinstr call state
+    | `Spec _ as spec -> compute_using_spec_or_body ~widenings:None spec kinstr call state
     | `Body _ as def ->
       let compute = compute_using_spec_or_body def in
       if Parameters.MemExecAll.get ()
       then compute_and_cache_call compute kinstr call state
-      else compute kinstr call state
+      else compute ~widenings:None kinstr call state
 
   let () = Transfer.compute_call_ref := (fun stmt -> compute_call (Kstmt stmt))
 
@@ -375,7 +392,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       Abstract.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call Kglobal call None init_state in
-      let final_states = List.map snd (final_result.Transfer.states) in
+      let final_states = List.map snd (final_result.Transfer_stmt.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.clear_call_stack ();
       Abstract.Dom.Store.mark_as_computed ();

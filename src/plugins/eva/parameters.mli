@@ -58,6 +58,9 @@ module ResultsAll: Parameter_sig.Bool
 
 module JoinResults: Parameter_sig.Bool
 
+module ReuseWidenings: Parameter_sig.Bool
+module SaveWidenings: Parameter_sig.Bool
+
 module Load: Parameter_sig.Filepath
 
 module WarnSignedConvertedDowncast: Parameter_sig.Bool

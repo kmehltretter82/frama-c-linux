@@ -28,6 +28,9 @@ let eval_callee_ref : (stmt -> exp -> kernel_function list option) ref =
 let call_sites_ref: (kernel_function -> unit -> stmt list option) ref = 
   ref (fun _ _ -> None)
 
+let widening_stmts_ref: (kernel_function -> unit -> stmt list option) ref =
+  ref (fun _ _ -> None)
+
 module Orig_project =
   State_builder.Option_ref(Project.Datatype)(
   struct
@@ -1297,6 +1300,53 @@ and alloc_site_correspondence f f' _env =
         end
       ) call_sites
 
+
+and find_candidate_widening_stmt stmt f floc floc' =
+  let is_candidate stmt stmt' = 
+    let relative_to_kf sloc floc =
+      let sline = (fst sloc).Filepath.pos_lnum in
+      let fline = (fst floc).Filepath.pos_lnum in
+      Int.abs (sline - fline)
+    in
+    let is_close ?(closeness=10) stmt stmt' = 
+      let sloc = Cil_datatype.Stmt.loc stmt in (* Move higher to optmize *)
+      let sloc' = Cil_datatype.Stmt.loc stmt' in
+      Int.abs((relative_to_kf sloc floc) - (relative_to_kf sloc' floc')) <= closeness 
+    in
+    let is_same_type stmt stmt' =
+      match stmt.skind, stmt'.skind with
+      | Loop _, Loop _ -> true
+      | _,_ -> false
+    in
+    is_same_type stmt stmt' && is_close stmt stmt'
+  in
+  let fdec = Kf.get_definition f in
+  let candidates = List.find_all (fun stmt' -> is_candidate stmt stmt') fdec.sallstmts in
+  if List.length candidates = 1 then
+    Some (List.hd candidates)
+  else if List.length candidates > 1 then
+    begin
+      (* Multiple candidates found, failing for safety *)
+      Kernel.warning "Multiple candidates found for loop head %a" Printer.pp_stmt stmt;
+      None
+    end
+  else None
+
+and widening_stmt_correspondence f f' _env =
+  match Project.on (Orig_project.get ()) (!widening_stmts_ref f) ()  with
+  | None -> ()
+  | Some (stmts: stmt list) ->
+    let floc = Kf.get_location f in
+    let floc'= Kf.get_location f' in
+    List.iter (fun stmt -> 
+        match find_candidate_widening_stmt stmt f' floc floc' with
+        | None -> () 
+        | Some stmt' ->
+          begin
+            Stmt.add stmt (`Partial (stmt', `Body_changed))
+          end
+      ) stmts
+
 (* correspondence of formals is supposed to have already been checked,
    and formals mapping to have been put in the local env
 *)
@@ -1305,6 +1355,15 @@ and is_same_fundec f f' env: body_correspondence =
      verified after the function body. If the given environment is not empty,
      resets this field for this function. *)
   let env = { env with goto_targets = [] } in
+  (* Adding locals even if body is not the same *)
+  let find_local vi =
+    let name = vi.vname in
+    try
+      let vi' = List.find (fun v -> v.vname = name) f'.slocals in
+      if is_same_varinfo vi vi' env
+      then Varinfo.add vi (`Same vi')
+    with Not_found -> ()
+  in
   let res, env =
     is_same_block f.sbody f'.sbody env &&>
     check_goto_targets
@@ -1320,7 +1379,8 @@ and is_same_fundec f f' env: body_correspondence =
   (match res with
    | `Same_body | `Callees_changed ->
      List.iter add_local f.slocals
-   | `Body_changed -> ());
+   | `Body_changed -> 
+     List.iter find_local f.slocals);
   res
 
 and is_same_varinfo vi vi' env =
@@ -1511,6 +1571,9 @@ and gfun_correspondence ?loc vi env =
         (match res with 
          | `Same _ -> ()
          | `Not_present | `Partial _ -> alloc_site_correspondence kf kf' env);
+        (match res with 
+         | `Same _ -> ()
+         | `Not_present | `Partial _ -> widening_stmt_correspondence kf kf' env);
         res
       end else begin
         (* signatures do not match, we consider that pointers
