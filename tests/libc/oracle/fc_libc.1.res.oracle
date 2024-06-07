@@ -1973,6 +1973,15 @@ char *realpath(char const * restrict file_name, char * restrict resolved_name);
 
 char *canonicalize_file_name(char const *path);
 
+/*@ requires valid_p: \valid((char *)buf + (0 .. n - 1));
+    ensures
+      initialization: \initialized((char *)\old(buf) + (0 .. \old(n) - 1));
+    assigns *((char *)buf + (0 .. n - 1)), Frama_C_entropy_source;
+    assigns *((char *)buf + (0 .. n - 1)) \from Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+ */
+void arc4random_buf(void *buf, size_t n);
+
 /*@
 predicate non_escaping{L}(void *s, ℤ n) =
   ∀ ℤ i; 0 ≤ i < n ⇒ ¬\dangling((char *)s + i);
