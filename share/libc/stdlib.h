@@ -900,6 +900,17 @@ extern char *realpath(const char *restrict file_name,
  */
 extern char *canonicalize_file_name(const char *path);
 
+extern volatile int Frama_C_entropy_source;
+
+// Non-POSIX
+/*@
+  requires valid_p: \valid(((char*)buf) + (0 .. n-1));
+  assigns ((char*)buf)[0 .. n-1] \from Frama_C_entropy_source;
+  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+  ensures initialization: \initialized(((char*)buf) + (0 .. n-1));
+*/
+void arc4random_buf(void *buf, size_t n);
+
 __END_DECLS
 
 __POP_FC_STDLIB

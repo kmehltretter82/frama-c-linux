@@ -6087,6 +6087,150 @@
           "kind": "pass",
           "level": "none",
           "message": {
+            "text": "behavior default! in function arc4random_buf."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 912,
+                  "startColumn": 5,
+                  "endLine": 912,
+                  "endColumn": 19,
+                  "byteLength": 14
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "valid_p." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 907,
+                  "startColumn": 20,
+                  "endLine": 907,
+                  "endColumn": 53,
+                  "byteLength": 33
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "initialization." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 910,
+                  "startColumn": 26,
+                  "endLine": 910,
+                  "endColumn": 65,
+                  "byteLength": 39
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": { "text": "assigns clause in function arc4random_buf." },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 908,
+                  "startColumn": 10,
+                  "endLine": 908,
+                  "endColumn": 32,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term *((char *)buf + (0 .. n - 1)) in function arc4random_buf."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 908,
+                  "startColumn": 10,
+                  "endLine": 908,
+                  "endColumn": 32,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
+            "text": "from clause of term Frama_C_entropy_source in function arc4random_buf."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "libc/stdlib.h",
+                  "uriBaseId": "FRAMAC_SHARE"
+                },
+                "region": {
+                  "startLine": 909,
+                  "startColumn": 10,
+                  "endLine": 909,
+                  "endColumn": 32,
+                  "byteLength": 22
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "user-spec",
+          "kind": "pass",
+          "level": "none",
+          "message": {
             "text": "behavior default! in function at_quick_exit."
           },
           "locations": [

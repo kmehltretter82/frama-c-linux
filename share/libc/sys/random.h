@@ -34,6 +34,11 @@ extern ssize_t getrandom (void *__buffer, size_t __length,
 
 extern int getentropy (void *__buffer, size_t __length);
 
+// Non-POSIX
+#define GRND_NONBLOCK 0x01
+#define GRND_RANDOM 0x02
+#define GRND_INSECURE 0x04
+
 __END_DECLS
 
 __POP_FC_STDLIB
