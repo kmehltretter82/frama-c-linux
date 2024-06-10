@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Utilitary functions on the Eva AST of lvalues and expressions. *)
+
 open Eva_ast_types
 
 (** Conversion to Cil *)
@@ -30,6 +32,7 @@ val to_cil_lval : lval -> Cil_types.lval
 
 (** Queries *)
 
+(** Cf {!Cil.is_mutable_or_initialized}. *)
 val is_mutable : lval -> bool
 val is_initialized : lval -> bool
 
@@ -53,6 +56,8 @@ val height_lval : lval -> int
 val exp_contains_volatile : exp -> bool
 val lval_contains_volatile : lval -> bool
 
+(** Returns the set of variables that syntactically appear in an expression or
+    lvalue. *)
 val vars_in_exp : exp -> Cil_datatype.Varinfo.Set.t
 val vars_in_lval : lval -> Cil_datatype.Varinfo.Set.t
 
@@ -87,13 +92,10 @@ val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
 
 (** Constant conversion and folding. *)
 
-val to_integer : exp -> Integer.t option
-val to_float : exp -> float option
-val is_zero : exp -> bool
-val is_zero_ptr : exp -> bool
 val const_fold: exp -> exp
 val fold_to_integer: exp -> Integer.t option
 
+val is_zero_ptr : exp -> bool
 
 (** Offsets *)
 
