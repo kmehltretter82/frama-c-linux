@@ -149,7 +149,7 @@ const compute_internal: Server.ExecRequest<decl,null> = {
   output: Json.jNull,
   signals: [],
 };
-/** Compute region domain for the given declaration */
+/** Compute regions for the given declaration */
 export const compute: Server.ExecRequest<decl,null>= compute_internal;
 
 const regions_internal: Server.GetRequest<decl,region[]> = {
@@ -159,7 +159,7 @@ const regions_internal: Server.GetRequest<decl,region[]> = {
   output: Json.jArray(jRegion),
   signals: [ { name: 'plugins.region.updated' } ],
 };
-/** Compute regions for the given declaration */
+/** Returns computed regions for the given declaration */
 export const regions: Server.GetRequest<decl,region[]>= regions_internal;
 
 const regionsAt_internal: Server.GetRequest<[ marker, boolean ],region[]> = {

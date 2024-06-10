@@ -211,7 +211,7 @@ let () = Analysis.add_hook (fun () -> Request.emit signal)
 let () =
   Request.register
     ~package ~kind:`EXEC ~name:"compute"
-    ~descr:(Md.plain "Compute region domain for the given declaration")
+    ~descr:(Md.plain "Compute regions for the given declaration")
     ~input:(module Kernel_ast.Decl)
     ~output:(module Data.Junit)
     (function SFunction kf -> Analysis.compute kf | _ -> ())
@@ -219,7 +219,7 @@ let () =
 let () =
   Request.register
     ~package ~kind:`GET ~name:"regions"
-    ~descr:(Md.plain "Compute regions for the given declaration")
+    ~descr:(Md.plain "Returns computed regions for the given declaration")
     ~input:(module Kernel_ast.Decl)
     ~output:(module Regions)
     ~signals:[signal]
