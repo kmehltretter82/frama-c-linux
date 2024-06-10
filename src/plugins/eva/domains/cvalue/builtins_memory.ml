@@ -174,14 +174,14 @@ let imprecise_copy ~name ~src_loc ~dst_loc ~dst_expr state =
      return [bottom]. In this case, return the previously computed state *)
   if Model.is_reachable new_state then new_state else state
 
-(* Creates the location {loc + [0..max_size-1]} of size char. *)
-let char_location loc max_size =
+(* Creates the location {loc + [min_size..max_size-1]} of size char. *)
+let char_location loc ?(min_size=Int.zero) max_size =
   let size_char = Bit_utils.sizeofchar () in
   let max = Int.sub max_size size_char in
   (* Use ranges modulo char_bits to read and write byte-by-byte, which can
      preserve some precision.*)
   let shift =
-    Ival.inject_interval ~min:(Some Int.zero) ~max:(Some max)
+    Ival.inject_interval ~min:(Some min_size) ~max:(Some max)
       ~rem:Int.zero ~modu:size_char
   in
   let loc = Location_Bits.shift shift loc in
@@ -271,45 +271,65 @@ let () =
 (*  Implementation of [memset] that accepts imprecise arguments. *)
 let frama_c_memset_imprecise state dst_expr dst v size =
   let size_min, size_max = min_max_size size in
+  let exact = Location_Bits.cardinal_zero_or_one dst in
+  (* Write [v] everywhere that is written, between [dst] and [dst+size_min]. *)
+  let state, min_zone =
+    if Int.gt size_min Int.zero then
+      let size = size_min in
+      let value = Cvalue.V_Or_Uninitialized.initialized v in
+      let from = Cvalue.V_Offsetmap.create ~size ~size_v:Integer.eight value in
+      warn_imprecise_offsm_write ~name:"memset" dst_expr from;
+      let state =
+        Cvalue.Model.paste_offsetmap ~from ~size ~exact ~dst_loc:dst state
+      in
+      let loc = make_loc dst (Int_Base.Value size_min) in
+      let written_zone = enumerate_valid_bits Locations.Write loc in
+      state, written_zone
+    else state, Zone.bottom
+  in
   (* Write [v] everywhere that might be written, ie between
-     [dst] and [dst+size-1]. *)
-  let state, over_zone =
-    if Int.gt size_max Int.zero then
-      let loc = char_location dst size_max in
+     [dst+size_min] and [dst+size_max-1]. *)
+  let state, extra_zone =
+    if Int.gt size_max size_min then
+      let loc = char_location dst ~min_size:size_min size_max in
       warn_imprecise_write ~name:"memset" dst_expr loc v;
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
       let written_zone = enumerate_valid_bits Locations.Write loc in
       state, written_zone
     else state, Zone.bottom
   in
-  (* Write "sure" bytes in an exact way: they exist only if there is only
-     one base, and within it, size_min+leftmost_loc > rightmost_loc *)
-  let state, sure_zone =
-    try
-      let base, offset = Location_Bits.find_lonely_key dst in
-      let minb, maxb = match Ival.min_and_max offset with
-        | Some minb, Some maxb -> minb, maxb
-        | _ -> raise Not_found
-      in
-      let sure = Int.sub (Int.add minb size_min) maxb in
-      if Int.gt sure Int.zero then
-        let dst_loc = Location_Bits.inject base (Ival.inject_singleton maxb) in
-        let vuninit = V_Or_Uninitialized.initialized v in
-        let size_v = Bit_utils.sizeofchar () in
-        let from = V_Offsetmap.create ~size:sure vuninit ~size_v in
-        warn_imprecise_offsm_write ~name:"memset" dst_expr from;
-        let state =
-          Cvalue.Model.paste_offsetmap
-            ~from ~dst_loc ~size:sure ~exact:true state
+  let over_zone = Zone.join min_zone extra_zone in
+  if exact
+  then state, min_zone, over_zone
+  else
+    (* Write "sure" bytes in an exact way: they exist only if there is only
+       one base, and within it, size_min+leftmost_loc > rightmost_loc *)
+    let state, sure_zone =
+      try
+        let base, offset = Location_Bits.find_lonely_key dst in
+        let minb, maxb = match Ival.min_and_max offset with
+          | Some minb, Some maxb -> minb, maxb
+          | _ -> raise Not_found
         in
-        let sure_loc = make_loc dst_loc (Int_Base.inject sure) in
-        let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
-        state, sure_zone
-      else
-        state, Zone.bottom
-    with Not_found -> state, Zone.bottom (* from find_lonely_key + explicit raise *)
-  in
-  state, sure_zone, over_zone
+        let sure = Int.sub (Int.add minb size_min) maxb in
+        if Int.gt sure Int.zero then
+          let dst_loc = Location_Bits.inject base (Ival.inject_singleton maxb) in
+          let vuninit = V_Or_Uninitialized.initialized v in
+          let size_v = Bit_utils.sizeofchar () in
+          let from = V_Offsetmap.create ~size:sure vuninit ~size_v in
+          warn_imprecise_offsm_write ~name:"memset" dst_expr from;
+          let state =
+            Cvalue.Model.paste_offsetmap
+              ~from ~dst_loc ~size:sure ~exact:true state
+          in
+          let sure_loc = make_loc dst_loc (Int_Base.inject sure) in
+          let sure_zone = enumerate_valid_bits Locations.Write sure_loc in
+          state, sure_zone
+        else
+          state, Zone.bottom
+      with Not_found -> state, Zone.bottom (* from find_lonely_key + explicit raise *)
+    in
+    state, sure_zone, over_zone
 
 (* Type that describes why the 'precise memset' builtin may fail. *)
 type imprecise_memset_reason =

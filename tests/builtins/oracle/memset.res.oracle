@@ -129,9 +129,6 @@
                                   {0},{12})) failed; destination is not exact
 [eva:alarm] memset.c:107: Warning: 
   accessing uninitialized left-value. assert \initialized(&s->ptr);
-[eva:alarm] memset.c:109: Warning: 
-  pointer comparison. assert \pointer_comparable((void *)q, (void *)0);
-[eva:alarm] memset.c:109: Warning: out of bounds write. assert \valid(q);
 [eva] Recording results for memset_weak_base
 [from] Computing for function memset_weak_base
 [from] Done for function memset_weak_base
@@ -142,26 +139,19 @@
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
-[eva:garbled-mix:summary] 
-  Origins of garbled mix generated during analysis:
-    memset.c:106: imprecise merge of addresses
-      (read in 3 statements, propagated through 1 statement)
-      garbled mix of &{x}
 [eva] memset.c:85: assertion 'Eva,initialization' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function memset_weak_base:
-  NULL[rbits 128 to 1927] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   x ∈ {42} or UNINITIALIZED
   s ∈ {{ &__malloc_w_memset_weak_base_l101[0] }}
-  q ∈ {{ NULL + [0..237] ; &x }}
-  __malloc_w_memset_weak_base_l101[0].i ∈ [--..--] or UNINITIALIZED
+  q ∈ {{ NULL ; &x }}
+  __malloc_w_memset_weak_base_l101[0].i ∈ {0; 421} or UNINITIALIZED
                                   [0].c ∈ {0; 1} or UNINITIALIZED
                                   [0].[bits 40 to 63] ∈
                                   {0} or UNINITIALIZED
                                   [0].ptr ∈
-                                  {{ garbled mix of &{x}
-                                   (origin: Merge {memset.c:106}) }} or UNINITIALIZED
+                                  {{ NULL ; &x }} or UNINITIALIZED
 [eva:final-states] Values at end of function test:
   NULL[rbits 128 to 143] ∈ {66} repeated %8 
       [rbits 144 to 1927] ∈ [--..--]
@@ -190,7 +180,31 @@
      [3]# ∈ {153} repeated %8 
      [4..6]# ∈ {0; 153} repeated %8 
      [7..99] ∈ {0}
-  t12[0..96]# ∈ {0; 1} repeated %8 
+  t12[0]# ∈ {0; 1} repeated %8 
+     [1..7] ∈ {0}
+     [8]# ∈ {0; 1} repeated %8 
+     [9..15] ∈ {0}
+     [16]# ∈ {0; 1} repeated %8 
+     [17..23] ∈ {0}
+     [24]# ∈ {0; 1} repeated %8 
+     [25..31] ∈ {0}
+     [32]# ∈ {0; 1} repeated %8 
+     [33..39] ∈ {0}
+     [40]# ∈ {0; 1} repeated %8 
+     [41..47] ∈ {0}
+     [48]# ∈ {0; 1} repeated %8 
+     [49..55] ∈ {0}
+     [56]# ∈ {0; 1} repeated %8 
+     [57..63] ∈ {0}
+     [64]# ∈ {0; 1} repeated %8 
+     [65..71] ∈ {0}
+     [72]# ∈ {0; 1} repeated %8 
+     [73..79] ∈ {0}
+     [80]# ∈ {0; 1} repeated %8 
+     [81..87] ∈ {0}
+     [88]# ∈ {0; 1} repeated %8 
+     [89..95] ∈ {0}
+     [96]# ∈ {0; 1} repeated %8 
      [97..99] ∈ {0}
   ts[0].f1 ∈ {-2; 0}
     [0].[bits 8 to 15] ∈ {0; 254}
@@ -224,7 +238,8 @@
   x ∈ {{ (void *)&a }}
   a ∈ {0}
 [eva:final-states] Values at end of function main:
-  NULL[rbits 128 to 1927] ∈ [--..--]
+  NULL[rbits 128 to 143] ∈ {66} repeated %8 
+      [rbits 144 to 1927] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   t1[0..99] ∈ {286331153}
   t2[0..99] ∈ {303174162}
@@ -251,7 +266,31 @@
      [3]# ∈ {153} repeated %8 
      [4..6]# ∈ {0; 153} repeated %8 
      [7..99] ∈ {0}
-  t12[0..96]# ∈ {0; 1} repeated %8 
+  t12[0]# ∈ {0; 1} repeated %8 
+     [1..7] ∈ {0}
+     [8]# ∈ {0; 1} repeated %8 
+     [9..15] ∈ {0}
+     [16]# ∈ {0; 1} repeated %8 
+     [17..23] ∈ {0}
+     [24]# ∈ {0; 1} repeated %8 
+     [25..31] ∈ {0}
+     [32]# ∈ {0; 1} repeated %8 
+     [33..39] ∈ {0}
+     [40]# ∈ {0; 1} repeated %8 
+     [41..47] ∈ {0}
+     [48]# ∈ {0; 1} repeated %8 
+     [49..55] ∈ {0}
+     [56]# ∈ {0; 1} repeated %8 
+     [57..63] ∈ {0}
+     [64]# ∈ {0; 1} repeated %8 
+     [65..71] ∈ {0}
+     [72]# ∈ {0; 1} repeated %8 
+     [73..79] ∈ {0}
+     [80]# ∈ {0; 1} repeated %8 
+     [81..87] ∈ {0}
+     [88]# ∈ {0; 1} repeated %8 
+     [89..95] ∈ {0}
+     [96]# ∈ {0; 1} repeated %8 
      [97..99] ∈ {0}
   ts[0].f1 ∈ {-2; 0}
     [0].[bits 8 to 15] ∈ {0; 254}
@@ -275,12 +314,12 @@
     [4]{.f3; .f4[0..2]} ∈ {-16843010; 0}
   S_incomplete_type[bits 0 to 7] ∈ {65}
                    [bits 8 to ..] ∈ [--..--] or UNINITIALIZED
-  __malloc_w_memset_weak_base_l101[0].i ∈ [--..--] or UNINITIALIZED
+  __malloc_w_memset_weak_base_l101[0].i ∈ {0; 421} or UNINITIALIZED
                                   [0].c ∈ {0; 1} or UNINITIALIZED
                                   [0].[bits 40 to 63] ∈
                                   {0} or UNINITIALIZED
                                   [0].ptr ∈
-                                  [--..--] or UNINITIALIZED or ESCAPINGADDR
+                                  {0} or UNINITIALIZED or ESCAPINGADDR
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to malloc at memset.c:101 (by memset_weak_base):
   __fc_heap_status FROM __fc_heap_status; size (and SELF)
@@ -325,7 +364,9 @@
   ts[0..4] FROM c
   \result FROM s
 [from] call to memset at memset.c:72 (by test):
-  t12[0..96] FROM c (and SELF)
+  t12{[0]; [8]; [16]; [24]; [32]; [40]; [48]; [56]; [64]; [72]; [80]; [88];
+      [96]}
+     FROM c (and SELF)
   \result FROM s
 [from] call to memset at memset.c:74 (by test):
   \result FROM s
@@ -353,22 +394,18 @@
      [7..12] FROM \nothing (and SELF)
   t11{[2]; [4..6]} FROM \nothing (and SELF)
      [3] FROM \nothing
-  t12[0..96] FROM \nothing (and SELF)
+  t12{[0]; [8]; [16]; [24]; [32]; [40]; [48]; [56]; [64]; [72]; [80]; [88];
+      [96]}
+     FROM \nothing (and SELF)
   ts[0..4] FROM vol (and SELF)
   S_incomplete_type[bits 0 to 7] FROM \nothing
 [from] call to uninit at memset.c:114 (by main):
   NO EFFECTS
 [from] call to memset_weak_base at memset.c:115 (by main):
-  NULL[16..240]
-      FROM __fc_heap_status;
-           __malloc_w_memset_weak_base_l101[0].ptr (and SELF)
   __fc_heap_status FROM __fc_heap_status (and SELF)
   __malloc_w_memset_weak_base_l101[0] FROM __fc_heap_status (and SELF)
 [from] entry point:
-  NULL[16..17] FROM __fc_heap_status; __malloc_w_memset_weak_base_l101[0].ptr
-      [18..240]
-      FROM __fc_heap_status;
-           __malloc_w_memset_weak_base_l101[0].ptr (and SELF)
+  NULL[16..17] FROM \nothing
   __fc_heap_status FROM __fc_heap_status (and SELF)
   t1[0..99] FROM \nothing
   t2[0..99] FROM \nothing
@@ -383,14 +420,15 @@
      [7..12] FROM \nothing (and SELF)
   t11{[2]; [4..6]} FROM \nothing (and SELF)
      [3] FROM \nothing
-  t12[0..96] FROM \nothing (and SELF)
+  t12{[0]; [8]; [16]; [24]; [32]; [40]; [48]; [56]; [64]; [72]; [80]; [88];
+      [96]}
+     FROM \nothing (and SELF)
   ts[0..4] FROM vol (and SELF)
   S_incomplete_type[bits 0 to 7] FROM \nothing
   __malloc_w_memset_weak_base_l101[0] FROM __fc_heap_status (and SELF)
 [from] ====== END OF CALLWISE DEPENDENCIES ======
 [inout] Out (internal) for function memset_weak_base:
-    NULL[16..240]; __fc_heap_status; x; s; q;
-    __malloc_w_memset_weak_base_l101[0]
+    __fc_heap_status; x; s; q; __malloc_w_memset_weak_base_l101[0]
 [inout] Inputs for function memset_weak_base:
     __fc_heap_status; __malloc_w_memset_weak_base_l101[0].ptr
 [inout] InOut (internal) for function memset_weak_base:
@@ -403,7 +441,8 @@
 [inout] Out (internal) for function test:
     NULL[16..17]; t1[0..99]; t2[0..99]; t3[10..99]; t4[1..99]; t5[0..99];
     t6[10..13]; t7[0..3]; t8[0..3]; t9[20..99]; t10[4..12]; t11[2..6];
-    t12[0..96]; ts[0..4]; dst; p; tmp_0; s; s1; k; absolute_valid_range;
+    t12{[0]; [8]; [16]; [24]; [32]; [40]; [48]; [56]; [64]; [72]; [80]; [88];
+        [96]}; ts[0..4]; dst; p; tmp_0; s; s1; k; absolute_valid_range;
     S_incomplete_type[bits 0 to 7]
 [inout] Inputs for function test:
     incomplete_type; vol
@@ -428,10 +467,12 @@
   Sure outputs:
     a
 [inout] Out (internal) for function main:
-    NULL[16..240]; __fc_heap_status; t1[0..99]; t2[0..99]; t3[10..99];
+    NULL[16..17]; __fc_heap_status; t1[0..99]; t2[0..99]; t3[10..99];
     t4[1..99]; t5[0..99]; t6[10..13]; t7[0..3]; t8[0..3]; t9[20..99];
-    t10[4..12]; t11[2..6]; t12[0..96]; ts[0..4];
-    S_incomplete_type[bits 0 to 7]; __malloc_w_memset_weak_base_l101[0]
+    t10[4..12]; t11[2..6];
+    t12{[0]; [8]; [16]; [24]; [32]; [40]; [48]; [56]; [64]; [72]; [80]; [88];
+        [96]}; ts[0..4]; S_incomplete_type[bits 0 to 7];
+    __malloc_w_memset_weak_base_l101[0]
 [inout] Inputs for function main:
     __fc_heap_status; incomplete_type; vol;
     __malloc_w_memset_weak_base_l101[0].ptr
