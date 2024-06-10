@@ -176,20 +176,27 @@ module Regions = Data.Jlist(Region)
 (* --- Server API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let regions map =
-  let pool = ref [] in
-  Memory.iter map (fun r -> pool := r :: !pool) ;
-  List.rev !pool
-
-let map_of_localizable (loc : Printer_tag.localizable) =
+let map_of_localizable ~local (loc : Printer_tag.localizable) =
   let open Printer_tag in
   match kf_of_localizable loc with
   | None -> raise Not_found
   | Some kf ->
     let domain = Analysis.find kf in
-    match ki_of_localizable loc with
-    | Kglobal -> domain.map
-    | Kstmt s -> Stmt.Map.find s domain.body
+    if local then
+      match ki_of_localizable loc with
+      | Kglobal -> domain.map
+      | Kstmt s -> Stmt.Map.find s domain.body
+    else domain.map
+
+let region_of_localizable (m: Memory.map) (loc: Printer_tag.localizable) =
+  try
+    match loc with
+    | PExp(_,_,e) -> Memory.exp m e
+    | PLval(_,_,lv) -> Some (Memory.lval m lv)
+    | PVDecl(_,_,x) -> Some (Memory.lval m (Var x,NoOffset))
+    | PStmt _ | PStmtStart _
+    | PTermLval _ | PGlobal _ | PIP _ | PType _ -> None
+  with Not_found -> None
 
 let map_of_declaration (decl : Printer_tag.declaration) =
   match decl with
@@ -217,20 +224,34 @@ let () =
     ~output:(module Regions)
     ~signals:[signal]
     begin fun decl ->
-      try regions @@ map_of_declaration decl
+      try Memory.regions @@ map_of_declaration decl
       with Not_found -> []
     end
 
 let () =
   Request.register
     ~package ~kind:`GET ~name:"regionsAt"
-    ~descr:(Md.plain "Compute regions at the given marker position")
-    ~input:(module Kernel_ast.Marker)
+    ~descr:(Md.plain "Compute regions at the given marker")
+    ~input:(module Data.Jpair(Kernel_ast.Marker)(Data.Jbool))
     ~output:(module Regions)
     ~signals:[signal]
-    begin fun loc ->
-      try regions @@ map_of_localizable loc
+    begin fun (loc,local) ->
+      try Memory.regions @@ map_of_localizable ~local loc
       with Not_found -> []
+    end
+
+let () =
+  Request.register
+    ~package ~kind:`GET ~name:"localize"
+    ~descr:(Md.plain "Localize in the local (true) or global map (false)")
+    ~input:(module Data.Jpair(Kernel_ast.Marker)(Data.Jbool))
+    ~output:(module NodeOpt)
+    ~signals:[signal]
+    begin fun (loc,local) ->
+      try
+        let map = map_of_localizable ~local loc in
+        region_of_localizable map loc
+      with Not_found -> None
     end
 
 (* -------------------------------------------------------------------------- *)

@@ -162,14 +162,32 @@ const regions_internal: Server.GetRequest<decl,region[]> = {
 /** Compute regions for the given declaration */
 export const regions: Server.GetRequest<decl,region[]>= regions_internal;
 
-const regionsAt_internal: Server.GetRequest<marker,region[]> = {
+const regionsAt_internal: Server.GetRequest<[ marker, boolean ],region[]> = {
   kind: Server.RqKind.GET,
   name: 'plugins.region.regionsAt',
-  input: jMarker,
+  input: Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jArray(jRegion),
   signals: [ { name: 'plugins.region.updated' } ],
 };
-/** Compute regions at the given marker position */
-export const regionsAt: Server.GetRequest<marker,region[]>= regionsAt_internal;
+/** Compute regions at the given marker */
+export const regionsAt: Server.GetRequest<[ marker, boolean ],region[]>= regionsAt_internal;
+
+const localize_internal: Server.GetRequest<
+  [ marker, boolean ],
+  node |
+  undefined
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.region.localize',
+  input: Json.jPair( jMarker, Json.jBoolean,),
+  output: Json.jOption(jNode),
+  signals: [ { name: 'plugins.region.updated' } ],
+};
+/** Localize in the local (true) or global map (false) */
+export const localize: Server.GetRequest<
+  [ marker, boolean ],
+  node |
+  undefined
+  >= localize_internal;
 
 /* ------------------------------------- */

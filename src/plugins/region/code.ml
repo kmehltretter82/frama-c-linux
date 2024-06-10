@@ -164,10 +164,9 @@ let instr (m:map) (s:stmt) (instr:instr) =
 type rmap = Memory.map Stmt.Map.t ref
 
 let store rmap m s =
-  rmap := Stmt.Map.add s (Memory.copy m) !rmap
+  rmap := Stmt.Map.add s (Memory.copy ~locked:true m) !rmap
 
 let rec stmt (r:rmap) (m:map) (s:stmt) =
-
   let annots = Annotations.code_annot s in
   if annots <> [] then
     Options.warning ~source:(fst @@ Stmt.loc s)
@@ -218,8 +217,8 @@ type domain = {
   spec : map Property.Map.t ;
 }
 
-let domain kf =
-  let m = Memory.create () in
+let domain ?global kf =
+  let m = match global with Some g -> g | None -> Memory.create () in
   let r = ref Stmt.Map.empty in
   begin
     try
@@ -227,7 +226,7 @@ let domain kf =
       block r m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
   end ; {
-    map = m ;
+    map = Memory.copy ~locked:true m ;
     body = !r ;
     spec = Property.Map.empty ;
   }

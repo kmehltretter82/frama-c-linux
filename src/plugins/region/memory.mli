@@ -50,8 +50,17 @@ val pp_node : Format.formatter -> node -> unit
 val pp_range : Format.formatter -> range -> unit
 val pp_region : Format.formatter -> region -> unit
 
+(** Initially unlocked. *)
 val create : unit -> map
-val copy : map -> map
+
+(** Default locked status is inherited from the copied map. *)
+val copy : ?locked:bool -> map -> map
+
+(** Lock the map. No more access nor merge can be added into the map. *)
+val lock : map -> unit
+
+(** Unlock the map. *)
+val unlock : map -> unit
 
 val root : map -> Cil_types.varinfo -> node
 val cell : map -> ?size:int -> ?ptr:node -> ?root:varinfo -> unit -> node
@@ -61,11 +70,19 @@ val id : node -> int
 val forge : int -> node
 val node : map -> node -> node
 val nodes : map -> node list -> node list
-val region : map -> node -> region
+
 val iter : map -> (region -> unit) -> unit
+val region : map -> node -> region
+val regions : map -> region list
 
 val merge : map -> node -> node -> node
 val read : map -> node -> Access.acs -> unit
 val write : map -> node -> Access.acs -> unit
 val shift : map -> node -> Access.acs -> unit
 val points_to : map -> node -> node -> unit
+
+(** @raise Not_found *)
+val lval : map -> lval -> node
+
+(** @raise Not_found *)
+val exp : map -> exp -> node option

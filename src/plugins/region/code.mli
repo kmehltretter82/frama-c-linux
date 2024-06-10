@@ -29,10 +29,12 @@ val exp : map -> stmt -> exp -> node option
 val instr : map -> stmt -> instr -> unit
 val stmt : map Stmt.Map.t ref -> map -> stmt -> unit
 
+(** All the provided maps are locked. *)
 type domain = {
   map : map ;
   body : map Stmt.Map.t ;
   spec : map Property.Map.t ;
 }
 
-val domain : kernel_function -> domain
+(** The global map, if provided, is used as an accumulator. *)
+val domain : ?global:map -> kernel_function -> domain

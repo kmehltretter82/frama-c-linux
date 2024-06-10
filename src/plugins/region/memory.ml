@@ -51,6 +51,7 @@ type rg = node Ranges.range
 
 type map = {
   store: chunk Ufind.store ;
+  mutable locked: bool ;
   mutable index: node Vmap.t ;
 }
 
@@ -69,6 +70,12 @@ let types (m : chunk) : typ list =
   Access.Set.iter add m.creads ;
   Access.Set.iter add m.cwrites ;
   Typ.Set.elements !pool
+
+let failwith_locked m fn =
+  if m.locked then raise (Invalid_argument fn)
+
+let lock m = m.locked <- true
+let unlock m = m.locked <- false
 
 (* -------------------------------------------------------------------------- *)
 (* --- Printers                                                           --- *)
@@ -110,11 +117,13 @@ let pp_chunk fmt (n: node) (m: chunk) =
 (* -------------------------------------------------------------------------- *)
 
 let create () = {
+  locked = false ;
   store = Ufind.new_store () ;
   index = Vmap.empty ;
 }
 
-let copy m = {
+let copy ?locked m = {
+  locked = (match locked with None -> m.locked | Some l -> l) ;
   store = Ufind.copy m.store ;
   index = m.index ;
 }
@@ -150,6 +159,7 @@ let get map node =
 (* -------------------------------------------------------------------------- *)
 
 let cell (m: map) ?size ?ptr ?root () =
+  failwith_locked m "Region.Memory.cell" ;
   let clayout = match size, ptr with
     | None, None -> Blob
     | None, Some _ -> Cell(Cil.bitsSizeOf Cil.voidPtrType,ptr)
@@ -162,6 +172,7 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
   Ufind.set m.store n (f r)
 
 let range (m: map) ~size ~offset ~length ~data : node =
+  failwith_locked m "Region.Memory.range" ;
   let last = offset + length in
   if not (0 <= offset && offset < last && last <= size) then
     raise (Invalid_argument "Region.Memory.range") ;
@@ -171,6 +182,7 @@ let range (m: map) ~size ~offset ~length ~data : node =
 
 let root (m: map) v =
   try Vmap.find v m.index with Not_found ->
+    failwith_locked m "Region.Memory.root" ;
     let n = cell m ~root:v () in
     m.index <- Vmap.add v n m.index ; n
 
@@ -262,6 +274,11 @@ let iter (m:map) (f: region -> unit) =
   let h = Hashtbl.create 0 in
   Vmap.iter (fun _x n -> walk h m f n) m.index
 
+let regions map =
+  let pool = ref [] in
+  iter map (fun r -> pool := r :: !pool) ;
+  List.rev !pool
+
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
 (* -------------------------------------------------------------------------- *)
@@ -344,6 +361,7 @@ let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
   end
 
 let merge (m: map) (a: node) (b: node) : node =
+  failwith_locked m "Region.Memory.merge" ;
   if Ufind.eq m.store a b then Ufind.find m.store a else
     let q = Queue.create () in
     do_merge m q a b ;
@@ -363,21 +381,80 @@ let access (m:map) (a:node) (ty: typ) =
   if sr <> size then ignore (merge m a (cell m ~size ()))
 
 let points_to (m: map) (a: node) (b : node) =
+  failwith_locked m "Region.Memory.points_to" ;
   ignore @@ merge m a @@ cell m ~ptr:b ()
 
 let read (m: map) (a: node) from =
+  failwith_locked m "Region.Memory.read" ;
   let r = get m a in
   Ufind.set m.store a { r with creads = Access.Set.add from r.creads } ;
   access m a (Access.typeof from)
 
 let write (m: map) (a: node) from =
+  failwith_locked m "Region.Memory.write" ;
   let r = get m a in
   Ufind.set m.store a { r with cwrites = Access.Set.add from r.cwrites } ;
   access m a (Access.typeof from)
 
 let shift (m: map) (a: node) from =
+  failwith_locked m "Region.Memory.shift" ;
   let r = get m a in
   Ufind.set m.store a { r with cshifts = Access.Set.add from r.cshifts }
 (* no access *)
+
+(* -------------------------------------------------------------------------- *)
+(* --- Lookup                                                            ---- *)
+(* -------------------------------------------------------------------------- *)
+
+let cranges m r =
+  let rg = Ufind.get m.store r in
+  match rg.clayout with
+  | Blob | Cell _ -> raise Not_found
+  | Compound(s,rgs) -> s, rgs
+
+let cpointed m r =
+  let rg = Ufind.get m.store r in
+  match rg.clayout with
+  | Blob | Compound _ | Cell(_,None) -> None
+  | Cell(_,Some r) -> Some (Ufind.find m.store r)
+
+let rec lval (m: map) (lv: lval) : node =
+  let h = host m (fst lv) in
+  offset m h (snd lv)
+
+and host (m: map) (h: lhost) : node =
+  match h with
+  | Var x -> Ufind.find m.store @@ Vmap.find x m.index
+  | Mem e ->
+    match exp m e with
+    | None -> raise Not_found
+    | Some r -> r
+
+and offset (m: map) (r: node) (ofs: offset) : node =
+  match ofs with
+  | NoOffset -> Ufind.find m.store r
+  | Field (fd, ofs) ->
+    let _, rgs = cranges m r in
+    let (p,w) = Cil.fieldBitsOffset fd in
+    let rg = Ranges.find p rgs in
+    if rg.offset <= p && p+w <= rg.offset + rg.length then
+      offset m rg.data ofs
+    else raise Not_found
+  | Index (_, ofs) ->
+    let s, rgs = cranges m r in
+    match rgs with
+    | R [rg] when rg.offset = 0 && rg.length = s ->
+      offset m rg.data ofs
+    | _ -> raise Not_found
+
+and exp (m: map) (e: exp) : node option =
+  match e.enode with
+  | Const _
+  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> None
+  | Lval lv -> cpointed m @@ lval m lv
+  | AddrOf lv | StartOf lv -> Some (lval m lv)
+  | CastE(_, e) -> exp m e
+  | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
+  | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
 
 (* -------------------------------------------------------------------------- *)
