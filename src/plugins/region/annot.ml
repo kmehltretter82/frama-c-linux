@@ -222,15 +222,15 @@ let rec parse_named_lpath (env:env) p =
 let kspec = ref 0
 let registry = Hashtbl.create 0
 
-let of_extid = Hashtbl.find registry
-let of_extrev = function
+let of_extid id = try Hashtbl.find registry id with Not_found -> []
+let of_extension = function
   | { ext_name="region" ; ext_kind = Ext_id k } -> of_extid k
-  | _ -> raise Not_found
-let of_extension e = List.rev (of_extrev e)
-let of_behavior bhv =
-  List.fold_left
-    (fun acc e -> List.rev_append (try of_extrev e with Not_found -> []) acc)
-    [] bhv.Cil_types.b_extended
+  | _ -> []
+let of_code_annot = function
+  | { annot_content = AExtended(_,_,e) } -> of_extension e
+  | _ -> []
+
+let of_behavior bhv = List.concat_map of_extension bhv.b_extended
 
 let typecheck typing_context _loc ps =
   let env = {
@@ -251,7 +251,12 @@ let printer _pp fmt = function
   | _ -> ()
 
 let () =
-  Acsl_extension.register_behavior
-    ~plugin:"region" "alias" typecheck ~printer false
+  begin
+    Acsl_extension.register_behavior
+      ~plugin:"region" "region" typecheck ~printer false ;
+    Acsl_extension.register_code_annot
+      ~plugin:"region" "region" typecheck ~printer false ;
+  end
+
 
 (* -------------------------------------------------------------------------- *)

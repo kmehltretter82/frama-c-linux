@@ -50,4 +50,5 @@ val pp_region : Format.formatter -> region -> unit
 val pp_regions : Format.formatter -> region list -> unit
 
 val of_extension : acsl_extension -> region list
+val of_code_annot : code_annotation -> region list
 val of_behavior : behavior -> region list
