@@ -47,21 +47,29 @@
   Called from offsetmap.i:87.
 [eva] using specification for function Frama_C_interval
 [eva] Done for function Frama_C_interval
-[eva] offsetmap.i:90: Frama_C_show_each_1_256_257: {0; 257}
+[eva] offsetmap.i:90: Frama_C_show_each_1_256_257: [-2147483648..2147483647]
+[eva:alarm] offsetmap.i:95: Warning: 
+  pointer comparison. assert \pointer_comparable((void *)q, (void *)0);
+[eva:alarm] offsetmap.i:95: Warning: out of bounds write. assert \valid(q);
 [eva] computing for function Frama_C_interval <- h <- main.
   Called from offsetmap.i:101.
 [eva] Done for function Frama_C_interval
-[eva] offsetmap.i:104: Frama_C_show_each_1_256_257: {0; 257}
+[eva] offsetmap.i:104: Frama_C_show_each_1_256_257: [-32768..32767]
 [eva] Recording results for h
 [eva] Done for function h
 [eva] Recording results for main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    offsetmap.i:94: imprecise merge of addresses
+      (read in 2 statements, propagated through 0 statements)
+      garbled mix of &{x}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   TT[0][bits 0 to 7]# ∈ [0..8]%32, bits 0 to 7 
     [bits 8 to 39]# ∈ [0..8] repeated %32, bits 8 to 39 
     [bits 40 to 71]# ∈ [0..8] repeated %32, bits 8 to 39 
-    [bits 72 to 287]# ∈ [0..8] repeated %32, bits 8 to 223 
+    {[2][bits 8 to 31]; [3..8]} ∈ [--..--]
     [9] ∈ {0}
   T[0][bits 0 to 7]# ∈ {1}%32, bits 0 to 7 
    [0][bits 8 to 31]# ∈ {0; 1}%32, bits 8 to 31 
@@ -102,19 +110,19 @@
   q ∈ {{ &s + [0..9999999] }}
   c2 ∈ [0..8]
 [eva:final-states] Values at end of function h:
-  x ∈ [0..257]
+  x ∈ [--..--]
   i_0 ∈ [0..6]
   p_0 ∈ {{ &t + {1} }}
   q ∈ {{ NULL ; &x }}
   t[0][bits 0 to 7]# ∈ {257}%16, bits 0 to 7 
-   [bits 8 to 119]# ∈ {0; 257} repeated %16, bits 8 to 119 
+   {[0][bits 8 to 15]; [1..6]; [7][bits 0 to 7]} ∈ [--..--]
    [7][bits 8 to 15]# ∈ {257}%16, bits 8 to 15 
   sp ∈ {{ &t + [1..13],1%2 }}
 [eva:final-states] Values at end of function main:
   TT[0][bits 0 to 7]# ∈ [0..8]%32, bits 0 to 7 
     [bits 8 to 39]# ∈ [0..8] repeated %32, bits 8 to 39 
     [bits 40 to 71]# ∈ [0..8] repeated %32, bits 8 to 39 
-    [bits 72 to 287]# ∈ [0..8] repeated %32, bits 8 to 223 
+    {[2][bits 8 to 31]; [3..8]} ∈ [--..--]
     [9] ∈ {0}
   T[0][bits 0 to 7]# ∈ {1}%32, bits 0 to 7 
    [0][bits 8 to 31]# ∈ {0; 1}%32, bits 8 to 31 

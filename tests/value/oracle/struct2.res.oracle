@@ -98,7 +98,8 @@
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f_precis:
-  NULL[rbits 32768 to 32799] ∈ {{ NULL + [--..--] ; (? *)&a }}
+  NULL[rbits 32768 to 32799] ∈
+      {{ garbled mix of &{a} (origin: Merge {struct2.i:149}) }}
       [rbits 32800 to 65543] ∈ [--..--]
   tab_s[0] ∈ {0}
        [1].a ∈ [--..--]

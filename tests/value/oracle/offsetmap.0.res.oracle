@@ -64,7 +64,7 @@
   TT[0][bits 0 to 7]# ∈ [0..8]%32, bits 0 to 7 
     [bits 8 to 39]# ∈ [0..8] repeated %32, bits 8 to 39 
     [bits 40 to 71]# ∈ [0..8] repeated %32, bits 8 to 39 
-    [bits 72 to 287]# ∈ [0..8] repeated %32, bits 8 to 223 
+    {[2][bits 8 to 31]; [3..8]} ∈ [--..--]
     [9] ∈ {0}
   T[0][bits 0 to 7]# ∈ {1}%32, bits 0 to 7 
    [0][bits 8 to 31]# ∈ {0; 1}%32, bits 8 to 31 
@@ -126,7 +126,7 @@
   TT[0][bits 0 to 7]# ∈ [0..8]%32, bits 0 to 7 
     [bits 8 to 39]# ∈ [0..8] repeated %32, bits 8 to 39 
     [bits 40 to 71]# ∈ [0..8] repeated %32, bits 8 to 39 
-    [bits 72 to 287]# ∈ [0..8] repeated %32, bits 8 to 223 
+    {[2][bits 8 to 31]; [3..8]} ∈ [--..--]
     [9] ∈ {0}
   T[0][bits 0 to 7]# ∈ {1}%32, bits 0 to 7 
    [0][bits 8 to 31]# ∈ {0; 1}%32, bits 8 to 31 

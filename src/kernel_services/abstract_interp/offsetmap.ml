@@ -1637,7 +1637,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         add_node ~min ~max:abs_max new_reml m v new_offr subr
   ;;
 
-  let update_itv_with_rem ~exact ~offset ~abs_max ~size ~rem v curr_off tree =
+  let update_itv_with_rem ~exact ~once ~offset ~abs_max ~size ~rem v curr_off tree =
     if Int.(equal size zero) then curr_off, tree else
       let off1, t1 = keep_above ~offset:abs_max curr_off tree in
       let off2, t2 = keep_below ~offset curr_off tree in
@@ -1659,9 +1659,16 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
             let new_offset = Integer.max offset impz.offset in
             let rem = realign ~offset ~new_offset rem size in
             let r_node = realign ~offset:impz.offset ~new_offset r_node m_node in
+            let node_abs_max = impz.offset +~ max in
+            let end_reached, write_max =
+              if node_abs_max >=~ abs_max
+              then true, abs_max
+              else false, node_abs_max
+            in
             let new_r, new_m, new_v =
               let joined_value = V.join v_node v in
-              if v_is_isotropic || (Rel.equal rem r_node && m_node =~ size)
+              if (v_is_isotropic && (once || size >~ (write_max -~ new_offset)))
+              || (Rel.equal rem r_node && m_node =~ size)
               then r_node, m_node, V.anisotropic_cast ~size:m_node joined_value
               else if V.is_isotropic v_node
               then rem, size, V.anisotropic_cast ~size joined_value
@@ -1670,12 +1677,6 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
                 let new_value = V.topify_with_origin origin joined_value in
                 let new_rem = Rel.zero and new_modu = Integer.one in
                 new_rem, new_modu, new_value
-            in
-            let node_abs_max = impz.offset +~ max in
-            let end_reached, write_max =
-              if node_abs_max >=~ abs_max
-              then true, abs_max
-              else false, node_abs_max
             in
             let new_left_offset, new_left_tree =
               add_node
@@ -1690,7 +1691,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         union !left_offset !left_tree off1 t1
   ;;
 
-  let update_itv = update_itv_with_rem ~rem:Rel.zero;;
+  let update_itv = update_itv_with_rem ~rem:Rel.zero ~once:false
 
   (* This should be in Int_Intervals, but is currently needed here.
      Returns an interval with reversed bounds when the intersection is empty. *)
@@ -1988,7 +1989,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
     let update = update_itv_with_rem ~exact in
     let treat_interval (imin, imax) (v, modu, rem) acc =
       let dmin, dmax = imin +~ start_dest, imax +~ start_dest in
-      snd (update
+      snd (update ~once:true
              ~offset:dmin ~abs_max:dmax ~rem:rem ~size:modu v Integer.zero acc)
     in
     fold_between ~entire:false (Int.zero, stop) treat_interval from to_
@@ -2153,7 +2154,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
     r
 
   let add ?(exact=true) (min, max) (v, modu, rem) m =
-    snd (update_itv_with_rem ~exact
+    snd (update_itv_with_rem ~exact ~once:true
            ~offset:min ~abs_max:max ~rem ~size:modu v Integer.zero m)
 
   let find_imprecise ~validity m =
