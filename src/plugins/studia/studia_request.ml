@@ -21,12 +21,14 @@
 (**************************************************************************)
 
 open Server
-open Cil_types
 
 let package =
   Package.package ~plugin:"studia" ~name:"studia" ~title:"Studia" ()
 
-type effects = { direct: stmt list; indirect: stmt list }
+type effects = {
+  direct: Printer_tag.localizable list;
+  indirect: Printer_tag.localizable list
+}
 
 let empty = { direct = []; indirect = []; }
 
@@ -51,26 +53,28 @@ module Effects = struct
   let jtype = R.jtype
 
   let to_json effects =
-    let markers = Printer_tag.localizable_of_stmt in
     R.default |>
-    R.set direct (List.map markers effects.direct) |>
-    R.set indirect (List.map markers effects.indirect) |>
+    R.set direct effects.direct |>
+    R.set indirect effects.indirect |>
     R.to_json
 end
+
+let stmt_marker = Printer_tag.localizable_of_stmt
+let global_marker vi = Printer_tag.localizable_of_declaration (SGlobal vi)
 
 let compute_writes zone =
   try
     let reads = Writes.compute zone in
     let add acc = function
       | Writes.Assign stmt | CallDirect stmt ->
-        { acc with direct = stmt :: acc.direct }
+        { acc with direct = stmt_marker stmt :: acc.direct }
       | CallIndirect stmt ->
-        { acc with indirect = stmt :: acc.indirect }
+        { acc with indirect = stmt_marker stmt :: acc.indirect }
       | FormalInit (_vi, callsites) ->
-        let calls = List.flatten (List.map snd callsites) in
-        { acc with direct = calls @ acc.direct }
-      | GlobalInit (_vi, _initinfo) ->
-        acc (* for now ignore global initializations *)
+        let calls = List.concat_map snd callsites in
+        { acc with direct = List.map stmt_marker calls @ acc.direct }
+      | GlobalInit (vi, _initinfo) ->
+        { acc with direct = global_marker vi :: acc.direct }
     in
     List.fold_left add empty reads
   with exn ->
@@ -82,8 +86,10 @@ let compute_reads zone =
   try
     let reads = Reads.compute zone in
     let add acc = function
-      | Reads.Direct stmt -> { acc with direct = stmt :: acc.direct }
-      | Indirect stmt -> { acc with indirect = stmt :: acc.indirect }
+      | Reads.Direct stmt ->
+        { acc with direct = stmt_marker stmt :: acc.direct }
+      | Indirect stmt ->
+        { acc with indirect = stmt_marker stmt :: acc.indirect }
     in
     List.fold_left add empty reads
   with exn ->
