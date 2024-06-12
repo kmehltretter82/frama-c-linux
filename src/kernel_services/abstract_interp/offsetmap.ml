@@ -1637,6 +1637,10 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         add_node ~min ~max:abs_max new_reml m v new_offr subr
   ;;
 
+  (* If [once] holds, interprets a single write from [offset] to [abs_max]
+     of the value [v] of size [size], repeated to fill the interval.
+     Otherwise, interprets independent writes of the value [v] of size [size]
+     at possible offsets, starting from [offset] until [abs_max].  *)
   let update_itv_with_rem ~exact ~once ~offset ~abs_max ~size ~rem v curr_off tree =
     if Int.(equal size zero) then curr_off, tree else
       let off1, t1 = keep_above ~offset:abs_max curr_off tree in
@@ -1665,14 +1669,29 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
               then true, abs_max
               else false, node_abs_max
             in
+            let new_node_size = write_max -~ new_offset in
             let new_r, new_m, new_v =
               let joined_value = V.join v_node v in
-              if (v_is_isotropic && (once || size >~ (write_max -~ new_offset)))
-              || (Rel.equal rem r_node && m_node =~ size)
-              then r_node, m_node, V.anisotropic_cast ~size:m_node joined_value
+              (* If the write has the same size and alignment as the existing
+                 node, then afterward each write location contains either the
+                 previous node value or the written value. *)
+              if Rel.equal rem r_node && m_node =~ size
+              then rem, size, joined_value
+              (* Each write location contains either the written value, or bits
+                 from the previous node value, which is a proper value if it is
+                 isotropic. *)
               else if V.is_isotropic v_node
               then rem, size, V.anisotropic_cast ~size joined_value
+              (* If the new node is smaller than the write size, then either it
+                 contains only the new value, or only the previous node value.
+                 If the new value is isotropic, we can then reuse the alignment
+                 and size of the existing node. *)
+              else if v_is_isotropic && (once || size >~ new_node_size)
+              then r_node, m_node, V.anisotropic_cast ~size:m_node joined_value
               else
+                (* Otherwise, bits of the existing node value can be mixed with
+                   the written value. We topify the joined value to be sound,
+                   but this is imprecise. *)
                 let origin = Origin.(current Merge) in
                 let new_value = V.topify_with_origin origin joined_value in
                 let new_rem = Rel.zero and new_modu = Integer.one in
