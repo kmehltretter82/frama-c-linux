@@ -3,7 +3,7 @@
 */
 
 #include "string.h"
-
+#include "stdlib.h"
 
 int t1[100];
 int t2[100];
@@ -89,7 +89,28 @@ void uninit() {
   memset(x, 0, 4);
 }
 
+typedef struct S {
+  int i;
+  char c;
+  int *ptr;
+} st;
+
+void memset_weak_base () {
+  int x;
+  /*@ eva_allocate fresh_weak; */
+  st *s = malloc(sizeof(st));
+  if (s == NULL) return;
+  s->i = 421;
+  s->c = 1;
+  s->ptr = &x;
+  memset(s, 0, sizeof(st));
+  int *q = s->ptr; /* As the base is weak, s->ptr must be 0 or &x.
+                      This should not be a garbled mix. */
+  if (q != NULL) *q = 42; // This write should be valid.
+}
+
 void main() {
   test();
   uninit();
+  memset_weak_base();
 }
