@@ -40,6 +40,8 @@ let create_why3_env loadpath =
   let main = WConf.get_main @@ WConf.read_config None in
   W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
 
+
+
 let extract_path thname =
   let segments = String.split_on_char '.' thname in
   match List.rev segments with
@@ -123,7 +125,13 @@ type env = {
   menv : why3module Datatype.String.Hashtbl.t
 }
 
-
+let create_empty_env wenv =
+  let tenv  = W.Ty.Hts.create 0 in
+  let lenv  = W.Term.Hls.create 0 in
+  let lils  = Logic_info.Hashtbl.create 0 in
+  let ltits  = Logic_type_info.Hashtbl.create 0 in
+  let menv  = Datatype.String.Hashtbl.create 0 in
+  { wenv; tenv; lenv; lils; ltits; menv }
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -185,9 +193,6 @@ and lti_of_ts (env : env) (ts : W.Ty.tysymbol) : C.logic_type_info =
         lt_attr = [];
       }
     in W.Ty.Hts.add env.tenv ts lti ;
-
-
-
 
     let cwmod = Datatype.String.Hashtbl.find env.menv @@ recover_module ts.ts_name in
     Datatype.String.Hashtbl.replace env.menv (recover_module ts.ts_name)
@@ -278,7 +283,7 @@ let import_theory (env : env) thname =
                    let li = li_of_ls env ls in
                    L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
-            | _ -> L.debug ~dkey "Decl and whatever"
+            | _ -> L.debug ~dkey "Other type of Decl"
           end
         | Use _| Clone _| Meta _ -> L.debug ~dkey ""
       ) theory.th_decls
@@ -298,12 +303,7 @@ let () =
       if libs <> [] || imports <> [] then
         begin
           let wenv = create_why3_env @@ libs in
-          let tenv  = W.Ty.Hts.create 0 in
-          let lenv  = W.Term.Hls.create 0 in
-          let lils  = Logic_info.Hashtbl.create 0 in
-          let ltits  = Logic_type_info.Hashtbl.create 0 in
-          let menv  = Datatype.String.Hashtbl.create 0 in
-          let env : env = { wenv; tenv; lenv; lils; ltits; menv } in
+          let env : env = create_empty_env wenv in
           add_builtins env;
           List.iter (import_theory env) @@ imports;
           W.Ty.Hts.iter (fun (tys) (lti) ->
