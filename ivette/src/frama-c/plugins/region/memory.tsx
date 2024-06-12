@@ -82,7 +82,7 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     r.labels.forEach(a => {
       const lid = `L${a}`;
       nodes.push({ ...L, id: lid, label: `${a}:` });
-      edges.push({ source: lid, target: id });
+      edges.push({ source: lid, aligned: true, head: 'tee', target: id });
     });
     // --- Roots
     const R: Dot.Node =
@@ -90,7 +90,7 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     r.roots.forEach(x => {
       const xid = `X${x}`;
       nodes.push({ ...R, id: xid, label: x });
-      edges.push({ source: xid, target: id });
+      edges.push({ source: xid, headAnchor: "e", target: id });
     });
     // --- Pointed
     if (r.pointed !== undefined) {

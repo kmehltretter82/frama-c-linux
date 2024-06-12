@@ -45,7 +45,8 @@ function RegionAnalys(): JSX.Element {
   const setComputing = Dome.useProtected(setRunning);
   const scope = States.useCurrentScope();
   const { kind, name } = States.useDeclaration(scope);
-  const regions = States.useRequest(Region.regions, kf) ?? [];
+  const regions =
+    States.useRequest(Region.regions, kf, { pending: null }) ?? [];
   React.useEffect(() => {
     if (!pinned && kind === 'FUNCTION' && scope !== kf) {
       setKf(scope);

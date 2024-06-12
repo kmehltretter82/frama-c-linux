@@ -49,6 +49,9 @@ export type Shape =
   | 'circle' | 'ellipse'
   | 'note' | 'tab' | 'folder' | 'cds';
 
+export type Anchor =
+  'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'c' | '_';
+
 export type Arrow = 'none' | 'arrow' | 'tee' | 'box' | 'dot';
 
 export type Line = 'solid' | 'dashed' | 'dotted';
@@ -94,20 +97,19 @@ export interface Edge {
   line?: Line;
   /** Default is `dark` */
   color?: Color;
-  /** Default is `arrow` */
   head?: Arrow;
-  /** Default is `none` */
-  tail?: Arrow;
-  /** Label font */
-  font?: Font;
-  /** Label */
-  label?: string;
-  /** Tooltip */
-  title?: string;
-  /** Head label */
   headLabel?: string,
-  /** Tail label */
+  headAnchor?: Anchor;
+  tail?: Arrow;
   tailLabel?: string,
+  tailAnchor?: Anchor;
+  font?: Font;
+  label?: string;
+  title?: string;
+  /** Edge constraints node placement (default: true). */
+  constraint?: boolean;
+  /** Node placement on the same rank (default: false). */
+  aligned?: boolean;
 }
 
 export interface Cluster {
@@ -319,7 +321,10 @@ class Builder {
   }
 
   attr(a: string, v: string | number | boolean | undefined): Builder {
-    return v ? this.print(' ', a, '=').value(v).print(';') : this;
+    if (v !== undefined && v !== '')
+      return this.print(' ', a, '=').value(v).print(';');
+    else
+      return this;
   }
 
   // --- Node Table Shape
@@ -405,6 +410,11 @@ class Builder {
   edge(e: Edge): void {
     const { line = 'solid', head = 'arrow', tail = 'none' } = e;
     const tooltip = e.title ?? e.label ?? `${e.source} -> ${e.target}`;
+    if (e.aligned === true)
+      this
+        .print('{ rank=same; ')
+        .port(e.source).print(' ')
+        .port(e.target).println(' };');
     this
       .print('  ')
       .port(e.source, e.sourcePort)
@@ -413,8 +423,11 @@ class Builder {
       .print(' [')
       .attr('label', e.label)
       .attr('fontname', e.font ? FONTNAME[e.font] : undefined)
+      .attr('headport', e.tailAnchor)
+      .attr('tailport', e.headAnchor)
       .attr('headlabel', e.headLabel)
       .attr('taillabel', e.tailLabel)
+      .attr('constraint', e.constraint === false ? false : undefined)
       .attr('labeltooltip', e.label ? tooltip : undefined)
       .attr('headtooltip', e.headLabel ? tooltip : undefined)
       .attr('tailtooltip', e.tailLabel ? tooltip : undefined)
