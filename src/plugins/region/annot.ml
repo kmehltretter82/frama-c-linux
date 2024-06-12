@@ -36,7 +36,6 @@ type path = {
 
 and step =
   | Var of varinfo
-  | Region of string
   | AddrOf of path
   | Star of path
   | Index of path
@@ -54,12 +53,11 @@ type region = {
 (* -------------------------------------------------------------------------- *)
 
 let atomic = function
-  | Var _ | Region _ | AddrOf _ | Star _ | Index _ | Field _ -> true
+  | Var _ | AddrOf _ | Star _ | Index _ | Field _ -> true
   | Shift _ | Cast _ -> false
 
 let rec pp_step fmt = function
   | Var x -> Varinfo.pretty fmt x
-  | Region a -> Format.pp_print_string fmt a
   | Field(p,f) -> pfield p f fmt
   | Index a -> Format.fprintf fmt "%a[..]" pp_atom a
   | Shift a -> Format.fprintf fmt "%a+(..)" pp_atom a
@@ -120,12 +118,10 @@ let getCompoundType env ~loc typ =
   | TComp(comp,_) -> comp
   | _ -> error env ~loc "Expected compound type for term"
 
-let parse_name (env:env) ~loc x =
-  try
-    match env.context.find_var x with
-    | { lv_origin = Some v } -> { loc ; typ = v.vtype ; step = Var v }
-    | _ -> error env ~loc "Variable '%s' is not a C-variable" x
-  with Not_found -> { loc ; typ = TVoid [] ; step = Region x }
+let parse_variable (env:env) ~loc x =
+  match env.context.find_var x with
+  | { lv_origin = Some v } -> { loc ; typ = v.vtype ; step = Var v }
+  | _ -> error env ~loc "Variable '%s' is not a C-variable" x
 
 let parse_field env ~loc comp f =
   try List.find (fun fd -> fd.fname = f) (Option.value ~default:[] comp.cfields)
@@ -149,7 +145,7 @@ let parse_typ env ~loc t =
 let rec parse_lpath (env:env) (e: lexpr) =
   let loc = e.lexpr_loc in
   match e.lexpr_node with
-  | PLvar x -> parse_name env ~loc x
+  | PLvar x -> parse_variable env ~loc x
   | PLunop( Ustar , p ) ->
     let lv = parse_lpath env p in
     if Cil.isPointerType lv.typ then

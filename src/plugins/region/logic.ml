@@ -26,7 +26,6 @@ open Memory
 let rec add_lval (m:map) (p:path): node =
   match p.step with
   | Var x -> add_root m x
-  | Region a -> add_label m a
   | Field(lv,fd) -> Memory.add_field m (add_lval m lv) fd
   | Index lv -> Memory.add_index m (add_lval m lv) lv.typ
   | Star e | Cast(_,e) -> add_pointer m e
@@ -41,7 +40,7 @@ and add_pointer  (m:map) (p:path): Memory.node =
 
 and add_exp (m:map) (p:path): Memory.node option =
   match p.step with
-  | (Var _ | Field _ | Index _ | Star _ | Cast _ | Region _) ->
+  | (Var _ | Field _ | Index _ | Star _ | Cast _) ->
     let r = add_lval m p in
     add_value m r p.typ
   | AddrOf p -> Some (add_lval m p)

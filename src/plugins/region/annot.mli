@@ -30,7 +30,6 @@ type path = {
 
 and step =
   | Var of varinfo
-  | Region of string
   | AddrOf of path
   | Star of path
   | Index of path
