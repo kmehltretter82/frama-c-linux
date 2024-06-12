@@ -35,6 +35,7 @@ type region = {
   node: node ;
   parents: node list ;
   roots: varinfo list ;
+  labels: string list ;
   types: typ list ;
   reads: Access.acs list ;
   writes: Access.acs list ;
@@ -62,10 +63,6 @@ val lock : map -> unit
 (** Unlock the map. *)
 val unlock : map -> unit
 
-val root : map -> Cil_types.varinfo -> node
-val cell : map -> ?size:int -> ?ptr:node -> ?root:varinfo -> unit -> node
-val range : map -> size:int -> offset:int -> length:int -> data:node -> node
-
 val id : node -> int
 val forge : int -> node
 val node : map -> node -> node
@@ -75,11 +72,21 @@ val iter : map -> (region -> unit) -> unit
 val region : map -> node -> region
 val regions : map -> region list
 
-val merge : map -> node -> node -> node
+val add_root : map -> Cil_types.varinfo -> node
+val add_label : map -> string -> node
+val add_cell : map -> ?size:int -> ?ptr:node -> ?root:varinfo -> ?label:string -> unit -> node
+val add_range : map -> size:int -> offset:int -> length:int -> data:node -> node
+val add_field : map -> node -> fieldinfo -> node
+val add_index : map -> node -> typ -> node
+val add_points_to : map -> node -> node -> unit
+val add_value : map -> node -> typ -> node option
+
 val read : map -> node -> Access.acs -> unit
 val write : map -> node -> Access.acs -> unit
 val shift : map -> node -> Access.acs -> unit
-val points_to : map -> node -> node -> unit
+
+val merge : map -> node -> node -> node
+val merge_all : map -> node list -> unit
 
 (** @raise Not_found *)
 val lval : map -> lval -> node

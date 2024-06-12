@@ -24,11 +24,6 @@ open Cil_types
 open Cil_datatype
 open Memory
 
-let typeof_array_elt ty =
-  match Cil.unrollType ty with
-  | TArray(te,_,_) -> te
-  | _ -> Cil.voidType
-
 (* -------------------------------------------------------------------------- *)
 (* ---  L-Values & Expressions                                            --- *)
 (* -------------------------------------------------------------------------- *)
@@ -38,25 +33,17 @@ let rec lval (m:map) (s:stmt) (lv:lval) : node =
   loffset m s (lhost m s h) (Cil.typeOfLhost h) (snd lv)
 
 and lhost (m:map) (s:stmt) = function
-  | Var x -> Memory.root m x
+  | Var x -> Memory.add_root m x
   | Mem e -> pointer m s e
 
 and loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | NoOffset -> r
   | Field(fd,ofs) ->
-    let size = Cil.bitsSizeOf ty in
-    let offset, length = Cil.fieldBitsOffset fd in
-    let data = Memory.cell m () in
-    let rc = Memory.range m ~size ~offset ~length ~data in
-    ignore @@ Memory.merge m r rc ; loffset m s data fd.ftype ofs
+    loffset m s (add_field m r fd) fd.ftype ofs
   | Index(_,ofs) ->
-    let size = Cil.bitsSizeOf ty in
-    let te = typeof_array_elt ty in
-    let data = Memory.cell m () in
-    let rc = Memory.range m ~size ~offset:0 ~length:size ~data in
-    ignore @@ Memory.merge m r rc ; loffset m s data te ofs
+    loffset m s (add_index m r ty) (Cil.typeOf_array_elem ty) ofs
 
-and pointer m s e = match exp m s e with None -> cell m () | Some r -> r
+and pointer m s e = match exp m s e with None -> add_cell m () | Some r -> r
 
 and value m s e = ignore (exp m s e)
 
@@ -70,12 +57,7 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
   | Lval lv ->
     let rv = lval m s lv in
     Memory.read m rv (Lval(s,lv)) ;
-    if Cil.isPointerType @@ Cil.typeOfLval lv then
-      let rp = cell m () in
-      Memory.points_to m rv rp ;
-      Some rp
-    else
-      None
+    Memory.add_value m rv @@ Cil.typeOfLval lv
 
   | UnOp(_,e,_) ->
     value m s e ; None
@@ -84,7 +66,7 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
     value m s k ;
     let r = pointer m s p in
     (*TODO: move the 'A' access on the source of the pointed region *)
-    Memory.shift m r (Exp(s,p)) ;
+    (*Memory.shift m r (Exp(s,p)) ;*)
     Some r
 
   | BinOp(_,a,b,_) ->
@@ -96,7 +78,7 @@ and exp (m: map) (s:stmt) (e:exp) : node option =
     if Cil.isPointerType ty then
       Some (pointer m s p)
     else
-      (value m s e ; None)
+      (value m s p ; None)
 
   | Const _
   | SizeOf _ | SizeOfE _ | SizeOfStr _
@@ -113,7 +95,7 @@ let rec init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
   | SingleInit e ->
     let r = lval m s lv in
     Memory.write m r acs ;
-    Option.iter (Memory.points_to m r) (exp m s e)
+    Option.iter (Memory.add_points_to m r) (exp m s e)
 
   | CompoundInit(_,fvs) ->
     List.iter
@@ -134,7 +116,7 @@ let instr (m:map) (s:stmt) (instr:instr) =
     let r = lval m s lv in
     let v = exp m s e in
     Memory.write m r (Lval(s,lv)) ;
-    Option.iter (Memory.points_to m r) v
+    Option.iter (Memory.add_points_to m r) v
 
   | Local_init(x,AssignInit iv,_) ->
     let acs = Access.Init(s,x) in
@@ -173,7 +155,7 @@ let rec stmt (r:rmap) (m:map) (s:stmt) =
       "Annotations not analyzed" ;
   match s.skind with
   | Instr ki -> instr m s ki ; store r m s
-  | Return(Some e,_) -> value  m s e ; store r m s
+  | Return(Some e,_) -> value m s e ; store r m s
   | Goto _ | Break _ | Continue _ | Return(None,_) -> store r m s
   | If(e,st,se,_) ->
     value m s e ;
@@ -208,6 +190,27 @@ and block (r:rmap) (m:map) (b:block) =
   List.iter (stmt r m) b.bstmts
 
 (* -------------------------------------------------------------------------- *)
+(* --- Behavior                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+type imap = Memory.map Property.Map.t ref
+
+let istore imap m ip =
+  imap := Property.Map.add ip (Memory.copy ~locked:true m) !imap
+
+let bhv ~kf (s:imap) (m:map) (bhv:behavior) =
+  List.iter
+    (fun e ->
+       let rs = Annot.of_extension e in
+       if rs <> [] then
+         begin
+           List.iter (Logic.add_region m) rs ;
+           let ip = Property.ip_of_extended (ELContract kf) e in
+           istore s m ip ;
+         end
+    ) bhv.b_extended
+
+(* -------------------------------------------------------------------------- *)
 (* --- Function                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -220,15 +223,23 @@ type domain = {
 let domain ?global kf =
   let m = match global with Some g -> g | None -> Memory.create () in
   let r = ref Stmt.Map.empty in
+  let s = ref Property.Map.empty in
+  begin
+    try
+      let funspec = Annotations.funspec kf in
+      List.iter (bhv ~kf s m) funspec.spec_behavior ;
+    with Annotations.No_funspec _ -> ()
+  end ;
   begin
     try
       let fundec = Kernel_function.get_definition kf in
       block r m fundec.sbody ;
     with Kernel_function.No_Definition -> ()
-  end ; {
+  end ;
+  {
     map = Memory.copy ~locked:true m ;
     body = !r ;
-    spec = Property.Map.empty ;
+    spec = !s ;
   }
 
 (* -------------------------------------------------------------------------- *)

@@ -92,15 +92,16 @@ export const rangeDefault: range =
   { offset: 0, length: 0, cells: 0, data: nodeDefault };
 
 export type region =
-  { node: node, roots: string[], parents: node[], sizeof: number,
-    ranges: range[], pointed?: node, reads: boolean, writes: boolean,
-    bytes: boolean, label: string, title: string };
+  { node: node, roots: string[], labels: string[], parents: node[],
+    sizeof: number, ranges: range[], pointed?: node, reads: boolean,
+    writes: boolean, bytes: boolean, label: string, title: string };
 
 /** Decoder for `region` */
 export const jRegion: Json.Decoder<region> =
   Json.jObject({
     node: jNode,
     roots: Json.jArray(Json.jString),
+    labels: Json.jArray(Json.jString),
     parents: Json.jArray(jNode),
     sizeof: Json.jNumber,
     ranges: Json.jArray(jRange),
@@ -115,11 +116,12 @@ export const jRegion: Json.Decoder<region> =
 /** Natural order for `region` */
 export const byRegion: Compare.Order<region> =
   Compare.byFields
-    <{ node: node, roots: string[], parents: node[], sizeof: number,
-       ranges: range[], pointed?: node, reads: boolean, writes: boolean,
-       bytes: boolean, label: string, title: string }>({
+    <{ node: node, roots: string[], labels: string[], parents: node[],
+       sizeof: number, ranges: range[], pointed?: node, reads: boolean,
+       writes: boolean, bytes: boolean, label: string, title: string }>({
     node: byNode,
     roots: Compare.array(Compare.alpha),
+    labels: Compare.array(Compare.alpha),
     parents: Compare.array(byNode),
     sizeof: Compare.number,
     ranges: Compare.array(byRange),
@@ -133,9 +135,9 @@ export const byRegion: Compare.Order<region> =
 
 /** Default value for `region` */
 export const regionDefault: region =
-  { node: nodeDefault, roots: [], parents: [], sizeof: 0, ranges: [],
-    pointed: undefined, reads: false, writes: false, bytes: false, label: '',
-    title: '' };
+  { node: nodeDefault, roots: [], labels: [], parents: [], sizeof: 0,
+    ranges: [], pointed: undefined, reads: false, writes: false,
+    bytes: false, label: '', title: '' };
 
 /** Region Analysis Updated */
 export const updated: Server.Signal = {

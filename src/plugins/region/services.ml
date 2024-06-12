@@ -71,6 +71,9 @@ struct
     let open Cil_types in
     Json.of_list @@ List.map (fun v -> Json.of_string v.vname) vs
 
+  let labels_to_json ls =
+    Json.of_list @@ List.map Json.of_string ls
+
   let ikind_to_char (ikind : Cil_types.ikind) =
     match ikind with
     | IBool | IUChar -> 'b'
@@ -141,6 +144,7 @@ struct
     Jrecord [
       "node", Node.jtype ;
       "roots", Jarray Jalpha ;
+      "labels", Jarray Jalpha ;
       "parents", NodeList.jtype ;
       "sizeof", Jnumber ;
       "ranges", Ranges.jtype ;
@@ -156,6 +160,7 @@ struct
     Json.of_fields [
       "node", Node.to_json m.node ;
       "roots", roots_to_json m.roots ;
+      "labels", labels_to_json m.labels ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;
       "ranges", Ranges.to_json @@ m.ranges ;

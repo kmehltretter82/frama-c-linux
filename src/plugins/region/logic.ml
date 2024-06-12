@@ -20,35 +20,36 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+open Annot
+open Memory
 
-type path = {
-  loc : location ;
-  typ : typ ;
-  step: step ;
-}
+let rec add_lval (m:map) (p:path): node =
+  match p.step with
+  | Var x -> add_root m x
+  | Region a -> add_label m a
+  | Field(lv,fd) -> Memory.add_field m (add_lval m lv) fd
+  | Index lv -> Memory.add_index m (add_lval m lv) lv.typ
+  | Star e | Cast(_,e) -> add_pointer m e
+  | Shift _ | AddrOf _ ->
+    Options.error ~source:(fst p.loc)
+      "Unexpected expression (l-value expected)" ;
+    Memory.add_cell m ()
+and add_pointer  (m:map) (p:path): Memory.node =
+  match add_exp m p with
+  | None -> add_cell m ()
+  | Some r -> r
 
-and step =
-  | Var of varinfo
-  | Region of string
-  | AddrOf of path
-  | Star of path
-  | Index of path
-  | Shift of path
-  | Field of path * fieldinfo
-  | Cast of typ * path
+and add_exp (m:map) (p:path): Memory.node option =
+  match p.step with
+  | (Var _ | Field _ | Index _ | Star _ | Cast _ | Region _) ->
+    let r = add_lval m p in
+    add_value m r p.typ
+  | AddrOf p -> Some (add_lval m p)
+  | Shift p -> add_exp m p
 
-type region = {
-  rname: string option ;
-  rpath: path list ;
-}
-
-val pp_step : Format.formatter -> step -> unit
-val pp_atom : Format.formatter -> path -> unit
-val pp_path : Format.formatter -> path -> unit
-val pp_region : Format.formatter -> region -> unit
-val pp_regions : Format.formatter -> region list -> unit
-
-val of_extension : acsl_extension -> region list
-val of_code_annot : code_annotation -> region list
-val of_behavior : behavior -> region list
+let add_region (m: map) (r : Annot.region) =
+  let rs = List.map (add_lval m) r.rpath in
+  merge_all m @@
+  match r.rname with
+  | None -> rs
+  | Some a -> add_label m a :: rs

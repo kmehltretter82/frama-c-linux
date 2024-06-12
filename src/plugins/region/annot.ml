@@ -28,25 +28,25 @@ open Cil_datatype
 (* ---  Region Specifications                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type lpath = {
+type path = {
   loc : location ;
-  ltype : typ ;
-  lnode : lnode ;
+  typ : typ ;
+  step: step ;
 }
 
-and lnode =
-  | L_var of varinfo
-  | L_region of string
-  | L_addr of lpath
-  | L_star of lpath
-  | L_index of lpath
-  | L_shift of lpath
-  | L_field of lpath * fieldinfo
-  | L_cast of typ * lpath
+and step =
+  | Var of varinfo
+  | Region of string
+  | AddrOf of path
+  | Star of path
+  | Index of path
+  | Shift of path
+  | Field of path * fieldinfo
+  | Cast of typ * path
 
 type region = {
   rname: string option ;
-  rpath: lpath list ;
+  rpath: path list ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -54,29 +54,29 @@ type region = {
 (* -------------------------------------------------------------------------- *)
 
 let atomic = function
-  | L_var _ | L_region _ | L_addr _ | L_star _ | L_index _ | L_field _ -> true
-  | L_shift _ | L_cast _ -> false
+  | Var _ | Region _ | AddrOf _ | Star _ | Index _ | Field _ -> true
+  | Shift _ | Cast _ -> false
 
-let rec pp_lnode fmt = function
-  | L_var x -> Varinfo.pretty fmt x
-  | L_region a -> Format.pp_print_string fmt a
-  | L_field(p,f) -> pfield p f fmt
-  | L_index a -> Format.fprintf fmt "%a[..]" pp_latom a
-  | L_shift a -> Format.fprintf fmt "%a+(..)" pp_latom a
-  | L_star a -> Format.fprintf fmt "*%a" pp_latom a
-  | L_addr a -> Format.fprintf fmt "&%a" pp_latom a
-  | L_cast(t,a) -> Format.fprintf fmt "(%a)@,%a" Typ.pretty t pp_latom a
+let rec pp_step fmt = function
+  | Var x -> Varinfo.pretty fmt x
+  | Region a -> Format.pp_print_string fmt a
+  | Field(p,f) -> pfield p f fmt
+  | Index a -> Format.fprintf fmt "%a[..]" pp_atom a
+  | Shift a -> Format.fprintf fmt "%a+(..)" pp_atom a
+  | Star a -> Format.fprintf fmt "*%a" pp_atom a
+  | AddrOf a -> Format.fprintf fmt "&%a" pp_atom a
+  | Cast(t,a) -> Format.fprintf fmt "(%a)@,%a" Typ.pretty t pp_atom a
 
 and pfield p fd fmt =
-  match p.lnode with
-  | L_star p -> Format.fprintf fmt "%a->%a" pp_latom p Fieldinfo.pretty fd
-  | _ -> Format.fprintf fmt "%a.%a" pp_latom p Fieldinfo.pretty fd
+  match p.step with
+  | Star p -> Format.fprintf fmt "%a->%a" pp_atom p Fieldinfo.pretty fd
+  | _ -> Format.fprintf fmt "%a.%a" pp_atom p Fieldinfo.pretty fd
 
-and pp_latom fmt a =
-  if atomic a.lnode then pp_lnode fmt a.lnode
-  else Format.fprintf fmt "@[<hov 2>(%a)@]" pp_lnode a.lnode
+and pp_atom fmt a =
+  if atomic a.step then pp_step fmt a.step
+  else Format.fprintf fmt "@[<hov 2>(%a)@]" pp_step a.step
 
-and pp_lpath fmt a = pp_lnode fmt a.lnode
+and pp_path fmt a = pp_step fmt a.step
 
 let pp_named fmt = function None -> () | Some a -> Format.fprintf fmt "%s: " a
 
@@ -85,10 +85,10 @@ let pp_region fmt r =
   | [] -> Format.pp_print_string fmt "\null"
   | p::ps ->
     begin
-      Format.fprintf fmt "@[<hov 2>]" ;
+      Format.fprintf fmt "@[<hov 2>" ;
       pp_named fmt r.rname ;
-      pp_lpath fmt p ;
-      List.iter (Format.fprintf fmt ",@ %a" pp_lpath) ps ;
+      pp_path fmt p ;
+      List.iter (Format.fprintf fmt ",@ %a" pp_path) ps ;
       Format.fprintf fmt "@]" ;
     end
 
@@ -96,7 +96,7 @@ let pp_regions fmt = function
   | [] -> Format.pp_print_string fmt "\null"
   | r::rs ->
     begin
-      Format.fprintf fmt "@[<hv 0>]" ;
+      Format.fprintf fmt "@[<hv 0>" ;
       pp_region fmt r ;
       List.iter (Format.fprintf fmt ",@ %a" pp_region) rs ;
       Format.fprintf fmt "@]" ;
@@ -109,7 +109,7 @@ let pp_regions fmt = function
 type env = {
   context: Logic_typing.typing_context ;
   mutable named: string option ;
-  mutable paths: lpath list ;
+  mutable paths: path list ;
   mutable specs: region list ;
 }
 
@@ -123,9 +123,9 @@ let getCompoundType env ~loc typ =
 let parse_name (env:env) ~loc x =
   try
     match env.context.find_var x with
-    | { lv_origin = Some v } -> { loc ; ltype = v.vtype ; lnode = L_var v }
+    | { lv_origin = Some v } -> { loc ; typ = v.vtype ; step = Var v }
     | _ -> error env ~loc "Variable '%s' is not a C-variable" x
-  with Not_found -> { loc ; ltype = TVoid [] ; lnode = L_region x }
+  with Not_found -> { loc ; typ = TVoid [] ; step = Region x }
 
 let parse_field env ~loc comp f =
   try List.find (fun fd -> fd.fname = f) (Option.value ~default:[] comp.cfields)
@@ -138,7 +138,7 @@ let parse_lrange (env: env) (e : lexpr) =
   | _ ->
     error env ~loc:e.lexpr_loc "Unexpected index (use unspecified range only)"
 
-let parse_ltype env ~loc t =
+let parse_typ env ~loc t =
   let open Logic_typing in
   let g = env.context in
   let t = g.logic_type g loc g.pre_state t in
@@ -152,52 +152,52 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLvar x -> parse_name env ~loc x
   | PLunop( Ustar , p ) ->
     let lv = parse_lpath env p in
-    if Cil.isPointerType lv.ltype then
-      let te = Cil.typeOf_pointed lv.ltype in
-      { loc ; lnode = L_star lv ; ltype = te }
+    if Cil.isPointerType lv.typ then
+      let te = Cil.typeOf_pointed lv.typ in
+      { loc ; step = Star lv ; typ = te }
     else
       error env ~loc "Pointer-type expected for operator '&'"
   | PLunop( Uamp , p ) ->
     let lv = parse_lpath env p in
-    let ltype = TPtr( lv.ltype , [] ) in
-    { loc ; lnode = L_addr lv ; ltype }
+    let typ = TPtr( lv.typ , [] ) in
+    { loc ; step = AddrOf lv ; typ }
   | PLbinop( p , Badd , rg ) ->
     parse_lrange env rg ;
-    let { ltype } as lv = parse_lpath env p in
-    if Cil.isPointerType ltype then
-      { loc ; lnode = L_shift lv ; ltype = ltype }
+    let { typ } as lv = parse_lpath env p in
+    if Cil.isPointerType typ then
+      { loc ; step = Shift lv ; typ = typ }
     else
-    if Cil.isArrayType ltype then
-      let te = Cil.typeOf_array_elem ltype in
-      { loc ; lnode = L_shift lv ; ltype = TPtr(te,[]) }
+    if Cil.isArrayType typ then
+      let te = Cil.typeOf_array_elem typ in
+      { loc ; step = Shift lv ; typ = TPtr(te,[]) }
     else
       error env ~loc "Pointer-type expected for operator '+'"
   | PLdot( p , f ) ->
     let lv = parse_lpath env p in
-    let comp = getCompoundType env ~loc:lv.loc lv.ltype in
+    let comp = getCompoundType env ~loc:lv.loc lv.typ in
     let fd = parse_field env ~loc comp f in
-    { loc ; lnode = L_field(lv,fd) ; ltype = fd.ftype }
+    { loc ; step = Field(lv,fd) ; typ = fd.ftype }
   | PLarrow( p , f ) ->
     let sp = { lexpr_loc = loc ; lexpr_node = PLunop(Ustar,p) } in
     let pf = { lexpr_loc = loc ; lexpr_node = PLdot(sp,f) } in
     parse_lpath env pf
   | PLarrget( p , rg ) ->
     parse_lrange env rg ;
-    let { ltype } as lv = parse_lpath env p in
-    if Cil.isPointerType ltype then
-      let pointed = Cil.typeOf_pointed ltype in
-      let ls = { loc ; lnode = L_shift lv ; ltype } in
-      { loc ; lnode = L_star ls ; ltype = pointed }
+    let { typ } as lv = parse_lpath env p in
+    if Cil.isPointerType typ then
+      let pointed = Cil.typeOf_pointed typ in
+      let ls = { loc ; step = Shift lv ; typ } in
+      { loc ; step = Star ls ; typ = pointed }
     else
-    if Cil.isArrayType ltype then
-      let elt = Cil.typeOf_array_elem ltype in
-      { loc ; lnode = L_index lv ; ltype = elt }
+    if Cil.isArrayType typ then
+      let elt = Cil.typeOf_array_elem typ in
+      { loc ; step = Index lv ; typ = elt }
     else
       error env ~loc:lv.loc "Pointer or array type expected"
   | PLcast( t , a ) ->
     let lv = parse_lpath env a in
-    let ty = parse_ltype env ~loc t in
-    { loc ; lnode = L_cast(ty,lv) ; ltype = ty }
+    let ty = parse_typ env ~loc t in
+    { loc ; step = Cast(ty,lv) ; typ = ty }
   | _ ->
     error env ~loc "Unexpected expression for region spec"
 
@@ -255,7 +255,7 @@ let () =
     Acsl_extension.register_behavior
       ~plugin:"region" "region" typecheck ~printer false ;
     Acsl_extension.register_code_annot
-      ~plugin:"region" "region" typecheck ~printer false ;
+      ~plugin:"region" "alias" typecheck ~printer false ;
   end
 
 
