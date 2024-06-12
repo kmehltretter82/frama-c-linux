@@ -32,6 +32,7 @@ type 'a store = 'a Imap.t ref
 let new_store () = ref Imap.empty
 let copy r = ref !r
 let rid = ref 0
+
 let make s v =
   let k = incr rid ; !rid in
   s := Imap.add k v !s ; k

@@ -1,0 +1,13 @@
+[kernel] Parsing swap.i (no preprocessing)
+[region] Analyzing regions
+[region] Function swap_aliased:
+  R0004: R-- a (int *) 64b (*R0007) ;
+  R0007: RW- R: (int) 32b ;
+  R0001: R-- b (int *) 64b (*R0007) ;
+  R0008: RW- tmp (int) 32b ;
+[region] Function swap_separated:
+  R0013: R-- a (int *) 64b (*R0016) ;
+  R0016: RW- A: (int) 32b ;
+  R0017: R-- b (int *) 64b (*R001a) ;
+  R001a: RW- B: (int) 32b ;
+  R001b: RW- tmp (int) 32b ;
