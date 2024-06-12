@@ -485,12 +485,14 @@ and offset (m: map) (r: node) (ofs: offset) : node =
   match ofs with
   | NoOffset -> Ufind.find m.store r
   | Field (fd, ofs) ->
-    let _, rgs = cranges m r in
-    let (p,w) = Cil.fieldBitsOffset fd in
-    let rg = Ranges.find p rgs in
-    if rg.offset <= p && p+w <= rg.offset + rg.length then
-      offset m rg.data ofs
-    else raise Not_found
+    if fd.fcomp.cstruct then
+      let _, rgs = cranges m r in
+      let (p,w) = Cil.fieldBitsOffset fd in
+      let rg = Ranges.find p rgs in
+      if rg.offset <= p && p+w <= rg.offset + rg.length then
+        offset m rg.data ofs
+      else raise Not_found
+    else r
   | Index (_, ofs) ->
     let s, rgs = cranges m r in
     match rgs with

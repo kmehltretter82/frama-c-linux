@@ -24,11 +24,6 @@ open Cil_types
 open Cil_datatype
 open Memory
 
-val lval : map -> stmt -> lval -> node
-val exp : map -> stmt -> exp -> node option
-val instr : map -> stmt -> instr -> unit
-val stmt : map Stmt.Map.t ref -> map -> stmt -> unit
-
 (** All the provided maps are locked. *)
 type domain = {
   map : map ;
