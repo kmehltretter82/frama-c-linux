@@ -267,8 +267,7 @@
       end
 
   let longident lexbuf =
-    let s = lexeme lexbuf in
-    if Logic_env.typename_status s then TYPENAME s else LONGIDENT s
+    let s = lexeme lexbuf in LONGIDENT s
 
   (* Update lexer buffer. *)
   let update_line_pos lexbuf line =

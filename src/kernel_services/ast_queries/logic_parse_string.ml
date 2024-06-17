@@ -122,7 +122,9 @@ let sync_typedefs () =
   Logic_env.reset_typenames ();
   Globals.Types.iter_types
     (fun name _ ns ->
-       if ns = Logic_typing.Typedef then Logic_env.add_typename name)
+       if ns = Logic_typing.Typedef then
+         try ignore @@ String.index name ':' with Not_found ->
+           Logic_env.add_typename name)
 
 let wrap f parsetree loc =
   match parsetree with

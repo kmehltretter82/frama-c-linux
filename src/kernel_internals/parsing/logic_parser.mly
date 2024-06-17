@@ -558,13 +558,13 @@ lexpr_inner:
 | RESULT { info $sloc PLresult }
 | SEPARATED LPAR ne_lexpr_list RPAR
       { info $sloc (PLseparated $3) }
-| full_identifier LPAR ne_lexpr_list RPAR
+| symbol_identifier LPAR ne_lexpr_list RPAR
       { info $sloc (PLapp ($1, [], $3)) }
-| full_identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
+| symbol_identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
       { info $sloc (PLapp ($1, $3, $6)) }
-| full_identifier LBRACE ne_label_args RBRACE
+| symbol_identifier LBRACE ne_label_args RBRACE
       { info $sloc (PLapp ($1, $3, [])) }
-| full_identifier  { info $sloc (PLvar $1) }
+| symbol_identifier  { info $sloc (PLvar $1) }
 | PI  { info $sloc (PLvar "\\pi") }
 | lexpr_inner GTGT lexpr_inner { info $sloc (PLbinop ($1, Brshift, $3))}
 | lexpr_inner LTLT lexpr_inner { info $sloc (PLbinop ($1, Blshift, $3))}
@@ -579,18 +579,22 @@ lexpr_inner:
 | EMPTY { info $sloc PLempty }
 | BSUNION LPAR lexpr_list RPAR { info $sloc (PLunion $3) }
 | INTER LPAR lexpr_list RPAR { info $sloc (PLinter $3) }
-| LBRACE lexpr_list RBRACE
-      { info $sloc (PLset ($2)) }
-| LBRACE lexpr PIPE binders RBRACE
+| LBRACE RBRACE
+      { info $sloc (PLset []) }
+| LBRACE lexpr_inner RBRACE
+      { info $sloc (PLset [$2]) }
+| LBRACE lexpr_inner COMMA lexpr_list RBRACE
+      { info $sloc (PLset ($2 :: $4)) }
+| LBRACE lexpr_inner PIPE binders RBRACE
       { info $sloc (PLcomprehension ($2,$4,None)) }
-| LBRACE lexpr PIPE binders SEMICOLON lexpr RBRACE
+| LBRACE lexpr_inner PIPE binders SEMICOLON lexpr RBRACE
       { info $sloc (PLcomprehension ($2,$4,Some $6)) }
     /* Aggregated object initialization */
 | LBRACE field_init RBRACE
       { info $sloc (PLinitField($2)) }
 | LBRACE array_init RBRACE
       { info $sloc (PLinitIndex($2)) }
-| LBRACE lexpr WITH update RBRACE
+| LBRACE lexpr_inner WITH update RBRACE
       { List.fold_left
 	  (fun a (path,upd_val) -> info $sloc (PLupdate(a,path,upd_val))) $2 $4 }
 /*
@@ -683,7 +687,7 @@ binders_reentrance:
 ;
 
 decl_spec:
-| type_spec(typename) var_spec { ($1, let (modif, name) = $2 in (modif $1, name))  }
+| type_spec(typesymbol) var_spec { ($1, let (modif, name) = $2 in (modif $1, name))  }
 ;
 
 var_spec:
@@ -761,10 +765,15 @@ logic_type_gen(tname):
 
 typename:
 | name = TYPENAME { name }
+;
+
+typesymbol:
+| name = TYPENAME { name }
+| name = LONGIDENT { name }
 /* TODO treat the case of an ACSL keyword that is also a typedef */
 ;
 
-logic_type: logic_type_gen(typename) { $1 }
+logic_type: logic_type_gen(typesymbol) { $1 }
 
 cv:
   CONST { cv_const }
@@ -772,16 +781,16 @@ cv:
 | BSGHOST { cv_ghost }
 ;
 
-type_spec_cv(tname):
-     type_spec(tname) cv_after { $2 $1 }
-|    cv type_spec_cv(tname) { LTattribute ($2, $1) }
+type_spec_cv:
+     type_spec(TYPENAME) cv_after { $2 $1 }
+|    cv type_spec_cv { LTattribute ($2, $1) }
 
 cv_after:
   /* empty */ { fun t -> t }
 | cv cv_after { fun t -> $2 (LTattribute (t,$1)) }
 
 cast_logic_type:
- | type_spec_cv(TYPENAME) abs_spec_cv_option { $2 $1 }
+ | type_spec_cv abs_spec_cv_option { $2 $1 }
 ;
 
 logic_rt_type:
@@ -902,9 +911,13 @@ ne_logic_type_list(tname):
 | l = separated_nonempty_list(COMMA,logic_type_gen(tname)) { l }
 ;
 
+symbol_identifier:
+| id = full_identifier { id }
+| name = LONGIDENT { name }
+;
+
 full_identifier:
 | id = identifier { id }
-| id = LONGIDENT { id }
 | ADMIT { "admit" }
 | ALLOCATES { "allocates" }
 | ASSERT { "assert" }
@@ -1866,12 +1879,14 @@ any_identifier:
 
 identifier_or_typename:
 | TYPENAME { $1 }
+| LONGIDENT { $1 }
 | full_identifier { $1 }
-
+;
 
 identifier_or_typename_full: /* allowed as C field names */
 | is_acsl_typename  { $1 }
-| identifier_or_typename { $1 }
+| TYPENAME { $1 }
+| full_identifier { $1 }
 ;
 
 identifier: /* part included into 'identifier_or_typename', but duplicated to avoid parsing conflicts */
