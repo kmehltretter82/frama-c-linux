@@ -27,7 +27,7 @@
   R0056: --- 128b 0..64 [1]: R0058 64..96 [1]: R007f ;
   R0058: -W- (double) 64b ;
   R007f: -W- (int) 32b ;
-  R0001: RW- inp (SN *) 64b (*R0007) ;
-  R000a: RW- out (SN *) 64b (*R000e) ;
-  R0011: RW- idx (SL *) 64b (*R0015) ;
+  R0001: RWA inp (SN *) 64b (*R0007) ;
+  R000a: RWA out (SN *) 64b (*R000e) ;
+  R0011: RWA idx (SL *) 64b (*R0015) ;
   R0018: RW- i (int) 32b ;

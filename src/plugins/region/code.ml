@@ -28,13 +28,23 @@ open Memory
 (* ---  L-Values & Expressions                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
+type value = { from : node option ; ptr : node option }
+let integral = { from = None ; ptr = None }
+let pointer m v =
+  match v.ptr with
+  | Some p -> v, p
+  | None ->
+    let p = add_cell m () in
+    Option.iter (fun s -> Memory.add_points_to m s p) v.from ;
+    { v with ptr = Some p }, p
+
 let rec add_lval (m:map) (s:stmt) (lv:lval) : node =
   let h = fst lv in
   add_loffset m s (add_lhost m s h) (Cil.typeOfLhost h) (snd lv)
 
 and add_lhost (m:map) (s:stmt) = function
   | Var x -> Memory.add_root m x
-  | Mem e -> add_pointer m s e
+  | Mem e -> snd @@ pointer m @@ add_exp m s e
 
 and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | NoOffset -> r
@@ -43,47 +53,43 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Index(_,ofs) ->
     add_loffset m s (add_index m r ty) (Cil.typeOf_array_elem ty) ofs
 
-and add_pointer m s e = match add_exp m s e with None -> add_cell m () | Some r -> r
-
 and add_value m s e = ignore (add_exp m s e)
 
-and add_exp (m: map) (s:stmt) (e:exp) : node option =
+and add_exp (m: map) (s:stmt) (e:exp) : value =
   match e.enode with
 
   | AddrOf lv | StartOf lv ->
-    let rv = add_lval m s lv in
-    Some rv
+    let rv = Some (add_lval m s lv) in
+    { from = rv ; ptr = rv }
 
   | Lval lv ->
     let rv = add_lval m s lv in
     Memory.read m rv (Lval(s,lv)) ;
-    Memory.add_value m rv @@ Cil.typeOfLval lv
-
-  | UnOp(_,e,_) ->
-    add_value m s e ; None
+    let ptr = Memory.add_value m rv @@ Cil.typeOfLval lv in
+    { from = Some rv ; ptr }
 
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     add_value m s k ;
-    let r = add_pointer m s p in
-    (*TODO: move the 'A' access on the source of the pointed region *)
-    (*Memory.shift m r (Exp(s,p)) ;*)
-    Some r
+    let v = add_exp m s p in
+    Option.iter (fun r -> Memory.shift m r (Exp(s,e))) v.from ; v
+
+  | UnOp(_,e,_) ->
+    add_value m s e ; integral
 
   | BinOp(_,a,b,_) ->
-    add_value m s a ;
-    add_value m s b ;
-    None
+    add_value m s a ; add_value m s b ; integral
 
   | CastE(ty,p) ->
+    let v = add_exp m s p in
     if Cil.isPointerType ty then
-      Some (add_pointer m s p)
+      fst @@ pointer m @@ v
     else
-      (add_value m s p ; None)
+      integral
 
   | Const _
   | SizeOf _ | SizeOfE _ | SizeOfStr _
   | AlignOf _ | AlignOfE _
-    -> None
+    -> integral
 
 (* -------------------------------------------------------------------------- *)
 (* --- Initializers                                                       --- *)
@@ -95,7 +101,7 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
   | SingleInit e ->
     let r = add_lval m s lv in
     Memory.write m r acs ;
-    Option.iter (Memory.add_points_to m r) (add_exp m s e)
+    Option.iter (Memory.add_points_to m r) (add_exp m s e).ptr
 
   | CompoundInit(_,fvs) ->
     List.iter
@@ -116,7 +122,7 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
     let r = add_lval m s lv in
     let v = add_exp m s e in
     Memory.write m r (Lval(s,lv)) ;
-    Option.iter (Memory.add_points_to m r) v
+    Option.iter (Memory.add_points_to m r) v.ptr
 
   | Local_init(x,AssignInit iv,_) ->
     let acs = Access.Init(s,x) in
