@@ -130,13 +130,10 @@ function Node(props: NodeProps): JSX.Element {
     child = false,
     hasChildren = false,
   } = props;
-  const debug = `#${node}`;
   const {
-    title = debug, childLabel = 'Script', header,
+    title, childLabel = 'Script', header,
     proved = false, pending = 0, size = 0
-  } = States.useRequest(
-    TIP.getNodeInfos, node, { pending: null, onError: null }
-  ) ?? {};
+  } = States.useRequestStable(TIP.getNodeInfos, node);
   const elt = cellRef.current;
   const current = !child && !parent;
   React.useEffect(() => {
@@ -238,11 +235,8 @@ export interface ServerActivity {
 }
 
 export function useServerActivity(): ServerActivity {
-  const rq = States.useRequest(WP.getScheduledTasks, null, { pending: null });
-  const procs = rq ? rq.procs : 0;
-  const active = rq ? rq.active : 0;
-  const done = rq ? rq.done : 0;
-  const todo = rq ? rq.todo : 0;
+  const { procs, active, done, todo } =
+    States.useRequestStable(WP.getScheduledTasks, null);
   const running = active + todo > 0;
   return { procs, active, done, todo, running };
 }
@@ -271,14 +265,15 @@ export function TIPView(props: TIPProps): JSX.Element {
     States.useSyncArrayElt(WP.goals, goal) ?? WP.goalsDataDefault;
   // --- proof status
   const {
-    current, index = -1, pending = 0, size = 0,
+    current, index, pending, size,
     tactic: nodeTactic, parents = [], children = [],
-  } = States.useRequest(TIP.getProofStatus, goal ? {
-    main: goal, unproved, subtree,
-  } : undefined, { pending: null }) ?? {};
+  } = States.useRequestStable(
+    TIP.getProofStatus,
+    goal ? { main: goal, unproved, subtree } : undefined,
+  );
   // --- script status
-  const { saved = false, proof = false, script } =
-    States.useRequest(TIP.getScriptStatus, goal, { pending: null }) ?? {};
+  const { saved, proof, script } =
+    States.useRequestStable(TIP.getScriptStatus, goal);
   // --- provers
   const available = States.useSyncArrayData(WP.ProverInfos);
   const [provers = [], setProvers] = States.useSyncState(WP.provers);

@@ -50,87 +50,135 @@ const D = new Dome.Debug('States');
 // --- Cached GET Requests
 // --------------------------------------------------------------------------
 
-/** Options to tweak the behavior of `useRequest()`. Null values means
-    keeping the last result. */
-export interface UseRequestOptions<A> {
-  /** Returned value in case where the server goes offline. */
-  offline?: A | null;
-  /** Temporary returned value when the request is pending. */
-  pending?: A | null;
-  /** Returned value when the request fails. */
-  onError?: A | null;
-  /** Re-send the request when any of the signals are sent. */
-  onSignals?: Server.Signal[];
+/** Response of `useRequestStatus()` */
+export interface RequestStatus<Out> {
+  /** Response of the current request, when available. */
+  response: Out | undefined;
+  /** Current response, or default value when undefined. */
+  value: Out;
+  /** Last returned value, until no more request or server goes offline. */
+  stable: Out;
+  /** Current request is still pending. */
+  pending: boolean;
+  /** Current request error, if any. */
+  error: string | undefined;
+  /** Interrupt currently processed request, if any. */
+  kill: () => void;
 }
 
 /**
-  Cached GET request (Custom React Hook).
+  Cached requests (Custom React Hook).
 
-  Sends the specified GET request and returns its result. The request is send
+  Sends the specified request and returns its result. The request is send
   asynchronously and cached until any change in the request parameters or server
   state. The change in the server state are tracked by the signals specified
   when registering the request or by the one in options.onSignals if specified.
-
-  Options can be used to tune more precisely the behavior of the hook.
  */
-export function useRequest<Kd extends Server.RqKind, In, Out>(
+export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
   rq: Server.Request<Kd, In, Out>,
-  params: In | undefined,
-  options: UseRequestOptions<Out> = {},
-): Out | undefined {
-  const initial = options.offline ?? undefined;
-  const [response, setResponse] = React.useState<Out | undefined>(initial);
-  const updateResponse = Dome.useProtected(
-    (opt: Out | undefined | null): void => {
-      if (opt !== null) setResponse(opt);
-    }
-  );
+  prm: In | undefined,
+  ...signals: Server.Signal[]
+): RequestStatus<Out> {
+
+  // Request Status Management
+  const NOP = (): void => { };
+  const killer = React.useRef(NOP);
+  const [response, setResponse] = React.useState<Out>();
+  const [stable, setStable] = React.useState<Out>(rq.fallback);
+  const [error, setError] = React.useState<string>();
+  const updateStable = Dome.useProtected(setStable);
+  const updateResponse = Dome.useProtected(setResponse);
+  const updateError = Dome.useProtected(setError);
+
   // Fetch Request
-  async function trigger(): Promise<void> {
-    if (Server.isRunning() && params !== undefined) {
-      try {
-        updateResponse(options.pending);
-        const r = await Server.send(rq, params);
-        updateResponse(r);
-      } catch (error) {
-        if (options.onError === undefined) {
-          D.error(`Fail in useRequest '${rq.name}'. ${error}`);
+  const trigger: () => void =
+    React.useCallback(
+      async function (): Promise<void> {
+        updateError(undefined);
+        updateResponse(undefined);
+        try {
+          if (Server.isRunning() && prm !== undefined) {
+            const task = Server.send(rq, prm);
+            killer.current = task.kill ?? NOP;
+            const result = await task;
+            updateResponse(result);
+            updateStable(result);
+          } else {
+            updateStable(rq.fallback);
+          }
+        } catch (err) {
+          updateError(`${err}`);
+          updateStable(rq.fallback);
+        } finally {
+          killer.current = NOP;
         }
-        updateResponse(options.onError);
-      }
-    } else {
-      updateResponse(options.offline);
-    }
-  }
+      }, [ rq, prm, updateStable, updateResponse, updateError ]);
 
   // Server & Cache Management
-  Server.useStatus();
-  const cached = React.useRef('');
+  const running = Server.isRunningStatus(Server.useStatus());
+  const cached = running ? JSON.stringify([rq.name, prm]) : null;
   React.useEffect(() => {
-    if (Server.isRunning()) {
-      const footprint = JSON.stringify([rq.name, params]);
-      if (cached.current !== footprint) {
-        cached.current = footprint;
-        trigger();
-      }
+    if (cached !== null) {
+      trigger();
     } else {
-      if (cached.current !== '') {
-        cached.current = '';
-        updateResponse(options.offline);
-      }
+      setResponse(undefined);
+      setStable(rq.fallback);
+      setError(undefined);
+      killer.current = NOP;
     }
-  });
+  }, [rq, trigger, cached] );
 
   // Signal Management
-  const signals = rq.signals.concat(options.onSignals ?? []);
+  const rqsignals = rq.signals.concat(signals);
   React.useEffect(() => {
-    signals.forEach((s) => Server.onSignal(s, trigger));
+    rqsignals.forEach((s) => Server.onSignal(s, trigger));
     return () => {
-      signals.forEach((s) => Server.offSignal(s, trigger));
+      rqsignals.forEach((s) => Server.offSignal(s, trigger));
     };
   });
 
-  return response;
+  // Full Response
+  const pending =
+    running &&
+    prm !== undefined &&
+    response === undefined &&
+    error === undefined;
+  const value = response ?? rq.fallback;
+  return {
+    response, value, stable, error, pending,
+    kill: killer.current,
+  };
+}
+
+// --------------------------------------------------------------------------
+// --- useRequest shortcurs
+// --------------------------------------------------------------------------
+
+/** Shortcut to `useRequestStatus().response */
+export function useRequestResponse<Kd extends Server.RqKind, In, Out>(
+  rq: Server.Request<Kd, In, Out>,
+  prm: In | undefined,
+  ...signals: Server.Signal[]
+): Out | undefined {
+  return useRequestStatus(rq, prm, ...signals).response;
+}
+
+/** Shortcut to `useRequestStatus().value */
+export function useRequestValue<Kd extends Server.RqKind, In, Out>(
+  rq: Server.Request<Kd, In, Out>,
+  prm: In | undefined,
+  ...signals: Server.Signal[]
+): Out {
+  return useRequestStatus(rq, prm, ...signals).value;
+}
+
+/** Shortcut to `useRequestStatus().stable */
+export function useRequestStable<Kd extends Server.RqKind, In, Out>(
+  rq: Server.Request<Kd, In, Out>,
+  prm: In | undefined,
+  ...signals: Server.Signal[]
+): Out {
+  return useRequestStatus(rq, prm, ...signals).stable;
 }
 
 // --------------------------------------------------------------------------
@@ -143,12 +191,10 @@ export type Tag = {
   descr?: string;
 };
 
-const holdCurrent = { offline: null, pending: null, onError: null };
-
 export type GetTags = Server.GetRequest<null, Tag[]>;
 
 export function useTags(rq: GetTags): Map<string, Tag> {
-  const tags = useRequest(rq, null, holdCurrent);
+  const tags = useRequestStable(rq, null);
   return React.useMemo(() => {
     const m = new Map<string, Tag>();
     if (tags !== undefined)

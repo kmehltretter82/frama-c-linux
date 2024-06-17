@@ -165,17 +165,8 @@ export interface GoalViewProps {
 
 export function GoalView(props: GoalViewProps): JSX.Element {
   const { node, locked } = props;
-  const jtext = States.useRequest(TIP.printSequent, props, {
-    pending: null,
-    offline: undefined,
-    onError: '',
-  }) ?? null;
-  const { part, term } =
-    States.useRequest(TIP.getSelection, node, {
-      pending: null,
-      offline: {},
-      onError: {},
-    }) ?? {};
+  const jtext = States.useRequestStable(TIP.printSequent, props);
+  const { part, term } = States.useRequestStable(TIP.getSelection, node);
   const proxy = React.useMemo(() => new TextProxy(), []);
   const sequent = React.useMemo(() => new Sequent(jtext), [jtext]);
   React.useEffect(() => proxy.updateContents(sequent.text), [proxy, sequent]);

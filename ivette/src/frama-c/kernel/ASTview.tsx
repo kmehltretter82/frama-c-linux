@@ -418,7 +418,7 @@ function getPropertiesNodes(tree: Tree): Node[] {
 // This aspect contains all the properties nodes, along with their tags.
 interface Property extends Node { tag: States.Tag }
 const PropertiesNodes = createPropertiesNodes();
-function createPropertiesNodes() : Editor.Aspect<Property[]> {
+function createPropertiesNodes(): Editor.Aspect<Property[]> {
   const deps = { tree: Tree, tags: Tags, statuses: PropertiesStatuses };
   return Editor.createAspect(deps, ({ tree, tags, statuses }) => {
     const nodes = getPropertiesNodes(tree);
@@ -494,9 +494,9 @@ function createPropertiesGutter(): Editor.Extension {
 type MarkerMenuExtender =
   (items: Dome.PopupMenuItem[], attr: Ast.markerAttributesData) => void;
 
-const MarkerMenuExtenders : MarkerMenuExtender[] = [];
+const MarkerMenuExtenders: MarkerMenuExtender[] = [];
 
-export function registerMarkerMenuExtender(e : MarkerMenuExtender) : void {
+export function registerMarkerMenuExtender(e: MarkerMenuExtender): void {
   MarkerMenuExtenders.push(e);
 }
 
@@ -530,7 +530,7 @@ function createContextMenuHandler(): Editor.Extension {
         const descr = `Calls to ${name}`;
         Lodash.forEach(groupedCallers, (group) => {
           const n = group.length;
-          const { call } : Eva.CallSite = group[0];
+          const { call }: Eva.CallSite = group[0];
           const { name: fct } = States.getDeclaration(call);
           const caller = `caller ${fct}`;
           const nsites = n > 1 ? `s (${n} call sites)` : '';
@@ -559,7 +559,8 @@ function createContextMenuHandler(): Editor.Extension {
         onClick: () => {
           const text = view.state.sliceDoc(node.from, node.to);
           if (text !== '') navigator.clipboard.writeText(text);
-      } });
+        }
+      });
       Dome.popupMenu(items);
       return;
     }
@@ -635,44 +636,31 @@ function createTaintTooltip(): Editor.Extension {
 
 // Server request handler returning the given function's text.
 function useAST(decl: Ast.decl | undefined): text {
-  return States.useRequest(
-    Ast.printDeclaration, decl || undefined,
-    { onError: [] }
-  ) ?? [];
+  return States.useRequestValue(Ast.printDeclaration, decl || undefined);
 }
 
 // Server request handler returning the given function's callers.
 function useCallers(decl: Decl): Eva.CallSite[] {
-  return States.useRequest(
-    Eva.getCallers, decl || undefined,
-    { onError: [] }
-  ) ?? [];
+  return States.useRequestValue(Eva.getCallers, decl || undefined);
 }
 
 // Server request handler returning the given function's callers.
 function useCallees(marker: Marker): Ast.decl[] {
-  return States.useRequest(
-    Eva.getCallees, marker || undefined,
-    { onError: [] }
-  ) ?? [];
+  return States.useRequestValue(Eva.getCallees, marker || undefined);
 }
 
 // Server request handler returning the tainted lvalues.
 function useTaints(decl: Decl): Eva.LvalueTaints[] {
-  return States.useRequest(Eva.taintedLvalues, decl, { onError: [] }) ?? [];
+  return States.useRequestValue(Eva.taintedLvalues, decl || undefined);
 }
 
 // Server request handler returning the given function's dead code information.
 function useDead(decl: Decl): Eva.deadCode {
-  return States.useRequest(
-    Eva.getDeadCode, decl || undefined,
-    { onError: emptyDeadCode }
-  ) ?? emptyDeadCode;
+  return States.useRequestValue(Eva.getDeadCode, decl || undefined)
+    ?? emptyDeadCode;
 }
 
 // -----------------------------------------------------------------------------
-
-
 
 // -----------------------------------------------------------------------------
 //  AST View component
@@ -748,7 +736,7 @@ export default function ASTview(): JSX.Element {
       <TitleBar>
         <IconButton
           icon={icon}
-          onClick= {unFoldButtonClicked}
+          onClick={unFoldButtonClicked}
           title={title + ' all multi-line ACSL properties'}
           className="titlebar-thin-icon"
         />

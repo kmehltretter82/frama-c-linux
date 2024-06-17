@@ -106,6 +106,7 @@ const getCallstacks_internal: Server.GetRequest<marker[],callstack[]> = {
   name: 'plugins.eva.values.getCallstacks',
   input: Json.jArray(jMarker),
   output: Json.jArray(jCallstack),
+  fallback: [],
   signals: [],
 };
 /** Callstacks for markers */
@@ -116,6 +117,7 @@ const getCallstackInfo_internal: Server.GetRequest<callstack,callsite[]> = {
   name: 'plugins.eva.values.getCallstackInfo',
   input: jCallstack,
   output: Json.jArray(jCallsite),
+  fallback: [],
   signals: [],
 };
 /** Callstack Description */
@@ -129,6 +131,7 @@ const getStmtInfo_internal: Server.GetRequest<
   name: 'plugins.eva.values.getStmtInfo',
   input: jMarker,
   output: Json.jObject({ fct: Json.jString, rank: Json.jNumber,}),
+  fallback: { fct: '', rank: 0 },
   signals: [],
 };
 /** Stmt Information */
@@ -152,6 +155,8 @@ const getProbeInfo_internal: Server.GetRequest<
             effects: Json.jBoolean,
             condition: Json.jBoolean,
           }),
+  fallback: { evaluable: false, code: undefined, stmt: undefined,
+              effects: false, condition: false },
   signals: [],
 };
 /** Probe informations */
@@ -216,6 +221,8 @@ const getValues_internal: Server.GetRequest<
             vThen: Json.jOption(jEvaluation),
             vElse: Json.jOption(jEvaluation),
           }),
+  fallback: { vBefore: undefined, vAfter: undefined, vThen: undefined,
+              vElse: undefined },
   signals: [],
 };
 /** Abstract values for the given marker */

@@ -158,6 +158,7 @@ const propKindTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'kernel.properties.propKindTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -204,6 +205,7 @@ const propStatusTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'kernel.properties.propStatusTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -261,6 +263,7 @@ const alarmsTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'kernel.properties.alarmsTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -337,6 +340,7 @@ const reloadStatus_internal: Server.GetRequest<null,null> = {
   name: 'kernel.properties.reloadStatus',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`status`](#status)  */
@@ -356,6 +360,7 @@ const fetchStatus_internal: Server.GetRequest<
             updated: Json.jArray(jStatusData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`status`](#status)  */
