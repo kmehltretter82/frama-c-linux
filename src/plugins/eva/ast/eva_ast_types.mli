@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Types definition of the Eva AST for lvalues and expressions.
+    Should also include ACSL terms and predicates in the future.
+    Most types are similar to {!Cil_types}. *)
 
 type origin =
   | Lval of Cil_types.lval
