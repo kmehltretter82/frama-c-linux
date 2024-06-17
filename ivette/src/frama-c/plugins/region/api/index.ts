@@ -149,6 +149,7 @@ const compute_internal: Server.ExecRequest<decl,null> = {
   name: 'plugins.region.compute',
   input: jDecl,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Compute regions for the given declaration */
@@ -159,6 +160,7 @@ const regions_internal: Server.GetRequest<decl,region[]> = {
   name: 'plugins.region.regions',
   input: jDecl,
   output: Json.jArray(jRegion),
+  fallback: [],
   signals: [ { name: 'plugins.region.updated' } ],
 };
 /** Returns computed regions for the given declaration */
@@ -169,6 +171,7 @@ const regionsAt_internal: Server.GetRequest<[ marker, boolean ],region[]> = {
   name: 'plugins.region.regionsAt',
   input: Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jArray(jRegion),
+  fallback: [],
   signals: [ { name: 'plugins.region.updated' } ],
 };
 /** Compute regions at the given marker */
@@ -183,6 +186,7 @@ const localize_internal: Server.GetRequest<
   name: 'plugins.region.localize',
   input: Json.jPair( jMarker, Json.jBoolean,),
   output: Json.jOption(jNode),
+  fallback: undefined,
   signals: [ { name: 'plugins.region.updated' } ],
 };
 /** Localize in the local (true) or global map (false) */
