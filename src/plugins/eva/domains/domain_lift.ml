@@ -58,16 +58,15 @@ module Make
     Domain.extract_expr ~oracle context state exp >>=: fun (value, origin) ->
     Val.extend value, origin
 
-  let extract_lval ~oracle context state lval typ loc =
+  let extract_lval ~oracle context state lval loc =
     let oracle exp = oracle exp >>=: Val.restrict in
     let loc = Loc.restrict loc in
-    Domain.extract_lval ~oracle context state lval typ loc
+    Domain.extract_lval ~oracle context state lval loc
     >>=: fun (value, origin) ->
     Val.extend value, origin
 
-  let backward_location state lval typ loc value =
-    Domain.backward_location
-      state lval typ (Loc.restrict loc) (Val.restrict value)
+  let backward_location state lval loc value =
+    Domain.backward_location state lval (Loc.restrict loc) (Val.restrict value)
     >>-: fun (loc, value) ->
     Loc.extend loc, Val.extend value
 

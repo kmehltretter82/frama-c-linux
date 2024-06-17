@@ -32,7 +32,7 @@ let equal_watch w1 w2 =
   | _ -> false
 
 type watchpoint =
-  { name_lv : Cil_types.exp;
+  { name_lv : Eva_ast.exp;
     loc: Locations.location;
     v: watch;
     mutable remaining_count: Integer.t;
@@ -115,7 +115,7 @@ let watch_hook _callstack stmt states =
          then begin
            Self.warning ~wkey:Self.wkey_watchpoint ~once:true ~current:true
              "%a %a%t"
-             Printer.pp_exp name
+             Eva_ast.pp_exp name
              V.pretty vs
              Eva_utils.pp_callstack;
            if Integer.is_zero current ||

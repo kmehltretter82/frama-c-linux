@@ -22,12 +22,11 @@
 
 (** Auxiliary functions on cvalue offsetmaps, used by the cvalue domain. *)
 
-open Cil_types
 open Cvalue
 
 (** Computes the offsetmap for an assignment:
     - in case of a copy, extracts the offsetmap from the state;
     - otherwise, translates the value assigned into an offsetmap. *)
 val offsetmap_of_assignment:
-  Model.t -> exp -> (Precise_locs.precise_location, V.t) Eval.assigned ->
+  Model.t -> Eva_ast.exp -> (Precise_locs.precise_location, V.t) Eval.assigned ->
   V_Offsetmap.t

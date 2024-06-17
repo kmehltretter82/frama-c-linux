@@ -99,8 +99,8 @@ module Sign = struct
       let sign_res = Sign.forward_unop context typ unop sign in
       let bug = not (Bottom.is_included is_included cval_res sign_res) in
       report bug "%a %a = %a  while  %a %a = %a"
-        Printer.pp_unop unop Cval.pretty cval (Bottom.pretty Cval.pretty) cval_res
-        Printer.pp_unop unop Sign.pretty sign (Bottom.pretty Sign.pretty) sign_res
+        Eva_ast.pp_unop unop Cval.pretty cval (Bottom.pretty Cval.pretty) cval_res
+        Eva_ast.pp_unop unop Sign.pretty sign (Bottom.pretty Sign.pretty) sign_res
     in
     List.iter test values
 
@@ -111,9 +111,9 @@ module Sign = struct
       let sign_res = Sign.forward_binop context typ binop sign1 sign2 in
       let bug = not (Bottom.is_included is_included cval_res sign_res) in
       report bug "%a %a %a = %a  while  %a %a %a = %a"
-        Cval.pretty cval1 Printer.pp_binop binop Cval.pretty cval2
+        Cval.pretty cval1 Eva_ast.pp_binop binop Cval.pretty cval2
         (Bottom.pretty Cval.pretty) cval_res
-        Sign.pretty sign1 Printer.pp_binop binop Sign.pretty sign2
+        Sign.pretty sign1 Eva_ast.pp_binop binop Sign.pretty sign2
         (Bottom.pretty Sign.pretty) sign_res
     in
     List.iter (fun x -> List.iter (test x) values) values

@@ -20,8 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
 module CVal = struct
   include Cvalue.V
 
@@ -50,10 +48,12 @@ module CVal = struct
   let assume_pointer = Cvalue_forward.assume_pointer
   let assume_comparable = Cvalue_forward.assume_comparable
 
-  let constant _context exp = function
+  let constant _context _exp = function
+    | Eva_ast.CTopInt _ -> Cvalue.V.top_int
     | CInt64 (i,_k,_s) -> Cvalue.V.inject_int i
     | CChr c           -> Cvalue.V.inject_int (Cil.charConstToInt c)
-    | CWStr _ | CStr _ -> Cvalue.V.inject (Base.of_string_exp exp) Ival.zero
+    | CString base ->
+      Cvalue.V.inject base Ival.zero
     | CReal (f, fkind, fstring) ->
       Cvalue_forward.eval_float_constant f fkind fstring
     | CEnum _ -> assert false
@@ -66,7 +66,7 @@ module CVal = struct
   let forward_binop _context typ binop v1 v2 =
     let value =
       match typ with
-      | TFloat (fkind, _) ->
+      | Cil_types.TFloat (fkind, _) ->
         Cvalue_forward.forward_binop_float (Fval.kind fkind) v1 binop v2
       | TInt _ | TPtr _ | _ as typ ->
         Cvalue_forward.forward_binop_int ~typ v1 binop v2

@@ -34,11 +34,11 @@ val assume_not_nan: assume_finite:bool -> fkind -> V.t -> V.t truth
 val assume_pointer: V.t -> V.t truth
 val assume_comparable: pointer_comparison -> V.t -> V.t -> (V.t * V.t) truth
 
-val forward_binop_int: typ: typ -> V.t -> binop -> V.t -> V.t
+val forward_binop_int: typ: typ -> V.t -> Eva_ast.binop -> V.t -> V.t
 
-val forward_binop_float: Fval.kind -> V.t -> binop -> V.t -> V.t
+val forward_binop_float: Fval.kind -> V.t -> Eva_ast.binop -> V.t -> V.t
 
-val forward_unop: typ -> unop -> V.t -> V.t
+val forward_unop: typ -> Eva_ast.unop -> V.t -> V.t
 
 val rewrap_integer: Eval_typ.integer_range -> V.t -> V.t
 

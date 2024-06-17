@@ -100,7 +100,7 @@ let get_subdivision stmt =
     x
 
 let pretty_actuals fmt actuals =
-  let pp fmt (e,x) = Cvalue.V.pretty_typ (Some (Cil.typeOf e)) fmt x in
+  let pp fmt (e,x) = Cvalue.V.pretty_typ (Some (e.Eva_ast.typ)) fmt x in
   Pretty_utils.pp_flowlist pp fmt actuals
 
 let pretty_current_cfunction_name fmt =
@@ -178,17 +178,6 @@ let postconditions_mention_result spec =
     false
   with Exit -> true
 
-let conv_comp op =
-  let module C = Abstract_interp.Comp in
-  match op with
-  | Eq -> C.Eq
-  | Ne -> C.Ne
-  | Le -> C.Le
-  | Lt -> C.Lt
-  | Ge -> C.Ge
-  | Gt -> C.Gt
-  | _ -> assert false
-
 let conv_relation rel =
   let module C = Abstract_interp.Comp in
   match rel with
@@ -199,72 +188,9 @@ let conv_relation rel =
   | Rge -> C.Ge
   | Rgt -> C.Gt
 
-let loc_dummy_value =
-  let l = { Cil_datatype.Position.unknown with
-            Filepath.pos_path = Datatype.Filepath.of_string "_value_" }
-  in
-  l, l
-
-let zero e =
-  let loc = loc_dummy_value in
-  let typ = Cil.unrollType (Cil.typeOf e) in
-  match typ with
-  | TFloat (fk, _) -> Cil.new_exp ~loc (Const (CReal (0., fk, None)))
-  | TEnum ({ekind = ik },_)
-  | TInt (ik, _) -> Cil.new_exp ~loc (Const (CInt64 (Integer.zero, ik, None)))
-  | TPtr _ ->
-    let ik = Cil.(theMachine.upointKind) in
-    let zero = Cil.new_exp ~loc (Const (CInt64 (Integer.zero, ik, None))) in
-    Cil.mkCast ~force:true ~newt:typ zero
-  | typ -> Self.fatal ~current:true "non-scalar type %a"
-             Printer.pp_typ typ
-
-let eq_with_zero positive e =
-  let op = if positive then Eq else Ne in
-  let loc = Cil_datatype.Location.unknown in
-  Cil.new_exp ~loc (BinOp (op, zero e, e, Cil.intType))
-
-let is_value_zero e =
-  e.eloc == loc_dummy_value
-
-let inv_rel = function
-  | Gt -> Le
-  | Lt -> Ge
-  | Le -> Gt
-  | Ge -> Lt
-  | Eq -> Ne
-  | Ne -> Eq
-  | _ -> assert false
-
-(* Transform an expression supposed to be [positive] into an equivalent
-   one in which the root expression is a comparison operator. *)
-let rec normalize_as_cond expr positive =
-  match expr.enode with
-  | UnOp (LNot, e, _) -> normalize_as_cond e (not positive)
-  | BinOp ((Le|Ne|Eq|Gt|Lt|Ge as binop), e1, e2, typ) ->
-    if positive then
-      expr
-    else
-      let binop = inv_rel binop in
-      let enode = BinOp (binop, e1, e2, typ) in
-      Cil.new_exp ~loc:expr.eloc enode
-  | _ ->
-    eq_with_zero (not positive) expr
-
 module PairExpBool =
   Datatype.Pair_with_collections(Cil_datatype.Exp)(Datatype.Bool)
     (struct let module_name = "Value.Eva_utils.PairExpBool" end)
-module MemoNormalizeAsCond =
-  State_builder.Hashtbl
-    (PairExpBool.Hashtbl)
-    (Cil_datatype.Exp)
-    (struct
-      let name = "Eva_utils.MemoNormalizeAsCond"
-      let size = 64
-      let dependencies = [ Ast.self ]
-    end)
-let normalize_as_cond e pos =
-  MemoNormalizeAsCond.memo (fun (e, pos) -> normalize_as_cond e pos) (e, pos)
 
 module MemoLvalToExp =
   Cil_state_builder.Lval_hashtbl
@@ -278,59 +204,6 @@ module MemoLvalToExp =
 let lval_to_exp =
   MemoLvalToExp.memo
     (fun lv -> Cil.new_exp ~loc:Cil_datatype.Location.unknown (Lval lv))
-
-(* Computation of the inputs of an expression. *)
-let rec deps_of_expr find_loc expr =
-  let rec process expr = match expr.enode with
-    | Lval lval ->
-      (* Dereference of an lvalue. *)
-      deps_of_lval find_loc lval
-    | UnOp (_, e, _) | CastE (_, e) ->
-      (* Unary operators. *)
-      process e
-    | BinOp (_, e1, e2, _) ->
-      (* Binary operators. *)
-      Deps.join (process e1) (process e2)
-    | StartOf lv | AddrOf lv ->
-      (* computation of an address: the inputs of the lvalue whose address
-         is computed are read to compute said address. *)
-      { data = indirect_zone_of_lval find_loc lv;
-        indirect = Locations.Zone.bottom; }
-    | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | AlignOfE _ ->
-      (* static constructs, nothing is read to evaluate them. *)
-      Deps.bottom
-  in
-  process expr
-
-and zone_of_expr find_loc expr = Deps.to_zone (deps_of_expr find_loc expr)
-
-(* dereference of an lvalue: first, its address must be computed,
-   then its contents themselves are read *)
-and deps_of_lval find_loc lval =
-  let ploc = find_loc lval in
-  let zone = Precise_locs.enumerate_valid_bits Read ploc in
-  { data = zone;
-    indirect = indirect_zone_of_lval find_loc lval; }
-
-(* Computations of the inputs of a lvalue : union of the "host" part and
-   the offset. *)
-and indirect_zone_of_lval find_loc (lhost, offset) =
-  Locations.Zone.join
-    (zone_of_lhost find_loc lhost) (zone_of_offset find_loc offset)
-
-(* Computation of the inputs of a host. Nothing for a variable, and the
-   inputs of [e] for a dereference [*e]. *)
-and zone_of_lhost find_loc = function
-  | Var _ -> Locations.Zone.bottom
-  | Mem e -> zone_of_expr find_loc e
-
-(* Computation of the inputs of an offset. *)
-and zone_of_offset find_loc = function
-  | NoOffset -> Locations.Zone.bottom
-  | Field (_, o) -> zone_of_offset find_loc o
-  | Index (e, o) ->
-    Locations.Zone.join
-      (zone_of_expr find_loc e) (zone_of_offset find_loc o)
 
 let rec height_expr expr =
   match expr.enode with

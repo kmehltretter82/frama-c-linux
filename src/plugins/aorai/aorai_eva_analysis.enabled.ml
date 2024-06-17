@@ -36,8 +36,8 @@ let show_aorai_variable state fmt var_name =
 
 let show_val fmt (expr, v) =
   Format.fprintf fmt "%a in %a"
-    Printer.pp_exp expr
-    (Cvalue.V.pretty_typ (Some (Cil.typeOf expr))) v
+    Eva.Eva_ast.pp_exp expr
+    (Cvalue.V.pretty_typ (Some expr.typ)) v
 
 let show_non_det_state fmt state =
   let (states,_) = Data_for_aorai.getGraph () in

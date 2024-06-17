@@ -674,7 +674,8 @@ module Typeinfo =
 
 module Exp = struct
   let pretty_ref = ref (fun _ _ -> assert false)
-  let dummy = { eid = -1; enode = Const (CStr ""); eloc = Location.unknown }
+  let zero = CInt64 (Integer.zero, IChar, None)
+  let dummy = { eid = -1; enode = Const zero; eloc = Location.unknown }
   include Make_with_collections
       (struct
         include Datatype.Undefined

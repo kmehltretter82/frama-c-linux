@@ -133,17 +133,18 @@ module type S = sig
 
   (** Embeds C constants into value abstractions: returns an abstract value
       for the given constant. The constant cannot be an enumeration constant. *)
-  val constant : context enriched -> exp -> constant -> t
+  val constant : context enriched -> Eva_ast.exp -> Eva_ast.constant -> t
 
   (** [forward_unop typ unop v] evaluates the value [unop v], resulting from the
       application of the unary operator [unop] to the value [v].  [typ] is the
       type of [v]. *)
-  val forward_unop : context enriched -> typ -> unop -> t -> t or_bottom
+  val forward_unop : context enriched -> typ -> Eva_ast.unop -> t -> t or_bottom
 
   (** [forward_binop typ binop v1 v2] evaluates the value [v1 binop v2],
       resulting from the application of the binary operator [binop] to the
       values [v1] and [v2]. [typ] is the type of [v1]. *)
-  val forward_binop : context enriched -> typ -> binop -> t -> t -> t or_bottom
+  val forward_binop :
+    context enriched -> typ -> Eva_ast.binop -> t -> t -> t or_bottom
 
   (** [rewrap_integer irange t] wraps around the abstract value [t] to fit the
       integer range [irange], assuming 2's complement. Also used on absolute
@@ -180,14 +181,14 @@ module type S = sig
       [input_type] is the type of [left], [resulting_type] the type of [result]. *)
   val backward_binop :
     context enriched -> input_type:typ -> resulting_type:typ ->
-    binop -> left:t -> right:t -> result:t ->
+    Eva_ast.binop -> left:t -> right:t -> result:t ->
     (t option * t option) or_bottom
 
   (** Backward evaluation of the unary operation [unop arg = res];
       tries to reduce the argument [arg] according to [res].
       [typ_arg] is the type of [arg]. *)
   val backward_unop :
-    context enriched -> typ_arg:typ -> unop ->
+    context enriched -> typ_arg:typ -> Eva_ast.unop ->
     arg:t -> res:t -> t option or_bottom
 
   (** Backward evaluation of the cast of the value [src_val] of type [src_typ]

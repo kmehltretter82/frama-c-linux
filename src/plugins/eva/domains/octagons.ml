@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+open Eva_ast
 
 (* If [true], checks invariants of the states created by most functions. *)
 let debug = false
@@ -61,19 +61,19 @@ type dependencies = Deps.t = {
   indirect: Locations.Zone.t;
 }
 
-type evaluator = Cil_types.exp -> Cvalue.V.t or_top
+type evaluator = exp -> Cvalue.V.t or_top
 
 (* Abstract interface for the variables used by the octagons. *)
 module type Variable = sig
   include Datatype.S_with_collections
   (* Creates a variable from a lvalue. *)
   val make_lval: lval -> t
-  val make_int: varinfo -> t
-  val make_startof: varinfo -> t
+  val make_int: Cil_types.varinfo -> t
+  val make_startof: Cil_types.varinfo -> t
   val kind: t -> kind (* The kind of the variable: integer or float. *)
   val lval: t -> lval option (* The CIL lval corresponding to the variable. *)
   val id: t -> int (* Unique id, needed to use variables as hptmap keys. *)
-  val deps: eval_loc:(Cil_types.lval -> Precise_locs.precise_location) ->
+  val deps: eval_loc:(lval -> Precise_locs.precise_location) ->
     t -> dependencies
 end
 
@@ -83,9 +83,9 @@ module Variable : Variable = struct
   module HCE = Hcexprs.HCE
 
   type var =
-    | Var of varinfo
-    | Int of varinfo
-    | StartOf of varinfo
+    | Var of Cil_types.varinfo
+    | Int of Cil_types.varinfo
+    | StartOf of Cil_types.varinfo
     | Lval of HCE.t
 
   type tt = var * int
@@ -125,9 +125,10 @@ module Variable : Variable = struct
 
   let make var = var, make_id var
 
-  let make_lval = function
-    | Cil_types.Var vi, NoOffset -> make (Var vi)
-    | lval -> make (Lval (HCE.of_lval lval))
+  let make_lval (lval : lval) =
+    match lval.node with
+    | Var vi, NoOffset -> make (Var vi)
+    | _ -> make (Lval (HCE.of_lval lval))
 
   let make_int vi = make (Int vi)
   let make_startof vi = make (StartOf vi)
@@ -140,7 +141,7 @@ module Variable : Variable = struct
 
   let lval (var, _) =
     match var with
-    | Var vi -> Some (Cil_types.Var vi, NoOffset)
+    | Var vi -> Some (Eva_ast.Build.var vi)
     | Lval lval -> HCE.to_lval lval
     | Int _ | StartOf _ -> None
 
@@ -154,7 +155,7 @@ module Variable : Variable = struct
     | StartOf _ ->
       { data = Locations.Zone.bottom ; indirect = Locations.Zone.bottom }
     | Lval lval ->
-      Eva_utils.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
+      Eva_ast.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
 end
 
 module VarSet =
@@ -267,7 +268,7 @@ let _pretty_octagon fmt octagon =
    request to the environment may return a new or an existing variable.
    The abstract domain chooses which expressions are worth being represented
    by a variable; the environment may return [None] otherwise. *)
-type environment = Cil_types.exp -> (Variable.t * Ival.t) option
+type environment = exp -> (Variable.t * Ival.t) option
 
 (* Transforms Cil expressions into mathematical octagons.
    Use Ival.t to evaluate expressions. *)
@@ -332,7 +333,7 @@ module Rewriting = struct
      where [v1] and [v2] are the intervals for [e1] and [e2], and [typ] is
      the type of [e1]. Returns the empty list otherwise. *)
   let apply_binop f (eval : evaluator) typ e1 op e2 =
-    let kind = typ_kind (Cil.typeOf e1) in
+    let kind = typ_kind e1.typ in
     let v1 = eval e1 in
     let v2 = eval e2 in
     if Cil.isPointerType typ
@@ -358,7 +359,7 @@ module Rewriting = struct
     match env expr with
     | Some (var, ival) -> [ { var; sign = true; coeff = Ival.neg_int ival } ]
     | None ->
-      match expr.enode with
+      match expr.node with
       | UnOp (Neg, e, typ) ->
         let* v = project_ival (eval e) in
         if may_overflow typ (Arith.neg v)
@@ -396,10 +397,10 @@ module Rewriting = struct
         apply_binop rewrite_binop eval typ e1 op e2
 
       | CastE (typ, e) ->
-        if Cil.(isIntegralType typ && isIntegralType (typeOf e)) then
+        if Cil.(isIntegralType typ && isIntegralType e.typ) then
           let* v = project_ival (eval e) in
           if may_overflow ~cast:true typ v then [] else rewrite eval env e
-        else if Cil.(isPointerType typ && isPointerType (typeOf e)) then
+        else if Cil.(isPointerType typ && isPointerType e.typ) then
           rewrite eval env e
         else
           []
@@ -408,7 +409,7 @@ module Rewriting = struct
 
   (* Rewrites the operation [e1 ± e2] into equivalent octagons ±(X±Y-value). *)
   let rewrite_binop (eval : evaluator) (env : environment) e1 binop e2 =
-    let kind = typ_kind (Cil.typeOf e1) in
+    let kind = typ_kind e1.typ in
     let vars1 = rewrite eval env e1 in
     let vars2 = rewrite eval env e2 in
     let vars2 = if binop = Sub then List.map neg vars2 else vars2 in
@@ -430,18 +431,18 @@ module Rewriting = struct
 
   (* Returns the range of the expression X-Y when the comparison X#Y holds. *)
   let comparison_range =
-    let open Abstract_interp.Comp in
     function
-    | Lt -> Ival.inject_range None (Some Integer.minus_one)
+    | Eva_ast.Lt -> Ival.inject_range None (Some Integer.minus_one)
     | Gt -> Ival.inject_range (Some Integer.one) None
     | Le -> Ival.inject_range None (Some Integer.zero)
     | Ge -> Ival.inject_range (Some Integer.zero) None
     | Eq -> Ival.zero
     | Ne -> Ival.top
+    | _ -> assert false
 
   (* Transforms the constraint [expr] ∈ [ival] into a list of octagonal
      constraints. *)
-  let make_octagons evaluate env expr ival =
+  let make_octagons evaluate env (expr : Eva_ast.exp) ival =
     let make_octagons_from_binop kind e1 op e2 ival =
       (* equivalent octagonal forms ±(X±Y-v) for [e1 op e2]. *)
       let rewritings = rewrite_binop evaluate env e1 op e2 in
@@ -453,23 +454,23 @@ module Rewriting = struct
       in
       List.map make_octagon rewritings
     in
-    match expr.enode with
+    match expr.node with
     | BinOp (PlusA | MinusA | PlusPI | MinusPI | MinusPP as binop, e1, e2, typ) ->
       let op = operation_of_binop binop in
       let make_octagons typ _ _ = make_octagons_from_binop typ e1 op e2 ival in
       apply_binop make_octagons evaluate typ e1 op e2
     | BinOp ((Lt | Gt | Le | Ge | Eq | Ne as binop), e1, e2, _typ) ->
-      let typ = Cil.typeOf e1 in
-      if not (Cil.isIntegralOrPointerType typ)
+      if not (Cil.isIntegralOrPointerType e1.typ)
       || (Ival.contains_zero ival && Ival.contains_non_zero ival)
       then []
       else
-        let comp = Eva_utils.conv_comp binop in
         let comp =
-          if Ival.is_zero ival then Abstract_interp.Comp.inv comp else comp
+          if Ival.is_zero ival
+          then Eva_ast.invert_relation binop
+          else binop
         in
         let range = comparison_range comp in
-        make_octagons_from_binop (typ_kind typ) e1 Sub e2 range
+        make_octagons_from_binop (typ_kind e1.typ) e1 Sub e2 range
     | _ -> []
 
   let overflow_alarms typ expr ival =
@@ -483,7 +484,8 @@ module Rewriting = struct
       let aux has_better_bound bound bound_kind alarms =
         if Ival.is_bottom ival || has_better_bound ival ival_range >= 0
         then
-          let alarm = Alarms.Overflow (overflow, expr, bound, bound_kind) in
+          let cil_expr = Eva_ast.to_cil_exp expr in
+          let alarm = Alarms.Overflow (overflow, cil_expr, bound, bound_kind) in
           Alarmset.set alarm Alarmset.True alarms
         else alarms
       in
@@ -509,13 +511,13 @@ module Rewriting = struct
       List.fold_left evaluate_octagon Ival.top octagons
     in
     let default = Ival.top, Alarmset.all in
-    match expr.enode with
+    match expr.node with
     | BinOp ((PlusA | MinusA as binop), e1, e2, typ) ->
       let op = if binop = PlusA then Add else Sub in
       let octagons = rewrite_binop eval env e1 op e2 in
       let ival = evaluate_octagons octagons in
       if Ival.(equal top ival) then default else
-        let kind = typ_kind (Cil.typeOf e1) in
+        let kind = typ_kind e1.typ in
         let ival2 =
           match
             project_ival (eval e1), project_ival (eval e2)
@@ -528,11 +530,10 @@ module Rewriting = struct
         then default
         else ival, overflow_alarms typ expr ival
     | BinOp ((Lt | Gt | Le | Ge | Eq as binop), e1, e2, _typ)
-      when Cil.isIntegralOrPointerType (Cil.typeOf e1) ->
-      let comp = Eva_utils.conv_comp binop in
+      when Cil.isIntegralOrPointerType e1.typ ->
       (* Evaluate [e1 - e2] and compare the resulting interval to the interval
          for which the comparison [e1 # e2] holds. *)
-      let range = comparison_range comp in
+      let range = comparison_range binop in
       let octagons = rewrite_binop eval env e1 Sub e2 in
       let ival = evaluate_octagons octagons in
       if Ival.is_included ival range then Ival.one, Alarmset.all
@@ -1264,7 +1265,7 @@ module State = struct
   let rec offset_to_coeff (eval : evaluator) base_type offset =
     let open Lattice_bounds.Top.Operators in
     match offset with
-    | Cil_types.NoOffset -> `Value (Ival.zero)
+    | NoOffset -> `Value (Ival.zero)
     | Field (fi, sub) ->
       let* sub_coeff = offset_to_coeff eval fi.ftype sub in
       begin try
@@ -1295,21 +1296,21 @@ module State = struct
       Top.fold ~top:false Cvalue.V.cardinal_zero_or_one
     in
     fun exp ->
-      match exp.enode with
+      match exp.node with
       | Lval lval
-        when Cil.isIntegralOrPointerType (Cil.typeOfLval lval)
-          && not (Eval_typ.lval_contains_volatile lval)
+        when Cil.isIntegralOrPointerType lval.typ
+          && not (Eva_ast.lval_contains_volatile lval)
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_lval lval, Ival.zero)
 
-      | CastE (typ, { enode = Lval (Var vi, NoOffset) })
+      | CastE (typ, { node = Lval { node = Var vi, NoOffset } })
         when Cil.isIntegralType typ
           && Cil.isFloatingType vi.vtype
           && not (Cil.typeHasQualifier "volatile" vi.vtype)
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_int vi, Ival.zero)
 
-      | StartOf (Var vi, offset) | AddrOf (Var vi, offset) ->
+      | StartOf { node = Var vi, offset } | AddrOf { node = Var vi, offset } ->
         let var = Variable.make_startof vi in
         let* coeff = offset_to_coeff eval vi.vtype offset in
         Some (var, coeff)
@@ -1652,11 +1653,11 @@ module Domain = struct
     then `Bottom, Alarmset.all
     else `Value (Cvalue.V.inject_ival ival, None), alarms
 
-  let extract_lval ~oracle:_ _context _t _lval _typ _loc = top_value
+  let extract_lval ~oracle:_ _context _t _lval _loc = top_value
 
   let reduce_further state expr value =
-    match expr.enode with
-    | Lval lval when Cil.(isIntegralOrPointerType (typeOfLval lval)) ->
+    match expr.node with
+    | Lval lval when Cil.(isIntegralOrPointerType lval.typ) ->
       begin
         try
           let x_ival = Cvalue.V.project_ival value in
@@ -1679,8 +1680,7 @@ module Domain = struct
               in
               let y_ival = Ival.narrow y_ival1 y_ival2 in
               if Ival.(equal top y_ival) then acc else
-                let y_enode = Lval lval in
-                let y_expr = Cil.new_exp ~loc:expr.eloc y_enode in
+                let y_expr = Eva_ast.Build.lval lval in
                 let y_cvalue = Cvalue.V.inject_ival y_ival in
                 (y_expr, y_cvalue) :: acc
           in
@@ -1716,9 +1716,9 @@ module Domain = struct
     if not infer_intervals
     then state
     else
-      match expr.enode with
-      | Lval lval when Cil.(isIntegralType (typeOfLval lval))
-                    && not (Eval_typ.lval_contains_volatile lval) ->
+      match expr.node with
+      | Lval lval when Cil.(isIntegralType lval.typ)
+                    && not (Eva_ast.lval_contains_volatile lval) ->
         let var = Variable.make_lval lval in
         let deps = Deps.add var (eval_deps var) state.deps in
         let intervals = Intervals.add var ival state.intervals in
@@ -1784,8 +1784,7 @@ module Domain = struct
       with Not_found -> State.remove state variable
     in
     let state = assign_interval eval_deps variable assigned state in
-    let enode = Lval lvalue in
-    let left_expr = Cil.new_exp ~loc:expr.eloc enode in
+    let left_expr = Eva_ast.Build.lval lvalue in
     (* On the assignment X = E; if X-E can be rewritten as ±(X±Y-v),
        then the octagonal constraint [X±Y ∈ v] holds. *)
     let octagons = Rewriting.rewrite_binop eval_exp env left_expr Sub expr in
@@ -1799,9 +1798,9 @@ module Domain = struct
     state >>-: check "precise assign"
 
   let assign kinstr left_value expr assigned valuation state =
-    if kinstr <> Kglobal
-    && Cil.isIntegralOrPointerType left_value.ltyp
-    && not (Eval_typ.lval_contains_volatile left_value.lval)
+    if kinstr <> Cil_types.Kglobal
+    && Cil.isIntegralOrPointerType left_value.lval.typ
+    && not (Eva_ast.lval_contains_volatile left_value.lval)
     then assign_variable left_value.lval expr assigned valuation state
     else
       let written_loc = Precise_locs.imprecise_location left_value.lloc in
@@ -1833,7 +1832,7 @@ module Domain = struct
         `Value (start_recursive_call recursion state)
       | None ->
         let assign_formal state { formal; concrete; avalue } =
-          let lval = (Var formal, NoOffset) in
+          let lval = Eva_ast.Build.var formal in
           if Cil.isIntegralOrPointerType formal.vtype
           then state >>- assign_variable lval concrete avalue valuation
           else state

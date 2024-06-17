@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Eva_ast
 open Cvalue
 open Abstract_interp
 open Locations
@@ -31,10 +32,10 @@ let register_builtin name ?replace builtin =
 let dkey = Self.register_category "imprecision"
 
 let rec lval_of_address exp =
-  match exp.enode with
+  match exp.node with
   | AddrOf lval -> lval
   | CastE (_typ, exp) -> lval_of_address exp
-  | _ -> Cil.mkMem ~addr:exp ~off:Cil_types.NoOffset
+  | _ -> Eva_ast.Build.mem exp
 
 let plevel = Parameters.ArrayPrecisionLevel.get
 
@@ -464,10 +465,10 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
     (* Now, try to find a type that matches [size]. *)
     let typ =
       (* If [exp_size] is a sizeof, use this type. *)
-      let rec find_sizeof e = match e.enode with
-        | SizeOf typ -> Some typ
-        | SizeOfE e -> Some (Cil.typeOf e)
-        | CastE (_, e) -> find_sizeof e
+      let rec find_sizeof e = match e with
+        | { origin = Exp { enode = SizeOf typ } } -> Some typ
+        | { origin = Exp { enode = SizeOfE e } } -> Some (Cil.typeOf e)
+        | { node = CastE (_, e) } -> find_sizeof e
         | _ -> None
       in
       match find_sizeof exp_size with

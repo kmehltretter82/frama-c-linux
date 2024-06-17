@@ -34,7 +34,7 @@ module Bound :
 sig
   type t
   exception UnsupportedBoundExpression
-  val of_exp : Cil_types.exp -> t
+  val of_exp : Eva_ast.exp -> t
   val of_integer : Integer.t -> t
   val succ : t -> t
 end

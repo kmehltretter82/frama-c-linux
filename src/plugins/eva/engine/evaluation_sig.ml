@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 
 (** Generic evaluation and reduction of expressions and left values. *)
@@ -97,7 +96,7 @@ module type S = sig
       expressions (including the possible pointer and offset of the lvalue). *)
   val lvaluate :
     ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
-    state -> lval -> (Valuation.t * loc * typ) evaluated
+    state -> lval -> (Valuation.t * loc) evaluated
 
   (** [reduce ~valuation state expr positive] evaluates the expression [expr]
       in the state [state], and then reduces the [valuation] such that

@@ -22,6 +22,9 @@
 
 open Cil_types
 
+type lval = Eva_ast.lval
+type exp = Eva_ast.exp
+
 (** Types and functions related to evaluations.
     Heavily used by abstract values and domains, evaluation of expressions,
     transfer functions of instructions and the dataflow analysis. *)
@@ -143,7 +146,6 @@ type ('a, 'origin) record_val = {
 (** Data record associated to each evaluated left-value. *)
 type 'a record_loc = {
   loc: 'a;                  (** The location of the left-value. *)
-  typ: typ;                 (** *)
   loc_alarms: Alarmset.t    (** The emitted alarms during the evaluation. *)
 }
 
@@ -187,7 +189,6 @@ end
 type 'loc left_value = {
   lval: lval;
   lloc: 'loc;
-  ltyp: typ;
 }
 
 (** Assigned values. *)

@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 open Lattice_bounds
 
@@ -175,19 +174,20 @@ struct
   let of_var (vi : Cil_types.varinfo) : t =
     Map.singleton (Base.of_varinfo vi) (`Value (Offset.of_var_address vi))
 
-  let of_lval oracle ((host,offset) as lval : Cil_types.lval) : t or_top =
+  let of_lval oracle (lval : lval) : t or_top =
+    let (host,offset) = lval.node in
     let oracle' = convert_oracle oracle in
-    let base_typ = Cil.typeOfLhost host in
+    let base_typ = Eva_ast.type_of_lhost host in
     let offset =
-      if Cil.typeHasQualifier "volatile" (Cil.typeOfLval lval) then
+      if Eva_ast.lval_contains_volatile lval then
         `Top
       else
-        Offset.of_cil_offset oracle' base_typ offset in
+        Offset.of_eva_offset oracle' base_typ offset in
     match host with
     | Var vi ->
       `Value (Map.singleton (Base.of_varinfo vi) offset)
     | Mem exp ->
-      let exp, index = match exp.enode with
+      let exp, index = match exp.node with
         | BinOp (PlusPI, e1, e2, _typ) ->
           e1, Some e2
         | _ -> exp, None
@@ -197,7 +197,7 @@ struct
           match Base.typeof base with
           | None -> `Top
           | Some base_typ ->
-            let typ = Cil.typeOf_pointed (Cil.typeOf exp) in
+            let typ = Cil.typeOf_pointed exp.typ in
             let* base_offset = Offset.of_ival ~base_typ ~typ ival in
             let* base_offset = match index with
               | None -> `Value (base_offset)
@@ -217,7 +217,7 @@ struct
 
   let of_term_lval env ((lhost, offset) as lval) =
     let+ vi = match lhost with
-      | TVar ({lv_origin=Some vi}) -> `Value (vi)
+      | Cil_types.TVar ({lv_origin=Some vi}) -> `Value (vi)
       | TResult _ -> Top.of_option env.Abstract_domain.result
       | _ -> `Top
     in
@@ -225,7 +225,7 @@ struct
     let offset' = Offset.of_term_offset vi.vtype offset in
     Map.singleton base' offset', Cil.typeOfTermLval lval
 
-  let of_term env t =
+  let of_term env (t : Cil_types.term) =
     match t.term_node with
     | TLval term_lval -> of_term_lval env term_lval
     | _ -> `Top
@@ -413,18 +413,19 @@ struct
       state referees
 
   let update_var_references ~oracle (dst : Cil_types.varinfo)
-      (src : Cil_types.exp option) (base_map,tracked : t) =
+      (src : Eva_ast.exp option) (base_map,tracked : t) =
     let incr = Option.bind src (fun expr ->
-        match expr.Cil_types.enode with
-        | BinOp ((PlusA|PlusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
-          when Cil_datatype.Varinfo.equal dst vi' ->
-          Cil.constFoldToInt exp
-        | BinOp ((PlusA|PlusPI), exp, { enode=Lval (Var vi', NoOffset)}, _typ)
-          when Cil_datatype.Varinfo.equal dst vi' ->
-          Cil.constFoldToInt exp
-        | BinOp ((MinusA|MinusPI), { enode=Lval (Var vi', NoOffset) }, exp, _typ)
-          when Cil_datatype.Varinfo.equal dst vi' ->
-          Option.map Integer.neg (Cil.constFoldToInt exp)
+        let is_dst (exp : Eva_ast.exp) = match exp.node with
+          | Lval { node = Var v, NoOffset } -> Cil_datatype.Varinfo.equal dst v
+          | _ -> false
+        in
+        match expr.node with
+        | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e1 ->
+          Eva_ast.fold_to_integer e2
+        | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e2 ->
+          Eva_ast.fold_to_integer e1
+        | BinOp ((MinusA|MinusPI), e1, e2, _typ) when is_dst e1 ->
+          Option.map Integer.neg (Eva_ast.fold_to_integer e2)
         | _ -> None)
     in
     (* [oracle] must be the oracle before the (non-invertible)
@@ -453,7 +454,7 @@ struct
     base_map, tracked
 
   let update_references ~oracle (dst : mdlocation)
-      (src : Cil_types.exp option) (state : t) =
+      (src : Eva_ast.exp option) (state : t) =
     let remove_references b state =
       match Base.to_varinfo b with
       | exception Base.Not_a_C_variable -> state (* only references to variables are kept *)
@@ -484,11 +485,11 @@ struct
     let oracle = convert_oracle oracle in
     read (Memory.get ~oracle) Value_or_Uninitialized.join state src
 
-  let mk_oracle (state : state) : Cil_types.exp -> value =
+  let mk_oracle (state : state) : Eva_ast.exp -> value =
     (* Until Eva gives access to good oracles, we use this poor stupid oracle
        instead *)
-    let rec oracle exp =
-      match exp.enode with
+    let rec oracle (exp : Eva_ast.exp) =
+      match exp.node with
       | Lval lval ->
         begin match Location.of_lval oracle lval with
           | `Top -> Value.top
@@ -509,15 +510,15 @@ struct
         Value.forward_binop_int ~typ (oracle e1) op (oracle e2)
       | CastE (typ, e) ->
         let scalar_type t = Option.get (Eval_typ.classify_as_scalar t) in
-        let src_type =  scalar_type (Cil.typeOf e)
+        let src_type =  scalar_type e.typ
         and dst_type = scalar_type typ in
         Value.forward_cast ~src_type ~dst_type (oracle e)
       | _ ->
         Self.fatal
           "This type of array index expression is not supported: %a"
-          Cil_printer.pp_exp exp
+          Eva_ast.pp_exp exp
     in
-    fun exp -> oracle (Cil.constFold true exp)
+    fun exp -> oracle (Eva_ast.const_fold exp)
 
   let mk_bioracle s1 s2 =
     let oracle_left = mk_oracle s1
@@ -671,8 +672,8 @@ struct
   let extract_expr ~oracle:_ _context _state _expr =
     `Value (Value.top, None), Alarmset.all
 
-  let extract_lval ~oracle _context state lv typ _loc =
-    if Cil.isScalarType typ then
+  let extract_lval ~oracle _context state lv _loc =
+    if Cil.isScalarType lv.Eva_ast.typ then
       let oracle = fun exp ->
         match oracle exp with
         | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
@@ -687,7 +688,9 @@ struct
         | `Value v ->
           Value_or_Uninitialized.get_v_normalized v >>-: (fun v -> v, None),
           if Value_or_Uninitialized.is_initialized v
-          then Alarmset.(set (Alarms.Uninitialized lv) True all)
+          then
+            let origin = Eva_ast.to_cil_lval lv in
+            Alarmset.(set (Alarms.Uninitialized origin) True all)
           else Alarmset.all
     else
       `Value (Value.top, None), Alarmset.all
@@ -695,7 +698,7 @@ struct
 
   (* Eva Transfer *)
 
-  let valuation_to_oracle state valuation : Cil_types.exp -> value = fun exp ->
+  let valuation_to_oracle state valuation : Eva_ast.exp -> value = fun exp ->
     let multidim_oracle = mk_oracle state in
     match valuation.Abstract_domain.find exp with
     | `Top -> multidim_oracle exp
@@ -705,8 +708,8 @@ struct
   let assume_exp valuation expr record state' =
     let* state = state' in
     let oracle = valuation_to_oracle state valuation in
-    match expr.enode with
-    | Lval lv when Cil.isScalarType (Cil.typeOfLval lv) ->
+    match (expr : Eva_ast.exp).node with
+    | Lval lv when Cil.isScalarType lv.typ ->
       let value = Value_or_Uninitialized.from_flagged record.value in
       if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
         match Location.of_lval oracle lv with
@@ -749,8 +752,8 @@ struct
         | `Value src ->
           overwrite ~oracle state dst src
 
-  let assign _kinstr { lval=dst; ltyp } src assigned_value valuation state =
-    if Int_Base.is_zero (Bit_utils.sizeof ltyp)
+  let assign _kinstr { lval=dst } src assigned_value valuation state =
+    if Int_Base.is_zero (Bit_utils.sizeof dst.typ)
     then `Value state
     else
       let+ state = assume_valuation valuation state in
@@ -768,7 +771,7 @@ struct
     let oracle = valuation_to_oracle state valuation in
     let bind state arg =
       state >>-:
-      assign' ~oracle ~value:arg.avalue (Cil.var arg.formal) (Some arg.concrete)
+      assign' ~oracle ~value:arg.avalue (Eva_ast.Build.var arg.formal) (Some arg.concrete)
     in
     List.fold_left bind (`Value state) call.arguments
 
@@ -779,10 +782,11 @@ struct
       let args = List.map (fun arg -> arg.avalue) call.arguments in
       let+ assigned_result = f args in
       let oracle = mk_oracle post in
-      assign' ~oracle ~value:assigned_result (Cil.var return) None post
+      let dst = Eva_ast.Build.var return in
+      assign' ~oracle ~value:assigned_result dst None post
 
   let show_expr valuation state fmt expr =
-    match expr.enode with
+    match (expr : Eva_ast.exp).node with
     | Lval lval | StartOf lval ->
       let oracle = valuation_to_oracle state valuation in
       begin match Location.of_lval oracle lval with
@@ -820,7 +824,7 @@ struct
     erase ~oracle ~weak:true state dst b
 
   let reduce_by_papp env li _labels args positive state =
-    match li.l_var_info.lv_name, args with
+    match li.Cil_types.l_var_info.lv_name, args with
     | "\\are_finite", [arg] ->
       begin match Location.of_term env arg with
         | `Top -> `Value state (* can't resolve location, ignore *)
@@ -837,7 +841,7 @@ struct
 
   let reduce_by_predicate env state predicate truth =
     let rec reduce predicate truth state =
-      match truth, predicate.pred_content with
+      match truth, predicate.Cil_types.pred_content with
       | true, Pand (p1,p2) | false, Por (p1,p2) ->
         state |> reduce p1 truth >>- reduce p2 truth
       | _,Papp (li, labels, args) ->
@@ -847,12 +851,13 @@ struct
     reduce predicate truth state
 
   let interpret_acsl_extension extension _env state =
-    match extension.ext_name with
+    match extension.Cil_types.ext_name with
     | "array_partition" ->
       let annotation = Eva_annotations.read_array_segmentation extension in
       let vi,offset,bounds = annotation in
       (* Update the segmentation *)
-      let lval = Cil_types.Var vi, offset in
+      let bounds = List.map Eva_ast.translate_exp bounds in
+      let lval = Eva_ast.translate_lval (Var vi, offset) in
       let oracle = mk_oracle state in
       begin match Location.of_lval oracle lval with
         | `Top -> state
@@ -864,7 +869,7 @@ struct
           let state = write update state loc in
           (* Update the references *)
           let add acc e =
-            let r = Cil.extract_varinfos_from_exp e in
+            let r = Eva_ast.vars_in_exp e in
             (Cil_datatype.Varinfo.Set.to_seq r |> List.of_seq) @ acc
           in
           let references = List.fold_left add [] bounds in
@@ -900,7 +905,7 @@ struct
       erase ~oracle state dst d
 
   let initialize_variable_using_type _kind vi state =
-    let lval = Cil.var vi in
+    let lval = Eva_ast.Build.var vi in
     let oracle = mk_oracle state in
     match Location.of_lval oracle lval with
     | `Top -> top

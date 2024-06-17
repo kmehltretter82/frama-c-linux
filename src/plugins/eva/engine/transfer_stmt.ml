@@ -103,14 +103,13 @@ module DumpFileCounters =
 
 module VarHashtbl = Cil_datatype.Varinfo.Hashtbl
 
-let substitution_visitor table = object
-  inherit Visitor.frama_c_copy (Project.current ())
-
-  method! vvrbl varinfo =
-    match VarHashtbl.find_opt table varinfo with
-    | None -> Cil.JustCopy
-    | Some vi -> Cil.ChangeTo vi
-end
+let substitution_visitor table =
+  let rewrite_varinfo ~visitor:_ vi =
+    match VarHashtbl.find_opt table vi with
+    | None -> vi
+    | Some vi' -> vi'
+  in
+  { Eva_ast.Rewrite.default with rewrite_varinfo }
 
 module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
@@ -163,17 +162,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   let evaluate_and_check ?valuation ~subdivnb state expr =
     let res = Eval.evaluate ?valuation ~subdivnb state expr in
-    report_unreachability state res "the expression %a" Printer.pp_exp expr;
+    report_unreachability state res "the expression %a" Eva_ast.pp_exp expr;
     res
 
   let lvaluate_and_check ?valuation ~subdivnb ~for_writing state lval =
     let res = Eval.lvaluate ?valuation ~subdivnb ~for_writing state lval in
-    report_unreachability state res "the lvalue %a" Printer.pp_lval lval;
+    report_unreachability state res "the lvalue %a" Eva_ast.pp_lval lval;
     res
 
   let copy_lvalue_and_check ?valuation ~subdivnb state lval =
     let res = Eval.copy_lvalue ?valuation ~subdivnb state lval in
-    report_unreachability state res "the copy of %a" Printer.pp_lval lval;
+    report_unreachability state res "the copy of %a" Eva_ast.pp_lval lval;
     res
 
   (* ------------------------------------------------------------------------ *)
@@ -187,10 +186,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     Assign value, valuation
 
   (* Assignment by copying the value of a right lvalue. *)
-  let assign_by_copy ~subdivnb state valuation lval lloc ltyp =
+  let assign_by_copy ~subdivnb state valuation lval lloc =
     copy_lvalue_and_check ~valuation ~subdivnb state lval
     >>=: fun (valuation, value) ->
-    Copy ({lval; lloc; ltyp}, value), valuation
+    Copy ({lval; lloc}, value), valuation
 
   (* For an initialization, use for_writing:false for the evaluation of
      the left location, as the written variable could be const.  This is only
@@ -205,10 +204,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Find a lvalue hidden under identity casts. This function correctly detects
      bitfields (thanks to [need_cast]) and will never expose the underlying
      field. *)
-  let rec find_lval expr = match expr.enode with
+  let rec find_lval (expr : exp) = match expr.node with
     | Lval lv -> Some lv
     | CastE (typ, e) ->
-      if Eval_typ.need_cast typ (Cil.typeOf e) then None else find_lval e
+      if Eval_typ.need_cast typ e.typ then None else find_lval e
     | _ -> None
 
   (* Emits an alarm if the left and right locations of a struct or union copy
@@ -217,7 +216,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if Cil.isStructOrUnionType typ
     then
       let truth = Location.assume_no_overlap ~partial:true loc right_loc in
-      let alarm () = Alarms.Overlap (lval, right_lval) in
+      let alarm () =
+        let cil_lval = Eva_ast.to_cil_lval lval in
+        let cil_right_lval = Eva_ast.to_cil_lval right_lval in
+        Alarms.Overlap (cil_lval, cil_right_lval)
+      in
       Eval.interpret_truth ~alarm (loc, right_loc) truth
     else `Value (loc, right_loc), Alarmset.none
 
@@ -239,12 +242,12 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         "@[<v>@[all target addresses were invalid. This path is \
          assumed to be dead.@]%t@]" Eva_utils.pp_callstack;
       `Bottom
-    | `Value (valuation, lloc, ltyp) ->
+    | `Value (valuation, lloc) ->
       (* Tries to interpret the assignment as a copy for the returned value
          of a function call, on struct and union types, and when
          -eva-warn-copy-indeterminate is disabled. *)
       let lval_copy =
-        if is_ret || Cil.isStructOrUnionType ltyp || do_copy_at kinstr
+        if is_ret || Cil.isStructOrUnionType lval.typ || do_copy_at kinstr
         then find_lval expr
         else None
       in
@@ -257,18 +260,18 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           (* In case of a copy, checks that the left and right locations are
              compatible and that they do not overlap. *)
           lvaluate_and_check ~for_writing ~subdivnb ~valuation state right_lval
-          >>= fun (valuation, rloc, rtyp) ->
-          check_overlap ltyp (lval, lloc) (right_lval, rloc)
+          >>= fun (valuation, rloc) ->
+          check_overlap lval.typ (lval, lloc) (right_lval, rloc)
           >>= fun (lloc, rloc) ->
           if are_compatible lloc rloc
-          then assign_by_copy ~subdivnb state valuation right_lval rloc rtyp
+          then assign_by_copy ~subdivnb state valuation right_lval rloc
           else assign_by_eval ~subdivnb state valuation expr
       in
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
       let* assigned, valuation = eval in
       let domain_valuation = Eval.to_domain_valuation valuation in
-      let lvalue = { lval; ltyp; lloc } in
+      let lvalue = { lval; lloc } in
       Domain.assign kinstr lvalue expr assigned domain_valuation state
 
   let assign = assign_lv_or_ret ~is_ret:false
@@ -351,7 +354,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
             | `Top -> Precise_locs.loc_top
             | `Value record -> get record.loc
           in
-          let expr_zone = Eva_utils.zone_of_expr find_loc expr in
+          let expr_zone = Eva_ast.zone_of_exp find_loc expr in
           let written_zone = inout.Inout_type.over_outputs_if_termination in
           not (Locations.Zone.intersects expr_zone written_zone)
 
@@ -387,7 +390,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         | Assign pre_value -> `Value pre_value
         | Copy (_lv, pre_value) -> pre_value.v
       in
-      let lval = Cil.var argument.formal in
+      let lval = Eva_ast.Build.var argument.formal in
       (* We use copy_lvalue instead of evaluate to get the escaping flag:
          if a formal is escaping at the end of the called function, it may
          have been freed, which is not detected as a write. We prevent the
@@ -428,7 +431,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     | None, Some vi_ret -> `Value (Domain.leave_scope kf_callee [vi_ret] state)
     | Some _, None -> assert false
     | Some lval, Some vi_ret ->
-      let exp_ret_caller = Eva_utils.lval_to_exp  (Var vi_ret, NoOffset) in
+      let exp_ret_caller = Eva_ast.Build.var_exp vi_ret in
       let+ state = assign_ret state (Kstmt stmt) lval exp_ret_caller in
       Domain.leave_scope kf_callee [vi_ret] state
 
@@ -483,19 +486,19 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
      evaluates the call argument [expr] in the state [state] and the valuation
      [valuation]. Returns the value assigned, and the updated valuation.
      TODO: share more code with [assign]. *)
-  let evaluate_actual ~subdivnb ~determinate valuation state expr =
-    match expr.enode with
+  let evaluate_actual ~subdivnb ~determinate valuation state (expr : exp) =
+    match expr.node with
     | Lval lv ->
       lvaluate_and_check ~for_writing:false ~subdivnb ~valuation state lv
-      >>= fun (valuation, loc, typ) ->
+      >>= fun (valuation, loc) ->
       if Int_Base.is_top (Location.size loc)
       then
         Self.abort ~current:true
           "Function argument %a has unknown size. Aborting"
-          Printer.pp_exp expr;
-      if determinate && Cil.isArithmeticOrPointerType (Cil.typeOfLval lv)
+          Eva_ast.pp_exp expr;
+      if determinate && Cil.isArithmeticOrPointerType lv.typ
       then assign_by_eval ~subdivnb state valuation expr
-      else assign_by_copy ~subdivnb state valuation lv loc typ
+      else assign_by_copy ~subdivnb state valuation lv loc
     | _ -> assign_by_eval ~subdivnb state valuation expr
 
   (* Evaluates the list of the actual arguments of a call. Returns the list
@@ -537,8 +540,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       let v = flagged.v >>-: Value.replace_base substitution in
       let flagged = { flagged with v } in
       let lloc = Location.replace_base substitution loc.lloc in
-      let lval = Visitor.visitFramacLval visitor loc.lval in
-      let loc = { loc with lval; lloc } in
+      let lval = Eva_ast.Rewrite.visit_lval visitor loc.lval in
+      let loc = { lval; lloc } in
       Copy (loc, flagged)
 
   let replace_recursive_call recursion call =
@@ -547,7 +550,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let visitor = substitution_visitor tbl in
     let base_substitution = recursion.base_substitution in
     let replace_arg argument =
-      let concrete = Visitor.visitFramacExpr visitor argument.concrete in
+      let concrete = Eva_ast.Rewrite.visit_exp visitor argument.concrete in
       let avalue = replace_value visitor base_substitution argument.avalue in
       { argument with concrete; avalue }
     in
@@ -606,7 +609,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         | `Value (valuation, _v) ->
           show_expr (Eval.to_domain_valuation valuation) state fmt expr
       in
-      Format.fprintf fmt "%a : @[<h>%t@]" Printer.pp_exp expr pp
+      Format.fprintf fmt "%a : @[<h>%t@]" Eva_ast.pp_exp expr pp
     in
     let pp = Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@ " ~suf:"@]" pretty in
     Self.result ~current:true
@@ -622,12 +625,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       fun fmt subdivnb lval state ->
         try
           let offsm =
-            let* (_, loc, _) =
+            let* (_, loc) =
               fst (Eval.lvaluate ~for_writing:false ~subdivnb state lval) in
             Eval_op.offsetmap_of_loc (get_ploc loc) (get_cvalue state)
           in
-          let typ = Cil.typeOfLval lval in
-          (Bottom.pretty (Eval_op.pretty_offsetmap typ)) fmt offsm
+          (Bottom.pretty (Eval_op.pretty_offsetmap lval.typ)) fmt offsm
         with Abstract_interp.Error_Top ->
           Format.fprintf fmt "%s" (Unicode.top_string ())
 
@@ -643,9 +645,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         (Bottom.pretty Cvalue.V.pretty) fmt value
 
   let pretty_arguments ~subdivnb state arguments =
-    let is_scalar lval = Cil.isArithmeticOrPointerType (Cil.typeOfLval lval) in
-    let pretty fmt expr =
-      match expr.enode with
+    let is_scalar lval = Cil.isArithmeticOrPointerType lval.Eva_ast.typ in
+    let pretty fmt (expr : Eva_ast.exp) =
+      match expr.node with
       | Lval lval | StartOf lval when not (is_scalar lval) ->
         show_offsm fmt subdivnb lval state
       | _ -> show_value fmt subdivnb expr state
@@ -785,7 +787,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let eval_loc (acc, valuation) lval =
       match lvaluate ~valuation lval with
       | `Bottom -> acc, valuation
-      | `Value (valuation, loc, _) -> (lval, loc) :: acc, valuation
+      | `Value (valuation, loc) -> (lval, loc) :: acc, valuation
     in
     let eval_list valuation lvs =
       List.fold_left eval_loc ([], valuation) lvs
@@ -794,7 +796,11 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let list2, _ = eval_list valuation lvs2 in
     let check acc (lval1, loc1) (lval2, loc2) =
       let truth = Location.assume_no_overlap ~partial:false loc1 loc2 in
-      let alarm () = Alarms.Not_separated (lval1, lval2) in
+      let alarm () =
+        let cil_lval1 = Eva_ast.to_cil_lval lval1
+        and cil_lval2 = Eva_ast.to_cil_lval lval2 in
+        Alarms.Not_separated (cil_lval1, cil_lval2)
+      in
       let alarm = process_truth ~alarm truth in
       Alarmset.combine alarm acc
     in
@@ -812,7 +818,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         let unauthorized_reads =
           List.filter
             (fun x -> List.for_all
-                (fun y -> not (LvalStructEq.equal x y)) modified2)
+                (fun y -> not (Eva_ast.Lval.equal x y)) modified2)
             writes1
         in
         let alarms1 = check_non_overlapping state unauthorized_reads reads2 in
@@ -845,7 +851,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let initialized = false in
     let init_value = Abstract_domain.Top in
     let initialize_volatile state varinfo =
-      let lval = Cil.var varinfo in
+      let lval = Eva_ast.Build.var varinfo in
       let location = Location.eval_varinfo varinfo in
       Domain.initialize_variable lval location ~initialized init_value state
     in

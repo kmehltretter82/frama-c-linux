@@ -45,6 +45,7 @@ module Queries = struct
     let status =
       if Cvalue.V.is_bottom (get_v v) then Alarmset.False else Alarmset.Unknown
     in
+    let lval = Eva_ast.to_cil_lval lval in
     match v with
     | C_uninit_noesc _ -> Alarmset.singleton ~status (Alarms.Uninitialized lval)
     | C_init_esc _     -> Alarmset.singleton ~status (Alarms.Dangling lval)
@@ -55,7 +56,7 @@ module Queries = struct
     | C_init_noesc _   -> Alarmset.none
 
 
-  let eval_one_loc state lval typ =
+  let eval_one_loc state lval =
     let eval_one_loc single_loc =
       let v = Cvalue.Model.find_indeterminate state single_loc in
       Cvalue.V_Or_Uninitialized.get_v v, indeterminate_alarms lval v
@@ -69,7 +70,7 @@ module Queries = struct
     in
     fun loc (acc_result, acc_alarms) ->
       let result, alarms = eval_one_loc loc in
-      let result = Cvalue_forward.make_volatile ~typ:typ result in
+      let result = Cvalue_forward.make_volatile ~typ:lval.typ result in
       Cvalue.V.join result acc_result, join_alarms acc_alarms alarms
 
   (* The zero singleton is shared between float and integer representations in
@@ -81,8 +82,8 @@ module Queries = struct
     | Cvalue.V.Top (bases, origin) -> Origin.register_read bases origin
     | _ -> ()
 
-  let extract_scalar_lval state lval typ loc =
-    let process_one_loc = eval_one_loc state lval typ in
+  let extract_scalar_lval state lval loc =
+    let process_one_loc = eval_one_loc state lval in
     let acc = Cvalue.V.bottom, None in
     let value, alarms = Precise_locs.fold process_one_loc loc acc in
     let alarms = match alarms with None -> Alarmset.none | Some a -> a in
@@ -90,9 +91,9 @@ module Queries = struct
        the same type as the read lvalue. In this case, we don't update the state
        with the new value stemming from the evaluation, even if it has been
        reduced, in order to not propagate incompatible type. *)
-    let incompatible_type = is_float value <> Cil.isFloatingType typ in
+    let incompatible_type = is_float value <> Cil.isFloatingType lval.typ in
     let origin = if incompatible_type then Some value else None in
-    let value = Cvalue_forward.reinterpret typ value in
+    let value = Cvalue_forward.reinterpret lval.typ value in
     read_garbled_mix value;
     if Cvalue.V.is_bottom value
     then `Bottom, alarms
@@ -100,7 +101,7 @@ module Queries = struct
 
   (* Imprecise version for aggregate types that cvalues are unable to precisely
      represent. The initialization alarms must remain sound, though. *)
-  let extract_aggregate_lval state lval _typ ploc =
+  let extract_aggregate_lval state lval ploc =
     let loc = Precise_locs.imprecise_location ploc in
     match loc.Locations.size with
     | Int_Base.Top -> `Value (Cvalue.V.top, None), Alarmset.all
@@ -116,19 +117,19 @@ module Queries = struct
         let v = if Cvalue.V.is_bottom v then `Bottom else `Value (v, None) in
         v, alarms
 
-  let extract_lval ~oracle:_ _context state lval typ loc =
-    if Cil.isArithmeticOrPointerType typ
-    then extract_scalar_lval state lval typ loc
-    else extract_aggregate_lval state lval typ loc
+  let extract_lval ~oracle:_ _context state lval loc =
+    if Cil.isArithmeticOrPointerType lval.Eva_ast.typ
+    then extract_scalar_lval state lval loc
+    else extract_aggregate_lval state lval loc
 
-  let backward_location state _lval typ precise_loc value =
+  let backward_location state lval precise_loc value =
     let size = Precise_locs.loc_size precise_loc in
     let upto = succ (Int_set.get_small_cardinal()) in
     let loc = Precise_locs.imprecise_location precise_loc in
     let eval_one_loc single_loc =
       let v = Cvalue.Model.find state single_loc in
-      let v = Cvalue_forward.make_volatile ~typ v in
-      Cvalue_forward.reinterpret typ v
+      let v = Cvalue_forward.make_volatile ~typ:lval.Eva_ast.typ v in
+      Cvalue_forward.reinterpret lval.typ v
     in
     let process_ival base ival (acc_loc, acc_val as acc) =
       let loc_bits = Locations.Location_Bits.inject base ival in
@@ -189,4 +190,4 @@ let lval_to_loc state lval =
   let eval, _alarms = lvaluate ~for_writing:false state lval in
   match eval with
   | `Bottom -> Locations.loc_bottom
-  | `Value (_valuation, ploc, _typ) -> Precise_locs.imprecise_location ploc
+  | `Value (_valuation, ploc) -> Precise_locs.imprecise_location ploc

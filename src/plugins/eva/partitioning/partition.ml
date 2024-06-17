@@ -25,42 +25,94 @@ open Bottom.Operators
 
 (* --- Split monitors --- *)
 
+type split_kind = Eva_annotations.split_kind = Static | Dynamic
+[@@deriving eq,ord]
+
+(* Same as Eva_annotations.split_term but with Eva_ast. *)
+type split_term =
+  | Expression of Eva_ast.Exp.t
+  | Predicate of Cil_datatype.PredicateStructEq.t
+[@@deriving eq, ord]
+
+let translate_split_term
+    (term : Eva_annotations.split_term) : split_term * Cil_types.location =
+  match term with
+  | Expression cil_exp ->
+    Expression (Eva_ast.translate_exp cil_exp), cil_exp.eloc
+  | Predicate pred ->
+    Predicate pred, pred.pred_loc
+
 type split_monitor = {
+  split_term : split_term;
+  split_kind : split_kind;
+  split_loc : Cil_datatype.Location.t;
   split_limit : int;
   mutable split_values : Datatype.Integer.Set.t;
 }
+[@@deriving eq,ord]
 
-let new_monitor ~split_limit = {
-  split_limit;
-  split_values = Datatype.Integer.Set.empty;
-}
+let new_monitor
+    ~(limit : int)
+    ~(kind : split_kind)
+    ~(term : Eva_annotations.split_term) =
+  let split_term, split_loc = translate_split_term term in
+  {
+    split_term;
+    split_kind = kind;
+    split_loc;
+    split_limit = limit;
+    split_values = Datatype.Integer.Set.empty;
+  }
+
+module SplitTerm = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+
+    module Exp = Eva_ast.Exp
+    module Predicate = Cil_datatype.PredicateStructEq
+
+    type t = split_term [@@deriving eq, ord]
+
+    let name = "Partition.SplitTerm"
+
+    let reprs =
+      Stdlib.List.map (fun e -> Expression e) Exp.reprs @
+      Stdlib.List.map (fun p -> Predicate p) Predicate.reprs
+
+    let pretty fmt = function
+      | Expression e -> Eva_ast.pp_exp fmt e
+      | Predicate p -> Printer.pp_predicate fmt p
+
+    let hash = function
+      | Expression e -> Hashtbl.hash (1, Exp.hash e)
+      | Predicate p -> Hashtbl.hash (2, Predicate.hash p)
+  end)
 
 module SplitMonitor = Datatype.Make_with_collections (
   struct
     include Datatype.Serializable_undefined
     module Values = Datatype.Integer.Set
 
-    type t = split_monitor
+    type t = split_monitor [@@deriving eq,ord]
 
     let name = "Partition.SplitMonitor"
 
-    let reprs = [ new_monitor ~split_limit:0 ]
-
-    let structural_descr =
-      Structural_descr.t_record
-        [| Datatype.Int.packed_descr; Values.packed_descr |]
-
-    let compare m1 m2 =
-      let c = Int.compare m1.split_limit m2.split_limit in
-      if c <> 0 then c else Values.compare m1.split_values m2.split_values
-
-    let equal = Datatype.from_compare
+    let reprs = [{
+        split_term = Expression (List.hd Eva_ast.Exp.reprs);
+        split_kind = Static;
+        split_loc = Cil_datatype.Location.unknown;
+        split_limit = 0;
+        split_values = Datatype.Integer.Set.empty
+      }]
 
     let pretty fmt m =
       Format.fprintf fmt "%d/%d" (Values.cardinal m.split_values) m.split_limit
 
     let hash m =
-      hash (Datatype.Int.hash m.split_limit, Values.hash m.split_values)
+      hash (
+        SplitTerm.hash m.split_term,
+        Cil_datatype.Location.hash m.split_loc,
+        Datatype.Int.hash m.split_limit,
+        Values.hash m.split_values)
 
     let copy m =
       { m with split_values = m.split_values }
@@ -85,46 +137,7 @@ let new_rationing ~limit ~merge = { current = ref 0; limit; merge }
 
 (* --- Keys --- *)
 
-type split_term = Eva_annotations.split_term =
-  | Expression of Cil_types.exp
-  | Predicate of Cil_types.predicate
 
-module SplitTerm = Datatype.Make_with_collections (struct
-    include Datatype.Serializable_undefined
-
-    module Expressions = Cil_datatype.ExpStructEq
-    module Predicates = Cil_datatype.PredicateStructEq
-
-    type t = split_term
-
-    let name = "Partition.SplitTerm"
-
-    let reprs =
-      Stdlib.List.map (fun e -> Expression e) Expressions.reprs @
-      Stdlib.List.map (fun p -> Predicate p) Predicates.reprs
-
-    let structural_descr =
-      Structural_descr.t_sum [|
-        [| Expressions.packed_descr |] ;
-        [| Predicates.packed_descr |] |]
-
-    let compare x y =
-      match x, y with
-      | Expression e1, Expression e2 -> Expressions.compare e1 e2
-      | Predicate p1, Predicate p2 -> Logic_utils.compare_predicate p1 p2
-      | Expression _, Predicate _ -> 1
-      | Predicate _, Expression _ -> -1
-
-    let equal = Datatype.from_compare
-
-    let pretty fmt = function
-      | Expression e -> Printer.pp_exp fmt e
-      | Predicate p -> Printer.pp_predicate fmt p
-
-    let hash = function
-      | Expression e -> FCHashtbl.hash (1,Expressions.hash e)
-      | Predicate p -> FCHashtbl.hash (2,Predicates.hash p)
-  end)
 
 module SplitMap = SplitTerm.Map
 
@@ -305,17 +318,15 @@ type unroll_limit =
   | IntLimit of int
   | AutoUnroll of Cil_types.stmt * int * int
 
-type split_kind = Eva_annotations.split_kind = Static | Dynamic
-
 type action =
   | Enter_loop of unroll_limit
   | Leave_loop
   | Incr_loop
   | Branch of branch * int
   | Ration of rationing
-  | Restrict of Cil_types.exp * Integer.t list
-  | Split of split_term * split_kind * split_monitor
-  | Merge of split_term
+  | Restrict of Eva_ast.exp * Integer.t list
+  | Split of split_monitor
+  | Merge of Eva_annotations.split_term
   | Update_dynamic_splits
 
 exception InvalidAction
@@ -370,47 +381,47 @@ struct
 
   exception Operation_failed
 
-  let fail ~exp message =
-    let source = fst exp.Cil_types.eloc in
+  let fail ~source message =
     let warn_and_raise message =
       Self.warning ~source ~once:true "%s" message;
       raise Operation_failed
     in
     Pretty_utils.ksfprintf warn_and_raise message
 
-  let evaluate_exp_to_ival state exp =
+  let evaluate_exp_to_ival ~source state exp =
     (* Evaluate the expression *)
     let valuation, value =
       match evaluate state exp with
       | `Value (valuation, value), alarms when Alarmset.is_empty alarms ->
         valuation, value
       | _ ->
-        fail ~exp "this partitioning parameter cannot be evaluated safely on \
-                   all states"
+        fail ~source "this partitioning parameter cannot be evaluated safely on \
+                      all states"
     in
     (* Get the cvalue *)
     let cvalue = match Abstract.Val.get Main_values.CVal.key with
       | Some get_cvalue -> get_cvalue value
-      | None -> fail ~exp "partitioning is disabled when the CValue domain is \
-                           not active"
+      | None -> fail ~source "partitioning is disabled when the CValue domain is \
+                              not active"
     in
     (* Extract the ival *)
     let ival =
       try
         Cvalue.V.project_ival cvalue
       with Cvalue.V.Not_based_on_null ->
-        fail ~exp "this partitioning parameter must evaluate to an integer"
+        fail ~source "this partitioning parameter must evaluate to an integer"
     in
     valuation, ival
 
   exception Split_limit of Integer.t option
 
   let split_by_value ~monitor state exp =
+    let source = fst monitor.split_loc in
     let module SplitValues = Datatype.Integer.Set in
-    let valuation, ival = evaluate_exp_to_ival state exp in
+    let valuation, ival = evaluate_exp_to_ival ~source state exp in
     (* Build a state with the lvalue set to a singleton *)
     let build i acc =
-      let value = Abstract.Val.inject_int (Cil.typeOf exp) i in
+      let value = Abstract.Val.inject_int exp.typ i in
       let state =
         let* valuation = Abstract.Eval.assume ~valuation state exp value in
         (* Check the reduction *)
@@ -418,9 +429,9 @@ struct
       in
       match state with
       | `Value state ->
-        let _,new_ival = evaluate_exp_to_ival state exp in
+        let _,new_ival = evaluate_exp_to_ival ~source state exp in
         if not (Ival.is_singleton_int new_ival) then
-          fail ~exp "failing to learn perfectly from split" ;
+          fail ~source "failing to learn perfectly from split" ;
         monitor.split_values <-
           SplitValues.add i monitor.split_values;
         (i, state) :: acc
@@ -452,18 +463,18 @@ struct
         | None -> ()
         | Some c -> Format.fprintf fmt " (%a)" Integer.pretty c
       in
-      fail ~exp "split on more than %d values%t prevented ; try to improve \
-                 the analysis precision or look at the option -eva-split-limit \
-                 to increase this limit."
+      fail ~source "split on more than %d values%t prevented ; try to improve \
+                    the analysis precision or look at the option -eva-split-limit \
+                    to increase this limit."
         monitor.split_limit pp_count
 
-  let eval_exp_to_int state exp =
-    let _valuation, ival = evaluate_exp_to_ival state exp in
+  let eval_exp_to_int ~source state exp =
+    let _valuation, ival = evaluate_exp_to_ival ~source state exp in
     try Integer.to_int_exn (Ival.project_int ival)
     with
     | Ival.Not_Singleton_Int ->
-      fail ~exp "this partitioning parameter must evaluate to a singleton"
-    | Z.Overflow -> fail ~exp "this partitioning parameter overflows an integer"
+      fail ~source "this partitioning parameter must evaluate to a singleton"
+    | Z.Overflow -> fail ~source "this partitioning parameter overflows an integer"
 
   let split_by_predicate state predicate =
     let env =
@@ -494,7 +505,7 @@ struct
   let stamp_by_value = match Abstract.Val.get Main_values.CVal.key with
     | None -> fun _ _ _ -> None
     | Some get -> fun expr expected_values state ->
-      let typ = Cil.typeOf expr in
+      let typ = expr.Eva_ast.typ in
       let make stamp i = stamp, i, Abstract.Val.inject_int typ i in
       let expected_values = List.mapi make expected_values in
       match fst (evaluate state expr) with
@@ -520,21 +531,24 @@ struct
       in
       let states =
         match term with
-        | Expression exp -> split_by_value ~monitor state exp
-        | Predicate pred -> split_by_predicate state pred
+        | Expression exp ->
+          split_by_value ~monitor state exp
+        | Predicate pred ->
+          split_by_predicate state pred
       in
       List.map update_key states
     with Operation_failed -> [(key,state)]
 
-  let split ~monitor (kind : split_kind) (term : split_term) (p : t) =
+  let split monitor (p : t) =
+    let { split_term; split_kind } = monitor in
     let add_split (key, state) =
       let dynamic_splits =
-        match kind with
-        | Static -> SplitMap.remove term key.dynamic_splits
-        | Dynamic -> SplitMap.add term monitor key.dynamic_splits
+        match split_kind with
+        | Static -> SplitMap.remove split_term key.dynamic_splits
+        | Dynamic -> SplitMap.add split_term monitor key.dynamic_splits
       in
       let key = { key with dynamic_splits } in
-      split_state ~monitor term (key, state)
+      split_state ~monitor split_term (key, state)
     in
     List.concat_map add_split p
 
@@ -554,8 +568,8 @@ struct
     List.map (fun (k,x) -> f k x, x) p
 
   let transfer_keys p = function
-    | Split (expr, kind, monitor) ->
-      split ~monitor kind expr p
+    | Split monitor ->
+      split monitor p
 
     | Update_dynamic_splits ->
       update_dynamic_splits p
@@ -567,7 +581,10 @@ struct
 
         | Enter_loop limit_kind -> fun k x ->
           let limit = try match limit_kind with
-            | ExpLimit exp -> eval_exp_to_int x exp
+            | ExpLimit cil_exp ->
+              let exp = Eva_ast.translate_exp cil_exp
+              and source = fst cil_exp.eloc in
+              eval_exp_to_int ~source x exp
             | IntLimit i -> i
             | AutoUnroll (stmt, min_unroll, max_unroll) ->
               match AutoLoopUnroll.compute ~max_unroll x stmt with
@@ -633,6 +650,7 @@ struct
           { k with ration_stamp = stamp_by_value expr expected_values s}
 
         | Merge term -> fun k _x ->
+          let term, _loc = translate_split_term term in
           { k with splits = SplitMap.remove term k.splits;
                    dynamic_splits = SplitMap.remove term k.dynamic_splits }
       in

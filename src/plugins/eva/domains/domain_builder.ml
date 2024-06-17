@@ -40,7 +40,7 @@ module type LeafDomain = sig
   val context_dependencies: context Abstract_context.dependencies
   val build_context: t -> context or_bottom
 
-  val backward_location: t -> lval -> typ -> 'loc -> 'v -> ('loc * 'v) or_bottom
+  val backward_location: t -> lval -> 'loc -> 'v -> ('loc * 'v) or_bottom
   val reduce_further: t -> exp -> 'v -> (exp * 'v) list
 
   val evaluate_predicate:
@@ -76,7 +76,7 @@ module Complete (Domain: InputDomain) = struct
   let context_dependencies = Abstract_context.Leaf (module Unit_context)
   let build_context _ = `Value ()
 
-  let backward_location _state _lval _typ loc value = `Value (loc, value)
+  let backward_location _state _lval loc value = `Value (loc, value)
   let reduce_further _state _expr _value = []
 
   let evaluate_predicate _env _state _predicate = Alarmset.Unknown
@@ -139,7 +139,7 @@ module Make_Minimal
 
   let top_answer = `Value (Value.top, None), Alarmset.all
   let extract_expr ~oracle:_ _context _state _expr = top_answer
-  let extract_lval ~oracle:_ _context _state _lval _typ _location = top_answer
+  let extract_lval ~oracle:_ _context _state _lval _location = top_answer
 
   let update _valuation state = `Value state
 
@@ -165,7 +165,7 @@ module Make_Minimal
     Domain.initialize_variable lval ~initialized value state
 
   let initialize_variable_using_type _kind varinfo state =
-    let lval = Cil.var varinfo in
+    let lval = Eva_ast.Build.var varinfo in
     Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
   let logic_assign _assigns _location _state = top
@@ -256,8 +256,8 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       let v = Domain.extract_expr state expr >>-: fun v -> v, None in
       v, Alarmset.all
 
-    let extract_lval ~oracle:_ _context state lval typ location =
-      let v = Domain.extract_lval state lval typ location >>-: fun v -> v, None in
+    let extract_lval ~oracle:_ _context state lval location =
+      let v = Domain.extract_lval state lval location >>-: fun v -> v, None in
       v, Alarmset.all
 
     let find valuation expr =
@@ -295,7 +295,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       Domain.initialize_variable lval ~initialized value state
 
     let initialize_variable_using_type _kind varinfo state =
-      let lval = Cil.var varinfo in
+      let lval = Eva_ast.Build.var varinfo in
       Domain.initialize_variable lval ~initialized:true Abstract_domain.Top state
 
     let logic_assign _assigns _location _state = top
@@ -448,16 +448,16 @@ module Restrict
     make_query default_query
       (fun s -> Domain.extract_expr ~oracle context s expr) state
 
-  let extract_lval ~oracle context state lval typ location =
+  let extract_lval ~oracle context state lval location =
     make_query
       default_query
-      (fun s -> Domain.extract_lval ~oracle context s lval typ location)
+      (fun s -> Domain.extract_lval ~oracle context s lval location)
       state
 
-  let backward_location state lval typ location value =
+  let backward_location state lval location value =
     make_query
       (`Value (location, value))
-      (fun s -> Domain.backward_location s lval typ location value)
+      (fun s -> Domain.backward_location s lval location value)
       state
 
   let reduce_further state expr value =

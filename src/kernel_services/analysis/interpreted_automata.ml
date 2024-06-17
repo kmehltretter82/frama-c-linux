@@ -123,6 +123,34 @@ module Vertex = Datatype.Make_with_collections
       let pretty fmt v = Format.pp_print_int fmt v.vertex_key
     end)
 
+module Transition = Datatype.Make (struct
+    include Datatype.Serializable_undefined
+    type t = vertex transition
+    let name = "Interpreted_automata.Transition"
+    let reprs = [Skip]
+    let pretty fmt =
+      let open Format in
+      let print_var_list fmt l =
+        Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo fmt l
+      and pretty_kind fmt = function
+        | Invariant -> Format.pp_print_string fmt "Invariant"
+        | Assert -> Format.pp_print_string fmt "Assert"
+        | Assume -> Format.pp_print_string fmt "Assume"
+        | Check -> Format.pp_print_string fmt "Check"
+      in function
+        | Skip -> ()
+        | Return (None,_) -> fprintf fmt "return"
+        | Return (Some exp,_) -> fprintf fmt "return %a" Printer.pp_exp exp
+        | Guard (exp,Then,_) -> Printer.pp_exp fmt exp
+        | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Printer.pp_exp exp
+        | Prop (a,_) ->
+          fprintf fmt "%a: %a"
+            pretty_kind a.kind Printer.pp_identified_predicate a.predicate
+        | Instr (instr,_) -> Printer.pp_instr fmt instr
+        | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
+        | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
+  end)
+
 module Edge =
 struct
   include Datatype.Make_with_collections
@@ -140,7 +168,7 @@ struct
         let equal e1 e2 =
           e1.edge_key = e2.edge_key &&
           Kernel_function.equal e1.edge_kf e2.edge_kf
-        let pretty fmt e = Format.pp_print_int fmt e.edge_key
+        let pretty fmt e = Transition.pretty fmt e.edge_transition
       end)
   let default = dummy_edge
 end
@@ -704,34 +732,41 @@ end
 (* --- Extract exit strategy                                          --- *)
 (* ---------------------------------------------------------------------- *)
 
-let exit_strategy graph component =
-  let head, l = match component with
-    | Wto.Component (v, w) -> v, Wto.Node (v) :: w
-    | Wto.Node (v) -> v, [component]
-  in
-  (* Build a table of vertices that should not be passed through to get
-     a path to an exit. At the begining it only contains the component head. *)
-  let table = Hashtbl.create (G.nb_vertex graph) in
-  Hashtbl.add table head ();
-  (* Filter elements at the top level of the wto, in reverse order *)
-  let rec f acc = function
-    | [] -> acc
-    | Wto.Node v :: l ->
-      if List.for_all (Hashtbl.mem table) (G.succ graph v) then
-        (Hashtbl.add table v (); f acc l)
-      else
-        f (Wto.Node v :: acc) l
-    | Wto.Component (v, w) :: l ->
-      let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
-      List.iter (fun v -> Hashtbl.add table v ()) vertices; (* Temporarilly add them *)
-      let succs = List.flatten (List.map (G.succ graph) vertices) in
-      if List.for_all (Hashtbl.mem table) succs then
-        f acc l
-      else (
-        List.iter (Hashtbl.remove table) vertices; (* Undo *)
-        f (Wto.Component (v, w) :: acc) l)
-  in
-  f [] (List.rev l)
+module Algorithms (G : Graph.Sig.G) =
+struct
+  let exit_strategy graph component =
+    let head, l = match component with
+      | Wto.Component (v, w) -> v, Wto.Node (v) :: w
+      | Wto.Node (v) -> v, [component]
+    in
+    (* Build a table of vertices that should not be passed through to get
+       a path to an exit. At the begining it only contains the component head. *)
+    let table = Hashtbl.create (G.nb_vertex graph) in
+    Hashtbl.add table head ();
+    (* Filter elements at the top level of the wto, in reverse order *)
+    let rec f acc = function
+      | [] -> acc
+      | Wto.Node v :: l ->
+        if List.for_all (Hashtbl.mem table) (G.succ graph v) then
+          (Hashtbl.add table v (); f acc l)
+        else
+          f (Wto.Node v :: acc) l
+      | Wto.Component (v, w) :: l ->
+        let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
+        List.iter (fun v -> Hashtbl.add table v ()) vertices; (* Temporarilly add them *)
+        let succs = List.flatten (List.map (G.succ graph) vertices) in
+        if List.for_all (Hashtbl.mem table) succs then
+          f acc l
+        else (
+          List.iter (Hashtbl.remove table) vertices; (* Undo *)
+          f (Wto.Component (v, w) :: acc) l)
+    in
+    f [] (List.rev l)
+end
+
+let exit_strategy =
+  let module Algorithms = Algorithms (G) in
+  Algorithms.exit_strategy
 
 
 (* ---------------------------------------------------------------------- *)
@@ -745,43 +780,17 @@ type 'a labeling =
   | `Custom of Format.formatter -> 'a -> unit
   ]
 
-let pretty_kind fmt = function
-  | Invariant -> Format.pp_print_string fmt "Invariant"
-  | Assert -> Format.pp_print_string fmt "Assert"
-  | Assume -> Format.pp_print_string fmt "Assume"
-  | Check -> Format.pp_print_string fmt "Check"
-
-let pretty_transition fmt t =
-  let open Format in
-  let print_var_list fmt l =
-    Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo fmt l
-  in
-  begin match t with
-    | Skip -> ()
-    | Return (None,_) -> fprintf fmt "return"
-    | Return (Some exp,_) -> fprintf fmt "return %a" Printer.pp_exp exp
-    | Guard (exp,Then,_) -> Printer.pp_exp fmt exp
-    | Guard (exp,Else,_) -> fprintf fmt "!(%a)" Printer.pp_exp exp
-    | Prop (a,_) ->
-      fprintf fmt "%a: %a"
-        pretty_kind a.kind Printer.pp_identified_predicate a.predicate
-    | Instr (instr,_) -> Printer.pp_instr fmt instr
-    | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
-    | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
-  end
-
-let pretty_edge fmt t = pretty_transition fmt t.edge_transition
-
-module MakeDot
+module Dot
     (V: sig
-       include Datatype.S_with_collections
+       include Hashtbl.HashedType
+       val pretty: Format.formatter -> t -> unit
        val start_of: t -> stmt option
      end)
-    (G: Graph.Sig.I
-     with type V.t = V.t
-      and type E.t = V.t * V.t edge * V.t
-      and type V.label = V.t
-      and type E.label = V.t edge)
+    (E: sig
+       type t
+       val pretty: Format.formatter -> t -> unit
+     end)
+    (G: Graph.Sig.G with type V.t = V.t and type E.t = V.t * E.t * V.t)
 = struct
 
   let htmllabel fmt =
@@ -822,7 +831,7 @@ module MakeDot
     in
     (* Build vertex attributes and subgraphs from wto if present *)
     let open Graph.Graphviz.DotAttributes in
-    let module Table = V.Hashtbl in
+    let module Table = FCHashtbl.Make (V) in
     let subgraphs = Table.create (G.nb_vertex g) in
     let tag =
       let c = ref 0 in
@@ -872,7 +881,7 @@ module MakeDot
           with Not_found -> None
         let default_edge_attributes _g = []
         let edge_attributes (v1,e,v2) =
-          htmllabel "%a" pretty_edge e ::
+          htmllabel "%a" E.pretty e ::
           if Table.mem subgraphs v1 && Table.mem subgraphs v2 then
             let (_,_,c1,_) = Table.find subgraphs v1 in
             let (_,_,c2,head2) = Table.find subgraphs v2 in
@@ -885,7 +894,7 @@ module MakeDot
 end
 
 module GDot =
-  MakeDot(struct include Vertex let start_of v = v.vertex_start_of end)(G)
+  Dot(struct include Vertex let start_of v = v.vertex_start_of end)(Edge)(G)
 
 let output_to_dot out_channel ?labeling ?wto g =
   GDot.output_to_dot  out_channel ?labeling ?wto g.graph
@@ -1098,10 +1107,10 @@ module UnrollUnnatural  = struct
 
 
   module GDot =
-    MakeDot(struct
+    Dot(struct
       include Version
       let start_of (v,_) = v.vertex_start_of
-    end)(G)
+    end)(Edge)(G)
 
   let output_to_dot out_channel ?labeling ?wto g =
     GDot.output_to_dot  out_channel ?labeling ?wto g

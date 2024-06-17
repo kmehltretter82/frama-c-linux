@@ -139,7 +139,7 @@ module Make (Abstract: Abstractions.S) = struct
   let copy_lvalue state expr = Eval.copy_lvalue state expr >>=: snd
 
   let eval_lval_to_loc state lv =
-    let get_loc (_, loc, _) = loc in
+    let get_loc (_, loc) = loc in
     let for_writing = false in
     Eval.lvaluate ~for_writing state lv >>=: get_loc
 
