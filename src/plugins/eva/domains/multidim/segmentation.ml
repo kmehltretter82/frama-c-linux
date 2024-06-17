@@ -101,12 +101,7 @@ module Bound =
 struct
   open Top.Operators
   module Var = Cil_datatype.Varinfo
-  module Exp =
-  struct
-    include Eva_ast.Exp
-    let equal e1 e2 =
-      if e1 == e2 then true else equal e1 e2
-  end
+  module Exp = Eva_ast.Exp
 
   type t =
     | Const of Integer.t
