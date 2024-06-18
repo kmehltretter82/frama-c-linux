@@ -738,18 +738,18 @@ let apply_transformation ?(force=true) nb file =
 
 (* Performs and closes all syntactic transformations *)
 let compute file =
-  let nb = Kernel.UnrollingLevel.get () in
-  let force = Kernel.UnrollingForce.get () in
+  let nb = Kernel.UnfoldingLevel.get () in
+  let force = Kernel.UnfoldingForce.get () in
   apply_transformation ~force nb file
 
-let unroll_transform =
+let transform =
   File.register_code_transformation_category "loop unfolding"
 
 let () =
   File.add_code_transformation_after_cleanup
-    ~deps:[(module Kernel.UnrollingLevel:Parameter_sig.S);
-           (module Kernel.UnrollingForce:Parameter_sig.S)]
-    unroll_transform compute
+    ~deps:[(module Kernel.UnfoldingLevel:Parameter_sig.S);
+           (module Kernel.UnfoldingForce:Parameter_sig.S)]
+    transform compute
 
 let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:location) args =
   let open Logic_typing in
