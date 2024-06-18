@@ -500,6 +500,24 @@ let get_zone_from_annot a (ki,kf) loop_body_opt results =
       results l
   | AStmtSpec _ -> (* TODO *)
     raise (NYI "[logic_interp] statement contract")
+  | AExtended(_,_, { ext_kind = Ext_preds preds }) ->
+    (* to select the declaration of the variables *)
+    List.fold_left
+      (fun results pred -> {
+           results with
+           locals = Varinfo.Set.union (extract_locals_from_pred pred) results.locals;
+           labels = Logic_label.Set.union (extract_labels_from_pred pred) results.labels
+         })
+      results preds
+  | AExtended(_,_, { ext_kind = Ext_terms terms }) ->
+    (* to select the declaration of the variables *)
+    List.fold_left
+      (fun results term -> {
+           results with
+           locals = Varinfo.Set.union (extract_locals_from_term term) results.locals;
+           labels = Logic_label.Set.union (extract_labels_from_term term) results.labels
+         })
+      results terms
   | AExtended _ -> raise (NYI "[logic_interp] extension")
 
 (* Used by annotations entry points. *)
