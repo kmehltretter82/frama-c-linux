@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,7 +34,7 @@ module Bound :
 sig
   type t
   exception UnsupportedBoundExpression
-  val of_exp : Cil_types.exp -> t
+  val of_exp : Eva_ast.exp -> t
   val of_integer : Integer.t -> t
   val succ : t -> t
 end

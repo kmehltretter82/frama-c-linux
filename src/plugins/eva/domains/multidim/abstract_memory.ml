@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -157,7 +157,7 @@ end
 
 type size = Integer.t
 type side = Left | Right
-type oracle = Cil_types.exp -> Int_val.t
+type oracle = Eva_ast.exp -> Int_val.t
 type bioracle = side -> oracle
 
 module type ProtoMemory =
@@ -190,5 +190,5 @@ sig
   val incr_bound : oracle:oracle -> Cil_types.varinfo -> Integer.t option ->
     t -> t
   val add_segmentation_bounds : oracle:oracle -> typ:Cil_types.typ ->
-    Cil_types.exp list -> t -> t
+    Eva_ast.exp list -> t -> t
 end

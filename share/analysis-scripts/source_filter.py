@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -37,84 +37,32 @@ the efficiency of regex-based heuristics."""
 # of errors when running the filters. Note that an absent tool
 # does _not_ lead to an error.
 
-from __future__ import annotations
-import os
+import external_tool
 from pathlib import Path
-import shutil
-import subprocess
 import sys
-from typing import Optional
-
-# warnings about missing commands are disabled during testing
-emit_warns = os.getenv("PTESTS_TESTING") is None
-
-# Cache for get_command.
-cached_commands: dict[str, Optional[Path]] = {}
-
-
-def resource_path(relative_path: str) -> str:
-    """Get absolute path to resource; only used by the pyinstaller standalone distribution"""
-    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, relative_path)
-
-
-def get_command(command: str, env_var_name: str) -> Optional[Path]:
-    """Returns a Path to the command; priority goes to the environment variable,
-    then in the PATH, then in the resource directory (for a pyinstaller binary)."""
-    if command in cached_commands:
-        return cached_commands[command]
-    cmd = os.getenv(env_var_name)
-    if cmd:
-        p = Path(cmd)
-    else:
-        cmd = shutil.which(command)
-        if cmd:
-            p = Path(cmd)
-        else:
-            p = Path(resource_path(command))
-            if not p.exists():
-                if emit_warns:
-                    print(
-                        f"info: optional external command '{command}' not found in PATH; "
-                        f"consider installing it or setting environment variable {env_var_name}"
-                    )
-                p = None
-    cached_commands[command] = p
-    return p
-
-
-def run_and_check(command_and_args: list[str], input_data: str) -> str:
-    try:
-        return subprocess.check_output(
-            command_and_args,
-            input=input_data,
-            stderr=None,
-            encoding="ascii",
-            errors="ignore",
-        )
-    except subprocess.CalledProcessError as e:
-        sys.exit(f"error running command: {command_and_args}\n{e}")
 
 
 def filter_with_scc(input_data: str) -> str:
-    scc = get_command("scc", "SCC")
+    scc_bin = "scc" if sys.platform != "win32" else "scc.exe"
+    scc = external_tool.get_command(scc_bin, "SCC")
     if scc:
-        return run_and_check([str(scc), "-k"], input_data)
+        return external_tool.run_and_check([scc, "-k", "-b"], input_data)
     else:
         return input_data
 
 
 def filter_with_astyle(input_data: str) -> str:
-    astyle = get_command("astyle", "ASTYLE")
+    astyle_bin = "astyle" if sys.platform != "win32" else "astyle.exe"
+    astyle = external_tool.get_command(astyle_bin, "ASTYLE")
     if astyle:
-        return run_and_check(
-            [str(astyle), "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
+        return external_tool.run_and_check(
+            [astyle, "--keep-one-line-blocks", "--keep-one-line-statements"], input_data
         )
     else:
         return input_data
 
 
-def open_and_filter(filename: str, apply_filters: bool) -> str:
+def open_and_filter(filename: Path, apply_filters: bool) -> str:
     # we ignore encoding errors and use ASCII to avoid issues when
     # opening files with different encodings (UTF-8, ISO-8859, etc)
     with open(filename, "r", encoding="ascii", errors="ignore") as f:

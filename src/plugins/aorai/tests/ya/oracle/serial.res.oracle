@@ -180,6 +180,18 @@ enum aorai_OpStatusList {
 };
 /* compiler builtin: 
    void Frama_C_show_aorai_state(...);   */
+/*@ ghost extern int __fc_heap_status; */
+
+/*@
+axiomatic dynamic_allocation {
+  predicate is_allocable{L}(ℤ n) 
+    reads __fc_heap_status;
+  
+  axiom never_allocable{L}:
+    ∀ ℤ i; i < 0 ∨ i > 18446744073709551615UL ⇒ ¬is_allocable(i);
+  
+  }
+ */
 extern int volatile Frama_C_entropy_source __attribute__((__unused__));
 
 /*@ requires order: min ≤ max;

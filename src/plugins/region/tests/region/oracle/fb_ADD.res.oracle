@@ -1,0 +1,13 @@
+[kernel] Parsing fb_ADD.i (no preprocessing)
+[region] Analyzing regions
+[region] Function job:
+  R0001: R-- fb (FB *) 64b (*R0003) ;
+  R0003: --- 704b 256..320 [1]: R0005 320..384 [1]: R0018 ;
+  R0005: R-- (struct N *) 64b (*R0008) ;
+  R0008: --- 128b 0..64 [1]: R000a 64..96 [1]: R0027 ;
+  R000a: RW- (double) 64b ;
+  R0027: RW- (int) 32b ;
+  R0018: R-- (struct N *) 64b (*R001b) ;
+  R001b: --- 128b 0..64 [1]: R001d 64..96 [1]: R003a ;
+  R001d: R-- (double) 64b ;
+  R003a: R-- (int) 32b ;

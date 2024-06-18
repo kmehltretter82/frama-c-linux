@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -112,6 +112,7 @@ const edgeKindTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'plugins.callgraph.edgeKindTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -176,6 +177,7 @@ const getCallgraph_internal: Server.GetRequest<null,graph | undefined> = {
   name: 'plugins.callgraph.getCallgraph',
   input: Json.jNull,
   output: Json.jOption(jGraph),
+  fallback: undefined,
   signals: [],
 };
 /** Getter for state [`callgraph`](#callgraph)  */
@@ -199,6 +201,7 @@ const getIsComputed_internal: Server.GetRequest<null,boolean> = {
   name: 'plugins.callgraph.getIsComputed',
   input: Json.jNull,
   output: Json.jBoolean,
+  fallback: false,
   signals: [],
 };
 /** Getter for state [`isComputed`](#iscomputed)  */
@@ -217,6 +220,7 @@ const compute_internal: Server.ExecRequest<null,null> = {
   name: 'plugins.callgraph.compute',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Compute the callgraph for the current project */

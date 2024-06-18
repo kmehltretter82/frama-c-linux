@@ -1,0 +1,470 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2024                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Eva_ast_types
+open Eva_ast_builder
+
+
+(* --- Conversion to Cil --- *)
+
+(* Memoization to avoid creating too many expressions. *)
+module ConversionToCil =
+  State_builder.Hashtbl
+    (Eva_ast_datatype.Exp.Hashtbl)
+    (Cil_datatype.Exp)
+    (struct
+      let name = "Eva.Eva_ast_utils.ConversionToCil"
+      let size = 16
+      let dependencies = [ Ast.self ]
+    end)
+
+let rec to_cil_exp exp =
+  match exp.origin with
+  | Exp e -> e
+  | _ -> ConversionToCil.memo build_cil_exp exp
+
+and build_cil_exp exp =
+  let exp_node : Cil_types.exp_node =
+    match exp.node with
+    | Const c -> Const (to_cil_const c)
+    | Lval lv -> Lval (to_cil_lval lv)
+    | UnOp (op, e, t) -> UnOp (to_cil_unop op, to_cil_exp e, t)
+    | BinOp (op, e1, e2, t) ->
+      BinOp (to_cil_binop op, to_cil_exp e1, to_cil_exp e2, t)
+    | CastE (t, e) -> CastE (t, to_cil_exp e)
+    | AddrOf lv -> AddrOf (to_cil_lval lv)
+    | StartOf lv -> StartOf (to_cil_lval lv)
+  in
+  Cil.new_exp ~loc:Cil_datatype.Location.unknown exp_node
+
+and to_cil_unop : Eva_ast_types.unop -> Cil_types.unop = function
+  | Neg -> Neg
+  | BNot -> BNot
+  | LNot -> LNot
+
+and to_cil_binop : Eva_ast_types.binop -> Cil_types.binop = function
+  | PlusA -> PlusA
+  | PlusPI -> PlusPI
+  | MinusA -> MinusA
+  | MinusPI -> MinusPI
+  | MinusPP -> MinusPP
+  | Mult -> Mult
+  | Div -> Div
+  | Mod -> Mod
+  | Shiftlt -> Shiftlt
+  | Shiftrt -> Shiftrt
+  | Lt -> Lt
+  | Gt -> Gt
+  | Le -> Le
+  | Ge -> Ge
+  | Eq -> Eq
+  | Ne -> Ne
+  | BAnd -> BAnd
+  | BXor -> BXor
+  | BOr -> BOr
+  | LAnd -> LAnd
+  | LOr -> LOr
+
+and to_cil_lval lval =
+  match lval.origin with
+  | Lval lv -> lv
+  | _ ->
+    let (lhost, offset) = lval.node in
+    to_cil_lhost lhost, to_cil_offset offset
+
+and to_cil_lhost : Eva_ast_types.lhost -> Cil_types.lhost = function
+  | Var vi -> Var vi
+  | Mem e -> Mem (to_cil_exp e)
+
+and to_cil_offset : Eva_ast_types.offset -> Cil_types.offset = function
+  | NoOffset -> NoOffset
+  | Field (fi, off) -> Field (fi, to_cil_offset off)
+  | Index (e, off) -> Index (to_cil_exp e, to_cil_offset off)
+
+and to_cil_const : Eva_ast_types.constant -> Cil_types.constant = function
+  | CInt64 (i, ik, s) -> CInt64 (i, ik, s)
+  | CChr c -> CChr c
+  | CReal (f, fk, s) -> CReal (f, fk, s)
+  | CEnum (ei, _) -> CEnum ei
+  | CTopInt _ | CString _ as constant ->
+    Self.fatal "The Eva constant %a cannot be converted to cil"
+      Eva_ast_printer.pp_constant constant
+
+
+(* --- Queries --- *)
+
+let is_mutable (lval : lval) : bool =
+  let (lhost, offset) = lval.node in
+  let rec aux base_mutable typ off =
+    let base_mutable = base_mutable && not (Cil.isConstType typ) in
+    match Cil.unrollType typ, off with
+    | _, NoOffset -> base_mutable
+    | _, Field (fi, off) ->
+      let base_mutable = base_mutable || Cil.(hasAttribute frama_c_mutable fi.fattr) in
+      aux base_mutable fi.ftype off
+    | TArray(typ, _, _), Index(_, off) -> aux base_mutable typ off
+    | typ, Index _ ->
+      Self.fatal "Index on non-array type %a" Printer.pp_typ typ
+  in
+  aux false (Eva_ast_typing.type_of_lhost lhost) offset
+
+let rec is_initialized_exp (on_same_obj : bool) (exp : exp) =
+  match exp.node with
+  | Lval lv | AddrOf lv | StartOf lv ->
+    let (lh, _) = lv.node in
+    is_initialized_lhost on_same_obj lh
+  | BinOp ((PlusPI|MinusPI), e, _, _) | CastE (_, e) ->
+    is_initialized_exp on_same_obj e
+  | _ -> false
+
+and is_initialized_lhost (on_same_obj : bool) (lhost : lhost) =
+  match lhost with
+  | Var vi -> Cil.(hasAttribute frama_c_init_obj vi.vattr)
+  | Mem e -> on_same_obj && is_initialized_exp false e
+
+let is_initialized lval =
+  let (lhost, _) = lval.node in
+  is_initialized_lhost true lhost
+
+
+(* --- Heights --- *)
+
+let rec height_exp exp =
+  match exp.node with
+  | Const _ -> 0
+  | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
+  | UnOp (_,e,_) | CastE (_, e) -> height_exp e + 1
+  | BinOp (_,e1,e2,_) -> max (height_exp e1) (height_exp e2) + 1
+
+and height_lval lv =
+  let host, offset = lv.node in
+  let h1 = match host with
+    | Var _ -> 0
+    | Mem e -> height_exp e + 1
+  in
+  max h1 (height_offset offset) + 1
+
+and height_offset = function
+  | NoOffset  -> 0
+  | Field (_,r) -> height_offset r + 1
+  | Index (e,r) -> max (height_exp e) (height_offset r) + 1
+
+
+(* --- Specialized visitors --- *)
+
+let exp_contains_volatile, lval_contains_volatile =
+  let open Eva_ast_visitor.Fold in
+  let neutral = false and combine b1 b2 = b1 || b2 in
+  let fold_lval ~visitor lval =
+    Cil.isVolatileType lval.typ || default.fold_lval ~visitor lval
+  in
+  let folder = { default with fold_lval } in
+  visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
+
+let vars_in_exp, vars_in_lval =
+  let module VarSet = Cil_datatype.Varinfo.Set in
+  let open Eva_ast_visitor.Fold in
+  let neutral = VarSet.empty and combine = VarSet.union in
+  let fold_lval ~visitor lval =
+    let vars = default.fold_lval ~visitor lval in
+    match fst lval.node with
+    | Var vi -> VarSet.add vi vars
+    | Mem _ -> vars
+  in
+  let folder = { default with fold_lval } in
+  visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
+
+
+(* Dependencies *)
+
+let rec deps_of_exp find_loc exp =
+  let rec process exp = match exp.node with
+    | Lval lval ->
+      deps_of_lval find_loc lval
+    | UnOp (_, e, _) | CastE (_, e) ->
+      process e
+    | BinOp (_, e1, e2, _) ->
+      Deps.join (process e1) (process e2)
+    | StartOf lv | AddrOf lv ->
+      Deps.data (indirect_zone_of_lval find_loc lv)
+    | Const _ ->
+      Deps.bottom
+  in
+  process exp
+
+and zone_of_exp find_loc exp = Deps.to_zone (deps_of_exp find_loc exp)
+
+and deps_of_lval find_loc lval =
+  let ploc = find_loc lval in
+  (* dereference of an lvalue: first, its address must be computed,
+     then its contents themselves are read *)
+  let indirect = indirect_zone_of_lval find_loc lval in
+  let data = Precise_locs.enumerate_valid_bits Read ploc in
+  { Deps.data ; indirect }
+
+and zone_of_lval find_loc lval = Deps.to_zone (deps_of_lval find_loc lval)
+
+(* Computations of the inputs of a lvalue : union of the "host" part and
+   the offset. *)
+and indirect_zone_of_lval find_loc lval =
+  let lhost, offset = lval.node in
+  let lhost_zone = zone_of_lhost find_loc lhost
+  and offset_zone = zone_of_offset find_loc offset in
+  Locations.Zone.join lhost_zone offset_zone
+
+(* Computation of the inputs of a host. Nothing for a variable, and the
+   inputs of [e] for a dereference [*e]. *)
+and zone_of_lhost find_loc = function
+  | Var _ -> Locations.Zone.bottom
+  | Mem e -> zone_of_exp find_loc e
+
+
+(* Computation of the inputs of an offset. *)
+and zone_of_offset find_loc = function
+  | NoOffset -> Locations.Zone.bottom
+  | Field (_, o) -> zone_of_offset find_loc o
+  | Index (e, o) ->
+    Locations.Zone.join
+      (zone_of_exp find_loc e) (zone_of_offset find_loc o)
+
+let rec to_integer e =
+  match e.node with
+  | Const (CInt64 (n,_,_)) -> Some n
+  | Const (CChr c) -> Some (Cil.charConstToInt c)
+  | Const (CEnum ({eival = v}, _)) -> Cil.isInteger v
+  | CastE (typ, e) when Cil.isPointerType typ ->
+    begin match to_integer e with
+      | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
+      | _ -> None
+    end
+  | _ -> None
+
+let to_float e =
+  match e.node with
+  | Const (CReal (f,_,_)) -> Some f
+  | _ -> None
+
+let is_zero exp =
+  match to_integer exp with
+  | None -> false
+  | Some i -> Integer.is_zero i
+
+let is_zero_ptr exp =
+  is_zero exp && Cil.isPointerType exp.typ
+
+
+(* Constant folding *)
+
+(* These functions are largely based on Cil.constFold. See there for details. *)
+let rec const_fold (exp: exp) : exp =
+  match exp.node with
+  | Const (CChr c) -> Build.integer ~ikind:IInt (Cil.charConstToInt c)
+  | Const (CEnum(_ei, e)) -> const_fold e
+  | Const (CTopInt _ | CReal _ | CString _ | CInt64 _) -> exp
+  | Lval lv -> mk_exp (Lval (const_fold_lval lv))
+  | AddrOf lv -> mk_exp (AddrOf (const_fold_lval lv))
+  | StartOf lv -> mk_exp (StartOf (const_fold_lval lv))
+  | CastE (t, e) -> const_fold_cast t e
+  | UnOp (op, e, t) -> const_fold_unop op e t
+  | BinOp (op, e1, e2, t) -> const_fold_binop op e1 e2 t
+
+and const_fold_cast (t : typ) (e : exp) : exp  =
+  let e' = const_fold e in
+  let default () = mk_exp (CastE (t, e')) in
+  match e'.node, Cil.unrollType t with
+  (* integer -> integer *)
+  | Const (CInt64 (i,_k,_)), (TInt (ikind, a) | TEnum ({ekind = ikind}, a))
+    when !Cil_datatype.drop_fc_internal_attributes a = [] ->
+    Build.integer ~ikind i
+  (* real -> integer *)
+  | Const (CReal (f,_,_)), (TInt(ikind, a) | TEnum ({ekind = ikind}, a))
+    when a = [] ->
+    begin try
+        let i = Floating_point.truncate_to_integer f in
+        if Cil.fitsInInt ikind i
+        then Build.integer ~ikind i
+        else default ()
+      with Floating_point.Float_Non_representable_as_Int64 _ ->
+        default ()
+    end
+  (* real -> float *)
+  | Const (CReal (f,_,_)), TFloat (fkind, a) when a = [] ->
+    Build.float ~fkind f
+  (* int -> float *)
+  | Const (CInt64(i,_,_)), (TFloat (fkind, a)) when a = [] ->
+    let f = Integer.to_float i in
+    Build.float ~fkind f
+  | _, _ -> default ()
+
+and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
+  let e' = const_fold e in
+  let default () = mk_exp (UnOp (op, e', t)) in
+  match e'.node, Cil.unrollType t with
+  (* Integer operations *)
+  | Const (CInt64 (i,_ik,_repr)), (TInt (ikind, _) | TEnum ({ekind=ikind},_)) ->
+    begin match op with
+      | Neg -> Build.integer ~ikind (Integer.neg i)
+      | BNot -> Build.integer ~ikind (Integer.lognot i)
+      | LNot -> if Integer.(equal i zero) then Build.one else Build.zero
+    end
+  (* Float operations*)
+  | Const (CReal(f,_,_)), TFloat (fk,_) ->
+    begin match op with
+      | Neg ->
+        let f = match fk with
+          | FFloat -> Floating_point.round_to_single_precision_float f
+          | FDouble | FLongDouble -> f
+        in
+        mk_exp (Const (CReal(-.f,fk,None)))
+      | _ -> default ()
+    end
+  (* No possible folding *)
+  | _ -> default ()
+
+and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
+  (* TODO: float comparisons *)
+  let e1' = const_fold e1 in
+  let e2' = const_fold e2 in
+  let default () = mk_exp (BinOp (op, e1', e2', t)) in
+  (* Can a shift operation be safely computed ? *)
+  let shift_in_bounds i2 =
+    try
+      let size = Integer.of_int (Cil.bitsSizeOf e1'.typ) in
+      Integer.(ge i2 zero && lt i2 size)
+    with Cil.SizeOfError _ -> false
+  in
+  match Cil.unrollType t with
+  (* Integer operations *)
+  | TInt (ikind, _) | TEnum ({ekind=ikind},_) ->
+    begin match op, to_integer e1', to_integer e2' with
+      | PlusA, Some z, _ when Integer.is_zero z -> e2'
+      | (PlusA | MinusA), _, Some z when Integer.is_zero z -> e1'
+      | PlusPI, _, Some z when Integer.is_zero z -> e1'
+      | MinusPI, _, Some z when Integer.is_zero z -> e1'
+      | PlusA, Some i1, Some i2 ->
+        Build.integer ~ikind (Integer.add i1 i2)
+      | MinusA, Some i1, Some i2 ->
+        Build.integer ~ikind (Integer.sub i1 i2)
+      | Mult, Some i1, Some i2 ->
+        Build.integer ~ikind (Integer.mul i1 i2)
+      | Mult, Some z, _ when Integer.is_zero z -> e1'
+      | Mult, Some i1, _ when Integer.is_one i1 -> e2'
+      | Mult, _, Some z when Integer.is_zero z -> e2'
+      | Mult, _, Some i2 when Integer.is_one i2 -> e1'
+      | Div, Some i1, Some i2  ->
+        begin
+          try Build.integer ~ikind (Integer.c_div i1 i2)
+          with Division_by_zero -> default ()
+        end
+      | Div, _, Some i2 when Integer.is_one i2 -> e1'
+      | Mod, Some i1, Some i2 ->
+        begin
+          try Build.integer ~ikind (Integer.c_rem i1 i2)
+          with Division_by_zero -> default ()
+        end
+      | BAnd, Some i1, Some i2 ->
+        Build.integer ~ikind (Integer.logand i1 i2)
+      | BAnd, Some z, _ when Integer.is_zero z -> e1'
+      | BAnd, _, Some z when Integer.is_zero z -> e2'
+      | BOr, Some i1, Some i2 ->
+        Build.integer ~ikind (Integer.logor i1 i2)
+      | BOr, Some z, _ when Integer.is_zero z -> e2'
+      | BOr, _, Some z when Integer.is_zero z -> e1'
+      | BXor, Some i1, Some i2 ->
+        Build.integer ~ikind (Integer.logxor i1 i2)
+      | Shiftlt, Some i1, Some i2 when shift_in_bounds i2 ->
+        Build.integer ~ikind (Integer.shift_left i1 i2)
+      | Shiftlt, Some z, _ when Integer.is_zero z -> e1'
+      | Shiftlt, _, Some z when Integer.is_zero z -> e1'
+      | Shiftrt, Some i1, Some i2 when shift_in_bounds i2 ->
+        if Cil.isSigned ikind then
+          Build.integer ~ikind (Integer.shift_right i1 i2)
+        else
+          Build.integer ~ikind (Integer.shift_right_logical i1 i2)
+      | Shiftrt, Some z, _ when Integer.is_zero z -> e1'
+      | Shiftrt, _, Some z when Integer.is_zero z -> e1'
+      | Eq, Some i1, Some i2 ->
+        Build.bool (Integer.equal i1 i2)
+      | Ne, Some i1, Some i2 ->
+        Build.bool (not (Integer.equal i1 i2))
+      | Le, Some i1, Some i2 ->
+        Build.bool (Integer.le i1 i2)
+      | Ge, Some i1, Some i2 ->
+        Build.bool (Integer.ge i1 i2)
+      | Lt, Some i1, Some i2 ->
+        Build.bool (Integer.lt i1 i2)
+      | Gt, Some i1, Some i2 ->
+        Build.bool (Integer.gt i1 i2)
+      | LAnd, Some i1, _ ->
+        if Integer.is_zero i1 then Build.zero else e2'
+      | LAnd, _, Some i2 ->
+        if Integer.is_zero i2 then Build.zero else e1'
+      | LOr, Some i1, _ ->
+        if Integer.is_zero i1 then e2' else Build.one
+      | LOr, _, Some i2 ->
+        if Integer.is_zero i2 then e1' else Build.one
+      | _ -> default ()
+    end
+  (* Floating-point operation *)
+  | TFloat (fkind, _) ->
+    begin match op, to_float e1', to_float e2' with
+      | PlusA, Some f1, Some f2 ->
+        Build.float ~fkind (f1 +. f2)
+      | MinusA, Some f1, Some f2 ->
+        Build.float ~fkind (f1 -. f2)
+      | Mult, Some f1, Some f2 ->
+        Build.float ~fkind (f1 *. f2)
+      | Div, Some f1, Some f2 ->
+        Build.float ~fkind (f1 /. f2)
+      | _ -> default ()
+    end
+  | _ -> default ()
+
+and const_fold_lval (lval : lval) : lval =
+  let lhost, offset = lval.node in
+  mk_lval (const_fold_lhost lhost, const_fold_offset offset)
+
+and const_fold_lhost : lhost -> lhost = function
+  | Mem e -> Mem (const_fold e)
+  | Var _ as host -> host
+
+and const_fold_offset : offset -> offset = function
+  | NoOffset -> NoOffset
+  | Field (fi, o) -> Field (fi, const_fold_offset o)
+  | Index (e, o) -> Index (const_fold e, const_fold_offset o)
+
+let fold_to_integer exp =
+  to_integer (const_fold exp)
+
+
+(* --- Offsets --- *)
+
+let rec last_offset offset : offset =
+  match offset with
+  | NoOffset | Field(_,NoOffset) | Index(_,NoOffset) -> offset
+  | Field(_,off) | Index(_,off) -> last_offset off
+
+let is_bitfield lval =
+  let (_, offset) = lval.node in
+  match last_offset offset with
+  | Field({fbitfield=Some _}, _) -> true
+  | _ -> false

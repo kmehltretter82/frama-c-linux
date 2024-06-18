@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function test_strcmp <- main.
-  Called from string_h.c:139.
+  Called from string_h.c:157.
 [eva] computing for function strcmp <- test_strcmp <- main.
   Called from string_h.c:5.
 [eva] using specification for function strcmp
@@ -13,14 +13,14 @@
   function strcmp: precondition 'valid_string_s1' got status valid.
 [eva] string_h.c:5: 
   function strcmp: precondition 'valid_string_s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:156: 
+[eva] FRAMAC_SHARE/libc/string.h:174: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcmp
-[eva:alarm] string_h.c:6: Warning: assertion got status unknown.
+[eva:alarm] string_h.c:6: Warning: check got status unknown.
 [eva] Recording results for test_strcmp
 [eva] Done for function test_strcmp
 [eva] computing for function test_strcat <- main.
-  Called from string_h.c:140.
+  Called from string_h.c:158.
 [eva] computing for function strcat <- test_strcat <- main.
   Called from string_h.c:13.
 [eva] using specification for function strcat
@@ -30,6 +30,8 @@
   function strcat: precondition 'valid_string_dest' got status valid.
 [eva] string_h.c:13: 
   function strcat: precondition 'room_string' got status valid.
+[eva] string_h.c:13: 
+  function strcat: precondition 'separation' got status valid.
 [eva] Done for function strcat
 [eva] computing for function strcat <- test_strcat <- main.
   Called from string_h.c:16.
@@ -39,11 +41,13 @@
   function strcat: precondition 'valid_string_dest' got status valid.
 [eva] string_h.c:16: 
   function strcat: precondition 'room_string' got status valid.
+[eva] string_h.c:16: 
+  function strcat: precondition 'separation' got status valid.
 [eva] Done for function strcat
 [eva] Recording results for test_strcat
 [eva] Done for function test_strcat
 [eva] computing for function test_strstr <- main.
-  Called from string_h.c:141.
+  Called from string_h.c:159.
 [eva] computing for function strstr <- test_strstr <- main.
   Called from string_h.c:24.
 [eva] using specification for function strstr
@@ -51,14 +55,14 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_h.c:24: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:243: 
+[eva] FRAMAC_SHARE/libc/string.h:266: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function strstr
-[eva:alarm] string_h.c:25: Warning: assertion got status unknown.
+[eva:alarm] string_h.c:25: Warning: check got status unknown.
 [eva] Recording results for test_strstr
 [eva] Done for function test_strstr
 [eva] computing for function test_strncat <- main.
-  Called from string_h.c:142.
+  Called from string_h.c:160.
 [eva] string_h.c:34: Trace partitioning superposing up to 100 states
 [eva] computing for function strncat <- test_strncat <- main.
   Called from string_h.c:36.
@@ -68,293 +72,542 @@
 [eva] string_h.c:36: 
   function strncat: precondition 'valid_string_dest' got status valid.
 [eva] string_h.c:36: 
+  function strncat: precondition 'separation' got status valid.
+[eva] string_h.c:36: 
   function strncat, behavior complete: precondition 'room_string' got status valid.
+[eva] Done for function strncat
+[eva] computing for function strncat <- test_strncat <- main.
+  Called from string_h.c:40.
+[eva] string_h.c:40: 
+  function strncat: precondition 'valid_nstring_src' got status valid.
+[eva] string_h.c:40: 
+  function strncat: precondition 'valid_string_dest' got status valid.
+[eva] string_h.c:40: 
+  function strncat: precondition 'separation' got status valid.
+[eva] string_h.c:40: 
+  function strncat, behavior partial: precondition 'room_string' got status valid.
+[eva] Done for function strncat
+[eva] computing for function strncat <- test_strncat <- main.
+  Called from string_h.c:44.
+[eva] string_h.c:44: 
+  function strncat: precondition 'valid_nstring_src' got status valid.
+[eva] string_h.c:44: 
+  function strncat: precondition 'valid_string_dest' got status valid.
+[eva] string_h.c:44: 
+  function strncat: precondition 'separation' got status valid.
+[eva:alarm] string_h.c:44: Warning: 
+  function strncat, behavior partial: precondition 'room_string' got status invalid.
 [eva] Done for function strncat
 [eva] Recording results for test_strncat
 [eva] Done for function test_strncat
 [eva] computing for function crashes_gcc <- main.
-  Called from string_h.c:143.
+  Called from string_h.c:161.
 [eva] computing for function strcpy <- crashes_gcc <- main.
-  Called from string_h.c:53.
+  Called from string_h.c:63.
 [eva] using specification for function strcpy
-[eva] string_h.c:53: 
+[eva] string_h.c:63: 
   function strcpy: precondition 'valid_string_src' got status valid.
-[eva] string_h.c:53: 
+[eva] string_h.c:63: 
   function strcpy: precondition 'room_string' got status valid.
-[eva:alarm] string_h.c:53: Warning: 
+[eva:alarm] string_h.c:63: Warning: 
   function strcpy: precondition 'separation' got status invalid.
 [eva] Done for function strcpy
 [eva] Recording results for crashes_gcc
 [eva] Done for function crashes_gcc
 [eva] computing for function test_strtok <- main.
-  Called from string_h.c:144.
+  Called from string_h.c:162.
 [eva] computing for function strtok <- test_strtok <- main.
-  Called from string_h.c:58.
+  Called from string_h.c:68.
 [eva] using specification for function strtok
-[eva] string_h.c:58: 
+[eva] string_h.c:68: 
   function strtok: precondition 'valid_string_delim' got status valid.
-[eva:alarm] string_h.c:58: Warning: 
+[eva] string_h.c:68: 
+  function strtok: precondition 'separation' got status valid.
+[eva:alarm] string_h.c:68: Warning: 
   function strtok, behavior resume_str: precondition 'not_first_call' got status invalid.
 [eva] Done for function strtok
-[eva] computing for function strtok <- test_strtok <- main.
-  Called from string_h.c:62.
-[eva] string_h.c:62: 
-  function strtok: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:62: 
-  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva] Done for function strtok
-[eva:alarm] string_h.c:63: Warning: assertion got status unknown.
-[eva] computing for function strtok <- test_strtok <- main.
-  Called from string_h.c:64.
-[eva] string_h.c:64: 
-  function strtok: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:64: 
-  function strtok, behavior resume_str: precondition 'not_first_call' got status valid.
-[eva] Done for function strtok
-[eva:alarm] string_h.c:65: Warning: assertion got status unknown.
-[eva] computing for function strtok <- test_strtok <- main.
-  Called from string_h.c:67.
-[eva] string_h.c:67: 
-  function strtok: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:67: 
-  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva] Done for function strtok
-[eva:alarm] string_h.c:68: Warning: assertion got status unknown.
-[eva] computing for function strtok <- test_strtok <- main.
-  Called from string_h.c:69.
-[eva] string_h.c:69: 
-  function strtok: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:69: 
-  function strtok, behavior resume_str: precondition 'not_first_call' got status valid.
-[eva] Done for function strtok
-[eva:alarm] string_h.c:70: Warning: assertion got status unknown.
 [eva] computing for function strtok <- test_strtok <- main.
   Called from string_h.c:72.
 [eva] string_h.c:72: 
   function strtok: precondition 'valid_string_delim' got status valid.
 [eva] string_h.c:72: 
+  function strtok: precondition 'separation' got status valid.
+[eva] string_h.c:72: 
   function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva:invalid-assigns] string_h.c:72: 
+[eva] Done for function strtok
+[eva] string_h.c:73: check got status valid.
+[eva] computing for function strtok <- test_strtok <- main.
+  Called from string_h.c:74.
+[eva] string_h.c:74: 
+  function strtok: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:74: 
+  function strtok: precondition 'separation' got status valid.
+[eva] string_h.c:74: 
+  function strtok, behavior resume_str: precondition 'not_first_call' got status valid.
+[eva] Done for function strtok
+[eva] string_h.c:75: check got status valid.
+[eva] computing for function strtok <- test_strtok <- main.
+  Called from string_h.c:77.
+[eva] string_h.c:77: 
+  function strtok: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:77: 
+  function strtok: precondition 'separation' got status valid.
+[eva] string_h.c:77: 
+  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
+[eva] Done for function strtok
+[eva] string_h.c:78: check got status valid.
+[eva] computing for function strtok <- test_strtok <- main.
+  Called from string_h.c:79.
+[eva] string_h.c:79: 
+  function strtok: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:79: 
+  function strtok: precondition 'separation' got status valid.
+[eva] string_h.c:79: 
+  function strtok, behavior resume_str: precondition 'not_first_call' got status valid.
+[eva] Done for function strtok
+[eva:alarm] string_h.c:80: Warning: check got status unknown.
+[eva] computing for function strtok <- test_strtok <- main.
+  Called from string_h.c:82.
+[eva] string_h.c:82: 
+  function strtok: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:82: 
+  function strtok: precondition 'separation' got status valid.
+[eva] string_h.c:82: 
+  function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
+[eva:invalid-assigns] string_h.c:82: 
   Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
 [eva] Done for function strtok
-[eva:alarm] string_h.c:73: Warning: assertion got status unknown.
+[eva:alarm] string_h.c:83: Warning: check got status unknown.
 [eva] computing for function strtok <- test_strtok <- main.
-  Called from string_h.c:75.
-[eva] string_h.c:75: 
+  Called from string_h.c:85.
+[eva] string_h.c:85: 
   function strtok: precondition 'valid_string_delim' got status valid.
-[eva:alarm] string_h.c:75: Warning: 
+[eva] string_h.c:85: 
+  function strtok: precondition 'separation' got status valid.
+[eva:alarm] string_h.c:85: Warning: 
   function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status invalid.
 [eva] Done for function strtok
 [eva] Recording results for test_strtok
 [eva] Done for function test_strtok
 [eva] computing for function test_strtok_r <- main.
-  Called from string_h.c:145.
+  Called from string_h.c:163.
 [eva] computing for function strtok_r <- test_strtok_r <- main.
-  Called from string_h.c:82.
+  Called from string_h.c:92.
 [eva] using specification for function strtok_r
-[eva] string_h.c:82: 
+[eva] string_h.c:92: 
   function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva:alarm] string_h.c:82: Warning: 
+[eva:alarm] string_h.c:92: Warning: 
+  function strtok_r: precondition 'separation' got status unknown.
+[eva:alarm] string_h.c:92: Warning: 
   function strtok_r: precondition 'valid_saveptr' got status invalid.
 [eva] Done for function strtok_r
-[eva] computing for function strtok_r <- test_strtok_r <- main.
-  Called from string_h.c:87.
-[eva] string_h.c:87: 
-  function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:87: 
-  function strtok_r: precondition 'valid_saveptr' got status valid.
-[eva] string_h.c:87: 
-  function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva] Done for function strtok_r
-[eva] computing for function strtok_r <- test_strtok_r <- main.
-  Called from string_h.c:89.
-[eva] string_h.c:89: 
-  function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva:alarm] string_h.c:89: Warning: 
-  function strtok_r: precondition 'valid_saveptr' got status invalid.
-[eva] Done for function strtok_r
-[eva:alarm] string_h.c:92: Warning: assertion got status unknown.
-[eva] computing for function strtok_r <- test_strtok_r <- main.
-  Called from string_h.c:93.
-[eva] string_h.c:93: 
-  function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:93: 
-  function strtok_r: precondition 'valid_saveptr' got status valid.
-[eva] string_h.c:93: 
-  function strtok_r, behavior resume_str: precondition 'not_first_call' got status valid.
-[eva] string_h.c:93: 
-  function strtok_r, behavior resume_str: precondition 'initialization,saveptr' got status valid.
-[eva] Done for function strtok_r
-[eva] string_h.c:94: Frama_C_show_each_saveptr: {{ &buf + [0..--] }}
-[eva:alarm] string_h.c:95: Warning: assertion got status unknown.
 [eva] computing for function strtok_r <- test_strtok_r <- main.
   Called from string_h.c:97.
 [eva] string_h.c:97: 
   function strtok_r: precondition 'valid_string_delim' got status valid.
+[eva:alarm] string_h.c:97: Warning: 
+  function strtok_r: precondition 'separation' got status unknown.
 [eva] string_h.c:97: 
   function strtok_r: precondition 'valid_saveptr' got status valid.
 [eva] string_h.c:97: 
   function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
 [eva] Done for function strtok_r
-[eva:alarm] string_h.c:98: Warning: assertion got status unknown.
 [eva] computing for function strtok_r <- test_strtok_r <- main.
   Called from string_h.c:99.
 [eva] string_h.c:99: 
   function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:99: 
+[eva:alarm] string_h.c:99: Warning: 
+  function strtok_r: precondition 'separation' got status unknown.
+[eva:alarm] string_h.c:99: Warning: 
+  function strtok_r: precondition 'valid_saveptr' got status invalid.
+[eva] Done for function strtok_r
+[eva] string_h.c:102: check got status valid.
+[eva] computing for function strtok_r <- test_strtok_r <- main.
+  Called from string_h.c:103.
+[eva] string_h.c:103: 
+  function strtok_r: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:103: 
+  function strtok_r: precondition 'separation' got status valid.
+[eva] string_h.c:103: 
   function strtok_r: precondition 'valid_saveptr' got status valid.
-[eva] string_h.c:99: 
+[eva] string_h.c:103: 
   function strtok_r, behavior resume_str: precondition 'not_first_call' got status valid.
-[eva] string_h.c:99: 
+[eva] string_h.c:103: 
   function strtok_r, behavior resume_str: precondition 'initialization,saveptr' got status valid.
 [eva] Done for function strtok_r
-[eva:alarm] string_h.c:100: Warning: assertion got status unknown.
+[eva] string_h.c:104: Frama_C_show_each_saveptr: {{ &buf + {0; 1} }}
+[eva] string_h.c:105: check got status valid.
 [eva] computing for function strtok_r <- test_strtok_r <- main.
-  Called from string_h.c:102.
-[eva] string_h.c:102: 
+  Called from string_h.c:107.
+[eva] string_h.c:107: 
   function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:102: 
+[eva] string_h.c:107: 
+  function strtok_r: precondition 'separation' got status valid.
+[eva] string_h.c:107: 
   function strtok_r: precondition 'valid_saveptr' got status valid.
-[eva] string_h.c:102: 
+[eva] string_h.c:107: 
   function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva:invalid-assigns] string_h.c:102: 
+[eva] Done for function strtok_r
+[eva] string_h.c:108: check got status valid.
+[eva] computing for function strtok_r <- test_strtok_r <- main.
+  Called from string_h.c:109.
+[eva] string_h.c:109: 
+  function strtok_r: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:109: 
+  function strtok_r: precondition 'separation' got status valid.
+[eva] string_h.c:109: 
+  function strtok_r: precondition 'valid_saveptr' got status valid.
+[eva] string_h.c:109: 
+  function strtok_r, behavior resume_str: precondition 'not_first_call' got status valid.
+[eva] string_h.c:109: 
+  function strtok_r, behavior resume_str: precondition 'initialization,saveptr' got status valid.
+[eva] Done for function strtok_r
+[eva:alarm] string_h.c:110: Warning: check got status unknown.
+[eva] computing for function strtok_r <- test_strtok_r <- main.
+  Called from string_h.c:112.
+[eva] string_h.c:112: 
+  function strtok_r: precondition 'valid_string_delim' got status valid.
+[eva] string_h.c:112: 
+  function strtok_r: precondition 'separation' got status valid.
+[eva] string_h.c:112: 
+  function strtok_r: precondition 'valid_saveptr' got status valid.
+[eva] string_h.c:112: 
+  function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
+[eva:invalid-assigns] string_h.c:112: 
   Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
 [eva] Done for function strtok_r
-[eva:alarm] string_h.c:103: Warning: assertion got status unknown.
+[eva:alarm] string_h.c:113: Warning: check got status unknown.
 [eva] computing for function strtok_r <- test_strtok_r <- main.
-  Called from string_h.c:105.
-[eva] string_h.c:105: 
+  Called from string_h.c:115.
+[eva] string_h.c:115: 
   function strtok_r: precondition 'valid_string_delim' got status valid.
-[eva] string_h.c:105: 
+[eva] string_h.c:115: 
+  function strtok_r: precondition 'separation' got status valid.
+[eva] string_h.c:115: 
   function strtok_r: precondition 'valid_saveptr' got status valid.
-[eva:alarm] string_h.c:105: Warning: 
+[eva:alarm] string_h.c:115: Warning: 
   function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status invalid.
 [eva] Done for function strtok_r
 [eva] Recording results for test_strtok_r
 [eva] Done for function test_strtok_r
 [eva] computing for function strdup <- main.
-  Called from string_h.c:146.
+  Called from string_h.c:164.
 [eva] using specification for function strdup
-[eva:libc:unsupported-spec] string_h.c:146: Warning: 
+[eva:libc:unsupported-spec] string_h.c:164: Warning: 
   The specification of function 'strdup' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/string.c' to the analyzed source files.
-[eva] string_h.c:146: Warning: ignoring unsupported allocates clause
-[eva] string_h.c:146: 
+[eva] string_h.c:164: Warning: ignoring unsupported allocates clause
+[eva] string_h.c:164: 
   function strdup: precondition 'valid_string_s' got status valid.
 [eva] Done for function strdup
 [eva] computing for function strndup <- main.
-  Called from string_h.c:147.
+  Called from string_h.c:165.
 [eva] using specification for function strndup
-[eva:libc:unsupported-spec] string_h.c:147: Warning: 
+[eva:libc:unsupported-spec] string_h.c:165: Warning: 
   The specification of function 'strndup' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/string.c' to the analyzed source files.
-[eva] string_h.c:147: Warning: ignoring unsupported allocates clause
-[eva] string_h.c:147: 
+[eva] string_h.c:165: Warning: ignoring unsupported allocates clause
+[eva] string_h.c:165: 
   function strndup: precondition 'valid_string_s' got status valid.
 [eva] Done for function strndup
 [eva] computing for function strsignal <- main.
-  Called from string_h.c:148.
+  Called from string_h.c:166.
 [eva] using specification for function strsignal
 [eva] Done for function strsignal
-[eva] string_h.c:149: assertion got status valid.
+[eva] string_h.c:167: check got status valid.
 [eva] computing for function test_strncpy <- main.
-  Called from string_h.c:150.
+  Called from string_h.c:168.
 [eva] computing for function strncpy <- test_strncpy <- main.
-  Called from string_h.c:113.
+  Called from string_h.c:123.
 [eva] using specification for function strncpy
-[eva] string_h.c:113: 
+[eva] string_h.c:123: 
   function strncpy: precondition 'valid_nstring_src' got status valid.
-[eva] string_h.c:113: 
+[eva] string_h.c:123: 
   function strncpy: precondition 'room_nstring' got status valid.
-[eva] string_h.c:113: 
+[eva] string_h.c:123: 
   function strncpy: precondition 'separation' got status valid.
 [eva] Done for function strncpy
 [eva] computing for function strncpy <- test_strncpy <- main.
-  Called from string_h.c:118.
-[eva:alarm] string_h.c:118: Warning: 
+  Called from string_h.c:128.
+[eva:alarm] string_h.c:128: Warning: 
   function strncpy: precondition 'valid_nstring_src' got status invalid.
-[eva] string_h.c:118: 
+[eva] string_h.c:128: 
   function strncpy: no state left, precondition 'room_nstring' got status valid.
-[eva] string_h.c:118: 
+[eva] string_h.c:128: 
   function strncpy: no state left, precondition 'separation' got status valid.
 [eva] Done for function strncpy
 [eva] Recording results for test_strncpy
 [eva] Done for function test_strncpy
 [eva] computing for function test_strlcpy <- main.
-  Called from string_h.c:151.
+  Called from string_h.c:169.
 [eva] computing for function strlcpy <- test_strlcpy <- main.
-  Called from string_h.c:126.
+  Called from string_h.c:136.
 [eva] using specification for function strlcpy
-[eva] string_h.c:126: 
+[eva] string_h.c:136: 
   function strlcpy: precondition 'valid_string_src' got status valid.
-[eva] string_h.c:126: 
+[eva] string_h.c:136: 
   function strlcpy: precondition 'room_nstring' got status valid.
-[eva] string_h.c:126: 
+[eva] string_h.c:136: 
   function strlcpy: precondition 'separation' got status valid.
 [eva] Done for function strlcpy
 [eva] computing for function strlcpy <- test_strlcpy <- main.
-  Called from string_h.c:127.
-[eva] string_h.c:127: 
+  Called from string_h.c:137.
+[eva] string_h.c:137: 
   function strlcpy: precondition 'valid_string_src' got status valid.
-[eva] string_h.c:127: 
+[eva] string_h.c:137: 
   function strlcpy: precondition 'room_nstring' got status valid.
-[eva] string_h.c:127: 
+[eva] string_h.c:137: 
   function strlcpy: precondition 'separation' got status valid.
 [eva] Done for function strlcpy
 [eva] computing for function strlcat <- test_strlcpy <- main.
-  Called from string_h.c:128.
+  Called from string_h.c:138.
 [eva] using specification for function strlcat
-[eva:alarm] string_h.c:128: Warning: 
+[eva:alarm] string_h.c:138: Warning: 
   function strlcat: precondition 'valid_string_src' got status unknown.
-[eva:alarm] string_h.c:128: Warning: 
+[eva:alarm] string_h.c:138: Warning: 
   function strlcat: precondition 'valid_string_dest' got status unknown.
-[eva] string_h.c:128: 
+[eva] string_h.c:138: 
   function strlcat: precondition 'room_nstring' got status valid.
+[eva] string_h.c:138: 
+  function strlcat: precondition 'separation' got status valid.
 [eva] Done for function strlcat
 [eva] computing for function strlcpy <- test_strlcpy <- main.
-  Called from string_h.c:132.
-[eva:alarm] string_h.c:132: Warning: 
+  Called from string_h.c:142.
+[eva:alarm] string_h.c:142: Warning: 
   function strlcpy: precondition 'valid_string_src' got status invalid.
-[eva] string_h.c:132: 
+[eva] string_h.c:142: 
   function strlcpy: no state left, precondition 'room_nstring' got status valid.
-[eva] string_h.c:132: 
+[eva] string_h.c:142: 
   function strlcpy: no state left, precondition 'separation' got status valid.
 [eva] Done for function strlcpy
 [eva] Recording results for test_strlcpy
 [eva] Done for function test_strlcpy
-[eva] string_h.c:154: Call to builtin strchr
-[eva] string_h.c:154: 
+[eva] computing for function test_strrchr <- main.
+  Called from string_h.c:170.
+[eva] computing for function strrchr <- test_strrchr <- main.
+  Called from string_h.c:149.
+[eva] using specification for function strrchr
+[eva] string_h.c:149: 
+  function strrchr: precondition 'valid_string_s' got status valid.
+[eva] Done for function strrchr
+[eva:alarm] string_h.c:150: Warning: check got status unknown.
+[eva] computing for function strrchr <- test_strrchr <- main.
+  Called from string_h.c:151.
+[eva] string_h.c:151: 
+  function strrchr: precondition 'valid_string_s' got status valid.
+[eva] Done for function strrchr
+[eva:alarm] string_h.c:152: Warning: check got status unknown.
+[eva] Recording results for test_strrchr
+[eva] Done for function test_strrchr
+[eva] string_h.c:173: Call to builtin strchr
+[eva] string_h.c:173: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:181: 
+[eva] FRAMAC_SHARE/libc/string.h:202: 
   cannot evaluate ACSL term, unsupported logic var p
+[eva:alarm] string_h.c:173: Warning: check got status unknown.
 [eva] computing for function strchrnul <- main.
-  Called from string_h.c:155.
+  Called from string_h.c:174.
 [eva] using specification for function strchrnul
-[eva] string_h.c:155: 
+[eva] string_h.c:174: 
   function strchrnul: precondition 'valid_string_s' got status valid.
 [eva] Done for function strchrnul
-[eva] string_h.c:157: Call to builtin strchr
-[eva] string_h.c:157: 
+[eva] string_h.c:176: Call to builtin strchr
+[eva] string_h.c:176: 
   function strchr: precondition 'valid_string_s' got status valid.
 [eva] computing for function strchrnul <- main.
-  Called from string_h.c:158.
-[eva] string_h.c:158: 
+  Called from string_h.c:177.
+[eva] string_h.c:177: 
   function strchrnul: precondition 'valid_string_s' got status valid.
 [eva] Done for function strchrnul
 [eva] computing for function mempcpy <- main.
-  Called from string_h.c:160.
+  Called from string_h.c:179.
 [eva] using specification for function mempcpy
-[eva] string_h.c:160: 
+[eva] string_h.c:179: 
   function mempcpy: precondition 'valid_dest' got status valid.
-[eva] string_h.c:160: 
+[eva] string_h.c:179: 
   function mempcpy: precondition 'valid_src' got status valid.
-[eva] string_h.c:160: 
+[eva] string_h.c:179: 
   function mempcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:114: 
+[eva] FRAMAC_SHARE/libc/string.h:131: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[kernel] string_h.c:160: Warning: using size of 'void'
+[kernel] string_h.c:179: Warning: using size of 'void'
 [eva] Done for function mempcpy
-[eva:alarm] string_h.c:161: Warning: assertion 'imprecise' got status unknown.
+[eva:alarm] string_h.c:180: Warning: check 'imprecise' got status unknown.
+[eva] string_h.c:182: Call to builtin strlen
+[eva] string_h.c:182: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva] computing for function memrchr <- main.
+  Called from string_h.c:182.
+[eva] using specification for function memrchr
+[eva] string_h.c:182: function memrchr: precondition 'valid' got status valid.
+[eva] string_h.c:182: 
+  function memrchr: precondition 'initialization' got status valid.
+[eva] string_h.c:182: 
+  function memrchr: precondition 'danglingness' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:99: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
+[eva] FRAMAC_SHARE/libc/string.h:103: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function memchr
+[eva] Done for function memrchr
+[eva:alarm] string_h.c:183: Warning: check 'imprecise' got status unknown.
+[eva] string_h.c:184: Call to builtin strlen
+[eva] string_h.c:184: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva] computing for function memrchr <- main.
+  Called from string_h.c:184.
+[eva] string_h.c:184: function memrchr: precondition 'valid' got status valid.
+[eva] string_h.c:184: 
+  function memrchr: precondition 'initialization' got status valid.
+[eva] string_h.c:184: 
+  function memrchr: precondition 'danglingness' got status valid.
+[eva] Done for function memrchr
+[eva:alarm] string_h.c:185: Warning: check 'imprecise' got status unknown.
+[eva] computing for function memmem <- main.
+  Called from string_h.c:190.
+[eva] using specification for function memmem
+[eva] string_h.c:190: 
+  function memmem: precondition 'valid_haystack' got status valid.
+[eva] string_h.c:190: 
+  function memmem: precondition 'valid_needle' got status valid.
+[eva] Done for function memmem
+[eva:alarm] string_h.c:191: Warning: check 'imprecise' got status unknown.
+[eva] computing for function memmem <- main.
+  Called from string_h.c:194.
+[eva] string_h.c:194: 
+  function memmem: precondition 'valid_haystack' got status valid.
+[eva] string_h.c:194: 
+  function memmem: precondition 'valid_needle' got status valid.
+[eva] Done for function memmem
+[eva:alarm] string_h.c:195: Warning: check 'imprecise' got status unknown.
+[eva] computing for function strsep <- main.
+  Called from string_h.c:199.
+[eva] using specification for function strsep
+[eva] string_h.c:199: 
+  function strsep: precondition 'valid_stringp' got status valid.
+[eva] string_h.c:199: 
+  function strsep, behavior valid_stringp: precondition 'valid_string_stringp' got status valid.
+[eva] Done for function strsep
+[eva] string_h.c:200: check got status valid.
+[eva] computing for function strsep <- main.
+  Called from string_h.c:201.
+[eva] string_h.c:201: 
+  function strsep: precondition 'valid_stringp' got status valid.
+[eva] string_h.c:201: 
+  function strsep, behavior valid_stringp: precondition 'valid_string_stringp' got status valid.
+[eva] Done for function strsep
+[eva] string_h.c:202: check got status valid.
+[eva] computing for function strsep <- main.
+  Called from string_h.c:204.
+[eva] string_h.c:204: 
+  function strsep: precondition 'valid_stringp' got status valid.
+[eva:invalid-assigns] string_h.c:204: 
+  Completely invalid destination for assigns clause *(*(stringp + (0 ..))).
+  Ignoring.
+[eva] Done for function strsep
+[eva] string_h.c:205: check got status valid.
+[eva] computing for function stpncpy <- main.
+  Called from string_h.c:209.
+[eva] using specification for function stpncpy
+[eva] string_h.c:209: 
+  function stpncpy: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:209: 
+  function stpncpy: precondition 'valid_dest' got status valid.
+[eva] string_h.c:209: 
+  function stpncpy: precondition 'separation' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:627: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
+[eva] Done for function stpncpy
+[eva] string_h.c:210: check got status valid.
+[eva:alarm] string_h.c:211: Warning: check got status unknown.
+[eva] computing for function stpncpy <- main.
+  Called from string_h.c:213.
+[eva] string_h.c:213: 
+  function stpncpy: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:213: 
+  function stpncpy: precondition 'valid_dest' got status valid.
+[eva] string_h.c:213: 
+  function stpncpy: precondition 'separation' got status valid.
+[eva] FRAMAC_SHARE/libc/string.h:621: 
+  cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
+[eva] Done for function stpncpy
+[eva:alarm] string_h.c:214: Warning: check got status unknown.
+[eva:alarm] string_h.c:215: Warning: check got status unknown.
+[eva] string_h.c:216: check got status valid.
+[eva] computing for function strlcat <- main.
+  Called from string_h.c:220.
+[eva] string_h.c:220: 
+  function strlcat: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:220: 
+  function strlcat: precondition 'valid_string_dest' got status valid.
+[eva] string_h.c:220: 
+  function strlcat: precondition 'room_nstring' got status valid.
+[eva] string_h.c:220: 
+  function strlcat: precondition 'separation' got status valid.
+[eva] Done for function strlcat
+[eva:alarm] string_h.c:221: Warning: check 'imprecise' got status unknown.
+[eva] computing for function strlcat <- main.
+  Called from string_h.c:222.
+[eva:alarm] string_h.c:222: Warning: 
+  function strlcat: precondition 'valid_string_src' got status unknown.
+[eva:alarm] string_h.c:222: Warning: 
+  function strlcat: precondition 'valid_string_dest' got status unknown.
+[eva] string_h.c:222: 
+  function strlcat: precondition 'room_nstring' got status valid.
+[eva] string_h.c:222: 
+  function strlcat: precondition 'separation' got status valid.
+[eva] Done for function strlcat
+[eva] computing for function strlcat <- main.
+  Called from string_h.c:227.
+[eva] string_h.c:227: 
+  function strlcat: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:227: 
+  function strlcat: precondition 'valid_string_dest' got status valid.
+[eva] string_h.c:227: 
+  function strlcat: precondition 'room_nstring' got status valid.
+[eva:alarm] string_h.c:227: Warning: 
+  function strlcat: precondition 'separation' got status invalid.
+[eva] Done for function strlcat
+[eva] computing for function strlcat <- main.
+  Called from string_h.c:231.
+[eva] string_h.c:231: 
+  function strlcat: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:231: 
+  function strlcat: precondition 'valid_string_dest' got status valid.
+[eva] string_h.c:231: 
+  function strlcat: precondition 'room_nstring' got status valid.
+[eva] string_h.c:231: 
+  function strlcat: precondition 'separation' got status valid.
+[eva] Done for function strlcat
+[eva] computing for function strlcat <- main.
+  Called from string_h.c:235.
+[eva] string_h.c:235: 
+  function strlcat: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:235: 
+  function strlcat: precondition 'valid_string_dest' got status valid.
+[eva] string_h.c:235: 
+  function strlcat: precondition 'room_nstring' got status valid.
+[eva] string_h.c:235: 
+  function strlcat: precondition 'separation' got status valid.
+[eva] Done for function strlcat
+[eva] computing for function strxfrm <- main.
+  Called from string_h.c:240.
+[eva] using specification for function strxfrm
+[eva] string_h.c:240: 
+  function strxfrm: precondition 'valid_dest' got status valid.
+[eva] string_h.c:240: 
+  function strxfrm: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:240: 
+  function strxfrm: precondition 'separation' got status valid.
+[eva] Done for function strxfrm
+[eva] computing for function strxfrm <- main.
+  Called from string_h.c:242.
+[eva] string_h.c:242: 
+  function strxfrm: precondition 'valid_dest' got status valid.
+[eva] string_h.c:242: 
+  function strxfrm: precondition 'valid_string_src' got status valid.
+[eva] string_h.c:242: 
+  function strxfrm: precondition 'separation' got status valid.
+[eva] Done for function strxfrm
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -368,7 +621,7 @@
          [1..5] ∈ [--..--] or UNINITIALIZED
          [6..9] ∈ UNINITIALIZED
 [eva:final-states] Values at end of function test_strcmp:
-  res ∈ {0}
+  res ∈ [--..--]
 [eva:final-states] Values at end of function test_strlcpy:
   buf[0..15] ∈ [--..--]
   buf2[0..5] ∈ [--..--]
@@ -385,6 +638,12 @@
       [1..99] ∈ [--..--] or UNINITIALIZED
   source[0..98] ∈ {90}
         [99] ∈ {0}
+  buf1[0] ∈ {97}
+      [1] ∈ {98}
+      [2] ∈ {0}
+      [3] ∈ {99}
+      [4] ∈ {100}
+      [5..7] ∈ [--..--]
 [eva:final-states] Values at end of function test_strncpy:
   src[0] ∈ {97}
      [1] ∈ {98}
@@ -393,30 +652,33 @@
   src2[0] ∈ {97}
       [1] ∈ {98}
       [2] ∈ UNINITIALIZED
+[eva:final-states] Values at end of function test_strrchr:
+  s1 ∈ {{ "not a palyndrome" }}
+  p ∈ {{ NULL ; "not a palyndrome" + [0..16] }}
 [eva:final-states] Values at end of function test_strstr:
   s ∈ {{ "aba" ; "bab" }}
   needle ∈ {{ "a" ; "b" }}
-  res ∈ {{ "aba" + {0; 1; 2; 3} ; "bab" + {0; 1; 2; 3} }}
+  res ∈ {{ NULL ; "aba" + {0; 1; 2; 3} ; "bab" + {0; 1; 2; 3} }}
 [eva:final-states] Values at end of function test_strtok:
-  __fc_strtok_ptr ∈ {{ "constant!" + [0..--] }}
+  __fc_strtok_ptr ∈ {{ "constant!" + [0..9] }}
   buf[0..1] ∈ [--..--]
   a ∈ {{ NULL ; &buf{[0], [1]} }}
   b ∈ {{ NULL ; &buf{[0], [1]} }}
   buf2[0..3] ∈ [--..--]
   p ∈ {{ NULL ; &buf2{[0], [1], [2], [3]} }}
-  q ∈ {{ NULL ; &buf2 + [0..--] }}
-  r ∈ {0}
+  q ∈ {{ NULL ; &buf2{[0], [1], [2], [3]} }}
+  r ∈ {{ NULL ; "constant!" + [0..9] }}
 [eva:final-states] Values at end of function test_strtok_r:
-  saveptr ∈ {{ "constant!" + [0..--] }}
+  saveptr ∈ {{ "constant!" + [0..9] }}
   buf[0..1] ∈ [--..--]
   a ∈ {{ NULL ; &buf{[0], [1]} }}
   b ∈ {{ NULL ; &buf{[0], [1]} }}
   buf2[0..3] ∈ [--..--]
   p ∈ {{ NULL ; &buf2{[0], [1], [2], [3]} }}
-  q ∈ {{ NULL ; &buf2 + [0..--] }}
-  r ∈ {0}
+  q ∈ {{ NULL ; &buf2{[0], [1], [2], [3]} }}
+  r ∈ {{ NULL ; "constant!" + [0..9] }}
 [eva:final-states] Values at end of function main:
-  __fc_strtok_ptr ∈ {{ "constant!" + [0..--] }}
+  __fc_strtok_ptr ∈ {{ "constant!" + [0..9] }}
   a ∈ [--..--]
   b ∈ [--..--]
   strsig ∈ {{ &__fc_strsignal[0] }}
@@ -428,5 +690,58 @@
   nul2 ∈ {{ "haystack" + [0..8] }}
   pdest[0..8] ∈ [--..--] or UNINITIALIZED
        [9] ∈ UNINITIALIZED
-  pend ∈ {{ &pdest[9] }}
+  pend ∈ {{ &pdest + [--..--] }}
+  rchr ∈ {{ NULL ; "haystack" + [0..8] }}
+  mm_haystack[0] ∈ {73}
+             [1] ∈ {104}
+             [2] ∈ {97}
+             [3] ∈ {118}
+             [4] ∈ {101}
+             [5] ∈ {0}
+             [6] ∈ {122}
+             [7] ∈ {101}
+             [8] ∈ {114}
+             [9] ∈ {111}
+  mm_needle[0] ∈ {122}
+           [1] ∈ {101}
+           [2] ∈ {114}
+           [3] ∈ {111}
+  memm ∈ {{ NULL ; &mm_haystack + [0..9] }}
+  mm_needle2[0] ∈ {48}
+  strsep_buf[0] ∈ [--..--]
+            [1] ∈ {44}
+            [2] ∈ {98}
+            [3..4] ∈ {44}
+            [5..6] ∈ {99}
+            [7] ∈ {0}
+  strsep_p1 ∈ {{ &strsep_buf[0] }}
+  strsep_needle[0] ∈ {44}
+               [1] ∈ {46}
+               [2] ∈ {47}
+               [3] ∈ {0}
+  strsep_p2 ∈ {0}
+  strsep_null ∈ {0}
+  stpncpy_src ∈ {{ "12345678" }}
+  stpncpy_dest[0..4] ∈ [--..--]
+  stpncpy_res ∈ {{ &stpncpy_dest[2] }}
+  stpncpy_src2 ∈ {{ "12" }}
+  strlcat_src ∈ {{ "cat" }}
+  strlcat_buf[0] ∈ [--..--]
+             [1] ∈ {111}
+             [2] ∈ {103}
+             [3..9] ∈ [--..--]
+  strlcat_res ∈ [--..--]
+  strlcat_buf2[0] ∈ {100}
+              [1] ∈ {111}
+              [2] ∈ {103}
+              [3..4] ∈ [--..--]
+              [5] ∈ {116}
+              [6..9] ∈ {0}
+  strlcat_buf3[0] ∈ {100}
+              [1] ∈ {111}
+              [2] ∈ {103}
+              [3..9] ∈ [--..--]
+  strxfrm_src ∈ {{ "harr" }}
+  strxfrm_res ∈ [--..--]
+  strxfrm_dest[0..9] ∈ [--..--] or UNINITIALIZED
   __retres ∈ {0}

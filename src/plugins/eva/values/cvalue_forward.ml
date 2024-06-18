@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -377,7 +377,7 @@ let forward_minus_pp ~typ ev1 ev2 =
    The function must behave as if it was acting on unbounded integers *)
 let forward_binop_int ~typ ev1 op ev2 =
   match op with
-  | PlusPI  -> V.add_untyped ~factor:(Bit_utils.osizeof_pointed typ) ev1 ev2
+  | Eva_ast.PlusPI  -> V.add_untyped ~factor:(Bit_utils.osizeof_pointed typ) ev1 ev2
   | MinusPI ->
     let int_base = Int_Base.neg (Bit_utils.osizeof_pointed typ) in
     V.add_untyped ~factor:int_base ev1 ev2
@@ -403,7 +403,7 @@ let forward_binop_int ~typ ev1 op ev2 =
       ~contains_zero: (V.contains_zero ev1 || V.contains_zero ev2)
       ~contains_non_zero:(V.contains_non_zero ev1 && V.contains_non_zero ev2)
   | Eq | Ne | Ge | Le | Gt | Lt ->
-    let op = Eva_utils.conv_comp op in
+    let op = Eva_ast.conv_relation op in
     let signed = Bit_utils.is_signed_int_enum_pointer (Cil.unrollType typ) in
     V.inject_comp_result (V.forward_comp_int ~signed op ev1 ev2)
 
@@ -416,12 +416,12 @@ let forward_binop_float fkind ev1 op ev2 =
       V.inject_float (f fkind f1 f2)
     in
     match op with
-    | PlusA ->   binary_float_floats "+." Fval.add
+    | Eva_ast.PlusA ->   binary_float_floats "+." Fval.add
     | MinusA ->  binary_float_floats "-." Fval.sub
     | Mult ->    binary_float_floats "*." Fval.mul
     | Div ->     binary_float_floats "/." Fval.div
     | Eq | Ne | Lt | Gt | Le | Ge ->
-      let op = Eva_utils.conv_comp op in
+      let op = Eva_ast.conv_relation op in
       V.inject_comp_result (Fval.forward_comp op f1 f2)
     | _ -> assert false
 
@@ -448,7 +448,7 @@ let forward_uneg v t =
 
 let forward_unop typ op value =
   match op with
-  | Neg -> forward_uneg value typ
+  | Eva_ast.Neg -> forward_uneg value typ
   | BNot -> begin
       match Cil.unrollType typ with
       | TInt (ik, _) | TEnum ({ekind=ik}, _) ->

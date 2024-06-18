@@ -118,8 +118,6 @@ stdenvNoCC.mkDerivation rec {
   outputs = [ "out" ];
 
   preConfigure = ''
-    patchShebangs src/plugins/eva/gen-api.sh
-    chmod +x src/plugins/eva/gen-api.sh
     dune build @frama-c-configure
   '';
 

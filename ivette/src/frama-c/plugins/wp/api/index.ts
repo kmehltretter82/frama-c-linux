@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -88,6 +88,7 @@ const getProvers_internal: Server.GetRequest<null,prover[]> = {
   name: 'plugins.wp.getProvers',
   input: Json.jNull,
   output: Json.jArray(jProver),
+  fallback: [],
   signals: [],
 };
 /** Getter for state [`provers`](#provers)  */
@@ -98,6 +99,7 @@ const setProvers_internal: Server.SetRequest<prover[],null> = {
   name: 'plugins.wp.setProvers',
   input: Json.jArray(jProver),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Setter for state [`provers`](#provers)  */
@@ -122,6 +124,7 @@ const getProcess_internal: Server.GetRequest<null,number> = {
   name: 'plugins.wp.getProcess',
   input: Json.jNull,
   output: Json.jNumber,
+  fallback: 0,
   signals: [],
 };
 /** Getter for state [`process`](#process)  */
@@ -132,6 +135,7 @@ const setProcess_internal: Server.SetRequest<number,null> = {
   name: 'plugins.wp.setProcess',
   input: Json.jNumber,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Setter for state [`process`](#process)  */
@@ -156,6 +160,7 @@ const getTimeout_internal: Server.GetRequest<null,number> = {
   name: 'plugins.wp.getTimeout',
   input: Json.jNull,
   output: Json.jNumber,
+  fallback: 0,
   signals: [],
 };
 /** Getter for state [`timeout`](#timeout)  */
@@ -166,6 +171,7 @@ const setTimeout_internal: Server.SetRequest<number,null> = {
   name: 'plugins.wp.setTimeout',
   input: Json.jNumber,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Setter for state [`timeout`](#timeout)  */
@@ -221,6 +227,7 @@ const reloadProverInfos_internal: Server.GetRequest<null,null> = {
   name: 'plugins.wp.reloadProverInfos',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`ProverInfos`](#proverinfos)  */
@@ -240,6 +247,7 @@ const fetchProverInfos_internal: Server.GetRequest<
             updated: Json.jArray(jProverInfosData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`ProverInfos`](#proverinfos)  */
@@ -441,6 +449,7 @@ const reloadGoals_internal: Server.GetRequest<null,null> = {
   name: 'plugins.wp.reloadGoals',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`goals`](#goals)  */
@@ -459,6 +468,7 @@ const fetchGoals_internal: Server.GetRequest<
             updated: Json.jArray(jGoalsData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`goals`](#goals)  */
@@ -490,6 +500,7 @@ const generateRTEGuards_internal: Server.ExecRequest<marker,null> = {
   name: 'plugins.wp.generateRTEGuards',
   input: jMarker,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Generate RTE guards for the function */
@@ -500,6 +511,7 @@ const startProofs_internal: Server.ExecRequest<marker,null> = {
   name: 'plugins.wp.startProofs',
   input: jMarker,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Generate goals and run provers */
@@ -523,6 +535,7 @@ const getScheduledTasks_internal: Server.GetRequest<
             done: Json.jNumber,
             todo: Json.jNumber,
           }),
+  fallback: { procs: 0, active: 0, done: 0, todo: 0 },
   signals: [ { name: 'plugins.wp.serverActivity' } ],
 };
 /** Scheduled tasks in proof server */
@@ -536,6 +549,7 @@ const cancelProofTasks_internal: Server.SetRequest<null,null> = {
   name: 'plugins.wp.cancelProofTasks',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Cancel all scheduled proof tasks */

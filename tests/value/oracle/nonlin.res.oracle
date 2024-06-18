@@ -33,11 +33,11 @@
 [eva:alarm] nonlin.c:38: Warning: 
   signed overflow.
   assert (int)((int)z + 17817) * (int)((int)z + 17817) ≤ 2147483647;
+[eva:nonlin] nonlin.c:45: non-linear 'i1 * i1', lv 'i1'
 [eva:nonlin] nonlin.c:45: 
   non-linear '(i2 + (long long)3) * (i2 + (long long)3)', lv 'i2'
-[eva:nonlin] nonlin.c:45: non-linear 'i1 * i1', lv 'i1'
-[eva:nonlin] nonlin.c:45: subdividing on i2
 [eva:nonlin] nonlin.c:45: subdividing on i1
+[eva:nonlin] nonlin.c:45: subdividing on i2
 [eva:alarm] nonlin.c:49: Warning: assertion got status unknown.
 [eva:nonlin] nonlin.c:50: non-linear '(int)idx * (int)idx', lv 'idx'
 [eva:nonlin] nonlin.c:50: subdividing on idx

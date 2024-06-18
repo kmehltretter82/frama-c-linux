@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -24,7 +24,10 @@
 #define Frama_C_BUILTIN
 #include "features.h"
 __PUSH_FC_STDLIB
-#include "__fc_define_size_t.h"
+#include "__fc_alloc_axiomatic.h"
+#include "__fc_define_wint_t.h"
+#include "stddef.h"
+#include "stdint.h"
 
 __BEGIN_DECLS
 
@@ -36,6 +39,13 @@ extern volatile int Frama_C_entropy_source __attribute__((unused));
     ensures initialization: \initialized(p + (0 .. l-1));
 */
 extern void Frama_C_make_unknown(char *p, size_t l) __attribute__((FC_BUILTIN));
+
+/*@ requires valid_p: \valid(p + (0 .. l-1));
+    assigns p[0 .. l-1] \from Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+    ensures initialization: \initialized(p + (0 .. l-1));
+*/
+extern void Frama_C_make_unknown_wchar(wchar_t *p, size_t l) __attribute__((FC_BUILTIN));
 
 /*@ assigns \result \from a, b, Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
@@ -154,21 +164,69 @@ extern long long Frama_C_long_long_interval(long long min, long long max)
 extern size_t Frama_C_size_t_interval(size_t min, size_t max)
     __attribute__((FC_BUILTIN));
 
-/*@ requires finite: \is_finite(min) && \is_finite(max);
-    requires order: min <= max;
+/*@ requires order: min <= max;
     assigns \result \from min, max, Frama_C_entropy_source;
     assigns Frama_C_entropy_source \from Frama_C_entropy_source;
-    ensures result_bounded: \is_finite(\result) && min <= \result <= max;
+    ensures result_bounded: min <= \result <= max ;
  */
+extern intmax_t Frama_C_intmax_t_interval(intmax_t min, intmax_t max)
+    __attribute__((FC_BUILTIN));
+
+/*@ requires order: min <= max;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+    ensures result_bounded: min <= \result <= max ;
+ */
+extern uintmax_t Frama_C_uintmax_t_interval(uintmax_t min, uintmax_t max)
+    __attribute__((FC_BUILTIN));
+
+/*@ requires order: min <= max;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+    ensures result_bounded: min <= \result <= max ;
+ */
+extern ptrdiff_t Frama_C_ptrdiff_t_interval(ptrdiff_t min, ptrdiff_t max)
+    __attribute__((FC_BUILTIN));
+
+/*@ requires order: min <= max;
+    assigns \result \from min, max, Frama_C_entropy_source;
+    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+    ensures result_bounded: min <= \result <= max ;
+ */
+extern wint_t Frama_C_wint_t_interval(wint_t min, wint_t max)
+    __attribute__((FC_BUILTIN));
+
+/*@
+  assigns \result \from min, max, Frama_C_entropy_source;
+  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+  behavior finite:
+    assumes finite: \is_finite(min) && \is_finite(max);
+    requires order: min <= max;
+    ensures result_bounded: \is_finite(\result) && min <= \result <= max;
+  behavior infinite_not_nan:
+    assumes infinite: \is_infinite(min) || \is_infinite(max);
+    assumes not_nan: !\is_NaN(min) && !\is_NaN(max);
+    requires order: min <= max;
+    ensures result_bounded: !\is_NaN(\result) && min <= \result <= max;
+  disjoint behaviors;
+*/
 extern float Frama_C_float_interval(float min, float max)
     __attribute__((FC_BUILTIN));
 
-/*@ requires finite: \is_finite(min) && \is_finite(max);
+/*@
+  assigns \result \from min, max, Frama_C_entropy_source;
+  assigns Frama_C_entropy_source \from Frama_C_entropy_source;
+  behavior finite:
+    assumes finite: \is_finite(min) && \is_finite(max);
     requires order: min <= max;
-    assigns \result \from min, max, Frama_C_entropy_source;
-    assigns Frama_C_entropy_source \from Frama_C_entropy_source;
     ensures result_bounded: \is_finite(\result) && min <= \result <= max;
- */
+  behavior infinite_not_nan:
+    assumes infinite: \is_infinite(min) || \is_infinite(max);
+    assumes not_nan: !\is_NaN(min) && !\is_NaN(max);
+    requires order: min <= max;
+    ensures result_bounded: !\is_NaN(\result) && min <= \result <= max;
+  disjoint behaviors;
+*/
 extern double Frama_C_double_interval(double min, double max)
     __attribute__((FC_BUILTIN));
 
@@ -192,6 +250,11 @@ __attribute__((FC_BUILTIN));
 /*@ assigns \result \from p; */
 extern size_t Frama_C_offset(const void *p) __attribute__((FC_BUILTIN));
 
+/*@
+  allocates \result;
+  assigns __fc_heap_status \from size, __fc_heap_status;
+  assigns \result \from indirect:size, indirect:__fc_heap_status;
+*/
 extern void *Frama_C_malloc_fresh(size_t size) __attribute__((FC_BUILTIN));
 
 //@ assigns \result \from i;

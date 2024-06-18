@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -90,6 +90,10 @@ let unsupported_specifications =
     "strerror", "string.c";
     "strndup", "string.c";
     "unsetenv", "stdlib.c";
+    "vasprintf", "stdio.c";
+    "vfscanf", "stdio.c";
+    "vscanf", "stdio.c";
+    "wcsdup", "wchar.c";
   ]
 
 let unsupported_specs_tbl =

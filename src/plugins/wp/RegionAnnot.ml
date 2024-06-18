@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -468,7 +468,7 @@ let typecheck typing_context _loc ps =
 
 let of_extid = Hashtbl.find registry
 let of_extrev = function
-  | { ext_name="region" ; ext_kind = Ext_id k } -> of_extid k
+  | { ext_name="wpregion" ; ext_kind = Ext_id k } -> of_extid k
   | _ -> raise Not_found
 let of_extension e = List.rev (of_extrev e)
 let of_behavior bhv =
@@ -498,7 +498,7 @@ let register () =
   then
     begin
       registered := true ;
-      Acsl_extension.register_behavior ~plugin:"wp" "region"
+      Acsl_extension.register_behavior ~plugin:"wp" "wpregion"
         typecheck ~printer:pp_extension false
     end
 

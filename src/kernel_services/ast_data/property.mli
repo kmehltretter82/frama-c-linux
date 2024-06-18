@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -508,14 +508,14 @@ val get_kf: identified_property -> kernel_function option
 val get_ir: identified_property -> identified_reachable
 (** For a given property, returns its corresponding [kernel_function], [kinstr]
     and program point.
-    @since Frama-C+dev *)
+    @since 29.0-Copper *)
 
 val get_prog_state: identified_property -> identified_reachable
 (** Uses [get_ir]. If [ir_kf] is [Some kf] and [ir_kinstr] is
     [Kglobal], we try to attach a statement depending on [ir_program_point] :
     the first statement of [kf] for [Before], the return statement of kf for
     [After].
-    @since Frama-C+dev *)
+    @since 29.0-Copper *)
 
 val get_behavior: identified_property -> funbehavior option
 val get_names: identified_property -> string list

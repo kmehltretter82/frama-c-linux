@@ -125,15 +125,14 @@ void test_strcat(void)
   //@assert p == s;
   //@assert s[0] == 'h' && s[4] == 'o' && s[5] == 0;
   s[4] = 0;
-  s[5] = 'h';
-  s[6] = 'e';
   s[7] = 'l';
-  s[8] = 0;
-  strcat(s, s+5);
-  //@assert s[3] == 'l' && s[4] == 'h' && s[6] == 'l' && s[7] == 0;
+  s[8] = 'o';
+  s[9] = 0;
+  strcat(s, s+7);
+  //@assert s[3] == 'l' && s[4] == 'l' && s[5] == 'o' && s[6] == 0;
   strcat(s, "");
   strcat(s, "x");
-  //@assert s[7] == 'x' && s[8] == 0;
+  //@assert s[6] == 'x' && s[7] == 0;
 }
 
 void test_strcpy(void)

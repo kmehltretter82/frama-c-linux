@@ -1,6 +1,7 @@
 [kernel] Parsing too_large_array.i (no preprocessing)
-[kernel] too_large_array.i:12: User Error: Array length is too large.
+[kernel:too-large-array] too_large_array.i:12: Warning: 
+  Array length is too large.
 [kernel] too_large_array.i:12: Warning: 
   Cannot represent length of array as an attribute
-[kernel] User Error: stopping on file "too_large_array.i" that has errors.
+[kernel] Warning: warning too-large-array treated as deferred error. See above messages for more information.
 [kernel] Frama-C aborted: invalid user input.

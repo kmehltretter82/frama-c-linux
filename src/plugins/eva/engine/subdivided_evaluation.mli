@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,14 +24,13 @@
     for expressions in which some l-values appear multiple times, proceed
     by disjunction on their abstract value, in order to gain precision. *)
 
-open Cil_types
 open Eval
 
 module type Forward_Evaluation = sig
   type value
   type valuation
-  type context
-  val evaluate: subdivided:bool -> context -> valuation ->
+  type environment
+  val evaluate: subdivided:bool -> environment -> valuation ->
     exp -> (valuation * value) evaluated
 end
 
@@ -45,11 +44,11 @@ module Make
   : sig
 
     val evaluate:
-      Eva.context -> Valuation.t -> subdivnb:int ->
+      Eva.environment -> Valuation.t -> subdivnb:int ->
       exp -> (Valuation.t * Value.t) evaluated
 
     val reduce_by_enumeration:
-      Eva.context -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
+      Eva.environment -> Valuation.t -> exp -> bool -> Valuation.t or_bottom
   end
 
 

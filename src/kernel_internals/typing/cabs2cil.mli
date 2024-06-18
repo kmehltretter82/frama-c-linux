@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (** Registers a new hook that will be applied each time a side-effect free

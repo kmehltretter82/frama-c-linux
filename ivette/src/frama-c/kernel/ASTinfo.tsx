@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -143,7 +143,7 @@ function MarkInfos(props: InfoSectionProps): JSX.Element {
   const foreign = !!current && !!scope && current !== scope;
   const [unfold, setUnfold] = React.useState(true);
   const [expand, setExpand] = React.useState(false);
-  const markerFields = States.useRequest(Ast.getInformation, marker) ?? [];
+  const markerFields = States.useRequestValue(Ast.getInformation, marker);
   const isScrolled = marker === scrolled;
   const isHovered = marker === hovered;
   const isSelected = marker === selected;
@@ -273,7 +273,7 @@ export default function ASTinfo(): JSX.Element {
   const [setting, setSetting] = Dome.useStringSettings(filterSettings, '');
   const { scope: current, marker: selected } = States.useCurrentLocation();
   const hovered = States.useHovered();
-  const allFields = States.useRequest(Ast.getInformation, null) ?? [];
+  const allFields = States.useRequestValue(Ast.getInformation, null);
   const excluded = React.useMemo(() => makeFilter(setting), [setting]);
   Dome.useEvent(States.MetaSelection, (loc: States.Location) => {
     setMarkers(addMarker(markers, loc.marker));

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -173,7 +173,7 @@ struct
 
   let empty_rationing = new_rationing ~limit:0 ~merge:false
 
-  let split_return (flow : flow) (return_exp : exp option) : flow =
+  let split_return (flow : flow) (return_exp : Eva_ast.exp option) : flow =
     let strategy = Split_return.kf_strategy kf in
     if strategy = Split_strategy.FullSplit
     then flow
@@ -189,7 +189,7 @@ struct
         match return_exp with
         | None -> apply (Ration empty_rationing)
         | Some return_exp ->
-          if Cil.isIntegralOrPointerType (Cil.typeOf return_exp)
+          if Cil.isIntegralOrPointerType return_exp.typ
           then apply (Restrict (return_exp, i))
           else apply (Ration empty_rationing)
 

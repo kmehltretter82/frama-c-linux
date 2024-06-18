@@ -2147,6 +2147,29 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'getline'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            assigns *(*lineptr + (0 .. *n - 1)), *n, *stream, \result;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            assigns *(*lineptr + (0 .. *n - 1)) \from *stream;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            assigns *n \from *stream;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            assigns *stream \from *stream;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 584)
+            assigns \result \from *stream;
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'fmemopen'
 --------------------------------------------------------------------------------
 
@@ -2160,15 +2183,15 @@
             errno_set:
               __fc_errno ≡ \old(__fc_errno) ∨ __fc_errno ∈ {22, 24, 12}
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 592)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 593)
             assigns __fc_errno, \result;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 592)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 593)
             assigns __fc_errno
               \from (indirect: buf), (indirect: size),
                     (indirect: *(mode + (0 .. strlen{Old}(mode))));
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 594)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 595)
             assigns \result
               \from __fc_p_fopen, (indirect: buf), (indirect: size),
                     (indirect: *(mode + (0 .. strlen{Old}(mode))));
@@ -2176,7 +2199,7 @@
 [  Valid  ] Default behavior
             default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 601) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 592) 
             allocates \old(buf);
             Unverifiable but considered Valid.
 
@@ -2184,29 +2207,60 @@
 --- Properties of Function 'asprintf'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Post-condition 'result_error_or_written_byes'
+[ Extern  ] Post-condition 'result_error_or_written_bytes'
             ensures
-            result_error_or_written_byes: \result ≡ -1 ∨ \result ≥ 0
+            result_error_or_written_bytes: \result ≡ -1 ∨ \result ≥ 0
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 613)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 614)
             assigns __fc_heap_status, \result, *strp;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 613)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 614)
             assigns __fc_heap_status
               \from (indirect: *(fmt + (0 ..))), __fc_heap_status;
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 614)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 615)
             assigns \result
               \from (indirect: *(fmt + (0 ..))), (indirect: __fc_heap_status);
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 615)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 616)
             assigns *strp
               \from *(fmt + (0 ..)), (indirect: __fc_heap_status);
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             default behavior
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 618) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 613) 
+            allocates *\old(strp);
+            Unverifiable but considered Valid.
+
+--------------------------------------------------------------------------------
+--- Properties of Function 'vasprintf'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_error_or_written_bytes'
+            ensures
+            result_error_or_written_bytes: \result ≡ -1 ∨ \result ≥ 0
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/stdio.h, line 627)
+            assigns __fc_heap_status, \result, *strp;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 627)
+            assigns __fc_heap_status
+              \from (indirect: *(fmt + (0 ..))), (indirect: ap),
+                    __fc_heap_status;
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 629)
+            assigns \result
+              \from (indirect: *(fmt + (0 ..))), (indirect: __fc_heap_status);
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/stdio.h, line 630)
+            assigns *strp
+              \from *(fmt + (0 ..)), ap, (indirect: __fc_heap_status);
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            default behavior
+            by Frama-C kernel.
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/stdio.h, line 626) 
             allocates *\old(strp);
             Unverifiable but considered Valid.
 
@@ -4257,9 +4311,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   194 Completely validated
+   196 Completely validated
     16 Locally validated
-   570 Considered valid
+   581 Considered valid
     56 To be validated
-   836 Total
+   849 Total
 --------------------------------------------------------------------------------

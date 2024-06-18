@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -281,7 +281,7 @@ val append_pre_label: Lenv.t -> Lenv.t
 val append_init_label: Lenv.t -> Lenv.t
 
 (** returns the builtin label corresponding to the given name if it exists
-    @since Frama-C+dev
+    @since 29.0-Copper
 *)
 val builtin_label: string -> logic_builtin_label option
 

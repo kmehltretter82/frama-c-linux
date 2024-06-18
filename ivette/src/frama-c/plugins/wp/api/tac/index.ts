@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -228,6 +228,7 @@ const reloadTactical_internal: Server.GetRequest<null,null> = {
   name: 'plugins.wp.tac.reloadTactical',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`tactical`](#tactical)  */
@@ -247,6 +248,7 @@ const fetchTactical_internal: Server.GetRequest<
             updated: Json.jArray(jTacticalData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`tactical`](#tactical)  */
@@ -277,6 +279,7 @@ const configureTactics_internal: Server.ExecRequest<node,null> = {
   name: 'plugins.wp.tac.configureTactics',
   input: jNode,
   output: Json.jNull,
+  fallback: null,
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
 /** Configure all tactics */
@@ -295,6 +298,7 @@ const setParameter_internal: Server.ExecRequest<
            value: Json.jAny,
          }),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Configure tactical parameter */
@@ -308,6 +312,7 @@ const applyTactic_internal: Server.ExecRequest<tactic,node[]> = {
   name: 'plugins.wp.tac.applyTactic',
   input: jTactic,
   output: Json.jArray(jNode),
+  fallback: [],
   signals: [],
 };
 /** Applies the (configured) tactic */
@@ -318,6 +323,7 @@ const applyTacticAndProve_internal: Server.ExecRequest<tactic,node[]> = {
   name: 'plugins.wp.tac.applyTacticAndProve',
   input: jTactic,
   output: Json.jArray(jNode),
+  fallback: [],
   signals: [],
 };
 /** Applies tactic and run provers on children */

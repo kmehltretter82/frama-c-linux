@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -33,6 +33,11 @@ extern ssize_t getrandom (void *__buffer, size_t __length,
                           unsigned int __flags);
 
 extern int getentropy (void *__buffer, size_t __length);
+
+// Non-POSIX
+#define GRND_NONBLOCK 0x01
+#define GRND_RANDOM 0x02
+#define GRND_INSECURE 0x04
 
 __END_DECLS
 

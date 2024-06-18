@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -46,6 +46,7 @@ type unroll_annotation =
 
 type split_kind = Static | Dynamic
 
+(** Splits can be performed according to a C expression or an ACSL predicate. *)
 type split_term =
   | Expression of Cil_types.exp
   | Predicate of Cil_types.predicate

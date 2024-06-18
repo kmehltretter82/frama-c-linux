@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -32,13 +32,16 @@ void atomic_thread_fence(memory_order order) {}
 
 void atomic_signal_fence(memory_order order) {}
 
-_Bool __fc_atomic_is_lock_free(void *obj) { return Frama_C_nondet(0, 1); }
+_Bool __fc_atomic_is_lock_free(void *obj, size_t obj_size) {
+  return Frama_C_nondet(0, 1);
+}
 
-void __fc_atomic_store_marker(void *object, unsigned long long desired) {}
+void __fc_atomic_store_marker(void *object, unsigned long long desired,
+                              size_t obj_size) {}
 
 void __fc_atomic_store_explicit_marker(void *object,
                                        unsigned long long desired,
-                                       memory_order order) {}
+                                       memory_order order, size_t obj_size) {}
 
 unsigned long long __fc_atomic_load(void *obj, size_t obj_size) {
   if (obj_size == sizeof(char)) return *((volatile atomic_uchar *)obj);

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 
 (** Generic evaluation and reduction of expressions and left values. *)
@@ -29,6 +28,9 @@ module type S = sig
 
   (** State of abstract domain. *)
   type state
+
+  (** Context *)
+  type context
 
   (** Numeric values to which the expressions are evaluated. *)
   type value
@@ -94,7 +96,7 @@ module type S = sig
       expressions (including the possible pointer and offset of the lvalue). *)
   val lvaluate :
     ?valuation:Valuation.t -> ?subdivnb:int -> for_writing:bool ->
-    state -> lval -> (Valuation.t * loc * typ) evaluated
+    state -> lval -> (Valuation.t * loc) evaluated
 
   (** [reduce ~valuation state expr positive] evaluates the expression [expr]
       in the state [state], and then reduces the [valuation] such that

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -155,7 +155,7 @@ let make_recursion call depth =
   let substitution = get_stack call.kf depth in
   let add_if_copy acc argument =
     match argument.avalue with
-    | Copy ({ lval = Var vi, _ }, _) -> Varinfo.Set.add vi acc
+    | Copy ({ lval = { node = Var vi, _ } }, _) -> Varinfo.Set.add vi acc
     | _ -> acc
   in
   let empty = Varinfo.Set.empty in

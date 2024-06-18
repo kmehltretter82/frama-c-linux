@@ -2,7 +2,7 @@
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
 ;;                                                                        ;;
-;;  Copyright (C) 2007-2023                                               ;;
+;;  Copyright (C) 2007-2024                                               ;;
 ;;    CEA (Commissariat à l'énergie atomique et aux énergies              ;;
 ;;         alternatives)                                                  ;;
 ;;                                                                        ;;
@@ -289,6 +289,8 @@
 (analysis-scripts/creduce.sh as lib/analysis-scripts/creduce.sh)
 (analysis-scripts/detect_recursion.py as lib/analysis-scripts/detect_recursion.py)
 (analysis-scripts/estimate_difficulty.py as lib/analysis-scripts/estimate_difficulty.py)
+(analysis-scripts/external_tool.py as lib/analysis-scripts/external_tool.py)
+(analysis-scripts/fclog.py as lib/analysis-scripts/fclog.py)
 (analysis-scripts/find_fun.py as lib/analysis-scripts/find_fun.py)
 (analysis-scripts/flamegraph.pl as lib/analysis-scripts/flamegraph.pl)
 (analysis-scripts/frama_c_results.py as lib/analysis-scripts/frama_c_results.py)

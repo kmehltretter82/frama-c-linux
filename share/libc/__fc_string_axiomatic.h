@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -270,10 +270,6 @@ __BEGIN_DECLS
   @ }
   @*/
 
-/*@ logic ℤ minimum(ℤ i, ℤ j) = i < j ? i : j;
-  @ logic ℤ maximum(ℤ i, ℤ j) = i < j ? j : i;
-  @*/
-
 /*@ predicate valid_string{L}(char *s) =
   @   0 <= strlen(s) && \valid(s+(0..strlen(s)));
   @
@@ -299,6 +295,9 @@ __BEGIN_DECLS
   @
   @ predicate valid_wstring_or_null{L}(wchar_t *s) =
   @   s == \null || valid_wstring(s);
+  @
+  @ logic ℤ strnlen(char *s, ℤ n) =
+  @   \min(strlen(s), n);
   @*/
 
 __END_DECLS

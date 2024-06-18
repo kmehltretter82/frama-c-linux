@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -79,6 +79,9 @@
 (* The types of the Cil AST. *)
 open Cil_types
 
+type exp = Eva_ast.exp
+type lval = Eva_ast.lval
+
 (* Definition of the types frequently used in Eva. *)
 open Eval
 
@@ -127,6 +130,11 @@ module type Queries = sig
   (** Domain state. *)
   type state
 
+  (** Domains can optionally provide a context to be used by value abstractions
+      when evaluating expressions. This can be safely ignored for most domains.
+      Defined as unit (no context) by {!Domain_builder.Complete}. *)
+  type context
+
   (** Numerical values to which the expressions are evaluated. *)
   type value
 
@@ -166,27 +174,32 @@ module type Queries = sig
     state -> exp -> (value * origin option) evaluated
 
   (** Query function for lvalues:
-      [extract_lval ~oracle context t lval typ loc] returns the known value
-      stored at the location [loc] of the left value [lval] of type [typ].
+      [extract_lval ~oracle context t lval loc] returns the known value
+      stored at the location [loc] of the left value [lval].
       See above for more details on queries. *)
   val extract_lval :
     oracle:(exp -> value evaluated) -> evaluation_context ->
-    state -> lval -> typ -> location -> (value * origin option) evaluated
+    state -> lval -> location -> (value * origin option) evaluated
 
   (** [backward_location state lval typ loc v] reduces the location [loc] of the
-      lvalue [lval] of type [typ], so that only the locations that may have value
+      lvalue [lval], so that only the locations that may have value
       [v] are kept.
       The returned location must be included in [loc], but it is always sound
       to return [loc] itself.
       Also returns the value that may have the returned location, if not bottom.
       Defined by {!Domain_builder.Complete} with no reduction. *)
   val backward_location :
-    state -> lval -> typ -> location -> value -> (location * value) or_bottom
+    state -> lval -> location -> value -> (location * value) or_bottom
 
   (** Given a reduction [expr] = [value], provides more reductions that may
       be performed.
       Defined by {!Domain_builder.Complete} with no reduction. *)
   val reduce_further : state -> exp -> value -> (exp * value) list
+
+  (** Returns the current context to be used by value abstractions for the
+      evaluation of expressions or lvalues.
+      Defined by {!Domain_builder.Complete} with no context. *)
+  val build_context : state -> context or_bottom
 
 end
 
@@ -510,6 +523,11 @@ module type Leaf = sig
   (** The key identifies the domain and the type [t] of its states.
       Automatically created by {!Domain_builder.Complete}. *)
   val key: t key
+
+  (** The abstract context used by the domain.
+      It carries the [context] type used by the domain.
+      Defined by {!Domain_builder.Complete} for the unit context. *)
+  val context_dependencies : context Abstract_context.dependencies
 
   (** The abstract value used by the domain.
       It carries the [value] type used by the domain.

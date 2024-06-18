@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -158,7 +158,7 @@ export function useStatus(): Status {
   return status;
 }
 
-const running = (st: Status): boolean =>
+export const isRunningStatus = (st: Status): boolean =>
   (st === Status.ON || st === Status.CMD);
 
 /**
@@ -167,7 +167,7 @@ const running = (st: Status): boolean =>
  *  defined by status `ON` or `CMD`.
  */
 export function isRunning(): boolean {
-  return running(status);
+  return isRunningStatus(status);
 }
 
 /**
@@ -229,8 +229,8 @@ function _status(newStatus: Status): void {
     const oldStatus = status;
     status = newStatus;
     STATUS.emit(newStatus);
-    const oldRun = running(oldStatus);
-    const newRun = running(newStatus);
+    const oldRun = isRunningStatus(oldStatus);
+    const newRun = isRunningStatus(newStatus);
     if (oldRun && !newRun) SHUTDOWN.emit();
     if (!oldRun && newRun) READY.emit();
   }
@@ -775,6 +775,8 @@ export interface Request<Kd extends RqKind, In, Out> {
   input: Json.Decoder<In>;
   /** Decoder of output parameters. */
   output: Json.Decoder<Out>;
+  /** Fallback output value */
+  fallback: Out;
   /** Signals the request depends on */
   signals: Array<Signal>;
 }
@@ -783,7 +785,7 @@ export type GetRequest<In, Out> = Request<RqKind.GET, In, Out>;
 export type SetRequest<In, Out> = Request<RqKind.SET, In, Out>;
 export type ExecRequest<In, Out> = Request<RqKind.EXEC, In, Out>;
 
-export interface Response<Data> extends Promise<Data> {
+export interface ServerTask<Data> extends Promise<Data> {
   kill?: () => void;
 }
 
@@ -796,22 +798,18 @@ export interface Response<Data> extends Promise<Data> {
 export function send<In, Out>(
   request: Request<RqKind, In, Out>,
   param: In,
-): Response<Out> {
+): ServerTask<Out> {
   if (!isRunning()) return Promise.reject('Server not running');
   if (!request.name) return Promise.reject('Undefined request');
   const rid = `RQ.${rqCount}`;
   rqCount += 1;
   const { kind, name } = request;
-  logModel.registerRequest(
-    {
-      rid,
-      kind,
-      name,
-      param: param as unknown as Json.json,
-      statut: statutLog.PENDING
-    }
-  );
-  const response: Response<Out> = new Promise<Out>((resolve, reject) => {
+  logModel.registerRequest({
+    rid, kind, name,
+    param: param as unknown as Json.json,
+    statut: statutLog.PENDING
+  });
+  const response: ServerTask<Out> = new Promise<Out>((resolve, reject) => {
     const unwrap = (js: Json.json): void => {
       try {
         resolve(request.output(js));

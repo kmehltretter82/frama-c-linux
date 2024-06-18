@@ -78,6 +78,7 @@
 [eva] initialized.c:63: 
   Frama_C_dump_each:
   # cvalue:
+  __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   b1 ∈ [--..--]
   b2 ∈ [--..--]
@@ -109,6 +110,7 @@
 [eva] initialized.c:68: 
   Frama_C_dump_each:
   # cvalue:
+  __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   b1 ∈ [--..--]
   b2 ∈ [--..--]

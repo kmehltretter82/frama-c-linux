@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -68,6 +68,7 @@ const getList_internal: Server.GetRequest<null,projectInfo[]> = {
   name: 'kernel.project.getList',
   input: Json.jNull,
   output: Json.jArray(jProjectInfo),
+  fallback: [],
   signals: [],
 };
 /** Returns the list of all projects */
@@ -78,6 +79,7 @@ const create_internal: Server.SetRequest<string,projectInfo> = {
   name: 'kernel.project.create',
   input: Json.jString,
   output: jProjectInfo,
+  fallback: projectInfoDefault,
   signals: [],
 };
 /** Create a new project */

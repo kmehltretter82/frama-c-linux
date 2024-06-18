@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -66,6 +66,7 @@ export default defineConfig({
         "dome/errors": path.resolve(DOME, "renderer", "errors"),
         "dome/frame": path.resolve(DOME, "renderer", "frame"),
         "dome/layout": path.resolve(DOME, "renderer", "layout"),
+        "dome/graph": path.resolve(DOME, "renderer", "graph"),
         "dome/misc": path.resolve(DOME, "misc"),
         "dome/system": path.resolve(DOME, "misc", "system.ts"),
         "dome/table": path.resolve(DOME, "renderer", "table"),

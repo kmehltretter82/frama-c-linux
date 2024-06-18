@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -518,7 +518,7 @@ module Select (Eval: Eval) = struct
          | Mem _, NoOffset when Cil.isFunctionType ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
-             let e = Eva_utils.lval_to_exp lv in
+             let e = Eva_ast.(Build.lval (translate_lval lv)) in
              let state =
                match ki with
                | Kglobal -> Eval.Analysis.get_global_state ()

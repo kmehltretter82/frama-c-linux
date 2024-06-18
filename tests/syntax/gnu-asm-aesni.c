@@ -11,7 +11,7 @@
    -------------------------
 */
 #ifdef __FRAMAC__
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 #else
 volatile int nondet;
 #define Frama_C_make_unknown(a, n) do {                 \

@@ -43,6 +43,7 @@
   __fc_mblen_state ∈ [--..--]
   __fc_mbtowc_state ∈ [--..--]
   __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   foo ∈ [--..--]
   p1 ∈ {{ &__malloc_main_l16[0] }}
   q1 ∈ {{ &__malloc_w_main_l29[0] }} or UNINITIALIZED

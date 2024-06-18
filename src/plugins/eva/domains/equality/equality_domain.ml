@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 
 type call_init_state =
@@ -127,7 +126,7 @@ module Internal = struct
 
   let pretty fmt (eqs, _, _) = Equality.Set.pretty fmt eqs
 
-  let pretty_debug fmt (eqs, deps, modified) =
+  let _pretty_debug fmt (eqs, deps, modified) =
     Format.fprintf fmt
       "@[<v>@[<hov 2>Eqs: %a@]@.@[<hov 2>Deps: %a@]@.@[<hov 2>Changed: %a@]@]"
       Equality.Set.pretty eqs Deps.pretty deps
@@ -176,18 +175,23 @@ let project (t, _, _) = t
 
 (* ------------------------- Abstract Domain -------------------------------- *)
 
-module Make
-    (Value : Abstract.Value.External)
-= struct
+module type Context = Abstract.Context.External
+module type Value = Abstract.Value.External
+
+module Make (Context : Context) (Value : Value with type context = Context.t) =
+struct
 
   include Internal
   include Store
 
   let get_cvalue = Value.get Main_values.CVal.key
 
+  type context = Context.t
   type value = Value.t
   type location = Precise_locs.precise_location
   type origin
+
+  let build_context _ = `Value Context.top
 
   let reduce_further (equalities, _, _) expr value =
     let atom = HCE.of_exp expr in
@@ -196,7 +200,7 @@ module Make
       Equality.Equality.fold
         (fun atom acc ->
            let e = HCE.to_exp atom in
-           if Cil_datatype.ExpStructEq.equal e expr
+           if Eva_ast.Exp.equal e expr
            then acc else (e, value) :: acc)
         equality []
     | None -> []
@@ -236,11 +240,11 @@ module Make
     | None -> `Value (Value.top, None), Alarmset.all
 
   let extract_expr ~oracle _context (equalities, _, _) expr =
-    let expr = Cil.constFold true expr in
+    let expr = Eva_ast.const_fold expr in
     let atom_e = HCE.of_exp expr in
     coop_eval oracle equalities atom_e
 
-  let extract_lval ~oracle _context (equalities, _, _) lval _typ _location =
+  let extract_lval ~oracle _context (equalities, _, _) lval _location =
     let atom_lv = HCE.of_lval lval in
     coop_eval oracle equalities atom_lv
 
@@ -315,11 +319,11 @@ module Make
     | E _ -> assert false
     | LV lv ->
       let zone =
-        match lv with
+        match lv.node with
         | Var vi, NoOffset -> Locations.zone_of_varinfo vi
         | _ ->
-          let expr = Cil.dummy_exp (Lval lv) in
-          Eva_utils.zone_of_expr (find_loc valuation) expr
+          let expr = Eva_ast.Build.lval lv in
+          Eva_ast.zone_of_exp (find_loc valuation) expr
       in
       Deps.add lval zone deps
 
@@ -341,8 +345,8 @@ module Make
     | `Top -> false (* should not happen *)
     | `Value { value = { v } } -> is_singleton v
 
-  let expr_is_cardinal_zero_or_one_loc valuation e =
-    match e.enode with
+  let expr_is_cardinal_zero_or_one_loc valuation (e : Eva_ast.exp) =
+    match e.node with
     | Lval lv -> begin
         let loc = valuation.Abstract_domain.find_loc lv in
         match loc with
@@ -375,9 +379,9 @@ module Make
        the reevaluation of [right_expr] would reduce it incorrectly, by
        removing indeterminate flags without emitting alarms. *)
   let assign_eq left_lval right_expr value valuation state =
-    if Eval_typ.lval_contains_volatile left_lval ||
-       Eval_typ.expr_contains_volatile right_expr ||
-       not (Cil.isArithmeticOrPointerType (Cil.typeOfLval left_lval)) ||
+    if Eva_ast.lval_contains_volatile left_lval ||
+       Eva_ast.exp_contains_volatile right_expr ||
+       not (Cil.isArithmeticOrPointerType left_lval.typ) ||
        indeterminate_copy value
     then state
     else
@@ -397,12 +401,12 @@ module Make
     let left_loc = Precise_locs.imprecise_location left_value.lloc in
     let direct_left_zone = Locations.(enumerate_valid_bits Write left_loc) in
     let state = kill Hcexprs.Modified direct_left_zone state in
-    let right_expr = Cil.constFold true right_expr in
+    let right_expr = Eva_ast.const_fold right_expr in
     try
       let indirect_left_zone =
-        Eva_utils.indirect_zone_of_lval (find_loc valuation) left_value.lval
+        Eva_ast.indirect_zone_of_lval (find_loc valuation) left_value.lval
       and right_zone =
-        Eva_utils.zone_of_expr (find_loc valuation) right_expr
+        Eva_ast.zone_of_exp (find_loc valuation) right_expr
       in
       (* After an assignment lv = e, the equality [lv == eq] holds iff the value
          of [e] and the location of [lv] are not modified by the assignment,
@@ -427,7 +431,7 @@ module Make
         state
       else
         try
-          let left_value = Var arg.formal, NoOffset in
+          let left_value = Eva_ast.Build.var arg.formal in
           assign_eq left_value arg.concrete arg.avalue valuation state
         with Top_location -> state
     in
@@ -442,18 +446,18 @@ module Make
      reasoning. This is the case for equalities between 0. and -0., and
      between non-comparable pointers, so we need to skip such equalities. *)
   let assume _stmt expr positive valuation (eqs, deps, modified_zone as state) =
-    match positive, expr.enode with
+    match positive, (expr : Eva_ast.exp).node with
     | true,  BinOp (Eq, e1, e2, _)
     | false, BinOp (Ne, e1, e2, _) ->
       begin
         if not (is_safe_equality valuation e1 e2)
         then `Value state
         else
-          let e1 = Cil.constFold true e1
-          and e2 = Cil.constFold true e2 in
-          if Eval_typ.expr_contains_volatile e1
-          || Eval_typ.expr_contains_volatile e2
-          || not (Cil.isArithmeticOrPointerType (Cil.typeOf e1))
+          let e1 = Eva_ast.const_fold e1
+          and e2 = Eva_ast.const_fold e2 in
+          if Eva_ast.exp_contains_volatile e1
+          || Eva_ast.exp_contains_volatile e2
+          || not (Cil.isArithmeticOrPointerType e1.typ)
           || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
               expr_cardinal_zero_or_one valuation e2)
           || (expr_is_cardinal_zero_or_one_loc valuation e2 &&
@@ -534,7 +538,7 @@ end
 module Functor = struct
   type location = Precise_locs.precise_location
   let location_dependencies = Main_locations.ploc
-  module Make (V : Abstract.Value.External) = Make (V)
+  module Make (C : Context) (V : Value with type context = C.t) = Make (C) (V)
 end
 
 let registered =

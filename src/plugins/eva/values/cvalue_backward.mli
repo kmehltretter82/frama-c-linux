@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,13 +34,13 @@ val backward_binop:
   typ_res:typ ->
   res_value: V.t ->
   typ_e1:typ ->
-  V.t -> binop -> V.t -> (V.t * V.t) option
+  V.t -> Eva_ast.binop -> V.t -> (V.t * V.t) option
 
 (** This function tries to reduce the argument value of an unary operation,
     given its result. [typ_arg] is the type of [arg]. *)
 val backward_unop:
   typ_arg:typ ->
-  unop ->
+  Eva_ast.unop ->
   arg: V.t ->
   res: V.t ->
   V.t option

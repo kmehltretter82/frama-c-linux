@@ -38,6 +38,7 @@
 (*                                                                         *)
 (*  File modified by CEA (Commissariat à l'énergie atomique et aux         *)
 (*                        énergies alternatives).                          *)
+(*                                                                         *)
 (***************************************************************************)
 
 (* Function extracted from Camomile library and modified by CEA to get the

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -95,7 +95,7 @@ module Make (Abstract: Abstractions.S) = struct
 
   module Abstract = struct
     include Abstract
-    module Eval = Evaluation.Make (Val) (Loc) (Dom)
+    module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
   end
 
   include Abstract
@@ -139,7 +139,7 @@ module Make (Abstract: Abstractions.S) = struct
   let copy_lvalue state expr = Eval.copy_lvalue state expr >>=: snd
 
   let eval_lval_to_loc state lv =
-    let get_loc (_, loc, _) = loc in
+    let get_loc (_, loc) = loc in
     let for_writing = false in
     Eval.lvaluate ~for_writing state lv >>=: get_loc
 
@@ -231,9 +231,5 @@ let compute =
 
 let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
-let main () =
-  (* Value computations *)
-  if Parameters.ForceValues.get () then compute ();
-  if is_computed () then Red_statuses.report ()
-
+let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main

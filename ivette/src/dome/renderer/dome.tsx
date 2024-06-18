@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -780,9 +780,10 @@ export function useTimer(period: number, callback: () => void): void {
 type Callback<A> = (arg: A) => void;
 
 /**
-   Protected callback against unmounted component.
-   The returned callback will be only fired when the component is mounted.
-   The provided callback need not be memoized.
+ * Protected callback against unwanted dependencies and unmounted component.
+ * - The provided callback need _not_ be memoized, no dependency is needed.
+ * - The provided callback will _not_ be fired after the component is unmounted.
+ * - The returned callback will be _constant_ during the entire hook lifetime.
  */
 export function useProtected<A>(fn: Callback<A> | undefined): Callback<A> {
   const cb = React.useRef<Callback<A>>();

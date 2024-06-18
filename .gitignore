@@ -186,6 +186,15 @@ Makefile.plugin.generated
 # WP/Coq Generated file
 .lia.cache
 
+# analysis-scripts
+share/analysis-scripts/build
+share/analysis-scripts/fced-dist
+share/analysis-scripts/fced-dist-prepare*
+share/analysis-scripts/fc-estimate-difficulty.*spec
+share/analysis-scripts/fc-estimate-difficulty
+share/analysis-scripts/fc-estimate-difficulty.exe
+share/analysis-scripts/libc_metrics.json
+
 # generated ML files
 
 /src/libraries/utils/json.ml

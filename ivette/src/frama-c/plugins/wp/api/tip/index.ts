@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -126,6 +126,9 @@ const getNodeInfos_internal: Server.GetRequest<
             path: Json.jArray(jNode),
             children: Json.jArray(jNode),
           }),
+  fallback: { title: '', proved: false, pending: 0, size: 0, stats: '',
+              results: [], tactic: undefined, header: undefined,
+              childLabel: undefined, path: [], children: [] },
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Proof node information */
@@ -144,6 +147,7 @@ const getResult_internal: Server.GetRequest<
   name: 'plugins.wp.tip.getResult',
   input: Json.jObject({ node: jNode, prover: jProver,}),
   output: jResult,
+  fallback: resultDefault,
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Result for specified node and prover */
@@ -173,6 +177,8 @@ const getProofStatus_internal: Server.GetRequest<
             tactic: Json.jOption(jTactic),
             children: Json.jArray(jNode),
           }),
+  fallback: { size: 0, index: 0, pending: 0, current: nodeDefault,
+              parents: [], tactic: undefined, children: [] },
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Current Proof Status of a Goal */
@@ -187,6 +193,7 @@ const goForward_internal: Server.SetRequest<goal,null> = {
   name: 'plugins.wp.tip.goForward',
   input: jGoal,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Go to to first pending node, or root if none */
@@ -197,6 +204,7 @@ const goToRoot_internal: Server.SetRequest<goal,null> = {
   name: 'plugins.wp.tip.goToRoot',
   input: jGoal,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Go to root of proof tree */
@@ -207,6 +215,7 @@ const goToIndex_internal: Server.SetRequest<[ goal, number ],null> = {
   name: 'plugins.wp.tip.goToIndex',
   input: Json.jPair( jGoal, Json.jNumber,),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Go to k-th pending node of proof tree */
@@ -217,6 +226,7 @@ const goToNode_internal: Server.SetRequest<node,null> = {
   name: 'plugins.wp.tip.goToNode',
   input: jNode,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Set current node of associated proof tree */
@@ -227,6 +237,7 @@ const clearNode_internal: Server.SetRequest<node,null> = {
   name: 'plugins.wp.tip.clearNode',
   input: jNode,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Cancel all node results and sub-tree (if any) */
@@ -237,6 +248,7 @@ const clearNodeTactic_internal: Server.SetRequest<node,null> = {
   name: 'plugins.wp.tip.clearNodeTactic',
   input: jNode,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Cancel node current tactic */
@@ -247,6 +259,7 @@ const clearParentTactic_internal: Server.SetRequest<node,null> = {
   name: 'plugins.wp.tip.clearParentTactic',
   input: jNode,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Cancel parent node tactic */
@@ -257,6 +270,7 @@ const clearGoal_internal: Server.SetRequest<goal,null> = {
   name: 'plugins.wp.tip.clearGoal',
   input: jGoal,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Remove the complete goal proof tree */
@@ -337,6 +351,7 @@ const printSequent_internal: Server.GetRequest<
            unmangled: Json.jOption(Json.jBoolean),
          }),
   output: jText,
+  fallback: textDefault,
   signals: [ { name: 'plugins.wp.tip.printStatus' } ],
 };
 /** Pretty-print the associated node */
@@ -351,6 +366,7 @@ const clearSelection_internal: Server.SetRequest<node,null> = {
   name: 'plugins.wp.tip.clearSelection',
   input: jNode,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Reset node selection */
@@ -369,6 +385,7 @@ const setSelection_internal: Server.SetRequest<
            extend: Json.jOption(Json.jBoolean),
          }),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Set node selection */
@@ -388,6 +405,7 @@ const getSelection_internal: Server.GetRequest<
             part: Json.jOption(jPart),
             term: Json.jOption(jTerm),
           }),
+  fallback: { part: undefined, term: undefined },
   signals: [ { name: 'plugins.wp.tip.printStatus' },
              { name: 'plugins.wp.tip.proofStatus' } ],
 };
@@ -409,6 +427,7 @@ const runProvers_internal: Server.SetRequest<
            provers: Json.jOption(Json.jArray(jProver)),
          }),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Schedule provers on proof node */
@@ -428,6 +447,7 @@ const killProvers_internal: Server.SetRequest<
            provers: Json.jOption(Json.jArray(jProver)),
          }),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Interrupt running provers on proof node */
@@ -447,6 +467,7 @@ const clearProvers_internal: Server.SetRequest<
            provers: Json.jOption(Json.jArray(jProver)),
          }),
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Remove prover results from proof node */
@@ -467,6 +488,7 @@ const getScriptStatus_internal: Server.GetRequest<
             script: Json.jOption(Json.jString),
             saved: Json.jBoolean,
           }),
+  fallback: { proof: false, script: undefined, saved: false },
   signals: [ { name: 'plugins.wp.tip.proofStatus' } ],
 };
 /** Script Status for a given Goal */
@@ -480,6 +502,7 @@ const saveScript_internal: Server.SetRequest<goal,null> = {
   name: 'plugins.wp.tip.saveScript',
   input: jGoal,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Save Script for the Goal */
@@ -490,6 +513,7 @@ const runScript_internal: Server.SetRequest<goal,null> = {
   name: 'plugins.wp.tip.runScript',
   input: jGoal,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Replay Saved Script for the Goal (if any) */
@@ -500,6 +524,7 @@ const clearProofScript_internal: Server.SetRequest<goal,null> = {
   name: 'plugins.wp.tip.clearProofScript',
   input: jGoal,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Clear Proof and Remove any Saved Script for the Goal */

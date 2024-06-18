@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -186,7 +186,7 @@ module TransferTaint = struct
      - its indirect dependencies, i.e. the memory zone its location depends on;
      - whether its location is a singleton. *)
   let compute_zones lval to_loc =
-    match lval with
+    match (lval : Eva_ast.lval).node with
     | Var vi, NoOffset ->
       (* Special case for direct access to variable: do not use [to_loc] here,
          as it will fail for the formal parameters of calls. *)
@@ -199,13 +199,13 @@ module TransferTaint = struct
         let loc = Precise_locs.imprecise_location ploc in
         Locations.enumerate_valid_bits Write loc
       in
-      let lv_indirect_zone = Eva_utils.indirect_zone_of_lval to_loc lval in
+      let lv_indirect_zone = Eva_ast.indirect_zone_of_lval to_loc lval in
       lv_zone, lv_indirect_zone, singleton
 
   (* Propagates data- and control-taints for an assignement [lval = exp]. *)
   let assign_aux lval exp to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
-    let exp_zone = Eva_utils.zone_of_expr to_loc exp in
+    let exp_zone = Eva_ast.zone_of_exp to_loc exp in
     (* [lv] becomes data-tainted if a memory location on which the value of
        [exp] depends on is data-tainted. *)
     let data_tainted = Zone.intersects state.locs_data exp_zone in
@@ -246,7 +246,7 @@ module TransferTaint = struct
     let state = filter_active_tainted_assumes stmt state in
     (* Add [stmt] as assume statement in [state] as soon as [exp] is tainted. *)
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Eva_utils.zone_of_expr to_loc exp in
+    let exp_zone = Eva_ast.zone_of_exp to_loc exp in
     let state =
       if not state.dependent_call && LatticeTaint.intersects state exp_zone
       then { state with assume_stmts = Stmt.Set.add stmt state.assume_stmts; }
@@ -265,7 +265,7 @@ module TransferTaint = struct
       let to_loc = loc_of_lval valuation in
       List.fold_left
         (fun s { Eval.concrete; formal; _ } ->
-           assign_aux (Cil.var formal) concrete to_loc s)
+           assign_aux (Eva_ast.Build.var formal) concrete to_loc s)
         state
         call.Eval.arguments
     in
@@ -279,7 +279,7 @@ module TransferTaint = struct
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
-    let exp_zone = Eva_utils.zone_of_expr to_loc exp in
+    let exp_zone = Eva_ast.zone_of_exp to_loc exp in
     Format.fprintf fmt "%B" (LatticeTaint.intersects state exp_zone)
 
 end
@@ -290,7 +290,7 @@ module QueriesTaint = struct
   let top_query = `Value (Cvalue.V.top, None), Alarmset.all
 
   let extract_expr ~oracle:_ _context _state _expr = top_query
-  let extract_lval ~oracle:_ _context _state _lv _typ _locs = top_query
+  let extract_lval ~oracle:_ _context _state _lv _locs = top_query
 
 end
 
@@ -585,6 +585,7 @@ let interpret_taint_logic
     end
     in
     (module struct
+      module Ctx = Abstract.Ctx
       module Val = Abstract.Val
       module Loc = Abstract.Loc
       module Dom = Dom

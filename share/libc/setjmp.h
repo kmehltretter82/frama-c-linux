@@ -2,7 +2,7 @@
 /*                                                                        */
 /*  This file is part of Frama-C.                                         */
 /*                                                                        */
-/*  Copyright (C) 2007-2023                                               */
+/*  Copyright (C) 2007-2024                                               */
 /*    CEA (Commissariat à l'énergie atomique et aux énergies              */
 /*         alternatives)                                                  */
 /*                                                                        */
@@ -27,27 +27,43 @@ __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
 /* Note: setjmp/longjmp/sigsetjmp/siglongjmp are currently unsupported
-   by Frama-C and should not be used. */
+   by Frama-C and should not be used. This file should nevertheless allow
+   Frama-C to parse code using them, but the semantics is unsound. */
 
-typedef int jmp_buf[5]; // arbitrary size
+// The definitions are inspired from glibc and musl, but simplified.
+// Minimally portable code should parse with them.
 
-/*@ assigns env[0..4]; // unsound - should "assigns \anything" */
+#include "__fc_define_sigset_t.h"
+
+typedef int __jmp_buf[8]; // arbitrary size
+
+typedef struct __jmp_buf_tag {
+  __jmp_buf __jmpbuf;
+  int saved;
+  sigset_t sigs;
+} jmp_buf[1];
+
+typedef jmp_buf sigjmp_buf;
+
+/*@ // unsound - should "assigns \anything"
+  assigns \result \from indirect:env; //missing: \from 'value given to longjmp'
+*/
 extern int setjmp(jmp_buf env);
 
 /*@
- assigns \nothing;
+ assigns \nothing; //missing: '\result \from setjmp()'
  ensures never_terminates: \false;
 */
 extern void longjmp(jmp_buf env, int val);
 
-#include "__fc_define_sigset_t.h"
-typedef struct __fc_sigjmp_buf {jmp_buf buf; sigset_t sigs;} sigjmp_buf;
-
-
+/*@ // unsound - should "assigns \anything"
+  assigns \result \from indirect:env, indirect:savesigs;
+  // missing:     \from 'value given to siglongjmp'
+*/
 extern int sigsetjmp(sigjmp_buf env, int savesigs);
 
 /*@
- assigns \nothing;
+ assigns \nothing; //missing: '\result \from sigsetjmp()'
  ensures never_terminates: \false;
 */
 extern void siglongjmp(sigjmp_buf env, int val);

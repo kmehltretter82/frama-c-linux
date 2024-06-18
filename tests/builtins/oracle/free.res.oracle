@@ -26,6 +26,7 @@
   __fc_mblen_state ∈ [--..--]
   __fc_mbtowc_state ∈ [--..--]
   __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
   v ∈ [--..--]
   p ∈ {{ &__malloc_main1_l8[0] }}
   q ∈ {{ &__malloc_main1_l10[0] }}

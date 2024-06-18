@@ -1,16 +1,16 @@
 ---
-title: 'FRAMA-C(1) 2023-05-12'
+title: 'FRAMA-C(1) 2024-04-24'
 header-includes:
 - |
   ```{=man}
   .\"------------------------------------------------------------------------
-  .\"
-  .\"  This file is part of Frama-C documentation
-  .\"
-  .\"  Copyright (C) 2007-2023
-  .\"    CEA (Commissariat à l'énergie atomique et aux énergies
-  .\"         alternatives)
-  .\"
+  .\"                                                                        
+  .\"  This file is part of Frama-C documentation                            
+  .\"                                                                        
+  .\"  Copyright (C) 2007-2024                                               
+  .\"    CEA (Commissariat à l'énergie atomique et aux énergies              
+  .\"         alternatives)                                                  
+  .\"                                                                        
   .\"  you can redistribute it and/or modify it under the terms of the
   .\"  CC-BY-SA 4.0 license
 

@@ -42,16 +42,12 @@
   Called from nonlin.c:18.
 [eva] using specification for function Frama_C_float_interval
 [eva] nonlin.c:18: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:18: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] computing for function Frama_C_float_interval <- nonlin_f <- main.
   Called from nonlin.c:19.
 [eva] nonlin.c:19: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:19: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] nonlin.c:22: assertion got status valid.
 [eva] nonlin.c:26: assertion got status valid.
@@ -158,16 +154,12 @@
 [eva] computing for function Frama_C_float_interval <- other <- main.
   Called from nonlin.c:61.
 [eva] nonlin.c:61: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:61: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] computing for function Frama_C_float_interval <- other <- main.
   Called from nonlin.c:62.
 [eva] nonlin.c:62: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:62: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:63: Warning: 
   accessing out of bounds index.
@@ -206,16 +198,12 @@
 [eva] computing for function Frama_C_float_interval <- norm <- main.
   Called from nonlin.c:84.
 [eva] nonlin.c:84: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:84: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] computing for function Frama_C_float_interval <- norm <- main.
   Called from nonlin.c:85.
 [eva] nonlin.c:85: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:85: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:92: Warning: 
   non-finite float value. assert \is_finite(\mul_float(v1, v1));
@@ -249,9 +237,7 @@
 [eva] computing for function Frama_C_float_interval <- around_zeros <- main.
   Called from nonlin.c:108.
 [eva] nonlin.c:108: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:108: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:113: Warning: 
   non-finite float value.
@@ -264,9 +250,7 @@
 [eva] computing for function Frama_C_float_interval <- subdivide_strategy <- main.
   Called from nonlin.c:126.
 [eva] nonlin.c:126: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:126: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva:alarm] nonlin.c:131: Warning: 
   non-finite float value. assert \is_finite(nondet);
@@ -276,9 +260,7 @@
 [eva] computing for function Frama_C_float_interval <- subdivide_strategy <- main.
   Called from nonlin.c:136.
 [eva] nonlin.c:136: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] nonlin.c:136: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] Recording results for subdivide_strategy
 [eva] Done for function subdivide_strategy

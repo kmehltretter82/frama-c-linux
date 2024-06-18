@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -26,7 +26,7 @@ import * as Messages from './Messages';
 import * as Ivette from 'ivette';
 
 Ivette.registerComponent({
-    id: 'ivette.console',
+    id: 'fc.kernel.console',
     label: 'Console',
     title: 'Frama-C Command Line',
     preferredPosition: 'AB',
@@ -34,7 +34,7 @@ Ivette.registerComponent({
 });
 
 Ivette.registerComponent({
-    id: 'ivette.messages',
+    id: 'fc.kernel.messages',
     label: 'Messages',
     title: 'Frama-C Messages',
     preferredPosition: 'CD',
@@ -43,7 +43,7 @@ Ivette.registerComponent({
 
 Ivette.registerView({
     id: 'ivette.console',
-    label: 'Frama-C',
+    label: 'Console',
     title: 'Frama-C Console & Messages',
-    layout: { AB: 'ivette.console', CD: 'ivette.messages' },
+    layout: { AB: 'fc.kernel.console', CD: 'fc.kernel.messages' },
 });

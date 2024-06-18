@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -30,7 +30,7 @@ val written_formals: Cil_types.kernel_function -> Cil_datatype.Varinfo.Set.t
     which may be internally overwritten by [kf] during its call. *)
 
 
-val safe_argument: Cil_types.exp -> bool
+val safe_argument: Eva_ast.exp -> bool
 (** [safe_argument e] returns [true] if [e] (which is supposed to be
     an actual parameter) is guaranteed to evaluate in the same way before and
     after the call. *)

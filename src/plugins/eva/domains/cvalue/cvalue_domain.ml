@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,6 +32,9 @@ module State = struct
 
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
+
+  type context = unit
+  let context_dependencies = Abstract_context.Leaf (module Unit_context)
 
   let log_category = Self.dkey_cvalue_domain
 
@@ -74,14 +77,16 @@ module State = struct
   let extract_expr ~oracle context (state, _) expr =
     Cvalue_queries.extract_expr ~oracle context state expr
 
-  let extract_lval ~oracle context (state, _) lval typ loc =
-    Cvalue_queries.extract_lval ~oracle context state lval typ loc
+  let extract_lval ~oracle context (state, _) lval loc =
+    Cvalue_queries.extract_lval ~oracle context state lval loc
 
-  let backward_location (state, _) lval typ precise_loc value =
-    Cvalue_queries.backward_location state lval typ precise_loc value
+  let backward_location (state, _) lval precise_loc value =
+    Cvalue_queries.backward_location state lval precise_loc value
 
   let reduce_further (state, _) expr value =
     Cvalue_queries.reduce_further state expr value
+
+  let build_context (state, _) = Cvalue_queries.build_context state
 
   (* ------------------------------------------------------------------------ *)
   (*                            Transfer Functions                            *)

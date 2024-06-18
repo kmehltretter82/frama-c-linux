@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,11 +37,14 @@ end
 
 (** Generic functor. *)
 module Make
-    (Value : Value)
+    (Context : Abstract_context.S)
+    (Value : Value with type context = Context.t)
     (Loc : Abstract_location.S with type value = Value.t)
-    (Domain : Queries with type value = Value.t
+    (Domain : Queries with type context = Context.t
+                       and type value = Value.t
                        and type location = Loc.location)
   : Evaluation_sig.S with type state = Domain.state
+                      and type context = Context.t
                       and type value = Value.t
                       and type origin = Domain.origin
                       and type loc = Loc.location

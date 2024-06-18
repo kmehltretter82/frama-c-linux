@@ -24,6 +24,7 @@ mk_tests {
       @src/plugins/markdown-report/tests/ptests \
       @src/plugins/nonterm/tests/ptests \
       @src/plugins/report/tests/ptests \
+      @src/plugins/region/tests/ptests \
       @src/plugins/server/tests/ptests \
       @src/plugins/variadic/tests/ptests
   '';

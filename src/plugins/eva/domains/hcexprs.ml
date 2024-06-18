@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,22 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
-(* The default comparison of Cil_datatype does not distinguish constants
-   with different textual representations in the source code when they
-   represent the same value.
-   However, when option -eva-all-rounding-modes-constants is enabled, the
-   evaluation of floating-point constants may differ according to their
-   textual representation: when the constant is not exactly representable in the
-   floating-point type, an interval is used instead of the nearest singleton
-   value. In this case, two constants with the same nearest value but different
-   textual representation may not be equal. We thus use the [compare_strict]
-   comparison, which also compares the textual representation of constants. *)
-
-module Exp = Cil_datatype.ExpStructEqStrict
-
-module Lval = Cil_datatype.LvalStructEqStrict
+module Exp = Eva_ast.Exp
+module Lval = Eva_ast.Lval
 
 (* lvalues are never stored under a constructor [E]. *)
 type unhashconsed_exprs = E of Exp.t | LV of Lval.t
@@ -55,7 +41,7 @@ module E = struct
 
       type t = unhashconsed_exprs
       let name = "Value.Symbolic_exprs.key"
-      let reprs = [ E Cil_datatype.Exp.dummy ]
+      let reprs = List.map (fun e -> E e) Exp.reprs
 
       let structural_descr =
         Structural_descr.t_sum
@@ -83,24 +69,20 @@ module E = struct
       let copy c = c
     end)
 
-  let replace_visitor kind ~late ~heir = object
-    inherit Visitor.frama_c_copy (Project.current ())
-
-    method! vexpr expr =
-      match expr.enode with
+  let replace kind ~late ~heir =
+    let open Eva_ast.Rewrite in
+    let rewrite_exp ~visitor (exp : Eva_ast.exp) =
+      match exp.node with
       | Lval lval ->
-        if Lval.equal lval late then Cil.ChangeTo heir else Cil.JustCopy
+        if Lval.equal lval late then heir else exp
       | StartOf lval | AddrOf lval ->
         if kind = Modified
-        then Cil.JustCopy
-        else if Lval.equal lval late then raise NonExchangeable else Cil.JustCopy
-      | AlignOfE _ -> raise NonExchangeable
-      | _ -> Cil.DoChildren
-  end
-
-  let replace kind ~late ~heir expr =
-    let visitor = replace_visitor kind ~late ~heir in
-    Visitor.visitFramacExpr visitor expr
+        then exp
+        else if Lval.equal lval late then raise NonExchangeable else exp
+      | _ -> default.rewrite_exp ~visitor exp
+    in
+    let rewriter = { default with rewrite_exp } in
+    Eva_ast.Rewrite.visit_exp rewriter
 end
 
 module HCE = struct
@@ -118,14 +100,14 @@ module HCE = struct
 
   let of_lval lv = hashcons (LV lv)
 
-  let of_exp exp =
-    match exp.enode with
+  let of_exp (exp : Eva_ast.exp) =
+    match exp.node with
     | Lval lv -> of_lval lv
     | _ -> hashcons (E exp)
 
   let to_exp h = match get h with
     | E e -> e
-    | LV lv -> Eva_utils.lval_to_exp lv
+    | LV lv -> Eva_ast.Build.lval lv
 
   let to_lval h = match get h with
     | E _ -> None
@@ -136,13 +118,13 @@ module HCE = struct
     | LV _ -> true
 
   let type_of h = match get h with
-    | E e -> Cil.typeOf e
-    | LV lv -> Cil.typeOfLval lv
+    | E e -> e.typ
+    | LV lv -> lv.typ
 
   let replace kind ~late ~heir h = match get h with
     | E e ->
       let e = E.replace kind ~late ~heir e in
-      if Eva_utils.height_expr e > height_limit
+      if Eva_ast.height_exp e > height_limit
       then raise NonExchangeable
       else of_exp e
     | LV lval -> if Lval.equal lval late then of_exp heir else h
@@ -159,17 +141,12 @@ type lvalues = {
 let empty_lvalues = { read = HCESet.empty; addr = HCESet.empty; }
 
 let syntactic_lvalues expr =
-  let rec gather expr lvalues =
-    match expr.enode with
+  let rec gather (expr : Eva_ast.exp) lvalues =
+    match expr.node with
     | Lval lv ->
       { lvalues with read = HCESet.add (HCE.of_lval lv) lvalues.read }
     | AddrOf lv | StartOf lv ->
       { lvalues with addr = HCESet.add (HCE.of_lval lv) lvalues.addr }
-    | AlignOfE e | SizeOfE e ->
-      (* The lvalues appearing in [e] are not read, and must all be in addr. *)
-      let new_lvalues = gather e empty_lvalues in
-      let new_addr = HCESet.union new_lvalues.read new_lvalues.addr in
-      { lvalues with addr = HCESet.union new_addr lvalues.addr }
     | UnOp (_, e, _) | CastE (_, e) -> gather e lvalues
     | BinOp (_, e1, e2, _) -> gather e1 (gather e2 lvalues)
     | _ -> lvalues

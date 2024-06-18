@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -59,7 +59,7 @@ module Make
 
   let eval_top = `Value (Value.top, None), Alarmset.all
   let extract_expr ~oracle:_ _ _ _ = eval_top
-  let extract_lval ~oracle:_ _ _ _ _ _ = eval_top
+  let extract_lval ~oracle:_ _ _ _ _ = eval_top
 
   let update _ _ = `Value ()
   let assign _ _ _ _ _ _ = `Value ()

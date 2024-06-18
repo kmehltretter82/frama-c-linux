@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -25,6 +25,7 @@
     to the internal modules of Eva they need. *)
 
 module Abstract_domain = Abstract_domain
+module Abstract_context = Abstract_context
 module Abstract_value = Abstract_value
 module Abstract_location = Abstract_location
 module Abstract = Abstract
@@ -34,6 +35,7 @@ module Alarmset = Alarmset
 module Analysis = Analysis
 module Assigns = Assigns
 module Callstack = Callstack
+module Unit_context = Unit_context
 module Cvalue_domain = Cvalue_domain
 module Cvalue_results = Cvalue_results
 module Domain_builder = Domain_builder
@@ -45,6 +47,7 @@ module Eval_annots = Eval_annots
 module Eval_op = Eval_op
 module Eval_terms = Eval_terms
 module Eval_typ = Eval_typ
+module Eva_ast = Eva_ast
 module Function_calls = Function_calls
 module Logic_inout = Logic_inout
 module Main_locations = Main_locations

@@ -4,7 +4,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -122,10 +122,10 @@ def terminate_process(process):
 
 
 def smart_rename(target):
-    target = re.sub("^\./", "", target)
-    target = re.sub("main\.eva$", "", target)
-    target = re.sub("\.eva$", "", target)
-    target = re.sub("\.frama-c/", "", target)
+    target = re.sub(r"^\./", "", target)
+    target = re.sub(r"main\.eva$", "", target)
+    target = re.sub(r"\.eva$", "", target)
+    target = re.sub(r"\.frama-c/", "", target)
     return target
 
 

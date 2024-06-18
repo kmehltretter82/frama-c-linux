@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: #"-eva-msg-key d-multidim -eva-domains multidim -eva-plevel 1 -eva-multidim-disjunctive-invariants"
 */
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 
 typedef struct {
   char kind;

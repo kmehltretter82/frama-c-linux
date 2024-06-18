@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -34,9 +34,11 @@ end
 
 module Make
     (Domain: Input_Domain)
+    (Ctx: Conversion with type internal := Domain.context)
     (Val: Conversion with type internal := Domain.value)
     (Loc: Conversion with type internal := Domain.location)
   : Abstract.Domain.Internal with type state = Domain.state
+                              and type context = Ctx.extended
                               and type value = Val.extended
                               and type location = Loc.extended
                               and type origin = Domain.origin

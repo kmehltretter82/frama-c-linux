@@ -5,7 +5,7 @@
 
 /* Tests the automatic loop unrolling heuristic. */
 
-#include <__fc_builtin.h>
+#include "__fc_builtin.h"
 
 volatile int undet;
 

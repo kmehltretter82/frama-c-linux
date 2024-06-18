@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -369,8 +369,13 @@ module Datatype_Offsm_or_top = Datatype.Make_with_collections(struct
   end)
 
 
-module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
+module Offsm
+  : Abstract_value.Leaf with type t = offsm_or_top and type context = unit
+= struct
   include Datatype_Offsm_or_top
+
+  type context = unit
+  let context = Abstract_context.Leaf (module Unit_context)
 
   let pretty_typ typ fmt = function
     | Top as o -> pretty fmt o
@@ -412,10 +417,10 @@ module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
   let assume_pointer v = `Unknown v
   let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 
-  let constant e _c =
+  let constant _context e _c =
     if store_redundant then
-      match Cil.constFoldToInt e with
-      | Some i -> inject_int (Cil.typeOf e) i
+      match Eva_ast.fold_to_integer e with
+      | Some i -> inject_int e.typ i
       | None -> Top
     else Top
 
@@ -426,17 +431,17 @@ module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
       let f v = snd (Cvalue.V_Or_Uninitialized.replace_base substitution v) in
       O (Cvalue.V_Offsetmap.map_on_values f offsm)
 
-  let forward_unop _typ op o =
+  let forward_unop _context _typ op o =
     let o' = match o, op with
-      | Top, _ | _, (Neg | LNot) -> Top
+      | Top, _ | _, (Eva_ast.Neg | LNot) -> Top
       | O o, BNot -> O (bnot o)
     in
     `Value o'
 
-  let forward_binop _typ op o1 o2 =
+  let forward_binop _context _typ op o1 o2 =
     let o' =
       match o1, o2, op with
-      | O _o1, O _o2, (Shiftlt | Shiftrt) ->
+      | O _o1, O _o2, (Eva_ast.Shiftlt | Shiftrt) ->
         (* It is inconvenient to handle shift here, because we need a
            constant for o2 *)
         Top
@@ -447,17 +452,18 @@ module Offsm : Abstract_value.Leaf with type t = offsm_or_top = struct
     in
     `Value o'
 
-  let backward_binop ~input_type:_ ~resulting_type:_ _op ~left:_ ~right:_ ~result:_ =
+  let backward_binop _context ~input_type:_ ~resulting_type:_
+      _op ~left:_ ~right:_ ~result:_ =
     `Value (None, None)
 
-  let backward_unop ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
+  let backward_unop _context ~typ_arg:_ _unop ~arg:_ ~res:_ = `Value None
 
-  let backward_cast ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+  let backward_cast _context ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
     `Value None
 
-  let rewrap_integer _range o = o
+  let rewrap_integer _context _range o = o
 
-  let forward_cast ~src_type ~dst_type o =
+  let forward_cast _context ~src_type ~dst_type o =
     let open Eval_typ in
     match o, src_type, dst_type with
     | O o, (TSInt src | TSPtr src), (TSInt dst | TSPtr dst) ->
@@ -515,23 +521,23 @@ let () = Abstractions.Hooks.register @@ fun (module Abstraction) ->
           let* v = strengthen_v typ (get_cvalue t) o in
           `Value (set_cvalue v t)
 
-      let forward_unop typ op t =
+      let forward_unop context typ op t =
         match op with
-        | BNot ->
+        | Eva_ast.BNot ->
           let t = strengthen_offsm typ t in
-          let* t = forward_unop typ op t in
+          let* t = forward_unop context typ op t in
           strengthen_v typ t
-        | _ -> forward_unop typ op t
+        | _ -> forward_unop context typ op t
 
-      let forward_binop typ op l r =
+      let forward_binop context typ op l r =
         match op with
-        | BAnd | BOr | BXor ->
+        | Eva_ast.BAnd | BOr | BXor ->
           let l = strengthen_offsm typ l
           and r = strengthen_offsm typ r in
-          let* t = forward_binop typ op l r in
+          let* t = forward_binop context typ op l r in
           strengthen_v typ t
         | Shiftlt | Shiftrt ->
-          let* p = forward_binop typ op l r in
+          let* p = forward_binop context typ op l r in
           begin
             try
               let i = get_cvalue r |> V.project_ival |> Ival.project_int in
@@ -542,7 +548,7 @@ let () = Abstractions.Hooks.register @@ fun (module Abstraction) ->
               `Value (set_offsm (O offsm) p)
             with V.Not_based_on_null | Ival.Not_Singleton_Int -> `Value p
           end
-        | _ -> forward_binop typ op l r
+        | _ -> forward_binop context typ op l r
     end in
     (module struct
       include Abstraction

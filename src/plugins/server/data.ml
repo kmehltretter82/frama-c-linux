@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -88,16 +88,14 @@ module Joption(A : S) : S with type t = A.t option =
 struct
   type t = A.t option
 
-  let nullable = try ignore (A.of_json `Null) ; true with _ -> false
-  let jtype = Joption (if not nullable then A.jtype else Jtuple [A.jtype])
+  let jtype = Joption A.jtype
 
   let to_json = function
     | None -> `Null
-    | Some v -> if nullable then `List [A.to_json v] else A.to_json v
+    | Some v -> A.to_json v
 
   let of_json = function
     | `Null -> None
-    | `List [js] when nullable -> Some (A.of_json js)
     | js -> Some (A.of_json js)
 
 end

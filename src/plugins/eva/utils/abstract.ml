@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -19,6 +19,28 @@
 (*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
 (*                                                                        *)
 (**************************************************************************)
+
+module Context = struct
+
+  type 'a context = (module Abstract_context.S with type t = 'a)
+  module C = struct type 'a t = 'a context end
+  include Structure.Shape (Structure.Key_Context) (C)
+
+  module type Internal = sig
+    include Abstract_context.S
+    val structure : t structure
+  end
+
+  module type External = sig
+    include Internal
+    include Structure.External
+      with type t := t
+       and type 'a key := 'a key
+       and type 'a data := 'a data
+  end
+
+end
+
 
 module Value = struct
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -97,8 +97,6 @@ type 'vertex transition =
 
 and guard_kind = Then | Else
 
-val pretty_transition: vertex transition Pretty_utils.formatter
-
 type 'vertex edge = private {
   edge_kf : Cil_types.kernel_function;
   edge_key : int;
@@ -106,8 +104,6 @@ type 'vertex edge = private {
   edge_transition : 'vertex transition;
   edge_loc : location;
 }
-
-val pretty_edge: vertex edge Pretty_utils.formatter
 
 module G : Graph.Sig.I
   with type V.t = vertex
@@ -284,6 +280,29 @@ module UnrollUnnatural : sig
   val unroll_unnatural_loop :
     automaton -> wto -> Compute.wto_index_table -> G.t
 
+end
+
+
+(** Generic versions of the algorithms on dataflow graphs *)
+
+module Algorithms (G : Graph.Sig.G) : sig
+  val exit_strategy : G.t -> G.V.t Wto.component -> G.V.t Wto.partition
+end
+
+module Dot
+    (V: sig
+       include Hashtbl.HashedType
+       val pretty: Format.formatter -> t -> unit
+       val start_of: t -> stmt option
+     end)
+    (E: sig
+       type t
+       val pretty: Format.formatter -> t -> unit
+     end)
+    (G: Graph.Sig.G with type V.t = V.t and type E.t = V.t * E.t * V.t) : sig
+  val output_to_dot :
+    out_channel -> ?labeling:V.t labeling -> ?wto:V.t Wto.partition ->
+    G.t -> unit
 end
 
 

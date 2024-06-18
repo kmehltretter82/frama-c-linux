@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -82,6 +82,7 @@ const getConfig_internal: Server.GetRequest<
             datadir: Json.jArray(Json.jString),
             pluginpath: Json.jArray(Json.jString),
           }),
+  fallback: { version: '', datadir: [], pluginpath: [] },
   signals: [],
 };
 /** Frama-C Kernel configuration */
@@ -95,6 +96,7 @@ const load_internal: Server.SetRequest<string,string | undefined> = {
   name: 'kernel.services.load',
   input: Json.jString,
   output: Json.jOption(Json.jString),
+  fallback: undefined,
   signals: [],
 };
 /** Load a save file. Returns an error, if not successfull. */
@@ -105,6 +107,7 @@ const save_internal: Server.SetRequest<string,string | undefined> = {
   name: 'kernel.services.save',
   input: Json.jString,
   output: Json.jOption(Json.jString),
+  fallback: undefined,
   signals: [],
 };
 /** Save the current session. Returns an error, if not successfull. */
@@ -140,6 +143,7 @@ const logkindTags_internal: Server.GetRequest<null,tag[]> = {
   name: 'kernel.services.logkindTags',
   input: Json.jNull,
   output: Json.jArray(jTag),
+  fallback: [],
   signals: [],
 };
 /** Registered tags for the above type. */
@@ -204,6 +208,7 @@ const reloadMessage_internal: Server.GetRequest<null,null> = {
   name: 'kernel.services.reloadMessage',
   input: Json.jNull,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Force full reload for array [`message`](#message)  */
@@ -223,6 +228,7 @@ const fetchMessage_internal: Server.GetRequest<
             updated: Json.jArray(jMessageData),
             pending: Json.jNumber,
           }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
   signals: [],
 };
 /** Data fetcher for array [`message`](#message)  */
@@ -295,6 +301,7 @@ const setLogs_internal: Server.SetRequest<boolean,null> = {
   name: 'kernel.services.setLogs',
   input: Json.jBoolean,
   output: Json.jNull,
+  fallback: null,
   signals: [],
 };
 /** Turn logs monitoring on/off */
@@ -305,6 +312,7 @@ const getLogs_internal: Server.GetRequest<null,log[]> = {
   name: 'kernel.services.getLogs',
   input: Json.jNull,
   output: Json.jArray(jLog),
+  fallback: [],
   signals: [],
 };
 /** Flush the last emitted logs since last call (max 100) */

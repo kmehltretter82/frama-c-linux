@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,7 +22,7 @@
 
 (** Creation of the initial state of abstract domain. *)
 
-open Cil_types
+open Eva_ast
 open Lattice_bounds
 
 module type S = sig
@@ -31,11 +31,11 @@ module type S = sig
   (** Compute the initial state for an analysis (as in {!initial_state}),
       but also bind the formal parameters of the function given as argument. *)
   val initial_state_with_formals :
-    lib_entry:bool -> kernel_function -> state or_bottom
+    lib_entry:bool -> Cil_types.kernel_function -> state or_bottom
 
   (** Initializes a local variable in the current state. *)
   val initialize_local_variable:
-    stmt -> varinfo -> init -> state -> state or_bottom
+    Cil_types.stmt -> varinfo -> init -> state -> state or_bottom
 end
 
 module Make

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -43,6 +43,9 @@ module type Key = sig
 end
 
 module Make () : Key
+
+(** Keys module for the abstract contexts of Eva. *)
+module Key_Context : Key
 
 (** Keys module for the abstract values of Eva. *)
 module Key_Value : Key

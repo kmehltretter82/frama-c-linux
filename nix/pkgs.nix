@@ -34,8 +34,7 @@ let
         cover = false ;
       } ;
     };
-    e-acsl-tests = oself.callPackage ./e-acsl-tests.nix { config = ""; };
-    e-acsl-dev-tests = oself.callPackage ./e-acsl-tests.nix { config = "dev"; };
+    e-acsl-tests = oself.callPackage ./e-acsl-tests.nix {};
     eva-default-tests = oself.callPackage ./eva-tests.nix { config = ""; };
     eva-apron-tests = oself.callPackage ./eva-tests.nix { config = "apron" ; };
     eva-bitwise-tests = oself.callPackage ./eva-tests.nix { config = "bitwise" ; };

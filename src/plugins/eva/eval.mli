@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -21,6 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
+
+type lval = Eva_ast.lval
+type exp = Eva_ast.exp
 
 (** Types and functions related to evaluations.
     Heavily used by abstract values and domains, evaluation of expressions,
@@ -58,6 +61,15 @@ val (>>=.) : 'a evaluated -> ('a -> 'b or_bottom) -> 'b evaluated
 (** Use this monad if the following function returns a simple value. *)
 val (>>=:) : 'a evaluated -> ('a -> 'b) -> 'b evaluated
 
+
+module Evaluated : sig
+  type 'a t = 'a evaluated
+  module Operators : sig
+    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
+    val ( let& ) : 'a t -> ('a -> 'b or_bottom) -> 'b t
+  end
+end
 
 (** Most backward evaluation function returns `Bottom if the reduction leads to
     an invalid state, `Unreduced if no reduction can be performed, or the
@@ -134,7 +146,6 @@ type ('a, 'origin) record_val = {
 (** Data record associated to each evaluated left-value. *)
 type 'a record_loc = {
   loc: 'a;                  (** The location of the left-value. *)
-  typ: typ;                 (** *)
   loc_alarms: Alarmset.t    (** The emitted alarms during the evaluation. *)
 }
 
@@ -178,7 +189,6 @@ end
 type 'loc left_value = {
   lval: lval;
   lloc: 'loc;
-  ltyp: typ;
 }
 
 (** Assigned values. *)

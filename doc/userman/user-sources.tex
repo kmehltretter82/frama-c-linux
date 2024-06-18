@@ -612,36 +612,6 @@ As stated before, if you want to ensure the code analyzed by \FramaC is
 strictly equivalent to the one from the target system, you must either
 proofread the definitions, or provide your own library files.
 
-\subsection*{Portability considerations}
-
-A few POSIX types are specified in an abstract way: {\em not required to be
-  arithmetic types}. This enables them to be defined as e.g. structures.
-Portable code using these types must not inspect them or apply operators
-that are only compatible with arithmetic types (e.g. comparing them with
-\texttt{NULL}). However, such comparisons do exist in the wild, and their
-parsing leads to two issues:
-\begin{itemize}
-\item \FramaC will fail parsing with a generic typing error message;
-\item the user may be unable or unwilling to modify the non-portable code,
-  since they may assume a specific libc implementation that uses an arithmetic
-  type.
-\end{itemize}
-The table below lists a few of such types that currently have special support
-in \FramaC's libc: by adding {\em \#define} macros to the preprocessing
-command-line (e.g. via \texttt{-cpp-extra-args=-D<macro>}), the user can ask
-\FramaC to handle such types as arithmetic.
-
-\begin{table}[!ht]
-  \centering
-  \begin{tabular}{l|l|l}
-    \textbf{Type name} & \textbf{Header} & \textbf{Macro name} \\
-    \midrule
-    \lstinline|pthread_t| & \lstinline|sys/types.h| & \lstinline|__FC_PTHREAD_T_IS_SCALAR| \\
-    \lstinline|fexcept_t| & \lstinline|fenv.h| & \lstinline|__FC_FEXCEPT_T_IS_SCALAR| \\
-  \end{tabular}
-\end{table}
-
-
 \section{Warnings during normalization}\label{sec:warnings-normalize}
 
 \emph{Note: the options below are deprecated, replaced by the more general and

@@ -8,9 +8,7 @@
   Called from precise_cos_sin.c:12.
 [eva] using specification for function Frama_C_float_interval
 [eva] precise_cos_sin.c:12: 
-  function Frama_C_float_interval: precondition 'finite' got status valid.
-[eva] precise_cos_sin.c:12: 
-  function Frama_C_float_interval: precondition 'order' got status valid.
+  function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
 [eva] precise_cos_sin.c:15: Call to builtin sin
 [eva] precise_cos_sin.c:15: 

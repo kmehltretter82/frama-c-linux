@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+open Eva_ast
 open Eval
 
 type function_calls =
@@ -547,7 +547,7 @@ module G = struct
         "λ" Bounds.pretty i.nb MC.pretty i.coeffs
 
   let pretty_loop_step fmt (stmt, ii) =
-    Format.fprintf fmt "s%d: %a" stmt.sid pretty_iteration_info ii
+    Format.fprintf fmt "s%d: %a" stmt.Cil_types.sid pretty_iteration_info ii
 
   let pretty_loop_info =
     Pretty_utils.pp_list ~pre:"@[<v>" ~suf:"@]" ~sep:"@ " pretty_loop_step
@@ -768,7 +768,7 @@ module G = struct
   (* This function returns [true] if [vi] _may_ be tracked. Variables for
      which we return [false] will never be part of a state. *)
   let tracked_variable vi =
-    Cil.isIntegralOrPointerType vi.vtype &&
+    Cil.isIntegralOrPointerType vi.Cil_types.vtype &&
     (match function_calls_handling with
      | FullInterprocedural -> true
      | IntraproceduralAll -> not vi.vglob
@@ -993,31 +993,30 @@ module G = struct
 
   let translate_exp state to_loc to_v e =
     let ptr_size e =
-      let typ_pointed = Cil.typeOf_pointed (Cil.typeOf e) in
+      let typ_pointed = Cil.typeOf_pointed e.typ in
       try Integer.of_int (Cil.bytesSizeOf typ_pointed)
       with Cil.SizeOfError _ -> raise Untranslatable
     in
     (* This function translates the expression as a precise gauge. For any
        expression that cannot be handled, [Untranslatable] is raised. *)
     let rec aux_gauge e =
-      match e.enode with
-      | Const _ | SizeOf _ | SizeOfE _  | SizeOfStr _ | AlignOf _ | AlignOfE _
-      | AddrOf _ | StartOf _ ->
+      match e.node with
+      | Const _ | AddrOf _ | StartOf _ ->
         raise Untranslatable (* constant: using linearization directly *)
 
       | CastE (typ_dst ,e) ->
         fits_in_type ~is_cast:true typ_dst (aux e)
 
       | Lval lv ->
-        let b = loc_to_base (to_loc lv) (Cil.typeOfLval lv) in
+        let b = loc_to_base (to_loc lv) lv.typ in
         gauge_from_state b state
 
       | UnOp (Neg , e, _) ->
-        fits_in_type (Cil.typeOf e) (Gauge.neg (aux e))
+        fits_in_type e.typ (Gauge.neg (aux e))
 
       | UnOp ((BNot | LNot) ,_,_) -> raise Untranslatable
 
-      | BinOp (op, e1, e2, _) -> aux_binop (Cil.typeOf e) op e1 e2
+      | BinOp (op, e1, e2, _) -> aux_binop e.typ op e1 e2
 
     and aux_binop typ_res op e1 e2 =
       let g = match op with
@@ -1097,7 +1096,7 @@ module G = struct
   let assign to_loc to_v lv e state =
     let loc = to_loc lv in
     try
-      let b = loc_to_base loc (Cil.typeOfLval lv) in
+      let b = loc_to_base loc lv.typ in
       let g = translate_exp state to_loc to_v e in
       store_gauge b g state
     with Untranslatable ->
@@ -1155,14 +1154,14 @@ module D : Abstract_domain.Leaf
 
   let assume_exp valuation e r state =
     if r.reductness = Created || r.reductness = Reduced then
-      match e.enode with
+      match e.node with
       | Lval lv -> begin
           match valuation.Abstract_domain.find_loc lv with
           | `Top -> `Value state
           | `Value {loc} ->
             let loc = Precise_locs.imprecise_location loc in
             try
-              let b = loc_to_base loc (Cil.typeOfLval lv) in
+              let b = loc_to_base loc lv.typ in
               match r.value.v with
               | `Bottom -> `Value state
               | `Value v ->
@@ -1258,10 +1257,10 @@ module D : Abstract_domain.Leaf
   let extract_expr ~oracle:_ _context _state _exp =
     `Value (Cvalue.V.top, None), Alarmset.all
 
-  let extract_lval ~oracle:_ _context state _lv typ loc =
+  let extract_lval ~oracle:_ _context state lv loc =
     let v =
       try
-        let b = loc_to_base (Precise_locs.imprecise_location loc) typ in
+        let b = loc_to_base (Precise_locs.imprecise_location loc) lv.typ in
         match extract_gauge state b with
         | Some g -> eval_gauge state g
         | None -> Cvalue.V.top

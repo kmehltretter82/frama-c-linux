@@ -3,7 +3,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2023                                               #
+#  Copyright (C) 2007-2024                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -22,14 +22,13 @@
 ##########################################################################
 
 THIS_SCRIPT="$0"
-CONFIG="<all>"
+CONFIG="<default>"
 VERBOSE=
 CLEAN=
 PREPARE=
 PULLCACHE=
 UPDATE=
 LOGS=
-COMMIT=
 TESTS=
 SAVE=
 COVER=
@@ -60,11 +59,13 @@ function Usage
     echo ""
     echo "  Tip: use shell completion"
     echo ""
-    echo "  <DIR>     all tests in <DIR>"
     echo "  <FILE>    single test file <FILE>"
+    echo "  <DIR>     all tests in <DIR>,"
+    echo "            or in directory tests/<DIR> (if it exists)"
+    echo "            or in plugin src/plugins/<DIR> (if it exists)"
     echo ""
-    echo "  -a|--all            run all tests (default behavior)"
-    echo "  -d|--default        run tests from default config only"
+    echo "  -a|--all            run all config"
+    echo "  -d|--default        run tests from default config only (by default)"
     echo "  -c|--config <name>  run tests from specified config only"
     echo ""
     echo ""
@@ -76,8 +77,8 @@ function Usage
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
     echo "  -f|--force          force re-run tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
-    echo "  -u|--update         run tests and update oracles (and WP-cache)"
-    echo "  -k|--commit         commit new test oracles"
+    echo "  -u|--update         update oracles (and WP-cache) and create new"
+    echo "                      test oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
@@ -155,6 +156,16 @@ do
             Usage
             exit 0
             ;;
+        "-a"|"--all")
+            CONFIG="<all>"
+            ;;
+        "-d"|"--default")
+            CONFIG="<default>"
+            ;;
+        "-c"|"--config")
+            CONFIG=$2
+            shift
+            ;;
         "-r"|"--clean")
             CLEAN=yes
             PREPARE=yes
@@ -166,22 +177,22 @@ do
             PULLCACHE=yes
             ;;
         "-f"|"--force")
-            DUNE_OPT+="--force "
+            DUNE_OPT+=" --force"
             ;;
         "-u"|"--update")
-            DUNE_OPT+="--auto-promote "
+            DUNE_OPT+=" --auto-promote"
             UPDATE=yes
             ;;
         "--watch")
-            DUNE_OPT+="--watch "
+            DUNE_OPT+=" --watch"
             ;;
         "-v"|"--verbose")
-            DUNE_OPT+="--display=short "
+            DUNE_OPT+=" --display=short"
             VERBOSE=yes
             ;;
         "-j"|"--jobs")
             if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
-                DUNE_OPT+="-j $2 "
+                DUNE_OPT+=" -j $2"
                 shift
             else
                 ErrorUsage \
@@ -191,18 +202,8 @@ do
         "-l"|"--logs")
             LOGS=yes
             ;;
-        "-k"|"--commit")
-            COMMIT=yes
-            ;;
         "-s"|"--save" )
             SAVE=yes
-            ;;
-        "-d"|"--default")
-            CONFIG="<default>"
-            ;;
-        "-c"|"--config")
-            CONFIG=$2
-            shift
             ;;
         "--coverage")
             COVER=yes
@@ -220,16 +221,19 @@ do
             ALIAS_NAME=$2
             shift
             ;;
-        "-a"|"--all")
-            TESTS=""
-            for dir in $TEST_DIRS ; do
-                if [ -d "$dir" ]; then
-                    TESTS="$TESTS $dir"
-                fi
-            done
+        "eva")
+            TESTS+=" tests/value tests/builtins tests/float tests/idct"
             ;;
-       *)
-            TESTS+=" $1"
+        *)
+            if [ -f $1 ] || [ -d $1 ]; then
+                TESTS+=" $1"
+            elif [ -d tests/$1 ]; then
+                TESTS+=" tests/$1"
+            elif [ -d src/plugins/$1/tests ]; then
+                TESTS+=" src/plugins/$1/tests"
+            else
+                ErrorUsage "'$1' is not a test file or directory"
+            fi
             ;;
     esac
     shift
@@ -306,6 +310,8 @@ function PrepareCoverage
         Cmd rm -rf _bisect
         Cmd mkdir _coverage
         Cmd mkdir _bisect
+
+        DUNE_OPT+=" --workspace dev/dune-workspace.cover"
     fi
 }
 
@@ -333,8 +339,45 @@ function GenerateCoverage
 # ---  Test Suite Preparation
 # --------------------------------------------------------------------------
 
+function GenerateDuneFiles
+{
+    Head "Generating dune files..."
+    Cmd make run-ptests
+}
+
+function CheckDuneFiles
+{
+    DEFAULT_FILE=tests/syntax/result/dune
+    if [ "$PREPARE" != "yes" ] ;
+    then
+        if [ ! -f "$DEFAULT_FILE" ] ;
+        then
+            GenerateDuneFiles
+        else
+            DATE_TEST_MODIFICATION=$(find $TESTS -type f \
+                                    -not -path "*/result*/*" \
+                                    -not -path "*/oracle*/*" \
+                                    -exec stat --printf "%Y\n" {} \+ | \
+                                    sort -n -r | head -n 1)
+            DATE_TEST_GENERATION=$(stat $DEFAULT_FILE --printf "%Y\n")
+            if [ $DATE_TEST_MODIFICATION -gt $DATE_TEST_GENERATION ] ;
+            then
+                GenerateDuneFiles
+            fi
+        fi
+    fi
+}
+
 function PrepareTests
 {
+    if [ "$TESTS" = "" ]; then
+        for dir in $TEST_DIRS ; do
+            if [ -d "$dir" ]; then
+                TESTS+=" $dir"
+            fi
+        done
+    fi
+
     if [ "$CLEAN" = "yes" ]
     then
         Head "Cleaning all tests..."
@@ -342,8 +385,7 @@ function PrepareTests
     fi
     if [ "$PREPARE" = "yes" ]
     then
-        Head "Generating dune files..."
-        Cmd make run-ptests
+        GenerateDuneFiles
     fi
 }
 
@@ -354,9 +396,6 @@ function PrepareTests
 [ "$DUNE_LOG" = "" ] || rm -rf $DUNE_LOG
 function RunAlias
 {
-    if [ "$COVER" = "yes" ]; then
-        DUNE_OPT+="--workspace dev/dune-workspace.cover "
-    fi
     Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
         Run dune build $DUNE_OPT $@
@@ -405,7 +444,11 @@ function TestFile
     FILE=$(basename $1)
 
     case "$CONFIG" in
-        "<all>"|"<default>")
+        "<all>")
+            RESULT="result*"
+            CFG="(all config)"
+            ;;
+        "<default>")
             RESULT=result
             CFG="(default config)"
             ;;
@@ -414,16 +457,21 @@ function TestFile
             CFG="(config $CONFIG)"
             ;;
     esac
-    if [ "$LOGS" = "yes" ]; then
-        ALIAS=$DIR/$RESULT/$FILE
-    else
-        ALIAS=$DIR/$RESULT/${FILE%.*}.diff
-    fi
-    if [ "$COMMIT" = "yes" ]; then
-        COMMITS="${COMMITS} $DIR/$RESULT/${FILE%.*}"
-    fi
+
+    RESULTS="$DIR/$RESULT"
+    for res in $RESULTS ; do
+        if [ "$LOGS" = "yes" ]; then
+            ALIAS+=" @$res/$FILE"
+        else
+            ALIAS+=" @$res/${FILE%.*}.diff"
+        fi
+        if [ "$UPDATE" = "yes" ]; then
+            COMMITS+=" $res/${FILE%.*}"
+        fi
+    done
+
     Head "Register test on file $1 $CFG"
-    DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
+    DUNE_ALIAS="${DUNE_ALIAS} $ALIAS"
 }
 
 # --------------------------------------------------------------------------
@@ -449,21 +497,38 @@ function Register
 }
 
 # --------------------------------------------------------------------------
-# ---  Tests Commits
+# ---  Tests Create New Oracles
 # --------------------------------------------------------------------------
 
-function Commits
+function CreateNewOraclesAux
+{
+    for log in $1*.$2.log
+    do
+        # Only non-empty oracles
+        if [ -s "$log" ];
+        then
+            dest="${log//result/oracle}"
+            dest="${dest//$2.log/$2.oracle}"
+            # Only non-existing oracles, existing ones will be updated via
+            # dune --auto-promote
+            if [ ! -f "../../$dest" ];
+            then
+                echo "Create oracle $dest"
+                cp -f $log "../../$dest"
+            fi
+        fi
+    done
+}
+
+function CreateNewOracles
 {
     while [ "$1" != "" ]
     do
         cd _build/default
-        for log in $1*.res.log
-        do
-            echo "Commit $log"
-            dest="${log//result/oracle}"
-            dest="${dest//res.log/res.oracle}"
-            cp -f $log "../../$dest"
-        done
+
+        CreateNewOraclesAux $1 res
+        CreateNewOraclesAux $1 err
+
         cd ../..
         shift
     done
@@ -484,7 +549,7 @@ function Status
             #-- Details
             Head "Details by directory:"
             if  [ "$NB" != "0" ]; then
-                for dir in $TEST_DIRS ; do
+                for dir in $TESTS ; do
                     if [ -d "$dir" ]; then
                         NB=$(grep -c "^frama-c-wtests $dir" "$1")
                         [ "$NB" = "0" ] || echo "- $dir= $NB"
@@ -514,9 +579,10 @@ SetEnv
 PullCache
 PrepareCoverage
 PrepareTests
+CheckDuneFiles
 Register $TESTS
 RunAlias ${DUNE_ALIAS}
-Commits ${COMMITS}
+CreateNewOracles ${COMMITS}
 Status $DUNE_LOG
 GenerateCoverage
 

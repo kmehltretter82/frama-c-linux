@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -87,6 +87,7 @@ module Make () = struct
   let print fmt x = Format.pp_print_string fmt x.name
 end
 
+module Key_Context = Make ()
 module Key_Value = Make ()
 module Key_Location = Make ()
 module Key_Domain = Make ()

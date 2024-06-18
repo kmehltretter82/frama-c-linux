@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -116,7 +116,7 @@ module type Simple_Cvalue = sig
   (** Query functions. *)
 
   val extract_expr: t -> exp -> cvalue or_bottom
-  val extract_lval: t -> lval -> typ -> precise_loc -> cvalue or_bottom
+  val extract_lval: t -> lval -> precise_loc -> cvalue or_bottom
 
   (** Transfer functions. *)
 

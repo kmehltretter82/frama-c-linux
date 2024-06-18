@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -23,13 +23,22 @@
 val product_category: Self.category
 
 module Make
-    (Value: Abstract_value.S)
-    (Left:  Abstract.Domain.Internal with type value = Value.t)
-    (Right: Abstract.Domain.Internal with type value = Left.value
-                                      and type location = Left.location)
-  : Abstract.Domain.Internal with type value = Value.t
-                              and type location = Left.location
-                              and type state = Left.state * Right.state
+    (Context  : Abstract_context.S)
+    (Value    : Abstract_value.S with type context = Context.t)
+    (Location : Abstract_location.S with type value = Value.t)
+    (Left  : Abstract.Domain.Internal
+     with type context = Context.t
+      and type value = Value.t
+      and type location = Location.location)
+    (Right : Abstract.Domain.Internal
+     with type context = Context.t
+      and type value = Value.t
+      and type location = Location.location)
+  : Abstract.Domain.Internal
+    with type context = Context.t
+     and type value = Value.t
+     and type location = Location.location
+     and type state = Left.state * Right.state
 
 
 (*

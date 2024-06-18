@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
+open Eva_ast
 open Locations
 
 let dkey = Self.register_category "d-symblocs"
@@ -117,45 +117,38 @@ end
 let interesting_exp get_locs get_val e =
   let is_comp = function Eq | Ne | Le | Ge | Lt | Gt -> true | _ -> false in
   let rec has_lvalue e =
-    match e.enode with
+    match e.node with
     | Lval _ ->
       not (Cvalue.V.cardinal_zero_or_one (get_val e))
     | CastE (_, e) | UnOp (_, e, _) ->
       has_lvalue e
     | BinOp (op, e1, e2,_) ->
       not (is_comp op) && (has_lvalue e1 || has_lvalue e2)
-    | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _ | AlignOf _ | AlignOfE _
-    | StartOf _ | AddrOf _ ->
+    | Const _ | StartOf _ | AddrOf _ ->
       false
   in
-  match e.enode with
+  match e.node with
   | Lval lv ->
     not (Precise_locs.cardinal_zero_or_one (get_locs lv))
   | BinOp (op, e1, e2,_) ->
     not (is_comp op) && has_lvalue e1 && has_lvalue e2
-  | CastE _ | UnOp _ | Const _ | SizeOf _ | SizeOfStr _ | SizeOfE _
-  | AlignOf _ | AlignOfE _ | StartOf _ | AddrOf _ ->
+  | CastE _ | UnOp _ | Const _ | StartOf _ | AddrOf _ ->
     false
 
 (* Locals and formals syntactically present in an expression or lvalue *)
-let rec vars_lv (h, o) = Base.Set.union (vars_host h) (vars_offset o)
-and vars_exp (e: exp) = match e.enode with
-  | Const _ | SizeOf _ | AlignOf _ | SizeOfStr _ ->
-    Base.Set.empty
-  | AddrOf lv | StartOf lv | Lval lv ->
-    vars_lv lv
-  | SizeOfE e | AlignOfE e | CastE (_,e) | UnOp (_,e,_) ->
-    vars_exp e
-  | BinOp (_,e1,e2,_) -> Base.Set.union (vars_exp e1) (vars_exp e2)
-and vars_host = function
-  | Var vi ->
-    (* Global variables never go out of scope, no need to track them *)
-    if vi.vglob then Base.Set.empty else Base.(Set.singleton (of_varinfo vi))
-  | Mem e -> vars_exp e
-and vars_offset = function
-  | NoOffset -> Base.Set.empty
-  | Field (_, o) -> vars_offset o
-  | Index (e, o) -> Base.Set.union (vars_exp e) (vars_offset o)
+let vars_to_bases vi_set =
+  vi_set
+  |> Cil_datatype.Varinfo.Set.to_seq
+  (* Global variables never go out of scope, no need to track them *)
+  |> Seq.filter (fun vi -> not vi.Cil_types.vglob)
+  |> Seq.map Base.of_varinfo
+  |> Base.Set.of_seq
+
+let vars_lv lv =
+  vars_to_bases (Eva_ast.vars_in_lval lv)
+
+let vars_exp (e: exp) =
+  vars_to_bases (Eva_ast.vars_in_exp e)
 
 (* Legacy names *)
 module B2K = K.BaseToHCESet
@@ -373,12 +366,12 @@ module Memory = struct
   (* Add the the mapping [lv --> v] to [state] when possible.
      [get_z] is a function that computes dependencies. *)
   let add_lv state get_z lv v  =
-    if Eval_typ.lval_contains_volatile lv then
+    if Eva_ast.lval_contains_volatile lv then
       state
     else
       let k = K.HCE.of_lval lv in
       let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect = Eva_utils.indirect_zone_of_lval get_z lv in
+      let z_lv_indirect = Eva_ast.indirect_zone_of_lval get_z lv in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
@@ -390,11 +383,11 @@ module Memory = struct
   (* Add the mapping [e --> v] to [state] when possible and useful.
      [get_z] is a function that computes dependencies. *)
   let add_exp state get_z e v =
-    if Eval_typ.expr_contains_volatile e then
+    if Eva_ast.exp_contains_volatile e then
       state
     else
       let k = K.HCE.of_exp e in
-      let z = Eva_utils.zone_of_expr get_z e in
+      let z = Eva_ast.zone_of_exp get_z e in
       add_key k v z state
 
   let find k state =
@@ -491,7 +484,7 @@ module D : Abstract_domain.Leaf
       | `Value loc -> loc.Eval.loc
     in
     if Precise_locs.(equal_loc loc_top r) then
-      Self.fatal "Unknown location for %a" Printer.pp_lval lv
+      Self.fatal "Unknown location for %a" Eva_ast.pp_lval lv
     else r
 
   let get_val valuation = fun lv ->
@@ -550,7 +543,7 @@ module D : Abstract_domain.Leaf
     `Value (Memory.kill loc state)
 
   let store_copy valuation lv loc state fv =
-    if Cil.isArithmeticOrPointerType lv.ltyp then
+    if Cil.isArithmeticOrPointerType lv.lval.typ then
       match fv.v, fv.initialized, fv.escaping with
       | `Value v, true, false -> store_value valuation lv.lval loc state v
       | _ -> store_indeterminate state loc
@@ -589,7 +582,7 @@ module D : Abstract_domain.Leaf
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none
 
-  let extract_lval ~oracle:_ _context state lv _typ _locs =
+  let extract_lval ~oracle:_ _context state lv _locs =
     match Memory.find_lval lv state with
     | None -> top_query
     | Some v -> `Value (v, None), Alarmset.none

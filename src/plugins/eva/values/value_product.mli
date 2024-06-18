@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,9 +35,12 @@ val narrow_truth_pair:
   (('a * 'b)  * ('a * 'b)) truth
 
 module Make
-    (Left: Abstract_value.S)
-    (Right: Abstract_value.S)
-  : Abstract_value.S with type t = Left.t * Right.t
+    (Context : Abstract_context.S)
+    (Left  : Abstract.Value.Internal with type context = Context.t)
+    (Right : Abstract.Value.Internal with type context = Context.t)
+  : Abstract.Value.Internal
+    with type t = Left.t * Right.t
+     and type context = Context.t
 
 
 (*

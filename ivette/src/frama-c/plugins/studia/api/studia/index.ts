@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -77,6 +77,7 @@ const getReadsLval_internal: Server.GetRequest<marker,effects> = {
   name: 'plugins.studia.studia.getReadsLval',
   input: jMarker,
   output: jEffects,
+  fallback: effectsDefault,
   signals: [],
 };
 /** Get the list of statements that read a lval. */
@@ -87,6 +88,7 @@ const getWritesLval_internal: Server.GetRequest<marker,effects> = {
   name: 'plugins.studia.studia.getWritesLval',
   input: jMarker,
   output: jEffects,
+  fallback: effectsDefault,
   signals: [],
 };
 /** Get the list of statements that write a lval. */

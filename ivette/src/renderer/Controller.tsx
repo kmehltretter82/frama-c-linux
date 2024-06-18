@@ -2,7 +2,7 @@
 /*                                                                          */
 /*   This file is part of Frama-C.                                          */
 /*                                                                          */
-/*   Copyright (C) 2007-2023                                                */
+/*   Copyright (C) 2007-2024                                                */
 /*     CEA (Commissariat à l'énergie atomique et aux énergies               */
 /*          alternatives)                                                   */
 /*                                                                          */
@@ -416,7 +416,7 @@ Server.onStatus((s: Server.Status) => {
       return;
     case Server.Status.FAILURE:
       Display.showError('Frama-C Server Failure');
-      Display.alertComponent('ivette.console');
+      Display.alertComponent('fc.kernel.console');
       return;
   }
 });
@@ -443,7 +443,9 @@ export const Status = (): JSX.Element => {
       led = 'active';
       blink = pending > 0;
       running = 'ON';
-      title = 'Server is running';
+      title = pending > 0
+        ? `Server running (${pending} pending requests)`
+        : 'Server running (idle)';
       break;
     case Server.Status.CMD:
       led = 'positive';
@@ -473,7 +475,7 @@ export const Status = (): JSX.Element => {
 
   return (
     <>
-      <LED status={led} blink={blink} />
+      <LED status={led} title={title} blink={blink} />
       <Code label={running} title={title} />
     </>
   );

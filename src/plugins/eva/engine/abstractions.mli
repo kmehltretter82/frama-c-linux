@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -49,14 +49,19 @@ module Domain : sig
     name:string -> descr:string -> ?experimental:bool -> ?priority:int ->
     (unit -> (module Abstract_domain.Leaf)) -> unit
 
+  module type Context = Abstract.Context.External
+  module type Value = Abstract.Value.External
+
   (** Functor domain which can be built over any value abstractions, but with
       fixed locations dependencies. *)
   module type Functor = sig
     type location
     val location_dependencies: location Abstract_location.dependencies
-    module Make (V : Abstract.Value.External) : sig
+    module Make (C : Context) (V : Value with type context = C.t) : sig
       include Abstract_domain.S
-        with type value = V.t and type location = location
+        with type context = C.t
+         and type value = V.t
+         and type location = location
       val key : state Abstract_domain.key
     end
   end
@@ -114,12 +119,15 @@ module type Value_with_reduction = sig
   val reduce : t -> t
 end
 
-(** The three abstractions used in an Eva analysis. *)
+(** The four abstractions used in an Eva analysis. *)
 module type S = sig
-  module Val : Value_with_reduction
+  module Ctx : Abstract.Context.External
+  module Val : Value_with_reduction with type context = Ctx.t
   module Loc : Abstract.Location.External with type value = Val.t
   module Dom : Abstract.Domain.External
-    with type value = Val.t and type location = Loc.location
+    with type value = Val.t
+     and type location = Loc.location
+     and type context = Ctx.t
 end
 
 (* The three abstractions plus an evaluation engine for these abstractions. *)
@@ -127,6 +135,7 @@ module type S_with_evaluation = sig
   include S
   module Eval : Evaluation_sig.S
     with type state = Dom.t
+     and type context = Ctx.t
      and type value = Val.t
      and type loc = Loc.location
      and type origin = Dom.origin

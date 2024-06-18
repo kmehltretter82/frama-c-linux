@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -85,7 +85,7 @@ sig
   val enter_loop : flow -> Cil_types.stmt -> flow
   val leave_loop : flow -> Cil_types.stmt -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
-  val split_return : flow -> Cil_types.exp option -> flow
+  val split_return : flow -> Eva_ast.exp option -> flow
 
   (** After the analysis of a function call, recombines callee partitioning keys
       with the caller key. *)

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -121,5 +121,5 @@ sig
   (* Update the array segmentation at the given offset so the given bound
      expressions appear in the segmentation *)
   val segmentation_hint : oracle:oracle ->
-    t -> location -> Cil_types.exp list -> t
+    t -> location -> Eva_ast.exp list -> t
 end

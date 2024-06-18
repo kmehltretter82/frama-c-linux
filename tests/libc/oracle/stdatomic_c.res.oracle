@@ -22,7 +22,7 @@
   Called from stdatomic_c.c:10.
 [eva] computing for function Frama_C_nondet <- __fc_atomic_is_lock_free <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:35.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:36.
 [eva] using specification for function Frama_C_nondet
 [eva] Done for function Frama_C_nondet
 [eva] Recording results for __fc_atomic_is_lock_free
@@ -42,7 +42,7 @@
 [eva] Done for function __fc_atomic_load
 [eva] computing for function __fc_atomic_load_explicit <- test_atomic_int <- main.
   Called from stdatomic_c.c:14.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:57: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:60: 
   Reusing old results for call to __fc_atomic_load
 [eva] Recording results for __fc_atomic_load_explicit
 [eva] Done for function __fc_atomic_load_explicit
@@ -56,7 +56,7 @@
 [eva] computing for function __fc_atomic_exchange <- 
                           __fc_atomic_exchange_explicit <- test_atomic_int <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:87.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:90.
 [eva] Recording results for __fc_atomic_exchange
 [eva] Done for function __fc_atomic_exchange
 [eva] Recording results for __fc_atomic_exchange_explicit
@@ -66,38 +66,38 @@
   Called from stdatomic_c.c:17.
 [eva] computing for function memcmp <- __fc_atomic_compare_exchange_strong <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:93.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:96.
 [eva] using specification for function memcmp
-[eva] FRAMAC_SHARE/libc/stdatomic.c:93: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'valid_s1' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:93: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'valid_s2' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:93: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'initialization,s1' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:93: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'initialization,s2' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:93: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'danglingness,s1' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:93: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'danglingness,s2' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:63: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function memcmp
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: 
   function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:101: 
+[eva] FRAMAC_SHARE/libc/string.h:118: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: 
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: 
   function memcpy: precondition 'separation' got status valid.
 [eva] Recording results for __fc_atomic_compare_exchange_strong
 [eva] Done for function __fc_atomic_compare_exchange_strong
@@ -107,14 +107,14 @@
 [eva] computing for function __fc_atomic_compare_exchange_strong <- 
                           __fc_atomic_compare_exchange_strong_explicit <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:104.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:107.
 [eva] computing for function memcmp <- __fc_atomic_compare_exchange_strong <- 
                           __fc_atomic_compare_exchange_strong_explicit <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:93.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:96.
 [eva] Done for function memcmp
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: Call to builtin memcpy
 [eva] Recording results for __fc_atomic_compare_exchange_strong
 [eva] Done for function __fc_atomic_compare_exchange_strong
 [eva] Recording results for __fc_atomic_compare_exchange_strong_explicit
@@ -125,14 +125,14 @@
 [eva] computing for function __fc_atomic_compare_exchange_strong <- 
                           __fc_atomic_compare_exchange_weak <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:110.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:113.
 [eva] computing for function memcmp <- __fc_atomic_compare_exchange_strong <- 
                           __fc_atomic_compare_exchange_weak <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:93.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:96.
 [eva] Done for function memcmp
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: Call to builtin memcpy
 [eva] Recording results for __fc_atomic_compare_exchange_strong
 [eva] Done for function __fc_atomic_compare_exchange_strong
 [eva] Recording results for __fc_atomic_compare_exchange_weak
@@ -143,14 +143,14 @@
 [eva] computing for function __fc_atomic_compare_exchange_strong <- 
                           __fc_atomic_compare_exchange_weak_explicit <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:118.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:121.
 [eva] computing for function memcmp <- __fc_atomic_compare_exchange_strong <- 
                           __fc_atomic_compare_exchange_weak_explicit <- 
                           test_atomic_int <- main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:93.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:96.
 [eva] Done for function memcmp
-[eva] FRAMAC_SHARE/libc/stdatomic.c:94: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/stdatomic.c:95: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:97: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/stdatomic.c:98: Call to builtin memcpy
 [eva] Recording results for __fc_atomic_compare_exchange_strong
 [eva] Done for function __fc_atomic_compare_exchange_strong
 [eva] Recording results for __fc_atomic_compare_exchange_weak_explicit
@@ -165,7 +165,7 @@
 [eva] computing for function __fc_atomic_fetch_add <- 
                           __fc_atomic_fetch_add_explicit <- test_atomic_int <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:147.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:150.
 [eva] Recording results for __fc_atomic_fetch_add
 [eva] Done for function __fc_atomic_fetch_add
 [eva] Recording results for __fc_atomic_fetch_add_explicit
@@ -180,7 +180,7 @@
 [eva] computing for function __fc_atomic_fetch_sub <- 
                           __fc_atomic_fetch_sub_explicit <- test_atomic_int <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:171.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:174.
 [eva] Recording results for __fc_atomic_fetch_sub
 [eva] Done for function __fc_atomic_fetch_sub
 [eva] Recording results for __fc_atomic_fetch_sub_explicit
@@ -195,7 +195,7 @@
 [eva] computing for function __fc_atomic_fetch_or <- 
                           __fc_atomic_fetch_or_explicit <- test_atomic_int <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:195.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:198.
 [eva] Recording results for __fc_atomic_fetch_or
 [eva] Done for function __fc_atomic_fetch_or
 [eva] Recording results for __fc_atomic_fetch_or_explicit
@@ -210,7 +210,7 @@
 [eva] computing for function __fc_atomic_fetch_xor <- 
                           __fc_atomic_fetch_xor_explicit <- test_atomic_int <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:225.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:228.
 [eva] Recording results for __fc_atomic_fetch_xor
 [eva] Done for function __fc_atomic_fetch_xor
 [eva] Recording results for __fc_atomic_fetch_xor_explicit
@@ -225,7 +225,7 @@
 [eva] computing for function __fc_atomic_fetch_and <- 
                           __fc_atomic_fetch_and_explicit <- test_atomic_int <- 
                           main.
-  Called from FRAMAC_SHARE/libc/stdatomic.c:255.
+  Called from FRAMAC_SHARE/libc/stdatomic.c:258.
 [eva] Recording results for __fc_atomic_fetch_and
 [eva] Done for function __fc_atomic_fetch_and
 [eva] Recording results for __fc_atomic_fetch_and_explicit

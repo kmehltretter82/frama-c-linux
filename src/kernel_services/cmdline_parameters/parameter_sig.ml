@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -286,12 +286,12 @@ module type Custom = sig
   val set_possible_values: string list -> unit
   (** Set what are the acceptable values for this parameter.
       If the given list is empty, then all values are acceptable.
-      @since Frama-C+dev *)
+      @since 29.0-Copper *)
 
   val get_possible_values: unit -> string list
   (** What are the acceptable values for this parameter.
       If the returned list is empty, then all values are acceptable.
-      @since Frama-C+dev *)
+      @since 29.0-Copper *)
 end
 
 (* ************************************************************************** *)
@@ -574,7 +574,7 @@ module type Builder = sig
     end): Filepath
 
   (** Allow using custom types as parameters.
-      @since Frama-c+dev *)
+      @since 29.0-Copper *)
   module Custom(X: sig
       include Input_with_arg
       include Datatype.S
@@ -586,7 +586,7 @@ module type Builder = sig
   (** A fixed set of possible values, represented by a type [t], intended to be
       a variant with only a finite number of possible constructions.
       Note that [t] must be comparable using [Stdlib.compare].
-      @since Frama-c+dev *)
+      @since 29.0-Copper *)
   module Enum(X : sig
       include Input_with_arg
       type t

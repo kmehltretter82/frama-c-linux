@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,6 +36,7 @@ end
 
 module Make
     (Domain: Input_Domain)
+    (Ctx: Conversion with type internal := Domain.context)
     (Val: Conversion with type internal := Domain.value)
     (Loc: Conversion with type internal := Domain.location)
 = struct
@@ -47,6 +48,7 @@ module Make
 
   let log_category = Domain.log_category
 
+  type context = Ctx.extended
   type value = Val.extended
   type location = Loc.extended
   type origin = Domain.origin
@@ -56,16 +58,15 @@ module Make
     Domain.extract_expr ~oracle context state exp >>=: fun (value, origin) ->
     Val.extend value, origin
 
-  let extract_lval ~oracle context state lval typ loc =
+  let extract_lval ~oracle context state lval loc =
     let oracle exp = oracle exp >>=: Val.restrict in
     let loc = Loc.restrict loc in
-    Domain.extract_lval ~oracle context state lval typ loc
+    Domain.extract_lval ~oracle context state lval loc
     >>=: fun (value, origin) ->
     Val.extend value, origin
 
-  let backward_location state lval typ loc value =
-    Domain.backward_location
-      state lval typ (Loc.restrict loc) (Val.restrict value)
+  let backward_location state lval loc value =
+    Domain.backward_location state lval (Loc.restrict loc) (Val.restrict value)
     >>-: fun (loc, value) ->
     Loc.extend loc, Val.extend value
 
@@ -73,6 +74,10 @@ module Make
     let list = Domain.reduce_further state expr (Val.restrict value) in
     List.map (fun (e, v) -> e, Val.extend v) list
 
+  let build_context state =
+    let open Bottom.Operators in
+    let+ context = Domain.build_context state in
+    Ctx.extend context
 
   let lift_left left = { left with lloc = Loc.restrict left.lloc }
   let lift_flagged_value value =

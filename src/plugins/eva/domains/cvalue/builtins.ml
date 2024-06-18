@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,12 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-
 exception Invalid_nb_of_args of int
 exception Outside_builtin_possibilities
 
-type builtin_type = unit -> typ * typ list
+type builtin_type = unit -> Eva_ast.typ * Eva_ast.typ list
 type cacheable = Eval.cacheable = Cacheable | NoCache | NoCacheCallers
 
 type full_result = {
@@ -39,7 +37,7 @@ type call_result =
   | Result of Cvalue.V.t list
   | Full of full_result
 
-type builtin = Cvalue.Model.t -> (exp * Cvalue.V.t) list -> call_result
+type builtin = Cvalue.Model.t -> (Eva_ast.exp * Cvalue.V.t) list -> call_result
 
 (* Table of all registered builtins; filled by [register_builtin] calls.  *)
 let table = Hashtbl.create 17
@@ -254,7 +252,8 @@ let process_result call state call_result =
       let b_ret = Base.of_varinfo vi_ret in
       let offsm = Eval_op.offsetmap_of_v ~typ:vi_ret.vtype value in
       let prefix = "Builtin " ^ Kernel_function.get_name call.kf in
-      Cvalue_transfer.warn_imprecise_offsm_write ~prefix (Cil.var vi_ret) offsm;
+      let lval_ret = Eva_ast.Build.var vi_ret in
+      Cvalue_transfer.warn_imprecise_offsm_write ~prefix lval_ret offsm;
       Cvalue.Model.add_base b_ret offsm state, clob
     | _, _ -> state, clob (* TODO: error? *)
   in

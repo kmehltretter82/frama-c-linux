@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -32,4 +32,4 @@ let offsetmap_of_assignment state expr = function
   | Copy (lv, _value) ->
     Bottom.non_bottom (Eval_op.offsetmap_of_loc lv.lloc state)
   | Assign value ->
-    offsetmap_of_v ~typ:(Cil.typeOf expr) value
+    offsetmap_of_v ~typ:expr.Eva_ast.typ value

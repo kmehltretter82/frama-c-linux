@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2023                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -126,7 +126,7 @@ val command :
     process will be filled into the arguments buffer.
     @raise Sys_error when a system error occurs
     @raise Async.Cancel when the computation is interrupted or on timeout
-    @before Frama-C+dev Async.Cancel was Db.Cancel
+    @before 29.0-Copper Async.Cancel was Db.Cancel
 *)
 
 (*

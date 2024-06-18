@@ -39,6 +39,7 @@
 (*                        énergies alternatives)                            *)
 (*               and INRIA (Institut National de Recherche en Informatique  *)
 (*                          et Automatique).                                *)
+(*                                                                          *)
 (****************************************************************************)
 
 (* Modified by TrustInSoft *)
@@ -5919,6 +5920,11 @@ let getCompField cinfo fieldName =
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
 
+let getCompType typ =
+  match unrollTypeSkel typ with
+  | TComp(comp,_) -> comp
+  | _ -> raise Not_found
+
 let sameSizeInt ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
   if machdep then bytesSizeOfInt ik1 == bytesSizeOfInt ik2
   else
@@ -6133,7 +6139,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
             warning
               ~wkey:Kernel.wkey_int_conversion
               ~current:true
-              "Integer compatibily is machine-dependent : %a and %a\n"
+              "Integer compatibility is machine-dependent: %a and %a\n"
               Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty t;
             result k oldk
           end
