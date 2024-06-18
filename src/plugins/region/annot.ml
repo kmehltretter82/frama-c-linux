@@ -113,20 +113,18 @@ type env = {
 
 let error (env:env) ~loc msg = env.context.error loc msg
 
-let getCompoundType env ~loc typ =
-  match Cil.unrollType typ with
-  | TComp(comp,_) -> comp
-  | _ -> error env ~loc "Expected compound type for term"
-
 let parse_variable (env:env) ~loc x =
   match env.context.find_var x with
   | { lv_origin = Some v } -> { loc ; typ = v.vtype ; step = Var v }
   | _ -> error env ~loc "Variable '%s' is not a C-variable" x
 
 let parse_field env ~loc comp f =
-  try List.find (fun fd -> fd.fname = f) (Option.value ~default:[] comp.cfields)
-  with Not_found ->
+  try Cil.getCompField comp f with Not_found ->
     error env ~loc "No field '%s' in compound type '%s'" f comp.cname
+
+let parse_compinfo env ~loc typ =
+  try Cil.getCompType typ with Not_found ->
+    error env ~loc "Expected compound type for term"
 
 let parse_lrange (env: env) (e : lexpr) =
   match e.lexpr_node with
@@ -170,7 +168,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
       error env ~loc "Pointer-type expected for operator '+'"
   | PLdot( p , f ) ->
     let lv = parse_lpath env p in
-    let comp = getCompoundType env ~loc:lv.loc lv.typ in
+    let comp = parse_compinfo env ~loc:lv.loc lv.typ in
     let fd = parse_field env ~loc comp f in
     { loc ; step = Field(lv,fd) ; typ = fd.ftype }
   | PLarrow( p , f ) ->
