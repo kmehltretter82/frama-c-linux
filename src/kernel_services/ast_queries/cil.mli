@@ -658,6 +658,8 @@ val lenOfArray64: exp option -> Integer.t
 (** Return a named fieldinfo in compinfo, or raise Not_found *)
 val getCompField: compinfo -> string -> fieldinfo
 
+(** Return the compinfo of the typ, or raise Not_found *)
+val getCompType: typ -> compinfo
 
 (** A datatype to be used in conjunction with [existsType] *)
 type existsAction =
