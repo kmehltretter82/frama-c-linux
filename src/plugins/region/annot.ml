@@ -152,7 +152,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
       let te = Cil.typeOf_pointed lv.typ in
       { loc ; step = Star lv ; typ = te }
     else
-      error env ~loc "Pointer-type expected for operator '&'"
+      error env ~loc "Pointer-type expected for operator '*'"
   | PLunop( Uamp , p ) ->
     let lv = parse_lpath env p in
     let typ = TPtr( lv.typ , [] ) in
