@@ -5936,6 +5936,11 @@ let getCompField cinfo fieldName =
     (fun fi -> fi.fname = fieldName)
     (Option.value ~default:[] cinfo.cfields)
 
+let getCompType typ =
+  match unrollTypeSkel typ with
+  | TComp(comp,_) -> comp
+  | _ -> raise Not_found
+
 let sameSizeInt ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
   if machdep then bytesSizeOfInt ik1 == bytesSizeOfInt ik2
   else

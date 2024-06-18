@@ -15,9 +15,6 @@ typedef struct Block {
   SN sum ;
 } FB ;
 
-/*@
-  \wp::wpregion A: fb ;
-*/
 void job(FB *fb)
 {
   fb->out1->v = fb->out1->v + fb->out2->v ;

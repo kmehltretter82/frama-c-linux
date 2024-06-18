@@ -1,4 +1,4 @@
-//@ \wp::wpregion *p; \wp::wpregion *q ;
+//@ region *p, *q ;
 int job( int n, int * p , int * q )
 {
   int s = 0 ;

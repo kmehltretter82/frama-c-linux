@@ -1,0 +1,10 @@
+[kernel] Parsing array2.i (no preprocessing)
+[region] Analyzing regions
+[region] Function job:
+  R000d: R-- n (int) 32b ;
+  R0001: R-A p (int *) 64b (*R0004) ;
+  R0004: R-- P: (int) 32b ;
+  R0005: R-A q (int *) 64b (*R0008) ;
+  R0008: R-- Q: (int) 32b ;
+  R0009: RW- s (int) 32b ;
+  R000b: RW- k (int) 32b ;

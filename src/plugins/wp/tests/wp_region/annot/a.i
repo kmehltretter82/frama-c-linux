@@ -24,7 +24,7 @@ struct Block {
 };
 typedef struct Block FB;
 /*@ terminates \true;
-    \wp::region *fb; */
+    \wp::wpregion *fb; */
 void fb_ADD(FB *fb)
 {
   (fb->out1)->v += (fb->out2)->v;
@@ -33,9 +33,9 @@ void fb_ADD(FB *fb)
 }
 
 /*@ terminates \true;
-    \wp::region IN: \pattern{PMEM}, (fb->inp1..fb->inp3);
-    \wp::region OUT: \pattern{PVECTOR}, (fb->out1..fb->out3);
-    \wp::region IDX: \pattern{PVECTOR}, (fb->idx1..fb->idx3);
+    \wp::wpregion IN: \pattern{PMEM}, (fb->inp1..fb->inp3);
+    \wp::wpregion OUT: \pattern{PVECTOR}, (fb->out1..fb->out3);
+    \wp::wpregion IDX: \pattern{PVECTOR}, (fb->idx1..fb->idx3);
  */
 void fb_SORT(FB *fb)
 {
@@ -56,5 +56,3 @@ void fb_SORT(FB *fb)
   (fb->sum)->s = 0;
   return;
 }
-
-

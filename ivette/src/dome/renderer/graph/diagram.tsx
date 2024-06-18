@@ -35,6 +35,8 @@ import './style.css';
 
 export type Direction = 'LR' | 'TD';
 
+export type Font = 'serif' | 'sans' | 'mono';
+
 export type Color =
   | 'white' | 'grey' | 'dark'
   | 'primary' | 'selected'
@@ -45,7 +47,10 @@ export type Shape =
   | 'point' | 'box'
   | 'diamond' | 'hexagon'
   | 'circle' | 'ellipse'
-  | 'note' | 'tab' | 'folder';
+  | 'note' | 'tab' | 'folder' | 'cds';
+
+export type Anchor =
+  'n' | 'ne' | 'e' | 'se' | 's' | 'sw' | 'w' | 'nw' | 'c' | '_';
 
 export type Arrow = 'none' | 'arrow' | 'tee' | 'box' | 'dot';
 
@@ -64,6 +69,8 @@ export interface Node {
   label?: string;
   /** Node tooltip */
   title?: string;
+  /** Node font (label) */
+  font?: Font;
   /** Node color (filled background) */
   color?: Color;
   /**
@@ -90,18 +97,19 @@ export interface Edge {
   line?: Line;
   /** Default is `dark` */
   color?: Color;
-  /** Default is `arrow` */
   head?: Arrow;
-  /** Default is `none` */
-  tail?: Arrow;
-  /** Label */
-  label?: string;
-  /** Tooltip */
-  title?: string;
-  /** Head label */
   headLabel?: string,
-  /** Tail label */
+  headAnchor?: Anchor;
+  tail?: Arrow;
   tailLabel?: string,
+  tailAnchor?: Anchor;
+  font?: Font;
+  label?: string;
+  title?: string;
+  /** Edge constraints node placement (default: true). */
+  constraint?: boolean;
+  /** Node placement on the same rank (default: false). */
+  aligned?: boolean;
 }
 
 export interface Cluster {
@@ -148,8 +156,14 @@ export interface DiagramProps {
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Color Model                                                        --- */
+/* --- CSS Model                                                          --- */
 /* -------------------------------------------------------------------------- */
+
+const FONTNAME = {
+  'serif': 'Times',
+  'sans': 'sans-serif',
+  'mono': 'Courier',
+};
 
 // node background colors
 const BGCOLOR = {
@@ -307,7 +321,10 @@ class Builder {
   }
 
   attr(a: string, v: string | number | boolean | undefined): Builder {
-    return v ? this.print(' ', a, '=').value(v).print(';') : this;
+    if (v !== undefined && v !== '')
+      return this.print(' ', a, '=').value(v).print(';');
+    else
+      return this;
   }
 
   // --- Node Table Shape
@@ -340,7 +357,8 @@ class Builder {
       .print('  ')
       .port(n.id)
       .print(' [')
-      .attr('id', n.id);
+      .attr('id', n.id)
+      .attr('fontname', n.font ? FONTNAME[n.font] : undefined);
     if (typeof n.shape === 'object') {
       this
         .attr('shape', 'record')
@@ -392,6 +410,11 @@ class Builder {
   edge(e: Edge): void {
     const { line = 'solid', head = 'arrow', tail = 'none' } = e;
     const tooltip = e.title ?? e.label ?? `${e.source} -> ${e.target}`;
+    if (e.aligned === true)
+      this
+        .print('{ rank=same; ')
+        .port(e.source).print(' ')
+        .port(e.target).println(' };');
     this
       .print('  ')
       .port(e.source, e.sourcePort)
@@ -399,8 +422,12 @@ class Builder {
       .port(e.target, e.targetPort)
       .print(' [')
       .attr('label', e.label)
+      .attr('fontname', e.font ? FONTNAME[e.font] : undefined)
+      .attr('headport', e.tailAnchor)
+      .attr('tailport', e.headAnchor)
       .attr('headlabel', e.headLabel)
       .attr('taillabel', e.tailLabel)
+      .attr('constraint', e.constraint === false ? false : undefined)
       .attr('labeltooltip', e.label ? tooltip : undefined)
       .attr('headtooltip', e.headLabel ? tooltip : undefined)
       .attr('tailtooltip', e.tailLabel ? tooltip : undefined)
@@ -476,7 +503,7 @@ function GraphvizView(props: GraphvizProps): JSX.Element {
     setError(undefined);
     graphviz(href, {
       useWorker: false,
-      fit: true, zoom: true, width, height,
+      fit: false, zoom: true, width, height,
     }).onerror(setError)
       .renderDot(model).on('end', function () {
         if (onSelection) {

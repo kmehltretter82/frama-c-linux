@@ -15,12 +15,6 @@ typedef struct Block {
   SN sum ;
 } FB ;
 
-/*@
-  \wp::wpregion Shared: *(fb->inp1 .. fb->inp3);
-  \wp::wpregion IN:      (fb->inp1 .. fb->inp3);
-  \wp::wpregion OUT:     (fb->out1 .. fb->out3);
-  \wp::wpregion IDX:     (fb->idx1 .. fb->idx3);
- */
 void job(FB *fb)
 {
   SN *inp = &(fb->inp1) ;
