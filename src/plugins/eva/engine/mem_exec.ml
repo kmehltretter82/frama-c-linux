@@ -675,10 +675,9 @@ module Make
       load_time_wrapper stat_gather_load_time gather in
     (* Builtin malloc wrapped *)
     let import_builtin_malloc () =
-      if (Parameters.CacheAllocation.get ()) 
-      then
-        Builtins_malloc.import project
-      else Kernel_function.Hashtbl.create 1 in
+      Base.import Eva_diff.import_base project;
+      Builtins_malloc.import project
+    in
     let not_imported_kf = load_time_wrapper stat_builtin_malloc_load_time import_builtin_malloc in
     (* Summaries wrapped *)
     let import_function_summaries () =
@@ -731,7 +730,6 @@ module Make
       let special_variables () =
         Special_variables.import saved in
       load_time_wrapper stat_special_variables_load_time special_variables;
-      Base.import Eva_diff.import_base saved;
       Self.feedback "Copying Eva analysis cache from save file %s" name;
       import_cached_calls_from name saved;
       (* Inout wrapped *)
