@@ -89,31 +89,16 @@
   let module_stack = Stack.create ()
   let module_types = Hashtbl.create 0
 
-  let push_typename ?(export=true) t =
+  let push_typename t =
     Logic_env.add_typename t ;
     try
       let m = Stack.top module_stack in
-      Hashtbl.add module_types m (export,t)
+      Hashtbl.add module_types m t
     with Stack.Empty -> ()
-
-  let import_typenames mId asId =
-    List.iter (fun (export,t) ->
-      if export then
-        begin
-          push_typename ~export:false t ;
-          match asId with
-          | None -> ()
-          | Some a ->
-            push_typename ~export:false @@ Printf.sprintf "%s::%s" a t
-        end
-    ) @@ Hashtbl.find_all module_types mId
 
   let pop_module_types () =
     let m = Stack.pop module_stack in
-    List.iter (fun (export,t) ->
-      Logic_env.remove_typename t ;
-      if export then Logic_env.add_typename (Printf.sprintf "%s::%s" m t)
-    ) @@ Hashtbl.find_all module_types m
+    List.iter Logic_env.remove_typename @@ Hashtbl.find_all module_types m
 
   let type_variables_stack = Stack.create ()
 
@@ -1696,10 +1681,10 @@ logic_def:
     { LDaxiomatic($2,$4) }
 | MODULE push_module_identifier LBRACE logic_decls RBRACE
     { pop_module_types () ; LDmodule($2,$4) }
-| IMPORT LONGIDENT SEMICOLON
-    { import_typenames $2 None ; LDimport($2,None) }
-| IMPORT LONGIDENT AS identifier SEMICOLON
-    { let asId = Some $4 in import_typenames $2 asId ; LDimport($2,asId) }
+| IMPORT mId = LONGIDENT SEMICOLON
+    { LDimport(mId,None) }
+| IMPORT mId = LONGIDENT AS asId = identifier SEMICOLON
+    { LDimport(mId,Some asId) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();
