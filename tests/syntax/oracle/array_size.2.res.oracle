@@ -1,12 +1,6 @@
 [kernel] Parsing array_size.c (with preprocessing)
 [kernel] array_size.c:23: User Error: 
-  "Variable length array in structure" extension is not supported
-[kernel] array_size.c:23: User Error: 
-  Array length size is not a compile-time constant: no explicit initializer allowed.
-  21    #ifdef VLA_INIT2
-  22    void h (int size) {
-  23      int a [2][size] = { { 0 } }; // same as above
-                    ^^^^
-  24    }
-  25    #endif
+  Variable-sized array cannot have initializer
+[kernel] User Error: stopping on file "array_size.c" that has errors. Add '-kernel-msg-key pp'
+  for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

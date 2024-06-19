@@ -20,7 +20,7 @@ void g(int size) {
 
 #ifdef VLA_INIT2
 void h (int size) {
-  int a [2][size] = { { 0 } }; // same as above
+  int a [size][2] = { { 0 } }; // same as above
 }
 #endif
 

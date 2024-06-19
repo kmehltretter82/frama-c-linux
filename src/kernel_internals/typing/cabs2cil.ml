@@ -3978,9 +3978,10 @@ let get_lval_compound_assigned op expr =
         Cil_printer.pp_lval x
   | _ -> abort_context "Expected lval for %s" op
 
+type var_decl_kind =
+  [ `FormalDecl | `GlobalDecl | `LocalDecl | `LocalStaticDecl ]
 type type_context =
-  | FormalDecl | GlobalDecl | LocalDecl | LocalStaticDecl
-  | FieldDecl | Typedef | OnlyType
+  [ var_decl_kind | `FieldDecl | `Typedef | `OnlyType ]
 
 (* The way formals are handled now might generate incorrect types, in the
    sense that they refer to a varinfo (in the case of VLA depending on a
@@ -4473,27 +4474,22 @@ and convertCVtoAttr (src: Cabs.cvspec list) : Cabs.attribute list =
 
 and makeVarInfoCabs
     ~(ghost:bool)
-    ~(isformal: bool)
-    ~(isglobal: bool)
+    ~(kind:var_decl_kind)
     ?(isgenerated=false)
     ?(referenced=false)
     (ldecl : location)
     (bt, sto, inline, attrs)
     (n,ndt,a)
   : varinfo =
-  let type_context =
-    if isformal then FormalDecl
-    else if isglobal then GlobalDecl
-    else if sto = Static then LocalStaticDecl
-    else LocalDecl
-  in
+  let isglobal = kind = `GlobalDecl || kind = `LocalStaticDecl in
+  let isformal = kind = `FormalDecl in
   let vtype, nattr =
-    doType ghost type_context (AttrName false)
-      ~allowVarSizeArrays:isformal  (* For locals we handle var-sized arrays
-                                       before makeVarInfoCabs; for formals
-                                       we do it afterwards *)
-      bt (Cabs.PARENTYPE(attrs, ndt, a)) in
-  (*Format.printf "Got yp:%a->%a(%a)@." d_type bt d_type vtype d_attrlist nattr;*)
+    doType ghost (kind:>type_context) (AttrName false)
+      ~allowVarSizeArrays:isformal
+      (* For locals we handle var-sized arrays before makeVarInfoCabs;
+         Hence, at this point only formals can have a VLA type *)
+      bt (Cabs.PARENTYPE(attrs, ndt, a))
+  in
   if hasAttribute "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
     let source = fst ldecl in
@@ -4517,17 +4513,13 @@ and makeVarInfoCabs
   if inline && not (isFunctionType vtype) then
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
-  (*  log "Looking at %s(%b): (%a)@." n isformal d_attrlist nattr;*)
-  let vi = makeVarinfo ~ghost ~referenced ~temp:isgenerated ~loc:ldecl isglobal isformal n vtype
+  let vi =
+    makeVarinfo ~ghost ~referenced ~temp:isgenerated ~loc:ldecl isglobal isformal n vtype
   in
   vi.vstorage <- sto;
   vi.vattr <- nattr;
   vi.vdefined <-
     not (isFunctionType vtype) && isglobal && (sto = NoStorage || sto = Static);
-
-  (*  if false then
-      log "Created varinfo %s : %a\n" vi.vname d_type vi.vtype;*)
-
   vi
 
 (* Process a local variable declaration and allow variable-sized arrays *)
@@ -4535,12 +4527,12 @@ and makeVarSizeVarInfo ghost (ldecl : location)
     spec_res
     (n,ndt,a)
   : varinfo * chunk * exp * bool =
+  let kind = `LocalDecl in
   if not (Cil.msvcMode ()) then
     match isVariableSizedArray ghost ndt with
     | None ->
-      makeVarInfoCabs ~ghost ~isformal:false
-        ~isglobal:false
-        ldecl spec_res (n,ndt,a), empty, zero ~loc:ldecl, false
+      makeVarInfoCabs ~ghost ~kind ldecl spec_res (n,ndt,a),
+      empty, zero ~loc:ldecl, false
     | Some (ndt', se, len) ->
       (* In this case, we have changed the type from VLA to pointer: add the
          qualifier to the elements. *)
@@ -4549,13 +4541,10 @@ and makeVarSizeVarInfo ghost (ldecl : location)
           (t, sto , inline , ("ghost", []) :: attrs)
         | normal -> normal
       in
-      makeVarInfoCabs ~ghost ~isformal:false
-        ~isglobal:false
-        ldecl spec_res (n,ndt',a), se, len, true
+      makeVarInfoCabs ~ghost ~kind ldecl spec_res (n,ndt',a), se, len, true
   else
-    makeVarInfoCabs ~ghost ~isformal:false
-      ~isglobal:false
-      ldecl spec_res (n,ndt,a), empty, zero ~loc:ldecl, false
+    makeVarInfoCabs ~ghost ~kind ldecl spec_res (n,ndt,a),
+    empty, zero ~loc:ldecl, false
 
 and doAttr ghost (a: Cabs.attribute) : attribute list =
   (* Strip the leading and trailing underscore *)
@@ -4851,21 +4840,26 @@ and doType (ghost:bool) (context: type_context)
                   Some CIL operations on this array may fail."
                  Cil_printer.pp_exp cst
              else begin
-               let msg =
-                 match context with
-                 | FieldDecl ->
-                   "\"Variable length array in structure\" extension is not supported"
-                 | GlobalDecl ->
+               match context with
+               | `FieldDecl ->
+                 Kernel.error ~once:true ~current:true
+                   "\"Variable length array in structure\" extension \
+                    is not supported"
+               | `GlobalDecl ->
+                 Kernel.error ~once:true ~current:true
                    "Global arrays cannot have variable size"
-                 | LocalStaticDecl ->
+               | `LocalStaticDecl ->
+                 Kernel.error ~once:true ~current:true
                    "Static arrays cannot have variable size"
-                 | Typedef ->
+               | `Typedef ->
+                 Kernel.error ~once:true ~current:true
                    "A type definition cannot be a variable-length array"
-                 | _ ->
-                   "Variable-length arrays are not supported in this configuration"
-               in
-               Kernel.error ~once:true ~current:true "%s" msg
-
+               | `LocalDecl ->
+                 Kernel.not_yet_implemented
+                   "For multi-dimensional arrays, variable length is only \
+                    supported on the first dimension"
+               | `OnlyType | `FormalDecl ->
+                 Kernel.fatal "VLA should be accepted in this context"
              end
            | _ -> ());
           if Cil.isZero len' && not allowZeroSizeArrays &&
@@ -4876,7 +4870,7 @@ and doType (ghost:bool) (context: type_context)
           Some len'
       in
       let al' = doAttributes ghost al in
-      if context <> FormalDecl && hasAttribute "static" al' then
+      if context <> `FormalDecl && hasAttribute "static" al' then
         Kernel.error ~once:true ~current:true
           "static specifier inside array argument is allowed only in \
            function argument";
@@ -4913,8 +4907,9 @@ and doType (ghost:bool) (context: type_context)
       let doOneArg argl_length is_ghost (s, (n, ndt, a, cloc)) : varinfo =
         let ghost = is_ghost || ghost in
         let s' = doSpecList cloc ghost n s in
-        let vi = makeVarInfoCabs ~ghost ~isformal:true ~isglobal:false
-            (convLoc cloc) s' (n,ndt,a) in
+        let vi =
+          makeVarInfoCabs ~ghost ~kind:`FormalDecl (convLoc cloc) s' (n,ndt,a)
+        in
         if isVoidType vi.vtype then begin
           if argl_length > 1 then
             Kernel.error ~once:true ~current:true
@@ -5075,7 +5070,7 @@ and doOnlyType loc ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true "Storage or inline specifier in type only";
   let tres, nattr =
-    doType ghost OnlyType AttrType bt' (Cabs.PARENTYPE(attrs, dt, [])) in
+    doType ghost `OnlyType AttrType bt' (Cabs.PARENTYPE(attrs, dt, [])) in
   if nattr <> [] then
     Kernel.error ~once:true ~current:true
       "Name attributes in only_type: %a" Cil_printer.pp_attributes nattr;
@@ -5119,7 +5114,7 @@ and makeCompType loc ghost (isstruct: bool)
       let allowZeroSizeArrays = Cil.gccMode () || Cil.msvcMode () in
       let ftype, fattr =
         doType
-          ~allowZeroSizeArrays ghost FieldDecl (AttrName false) bt
+          ~allowZeroSizeArrays ghost `FieldDecl (AttrName false) bt
           (Cabs.PARENTYPE(attrs, ndt, a))
       in
       (* check for fields whose type is incomplete. In particular, this rules
@@ -8510,8 +8505,10 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
   in
   (* Make a first version of the varinfo *)
   let vi_loc = convLoc cloc in
-  let vi = makeVarInfoCabs ~ghost ~isformal:false ~referenced:islibc
-      ~isglobal:true ~isgenerated vi_loc (t,s,b,attr_list) (n,ndt,a)
+  let vi =
+    makeVarInfoCabs
+      ~ghost ~kind:`GlobalDecl ~referenced:islibc ~isgenerated
+      vi_loc (t,s,b,attr_list) (n,ndt,a)
   in
   (* Add the variable to the environment before doing the initializer
    * because it might refer to the variable itself *)
@@ -8797,9 +8794,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
     in
     let newname, _  = newAlphaName ghost true "" full_name in
     (* Make it global  *)
-    let vi = makeVarInfoCabs ~ghost ~isformal:false
-        ~isglobal:true
-        loc specs (n, ndt, a) in
+    let vi = makeVarInfoCabs ~ghost ~kind:`LocalStaticDecl loc specs (n, ndt, a)
+    in
     checkArray inite vi;
     vi.vname <- newname;
     let attrs = Cil.addAttribute (Attr (fc_local_static,[])) vi.vattr in
@@ -8880,8 +8876,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
         let savelen =
           makeVarInfoCabs
             ~ghost
-            ~isformal:false
-            ~isglobal:false
+            ~kind:`LocalDecl
             loc
             (theMachine.typeOfSizeOf, NoStorage, false, [])
             ("__lengthof_" ^ vi.vname,JUSTBASE, [])
@@ -9091,7 +9086,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       if isglobal then begin
         let bt,_,_,attrs = spec_res in
         let vtype, nattr =
-          doType local_env.is_ghost GlobalDecl
+          doType local_env.is_ghost `GlobalDecl
             (AttrName false) bt (Cabs.PARENTYPE(attrs, ndt, a)) in
         (match filterAttributes "alias" nattr with
          | [] -> (* ordinary prototype. *)
@@ -9229,7 +9224,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       let bt,sto,inl,attrs = doSpecList idloc local_env.is_ghost n specs in
       !currentFunctionFDEC.svar.vinline <- inl;
       let ftyp, funattr =
-        doType local_env.is_ghost GlobalDecl
+        doType local_env.is_ghost `GlobalDecl
           (AttrName false) bt (Cabs.PARENTYPE(attrs, dt, a))
       in
       if hasAttribute "thread" funattr then begin
@@ -9635,7 +9630,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
   let createTypedef ((n,ndt,a,_) : Cabs.name) =
     (*    E.s (error "doTypeDef") *)
     let newTyp, tattr =
-      doType ghost Typedef AttrType bt (Cabs.PARENTYPE(attrs, ndt, a))  in
+      doType ghost `Typedef AttrType bt (Cabs.PARENTYPE(attrs, ndt, a))  in
     checkTypedefSize n newTyp;
     let tattr = fc_stdlib_attribute tattr in
     let newTyp' = cabsTypeAddAttributes tattr newTyp in
@@ -9734,7 +9729,7 @@ and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
     Kernel.error ~once:true ~current:true
       "Storage or inline specifier not allowed in typedef";
   let restyp, nattr =
-    doType ghost Typedef AttrType bt (Cabs.PARENTYPE(attrs, Cabs.JUSTBASE, []))
+    doType ghost `Typedef AttrType bt (Cabs.PARENTYPE(attrs, Cabs.JUSTBASE, []))
   in
   if nattr <> [] then
     Kernel.warning ~current:true "Ignoring identifier attribute";
@@ -10251,7 +10246,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           let spec = doSpecList ldecl ghost n t in
           let vi =
             makeVarInfoCabs
-              ~ghost ~isformal:false ~isglobal:false ldecl spec (n,ndt,a)
+              ~ghost ~kind:`LocalDecl ldecl spec (n,ndt,a)
           in
           addLocalToEnv ghost n (EnvVar vi);
           !currentFunctionFDEC.slocals <- vi :: !currentFunctionFDEC.slocals;
