@@ -34,7 +34,7 @@ let dkey = Self.register_category "imprecision"
 let rec lval_of_address exp =
   match exp.node with
   | AddrOf lval -> lval
-  | CastE (_typ, exp) -> lval_of_address exp
+  | CastE (_typ, exp) when Cil.isPointerType exp.typ -> lval_of_address exp
   | _ -> Eva_ast.Build.mem exp
 
 let plevel = Parameters.ArrayPrecisionLevel.get
