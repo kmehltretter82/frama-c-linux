@@ -4451,8 +4451,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
        *)
       t'
 
-    | [Cabs.TtypeofT (specs, dt)] ->
-      doOnlyType loc ghost specs dt
+    | [Cabs.TtypeofT (specs, dt)] -> doOnlyType loc ghost specs dt
 
     | l ->
       abort_context
@@ -5065,12 +5064,14 @@ and isVariableSizedArray ghost (dt: Cabs.decl_type)
   | None -> None
   | Some (se, e) -> Some (dt', se, e)
 
-and doOnlyType loc ghost (specs: Cabs.spec_elem list) (dt: Cabs.decl_type) : typ =
+and doOnlyType loc ghost specs dt =
   let bt',sto,inl,attrs = doSpecList loc ghost "" specs in
   if sto <> NoStorage || inl then
     Kernel.error ~once:true ~current:true "Storage or inline specifier in type only";
   let tres, nattr =
-    doType ghost `OnlyType AttrType bt' (Cabs.PARENTYPE(attrs, dt, [])) in
+    doType ghost `OnlyType AttrType bt' (Cabs.PARENTYPE(attrs, dt, []))
+      ~allowVarSizeArrays:true
+  in
   if nattr <> [] then
     Kernel.error ~once:true ~current:true
       "Name attributes in only_type: %a" Cil_printer.pp_attributes nattr;
