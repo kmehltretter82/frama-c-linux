@@ -73,6 +73,7 @@ type extension_common = {
   plugin: string;
   is_same_ext: extension_same;
 }
+type module_loader = typing_context -> location -> string list -> unit
 
 let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
@@ -132,6 +133,9 @@ module Extensions = struct
   (*hash table for status, preprocessor and typer of block extensions*)
   let ext_block_tbl = Hashtbl.create 5
 
+  (*hash table for module loader*)
+  let ext_module_loader = Hashtbl.create 5
+
   let find_single name :extension_single =
     try Hashtbl.find ext_single_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
@@ -143,6 +147,10 @@ module Extensions = struct
   let find_block name :extension_block =
     try Hashtbl.find ext_block_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
+
+  let find_loader name :module_loader =
+    try Hashtbl.find ext_module_loader name with Not_found ->
+      Kernel.fatal ~current:true "unsupported module loader '%s'" name
 
   (* [Logic_lexer] can ask for something that is not a category, which is not
      a fatal error. *)
@@ -183,6 +191,14 @@ module Extensions = struct
         Hashtbl.add ext_block_tbl name info1;
         Hashtbl.add ext_tbl name info2
       end
+
+  let register_loader name loader =
+    if Hashtbl.mem ext_module_loader name then
+      Kernel.warning ~wkey:Kernel.wkey_acsl_extension
+        "Trying to register module loader %s twice. Ignoring second loader"
+        name
+    else
+      Hashtbl.add ext_module_loader name loader
 
   let preprocess name = (find_single name).preprocessor
 
@@ -264,6 +280,8 @@ let register_code_annot_next_loop =
   Extensions.register (Ext_code_annot Ext_next_loop)
 let register_code_annot_next_both =
   Extensions.register (Ext_code_annot Ext_next_both)
+let register_module_loader =
+  Extensions.register_loader
 
 (* Setup global references *)
 
@@ -278,7 +296,8 @@ let () =
   Logic_typing.set_extension_handler
     ~is_extension: Extensions.is_extension
     ~typer: Extensions.typing
-    ~typer_block: Extensions.typing_block ;
+    ~typer_block: Extensions.typing_block
+    ~loader: Extensions.find_loader;
   Cil.set_extension_handler
     ~visit: Extensions.visit ;
   Cil_printer.set_extension_handler

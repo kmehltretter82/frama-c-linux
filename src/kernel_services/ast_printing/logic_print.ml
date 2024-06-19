@@ -401,10 +401,12 @@ let rec print_decl fmt d =
         ignore @@ Stack.pop module_prefix ;
         raise err
     end
-  | LDimport (s,None) ->
-    fprintf fmt "@[<2>import@ %s;@]@\n}" s
-  | LDimport (s,Some a) ->
-    fprintf fmt "@[<2>import@ %s \\as %s;@]@\n}" s a
+  | LDimport (drv,mId,asId) ->
+    fprintf fmt "@[<2>import" ;
+    Option.iter (fprintf fmt "@ %s:") drv ;
+    fprintf fmt "@ %s" mId ;
+    Option.iter (fprintf fmt "@ \\as %s") asId ;
+    fprintf fmt ";@]@\n}"
   | LDinvariant (s,e) ->
     fprintf fmt "@[<2>invariant@ %s:@ %a;@]" s print_lexpr e
   | LDtype_annot ty -> print_type_annot fmt ty

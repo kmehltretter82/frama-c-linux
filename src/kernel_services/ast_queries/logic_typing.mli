@@ -77,7 +77,6 @@ module Lenv : sig
   val find_type_var: string -> t -> Cil_types.logic_type
   val find_logic_info: string -> t -> Cil_types.logic_info
   val find_logic_label: string -> t -> Cil_types.logic_label
-
 end
 
 type type_namespace = Typedef | Struct | Union | Enum
@@ -128,6 +127,9 @@ type typing_context = {
     typing_context ->
     accept_formal:bool ->
     Lenv.t -> Logic_ptree.assigns -> assigns;
+  add_logic_type: location -> logic_type_info -> unit;
+  add_logic_ctor: location -> logic_ctor_info -> unit;
+  add_logic_function: location -> logic_info -> unit;
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
 
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
@@ -295,10 +297,10 @@ val set_extension_handler:
   is_extension:(string -> bool) ->
   typer:(string -> typing_context -> location -> Logic_ptree.lexpr list ->
          (bool * acsl_extension_kind)) ->
-  typer_block:(string -> typing_context ->
-               Filepath.position * Filepath.position ->
+  typer_block:(string -> typing_context -> location ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
+  loader:(string -> typing_context -> location -> string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
@@ -308,7 +310,7 @@ val set_extension_handler:
 val get_typer :
   string ->
   typing_context:typing_context ->
-  loc:Filepath.position * Filepath.position ->
+  loc:location ->
   Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
 
 val get_typer_block:
@@ -317,3 +319,9 @@ val get_typer_block:
   loc:Logic_ptree.location ->
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
+
+val get_loader:
+  string ->
+  typing_context:typing_context ->
+  loc:Logic_ptree.location ->
+  string list -> unit

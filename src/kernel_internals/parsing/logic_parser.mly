@@ -1681,15 +1681,20 @@ logic_def:
     { LDaxiomatic($2,$4) }
 | MODULE push_module_identifier LBRACE logic_decls RBRACE
     { pop_module_types () ; LDmodule($2,$4) }
-| IMPORT mId = LONGIDENT SEMICOLON
-    { LDimport(mId,None) }
-| IMPORT mId = LONGIDENT AS asId = identifier SEMICOLON
-    { LDimport(mId,Some asId) }
+| IMPORT drv = module_driver mId = LONGIDENT SEMICOLON
+    { LDimport(drv,mId,None) }
+| IMPORT drv = module_driver mId = LONGIDENT AS asId = identifier SEMICOLON
+    { LDimport(drv,mId,Some asId) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();
           LDtype(id,tvars,Some $4)
         }
+;
+
+module_driver:
+| identifier_or_typename_full COMMA { Some $1 }
+| { None }
 ;
 
 push_module_identifier:

@@ -153,3 +153,6 @@ val register_code_annot_next_loop: register_extension
 
 (** Registers extension both for code and loop annotations. *)
 val register_code_annot_next_both: register_extension
+
+type module_loader = typing_context -> location -> string list -> unit
+val register_module_loader : string -> module_loader -> unit

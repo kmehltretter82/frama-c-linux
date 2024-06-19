@@ -524,6 +524,9 @@ type typing_context = {
     accept_formal:bool ->
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
+  add_logic_type: location -> logic_type_info -> unit;
+  add_logic_ctor: location -> logic_ctor_info -> unit;
+  add_logic_function: location -> logic_info -> unit;
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
 }
@@ -533,12 +536,14 @@ module Extensions = struct
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_typer = ref (fun _ _ _ _ -> assert false)
   let ref_typer_block = ref (fun _ _ _ _ -> assert false)
+  let ref_loader = ref (fun _ _ _ _ -> assert false)
 
-  let set_handler ~is_extension ~typer ~typer_block =
+  let set_handler ~is_extension ~typer ~typer_block ~loader =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_typer := typer ;
     ref_typer_block := typer_block;
+    ref_loader := loader ;
     initialized := true
 
   let is_extension name = !ref_is_extension name
@@ -546,13 +551,17 @@ module Extensions = struct
   let typer name ~typing_context:typing_context ~loc =
     !ref_typer name typing_context loc
 
-  let typer_block name ~typing_context:typing_context ~loc =
-    !ref_typer_block name typing_context loc
+  let typer_block name ~typing_context:typing_context ~loc mId =
+    !ref_typer_block name typing_context loc mId
+
+  let loader name ~typing_context:typing_context ~loc =
+    !ref_loader name typing_context loc
 
 end
 let set_extension_handler = Extensions.set_handler
 let get_typer = Extensions.typer
 let get_typer_block = Extensions.typer_block
+let get_loader = Extensions.loader
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with
@@ -754,29 +763,6 @@ struct
           | [] -> None | ls -> Some (Lfun ls)
         end f
 
-  let make_typing_context ~pre_state ~post_state ~assigns_env
-      ~logic_type ~type_predicate ~type_term ~type_assigns = {
-    silent = false;
-    is_loop = C.is_loop;
-    pre_state=pre_state;
-    post_state=post_state;
-    assigns_env=assigns_env;
-    logic_type= logic_type;
-    type_predicate= type_predicate;
-    type_term= type_term;
-    type_assigns = type_assigns;
-    anonCompFieldName = C.anonCompFieldName;
-    conditionalConversion = C.conditionalConversion;
-    find_macro = C.find_macro;
-    find_var = C.find_var;
-    find_enum_tag = C.find_enum_tag;
-    find_comp_field = C.find_comp_field;
-    find_type = C.find_type ;
-    find_label = C.find_label;
-    error = C.error;
-    on_error = C.on_error;
-  }
-
   let rollback = Queue.create ()
 
   let start_transaction () = Queue.clear rollback
@@ -805,6 +791,14 @@ struct
       add_rollback_action (Logic_env.remove_logic_info_gen eq) li
     end
 
+  let add_logic_ctor loc ct =
+    try
+      ignore (Logic_env.find_logic_ctor ct.ctor_name);
+      C.error loc "logic type constructor %s is already defined" ct.ctor_name
+    with Not_found ->
+      Logic_env.add_logic_ctor ct.ctor_name ct;
+      add_rollback_action Logic_env.remove_logic_ctor ct.ctor_name
+
   let add_logic_type loc info =
     try
       ignore (Logic_env.find_logic_type info.lt_name);
@@ -812,6 +806,32 @@ struct
     with Not_found ->
       Logic_env.add_logic_type info.lt_name info;
       add_rollback_action Logic_env.remove_logic_type info.lt_name
+
+  let make_typing_context ~pre_state ~post_state ~assigns_env
+      ~logic_type ~type_predicate ~type_term ~type_assigns = {
+    silent = false;
+    is_loop = C.is_loop;
+    pre_state=pre_state;
+    post_state=post_state;
+    assigns_env=assigns_env;
+    logic_type= logic_type;
+    type_predicate= type_predicate;
+    type_term= type_term;
+    type_assigns = type_assigns;
+    anonCompFieldName = C.anonCompFieldName;
+    conditionalConversion = C.conditionalConversion;
+    find_macro = C.find_macro;
+    find_var = C.find_var;
+    find_enum_tag = C.find_enum_tag;
+    find_comp_field = C.find_comp_field;
+    find_type = C.find_type ;
+    find_label = C.find_label;
+    add_logic_function ;
+    add_logic_type ;
+    add_logic_ctor ;
+    error = C.error;
+    on_error = C.on_error;
+  }
 
   let check_non_void_ptr loc ty =
     if Logic_utils.isLogicVoidPointerType ty then
@@ -4268,7 +4288,14 @@ struct
       ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
       Some (Dmodule(name,l,[],loc))
 
-    | LDimport(name,alias) ->
+    | LDimport(drv,name,alias) ->
+      Option.iter
+        begin fun drv ->
+          let typing_context = base_ctxt (Lenv.empty ()) in
+          Extensions.loader drv ~typing_context ~loc
+          @@ List.filter (fun s -> s <> "")
+          @@ String.split_on_char ':' name
+        end drv ;
       open_scope ~name ?alias () ; None
 
     | LDtype(name,l,def) ->
