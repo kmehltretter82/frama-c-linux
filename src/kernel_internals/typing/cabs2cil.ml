@@ -3040,9 +3040,9 @@ let rec collectInitializer
         | Some len -> begin
             match constFoldToInt len with
             | Some ni when Integer.ge ni Integer.zero -> to_integer ni, false
-            | _ ->
-              abort_context
-                "\"Variable length array in structure\" extension is not supported"
+            | _ -> (* VLA cannot have initializers, and this should have
+                      been captured beforehand. *)
+              Kernel.fatal "Trying to initialize a variable-length array"
           end
         | _ ->
           (* unsized array case, length comes from initializers *)
