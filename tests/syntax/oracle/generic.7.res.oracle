@@ -1,12 +1,12 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel] generic.c:65: User Error: 
+[kernel] generic.c:66: User Error: 
   no compatible types and no default type in _Generic selection:
   controlling expression: '"abc"' (type: char *);
   candidate types: char const *
-  63    #endif
-  64    #ifdef INCOMPATIBLE_QUALIFIED_TYPE
-  65      int a = _Generic("abc", char const *: 0);
+  64    #endif
+  65    #ifdef INCOMPATIBLE_QUALIFIED_TYPE
+  66      int a = _Generic("abc", char const *: 0);
                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  66    #endif
-  67      int ok1 = _Generic("abc", char*: 0);
+  67    #endif
+  68    #ifdef VLA
 [kernel] Frama-C aborted: invalid user input.

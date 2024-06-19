@@ -9,6 +9,7 @@
    STDOPT: #"-cpp-extra-args=-DINCOMPLETE_TYPE"
    STDOPT: #"-cpp-extra-args=-DINCOMPATIBLE_QUALIFIED_TYPE"
    STDOPT: #"-cpp-extra-args=-DFUNCTION_TYPE"
+   STDOPT: #"-cpp-extra-args=-DVLA"
    EXIT: 0
    STDOPT:
 */
@@ -63,6 +64,11 @@ int main() {
 #endif
 #ifdef INCOMPATIBLE_QUALIFIED_TYPE
   int a = _Generic("abc", char const *: 0);
+#endif
+#ifdef VLA
+  int x = 42;
+  int y[x];
+  int a = _Generic(y, int[x]: 0, default: 1);
 #endif
   int ok1 = _Generic("abc", char*: 0);
   int ok2 = _Generic(1.0, float: 1, double: 0);
