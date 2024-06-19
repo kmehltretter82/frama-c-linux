@@ -390,8 +390,9 @@ rule token = parse
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
-  | rIdentifier ( "::" rIdentifier )+ { longident lexbuf }
-  | rIdentifier ( "::" rIdentifier )* "::(" rOP+ ")" { longident lexbuf }
+  | rIdentifier ( "::" rIdentifier )+                 { longident lexbuf }
+  | rIdentifier ( "::" rIdentifier )+ "'" rIdentifier { longident lexbuf }
+  | rIdentifier ( "::" rIdentifier )* "::(" rOP+ ")"  { longident lexbuf }
   | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
