@@ -183,6 +183,7 @@ let init_dependencies from =
       Logic_ctor_info.self;
       Lemmas.self;
       Axiomatics.self;
+      Modules.self;
       Model_info.self;
     ]
 
@@ -350,6 +351,7 @@ let prepare_tables () =
   Logic_info.clear ();
   Lemmas.clear ();
   Axiomatics.clear();
+  Modules.clear();
   Model_info.clear ();
   Logic_type_builtin.iter Logic_type_info.add;
   Logic_ctor_builtin.iter Logic_ctor_info.add;

@@ -643,7 +643,7 @@ let lfEq = LogicMerging.create_eq_table 111 (* Logic functions *)
 let ltEq = PlainMerging.create_eq_table 111 (* Logic types *)
 let lcEq = PlainMerging.create_eq_table 111 (* Logic constructors *)
 
-let laEq = PlainMerging.create_eq_table 111 (* Axiomatics *)
+let laEq = PlainMerging.create_eq_table 111 (* Axiomatics & Modules *)
 let llEq = PlainMerging.create_eq_table 111 (* Lemmas *)
 
 let lvEq = VolatileMerging.create_eq_table 111
