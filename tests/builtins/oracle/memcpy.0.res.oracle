@@ -3,7 +3,6 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
-  NULL[rbits 800000 to 800015] ∈ [--..--]
   i ∈ [--..--]
   src[0..19] ∈ {0}
   dst1[0..19] ∈ {0}
@@ -320,7 +319,6 @@
 [eva] memcpy.c:216: 
   Frama_C_dump_each:
   # cvalue:
-  NULL[rbits 800000 to 800015] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
   __fc_strerror[0..63] ∈ [--..--]
@@ -355,17 +353,14 @@
   Called from memcpy.c:230.
 [eva] memcpy.c:221: Call to builtin memcpy
 [eva:alarm] memcpy.c:221: Warning: 
-  function memcpy: precondition 'valid_dest' got status invalid.
-[eva] memcpy.c:221: 
-  function memcpy: no state left, precondition 'valid_src' got status valid.
-[eva] memcpy.c:221: 
-  function memcpy: no state left, precondition 'separation' got status valid.
+  function memcpy: precondition 'valid_dest' got status unknown.
+[eva] memcpy.c:221: function memcpy: precondition 'valid_src' got status valid.
+[eva] memcpy.c:221: function memcpy: precondition 'separation' got status valid.
 [eva] memcpy.c:222: Call to builtin memcpy
 [eva] memcpy.c:222: function memcpy: precondition 'valid_dest' got status valid.
 [eva:alarm] memcpy.c:222: Warning: 
-  function memcpy: precondition 'valid_src' got status invalid.
-[eva] memcpy.c:222: 
-  function memcpy: no state left, precondition 'separation' got status valid.
+  function memcpy: precondition 'valid_src' got status unknown.
+[eva] memcpy.c:222: function memcpy: precondition 'separation' got status valid.
 [eva] Recording results for copy_0
 [from] Computing for function copy_0
 [from] Done for function copy_0
@@ -861,8 +856,8 @@
     ptop2[2..749]; ptop3[2..797]; ptop4[2..798]; garbledsize[10..99];
     pgarbledsize; dstmaybesize1[0..14]; dstmaybesize2[0..5]; maybesize
 [inout] Inputs for function test:
-    NULL[100000..100001]; i; src[0..19]; maybe; v1; v2;
-    v4{.x; .y; .p; .padding[0..3]}; t[0..3]; "d"[bits 0 to 7]
+    i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3];
+    "d"[bits 0 to 7]
 [inout] InOut (internal) for function test:
   Operational inputs:
     i; src[0..19]; maybe; v1{.p; .padding[0..23]}; v2;
@@ -900,8 +895,8 @@
     dst5[0..99]; tm[0..999]; um{[0..998]; [999][bits 0 to 15]}; ttyp[0..999];
     v1{.x; .y}; v2; v3; v4; v5; t[1..3]
 [inout] Inputs for function main:
-    NULL[100000..100001]; i; src[0..19]; maybe; v1; v2;
-    v4{.x; .y; .p; .padding[0..3]}; t[0..3]; "d"[bits 0 to 7]
+    i; src[0..19]; maybe; v1; v2; v4{.x; .y; .p; .padding[0..3]}; t[0..3];
+    "d"[bits 0 to 7]
 [inout] InOut (internal) for function main:
   Operational inputs:
     i; src[0..19]; maybe; v1{.p; .padding[0..23]}; v2;
@@ -1075,48 +1070,10 @@
 --- Properties of Function 'memcpy'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Pre-condition 'valid_dest'
-            By Call Preconditions, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 221)
-             - Instance of 'Pre-condition 'valid_dest'' of 'buggy' at call 'memcpy' (file memcpy.c, line 32)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 74)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 79)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 93)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 95)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 100)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 118)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 126)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 135)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 144)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 149)
-
-             - Instance of 'Pre-condition 'valid_dest'' of 'test' at call 'memcpy' (file memcpy.c, line 155)
-
-[  Alarm  ] Pre-condition 'valid_src'
-            By Call Preconditions, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 222)
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 74)
-
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 79)
-
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 91)
-
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 100)
-
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 149)
-
-             - Instance of 'Pre-condition 'valid_src'' of 'test' at call 'memcpy' (file memcpy.c, line 155)
-
+[    -    ] Pre-condition 'valid_dest'
+            tried with Call Preconditions.
+[    -    ] Pre-condition 'valid_src'
+            tried with Call Preconditions.
 [    -    ] Pre-condition 'separation'
             tried with Call Preconditions.
 [ Extern  ] Post-condition 'copied_contents'
@@ -2228,10 +2185,9 @@
 --- Properties of Function 'copy_0'
 --------------------------------------------------------------------------------
 
-[  Alarm  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 221)
+[    -    ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 221)
 
-            By Eva, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 221)
+            tried with Eva.
 [  Valid  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 221)
 
             by Eva.
@@ -2241,10 +2197,9 @@
 [  Valid  ] Instance of 'Pre-condition 'valid_dest'' at call 'memcpy' (file memcpy.c, line 222)
 
             by Eva.
-[  Alarm  ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 222)
+[    -    ] Instance of 'Pre-condition 'valid_src'' at call 'memcpy' (file memcpy.c, line 222)
 
-            By Eva, with pending:
-             - Unreachable call 'memcpy' (file memcpy.c, line 222)
+            tried with Eva.
 [  Valid  ] Instance of 'Pre-condition 'separation'' at call 'memcpy' (file memcpy.c, line 222)
 
             by Eva.
@@ -2255,7 +2210,6 @@
    169 Completely validated
      1 Locally validated
    267 Considered valid
-    32 To be validated
-     4 Alarms emitted
+    36 To be validated
    473 Total
 --------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 /* run.config*
    PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-calldeps -eva-msg-key imprecision -eva-plevel 150 -inout -no-deps -absolute-valid-range 100000-100001 -then -report"
+   STDOPT: +"-calldeps -eva-msg-key imprecision -eva-plevel 150 -inout -no-deps -then -report"
+   STDOPT: +"-absolute-valid-range 100000-100001 -main copy_0"
 */
-
 
 #include "string.h"
 
