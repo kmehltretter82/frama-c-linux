@@ -18,9 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
--   Kernel    [2024-05-18] New ACSL extension loop unfold (replaces loop pragma UNROLL)
--!  Kernel    [2024-05-18] Removed loop pragma UNROLL annotations
-o!  Kernel    [2024-05-18] Renamed module Unroll_loop into Unfold_loop
+-   Kernel    [2024-05-20] New ACSL extension loop unfold (replaces loop pragma UNROLL)
+-!  Kernel    [2024-05-20] Removed loop pragma UNROLL annotations
+o!  Kernel    [2024-05-20] Renamed module Unroll_loop into Unfold_loop
 
 ###############################################################################
 Open Source Release 29.0 (Copper)
@@ -37,9 +37,6 @@ o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in
               and allow #undefining builtin macros in the command-line.
 -   Eva       [2024-04-18] Remove support for deprecated WIDEN_HINTS loop pragma.
               Use ACSL extension "widen_hints" instead.
-o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
--   Kernel    [2024-04-18] New ACSL extension loop unroll (replaces loop pragma UNROLL)
--!  Kernel    [2024-04-18] Removed all loop pragma annotations
 o   Kernel    [2024-04-17] Remove deprecated funcs Extlib.string_{pre,suf}fix
 -   Alias     [2024-04-16] Fix analysis results in the presence of structures.
               Complete rework of the API. Improved documentation. Fix stack
