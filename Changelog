@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2024-05-20] New ACSL extension loop unfold (replaces loop pragma UNROLL)
+-!  Kernel    [2024-05-20] Removed loop pragma UNROLL annotations
+o!  Kernel    [2024-05-20] Renamed module Unroll_loop into Unfold_loop
+
 ###############################################################################
 Open Source Release 29.0 (Copper)
 ###############################################################################

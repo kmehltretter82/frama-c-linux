@@ -38,7 +38,7 @@ include
           Kernel.ReadAnnot.self;
           Kernel.PreprocessAnnot.self;
           Kernel.Files.self;
-          Kernel.UnrollingLevel.self;
+          Kernel.UnfoldingLevel.self;
           Kernel.Keep_unused_specified_functions.self;
           Kernel.Keep_unused_types.self;
           Cil.selfFormalsDecl ]

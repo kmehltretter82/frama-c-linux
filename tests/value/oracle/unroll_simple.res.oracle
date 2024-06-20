@@ -27,8 +27,8 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    c; G; i; MAX; JMAX; j; tmp; tmp_unroll_774; tmp_unroll_782; tmp_unroll_790;
-    tmp_unroll_798; tmp_unroll_806; tmp_unroll_814; tmp_unroll_822;
-    tmp_unroll_830; tmp_unroll_838; tmp_unroll_846
+    c; G; i; MAX; JMAX; j; tmp; tmp_unfold_774; tmp_unfold_782; tmp_unfold_790;
+    tmp_unfold_798; tmp_unfold_806; tmp_unfold_814; tmp_unfold_822;
+    tmp_unfold_830; tmp_unfold_838; tmp_unfold_846
 [inout] Inputs for function main:
     \nothing

@@ -43,7 +43,7 @@ void master(void)
 */
 void unroll(void)
 {
-  /*@ loop pragma UNROLL "completely", U; */
+  /*@ loop unfold "completely", U; */
   for (int i = 0; i < N; i++)
     { f(); g(); }
   return;
@@ -57,7 +57,7 @@ void unroll(void)
 */
 void induction(int n)
 {
-  /*@ 
+  /*@
     loop invariant 0 <= i <= n;
     loop invariant CALL == [| F , G |] *^ i;
     loop assigns i,calls;
@@ -77,8 +77,8 @@ void induction(int n)
 void shifted(int n)
 {
   f();
-  
-  /*@ 
+
+  /*@
     loop invariant 0 <= i <= n;
     loop invariant CALL == ([| F , G |] *^ i ^ [| F |]);
     loop assigns i,calls;

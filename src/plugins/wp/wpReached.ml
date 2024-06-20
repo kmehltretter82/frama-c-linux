@@ -59,11 +59,6 @@ let node () =
 (* --- Unrolled Loop                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_unrolled_completely spec =
-  match spec.term_node with
-  | TConst (LStr "completely") -> true
-  | _ -> false
-
 let rec is_predicate cond p =
   match p.pred_content with
   | Pfalse -> not cond
@@ -88,8 +83,6 @@ let rec is_predicate cond p =
 
 let is_dead_annot ca =
   match ca.annot_content with
-  | APragma (Loop_pragma (Unroll_specs [ spec ; _ ])) ->
-    is_unrolled_completely spec
   | AAssert([],p)
   | AInvariant([],_,p) ->
     Logic_utils.use_predicate p.tp_kind && is_predicate false p.tp_statement

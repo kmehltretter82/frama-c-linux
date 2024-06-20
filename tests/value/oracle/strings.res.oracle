@@ -69,8 +69,8 @@
   Called from strings.i:53.
 [eva:alarm] strings.i:23: Warning: 
   out of bounds write.
-  assert \valid(tmp_unroll_46);
-  (tmp_unroll_46 from ldst++)
+  assert \valid(tmp_unfold_46);
+  (tmp_unfold_46 from ldst++)
 [kernel] strings.i:23: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for strcpy
@@ -387,11 +387,11 @@
 [inout] Inputs for function long_chain:
     ANYTHING(origin:Unknown)
 [inout] Out (internal) for function strcpy:
-    src; ldst; b[0..4]; tmp_unroll_46; tmp_1_unroll_46; tmp_0_unroll_46;
-    tmp_unroll_49; tmp_1_unroll_49; tmp_0_unroll_49; tmp_unroll_52;
-    tmp_1_unroll_52; tmp_0_unroll_52; tmp_unroll_55; tmp_1_unroll_55;
-    tmp_0_unroll_55; tmp_unroll_58; tmp_1_unroll_58; tmp_0_unroll_58;
-    tmp_unroll_61; tmp_1_unroll_61; tmp_0_unroll_61
+    src; ldst; b[0..4]; tmp_unfold_46; tmp_1_unfold_46; tmp_0_unfold_46;
+    tmp_unfold_49; tmp_1_unfold_49; tmp_0_unfold_49; tmp_unfold_52;
+    tmp_1_unfold_52; tmp_0_unfold_52; tmp_unfold_55; tmp_1_unfold_55;
+    tmp_0_unfold_55; tmp_unfold_58; tmp_1_unfold_58; tmp_0_unfold_58;
+    tmp_unfold_61; tmp_1_unfold_61; tmp_0_unfold_61
 [inout] Inputs for function strcpy:
     a[0..5]
 [inout] Out (internal) for function string_writes:
@@ -399,8 +399,8 @@
 [inout] Inputs for function string_writes:
     nondet; s3; s4; s5; s6; cc; "tutu"[bits 0 to 7]
 [inout] Out (internal) for function strlen:
-    s; l; tmp_unroll_106; tmp_unroll_109; tmp_unroll_112; tmp_unroll_115;
-    tmp_unroll_118; tmp_unroll_121
+    s; l; tmp_unfold_106; tmp_unfold_109; tmp_unfold_112; tmp_unfold_115;
+    tmp_unfold_118; tmp_unfold_121
 [inout] Inputs for function strlen:
     s1[0..5]
 [inout] Out (internal) for function string_comparison:

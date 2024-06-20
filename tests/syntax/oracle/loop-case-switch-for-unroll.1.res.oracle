@@ -174,61 +174,61 @@ void main(void)
     tmp_0 = gen_nondet(68);
     if (tmp_0) goto L1;
     {
-      int tmp_1_unroll_41;
-      case 1: tmp_1_unroll_41 = gen_nondet(71);
-      if (tmp_1_unroll_41) goto L1_unrolling_11_loop;
-      L_unrolling_8_loop: x = y;
+      int tmp_1_unfold_41;
+      case 1: tmp_1_unfold_41 = gen_nondet(71);
+      if (tmp_1_unfold_41) goto L1_unfolding_11_loop;
+      L_unfolding_8_loop: x = y;
       case 2:
       {
-        int j_unroll_40;
-        int i_unroll_40 = 0;
-        if (! (i_unroll_40 < 4)) goto unrolling_2_loop_unrolling_12_loop;
+        int j_unfold_40;
+        int i_unfold_40 = 0;
+        if (! (i_unfold_40 < 4)) goto unfolding_2_loop_unfolding_12_loop;
         {
-          int tmp_2_unroll_12_unroll_26;
-          int tmp_3_unroll_12_unroll_26;
-          int tmp_4_unroll_12_unroll_26;
-          int tmp_5_unroll_12_unroll_26;
-          L1_unrolling_4_loop_unrolling_9_loop: j_unroll_40 = gen_nondet(76);
-          tmp_2_unroll_12_unroll_26 = gen_nondet(77);
-          if (tmp_2_unroll_12_unroll_26 > 10) i_unroll_40 = 10;
-          else i_unroll_40 = 0;
-          Frama_C_show_each_i_(i_unroll_40);
-          tmp_3_unroll_12_unroll_26 = gen_nondet(79);
-          if (tmp_3_unroll_12_unroll_26) goto L_unrolling_8_loop;
-          tmp_4_unroll_12_unroll_26 = gen_nondet(80);
-          if (tmp_4_unroll_12_unroll_26) goto L0;
-          tmp_5_unroll_12_unroll_26 = gen_nondet(81);
-          if (tmp_5_unroll_12_unroll_26) goto L3;
+          int tmp_2_unfold_12_unfold_26;
+          int tmp_3_unfold_12_unfold_26;
+          int tmp_4_unfold_12_unfold_26;
+          int tmp_5_unfold_12_unfold_26;
+          L1_unfolding_4_loop_unfolding_9_loop: j_unfold_40 = gen_nondet(76);
+          tmp_2_unfold_12_unfold_26 = gen_nondet(77);
+          if (tmp_2_unfold_12_unfold_26 > 10) i_unfold_40 = 10;
+          else i_unfold_40 = 0;
+          Frama_C_show_each_i_(i_unfold_40);
+          tmp_3_unfold_12_unfold_26 = gen_nondet(79);
+          if (tmp_3_unfold_12_unfold_26) goto L_unfolding_8_loop;
+          tmp_4_unfold_12_unfold_26 = gen_nondet(80);
+          if (tmp_4_unfold_12_unfold_26) goto L0;
+          tmp_5_unfold_12_unfold_26 = gen_nondet(81);
+          if (tmp_5_unfold_12_unfold_26) goto L3;
         }
-        i_unroll_40 ++;
-        unrolling_3_loop_unrolling_10_loop: ;
-        /*@ loop pragma UNROLL "done", 1; */
-        while (i_unroll_40 < 4) {
+        i_unfold_40 ++;
+        unfolding_3_loop_unfolding_10_loop: ;
+        /*@ loop unfold "done", 1; */
+        while (i_unfold_40 < 4) {
           {
-            int tmp_2_unroll_37;
-            int tmp_3_unroll_37;
-            int tmp_4_unroll_37;
-            int tmp_5_unroll_37;
-            L1_unrolling_11_loop: j_unroll_40 = gen_nondet(76);
-            tmp_2_unroll_37 = gen_nondet(77);
-            if (tmp_2_unroll_37 > 10) i_unroll_40 = 10; else i_unroll_40 = 0;
-            Frama_C_show_each_i_(i_unroll_40);
-            tmp_3_unroll_37 = gen_nondet(79);
-            if (tmp_3_unroll_37) goto L_unrolling_8_loop;
-            tmp_4_unroll_37 = gen_nondet(80);
-            if (tmp_4_unroll_37) goto L0;
-            tmp_5_unroll_37 = gen_nondet(81);
-            if (tmp_5_unroll_37) goto L3;
+            int tmp_2_unfold_37;
+            int tmp_3_unfold_37;
+            int tmp_4_unfold_37;
+            int tmp_5_unfold_37;
+            L1_unfolding_11_loop: j_unfold_40 = gen_nondet(76);
+            tmp_2_unfold_37 = gen_nondet(77);
+            if (tmp_2_unfold_37 > 10) i_unfold_40 = 10; else i_unfold_40 = 0;
+            Frama_C_show_each_i_(i_unfold_40);
+            tmp_3_unfold_37 = gen_nondet(79);
+            if (tmp_3_unfold_37) goto L_unfolding_8_loop;
+            tmp_4_unfold_37 = gen_nondet(80);
+            if (tmp_4_unfold_37) goto L0;
+            tmp_5_unfold_37 = gen_nondet(81);
+            if (tmp_5_unfold_37) goto L3;
           }
-          i_unroll_40 ++;
+          i_unfold_40 ++;
         }
-        unrolling_2_loop_unrolling_12_loop: ;
+        unfolding_2_loop_unfolding_12_loop: ;
       }
     }
     n --;
-    if (! (n > 0)) goto unrolling_6_loop;
-    unrolling_7_loop: ;
-    /*@ loop pragma UNROLL "done", 1; */
+    if (! (n > 0)) goto unfolding_6_loop;
+    unfolding_7_loop: ;
+    /*@ loop unfold "done", 1; */
     while (1) {
       {
         int tmp_1;
@@ -238,26 +238,26 @@ void main(void)
         {
           int j;
           int i = 0;
-          if (! (i < 4)) goto unrolling_2_loop;
+          if (! (i < 4)) goto unfolding_2_loop;
           {
-            int tmp_2_unroll_12;
-            int tmp_3_unroll_12;
-            int tmp_4_unroll_12;
-            int tmp_5_unroll_12;
-            L1_unrolling_4_loop: j = gen_nondet(76);
-            tmp_2_unroll_12 = gen_nondet(77);
-            if (tmp_2_unroll_12 > 10) i = 10; else i = 0;
+            int tmp_2_unfold_12;
+            int tmp_3_unfold_12;
+            int tmp_4_unfold_12;
+            int tmp_5_unfold_12;
+            L1_unfolding_4_loop: j = gen_nondet(76);
+            tmp_2_unfold_12 = gen_nondet(77);
+            if (tmp_2_unfold_12 > 10) i = 10; else i = 0;
             Frama_C_show_each_i_(i);
-            tmp_3_unroll_12 = gen_nondet(79);
-            if (tmp_3_unroll_12) goto L;
-            tmp_4_unroll_12 = gen_nondet(80);
-            if (tmp_4_unroll_12) goto L0;
-            tmp_5_unroll_12 = gen_nondet(81);
-            if (tmp_5_unroll_12) goto L3;
+            tmp_3_unfold_12 = gen_nondet(79);
+            if (tmp_3_unfold_12) goto L;
+            tmp_4_unfold_12 = gen_nondet(80);
+            if (tmp_4_unfold_12) goto L0;
+            tmp_5_unfold_12 = gen_nondet(81);
+            if (tmp_5_unfold_12) goto L3;
           }
           i ++;
-          unrolling_3_loop: ;
-          /*@ loop pragma UNROLL "done", 1; */
+          unfolding_3_loop: ;
+          /*@ loop unfold "done", 1; */
           while (i < 4) {
             {
               int tmp_2;
@@ -277,13 +277,13 @@ void main(void)
             }
             i ++;
           }
-          unrolling_2_loop: ;
+          unfolding_2_loop: ;
         }
       }
       n --;
       if (! (n > 0)) break;
     }
-    unrolling_6_loop: ;
+    unfolding_6_loop: ;
     Frama_C_show_each_y_(y);
     Frama_C_show_each_x_(x);
   }

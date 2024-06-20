@@ -7,7 +7,7 @@ enum { SIX = 6 } ;
 volatile foo;
 void main () {
   int j = 0;
-  /*@ loop pragma UNROLL "completely", 4; */
+  /*@ loop unfold "completely", 4; */
   for (int i=1;i<4;i++) {
     switch (i) {
     case 1: j+=1; break;
@@ -21,7 +21,7 @@ void main () {
   {
     int x = 0;
   L:
-    //@ loop pragma UNROLL 3;
+    //@ loop unfold 3;
     while(x<5) {
       int y=0;
       x++; y++;
@@ -29,13 +29,13 @@ void main () {
   }
 
   j = 0;
-  //@ loop pragma UNROLL SIX;
+  //@ loop unfold SIX;
   while(foo) {
     switch(j) {
     case -1: j++;
       break;
     case 0:
-      //@ loop pragma UNROLL 3;
+      //@ loop unfold 3;
       while (j<5) {j++;}
       break;
     case 5:
@@ -44,19 +44,19 @@ void main () {
     }
   }
 
-  {  
+  {
     if (j==0) goto zero;
     if (j==1) goto un;
     return;
   zero:
-    //@ loop pragma UNROLL 3;
+    //@ loop unfold 3;
     while (j<5) { un: j++;}
   }
 
 }
 
 void main2 () {
-  /*@ loop pragma UNROLL 2; */
+  /*@ loop unfold 2; */
   for (int i=0;i<2;i++) {
     for (int j=0;j<2;j++){
       i += 1;
@@ -68,10 +68,10 @@ void main2 () {
 }
 
 void main2_done () {
-  /*@ loop pragma UNROLL 2;
-    @ loop pragma UNROLL "done", 2; */
+  /*@ loop unfold 2;
+    @ loop unfold "done", 2; */
   for (int i=0;i<2;i++) {
-    /*@ loop pragma UNROLL 2; */
+    /*@ loop unfold 2; */
     for (int j=0;j<2;j++){
       i += 1;
       goto foo;
@@ -84,7 +84,7 @@ void main2_done () {
 void main3 (int c) {
   int i=0;
   if (c == 0) goto foo;
-  /*@ loop pragma UNROLL 2; */
+  /*@ loop unfold 2; */
   for (;i<5;i++) {
     int j = 0 ;
     if (i == j) goto foo;
@@ -102,4 +102,3 @@ void main3 (int c) {
   up:;
   }
 }
-

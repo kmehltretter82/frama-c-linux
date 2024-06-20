@@ -2,8 +2,8 @@ int main () {
 
   int x = 0;
 
-  /*@ 
-    loop pragma UNROLL 4;
+  /*@
+    loop unfold 4;
     loop invariant \at(x,LoopEntry) == 0;
     loop invariant \at(x,LoopCurrent) <= 15;
   */

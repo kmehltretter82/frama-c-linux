@@ -17,6 +17,6 @@ enum {Max = 16};
   @ ensures zero: zeroed(t,0,Max-1);
  */
 void unrolled_loop(unsigned *t){
-  //@ loop pragma UNROLL "completely", Max+1;
+  //@ loop unfold "completely", Max+1;
   for (unsigned i=0; i<Max; i++) t[i] = 0;
 }

@@ -731,7 +731,7 @@ let is_annot_next_stmt c =
   | AAssigns _ | AAllocation _
   | APragma (Slice_pragma (SPctrl | SPexpr _))
   | APragma (Impact_pragma (IPexpr _))
-  | APragma (Loop_pragma _) -> false
+    -> false
 
 let rec add_attribute_glob_annot a g =
   match g with
@@ -1176,10 +1176,6 @@ let is_same_logic_type_info t1 t2 =
   is_same_attributes t1.lt_attr t2.lt_attr &&
   is_same_opt is_same_logic_type_def t1.lt_def t2.lt_def
 
-let is_same_loop_pragma p1 p2 =
-  match p1,p2 with
-    Unroll_specs l1, Unroll_specs l2 -> is_same_list is_same_term l1 l2
-
 let is_same_slice_pragma p1 p2 =
   match p1,p2 with
     SPexpr t1, SPexpr t2 -> is_same_term t1 t2
@@ -1194,10 +1190,9 @@ let is_same_impact_pragma p1 p2 =
 
 let is_same_pragma p1 p2 =
   match p1,p2 with
-  | Loop_pragma p1, Loop_pragma p2 -> is_same_loop_pragma p1 p2
   | Slice_pragma p1, Slice_pragma p2 -> is_same_slice_pragma p1 p2
   | Impact_pragma p1, Impact_pragma p2 -> is_same_impact_pragma p1 p2
-  | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
+  | (Slice_pragma _ | Impact_pragma _), _ -> false
 
 let rec is_same_extension x1 x2 =
   Datatype.String.equal x1.ext_name x2.ext_name &&
@@ -2275,9 +2270,6 @@ let is_assigns ca =
 let is_pragma ca =
   match ca.annot_content with APragma _ -> true | _ -> false
 
-let is_loop_pragma ca =
-  match ca.annot_content with APragma (Loop_pragma _) -> true | _ -> false
-
 let is_slice_pragma ca =
   match ca.annot_content with APragma (Slice_pragma _) -> true | _ -> false
 
@@ -2289,7 +2281,7 @@ let is_loop_extension ca =
 
 let is_loop_annot s =
   is_loop_invariant s || is_assigns s || is_allocation s ||
-  is_variant s || is_loop_pragma s || is_loop_extension s
+  is_variant s || is_loop_extension s
 
 let is_trivial_annotation a =
   match a.annot_content with
@@ -2299,17 +2291,10 @@ let is_trivial_annotation a =
     -> false
 
 let is_property_pragma = function
-  | Loop_pragma (Unroll_specs _)
   | Slice_pragma (SPexpr _ | SPctrl | SPstmt)
   | Impact_pragma (IPexpr _ | IPstmt) -> false
 (* If at some time a pragma becomes something which should be proven,
    update the pragma-related code in gui/property_navigator.ml *)
-
-
-let extract_loop_pragma l =
-  List.fold_right
-    (fun ca l -> match ca.annot_content with
-         APragma (Loop_pragma lp) -> lp::l | _ -> l) l []
 
 let extract_contract l =
   List.fold_right

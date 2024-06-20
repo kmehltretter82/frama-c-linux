@@ -304,26 +304,37 @@ underscores as prefix and suffix, \texttt{-UMACRO} will also undefine
   \texttt{do ... while(0)}. This option is set by default.
 
 \item \texttt{\optiondef{-}{ulevel} <n>} unrolls all loops n times. This is a
-  purely syntactic operation.  Loops can be unrolled individually, by
-  inserting the \pragmadef{UNROLL} pragma just before the loop statement. Do
+  purely syntactic operation. Loops can be unfolded individually, by
+  inserting a \verb+loop unfold+ annotation just before the loop statement. Do
   not confuse this option with plug-in-specific options that may also be called
-  ``unrolling''~\cite{value}. Below is a typical example of use.
+  ``unrolling''~\cite{value}\footnote{
+    Historically, \textit{syntactic} loop unrolling was denoted by
+    \texttt{loop pragma UNROLL} annotations. Later on, \textsf{EVA} introduced
+    \textit{semantic} unrolling with \texttt{loop unroll} annotations.
+    Loop pragams was removed for Frama-C 29 (Copper) and it was
+    decided to introduce \texttt{loop unfold} annotations for \textit{syntactic}
+    unrolling and to reserve \texttt{loop unroll} annotations for \textit{semantic}
+    loop unrolling with \textsf{EVA}.
+  }. Below is a typical example of use:
 \begin{ccode}
-/*@ loop pragma UNROLL 10; */
+/*@ loop unfold 10; */
 for(i = 0; i < 9; i++) ...
 \end{ccode}
-The transformation introduces an \pragmadef{UNROLL} pragma indicating that the unrolling process has been done:
+The transformation introduces an additional \verb+loop unfold+ annotation
+indicating that the unrolling process has been done:
 \begin{ccode}
 ... // loop unrolled 10 times
-/*@ loop pragma UNROLL 10;
-    loop pragma UNROLL "done", 10; */
+/*@ loop unfold 10;
+    loop unfold "done", 10; */
   ... // remaining loop
 \end{ccode}
-That allows to disable unrolling transformation on such a loop when reusing \FramaC with a code obtained by a previous use of \FramaC tool.
-To ignore this disabling \pragmadef{UNROLL} pragma and force unrolling, the option \texttt{\optiondef{-}{ulevel-force}} has to be set.
+That allows to disable unrolling transformation on such a loop when reusing
+\FramaC with a code obtained by a previous use of \FramaC tool.
+To ignore this disabling \verb+loop unfold "done"+ and force unrolling,
+the option \texttt{\optiondef{-}{ulevel-force}} has to be set.
 
 Passing a negative argument to \texttt{-ulevel} will disable unrolling, even
-in case of \texttt{UNROLL} pragma.
+in case of \verb+loop unfold+ annotations.
 \end{description}
 
 \section{Normalizing Contracts}\label{sec:normalize-contracts}

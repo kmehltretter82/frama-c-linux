@@ -713,10 +713,6 @@ and is_same_behavior b b' env =
 and is_same_variant (v,m) (v',m') env =
   is_same_term v v' env && is_same_opt is_matching_logic_info m m' env
 
-and is_same_loop_pragma p p' env =
-  match p, p' with
-  | Unroll_specs l, Unroll_specs l' -> is_same_list is_same_term l l' env
-
 and is_same_slice_pragma p p' env =
   match p, p' with
   | SPexpr t, SPexpr t' -> is_same_term t t' env
@@ -732,10 +728,9 @@ and is_same_impact_pragma p p' env =
 
 and is_same_pragma p p' env =
   match p,p' with
-  | Loop_pragma p, Loop_pragma p' -> is_same_loop_pragma p p' env
   | Slice_pragma p, Slice_pragma p' -> is_same_slice_pragma p p' env
   | Impact_pragma p, Impact_pragma p' -> is_same_impact_pragma p p' env
-  | (Loop_pragma _ | Slice_pragma _ | Impact_pragma _), _ -> false
+  | (Slice_pragma _ | Impact_pragma _), _ -> false
 
 and are_same_behaviors bhvs bhvs' env =
   let treat_one_behavior acc b =

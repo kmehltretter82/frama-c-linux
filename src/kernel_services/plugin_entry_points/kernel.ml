@@ -1268,26 +1268,26 @@ module JsonCompilationDatabase =
 let normalisation = add_group "Customizing Normalization"
 
 let () = Parameter_customize.set_group normalisation
-module UnrollingLevel =
+module UnfoldingLevel =
   Zero
     (struct
-      let module_name = "UnrollingLevel"
+      let module_name = "UnfoldingLevel"
       let option_name = "-ulevel"
       let arg_name = "l"
       let help =
-        "unroll loops n times (defaults to 0) before analyzes. \
-         A negative value hides UNROLL loop pragmas."
+        "unfold loops n times (defaults to 0) before analyzes. \
+         A negative value hides loop unfold annotations."
     end)
 
 let () = Parameter_customize.set_group normalisation
-module UnrollingForce =
+module UnfoldingForce =
   Bool
     (struct
-      let module_name = "UnrollingForce"
+      let module_name = "UnfoldingForce"
       let default = false
       let option_name = "-ulevel-force"
       let help =
-        "ignore UNROLL loop pragmas disabling unrolling."
+        "ignore loop unfold \"done\" specifications (force unfolding)."
     end)
 
 let () = Parameter_customize.set_group normalisation

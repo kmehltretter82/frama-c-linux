@@ -136,7 +136,7 @@ int main() {
   do { } while (09);
 #endif
 #ifdef UNROLL_PRAGMA
-  //@ loop pragma UNROLL 99999999999999999999;
+  //@ loop unfold 99999999999999999999;
 #endif
   while (nondet);
   return 0;

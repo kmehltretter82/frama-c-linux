@@ -19,7 +19,7 @@ int bts_2176() {
      1 */
   r = /* comment 2 */ 1;
 
-  //@ loop pragma UNROLL 10;
+  //@ loop unfold 10;
   for(i=0; i<10; i++) {
     r += 1;
   }

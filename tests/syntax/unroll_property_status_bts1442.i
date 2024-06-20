@@ -7,7 +7,7 @@ int u(void);
 
 char *strcpy(char*dst, char*src) {
   char* ldst=dst;
-  /*@ loop pragma UNROLL 20; */
+  /*@ loop unfold 20; */
   while (*ldst++ = *src++)
     ;
   return dst;

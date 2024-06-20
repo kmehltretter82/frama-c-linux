@@ -210,7 +210,6 @@ function filterKind(
     case 'behavior': return filter('kind.behavior');
     case 'reachable': return filter('kind.reachable');
     case 'axiomatic': return filter('kind.axiomatic');
-    case 'loop_pragma': return filter('kind.pragma');
     case 'assumes': return filter('kind.assumes');
     default: return filter('kind.others');
   }

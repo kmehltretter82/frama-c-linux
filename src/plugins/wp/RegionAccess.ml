@@ -392,7 +392,6 @@ class visitor map =
     (* vpredicate and vterm are called from vcode_annot *)
 
     (* speed up: skip non interesting subtrees *)
-    method! vloop_pragma _ =  Cil.SkipChildren (* no need *)
     method! vvdec _ = Cil.SkipChildren (* done via stmt *)
     method! vexpr _ = Cil.SkipChildren (* done via stmt *)
     method! vlval _ = Cil.SkipChildren (* done via stmt *)

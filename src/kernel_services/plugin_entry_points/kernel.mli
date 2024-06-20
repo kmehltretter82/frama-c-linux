@@ -438,10 +438,10 @@ module Set_project_as_default: Parameter_sig.Bool
 (** {2 Customizing Normalization and parsing} *)
 (* ************************************************************************* *)
 
-module UnrollingLevel: Parameter_sig.Int
+module UnfoldingLevel: Parameter_sig.Int
 (** Behavior of option "-ulevel" *)
 
-module UnrollingForce: Parameter_sig.Bool
+module UnfoldingForce: Parameter_sig.Bool
 (** Behavior of option "-ulevel-force"
     @since Neon-20140301 *)
 

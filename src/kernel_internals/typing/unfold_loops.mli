@@ -20,14 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Syntactic loop unrolling.
+(** Syntactic loop unfolding.
     Uses code transformation hook mechanism (after-cleanup phase)
     of {!File} and exports nothing.
 
-    Name of the transformation is "loop unrolling"
+    Name of the transformation is "loop unfolding"
 *)
 
-val unroll_transform: File.code_transformation_category
+val transform: File.code_transformation_category
 
 (*
 Local Variables:

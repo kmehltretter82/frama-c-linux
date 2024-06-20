@@ -17,44 +17,44 @@ volatile int c;
 void main() {
   unsigned int i = 0;
 
-  //@ loop pragma UNROLL sizeof(t)/sizeof(t[0]); // 4
+  //@ loop unfold sizeof(t)/sizeof(t[0]); // 4
   while (c) {
     i++;
   }
 
-  //@ loop pragma UNROLL \offset(&s.v.l); // 12
+  //@ loop unfold \offset(&s.v.l); // 12
   while (c) {
     i++;
   }
 
-  //@ loop pragma UNROLL s.i + s.v.l; // 5+0
-  while (c) {
-    i++;
-  }
-
-
-  //@ loop pragma UNROLL \max(t[..]); // 4
-  while (c) {
-    i++;
-  }
-
-  //@ loop pragma UNROLL \min(t[..]); // 0 because of missing initializer
-  while (c) {
-    i++;
-  }
-
-  //@ loop pragma UNROLL \max(\union(1, 1+s.i)); // 6
+  //@ loop unfold s.i + s.v.l; // 5+0
   while (c) {
     i++;
   }
 
 
-  //@ loop pragma UNROLL \min(t[\union(1, 3)]) + \max(t[\union(1, 3)]); // 2+0
+  //@ loop unfold \max(t[..]); // 4
   while (c) {
     i++;
   }
 
-  //@ loop pragma UNROLL \min(u[..1].i1) * \max(u[..1].i1); // 2*3
+  //@ loop unfold \min(t[..]); // 0 because of missing initializer
+  while (c) {
+    i++;
+  }
+
+  //@ loop unfold \max(\union(1, 1+s.i)); // 6
+  while (c) {
+    i++;
+  }
+
+
+  //@ loop unfold \min(t[\union(1, 3)]) + \max(t[\union(1, 3)]); // 2+0
+  while (c) {
+    i++;
+  }
+
+  //@ loop unfold \min(u[..1].i1) * \max(u[..1].i1); // 2*3
   while (c) {
     i++;
   }
@@ -62,5 +62,3 @@ void main() {
 
 
 }
-
-

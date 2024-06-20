@@ -124,7 +124,6 @@ install_printer Cil_types_debug.pp_predicate
 install_printer Cil_types_debug.pp_spec
 install_printer Cil_types_debug.pp_acsl_extension
 install_printer Cil_types_debug.pp_acsl_extension_kind
-install_printer Cil_types_debug.pp_loop_pragma
 install_printer Cil_types_debug.pp_slice_pragma
 install_printer Cil_types_debug.pp_impact_pragma
 install_printer Cil_types_debug.pp_pragma

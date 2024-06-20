@@ -200,13 +200,13 @@ void main1(void)
 void g(void)
 {
   int i = 0;
-  if (! (i < 5)) goto unrolling_2_loop;
+  if (! (i < 5)) goto unfolding_2_loop;
   i ++;
-  unrolling_3_loop: ;
-  /*@ loop pragma UNROLL 1;
-      loop pragma UNROLL "done", 1; */
+  unfolding_3_loop: ;
+  /*@ loop unfold 1;
+      loop unfold "done", 1; */
   while (i < 5) i ++;
-  unrolling_2_loop: ;
+  unfolding_2_loop: ;
   return;
 }
 
@@ -266,13 +266,13 @@ void main1(void)
 void g(void)
 {
   int i = 0;
-  if (! (i < 5)) goto unrolling_2_loop;
+  if (! (i < 5)) goto unfolding_2_loop;
   i ++;
-  unrolling_3_loop: ;
-  /*@ loop pragma UNROLL 1;
-      loop pragma UNROLL "done", 1; */
+  unfolding_3_loop: ;
+  /*@ loop unfold 1;
+      loop unfold "done", 1; */
   while (i < 5) i ++;
-  unrolling_2_loop: ;
+  unfolding_2_loop: ;
   return;
 }
 
@@ -332,13 +332,13 @@ void main1(void)
 void g(void)
 {
   int i = 0;
-  if (! (i < 5)) goto unrolling_2_loop;
+  if (! (i < 5)) goto unfolding_2_loop;
   i ++;
-  unrolling_3_loop: ;
-  /*@ loop pragma UNROLL 1;
-      loop pragma UNROLL "done", 1; */
+  unfolding_3_loop: ;
+  /*@ loop unfold 1;
+      loop unfold "done", 1; */
   while (i < 5) i ++;
-  unrolling_2_loop: ;
+  unfolding_2_loop: ;
   return;
 }
 

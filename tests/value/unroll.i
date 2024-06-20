@@ -5,21 +5,21 @@ void main (int c) {
   int MAX = 12;
   int JMAX=5;
   int j,k,S;
-  /*@ loop pragma UNROLL 14; */ // first loop unrolled 14 times
+  /*@ loop unfold 14; */ // first loop unrolled 14 times
   for (i=0; i<=MAX; i++)
     {
       G+=i;
     }
-  /*@ loop pragma UNROLL 124; */
+  /*@ loop unfold 124; */
   for (i=0; i<=10*MAX; i++)
     {
       G+=i;
     }
-  /*@ loop pragma UNROLL 12+2; */ // loop unrolled 14 times
+  /*@ loop unfold 12+2; */ // loop unrolled 14 times
   for (i=0; i<=MAX; i++)
     {
       j=0;
-      /*@ loop pragma UNROLL FIFTY_TIMES; */
+      /*@ loop unfold FIFTY_TIMES; */
       while (j<=JMAX)
         {
           G+=i;
@@ -27,7 +27,7 @@ void main (int c) {
           }
     }
 
-//@ loop pragma UNROLL 128*sizeof(char);
+//@ loop unfold 128*sizeof(char);
   do {
     G += i;
     i++;
@@ -35,7 +35,7 @@ void main (int c) {
     }
   while (i<=256 || j>=0);
 
-//@ loop pragma UNROLL 10;
+//@ loop unfold 10;
  do
     { if(c) continue;
 
@@ -45,17 +45,17 @@ void main (int c) {
       }
   while(c);
 
-//@ loop pragma UNROLL c;
+//@ loop unfold c;
  while(0);
 
  S=1;
  k=1;
- //@ loop pragma UNROLL "completly", NB_TIMES;
+ //@ loop unfold "completly", NB_TIMES;
  do {
    S=S*k;
-   k++; 
+   k++;
  } while (k <= NB_TIMES) ;
- 
+
 }
 
 #if 0
@@ -69,7 +69,7 @@ int main2(int c,signed char nr_map) {
   biosmap = g_biosmap;
   if (nr_map<2)  return (-1);
 
-//@ loop pragma UNROLL 200;
+//@ loop unfold 200;
   do {
     unsigned long long start = biosmap->addr;
     unsigned long long size = biosmap->size;

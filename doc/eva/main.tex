@@ -3784,8 +3784,11 @@ especially for nested loops. This may cause the analyzer to use more time and
 memory.
 
 It is possible to control syntactic unrolling for each loop in the analyzed code
-with the annotation \lstinline|//@loop pragma UNROLL n;|, placed before the loop.
-
+with the annotation \lstinline|//@loop unfold n;|, placed before the loop.
+You may also specify \lstinline|//@loop unfold "completely", n;| for a loop
+that shall be completely unrolled after $n$ steps. Although, consider that
+a loop that executes $n$ times before exiting will need $n+1$ unrolling steps,
+since the $n+1$ iteration need to be executed for terminating the loop.
 
 \subsection{Widening hints and loop invariants}
 

@@ -24,7 +24,7 @@ void main1() {
 }
 
 void g() {// Do not crash when loop unrolling clears the dependencies of the AST
-  //@ loop pragma UNROLL 1;
+  //@ loop unfold 1;
   for (int i=0; i<5; i++) {
   }
 }

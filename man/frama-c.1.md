@@ -447,11 +447,11 @@ the analysis is launched).
 : syntactically unroll loops *n* times before the analysis. This can be quite
 costly and some plugins (e.g. Eva) provide more efficient ways to perform the
 same thing. See their respective manuals for more information. This can also be
-activated on a per-loop basis via the **loop pragma unroll <m>** directive.
+activated on a per-loop basis via the **loop unfold <m>** directive.
 A negative value for *n* will inhibit such pragmas.
 
 [-no]-ulevel-force
-: ignores **UNROLL** loop pragmas disabling unrolling.
+: ignores **loop unfold "done"** disabling syntactic loop unrolling.
 
 [-no]-unicode
 outputs ACSL formulas with UTF-8 characters. This is the default.

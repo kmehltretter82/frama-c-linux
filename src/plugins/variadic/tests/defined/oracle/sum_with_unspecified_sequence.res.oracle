@@ -7,12 +7,12 @@
   out of bounds read. assert \valid_read((int *)*list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow.
-  assert -2147483648 ≤ ret + tmp_unroll_5;
-  (tmp_unroll_5 from vararg)
+  assert -2147483648 ≤ ret + tmp_unfold_5;
+  (tmp_unfold_5 from vararg)
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   signed overflow.
-  assert ret + tmp_unroll_5 ≤ 2147483647;
-  (tmp_unroll_5 from vararg)
+  assert ret + tmp_unfold_5 ≤ 2147483647;
+  (tmp_unfold_5 from vararg)
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
   out of bounds read. assert \valid_read(list);
 [eva:alarm] sum_with_unspecified_sequence.c:14: Warning: 
@@ -43,20 +43,20 @@ int sum(int n, void * const *__va_params)
   int ret = 0;
   list = __va_params;
   i = 0;
-  if (! (i < n)) goto unrolling_2_loop;
+  if (! (i < n)) goto unfolding_2_loop;
   {
-    int tmp_unroll_5;
+    int tmp_unfold_5;
     /*@ assert Eva: mem_access: \valid_read(list); */
     /*@ assert Eva: mem_access: \valid_read((int *)*list); */
-    tmp_unroll_5 = *((int *)*list);
+    tmp_unfold_5 = *((int *)*list);
     list ++;
-    /*@ assert Eva: signed_overflow: -2147483648 ≤ ret + tmp_unroll_5; */
-    /*@ assert Eva: signed_overflow: ret + tmp_unroll_5 ≤ 2147483647; */
-    ret += tmp_unroll_5;
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ ret + tmp_unfold_5; */
+    /*@ assert Eva: signed_overflow: ret + tmp_unfold_5 ≤ 2147483647; */
+    ret += tmp_unfold_5;
   }
   i ++;
-  unrolling_3_loop: ;
-  /*@ loop pragma UNROLL "done", 1; */
+  unfolding_3_loop: ;
+  /*@ loop unfold "done", 1; */
   while (i < n) {
     {
       int tmp;
@@ -70,7 +70,7 @@ int sum(int n, void * const *__va_params)
     }
     i ++;
   }
-  unrolling_2_loop: ;
+  unfolding_2_loop: ;
   return ret;
 }
 

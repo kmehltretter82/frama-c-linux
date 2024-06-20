@@ -649,7 +649,6 @@ let cfun_code env kf = (* Visits term/pred of code annotations and C exp *)
     method !vpredicate p = do_pred p ; Cil.SkipChildren
     method !vterm t = do_term t ; Cil.SkipChildren
     (* speed up: skip non interesting subtrees *)
-    method! vloop_pragma _ =  Cil.SkipChildren (* no need *)
     method! vvdec _ = Cil.SkipChildren (* done via stmt *)
     method! vexpr _ = Cil.SkipChildren (* done via stmt *)
     method! vlval _ = Cil.SkipChildren (* done via stmt *)
