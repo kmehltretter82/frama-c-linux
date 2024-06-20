@@ -47,8 +47,8 @@ val lift_unop : (Ival.t -> Ival.t) -> ival -> ival
 val lift_arith_binop : (Ival.t -> Ival.t -> Ival.t) -> ival -> ival -> ival
 (** Lift a binary operation on [IVal.t] to the type [ival] *)
 
-(** assume [Ival _] as argument *)
-val extract_ival :  ival -> Ival.t
+(** @return [Some ival] if argument is [Ival ival] *)
+val extract_ival : ival -> Ival.t option
 
 val ival_of_ikind: ikind -> Ival.t
 

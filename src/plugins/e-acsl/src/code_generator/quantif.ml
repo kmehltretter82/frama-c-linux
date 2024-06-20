@@ -48,17 +48,21 @@ let rec has_empty_quantif_with_false_negative ~logic_env = function
     (* case 2 *)
     false
   | (t1, _, t2) :: guards ->
-    let lower_bound, _ = Ival.min_and_max (Interval.get_ival ~logic_env t1) in
-    let _, upper_bound = Ival.min_and_max (Interval.get_ival ~logic_env t2) in
-    begin
-      match lower_bound, upper_bound with
-      | Some lower_bound, Some upper_bound ->
-        let res  = lower_bound >= upper_bound in
-        res (* case 1 *) ||
-        has_empty_quantif_with_false_negative guards ~logic_env
-      | None, _ | _, None ->
-        has_empty_quantif_with_false_negative guards ~logic_env
-    end
+    let bounds =
+      let open Option.Operators in
+      let* ival1 = Interval.get_ival ~logic_env t1 in
+      let* ival2 = Interval.get_ival ~logic_env t2 in
+      let* lower_bound = fst @@ Ival.min_and_max ival1 in
+      let* upper_bound = snd @@ Ival.min_and_max ival2 in
+      Some (lower_bound, upper_bound)
+    in
+    match bounds with
+    | Some (lower_bound, upper_bound) ->
+      let res  = lower_bound >= upper_bound in
+      res (* case 1 *) ||
+      has_empty_quantif_with_false_negative guards ~logic_env
+    | None ->
+      has_empty_quantif_with_false_negative guards ~logic_env
 
 let () =
   Labels.has_empty_quantif_ref :=

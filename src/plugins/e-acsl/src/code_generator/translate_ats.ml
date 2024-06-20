@@ -136,10 +136,9 @@ let rec sizes_and_shifts_from_quantifs ~loc ~logic_env kf lscope sizes_and_shift
        beneficial. In particular, though we may allocate more memory than
        needed, the number of reads/writes into it is the same in both cases.
        Conclusion: over-approximate [t_size] *)
-    let t_size = match Ival.min_and_max iv with
-      | _, Some max ->
-        Logic_const.tint ~loc max
-      | _, None ->
+    let t_size = match Option.map Ival.min_and_max iv with
+      | Some (_, Some max) -> Logic_const.tint ~loc max
+      | _ ->
         Error.not_yet
           "\\at on purely logic variables and with quantifier that uses \
            too complex bound (E-ACSL cannot infer a finite upper bound to it)"
