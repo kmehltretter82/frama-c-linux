@@ -1,7 +1,9 @@
 /* run.config*
  PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-calldeps -eva-slevel-function init:2000 -eva-msg-key imprecision -eva-plevel 150 -main main_all -inout -no-deps -absolute-valid-range 100000-100001 -then -report"
+   STDOPT: +"-calldeps -eva-slevel-function init:2000 -eva-msg-key imprecision -eva-plevel 150 -inout -no-deps -absolute-valid-range 100000-100001 -then -report"
 */
+
+
 #include "string.h"
 
 volatile int i;
@@ -10,6 +12,7 @@ char dst1[20], dst2[20], dst3[20], dst4[20], dst5[100];
 
 void init () {
   int j;
+
   for (j=0;j<20;j++) {
     src[j] = j+1;
     dst1[j] = -1;
@@ -17,6 +20,7 @@ void init () {
     dst3[j] = -1;
     dst4[j] = -1;
   }
+
   for (j=0;j<100;j++) dst5[j] = -1;
 }
 
@@ -57,7 +61,7 @@ struct t1 { int x; int y; int* p; char padding[24];} v1,v2, v3, v4, v5;
 struct t1 t[4];
 
 
-void main (int a, int b){
+void test (int a, int b){
   buggy ();
 
   many ();
@@ -94,7 +98,7 @@ void main (int a, int b){
     int x=1;
     while(1)
       memcpy((void *)&x, (void const*)&x, i);
-  }  
+  }
 
   char *p;
   p = maybe ? &dst5[0] : &dst5[20];
@@ -164,7 +168,7 @@ int itv(int l, int u);
 */
 void make_unknown(unsigned char *p, size_t l);
 
-void main_uninit () {
+void test_uninit () {
  unsigned char a[50];
  unsigned char b[50];
  int r = 0;
@@ -202,7 +206,7 @@ void main_uninit () {
  }
 }
 
-void main_local() {
+void test_local() {
   int* p, *q;
   { int y;
     q = &y;
@@ -213,19 +217,16 @@ void main_local() {
 }
 
 void copy_0() {
-
-
-
   int l;
   if (i) memcpy(0, &l, 0);
   if (i) memcpy(&l, 0, 0);
 }
 
 
-void main_all () {
-  if (maybe) main (maybe, maybe);
-  else if (maybe) main_uninit ();
-  else if (maybe) main_local ();
+void main () {
+  if (maybe) test (maybe, maybe);
+  else if (maybe) test_uninit ();
+  else if (maybe) test_local ();
   else if (maybe) copy_0 ();
   while (1); // results of main are unimportant
 }
