@@ -800,32 +800,66 @@ struct
 
   let add_rollback_action f x = Queue.add (fun () -> f x) rollback
 
-  let add_logic_info loc li =
-    let lv = li.l_var_info in
-    (try
-       let _ = Logic_env.find_logic_ctor lv.lv_name in
-       C.error loc "constructor %s is already defined" lv.lv_name
-     with Not_found -> ());
-    if Logic_utils.mem_logic_function li then
-      begin
-        C.error loc
-          "%s %s is already declared with the same profile"
-          (match li.l_type with None -> "predicate" | Some _ -> "logic function")
-          lv.lv_name
-      end
-    else
-      begin
-        Logic_utils.add_logic_function li;
-        add_rollback_action Logic_utils.remove_logic_function li
-      end
-
-  let add_logic_type loc info =
+  let add_logic_info loc lf =
+    let lv = lf.l_var_info in
     try
-      ignore (Logic_env.find_logic_type info.lt_name);
-      C.error loc "logic type %s is already defined" info.lt_name
+      let _ = Logic_env.find_logic_ctor lv.lv_name in
+      C.error loc "constructor %s is already defined" lv.lv_name
     with Not_found ->
-      Logic_env.add_logic_type info.lt_name info;
-      add_rollback_action Logic_env.remove_logic_type info.lt_name
+      if Logic_utils.mem_logic_function lf then
+        begin
+          C.error loc
+            "%s %s is already declared with the same profile"
+            (match lf.l_type with None -> "predicate" | Some _ -> "logic function")
+            lv.lv_name
+        end
+      else
+        begin
+          Logic_utils.add_logic_function lf;
+          add_rollback_action Logic_utils.remove_logic_function lf
+        end
+
+  let add_logic_type loc lt =
+    try
+      ignore (Logic_env.find_logic_type lt.lt_name);
+      C.error loc "logic type %s is already defined" lt.lt_name
+    with Not_found ->
+      Logic_env.add_logic_type lt.lt_name lt;
+      add_rollback_action Logic_env.remove_logic_type lt.lt_name
+
+  let add_logic_ctor loc ct =
+    try
+      ignore (Logic_env.find_logic_ctor ct.ctor_name);
+      C.error loc "type constructor %s is already defined" ct.ctor_name
+    with Not_found ->
+      let lfs = Logic_env.find_all_logic_functions ct.ctor_name in
+      if lfs <> [] then
+        C.error loc "logic function %s is already defined" ct.ctor_name
+      else
+        begin
+          Logic_env.add_logic_ctor ct.ctor_name ct;
+          add_rollback_action Logic_env.remove_logic_ctor ct.ctor_name ;
+        end
+
+  let make_module_builder (decls : global_annotation list ref) moduleId =
+    let wrap = Printf.sprintf "%s::%s" moduleId in
+    let add_logic_ctor loc ct =
+      ct.ctor_name <- wrap ct.ctor_name ;
+      add_logic_ctor loc ct in
+    let add_logic_type loc lt =
+      lt.lt_name <- wrap lt.lt_name ;
+      add_logic_type loc lt ;
+      begin
+        match lt.lt_def with
+        | Some (LTsum cts) -> List.iter (add_logic_ctor loc) cts
+        | Some (LTsyn _) | None -> ()
+      end ;
+      decls := (Dtype(lt,loc)) :: !decls in
+    let add_logic_function loc lf =
+      lf.l_var_info.lv_name <- wrap lf.l_var_info.lv_name ;
+      add_logic_info loc lf ;
+      decls := (Dfun_or_pred(lf,loc)) :: !decls in
+    { add_logic_type ; add_logic_function }
 
   let check_non_void_ptr loc ty =
     if Logic_utils.isLogicVoidPointerType ty then
@@ -4281,8 +4315,16 @@ struct
       ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
       Some (Dmodule(name,l,[],loc))
 
-    | LDimport(_drv,moduleId,alias) ->
-      open_scope ~name:moduleId ?alias () ; None
+    | LDimport(None,name,alias) ->
+      open_scope ~name ?alias () ; None
+
+    | LDimport(Some driver,name,alias) ->
+      let decls = ref [] in
+      let builder = make_module_builder decls name in
+      let path = Logic_utils.longident name in
+      Extensions.importer driver ~builder ~loc path ;
+      open_scope ~name ?alias () ;
+      Some (Dmodule(name,List.rev !decls,[],loc))
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in
