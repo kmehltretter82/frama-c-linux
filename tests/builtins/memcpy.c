@@ -1,6 +1,6 @@
 /* run.config*
- PLUGIN: @PTEST_PLUGIN@ report
-   STDOPT: +"-calldeps -eva-slevel-function init:2000 -eva-msg-key imprecision -eva-plevel 150 -inout -no-deps -absolute-valid-range 100000-100001 -then -report"
+   PLUGIN: @PTEST_PLUGIN@ report
+   STDOPT: +"-calldeps -eva-msg-key imprecision -eva-plevel 150 -inout -no-deps -absolute-valid-range 100000-100001 -then -report"
 */
 
 
@@ -12,7 +12,7 @@ char dst1[20], dst2[20], dst3[20], dst4[20], dst5[100];
 
 void init () {
   int j;
-
+  //@ loop unroll 20;
   for (j=0;j<20;j++) {
     src[j] = j+1;
     dst1[j] = -1;
@@ -20,7 +20,7 @@ void init () {
     dst3[j] = -1;
     dst4[j] = -1;
   }
-
+  //@ loop unroll 100;
   for (j=0;j<100;j++) dst5[j] = -1;
 }
 
