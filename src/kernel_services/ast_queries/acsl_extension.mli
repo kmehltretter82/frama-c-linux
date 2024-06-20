@@ -58,6 +58,9 @@ type extension_printer =
 type extension_same =
   acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
 
+type extension_module_importer =
+  module_builder -> location -> string list -> unit
+
 (** type of functions that register new ACSL extensions to be used in place of
     various kinds of ACSL annotations.
 
@@ -154,5 +157,27 @@ val register_code_annot_next_loop: register_extension
 (** Registers extension both for code and loop annotations. *)
 val register_code_annot_next_both: register_extension
 
-type module_loader = typing_context -> location -> string list -> unit
-val register_module_loader : string -> module_loader -> unit
+(**
+   Module importer extensions allow to extends the import clause with external
+   loaders. For instance, consider the following declaration:
+   [
+   //@ import A: foo::bar;
+   ]
+
+   This import clause will invoke an external module importer named ["A"]
+   provided it has been properly registered.
+
+   A module importer extension is a function that receives a [module_builder]
+   parameter to be populated with contents of the module. The module name is
+   provided as list (See {Logic_utils.longident} for details).
+
+   New type and function symbols shall be created with `Cil.make_xxx` functions.
+   The registered symbols {i will} be automatically prefixed with the name of
+   the imported module.
+
+   The register module importer function might be invoked several times,
+   typically when a given module is imported from several files. Although
+   external module importers might use memoization internally, the provided
+   module builder shall be populated on every call.
+*)
+val register_module_importer : string -> extension_module_importer -> unit

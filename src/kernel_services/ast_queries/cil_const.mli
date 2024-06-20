@@ -211,15 +211,14 @@ val make_logic_var_quant: string -> logic_type -> logic_var
 val make_logic_var_local: string -> logic_type -> logic_var
 
 (** Create a fresh logical (global) variable giving its name and type. *)
-val make_logic_info : string -> (* logic_type -> *) logic_info
+val make_logic_info : string -> logic_info
 
 (** Create a new local logic variable given its name.
     @since Fluorine-20130401
 *)
-val make_logic_info_local : string -> (* logic_type -> *) logic_info
+val make_logic_info_local : string -> logic_info
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
+(** Create a logic type info given its name.
+    @since Frama-C+dev
 *)
+val make_logic_type : string -> logic_type_info

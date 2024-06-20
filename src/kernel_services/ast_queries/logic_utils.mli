@@ -34,13 +34,30 @@ exception Not_well_formed of location * string
 (** exception raised when an unknown extension is called. *)
 exception Unknown_ext
 
+(** Split a long-identifier into the list of its components.
+    eg. ["A::B::(<:)"] is split into [["A";"B";"(<:)"]].
+    Returns a singleton for regular identifiers.
+    @since Frama-C+dev *)
+val longident : string -> string list
+
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
     to build terms and predicates.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-(** add a logic function in the environment.
-    See {!Logic_env.add_logic_function_gen}*)
+(** Check if there is a logic function with same profile in the environment.
+    @since Frama-C+dev *)
+val mem_logic_function : logic_info -> bool
+
+(** Add a logic function in the environment.
+    Replaces any existing logic function with the same profile.
+    See {!Logic_env.add_logic_function_gen}
+    @since Frama-C+dev *)
 val add_logic_function : logic_info -> unit
+
+(** remove any logic function with the same profile from the environment.
+    See {!Logic_env.remove_logic_function_gen}
+    @since Frama-C+dev *)
+val remove_logic_function : logic_info -> unit
 
 (** {2 Types} *)
 

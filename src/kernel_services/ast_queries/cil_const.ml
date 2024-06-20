@@ -186,6 +186,13 @@ let make_logic_info k x =
 let make_logic_info_local = make_logic_info LVLocal
 let make_logic_info = make_logic_info LVGlobal
 
+let make_logic_type name = {
+  lt_name = name ;
+  lt_params = [] ;
+  lt_def = None ;
+  lt_attr = [] ;
+}
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

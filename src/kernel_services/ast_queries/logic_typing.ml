@@ -524,11 +524,13 @@ type typing_context = {
     accept_formal:bool ->
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
-  add_logic_type: location -> logic_type_info -> unit;
-  add_logic_ctor: location -> logic_ctor_info -> unit;
-  add_logic_function: location -> logic_info -> unit;
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+}
+
+type module_builder = {
+  add_logic_type : location -> logic_type_info -> unit ;
+  add_logic_function : location -> logic_info -> unit ;
 }
 
 module Extensions = struct
@@ -536,32 +538,33 @@ module Extensions = struct
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_typer = ref (fun _ _ _ _ -> assert false)
   let ref_typer_block = ref (fun _ _ _ _ -> assert false)
-  let ref_loader = ref (fun _ _ _ _ -> assert false)
+  let ref_importer = ref (fun _ _ _ _ -> assert false)
 
-  let set_handler ~is_extension ~typer ~typer_block ~loader =
+  let set_handler ~is_extension ~typer ~typer_block ~importer =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_typer := typer ;
     ref_typer_block := typer_block;
-    ref_loader := loader ;
+    ref_importer := importer ;
     initialized := true
 
   let is_extension name = !ref_is_extension name
 
-  let typer name ~typing_context:typing_context ~loc =
+  let typer name ~(typing_context:typing_context) ~(loc:location) =
     !ref_typer name typing_context loc
 
-  let typer_block name ~typing_context:typing_context ~loc mId =
+  let typer_block name ~(typing_context:typing_context) ~(loc:location) mId =
     !ref_typer_block name typing_context loc mId
 
-  let loader name ~typing_context:typing_context ~loc =
-    !ref_loader name typing_context loc
+  let importer name ~(builder:module_builder) ~(loc:location)
+      (moduleId: string list) : unit =
+    !ref_importer name builder loc moduleId
 
 end
 let set_extension_handler = Extensions.set_handler
 let get_typer = Extensions.typer
 let get_typer_block = Extensions.typer_block
-let get_loader = Extensions.loader
+let get_importer = Extensions.importer
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with
@@ -693,6 +696,29 @@ module Make
      end) =
 struct
 
+  let make_typing_context ~pre_state ~post_state ~assigns_env
+      ~logic_type ~type_predicate ~type_term ~type_assigns = {
+    silent = false;
+    is_loop = C.is_loop;
+    pre_state=pre_state;
+    post_state=post_state;
+    assigns_env=assigns_env;
+    logic_type= logic_type;
+    type_predicate= type_predicate;
+    type_term= type_term;
+    type_assigns = type_assigns;
+    anonCompFieldName = C.anonCompFieldName;
+    conditionalConversion = C.conditionalConversion;
+    find_macro = C.find_macro;
+    find_var = C.find_var;
+    find_enum_tag = C.find_enum_tag;
+    find_comp_field = C.find_comp_field;
+    find_type = C.find_type ;
+    find_label = C.find_label;
+    error = C.error;
+    on_error = C.on_error;
+  }
+
   (* Imported Scope *)
 
   type scope = {
@@ -774,30 +800,24 @@ struct
 
   let add_rollback_action f x = Queue.add (fun () -> f x) rollback
 
-  let add_logic_function loc li =
+  let add_logic_info loc li =
+    let lv = li.l_var_info in
     (try
-       let _ = Logic_env.find_logic_ctor li.l_var_info.lv_name in
-       C.error loc "constructor %s is already defined" li.l_var_info.lv_name
+       let _ = Logic_env.find_logic_ctor lv.lv_name in
+       C.error loc "constructor %s is already defined" lv.lv_name
      with Not_found -> ());
-    let l = Logic_env.find_all_logic_functions li.l_var_info.lv_name in
-    if List.exists (Logic_utils.is_same_logic_profile li) l then begin
-      C.error loc
-        "%s %s is already declared with the same profile"
-        (match li.l_type with None -> "predicate" | Some _ -> "logic function")
-        li.l_var_info.lv_name
-    end else begin
-      let eq = Logic_utils.is_same_logic_profile in
-      Logic_env.add_logic_function_gen eq li;
-      add_rollback_action (Logic_env.remove_logic_info_gen eq) li
-    end
-
-  let add_logic_ctor loc ct =
-    try
-      ignore (Logic_env.find_logic_ctor ct.ctor_name);
-      C.error loc "logic type constructor %s is already defined" ct.ctor_name
-    with Not_found ->
-      Logic_env.add_logic_ctor ct.ctor_name ct;
-      add_rollback_action Logic_env.remove_logic_ctor ct.ctor_name
+    if Logic_utils.mem_logic_function li then
+      begin
+        C.error loc
+          "%s %s is already declared with the same profile"
+          (match li.l_type with None -> "predicate" | Some _ -> "logic function")
+          lv.lv_name
+      end
+    else
+      begin
+        Logic_utils.add_logic_function li;
+        add_rollback_action Logic_utils.remove_logic_function li
+      end
 
   let add_logic_type loc info =
     try
@@ -806,32 +826,6 @@ struct
     with Not_found ->
       Logic_env.add_logic_type info.lt_name info;
       add_rollback_action Logic_env.remove_logic_type info.lt_name
-
-  let make_typing_context ~pre_state ~post_state ~assigns_env
-      ~logic_type ~type_predicate ~type_term ~type_assigns = {
-    silent = false;
-    is_loop = C.is_loop;
-    pre_state=pre_state;
-    post_state=post_state;
-    assigns_env=assigns_env;
-    logic_type= logic_type;
-    type_predicate= type_predicate;
-    type_term= type_term;
-    type_assigns = type_assigns;
-    anonCompFieldName = C.anonCompFieldName;
-    conditionalConversion = C.conditionalConversion;
-    find_macro = C.find_macro;
-    find_var = C.find_var;
-    find_enum_tag = C.find_enum_tag;
-    find_comp_field = C.find_comp_field;
-    find_type = C.find_type ;
-    find_label = C.find_label;
-    add_logic_function ;
-    add_logic_type ;
-    add_logic_ctor ;
-    error = C.error;
-    on_error = C.on_error;
-  }
 
   let check_non_void_ptr loc ty =
     if Logic_utils.isLogicVoidPointerType ty then
@@ -3820,8 +3814,7 @@ struct
               ~logic_type
               ~type_predicate
               ~type_term
-              ~type_assigns:type_assign
-          in
+              ~type_assigns:type_assign in
           let b_assumes = List.map (id_predicate env) bas in
           let b_requires= List.map (id_predicate_top env) br in
           let b_post_cond =
@@ -4116,7 +4109,7 @@ struct
     info.l_profile <- p;
     info.l_type <- t;
     info.l_labels <- labels;
-    add_logic_function loc info;
+    add_logic_info loc info;
     env,info
 
   let type_annot loc ti =
@@ -4288,15 +4281,8 @@ struct
       ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
       Some (Dmodule(name,l,[],loc))
 
-    | LDimport(drv,name,alias) ->
-      Option.iter
-        begin fun drv ->
-          let typing_context = base_ctxt (Lenv.empty ()) in
-          Extensions.loader drv ~typing_context ~loc
-          @@ List.filter (fun s -> s <> "")
-          @@ String.split_on_char ':' name
-        end drv ;
-      open_scope ~name ?alias () ; None
+    | LDimport(_drv,moduleId,alias) ->
+      open_scope ~name:moduleId ?alias () ; None
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in
@@ -4347,7 +4333,7 @@ struct
       in
       li.l_labels <- labels;
       li.l_body <- LBpred p;
-      add_logic_function loc li;
+      add_logic_info loc li;
       update_info_wrt_default_label li;
       Some (Dinvariant (li,loc))
 

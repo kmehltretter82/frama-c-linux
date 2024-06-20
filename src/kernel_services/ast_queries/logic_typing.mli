@@ -127,11 +127,7 @@ type typing_context = {
     typing_context ->
     accept_formal:bool ->
     Lenv.t -> Logic_ptree.assigns -> assigns;
-  add_logic_type: location -> logic_type_info -> unit;
-  add_logic_ctor: location -> logic_ctor_info -> unit;
-  add_logic_function: location -> logic_info -> unit;
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
-
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
   (** [on_error f rollback x] will attempt to evaluate [f x]. If this triggers
       an error while in [-kernel-warn-key annot-error] mode, [rollback
@@ -144,6 +140,14 @@ type typing_context = {
   *)
 }
 
+(** Functions that can be called when importing external modules into ACSL.
+    See {Acsl_extension.register_module_importer} for details.
+    @since Frama-C+dev
+*)
+type module_builder = {
+  add_logic_type : location -> logic_type_info -> unit ;
+  add_logic_function : location -> logic_info -> unit ;
+}
 
 module type S =
 sig
@@ -300,7 +304,7 @@ val set_extension_handler:
   typer_block:(string -> typing_context -> location ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
-  loader:(string -> typing_context -> location -> string list -> unit) ->
+  importer:(string -> module_builder -> location -> string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
@@ -320,8 +324,8 @@ val get_typer_block:
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
 
-val get_loader:
+val get_importer:
   string ->
-  typing_context:typing_context ->
+  builder:module_builder ->
   loc:Logic_ptree.location ->
   string list -> unit
