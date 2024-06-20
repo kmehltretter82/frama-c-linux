@@ -1206,7 +1206,7 @@ sig
 
   val join : t -> t -> t
   val widen : t -> t -> t option (* returns None when inclusion *)
-  val transfer : vertex transition ->  t -> t option
+  val transfer : vertex -> vertex edge ->  t -> t option
 end
 
 module type DataflowAnalysis =
@@ -1254,7 +1254,7 @@ struct
     let process_edge v e acc =
       (* Retrieve origin value *)
       let value = States.find_opt results v in
-      let result = Option.bind value (D.transfer e.edge_transition) in
+      let result = Option.bind value (D.transfer v e) in
       Option.to_list result @ acc
     in
 

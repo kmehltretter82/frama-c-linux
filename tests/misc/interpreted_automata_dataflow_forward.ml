@@ -83,9 +83,9 @@ struct
     with Not_constant ->
       Map.remove vi v
 
-  let transfer t v =
+  let transfer _ e v =
     let open Interpreted_automata in
-    match t with
+    match e.edge_transition with
     | Skip | Return _ | Prop _ | Enter _ | Leave _ -> Some v
     | Guard (exp, kind, _) -> assume v exp kind
     | Instr (Set ((Var vi, NoOffset), exp, _), _) -> Some (assign v vi exp)

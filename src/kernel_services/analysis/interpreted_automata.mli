@@ -52,9 +52,9 @@ type 'a control =
       the given cases and default vertices. *)
 
 (** Vertices are control points. When a vertice is the *start* of a statement,
-    this statement is kept in vertex_stmt. Currently, this statement is kept for
-    two reasons: to know when callbacks should be called and when annotations
-    should be read. *)
+    this statement is kept in [vertex_start_of]. Currently, this statement is
+    kept for two reasons: to know when callbacks should be called and when
+    annotations should be read. *)
 
 type vertex = private {
   vertex_kf : Cil_types.kernel_function;
@@ -325,10 +325,10 @@ sig
       Called on loop heads to ensure the analysis termination. *)
   val widen : t -> t -> t option
 
-  (** Transfer function for transitions: computes the state after the transition
+  (** Transfer function for edges: computes the state after the transition
       from the state before. Returns None if the end of the transition is not
       reachable from the given state. *)
-  val transfer : vertex transition ->  t -> t option
+  val transfer : vertex -> vertex edge ->  t -> t option
 end
 
 (** Simple dataflow analysis *)
