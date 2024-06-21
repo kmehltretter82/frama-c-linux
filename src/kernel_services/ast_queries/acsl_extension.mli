@@ -101,18 +101,18 @@ type extension_module_importer =
 
     Here is a basic example:
     {[
-    let count = ref 0
-    let foo_typer typing_context loc = function
-      | p :: [] ->
-        Ext_preds
-        [ (typing_context.type_predicate
-             typing_context
-             (typing_context.post_state [Normal])
-             p)])
-      | [] -> let id = !count in incr count; Ext_id id
-      | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-    let () =
-      Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
+      let count = ref 0
+      let foo_typer ctxt loc = function
+        | [] ->
+          let id = !count in incr count;
+          Ext_id id
+        | [p] ->
+          Ext_preds [ctxt.type_predicate ctxt (ctxt.post_state [Normal]) p]
+        | _ ->
+          typing_context.error loc "expecting a predicate after keyword FOO"
+
+      let () =
+        Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
     ]}
     @before 29.0-Copper parameters [plugin] and [is_same_ext] were not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
@@ -161,7 +161,7 @@ val register_code_annot_next_both: register_extension
    Module importer extensions allow to extends the import clause with external
    loaders. For instance, consider the following declaration:
    {[
-   //@ import A: foo::bar;
+     //@ import A: foo::bar;
    ]}
 
    This import clause will invoke an external module importer named ["A"]
