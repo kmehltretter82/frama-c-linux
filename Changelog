@@ -41,6 +41,14 @@ o   Eva       [2024-07-31] Export profiling information about the analysis
               performance via the new module Eva_perf in Eva.mli.
 -   Ivette    [2024-07-26] New flamegraph component to visualize Eva analysis
               time by C functions, in the "Eva Summary" view by default.
+-   Kernel    [2024-06-21] Support for ACSL (and external) modules.
+-   Kernel    [2024-06-21] New debug category printer:imported-modules
+o   Dev       [2024-06-21] New ACSL extension for external modules
+o!  Dev       [2024-06-21] Move functions for finding logic types, functions,
+              predicates and constructors from Logic_typing to Logic_env.
+o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh;
+              add a section in the user manual about how to manually
+              replace it.
 -   Kernel    [2024-05-20] New ACSL extension loop unfold (replaces loop pragma UNROLL)
 -!  Kernel    [2024-05-20] Removed loop pragma UNROLL annotations
 o!  Kernel    [2024-05-20] Renamed module Unroll_loop into Unfold_loop
