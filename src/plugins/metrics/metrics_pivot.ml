@@ -143,7 +143,7 @@ let name_of_global_annotation = function
   | Dinvariant (li, _)
   | Dtype_annot (li, _) -> Some (name_of_logic_info li)
   | Daxiomatic (name, _, _, _)
-  | Dmodule (name, _, _, _)
+  | Dmodule (name, _, _, _, _)
   | Dtype ({lt_name = name}, _)
   | Dlemma (name, _, _, _, _, _)
   | Dmodel_annot ({mi_name = name}, _)

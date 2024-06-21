@@ -1690,7 +1690,7 @@ let rec remove_declared_global_annot logic_vars = function
   | Dvolatile _ | Dtype _ | Dlemma _ | Dmodel_annot _
   | Dextended _ ->
     logic_vars
-  | Daxiomatic (_,l,_, _) | Dmodule (_,l,_, _) ->
+  | Daxiomatic (_,l,_,_) | Dmodule (_,l,_,_,_) ->
     List.fold_left remove_declared_global_annot logic_vars l
 
 let remove_declared_global c_vars logic_vars = function
@@ -1806,7 +1806,7 @@ let logic_info_of_global s =
   let rec check_one acc = function
     | Dfun_or_pred(li,_) | Dinvariant(li,_) | Dtype_annot(li,_) ->
       check_logic_info li acc
-    | Daxiomatic (_,l, _, _) | Dmodule (_,l, _, _) ->
+    | Daxiomatic (_,l, _, _) | Dmodule (_,l, _, _, _) ->
       List.fold_left check_one acc l
     | Dtype _ | Dvolatile _ | Dlemma _ | Dmodel_annot _
     | Dextended _

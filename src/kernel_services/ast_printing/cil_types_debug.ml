@@ -971,10 +971,10 @@ and pp_global_annotation fmt = function
     Format.fprintf fmt "Daxiomatic(%a,%a,%a,%a)"  pp_string string
       (pp_list pp_global_annotation) global_annotation_list
       pp_attributes attributes  pp_location location
-  | Dmodule(string,global_annotation_list,attributes,location) ->
-    Format.fprintf fmt "Dmodule(%a,%a,%a,%a)"  pp_string string
+  | Dmodule(string,global_annotation_list,attributes,driver,location) ->
+    Format.fprintf fmt "Dmodule(%a,%a,%a,%a,%a)"  pp_string string
       (pp_list pp_global_annotation) global_annotation_list
-      pp_attributes attributes  pp_location location
+      pp_attributes attributes (pp_option pp_string) driver pp_location location
   | Dtype(logic_type_info,location) ->
     Format.fprintf fmt "Dtype(%a,%a)"  pp_logic_type_info logic_type_info  pp_location location
   | Dlemma(string,logic_label_list,string_list,predicate,attributes,location) ->

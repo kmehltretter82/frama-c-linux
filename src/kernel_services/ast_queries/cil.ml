@@ -1919,10 +1919,10 @@ and childrenAnnotation vis a =
     let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
     let attr' = visitCilAttributes vis attr in
     if l' != l || attr != attr' then Daxiomatic(id,l',attr',loc) else a
-  | Dmodule(id,l,attr,loc) ->
+  | Dmodule(id,l,attr,drv,loc) ->
     let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
     let attr' = visitCilAttributes vis attr in
-    if l' != l || attr != attr' then Dmodule(id,l',attr',loc) else a
+    if l' != l || attr != attr' then Dmodule(id,l',attr',drv,loc) else a
   | Dextended (e,attr,loc) ->
     let e' = visitCilExtended vis e in
     let attr' = visitCilAttributes vis attr in
@@ -2178,7 +2178,7 @@ and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
     let last = mkStmt ~ghost:res.ghost res.skind in
     let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
     block.battrs <- addAttribute (Attr (vis_tmp_attr, [])) block.battrs;
-     (* Make our statement contain the instructions to prepend *)
+    (* Make our statement contain the instructions to prepend *)
     res.skind <- Block block;
     vis#pop_stmt s; res
 
@@ -5255,7 +5255,7 @@ let mapGlobals (fl: file)
 let global_annotation_attributes = function
   | Dfun_or_pred ({l_var_info = { lv_attr }}, _) -> lv_attr
   | Dvolatile (_,_,_,attrs,_) -> attrs
-  | Daxiomatic (_,_,attrs,_) | Dmodule(_,_,attrs,_) -> attrs
+  | Daxiomatic (_,_,attrs,_) | Dmodule(_,_,attrs,_,_) -> attrs
   | Dtype ({ lt_attr }, _) -> lt_attr
   | Dlemma (_,_,_,_,attrs,_) -> attrs
   | Dinvariant ({l_var_info = { lv_attr }}, _) -> lv_attr

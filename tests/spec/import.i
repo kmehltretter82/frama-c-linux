@@ -1,6 +1,7 @@
 /* run.config
 MODULE: @PTEST_NAME@
 OPT: -print
+OPT: -print -kernel-msg-key printer:imported-modules
 */
 
 /*@ import foo: A::B; */

@@ -3423,10 +3423,18 @@ class cil_printer () = object (self)
         (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
            self#global_annotation)
         decls
-    | Dmodule(id,decls,_attr, _) ->
+    | Dmodule(id, _, _, Some drv, _)
+      when not Kernel.(is_debug_key_enabled dkey_print_imported_modules) ->
+      fprintf fmt "@[<hov 2>%a %s: %s %a _ ;@]@\n"
+        self#pp_acsl_keyword "import" drv id
+        self#pp_acsl_keyword "\\as"
+    | Dmodule(id, decls, _attr, driver, _) ->
       begin
         (* attributes are meant to be purely internal for now. *)
-        fprintf fmt "@[<v 2>@[%a %a {@]"
+        fprintf fmt "@[<v 2>@[" ;
+        if Kernel.(is_debug_key_enabled dkey_print_imported_modules) then
+          Option.iter (fprintf fmt "// import %s:@\n") driver ;
+        fprintf fmt "%a %a {@]"
           self#pp_acsl_keyword "module" self#logic_name id ;
         try
           Stack.push (id ^ "::") module_stack ;

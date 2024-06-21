@@ -1520,7 +1520,7 @@ let ip_of_global_annotation a =
     | Daxiomatic(iax_name, l, iax_attrs, _) ->
       let iax_props = List.fold_left aux [] l in
       IPAxiomatic {iax_name; iax_props; iax_attrs} :: (iax_props @ acc)
-    | Dmodule(im_name, l, im_attrs, _) ->
+    | Dmodule(im_name, l, im_attrs, _, _) ->
       let im_props = List.fold_left aux [] l in
       IPModule {im_name; im_props; im_attrs} :: (im_props @ acc)
     | Dlemma(il_name, il_labels, il_args, il_pred, il_attrs, il_loc) ->

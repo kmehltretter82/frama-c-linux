@@ -4325,18 +4325,18 @@ struct
       let l = List.filter_map (decl ~context) decls in
       pop_imports () ;
       ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
-      Some (Dmodule(name,l,[],loc))
+      Some (Dmodule(name,l,[],None,loc))
 
     | LDimport(None,name,alias) ->
       add_import ?alias name ; None
 
-    | LDimport(Some driver,name,alias) ->
+    | LDimport(Some driver as drv,name,alias) ->
       let decls = ref [] in
       let builder = make_module_builder decls name in
       let path = Logic_utils.longident name in
       Extensions.importer driver ~builder ~loc path ;
       add_import ?alias name ;
-      Some (Dmodule(name,List.rev !decls,[],loc))
+      Some (Dmodule(name,List.rev !decls,[],drv,loc))
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in

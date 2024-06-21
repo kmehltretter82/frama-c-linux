@@ -320,7 +320,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
         match an with
         | Dfun_or_pred (li, _) -> li.l_var_info.lv_name
         | Dvolatile (_, _, _, _, _) -> " (Volatile) "
-        | Daxiomatic (s, _, _, _) | Dmodule (s, _, _, _) -> s
+        | Daxiomatic (s, _, _, _) | Dmodule (s, _, _, _, _) -> s
         | Dtype (lti, _) ->  lti.lt_name
         | Dlemma (ln, _, _, _, _, _) ->  ln
         | Dinvariant (toto, _) -> toto.l_var_info.lv_name

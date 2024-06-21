@@ -104,6 +104,8 @@ let dkey_print_logic_coercions = register_category "printer:logic-coercions"
 
 let dkey_print_logic_types = register_category "printer:logic-types"
 
+let dkey_print_imported_modules = register_category "printer:imported-modules"
+
 let dkey_print_attrs = register_category "printer:attrs"
 
 let dkey_print_sid = register_category "printer:sid"
