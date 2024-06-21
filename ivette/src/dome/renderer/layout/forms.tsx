@@ -44,7 +44,12 @@ import React from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
 import { SVG } from 'dome/controls/icons';
-import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
+import {
+  Checkbox,
+  Radio,
+  Select as SelectMenu,
+  Button
+} from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 
 export type FieldError =
@@ -1447,6 +1452,36 @@ export function ColorField(props: ColorFieldProps): JSX.Element {
         onChange={onChange}
       />
     </Field>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Button Field                                                       ---*/
+/* --------------------------------------------------------------------------*/
+/** @category Form Fields */
+export function ButtonField(props: FieldProps<boolean>): JSX.Element | null {
+  const { hidden, disabled } = useContext(props);
+
+  if (hidden) return null;
+
+  const { value, onChanged } = props.state;
+  const { label, title } = props;
+  const css = Utils.classes(
+    'dome-xForm-field dome-text-label',
+    disabled && 'dome-disabled',
+  );
+  const onClick = (): void => {
+    onChanged(!value, undefined, false);
+  };
+  return (
+    <Button
+      className={css}
+      label={label}
+      title={title}
+      disabled={disabled}
+      selected= {value}
+      onClick={onClick}
+    />
   );
 }
 
