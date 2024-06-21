@@ -3983,6 +3983,8 @@ registered by one of the following functions, depending on its category.
 \scodeidx{Acsl\_extension}{register\_code\_annot\_next\_both}
 \item \texttt{Acsl\_extension.register\_code\_annot\_next\_both}%
 \scodeidx{Acsl\_extension}{register\_code\_annot\_next\_loop}
+\item \texttt{Acsl\_extension.register\_module\_importer}%
+\scodeidx{Acsl\_extension}{register\_module\_importer}
 \end{itemize}
 
 Each function takes the following mandatory arguments:
@@ -3992,9 +3994,12 @@ Each function takes the following mandatory arguments:
 \item \texttt{kw} the name of the extension,
 \item \texttt{typer} the type-checking function itself.
 \item \texttt{status}, a boolean flag indicating whether the extended
-  annotation may have a validity status, and
-
+  annotation may have a validity status.
 \end{itemize}
+
+The last function has a different behavior and is used to load external
+\acsl modules with the \verb+import+ clause. It is treated at the end
+of the section.
 
 During type-checking, the list \verb|[e1;...;en]| will be given to \verb|typer|,
 together with the current typing environment (which allows discriminating
@@ -4112,7 +4117,59 @@ version in the interface:
 
 \includegraphics[width=\textwidth]{examples/acsl_extension_ext_types/acsl_extension_ext_types}
 
+\paragraph{External Modules.} Finally, let us introduce how to extend \acsl
+modules with external module importers. A typical usage is to import logical
+definitions from other languages, eg. \textsf{Coq} or \textsf{Why3}, as regular
+\acsl module definitions. From the user point the view, this takes the form
+of an extended \verb+import+ clause:
 
+\begin{lstlisting}[style=c]
+//@ \import Foo: foo::bar::Jazz ;
+\end{lstlisting}
+
+Here, \verb+Foo:+ specifies the name of the \acsl extension responsible for
+importing the module, and \verb+foo::bar::Jazz+ is the name of the module
+to be imported. To register such an \acsl extension point, a plug-in shall call
+the \verb+Acsl_extension.register_module_importer+ with a loader function, as
+follows:
+
+
+\begin{lstlisting}[language=OCaml]
+open Cil_types
+open Logic_typing
+
+let loader (ctxt: module_builder) (loc: location) (path: string list) =
+  begin
+    (* in the example above, path is ["foo","bar","Jazz"] *)
+    (* ... read some file .. *)
+    let p : location = ... in
+    let t = Cil.make_logic_type "t" in
+    (* ... configure type t ... *)
+    let q : location = ... in
+    let f = Cil.make_logic_info "f" in
+    (* ... configure function f ... *)
+    ctxt.add_logic_type p t ;
+    ctxt.add_logic_function q f ;
+    (* ... *)
+  end
+
+let () = Acsl_extension.register_module_importer "Foo" loader
+\end{lstlisting}
+
+Added types and functions shall use local names, as in the example above.
+After importation, the imported declarations will be accessible through
+their full-name identifier, for instance \verb+foo::bar::Jazz:f+
+in the example above.
+
+As explained in the \framac source documentation, module importers might be
+invoked multiple times by the kernel, eg. when a given module is imported from
+different source files. Although the loader itself can use memoization
+techniques to save time, the module builder shall be populated on every call.
+
+For debugging module importers, you can use
+\verb+-kernel-msg-key printer:imported-modules+ together with \verb+-print+.
+Using this message key, the imported modules are printed instead of the
+original \verb+import+ clause.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
