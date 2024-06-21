@@ -34,6 +34,9 @@ exception Not_well_formed of location * string
 (** exception raised when an unknown extension is called. *)
 exception Unknown_ext
 
+(** Test if the given string contains ':' (long-identifiers). *)
+val is_qualified : string -> bool
+
 (** Split a long-identifier into the list of its components.
     eg. ["A::B::(<:)"] is split into [["A";"B";"(<:)"]].
     Returns a singleton for regular identifiers.

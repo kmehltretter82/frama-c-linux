@@ -182,7 +182,7 @@ sig
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
 
   (** Open module in local environment. *)
-  val add_import : ?alias:string -> string -> unit
+  val add_import : ?current:bool -> ?alias:string -> string -> unit
   val clear_imports : unit -> unit
   val push_imports : unit -> unit
   val pop_imports : unit -> unit

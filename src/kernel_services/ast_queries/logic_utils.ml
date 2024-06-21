@@ -870,6 +870,9 @@ let is_same_builtin_profile l1 l2 =
   is_same_list (fun (_,t1) (_,t2) -> is_same_type t1 t2)
     l1.bl_profile l2.bl_profile
 
+let is_qualified a =
+  try ignore @@ String.index a ':' ; true with Not_found -> false
+
 let longident = Str.split @@ Str.regexp_string "::"
 
 let mem_logic_function f =

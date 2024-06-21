@@ -17,7 +17,7 @@ module foo::bar {
   logic Foo::t inv(Foo::t x) ;
   
   logic Foo::t opN(Foo::t x, ℤ n) =
-    n ≥ 0? Foo::opN(x, n): Foo::opN(inv(x), -n);
+    n ≥ 0? Foo::opN(x, n): opN(inv(x), -n);
   
   }
  */
