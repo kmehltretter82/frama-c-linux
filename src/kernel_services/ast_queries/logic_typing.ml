@@ -758,7 +758,7 @@ struct
 
   let add_import ?(current=false) ?alias name =
     begin
-      let short = match alias with Some a -> a | None ->
+      let short = match alias with Some "_" -> "" | Some a -> a | None ->
         List.hd @@ List.rev @@ Logic_utils.longident name in
       let s = {
         long_prefix = name ^ "::";
@@ -4303,8 +4303,8 @@ struct
         C.error loc
           "Duplicated axiomatics %s (first occurrence at %a)"
           id Cil_printer.pp_location oldloc in
-      let l = List.filter_map (decl ~context:InAxiomatic) decls in
       ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
+      let l = List.filter_map (decl ~context:InAxiomatic) decls in
       Some (Daxiomatic(id,l,[],loc))
 
     | LDmodule(id,decls) ->
@@ -4320,23 +4320,29 @@ struct
         C.error loc
           "Duplicated module %s (first occurrence at %a)"
           id Cil_printer.pp_location oldloc in
+      ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
       push_imports () ;
       add_import ~current:true name ;
       let l = List.filter_map (decl ~context) decls in
       pop_imports () ;
-      ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
       Some (Dmodule(name,l,[],None,loc))
 
     | LDimport(None,name,alias) ->
       add_import ?alias name ; None
 
     | LDimport(Some driver as drv,name,alias) ->
-      let decls = ref [] in
-      let builder = make_module_builder decls name in
-      let path = Logic_utils.longident name in
-      Extensions.importer driver ~builder ~loc path ;
-      add_import ?alias name ;
-      Some (Dmodule(name,List.rev !decls,[],drv,loc))
+      let annot =
+        if not @@ Logic_env.Modules.mem name then
+          begin
+            let decls = ref [] in
+            let builder = make_module_builder decls name in
+            let path = Logic_utils.longident name in
+            Extensions.importer driver ~builder ~loc path ;
+            Logic_env.Modules.add name loc ;
+            Some (Dmodule(name,List.rev !decls,[],drv,loc))
+          end
+        else None
+      in add_import ?alias name ; annot
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in

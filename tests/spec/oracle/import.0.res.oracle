@@ -7,4 +7,10 @@
  */
 /*@ predicate check1(A::B::t x) = A::B::check(x, 0);
  */
+/*@ predicate check2(A::B::t x) = A::B::check(x, 0);
+ */
+/*@ predicate check3(A::B::t x) = A::B::check(x, 0);
+ */
+/*@ predicate check4(A::B::t x) = A::B::check(x, 0);
+ */
 
