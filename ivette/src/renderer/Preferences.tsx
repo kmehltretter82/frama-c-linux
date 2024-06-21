@@ -137,7 +137,7 @@ function NotificationFields(): JSX.Element {
 
 export default function Preferences(): JSX.Element {
   return (
-    <Forms.Form>
+    <Forms.PageForm>
       <Forms.Section label="Theme" unfold>
         <ThemeFields />
       </Forms.Section>
@@ -148,7 +148,7 @@ export default function Preferences(): JSX.Element {
         <ConsoleFields />
         <NotificationFields />
       </Forms.Section>
-    </Forms.Form>
+    </Forms.PageForm>
   );
 }
 

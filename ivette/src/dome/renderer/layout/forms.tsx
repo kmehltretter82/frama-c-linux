@@ -702,15 +702,13 @@ export interface FormProps extends FilterProps, Children {
   className?: string;
   /** Additional container style. */
   style?: React.CSSProperties;
-  /** Page mode */
-  layout?: formLayout;
 }
 
-/**
-   Main Form Container.
-   @category Form Containers
- */
-export function Form(props: FormProps): JSX.Element | null {
+interface FormLayoutProps extends FormProps {
+  layout: formLayout;
+}
+
+function FormLayout(props: FormLayoutProps): JSX.Element | null {
   const { className, style, children,
     layout = DEFAULT_MODE, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
@@ -726,6 +724,22 @@ export function Form(props: FormProps): JSX.Element | null {
       </CONTEXT.Provider>
     </div>
   );
+}
+
+/**
+   Form with page layout.
+   @category Form Containers
+ */
+export function SidebarForm(props: FormProps): JSX.Element {
+  return <FormLayout layout="sidebar" {...props} />;
+}
+
+/**
+   Form with sidebar layout.
+   @category Form Containers
+ */
+   export function PageForm(props: FormProps): JSX.Element {
+  return <FormLayout layout="page" {...props} />;
 }
 
 // --------------------------------------------------------------------------
