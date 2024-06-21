@@ -141,7 +141,7 @@ type typing_context = {
 }
 
 (** Functions that can be called when importing external modules into ACSL.
-    See {Acsl_extension.register_module_importer} for details.
+    See {!Acsl_extension.register_module_importer} for details.
     @since Frama-C+dev
 *)
 type module_builder = {

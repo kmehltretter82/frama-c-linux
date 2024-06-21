@@ -100,7 +100,7 @@ type extension_module_importer =
     status or not.
 
     Here is a basic example:
-    [
+    {[
     let count = ref 0
     let foo_typer typing_context loc = function
       | p :: [] ->
@@ -113,7 +113,7 @@ type extension_module_importer =
       | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
     let () =
       Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
-    ]
+    ]}
     @before 29.0-Copper parameters [plugin] and [is_same_ext] were not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
@@ -160,16 +160,16 @@ val register_code_annot_next_both: register_extension
 (**
    Module importer extensions allow to extends the import clause with external
    loaders. For instance, consider the following declaration:
-   [
+   {[
    //@ import A: foo::bar;
-   ]
+   ]}
 
    This import clause will invoke an external module importer named ["A"]
    provided it has been properly registered.
 
    A module importer extension is a function that receives a [module_builder]
    parameter to be populated with contents of the module. The module name is
-   provided as list (See {Logic_utils.longident} for details).
+   provided as list (See {!Logic_utils.longident} for details).
 
    New type and function symbols shall be created with `Cil.make_xxx` functions.
    The registered symbols {i will} be automatically prefixed with the name of
