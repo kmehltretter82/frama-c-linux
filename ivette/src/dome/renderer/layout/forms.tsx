@@ -40,17 +40,13 @@
 
 import { debounce } from 'lodash';
 import Events from 'events';
-import React from 'react';
+import React, { Children } from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
-import { SVG } from 'dome/controls/icons';
-import {
-  Checkbox,
-  Radio,
-  Select as SelectMenu,
-  Button
-} from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
+import { Icon, IconKind, SVG } from 'dome/controls/icons';
+import { Checkbox, Radio, SelectMenu, Button } from 'dome/controls/buttons';
+import { Hbox } from 'dome/layout/boxes';
 
 export type FieldError =
   | undefined | boolean | string
@@ -641,6 +637,7 @@ export function useIndex<A>(
 /* --- Form Filter Context                                                ---*/
 /* --------------------------------------------------------------------------*/
 
+type formLayout = "page" | "sidebar";
 export interface FilterProps {
   /** default is false. */
   hidden?: boolean;
@@ -657,6 +654,7 @@ export interface Children { children?: React.ReactNode }
 interface FormContext {
   disabled: boolean;
   hidden: boolean;
+  layout: formLayout;
 }
 
 const CONTEXT = React.createContext<FormContext | undefined>(undefined);
@@ -669,11 +667,14 @@ const DISABLED =
   ({ disabled = false, enabled = true }: FilterProps): boolean =>
     disabled || !enabled;
 
+const DEFAULT_MODE = "page";
+
 function useContext(props?: FilterProps): FormContext {
   const Parent = React.useContext(CONTEXT);
   return {
     hidden: (props && HIDDEN(props)) || (Parent?.hidden ?? false),
     disabled: (props && DISABLED(props)) || (Parent?.disabled ?? false),
+    layout: Parent?.layout ?? DEFAULT_MODE,
   };
 }
 
@@ -696,29 +697,49 @@ export function FormFilter(props: FilterProps & Children): JSX.Element | null {
 /* --------------------------------------------------------------------------*/
 
 /** @category Form Containers */
-export interface PageProps extends FilterProps, Children {
+export interface FormProps extends FilterProps, Children {
   /** Additional container class. */
   className?: string;
   /** Additional container style. */
   style?: React.CSSProperties;
 }
 
-/**
-   Main Form Container.
-   @category Form Containers
- */
-export function Page(props: PageProps): JSX.Element | null {
-  const { className, style, children, ...filter } = props;
+interface FormLayoutProps extends FormProps {
+  layout: formLayout;
+}
+
+function FormLayout(props: FormLayoutProps): JSX.Element | null {
+  const { className, style, children,
+    layout = DEFAULT_MODE, ...filter } = props;
   const { hidden, disabled } = useContext(filter);
-  const css = Utils.classes(className ?? 'dome-xForm-grid');
+  const css = Utils.classes(
+    'dome-xForm-'+(layout === DEFAULT_MODE ? "grid" : layout),
+    className
+  );
   if (hidden) return null;
   return (
     <div className={css} style={style}>
-      <CONTEXT.Provider value={{ hidden, disabled }}>
+      <CONTEXT.Provider value={{ hidden, disabled, layout }}>
         {children}
       </CONTEXT.Provider>
     </div>
   );
+}
+
+/**
+   Form with page layout.
+   @category Form Containers
+ */
+export function SidebarForm(props: FormProps): JSX.Element {
+  return <FormLayout layout="sidebar" {...props} />;
+}
+
+/**
+   Form with sidebar layout.
+   @category Form Containers
+ */
+   export function PageForm(props: FormProps): JSX.Element {
+  return <FormLayout layout="page" {...props} />;
 }
 
 // --------------------------------------------------------------------------
@@ -797,7 +818,7 @@ export interface SectionProps extends FilterProps, Children {
 /** @category Form Fields */
 export function Section(props: SectionProps): JSX.Element | null {
   const { label, title, children, warning, error, ...filter } = props;
-  const { disabled, hidden } = useContext(filter);
+  const { disabled, hidden, layout } = useContext(filter);
   const [unfold, flip] = Dome.useFlipSettings(props.settings, props.unfold);
 
   if (hidden) return null;
@@ -810,7 +831,7 @@ export function Section(props: SectionProps): JSX.Element | null {
   );
 
   return (
-    <CONTEXT.Provider value={{ hidden, disabled }}>
+    <CONTEXT.Provider value={{ hidden, disabled, layout }}>
       <div className="dome-xForm-section" onClick={flip}>
         <div className="dome-xForm-fold">
           <SVG id={unfold ? 'TRIANGLE.DOWN' : 'TRIANGLE.RIGHT'} size={11} />
@@ -823,6 +844,79 @@ export function Section(props: SectionProps): JSX.Element | null {
       {unfold && children}
       {unfold && <div className="dome-xForm-hsep" />}
     </CONTEXT.Provider>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Actions Field                                                     --- */
+/* --------------------------------------------------------------------------*/
+
+/** @category Form Fields Actions*/
+export type ActionsButtonProps<A> = {
+  state: FieldState<A>,
+  title?: string,
+  equal?: (a: A, b: A) => boolean
+}
+
+/** @category Form Fields Actions*/
+export function ResetButton<A>(
+  props: ActionsButtonProps<A>
+): JSX.Element | null {
+  const { state, title, equal } = props;
+  const { value, reset, onChanged } = state;
+
+  if(!isResetAble(state)) return null;
+
+  const isEqual = compare(equal, reset as A, value);
+  return (
+    <Icon
+      id = "RELOAD"
+      title = {(title ?? "Reset")+(isEqual ? " : Field modified": "")}
+      size = {12}
+      kind ={isEqual ? "warning" as IconKind : "default" as IconKind}
+      onClick = {() => {
+        onChanged(reset as A, undefined, true);
+      }}
+    />
+  );
+}
+
+/** @category Form Fields Actions*/
+export function CommitButton<A>(
+  props: ActionsButtonProps<A>
+): JSX.Element | null {
+  const { state, title, equal } = props;
+  const { value, error, reset, onChanged } = state;
+
+  const commitAble = Boolean(
+    isCommitAble(state) &&
+    (!compare(equal, reset as A, value))
+  );
+  if(!commitAble) return null;
+  return (
+    <Icon
+      id = "PUSH"
+      title = {title ?? "Update FC"}
+      size = {14}
+      onClick = {() => {
+        onChanged(value, error, true);
+      }}
+    />
+  );
+}
+
+/** @category Form Fields Actions*/
+export function Actions(props?: Children): JSX.Element | null {
+  if(!props) return null;
+  const { children } = props;
+  const cssFieldAction = Utils.classes(
+    'dome-xForm-field-actions'
+  );
+
+  return (
+    <div className={cssFieldAction}>
+      {children}
+    </div>
   );
 }
 
@@ -844,6 +938,8 @@ export interface GenericFieldProps extends FilterProps, Children {
   onError?: string;
   /** Error (if any). */
   error?: FieldError;
+  /** list of actions. */
+  actions?: JSX.Element;
 }
 
 let FIELDID = 0;
@@ -859,11 +955,10 @@ export function useHtmlFor(): string {
    @category Form Fields
  */
 export function Field(props: GenericFieldProps): JSX.Element | null {
-  const { hidden, disabled } = useContext(props);
-
+  const { hidden, disabled, layout } = useContext(props);
   if (hidden) return null;
 
-  const { label, title, offset, htmlFor, children } = props;
+  const { label, title, offset, htmlFor, actions, children } = props;
 
   const cssLabel = Utils.classes(
     'dome-xForm-label dome-text-label',
@@ -881,22 +976,45 @@ export function Field(props: GenericFieldProps): JSX.Element | null {
     <Warning offset={offset} warning={onError} error={error} />
   ) : null;
 
-  return (
-    <>
-      <Label
-        className={cssLabel}
-        style={{ top: offset }}
-        htmlFor={htmlFor}
-        title={title}
-        label={label}
-      />
-      <div className={cssField} title={title}>
-        {children}
-        {WARNING}
-      </div>
-    </>
+  const labelField: JSX.Element =  (
+    <Label
+      className={cssLabel}
+      style={{ top: offset }}
+      htmlFor={htmlFor}
+      title={title}
+      label={label}
+    />
   );
 
+  switch(layout) {
+    case "sidebar": return (
+      <Hbox className={Utils.classes(
+        "dome-xForm-field-block",
+        disabled ? 'dome-disabled' : ""
+      )}>
+        <div className='dome-xForm-label-actions'>
+          {labelField}
+          {actions}
+        </div>
+        <div className={cssField} title={title}>
+          {children}
+          {WARNING}
+        </div>
+      </Hbox>
+    );
+    case "page":
+    default:
+      return (
+        <>
+          {labelField}
+          <div className={cssField} title={title}>
+            {children}
+            {WARNING}
+            {actions}
+          </div>
+        </>
+      );
+  }
 }
 
 /* --------------------------------------------------------------------------*/
@@ -915,6 +1033,8 @@ export interface FieldProps<A> extends FilterProps {
   checker?: Checker<A>;
   /** Alternative error message (in case of error). */
   onError?: string;
+  /** list of actions. */
+  actions?: JSX.Element;
 }
 
 type InputEvent = { target: { value: string } };

@@ -29,7 +29,7 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Boxes from 'dome/layout/boxes';
 import { HSplit } from 'dome/layout/splitters';
 import { Text } from 'frama-c/richtext';
-import { Checkbox, Select } from 'dome/controls/buttons';
+import { Checkbox, SelectMenu } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 
 const globalSelectedDomain = new GlobalState("");
@@ -73,13 +73,13 @@ export function EvaStates(): JSX.Element {
     <>
       <Boxes.Hbox className="domain-state-box">
         <Label>Domain: </Label>
-        <Select
+        <SelectMenu
           title="Select the analysis domain to be shown"
           value={selected}
           onChange={(domain) => setSelected(domain ?? "")}
         >
           {list}
-        </Select>
+        </SelectMenu>
         <Boxes.Filler/>
         <Checkbox
           label="Filtered state"

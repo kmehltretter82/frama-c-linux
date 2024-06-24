@@ -262,7 +262,7 @@
 /* -------------------------------------------------------------------------- */
 
 /* Main Form */
-.dome-xForm-grid
+.dome-xForm-grid:not(.message-search)
 {
     flex: 1 1 auto;
     overflow: auto;
@@ -297,6 +297,57 @@
     grid-column-start: left ;
     grid-column-end: right ;
     justify-self: start ;
+}
+
+
+/* Block Container */
+.dome-xForm-sidebar
+{
+    padding: 4px 4px 4px 12px;
+
+    .dome-xForm-field-block,
+    .dome-xForm-field-block .dome-xForm-label-actions,
+    .dome-xForm-field-block > .dome-xForm-field {
+        display:flex;
+        flex-wrap: wrap;
+    }
+
+    .dome-xForm-field-block .dome-xForm-label{
+        margin-right: 15px;
+    }
+
+    .dome-xForm-field-block .dome-xForm-field-actions {
+        margin: auto 0;
+    }
+
+    .dome-xForm-field-block,
+    .dome-xForm-field-block > .dome-xForm-field {
+        max-width: 100%;
+        align-items: center;
+        margin: 2px 0;
+    }
+    .dome-xForm-field-block {
+        justify-content: space-between;
+        margin-top: 4px;
+    }
+    .dome-xForm-section {
+        left: auto; /* Cancel dome left placement */
+    }
+    .dome-xForm-section:not(:first-child) {
+        margin-top: 15px ;
+    }
+    .dome-xForm-field-block {
+        position:relative;
+        border-radius: 4px;
+        background-color: var(--background-block-form);
+        padding: 2px 8px 2px 2px;
+    }
+    .dome-xForm-label {
+        font-weight: bold;
+    }
+    .message-emitter-category {
+        margin-bottom: 10px;
+    }
 }
 
 /* -------------------------------------------------------------------------- */

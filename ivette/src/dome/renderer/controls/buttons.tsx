@@ -498,7 +498,7 @@ export interface SelectProps {
    *   <option value='…' disabled=… >…</option>
 
  */
-export function Select(props: SelectProps): JSX.Element {
+export function SelectMenu(props: SelectProps): JSX.Element {
   const { onChange, placeholder, focus=false } = props;
   const className = classes(
     'dome-xSelect dome-xBoxButton dome-xButton-default dome-xButton-label',

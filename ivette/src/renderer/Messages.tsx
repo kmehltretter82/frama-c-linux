@@ -253,7 +253,7 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
     ));
 
   return (
-    <Forms.Page className="message-search">
+    <Forms.PageForm className="message-search">
       <Forms.CheckboxField
         label="Current function"
         title="Only show messages emitted at the current function"
@@ -290,7 +290,7 @@ function MessageFilter(props: { filter: State<Filter> }): JSX.Element {
           <Forms.CheckboxField label='Others' state={othersState} />
         </div>
       </Section>
-    </Forms.Page>
+    </Forms.PageForm>
   );
 }
 
