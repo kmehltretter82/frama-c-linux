@@ -26,14 +26,16 @@ open Eva_automata
 open Lattice_bounds
 open Bottom.Operators
 
-let check_signals, signal_abort =
-  let signal_emitted = ref false in
-  (fun () ->
-     if !signal_emitted then begin
-       signal_emitted := false;
-       raise Sys.Break
-     end),
-  (fun () -> signal_emitted := true)
+type signal = Abort | Kill
+
+let signal_emitted = ref None
+let signal_abort ~kill = signal_emitted := Some (if kill then Kill else Abort)
+let signal_reset () = signal_emitted := None
+
+let check_signals () =
+  Option.iter
+    (fun signal -> raise (if signal = Kill then Sys.Break else Self.Abort))
+    !signal_emitted
 
 let dkey = Self.dkey_iterator
 let stat_iterations = Statistics.register_statement_stat "iterations"

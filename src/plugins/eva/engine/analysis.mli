@@ -77,6 +77,10 @@ val register_hook: ((module S) -> unit) -> unit
 val force_compute : unit -> unit
 (** Perform a full analysis, starting from the [main] function. *)
 
+val abort : unit -> unit
+(** Cleanly abort the analysis at the next safe point: partial results will be
+    saved and Frama-C is not killed. *)
+
 [@@@ api_start]
 val compute : unit -> unit
 (** Computes the Eva analysis, if not already computed, using the entry point

@@ -55,6 +55,22 @@ let computation_signal =
     ~output:(module ComputationState)
     (module Self.ComputationState)
 
+let () = Request.register ~package
+    ~kind:`EXEC
+    ~name:"compute"
+    ~descr:(Markdown.plain "run eva analysis")
+    ~input:(module Data.Junit)
+    ~output:(module Data.Junit)
+    Analysis.compute
+
+let () = Request.register ~package
+    ~kind:`GET (* able to interrupt the EXEC compute request *)
+    ~name:"abort"
+    ~descr:(Markdown.plain "abort eva analysis")
+    ~input:(module Data.Junit)
+    ~output:(module Data.Junit)
+    Analysis.abort
+
 (* ----- Callers & Callees -------------------------------------------------- *)
 
 module CallSite =

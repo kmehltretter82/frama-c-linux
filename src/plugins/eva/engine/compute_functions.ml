@@ -88,6 +88,7 @@ let generate_specs () =
   Parameters.UsePrototype.iter aux
 
 let pre_analysis () =
+  Iterator.signal_reset ();
   floats_ok ();
   options_ok ();
   plugins_ok ();
@@ -139,7 +140,7 @@ let register_signal_handler () =
   let warn () =
     Self.warning ~once:true "Stopping analysis at user request@."
   in
-  let stop _ = warn (); Iterator.signal_abort () in
+  let stop _ = warn (); Iterator.signal_abort ~kill:true in
   let interrupt _ = warn (); raise Sys.Break in
   let register_handler signal handler =
     match Sys.signal signal (Sys.Signal_handle handler) with

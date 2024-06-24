@@ -35,6 +35,9 @@ type computation_state = NotComputed | Computing | Computed | Aborted
     [force_compute] and states updates. *)
 module ComputationState : State_builder.Ref with type data = computation_state
 
+(** Exception used to cleanly abort the analysis (without killing Frama-C). *)
+exception Abort
+
 (** Debug categories responsible for printing initial and final states of Value.
     Enabled by default, but can be disabled via the command-line:
     -value-msg-key="-initial_state,-final_state" *)

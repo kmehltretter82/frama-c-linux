@@ -138,8 +138,9 @@ let protect f ~cleanup =
   with
   | Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _
   | Sys.Break as e when catch () ->
-    cleanup ();
-    raise e
+    cleanup (); raise e
+  | Self.Abort as e ->
+    cleanup (); raise e
 
 let register_new_var v typ =
   if Cil.isFunctionType typ then

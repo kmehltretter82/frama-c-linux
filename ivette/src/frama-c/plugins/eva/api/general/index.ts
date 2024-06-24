@@ -113,6 +113,28 @@ const computationState_internal: State.Value<computationStateType> = {
 /** The current computation state of the analysis. */
 export const computationState: State.Value<computationStateType> = computationState_internal;
 
+const compute_internal: Server.ExecRequest<null,null> = {
+  kind: Server.RqKind.EXEC,
+  name: 'plugins.eva.general.compute',
+  input: Json.jNull,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** run eva analysis */
+export const compute: Server.ExecRequest<null,null>= compute_internal;
+
+const abort_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.abort',
+  input: Json.jNull,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** abort eva analysis */
+export const abort: Server.GetRequest<null,null>= abort_internal;
+
 /** Callee function and caller stmt */
 export type CallSite = { call: decl, stmt: marker };
 
