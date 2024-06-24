@@ -24,7 +24,7 @@ import React, { Fragment } from 'react';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { IconButton, IconButtonKind } from 'dome/controls/buttons';
-import { Spinner, Select } from 'dome/controls/buttons';
+import { Spinner, SelectMenu } from 'dome/controls/buttons';
 import { Label, Item, Descr } from 'dome/controls/labels';
 import { Hbox, Vbox, Filler } from 'dome/layout/boxes';
 import { Separator } from 'dome/frame/toolbars';
@@ -346,12 +346,12 @@ function SelectorParam(props: ParameterProps): JSX.Element
   };
   return (
     <Label label={label} title={title}>
-      <Select
+      <SelectMenu
         className="wp-config-field wp-config-select"
         value={value}
         disabled={locked}
         onChange={onChange}
-      >{options}</Select>
+      >{options}</SelectMenu>
     </Label>
   );
 }

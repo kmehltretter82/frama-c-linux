@@ -43,10 +43,10 @@ import Events from 'events';
 import React, { Children } from 'react';
 import * as Dome from 'dome';
 import * as Utils from 'dome/misc/utils';
-import { Hbox } from 'dome/layout/boxes';
-import { Icon, IconKind, SVG } from 'dome/controls/icons';
-import { Checkbox, Radio, Select as SelectMenu } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
+import { Icon, IconKind, SVG } from 'dome/controls/icons';
+import { Checkbox, Radio, SelectMenu, Button } from 'dome/controls/buttons';
+import { Hbox } from 'dome/layout/boxes';
 
 export type FieldError =
   | undefined | boolean | string
@@ -1572,6 +1572,36 @@ export function ColorField(props: ColorFieldProps): JSX.Element {
         onChange={onChange}
       />
     </Field>
+  );
+}
+
+/* --------------------------------------------------------------------------*/
+/* --- Button Field                                                       ---*/
+/* --------------------------------------------------------------------------*/
+/** @category Form Fields */
+export function ButtonField(props: FieldProps<boolean>): JSX.Element | null {
+  const { hidden, disabled } = useContext(props);
+
+  if (hidden) return null;
+
+  const { value, onChanged } = props.state;
+  const { label, title } = props;
+  const css = Utils.classes(
+    'dome-xForm-field dome-text-label',
+    disabled && 'dome-disabled',
+  );
+  const onClick = (): void => {
+    onChanged(!value, undefined, false);
+  };
+  return (
+    <Button
+      className={css}
+      label={label}
+      title={title}
+      disabled={disabled}
+      selected= {value}
+      onClick={onClick}
+    />
   );
 }
 

@@ -31,11 +31,23 @@ let register_builtin name ?replace builtin =
 
 let dkey = Self.register_category "imprecision"
 
-let rec lval_of_address exp =
+let rec pretty_lval_of_address exp =
   match exp.node with
   | AddrOf lval -> lval
-  | CastE (_typ, exp) -> lval_of_address exp
+  | CastE (_typ, exp) when Cil.isPointerType exp.typ ->
+    (* Removes conversion to void* for more readable messages. *)
+    pretty_lval_of_address exp
   | _ -> Eva_ast.Build.mem exp
+
+let warn_imprecise_offsm_write ~name dst_expr offsetmap =
+  let prefix = "Builtin " ^ name in
+  let dst_lval = pretty_lval_of_address dst_expr in
+  Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsetmap
+
+let warn_imprecise_write ~name dst_expr loc v =
+  let prefix = "Builtin " ^ name in
+  let dst_lval = pretty_lval_of_address dst_expr in
+  Cvalue_transfer.warn_imprecise_write ~prefix dst_lval loc v
 
 let plevel = Parameters.ArrayPrecisionLevel.get
 
@@ -95,13 +107,12 @@ let add_sure_deps ~size ~src ~dst (deps_table, sure_output) =
   deps_table, Zone.join sure_zone sure_output
 
 (* Copy the offsetmap of size [size] from [src] to [dst] in [state]. *)
-let copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_lval state =
+let copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_expr state =
   match Cvalue.Model.copy_offsetmap src size state with
   | `Bottom -> Cvalue.Model.bottom
   | `Value offsetmap ->
     check_indeterminate_offsetmap ~name offsetmap;
-    let prefix = "Builtin " ^ name in
-    Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsetmap;
+    warn_imprecise_offsm_write ~name dst_expr offsetmap;
     Cvalue.Model.paste_offsetmap ~from:offsetmap ~dst_loc:dst ~size ~exact state
 
 (* Returns the min and max size of a copy from an Ival.t. *)
@@ -125,7 +136,7 @@ let shift ~factor:i src dst size =
    after the copy for the minimum size has already been done.
    Iterates on all possible values of [size] (after the first), and does the
    copy for [previous_size..size]. *)
-let copy_remaining_size_by_size ~name ~src ~dst ~dst_lval ~size state =
+let copy_remaining_size_by_size ~name ~src ~dst ~dst_expr ~size state =
   let exception Result of Cvalue.Model.t in
   let do_size size (state, previous_size) =
     (* First iteration: this copy has already been performed, skip. *)
@@ -137,7 +148,7 @@ let copy_remaining_size_by_size ~name ~src ~dst ~dst_lval ~size state =
       (* [exact] is false as all these copies may not happen according to the
           concrete value of [size]. *)
       let exact = false in
-      let new_state = copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_lval state in
+      let new_state = copy_offsetmap ~name ~exact ~size ~src ~dst ~dst_expr state in
       (* If this copy failed, the current size is completely invalid, and so
          will be the following ones. Stop now with the previous state. *)
       if not (Cvalue.Model.is_reachable new_state) then raise (Result state);
@@ -147,7 +158,7 @@ let copy_remaining_size_by_size ~name ~src ~dst ~dst_lval ~size state =
   with Result state -> state
 
 (* Copy the value at location [src_loc] to location [dst_loc] in [state]. *)
-let imprecise_copy ~name ~src_loc ~dst_loc ~dst_lval state =
+let imprecise_copy ~name ~src_loc ~dst_loc ~dst_expr state =
   Self.debug ~dkey ~once:true ~current:true
     "In %s builtin: too many sizes to enumerate, possible loss of precision"
     name;
@@ -155,8 +166,7 @@ let imprecise_copy ~name ~src_loc ~dst_loc ~dst_lval state =
   let v = Model.find_indeterminate ~conflate_bottom:false state src_loc in
   warn_indeterminate_value ~name v;
   let value = Cvalue.V_Or_Uninitialized.get_v v in
-  let prefix = "Builtin " ^ name in
-  Cvalue_transfer.warn_imprecise_write ~prefix dst_lval dst_loc value;
+  warn_imprecise_write ~name dst_expr dst_loc value;
   let new_state =
     Cvalue.Model.add_indeterminate_binding ~exact:false state dst_loc v
   in
@@ -177,7 +187,7 @@ let char_location loc max_size =
   let loc = Location_Bits.shift shift loc in
   make_loc loc (Int_Base.inject size_char)
 
-let compute_memcpy ~name ~dst_lval ~dst ~src ~size state =
+let compute_memcpy ~name ~dst_expr ~dst ~src ~size state =
   let size_min, size_max = min_max_size size in
   (* Empty \from dependencies and sure output *)
   let empty_deps = Assigns.Memory.empty, Zone.bottom in
@@ -187,7 +197,7 @@ let compute_memcpy ~name ~dst_lval ~dst ~src ~size state =
     if Int.gt size_min Int.zero
     then
       let state =
-        copy_offsetmap ~name ~exact:true ~size:size_min ~src ~dst ~dst_lval state
+        copy_offsetmap ~name ~exact:true ~size:size_min ~src ~dst ~dst_expr state
       in
       (* If the copy succeeded, update \from dependencies and sure output. *)
       if Cvalue.Model.is_reachable state
@@ -213,15 +223,14 @@ let compute_memcpy ~name ~dst_lval ~dst ~src ~size state =
        write the result as one byte in dst+(size_min..size_max-1). *)
     let state =
       if Ival.cardinal_is_less_than size (plevel () / 10)
-      then copy_remaining_size_by_size ~name ~src ~dst ~dst_lval ~size state
-      else imprecise_copy ~name ~src_loc ~dst_loc ~dst_lval state
+      then copy_remaining_size_by_size ~name ~src ~dst ~dst_expr ~size state
+      else imprecise_copy ~name ~src_loc ~dst_loc ~dst_expr state
     in
     state, deps_table, written_zone
 
 let frama_c_memcpy name state actuals =
   match actuals with
-  | [(dst_exp, dst_cvalue); (_src_exp, src_cvalue); (_size_exp, size_cvalue)] ->
-    let dst_lval = lval_of_address dst_exp in
+  | [(dst_expr, dst_cvalue); (_src_exp, src_cvalue); (_size_exp, size_cvalue)] ->
     let size =
       try Cvalue.V.project_ival size_cvalue
       with Cvalue.V.Not_based_on_null -> Ival.top (* TODO: use size_t *)
@@ -235,7 +244,7 @@ let frama_c_memcpy name state actuals =
     let dst = reduce_to_valid_loc dst size Locations.Write in
     (* Do the copy. *)
     let state, memory, sure_output =
-      compute_memcpy ~name ~dst_lval ~dst ~src ~size state
+      compute_memcpy ~name ~dst_expr ~dst ~src ~size state
     in
     (* Build the builtin results. *)
     let return = deps_nth_arg 0 in
@@ -260,15 +269,14 @@ let () =
 (* -------------------------------------------------------------------------- *)
 
 (*  Implementation of [memset] that accepts imprecise arguments. *)
-let frama_c_memset_imprecise state dst_lval dst v size =
-  let prefix = "Builtin memset" in
+let frama_c_memset_imprecise state dst_expr dst v size =
   let size_min, size_max = min_max_size size in
   (* Write [v] everywhere that might be written, ie between
      [dst] and [dst+size-1]. *)
   let state, over_zone =
     if Int.gt size_max Int.zero then
       let loc = char_location dst size_max in
-      Cvalue_transfer.warn_imprecise_write ~prefix dst_lval loc v;
+      warn_imprecise_write ~name:"memset" dst_expr loc v;
       let state = Cvalue.Model.add_binding ~exact:false state loc v in
       let written_zone = enumerate_valid_bits Locations.Write loc in
       state, written_zone
@@ -289,7 +297,7 @@ let frama_c_memset_imprecise state dst_lval dst v size =
         let vuninit = V_Or_Uninitialized.initialized v in
         let size_v = Bit_utils.sizeofchar () in
         let from = V_Offsetmap.create ~size:sure vuninit ~size_v in
-        Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval from;
+        warn_imprecise_offsm_write ~name:"memset" dst_expr from;
         let state =
           Cvalue.Model.paste_offsetmap
             ~from ~dst_loc ~size:sure ~exact:true state
@@ -452,7 +460,7 @@ let memset_typ_offsm typ v =
 
 (*  Precise memset builtin, that requires its arguments to be sufficiently
     precise abstract values. *)
-let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
+let frama_c_memset_precise state dst_expr dst v (exp_size, size) =
   try
     (* We want an exact size, Otherwise, we can use the imprecise memset as a
        fallback *)
@@ -483,8 +491,7 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
         snd (Bit_utils.(find_offset vi_dst.vtype ~offset mo))
     in
     let offsm = memset_typ_offsm typ v in
-    let prefix = "Builtin memset" in
-    Cvalue_transfer.warn_imprecise_offsm_write ~prefix dst_lval offsm;
+    warn_imprecise_offsm_write ~name:"memset" dst_expr offsm;
     let state =
       Cvalue.Model.paste_offsetmap
         ~from:offsm ~dst_loc:dst ~size ~exact:true state
@@ -503,9 +510,8 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
 
 let frama_c_memset state actuals =
   match actuals with
-  | [(dst_exp, dst_cvalue); (_, v); (exp_size, size_cvalue)] ->
+  | [(dst_expr, dst_cvalue); (_, v); (exp_size, size_cvalue)] ->
     begin
-      let dst_lval = lval_of_address dst_exp in
       let size =
         try Cvalue.V.project_ival size_cvalue
         with Cvalue.V.Not_based_on_null -> Ival.top (* TODO: use size_t *)
@@ -523,13 +529,13 @@ let frama_c_memset state actuals =
           v
       in
       let state, sure_output, over_output =
-        try frama_c_memset_precise state dst_lval dst v (exp_size, size)
+        try frama_c_memset_precise state dst_expr dst v (exp_size, size)
         with ImpreciseMemset reason ->
           Self.debug ~dkey ~current:true
             "Call to builtin precise_memset(%a) failed; %s%t"
             Eva_utils.pretty_actuals actuals (imprecision_descr reason)
             Eva_utils.pp_callstack;
-          frama_c_memset_imprecise state dst_lval dst v size
+          frama_c_memset_imprecise state dst_expr dst v size
       in
       let assigns =
         let value_dep = deps_nth_arg 1 in

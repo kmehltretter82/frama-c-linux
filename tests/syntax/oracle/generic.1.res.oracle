@@ -1,11 +1,11 @@
 [kernel] Parsing generic.c (with preprocessing)
-[kernel] generic.c:36: 
+[kernel] generic.c:37: 
   _Generic requires at least one generic association:
-  Location: line 36, between columns 10 and 25, before or at token: ;
-  34    int main() {
-  35    #ifdef NONE
-  36      int a = _Generic("abc");
+  Location: line 37, between columns 10 and 25, before or at token: ;
+  35    int main() {
+  36    #ifdef NONE
+  37      int a = _Generic("abc");
                   ^^^^^^^^^^^^^^^
-  37    #endif
-  38    #ifdef TOO_MANY_DEFAULTS
+  38    #endif
+  39    #ifdef TOO_MANY_DEFAULTS
 [kernel] Frama-C aborted: invalid user input.

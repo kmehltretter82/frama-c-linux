@@ -3,6 +3,9 @@
    STDOPT: -machdep x86_64
    STDOPT: -machdep x86_32
 */
+
+#include <assert.h>
+
 char c = 1;
 _Static_assert(sizeof(-c) == sizeof(int), "Integer promotion with minus");
 _Static_assert(sizeof(+c) == sizeof(int), "Integer promotion with plus");
@@ -40,3 +43,8 @@ float f = 1.;
 _Static_assert(sizeof +f == sizeof(float), "Float promotion");
 double d = 1.;
 _Static_assert(sizeof +d == sizeof(double), "Double promotion");
+
+void vla(int n) {
+  unsigned long s = sizeof(int[n]);
+  assert(s == n * sizeof(int));
+}

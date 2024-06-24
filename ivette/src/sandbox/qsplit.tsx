@@ -39,14 +39,14 @@ function Quarter(props: {
 }): JSX.Element {
   const onChange = (s?: string): void => props.setValue(s ? s : undefined);
   return (
-    <Ctrl.Select value={props.value ?? ''} onChange={onChange}>
+    <Ctrl.SelectMenu value={props.value ?? ''} onChange={onChange}>
       <option value=''>-</option>
       <option value='A'>A</option>
       <option value='B'>B</option>
       <option value='C'>C</option>
       <option value='D'>D</option>
       <option value='E'>E</option>
-    </Ctrl.Select>
+    </Ctrl.SelectMenu>
   );
 }
 
