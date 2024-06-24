@@ -42,6 +42,8 @@ import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { bySource } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { declDefault } from 'frama-c/kernel/api/ast';
@@ -50,9 +52,15 @@ import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
+import { jSource } from 'frama-c/kernel/api/ast';
+//@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { markerDefault } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { source } from 'frama-c/kernel/api/ast';
+//@ts-ignore
+import { sourceDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
@@ -759,5 +767,664 @@ export const getStates: Server.GetRequest<
   [ marker, boolean ],
   [ string, string, string ][]
   >= getStates_internal;
+
+const getCurrentLoc_internal: Server.GetRequest<null,source> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getCurrentLoc',
+  input: Json.jNull,
+  output: jSource,
+  fallback: sourceDefault,
+  signals: [],
+};
+/** Get current location */
+export const getCurrentLoc: Server.GetRequest<null,source>= getCurrentLoc_internal;
+
+/** Signal for state [`eva`](#eva)  */
+export const signalEva: Server.Signal = {
+  name: 'plugins.eva.general.signalEva',
+};
+
+const getEva_internal: Server.GetRequest<null,boolean> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getEva',
+  input: Json.jNull,
+  output: Json.jBoolean,
+  fallback: false,
+  signals: [],
+};
+/** Getter for state [`eva`](#eva)  */
+export const getEva: Server.GetRequest<null,boolean>= getEva_internal;
+
+const setEva_internal: Server.SetRequest<boolean,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setEva',
+  input: Json.jBoolean,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`eva`](#eva)  */
+export const setEva: Server.SetRequest<boolean,null>= setEva_internal;
+
+const eva_internal: State.State<boolean> = {
+  name: 'plugins.eva.general.eva',
+  signal: signalEva,
+  getter: getEva,
+  setter: setEva,
+};
+/** Eva enabled */
+export const eva: State.State<boolean> = eva_internal;
+
+/** Signal for state [`precision`](#precision)  */
+export const signalPrecision: Server.Signal = {
+  name: 'plugins.eva.general.signalPrecision',
+};
+
+const getPrecision_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getPrecision',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`precision`](#precision)  */
+export const getPrecision: Server.GetRequest<null,number>= getPrecision_internal;
+
+const setPrecision_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setPrecision',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`precision`](#precision)  */
+export const setPrecision: Server.SetRequest<number,null>= setPrecision_internal;
+
+const precision_internal: State.State<number> = {
+  name: 'plugins.eva.general.precision',
+  signal: signalPrecision,
+  getter: getPrecision,
+  setter: setPrecision,
+};
+/** Precision value */
+export const precision: State.State<number> = precision_internal;
+
+/** Signal for state [`slevel`](#slevel)  */
+export const signalSlevel: Server.Signal = {
+  name: 'plugins.eva.general.signalSlevel',
+};
+
+const getSlevel_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getSlevel',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`slevel`](#slevel)  */
+export const getSlevel: Server.GetRequest<null,number>= getSlevel_internal;
+
+const setSlevel_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setSlevel',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`slevel`](#slevel)  */
+export const setSlevel: Server.SetRequest<number,null>= setSlevel_internal;
+
+const slevel_internal: State.State<number> = {
+  name: 'plugins.eva.general.slevel',
+  signal: signalSlevel,
+  getter: getSlevel,
+  setter: setSlevel,
+};
+/** slevel value */
+export const slevel: State.State<number> = slevel_internal;
+
+/** Signal for state [`main`](#main)  */
+export const signalMain: Server.Signal = {
+  name: 'plugins.eva.general.signalMain',
+};
+
+const getMain_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getMain',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`main`](#main)  */
+export const getMain: Server.GetRequest<null,string>= getMain_internal;
+
+const setMain_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setMain',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`main`](#main)  */
+export const setMain: Server.SetRequest<string,null>= setMain_internal;
+
+const main_internal: State.State<string> = {
+  name: 'plugins.eva.general.main',
+  signal: signalMain,
+  getter: getMain,
+  setter: setMain,
+};
+/** main function */
+export const main: State.State<string> = main_internal;
+
+/** Signal for state [`libEntry`](#libentry)  */
+export const signalLibEntry: Server.Signal = {
+  name: 'plugins.eva.general.signalLibEntry',
+};
+
+const getLibEntry_internal: Server.GetRequest<null,boolean> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getLibEntry',
+  input: Json.jNull,
+  output: Json.jBoolean,
+  fallback: false,
+  signals: [],
+};
+/** Getter for state [`libEntry`](#libentry)  */
+export const getLibEntry: Server.GetRequest<null,boolean>= getLibEntry_internal;
+
+const setLibEntry_internal: Server.SetRequest<boolean,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setLibEntry',
+  input: Json.jBoolean,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`libEntry`](#libentry)  */
+export const setLibEntry: Server.SetRequest<boolean,null>= setLibEntry_internal;
+
+const libEntry_internal: State.State<boolean> = {
+  name: 'plugins.eva.general.libEntry',
+  signal: signalLibEntry,
+  getter: getLibEntry,
+  setter: setLibEntry,
+};
+/** slevel value */
+export const libEntry: State.State<boolean> = libEntry_internal;
+
+/** Signal for state [`Domains`](#domains)  */
+export const signalDomains: Server.Signal = {
+  name: 'plugins.eva.general.signalDomains',
+};
+
+const getDomains_internal: Server.GetRequest<null,string[]> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getDomains',
+  input: Json.jNull,
+  output: Json.jArray(Json.jString),
+  fallback: [],
+  signals: [],
+};
+/** Getter for state [`Domains`](#domains)  */
+export const getDomains: Server.GetRequest<null,string[]>= getDomains_internal;
+
+const setDomains_internal: Server.SetRequest<string[],null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setDomains',
+  input: Json.jArray(Json.jString),
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`Domains`](#domains)  */
+export const setDomains: Server.SetRequest<string[],null>= setDomains_internal;
+
+const Domains_internal: State.State<string[]> = {
+  name: 'plugins.eva.general.Domains',
+  signal: signalDomains,
+  getter: getDomains,
+  setter: setDomains,
+};
+/** domains value */
+export const Domains: State.State<string[]> = Domains_internal;
+
+/** Signal for state [`ilevel`](#ilevel)  */
+export const signalIlevel: Server.Signal = {
+  name: 'plugins.eva.general.signalIlevel',
+};
+
+const getIlevel_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getIlevel',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`ilevel`](#ilevel)  */
+export const getIlevel: Server.GetRequest<null,number>= getIlevel_internal;
+
+const setIlevel_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setIlevel',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`ilevel`](#ilevel)  */
+export const setIlevel: Server.SetRequest<number,null>= setIlevel_internal;
+
+const ilevel_internal: State.State<number> = {
+  name: 'plugins.eva.general.ilevel',
+  signal: signalIlevel,
+  getter: getIlevel,
+  setter: setIlevel,
+};
+/** ilevel value */
+export const ilevel: State.State<number> = ilevel_internal;
+
+/** Signal for state [`MinLoopUnroll`](#minloopunroll)  */
+export const signalMinLoopUnroll: Server.Signal = {
+  name: 'plugins.eva.general.signalMinLoopUnroll',
+};
+
+const getMinLoopUnroll_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getMinLoopUnroll',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`MinLoopUnroll`](#minloopunroll)  */
+export const getMinLoopUnroll: Server.GetRequest<null,number>= getMinLoopUnroll_internal;
+
+const setMinLoopUnroll_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setMinLoopUnroll',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`MinLoopUnroll`](#minloopunroll)  */
+export const setMinLoopUnroll: Server.SetRequest<number,null>= setMinLoopUnroll_internal;
+
+const MinLoopUnroll_internal: State.State<number> = {
+  name: 'plugins.eva.general.MinLoopUnroll',
+  signal: signalMinLoopUnroll,
+  getter: getMinLoopUnroll,
+  setter: setMinLoopUnroll,
+};
+/** Min loop unroll value */
+export const MinLoopUnroll: State.State<number> = MinLoopUnroll_internal;
+
+/** Signal for state [`AutoLoopUnroll`](#autoloopunroll)  */
+export const signalAutoLoopUnroll: Server.Signal = {
+  name: 'plugins.eva.general.signalAutoLoopUnroll',
+};
+
+const getAutoLoopUnroll_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getAutoLoopUnroll',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`AutoLoopUnroll`](#autoloopunroll)  */
+export const getAutoLoopUnroll: Server.GetRequest<null,number>= getAutoLoopUnroll_internal;
+
+const setAutoLoopUnroll_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setAutoLoopUnroll',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`AutoLoopUnroll`](#autoloopunroll)  */
+export const setAutoLoopUnroll: Server.SetRequest<number,null>= setAutoLoopUnroll_internal;
+
+const AutoLoopUnroll_internal: State.State<number> = {
+  name: 'plugins.eva.general.AutoLoopUnroll',
+  signal: signalAutoLoopUnroll,
+  getter: getAutoLoopUnroll,
+  setter: setAutoLoopUnroll,
+};
+/** Auto loop unroll value */
+export const AutoLoopUnroll: State.State<number> = AutoLoopUnroll_internal;
+
+/** Signal for state [`WideningDelay`](#wideningdelay)  */
+export const signalWideningDelay: Server.Signal = {
+  name: 'plugins.eva.general.signalWideningDelay',
+};
+
+const getWideningDelay_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getWideningDelay',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`WideningDelay`](#wideningdelay)  */
+export const getWideningDelay: Server.GetRequest<null,number>= getWideningDelay_internal;
+
+const setWideningDelay_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setWideningDelay',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`WideningDelay`](#wideningdelay)  */
+export const setWideningDelay: Server.SetRequest<number,null>= setWideningDelay_internal;
+
+const WideningDelay_internal: State.State<number> = {
+  name: 'plugins.eva.general.WideningDelay',
+  signal: signalWideningDelay,
+  getter: getWideningDelay,
+  setter: setWideningDelay,
+};
+/** Widening delay */
+export const WideningDelay: State.State<number> = WideningDelay_internal;
+
+/** Signal for state [`HistoryPartitioning`](#historypartitioning)  */
+export const signalHistoryPartitioning: Server.Signal = {
+  name: 'plugins.eva.general.signalHistoryPartitioning',
+};
+
+const getHistoryPartitioning_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getHistoryPartitioning',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`HistoryPartitioning`](#historypartitioning)  */
+export const getHistoryPartitioning: Server.GetRequest<null,number>= getHistoryPartitioning_internal;
+
+const setHistoryPartitioning_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setHistoryPartitioning',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`HistoryPartitioning`](#historypartitioning)  */
+export const setHistoryPartitioning: Server.SetRequest<number,null>= setHistoryPartitioning_internal;
+
+const HistoryPartitioning_internal: State.State<number> = {
+  name: 'plugins.eva.general.HistoryPartitioning',
+  signal: signalHistoryPartitioning,
+  getter: getHistoryPartitioning,
+  setter: setHistoryPartitioning,
+};
+/** History partitioning */
+export const HistoryPartitioning: State.State<number> = HistoryPartitioning_internal;
+
+/** Signal for state [`ArrayPrecisionLevel`](#arrayprecisionlevel)  */
+export const signalArrayPrecisionLevel: Server.Signal = {
+  name: 'plugins.eva.general.signalArrayPrecisionLevel',
+};
+
+const getArrayPrecisionLevel_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getArrayPrecisionLevel',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`ArrayPrecisionLevel`](#arrayprecisionlevel)  */
+export const getArrayPrecisionLevel: Server.GetRequest<null,number>= getArrayPrecisionLevel_internal;
+
+const setArrayPrecisionLevel_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setArrayPrecisionLevel',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`ArrayPrecisionLevel`](#arrayprecisionlevel)  */
+export const setArrayPrecisionLevel: Server.SetRequest<number,null>= setArrayPrecisionLevel_internal;
+
+const ArrayPrecisionLevel_internal: State.State<number> = {
+  name: 'plugins.eva.general.ArrayPrecisionLevel',
+  signal: signalArrayPrecisionLevel,
+  getter: getArrayPrecisionLevel,
+  setter: setArrayPrecisionLevel,
+};
+/** Array precision level */
+export const ArrayPrecisionLevel: State.State<number> = ArrayPrecisionLevel_internal;
+
+/** Signal for state [`LinearLevel`](#linearlevel)  */
+export const signalLinearLevel: Server.Signal = {
+  name: 'plugins.eva.general.signalLinearLevel',
+};
+
+const getLinearLevel_internal: Server.GetRequest<null,number> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getLinearLevel',
+  input: Json.jNull,
+  output: Json.jNumber,
+  fallback: 0,
+  signals: [],
+};
+/** Getter for state [`LinearLevel`](#linearlevel)  */
+export const getLinearLevel: Server.GetRequest<null,number>= getLinearLevel_internal;
+
+const setLinearLevel_internal: Server.SetRequest<number,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setLinearLevel',
+  input: Json.jNumber,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`LinearLevel`](#linearlevel)  */
+export const setLinearLevel: Server.SetRequest<number,null>= setLinearLevel_internal;
+
+const LinearLevel_internal: State.State<number> = {
+  name: 'plugins.eva.general.LinearLevel',
+  signal: signalLinearLevel,
+  getter: getLinearLevel,
+  setter: setLinearLevel,
+};
+/** Linear level */
+export const LinearLevel: State.State<number> = LinearLevel_internal;
+
+/** Signal for state [`EqualityCall`](#equalitycall)  */
+export const signalEqualityCall: Server.Signal = {
+  name: 'plugins.eva.general.signalEqualityCall',
+};
+
+const getEqualityCall_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getEqualityCall',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`EqualityCall`](#equalitycall)  */
+export const getEqualityCall: Server.GetRequest<null,string>= getEqualityCall_internal;
+
+const setEqualityCall_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setEqualityCall',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`EqualityCall`](#equalitycall)  */
+export const setEqualityCall: Server.SetRequest<string,null>= setEqualityCall_internal;
+
+const EqualityCall_internal: State.State<string> = {
+  name: 'plugins.eva.general.EqualityCall',
+  signal: signalEqualityCall,
+  getter: getEqualityCall,
+  setter: setEqualityCall,
+};
+/** Equality call */
+export const EqualityCall: State.State<string> = EqualityCall_internal;
+
+/** Signal for state [`OctagonCall`](#octagoncall)  */
+export const signalOctagonCall: Server.Signal = {
+  name: 'plugins.eva.general.signalOctagonCall',
+};
+
+const getOctagonCall_internal: Server.GetRequest<null,boolean> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getOctagonCall',
+  input: Json.jNull,
+  output: Json.jBoolean,
+  fallback: false,
+  signals: [],
+};
+/** Getter for state [`OctagonCall`](#octagoncall)  */
+export const getOctagonCall: Server.GetRequest<null,boolean>= getOctagonCall_internal;
+
+const setOctagonCall_internal: Server.SetRequest<boolean,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setOctagonCall',
+  input: Json.jBoolean,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`OctagonCall`](#octagoncall)  */
+export const setOctagonCall: Server.SetRequest<boolean,null>= setOctagonCall_internal;
+
+const OctagonCall_internal: State.State<boolean> = {
+  name: 'plugins.eva.general.OctagonCall',
+  signal: signalOctagonCall,
+  getter: getOctagonCall,
+  setter: setOctagonCall,
+};
+/** Octagon call */
+export const OctagonCall: State.State<boolean> = OctagonCall_internal;
+
+/** Signal for state [`SplitReturn`](#splitreturn)  */
+export const signalSplitReturn: Server.Signal = {
+  name: 'plugins.eva.general.signalSplitReturn',
+};
+
+const getSplitReturn_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getSplitReturn',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`SplitReturn`](#splitreturn)  */
+export const getSplitReturn: Server.GetRequest<null,string>= getSplitReturn_internal;
+
+const setSplitReturn_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setSplitReturn',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`SplitReturn`](#splitreturn)  */
+export const setSplitReturn: Server.SetRequest<string,null>= setSplitReturn_internal;
+
+const SplitReturn_internal: State.State<string> = {
+  name: 'plugins.eva.general.SplitReturn',
+  signal: signalSplitReturn,
+  getter: getSplitReturn,
+  setter: setSplitReturn,
+};
+/** Split return value */
+export const SplitReturn: State.State<string> = SplitReturn_internal;
+
+/** Signal for state [`AllocReturnsNull`](#allocreturnsnull)  */
+export const signalAllocReturnsNull: Server.Signal = {
+  name: 'plugins.eva.general.signalAllocReturnsNull',
+};
+
+const getAllocReturnsNull_internal: Server.GetRequest<null,boolean> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getAllocReturnsNull',
+  input: Json.jNull,
+  output: Json.jBoolean,
+  fallback: false,
+  signals: [],
+};
+/** Getter for state [`AllocReturnsNull`](#allocreturnsnull)  */
+export const getAllocReturnsNull: Server.GetRequest<null,boolean>= getAllocReturnsNull_internal;
+
+const setAllocReturnsNull_internal: Server.SetRequest<boolean,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setAllocReturnsNull',
+  input: Json.jBoolean,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`AllocReturnsNull`](#allocreturnsnull)  */
+export const setAllocReturnsNull: Server.SetRequest<boolean,null>= setAllocReturnsNull_internal;
+
+const AllocReturnsNull_internal: State.State<boolean> = {
+  name: 'plugins.eva.general.AllocReturnsNull',
+  signal: signalAllocReturnsNull,
+  getter: getAllocReturnsNull,
+  setter: setAllocReturnsNull,
+};
+/** AllocReturnsNull value */
+export const AllocReturnsNull: State.State<boolean> = AllocReturnsNull_internal;
+
+/** Signal for state [`WarnPointerComparison`](#warnpointercomparison)  */
+export const signalWarnPointerComparison: Server.Signal = {
+  name: 'plugins.eva.general.signalWarnPointerComparison',
+};
+
+const getWarnPointerComparison_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.general.getWarnPointerComparison',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`WarnPointerComparison`](#warnpointercomparison)  */
+export const getWarnPointerComparison: Server.GetRequest<null,string>= getWarnPointerComparison_internal;
+
+const setWarnPointerComparison_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'plugins.eva.general.setWarnPointerComparison',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`WarnPointerComparison`](#warnpointercomparison)  */
+export const setWarnPointerComparison: Server.SetRequest<string,null>= setWarnPointerComparison_internal;
+
+const WarnPointerComparison_internal: State.State<string> = {
+  name: 'plugins.eva.general.WarnPointerComparison',
+  signal: signalWarnPointerComparison,
+  getter: getWarnPointerComparison,
+  setter: setWarnPointerComparison,
+};
+/** Warn pointer comparison value */
+export const WarnPointerComparison: State.State<string> = WarnPointerComparison_internal;
 
 /* ------------------------------------- */

@@ -4,7 +4,9 @@
 
 :root {
   --eva-min-width: 90px;
+  --eva-shadow-warning: darkorange;
 }
+
 
 .eva-info {
   width: 100%;
@@ -331,6 +333,168 @@ tr:first-of-type > .eva-table-callsite-box {
     padding: 6px;
     margin-top: 6px;
     background-color: var(--background-report);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Sidebar Eva                                                        --- */
+/* -------------------------------------------------------------------------- */
+@keyframes eva-spinner {
+  from {
+      transform: rotate(-90deg);
+  } to {
+      transform: rotate(270deg);
+  }
+}
+
+/* ------------------ */
+/* --- Tools Eva  --- */
+.eva-tools {
+  display: block;
+  position: sticky;
+  top: 0px;
+  z-index: 10;
+  background-color: var(--background-profound);
+  padding: 5px;
+  border: 5px outset;
+  border-color: rgb(from var(--border-discrete) r g b / .7);
+  margin: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+
+  .eva-tools-actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .dome-xIconButton {
+    padding: 2px 5px;
+  }
+  .dome-xIconButton:hover {
+    cursor: pointer;
+    color: var(--background-button-hover);
+  }
+  .eva-status-icon.eva-computing {
+    transform: rotate(90deg);
+    animation: eva-spinner .9s linear infinite;
+    fill: var(--eva-alarms-unknown);
+  }
+  .eva-status-icon.eva-computed { fill: var(--eva-alarms-true); }
+  .eva-status-icon.eva-aborted,
+  .eva-status-icon.eva-not_computed {
+    fill: var(--eva-alarms-false);
+  }
+}
+
+/* ------------------ */
+/* --- Form Eva   --- */
+.eva-form {
+  padding: 4px 12px;
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: column;
+
+  >label.dome-xCheckbox{
+    display: flex;
+    flex-direction: row-reverse;
+    font-size: 1.08em;
+    padding: 5px;
+
+    &:hover {
+      color: var(--text-highlighted);
+      cursor:pointer;
+      input {
+        border: 1px solid var(--text-highlighted);
+      }
+    }
+
+    &:has(input:disabled),
+    &:hover:has(input:disabled) {
+      color: var(--disabled-text) !important;
+      cursor:default;
+    }
+
+    input {
+      margin-left: 10px;
+      padding-bottom: 0;
+      border: 1px solid var(--text-discrete);
+    }
+
+    input:checked { background-color: var(--positive-button-active) }
+  }
+
+  .dome-xForm-field-actions { min-width: 42px; }
+
+  .dome-xCheckbox { overflow: hidden; }
+
+  .dome-xForm-field {
+    padding: 1px;
+
+    >input[type=radio] { display: none; }
+    &:has(> input[type=radio]) {
+      min-width: 0px;
+      border-radius: 2em 2em;
+      margin: 2px 3px;
+      padding: 2px 10px;
+    }
+
+    &:has(> input[type=radio]:checked):hover {
+      border-color: var(--border);
+      cursor:default;
+    }
+  }
+
+  .dome-xButton,
+  .dome-xForm-field:has(> input[type=radio]) {
+    border: solid 1px;
+    border-color: var(--border);
+    color: var(--text-discrete);
+    background-color: transparent;
+    background-image: none;
+  }
+
+  .dome-xButton:hover,
+  .dome-xForm-field:has(> input[type=radio]):hover {
+    cursor: pointer;
+    border-color: var(--text-highlighted);
+    color: var(--text-highlighted);
+    background-color: transparent;
+    background-image: none ;
+  }
+
+  .dome-xButton-selected,
+  .dome-xForm-field:has(> input[type=radio]:checked) {
+    color: var(--text);
+    background-color: var(--checked-element);
+    background-image: none;
+  }
+
+  .dome-xButton-selected:hover {
+    border-color: var(--text-highlighted);
+    background-image: none ;
+    background-color: var(--checked-element);
+    opacity: 0.5;
+  }
+
+  .dome-xForm-field-block:has(> .dome-xForm-field .eva-field-modified) {
+    box-shadow: -4px 0px 4px var(--eva-shadow-warning);
+  }
+
+  .dome-xForm-field-block:has(.dome-xForm-field .hidden-field) {
+    display: none;
+  }
+
+  input[type=number] {
+    background-color: var(--background-interaction);
+    color: var(--text);
+    text-align: right;
+    width: 80px;
+    max-width: 100%;
+    margin-right: 0;
+    padding: 1px;
+    margin-right: 5px;
+    border: none;
+  }
 }
 
 /* -------------------------------------------------------------------------- */

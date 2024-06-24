@@ -22,6 +22,9 @@
 
 open Server
 open Cil_types
+module D = Server.Data
+module S = Server.States
+module Md = Markdown
 
 let package =
   Package.package
@@ -869,4 +872,189 @@ let () = Request.register ~package
     ~signals:[computation_signal]
     get_states
 
+let () = Request.register ~package
+    ~kind:`GET ~name:"getCurrentLoc"
+    ~descr:(Md.plain "Get current location")
+    ~input:(module Data.Junit)
+    ~output:(module Kernel_ast.Position)
+    ~signals:[]
+    (fun () -> fst (Current_loc.get ()))
+
+(* -------------------------------------------------------------------------- *)
+(* --- Eva Options                                                        --- *)
+(* -------------------------------------------------------------------------- *)
+let _ =
+  S.register_state ~package
+    ~name:"eva"
+    ~descr:(Md.plain "Eva enabled")
+    ~data:(module D.Jbool)
+    ~get:Parameters.ForceValues.get
+    ~set:Parameters.ForceValues.set
+    ~add_hook:Parameters.ForceValues.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"precision"
+    ~descr:(Md.plain "Precision value")
+    ~data:(module D.Jint)
+    ~get:Parameters.Precision.get
+    ~set:Parameters.Precision.set
+    ~add_hook:Parameters.Precision.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"slevel"
+    ~descr:(Md.plain "slevel value")
+    ~data:(module D.Jint)
+    ~get:Parameters.SemanticUnrollingLevel.get
+    ~set:Parameters.SemanticUnrollingLevel.set
+    ~add_hook:Parameters.SemanticUnrollingLevel.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"main"
+    ~descr:(Md.plain "main function")
+    ~data:(module D.Jstring)
+    ~get:Kernel.MainFunction.get
+    ~set:Kernel.MainFunction.set
+    ~add_hook:Kernel.MainFunction.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"libEntry"
+    ~descr:(Md.plain "slevel value")
+    ~data:(module D.Jbool)
+    ~get:Kernel.LibEntry.get
+    ~set:Kernel.LibEntry.set
+    ~add_hook:Kernel.LibEntry.add_hook_on_update ()
+
+let get_domains () =
+  let set = Parameters.Domains.get () in
+  Datatype.String.Set.elements set
+
+let set_domains list =
+  let option = "cvalue" in
+  let set = Datatype.String.Set.of_list list in
+  Parameters.Domains.set (Datatype.String.Set.add option set)
+
+let signal =
+  S.register_state ~package
+    ~name:"Domains"
+    ~descr:(Md.plain "domains value")
+    ~data:(module D.Jlist (D.Jstring))
+    ~get:get_domains
+    ~set:set_domains
+    ()
+
+let () =
+  Parameters.Domains.add_update_hook (fun _ _ -> Request.emit signal)
+
+let _ =
+  S.register_state ~package
+    ~name:"ilevel"
+    ~descr:(Md.plain "ilevel value")
+    ~data:(module D.Jint)
+    ~get:Parameters.ILevel.get
+    ~set:Parameters.ILevel.set
+    ~add_hook:Parameters.ILevel.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"MinLoopUnroll"
+    ~descr:(Md.plain "Min loop unroll value")
+    ~data:(module D.Jint)
+    ~get:Parameters.MinLoopUnroll.get
+    ~set:Parameters.MinLoopUnroll.set
+    ~add_hook:Parameters.MinLoopUnroll.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"AutoLoopUnroll"
+    ~descr:(Md.plain "Auto loop unroll value")
+    ~data:(module D.Jint)
+    ~get:Parameters.AutoLoopUnroll.get
+    ~set:Parameters.AutoLoopUnroll.set
+    ~add_hook:Parameters.AutoLoopUnroll.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"WideningDelay"
+    ~descr:(Md.plain "Widening delay")
+    ~data:(module D.Jint)
+    ~get:Parameters.WideningDelay.get
+    ~set:Parameters.WideningDelay.set
+    ~add_hook:Parameters.WideningDelay.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"HistoryPartitioning"
+    ~descr:(Md.plain "History partitioning")
+    ~data:(module D.Jint)
+    ~get:Parameters.HistoryPartitioning.get
+    ~set:Parameters.HistoryPartitioning.set
+    ~add_hook:Parameters.HistoryPartitioning.add_hook_on_update ()
+
+
+let _ =
+  S.register_state ~package
+    ~name:"ArrayPrecisionLevel"
+    ~descr:(Md.plain "Array precision level")
+    ~data:(module D.Jint)
+    ~get:Parameters.ArrayPrecisionLevel.get
+    ~set:Parameters.ArrayPrecisionLevel.set
+    ~add_hook:Parameters.ArrayPrecisionLevel.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"LinearLevel"
+    ~descr:(Md.plain "Linear level")
+    ~data:(module D.Jint)
+    ~get:Parameters.LinearLevel.get
+    ~set:Parameters.LinearLevel.set
+    ~add_hook:Parameters.LinearLevel.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"EqualityCall"
+    ~descr:(Md.plain "Equality call")
+    ~data:(module D.Jstring)
+    ~get:Parameters.EqualityCall.get
+    ~set:Parameters.EqualityCall.set
+    ~add_hook:Parameters.EqualityCall.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"OctagonCall"
+    ~descr:(Md.plain "Octagon call")
+    ~data:(module D.Jbool)
+    ~get:Parameters.OctagonCall.get
+    ~set:Parameters.OctagonCall.set
+    ~add_hook:Parameters.OctagonCall.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"SplitReturn"
+    ~descr:(Md.plain "Split return value")
+    ~data:(module D.Jstring)
+    ~get:Parameters.SplitReturn.get
+    ~set:Parameters.SplitReturn.set
+    ~add_hook:Parameters.SplitReturn.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"AllocReturnsNull"
+    ~descr:(Md.plain "AllocReturnsNull value")
+    ~data:(module D.Jbool)
+    ~get:Parameters.AllocReturnsNull.get
+    ~set:Parameters.AllocReturnsNull.set
+    ~add_hook:Parameters.AllocReturnsNull.add_hook_on_update ()
+
+let _ =
+  S.register_state ~package
+    ~name:"WarnPointerComparison"
+    ~descr:(Md.plain "Warn pointer comparison value")
+    ~data:(module D.Jstring)
+    ~get:Parameters.WarnPointerComparison.get
+    ~set:Parameters.WarnPointerComparison.set
+    ~add_hook:Parameters.WarnPointerComparison.add_hook_on_update ()
 (* -------------------------------------------------------------------------- *)

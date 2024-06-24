@@ -29,6 +29,7 @@ import './valuetable';
 import './Summary';
 import './Coverage';
 import './DomainStates';
+import './EvaSidebar';
 import './style.css';
 
 // --------------------------------------------------------------------------
