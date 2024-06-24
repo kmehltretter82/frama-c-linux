@@ -14,7 +14,7 @@ extensions coming from an unloaded plug-in can be ignored this way. For
 example, if \Eva is not loaded, \lstinline|\eva::unroll _| annotations will be
 ignored with a warning, whereas \lstinline|unroll _| cannot be identified as
 being supported by Eva, which means that it can only be treated as a user
-error. 
+error.
 
 \section{Handling indirect calls with \texttt{calls}}
 \label{acsl:calls}
@@ -32,6 +32,54 @@ indicates that the pointer \lstinline|f| can point to any one of
 \lstinline|f1|, \lstinline|f2|, ..., \lstinline|fn|.
 
 It is in particular used by the WP plug-in (see \cite{wp} for more information).
+
+\section{External Module Importers}
+
+Plug-ins have the possibility to load \acsl module from external sources.
+A typical usage is to import \acsl logical declarations from other
+languages, eg. \textsf{Coq} or \textsf{Why3}.
+
+External \acsl module importation is triggered by special \verb+import+ global
+annotations:
+\begin{lstlisting}
+//@ import <loader>: <module-name> [ \as <alias-name> ];
+\end{lstlisting}
+The syntax is similar to the geneal \verb+import+ annotation, except that the
+module name is prefixed with the name of the loader extension. Loader names are
+defined by plugin extensions and you shall refer to the documentation of your
+plug-ins to know the loaders they provides.
+
+The same external module can be imported several times under any aliases, in
+which case they all refer to the same logical specifications, like regular
+modules.
+
+When printing the internal AST from \FramaC command line using \verb+-print+
+option, externally imported modules are listed with one single clause for each,
+with no aliasing in order to avoid any ambiguity. For instance:
+\begin{lstlisting}
+//@ import MyLoader: foo::bar::Jazz \as _ ;
+\end{lstlisting}
+
+Alternatively, you can debug the logical definitions actually imported by any
+driver by using \verb+-print+ with the \verb+printer:imported-modules+ debugging
+key:
+\begin{lstlisting}
+> frama-c ... -print -kernel-message-key printer:imported-modules
+\end{lstlisting}
+
+With this option, the contents of the imported modules are printed like regular
+module definitions, with only a comment to mention the origin of the plug-in:
+\begin{lstlisting}
+/*@ // import MyLoader:
+    module foo::bar::Jazz {
+        ...
+    }
+  */
+\end{lstlisting}
+Notice that, when using the \verb+printer:imported-modules+ message key, the
+resulting file will still compile and type-check, but the plug-in extension will
+no more be aware of the external nature of those modules, and it will probably
+\emph{not} work as with the original specification.
 
 %%% Local Variables:
 %%% mode: latex
