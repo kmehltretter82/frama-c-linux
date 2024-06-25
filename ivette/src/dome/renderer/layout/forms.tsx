@@ -155,6 +155,7 @@ export type BufferCallback = () => void;
 export class BufferController {
   private readonly evt = new Events();
   private errors = 0;
+  private notified = false;
 
   /** Notify all reset listener events. */
   reset(): void { this.evt.emit('reset'); }
@@ -168,6 +169,9 @@ export class BufferController {
   /** There are active listeners for Commit event. */
   hasCommit(): boolean { return this.evt.listenerCount('commit') > 0; }
 
+  /** Reset notified to false. */
+  resetNotified(): void { this.notified = false; }
+
   /** Get the number of errors */
   getErrors(): number { return this.errors; }
 
@@ -178,7 +182,12 @@ export class BufferController {
   }
 
   /** @internal */
-  protected notify(): void { this.evt.emit('update'); }
+  protected notify(): void {
+    if(!this.notified) {
+      this.evt.emit('update');
+      this.notified = true;
+    }
+  }
 
   /** @internal */
   onChange(fn: BufferCallback): void { this.evt.addListener('update', fn); }
