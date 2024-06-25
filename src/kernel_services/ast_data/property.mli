@@ -479,7 +479,7 @@ val ip_of_code_annot:
 
 (** Builds the IP related to the code annotation.
     should be used only on code annotations returning a single ip, i.e.
-    assert, invariant, variant, pragma.
+    assert, invariant, variant.
     @raise Invalid_argument if the resulting code annotation has an empty set
     of identified property
     @since Carbon-20110201 *)
@@ -499,7 +499,7 @@ val ip_of_global_annotation_single:
 
 val has_status: identified_property -> bool
 (** Does the property has a logical status (which may be Never_tried)?
-    False for pragma, assumes clauses and some ACSL extensions.
+    False for assumes clauses and some ACSL extensions.
     @since 19.0-Potassium *)
 
 val get_kinstr: identified_property -> kinstr
