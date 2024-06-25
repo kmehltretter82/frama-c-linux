@@ -341,11 +341,13 @@ export function useBuffer<A>(
       setModified(!isReset);
       setBuffer(newValue);
       setBerror(newError);
-      if (isReset && !compare(equal, newValue, value)) {
+      if (compare(equal, rollback, newValue)) {
+        setModified(false);
+      } else if (isReset && !compare(equal, newValue, value)) {
         setCommited(false);
         onChanged(newValue, newError, isReset);
       }
-    }, [equal, value, onChanged]);
+    }, [equal, value, rollback, onChanged]);
 
   return {
     value: modified || !commited ? buffer : value,
