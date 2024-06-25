@@ -70,6 +70,12 @@ Note: these options must be placed _before_ all other arguments.
   input), this script will copy a template to the current directory and you
   need to fill it so that creduce will work. This usage mode requires knowing
   how C-Reduce works.
+
+- If you want to pass options to the creduce/cvise executable itself, you need
+  to use environment variable CREDUCE_OPTIONS. For instance, if you want the
+  result to be \"obfuscated\" when using cvise, use option --renaming:
+
+  CREDUCE_OPTIONS=\"--renaming\" frama-c-script creduce <file> <Frama-C options>
 "
 
 #### Command-line and environment validation
@@ -292,7 +298,7 @@ if [ $? -ne 0 ]; then
 fi
 set -e
 
-"$CREDUCE" script_for_creduce.sh "$base"
+"$CREDUCE" $CREDUCE_OPTIONS script_for_creduce.sh "$base"
 
 echo "Finished reducing file: $dir_for_reduction/$base"
 echo "Remember to remove 'script_for_creduce.sh' after you are done."
