@@ -8,10 +8,6 @@
   Called from socket_h.c:7.
 [eva] using specification for function socket
 [eva] Done for function socket
-[eva] computing for function exit <- main.
-  Called from socket_h.c:8.
-[eva] using specification for function exit
-[eva] Done for function exit
 [eva] computing for function inet_addr <- main.
   Called from socket_h.c:11.
 [eva] using specification for function inet_addr
@@ -32,6 +28,10 @@
 [eva] Done for function connect
 [eva] computing for function exit <- main.
   Called from socket_h.c:14.
+[eva] using specification for function exit
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from socket_h.c:8.
 [eva] Done for function exit
 [eva] computing for function getsockopt <- main.
   Called from socket_h.c:18.

@@ -8,10 +8,6 @@
   Called from sys_select.c:9.
 [eva] using specification for function socket
 [eva] Done for function socket
-[eva] computing for function exit <- main.
-  Called from sys_select.c:10.
-[eva] using specification for function exit
-[eva] Done for function exit
 [eva] sys_select.c:16: Call to builtin memset
 [eva] sys_select.c:16: function memset: precondition 'valid_s' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:151: 
@@ -34,6 +30,10 @@
 [eva] Done for function bind
 [eva] computing for function exit <- main.
   Called from sys_select.c:21.
+[eva] using specification for function exit
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from sys_select.c:10.
 [eva] Done for function exit
 [eva] computing for function FD_ZERO <- main.
   Called from sys_select.c:22.

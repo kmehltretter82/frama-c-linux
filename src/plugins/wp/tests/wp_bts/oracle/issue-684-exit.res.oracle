@@ -4,6 +4,8 @@
 [kernel:annot:missing-spec] FRAMAC_SHARE/libc/stdlib.h:543: Warning: 
   Neither code nor explicit terminates for function exit,
    generating default clauses. See -generated-spec-* options for more info
+[wp] [Valid] Goal inconditional_exit_assigns_normal (Cfg) (Unreachable)
+[wp] [Valid] Goal inconditional_exit_ensures (Cfg) (Unreachable)
 [wp] Warning: Missing RTE guards
 ------------------------------------------------------------
   Function inconditional_exit
@@ -14,22 +16,7 @@ Prove: true.
 
 ------------------------------------------------------------
 
-Goal Post-condition (file issue-684-exit.c, line 4) in 'inconditional_exit':
-Prove: true.
-
-------------------------------------------------------------
-
 Goal Exit-condition (file issue-684-exit.c, line 3) in 'inconditional_exit':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'inconditional_exit':
-Prove: true.
-
-------------------------------------------------------------
-
-Goal Assigns nothing in 'inconditional_exit':
 Prove: true.
 
 ------------------------------------------------------------

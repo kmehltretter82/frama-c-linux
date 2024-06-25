@@ -16,13 +16,20 @@
   Called from noreturn.i:28.
 [eva] Recording results for warn_never_ends
 [eva] Done for function warn_never_ends
-[kernel:annot:missing-spec] noreturn.i:29: Warning: 
-  Neither code nor specification for function stop,
-   generating default assigns. See -generated-spec-* options for more info
-[eva] computing for function stop <- main.
-  Called from noreturn.i:29.
-[eva] using specification for function stop
-[eva] Done for function stop
+[eva] computing for function should_never_end <- main.
+  Called from noreturn.i:33.
+[eva] Recording results for should_never_end
+[eva] Done for function should_never_end
+[eva] computing for function should_never_end <- main.
+  Called from noreturn.i:32.
+[eva] Recording results for should_never_end
+[eva] noreturn.i:32: Warning: 
+  function should_never_end may terminate but has the noreturn attribute
+[eva] Done for function should_never_end
+[eva] computing for function never_ends <- main.
+  Called from noreturn.i:31.
+[eva] Recording results for never_ends
+[eva] Done for function never_ends
 [kernel:annot:missing-spec] noreturn.i:30: Warning: 
   Neither code nor specification for function haltme,
    generating default assigns. See -generated-spec-* options for more info
@@ -30,20 +37,13 @@
   Called from noreturn.i:30.
 [eva] using specification for function haltme
 [eva] Done for function haltme
-[eva] computing for function never_ends <- main.
-  Called from noreturn.i:31.
-[eva] Recording results for never_ends
-[eva] Done for function never_ends
-[eva] computing for function should_never_end <- main.
-  Called from noreturn.i:32.
-[eva] Recording results for should_never_end
-[eva] noreturn.i:32: Warning: 
-  function should_never_end may terminate but has the noreturn attribute
-[eva] Done for function should_never_end
-[eva] computing for function should_never_end <- main.
-  Called from noreturn.i:33.
-[eva] Recording results for should_never_end
-[eva] Done for function should_never_end
+[kernel:annot:missing-spec] noreturn.i:29: Warning: 
+  Neither code nor specification for function stop,
+   generating default assigns. See -generated-spec-* options for more info
+[eva] computing for function stop <- main.
+  Called from noreturn.i:29.
+[eva] using specification for function stop
+[eva] Done for function stop
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
