@@ -81,6 +81,11 @@ sig
   (** Set a hook on function statistics computation *)
   val add_hook_on_change:
     ((key, data) State_builder.hashtbl_event -> unit) -> unit
+
+  module Datatype: Datatype.S
+
+  (** Set a hook on statistics changes by the project library *)
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 (** Compute analysis statistics. *)
