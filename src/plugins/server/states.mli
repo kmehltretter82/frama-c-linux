@@ -56,6 +56,8 @@ module type Value = sig
   type data
   val get: unit -> data
   val add_hook_on_change: (data -> unit) -> unit
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 (** Same as [register_value] but takes a [State_builder.Ref] module as
@@ -97,6 +99,8 @@ module type State = sig
   val set: data -> unit
   val get: unit -> data
   val add_hook_on_change: (data -> unit) -> unit
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 (** Same as [register_state] but takes a [State_builder.Ref] module as
@@ -194,6 +198,8 @@ module type TableState = sig
   val iter: (key -> data -> unit) -> unit
   val add_hook_on_change:
     ((key, data) State_builder.hashtbl_event -> unit) -> unit
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 (** Same as [register_array] but takes a [State_builder.Hashtbl] module as

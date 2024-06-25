@@ -69,15 +69,18 @@ module type Value = sig
   type data
   val get: unit -> data
   val add_hook_on_change: (data -> unit) -> unit
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 let register_framac_value (type a) ~package ~name ~descr
     ~(output : a Request.output)
     (state : (module Value with type data = a)) =
   let module State = (val state) in
-  register_value ~package ~name ~descr ~output
-    ~get:State.get
-    ~add_hook:State.add_hook_on_change ()
+  let signal = register_value ~package ~name ~descr ~output ~get:State.get () in
+  register_hook signal State.add_hook_on_change ;
+  register_hook signal State.add_hook_on_update ;
+  signal
 
 (* -------------------------------------------------------------------------- *)
 (* --- States                                                             --- *)
@@ -110,15 +113,19 @@ module type State = sig
   val set: data -> unit
   val get: unit -> data
   val add_hook_on_change: (data -> unit) -> unit
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 let register_framac_state (type a) ~package ~name ~descr
     ~(data : a data)
     (state : (module State with type data = a)) =
   let module State = (val state) in
-  register_state ~package ~name ~descr ~data
-    ~get:State.get ~set:State.set
-    ~add_hook:State.add_hook_on_change ()
+  let get, set = State.(get, set) in
+  let signal = register_state ~package ~name ~descr ~data ~get ~set () in
+  register_hook signal State.add_hook_on_change ;
+  register_hook signal State.add_hook_on_update ;
+  signal
 
 (* -------------------------------------------------------------------------- *)
 (* --- Model Signature                                                    --- *)
@@ -430,6 +437,8 @@ module type TableState = sig
   val iter: (key -> data -> unit) -> unit
   val add_hook_on_change:
     ((key, data) State_builder.hashtbl_event -> unit) -> unit
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
 
 let register_framac_array (type key) (type data) ~package ~name ~descr ~key
@@ -447,7 +456,8 @@ let register_framac_array (type key) (type data) ~package ~name ~descr ~key
     | Remove k -> remove_key array (key k)
     | Clear -> reload array
   in
-  install_hook array.signal handle_event (Table.add_hook_on_change);
+  install_hook array.signal handle_event Table.add_hook_on_change;
+  install_hook array.signal (fun _ -> reload array) Table.add_hook_on_update;
   array
 
 (* -------------------------------------------------------------------------- *)
