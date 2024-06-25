@@ -537,8 +537,7 @@ let get_prop_scope_at_stmt ~warn kf stmt ?(proven=CA_Map.empty) annot =
       end;
       let add ((acc_scope, acc_to_be_rm) as acc) s = match pre_state s with
         | State.SameVal ->
-          if Dominators.dominates stmt s && not (Cil_datatype.Stmt.equal stmt s)
-          then
+          if Postdom.strictly_dominates stmt s then
             let acc_scope = add_s s acc_scope in
             let acc_to_be_rm = check_stmt_annots (annot, stmt) s acc_to_be_rm in
             (acc_scope, acc_to_be_rm)

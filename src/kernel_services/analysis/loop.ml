@@ -51,7 +51,7 @@ let findNaturalLoops (f: fundec) =
             and [b -> s] is a back-edge. *)
          List.fold_left
            (fun acc s ->
-              if Dominators.dominates s b then
+              if Postdom.dominates s b then
                 let cur =
                   try Stmt.Map.find s acc
                   with Not_found -> []

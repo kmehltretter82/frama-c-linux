@@ -205,7 +205,7 @@ class vis flag = object(self)
       let is_backjump_var v =
         v.vdefined &&
         let def = Cil.find_def_stmt current_block v in
-        Dominators.dominates def s && not (Dominators.dominates def succ)
+        Postdom.dominates def s && not (Postdom.dominates def succ)
       in
       let current_vars = List.filter is_backjump_var current_block.blocals in
       current_vars @ vars
@@ -221,7 +221,7 @@ class vis flag = object(self)
     let check_def_domination kind b s v =
       if v.vdefined then begin
         let def = Cil.find_def_stmt b v in
-        if not (Dominators.dominates s def) then
+        if not (Postdom.dominates s def) then
           (* if the jump's target [s] dominates the definition [def],
              jumping to it from outside the block will not prevent the
              initialization, hence is permitted: technically, the scope only

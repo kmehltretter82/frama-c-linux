@@ -99,7 +99,8 @@ struct
   end
 
   module DomTree = struct
-    let dominates = Dominators.dominates
+    let dominates = Postdom.dominates
+
     let domtree_postfix_iter f =
 
       (* Reverse the normal domtree. *)
@@ -110,7 +111,7 @@ struct
         with Not_found -> [] in
 
       Set.iter (fun x ->
-          match Dominators.get_idom x with
+          match Postdom.get_idom x with
           | None -> ()
           | Some idom -> Hashtbl.replace dom_tree idom (x::(find_or_empty idom)))
         Graph.all_nodes;
