@@ -171,7 +171,8 @@
 ########
 # XML #
 ########
-| ".*\.xml" -> frame open: "<!--" line: "-" close: "-->"
+| ".*\.xml" -> frame open: "<!--" line: " " close: "-->"
+| ".*\.xml" -> skip match: "<\?xml.*\?>"
 
 #######
 # DTD #
