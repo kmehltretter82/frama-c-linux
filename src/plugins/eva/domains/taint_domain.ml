@@ -170,7 +170,7 @@ module TransferTaint = struct
   let filter_active_tainted_assumes stmt state =
     let assume_stmts =
       Stmt.Set.filter
-        (fun assume_stmt -> not (Postdom.postdominates stmt assume_stmt))
+        (fun assume_stmt -> not (Dominators.postdominates stmt assume_stmt))
         state.assume_stmts
     in
     { state with assume_stmts }

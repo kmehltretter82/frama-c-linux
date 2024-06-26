@@ -481,7 +481,7 @@ struct
       let map' =
         ZoneStmtMap.fold
           (fun k _v acc_map ->
-             if Postdom.postdominates s k
+             if Dominators.postdominates s k
              then ZoneStmtMap.remove k acc_map
              else acc_map
           ) map map
