@@ -97,11 +97,11 @@ let pp_lvs fmt (lvs : C.logic_var list) =
   List.iter (fun (lv: C.logic_var) ->
       Format.fprintf fmt "@ %a: %a"
         Cpp.pp_logic_var lv Cpp.pp_logic_type lv.lv_type
-    ) lvs;
+    ) lvs
 
-  (* -------------------------------------------------------------------------*)
-  (* ---    Types                                                           - *)
-  (* -------------------------------------------------------------------------*)
+(* -------------------------------------------------------------------------*)
+(* ---    Types                                                           - *)
+(* -------------------------------------------------------------------------*)
 
 
 type tvars = C.logic_type W.Ty.Mtv.t
@@ -121,7 +121,7 @@ type env = {
   menv : why3module Datatype.String.Hashtbl.t
 }
 
-type temp_menv = {
+type menv = {
   mutable lti : C.logic_type_info list;
   mutable li : C.logic_info list;
 }
@@ -133,6 +133,7 @@ let create_empty_env wenv =
   let ltits  = Logic_type_info.Hashtbl.create 0 in
   let menv  = Datatype.String.Hashtbl.create 0 in
   { wenv; tenv; lenv; lils; ltits; menv }
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -171,21 +172,21 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
        x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
-let rec lt_of_ty (env : env) (temp_menv) (tvs : tvars)  (ty: W.Ty.ty) : C.logic_type =
+let rec lt_of_ty (env : env) (menv) (tvs : tvars)  (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_int) -> C.Linteger
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_real) -> C.Lreal
-  | Tyapp(s,ts) -> C.Ltype( lti_of_ts env temp_menv s ,
-                            List.map (lt_of_ty env temp_menv tvs ) ts)
+  | Tyapp(s,ts) -> C.Ltype( lti_of_ts env menv s ,
+                            List.map (lt_of_ty env menv tvs ) ts)
 
-and lti_of_ts (env : env) (temp_menv : temp_menv) (ts : W.Ty.tysymbol) : C.logic_type_info =
+and lti_of_ts (env : env) (menv : menv) (ts : W.Ty.tysymbol) : C.logic_type_info =
   try W.Ty.Hts.find env.tenv ts with Not_found ->
     let (lt_params,tvars) = tvars_of_txs ts.ts_args in
     let lt_def =
       match ts.ts_def with
       | NoDef | Range _ | Float _ -> None
-      | Alias ty -> Some (C.LTsyn (lt_of_ty env temp_menv tvars ty))
+      | Alias ty -> Some (C.LTsyn (lt_of_ty env menv tvars ty))
     in
     let lti =
       C.{
@@ -194,29 +195,28 @@ and lti_of_ts (env : env) (temp_menv : temp_menv) (ts : W.Ty.tysymbol) : C.logic
         lt_attr = [];
       }
     in W.Ty.Hts.add env.tenv ts lti ;
-    temp_menv.lti <- lti :: temp_menv.lti;
+    menv.lti <- lti :: menv.lti;
     Logic_type_info.Hashtbl.add env.ltits lti ts;
     lti
-
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Functions conversion                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let lv_of_ty (env:env) (temp_menv : temp_menv) (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
+let lv_of_ty (env:env) (menv : menv) (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
   Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
-  @@ (lt_of_ty env temp_menv tvars ty)
+  @@ (lt_of_ty env menv tvars ty)
 
 let lt_of_ty_opt (lt_opt) =
   match lt_opt with
   | None -> C.Ctype (C.TVoid []) (* Same as logic_typing *)
   | Some tr -> tr
 
-let li_of_ls (env:env) (temp_menv : temp_menv) (ls : W.Term.lsymbol)  : C.logic_info =
+let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
   let l_tparams,tvars =
     tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
-  let l_type = Option.map (lt_of_ty  env temp_menv tvars ) ls.ls_value in
-  let l_profile = List.mapi (lv_of_ty env temp_menv tvars ) ls.ls_args in
+  let l_type = Option.map (lt_of_ty  env menv tvars ) ls.ls_value in
+  let l_profile = List.mapi (lv_of_ty env menv tvars ) ls.ls_args in
   let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
   let signature = C.Larrow (l_args, lt_of_ty_opt l_type) in
   let li =
@@ -230,10 +230,8 @@ let li_of_ls (env:env) (temp_menv : temp_menv) (ls : W.Term.lsymbol)  : C.logic_
       l_profile ;
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
-  temp_menv.li <- li :: temp_menv.li;
-  Logic_info.Hashtbl.add env.lils li ls;
-  li
-
+  menv.li <- li :: menv.li;
+  Logic_info.Hashtbl.add env.lils li ls; li
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
@@ -242,7 +240,7 @@ let li_of_ls (env:env) (temp_menv : temp_menv) (ls : W.Term.lsymbol)  : C.logic_
 let import_theory (env : env) thname =
   let theory_name, theory_path = extract_path thname in
   try
-    let temp_menv : temp_menv = {li = []; lti = []} in
+    let menv : menv = {li = []; lti = []} in
     let theory = W.Env.read_theory env.wenv theory_path theory_name in
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
@@ -252,14 +250,14 @@ let import_theory (env : env) thname =
             | Dtype ts ->
               L.debug ~dkey "Decl and type %a"  pp_id ts.ts_name;
               L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
-              let lti =  lti_of_ts env temp_menv ts in
+              let lti =  lti_of_ts env menv ts in
               L.debug ~dkey "Correspondign LTI %a" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
                    L.debug ~dkey "Decl and data %a" pp_id  ts.ts_name;
                    L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
-                   let lti =  lti_of_ts env temp_menv ts  in
+                   let lti =  lti_of_ts env menv ts  in
                    L.debug ~dkey "Correspondign data LTI %a" pp_lti lti;
                 ) ddatas
             | Dparam ls ->
@@ -270,7 +268,7 @@ let import_theory (env : env) thname =
                 (fun ((ls,_):W.Decl.logic_decl) ->
                    L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
                    L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
-                   let li = li_of_ls env temp_menv ls in
+                   let li = li_of_ls env menv ls in
                    L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
                 ) dlogics
             | _ -> L.debug ~dkey "Other type of Decl"
@@ -278,12 +276,11 @@ let import_theory (env : env) thname =
         | Use _| Clone _| Meta _ -> L.debug ~dkey ""
       ) theory.th_decls;
     Datatype.String.Hashtbl.add env.menv thname
-      { logics =  List.rev temp_menv.li;
-        types = List.rev temp_menv.lti;
+      { logics =  List.rev menv.li;
+        types = List.rev menv.lti;
         paths = theory_path };
   with W.Env.LibraryNotFound _ ->
     L.error "Library %s not found" thname
-
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Main                                                            --- *)
@@ -327,7 +324,6 @@ let () =
                 pp_li li pp_ls ls )
             env.lils;
         end
-
     end
 
 (* -------------------------------------------------------------------------- *)
