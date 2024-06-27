@@ -330,27 +330,22 @@ module Make
 
   let merge_widenings old_ws new_ws = 
     let join_same _ m1 m2 = 
-      match m1, m2 with
-      | Some x, None -> Some x
-      | None, Some x -> Some x
-      | None, None -> None
-      | Some x, Some y -> Some (Domain.join x y)
+      Some (Domain.join m1 m2)
     in
-    Partition.Key.Map.merge join_same old_ws new_ws
+    Partition.Key.Map.union join_same old_ws new_ws
 
   let merge_statements old_stmt new_stmt =
-    let join_same _ s1 s2 =
-      match s1, s2 with
-      | Some x, None | None, Some x -> Some x
-      | None, None -> None
-      | Some x, Some y -> Some (merge_widenings x y)
+    let join_same _ s1 s2 = 
+      Some (merge_widenings s1 s2)
     in
-    Cil_datatype.Stmt.Map.merge join_same old_stmt new_stmt
+    Cil_datatype.Stmt.Map.union join_same old_stmt new_stmt
 
   let reduce_widenings inout kf (partitions: Partitions.t) =
-    let output_bases = bases inout.Inout_type.over_outputs_if_termination in
+    let input_bases = bases inout.Inout_type.over_inputs in
+    let output_bases = bases inout.Inout_type.over_outputs in
+    let all_bases = Base.Hptset.union input_bases output_bases in
     let filter widened_state =
-      Domain.filter (`Post kf) output_bases widened_state
+      Domain.filter (`Post kf) all_bases widened_state
     in Partition.Key.Map.map filter partitions
 
   let store_widenings_kf inout kf args _callstack widenings =
