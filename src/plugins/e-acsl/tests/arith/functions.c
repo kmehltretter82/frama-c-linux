@@ -46,6 +46,9 @@ int glob = 5;
 // Test functions returning a rational
 /*@ logic real over(real a, real b) = a/b; */
 
+// Test functions using a rational
+/*@ logic integer signum(ℝ x) = x > 0. ? 1 : x < 0. ? -1 : 0; */
+
 //Test function using a global variable (they elaborate to functions
 //with labels)
 int z = 8;
@@ -91,4 +94,8 @@ int main(void) {
   /*@ assert f_here(27) == 27; */;
 
   /*@ assert f3(5) == 13; */;
+
+  /*@ assert signum(3.0) > 0; */
+  /*@ assert signum(0.0-3.0) < 0; */
+  /*@ assert signum(0.0) ≡ 0; */
 }
