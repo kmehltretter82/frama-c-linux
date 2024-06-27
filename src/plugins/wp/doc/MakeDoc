@@ -25,7 +25,7 @@
 # --------------------------------------------------------------------------
 FRAMAC_DOC= .make-class .make-images .make-icons VERSION VERSION_CODENAME
 # --------------------------------------------------------------------------
-FRAMAC_CLASS=frama-c-book.cls fc-macros.tex logos anr-logo.png frama-c-guy.png
+FRAMAC_CLASS=frama-c-book.cls fc-macros.tex logos anr-logo.png
 FRAMAC_BULLETS=never_tried.png unknown.png valid_under_hyp.png surely_valid.png
 FRAMAC_IMAGES=cealistlogo.jpg
 # --------------------------------------------------------------------------
