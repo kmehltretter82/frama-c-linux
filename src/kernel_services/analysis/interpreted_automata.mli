@@ -318,11 +318,17 @@ sig
   (** Merges two states coming from different paths. *)
   val join : t -> t -> t
 
-  (** [widen v1 v2] must returns None if [v2] is included in [v1].
-      Otherwise, over-approximates the join between [v1] and [v2] such that
+  (** [widen v1 v2] is called on loop heads after each iteration of the
+      analysis on the loop body: [v1] is the previous state before the
+      iteration, and [v2] the new state after the iteration.
+      The function must return None if the analysis has reached a fixpoint for
+      the loop: this is the case if [join v1 v2] is equivalent to [v1], as a new
+      iteration would have the same entry state as the last one.
+      Otherwise, it must return the new entry state for the next iteration,
+      by over-approximating the join between [v1] and [v2] such that
       any sequence of successive widenings is ultimately stationary,
       i.e. […widen (widen (widen x0 x1) x2) x3…] eventually returns None.
-      Called on loop heads to ensure the analysis termination. *)
+      This ensures the analysis termination. *)
   val widen : t -> t -> t option
 
   (** Transfer function for edges: computes the state after the transition
