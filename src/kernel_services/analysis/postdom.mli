@@ -101,3 +101,12 @@ val pretty_postdominators : Format.formatter -> unit -> unit
     @since Frama-C+dev
 *)
 
+val print_dot_dominators : string -> kernel_function -> unit
+(** Print the domination graph in a file [basename.function_name.dot].
+    @since Frama-C+dev
+*)
+
+val print_dot_postdominators : string -> kernel_function -> unit
+(** Print the postdomination graph in a file [basename.function_name.dot].
+    @since Frama-C+dev
+*)

@@ -27,7 +27,10 @@
 open Cil_types
 open Interpreted_automata
 
-(* State type of our domain. *)
+(* Datatype used to create a dot graph using analysis results. *)
+module StmtTbl = Cil_datatype.Stmt.Hashtbl
+
+(* State type for our domain. *)
 module StmtSet = struct
   include Cil_datatype.Stmt.Hptset
   let pretty fmt set =
@@ -36,6 +39,9 @@ module StmtSet = struct
       fmt set
 end
 
+(* Used to store the result of the analysis. [None] means the statement is
+   unreachable while [Some set] means the statement was reached with this set
+   of statements. *)
 module StmtSetOpt = struct
   include Datatype.Option (StmtSet)
 
@@ -49,6 +55,45 @@ module StmtSetOpt = struct
     Pretty_utils.pp_opt ~none:"Top" StmtSet.pretty fmt setopt
 end
 
+module DotGraph = Graph.Graphviz.Dot (
+  struct
+    type t = string * (StmtSetOpt.t StmtTbl.t)
+    module V = struct
+      type t = stmt
+      let pretty fmt v = Cil_printer.pp_stmt fmt v
+    end
+    module E = struct
+      type t = (V.t * V.t)
+      let src = fst
+      let dst = snd
+    end
+
+    let iter_vertex f (_, graph) =
+      StmtTbl.iter (fun stmt _ -> f stmt) graph
+
+    let iter_edges_e f (_, graph) =
+      let do_edges stmt set_opt =
+        let do_edge p = f (p, stmt) in
+        Option.iter (fun set -> StmtSet.iter do_edge set) set_opt
+      in
+      StmtTbl.iter do_edges graph
+
+    let graph_attributes (title, _) = [`Label title]
+
+    let default_vertex_attributes _g = [`Shape `Box; `Style `Filled]
+
+    let vertex_name stmt = string_of_int stmt.sid
+
+    let vertex_attributes stmt =
+      let txt = Format.asprintf "%a" V.pretty stmt in
+      [`Label txt]
+
+    let default_edge_attributes _g = []
+
+    let edge_attributes _s = []
+
+    let get_subgraph _v = None
+  end)
 
 (* Both analysis are using this domain. It simply propagate all encountered
    statements by adding them to the state. The [join] performs an intersection
@@ -145,6 +190,51 @@ module Compute (Analysis : Analysis) = struct
          Format.fprintf fmt "Stmt:%d -> @[%a@]" k.sid StmtSetOpt.pretty v
       ) fmt l
 
+  let get_set graph stmt =
+    match StmtTbl.find_opt graph stmt with
+    | Some None -> assert false
+    | Some (Some l) -> l
+    | None ->
+      match get_strict stmt with
+      | Some set ->
+        StmtTbl.add graph stmt (Some set); set
+      | None ->
+        StmtTbl.add graph stmt None;
+        raise Not_found
+
+  (* [s_set] are [s] (post)dominators, including [s]. We don't have to represent
+     the relation between [s] and [s], so [get_set] removes it. And because the
+     (post)domination relation is transitive, if [p] is in [s_set], we can
+     remove [p_set] from [s_set] in order to have a clearer graph.
+  *)
+  let reduce graph s =
+    (* Union of all (post)dominators of [s] (post)dominators [s_set]. *)
+    let unions p acc = get_set graph p |> StmtSet.union acc in
+    try
+      let s_set = get_set graph s in
+      let p_sets = StmtSet.fold unions s_set StmtSet.empty in
+      let res = StmtSet.diff s_set p_sets in
+      StmtTbl.replace graph s (Some res)
+    with Not_found -> ()
+
+  let build_dot filename kf =
+    match kf.fundec with
+    | Definition (fct, _) ->
+      let graph = StmtTbl.create (List.length fct.sallstmts) in
+      List.iter (reduce graph) fct.sallstmts;
+      let name = Kernel_function.get_name kf in
+      let title = Format.sprintf "%s for function %s" Analysis.name name in
+      let file = open_out filename in
+      DotGraph.output_graph file (title, graph);
+      close_out file
+    | Declaration _ ->
+      Kernel.fatal "cannot compute for a function without body %a"
+        Kernel_function.pretty kf
+
+  let print_dot basename kf =
+    let filename = basename ^ "." ^ Kernel_function.get_name kf ^ ".dot" in
+    build_dot filename kf;
+    Kernel.result "dot file generated in %s" filename
 end
 
 (* ---------------------------------------------------------------------- *)
@@ -176,6 +266,8 @@ let strictly_dominates = Dominators.mem_strict
 
 let pretty_dominators = Dominators.pretty
 
+let print_dot_dominators = Dominators.print_dot
+
 (* ---------------------------------------------------------------------- *)
 (* --- Postdominators                                                 --- *)
 (* ---------------------------------------------------------------------- *)
@@ -204,3 +296,5 @@ let postdominates = PostDominators.mem
 let strictly_postdominates = PostDominators.mem_strict
 
 let pretty_postdominators = PostDominators.pretty
+
+let print_dot_postdominators = PostDominators.print_dot
