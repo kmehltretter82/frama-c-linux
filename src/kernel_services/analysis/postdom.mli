@@ -32,6 +32,13 @@
     By definition, a statement always (post)dominates itself (except if it is
     unreachable).
 
+    An immediate (post)dominator (or i(post)dom) [d] is the unique
+    (post)dominator of [s] that strictly (post)dominates [s] but is
+    (post)dominated by all other (post)dominators of [s].
+
+    A common ancestor (or children) of a list of statements is a (post)dominator
+    that (post)dominates all the statements
+
     @before Frama-C+dev This module was using [Dataflow2] instead of
     [Interpreted_automata]. The new version also offers more function via its
     API.
@@ -86,6 +93,25 @@ val strictly_dominates : stmt -> stmt -> bool
 
 val strictly_postdominates : stmt -> stmt -> bool
 (** [strictly_postdominates a b] return [true] if [a] strictly postdominates [b].
+    @since Frama-C+dev
+*)
+
+val get_idom : stmt -> stmt option
+(** Return the immediate dominator of the given statement. *)
+
+val get_ipostdom : stmt -> stmt option
+(** Return the immediate postdominator of the given statement.
+    @since Frama-C+dev
+*)
+
+val nearest_common_ancestor : stmt list -> stmt option
+(** Return the closest common ancestor of the given statement list.
+    @before Frama-C+dev previous implementation always returned a statement and
+    raised a failed assertion in case of unreachable statement.
+*)
+
+val nearest_common_children : stmt list -> stmt option
+(** Return the closest common children of the given statement list.
     @since Frama-C+dev
 *)
 

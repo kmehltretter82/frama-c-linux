@@ -37,6 +37,12 @@ module StmtSet = struct
     Pretty_utils.pp_iter ~pre:"@[{" ~sep:",@," ~suf:"}@]"
       iter (fun fmt stmt -> Format.pp_print_int fmt stmt.sid)
       fmt set
+
+  (* [find_opt_for_all f set] find the first element [a] of the [set] which
+     satisfies [f a b] on all elements [b] of [set] (including himself). *)
+  let find_opt_for_all f set =
+    let f' a = for_all (fun b -> f a b) set in
+    List.find_opt f' (elements set)
 end
 
 (* Used to store the result of the analysis. [None] means the statement is
@@ -50,6 +56,15 @@ module StmtSetOpt = struct
 
   let mem s setopt =
     Option.fold ~none:false ~some:(StmtSet.mem s) setopt
+
+  let inter s s' =
+    match s, s' with
+    | None, None -> None
+    | Some s, None | None, Some s -> Some s
+    | Some s, Some s' -> Some (StmtSet.inter s s')
+
+  let find_opt_for_all f setopt =
+    Option.bind setopt (StmtSet.find_opt_for_all f)
 
   let pretty fmt setopt =
     Pretty_utils.pp_opt ~none:"Top" StmtSet.pretty fmt setopt
@@ -183,6 +198,27 @@ module Compute (Analysis : Analysis) = struct
   (* Generic function to test the strict (post)domination of 2 statements. *)
   let mem_strict a b = get_strict b |> StmtSetOpt.mem a
 
+  (* The nearest common ancestor (resp. children) is the ancestor which is
+     dominated (resp. postdominated) by all common ancestors, ie. the lowest
+     (resp. highest) ancestor in the domination tree. *)
+  let nearest stmtl =
+    let exception Unreachable in
+    (* Get the set of strict (post)doms for each statement and intersect them to
+       keep the common ones. If one of them is None (unreachable), they do not
+       share a common ancestor/children. *)
+    let common_set =
+      try
+        List.fold_left (fun acc s ->
+            match get_strict s with
+            | None -> raise Unreachable
+            | set -> StmtSetOpt.inter acc set
+          ) None stmtl
+      with Unreachable -> None
+    in
+    (* Try to find a statement [s] in [common_set] which is (post)dominated by
+       all statements of the [common_set]. *)
+    StmtSetOpt.find_opt_for_all (Fun.flip mem) common_set
+
   let pretty fmt () =
     let l = Table.to_seq () |> List.of_seq in
     Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~empty:"Empty"
@@ -264,6 +300,10 @@ let dominates = Dominators.mem
 
 let strictly_dominates = Dominators.mem_strict
 
+let get_idom s = Dominators.nearest [s]
+
+let nearest_common_ancestor = Dominators.nearest
+
 let pretty_dominators = Dominators.pretty
 
 let print_dot_dominators = Dominators.print_dot
@@ -294,6 +334,10 @@ let get_strict_postdominators = PostDominators.get_strict
 let postdominates = PostDominators.mem
 
 let strictly_postdominates = PostDominators.mem_strict
+
+let get_ipostdom s = PostDominators.nearest [s]
+
+let nearest_common_children = PostDominators.nearest
 
 let pretty_postdominators = PostDominators.pretty
 
