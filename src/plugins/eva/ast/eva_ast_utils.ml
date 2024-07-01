@@ -252,7 +252,8 @@ let rec to_integer e =
   | Const (CChr c) -> Some (Cil.charConstToInt c)
   | Const (CEnum ({eival = v}, _)) -> Cil.isInteger v
   | CastE (typ, e) when Cil.isPointerType typ ->
-    begin match to_integer e with
+    begin
+      match to_integer e with
       | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
       | _ -> None
     end
@@ -328,7 +329,9 @@ let rec const_fold (exp: exp) : exp =
 and const_fold_cast (t : typ) (e : exp) : exp  =
   let e = const_fold e in
   let default () = mk_exp (CastE (t, e)) in
-  if Cil.typeAttr t <> [] then default () else
+  if Cil.typeAttr t <> [] then
+    default ()
+  else
     match to_value e, type_kind t with
     (* integer -> integer *)
     | `Int i, `Int ikind -> Build.integer ~ikind i
@@ -382,10 +385,13 @@ and const_fold_binop (op : binop) (e1 : exp) (e2 : exp) (t : typ) : exp =
     end
   (* Special cases for some integer operations *)
   | `Int _, i1, i2 ->
+    (* These three functions always return false when the value is not a
+       constant integer — so [is_non_zero] is not the opposite of [is_zero]. *)
     let is_zero = function `Int i -> Integer.is_zero i | _ -> false in
     let is_one = function `Int i -> Integer.is_one i | _ -> false in
     let is_non_zero = function `Int i -> not (Integer.is_zero i) | _ -> false in
-    begin match op with
+    begin
+      match op with
       | PlusA when is_zero i1 -> e2
       | PlusA | MinusA | PlusPI | MinusPI when is_zero i2 -> e1
       | Mult when is_zero i1 || is_one i2 -> e1
