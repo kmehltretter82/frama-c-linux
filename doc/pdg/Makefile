@@ -47,13 +47,9 @@ main.pdf: $(FRAMAC_MODERN) $(BIB_FILE) \
 
 ###############################################################################
 
-GENERATED+=call-f.fig call-g.fig
-%.fig : %.dot
-	dot -Tfig $< > $@
-
 GENERATED+=call-f.pdf call-g.pdf
-%.pdf : %.fig
-	fig2dev -L pdf $< $@
+%.pdf : %.dot
+	dot -Tpdf $< > $@
 
 GENERATED+=call-f.dot call-g.dot
 call-%.dot : $(TEST_DIR)/oracle/call.%.dot
