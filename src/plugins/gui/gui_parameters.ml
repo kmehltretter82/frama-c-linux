@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = Plugin.is_config_visible ()
 include Plugin.Register
     (struct
       let name = "GUI"

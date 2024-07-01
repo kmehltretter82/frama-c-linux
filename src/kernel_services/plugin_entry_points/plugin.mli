@@ -143,21 +143,6 @@ val is_session_visible: unit -> unit
     To be called just before applying {!Register} to create plug-in services.
     @since Neon-20140301 *)
 
-val is_cache_visible: unit -> unit
-(** Make visible to the end-user the -<plug-in>-cache-dir option.
-    To be called just before applying {!Register} to create plug-in services.
-    @since Neon-20140301 *)
-
-val is_config_visible: unit -> unit
-(** Make visible to the end-user the -<plug-in>-config-dir option.
-    To be called just before applying {!Register} to create plug-in services.
-    @since Neon-20140301 *)
-
-val is_state_visible: unit -> unit
-(** Make visible to the end-user the -<plug-in>-state-dir option.
-    To be called just before applying {!Register} to create plug-in services.
-    @since Neon-20140301 *)
-
 val plugin_subpath: string -> unit
 (** Use the given string as the sub-directory in which the plugin files will
     be installed (ie. [share/frama-c/plugin_subpath]...). Relevant for

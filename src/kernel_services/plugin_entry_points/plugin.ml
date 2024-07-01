@@ -88,13 +88,6 @@ let is_share_visible () = share_visible_ref := true
 let session_visible_ref = ref false
 let is_session_visible () = session_visible_ref := true
 
-let cache_visible_ref = ref false
-let is_cache_visible () = cache_visible_ref := true
-let config_visible_ref = ref false
-let is_config_visible () = config_visible_ref := true
-let state_visible_ref = ref false
-let is_state_visible () = state_visible_ref := true
-
 let plugin_subpath_ref = ref None
 let plugin_subpath s = plugin_subpath_ref := Some s
 
@@ -104,9 +97,6 @@ let reset_plugin () =
   kernel := false;
   share_visible_ref := false;
   session_visible_ref := false;
-  cache_visible_ref := false;
-  config_visible_ref := false;
-  state_visible_ref := false;
   plugin_subpath_ref := None;
   default_msg_keys_ref := [];
 ;;
@@ -481,7 +471,6 @@ struct
   module type User_dir_input = sig
     val name: string
     val getter: unit -> Fc_Filepath.Normalized.t
-    val visible_ref: bool ref
     val kernel_get: unit -> Fc_Filepath.Normalized.t
     val kernel_is_set: unit -> bool
   end
@@ -504,7 +493,7 @@ struct
               | Some p when p <> "" -> Fc_Filepath.Normalized.of_string p
               | _ -> I.getter ()
           ]
-          let visible_ref = !I.visible_ref
+          let visible_ref = !Parameter_customize.is_visible_ref
         end)
   end
 
@@ -512,7 +501,6 @@ struct
       (struct
         let name = "cache"
         let getter = System_config.User_dirs.cache
-        let visible_ref = cache_visible_ref
         let kernel_get () = !cache_ref ()
         let kernel_is_set () = !cache_is_set_ref ()
       end)
@@ -521,7 +509,6 @@ struct
       (struct
         let name = "config"
         let getter = System_config.User_dirs.config
-        let visible_ref = config_visible_ref
         let kernel_get () = !config_ref ()
         let kernel_is_set () = !config_is_set_ref ()
       end)
@@ -530,7 +517,6 @@ struct
       (struct
         let name = "state"
         let getter = System_config.User_dirs.state
-        let visible_ref = state_visible_ref
         let kernel_get () = !state_ref ()
         let kernel_is_set () = !state_is_set_ref ()
       end)
