@@ -361,23 +361,42 @@ module type Specific_dir = sig
         + [Must_exist] aborts if the resulting path does not exist. *)
 end
 
-(** Specializes Specific_dir for user directories (config, state, ...). These
-    directories. We do not expect these directories to exist.
+(** Specializes Specific_dir for dune site directories (share, lib, ...).
+    We expect these directories to exist.
+
+    @since Frama-C+dev
+*)
+module type Dune_site_dir =sig
+  include Specific_dir
+
+  (** Refer to {!Specific_dir.get_dir} *)
+  val get_dir:
+    ?mode:[< `Normalize_only | `Must_exist > `Normalize_only ] ->
+    string -> Filepath.Normalized.t
+
+  (** Refer to {!Specific_dir.get_file} *)
+  val get_file:
+    ?mode:[< `Normalize_only | `Must_exist > `Normalize_only ] ->
+    string -> Filepath.Normalized.t
+end
+
+(** Specializes Specific_dir for user directories (config, state, ...).
+    We do not expect these directories to exist.
 
     @since Frama-C+dev
 *)
 module type User_dir = sig
   include Specific_dir
 
+  (** Refer to {!Specific_dir.get_dir} *)
   val get_dir:
     ?mode:[< `Normalize_only | `Create_path > `Normalize_only ] ->
     string -> Filepath.Normalized.t
-  (** Refer to {!Specific_dir.get_dir} *)
 
+  (** Refer to {!Specific_dir.get_file} *)
   val get_file:
     ?mode:[< `Normalize_only | `Create_path > `Normalize_only ] ->
     string -> Filepath.Normalized.t
-  (** Refer to {!Specific_dir.get_file} *)
 end
 
 (* ************************************************************************** *)

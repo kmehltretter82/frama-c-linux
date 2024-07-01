@@ -42,7 +42,7 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
-  module Share: Parameter_sig.Specific_dir
+  module Share: Parameter_sig.Dune_site_dir
   module Session: Parameter_sig.Specific_dir
   module Cache_dir () : Parameter_sig.User_dir
   module Config_dir () : Parameter_sig.User_dir
@@ -291,6 +291,76 @@ struct
   (** {3 Specific directories} *)
   (* ************************************************************************ *)
 
+  module Share : Parameter_sig.Dune_site_dir = struct
+    let is_visible = !share_visible_ref
+    let is_kernel = is_kernel () (* the side effect must be applied right now *)
+
+    module Dir_name =
+      Filepath
+        (struct
+          let option_name = prefix ^ "share"
+          let arg_name = "dir"
+          let help =
+            if is_visible then
+              "set the plug-in share directory to <dir> (may be used if the \
+               plug-in is not installed at the same place as Frama-C)"
+            else empty_string
+          let existence = Fc_Filepath.Must_exist
+          let file_kind = ""
+        end)
+
+    let set filepath = Dir_name.set filepath
+    let get () = Dir_name.get ()
+    let is_set () = Dir_name.is_set ()
+
+    let add_plugin path = Datatype.Filepath.concat path plugin_subpath
+
+    let dirs =
+      if is_visible && Dir_name.is_set ()
+      then [ Dir_name.get () ]
+      else List.map add_plugin System_config.Share.dirs
+
+    let find relative =
+      let exception Found of Datatype.Filepath.t in
+      let check_presence dir =
+        let path = Datatype.Filepath.concat dir relative in
+        if Fc_Filepath.exists path then raise (Found path)
+      in
+      try List.iter check_presence dirs ; None
+      with Found path -> Some path
+
+    let default relative =
+      match dirs with
+      | [] -> assert false
+      | x :: _ -> Datatype.Filepath.concat x relative
+
+    let get_dir ?(mode=`Normalize_only) s =
+      let path = find s in
+      match mode, path with
+      | `Normalize_only, None -> default s
+      | (`Must_exist | `Normalize_only), Some p when Fc_Filepath.is_dir p -> p
+      | (`Must_exist | `Normalize_only), Some p ->
+        L.abort "%a is expected to be a directory" Datatype.Filepath.pretty p
+      | `Must_exist, None ->
+        L.abort "Could not find directory %s in Frama-C%s share"
+          s (if is_kernel then "" else "/" ^ P.name)
+
+    let get_file ?(mode=`Normalize_only) s =
+      let dirname = Filename.dirname s in
+      let basename = Filename.basename s in
+      let dir = get_dir ~mode dirname in
+      let path = Datatype.Filepath.concat dir basename in
+      match mode with
+      | `Normalize_only -> path
+      | `Must_exist when not @@ Fc_Filepath.exists path ->
+        L.abort "Could not find file %s in Frama-C%s share"
+          s (if is_kernel then "" else "/" ^ P.name)
+      | `Must_exist when Fc_Filepath.is_dir path ->
+        L.abort "%a is expected to be a file"
+          Datatype.Filepath.pretty path
+      | `Must_exist -> path
+  end
+
   module Make_specific_dir
       (O: Parameter_sig.Input_with_arg)
       (D: sig
@@ -431,18 +501,6 @@ struct
 
   end
 
-  module Share =
-    Make_specific_dir
-      (struct
-        let option_name = "share"
-        let arg_name = "dir"
-        let help = "set the plug-in share directory to <dir> \
-                    (may be used if the plug-in is not installed at the same place as Frama-C)"
-      end)
-      (struct
-        let dirs () = System_config.Share.dirs
-        let visible_ref = !share_visible_ref
-      end)
 
   module Session =
     Make_specific_dir

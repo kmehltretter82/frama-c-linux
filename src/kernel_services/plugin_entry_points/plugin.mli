@@ -44,8 +44,10 @@ module type S_no_log = sig
   module Debug: Parameter_sig.Int
 
   (** Handle the specific `share' directory of the plug-in.
-      @since Oxygen-20120901 *)
-  module Share: Parameter_sig.Specific_dir
+      @since Oxygen-20120901
+      @before Frama-C+dev more modes were allowed
+  *)
+  module Share: Parameter_sig.Dune_site_dir
 
   (** Handle the specific `session' directory of the plug-in.
       @since Neon-20140301 *)
