@@ -44,9 +44,9 @@ module type S_no_log = sig
   module Debug: Parameter_sig.Int
   module Share: Parameter_sig.Specific_dir
   module Session: Parameter_sig.Specific_dir
-  module Cache_dir () : Parameter_sig.Specific_dir
-  module Config_dir () : Parameter_sig.Specific_dir
-  module State_dir () : Parameter_sig.Specific_dir
+  module Cache_dir () : Parameter_sig.User_dir
+  module Config_dir () : Parameter_sig.User_dir
+  module State_dir () : Parameter_sig.User_dir
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
   val add_plugin_output_aliases:
@@ -296,7 +296,8 @@ struct
       (D: sig
          val dirs: unit -> Fc_Filepath.Normalized.t list
          val visible_ref: bool
-       end)
+       end) :
+    Parameter_sig.Specific_dir
   =
   struct
 
@@ -354,6 +355,13 @@ struct
       end
 
     let get_dir ?(mode=`Normalize_only) s =
+      (* In presence of more than one base directory, consider the first to
+             form the resulting [filepath]. *)
+      let filepath =
+        match base_dirs () with
+        | [] -> assert false
+        | d :: _ -> Datatype.Filepath.concat d s
+      in
       match mode with
       | `Must_exist ->
         begin
@@ -387,35 +395,21 @@ struct
               (base_dirs ())
           | Some d -> d
         end
-      | _ ->
+      | `Normalize_only ->
+        filepath
+      | `Create_path ->
         begin
-          (* In presence of more than one base directory, consider the first to
-             form the resulting [filepath]. *)
-          let filepath =
-            match base_dirs () with
-            | [] -> assert false
-            | d :: _ -> Datatype.Filepath.concat d s
-          in
-          match mode with
-          | `Must_exist ->
-            (* Already taken care of. *)
-            assert false
-          | `Normalize_only ->
-            filepath
-          | `Create_path ->
-            begin
-              (try
-                 if not (Fc_Filepath.is_dir filepath)
-                 then
-                   (* [filepath] already exists, and it is a file. *)
-                   L.abort
-                     "cannot create directory as file %a already exists"
-                     Datatype.Filepath.pretty filepath
-               with Sys_error _ ->
-                 (* [filepath] does not exist: create the directory path. *)
-                 ignore (mk_dir (filepath :> string)));
-              filepath
-            end
+          (try
+             if not (Fc_Filepath.is_dir filepath)
+             then
+               (* [filepath] already exists, and it is a file. *)
+               L.abort
+                 "cannot create directory as file %a already exists"
+                 Datatype.Filepath.pretty filepath
+           with Sys_error _ ->
+             (* [filepath] does not exist: create the directory path. *)
+             ignore (mk_dir (filepath :> string)));
+          filepath
         end
 
     let get_file ?(mode=`Normalize_only) s =
@@ -475,7 +469,7 @@ struct
     val kernel_is_set: unit -> bool
   end
 
-  module User_dir (I: User_dir_input) = struct
+  module User_dir (I: User_dir_input) : Parameter_sig.User_dir = struct
     include Make_specific_dir
         (struct
           let option_name = I.name
@@ -495,6 +489,9 @@ struct
           ]
           let visible_ref = !Parameter_customize.is_visible_ref
         end)
+
+    let get_dir ?mode s = get_dir ?mode s
+    let get_file ?mode s = get_file ?mode s
   end
 
   module Cache_dir () = User_dir

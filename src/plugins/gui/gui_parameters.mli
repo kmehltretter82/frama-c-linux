@@ -24,7 +24,7 @@
 
 include Plugin.S
 
-module Config_dir : Parameter_sig.Specific_dir
+module Config_dir : Parameter_sig.User_dir
 
 module Project_name: Parameter_sig.String
 (** Option -gui-project. *)

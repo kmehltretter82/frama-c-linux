@@ -54,18 +54,19 @@ module type S_no_log = sig
   (** Handle the specific `cache' directory of the plug-in.
       @since Frama-C+dev
   *)
-  module Cache_dir (): Parameter_sig.Specific_dir
+  module Cache_dir (): Parameter_sig.User_dir
 
   (** Handle the specific `config' directory of the plug-in.
       @since Neon-20140301
-      @before Frama-C+dev this was not a functor
+      @before Frama-C+dev this was not a functor and one could expect the
+              directory to exist
   *)
-  module Config_dir (): Parameter_sig.Specific_dir
+  module Config_dir (): Parameter_sig.User_dir
 
   (** Handle the specific `state' directory of the plug-in.
       @since Frama-C+dev
   *)
-  module State_dir (): Parameter_sig.Specific_dir
+  module State_dir (): Parameter_sig.User_dir
 
   val help: Cmdline.Group.t
   (** The group containing option -*-help.

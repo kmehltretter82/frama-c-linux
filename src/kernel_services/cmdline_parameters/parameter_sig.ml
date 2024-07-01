@@ -337,7 +337,7 @@ module type Specific_dir = sig
   (** @return whether the plugin <specific-dir> has been set. *)
 
   val get_dir:
-    ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
+    ?mode:[< `Normalize_only | `Create_path | `Must_exist > `Normalize_only] ->
     string ->
     Filepath.Normalized.t
   (** [get_dir ?mode p] returns a (local) path [p], i.e. relative to the plugin
@@ -349,7 +349,7 @@ module type Specific_dir = sig
       + [Must_exist] aborts if the resulting path does not exist. *)
 
   val get_file:
-    ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
+    ?mode:[< `Normalize_only | `Create_path | `Must_exist > `Normalize_only] ->
     string ->
     Filepath.Normalized.t
     (** [get_file ?mode p] returns a (local) path [p], i.e. relative to the
@@ -359,6 +359,25 @@ module type Specific_dir = sig
         + [Normalize_only] just normalizes the resulting path (default).
         + [Create_path] creates the dirname of resulting path, if does not exist.
         + [Must_exist] aborts if the resulting path does not exist. *)
+end
+
+(** Specializes Specific_dir for user directories (config, state, ...). These
+    directories. We do not expect these directories to exist.
+
+    @since Frama-C+dev
+*)
+module type User_dir = sig
+  include Specific_dir
+
+  val get_dir:
+    ?mode:[< `Normalize_only | `Create_path > `Normalize_only ] ->
+    string -> Filepath.Normalized.t
+  (** Refer to {!Specific_dir.get_dir} *)
+
+  val get_file:
+    ?mode:[< `Normalize_only | `Create_path > `Normalize_only ] ->
+    string -> Filepath.Normalized.t
+  (** Refer to {!Specific_dir.get_file} *)
 end
 
 (* ************************************************************************** *)
