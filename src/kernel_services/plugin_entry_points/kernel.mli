@@ -418,10 +418,20 @@ module Session_dir: Parameter_sig.Filepath
     @before 23.0-Vanadium parameter type was string instead of Filepath.
 *)
 
+module Cache_dir: Parameter_sig.Filepath
+(** Directory in which cache files are searched.
+    @since Frama-C+dev
+*)
+
 module Config_dir: Parameter_sig.Filepath
 (** Directory in which config files are searched.
     @since Neon-20140301
     @before 23.0-Vanadium parameter type was string instead of Filepath.
+*)
+
+module State_dir: Parameter_sig.Filepath
+(** Directory in which state files are searched.
+    @since Frama-C+dev
 *)
 
 (* this stop special comment does not work as expected (and as explained in the

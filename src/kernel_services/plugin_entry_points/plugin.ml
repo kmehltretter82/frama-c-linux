@@ -27,8 +27,12 @@ let empty_string = ""
 let positive_debug_ref = ref 0
 let session_is_set_ref = Extlib.mk_fun "session_is_set_ref"
 let session_ref = Extlib.mk_fun "session_ref"
+let cache_is_set_ref = Extlib.mk_fun "cache_is_set_ref"
+let cache_ref = Extlib.mk_fun "cache_ref"
 let config_is_set_ref = Extlib.mk_fun "config_is_set_ref"
 let config_ref = Extlib.mk_fun "config_ref"
+let state_is_set_ref = Extlib.mk_fun "state_is_set_ref"
+let state_ref = Extlib.mk_fun "state_ref"
 
 (* ************************************************************************* *)
 (** {2 Signatures} *)
@@ -40,7 +44,9 @@ module type S_no_log = sig
   module Debug: Parameter_sig.Int
   module Share: Parameter_sig.Specific_dir
   module Session: Parameter_sig.Specific_dir
-  module Config: Parameter_sig.Specific_dir
+  module Cache_dir () : Parameter_sig.Specific_dir
+  module Config_dir () : Parameter_sig.Specific_dir
+  module State_dir () : Parameter_sig.Specific_dir
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
   val add_plugin_output_aliases:
@@ -82,8 +88,12 @@ let is_share_visible () = share_visible_ref := true
 let session_visible_ref = ref false
 let is_session_visible () = session_visible_ref := true
 
+let cache_visible_ref = ref false
+let is_cache_visible () = cache_visible_ref := true
 let config_visible_ref = ref false
 let is_config_visible () = config_visible_ref := true
+let state_visible_ref = ref false
+let is_state_visible () = state_visible_ref := true
 
 let plugin_subpath_ref = ref None
 let plugin_subpath s = plugin_subpath_ref := Some s
@@ -94,7 +104,9 @@ let reset_plugin () =
   kernel := false;
   share_visible_ref := false;
   session_visible_ref := false;
+  cache_visible_ref := false;
   config_visible_ref := false;
+  state_visible_ref := false;
   plugin_subpath_ref := None;
   default_msg_keys_ref := [];
 ;;
@@ -466,36 +478,61 @@ struct
         let visible_ref = !session_visible_ref
       end)
 
-  module Config =
-    Make_specific_dir
+  module type User_dir_input = sig
+    val name: string
+    val getter: unit -> Fc_Filepath.Normalized.t
+    val visible_ref: bool ref
+    val kernel_get: unit -> Fc_Filepath.Normalized.t
+    val kernel_is_set: unit -> bool
+  end
+
+  module User_dir (I: User_dir_input) = struct
+    include Make_specific_dir
+        (struct
+          let option_name = I.name
+          let arg_name = "dir"
+          let help = Format.asprintf
+              "set the plug-in %s directory to <dir> \
+               (may be used on systems with no default user directory)"
+              I.name
+        end)
+        (struct
+          let dirs () = [
+            let var = "FRAMAC_" ^ (Stdlib.String.uppercase_ascii I.name) in
+            if I.kernel_is_set () then I.kernel_get ()
+            else match Sys.getenv_opt var with
+              | Some p when p <> "" -> Fc_Filepath.Normalized.of_string p
+              | _ -> I.getter ()
+          ]
+          let visible_ref = !I.visible_ref
+        end)
+  end
+
+  module Cache_dir () = User_dir
       (struct
-        let option_name = "config"
-        let arg_name = "dir"
-        let help = "set the plug-in config directory to <dir> \
-                    (may be used on systems with no default user directory)"
+        let name = "cache"
+        let getter = System_config.User_dirs.cache
+        let visible_ref = cache_visible_ref
+        let kernel_get () = !cache_ref ()
+        let kernel_is_set () = !cache_is_set_ref ()
       end)
+
+  module Config_dir () = User_dir
       (struct
-        let dirs () = [
-          let to_path = Fc_Filepath.Normalized.of_string in
-          let d, vis =
-            if !config_is_set_ref () then !config_ref (), false
-            else
-              try to_path (Sys.getenv "FRAMAC_CONFIG"), false
-              with Not_found ->
-              try to_path (Sys.getenv "USERPROFILE"), false (* Win32 *)
-              with Not_found ->
-              (* Unix like *)
-              try to_path (Sys.getenv "XDG_CONFIG_HOME"), true
-              with Not_found ->
-              try
-                Fc_Filepath.Normalized.concat
-                  (to_path (Sys.getenv "HOME")) ".config", true
-              with Not_found -> to_path ".", false
-          in
-          Fc_Filepath.Normalized.concat
-            d (if vis then "frama-c" else ".frama-c")
-        ]
-        let visible_ref = !config_visible_ref
+        let name = "config"
+        let getter = System_config.User_dirs.config
+        let visible_ref = config_visible_ref
+        let kernel_get () = !config_ref ()
+        let kernel_is_set () = !config_is_set_ref ()
+      end)
+
+  module State_dir () = User_dir
+      (struct
+        let name = "state"
+        let getter = System_config.User_dirs.state
+        let visible_ref = state_visible_ref
+        let kernel_get () = !state_ref ()
+        let kernel_is_set () = !state_is_set_ref ()
       end)
 
   let help = add_group "Getting Information"

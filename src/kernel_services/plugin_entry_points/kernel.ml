@@ -976,6 +976,21 @@ let () = Plugin.session_ref := Session_dir.get
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
+module Cache_dir =
+  P.Filepath
+    (struct
+      let option_name = "-cache"
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
+      let help = "directory in which cache files are stored"
+    end)
+let () = Plugin.cache_is_set_ref := Cache_dir.is_set
+let () = Plugin.cache_ref := Cache_dir.get
+
+let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
+let () = Parameter_customize.set_group saveload
+let () = Parameter_customize.do_not_projectify ()
 module Config_dir =
   P.Filepath
     (struct
@@ -983,10 +998,25 @@ module Config_dir =
       let arg_name = "path"
       let existence = Filepath.Indifferent
       let file_kind = "directory"
-      let help = "directory in which configuration files are searched"
+      let help = "directory in which configuration files are stored"
     end)
 let () = Plugin.config_is_set_ref := Config_dir.is_set
 let () = Plugin.config_ref := Config_dir.get
+
+let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
+let () = Parameter_customize.set_group saveload
+let () = Parameter_customize.do_not_projectify ()
+module State_dir =
+  P.Filepath
+    (struct
+      let option_name = "-state"
+      let arg_name = "path"
+      let existence = Filepath.Indifferent
+      let file_kind = "directory"
+      let help = "directory in which state files are stored"
+    end)
+let () = Plugin.state_is_set_ref := State_dir.is_set
+let () = Plugin.state_ref := State_dir.get
 
 (* ************************************************************************* *)
 (** {2 Parsing} *)

@@ -91,3 +91,7 @@ module Preprocessor = struct
 
   let supported_arch_options = [@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@]
 end
+
+module User_dirs = struct
+  include @FRAMAC_TARGET_SYSTEM_CONFIG_INCLUDE@
+end

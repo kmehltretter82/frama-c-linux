@@ -112,6 +112,18 @@ module Preprocessor : sig
   *)
 end
 
+(** Default user directories *)
+module User_dirs : sig
+  val cache: unit -> Filepath.Normalized.t
+  (** Where Frama-C should read/write cached files. *)
+
+  val config: unit -> Filepath.Normalized.t
+  (** Where Frama-C should read/write config files. *)
+
+  val state: unit -> Filepath.Normalized.t
+  (** Where Frama-C should read/write state files *)
+end
+
 val is_gui: bool
 (** Is the Frama-C GUI running? *)
 
