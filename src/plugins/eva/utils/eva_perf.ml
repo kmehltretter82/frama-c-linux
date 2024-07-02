@@ -20,459 +20,312 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
-
-(****************************************************************)
-(* Configuration *)
-
 (* Period between two consecutive displays, in seconds. *)
-let display_interval = 60.0;;
+let display_interval = 60.0
 
 (* Do not show functions that execute for less than that percent of
-   the total running time.  The value is 1/60, i.e. does not display
+   the total running time. The value is 1/60, i.e. does not display
    functions that execute for longer than 3s after it has run for
-   3 minutes.
-*)
-let does_not_account_smaller_than = 1.667
+   3 minutes. *)
+let threshold = 1.667 /. 100.
 
 (* OCaml time is not always increasing, so we use max to fix this. *)
 let duration a b = max (b -. a) 0.0
 
-(****************************************************************)
-(* The metrics being computed and displayed. *)
+(* -------------------------------------------------------------------------- *)
+(*                                 Flamegraph                                 *)
+(* -------------------------------------------------------------------------- *)
 
-(* Performance information regarding a called function. *)
-module Call_info = struct
-  type t = {
-    (* How many times the function was called. *)
-    mutable nb_calls: int;
+(* Ref to the formatter to be written if option [-eva-flamegraph] is set. *)
+let flamegraph_output = ref None
 
-    (* The accumulated execution time for past calls. *)
-    mutable total_duration: float;
+(* Sets the reference above according to -eva-flamegraph. *)
+let initialize_flamegraph () =
+  if not (Parameters.ValPerfFlamegraphs.is_empty ()) then
+    try
+      let file = Parameters.ValPerfFlamegraphs.get () in
+      let out_channel = open_out (file :> string) in
+      let formatter = Format.formatter_of_out_channel out_channel in
+      flamegraph_output := Some formatter;
+    with e ->
+      Self.error "cannot open flamegraph file: %s" (Printexc.to_string e);
+      flamegraph_output := None (* to be on the safe side *)
 
-    (* If we are executing the function, since when. It is a list
-       because of the recursive calls. *)
-    mutable since: float list;
-  }
-  ;;
-
-  let create() = { nb_calls = 0; total_duration = 0.0; since = [] };;
-
-  (* Represents the calls to the main function.  *)
-  let main = create();;
-
-  (* Also accounts for currently executing time. *)
-  let total_duration current_time call_info =
-    let additional_time = match call_info.since with
-      | [] -> 0.0
-      | since::_ -> duration since current_time
-    in
-    assert (additional_time >= 0.0);
-    additional_time +. call_info.total_duration
-  ;;
-
-
-  let print fmt kf call_info current_time =
-    let bullet = match call_info.since with
-      | [] -> "+"
-      | _::_ -> "*"
-    in
-    Format.fprintf fmt "%s %a: executed: %dx total: %.3fs\n" bullet
-      Kernel_function.pretty kf call_info.nb_calls (total_duration current_time call_info)
-  ;;
-
-  (* Sorts call_infos by decreasing execution time.  *)
-  let cmp current_time ci1 ci2 =
-    - (Stdlib.compare (total_duration current_time ci1) (total_duration current_time ci2))
-  ;;
-
-  (* From an iteration, filter and sort by call_info, and returns the
-     sorted list. *)
-  let filter_and_sort iter get_ci _parent_duration current_time =
-    let analysis_total_time = total_duration current_time main in
-    let threshold = analysis_total_time *. (does_not_account_smaller_than /. 100.0) in
-    let list = ref [] in
-    iter (fun elt ->
-        let ci = get_ci elt in
-        if total_duration current_time ci > threshold
-        then list := elt::!list);
-    let sorted_list = List.fast_sort
-        (fun elt1 elt2 -> (cmp current_time) (get_ci elt1) (get_ci elt2)) !list
-    in
-    sorted_list
-  ;;
-
-  (* before/after pair. *)
-  let before_call t since =
-    t.since <- since::t.since
-  ;;
-
-  let after_call t to_ =
-    let since = List.hd t.since in
-    let duration = duration since to_ in
-    assert (duration >= 0.0);
-    t.total_duration <- t.total_duration +. duration;
-    t.nb_calls <- t.nb_calls + 1;
-    t.since <- List.tl t.since
-  ;;
-
-
-end
-
-(****************************************************************)
-(* Flat and DAG views of performance. *)
-
-(* Note: since need to be stored only in the flat view. *)
-
-type flat_perf_info = {
-  (* The grand total performance information for the function. *)
-  call_info: Call_info.t;
-
-  (* For DAG-view: the per-caller performance information. *)
-  called_functions: Call_info.t Kernel_function.Hashtbl.t;
-}
-;;
-
-let flat_perf_create() = {
-  call_info = Call_info.create();
-  called_functions = Kernel_function.Hashtbl.create 17;
-};;
-
-let flat = Kernel_function.Hashtbl.create 17;;
-
-let flat_print current_time fmt =
-  Format.fprintf fmt "Long running functions (does not include current running time):\n";
-  Format.fprintf fmt "===============================================================\n";
-  let each_flat_entry (kf, pi) =
-    Call_info.print fmt kf pi.call_info current_time;
-    Format.fprintf fmt "    ";
-    let caller_duration = Call_info.total_duration current_time pi.call_info in
-    let total_sub = ref 0.0 in
-    let total_others = ref 0.0 in
-    let nb_others = ref 0 in
-    let each_called_entry kf ci =
-      let callee_duration = Call_info.total_duration current_time ci in
-      total_sub := !total_sub +. callee_duration;
-      let percentage = (100.0 *. (callee_duration /. caller_duration)) in
-      if percentage > 5.0
-      then
-        Format.fprintf fmt "| %a %dx %.3fs (%.1f%%) "
-          Kernel_function.pretty kf ci.Call_info.nb_calls
-          callee_duration percentage
-      else
-        (total_others := !total_others +. callee_duration;
-         incr nb_others)
-    in
-    Kernel_function.Hashtbl.iter_sorted_by_value
-      ~cmp:(Call_info.cmp current_time) each_called_entry pi.called_functions;
-    (if !nb_others > 0
-     then Format.fprintf fmt "| %d others: %.3fs (%.1f%%) "
-         !nb_others !total_others (100.0 *. !total_others /. caller_duration));
-    let self_duration = duration !total_sub caller_duration in
-    Format.fprintf fmt "| self: %.3fs (%.1f%%)|\n"
-      self_duration
-      (100.0 *. (self_duration /. caller_duration))
+(* Adds [duration] for the callstack [kf_list] into the flamegraph file. *)
+let update_flamegraph kf_list duration =
+  let print fmt =
+    let pp_callstack = Pretty_utils.pp_list ~sep:";" Kernel_function.pretty in
+    Format.fprintf fmt "%a %.3f\n%!"
+      pp_callstack (List.rev kf_list) (duration *. 1000.)
   in
-  let flat_entries = Call_info.filter_and_sort
-      (fun f -> Kernel_function.Hashtbl.iter (fun k v -> f(k,v)) flat)
-      (fun (_,v) -> v.call_info)
-      (Call_info.total_duration current_time Call_info.main)
-      current_time in
-  List.iter each_flat_entry flat_entries
-;;
+  Option.iter print !flamegraph_output
 
+(* -------------------------------------------------------------------------- *)
+(*                      Save execution time by callstack                      *)
+(* -------------------------------------------------------------------------- *)
 
-
-(****************************************************************)
-(* Per-callstack performance. *)
-
-module Call_site = Datatype.Pair(Kernel_function)(Cil_datatype.Kinstr)
-
-module Imperative_callstack_trie(M:sig type t val default:unit -> t end) = struct
-
-  module Hashtbl = Hashtbl.Make(Call_site)
-
-  type elt = {
-    mutable self: M.t ;
-    subtree: t
-  }
-
-  and t = elt Hashtbl.t
-  ;;
-
-  let empty() = Hashtbl.create 7;;
-  let reset t = Hashtbl.clear t;;
-  let create_node init =
-    { self = init; subtree = empty() }
-
-  let rec find_subtree t callstack res = match callstack with
-    | [] ->
-      (match res with
-       | None -> failwith "Called findsubtree with an empty callstack"
-       | Some x -> x)
-    | a::b ->
-      let subnode =
-        try Hashtbl.find t a
-        with Not_found -> let n = create_node (M.default()) in
-          Hashtbl.add t a n;
-          n
-      in find_subtree subnode.subtree b (Some subnode)
-
-  let find_subtree t callstack =
-    find_subtree t (Callstack.to_call_list callstack) None
-
-  let find t callstack = (find_subtree t callstack).self
-
-  let _add t callstack smth =
-    let node = find_subtree t callstack in
-    node.self <- smth
-  ;;
-
-  let _update t callstack f =
-    let node = find_subtree t callstack in
-    node.self <- f node.self
-  ;;
-end
-
-type perf_info = {
-  call_info_per_stack: Call_info.t;
+(* Statistic about the analysis of a function or a callstack. *)
+type stat = {
+  nb_calls: int; (* How many times the function has been analyzed. *)
+  self_duration: float; (* Time spent analyzing the function itself. *)
+  total_duration: float; (* Total time, including functions called. *)
+  called: Kernel_function.Hptset.t; (* Set of functions called. *)
 }
 
-module Perf_by_callstack = Imperative_callstack_trie(struct
-    type t = perf_info
-    let default() =
-      { call_info_per_stack = Call_info.create() }
+let empty_stat =
+  { nb_calls = 0; self_duration = 0.; total_duration = 0.;
+    called = Kernel_function.Hptset.empty; }
+
+module Stat = Datatype.Make (struct
+    include Datatype.Serializable_undefined
+    type t = stat
+    let name = "Eva_perf.Stat"
+    let reprs = [ empty_stat ]
   end)
 
-(* Head of the tree. Only the subtree field il really used.  *)
-let perf = Perf_by_callstack.empty();;
-let last_time_displayed = ref 0.0;;
+module KfList =
+  Datatype.List_with_collections (Kernel_function)
+    (struct let module_name = "Eva_perf.KfList" end)
 
-
-let print_indentation fmt n =
-  for _i = 0 to n-1 do Format.fprintf fmt "| " done;
-;;
-
-let rec display_node fmt kf indentation node curtime =
-  print_indentation fmt indentation;
-  Call_info.print fmt kf node.Perf_by_callstack.self.call_info_per_stack curtime;
-  display_subtree fmt (indentation+1) node.Perf_by_callstack.subtree
-    (Call_info.total_duration
-       curtime node.Perf_by_callstack.self.call_info_per_stack)
-    curtime
-
-and display_subtree fmt indentation subtree parent_duration curtime =
-  let entries = Call_info.filter_and_sort
-      (fun f -> Perf_by_callstack.Hashtbl.iter (fun k v -> f(k,v)) subtree)
-      (fun (_,node) -> node.Perf_by_callstack.self.call_info_per_stack)
-      parent_duration
-      curtime
-  in
-  List.iter (fun ((kf,_),node) -> display_node fmt kf indentation node curtime) entries;
-;;
-
-let display fmt =
-  if Parameters.ValShowPerf.get()
-  then begin
-    Format.fprintf fmt "####### Value execution feedback #########\n";
-    let current_time = (Sys.time()) in
-    flat_print current_time fmt;
-    Format.fprintf fmt "\n";
-    Format.fprintf fmt "Execution time per callstack (includes current running time):\n";
-    Format.fprintf fmt "=============================================================\n";
-    display_subtree fmt 0 perf
-      (Call_info.total_duration current_time Call_info.main) current_time;
-    Format.fprintf fmt "################\n"
+module StatByCallstack = struct
+  module Info = struct
+    let name = "Eva_perf.StatByCallstack"
+    let dependencies = [ Self.state ]
+    let size = 32;
   end
-;;
 
-let caller_callee_callinfo callstack =
-  match Callstack.top_caller callstack with
-  | Some caller_kf ->
-    let callee_kf = Callstack.top_kf callstack in
-    let caller_flat = Kernel_function.Hashtbl.find flat caller_kf in
-    (try
-       Kernel_function.Hashtbl.find caller_flat.called_functions callee_kf
-     with Not_found ->
-       let call_info = Call_info.create() in
-       Kernel_function.Hashtbl.add caller_flat.called_functions callee_kf call_info;
-       call_info)
-  | None -> Call_info.main
-;;
+  include State_builder.Hashtbl (KfList.Hashtbl) (Stat) (Info)
 
-let start_doing_perf callstack =
-  if Parameters.ValShowPerf.get()
-  then begin
-    let time = Sys.time() in
-    let kf = Callstack.top_kf callstack in
-    let flat_info =
-      try Kernel_function.Hashtbl.find flat kf
-      with Not_found ->
-        let flatp = flat_perf_create() in
-        Kernel_function.Hashtbl.add flat kf flatp; flatp
-    in
+  let get kf_list =
+    try find kf_list
+    with Not_found -> empty_stat
 
-    Call_info.before_call flat_info.call_info time;
-    Call_info.before_call (caller_callee_callinfo callstack) time;
-    let node = Perf_by_callstack.find perf callstack in
-    Call_info.before_call node.call_info_per_stack time;
+  let add_total stat total =
+    { stat with nb_calls = stat.nb_calls + 1;
+                total_duration = stat.total_duration +. total; }
 
-    if (duration !last_time_displayed time) > display_interval
-    then (last_time_displayed := time; Kernel.feedback "%t" display)
-  end
-;;
+  let add_called stat called =
+    { stat with called = Kernel_function.Hptset.add called stat.called }
 
-let stop_doing_perf callstack =
-  if Parameters.ValShowPerf.get()
-  then begin
-    let time = Sys.time() in
-    let kf = Callstack.top_kf callstack in
-    let flat_info = Kernel_function.Hashtbl.find flat kf in
-    Call_info.after_call flat_info.call_info time;
-    let node = Perf_by_callstack.find perf callstack in
-    Call_info.after_call node.call_info_per_stack time;
-    Call_info.after_call (caller_callee_callinfo callstack) time;
-  end
-;;
-
-let reset_perf () =
-  let reset_callinfo ci =
-    ci.Call_info.nb_calls <- 0;
-    ci.Call_info.total_duration <- 0.0;
-    ci.Call_info.since <- []
-  in
-  reset_callinfo Call_info.main;
-  Kernel_function.Hashtbl.clear flat;
-  last_time_displayed := 0.0;
-  Perf_by_callstack.reset perf
-;;
-
-(* -------------------------------------------------------------------------- *)
-(* --- Flamegraphs                                                        --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* Set to [Some _] if option [-eva-flamegraph] is set and [main] is
-   currently being analyzed and the file is ok. Otherwise, set to [None]. *)
-let oc_fmt_flamegraph = ref None
-
-(* We cannot use a Callstack here because we ignore the call statements. *)
-module KfList = struct
-  include Datatype.List_with_collections(Cil_datatype.Kf)
-      (struct
-        let module_name = "Eva.KfList"
-      end)
-  let pretty ?(sep=format_of_string ";") fmt l =
-    Pretty_utils.pp_flowlist ~left:"" ~sep ~right:""
-      (fun fmt kf -> Kernel_function.pretty fmt kf)
-      fmt l
+  let add ?called ?total ~self kf_list =
+    let stat = get kf_list in
+    let stat = { stat with self_duration = stat.self_duration +. self } in
+    let stat = Option.fold total ~none:stat ~some:(add_total stat) in
+    let stat = Option.fold called ~none:stat ~some:(add_called stat) in
+    replace kf_list stat
 end
 
-(* A mapping from callstacks to (time_of_last_call, total_duration).
-   [time_of_last_call] is the timestamp of the last time that the leaf function
-   in the callstack was called.
-   [total_duration] is the accumulated total amount of time spent in the
-   callstack.
-*)
-module EvaFlamegraph =
-  State_builder.Hashtbl
-    (KfList.Hashtbl)
-    (Datatype.Pair(Datatype.Float)(Datatype.Float))
-    (struct
-      let name = "Eva.Flamegraph"
-      let dependencies = [ Ast.self ]
-      let size = 20
-    end)
+(* Reference to the time at which the analysis of each function from the current
+   callstack started. The most recent function is the head of the list.
+   Set when starting the analysis of a function, used when leaving the function
+   to compute the total time the analysis has taken. *)
+let stack_timestamp = ref []
 
-(* update the [self_total_time] information for the function being analyzed,
-   assuming that the current time is [time] *)
-let update_self_total_time cl time =
-  try
-    let (start_caller, total) = EvaFlamegraph.find cl in
-    let d = duration start_caller time in
-    let new_total = d +. total in
-    EvaFlamegraph.replace cl (time, new_total);
-    new_total
-  with Not_found ->
-    Self.fatal
-      "EvaFlamegraph: caller list not found: %a"
-      (KfList.pretty ~sep:";") cl
+(* Set and used whenever the current analyzed function changes, to compute the
+   time spent analyzing each function. *)
+let last_timestamp = ref 0.
 
-let start_call_flamegraph_main cl =
-  (* Analysis of main *)
-  EvaFlamegraph.clear ();
-  EvaFlamegraph.add cl (Sys.time (), 0.0);
-  if not (Parameters.ValPerfFlamegraphs.is_empty ()) then begin
-    let file = Parameters.ValPerfFlamegraphs.get () in
-    try
-      let oc = open_out (file:>string) in
-      oc_fmt_flamegraph := Some (oc, Format.formatter_of_out_channel oc);
-    with e ->
-      Self.error "cannot open flamegraph file: %s"
-        (Printexc.to_string e);
-      oc_fmt_flamegraph := None (* to be on the safe side  *)
-  end
+let duration_since_last_timestamp current_time =
+  let duration = duration !last_timestamp current_time in
+  last_timestamp := current_time;
+  duration
 
-(* called when a new function is being analyzed *)
-let start_call_flamegraph ~prev cs =
-  let cl = Callstack.to_kf_list cs in
-  let prev = Option.map Callstack.to_kf_list prev in
-  match prev with
-  | None -> start_call_flamegraph_main cl
-  | Some prev ->
-    let time = Sys.time () in
-    ignore (update_self_total_time prev time);
-    let (_start, total) =
-      try EvaFlamegraph.find cl with Not_found -> (0.0, 0.0)
-    in
-    EvaFlamegraph.replace cl (time, total)
-;;
+(* Called at the start of the analysis of a callstack. *)
+let register_start callstack current_time =
+  let kf = Callstack.top_kf callstack in
+  let kf_list = List.map fst !stack_timestamp in
+  stack_timestamp := (kf, current_time) :: !stack_timestamp;
+  match kf_list with
+  | [] ->
+    last_timestamp := current_time;
+    initialize_flamegraph ()
+  | kf_list ->
+    let last_duration = duration_since_last_timestamp current_time in
+    StatByCallstack.add ~called:kf ~self:last_duration kf_list;
+    update_flamegraph kf_list last_duration
 
-(* called when the analysis of a function ends. This function is at the top
-   of [callstack] *)
-let end_call_flamegraph cs =
-  let cl = Callstack.to_kf_list cs in
-  let time = Sys.time () in
-  let total = update_self_total_time cl time in (* update current function *)
-  begin
-    match !oc_fmt_flamegraph with
-    | None -> ()
-    | Some (_, fmt) -> (* Flamegraphs are being written to a file *)
-      Format.fprintf fmt "%a %.3f\n%!"
-        (KfList.pretty ~sep:";") cl (total *. 1000.)
-  end
-
-let reset_flamegraph () =
-  EvaFlamegraph.clear ();
-  match !oc_fmt_flamegraph with
-  | None -> ()
-  | Some (oc, _) ->
-    close_out oc; oc_fmt_flamegraph := None
+(* Called at the end of the analysis of a callstack. *)
+let register_stop _callstack current_time =
+  let kf_list = List.map fst !stack_timestamp in
+  match !stack_timestamp with
+  | [] -> assert false
+  | (_kf, start) :: tl ->
+    stack_timestamp := tl;
+    let last_duration = duration_since_last_timestamp current_time in
+    let total = duration start current_time in
+    StatByCallstack.add ~total ~self:last_duration kf_list;
+    update_flamegraph kf_list last_duration
 
 (* -------------------------------------------------------------------------- *)
-(* --- Exported interface                                                 --- *)
+(*                    Compute execution time by function                      *)
 (* -------------------------------------------------------------------------- *)
 
-let start_call ~prev cs =
-  start_doing_perf cs;
-  start_call_flamegraph ~prev cs
+(* Returns the total duration of the analysis. *)
+let analysis_duration current_time =
+  match !stack_timestamp with
+  | [] ->
+    (* No analysis ongoing: use the duration of the main function. *)
+    let main, _ = Globals.entry_point () in
+    let stat = StatByCallstack.get [main] in
+    stat.total_duration
+  | list ->
+    (* Analysis in progress: diff between analysis start and current time. *)
+    let analysis_start = List.rev list |> List.hd |> snd in
+    duration analysis_start current_time
 
-let end_call callgraph =
-  stop_doing_perf callgraph;
-  end_call_flamegraph callgraph
+(* Updates the total duration of [stat] by the current executing time if the
+   analysis of [kf] is ongoing. *)
+let complete_duration kf stat current_time =
+  let eq_kf t = Kernel_function.equal kf (fst t) in
+  match List.find_opt eq_kf !stack_timestamp with
+  | None -> stat
+  | Some (_kf, since) ->
+    let total_duration = stat.total_duration +. (duration since current_time) in
+    { stat with total_duration }
+
+(* Filters and sorts the [list] of pairs (kf, stat) according to total time. *)
+let filter_and_sort ~total_duration ~current_time list =
+  let limit = total_duration *. threshold in
+  let complete (kf, stat) = kf, complete_duration kf stat current_time in
+  let list = List.map complete list in
+  let filter (_kf, stat) = stat.total_duration > limit in
+  let filtered, others = List.partition filter list in
+  let cmp s1 s2 = Float.compare s2.total_duration s1.total_duration in
+  List.fast_sort (fun (_, s1) (_, s2) -> cmp s1 s2) filtered, others
+
+let merge_stat s1 s2 =
+  { nb_calls = s1.nb_calls + s2.nb_calls;
+    self_duration = s1.self_duration +. s2.self_duration;
+    total_duration = s1.total_duration +. s2.total_duration;
+    called = Kernel_function.Hptset.union s1.called s2.called; }
+
+(* Use recorded stats in StatByCallstack to compute stat by functions,
+   regardless of the callstack. Returns a list of the functions with the
+   longest total analysis time. Each function is associated to its stat
+   and those of all called functions. *)
+let compute_stat_by_fun ~total_duration ~current_time =
+  let module KfHashtbl = Kernel_function.Hashtbl in
+  let stat_by_fun = KfHashtbl.create 60 in
+  let stat_by_caller = KfHashtbl.create 60 in
+  let find_calls caller =
+    KfHashtbl.memo stat_by_caller caller (fun _ -> KfHashtbl.create 32)
+  in
+  let find_stat hashtbl kf = KfHashtbl.find_def hashtbl kf empty_stat in
+  let add_stat hashtbl kf new_stat =
+    let old_stat = find_stat hashtbl kf in
+    let stat = merge_stat old_stat new_stat in
+    KfHashtbl.replace hashtbl kf stat
+  in
+  let process kf_list stat =
+    match kf_list with
+    | [] -> ()
+    | [ kf ] -> add_stat stat_by_fun kf stat
+    | kf :: caller :: _ ->
+      add_stat stat_by_fun kf stat;
+      add_stat (find_calls caller) kf stat;
+  in
+  StatByCallstack.iter process;
+  let list = KfHashtbl.to_seq stat_by_fun |> List.of_seq in
+  let filtered_sorted, _ = filter_and_sort ~total_duration ~current_time list in
+  let get_calls kf = find_calls kf |> KfHashtbl.to_seq |> List.of_seq in
+  List.map (fun (kf, stat) -> kf, (stat, get_calls kf)) filtered_sorted
+
+(* -------------------------------------------------------------------------- *)
+(*                         Print execution feedback                           *)
+(* -------------------------------------------------------------------------- *)
+
+(* Prints info on the analysis time of function [kf] given by [stat].
+   [calls] is the list of called functions with their own statistics. *)
+let print_function fmt current_time (kf, (stat, calls)) =
+  let total_duration = stat.total_duration in
+  Format.fprintf fmt "* %a: executed: %dx total: %.3fs\n    "
+    Kernel_function.pretty kf stat.nb_calls total_duration;
+  let sorted, others = filter_and_sort ~total_duration ~current_time calls in
+  let nb_others = List.length others in
+  let others_duration =
+    List.fold_left (fun acc (_kf, stat) -> acc +. stat.total_duration) 0. others
+  in
+  let percent duration = 100. *. duration /. total_duration in
+  let pp_duration fmt d = Format.fprintf fmt "%.3fs (%.1f%%)" d (percent d) in
+  let print_called (kf, stat) =
+    Format.fprintf fmt "| %a %dx %a "
+      Kernel_function.pretty kf stat.nb_calls pp_duration stat.total_duration;
+  in
+  List.iter print_called sorted;
+  if nb_others > 0 then
+    Format.fprintf fmt "| %d others: %a " nb_others pp_duration others_duration;
+  Format.fprintf fmt "| self: %a\n" pp_duration stat.self_duration
+
+(* Prints info on the functions with the longest analysis time. *)
+let print_flat ~total_duration ~current_time fmt =
+  let list = compute_stat_by_fun ~total_duration ~current_time in
+  List.iter (print_function fmt current_time) list
+
+(* Prints execution time as a tree from the main function. *)
+let print_tree ~total_duration ~current_time fmt =
+  let rec print indent previous_callstack (kf, stat) =
+    for _i = 0 to indent-1 do Format.fprintf fmt "| " done;
+    Format.fprintf fmt "* %a: executed: %dx total: %.3fs\n"
+      Kernel_function.pretty kf stat.nb_calls stat.total_duration;
+    let callstack = kf :: previous_callstack in
+    let called = Kernel_function.Hptset.elements stat.called in
+    let find_stat kf = kf, StatByCallstack.get (kf :: callstack) in
+    let calls = List.map find_stat called in
+    let sorted, _ = filter_and_sort ~total_duration ~current_time calls in
+    List.iter (print (indent+1) callstack) sorted
+  in
+  let main, _ = Globals.entry_point () in
+  let stat = StatByCallstack.get [main] in
+  print 0 [] (main, complete_duration main stat current_time)
+
+let show_perf current_time fmt =
+  let total_duration = analysis_duration current_time in
+  Format.fprintf fmt
+    "######## Eva execution feedback ########\
+     \nLong running functions:\
+     \n================================================================\n";
+  print_flat ~total_duration ~current_time fmt;
+  Format.fprintf fmt
+    "\nExecution time per callstack:\
+     \n================================================================\n";
+  print_tree ~total_duration ~current_time fmt;
+  Format.fprintf fmt " \n"
+
+(* -------------------------------------------------------------------------- *)
+(*                            Exported functions                              *)
+(* -------------------------------------------------------------------------- *)
+
+let start callstack =
+  let current_time = Sys.time () in
+  register_start callstack current_time
+
+let last_time_displayed = ref 0.0
+
+let stop callstack =
+  let current_time = Sys.time () in
+  register_stop callstack current_time;
+  if Parameters.ValShowPerf.get ()
+  && (duration !last_time_displayed current_time) > display_interval
+  then begin
+    last_time_displayed := current_time;
+    Self.feedback "%t" (show_perf current_time)
+  end
+
+let display fmt =
+  if Parameters.ValShowPerf.get ()
+  then show_perf (Sys.time ()) fmt
 
 let reset () =
-  reset_perf ();
-  reset_flamegraph ()
+  StatByCallstack.clear ();
+  flamegraph_output := None;
+  stack_timestamp := [];
+  last_timestamp := 0.;
+  last_time_displayed := 0.
 
 
-(* TODO: Output files with more graphical outputs, such as
+type 'a by_fun = (Cil_types.kernel_function * 'a) list
 
-   Gprof2dot-like output: (directory output the dot)
-   http://code.google.com/p/jrfonseca/wiki/Gprof2Dot
-
-   The latter would be useful to see when imbricated loops multiply
-   the number of calls to leaf functions.
-
-   TODO: Also account for the memexec hit rate; and for the individual
-   execution time of derived plugins.
-*)
+let compute_stat_by_fun () : (stat * stat by_fun) by_fun =
+  let current_time = Sys.time () in
+  let total_duration = analysis_duration current_time in
+  compute_stat_by_fun ~total_duration ~current_time

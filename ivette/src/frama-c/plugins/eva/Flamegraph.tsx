@@ -23,7 +23,6 @@
 import React from 'react';
 import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
-import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import { FlameGraph } from 'react-flame-graph';
@@ -34,7 +33,7 @@ import { useFlipSettings } from 'dome';
 
 // --- Flamegraph Table ---
 interface Flamegraph {
-  kfKey?: string;
+  kfDecl?: string;
   name: string;
   value: number;
   children?: Flamegraph[];
@@ -43,13 +42,13 @@ interface Flamegraph {
 const addNodeToFlamegraph = (
   flamegraph: Flamegraph,
   cs: string[],
-  row: Eva.evaFlamegraphData,
+  row: Eva.flamegraphData,
 ): void => {
   // Accumulate times for all nodes crossed
-  flamegraph.value += row.time;
+  flamegraph.value += row.totalTime;
   // updating last node
   if(cs.length === 0) {
-    flamegraph.kfKey = row.kfkey;
+    flamegraph.kfDecl = row.kfDecl;
     return;
   }
   // Search/create next node
@@ -91,7 +90,7 @@ function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const changeScope = (node:any): void => {
-    if (useScope) States.setCurrentScope(node.source.kfKey as Ast.decl);
+    if (useScope) States.setCurrentScope(node.source.kfDecl);
   };
 
   return (
@@ -120,16 +119,16 @@ function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
 export function FlamegraphComponent(): JSX.Element {
   const [useScope, flipUseScope] =
     useFlipSettings("eva.flamegraph.scope", true);
-  const model = States.useSyncArrayData(Eva.evaFlamegraph);
+  const model = States.useSyncArrayData(Eva.flamegraph);
 
   const flameGraph = React.useMemo<Flamegraph | null>(() => {
     if(model.length === 0 ) return null;
     const flame: Flamegraph = {
-      name: model[0].funlist.split(":")[0],
+      name: model[0].key.split(":")[0],
       value: 0
     };
     model.forEach(row => {
-      const cs = row.funlist.split(":");
+      const cs = row.key.split(":");
       cs.shift();
       addNodeToFlamegraph(flame, cs, row);
     });
