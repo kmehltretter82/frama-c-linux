@@ -22,6 +22,7 @@
 
 import React, { useEffect } from 'react';
 
+import { Icon } from 'dome/controls/icons';
 import { classes } from 'dome/misc/utils';
 import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
@@ -29,10 +30,9 @@ import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 
-import EvaReady from 'frama-c/plugins/eva/EvaReady';
+import { EvaReady } from 'frama-c/plugins/eva/components/AnalysisStatus';
 import * as API from './api';
 import type { marker } from 'frama-c/kernel/api/ast';
-import gearsIcon from '../eva/images/gears.svg';
 
 import './dive.css';
 
@@ -79,7 +79,16 @@ function Folder(props: FolderProps): JSX.Element {
 }
 
 function Exploring(): JSX.Element {
-  return <><img src={gearsIcon} className="exploration" />Exploring...</>;
+  return (
+  <>
+    <Icon
+      id={"SPINNER"}
+      className={"exploration"}
+      size={130}
+    />
+    Exploring...
+  </>
+  );
 }
 
 interface MarkerProps { marker: marker }

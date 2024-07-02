@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import * as Forms from 'dome/layout/forms';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 
 export type KeyVal<A> = {[key: string]: A}
 
@@ -298,3 +299,47 @@ export function domainsEquality(
     domainsToKeyVal(b)
   );
 }
+
+/* ************************************************************************ *
+ * Eva Status
+ * ************************************************************************ */
+export interface EvaStatusInfos {
+  message: string;
+  title: string;
+  icon: string;
+}
+
+export type EvaStatus = {
+  [key in Eva.computationStateType | "undefined"]: EvaStatusInfos
+}
+
+export const evaBasicStatus: EvaStatus = {
+  'undefined': {
+    message: "Eva state undefined.",
+    title: "Undefined",
+    icon: "CROSS",
+  },
+  'not_computed': {
+    message: "No Eva analysis has been run yet.",
+    title: "not_computed",
+    icon: "CROSS",
+  },
+  'computing': {
+    message: "Eva analysis in progress…",
+    title: "computing",
+    icon: "SPINNER",
+  },
+  'computed': {
+    message: "",
+    title: "computed",
+    icon: "CHECK",
+  },
+  'aborted': {
+    message: "",
+    title:
+      "The Eva analysis has been prematurely aborted by an internal error "+
+      "or a user interruption : "+
+      "the displayed results will be incomplete.",
+    icon: "WARNING",
+  },
+};

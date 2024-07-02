@@ -22,6 +22,7 @@
 
 import React from 'react';
 import _ from 'lodash';
+import { Icon } from 'dome/controls/icons';
 import * as Ivette from 'ivette';
 import * as Server from 'frama-c/server';
 
@@ -38,7 +39,6 @@ import style from './graph-style.json';
 import { useGlobalState } from 'dome/data/states';
 import * as States from 'frama-c/states';
 
-import gearsIcon from 'frama-c/plugins/eva/images/gears.svg';
 import { CallstackState } from 'frama-c/plugins/eva/valuetable';
 
 import './callgraph.css';
@@ -156,7 +156,13 @@ function Callgraph() : JSX.Element {
 
   if (isComputed === false) {
     Server.send(CgAPI.compute, null);
-    return (<img src={gearsIcon} className="callgraph-computing" />);
+    return (
+      <Icon
+        id={"SPINNER"}
+        className={"callgraph-computing"}
+        size={130}
+      />
+    );
   }
   else if (graph !== undefined) {
     return (

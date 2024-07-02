@@ -32,7 +32,10 @@ import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
-import EvaReady from './EvaReady';
+import {
+  EvaReady,
+  EvaStatus
+} from 'frama-c/plugins/eva/components/AnalysisStatus';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -1138,6 +1141,7 @@ function EvaTable(): JSX.Element {
   return (
     <>
       <Ivette.TitleBar>
+        <EvaStatus iconSize={12} showStatus={["computed", "aborted"]}/>
         <IconButton
           icon="ITEMS.LIST"
           title="Show values by callstack by default"
