@@ -295,6 +295,11 @@ struct
     let is_visible = !share_visible_ref
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
+    let () =
+      Parameter_customize.set_cmdline_stage Cmdline.Extended;
+      if is_visible then Parameter_customize.is_reconfigurable ()
+      else Parameter_customize.is_invisible ()
+
     module Dir_name =
       Filepath
         (struct
