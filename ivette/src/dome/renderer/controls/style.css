@@ -16,6 +16,7 @@
 /* -------------------------------------------------------------------------- */
 /* --- Styling Icons                                                      --- */
 /* -------------------------------------------------------------------------- */
+@keyframes dome-xIcon-spinner { to { rotate: 360deg; } }
 
 .dome-xIcon {
     flex: 0 0 auto ;
@@ -34,6 +35,7 @@
 .dome-xIcon-positive { fill: var(--positive-button-color) ; }
 .dome-xIcon-negative { fill: var(--negative-button-color) ; }
 .dome-xIcon-warning { fill: var(--warning-button-hover) ; }
+.dome-xIcon-spinning svg { animation: dome-xIcon-spinner 1.3s linear infinite; }
 
 .dome-xBadge {
     flex: 0 0 auto ;

@@ -51,6 +51,8 @@ export interface LabelProps {
   title?: string;
   /** Icon kind. */
   kind?: IconKind,
+  /** Icon spinning */
+  spinning?: boolean;
   /** Additional class. */
   className?: string;
   /** Additional class for icon. */
@@ -98,7 +100,11 @@ const makeLabel = (className: string) =>
         htmlFor={props.htmlFor}
       >
         {props.icon &&
-         <Icon title={props.title} id={props.icon} className={iconClass} />}
+          <Icon title={props.title}
+                id={props.icon}
+                className={iconClass}
+                spinning={props.spinning}
+          />}
         {props.label}
         {props.children}
       </label>

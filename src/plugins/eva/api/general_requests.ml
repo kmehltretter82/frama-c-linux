@@ -872,14 +872,6 @@ let () = Request.register ~package
     ~signals:[computation_signal]
     get_states
 
-let () = Request.register ~package
-    ~kind:`GET ~name:"getCurrentLoc"
-    ~descr:(Md.plain "Get current location")
-    ~input:(module Data.Junit)
-    ~output:(module Kernel_ast.Position)
-    ~signals:[]
-    (fun () -> fst (Current_loc.get ()))
-
 (* -------------------------------------------------------------------------- *)
 (* --- Eva Options                                                        --- *)
 (* -------------------------------------------------------------------------- *)

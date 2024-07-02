@@ -112,6 +112,8 @@ export interface IconProps extends SVGprops {
   fill?: string;
   /** Icon Kind. */
   kind?: IconKind;
+  /** Icon spinning */
+  spinning?: boolean;
   /** Click callback. */
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
   /** Right-Click callback. */
@@ -127,12 +129,14 @@ export function Icon(props: IconProps): JSX.Element {
     id, title, fill, kind='default',
     size, className, offset, style,
     visible = true, display = true,
-    onClick, onContextMenu,
+    spinning, onClick, onContextMenu,
   } = props;
+  const forceSpinning = Boolean(id === "SPINNER" && spinning === undefined);
   const divClass = classes(
     'dome-xIcon', `dome-xIcon-${kind}`,
     !visible && 'dome-control-hidden',
     !display && 'dome-control-erased',
+    (forceSpinning || spinning) && 'dome-xIcon-spinning',
     className
   );
   const divStyle = styles(fill && { fill }, style);

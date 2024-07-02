@@ -42,8 +42,6 @@ import { byDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { bySource } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { decl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { declDefault } from 'frama-c/kernel/api/ast';
@@ -52,15 +50,9 @@ import { jDecl } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { jMarker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
-import { jSource } from 'frama-c/kernel/api/ast';
-//@ts-ignore
 import { marker } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { markerDefault } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { source } from 'frama-c/kernel/api/ast';
-//@ts-ignore
-import { sourceDefault } from 'frama-c/kernel/api/ast';
 //@ts-ignore
 import { byTag } from 'frama-c/kernel/api/data';
 //@ts-ignore
@@ -767,17 +759,6 @@ export const getStates: Server.GetRequest<
   [ marker, boolean ],
   [ string, string, string ][]
   >= getStates_internal;
-
-const getCurrentLoc_internal: Server.GetRequest<null,source> = {
-  kind: Server.RqKind.GET,
-  name: 'plugins.eva.general.getCurrentLoc',
-  input: Json.jNull,
-  output: jSource,
-  fallback: sourceDefault,
-  signals: [],
-};
-/** Get current location */
-export const getCurrentLoc: Server.GetRequest<null,source>= getCurrentLoc_internal;
 
 /** Signal for state [`eva`](#eva)  */
 export const signalEva: Server.Signal = {

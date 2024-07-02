@@ -4,7 +4,6 @@
 
 :root {
   --eva-min-width: 90px;
-  --eva-shadow-warning: darkorange;
 }
 
 
@@ -338,29 +337,20 @@ tr:first-of-type > .eva-table-callsite-box {
 /* -------------------------------------------------------------------------- */
 /* --- Sidebar Eva                                                        --- */
 /* -------------------------------------------------------------------------- */
-@keyframes eva-spinner {
-  from {
-      transform: rotate(-90deg);
-  } to {
-      transform: rotate(270deg);
-  }
-}
 
 /* ------------------ */
 /* --- Tools Eva  --- */
 .eva-tools {
-  display: block;
   position: sticky;
   top: 0px;
   z-index: 10;
   background-color: var(--background-profound);
   padding: 5px;
-  border: 5px outset;
-  border-color: rgb(from var(--border-discrete) r g b / .7);
-  margin: 10px;
+  border-bottom: solid 1px var(--border-discrete);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
 
   .eva-tools-actions {
     display: flex;
@@ -374,9 +364,7 @@ tr:first-of-type > .eva-table-callsite-box {
     cursor: pointer;
     color: var(--background-button-hover);
   }
-  .eva-status-icon.eva-computing {
-    transform: rotate(90deg);
-    animation: eva-spinner .9s linear infinite;
+  .eva-status-icon.eva-computing svg {
     fill: var(--eva-alarms-unknown);
   }
   .eva-status-icon.eva-computed { fill: var(--eva-alarms-true); }
@@ -389,11 +377,6 @@ tr:first-of-type > .eva-table-callsite-box {
 /* ------------------ */
 /* --- Form Eva   --- */
 .eva-form {
-  padding: 4px 12px;
-  display: flex;
-  flex-wrap: nowrap;
-  flex-direction: column;
-
   >label.dome-xCheckbox{
     display: flex;
     flex-direction: row-reverse;
@@ -424,13 +407,9 @@ tr:first-of-type > .eva-table-callsite-box {
   }
 
   .dome-xForm-field-actions { min-width: 42px; }
-
-  .dome-xCheckbox { overflow: hidden; }
-
   .dome-xForm-field {
-    padding: 1px;
-
     >input[type=radio] { display: none; }
+
     &:has(> input[type=radio]) {
       min-width: 0px;
       border-radius: 2em 2em;
@@ -442,58 +421,36 @@ tr:first-of-type > .eva-table-callsite-box {
       border-color: var(--border);
       cursor:default;
     }
-  }
 
-  .dome-xButton,
-  .dome-xForm-field:has(> input[type=radio]) {
-    border: solid 1px;
-    border-color: var(--border);
-    color: var(--text-discrete);
-    background-color: transparent;
-    background-image: none;
-  }
+    &:has(> input[type=radio]) {
+      border: solid 1px;
+      border-color: var(--border);
+      color: var(--text-discrete);
+      background-color: transparent;
+      background-image: none;
+    }
 
-  .dome-xButton:hover,
-  .dome-xForm-field:has(> input[type=radio]):hover {
-    cursor: pointer;
-    border-color: var(--text-highlighted);
-    color: var(--text-highlighted);
-    background-color: transparent;
-    background-image: none ;
-  }
+    &:has(> input[type=radio]):hover {
+      cursor: pointer;
+      border-color: var(--text-highlighted);
+      color: var(--text-highlighted);
+      background-color: transparent;
+      background-image: none ;
+    }
 
-  .dome-xButton-selected,
-  .dome-xForm-field:has(> input[type=radio]:checked) {
-    color: var(--text);
-    background-color: var(--checked-element);
-    background-image: none;
-  }
-
-  .dome-xButton-selected:hover {
-    border-color: var(--text-highlighted);
-    background-image: none ;
-    background-color: var(--checked-element);
-    opacity: 0.5;
+    &:has(> input[type=radio]:checked) {
+      color: var(--text);
+      background-color: var(--checked-element);
+      background-image: none;
+    }
   }
 
   .dome-xForm-field-block:has(> .dome-xForm-field .eva-field-modified) {
-    box-shadow: -4px 0px 4px var(--eva-shadow-warning);
+    box-shadow: -4px 0px 4px var(--warning);
   }
 
   .dome-xForm-field-block:has(.dome-xForm-field .hidden-field) {
     display: none;
-  }
-
-  input[type=number] {
-    background-color: var(--background-interaction);
-    color: var(--text);
-    text-align: right;
-    width: 80px;
-    max-width: 100%;
-    margin-right: 0;
-    padding: 1px;
-    margin-right: 5px;
-    border: none;
   }
 }
 
