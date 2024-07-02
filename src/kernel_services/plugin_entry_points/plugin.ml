@@ -43,7 +43,7 @@ module type S_no_log = sig
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
   module Share: Parameter_sig.Dune_site_dir
-  module Session: Parameter_sig.Specific_dir
+  module Session: Parameter_sig.User_dir
   module Cache_dir () : Parameter_sig.User_dir
   module Config_dir () : Parameter_sig.User_dir
   module State_dir () : Parameter_sig.User_dir
@@ -313,7 +313,9 @@ struct
     let get () = Dir_name.get ()
     let is_set () = Dir_name.is_set ()
 
-    let add_plugin path = Datatype.Filepath.concat path plugin_subpath
+    let add_plugin path =
+      if is_kernel then path
+      else Datatype.Filepath.concat path plugin_subpath
 
     let dirs =
       if is_visible && Dir_name.is_set ()
@@ -364,10 +366,10 @@ struct
   module Make_specific_dir
       (O: Parameter_sig.Input_with_arg)
       (D: sig
-         val dirs: unit -> Fc_Filepath.Normalized.t list
+         val dir: unit -> Fc_Filepath.Normalized.t
          val visible_ref: bool
        end) :
-    Parameter_sig.Specific_dir
+    Parameter_sig.User_dir
   =
   struct
 
@@ -402,85 +404,29 @@ struct
     let get () = Dir_name.get ()
     let is_set () = Dir_name.is_set ()
 
-    let base_dirs () =
-      (* Get the specified dir if any. *)
-      let plugin_base_dir =
-        if is_visible
-        then Dir_name.get ()
-        else Datatype.Filepath.dummy
-      in
-      if not (plugin_base_dir = Datatype.Filepath.dummy)
-      then [plugin_base_dir]
-      else begin
-        (* No specified dir: look for the default ones.
-           At least one default value must be in place. *)
-        let dirs = D.dirs () in
-        assert (dirs <> []);
-        if is_kernel
-        then dirs
-        else
-          List.map
-            (fun x -> Datatype.Filepath.concat x plugin_subpath)
-            dirs
-      end
+    let add_plugin path =
+      if is_kernel then path
+      else Datatype.Filepath.concat path plugin_subpath
+
+    let base_dir () =
+      if is_visible && Dir_name.is_set ()
+      then Dir_name.get ()
+      else add_plugin @@ D.dir ()
 
     let get_dir ?(mode=`Normalize_only) s =
-      (* In presence of more than one base directory, consider the first to
-             form the resulting [filepath]. *)
-      let filepath =
-        match base_dirs () with
-        | [] -> assert false
-        | d :: _ -> Datatype.Filepath.concat d s
-      in
+      let dir = Datatype.Filepath.concat (base_dir ()) s in
       match mode with
-      | `Must_exist ->
-        begin
-          let dir =
-            let exception Found of Datatype.Filepath.t in
-            try
-              List.fold_left
-                (fun dummy d ->
-                   let name = Datatype.Filepath.concat d s in
-                   if Fc_Filepath.exists name
-                   then raise (Found name)
-                   else dummy)
-                None
-                (base_dirs ())
-            with Found d ->
-              Some d
-          in
-          match dir with
-          | None ->
-            let pp_path fmt (path:Dir_name.t) =
-              Format.pp_print_string fmt (path :> string)
-            in
-            let pp_subdir fmt = function
-              | "." -> ()
-              | s -> Format.fprintf fmt " sub-directory %s in " s
-            in
-            L.abort "there is no%a %s directories: %a"
-              pp_subdir s
-              O.option_name
-              (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt ", ") pp_path)
-              (base_dirs ())
-          | Some d -> d
-        end
-      | `Normalize_only ->
-        filepath
+      | `Normalize_only -> dir
       | `Create_path ->
-        begin
-          (try
-             if not (Fc_Filepath.is_dir filepath)
-             then
-               (* [filepath] already exists, and it is a file. *)
-               L.abort
-                 "cannot create directory as file %a already exists"
-                 Datatype.Filepath.pretty filepath
-           with Sys_error _ ->
-             (* [filepath] does not exist: create the directory path. *)
-             ignore (mk_dir (filepath :> string)));
-          filepath
-        end
+        try
+          if not @@ Fc_Filepath.is_dir dir
+          then
+            L.abort
+              "cannot create directory as file %a already exists"
+              Datatype.Filepath.pretty dir
+          else dir
+        with Sys_error _ ->
+          ignore (mk_dir (dir :> string)); dir
 
     let get_file ?(mode=`Normalize_only) s =
       let s_dirname = Filename.dirname s in
@@ -488,10 +434,6 @@ struct
       let s_basename = Filename.basename s in
       let filepath = Datatype.Filepath.concat base_dir s_basename in
       match mode with
-      | `Must_exist ->
-        if Fc_Filepath.exists filepath
-        then filepath
-        else L.abort "there is no file %s in %s directories" (filepath :> string) O.option_name
       | `Normalize_only ->
         filepath
       | `Create_path ->
@@ -501,7 +443,6 @@ struct
 
   end
 
-
   module Session =
     Make_specific_dir
       (struct
@@ -510,13 +451,14 @@ struct
         let help = "set the plug-in session directory to <dir>"
       end)
       (struct
-        let dirs () = [
-          if !session_is_set_ref () then !session_ref ()
+        let dir () =
+          if !session_is_set_ref ()
+          then !session_ref ()
           else
             Fc_Filepath.Normalized.of_string
               (try Sys.getenv "FRAMAC_SESSION"
                with Not_found -> "./.frama-c")
-        ]
+
         let visible_ref = !session_visible_ref
       end)
 
@@ -538,13 +480,13 @@ struct
               I.name
         end)
         (struct
-          let dirs () = [
+          let dir () =
             let var = "FRAMAC_" ^ (Stdlib.String.uppercase_ascii I.name) in
             if I.kernel_is_set () then I.kernel_get ()
             else match Sys.getenv_opt var with
               | Some p when p <> "" -> Fc_Filepath.Normalized.of_string p
               | _ -> I.getter ()
-          ]
+
           let visible_ref = !Parameter_customize.is_visible_ref
         end)
 

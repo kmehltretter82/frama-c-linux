@@ -51,7 +51,7 @@ module type S_no_log = sig
 
   (** Handle the specific `session' directory of the plug-in.
       @since Neon-20140301 *)
-  module Session: Parameter_sig.Specific_dir
+  module Session: Parameter_sig.User_dir
 
   (** Handle the specific `cache' directory of the plug-in.
       @since Frama-C+dev
