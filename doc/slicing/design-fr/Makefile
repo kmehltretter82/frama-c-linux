@@ -25,7 +25,7 @@
 all: main.pdf
 
 GENERATED=biblio.bib
-GENERATED+=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
+GENERATED+=frama-c-book.cls
 FRAMAC_DOC_ROOT_DIR=../..
 include $(FRAMAC_DOC_ROOT_DIR)/MakeLaTeXModern
 

@@ -25,14 +25,14 @@
 all: main.pdf
 
 GENERATED=biblio.bib
-GENERATED+=frama-c-book.cls frama-c-cover.pdf frama-c-left.pdf frama-c-right.pdf
+GENERATED+=frama-c-book.cls
 include ../MakeLaTeXModern
 
 DWNLDDIR=../manuals
 DOCNAME=pdg-documentation-fr.pdf
 TEST_DIR=../../tests/pdg
 
-BIB_FILE = ../slicing/bib-slicing.bib
+BIB_FILE = ../slicing/design-fr/bib-slicing.bib
 main.bbl : $(BIB_FILE)
 	@echo "=== Fichier .bib plus récent -> effacement du .bbl"
 	rm -f $(SRC).bbl
@@ -47,13 +47,9 @@ main.pdf: $(FRAMAC_MODERN) $(BIB_FILE) \
 
 ###############################################################################
 
-GENERATED+=call-f.fig call-g.fig
-%.fig : %.dot
-	dot -Tfig $< > $@
-
 GENERATED+=call-f.pdf call-g.pdf
-%.pdf : %.fig
-	fig2dev -L pdf $< $@
+%.pdf : %.dot
+	dot -Tpdf $< > $@
 
 GENERATED+=call-f.dot call-g.dot
 call-%.dot : $(TEST_DIR)/oracle/call.%.dot
