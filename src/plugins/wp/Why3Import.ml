@@ -121,7 +121,9 @@ type env = {
   lenv : C.logic_info W.Term.Hls.t;
   lils : W.Term.lsymbol Logic_info.Hashtbl.t;
   ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
-  menv : why3module Datatype.String.Hashtbl.t
+  menv : why3module Datatype.String.Hashtbl.t;
+  tloc : C.logic_type_info Location.Hashtbl.t;
+  lloc : C.logic_info Location.Hashtbl.t;
 }
 
 type menv = {
@@ -135,7 +137,9 @@ let create_empty_env wenv =
   let lils  = Logic_info.Hashtbl.create 0 in
   let ltits  = Logic_type_info.Hashtbl.create 0 in
   let menv  = Datatype.String.Hashtbl.create 0 in
-  { wenv; tenv; lenv; lils; ltits; menv }
+  let tloc = Location.Hashtbl.create 0 in
+  let lloc = Location.Hashtbl.create 0 in
+  { wenv; tenv; lenv; lils; ltits; menv; tloc; lloc }
 
 
 (* -------------------------------------------------------------------------- *)
@@ -166,34 +170,31 @@ let add_builtins env =
 (* ---    Location handling                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let convert_location (wloc : Why3.Loc.position) : C.location =
-  let (file,lstart,cstart,lend,cend) = Why3.Loc.get wloc in
-  let pstart = {
-    Filepath.pos_path = F.of_string file;
-    pos_lnum = lstart;
-    pos_bol = 0;
-    pos_cnum = cstart;
-  }  in
-  let pend = {
-    Filepath.pos_path = F.of_string file;
-    pos_lnum = lend;
-    pos_bol = 0;
-    pos_cnum = cend;
-  } in (pstart, pend)
+let convert_location (wloc : Why3.Loc.position option) : C.location =
+  match wloc with
+  | Some loc ->
+    let (file,lstart,cstart,lend,cend) = Why3.Loc.get loc in
+    let pstart = {
+      Filepath.pos_path = F.of_string file;
+      pos_lnum = lstart;
+      pos_bol = 0;
+      pos_cnum = cstart;
+    }  in
+    let pend = {
+      Filepath.pos_path = F.of_string file;
+      pos_lnum = lend;
+      pos_bol = 0;
+      pos_cnum = cend;
+    } in (pstart, pend)
+  | None ->
+    (Position.unknown, Position.unknown)
+
 
 (* For debug use only *)
 let pp_cil_loc fmt (id : W.Ident.ident) =
-  match id.id_loc with
-  | Some loc -> Cpp.pp_location fmt (convert_location loc)
-  | None -> L.error "No location found"
+  Cpp.pp_location fmt @@ convert_location id.id_loc
 
-let pp_cil_loc_pos fmt (id : W.Ident.ident) =
-  match id.id_loc with
-  | Some loc ->
-    let (ps,pe) = convert_location loc in
-    Filepath.pp_pos fmt ps;
-    Filepath.pp_pos fmt pe;
-  | None -> L.error "No location found"
+
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)
@@ -232,6 +233,7 @@ and lti_of_ts (env : env) (menv : menv) (ts : W.Ty.tysymbol) : C.logic_type_info
       }
     in W.Ty.Hts.add env.tenv ts lti ;
     menv.lti <- lti :: menv.lti;
+    Location.Hashtbl.add env.tloc (convert_location ts.ts_name.id_loc) lti;
     Logic_type_info.Hashtbl.add env.ltits lti ts;
     lti
 
@@ -267,7 +269,9 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
   menv.li <- li :: menv.li;
-  Logic_info.Hashtbl.add env.lils li ls; li
+  Location.Hashtbl.add env.lloc (convert_location ls.ls_name.id_loc) li;
+  Logic_info.Hashtbl.add env.lils li ls;
+  li
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
@@ -357,15 +361,23 @@ let () =
                 pp_lti lti pp_tys ts;
               L.result "Logic type info located at : %a" pp_id_loc ts.ts_name;
               L.result "CIL Location will be %a" pp_cil_loc ts.ts_name;
-              L.result "with positions %a" pp_cil_loc_pos ts.ts_name )
+            )
             env.ltits;
           Logic_info.Hashtbl.iter ( fun (li) (ls) ->
               L.result "Logic info %a is associated to ls : %a "
                 pp_li li pp_ls ls;
               L.result "Logic info located at : %a" pp_id_loc ls.ls_name;
               L.result "CIL Location will be %a" pp_cil_loc ls.ls_name;
-              L.result "with positions %a" pp_cil_loc_pos ls.ls_name  )
+            )
             env.lils;
+          Location.Hashtbl.iter ( fun (loc) (lti) ->
+              L.result "Logic info %a is associated to loc %a "
+                pp_lti lti Cpp.pp_location loc;
+            ) env.tloc;
+          Location.Hashtbl.iter ( fun (loc) (li) ->
+              L.result "Logic info %a is associated to loc %a "
+                pp_li li Cpp.pp_location loc;
+            ) env.lloc;
         end
     end
 
