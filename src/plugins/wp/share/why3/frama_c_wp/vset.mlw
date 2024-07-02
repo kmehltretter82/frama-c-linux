@@ -39,10 +39,8 @@ theory Vset
   function singleton 'a : set 'a
 
   function union (set 'a) (set 'a) : set 'a
-  clone algebra.AC as Lunion with type t = set 'a, function op = union with axiom .
 
   function inter (set 'a) (set 'a) : set 'a
-  clone algebra.AC as Linter with type t = set 'a, function op = inter with axiom .
 
   predicate member 'a (set 'a)
   function member_bool 'a (set 'a) : bool

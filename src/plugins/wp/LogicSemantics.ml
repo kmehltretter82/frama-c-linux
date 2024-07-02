@@ -686,7 +686,7 @@ struct
         | Ctype t -> Lang.assume (Cvalues.has_ctype t r)
         | _ -> ()
       end ;
-      Vexp r
+      Cvalues.plain t.term_type r
 
     | Tlambda _ ->
       Warning.error "Lambda-functions not yet implemented"

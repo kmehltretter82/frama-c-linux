@@ -94,16 +94,33 @@ let pretty fmt = function
 let library = "vset"
 
 let adt_set = Lang.datatype ~library "set"
-let tau_of_set te = Logic.Data( adt_set , [te] )
+let tau_of_set (te:tau) : tau = Logic.Data( adt_set , [te] )
+
+let typecheck_binop (params:tau option list) : tau =
+  match params with
+  | [] | [ _ ] -> raise (Invalid_argument "WP.Vset.typecheck_binop: too few arguments")
+  | [ Some t ; _ ] -> t
+  | [ None ; Some t ] -> t
+  | _ -> raise (Invalid_argument "WP.Vset.typecheck_binop: too many arguments")
+
+let typecheck_unop (params:tau option list) : tau =
+  match params with
+  | [] -> raise (Invalid_argument "WP.Vset.typecheck_unop: too few arguments")
+  | [ Some t ] -> tau_of_set t
+  | _ -> raise (Invalid_argument "WP.Vset.typecheck_unop: too many arguments")
+
+let typecheck_range (_:tau option list) : tau =
+  tau_of_set Logic.Int
+
 let p_member = Lang.extern_p ~library ~bool:"member_bool" ~prop:"member" ()
 let f_empty = Lang.extern_f ~library "empty"
-let f_union = Lang.extern_f ~library "union"
-let f_inter = Lang.extern_f ~library "inter"
-let f_range = Lang.extern_f ~library "range"
-let f_range_sup = Lang.extern_f ~library "range_sup"
-let f_range_inf = Lang.extern_f ~library "range_inf"
-let f_range_all = Lang.extern_f ~library "range_all"
-let f_singleton = Lang.extern_f ~library "singleton"
+let f_union = Lang.extern_f ~library ~typecheck:typecheck_binop "union"
+let f_inter = Lang.extern_f ~library ~typecheck:typecheck_binop "inter"
+let f_range = Lang.extern_f ~library ~typecheck:typecheck_range "range"
+let f_range_sup = Lang.extern_f ~library ~typecheck:typecheck_range "range_sup"
+let f_range_inf = Lang.extern_f ~library ~typecheck:typecheck_range "range_inf"
+let f_range_all = Lang.extern_f ~library ~typecheck:typecheck_range "range_all"
+let f_singleton = Lang.extern_f ~library ~typecheck:typecheck_unop "singleton"
 
 let single a b = match a,b with
   | Some x , Some y when F.QED.equal x y -> a
