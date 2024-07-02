@@ -84,6 +84,8 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   | Some loc -> W.Loc.pp_position fmt loc
   | None -> L.error "No location found"
 
+
+
 (* For debug only*)
 let pp_lti fmt (lti : C.logic_type_info) =
   Cpp.pp_logic_type_info fmt lti
@@ -91,6 +93,7 @@ let pp_lti fmt (lti : C.logic_type_info) =
 (* For debug only*)
 let pp_li fmt (li : C.logic_info) =
   Cpp.pp_logic_info fmt li
+
 
 (* For debug only*)
 let pp_lvs fmt (lvs : C.logic_var list) =
@@ -134,6 +137,7 @@ let create_empty_env wenv =
   let menv  = Datatype.String.Hashtbl.create 0 in
   { wenv; tenv; lenv; lils; ltits; menv }
 
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
 (* -------------------------------------------------------------------------- *)
@@ -158,6 +162,38 @@ let add_builtins env =
     add_builtin env.tenv ts_set "set" ["A"];
   end
 
+(* -------------------------------------------------------------------------- *)
+(* ---    Location handling                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let convert_location (wloc : Why3.Loc.position) : C.location =
+  let (file,lstart,cstart,lend,cend) = Why3.Loc.get wloc in
+  let pstart = {
+    Filepath.pos_path = F.of_string file;
+    pos_lnum = lstart;
+    pos_bol = 0;
+    pos_cnum = cstart;
+  }  in
+  let pend = {
+    Filepath.pos_path = F.of_string file;
+    pos_lnum = lend;
+    pos_bol = 0;
+    pos_cnum = cend;
+  } in (pstart, pend)
+
+(* For debug use only *)
+let pp_cil_loc fmt (id : W.Ident.ident) =
+  match id.id_loc with
+  | Some loc -> Cpp.pp_location fmt (convert_location loc)
+  | None -> L.error "No location found"
+
+let pp_cil_loc_pos fmt (id : W.Ident.ident) =
+  match id.id_loc with
+  | Some loc ->
+    let (ps,pe) = convert_location loc in
+    Filepath.pp_pos fmt ps;
+    Filepath.pp_pos fmt pe;
+  | None -> L.error "No location found"
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)
@@ -309,7 +345,8 @@ let () =
           Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
               L.result "@[Module %s at %s@]" s (String.concat "::" why3mod.paths);
               List.iter (fun (li) ->
-                  L.result "Logic : @[<hov1>%a@]" pp_li li)
+                  L.result "Logic : @[<hov1>%a@]" pp_li li;
+                )
                 why3mod.logics;
               List.iter (fun (lti) ->
                   L.result "Type : @[<hov1>%a@]" pp_lti lti)
@@ -317,11 +354,17 @@ let () =
             ) env.menv;
           Logic_type_info.Hashtbl.iter ( fun (lti) (ts) ->
               L.result "Logic type info : %a is associated to ts : %a "
-                pp_lti lti pp_tys ts )
+                pp_lti lti pp_tys ts;
+              L.result "Logic type info located at : %a" pp_id_loc ts.ts_name;
+              L.result "CIL Location will be %a" pp_cil_loc ts.ts_name;
+              L.result "with positions %a" pp_cil_loc_pos ts.ts_name )
             env.ltits;
           Logic_info.Hashtbl.iter ( fun (li) (ls) ->
               L.result "Logic info %a is associated to ls : %a "
-                pp_li li pp_ls ls )
+                pp_li li pp_ls ls;
+              L.result "Logic info located at : %a" pp_id_loc ls.ls_name;
+              L.result "CIL Location will be %a" pp_cil_loc ls.ls_name;
+              L.result "with positions %a" pp_cil_loc_pos ls.ls_name  )
             env.lils;
         end
     end
