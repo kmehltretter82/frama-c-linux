@@ -426,10 +426,7 @@ struct
   let export_widening (w: widening) =
     let stmt = w.widening_stmt in 
     let states = w.widening_partition |>
-                 Partition.filter_map (fun _k w_state -> 
-                     let state = match w_state.widened_state with
-                       | None -> Option.get w_state.previous_state
-                       | Some v -> v in
-                     Some state) in
+                 Partition.filter_map 
+                   (fun _k w_state -> w_state.widened_state) in
     stmt, states
 end
