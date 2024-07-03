@@ -126,27 +126,6 @@ val of_int32 : Int32.t -> t
 
 (**
    @raise Z.Overflow if too big
-   @deprecated 24.0-Chromium Renamed to [to_int_exn].
-                           Also consider using [to_int_opt].
-*)
-val to_int : t -> int [@@deprecated]
-
-(**
-   @raise Z.Overflow if too big
-   @deprecated 24.0-Chromium Renamed to [to_int64_exn].
-                           Also consider using [to_int64_opt].
-*)
-val to_int64 : t -> int64 [@@deprecated]
-
-(**
-   @raise Z.Overflow if too big
-   @deprecated 24.0-Chromium Renamed to [to_int32_exn].
-                           Also consider using [to_int32_opt].
-*)
-val to_int32 : t -> int32 [@@deprecated]
-
-(**
-   @raise Z.Overflow if too big
    @since 24.0-Chromium
 *)
 val to_int_exn : t -> int
