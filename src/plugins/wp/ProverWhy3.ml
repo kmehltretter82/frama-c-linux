@@ -1406,7 +1406,9 @@ let editor_mutex = Task.mutex ()
 let editor_command pconf =
   let config = Why3Provers.config () in
   try
-    let ed = Why3.Whyconf.editor_by_id config pconf.Why3.Whyconf.editor in
+    let prover = pconf.Why3.Whyconf.prover in
+    let ed_id = Why3.Whyconf.get_prover_editor config prover in
+    let ed = Why3.Whyconf.editor_by_id config ed_id in
     String.concat " " (ed.editor_command :: ed.editor_options)
   with Not_found ->
     Why3.Whyconf.(default_editor (get_main config))
