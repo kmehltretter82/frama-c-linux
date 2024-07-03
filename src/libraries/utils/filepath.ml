@@ -297,9 +297,7 @@ module Normalized = struct
         (String.lowercase_ascii s2)
 
   let empty = normalize ""
-  let unknown = empty
   let is_empty fp = equal fp empty
-  let is_unknown = is_empty
   let special_stdout = normalize "-"
   let is_special_stdout fp = equal fp special_stdout
 
