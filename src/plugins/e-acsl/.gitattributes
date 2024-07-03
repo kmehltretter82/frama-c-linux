@@ -5,10 +5,7 @@
 dune-project header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 dune header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 
-configure.ac header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
-
 Makefile header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
-Makefile.in header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 
 *.c header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL
 *.h header_spec=CEA_LGPL_OR_PROPRIETARY.E_ACSL

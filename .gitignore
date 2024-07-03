@@ -3,24 +3,15 @@
 ###########
 
 TAGS
-*.annot
-#ocamlyacc -v
-*.output
 *~
-*_DEP
-*.depend
 \#*
 .\#*
 .DS_Store
 *.tmp
 
 #artifacts from execution
-frama_c_journal.ml
 /.frama-c/
-/frama-c*.tar.gz
 /.merlin
-/headers/hdrck
-/headers/hdrck.exe
 /bin/ivette
 .ivette
 
@@ -54,19 +45,10 @@ _bisect
 /tests/crowbar/mutable
 /tests/crowbar/output-*
 /tests/crowbar/test_ghost_cfg
-/tests/*/*.opt
 
 /.test-errors.log
 
-/dev/fc-time
-/dev/fc-memuse
-/bin/ocamldep_transitive_closure
-
 #share
-/share/Makefile.config
-/share/Makefile.dynamic_config
-/share/Makefile.kernel
-/share/frama-c.rc
 #created by create_share_link target
 /share/.gitignore
 /share/manuals/
@@ -110,11 +92,6 @@ _bisect
 /doc/code/print_api/dynamic_plugins.mli
 /doc/code/print_api/_build/
 
-/doc/developer/tutorial/viewcfg/src/META.frama-c-viewcfg
-/doc/developer/tutorial/viewcfg/src/Makefile
-/doc/developer/tutorial/viewcfg/src/gui/
-/doc/developer/tutorial/viewcfg/src/top/
-
 /doc/doxygen
 
 /doc/pdg/call-f.eps
@@ -144,23 +121,7 @@ _bisect
 
 /doc/server/
 
-#lib
-/lib/fc/
-/lib/plugins/*.mli
-/lib/plugins/*.ml
-/lib/plugins/top/
-/lib/plugins/gui/
-/lib/plugins/top/
-/lib/plugins/META.frama-c-*
-/lib/plugins/.placeholders_ready
-
 #plugins
-/share/e-acsl/
-/share/c2fc/
-/src/plugins/*/configure
-/src/plugins/*/.depend
-/src/plugins/*/autom4te.cache/
-/src/plugins/*/Makefile.plugin.generated
 /src/plugins/*/doc/*/*.dot
 /src/plugins/*/doc/*/*.aux
 /src/plugins/*/doc/*/*.bbl
@@ -173,7 +134,6 @@ _bisect
 /src/plugins/*/doc/*/*.log
 /src/plugins/*/doc/*/*.out
 /src/plugins/*/doc/*/*.idx
-Makefile.plugin.generated
 
 # WP/Coq Generated file
 .lia.cache
@@ -186,19 +146,6 @@ share/analysis-scripts/fc-estimate-difficulty.*spec
 share/analysis-scripts/fc-estimate-difficulty
 share/analysis-scripts/fc-estimate-difficulty.exe
 share/analysis-scripts/libc_metrics.json
-
-# generated ML files
-
-/src/libraries/utils/json.ml
-/src/kernel_internals/runtime/fc_config.ml
-/src/kernel_internals/parsing/logic_lexer.ml
-/src/kernel_internals/parsing/logic_parser.ml
-/src/kernel_internals/parsing/logic_parser.mli
-/src/kernel_internals/parsing/logic_preprocess.ml
-/src/kernel_internals/parsing/clexer.ml
-/src/kernel_internals/parsing/cparser.ml
-/src/kernel_internals/parsing/cparser.mli
-/src/plugins/markdown-report/META
 
 # generated tar.gz files
 
