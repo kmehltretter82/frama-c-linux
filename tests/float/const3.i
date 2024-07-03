@@ -1,6 +1,6 @@
 /* run.config*
-  STDOPT: #"-warn-decimal-float all"
-  STDOPT: #"-warn-decimal-float all -eva-all-rounding-modes-constants -float-hex"
+  STDOPT: #"-kernel-warn-key parser:decimal-float=active"
+  STDOPT: #"-kernel-warn-key parser:decimal-float=active -eva-all-rounding-modes-constants -float-hex"
 */
 
 double f1 = 1e-40f;
