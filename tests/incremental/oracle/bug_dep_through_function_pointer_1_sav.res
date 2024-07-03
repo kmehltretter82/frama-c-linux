@@ -6,13 +6,13 @@
   
 [eva:memexec] No previous call found for main
 [eva:memexec] No previous call found for test
-[eva] computing for function <ok7z> test <- main.
+[eva] computing for function test <- main.
   Called from bug_dep_through_function_pointer_1.c:37.
 [eva:memexec] No previous call found for foo
-[eva] computing for function <9Vhj> foo <- test <- main.
+[eva] computing for function foo <- test <- main.
   Called from bug_dep_through_function_pointer_1.c:29.
 [eva:memexec] No previous call found for alloc
-[eva] computing for function <C2bm> alloc <- foo <- test <- main.
+[eva] computing for function alloc <- foo <- test <- main.
   Called from bug_dep_through_function_pointer_1.c:17.
 [eva] bug_dep_through_function_pointer_1.c:11: Call to builtin malloc
 [eva] bug_dep_through_function_pointer_1.c:11: 
@@ -29,13 +29,13 @@
 [eva] Recording results for test
 [eva] Done for function test
 [eva:memexec] No previous call found for test
-[eva] computing for function <85FG> test <- main.
+[eva] computing for function test <- main.
   Called from bug_dep_through_function_pointer_1.c:38.
 [eva:memexec] No previous call found for bar
-[eva] computing for function <MhBg> bar <- test <- main.
+[eva] computing for function bar <- test <- main.
   Called from bug_dep_through_function_pointer_1.c:29.
 [eva:memexec] No previous saved state found for alloc
-[eva] computing for function <ZMzB> alloc <- bar <- test <- main.
+[eva] computing for function alloc <- bar <- test <- main.
   Called from bug_dep_through_function_pointer_1.c:23.
 [eva] bug_dep_through_function_pointer_1.c:11: Call to builtin malloc
 [eva] bug_dep_through_function_pointer_1.c:11: 
@@ -190,21 +190,21 @@ Allocation sites: {
                     main }
 Call sites: { int *q = alloc(); }
 
-Dynamic allocated bases: {[ __malloc_alloc_l11 -> <C2bm> alloc :: bug_dep_through_function_pointer_1.c:17 <-
-                                                         foo :: bug_dep_through_function_pointer_1.c:29 <-
-                                                         test :: bug_dep_through_function_pointer_1.c:37 <-
-                                                         main
-                            __malloc_alloc_l11_0 -> <ZMzB> alloc :: bug_dep_through_function_pointer_1.c:23 <-
-                                                           bar :: bug_dep_through_function_pointer_1.c:29 <-
-                                                           test :: bug_dep_through_function_pointer_1.c:38 <-
-                                                           main ]}
-Malloced by stack: <Wxdr> malloc :: bug_dep_through_function_pointer_1.c:11 <-
-                          alloc :: bug_dep_through_function_pointer_1.c:23 <-
-                          bar :: bug_dep_through_function_pointer_1.c:29 <-
-                          test :: bug_dep_through_function_pointer_1.c:38 <-
-                          main -> __malloc_alloc_l11_0
-Malloced by stack: <5ZHW> malloc :: bug_dep_through_function_pointer_1.c:11 <-
-                          alloc :: bug_dep_through_function_pointer_1.c:17 <-
-                          foo :: bug_dep_through_function_pointer_1.c:29 <-
-                          test :: bug_dep_through_function_pointer_1.c:37 <-
-                          main -> __malloc_alloc_l11
+Dynamic allocated bases: {[ __malloc_alloc_l11 -> alloc :: bug_dep_through_function_pointer_1.c:17 <-
+                                                  foo :: bug_dep_through_function_pointer_1.c:29 <-
+                                                  test :: bug_dep_through_function_pointer_1.c:37 <-
+                                                  main
+                            __malloc_alloc_l11_0 -> alloc :: bug_dep_through_function_pointer_1.c:23 <-
+                                                    bar :: bug_dep_through_function_pointer_1.c:29 <-
+                                                    test :: bug_dep_through_function_pointer_1.c:38 <-
+                                                    main ]}
+Malloced by stack: malloc :: bug_dep_through_function_pointer_1.c:11 <-
+                   alloc :: bug_dep_through_function_pointer_1.c:23 <-
+                   bar :: bug_dep_through_function_pointer_1.c:29 <-
+                   test :: bug_dep_through_function_pointer_1.c:38 <-
+                   main -> __malloc_alloc_l11_0
+Malloced by stack: malloc :: bug_dep_through_function_pointer_1.c:11 <-
+                   alloc :: bug_dep_through_function_pointer_1.c:17 <-
+                   foo :: bug_dep_through_function_pointer_1.c:29 <-
+                   test :: bug_dep_through_function_pointer_1.c:37 <-
+                   main -> __malloc_alloc_l11

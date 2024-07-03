@@ -613,15 +613,6 @@ let callee stmt =
   in
   before stmt |> eval_callee callee_exp |> Result.value ~default:[]
 
-let () =
-  let f stmt exp =
-    match before stmt |> eval_callee exp with
-    | Ok list -> Some list
-    | Error Bottom -> None 
-    | Error _ -> None
-  in
-  Ast_diff.eval_callee_ref := f
-
 (* Value conversion *)
 
 let as_cvalue_or_uninitialized (Value evaluation) =

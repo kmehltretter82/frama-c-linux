@@ -281,6 +281,24 @@ let dump () =
   let g = Subgraph.get () in
   Options.dump GV.output_graph g
 
+let () = 
+  let graph = ref (G.create ()) in
+  let eval_callee stmt _expr =
+    if G.is_empty !graph
+    then syntactic_compute !graph;
+    try
+      let kf = Kernel_function.find_englobing_kf stmt in
+      let edges = G.succ_e !graph kf in
+      let filter acc (_kf, s, callee) =
+        if Cil_datatype.Stmt.equal stmt s
+        then callee :: acc
+        else acc
+      in
+      Some (List.fold_left filter [] edges)
+    with Not_found -> None
+  in 
+  Ast_diff.eval_callee_ref := eval_callee
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

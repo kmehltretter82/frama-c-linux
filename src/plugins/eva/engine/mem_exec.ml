@@ -456,7 +456,9 @@ module Make
               let _ = 
                 if not (Base.Hptset.is_empty allocated) then
                   Self.debug ~dkey: dkey_malloc
-                    "--- Reused allocated bases %a for KF %a at callstack %a @." Base.Hptset.pretty allocated Kernel_function.pretty kf Callstack.pretty (Eva_utils.current_call_stack ()) in
+                    "--- Reused allocated bases %a for KF %a at callstack %a @."
+                    Base.Hptset.pretty allocated Kernel_function.pretty kf
+                    Callstack.pretty (Eva_utils.current_call_stack ()) in
               let process bases_to_substitute (key,output) =
                 key,
                 Domain.reuse kf bases_to_substitute ~current_input:state ~previous_output:output
