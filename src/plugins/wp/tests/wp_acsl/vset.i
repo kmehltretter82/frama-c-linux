@@ -1,5 +1,6 @@
 
 //@ lemma direct_in: 2 \in {1,2,3};
+//@ lemma direct_in_singleton: 2 \in {2};
 
 //@ logic set<integer> Set1 = {1,2,3};
 //@ lemma indirect_in_constants: 2 \in Set1;
@@ -26,8 +27,15 @@
 
 /*@
   logic set<integer> iota(integer n) =
-    (n <= 0) ? { 0 } : \union(n, iota(n-1)) ;
+    (n <= 0) ? {0} : \union({n}, iota(n-1)) ;
 
-  lemma iota_compute_equal_constants: iota(4) == { 0, 1, 2, 3, 4 };
+  lemma rec_iota:
+    \forall integer i, n;
+    i \in iota(n) ==> i==n || i \in iota(n-1);
+
+  lemma iota0_compute_0in_constants: 0 \in iota(0);
+  lemma iota3_compute_0in_constants: 0 \in iota(3);
+  lemma iota3_compute_2in_constants: 2 \in iota(3);
+  lemma iota3_compute_equal_constants: iota(3) == { 0, 1, 2, 3 };
 
 */

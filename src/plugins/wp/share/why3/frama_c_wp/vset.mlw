@@ -28,58 +28,42 @@ theory Vset
 
   use bool.Bool
   use int.Int
+  use export set.Set
 
   (* -------------------------------------------------------------------------- *)
   (* --- Classical Sets for Alt-Ergo                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  type set 'a
-
-  function empty : set 'a
-  function singleton 'a : set 'a
-
-  function union (set 'a) (set 'a) : set 'a
-
-  function inter (set 'a) (set 'a) : set 'a
-
-  predicate member 'a (set 'a)
   function member_bool 'a (set 'a) : bool
+  predicate member (elt:'a) (s: set 'a) = mem elt s
+  predicate eqset (a : set 'a) (b : set 'a) =
+    forall x : 'a. (member x a) <-> (member x b)
 
   function range int int : set int (* [a..b] *)
   function range_sup int : set int (* [a..] *)
   function range_inf int : set int (* [..b] *)
   function range_all : set int (* [..] *)
 
-  predicate eqset (a : set 'a) (b : set 'a) =
-    forall x : 'a. (member x a) <-> (member x b)
-
-  predicate subset (a : set 'a) (b : set 'a) =
-    forall x : 'a. (member x a) -> (member x b)
-
-  predicate disjoint (a : set 'a) (b : set 'a) =
-    forall x : 'a. (member x a) -> (member x b) -> false
-
   (* -------------------------------------------------------------------------- *)
 
   axiom member_bool : forall x:'a. forall s:set 'a [member_bool x s].
     if member x s then member_bool x s = True else member_bool x s = False
-
-  axiom member_empty : forall x:'a [member x empty].
+  lemma member_empty : forall x:'a [member x empty].
     not (member x empty)
 
-  axiom member_singleton : forall x:'a,y:'a [member x (singleton y)].
+  lemma member_singleton : forall x:'a,y:'a [member x (singleton y)].
     member x (singleton y) <-> x=y
 
-  axiom member_union : forall x:'a. forall a:set 'a,b:set 'a [member x (union a b)].
+  lemma member_union : forall x:'a. forall a:set 'a,b:set 'a [member x (union a b)].
     member x (union a b) <-> (member x a) \/ (member x b)
 
-  axiom member_inter : forall x:'a. forall a:set 'a,b:set 'a [member x (inter a b)].
+  lemma member_inter : forall x:'a. forall a:set 'a,b:set 'a [member x (inter a b)].
     member x (inter a b) <-> (member x a) /\ (member x b)
 
-  axiom union_empty : forall a:set 'a [(union a empty)|(union empty a)].
+  lemma union_empty : forall a:set 'a [(union a empty)|(union empty a)].
     (union a empty) = a /\ (union empty a) = a
 
-  axiom inter_empty : forall a:set 'a [(inter a empty)|(inter empty a)].
+  lemma inter_empty : forall a:set 'a [(inter a empty)|(inter empty a)].
     (inter a empty) = empty /\ (inter empty a) = empty
 
   axiom member_range : forall x:int,a:int,b:int [member x (range a b)].
