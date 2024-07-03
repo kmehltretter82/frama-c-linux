@@ -112,7 +112,7 @@ let typecheck_unop (params:tau option list) : tau =
 let typecheck_range (_:tau option list) : tau =
   tau_of_set Logic.Int
 
-let p_member = Lang.extern_p ~library ~bool:"member_bool" ~prop:"member" ()
+let p_member = Lang.extern_p ~library ~bool:"member_bool" ~prop:"mem" ()
 let f_empty = Lang.extern_f ~library "empty"
 let f_union = Lang.extern_f ~library ~typecheck:typecheck_binop "union"
 let f_inter = Lang.extern_f ~library ~typecheck:typecheck_binop "inter"
