@@ -1,8 +1,9 @@
 # frama-c -wp [...]
 [kernel] Parsing vset.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] 12 goals scheduled
+[wp] 21 goals scheduled
 [wp] [Valid] typed_lemma_direct_in (Qed)
+[wp] [Valid] typed_lemma_direct_in_singleton (Qed)
 [wp] [Valid] typed_lemma_indirect_equal_constants (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_indirect_equal_ghost (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_indirect_equal_logical (Alt-Ergo) (Cached)
@@ -13,11 +14,20 @@
 [wp] [Valid] typed_lemma_indirect_not_equal_logical (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_indirect_not_in_constants (Alt-Ergo) (Cached)
 [wp] [Valid] typed_lemma_indirect_not_in_logical (Alt-Ergo) (Cached)
-[wp] [Valid] typed_lemma_iota_compute_equal_constants (Alt-Ergo) (Cached)
-[wp] Proved goals:   12 / 12
-  Qed:             1
-  Alt-Ergo:       11
+[wp] [Valid] typed_lemma_iota0_compute_0in_constants (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_iota1_compute_equal_constants (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_iota3_compute_0in_constants (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_iota3_compute_2in_constants (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lemma_iota3_compute_equal_constants (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lemma_iota_ind0 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_rec_iota (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_lemma_rec_iota_gt0 (Alt-Ergo) (Cached)
+[wp] [Valid] typed_lemma_rec_iota_le0 (Alt-Ergo) (Cached)
+[wp] Proved goals:   18 / 21
+  Qed:             2
+  Alt-Ergo:       16
+  Unsuccess:       3
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Lemma                     1       11       12       100%
+  Lemma                     2       16       21      85.7%
 ------------------------------------------------------------

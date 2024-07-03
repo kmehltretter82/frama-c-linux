@@ -10,9 +10,15 @@ Prove: true.
 
 ------------------------------------------------------------
 
+Goal Lemma 'direct_in_singleton':
+Assume Lemmas: 'direct_in'
+Prove: true.
+
+------------------------------------------------------------
+
 Goal Lemma 'indirect_equal_constants':
 Assume Lemmas: 'indirect_not_in_constants' 'indirect_in_constants'
-  'direct_in'
+  'direct_in_singleton' 'direct_in'
 Prove: member(1, L_Set1) /\ member(2, L_Set1) /\ member(3, L_Set1) /\
     (forall i : Z. (member(i, L_Set1) -> ((i = 1) \/ (i = 2) \/ (i = 3)))).
 
@@ -22,7 +28,8 @@ Goal Lemma 'indirect_equal_ghost':
 Assume Lemmas: 'indirect_in_ghost' 'indirect_not_equal_logical'
   'indirect_equal_logical' 'indirect_not_in_logical' 'indirect_in_logical'
   'indirect_not_equal_constants' 'indirect_equal_constants'
-  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
 Let a = L_Set2(int3_0, int2_0, int1_0).
 Assume {
   Have: is_sint32(int1_0).
@@ -38,14 +45,15 @@ Prove: member(int1_0, a) /\ member(int2_0, a) /\ member(int3_0, a) /\
 Goal Lemma 'indirect_equal_logical':
 Assume Lemmas: 'indirect_not_in_logical' 'indirect_in_logical'
   'indirect_not_equal_constants' 'indirect_equal_constants'
-  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
 Prove: member(1, L_Set3) /\ member(2, L_Set3) /\ member(3, L_Set3) /\
     (forall i : Z. (member(i, L_Set3) -> ((i = 1) \/ (i = 2) \/ (i = 3)))).
 
 ------------------------------------------------------------
 
 Goal Lemma 'indirect_in_constants':
-Assume Lemmas: 'direct_in'
+Assume Lemmas: 'direct_in_singleton' 'direct_in'
 Prove: member(2, L_Set1).
 
 ------------------------------------------------------------
@@ -54,7 +62,8 @@ Goal Lemma 'indirect_in_ghost':
 Assume Lemmas: 'indirect_not_equal_logical' 'indirect_equal_logical'
   'indirect_not_in_logical' 'indirect_in_logical'
   'indirect_not_equal_constants' 'indirect_equal_constants'
-  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
 Assume { Have: is_sint32(int2_0). }
 Prove: member(int2_0, L_Set2(int3_0, int2_0, int1_0)).
 
@@ -62,14 +71,15 @@ Prove: member(int2_0, L_Set2(int3_0, int2_0, int1_0)).
 
 Goal Lemma 'indirect_in_logical':
 Assume Lemmas: 'indirect_not_equal_constants' 'indirect_equal_constants'
-  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
 Prove: member(2, L_Set3).
 
 ------------------------------------------------------------
 
 Goal Lemma 'indirect_not_equal_constants':
 Assume Lemmas: 'indirect_equal_constants' 'indirect_not_in_constants'
-  'indirect_in_constants' 'direct_in'
+  'indirect_in_constants' 'direct_in_singleton' 'direct_in'
 Prove: (!member(0, L_Set1)) \/ (!member(1, L_Set1)) \/
     (!member(2, L_Set1)) \/
     (exists i : Z. (i != 0) /\ (i != 1) /\ (i != 2) /\ member(i, L_Set1)).
@@ -80,7 +90,7 @@ Goal Lemma 'indirect_not_equal_logical':
 Assume Lemmas: 'indirect_equal_logical' 'indirect_not_in_logical'
   'indirect_in_logical' 'indirect_not_equal_constants'
   'indirect_equal_constants' 'indirect_not_in_constants'
-  'indirect_in_constants' 'direct_in'
+  'indirect_in_constants' 'direct_in_singleton' 'direct_in'
 Prove: (!member(0, L_Set3)) \/ (!member(1, L_Set3)) \/
     (!member(2, L_Set3)) \/
     (exists i : Z. (i != 0) /\ (i != 1) /\ (i != 2) /\ member(i, L_Set3)).
@@ -88,7 +98,7 @@ Prove: (!member(0, L_Set3)) \/ (!member(1, L_Set3)) \/
 ------------------------------------------------------------
 
 Goal Lemma 'indirect_not_in_constants':
-Assume Lemmas: 'indirect_in_constants' 'direct_in'
+Assume Lemmas: 'indirect_in_constants' 'direct_in_singleton' 'direct_in'
 Prove: !member(4, L_Set1).
 
 ------------------------------------------------------------
@@ -96,21 +106,121 @@ Prove: !member(4, L_Set1).
 Goal Lemma 'indirect_not_in_logical':
 Assume Lemmas: 'indirect_in_logical' 'indirect_not_equal_constants'
   'indirect_equal_constants' 'indirect_not_in_constants'
-  'indirect_in_constants' 'direct_in'
+  'indirect_in_constants' 'direct_in_singleton' 'direct_in'
 Prove: !member(0, L_Set3).
 
 ------------------------------------------------------------
 
-Goal Lemma 'iota_compute_equal_constants':
+Goal Lemma 'iota0_compute_0in_constants':
+Assume Lemmas: 'rec_iota' 'rec_iota_gt0' 'rec_iota_le0' 'iota_ind0'
+  'indirect_equal_ghost' 'indirect_in_ghost' 'indirect_not_equal_logical'
+  'indirect_equal_logical' 'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Prove: member(0, L_iota(0)).
+
+------------------------------------------------------------
+
+Goal Lemma 'iota1_compute_equal_constants':
+Assume Lemmas: 'iota3_compute_equal_constants' 'iota3_compute_2in_constants'
+  'iota3_compute_0in_constants' 'iota0_compute_0in_constants' 'rec_iota'
+  'rec_iota_gt0' 'rec_iota_le0' 'iota_ind0' 'indirect_equal_ghost'
+  'indirect_in_ghost' 'indirect_not_equal_logical' 'indirect_equal_logical'
+  'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Let a = L_iota(1).
+Prove: member(0, a) /\ member(1, a) /\
+    (forall i : Z. (member(i, a) -> ((i = 0) \/ (i = 1)))).
+
+------------------------------------------------------------
+
+Goal Lemma 'iota3_compute_0in_constants':
+Assume Lemmas: 'iota0_compute_0in_constants' 'rec_iota' 'rec_iota_gt0'
+  'rec_iota_le0' 'iota_ind0' 'indirect_equal_ghost' 'indirect_in_ghost'
+  'indirect_not_equal_logical' 'indirect_equal_logical'
+  'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Prove: member(0, L_iota(3)).
+
+------------------------------------------------------------
+
+Goal Lemma 'iota3_compute_2in_constants':
+Assume Lemmas: 'iota3_compute_0in_constants' 'iota0_compute_0in_constants'
+  'rec_iota' 'rec_iota_gt0' 'rec_iota_le0' 'iota_ind0' 'indirect_equal_ghost'
+  'indirect_in_ghost' 'indirect_not_equal_logical' 'indirect_equal_logical'
+  'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Prove: member(2, L_iota(3)).
+
+------------------------------------------------------------
+
+Goal Lemma 'iota3_compute_equal_constants':
+Assume Lemmas: 'iota3_compute_2in_constants' 'iota3_compute_0in_constants'
+  'iota0_compute_0in_constants' 'rec_iota' 'rec_iota_gt0' 'rec_iota_le0'
+  'iota_ind0' 'indirect_equal_ghost' 'indirect_in_ghost'
+  'indirect_not_equal_logical' 'indirect_equal_logical'
+  'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Let a = L_iota(3).
+Prove: member(0, a) /\ member(1, a) /\ member(2, a) /\ member(3, a) /\
+    (forall i : Z. (member(i, a) ->
+     ((i = 0) \/ (i = 1) \/ (i = 2) \/ (i = 3)))).
+
+------------------------------------------------------------
+
+Goal Lemma 'iota_ind0':
 Assume Lemmas: 'indirect_equal_ghost' 'indirect_in_ghost'
   'indirect_not_equal_logical' 'indirect_equal_logical'
   'indirect_not_in_logical' 'indirect_in_logical'
   'indirect_not_equal_constants' 'indirect_equal_constants'
-  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in'
-Let a = L_iota(4).
-Prove: member(0, a) /\ member(1, a) /\ member(2, a) /\ member(3, a) /\
-    member(4, a) /\
-    (forall i : Z. (member(i, a) ->
-     ((i = 0) \/ (i = 1) \/ (i = 2) \/ (i = 3) \/ (i = 4)))).
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Let a = L_iota(n). Assume { Have: n <= 0. }
+Prove: member(0, a) /\ (forall i : Z. (member(i, a) -> (i = 0))).
+
+------------------------------------------------------------
+
+Goal Lemma 'rec_iota':
+Assume Lemmas: 'rec_iota_gt0' 'rec_iota_le0' 'iota_ind0'
+  'indirect_equal_ghost' 'indirect_in_ghost' 'indirect_not_equal_logical'
+  'indirect_equal_logical' 'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Assume { Have: member(i, L_iota(n)). }
+Prove: (n = i) \/ member(i, L_iota(n - 1)).
+
+------------------------------------------------------------
+
+Goal Lemma 'rec_iota_gt0':
+Assume Lemmas: 'rec_iota_le0' 'iota_ind0' 'indirect_equal_ghost'
+  'indirect_in_ghost' 'indirect_not_equal_logical' 'indirect_equal_logical'
+  'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Assume { Have: 0 < n. Have: member(i, L_iota(n)). }
+Prove: (n = i) \/ member(i, L_iota(n - 1)).
+
+------------------------------------------------------------
+
+Goal Lemma 'rec_iota_le0':
+Assume Lemmas: 'iota_ind0' 'indirect_equal_ghost' 'indirect_in_ghost'
+  'indirect_not_equal_logical' 'indirect_equal_logical'
+  'indirect_not_in_logical' 'indirect_in_logical'
+  'indirect_not_equal_constants' 'indirect_equal_constants'
+  'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
+  'direct_in'
+Assume { Have: n <= 0. Have: member(i, L_iota(n)). }
+Prove: i = 0.
 
 ------------------------------------------------------------
