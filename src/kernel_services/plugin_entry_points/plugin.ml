@@ -414,8 +414,8 @@ struct
       else Datatype.Filepath.concat path plugin_subpath
 
     let base_dir () =
-      if is_visible && Dir_name.is_set ()
-      then Dir_name.get ()
+      if is_visible && is_set ()
+      then get ()
       else add_plugin @@ D.dir ()
 
     let get_dir ?(mode=`Normalize_only) s =
@@ -485,10 +485,18 @@ struct
               I.name
         end)
         (struct
+          let is_kernel = is_kernel () (* the side effect must be applied right now *)
+
+          let var_name =
+            "FRAMAC_" ^
+            (if is_kernel
+             then ""
+             else (Stdlib.String.uppercase_ascii P.shortname) ^ "_") ^
+            (Stdlib.String.uppercase_ascii I.name)
+
           let dir () =
-            let var = "FRAMAC_" ^ (Stdlib.String.uppercase_ascii I.name) in
             if I.kernel_is_set () then I.kernel_get ()
-            else match Sys.getenv_opt var with
+            else match Sys.getenv_opt var_name with
               | Some p when p <> "" -> Fc_Filepath.Normalized.of_string p
               | _ -> I.getter ()
 
