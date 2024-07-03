@@ -322,9 +322,8 @@ struct
       if is_kernel then path
       else Datatype.Filepath.concat path plugin_subpath
 
-    let dirs =
-      if is_visible && Dir_name.is_set ()
-      then [ Dir_name.get () ]
+    let dirs () =
+      if is_visible && is_set () then [ get () ]
       else List.map add_plugin System_config.Share.dirs
 
     let find relative =
@@ -333,11 +332,11 @@ struct
         let path = Datatype.Filepath.concat dir relative in
         if Fc_Filepath.exists path then raise (Found path)
       in
-      try List.iter check_presence dirs ; None
+      try List.iter check_presence (dirs ()) ; None
       with Found path -> Some path
 
     let default relative =
-      match dirs with
+      match dirs () with
       | [] -> assert false
       | x :: _ -> Datatype.Filepath.concat x relative
 
@@ -362,10 +361,11 @@ struct
       | `Must_exist when not @@ Fc_Filepath.exists path ->
         L.abort "Could not find file %s in Frama-C%s share"
           s (if is_kernel then "" else "/" ^ P.name)
-      | `Must_exist when Fc_Filepath.is_dir path ->
+      | (`Normalize_only | `Must_exist)
+        when Fc_Filepath.exists path && Fc_Filepath.is_dir path ->
         L.abort "%a is expected to be a file"
           Datatype.Filepath.pretty path
-      | `Must_exist -> path
+      | (`Normalize_only | `Must_exist) -> path
   end
 
   module Make_specific_dir
