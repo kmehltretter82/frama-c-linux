@@ -61,6 +61,7 @@
   Widened states: 
   (0),
   a ∈ {3}
+  arr ∈ {{ &__malloc_loop_l38[0] }}
   i ∈ {0; 1; 2; 3}
   __malloc_loop_l38[0] ∈
                    {{ &__malloc_w_alloc_l12[0] ; &__malloc_alloc_l12 ;
