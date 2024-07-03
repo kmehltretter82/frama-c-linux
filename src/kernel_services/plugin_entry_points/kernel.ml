@@ -961,60 +961,28 @@ let () = Cmdline.load_all_plugins := bootstrap_loader
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
-module Session_dir =
-  P.Filepath
-    (struct
-      let option_name = "-session"
-      let arg_name = "path"
-      let existence = Filepath.Indifferent
-      let file_kind = "directory"
-      let help = "directory in which session files are searched"
-    end)
+module Session_dir = Session
 let () = Plugin.session_is_set_ref := Session_dir.is_set
 let () = Plugin.session_ref := Session_dir.get
 
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
-module Cache_dir =
-  P.Filepath
-    (struct
-      let option_name = "-cache"
-      let arg_name = "path"
-      let existence = Filepath.Indifferent
-      let file_kind = "directory"
-      let help = "directory in which cache files are stored"
-    end)
+module Cache_dir = Cache_dir ()
 let () = Plugin.cache_is_set_ref := Cache_dir.is_set
 let () = Plugin.cache_ref := Cache_dir.get
 
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
-module Config_dir =
-  P.Filepath
-    (struct
-      let option_name = "-config"
-      let arg_name = "path"
-      let existence = Filepath.Indifferent
-      let file_kind = "directory"
-      let help = "directory in which configuration files are stored"
-    end)
+module Config_dir = Config_dir ()
 let () = Plugin.config_is_set_ref := Config_dir.is_set
 let () = Plugin.config_ref := Config_dir.get
 
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extending
 let () = Parameter_customize.set_group saveload
 let () = Parameter_customize.do_not_projectify ()
-module State_dir =
-  P.Filepath
-    (struct
-      let option_name = "-state"
-      let arg_name = "path"
-      let existence = Filepath.Indifferent
-      let file_kind = "directory"
-      let help = "directory in which state files are stored"
-    end)
+module State_dir = State_dir ()
 let () = Plugin.state_is_set_ref := State_dir.is_set
 let () = Plugin.state_ref := State_dir.get
 

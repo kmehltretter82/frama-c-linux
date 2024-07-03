@@ -357,7 +357,6 @@ struct
       let dir = get_dir ~mode dirname in
       let path = Datatype.Filepath.concat dir basename in
       match mode with
-      | `Normalize_only -> path
       | `Must_exist when not @@ Fc_Filepath.exists path ->
         L.abort "Could not find file %s in Frama-C%s share"
           s (if is_kernel then "" else "/" ^ P.name)
@@ -368,58 +367,66 @@ struct
       | (`Normalize_only | `Must_exist) -> path
   end
 
-  module Make_specific_dir
-      (O: Parameter_sig.Input_with_arg)
+  module Make_user_dir
       (D: sig
-         val dir: unit -> Fc_Filepath.Normalized.t
-         val visible_ref: bool
-       end) :
-    Parameter_sig.User_dir
+         val name : string
+         val default_root : unit -> Fc_Filepath.Normalized.t
+         val kernel_get : unit -> Fc_Filepath.Normalized.t
+         val is_visible : bool
+       end)
   =
   struct
-
-    let is_visible = D.visible_ref
-    let is_kernel = is_kernel () (* the side effect must be applied right now *)
+    let is_visible = D.is_visible
+    let is_kernel = P.name = ""
 
     let () =
       Parameter_customize.set_cmdline_stage Cmdline.Extended;
       if is_visible then Parameter_customize.is_reconfigurable ()
       else Parameter_customize.is_invisible ()
 
+    let prefix = if is_kernel then "-" else prefix
+    let var_name =
+      Stdlib.String.uppercase_ascii
+        ("FRAMAC_" ^ (if is_kernel then "" else P.shortname ^ "_") ^ D.name)
+
     module Dir_name =
       Filepath
         (struct
-          let option_name = prefix ^ O.option_name
-          let arg_name = O.arg_name
-          let help = if is_visible then O.help else empty_string
+          let option_name = prefix ^ D.name
+          let arg_name = "dir"
+          let help =
+            if is_visible && is_kernel
+            then Format.asprintf "set the Frama-C %s directory to <dir>" D.name
+            else
+            if is_visible
+            then Format.asprintf "set the plug-in %s directory to <dir>" D.name
+            else empty_string
+
           let existence = Fc_Filepath.Indifferent
           let file_kind = ""
         end)
+
+    let get () =
+      if Dir_name.is_set () then Dir_name.get ()
+      else match Sys.getenv_opt var_name with
+        | Some s when s <> "" -> Fc_Filepath.Normalized.of_string s
+        | _ when is_kernel -> D.default_root ()
+        | _ -> Fc_Filepath.Normalized.concat (D.kernel_get ()) P.shortname
+
+    let set = Dir_name.set
+    let is_set = Dir_name.is_set
 
     let mk_dir d =
       let d' = Fc_Filepath.Normalized.of_string d in
       try
         if Extlib.mkdir ~parents:true d' 0o755 then
-          L.warning "created %s directory `%a'" O.option_name Fc_Filepath.Normalized.pretty d';
+          L.warning "created %s directory `%a'" D.name Fc_Filepath.Normalized.pretty d';
         d
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'" O.option_name Fc_Filepath.Normalized.pretty d'
-
-    let set filepath = Dir_name.set filepath
-    let get () = Dir_name.get ()
-    let is_set () = Dir_name.is_set ()
-
-    let add_plugin path =
-      if is_kernel then path
-      else Datatype.Filepath.concat path plugin_subpath
-
-    let base_dir () =
-      if is_visible && is_set ()
-      then get ()
-      else add_plugin @@ D.dir ()
+        L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.Normalized.pretty d'
 
     let get_dir ?(mode=`Normalize_only) s =
-      let dir = Datatype.Filepath.concat (base_dir ()) s in
+      let dir = Datatype.Filepath.concat (get ()) s in
       match mode with
       | `Normalize_only -> dir
       | `Create_path ->
@@ -434,101 +441,42 @@ struct
           ignore (mk_dir (dir :> string)); dir
 
     let get_file ?(mode=`Normalize_only) s =
-      let s_dirname = Filename.dirname s in
-      let base_dir = get_dir ~mode s_dirname in
-      let s_basename = Filename.basename s in
-      let filepath = Datatype.Filepath.concat base_dir s_basename in
-      match mode with
-      | `Normalize_only ->
-        filepath
-      | `Create_path ->
-        (* No need to create anything here, as the path of sub-directories has
-           been already created by [get_dir] for computing [base_dir]. *)
-        filepath
-
+      let base_dir = get_dir ~mode @@ Filename.dirname s in
+      (* No need to create anything here, as the path of sub-directories has
+         been already created by [get_dir] for computing [base_dir]. *)
+      Datatype.Filepath.concat base_dir @@ Filename.basename s
   end
 
-  module Session =
-    Make_specific_dir
+  module Session = Make_user_dir
       (struct
-        let option_name = "session"
-        let arg_name = "dir"
-        let help = "set the plug-in session directory to <dir>"
-      end)
-      (struct
-        let dir () =
-          if !session_is_set_ref ()
-          then !session_ref ()
-          else
-            Fc_Filepath.Normalized.of_string
-              (try Sys.getenv "FRAMAC_SESSION"
-               with Not_found -> "./.frama-c")
-
-        let visible_ref = !session_visible_ref
+        let name = "session"
+        let default_root () = Fc_Filepath.Normalized.of_string "./.frama-c"
+        let kernel_get () = !session_ref ()
+        let is_visible = !session_visible_ref
       end)
 
-  module type User_dir_input = sig
-    val name: string
-    val getter: unit -> Fc_Filepath.Normalized.t
-    val kernel_get: unit -> Fc_Filepath.Normalized.t
-    val kernel_is_set: unit -> bool
-  end
-
-  module User_dir (I: User_dir_input) : Parameter_sig.User_dir = struct
-    include Make_specific_dir
-        (struct
-          let option_name = I.name
-          let arg_name = "dir"
-          let help = Format.asprintf
-              "set the plug-in %s directory to <dir> \
-               (may be used on systems with no default user directory)"
-              I.name
-        end)
-        (struct
-          let is_kernel = is_kernel () (* the side effect must be applied right now *)
-
-          let var_name =
-            "FRAMAC_" ^
-            (if is_kernel
-             then ""
-             else (Stdlib.String.uppercase_ascii P.shortname) ^ "_") ^
-            (Stdlib.String.uppercase_ascii I.name)
-
-          let dir () =
-            if I.kernel_is_set () then I.kernel_get ()
-            else match Sys.getenv_opt var_name with
-              | Some p when p <> "" -> Fc_Filepath.Normalized.of_string p
-              | _ -> I.getter ()
-
-          let visible_ref = !Parameter_customize.is_visible_ref
-        end)
-
-    let get_dir ?mode s = get_dir ?mode s
-    let get_file ?mode s = get_file ?mode s
-  end
-
-  module Cache_dir () = User_dir
+  module Cache_dir () = Make_user_dir
       (struct
         let name = "cache"
-        let getter = System_config.User_dirs.cache
+        let default_root = System_config.User_dirs.cache
         let kernel_get () = !cache_ref ()
-        let kernel_is_set () = !cache_is_set_ref ()
+        let is_visible = !Parameter_customize.is_visible_ref
       end)
 
-  module Config_dir () = User_dir
+  module Config_dir () = Make_user_dir
       (struct
         let name = "config"
-        let getter = System_config.User_dirs.config
+        let default_root = System_config.User_dirs.config
         let kernel_get () = !config_ref ()
-        let kernel_is_set () = !config_is_set_ref ()
+        let is_visible = !Parameter_customize.is_visible_ref
       end)
 
-  module State_dir () = User_dir
+  module State_dir () = Make_user_dir
       (struct
         let name = "state"
-        let getter = System_config.User_dirs.state
+        let default_root = System_config.User_dirs.state
         let kernel_get () = !state_ref ()
-        let kernel_is_set () = !state_is_set_ref ()
+        let is_visible = !Parameter_customize.is_visible_ref
       end)
 
   let help = add_group "Getting Information"
