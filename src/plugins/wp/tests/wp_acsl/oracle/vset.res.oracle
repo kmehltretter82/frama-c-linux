@@ -1,18 +1,46 @@
 # frama-c -wp [...]
 [kernel] Parsing vset.i (no preprocessing)
 [wp] Running WP plugin...
+[wp] 21 goals scheduled
+[wp] [Valid] typed_lemma_direct_in (Qed)
+[wp] [Valid] typed_lemma_direct_in_singleton (Qed)
+[wp] [NoResult] typed_lemma_indirect_in_constants (Qed)
+[wp] [Unsuccess] typed_lemma_indirect_equal_logical (Tactic) (Qed)
+[wp] [Unsuccess] typed_lemma_indirect_equal_ghost (Tactic) (Qed)
+[wp] [Unsuccess] typed_lemma_indirect_equal_constants (Tactic) (Qed)
+[wp] [NoResult] typed_lemma_indirect_not_equal_logical (Qed)
+[wp] [NoResult] typed_lemma_indirect_not_equal_constants (Qed)
+[wp] [NoResult] typed_lemma_indirect_in_logical (Qed)
+[wp] [NoResult] typed_lemma_indirect_in_ghost (Qed)
+[wp] [Unsuccess] typed_lemma_iota1_compute_equal_constants (Tactic) (Qed)
+[wp] [NoResult] typed_lemma_iota0_compute_0in_constants (Qed)
+[wp] [NoResult] typed_lemma_indirect_not_in_logical (Qed)
+[wp] [NoResult] typed_lemma_indirect_not_in_constants (Qed)
+[wp] [Unsuccess] typed_lemma_iota_ind0 (Tactic) (Qed)
+[wp] [Unsuccess] typed_lemma_iota3_compute_equal_constants (Tactic) (Qed)
+[wp] [NoResult] typed_lemma_iota3_compute_2in_constants (Qed)
+[wp] [NoResult] typed_lemma_iota3_compute_0in_constants (Qed)
+[wp] [NoResult] typed_lemma_rec_iota_le0 (Qed)
+[wp] [NoResult] typed_lemma_rec_iota_gt0 (Qed)
+[wp] [NoResult] typed_lemma_rec_iota (Qed)
+[wp] Proved goals:    2 / 21
+  Qed:             2
+  Unsuccess:      19
+  Missing:        13
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------
 
 Goal Lemma 'direct_in':
 Prove: true.
+Prover Qed returns Valid
 
 ------------------------------------------------------------
 
 Goal Lemma 'direct_in_singleton':
 Assume Lemmas: 'direct_in'
 Prove: true.
+Prover Qed returns Valid
 
 ------------------------------------------------------------
 
@@ -21,6 +49,7 @@ Assume Lemmas: 'indirect_not_in_constants' 'indirect_in_constants'
   'direct_in_singleton' 'direct_in'
 Prove: mem(1, L_Set1) /\ mem(2, L_Set1) /\ mem(3, L_Set1) /\
     (forall i : Z. (mem(i, L_Set1) -> ((i = 1) \/ (i = 2) \/ (i = 3)))).
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
@@ -30,15 +59,11 @@ Assume Lemmas: 'indirect_in_ghost' 'indirect_not_equal_logical'
   'indirect_not_equal_constants' 'indirect_equal_constants'
   'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
   'direct_in'
-Let a = L_Set2(int3_0, int2_0, int1_0).
-Assume {
-  Have: is_sint32(int1_0).
-  Have: is_sint32(int2_0).
-  Have: is_sint32(int3_0).
-}
-Prove: mem(int1_0, a) /\ mem(int2_0, a) /\ mem(int3_0, a) /\
-    (forall i : Z. (mem(i, a) ->
-     ((i = int1_0) \/ (i = int2_0) \/ (i = int3_0)))).
+Let a = L_Set2(int2_0, int1_0).
+Assume { Have: is_sint32(int1_0). Have: is_sint32(int2_0). }
+Prove: mem(int1_0, a) /\ mem(int2_0, a) /\
+    (forall i : Z. (mem(i, a) -> ((i = int1_0) \/ (i = int2_0)))).
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
@@ -47,8 +72,9 @@ Assume Lemmas: 'indirect_not_in_logical' 'indirect_in_logical'
   'indirect_not_equal_constants' 'indirect_equal_constants'
   'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
   'direct_in'
-Prove: mem(1, L_Set3) /\ mem(2, L_Set3) /\ mem(3, L_Set3) /\
-    (forall i : Z. (mem(i, L_Set3) -> ((i = 1) \/ (i = 2) \/ (i = 3)))).
+Prove: mem(1, L_Set3) /\ mem(2, L_Set3) /\
+    (forall i : Z. (mem(i, L_Set3) -> ((i = 1) \/ (i = 2)))).
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
@@ -65,7 +91,7 @@ Assume Lemmas: 'indirect_not_equal_logical' 'indirect_equal_logical'
   'indirect_not_in_constants' 'indirect_in_constants' 'direct_in_singleton'
   'direct_in'
 Assume { Have: is_sint32(int2_0). }
-Prove: mem(int2_0, L_Set2(int3_0, int2_0, int1_0)).
+Prove: mem(int2_0, L_Set2(int2_0, int1_0)).
 
 ------------------------------------------------------------
 
@@ -90,8 +116,8 @@ Assume Lemmas: 'indirect_equal_logical' 'indirect_not_in_logical'
   'indirect_in_logical' 'indirect_not_equal_constants'
   'indirect_equal_constants' 'indirect_not_in_constants'
   'indirect_in_constants' 'direct_in_singleton' 'direct_in'
-Prove: (!mem(0, L_Set3)) \/ (!mem(1, L_Set3)) \/ (!mem(2, L_Set3)) \/
-    (exists i : Z. (i != 0) /\ (i != 1) /\ (i != 2) /\ mem(i, L_Set3)).
+Prove: (!mem(0, L_Set3)) \/ (!mem(1, L_Set3)) \/
+    (exists i : Z. (i != 0) /\ (i != 1) /\ mem(i, L_Set3)).
 
 ------------------------------------------------------------
 
@@ -132,6 +158,7 @@ Assume Lemmas: 'iota3_compute_equal_constants' 'iota3_compute_2in_constants'
 Let a = L_iota(1).
 Prove: mem(0, a) /\ mem(1, a) /\
     (forall i : Z. (mem(i, a) -> ((i = 0) \/ (i = 1)))).
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
@@ -171,6 +198,7 @@ Assume Lemmas: 'iota3_compute_2in_constants' 'iota3_compute_0in_constants'
 Let a = L_iota(3).
 Prove: mem(0, a) /\ mem(1, a) /\ mem(2, a) /\ mem(3, a) /\
     (forall i : Z. (mem(i, a) -> ((i = 0) \/ (i = 1) \/ (i = 2) \/ (i = 3)))).
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
@@ -183,6 +211,7 @@ Assume Lemmas: 'indirect_equal_ghost' 'indirect_in_ghost'
   'direct_in'
 Let a = L_iota(n). Assume { Have: n <= 0. }
 Prove: mem(0, a) /\ (forall i : Z. (mem(i, a) -> (i = 0))).
+Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
