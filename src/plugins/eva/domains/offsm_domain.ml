@@ -186,7 +186,7 @@ module D : Abstract_domain.Leaf
   let extract_lval ~oracle:_ _context state lv locs =
     let o =
       if Cil.typeHasQualifier "volatile" lv.Eva_ast.typ ||
-         not (Cil.isArithmeticOrPointerType lv.Eva_ast.typ)
+         not (Cil.isScalarType lv.Eva_ast.typ)
       then
         `Value (Top, None)
       else

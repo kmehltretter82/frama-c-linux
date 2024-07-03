@@ -191,7 +191,7 @@ let apply_on_all_locs f loc state =
 (* Display [o] as a single value, when this is more readable and more precise
    than the standard display. *)
 let pretty_stitched_offsetmap fmt typ o =
-  if Cil.isArithmeticOrPointerType typ &&
+  if Cil.isScalarType typ &&
      not (Cvalue.V_Offsetmap.is_single_interval o)
   then
     let v = v_uninit_of_offsetmap ~typ o in

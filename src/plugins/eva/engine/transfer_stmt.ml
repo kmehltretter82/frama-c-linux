@@ -365,7 +365,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let written_formals = Backward_formals.written_formals call.kf in
     let is_safe argument =
       not (Varinfo.Set.mem argument.formal written_formals)
-      && Cil.isArithmeticOrPointerType argument.formal.vtype
+      && Cil.isScalarType argument.formal.vtype
       && is_safe_argument valuation argument.concrete
     in
     List.filter is_safe call.arguments
@@ -496,7 +496,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         Self.abort ~current:true
           "Function argument %a has unknown size. Aborting"
           Eva_ast.pp_exp expr;
-      if determinate && Cil.isArithmeticOrPointerType lv.typ
+      if determinate && Cil.isScalarType lv.typ
       then assign_by_eval ~subdivnb state valuation expr
       else assign_by_copy ~subdivnb state valuation lv loc
     | _ -> assign_by_eval ~subdivnb state valuation expr
@@ -645,7 +645,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         (Bottom.pretty Cvalue.V.pretty) fmt value
 
   let pretty_arguments ~subdivnb state arguments =
-    let is_scalar lval = Cil.isArithmeticOrPointerType lval.Eva_ast.typ in
+    let is_scalar lval = Cil.isScalarType lval.Eva_ast.typ in
     let pretty fmt (expr : Eva_ast.exp) =
       match expr.node with
       | Lval lval | StartOf lval when not (is_scalar lval) ->

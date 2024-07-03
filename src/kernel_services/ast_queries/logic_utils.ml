@@ -246,7 +246,7 @@ let mk_cast ?loc ?(force=false) newt t =
                (Ctype newt')
         -> unroll_cast e
       | TCast(true,Linteger,e)
-        when Cil.isArithmeticOrPointerType newt'
+        when Cil.isScalarType newt'
         -> unroll_cast e
       | TCast(true,Lreal,e)
         when Cil.isFloatingType newt'

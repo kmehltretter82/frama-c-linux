@@ -559,11 +559,6 @@ val isArithmeticType: typ -> bool
 *)
 val isScalarType: typ -> bool
 
-(** alias of isScalarType.
-    @deprecated 22.0-Titanium use isScalarType instead
-*)
-val isArithmeticOrPointerType: typ -> bool
-
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
     floating point, either C or mathematical one. *)
 val isLogicArithmeticType: logic_type -> bool

@@ -118,7 +118,7 @@ module Queries = struct
         v, alarms
 
   let extract_lval ~oracle:_ _context state lval loc =
-    if Cil.isArithmeticOrPointerType lval.Eva_ast.typ
+    if Cil.isScalarType lval.Eva_ast.typ
     then extract_scalar_lval state lval loc
     else extract_aggregate_lval state lval loc
 
