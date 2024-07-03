@@ -29,6 +29,19 @@
   logic set<integer> iota(integer n) =
     (n <= 0) ? {0} : \union({n}, iota(n-1)) ;
 
+  lemma iota_ind0:
+    \forall integer n;
+    n <= 0 ==> iota(n) == {0};
+  lemma rec_iota_le0:
+    \forall integer i, n;
+    i \in iota(n) ==>
+    n <= 0 ==>
+    i==0;
+  lemma rec_iota_gt0:
+    \forall integer i, n;
+    i \in iota(n) ==>
+    0 < n ==>
+    i==n || i \in iota(n-1);
   lemma rec_iota:
     \forall integer i, n;
     i \in iota(n) ==> i==n || i \in iota(n-1);
@@ -37,5 +50,6 @@
   lemma iota3_compute_0in_constants: 0 \in iota(3);
   lemma iota3_compute_2in_constants: 2 \in iota(3);
   lemma iota3_compute_equal_constants: iota(3) == { 0, 1, 2, 3 };
+  lemma iota1_compute_equal_constants: iota(1) == { 0, 1 };
 
 */
