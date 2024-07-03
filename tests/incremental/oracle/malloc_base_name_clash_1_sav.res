@@ -6,10 +6,10 @@
   
 [eva:memexec] No previous call found for main
 [eva:memexec] No previous call found for foo
-[eva] computing for function <ysEK> foo <- main.
+[eva] computing for function foo <- main.
   Called from malloc_base_name_clash_1.c:26.
 [eva:memexec] No previous call found for alloc
-[eva] computing for function <KiXL> alloc <- foo <- main.
+[eva] computing for function alloc <- foo <- main.
   Called from malloc_base_name_clash_1.c:16.
 [eva] malloc_base_name_clash_1.c:10: Call to builtin malloc
 [eva] malloc_base_name_clash_1.c:10: allocating variable __malloc_alloc_l10
@@ -18,10 +18,10 @@
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:memexec] No previous call found for bar
-[eva] computing for function <yVF9> bar <- main.
+[eva] computing for function bar <- main.
   Called from malloc_base_name_clash_1.c:27.
 [eva:memexec] No previous call found for alloc
-[eva] computing for function <acB2> alloc <- bar <- main.
+[eva] computing for function alloc <- bar <- main.
   Called from malloc_base_name_clash_1.c:21.
 [eva] malloc_base_name_clash_1.c:10: Call to builtin malloc
 [eva] malloc_base_name_clash_1.c:10: allocating variable __malloc_alloc_l10_0
@@ -133,17 +133,17 @@ Allocation sites: {
                     main }
 Call sites: { alloc(1); }
 
-Dynamic allocated bases: {[ __malloc_alloc_l10 -> <KiXL> alloc :: malloc_base_name_clash_1.c:16 <-
-                                                         foo :: malloc_base_name_clash_1.c:26 <-
-                                                         main
-                            __malloc_alloc_l10_0 -> <acB2> alloc :: malloc_base_name_clash_1.c:21 <-
-                                                           bar :: malloc_base_name_clash_1.c:27 <-
-                                                           main ]}
-Malloced by stack: <KjPK> malloc :: malloc_base_name_clash_1.c:10 <-
-                          alloc :: malloc_base_name_clash_1.c:21 <-
-                          bar :: malloc_base_name_clash_1.c:27 <-
-                          main -> __malloc_alloc_l10_0
-Malloced by stack: <NDqA> malloc :: malloc_base_name_clash_1.c:10 <-
-                          alloc :: malloc_base_name_clash_1.c:16 <-
-                          foo :: malloc_base_name_clash_1.c:26 <-
-                          main -> __malloc_alloc_l10
+Dynamic allocated bases: {[ __malloc_alloc_l10 -> alloc :: malloc_base_name_clash_1.c:16 <-
+                                                  foo :: malloc_base_name_clash_1.c:26 <-
+                                                  main
+                            __malloc_alloc_l10_0 -> alloc :: malloc_base_name_clash_1.c:21 <-
+                                                    bar :: malloc_base_name_clash_1.c:27 <-
+                                                    main ]}
+Malloced by stack: malloc :: malloc_base_name_clash_1.c:10 <-
+                   alloc :: malloc_base_name_clash_1.c:21 <-
+                   bar :: malloc_base_name_clash_1.c:27 <-
+                   main -> __malloc_alloc_l10_0
+Malloced by stack: malloc :: malloc_base_name_clash_1.c:10 <-
+                   alloc :: malloc_base_name_clash_1.c:16 <-
+                   foo :: malloc_base_name_clash_1.c:26 <-
+                   main -> __malloc_alloc_l10

@@ -4,41 +4,6 @@
 [eva] Copying Eva analysis cache from save file malloc_modif_1.sav
 [eva] In save file malloc_modif_1.sav, 5 saved calls for 4 functions
 [eva] In save file malloc_modif_1.sav, 0 saved widenings for 0 functions
-[eva:callstack] Statement not found: alloc();
-[eva:callstack] 
-  Callstack import failed: <cKzi> alloc :: malloc_modif_1.c:22 <-
-                                  bar :: malloc_modif_1.c:28 <-
-                                  main
-[eva:callstack] Statement not found: alloc();
-[eva:callstack] 
-  Callstack import failed: <Mv6q> malloc :: malloc_modif_1.c:11 <-
-                                  alloc :: malloc_modif_1.c:22 <-
-                                  bar :: malloc_modif_1.c:28 <-
-                                  main
-[eva:callstack] Statement not found: alloc();
-[eva:callstack] 
-  Callstack import failed: <Mv6q> malloc :: malloc_modif_1.c:11 <-
-                                  alloc :: malloc_modif_1.c:22 <-
-                                  bar :: malloc_modif_1.c:28 <-
-                                  main
-[eva:callstack] Statement not found: alloc();
-[eva:callstack] 
-  Callstack import failed: <Mv6q> malloc :: malloc_modif_1.c:11 <-
-                                  alloc :: malloc_modif_1.c:22 <-
-                                  bar :: malloc_modif_1.c:28 <-
-                                  main
-[eva:callstack] Statement not found: alloc();
-[eva:callstack] 
-  Callstack import failed: <Mv6q> malloc :: malloc_modif_1.c:11 <-
-                                  alloc :: malloc_modif_1.c:22 <-
-                                  bar :: malloc_modif_1.c:28 <-
-                                  main
-[eva:callstack] Statement not found: alloc();
-[eva:callstack] 
-  Callstack import failed: <Mv6q> malloc :: malloc_modif_1.c:11 <-
-                                  alloc :: malloc_modif_1.c:22 <-
-                                  bar :: malloc_modif_1.c:28 <-
-                                  main
 [eva:memexec] Function foo has been modified: -> foo (body changed)
 [eva:memexec] 
   Function alloc has no syntax diff but cannot imported due to dynalloc data import failure
@@ -55,10 +20,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
 [eva:memexec] No previous call found for main
 [eva:memexec] No previous call found for foo
-[eva] computing for function <7QtG> foo <- main.
+[eva] computing for function foo <- main.
   Called from malloc_modif_2.c:25.
 [eva:memexec] No previous call found for alloc
-[eva] computing for function <5iBo> alloc <- foo <- main.
+[eva] computing for function alloc <- foo <- main.
   Called from malloc_modif_2.c:15.
 [eva] malloc_modif_2.c:8: Call to builtin malloc
 [eva] malloc_modif_2.c:9: Call to builtin free
@@ -70,7 +35,7 @@
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:memexec] No previous call found for bar
-[eva] computing for function <cP6E> bar <- main.
+[eva] computing for function bar <- main.
   Called from malloc_modif_2.c:26.
 [eva] Recording results for bar
 [eva] Done for function bar
@@ -137,10 +102,10 @@ Allocation sites: {
                     main }
 Call sites: { foo();; bar(); }
 
-Dynamic allocated bases: {[ __malloc_alloc_l11 -> <5iBo> alloc :: malloc_modif_2.c:15 <-
-                                                         foo :: malloc_modif_2.c:25 <-
-                                                         main ]}
-Malloced by stack: <naWX> malloc :: malloc_modif_2.c:8 <-
-                          alloc :: malloc_modif_2.c:15 <-
-                          foo :: malloc_modif_2.c:25 <-
-                          main -> __malloc_alloc_l11
+Dynamic allocated bases: {[ __malloc_alloc_l11 -> alloc :: malloc_modif_2.c:15 <-
+                                                  foo :: malloc_modif_2.c:25 <-
+                                                  main ]}
+Malloced by stack: malloc :: malloc_modif_2.c:8 <-
+                   alloc :: malloc_modif_2.c:15 <-
+                   foo :: malloc_modif_2.c:25 <-
+                   main -> __malloc_alloc_l11

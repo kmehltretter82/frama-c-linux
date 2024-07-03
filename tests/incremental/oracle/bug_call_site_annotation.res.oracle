@@ -17,7 +17,7 @@
   S_1___fc_env[0..1] ∈ [--..--]
 [eva:memexec-malloc] 
   --- Reused allocated bases {__malloc_foo_l10} for KF main at callstack 
-  <A5r5> main
+  main
 [eva] :0: Reusing old results for call to main
 [eva] ====== VALUES COMPUTED ======
 [eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
@@ -45,8 +45,8 @@ Allocation sites: {
                     main; foo :: bug_call_site_annotation.c:16 <- main }
 Call sites: { foo(*(argv + 0)); }
 
-Dynamic allocated bases: {[ __malloc_foo_l10 -> <f3Ss> foo :: bug_call_site_annotation.c:16 <-
-                                                       main ]}
-Malloced by stack: <LPVn> malloc :: bug_call_site_annotation.c:10 <-
-                          foo :: bug_call_site_annotation.c:16 <-
-                          main -> __malloc_foo_l10
+Dynamic allocated bases: {[ __malloc_foo_l10 -> foo :: bug_call_site_annotation.c:16 <-
+                                                main ]}
+Malloced by stack: malloc :: bug_call_site_annotation.c:10 <-
+                   foo :: bug_call_site_annotation.c:16 <-
+                   main -> __malloc_foo_l10

@@ -8,7 +8,7 @@
 [eva:alarm] bug_call_site_annotation.c:16: Warning: 
   out of bounds read. assert \valid_read(argv + 0);
 [eva:memexec] No previous call found for foo
-[eva] computing for function <f3Ss> foo <- main.
+[eva] computing for function foo <- main.
   Called from bug_call_site_annotation.c:16.
 [eva] bug_call_site_annotation.c:10: Call to builtin malloc
 [eva] bug_call_site_annotation.c:10: allocating variable __malloc_foo_l10
@@ -55,8 +55,8 @@ Call sites: {
               /*@ assert Eva: mem_access: \valid_read(argv + 0); */
               foo(*(argv + 0)); }
 
-Dynamic allocated bases: {[ __malloc_foo_l10 -> <f3Ss> foo :: bug_call_site_annotation.c:16 <-
-                                                       main ]}
-Malloced by stack: <LPVn> malloc :: bug_call_site_annotation.c:10 <-
-                          foo :: bug_call_site_annotation.c:16 <-
-                          main -> __malloc_foo_l10
+Dynamic allocated bases: {[ __malloc_foo_l10 -> foo :: bug_call_site_annotation.c:16 <-
+                                                main ]}
+Malloced by stack: malloc :: bug_call_site_annotation.c:10 <-
+                   foo :: bug_call_site_annotation.c:16 <-
+                   main -> __malloc_foo_l10

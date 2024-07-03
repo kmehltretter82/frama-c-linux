@@ -6,10 +6,10 @@
   
 [eva:memexec] No previous call found for main
 [eva:memexec] No previous call found for foo
-[eva] computing for function <7zs2> foo <- main.
+[eva] computing for function foo <- main.
   Called from malloc_modif_1.c:27.
 [eva:memexec] No previous call found for alloc
-[eva] computing for function <5r4w> alloc <- foo <- main.
+[eva] computing for function alloc <- foo <- main.
   Called from malloc_modif_1.c:17.
 [eva] malloc_modif_1.c:11: Call to builtin malloc
 [eva] malloc_modif_1.c:11: allocating variable __malloc_alloc_l11
@@ -22,10 +22,10 @@
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:memexec] No previous call found for bar
-[eva] computing for function <VQhd> bar <- main.
+[eva] computing for function bar <- main.
   Called from malloc_modif_1.c:28.
 [eva:memexec] No previous saved state found for alloc
-[eva] computing for function <cKzi> alloc <- bar <- main.
+[eva] computing for function alloc <- bar <- main.
   Called from malloc_modif_1.c:22.
 [eva] malloc_modif_1.c:11: Call to builtin malloc
 [eva] malloc_modif_1.c:11: allocating variable __malloc_alloc_l11_0
@@ -130,17 +130,17 @@ Allocation sites: {
                     main }
 Call sites: { alloc(); }
 
-Dynamic allocated bases: {[ __malloc_alloc_l11 -> <5r4w> alloc :: malloc_modif_1.c:17 <-
-                                                         foo :: malloc_modif_1.c:27 <-
-                                                         main
-                            __malloc_alloc_l11_0 -> <cKzi> alloc :: malloc_modif_1.c:22 <-
-                                                           bar :: malloc_modif_1.c:28 <-
-                                                           main ]}
-Malloced by stack: <ZrhC> malloc :: malloc_modif_1.c:11 <-
-                          alloc :: malloc_modif_1.c:17 <-
-                          foo :: malloc_modif_1.c:27 <-
-                          main -> __malloc_alloc_l11
-Malloced by stack: <Mv6q> malloc :: malloc_modif_1.c:11 <-
-                          alloc :: malloc_modif_1.c:22 <-
-                          bar :: malloc_modif_1.c:28 <-
-                          main -> __malloc_alloc_l11_0
+Dynamic allocated bases: {[ __malloc_alloc_l11 -> alloc :: malloc_modif_1.c:17 <-
+                                                  foo :: malloc_modif_1.c:27 <-
+                                                  main
+                            __malloc_alloc_l11_0 -> alloc :: malloc_modif_1.c:22 <-
+                                                    bar :: malloc_modif_1.c:28 <-
+                                                    main ]}
+Malloced by stack: malloc :: malloc_modif_1.c:11 <-
+                   alloc :: malloc_modif_1.c:17 <-
+                   foo :: malloc_modif_1.c:27 <-
+                   main -> __malloc_alloc_l11
+Malloced by stack: malloc :: malloc_modif_1.c:11 <-
+                   alloc :: malloc_modif_1.c:22 <-
+                   bar :: malloc_modif_1.c:28 <-
+                   main -> __malloc_alloc_l11_0

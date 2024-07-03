@@ -19,10 +19,10 @@
   S_1___fc_env[0..1] ∈ [--..--]
 [eva:memexec] No previous call found for main
 [eva:memexec] No previous call found for foo
-[eva] computing for function <aZAB> foo <- main.
+[eva] computing for function foo <- main.
   Called from malloc_modif_3.c:25.
 [eva:memexec] No previous saved state found for alloc
-[eva] computing for function <mSWv> alloc <- foo <- main.
+[eva] computing for function alloc <- foo <- main.
   Called from malloc_modif_3.c:15.
 [eva] malloc_modif_3.c:8: Call to builtin malloc
 [eva] malloc_modif_3.c:9: Call to builtin free
@@ -35,7 +35,7 @@
 [eva] Done for function foo
 [eva:memexec-malloc] 
   --- Reused allocated bases {__malloc_alloc_l11_0} for KF bar at callstack 
-  <X3ED> bar :: malloc_modif_3.c:26 <- main
+  bar :: malloc_modif_3.c:26 <- main
 [eva] malloc_modif_3.c:26: Reusing old results for call to bar
 [eva] Recording results for main
 [eva] Done for function main
@@ -131,17 +131,17 @@ Allocation sites: {
                     main }
 Call sites: { alloc(); }
 
-Dynamic allocated bases: {[ __malloc_alloc_l11 -> <mSWv> alloc :: malloc_modif_3.c:15 <-
-                                                         foo :: malloc_modif_3.c:25 <-
-                                                         main
-                            __malloc_alloc_l11_0 -> <sgG2> alloc :: malloc_modif_3.c:20 <-
-                                                           bar :: malloc_modif_3.c:26 <-
-                                                           main ]}
-Malloced by stack: <j9jr> malloc :: malloc_modif_3.c:8 <-
-                          alloc :: malloc_modif_3.c:20 <-
-                          bar :: malloc_modif_3.c:26 <-
-                          main -> __malloc_alloc_l11_0
-Malloced by stack: <h3tU> malloc :: malloc_modif_3.c:8 <-
-                          alloc :: malloc_modif_3.c:15 <-
-                          foo :: malloc_modif_3.c:25 <-
-                          main -> __malloc_alloc_l11
+Dynamic allocated bases: {[ __malloc_alloc_l11 -> alloc :: malloc_modif_3.c:15 <-
+                                                  foo :: malloc_modif_3.c:25 <-
+                                                  main
+                            __malloc_alloc_l11_0 -> alloc :: malloc_modif_3.c:20 <-
+                                                    bar :: malloc_modif_3.c:26 <-
+                                                    main ]}
+Malloced by stack: malloc :: malloc_modif_3.c:8 <-
+                   alloc :: malloc_modif_3.c:20 <-
+                   bar :: malloc_modif_3.c:26 <-
+                   main -> __malloc_alloc_l11_0
+Malloced by stack: malloc :: malloc_modif_3.c:8 <-
+                   alloc :: malloc_modif_3.c:15 <-
+                   foo :: malloc_modif_3.c:25 <-
+                   main -> __malloc_alloc_l11
