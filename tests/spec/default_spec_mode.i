@@ -30,3 +30,9 @@ int f3(int* a);
 int f4(int* b){
   return f3(b);
 }
+
+__attribute__((__noreturn__)) void f5();
+
+void f5(){
+  while(1);
+}

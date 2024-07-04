@@ -653,6 +653,8 @@ end
 (* |-------|------|-------|------|-------|------|-------|------| *)
 (* | true  | true | ACSL  | ACSL | false | true |  ???  |  ??  | *)
 (* |-----------------------------------------------------------| *)
+(* Note: Terminates are set to false in ACSL, Frama-C and Safe   *)
+(* modes if the function has the attribute noreturn.             *)
 (* ***************************************************************)
 (* ****** Status emitted on prototypes ******)
 (* |--------------------------------------| *)
@@ -679,13 +681,16 @@ struct
 
   let get_clauses _spec _table = None
 
-  let acsl_default _kf =
-    Some(Logic_const.(new_predicate ptrue))
+  let acsl_default kf =
+    if Kernel_function.has_noreturn_attr kf then
+      Some(Logic_const.(new_predicate pfalse))
+    else
+      Some(Logic_const.(new_predicate ptrue))
 
   let safe_default kf =
-    if Kernel_function.has_definition kf
-    then Some(Logic_const.(new_predicate ptrue))
-    else Some(Logic_const.(new_predicate pfalse))
+    if Kernel_function.has_noreturn_attr kf || not (Kernel_function.has_definition kf) then
+      Some(Logic_const.(new_predicate pfalse))
+    else Some(Logic_const.(new_predicate ptrue))
 
   let frama_c_default kf =
     acsl_default kf

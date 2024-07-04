@@ -567,6 +567,12 @@ let is_in_libc kf =
     | Declaration (_, { vattr }, _, _) -> vattr
   in Cil.is_in_libc attrs
 
+let has_noreturn_attr kf =
+  match kf.fundec with
+  | Definition ({ svar = { vattr } },_)
+  | Declaration (_, { vattr }, _, _) ->
+    Cil.hasAttribute "noreturn" vattr
+
 let is_first_stmt kf stmt =
   try
     let first = find_first_stmt kf in

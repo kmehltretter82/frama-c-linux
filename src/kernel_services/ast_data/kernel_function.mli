@@ -182,6 +182,10 @@ val is_in_libc : t -> bool
 (** @return true iff the given function attributes contain libc indicators.
     @since 24.0-Chromium *)
 
+val has_noreturn_attr : t -> bool
+(** @return true iff the given function contain the noreturn attribute.
+    @since Frama-C+dev *)
+
 val is_not_called: t -> bool
 (** @return true if the given function is not called in the program.
     Warning, return false does not ensure that the function is called.
