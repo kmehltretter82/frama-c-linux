@@ -201,7 +201,7 @@ sig
   val get_clauses : spec -> behaviors -> clause list option
 
   (* Generate a default clause in ACSL mode. *)
-  val acsl_default : unit -> clause
+  val acsl_default : kernel_function -> clause
   (* Generate a default clause in Safe mode. *)
   val safe_default : kernel_function -> clause
   (* Generate a default clause in Frama_C mode. *)
@@ -225,7 +225,7 @@ struct
   (* Either combine existing clauses or generate new ones depending on the
      selected mode and original specification. *)
   let combine_or_default mode kf spec table =
-    if mode = ACSL then false, G.acsl_default ()
+    if mode = ACSL then false, G.acsl_default kf
     else
       let clauses_opt = G.get_clauses spec table in
       match mode, clauses_opt with
@@ -298,7 +298,7 @@ struct
 
   let get_clauses = get_clauses_generic
 
-  let acsl_default () =
+  let acsl_default _kf =
     [ Exits, Logic_const.(new_predicate pfalse) ]
 
   let safe_default kf =
@@ -306,8 +306,8 @@ struct
     then [ Exits, Logic_const.(new_predicate pfalse) ]
     else []
 
-  let frama_c_default _kf =
-    acsl_default ()
+  let frama_c_default kf =
+    acsl_default kf
 
   let combine_default (clauses : clause list) =
     let collect acc clauses = List.rev_append (List.rev clauses) acc in
@@ -388,7 +388,7 @@ struct
 
   let get_clauses = get_clauses_generic
 
-  let acsl_default () =
+  let acsl_default _kf =
     WritesAny
 
   let safe_default kf =
@@ -511,15 +511,15 @@ struct
 
   let get_clauses = get_clauses_generic
 
-  let acsl_default () = []
+  let acsl_default _kf = []
 
   let safe_default kf =
     if Kernel_function.has_definition kf
     then []
     else [ Logic_const.(new_predicate pfalse) ]
 
-  let frama_c_default _kf =
-    acsl_default ()
+  let frama_c_default kf =
+    acsl_default kf
 
   let combine_default (clauses : clause list) =
     let flatten_require clause =
@@ -584,7 +584,7 @@ struct
 
   let get_clauses = get_clauses_generic
 
-  let acsl_default () =
+  let acsl_default _kf =
     FreeAlloc([],[])
 
   let safe_default kf =
@@ -592,8 +592,8 @@ struct
     then FreeAlloc([],[])
     else FreeAllocAny
 
-  let frama_c_default _kf =
-    acsl_default ()
+  let frama_c_default kf =
+    acsl_default kf
 
   let combine_default clauses =
     (* Note: combination is made on a set of behaviors in the sens of
@@ -679,7 +679,7 @@ struct
 
   let get_clauses _spec _table = None
 
-  let acsl_default () =
+  let acsl_default _kf =
     Some(Logic_const.(new_predicate ptrue))
 
   let safe_default kf =
@@ -687,8 +687,8 @@ struct
     then Some(Logic_const.(new_predicate ptrue))
     else Some(Logic_const.(new_predicate pfalse))
 
-  let frama_c_default _kf =
-    acsl_default ()
+  let frama_c_default kf =
+    acsl_default kf
 
   let combine_default _clauses =
     assert false
