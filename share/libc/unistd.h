@@ -836,6 +836,7 @@ extern int          execve(const char *path, char *const argv[], char *const env
 extern int          execvp(const char *path, char *const argv[]);
 
 /*@
+  terminates \false;
   assigns \nothing;
   ensures never_terminates: \false;
 */
