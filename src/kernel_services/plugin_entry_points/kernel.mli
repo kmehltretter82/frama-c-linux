@@ -501,8 +501,8 @@ module SimplifyCfg: Parameter_sig.Bool
 module KeepSwitch: Parameter_sig.Bool
 (** Behavior of option "-keep-switch" *)
 
-module Keep_unused_specified_functions: Parameter_sig.Bool
-(** Behavior of option "-keep-unused-specified-functions". *)
+module KeepUnusedFunctions: Parameter_sig.String
+(** Behavior of option "-keep-unused-functions". *)
 
 module Keep_unused_types: Parameter_sig.Bool
 (** Behavior of option "-keep-unused-types". *)

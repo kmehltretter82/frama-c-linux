@@ -260,8 +260,12 @@ Defaults to no.
 [-no]-keep-switch
 : when **-simplify-cfg** is set, keeps switch statements. Defaults to no.
 
--keep-unused-specified-functions
-: see **-remove-unused-specified-functions**.
+-keep-unused-functions *criterion*
+: keeps or removes function prototypes for functions that have no body and
+are not used. *criterion* is one of: **none**, **specified**, **all**, and
+**all_debug**; **specified** (the default value) keeps function prototypes
+that have an ACSL specification. **all** and **all_debug** are identical except
+for compiler builtins, which are only included with **all_debug**.
 
 -keep-unused-types
 : see **-remove-unused-types**.
@@ -386,11 +390,6 @@ functions were fully inlined.
 -remove-projects *p1,...,pn*
 : removes the given projects *p1,...,pn*.
 **@all_but_current** removes all projects but the current one.
-
--remove-unused-specified-functions
-: keeps function prototypes that have an ACSL specification but are not used
-in the code. This is the default. Functions having the attribute
-**FRAMAC_BUILTIN** are always kept.
 
 -remove-unused-types
 : remove types and struct/union/enum declarations that are not referenced

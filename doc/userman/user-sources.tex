@@ -258,10 +258,16 @@ a negative value, and choose the smallest rank possible starting from
   Other plug-ins may prefer this option to be used because it better
   preserves the structure of the original program.
 
-\item \optiondef{-}{keep-unused-specified-functions} does not remove from the
-  AST uncalled function prototypes that have ACSL contracts. This option is
-  set by default. So you mostly use the opposite form, namely
-  \optiondef{-}{remove-unused-specified-functions}.
+\item \texttt{\optiondef{-}{keep-unused-functions} <value>} defines which
+  unused function prototypes are kept in the AST. By default (value
+  \texttt{specified}), only those with ACSL specifications are preserved;
+  the user can force those to be removed as well (with value \texttt{none}),
+  or keep prototypes that are both unused and unspecified (value \texttt{all}).
+  A special value \texttt{all\_debug} also preserves predefined prototypes
+  (e.g. compiler builtins).
+  This option extends and replaces previous options
+  \texttt{-keep-unused-specified-functions} and
+  \texttt{-remove-unused-specified-functions}.
 
 \item \optiondef{-}{keep-unused-types} does not remove unused types and
   enum/struct/union declarations. By default, such types are removed,

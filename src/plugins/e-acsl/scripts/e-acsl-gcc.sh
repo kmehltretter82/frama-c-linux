@@ -1041,7 +1041,7 @@ fi
 
 # Extra Frama-C Flags E-ACSL needs
 FRAMAC_FLAGS="$FRAMAC_FLAGS \
-  -remove-unused-specified-functions"
+  -keep-unused-functions none"
 
 if [ -n "$OPTION_VALIDATE_FORMAT_STRINGS" ]; then
   FRAMAC_FLAGS="$FRAMAC_FLAGS \

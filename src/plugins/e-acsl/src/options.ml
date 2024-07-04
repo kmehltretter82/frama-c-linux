@@ -293,7 +293,7 @@ let setup ?(rtl=false) () =
   end;
   (* Additionnal kernel options while parsing the RTL project. *)
   if rtl then begin
-    Kernel.Keep_unused_specified_functions.off ();
+    Kernel.KeepUnusedFunctions.set "none";
     Kernel.CppExtraArgs.add
       (Format.asprintf " -DE_ACSL_MACHDEP=%s" (Kernel.Machdep.get ()));
   end

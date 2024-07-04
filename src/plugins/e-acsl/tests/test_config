@@ -1,6 +1,6 @@
 MACRO: DEST @PTEST_RESULT@/gen_@PTEST_NAME@
 MACRO: MACHDEP -machdep gcc_x86_64
-MACRO: GLOBAL @MACHDEP@ -remove-unused-specified-functions -verbose 0 -no-unicode
+MACRO: GLOBAL @MACHDEP@ -keep-unused-functions none -verbose 0 -no-unicode
 
 COMMENT: no more share to set with Dune
 MACRO: EACSL -e-acsl -e-acsl-verbose 1
