@@ -51,7 +51,7 @@ val ordered : limit:bool -> strict:bool -> term option -> term option -> pred
     - [strict]: if [true], comparison is [<] instead of [<=] *)
 
 val is_empty : set -> pred
-val equal : set -> set -> pred
+val equal : ?use_eq:bool -> set -> set -> pred
 val subset : set -> set -> pred
 val disjoint : set -> set -> pred
 

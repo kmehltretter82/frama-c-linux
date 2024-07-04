@@ -28,3 +28,9 @@
 //@ logic set<int> Set2 = {int1,int2};
 //@ check lemma indirect_in_ghost: int2 \in Set2;
 //@ check lemma indirect_equal_ghost: Set2 == {int1,int2};
+
+/*@ check lemma test:
+  @   \forall set<int> a,b,c;
+  @   (a == b || b == c) ==>
+  @   (\union(a,\union(b,c)) == \union(a,c));
+  @*/

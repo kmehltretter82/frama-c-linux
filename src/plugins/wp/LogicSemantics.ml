@@ -320,7 +320,7 @@ struct
       let sa = set_of_term env a in
       let sb = set_of_term env b in
       (* TODO: should be parametric in the equality of elements *)
-      Vset.equal sa sb
+      Vset.equal ~use_eq:(use_equal polarity) sa sb
 
     | EQ_loc ->
       let la = loc_of_term env a in

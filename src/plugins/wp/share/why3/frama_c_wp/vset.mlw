@@ -36,8 +36,6 @@ theory Vset
   (* -------------------------------------------------------------------------- *)
 
   function member_bool 'a (set 'a) : bool
-  predicate eqset (a : set 'a) (b : set 'a) =
-    forall x : 'a. (mem x a) <-> (mem x b)
 
   let function range (inf sup:int) : set int (* [a..b] *) =
     fun elt -> if inf <= elt <= sup then true else false

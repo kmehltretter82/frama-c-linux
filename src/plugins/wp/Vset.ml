@@ -254,8 +254,11 @@ let subset xs ys =
 (* --- Equality                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let equal xs ys =
-  p_and (subset xs ys) (subset ys xs)
+let equal ?(use_eq:bool=false) (xs:set) (ys:set) =
+  match xs, ys with
+  | [  Set (_,s1) ], [  Set (_,s2) ] when use_eq -> p_equal s1 s2
+  | _ -> p_and (subset xs ys) (subset ys xs)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Separation                                                         --- *)
