@@ -205,16 +205,6 @@ opposite form \texttt{-no-collapse-call-cast} is more useful.
 constant expressions. For instance,
 the expression \texttt{1+2} is replaced by \texttt{3}.
 
-\item \deprecatedoptiondef{-}{continue-annot-error} \emph{Deprecated option.}
-  Just emits a warning and discards the annotation when it fails to type-check,
-  instead of generating an error (errors in \C are still fatal). This behavior
-  is now managed by warning category (Section~\ref{sec:feedback-options})
-\texttt{annot-error}, whose default status is ``abort''. Behavior of
-\texttt{-continue-annot-error} can thus be obtained with
-\texttt{-kernel-warn-key annot-error=active}, or even
-\texttt{-kernel-warn-key annot-error=inactive} to silently ignore any ill-formed
-annotations.
-
 \item \texttt{\optiondef{-}{enums} <repr name>} specifies which representation
 should be used for a given enumerated type. Namely, the C standard allows the use
 of any integral type in which all the corresponding tags can be represented.
@@ -618,38 +608,18 @@ As stated before, if you want to ensure the code analyzed by \FramaC is
 strictly equivalent to the one from the target system, you must either
 proofread the definitions, or provide your own library files.
 
-\section{Warnings during normalization}\label{sec:warnings-normalize}
+% \section{Warnings during normalization}\label{sec:warnings-normalize}
 
-\emph{Note: the options below are deprecated, replaced by the more general and
-  flexible mechanism of \emph{warning categories}, described in
-  Section~\ref{sec:feedback-options}.}
+% \emph{Note: the options below are deprecated, replaced by the more general and
+%   flexible mechanism of \emph{warning categories}, described in
+%   Section~\ref{sec:feedback-options}.}
 
-Some options can be used to influence the warnings that are
-emitted by \FramaC during the normalization phase.
+% Some options can be used to influence the warnings that are
+% emitted by \FramaC during the normalization phase.
 
-\begin{description}
-\item \texttt{\deprecatedoptiondef{-}{warn-decimal-float} <freq>}
-  (\emph{deprecated}) warns
-  when floating-point constants in the program cannot be exactly represented;
-  freq must be one of \texttt{none}, \texttt{once} or \texttt{all}.
-  Defaults to \texttt{once}.
-  \emph{Superseded by warning category \texttt{parser:decimal-float}.}
+% \begin{description}
 
-\item \texttt{\deprecatedoptiondef{-}{implicit-function-declaration} <action>}
-  (\emph{deprecated}) defines
-  the action to perform (\texttt{ignore}, \texttt{warn} or \texttt{error})
-  whenever a call to a function that has not been previously declared is found.
-  This is invalid in C90 or in C99, but could be valid K\&R code.
-  Defaults to \texttt{warn}.
-  \emph{Superseded by warning category \texttt{typing:implicit-function-declaration}}.
-  \textbf{Note:} parsing is not guaranteed to succeed, regardless of
-  the emission of the warning. Upon encountering a call to an undeclared
-  function, \FramaC attempts to continue its parsing
-  phase by inferring a prototype corresponding to the type of the
-  arguments at the call (modulo default argument promotions).
-  If the real declaration does not match the
-  inferred prototype, parsing will later end with an error.
-\end{description}
+% \end{description}
 
 \section{Testing the Source Code Preparation}
 

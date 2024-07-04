@@ -168,20 +168,6 @@ variables with const qualifier must be actually constant.
 Defaults to yes.
 The opposite option is \f[B]-unsafe-writable\f[R].
 .TP
-[-no]-continue-annot-error
-when analyzing an annotation, the default behavior (the \f[B]-no\f[R]
-version of this option) when a typechecking error occurs is to reject
-the source file as is the case for typechecking errors within the C
-code.
-With this option on, the typechecker will only output a warning and
-discard the annotation but type‐checking will continue (errors in C code
-are still fatal, though).
-.PD 0
-.P
-.PD
-\f[B]Deprecated\f[R]: use \f[B]-kernel-warn-key annot-error\f[R]
-instead.
-.TP
 -cpp-command \f[I]cmd\f[R]
 uses \f[I]cmd\f[R] as the command to preprocess C files.
 Defaults to the \f[B]CPP\f[R] environment variable or to
@@ -260,17 +246,6 @@ If \f[B]-cpp-frama-c-compliant\f[R] is not false, also adds
 \f[B]-nostdinc\f[R] to prevent an inconsistent mix of system and Frama-C
 header files.
 Defaults to yes.
-.TP
--implicit-function-declaration \f[I]action\f[R]
-warns or aborts when a function is called before it has been declared.
-\f[I]action\f[R] can be one of \f[B]ignore\f[R], \f[B]warn\f[R], or
-\f[B]error\f[R].
-Defaults to \f[B]warn\f[R].
-.PD 0
-.P
-.PD
-\f[B]Deprecated\f[R]: use \f[B]-kernel-warn-key
-typing:implicit-function-declaration\f[R] instead.
 .TP
 -initialized-padding-locals
 implicit initialization of locals sets padding bits to 0.
@@ -547,17 +522,6 @@ case (this is the default).
 .TP
 -version
 outputs the version string of Frama-C.
-.TP
--warn-decimal-float \f[I]freq\f[R]
-warns when a floating-point constant cannot be exactly represented
-(e.g.\ 0.1).
-\f[I]freq\f[R] can be one of \f[B]none\f[R], \f[B]once\f[R], or
-\f[B]all\f[R].
-.PD 0
-.P
-.PD
-\f[B]Deprecated\f[R]: use \f[B]-kernel-warn-key
-parser:decimal-float=once\f[R] (and variants) instead.
 .TP
 [-no]-warn-invalid-pointer
 generate alarms for invalid pointer arithmetic.
