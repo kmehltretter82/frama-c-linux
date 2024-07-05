@@ -3,8 +3,12 @@
    STDOPT:
 */
 
+#include <stdint.h>
+
 int * const a;
 int * b = a;
+
+uintptr_t b1 = (uintptr_t) a;
 
 struct stru {
     const int c;
