@@ -36,11 +36,9 @@ let dkey = L.register_category "why3.import"
 (* ---    Why3 Environment                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let create_why3_env loadpath =
+let why3_env loadpath =
   let main = WConf.get_main @@ WConf.read_config None in
   W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
-
-
 
 let extract_path thname =
   let segments = String.split_on_char '.' thname in
@@ -84,8 +82,6 @@ let pp_id_loc fmt (id : W.Ident.ident) =
   | Some loc -> W.Loc.pp_position fmt loc
   | None -> L.error "No location found"
 
-
-
 (* For debug only*)
 let pp_lti fmt (lti : C.logic_type_info) =
   Cpp.pp_logic_type_info fmt lti
@@ -93,7 +89,6 @@ let pp_lti fmt (lti : C.logic_type_info) =
 (* For debug only*)
 let pp_li fmt (li : C.logic_info) =
   Cpp.pp_logic_info fmt li
-
 
 (* For debug only*)
 let pp_lvs fmt (lvs : C.logic_var list) =
@@ -105,7 +100,6 @@ let pp_lvs fmt (lvs : C.logic_var list) =
 (* -------------------------------------------------------------------------*)
 (* ---    Types                                                           - *)
 (* -------------------------------------------------------------------------*)
-
 
 type tvars = C.logic_type W.Ty.Mtv.t
 
@@ -129,14 +123,13 @@ type menv = {
   mutable li : (C.logic_info * C.location) list;
 }
 
-let create_empty_env wenv =
+let create wenv =
   let tenv  = W.Ty.Hts.create 0 in
   let lenv  = W.Term.Hls.create 0 in
   let lils  = Logic_info.Hashtbl.create 0 in
   let ltits  = Logic_type_info.Hashtbl.create 0 in
   let menv  = Datatype.String.Hashtbl.create 0 in
   { wenv; tenv; lenv; lils; ltits; menv }
-
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
@@ -320,8 +313,24 @@ let import_theory (env : env) thname =
 (* ---    Module registration                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Env = WpContext.StaticGenerator
+    (Datatype.Unit)
+    (struct
+      type key = unit
+      type data = env
+      let name = "Wp.Why3Import.Env"
+      let compile () =
+        let env = create @@ why3_env @@ L.Library.get () in
+        add_builtins env ; env
+    end)
+
 let loader (ctxt: Logic_typing.module_builder) (loc: C.location) (m: string list) =
   begin
+
+    (* Use Env.get () to obtain the global env of the current project *)
+    (* Use import_theory if the module is not in the hashtbl *)
+    (* Register logics in ctxt for the imported (or cached) module *)
+
     L.result "[test-import:%d] Loading %s.@." (fst loc).pos_lnum (String.concat "::" m) ;
     let t = Cil_const.make_logic_type "t" in
     let check = Cil_const.make_logic_info "check" in
@@ -332,60 +341,10 @@ let loader (ctxt: Logic_typing.module_builder) (loc: C.location) (m: string list
     ctxt.add_logic_function loc check ;
   end
 
-let () = Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader
-
-
-(* -------------------------------------------------------------------------- *)
-(* ---    Main                                                            --- *)
-(* -------------------------------------------------------------------------- *)
-
 let () =
-  Boot.Main.extend
+  Cmdline.run_after_extended_stage
     begin fun () ->
-      let libs = L.Library.get() in
-      let imports = L.Import.get() in
-      if libs <> [] || imports <> [] then
-        begin
-          let wenv = create_why3_env @@ libs in
-          let env : env = create_empty_env wenv in
-          add_builtins env;
-          List.iter (import_theory env) @@ imports;
-          W.Ty.Hts.iter (fun (tys) (lti) ->
-              L.result "Why3 type symbol : %a" pp_tys tys;
-              L.result "Corresponding CIL logic type info %a" pp_lti lti;
-            ) env.tenv;
-          W.Term.Hls.iter (fun (ls) (li) ->
-              L.result "Why3 logic symbol : %a" pp_ls ls;
-              L.result "Corresponding CIL logic info : %a" pp_li li;
-              L.result "Associated parameters : @[<hov2>%a@]" pp_lvs li.l_profile;
-            ) env.lenv;
-          Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
-              L.result "@[Module %s at %s@]" s (String.concat "::" why3mod.paths);
-              List.iter (fun ((li,loc)) ->
-                  L.result "Logic : @[<hov1>%a@]" pp_li li;
-                  L.result "at %a" Cpp.pp_location loc;
-                )
-                why3mod.logics;
-              List.iter (fun ((lti,loc)) ->
-                  L.result "Type : @[<hov1>%a@]" pp_lti lti;
-                  L.result "at %a" Cpp.pp_location loc;)
-                why3mod.types;
-            ) env.menv;
-          Logic_type_info.Hashtbl.iter ( fun (lti) (ts) ->
-              L.result "Logic type info : %a is associated to ts : %a "
-                pp_lti lti pp_tys ts;
-              L.result "Logic type info located at : %a" pp_id_loc ts.ts_name;
-              L.result "CIL Location will be %a" pp_cil_loc ts.ts_name;
-            )
-            env.ltits;
-          Logic_info.Hashtbl.iter ( fun (li) (ls) ->
-              L.result "Logic info %a is associated to ls : %a "
-                pp_li li pp_ls ls;
-              L.result "Logic info located at : %a" pp_id_loc ls.ls_name;
-              L.result "CIL Location will be %a" pp_cil_loc ls.ls_name;
-            )
-            env.lils;
-        end
+      Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader
     end
 
 (* -------------------------------------------------------------------------- *)
