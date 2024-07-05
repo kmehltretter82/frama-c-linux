@@ -37,9 +37,10 @@ export function EvaSideBar(): JSX.Element {
     return Forms.useBuffer(remote, useServerField(state, defaultValue));
   }
 
-  const precision = useField(Params.evaPrecision, 0);
   const main = useField(Params.main, "");
   const libEntry = useField(Params.libEntry, false);
+  const precision = useField(Params.evaPrecision, 0);
+
   const domains = useField(Params.evaDomains, "cvalue");
   const domainsFiltered = Forms.useFilter(
     domains,
@@ -47,101 +48,192 @@ export function EvaSideBar(): JSX.Element {
     EvaDef.KeyValToDomains,
     EvaDef.formEvaDomains
   );
-  const WideningDelay = useField(Params.evaWideningDelay, 0);
-  const ArrayPrecisionLevel = useField(Params.evaPlevel, 0);
-  const LinearLevel = useField(Params.evaSubdivideNonLinear, 0);
   const EqualityCall = useField(Params.evaEqualityThroughCalls, "none");
   const OctagonCall = useField(Params.evaOctagonThroughCalls, false);
-  const sLevel = useField(Params.evaSlevel, 0);
-  const iLevel = useField(Params.evaIlevel, 0);
+  const MultidimDisjunctive =
+    useField(Params.evaMultidimDisjunctiveInvariants, false);
+
   const AutoLoopUnroll = useField(Params.evaAutoLoopUnroll, 0);
   const MinLoopUnroll = useField(Params.evaMinLoopUnroll, 0);
-  const SplitReturn = useField(Params.evaSplitReturn, "none");
-  const HistoryPartitioning = useField(Params.evaPartitionHistory, 0);
-  const AllocReturnsNull = useField(Params.evaAllocReturnsNull, false);
-  const WarnPointerComparison =
-    useField(Params.evaWarnUndefinedPointerComparison, "none");
+  const WideningDelay = useField(Params.evaWideningDelay, 0);
+  const WideningPeriod = useField(Params.evaWideningPeriod, 0);
 
-  const evaFields = {
-    "precision": {
+  const sLevel = useField(Params.evaSlevel, 0);
+  const SplitReturn = useField(Params.evaSplitReturn, "none");
+  const PartitionHistory = useField(Params.evaPartitionHistory, 0);
+
+  const iLevel = useField(Params.evaIlevel, 0);
+  const pLevel = useField(Params.evaPlevel, 0);
+  const Subdivide = useField(Params.evaSubdivideNonLinear, 0);
+
+  const AllocBuiltin = useField(Params.evaAllocBuiltin, "");
+  const AllocReturnsNull = useField(Params.evaAllocReturnsNull, false);
+  const mLevel = useField(Params.evaMlevel, 0);
+
+  const ContextDepth = useField(Params.evaContextDepth, 0);
+  const ContextWidth = useField(Params.evaContextWidth, 0);
+  const ContextValidPointers = useField(Params.evaContextValidPointers, false);
+
+  const warnSignedOverflow = useField(Params.warnSignedOverflow, true);
+  const warnUnsignedOverflow = useField(Params.warnUnsignedOverflow, false);
+  const warnSignedDowncast = useField(Params.warnSignedDowncast, false);
+  const warnUnsignedDowncast = useField(Params.warnUnsignedDowncast, false);
+  const warnPointerDowncast = useField(Params.warnPointerDowncast, true);
+  const warnSpecialFloat = useField(Params.warnSpecialFloat, "non-finite");
+  const warnInvalidPointer = useField(Params.warnInvalidPointer, false);
+  const warnInvalidBool = useField(Params.warnInvalidBool, true);
+  const warnLeftShiftNegative = useField(Params.warnLeftShiftNegative, true);
+  const warnRightShiftNegative = useField(Params.warnRightShiftNegative, false);
+
+  const evaFields : EvaDef.EvaFormProps = {
+    "-main": {
+      label: "Main",
+      state: main
+    },
+    "-lib-entry": {
+      label: "LibEntry",
+      state: libEntry
+    },
+    "-eva-precision": {
       label: "Precision",
       step: 1, min: -1, max: 11,
       state: precision
     },
-    "main": {
-      label: "Main",
-      state: main
-    },
-    "libEntry": {
-      label: "LibEntry",
-      state: libEntry
-    },
-    "domains": {
+    "-eva-domains": {
       label: "Domains",
       state: domainsFiltered
     },
-    "sLevel": {
-      label: "Slevel",
-      step: 100, min: 0, max: 5000,
-      state: sLevel
+    "-eva-equality-through-calls": {
+      label: "Equality through function call",
+      optionRadio: EvaDef.formEvaEqualityCall,
+      state: EqualityCall
     },
-    "iLevel": {
-      label: "Ilevel",
-      step: 10, min: 0, max: 256,
-      state: iLevel
+    "-eva-octagon-through-calls": {
+      label: "Octagon through function call",
+      state: OctagonCall
     },
-    "AutoLoopUnroll": {
-      label: "Auto loop unroll",
-      step: 50, min: 0, max: 1024,
+    "-eva-multidim-disjunctive-invariants": {
+      label: "Multidim disjunctive invariant inference",
+      state: MultidimDisjunctive
+    },
+    "-eva-auto-loop-unroll": {
+      label: "Automatic loop unrolling",
+      step: 20, min: 0, max: 1024,
       state: AutoLoopUnroll
     },
-    "SplitReturn": {
+    "-eva-min-loop-unroll": {
+      label: "Minimun loop unrolling",
+      step: 1, min: 0, max: 10,
+      state: MinLoopUnroll
+    },
+    "-eva-widening-delay": {
+      label: "Widening delay",
+      step: 1, min: 1, max: 10,
+      state: WideningDelay
+    },
+    "-eva-widening-period": {
+      label: "Widening period",
+      step: 1, min: 1, max: 10,
+      state: WideningPeriod
+    },
+    "-eva-slevel": {
+      label: "Slevel",
+      step: 10, min: 0, max: 10000,
+      state: sLevel
+    },
+    "-eva-split-return": {
       label: "Split return",
       optionRadio: EvaDef.formEvaSplitReturn,
       state: SplitReturn
     },
-    "AllocReturnsNull": {
-      label: "Alloc returns null",
-      state: AllocReturnsNull
+    "-eva-ilevel": {
+      label: "Ilevel",
+      step: 10, min: 0, max: 1024,
+      state: iLevel
     },
-    "WarnPointerComparison": {
-      label: "Warn pointer comparison",
-      optionRadio: EvaDef.formEvaPointerComparison,
-      state: WarnPointerComparison
-    },
-    "MinLoopUnroll": {
-      label: "Min loop unroll",
-      step: 1, min: 0, max: 4,
-      state: MinLoopUnroll
-    },
-    "WideningDelay": {
-      label: "Widening delay",
-      step: 1, min: 1, max: 6,
-      state: WideningDelay
-    },
-    "HistoryPartitioning": {
-      label: "History partitioning",
-      step: 1, min: 0, max: 2,
-      state: HistoryPartitioning
-    },
-    "ArrayPrecisionLevel": {
+    "-eva-plevel": {
       label: "PLevel",
       step: 100, min: 0, max: 5000,
-      state: ArrayPrecisionLevel
+      state: pLevel
     },
-    "LinearLevel": {
-      label: "Linear level",
-      step: 5, min: 0, max: 220,
-      state: LinearLevel
+    "-eva-partition-history": {
+      label: "History partitioning",
+      step: 1, min: 0, max: 5,
+      state: PartitionHistory
     },
-    "EqualityCall": {
-      label: "Equality call",
-      optionRadio: EvaDef.formEvaEqualityCall,
-      state: EqualityCall
+    "-eva-subdivide-non-linear": {
+      label: "Subdivision on non-linear expressions",
+      step: 20, min: 0, max: 1024,
+      state: Subdivide
     },
-    "OctagonCall": {
-      label: "Octagon call",
-      state: OctagonCall
+    "-eva-alloc-builtin": {
+      label: "Allocation builtin behavior",
+      optionRadio: EvaDef.formEvaAllocBuiltin,
+      state: AllocBuiltin
+    },
+    "-eva-alloc-returns-null": {
+      label: "Allocation return null",
+      state: AllocReturnsNull
+    },
+    "-eva-mlevel": {
+      label: "Mlevel",
+      step: 1, min: 0, max: 20,
+      state: mLevel
+    },
+    "-eva-context-depth": {
+       label: "Initial context depth",
+       step: 1, min: 0, max: 10,
+       state: ContextDepth
+    },
+    "-eva-context-width": {
+       label: "Initial context width",
+       step: 1, min: 1, max: 1024,
+       state: ContextWidth
+    },
+    "-eva-context-valid-pointers": {
+       label: "Validity of initial pointers",
+       state: ContextValidPointers
+    },
+    "-warn-signed-overflow": {
+      label: "Signed overflow",
+      state: warnSignedOverflow
+    },
+    "-warn-unsigned-overflow": {
+      label: "Unsigned overflow",
+      state: warnUnsignedOverflow
+    },
+    "-warn-signed-downcast": {
+      label: "Signed downcast",
+      state: warnSignedDowncast
+    },
+    "-warn-unsigned-downcast": {
+      label: "Unsigned downcast",
+      state: warnUnsignedDowncast
+    },
+    "-warn-pointer-downcast": {
+      label: "Pointer downcast",
+      state: warnPointerDowncast
+    },
+    "-warn-special-float": {
+      label: "Special float",
+      optionRadio: EvaDef.formWarnSpecialFloat,
+      state: warnSpecialFloat
+    },
+    "-warn-invalid-pointer": {
+      label: "Invalid pointer",
+      state: warnInvalidPointer
+    },
+    "-warn-invalid-bool": {
+      label: "Invalid _Bool",
+      state: warnInvalidBool
+    },
+    "-warn-left-shift-negative": {
+      label: "Negative left shift",
+      state: warnLeftShiftNegative
+    },
+    "-warn-right-shift-negative": {
+      label: "Negative right shift",
+      state: warnRightShiftNegative
     },
   };
 

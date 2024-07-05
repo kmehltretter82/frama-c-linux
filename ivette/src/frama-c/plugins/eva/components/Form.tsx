@@ -103,6 +103,7 @@ export function RadioFieldList(
 /* -------------------------------------------------------------------------- */
 /* ---Eva Form                                                            --- */
 /* -------------------------------------------------------------------------- */
+
 interface EvaFormOptionsProps {
   fields: EvaDef.EvaFormProps;
 }
@@ -162,13 +163,11 @@ export function EvaFormOptions(
     state: Forms.FieldState<A>,
     name: EvaDef.fieldsName
   ): string | undefined {
-    const isDepPrecision = EvaDef.fieldsPrecisionDependent.includes(name);
     const notVisible =
       !showAllFields.value &&
       !EvaDef.fieldsAlwaysVisible.includes(name);
     return classes(
       !Forms.isStable(state) && "eva-field-modified",
-      isDepPrecision && "eva-precision-dep",
       notVisible ? "hidden-field" : "visible-field"
     );
   }
@@ -213,7 +212,7 @@ export function EvaFormOptions(
         label={field.label}
         actions={getActions(state)}
       >
-        <div className={getClasses(state, "libEntry")} />
+        <div className={getClasses(state, name)} />
         <Forms.ButtonField
           label={state.value ? "Enabled" : "disabled"}
           state={state}
@@ -224,14 +223,14 @@ export function EvaFormOptions(
 
   const mainField =
   <Forms.SelectField
-    label="Eva main"
-    state={fields["main"].state as Forms.FieldState<string | undefined>}
-    actions={getActions(fields["main"].state)}
+    label="Main"
+    state={fields["-main"].state as Forms.FieldState<string | undefined>}
+    actions={getActions(fields["-main"].state)}
   >
     {
       fctsList.map((f) => <option
           key={f.key} id={f.key} value={f.name}
-          className={getClasses(fields["main"].state, "main")}
+          className={getClasses(fields["-main"].state, "-main")}
         >{f.name}</option>
       )
     }
@@ -241,10 +240,12 @@ export function EvaFormOptions(
   <ButtonFieldList
     fieldProps={{
       label: "Domains",
-      actions: getActions(fields["domains"].state, EvaDef.buttonListEquality)
+      actions: getActions(
+        fields["-eva-domains"]
+        .state, EvaDef.buttonListEquality)
     }}
-    classeName={getClasses(fields["domains"].state, "domains")}
-    state={fields["domains"].state}
+    classeName={getClasses(fields["-eva-domains"].state, "-eva-domains")}
+    state={fields["-eva-domains"].state}
     />;
 
   return (
@@ -257,31 +258,56 @@ export function EvaFormOptions(
         disabled={isNoAlwaysVisibleFieldsStable()}
       />
 
-      {getSpinnerField("precision")}
       {mainField}
-      {getBooleanField("libEntry")}
+      {getBooleanField("-lib-entry")}
+      {getSpinnerField("-eva-precision")}
 
-      <Section label="Abstract interpretation" >
-          {domainsField}
-          {getSpinnerField("iLevel")}
-          {getSpinnerField("WideningDelay")}
-          {getSpinnerField("ArrayPrecisionLevel")}
-          {getSpinnerField("LinearLevel")}
-          {getRadioField("EqualityCall")}
-          {getBooleanField("OctagonCall")}
+      <Section label="Analysis Domains" >
+        {domainsField}
+        {getRadioField("-eva-equality-through-calls")}
+        {getBooleanField("-eva-octagon-through-calls")}
+        {getBooleanField("-eva-multidim-disjunctive-invariants")}
       </Section>
 
-      <Section label="State partitioning" >
-          {getSpinnerField("sLevel")}
-          {getSpinnerField("MinLoopUnroll")}
-          {getSpinnerField("AutoLoopUnroll")}
-          {getSpinnerField("HistoryPartitioning")}
-          {getRadioField("SplitReturn")}
+      <Section label="Analysis of Loops" >
+        {getSpinnerField("-eva-auto-loop-unroll")}
+        {getSpinnerField("-eva-min-loop-unroll")}
+        {getSpinnerField("-eva-widening-delay")}
+        {getSpinnerField("-eva-widening-period")}
       </Section>
 
-      <Section label="Message" >
-        {getBooleanField("AllocReturnsNull")}
-        {getRadioField("WarnPointerComparison")}
+      <Section label="Partitioning and Disjunctions" >
+        {getSpinnerField("-eva-slevel")}
+        {getRadioField("-eva-split-return")}
+        {getSpinnerField("-eva-partition-history")}
+        {getSpinnerField("-eva-ilevel")}
+        {getSpinnerField("-eva-plevel")}
+        {getSpinnerField("-eva-subdivide-non-linear")}
+      </Section>
+
+      <Section label="Dynamic Allocation" >
+        {getRadioField("-eva-alloc-builtin")}
+        {getBooleanField("-eva-alloc-returns-null")}
+        {getSpinnerField("-eva-mlevel")}
+      </Section>
+
+      <Section label="Initial Context" >
+        {getSpinnerField("-eva-context-depth")}
+        {getSpinnerField("-eva-context-width")}
+        {getBooleanField("-eva-context-valid-pointers")}
+      </Section>
+
+      <Section label="Alarms" >
+        {getBooleanField("-warn-signed-overflow")}
+        {getBooleanField("-warn-unsigned-overflow")}
+        {getBooleanField("-warn-signed-downcast")}
+        {getBooleanField("-warn-unsigned-downcast")}
+        {getBooleanField("-warn-pointer-downcast")}
+        {getRadioField("-warn-special-float")}
+        {getBooleanField("-warn-invalid-pointer")}
+        {getBooleanField("-warn-invalid-bool")}
+        {getBooleanField("-warn-left-shift-negative")}
+        {getBooleanField("-warn-right-shift-negative")}
       </Section>
 
     </Forms.SidebarForm>

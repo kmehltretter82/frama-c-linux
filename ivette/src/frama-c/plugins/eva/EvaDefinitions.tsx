@@ -53,23 +53,39 @@ export interface ButtonFieldListProps {
 }
 
 export type fieldsName =
-  "precision" |
-  "main" |
-  "libEntry" |
-  "domains" |
-  "iLevel" |
-  "WideningDelay" |
-  "ArrayPrecisionLevel" |
-  "LinearLevel" |
-  "EqualityCall" |
-  "OctagonCall" |
-  "sLevel" |
-  "MinLoopUnroll" |
-  "AutoLoopUnroll" |
-  "HistoryPartitioning" |
-  "SplitReturn" |
-  "AllocReturnsNull" |
-  "WarnPointerComparison"
+  "-main" |
+  "-lib-entry" |
+  "-eva-precision" |
+  "-eva-domains" |
+  "-eva-equality-through-calls" |
+  "-eva-octagon-through-calls" |
+  "-eva-multidim-disjunctive-invariants" |
+  "-eva-auto-loop-unroll" |
+  "-eva-min-loop-unroll" |
+  "-eva-widening-delay" |
+  "-eva-widening-period" |
+  "-eva-slevel" |
+  "-eva-split-return" |
+  "-eva-ilevel" |
+  "-eva-plevel" |
+  "-eva-partition-history" |
+  "-eva-subdivide-non-linear" |
+  "-eva-alloc-builtin" |
+  "-eva-alloc-returns-null" |
+  "-eva-mlevel" |
+  "-eva-context-depth" |
+  "-eva-context-width" |
+  "-eva-context-valid-pointers" |
+  "-warn-signed-overflow" |
+  "-warn-unsigned-overflow" |
+  "-warn-signed-downcast" |
+  "-warn-unsigned-downcast" |
+  "-warn-pointer-downcast" |
+  "-warn-special-float" |
+  "-warn-invalid-pointer" |
+  "-warn-invalid-bool" |
+  "-warn-left-shift-negative" |
+  "-warn-right-shift-negative"
 
 export interface EvaField {
   label: string,
@@ -86,32 +102,17 @@ export type EvaFormProps =  {[key in fieldsName]: EvaField};
 /* ************************************************************************ *
  * Option Eva Forms
  * ************************************************************************ */
-export const fieldsPrecisionDependent: fieldsName[] = [
-  "MinLoopUnroll",
-  "AutoLoopUnroll",
-  "WideningDelay",
-  "HistoryPartitioning",
-  "sLevel",
-  "iLevel",
-  "ArrayPrecisionLevel",
-  "LinearLevel",
-  "domains",
-  "SplitReturn",
-  "EqualityCall",
-  "OctagonCall"
-];
 
 export const fieldsAlwaysVisible:fieldsName[] = [
-  "precision",
-  "main",
-  "libEntry",
-  "domains",
-  "sLevel",
-  "iLevel",
-  "AutoLoopUnroll",
-  "SplitReturn",
-  "AllocReturnsNull",
-  "WarnPointerComparison",
+  "-main",
+  "-lib-entry",
+  "-eva-precision",
+  "-eva-domains",
+  "-eva-auto-loop-unroll",
+  "-eva-slevel",
+  "-eva-split-return",
+  "-eva-partition-history",
+  "-eva-ilevel",
 ];
 
 export const formEvaDomains: KeyVal<boolean> = {
@@ -119,24 +120,35 @@ export const formEvaDomains: KeyVal<boolean> = {
   'symbolic-locations': false,
   'octagon': false,
   'gauges': false,
+  'multidim': false,
+  'bitwise': false,
+  'taint': false,
   'cvalue': false,
 };
+
+export const formWarnSpecialFloat: KeyVal<string> = {
+  'none': 'None',
+  'nan': 'NaN',
+  'non-finite': 'NonFinite',
+};
+
 export const formEvaSplitReturn: KeyVal<string> = {
   '': 'None',
   'full': 'Full',
   'auto': 'Auto'
 };
 
-export const formEvaPointerComparison: KeyVal<string> = {
-  '': 'None',
-  'pointer': 'Pointer',
-  'all': 'All'
-};
-
 export const formEvaEqualityCall: KeyVal<string> = {
   'none': 'None',
   'formals': 'Formals',
   'all': 'All'
+};
+
+export const formEvaAllocBuiltin: KeyVal<string> = {
+  'imprecise': 'Imprecise',
+  'by_stack': 'ByStack',
+  'fresh': 'Fresh',
+  'fresh_weak': 'FreshWeak',
 };
 
 export const domainsToKeyVal = (value: string): KeyVal<boolean> => {
