@@ -22,7 +22,7 @@ const int f = f;
 
 int g = g;
 
-int h = (int) &h;
+short h = (short) &h;
 
 const int i;
 int j = i;

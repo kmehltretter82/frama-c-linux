@@ -3,6 +3,8 @@
 [kernel] ko_global.c:11: User Error: a is not a compile-time constant
 [kernel] ko_global.c:21: User Error: f is not a compile-time constant
 [kernel] ko_global.c:23: User Error: g is not a compile-time constant
+[kernel] ko_global.c:25: User Error: 
+  Initializer element is not a compile-time constant
 [kernel] ko_global.c:28: User Error: i is not a compile-time constant
 [kernel] ko_global.c:31: User Error: k is not a compile-time constant
 [kernel] ko_global.c:38: User Error: n is not a compile-time constant

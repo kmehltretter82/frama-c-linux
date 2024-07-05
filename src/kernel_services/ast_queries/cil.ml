@@ -5881,10 +5881,12 @@ let rec isConstantGen lit_only is_varinfo_cst f e = match e.enode with
     begin
       match t, typeOf e with
       | TInt (i, _), TPtr _ ->
-        (* gcc/clang/ccomp consider a non-truncated pointer to be a constant.
-           If it is truncated, we check whether we already know its value. *)
-        bytesSizeOfInt theMachine.upointKind <= bytesSizeOfInt i ||
-        isConstantGen true is_varinfo_cst f e
+        (* gcc/clang/ccomp only consider non-truncated constant ptr values
+           to be constant. If it is truncated, we consider it non-const
+           in any case.
+        *)
+        bytesSizeOfInt theMachine.upointKind <= bytesSizeOfInt i &&
+        isConstantGen false is_varinfo_cst f e
       | _ -> isConstantGen lit_only is_varinfo_cst f e
     end
   | AddrOf (Var vi, off) | StartOf (Var vi, off) ->
