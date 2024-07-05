@@ -35,7 +35,7 @@ theory Vset
   (* --- Classical Sets for Alt-Ergo                                        --- *)
   (* -------------------------------------------------------------------------- *)
 
-  function member_bool 'a (set 'a) : bool
+  function member_bool (x:'a) (s:set 'a) : bool = s x
 
   let function range (inf sup:int) : set int (* [a..b] *) =
     fun elt -> if inf <= elt <= sup then true else false
@@ -47,11 +47,6 @@ theory Vset
     fun elt -> if inf <= elt then true else false
 
   function range_all : set int (* [..] *) = fun _ -> true
-
-  (* -------------------------------------------------------------------------- *)
-
-  axiom member_bool : forall x:'a. forall s:set 'a [member_bool x s].
-    if mem x s then member_bool x s = True else member_bool x s = False
 
   (* -------------------------------------------------------------------------- *)
 

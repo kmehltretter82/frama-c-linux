@@ -14,13 +14,11 @@
 [wp] [Valid] typed_check_lemma_indirect_not_equal_logical (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_lemma_indirect_not_in_constants (Alt-Ergo) (Cached)
 [wp] [Valid] typed_check_lemma_indirect_not_in_logical (Alt-Ergo) (Cached)
-[wp] [NoResult] typed_check_lemma_test (Qed)
-[wp] Proved goals:   12 / 13
+[wp] [Valid] typed_check_lemma_test (Alt-Ergo) (Cached)
+[wp] Proved goals:   13 / 13
   Qed:             2
-  Alt-Ergo:       10
-  Unsuccess:       1
-  Missing:         1
+  Alt-Ergo:       11
 ------------------------------------------------------------
  Axiomatics                WP     Alt-Ergo  Total   Success
-  Lemma                     2       10       13      92.3%
+  Lemma                     2       11       13       100%
 ------------------------------------------------------------

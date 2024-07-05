@@ -1,9 +1,3 @@
-/* run.config
-   OPT:-wp-auto wp:split
-*/
-/* run.config_qualif
-   OPT:-wp-auto wp:split
-*/
 
 //@ check lemma direct_in: 2 \in {1,2,3};
 //@ check lemma direct_in_singleton: 2 \in {2};

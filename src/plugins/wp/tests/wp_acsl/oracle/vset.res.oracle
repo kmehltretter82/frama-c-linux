@@ -1,44 +1,23 @@
 # frama-c -wp [...]
 [kernel] Parsing vset.i (no preprocessing)
 [wp] Running WP plugin...
-[wp] 13 goals scheduled
-[wp] [Valid] typed_check_lemma_direct_in (Qed)
-[wp] [Valid] typed_check_lemma_direct_in_singleton (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_in_constants (Qed)
-[wp] [Unsuccess] typed_check_lemma_indirect_equal_logical (Tactic) (Qed)
-[wp] [Unsuccess] typed_check_lemma_indirect_equal_ghost (Tactic) (Qed)
-[wp] [Unsuccess] typed_check_lemma_indirect_equal_constants (Tactic) (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_not_equal_logical (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_not_equal_constants (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_in_logical (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_in_ghost (Qed)
-[wp] [NoResult] typed_check_lemma_test (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_not_in_logical (Qed)
-[wp] [NoResult] typed_check_lemma_indirect_not_in_constants (Qed)
-[wp] Proved goals:    2 / 13
-  Qed:             2
-  Unsuccess:      11
-  Missing:         8
 ------------------------------------------------------------
   Global
 ------------------------------------------------------------
 
 Goal Check Lemma 'direct_in':
 Prove: true.
-Prover Qed returns Valid
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'direct_in_singleton':
 Prove: true.
-Prover Qed returns Valid
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'indirect_equal_constants':
 Prove: mem(1, L_Set1) /\ mem(2, L_Set1) /\ mem(3, L_Set1) /\
     (forall i : Z. (mem(i, L_Set1) -> ((i = 1) \/ (i = 2) \/ (i = 3)))).
-Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
@@ -47,14 +26,12 @@ Let a = L_Set2(int2_0, int1_0).
 Assume { Have: is_sint32(int1_0). Have: is_sint32(int2_0). }
 Prove: mem(int1_0, a) /\ mem(int2_0, a) /\
     (forall i : Z. (mem(i, a) -> ((i = int1_0) \/ (i = int2_0)))).
-Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
 Goal Check Lemma 'indirect_equal_logical':
 Prove: mem(1, L_Set3) /\ mem(2, L_Set3) /\
     (forall i : Z. (mem(i, L_Set3) -> ((i = 1) \/ (i = 2)))).
-Prover Script returns Unsuccess
 
 ------------------------------------------------------------
 
