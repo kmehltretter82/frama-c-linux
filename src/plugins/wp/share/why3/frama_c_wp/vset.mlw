@@ -53,18 +53,6 @@ theory Vset
   axiom member_bool : forall x:'a. forall s:set 'a [member_bool x s].
     if mem x s then member_bool x s = True else member_bool x s = False
 
-  lemma member_range : forall x:int,a:int,b:int [mem x (range a b)].
-    mem x (range a b) <-> (a <= x /\ x <= b)
-
-  lemma member_range_sup : forall x:int,a:int [mem x (range_sup a)].
-    mem x (range_sup a) <-> (a <= x)
-
-  lemma member_range_inf : forall x:int,b:int [mem x (range_inf b)].
-    mem x (range_inf b) <-> (x <= b)
-
-  lemma member_range_all : forall x:int [mem x range_all].
-    mem x range_all
-
   (* -------------------------------------------------------------------------- *)
 
 end
