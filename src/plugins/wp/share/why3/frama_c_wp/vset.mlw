@@ -21,32 +21,27 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Sets for Why-3                                                     --- *)
+(* --- Additional Sets Symbols for WP                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
 theory Vset
 
-  use bool.Bool
   use int.Int
-  use map.Map
+  use map.Const
   use export set.Set
 
-  (* -------------------------------------------------------------------------- *)
-  (* --- Classical Sets for Alt-Ergo                                        --- *)
-  (* -------------------------------------------------------------------------- *)
-
-  function member_bool (x:'a) (s:set 'a) : bool = s x
+  function memb (x:'a) (s:set 'a) : bool = s x
 
   let function range (inf sup:int) : set int (* [a..b] *) =
-    fun elt -> if inf <= elt <= sup then true else false
+    fun elt -> inf <= elt <= sup
 
   function range_sup (sup:int) : set int (* [a..] *) =
-    fun elt -> if elt <= sup then true else false
+    fun elt -> elt <= sup
 
   function range_inf (inf:int) : set int (* [..b] *) =
-    fun elt -> if inf <= elt then true else false
+    fun elt -> inf <= elt
 
-  function range_all : set int (* [..] *) = fun _ -> true
+  function range_all : set int (* [..] *) = const true
 
   (* -------------------------------------------------------------------------- *)
 
