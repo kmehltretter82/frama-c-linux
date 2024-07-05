@@ -336,8 +336,17 @@ type position =
     pos_cnum : int;
   }
 
+let empty_pos = {
+  pos_path = Normalized.empty;
+  pos_lnum = 0;
+  pos_bol = 0;
+  pos_cnum = -1;
+}
+
 let pp_pos fmt pos =
   Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
+
+let is_empty_pos pos = pos == empty_pos
 
 let exists (s : Normalized.t) = Sys.file_exists (s :> string)
 

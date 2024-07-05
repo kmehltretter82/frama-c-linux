@@ -206,10 +206,20 @@ type position =
     pos_cnum : int;
   }
 
+(** Empty position, used as 'dummy' for [Cil_datatype.Position].
+    @since Frama-C+dev
+*)
+val empty_pos : position
+
 (** Pretty-prints a position, in the format file:line.
     @since 18.0-Argon
 *)
 val pp_pos : Format.formatter -> position -> unit
+
+(** Return true if the given position is the empty position.
+    @since Frama-C+dev
+*)
+val is_empty_pos : position -> bool
 
 (** Return the current working directory.
     Implicitly uses {!Unix.realpath} to normalize paths and avoid issues with

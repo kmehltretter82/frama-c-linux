@@ -166,12 +166,7 @@ end
 
 module Position =  struct
   let pretty_ref = ref UtilsFilepath.pp_pos
-  let unknown = {
-    Filepath.pos_path = Datatype.Filepath.dummy;
-    pos_lnum = 0;
-    pos_bol = 0;
-    pos_cnum = -1;
-  }
+  let unknown = Filepath.empty_pos
   let of_lexing_pos p = {
     Filepath.pos_path = Datatype.Filepath.of_string p.Lexing.pos_fname;
     pos_lnum = p.Lexing.pos_lnum;
