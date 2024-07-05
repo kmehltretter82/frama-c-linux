@@ -525,7 +525,8 @@ let pp_value pp fmt = function
 let pp_logic pp fmt = function
   | Vexp e -> F.pp_term fmt e
   | Vloc l -> pp fmt l
-  | Lset _ | Vset _ -> Format.pp_print_string fmt "<set>"
+  | Lset _ -> Format.pp_print_string fmt "<lset>"
+  | Vset vs -> Format.fprintf fmt "{ %a }" Vset.pretty vs
 
 let pp_rloc pp fmt = function
   | Rloc(obj,l) ->

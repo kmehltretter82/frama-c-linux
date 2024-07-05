@@ -81,7 +81,7 @@ logic sign "\\sign"(float64) = "sign_f64";
 
 library vset:
 type set = "set";
-why3.import := "vset.Vset";
+why3.import := "frama_c_wp.vset.Vset";
 
 library vlist:
 why3.import := "frama_c_wp.vlist.Vlist";

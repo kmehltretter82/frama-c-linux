@@ -94,16 +94,31 @@ let pretty fmt = function
 let library = "vset"
 
 let adt_set = Lang.datatype ~library "set"
-let tau_of_set te = Logic.Data( adt_set , [te] )
-let p_member = Lang.extern_p ~library ~bool:"member_bool" ~prop:"member" ()
+let tau_of_set (te:tau) : tau = Logic.Data( adt_set , [te] )
+
+let typecheck_binop (params:tau option list) : tau =
+  match params with
+  | [ Some t ; _ ] | [ _ ; Some t ]-> t
+  | _ -> raise (Invalid_argument "WP.Vset.typecheck_binop")
+
+
+let typecheck_singleton (params:tau option list) : tau =
+  match params with
+  | [ Some t ] -> tau_of_set t
+  | _ -> raise (Invalid_argument "WP.Vset.typecheck_unop")
+
+let typecheck_range (_:tau option list) : tau =
+  tau_of_set Logic.Int
+
+let p_member = Lang.extern_p ~library ~bool:"memb" ~prop:"mem" ()
 let f_empty = Lang.extern_f ~library "empty"
-let f_union = Lang.extern_f ~library "union"
-let f_inter = Lang.extern_f ~library "inter"
-let f_range = Lang.extern_f ~library "range"
-let f_range_sup = Lang.extern_f ~library "range_sup"
-let f_range_inf = Lang.extern_f ~library "range_inf"
-let f_range_all = Lang.extern_f ~library "range_all"
-let f_singleton = Lang.extern_f ~library "singleton"
+let f_union = Lang.extern_f ~library ~typecheck:typecheck_binop "union"
+let f_inter = Lang.extern_f ~library ~typecheck:typecheck_binop "inter"
+let f_range = Lang.extern_f ~library ~typecheck:typecheck_range "range"
+let f_range_sup = Lang.extern_f ~library ~typecheck:typecheck_range "range_sup"
+let f_range_inf = Lang.extern_f ~library ~typecheck:typecheck_range "range_inf"
+let f_range_all = Lang.extern_f ~library ~typecheck:typecheck_range "range_all"
+let f_singleton = Lang.extern_f ~library ~typecheck:typecheck_singleton "singleton"
 
 let single a b = match a,b with
   | Some x , Some y when F.QED.equal x y -> a
@@ -237,8 +252,11 @@ let subset xs ys =
 (* --- Equality                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let equal xs ys =
-  p_and (subset xs ys) (subset ys xs)
+let equal ?(use_eq:bool=false) (xs:set) (ys:set) =
+  match xs, ys with
+  | [  Set (_,s1) ], [  Set (_,s2) ] when use_eq -> p_equal s1 s2
+  | _ -> p_and (subset xs ys) (subset ys xs)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Separation                                                         --- *)

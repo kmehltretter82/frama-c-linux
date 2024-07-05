@@ -320,7 +320,7 @@ struct
       let sa = set_of_term env a in
       let sb = set_of_term env b in
       (* TODO: should be parametric in the equality of elements *)
-      Vset.equal sa sb
+      Vset.equal ~use_eq:(use_equal polarity) sa sb
 
     | EQ_loc ->
       let la = loc_of_term env a in
@@ -686,7 +686,7 @@ struct
         | Ctype t -> Lang.assume (Cvalues.has_ctype t r)
         | _ -> ()
       end ;
-      Vexp r
+      Cvalues.plain t.term_type r
 
     | Tlambda _ ->
       Warning.error "Lambda-functions not yet implemented"
