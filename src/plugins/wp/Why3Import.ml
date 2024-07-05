@@ -33,24 +33,6 @@ module WConf = Why3.Whyconf
 let dkey = L.register_category "why3.import"
 
 (* -------------------------------------------------------------------------- *)
-(* ---    Module registration                                             --- *)
-(* -------------------------------------------------------------------------- *)
-
-let loader (ctxt: Logic_typing.module_builder) (loc: C.location) (m: string list) =
-  begin
-    L.result "[test-import:%d] Loading %s.@." (fst loc).pos_lnum (String.concat "::" m) ;
-    let t = Cil_const.make_logic_type "t" in
-    let check = Cil_const.make_logic_info "check" in
-    let x = Cil_const.make_logic_var_formal "x" (Ltype(t,[])) in
-    let k = Cil_const.make_logic_var_formal "k" Linteger in
-    check.l_profile <- [x;k] ;
-    ctxt.add_logic_type loc t ;
-    ctxt.add_logic_function loc check ;
-  end
-
-let () = Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader
-
-(* -------------------------------------------------------------------------- *)
 (* ---    Why3 Environment                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -337,6 +319,21 @@ let import_theory (env : env) thname =
 (* -------------------------------------------------------------------------- *)
 (* ---    Module registration                                             --- *)
 (* -------------------------------------------------------------------------- *)
+
+let loader (ctxt: Logic_typing.module_builder) (loc: C.location) (m: string list) =
+  begin
+    L.result "[test-import:%d] Loading %s.@." (fst loc).pos_lnum (String.concat "::" m) ;
+    let t = Cil_const.make_logic_type "t" in
+    let check = Cil_const.make_logic_info "check" in
+    let x = Cil_const.make_logic_var_formal "x" (Ltype(t,[])) in
+    let k = Cil_const.make_logic_var_formal "k" Linteger in
+    check.l_profile <- [x;k] ;
+    ctxt.add_logic_type loc t ;
+    ctxt.add_logic_function loc check ;
+  end
+
+let () = Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader
+
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Main                                                            --- *)
