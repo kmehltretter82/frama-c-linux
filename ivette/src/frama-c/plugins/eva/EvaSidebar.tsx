@@ -23,7 +23,7 @@
 import React from 'react';
 import * as Forms from 'dome/layout/forms';
 import * as Ivette from 'ivette';
-import { useServerField } from 'frama-c/states';
+import { useServerField, State } from 'frama-c/states';
 import * as Params from 'frama-c/kernel/api/parameters';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
 import { EvaFormOptions } from 'frama-c/plugins/eva/components/Form';
@@ -33,31 +33,34 @@ import EvaTools from './components/Tools';
 export function EvaSideBar(): JSX.Element {
   const remote = Forms.useController();
 
-  /* eslint-disable max-len */
-  const precision = Forms.useBuffer(remote, useServerField(Params.evaPrecision, 0));
-  const main = Forms.useBuffer(remote, useServerField(Params.main, ""));
-  const libEntry = Forms.useBuffer(remote, useServerField(Params.libEntry, false));
-  const domains = Forms.useBuffer(remote, useServerField(Params.evaDomains, "cvalue"));
+  function useField<A>(state: State<A>, defaultValue: A) : Forms.FieldState<A> {
+    return Forms.useBuffer(remote, useServerField(state, defaultValue));
+  }
+
+  const precision = useField(Params.evaPrecision, 0);
+  const main = useField(Params.main, "");
+  const libEntry = useField(Params.libEntry, false);
+  const domains = useField(Params.evaDomains, "cvalue");
   const domainsFiltered = Forms.useFilter(
     domains,
     EvaDef.domainsToKeyVal,
     EvaDef.KeyValToDomains,
     EvaDef.formEvaDomains
   );
-  const WideningDelay = Forms.useBuffer(remote, useServerField(Params.evaWideningDelay, 0));
-  const ArrayPrecisionLevel = Forms.useBuffer(remote, useServerField(Params.evaPlevel, 0));
-  const LinearLevel = Forms.useBuffer(remote, useServerField(Params.evaSubdivideNonLinear, 0));
-  const EqualityCall = Forms.useBuffer(remote, useServerField(Params.evaEqualityThroughCalls, "none"));
-  const OctagonCall = Forms.useBuffer(remote, useServerField(Params.evaOctagonThroughCalls, false));
-  const sLevel = Forms.useBuffer(remote, useServerField(Params.evaSlevel, 0));
-  const iLevel = Forms.useBuffer(remote, useServerField(Params.evaIlevel, 0));
-  const AutoLoopUnroll = Forms.useBuffer(remote, useServerField(Params.evaAutoLoopUnroll, 0));
-  const MinLoopUnroll = Forms.useBuffer(remote, useServerField(Params.evaMinLoopUnroll, 0));
-  const SplitReturn = Forms.useBuffer(remote, useServerField(Params.evaSplitReturn, "none"));
-  const HistoryPartitioning = Forms.useBuffer(remote, useServerField(Params.evaPartitionHistory, 0));
-  const AllocReturnsNull = Forms.useBuffer(remote, useServerField(Params.evaAllocReturnsNull, false));
-  const WarnPointerComparison = Forms.useBuffer(remote, useServerField(Params.evaWarnUndefinedPointerComparison, "none"));
-  /* eslint-enable max-len */
+  const WideningDelay = useField(Params.evaWideningDelay, 0);
+  const ArrayPrecisionLevel = useField(Params.evaPlevel, 0);
+  const LinearLevel = useField(Params.evaSubdivideNonLinear, 0);
+  const EqualityCall = useField(Params.evaEqualityThroughCalls, "none");
+  const OctagonCall = useField(Params.evaOctagonThroughCalls, false);
+  const sLevel = useField(Params.evaSlevel, 0);
+  const iLevel = useField(Params.evaIlevel, 0);
+  const AutoLoopUnroll = useField(Params.evaAutoLoopUnroll, 0);
+  const MinLoopUnroll = useField(Params.evaMinLoopUnroll, 0);
+  const SplitReturn = useField(Params.evaSplitReturn, "none");
+  const HistoryPartitioning = useField(Params.evaPartitionHistory, 0);
+  const AllocReturnsNull = useField(Params.evaAllocReturnsNull, false);
+  const WarnPointerComparison =
+    useField(Params.evaWarnUndefinedPointerComparison, "none");
 
   const evaFields = {
     "precision": {
