@@ -139,17 +139,18 @@ export const formEvaEqualityCall: KeyVal<string> = {
   'all': 'All'
 };
 
-export const domainsToKeyVal = (value: string[]): KeyVal<boolean> => {
+export const domainsToKeyVal = (value: string): KeyVal<boolean> => {
   const domains = { ...formEvaDomains };
-  for (const domain of value) { domains[domain] = true; }
+  const array = value.split(',');
+  for (const domain of array) { domains[domain] = true; }
   return domains;
 };
 
-export const KeyValToDomains = (value: KeyVal<boolean>):string[] => {
-  return Object.entries(value).reduce(function (acc: string[], cur) {
-    if(cur[1]) acc.push(cur[0]);
-    return acc;
-  }, []);
+export const KeyValToDomains = (value: KeyVal<boolean>):string => {
+  return Object.entries(value).reduce(function (acc: string, cur) {
+    if(cur[1]) return (acc + "," + cur[0]);
+    else return acc;
+  }, "cvalue");
 };
 
 export function buttonListEquality(
@@ -170,7 +171,7 @@ export function buttonListEquality(
 }
 
 export function domainsEquality(
-  a: string[], b: string[]
+  a: string, b: string
 ): boolean {
   return buttonListEquality(
     domainsToKeyVal(a),
