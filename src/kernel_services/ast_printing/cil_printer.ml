@@ -1737,10 +1737,10 @@ class cil_printer () = object (self)
              (* If the function has attributes then print a prototype because
               * GCC cannot accept function attributes in a definition *)
              let oldattr = fundec.svar.vattr in
-             let oldattr = List.filter keep_attr oldattr in
+             let oldattr' = List.filter keep_attr oldattr in
              (* Always print the file name before function declarations *)
              (* Prototype first *)
-             if oldattr <> [] then
+             if oldattr' <> [] then
                (self#line_directive fmt l;
                 fprintf fmt "%a@\n"
                   self#vdecl_complete fundec.svar);
@@ -1749,6 +1749,7 @@ class cil_printer () = object (self)
              (* Body now *)
              self#line_directive ~forcefile:true fmt l;
              self#fundecl fmt fundec;
+             (* Restore the list of attributes *)
              fundec.svar.vattr <- oldattr) ;
         fprintf fmt "@\n";
         self#out_current_function
