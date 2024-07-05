@@ -111,8 +111,8 @@ type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
   paths : string list;
-  types : C.logic_type_info list;
-  logics : C.logic_info list;
+  types : (C.logic_type_info * C.location) list;
+  logics : (C.logic_info * C.location) list;
 }
 
 type env = {
@@ -122,13 +122,11 @@ type env = {
   lils : W.Term.lsymbol Logic_info.Hashtbl.t;
   ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
   menv : why3module Datatype.String.Hashtbl.t;
-  tloc : C.logic_type_info Location.Hashtbl.t;
-  lloc : C.logic_info Location.Hashtbl.t;
 }
 
 type menv = {
-  mutable lti : C.logic_type_info list;
-  mutable li : C.logic_info list;
+  mutable lti : (C.logic_type_info * C.location) list;
+  mutable li : (C.logic_info * C.location) list;
 }
 
 let create_empty_env wenv =
@@ -137,9 +135,7 @@ let create_empty_env wenv =
   let lils  = Logic_info.Hashtbl.create 0 in
   let ltits  = Logic_type_info.Hashtbl.create 0 in
   let menv  = Datatype.String.Hashtbl.create 0 in
-  let tloc = Location.Hashtbl.create 0 in
-  let lloc = Location.Hashtbl.create 0 in
-  { wenv; tenv; lenv; lils; ltits; menv; tloc; lloc }
+  { wenv; tenv; lenv; lils; ltits; menv }
 
 
 (* -------------------------------------------------------------------------- *)
@@ -232,8 +228,7 @@ and lti_of_ts (env : env) (menv : menv) (ts : W.Ty.tysymbol) : C.logic_type_info
         lt_attr = [];
       }
     in W.Ty.Hts.add env.tenv ts lti ;
-    menv.lti <- lti :: menv.lti;
-    Location.Hashtbl.add env.tloc (convert_location ts.ts_name.id_loc) lti;
+    menv.lti <- (lti, (convert_location ts.ts_name.id_loc) ) :: menv.lti;
     Logic_type_info.Hashtbl.add env.ltits lti ts;
     lti
 
@@ -268,8 +263,7 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
       l_profile ;
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
-  menv.li <- li :: menv.li;
-  Location.Hashtbl.add env.lloc (convert_location ls.ls_name.id_loc) li;
+  menv.li <- (li, (convert_location ls.ls_name.id_loc) ):: menv.li;
   Logic_info.Hashtbl.add env.lils li ls;
   li
 
@@ -323,6 +317,29 @@ let import_theory (env : env) thname =
     L.error "Library %s not found" thname
 
 (* -------------------------------------------------------------------------- *)
+(* ---    Module registration                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+(* let loader (ctxt: Logic_typing.module_builder) (loc: C.location) (m: string list) =
+   begin
+    Format.printf "[test-import:%d] Loading %s.@."
+      (fst loc).pos_lnum (String.concat "::" m) ;
+    let t = Cil_const.make_logic_type "t" in
+    let check = Cil_const.make_logic_info "check" in
+    let x = Cil_const.make_logic_var_formal "x" (Ltype(t,[])) in
+    let k = Cil_const.make_logic_var_formal "k" Linteger in
+    check.l_profile <- [x;k] ;
+    ctxt.add_logic_type loc t ;
+    ctxt.add_logic_function loc check ;
+   end
+
+   let register () =
+   begin
+    Acsl_extension.register_module_importer "Why3" loader
+   end *)
+
+
+(* -------------------------------------------------------------------------- *)
 (* ---    Main                                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -348,12 +365,14 @@ let () =
             ) env.lenv;
           Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
               L.result "@[Module %s at %s@]" s (String.concat "::" why3mod.paths);
-              List.iter (fun (li) ->
+              List.iter (fun ((li,loc)) ->
                   L.result "Logic : @[<hov1>%a@]" pp_li li;
+                  L.result "at %a" Cpp.pp_location loc;
                 )
                 why3mod.logics;
-              List.iter (fun (lti) ->
-                  L.result "Type : @[<hov1>%a@]" pp_lti lti)
+              List.iter (fun ((lti,loc)) ->
+                  L.result "Type : @[<hov1>%a@]" pp_lti lti;
+                  L.result "at %a" Cpp.pp_location loc;)
                 why3mod.types;
             ) env.menv;
           Logic_type_info.Hashtbl.iter ( fun (lti) (ts) ->
@@ -370,14 +389,6 @@ let () =
               L.result "CIL Location will be %a" pp_cil_loc ls.ls_name;
             )
             env.lils;
-          Location.Hashtbl.iter ( fun (loc) (lti) ->
-              L.result "Logic info %a is associated to loc %a "
-                pp_lti lti Cpp.pp_location loc;
-            ) env.tloc;
-          Location.Hashtbl.iter ( fun (loc) (li) ->
-              L.result "Logic info %a is associated to loc %a "
-                pp_li li Cpp.pp_location loc;
-            ) env.lloc;
         end
     end
 
