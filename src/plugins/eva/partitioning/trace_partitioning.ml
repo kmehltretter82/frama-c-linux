@@ -166,10 +166,10 @@ struct
 
   (* Partition transfer functions *)
 
-  let enter_loop (flow : flow) (i : Eva_automata.vertex) : flow =
+  let enter_loop (flow : flow) (i : Eva_automata.loop) : flow =
     Flow.transfer_keys flow (Enter_loop (unroll i))
 
-  let leave_loop (flow : flow) (_i : Eva_automata.vertex) : flow =
+  let leave_loop (flow : flow) (_i : Eva_automata.loop) : flow =
     Flow.transfer_keys flow Leave_loop
 
   let next_loop_iteration (flow : flow) (_i : stmt) : flow =

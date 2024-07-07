@@ -93,3 +93,16 @@ val exit_strategy : automaton -> vertex Wto.component -> wto
 val wto_index_diff : vertex -> vertex -> vertex list * vertex list
 val is_wto_head : vertex -> bool
 val is_back_edge : vertex * vertex -> bool
+
+(* Loops identification *)
+
+type loop = {
+  graph: graph; (** The complete graph of the englobing function. *)
+  head: vertex; (** The head of the loop. *)
+  wto: wto;     (** The wto for the loop body (without the loop head). *)
+  stmt: stmt;   (** One of the loop statement, preferabily the a while
+                    statement *)
+}
+
+(** Builds the loop type for the englobing loop of vertex. *)
+val find_loop : vertex -> loop option

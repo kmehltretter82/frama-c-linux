@@ -104,7 +104,6 @@ let dummy_edge = {
 
 (* --- Datatypes --- *)
 
-
 (* Compare function helper *)
 let (<?>) c lcmp =
   if c <> 0 then c else Lazy.force lcmp

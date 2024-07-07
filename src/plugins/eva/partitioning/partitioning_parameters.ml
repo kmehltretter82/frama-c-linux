@@ -80,12 +80,8 @@ struct
       else Partition.IntLimit min_loop_unroll
     in
     let default = automatic_unrolling auto_loop_unroll in
-    let stmt = match loop.vertex_info with
-      | NoneInfo -> Option.get loop.vertex_start_of
-      | LoopHead { stmt } -> stmt
-    in
-    match get_unroll_annot stmt with
-    | [] -> warn_no_loop_unroll stmt; default
+    match get_unroll_annot loop.stmt with
+    | [] -> warn_no_loop_unroll loop.stmt; default
     | [UnrollFull] -> Partition.IntLimit default_loop_unroll
     | [UnrollAuto i] -> automatic_unrolling i
     | [UnrollAmount t] -> begin

@@ -316,7 +316,7 @@ let to_list (p : 'a partition) : (key * 'a) list =
 type unroll_limit =
   | ExpLimit of Cil_types.exp
   | IntLimit of int
-  | AutoUnroll of Eva_automata.vertex * int * int
+  | AutoUnroll of Eva_automata.loop * int * int
 
 type action =
   | Enter_loop of unroll_limit

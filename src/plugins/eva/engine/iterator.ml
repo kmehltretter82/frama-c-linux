@@ -415,23 +415,19 @@ module Make_Dataflow
       | _ -> flow
     in
     (* Loop transitions *)
-    let loop_stmt v =
-      match v.vertex_info with
-      | LoopHead { stmt } -> stmt
-      | _ -> Option.get v.vertex_start_of
-    in
+    let get_loop v = Option.get (Eva_automata.find_loop v) in
     let enter_loop f v =
-      let stmt = loop_stmt v in
-      let f = Partitioning.enter_loop f v in
-      Partitioning.transfer (lift (Domain.enter_loop stmt)) f
+      let loop = get_loop v in
+      let f = Partitioning.enter_loop f loop in
+      Partitioning.transfer (lift (Domain.enter_loop loop.stmt)) f
     and leave_loop f v =
-      let stmt = loop_stmt v in
-      let f = Partitioning.leave_loop f v in
-      Partitioning.transfer (lift (Domain.leave_loop stmt)) f
+      let loop = get_loop v in
+      let f = Partitioning.leave_loop f loop in
+      Partitioning.transfer (lift (Domain.leave_loop loop.stmt)) f
     and incr_loop_counter f v =
-      let stmt = loop_stmt v in
-      let f = Partitioning.next_loop_iteration f stmt in
-      Partitioning.transfer (lift (Domain.incr_loop_counter stmt)) f
+      let loop = get_loop v in
+      let f = Partitioning.next_loop_iteration f loop.stmt in
+      Partitioning.transfer (lift (Domain.incr_loop_counter loop.stmt)) f
     in
     let loops_left, loops_entered =
       Eva_automata.wto_index_diff v1 v2

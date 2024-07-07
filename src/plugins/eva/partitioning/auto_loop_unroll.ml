@@ -64,32 +64,6 @@ let is_true = function
 module Graph = struct
   open Eva_automata
 
-  type loop =
-    { graph: G.t;   (* The complete graph of the englobing function. *)
-      head: vertex; (* The head of the loop. *)
-      wto: wto;     (* The wto for the loop body (without the loop head). *)
-    }
-
-  (* Builds the loop type for the englobing loop of statement [stmt]
-     in function [kf]. Raises [Not_found] if no loop is found. *)
-  let find_loop kf vertex =
-    let automaton = get_automaton kf in
-    let graph = automaton.graph in
-    match vertex.vertex_wto_index with
-    | [] ->
-      raise Not_found
-    | head :: _ ->
-      (* Find in the wto the component whose head is [head]. *)
-      let rec find = function
-        | [] -> assert false
-        | Wto.Node _ :: tl -> find tl
-        | Wto.Component (h, l) :: tl ->
-          if Vertex.equal h head
-          then {graph; head; wto = l}
-          else find (l @ tl)
-      in
-      find automaton.wto
-
   (* Applies [f acc instr] to all instructions [instr] in the [loop]. *)
   let fold_transitions f loop acc =
     let transfer (_v1, edge, _v2) acc =
@@ -509,7 +483,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* Is the number of iterations of a loop bounded by [limit]?
      [state] is the loop entry state, and [loop_block] the block of the loop. *)
-  let is_bounded_loop kf stmt loop context state limit =
+  let is_bounded_loop loop context state limit =
+    let kf = loop.Eva_automata.head.vertex_kf
+    and stmt = loop.stmt in
     (* Computes the effect of the loop. Stops if it contains assembly code. *)
     compute_loop_effect loop >>: fun loop_effect ->
     (* Finds loop exit conditions. *)
@@ -568,21 +544,13 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
        iteration by [limit]. *)
     List.exists is_bounded_by_condition exit_conditions
 
-  (* Computes an automatic loop unrolling for loop identified by [vertex] in
-     state [state], with a maximum limit. Returns None for no automatic loop
-     unrolling. *)
-  let compute ~max_unroll state vertex =
+  (* Computes an automatic loop unrolling for [loop]] in state [state], with a
+     maximum limit. Returns None for no automatic loop unrolling. *)
+  let compute ~max_unroll state loop =
     let open Option.Operators in
     let* from_domains = Dom.build_context state |> Bottom.to_option in
     try
-      let kf = vertex.Eva_automata.vertex_kf in
-      let loop = Graph.find_loop kf vertex in
-      let stmt =
-        match vertex.vertex_info with
-        | LoopHead { stmt } -> stmt
-        | NoneInfo -> Option.get vertex.vertex_start_of
-      in
-      if is_bounded_loop kf stmt loop { from_domains } state max_unroll
+      if is_bounded_loop loop { from_domains } state max_unroll
       then Some max_unroll
       else None
     with Not_found -> None

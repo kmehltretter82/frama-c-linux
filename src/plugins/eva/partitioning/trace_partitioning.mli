@@ -82,8 +82,8 @@ sig
 
   (* --- Partition transfer functions --- *)
 
-  val enter_loop : flow -> Eva_automata.vertex -> flow
-  val leave_loop : flow -> Eva_automata.vertex -> flow
+  val enter_loop : flow -> Eva_automata.loop -> flow
+  val leave_loop : flow -> Eva_automata.loop -> flow
   val next_loop_iteration : flow -> Cil_types.stmt -> flow
   val split_return : flow -> Eva_ast.exp option -> flow
 

@@ -343,3 +343,36 @@ let is_wto_head v =
 
 let is_back_edge (v1,v2) =
   List.exists (Vertex.equal v2) (v1.vertex_wto_index)
+
+
+(* Loops identification *)
+
+type loop = {
+  graph: graph;
+  head: vertex;
+  wto: wto;
+  stmt: stmt;
+}
+
+let loop_stmt head =
+  match head.vertex_info with
+  | LoopHead { stmt } -> stmt
+  | NoneInfo -> Option.get head.vertex_start_of
+
+let find_loop vertex =
+  let automaton = get_automaton vertex.vertex_kf in
+  let graph = automaton.graph in
+  match vertex.vertex_wto_index with
+  | [] ->
+    None
+  | head :: _ ->
+    (* Find in the wto the component whose head is [head]. *)
+    let rec find = function
+      | [] -> assert false
+      | Wto.Node _ :: tl -> find tl
+      | Wto.Component (h, l) :: tl ->
+        if Vertex.equal h head
+        then {graph; head; wto = l; stmt = loop_stmt head}
+        else find (l @ tl)
+    in
+    Some (find automaton.wto)

@@ -25,6 +25,6 @@
 module Make (Abstract: Abstractions.S_with_evaluation) : sig
 
   val compute:
-    max_unroll:int -> Abstract.Dom.t -> Eva_automata.vertex -> int option
+    max_unroll:int -> Abstract.Dom.t -> Eva_automata.loop -> int option
 
 end
