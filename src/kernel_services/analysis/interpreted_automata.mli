@@ -160,10 +160,6 @@ val build_wto : ?pref:WTO.pref -> automaton -> wto
     version of [build_automaton]  *)
 val get_automaton : Cil_types.kernel_function -> automaton
 
-(** Get the wto for the given kernel_function. This is a memoized version
-    of [build_wto] for the automaton returned by [get_wto] *)
-val get_wto : Cil_types.kernel_function -> wto
-
 (** Extract an exit strategy from a component, i.e. a sub-wto where all
     vertices lead outside the wto without passing through the head. *)
 val exit_strategy : automaton -> vertex Wto.component -> wto
@@ -187,22 +183,6 @@ module WTOIndex : sig
   (** @return the components left and the components entered when going from
       one index to another *)
   val diff : wto_index -> wto_index -> vertex list * vertex list
-
-  (** @return the wto_index for a statement. Uses the memoized wto. *)
-  val get : vertex -> wto_index
-
-  (** @return the components left and the components entered when going from
-      one vertex to another. Uses the memoized wto. *)
-  val get_diff : vertex -> vertex -> vertex list * vertex list
-
-  (** @return wether [v] is a component head or not. Uses the memoized wto. *)
-  val is_head : vertex -> bool
-
-  (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
-      is a wto head of any component where v2 is included. This assumes that
-      (v1,v2) is actually an edge present in the control flow graph. Uses the
-      memoized wto. *)
-  val is_back_edge : vertex * vertex -> bool
 
   module Table : sig
     type t = wto_index Vertex.Hashtbl.t

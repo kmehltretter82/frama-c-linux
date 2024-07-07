@@ -894,15 +894,15 @@ module AstDiff =
     end)
 
 let () = Parameter_customize.set_group inout_source
-    
+
 module DebugInterpretedAutomata =
   False
-  (struct
-    let option_name = "-debug-interpreted-automata"
-    let module_name = "DebugInterpretedAutomata"
-    let help = "outputs each interpreted automata built into a dot file"
-  end)
-    
+    (struct
+      let option_name = "-debug-interpreted-automata"
+      let module_name = "DebugInterpretedAutomata"
+      let help = "outputs each interpreted automata built into a dot file"
+    end)
+
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
 (* ************************************************************************* *)

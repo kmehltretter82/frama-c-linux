@@ -931,20 +931,6 @@ let default_pref v1 v2 =
 let build_wto ?(pref=default_pref) automaton =
   G.build_wto ~pref automaton.graph automaton.entry_point
 
-module WTOState = Kernel_function.Make_Table (WTO)
-    (struct
-      let size = 97
-      let name = "Interpreted_automata.WTOState"
-      let dependencies = [Ast.self]
-    end)
-
-let get_wto =
-  let build kf =
-    let automaton = get_automaton kf in
-    build_wto ~pref:default_pref automaton
-  in
-  WTOState.memo build
-
 
 (* ---------------------------------------------------------------------- *)
 (* --- WTO Indexes                                                    --- *)
@@ -1020,12 +1006,6 @@ struct
         let name = "Interpreted_automata.WTOIndex.State"
         let dependencies = [Ast.self]
       end)
-
-  let get_table = State.memo (fun kf -> Table.build (get_wto kf))
-  let get v = Table.find (get_table v.vertex_kf) v
-  let get_diff v1 v2 = diff (get v1) (get v2)
-  let is_head v = Table.is_head (get_table v.vertex_kf) v
-  let is_back_edge (v1,v2) = Table.is_back_edge (get_table v1.vertex_kf) (v1,v2)
 end
 
 
