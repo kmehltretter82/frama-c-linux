@@ -54,6 +54,7 @@ type transition =
   | Asm of attributes * string list * extended_asm option * stmt
 
 type edge = private {
+  edge_kf : kernel_function;
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : transition;

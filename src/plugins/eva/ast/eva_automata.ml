@@ -51,6 +51,7 @@ type transition =
   | Asm of attributes * string list * extended_asm option * stmt
 
 type edge = {
+  edge_kf : kernel_function;
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : transition;
@@ -66,20 +67,29 @@ let dummy_vertex = {
 }
 
 let dummy_edge = {
+  edge_kf = List.hd (Cil_datatype.Kf.reprs);
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
   edge_loc = Cil_datatype.Location.unknown;
 }
 
+let (<?>) c lcmp =
+  if c <> 0 then c else Lazy.force lcmp
+
 module Vertex = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = vertex
     let reprs = [dummy_vertex]
     let name = "Eva_automata.Vertex"
-    let compare v1 v2 = v1.vertex_key - v2.vertex_key
-    let hash v = v.vertex_key
-    let equal v1 v2 = v1.vertex_key = v2.vertex_key
+    let compare v1 v2 =
+      v1.vertex_key - v2.vertex_key <?>
+      lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
+    let hash v =
+      Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
+    let equal v1 v2 =
+      v1.vertex_key = v2.vertex_key &&
+      Kernel_function.equal v1.vertex_kf v2.vertex_kf
     let pretty fmt v =
       Format.pp_print_int fmt v.vertex_key;
       Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
@@ -109,20 +119,22 @@ module Transition = Datatype.Make (struct
       | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
   end)
 
-module Edge =
-struct
-  include Datatype.Make_with_collections
-      (struct
-        include Datatype.Serializable_undefined
-        type t = edge
-        let reprs = [dummy_edge]
-        let name = "Eva_automata.Edge"
-        let compare e1 e2 = e1.edge_key - e2.edge_key
-        let hash e = e.edge_key
-        let equal e1 e2 = e1.edge_key = e2.edge_key
-        let pretty fmt e = Transition.pretty fmt e.edge_transition
-      end)
-end
+module Edge = Datatype.Make_with_collections
+    (struct
+      include Datatype.Serializable_undefined
+      type t = edge
+      let reprs = [dummy_edge]
+      let name = "Eva_automata.Edge"
+      let compare e1 e2 =
+        e1.edge_key - e2.edge_key <?>
+        lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
+      let hash e =
+        Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
+      let equal e1 e2 =
+        e1.edge_key = e2.edge_key &&
+        Kernel_function.equal e1.edge_kf e2.edge_kf
+      let pretty fmt e = Transition.pretty fmt e.edge_transition
+    end)
 
 
 (* --- Automata types --- *)
@@ -270,6 +282,7 @@ let translate_automaton kf =
     let v' = VertexTable.find table v
     and w' = VertexTable.find table w
     and e' = {
+      edge_kf = e.Src.edge_kf;
       edge_key = e.Src.edge_key;
       edge_kinstr = e.Src.edge_kinstr;
       edge_transition = translate_transition e.Src.edge_transition;
