@@ -829,6 +829,8 @@ struct
   let e_true   = constant (insert True)
   let e_zero   = constant (insert (Kint Z.zero))
   let e_one    = constant (insert (Kint Z.one))
+  let e_zero_r = constant (insert (Kreal Q.zero))
+  let e_one_r = constant (insert (Kreal Q.one))
   let e_int n  = insert (Kint (Z.of_int n))
   let e_float r = insert (Kreal (Q.of_float r))
   let e_zint z = insert (Kint z)
@@ -852,13 +854,31 @@ struct
 
   let c_fun f xs tau = insert ?tau (Fun(f,xs))
 
-  let c_add = function
+  let c_add0 = function
+    | [] -> assert false
+    | xs -> insert(Add(List.sort compare xs))
+
+  let i_add = function
     | [] -> e_zero
     | [x] -> x
     | xs -> insert(Add(List.sort compare xs))
 
-  let c_mul = function
+  let r_add = function
+    | [] -> e_zero_r
+    | [x] -> x
+    | xs -> insert(Add(List.sort compare xs))
+
+  let c_mul0 = function
+    | [] -> assert false
+    | xs -> insert(Mul(List.sort compare xs))
+
+  let i_mul = function
     | [] -> e_one
+    | [x] -> x
+    | xs -> insert(Mul(List.sort compare xs))
+
+  let r_mul = function
+    | [] -> e_one_r
     | [x] -> x
     | xs -> insert(Mul(List.sort compare xs))
 
@@ -911,9 +931,8 @@ struct
       with Exit ->
         insert(Rdef (List.sort compare_field fxs))
 
-  [@@@ warning "-32"]
   let insert _ = assert false (* [insert] should not be used afterwards *)
-  [@@@ warning "+32"]
+  [@@ warning "-32"]
 
   let is_primitive e =
     match e.repr with
@@ -1209,7 +1228,7 @@ struct
 
   let rec times z e =
     if Z.equal z Z.one then e else
-    if Z.equal z Z.zero then e_zint Z.zero else
+    if Z.equal z Z.zero then if is_real e then e_zero_r else e_zero else
       match e.repr with
       | Kint z' -> e_zint (Z.mul z z')
       | Kreal r -> e_real (q_times z r)
@@ -1226,27 +1245,27 @@ struct
     let c = Q.sub a b in
     match xs , ys with
     | [] , [] -> if fz c Q.zero then e_true else e_false
-    | [] , _ -> fe (e_real c) (c_add ys)
-    | _ , [] -> fe (c_add xs) (e_real (Q.neg c))
+    | [] , _ -> fe (e_real c) (r_add ys)
+    | _ , [] -> fe (r_add xs) (e_real (Q.neg c))
     | _ ->
       let s = Q.sign c in
-      if s < 0 then fe (c_add xs) (c_add (e_real (Q.neg c) :: ys)) else
-      if s > 0 then fe (c_add (e_real c :: xs)) (c_add ys) else
-        fe (c_add xs) (c_add ys)
+      if s < 0 then fe (r_add xs) (r_add (e_real (Q.neg c) :: ys)) else
+      if s > 0 then fe (r_add (e_real c :: xs)) (r_add ys) else
+        fe (r_add xs) (r_add ys)
 
   let i_affine_rel fc fe c xs ys =
     match xs , ys with
     | [] , [] -> if fc c Z.zero then e_true else e_false
-    | [] , _ -> fe (e_zint c) (c_add ys) (* c+0 R ys <-> c R ys *)
-    | _ , [] -> fe (c_add xs) (e_zint (Z.neg c)) (* c+xs R 0 <-> xs R -c *)
+    | [] , _ -> fe (e_zint c) (i_add ys) (* c+0 R ys <-> c R ys *)
+    | _ , [] -> fe (i_add xs) (e_zint (Z.neg c)) (* c+xs R 0 <-> xs R -c *)
     | _ ->
       match sign c with
       (* 0+xs R ys <-> xs R ys *)
-      | Null -> fe (c_add xs) (c_add ys)
+      | Null -> fe (i_add xs) (i_add ys)
       (* c+xs R ys <-> xs R (-c+ys) *)
-      | Negative -> fe (c_add xs) (c_add (e_zint (Z.neg c) :: ys))
+      | Negative -> fe (i_add xs) (i_add (e_zint (Z.neg c) :: ys))
       (* c+xs R ys <-> (c+xs) R ys *)
-      | Positive -> fe (c_add (e_zint c :: xs)) (c_add ys)
+      | Positive -> fe (i_add (e_zint c :: xs)) (i_add ys)
 
   let i_affine_leq c xs ys =
     if Z.equal c Z.one
@@ -1371,26 +1390,26 @@ struct
 
   (* --- Affine Dispatch --- *)
 
-  let is_affine xs ys =
+  let is_affine_int xs ys =
     not (List.exists is_real xs || List.exists is_real ys)
 
   let affine_eq c xs ys =
-    if is_affine xs ys
+    if is_affine_int xs ys
     then i_affine_rel Z.equal c_builtin_eq c xs ys
     else r_affine_rel Q.equal c_builtin_eq c xs ys
 
   let affine_neq c xs ys =
-    if is_affine xs ys
+    if is_affine_int xs ys
     then i_affine_rel (fun x y -> not (Z.equal x y)) c_builtin_neq c xs ys
     else r_affine_rel (fun x y -> not (Q.equal x y)) c_builtin_neq c xs ys
 
   let affine_leq c xs ys =
-    if is_affine xs ys
+    if is_affine_int xs ys
     then i_affine_ratio_leq c xs ys
     else r_affine_rel Q.leq c_builtin_leq c xs ys
 
   let affine_lt c xs ys =
-    if is_affine xs ys
+    if is_affine_int xs ys
     then i_affine_ratio_lt c xs ys
     else r_affine_rel Q.lt c_builtin_lt c xs ys
 
@@ -1450,14 +1469,16 @@ struct
   let addition ts =
     let kts = unfold_affine [] Z.one ts in
     let kts = List.sort compare_monoms kts in
-    c_add (fold_affine fold_monom [] kts)
+    let kts = fold_affine fold_monom [] kts in
+    if List.exists is_real ts then r_add kts else i_add kts
 
   (* a and b normalized *)
   let substraction a b =
     let kts = unfold_affine1 [] Z.one a in
     let kts = unfold_affine1 kts Z.minus_one b in
     let kts = List.sort compare_monoms kts in
-    c_add (fold_affine fold_monom [] kts)
+    let kts = fold_affine fold_monom [] kts in
+    if is_real a || is_real b then r_add kts else i_add kts
 
   (* --- Relations --- *)
 
@@ -1543,20 +1564,23 @@ struct
       let r,ts = r_ground Q.mul Q.one [] ts in
       if Q.equal Q.zero r then e_real Q.zero else
       if ts=[] then e_real r else
-      if Q.equal r Q.one then c_mul ts else  c_mul (e_real r :: ts)
+      if Q.equal r Q.one then r_mul ts else  r_mul (e_real r :: ts)
     else
       let s,ts = i_ground Z.mul Z.one [] ts in
       if Z.equal Z.zero s then e_zint Z.zero else
       if ts=[] then e_zint s else
-        let t = c_mul ts in
+        let t = i_mul ts in
         if Z.equal s Z.one then t else c_times s t
 
   let e_times k x =
     if Z.equal k Z.one then x else
-    if Z.equal k Z.zero then e_zero else
+    if Z.equal k Z.zero then
+      if is_real x then e_zero_r else e_zero
+    else
       let kts = unfold_affine1 [] k x in
       let kts = List.sort compare_monoms kts in
-      c_add (fold_affine fold_monom [] kts)
+      let kts = fold_affine fold_monom [] kts in
+      if is_real x then r_add kts else i_add kts
 
   (* --- Divisions --- *)
 
@@ -2141,8 +2165,8 @@ struct
     match e0.repr with
     | Kint _ | Kreal _ | Fvar _ | Bvar _ | True | False -> e0
     | Not e -> c_not (f e)
-    | Add xs -> c_add (List.map f xs)
-    | Mul xs -> c_mul (List.map f xs)
+    | Add xs -> c_add0 (List.map f xs)
+    | Mul xs -> c_mul0 (List.map f xs)
     | And xs -> c_and (List.map f xs)
     | Or  xs -> c_or (List.map f xs)
     | Mod(x,y) -> c_mod (f x) (f y)
