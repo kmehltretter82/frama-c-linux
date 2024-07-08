@@ -626,12 +626,11 @@ let build_automaton kf =
         { control with src }
     in
 
-    (* Adds an empty vertex before loops (and goto destinations), allowing Eva
-       to distinguish between the state juste before the loop (or the goto)
-       and the states in the loop (or coming from the goto statements). *)
+    (* Adds an empty vertex before goto destinations, allowing Eva
+       to distinguish between the state juste before the label
+       and the joined states from the gotoes. *)
     let control =
-      if is_loop stmt || is_goto_destination stmt
-      then
+      if is_goto_destination stmt then
         let src = add_vertex () in
         add_edge control.src src kinstr Skip loc;
         { control with src }
