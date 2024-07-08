@@ -52,6 +52,7 @@ type adt = private
   | Mrecord of mdt * fields (** External record-type *)
   | Atype of logic_type_info (** Logic Type *)
   | Comp of compinfo * datakind (** C-code struct or union *)
+  | Wtype of string list * string * string list (** Why3 imported type *)
 
 (** name to print to the provers *)
 and mdt = string extern
@@ -89,6 +90,7 @@ and lsymbol = {
 and source =
   | Generated of WpContext.context option * string
   | Extern of Engine.link extern
+  | Wsymbol of string list * string * string list (** Why3 imported logic symbol *)
 
 val mem_builtin_type : name:string -> bool
 val is_builtin : logic_type_info -> bool
@@ -159,6 +161,17 @@ val generated_p : ?context:bool -> ?coloring:bool -> string -> lfun
 
 val extern_t:
   string -> link:string -> library:library -> mdt
+
+val imported_t:
+  package:string list -> theory:string -> name:string list -> adt
+
+val imported_f:
+  package:string list -> theory:string -> name:string list ->
+  ?params:sort list ->
+  ?result:sort ->
+  ?typecheck:(tau option list -> tau) ->
+  unit -> lfun
+
 
 (** {2 Sorting and Typing} *)
 

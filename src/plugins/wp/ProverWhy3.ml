@@ -141,13 +141,14 @@ let empty_cnv ?(polarity=`NoPolarity) (ctx:context) : convert = {
   convert_for_export = Lang.F.Tmap.empty;
 }
 
-
-let lfun_name (lfun:Lang.lfun) =
+let lfun_wname (lfun:Lang.lfun) =
   match lfun with
   | ACSL f -> Qed.Engine.F_call (Lang.logic_id f)
   | CTOR c -> Qed.Engine.F_call (Lang.ctor_id c)
   | FUN({m_source=Generated(_,n)}) -> Qed.Engine.F_call n
   | FUN({m_source=Extern e}) -> e.Lang.ext_link
+  | FUN({m_source=Wsymbol(p,m,s)}) ->
+    Qed.Engine.F_call (String.concat "." (p @ m :: s))
 
 let coerce ~cnv sort expected r =
   match sort, expected with
@@ -156,12 +157,13 @@ let coerce ~cnv sort expected r =
     t_app ~cnv ~f:["real"] ~l:"FromInt" ~p:["from_int"] [r]
   | _ -> r
 
-let name_of_adt = function
+let adt_wname = function
   | Lang.Mtype a -> a.Lang.ext_link
   | Mrecord(a,_) -> a.Lang.ext_link
   | Comp (c, KValue) -> Lang.comp_id c
   | Comp (c, KInit) -> Lang.comp_init_id c
   | Atype lt -> Lang.type_id lt
+  | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
 let tvar =
   let tvar = Datatype.Int.Hashtbl.create 10 in
@@ -169,8 +171,7 @@ let tvar =
     Datatype.Int.Hashtbl.memo tvar i
       (fun i ->
          let id = Why3.Ident.id_fresh (Printf.sprintf "a%i" i) in
-         Why3.Ty.create_tvsymbol id
-      )
+         Why3.Ty.create_tvsymbol id)
 
 
 (** Sharing *)
@@ -216,6 +217,16 @@ let wp_why3_lib library =
 
 (* conversion *)
 
+let of_adt ~cnv = function
+  | Lang.Wtype(f,l,p) -> get_ts ~cnv ~f ~l ~p
+  | adt ->
+    let s = adt_wname adt in
+    try Hashtbl.find cnv.incomplete_types s
+    with Not_found ->
+    try Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s))
+    with Not_found ->
+      why3_failure "Can't find type '%s' in why3 namespace" s
+
 let rec of_tau ~cnv (t:Lang.F.tau) =
   match t with
   | Prop -> None
@@ -225,18 +236,9 @@ let rec of_tau ~cnv (t:Lang.F.tau) =
   | Array(k,v) ->
     let ts = get_ts ~cnv ~f:["map"] ~l:"Map" ~p:["map"] in
     Some (Why3.Ty.ty_app ts [Option.get (of_tau ~cnv k); Option.get (of_tau ~cnv v)])
-  | Data(adt,l) -> begin
-      let s = name_of_adt adt in
-      let find s =
-        try Hashtbl.find cnv.incomplete_types s
-        with Not_found ->
-          Why3.Theory.(ns_find_ts (get_namespace cnv.th) (cut_path s))
-      in
-      match find s with
-      | ts -> Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (of_tau ~cnv e)) l))
-      | exception Not_found ->
-        why3_failure "Can't find type '%s' in why3 namespace" s
-    end
+  | Data(adt,l) ->
+    let ts = of_adt ~cnv adt in
+    Some (Why3.Ty.ty_app ts (List.map (fun e -> Option.get (of_tau ~cnv e)) l))
   | Tvar i -> Some (Why3.Ty.ty_var (tvar i))
   | Record _ ->
     why3_failure "Type %a not (yet) convertible" Lang.F.pp_tau t
@@ -333,7 +335,7 @@ let rec of_trigger ~cnv t =
   | TgSet(m,k,v) ->
     t_app ~cnv ~f:["map"] ~l:"Map" ~p:["set"] [of_trigger ~cnv m;of_trigger ~cnv k;of_trigger ~cnv v]
   | TgFun (f,l) -> begin
-      match lfun_name f with
+      match lfun_wname f with
       | F_call s ->
         let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
         Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger ~cnv e) l)
@@ -341,7 +343,7 @@ let rec of_trigger ~cnv t =
     end
   | TgProp (f,l) ->
     begin
-      match lfun_name f with
+      match lfun_wname f with
       | F_call s ->
         let ls = Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s)) in
         Why3.Term.t_app_infer ls (List.map (fun e -> of_trigger ~cnv e) l)
@@ -504,6 +506,9 @@ let rec of_term ~cnv expected t : Why3.Term.term =
       coerce ~cnv sort expected $
       t_app' ~cnv ~f:["map"] ~l:"Const" ~p:["const"] [of_term ~cnv vsort v] (of_tau ~cnv sort)
     (* Generic *)
+    | Fun (FUN({m_source=Wsymbol(f,l,p)}),ls), _, _ ->
+      t_app ~cnv ~f ~l ~p $ List.map (of_term' cnv) ls
+
     | Fun (f,l), _, _ -> begin
         let t_app ls l r  =
           Why3.Term.t_app ls l r
@@ -526,7 +531,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         let apply_from_ns' s l =
           apply_from_ns s (List.map (fun e -> of_term' cnv e) l)
         in
-        match lfun_name f, expected with
+        match lfun_wname f, expected with
         | F_call s, _ -> apply_from_ns' s l sort
         | Qed.Engine.F_subst (s, _), _ -> apply_from_ns' s l sort
         | Qed.Engine.F_left s, _ | Qed.Engine.F_assoc s, _ ->
@@ -591,7 +596,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           Why3.Term.t_app ls l (of_tau ~cnv expected)
         | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
       end
-    | (Rdef _, Data ((Mtype _|Mrecord (_, _)|Atype _), _), _)
+    | (Rdef _, Data ((Mtype _|Mrecord (_, _)|Atype _|Wtype _), _), _)
     | (Rdef _, (Prop|Bool|Int|Real|Tvar _|Array (_, _)), _)
     | (Aset (_, _, _), (Prop|Bool|Int|Real|Tvar _|Record _|Data (_, _)), _)
     | (Neq (_, _), _, (Int|Real|Tvar _|Array (_, _)|Record _|Data (_, _)))
@@ -776,6 +781,8 @@ class visitor (ctx:context) c =
       Wp_parameters.debug ~dkey:dkey_api "End  on_cluster %s@." name;
       ctx.th <- th
 
+    method on_theory file thy =
+      self#add_import_use ~import:false file thy ("W_" ^ thy)
 
     method section _ = ()
 
@@ -978,7 +985,7 @@ class visitor (ctx:context) c =
       begin
         match d.d_definition with
         | Logic t ->
-          let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+          let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_wname d.d_lfun)) in
           let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
           let ty_args = List.map map d.d_params in
           let id = Why3.Term.create_lsymbol id ty_args (of_tau ~cnv t) in
@@ -987,7 +994,7 @@ class visitor (ctx:context) c =
         | Function(t,mu,v) -> begin
             match mu with
             | Rec -> (* transform recursive function into an axioms *)
-              let name = Qed.Export.link_name (lfun_name d.d_lfun) in
+              let name = Qed.Export.link_name (lfun_wname d.d_lfun) in
               let id = Why3.Ident.id_fresh name in
               let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
@@ -1011,7 +1018,7 @@ class visitor (ctx:context) c =
                   t in
               ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
             | Def ->
-              let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+              let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_wname d.d_lfun)) in
               let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
               let result = of_tau ~cnv t in
@@ -1025,7 +1032,7 @@ class visitor (ctx:context) c =
         | Predicate(mu,p) -> begin
             match mu with
             | Rec ->
-              let name = Qed.Export.link_name (lfun_name d.d_lfun) in
+              let name = Qed.Export.link_name (lfun_wname d.d_lfun) in
               let id = Why3.Ident.id_fresh name in
               let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
@@ -1048,7 +1055,7 @@ class visitor (ctx:context) c =
                   t in
               ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl;
             | Def ->
-              let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_name d.d_lfun)) in
+              let id = Why3.Ident.id_fresh (Qed.Export.link_name (lfun_wname d.d_lfun)) in
               let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
               let ty_args = List.map map d.d_params in
               let id = Why3.Term.create_lsymbol id ty_args None in
@@ -1060,7 +1067,7 @@ class visitor (ctx:context) c =
           end
         | Inductive dl ->
           (* create predicate symbol *)
-          let fname = Qed.Export.link_name (lfun_name d.d_lfun) in
+          let fname = Qed.Export.link_name (lfun_wname d.d_lfun) in
           let id = Why3.Ident.id_fresh fname in
           let map e = Option.get (of_tau ~cnv (Lang.F.tau_of_var e)) in
           let ty_args = List.map map d.d_params in
