@@ -267,48 +267,48 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
 let import_theory (env : env) thname =
   let theory_name, theory_path = extract_path thname in
   try
-    if not (Datatype.String.Hashtbl.mem env.menv thname) then
-      begin
-        let menv : menv = {li = []; lti = []} in
-        let theory = W.Env.read_theory env.wenv theory_path theory_name in
-        List.iter (fun (tdecl : T.tdecl) ->
-            match tdecl.td_node with
-            | Decl decl ->
-              begin
-                match decl.d_node with
-                | Dtype ts ->
-                  L.debug ~dkey "Decl and type %a"  pp_id ts.ts_name;
-                  L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
-                  let lti =  lti_of_ts env menv ts in
-                  L.debug ~dkey "Correspondign LTI %a" pp_lti lti;
-                | Ddata ddatas ->
-                  List.iter
-                    (fun ((ts, _) : W.Decl.data_decl) ->
-                       L.debug ~dkey "Decl and data %a" pp_id  ts.ts_name;
-                       L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
-                       let lti =  lti_of_ts env menv ts  in
-                       L.debug ~dkey "Correspondign data LTI %a" pp_lti lti;
-                    ) ddatas
-                | Dparam ls ->
-                  L.debug ~dkey "Decl and dparam %a" pp_id ls.ls_name;
-                  L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name
-                | Dlogic dlogics ->
-                  List.iter
-                    (fun ((ls,_):W.Decl.logic_decl) ->
-                       L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
-                       L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
-                       let li = li_of_ls env menv ls in
-                       L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
-                    ) dlogics
-                | _ -> L.debug ~dkey "Other type of Decl"
-              end
-            | Use _| Clone _| Meta _ -> L.debug ~dkey ""
-          ) theory.th_decls;
-        Datatype.String.Hashtbl.add env.menv thname
-          { logics =  List.rev menv.li;
-            types = List.rev menv.lti;
-            paths = theory_path };
-      end
+    try ignore (Datatype.String.Hashtbl.find env.menv thname) with Not_found ->
+      let menv : menv = {li = []; lti = []} in
+      let theory = W.Env.read_theory env.wenv theory_path theory_name in
+      List.iter (fun (tdecl : T.tdecl) ->
+          match tdecl.td_node with
+          | Decl decl ->
+            begin
+              match decl.d_node with
+              | Dtype ts ->
+                L.debug ~dkey "Decl and type %a"  pp_id ts.ts_name;
+                L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
+                let lti =  lti_of_ts env menv ts in
+                L.debug ~dkey "Correspondign LTI %a" pp_lti lti;
+              | Ddata ddatas ->
+                List.iter
+                  (fun ((ts, _) : W.Decl.data_decl) ->
+                     L.debug ~dkey "Decl and data %a" pp_id  ts.ts_name;
+                     L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
+                     let lti =  lti_of_ts env menv ts  in
+                     L.debug ~dkey "Correspondign data LTI %a" pp_lti lti;
+                  ) ddatas
+              | Dparam ls ->
+                L.debug ~dkey "Decl and dparam %a" pp_id ls.ls_name;
+                L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name
+              | Dlogic dlogics ->
+                List.iter
+                  (fun ((ls,_):W.Decl.logic_decl) ->
+                     L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
+                     L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
+                     let li = li_of_ls env menv ls in
+                     L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
+                  ) dlogics
+              | _ -> L.debug ~dkey "Other type of Decl"
+            end
+          | Use _| Clone _| Meta _ -> L.debug ~dkey ""
+        ) theory.th_decls;
+      Datatype.String.Hashtbl.add env.menv thname
+        { logics =  List.rev menv.li;
+          types = List.rev menv.lti;
+          paths = theory_path };
+
+
   with W.Env.LibraryNotFound _ ->
     L.error "Library %s not found" thname
 
@@ -348,6 +348,9 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
     @@ String.concat "::" current_module.paths;
+
+    (*LB.add_builtin*)
+
 
   end
 
