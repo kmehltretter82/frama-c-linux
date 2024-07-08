@@ -309,8 +309,6 @@ let import_theory (env : env) thname =
             types = List.rev menv.lti;
             paths = theory_path };
       end
-    else
-      L.error "Trying to register %s a second time, ignoring" thname;
   with W.Env.LibraryNotFound _ ->
     L.error "Library %s not found" thname
 
