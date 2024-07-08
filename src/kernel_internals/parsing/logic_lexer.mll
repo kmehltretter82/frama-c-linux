@@ -623,13 +623,11 @@ and comment = parse
 
   let spec = parse_from_position Logic_parser.spec
 
-  let ext_spec lexbuf = try
-      ext_acsl_spec := true ;
-      let r = Logic_parser.ext_spec token lexbuf in
-      ext_acsl_spec := false ; r
-    with exn ->
-      ext_acsl_spec := false ;
-      raise exn
+  let ext_spec lexbuf =
+    ext_acsl_spec:=true;
+    let finally() = ext_acsl_spec:=false in
+    let work () = Logic_parser.ext_spec token lexbuf in
+    Fun.protect ~finally work
 
   type 'a parse = Filepath.position * string -> (Filepath.position * 'a) option
 
