@@ -158,7 +158,7 @@ val register_code_annot_next_loop: register_extension
 val register_code_annot_next_both: register_extension
 
 (**
-   Module importer extensions allow to extends the import clause with external
+   Module importer extensions allow extending the import clause with external
    loaders. For instance, consider the following declaration:
    {[
      //@ import A: foo::bar;
