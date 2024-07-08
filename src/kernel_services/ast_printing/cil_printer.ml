@@ -746,8 +746,7 @@ class cil_printer () = object (self)
       self#storage v.vstorage
       self#attributes stom
       (if stom = [] then "" else " ")
-      (self#typ ?fundecl name)
-      v.vtype
+      (self#typ ?fundecl name) v.vtype
       self#attributes rest
 
   (*** L-VALUES ***)
@@ -2095,7 +2094,7 @@ class cil_printer () = object (self)
       let name' fmt =
         if a = [] then pname fmt false
         else if nameOpt = None then printAttributes fmt a
-        else fprintf fmt "(%a%a)" printAttributes a pname (a <> [])
+        else fprintf fmt "(%a%a)" printAttributes a pname true
       in
       let partition_ghosts ghost_arg args =
         match args with

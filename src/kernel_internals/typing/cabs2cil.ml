@@ -3750,25 +3750,11 @@ let rec compute_from_root f = function
 
   | _ :: rest -> compute_from_root f rest
 
-let instrFallsThrough (i : instr) = match i with
-  | Local_init _ -> true
-  | Set _ -> true
-  | Call (None, {enode = Lval (Var e, NoOffset)}, _, _) ->
-    (* See if this is exit, or if it has the noreturn attribute *)
-    if e.vname = "exit" then false
-    else if hasAttribute "noreturn" e.vattr then false
-    else true
-  | Call _ -> true
-  | Asm _ -> true
-  | Skip _ -> true
-  | Code_annot _ -> true
-
 let rec stmtFallsThrough (s: stmt) : bool =
   Kernel.debug ~level:4 "stmtFallsThrough stmt %a"
     Cil_printer.pp_location (Stmt.loc s);
   match s.skind with
-  | Instr(il) ->
-    instrFallsThrough il
+  | Instr il -> Cil.instr_falls_through il
   | UnspecifiedSequence seq ->
     blockFallsThrough (block_from_unspecified_sequence seq)
   | Return _ | Break _ | Continue _ | Throw _ -> false
@@ -9570,7 +9556,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
               !currentFunctionFDEC.svar.vname;
             [assert_false ()], res
         in
-        if not (hasAttribute "noreturn" !currentFunctionFDEC.svar.vattr)
+        if not (typeHasAttribute "noreturn" !currentFunctionFDEC.svar.vtype)
         then
           !currentFunctionFDEC.sbody.bstmts <-
             !currentFunctionFDEC.sbody.bstmts

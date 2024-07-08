@@ -569,9 +569,9 @@ let is_in_libc kf =
 
 let has_noreturn_attr kf =
   match kf.fundec with
-  | Definition ({ svar = { vattr } },_)
-  | Declaration (_, { vattr }, _, _) ->
-    Cil.hasAttribute "noreturn" vattr
+  | Definition ({ svar = vi },_)
+  | Declaration (_, vi, _, _) ->
+    Cil.typeHasAttribute "noreturn" vi.vtype
 
 let is_first_stmt kf stmt =
   try

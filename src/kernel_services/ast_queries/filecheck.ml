@@ -352,16 +352,7 @@ module Base_checker = struct
                    has successors:@\n%a"
                   print_stmt stmt Printer.pp_varinfo f.svar
                   (Pretty_utils.pp_list ~sep:"@\n" print_stmt) stmt.succs
-            |  Instr(Call (_, called, _, _))
-              when Cil.typeHasAttribute "noreturn" (Cil.typeOf called) ->
-              if stmt.succs <> [] then
-                check_abort
-                  "exit statement %a in function %a \
-                   has successors:@\n%a"
-                  print_stmt stmt Printer.pp_varinfo f.svar
-                  (Pretty_utils.pp_list ~sep:"@\n" print_stmt) stmt.succs
-            |  Instr(Call (_, { enode = Lval(Var called,NoOffset)}, _, _))
-              when Cil.hasAttribute "noreturn" called.vattr ->
+            | Instr i when not (Cil.instr_falls_through i) ->
               if stmt.succs <> [] then
                 check_abort
                   "exit statement %a in function %a \

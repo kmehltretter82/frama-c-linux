@@ -425,12 +425,12 @@ let attributeHash: (string, attributeClass) Hashtbl.t =
   (* Now come the MSVC declspec attributes *)
   List.iter (fun a -> Hashtbl.add table a (AttrName true))
     [ "thread"; "naked"; "dllimport"; "dllexport";
-      "selectany"; "allocate"; "nothrow"; "novtable"; "property";  "noreturn";
+      "selectany"; "allocate"; "nothrow"; "novtable"; "property";
       "uuid"; "align" ];
   List.iter (fun a -> Hashtbl.add table a (AttrFunType false))
-    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline"; ];
+    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline";];
   List.iter (fun a -> Hashtbl.add table a (AttrFunType true))
-    [ "stdcall";"cdecl"; "fastcall" ];
+    [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
   List.iter (fun a -> Hashtbl.add table a AttrType)
     [ "const"; "volatile"; "restrict"; "mode" ];
   table
@@ -3232,7 +3232,7 @@ let separateStorageModifiers (al: attribute list) =
   let isstoragemod (Attr(an, _) | AttrAnnot an : attribute) : bool =
     try
       match Hashtbl.find attributeHash an with
-        AttrName issm -> issm
+      | AttrName issm -> issm
       | _ -> false
     with Not_found -> false
   in
@@ -5521,6 +5521,10 @@ let has_extern_local_init b =
     let action _ _ () = raise Exit in
     try fold_local_init b action (); false with Exit -> true
   end
+
+let instr_falls_through = function
+  | Call (_, f, _, _) -> not (typeHasAttribute "noreturn" (typeOf f))
+  | _ -> true
 
 let splitFunctionType (ftype: typ)
   : typ * (string * typ * attributes) list option * bool * attributes =

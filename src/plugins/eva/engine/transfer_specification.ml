@@ -572,7 +572,7 @@ module Make
      some warnings are disabled, such as warnings about new garbled mixes. *)
   let compute_using_specification ~warn kinstr call spec state =
     let vi = Kernel_function.get_vi call.kf in
-    if Cil.hasAttribute "noreturn" vi.vattr
+    if Cil.typeHasAttribute "noreturn" vi.vtype
     then []
     else
       (* Initializes the variable returned by the function. *)
