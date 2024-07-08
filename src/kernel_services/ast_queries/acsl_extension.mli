@@ -173,7 +173,7 @@ val register_code_annot_next_both: register_extension
 
    New type and function symbols shall be created with `Cil.make_xxx` functions.
    The registered symbols {i will} be automatically prefixed with the name of
-   the imported module.
+   the imported module if necessary.
 
    The register module importer function might be invoked several times,
    typically when a given module is imported from several files. Although

@@ -854,7 +854,9 @@ struct
         end
 
   let make_module_builder (decls : global_annotation list ref) moduleId =
-    let wrap = Printf.sprintf "%s::%s" moduleId in
+    let prefix = moduleId ^ "::" in
+    let wrap s =
+      if String.starts_with ~prefix s then s else prefix ^ s in
     let add_logic_ctor loc ct =
       ct.ctor_name <- wrap ct.ctor_name ;
       add_logic_ctor loc ct in
