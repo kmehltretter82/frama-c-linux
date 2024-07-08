@@ -467,8 +467,8 @@ let rec of_term ~cnv expected t : Why3.Term.term =
         | tau ->
           match List.find (fun spe -> spe.Lang.For_export.for_tau tau) !specific_equalities with
           | spe when cnv.polarity = `Positive -> of_term ~cnv expected (spe.mk_new_eq a b)
-          | exception Not_found -> Why3.Term.t_equ (of_term' cnv a) (of_term' cnv b)
-          | _                   -> Why3.Term.t_equ (of_term' cnv a) (of_term' cnv b)
+          | exception Not_found -> poly ~cnv Why3.Term.t_equ a b
+          | _                   -> poly ~cnv Why3.Term.t_equ a b
       end
     | Neq (a,b), _, Prop ->
       begin
@@ -479,13 +479,13 @@ let rec of_term ~cnv expected t : Why3.Term.term =
           match List.find (fun spe -> spe.Lang.For_export.for_tau tau) !specific_equalities with
           | spe when cnv.polarity = `Negative ->
             Why3.Term.t_not (of_term ~cnv expected (spe.mk_new_eq a b))
-          | exception Not_found -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
-          | _                   -> Why3.Term.t_neq (of_term' cnv a) (of_term' cnv b)
+          | exception Not_found -> poly ~cnv Why3.Term.t_neq a b
+          | _                   -> poly ~cnv Why3.Term.t_neq a b
       end
     | Eq (a,b), _, Bool ->
-      t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["eqb"] [of_term' cnv a; of_term' cnv b]
+      poly ~cnv (fun a b -> t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["eqb"] [a;b]) a b
     | Neq (a,b), _, Bool ->
-      t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["neqb"] [of_term' cnv a; of_term' cnv b]
+      poly ~cnv (fun a b -> t_app ~cnv ~f:(wp_why3_lib "qed") ~l:"Qed" ~p:["neqb"] [a;b]) a b
     | If(a,b,c), _, _ ->
       let cnv' = {cnv with polarity = `NoPolarity} in
       Why3.Term.t_if (of_term ~cnv:cnv' Prop a) (of_term ~cnv expected b) (of_term ~cnv expected c)
@@ -677,6 +677,15 @@ and int_or_real ~cnv ~fint ~lint ~pint ~freal ~lreal ~preal a b =
   | Real, Int | Real, Real | Int, Real ->
     t_app_fold ~f:freal ~l:lreal ~p:preal ~cnv Real [a; b]
   | _ -> assert false
+
+and poly ~cnv f a b =
+  match Lang.F.typeof a, Lang.F.typeof b with
+  | Int,Int ->
+    f (of_term ~cnv Int a) (of_term ~cnv Int b)
+  | Int,Real | Real,Int | Real,Real ->
+    f (of_term ~cnv Real a) (of_term ~cnv Real b)
+  | ta,tb ->
+    f (of_term ~cnv ta a) (of_term ~cnv tb b)
 
 let rebuild cnv t =
   let t, cache = Lang.For_export.rebuild ~cache:cnv.convert_for_export t in
