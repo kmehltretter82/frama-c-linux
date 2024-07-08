@@ -403,11 +403,16 @@ tr:first-of-type > .eva-table-callsite-box {
       border: 1px solid var(--text-discrete);
     }
 
-    input:checked { background-color: var(--positive-button-active) }
   }
 
-  .dome-xForm-field-actions { min-width: 42px; }
+  .dome-xForm-field-actions { min-width: 61px; }
+  input[type="number"]::-webkit-inner-spin-button {
+    margin-left: 4px;
+  }
   .dome-xForm-field {
+
+
+
     >input[type=radio] { display: none; }
 
     &:has(> input[type=radio]) {
@@ -443,6 +448,20 @@ tr:first-of-type > .eva-table-callsite-box {
       background-color: var(--checked-element);
       background-image: none;
     }
+
+    .field-eva-domains + button.dome-xForm-field {
+      display: none;
+    }
+  }
+
+  .dome-xForm-field-block .eva-field-help {
+    display: none;
+    background-color: var(--background-profound);
+    border-radius: 100%;
+    padding: 2px 4px;
+  }
+  .dome-xForm-field-block:hover .eva-field-help {
+    display: inline;
   }
 
   .dome-xForm-field-block:has(> .dome-xForm-field .eva-field-modified) {

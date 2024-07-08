@@ -32,6 +32,7 @@ import * as States from 'frama-c/states';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as EvaDef from 'frama-c/plugins/eva/EvaDefinitions';
+import { Icon } from 'dome/controls/icons';
 
 /* -------------------------------------------------------------------------- */
 /* --- Eva form section                                                   --- */
@@ -110,11 +111,18 @@ interface EvaFormOptionsProps {
 
 function getActions<A>(
   state: Forms.FieldState<A>,
+  name: EvaDef.fieldsName,
   equal?: (a: A, b: A) => boolean,
 ): JSX.Element | undefined {
   if(!state) return undefined;
   return (
     <Forms.Actions>
+      <Icon
+        id = "HELP"
+        title = {EvaDef.fieldHelp[name]}
+        size = {12}
+        className = "eva-field-help"
+      />
       <Forms.ResetButton
         state={state}
         title="Reset"
@@ -167,6 +175,7 @@ export function EvaFormOptions(
       !showAllFields.value &&
       !EvaDef.fieldsAlwaysVisible.includes(name);
     return classes(
+      "field"+name,
       !Forms.isStable(state) && "eva-field-modified",
       notVisible ? "hidden-field" : "visible-field"
     );
@@ -183,7 +192,7 @@ export function EvaFormOptions(
       max={field.max as number}
       state={field.state as Forms.FieldState<number | undefined>}
       className={getClasses(state, name)}
-      actions={getActions(state)}
+      actions={getActions(state, name)}
       />
     );
   }
@@ -195,7 +204,7 @@ export function EvaFormOptions(
       <RadioFieldList
         fieldProps={{
           label: field.label,
-          actions: getActions(state)
+          actions: getActions(state, name)
         }}
         classeName={getClasses(state, name)}
         values={field.optionRadio as EvaDef.RadioList}
@@ -210,7 +219,7 @@ export function EvaFormOptions(
     return (
       <Forms.Field
         label={field.label}
-        actions={getActions(state)}
+        actions={getActions(state, name)}
       >
         <div className={getClasses(state, name)} />
         <Forms.ButtonField
@@ -225,7 +234,7 @@ export function EvaFormOptions(
   <Forms.SelectField
     label="Main"
     state={fields["-main"].state as Forms.FieldState<string | undefined>}
-    actions={getActions(fields["-main"].state)}
+    actions={getActions(fields["-main"].state, "-main")}
   >
     {
       fctsList.map((f) => <option
@@ -241,8 +250,9 @@ export function EvaFormOptions(
     fieldProps={{
       label: "Domains",
       actions: getActions(
-        fields["-eva-domains"]
-        .state, EvaDef.buttonListEquality)
+        fields["-eva-domains"].state,
+        "-eva-domains",
+        EvaDef.buttonListEquality)
     }}
     classeName={getClasses(fields["-eva-domains"].state, "-eva-domains")}
     state={fields["-eva-domains"].state}
@@ -285,18 +295,23 @@ export function EvaFormOptions(
         {getSpinnerField("-eva-subdivide-non-linear")}
       </Section>
 
+      {showAllFields.value &&
       <Section label="Dynamic Allocation" >
         {getRadioField("-eva-alloc-builtin")}
         {getBooleanField("-eva-alloc-returns-null")}
         {getSpinnerField("-eva-mlevel")}
       </Section>
+      }
 
+      {showAllFields.value &&
       <Section label="Initial Context" >
         {getSpinnerField("-eva-context-depth")}
         {getSpinnerField("-eva-context-width")}
         {getBooleanField("-eva-context-valid-pointers")}
       </Section>
+      }
 
+      {showAllFields.value &&
       <Section label="Alarms" >
         {getBooleanField("-warn-signed-overflow")}
         {getBooleanField("-warn-unsigned-overflow")}
@@ -309,6 +324,7 @@ export function EvaFormOptions(
         {getBooleanField("-warn-left-shift-negative")}
         {getBooleanField("-warn-right-shift-negative")}
       </Section>
+      }
 
     </Forms.SidebarForm>
   );

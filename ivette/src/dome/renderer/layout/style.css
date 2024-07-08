@@ -382,7 +382,7 @@
       background-color: var(--background-interaction);
     }
 
-    select.dome-XSelect {
+    select.dome-xSelect {
       border: none;
       min-width: 80px;
       background-color: var(--background-interaction);
