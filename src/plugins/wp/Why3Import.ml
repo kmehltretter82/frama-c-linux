@@ -349,7 +349,7 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
         ctxt.add_logic_function loc li;
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
-      @@ String.concat "::" current_module.paths;
+    @@ String.concat "::" current_module.paths;
 
   end
 
