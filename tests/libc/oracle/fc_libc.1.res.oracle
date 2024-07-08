@@ -907,7 +907,7 @@ extern  __attribute__((__noreturn__)) void __builtin_abort(void);
     ensures never_terminates: \false;
     assigns \nothing; */
  __attribute__((__noreturn__, __FC_BUILTIN__)) void Frama_C_abort(void);
-void Frama_C_abort(void)
+ __attribute__((__noreturn__)) void Frama_C_abort(void)
 {
   __builtin_abort();
   return;

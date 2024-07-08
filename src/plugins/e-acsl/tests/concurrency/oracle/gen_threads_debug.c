@@ -133,7 +133,7 @@ void __gen_e_acsl_perror(char const *s);
     
     assigns \exit_status \from status;
  */
-void __gen_e_acsl_exit(int status);
+ __attribute__((__noreturn__)) void __gen_e_acsl_exit(int status);
 
 /*@ ensures result_ok_or_error: \result == 0 || \result == -1;
     assigns \result, Frama_C_entropy_source;
@@ -450,7 +450,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     
     assigns \exit_status \from status;
  */
-void __gen_e_acsl_exit(int status)
+ __attribute__((__noreturn__)) void __gen_e_acsl_exit(int status)
 {
   __e_acsl_store_block((void *)(& status),4UL);
   exit(status);

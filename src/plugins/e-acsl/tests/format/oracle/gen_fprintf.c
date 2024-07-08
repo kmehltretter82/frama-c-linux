@@ -66,7 +66,7 @@ int __gen_e_acsl_fclose(FILE *stream);
     
     assigns \exit_status \from status;
  */
-void __gen_e_acsl_exit(int status);
+ __attribute__((__noreturn__)) void __gen_e_acsl_exit(int status);
 
 /*@ ensures result_ok_or_error: \result == -1 || \result >= 0;
     ensures
@@ -262,7 +262,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     
     assigns \exit_status \from status;
  */
-void __gen_e_acsl_exit(int status)
+ __attribute__((__noreturn__)) void __gen_e_acsl_exit(int status)
 {
   exit(status);
   {
