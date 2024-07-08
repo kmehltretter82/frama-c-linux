@@ -3912,13 +3912,14 @@ An extension is characterized by its introducing keyword \texttt{kw}, or
 extensions is not possible, especially if they belong to different categories,
 as this would lead to ambiguities in the parser. It is advised to prefix the
 keyword with the plug-in that registers it, for example
-\lstinline{\wp::strategy}, by doing this, one assures that when the plug-in that
+\lstinline{\wp::strategy}. By doing this, one ensures that when the plug-in that
 registers the extension is not available, the extension will be ignored (with a
 warning) and the parsing will continue.
 
-Once an extension is registered a clause of the form \verb|kw e1,...,en;|, where each \verb|ei| can be
-any syntactically valid ACSL term or predicate, will be treated by the parser as belonging to the
-extension \verb|kw|.
+Once an extension is registered with keyword \lstinline|kw|,
+a clause of the form \verb|kw e1,...,en;|,
+where each \verb|ei| can be any syntactically valid ACSL term or predicate,
+will be treated by the parser as belonging to the extension \verb|kw|.
 
 Contract extension clauses must occur after \verb|assumes| and \verb|requires| clauses if any, but
 can be freely mixed with other behavior clauses (post-conditions, \verb|assigns|, \verb|frees| and
@@ -3999,7 +4000,7 @@ Each function takes the following mandatory arguments:
 
 The last function has a different behavior and is used to load external
 \acsl modules with the \verb+import+ clause. It is treated at the end
-of the section.
+of the section (see p.~\pageref{par:ext-modules}).
 
 During type-checking, the list \verb|[e1;...;en]| will be given to \verb|typer|,
 together with the current typing environment (which allows discriminating
@@ -4117,9 +4118,11 @@ version in the interface:
 
 \includegraphics[width=\textwidth]{examples/acsl_extension_ext_types/acsl_extension_ext_types}
 
-\paragraph{External Modules.} Finally, let us introduce how to extend \acsl
+\paragraph{External Modules.}
+\label{par:ext-modules}
+Finally, let us introduce how to extend \acsl
 modules with external module importers. A typical usage is to import logical
-definitions from other languages, eg. \textsf{Coq} or \textsf{Why3}, as regular
+definitions from other languages, e.g. \textsf{Coq} or \textsf{Why3}, as regular
 \acsl module definitions. From the user point the view, this takes the form
 of an extended \verb+import+ clause:
 
@@ -4162,7 +4165,7 @@ their full-name identifier, for instance \verb+foo::bar::Jazz:f+
 in the example above.
 
 As explained in the \framac source documentation, module importers might be
-invoked multiple times by the kernel, eg. when a given module is imported from
+invoked multiple times by the kernel, e.g. when a given module is imported from
 different source files. Although the loader itself can use memoization
 techniques to save time, the module builder shall be populated on every call.
 
