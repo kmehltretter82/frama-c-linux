@@ -326,6 +326,18 @@ let add_builtin name kinds lfun =
   else
     Context.bind driver builtin_driver (register name kinds) phi
 
+let add_builtin_type name adt =
+  let bt =
+    match adt with
+    | Mtype m -> E_mdt m
+    | Wtype(p,m,s) -> E_why3(p,m,s)
+    | _ -> assert false
+  in
+  if Context.defined driver then
+    register_type name bt
+  else
+    Context.bind driver builtin_driver (register_type name) bt
+
 let add_type ?source name ~library ?link () =
   if Context.defined driver then
     add_type ?source name ~library ?link ()

@@ -198,7 +198,10 @@ let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
-type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
+type t_builtin =
+  | E_mdt of mdt
+  | E_why3 of string list * string * string list
+  | E_poly of (tau list -> tau)
 let builtin_types = Context.create "Wp.Lang.builtin_types"
 
 let find_builtin name = Context.get builtin_types name
@@ -206,12 +209,14 @@ let find_builtin name = Context.get builtin_types name
 let adt lt =
   try match find_builtin lt.lt_name with
     | E_mdt m -> Mtype m
+    | E_why3(p,m,s) -> Wtype(p,m,s)
     | E_poly _ -> assert false
   with Not_found -> Atype lt
 
 let atype lt ts =
   try match find_builtin lt.lt_name with
     | E_mdt m -> Logic.Data(Mtype m,ts)
+    | E_why3(p,m,s) -> Logic.Data(Wtype(p,m,s),ts)
     | E_poly ftau -> ftau ts
   with Not_found -> Logic.Data(Atype lt,ts)
 
@@ -295,6 +300,7 @@ end
 let get_builtin_type ~name =
   match find_builtin name with
   | E_mdt m -> Mtype m
+  | E_why3(p,m,s) -> Wtype(p,m,s)
   | E_poly _ -> assert false
 
 let mem_builtin_type ~name =
@@ -308,6 +314,13 @@ let is_builtin_type ~name = function
     begin
       try match find_builtin name with
         | E_mdt m0 -> m == m0
+        | _ -> false
+      with Not_found -> false
+    end
+  | Data(Wtype(p,m,s),_) ->
+    begin
+      try match find_builtin name with
+        | E_why3(p0,m0,s0) -> (p,m,s) = (p0,m0,s0)
         | _ -> false
       with Not_found -> false
     end

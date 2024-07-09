@@ -69,7 +69,10 @@ and field = private
   | Cfield of fieldinfo * datakind
 and tau = (field,adt) Logic.datatype
 
-type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
+type t_builtin =
+  | E_mdt of mdt
+  | E_why3 of string list * string * string list
+  | E_poly of (tau list -> tau)
 
 type lfun = private
   | ACSL of Cil_types.logic_info (** Registered in Definition.t,
@@ -171,7 +174,6 @@ val imported_f:
   ?result:sort ->
   ?typecheck:(tau option list -> tau) ->
   unit -> lfun
-
 
 (** {2 Sorting and Typing} *)
 

@@ -39,8 +39,13 @@ type kind =
 
 val kind_of_tau : tau -> kind
 
-(** Add a new builtin. This builtin will be shared with all created drivers *)
+(** Add a new builtin. This builtin will be shared with all created drivers. *)
 val add_builtin : string -> kind list -> lfun -> unit
+
+(** Add a new builtin type.
+    Must be an extern or imported type.
+    This builtin will be shared with all created drivers. *)
+val add_builtin_type : string -> adt -> unit
 
 type driver
 val driver: driver Context.value
