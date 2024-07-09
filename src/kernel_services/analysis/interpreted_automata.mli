@@ -311,10 +311,10 @@ end
     using this dataflow computation. *)
 
 type 'a widening =
-  | Fixpoint       (** The analysis have reached a fixpoint *)
-  | Widening of 'a (** The analysis have not reached a fixpoint and must
-                       continue with the provided state, widened if termination
-                       requires it. *)
+  | Fixpoint       (** The analysis of the loop has reached a fixpoint. *)
+  | Widening of 'a (** The analysis of the loop has not reached a fixpoint yet,
+                       and must continue through a new iteration with the given
+                       state, widened if termination requires it. *)
 
 (** Input domain for a simple dataflow analysis. *)
 module type Domain =
@@ -328,8 +328,8 @@ sig
       analysis on the loop body: [v1] is the previous state before the
       iteration, and [v2] the new state after the iteration.
       The function must return [Fixpoint] if the analysis has reached a fixpoint
-      for the loop: this is the case if [join v1 v2] is equivalent to [v1], as a
-      new iteration would have the same entry state as the last one.
+      for the loop: this is usually the case if [join v1 v2] is equal to [v1],
+      as a new iteration would have the same entry state as the last one.
       Otherwise, it must return the new entry state for the next iteration,
       by over-approximating the join between [v1] and [v2] such that
       any sequence of successive widenings is ultimately stationary,
@@ -337,10 +337,11 @@ sig
       This ensures the analysis termination. *)
   val widen : t -> t -> t widening
 
-  (** Transfer function for edges: computes the state after the transition
-      from the state before. Returns None if the end of the transition is not
+  (** Transfer function for edges: [transfer v e s] computes the state
+      after the transition [e.edge_transition] from the state [s] before,
+      at vertex [v]. Returns None if the end of the transition is not
       reachable from the given state. *)
-  val transfer : vertex -> vertex edge ->  t -> t option
+  val transfer : vertex -> vertex edge -> t -> t option
 end
 
 (** Simple dataflow analysis *)
