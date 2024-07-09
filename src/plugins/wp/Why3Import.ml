@@ -262,14 +262,14 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
   Logic_info.Hashtbl.add env.lils li ls;
   li
 
-  let kind_of_lt (lt : C.logic_type) : LB.kind =
-    match lt with
-    | C.Linteger -> LB.Z
-    | C.Lreal -> LB.R
-    | _ -> LB.A
+let kind_of_lt (lt : C.logic_type) : LB.kind =
+  match lt with
+  | C.Linteger -> LB.Z
+  | C.Lreal -> LB.R
+  | _ -> LB.A
 
-    let kind_of_lv (lv : C.logic_var) : LB.kind =
-      kind_of_lt lv.lv_type
+let kind_of_lv (lv : C.logic_var) : LB.kind =
+  kind_of_lt lv.lv_type
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
@@ -374,10 +374,15 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
 
   end
 
-let () =
-  Cmdline.run_after_extended_stage
-    begin fun () ->
-      Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader
+let registered = ref false
+
+let register () =
+  if not !registered then
+    begin
+      registered := true ;
+      Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader ;
     end
+
+let () = Cmdline.run_after_extended_stage register
 
 (* -------------------------------------------------------------------------- *)
