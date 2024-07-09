@@ -215,7 +215,7 @@ let field = function
 let load = function
   | Loc_var x -> Val_var x (* E.access x ByValue E.bot *)
   | Loc_shift(x,e) ->
-    if Cil.isArithmeticOrPointerType x.vtype then
+    if Cil.isScalarType x.vtype then
       E (E.access x ByAddr e)
     else
       E (E.access x ByValue e)

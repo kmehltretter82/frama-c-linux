@@ -138,9 +138,10 @@ type typing_context = {
 
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
   (** [on_error f rollback x] will attempt to evaluate [f x]. If this triggers
-      an error while in [-continue-annot-error] mode, [rollback (loc,cause)]
-      will be executed (where [loc] is the location of the error and [cause]
-      a text message indicating the issue) and the exception will be re-raised.
+      an error while in [-kernel-warn-key annot-error] mode, [rollback
+      (loc,cause)] will be executed (where [loc] is the location of the error
+      and [cause] a text message indicating the issue) and the exception will
+      be re-raised.
 
       @since Chlorine-20180501
       @before 25.0-Manganese [rollback] didn't take [loc] and [cause] as argument

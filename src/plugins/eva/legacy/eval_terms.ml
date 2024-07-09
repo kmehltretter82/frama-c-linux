@@ -508,7 +508,7 @@ let rec isLogicNonCompositeType t =
     (try isLogicNonCompositeType (Logic_const.type_of_element t)
      with Failure _ -> false)
   | Linteger | Lreal -> true
-  | Ctype t -> Cil.isArithmeticOrPointerType t
+  | Ctype t -> Cil.isScalarType t
 
 let rec infer_type = function
   | Ctype t ->

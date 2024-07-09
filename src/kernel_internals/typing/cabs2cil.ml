@@ -3606,10 +3606,10 @@ struct
 
   let integral_cast = integral_cast
 
-  (* This function raises a non-recoverable when [-continue-annot-error] is not
-     set, and [LogicTypeError] otherwise. This exception must *not* escape
-     Cabs2cil. Hence, each call to a function of module [Ltyping] below must
-     catch it. *)
+  (* This function raises a non-recoverable when [-kernel-warn-key annot-error]
+     is not set, and [LogicTypeError] otherwise. This exception must *not*
+     escape Cabs2cil. Hence, each call to a function of module [Ltyping] below
+     must catch it. *)
   let error loc msg =
     Pretty_utils.ksfprintf (fun e -> raise (LogicTypeError (loc,e))) msg
 

@@ -135,18 +135,6 @@ module Normalized: sig
   (** Pretty-prints the normalized (absolute) path. *)
   val pp_abs: Format.formatter -> t -> unit
 
-  (** Unknown filepath, used as 'dummy' for [Datatype.Filepath].
-      @deprecated 23.0-Vanadium use 'empty' instead
-  *)
-  val unknown: t
-  [@@alert deprecated "Use Filepath.Normalized.empty instead"]
-
-  (** @since 20.0-Calcium
-      @deprecated 23.0-Vanadium use 'is_empty' instead
-  *)
-  val is_unknown: t -> bool
-  [@@alert deprecated "Use Filepath.Normalized.is_empty instead"]
-
   (** Empty filepath, used as 'dummy' for [Datatype.Filepath].
       @since 23.0-Vanadium.
   *)

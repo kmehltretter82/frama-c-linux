@@ -1,5 +1,5 @@
 /* run.config*
-   OPT: -eva @EVA_CONFIG@ -float-hex -warn-decimal-float all -then -out -deps
+   OPT: -eva @EVA_CONFIG@ -float-hex -kernel-warn-key parser:decimal-float=active -then -out -deps
 */
 typedef double mydouble;
 

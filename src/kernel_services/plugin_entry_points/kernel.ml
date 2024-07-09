@@ -1148,87 +1148,12 @@ module FramaCStdLib =
     end)
 
 let () = Parameter_customize.set_group parsing
-let () = Parameter_customize.do_not_reset_on_copy ()
-module ContinueOnAnnotError =
-  False(struct
-    let module_name = "ContinueOnAnnotError"
-    let option_name = "-continue-annot-error"
-    let help =
-      "[DEPRECATED: Use -kernel-warn-key annot-error instead] \
-       When an annotation fails to type-check, emit a warning \
-       and discard the annotation instead of generating an error \
-       (errors in C are still fatal)"
-  end)
-let () =
-  ContinueOnAnnotError.add_set_hook
-    (fun _ f ->
-       warning ~once:true
-         "-continue-annot-error is deprecated. \
-          Use -kernel-warn-key annot-error (or similar option) instead";
-       set_warn_status wkey_annot_error (if f then Log.Wactive else Log.Wabort))
-
-let () = Parameter_customize.set_group parsing
 module Orig_name =
   False(struct
     let option_name = "-orig-name"
     let module_name = "Orig_name"
     let help = "prints a message each time a variable is renamed"
   end)
-
-let () = Parameter_customize.set_group parsing
-let () = Parameter_customize.do_not_reset_on_copy ()
-module ImplicitFunctionDeclaration =
-  String(struct
-    let option_name = "-implicit-function-declaration"
-    let arg_name = "action"
-    let help =
-      "[DEPRECATED: Use \
-       -kernel-warn-key typing:implicit-function-declaration=error instead] \
-       Warn or abort when a function is called before it has been declared \
-       (non-C99 compliant); action must be ignore, warn, or error"
-    let default = "warn"
-    let module_name = "ImplicitFunctionDeclaration"
-  end)
-let () = ImplicitFunctionDeclaration.set_possible_values ["ignore"; "warn"; "error"]
-let () =
-  ImplicitFunctionDeclaration.add_set_hook
-    (fun _ s ->
-       warning ~once:true
-         "-implicit-function-declaration is deprecated, \
-          use '-kernel-warn-key typing:implicit-function-declaration' \
-          (or similar options) instead.";
-       let status =
-         if s = "ignore" then Log.Winactive else
-         if s = "warn" then Log.Wactive else
-         if s = "error" then Log.Wabort
-         else fatal "invalid value: %s" s
-       in
-       set_warn_status wkey_implicit_function_declaration status)
-
-
-let () = Parameter_customize.set_group parsing
-let () = Parameter_customize.do_not_reset_on_copy ()
-module WarnDecimalFloat =
-  String(struct
-    let option_name = "-warn-decimal-float"
-    let arg_name = "freq"
-    let help = "[DEPRECATED: Use -kernel-warn-key \
-                parser:decimal-float=active (or inactive) instead] \
-                Warn when floating-point constants cannot be exactly \
-                represented; freq must be one of none, once or all"
-    let default = "once"
-    let module_name = "WarnDecimalFloat"
-  end)
-let () = WarnDecimalFloat.set_possible_values ["none"; "once"; "all"]
-let () = WarnDecimalFloat.add_set_hook
-    (fun _ s ->
-       let status =
-         if s = "none" then Log.Winactive
-         else if s = "once" then Log.Wonce
-         else if s = "all" then Log.Wactive
-         else fatal "invalid value: %s" s
-       in
-       set_warn_status wkey_decimal_float status)
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()

@@ -3597,8 +3597,6 @@ let isPointerType t =
 (* ISO 6.2.5.21 *)
 let isScalarType t = isArithmeticType t || isPointerType t
 
-let isArithmeticOrPointerType = isScalarType
-
 
 (********** TRANSPARENT UNION ******)
 (* Check if a type is a transparent union, and return the first field if it

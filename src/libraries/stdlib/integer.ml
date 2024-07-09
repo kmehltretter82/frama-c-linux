@@ -105,12 +105,6 @@ let to_int_exn = Z.to_int
 let to_int64_exn = Z.to_int64
 let to_int32_exn = Z.to_int32
 
-(* These functions are deprecated (renamed to *_exn) and will be removed
-   in a future version. *)
-let to_int = to_int_exn
-let to_int64 = to_int64_exn
-let to_int32 = to_int32_exn
-
 let wrap to_int i = try Some (to_int i) with Z.Overflow -> None
 let to_int_opt = wrap Z.to_int
 let to_int64_opt = wrap Z.to_int64
@@ -202,9 +196,9 @@ let pretty_hex fmt v =
     if gt v two_power_60 then
       let quo, rem = Z.ediv_rem v two_power_60 in
       aux quo;
-      Format.fprintf fmt "%015LX" (to_int64 rem)
+      Format.fprintf fmt "%015LX" (to_int64_exn rem)
     else
-      Format.fprintf fmt "%LX" (to_int64 v)
+      Format.fprintf fmt "%LX" (to_int64_exn v)
   in
   if equal v zero then Format.pp_print_string fmt "0"
   else if gt v zero then (Format.pp_print_string fmt "0x"; aux v)
@@ -229,7 +223,7 @@ let length u v = succ (sub v u)
 let extract_bits ~start ~stop v =
   assert (ge start zero && ge stop start);
   (*Format.printf "%a[%a..%a]@\n" pretty v pretty start pretty stop;*)
-  let r = Z.extract v (to_int start) (to_int (length start stop)) in
+  let r = Z.extract v (to_int_exn start) (to_int_exn (length start stop)) in
   (*Format.printf "%a[%a..%a]=%a@\n" pretty v pretty start pretty stop pretty r;*)
   r
 

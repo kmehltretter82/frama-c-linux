@@ -155,14 +155,6 @@ Defaults to no.
 : variables with const qualifier must be actually constant. Defaults to yes.
 The opposite option is **-unsafe-writable**.
 
-[-no]-continue-annot-error
-: when analyzing an annotation, the default behavior (the **-no** version of
-this option) when a typechecking error occurs is to reject the source file as
-is the case for typechecking errors within the C code. With this option on,
-the typechecker will only output a warning and discard the annotation but
-type‐checking will continue (errors in C code are still fatal, though). \
-**Deprecated**: use **-kernel-warn-key annot-error** instead.
-
 -cpp-command *cmd*
 : uses *cmd* as the command to preprocess C files.
 Defaults to the **CPP** environment variable or to
@@ -227,13 +219,6 @@ Default is **gcc-enums**.
 : adds **-I$FRAMAC_SHARE/libc** to the options given to the cpp command.
 If **-cpp-frama-c-compliant** is not false, also adds **-nostdinc** to prevent
 an inconsistent mix of system and Frama-C header files. Defaults to yes.
-
--implicit-function-declaration *action*
-: warns or aborts when a function is called before it has been declared.
-*action* can be one of **ignore**, **warn**, or **error**.
-Defaults to **warn**.\
-**Deprecated**: use **-kernel-warn-key typing:implicit-function-declaration**
-instead.
 
 -initialized-padding-locals
 : implicit initialization of locals sets padding bits to 0.
@@ -468,12 +453,6 @@ the case (this is the default).
 
 -version
 : outputs the version string of Frama-C.
-
--warn-decimal-float *freq*
-: warns when a floating-point constant cannot be exactly represented
-(e.g. 0.1). *freq* can be one of **none**, **once**, or **all**. \
-**Deprecated**: use **-kernel-warn-key parser:decimal-float=once**
-(and variants) instead.
 
 [-no]-warn-invalid-pointer
 : generate alarms for invalid pointer arithmetic. Defaults to no.
