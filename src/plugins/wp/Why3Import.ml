@@ -29,6 +29,7 @@ module T = Why3.Theory
 module F = Filepath.Normalized
 module W = Why3
 module WConf = Why3.Whyconf
+module LB = LogicBuiltins
 
 let dkey = L.register_category "why3.import"
 
@@ -59,6 +60,7 @@ let of_infix s =
 
 let construct_acsl_name (id : W.Ident.ident) =
   let (paths,name,scopes) = T.restore_path id in
+  List.iter (L.result "scope :::: %s") scopes;
   match List.rev scopes with
   | (t::q) ->
     String.concat "::" (paths @ name :: List.rev_append q [of_infix t])
@@ -260,6 +262,15 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
   Logic_info.Hashtbl.add env.lils li ls;
   li
 
+  let kind_of_lt (lt : C.logic_type) : LB.kind =
+    match lt with
+    | C.Linteger -> LB.Z
+    | C.Lreal -> LB.R
+    | _ -> LB.A
+
+    let kind_of_lv (lv : C.logic_var) : LB.kind =
+      kind_of_lt lv.lv_type
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -342,9 +353,19 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
     let current_module = Datatype.String.Hashtbl.find env.menv thname in
     List.iter (fun (lti,loc) ->
         ctxt.add_logic_type loc lti;
+        (* let ty = Logic_type_info.Hashtbl.find env.ltits lti in
+        let (package,theory,name) = T.restore_path ty.ts_name in
+        LB.add_builtin thname (List.map (kind_of_lv) lti.) @@
+        Lang.imported_t ~package:package ~theory:theory ~name:name (); *)
       ) current_module.types;
     List.iter (fun (li, loc) ->
         ctxt.add_logic_function loc li;
+        L.result "%s" li.l_var_info.lv_name;
+        let ls = Logic_info.Hashtbl.find env.lils li in
+        let (package,theory,name) = T.restore_path ls.ls_name in
+        LB.add_builtin thname (List.map (kind_of_lv) li.l_profile) @@
+        Lang.imported_f ~package:package ~theory:theory ~name:name ();
+
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
     @@ String.concat "::" current_module.paths;
