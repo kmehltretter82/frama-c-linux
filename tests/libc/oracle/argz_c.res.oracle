@@ -87,10 +87,6 @@
 [eva] Done for function stpcpy
 [eva] Recording results for argz_create
 [eva] Done for function argz_create
-[eva] computing for function exit <- main.
-  Called from argz_c.c:21.
-[eva] using specification for function exit
-[eva] Done for function exit
 [eva] argz_c.c:22: assertion got status valid.
 [eva] argz_c.c:23: Call to builtin free
 [eva] argz_c.c:23: function free: precondition 'freeable' got status valid.
@@ -104,9 +100,6 @@
   allocating variable __malloc_argz_create_sep_l208
 [eva] Recording results for argz_create_sep
 [eva] Done for function argz_create_sep
-[eva] computing for function exit <- main.
-  Called from argz_c.c:26.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:27.
 [eva] using specification for function __FC_assert
@@ -152,9 +145,6 @@
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
-[eva] computing for function exit <- main.
-  Called from argz_c.c:31.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:32.
 [eva] argz_c.c:32: 
@@ -172,9 +162,6 @@
   allocating variable __realloc_argz_add_sep_l299
 [eva] Recording results for argz_add_sep
 [eva] Done for function argz_add_sep
-[eva] computing for function exit <- main.
-  Called from argz_c.c:34.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:35.
 [eva] argz_c.c:35: 
@@ -203,9 +190,6 @@
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
-[eva] computing for function exit <- main.
-  Called from argz_c.c:39.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:40.
 [eva] argz_c.c:40: 
@@ -224,9 +208,6 @@
 [eva] Done for function argz_append
 [eva] Recording results for argz_add
 [eva] Done for function argz_add
-[eva] computing for function exit <- main.
-  Called from argz_c.c:42.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:43.
 [eva] argz_c.c:43: 
@@ -499,9 +480,6 @@
 [eva] FRAMAC_SHARE/libc/argz.c:126: Call to builtin free
 [eva] Recording results for argz_replace
 [eva] Done for function argz_replace
-[eva] computing for function exit <- main.
-  Called from argz_c.c:46.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:47.
 [eva] argz_c.c:47: 
@@ -601,9 +579,6 @@
   function memmove: precondition 'valid_src' got status valid.
 [eva] Recording results for argz_insert
 [eva] Done for function argz_insert
-[eva] computing for function exit <- main.
-  Called from argz_c.c:65.
-[eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:66.
 [eva] argz_c.c:66: 
@@ -628,6 +603,31 @@
 [eva] Done for function argz_insert
 [eva] computing for function exit <- main.
   Called from argz_c.c:68.
+[eva] using specification for function exit
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:65.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:46.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:42.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:39.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:34.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:31.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:26.
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from argz_c.c:21.
 [eva] Done for function exit
 [eva] computing for function __FC_assert <- main.
   Called from argz_c.c:69.

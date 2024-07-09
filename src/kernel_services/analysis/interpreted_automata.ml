@@ -245,6 +245,13 @@ let last_loc block =
   try f (List.rev block.bstmts)
   with Not_found -> unknown_loc
 
+let has_noreturn_attr = function
+  | Call (_, {enode = Lval (Var vf, NoOffset)}, _, _) ->
+    Cil.hasAttribute "noreturn" vf.vattr
+  | Call (_, f, _, _) ->
+    Cil.typeHasAttribute "noreturn" (Cil.typeOf f)
+  | _ -> false
+
 module LabelMap = struct
   include Cil_datatype.Logic_label.Map
   let add_builtin name = add (BuiltinLabel name)
@@ -375,6 +382,7 @@ let build_automaton ~annotations kf =
   and return_point = add_vertex () in
   let start_code = if annotations then add_vertex () else entry_point in
   let end_code = if annotations then add_vertex () else return_point in
+  let exit_point = add_vertex () in
 
   (* AST traversal *)
   let rec do_block control kinstr labels block =
@@ -431,8 +439,13 @@ let build_automaton ~annotations kf =
     (* Handle statement *)
     let dest = match stmt.skind with
       | Cil_types.Instr instr ->
-        add_edge control.src control.dest kinstr (Instr (instr, stmt)) loc;
-        control.dest
+        let dest =
+          if has_noreturn_attr instr
+          then exit_point
+          else control.dest
+        in
+        add_edge control.src dest kinstr (Instr (instr, stmt)) loc;
+        dest
 
       | Cil_types.Return (opt_exp, _) ->
         let exited_blocks = Kernel_function.find_all_enclosing_blocks stmt in
@@ -1200,13 +1213,15 @@ end
 (* --- Dataflow computation                                           --- *)
 (* ---------------------------------------------------------------------- *)
 
+type 'a widening = Fixpoint | Widening of 'a
+
 module type Domain =
 sig
   type t
 
   val join : t -> t -> t
-  val widen : t -> t -> t option (* returns None when inclusion *)
-  val transfer : vertex transition ->  t -> t option
+  val widen : t -> t -> t widening
+  val transfer : vertex -> vertex edge ->  t -> t option
 end
 
 module type DataflowAnalysis =
@@ -1254,7 +1269,7 @@ struct
     let process_edge v e acc =
       (* Retrieve origin value *)
       let value = States.find_opt results v in
-      let result = Option.bind value (D.transfer e.edge_transition) in
+      let result = Option.bind value (D.transfer v e) in
       Option.to_list result @ acc
     in
 
@@ -1279,8 +1294,8 @@ struct
       | None, _ -> true (* Previous was bottom *)
       | Some v1, Some v2 ->
         match D.widen v1 v2 with
-        | None -> false (* End of iteration *)
-        | Some value -> (* new value *)
+        | Fixpoint -> false (* End of iteration *)
+        | Widening value -> (* new value *)
           States.replace results v value;
           true
     in

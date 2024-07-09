@@ -52,9 +52,9 @@ type 'a control =
       the given cases and default vertices. *)
 
 (** Vertices are control points. When a vertice is the *start* of a statement,
-    this statement is kept in vertex_stmt. Currently, this statement is kept for
-    two reasons: to know when callbacks should be called and when annotations
-    should be read. *)
+    this statement is kept in [vertex_start_of]. Currently, this statement is
+    kept for two reasons: to know when callbacks should be called and when
+    annotations should be read. *)
 
 type vertex = private {
   vertex_kf : Cil_types.kernel_function;
@@ -310,6 +310,12 @@ end
     See tests/misc/interpreted_automata_dataflow.ml for a complete example
     using this dataflow computation. *)
 
+type 'a widening =
+  | Fixpoint       (** The analysis of the loop has reached a fixpoint. *)
+  | Widening of 'a (** The analysis of the loop has not reached a fixpoint yet,
+                       and must continue through a new iteration with the given
+                       state, widened if termination requires it. *)
+
 (** Input domain for a simple dataflow analysis. *)
 module type Domain =
 sig
@@ -318,17 +324,24 @@ sig
   (** Merges two states coming from different paths. *)
   val join : t -> t -> t
 
-  (** [widen v1 v2] must returns None if [v2] is included in [v1].
-      Otherwise, over-approximates the join between [v1] and [v2] such that
+  (** [widen v1 v2] is called on loop heads after each iteration of the
+      analysis on the loop body: [v1] is the previous state before the
+      iteration, and [v2] the new state after the iteration.
+      The function must return [Fixpoint] if the analysis has reached a fixpoint
+      for the loop: this is usually the case if [join v1 v2] is equal to [v1],
+      as a new iteration would have the same entry state as the last one.
+      Otherwise, it must return the new entry state for the next iteration,
+      by over-approximating the join between [v1] and [v2] such that
       any sequence of successive widenings is ultimately stationary,
-      i.e. […widen (widen (widen x0 x1) x2) x3…] eventually returns None.
-      Called on loop heads to ensure the analysis termination. *)
-  val widen : t -> t -> t option
+      i.e. […widen (widen (widen x0 x1) x2) x3…] eventually returns [Fixpoint].
+      This ensures the analysis termination. *)
+  val widen : t -> t -> t widening
 
-  (** Transfer function for transitions: computes the state after the transition
-      from the state before. Returns None if the end of the transition is not
+  (** Transfer function for edges: [transfer v e s] computes the state
+      after the transition [e.edge_transition] from the state [s] before,
+      at vertex [v]. Returns None if the end of the transition is not
       reachable from the given state. *)
-  val transfer : vertex transition ->  t -> t option
+  val transfer : vertex -> vertex edge -> t -> t option
 end
 
 (** Simple dataflow analysis *)

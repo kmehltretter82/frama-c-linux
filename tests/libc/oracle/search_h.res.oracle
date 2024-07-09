@@ -44,6 +44,8 @@
 [eva:invalid-assigns] search_h.c:34: 
   Completely invalid destination for assigns clause *compar. Ignoring.
 [eva] Done for function tsearch
+[eva:alarm] search_h.c:40: Warning: 
+  out of bounds read. assert \valid_read((struct element **)node);
 [eva] computing for function fprintf_va_1 <- main.
   Called from search_h.c:36.
 [eva] using specification for function fprintf_va_1
@@ -53,8 +55,6 @@
   Called from search_h.c:38.
 [eva] using specification for function exit
 [eva] Done for function exit
-[eva:alarm] search_h.c:40: Warning: 
-  out of bounds read. assert \valid_read((struct element **)node);
 [kernel:annot:missing-spec] search_h.c:46: Warning: 
   Neither code nor specification for function twalk,
    generating default assigns. See -generated-spec-* options for more info

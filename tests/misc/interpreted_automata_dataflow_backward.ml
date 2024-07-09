@@ -16,9 +16,9 @@ struct
 
   let widen v1 v2 =
     if Set.subset v2 v1 then
-      None (* Inclusion *)
+      Interpreted_automata.Fixpoint (* Inclusion *)
     else
-      Some v2 (* No widening necessary *)
+      Interpreted_automata.Widening v2 (* No widening necessary *)
 
   let rec vars exp =
     match exp.enode with
@@ -34,9 +34,9 @@ struct
     | Lval (Var vi, _) -> Set.singleton vi
     | Lval (Mem e, _) -> vars e
 
-  let transfer t v =
+  let transfer _ e v =
     let open Interpreted_automata in
-    let r = match t with
+    let r = match e.edge_transition with
       | Skip | Prop _ | Leave _ | Return (None,_) ->
         v (* Nothing to do *)
       | Enter b ->

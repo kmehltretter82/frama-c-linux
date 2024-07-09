@@ -25,9 +25,9 @@ struct
       Map.find_opt vi v2 = Some x
     in
     if Map.for_all same_entry v1 then
-      None (* Inclusion *)
+      Interpreted_automata.Fixpoint (* Inclusion *)
     else
-      Some v2 (* No widening necessary *)
+      Interpreted_automata.Widening v2 (* No widening necessary *)
 
   exception Not_constant
 
@@ -83,9 +83,9 @@ struct
     with Not_constant ->
       Map.remove vi v
 
-  let transfer t v =
+  let transfer _ e v =
     let open Interpreted_automata in
-    match t with
+    match e.edge_transition with
     | Skip | Return _ | Prop _ | Enter _ | Leave _ -> Some v
     | Guard (exp, kind, _) -> assume v exp kind
     | Instr (Set ((Var vi, NoOffset), exp, _), _) -> Some (assign v vi exp)

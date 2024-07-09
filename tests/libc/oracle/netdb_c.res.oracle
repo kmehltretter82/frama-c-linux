@@ -161,10 +161,6 @@
 [eva] netdb_c.c:36: 
   function fprintf_va_1: precondition valid_read_string(format) got status valid.
 [eva] Done for function fprintf_va_1
-[eva] computing for function exit <- main.
-  Called from netdb_c.c:37.
-[eva] using specification for function exit
-[eva] Done for function exit
 [eva] computing for function socket <- main.
   Called from netdb_c.c:46.
 [eva] using specification for function socket
@@ -189,6 +185,10 @@
 [eva] Done for function fprintf_va_2
 [eva] computing for function exit <- main.
   Called from netdb_c.c:58.
+[eva] using specification for function exit
+[eva] Done for function exit
+[eva] computing for function exit <- main.
+  Called from netdb_c.c:37.
 [eva] Done for function exit
 [eva] computing for function freeaddrinfo <- main.
   Called from netdb_c.c:61.
