@@ -3,8 +3,12 @@
    STDOPT:
 */
 
+#include <stdint.h>
+
 int * const a;
 int * b = a;
+
+uintptr_t b1 = (uintptr_t) a;
 
 struct stru {
     const int c;
@@ -18,7 +22,7 @@ const int f = f;
 
 int g = g;
 
-int h = (int) &h;
+short h = (short) &h;
 
 const int i;
 int j = i;
