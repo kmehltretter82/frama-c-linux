@@ -1213,12 +1213,14 @@ end
 (* --- Dataflow computation                                           --- *)
 (* ---------------------------------------------------------------------- *)
 
+type 'a widening = Fixpoint | Widening of 'a
+
 module type Domain =
 sig
   type t
 
   val join : t -> t -> t
-  val widen : t -> t -> t option (* returns None when inclusion *)
+  val widen : t -> t -> t widening
   val transfer : vertex -> vertex edge ->  t -> t option
 end
 
@@ -1292,8 +1294,8 @@ struct
       | None, _ -> true (* Previous was bottom *)
       | Some v1, Some v2 ->
         match D.widen v1 v2 with
-        | None -> false (* End of iteration *)
-        | Some value -> (* new value *)
+        | Fixpoint -> false (* End of iteration *)
+        | Widening value -> (* new value *)
           States.replace results v value;
           true
     in

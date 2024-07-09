@@ -310,6 +310,12 @@ end
     See tests/misc/interpreted_automata_dataflow.ml for a complete example
     using this dataflow computation. *)
 
+type 'a widening =
+  | Fixpoint       (** The analysis have reached a fixpoint *)
+  | Widening of 'a (** The analysis have not reached a fixpoint and must
+                       continue with the provided state, widened if termination
+                       requires it. *)
+
 (** Input domain for a simple dataflow analysis. *)
 module type Domain =
 sig
@@ -321,15 +327,15 @@ sig
   (** [widen v1 v2] is called on loop heads after each iteration of the
       analysis on the loop body: [v1] is the previous state before the
       iteration, and [v2] the new state after the iteration.
-      The function must return None if the analysis has reached a fixpoint for
-      the loop: this is the case if [join v1 v2] is equivalent to [v1], as a new
-      iteration would have the same entry state as the last one.
+      The function must return [Fixpoint] if the analysis has reached a fixpoint
+      for the loop: this is the case if [join v1 v2] is equivalent to [v1], as a
+      new iteration would have the same entry state as the last one.
       Otherwise, it must return the new entry state for the next iteration,
       by over-approximating the join between [v1] and [v2] such that
       any sequence of successive widenings is ultimately stationary,
-      i.e. […widen (widen (widen x0 x1) x2) x3…] eventually returns None.
+      i.e. […widen (widen (widen x0 x1) x2) x3…] eventually returns [Fixpoint].
       This ensures the analysis termination. *)
-  val widen : t -> t -> t option
+  val widen : t -> t -> t widening
 
   (** Transfer function for edges: computes the state after the transition
       from the state before. Returns None if the end of the transition is not

@@ -25,9 +25,9 @@ struct
       Map.find_opt vi v2 = Some x
     in
     if Map.for_all same_entry v1 then
-      None (* Inclusion *)
+      Interpreted_automata.Fixpoint (* Inclusion *)
     else
-      Some v2 (* No widening necessary *)
+      Interpreted_automata.Widening v2 (* No widening necessary *)
 
   exception Not_constant
 

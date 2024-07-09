@@ -16,9 +16,9 @@ struct
 
   let widen v1 v2 =
     if Set.subset v2 v1 then
-      None (* Inclusion *)
+      Interpreted_automata.Fixpoint (* Inclusion *)
     else
-      Some v2 (* No widening necessary *)
+      Interpreted_automata.Widening v2 (* No widening necessary *)
 
   let rec vars exp =
     match exp.enode with
