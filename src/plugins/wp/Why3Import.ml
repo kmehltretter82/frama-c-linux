@@ -353,10 +353,9 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
     let current_module = Datatype.String.Hashtbl.find env.menv thname in
     List.iter (fun (lti,loc) ->
         ctxt.add_logic_type loc lti;
-        (* let ty = Logic_type_info.Hashtbl.find env.ltits lti in
-        let (package,theory,name) = T.restore_path ty.ts_name in
-        LB.add_builtin thname (List.map (kind_of_lv) lti.) @@
-        Lang.imported_t ~package:package ~theory:theory ~name:name (); *)
+        let ty = Logic_type_info.Hashtbl.find env.ltits lti in
+        let (_,theory,_) = T.restore_path ty.ts_name in
+        LB.add_type thname ~library:theory ();
       ) current_module.types;
     List.iter (fun (li, loc) ->
         ctxt.add_logic_function loc li;
