@@ -27,8 +27,10 @@
 // and GNU-based code ***
 
 #ifdef __FRAMAC__
-#define __PUSH_FC_STDLIB #pragma fc_stdlib(push,__FILE__)
-#define __POP_FC_STDLIB #pragma fc_stdlib(pop)
+#define __PRAGMA(x) _Pragma(#x)
+#define __PRAGMA_PUSH(f) __PRAGMA(fc_stdlib(push,f))
+#define __PUSH_FC_STDLIB __PRAGMA_PUSH(__FILE__)
+#define __POP_FC_STDLIB __PRAGMA(fc_stdlib(pop))
 #else
 #define __PUSH_FC_STDLIB
 #define __POP_FC_STDLIB
