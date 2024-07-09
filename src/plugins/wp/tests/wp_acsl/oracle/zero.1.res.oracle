@@ -1,0 +1,130 @@
+# frama-c -wp -wp-model 'Typed (Real)' [...]
+[kernel] Parsing zero.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal foo_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal foo_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+[wp] [Valid] Goal init_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal init_terminates (Cfg) (Trivial)
+------------------------------------------------------------
+  Function foo
+------------------------------------------------------------
+
+Goal Assertion (file zero.i, line 14):
+Prove: P_Foo(.0).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function init
+------------------------------------------------------------
+
+Goal Preservation of Invariant (file zero.i, line 24):
+Let a = shift_float64(s, 0).
+Assume {
+  Type: is_uint32(i).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Invariant 'is_zero' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (havoc(Mf64_undef_0, Mf64_0, a, 10)[shift_float64(s, i_1)] = 0))).
+  (* Then *)
+  Have: i <= 9.
+}
+Prove: to_uint32(1 + i) <= 10.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant (file zero.i, line 24):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Preservation of Invariant 'is_zero' (file zero.i, line 25):
+Let x = to_uint32(1 + i).
+Let a = shift_float64(s, 0).
+Let a_1 = havoc(Mf64_undef_0, Mf64_0, a, 10).
+Assume {
+  Type: is_uint32(i).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Goal *)
+  When: (0 <= i_1) /\ (i_1 < x).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Invariant 'is_zero' *)
+  Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
+      (a_1[shift_float64(s, i_2)] = 0))).
+  (* Then *)
+  Have: i <= 9.
+  (* Invariant *)
+  Have: x <= 10.
+}
+Prove: a_1[shift_float64(s, i) <- .0][shift_float64(s, i_1)] = 0.
+
+------------------------------------------------------------
+
+Goal Establishment of Invariant 'is_zero' (file zero.i, line 25):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file zero.i, line 26) (1/2):
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Loop assigns (file zero.i, line 26) (2/2):
+Effect at line 30
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file zero.i, line 19) in 'init' (1/2):
+Effect at line 29
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Assigns (file zero.i, line 19) in 'init' (2/2):
+Effect at line 29
+Prove: true.
+
+------------------------------------------------------------
+
+Goal Decreasing of Loop variant at loop (file zero.i, line 29):
+Let x = to_uint32(1 + i).
+Let a = shift_float64(s, 0).
+Let a_1 = havoc(Mf64_undef_0, Mf64_0, a, 10).
+Assume {
+  Type: is_uint32(i).
+  (* Heap *)
+  Type: (region(s.base) <= 0) /\ linked(Malloc_0).
+  (* Pre-condition *)
+  Have: valid_rw(Malloc_0, a, 10).
+  (* Invariant *)
+  Have: (0 <= i) /\ (i <= 10).
+  (* Invariant 'is_zero' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
+      (a_1[shift_float64(s, i_1)] = 0))).
+  (* Then *)
+  Have: i <= 9.
+  (* Invariant *)
+  Have: x <= 10.
+  (* Invariant 'is_zero' *)
+  Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < x) ->
+      (a_1[shift_float64(s, i) <- .0][shift_float64(s, i_1)] = 0))).
+}
+Prove: i < x.
+
+------------------------------------------------------------
+
+Goal Positivity of Loop variant at loop (file zero.i, line 29):
+Prove: true.
+
+------------------------------------------------------------
