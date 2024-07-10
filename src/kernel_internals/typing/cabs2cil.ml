@@ -7947,16 +7947,21 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
   let open Current_loc.Operators in
 
   let checkArrayInit ty init =
-    if Cil.isArrayType ty then
-      match init with
-      | COMPOUND_INIT _
-      | SINGLE_INIT
-          { expr_node =
-              CONSTANT (CONST_STRING _
-                       | CONST_WSTRING _)} -> ()
-      | _ ->
-        Kernel.error ~current:true ~once:true
-          "Array initializer must be an initializer list or string literal"
+    let init_ok =
+      if Cil.isArrayType ty then
+        match init with
+        | COMPOUND_INIT _ -> true
+        | SINGLE_INIT e ->
+          (match stripParen e with
+             { expr_node =
+                 CONSTANT (CONST_STRING _ | CONST_WSTRING _)} -> true
+           | _ -> false)
+        | _ -> false
+      else true
+    in
+    if not init_ok then
+      Kernel.error ~current:true ~once:true
+        "Array initializer must be an initializer list or string literal";
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
     "@\nStarting a new initializer for %s : %a@\n"
@@ -8005,6 +8010,12 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
 and doInit local_env asconst preinit so acc initl =
   let ghost = local_env.is_ghost in
   let whoami fmt = Cil_printer.pp_lval fmt (Var so.host, so.soOff) in
+  let initl =
+    match initl with
+    | (initwhat, SINGLE_INIT e)::tl ->
+      (initwhat, SINGLE_INIT (stripParen e)) ::tl
+    | _ -> initl
+  in
   let initl1 =
     match initl with
     | (Cabs.NEXT_INIT,
