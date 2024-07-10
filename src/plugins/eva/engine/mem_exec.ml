@@ -48,6 +48,9 @@ let stat_loop_widenings_load_time = Statistics.register_global_stat
     "time-loop-widenings-import"
 let stat_gather_load_time = Statistics.register_global_stat
     "time-gather-import"
+(* Total number of loops whose widenings are saved  *)
+let stat_saved_widenings = Statistics.register_global_stat
+    "memexec-saved-widenings"
 
 
 let proxy = State_builder.Proxy.(create "Mem_exec.proxy" Forward [])
@@ -364,7 +367,8 @@ module Make
       Cil_datatype.Stmt.Map.map f widenings in
     let merged = merge_statements old_widenings reduced_widenings in 
     let new_map_args = ActualArgs.Map.add args merged map_args in 
-    PreviousWidenings.replace kf new_map_args
+    PreviousWidenings.replace kf new_map_args;
+    Statistics.incr_by stat_saved_widenings () (Cil_datatype.Stmt.Map.cardinal merged)
 
 
   let store_widenings kf args callstack widenings = 

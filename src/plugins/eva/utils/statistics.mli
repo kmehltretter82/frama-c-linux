@@ -33,6 +33,9 @@ val set : 'a t -> 'a -> int -> unit
 (* Adds 1 to the stat or set it to 1 if undefined *)
 val incr : 'a t -> 'a -> unit
 
+(* Adds the given value to the stat or set it to the given value if undefined *)
+val incr_by : 'a t -> 'a -> int -> unit
+
 (* Set the stat to the maximum between the current value and the given value *)
 val grow : 'a t -> 'a -> int -> unit
 

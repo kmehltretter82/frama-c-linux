@@ -176,6 +176,9 @@ let incr (type a) (stat : a t) (x : a) =
 let grow (type a) (stat : a t) (x : a) value =
   update stat x (fun v -> max v value)
 
+let incr_by (type a) (stat : a t) (x : a) value =
+  update stat x (fun v -> v + value)
+
 let reset_all () =
   State.clear ()
 

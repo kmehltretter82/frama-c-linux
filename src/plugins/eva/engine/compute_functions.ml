@@ -28,6 +28,10 @@ let _dkey_compute_time = Self.register_category "compute-time"
 
 let stat_uncacheable = Statistics.register_global_stat "function-uncacheable"
 let stat_cacheable = Statistics.register_global_stat "function-cacheable"
+let stat_cache_hits = Statistics.register_global_stat "cache-hits"
+let stat_cache_misses = Statistics.register_global_stat "cache-misses"
+
+(* ----- Initialization ------------------------------------------------------ *)
 
 (* Clear Eva's various caches. Some operations of Eva depend on parameters,
    such as -ilevel or -plevel, so clearing those caches ensures that those
@@ -190,6 +194,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     match MemExec.reuse_previous_call call.kf init_state args with
     | None ->
+      Statistics.incr stat_cache_misses ();
       let widenings = match Parameters.ReuseWidenings.get () with
         | false -> None
         | true -> 
@@ -218,6 +223,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       in
       result
     | Some (call_result, i) ->
+      Statistics.incr stat_cache_hits ();
       apply_call_hooks call init_state `Reuse;
       (* Evaluate the preconditions of kf, to update the statuses
          at this call. *)
