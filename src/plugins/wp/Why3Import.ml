@@ -249,6 +249,15 @@ let kind_of_lt (lt : C.logic_type) : LB.kind =
 let kind_of_lv (lv : C.logic_var) : LB.kind =
   kind_of_lt lv.lv_type
 
+let sort_of_lt (lt : C.logic_type) : Qed.Logic.sort =
+  match lt with
+  | C.Linteger -> Qed.Logic.Sint
+  | C.Lreal -> Qed.Logic.Sreal
+  | _ -> Qed.Logic.Sdata
+
+let sort_of_lv (lv : C.logic_var) : Qed.Logic.sort =
+  sort_of_lt lv.lv_type
+
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
 (* -------------------------------------------------------------------------- *)
@@ -339,8 +348,10 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
         ctxt.add_logic_function loc li;
         let ls = Logic_info.Hashtbl.find env.lils li in
         let (package,theory,name) = T.restore_path ls.ls_name in
+        let params = List.map (sort_of_lv) li.l_profile in
+        let result = sort_of_lt @@ Option.get (li.l_type) in
         LB.add_builtin thname (List.map (kind_of_lv) li.l_profile) @@
-        Lang.imported_f ~package ~theory ~name ();
+        Lang.imported_f ~package ~theory ~name ~params ~result  ();
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
     @@ String.concat "::" current_module.paths;
