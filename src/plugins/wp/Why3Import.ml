@@ -60,7 +60,6 @@ let of_infix s =
 
 let construct_acsl_name (id : W.Ident.ident) =
   let (paths,name,scopes) = T.restore_path id in
-  List.iter (L.result "scope :::: %s") scopes;
   match List.rev scopes with
   | (t::q) ->
     String.concat "::" (paths @ name :: List.rev_append q [of_infix t])
@@ -69,14 +68,6 @@ let construct_acsl_name (id : W.Ident.ident) =
 (* For debug only*)
 let pp_id fmt (id: W.Ident.ident) =
   Format.pp_print_string fmt id.id_string
-
-(* For debug only*)
-let _pp_tys fmt (tys: W.Ty.tysymbol) =
-  W.Pretty.print_ty_decl fmt tys
-
-(* For debug only*)
-let _pp_ls fmt ls =
-  W.Pretty.print_ls fmt ls
 
 (* For debug only*)
 let pp_id_loc fmt (id : W.Ident.ident) =
@@ -91,13 +82,6 @@ let pp_lti fmt (lti : C.logic_type_info) =
 (* For debug only*)
 let pp_li fmt (li : C.logic_info) =
   Cpp.pp_logic_info fmt li
-
-(* For debug only*)
-let _pp_lvs fmt (lvs : C.logic_var list) =
-  List.iter (fun (lv: C.logic_var) ->
-      Format.fprintf fmt "@ %a: %a"
-        Cpp.pp_logic_var lv Cpp.pp_logic_type lv.lv_type
-    ) lvs
 
 (* -------------------------------------------------------------------------*)
 (* ---    Types                                                           - *)
@@ -179,12 +163,6 @@ let convert_location (wloc : Why3.Loc.position option) : C.location =
     } in (pstart, pend)
   | None ->
     (Position.unknown, Position.unknown)
-
-
-(* For debug use only *)
-let _pp_cil_loc fmt (id : W.Ident.ident) =
-  Cpp.pp_location fmt @@ convert_location id.id_loc
-
 
 
 (* -------------------------------------------------------------------------- *)
@@ -354,17 +332,15 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
     List.iter (fun (lti,loc) ->
         ctxt.add_logic_type loc lti;
         let ty = Logic_type_info.Hashtbl.find env.ltits lti in
-        let (_,theory,_) = T.restore_path ty.ts_name in
-        LB.add_type thname ~library:theory ();
+        let (package,theory,name) = T.restore_path ty.ts_name in
+        LB.add_builtin_type thname @@ Lang.imported_t ~package ~theory ~name ;
       ) current_module.types;
     List.iter (fun (li, loc) ->
         ctxt.add_logic_function loc li;
-        L.result "%s" li.l_var_info.lv_name;
         let ls = Logic_info.Hashtbl.find env.lils li in
         let (package,theory,name) = T.restore_path ls.ls_name in
         LB.add_builtin thname (List.map (kind_of_lv) li.l_profile) @@
-        Lang.imported_f ~package:package ~theory:theory ~name:name ();
-
+        Lang.imported_f ~package ~theory ~name ();
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
     @@ String.concat "::" current_module.paths;
