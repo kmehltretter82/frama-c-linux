@@ -6298,39 +6298,39 @@ and doExp local_env
       end
     | Cabs.CALL({ expr_node = VARIABLE "__builtin_choose_expr"},
                 args, ghost_args)
-        when Cil.gccMode() ->
-        (* __builtin_choose_expr is supposed to choose at compile time between
-           two expressions, hence we have to handle it separately from the
-           normal calls. *)
-        begin
-          match args, ghost_args with
-          | [ cond; e1; e2 ], [] ->
-            let _, chunk, cond, _ =
-              doExp (no_paren_local_env local_env) CConst cond (AExp None)
-            in
-            if not (isEmpty chunk) then
+      when Cil.gccMode() ->
+      (* __builtin_choose_expr is supposed to choose at compile time between
+         two expressions, hence we have to handle it separately from the
+         normal calls. *)
+      begin
+        match args, ghost_args with
+        | [ cond; e1; e2 ], [] ->
+          let _, chunk, cond, _ =
+            doExp (no_paren_local_env local_env) CConst cond (AExp None)
+          in
+          if not (isEmpty chunk) then
+            abort_context ~loc:cond.eloc
+              "first argument of __builtin_choose_expr \
+               shouldn't have side effect";
+          let cond_is_true =
+            match (Cil.constFold true cond).enode with
+            | Const (CInt64 (v,_,_)) -> not (Z.equal v Z.zero)
+            | Const (CReal(v,_,_)) -> Fc_float.compare v 0. <> 0
+            | Const (CChr c) -> Char.code c <> 0
+            | Const (CStr _) | Const (CWStr _) -> true
+            | _ ->
               abort_context ~loc:cond.eloc
-                "first argument of __builtin_choose_expr \
-                 shouldn't have side effect";
-            let cond_is_true =
-              match (Cil.constFold true cond).enode with
-              | Const (CInt64 (v,_,_)) -> not (Z.equal v Z.zero)
-              | Const (CReal(v,_,_)) -> Fc_float.compare v 0. <> 0
-              | Const (CChr c) -> Char.code c <> 0
-              | Const (CStr _) | Const (CWStr _) -> true
-              | _ ->
-                abort_context ~loc:cond.eloc
-                  "first argument of __builtin_choose_expr should be \
-                   a compile-time constant"
-            in
-            if cond_is_true then begin
-              doExp (no_paren_local_env local_env) asconst e1 what
-            end else begin
-              doExp (no_paren_local_env local_env) asconst e2 what
-            end
-          | _ ->
-            abort_context "ill-formed call to __builtin_choose_expr"
-        end
+                "first argument of __builtin_choose_expr should be \
+                 a compile-time constant"
+          in
+          if cond_is_true then begin
+            doExp (no_paren_local_env local_env) asconst e1 what
+          end else begin
+            doExp (no_paren_local_env local_env) asconst e2 what
+          end
+        | _ ->
+          abort_context "ill-formed call to __builtin_choose_expr"
+      end
     | Cabs.CALL(f, args, ghost_args) ->
       let (rf,sf, f', ft') =
         match (stripParen f).expr_node with
