@@ -37,6 +37,7 @@ let check_signals, signal_abort =
 let dkey = Self.dkey_iterator
 let stat_iterations = Statistics.register_statement_stat "iterations"
 let stat_total_iterations = Statistics.register_global_stat "total-iterations"
+let stat_reused_widenings = Statistics.register_global_stat "reused-widenings"
 
 let blocks_share_locals b1 b2 =
   match b1.blocals, b2.blocals with
@@ -597,7 +598,8 @@ module Make_Dataflow
               let saved_widening = Cil_datatype.Stmt.Map.find stmt widenings in
               let widening = Partitioning.import_widening stmt saved_widening in
               let _ = Self.debug ~dkey:Self.dkey_widening "Re-importing widening @.%a" Partitioning.pretty_widening widening in
-              VertexTable.replace w_table vertex widening
+              VertexTable.replace w_table vertex widening;
+              Statistics.incr stat_reused_widenings ()
             | _ -> raise Not_found
           with Not_found ->
             ()
