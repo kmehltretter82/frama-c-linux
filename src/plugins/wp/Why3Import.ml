@@ -241,23 +241,6 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
   Logic_info.Hashtbl.add env.lils li ls;
   li
 
-let kind_of_lt (lt : C.logic_type) : LB.kind =
-  match lt with
-  | C.Linteger -> LB.Z
-  | C.Lreal -> LB.R
-  | _ -> LB.A
-
-let kind_of_lv (lv : C.logic_var) : LB.kind =
-  kind_of_lt lv.lv_type
-
-let sort_of_lt (lt : C.logic_type) : Qed.Logic.sort =
-  match lt with
-  | C.Linteger -> Qed.Logic.Sint
-  | C.Lreal -> Qed.Logic.Sreal
-  | _ -> Qed.Logic.Sdata
-
-let sort_of_lv (lv : C.logic_var) : Qed.Logic.sort =
-  sort_of_lt lv.lv_type
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
@@ -302,6 +285,24 @@ let parse_theory (env) (theory_name) (theory_path) (menv)=
     L.error "Library %s not found" theory_name
 
 let register_builtin env thname =
+  let kind_of_lt (lt : C.logic_type) : LB.kind =
+    match lt with
+    | C.Linteger -> LB.Z
+    | C.Lreal -> LB.R
+    | _ -> LB.A
+  in
+  let kind_of_lv (lv : C.logic_var) : LB.kind =
+    kind_of_lt lv.lv_type
+  in
+  let sort_of_lt (lt : C.logic_type) : Qed.Logic.sort =
+    match lt with
+    | C.Linteger -> Qed.Logic.Sint
+    | C.Lreal -> Qed.Logic.Sreal
+    | _ -> Qed.Logic.Sdata
+  in
+  let sort_of_lv (lv : C.logic_var) : Qed.Logic.sort =
+    sort_of_lt lv.lv_type
+  in
   begin
     let current_module = Datatype.String.Hashtbl.find env.menv thname in
     List.iter (fun (lti, _) ->
