@@ -146,34 +146,49 @@ let fmake ulp value = match ulp with
   | Float64 -> F.e_fun ~result:t64 fq64 [F.e_float value]
 
 let qmake ulp q = fmake ulp (Q.to_float q)
-let re_mantissa = "\\([-+]?[0-9]*\\)"
-let re_comma = "\\(.\\(\\(0*[1-9]\\)*\\)0*\\)?"
-let re_exponent = "\\([eE]\\([-+]?[0-9]*\\)\\)?"
-let re_suffix = "\\([flFL]\\)?"
-let re_real =
-  Str.regexp (re_mantissa ^ re_comma ^ re_exponent ^ re_suffix ^ "$")
+
+let re_float = Str.regexp ".*[fldFLD]$"
+let re_mantissa = Str.regexp "[-+]?[0-9]*"
+let re_decimal = Str.regexp "\\.[0-9]*"
+let re_exponent = Str.regexp "[eE][-+]?[0-9]*"
 
 let parse_literal ~model v r =
   try
-    if Str.string_match re_real r 0 then
-      let has_suffix =
-        try ignore (Str.matched_group 7 r) ; true
-        with Not_found -> false in
-      if has_suffix && model = Float then
-        Q.of_float v
-      else
-        let ma = Str.matched_group 1 r in
-        let mb = try Str.matched_group 3 r with Not_found -> "" in
-        let me = try Str.matched_group 6 r with Not_found -> "0" in
-        let n = int_of_string me - String.length mb in
-        let d n =
-          let s = Bytes.make (succ n) '0' in
-          Bytes.set s 0 '1' ; Q.of_string (Bytes.to_string s) in
-        let m = Q.of_string (ma ^ mb) in
-        if n < 0 then Q.div m (d (-n)) else
-        if n > 0 then Q.mul m (d n) else m
-    else Q.of_float v
-  with Failure _ ->
+    if model = Float && Str.string_match re_float r 0 then Q.of_float v
+    else
+      begin
+        if not @@ Str.string_match re_mantissa r 0 then
+          raise Not_found ;
+        let mantissa = Str.matched_string r in
+        let p = Str.match_end () in (* length mantissa = p *)
+        let q, decimal =
+          if Str.string_match re_decimal r p then
+            let q = Str.match_end () in
+            q, String.sub r (p + 1) (q - p - 1)
+          else
+            p, "" in
+        let n, exponent =
+          if Str.string_match re_exponent r q then
+            let n = Str.match_end () in
+            n, String.sub r (q + 1) (n - q - 1)
+          else
+            q, "0" in
+        if n <> String.length r && not @@ Str.string_match re_float r n then
+          raise Not_found ;
+        let digits = Z.of_string @@ mantissa ^ decimal in
+        let decades = int_of_string exponent - String.length decimal in
+        let power n =
+          let s = Bytes.make (n+1) '0' in Bytes.set s 0 '1' ;
+          Z.of_string (String.of_bytes s) in
+        if decades < 0 then
+          Q.make digits @@ power (-decades)
+        else
+        if decades > 0 then
+          Q.of_bigint (Z.mul digits @@ power decades)
+        else
+          Q.of_bigint digits
+      end
+  with Failure _ | Not_found | Invalid_argument _ ->
     Warning.error "Unexpected constant literal %S" r
 
 let acsl_lit l =
