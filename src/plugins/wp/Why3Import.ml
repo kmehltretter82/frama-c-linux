@@ -342,7 +342,7 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
         ctxt.add_logic_type loc lti;
         let ty = Logic_type_info.Hashtbl.find env.ltits lti in
         let (package,theory,name) = T.restore_path ty.ts_name in
-        LB.add_builtin_type thname @@ Lang.imported_t ~package ~theory ~name ;
+        LB.add_builtin_type lti.lt_name @@ Lang.imported_t ~package ~theory ~name ;
       ) current_module.types;
     List.iter (fun (li, loc) ->
         ctxt.add_logic_function loc li;
@@ -350,14 +350,11 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
         let (package,theory,name) = T.restore_path ls.ls_name in
         let params = List.map (sort_of_lv) li.l_profile in
         let result = sort_of_lt @@ Option.get (li.l_type) in
-        LB.add_builtin thname (List.map (kind_of_lv) li.l_profile) @@
+        LB.add_builtin li.l_var_info.lv_name (List.map (kind_of_lv) li.l_profile) @@
         Lang.imported_f ~package ~theory ~name ~params ~result  ();
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
     @@ String.concat "::" current_module.paths;
-
-    (*LB.add_builtin*)
-
 
   end
 
