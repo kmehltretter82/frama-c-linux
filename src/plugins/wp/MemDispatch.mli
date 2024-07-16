@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
+(*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2024                                               *)
-(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -21,14 +21,9 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Region Analysis API                                                --- *)
+(* --- Empty Memory Model                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_map kf = (Code.domain kf).map
-let get_id n = Memory.id n
-let get_uid m n = Memory.id @@ Memory.node m n
-let get_node m id = Memory.node m @@ Memory.forge id
+open Dispatcher
 
-include Memory
-
-let iter = Memory.iter_node
+module Make(_: Dispatcher) : Sigs.Model

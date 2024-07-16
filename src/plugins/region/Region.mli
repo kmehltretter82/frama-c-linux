@@ -44,7 +44,8 @@ open Cil_types
 type map
 type node
 val get_map : kernel_function -> map
-val get_id : map -> node -> int
+val get_id : node -> int
+val get_uid : map -> node -> int
 val get_node : map -> int -> node
 
 (** Normalize node *)

@@ -1,9 +1,9 @@
 (**************************************************************************)
 (*                                                                        *)
-(*  This file is part of Frama-C.                                         *)
+(*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
 (*  Copyright (C) 2007-2024                                               *)
-(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
 (*  you can redistribute it and/or modify it under the terms of the GNU   *)
@@ -20,15 +20,44 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* -------------------------------------------------------------------------- *)
-(* --- Region Analysis API                                                --- *)
-(* -------------------------------------------------------------------------- *)
+open Either
+open Sigs
 
-let get_map kf = (Code.domain kf).map
-let get_id n = Memory.id n
-let get_uid m n = Memory.id @@ Memory.node m n
-let get_node m id = Memory.node m @@ Memory.forge id
+type ('a, 'b) product = {
+  left: 'a;
+  right: 'b;
+}
 
-include Memory
+module Product =
+struct
 
-let iter = Memory.iter_node
+  let map_either f_left f_right p = function
+    | Left  l -> { p with left  = f_left  p.left  l }
+    | Right r -> { p with right = f_right p.right r }
+  let map2 f_left f_right p = {
+    left  = f_left  p.left  ;
+    right = f_right p.right ;
+  }
+  let map22 f_left f_right p q = {
+    left  = f_left  p.left  q.left  ;
+    right = f_right p.right q.right ;
+  }
+
+  let iter f_left f_right p =
+    f_left  p.left;
+    f_right p.right
+
+  let iter2 f_left f_right p q =
+    f_left  p.left  q.left;
+    f_right p.right q.right
+
+  let sequence_left (s: (('a, 'b) product) sequence) : 'a sequence = {
+    pre  = s.pre.left  ;
+    post = s.post.left ;
+  }
+  let sequence_right (s: (('a, 'b) product) sequence) : 'b sequence = {
+    pre  = s.pre.right  ;
+    post = s.post.right ;
+  }
+
+end
