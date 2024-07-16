@@ -194,6 +194,19 @@ _Bool __builtin_umull_overflow(unsigned long a, unsigned long b, unsigned long* 
  */
 _Bool __builtin_umulll_overflow(unsigned long long a, unsigned long long b, unsigned long long* res);
 
+// NB: technically, the types of a, b and *res could differ, but we assume that
+// this is not the case
+
+#define __builtin_mul_overflow(a,b,res) \
+  _Generic((a), \
+    int: __built_smul_overflow, \
+    unsigned int: __builtin_umul_overflow, \
+    long: __builtin_smull_overflow, \
+    unsigned long: __builtin_umull_overflow, \
+    long long: __builtin_smulll_overflow, \
+    unsigned long long: __builtin_umulll_overflow \
+  )(a,b,res)
+
 /*@
   requires x_nonzero: x != 0;
   assigns \result \from indirect:x;
