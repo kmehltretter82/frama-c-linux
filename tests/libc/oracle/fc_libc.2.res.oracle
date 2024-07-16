@@ -18,6 +18,7 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_key_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_locale_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_max_open_files.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_define_mbstate_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_mode_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_nlink_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_null.h (with preprocessing)
@@ -60,6 +61,7 @@ skipping FRAMAC_SHARE/libc/complex.h
 [kernel] Parsing FRAMAC_SHARE/libc/endian.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/err.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/errno.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/error.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/fcntl.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/features.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/fenv.h (with preprocessing)
@@ -145,6 +147,7 @@ skipping FRAMAC_SHARE/libc/complex.h
 skipping FRAMAC_SHARE/libc/tgmath.h
 [kernel] Parsing FRAMAC_SHARE/libc/time.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/trace.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/uchar.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/ulimit.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/unistd.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/utime.h (with preprocessing)

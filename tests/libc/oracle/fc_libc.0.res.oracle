@@ -5,10 +5,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] fc_libc.c:206: assertion got status valid.
-[eva] fc_libc.c:207: assertion got status valid.
-[eva] fc_libc.c:208: assertion got status valid.
 [eva] fc_libc.c:209: assertion got status valid.
+[eva] fc_libc.c:210: assertion got status valid.
+[eva] fc_libc.c:211: assertion got status valid.
+[eva] fc_libc.c:212: assertion got status valid.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -32,6 +32,8 @@
 #include "err.h"
 #include "errno.c"
 #include "errno.h"
+#include "error.c"
+#include "error.h"
 #include "fcntl.h"
 #include "fenv.c"
 #include "fenv.h"
@@ -85,6 +87,7 @@
 #include "syslog.h"
 #include "termios.h"
 #include "time.h"
+#include "uchar.h"
 #include "unistd.c"
 #include "unistd.h"
 #include "wchar.c"

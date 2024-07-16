@@ -3,6 +3,10 @@
     "source":"Manpages, mostly Linux and BSD",
     "data":{
         "arc4random_buf": {"header":"stdlib.h"},
+        "error": {"header":"error.h"},
+        "error_at_line": {"header":"error.h"},
+        "error_message_count": {"header":"error.h"},
+        "error_one_per_line": {"header":"error.h"},
         "facilitynames": {"header":"syslog.h"},
         "getresgid": {"header":"unistd.h"},
         "getresuid": {"header":"unistd.h"},

@@ -20,25 +20,10 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.c"
-#include "argz.c"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "error.c"
-#include "fenv.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "netinet/in.c"
-#include "pwd.c"
-#include "signal.c"
-#include "sys/socket.c"
-#include "stdatomic.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "unistd.c"
-#include "wchar.c"
+#include "error.h"
+__PUSH_FC_STDLIB
+
+unsigned int error_message_count = 0;
+int error_one_per_line = 0;
+
+__POP_FC_STDLIB

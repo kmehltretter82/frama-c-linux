@@ -20,25 +20,34 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.c"
-#include "argz.c"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "error.c"
-#include "fenv.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "netinet/in.c"
-#include "pwd.c"
-#include "signal.c"
-#include "sys/socket.c"
-#include "stdatomic.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "unistd.c"
-#include "wchar.c"
+/* Non-POSIX; glibc definitions */
+
+#ifndef __FC_ERROR_H
+#define __FC_ERROR_H
+#include "features.h"
+__PUSH_FC_STDLIB
+#include "__fc_machdep.h"
+
+__BEGIN_DECLS
+
+extern unsigned int error_message_count;
+
+extern int error_one_per_line;
+
+/*@
+  assigns error_message_count \from error_message_count;
+*/
+extern void error(int __status, int __errnum, const char *__format, ...);
+
+/*@
+  assigns error_message_count \from error_message_count;
+*/
+extern void error_at_line(int __status, int __errnum, const char *__fname,
+                          unsigned int __lineno, const char *__format, ...);
+
+extern void (*error_print_progname)(void);
+
+__END_DECLS
+
+__POP_FC_STDLIB
+#endif
