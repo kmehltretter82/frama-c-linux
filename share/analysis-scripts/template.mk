@@ -42,6 +42,9 @@ MACHDEP = x86_64
 ## Preprocessing flags (for -cpp-extra-args)
 CPPFLAGS    += \
 
+## Other preprocessing and parsing flags (e.g. -cpp-extra-args-per-file)
+PARSEFLAGS    += \
+
 ## General flags
 FCFLAGS     += \
   -add-symbolic-path=..:. \
