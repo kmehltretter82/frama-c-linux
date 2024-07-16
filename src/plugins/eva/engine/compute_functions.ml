@@ -128,6 +128,8 @@ let post_analysis () =
   post_analysis_cleanup ~aborted:false;
   (* Remove redundant alarms *)
   if Parameters.RmAssert.get () then Eva_dynamic.Scope.rm_asserts ();
+  (* The above functions may have changed the status of alarms. *)
+  Summary.FunctionStats.recompute_all ();
   Red_statuses.report ()
 
 (* Registers signal handlers for SIGUSR1 and SIGINT to cleanly abort the Eva

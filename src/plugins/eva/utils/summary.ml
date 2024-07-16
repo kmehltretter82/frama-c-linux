@@ -147,12 +147,18 @@ end
 
 (* --- Function stats computation --- *)
 
+(* When Eva has emitted several statuses, keep the most precise. *)
+let merge_status acc new_status =
+  match acc, new_status with
+  | Some _, Property_status.Dont_know -> acc
+  | _ -> Some new_status
+
 let get_status ip =
   let eva_emitter = Eva_utils.emitter in
   let aux_status emitter status acc =
     let emitter = Emitter.Usable_emitter.get emitter.Property_status.emitter in
     if Emitter.equal eva_emitter emitter
-    then Some status
+    then merge_status acc status
     else acc
   in
   Property_status.fold_on_statuses aux_status ip None
@@ -214,10 +220,8 @@ module FunctionStats = struct
         let size = 17
       end)
 
-  let get kf =
-    try Some (find kf)
-    with Not_found -> None
   let recompute kf = replace kf (compute_fun_stats kf)
+  let recompute_all () = iter (fun kf _ -> recompute kf)
 end
 
 
@@ -284,7 +288,7 @@ let compute_stats () =
   let do_fun fundec =
     let kf = Globals.Functions.get fundec.Cil_types.svar in
     let consider = consider_function fundec.Cil_types.svar in
-    match FunctionStats.get kf with
+    match FunctionStats.find_opt kf with
     | Some fun_stats ->
       AlarmsStats.add_list prog_alarms fun_stats.fun_alarm_count;
       if consider then
