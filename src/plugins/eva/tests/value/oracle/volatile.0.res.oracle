@@ -368,11 +368,11 @@
 [eva:final-states] Values at end of function main1:
   G ∈ [--..--]
   E ∈ [--..--]
-  X ∈ {2}
+  X ∈ [--..--]
   Y ∈ [--..--]
   pV ∈ {{ &Y }}
   k ∈ [--..--]
-  x ∈ {2}
+  x ∈ [--..--]
   y ∈ [--..--]
   a ∈ {11; 12}
   b ∈ [--..--]
@@ -415,11 +415,11 @@
 [eva:final-states] Values at end of function main:
   G ∈ [--..--]
   E ∈ [--..--]
-  X ∈ {2}
+  X ∈ [--..--]
   Y ∈ [--..--]
   pV ∈ {{ &Y }}
   k ∈ {{ NULL ; (int)&X }}
-  x ∈ {2}
+  x ∈ [--..--]
   y ∈ [--..--]
   a ∈ {11; 12}
   b ∈ [--..--]

@@ -354,31 +354,23 @@ module Memory = struct
   (* Add the the mapping [lv --> v] to [state] when possible.
      [get_z] is a function that computes dependencies. *)
   let add_lv state get_z lv v  =
-    if Eva_ast.lval_contains_volatile lv then
+    let k = K.HCE.of_lval lv in
+    let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
+    let z_lv_indirect = Eva_ast.PreciseDepsOf.indirect_zone_of_lval get_z lv in
+    if Memory_zone.intersects z_lv z_lv_indirect then
+      (* The location of [lv] intersects with the zones needed to compute
+         itself, the equality would not hold. *)
       state
     else
-      let k = K.HCE.of_lval lv in
-      let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect =
-        Eva_ast.PreciseDepsOf.indirect_zone_of_lval get_z lv
-      in
-      if Memory_zone.intersects z_lv z_lv_indirect then
-        (* The location of [lv] intersects with the zones needed to compute
-           itself, the equality would not hold. *)
-        state
-      else
-        let z = Memory_zone.join z_lv z_lv_indirect in
-        add_key k v z state
+      let z = Memory_zone.join z_lv z_lv_indirect in
+      add_key k v z state
 
   (* Add the mapping [e --> v] to [state] when possible and useful.
      [get_z] is a function that computes dependencies. *)
   let add_exp state get_z e v =
-    if Eva_ast.exp_contains_volatile e then
-      state
-    else
-      let k = K.HCE.of_exp e in
-      let z = Eva_ast.PreciseDepsOf.zone_of_exp get_z e in
-      add_key k v z state
+    let k = K.HCE.of_exp e in
+    let z = Eva_ast.PreciseDepsOf.zone_of_exp get_z e in
+    add_key k v z state
 
   let find k state =
     try Some (K2V.find k state.values)
@@ -489,23 +481,19 @@ module D : Abstract_domain.Leaf
          lvalues, or that embed two non-singleton lvalues for the first
          time. *)
       match r.reductness, v.v, v.initialized, v.escaping with
-      | (Created | Reduced), `Value v, true, false ->
-        if interesting_exp (get_locs valuation) (get_val valuation) e then
-          begin
-            let k = K.HCE.of_exp e in
-            (* remove the existing binding: the key may already be in
-               the state, and [add_exp] assumes it is not the case.
-               The new dependencies may not be the same (in rare cases
-               where one dependency has disappeared by reduction), so
-               we need to update the dependency inverse maps. *)
-            (* TODO: it would be more efficient to use a function that
-               compares the previous and current dependencies, and update
-               the inverse maps accordingly. *)
-            let state = Memory.remove_key k state in
-            Memory.add_exp state (get_locs valuation) e v
-          end
-        else
-          state
+      | (Created | Reduced), `Value v, true, false
+        when interesting_exp (get_locs valuation) (get_val valuation) e ->
+        (* remove the existing binding: the key may already be in
+           the state, and [add_exp] assumes it is not the case.
+           The new dependencies may not be the same (in rare cases
+           where one dependency has disappeared by reduction), so
+           we need to update the dependency inverse maps. *)
+        (* TODO: it would be more efficient to use a function that
+           compares the previous and current dependencies, and update
+           the inverse maps accordingly. *)
+        let k = K.HCE.of_exp e in
+        let state = Memory.remove_key k state in
+        Memory.add_exp state (get_locs valuation) e v
       | _ -> state
     in
     `Value (valuation.Abstract_domain.fold aux state)
@@ -537,9 +525,12 @@ module D : Abstract_domain.Leaf
   (* perform [lv = e] in [state] *)
   let assign ~pos:_ lv _e v valuation state =
     update valuation state >>- fun state ->
-    match v with
-    | Copy (_, vc) -> store_copy valuation lv lv.lloc state vc
-    | Assign v -> store_value valuation lv.lval lv.lloc state v
+    if valuation.Abstract_domain.is_volatile (`Lval lv.lval)
+    then store_indeterminate state lv.lloc
+    else
+      match v with
+      | Copy (_, vc) -> store_copy valuation lv lv.lloc state vc
+      | Assign v -> store_value valuation lv.lval lv.lloc state v
 
   let assume ~pos:_ _exp _pos valuation state = update valuation state
 
