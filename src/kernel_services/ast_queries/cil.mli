@@ -2468,44 +2468,6 @@ val mapNoCopyList: ('a -> 'a list) -> 'a list -> 'a list
 [@@alert deprecated "Use [Extlib.map_no_copy_list] instead."]
 
 (* ************************************************************************* *)
-(** {2 An Interpreter for constructing CIL constructs} *)
-(* ************************************************************************* *)
-
-(** The type of argument for the interpreter *)
-type formatArg =
-    Fe of exp
-  | Feo of exp option  (** For array lengths *)
-  | Fu of unop
-  | Fb of binop
-  | Fk of ikind
-  | FE of exp list (** For arguments in a function call *)
-  | Ff of (string * typ * attributes) (** For a formal argument *)
-  | FF of (string * typ * attributes) list (** For formal argument lists *)
-  | Fva of bool (** For the ellipsis in a function type *)
-  | Fv of varinfo
-  | Fl of lval
-  | Flo of lval option
-
-  | Fo of offset
-
-  | Fc of compinfo
-  | Fi of instr
-  | FI of instr list
-  | Ft of typ
-  | Fd of int
-  | Fg of string
-  | Fs of stmt
-  | FS of stmt list
-  | FA of attributes
-
-  | Fp of attrparam
-  | FP of attrparam list
-
-  | FX of string
-
-val d_formatarg : Format.formatter -> formatArg -> unit
-
-(* ************************************************************************* *)
 (** {2 Misc} *)
 (* ************************************************************************* *)
 

@@ -53,7 +53,6 @@
  *)
 
 open Logic_const
-open Format
 open Cil_datatype
 open Cil_types
 
@@ -7235,66 +7234,6 @@ let pushGlobal (g: global)
           in
           g :: (List.fold_left aux !types vl)
     end
-
-
-type formatArg =
-    Fe of exp
-  | Feo of exp option  (** For array lengths *)
-  | Fu of unop
-  | Fb of binop
-  | Fk of ikind
-  | FE of exp list (** For arguments in a function call *)
-  | Ff of (string * typ * attributes) (** For a formal argument *)
-  | FF of (string * typ * attributes) list (* For formal argument lists *)
-  | Fva of bool (** For the ellipsis in a function type *)
-  | Fv of varinfo
-  | Fl of lval
-  | Flo of lval option (** For the result of a function call *)
-  | Fo of offset
-  | Fc of compinfo
-  | Fi of instr
-  | FI of instr list
-  | Ft of typ
-  | Fd of int
-  | Fg of string
-  | Fs of stmt
-  | FS of stmt list
-  | FA of attributes
-
-  | Fp of attrparam
-  | FP of attrparam list
-
-  | FX of string
-
-let d_formatarg fmt = function
-    Fe e -> fprintf fmt "Fe(%a)" !pp_exp_ref e
-  | Feo None -> fprintf fmt "Feo(None)"
-  | Feo (Some e) -> fprintf fmt "Feo(%a)" !pp_exp_ref e
-  | FE _ -> fprintf fmt "FE()"
-  | Fk _ik -> fprintf fmt "Fk()"
-  | Fva b -> fprintf fmt "Fva(%b)" b
-  | Ff (an, _, _) -> fprintf fmt "Ff(%s)" an
-  | FF _ -> fprintf fmt "FF(...)"
-  | FA _ -> fprintf fmt "FA(...)"
-  | Fu _uo -> fprintf fmt "Fu()"
-  | Fb _bo -> fprintf fmt "Fb()"
-  | Fv v -> fprintf fmt "Fv(%s)" v.vname
-  | Fl l -> fprintf fmt "Fl(%a)" !pp_lval_ref l
-  | Flo None -> fprintf fmt "Flo(None)"
-  | Flo (Some l) -> fprintf fmt "Flo(%a)" !pp_lval_ref l
-  | Fo _o -> fprintf fmt "Fo"
-  | Fc ci -> fprintf fmt "Fc(%s)" ci.cname
-  | Fi _i -> fprintf fmt "Fi(...)"
-  | FI _i -> fprintf fmt "FI(...)"
-  | Ft t -> fprintf fmt "Ft(%a)" !pp_typ_ref t
-  | Fd n -> fprintf fmt "Fd(%d)" n
-  | Fg s -> fprintf fmt "Fg(%s)" s
-  | Fp _ -> fprintf fmt "Fp(...)"
-  | FP _n -> fprintf fmt "FP(...)"
-  | Fs _ -> fprintf fmt "FS"
-  | FS _ -> fprintf fmt "FS"
-
-  | FX _ -> fprintf fmt "FX()"
 
 let make_temp_logic_var =
   let counter = ref 0 in
