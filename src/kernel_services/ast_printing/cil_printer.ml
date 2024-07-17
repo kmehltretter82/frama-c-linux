@@ -1849,8 +1849,8 @@ class cil_printer () = object (self)
         let suppress =
           not state.print_cil_input
           && not (Cil.msvcMode ())
-          && (Cil.startsWith "box" an
-              || Cil.startsWith "ccured" an
+          && (String.starts_with ~prefix:"box" an
+              || String.starts_with ~prefix:"ccured" an
               || an = "merger"
               || an = "cilnoremove")
         in

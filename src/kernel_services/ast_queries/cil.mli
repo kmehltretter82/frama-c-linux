@@ -2452,18 +2452,20 @@ val bitsOffset: typ -> offset -> int * int
     this after you call {!Cil.initCIL}. *)
 val fieldBitsOffset: fieldinfo -> int * int
 
-(** Like map but try not to make a copy of the list *)
+(** Like map but try not to make a copy of the list
+    @deprecated Frama-C+dev *)
 val mapNoCopy: ('a -> 'a) -> 'a list -> 'a list
+[@@alert deprecated "Use [Extlib.map_no_copy] instead."]
 
-(** same as mapNoCopy for options*)
+(** same as mapNoCopy for options
+    @deprecated Frama-C+dev *)
 val optMapNoCopy: ('a -> 'a) -> 'a option -> 'a option
+[@@alert deprecated "Use [Extlib.opt_map_no_copy] instead."]
 
-(** Like map but each call can return a list. Try not to make a copy of the
-    list *)
+(** Like map but each call can return a list. Try not to make a copy of the list
+    @deprecated Frama-C+dev *)
 val mapNoCopyList: ('a -> 'a list) -> 'a list -> 'a list
-
-(** sm: return true if the first is a prefix of the second string *)
-val startsWith: string -> string -> bool
+[@@alert deprecated "Use [Extlib.map_no_copy_list] instead."]
 
 (* ************************************************************************* *)
 (** {2 An Interpreter for constructing CIL constructs} *)
