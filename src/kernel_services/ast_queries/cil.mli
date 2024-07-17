@@ -56,7 +56,7 @@ open Cil_datatype
     set [Cil.msvcMode]. [initLogicBuiltins] is the function to call to init
     logic builtins. The [Machdeps] argument is a description of the hardware
     platform and of the compiler used. *)
-val initCIL: initLogicBuiltins:(unit -> unit) -> Cil_types.mach -> unit
+val initCIL: initLogicBuiltins:(unit -> unit) -> mach -> unit
 
 (* ************************************************************************* *)
 (** {2 Customization} *)
@@ -471,12 +471,12 @@ val separateStorageModifiers: attribute list -> attribute list * attribute list
     values of the corresponding input types.
     @since Nitrogen-20111001 (moved from Cabs2cil)
 *)
-val arithmeticConversion : Cil_types.typ -> Cil_types.typ -> Cil_types.typ
+val arithmeticConversion : typ -> typ -> typ
 
 (** performs the usual integral promotions mentioned in C reference manual.
     @since Nitrogen-20111001 (moved from Cabs2cil)
 *)
-val integralPromotion : Cil_types.typ -> Cil_types.typ
+val integralPromotion : typ -> typ
 
 (** True if the argument is a character type (i.e. plain, signed or unsigned)
     @since Chlorine-20180501 *)
@@ -900,7 +900,7 @@ val makeTempVar: fundec -> ?insert:bool -> ?ghost:bool -> ?name:string ->
     is unique. [source] defaults to [true]. [temp] defaults to [false].
 *)
 val makeGlobalVar: ?source:bool -> ?temp:bool -> ?referenced:bool ->
-  ?ghost:bool -> ?loc:Cil_datatype.Location.t -> string -> typ -> varinfo
+  ?ghost:bool -> ?loc:Location.t -> string -> typ -> varinfo
 
 (** Make a shallow copy of a [varinfo] and assign a new identifier.
     If the original varinfo has an associated logic var, it is copied too and
@@ -1046,11 +1046,10 @@ val isLogicNull: term -> bool
 val no_op_coerce: logic_type -> term -> bool
 
 (** gives the value of a wide char literal. *)
-val reduce_multichar: Cil_types.typ -> int64 list -> int64
+val reduce_multichar: typ -> int64 list -> int64
 
 (** gives the value of a char literal. *)
-val interpret_character_constant:
-  int64 list -> Cil_types.constant * Cil_types.typ
+val interpret_character_constant: int64 list -> constant * typ
 
 (** Given the character c in a (CChr c), sign-extend it to 32 bits.
     (This is the official way of interpreting character constants, according to
@@ -1782,11 +1781,11 @@ val mk_behavior :
   ?assumes:identified_predicate list ->
   ?requires:identified_predicate list ->
   ?post_cond:(termination_kind * identified_predicate) list ->
-  ?assigns:Cil_types.assigns ->
-  ?allocation:Cil_types.allocation ->
+  ?assigns:assigns ->
+  ?allocation:allocation ->
   ?extended:acsl_extension list ->
   unit ->
-  Cil_types.behavior
+  behavior
 (** returns a dummy behavior with the default name [Cil.default_behavior_name].
     invariant: [b_assumes] must always be
     empty for behavior named [Cil.default_behavior_name]
@@ -2518,18 +2517,17 @@ val extract_free_logicvars_from_predicate :
 
 (** extract [logic_label] elements from a [code_annotation] *)
 val extract_labels_from_annot:
-  code_annotation -> Cil_datatype.Logic_label.Set.t
+  code_annotation -> Logic_label.Set.t
 
 (** extract [logic_label] elements from a [term] *)
-val extract_labels_from_term: term -> Cil_datatype.Logic_label.Set.t
+val extract_labels_from_term: term -> Logic_label.Set.t
 
 (** extract [logic_label] elements from a [pred] *)
 val extract_labels_from_pred:
-  predicate -> Cil_datatype.Logic_label.Set.t
+  predicate -> Logic_label.Set.t
 
 (** extract [stmt] elements from [logic_label] elements *)
-val extract_stmts_from_labels:
-  Cil_datatype.Logic_label.Set.t -> Cil_datatype.Stmt.Set.t
+val extract_stmts_from_labels: Logic_label.Set.t -> Stmt.Set.t
 
 (** creates a visitor that will replace in place uses of var in the first
     list by their counterpart in the second list.
