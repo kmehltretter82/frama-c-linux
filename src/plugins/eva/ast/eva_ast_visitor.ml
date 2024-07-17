@@ -178,8 +178,8 @@ struct
     fold_offset;
   }
 
-  let visit_exp ~neutral ~combine rewriter =
-    let visitor = bind ~neutral ~combine rewriter in visitor.exp
-  let visit_lval ~neutral ~combine rewriter =
-    let visitor = bind ~neutral ~combine rewriter in visitor.lval
+  let visit_exp ~neutral ~combine folder =
+    let visitor = bind ~neutral ~combine folder in visitor.exp
+  let visit_lval ~neutral ~combine folder =
+    let visitor = bind ~neutral ~combine folder in visitor.lval
 end
