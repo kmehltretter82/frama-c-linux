@@ -82,6 +82,7 @@ do
             echo "  VERSION_CODENAME=<name> (overriden by --codename)"
             echo "  OPEN_SOURCE=yes|no (overriden by --open-source and --closed-source)"
             echo "  CI_LINK=yes|no (also set by --ci-link)"
+            echo "  USE_STASH=yes|no (default: no)"
             echo ""
             exit 0
             ;;
@@ -117,7 +118,11 @@ VERSION=$(cat VERSION)
 VERSION_SAFE=${VERSION/~/-}
 
 FRAMAC="frama-c-$VERSION_SAFE-$VERSION_CODENAME"
-FRAMAC_TAR="$FRAMAC.tar"
+if [ "$USE_STASH" == "yes" ]; then
+    FRAMAC_TAR="frama-c-current.tar"
+else
+    FRAMAC_TAR="$FRAMAC.tar"
+fi
 
 ################################################################################
 # Check Opam file
@@ -164,7 +169,7 @@ echo "----------------------------------------------------------------"
 # Warn if there are uncommitted changes (will not be taken into account)
 
 GIT_STATUS="$(git status --porcelain -- $(sed 's/^./:!&/' <<< $EXTERNAL_PLUGINS))"
-if [ "" != "$GIT_STATUS" ]; then
+if [ "" != "$GIT_STATUS" -a "$USE_STASH" != "yes" ]; then
   echo "WARNING: uncommitted changes will be IGNORED when making archive:"
   echo "$GIT_STATUS" | sed 's/^/  /'
   echo "----------------------------------------------------------------"
@@ -173,7 +178,12 @@ fi
 ################################################################################
 # Prepare Archive
 
-git archive HEAD -o $FRAMAC_TAR --prefix "$FRAMAC/"
+# For the "instant Docker image" script: allow inclusion of uncommitted changes
+if [ "$USE_STASH" == "yes" ]; then
+    ARCHIVE_COMMIT=$(git stash create)
+fi
+
+git archive ${ARCHIVE_COMMIT:-HEAD} -o $FRAMAC_TAR --prefix "$FRAMAC/"
 
 ################################################################################
 # Add external plugin to archive
