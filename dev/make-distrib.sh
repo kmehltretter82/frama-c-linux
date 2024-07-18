@@ -21,6 +21,8 @@
 #                                                                        #
 ##########################################################################
 
+set -e
+
 ################################################################################
 # Configuration
 
@@ -290,8 +292,7 @@ $HDRCK -update $MAKE_HEADER_OPT -spec-format="3-fields-by-line" -C "$TMP_DIR/$FR
 # Sanity check
 
 if [ "$OPEN_SOURCE" == "yes" ] ; then
-  OUT=$(grep -Iir "Contact CEA LIST for licensing." $TMP_DIR | grep -v "headers/" | grep -v "dev/make-distrib.sh")
-  if [ "$?" == "0" ]; then
+  if grep -Iir --exclude-dir="headers" --exclude="make-distrib.sh" "Contact CEA LIST for licensing." $TMP_DIR; then
     echo "Looks like there are some files containing undetected closed source licences"
     exit 1
   fi
