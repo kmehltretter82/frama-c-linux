@@ -30,6 +30,8 @@
 # FRAMAC_GUI    frama-c gui binary
 # IVETTE        ivette binary
 # CPPFLAGS      preprocessing flags
+# PARSEFLAGS    other preprocessing and parsing flags
+#               (e.g. -cpp-extra-args-per-file)
 # MACHDEP       machdep
 # FCFLAGS       general flags to use with frama-c
 # FCGUIFLAGS    flags to use with frama-c-gui
@@ -126,6 +128,7 @@ EVAFLAGS   ?= \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 WPFLAGS    ?=
+PARSEFLAGS ?=
 FCFLAGS    ?=
 FCGUIFLAGS ?=
 IVETTEFLAGS ?=
@@ -161,6 +164,7 @@ SHELL        := $(shell which bash)
 
 %.parse: SOURCES = $(filter-out %/command,$^)
 %.parse: PARSE = $(FRAMAC) \
+                 $(PARSEFLAGS) \
                  $(FCFLAGS) \
                  $(if $(value MACHDEP),-machdep $(MACHDEP),) \
                  -cpp-extra-args="$(CPPFLAGS)" $(SOURCES) \
