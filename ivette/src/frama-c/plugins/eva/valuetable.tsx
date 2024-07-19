@@ -105,30 +105,18 @@ function TableCell(props: TableCellProps): JSX.Element {
  * cleanly represent the summary of all the callstacks. */
 type callstack = 'Summary' | Values.callstack
 
-/* Builds a cached version of the `getCallstacks` request */
-function useCallstacksCache(): Request<Ast.marker[], callstack[]> {
-  const g: Request<Ast.marker[], callstack[]> =
-    React.useCallback((m) => Server.send(Values.getCallstacks, m), []);
-  const toString = React.useCallback((ms: string[]) => ms.join('|'), []);
-  return Dome.useCache(g, toString);
+/* `getCallstacks` request */
+function useCallstacks(): Request<Ast.marker[], callstack[]> {
+  return React.useCallback((m) => Server.send(Values.getCallstacks, m), []);
 }
 
-/* -------------------------------------------------------------------------- */
-
-
-
-/* -------------------------------------------------------------------------- */
-/* --- Callsite related definitions                                       --- */
-/* -------------------------------------------------------------------------- */
-
-/* Builds a cached version of the `getCallstackInfo` request */
-function useCallsitesCache(): Request<callstack, Values.callsite[]> {
-  const getter = React.useCallback(
+/* `getCallstackInfo` request */
+function useCallsites(): Request<callstack, Values.callsite[]> {
+  return React.useCallback(
     (c: callstack): Promise<Values.callsite[]> => {
       if (c !== 'Summary') return Server.send(Values.getCallstackInfo, c);
       else return Promise.resolve([]);
     }, []);
-  return Dome.useCache(getter);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -164,37 +152,22 @@ interface Probe {
   evaluate: Request<callstack, Evaluation>
 }
 
-/* Builds a cached version of the `getValues` request */
-function useEvaluationCache(): Request<[Ast.marker, callstack], Evaluation> {
-  type LocStack = [Ast.marker, callstack];
-  const getKey = React.useCallback(([m, c]: LocStack): string => {
-    return `${m}:${c}`;
-  }, []);
-  const getData: Request<LocStack, Evaluation> =
-    React.useCallback(([t, c]) => {
-      const callstack = c === 'Summary' ? undefined : c;
-      return Server.send(Values.getValues, { target: t, callstack });
-    }, []);
-  return Dome.useCache(getData, getKey);
-}
-
-/* Builds a cached function that builds a Probe given a Location */
-function useProbeCache(): Request<[Ast.decl, Ast.marker], Probe> {
-  const cache = useEvaluationCache();
-  const getKey = React.useCallback(
-    ([scope, marker]: [Ast.decl, Ast.marker]): string => {
-      return `${scope}:${marker}`;
+/* Builds a Probe given a Location */
+function useProbe(): Request<[Ast.decl, Ast.marker], Probe> {
+  const getValues = React.useCallback(
+    ([target, cs]: [Ast.marker, callstack]): Promise<Evaluation> => {
+      const callstack = cs === 'Summary' ? undefined : cs;
+      return Server.send(Values.getValues, { target, callstack });
     }, []
   );
-  const getData = React.useCallback(
+  return React.useCallback(
     async ([scope, marker]: [Ast.decl, Ast.marker]): Promise<Probe> => {
       const infos = await Server.send(Values.getProbeInfo, marker);
       const evaluate: Request<callstack, Evaluation> = (c) =>
-        cache([marker, c]);
+        getValues([marker, c]);
       return { marker, scope, ...infos, evaluate };
-    }, [cache]
+    }, [getValues]
   );
-  return Dome.useCache(getData, getKey);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -1009,10 +982,10 @@ function EvaTable(): JSX.Element {
    * related column into view if needed */
   const [locEvt] = React.useState(new Dome.Event<Ast.marker>('eva-location'));
 
-  /* Build cached version of needed server's requests */
-  const getProbe = useProbeCache();
-  const getCallsites = useCallsitesCache();
-  const getCallstacks = useCallstacksCache();
+  /* Needed server's requests */
+  const getProbe = useProbe();
+  const getCallsites = useCallsites();
+  const getCallstacks = useCallstacks();
 
   /* Updates the scope manager when the showCallstacks state changes. */
   React.useEffect(() => {
@@ -1153,6 +1126,13 @@ function EvaTable(): JSX.Element {
   /* Handle Evaluation mode */
   const computationState = States.useSyncValue(Eva.computationState);
   useEvaluationMode({ computationState, marker, scope, setLocPin });
+
+  /* Clear the table when Eva values change. */
+  const clear = (): void => {
+    fcts.clear();
+    setTic(tac + 1);
+  };
+  Server.useSignal(Values.changed, clear);
 
   /* Builds the component */
   return (

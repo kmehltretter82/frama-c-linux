@@ -868,5 +868,3 @@ let () = Request.register ~package
           (Data.Jtriple (Data.Jstring) (Data.Jstring) (Data.Jstring)))
     ~signals:[computation_signal]
     get_states
-
-(* -------------------------------------------------------------------------- *)

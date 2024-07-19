@@ -211,7 +211,7 @@ type functionsData =
 
 type FctKey = Json.key<'#functions'>;
 
-function computeFcts(
+export function computeFcts(
   ker: States.ArrayProxy<FctKey, Ast.functionsData>,
   eva: States.ArrayProxy<FctKey, Eva.functionsData>,
 ): functionsData[] {

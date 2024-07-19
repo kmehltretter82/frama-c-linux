@@ -26,6 +26,61 @@ module Pkg = Package
 module Senv = Server_parameters
 
 (* -------------------------------------------------------------------------- *)
+(* --- Frama-C Parameters                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let package =
+  Package.package ~name:"parameters" ~title:"All Frama-C parameters" ()
+
+(* Translates a parameter name into a valid camlCase request. *)
+let camlCaseParameter name =
+  match String.split_on_char '-' name with
+  | "" :: head :: tail ->
+    List.fold_left (^) head (List.map String.capitalize_ascii tail)
+  | _ -> Senv.fatal "Invalid parameter %s" name
+
+(* Registers a synchronized state for the given parameter. *)
+let register_parameter parameter =
+  let open Typed_parameter in
+  let parameter_name = parameter.name in
+  let descr = Md.plain ("State of parameter " ^ parameter_name) in
+  let name = camlCaseParameter parameter_name in
+  let register data accessor =
+    let add_hook f = accessor.add_update_hook (fun _ x -> f x) in
+    ignore
+      (States.register_state ~package ~name ~descr
+         ~data ~get:accessor.get ~set:accessor.set ~add_hook ())
+  in
+  match parameter.accessor with
+  | Bool (accessor, _) -> register (module Data.Jbool) accessor
+  | Int (accessor, _) -> register (module Data.Jint) accessor
+  | String (accessor, _) -> register (module Data.Jstring) accessor
+
+(* Registers requests for all parameters of the given plugin. *)
+let register_plugin_parameters plugin =
+  let register_group _group list =
+    let is_visible p = p.Typed_parameter.visible && p.reconfigurable in
+    List.iter register_parameter (List.filter is_visible list)
+  in
+  Hashtbl.iter register_group plugin.Plugin.p_parameters
+
+(* Automatically registers requests for all Frama-C parameters. *)
+let register_all () =
+  (* For now, only registers parameters from the kernel and some plugins. *)
+  let whitelist = [ "kernel"; "Eva"; "WP"; "rtegen" ] in
+  let register plugin =
+    if List.mem plugin.Plugin.p_name whitelist
+    then register_plugin_parameters plugin
+  in
+  Plugin.iter_on_plugins register
+
+let apply_once =
+  let once = ref true in
+  fun f () -> if !once then (once := false; f())
+
+let () = Cmdline.run_after_extended_stage (apply_once register_all)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Frama-C Kernel Services                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
