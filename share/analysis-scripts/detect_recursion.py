@@ -25,6 +25,7 @@
 """This script finds files containing likely declarations and definitions
 for a given function name, via heuristic syntactic matching."""
 
+from pathlib import Path
 import sys
 import build_callgraph
 
@@ -34,7 +35,7 @@ if len(sys.argv) < 2:
     print("        prints a heuristic callgraph for the specified files.")
     sys.exit(1)
 else:
-    files = sys.argv[1:]
+    files = set([Path(f) for f in sys.argv[1:]])
 
 cg = build_callgraph.compute(files)
 build_callgraph.detect_recursion(cg)

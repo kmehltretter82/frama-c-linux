@@ -25,6 +25,7 @@
 """This script uses heuristics to list all function definitions and
 declarations in a set of files."""
 
+from pathlib import Path
 import sys
 import os
 import function_finder
@@ -39,7 +40,7 @@ if len(sys.argv) < 4:
     sys.exit(1)
 
 
-def boolish_string(s):
+def boolish_string(s: str) -> bool:
     if s.lower() == "true" or s == "1":
         return True
     if s.lower() == "false" or s == "0":
@@ -49,7 +50,7 @@ def boolish_string(s):
 
 want_defs = boolish_string(sys.argv[1])
 want_decls = boolish_string(sys.argv[2])
-files = sys.argv[3:]
+files = set([Path(f) for f in sys.argv[3:]])
 
 for f in sorted(files):
     with open(f, encoding="ascii", errors="ignore") as data:

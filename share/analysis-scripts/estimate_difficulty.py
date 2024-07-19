@@ -261,8 +261,8 @@ if not no_cloc:
         data = external_tool.run_and_check(
             [cloc, "--hide-rate", "--progress-rate=0", "--csv"] + list(str(f) for f in files), ""
         )
-        data = data.splitlines()
-        [nfiles, _sum, nblank, ncomment, ncode] = data[-1].split(",")
+        datas = data.splitlines()
+        [nfiles, _sum, nblank, ncomment, ncode] = datas[-1].split(",")
         nlines = int(nblank) + int(ncomment) + int(ncode)
         logging.info(
             "Processing %d file(s), approx. %d lines of code (out of %d lines)",
