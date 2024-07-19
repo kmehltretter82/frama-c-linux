@@ -280,8 +280,8 @@ module type Messages = sig
 
   val register_category: string -> category
   (** register a new debugging/verbose category.
-      Note: categories must be added (e.g. via [add_debug_keys])
-      after registration.
+      Note: to enable a category's messages by default, add it
+      (e.g. via [add_debug_keys]) after registration.
       @since Fluorine-20130401
   *)
 
@@ -310,14 +310,17 @@ module type Messages = sig
   (** returns all registered categories. *)
 
   val add_debug_keys : category -> unit
-  (** adds categories corresponding to string (including potential
-      subcategories) to the set of categories for which messages are
-      to be displayed. The string must have been registered beforehand.
+  (** [add_debug_keys s] enables the emission of messages for the categories
+      corresponding to [s], including potential subcategories (e.g. [a]
+      and [a:b] for string [a:b]).
+      The string must have been registered beforehand.
       @since Fluorine-20130401 use categories instead of plain string
   *)
 
   val del_debug_keys: category -> unit
-  (** removes the given categories from the set for which messages are printed.
+  (** [add_debug_keys s] disables the emission of messages for the categories
+      corresponding to [s], including potential subcategories (e.g. [a]
+      and [a:b] for string [a:b]).
       The string must have been registered beforehand.
       @since Fluorine-20130401
   *)
