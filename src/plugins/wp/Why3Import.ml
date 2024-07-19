@@ -246,8 +246,14 @@ let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
 (* ---    Theory                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let parse_theory (env) (theory_name) (theory_path) (menv)=
-  try let theory = W.Env.read_theory env.wenv theory_path theory_name in
+let get_theory (env) (theory_name) (theory_path) =
+  try W.Env.read_theory env.wenv theory_path theory_name
+  with W.Env.LibraryNotFound _ ->
+    L.error "Library %s not found" theory_name; W.Theory.ignore_theory
+
+
+let rec parse_theory (env) (theory:W.Theory.theory) (menv) =
+  begin
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
         | Decl decl ->
@@ -275,14 +281,25 @@ let parse_theory (env) (theory_name) (theory_path) (menv)=
                    L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
                    L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
                    let li = li_of_ls env menv ls in
-                   L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
+                   L.debug ~dkey "Corresponding dlogic LI %a" pp_li li;
                 ) dlogics
-            | _ -> L.debug ~dkey "Other type of Decl"
+            | Dind (_,dec) ->
+              List.iter (fun ((ls,_) : W.Decl.ind_decl) ->
+                  L.result "Dind with ls %s" ls.ls_name.id_string;
+                  (* let li = li_of_ls env menv ls in
+                  L.debug ~dkey  "Corresponding dlogic LI %a" pp_li li; *)
+                ) dec;
+
+            | Dprop (_,prsymbol,_) ->
+              L.result "Dprop with prsymbol %s" prsymbol.pr_name.id_string;
           end
-        | Use _| Clone _| Meta _ -> L.debug ~dkey ""
+        | Use exth ->
+          L.debug ~dkey "Parsing use of external theories %s" exth.th_name.id_string;
+          parse_theory env exth menv;
+        | Clone _| Meta _ -> L.result  "Not a Decl"
       ) theory.th_decls;
-  with W.Env.LibraryNotFound _ ->
-    L.error "Library %s not found" theory_name
+  end
+
 
 let register_builtin env thname =
   let kind_of_lt (lt : C.logic_type) : LB.kind =
@@ -309,7 +326,9 @@ let register_builtin env thname =
         let ty = Logic_type_info.Hashtbl.find env.ltits lti in
         let (package,theory,name) = T.restore_path ty.ts_name in
         LB.add_builtin_type lti.lt_name @@ Lang.imported_t ~package ~theory ~name ;
+        L.result "Imported type ! %a" pp_lti lti;
       ) current_module.types;
+
     List.iter (fun (li, _) ->
         let ls = Logic_info.Hashtbl.find env.lils li in
         let (package,theory,name) = T.restore_path ls.ls_name in
@@ -317,6 +336,7 @@ let register_builtin env thname =
         let result = sort_of_lt @@ Option.get (li.l_type) in
         LB.add_builtin li.l_var_info.lv_name (List.map (kind_of_lv) li.l_profile) @@
         Lang.imported_f ~package ~theory ~name ~params ~result  ();
+        L.result "Imported logic ! %a" pp_li li;
       ) current_module.logics;
   end
 
@@ -327,7 +347,8 @@ let import_theory (env : env) thname =
     let i = Datatype.String.Hashtbl.find env.menv thname in
     List.iter (L.result "%s") i.paths;
   with Not_found ->
-    parse_theory env theory_name theory_path menv;
+    let theory = get_theory env theory_name theory_path in
+    parse_theory env theory menv;
     Datatype.String.Hashtbl.add env.menv thname
       { logics =  List.rev menv.li;
         types = List.rev menv.lti;
@@ -365,11 +386,15 @@ let loader (ctxt: Logic_typing.module_builder) (_: C.location) (m: string list) 
     import_theory (Env.get ()) thname;
     let env = Env.get () in
     let current_module = Datatype.String.Hashtbl.find env.menv thname in
+
     List.iter (fun (lti,loc) ->
         ctxt.add_logic_type loc lti;
+        L.result "%a" pp_lti lti;
       ) current_module.types;
     List.iter (fun (li, loc) ->
         ctxt.add_logic_function loc li;
+        L.result "%a" pp_li li;
+
       ) current_module.logics;
     L.result "Successfully imported theory at %s"
     @@ String.concat "::" current_module.paths;
