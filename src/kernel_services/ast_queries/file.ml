@@ -270,7 +270,7 @@ let print_machdep fmt (m : Cil_types.mach) =
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
 
-let machdep_dir () = Kernel.Share.get_dir ~mode:`Must_exist "machdeps"
+let machdep_dir () = Kernel.Share.get_dir "machdeps"
 
 let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 

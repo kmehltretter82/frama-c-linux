@@ -177,21 +177,33 @@ Customized via options plug-in level
 Customized plug-in option > plug-in var
   $ HOME=home FRAMAC_DIRS_CACHE=cache_bad dune exec -- frama-c -dirs-cache-only -dirs-cache cache
   [dirs] Warning: created cache directory `cache/created'
+  [dirs] User Error: cache/created is expected to be a file, found a directory
+  [kernel] Plug-in dirs aborted: invalid user input.
+  [1]
   $ rm -rf home cache
 
 Customized plug-in var > kernel option
   $ HOME=home FRAMAC_DIRS_CACHE=cache dune exec -- frama-c -dirs-cache-only -cache cache_bad
   [dirs] Warning: created cache directory `cache/created'
+  [dirs] User Error: cache/created is expected to be a file, found a directory
+  [kernel] Plug-in dirs aborted: invalid user input.
+  [1]
   $ rm -rf home cache
 
 Customized kernel option > kernel var
   $ HOME=home FRAMAC_CACHE=cache_bad dune exec -- frama-c -dirs-cache-only -cache cache
   [dirs] Warning: created cache directory `cache/dirs/created'
+  [dirs] User Error: cache/dirs/created is expected to be a file, found a directory
+  [kernel] Plug-in dirs aborted: invalid user input.
+  [1]
   $ rm -rf home cache
 
 Customized kernel var > xdg var
   $ HOME=home XDG_CACHE_HOME=cache_bad FRAMAC_CACHE=cache dune exec -- frama-c -dirs-cache-only
   [dirs] Warning: created cache directory `cache/dirs/created'
+  [dirs] User Error: cache/dirs/created is expected to be a file, found a directory
+  [kernel] Plug-in dirs aborted: invalid user input.
+  [1]
   $ rm -rf home cache
 
 Bad home value
@@ -214,7 +226,7 @@ File already exists were a directory is expected
   $ mkdir cache
   $ touch cache/created
   $ HOME=home dune exec -- frama-c -dirs-cache cache
-  [dirs] User Error: cannot create directory as file cache/created already exists
+  [dirs] User Error: cache/created is expected to be a directory
   [kernel] Plug-in dirs aborted: invalid user input.
   [1]
   $ rm -rf cache

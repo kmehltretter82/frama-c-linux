@@ -326,45 +326,28 @@ struct
       if is_visible && is_set () then [ get () ]
       else List.map add_plugin System_config.Share.dirs
 
-    let find relative =
+    let find ~is_dir relative =
       let exception Found of Datatype.Filepath.t in
       let check_presence dir =
         let path = Datatype.Filepath.concat dir relative in
         if Fc_Filepath.exists path then raise (Found path)
       in
-      try List.iter check_presence (dirs ()) ; None
-      with Found path -> Some path
-
-    let default relative =
-      match dirs () with
-      | [] -> assert false
-      | x :: _ -> Datatype.Filepath.concat x relative
-
-    let get_dir ?(mode=`Normalize_only) s =
-      let path = find s in
-      match mode, path with
-      | `Normalize_only, None -> default s
-      | (`Must_exist | `Normalize_only), Some p when Fc_Filepath.is_dir p -> p
-      | (`Must_exist | `Normalize_only), Some p ->
-        L.abort "%a is expected to be a directory" Datatype.Filepath.pretty p
-      | `Must_exist, None ->
-        L.abort "Could not find directory %s in Frama-C%s share"
-          s (if is_kernel then "" else "/" ^ P.name)
-
-    let get_file ?(mode=`Normalize_only) s =
-      let dirname = Filename.dirname s in
-      let basename = Filename.basename s in
-      let dir = get_dir ~mode dirname in
-      let path = Datatype.Filepath.concat dir basename in
-      match mode with
-      | `Must_exist when not @@ Fc_Filepath.exists path ->
-        L.abort "Could not find file %s in Frama-C%s share"
-          s (if is_kernel then "" else "/" ^ P.name)
-      | (`Normalize_only | `Must_exist)
-        when Fc_Filepath.exists path && Fc_Filepath.is_dir path ->
-        L.abort "%a is expected to be a file"
+      try
+        List.iter check_presence (dirs ()) ;
+        L.abort
+          "Could not find %s %s in Frama-C%s share"
+          (if is_dir then "directory" else "file")
+          relative
+          (if is_kernel then "" else "/" ^ P.name)
+      with
+      | Found path when is_dir <> Fc_Filepath.is_dir path ->
+        L.abort "%a is expected to be a %s"
           Datatype.Filepath.pretty path
-      | (`Normalize_only | `Must_exist) -> path
+          (if is_dir then "directory" else "file")
+      | Found path -> path
+
+    let get_dir = find ~is_dir:true
+    let get_file = find ~is_dir:false
   end
 
   module Make_user_dir
@@ -425,26 +408,31 @@ struct
       with Unix.Unix_error _ ->
         L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.Normalized.pretty d'
 
-    let get_dir ?(mode=`Normalize_only) s =
+    let get_dir ?(create_path=false) s =
       let dir = Datatype.Filepath.concat (get ()) s in
-      match mode with
-      | `Normalize_only -> dir
-      | `Create_path ->
-        try
-          if not @@ Fc_Filepath.is_dir dir
-          then
-            L.abort
-              "cannot create directory as file %a already exists"
+      if Fc_Filepath.exists dir then
+        begin
+          if Fc_Filepath.is_dir dir then dir
+          else
+            L.abort "%a is expected to be a directory"
               Datatype.Filepath.pretty dir
+        end
+      else
+        begin
+          if create_path then ((ignore (mk_dir (dir :> string))) ; dir)
           else dir
-        with Sys_error _ ->
-          ignore (mk_dir (dir :> string)); dir
+        end
 
-    let get_file ?(mode=`Normalize_only) s =
-      let base_dir = get_dir ~mode @@ Filename.dirname s in
+    let get_file ?create_path s =
+      let base_dir = get_dir ?create_path @@ Filename.dirname s in
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
-      Datatype.Filepath.concat base_dir @@ Filename.basename s
+      let path = Datatype.Filepath.concat base_dir @@ Filename.basename s in
+      if Fc_Filepath.exists path && Fc_Filepath.is_dir path then
+        L.abort "%a is expected to be a file, found a directory"
+          Datatype.Filepath.pretty path
+      else
+        path
   end
 
   module Session = Make_user_dir

@@ -19,27 +19,21 @@ let run_all () =
   Kernel.feedback "IS_SET %b" (Share.is_set ()) ;
 
   Self.feedback "path (dir)" ;
-  never_fail_get (Share.get_dir ~mode:`Must_exist) "path" ;
   never_fail_get Share.get_dir "path" ;
 
   Self.feedback "path/file.txt (file)" ;
-  never_fail_get (Share.get_file ~mode:`Must_exist) "path/file.txt" ;
   never_fail_get Share.get_file "path/file.txt" ;
 
   Self.feedback "foo (dir)" ;
-  never_fail_get (Share.get_dir ~mode:`Must_exist) "foo" ;
   never_fail_get Share.get_dir "foo" ;
 
   Self.feedback "foo.txt (file)" ;
-  never_fail_get (Share.get_file ~mode:`Must_exist) "foo.txt" ;
   never_fail_get Share.get_file "foo.txt" ;
 
   Self.feedback "path (file)" ;
-  never_fail_get (Share.get_file ~mode:`Must_exist) "path" ;
   never_fail_get Share.get_file "path" ;
 
   Self.feedback "path/file.txt" ;
-  never_fail_get (Share.get_dir ~mode:`Must_exist) "path/file.txt" ;
   never_fail_get Share.get_dir "path/file.txt"
 
 

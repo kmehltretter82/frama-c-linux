@@ -19,15 +19,17 @@ module Session = Self.Session
 
 let run_all () =
   if OnlyCache.get ()
-  then
-    ignore @@ Cache.get_dir ~mode:`Create_path "created"
+  then begin
+    ignore @@ Cache.get_dir ~create_path:true "created" ;
+    ignore @@ Cache.get_file "created" (* < fails *)
+  end
   else
     try
-      ignore @@ Cache.get_dir ~mode:`Create_path "created" ;
-      ignore @@ Config.get_dir ~mode:`Create_path "created" ;
-      ignore @@ State.get_dir ~mode:`Create_path "created" ;
-      ignore @@ Session.get_dir ~mode:`Create_path "created" ;
-      ignore @@ Session.get_file ~mode:`Create_path "created_filepath/file" ;
+      ignore @@ Cache.get_dir ~create_path:true "created" ;
+      ignore @@ Config.get_dir ~create_path:true "created" ;
+      ignore @@ State.get_dir ~create_path:true "created" ;
+      ignore @@ Session.get_dir ~create_path:true "created" ;
+      ignore @@ Session.get_file ~create_path:true "created_filepath/file" ;
 
 
       (* Here: ~mode:`Normalize_only *)

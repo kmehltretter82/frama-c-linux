@@ -23,7 +23,7 @@
 open Cil_types
 open Cil_datatype
 
-let rtl_file () = Options.Share.get_file ~mode:`Must_exist "e_acsl.h"
+let rtl_file () = Options.Share.get_file "e_acsl.h"
 
 (* create the RTL AST in a fresh project *)
 let create_rtl_ast prj =
