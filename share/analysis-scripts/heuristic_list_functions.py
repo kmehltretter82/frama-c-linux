@@ -51,7 +51,7 @@ want_defs = boolish_string(sys.argv[1])
 want_decls = boolish_string(sys.argv[2])
 files = sys.argv[3:]
 
-for f in files:
+for f in sorted(files):
     with open(f, encoding="ascii", errors="ignore") as data:
         file_content = data.read()
     file_lines = file_content.splitlines(keepends=True)
