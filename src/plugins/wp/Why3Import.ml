@@ -286,8 +286,6 @@ let rec parse_theory (env) (theory:W.Theory.theory) (menv) =
             | Dind (_,dec) ->
               List.iter (fun ((ls,_) : W.Decl.ind_decl) ->
                   L.result "Dind with ls %s" ls.ls_name.id_string;
-                  (* let li = li_of_ls env menv ls in
-                  L.debug ~dkey  "Corresponding dlogic LI %a" pp_li li; *)
                 ) dec;
 
             | Dprop (_,prsymbol,_) ->
