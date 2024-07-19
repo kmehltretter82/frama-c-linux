@@ -217,7 +217,10 @@ let force_compute () =
   (* The new analyzer can be accesed through hooks *)
   Self.ComputationState.set Computing;
   let module Analyzer = (val snd !ref_analyzer) in
-  Analyzer.compute_from_entry_point ~lib_entry kf
+  try Analyzer.compute_from_entry_point ~lib_entry kf
+  with Self.Abort ->
+    Self.(ComputationState.set Aborted);
+    Self.error "The analysis has been aborted: results are incomplete."
 
 let compute () =
   (* Nothing to recompute when Eva has already been computed. This boolean
@@ -233,3 +236,7 @@ let () = Parameters.ForceValues.set_output_dependencies [Self.state]
 
 let main () = if Parameters.ForceValues.get () then compute ()
 let () = Boot.Main.extend main
+
+let abort () =
+  if Self.ComputationState.get () = Computing
+  then Iterator.signal_abort ~kill:false

@@ -67,6 +67,8 @@ struct
   include (State_builder.Ref (Datatype') (Prototype))
 end
 
+exception Abort
+
 let is_computed () =
   match ComputationState.get () with
   | Computed | Aborted -> true
