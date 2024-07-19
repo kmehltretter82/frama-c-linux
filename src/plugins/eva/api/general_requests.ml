@@ -22,9 +22,6 @@
 
 open Server
 open Cil_types
-module D = Server.Data
-module S = Server.States
-module Md = Markdown
 
 let package =
   Package.package

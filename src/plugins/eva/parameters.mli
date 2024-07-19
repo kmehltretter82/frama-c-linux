@@ -86,8 +86,6 @@ module SplitLimit : Parameter_sig.Int
 module InterproceduralSplits : Parameter_sig.Bool
 module InterproceduralHistory : Parameter_sig.Bool
 
-module ILevel: Parameter_sig.Int
-
 module ArrayPrecisionLevel: Parameter_sig.Int
 
 module AllocatedContextValid: Parameter_sig.Bool
@@ -119,7 +117,6 @@ module BuiltinsOverrides:
 module BuiltinsAuto: Parameter_sig.Bool
 module BuiltinsList: Parameter_sig.Bool
 
-module SplitReturn: Parameter_sig.String
 module SplitReturnFunction:
   Parameter_sig.Map with type key = Cil_types.kernel_function
                      and type value = Split_strategy.t
