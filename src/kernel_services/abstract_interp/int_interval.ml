@@ -22,9 +22,6 @@
 
 open Abstract_interp
 
-let emitter = Lattice_messages.register "Int_interval";;
-let log_imprecision s = Lattice_messages.emit_imprecision emitter s
-
 (* Represents the interval between [min] and [max], congruent to [rem] modulo
    [modulo]. A value of [None] for [min] (resp. [max]) represents -infinity
    (resp. +infinity). [modulo] is > 0, and [0 <= rem < modulo]. *)
@@ -683,12 +680,11 @@ let div_range x ymn ymx =
     let max = Int.max (Int.max c1 c2) (Int.max c3 c4) in
     inject_range (Some min) (Some max)
   | _ ->
-    log_imprecision "Ival.div_range";
     top
 
 let div x y =
   match y.min, y.max with
-  | None, _ | _, None -> log_imprecision "Ival.div"; `Value top
+  | None, _ | _, None -> `Value top
   | Some min, Some max ->
     let result_pos =
       if Int.gt max Int.zero

@@ -38,8 +38,6 @@ let ( %~ ) = Integer.e_rem
 let succ = Integer.succ
 let pred = Integer.pred
 
-let msg_emitter = Lattice_messages.register "Offsetmap"
-
 (** Offsetmaps are unbalanced trees that map intervals to values, with
     the additional properties that the shape of the tree is entirely determined
     by the intervals that are mapped (see function [is_above] for the ordering).
@@ -1885,7 +1883,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         if size <~ period then
           (* We are going to write the locations that are between [size+1] and
              [period] unnecessarily, warn the user *)
-          Lattice_messages.emit_approximation msg_emitter
+          Abstract_interp.feedback_approximation
             "more than %d(%a) %s. Approximating."
             plevel pretty_int number !imprecise_write_msg;
         let abs_max = pred (mx +~ size) in
@@ -1895,7 +1893,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
             let origin = Origin.(current Misalign_write) in
             let v' = V.topify_with_origin origin v in
             if not (V.equal v v') then
-              Lattice_messages.emit_approximation msg_emitter
+              Abstract_interp.feedback_approximation
                 "approximating value to write.";
             v'
         in
@@ -2066,7 +2064,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         | _ -> true (* at least two nodes *)
       in
       if imprecise then
-        Lattice_messages.emit_approximation msg_emitter
+        Abstract_interp.feedback_approximation
           "too many locations to update in array. Approximating.";
       update ~validity ~exact ~offsets ~size v dst
 

@@ -23,6 +23,8 @@
 (** Functors for generic lattices implementations.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
+val feedback_approximation: ('a, Format.formatter, unit) format -> 'a
+
 exception Error_Top
 (** Raised by some functions when encountering a top value. *)
 

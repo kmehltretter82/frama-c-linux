@@ -24,8 +24,6 @@ open Cil_types
 open Cil
 open Abstract_interp
 
-let emitter = Lattice_messages.register "Locations"
-
 module Initial_Values = struct
   let v = [ [Base.null,Ival.zero];
             [Base.null,Ival.one];
@@ -548,7 +546,7 @@ let int_base_size_of_varinfo v =
     let s = Int.of_int s in
     Int_Base.inject s
   with Cil.SizeOfError (msg, _) ->
-    Lattice_messages.emit_approximation emitter
+    Abstract_interp.feedback_approximation
       "imprecise size for variable %a (%s)" Printer.pp_varinfo v msg;
     Int_Base.top
 

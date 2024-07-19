@@ -27,9 +27,6 @@ open Bottom.Operators
 let small_cardinal = Int_set.get_small_cardinal
 let small_cardinal_Int () = Int.of_int (small_cardinal ())
 
-let emitter = Lattice_messages.register "Int_val"
-let log_imprecision s = Lattice_messages.emit_imprecision emitter s
-
 type widen_hint = Datatype.Integer.Set.t
 
 (* --------------------------------- Datatype ------------------------------- *)
@@ -315,7 +312,6 @@ let diff_if_one value rem =
   | _ -> `Value value
 
 let diff value rem =
-  log_imprecision "Ival.diff";
   diff_if_one value rem
 
 (* ------------------------------- Lattice ---------------------------------- *)
@@ -426,8 +422,6 @@ let add_under v1 v2 =
   | Set s1, Set s2 -> `Value (inject_set_or_top (Int_set.add_under s1 s2))
   | Itv i1, Itv i2 -> Int_interval.add_under i1 i2 >>-: inject_itv
   | Set s, Itv i | Itv i, Set s ->
-    if Int_set.cardinal s <> 1
-    then log_imprecision "Ival.add_int_under";
     (* This is precise if [s] has only one element. Otherwise, this is not worse
        than another computation. *)
     `Value (Itv (Int_interval.add_singleton_int (Int_set.min s) i))
@@ -527,7 +521,6 @@ let shift_aux scale op (x: t) (y: t) =
       let factor = check_make ~min ~max ~rem:Int.zero ~modu in
       op x factor
   with Z.Overflow ->
-    Lattice_messages.emit_imprecision emitter "Ival.shift_aux";
     (* We only preserve the sign of the result *)
     if is_included x positive_integers then positive_integers
     else
@@ -659,9 +652,7 @@ let extract_bits ~start ~stop = function
       let dived = scale_div ~pos:true (Int.two_power start) d in
       let factor = Int.two_power (Int.length start stop) in
       scale_rem ~pos:true factor dived
-    with Z.Overflow ->
-      Lattice_messages.emit_imprecision emitter "Ival.extract_bits";
-      top
+    with Z.Overflow -> top
 
 let make = check_make
 
