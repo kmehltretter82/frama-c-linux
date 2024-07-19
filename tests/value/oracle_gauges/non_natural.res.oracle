@@ -61,10 +61,10 @@
 < [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + [0..--],0%32 }}
 125,126d74
 <   more than 200(12501) elements to enumerate. Approximating.
-< [kernel] non_natural.i:23: 
+< [kernel:approximation] non_natural.i:23: 
 129,130d76
 <   more than 200(12501) elements to enumerate. Approximating.
-< [kernel] non_natural.i:24: 
+< [kernel:approximation] non_natural.i:24: 
 189,192c135
 < [eva] non_natural.i:38: Frama_C_show_each: {{ &p2 + [0..400000],0%32 }}
 < [eva:alarm] non_natural.i:39: Warning: 

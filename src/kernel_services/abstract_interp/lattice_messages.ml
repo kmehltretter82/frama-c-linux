@@ -28,13 +28,16 @@ type t =
 
 type emitter = unit
 
+let dkey = Kernel.register_category "approximation"
+let () = Kernel.add_debug_keys dkey
+
 let emit _emitter msg =
   match msg with
   | Imprecision _ -> () (* Only for debug purposes *)
   | Approximation str
   | Costly str
   | Unsoundness str ->
-    Kernel.feedback ~current:true ~once:true "%s" str
+    Kernel.feedback ~dkey ~current:true ~once:true "%s" str
 ;;
 
 let register _name = ()

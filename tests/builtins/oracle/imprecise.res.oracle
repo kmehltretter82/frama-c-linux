@@ -216,27 +216,27 @@
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] imprecise.c:111: Warning: 
   accessing out of bounds index. assert v < 300;
-[kernel] imprecise.c:111: 
+[kernel:approximation] imprecise.c:111: 
   more than 200(300) locations to update in array. Approximating.
 [eva:alarm] imprecise.c:112: Warning: assertion got status unknown.
 [eva:alarm] imprecise.c:114: Warning: 
   accessing out of bounds index. assert 0 ≤ v;
 [eva:alarm] imprecise.c:114: Warning: 
   accessing out of bounds index. assert v < 300;
-[kernel] imprecise.c:114: 
+[kernel:approximation] imprecise.c:114: 
   more than 200(300) locations to update in array. Approximating.
-[kernel] imprecise.c:114: approximating value to write.
+[kernel:approximation] imprecise.c:114: approximating value to write.
 [eva:alarm] imprecise.c:116: Warning: assertion got status unknown.
 [eva] Recording results for many_writes
 [from] Computing for function many_writes
-[kernel] imprecise.c:111: 
+[kernel:approximation] imprecise.c:111: 
   more than 200(300) dependencies to update. Approximating.
-[kernel] imprecise.c:114: 
+[kernel:approximation] imprecise.c:114: 
   more than 200(300) dependencies to update. Approximating.
 [from] Done for function many_writes
-[kernel] imprecise.c:111: 
+[kernel:approximation] imprecise.c:111: 
   more than 200(300) elements to enumerate. Approximating.
-[kernel] imprecise.c:114: 
+[kernel:approximation] imprecise.c:114: 
   more than 200(300) elements to enumerate. Approximating.
 [eva] Done for function many_writes
 [eva] computing for function overlap <- main.
@@ -252,7 +252,8 @@
 [eva] imprecise.c:133: Call to builtin memset
 [eva] imprecise.c:133: function memset: precondition 'valid_s' got status valid.
 [eva:alarm] imprecise.c:136: Warning: assertion got status unknown.
-[kernel] imprecise.c:137: too many locations to update in array. Approximating.
+[kernel:approximation] imprecise.c:137: 
+  too many locations to update in array. Approximating.
 [eva:alarm] imprecise.c:140: Warning: 
   accessing uninitialized left-value.
   assert \initialized((int *)(&t_big) + 48);

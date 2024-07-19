@@ -42,20 +42,24 @@
 [eva] memcpy.c:51: function memcpy: precondition 'valid_dest' got status valid.
 [eva] memcpy.c:51: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:51: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:51: too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:51: 
+  too many locations to update in array. Approximating.
 [eva] memcpy.c:53: Call to builtin memcpy
 [eva] memcpy.c:53: function memcpy: precondition 'valid_dest' got status valid.
 [eva] memcpy.c:53: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:53: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:53: too many locations to update in array. Approximating.
-[kernel] memcpy.c:53: 
+[kernel:approximation] memcpy.c:53: 
+  too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:53: 
   more than 150(1000) locations to update in array. Approximating.
-[kernel] memcpy.c:53: more than 150(1000) elements to enumerate. Approximating.
+[kernel:approximation] memcpy.c:53: 
+  more than 150(1000) elements to enumerate. Approximating.
 [eva] memcpy.c:57: Call to builtin memcpy
 [eva] memcpy.c:57: function memcpy: precondition 'valid_dest' got status valid.
 [eva] memcpy.c:57: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:57: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:57: too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:57: 
+  too many locations to update in array. Approximating.
 [eva] Recording results for many
 [from] Computing for function many
 [from] Done for function many
@@ -160,28 +164,32 @@
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:118: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:118: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:118: too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:118: 
+  too many locations to update in array. Approximating.
 [eva] memcpy.c:122: starting to merge loop iterations
 [eva] memcpy.c:126: Call to builtin memcpy
 [eva:alarm] memcpy.c:126: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:126: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:126: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:126: too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:126: 
+  too many locations to update in array. Approximating.
 [eva] memcpy.c:130: starting to merge loop iterations
 [eva] memcpy.c:135: Call to builtin memcpy
 [eva:alarm] memcpy.c:135: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:135: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:135: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:135: too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:135: 
+  too many locations to update in array. Approximating.
 [eva] memcpy.c:139: starting to merge loop iterations
 [eva] memcpy.c:144: Call to builtin memcpy
 [eva:alarm] memcpy.c:144: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:144: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:144: function memcpy: precondition 'separation' got status valid.
-[kernel] memcpy.c:144: too many locations to update in array. Approximating.
+[kernel:approximation] memcpy.c:144: 
+  too many locations to update in array. Approximating.
 [eva] memcpy.c:149: Call to builtin memcpy
 [eva:alarm] memcpy.c:149: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
