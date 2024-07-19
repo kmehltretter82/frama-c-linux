@@ -29,6 +29,7 @@ available."""
 
 from __future__ import annotations
 import argparse
+import functools
 import json
 import logging
 import os
@@ -252,6 +253,7 @@ def copy_fc_stubs() -> Path:
 # Returns pairs (line_number, has_args) for each likely definition of
 # [funcname] in [filename].
 # [has_args] is used to distinguish between main(void) and main(int, char**).
+@functools.cache
 def find_definitions(funcname: str, filename: Path) -> list[tuple[int, bool]]:
     file_content = source_filter.open_and_filter(
         Path(filename), not under_test and do_filter_source
