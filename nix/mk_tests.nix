@@ -92,7 +92,7 @@ stdenvNoCC.mkDerivation {
     (if cover
      then ''
          mkdir -p _bisect
-         export DUNE_WORKSPACE="dev/dune-workspace.cover"
+         export DUNE_WORKSPACE="$(pwd)/dev/dune-workspace.cover"
          export BISECT_FILE="$(pwd)/_bisect/bisect-"
      ''
      else "");

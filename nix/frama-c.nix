@@ -124,7 +124,7 @@ stdenvNoCC.mkDerivation rec {
   dune_opt = if release_mode then "--release" else "" ;
 
   buildPhase = (if cover then ''
-      export DUNE_WORKSPACE="dev/dune-workspace.cover"
+      export DUNE_WORKSPACE="$(pwd)/dev/dune-workspace.cover"
     '' else "") +
     ''
       dune build -j2 --display short --error-reporting=twice $dune_opt @install
