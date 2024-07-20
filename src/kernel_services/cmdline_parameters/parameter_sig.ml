@@ -331,7 +331,7 @@ end
 
     @since Frama-C+dev
 *)
-module type Dune_site_dir = sig
+module type Site_dir = sig
   val set: Filepath.Normalized.t -> unit
   (** Sets the <dune-site-dir> directory (without creating it). *)
 

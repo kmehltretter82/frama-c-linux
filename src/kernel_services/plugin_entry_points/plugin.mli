@@ -47,7 +47,7 @@ module type S_no_log = sig
       @since Oxygen-20120901
       @before Frama-C+dev more modes were allowed
   *)
-  module Share: Parameter_sig.Dune_site_dir
+  module Share: Parameter_sig.Site_dir
 
   (** Handle the specific `session' directory of the plug-in.
       @since Neon-20140301 *)

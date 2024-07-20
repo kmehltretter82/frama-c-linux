@@ -42,7 +42,7 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
-  module Share: Parameter_sig.Dune_site_dir
+  module Share: Parameter_sig.Site_dir
   module Session: Parameter_sig.User_dir
   module Cache_dir () : Parameter_sig.User_dir
   module Config_dir () : Parameter_sig.User_dir
@@ -291,7 +291,7 @@ struct
   (** {3 Specific directories} *)
   (* ************************************************************************ *)
 
-  module Share : Parameter_sig.Dune_site_dir = struct
+  module Share : Parameter_sig.Site_dir = struct
     let is_visible = !share_visible_ref
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
