@@ -1046,6 +1046,114 @@ const kernelLog_internal: State.State<string> = {
 /** State of parameter -kernel-log */
 export const kernelLog: State.State<string> = kernelLog_internal;
 
+/** Signal for state [`state`](#state)  */
+export const signalState: Server.Signal = {
+  name: 'kernel.parameters.signalState',
+};
+
+const getState_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.parameters.getState',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`state`](#state)  */
+export const getState: Server.GetRequest<null,string>= getState_internal;
+
+const setState_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.parameters.setState',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`state`](#state)  */
+export const setState: Server.SetRequest<string,null>= setState_internal;
+
+const state_internal: State.State<string> = {
+  name: 'kernel.parameters.state',
+  signal: signalState,
+  getter: getState,
+  setter: setState,
+};
+/** State of parameter -state */
+export const state: State.State<string> = state_internal;
+
+/** Signal for state [`config`](#config)  */
+export const signalConfig: Server.Signal = {
+  name: 'kernel.parameters.signalConfig',
+};
+
+const getConfig_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.parameters.getConfig',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`config`](#config)  */
+export const getConfig: Server.GetRequest<null,string>= getConfig_internal;
+
+const setConfig_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.parameters.setConfig',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`config`](#config)  */
+export const setConfig: Server.SetRequest<string,null>= setConfig_internal;
+
+const config_internal: State.State<string> = {
+  name: 'kernel.parameters.config',
+  signal: signalConfig,
+  getter: getConfig,
+  setter: setConfig,
+};
+/** State of parameter -config */
+export const config: State.State<string> = config_internal;
+
+/** Signal for state [`cache`](#cache)  */
+export const signalCache: Server.Signal = {
+  name: 'kernel.parameters.signalCache',
+};
+
+const getCache_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.parameters.getCache',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`cache`](#cache)  */
+export const getCache: Server.GetRequest<null,string>= getCache_internal;
+
+const setCache_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.parameters.setCache',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`cache`](#cache)  */
+export const setCache: Server.SetRequest<string,null>= setCache_internal;
+
+const cache_internal: State.State<string> = {
+  name: 'kernel.parameters.cache',
+  signal: signalCache,
+  getter: getCache,
+  setter: setCache,
+};
+/** State of parameter -cache */
+export const cache: State.State<string> = cache_internal;
+
 /** Signal for state [`save`](#save)  */
 export const signalSave: Server.Signal = {
   name: 'kernel.parameters.signalSave',
