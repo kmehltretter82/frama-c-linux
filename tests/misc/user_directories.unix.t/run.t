@@ -16,21 +16,21 @@ Basic case
   [dirs] home/.local/state/frama-c/dirs/not_created
   [dirs] .frama-c/dirs/not_created
   [dirs] .frama-c/dirs/not_created_filepath/file
-  $ find home
+  $ find home | sort
   home
   home/.cache
   home/.cache/frama-c
   home/.cache/frama-c/dirs
   home/.cache/frama-c/dirs/created
+  home/.config
+  home/.config/frama-c
+  home/.config/frama-c/dirs
+  home/.config/frama-c/dirs/created
   home/.local
   home/.local/state
   home/.local/state/frama-c
   home/.local/state/frama-c/dirs
   home/.local/state/frama-c/dirs/created
-  home/.config
-  home/.config/frama-c
-  home/.config/frama-c/dirs
-  home/.config/frama-c/dirs/created
   $ rm -rf home
 
 Customized via variables: XDG level
@@ -44,20 +44,19 @@ Customized via variables: XDG level
   [dirs] state/frama-c/dirs/not_created
   [dirs] .frama-c/dirs/not_created
   [dirs] .frama-c/dirs/not_created_filepath/file
-  $ find home
+  $ find home | sort
   find: 'home': No such file or directory
-  [1]
-  $ find cache
+  $ find cache | sort
   cache
   cache/frama-c
   cache/frama-c/dirs
   cache/frama-c/dirs/created
-  $ find config
+  $ find config | sort
   config
   config/frama-c
   config/frama-c/dirs
   config/frama-c/dirs/created
-  $ find state
+  $ find state | sort
   state
   state/frama-c
   state/frama-c/dirs
@@ -77,18 +76,17 @@ Customized via variables: Kernel level
   [dirs] state/dirs/not_created
   [dirs] session/dirs/not_created
   [dirs] session/dirs/not_created_filepath/file
-  $ find home
+  $ find home | sort
   find: 'home': No such file or directory
-  [1]
-  $ find cache
+  $ find cache | sort
   cache
   cache/dirs
   cache/dirs/created
-  $ find config
+  $ find config | sort
   config
   config/dirs
   config/dirs/created
-  $ find state
+  $ find state | sort
   state
   state/dirs
   state/dirs/created
@@ -107,16 +105,15 @@ Customized via variables: Plugin level
   [dirs] state/not_created
   [dirs] session/not_created
   [dirs] session/not_created_filepath/file
-  $ find home
+  $ find home | sort
   find: 'home': No such file or directory
-  [1]
-  $ find cache
+  $ find cache | sort
   cache
   cache/created
-  $ find config
+  $ find config | sort
   config
   config/created
-  $ find state
+  $ find state | sort
   state
   state/created
   $ rm -rf home cache config state
@@ -132,18 +129,17 @@ Customized via options kernel level
   [dirs] state/dirs/not_created
   [dirs] session/dirs/not_created
   [dirs] session/dirs/not_created_filepath/file
-  $ find home
+  $ find home | sort
   find: 'home': No such file or directory
-  [1]
-  $ find cache
+  $ find cache | sort
   cache
   cache/dirs
   cache/dirs/created
-  $ find config
+  $ find config | sort
   config
   config/dirs
   config/dirs/created
-  $ find state
+  $ find state | sort
   state
   state/dirs
   state/dirs/created
@@ -160,16 +156,15 @@ Customized via options plug-in level
   [dirs] state/not_created
   [dirs] session/not_created
   [dirs] session/not_created_filepath/file
-  $ find home
+  $ find home | sort
   find: 'home': No such file or directory
-  [1]
-  $ find cache
+  $ find cache | sort
   cache
   cache/created
-  $ find config
+  $ find config | sort
   config
   config/created
-  $ find state
+  $ find state | sort
   state
   state/created
   $ rm -rf home cache config state
