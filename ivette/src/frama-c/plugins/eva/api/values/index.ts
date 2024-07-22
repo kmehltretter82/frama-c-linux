@@ -232,4 +232,112 @@ export const getValues: Server.GetRequest<
     vElse?: evaluation }
   >= getValues_internal;
 
+/** Data for array rows [`evaFlamegraph`](#evaflamegraph)  */
+export interface evaFlamegraphData {
+  /** Entry identifier. */
+  key: Json.key<'#evaFlamegraph'>;
+  /** Callstack identifier */
+  stack: callstack;
+  /** Computation time for the callstack */
+  time: number;
+  /** Callstack description */
+  title: string;
+  /** Function name */
+  name: string;
+  /** Function list */
+  funlist: string;
+  /** Kernel function key */
+  kfkey: string;
+}
+
+/** Decoder for `evaFlamegraphData` */
+export const jEvaFlamegraphData: Json.Decoder<evaFlamegraphData> =
+  Json.jObject({
+    key: Json.jKey<'#evaFlamegraph'>('#evaFlamegraph'),
+    stack: jCallstack,
+    time: Json.jNumber,
+    title: Json.jString,
+    name: Json.jString,
+    funlist: Json.jString,
+    kfkey: Json.jString,
+  });
+
+/** Natural order for `evaFlamegraphData` */
+export const byEvaFlamegraphData: Compare.Order<evaFlamegraphData> =
+  Compare.byFields
+    <{ key: Json.key<'#evaFlamegraph'>, stack: callstack, time: number,
+       title: string, name: string, funlist: string, kfkey: string }>({
+    key: Compare.string,
+    stack: byCallstack,
+    time: Compare.number,
+    title: Compare.string,
+    name: Compare.string,
+    funlist: Compare.string,
+    kfkey: Compare.string,
+  });
+
+/** Signal for array [`evaFlamegraph`](#evaflamegraph)  */
+export const signalEvaFlamegraph: Server.Signal = {
+  name: 'plugins.eva.values.signalEvaFlamegraph',
+};
+
+const reloadEvaFlamegraph_internal: Server.GetRequest<null,null> = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.values.reloadEvaFlamegraph',
+  input: Json.jNull,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Force full reload for array [`evaFlamegraph`](#evaflamegraph)  */
+export const reloadEvaFlamegraph: Server.GetRequest<null,null>= reloadEvaFlamegraph_internal;
+
+const fetchEvaFlamegraph_internal: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#evaFlamegraph'>[],
+    updated: evaFlamegraphData[], pending: number }
+  > = {
+  kind: Server.RqKind.GET,
+  name: 'plugins.eva.values.fetchEvaFlamegraph',
+  input: Json.jNumber,
+  output: Json.jObject({
+            reload: Json.jBoolean,
+            removed: Json.jArray(
+                       Json.jKey<'#evaFlamegraph'>('#evaFlamegraph')),
+            updated: Json.jArray(jEvaFlamegraphData),
+            pending: Json.jNumber,
+          }),
+  fallback: { reload: false, removed: [], updated: [], pending: 0 },
+  signals: [],
+};
+/** Data fetcher for array [`evaFlamegraph`](#evaflamegraph)  */
+export const fetchEvaFlamegraph: Server.GetRequest<
+  number,
+  { reload: boolean, removed: Json.key<'#evaFlamegraph'>[],
+    updated: evaFlamegraphData[], pending: number }
+  >= fetchEvaFlamegraph_internal;
+
+const evaFlamegraph_internal: State.Array<
+  Json.key<'#evaFlamegraph'>,
+  evaFlamegraphData
+  > = {
+  name: 'plugins.eva.values.evaFlamegraph',
+  getkey: ((d:evaFlamegraphData) => d.key),
+  signal: signalEvaFlamegraph,
+  fetch: fetchEvaFlamegraph,
+  reload: reloadEvaFlamegraph,
+  order: byEvaFlamegraphData,
+};
+/** Data for Eva flamegraph */
+export const evaFlamegraph: State.Array<
+  Json.key<'#evaFlamegraph'>,
+  evaFlamegraphData
+  > = evaFlamegraph_internal;
+
+/** Default value for `evaFlamegraphData` */
+export const evaFlamegraphDataDefault: evaFlamegraphData =
+  { key: Json.jKey<'#evaFlamegraph'>('#evaFlamegraph')(''),
+    stack: callstackDefault, time: 0, title: '', name: '', funlist: '',
+    kfkey: '' };
+
 /* ------------------------------------- */

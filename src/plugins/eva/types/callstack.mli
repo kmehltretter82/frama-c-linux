@@ -27,6 +27,8 @@ type call = Cil_types.kernel_function * Cil_types.stmt
 
 module Call : Datatype.S with type t = call
 
+module Calls : Datatype.S with type t = call list
+
 (** Eva callstacks. *)
 type callstack = {
   thread: int;

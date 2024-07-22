@@ -213,8 +213,11 @@ end
 (* --- Domain Utilities                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Jcallstack : S with type t = Callstack.t =
-  Data.Index
+module Jcallstack :
+sig
+  include Data.S with type t = Callstack.t
+  val get : Callstack.t -> int
+end = Data.Index
     (Callstack.Map)
     (struct
       let package = package
@@ -720,5 +723,47 @@ let () =
           set_else rq (Some v_else)
         | Nothing -> ()
     end
+
+let _evaFlamegraph =
+  let model = States.model () in
+  (* This field is usefull for interact with other components,
+     eg. the currently selected callstack in EVA values *)
+  States.column model ~name:"stack"
+    ~descr:(Markdown.plain "Callstack identifier")
+    ~data:(module Jcallstack) ~get:fst ;
+  (* This field contains the computation time *)
+  States.column model ~name:"time"
+    ~descr:(Markdown.plain "Computation time for the callstack")
+    ~data:(module Data.Jfloat) ~get:snd ;
+  (* This field might be usefull to display tooltips on the flames *)
+  States.column model ~name:"title"
+    ~descr:(Markdown.plain "Callstack description")
+    ~data:(module Data.Jstring)
+    ~get:(fun (cs,_) -> Pretty_utils.to_string Callstack.pretty cs);
+  (* This field contains the name of the function on top of the callstack *)
+  States.column model ~name:"name"
+    ~descr:(Markdown.plain "Function name")
+    ~data:(module Data.Jstring)
+    ~get:(fun (cs,_) -> Kernel_function.get_name (Callstack.top_kf cs));
+  (* This field contains the list of the function name *)
+  States.column model ~name:"funlist"
+    ~descr:(Markdown.plain "Function list")
+    ~data:(module Data.Jstring)
+    ~get:(fun (cs,_) -> List.fold_left (fun acc kf->
+        match acc with
+        | "" -> Kernel_function.get_name kf
+        | _ -> acc ^ ":" ^ Kernel_function.get_name kf) "" (Callstack.to_kf_list cs));
+  (* This field contains the declaration of the function on top of the callstack *)
+  States.column model ~name:"kfkey"
+    ~descr:(Markdown.plain "Kernel function key")
+    ~data:(module Data.Jstring)
+    ~get:(fun (cs,_) -> Kernel_ast.Decl.index (SFunction (Callstack.top_kf cs)));
+  (* Add/remove other fields if necessary... *)
+  States.register_framac_array
+    ~package
+    ~name:"evaFlamegraph"
+    ~descr:(Markdown.plain "Data for Eva flamegraph")
+    ~key:(fun cs -> Format.sprintf "#%06d" @@ Jcallstack.get cs)
+    model (module Eva_perf.EvaFlamegraph)
 
 (* -------------------------------------------------------------------------- *)

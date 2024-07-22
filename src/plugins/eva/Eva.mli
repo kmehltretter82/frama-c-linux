@@ -118,6 +118,8 @@ module Callstack: sig
 
   module Call : Datatype.S with type t = call
 
+  module Calls : Datatype.S with type t = call list
+
   (** Eva callstacks. *)
   type callstack = {
     thread: int;
