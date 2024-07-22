@@ -48,22 +48,18 @@ def get_command(command: str, env_var_name: str) -> Path | None:
     then in the PATH, then in the resource directory (for a pyinstaller binary)."""
     if command in cached_commands:
         return cached_commands[command]
-    p_str = os.getenv(env_var_name)
+    p_str = os.getenv(env_var_name) or shutil.which(command)
     if p_str:
         p = Path(p_str)
     else:
-        p_str = shutil.which(command)
-        if p_str:
-            p = Path(p_str)
-        else:
-            p = Path(resource_path(command))
-            if not p.exists():
-                if emit_warns:
-                    print(
-                        f"info: optional external command '{command}' not found in PATH;",
-                        f"consider installing it or setting environment variable {env_var_name}",
-                    )
-                p = None
+        p = Path(resource_path(command))
+        if not p.exists():
+            if emit_warns:
+                print(
+                    f"info: optional external command '{command}' not found in PATH;",
+                    f"consider installing it or setting environment variable {env_var_name}",
+                )
+            p = None
     cached_commands[command] = p
     return p
 
