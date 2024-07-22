@@ -30,9 +30,6 @@ let set_small_cardinal i = small_cardinal := i
 
 let debug_cardinal = false
 
-let emitter = Lattice_messages.register "Int_set";;
-let log_imprecision s = Lattice_messages.emit_imprecision emitter s
-
 (* Small sets of integers, implemented as sorted non-empty arrays. *)
 type set = Int.t array
 
@@ -335,7 +332,6 @@ let set_to_ival_under set =
   (* Else: arbitrarily drop some elements of the under approximation. *)
   else
     let a = Array.make !small_cardinal Int.zero in
-    log_imprecision "Ival.set_to_ival_under";
     try
       ignore (Int.Set.fold (fun elt i ->
           if i = !small_cardinal then raise Exit;

@@ -25,7 +25,11 @@ exception Error_Bottom
 exception Not_less_than
 exception Can_not_subdiv
 
-let msg_emitter = Lattice_messages.register "Abstract_interp"
+let dkey = Kernel.register_category "approximation"
+let () = Kernel.add_debug_keys dkey
+
+let feedback_approximation format =
+  Kernel.feedback ~dkey ~current:true ~once:true format
 
 type truth = True | False | Unknown
 
@@ -269,8 +273,7 @@ module Int = struct
     let nb_loop = e_div (sub sup inf) step in
     let rec fold_incr ~counter ~inf acc =
       if equal counter onethousand then
-        Lattice_messages.emit_costly msg_emitter
-          "enumerating %a integers" pretty nb_loop;
+        feedback_approximation "enumerating %a integers" pretty nb_loop;
       if le inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_incr ~counter:(succ counter) ~inf:(add step inf) (f inf acc)
@@ -278,8 +281,7 @@ module Int = struct
     in
     let rec fold_decr ~counter ~sup acc =
       if equal counter onethousand then
-        Lattice_messages.emit_costly msg_emitter
-          "enumerating %a integers" pretty nb_loop;
+        feedback_approximation "enumerating %a integers" pretty nb_loop;
       if le inf sup then begin
         (*          Format.printf "Int.fold: %a@\n" pretty inf; *)
         fold_decr ~counter:(succ counter) ~sup:(add step sup) (f sup acc)

@@ -1,11 +1,11 @@
 220a221,222
-> [kernel] imprecise.c:111: 
+> [kernel:approximation] imprecise.c:111: 
 >   more than 200(300) elements to enumerate. Approximating.
 228a231,232
-> [kernel] imprecise.c:114: 
+> [kernel:approximation] imprecise.c:114: 
 >   more than 200(300) elements to enumerate. Approximating.
 237,240d240
-< [kernel] imprecise.c:111: 
+< [kernel:approximation] imprecise.c:111: 
 <   more than 200(300) elements to enumerate. Approximating.
-< [kernel] imprecise.c:114: 
+< [kernel:approximation] imprecise.c:114: 
 <   more than 200(300) elements to enumerate. Approximating.

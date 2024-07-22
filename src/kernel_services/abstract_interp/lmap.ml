@@ -24,8 +24,6 @@ open Abstract_interp
 open Locations
 open Lattice_bounds
 
-let msg_emitter = Lattice_messages.register "Lmap";;
-
 type 'a default_contents =
   | Bottom
   | Top of 'a
@@ -201,7 +199,7 @@ struct
       in
       match loc with
       | Location_Bits.Top (Base.SetLattice.Top, orig) ->
-        Lattice_messages.emit_approximation msg_emitter
+        Abstract_interp.feedback_approximation
           "writing at a completely unknown address @[%a@]"
           Origin.pretty_as_reason orig;
         raise Result_is_top
@@ -526,7 +524,7 @@ struct
         !had_non_bottom, result
       | Location_Bits.Top (top, orig) ->
         if not (Base.SetLattice.equal top Base.SetLattice.top) then
-          Lattice_messages.emit_approximation msg_emitter
+          Abstract_interp.feedback_approximation
             "writing somewhere in @[%a@]@[%a@]."
             Base.SetLattice.pretty top
             Origin.pretty_as_reason orig;

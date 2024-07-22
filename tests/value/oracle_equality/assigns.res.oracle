@@ -1,6 +1,6 @@
 154,155d153
 <   more than 200(1000) locations to update in array. Approximating.
-< [kernel] assigns.i:104: 
+< [kernel:approximation] assigns.i:104: 
 156a155,156
-> [kernel] assigns.i:104: 
+> [kernel:approximation] assigns.i:104: 
 >   more than 200(1000) locations to update in array. Approximating.

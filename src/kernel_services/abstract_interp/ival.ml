@@ -24,9 +24,6 @@ open Abstract_interp
 open Lattice_bounds
 open Bottom.Operators
 
-let emitter = Lattice_messages.register "Ival"
-let log_imprecision s = Lattice_messages.emit_imprecision emitter s
-
 module type Type = sig
   (* Binary abstract operations do not model precisely float/integer operations.
      It is the responsibility of the callers to have two operands of the same
@@ -667,7 +664,6 @@ let diff_if_one value rem =
   | _, _ -> value
 
 let diff value rem =
-  log_imprecision "Ival.diff";
   diff_if_one value rem
 
 (* This function is an iterator, but it needs [diff_if_one] just above. *)
