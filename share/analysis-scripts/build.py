@@ -29,6 +29,7 @@ available."""
 
 from __future__ import annotations
 import argparse
+import functools
 import json
 import logging
 import os
@@ -252,7 +253,8 @@ def copy_fc_stubs() -> Path:
 # Returns pairs (line_number, has_args) for each likely definition of
 # [funcname] in [filename].
 # [has_args] is used to distinguish between main(void) and main(int, char**).
-def find_definitions(funcname: str, filename: str) -> list[tuple[str, bool]]:
+@functools.cache
+def find_definitions(funcname: str, filename: Path) -> list[tuple[int, bool]]:
     file_content = source_filter.open_and_filter(
         Path(filename), not under_test and do_filter_source
     )
@@ -261,7 +263,7 @@ def find_definitions(funcname: str, filename: str) -> list[tuple[str, bool]]:
     defs = function_finder.find_definitions_and_declarations(
         True, False, filename, file_content, file_lines, newlines, funcname
     )
-    res = []
+    res: list[tuple[int, bool]] = []
     for d in defs:
         defining_line = file_lines[d[2] - 1]
         after_funcname = defining_line[defining_line.find(funcname) + len(funcname) :]
@@ -367,7 +369,7 @@ if unknown_sources:
 # We also need to check if the main function uses a 'main(void)'-style
 # signature, to patch fc_stubs.c.
 
-main_definitions: dict[Path, list[tuple[Path, str, bool]]] = {}
+main_definitions: dict[Path, list[tuple[Path, int, bool]]] = {}
 for target, sources in sorted(sources_map.items()):
     main_definitions[target] = []
     for source in sources:

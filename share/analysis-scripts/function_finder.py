@@ -24,6 +24,7 @@
 
 """Exports find_function_in_file, to be used by other scripts"""
 
+from pathlib import Path
 import bisect
 import os
 import re
@@ -55,7 +56,7 @@ debug = os.getenv("DEBUG", False)
 
 
 # Precomputes the regex for 'fname'
-def prepare_re_specific_name(fname):
+def prepare_re_specific_name(fname: str) -> re.Pattern:
     re_fun = re.compile(
         "^"
         + optional_type_prefix
@@ -72,9 +73,9 @@ def prepare_re_specific_name(fname):
 
 
 # Returns 0 if not found, 1 if declaration, 2 if definition
-def find_specific_name(prepared_re, f):
+def find_specific_name(prepared_re: re.Pattern, f: Path) -> int:
     with open(f, encoding="ascii", errors="ignore") as data:
-        file_content = data.read()
+        file_content: str = data.read()
         has_decl_or_def = prepared_re.search(file_content)
         if has_decl_or_def is None:
             return 0
@@ -86,7 +87,7 @@ def find_specific_name(prepared_re, f):
 # matches function definitions or declarations
 # if funcname is not None, only matches for the specified
 # function name
-def compute_re_def_or_decl(funcname):
+def compute_re_def_or_decl(funcname: str) -> re.Pattern:
     ident = funcname if funcname else c_identifier
     return re.compile(
         "^"
@@ -110,7 +111,7 @@ re_funcall = re.compile("(" + c_identifier + ")" + whitespace + r"\(")
 
 # Computes the offset (in bytes) of each '\n' in the file,
 # returning them as a list
-def compute_newline_offsets(file_lines):
+def compute_newline_offsets(file_lines: list[str]) -> list[int]:
     offsets = []
     current = 0
     for line in file_lines:
@@ -122,7 +123,7 @@ def compute_newline_offsets(file_lines):
 # Returns the line number (starting at 1) containing the character
 # of offset [offset].
 # [offsets] is the sorted list of offsets for newline characters in the file.
-def line_of_offset(offsets, offset):
+def line_of_offset(offsets: list[int], offset: int) -> int:
     return bisect.bisect_right(offsets, offset) + 1
 
 
@@ -132,7 +133,7 @@ def line_of_offset(offsets, offset):
 # This is a heuristic to attempt to detect function closing braces:
 # it assumes that the first '}' (without preceding whitespace) after a
 # function definition denotes its closing brace.
-def compute_closing_braces(file_lines):
+def compute_closing_braces(file_lines: list[str]) -> list[int]:
     braces = []
     for i, line in enumerate(file_lines, start=1):
         # note: lines contain '\n', so they are never empty
@@ -153,7 +154,7 @@ def compute_closing_braces(file_lines):
 # closing braces were found).
 #
 # [line_numbers] must be sorted in ascending order.
-def get_first_line_after(line_numbers, n):
+def get_first_line_after(line_numbers: list[int], n: int) -> int | None:
     try:
         return line_numbers[bisect.bisect_left(line_numbers, n)]
     except IndexError:
@@ -172,8 +173,14 @@ def get_first_line_after(line_numbers, n):
 # itself and avoid considering it as a call. For function definitions,
 # this is the opening brace; for function declarations, this is the semicolon.
 def find_definitions_and_declarations(
-    want_defs, want_decls, filename, file_content, file_lines, newlines, funcname=None
-):
+    want_defs: bool,
+    want_decls: bool,
+    filename: Path,
+    file_content: str,
+    file_lines: list[str],
+    newlines: list[int],
+    funcname=None,
+) -> list[tuple[str, bool, int, int, int]]:
     braces = compute_closing_braces(file_lines)
     res = []
     re_fundef_or_decl = compute_re_def_or_decl(funcname)
@@ -199,8 +206,10 @@ def find_definitions_and_declarations(
             if definition.strip().endswith("}"):
                 end = line_of_offset(newlines, terminator_offset)
             else:
-                end = get_first_line_after(braces, start)
-                if not end:
+                maybe_end = get_first_line_after(braces, start)
+                if maybe_end:
+                    end = maybe_end
+                else:
                     # no closing braces found; try again the "single-line function heuristic"
                     line_of_opening_brace = line_of_offset(newlines, terminator_offset)
                     if start == line_of_opening_brace and definition.rstrip()[-1] == "}":
@@ -230,7 +239,7 @@ calls_blacklist = ["if", "while", "for", "return", "sizeof", "switch", "_Alignas
 #
 # Note: this may include the function prototype itself;
 # it must be filtered by the caller.
-def find_calls(file_content, newlines):
+def find_calls(file_content: str, newlines: list[int]) -> list[tuple[str, int, int]]:
     # create a list of Match objects that fit "pattern" regex
     res = []
     for match in re.finditer(re_funcall, file_content):
