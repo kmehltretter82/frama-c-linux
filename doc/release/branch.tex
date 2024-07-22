@@ -14,12 +14,11 @@ be integrated into the upcoming release.
 
 When the ``freeze'' period arrives (usually a few weeks before the beta
 release), the release manager may decide to prevent direct merges to the
-\texttt{master} branch, until the \texttt{stable} branch is created.
-If so, then the branch should be protected such that Developers can no
-longer push and merge to it, without asking for a Master to do it.
-
-In Gitlab, this is done via: Frama-C project $\rightarrow$ Settings
-$\rightarrow$ Repository $\rightarrow$ Protected Branches.
+\texttt{master} branch, until the \texttt{stable} branch is created. If so, then
+the branch should be protected such that Developers can no longer push and merge
+to it, without asking for a Maintainer to do it. In Gitlab, this is done via:
+Frama-C project $\rightarrow$ Settings $\rightarrow$ Repository $\rightarrow$
+Protected Branches.\\
 
 \textbf{The \texttt{master} branch must be protected \emph{at all times}.
   Parameters
@@ -29,7 +28,7 @@ $\rightarrow$ Repository $\rightarrow$ Protected Branches.
 
 \section{Creating the branch}
 
-Note that you must be member of the GitLab groups "frama-c", "dev" and have
+\textbf{Note:} You must be member of the GitLab groups "frama-c", "dev" and have
 access to each plugin of continuous integration.
 
 Create the branch \texttt{stable/release}, where \texttt{release} is the
@@ -55,6 +54,9 @@ and go through Merge-requests. Everything else should go in \texttt{master},
 which can then be reset to standard-level protection (Developers + Maintainers
 allowed to push/merge).
 
+\textbf{Note:} If there are still merge requests tagged for this release, make
+sure to set their targeted branch to \texttt{stable/release}.
+
 \section{GitLab issues}
 
 {\em This is currently done periodically in specific Frama-C meetings, so only
@@ -73,8 +75,11 @@ one.
 
 On the new \texttt{stable} branch, execute the script:
 \begin{verbatim}
-./dev/set-version.sh NN.M # to be replaced with actual major/minor version
+# to be replaced with actual major/minor version
+# Add suffix ~beta for beta releases only
+./dev/set-version.sh NN.M
 \end{verbatim}
+
 This will:
 \begin{itemize}
   \item update the \texttt{Changelog}s
@@ -85,6 +90,10 @@ This will:
   \item update the Frama-C build script
   \item update the reference configuration
 \end{itemize}
+
+For beta releases, update manually the doc link in opam file to add
+\texttt{-beta} (not \texttt{\textasciitilde{}beta}) :
+\texttt{http://frama-c.com/download/user-manual-<NN.M>-beta-<Codename>.pdf}\\
 
 Merge the \texttt{stable} branch in the \texttt{master} branch.
 
@@ -100,6 +109,28 @@ This will:
 
 Commit this change and push.
 
+\section{External plugins}
+
+List of external plugins repo names:
+\begin{itemize}
+  \item ACSL-importer
+  \item Caveat-importer
+  \item Cfp
+  \item frama-clang
+  \item GenAssigns
+  \item Meta
+  \item Minimal
+  \item Mthread
+  \item PathCrawler
+  \item Security
+  \item Volatile
+\end{itemize}
+For each one of them, check that versions in the \texttt{dune-project} files are
+coherent with \FramaC's new release. If not, update them and run \verb+make+ to
+generate the new opam file. Create a new branch, commit and push. Create a merge
+request targetting \texttt{stable/copper} on each plugin and assign your co-rm.
+This changes will need to be merged on master's branches later.
+
 \section{Copyright}
 
 Check that the date in copyright headers is correct. If not then:
@@ -108,8 +139,6 @@ Check that the date in copyright headers is correct. If not then:
   \begin{itemize}
     \item \texttt{headers/closed-source/*}
     \item \texttt{headers/open-source/*}
-    \item \texttt{ivette/headers/closed-source/*}
-    \item \texttt{ivette/headers/open-source/*}
     \item \texttt{src/plugins/e-acsl/headers/closed-source/*}
     \item \texttt{src/plugins/e-acsl/headers/open-source/*}
   \end{itemize}

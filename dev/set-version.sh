@@ -87,6 +87,9 @@ else
   echo "$NEXT" >VERSION
   echo "$NEXT_CODENAME" >VERSION_CODENAME
 
+  # Ivette
+  $SED -i "s/^  \"version\": .*/  \"version\": \"$CURRENT_MAJOR.$CURRENT_MINOR.0\",/g" ivette/package.json
+
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
   $SED -i "s/\(.*\)$CURRENT_MAJOR.$CURRENT_MINOR-$CURRENT_CODENAME\(.*\)/\1$NEXT_MAJOR.$NEXT_MINOR-$NEXT_CODENAME\2/g" opam
@@ -124,6 +127,8 @@ else
     doc/aorai/main.tex
   $SED -i "s/\(^\\\\section\*{E-ACSL \\\\eacslpluginversion \\\\eacslplugincodename}\)/%\1\n\n\\\\section\*{E-ACSL $NEXT_MAJOR.$NEXT_MINOR $NEXT_CODENAME}/g" \
     src/plugins/e-acsl/doc/userman/changes.tex
+  $SED -i "s/\(^\\\\subsection\*{Version Frama-C+dev}\)/%\1\n\n\\\\subsection\*{Version $NEXT_CODENAME-$NEXT_MAJOR}/g" \
+    src/plugins/e-acsl/doc/refman/changes_modern.tex
 
   # Reference configuration
   $SED -i "s/Frama-C [1-9][0-9]\.[0-9]/Frama-C $NEXT_MAJOR.$NEXT_MINOR/gI" \

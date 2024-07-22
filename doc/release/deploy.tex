@@ -32,6 +32,13 @@ following:
   on \texttt{pub} (it must be started manually and requires the branch).
 \end{description}
 
+After running \texttt{release-branch} and \texttt{release-create}, either the
+tag indicates a beta release and then this tag is pushed on the public GitLab
+repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
+release and the release should be available in
+\url{https://git.frama-c.com/pub/frama-c/-/releases}, as well as the tag of the
+version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
+
 \section{Check the website}
 
 Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}.
@@ -48,41 +55,41 @@ Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}
     \item check manual links (reminder: the links are dead at this moment), it must contain \texttt{NN.N-Version}
     \item check ACSL version.
   \end{itemize}
-  \item \texttt{/html/changelog.html\#Codename-NN.N}
+  \item \texttt{/html/changelog.html\#<codename>-<NN.M>}
   \item \texttt{/html/acsl.html}: check ACSL versions list
   \item \texttt{rss.xml}: check last event
 \end{itemize}
 
 For a beta version, the installation pages for:
 \begin{itemize}
-\item \texttt{/html/installations/beta\_codename.html} should indicate the beta status
-\item \texttt{/html/installations/current\_codename.html} should not indicate anything
-\item \texttt{/html/installations/previous\_codename.html} should indicate older version
+\item \texttt{/html/installations/<beta\_codename>.html} should indicate the beta status
+\item \texttt{/html/installations/<current\_codename>.html} should not indicate anything
+\item \texttt{/html/installations/<previous\_codename>.html} should indicate older version
 \end{itemize}
 
 For a final version, the installation pages for:
 \begin{itemize}
-\item \texttt{/html/installations/codename.html} should not indicate anything
-\item \texttt{/html/installations/previous\_codename.html} should indicate older version
+\item \texttt{/html/installations/<codename>.html} should not indicate anything
+\item \texttt{/html/installations/<previous\_codename>.html} should indicate older version
 \end{itemize}
 
 On GitLab, in the website repository, in the merge request assigned to you, the
 following files must appear as \textbf{new} in \texttt{download}:
 \begin{itemize}
-  \item \texttt{acsl-X.XX.pdf}
-  \item \texttt{acsl-implementation-NN.N-CODENAME.pdf}
-  \item \texttt{plugin-development-guide-NN.N-CODENAME.pdf}
-  \item \texttt{user-manual-NN.N-CODENAME.pdf}
-  \item \texttt{<plugin>-manual-NN.N-CODENAME.pdf}\\
+  \item \texttt{acsl-<X.YY>.pdf}
+  \item \texttt{acsl-implementation-<NN.M>-<Codename>.pdf}
+  \item \texttt{plugin-development-guide-<NN.M>-<Codename>.pdf}
+  \item \texttt{user-manual-<NN.M>-<Codename>.pdf}
+  \item \texttt{<plugin>-manual-<NN.M>-<Codename>.pdf}\\
         for Aorai, EVA, Metrics, RTE and WP
-  \item \texttt{e-acsl/e-acsl-X.XX.pdf}
-  \item \texttt{e-acsl/e-acsl-implementation-NN.N-CODENAME.pdf}
-  \item \texttt{e-acsl/e-acsl-manual-NN.N-CODENAME.pdf}
-  \item \texttt{aorai-example-NN.N-CODENAME.tar.gz}
-  \item \texttt{frama-c-NN.N-CODENAME.tar.gz}
-  \item \texttt{frama-c-NN.N-CODENAME-api.tar.gz}
-  \item \texttt{frama-c-server-NN.N-CODENAME-api.tar.gz}
-  \item \texttt{hello-NN.N-CODENAME.tar.gz}
+  \item \texttt{e-acsl/e-acsl-<X.YY>.pdf}
+  \item \texttt{e-acsl/e-acsl-implementation-<NN.M>-<Codename>.pdf}
+  \item \texttt{e-acsl/e-acsl-manual-<NN.M>-<Codename>.pdf}
+  \item \texttt{aorai-example-<NN.M>-<Codename>.tar.gz}
+  \item \texttt{frama-c-<NN.M>-<Codename>.tar.gz}
+  \item \texttt{frama-c-<NN.M>-<Codename>-api.tar.gz}
+  \item \texttt{frama-c-server-<NN.M>-<Codename>-api.tar.gz}
+  \item \texttt{hello-<NN.M>-<Codename>.tar.gz}
 \end{itemize}
 
 For a final release \textbf{ONLY}, the following files must appear as \textbf{modified} in \texttt{download}:
@@ -101,7 +108,7 @@ For a final release \textbf{ONLY}, the following files must appear as \textbf{mo
   \item \texttt{e-acsl/e-acsl-implementation.pdf}
   \item \texttt{e-acsl/e-acsl-manual.pdf}
   \item \texttt{frama-c-aorai-example.tar.gz}
-  \item \texttt{hello.tar.gz}
+  \item \texttt{frama-c-hello.tar.gz}
 \end{itemize}
 
 If everything is fine, merge the website and ask a website maintainer to put it
@@ -113,16 +120,6 @@ Open the generated wiki page (visible in the public website activity). Check the
 links (files are available only once the website has been put online). If
 everything is fine, edit the main wiki page and the sidebar with a link to the
 page (\url{https://git.frama-c.com/pub/frama-c/-/wikis/home}).
-
-In the release pipeline, run the job \texttt{release - release-branch}. It will
-push the stable branch on the public repository.
-
-Then, run the job \texttt{release - release-create}. After this, either the
-tag indicates a beta release and then this tag is pushed on the public GitLab
-repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
-release and the release should be available in
-\url{https://git.frama-c.com/pub/frama-c/-/releases}, as well as the tag of the
-version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
 
 \section{Announcements}
 
@@ -154,6 +151,8 @@ Check if other \FramaC (and related) repositories need to be updated:
 \end{itemize}
 
 \section{Docker image preparation}
+
+This section only applies to non-beta releases.
 
 \textbf{Note:} you need access to the \texttt{framac} Docker Hub account to be
 able to upload the image.

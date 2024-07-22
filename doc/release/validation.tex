@@ -28,21 +28,21 @@ If you don't know them, ask plug-in developers to verify them.
 \end{itemize}
 
 \section{Fix version}
+\label{sec:validation:version}
 
 The tasks listed in this section are performed by the Release Manager.
 
 \subsection{Versions in documentation files}
 
-Change version and codename in the following files:
+For final release only, remove \texttt{\textasciitilde{}beta} and
+\texttt{-beta} mentions in the following files :
 \begin{itemize}
-  \item \texttt{ALL\_VERSIONS} (non-beta only)
-  \item \texttt{VERSION} (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
+  \item \texttt{VERSION}
   \item \texttt{opam}
-  \begin{itemize}
-     \item change version (for beta releases, add suffix \texttt{\textasciitilde{}beta}, not \texttt{-beta})
-     \item change doc link: \texttt{…/download/user-manual-<version>-<codename>.pdf}
-           (with \texttt{-beta} in version for beta releases, not \texttt{\textasciitilde{}beta})
-  \end{itemize}
+    \begin{itemize}
+      \item in version field
+      \item in the doc link
+    \end{itemize}
 \end{itemize}
 
 \subsection{Versions in source: API documentation}
@@ -99,7 +99,9 @@ git ls-files -z | \
 parallel -0 -n1 git blame --line-porcelain | \
 sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
 \end{verbatim}
-(source for the command: \url{https://gist.github.com/amitchhajer/4461043})
+
+\textbf{Note:} This requires to install the package \texttt{parallel}. Source
+for the command: \url{https://gist.github.com/amitchhajer/4461043}.
 
 \subsection{Commit}
 
@@ -110,7 +112,7 @@ Commit any change that you have done during these checks \textbf{and push}.
 In the last continuous integration pipeline of the release branch, force the
 run of the following targets:
 \begin{itemize}
-  \item manuals
+  \item manuals-artifacts
   \item opam-pin
   \item opam-pin-minimal
 \end{itemize}
@@ -121,7 +123,7 @@ They shall succeed. Collect the artifacts of the following targets:
   \item manuals
 \end{itemize}
 
-Check that these artifacts are as expected. In particular:
+\noindent Check that these artifacts are as expected. In particular:
 \begin{itemize}
   \item API documentatation:
     \begin{itemize}
@@ -132,7 +134,9 @@ Check that these artifacts are as expected. In particular:
   \item Check versions in manuals
   \item Tarball
     \begin{itemize}
-      \item Check that no non-free components are distributed
+      \item Check that no non-free components are distributed (note: unless
+      someone inadvertently added non-free code, \FramaC does not contain any,
+      this check is obsolete).
       \item Check that no \texttt{/home/user} path can be found in the distribution,
       \item Build and test
         \begin{itemize}
@@ -147,7 +151,7 @@ Check that these artifacts are as expected. In particular:
     \end{itemize}
 \end{itemize}
 
-Alternatively, you can use \texttt{docker} to compile the archive against a
+\noindent Alternatively, you can use \texttt{docker} to compile the archive against a
 precise configuration:
 \begin{itemize}
   \item \verb+cp distributed/frama-c-<VERSION>.tar.gz developer_tools/docker+
@@ -156,10 +160,19 @@ precise configuration:
   \item \verb+docker build . -t framac/frama-c:dev --target frama-c-gui-slim \+\\
         \verb+  -f Dockerfile.dev --build-arg=from_archive=frama-c-<VERSION>.tar.gz+
 \end{itemize}
-For the GUI: in order to be able to launch
-\verb+x11docker framac/frama-c:dev frama-c-gui+,
+For the GUI: in order to be able to launch \verb+x11docker framac/frama-c:dev frama-c-gui+,
 you might want to install the
 \href{https://github.com/mviereck/x11docker}{\texttt{x11docker}} script.
+
+\noindent \FramaC's GUI can be tested with :
+\begin{itemize}
+  \item \texttt{bin/frama-c-gui} for the old GUI.
+  \item \texttt{bin/ivette} for the new GUI.
+\end{itemize}
+\Eva can be tested with \texttt{<gui> -eva tests/idtc/*.c} and \Wp with
+\texttt{<gui> -wp -wp-rte src/plugins/wp/tests/wp\_gallery/find.i}. Try to
+navigate in the code, check some values with \Eva, check that \Wp prove some
+annotations, this should be enough.
 
 \section{Validate release}
 
@@ -182,8 +195,12 @@ expected format is:
   # ...
 \end{lstlisting}
 
-It should only list main changes, that will be displayed on the event section
-of the website and the wiki page.
+It should only list main changes, that will be displayed on the event section of
+the website and the wiki page.
+
+\textbf{Note:} Make sure to use markdown code formating \verb+``+ if the texte
+contains things that could be affected by markdown formatting (for example
+\verb+\word1_word2+ will be displayed as \verb+word2+ without code formatting.
 
 Create the version commit, tag it using \texttt{git tag \$(cat VERSION | sed -e "s/\textasciitilde /-/")}
 and push it (e.g. via \texttt{git push origin \$(cat VERSION | sed -e "s/\textasciitilde/-/")}).
