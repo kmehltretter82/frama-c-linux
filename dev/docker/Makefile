@@ -88,6 +88,10 @@ custom.% custom-gui.% custom-stripped.%:
 	exit 1
 else
 BUILD_ARGS += --build-arg=from_archive=$(FRAMAC_ARCHIVE)
+custom-fast.%: $(DEPS)
+	cp ../../reference-configuration.md .
+	$(DOCKER) build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c
+
 custom.%: $(DEPS)
 	cp ../../reference-configuration.md .
 	$(DOCKER) build . -t frama-c-$@ $(BUILD_ARGS) --target frama-c-slim
