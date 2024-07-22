@@ -29,7 +29,7 @@ type prefix
 module type Id_Datatype = sig
   include Datatype.S
   val id: t -> int (** Identity of a key. Must verify [id k >= 0] and
-                       [equal k1 k2 ==> id k1 = id k2] *)
+                       [equal k1 k2 <==> id k1 = id k2] *)
 end
 
 (** This functor builds {!Hptmap_sig.Shape} for maps indexed by keys [Key],
@@ -46,7 +46,7 @@ module type Info = sig
 
   val initial_values : (key * v) list list
   (** List of the maps that must be shared between all instances of Frama-C
-      (the maps being described by the list of their elements).
+      (the maps being described by the list of their bindings).
       Must include all maps that are exported at Caml link-time when the
       functor is applied. *)
 
