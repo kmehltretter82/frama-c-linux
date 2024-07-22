@@ -39,6 +39,7 @@ module Version : sig
   (** Frama-C minor version number. *)
 end
 
+(** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Share : sig
   val dirs: Filepath.Normalized.t list
   (** Directories where architecture independent files are in order of
@@ -55,6 +56,7 @@ module Share : sig
   (** Directory where Frama-C libc headers are. *)
 end
 
+(** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Lib : sig
   val dirs: Filepath.Normalized.t list
   (** Directories where library and executable files are, in order of
@@ -67,6 +69,7 @@ module Lib : sig
   (** Last directory of libdirs (the directory of frama-c installation) *)
 end
 
+(** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Plugins : sig
   val dirs: Filepath.Normalized.t list
   (** Directories where the Frama-C dynamic plug-ins are. *)
@@ -81,6 +84,7 @@ module Plugins : sig
   (** Load all plug-ins, do not load GUI plug-in when not in GTK GUI mode *)
 end
 
+(** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Preprocessor : sig
   val command: string
   (** Name of the default command to call the preprocessor.
@@ -112,7 +116,8 @@ module Preprocessor : sig
   *)
 end
 
-(** Default user directories *)
+(** Default user directories
+    Unless you are working in the kernel of Frama-C, you should not use this. *)
 module User_dirs : sig
   val cache: unit -> Filepath.Normalized.t
   (** Where Frama-C should read/write cached files. *)
