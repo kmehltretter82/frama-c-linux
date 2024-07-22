@@ -33,6 +33,8 @@ val reset: unit -> unit
     called during the analysis. *)
 val display: Format.formatter -> unit
 
+[@@@ api_start]
+(** Statistics about the analysis performance. *)
 
 (** Statistic about the analysis time of a function or a callstack. *)
 type stat = {
@@ -73,3 +75,5 @@ module StatByCallstack : sig
   (** Set a hook on statistics changes by the project library *)
   val add_hook_on_update: (Datatype.t -> unit) -> unit
 end
+
+[@@@ api_end]
