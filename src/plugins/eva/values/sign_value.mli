@@ -29,4 +29,3 @@ type signs = {
 }
 
 include Abstract_value.Leaf with type t = signs and type context = unit
-val pretty_debug: t Pretty_utils.formatter

@@ -40,9 +40,6 @@ module type Value = sig
       mapped to [V.top]. *)
   val track_variable: Cil_types.varinfo -> bool
 
-  (** Can be equal to {!pretty} *)
-  val pretty_debug: t Pretty_utils.formatter
-
   (** A list of builtins for the domain: each builtin is associated with the
       name of the C function it interprets. *)
   val builtins: (string * t builtin) list

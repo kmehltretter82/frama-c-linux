@@ -39,12 +39,6 @@ module Shape (Key : Id_Datatype): sig
   type 'a t = 'a map
 end
 
-(** Values stored in the map *)
-module type V = sig
-  include Datatype.S
-  val pretty_debug: t Pretty_utils.formatter
-end
-
 (** Required information for the correctness of the hptmaps. *)
 module type Info = sig
   type key
@@ -65,7 +59,7 @@ end
     to values [V]. *)
 module Make
     (Key : Id_Datatype)
-    (V : V)
+    (V : Datatype.S)
     (_ : Info with type key := Key.t
                and type v := V.t)
   : Hptmap_sig.S with type key = Key.t
@@ -94,7 +88,7 @@ end
     each tree. *)
 module Make_with_compositional_bool
     (Key : Id_Datatype)
-    (V : V)
+    (V : Datatype.S)
     (_ : Compositional_bool with type key := Key.t
                              and type v := V.t)
     (_ : Info with type key := Key.t

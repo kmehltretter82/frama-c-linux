@@ -588,7 +588,6 @@ end
 
 module Diamond = struct
   include Datatype.Make (DiamondDatatype)
-  let pretty_debug = pretty
 
   let top = { add = Ival.top; sub = Ival.top }
 
@@ -736,9 +735,7 @@ end
 (* Keep track of related variables in an octagon state. *)
 module Relations = struct
 
-  include Hptmap.Make (Variable)
-      (struct include VarSet let pretty_debug = pretty end)
-      (Hptmap_Info)
+  include Hptmap.Make (Variable) (VarSet) (Hptmap_Info)
 
   let inter =
     let cache = Hptmap_sig.PersistentCache "Octagons.Relations.inter" in
@@ -895,7 +892,6 @@ module BaseToVariables = struct
     include Datatype.Pair
         (VSet) (* Directly dependent variables *)
         (VSet) (* Indirectly dependent variables *)
-    let pretty_debug = pretty
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
     let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
     let is_empty (s, t) = VSet.is_empty s && VSet.is_empty t

@@ -130,11 +130,6 @@ module type Id_Datatype = sig
   val id: t -> int
 end
 
-module type V = sig
-  include Datatype.S
-  val pretty_debug: t Pretty_utils.formatter
-end
-
 module Shape(Key: Id_Datatype) = struct
   type key = Key.t
   type 'b map = (Key.t, 'b) tree
@@ -599,7 +594,7 @@ end
 
 module Make_with_compositional_bool
     (Key: Id_Datatype)
-    (V : V)
+    (V : Datatype.S)
     (Compositional_bool : Compositional_bool with type key := Key.t
                                               and type v := V.t)
     (Info: Info with type key := Key.t
@@ -621,7 +616,7 @@ struct
         "L@[<v>@[(A %x, T %a)@]@ @[(AK %x)%a@]@ @[ -> (AV %x)@]@ @[%a@]@]"
         (Extlib.address_of_value t) Tag_comp.pretty comp
         (Extlib.address_of_value k) Key.pretty k
-        (Extlib.address_of_value v) V.pretty_debug v
+        (Extlib.address_of_value v) V.pretty v
     | Branch (prefix, mask, t1, t2, tag) as t ->
       Format.fprintf fmt
         "B@[<v>@[(A %x, T %a, P %x, M %x)@]@ @[%a@]@ @[ %a@]@]"
@@ -1437,8 +1432,11 @@ module Comp_unused = struct
   let compose _ _ = false
 end
 
-module Make (Key: Id_Datatype) (V : V) (Info: Info with type key := Key.t
-                                                    and type v := V.t)
+module Make
+    (Key: Id_Datatype)
+    (V : Datatype.S)
+    (Info: Info with type key := Key.t
+                 and type v := V.t)
   = Make_with_compositional_bool (Key) (V) (Comp_unused) (Info)
 
 (*

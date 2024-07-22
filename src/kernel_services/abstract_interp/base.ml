@@ -452,7 +452,6 @@ module Base = struct
         let copy = Datatype.undefined
       end)
   let id = id
-  let pretty_debug = pretty
 end
 
 include Base

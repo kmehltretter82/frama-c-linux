@@ -45,8 +45,6 @@ let pretty_precise fmt {data; indirect} =
       Zone.pretty indirect
       Zone.pretty data
 
-let pretty_debug = pretty_precise
-
 (* Conversion to zone, used by default pretty printing *)
 let to_zone d = Locations.Zone.join d.data d.indirect
 

@@ -34,7 +34,7 @@ struct
   module HV = Hashtbl.Make(Stmt)
   module HptmapStmtBool = Hptmap.Make
       (Cil_datatype.Stmt_Id)
-      (struct include Datatype.Bool let pretty_debug = pretty end)
+      (Datatype.Bool)
       (struct
         let initial_values = []
         let dependencies = [ Ast.self ]

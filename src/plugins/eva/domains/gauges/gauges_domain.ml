@@ -65,7 +65,6 @@ module G = struct
           | Some i -> Abstract_interp.Int.pretty fmt i
         in
         Format.fprintf fmt "[%a .. %a]" (pp_bound '-') min (pp_bound '+') max
-    let pretty_debug = pretty
 
     let inject_range n1 n2 : t =
       Some (Integer.of_int (min n1 n2)), Some (Integer.of_int (max n1 n2))

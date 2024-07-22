@@ -78,8 +78,6 @@ type call = Call.t
 
 include Datatype.Make_with_collections (Prototype)
 
-let pretty_debug = pretty
-
 let compare_lex cs1 cs2 =
   if cs1 == cs2 then 0 else
     let c = Thread.compare cs1.thread cs2.thread in

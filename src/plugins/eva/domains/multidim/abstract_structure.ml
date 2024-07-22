@@ -75,7 +75,6 @@ struct
         let name = "Abstract_Memory.Structure.Values"
         let reprs = [ of_raw Bit.zero ]
       end)
-    let pretty_debug = pretty
   end
 
 

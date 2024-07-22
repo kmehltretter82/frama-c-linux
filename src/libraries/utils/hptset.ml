@@ -110,17 +110,12 @@ module Make
 
   type elt = X.t
 
-  module Unit = struct
-    include Datatype.Unit
-    let pretty_debug = pretty
-  end
-
   module Hptmap_Info = struct
     let initial_values = List.map (List.map (fun k -> k, ())) Info.initial_values
     let dependencies = Info.dependencies
   end
 
-  module M = Hptmap.Make (X) (Unit) (Hptmap_Info)
+  module M = Hptmap.Make (X) (Datatype.Unit) (Hptmap_Info)
   include M
 
   let add k s = add k () s

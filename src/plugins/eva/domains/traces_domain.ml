@@ -223,7 +223,6 @@ module EdgeList = struct
   include Datatype.List_with_collections(Edge)
       (struct let module_name = "Value.Traces_domain.EdgeList" end)
   let pretty = Edge.pretty_list
-  let pretty_debug = pretty
 end
 
 module Graph = struct

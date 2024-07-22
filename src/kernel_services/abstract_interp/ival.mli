@@ -330,8 +330,6 @@ val complement_int_under: size:int -> signed:bool -> t -> t Lattice_bounds.or_bo
 (** Returns an under-approximation of the integers of the given size and
     signedness that are *not* represented by the given ival. *)
 
-val pretty_debug : Format.formatter -> t -> unit
-
 (**/**)
 
 val rehash: t -> t (* Low-level operation for demarshalling *)

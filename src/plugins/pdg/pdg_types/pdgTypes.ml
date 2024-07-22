@@ -224,13 +224,10 @@ module DpdZone : sig
   val dpd_zone : t -> Locations.Zone.t option
 
   val pretty : Format.formatter -> t -> unit
-  val pretty_debug: Format.formatter -> t -> unit
 end = struct
 
   include Datatype.Pair(Dpd)(Datatype.Option(Locations.Zone))
   (* None == Locations.Zone.Top *)
-
-  let pretty_debug = pretty
 
   let dpd_kind dpd = fst dpd
   let dpd_zone dpd = snd dpd

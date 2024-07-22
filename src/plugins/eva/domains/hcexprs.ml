@@ -96,8 +96,6 @@ module HCE = struct
 
   include S
 
-  let pretty_debug = pretty
-
   let of_lval lv = hashcons (LV lv)
 
   let of_exp (exp : Eva_ast.exp) =

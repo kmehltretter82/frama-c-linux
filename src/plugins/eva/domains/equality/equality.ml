@@ -75,7 +75,6 @@ module Set = struct
        the value of [lv], and the second set gathers the expressions that
        contains [&lv]. *)
     include Datatype.Triple (Equality) (HCESet) (HCESet)
-    let pretty_debug = pretty
 
     let inter (left_eq, left_set, left_set') (right_eq, right_set, right_set') =
       let equality = Equality.inter left_eq right_eq

@@ -1024,7 +1024,6 @@ let bitwise_not ~size ~signed v =
   else
     bitwise_unsigned_not ~size v
 
-let pretty_debug = pretty
 let name = "ival"
 
 (*
