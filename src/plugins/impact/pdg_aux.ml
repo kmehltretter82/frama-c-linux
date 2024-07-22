@@ -32,11 +32,7 @@ module Hptmap_Info = struct
 end
 
 module NS = struct
-  include Hptmap.Make
-      (PdgTypes.Node)
-      (Locations.Zone)
-      (Hptmap.Comp_unused)
-      (Hptmap_Info)
+  include Hptmap.Make (PdgTypes.Node) (Locations.Zone) (Hptmap_Info)
 
   let intersects =
     let name = "Impact.Pdg_aux.NS.intersects" in

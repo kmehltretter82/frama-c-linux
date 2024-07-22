@@ -49,7 +49,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
     let dependencies = [ Ast.self ]
   end
 
-  include Hptmap.Make (Base.Base) (Value) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Base.Base) (Value) (Hptmap_Info)
 
   let name = Info.name
 

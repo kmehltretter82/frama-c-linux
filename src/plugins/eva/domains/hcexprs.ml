@@ -162,7 +162,7 @@ module HCEToZone = struct
 
   let cache_prefix = "Value.Symbolic_exprs.K2Z"
 
-  include Hptmap.Make (HCE) (Locations.Zone) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (HCE) (Locations.Zone) (Hptmap_Info)
 
   let is_included =
     let cache_name = cache_prefix ^ ".is_included" in
@@ -202,7 +202,7 @@ end
 
 module BaseToHCESet = struct
 
-  include Hptmap.Make (Base.Base) (HCESet) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Base.Base) (HCESet) (Hptmap_Info)
 
   let cache_prefix = "Value.Symbolic_exprs.B2K"
 

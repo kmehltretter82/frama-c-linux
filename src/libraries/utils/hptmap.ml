@@ -93,13 +93,6 @@ struct
 end
 type tag = Tag_comp.t
 
-module Comp_unused =
-struct
-  let e = false
-  let f _ _ = false
-  let compose _ _ = false
-end
-
 (* A tree is either empty, or a leaf node, containing both
    the integer key and a piece of data, or a binary node.
    Each binary node carries two integers. The first one is
@@ -592,8 +585,8 @@ module type Compositional_bool = sig
   type key
   type v
 
-  val e : bool
-  val f : key -> v -> bool
+  val empty : bool
+  val leaf : key -> v -> bool
   val compose : bool -> bool -> bool
 end
 
@@ -604,7 +597,7 @@ module type Info = sig
   val dependencies : State.t list
 end
 
-module Make
+module Make_with_compositional_bool
     (Key: Id_Datatype)
     (V : V)
     (Compositional_bool : Compositional_bool with type key := Key.t
@@ -649,7 +642,7 @@ struct
 
   let compositional_bool t =
     match t with
-    | Empty -> Compositional_bool.e
+    | Empty -> Compositional_bool.empty
     | Leaf (_,_,tc)
     | Branch (_,_,_,_,tc) -> Tag_comp.get_comp tc
 
@@ -659,7 +652,7 @@ struct
 
   let initial_values =
     let tc k v =
-      let b = Compositional_bool.f k v in
+      let b = Compositional_bool.leaf k v in
       let tag = !current_tag in
       incr current_tag;
       Tag_comp.encode tag b
@@ -754,7 +747,7 @@ struct
     (* The test k < p+m and the implementation of [highest_bit] do not work
        with negative keys. *)
     assert (Key.id k >= 0);
-    let b = Compositional_bool.f k v in
+    let b = Compositional_bool.leaf k v in
     let tag = !current_tag in
     let new_tr = Leaf (k, v, Tag_comp.encode tag b) in
     let result = PatriciaHashconsTbl.merge new_tr in
@@ -1438,6 +1431,15 @@ struct
   let equal_subtree = equal
 end
 
+module Comp_unused = struct
+  let empty = false
+  let leaf _ _ = false
+  let compose _ _ = false
+end
+
+module Make (Key: Id_Datatype) (V : V) (Info: Info with type key := Key.t
+                                                    and type v := V.t)
+  = Make_with_compositional_bool (Key) (V) (Comp_unused) (Info)
 
 (*
 Local Variables:

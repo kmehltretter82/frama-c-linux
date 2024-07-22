@@ -46,9 +46,9 @@ end
    are included in it. Said otherwise, we do not consider the cardinality
    of the concretization, but instead the one of the Ocaml datastructure. *)
 module Comp_exact = struct
-  let e = true (* corresponds to bottom *)
+  let empty = true (* corresponds to bottom *)
 
-  let f _b v = Ival.cardinal_zero_or_one v
+  let leaf _b v = Ival.cardinal_zero_or_one v
   (* on Ival, both forms of cardinal coincide *)
 
   let compose _ _ = false
@@ -60,7 +60,8 @@ end
 module Location_Bytes = struct
 
   module M = struct
-    include Hptmap.Make (Base.Base) (Ival) (Comp_exact) (Hptmap_Info)
+    include Hptmap.Make_with_compositional_bool
+        (Base.Base) (Ival) (Comp_exact) (Hptmap_Info)
     let shape x = x
   end
   let () = Ast.add_monotonic_state M.self
@@ -376,7 +377,7 @@ module Zone = struct
     let dependencies = [ Ast.self ]
   end
 
-  module M = Hptmap.Make (Base.Base) (Int_Intervals) (Hptmap.Comp_unused) (Info)
+  module M = Hptmap.Make (Base.Base) (Int_Intervals) (Info)
   let () = Ast.add_monotonic_state M.self
   let clear_caches = M.clear_caches
 

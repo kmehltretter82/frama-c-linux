@@ -37,7 +37,7 @@ module K2V = struct
     let initial_values = []
     let dependencies = [ Ast.self ]
   end
-  module M = Hptmap.Make (K.HCE) (V) (Hptmap.Comp_unused) (Hptmap_Info)
+  module M = Hptmap.Make (K.HCE) (V) (Hptmap_Info)
 
   include M
 

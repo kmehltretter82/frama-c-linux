@@ -617,7 +617,7 @@ end
 (* Maps linking pairs of variables (X, Y) to intervals for X+Y and X-Y. *)
 module Octagons = struct
 
-  include Hptmap.Make (Pair) (Diamond) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Pair) (Diamond) (Hptmap_Info)
 
   let internal_join = join
 
@@ -738,7 +738,7 @@ module Relations = struct
 
   include Hptmap.Make (Variable)
       (struct include VarSet let pretty_debug = pretty end)
-      (Hptmap.Comp_unused) (Hptmap_Info)
+      (Hptmap_Info)
 
   let inter =
     let cache = Hptmap_sig.PersistentCache "Octagons.Relations.inter" in
@@ -779,7 +779,7 @@ end
 
 module Intervals = struct
 
-  include Hptmap.Make (Variable) (Ival) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Variable) (Ival) (Hptmap_Info)
 
   let internal_join = join
 
@@ -832,7 +832,7 @@ module VariableToDeps =
 struct
   let cache_prefix = "Eva.Octagons.VariableToDeps"
 
-  include Hptmap.Make (Variable) (Deps) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Variable) (Deps) (Hptmap_Info)
 
   let is_included: t -> t -> bool =
     let cache_name = cache_prefix ^ ".is_included" in
@@ -901,7 +901,7 @@ module BaseToVariables = struct
     let is_empty (s, t) = VSet.is_empty s && VSet.is_empty t
   end
 
-  include Hptmap.Make (Base.Base) (VSetPair) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Base.Base) (VSetPair) (Hptmap_Info)
 
   let cache_prefix = "Eva.Octagons.BaseToVariables"
 

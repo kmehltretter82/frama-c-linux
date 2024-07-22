@@ -281,7 +281,7 @@ module G = struct
     let dependencies = [ Ast.self ]
   end
 
-  module To = Hptmap.Make (Node) (DpdZone) (Hptmap.Comp_unused) (Hptmap_Info)
+  module To = Hptmap.Make (Node) (DpdZone) (Hptmap_Info)
   let () = Ast.add_hook_on_update (fun _ -> To.clear_caches ())
   (* See comment on previous call to Ast.add_hook_on_update *)
 

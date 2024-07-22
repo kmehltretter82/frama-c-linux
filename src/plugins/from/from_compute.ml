@@ -148,7 +148,7 @@ module ZoneStmtMap = struct
     let dependencies = [ Ast.self ]
   end
 
-  include Hptmap.Make (Stmt_Id) (Zone) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Stmt_Id) (Zone) (Hptmap_Info)
 
   let join =
     let decide _k z1 z2 = Zone.join z1 z2 in

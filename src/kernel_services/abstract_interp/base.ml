@@ -555,7 +555,7 @@ let of_string_exp e =
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
 module BMap =
-  Hptmap.Make (Base) (Base) (Hptmap.Comp_unused)
+  Hptmap.Make (Base) (Base)
     (struct
       let initial_values = []
       let dependencies = [ Ast.self ]

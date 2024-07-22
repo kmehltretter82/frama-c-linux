@@ -35,7 +35,6 @@ struct
   module HptmapStmtBool = Hptmap.Make
       (Cil_datatype.Stmt_Id)
       (struct include Datatype.Bool let pretty_debug = pretty end)
-      (Hptmap.Comp_unused)
       (struct
         let initial_values = []
         let dependencies = [ Ast.self ]

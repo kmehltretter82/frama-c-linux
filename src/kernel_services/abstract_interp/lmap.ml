@@ -88,17 +88,18 @@ struct
     end
 
     module Comp = struct
-      let f _base offsetmap = Offsetmap.cardinal_zero_or_one offsetmap
+      let empty = true
+      let leaf _base offsetmap = Offsetmap.cardinal_zero_or_one offsetmap
       let compose a b = a && b
-      let e = true
     end
 
-    module Hptmap_Info = struct
+    module Info = struct
       let initial_values = []
       let dependencies = [ Ast.self ]
     end
 
-    module M = Hptmap.Make (Base.Base) (Offsetmap) (Comp) (Hptmap_Info)
+    module M =
+      Hptmap.Make_with_compositional_bool (Base.Base) (Offsetmap) (Comp) (Info)
     let () = Ast.add_monotonic_state M.self
 
     include M

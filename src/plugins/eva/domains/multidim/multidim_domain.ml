@@ -346,7 +346,7 @@ struct
 
   module BaseMap =
   struct
-    include Hptmap.Make (Base.Base) (V) (Hptmap.Comp_unused) (Hptmap_Info)
+    include Hptmap.Make (Base.Base) (V) (Hptmap_Info)
 
     let find_or_top (state : t) (b : Base.t) =
       try find b state with Not_found -> V.top

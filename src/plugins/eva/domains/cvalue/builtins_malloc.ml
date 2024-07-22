@@ -42,8 +42,7 @@ module Hptmap_Info = struct
   let dependencies = [ Ast.self ]
 end
 
-module Base_hptmap =
-  Hptmap.Make (Base.Base) (Callstack) (Hptmap.Comp_unused) (Hptmap_Info)
+module Base_hptmap = Hptmap.Make (Base.Base) (Callstack) (Hptmap_Info)
 
 module Dynamic_Alloc_Bases =
   State_builder.Ref

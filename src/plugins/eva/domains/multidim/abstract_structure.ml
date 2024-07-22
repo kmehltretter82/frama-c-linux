@@ -83,8 +83,7 @@ struct
     let initial_values = []
     let dependencies = [ Ast.self ]
   end
-  module FieldMap =
-    Hptmap.Make (Field) (Values) (Hptmap.Comp_unused) (Hptmap_Info)
+  module FieldMap = Hptmap.Make (Field) (Values) (Hptmap_Info)
 
   type t = {
     padding: Bit.t;

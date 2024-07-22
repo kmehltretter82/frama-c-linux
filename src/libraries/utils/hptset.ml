@@ -120,7 +120,7 @@ module Make
     let dependencies = Info.dependencies
   end
 
-  module M = Hptmap.Make (X) (Unit) (Hptmap.Comp_unused) (Hptmap_Info)
+  module M = Hptmap.Make (X) (Unit) (Hptmap_Info)
   include M
 
   let add k s = add k () s

@@ -285,7 +285,7 @@ module G = struct
   *)
   module MV = struct
 
-    include Hptmap.Make (Base) (Cvalue.V) (Hptmap.Comp_unused) (Hptmap_Info)
+    include Hptmap.Make (Base) (Cvalue.V) (Hptmap_Info)
 
     (* This function computes a pointwise union on two MVs assumed to have
        disjoint set of keys. *)
@@ -322,7 +322,7 @@ module G = struct
      are not incremented in one inner, but only in outemost one. *)
   module MC = struct
 
-    include Hptmap.Make (Base) (Bounds) (Hptmap.Comp_unused) (Hptmap_Info)
+    include Hptmap.Make (Base) (Bounds) (Hptmap_Info)
 
     (* This function computes a pointwise union on two MCs assumed to have
        disjoint set of keys. *)

@@ -232,7 +232,7 @@ module Graph = struct
     let initial_values = []
     let dependencies = [ Ast.self ]
   end
-  include Hptmap.Make (Node) (EdgeList) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (Node) (EdgeList) (Hptmap_Info)
 
   let is_included =
     let cache = Hptmap_sig.NoCache in

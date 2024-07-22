@@ -145,7 +145,7 @@ struct
       let initial_values = []
       let dependencies = [ Ast.self ]
     end
-    include Hptmap.Make (Base.Base) (LOffset) (Hptmap.Comp_unused) (Hptmap_Info)
+    include Hptmap.Make (Base.Base) (LOffset) (Hptmap_Info)
     let () = Ast.add_monotonic_state self
 
     (* We override [add] so that the map is canonical: no key should be

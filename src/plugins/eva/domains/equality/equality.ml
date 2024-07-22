@@ -98,7 +98,7 @@ module Set = struct
     let initial_values = []
     let dependencies = [ Ast.self ]
   end
-  include Hptmap.Make (HCE) (Data) (Hptmap.Comp_unused) (Hptmap_Info)
+  include Hptmap.Make (HCE) (Data) (Hptmap_Info)
 
   let find_option elt map =
     try
