@@ -42,11 +42,11 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
-  module Share: Parameter_sig.Site_dir
-  module Session: Parameter_sig.User_dir
-  module Cache_dir () : Parameter_sig.User_dir
-  module Config_dir () : Parameter_sig.User_dir
-  module State_dir () : Parameter_sig.User_dir
+  module Share: Parameter_sig.Site_root
+  module Session: Parameter_sig.User_dir_opt
+  module Cache_dir () : Parameter_sig.User_dir_opt
+  module Config_dir () : Parameter_sig.User_dir_opt
+  module State_dir () : Parameter_sig.User_dir_opt
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
   val add_plugin_output_aliases:
@@ -291,7 +291,7 @@ struct
   (** {3 Specific directories} *)
   (* ************************************************************************ *)
 
-  module Share : Parameter_sig.Site_dir = struct
+  module Share : Parameter_sig.Site_root = struct
     let is_visible = !share_visible_ref
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
@@ -320,16 +320,16 @@ struct
 
     let add_plugin path =
       if is_kernel then path
-      else Datatype.Filepath.concat path plugin_subpath
+      else Fc_Filepath.Normalized.concat path plugin_subpath
 
     let dirs () =
       if is_visible && is_set () then [ get () ]
       else List.map add_plugin System_config.Share.dirs
 
     let find ~is_dir relative =
-      let exception Found of Datatype.Filepath.t in
+      let exception Found of Fc_Filepath.Normalized.t in
       let check_presence dir =
-        let path = Datatype.Filepath.concat dir relative in
+        let path = Fc_Filepath.Normalized.concat dir relative in
         if Fc_Filepath.exists path then raise (Found path)
       in
       try
@@ -342,7 +342,7 @@ struct
       with
       | Found path when is_dir <> Fc_Filepath.is_dir path ->
         L.abort "%a is expected to be a %s"
-          Datatype.Filepath.pretty path
+          Fc_Filepath.Normalized.pretty path
           (if is_dir then "directory" else "file")
       | Found path -> path
 
@@ -350,7 +350,7 @@ struct
     let get_file = find ~is_dir:false
   end
 
-  module Make_user_dir
+  module Make_user_dir_root
       (D: sig
          val name : string
          val default_root : unit -> Fc_Filepath.Normalized.t
@@ -403,19 +403,21 @@ struct
       let d' = Fc_Filepath.Normalized.of_string d in
       try
         if Extlib.mkdir ~parents:true d' 0o755 then
-          L.warning "created %s directory `%a'" D.name Fc_Filepath.Normalized.pretty d';
+          L.warning "created %s directory `%a'"
+            D.name Fc_Filepath.Normalized.pretty d';
         d
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'" D.name Fc_Filepath.Normalized.pretty d'
+        L.abort "cannot create %s directory `%a'"
+          D.name Fc_Filepath.Normalized.pretty d'
 
     let get_dir ?(create_path=false) s =
-      let dir = Datatype.Filepath.concat (get ()) s in
+      let dir = Fc_Filepath.Normalized.concat (get ()) s in
       if Fc_Filepath.exists dir then
         begin
           if Fc_Filepath.is_dir dir then dir
           else
             L.abort "%a is expected to be a directory"
-              Datatype.Filepath.pretty dir
+              Fc_Filepath.Normalized.pretty dir
         end
       else
         begin
@@ -427,15 +429,15 @@ struct
       let base_dir = get_dir ?create_path @@ Filename.dirname s in
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
-      let path = Datatype.Filepath.concat base_dir @@ Filename.basename s in
+      let path = Fc_Filepath.Normalized.concat base_dir @@ Filename.basename s in
       if Fc_Filepath.exists path && Fc_Filepath.is_dir path then
         L.abort "%a is expected to be a file, found a directory"
-          Datatype.Filepath.pretty path
+          Fc_Filepath.Normalized.pretty path
       else
         path
   end
 
-  module Session = Make_user_dir
+  module Session = Make_user_dir_root
       (struct
         let name = "session"
         let default_root () = Fc_Filepath.Normalized.of_string "./.frama-c"
@@ -443,7 +445,7 @@ struct
         let is_visible = !session_visible_ref
       end)
 
-  module Cache_dir () = Make_user_dir
+  module Cache_dir () = Make_user_dir_root
       (struct
         let name = "cache"
         let default_root = System_config.User_dirs.cache
@@ -451,7 +453,7 @@ struct
         let is_visible = !Parameter_customize.is_visible_ref
       end)
 
-  module Config_dir () = Make_user_dir
+  module Config_dir () = Make_user_dir_root
       (struct
         let name = "config"
         let default_root = System_config.User_dirs.config
@@ -459,7 +461,7 @@ struct
         let is_visible = !Parameter_customize.is_visible_ref
       end)
 
-  module State_dir () = Make_user_dir
+  module State_dir () = Make_user_dir_root
       (struct
         let name = "state"
         let default_root = System_config.User_dirs.state

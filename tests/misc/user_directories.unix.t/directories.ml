@@ -13,15 +13,55 @@ module OnlyCache = Self.False(struct
   end)
 
 module Cache = Self.Cache_dir ()
+module Sub_cache_no_opt =
+  Self.Make_user_dir
+    (Cache)
+    (struct let name = "noopt" end)
+
+module Sub_cache_opt_no_var =
+  Self.Make_user_dir_opt
+    (Cache)
+    (struct
+      let name = "optnovar"
+      let env = None
+      let help = ""
+    end)
+
+module Sub_cache_opt_var =
+  Self.Make_user_dir_opt
+    (Cache)
+    (struct
+      let name = "optvar"
+      let env = Some "FRAMAC_DIRS_VAR"
+      let help = ""
+    end)
+
 module Config = Self.Config_dir ()
 module State = Self.State_dir ()
 module Session = Self.Session
+
+let never_fail_get f x =
+  try
+    let s = f x in
+    Self.feedback "Found: %a" Filepath.Normalized.pretty s
+  with _ -> ()
 
 let run_all () =
   if OnlyCache.get ()
   then begin
     ignore @@ Cache.get_dir ~create_path:true "created" ;
-    ignore @@ Cache.get_file "created" (* < fails *)
+    ignore @@ Sub_cache_no_opt.get_dir ~create_path:true "." ;
+    ignore @@ Sub_cache_no_opt.get_dir "foo" ;
+    ignore @@ Sub_cache_opt_no_var.get_dir ~create_path:true "." ;
+    ignore @@ Sub_cache_opt_no_var.get_dir "foo" ;
+    ignore @@ Sub_cache_opt_var.get_dir ~create_path:true "." ;
+    ignore @@ Sub_cache_opt_var.get_dir "foo" ;
+
+    ignore @@ Sub_cache_no_opt.get_file "file" ;
+    ignore @@ Sub_cache_opt_var.get_file "file" ;
+
+    never_fail_get Cache.get_file "created" ;
+    never_fail_get Sub_cache_opt_var.get_file "."
   end
   else
     try
@@ -31,8 +71,6 @@ let run_all () =
       ignore @@ Session.get_dir ~create_path:true "created" ;
       ignore @@ Session.get_file ~create_path:true "created_filepath/file" ;
 
-
-      (* Here: ~mode:`Normalize_only *)
       let cache_dir = Cache.get_dir "not_created" in
       let config_dir = Config.get_dir "not_created" in
       let state_dir = State.get_dir "not_created" in

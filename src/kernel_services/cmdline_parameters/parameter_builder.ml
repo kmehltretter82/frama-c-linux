@@ -538,6 +538,114 @@ struct
   end
 
   (* ************************************************************************ *)
+  (** {3 Make_*_dir} *)
+  (* ************************************************************************ *)
+
+  (** Builds a Site_dir from an existing one. The corresponding directory always
+      performs a full path resolution.
+
+      @since Frama-C+dev
+  *)
+  module Make_site_dir
+      (Parent: Parameter_sig.Site_dir)
+      (Info: sig val name: string end)
+    : Parameter_sig.Site_dir
+  =
+  struct
+    (* Note: it recursively rebuilds the path relative to the root directory,
+       until we reach the root and resolve the path. *)
+    let get_dir name = Parent.get_dir (Info.name ^ "/" ^ name)
+    let get_file name = Parent.get_file (Info.name ^ "/" ^ name)
+  end
+
+  (** Builds a User_dir from an existing one.
+
+      @since Frama-C+dev
+  *)
+  module Make_user_dir
+      (Parent: Parameter_sig.User_dir)
+      (Info: sig val name: string end)
+    : Parameter_sig.User_dir
+  =
+  struct
+    let get_dir ?create_path name =
+      Parent.get_dir ?create_path (Info.name ^ "/" ^ name)
+    let get_file ?create_path name =
+      Parent.get_file ?create_path (Info.name ^ "/" ^ name)
+  end
+
+  module Make_user_dir_opt
+      (Parent: Parameter_sig.User_dir)
+      (Info: sig
+         val name: string
+         val env: string option
+         val help: string
+       end): Parameter_sig.User_dir_opt
+  =
+  struct
+    let is_kernel = P.shortname = ""
+    let prefix = "-" ^ (if is_kernel then "" else P.shortname ^ "-")
+
+    module Dir_name =
+      Filepath
+        (struct
+          let option_name = prefix ^ Info.name
+          let arg_name = "dir"
+          let help = Info.help
+          let existence = Fc_Filepath.Indifferent
+          let file_kind = ""
+        end)
+
+    let get () =
+      if Dir_name.is_set () then Dir_name.get ()
+      else
+        match Option.bind Info.env Sys.getenv_opt with
+        | Some s when s <> "" -> Fc_Filepath.Normalized.of_string s
+        | _ -> Parent.get_dir Info.name
+
+    let set = Dir_name.set
+    let is_set = Dir_name.is_set
+
+    let mk_dir d =
+      let d' = Fc_Filepath.Normalized.of_string d in
+      try
+        if Extlib.mkdir ~parents:true d' 0o755 then
+          P.L.warning "created %s directory `%a'"
+            Info.name Fc_Filepath.Normalized.pretty d';
+        d
+      with Unix.Unix_error _ ->
+        P.L.abort "cannot create %s directory `%a'"
+          Info.name Fc_Filepath.Normalized.pretty d'
+
+    let get_dir ?(create_path=false) name =
+      let dir = Datatype.Filepath.concat (get ()) name in
+      if Fc_Filepath.exists dir then
+        begin
+          if Fc_Filepath.is_dir dir then dir
+          else
+            P.L.abort "%a is expected to be a directory"
+              Datatype.Filepath.pretty dir
+        end
+      else
+        begin
+          if create_path then ((ignore (mk_dir (dir :> string))) ; dir)
+          else dir
+        end
+
+    let get_file ?create_path s =
+      let base_dir = get_dir ?create_path @@ Filename.dirname s in
+      (* No need to create anything here, as the path of sub-directories has
+         been already created by [get_dir] for computing [base_dir]. *)
+      let path = Datatype.Filepath.concat base_dir @@ Filename.basename s in
+      if Fc_Filepath.exists path && Fc_Filepath.is_dir path then
+        P.L.abort "%a is expected to be a file, found a directory"
+          Datatype.Filepath.pretty path
+      else
+        path
+
+  end
+
+  (* ************************************************************************ *)
   (** {3 Custom parameters} *)
   (* ************************************************************************ *)
 

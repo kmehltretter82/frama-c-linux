@@ -324,27 +324,24 @@ module type Filepath = sig
   val is_empty: unit -> bool
 end
 
-(** Dune site directories (share, lib, ...).
-    The root of a particular directory (say share) may not be unique, and these
-    are considered as installed files (although the user might provide another
-    location).
+(** Dune site directories (share, lib, ...) and subdirectories.
+    They are connected to a root module (see {!Site_root}), that may not be
+    unique, and these are considered as installed files (although the user might
+    provide another location).
 
     @since Frama-C+dev
 *)
 module type Site_dir = sig
-  val set: Filepath.Normalized.t -> unit
-  (** Sets the <dune-site-dir> directory (without creating it). *)
-
-  val get: unit -> Filepath.Normalized.t
-  (** @return the <dune-site-dir> directory (without creating it). *)
-
-  val is_set: unit -> bool
-  (** @return whether the <dune-site-dir> has been set. *)
-
   val get_dir: string -> Filepath.Normalized.t
   (** [get_dir name] tries to find the directory named [name] in the
       site. The function aborts if: [name] cannot be found or is a file instead
       of a directory, otherwise it returns the path.
+
+      Be careful! This function finds the first directory that exists in the
+      site path. Thus, by extending this path, we get *only* the subdirs and
+      files in this directory, not in all directories of same name.
+      {!Builder.Make_site_dir} can be used to get directories that will always
+      perform the resolution.
   *)
 
   val get_file: string -> Filepath.Normalized.t
@@ -354,21 +351,29 @@ module type Site_dir = sig
   *)
 end
 
-(** Specializes Specific_dir for user directories (config, state, ...).
+(** Dune site roots (share, lib, ...).
+
+    @since Frama-C+dev
+*)
+module type Site_root = sig
+  val set: Filepath.Normalized.t -> unit
+  (** Sets the <dune-site-dir> directory (without creating it). *)
+
+  val get: unit -> Filepath.Normalized.t
+  (** @return the <dune-site-dir> directory (without creating it). *)
+
+  val is_set: unit -> bool
+  (** @return whether the <dune-site-dir> has been set. *)
+
+  include Site_dir
+end
+
+(** User directories (session, config, state, ...).
     We do not expect these directories/files to exist.
 
     @since Frama-C+dev
 *)
 module type User_dir = sig
-  val set: Filepath.Normalized.t -> unit
-  (** Sets the <user-dir> directory (without creating it). *)
-
-  val get: unit -> Filepath.Normalized.t
-  (** @return the <user-dir> directory (without creating it). *)
-
-  val is_set: unit -> bool
-  (** @return whether the <user-dir> has been set. *)
-
   val get_dir: ?create_path:bool -> string -> Filepath.Normalized.t
   (** [get_dir ~create_path name] tries to get the directory [name].
       The function aborts if:
@@ -390,6 +395,25 @@ module type User_dir = sig
       created by the function.
   *)
 end
+
+(** User directories with an option to override the default path.
+
+    @since Frama-C+dev
+*)
+module type User_dir_opt = sig
+  include User_dir
+
+  val set: Filepath.Normalized.t -> unit
+  (** Sets the <user-dir> directory (without creating it). *)
+
+  val get: unit -> Filepath.Normalized.t
+  (** @return the <user-dir> directory (without creating it). *)
+
+  val is_set: unit -> bool
+  (** @return whether the <user-dir> has been set. *)
+end
+
+
 
 (* ************************************************************************** *)
 (** {3 Collections} *)
@@ -602,6 +626,24 @@ module type Builder = sig
       (** used in error message if the file does not exist where it should
           and vice-versa. *)
     end): Filepath
+
+  module Make_site_dir
+      (_: Site_dir)
+      (_: sig val name: string end)
+    : Site_dir
+
+  module Make_user_dir
+      (_: User_dir)
+      (_: sig val name: string end)
+    : User_dir
+
+  module Make_user_dir_opt
+      (_: User_dir)
+      (_: sig
+         val name: string
+         val env: string option
+         val help: string
+       end): User_dir_opt
 
   (** Allow using custom types as parameters.
       @since 29.0-Copper *)

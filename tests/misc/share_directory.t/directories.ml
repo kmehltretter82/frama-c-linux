@@ -9,6 +9,11 @@ module Self =
 
 module Share = Self.Share
 
+module Path =
+  Self.Make_site_dir
+    (Share)
+    (struct let name = "path" end)
+
 let never_fail_get f x =
   try
     let s = f x in
@@ -21,8 +26,14 @@ let run_all () =
   Self.feedback "path (dir)" ;
   never_fail_get Share.get_dir "path" ;
 
+  Self.feedback "Path (.)" ;
+  never_fail_get Path.get_dir "." ;
+
   Self.feedback "path/file.txt (file)" ;
   never_fail_get Share.get_file "path/file.txt" ;
+
+  Self.feedback "Path (file)" ;
+  never_fail_get Path.get_file "file.txt" ;
 
   Self.feedback "foo (dir)" ;
   never_fail_get Share.get_dir "foo" ;

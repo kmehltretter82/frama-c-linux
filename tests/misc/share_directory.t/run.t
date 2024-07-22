@@ -5,7 +5,11 @@ Basic case
   [kernel] IS_SET false
   [dirs] path (dir)
   [dirs] Found: _build/install/default/share/frama-c/share/dirs/path
+  [dirs] Path (.)
+  [dirs] Found: _build/install/default/share/frama-c/share/dirs/path
   [dirs] path/file.txt (file)
+  [dirs] Found: _build/install/default/share/frama-c/share/dirs/path/file.txt
+  [dirs] Path (file)
   [dirs] Found: _build/install/default/share/frama-c/share/dirs/path/file.txt
   [dirs] foo (dir)
   [dirs] User Error: Could not find directory foo in Frama-C/directories share
@@ -22,7 +26,11 @@ With option
   [kernel] IS_SET true
   [dirs] path (dir)
   [dirs] Found: copied/path
+  [dirs] Path (.)
+  [dirs] Found: copied/path
   [dirs] path/file.txt (file)
+  [dirs] Found: copied/path/file.txt
+  [dirs] Path (file)
   [dirs] Found: copied/path/file.txt
   [dirs] foo (dir)
   [dirs] User Error: Could not find directory foo in Frama-C/directories share

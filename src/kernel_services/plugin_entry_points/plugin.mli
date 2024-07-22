@@ -47,28 +47,28 @@ module type S_no_log = sig
       @since Oxygen-20120901
       @before Frama-C+dev more modes were allowed
   *)
-  module Share: Parameter_sig.Site_dir
+  module Share: Parameter_sig.Site_root
 
   (** Handle the specific `session' directory of the plug-in.
       @since Neon-20140301 *)
-  module Session: Parameter_sig.User_dir
+  module Session: Parameter_sig.User_dir_opt
 
   (** Handle the specific `cache' directory of the plug-in.
       @since Frama-C+dev
   *)
-  module Cache_dir (): Parameter_sig.User_dir
+  module Cache_dir (): Parameter_sig.User_dir_opt
 
   (** Handle the specific `config' directory of the plug-in.
       @since Neon-20140301
       @before Frama-C+dev this was not a functor and one could expect the
               directory to exist
   *)
-  module Config_dir (): Parameter_sig.User_dir
+  module Config_dir (): Parameter_sig.User_dir_opt
 
   (** Handle the specific `state' directory of the plug-in.
       @since Frama-C+dev
   *)
-  module State_dir (): Parameter_sig.User_dir
+  module State_dir (): Parameter_sig.User_dir_opt
 
   val help: Cmdline.Group.t
   (** The group containing option -*-help.
