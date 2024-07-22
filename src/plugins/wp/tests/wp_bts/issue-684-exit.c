@@ -3,6 +3,6 @@
   @ exits \exit_status == state;
   @ ensures \false;
 */
-void inconditional_exit(int state) {
+__attribute__((noreturn)) void inconditional_exit(int state) {
   exit (state);
 }

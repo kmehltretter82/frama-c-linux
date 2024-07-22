@@ -127,7 +127,8 @@ int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex);
  */
 void __gen_e_acsl_perror(char const *s);
 
-/*@ exits status: \exit_status == \old(status);
+/*@ terminates \false;
+    exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
@@ -433,7 +434,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "usleep";
-    __gen_e_acsl_assert_data.line = 1152;
+    __gen_e_acsl_assert_data.line = 1153;
     __gen_e_acsl_assert_data.name = "result_ok_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -443,7 +444,8 @@ int __gen_e_acsl_usleep(useconds_t usec)
   }
 }
 
-/*@ exits status: \exit_status == \old(status);
+/*@ terminates \false;
+    exits status: \exit_status == \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
@@ -459,7 +461,7 @@ void __gen_e_acsl_exit(int status)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 541;
+    __gen_e_acsl_assert_data.line = 543;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     __e_acsl_delete_block((void *)(& status));
