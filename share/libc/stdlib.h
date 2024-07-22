@@ -523,6 +523,7 @@ extern void *reallocarray(void *ptr, size_t nmemb, size_t size);
 /* ISO C: 7.20.4 */
 
 /*@
+  terminates \false;
   assigns \exit_status \from \nothing;
   exits status: \exit_status != EXIT_SUCCESS;
   ensures never_terminates: \false;
@@ -536,6 +537,7 @@ extern int atexit(void (*func)(void));
 extern int at_quick_exit(void (*func)(void));
 
 /*@
+  terminates \false;
   assigns \exit_status \from status;
   exits status: \exit_status == status;
   ensures never_terminates: \false;
@@ -543,6 +545,7 @@ extern int at_quick_exit(void (*func)(void));
 extern void exit(int status) __attribute__ ((__noreturn__));
 
 /*@
+  terminates \false;
   assigns \nothing;
   ensures never_terminates: \false;
 */
@@ -619,6 +622,7 @@ extern int setenv(const char *name, const char *value, int overwrite);
 extern int unsetenv(const char *name);
 
 /*@
+  terminates \false;
   assigns \nothing;
   ensures never_terminates: \false;
  */

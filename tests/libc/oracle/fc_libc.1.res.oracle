@@ -1754,7 +1754,8 @@ extern void *realloc(void *ptr, size_t size);
  */
 extern void *reallocarray(void *ptr, size_t nmemb, size_t size);
 
-/*@ exits status: \exit_status ≢ 0;
+/*@ terminates \false;
+    exits status: \exit_status ≢ 0;
     ensures never_terminates: \false;
     
     assigns \exit_status \from \nothing;
@@ -1769,14 +1770,16 @@ extern int atexit(void (*func)(void));
     assigns \result \from \nothing; */
 extern int at_quick_exit(void (*func)(void));
 
-/*@ exits status: \exit_status ≡ \old(status);
+/*@ terminates \false;
+    exits status: \exit_status ≡ \old(status);
     ensures never_terminates: \false;
     
     assigns \exit_status \from status;
  */
 extern  __attribute__((__noreturn__)) void exit(int status);
 
-/*@ ensures never_terminates: \false;
+/*@ terminates \false;
+    ensures never_terminates: \false;
     assigns \nothing; */
 extern  __attribute__((__noreturn__)) void _Exit(int status);
 
@@ -1789,7 +1792,8 @@ int setenv(char const *name, char const *value, int overwrite);
 
 int unsetenv(char const *name);
 
-/*@ ensures never_terminates: \false;
+/*@ terminates \false;
+    ensures never_terminates: \false;
     assigns \nothing; */
 extern  __attribute__((__noreturn__)) void quick_exit(int status);
 
@@ -9714,7 +9718,8 @@ extern int execve(char const *path, char * const *argv, char * const *env);
  */
 extern int execvp(char const *path, char * const *argv);
 
-/*@ ensures never_terminates: \false;
+/*@ terminates \false;
+    ensures never_terminates: \false;
     assigns \nothing; */
 extern  __attribute__((__noreturn__)) void _exit(int __x0);
 

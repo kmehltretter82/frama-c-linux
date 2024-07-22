@@ -40,4 +40,17 @@ int f4(int *b)
   return tmp;
 }
 
+ __attribute__((__noreturn__)) void f5(void);
+
+/*@ terminates \false;
+    exits \false;
+    assigns \nothing;
+    allocates \nothing; */
+ __attribute__((__noreturn__)) void f5(void);
+void f5(void)
+{
+  while (1) ;
+  return;
+}
+
 

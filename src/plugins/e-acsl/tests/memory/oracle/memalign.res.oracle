@@ -2,25 +2,25 @@
 [e-acsl] Warning: annotating undefined function `posix_memalign':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:784: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:788: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:794: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:798: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:801: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:805: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:784: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:788: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:784: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:788: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:798: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:802: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:799: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:803: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

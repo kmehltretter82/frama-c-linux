@@ -49,7 +49,7 @@
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:274: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:850: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:851: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:82: Warning: 
@@ -58,17 +58,23 @@
 [e-acsl] FRAMAC_SHARE/libc/sys/wait.h:89: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:538: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
+  E-ACSL construct `terminates clause' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:540: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:542: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:525: Warning: 
+  E-ACSL construct `terminates clause' is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:525: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:527: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:528: Warning: 
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
