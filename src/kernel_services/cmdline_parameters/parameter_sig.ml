@@ -369,7 +369,9 @@ module type Site_root = sig
 end
 
 (** User directories (session, config, state, ...).
-    We do not expect these directories/files to exist.
+    We do not expect these directories/files to exist. Several roots are
+    provided in {!Plugin}, namely {!Plugin.Session}, {!Plugin.Cache_dir},
+    {!Plugin.Config_dir} and {!Plugin.State_dir}.
 
     @since Frama-C+dev
 *)
@@ -381,7 +383,8 @@ module type User_dir = sig
       - creating a the directory fails.
 
       Otherwise returns the path, and creates it if [create_path] is true
-      (it defaults to false).
+      (it defaults to false). Subdirectories modules can be created with
+      {!Builder.Make_user_dir} and {!Builder.Make_user_dir_opt}.
   *)
 
   val get_file: ?create_path:bool -> string -> Filepath.Normalized.t
@@ -396,7 +399,7 @@ module type User_dir = sig
   *)
 end
 
-(** User directories with an option to override the default path.
+(** Basically {!User_dir} but with an option to override the original path.
 
     @since Frama-C+dev
 *)
@@ -627,21 +630,46 @@ module type Builder = sig
           and vice-versa. *)
     end): Filepath
 
+  (** Builds a {!Site_dir} from an existing one. The first parameter is the
+      parent directory. The second gives the name of the directory to create.
+
+      @since Frama-C+dev
+  *)
   module Make_site_dir
       (_: Site_dir)
       (_: sig val name: string end)
     : Site_dir
 
+
+  (** Builds a {!User_dir} from an existing one. The first parameter is the
+      parent directory. The second gives the name of the directory to create.
+
+      @since Frama-C+dev
+  *)
   module Make_user_dir
       (_: User_dir)
       (_: sig val name: string end)
     : User_dir
 
+  (** Builds a {!User_dir_opt} from an existing {!User_dir}. The first parameter
+      is the parent directory. The second gives the name of the directory to
+      create (also used to create the option name), a possible environment
+      variable name and the help message for the option.
+
+      @since Frama-C+dev
+  *)
   module Make_user_dir_opt
       (_: User_dir)
       (_: sig
          val name: string
+         (** The name of the directory, also used to create an option of the
+             form -<plugin>-<name>. *)
+
          val env: string option
+         (** Can be used to provide an environment variable that can be used
+             instead of the option. The option has higher priority.
+         *)
+
          val help: string
        end): User_dir_opt
 
