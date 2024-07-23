@@ -28,6 +28,7 @@ module FcPlugin = Plugin
 
 let () = Plugin.register_kernel ()
 
+let () = Plugin.is_session_visible ()
 module P = Plugin.Register
     (struct
       let name = ""
