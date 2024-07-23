@@ -50,7 +50,9 @@ module type S_no_log = sig
   module Share: Parameter_sig.Site_root
 
   (** Handle the specific `session' directory of the plug-in.
-      @since Neon-20140301 *)
+      @since Neon-20140301
+      @before Frama-C+dev Session was a Specific_dir.
+  *)
   module Session: Parameter_sig.User_dir_opt
 
   (** Handle the specific `cache' directory of the plug-in.
