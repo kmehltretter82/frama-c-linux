@@ -32,8 +32,8 @@ and step =
   | Var of varinfo
   | AddrOf of path
   | Star of path
-  | Index of path
   | Shift of path
+  | Index of path * int
   | Field of path * fieldinfo
   | Cast of typ * path
 

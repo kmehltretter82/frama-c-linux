@@ -163,26 +163,24 @@ let get map node =
   try Ufind.get map.store node
   with Not_found -> empty
 
-(* -------------------------------------------------------------------------- *)
-(* --- Chunk Constructors                                                 --- *)
-(* -------------------------------------------------------------------------- *)
-
-let add_cell (m: map) ?size ?ptr ?root ?label () =
-  failwith_locked m "Region.Memory.add_cell" ;
-  let clayout = match size, ptr with
-    | None, None -> Blob
-    | None, Some _ -> Cell(Cil.bitsSizeOf Cil.voidPtrType,ptr)
-    | Some s, _ -> Cell(s,ptr) in
-  let croots = Vset.(match root with None -> empty | Some v -> singleton v) in
-  let clabels = Lset.(match label with None -> empty | Some a -> singleton a) in
-  Ufind.make m.store { empty with clayout ; croots ; clabels }
-
 let update (m: map) (n: node) (f: chunk -> chunk) =
   let r = get m n in
   Ufind.set m.store n (f r)
 
-let add_range (m: map) ~size ~offset ~length ~data : node =
-  failwith_locked m "Region.Memory.add_range" ;
+(* -------------------------------------------------------------------------- *)
+(* --- Chunk Constructors                                                 --- *)
+(* -------------------------------------------------------------------------- *)
+
+let new_chunk (m: map) ?(size=0) ?ptr () =
+  failwith_locked m "Region.Memory.new_chunk" ;
+  let clayout =
+    match ptr with
+    | None -> if size = 0 then Blob else Cell(size,None)
+    | Some _ -> Cell(Ranges.gcd size Cil.(bitsSizeOf voidPtrType), ptr)
+  in Ufind.make m.store { empty with clayout }
+
+let new_range (m: map) ~size ~offset ~length ~data : node =
+  failwith_locked m "Region.Memory.new_range" ;
   let last = offset + length in
   if not (0 <= offset && offset < last && last <= size) then
     raise (Invalid_argument "Region.Memory.add_range") ;
@@ -193,13 +191,15 @@ let add_range (m: map) ~size ~offset ~length ~data : node =
 let add_root (m: map) v =
   try Vmap.find v m.roots with Not_found ->
     failwith_locked m "Region.Memory.add_root" ;
-    let n = add_cell m ~root:v () in
+    let n = new_chunk m () in
+    update m n (fun d -> { d with croots = Vset.singleton v }) ;
     m.roots <- Vmap.add v n m.roots ; n
 
 let add_label (m: map) a =
   try Lmap.find a m.labels with Not_found ->
     failwith_locked m "Region.Memory.add_label" ;
-    let n = add_cell m ~label:a () in
+    let n = new_chunk m () in
+    update m n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
 
 (* -------------------------------------------------------------------------- *)
@@ -332,7 +332,7 @@ let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
   let size = Ranges.(sa %. sb %. dp %. dq) in
   let data = merge_node m q na nb in
   if size = sa && size = sb then data else
-    merge_node m q (add_cell m ~size ()) data
+    merge_node m q (new_chunk m ~size ()) data
 
 let merge_ranges (m: map) (q: queue)
     (sa : int) (wa : node Ranges.t)
@@ -359,7 +359,7 @@ let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
     Compound(size, singleton ~size @@ Ranges.squash (merge_node m q) wr)
 
   | Compound(sr,wr), Cell(sx,Some ptr) | Cell(sx,Some ptr), Compound(sr,wr) ->
-    let rp = add_cell m ~size:sx ~ptr () in
+    let rp = new_chunk m ~size:sx ~ptr () in
     let wx = Ranges.range ~length:sx rp in
     merge_ranges m q sx wx sr wr
 
@@ -405,24 +405,25 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
   if ci.cstruct then
     let size = Cil.bitsSizeOf (TComp(ci,[])) in
     let offset, length = Cil.fieldBitsOffset fd in
-    let data = add_cell m () in
-    let rc = add_range m ~size ~offset ~length ~data in
-    ignore @@ merge m r rc ; data
+    let rf = new_chunk m () in
+    let rc = new_range m ~size ~offset ~length ~data:rf in
+    ignore @@ merge m r rc ; rf
   else r
 
-let add_index (m:map) (r:node) (ty:typ) : node =
-  let size = Cil.bitsSizeOf ty in
-  let data = add_cell m () in
-  let rc = add_range m ~size ~offset:0 ~length:size ~data in
-  ignore @@ merge m r rc ; data
+let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
+  let sizelt = Cil.bitsSizeOf ty in
+  let length = sizelt * n in
+  let re = new_chunk m () in
+  let rc = new_range m ~size:length ~offset:0 ~length ~data:re in
+  ignore @@ merge m r rc ; re
 
 let add_points_to (m: map) (a: node) (b : node) =
   failwith_locked m "Region.Memory.points_to" ;
-  ignore @@ merge m a @@ add_cell m ~ptr:b ()
+  ignore @@ merge m a @@ new_chunk m ~ptr:b ()
 
 let add_value (m:map) (rv:node) (ty:typ) : node option =
   if Cil.isPointerType ty then
-    let rp = add_cell m () in
+    let rp = new_chunk m () in
     add_points_to m rv rp ;
     Some rp
   else
@@ -432,28 +433,28 @@ let add_value (m:map) (rv:node) (ty:typ) : node option =
 (* --- Access                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let access (m:map) (a:node) (ty: typ) =
+let sized (m:map) (a:node) (ty: typ) =
   let sr = sizeof (get m a).clayout in
   let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
-  if sr <> size then ignore (merge m a (add_cell m ~size ()))
+  if sr <> size then ignore (merge m a (new_chunk m ~size ()))
 
 let read (m: map) (a: node) from =
   failwith_locked m "Region.Memory.read" ;
   let r = get m a in
   Ufind.set m.store a { r with creads = Access.Set.add from r.creads } ;
-  access m a (Access.typeof from)
+  sized m a (Access.typeof from)
 
 let write (m: map) (a: node) from =
   failwith_locked m "Region.Memory.write" ;
   let r = get m a in
   Ufind.set m.store a { r with cwrites = Access.Set.add from r.cwrites } ;
-  access m a (Access.typeof from)
+  sized m a (Access.typeof from)
 
 let shift (m: map) (a: node) from =
   failwith_locked m "Region.Memory.shift" ;
   let r = get m a in
-  Ufind.set m.store a { r with cshifts = Access.Set.add from r.cshifts }
-(* no access *)
+  Ufind.set m.store a { r with cshifts = Access.Set.add from r.cshifts } ;
+  sized m a (Access.typeof from)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lookup                                                            ---- *)
