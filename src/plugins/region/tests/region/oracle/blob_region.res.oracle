@@ -5,9 +5,9 @@
   R0004: --- 0b ;
   R0001: -W- p (int *) 64b (*R0004) ;
 [region] Function struct_blob:
-  R0009: --- y 64b 0..32 [0]: R000a ;
-  R000a: --- 0b ;
-  R0007: -W- p (int *) 64b (*R000a) ;
+  R0003: --- y 64b 0..32 [0]: R0004 ;
+  R0004: --- 0b ;
+  R0001: -W- p (int *) 64b (*R0004) ;
 [region] Function var_blob:
-  R000f: --- x 0b ;
-  R000d: -W- p (int *) 64b (*R000f) ;
+  R0003: --- x 0b ;
+  R0001: -W- p (int *) 64b (*R0003) ;
