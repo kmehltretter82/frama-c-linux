@@ -61,7 +61,8 @@ let origin_to_locations = function
   | Studia.Writes.Assign s
   | CallDirect s -> [Printer_tag.localizable_of_stmt s]
   | CallIndirect _s -> []
-  | GlobalInit (_vi, _init) -> []
+  | GlobalInit (vi, _init) ->
+    [ Printer_tag.localizable_of_declaration (SGlobal vi) ]
   | FormalInit (_vi, callsites) ->
     List.concat_map
       (fun (_,l) -> List.map Printer_tag.localizable_of_stmt l)
