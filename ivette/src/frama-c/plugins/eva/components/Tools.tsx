@@ -23,35 +23,16 @@
 import React from 'react';
 import { IconButton } from 'dome/controls/buttons';
 import { Hbox } from 'dome/layout/boxes';
-import { Icon } from 'dome/controls/icons';
 import * as Forms from 'dome/layout/forms';
 import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+import { EvaStatus } from 'frama-c/plugins/eva/components/AnalysisStatus';
 
 
 export interface EvaToolsProps {
   remote: Forms.BufferController;
   iconSize: number;
-}
-
-function EvaState(
-  state: Eva.computationStateType | undefined
-): JSX.Element {
-  let id, title;
-  switch(state) {
-    case "computed": id="CHECK"; title="Computed"; break;
-    case "aborted": id="CROSS"; title="Aborted"; break;
-    case "not_computed": id="CROSS"; title="Not computed"; break;
-    case "computing": id="SPINNER"; title="Computing"; break;
-    default: id="CROSS"; title="Status undefined"; break;
-  }
-  return <Icon
-    id={id}
-    title={title}
-    className={"eva-status-icon eva-"+state}
-    size={18}
-  />;
 }
 
 export default function EvaTools(
@@ -106,8 +87,8 @@ export default function EvaTools(
           onClick={syncToFC}
         />
       </Hbox>
-      <Hbox className='eva-tools-title'>
-        {EvaState(evaComputed)}
+      <Hbox className='eva-tools-status'>
+        <EvaStatus iconSize={18} />
       </Hbox>
     </Hbox>
   );

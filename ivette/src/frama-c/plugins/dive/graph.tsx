@@ -47,7 +47,8 @@ import { Space } from 'dome/frame/toolbars';
 
 import '@fortawesome/fontawesome-free/js/all';
 
-import EvaReady from 'frama-c/plugins/eva/EvaReady';
+import { EvaReady, EvaStatus }
+  from 'frama-c/plugins/eva/components/AnalysisStatus';
 import Legend from './legend';
 import style from './style.json';
 import layouts from './layouts.json';
@@ -745,6 +746,8 @@ export default function GraphComponent(): JSX.Element {
           onClick={() => graph.current?.clear()}
           title="Clear the graph"
         />
+        <Space />
+        <EvaStatus />
       </Ivette.TitleBar>
       <EvaReady>
         <>

@@ -31,6 +31,7 @@ import { HSplit } from 'dome/layout/splitters';
 import { Text } from 'frama-c/richtext';
 import { Checkbox, SelectMenu } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
+import { EvaStatus } from './components/AnalysisStatus';
 
 const globalSelectedDomain = new GlobalState("");
 const globalFilter = new GlobalState(true);
@@ -111,7 +112,9 @@ export function EvaStates(): JSX.Element {
 function EvaStatesComponent(): JSX.Element {
   return (
     <>
-      <Ivette.TitleBar />
+      <Ivette.TitleBar>
+        <EvaStatus />
+      </Ivette.TitleBar>
       <EvaStates />
     </>
   );

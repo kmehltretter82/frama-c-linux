@@ -32,7 +32,7 @@ import * as Server from 'frama-c/server';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Values from 'frama-c/plugins/eva/api/values';
-import EvaReady from './EvaReady';
+import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -1144,6 +1144,8 @@ function EvaTable(): JSX.Element {
           selected={showCallstacks}
           onClick={flipCallstacks}
         />
+        <Inset />
+        <EvaStatus />
       </Ivette.TitleBar>
       <EvaReady>
         <div className="eva-functions-section">

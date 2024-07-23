@@ -28,7 +28,7 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 import CoverageMeter, { percent } from './CoverageMeter';
 
 import './style_summary.css';
-import EvaReady from './EvaReady';
+import { EvaReady, EvaStatus } from './components/AnalysisStatus';
 
 function CoverageTable(data: Eva.programStatsType): JSX.Element {
   const { progFunCoverage: functions, progStmtCoverage: statements } = data;
@@ -223,7 +223,9 @@ export function EvaSummary(): JSX.Element {
 function EvaSummaryComponent(): JSX.Element {
   return (
     <>
-      <Ivette.TitleBar />
+      <Ivette.TitleBar>
+        <EvaStatus />
+      </Ivette.TitleBar>
       <EvaReady>
         <EvaSummary />
       </EvaReady>

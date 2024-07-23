@@ -334,6 +334,11 @@ tr:first-of-type > .eva-table-callsite-box {
     background-color: var(--background-report);
 }
 
+.eva-status-icon.eva-computing { fill: var(--eva-alarms-unknown); }
+.eva-status-icon.eva-aborted { fill: var(--eva-alarms-unknown); }
+.eva-status-icon.eva-computed { fill: var(--eva-alarms-true); }
+.eva-status-icon.eva-not_computed { fill: var(--eva-alarms-false); }
+
 /* -------------------------------------------------------------------------- */
 /* --- Sidebar Eva                                                        --- */
 /* -------------------------------------------------------------------------- */
@@ -342,7 +347,7 @@ tr:first-of-type > .eva-table-callsite-box {
 /* --- Tools Eva  --- */
 .eva-tools {
   position: sticky;
-  top: 0px;
+  top: 10px;
   z-index: 10;
   background-color: var(--background-profound);
   padding: 5px;
@@ -363,14 +368,6 @@ tr:first-of-type > .eva-table-callsite-box {
   .dome-xIconButton:hover {
     cursor: pointer;
     color: var(--background-button-hover);
-  }
-  .eva-status-icon.eva-computing svg {
-    fill: var(--eva-alarms-unknown);
-  }
-  .eva-status-icon.eva-computed { fill: var(--eva-alarms-true); }
-  .eva-status-icon.eva-aborted,
-  .eva-status-icon.eva-not_computed {
-    fill: var(--eva-alarms-false);
   }
 }
 
@@ -473,4 +470,44 @@ tr:first-of-type > .eva-table-callsite-box {
   }
 }
 
+
+/* -------------------------------------------------------------------------- */
+/* --- Status Eva                                                         --- */
+/* -------------------------------------------------------------------------- */
+.eva-status {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  margin:10%;
+
+  span {
+    font-size: 16px;
+    text-align: center;
+  }
+
+  button {
+    margin: auto;
+  }
+
+  .eva-status-icon,
+  .eva-status-icon svg{
+    fill: var(--background-softer);
+  }
+}
+
+.eva-status-icon {
+  max-width: 90%;
+  max-height: 200px;
+  fill: var(--info-text-discrete);
+  cursor: default;
+}
+
+.labview-titlebar .dome-xIcon.eva-status-icon {
+  cursor: default;
+}
+
+.eva-status-computing {
+  font-weight: bold;
+}
 /* -------------------------------------------------------------------------- */
