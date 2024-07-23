@@ -1,8 +1,3 @@
-/* run.config
-  EXIT: 125
-  OPT: -region
-*/
-
 void array_blob() {
   int arr[3];
   int* p = &arr[1];

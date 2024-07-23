@@ -1,28 +1,13 @@
 [kernel] Parsing blob_region.i (no preprocessing)
 [region] Analyzing regions
-[kernel] Current source was: :0
-  The full backtrace is:
-  Raised at Region__Memory.make_range in file "src/plugins/region/memory.ml", line 260, characters 10-52
-  Called from Stdlib__List.map in file "list.ml", line 92, characters 20-23
-  Called from Region__Memory.make_region in file "src/plugins/region/memory.ml", line 274, characters 11-54
-  Called from Region__Memory.walk in file "src/plugins/region/memory.ml", line 286, characters 6-25
-  Called from Stdlib__Map.Make.iter in file "map.ml", line 297, characters 20-25
-  Called from Stdlib__Map.Make.iter in file "map.ml", line 297, characters 10-18
-  Called from Stdlib__Format.output_acc in file "format.ml", line 1295, characters 4-20
-  Called from Stdlib__Format.output_acc in file "format.ml", line 1295, characters 4-20
-  Called from Stdlib__Format.kfprintf.(fun) in file "format.ml", line 1356, characters 16-34
-  Called from Region__Analysis.get in file "src/plugins/region/analysis.ml", line 59, characters 4-263
-  Called from Region__Analysis.compute in file "src/plugins/region/analysis.ml", line 70, characters 27-33
-  Called from Stdlib__Map.Make.iter in file "map.ml", line 297, characters 20-25
-  Called from Stdlib__Queue.iter.iter in file "queue.ml", line 121, characters 6-15
-  Called from Frama_c_kernel__Boot.play_analysis in file "src/kernel_internals/runtime/boot.ml", line 38, characters 4-17
-  Called from Frama_c_kernel__Cmdline.play_in_toplevel_one_shot in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 837, characters 2-9
-  Called from Frama_c_kernel__Cmdline.play_in_toplevel in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 867, characters 18-64
-  Called from Frama_c_kernel__Cmdline.catch_toplevel_run in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 231, characters 4-8
-  
-  Unexpected error (Division_by_zero).
-  Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues
-  Your Frama-C version is 29.0+dev (Copper).
-  Note that a version and a backtrace alone often do not contain enough
-  information to understand the bug. Guidelines for reporting bugs are at:
-  https://git.frama-c.com/pub/frama-c/-/wikis/Guidelines-for-reporting-bugs
+[region] Function array_blob:
+  R0003: --- arr 96b 0..96 [0]: R0004 ;
+  R0004: --- 0b ;
+  R0001: -W- p (int *) 64b (*R0004) ;
+[region] Function struct_blob:
+  R0009: --- y 64b 0..32 [0]: R000a ;
+  R000a: --- 0b ;
+  R0007: -W- p (int *) 64b (*R000a) ;
+[region] Function var_blob:
+  R000f: --- x 0b ;
+  R000d: -W- p (int *) 64b (*R000f) ;

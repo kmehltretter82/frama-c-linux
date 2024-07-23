@@ -254,12 +254,14 @@ let pp_region fmt (m: region) =
     Format.fprintf fmt " ;@]" ;
   end
 
-let make_range (m: map) (rg: rg) : range = {
-  offset = rg.offset ;
-  length = rg.length ;
-  cells = rg.length / sizeof (get m rg.data).clayout ;
-  data = node m rg.data ;
-}
+let make_range (m: map) (rg: rg) : range =
+  let s = sizeof (get m rg.data).clayout in
+  {
+    offset = rg.offset ;
+    length = rg.length ;
+    cells = if s = 0 then 0 else rg.length / s ;
+    data = node m rg.data ;
+  }
 
 let make_region (m: map) (n: node) (r: chunk) : region = {
   node = n ;
