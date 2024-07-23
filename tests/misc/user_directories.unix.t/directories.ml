@@ -22,18 +22,22 @@ module Sub_cache_opt_no_var =
   Self.Make_user_dir_opt
     (Cache)
     (struct
-      let name = "optnovar"
-      let env = None
+      let option_name = "-dirs-opt-no-var"
+      let arg_name = "dir"
       let help = ""
+      let env = None
+      let dirname = "optnovar"
     end)
 
 module Sub_cache_opt_var =
   Self.Make_user_dir_opt
     (Cache)
     (struct
-      let name = "optvar"
-      let env = Some "FRAMAC_DIRS_VAR"
+      let option_name = "-dirs-optvar"
+      let arg_name = "dir"
       let help = ""
+      let env = Some "FRAMAC_DIRS_VAR"
+      let dirname = "optvar"
     end)
 
 module Config = Self.Config_dir ()

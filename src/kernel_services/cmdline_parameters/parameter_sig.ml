@@ -661,16 +661,14 @@ module type Builder = sig
   module Make_user_dir_opt
       (_: User_dir)
       (_: sig
-         val name: string
-         (** The name of the directory, also used to create an option of the
-             form -<plugin>-<name>. *)
-
+         include Input_with_arg
          val env: string option
          (** Can be used to provide an environment variable that can be used
              instead of the option. The option has higher priority.
          *)
 
-         val help: string
+         val dirname: string
+         (** The name of the directory *)
        end): User_dir_opt
 
   (** Allow using custom types as parameters.

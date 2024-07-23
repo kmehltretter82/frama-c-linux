@@ -577,21 +577,16 @@ struct
   module Make_user_dir_opt
       (Parent: Parameter_sig.User_dir)
       (Info: sig
-         val name: string
+         include Parameter_sig.Input_with_arg
          val env: string option
-         val help: string
+         val dirname: string
        end): Parameter_sig.User_dir_opt
   =
   struct
-    let is_kernel = P.shortname = ""
-    let prefix = "-" ^ (if is_kernel then "" else P.shortname ^ "-")
-
     module Dir_name =
       Filepath
         (struct
-          let option_name = prefix ^ Info.name
-          let arg_name = "dir"
-          let help = Info.help
+          include Info
           let existence = Fc_Filepath.Indifferent
           let file_kind = ""
         end)
@@ -601,7 +596,7 @@ struct
       else
         match Option.bind Info.env Sys.getenv_opt with
         | Some s when s <> "" -> Fc_Filepath.Normalized.of_string s
-        | _ -> Parent.get_dir Info.name
+        | _ -> Parent.get_dir Info.dirname
 
     let set = Dir_name.set
     let is_set = Dir_name.is_set
@@ -611,11 +606,11 @@ struct
       try
         if Extlib.mkdir ~parents:true d' 0o755 then
           P.L.warning "created %s directory `%a'"
-            Info.name Fc_Filepath.Normalized.pretty d';
+            Info.dirname Fc_Filepath.Normalized.pretty d';
         d
       with Unix.Unix_error _ ->
         P.L.abort "cannot create %s directory `%a'"
-          Info.name Fc_Filepath.Normalized.pretty d'
+          Info.dirname Fc_Filepath.Normalized.pretty d'
 
     let get_dir ?(create_path=false) name =
       let dir = Datatype.Filepath.concat (get ()) name in
