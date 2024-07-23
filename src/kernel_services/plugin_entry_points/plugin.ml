@@ -359,6 +359,8 @@ struct
        end)
   =
   struct
+    open Fc_Filepath.Normalized
+
     let is_visible = D.is_visible
     let is_kernel = P.name = ""
 
@@ -392,49 +394,38 @@ struct
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else match Sys.getenv_opt var_name with
-        | Some s when s <> "" -> Fc_Filepath.Normalized.of_string s
+        | Some s when s <> "" -> of_string s
         | _ when is_kernel -> D.default_root ()
-        | _ -> Fc_Filepath.Normalized.concat (D.kernel_get ()) P.shortname
+        | _ -> concat (D.kernel_get ()) P.shortname
 
     let set = Dir_name.set
     let is_set = Dir_name.is_set
 
+    let expected ~dir path =
+      if dir <> Fc_Filepath.is_dir path then
+        L.abort "%a is expected to be a %s"
+          pretty path (if dir then "directory" else "file")
+
     let mk_dir d =
-      let d' = Fc_Filepath.Normalized.of_string d in
-      try
-        if Extlib.mkdir ~parents:true d' 0o755 then
-          L.warning "created %s directory `%a'"
-            D.name Fc_Filepath.Normalized.pretty d';
-        d
+      try ignore @@ Extlib.mkdir ~parents:true d 0o755
       with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'"
-          D.name Fc_Filepath.Normalized.pretty d'
+        L.abort "cannot create %s directory `%a'" D.name pretty d
 
     let get_dir ?(create_path=false) s =
-      let dir = Fc_Filepath.Normalized.concat (get ()) s in
-      if Fc_Filepath.exists dir then
-        begin
-          if Fc_Filepath.is_dir dir then dir
-          else
-            L.abort "%a is expected to be a directory"
-              Fc_Filepath.Normalized.pretty dir
-        end
-      else
-        begin
-          if create_path then ((ignore (mk_dir (dir :> string))) ; dir)
-          else dir
-        end
+      let dir = concat (get ()) s in
+      if Fc_Filepath.exists dir
+      then (expected ~dir:true dir ; dir)
+      else if create_path
+      then (mk_dir dir ; dir)
+      else dir
 
     let get_file ?create_path s =
       let base_dir = get_dir ?create_path @@ Filename.dirname s in
       (* No need to create anything here, as the path of sub-directories has
          been already created by [get_dir] for computing [base_dir]. *)
-      let path = Fc_Filepath.Normalized.concat base_dir @@ Filename.basename s in
-      if Fc_Filepath.exists path && Fc_Filepath.is_dir path then
-        L.abort "%a is expected to be a file, found a directory"
-          Fc_Filepath.Normalized.pretty path
-      else
-        path
+      let path = concat base_dir @@ Filename.basename s in
+      if Fc_Filepath.exists path then expected ~dir:false path ;
+      path
   end
 
   module Session = Make_user_dir_root

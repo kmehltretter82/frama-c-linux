@@ -5,11 +5,6 @@ touch the actual user HOME.
 
 Basic case
   $ HOME=home dune exec -- frama-c
-  [dirs] Warning: created cache directory `home/.cache/frama-c/dirs/created'
-  [dirs] Warning: created config directory `home/.config/frama-c/dirs/created'
-  [dirs] Warning: created state directory `home/.local/state/frama-c/dirs/created'
-  [dirs] Warning: created session directory `.frama-c/dirs/created'
-  [dirs] Warning: created session directory `.frama-c/dirs/created_filepath'
   [dirs] Not created:
   [dirs] home/.cache/frama-c/dirs/not_created
   [dirs] home/.config/frama-c/dirs/not_created
@@ -35,9 +30,6 @@ Basic case
 
 Customized via variables: XDG level
   $ HOME=home XDG_CACHE_HOME=cache XDG_CONFIG_HOME=config XDG_STATE_HOME=state dune exec -- frama-c
-  [dirs] Warning: created cache directory `cache/frama-c/dirs/created'
-  [dirs] Warning: created config directory `config/frama-c/dirs/created'
-  [dirs] Warning: created state directory `state/frama-c/dirs/created'
   [dirs] Not created:
   [dirs] cache/frama-c/dirs/not_created
   [dirs] config/frama-c/dirs/not_created
@@ -65,11 +57,6 @@ Customized via variables: XDG level
 
 Customized via variables: Kernel level
   $ HOME=home FRAMAC_CACHE=cache FRAMAC_CONFIG=config FRAMAC_STATE=state FRAMAC_SESSION=session dune exec -- frama-c
-  [dirs] Warning: created cache directory `cache/dirs/created'
-  [dirs] Warning: created config directory `config/dirs/created'
-  [dirs] Warning: created state directory `state/dirs/created'
-  [dirs] Warning: created session directory `session/dirs/created'
-  [dirs] Warning: created session directory `session/dirs/created_filepath'
   [dirs] Not created:
   [dirs] cache/dirs/not_created
   [dirs] config/dirs/not_created
@@ -94,11 +81,6 @@ Customized via variables: Kernel level
 
 Customized via variables: Plugin level
   $ HOME=home FRAMAC_DIRS_CACHE=cache FRAMAC_DIRS_CONFIG=config FRAMAC_DIRS_STATE=state FRAMAC_DIRS_SESSION=session dune exec -- frama-c
-  [dirs] Warning: created cache directory `cache/created'
-  [dirs] Warning: created config directory `config/created'
-  [dirs] Warning: created state directory `state/created'
-  [dirs] Warning: created session directory `session/created'
-  [dirs] Warning: created session directory `session/created_filepath'
   [dirs] Not created:
   [dirs] cache/not_created
   [dirs] config/not_created
@@ -120,9 +102,6 @@ Customized via variables: Plugin level
 
 Customized via options kernel level
   $ HOME=home dune exec -- frama-c -cache cache -config config -state state -session session
-  [dirs] Warning: created cache directory `cache/dirs/created'
-  [dirs] Warning: created config directory `config/dirs/created'
-  [dirs] Warning: created state directory `state/dirs/created'
   [dirs] Not created:
   [dirs] cache/dirs/not_created
   [dirs] config/dirs/not_created
@@ -147,9 +126,6 @@ Customized via options kernel level
 
 Customized via options plug-in level
   $ HOME=home dune exec -- frama-c -dirs-cache cache -dirs-config config -dirs-state state -dirs-session session
-  [dirs] Warning: created cache directory `cache/created'
-  [dirs] Warning: created config directory `config/created'
-  [dirs] Warning: created state directory `state/created'
   [dirs] Not created:
   [dirs] cache/not_created
   [dirs] config/not_created
@@ -171,62 +147,38 @@ Customized via options plug-in level
 
 Customized plug-in subdir option > plug-in subdir variable
   $ HOME=home FRAMAC_DIRS_VAR=subdir_bad dune exec -- frama-c -dirs-cache-only -dirs-optvar subdir
-  [dirs] Warning: created cache directory `home/.cache/frama-c/dirs/created'
-  [dirs] Warning: created cache directory `home/.cache/frama-c/dirs/noopt'
-  [dirs] Warning: created optnovar directory `home/.cache/frama-c/dirs/optnovar'
-  [dirs] Warning: created optvar directory `subdir'
-  [dirs] User Error: home/.cache/frama-c/dirs/created is expected to be a file, found a directory
-  [dirs] User Error: subdir is expected to be a file, found a directory
+  [dirs] User Error: home/.cache/frama-c/dirs/created is expected to be a file
+  [dirs] User Error: subdir is expected to be a file
   $ rm -rf home cache subdir
 
 Customized plug-in subdir variable > plug-in option
   $ HOME=home FRAMAC_DIRS_VAR=subdir dune exec -- frama-c -dirs-cache-only -dirs-cache cache
-  [dirs] Warning: created cache directory `cache/created'
-  [dirs] Warning: created cache directory `cache/noopt'
-  [dirs] Warning: created optnovar directory `cache/optnovar'
-  [dirs] Warning: created optvar directory `subdir'
-  [dirs] User Error: cache/created is expected to be a file, found a directory
-  [dirs] User Error: subdir is expected to be a file, found a directory
+  [dirs] User Error: cache/created is expected to be a file
+  [dirs] User Error: subdir is expected to be a file
   $ rm -rf home cache subdir
 
 Customized plug-in option > plug-in var
   $ HOME=home FRAMAC_DIRS_CACHE=cache_bad dune exec -- frama-c -dirs-cache-only -dirs-cache cache
-  [dirs] Warning: created cache directory `cache/created'
-  [dirs] Warning: created cache directory `cache/noopt'
-  [dirs] Warning: created optnovar directory `cache/optnovar'
-  [dirs] Warning: created optvar directory `cache/optvar'
-  [dirs] User Error: cache/created is expected to be a file, found a directory
-  [dirs] User Error: cache/optvar is expected to be a file, found a directory
+  [dirs] User Error: cache/created is expected to be a file
+  [dirs] User Error: cache/optvar is expected to be a file
   $ rm -rf home cache
 
 Customized plug-in var > kernel option
   $ HOME=home FRAMAC_DIRS_CACHE=cache dune exec -- frama-c -dirs-cache-only -cache cache_bad
-  [dirs] Warning: created cache directory `cache/created'
-  [dirs] Warning: created cache directory `cache/noopt'
-  [dirs] Warning: created optnovar directory `cache/optnovar'
-  [dirs] Warning: created optvar directory `cache/optvar'
-  [dirs] User Error: cache/created is expected to be a file, found a directory
-  [dirs] User Error: cache/optvar is expected to be a file, found a directory
+  [dirs] User Error: cache/created is expected to be a file
+  [dirs] User Error: cache/optvar is expected to be a file
   $ rm -rf home cache
 
 Customized kernel option > kernel var
   $ HOME=home FRAMAC_CACHE=cache_bad dune exec -- frama-c -dirs-cache-only -cache cache
-  [dirs] Warning: created cache directory `cache/dirs/created'
-  [dirs] Warning: created cache directory `cache/dirs/noopt'
-  [dirs] Warning: created optnovar directory `cache/dirs/optnovar'
-  [dirs] Warning: created optvar directory `cache/dirs/optvar'
-  [dirs] User Error: cache/dirs/created is expected to be a file, found a directory
-  [dirs] User Error: cache/dirs/optvar is expected to be a file, found a directory
+  [dirs] User Error: cache/dirs/created is expected to be a file
+  [dirs] User Error: cache/dirs/optvar is expected to be a file
   $ rm -rf home cache
 
 Customized kernel var > xdg var
   $ HOME=home XDG_CACHE_HOME=cache_bad FRAMAC_CACHE=cache dune exec -- frama-c -dirs-cache-only
-  [dirs] Warning: created cache directory `cache/dirs/created'
-  [dirs] Warning: created cache directory `cache/dirs/noopt'
-  [dirs] Warning: created optnovar directory `cache/dirs/optnovar'
-  [dirs] Warning: created optvar directory `cache/dirs/optvar'
-  [dirs] User Error: cache/dirs/created is expected to be a file, found a directory
-  [dirs] User Error: cache/dirs/optvar is expected to be a file, found a directory
+  [dirs] User Error: cache/dirs/created is expected to be a file
+  [dirs] User Error: cache/dirs/optvar is expected to be a file
   $ rm -rf home cache
 
 Bad home value
