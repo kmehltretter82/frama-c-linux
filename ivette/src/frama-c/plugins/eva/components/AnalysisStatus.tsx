@@ -32,8 +32,8 @@ interface EvaReadyProps {
 }
 
 interface EvaStatusProp {
-  iconSize: number;
-  showStatus?: Eva.computationStateType[];
+  iconSize?: number; // default size for titlebar
+  showStatus?: Eva.computationStateType[]; // all status shown by default
 }
 
 interface StatusIconProp {
@@ -56,7 +56,7 @@ function StatusIcon(props: StatusIconProp):JSX.Element {
 }
 
 export function EvaStatus(props: EvaStatusProp): JSX.Element | null {
-  const { iconSize, showStatus } = props;
+  const { iconSize = 12, showStatus } = props;
   const status = useSyncValue(Eva.computationState);
 
   if(!showStatus || status && showStatus?.includes(status)) {

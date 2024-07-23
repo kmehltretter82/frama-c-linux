@@ -500,6 +500,11 @@ tr:first-of-type > .eva-table-callsite-box {
   max-width: 90%;
   max-height: 200px;
   fill: var(--info-text-discrete);
+  cursor: default;
+}
+
+.labview-titlebar .dome-xIcon.eva-status-icon {
+  cursor: default;
 }
 
 .eva-status-computing {
