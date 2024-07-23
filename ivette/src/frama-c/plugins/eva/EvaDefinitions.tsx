@@ -316,26 +316,26 @@ export type EvaStatus = {
 export const evaBasicStatus: EvaStatus = {
   'undefined': {
     message: "Eva state undefined.",
-    title: "Undefined",
+    title: "No communication established with the Frama-C server.",
     icon: "CROSS",
   },
   'not_computed': {
-    message: "No Eva analysis has been run yet.",
-    title: "not_computed",
+    message: "No Eva analysis.",
+    title: "No Eva analysis has been run yet.",
     icon: "CROSS",
   },
   'computing': {
     message: "Eva analysis in progress…",
-    title: "computing",
+    title: "The Eva analysis is currently ongoing.",
     icon: "SPINNER",
   },
   'computed': {
-    message: "",
-    title: "computed",
+    message: "Eva analysis successfully completed.",
+    title: "The Eva analysis has completed successfully.",
     icon: "CHECK",
   },
   'aborted': {
-    message: "",
+    message: "Eva analysis aborted.",
     title:
       "The Eva analysis has been prematurely aborted by an internal error "+
       "or a user interruption : "+

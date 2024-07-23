@@ -334,14 +334,10 @@ tr:first-of-type > .eva-table-callsite-box {
     background-color: var(--background-report);
 }
 
-.eva-status-icon.eva-computing svg {
-  fill: var(--eva-alarms-unknown);
-}
+.eva-status-icon.eva-computing { fill: var(--eva-alarms-unknown); }
 .eva-status-icon.eva-aborted { fill: var(--eva-alarms-unknown); }
 .eva-status-icon.eva-computed { fill: var(--eva-alarms-true); }
-.eva-status-icon.eva-not_computed {
-  fill: var(--eva-alarms-false);
-}
+.eva-status-icon.eva-not_computed { fill: var(--eva-alarms-false); }
 
 /* -------------------------------------------------------------------------- */
 /* --- Sidebar Eva                                                        --- */
