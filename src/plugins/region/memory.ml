@@ -392,9 +392,9 @@ let merge_all (m:map) = function
       do_merge m q a b ;
     done
 
-let merge (m: map) (a: node) (b: node) : node =
+let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
-  merge_all m [a;b] ; Ufind.find m.store (min a b)
+  merge_all m [a;b]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
@@ -411,10 +411,9 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
   else r
 
 let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
-  let sizelt = Cil.bitsSizeOf ty in
-  let length = sizelt * n in
+  let s = Cil.bitsSizeOf ty * n in
   let re = new_chunk m () in
-  let rc = new_range m ~size:length ~offset:0 ~length ~data:re in
+  let rc = new_range m ~size:s ~offset:0 ~length:s ~data:re in
   ignore @@ merge m r rc ; re
 
 let add_points_to (m: map) (a: node) (b : node) =

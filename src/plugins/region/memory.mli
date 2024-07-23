@@ -84,7 +84,7 @@ val read : map -> node -> Access.acs -> unit
 val write : map -> node -> Access.acs -> unit
 val shift : map -> node -> Access.acs -> unit
 
-val merge : map -> node -> node -> node
+val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
 
 (** @raise Not_found *)
