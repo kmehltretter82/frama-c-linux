@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash -eu
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -110,7 +110,7 @@ dir_for_reduction="creducing"
 
 script_for_creduce="./script_for_creduce.sh"
 
-if [ -z "$CREDUCE" ]; then
+if [ -z "${CREDUCE+x}" ]; then
     # Now some distributions have 'cvise' instead of 'creduce', so try it
     # if found in PATH
     if command -v cvise 2>&1 >/dev/null; then
@@ -149,7 +149,7 @@ if [[ $(dirname "$file") = "$dir_for_reduction" ]]; then
     exit 1
 fi
 
-if [ -z "$FRAMAC_BIN" ]; then
+if [ -z "${FRAMAC_BIN+x}" ]; then
     if ! command -v "frama-c" >/dev/null; then
         echo "error: frama-c must be in the PATH, or FRAMAC_BIN must point to"
         echo "       the directory containing the frama-c binary"
@@ -161,7 +161,7 @@ else
 fi
 echo "[info] using FRAMAC: $FRAMAC"
 
-if [ -z "$FRAMAC_LIB" ]; then
+if [ -z "${FRAMAC_LIB+x}" ]; then
     FRAMAC_LIB="$("$FRAMAC" -print-lib-path)"
 fi
 
@@ -182,7 +182,7 @@ fi
 #
 #### End of command-line and environment validation
 
-if [[ ! "$options" =~ no-autoload-plugins ]]; then
+if [[ ! "$@" =~ no-autoload-plugins ]]; then
     echo "********************************************************************"
     echo "Hint: consider using -no-autoload-plugins -load-module [modules]"
     echo "      for faster reduction"
@@ -237,9 +237,11 @@ if [ ! -e "$script_for_creduce" ]; then
     case $errorkind in
         1)
             cp "$FRAMAC_LIB/analysis-scripts/script_for_creduce_fatal.sh" "$script_for_creduce"
+            chmod +w "$script_for_creduce"
             ;;
         2)
             cp "$FRAMAC_LIB/analysis-scripts/script_for_creduce_non_fatal.sh" "$script_for_creduce"
+            chmod +w "$script_for_creduce"
             echo "Script copied. Please edit $script_for_creduce and re-run this script."
             exit 0
             ;;
@@ -298,6 +300,10 @@ if [ $? -ne 0 ]; then
 fi
 set -e
 
+# CREDUCE_OPTIONS may not have been defined
+# Note: the absence of double quotes around $CREDUCE_OPTIONS below is
+# intentional, to allow passing multiple options
+CREDUCE_OPTIONS=${CREDUCE_OPTIONS:-}
 "$CREDUCE" $CREDUCE_OPTIONS script_for_creduce.sh "$base"
 
 echo "Finished reducing file: $dir_for_reduction/$base"
