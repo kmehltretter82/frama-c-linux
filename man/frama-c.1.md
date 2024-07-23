@@ -1,5 +1,5 @@
 ---
-title: 'FRAMA-C(1) 2024-04-24'
+title: 'FRAMA-C(1) 2024-07-23'
 header-includes:
 - |
   ```{=man}
