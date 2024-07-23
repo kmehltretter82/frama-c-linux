@@ -1,4 +1,4 @@
-[kernel] Parsing blob_region.i (no preprocessing)
+[kernel] Parsing blob.i (no preprocessing)
 [region] Analyzing regions
 [region] Function array_blob:
   R0003: --- arr 96b 0..96 [0]: R0004 ;
