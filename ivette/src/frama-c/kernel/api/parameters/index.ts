@@ -38,6 +38,42 @@ import * as Server from 'frama-c/server';
 import * as State from 'frama-c/states';
 
 
+/** Signal for state [`session`](#session)  */
+export const signalSession: Server.Signal = {
+  name: 'kernel.parameters.signalSession',
+};
+
+const getSession_internal: Server.GetRequest<null,string> = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.parameters.getSession',
+  input: Json.jNull,
+  output: Json.jString,
+  fallback: '',
+  signals: [],
+};
+/** Getter for state [`session`](#session)  */
+export const getSession: Server.GetRequest<null,string>= getSession_internal;
+
+const setSession_internal: Server.SetRequest<string,null> = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.parameters.setSession',
+  input: Json.jString,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`session`](#session)  */
+export const setSession: Server.SetRequest<string,null>= setSession_internal;
+
+const session_internal: State.State<string> = {
+  name: 'kernel.parameters.session',
+  signal: signalSession,
+  getter: getSession,
+  setter: setSession,
+};
+/** State of parameter -session */
+export const session: State.State<string> = session_internal;
+
 /** Signal for state [`astDiff`](#astdiff)  */
 export const signalAstDiff: Server.Signal = {
   name: 'kernel.parameters.signalAstDiff',
