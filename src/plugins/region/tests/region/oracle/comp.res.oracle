@@ -1,0 +1,9 @@
+[kernel] Parsing comp.c (with preprocessing)
+[region] Analyzing regions
+[region] Function f:
+  R0003: --- s 192b 0..32 [1]: R0004 64..128 [1]: R0007 128..192 [1]: R000b ;
+  R0004: -W- (int) 32b ;
+  R0007: -W- (int *) 64b (*R0001) ;
+  R0001: RW- a (int) 32b ;
+  R000b: --- 64b 0..64 [4]: R000d ;
+  R000d: -W- (short) 16b ;
