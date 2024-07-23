@@ -481,22 +481,53 @@ Each \FramaC plug-in may have its own session directory (default is
 a plug-in's session directory by using the option \texttt{-<plug-in
   shortname>-session}.
 
-\subsection{Variable \texttt{FRAMAC\_CONFIG}}\label{sec:var-config}
+\subsection{User directories variables}\label{sec:var-user-dirs}
 
-\FramaC may have to generate configuration files during a session in order to
-reuse them later in other sessions.
+\FramaC provides facilities for sharing information between session using
+XDG-like cache, config and state directories. Of course, the default location of
+these directories is system dependent.
 
-By default, these files are generated or searched in a subdirectory
-\texttt{frama-c} (or \texttt{.frama-c}) of the system's default configuration
-directory ({\it e.g.}
-\texttt{\%USERPROFILE\%} on Windows or \texttt{\$HOME/.config}
-on Linux). You can also set the environment variable \textttdef{FRAMAC\_CONFIG}
-or the option \optiondef{-}{config} to change this path.
+\begin{itemize}
+  \item macOS
+  \begin{itemize}
+    \item cache: \lstinline{~/Library/Caches/frama-c}
+    \item config: \lstinline{~/Application Support/frama-c/config}
+    \item state: \lstinline{~/Application Support/frama-c/state}
+  \end{itemize}
+  \item Unix (non macOS)
+  \begin{itemize}
+    \item cache: \lstinline{~/.cache/frama-c}
+    \item config: \lstinline{~/.config/frama-c}
+    \item state: \lstinline{ ~/.local/state/frama-c}
+  \end{itemize}
+  \item Windows
+  \begin{itemize}
+    \item cache: \lstinline{%TEMP%/frama-c}
+    \item config: \lstinline{%LOCALAPPDATA%/frama-c/config}
+    \item state: \lstinline{%LOCALAPPDATA%/frama-c/state}
+  \end{itemize}
+\end{itemize}
 
-Each \FramaC plug-in may have its own configuration directory if required (on
-Linux, default is \texttt{\$HOME/.config/frama-c/<plug-in shortname>}). It is
-also possible to change a plug-in's config directory by using the option
-\texttt{-<plug-in shortname>-config}.
+There are three ways to customize these locations for \FramaC:
+\begin{itemize}
+  \item Frama-C options: \lstinline{-cache/-config/-state}
+  \item Frama-C variables: \lstinline{FRAMAC_CACHE/CONFIG/STATE}
+  \item XDG variables: \lstinline{XDG_CACHE/CONFIG/STATE_HOME} (will create subdirectory \lstinline{frama-c} in it)
+\end{itemize}
+
+If several are used at the same time for the same directory, the order of
+priority is: \FramaC options > \FramaC variables > XDG variables.
+
+Each \FramaC plug-in may have its own user directories if required, they are
+put in a subdirectory \lstinline{plug-in shortname}. Furthermore, they may
+provide options and variables to override it:
+\begin{itemize}
+  \item \lstinline{-<plug-in shortname>-cache/config/state}
+  \item \lstinline{FRAMAC_<PLUG_IN SHORTNAME>_CACHE/CONFIG/STATE}
+\end{itemize}
+
+Again, options have the priority over the variables. Furthermore, plug-in
+configuration have the priority over kernel configuration.
 
 \section{Exit Status}
 
