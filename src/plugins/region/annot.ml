@@ -38,8 +38,8 @@ and step =
   | Var of varinfo
   | AddrOf of path
   | Star of path
-  | Index of path
   | Shift of path
+  | Index of path * int
   | Field of path * fieldinfo
   | Cast of typ * path
 
@@ -59,7 +59,7 @@ let atomic = function
 let rec pp_step fmt = function
   | Var x -> Varinfo.pretty fmt x
   | Field(p,f) -> pfield p f fmt
-  | Index a -> Format.fprintf fmt "%a[..]" pp_atom a
+  | Index(a,n) -> Format.fprintf fmt "%a[%d]" pp_atom a n
   | Shift a -> Format.fprintf fmt "%a+(..)" pp_atom a
   | Star a -> Format.fprintf fmt "*%a" pp_atom a
   | AddrOf a -> Format.fprintf fmt "&%a" pp_atom a
@@ -184,8 +184,8 @@ let rec parse_lpath (env:env) (e: lexpr) =
       { loc ; step = Star ls ; typ = pointed }
     else
     if Cil.isArrayType typ then
-      let elt = Cil.typeOf_array_elem typ in
-      { loc ; step = Index lv ; typ = elt }
+      let elt,size = Cil.typeOf_array_elem_size typ in
+      { loc ; step = Index(lv,Z.to_int @@ Option.get size) ; typ = elt }
     else
       error env ~loc:lv.loc "Pointer or array type expected"
   | PLcast( t , a ) ->

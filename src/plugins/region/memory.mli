@@ -72,12 +72,11 @@ val iter : map -> (region -> unit) -> unit
 val region : map -> node -> region
 val regions : map -> region list
 
+val new_chunk : map -> ?size:int -> ?ptr:node -> unit -> node
 val add_root : map -> Cil_types.varinfo -> node
 val add_label : map -> string -> node
-val add_cell : map -> ?size:int -> ?ptr:node -> ?root:varinfo -> ?label:string -> unit -> node
-val add_range : map -> size:int -> offset:int -> length:int -> data:node -> node
 val add_field : map -> node -> fieldinfo -> node
-val add_index : map -> node -> typ -> node
+val add_index : map -> node -> typ -> int -> node
 val add_points_to : map -> node -> node -> unit
 val add_value : map -> node -> typ -> node option
 
@@ -85,7 +84,7 @@ val read : map -> node -> Access.acs -> unit
 val write : map -> node -> Access.acs -> unit
 val shift : map -> node -> Access.acs -> unit
 
-val merge : map -> node -> node -> node
+val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
 
 (** @raise Not_found *)

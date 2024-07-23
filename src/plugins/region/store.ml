@@ -27,18 +27,20 @@
 module Imap = Map.Make(Int)
 
 type 'a rref = int
-type 'a store = 'a Imap.t ref
+type 'a store = {
+  mutable rid : int ;
+  mutable map : 'a Imap.t ;
+}
 
-let new_store () = ref Imap.empty
-let copy r = ref !r
-let rid = ref 0
+let new_store () = { rid = 0 ; map = Imap.empty }
+let copy r = { rid = r.rid ; map = r.map }
 
 let make s v =
-  let k = incr rid ; !rid in
-  s := Imap.add k v !s ; k
+  let k = succ s.rid in
+  s.rid <- k ; s.map <- Imap.add k v s.map ; k
 
-let get s k = Imap.find k !s
-let set s k v = s := Imap.add k v !s
+let get s k = Imap.find k s.map
+let set s k v = s.map <- Imap.add k v s.map
 
 let eq _s i j = (i == j)
 

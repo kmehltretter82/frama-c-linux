@@ -1253,6 +1253,12 @@ val typeOf_array_elem : typ -> typ
 (** Returns the type of the array elements of the given type.
     Asserts it is an array type. *)
 
+val typeOf_array_elem_size : typ -> typ * Z.t option
+(** Returns the type of the array elements of the given type, and the size
+    of the array, if any.
+    Asserts it is an array type.
+    @since Frama-C+dev *)
+
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
 

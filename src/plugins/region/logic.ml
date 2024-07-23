@@ -27,15 +27,15 @@ let rec add_lval (m:map) (p:path): node =
   match p.step with
   | Var x -> add_root m x
   | Field(lv,fd) -> Memory.add_field m (add_lval m lv) fd
-  | Index lv -> Memory.add_index m (add_lval m lv) lv.typ
+  | Index(lv,n) -> Memory.add_index m (add_lval m lv) lv.typ n
   | Star e | Cast(_,e) -> add_pointer m e
   | Shift _ | AddrOf _ ->
     Options.error ~source:(fst p.loc)
       "Unexpected expression (l-value expected)" ;
-    Memory.add_cell m ()
+    Memory.new_chunk m ()
 and add_pointer  (m:map) (p:path): Memory.node =
   match add_exp m p with
-  | None -> add_cell m ()
+  | None -> Memory.new_chunk m ()
   | Some r -> r
 
 and add_exp (m:map) (p:path): Memory.node option =

@@ -34,7 +34,7 @@ let pointer m v =
   match v.ptr with
   | Some p -> v, p
   | None ->
-    let p = add_cell m () in
+    let p = new_chunk m () in
     Option.iter (fun s -> Memory.add_points_to m s p) v.from ;
     { v with ptr = Some p }, p
 
@@ -51,7 +51,9 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field m r fd) fd.ftype ofs
   | Index(_,ofs) ->
-    add_loffset m s (add_index m r ty) (Cil.typeOf_array_elem ty) ofs
+    let elt,size = Cil.typeOf_array_elem_size ty in
+    let n = Z.to_int @@ Option.get size in
+    add_loffset m s (add_index m r elt n) elt ofs
 
 and add_value m s e = ignore (add_exp m s e)
 

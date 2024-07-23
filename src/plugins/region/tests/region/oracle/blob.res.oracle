@@ -1,0 +1,13 @@
+[kernel] Parsing blob.i (no preprocessing)
+[region] Analyzing regions
+[region] Function array_blob:
+  R0003: --- arr 96b 0..96 [0]: R0004 ;
+  R0004: --- 0b ;
+  R0001: -W- p (int *) 64b (*R0004) ;
+[region] Function struct_blob:
+  R0003: --- y 64b 0..32 [0]: R0004 ;
+  R0004: --- 0b ;
+  R0001: -W- p (int *) 64b (*R0004) ;
+[region] Function var_blob:
+  R0003: --- x 0b ;
+  R0001: -W- p (int *) 64b (*R0003) ;

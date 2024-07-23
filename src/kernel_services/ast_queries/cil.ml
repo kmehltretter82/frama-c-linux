@@ -3635,17 +3635,20 @@ let setReturnTypeVI (v: varinfo) (t: typ) =
 let setReturnType (f:fundec) (t:typ) =
   setReturnTypeVI f.svar t
 
-(** Returns the type pointed by the given type. Asserts it is a pointer type *)
 let typeOf_pointed typ =
   match unrollType typ with
   | TPtr (typ,_) -> typ
   | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
 
-(** Returns the type of the elements of the array. Asserts it is an array type
-*)
 let typeOf_array_elem t =
   match unrollType t with
   | TArray (ty_elem, _, _) -> ty_elem
+  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+
+let typeOf_array_elem_size t =
+  match unrollType t with
+  | TArray (ty_elem, arr_size, _ ) ->
+    ty_elem, Option.bind arr_size !constfoldtoint
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
 let no_op_coerce typ t =
