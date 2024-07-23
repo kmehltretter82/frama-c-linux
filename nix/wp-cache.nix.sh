@@ -21,7 +21,10 @@
 #                                                                        #
 ##########################################################################
 
-commit="$(git ls-remote git@git.frama-c.com:frama-c/wp-cache.git HEAD | cut -f1)"
+commit="$(git ls-remote git@git.frama-c.com:frama-c/wp-cache.git HEAD)"
+if [ $? != 0 ]; then exit 1; fi
+
+commit=$(echo "$commit" | cut -f1)
 
 cat >./nix/wp-cache.nix << EOL
 { lib, stdenv } :
