@@ -432,24 +432,6 @@ function createPropertiesNodes(): Editor.Aspect<Property[]> {
   });
 }
 
-// Bullet colors.
-function getBulletColor(status: States.Tag): string {
-  switch (status.name) {
-    case 'unknown': return '#FF8300';
-    case 'invalid':
-    case 'invalid_under_hyp': return '#FF0000';
-    case 'valid':
-    case 'valid_under_hyp': return '#00B900';
-    case 'considered_valid': return '#73bbbb';
-    case 'invalid_but_dead':
-    case 'valid_but_dead':
-    case 'unknown_but_dead': return '#000000';
-    case 'never_tried': return '#FFFFFF';
-    case 'inconsistent': return '#FF00FF';
-    default: return '#FF8300';
-  }
-}
-
 // Property bullet gutter marker.
 class PropertyBullet extends Editor.GutterMarker {
   readonly bullet: HTMLDivElement;
@@ -457,12 +439,10 @@ class PropertyBullet extends Editor.GutterMarker {
   constructor(status?: States.Tag) {
     super();
     this.bullet = document.createElement('div');
-    this.bullet.innerHTML = '◉';
-    if (status) {
-      this.bullet.style.color = getBulletColor(status);
-      this.bullet.style.textAlign = 'center';
-      if (status.descr) this.bullet.title = status.descr;
-    }
+    this.bullet.classList.add('bullet');
+    if (!status) return;
+    this.bullet.classList.add(status.name);
+    if (status.descr) this.bullet.title = status.descr;
   }
 }
 

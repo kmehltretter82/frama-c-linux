@@ -50,14 +50,71 @@
     border-bottom: solid 0.2em var(--non-terminating);
 }
 
-.bullet {
-    width: 1.5em;
-    background: var(--code-bullet);
-}
-
 /* More contrasted color for thinner icons. */
 .titlebar-thin-icon {
     fill: var(--text);
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Status Bullets                                                     --- */
+/* -------------------------------------------------------------------------- */
+
+.bullet {
+    width: 60%;
+    aspect-ratio: 1 / 1;
+    text-align: center;
+    border-radius: 50%;
+    border: 0.5px solid rgba(0, 0, 0, 0.5);
+    margin-left: 20%;
+    margin-top: 25%;
+}
+
+.bullet.dead {
+    background: var(--status-dead);
+}
+
+.bullet.valid {
+    background: var(--status-valid);
+}
+
+.bullet.invalid {
+    background: var(--status-invalid);
+}
+
+.bullet.unknown {
+    background: var(--status-unknown);
+}
+
+.bullet.never_tried {
+    background: var(--status-never-tried);
+}
+
+.bullet.inconsistent {
+    background: var(--status-inconsistent);
+}
+
+.bullet.valid_but_dead {
+    background: var(--status-valid-but-dead);
+}
+
+.bullet.invalid_but_dead {
+    background: var(--status-invalid-but-dead);
+}
+
+.bullet.unknown_but_dead {
+    background: var(--status-unknown-but-dead);
+}
+
+.bullet.valid_under_hyp {
+    background: var(--status-valid-under-hyp);
+}
+
+.bullet.considered_valid {
+    background: var(--status-considered-valid);
+}
+
+.bullet.invalid_under_hyp {
+    background: var(--status-invalid-under-hyp);
 }
 
 /* -------------------------------------------------------------------------- */

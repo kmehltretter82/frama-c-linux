@@ -109,5 +109,20 @@
     --codemirror-number: #116644;
     --codemirror-keyword: #770088;
     --codemirror-def: #0000ff;
+
+    --status-dead : #000000;
+    --status-valid : #499E00;
+    --status-invalid: #FF0000;
+    --status-unknown: #FFE62E;
+    --status-never-tried: #FFFFFF;
+    --status-inconsistent: #FF00FF;
+
+    --status-valid-but-dead: linear-gradient(to right, var(--status-valid) 49%, var(--status-dead) 51%);
+    --status-invalid-but-dead: linear-gradient(to right, var(--status-invalid) 49%, var(--status-dead) 51%);
+    --status-unknown-but-dead: linear-gradient(to right, var(--status-unknown) 49%, var(--status-dead) 51%);
+
+    --status-valid-under-hyp: linear-gradient(to right, var(--status-valid) 49%, var(--status-unknown) 51%);
+    --status-considered-valid: linear-gradient(to right, var(--status-valid) 49%, #73BBBB 51%);
+    --status-invalid-under-hyp: linear-gradient(to right, var(--status-invalid) 49%, var(--status-unknown) 51%);
   }
 }
