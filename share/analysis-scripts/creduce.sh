@@ -113,14 +113,14 @@ script_for_creduce="./script_for_creduce.sh"
 if [ -z "${CREDUCE+x}" ]; then
     # Now some distributions have 'cvise' instead of 'creduce', so try it
     # if found in PATH
-    if command -v cvise 2>&1 >/dev/null; then
+    if command -v cvise >/dev/null 2>&1; then
         CREDUCE="cvise"
     else
         CREDUCE="creduce"
     fi
 fi
 
-if ! command -v "$CREDUCE" 2>&1 >/dev/null; then
+if ! command -v "$CREDUCE" >/dev/null 2>&1; then
     echo "cvise/creduce not found; install it in the PATH or"
     echo "put it in environment variable CREDUCE."
     exit 1
@@ -137,7 +137,7 @@ for f in "$@"; do
         too_many_sources+=" $f"
     fi
 done
-if [ ! -z "$too_many_sources" ]; then
+if [ -n "$too_many_sources" ]; then
     echo "error: too many sources; only the first argument must be a file: $file"
     echo "       remove these from the command-line:$too_many_sources"
     exit 1
@@ -182,7 +182,7 @@ fi
 #
 #### End of command-line and environment validation
 
-if [[ ! "$@" =~ no-autoload-plugins ]]; then
+if [[ ! "$*" =~ no-autoload-plugins ]]; then
     echo "********************************************************************"
     echo "Hint: consider using -no-autoload-plugins -load-module [modules]"
     echo "      for faster reduction"
@@ -208,7 +208,7 @@ else
     cpp_retcode=$?
     set -e
     if [ $cpp_retcode -ne 0 ]; then
-        echo "error trying to get preprocessing flags (exit code: $cpp_retcode): $FRAMAC -print-cpp-commands $@ $file"
+        echo "error trying to get preprocessing flags (exit code: $cpp_retcode): $FRAMAC -print-cpp-commands $* $file"
         exit $cpp_retcode
     fi
     CPP=$(echo "$cpp_output" | \
@@ -269,7 +269,7 @@ else
 fi
 "$SED" -i "s|@FRAMAC@|$FRAMAC|g" "$script_for_creduce"
 "$SED" -i "s|@BASE@|$base|g" "$script_for_creduce"
-"$SED" -i "s|@FCFLAGS@|$(echo $@ | tr "'" "\\'")|g" "$script_for_creduce"
+"$SED" -i "s|@FCFLAGS@|$(echo "$@" | tr "'" "\\'")|g" "$script_for_creduce"
 chmod u+x "$script_for_creduce"
 
 trap '{ echo "Creduce interrupted!"; echo ""; echo "(partially) reduced file: $dir_for_reduction/$base"; exit 0; }' SIGINT
@@ -288,7 +288,7 @@ if [ $? -ne 0 ]; then
     echo "       check the options given to Frama-C."
     echo "       If you edited '$script_for_creduce', check it as well."
     echo ""
-    if [ $(wc -l /tmp/script_for_creduce.out | cut -d' ' -f1) -gt 20 ]; then
+    if [ "$(wc -l /tmp/script_for_creduce.out | cut -d' ' -f1)" -gt 20 ]; then
         echo "# Script output (first 20 lines):"
         head -n 20 /tmp/script_for_creduce.out
         echo "(...) [truncated; full output in /tmp/script_for_creduce.out]"
