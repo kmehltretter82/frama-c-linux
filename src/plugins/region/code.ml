@@ -123,8 +123,8 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
   | Set(lv, { enode = Lval exp }, _) ->
     let l = add_lval m s lv in
     let r = add_lval m s exp in
-    Memory.read m l (Lval(s,exp)) ;
-    Memory.write  m l (Lval(s,lv)) ;
+    Memory.read m r (Lval(s,exp)) ;
+    Memory.write m l (Lval(s,lv)) ;
     Memory.merge_copy m ~l ~r
 
   | Set(lv,e,_) ->
