@@ -1,4 +1,5 @@
 /* run.config
+   STDOPT: +"-eva-unroll-recursive-calls 5"
    COMMENT: functions used in Contiki
 */
 

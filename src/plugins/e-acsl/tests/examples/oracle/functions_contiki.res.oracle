@@ -1,8 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl] functions_contiki.c:27: Warning: 
+[e-acsl] functions_contiki.c:28: Warning: 
   no assigns clause generated for function length because pointers as arguments is not yet supported
-[e-acsl] functions_contiki.c:27: Warning: 
-  E-ACSL construct `logic functions with labels' is not yet supported.
-  Ignoring annotation.
+[e-acsl] functions_contiki.c:28: Warning: 
+  no assigns clause generated for function length_aux because pointers as arguments is not yet supported
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] functions_contiki.c:27: Warning: assertion got status unknown.
+[eva:alarm] functions_contiki.c:18: Warning: 
+  accessing uninitialized left-value. assert \initialized(&l->next);
