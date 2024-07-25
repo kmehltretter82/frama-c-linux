@@ -40,7 +40,10 @@ function makeRecord(
   ranges.forEach((rg, i) => {
     const port = `r${i}`;
     const target = `n${rg.data}`;
-    edges.push({ source, sourcePort: port, target });
+    edges.push({
+      source, sourcePort: port, target,
+      head: 'none', line: 'dashed'
+    });
     if (offset !== rg.offset)
       cells.push(`${offset}..${rg.offset - 1} ##`);
     offset = rg.offset + rg.length;
@@ -82,7 +85,10 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     r.labels.forEach(a => {
       const lid = `L${a}`;
       nodes.push({ ...L, id: lid, label: `${a}:` });
-      edges.push({ source: lid, aligned: true, head: 'tee', target: id });
+      edges.push({
+        source: lid, target: id, aligned: true,
+        headAnchor: 'n', head: 'none', color: 'grey'
+      });
     });
     // --- Roots
     const R: Dot.Node =
@@ -90,12 +96,15 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     r.roots.forEach(x => {
       const xid = `X${x}`;
       nodes.push({ ...R, id: xid, label: x });
-      edges.push({ source: xid, headAnchor: "e", target: id });
+      edges.push({
+        source: xid, target: id,
+        headAnchor: "e", head: 'none', color: 'grey'
+      });
     });
     // --- Pointed
     if (r.pointed !== undefined) {
       const pid = `n${r.pointed}`;
-      edges.push({ source: id, target: pid, head: 'dot', color: 'orange' });
+      edges.push({ source: id, target: pid });
     }
   });
   return { nodes, edges };
