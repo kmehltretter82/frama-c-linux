@@ -237,6 +237,57 @@ let process_inactive_postconds kf inactive_bhvs =
            (pp_header kf) b Eva_utils.pp_callstack;
     ) inactive_bhvs
 
+
+(* ---------------- Evaluation of "calls" ACSL extension  ------------------- *)
+
+let get_call term =
+  match term.term_node with
+  | TLval (TVar { lv_origin = Some v }, TNoOffset ) -> Globals.Functions.get v
+  | _ -> raise Not_found
+
+(* Returns the list of kernel functions referred to by a "calls" annotation,
+   or raise exception Not_found if it is not a proper "calls" annotation. *)
+let get_calls_kf code_annot =
+  match code_annot.annot_content with
+  | AExtended (_, _, { ext_kind = Ext_terms terms }) -> List.map get_call terms
+  | _ -> raise Not_found
+
+(* Returns the "calls" annotations at statement [stmt]. *)
+let get_calls_annotations stmt =
+  let filter code_annot =
+    match code_annot.annot_content with
+    | AExtended (_, _, e) -> e.ext_name = "calls" && e.ext_has_status
+    | _ -> false
+  in
+  Annotations.code_annot ~filter stmt
+
+(* Checks one "calls" annotation [code_annot] at statement [stmt]. *)
+let check_calls_annotation stmt called_functions code_annot =
+  match get_calls_kf code_annot with
+  | exception Not_found ->
+    Self.warning ~current:true ~once:true
+      "Ignoring invalid calls annotation: %a"
+      Printer.pp_code_annotation code_annot;
+    called_functions
+  | kfs ->
+    let length = List.length called_functions in
+    let kfs = Kernel_function.Set.of_list kfs in
+    let is_call (kf, _) = Kernel_function.Set.mem kf kfs in
+    let called_functions = List.filter is_call called_functions in
+    let status =
+      match List.length called_functions with
+      | 0 -> Alarmset.False
+      | l when l = length -> Alarmset.True
+      | _ -> Alarmset.Unknown
+    in
+    let kf = Kernel_function.find_englobing_kf stmt in
+    emit_code_annot_status ~reduce:true ~empty:false kf stmt code_annot status;
+    called_functions
+
+let check_calls_annotations stmt called_functions =
+  let calls = get_calls_annotations stmt in
+  List.fold_left (check_calls_annotation stmt) called_functions calls
+
 (* -------------------------------- Functor --------------------------------- *)
 
 module type S = sig
