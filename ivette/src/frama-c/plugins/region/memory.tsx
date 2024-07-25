@@ -58,8 +58,8 @@ function makeRecord(
 }
 
 interface Diagram {
-  nodes: Dot.Node[];
-  edges: Dot.Edge[];
+  nodes: readonly Dot.Node[];
+  edges: readonly Dot.Edge[];
 }
 
 function makeDiagram(regions: readonly Region.region[]): Diagram {
@@ -110,11 +110,23 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
   return { nodes, edges };
 }
 
-function addSelected(d: Diagram, label: string, node: Region.node): void {
-  d.nodes.push({
-    id: 'Selected', label, title: "Selected Marker", shape: 'note'
-  });
-  d.edges.push({ source: 'Selected', target: `n${node}` });
+function addSelected(
+  diag: Diagram,
+  node: Region.node | undefined,
+  label: string | undefined
+): Diagram {
+  if (node && label) {
+    const nodes = diag.nodes.concat({
+      id: 'Selected', label, title: "Selected Marker",
+      shape: 'note', color: 'selected'
+    });
+    const edges = diag.edges.concat({
+      source: 'Selected', target: `n${node}`, aligned: true,
+      headAnchor: 's', tailAnchor: 'n',
+    });
+    return { nodes, edges };
+  } else
+    return diag;
 }
 
 export interface MemoryViewProps {
@@ -125,9 +137,12 @@ export interface MemoryViewProps {
 
 export function MemoryView(props: MemoryViewProps): JSX.Element {
   const { regions = [], label, node } = props;
-  const diagram = React.useMemo(() => makeDiagram(regions), [regions]);
-  if (label && node) addSelected(diagram, label, node);
-  return <Dot.Diagram {...diagram} />;
+  const baseDiagram = React.useMemo(() => makeDiagram(regions), [regions]);
+  const fullDiagram = React.useMemo(
+    () => addSelected(baseDiagram, node, label),
+    [baseDiagram, node, label]
+  );
+  return <Dot.Diagram {...fullDiagram} />;
 }
 
 // --------------------------------------------------------------------------

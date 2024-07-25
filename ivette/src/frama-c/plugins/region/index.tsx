@@ -43,9 +43,11 @@ function RegionAnalys(): JSX.Element {
   const [pinned, setPinned] = React.useState(false);
   const [running, setRunning] = React.useState(false);
   const setComputing = Dome.useProtected(setRunning);
-  const scope = States.useCurrentScope();
+  const { scope, marker } = States.useCurrentLocation();
   const { kind, name } = States.useDeclaration(scope);
   const regions = States.useRequestStable(Region.regions, kf);
+  const node = States.useRequestStable(Region.localize, marker);
+  const { descr: label } = States.useMarker(marker);
   React.useEffect(() => {
     if (!pinned && kind === 'FUNCTION' && scope !== kf) {
       setKf(scope);
@@ -84,7 +86,7 @@ function RegionAnalys(): JSX.Element {
           onClick={() => setPinned(!pinned)}
         />
       </Tools.ToolBar>
-      <MemoryView regions={regions} />
+      <MemoryView regions={regions} node={node} label={label} />
     </>
   );
 }
