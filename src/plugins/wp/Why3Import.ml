@@ -285,11 +285,11 @@ let rec parse_theory (env) (theory:W.Theory.theory) (menv) =
                 ) dlogics
             | Dind (_,dec) ->
               List.iter (fun ((ls,_) : W.Decl.ind_decl) ->
-                  L.result "Dind with ls %s" ls.ls_name.id_string;
+                  L.debug ~dkey "Dind with ls %s" ls.ls_name.id_string;
                 ) dec;
 
             | Dprop (_,prsymbol,_) ->
-              L.result "Dprop with prsymbol %s" prsymbol.pr_name.id_string;
+              L.debug ~dkey "Dprop with prsymbol %s" prsymbol.pr_name.id_string;
           end
         | Use exth ->
           L.debug ~dkey "Parsing use of external theories %s" exth.th_name.id_string;
@@ -331,7 +331,10 @@ let register_builtin env thname =
         let ls = Logic_info.Hashtbl.find env.lils li in
         let (package,theory,name) = T.restore_path ls.ls_name in
         let params = List.map (sort_of_lv) li.l_profile in
-        let result = sort_of_lt @@ Option.get (li.l_type) in
+        let result = match li.l_type with
+          | Some a -> sort_of_lt a
+          | None -> Qed.Logic.Sprop
+        in
         LB.add_builtin li.l_var_info.lv_name (List.map (kind_of_lv) li.l_profile) @@
         Lang.imported_f ~package ~theory ~name ~params ~result  ();
         L.result "Imported logic ! %a" pp_li li;
