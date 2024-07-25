@@ -21,4 +21,4 @@
 (**************************************************************************)
 
 let is_computed () = false
-let get_cvalue_state kinstr = Cvalue.Model.top
+let get_cvalue_state _kinstr = Cvalue.Model.top
