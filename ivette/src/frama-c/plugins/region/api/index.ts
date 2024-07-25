@@ -66,11 +66,13 @@ export const byNode: Compare.Order<node> = Compare.number;
 export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
 
 export type range =
-  { offset: number, length: number, cells: number, data: node };
+  { label: string, offset: number, length: number, cells: number, data: node
+    };
 
 /** Decoder for `range` */
 export const jRange: Json.Decoder<range> =
   Json.jObject({
+    label: Json.jString,
     offset: Json.jNumber,
     length: Json.jNumber,
     cells: Json.jNumber,
@@ -80,7 +82,9 @@ export const jRange: Json.Decoder<range> =
 /** Natural order for `range` */
 export const byRange: Compare.Order<range> =
   Compare.byFields
-    <{ offset: number, length: number, cells: number, data: node }>({
+    <{ label: string, offset: number, length: number, cells: number,
+       data: node }>({
+    label: Compare.string,
     offset: Compare.number,
     length: Compare.number,
     cells: Compare.number,
@@ -89,7 +93,7 @@ export const byRange: Compare.Order<range> =
 
 /** Default value for `range` */
 export const rangeDefault: range =
-  { offset: 0, length: 0, cells: 0, data: nodeDefault };
+  { label: '', offset: 0, length: 0, cells: 0, data: nodeDefault };
 
 export type region =
   { node: node, roots: string[], labels: string[], parents: node[],

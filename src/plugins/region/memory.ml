@@ -39,7 +39,7 @@ type node = chunk Ufind.rref
 and layout =
   | Blob
   | Cell of int * node option
-  | Compound of int * node Ranges.t
+  | Compound of int * Fields.domain * node Ranges.t
 
 and chunk = {
   cparents: node list ;
@@ -64,8 +64,9 @@ type map = {
 (* --- Accessors                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_) -> s
-let ranges = function Blob | Cell _ -> [] | Compound(_,R rs) -> rs
+let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_,_) -> s
+let ranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs
+let fields = function Blob | Cell _ -> Fields.empty | Compound(_,fds,_) -> fds
 let pointed = function Blob | Compound _ -> None | Cell(_,p) -> p
 
 let types (m : chunk) : typ list =
@@ -88,15 +89,19 @@ let unlock m = m.locked <- false
 
 let pp_node fmt (n : node) = Format.fprintf fmt "R%04x" @@ Store.id n
 
+let pp_field fields fmt fd =
+  if Options.debug_atleast 1 then Ranges.pp_range fmt fd else
+    Fields.pretty fields fmt fd
+
 let pp_layout fmt = function
   | Blob -> Format.pp_print_string fmt "<blob>"
   | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
   | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
-  | Compound(s,rg) ->
+  | Compound(s,fields,rg) ->
     Format.fprintf fmt "@[<hv 0>{%04d" s ;
     Ranges.iteri
       (fun (rg : rg) ->
-         Format.fprintf fmt "@ | %a: %a" Ranges.pp_range rg pp_node rg.data
+         Format.fprintf fmt "@ | %a: %a" (pp_field fields) rg pp_node rg.data
       ) rg ;
     Format.fprintf fmt "@ }@]"
 
@@ -179,12 +184,13 @@ let new_chunk (m: map) ?(size=0) ?ptr () =
     | Some _ -> Cell(Ranges.gcd size Cil.(bitsSizeOf voidPtrType), ptr)
   in Ufind.make m.store { empty with clayout }
 
-let new_range (m: map) ~size ~offset ~length ~data : node =
+let new_range (m: map) ?(fields=Fields.empty) ~size ~offset ~length data : node =
   failwith_locked m "Region.Memory.new_range" ;
   let last = offset + length in
   if not (0 <= offset && offset < last && last <= size) then
     raise (Invalid_argument "Region.Memory.add_range") ;
-  let clayout = Compound(size, Ranges.singleton { offset ; length ; data }) in
+  let ranges = Ranges.singleton { offset ; length ; data } in
+  let clayout = Compound(size, fields, ranges) in
   let n = Ufind.make m.store { empty with clayout } in
   update m data (fun r -> { r with cparents = nodes m @@ n :: r.cparents }) ; n
 
@@ -207,6 +213,7 @@ let add_label (m: map) a =
 (* -------------------------------------------------------------------------- *)
 
 type range = {
+  label: string ; (* pretty printed fields *)
   offset: int ;
   length: int ;
   cells: int ;
@@ -219,6 +226,7 @@ type region = {
   roots: varinfo list ;
   labels: string list ;
   types: typ list ;
+  fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   shifts: Access.acs list ;
@@ -227,9 +235,29 @@ type region = {
   pointed: node option ;
 }
 
-let pp_range fmt (r: range) =
-  Format.fprintf fmt "%d..%d [%d]: %a"
-    r.offset (r.offset + r.length) r.cells pp_node r.data
+let pp_cells fmt = function
+| 1 -> ()
+| 0 -> Format.fprintf fmt "[…]"
+| n -> Format.fprintf fmt "[%d]" n
+
+type slice =
+  | Padding of int
+  | Range of range
+
+let pad n s = if n > 0 then Padding n :: s else s
+
+let rec span k s = function
+  | [] -> pad (s-k) []
+  | r::rs -> pad (r.offset - k) @@ Range r :: span (r.offset + r.length) s rs
+
+let pp_slice fields fmt = function
+  | Padding n ->
+    Format.fprintf fmt "@ %a;" Fields.pp_bits n
+  | Range r ->
+    Format.fprintf fmt "@ %t: %a%a;"
+      (Fields.pslice ~fields ~offset:r.offset ~length:r.length)
+      pp_node r.data
+      pp_cells r.cells
 
 let pp_region fmt (m: region) =
   begin
@@ -242,9 +270,12 @@ let pp_region fmt (m: region) =
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
-    Format.fprintf fmt "@[<hv 0>" ;
-    List.iter (Format.fprintf fmt "@ %a" pp_range) m.ranges ;
-    Format.fprintf fmt "@]" ;
+    if m.ranges <> [] then
+      begin
+        Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
+        List.iter (pp_slice m.fields fmt) (span 0 m.sizeof m.ranges) ;
+        Format.fprintf fmt "@]@ }@]" ;
+      end ;
     if Options.debug_atleast 1 then
       begin
         List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
@@ -254,28 +285,31 @@ let pp_region fmt (m: region) =
     Format.fprintf fmt " ;@]" ;
   end
 
-let make_range (m: map) (rg: rg) : range =
-  let s = sizeof (get m rg.data).clayout in
+let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
+  let s = sizeof (get m data).clayout in
+  let p = Fields.pslice ~fields ~offset ~length in
   {
-    offset = rg.offset ;
-    length = rg.length ;
-    cells = if s = 0 then 0 else rg.length / s ;
-    data = node m rg.data ;
+    label = Format.asprintf "%t" p ;
+    offset ; length ;
+    cells = if s = 0 then 0 else length / s ;
+    data = node m data ;
   }
 
-let make_region (m: map) (n: node) (r: chunk) : region = {
-  node = n ;
-  parents = nodes m r.cparents ;
-  roots = Vset.elements r.croots ;
-  labels = Lset.elements r.clabels ;
-  reads = Access.Set.elements r.creads ;
-  writes = Access.Set.elements r.cwrites ;
-  shifts = Access.Set.elements r.cshifts ;
-  types = types r ;
-  sizeof = sizeof r.clayout ;
-  ranges = List.map (make_range m) @@ ranges r.clayout ;
-  pointed = Option.map (node m) (pointed r.clayout) ;
-}
+let make_region (m: map) (n: node) (r: chunk) : region =
+  let fields = fields r.clayout in
+  {
+    node = n ;
+    parents = nodes m r.cparents ;
+    roots = Vset.elements r.croots ;
+    labels = Lset.elements r.clabels ;
+    reads = Access.Set.elements r.creads ;
+    writes = Access.Set.elements r.cwrites ;
+    shifts = Access.Set.elements r.cshifts ;
+    types = types r ;
+    sizeof = sizeof r.clayout ;
+    fields ; ranges = List.map (make_range m fields) @@ ranges r.clayout ;
+    pointed = Option.map (node m) (pointed r.clayout) ;
+  }
 
 let region map n = make_region map n (get map n)
 
@@ -289,7 +323,7 @@ let rec walk h m f n =
     match r.clayout with
     | Blob -> ()
     | Cell(_,p) -> Option.iter (walk h m f) p
-    | Compound(_,rg) -> Ranges.iter (walk h m f) rg
+    | Compound(_,_,rg) -> Ranges.iter (walk h m f) rg
 
 let iter (m:map) (f: region -> unit) =
   let h = Hashtbl.create 0 in
@@ -335,16 +369,17 @@ let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
     merge_node m q (new_chunk m ~size ()) data
 
 let merge_ranges (m: map) (q: queue)
-    (sa : int) (wa : node Ranges.t)
-    (sb : int) (wb : node Ranges.t)
+    (sa : int) (fa : Fields.domain) (wa : node Ranges.t)
+    (sb : int) (fb : Fields.domain) (wb : node Ranges.t)
   : layout =
+  let fields = Fields.union fa fb in
   if sa = sb then
-    Compound(sa, Ranges.merge (merge_range m q) wa wb)
+    Compound(sa, fields, Ranges.merge (merge_range m q) wa wb)
   else
     let size = Ranges.gcd sa sb in
     let ra = Ranges.squash (merge_node m q) wa in
     let rb = Ranges.squash (merge_node m q) wb in
-    Compound(size, singleton ~size @@ merge_opt m q ra rb)
+    Compound(size, fields, singleton ~size @@ merge_opt m q ra rb)
 
 let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
   match a, b with
@@ -352,16 +387,20 @@ let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
 
   | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_opt m q pa pb)
 
-  | Compound(sa,wa), Compound(sb,wb) -> merge_ranges m q sa wa sb wb
+  | Compound(sa,fa,wa), Compound(sb,fb,wb) ->
+    merge_ranges m q sa fa wa sb fb wb
 
-  | Compound(sr,wr), Cell(sx,None) | Cell(sx,None), Compound(sr,wr) ->
+  | Compound(sr,fr,wr), Cell(sx,None)
+  | Cell(sx,None), Compound(sr,fr,wr) ->
     let size = Ranges.gcd sx sr in
-    Compound(size, singleton ~size @@ Ranges.squash (merge_node m q) wr)
+    Compound(size, fr, singleton ~size @@ Ranges.squash (merge_node m q) wr)
 
-  | Compound(sr,wr), Cell(sx,Some ptr) | Cell(sx,Some ptr), Compound(sr,wr) ->
+  | Compound(sr,fr,wr), Cell(sx,Some ptr)
+  | Cell(sx,Some ptr), Compound(sr,fr,wr) ->
     let rp = new_chunk m ~size:sx ~ptr () in
+    let fx = Fields.empty in
     let wx = Ranges.range ~length:sx rp in
-    merge_ranges m q sx wx sr wr
+    merge_ranges m q sx fx wx sr fr wr
 
 let merge_region (m: map) (q: queue) (a : chunk) (b : chunk) : chunk = {
   cparents = nodes m @@ Store.bag a.cparents b.cparents ;
@@ -406,14 +445,15 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
     let size = Cil.bitsSizeOf (TComp(ci,[])) in
     let offset, length = Cil.fieldBitsOffset fd in
     let rf = new_chunk m () in
-    let rc = new_range m ~size ~offset ~length ~data:rf in
+    let fields = Fields.singleton fd in
+    let rc = new_range m ~fields ~size ~offset ~length rf in
     ignore @@ merge m r rc ; rf
   else r
 
 let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
   let s = Cil.bitsSizeOf ty * n in
   let re = new_chunk m () in
-  let rc = new_range m ~size:s ~offset:0 ~length:s ~data:re in
+  let rc = new_range m ~size:s ~offset:0 ~length:s re in
   ignore @@ merge m r rc ; re
 
 let add_points_to (m: map) (a: node) (b : node) =
@@ -463,7 +503,7 @@ let cranges m r =
   let rg = Ufind.get m.store r in
   match rg.clayout with
   | Blob | Cell _ -> raise Not_found
-  | Compound(s,rgs) -> s, rgs
+  | Compound(s,_,rgs) -> s, rgs
 
 let cpointed m r =
   let rg = Ufind.get m.store r in

@@ -46,13 +46,16 @@ struct
   type t = Memory.range
   let jtype = Data.declare ~package ~name:"range" @@
     Jrecord [
+      "label", Jstring ;
       "offset", Jnumber ;
       "length", Jnumber ;
       "cells", Jnumber ;
       "data", Node.jtype ;
     ]
+
   let to_json (rg : Memory.range) =
     Json.of_fields [
+      "label", Json.of_string rg.label ;
       "offset", Json.of_int rg.offset ;
       "length", Json.of_int rg.length ;
       "cells", Json.of_int rg.cells ;

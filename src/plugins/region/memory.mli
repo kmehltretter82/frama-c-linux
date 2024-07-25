@@ -25,6 +25,7 @@ open Cil_types
 type node
 
 type range = {
+  label: string ;
   offset: int ;
   length: int ;
   cells: int ;
@@ -37,6 +38,7 @@ type region = {
   roots: varinfo list ;
   labels: string list ;
   types: typ list ;
+  fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   shifts: Access.acs list ;
@@ -48,7 +50,6 @@ type region = {
 type map
 
 val pp_node : Format.formatter -> node -> unit
-val pp_range : Format.formatter -> range -> unit
 val pp_region : Format.formatter -> region -> unit
 
 (** Initially unlocked. *)

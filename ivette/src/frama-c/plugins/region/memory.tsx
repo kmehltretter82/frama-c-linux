@@ -45,15 +45,12 @@ function makeRecord(
       head: 'none', line: 'dashed'
     });
     if (offset !== rg.offset)
-      cells.push(`${offset}..${rg.offset - 1} ##`);
+      cells.push(`#${rg.offset - offset}b`);
     offset = rg.offset + rg.length;
-    cells.push({
-      label: `${rg.offset}..${offset - 1} [${rg.cells}]`,
-      port,
-    });
+    cells.push({ label: rg.label, port });
   });
   if (offset !== sizeof)
-    cells.push(`${offset}..${sizeof - 1} ##`);
+    cells.push(`#${sizeof-offset}b`);
   return cells;
 }
 
