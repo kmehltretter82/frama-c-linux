@@ -32,11 +32,11 @@ let union = Domain.union
 let empty = Domain.empty
 let singleton (fd : fieldinfo) = Domain.singleton fd.fcomp
 
-(* minimal offset first, then maximal length, then largest struct *)
+(* minimal offset first, then minimal length, then largest struct *)
 let compare (a : field) (b : field) =
   let cmp = a.offset - b.offset in
   if cmp <> 0 then cmp else
-    let cmp = b.length - a.length in
+    let cmp = a.length - b.length in
     if cmp <> 0 then cmp else
       let sa = Cil.bitsSizeOf (TComp(a.data.fcomp,[])) in
       let sb = Cil.bitsSizeOf (TComp(b.data.fcomp,[])) in
@@ -64,26 +64,31 @@ let find fields rg =
 
 type slice = Bits of int | Field of fieldinfo
 
-let delta (a : _ range) (b : _ range) =
-  let p = a.offset + a.length in
-  let q = b.offset in
-  if p < q then [Bits (q - p)] else []
-
-let span fields rg =
-  match find_all fields rg with
-  | [] -> [Bits rg.length]
-  | fr :: frs ->
-    delta rg fr @ [Field fr.data] @
-    match List.rev frs with
-    | [] -> delta fr rg
-    | lr :: _ -> delta fr lr @ [Field lr.data] @ delta lr rg
-
 let pp_bits fmt n =
   if n <> 0 then Format.fprintf fmt "#%db" n
 
 let pp_slice fmt = function
   | Bits n -> pp_bits fmt n
   | Field fd -> Format.fprintf fmt ".%s" fd.fname
+
+let pad p q s =
+  let n = q - p in
+  if n > 0 then Bits n :: s else s
+
+let last (rg : _ range) = rg.offset + rg.length
+
+let span fields rg =
+  match find_all fields rg with
+  | [] -> [Bits rg.length]
+  | fr :: frs ->
+    pad rg.offset fr.offset @@
+    Field fr.data ::
+    let p = last fr in
+    let q = last rg in
+    match List.rev @@ List.filter (fun r -> p <= r.offset) frs with
+    | [] -> pad p q []
+    | lr :: _ ->
+      pad p lr.offset @@ Field lr.data :: pad (last lr) q []
 
 let pretty fields fmt rg =
   List.iter (pp_slice fmt) @@ span fields rg

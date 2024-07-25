@@ -236,19 +236,21 @@ type region = {
 }
 
 let pp_cells fmt = function
-| 1 -> ()
-| 0 -> Format.fprintf fmt "[…]"
-| n -> Format.fprintf fmt "[%d]" n
+  | 1 -> ()
+  | 0 -> Format.fprintf fmt "[…]"
+  | n -> Format.fprintf fmt "[%d]" n
 
 type slice =
   | Padding of int
   | Range of range
 
-let pad n s = if n > 0 then Padding n :: s else s
+let pad p q s =
+  let n = q - p in
+  if n > 0 then Padding n :: s else s
 
 let rec span k s = function
-  | [] -> pad (s-k) []
-  | r::rs -> pad (r.offset - k) @@ Range r :: span (r.offset + r.length) s rs
+  | [] -> pad k s []
+  | r::rs -> pad k r.offset @@ Range r :: span (r.offset + r.length) s rs
 
 let pp_slice fields fmt = function
   | Padding n ->
@@ -258,6 +260,10 @@ let pp_slice fields fmt = function
       (Fields.pslice ~fields ~offset:r.offset ~length:r.length)
       pp_node r.data
       pp_cells r.cells
+
+let pp_range fmt (r: range) =
+  Format.fprintf fmt "@ %d..%d: %a%a;"
+    r.offset (r.offset + r.length) pp_node r.data pp_cells r.cells
 
 let pp_region fmt (m: region) =
   begin
@@ -273,7 +279,10 @@ let pp_region fmt (m: region) =
     if m.ranges <> [] then
       begin
         Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
-        List.iter (pp_slice m.fields fmt) (span 0 m.sizeof m.ranges) ;
+        if Options.debug_atleast 1 then
+          List.iter (pp_range fmt) m.ranges
+        else
+          List.iter (pp_slice m.fields fmt) (span 0 m.sizeof m.ranges) ;
         Format.fprintf fmt "@]@ }@]" ;
       end ;
     if Options.debug_atleast 1 then
