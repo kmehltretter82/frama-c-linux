@@ -251,8 +251,7 @@ let get_theory (env) (theory_name) (theory_path) =
   with W.Env.LibraryNotFound _ ->
     L.error "Library %s not found" theory_name; W.Theory.ignore_theory
 
-
-let rec parse_theory (env) (theory:W.Theory.theory) (menv) =
+let parse_theory (env) (theory:W.Theory.theory) (menv) =
   begin
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
@@ -260,41 +259,38 @@ let rec parse_theory (env) (theory:W.Theory.theory) (menv) =
           begin
             match decl.d_node with
             | Dtype ts ->
-              L.debug ~dkey "Decl and type %a"  pp_id ts.ts_name;
-              L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
+              L.debug ~dkey "Decl: type %a"  pp_id ts.ts_name;
               let lti =  lti_of_ts env menv ts in
-              L.debug ~dkey "Correspondign LTI %a" pp_lti lti;
+              L.debug ~dkey "Corresponding LTI %a" pp_lti lti;
             | Ddata ddatas ->
               List.iter
                 (fun ((ts, _) : W.Decl.data_decl) ->
-                   L.debug ~dkey "Decl and data %a" pp_id  ts.ts_name;
-                   L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
+                   L.debug ~dkey "Decl: data %a" pp_id  ts.ts_name;
                    let lti =  lti_of_ts env menv ts  in
                    L.debug ~dkey "Correspondign data LTI %a" pp_lti lti;
                 ) ddatas
             | Dparam ls ->
-              L.debug ~dkey "Decl and dparam %a" pp_id ls.ls_name;
-              L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name
+              L.debug ~dkey "Decl: param %a" pp_id ls.ls_name;
+              let li = li_of_ls env menv ls in
+              L.debug ~dkey "Corresponding dlogic LI %a" pp_li li
             | Dlogic dlogics ->
               List.iter
                 (fun ((ls,_):W.Decl.logic_decl) ->
-                   L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
+                   L.debug ~dkey "Decl:logic %a" pp_id ls.ls_name;
                    L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
                    let li = li_of_ls env menv ls in
                    L.debug ~dkey "Corresponding dlogic LI %a" pp_li li;
                 ) dlogics
             | Dind (_,dec) ->
               List.iter (fun ((ls,_) : W.Decl.ind_decl) ->
-                  L.debug ~dkey "Dind with ls %s" ls.ls_name.id_string;
+                  L.debug ~dkey "Ddecl: indutive %a" pp_id ls.ls_name;
+                  let li = li_of_ls env menv ls in
+                  L.debug ~dkey "Corresponding dlogic LI %a" pp_li li;
                 ) dec;
 
-            | Dprop (_,prsymbol,_) ->
-              L.debug ~dkey "Dprop with prsymbol %s" prsymbol.pr_name.id_string;
+            | Dprop _ -> ()
           end
-        | Use exth ->
-          L.debug ~dkey "Parsing use of external theories %s" exth.th_name.id_string;
-          parse_theory env exth menv;
-        | Clone _| Meta _ -> L.result  "Not a Decl"
+        | Use _ | Clone _ | Meta _ -> ()
       ) theory.th_decls;
   end
 
@@ -354,14 +350,11 @@ let import_theory (env : env) thname =
       { logics =  List.rev menv.li;
         types = List.rev menv.lti;
         paths = theory_path };
-    register_builtin env thname;
+    register_builtin env thname
 
-
-
-
-    (* -------------------------------------------------------------------------- *)
-    (* ---    Module registration                                             --- *)
-    (* -------------------------------------------------------------------------- *)
+(* -------------------------------------------------------------------------- *)
+(* ---    Module registration                                             --- *)
+(* -------------------------------------------------------------------------- *)
 
 module Env = WpContext.StaticGenerator
     (Datatype.Unit)
