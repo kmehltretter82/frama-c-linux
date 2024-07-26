@@ -367,7 +367,7 @@ let pragma_align_by_struct = H.create 17
 
 let process_align_pragma name args =
   let aux pname v =
-    (if Cil.msvcMode () || Cil.gccMode ()
+    (if Machine.(msvcMode () || gccMode ())
      then Kernel.warning ?wkey:None else Kernel.debug ~level:1 ?dkey:None)
       ~current:true "Parsing ICC '%s' pragma." pname;
     match args with
@@ -404,7 +404,7 @@ let packing_pragma_stack = Stack.create ()
 let current_packing_pragma = ref None
 let pretty_current_packing_pragma fmt =
   let align =
-    Option.value ~default:(Integer.of_int theMachine.theMachine.alignof_aligned)
+    Option.value ~default:(Integer.of_int (Machine.alignof_aligned ()))
       !current_packing_pragma
   in
   Integer.pretty fmt align
@@ -420,7 +420,7 @@ let pretty_current_packing_pragma fmt =
    with such pragmas, we emulate GCC's current behavior but emit a warning.
    This is the only case when this function returns [None]. *)
 let get_valid_pragma_pack_alignment n =
-  if Integer.is_zero n && Cil.gccMode () then begin
+  if Integer.is_zero n && Machine.gccMode () then begin
     Kernel.warning ~current:true "GCC accepts pack(0) but does not specify its \
                                   behavior; considering it equivalent to pack()";
     true, None
@@ -442,7 +442,7 @@ let process_pack_pragma name args =
         | [ACons ("",[])] (*  #pragma pack() *) ->
           Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
             "packing pragma: restoring alignment to default (%d)"
-            theMachine.theMachine.alignof_aligned;
+            (Machine.alignof_aligned ());
           current_packing_pragma := None; None
         | [AInt n] (* #pragma pack(n) *) ->
           let is_valid, new_pragma = get_valid_pragma_pack_alignment n in
@@ -518,7 +518,7 @@ let is_power_of_two i = i > 0 && i land (i-1) = 0
    also return [None]. *)
 let eval_aligned_attrparams aps =
   match aps with
-  | [] -> Some (Integer.of_int theMachine.theMachine.alignof_aligned)
+  | [] -> Some (Integer.of_int (Machine.alignof_aligned ()))
   | [ap] ->
     begin
       match Cil.intOfAttrparam ap with
@@ -560,7 +560,7 @@ let warn_incompatible_pragmas_attributes apragma has_attrs =
     Kernel.warning ~current:true ~once:true
       "ignoring 'align' pragma due to presence of 'pack' pragma.@ \
        No compiler was supposed to accept both syntaxes.";
-  if Cil.msvcMode () && has_attrs then
+  if Machine.msvcMode () && has_attrs then
     (* MSVC does not allow attributes *)
     Kernel.warning ~current:true ~once:true
       "field attributes should not be present in MSVC-compatible sources"
@@ -651,7 +651,7 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
             if Cil.isUnsizedArrayType fi.ftype
             then
               (* flexible array member: use size of pointer *)
-              Cil.bitsSizeOf theMachine.upointType
+              Cil.bitsSizeOf (Machine.uintptr_type ())
             else
               Cil.bytesSizeOf fi.ftype
           in
@@ -712,11 +712,11 @@ let convLoc (l : cabsloc) =
   l
 
 let isOldStyleVarArgName n =
-  if Cil.msvcMode () then n = "va_alist"
+  if Machine.msvcMode () then n = "va_alist"
   else n = "__builtin_va_alist"
 
 let isOldStyleVarArgTypeName n =
-  if Cil.msvcMode () then n = "va_list"  || n = "__ccured_va_list"
+  if Machine.msvcMode () then n = "va_list"  || n = "__ccured_va_list"
   else n = "__builtin_va_alist_t"
 
 (* CERT EXP 46 rule: operands of bitwise operators should not be of type _Bool
@@ -1390,13 +1390,13 @@ let canDropStatement (s: stmt) : bool =
   !pRes
 
 let fail_if_incompatible_sizeof ~ensure_complete op typ =
-  if Cil.isFunctionType typ && Cil.theMachine.theMachine.sizeof_fun < 0 then
+  if Cil.isFunctionType typ && Machine.sizeof_fun () < 0 then
     Kernel.error ~current:true "%s called on function %s" op
-      (Cil.allowed_machdep "GCC");
+      (Machdep.allowed_machdep "GCC");
   let is_void = Cil.isVoidType typ in
-  if is_void && Cil.theMachine.theMachine.sizeof_void < 0 then
+  if is_void && Machine.sizeof_void () < 0 then
     Kernel.error ~current:true "%s on void type %s" op
-      (Cil.allowed_machdep "GCC/MSVC");
+      (Machdep.allowed_machdep "GCC/MSVC");
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
     Kernel.error ~current:true
       "%s on incomplete type '%a'" op Cil_datatype.Typ.pretty typ
@@ -2166,7 +2166,7 @@ struct
            was too big *)
         let e' = mkCast ~newt:t e in
         let constFold = constFold true in
-        let e'' = if theMachine.lowerConstants then constFold e' else e' in
+        let e'' = if Machine.lower_constants () then constFold e' else e' in
         (match constFoldToInt e, constFoldToInt e'' with
          | Some i1, Some i2 when not (Integer.equal i1 i2) ->
            Kernel.feedback ~once:true ~source:(fst e.eloc)
@@ -2844,7 +2844,7 @@ let memoBuiltin ?force_keep ?spec name proto =
 
 let vla_alloc_fun () =
   let size_arg =
-    Cil.makeVarinfo false true "size" theMachine.typeOfSizeOf
+    Cil.makeVarinfo false true "size" (Machine.sizeof_type ())
   in
   let res_iterm =
     Logic_const.new_identified_term
@@ -2929,9 +2929,9 @@ let rec _pp_preInit fmt = function
 
 (* special case for treating GNU extension on empty compound initializers. *)
 let empty_preinit() =
-  if Cil.gccMode () || Cil.msvcMode () then
+  if Machine.(gccMode () || msvcMode ()) then
     CompoundPre (ref (-1), ref [| |])
-  else abort_context "empty initializers %s" (Cil.allowed_machdep "GCC/MSVC")
+  else abort_context "empty initializers %s" (Machdep.allowed_machdep "GCC/MSVC")
 
 (* Set an initializer *)
 let rec setOneInit this o preinit =
@@ -3116,7 +3116,7 @@ let rec collectInitializer
         else
           begin
             (* not a flexible array member *)
-            if len = 0 && not (Cil.gccMode() || Cil.msvcMode ()) then
+            if len = 0 && not Machine.(gccMode () || msvcMode ()) then
               Kernel.error ~once:true ~current:true
                 "arrays of size zero not supported in C99@ \
                  (only allowed as compiler extensions)";
@@ -3177,7 +3177,7 @@ let rec collectInitializer
         | _ ->
           abort_context "Can initialize only one field for union"
       in
-      if Cil.msvcMode () && !pMaxIdx != 0 then
+      if Machine.msvcMode () && !pMaxIdx != 0 then
         Kernel.warning ~current:true
           "On MSVC we can initialize only the first field of a union";
       let init, reads = findField 0 (Option.value ~default:[] comp.cfields) in
@@ -3536,7 +3536,7 @@ let suggestAnonName (nl: Cabs.name list) =
 
 (** Optional constant folding of binary operations *)
 let optConstFoldBinOp loc machdep bop e1 e2 t =
-  if theMachine.lowerConstants then
+  if Machine.lower_constants () then
     constFoldBinOp ~loc machdep bop e1 e2 t
   else
     new_exp ~loc (BinOp(bop, e1, e2, t))
@@ -4057,7 +4057,7 @@ let checkTypedefSize name typ =
         Kernel.warning ~current:true
           "bad type '%a' (%d bits) for typedef '%s' using machdep %s;@ \
            check for mismatch between -machdep flag and headers used"
-          Typ.pretty typ size name Cil.theMachine.theMachine.machdep_name
+          Typ.pretty typ size name (Machine.machdep_name ())
     with
     (* Not a standard integer type, ignore it. *)
       Not_found -> ()
@@ -4158,7 +4158,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
     (* GCC allows a named type that appears first to be followed by things
      * like "short", "signed", "unsigned" or "long". *)
     match tspecs with
-    | Cabs.Tnamed _ :: (_ :: _ as rest) when Cil.gccMode () ->
+    | Cabs.Tnamed _ :: (_ :: _ as rest) when Machine.gccMode () ->
       (* If rest contains "short" or "long" then drop the Tnamed *)
       if List.exists (function Cabs.Tshort -> true
                              | Cabs.Tlong -> true | _ -> false) rest then
@@ -4263,9 +4263,9 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
 
     (* Now the other type specifiers *)
     | [Cabs.Tnamed "__builtin_va_list"]
-      when Cil.theMachine.theMachine.has__builtin_va_list ->
+      when Machine.has_builtin_va_list () ->
       TBuiltin_va_list []
-    | [Cabs.Tnamed "__fc_builtin_size_t"] -> Cil.theMachine.typeOfSizeOf
+    | [Cabs.Tnamed "__fc_builtin_size_t"] -> Machine.sizeof_type ()
     | [Cabs.Tnamed n] ->
       (match lookupType ghost "type" n with
        | (TNamed _) as x, _ -> x
@@ -4336,7 +4336,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
           smallest := i;
         if Integer.gt i !largest then
           largest := i;
-        if Cil.msvcMode () then
+        if Machine.msvcMode () then
           IInt
         else begin
           match Kernel.Enums.get () with
@@ -4387,7 +4387,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
                 Cil_printer.pp_exp e'
             | Some i ->
               let ik = updateEnum i in
-              if theMachine.lowerConstants then
+              if Machine.lower_constants () then
                 kinteger64 ~loc:e.expr_loc ~kind:ik i
               else
                 e'
@@ -4528,7 +4528,7 @@ and makeVarSizeVarInfo ghost (ldecl : location)
     (n,ndt,a)
   : varinfo * chunk * exp * bool =
   let kind = `LocalDecl in
-  if not (Cil.msvcMode ()) then
+  if not (Machine.msvcMode ()) then
     match isVariableSizedArray ghost ndt with
     | None ->
       makeVarInfoCabs ~ghost ~kind ldecl spec_res (n,ndt,a),
@@ -4569,7 +4569,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
             match Datatype.String.Hashtbl.find env n' with
             | EnvEnum item, _ -> begin
                 match constFoldToInt item.eival with
-                | Some i64 when theMachine.lowerConstants ->
+                | Some i64 when Machine.lower_constants () ->
                   AInt i64
                 |  _ -> ACons(n', [])
               end
@@ -4712,7 +4712,7 @@ and doType (ghost:bool) (context: type_context)
           else
             cabsTypeAddAttributes a2f
               (cabsTypeAddAttributes a1f restyp)
-        | TPtr ((TFun _ as tf), ap) when not (Cil.msvcMode ()) ->
+        | TPtr ((TFun _ as tf), ap) when not (Machine.msvcMode ()) ->
           if a1fadded then
             TPtr(cabsTypeAddAttributes a2f tf, ap)
           else
@@ -4768,7 +4768,7 @@ and doType (ghost:bool) (context: type_context)
       then
         (* because we tested previously for incomplete types and now tested again
            forbidding zero-length arrays, bt is necessarily a zero-length array *)
-        if Cil.gccMode () || Cil.msvcMode () then
+        if Machine.(gccMode () || msvcMode ()) then
           Kernel.warning ~once:true ~current:true
             "declaration of array of 'zero-length arrays' ('%a`);@ \
              zero-length arrays are a compiler extension"
@@ -4814,7 +4814,7 @@ and doType (ghost:bool) (context: type_context)
                           we just check here that the size is not widely off.*)
                        Integer.one
                    in
-                   let size_t = bitsSizeOfInt theMachine.kindOfSizeOf in
+                   let size_t = bitsSizeOfInt (Machine.sizeof_kind ()) in
                    let size_max = Cil.max_unsigned_number size_t in
                    let array_size = Integer.mul i elem_size in
                    if Integer.gt array_size size_max then
@@ -4863,10 +4863,10 @@ and doType (ghost:bool) (context: type_context)
              end
            | _ -> ());
           if Cil.isZero len' && not allowZeroSizeArrays &&
-             not (Cil.gccMode () || Cil.msvcMode ())
+             not Machine.(gccMode () || msvcMode ())
           then
             Kernel.error ~once:true ~current:true
-              "zero-length arrays %s" (Cil.allowed_machdep "GCC/MSVC");
+              "zero-length arrays %s" (Machdep.allowed_machdep "GCC/MSVC");
           Some len'
       in
       let al' = doAttributes ghost al in
@@ -4884,7 +4884,7 @@ and doType (ghost:bool) (context: type_context)
        * builtin_va_alist_t". On MSVC we do not have the ellipsis and we
        * have a last argument "va_alist: va_list" *)
       let args', isva' =
-        if args != [] && Cil.msvcMode () = not isva then begin
+        if args != [] && Machine.msvcMode () = not isva then begin
           let newisva = ref isva in
           let rec doLast = function
               [([Cabs.SpecType (Cabs.Tnamed atn)], (an, Cabs.JUSTBASE, [], _))]
@@ -5113,7 +5113,7 @@ and makeCompType loc ghost (isstruct: bool)
       let<> UpdatedCurrentLoc = cloc in
       if sto <> NoStorage || inl then
         Kernel.error ~once:true ~source "Storage or inline not allowed for fields";
-      let allowZeroSizeArrays = Cil.gccMode () || Cil.msvcMode () in
+      let allowZeroSizeArrays = Machine.(gccMode () || msvcMode ()) in
       let ftype, fattr =
         doType
           ~allowZeroSizeArrays ghost `FieldDecl (AttrName false) bt
@@ -5133,11 +5133,11 @@ and makeCompType loc ghost (isstruct: bool)
             "non-final field `%s' declared with a type containing a flexible \
              array member."
             n
-        else if not (Cil.gccMode() || Cil.msvcMode ()) then
+        else if not Machine.(gccMode() || msvcMode ()) then
           Kernel.error ~source
             "field `%s' declared with a type containing a flexible array \
              member %s."
-            n (Cil.allowed_machdep "GCC/MSVC")
+            n (Machdep.allowed_machdep "GCC/MSVC")
       end
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
@@ -5290,11 +5290,11 @@ and makeCompType loc ghost (isstruct: bool)
       (* Do not add unnamed bitfields: they can share the empty name. *)
       if f.fname <> "" then Hashtbl.add fld_table f.fname f
   in
-  if flds = [] && not (Cil.acceptEmptyCompinfo ()) then
+  if flds = [] && not (Machine.acceptEmptyCompinfo ()) then
     Kernel.error ~current:true ~once:true
       "empty %ss %s"
       (if comp.cstruct then "struct" else "union")
-      (Cil.allowed_machdep "GCC/MSVC");
+      (Machdep.allowed_machdep "GCC/MSVC");
   List.iter check flds;
   if comp.cfields <> None then begin
     let old_fields = Option.get comp.cfields in
@@ -5525,7 +5525,7 @@ and doExp local_env
             (*Kernel.debug "Looking for %s got enum %s : %a of type %a"
               n item.einame Cil_printer.pp_exp item.eival
               Cil_datatype.Typ.pretty typ; *)
-            if Cil.theMachine.Cil.lowerConstants then
+            if Machine.lower_constants () then
               finishExp [] (unspecified_chunk empty) item.eival typ
             else
               finishExp []
@@ -5727,8 +5727,8 @@ and doExp local_env
            * the value.  But L'abc' has type wchar, and so is equivalent to
            * L'c').  But gcc allows L'abc', so I'll leave this here in case
            * I'm missing some architecture dependent behavior. *)
-          let value = reduce_multichar theMachine.wcharType char_list in
-          let result = kinteger64 ~loc ~kind:theMachine.wcharKind
+          let value = reduce_multichar (Machine.wchar_type ()) char_list in
+          let result = kinteger64 ~loc ~kind:(Machine.wchar_kind ())
               (Integer.of_int64 value)
           in
           finishExp [] (unspecified_chunk empty) result (typeOf result)
@@ -5753,7 +5753,7 @@ and doExp local_env
       let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "sizeof" typ;
       let res = new_exp ~loc (SizeOf typ) in
-      finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
+      finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
 
     | Cabs.EXPR_SIZEOF e ->
       (* Allow non-constants in sizeof *)
@@ -5774,13 +5774,13 @@ and doExp local_env
         | Const (CStr s) -> new_exp ~loc (SizeOfStr s)
         | _ -> new_exp ~loc (SizeOfE e')
       in
-      finishExp [] scope_chunk size theMachine.typeOfSizeOf
+      finishExp [] scope_chunk size (Machine.sizeof_type ())
 
     | Cabs.TYPE_ALIGNOF (bt, dt) ->
       let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
       let res = new_exp ~loc (AlignOf typ) in
-      finishExp [] (unspecified_chunk empty) res theMachine.typeOfSizeOf
+      finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
 
     | Cabs.EXPR_ALIGNOF e ->
       let (_, se, e', lvt) =
@@ -5796,7 +5796,7 @@ and doExp local_env
         | _ -> e'
       in
       finishExp [] scope_chunk (new_exp ~loc (AlignOfE(e'')))
-        theMachine.typeOfSizeOf
+        (Machine.sizeof_type ())
 
     | Cabs.CAST ((specs, dt), ie) ->
       let s', dt', ie' = preprocessCast loc local_env.is_ghost specs dt ie in
@@ -5937,7 +5937,7 @@ and doExp local_env
            * taking the address of the argument that was removed while
            * processing the function type. We compute the address based on
            * the address of the last real argument *)
-          if Cil.msvcMode () then begin
+          if Machine.msvcMode () then begin
             let rec getLast = function
               | [] ->
                 abort_context
@@ -6842,7 +6842,7 @@ and doExp local_env
                 | [ ] -> begin
                     piscall := false;
                     pres := new_exp ~loc:e.expr_loc (SizeOfE !pf);
-                    prestype := theMachine.typeOfSizeOf
+                    prestype := (Machine.sizeof_type ())
                   end
                 | _ ->
                   Kernel.warning ~current:true
@@ -6899,13 +6899,13 @@ and doExp local_env
                | [{ enode = CastE (_, {enode = AddrOf (host, offset)}) } as e] ->
                  begin
                    piscall := false;
-                   prestype := Cil.theMachine.Cil.typeOfSizeOf;
+                   prestype := Machine.sizeof_type ();
                    let typ = Cil.typeOfLhost host in
                    try
                      let start, _width = Cil.bitsOffset typ offset in
                      if start mod 8 <> 0 then
                        Kernel.error ~current:true "Using offset of bitfield";
-                     let kind = Cil.theMachine.kindOfSizeOf in
+                     let kind = Machine.sizeof_kind () in
                      pres := Cil.kinteger ~loc:e.eloc kind (start / 8);
                    with SizeOfError (s, _) ->
                      pres := e;
@@ -7625,7 +7625,7 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   | (Mod|BAnd|BOr|BXor) -> doIntegralArithmetic ()
   | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
-    if Cil.msvcMode () then
+    if Machine.msvcMode () then
       (* MSVC has a bug. We duplicate it here *)
       doIntegralArithmetic ()
     else
@@ -7654,8 +7654,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
         (Cil.type_remove_qualifier_attributes_deep t1)
         (Cil.type_remove_qualifier_attributes_deep t2)
     then
-      theMachine.ptrdiffType,
-      optConstFoldBinOp loc false MinusPP e1 e2 theMachine.ptrdiffType
+      Machine.ptrdiff_type (),
+      optConstFoldBinOp loc false MinusPP e1 e2 (Machine.ptrdiff_type ())
     else abort_context "incompatible types in pointer subtraction"
 
   (* Two special cases for comparisons with the NULL pointer. We are a bit
@@ -7726,7 +7726,7 @@ and doCondExp local_env asconst
                clean_up_cond_locals ce2; ce1
              end else CEAnd (ce1, ce2))
         | CEExp(se1, e1'), CEExp (se2, e2') when
-            theMachine.useLogicalOperators && isEmpty se1 && isEmpty se2 ->
+            Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
           CEExp (empty, new_exp ~loc (BinOp(LAnd, e1', e2', intType)))
         | _ -> CEAnd (ce1, ce2)
       end
@@ -7745,7 +7745,7 @@ and doCondExp local_env asconst
                clean_up_cond_locals ce2; ce1
              end else CEOr (ce1, ce2))
         | CEExp (se1, e1'), CEExp (se2, e2') when
-            theMachine.useLogicalOperators && isEmpty se1 && isEmpty se2 ->
+            Machine.use_logical_operators () && isEmpty se1 && isEmpty se2 ->
           CEExp (empty, new_exp ~loc (BinOp(LOr, e1', e2', intType)))
         | _ -> CEOr (ce1, ce2)
       end
@@ -7777,7 +7777,7 @@ and doCondExp local_env asconst
          ConditionalSideEffectHook.apply (orig,e));
       ignore (checkBool t e');
       CEExp (add_reads ~ghost e.expr_loc r se,
-             if asconst <> CNoConst || theMachine.lowerConstants then
+             if asconst <> CNoConst || Machine.lower_constants () then
                constFold true e'
              else e')
   in
@@ -8149,7 +8149,7 @@ and doInit local_env asconst preinit so acc initl =
        match bt' with
        (* compare bt to wchar_t, ignoring signed vs. unsigned *)
        | TInt _ when (bitsSizeOf bt') =
-                     (bitsSizeOf theMachine.wcharType) ->
+                     (bitsSizeOf (Machine.wchar_type ())) ->
          true
        | TInt _ ->
          (*Base type is a scalar other than wchar_t.
@@ -8163,8 +8163,8 @@ and doInit local_env asconst preinit so acc initl =
       )
     ->
     let maxWChar =  (*  (2**(bitsSizeOf !wcharType)) - 1  *)
-      Int64.sub (Int64.shift_left Int64.one (bitsSizeOf theMachine.wcharType))
-        Int64.one in
+      Int64.(sub (shift_left one (bitsSizeOf (Machine.wchar_type ()))) one)
+    in
     let charinits =
       let init c =
         if Int64.compare c maxWChar > 0 then (* if c > maxWChar *)
@@ -8254,7 +8254,7 @@ and doInit local_env asconst preinit so acc initl =
       Cil_printer.pp_exp oneinit' Cil_datatype.Typ.pretty t'
       Cil_datatype.Typ.pretty so.soTyp;
     let init_expr =
-      if theMachine.insertImplicitCasts then snd (castTo t' so.soTyp oneinit')
+      if Machine.insert_implicit_casts () then snd (castTo t' so.soTyp oneinit')
       else oneinit'
     in
     let preinit' = setOneInit preinit so.soOff (SinglePre (init_expr,r)) in
@@ -8891,7 +8891,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
             ~ghost
             ~kind:`LocalDecl
             loc
-            (theMachine.typeOfSizeOf, NoStorage, false, [])
+            (Machine.sizeof_type (), NoStorage, false, [])
             ("__lengthof_" ^ vi.vname,JUSTBASE, [])
         in
         (* Register it *)
@@ -8904,7 +8904,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
             (BinOp(Mult,
                    elt_size,
                    new_exp ~loc (Lval (var savelen)),
-                   theMachine.typeOfSizeOf))
+                   Machine.sizeof_type ()))
         in
         (* Register the length *)
         IH.add varSizeArrays vi.vid alloca_size;
@@ -8928,7 +8928,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
                 Logic_const.prel ~loc:castloc (Rlt, zero, talloca_size)
               in
               let max_size =
-                let szTo = Cil.bitsSizeOf theMachine.typeOfSizeOf in
+                let szTo = Cil.bitsSizeOf (Machine.sizeof_type ()) in
                 let max_bound =  Logic_const.tint ~loc:castloc (Cil.max_unsigned_number szTo) in
                 Logic_const.prel ~loc:castloc (Rle, talloca_size, max_bound)
               in
@@ -10076,7 +10076,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         "Case statement with a non-constant";
     let chunk =
       caseRangeChunk ~ghost
-        [if theMachine.lowerConstants then constFold false e' else e']
+        [if Machine.lower_constants () then constFold false e' else e']
         loc' (doStatement local_env s)
     in
     (* se has no statement, but can contain local variables, in

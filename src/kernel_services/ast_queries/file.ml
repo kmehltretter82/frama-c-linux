@@ -313,7 +313,7 @@ let set_machdep () =
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
-(* Local to this module. Use Cil.theMachine.theMachine outside *)
+(* Local to this module. Use Machine module instead. *)
 let get_machdep () =
   let m = Kernel.Machdep.get () in
   let file =
@@ -1198,12 +1198,12 @@ let prepare_cil_file ast =
   Ast.set_file ast
 
 let fill_built_ins () =
-  if Cil.selfMachine_is_computed () then begin
+  if Machine.is_computed () then begin
     Kernel.debug "Machine is computed, just fill the built-ins";
     Cil_builtins.init_builtins ();
   end else begin
     Kernel.debug "Machine is not computed, initialize everything";
-    Cil.initCIL ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
+    Machine.init ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   end;
   (* Fill logic tables with builtins *)
   Logic_env.Builtins.apply ();
@@ -1621,7 +1621,7 @@ let reorder_ast () = reorder_custom_ast (Ast.get())
 
 (* Fill logic tables with builtins *)
 let init_cil () =
-  Cil.initCIL ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
+  Machine.init ~initLogicBuiltins:(Logic_builtin.init()) (get_machdep ());
   Logic_env.Builtins.apply ();
   Logic_env.prepare_tables ()
 

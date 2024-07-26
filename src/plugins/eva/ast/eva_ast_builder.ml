@@ -82,7 +82,7 @@ let rec translate_exp (e : Cil_types.exp) =
     | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
       match (Cil.constFold true e).enode with
       | Const c -> Const (translate_constant c)
-      | _ -> Const (CTopInt Cil.theMachine.kindOfSizeOf)
+      | _ -> Const (CTopInt (Machine.sizeof_kind ()))
   in
   mk_exp ~origin:(Exp e) node
 
@@ -191,7 +191,7 @@ struct
           Cil.arithmeticConversion e1.typ e2.typ
         else if Cil.isPointerType e1.typ && Cil.isPointerType e2.typ then
           if Cil.need_cast ~force:true e1.typ e2.typ then
-            Cil.theMachine.upointType
+            Machine.uintptr_type ()
           else
             e1.typ
         else
@@ -241,7 +241,7 @@ let zero_typed (typ : Cil_types.typ) =
   | TEnum ({ekind = ik },_)
   | TInt (ik, _) -> mk_exp (Const (CInt64 (Integer.zero, ik, None)))
   | TPtr _ ->
-    let ik = Cil.(theMachine.upointKind) in
+    let ik = Machine.uintptr_kind () in
     let zero = mk_exp (Const (CInt64 (Integer.zero, ik, None))) in
     Build.cast typ zero
   | typ ->

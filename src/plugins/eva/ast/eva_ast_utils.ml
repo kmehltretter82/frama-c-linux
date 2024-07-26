@@ -254,7 +254,7 @@ let rec to_integer e =
   | CastE (typ, e) when Cil.isPointerType typ ->
     begin
       match to_integer e with
-      | Some i as r when Cil.fitsInInt Cil.theMachine.upointKind i -> r
+      | Some i as r when Cil.fitsInInt (Machine.uintptr_kind ()) i -> r
       | _ -> None
     end
   | _ -> None

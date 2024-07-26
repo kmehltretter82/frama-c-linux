@@ -263,7 +263,7 @@ let isExportedRoot global =
         else if v.vstorage = Static then
           v.vname, not !rmUnusedStatic, "static function"
         else if v.vinline && v.vstorage != Extern
-                && (Cil.msvcMode () || !rmUnusedInlines) then
+                && (Machine.msvcMode () || !rmUnusedInlines) then
           v.vname, false, "inline function"
         else
           v.vname, true, "other function"
@@ -378,7 +378,7 @@ class markReachableVisitor
       | _ -> DoChildren
 
     method! vinst = function
-      | Asm (_, tmpls, _, _) when Cil.msvcMode () ->
+      | Asm (_, tmpls, _, _) when Machine.msvcMode () ->
         (* If we have inline assembly on MSVC, we cannot tell which locals
          * are referenced. Keep them all *)
         (match !currentFunc with

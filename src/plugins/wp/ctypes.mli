@@ -92,10 +92,10 @@ val c_ptr  : unit -> c_int
 (** Returns the type of pointers *)
 
 val c_int    : ikind -> c_int
-(** Conforms to {!Cil.theMachine} *)
+(** Conforms to {!Machine.theMachine} *)
 
 val c_float  : fkind -> c_float
-(** Conforms to {!Cil.theMachine} *)
+(** Conforms to {!Machine.theMachine} *)
 
 val object_of : typ -> c_object
 

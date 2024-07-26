@@ -58,7 +58,7 @@ let get_set_suffix_and_arg res_ty e =
   | Gmpz, Rational -> "_z", [ e ]
   | Rational, Gmpz -> "_q", [ e ]
   | C_integer IChar, _ ->
-    (if Cil.theMachine.Cil.theMachine.char_is_unsigned then "_ui"
+    (if Machine.char_is_unsigned () then "_ui"
      else "_si"),
     args_uisi e
   | C_integer (IBool | IUChar | IUInt | IUShort | IULong), _ ->

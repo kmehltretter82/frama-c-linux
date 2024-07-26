@@ -58,7 +58,7 @@ let add_destructor (_, l as acc) var =
       | ACons (f, [n]) ->
         (match Cil.intOfAttrparam n with
          | Some n ->
-           mk_call f e [Cil.kinteger ~loc Cil.(theMachine.kindOfSizeOf) n]
+           mk_call f e [Cil.kinteger ~loc (Machine.sizeof_kind ()) n]
          | None ->
            Kernel.fatal
              "unexpected argument of attribute %s: %a"

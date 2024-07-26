@@ -813,13 +813,13 @@ and constant =
 
   | CWStr of int64 list
   (** Wide character string constant. Note that the local interpretation of such
-      a literal depends on {!Cil.theMachine.wcharType} and
-      {!Cil.theMachine.wcharKind}.  Such a constant has type pointer to
-      {!Cil.theMachine.wcharType}. The escape characters in the string have not
-      been "interpreted" in the sense that L"A\xabcd" remains "A\xabcd" rather
-      than being represented as the wide character list with two elements: 65
-      and 43981. That "interpretation" depends on the underlying wide character
-      type. *)
+      a literal depends on {!Machine.theMachine.wcharType} and
+      {!Machine.theMachine.wcharKind}.  Such a constant has type pointer to
+      {!Machine.theMachine.wcharType}. The escape characters in the string
+      have not been "interpreted" in the sense that L"A\xabcd" remains
+      "A\xabcd" rather than being represented as the wide character list with
+      two elements: 65 and 43981. That "interpretation" depends on the
+      underlying wide character type. *)
 
   | CChr of char
   (** Character constant.  This has type int, so use charConstToInt to read the

@@ -56,7 +56,7 @@ let length_exp ~loc kf env ~name array =
         env
         kf
         None
-        Cil.theMachine.typeOfSizeOf
+        (Machine.sizeof_type ())
         name
         [ array ]
     in
@@ -74,7 +74,7 @@ let length_exp ~loc kf env ~name array =
         kf
         None
         ~name
-        Cil.theMachine.typeOfSizeOf
+        (Machine.sizeof_type ())
         (fun v _ -> [
              Smart_stmt.assigns
                ~loc
@@ -166,7 +166,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       kf
       None
       ~name:"iter"
-      Cil.theMachine.typeOfSizeOf
+      (Machine.sizeof_type ())
       (fun _ _ -> [])
   in
 

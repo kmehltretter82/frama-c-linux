@@ -171,7 +171,7 @@ let prepare_builtin kf (name, builtin, cacheable, expected_typ) =
        (got: %a. Machdep is %s)."
       name Kernel_function.pretty kf
       Printer.pp_typ (Kernel_function.get_type kf)
-      Cil.theMachine.theMachine.machdep_name
+      (Machine.machdep_name ())
   else
     match find_builtin_specification kf with
     | None ->

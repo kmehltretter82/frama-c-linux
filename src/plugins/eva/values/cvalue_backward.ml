@@ -357,7 +357,7 @@ let backward_unop ~typ_arg op ~arg:_ ~res =
 (* ikind of an (unrolled) integer type *)
 let ikind = function
   | TInt (ik, _) | TEnum ({ekind = ik}, _) -> ik
-  | TPtr _ -> Cil.(theMachine.upointKind)
+  | TPtr _ -> Machine.uintptr_kind ()
   | _ -> assert false
 
 (* does [v] fits in the integer type corresponding to [ik]? *)

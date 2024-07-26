@@ -52,75 +52,31 @@
 open Cil_types
 open Cil_datatype
 
-(** Call this function to perform some initialization, and only after you have
-    set [Cil.msvcMode]. [initLogicBuiltins] is the function to call to init
-    logic builtins. The [Machdeps] argument is a description of the hardware
-    platform and of the compiler used. *)
-val initCIL: initLogicBuiltins:(unit -> unit) -> mach -> unit
-
 (* ************************************************************************* *)
 (** {2 Customization} *)
 (* ************************************************************************* *)
 
-type theMachine = private
-  { mutable useLogicalOperators: bool;
-    (** Whether to use the logical operands LAnd and LOr. By default, do not
-        use them because they are unlike other expressions and do not
-        evaluate both of their operands *)
-    mutable theMachine: mach;
-    mutable lowerConstants: bool; (** Do lower constants (default true) *)
-    mutable insertImplicitCasts: bool;
-    (** Do insert implicit casts (default true) *)
-    mutable stringLiteralType: typ;
-    mutable upointKind: ikind
-  (** An unsigned integer type that fits pointers. *);
-    mutable upointType: typ;
-    mutable wcharKind: ikind; (** An integer type that fits wchar_t. *)
-    mutable wcharType: typ;
-    mutable ptrdiffKind: ikind; (** An integer type that fits ptrdiff_t. *)
-    mutable ptrdiffType: typ;
-    mutable typeOfSizeOf: typ;
-    (** An integer type that is the type of sizeof. *)
-    mutable kindOfSizeOf: ikind;
-    (** The integer kind of {!Cil.typeOfSizeOf}. *)
-  }
+type theMachine = Machine.machine
 
+(** @deprecated Frama-C+dev *)
 val theMachine : theMachine
-(** Current machine description *)
+[@@alert deprecated "Use Machine getter functions instead"]
 
-val selfMachine: State.t
-
-val selfMachine_is_computed: ?project:Project.project -> unit -> bool
-(** whether current project has set its machine description. *)
-
+(** @deprecated Frama-C+dev *)
 val msvcMode: unit -> bool
+[@@alert deprecated "Use Machine.msvcMode instead"]
+
+(** @deprecated Frama-C+dev *)
 val gccMode: unit -> bool
+[@@alert deprecated "Use Machine.gccMode instead"]
 
+(** @deprecated Frama-C+dev *)
 val set_acceptEmptyCompinfo: unit -> unit
-(** After a call to this function, empty compinfos are allowed by the kernel,
-    this must be used as a configuration step equivalent to a machdep, except
-    that it is not a user configuration.
+[@@alert deprecated "Use Machine.set_acceptEmptyCompinfo instead"]
 
-    Note that if the selected machdep is GCC or MSVC, this call has no effect
-    as these modes already allow empty compinfos.
-
-    @since 23.0-Vanadium
-*)
-
+(** @deprecated Frama-C+dev *)
 val acceptEmptyCompinfo: unit -> bool
-(** whether we accept empty struct. Implied by {!Cil.msvcMode} and
-    {!Cil.gccMode}, and can be forced by {!Cil.set_acceptEmptyCompinfo}
-    otherwise.
-
-    @since 23.0-Vanadium
-*)
-
-val allowed_machdep: string -> string
-(** [allowed_machdep "machdep family"] provides a standard message for features
-    only allowed for a particular machdep.
-
-    @since 25.0-Manganese
-*)
+[@@alert deprecated "Use Machine.acceptEmptyCompinfo instead"]
 
 (* ************************************************************************* *)
 (** {2 Values for manipulating globals} *)
@@ -2287,7 +2243,7 @@ val floatKindForSize : int-> fkind
 (** The size of a type, in bits. Trailing padding is added for structs and
     arrays. Raises {!Cil.SizeOfError} when it cannot compute the size. This
     function is architecture dependent, so you should only call this after you
-    call {!Cil.initCIL}. Remember that on GCC sizeof(void) is 1! *)
+    call {!Machine.init}. Remember that on GCC sizeof(void) is 1! *)
 val bitsSizeOf: typ -> int
 
 (** The size of a type, in bytes. Raises {!Cil.SizeOfError} when it cannot
@@ -2362,12 +2318,12 @@ val intKindForValue: Integer.t -> bool -> ikind
 
 (** The size of a type, in bytes. Returns a constant expression or a "sizeof"
     expression if it cannot compute the size. This function is architecture
-    dependent, so you should only call this after you call {!Cil.initCIL}.  *)
+    dependent, so you should only call this after you call {!Machine.init}.  *)
 val sizeOf: loc:location -> typ -> exp
 
 (** The minimum alignment (in bytes) for a type. This function is
     architecture dependent, so you should only call this after you call
-    {!Cil.initCIL}.
+    {!Machine.init}.
     @raise {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
@@ -2380,14 +2336,14 @@ val intOfAttrparam: attrparam -> int option
     base address and the width (also expressed in bits) for the subobject
     denoted by the offset. Raises {!Cil.SizeOfError} when it cannot compute
     the size. This function is architecture dependent, so you should only call
-    this after you call {!Cil.initCIL}. *)
+    this after you call {!Machine.init}. *)
 val bitsOffset: typ -> offset -> int * int
 
 (** Give a field, returns the number of bits from the structure or union
     containing the field and the width (also expressed in bits) for the subobject
     denoted by the field. Raises {!Cil.SizeOfError} when it cannot compute
     the size. This function is architecture dependent, so you should only call
-    this after you call {!Cil.initCIL}. *)
+    this after you call {!Machine.init}. *)
 val fieldBitsOffset: fieldinfo -> int * int
 
 (** Like map but try not to make a copy of the list
@@ -2512,12 +2468,6 @@ val set_extension_handler:
     If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
 *)
-
-(* ***********************************************************************)
-(** {2 Forward references} *)
-(* ***********************************************************************)
-
-val init_builtins_ref: (unit -> unit) ref
 
 (** void
     @deprecated Frama-C+dev *)

@@ -125,7 +125,7 @@ let strlen ~loc ~name env kf e =
     ~name
     env
     kf
-    Cil.theMachine.typeOfSizeOf
+    (Machine.sizeof_type ())
     "builtin_strlen"
     [ e ]
 
@@ -206,8 +206,8 @@ let term_to_sizet_exp ~loc ~name ?(check_lower_bound=true) kf env t =
     (* We know that [t] can be translated to a C type, so we start with that *)
     let e, _, env = Translate_terms.to_exp ~adata:Assert.no_data kf env t in
     (* Then we can check if the expression will fit in a [size_t] *)
-    let sizet = Cil.(theMachine.typeOfSizeOf) in
-    let sizet_kind = Cil.(theMachine.kindOfSizeOf) in
+    let sizet = Machine.sizeof_type () in
+    let sizet_kind = Machine.sizeof_kind () in
     let check_lower_bound, check_upper_bound =
       let lower, upper =
         match nty with
@@ -360,7 +360,7 @@ let update_memory_model ~loc ?result env kf caller args =
 
   | "fread", [ buffer_e; size_e; _; _ ] ->
     let result, env =
-      get_result_var ~loc ~name kf Cil.theMachine.typeOfSizeOf env result
+      get_result_var ~loc ~name kf (Machine.sizeof_type ()) env result
     in
     let env = Env.push env in
     let result_t = lval_to_term ~loc result in
@@ -476,7 +476,7 @@ let update_memory_model ~loc ?result env kf caller args =
         env
         kf
         None
-        Cil.theMachine.typeOfSizeOf
+        (Machine.sizeof_type ())
         (fun _ _ -> [])
     in
     let env = Env.push env in

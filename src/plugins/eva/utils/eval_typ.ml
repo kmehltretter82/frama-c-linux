@@ -180,7 +180,7 @@ type scalar_typ =
   | TSFloat of fkind
 
 let pointer_range () =
-  { i_bits = Cil.bitsSizeOfInt Cil.theMachine.Cil.upointKind;
+  { i_bits = Cil.bitsSizeOfInt (Machine.uintptr_kind ());
     i_signed = false; }
 
 let classify_as_scalar typ =

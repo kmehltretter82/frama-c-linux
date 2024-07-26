@@ -90,7 +90,7 @@ module Builtin_functions =
     (Datatype.Triple(Typ)(Datatype.List(Typ))(Datatype.Bool))
     (struct
       let name = "Builtin_functions"
-      let dependencies = [ Cil.selfMachine ]
+      let dependencies = [ Machine.self ]
       let size = 49
     end)
 
@@ -261,7 +261,7 @@ let build_type_table () : (string, typ option) Hashtbl.t =
   let types =
     [
       ("__builtin_va_list",
-       Some (if Cil.theMachine.theMachine.has__builtin_va_list
+       Some (if Machine.has_builtin_va_list ()
              then TBuiltin_va_list []
              else Cil_const.voidPtrType));
       ("char *", Some Cil_const.charPtrType);
@@ -294,7 +294,7 @@ let build_type_table () : (string, typ option) Hashtbl.t =
       ("void", Some Cil_const.voidType);
       ("void *", Some Cil_const.voidPtrType);
       ("void const *", Some Cil_const.voidConstPtrType);
-      ("size_t", Some Cil.theMachine.typeOfSizeOf);
+      ("size_t", Some (Machine.sizeof_type ()));
       ("int8_t", int8_t);
       ("int16_t", int16_t);
       ("int32_t", int32_t);
@@ -337,7 +337,7 @@ let parse_type ?(template="") type_table s =
     Kernel.fatal "invalid type '%s' in compiler_builtins JSON" s
 
 let is_machdep_active compiler =
-  match compiler, Cil.gccMode (), Cil.msvcMode () with
+  match compiler, Machine.gccMode (), Machine.msvcMode () with
   | None, _, _ (* always active *)
   | Some GCC, true, _
   | Some MSVC, _, true
@@ -401,7 +401,7 @@ let init_other_builtin_templates () =
 let init_builtins_from_json () =
   (* For performance reasons, we avoid loading GCC builtins unless we are
      using a GCC machdep *)
-  if Cil.gccMode () then init_gcc_builtin_templates ();
+  if Machine.gccMode () then init_gcc_builtin_templates ();
   init_other_builtin_templates ();
   let type_table = build_type_table () in
   Builtin_templates.iter (fun name entry ->
@@ -412,8 +412,9 @@ let init_builtins_from_json () =
     )
 
 let init_builtins () =
-  if not (Cil.selfMachine_is_computed ()) then
-    Kernel.fatal ~current:true "You must call initCIL before init_builtins" ;
+  if not (Machine.is_computed ()) then
+    Kernel.fatal ~current:true
+      "You must call Machine.init before init_builtins" ;
   if Builtin_functions.length () <> 0 then
     Kernel.fatal ~current:true "Cil builtins already initialized." ;
   init_builtins_from_json ();
@@ -423,4 +424,4 @@ let init_builtins () =
 let builtinLoc: location = Location.unknown
 
 let () =
-  Cil.init_builtins_ref := init_builtins
+  Machine.init_builtins_ref := init_builtins

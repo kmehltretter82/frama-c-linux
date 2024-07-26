@@ -425,7 +425,7 @@ let find_predicate_by_width typ narrow_name wide_name =
       (* drop attributes to remove 'const' qualifiers and fc_stdlib attributes *)
       Cil_datatype.Typ.equal
         (Cil.typeDeepDropAllAttributes (Cil.unrollTypeDeep t))
-        Cil.theMachine.Cil.wcharType ->
+        (Machine.wchar_type ()) ->
     find_predicate wide_name
   | _ ->
     Self.warning ~current:true ~wkey:wkey_typing

@@ -166,7 +166,7 @@ let rec signed_counterpart typ =
   | TEnum ({ekind = ik} as info, attrs) ->
     let info = { info with ekind = signed_ikind ik} in
     TEnum (info, attrs)
-  | TPtr _ -> signed_counterpart Cil.(theMachine.upointType)
+  | TPtr _ -> signed_counterpart ((Machine.uintptr_type ()))
   | _ -> assert false
 
 let return t = `Value t, Alarmset.none

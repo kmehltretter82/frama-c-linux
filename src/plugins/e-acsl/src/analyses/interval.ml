@@ -228,11 +228,11 @@ let replace_all_args_ival li args_ival =
 
 let infer_sizeof ty =
   try singleton_of_int (Cil.bytesSizeOf ty)
-  with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
+  with Cil.SizeOfError _ -> interv_of_typ (Machine.sizeof_type ())
 
 let infer_alignof ty =
   try singleton_of_int (Cil.bytesAlignOf ty)
-  with Cil.SizeOfError _ -> interv_of_typ Cil.theMachine.Cil.typeOfSizeOf
+  with Cil.SizeOfError _ -> interv_of_typ (Machine.sizeof_type ())
 
 (* Infer the interval of an extended quantifier \sum or \product.
    [lambda] is the interval of the lambda term, [min] (resp. [max]) is the
