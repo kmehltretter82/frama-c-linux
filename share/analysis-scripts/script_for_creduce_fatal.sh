@@ -29,10 +29,11 @@
 set +e
 "@FRAMAC@" "@BASE@" @FCFLAGS@
 retcode=$?
+set -e
+
 # see cmdline.ml for the different exit codes returned by Frama-C
-if [ $retcode -eq 125 -o $retcode -eq 4 ]; then
+if [ $retcode -eq 125 ] || [ $retcode -eq 4 ]; then
     exit 0
 else
     exit 1
 fi
-set -e

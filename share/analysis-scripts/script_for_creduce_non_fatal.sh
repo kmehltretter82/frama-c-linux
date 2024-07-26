@@ -32,7 +32,7 @@ fc_out=$(mktemp creduce_fc_XXXXXX.log)
 
 # We always check that the reduced file remains valid C code.
 set -o pipefail
-@CPP@ "@BASE@" 2>&1 | tee $cc_out
+@CPP@ "@BASE@" 2>&1 | tee "$cc_out"
 set +o pipefail
 
 ### Examples of conditions to be maintained by C-Reduce; copy and adapt
@@ -49,10 +49,12 @@ set +o pipefail
 
 ##########
 
+set +e # allow Frama-C to fail so we can retrieve its exit code
 set -o pipefail
-"@FRAMAC@" "@BASE@" @FCFLAGS@ 2>&1 | tee $fc_out
-fc_retcode=$(echo ${PIPESTATUS[0]})
+"@FRAMAC@" "@BASE@" @FCFLAGS@ 2>&1 | tee "$fc_out"
+fc_retcode=${PIPESTATUS[0]}
 set +o pipefail
+set -e
 
 ### Examples of conditions to be maintained by C-Reduce; copy and adapt
 #
@@ -69,4 +71,4 @@ set +o pipefail
 ##########
 
 ### Cleanup
-rm -f $cc_out $fc_out
+rm -f "$cc_out" "$fc_out"
