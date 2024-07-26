@@ -206,7 +206,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   in
   let s = Logic_const.term ~loc (TSizeOf ty) Linteger in
   (* ptr *)
-  let typ_charptr = Cil.charPtrType in
+  let typ_charptr = Cil_const.charPtrType in
   let ptr = Logic_const.term
       ~loc
       (TBinOp(

@@ -18,7 +18,7 @@ class transform prj = object(_self)
               (fun () ->
                  Options.feedback "current prj = %a"
                    Project.pretty (Project.current ());
-                 ignore(Cil.makeFormalVar fundec "ok" Cil.intType))
+                 ignore(Cil.makeFormalVar fundec "ok" Cil_const.intType))
               ();
             let g = GFun({ fundec with svar = fundec.svar }, loc) in
             [g]
@@ -37,7 +37,7 @@ class transform prj = object(_self)
                 | TFun(typ, args, varity, attr) ->
                   let vtype = Cil.argsToList args in
                   let new_fun_typ =  TFun(
-                      typ, Some (vtype @ [ "ok", Cil.intType, [] ]),
+                      typ, Some (vtype @ [ "ok", Cil_const.intType, [] ]),
                       varity, attr)
                   in
                   Cil.update_var_type vi new_fun_typ;

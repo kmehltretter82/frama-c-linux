@@ -300,7 +300,7 @@ let constant_term loc i =
   {
     term_node = TConst(Integer(i,None));
     term_loc = loc;
-    term_type = Ctype intType;
+    term_type = Ctype Cil_const.intType;
     term_name = [];
   }
 

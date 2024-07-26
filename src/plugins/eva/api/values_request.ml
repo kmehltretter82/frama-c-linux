@@ -523,7 +523,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
       let expr' = Eva_ast.translate_exp expr in
       eval_steps expr'.typ (eval_expr expr') eval_point callstack
     | Ppred pred ->
-      eval_steps Cil.intType (eval_pred eval_point pred) eval_point callstack
+      eval_steps Cil_const.intType (eval_pred eval_point pred) eval_point callstack
 end
 
 let proxy =

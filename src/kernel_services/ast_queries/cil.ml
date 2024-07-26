@@ -56,6 +56,7 @@ open Logic_const
 open Format
 open Cil_datatype
 open Cil_types
+open Cil_const
 
 (* ************************************************************************* *)
 (* Reporting messages *)
@@ -74,34 +75,6 @@ let abort_context msg =
     Errorloc.pp_context_from_file fmt loc
   in
   Kernel.abort ~current:true ~append msg
-
-let voidType = Cil_const.voidType
-let intType = TInt(IInt,[])
-let uintType = TInt(IUInt,[])
-let shortType = TInt(IShort, [])
-let ushortType = TInt(IUShort, [])
-let longType = TInt(ILong,[])
-let longLongType = TInt(ILongLong,[])
-let ulongType = TInt(IULong,[])
-let ulongLongType = TInt(IULongLong, [])
-let charType = TInt(IChar, [])
-let ucharType = TInt(IUChar, [])
-let scharType = TInt(ISChar, [])
-
-let charPtrType = TPtr(charType,[])
-let ucharPtrType = TPtr(ucharType,[])
-let scharPtrType = TPtr(scharType,[])
-let charConstPtrType = TPtr(TInt(IChar, [Attr("const", [])]),[])
-
-let voidPtrType = TPtr(voidType, [])
-let voidConstPtrType = TPtr(TVoid [Attr ("const", [])], [])
-
-let intPtrType = TPtr(intType, [])
-let uintPtrType = TPtr(uintType, [])
-
-let doubleType = TFloat(FDouble, [])
-let floatType = TFloat(FFloat, [])
-let longDoubleType = TFloat (FLongDouble, [])
 
 type theMachine =
   { mutable useLogicalOperators: bool;
@@ -7714,6 +7687,38 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
+
+(******************************************************************************)
+(** Forward Cil_const types                                                   *)
+(******************************************************************************)
+
+let voidType = voidType
+let intType = intType
+let uintType = uintType
+let shortType = shortType
+let ushortType = ushortType
+let longType = longType
+let longLongType = longLongType
+let ulongType = ulongType
+let ulongLongType = ulongLongType
+let charType = charType
+let ucharType = ucharType
+let scharType = scharType
+
+let charPtrType = charPtrType
+let ucharPtrType = ucharPtrType
+let scharPtrType = scharPtrType
+let charConstPtrType = charConstPtrType
+
+let voidPtrType = voidPtrType
+let voidConstPtrType = voidConstPtrType
+
+let intPtrType = intPtrType
+let uintPtrType = uintPtrType
+
+let doubleType = doubleType
+let floatType = floatType
+let longDoubleType = longDoubleType
 
 (*
 Local Variables:

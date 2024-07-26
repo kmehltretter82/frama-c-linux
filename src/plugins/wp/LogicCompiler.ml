@@ -314,7 +314,7 @@ struct
     match f.status with
     | Some x -> x
     | None ->
-      let x = fresh_cvar ~basename:"status" Cil.intType in
+      let x = fresh_cvar ~basename:"status" Cil_const.intType in
       f.status <- Some x ; x
 
   let trigger tg =

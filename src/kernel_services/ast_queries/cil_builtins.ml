@@ -248,11 +248,11 @@ end
    matching.
 *)
 let build_type_table () : (string, typ option) Hashtbl.t =
-  let int8_t = Some Cil.scharType in
+  let int8_t = Some Cil_const.scharType in
   let int16_t = try Some (Cil.int16_t ()) with Not_found -> None in
   let int32_t = try Some (Cil.int32_t ()) with Not_found -> None in
   let int64_t = try Some (Cil.int64_t ()) with Not_found -> None in
-  let uint8_t = Some Cil.ucharType in
+  let uint8_t = Some Cil_const.ucharType in
   let uint16_t = try Some (Cil.uint16_t ()) with Not_found -> None in
   let uint32_t = try Some (Cil.uint32_t ()) with Not_found -> None in
   let uint64_t = try Some (Cil.uint64_t ()) with Not_found -> None in
@@ -263,37 +263,37 @@ let build_type_table () : (string, typ option) Hashtbl.t =
       ("__builtin_va_list",
        Some (if Cil.theMachine.theMachine.has__builtin_va_list
              then TBuiltin_va_list []
-             else Cil.voidPtrType));
-      ("char *", Some Cil.charPtrType);
-      ("char const *", Some Cil.charConstPtrType);
-      ("double", Some Cil.doubleType);
-      ("double *", Some (TPtr(Cil.doubleType,[])));
-      ("float", Some Cil.floatType);
-      ("float *", Some (TPtr(Cil.floatType,[])));
-      ("int", Some Cil.intType);
-      ("int *", Some Cil.intPtrType);
-      ("int volatile *", Some (TPtr(typeAddVolatile Cil.intType,[])));
-      ("long", Some Cil.longType);
-      ("long double", Some Cil.longDoubleType);
-      ("long double *", Some (TPtr(Cil.longDoubleType,[])));
-      ("long long", Some Cil.longLongType);
-      ("long long volatile *", Some (TPtr(typeAddVolatile Cil.longLongType,[])));
-      ("short", Some Cil.shortType);
-      ("short volatile *", Some (TPtr(typeAddVolatile Cil.shortType,[])));
-      ("signed char", Some Cil.scharType);
-      ("signed char volatile *", Some (TPtr(typeAddVolatile Cil.scharType,[])));
-      ("unsigned char", Some Cil.ucharType);
-      ("unsigned char volatile *", Some (TPtr(typeAddVolatile Cil.ucharType,[])));
-      ("unsigned int", Some Cil.uintType);
-      ("unsigned int volatile *", Some (TPtr(typeAddVolatile Cil.uintType,[])));
-      ("unsigned long", Some Cil.ulongType);
-      ("unsigned long long", Some Cil.ulongLongType);
-      ("unsigned long long volatile *", Some (TPtr(typeAddVolatile Cil.ulongLongType,[])));
-      ("unsigned short", Some Cil.ushortType);
-      ("unsigned short volatile *", Some (TPtr(typeAddVolatile Cil.ushortType,[])));
-      ("void", Some Cil.voidType);
-      ("void *", Some Cil.voidPtrType);
-      ("void const *", Some Cil.voidConstPtrType);
+             else Cil_const.voidPtrType));
+      ("char *", Some Cil_const.charPtrType);
+      ("char const *", Some Cil_const.charConstPtrType);
+      ("double", Some Cil_const.doubleType);
+      ("double *", Some (TPtr(Cil_const.doubleType,[])));
+      ("float", Some Cil_const.floatType);
+      ("float *", Some (TPtr(Cil_const.floatType,[])));
+      ("int", Some Cil_const.intType);
+      ("int *", Some Cil_const.intPtrType);
+      ("int volatile *", Some (TPtr(typeAddVolatile Cil_const.intType,[])));
+      ("long", Some Cil_const.longType);
+      ("long double", Some Cil_const.longDoubleType);
+      ("long double *", Some (TPtr(Cil_const.longDoubleType,[])));
+      ("long long", Some Cil_const.longLongType);
+      ("long long volatile *", Some (TPtr(typeAddVolatile Cil_const.longLongType,[])));
+      ("short", Some Cil_const.shortType);
+      ("short volatile *", Some (TPtr(typeAddVolatile Cil_const.shortType,[])));
+      ("signed char", Some Cil_const.scharType);
+      ("signed char volatile *", Some (TPtr(typeAddVolatile Cil_const.scharType,[])));
+      ("unsigned char", Some Cil_const.ucharType);
+      ("unsigned char volatile *", Some (TPtr(typeAddVolatile Cil_const.ucharType,[])));
+      ("unsigned int", Some Cil_const.uintType);
+      ("unsigned int volatile *", Some (TPtr(typeAddVolatile Cil_const.uintType,[])));
+      ("unsigned long", Some Cil_const.ulongType);
+      ("unsigned long long", Some Cil_const.ulongLongType);
+      ("unsigned long long volatile *", Some (TPtr(typeAddVolatile Cil_const.ulongLongType,[])));
+      ("unsigned short", Some Cil_const.ushortType);
+      ("unsigned short volatile *", Some (TPtr(typeAddVolatile Cil_const.ushortType,[])));
+      ("void", Some Cil_const.voidType);
+      ("void *", Some Cil_const.voidPtrType);
+      ("void const *", Some Cil_const.voidConstPtrType);
       ("size_t", Some Cil.theMachine.typeOfSizeOf);
       ("int8_t", int8_t);
       ("int16_t", int16_t);

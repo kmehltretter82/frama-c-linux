@@ -566,7 +566,7 @@ let prepare_fundec kf =
 let sound_verdict_vi =
   lazy
     (let name = Functions.RTL.mk_api_name "sound_verdict" in
-     let vi = Cil.makeGlobalVar name Cil.intType in
+     let vi = Cil.makeGlobalVar name Cil_const.intType in
      vi.vstorage <- Extern;
      vi.vreferenced <- true;
      vi.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN", [])) vi.vattr;

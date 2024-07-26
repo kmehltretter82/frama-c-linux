@@ -285,8 +285,8 @@ let rec object_of typ =
   match typ with
   | TInt(i,_) -> C_int (c_int i)
   | TFloat(f,_) -> C_float (c_float f)
-  | TPtr(typ,_) -> C_pointer (if Cil.isVoidType typ then Cil.charType else typ)
-  | TFun _ -> C_pointer Cil.voidType
+  | TPtr(typ,_) -> C_pointer (if Cil.isVoidType typ then Cil_const.charType else typ)
+  | TFun _ -> C_pointer Cil_const.voidType
   | TEnum ({ekind=i},_) -> C_int (c_int i)
   | TComp (comp,_) -> C_comp comp
   | TArray (typ_elt,e_opt,_) ->

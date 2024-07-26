@@ -40,7 +40,7 @@ module Sign = struct
     include Sign_value
     let zero = zero
     let pos = one
-    let neg = inject_int Cil.uintType Integer.minus_one
+    let neg = inject_int Cil_const.uintType Integer.minus_one
     let pos_or_zero = join zero pos
     let neg_or_zero = join zero neg
     let pos_neg = join pos neg

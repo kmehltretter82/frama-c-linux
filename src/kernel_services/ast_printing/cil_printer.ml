@@ -395,13 +395,13 @@ module Precedence = struct
     | AUnOp (uo, _) ->
       getParenthLevel
         (Cil.dummy_exp
-           (UnOp(uo, Cil.zero ~loc:Cil_datatype.Location.unknown, Cil.intType)))
+           (UnOp(uo, Cil.zero ~loc:Cil_datatype.Location.unknown, Cil_const.intType)))
     | ABinOp (bo, _, _) ->
       getParenthLevel
         (Cil.dummy_exp(BinOp(bo,
                              Cil.zero ~loc:Cil_datatype.Location.unknown,
                              Cil.zero ~loc:Cil_datatype.Location.unknown,
-                             Cil.intType)))
+                             Cil_const.intType)))
     | AAddrOf _ -> addrOfLevel
     | ADot _ | AIndex _ | AStar _ -> memOffset_level
     | AQuestion _ -> questionLevel
@@ -1550,7 +1550,7 @@ class cil_printer () = object (self)
       fprintf fmt "@[<hv>%a@[<v 2>%a (%a) %a@]@]"
         (fun fmt -> self#line_directive ~forcefile:false fmt) l
         self#pp_keyword "if"
-        self#exp (Cil.dummy_exp(UnOp(LNot,be,Cil.intType)))
+        self#exp (Cil.dummy_exp(UnOp(LNot,be,Cil_const.intType)))
         (self#unboxed_block Other) e
 
     | If(be,{bstmts=[{skind=Goto(gref,_);labels=[]}]; battrs=[]},e,l)
@@ -1558,7 +1558,7 @@ class cil_printer () = object (self)
       fprintf fmt "@[<hv>%a@[<v 2>%a (%a) %a@]@]"
         (fun fmt -> self#line_directive ~forcefile:false fmt) l
         self#pp_keyword "if"
-        self#exp (Cil.dummy_exp(UnOp(LNot,be,Cil.intType)))
+        self#exp (Cil.dummy_exp(UnOp(LNot,be,Cil_const.intType)))
         (self#unboxed_block Other) e;
 
     | If(be,t,e,l) ->
@@ -1629,11 +1629,11 @@ class cil_printer () = object (self)
                    && Cil_datatype.Stmt.equal !sref next ->
                  to_skip, e, rest
                | [ { skind = Break _ } as s ], [] when self#may_be_skipped s ->
-                 to_skip, Cil.dummy_exp (UnOp(LNot, e, Cil.intType)), rest
+                 to_skip, Cil.dummy_exp (UnOp(LNot, e, Cil_const.intType)), rest
                | [ { skind = Goto(sref, _) } as s ], []
                  when self#may_be_skipped s
                    && Cil_datatype.Stmt.equal !sref next ->
-                 to_skip, Cil.dummy_exp (UnOp(LNot, e, Cil.intType)), rest
+                 to_skip, Cil.dummy_exp (UnOp(LNot, e, Cil_const.intType)), rest
                | _ -> raise Not_found)
             | _ -> raise Not_found
           in

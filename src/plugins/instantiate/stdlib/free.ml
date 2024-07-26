@@ -81,7 +81,7 @@ let generate_prototype alloc_t =
   let params = [
     ("ptr", (ptr_of alloc_t), [])
   ] in
-  name, (TFun(Cil.voidType, Some params, false, []))
+  name, (TFun(Cil_const.voidType, Some params, false, []))
 
 let well_typed_call _ret _fct args =
   match args with

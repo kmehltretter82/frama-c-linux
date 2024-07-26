@@ -443,9 +443,9 @@ let create_special_float_predicate ~loc e fkind predicate =
   let loc = best_loc ~loc e.eloc in
   let t = Logic_utils.expr_to_term e in
   let typ = match fkind with
-    | FFloat -> Cil.floatType
-    | FDouble -> Cil.doubleType
-    | FLongDouble -> Cil.longDoubleType
+    | FFloat -> Cil_const.floatType
+    | FDouble -> Cil_const.doubleType
+    | FLongDouble -> Cil_const.longDoubleType
   in
   let t = Logic_utils.mk_cast ~loc typ t in
   (* Different signatures, depending on the type of the argument *)
@@ -515,8 +515,8 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let t1 = match e1 with
         | None -> begin
             let typ = match Cil.unrollTypeDeep (Cil.typeOf e2) with
-              | TPtr (TFun _, _) -> TPtr (TFun(Cil.voidType, None, false, []), [])
-              | _ -> Cil.voidPtrType
+              | TPtr (TFun _, _) -> TPtr (TFun(Cil_const.voidType, None, false, []), [])
+              | _ -> Cil_const.voidPtrType
             in
             let zero = Cil.lzero () in
             Logic_const.term (TCast (false, Ctype typ, zero)) (Ctype typ)
@@ -531,7 +531,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = best_loc ~loc e1.eloc in
       let t1 = Logic_utils.expr_to_term e1 in
       let here = Logic_const.here_label in
-      let typ = Ctype Cil.charPtrType in
+      let typ = Ctype Cil_const.charPtrType in
       let t1 =
         Logic_const.term ~loc:(best_loc ~loc e1.eloc) (Tbase_addr(here, t1)) typ
       in

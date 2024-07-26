@@ -365,7 +365,7 @@ let generate_exn_union e exns =
       false union_name ~norig:union_name create_union_fields []
   in
   let create_struct_fields _ =
-    let uncaught = (exn_uncaught_name, Cil.intType, None, [], loc) in
+    let uncaught = (exn_uncaught_name, Cil_const.intType, None, [], loc) in
     let kind = (exn_kind_name, TEnum (e,[]), None, [], loc) in
     let obj =
       (exn_obj_name,
@@ -495,7 +495,7 @@ class erase_exn =
     method private test_uncaught_flag loc b =
       let e1 = Cil.new_exp ~loc (Lval self#uncaught_flag_field) in
       let e2 = if b then Cil.one ~loc else Cil.zero ~loc in
-      Cil.new_exp ~loc (BinOp(Eq,e1,e2,Cil.intType))
+      Cil.new_exp ~loc (BinOp(Eq,e1,e2,Cil_const.intType))
 
     method private pred_uncaught_flag loc b =
       let e1 =

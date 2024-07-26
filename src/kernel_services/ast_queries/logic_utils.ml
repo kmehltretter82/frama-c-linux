@@ -91,7 +91,7 @@ let logicCType t =
     | Ctype t -> t
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
       logicCType (unroll_ltdef ty)
-    | Lvar _ -> Cil.intType
+    | Lvar _ -> Cil_const.intType
     | _ -> failwith "not a C type"
   in plain_or_set logicCType t
 
@@ -645,11 +645,11 @@ let array_with_range arr size =
   let arr = Cil.stripCasts arr in
   let typ_arr = typeOf arr in
   let no_cast = isAnyCharPtrType typ_arr || isAnyCharArrayType typ_arr in
-  let char_ptr = Ctype Cil.charPtrType in
+  let char_ptr = Ctype Cil_const.charPtrType in
   let arr = expr_to_term arr in
   let arr =
     if no_cast then arr
-    else mk_cast ~loc Cil.charPtrType arr
+    else mk_cast ~loc Cil_const.charPtrType arr
   and range_end =
     Logic_const.term ~loc:size.term_loc
       (TBinOp (MinusA, size, Cil.lconstant Integer.one))
@@ -2358,9 +2358,9 @@ let complete_types f = Cil.visitCilFile (new complete_types) f
 
 let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
   let preds = Logic_env.find_all_logic_functions "\\pointer_comparable" in
-  let cfct_ptr = TPtr (TFun(Cil.voidType,None,false,[]),[]) in
+  let cfct_ptr = TPtr (TFun(Cil_const.voidType,None,false,[]),[]) in
   let fct_ptr = Ctype cfct_ptr in
-  let obj_ptr = Ctype Cil.voidPtrType in
+  let obj_ptr = Ctype Cil_const.voidPtrType in
   let discriminate t =
     let loc = t.term_loc in
     match Logic_const.unroll_ltdef t.term_type with
@@ -2373,7 +2373,7 @@ let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
          (* Value may emit pointer_comparable alarms on anything that
             may be compared. We cast scalar to void* to account for
             this *)
-         mk_cast ~loc Cil.voidPtrType t, obj_ptr
+         mk_cast ~loc Cil_const.voidPtrType t, obj_ptr
        | TVoid _ | TFun _ | TNamed _ | TComp _ | TBuiltin_va_list _
        | TArray _ (* in logic array do not decay implicitly
                      into pointers. *)
@@ -2565,7 +2565,7 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
   in
   match unroll_type ltyp with
   | Ctype typ -> loopOff typ Integer.zero Integer.zero off
-  | _ -> raise (SizeOfError ("bitsLogicOffset on logic type", Cil.voidPtrType))
+  | _ -> raise (SizeOfError ("bitsLogicOffset on logic type", Cil_const.voidPtrType))
 
 (* Handle \min(\union(args)) or \max(\union(args)), depending on [f] *)
 and constFoldMinMax ~machdep f args =

@@ -329,7 +329,7 @@ let crosscond_to_pred cross curr_f curr_status =
     function
     (* Lazy evaluation of logic operators if the result can be statically
        computed *)
-    | TOr  (c1, c2) -> (*BinOp(LOr,convert c1,convert c2,Cil.intType)*)
+    | TOr  (c1, c2) -> (*BinOp(LOr,convert c1,convert c2,Cil_const.intType)*)
       begin
         let (c1_val,c1_pred) = convert c1 in
         match c1_val with
@@ -343,7 +343,7 @@ let crosscond_to_pred cross curr_f curr_status =
           | Undefined -> (Undefined,Logic_const.por(c1_pred, c2_pred))
       end
 
-    | TAnd (c1, c2) -> (*BinOp(LAnd,convert c1,convert c2,Cil.intType)*)
+    | TAnd (c1, c2) -> (*BinOp(LAnd,convert c1,convert c2,Cil_const.intType)*)
       begin
         let (c1_val,c1_pred) = convert c1 in
         match c1_val with
@@ -357,7 +357,7 @@ let crosscond_to_pred cross curr_f curr_status =
           | Undefined -> (Undefined,Logic_const.pand(c1_pred, c2_pred))
       end
 
-    | TNot (c1)     -> (*UnOp(LNot,convert c1,Cil.intType)*)
+    | TNot (c1)     -> (*UnOp(LNot,convert c1,Cil_const.intType)*)
       begin
         let (c1_val,c1_pred) = convert c1 in
         match c1_val with
@@ -415,10 +415,10 @@ let rec term_to_exp t res =
   | TAlignOf ty -> new_exp ~loc (AlignOf ty)
   | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res))
   | TUnOp (unop, t) ->
-    new_exp ~loc (UnOp (unop, term_to_exp t res, Cil.intType))
+    new_exp ~loc (UnOp (unop, term_to_exp t res, Cil_const.intType))
   | TBinOp (binop, t1, t2)->
     new_exp ~loc
-      (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil.intType))
+      (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil_const.intType))
   | TCast (false, Ctype ty, {term_node = TConst(LReal lreal)}) when Cil.isFloatingType ty ->
     (match Cil.unrollType ty with
      | TFloat(fk,_) ->
@@ -482,7 +482,7 @@ let get_bhv_aux_fct kf bhv =
     vi.vdefined <- false;
     vi.vghost <- true;
     let (_,args,varargs,_) = Cil.splitFunctionTypeVI ovi in
-    let typ = TFun(Cil.intType, args, varargs,[]) in
+    let typ = TFun(Cil_const.intType, args, varargs,[]) in
     Cil.update_var_type vi typ;
     Cil.setFormalsDecl vi typ;
     vi.vattr <- [];
@@ -505,7 +505,7 @@ let get_bhv_aux_fct kf bhv =
     let assumes = Visitor.visitFramacPredicates vis bhv.b_assumes in
     let assumes = List.map Logic_const.refresh_predicate assumes in
     let assigns = Writes [] in
-    let ret_typ = Cil.typeAddGhost Cil.intType in
+    let ret_typ = Cil.typeAddGhost Cil_const.intType in
     let post_cond =
       [Normal,
        Logic_const.(
@@ -549,7 +549,7 @@ let mk_behavior_call generated_kf kf bhv =
     Cil.makeLocalVar
       (Kernel_function.get_definition generated_kf)
       ~ghost:true ~referenced:true ~insert:false
-      (get_fresh "bhv_aux") Cil.intType
+      (get_fresh "bhv_aux") Cil_const.intType
   in
   let stmt =
     Cil.mkStmtOneInstr
@@ -607,7 +607,7 @@ let crosscond_to_exp generated_kf curr_f curr_status loc cond res =
       let stmts1, vars1, defs1, e1 = expnode_convert c1 in
       (match Cil.isInteger e1 with
        | None ->
-         stmts1, vars1, defs1, Cil.new_exp ~loc (UnOp(LNot, e1,Cil.intType))
+         stmts1, vars1, defs1, Cil.new_exp ~loc (UnOp(LNot, e1,Cil_const.intType))
        | Some i when Integer.is_zero i ->
          [], [], Cil_datatype.Varinfo.Set.empty, Cil.one ~loc
        | Some _ -> [], [], Cil_datatype.Varinfo.Set.empty, Cil.zero ~loc)
@@ -768,13 +768,13 @@ let mk_int_term value = Cil.lconstant (Integer.of_int value)
 let mk_term_from_vi vi =
   Logic_const.term
     (TLval((Logic_utils.lval_to_term_lval (Cil.var vi))))
-    (Ctype Cil.intType)
+    (Ctype Cil_const.intType)
 
 (** Given an lval term 'host' and an integer value 'off', it returns a lval term host[off]. *)
 let mk_offseted_array host off =
   Logic_const.term
     (TLval(Logic_const.addTermOffsetLval (TIndex(mk_int_term (off),TNoOffset)) host))
-    (Ctype Cil.intType)
+    (Ctype Cil_const.intType)
 
 let int2enumstate nums =
   let enum = find_enum nums in
@@ -792,7 +792,7 @@ let mk_offseted_array_states_as_enum host off =
                     (TConst(LEnum enum)) (Ctype (TEnum (enum.eihost,[]))),
                   TNoOffset))
           host))
-    (Ctype Cil.intType)
+    (Ctype Cil_const.intType)
 
 (** Returns a lval term associated to the curState generated variable. *)
 let host_state_term() = lval_to_term_lval (state_lval())
@@ -935,7 +935,7 @@ class visit_decl_loops_init () =
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
             Cil.typeAddAttributes
-              [Attr (Cil.frama_c_ghost_formal,[])] Cil.intType
+              [Attr (Cil.frama_c_ghost_formal,[])] Cil_const.intType
           in
           let var = Cil.makeLocalVar ~ghost:true f ~scope name typ in
           Data_for_aorai.set_varinfo name var
@@ -1988,7 +1988,7 @@ let auto_func_behaviors loc f st state =
             (Logic_const.term
                (TConst (constant_to_lconstant
                           (Data_for_aorai.op_status_to_cenum st)))
-               (Ctype Cil.intType))))
+               (Ctype Cil_const.intType))))
     in
     let called_pre_2 =
       Logic_const.new_predicate
@@ -2000,7 +2000,7 @@ let auto_func_behaviors loc f st state =
                (TConst((constant_to_lconstant
                           (Data_for_aorai.func_to_cenum
                              (Kernel_function.get_name f)))))
-               (Ctype Cil.intType))))
+               (Ctype Cil_const.intType))))
     in
     (* let old_pred = Aorai_utils.mk_old_state_pred loc in *)
     [(Normal, called_pre); (Normal, called_pre_2)]

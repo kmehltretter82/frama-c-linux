@@ -59,6 +59,7 @@ let valid_sid = false
    for the valid_sid label of Cil.mkStmt*. *)
 open Cil_types
 open Cil_datatype
+open Cil_const
 
 (* Maps the start and end positions of a function declaration or definition
    (including its possible contract) to its name. *)
@@ -2847,7 +2848,7 @@ let vla_alloc_fun () =
   in
   let res_iterm =
     Logic_const.new_identified_term
-      (Logic_const.tresult Cil.voidPtrType)
+      (Logic_const.tresult voidPtrType)
   in
   let behavior =
     Cil.mk_behavior ~assigns:(Writes [(res_iterm, From [])])
@@ -4037,8 +4038,8 @@ let initStdIntegerSizes () =
     in
     List.iter add bases
   in
-  add_special_types "ptr" (Cil.bitsSizeOf Cil.voidPtrType);
-  add_special_types "max" (Cil.bitsSizeOf Cil.longLongType)
+  add_special_types "ptr" (Cil.bitsSizeOf voidPtrType);
+  add_special_types "max" (Cil.bitsSizeOf longLongType)
 
 (* [checkTypedefSize name typ] checks if [name] is acceptable as a typedef
    name for type [typ]. If [name] is one of the standard integer type names
@@ -6527,8 +6528,8 @@ and doExp local_env
                let ok1 =
                  (* accept literal strings even when expecting non-const char*;
                     equivalent to GCC's default behavior (-Wno-write-strings) *)
-                 (Typ.equal (Cil.unrollType texpected) Cil.charPtrType &&
-                  Typ.equal (Cil.unrollType att) Cil.charConstPtrType) ||
+                 (Typ.equal (Cil.unrollType texpected) charPtrType &&
+                  Typ.equal (Cil.unrollType att) charConstPtrType) ||
                  (* all pointers are convertible to void* *)
                  (Cil.isVoidPtrType texpected && Cil.isPointerType att) ||
                  (* allow implicit void* -> char* conversion *)
@@ -6555,7 +6556,7 @@ and doExp local_env
                    Kernel.warning ~wkey:Kernel.wkey_implicit_conv_void_ptr
                      ~current:true ~once:true
                      "implicit conversion from %a to %a"
-                     Cil_datatype.Typ.pretty Cil.voidPtrType
+                     Cil_datatype.Typ.pretty voidPtrType
                      Cil_datatype.Typ.pretty texpected;
                    true
                  end else
@@ -6958,13 +6959,13 @@ and doExp local_env
                piscall := false;
                let cst = CReal (infinity, FFloat, Some "INFINITY") in
                pres := Cil.new_exp ~loc (Const cst);
-               prestype := Cil.floatType;
+               prestype := floatType;
              end
            | "__fc_nan" -> begin
                piscall := false;
                let cst = CReal (nan, FFloat, Some "NAN") in
                pres := Cil.new_exp ~loc (Const cst);
-               prestype := Cil.floatType;
+               prestype := floatType;
              end
 
            (* TODO: Only keep the side effects of the 1st or 2nd argument
@@ -7604,8 +7605,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
        arguments with incompatible types to a common type *)
     let e1', e2' =
       if not (areCompatibleTypes t1p t2p) then
-        mkCastT ~oldt:t1 ~newt:Cil.voidPtrType e1,
-        mkCastT ~oldt:t2 ~newt:Cil.voidPtrType e2
+        mkCastT ~oldt:t1 ~newt:voidPtrType e1,
+        mkCastT ~oldt:t2 ~newt:voidPtrType e2
       else e1, e2
     in
     intType,

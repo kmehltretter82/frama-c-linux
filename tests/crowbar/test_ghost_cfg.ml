@@ -47,11 +47,11 @@ let add_stack stmt env = { env with stmt_stack = stmt :: env.stmt_stack }
 
 let () = Project.set_current (Project.create "simple project")
 
-let x = Cil.makeGlobalVar "x" Cil.intType
+let x = Cil.makeGlobalVar "x" Cil_const.intType
 
-let y = Cil.makeGlobalVar ~ghost:true "y" Cil.intType
+let y = Cil.makeGlobalVar ~ghost:true "y" Cil_const.intType
 
-let f = Cil.makeGlobalVar "f" (Cil_types.TFun (Cil.voidType,Some [],false,[]))
+let f = Cil.makeGlobalVar "f" (Cil_types.TFun (Cil_const.voidType,Some [],false,[]))
 
 let return = Cil.mkStmt (Return (None, Loc.unknown))
 
@@ -102,7 +102,7 @@ let gen_inst ghost env =
       (Set
          (Cil.var v,
           Cil.new_exp ~loc
-            (BinOp (PlusA,Cil.evar v,Cil.one ~loc,Cil.intType)),loc))
+            (BinOp (PlusA,Cil.evar v,Cil.one ~loc,Cil_const.intType)),loc))
   in
   let env = add_stack stmt env in
   env, stmt
@@ -119,7 +119,7 @@ let gen_return ghost env =
   let ghost = ghost_status env ghost in
   let stmt = Cil.mkStmt ~ghost (Return (None, Loc.unknown)) in
   let e =
-    Cil.new_exp ~loc (BinOp(Lt,Cil.evar x,Cil.integer ~loc 53,Cil.intType))
+    Cil.new_exp ~loc (BinOp(Lt,Cil.evar x,Cil.integer ~loc 53,Cil_const.intType))
   in
   let stmt = Cil.mkStmt ~ghost (If (e,Cil.mkBlock [stmt],Cil.mkBlock[],loc)) in
   let env = if ghost then { env with should_fail = true } else env in
@@ -224,7 +224,7 @@ let gen_if ghost ghost_else stmt_then stmt_else env =
   let loc = Loc.unknown in
   let stmt = Cil.mkEmptyStmt ~ghost ~loc () in
   let e =
-    Cil.new_exp ~loc (BinOp (Ne,Cil.evar ~loc x,Cil.zero ~loc,Cil.intType))
+    Cil.new_exp ~loc (BinOp (Ne,Cil.evar ~loc x,Cil.zero ~loc,Cil_const.intType))
   in
   let if_env = add_stack stmt env in
   let if_env = { if_env with in_ghost = ghost } in
@@ -419,7 +419,7 @@ let gen_loop ghost stmts env =
   in
   let (new_env, stmts) = stmts new_env in
   let e =
-    Cil.new_exp ~loc (BinOp (Ge,Cil.evar x,Cil.integer ~loc 42,Cil.intType))
+    Cil.new_exp ~loc (BinOp (Ge,Cil.evar x,Cil.integer ~loc 42,Cil_const.intType))
   in
   let cond_stmt =
     Cil.mkStmt ~ghost

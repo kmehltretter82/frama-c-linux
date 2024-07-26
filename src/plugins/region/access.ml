@@ -78,6 +78,6 @@ let typeof = function
   | Term(_,lt) ->
     match Cil.typeOfTermLval lt with
     | Ctype ty -> ty
-    | _ -> Cil.voidType
+    | _ -> Cil_const.voidType
 
 module Set = Set.Make(struct type t = acs let compare = compare end)

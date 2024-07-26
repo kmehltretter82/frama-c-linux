@@ -197,7 +197,7 @@ struct
         else
           invalid_arg "unsupported construction"
       in
-      mk_exp (BinOp (op, cast t e1, cast t e2, Cil.intType))
+      mk_exp (BinOp (op, cast t e1, cast t e2, Cil_const.intType))
 
     | _ -> invalid_arg "unsupported construction"
 
@@ -259,7 +259,7 @@ let rec normalize_condition exp positive =
   | _ ->
     let op = if positive then Ne else Eq in
     let typ = Cil.unrollType exp.typ in
-    mk_exp (BinOp (op, zero_typed typ, exp, Cil.intType))
+    mk_exp (BinOp (op, zero_typed typ, exp, Cil_const.intType))
 
 
 (* --- Hide mk optional paremeters --- *)

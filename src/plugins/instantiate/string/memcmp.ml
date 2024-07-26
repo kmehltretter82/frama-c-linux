@@ -38,7 +38,7 @@ let requires loc _ s1 s2 len =
 
 let presult_memcmp ?loc p1 p2 len =
   let eq = punfold_all_elems_eq ?loc p1 p2 len in
-  let res = prel ?loc (Req, (tresult ?loc Cil.intType), (tinteger ?loc 0)) in
+  let res = prel ?loc (Req, (tresult ?loc Cil_const.intType), (tinteger ?loc 0)) in
   piff ?loc (res, eq)
 
 let assigns loc _ s1 s2 len =
@@ -48,7 +48,7 @@ let assigns loc _ s1 s2 len =
   in
   let s1_range = indirect_range loc s1 len in
   let s2_range = indirect_range loc s2 len in
-  let result = new_identified_term (tresult Cil.intType) in
+  let result = new_identified_term (tresult Cil_const.intType) in
   let res = result, From [s1_range ; s2_range] in
   Writes [ res ]
 
@@ -67,7 +67,7 @@ struct
   open Mem_utils
   let name = function_name
   let prototype () =
-    Data Cil.intType,
+    Data Cil_const.intType,
     [
       ("s1" , CPtr,Strip) ;
       ("s2" , CPtr,Strip) ;

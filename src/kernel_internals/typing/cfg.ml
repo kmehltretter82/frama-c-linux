@@ -603,9 +603,9 @@ let xform_switch_block ?(keepSwitch=false) b =
                         Const (CInt64 (z,_,_))
                         when Integer.equal z Integer.zero
                         ->
-                        new_exp ~loc:ce.eloc (UnOp(LNot,e,intType))
+                        new_exp ~loc:ce.eloc (UnOp(LNot,e,Cil_const.intType))
                       | _ ->
-                        new_exp ~loc:ce.eloc (BinOp(Eq,e,ce,intType))
+                        new_exp ~loc:ce.eloc (BinOp(Eq,e,ce,Cil_const.intType))
                     in
                     (* end replacement *)
                     let then_block =

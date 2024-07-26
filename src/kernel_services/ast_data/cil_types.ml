@@ -297,21 +297,21 @@ and global =
     functions do not take into account the [packed] attributes and pragmas. *)
 
 and typ =
-  | TVoid of attributes (** Void type. Also predefined as {!Cil.voidType} *)
+  | TVoid of attributes (** Void type. Also predefined as {!Cil_const.voidType} *)
 
   | TInt of ikind * attributes
   (** An integer type. The kind specifies the sign and width. Several useful
-      variants are predefined as {!Cil.intType}, {!Cil.uintType},
-      {!Cil.longType}, {!Cil.charType}. *)
+      variants are predefined as {!Cil_const.intType}, {!Cil_const.uintType},
+      {!Cil_const.longType}, {!Cil_const.charType}. *)
 
   | TFloat of fkind * attributes
   (** A floating-point type. The kind specifies the precision. You can also use
-      the predefined constant {!Cil.doubleType}. *)
+      the predefined constant {!Cil_const.doubleType}. *)
 
   | TPtr of typ * attributes
   (** Pointer type. Several useful variants are predefined as
-      {!Cil.charPtrType}, {!Cil.charConstPtrType} (pointer to a constant
-      character), {!Cil.voidPtrType}, {!Cil.intPtrType} *)
+      {!Cil_const.charPtrType}, {!Cil_const.charConstPtrType} (pointer to a constant
+      character), {!Cil_const.voidPtrType}, {!Cil_const.intPtrType} *)
 
   | TArray of typ * exp option * attributes
   (** Array type. It indicates the base type and the array length. *)

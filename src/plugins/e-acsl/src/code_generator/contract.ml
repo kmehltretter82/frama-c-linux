@@ -333,7 +333,7 @@ let check_default_requires kf env contract =
     the given contract in the environment *)
 let check_other_requires kf env contract =
   let get_or_create_assumes_var =
-    mk_get_or_create_var kf Cil.intType "assumes_value"
+    mk_get_or_create_var kf Cil_const.intType "assumes_value"
   in
   let kinstr = Env.get_kinstr env in
   let do_behavior env b =
@@ -595,7 +595,7 @@ let check_complete_and_disjoint kf env contract =
     (* Create a common variable to hold the number of active behavior for the
        current check *)
     let get_or_create_var =
-      mk_get_or_create_var kf Cil.intType "active_bhvrs"
+      mk_get_or_create_var kf Cil_const.intType "active_bhvrs"
     in
     (* Check the complete and disjoint clauses *)
     let check_bhvrs env ppt_to_translate bhvrs =
@@ -623,7 +623,7 @@ let check_complete_and_disjoint kf env contract =
 (** Insert ensures check for the given contract in the environement *)
 let check_post_conds kf env contract =
   let get_or_create_assumes_var =
-    mk_get_or_create_var kf Cil.intType "assumes_value"
+    mk_get_or_create_var kf Cil_const.intType "assumes_value"
   in
   let kinstr = Env.get_kinstr env in
   let do_behavior env b =

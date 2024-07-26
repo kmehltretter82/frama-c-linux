@@ -27,11 +27,11 @@ open Cil_types
 let add = Logic_env.add_builtin_logic_function_gen
     Logic_utils.is_same_builtin_profile
 
-let float_type = Ctype Cil.floatType
-let double_type = Ctype Cil.doubleType
-let long_double_type = Ctype Cil.longDoubleType
-let object_ptr = Ctype Cil.voidPtrType
-let fun_ptr = Ctype (TPtr(TFun(Cil.voidType,None,false,[]),[]))
+let float_type = Ctype Cil_const.floatType
+let double_type = Ctype Cil_const.doubleType
+let long_double_type = Ctype Cil_const.longDoubleType
+let object_ptr = Ctype Cil_const.voidPtrType
+let fun_ptr = Ctype (TPtr(TFun(Cil_const.voidType,None,false,[]),[]))
 
 let polymorphic_type name = name, Lvar name
 

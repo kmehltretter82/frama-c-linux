@@ -5,8 +5,8 @@ class test prj = object(self)
   method private create_f () =
     let f = Cil.emptyFunction "f" in
     f.svar.vdefined <- true;
-    let x = Cil.makeFormalVar f "x" Cil.intType in
-    Cil.setReturnType f Cil.intType;
+    let x = Cil.makeFormalVar f "x" Cil_const.intType in
+    Cil.setReturnType f Cil_const.intType;
     Queue.add (fun () -> Cil.setFormals f [x])
       self#get_filling_actions;
     f.sbody <-

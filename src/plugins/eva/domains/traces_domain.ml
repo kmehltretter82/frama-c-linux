@@ -958,7 +958,7 @@ let rec stmts_of_cfg cfg current var_map locals return_exp acc =
         | None -> Self.not_yet_implemented "Traces_domain: Loop without condition"
         | Some(exp,nloop,bloop,n2) ->
           let exp = subst_in_exp var_map exp in
-          let exp = if bloop then exp else Cil.new_exp ~loc:dummy_loc (UnOp(LNot,exp,Cil.intType)) in
+          let exp = if bloop then exp else Cil.new_exp ~loc:dummy_loc (UnOp(LNot,exp,Cil_const.intType)) in
           let body = stmts_of_cfg g nloop var_map locals None [] in
           let acc = (List.rev (Cil.mkLoop ~guard:exp ~body ())) @ acc in
           stmts_of_cfg cfg n2 var_map locals return_exp acc

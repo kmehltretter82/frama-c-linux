@@ -5,19 +5,19 @@ let loc = Location.unknown
 
 let null () =
   let e = zero ~loc in
-  mkCast ~force:true ~newt:voidPtrType e
+  mkCast ~force:true ~newt:Cil_const.voidPtrType e
 
 let inull () =
   let e = zero ~loc in
-  mkCast ~force:true ~newt:intPtrType e
+  mkCast ~force:true ~newt:Cil_const.intPtrType e
 
 let cone () =
   let e = one ~loc in
-  mkCast ~force:true ~newt:charPtrType e
+  mkCast ~force:true ~newt:Cil_const.charPtrType e
 
 let ione () =
   let e = one ~loc in
-  mkCast ~force:true ~newt:intPtrType e
+  mkCast ~force:true ~newt:Cil_const.intPtrType e
 
 let test =
   let n = ref 0 in

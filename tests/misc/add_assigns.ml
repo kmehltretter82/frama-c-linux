@@ -16,7 +16,7 @@ let main () =
       Logic_const.(
         new_identified_term
           (term (TLval (TMem (tvar (Cil.cvar_to_lvar y)), TNoOffset))
-             (Ctype Cil.intType)))
+             (Ctype Cil_const.intType)))
     in
     let assigns = Writes [mem, FromAny] in
     let bhv = Cil.mk_behavior ~assigns () in

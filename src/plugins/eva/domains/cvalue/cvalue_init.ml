@@ -339,7 +339,7 @@ let initialize_var_using_type varinfo state =
         Cabs2cil.fresh_global ("WELL_"^name)
       in
       let hidden_var =
-        Eva_utils.create_new_var hidden_var_name Cil.charType
+        Eva_utils.create_new_var hidden_var_name Cil_const.charType
       in
       hidden_var.vdescr <- Some (name_desc^"_WELL");
       let validity = Base.Known (Integer.zero, Bit_utils.max_bit_address ()) in

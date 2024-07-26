@@ -25,7 +25,7 @@ open Eva_ast_types
 let type_of_const : constant -> typ = function
   | CTopInt ik -> Cil_types.TInt (ik, [])
   | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
-  | CChr _ -> Cil.intType
+  | CChr _ -> Cil_const.intType
   | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType
   | CString (String (_, Base.CSWstring _)) -> TPtr (Cil.theMachine.wcharType, [])
   | CString (_) -> assert false (* it must be a String base*)

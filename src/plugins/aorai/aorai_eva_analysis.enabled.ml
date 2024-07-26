@@ -81,7 +81,7 @@ let builtin_show_aorai_state state args =
 
 let () =
   Cil_builtins.add_custom_builtin
-    (fun () -> (show_aorai_state,Cil.voidType,[],true))
+    (fun () -> (show_aorai_state,Cil_const.voidType,[],true))
 
 let () =
   Eva.Builtins.register_builtin show_aorai_state Cacheable builtin_show_aorai_state;

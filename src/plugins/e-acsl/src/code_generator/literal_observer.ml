@@ -37,7 +37,7 @@ let literal loc env kf s =
         env
         kf
         None
-        Cil.charPtrType
+        Cil_const.charPtrType
         (fun _ _ -> [] (* done in the initializer, see {!vglob_aux} *))
     in
     Literal_strings.add s vi;

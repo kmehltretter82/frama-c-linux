@@ -147,7 +147,7 @@ let compare v1 v2 = Datatype.Int.compare (id v1) (id v2)
 
 let typeof v =
   match v with
-  | String (_,_) -> Some charConstPtrType
+  | String (_,_) -> Some Cil_const.charConstPtrType
   | CLogic_Var (_, ty, _) -> Some ty
   | Null -> None
   | Var (v,_) | Allocated(v,_,_) -> Some (unrollType v.vtype)
@@ -156,7 +156,7 @@ let cstring_bitlength s =
   let u, l =
     match s with
     | CSString s ->
-      bitsSizeOf charType, (String.length s)
+      bitsSizeOf Cil_const.charType, (String.length s)
     | CSWstring s ->
       bitsSizeOf theMachine.wcharType, (List.length s)
   in

@@ -299,7 +299,7 @@ let treal_zero ?(loc=Cil_datatype.Location.unknown) ?(ltyp=Lreal) () =
   term ~loc (TConst (LReal zero)) ltyp
 
 let tstring ?(loc=Cil_datatype.Location.unknown) s =
-  (* Cannot refer to Cil.charConstPtrType in this module... *)
+  (* Cannot refer to Cil_const.charConstPtrType in this module... *)
   let typ = TPtr(TInt(IChar, [Attr("const", [])]),[]) in
   term ~loc (TConst (LStr s)) (Ctype typ)
 

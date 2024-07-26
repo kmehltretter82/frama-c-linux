@@ -161,7 +161,7 @@ let zone_to_term ?(to_char=false) loc zone =
       let len = Logic_utils.expr_to_term (Cil.sizeOf ~loc pointed) in
       let last = term (TBinOp(MinusA, len, tinteger ~loc 1)) len.term_type in
       let range = trange ~loc (Some (tinteger ~loc 0), Some last) in
-      let ptr = Logic_utils.mk_cast ~loc Cil.charPtrType ptr in
+      let ptr = Logic_utils.mk_cast ~loc Cil_const.charPtrType ptr in
       term ~loc (TBinOp(PlusPI, ptr, range)) ptr.term_type
   in
   match zone with
@@ -175,20 +175,20 @@ let zone_to_term ?(to_char=false) loc zone =
     in
     let ptr =
       if not to_char then ptr
-      else Logic_utils.mk_cast ~loc Cil.charPtrType ptr
+      else Logic_utils.mk_cast ~loc Cil_const.charPtrType ptr
     in
     let range = trange ~loc (None, None) in
     term ~loc (TBinOp(PlusPI, ptr, range)) ptr.term_type
 
 let region_to_term loc = function
-  | [] -> term ~loc Tempty_set (Ctype Cil.charPtrType)
+  | [] -> term ~loc Tempty_set (Ctype Cil_const.charPtrType)
   | [z] -> zone_to_term loc z
   | x :: tl as l ->
     let fst = type_of_zone x in
     let tl = List.map type_of_zone tl in
     let to_char = not (List.for_all (Cil_datatype.Typ.equal fst) tl) in
     let set_typ =
-      make_set_type (Ctype (if to_char then Cil.charPtrType else fst))
+      make_set_type (Ctype (if to_char then Cil_const.charPtrType else fst))
     in
     term ~loc (Tunion (List.map (zone_to_term ~to_char loc) l)) set_typ
 
@@ -247,7 +247,7 @@ let welltyped zones =
   in
   let compare_zone a b =
     Cil_datatype.Typ.compare (type_of_zone a) (type_of_zone b) in
-  partition_by_type Cil.voidType [] (List.sort compare_zone zones)
+  partition_by_type Cil_const.voidType [] (List.sort compare_zone zones)
 
 let global_zones partition =
   List.map (fun z -> [z]) partition.globals

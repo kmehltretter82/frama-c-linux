@@ -179,8 +179,8 @@ module Z = struct
 
   let add_cast ~loc ?name env kf ty e =
     let fname, new_ty =
-      if Cil.isSignedInteger ty then "__gmpz_get_si", Cil.longType
-      else "__gmpz_get_ui", Cil.ulongType
+      if Cil.isSignedInteger ty then "__gmpz_get_si", Cil_const.longType
+      else "__gmpz_get_ui", Cil_const.ulongType
     in
     let _, e, env =
       Env.new_var
@@ -216,7 +216,7 @@ module Z = struct
         kf
         t_opt
         ~name
-        Cil.intType
+        Cil_const.intType
         (fun v _ ->
            [ Smart_stmt.rtl_call ~loc
                ~result:(Cil.var v)
@@ -224,7 +224,7 @@ module Z = struct
                "__gmpz_cmp"
                [ e1; e2 ] ])
     in
-    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
+    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil_const.intType)), env
 
 end
 
@@ -355,7 +355,7 @@ module Q = struct
           env
           kf
           None
-          Cil.doubleType
+          Cil_const.doubleType
           (fun v _ ->
              [ Smart_stmt.rtl_call ~loc
                  ~result:(Cil.var v)
@@ -379,7 +379,7 @@ module Q = struct
       let e, env = get_double e env in
       Options.warning
         ~once:true "R to float: double rounding might cause unsoundness";
-      Cil.mkCastT ~force:false ~oldt:Cil.doubleType ~newt:ty e, env
+      Cil.mkCastT ~force:false ~oldt:Cil_const.doubleType ~newt:ty e, env
     | TInt(IULongLong, _) ->
       (* The biggest C integer type we can extract from GMP is ulong *)
       Error.not_yet "R to unsigned long long"
@@ -425,7 +425,7 @@ module Q = struct
         kf
         t_opt
         ~name
-        Cil.intType
+        Cil_const.intType
         (fun v _ ->
            [ Smart_stmt.rtl_call ~loc
                ~result:(Cil.var v)
@@ -433,7 +433,7 @@ module Q = struct
                fname
                [ e1; e2 ] ])
     in
-    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil.intType)), env
+    Cil.new_exp ~loc (BinOp(bop, e, Cil.zero ~loc, Cil_const.intType)), env
 
 end
 

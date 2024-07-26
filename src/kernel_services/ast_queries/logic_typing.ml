@@ -1255,9 +1255,9 @@ struct
         let loc = t.term_loc in
         let sizeof = term ~loc (TSizeOf (logicCType ptd_type)) Linteger in
         let range = trange ~loc (Some (lzero ~loc ()), Some sizeof) in
-        let converted_type = set_conversion (Ctype Cil.charPtrType) t.term_type
+        let converted_type = set_conversion (Ctype Cil_const.charPtrType) t.term_type
         in
-        let cast = term ~loc (TCast(false, Ctype Cil.charPtrType, t)) converted_type in
+        let cast = term ~loc (TCast(false, Ctype Cil_const.charPtrType, t)) converted_type in
         term ~loc (TBinOp(PlusPI,cast,range)) (make_set_type converted_type)
     in
     lift_set convert_one_location t
@@ -1311,7 +1311,7 @@ struct
         logic_coerce (make_set_type e.term_type) e
       | Linteger, Linteger | Lreal, Lreal -> e
       | Linteger, Ctype t when isLogicPointerType newt && isLogicNull e ->
-        c_mk_cast ~force e intType t
+        c_mk_cast ~force e Cil_const.intType t
       | Linteger, (Ctype newt) | Lreal, (Ctype newt) when explicit ->
         Logic_utils.mk_cast ~loc newt e
       | Linteger, Ctype t when isIntegralType t ->
@@ -1899,7 +1899,7 @@ struct
     else if is_arithmetic_type ot && is_arithmetic_type nt then
       let typ = arithmetic_conversion ot nt in ArithConv, typ
     else if is_pointer_type ot && is_pointer_type nt then
-      let typ = Ctype Cil.charPtrType in
+      let typ = Ctype Cil_const.charPtrType in
       PointerConv, (if is_set_type ot then make_set_type typ else typ)
     else
       let _,_,t = partial_unif ~overloaded:false loc t ot nt env in
@@ -2573,7 +2573,7 @@ struct
       let t = Logic_utils.parse_float ~loc s in
       t.term_node , t.term_type
     | PLconstant (StringConstant s) ->
-      TConst (LStr (unescape s)), Ctype Cil.charPtrType
+      TConst (LStr (unescape s)), Ctype Cil_const.charPtrType
     | PLconstant (WStringConstant s) ->
       TConst (LWStr (wcharlist_of_string s)),
       Ctype (TPtr(Cil.theMachine.wcharType,[]))
@@ -2915,7 +2915,7 @@ struct
       let t =
         lift_set
           (fun t -> Logic_const.term (Tbase_addr (l,t))
-              (Ctype Cil.charPtrType)) t
+              (Ctype Cil_const.charPtrType)) t
       in t.term_node, t.term_type
     | PLoffset (l, t) ->
       (* offset need a current label to have some semantics *)
@@ -3519,7 +3519,7 @@ struct
       in
       let var = Cil_const.make_logic_info_local x in
       var.l_profile <- args;
-      let rt = Option.value typ ~default:(Ctype Cil.voidType) in
+      let rt = Option.value typ ~default:(Ctype Cil_const.voidType) in
       var.l_var_info.lv_type <- make_arrow_type args rt;
       var.l_type <- typ;
       var.l_body <- tdef;
@@ -4042,7 +4042,7 @@ struct
        - Polymorphism is not reflected on the lvar level.
        - However, such lvar should rarely if at all be seen under a Tvar.
     *)
-    let rt = Option.value t ~default:(Ctype Cil.voidType) in
+    let rt = Option.value t ~default:(Ctype Cil_const.voidType) in
     info.l_var_info.lv_type <- make_arrow_type p rt;
     info.l_tparams <- poly;
     info.l_profile <- p;
