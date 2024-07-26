@@ -82,6 +82,7 @@ extern void *lsearch(const void *key, void *base, size_t *nelp,
 extern void remque(void *element);
 
 /*@
+  frees *rootp;
   assigns ((char*)rootp)[0..] \from ((char*)key)[0..], ((char*)rootp)[0..],
     indirect:compar;
   assigns \result \from *rootp, indirect:((char*)key)[0..], indirect:compar;
@@ -96,9 +97,11 @@ extern void *tfind(const void *key, void *const *rootp,
                    int(*compar)(const void *, const void *));
 
 /*@
-  assigns *rootp \from key, *rootp, indirect:((char*)key)[0..],
+  allocates \result;
+  allocates *rootp;
+  assigns *rootp \from *rootp, indirect:((char*)key)[0..],
     indirect:((char*)rootp)[0..], indirect:compar;
-  assigns \result \from key, *rootp, indirect:((char*)key)[0..],
+  assigns \result \from *rootp, indirect:((char*)key)[0..],
     indirect:((char*)rootp)[0..], indirect:compar;
 */
 extern void *tsearch(const void *key, void **rootp,
