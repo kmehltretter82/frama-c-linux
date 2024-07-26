@@ -35,7 +35,7 @@ end
 
 let round fkind =
   if fkind = Single
-  then Floating_point.round_to_single_precision_float
+  then fun f -> Floating_point.(single f |> to_float)
   else fun f -> f
 
 (* Inject a float as a singleton interval. *)
@@ -189,8 +189,6 @@ let test_comp_on_itv ~ne op fval_op str_op ((b1, e1), (b2, e2)) =
   in
   check b1 b2; check b1 e2; check e1 b2; check e1 e2
 
-external c_powf: float -> float -> float = "c_powf"
-
 (* Round-trip of reinterpretation. Is the identity in the concrete. *)
 let reinterpret fkind f =
   let signed = false in
@@ -225,9 +223,11 @@ let test_forward_unop () =
   test_unop Stdlib.ceil ceil "ceil";
   (* TODO: use interesting floating-point values for trigonometry. *)
   test_unop ~fkinds:[Double] Stdlib.cos cos "cos";
-  test_unop ~fkinds:[Single] Floating_point.cosf cos "cos";
+  let cosf f = Floating_point.(single f |> cos |> to_float) in
+  test_unop ~fkinds:[Single] cosf cos "cos";
   test_unop ~fkinds:[Double] Stdlib.sin sin "sin";
-  test_unop ~fkinds:[Single] Floating_point.sinf sin "sin";
+  let sinf f = Floating_point.(single f |> sin |> to_float) in
+  test_unop ~fkinds:[Single] sinf sin "sin";
   test_unop ~exact:false ~fkinds:[Single; Double]
     (fun f -> f) reinterpret "reinterpret";
 ;;
@@ -249,9 +249,11 @@ let test_forward_binop () =
   test_binop ~pow:false fkinds ( /. ) div "/";
   test_binop ~pow:false [Single; Double] mod_float fmod "mod";
   test_binop ~pow:true [Double] ( ** ) pow "pow";
-  test_binop ~pow:true [Single] Floating_point.powf pow "pow";
+  let powf b e = Floating_point.(pow (single b) (single e) |> to_float) in
+  test_binop ~pow:true [Single] powf pow "pow";
   test_binop ~pow:false [Double] Stdlib.atan2 atan2 "atan2";
-  test_binop ~pow:false [Single] Floating_point.atan2f atan2 "atan2"
+  let atan2f b e = Floating_point.(atan2 (single b) (single e) |> to_float) in
+  test_binop ~pow:false [Single] atan2f atan2 "atan2"
 
 let interesting_for_comp =
   [-.infinity; -1.2e-323; -0.; infinity; 1.3e-323; +0.; ]

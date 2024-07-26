@@ -342,7 +342,7 @@ struct
     let open Cil_types in
     let fv =
       match kind with
-      | FFloat -> Floating_point.round_to_single_precision_float fv
+      | FFloat -> Floating_point.(single fv |> to_float)
       | FDouble | FLongDouble -> fv
     in CReal(fv,kind,None)
 

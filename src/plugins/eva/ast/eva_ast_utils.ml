@@ -342,13 +342,9 @@ and const_fold_cast (t : typ) (e : exp) : exp  =
     | `Float f, `Float fkind -> Build.float ~fkind f
     (* float -> integer *)
     | `Float f, `Int ikind ->
-      begin try
-          let i = Floating_point.truncate_to_integer f in
-          if Cil.fitsInInt ikind i
-          then Build.integer ~ikind i
-          else default ()
-        with Floating_point.Float_Non_representable_as_Int64 _ ->
-          default ()
+      begin match Floating_point.(double f |> truncate_to_integer) with
+        | Integer i when Cil.fitsInInt ikind i -> Build.integer ~ikind i
+        | Overflow | Underflow | Integer _ -> default ()
       end
     (* int -> float *)
     | `Int i, `Float fkind -> Build.float ~fkind (Integer.to_float i)
@@ -366,7 +362,7 @@ and const_fold_unop (op : unop) (e : exp) (t : typ) : exp =
   (* Float operations *)
   | Neg, `Float f, `Float fkind ->
     let f = match fkind with
-      | FFloat -> Floating_point.round_to_single_precision_float f
+      | FFloat -> Floating_point.(single f |> to_float)
       | FDouble | FLongDouble -> f
     in
     mk_exp (Const (CReal (-.f, fkind, None)))

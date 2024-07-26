@@ -681,13 +681,12 @@ class cil_printer () = object (self)
 
     | CChr(c) -> fprintf fmt "'%s'" (Escape.escape_char c)
     | CReal(_, _, Some s) -> fprintf fmt "%s" s
-    | CReal(f, fsize, None) ->
-      fprintf fmt "%a%s"
-        Floating_point.pretty f
-        (match fsize with
-           FFloat -> "f"
-         | FDouble -> ""
-         | FLongDouble -> "L")
+    | CReal(f, FFloat, None) ->
+      Floating_point.(fprintf fmt "%af" pretty (single f))
+    | CReal(f, FDouble, None) ->
+      Floating_point.(fprintf fmt "%a" pretty (double f))
+    | CReal(f, FLongDouble, None) ->
+      Floating_point.(fprintf fmt "%aL" pretty (long f))
     | CEnum {einame = s} -> self#varname fmt s
 
   (*** VARIABLES ***)

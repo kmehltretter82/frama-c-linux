@@ -374,43 +374,31 @@ let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
   let e_typ = Cil.unrollType (Cil.typeOf exp) in
   match e_typ.tnode, ty.tnode with
   | TFloat _, TInt ikind ->
-    let szTo = Cil.bitsSizeOfBitfield ty in
-    let min_ty, max_ty =
-      if Cil.isSigned ikind then
-        Cil.min_signed_number szTo, Cil.max_signed_number szTo
-      else
-        Integer.zero, Cil.max_unsigned_number szTo
-    in
-    let alarm ?(invalid=false) bk =
-      let b = match bk with
-        | Lower_bound -> min_ty
-        | Upper_bound -> max_ty
-      in
-      on_alarm ~invalid (Alarms.Float_to_int (exp, b, bk))
-    in
-    let f = match exp.enode with
-      | Const (CReal (f, _, _)) -> Some f
-      | UnOp (Neg, { enode = Const (CReal (f, _, _))}, _) -> Some (-. f)
+    let signed = Cil.isSigned ikind in
+    let size = Cil.bitsSizeOfBitfield ty in
+    let largest = Cil.max_unsigned_number size in
+    let max_ty = if signed then Cil.max_signed_number size else largest in
+    let min_ty = if signed then Cil.min_signed_number size else Integer.zero in
+    let bound = function Lower_bound -> min_ty | Upper_bound -> max_ty in
+    let build_alarm b = Alarms.Float_to_int (exp, bound b, b) in
+    let alarm ?(invalid = false) b = on_alarm ~invalid (build_alarm b) in
+    let number =
+      match exp.enode with
+      | Const (CReal (f, fk, _)) -> Some (f, fk)
+      | UnOp (Neg, { enode = Const (CReal (f, fk, _)) }, _) -> Some (-. f, fk)
       | _ -> None
     in
-    (match remove_trivial, f with
-     | true, Some f ->
-       begin
-         try
-           let fint = Floating_point.truncate_to_integer f in
-           if Integer.lt fint min_ty then
-             alarm ~invalid:true Lower_bound
-           else if Integer.gt fint max_ty then
-             alarm ~invalid:true Upper_bound
-         with Floating_point.Float_Non_representable_as_Int64 sign ->
-         match sign with
-         | Floating_point.Neg -> alarm Lower_bound
-         | Floating_point.Pos -> alarm Upper_bound
-       end
-     | _ ->
-       alarm Upper_bound;
-       alarm Lower_bound;
-    )
+    begin match remove_trivial, number with
+      | false, _ | true, None -> alarm Upper_bound ; alarm Lower_bound
+      | true, Some (f, fkind) ->
+        let Format fmt = Floating_point.format_of_fkind fkind in
+        match Floating_point.(of_float fmt f |> truncate_to_integer) with
+        | Underflow -> alarm Lower_bound
+        | Overflow  -> alarm Upper_bound
+        | Integer i when Integer.lt i min_ty -> alarm ~invalid:true Lower_bound
+        | Integer i when Integer.gt i max_ty -> alarm ~invalid:true Upper_bound
+        | Integer _ -> ()
+    end
   | _ -> ()
 
 (* assertion for checking only finite float are used *)

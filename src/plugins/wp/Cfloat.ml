@@ -139,7 +139,7 @@ let () = Context.register
 (* --- Literals                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rfloat = Floating_point.round_to_single_precision_float
+let rfloat f = Floating_point.(single f |> to_float)
 
 let fmake ulp value = match ulp with
   | Float32 -> F.e_fun ~result:t32 fq32 [F.e_float (rfloat value)]
@@ -226,28 +226,25 @@ let printers = [
 let re_int_float = Str.regexp "\\(-?[0-9]+\\)\\(e[+-]?[0-9]+\\)?$"
 
 let force_float r =
-  if Str.string_match re_int_float r 0
-  then
-    let group n r = try Str.matched_group n r with Not_found -> ""
-    in group 1 r ^ ".0" ^ group 2 r
+  if Str.string_match re_int_float r 0 then
+    let group n r = try Str.matched_group n r with Not_found -> "" in
+    group 1 r ^ ".0" ^ group 2 r
   else r
 
-let float_lit ulp (q : Q.t) =
-  let v = match ulp with
-    | Float32 -> rfloat @@ Q.to_float q
-    | Float64 -> Q.to_float q in
-  let reparse ulp r =
-    match ulp with
-    | Float32 -> rfloat @@ float_of_string r
-    | Float64 -> float_of_string r
-  in
-  let rec lookup ulp v = function
+let format = function
+  | Float32 -> Floating_point.(Format Single)
+  | Float64 -> Floating_point.(Format Double)
+
+let float_lit fmt (q : Q.t) =
+  let Format fmt = format fmt in
+  let v = Floating_point.of_float fmt (Q.to_float q) in
+  let reparse s = Floating_point.of_float fmt (float_of_string s) in
+  let rec lookup = function
     | [] -> Pretty_utils.to_string Floating_point.pretty v
-    | pp::pps ->
-      let r = force_float @@ pp v in
-      if reparse ulp r = v then r else
-        lookup ulp v pps
-  in lookup ulp v printers
+    | pp :: pps ->
+      let r = Floating_point.to_float v |> pp |> force_float in
+      if reparse r = v then r else lookup pps
+  in lookup printers
 
 (* -------------------------------------------------------------------------- *)
 (* --- Finites                                                            --- *)

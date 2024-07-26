@@ -777,51 +777,33 @@ let scale_int_base factor v = match factor with
   | Int_Base.Top -> top
   | Int_Base.Value f -> scale f v
 
-type overflow_float_to_int =
-  | FtI_Ok of Int.t (* Value in range *)
-  | FtI_Overflow of Floating_point.sign (* Overflow in the corresponding
-                                           direction *)
-
 let cast_float_to_int_non_nan ~signed ~size (min, max) =
   let all = create_all_values ~size ~signed in
   let min_all = Option.get (min_int all) in
   let max_all = Option.get (max_int all) in
-  let conv f =
-    try
-      (* truncate_to_integer returns an integer that fits in a 64 bits
-         integer, but might not fit in [size, sized] *)
-      let i = Floating_point.truncate_to_integer f in
-      if Int.ge i min_all then
-        if Int.le i max_all then FtI_Ok i
-        else FtI_Overflow Floating_point.Pos
-      else FtI_Overflow Floating_point.Neg
-    with Floating_point.Float_Non_representable_as_Int64 sign ->
-      FtI_Overflow sign
+  let range l u = inject_range (Some l) (Some u) in
+  let convert f =
+    match Floating_point.(double f |> truncate_to_integer) with
+    | Integer i when Int.lt i min_all -> Floating_point.Underflow
+    | Integer i when Int.gt i max_all -> Floating_point.Overflow
+    | truncated -> truncated
   in
-  let min_int = conv (Fval.F.to_float min) in
-  let max_int = conv (Fval.F.to_float max) in
+  let min_int = convert (Fval.F.to_float min) in
+  let max_int = convert (Fval.F.to_float max) in
   match min_int, max_int with
-  | FtI_Ok min_int, FtI_Ok max_int -> (* no overflow *)
-    inject_range (Some min_int) (Some max_int)
-
-  | FtI_Overflow Floating_point.Neg, FtI_Ok max_int -> (* one overflow *)
-    inject_range (Some min_all) (Some max_int)
-  | FtI_Ok min_int, FtI_Overflow Floating_point.Pos -> (* one overflow *)
-    inject_range (Some min_int) (Some max_all)
-
-  (* two overflows *)
-  | FtI_Overflow Floating_point.Neg, FtI_Overflow Floating_point.Pos ->
-    inject_range (Some min_all) (Some max_all)
-
-  (* Completely out of range *)
-  | FtI_Overflow Floating_point.Pos, FtI_Overflow Floating_point.Pos
-  | FtI_Overflow Floating_point.Neg, FtI_Overflow Floating_point.Neg ->
-    bottom
-
-  | FtI_Overflow Floating_point.Pos, FtI_Overflow Floating_point.Neg
-  | FtI_Overflow Floating_point.Pos, FtI_Ok _
-  | FtI_Ok _, FtI_Overflow Floating_point.Neg ->
-    assert false (* impossible if min-max are correct *)
+  (* no overflow nor underflow *)
+  | Integer min_int, Integer max_int -> range min_int max_int
+  (* one underflow *)
+  | Underflow, Integer max_int -> range min_all max_int
+  (* one overflow *)
+  | Integer min_int, Overflow -> range min_int max_all
+  (* one underflow and one overflow *)
+  | Underflow, Overflow -> range min_all max_all
+  (* completely out of range *)
+  | Underflow, Underflow | Overflow, Overflow -> bottom
+  (* impossible if min-max are correct *)
+  | Overflow, Underflow | Overflow, Integer _ | Integer _, Underflow ->
+    assert false
 
 let cast_float_to_int ~signed ~size iv =
   if equal top iv then top
@@ -984,20 +966,19 @@ let reinterpret_as_float kind i =
       let f = Bottom.join_list Fval.join (pos :: neg :: nan) in
       inject_float (Bottom.non_bottom f)
     in
-    let open Floating_point in
+    let Format format = Floating_point.format_of_fkind kind in
+    let minf, maxf = Floating_point.finite_range_of ~format in
+    let minf, maxf = Floating_point.(bits_encoding minf, bits_encoding maxf) in
     match kind with
     | Cil_types.FDouble ->
       let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64_exn v)) in
-      reinterpret
-        64 Fval.Double conv bits_of_most_negative_double bits_of_max_double
+      reinterpret 64 Fval.Double conv minf maxf
     | Cil_types.FFloat ->
       let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32_exn v)) in
-      reinterpret
-        32 Fval.Single conv bits_of_most_negative_float bits_of_max_float
+      reinterpret 32 Fval.Single conv minf maxf
     | Cil_types.FLongDouble ->
       (* currently always imprecise *)
       top_float
-
 
 let bitwise_int f_int v1 v2 =
   match v1, v2 with

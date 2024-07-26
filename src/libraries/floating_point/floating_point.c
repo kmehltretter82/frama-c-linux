@@ -1,0 +1,325 @@
+/**************************************************************************/
+/*                                                                        */
+/*  This file is part of Frama-C.                                         */
+/*                                                                        */
+/*  Copyright (C) 2007-2024                                               */
+/*    CEA (Commissariat à l'énergie atomique et aux énergies              */
+/*         alternatives)                                                  */
+/*                                                                        */
+/*  you can redistribute it and/or modify it under the terms of the GNU   */
+/*  Lesser General Public License as published by the Free Software       */
+/*  Foundation, version 2.1.                                              */
+/*                                                                        */
+/*  It is distributed in the hope that it will be useful,                 */
+/*  but WITHOUT ANY WARRANTY; without even the implied warranty of        */
+/*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         */
+/*  GNU Lesser General Public License for more details.                   */
+/*                                                                        */
+/*  See the GNU Lesser General Public License version 2.1                 */
+/*  for more details (enclosed in the file licenses/LGPLv2.1).            */
+/*                                                                        */
+/**************************************************************************/
+
+// Must be the first included header
+#ifdef _WIN32
+#include "windows.h"
+#endif
+
+// Some BSD flavors do not implement all of C99
+#if defined(__NetBSD__)
+#include <ieeefp.h>
+#define FE_DOWNWARD FP_RM
+#define FE_UPWARD FP_RP
+#define FE_TONEAREST FP_RN
+#define FE_TOWARDZERO FP_RZ
+#define fegetround() fpgetround()
+#define fesetround(RM) fpsetround(RM)
+#else
+#include <fenv.h>
+#endif
+
+#include <ctype.h>
+#include <math.h>
+
+#include "caml/alloc.h"
+#include "caml/fail.h"
+#include "caml/mlvalues.h"
+
+// Rounding modes supported by Frama-C. Must be synchronized with
+// the type [rounding] of the [Floating_point] module.
+typedef enum { Nearest_even, Upward, Downward, Toward_zero } rounding_mode;
+
+// Convert Frama-C rounding modes to fenv.h rounding modes.
+int fenv_mode(value frama_c_mode) {
+  switch ((rounding_mode)Int_val(frama_c_mode)) {
+  case Nearest_even:
+    return FE_TONEAREST;
+  case Upward:
+    return FE_UPWARD;
+  case Downward:
+    return FE_DOWNWARD;
+  case Toward_zero:
+    return FE_TOWARDZERO;
+  }
+}
+
+// Set the processor rounding mode.
+value frama_c_set_round_mode(value frama_c_mode) {
+  fesetround(fenv_mode(frama_c_mode));
+  return Val_unit;
+}
+
+// Return the current rounding mode.
+value frama_c_get_round_mode(value _) {
+  switch (fegetround()) {
+  case FE_TONEAREST:
+    return Val_int(Nearest_even);
+  case FE_UPWARD:
+    return Val_int(Upward);
+  case FE_DOWNWARD:
+    return Val_int(Downward);
+  case FE_TOWARDZERO:
+    return Val_int(Toward_zero);
+  }
+}
+
+// Floating-point formats supported by Frama-C. Must be synchronized with
+// the ['f format] type of the [Floating_point] module.
+typedef enum { Single, Double, Long } precision;
+
+// Convert the Frama-C format into a precision.
+precision decode_precision(value prec) { return (precision)Int_val(prec); }
+
+// Convert OCaml numerical values into floats, doubles or long doubles.
+float to_float(value num) { return Double_val(num); }
+double to_double(value num) { return Double_val(num); }
+long double to_long(value num) { return Double_val(num); }
+
+// Convert a C double into an OCaml double.
+value to_ocaml(double d) { return caml_copy_double(d); }
+
+// Round a floating-point number into a given format. It is based on
+// C implicit casts to perform the roundings.
+value frama_c_round_to(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(to_float(num));
+  case Double:
+    return to_ocaml(to_double(num));
+  case Long:
+    return to_ocaml(to_long(num));
+  }
+}
+
+value float_compare_total(value x, value y) {
+  union {
+    double d;
+    int64_t i;
+  } ux, uy;
+  ux.d = Double_val(x);
+  uy.d = Double_val(y);
+
+  if (ux.i == uy.i)
+    return Val_int(0);
+
+  ux.i = ux.i ^ (((uint64_t)(ux.i >> 63)) >> 1);
+  uy.i = uy.i ^ (((uint64_t)(uy.i >> 63)) >> 1);
+
+  if (ux.i < uy.i)
+    return Val_int(-1);
+  else
+    return Val_int(1);
+}
+
+value float_is_negative(value v) {
+  union {
+    double d;
+    uint64_t i;
+  } uv;
+  uv.d = Double_val(v);
+  return (Val_int((int)((uv.i) >> 63)));
+}
+
+// Some compilers apply the C90 standard strictly and do not prototype
+// strtof() although it is available in the C library.
+float strtof(const char *, char **);
+
+// Convert a string into a single precision float.
+value single_precision_of_string(value str) {
+  const char *s = (const char *)str;
+  const char *s_end = s + caml_string_length(str);
+  char *end;
+  float f = strtof(s, &end);
+  char last = tolower(*end);
+  // Because strtof does not consider optional floating-point suffixes
+  // (f, F, l, L), we have to test if they are the cause of the
+  // difference, and if so, ignore it.
+  if (end != s_end && (end + 1 != s_end || last != 'f' && last != 'f'))
+    caml_failwith("single_precision_of_string");
+  return to_ocaml(f);
+}
+
+value frama_c_round(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(roundf(to_float(num)));
+  case Double:
+    return to_ocaml(round(to_double(num)));
+  case Long:
+    return to_ocaml(roundl(to_long(num)));
+  }
+}
+
+value frama_c_trunc(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(truncf(to_float(num)));
+  case Double:
+    return to_ocaml(trunc(to_double(num)));
+  case Long:
+    return to_ocaml(truncl(to_long(num)));
+  }
+}
+
+value frama_c_exp(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(expf(to_float(num)));
+  case Double:
+    return to_ocaml(exp(to_double(num)));
+  case Long:
+    return to_ocaml(expl(to_long(num)));
+  }
+}
+
+value frama_c_log(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(logf(to_float(num)));
+  case Double:
+    return to_ocaml(log(to_double(num)));
+  case Long:
+    return to_ocaml(logl(to_long(num)));
+  }
+}
+
+value frama_c_log10(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(log10f(to_float(num)));
+  case Double:
+    return to_ocaml(log10(to_double(num)));
+  case Long:
+    return to_ocaml(log10l(to_long(num)));
+  }
+}
+
+value frama_c_pow(value frama_c_prec, value num, value exp) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(powf(to_float(num), to_float(exp)));
+  case Double:
+    return to_ocaml(pow(to_double(num), to_double(exp)));
+  case Long:
+    return to_ocaml(powl(to_long(num), to_long(exp)));
+  }
+}
+
+value frama_c_sqrt(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(sqrtf(to_float(num)));
+  case Double:
+    return to_ocaml(sqrt(to_double(num)));
+  case Long:
+    return to_ocaml(sqrtl(to_long(num)));
+  }
+}
+
+value frama_c_fmod(value frama_c_prec, value num, value mod) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(fmodf(to_float(num), to_float(mod)));
+  case Double:
+    return to_ocaml(fmod(to_double(num), to_double(mod)));
+  case Long:
+    return to_ocaml(fmodl(to_long(num), to_long(mod)));
+  }
+}
+
+value frama_c_cos(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(cosf(to_float(num)));
+  case Double:
+    return to_ocaml(cos(to_double(num)));
+  case Long:
+    return to_ocaml(cosl(to_long(num)));
+  }
+}
+
+value frama_c_sin(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(sinf(to_float(num)));
+  case Double:
+    return to_ocaml(sin(to_double(num)));
+  case Long:
+    return to_ocaml(sinl(to_long(num)));
+  }
+}
+
+value frama_c_tan(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(tanf(to_float(num)));
+  case Double:
+    return to_ocaml(tan(to_double(num)));
+  case Long:
+    return to_ocaml(tanl(to_long(num)));
+  }
+}
+
+value frama_c_acos(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(acosf(to_float(num)));
+  case Double:
+    return to_ocaml(acos(to_double(num)));
+  case Long:
+    return to_ocaml(acosl(to_long(num)));
+  }
+}
+
+value frama_c_asin(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(asinf(to_float(num)));
+  case Double:
+    return to_ocaml(asin(to_double(num)));
+  case Long:
+    return to_ocaml(asinl(to_long(num)));
+  }
+}
+
+value frama_c_atan(value frama_c_prec, value num) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(atanf(to_float(num)));
+  case Double:
+    return to_ocaml(atan(to_double(num)));
+  case Long:
+    return to_ocaml(atanl(to_long(num)));
+  }
+}
+
+value frama_c_atan2(value frama_c_prec, value l, value r) {
+  switch (decode_precision(frama_c_prec)) {
+  case Single:
+    return to_ocaml(atan2f(to_float(l), to_float(r)));
+  case Double:
+    return to_ocaml(atan2(to_double(l), to_double(r)));
+  case Long:
+    return to_ocaml(atan2l(to_long(l), to_long(r)));
+  }
+}

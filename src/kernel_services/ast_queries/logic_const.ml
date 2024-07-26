@@ -294,11 +294,9 @@ let tint ?(loc=Cil_datatype.Location.unknown) i =
 
 (** A real constant (of type real) from a Caml float . *)
 let treal ?(loc=Cil_datatype.Location.unknown) f =
-  let s = Pretty_utils.to_string Floating_point.pretty f in
-  let r = {
-    r_literal = s ;
-    r_upper = f ; r_lower = f ; r_nearest = f ;
-  } in
+  let tf = Floating_point.double f in
+  let s = Pretty_utils.to_string Floating_point.pretty tf in
+  let r = { r_literal = s ; r_upper = f ; r_lower = f ; r_nearest = f ; } in
   term ~loc (TConst (LReal r)) Lreal
 
 let treal_zero ?(loc=Cil_datatype.Location.unknown) ?(ltyp=Lreal) () =

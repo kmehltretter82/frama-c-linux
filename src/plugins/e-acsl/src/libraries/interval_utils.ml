@@ -96,17 +96,10 @@ let join i1 i2 = match i1, i2 with
            this float type; otherwise return Rational *)
         (try
            let to_float n = Int64.to_float (Integer.to_int64_exn n) in
+           let Format format = Floating_point.format_of_fkind k in
+           let minf, maxf = Floating_point.finite_range_of ~format in
+           let minf, maxf = Floating_point.(to_float minf, to_float maxf) in
            let mini, maxi = to_float min, to_float max in
-           let minf, maxf = match k with
-             | FFloat ->
-               Floating_point.most_negative_single_precision_float,
-               Floating_point.max_single_precision_float
-             | FDouble ->
-               -. Float.max_float,
-               Float.max_float
-             | FLongDouble ->
-               raise Exit
-           in
            if mini >= minf && maxi <= maxf then Float(k, None) else Rational
          with Z.Overflow | Exit ->
            Rational)
@@ -137,10 +130,8 @@ let meet i1 i2 = match i1, i2 with
   | Float(k',None), Float(k, Some f) ->
     let f_in_k' = match k' with
       | FFloat ->
-        let minf,maxf =
-          Floating_point.most_negative_single_precision_float,
-          Floating_point.max_single_precision_float
-        in minf <= f && f <= maxf
+        let minf, maxf = Floating_point.finite_range_of ~format:Single in
+        Floating_point.to_float minf <= f && f <= Floating_point.to_float maxf
       | FDouble
       | FLongDouble ->
         true
@@ -180,18 +171,11 @@ let meet i1 i2 = match i1, i2 with
         (try
            let to_float n = Int64.to_float (Integer.to_int64_exn n) in
            let mini, maxi = to_float min, to_float max in
-           let minf, maxf = match k with
-             | FFloat ->
-               Floating_point.most_negative_single_precision_float,
-               Floating_point.max_single_precision_float
-             | FDouble ->
-               -. Float.max_float,
-               Float.max_float
-             | FLongDouble ->
-               raise Exit
-           in
+           let Format format = Floating_point.format_of_fkind k in
+           let minf, maxf = Floating_point.finite_range_of ~format in
+           let minf, maxf = Floating_point.(to_float minf, to_float maxf) in
            if mini <= minf && maxi >= maxf then Float(k, None) else Rational
-         with Z.Overflow | Exit ->
+         with Z.Overflow ->
            Rational)
       | None, Some _ | Some _, None ->
         assert false
