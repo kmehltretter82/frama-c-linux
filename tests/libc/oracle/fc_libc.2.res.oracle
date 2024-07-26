@@ -129,6 +129,7 @@ skipping FRAMAC_SHARE/libc/complex.h
 [kernel] Parsing FRAMAC_SHARE/libc/sys/socket.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/stat.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/statvfs.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/sys/sysmacros.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/time.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/times.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/timex.h (with preprocessing)

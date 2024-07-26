@@ -111,6 +111,7 @@
 #include "sys/socket.h"
 #include "sys/stat.h"
 #include "sys/statvfs.h"
+#include "sys/sysmacros.h"
 #include "sys/time.h"
 #include "sys/times.h"
 #include "sys/timex.h"
