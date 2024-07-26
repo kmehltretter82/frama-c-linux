@@ -261,8 +261,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       | Kstmt stmt when Parameters.ValShowProgress.get () ->
         Self.feedback
           "@[computing for function %a.@\nCalled from %a.@]"
-          (Callstack.pretty_short ~hide_hash:false ~sep:" <- " ~rev:true)
-          call.callstack
+          Callstack.pretty_short call.callstack
           Cil_datatype.Location.pretty (Cil_datatype.Stmt.loc stmt)
       | _ -> ()
     end;
