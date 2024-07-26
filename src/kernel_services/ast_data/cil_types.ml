@@ -754,9 +754,9 @@ and exp_node =
   | Const      of constant              (** Constant *)
   | Lval       of lval                  (** Lvalue *)
   | SizeOf     of typ
-  (** sizeof(<type>). Has [unsigned int] type (ISO 6.5.3.4). This is not
-      turned into a constant because some transformations might want to change
-      types *)
+  (** sizeof(<type>). Has [size_t] type (ISO 6.5.3.4) which depends on machine
+      configuration (cf. {!Machine}). This is not turned into a constant
+      because some transformations might want to change types *)
 
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
@@ -766,7 +766,8 @@ and exp_node =
       type pointer to character. *)
 
   | AlignOf    of typ
-  (** This corresponds to the GCC __alignof_. Has [unsigned int] type *)
+  (** This corresponds to the GCC __alignof_. Has [size_t] type which depends on
+      machine configuration (cf. {!Machine}). *)
 
   | AlignOfE   of exp
 
