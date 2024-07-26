@@ -70,13 +70,28 @@ interface EvaFlamegraphProps {
   size: Size
 }
 
+/* Round f to at most [decimal] decimals. */
+function round(f: number, decimal: number): number {
+  const factor = 10 ** decimal;
+  return Math.round(f * factor) / factor;
+}
+
+/* Returns text to be shown about a node in a flamegraph. */
+function nodeInfoText(flameGraph:Flamegraph, node:Flamegraph): string {
+  const percentage = round(100 * node.value / flameGraph.value, 1);
+  const value = round(node.value, 2);
+  const infos = node.name + " : " + value + "s : " + percentage + "%";
+  return infos;
+}
+
 function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
   const { useScope, flameGraph, size } = props;
   const { width, height } = size;
   const [ nodeInfos, setNodeInfos ] = React.useState("");
 
-  const changeScope = (f: Flamegraph): void => {
-    States.setCurrentScope(f.kfKey as Ast.decl);
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+  const changeScope = (node:any): void => {
+    if (useScope) States.setCurrentScope(node.source.kfKey as Ast.decl);
   };
 
   return (
@@ -85,18 +100,9 @@ function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
         data={flameGraph}
         height={height}
         width={width}
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-        onChange={(node:any) => {
-          if(useScope) changeScope(node.source);
-        }}
-        onMouseOver={(_e:Event, nodeInfos:Flamegraph) => {
-          const percentage = Math.round(
-            10*(nodeInfos.value * 100)/flameGraph.value)/10;
-          const value = Math.round(nodeInfos.value*100)/100;
-          const infos = (
-            nodeInfos.name+" : "+value+"s : "+percentage+"%"
-          );
-          setNodeInfos(infos);
+        onChange={changeScope}
+        onMouseOver={(_e:Event, node:Flamegraph) => {
+          setNodeInfos(nodeInfoText(flameGraph, node));
         }}
         onMouseOut={() => { setNodeInfos(""); }}
       />
