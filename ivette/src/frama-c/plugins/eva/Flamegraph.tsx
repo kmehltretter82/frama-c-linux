@@ -25,7 +25,7 @@ import { IconButton } from 'dome/controls/buttons';
 import * as Ivette from 'ivette';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
-import * as Eva from 'frama-c/plugins/eva/api/values';
+import * as Eva from 'frama-c/plugins/eva/api/general';
 import { FlameGraph } from 'react-flame-graph';
 import AutoSizer, { Size } from 'react-virtualized-auto-sizer';
 import { EvaReady, EvaStatus } from './components/AnalysisStatus';
