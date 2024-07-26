@@ -237,6 +237,7 @@
 (libc/sys/socket.h as libc/sys/socket.h)
 (libc/sys/stat.h as libc/sys/stat.h)
 (libc/sys/statvfs.h as libc/sys/statvfs.h)
+(libc/sys/sysmacros.h as libc/sys/sysmacros.h)
 (libc/sys/time.h as libc/sys/time.h)
 (libc/sys/times.h as libc/sys/times.h)
 (libc/sys/timex.h as libc/sys/timex.h)

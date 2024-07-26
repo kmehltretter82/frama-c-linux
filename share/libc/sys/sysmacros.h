@@ -20,48 +20,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_TYPES_H__
-#define __FC_SYS_TYPES_H__
-#include "../features.h"
-__PUSH_FC_STDLIB
-__BEGIN_DECLS
+// glibc-specific, Non-POSIX
 
-#include "__fc_machdep.h"
-#include "../__fc_define_id_t.h"
-#include "../__fc_define_pid_t.h"
-#include "../__fc_define_size_t.h"
-#include "../__fc_define_ssize_t.h"
-#include "../__fc_define_uid_and_gid.h"
-#include "../__fc_define_time_t.h"
-#include "../__fc_define_suseconds_t.h"
-#include "../__fc_define_ino_t.h"
-#include "../__fc_define_blkcnt_t.h"
-#include "../__fc_define_blksize_t.h"
-#include "../__fc_define_dev_t.h"
-#include "../__fc_define_mode_t.h"
-#include "../__fc_define_nlink_t.h"
-#include "../__fc_define_off_t.h"
-#include "../__fc_define_pthread_types.h"
-#include "../__fc_define_key_t.h"
+#ifndef __FC_SYS_SYSMACROS_H__
+#define __FC_SYS_SYSMACROS_H__
 
-#ifndef __u_char_defined
-typedef unsigned long u_long;
-typedef unsigned int u_int;
-typedef unsigned short u_short;
-typedef unsigned char u_char;
+// The macros below are useful for coreutils.
+#define major(dev)  (((dev) >> 8) & 0xff)
+#define minor(dev)  ((dev) & 0xff)
+#define makedev(maj, min)  (((maj) << 8) | (min))
 
-// Some glibc versions include major/minor/makedev here, but recently
-// they are in 'sysmacros.h'
-#include "sysmacros.h"
-
-#define __u_char_defined
-#endif
-
-// Non-POSIX
-#ifndef caddr_t
-typedef char *caddr_t;
-#endif
-
-__END_DECLS
-__POP_FC_STDLIB
 #endif
