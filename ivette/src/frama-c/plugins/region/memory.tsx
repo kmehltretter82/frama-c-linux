@@ -47,7 +47,11 @@ function makeRecord(
     if (offset !== rg.offset)
       cells.push(`#${rg.offset - offset}b`);
     offset = rg.offset + rg.length;
-    cells.push({ label: rg.label, port });
+    const label =
+      rg.cells < 1 ? `${rg.label} […]` :
+        rg.cells > 1 ? `${rg.label} [${rg.cells}]` :
+          rg.label;
+    cells.push({ label, port });
   });
   if (offset !== sizeof)
     cells.push(`#${sizeof-offset}b`);
