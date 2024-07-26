@@ -353,110 +353,116 @@ let reset_perf () =
 
 (* Set to [Some _] if option [-eva-flamegraph] is set and [main] is
    currently being analyzed and the file is ok. Otherwise, set to [None]. *)
-let oc_flamegraph = ref None
+let oc_fmt_flamegraph = ref None
 
-let stack_flamegraph = ref []
-(* Callstack for flamegraphs. The most recent function is at the top of the
-   list. The elements of the list are [(starting_time, self_total_time)].
-   [starting_time] is the time when we started analyzing the function.
-   [total_time] is the time spent so far in the function itself, _without the
-   callees_. [total_time] is updated from [starting_time] when we start a
-   callee, or when the analysis of the function ends. This stack is never
-   empty when an analysis is in progress. *)
+(* We cannot use a Callstack here because we ignore the call statements. *)
+module KfList = struct
+  include Datatype.List_with_collections(Cil_datatype.Kf)
+      (struct
+        let module_name = "Eva.KfList"
+      end)
+  let pretty ?(sep=format_of_string ";") fmt l =
+    Pretty_utils.pp_flowlist ~left:"" ~sep ~right:""
+      (fun fmt kf -> Kernel_function.pretty fmt kf)
+      fmt l
+end
 
-(* pretty-prints the functions in a Value callstack, starting by main (i.e.
-   in reverse order). *)
-let pretty_callstack oc callstack =
-  let rec aux oc = function
-    | [] -> () (* does not happen in theory *)
-    | [main] -> Printf.fprintf oc "%s" (Kernel_function.get_name main)
-    | kf :: q -> Printf.fprintf oc "%s;%a" (Kernel_function.get_name kf) aux q
-  in
-  aux oc (Callstack.to_kf_list callstack)
+(* A mapping from callstacks to (time_of_last_call, total_duration).
+   [time_of_last_call] is the timestamp of the last time that the leaf function
+   in the callstack was called.
+   [total_duration] is the accumulated total amount of time spent in the
+   callstack.
+*)
+module EvaFlamegraph =
+  State_builder.Hashtbl
+    (KfList.Hashtbl)
+    (Datatype.Pair(Datatype.Float)(Datatype.Float))
+    (struct
+      let name = "Eva.Flamegraph"
+      let dependencies = [ Ast.self ]
+      let size = 20
+    end)
 
 (* update the [self_total_time] information for the function being analyzed,
    assuming that the current time is [time] *)
-let update_self_total_time time =
-  match !stack_flamegraph with
-  | [] -> assert false
-  | (start_caller, total) :: q ->
+let update_self_total_time cl time =
+  try
+    let (start_caller, total) = EvaFlamegraph.find cl in
     let d = duration start_caller time in
-    stack_flamegraph := (start_caller, d +. total) :: q
+    let new_total = d +. total in
+    EvaFlamegraph.replace cl (time, new_total);
+    new_total
+  with Not_found ->
+    Self.fatal
+      "EvaFlamegraph: caller list not found: %a"
+      (KfList.pretty ~sep:";") cl
+
+let start_call_flamegraph_main cl =
+  (* Analysis of main *)
+  EvaFlamegraph.clear ();
+  EvaFlamegraph.add cl (Sys.time (), 0.0);
+  if not (Parameters.ValPerfFlamegraphs.is_empty ()) then begin
+    let file = Parameters.ValPerfFlamegraphs.get () in
+    try
+      let oc = open_out (file:>string) in
+      oc_fmt_flamegraph := Some (oc, Format.formatter_of_out_channel oc);
+    with e ->
+      Self.error "cannot open flamegraph file: %s"
+        (Printexc.to_string e);
+      oc_fmt_flamegraph := None (* to be on the safe side  *)
+  end
 
 (* called when a new function is being analyzed *)
-let start_doing_flamegraph callstack =
-  match callstack.Callstack.stack with
-  | [] ->
-    (* Analysis of main *)
-    if not (Parameters.ValPerfFlamegraphs.is_empty ()) then begin
-      let file = Parameters.ValPerfFlamegraphs.get () in
-      try
-        (* Flamegraphs must be computed. Set up the stack and the output file *)
-        let oc = open_out (file:>string) in
-        oc_flamegraph := Some oc;
-        stack_flamegraph := [ (Sys.time (), 0.) ]
-      with e ->
-        Self.error "cannot open flamegraph file: %s"
-          (Printexc.to_string e);
-        oc_flamegraph := None (* to be on the safe side  *)
-    end
-  | _ :: _ ->
-    if !oc_flamegraph <> None then
-      (* Flamegraphs are being computed. Update time spent in current function
-         so far, then push a slot for the analysis of the new function *)
-      let time = Sys.time () in
-      update_self_total_time time;
-      stack_flamegraph := (time, 0.) :: !stack_flamegraph;
+let start_call_flamegraph ~prev cs =
+  let cl = Callstack.to_kf_list cs in
+  let prev = Option.map Callstack.to_kf_list prev in
+  match prev with
+  | None -> start_call_flamegraph_main cl
+  | Some prev ->
+    let time = Sys.time () in
+    ignore (update_self_total_time prev time);
+    let (_start, total) =
+      try EvaFlamegraph.find cl with Not_found -> (0.0, 0.0)
+    in
+    EvaFlamegraph.replace cl (time, total)
 ;;
 
 (* called when the analysis of a function ends. This function is at the top
    of [callstack] *)
-let stop_doing_flamegraph callstack =
-  match !oc_flamegraph with
-  | None -> ()
-  | Some oc -> (* Flamegraphs are being recorded *)
-    let time = Sys.time() in
-    update_self_total_time time; (* update current function *)
-    match !stack_flamegraph with
-    | [] -> assert false
-    | (_, total) :: q ->
-      (* dump the total time (that we just updated) for the current function *)
-      Printf.fprintf oc "%a %.3f\n%!"
-        pretty_callstack callstack (total *. 1000.);
-      match q with
-      | [] -> stack_flamegraph := [] (* we are back to the main function *)
-      | (_, total_caller) :: q' ->
-        (* drop the current function from the flamegraph stack AND update
-           the 'current time' information, so that the time spent in the
-           callee is not counted. *)
-        stack_flamegraph := (time, total_caller) :: q'
-;;
+let end_call_flamegraph cs =
+  let cl = Callstack.to_kf_list cs in
+  let time = Sys.time () in
+  let total = update_self_total_time cl time in (* update current function *)
+  begin
+    match !oc_fmt_flamegraph with
+    | None -> ()
+    | Some (_, fmt) -> (* Flamegraphs are being written to a file *)
+      Format.fprintf fmt "%a %.3f\n%!"
+        (KfList.pretty ~sep:";") cl (total *. 1000.)
+  end
 
 let reset_flamegraph () =
-  match !oc_flamegraph with
+  EvaFlamegraph.clear ();
+  match !oc_fmt_flamegraph with
   | None -> ()
-  | Some fd -> close_out fd; stack_flamegraph := []; oc_flamegraph := None
-
+  | Some (oc, _) ->
+    close_out oc; oc_fmt_flamegraph := None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Exported interface                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let start_doing callgraph =
-  start_doing_perf callgraph;
-  start_doing_flamegraph callgraph;
-;;
+let start_call ~prev cs =
+  start_doing_perf cs;
+  start_call_flamegraph ~prev cs
 
-let stop_doing callgraph =
+let end_call callgraph =
   stop_doing_perf callgraph;
-  stop_doing_flamegraph callgraph;
-;;
-
+  end_call_flamegraph callgraph
 
 let reset () =
   reset_perf ();
-  reset_flamegraph ();
-;;
+  reset_flamegraph ()
 
 
 (* TODO: Output files with more graphical outputs, such as

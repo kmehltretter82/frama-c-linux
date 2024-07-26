@@ -340,6 +340,17 @@ tr:first-of-type > .eva-table-callsite-box {
 .eva-status-icon.eva-not_computed { fill: var(--eva-alarms-false); }
 
 /* -------------------------------------------------------------------------- */
+/* --- Flamegraph                                                         --- */
+/* -------------------------------------------------------------------------- */
+
+.flame-details {
+  padding: 3px 10px;
+  position: absolute;
+  bottom : 0;
+  background-color: var(--background-report);
+}
+
+/* -------------------------------------------------------------------------- */
 /* --- Sidebar Eva                                                        --- */
 /* -------------------------------------------------------------------------- */
 

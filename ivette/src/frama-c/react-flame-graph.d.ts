@@ -20,47 +20,4 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-// --------------------------------------------------------------------------
-// --- Eva Values
-// --------------------------------------------------------------------------
-
-import * as Ivette from 'ivette';
-import './valuetable';
-import './Summary';
-import './Coverage';
-import './DomainStates';
-import './EvaSidebar';
-import './Flamegraph';
-import './style.css';
-
-// --------------------------------------------------------------------------
-// --- Export Component
-// --------------------------------------------------------------------------
-
-Ivette.registerGroup({
-  id: 'fc.eva',
-  label: 'Eva Plugin'
-});
-
-Ivette.registerView({
-  id: 'fc.eva.summary',
-  label: 'Eva Summary',
-  layout: {
-    'A': 'fc.eva.summary',
-    'B': 'fc.eva.coverage',
-    'C': 'fc.kernel.messages',
-    'D': 'fc.eva.flamegraph',
-  },
-});
-
-Ivette.registerView({
-  id: 'fc.eva.values',
-  label: 'Eva Values',
-  layout: {
-    'A': 'fc.kernel.astview',
-    'B': 'fc.kernel.astinfo',
-    'CD': 'fc.eva.values',
-  }
-});
-
-// --------------------------------------------------------------------------
+declare module 'react-flame-graph';
