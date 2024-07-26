@@ -33,10 +33,10 @@ import { useFlipSettings } from 'dome';
 
 // --- Flamegraph Table ---
 interface Flamegraph {
-  kfDecl?: string;
   name: string;
   value: number;
-  children?: Flamegraph[];
+  children: Flamegraph[];
+  info?: Eva.flamegraphData;
 }
 
 const addNodeToFlamegraph = (
@@ -51,19 +51,18 @@ const addNodeToFlamegraph = (
   flamegraph.value += row.selfTime;
   // updating last node
   if(cs.length === 0) {
-    flamegraph.kfDecl = row.kfDecl;
-    return;
+    flamegraph.info = row;
+  } else {
+    // Search/create next node
+    let nextNode = flamegraph.children.find((elt) => elt.name === cs[0]);
+    if (!nextNode) {
+      nextNode = { name: cs[0], value: 0, children: [] };
+      flamegraph.children.unshift(nextNode);
+    }
+    cs.shift();
+    // Treatment of the next node
+    addNodeToFlamegraph(nextNode, cs, row);
   }
-  // Search/create next node
-  if (!flamegraph.children) flamegraph.children = [];
-  let nextNode = flamegraph.children.find((elt) => elt.name === cs[0]);
-  if (!nextNode) {
-    nextNode = { name: cs[0], value: 0 };
-    flamegraph.children.unshift(nextNode);
-  }
-  cs.shift();
-  // Treatment of the next node
-  addNodeToFlamegraph(nextNode, cs, row);
 };
 
 interface EvaFlamegraphProps {
@@ -80,9 +79,15 @@ function round(f: number, decimal: number): number {
 
 /* Returns text to be shown about a node in a flamegraph. */
 function nodeInfoText(flameGraph:Flamegraph, node:Flamegraph): string {
+  if (node.info === undefined) return "";
   const percentage = round(100 * node.value / flameGraph.value, 1);
-  const value = round(node.value, 2);
-  const infos = node.name + " : " + value + "s : " + percentage + "%";
+  const total = round(node.value, 2);
+  const self = round(node.info.selfTime, 2);
+  const infos =
+    `${node.name}:\n`
+    + `  callstack analyzed ${node.info.nbCalls} times\n`
+    + `  total time (including called functions): ${total}s.,  ${percentage}%\n`
+    + `  time for ${node.name} only: ${self}s.`;
   return infos;
 }
 
@@ -93,7 +98,7 @@ function EvaFlamegraph(props: EvaFlamegraphProps): JSX.Element {
 
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const changeScope = (node:any): void => {
-    if (useScope) States.setCurrentScope(node.source.kfDecl);
+    if (useScope) States.setCurrentScope(node.source.info.kfDecl);
   };
 
   return (
@@ -126,10 +131,8 @@ export function FlamegraphComponent(): JSX.Element {
 
   const flameGraph = React.useMemo<Flamegraph | null>(() => {
     if(model.length === 0 ) return null;
-    const flame: Flamegraph = {
-      name: model[0].key.split(":")[0],
-      value: 0
-    };
+    const mainName = model[0].key.split(":")[0];
+    const flame: Flamegraph = { name: mainName, value: 0, children: [] };
     model.forEach(row => {
       const cs = row.key.split(":");
       cs.shift();
@@ -138,7 +141,7 @@ export function FlamegraphComponent(): JSX.Element {
     return flame;
   }, [model]);
 
-  const isWaitingForData = !flameGraph || !flameGraph.children;
+  const isWaitingForData = flameGraph === null;
 
   return (
     <>

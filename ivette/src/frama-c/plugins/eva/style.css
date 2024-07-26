@@ -346,8 +346,9 @@ tr:first-of-type > .eva-table-callsite-box {
 .flame-details {
   padding: 3px 10px;
   position: absolute;
-  bottom : 0;
+  bottom: 0;
   background-color: var(--background-report);
+  white-space: pre-wrap;
 }
 
 /* -------------------------------------------------------------------------- */
