@@ -46,13 +46,16 @@ struct
   type t = Memory.range
   let jtype = Data.declare ~package ~name:"range" @@
     Jrecord [
+      "label", Jstring ;
       "offset", Jnumber ;
       "length", Jnumber ;
       "cells", Jnumber ;
       "data", Node.jtype ;
     ]
+
   let to_json (rg : Memory.range) =
     Json.of_fields [
+      "label", Json.of_string rg.label ;
       "offset", Json.of_int rg.offset ;
       "length", Json.of_int rg.length ;
       "cells", Json.of_int rg.cells ;
@@ -181,13 +184,13 @@ module Regions = Data.Jlist(Region)
 (* --- Server API                                                         --- *)
 (* -------------------------------------------------------------------------- *)
 
-let map_of_localizable ~local (loc : Printer_tag.localizable) =
+let map_of_localizable ?(atStmt=false) (loc : Printer_tag.localizable) =
   let open Printer_tag in
   match kf_of_localizable loc with
   | None -> raise Not_found
   | Some kf ->
     let domain = Analysis.find kf in
-    if local then
+    if atStmt then
       match ki_of_localizable loc with
       | Kglobal -> domain.map
       | Kstmt s -> Stmt.Map.find s domain.body
@@ -236,25 +239,25 @@ let () =
 let () =
   Request.register
     ~package ~kind:`GET ~name:"regionsAt"
-    ~descr:(Md.plain "Compute regions at the given marker")
-    ~input:(module Data.Jpair(Kernel_ast.Marker)(Data.Jbool))
+    ~descr:(Md.plain "Compute regions at the given marker program point")
+    ~input:(module Kernel_ast.Marker)
     ~output:(module Regions)
     ~signals:[signal]
-    begin fun (loc,local) ->
-      try Memory.regions @@ map_of_localizable ~local loc
+    begin fun loc ->
+      try Memory.regions @@ map_of_localizable ~atStmt:true loc
       with Not_found -> []
     end
 
 let () =
   Request.register
     ~package ~kind:`GET ~name:"localize"
-    ~descr:(Md.plain "Localize in the local (true) or global map (false)")
-    ~input:(module Data.Jpair(Kernel_ast.Marker)(Data.Jbool))
+    ~descr:(Md.plain "Localize the marker in its map")
+    ~input:(module Kernel_ast.Marker)
     ~output:(module NodeOpt)
     ~signals:[signal]
-    begin fun (loc,local) ->
+    begin fun loc ->
       try
-        let map = map_of_localizable ~local loc in
+        let map = map_of_localizable loc in
         region_of_localizable map loc
       with Not_found -> None
     end

@@ -66,11 +66,13 @@ export const byNode: Compare.Order<node> = Compare.number;
 export const nodeDefault: node = Json.jIndex<'#node'>('#node')(-1);
 
 export type range =
-  { offset: number, length: number, cells: number, data: node };
+  { label: string, offset: number, length: number, cells: number, data: node
+    };
 
 /** Decoder for `range` */
 export const jRange: Json.Decoder<range> =
   Json.jObject({
+    label: Json.jString,
     offset: Json.jNumber,
     length: Json.jNumber,
     cells: Json.jNumber,
@@ -80,7 +82,9 @@ export const jRange: Json.Decoder<range> =
 /** Natural order for `range` */
 export const byRange: Compare.Order<range> =
   Compare.byFields
-    <{ offset: number, length: number, cells: number, data: node }>({
+    <{ label: string, offset: number, length: number, cells: number,
+       data: node }>({
+    label: Compare.string,
     offset: Compare.number,
     length: Compare.number,
     cells: Compare.number,
@@ -89,7 +93,7 @@ export const byRange: Compare.Order<range> =
 
 /** Default value for `range` */
 export const rangeDefault: range =
-  { offset: 0, length: 0, cells: 0, data: nodeDefault };
+  { label: '', offset: 0, length: 0, cells: 0, data: nodeDefault };
 
 export type region =
   { node: node, roots: string[], labels: string[], parents: node[],
@@ -166,34 +170,26 @@ const regions_internal: Server.GetRequest<decl,region[]> = {
 /** Returns computed regions for the given declaration */
 export const regions: Server.GetRequest<decl,region[]>= regions_internal;
 
-const regionsAt_internal: Server.GetRequest<[ marker, boolean ],region[]> = {
+const regionsAt_internal: Server.GetRequest<marker,region[]> = {
   kind: Server.RqKind.GET,
   name: 'plugins.region.regionsAt',
-  input: Json.jPair( jMarker, Json.jBoolean,),
+  input: jMarker,
   output: Json.jArray(jRegion),
   fallback: [],
   signals: [ { name: 'plugins.region.updated' } ],
 };
-/** Compute regions at the given marker */
-export const regionsAt: Server.GetRequest<[ marker, boolean ],region[]>= regionsAt_internal;
+/** Compute regions at the given marker program point */
+export const regionsAt: Server.GetRequest<marker,region[]>= regionsAt_internal;
 
-const localize_internal: Server.GetRequest<
-  [ marker, boolean ],
-  node |
-  undefined
-  > = {
+const localize_internal: Server.GetRequest<marker,node | undefined> = {
   kind: Server.RqKind.GET,
   name: 'plugins.region.localize',
-  input: Json.jPair( jMarker, Json.jBoolean,),
+  input: jMarker,
   output: Json.jOption(jNode),
   fallback: undefined,
   signals: [ { name: 'plugins.region.updated' } ],
 };
-/** Localize in the local (true) or global map (false) */
-export const localize: Server.GetRequest<
-  [ marker, boolean ],
-  node |
-  undefined
-  >= localize_internal;
+/** Localize the marker in its map */
+export const localize: Server.GetRequest<marker,node | undefined>= localize_internal;
 
 /* ------------------------------------- */

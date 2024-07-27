@@ -288,14 +288,17 @@ let fold f v w = match v with
   | `Assoc fs -> List.fold_left (fun w (e,v) -> f e v w) w fs
   | _ -> invalid "fold"
 
+let is_defined = function `Null -> false | _ -> true
+let is_field (_,v) = is_defined v
+
 let of_bool b = `Bool b
 let of_int k = `Int k
 let of_string s = `String s
 let of_float f = `Float f
 let of_list xs = `List xs
 let of_array xs = `List (Array.to_list xs)
-let of_fields m = `Assoc m
-
+let of_fields m = `Assoc (List.filter is_field m)
+let of_option f = function None -> `Null | Some v -> f v
 
 (* JSON file cache and merging *)
 

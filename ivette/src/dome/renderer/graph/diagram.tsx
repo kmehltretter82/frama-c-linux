@@ -310,7 +310,7 @@ class Builder {
   // --- Attributes
 
   escaped(a: string): Builder {
-    return this.print(a.split('"').join('\\"'));
+    return this.print(a.replace(/["{}|]/g, '\\$&'));
   }
 
   value(a: string | number | boolean): Builder {

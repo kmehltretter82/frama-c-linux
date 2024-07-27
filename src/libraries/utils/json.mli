@@ -64,7 +64,8 @@ val of_string : string -> t
 val of_float : float -> t
 val of_list : t list -> t
 val of_array : t array -> t
-val of_fields : (string * t) list -> t
+val of_fields : (string * t) list -> t (** Filers out null fields *)
+val of_option : ('a -> t) -> 'a option -> t (** Maps none to null *)
 
 (** {2 Parsers} *)
 

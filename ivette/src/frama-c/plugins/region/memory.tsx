@@ -40,23 +40,27 @@ function makeRecord(
   ranges.forEach((rg, i) => {
     const port = `r${i}`;
     const target = `n${rg.data}`;
-    edges.push({ source, sourcePort: port, target });
-    if (offset !== rg.offset)
-      cells.push(`${offset}..${rg.offset - 1} ##`);
-    offset = rg.offset + rg.length;
-    cells.push({
-      label: `${rg.offset}..${offset - 1} [${rg.cells}]`,
-      port,
+    edges.push({
+      source, sourcePort: port, target,
+      head: 'none', line: 'dashed'
     });
+    if (offset !== rg.offset)
+      cells.push(`#${rg.offset - offset}b`);
+    offset = rg.offset + rg.length;
+    const label =
+      rg.cells < 1 ? `${rg.label} […]` :
+        rg.cells > 1 ? `${rg.label} [${rg.cells}]` :
+          rg.label;
+    cells.push({ label, port });
   });
   if (offset !== sizeof)
-    cells.push(`${offset}..${sizeof - 1} ##`);
+    cells.push(`#${sizeof-offset}b`);
   return cells;
 }
 
 interface Diagram {
-  nodes: Dot.Node[];
-  edges: Dot.Edge[];
+  nodes: readonly Dot.Node[];
+  edges: readonly Dot.Edge[];
 }
 
 function makeDiagram(regions: readonly Region.region[]): Diagram {
@@ -82,7 +86,10 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     r.labels.forEach(a => {
       const lid = `L${a}`;
       nodes.push({ ...L, id: lid, label: `${a}:` });
-      edges.push({ source: lid, aligned: true, head: 'tee', target: id });
+      edges.push({
+        source: lid, target: id, aligned: true,
+        headAnchor: 'n', head: 'none', color: 'grey'
+      });
     });
     // --- Roots
     const R: Dot.Node =
@@ -90,22 +97,37 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     r.roots.forEach(x => {
       const xid = `X${x}`;
       nodes.push({ ...R, id: xid, label: x });
-      edges.push({ source: xid, headAnchor: "e", target: id });
+      edges.push({
+        source: xid, target: id,
+        headAnchor: "e", head: 'none', color: 'grey'
+      });
     });
     // --- Pointed
     if (r.pointed !== undefined) {
       const pid = `n${r.pointed}`;
-      edges.push({ source: id, target: pid, head: 'dot', color: 'orange' });
+      edges.push({ source: id, target: pid });
     }
   });
   return { nodes, edges };
 }
 
-function addSelected(d: Diagram, label: string, node: Region.node): void {
-  d.nodes.push({
-    id: 'Selected', label, title: "Selected Marker", shape: 'note'
-  });
-  d.edges.push({ source: 'Selected', target: `n${node}` });
+function addSelected(
+  diag: Diagram,
+  node: Region.node | undefined,
+  label: string | undefined
+): Diagram {
+  if (node && label) {
+    const nodes = diag.nodes.concat({
+      id: 'Selected', label, title: "Selected Marker",
+      shape: 'note', color: 'selected'
+    });
+    const edges = diag.edges.concat({
+      source: 'Selected', target: `n${node}`, aligned: true,
+      headAnchor: 's', tailAnchor: 'n',
+    });
+    return { nodes, edges };
+  } else
+    return diag;
 }
 
 export interface MemoryViewProps {
@@ -116,9 +138,12 @@ export interface MemoryViewProps {
 
 export function MemoryView(props: MemoryViewProps): JSX.Element {
   const { regions = [], label, node } = props;
-  const diagram = React.useMemo(() => makeDiagram(regions), [regions]);
-  if (label && node) addSelected(diagram, label, node);
-  return <Dot.Diagram {...diagram} />;
+  const baseDiagram = React.useMemo(() => makeDiagram(regions), [regions]);
+  const fullDiagram = React.useMemo(
+    () => addSelected(baseDiagram, node, label),
+    [baseDiagram, node, label]
+  );
+  return <Dot.Diagram {...fullDiagram} />;
 }
 
 // --------------------------------------------------------------------------
