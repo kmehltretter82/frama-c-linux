@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Machdep
 
 (******************************************************************************)
 (*** Machine parameters                                                       *)
@@ -59,7 +60,7 @@ type machine = {
 (* Contain dummy values *)
 let create_machine () = {
   useLogicalOperators = false;
-  machdep = Cil_datatype.Machdep.dummy;
+  machdep = List.hd Machdep.reprs;
   lowerConstants = false;
   insertImplicitCasts = true;
   stringLiteralType = Cil_const.charConstPtrType;
@@ -180,9 +181,8 @@ let rand_max () = the_machine.machdep.rand_max
 let mb_cur_max () = the_machine.machdep.mb_cur_max
 let nsig () = the_machine.machdep.nsig
 
-
-let msvcMode () = compiler () = "msvc"
-let gccMode () = compiler () = "gcc" || compiler () = "clang"
+let msvcMode () = msvcMode (get_machdep ())
+let gccMode () = gccMode (get_machdep ())
 
 let acceptEmptyCompinfo = ref false
 let set_acceptEmptyCompinfo () = acceptEmptyCompinfo := true

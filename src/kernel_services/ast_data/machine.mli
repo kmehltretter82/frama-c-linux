@@ -139,7 +139,7 @@ val compiler: unit -> string
 
 val machdep_name: unit -> string
 
-val get_machdep: unit -> mach
+val get_machdep: unit -> Machdep.mach
 
 val char_is_unsigned: unit -> bool
 
@@ -164,16 +164,16 @@ val insert_implicit_casts: unit -> bool
 (* ***********************************************************************)
 
 val msvcMode: unit -> bool
-(** Short for {!Machine.compiler} [= "msvc"] *)
+(** Short for [Machdep.msvcMode (get_machdep ())]
+    @since Frama-C+dev  *)
 
 val gccMode: unit -> bool
-(** Short for {!Machine.compiler} [= "gcc"] *)
+(** Short for [Machdep.gccMode (get_machdep ())]
+    @since Frama-C+dev  *)
 
 val acceptEmptyCompinfo: unit -> bool
-(** whether we accept empty struct. Implied by {!Machine.msvcMode} and
-    {!Machine.gccMode}, and can be forced by {!Machine.set_acceptEmptyCompinfo}
-    otherwise.
-
+(** whether we accept empty struct. Implied by {!msvcMode} and {!gccMode}, and
+    can be forced by {!set_acceptEmptyCompinfo} otherwise.
     @since Frama-C+dev
 *)
 
@@ -193,10 +193,10 @@ val set_acceptEmptyCompinfo: unit -> unit
 (* ***********************************************************************)
 
 (** Call this function to perform some initialization, and only after you have
-    set [Machine.msvcMode]. [initLogicBuiltins] is the function to call to init
-    logic builtins. The [Machdeps] argument is a description of the hardware
+    set {!msvcMode}. {!initLogicBuiltins} is the function to call to init
+    logic builtins. The [Machdep] argument is a description of the hardware
     platform and of the compiler used. *)
-val init: initLogicBuiltins:(unit -> unit) -> mach -> unit
+val init: initLogicBuiltins:(unit -> unit) -> Machdep.mach -> unit
 
 (* ***********************************************************************)
 (** {2 Forward references}                                               *)
@@ -216,7 +216,7 @@ type machine = private
     (** Whether to use the logical operands LAnd and LOr. By default, do not
         use them because they are unlike other expressions and do not
         evaluate both of their operands. *)
-    mutable machdep: mach;
+    mutable machdep: Machdep.mach;
     (** Machine.init will set this to the current machine description. *)
     mutable lowerConstants: bool;
     (** Do lower constants (default true) *)

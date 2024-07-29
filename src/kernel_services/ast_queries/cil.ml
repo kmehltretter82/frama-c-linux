@@ -3808,11 +3808,8 @@ and isWFNonGhostType t =
     | TPtr(t, _) | TArray(t, _, _) -> isWFNonGhostType t
     | _ -> true
 
-(**
- **
- ** MACHINE DEPENDENT PART
- **
- **)
+(**** MACHINE DEPENDENT PART ****)
+
 exception SizeOfError of string * typ
 
 type sizeof_or_error =

@@ -231,7 +231,7 @@ val reorder_custom_ast: Cil_types.file -> unit
 (* ************************************************************************* *)
 
 val pretty_machdep :
-  ?fmt:Format.formatter -> ?machdep:Cil_types.mach -> unit -> unit
+  ?fmt:Format.formatter -> ?machdep:Machdep.mach -> unit -> unit
 (** Prints the associated [machdep], or the current one in current project
     by default. Default output formatter is [Log.print_on_output]. *)
 

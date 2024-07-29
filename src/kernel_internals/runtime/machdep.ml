@@ -20,7 +20,258 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
+let yaml_dict_to_list = function
+  | `O l ->
+    let make_one acc (k,v) =
+      Result.(
+        bind acc
+          (fun l ->
+             match Yaml.Util.to_string v with
+             | Ok s -> Ok((k,s) :: l)
+             | Error (`Msg s) ->
+               Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
+    in
+    List.fold_left make_one (Ok []) l
+  | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
+
+type mach = {
+  sizeof_short: int;
+  sizeof_int: int;
+  sizeof_long: int;
+  sizeof_longlong: int;
+  sizeof_ptr: int;
+  sizeof_float: int;
+  sizeof_double: int;
+  sizeof_longdouble: int;
+  sizeof_void: int;
+  sizeof_fun: int;
+  size_t: string;
+  ssize_t: string;
+  wchar_t: string;
+  ptrdiff_t: string;
+  intptr_t: string;
+  uintptr_t: string;
+  int_fast8_t: string;
+  int_fast16_t: string;
+  int_fast32_t: string;
+  int_fast64_t: string;
+  uint_fast8_t: string;
+  uint_fast16_t: string;
+  uint_fast32_t: string;
+  uint_fast64_t: string;
+  wint_t: string;
+  sig_atomic_t: string;
+  time_t: string;
+  alignof_short: int;
+  alignof_int: int;
+  alignof_long: int;
+  alignof_longlong: int;
+  alignof_ptr: int;
+  alignof_float: int;
+  alignof_double: int;
+  alignof_longdouble: int;
+  alignof_str: int;
+  alignof_fun: int;
+  alignof_aligned: int;
+  char_is_unsigned: bool;
+  little_endian: bool;
+  has__builtin_va_list: bool;
+  compiler: string;
+  cpp_arch_flags: string list;
+  version: string;
+  weof: string;
+  wordsize: string;
+  posix_version: string;
+  bufsiz: string;
+  eof: string;
+  fopen_max: string;
+  filename_max: string;
+  host_name_max: string;
+  tty_name_max: string;
+  l_tmpnam: string;
+  path_max: string;
+  tmp_max: string;
+  rand_max: string;
+  mb_cur_max: string;
+  nsig: string;
+  errno: (string * string) list  [@of_yaml yaml_dict_to_list];
+  machdep_name: string;
+  custom_defs: (string * string) list [@of_yaml yaml_dict_to_list];
+} [@@deriving yaml]
+
+let dummy = {
+  sizeof_short = 2;
+  sizeof_int = 4;
+  sizeof_long = 8;
+  sizeof_longlong = 8;
+  sizeof_ptr = 8;
+  sizeof_float = 4;
+  sizeof_double = 8;
+  sizeof_longdouble = 16;
+  sizeof_void = -1;
+  sizeof_fun = -1;
+  size_t = "unsigned long";
+  ssize_t = "long";
+  wchar_t = "int";
+  ptrdiff_t = "long";
+  intptr_t = "long";
+  uintptr_t = "unsigned long";
+  int_fast8_t = "signed char";
+  int_fast16_t = "long";
+  int_fast32_t = "long";
+  int_fast64_t = "long";
+  uint_fast8_t = "unsigned char";
+  uint_fast16_t = "unsigned long";
+  uint_fast32_t = "unsigned long";
+  uint_fast64_t = "unsigned long";
+  wint_t = "int";
+  sig_atomic_t = "int";
+  time_t = "long";
+  alignof_short = 2;
+  alignof_int = 4;
+  alignof_long = 8;
+  alignof_longlong = 8;
+  alignof_ptr = 8;
+  alignof_float = 4;
+  alignof_double = 8;
+  alignof_longdouble = 16;
+  alignof_str = 1;
+  alignof_fun = -1;
+  alignof_aligned = 16;
+  char_is_unsigned = true;
+  little_endian = true;
+  has__builtin_va_list = true;
+  compiler = "none";
+  cpp_arch_flags = [];
+  version = "N/A";
+  weof = "(-1)";
+  wordsize = "64";
+  posix_version = "";
+  bufsiz = "255";
+  eof = "(-1)";
+  fopen_max = "255";
+  filename_max = "4095";
+  path_max = "256";
+  tty_name_max = "255";
+  host_name_max = "255";
+  l_tmpnam = "63";
+  tmp_max = "1024";
+  rand_max = "0xFFFFFFFE";
+  mb_cur_max = "16";
+  nsig = "";
+  errno = [
+    "edom", "33";
+    "eilseq", "84";
+    "erange", "34";
+  ];
+  machdep_name = "dummy";
+  custom_defs = [];
+}
+
+module Machdep = struct
+
+  include Datatype.Make_with_collections(struct
+      include Datatype.Serializable_undefined
+      type t = mach
+      let name = "Machdep"
+      let reprs = [dummy]
+      let compare: t -> t -> int = Stdlib.compare
+      let equal: t -> t -> bool = (=)
+      let hash: t -> int = Hashtbl.hash
+      let copy = Datatype.identity
+    end)
+
+  let pretty fmt mach =
+    let open Format in
+    let pp_pair fmt (a, b) = fprintf fmt "(%s, %s)" a b in
+    fprintf fmt
+      "{sizeof_short=%d;sizeof_int=%d;sizeof_long=%d;sizeof_longlong=%d;\
+       sizeof_ptr=%d;sizeof_float=%d;sizeof_double=%d;sizeof_longdouble=%d;\
+       sizeof_void=%d;sizeof_fun=%d;size_t=%s;ssize_t=%s;wchar_t=%s;
+       ptrdiff_t=%s;intptr_t=%s;uintptr_t=%s;\
+       int_fast8_t=%s;int_fast16_t=%s;int_fast32_t=%s;int_fast64_t=%s;\
+       uint_fast8_t=%s;uint_fast16_t=%s;uint_fast32_t=%s;uint_fast64_t=%s;\
+       wint_t=%s;sig_atomic_t=%s;time_t=%s;\
+       alignof_short=%d;alignof_int=%d;alignof_long=%d;alignof_longlong=%d;\
+       alignof_ptr=%d;alignof_float=%d;alignof_double=%d;alignof_longdouble=%d;\
+       alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;\
+       char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;
+       compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;
+       posix_version=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;
+       path_max=%s;tty_name_max=%s;host_name_max=%s;l_tmpnam=%s;tmp_max=%s;\
+       rand_max=%s;mb_cur_max=%s;nsig=%s;errno=%a;machdep_name=%s;custom_defs=%a}"
+      mach.sizeof_short
+      mach.sizeof_int
+      mach.sizeof_long
+      mach.sizeof_longlong
+      mach.sizeof_ptr
+      mach.sizeof_float
+      mach.sizeof_double
+      mach.sizeof_longdouble
+      mach.sizeof_void
+      mach.sizeof_fun
+      mach.size_t
+      mach.ssize_t
+      mach.wchar_t
+      mach.ptrdiff_t
+      mach.intptr_t
+      mach.uintptr_t
+      mach.int_fast8_t
+      mach.int_fast16_t
+      mach.int_fast32_t
+      mach.int_fast64_t
+      mach.uint_fast8_t
+      mach.uint_fast16_t
+      mach.uint_fast32_t
+      mach.uint_fast64_t
+      mach.wint_t
+      mach.sig_atomic_t
+      mach.time_t
+      mach.alignof_short
+      mach.alignof_int
+      mach.alignof_long
+      mach.alignof_longlong
+      mach.alignof_ptr
+      mach.alignof_float
+      mach.alignof_double
+      mach.alignof_longdouble
+      mach.alignof_str
+      mach.alignof_fun
+      mach.alignof_aligned
+      mach.char_is_unsigned
+      mach.little_endian
+      mach.has__builtin_va_list
+      mach.compiler
+      (pp_print_list pp_print_string) mach.cpp_arch_flags
+      mach.version
+      mach.weof
+      mach.wordsize
+      mach.posix_version
+      mach.bufsiz
+      mach.eof
+      mach.fopen_max
+      mach.filename_max
+      mach.path_max
+      mach.tty_name_max
+      mach.host_name_max
+      mach.l_tmpnam
+      mach.tmp_max
+      mach.rand_max
+      mach.mb_cur_max
+      mach.nsig
+      (pp_print_list pp_pair) mach.errno
+      mach.machdep_name
+      (pp_print_list pp_pair) mach.custom_defs
+end
+
+let msvcMode machdep = machdep.compiler = "msvc"
+let gccMode machdep = machdep.compiler = "gcc" || machdep.compiler = "clang"
+
+let allowed_machdep machdep =
+  Format.asprintf
+    "only allowed for %s machdeps; see option -machdep or \
+     run 'frama-c -machdep help' for the list of available machdeps"
+    machdep
 
 let gen_define fmt macro pp def =
   Format.fprintf fmt "#define %s %a@\n" macro pp def
@@ -350,8 +601,7 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   List.iter (gen_define_errno_macro fmt) mach.errno;
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;
-  (* NB: should we use Cil.gccMode() here? *)
-  if mach.compiler = "gcc" then
+  if gccMode mach then
     gen_include fmt "__fc_gcc_builtins.h";
 
   gen_define_custom_macros fmt censored_macros mach.custom_defs;

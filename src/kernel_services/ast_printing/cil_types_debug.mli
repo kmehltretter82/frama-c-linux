@@ -156,4 +156,3 @@ val pp_kinstr : Format.formatter -> Cil_types.kinstr -> unit
 val pp_cil_function : Format.formatter -> Cil_types.cil_function -> unit
 val pp_kernel_function : Format.formatter -> Cil_types.kernel_function -> unit
 val pp_syntactic_scope: Format.formatter -> Cil_types.syntactic_scope -> unit
-val pp_mach : Format.formatter -> Cil_types.mach -> unit

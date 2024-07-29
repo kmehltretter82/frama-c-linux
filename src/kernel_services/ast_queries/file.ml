@@ -220,9 +220,8 @@ let pre_register = Files.pre_register
 (* ************************************************************************* *)
 
 (* not exported, see [pretty_machdep] below. *)
-let print_machdep fmt (m : Cil_types.mach) =
+let print_machdep fmt (m : Machdep.mach) =
   begin
-    let open Cil_types in
     Format.fprintf fmt "Machine: %s@\n" m.version ;
     let pp_size_error fmt v =
       if v < 0
@@ -324,7 +323,7 @@ let get_machdep () =
   let res =
     Result.bind
       (Yaml_unix.of_file (Fpath.v (file:>string)))
-      Cil_types.mach_of_yaml
+      Machdep.mach_of_yaml
   in
   match res with
   | Ok machdep -> machdep
