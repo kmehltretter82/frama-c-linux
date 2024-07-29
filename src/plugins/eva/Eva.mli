@@ -840,23 +840,18 @@ module Eva_perf: sig
 
   (** Statistics about each analyzed callstack. *)
   module StatByCallstack : sig
-    type key = Cil_types.kernel_function list
-    type data = stat
+    type callstack = Cil_types.kernel_function list
 
     (** Get the current analysis statistic for a callstack. *)
-    val get: key -> stat
+    val get: callstack -> stat
 
     (** Iterate on the statistic of every analyzed callstack. *)
-    val iter: (key -> stat -> unit) -> unit
+    val iter: (callstack -> stat -> unit) -> unit
 
     (** Set a hook on statistics computation *)
     val add_hook_on_change:
-      ((key, stat) State_builder.hashtbl_event -> unit) -> unit
+      ((callstack, stat) State_builder.hashtbl_event -> unit) -> unit
 
-    module Datatype: Datatype.S
-
-    (** Set a hook on statistics changes by the project library *)
-    val add_hook_on_update: (Datatype.t -> unit) -> unit
   end
 end
 

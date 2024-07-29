@@ -96,6 +96,8 @@ module StatByCallstack = struct
 
   include State_builder.Hashtbl (KfList.Hashtbl) (Stat) (Info)
 
+  type callstack = KfList.t
+
   let get kf_list =
     try find kf_list
     with Not_found -> empty_stat
