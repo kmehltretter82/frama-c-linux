@@ -44,8 +44,11 @@ const addNodeToFlamegraph = (
   cs: string[],
   row: Eva.flamegraphData,
 ): void => {
-  // Accumulate times for all nodes crossed
-  flamegraph.value += row.totalTime;
+  /* Accumulate times for all nodes crossed. We do not rely on [row.totalTime]
+     as during the analysis, the flamegraph is incomplete and the total time
+     of some callstacks may be inconsistent. So we rebuild the total time of
+     each callstack from the selfTime of all available callstacks. */
+  flamegraph.value += row.selfTime;
   // updating last node
   if(cs.length === 0) {
     flamegraph.kfDecl = row.kfDecl;
