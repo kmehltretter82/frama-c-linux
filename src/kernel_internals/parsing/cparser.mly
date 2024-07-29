@@ -866,10 +866,9 @@ bracket_comma_expression:
   LBRACKET comma_expression RBRACKET                   { $2 }
 ;
 
-
 /*** statements ***/
-block: /* ISO 6.8.2 */
-    block_begin local_labels block_attrs block_content RBRACE
+generic_block(content):
+    block_begin local_labels block_attrs content RBRACE
       {
        { blabels = $2;
          battrs = $3;
@@ -877,6 +876,13 @@ block: /* ISO 6.8.2 */
        $1, $5
       }
 ;
+
+block: /* ISO 6.8.2 */
+       generic_block(block_content) { $1 }
+
+main_block:
+  generic_block(main_block_content) { $1 }
+
 block_begin:
     LBRACE  { !Lexerhack.push_context (); $1 }
 ;
@@ -888,6 +894,17 @@ block_attrs:
 ;
 
 block_content: block_element_list { !Lexerhack.pop_context(); $1 }
+
+/* for the main block of a function, we must pop
+   _two_ contexts: the one of the block itself, and the one
+   introduced for the definition itself (which includes the
+   parameters and the function name)
+*/
+main_block_content: block_element_list {
+    !Lexerhack.pop_context();
+    !Lexerhack.pop_context();
+    $1
+}
 
 /* statements and declarations in a block, in any order (for C99 support) */
 block_element_list:
@@ -1502,37 +1519,35 @@ abs_direct_decl_opt:
     abs_direct_decl                 { $1 }
 |   /* empty */                     { JUSTBASE }
 ;
+
+/* NB: we can't use SPEC? below for obscure shift/reduce conflicts.
+   Feel free to investigate more.
+*/
 function_def:  /* (* ISO 6.9.1 *) */
-  SPEC function_def_start block
+ s=SPEC fn=function_def_start b=main_block
           {
-            let (loc, specs, decl) = $2 in
+            let (loc, specs, decl) = fn in
             let spec_loc =
-              let loc = fst $1 in
+              let loc = fst s in
               Option.map
                 (fun (loc', spec) -> spec, (loc, loc'))
-                (Logic_lexer.spec $1)
+                (Logic_lexer.spec s)
             in
             currentFunctionName := "<__FUNCTION__ used outside any functions>";
-            !Lexerhack.pop_context (); (* The context pushed by
-                                    * announceFunctionName *)
-            doFunctionDef spec_loc loc (trd3 $3) specs decl (fst3 $3)
+            doFunctionDef spec_loc loc (trd3 b) specs decl (fst3 b)
           }
-|  function_def_start block
-          { let (loc, specs, decl) = $1 in
-            currentFunctionName := "<__FUNCTION__ used outside any functions>";
-            !Lexerhack.pop_context (); (* The context pushed by
-                                    * announceFunctionName *)
-            (*OCAMLYACC BUG??? Format.printf "%a@." d_cabsloc (trd3 $2);*)
-            doFunctionDef None ((*handleLoc*) loc) (trd3 $2) specs decl (fst3 $2)
-          }
-
+| fn = function_def_start b = main_block
+  { let (loc, specs, decl) = fn in
+    currentFunctionName:= "<__FUNCTION__ used outside any functions>";
+    doFunctionDef None loc (trd3 b) specs decl (fst3 b)
+  }
+;
 
 function_def_start:  /* (* ISO 6.9.1 *) */
   decl_spec_list declarator
                             { announceFunctionName $2;
                               (fourth4 $2, fst $1, $2)
                             }
-
 /* (* Old-style function prototype *) */
 | decl_spec_list old_proto_decl
                             { announceFunctionName $2;
