@@ -24,12 +24,17 @@
 #define __FC_ULIMIT_H
 #include "features.h"
 __PUSH_FC_STDLIB
+#include "errno.h"
 
 __BEGIN_DECLS
 
 #define UL_GETFSIZE 1
 #define UL_SETFSIZE 2
 
+/*@
+  assigns \result, errno \from indirect:cmd;
+  //missing: from 'current process'
+*/
 extern long ulimit(int cmd, ...);
 
 __END_DECLS

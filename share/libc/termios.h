@@ -200,8 +200,17 @@ extern int     cfsetispeed(struct termios *termios_p, speed_t speed);
  */
 extern int     cfsetospeed(struct termios *termios_p, speed_t speed);
 
-extern int     tcdrain(int);
-extern int     tcflow(int, int);
+/*@
+  assigns \result \from indirect:fildes;
+    //missing: assigns 'terminal', \from 'terminal'
+*/
+extern int tcdrain(int fildes);
+
+/*@
+  assigns \result \from indirect:fildes, indirect:action;
+    //missing: assigns 'terminal', \from 'terminal'
+*/
+extern int tcflow(int fildes, int action);
 
 /*@
   // missing requires valid_fd: {fd is an open file descriptor
@@ -232,8 +241,17 @@ extern int     tcflush(int fd, int queue_selector);
  */
 extern int     tcgetattr(int fd, struct termios *termios_p);
 
-extern pid_t   tcgetsid(int);
-extern int     tcsendbreak(int, int);
+/*@
+  assigns \result \from indirect:fildes;
+    //missing: \from 'process group', 'terminal'
+*/
+extern pid_t tcgetsid(int fildes);
+
+/*@
+  assigns \result \from indirect:fildes, indirect:duration;
+    //missing: assigns 'terminal', \from 'terminal'
+*/
+extern int tcsendbreak(int fildes, int duration);
 
 /*@
   requires valid_termios_p: \valid(termios_p);
