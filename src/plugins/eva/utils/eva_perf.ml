@@ -240,23 +240,26 @@ let compute_stat_by_fun ~total_duration ~current_time =
    [calls] is the list of called functions with their own statistics. *)
 let print_function fmt current_time (kf, (stat, calls)) =
   let total_duration = stat.total_duration in
-  Format.fprintf fmt "* %a: executed: %dx total: %.3fs\n    "
+  Format.fprintf fmt "* %a: executed: %dx total: %.3fs@,"
     Kernel_function.pretty kf stat.nb_calls total_duration;
-  let sorted, others = filter_and_sort ~total_duration ~current_time calls in
-  let nb_others = List.length others in
-  let others_duration =
-    List.fold_left (fun acc (_kf, stat) -> acc +. stat.total_duration) 0. others
+  let print_called_functions fmt =
+    let sorted, others = filter_and_sort ~total_duration ~current_time calls in
+    let nb_others = List.length others in
+    let others_duration =
+      List.fold_left (fun acc (_, stat) -> acc +. stat.total_duration) 0. others
+    in
+    let percent duration = 100. *. duration /. total_duration in
+    let pp_duration fmt d = Format.fprintf fmt "%.3fs (%.1f%%)" d (percent d) in
+    let print_called (kf, stat) =
+      Format.fprintf fmt "| %a %dx %a@ "
+        Kernel_function.pretty kf stat.nb_calls pp_duration stat.total_duration;
+    in
+    List.iter print_called sorted;
+    if nb_others > 0 then
+      Format.fprintf fmt "| %d others: %a@ " nb_others pp_duration others_duration;
+    Format.fprintf fmt "| self: %a" pp_duration stat.self_duration
   in
-  let percent duration = 100. *. duration /. total_duration in
-  let pp_duration fmt d = Format.fprintf fmt "%.3fs (%.1f%%)" d (percent d) in
-  let print_called (kf, stat) =
-    Format.fprintf fmt "| %a %dx %a "
-      Kernel_function.pretty kf stat.nb_calls pp_duration stat.total_duration;
-  in
-  List.iter print_called sorted;
-  if nb_others > 0 then
-    Format.fprintf fmt "| %d others: %a " nb_others pp_duration others_duration;
-  Format.fprintf fmt "| self: %a\n" pp_duration stat.self_duration
+  Format.fprintf fmt "  @[<hov>%t@]@," print_called_functions
 
 (* Prints info on the functions with the longest analysis time. *)
 let print_flat ~total_duration ~current_time fmt =
@@ -267,7 +270,7 @@ let print_flat ~total_duration ~current_time fmt =
 let print_tree ~total_duration ~current_time fmt =
   let rec print indent previous_callstack (kf, stat) =
     for _i = 0 to indent-1 do Format.fprintf fmt "| " done;
-    Format.fprintf fmt "* %a: executed: %dx total: %.3fs\n"
+    Format.fprintf fmt "* %a: executed: %dx total: %.3fs@,"
       Kernel_function.pretty kf stat.nb_calls stat.total_duration;
     let callstack = kf :: previous_callstack in
     let called = Kernel_function.Hptset.elements stat.called in
@@ -283,15 +286,15 @@ let print_tree ~total_duration ~current_time fmt =
 let show_perf current_time fmt =
   let total_duration = analysis_duration current_time in
   Format.fprintf fmt
-    "######## Eva execution feedback ########\
-     \nLong running functions:\
-     \n================================================================\n";
+    "@[<v> ######## Eva execution feedback ######## \
+     @,Long running functions:\
+     @,================================================================@,";
   print_flat ~total_duration ~current_time fmt;
   Format.fprintf fmt
-    "\nExecution time per callstack:\
-     \n================================================================\n";
+    "@,Execution time per callstack:\
+     @,================================================================@,";
   print_tree ~total_duration ~current_time fmt;
-  Format.fprintf fmt " \n"
+  Format.fprintf fmt " @,@]"
 
 (* -------------------------------------------------------------------------- *)
 (*                            Exported functions                              *)
