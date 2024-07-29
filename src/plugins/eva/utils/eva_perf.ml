@@ -24,7 +24,7 @@
 let display_interval = 60.0
 
 (* Do not show functions that execute for less than that percent of
-   the total running time. The value is 1/60, i.e. does not display
+   the total running time. The value is 1/60, i.e. it only displays
    functions that execute for longer than 3s after it has run for
    3 minutes. *)
 let threshold = 1.667 /. 100.
