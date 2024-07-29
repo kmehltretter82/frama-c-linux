@@ -879,10 +879,10 @@ let callstack_to_string kf_list =
 let _evaFlamegraph =
   let model = States.model () in
 
-  States.column model ~name:"stack"
-    ~descr:(Markdown.plain "Callstack as functions list starting from main")
-    ~data:(module Data.Jlist (Kernel_ast.Decl))
-    ~get:(fun (cs, _) -> List.rev_map (fun kf -> Printer_tag.SFunction kf) cs);
+  States.column model ~name:"stackNames"
+    ~descr:(Markdown.plain "Callstack as functions name list, starting from main")
+    ~data:(module Data.Jlist (Data.Jstring))
+    ~get:(fun (cs, _) -> List.rev_map Kernel_function.get_name cs);
 
   States.column model ~name:"nbCalls"
     ~descr:(Markdown.plain "Number of times the callstack has been analyzed")
@@ -899,13 +899,8 @@ let _evaFlamegraph =
     ~data:(module Data.Jfloat)
     ~get:(fun (_cs, stat) -> stat.Eva_perf.total_duration);
 
-  States.column model ~name:"functionName"
-    ~descr:(Markdown.plain "Name of the top function")
-    ~data:(module Data.Jstring)
-    ~get:(fun (cs, _) -> Kernel_function.get_name (List.hd cs));
-
   States.column model ~name:"kfDecl"
-    ~descr:(Markdown.plain "Key of the top function")
+    ~descr:(Markdown.plain "Declaration of the top function")
     ~data:(module Kernel_ast.Decl)
     ~get:(fun (cs, _) -> Printer_tag.SFunction (List.hd cs));
 

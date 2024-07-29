@@ -764,17 +764,15 @@ export const getStates: Server.GetRequest<
 export interface flamegraphData {
   /** Entry identifier. */
   key: Json.key<'#flamegraph'>;
-  /** Callstack as functions list starting from main */
-  stack: decl[];
+  /** Callstack as functions name list, starting from main */
+  stackNames: string[];
   /** Number of times the callstack has been analyzed */
   nbCalls: number;
   /** Computation time for the callstack itself */
   selfTime: number;
   /** Total computation time, including functions called */
   totalTime: number;
-  /** Name of the top function */
-  functionName: string;
-  /** Key of the top function */
+  /** Declaration of the top function */
   kfDecl: decl;
 }
 
@@ -782,26 +780,23 @@ export interface flamegraphData {
 export const jFlamegraphData: Json.Decoder<flamegraphData> =
   Json.jObject({
     key: Json.jKey<'#flamegraph'>('#flamegraph'),
-    stack: Json.jArray(jDecl),
+    stackNames: Json.jArray(Json.jString),
     nbCalls: Json.jNumber,
     selfTime: Json.jNumber,
     totalTime: Json.jNumber,
-    functionName: Json.jString,
     kfDecl: jDecl,
   });
 
 /** Natural order for `flamegraphData` */
 export const byFlamegraphData: Compare.Order<flamegraphData> =
   Compare.byFields
-    <{ key: Json.key<'#flamegraph'>, stack: decl[], nbCalls: number,
-       selfTime: number, totalTime: number, functionName: string,
-       kfDecl: decl }>({
+    <{ key: Json.key<'#flamegraph'>, stackNames: string[], nbCalls: number,
+       selfTime: number, totalTime: number, kfDecl: decl }>({
     key: Compare.string,
-    stack: Compare.array(byDecl),
+    stackNames: Compare.array(Compare.string),
     nbCalls: Compare.number,
     selfTime: Compare.number,
     totalTime: Compare.number,
-    functionName: Compare.string,
     kfDecl: byDecl,
   });
 
@@ -861,7 +856,7 @@ export const flamegraph: State.Array<Json.key<'#flamegraph'>,flamegraphData> = f
 
 /** Default value for `flamegraphData` */
 export const flamegraphDataDefault: flamegraphData =
-  { key: Json.jKey<'#flamegraph'>('#flamegraph')(''), stack: [], nbCalls: 0,
-    selfTime: 0, totalTime: 0, functionName: '', kfDecl: declDefault };
+  { key: Json.jKey<'#flamegraph'>('#flamegraph')(''), stackNames: [],
+    nbCalls: 0, selfTime: 0, totalTime: 0, kfDecl: declDefault };
 
 /* ------------------------------------- */

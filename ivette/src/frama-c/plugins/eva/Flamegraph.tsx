@@ -131,10 +131,10 @@ export function FlamegraphComponent(): JSX.Element {
 
   const flameGraph = React.useMemo<Flamegraph | null>(() => {
     if(model.length === 0 ) return null;
-    const mainName = model[0].key.split(":")[0];
+    const mainName = model[0].stackNames[0];
     const flame: Flamegraph = { name: mainName, value: 0, children: [] };
     model.forEach(row => {
-      const cs = row.key.split(":");
+      const cs = row.stackNames;
       cs.shift();
       addNodeToFlamegraph(flame, cs, row);
     });
