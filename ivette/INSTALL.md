@@ -1,7 +1,7 @@
 # Dependencies
 
 Required package to be installed:
-- `node` version 20.x;
+- `node` version 20.x or 22.x;
 - `yarn` for node pakage management;
 - `pandoc` for generating the documentation.
 
@@ -9,8 +9,8 @@ Required package to be installed:
 
 ```sh
 $ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
-$ nvm install 20
-$ nvm use 20
+$ nvm install 22
+$ nvm use 22
 $ npm install --global yarn
 ```
 
@@ -26,8 +26,8 @@ $ pacman -S yarn
 ```sh
 $ brew install yarn
 $ brew install nvm # follow instructions
-$ nvm install 20
-$ nvm use 20
+$ nvm install 22
+$ nvm use 22
 ```
 
 # Installation
