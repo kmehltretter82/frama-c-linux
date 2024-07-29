@@ -225,29 +225,15 @@ export function computeFcts(
 
 type FunctionProps = InfiniteScrollableListProps
 
-export function Functions(props: FunctionProps): JSX.Element {
+interface FunctionFilterRet {
+  contextMenuItems: Dome.PopupMenuItem[],
+  multipleSelection: States.Scope[],
+  showFunction: (fct: functionsData) => boolean,
+  isSelected: (fct: functionsData) => boolean
+}
 
-  // Hooks
-  const scope = States.useCurrentScope();
-  const { kind, name } = States.useDeclaration(scope);
-  const ker = States.useSyncArrayProxy(Ast.functions);
-  const eva = States.useSyncArrayProxy(Eva.functions);
+export function useFunctionFilter(): FunctionFilterRet {
   const getMarker = States.useSyncArrayGetter(Ast.markerAttributes);
-  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
-
-  function useFlipSettings(label: string, b: boolean): setting {
-    return Dome.useFlipSettings('ivette.functions.' + label, b);
-  }
-  const stdlib = useFlipSettings('stdlib', false);
-  const builtin = useFlipSettings('builtin', false);
-  const def = useFlipSettings('def', true);
-  const undef = useFlipSettings('undef', true);
-  const intern = useFlipSettings('intern', true);
-  const extern = useFlipSettings('extern', true);
-  const evaAnalyzed = useFlipSettings('eva-analyzed', true);
-  const evaUnreached = useFlipSettings('eva-unreached', true);
-  const selected = useFlipSettings('selected', false);
-
   const { markers } = Locations.useSelection();
   const multipleSelection: States.Scope[] =
     React.useMemo(
@@ -256,45 +242,94 @@ export function Functions(props: FunctionProps): JSX.Element {
   const multipleSelectionActive = multipleSelection.length > 0;
   const evaComputed = States.useSyncValue(computationState) === 'computed';
 
-  // Currently selected function.
-  const current = (scope && kind === 'FUNCTION') ? name : undefined;
+  const isSelected = React.useMemo(() => {
+    return (fct: functionsData): boolean => {
+      const idx = multipleSelection.findIndex((s) => s === fct.decl);
+      return 0 <= idx;
+    };
+  }, [multipleSelection]);
 
-  function isSelected(fct: functionsData): boolean {
-    const idx = multipleSelection.findIndex((s) => s === fct.decl);
-    return 0 <= idx;
-  }
+  const useFlipSettings = (label: string, b: boolean): setting => {
+    return Dome.useFlipSettings('ivette.functions.' + label, b);
+  };
 
-  function showFunction(fct: functionsData): boolean {
-    const visible =
-      (stdlib[0] || !fct.stdlib)
-      && (builtin[0] || !fct.builtin)
-      && (def[0] || !fct.defined)
-      && (undef[0] || fct.defined)
-      && (intern[0] || fct.extern)
-      && (extern[0] || !fct.extern)
-      && (!multipleSelectionActive || !selected[0] || isSelected(fct))
-      && (evaAnalyzed[0] || !evaComputed ||
-        !('eva_analyzed' in fct && fct.eva_analyzed === true))
-      && (evaUnreached[0] || !evaComputed ||
-        ('eva_analyzed' in fct && fct.eva_analyzed === true));
-    return !!visible;
-  }
+  const stdlibState = useFlipSettings('stdlib', false);
+  const builtinState = useFlipSettings('builtin', false);
+  const defState = useFlipSettings('def', true);
+  const undefState = useFlipSettings('undef', true);
+  const internState = useFlipSettings('intern', true);
+  const externState = useFlipSettings('extern', true);
+  const evaAnalyzedState = useFlipSettings('eva-analyzed', true);
+  const evaUnreachedState = useFlipSettings('eva-unreached', true);
+  const selectedState = useFlipSettings('selected', false);
+
+  const [stdlib, ] = stdlibState;
+  const [builtin, ] = builtinState;
+  const [def, ] = defState;
+  const [undef, ] = undefState;
+  const [intern, ] = internState;
+  const [extern, ] = externState;
+  const [evaAnalyzed, ] = evaAnalyzedState;
+  const [evaUnreached, ] = evaUnreachedState;
+  const [selected, ] = selectedState;
+
+  const showFunction = React.useMemo(() => {
+    return (fct: functionsData): boolean => {
+        const visible =
+          (stdlib || !fct.stdlib)
+          && (builtin || !fct.builtin)
+          && (def || !fct.defined)
+          && (undef || fct.defined)
+          && (intern || fct.extern)
+          && (extern || !fct.extern)
+          && (!multipleSelectionActive || !selected || isSelected(fct))
+          && (evaAnalyzed || !evaComputed ||
+            !('eva_analyzed' in fct && fct.eva_analyzed === true))
+          && (evaUnreached || !evaComputed ||
+            ('eva_analyzed' in fct && fct.eva_analyzed === true));
+        return !!visible;
+      };
+  }, [stdlib, builtin, def, undef, intern, extern,
+    evaAnalyzed, evaUnreached, selected,
+    evaComputed, isSelected, multipleSelectionActive
+  ]);
 
   const contextMenuItems: Dome.PopupMenuItem[] = [
-    menuItem('Show Frama-C builtins', builtin),
-    menuItem('Show stdlib functions', stdlib),
+    menuItem('Show Frama-C builtins', builtinState),
+    menuItem('Show stdlib functions', stdlibState),
     'separator',
-    menuItem('Show defined functions', def),
-    menuItem('Show undefined functions', undef),
+    menuItem('Show defined functions', defState),
+    menuItem('Show undefined functions', undefState),
     'separator',
-    menuItem('Show non-extern functions', intern),
-    menuItem('Show extern functions', extern),
+    menuItem('Show non-extern functions', internState),
+    menuItem('Show extern functions', externState),
     'separator',
-    menuItem('Show functions analyzed by Eva', evaAnalyzed, evaComputed),
-    menuItem('Show functions unreached by Eva', evaUnreached, evaComputed),
+    menuItem('Show functions analyzed by Eva', evaAnalyzedState, evaComputed),
+    menuItem('Show functions unreached by Eva', evaUnreachedState, evaComputed),
     'separator',
-    menuItem('Selected only', selected, multipleSelectionActive),
+    menuItem('Selected only', selectedState, multipleSelectionActive),
   ];
+
+  return {
+    contextMenuItems: contextMenuItems,
+    multipleSelection: multipleSelection,
+    showFunction: showFunction,
+    isSelected: isSelected
+  };
+}
+
+export function Functions(props: FunctionProps): JSX.Element {
+  // Hooks
+  const scope = States.useCurrentScope();
+  const { kind, name } = States.useDeclaration(scope);
+
+  const ker = States.useSyncArrayProxy(Ast.functions);
+  const eva = States.useSyncArrayProxy(Eva.functions);
+  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
+  const { showFunction, contextMenuItems } = useFunctionFilter();
+
+  // Currently selected function.
+  const current = (scope && kind === 'FUNCTION') ? name : undefined;
 
   // Filtered
   const items =
