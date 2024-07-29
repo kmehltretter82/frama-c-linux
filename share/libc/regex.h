@@ -86,10 +86,35 @@ typedef struct __fc_regmatch_t
   regoff_t rm_eo;
 } regmatch_t;
 
-extern int    regcomp(regex_t *, const char *, int);
-extern int    regexec(const regex_t *, const char *, size_t, regmatch_t[], int);
-extern size_t regerror(int, const regex_t *, char *, size_t);
-extern void   regfree(regex_t *);
+/*@
+  allocates preg->buffer, preg->fastmap, preg->translate;
+  assigns \result \from indirect:pattern[0..], indirect:cflags;
+  assigns *preg \from pattern[0..], cflags;
+*/
+extern int regcomp(regex_t *restrict preg, const char *restrict pattern, int cflags);
+
+/*@
+  assigns \result \from indirect:errcode, indirect:*preg, indirect:errbuf_size;
+  assigns errbuf[0 .. errbuf_size-1] \from errcode, *preg,
+                                           indirect:errbuf_size;
+*/
+extern size_t regerror(int errcode, const regex_t *restrict preg,
+                       char *restrict errbuf, size_t errbuf_size);
+
+/*@
+  assigns \result \from indirect:*preg, indirect:string[0..],
+                        indirect:pmatch[0 .. nmatch-1], indirect:eflags;
+  assigns pmatch[0 .. nmatch-1] \from *preg, string[0..], indirect:nmatch,
+                                      indirect:eflags;
+*/
+extern int regexec(const regex_t *preg, const char *restrict string,
+                   size_t nmatch, regmatch_t pmatch[], int eflags);
+
+/*@
+  frees preg->buffer, preg->fastmap, preg->translate;
+  assigns \nothing;
+*/
+extern void regfree(regex_t *preg);
 
 __END_DECLS
 
