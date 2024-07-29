@@ -122,14 +122,9 @@ run-test: [
 ]
 
 depends: [
-  "dune" { >= "3.7.0"
-         & != "3.13.0" # performance problem
-         }
+  "dune" { > "3.13.0" }
   "dune-configurator"
-  "dune-site" { >= "3.7.0"
-              & != "3.13.0" # performance problem
-              }
-
+  "dune-site" { > "3.13.0" }
   ( "alt-ergo-free" | "alt-ergo" )
   "conf-graphviz" { post }
   "conf-time" { with-test }
