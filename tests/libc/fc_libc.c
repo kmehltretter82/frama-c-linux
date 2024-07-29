@@ -98,6 +98,7 @@
 #include "fcntl.h"
 #include "__fc_select.h"
 #include "__fc_string_axiomatic.h"
+#include "__fc_strto_axiomatic.h"
 #include "__fc_utmp_constants.h"
 #include "features.h"
 #include "fenv.h"

@@ -2,11 +2,10 @@
  STDOPT: +"-machdep msvc_x86_64"
  STDOPT: +"-machdep ppc_32"
  */
-// Note: machdep MSVC is used to avoid warnings due to
-// "non implemented long double" when testing strtold.
-// In MSVC, "long double" is mapped to "double".
+// Note: machdep MSVC is used to avoid warnings due to "non implemented long
+// double" when testing strtold. In MSVC, "long double" is mapped to "double".
 #include <stdlib.h>
-
+#include <errno.h>
 //@ assigns \result \from *(int*)a, *(int*)b;
 int compare_int(const void *a, const void *b) {
   return (*(int*)a < *(int*)b) ? -1 : (*(int*)a > *(int*)b);
@@ -20,28 +19,55 @@ int main() {
   char *sl = "12 34 -56";
   char *s = sl;
   char *pl, *q;
+  errno = 0;
   long l = strtol(s, &pl, base);
+  //@ split errno;
+  if (errno) return 1;
   l = strtol(pl, &q, base);
+  //@ split errno;
+  if (errno) return 1;
   l = strtol(q, NULL, base);
+  //@ split errno;
+  if (errno) return 1;
   l = strtol(s+9, NULL, base);
+  //@ split errno;
+  if (errno) return 1;
 
   s = sl;
   char *pll;
   long long ll = strtoll(s, &pll, base);
+  //@ split errno;
+  if (errno) return 1;
   ll = strtoll(pll, &q, base);
+  //@ split errno;
+  if (errno) return 1;
   ll = strtoll(q, NULL, base);
+  //@ split errno;
+  if (errno) return 1;
 
   s = sl;
   char *pul;
   unsigned long ul = strtoul(s, &pul, base);
+  //@ split errno;
+  if (errno) return 1;
   ul = strtoul(pul, &q, base);
+  //@ split errno;
+  if (errno) return 1;
   ul = strtoul(q, NULL, base);
+  //@ split errno;
+  if (errno) return 1;
 
   s = sl;
   char *pull;
   unsigned long long ull = strtoull(s, &pull, base);
+  //@ split errno;
+  if (errno) return 1;
   ull = strtoull(pull, &q, base);
+  //@ split errno;
+  if (errno) return 1;
   ull = strtoull(q, NULL, base);
+  //@ split errno;
+  if (errno) return 1;
 
   char *sd = " 3.14 0x1.2p2";
   s = sd;

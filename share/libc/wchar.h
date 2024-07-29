@@ -302,6 +302,268 @@ extern int mbsinit(const mbstate_t *ps);
 extern size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n,
                       mbstate_t *restrict ps);
 
+#include "__fc_strto_axiomatic.h"
+
+/*@
+  requires valid_string_nptr: valid_read_wstring(nptr);
+  requires separation: \separated(nptr, endptr);
+  requires base_range: base == 0 || 2 <= base <= 36;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:endptr, indirect:base;
+  assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: wcs_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: wcs_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 2;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LONG_MIN || \result == LONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: wcs_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LONG_MIN || \result == LONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: wcs_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: wcs_to_integer(nptr, LONG_MIN, LONG_MAX, base) == 1;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+  complete behaviors;
+  disjoint behaviors;
+*/
+long wcstol(const wchar_t *restrict nptr, wchar_t **restrict endptr,
+            int base);
+
+/*@
+  requires valid_string_nptr: valid_read_wstring(nptr);
+  requires separation: \separated(nptr, endptr);
+  requires base_range: base == 0 || 2 <= base <= 36;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:endptr, indirect:base;
+  assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: wcs_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: wcs_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 2;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LLONG_MIN || \result == LLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: wcs_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == LLONG_MIN || \result == LLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: wcs_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: wcs_to_integer(nptr, LLONG_MIN, LLONG_MAX, base) == 1;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+  complete behaviors;
+  disjoint behaviors;
+*/
+long long wcstoll(const wchar_t *restrict nptr,
+                  wchar_t **restrict endptr, int base);
+
+/*@
+  requires valid_string_nptr: valid_read_wstring(nptr);
+  requires separation: \separated(nptr, endptr);
+  requires base_range: base == 0 || 2 <= base <= 36;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:endptr, indirect:base;
+  assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: wcs_to_integer(nptr, 0, ULONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: wcs_to_integer(nptr, 0, ULONG_MAX, base) == 2;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: wcs_to_integer(nptr, 0, ULONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: wcs_to_integer(nptr, 0, ULONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: wcs_to_integer(nptr, 0, ULONG_MAX, base) == 1;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+  complete behaviors;
+  disjoint behaviors;
+*/
+unsigned long wcstoul(const wchar_t *restrict nptr,
+                      wchar_t **restrict endptr, int base);
+
+/*@
+  requires valid_string_nptr: valid_read_wstring(nptr);
+  requires separation: \separated(nptr, endptr);
+  requires base_range: base == 0 || 2 <= base <= 36;
+  assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:base;
+  assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                        indirect:endptr, indirect:base;
+  assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+  behavior cannot_convert:
+    assumes
+      no_conversion: wcs_to_integer(nptr, 0, ULLONG_MAX, base) == 0;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_no_conversion: \result == 0;
+    ensures errno_set: __fc_errno == EINVAL;
+  behavior out_of_range_null_endptr:
+    assumes
+      out_of_range: wcs_to_integer(nptr, 0, ULLONG_MAX, base) == 2;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior out_of_range_nonnull_endptr:
+    // Note: the standard does not state that endptr is definitively assigned
+    //       to in this case, so we assume it may be.
+    assumes
+      out_of_range: wcs_to_integer(nptr, 0, ULLONG_MAX, base) == 2;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+    assigns __fc_errno \from indirect:nptr[0 .. wcslen(nptr)], indirect:base;
+    ensures result_out_of_range: \result == ULLONG_MAX;
+    ensures errno_set: __fc_errno == ERANGE;
+  behavior in_range_null_endptr:
+    assumes in_range: wcs_to_integer(nptr, 0, ULLONG_MAX, base) == 1;
+    assumes null_endptr: endptr == \null;
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+  behavior in_range_nonnull_endptr:
+    assumes in_range: wcs_to_integer(nptr, 0, ULLONG_MAX, base) == 1;
+    assumes nonnull_endptr: endptr != \null;
+    requires valid_endptr: \valid(endptr);
+    assigns \result \from indirect:nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:base;
+    assigns *endptr \from nptr, indirect:nptr[0 .. wcslen(nptr)],
+                          indirect:endptr, indirect:base;
+    ensures initialization: \initialized(endptr);
+    ensures valid_endptr_content: \valid_read(*endptr);
+    ensures endptr_same_base: \base_addr(*endptr) == \base_addr(nptr);
+  complete behaviors;
+  disjoint behaviors;
+*/
+unsigned long long wcstoull(const wchar_t *restrict nptr,
+                            wchar_t **restrict endptr, int base);
+
 /* It is unclear whether these are more often in wchar.h or stdio.h */
 
 extern int fwprintf(FILE * stream, const wchar_t * format, ...);

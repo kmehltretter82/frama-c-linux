@@ -29,4 +29,14 @@ void main() {
   //@ assert a >= 0;
   a = imaxabs(0);
   //@ assert a == 0;
+
+  char *onetwothreefourab = "1234ab";
+  char *endptr;
+  intmax_t imax = strtoimax(onetwothreefourab, &endptr, 10);
+  intmax_t umax = strtoumax(onetwothreefourab, &endptr, 8);
+
+  wchar_t *onetwothreefourab_w = L"1234ab";
+  wchar_t *endptr_w;
+  intmax_t wimax = wcstoimax(onetwothreefourab_w, &endptr_w, 10);
+  intmax_t wumax = wcstoumax(onetwothreefourab_w, &endptr_w, 8);
 }
