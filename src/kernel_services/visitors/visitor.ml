@@ -481,14 +481,14 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
       in
       let change_do_children spec =
         let new_behaviors =
-          Cil.mapNoCopy self#vbehavior_annot spec.spec_behavior
+          Extlib.map_no_copy self#vbehavior_annot spec.spec_behavior
         in
         let new_terminates =
-          Cil.optMapNoCopy (Cil.visitCilIdPredicate (self:>Cil.cilVisitor))
+          Extlib.opt_map_no_copy (Cil.visitCilIdPredicate (self:>Cil.cilVisitor))
             spec.spec_terminates
         in
         let new_decreases =
-          Cil.optMapNoCopy
+          Extlib.opt_map_no_copy
             (fun (d,s as acc) ->
                let d' = Cil.visitCilTerm (self:>Cil.cilVisitor) d in
                if d != d' then (d',s) else acc)

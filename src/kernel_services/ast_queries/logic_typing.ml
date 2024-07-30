@@ -2268,7 +2268,7 @@ struct
         method! vlogic_info_decl info =
           match info.l_body with
           | LBinductive l ->
-            let l' = Cil.mapNoCopy self#treat_ind_case l in
+            let l' = Extlib.map_no_copy self#treat_ind_case l in
             if l != l' then info.l_body <- LBinductive l';
             SkipChildren
           | _ -> DoChildren

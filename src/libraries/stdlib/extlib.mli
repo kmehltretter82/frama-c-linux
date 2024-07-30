@@ -155,6 +155,14 @@ val list_slice: ?first:int -> ?last:int -> 'a list -> 'a list
     and inverted ranges result in empty lists.
     @since 18.0-Argon *)
 
+val map_no_copy: ('a -> 'a) -> 'a list -> 'a list
+(** Like map but try not to make a copy of the list
+    @since Frama-C+dev *)
+
+val map_no_copy_list: ('a -> 'a list) -> 'a list -> 'a list
+(** Like map but each call can return a list. Try not to make a copy of the list
+    @since Frama-C+dev *)
+
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
@@ -188,6 +196,10 @@ val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
 (** @return [f a b] if arguments are [Some a] and [Some b], orelse return
     [None].
     @since 24.0-Chromium *)
+
+val opt_map_no_copy: ('a -> 'a) -> 'a option -> 'a option
+(** same as map_no_copy for options.
+    @since Frama-C+dev *)
 
 (* ************************************************************************* *)
 (** {2 Strings} *)

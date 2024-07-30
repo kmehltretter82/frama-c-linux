@@ -53,7 +53,6 @@
  *)
 
 open Logic_const
-open Format
 open Cil_datatype
 open Cil_types
 
@@ -1313,43 +1312,14 @@ let doVisit (vis: 'visitor)
 let doVisitCil vis previsit startvisit children node =
   doVisit vis vis#plain_copy_visitor previsit startvisit children node
 
-let rev_until i l =
-  let rec aux acc =
-    function
-      [] -> acc
-    | i'::_ when i' == i -> acc
-    | i'::l -> aux (i'::acc) l
-  in aux [] l
+let mapNoCopy = Extlib.map_no_copy
+[@@alert deprecated "Use [Extlib.map_no_copy] instead"]
 
-(* mapNoCopy is like map but avoid copying the list if the function does not
- * change the elements. *)
-let mapNoCopy (f: 'a -> 'a) orig =
-  let rec aux ((acc,has_changed) as res) l =
-    match l with
-      [] -> if has_changed then List.rev acc else orig
-    | i :: resti ->
-      let i' = f i in
-      if has_changed then
-        aux (i'::acc,true) resti
-      else if i' != i then
-        aux (i'::rev_until i orig,true) resti
-      else
-        aux res resti
-  in aux ([],false) orig
+let mapNoCopyList = Extlib.map_no_copy_list
+[@@alert deprecated "Use [Extlib.map_no_copy_list] instead"]
 
-let mapNoCopyList (f: 'a -> 'a list) orig =
-  let rec aux ((acc,has_changed) as res) l =
-    match l with
-      [] -> if has_changed then List.rev acc else orig
-    | i :: resti ->
-      let l' = f i in
-      if has_changed then
-        aux (List.rev_append l' acc,true) resti
-      else
-        (match l' with
-           [i'] when i' == i -> aux res resti
-         | _ -> aux (List.rev_append l' (rev_until i orig), true) resti)
-  in aux ([],false) orig
+let optMapNoCopy = Extlib.opt_map_no_copy
+[@@alert deprecated "Use [Extlib.opt_map_no_copy] instead."]
 
 (* A visitor for lists *)
 let doVisitList  (vis: 'visit)
@@ -1373,7 +1343,7 @@ let doVisitList  (vis: 'visit)
         JustCopy | JustCopyPost _ -> only_copy_vis
       | _ -> vis
     in
-    let nodespost = mapNoCopy (children vis) nodespre in
+    let nodespost = Extlib.map_no_copy (children vis) nodespre in
     match action with
     | DoChildrenPost f | ChangeDoChildrenPost (_, f) | JustCopyPost f ->
       f nodespost
@@ -1381,12 +1351,6 @@ let doVisitList  (vis: 'visit)
 
 let doVisitListCil vis previsit startvisit children node =
   doVisitList vis vis#plain_copy_visitor previsit startvisit children node
-
-let optMapNoCopy f o =
-  match o with
-    None -> o
-  | Some x ->
-    let x' = f x in if x' != x then Some x' else o
 
 let debugVisit = false
 
@@ -1439,7 +1403,7 @@ and childrenTermNode vis tn =
     let ci' =
       doVisitCil vis id vis#vlogic_ctor_info_use alphabetabeta ci
     in
-    let args' = mapNoCopy vTerm args in
+    let args' = Extlib.map_no_copy vTerm args in
     if ci' != ci || args != args' then TDataCons(ci',args') else tn
   | TLval tl ->
     let tl' = vTermLval tl in
@@ -1477,13 +1441,13 @@ and childrenTermNode vis tn =
   | Tapp(li,labels,args) ->
     let li' = vLogicInfo li in
     let labels' =
-      mapNoCopy (visitCilLogicLabel vis) labels in
+      Extlib.map_no_copy (visitCilLogicLabel vis) labels in
 (*
  Format.eprintf "Cil.children_term_node: li = %s(%d), li' = %s(%d)@."
    li.l_var_info.lv_name li.l_var_info.lv_id
           li'.l_var_info.lv_name li'.l_var_info.lv_id;
 *)
-    let args' = mapNoCopy vTerm args in
+    let args' = Extlib.map_no_copy vTerm args in
     if li' != li || labels' != labels || args' != args then
       Tapp(li',labels',args') else tn
   | Tif(test,ttrue,tfalse) ->
@@ -1525,15 +1489,15 @@ and childrenTermNode vis tn =
   | Ttype ty ->
     let ty' = vTyp ty in if ty' != ty then Ttype ty' else tn
   | Tunion locs ->
-    let locs' = mapNoCopy (visitCilTerm vis) locs in
+    let locs' = Extlib.map_no_copy (visitCilTerm vis) locs in
     if locs != locs' then Tunion(locs') else tn
   | Tinter locs ->
-    let locs' = mapNoCopy (visitCilTerm vis) locs in
+    let locs' = Extlib.map_no_copy (visitCilTerm vis) locs in
     if locs != locs' then Tinter(locs') else tn
   | Tcomprehension(lval,quant,pred) ->
     let quant' = visitCilQuantifiers vis quant in
     let lval' = visitCilTerm vis lval in
-    let pred' = (optMapNoCopy (visitCilPredicate vis)) pred in
+    let pred' = (Extlib.opt_map_no_copy (visitCilPredicate vis)) pred in
     if lval' != lval || quant' != quant || pred' != pred
     then
       Tcomprehension(lval',quant',pred')
@@ -1541,8 +1505,8 @@ and childrenTermNode vis tn =
       tn
   | Tempty_set -> tn
   | Trange(low,high) ->
-    let low' = optMapNoCopy (visitCilTerm vis) low in
-    let high' = optMapNoCopy (visitCilTerm vis) high in
+    let low' = Extlib.opt_map_no_copy (visitCilTerm vis) low in
+    let high' = Extlib.opt_map_no_copy (visitCilTerm vis) high in
     if low != low' || high != high' then Trange(low',high')
     else tn
   | Tlet(def,body) ->
@@ -1623,8 +1587,8 @@ and visitCilLogicInfo vis li =
 
 and childrenLogicInfo vis li =
   (* NB: underlying varinfo has been already visited. *)
-  let lt = optMapNoCopy (visitCilLogicType vis) li.l_type in
-  let lp = mapNoCopy (visitCilLogicVarDecl vis) li.l_profile in
+  let lt = Extlib.opt_map_no_copy (visitCilLogicType vis) li.l_type in
+  let lp = Extlib.map_no_copy (visitCilLogicVarDecl vis) li.l_profile in
   li.l_type <- lt;
   li.l_profile <- lp;
   li.l_body <-
@@ -1632,14 +1596,14 @@ and childrenLogicInfo vis li =
       match li.l_body with
       | LBnone -> li.l_body
       | LBreads ol ->
-        let l = mapNoCopy (visitCilIdTerm vis) ol in
+        let l = Extlib.map_no_copy (visitCilIdTerm vis) ol in
         if l != ol then LBreads l else li.l_body
       | LBterm ot ->
         let t = visitCilTerm vis ot in
         if t != ot then LBterm t else li.l_body
       | LBinductive inddef ->
         let i =
-          mapNoCopy
+          Extlib.map_no_copy
             (fun (id,labs,tvars,p) ->
                (id, labs, tvars, visitCilPredicate vis p))
             inddef
@@ -1656,7 +1620,7 @@ and visitCilLogicTypeInfo vis lt =
     vis#vlogic_type_info_decl childrenLogicTypeInfo lt
 
 and childrenLogicTypeInfo vis lt =
-  let def = optMapNoCopy (visitCilLogicTypeDef vis) lt.lt_def in
+  let def = Extlib.opt_map_no_copy (visitCilLogicTypeDef vis) lt.lt_def in
   lt.lt_def <- def; lt
 
 and visitCilLogicTypeDef vis def =
@@ -1665,7 +1629,7 @@ and visitCilLogicTypeDef vis def =
 and childrenLogicTypeDef vis def =
   match def with
   | LTsum l ->
-    let l' = mapNoCopy (visitCilLogicCtorInfoAddTable vis) l in
+    let l' = Extlib.map_no_copy (visitCilLogicCtorInfoAddTable vis) l in
     if l != l' then LTsum l' else def
   | LTsyn typ ->
     let typ' = visitCilLogicType vis typ in
@@ -1688,7 +1652,7 @@ and childrenLogicCtorInfo vis ctor =
       vis#vlogic_type_info_use alphabetabeta ctor.ctor_type
   in
   let ctor_params = ctor.ctor_params in
-  let ctor_params' = mapNoCopy (visitCilLogicType vis) ctor_params in
+  let ctor_params' = Extlib.map_no_copy (visitCilLogicType vis) ctor_params in
   if ctor_type != ctor.ctor_type || ctor_params != ctor_params' then
     { ctor with ctor_type = ctor_type; ctor_params = ctor_params' }
   else ctor
@@ -1705,10 +1669,10 @@ and childrenLogicType vis ty =
   | Ltype (s,l) ->
     let s' = doVisitCil vis (Visitor_behavior.Get.logic_type_info vis#behavior)
         vis#vlogic_type_info_use alphabetabeta s in
-    let l' = mapNoCopy (visitCilLogicType vis) l in
+    let l' = Extlib.map_no_copy (visitCilLogicType vis) l in
     if s' != s || l' != l then Ltype (s',l') else ty
   | Larrow(args,rttyp) ->
-    let args' = mapNoCopy(visitCilLogicType vis) args in
+    let args' = Extlib.map_no_copy (visitCilLogicType vis) args in
     let rttyp' = visitCilLogicType vis rttyp in
     if args' != args || rttyp' != rttyp then Larrow(args',rttyp') else ty
   | Lvar _ -> ty
@@ -1724,7 +1688,7 @@ and visitCilLogicVarDecl vis lv =
 and childrenLogicVarDecl vis lv =
   lv.lv_type <- visitCilLogicType vis lv.lv_type;
   lv.lv_origin <-
-    optMapNoCopy (visitCilVarUse vis) lv.lv_origin;
+    Extlib.opt_map_no_copy (visitCilVarUse vis) lv.lv_origin;
   lv
 
 and visitCilLogicVarUse vis lv =
@@ -1760,11 +1724,11 @@ and visitCilLogicVarUse vis lv =
     childrenLogicVarUse lv
 
 and childrenLogicVarUse vis lv =
-  lv.lv_origin <- optMapNoCopy (visitCilVarUse vis) lv.lv_origin; lv
+  lv.lv_origin <- Extlib.opt_map_no_copy (visitCilVarUse vis) lv.lv_origin; lv
 
 and visitCilQuantifiers vis lv =
   doVisitCil vis id vis#vquantifiers
-    (fun vis l -> mapNoCopy (visitCilLogicVarDecl vis) l) lv
+    (fun vis l -> Extlib.map_no_copy (visitCilLogicVarDecl vis) l) lv
 
 and visitCilIdPredicate vis ip =
   doVisitCil
@@ -1803,8 +1767,8 @@ and childrenPredicateNode vis p =
     Pfalse | Ptrue -> p
   | Papp (pred,labels,args) ->
     let pred' = vLogicInfo pred in
-    let labels' = mapNoCopy (visitCilLogicLabel vis) labels in
-    let args' = mapNoCopy vTerm args in
+    let labels' = Extlib.map_no_copy (visitCilLogicLabel vis) labels in
+    let args' = Extlib.map_no_copy vTerm args in
     if pred' != pred || labels' != labels || args' != args then
       Papp(pred',labels',args')
     else p
@@ -1908,7 +1872,7 @@ and childrenPredicateNode vis p =
     let t' = vTerm t in
     if t' != t || s != s' then Pdangling (s',t') else p
   | Pseparated seps ->
-    let seps' = mapNoCopy vTerm seps in
+    let seps' = Extlib.map_no_copy vTerm seps in
     if seps' != seps then Pseparated seps' else p
   | Pfresh (s1,s2,t,n) ->
     let s1' = visitCilLogicLabel vis s1 in
@@ -1939,7 +1903,7 @@ and visitCilFrees vis l =
 and visitCilAllocates vis l =
   doVisitCil vis id vis#vallocates childrenFreeAlloc l
 and childrenFreeAlloc vis l =
-  mapNoCopy (visitCilIdTerm vis) l
+  Extlib.map_no_copy (visitCilIdTerm vis) l
 
 and visitCilAssigns vis a =
   doVisitCil vis id vis#vassigns childrenAssigns a
@@ -1947,7 +1911,7 @@ and childrenAssigns vis a =
   match a with
     WritesAny -> a
   | Writes l ->
-    let l' = mapNoCopy (visitCilFrom vis) l in
+    let l' = Extlib.map_no_copy (visitCilFrom vis) l in
     if l' != l then Writes l' else a
 
 and visitCilFrom vis f =
@@ -1963,7 +1927,7 @@ and childrenDeps vis d =
   match d with
     FromAny -> d
   | From l ->
-    let l' = mapNoCopy (visitCilIdTerm vis) l in
+    let l' = Extlib.map_no_copy (visitCilIdTerm vis) l in
     if l !=l' then From l' else d
 
 and visitCilBehavior vis b =
@@ -1974,13 +1938,13 @@ and childrenBehavior vis b =
   b.b_assumes <- visitCilPredicates vis b.b_assumes;
   b.b_requires <- visitCilPredicates vis b.b_requires;
   b.b_post_cond <-
-    mapNoCopy
+    Extlib.map_no_copy
       (function ((k,p) as pc) ->
          let p' = visitCilIdPredicate vis p in if p != p' then (k,p') else pc)
       b.b_post_cond;
   b.b_assigns <- visitCilAssigns vis b.b_assigns;
   b.b_allocation <- visitCilAllocation vis b.b_allocation ;
-  b.b_extended <- mapNoCopy (visitCilExtended vis) b.b_extended;
+  b.b_extended <- Extlib.map_no_copy (visitCilExtended vis) b.b_extended;
   b
 
 and visitCilExtended vis orig =
@@ -1995,18 +1959,18 @@ and childrenCilExtended vis p =
   match p with
   | Ext_id _ -> p
   | Ext_terms terms ->
-    let terms' = mapNoCopy (visitCilTerm vis) terms in
+    let terms' = Extlib.map_no_copy (visitCilTerm vis) terms in
     if terms == terms' then p else Ext_terms terms'
   | Ext_preds preds ->
-    let preds' = mapNoCopy (visitCilPredicate vis) preds in
+    let preds' = Extlib.map_no_copy (visitCilPredicate vis) preds in
     if preds == preds' then p else Ext_preds preds'
   | Ext_annot (id,annots) ->
-    let annots' = mapNoCopy (visitCilExtended vis) annots in
+    let annots' = Extlib.map_no_copy (visitCilExtended vis) annots in
     if annots == annots' then p else Ext_annot (id,annots')
 
-and visitCilPredicates vis ps = mapNoCopy (visitCilIdPredicate vis) ps
+and visitCilPredicates vis ps = Extlib.map_no_copy (visitCilIdPredicate vis) ps
 
-and visitCilBehaviors vis bs = mapNoCopy (visitCilBehavior vis) bs
+and visitCilBehaviors vis bs = Extlib.map_no_copy (visitCilBehavior vis) bs
 
 and visitCilFunspec vis s =
   doVisitCil vis (Visitor_behavior.cfunspec vis#behavior) vis#vspec childrenSpec s
@@ -2014,9 +1978,9 @@ and visitCilFunspec vis s =
 and childrenSpec vis s =
   s.spec_behavior <- visitCilBehaviors vis s.spec_behavior;
   s.spec_variant <-
-    optMapNoCopy (fun x -> (visitCilTerm vis (fst x), snd x)) s.spec_variant;
+    Extlib.opt_map_no_copy (fun x -> (visitCilTerm vis (fst x), snd x)) s.spec_variant;
   s.spec_terminates <-
-    optMapNoCopy (visitCilIdPredicate vis) s.spec_terminates;
+    Extlib.opt_map_no_copy (visitCilIdPredicate vis) s.spec_terminates;
   (* nothing is done now for behaviors names, no need to visit complete and
      disjoint behaviors clauses
   *)
@@ -2117,9 +2081,9 @@ and childrenAnnotation vis a =
         vis#get_filling_actions;
     if mfi' != mfi then Dmodel_annot (mfi',loc) else a
   | Dvolatile(tset,rvi,wvi,attr,loc) ->
-    let tset' = mapNoCopy (visitCilIdTerm vis) tset in
-    let rvi' = optMapNoCopy (visitCilVarUse vis) rvi in
-    let wvi' = optMapNoCopy (visitCilVarUse vis) wvi in
+    let tset' = Extlib.map_no_copy (visitCilIdTerm vis) tset in
+    let rvi' = Extlib.opt_map_no_copy (visitCilVarUse vis) rvi in
+    let wvi' = Extlib.opt_map_no_copy (visitCilVarUse vis) wvi in
     let attr' = visitCilAttributes vis attr in
     if tset' != tset || rvi' != rvi || wvi' != wvi || attr' != attr then
       Dvolatile(tset',rvi',wvi',attr',loc)
@@ -2128,7 +2092,7 @@ and childrenAnnotation vis a =
  (*
         Format.eprintf "cil.visitCilAnnotation on axiomatic %s@." id;
  *)
-    let l' = mapNoCopy (visitCilAnnotation vis) l in
+    let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
     let attr' = visitCilAttributes vis attr in
     if l' != l || attr != attr' then Daxiomatic(id,l',attr',loc) else a
   | Dextended (e,attr,loc) ->
@@ -2307,7 +2271,7 @@ and childrenLocal_init vi (vis: cilVisitor) li =
     if i != i' then AssignInit i' else li
   | ConsInit(f,args, k) ->
     let f' = visitCilVarUse vis f in
-    let args' = mapNoCopy (visitCilExpr vis) args in
+    let args' = Extlib.map_no_copy (visitCilExpr vis) args in
     if f' != f || args' != args then ConsInit(f',args',k) else li
 
 and visitCilInstr (vis: cilVisitor) (i: instr) : instr list =
@@ -2330,11 +2294,11 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
     let lv' = fLval lv in let e' = fExp e in
     if lv' != lv || e' != e then Set(lv',e',l) else i
   | Call(None,f,args,l) ->
-    let f' = fExp f in let args' = mapNoCopy fExp args in
+    let f' = fExp f in let args' = Extlib.map_no_copy fExp args in
     if f' != f || args' != args then Call(None,f',args',l) else i
   | Call(Some lv,fn,args,l) ->
     let lv' = fLval lv in let fn' = fExp fn in
-    let args' = mapNoCopy fExp args in
+    let args' = Extlib.map_no_copy fExp args in
     if lv' != lv || fn' != fn || args' != args
     then Call(Some lv', fn', args', l) else i
 
@@ -2344,14 +2308,14 @@ and childrenInstr (vis: cilVisitor) (i: instr) : instr =
      | Some ext ->
        let asm_outputs_pre = ext.asm_outputs in
        let asm_outputs =
-         mapNoCopy
+         Extlib.map_no_copy
            (fun ((id,s,lv) as pair) ->
               let lv' = fLval lv in
               if lv' != lv then (id,s,lv') else pair) asm_outputs_pre
        in
        let asm_inputs_pre = ext.asm_inputs in
        let asm_inputs =
-         mapNoCopy
+         Extlib.map_no_copy
            (fun ((id,s,e) as pair) ->
               let e' = fExp e in
               if e' != e then (id,s,e') else pair) asm_inputs_pre
@@ -2400,14 +2364,14 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
   let fExp e = (visitCilExpr vis e) in
   let fBlock b = visitCilBlock vis b in
   let fInst i = visitCilInstr vis i in
-  let fLoopAnnot a = mapNoCopy (visitCilCodeAnnotation vis) a in
+  let fLoopAnnot a = Extlib.map_no_copy (visitCilCodeAnnotation vis) a in
   (* Just change the statement kind *)
   let skind' =
     match s.skind with
       Break _ | Continue _ | Return (None, _) -> s.skind
     | UnspecifiedSequence seq ->
       let seq' =
-        mapNoCopy
+        Extlib.map_no_copy
           (function (stmt,modified,writes,reads,calls) as orig->
              let stmt' = visitCilStmt vis stmt in
              (match stmt'.skind with
@@ -2417,12 +2381,12 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
                 to just copy the varinfo when using the copy visitor,
                 and not apply vvrbl, i.e. not using vis but generic_visitor ?
              *)
-             let modified' = mapNoCopy (visitCilLval vis) modified in
-             let writes' = mapNoCopy (visitCilLval vis) writes in
-             let reads' = mapNoCopy (visitCilLval vis) reads in
+             let modified' = Extlib.map_no_copy (visitCilLval vis) modified in
+             let writes' = Extlib.map_no_copy (visitCilLval vis) writes in
+             let reads' = Extlib.map_no_copy (visitCilLval vis) reads in
              let calls' =
                if Visitor_behavior.is_copy vis#behavior then
-                 (* we need new references anyway, no need for mapNoCopy *)
+                 (* we need new references anyway, no need for Extlib.map_no_copy *)
                  List.map (fun x -> ref (Visitor_behavior.Memo.stmt vis#behavior !x)) calls
                else calls
              in
@@ -2459,7 +2423,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
       let e' = fExp e in
       toPrepend := vis#unqueueInstr (); (* insert these before the switch *)
       let b' = fBlock b in
-      let stmts' = mapNoCopy (Visitor_behavior.Get.stmt vis#behavior) stmts in
+      let stmts' = Extlib.map_no_copy (Visitor_behavior.Get.stmt vis#behavior) stmts in
       (* the stmts in b should have cleaned up after themselves.*)
       assertEmptyQueue vis;
       if e' != e || b' != b || stmts' != stmts then
@@ -2478,7 +2442,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
         let t' = visitCilType vis t in
         if e != e' || t != t' then (e',t') else exc
       in
-      let e' = optMapNoCopy visit e in
+      let e' = Extlib.opt_map_no_copy visit e in
       if e != e' then Throw (e,loc) else s.skind
     | TryCatch (b,l,loc) ->
       let b' = fBlock b in
@@ -2487,7 +2451,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
         let b' = fBlock b in
         if v != v' || b != b' then (v', b') else catch
       in
-      let l' = mapNoCopy visit l in
+      let l' = Extlib.map_no_copy visit l in
       if b != b' || l != l' then TryCatch (b', l',loc) else s.skind
     | TryFinally (b, h, l) ->
       let b' = fBlock b in
@@ -2497,7 +2461,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
       let b' = fBlock b in
       assertEmptyQueue vis;
       (* visit the instructions *)
-      let il' = mapNoCopyList fInst il in
+      let il' = Extlib.map_no_copy_list fInst il in
       (* Visit the expression *)
       let e' = fExp e in
       let il'' =
@@ -2523,7 +2487,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
         if e' != e then Case (e', l) else lb
       | lb -> lb
     in
-    mapNoCopy fLabel s.labels
+    Extlib.map_no_copy fLabel s.labels
   in
   if labels' != s.labels then s.labels <- labels';
   s
@@ -2537,7 +2501,7 @@ and visitCilCatch_binder vis cb =
       if v != v' || b != b' then (v', b') else conv
     in
     let v' = visitCilVarDecl vis v in
-    let l' = mapNoCopy visit_one_conversion l in
+    let l' = Extlib.map_no_copy visit_one_conversion l in
     if v != v' || l != l' then Catch_exn(v',l') else cb
   | Catch_all -> cb
 and visitCilBlock (vis: cilVisitor) (b: block) : block =
@@ -2560,11 +2524,11 @@ and childrenBlock (vis: cilVisitor) (b: block) : block =
      that wish to create a local into the innermost scope can simply append
      it to the current block.
   *)
-  let locals' = mapNoCopy (Visitor_behavior.Get.varinfo vis#behavior) b.blocals in
-  let statics' = mapNoCopy (Visitor_behavior.Get.varinfo vis#behavior) b.bstatics in
+  let locals' = Extlib.map_no_copy (Visitor_behavior.Get.varinfo vis#behavior) b.blocals in
+  let statics' = Extlib.map_no_copy (Visitor_behavior.Get.varinfo vis#behavior) b.bstatics in
   b.blocals <- locals';
   b.bstatics <- statics';
-  let stmts' = mapNoCopy fStmt b.bstmts in
+  let stmts' = Extlib.map_no_copy fStmt b.bstmts in
   b.bstmts <- stmts';
   flatten_transient_sub_blocks b
 
@@ -2605,7 +2569,7 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
       let aa' = fAttr aa in
       if at' != at || aa' != aa then (an,at',aa') else arg
     in
-    let argslist' = mapNoCopy visitArg argslist in
+    let argslist' = Extlib.map_no_copy visitArg argslist in
     let a' = fAttr a in
     if rettype' != rettype || argslist' != argslist || a' != a  then
       let args' = if argslist' == argslist then args else Some argslist' in
@@ -2641,7 +2605,7 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
   in
   let typ = visitCilType vis v.vtype in
   v.vattr <- visitCilAttributes vis v.vattr;
-  v.vlogic_var_assoc <- optMapNoCopy visit_orig_var_assoc v.vlogic_var_assoc;
+  v.vlogic_var_assoc <- Extlib.opt_map_no_copy visit_orig_var_assoc v.vlogic_var_assoc;
   update_var_type v typ;
   v
 
@@ -2650,7 +2614,7 @@ and visitCilVarUse vis v =
 
 and visitCilAttributes (vis: cilVisitor) (al: attribute list) : attribute list=
   let al' =
-    mapNoCopyList
+    Extlib.map_no_copy_list
       (doVisitListCil vis
          id vis#vattr childrenAttribute) al in
   if al' != al then
@@ -2662,7 +2626,7 @@ and childrenAttribute (vis: cilVisitor) (a: attribute) : attribute =
   let fAttrP a = visitCilAttrParams vis a in
   match a with
   | Attr (n, args) ->
-    let args' = mapNoCopy fAttrP args in
+    let args' = Extlib.map_no_copy fAttrP args in
     if args' != args then Attr(n, args') else a
   | AttrAnnot _ ->
     a
@@ -2675,7 +2639,7 @@ and childrenAttrparam (vis: cilVisitor) (aa: attrparam) : attrparam =
   match aa with
     AInt _ | AStr _ -> aa
   | ACons(n, args) ->
-    let args' = mapNoCopy fAttrP args in
+    let args' = Extlib.map_no_copy fAttrP args in
     if args' != args then ACons(n, args') else aa
   | ASizeOf t ->
     let t' = fTyp t in
@@ -2720,8 +2684,8 @@ and childrenAttrparam (vis: cilVisitor) (aa: attrparam) : attrparam =
 let rec fix_succs_preds_block b block =
   List.iter (fix_succs_preds b) block.bstmts
 and fix_succs_preds b stmt =
-  stmt.succs <- mapNoCopy (Visitor_behavior.Get.stmt b) stmt.succs;
-  stmt.preds <- mapNoCopy (Visitor_behavior.Get.stmt b) stmt.preds;
+  stmt.succs <- Extlib.map_no_copy (Visitor_behavior.Get.stmt b) stmt.succs;
+  stmt.preds <- Extlib.map_no_copy (Visitor_behavior.Get.stmt b) stmt.preds;
   match stmt.skind with
     If(_,bthen,belse,_) ->
     fix_succs_preds_block b bthen;
@@ -2731,8 +2695,8 @@ and fix_succs_preds b stmt =
     stmt.skind <- Switch(e,cases,List.map (Visitor_behavior.Get.stmt b) stmts,l)
   | Loop(annot,block,loc,stmt1,stmt2) ->
     fix_succs_preds_block b block;
-    let stmt1' = optMapNoCopy (Visitor_behavior.Get.stmt b) stmt1 in
-    let stmt2' = optMapNoCopy (Visitor_behavior.Get.stmt b) stmt2 in
+    let stmt1' = Extlib.opt_map_no_copy (Visitor_behavior.Get.stmt b) stmt1 in
+    let stmt2' = Extlib.opt_map_no_copy (Visitor_behavior.Get.stmt b) stmt2 in
     stmt.skind <- Loop(annot,block,loc,stmt1',stmt2')
   | Block block -> fix_succs_preds_block b block
   | TryFinally(block1,block2,_) ->
@@ -2778,9 +2742,9 @@ and childrenFunction (vis : cilVisitor) (f : fundec) : fundec =
   end;
   f.svar <- nv; (* hit the function name *)
   (* visit the formals *)
-  let newformals = mapNoCopy (visitCilVarDecl vis) f.sformals in
+  let newformals = Extlib.map_no_copy (visitCilVarDecl vis) f.sformals in
   (* visit local declarations *)
-  f.slocals <- mapNoCopy (visitCilVarDecl vis) f.slocals;
+  f.slocals <- Extlib.map_no_copy (visitCilVarDecl vis) f.slocals;
   (* Make sure the type reflects the formals *)
   let selection = State_selection.singleton FormalsDecl.self in
   if Visitor_behavior.is_copy vis#behavior || newformals != f.sformals then begin
@@ -2809,7 +2773,7 @@ let visitCilFieldInfo vis f =
   doVisitCil vis (Visitor_behavior.Memo.fieldinfo vis#behavior) vis#vfieldinfo childrenFieldInfo f
 
 let childrenCompInfo vis comp =
-  comp.cfields <- optMapNoCopy (mapNoCopy (visitCilFieldInfo vis)) comp.cfields;
+  comp.cfields <- Extlib.opt_map_no_copy (Extlib.map_no_copy (visitCilFieldInfo vis)) comp.cfields;
   comp.cattr <- visitCilAttributes vis comp.cattr;
   comp
 
@@ -2825,7 +2789,7 @@ let visitCilEnumItem vis e =
   doVisitCil vis (Visitor_behavior.Memo.enumitem vis#behavior) vis#venumitem childrenEnumItem e
 
 let childrenEnumInfo vis e =
-  e.eitems <- mapNoCopy (visitCilEnumItem vis) e.eitems;
+  e.eitems <- Extlib.map_no_copy (visitCilEnumItem vis) e.eitems;
   e.eattr <- visitCilAttributes vis e.eattr;
   e
 
@@ -2865,7 +2829,7 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
       try Some (getFormalsDecl v) with Not_found -> None
     in
     let v' = visitCilVarDecl vis v in
-    let form' = optMapNoCopy (mapNoCopy (visitCilVarDecl vis)) form in
+    let form' = Extlib.opt_map_no_copy (Extlib.map_no_copy (visitCilVarDecl vis)) form in
     let spec' =
       if is_empty_funspec spec then begin
         if Visitor_behavior.is_copy vis#behavior then
@@ -2904,11 +2868,6 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
     let a' = visitCilAnnotation vis a in
     if a' != a then GAnnot(a',l) else g
   | GText _ | GAsm _ -> g
-
-(* sm: utility *)
-let startsWith prefix s =
-  let prefixLen = String.length prefix in
-  String.length s >= prefixLen && String.sub s 0 prefixLen = prefix
 
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
@@ -7275,66 +7234,6 @@ let pushGlobal (g: global)
           in
           g :: (List.fold_left aux !types vl)
     end
-
-
-type formatArg =
-    Fe of exp
-  | Feo of exp option  (** For array lengths *)
-  | Fu of unop
-  | Fb of binop
-  | Fk of ikind
-  | FE of exp list (** For arguments in a function call *)
-  | Ff of (string * typ * attributes) (** For a formal argument *)
-  | FF of (string * typ * attributes) list (* For formal argument lists *)
-  | Fva of bool (** For the ellipsis in a function type *)
-  | Fv of varinfo
-  | Fl of lval
-  | Flo of lval option (** For the result of a function call *)
-  | Fo of offset
-  | Fc of compinfo
-  | Fi of instr
-  | FI of instr list
-  | Ft of typ
-  | Fd of int
-  | Fg of string
-  | Fs of stmt
-  | FS of stmt list
-  | FA of attributes
-
-  | Fp of attrparam
-  | FP of attrparam list
-
-  | FX of string
-
-let d_formatarg fmt = function
-    Fe e -> fprintf fmt "Fe(%a)" !pp_exp_ref e
-  | Feo None -> fprintf fmt "Feo(None)"
-  | Feo (Some e) -> fprintf fmt "Feo(%a)" !pp_exp_ref e
-  | FE _ -> fprintf fmt "FE()"
-  | Fk _ik -> fprintf fmt "Fk()"
-  | Fva b -> fprintf fmt "Fva(%b)" b
-  | Ff (an, _, _) -> fprintf fmt "Ff(%s)" an
-  | FF _ -> fprintf fmt "FF(...)"
-  | FA _ -> fprintf fmt "FA(...)"
-  | Fu _uo -> fprintf fmt "Fu()"
-  | Fb _bo -> fprintf fmt "Fb()"
-  | Fv v -> fprintf fmt "Fv(%s)" v.vname
-  | Fl l -> fprintf fmt "Fl(%a)" !pp_lval_ref l
-  | Flo None -> fprintf fmt "Flo(None)"
-  | Flo (Some l) -> fprintf fmt "Flo(%a)" !pp_lval_ref l
-  | Fo _o -> fprintf fmt "Fo"
-  | Fc ci -> fprintf fmt "Fc(%s)" ci.cname
-  | Fi _i -> fprintf fmt "Fi(...)"
-  | FI _i -> fprintf fmt "FI(...)"
-  | Ft t -> fprintf fmt "Ft(%a)" !pp_typ_ref t
-  | Fd n -> fprintf fmt "Fd(%d)" n
-  | Fg s -> fprintf fmt "Fg(%s)" s
-  | Fp _ -> fprintf fmt "Fp(...)"
-  | FP _n -> fprintf fmt "FP(...)"
-  | Fs _ -> fprintf fmt "FS"
-  | FS _ -> fprintf fmt "FS"
-
-  | FX _ -> fprintf fmt "FX()"
 
 let make_temp_logic_var =
   let counter = ref 0 in

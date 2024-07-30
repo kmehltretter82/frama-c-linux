@@ -160,7 +160,6 @@ let subsets k l =
       | [] -> assert false
   in aux k l (List.length l)
 
-
 let list_first_n n l =
   let rec aux acc n = function
     | h :: t when n > 0 -> aux (h :: acc) (n-1) t
@@ -190,6 +189,45 @@ let list_slice ?(first = 0) ?last l =
   | None -> l
   | Some n -> list_first_n (normalize n - first) l
 
+let rev_until i l =
+  let rec aux acc =
+    function
+    | [] -> acc
+    | i'::_ when i' == i -> acc
+    | i'::l -> aux (i'::acc) l
+  in aux [] l
+
+(* mapNoCopy is like map but avoid copying the list if the function does not
+   change the elements. *)
+let map_no_copy (f: 'a -> 'a) orig =
+  let rec aux ((acc,has_changed) as res) l =
+    match l with
+    | [] -> if has_changed then List.rev acc else orig
+    | i :: resti ->
+      let i' = f i in
+      if has_changed then
+        aux (i'::acc,true) resti
+      else if i' != i then
+        aux (i'::rev_until i orig,true) resti
+      else
+        aux res resti
+  in aux ([],false) orig
+
+(* Same than map_no_copy but [f] returns a list. *)
+let map_no_copy_list (f: 'a -> 'a list) orig =
+  let rec aux ((acc,has_changed) as res) l =
+    match l with
+    | [] -> if has_changed then List.rev acc else orig
+    | i :: resti ->
+      let l' = f i in
+      if has_changed then
+        aux (List.rev_append l' acc,true) resti
+      else
+        (match l' with
+         | [i'] when i' == i -> aux res resti
+         | _ -> aux (List.rev_append l' (rev_until i orig), true) resti)
+  in aux ([],false) orig
+
 (* ************************************************************************* *)
 (** {2 Options} *)
 (* ************************************************************************* *)
@@ -215,6 +253,13 @@ let opt_hash hash v = match v with
 let opt_map2 f x y = match x, y with
   | None, _ | _, None -> None
   | Some x, Some y -> Some (f x y)
+
+let opt_map_no_copy f o =
+  match o with
+  | None -> o
+  | Some x ->
+    let x' = f x in
+    if x' != x then Some x' else o
 
 (* ************************************************************************* *)
 (** {2 Performance} *)
