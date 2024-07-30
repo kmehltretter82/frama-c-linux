@@ -94,10 +94,16 @@ let get_backtrace () =
   (* Get the backtrace before potentially destroying it in the handler below *)
   let bt = Printexc.get_backtrace () in
   let current_src_string =
-    try
-      let src = Log.get_current_source() in
-      Format.asprintf "Current source was: %a@." Filepath.pp_pos src
-    with Not_found -> "Current source was not set\n"
+    let src_text =
+      try
+        let src = Log.get_current_source () in
+        if Filepath.is_empty_pos src then
+          "<unknown>"
+        else
+          Format.asprintf "%a" Filepath.pp_pos src
+      with Not_found -> "<unset>"
+    in
+    Format.asprintf "Current source was: %s@." src_text
   in
   current_src_string ^ "The full backtrace is:\n" ^ bt
 

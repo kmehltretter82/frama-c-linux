@@ -4,7 +4,7 @@
 [test] Failure: Testing failure function
 [test:a] Warning: Another Warning A
 [test] Failure: Deferred internal error message was emitted during execution. See above messages for more information.
-[kernel] Current source was: :0
+[kernel] Current source was: <unknown>
   The full backtrace is:
   
   Plug-in test aborted: internal error.
