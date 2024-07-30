@@ -1,6 +1,6 @@
 { lib
 , stdenv
-, clang_11
+, clang_12
 , frama-c
 , frama-c-hdrck
 , frama-c-lint
@@ -12,7 +12,7 @@
 stdenv.mkDerivation rec {
   name = "plugin-checkers-shell";
   buildInputs = [
-    clang_11
+    clang_12
     frama-c
     frama-c-hdrck
     frama-c-lint
