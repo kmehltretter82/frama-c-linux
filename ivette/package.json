@@ -48,7 +48,7 @@
     "react-dom": "^18",
     "react-draggable": "^4.4.6",
     "react-fast-compare": "^3.2.2",
-    "react-flame-graph" : "^1.4.0",
+    "react-flame-graph": "^1.4.0",
     "react-force-graph-2d": "^1.25.4",
     "react-force-graph-3d": "^1.24.2",
     "react-infinite-scroller": "^1.2.6",
@@ -56,7 +56,8 @@
     "react-virtualized": "9.22.5",
     "react-virtualized-auto-sizer": "^1.0.22",
     "source-map-support": "^0.5.21",
-    "tippy.js": "6.3.7"
+    "tippy.js": "6.3.7",
+    "typedoc": "^0.26.6"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",

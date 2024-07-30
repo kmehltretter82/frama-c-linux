@@ -412,7 +412,7 @@ export class ArrayModel<Key, Row>
      Silently removes the entries.
      Modification will be only visible after a final [[reload]].
      Useful for a large number of batched updates.
-     @param key - the removed entry.
+     @param keys - the entries to remove.
    */
   removeData(keys: Collection<Key>): void {
     forEach(keys, (k) => this.index.delete(k));
@@ -472,7 +472,9 @@ export class CompactModel<Key, Row> extends ArrayModel<Key, Row> {
 
   getkey: (d: Row) => Key;
 
-  /** @param key - the key property of `Row` holding an entry identifier. */
+  /**
+   * @param getkey -
+   * returns the key property of `Row` holding an entry identifier. */
   constructor(getkey: (d: Row) => Key) {
     super();
     this.getkey = getkey;

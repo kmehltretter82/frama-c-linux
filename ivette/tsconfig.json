@@ -96,7 +96,6 @@
   "include": [
     "src/**/*",
     "src/**/*.json",
-    "api/**/*",
     "tests/**/*"
   ],
   "exclude": [

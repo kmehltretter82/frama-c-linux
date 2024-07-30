@@ -156,8 +156,9 @@ DOC_GUIDES= src/dome/doc/guides
 
 NODEBIN= ./node_modules/.bin
 
-DOCDIRS= src/ivette src/dome/renderer src/dome/utils src/frama-c/api
-DOCFILES= src/frama-c/server.ts src/frama-c/states.ts $(shell find $(DOCDIRS) -name "*.ts" -or -name "*.tsx")
+DOCDIRS= src/ivette src/dome/renderer src/dome/misc src/frama-c/kernel/api src/frama-c/plugins/*/api
+ENTRYPOINTS= $(addprefix -entryPoints , $(DOCDIRS))
+DOCFILES= src/frama-c/server.ts src/frama-c/states.ts --entryPointStrategy expand $(ENTRYPOINTS)
 
 icons: $(DOC_ICONS_GALLERY)
 
