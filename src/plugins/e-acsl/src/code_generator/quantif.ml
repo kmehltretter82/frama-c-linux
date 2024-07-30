@@ -122,7 +122,7 @@ let convert kf env loc ~is_forall quantif =
           env
           kf
           None
-          intType
+          Cil_const.intType
           (fun v _ ->
              let lv = var v in
              [ Smart_stmt.assigns ~loc ~result:lv init_val ])

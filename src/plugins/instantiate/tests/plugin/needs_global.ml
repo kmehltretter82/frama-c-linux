@@ -14,7 +14,7 @@ let retype_args _ = function
 
 let generate_function_type t =
   let params = [("x", Cil_types.TPtr(t, []), [])] in
-  Cil_types.TFun(Cil.voidType, Some params, false, [])
+  Cil_types.TFun(Cil_const.voidType, Some params, false, [])
 
 let generate_prototype function_name t =
   let fun_type = generate_function_type t in
@@ -29,7 +29,7 @@ let generate_spec needed _ _ _ =
   let open Logic_const in
   let open Instantiate.Global_context in
   let make () =
-    let vi = Cil.makeVarinfo ~ghost:true true false needed Cil.floatType in
+    let vi = Cil.makeVarinfo ~ghost:true true false needed Cil_const.floatType in
     vi.vstorage <- Extern ;
     vi
   in

@@ -183,7 +183,7 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
     in
     (* cond = 0; *)
     let cond_as_varinfo, cond_as_exp, env =
-      create_and_init_var ~loc kf Cil.intType "cond" (Cil.zero ~loc) env
+      create_and_init_var ~loc kf Cil_const.intType "cond" (Cil.zero ~loc) env
     in
     (* lbda = 0; *)
     let lbd_as_varinfo, lbd_as_exp, env =
@@ -493,7 +493,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
             env
             kf
             None
-            Cil.intType
+            Cil_const.intType
             (fun vi _e ->
                let result = Cil.var vi in
                let fname = "__gmpz_fits_ulong_p" in
@@ -812,7 +812,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
         ~loc
         kf
         name
-        Cil.voidPtrType
+        Cil_const.voidPtrType
         env
         t'
     in

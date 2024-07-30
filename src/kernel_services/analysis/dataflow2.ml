@@ -416,10 +416,10 @@ module Forwards(T : ForwardsTransfer) = struct
               (* This helps when switch is used on boolean expressions. *)
               | Const (CInt64 (z,_,_))
                 when Integer.equal z Integer.zero ->
-                new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,intType))
+                new_exp ~loc:exp_sw.eloc (UnOp(LNot,exp_sw,Cil_const.intType))
               | _ ->
                 Cil.new_exp ~loc:exp_case.eloc
-                  (BinOp (Eq, exp_sw, exp_case, Cil.intType))
+                  (BinOp (Eq, exp_sw, exp_case, Cil_const.intType))
             in
             let branch_case, branch_not_case = T.doGuard s exp before in
             (match branch_case with

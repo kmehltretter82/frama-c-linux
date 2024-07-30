@@ -217,7 +217,7 @@ let guess_intended_malloc_type stack sizev constant_size =
     | Kstmt {skind = Instr(Local_init(vi, _, _))} -> mk_typed_size vi.vtype
     | _ -> raise Exit
   with Exit | Cil.SizeOfError _ -> (* Default, use char *)
-    { min_bytes = size_min; max_bytes = size_max; elem_typ = Cil.charType;
+    { min_bytes = size_min; max_bytes = size_max; elem_typ = Cil_const.charType;
       nb_elems = nb_elems Int.one }
 
 (* Helper function to create the best type for a new base.  Builds an
@@ -376,7 +376,7 @@ let string_of_region = function
 let create_weakest_base region =
   let stack = { (Eva_utils.current_call_stack ()) with stack = [] } in
   let type_base =
-    TArray (Cil.charType, None, [])
+    TArray (Cil_const.charType, None, [])
   in
   let var = create_new_var stack "alloc" type_base Weak in
   Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
@@ -492,7 +492,7 @@ let register_malloc ?replace name ?returns_null prefix region =
     Builtins.Full { c_values; c_clobbered; c_assigns = None; }
   in
   let name = "Frama_C_" ^ name in
-  let typ () = Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf] in
+  let typ () = Cil_const.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf] in
   Builtins.register_builtin ?replace name NoCacheCallers builtin ~typ
 
 let () =
@@ -548,7 +548,7 @@ let () =
   let replace = "calloc" in
   let typ () =
     let sizeof_typ = Cil.theMachine.Cil.typeOfSizeOf in
-    Cil.voidPtrType, [ sizeof_typ; sizeof_typ ]
+    Cil_const.voidPtrType, [ sizeof_typ; sizeof_typ ]
   in
   Builtins.register_builtin ~replace name NoCacheCallers calloc_builtin ~typ
 
@@ -655,7 +655,7 @@ let frama_c_free state actuals =
 
 let () =
   Builtins.register_builtin ~replace:"free" "Frama_C_free" Cacheable
-    frama_c_free ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
+    frama_c_free ~typ:(fun () -> (Cil_const.voidType, [Cil_const.voidPtrType]))
 
 (* built-in for [__fc_vla_free] function. By construction, VLA should always
    be mapped to a single base. *)
@@ -672,7 +672,7 @@ let frama_c_vla_free state actuals =
 let () =
   Builtins.register_builtin
     ~replace:"__fc_vla_free" "Frama_C_vla_free" Cacheable frama_c_vla_free
-    ~typ:(fun () -> (Cil.voidType, [Cil.voidPtrType]))
+    ~typ:(fun () -> (Cil_const.voidType, [Cil_const.voidPtrType]))
 
 let free_automatic_bases stack state =
   (* free automatic bases that were allocated in the current function *)
@@ -839,7 +839,7 @@ let realloc_builtin state args =
 let () =
   let name = "Frama_C_realloc" in
   let replace = "realloc" in
-  let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
+  let typ () = Cil_const.(voidPtrType, [voidPtrType; Cil.theMachine.typeOfSizeOf]) in
   Builtins.register_builtin ~replace name NoCacheCallers realloc_builtin ~typ
 
 let reallocarray_builtin state args =
@@ -873,8 +873,8 @@ let () =
   let name = "Frama_C_reallocarray" in
   let replace = "reallocarray" in
   let typ () =
-    Cil.(voidPtrType,
-         [voidPtrType; theMachine.typeOfSizeOf; theMachine.typeOfSizeOf])
+    Cil_const.voidPtrType,
+    [Cil_const.voidPtrType; Cil.theMachine.typeOfSizeOf; Cil.theMachine.typeOfSizeOf]
   in
   Builtins.register_builtin
     ~replace name NoCacheCallers reallocarray_builtin ~typ

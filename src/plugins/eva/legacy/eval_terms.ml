@@ -458,12 +458,12 @@ let inject_no_deps typ cvalue =
 
 (* Integer result with no memory dependencies: constants, sizeof & alignof,
    and values of logic variables.*)
-let einteger = inject_no_deps Cil.intType
+let einteger = inject_no_deps Cil_const.intType
 
 (* Note: some reals cannot be exactly represented as floats; in which
    case we do not know their under-approximation. *)
-let ereal fval = inject_no_deps Cil.doubleType (Cvalue.V.inject_float fval)
-let efloat fval = inject_no_deps Cil.floatType (Cvalue.V.inject_float fval)
+let ereal fval = inject_no_deps Cil_const.doubleType (Cvalue.V.inject_float fval)
+let efloat fval = inject_no_deps Cil_const.floatType (Cvalue.V.inject_float fval)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilitary functions on the Cil AST                                 --- *)
@@ -513,12 +513,12 @@ let rec isLogicNonCompositeType t =
 let rec infer_type = function
   | Ctype t ->
     (match t with
-     | TInt _ -> Cil.intType
-     | TFloat _ -> Cil.doubleType
+     | TInt _ -> Cil_const.intType
+     | TFloat _ -> Cil_const.doubleType
      | _ -> t)
-  | Lvar _ -> Cil.voidPtrType (* For polymorphic empty sets *)
-  | Linteger -> Cil.intType
-  | Lreal -> Cil.doubleType
+  | Lvar _ -> Cil_const.voidPtrType (* For polymorphic empty sets *)
+  | Linteger -> Cil_const.intType
+  | Lreal -> Cil_const.doubleType
   | Ltype _ | Larrow _ as t ->
     if Logic_const.is_plain_type t then
       unsupported (Pretty_utils.to_string Cil_datatype.Logic_type.pretty t)
@@ -548,12 +548,12 @@ let infer_binop_res_type op targ =
   | PlusA | MinusA | Mult | Div -> targ
   | PlusPI | MinusPI ->
     assert (Cil.isPointerType targ); targ
-  | MinusPP -> Cil.intType
+  | MinusPP -> Cil_const.intType
   | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr ->
     (* can only be applied on integral arguments *)
-    assert (Cil.isIntegralType targ); Cil.intType
+    assert (Cil.isIntegralType targ); Cil_const.intType
   | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
-    Cil.intType (* those operators always return a boolean *)
+    Cil_const.intType (* those operators always return a boolean *)
 
 (* Computes [*tsets], assuming that [tsets] has a pointer type. *)
 let deref_tsets tsets = Cil.mkTermMem ~addr:tsets ~off:TNoOffset
@@ -814,7 +814,7 @@ let eval_logic_charlen wrapper env v ldeps =
   let eunder = under_from_over eover in
   (* the C strlen function has type size_t, but the logic strlen function has
      type ℤ (signed) *)
-  let etype = Cil.intType in
+  let etype = Cil_const.intType in
   { etype; ldeps; eover; empty = false; eunder }
 
 (* Evaluates the logical predicates strchr/wcschr. *)
@@ -1057,7 +1057,7 @@ let rec eval_term ~alarm_mode env t =
     let cvalue = LogicVarEnv.find logic_var env.logic_vars in
     if logic_var.lv_type = Linteger
     then einteger cvalue
-    else inject_no_deps Cil.doubleType cvalue
+    else inject_no_deps Cil_const.doubleType cvalue
 
   | TLval tlval ->
     let lval = eval_tlval ~alarm_mode env tlval in
@@ -1095,7 +1095,7 @@ let rec eval_term ~alarm_mode env t =
     let typ' = match op with
       | Neg -> r.etype
       | BNot -> r.etype (* can only be used on an integer type *)
-      | LNot -> Cil.intType
+      | LNot -> Cil_const.intType
     in
     let op = Eva_ast.translate_unop op in
     let v = Cvalue_forward.forward_unop r.etype op r.eover in
@@ -1149,7 +1149,7 @@ let rec eval_term ~alarm_mode env t =
     in
     let empty = Cvalue.V.is_bottom eunder in
     { ldeps = !deps;
-      etype = Cil.intType;
+      etype = Cil_const.intType;
       eunder; eover; empty; }
 
   | TCast (false, Ctype typ, t) ->
@@ -1180,7 +1180,7 @@ let rec eval_term ~alarm_mode env t =
          then V.cast_int_to_float Fval.Real r.eover
          else V.cast_float_to_float Fval.Real r.eover
        in
-       { etype = Cil.longDoubleType; (* hack until logic type *)
+       { etype = Cil_const.longDoubleType; (* hack until logic type *)
          ldeps = r.ldeps;
          eover; eunder = under_from_over eover;
          empty = r.empty }
@@ -1227,7 +1227,7 @@ let rec eval_term ~alarm_mode env t =
       empty = true; }
 
   | Tnull ->
-    { etype = Cil.voidPtrType;
+    { etype = Cil_const.voidPtrType;
       ldeps = empty_logic_deps;
       eunder = Cvalue.V.singleton_zero;
       eover = Cvalue.V.singleton_zero;
@@ -1243,7 +1243,7 @@ let rec eval_term ~alarm_mode env t =
       with Abstract_interp.Error_Top -> Ival.top
     in
     let eover = Cvalue.V.inject_ival offs in
-    { etype = Cil.intType;
+    { etype = Cil_const.intType;
       ldeps = r.ldeps;
       eover;
       eunder = under_from_over eover;
@@ -1256,7 +1256,7 @@ let rec eval_term ~alarm_mode env t =
       try Location_Bytes.fold_bases add_base r.eover V.bottom
       with Abstract_interp.Error_Top -> r.eover
     in
-    { etype = Cil.charPtrType;
+    { etype = Cil_const.charPtrType;
       ldeps = r.ldeps;
       eover;
       eunder = under_from_over eover;
@@ -1293,7 +1293,7 @@ let rec eval_term ~alarm_mode env t =
       with Abstract_interp.Error_Top -> Ival.top
     in
     let eover = V.inject_ival bl in
-    { etype = Cil.charPtrType;
+    { etype = Cil_const.charPtrType;
       ldeps = r.ldeps;
       eover;
       eunder = under_from_over eover;
@@ -1839,7 +1839,7 @@ and eval_term_as_exact_locs ~alarm_mode env t =
         let aux loc () =
           let state = env_current_state env in
           let v = find_or_alarm ~alarm_mode state loc in
-          let v = Cvalue_forward.reinterpret Cil.longDoubleType v in
+          let v = Cvalue_forward.reinterpret Cil_const.longDoubleType v in
           let is_finite =
             match V.project_float v with
             | exception Cvalue.V.Not_based_on_null -> Unknown

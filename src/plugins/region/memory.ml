@@ -181,7 +181,7 @@ let new_chunk (m: map) ?(size=0) ?ptr () =
   let clayout =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
-    | Some _ -> Cell(Ranges.gcd size Cil.(bitsSizeOf voidPtrType), ptr)
+    | Some _ -> Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
   in Ufind.make m.store { empty with clayout }
 
 let new_range (m: map) ?(fields=Fields.empty) ~size ~offset ~length data : node =

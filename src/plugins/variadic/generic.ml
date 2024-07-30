@@ -160,7 +160,7 @@ let translate_call ~builder callee pars =
 
   (* Build an array to store addresses *)
   let init = match vis with (* C standard forbids arrays of size 0 *)
-    | [] -> [Build.(of_init (Cil.makeZeroInit ~loc Cil.voidPtrType))]
+    | [] -> [Build.(of_init (Cil.makeZeroInit ~loc Cil_const.voidPtrType))]
     | l -> List.map Build.addr l
   in
   let ty = Build.(array (ptr void) ~size:(List.length init)) in

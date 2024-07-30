@@ -44,7 +44,35 @@
 
 open Cil_types
 
+(* Types *)
+
 let voidType = TVoid([])
+let intType = TInt(IInt,[])
+let uintType = TInt(IUInt,[])
+let shortType = TInt(IShort, [])
+let ushortType = TInt(IUShort, [])
+let longType = TInt(ILong,[])
+let longLongType = TInt(ILongLong,[])
+let ulongType = TInt(IULong,[])
+let ulongLongType = TInt(IULongLong, [])
+let charType = TInt(IChar, [])
+let scharType = TInt(ISChar, [])
+let ucharType = TInt(IUChar, [])
+
+let charPtrType = TPtr(charType,[])
+let scharPtrType = TPtr(scharType,[])
+let ucharPtrType = TPtr(ucharType,[])
+let charConstPtrType = TPtr(TInt(IChar, [Attr("const", [])]),[])
+
+let voidPtrType = TPtr(voidType, [])
+let voidConstPtrType = TPtr(TVoid [Attr ("const", [])], [])
+
+let intPtrType = TPtr(intType, [])
+let uintPtrType = TPtr(uintType, [])
+
+let doubleType = TFloat(FDouble, [])
+let floatType = TFloat(FFloat, [])
+let longDoubleType = TFloat (FLongDouble, [])
 
 module Vid = State_builder.SharedCounter(struct let name = "vid_counter" end)
 module Sid = State_builder.SharedCounter(struct let name = "sid" end)

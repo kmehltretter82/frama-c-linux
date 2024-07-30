@@ -50,7 +50,7 @@ let valid_size ?loc typ size =
 let heap_status () =
   let name = "__fc_heap_status" in
   let make () =
-    let vi = Cil.makeVarinfo ~ghost:true true false name Cil.intType in
+    let vi = Cil.makeVarinfo ~ghost:true true false name Cil_const.intType in
     vi.vstorage <- Extern ;
     vi
   in
@@ -60,7 +60,7 @@ let heap_status () =
 let make_is_allocable () =
   let name = "is_allocable" in
   {
-    l_var_info = Cil_const.make_logic_var_global name (Ctype Cil.voidType) ;
+    l_var_info = Cil_const.make_logic_var_global name (Ctype Cil_const.voidType) ;
     l_type = None ;
     l_tparams = [];
     l_labels = [FormalLabel("L")];

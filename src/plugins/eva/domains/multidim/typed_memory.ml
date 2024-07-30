@@ -484,7 +484,7 @@ struct
           in
           match m' with
           | `Top -> (* No suitable bound for the partition *)
-            let+ v = f ~weak:true Cil.voidType m in v
+            let+ v = f ~weak:true Cil_const.voidType m in v
           | `Bottom | `Value _ as m -> m
       in aux
 

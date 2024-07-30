@@ -96,7 +96,7 @@ module State_var =
     end)
 
 let get_state_var =
-  let add_var state = Cil.makeGlobalVar ~ghost:true state.name Cil.intType in
+  let add_var state = Cil.makeGlobalVar ~ghost:true state.name Cil_const.intType in
   State_var.memo add_var
 
 let get_state_logic_var state = Cil.cvar_to_lvar (get_state_var state)
@@ -327,11 +327,11 @@ let memo_multi_state st =
   match st.multi_state with
   | None ->
     let aux =
-      Cil.makeGlobalVar ~ghost:true (get_fresh "aorai_aux") Cil.intType
+      Cil.makeGlobalVar ~ghost:true (get_fresh "aorai_aux") Cil_const.intType
     in
     let laux = Cil.cvar_to_lvar aux in
     let set = Cil_const.make_logic_info (get_fresh (st.name ^ "_pebble")) in
-    let typ = Logic_const.make_set_type (Ctype Cil.intType) in
+    let typ = Logic_const.make_set_type (Ctype Cil_const.intType) in
     set.l_var_info.lv_type <- typ;
     set.l_labels <- [FormalLabel "L"];
     set.l_type <- Some typ;
@@ -737,7 +737,7 @@ let type_expr metaenv env ?tr ?current e =
     | PCst (Logic_ptree.StringConstant s) ->
       let t =
         Logic_const.term
-          (TConst(LStr (Logic_typing.unescape s))) (Ctype Cil.charPtrType)
+          (TConst(LStr (Logic_typing.unescape s))) (Ctype Cil_const.charPtrType)
       in
       env,t,cond
     | PCst (Logic_ptree.WStringConstant s) ->
@@ -1063,7 +1063,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
         (* We're using an int: adds an (somewhat artificial) requirements
            that the counter itself does not overflow...
         *)
-        let i = Cil.max_signed_number (Cil.bitsSizeOf Cil.intType) in
+        let i = Cil.max_signed_number (Cil.bitsSizeOf Cil_const.intType) in
         let e = Logic_const.tint ~loc i in
         TRel(Cil_types.Rlt, counter, e)
       | Some e ->
@@ -1146,8 +1146,8 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       (* TODO: makes it an integer *)
       let counter =
         let ty = if needs_pebble then
-            Cil_types.TArray (Cil.intType,None,[])
-          else Cil.intType
+            Cil_types.TArray (Cil_const.intType,None,[])
+          else Cil_const.intType
         in (* We won't always need a counter *)
         lazy (
           let
@@ -1167,7 +1167,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
         else base
       in
       let make_counter_term st =
-        Logic_const.term (TLval (make_counter st)) (Ctype Cil.intType)
+        Logic_const.term (TLval (make_counter st)) (Ctype Cil_const.intType)
       in
       Aorai_option.debug ~dkey "Inner start is %s; Inner end is %s"
         inner_start.name inner_end.name;
@@ -1359,7 +1359,7 @@ let type_trans auto metaenv env tr =
         let count = (* TODO: make it an integer. *)
           Cil.makeGlobalVar
             ~ghost:true
-            (get_fresh ("aorai_cnt_" ^ start.name)) Cil.intType
+            (get_fresh ("aorai_cnt_" ^ start.name)) Cil_const.intType
         in
         add_aux_variable count;
         let transitions =

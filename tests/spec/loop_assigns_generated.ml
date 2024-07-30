@@ -58,12 +58,12 @@ let main () =
       def.sallstmts
   in
   let s3 = Kernel_function.find_return kf in
-  let j = Cil.makeLocalVar def ~insert:true "j" Cil.intType in
-  let k = Cil.makeLocalVar def ~insert:true "k" Cil.intType in
-  let l = Cil.makeLocalVar def ~insert:true "l" Cil.intType in
-  let p = Cil.makeLocalVar def ~insert:true "p" Cil.intPtrType in
-  let q = Cil.makeLocalVar def ~insert:true "q" Cil.intPtrType in
-  let r = Cil.makeLocalVar def ~insert:true "r" Cil.intPtrType in
+  let j = Cil.makeLocalVar def ~insert:true "j" Cil_const.intType in
+  let k = Cil.makeLocalVar def ~insert:true "k" Cil_const.intType in
+  let l = Cil.makeLocalVar def ~insert:true "l" Cil_const.intType in
+  let p = Cil.makeLocalVar def ~insert:true "p" Cil_const.intPtrType in
+  let q = Cil.makeLocalVar def ~insert:true "q" Cil_const.intPtrType in
+  let r = Cil.makeLocalVar def ~insert:true "r" Cil_const.intPtrType in
   add_assigns e1 kf s j;
   add_assigns e2 kf s k;
   add_assigns e1 kf s l;

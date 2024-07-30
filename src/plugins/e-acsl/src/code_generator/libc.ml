@@ -440,7 +440,7 @@ let update_memory_model ~loc ?result env kf caller args =
   | "strncat", _ -> wrong_number_of_arguments name
 
   | "sprintf", buffer_e :: _ :: _  ->
-    let result, env = get_result_var ~loc ~name kf Cil.intType env result in
+    let result, env = get_result_var ~loc ~name kf Cil_const.intType env result in
     let result_e = Smart_exp.lval ~loc result in
     let env = Env.push env in
     let result_t = lval_to_term ~loc result in
@@ -465,7 +465,7 @@ let update_memory_model ~loc ?result env kf caller args =
   | "sprintf", _ -> wrong_number_of_arguments name
 
   | "snprintf", buffer_e :: size_e :: _ :: _ ->
-    let result, env = get_result_var ~loc ~name kf Cil.intType env result in
+    let result, env = get_result_var ~loc ~name kf Cil_const.intType env result in
     let result_e = Smart_exp.lval ~loc result in
     let env = Env.push env in
     let n_vi, n_e, env =

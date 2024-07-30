@@ -484,7 +484,7 @@ let build_automaton ~annotations kf =
       | Switch (exp1, block, cases, _) ->
         (* Guards for edges of the switch *)
         let build_guard exp2 kind =
-          let enode = BinOp (Eq,exp1,exp2,Cil.intType) in
+          let enode = BinOp (Eq,exp1,exp2,Cil_const.intType) in
           Guard (Cil.new_exp ~loc:exp2.eloc enode, kind, stmt)
         in
         (* First build the automaton for the block *)

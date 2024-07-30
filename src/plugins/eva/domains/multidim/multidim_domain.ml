@@ -234,7 +234,7 @@ struct
     let loc' = Precise_locs.imprecise_location loc in
     let add_base base map =
       (* Null base doesn't have a type ; use void instead *)
-      let typ = Option.value ~default:Cil.voidType (Base.typeof base) in
+      let typ = Option.value ~default:Cil_const.voidType (Base.typeof base) in
       Map.add base (`Value (Offset.NoOffset typ)) map
     in
     Locations.Location_Bits.(fold_bases add_base loc'.loc empty)

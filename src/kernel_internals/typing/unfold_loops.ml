@@ -692,7 +692,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
       in
       let h sloop new_stmts = (* To indicate that the unrolling has been done *)
         let kind = Ext_terms [
-            (Logic_const.term (TConst (LStr "done")) (Ctype Cil.charPtrType)) ;
+            (Logic_const.term (TConst (LStr "done")) (Ctype Cil_const.charPtrType)) ;
             Logic_const.tinteger number
           ] in
         let ext = Logic_const.new_acsl_extension "unfold" loc false kind in

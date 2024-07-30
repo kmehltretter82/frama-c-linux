@@ -291,38 +291,11 @@ val foldLeftCompound:
 (** {2 Values for manipulating types} *)
 (* ************************************************************************* *)
 
-(** void *)
-val voidType: typ
-
 (** is the given type "void"? *)
 val isVoidType: typ -> bool
 
 (** is the given type "void *"? *)
 val isVoidPtrType: typ -> bool
-
-(** int *)
-val intType: typ
-
-(** unsigned int *)
-val uintType: typ
-
-(** short *)
-val shortType : typ
-
-(** unsigned short *)
-val ushortType : typ
-
-(** long *)
-val longType: typ
-
-(** long long *)
-val longLongType: typ
-
-(** unsigned long *)
-val ulongType: typ
-
-(** unsigned long long *)
-val ulongLongType: typ
 
 (** Any signed integer type of size 16 bits.
     It is equivalent to the ISO C int16_t type but without using the
@@ -371,40 +344,6 @@ val uint32_t: unit -> typ
     @since Nitrogen-20111001
 *)
 val uint64_t: unit -> typ
-
-(** char *)
-val charType: typ
-val scharType: typ
-val ucharType: typ
-
-(** char * *)
-val charPtrType: typ
-val scharPtrType: typ
-val ucharPtrType: typ
-
-(** char const * *)
-val charConstPtrType: typ
-
-(** void * *)
-val voidPtrType: typ
-
-(** void const * *)
-val voidConstPtrType: typ
-
-(** int * *)
-val intPtrType: typ
-
-(** unsigned int * *)
-val uintPtrType: typ
-
-(** float *)
-val floatType: typ
-
-(** double *)
-val doubleType: typ
-
-(** long double *)
-val longDoubleType: typ
 
 (** @return true if and only if the given type is a signed integer type. *)
 val isSignedInteger: typ -> bool
@@ -2579,6 +2518,121 @@ val set_extension_handler:
 (* ***********************************************************************)
 
 val init_builtins_ref: (unit -> unit) ref
+
+(** void
+    @deprecated Frama-C+dev *)
+val voidType: typ
+[@@alert deprecated "Use Cil_const.voidType types instead."]
+
+(** int
+    @deprecated Frama-C+dev *)
+val intType: typ
+[@@alert deprecated "Use Cil_const.intType types instead."]
+
+(** unsigned int
+    @deprecated Frama-C+dev *)
+val uintType: typ
+[@@alert deprecated "Use Cil_const.uintType types instead."]
+
+(** short
+    @deprecated Frama-C+dev *)
+val shortType : typ
+[@@alert deprecated "Use Cil_const.shortType  types instead."]
+
+(** unsigned short
+    @deprecated Frama-C+dev *)
+val ushortType : typ
+[@@alert deprecated "Use Cil_const.ushortType  types instead."]
+
+(** long
+    @deprecated Frama-C+dev *)
+val longType: typ
+[@@alert deprecated "Use Cil_const.longType types instead."]
+
+(** long long
+    @deprecated Frama-C+dev *)
+val longLongType: typ
+[@@alert deprecated "Use Cil_const.longLongType types instead."]
+
+(** unsigned long
+    @deprecated Frama-C+dev *)
+val ulongType: typ
+[@@alert deprecated "Use Cil_const.ulongType types instead."]
+
+(** unsigned long long
+    @deprecated Frama-C+dev *)
+val ulongLongType: typ
+[@@alert deprecated "Use Cil_const.ulongLongType types instead."]
+
+(** char
+    @deprecated Frama-C+dev *)
+val charType: typ
+[@@alert deprecated "Use Cil_const.charType types instead."]
+
+(** signed char
+    @deprecated Frama-C+dev *)
+val scharType: typ
+[@@alert deprecated "Use Cil_const.scharType types instead."]
+
+(** unsigned char
+    @deprecated Frama-C+dev *)
+val ucharType: typ
+[@@alert deprecated "Use Cil_const.ucharType types instead."]
+
+(** char *
+    @deprecated Frama-C+dev *)
+val charPtrType: typ
+[@@alert deprecated "Use Cil_const.charPtrType types instead."]
+
+(** signed char *
+    @deprecated Frama-C+dev *)
+val scharPtrType: typ
+[@@alert deprecated "Use Cil_const.scharPtrType types instead."]
+
+(** unsigned char *
+    @deprecated Frama-C+dev *)
+val ucharPtrType: typ
+[@@alert deprecated "Use Cil_const.ucharPtrType types instead."]
+
+(** char const *
+    @deprecated Frama-C+dev *)
+val charConstPtrType: typ
+[@@alert deprecated "Use Cil_const.charConstPtrType types instead."]
+
+(** void *
+    @deprecated Frama-C+dev *)
+val voidPtrType: typ
+[@@alert deprecated "Use Cil_const.voidPtrType types instead."]
+
+(** void const *
+    @deprecated Frama-C+dev *)
+val voidConstPtrType: typ
+[@@alert deprecated "Use Cil_const.voidConstPtrType types instead."]
+
+(** int *
+    @deprecated Frama-C+dev *)
+val intPtrType: typ
+[@@alert deprecated "Use Cil_const.intPtrType types instead."]
+
+(** unsigned int *
+    @deprecated Frama-C+dev *)
+val uintPtrType: typ
+[@@alert deprecated "Use Cil_const.uintPtrType types instead."]
+
+(** float
+    @deprecated Frama-C+dev *)
+val floatType: typ
+[@@alert deprecated "Use Cil_const.floatType types instead."]
+
+(** double
+    @deprecated Frama-C+dev *)
+val doubleType: typ
+[@@alert deprecated "Use Cil_const.doubleType types instead."]
+
+(** long double
+    @deprecated Frama-C+dev *)
+val longDoubleType: typ
+[@@alert deprecated "Use Cil_const.longDoubleType types instead."]
 
 (*
 Local Variables:

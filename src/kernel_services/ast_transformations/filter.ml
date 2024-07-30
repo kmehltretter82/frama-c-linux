@@ -229,7 +229,7 @@ end = struct
     with Not_found ->
       let ff_var = Cil.copyVarinfo fct_var name in
       if not (Info.result_visible kf finfo) then
-        Cil.setReturnTypeVI ff_var Cil.voidType;
+        Cil.setReturnTypeVI ff_var Cil_const.voidType;
       (* Notice that we don't have to filter the parameter types here :
        * they will be update by [Cil.setFormals] later on. *)
       debug "[ff_var] Mem fct var %s:%d@."

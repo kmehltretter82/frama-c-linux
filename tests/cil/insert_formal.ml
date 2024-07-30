@@ -1,12 +1,12 @@
 open Cil_types
 
 let update_func f =
-  let insert_circ f = Cil.makeFormalVar f ~where:"^" "x" Cil.intType in
-  let insert_dollar f = Cil.makeFormalVar f ~where:"$" "x" Cil.intType in
-  let insert_circ_g f = Cil.makeFormalVar f ~ghost:true ~where:"^" "x" Cil.intType in
-  let insert_dollar_g f = Cil.makeFormalVar f ~ghost:true ~where:"$" "x" Cil.intType in
-  let insert_a f = Cil.makeFormalVar f ~where:"a" "x" Cil.intType in
-  let insert_a_g f = Cil.makeFormalVar f ~ghost:true ~where:"a" "x" Cil.intType in
+  let insert_circ f = Cil.makeFormalVar f ~where:"^" "x" Cil_const.intType in
+  let insert_dollar f = Cil.makeFormalVar f ~where:"$" "x" Cil_const.intType in
+  let insert_circ_g f = Cil.makeFormalVar f ~ghost:true ~where:"^" "x" Cil_const.intType in
+  let insert_dollar_g f = Cil.makeFormalVar f ~ghost:true ~where:"$" "x" Cil_const.intType in
+  let insert_a f = Cil.makeFormalVar f ~where:"a" "x" Cil_const.intType in
+  let insert_a_g f = Cil.makeFormalVar f ~ghost:true ~where:"a" "x" Cil_const.intType in
   let circ_list = [
     "void_circumflex" ;
     "a_circumflex" ;

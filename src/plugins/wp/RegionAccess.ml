@@ -57,7 +57,7 @@ let pp_value fmt = function
 let cc_string map exp =
   let cst = Pretty_utils.to_string Cil_datatype.Exp.pretty exp in
   let addrof = Region.of_cstring map ~eid:exp.eid ~cst in
-  { addrof ; typeOfPointed = Cil.charType ; shift=false }
+  { addrof ; typeOfPointed = Cil_const.charType ; shift=false }
 
 (* -------------------------------------------------------------------------- *)
 (* --- Reading Values                                                     --- *)
@@ -261,7 +261,7 @@ and cc_term_value (map:map) (term:term) =
   | Tnull ->
     Addr_of {
       addrof = Region.of_null map ;
-      typeOfPointed = Cil.charType ;
+      typeOfPointed = Cil_const.charType ;
       shift = false ;
     }
 
@@ -286,7 +286,7 @@ and cc_term_value (map:map) (term:term) =
     cc_term_offset_read map ofs ;
     Pure
 
-  | Tbase_addr(_at,t) -> cast Cil.voidPtrType @@ cc_term_value map t
+  | Tbase_addr(_at,t) -> cast Cil_const.voidPtrType @@ cc_term_value map t
   | Tblock_length(_at,t) | Toffset(_at,t) -> cc_term map t ; Pure
 
   | Tif(c,a,b) ->

@@ -191,7 +191,7 @@ struct
     let obj = function
       | I i -> C_int i
       | F f -> C_float f
-      | P -> C_pointer Cil.voidPtrType
+      | P -> C_pointer Cil_const.voidPtrType
       | C c -> C_comp c
     let tau = function
       | I _ -> Lang.t_int

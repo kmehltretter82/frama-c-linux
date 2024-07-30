@@ -148,7 +148,7 @@ let comparison_to_exp ~loc kf env ~name bop array1 array2 =
       kf
       None
       ~name
-      Cil.intType
+      Cil_const.intType
       (fun v _ -> [ Smart_stmt.assigns ~loc ~result:(Cil.var v) (res_value ()) ])
   in
 

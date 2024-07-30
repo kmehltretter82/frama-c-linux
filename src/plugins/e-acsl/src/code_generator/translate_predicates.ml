@@ -231,7 +231,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
             | _ -> assert false
           in
           let e, adata, env =
-            Memory_translate.call_valid ~adata ~loc kf name Cil.intType env t p
+            Memory_translate.call_valid ~adata ~loc kf name Cil_const.intType env t p
           in
           let adata = Assert.register_pred ~loc env p e adata in
           e, adata, env
@@ -268,7 +268,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
         ~loc
         kf
         "separated"
-        Cil.intType
+        Cil_const.intType
         env
         tlist
         p
@@ -295,7 +295,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
               ~loc
               kf
               "initialized"
-              Cil.intType
+              Cil_const.intType
               env
               [ t ]
               p
@@ -311,7 +311,7 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
       | Some spec -> of_bool spec.freeable, adata, env
       | None ->
         let e, adata, env =
-          Memory_translate.call ~adata ~loc kf "freeable" Cil.intType env t
+          Memory_translate.call ~adata ~loc kf "freeable" Cil_const.intType env t
         in
         let adata = Assert.register_pred ~loc env p e adata in
         e, adata, env
@@ -356,7 +356,7 @@ let generalized_untyped_to_exp ~adata ?name kf ?rte env p =
      predicate, and the typing environment must be kept. *)
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
   let e, adata, env = to_exp ~adata ?name kf ~rte env p in
-  assert (Typ.equal (Cil.typeOf e) Cil.intType);
+  assert (Typ.equal (Cil.typeOf e) Cil_const.intType);
   let env = Env.Logic_scope.reset env in
   e, adata, env
 

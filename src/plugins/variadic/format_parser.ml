@@ -78,7 +78,7 @@ let rec make_flags_unique = function
 (* When checking, we don't really care which type are returned but only if
    it can be returned *)
 let find_typedef : Format_typer.typdef_finder =
-  fun _namespace _name -> Cil.voidType
+  fun _namespace _name -> Cil_const.voidType
 
 let check_f_specification spec =
   (* Check the correctness of precision and field width fields *)

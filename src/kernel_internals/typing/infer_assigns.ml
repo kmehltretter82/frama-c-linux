@@ -51,7 +51,7 @@ let from_prototype kf =
          let typ = vi.vtype in
          if Cil.isVoidPtrType typ then
            let const = typeHasAttribute "const" (Cil.typeOf_pointed typ) in
-           let typ' = if const then Cil.charConstPtrType else Cil.charPtrType in
+           let typ' = if const then Cil_const.charConstPtrType else Cil_const.charPtrType in
            (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
          else (vi.vghost, t, typ)
       ) pointer_args

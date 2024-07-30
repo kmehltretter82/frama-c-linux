@@ -49,20 +49,20 @@ let add_int_exn f =
   let c = Cil.evar (List.hd f.sformals) in
   let loc = Cil_datatype.Location.unknown in
   let test =
-    Cil.new_exp ~loc (BinOp (Lt,c,Cil.kinteger ~loc IInt 50,Cil.intType))
+    Cil.new_exp ~loc (BinOp (Lt,c,Cil.kinteger ~loc IInt 50,Cil_const.intType))
   in
-  add_throw_test f Cil.intType test (SingleInit (Cil.zero ~loc))
+  add_throw_test f Cil_const.intType test (SingleInit (Cil.zero ~loc))
 
 let add_int_ptr_exn glob f =
   let c = Cil.evar (List.hd f.sformals) in
   let loc = Cil_datatype.Location.unknown in
   let test =
-    Cil.new_exp ~loc (BinOp (Gt,c,Cil.kinteger ~loc IInt 150, Cil.intType))
+    Cil.new_exp ~loc (BinOp (Gt,c,Cil.kinteger ~loc IInt 150, Cil_const.intType))
   in
   let init =
     SingleInit (Cil.new_exp ~loc (AddrOf(Var glob,NoOffset)))
   in
-  add_throw_test f Cil.intPtrType test init
+  add_throw_test f Cil_const.intPtrType test init
 
 let add_catch my_exn my_exn2 f =
   let exn_type = TComp(my_exn, []) in
@@ -73,10 +73,10 @@ let add_catch my_exn my_exn2 f =
   let loc = Cil_datatype.Location.unknown in
   let real_locals = f.sbody.blocals in
   let v1 = Cil.makeLocalVar f "exn" exn_type in
-  let v2 = Cil.makeLocalVar f "y" Cil.intType in
+  let v2 = Cil.makeLocalVar f "y" Cil_const.intType in
   let v3 = Cil.makeLocalVar f "exn_aux" exn_type in
   let v4 = Cil.makeLocalVar f "exn2" exn_type2 in
-  let v5 = Cil.makeLocalVar f "not_thrown" Cil.doubleType in
+  let v5 = Cil.makeLocalVar f "not_thrown" Cil_const.doubleType in
   f.sbody.blocals <- real_locals;
   let id_block =
     Cil.mkBlock [Cil.mkStmtOneInstr (Set (Cil.var v1, Cil.evar ~loc v3, loc))]

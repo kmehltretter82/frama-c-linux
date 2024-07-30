@@ -68,7 +68,7 @@ let mk_function name =
   let vi =
     Cil.makeGlobalVar ~source:true
       name
-      (TFun(Cil.voidType, Some [], false, []))
+      (TFun(Cil_const.voidType, Some [], false, []))
   in
   vi.vdefined <- true;
   (* There is no contract associated with the function *)

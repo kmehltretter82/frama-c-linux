@@ -226,7 +226,7 @@ let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
     e2, Env.transfer ~from:env2 env
   | _ ->
     let ty = match t_opt with
-      | None (* predicate *) -> Cil.intType
+      | None (* predicate *) -> Cil_const.intType
       | Some t -> Typing.get_typ ~logic_env:(Env.Logic_env.get env) t
     in
     let _, e, env =

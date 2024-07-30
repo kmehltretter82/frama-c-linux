@@ -319,7 +319,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
   (* Creating the pointer *)
   let ty = match pot with
     | PoT_pred _ ->
-      Cil.intType
+      Cil_const.intType
     | PoT_term t ->
       begin match Typing.get_number_ty ~logic_env t with
         | C_integer _ | C_float _ | Nan ->

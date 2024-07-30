@@ -163,7 +163,7 @@ class visit_adding_code_for_synchronisation =
          - what about varargs?
       *)
       let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
-      Cil.update_var_type vi_pre (TFun(Cil.voidType, args, varargs,[]));
+      Cil.update_var_type vi_pre (TFun(Cil_const.voidType, args, varargs,[]));
       vi_pre.vattr <- [];
 
       (* in particular get rid of __no_return if set in vi*)
@@ -176,7 +176,7 @@ class visit_adding_code_for_synchronisation =
       let vi_post =
         Cil.makeGlobalVar ~ghost:true
           (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
-          (TFun(voidType,Some arg,false,[]))
+          (TFun(Cil_const.voidType,Some arg,false,[]))
       in
       Kernel_function.Hashtbl.add aux_post_table kf vi_post;
       Aux_funcs.(add vi_post (Post kf));
@@ -186,9 +186,9 @@ class visit_adding_code_for_synchronisation =
          we have to update the function's formals. Search
          for LBLsformals. *)
       Cil.setFunctionTypeMakeFormals
-        fun_dec_pre (TFun(Cil.voidType, args, varargs,[]));
+        fun_dec_pre (TFun(Cil_const.voidType, args, varargs,[]));
       Cil.setFunctionTypeMakeFormals
-        fun_dec_post (TFun(voidType,Some arg,false,[]));
+        fun_dec_post (TFun(Cil_const.voidType, Some arg, false,[]));
       (* We will now fill the function with the result
          of the automaton's analysis. *)
       Globals.Functions.replace_by_definition
@@ -845,7 +845,7 @@ class visit_adding_pre_post_from_buch treatloops =
                 (TConst
                    (Logic_utils.constant_to_lconstant
                       (Data_for_aorai.op_status_to_cenum Automaton_ast.Return)))
-                (Ctype Cil.intType)))
+                (Ctype Cil_const.intType)))
       in
       let called_post_2 =
         Logic_const.new_predicate
@@ -858,7 +858,7 @@ class visit_adding_pre_post_from_buch treatloops =
                    (Logic_utils.constant_to_lconstant
                       (Data_for_aorai.func_to_cenum
                          (Kernel_function.get_name kf))))
-                (Ctype Cil.intType)))
+                (Ctype Cil_const.intType)))
       in
       let name = "Buchi_property_behavior_function_states" in
       let post_cond = [Normal, called_post; Normal, called_post_2] in

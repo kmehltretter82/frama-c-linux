@@ -815,7 +815,7 @@ let inject_mtracking_handler main =
           (* some non-standard arguments. *)
           nulls
       in
-      let ptr_size = Cil.sizeOf ~loc Cil.voidPtrType in
+      let ptr_size = Cil.sizeOf ~loc Cil_const.voidPtrType in
       let args = args @ [ ptr_size ] in
       let init = Smart_stmt.rtl_call ~loc "memory_init" args in
       let clean = Smart_stmt.rtl_call ~loc "memory_clean" [] in

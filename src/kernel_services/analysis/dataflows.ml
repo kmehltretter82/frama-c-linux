@@ -625,9 +625,9 @@ let transfer_switch_from_guard transfer_guard stmt state =
           (* This helps when switch is used on boolean expressions. *)
           | Const (CInt64 (z,_,_))
             when Integer.equal z Integer.zero ->
-            Cil.new_exp ~loc:cond.eloc (UnOp(LNot,cond,Cil.intType))
+            Cil.new_exp ~loc:cond.eloc (UnOp(LNot,cond,Cil_const.intType))
           | _ -> Cil.new_exp ~loc:exp_case.eloc
-                   (BinOp (Eq, cond, exp_case, Cil.intType))
+                   (BinOp (Eq, cond, exp_case, Cil_const.intType))
         in
         let (true_state, false_state) =
           transfer_guard stmt if_equivalent_cond input_state

@@ -58,7 +58,7 @@ let lnot ~loc e =
          with the [LNot] operator. *)
       match e.enode with
       | UnOp (LNot, e, _) -> e
-      | _ -> Cil.new_exp ~loc (UnOp (LNot, e, Cil.intType))
+      | _ -> Cil.new_exp ~loc (UnOp (LNot, e, Cil_const.intType))
     end
   | Some i when Integer.equal i Integer.zero ->
     (* The expression is an integer equal to zero, directly return one. *)

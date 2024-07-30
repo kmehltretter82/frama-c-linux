@@ -45,7 +45,96 @@
 (** Smart constructors for some CIL data types *)
 open Cil_types
 
+(** void *)
 val voidType: typ
+
+(** int
+    @since Frama-C+dev *)
+val intType: typ
+
+(** unsigned
+    @since Frama-C+dev *)
+val uintType: typ
+
+(** short
+    @since Frama-C+dev *)
+val shortType : typ
+
+(** unsigned short
+    @since Frama-C+dev *)
+val ushortType : typ
+
+(** long
+    @since Frama-C+dev *)
+val longType: typ
+
+(** long long
+    @since Frama-C+dev *)
+val longLongType: typ
+
+(** unsigned long
+    @since Frama-C+dev *)
+val ulongType: typ
+
+(** unsigned long long
+    @since Frama-C+dev *)
+val ulongLongType: typ
+
+(** char
+    @since Frama-C+dev *)
+val charType: typ
+
+(** signed char
+    @since Frama-C+dev *)
+val scharType: typ
+
+(** unsigned char
+    @since Frama-C+dev *)
+val ucharType: typ
+
+(** char *
+    @since Frama-C+dev *)
+val charPtrType: typ
+
+(** signed char *
+    @since Frama-C+dev *)
+val scharPtrType: typ
+
+(** unisgned char *
+    @since Frama-C+dev *)
+val ucharPtrType: typ
+
+(** char const *
+    @since Frama-C+dev *)
+val charConstPtrType: typ
+
+(** void *
+    @since Frama-C+dev *)
+val voidPtrType: typ
+
+(** void const *
+    @since Frama-C+dev *)
+val voidConstPtrType: typ
+
+(** int *
+    @since Frama-C+dev *)
+val intPtrType: typ
+
+(** unsigned int *
+    @since Frama-C+dev *)
+val uintPtrType: typ
+
+(** float
+    @since Frama-C+dev *)
+val floatType: typ
+
+(** double
+    @since Frama-C+dev *)
+val doubleType: typ
+
+(** long double
+    @since Frama-C+dev *)
+val longDoubleType: typ
 
 module Vid: sig val next: unit -> int end
 module Sid: sig val next: unit -> int end

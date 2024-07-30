@@ -20,7 +20,7 @@ let generate_function_type t =
   let params = [
     ("x", Cil_types.TPtr(t, []), [])
   ] in
-  Cil_types.TFun(Cil.voidType, Some params, false, [])
+  Cil_types.TFun(Cil_const.voidType, Some params, false, [])
 
 let generate_prototype t =
   let fun_type = generate_function_type t in

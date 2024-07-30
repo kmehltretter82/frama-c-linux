@@ -28,7 +28,7 @@ open Cil_types
 open Cil
 
 (** [sizeof(char)] in bits *)
-let sizeofchar () = Integer.of_int (bitsSizeOf charType)
+let sizeofchar () = Integer.of_int (bitsSizeOf Cil_const.charType)
 
 (** [sizeof(char* )] in bits *)
 let sizeofpointer () =  bitsSizeOf theMachine.upointType

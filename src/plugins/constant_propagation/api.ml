@@ -202,7 +202,7 @@ class propagate project fnames ~cast_intro = object(self)
                   (self#add_cast
                      ~ignore_const_cast:false
                      ~oldt:(Cil.typeOf expr')
-                     ~newt:Cil.charPtrType
+                     ~newt:Cil_const.charPtrType
                      expr')
                   rem
           in
