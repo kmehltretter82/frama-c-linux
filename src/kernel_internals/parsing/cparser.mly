@@ -1089,39 +1089,18 @@ ghost_parameter:
 ;
 
 declaration:                                /* ISO 6.7.*/
-    specif=decl_spec_list decls=init_declarator_list SEMICOLON
+    spec=ioption(SPEC) specif=decl_spec_list decls=init_declarator_list? SEMICOLON
   {
     let loc = Cil_datatype.Location.of_lexing_loc $loc in
-    doDeclaration None loc (fst specif) decls
+    let decls = Option.value ~default:[] decls in
+    if !Lexerhack.is_typedef () && decls = [] then begin
+      let source = fst loc in
+      let wkey = Kernel.wkey_unnamed_typedef in
+      Kernel.warning ~source ~wkey "typedef without a name"
+    end;
+    !Lexerhack.reset_typedef();
+    doDeclaration spec loc (fst specif) decls
   }
-|   decls=decl_spec_list SEMICOLON
-      {
-        let loc = Cil_datatype.Location.of_lexing_loc $loc in
-        if !Lexerhack.is_typedef () then begin
-          let source = fst loc in
-          let wkey = Kernel.wkey_unnamed_typedef in
-          Kernel.warning ~source ~wkey "typedef without a name"
-        end;
-        !Lexerhack.reset_typedef();
-        doDeclaration None loc (fst decls) []
-      }
-|   spec=SPEC specif=decl_spec_list decls=init_declarator_list SEMICOLON
-          {
-            let loc = Cil_datatype.Location.of_lexing_loc $loc in
-            doDeclaration (Some spec) loc (fst specif) decls
-          }
-|   spec=SPEC specif=decl_spec_list SEMICOLON
-      {
-        let loc = Cil_datatype.Location.of_lexing_loc $loc in
-        if !Lexerhack.is_typedef () then begin
-          let source =
-            Cil_datatype.Position.of_lexing_pos $startpos(specif)
-          in
-          let wkey = Kernel.wkey_unnamed_typedef in
-          Kernel.warning ~source ~wkey "typedef without a name"
-        end;
-        !Lexerhack.reset_typedef();
-        doDeclaration (Some spec) loc (fst specif) [] }
 |   static_assert_declaration SEMICOLON
       { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
 ;
