@@ -51,7 +51,7 @@ let external_formatters = [
     available_cmd = "black --version > /dev/null 2> /dev/null";
     check_cmd = "black --quiet --line-length 100 --check" ;
     update_cmd = "black --quiet --line-length 100" ;
-    version_cmd  = "black --version | grep black | grep -E '23\\.[0-9]+\\.[0-9]+' > /dev/null 2> /dev/null"
+    version_cmd  = "black --version | grep black | grep -E '24\\.[0-9]+\\.[0-9]+' > /dev/null 2> /dev/null"
   }
 ]
 
