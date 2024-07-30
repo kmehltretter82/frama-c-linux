@@ -1520,27 +1520,25 @@ abs_direct_decl_opt:
 |   /* empty */                     { JUSTBASE }
 ;
 
-/* NB: we can't use SPEC? below for obscure shift/reduce conflicts.
-   Feel free to investigate more.
+/* NB: we can't use option(SPEC) below for obscure shift/reduce conflicts and
+   need to inline this rule. Feel free to investigate more.
 */
 function_def:  /* (* ISO 6.9.1 *) */
- s=SPEC fn=function_def_start b=main_block
-          {
-            let (loc, specs, decl) = fn in
-            let spec_loc =
-              let loc = fst s in
-              Option.map
-                (fun (loc', spec) -> spec, (loc, loc'))
-                (Logic_lexer.spec s)
-            in
-            currentFunctionName := "<__FUNCTION__ used outside any functions>";
-            doFunctionDef spec_loc loc (trd3 b) specs decl (fst3 b)
-          }
-| fn = function_def_start b = main_block
-  { let (loc, specs, decl) = fn in
-    currentFunctionName:= "<__FUNCTION__ used outside any functions>";
-    doFunctionDef None loc (trd3 b) specs decl (fst3 b)
-  }
+ s=ioption(SPEC) fn=function_def_start b=main_block
+    {
+      let (loc, specs, decl) = fn in
+      let spec_loc =
+        match s with
+        | None -> None
+        | Some s ->
+          let loc = fst s in
+          Option.map
+            (fun (loc', spec) -> spec, (loc, loc'))
+            (Logic_lexer.spec s)
+      in
+      currentFunctionName := "<__FUNCTION__ used outside any functions>";
+      doFunctionDef spec_loc loc (trd3 b) specs decl (fst3 b)
+    }
 ;
 
 function_def_start:  /* (* ISO 6.9.1 *) */
