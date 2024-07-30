@@ -233,14 +233,7 @@ let pretty file_name =
     skip_dot file_name
   else
     let path = insert cwd file_name in
-    let file_name = path.path_name in
-    let cwd_name = cwd.path_name in
-    if String.starts_with ~prefix:cwd_name file_name && cwd_name <> file_name
-    then
-      let n = 1 + String.length cwd_name in
-      String.sub file_name n (String.length file_name - n)
-    else
-      skip_dot (add_path path)
+    skip_dot (add_path path)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Relative Paths                                                     --- *)
