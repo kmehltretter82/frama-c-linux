@@ -878,7 +878,7 @@ generic_block(content):
 ;
 
 block: /* ISO 6.8.2 */
-       generic_block(block_content) { $1 }
+  generic_block(block_content) { $1 }
 
 main_block:
   generic_block(main_block_content) { $1 }
