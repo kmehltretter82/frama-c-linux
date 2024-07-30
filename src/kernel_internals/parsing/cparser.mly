@@ -1091,7 +1091,7 @@ ghost_parameter:
 declaration:                                /* ISO 6.7.*/
     spec=ioption(SPEC) specif=decl_spec_list decls=init_declarator_list? SEMICOLON
   {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc in
+    let loc = Cil_datatype.Location.of_lexing_loc ($symbolstartpos,$endpos) in
     let decls = Option.value ~default:[] decls in
     if !Lexerhack.is_typedef () && decls = [] then begin
       let source = fst loc in
