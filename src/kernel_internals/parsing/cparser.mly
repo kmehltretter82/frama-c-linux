@@ -129,8 +129,7 @@ let register_symbol_class nl =
     if !Lexerhack.is_typedef() then !Lexerhack.add_type
     else !Lexerhack.add_identifier
   in
-  List.iter (fun ((n, _, _, _), _) -> add n) nl;
-  !Lexerhack.reset_typedef()
+  List.iter (fun ((n, _, _, _), _) -> add n) nl
 
 let doDeclaration logic_spec (loc: cabsloc) (specs: spec_elem list) (nl: init_name list)  =
   if isTypedef specs then begin
