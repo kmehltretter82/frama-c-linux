@@ -65,7 +65,6 @@ include Datatype.Make(struct
         (if v.zero then "0" else "")
         (if v.pos  then "+" else "")
   end)
-let pretty_debug = pretty
 let pretty_typ _ = pretty
 
 type context = unit

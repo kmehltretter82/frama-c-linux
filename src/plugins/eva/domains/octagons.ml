@@ -44,6 +44,11 @@ let saturate_octagons = true
    the caller either. *)
 let intraprocedural () = not (Parameters.OctagonCall.get ())
 
+module Hptmap_Info = struct
+  let initial_values = []
+  let dependencies = [ Ast.self ]
+end
+
 (* -------------------------------------------------------------------------- *)
 (*                  Basic types: pair of variables and Ival.t                 *)
 (* -------------------------------------------------------------------------- *)
@@ -158,11 +163,7 @@ module Variable : Variable = struct
       Eva_ast.deps_of_lval eval_loc (Option.get (HCE.to_lval lval))
 end
 
-module VarSet =
-  Hptset.Make
-    (Variable)
-    (struct let v = [ [ ] ] end)
-    (struct let l = [ Ast.self ] end)
+module VarSet = Hptset.Make (Variable) (Hptmap_Info)
 
 (* Pairs of related variables in an octagon.
    This module imposes an order between the two variables X and Y in a pair
@@ -587,7 +588,6 @@ end
 
 module Diamond = struct
   include Datatype.Make (DiamondDatatype)
-  let pretty_debug = pretty
 
   let top = { add = Ival.top; sub = Ival.top }
 
@@ -615,11 +615,8 @@ end
 
 (* Maps linking pairs of variables (X, Y) to intervals for X+Y and X-Y. *)
 module Octagons = struct
-  module Initial_Values = struct let v = [[]] end
-  module Dependencies = struct let l = [ Ast.self ] end
 
-  include Hptmap.Make (Pair) (Diamond)
-      (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
+  include Hptmap.Make (Pair) (Diamond) (Hptmap_Info)
 
   let internal_join = join
 
@@ -737,12 +734,8 @@ end
 
 (* Keep track of related variables in an octagon state. *)
 module Relations = struct
-  module Initial_Values = struct let v = [[]] end
-  module Dependencies = struct let l = [ Ast.self ] end
 
-  include Hptmap.Make (Variable)
-      (struct include VarSet let pretty_debug = pretty end)
-      (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
+  include Hptmap.Make (Variable) (VarSet) (Hptmap_Info)
 
   let inter =
     let cache = Hptmap_sig.PersistentCache "Octagons.Relations.inter" in
@@ -782,11 +775,8 @@ end
 (* -------------------------------------------------------------------------- *)
 
 module Intervals = struct
-  module Initial_Values = struct let v = [[]] end
-  module Dependencies = struct let l = [ Ast.self ] end
 
-  include Hptmap.Make (Variable) (Ival)
-      (Hptmap.Comp_unused) (Initial_Values) (Dependencies)
+  include Hptmap.Make (Variable) (Ival) (Hptmap_Info)
 
   let internal_join = join
 
@@ -839,8 +829,7 @@ module VariableToDeps =
 struct
   let cache_prefix = "Eva.Octagons.VariableToDeps"
 
-  include Hptmap.Make (Variable) (Deps) (Hptmap.Comp_unused)
-      (struct let v = [[]] end) (struct let l = [Ast.self] end)
+  include Hptmap.Make (Variable) (Deps) (Hptmap_Info)
 
   let is_included: t -> t -> bool =
     let cache_name = cache_prefix ^ ".is_included" in
@@ -903,14 +892,12 @@ module BaseToVariables = struct
     include Datatype.Pair
         (VSet) (* Directly dependent variables *)
         (VSet) (* Indirectly dependent variables *)
-    let pretty_debug = pretty
     let inter (s1,t1) (s2,t2) = VSet.inter s1 s2, VSet.inter t1 t2
     let union (s1,t1) (s2,t2) = VSet.union s1 s2, VSet.union t1 t2
     let is_empty (s, t) = VSet.is_empty s && VSet.is_empty t
   end
 
-  include Hptmap.Make (Base.Base) (VSetPair) (Hptmap.Comp_unused)
-      (struct let v = [[]] end) (struct let l = [Ast.self] end)
+  include Hptmap.Make (Base.Base) (VSetPair) (Hptmap_Info)
 
   let cache_prefix = "Eva.Octagons.BaseToVariables"
 

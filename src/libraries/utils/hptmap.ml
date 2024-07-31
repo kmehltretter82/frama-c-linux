@@ -93,13 +93,6 @@ struct
 end
 type tag = Tag_comp.t
 
-module Comp_unused =
-struct
-  let e = false
-  let f _ _ = false
-  let compose _ _ = false
-end
-
 (* A tree is either empty, or a leaf node, containing both
    the integer key and a piece of data, or a binary node.
    Each binary node carries two integers. The first one is
@@ -135,11 +128,6 @@ let rec iter f htr =
 module type Id_Datatype = sig
   include Datatype.S
   val id: t -> int
-end
-
-module type V = sig
-  include Datatype.S
-  val pretty_debug: t Pretty_utils.formatter
 end
 
 module Shape(Key: Id_Datatype) = struct
@@ -592,29 +580,25 @@ module type Compositional_bool = sig
   type key
   type v
 
-  val e : bool
-  val f : key -> v -> bool
+  val empty : bool
+  val leaf : key -> v -> bool
   val compose : bool -> bool -> bool
 end
 
-module type Initial_values = sig
+module type Info = sig
   type key
   type v
-  val v : (key*v) list list
+  val initial_values : (key * v) list list
+  val dependencies : State.t list
 end
 
-module type Datatype_deps = sig
-  val l : State.t list
-end
-
-module Make
+module Make_with_compositional_bool
     (Key: Id_Datatype)
-    (V : V)
+    (V : Datatype.S)
     (Compositional_bool : Compositional_bool with type key := Key.t
                                               and type v := V.t)
-    (Initial_Values: Initial_values with type key := Key.t
-                                     and type v := V.t)
-    (Datatype_deps: Datatype_deps)
+    (Info: Info with type key := Key.t
+                 and type v := V.t)
 =
 struct
 
@@ -632,7 +616,7 @@ struct
         "L@[<v>@[(A %x, T %a)@]@ @[(AK %x)%a@]@ @[ -> (AV %x)@]@ @[%a@]@]"
         (Extlib.address_of_value t) Tag_comp.pretty comp
         (Extlib.address_of_value k) Key.pretty k
-        (Extlib.address_of_value v) V.pretty_debug v
+        (Extlib.address_of_value v) V.pretty v
     | Branch (prefix, mask, t1, t2, tag) as t ->
       Format.fprintf fmt
         "B@[<v>@[(A %x, T %a, P %x, M %x)@]@ @[%a@]@ @[ %a@]@]"
@@ -653,7 +637,7 @@ struct
 
   let compositional_bool t =
     match t with
-    | Empty -> Compositional_bool.e
+    | Empty -> Compositional_bool.empty
     | Leaf (_,_,tc)
     | Branch (_,_,_,_,tc) -> Tag_comp.get_comp tc
 
@@ -663,16 +647,23 @@ struct
 
   let initial_values =
     let tc k v =
-      let b = Compositional_bool.f k v in
+      let b = Compositional_bool.leaf k v in
       let tag = !current_tag in
       incr current_tag;
       Tag_comp.encode tag b
+    in
+    (* If required, add the empty map to the initial values, as it is always
+       exported by the functor at Caml link-time. *)
+    let initial_values =
+      if List.mem [] Info.initial_values
+      then Info.initial_values
+      else [] :: Info.initial_values
     in
     List.map
       (function [k,v] -> Leaf (k, v, tc k v)
               | [] -> Empty
               | _ -> assert false)
-      Initial_Values.v
+      initial_values
 
   let rehash_ref = ref (fun _ -> assert false)
 
@@ -741,7 +732,7 @@ struct
       end)
       (struct
         let name = Type.name ty ^ " hashconsing table"
-        let dependencies = Datatype_deps.l
+        let dependencies = Info.dependencies
         let size = 137
       end)
 
@@ -751,7 +742,7 @@ struct
     (* The test k < p+m and the implementation of [highest_bit] do not work
        with negative keys. *)
     assert (Key.id k >= 0);
-    let b = Compositional_bool.f k v in
+    let b = Compositional_bool.leaf k v in
     let tag = !current_tag in
     let new_tr = Leaf (k, v, Tag_comp.encode tag b) in
     let result = PatriciaHashconsTbl.merge new_tr in
@@ -1435,6 +1426,18 @@ struct
   let equal_subtree = equal
 end
 
+module Comp_unused = struct
+  let empty = false
+  let leaf _ _ = false
+  let compose _ _ = false
+end
+
+module Make
+    (Key: Id_Datatype)
+    (V : Datatype.S)
+    (Info: Info with type key := Key.t
+                 and type v := V.t)
+  = Make_with_compositional_bool (Key) (V) (Comp_unused) (Info)
 
 (*
 Local Variables:

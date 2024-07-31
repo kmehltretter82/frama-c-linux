@@ -307,18 +307,18 @@ module Stmt_Id = struct
       end)
   let id stmt = stmt.sid
 end
+
+module Hptset_Info = struct
+  let initial_values = []
+  let dependencies = [] (* This should be [Ast.self], but cannot be done here *)
+end
+
 module Stmt = struct
   include Stmt_Id
 
   let pretty_sid fmt s = Format.pp_print_int fmt s.sid
 
-  module Hptset = struct
-    include Hptset.Make
-        (Stmt_Id)
-        (struct let v = [ [ ] ] end)
-        (struct let l = [ ] (* This should be [Ast.self], but cannot be done
-                               here *) end)
-  end
+  module Hptset = Hptset.Make (Stmt_Id) (Hptset_Info)
   let () = clear_caches := Hptset.clear_caches :: !clear_caches
 
   let rec loc_skind = function
@@ -760,12 +760,7 @@ end
 module Varinfo = struct
   include Varinfo_Id
 
-  module Hptset = struct
-    include Hptset.Make
-        (Varinfo_Id)
-        (struct let v = [ [ ] ] end)
-        (struct let l = [ ] (* Should morally be [Ast.self] *) end)
-  end
+  module Hptset = Hptset.Make (Varinfo_Id) (Hptset_Info)
   let () = clear_caches := Hptset.clear_caches :: !clear_caches
 end
 

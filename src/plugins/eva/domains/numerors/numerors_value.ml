@@ -113,7 +113,6 @@ module T = struct
   let pretty = pp_print
 end
 include Datatype.Make(T)
-let pretty_debug = pretty
 let pretty_typ _ = pretty
 
 type context = unit

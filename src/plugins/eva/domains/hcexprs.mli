@@ -40,7 +40,6 @@ module E: Datatype.S with type t = unhashconsed_exprs
 module HCE: sig
   include Datatype.S_with_collections
   val self: State.t
-  val pretty_debug: t Pretty_utils.formatter
 
   val id: t -> int
 

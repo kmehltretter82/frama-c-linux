@@ -65,7 +65,6 @@ module G = struct
           | Some i -> Abstract_interp.Int.pretty fmt i
         in
         Format.fprintf fmt "[%a .. %a]" (pp_bound '-') min (pp_bound '+') max
-    let pretty_debug = pretty
 
     let inject_range n1 n2 : t =
       Some (Integer.of_int (min n1 n2)), Some (Integer.of_int (max n1 n2))
@@ -272,6 +271,11 @@ module G = struct
 
   end
 
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+
   (* A MV contains (usual) values for the different bases that are incremented
      in a loop.
      1. for missing bases, no information is stored (i.e. Top)
@@ -280,9 +284,7 @@ module G = struct
   *)
   module MV = struct
 
-    include Hptmap.Make(Base)(Cvalue.V)(Hptmap.Comp_unused)
-        (struct let v = [] end)
-        (struct let l = [Ast.self] end)
+    include Hptmap.Make (Base) (Cvalue.V) (Hptmap_Info)
 
     (* This function computes a pointwise union on two MVs assumed to have
        disjoint set of keys. *)
@@ -319,9 +321,7 @@ module G = struct
      are not incremented in one inner, but only in outemost one. *)
   module MC = struct
 
-    include Hptmap.Make(Base)(Bounds)(Hptmap.Comp_unused)
-        (struct let v = [] end)
-        (struct let l = [Ast.self] end)
+    include Hptmap.Make (Base) (Bounds) (Hptmap_Info)
 
     (* This function computes a pointwise union on two MCs assumed to have
        disjoint set of keys. *)

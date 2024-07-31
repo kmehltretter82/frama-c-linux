@@ -96,8 +96,6 @@ module HCE = struct
 
   include S
 
-  let pretty_debug = pretty
-
   let of_lval lv = hashcons (LV lv)
 
   let of_exp (exp : Eva_ast.exp) =
@@ -130,8 +128,12 @@ module HCE = struct
     | LV lval -> if Lval.equal lval late then of_exp heir else h
 end
 
-module HCESet =
-  Hptset.Make (HCE) (struct let v = [] end) (struct let l = [Ast.self] end)
+module Hptmap_Info = struct
+  let initial_values = []
+  let dependencies = [ Ast.self ]
+end
+
+module HCESet = Hptset.Make (HCE) (Hptmap_Info)
 
 type lvalues = {
   read : HCESet.t;
@@ -158,8 +160,7 @@ module HCEToZone = struct
 
   let cache_prefix = "Value.Symbolic_exprs.K2Z"
 
-  include Hptmap.Make(HCE)(Locations.Zone)(Hptmap.Comp_unused)
-      (struct let v = [] end)(struct let l = [Ast.self] end)
+  include Hptmap.Make (HCE) (Locations.Zone) (Hptmap_Info)
 
   let is_included =
     let cache_name = cache_prefix ^ ".is_included" in
@@ -199,8 +200,7 @@ end
 
 module BaseToHCESet = struct
 
-  include Hptmap.Make (Base.Base) (HCESet) (Hptmap.Comp_unused)
-      (struct let v = [] end)(struct let l = [Ast.self] end)
+  include Hptmap.Make (Base.Base) (HCESet) (Hptmap_Info)
 
   let cache_prefix = "Value.Symbolic_exprs.B2K"
 

@@ -32,8 +32,12 @@ module V = Cvalue.V (* TODO: functorize (with locations too ?) *)
 
 (* Map from expressions/lvalues to abstract values *)
 module K2V = struct
-  module M = Hptmap.Make(K.HCE)(V)(Hptmap.Comp_unused)
-      (struct let v = [] end)(struct let l = [Ast.self] end)
+
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+  module M = Hptmap.Make (K.HCE) (V) (Hptmap_Info)
 
   include M
 

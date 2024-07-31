@@ -223,13 +223,15 @@ module EdgeList = struct
   include Datatype.List_with_collections(Edge)
       (struct let module_name = "Value.Traces_domain.EdgeList" end)
   let pretty = Edge.pretty_list
-  let pretty_debug = pretty
 end
 
 module Graph = struct
-  include Hptmap.Make(Node)(EdgeList)(Hptmap.Comp_unused)
-      (struct let v = [[]] end)
-      (struct let l = [Ast.self] end)
+
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+  include Hptmap.Make (Node) (EdgeList) (Hptmap_Info)
 
   let is_included =
     let cache = Hptmap_sig.NoCache in

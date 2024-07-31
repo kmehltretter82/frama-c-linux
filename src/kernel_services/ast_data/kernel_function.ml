@@ -628,8 +628,10 @@ module Make_Table = State_builder.Hashtbl(Cil_datatype.Kf.Hashtbl)
 module Hptset = struct
   include Hptset.Make
       (Cil_datatype.Kf)
-      (struct let v = [ [ ] ] end)
-      (struct let l = [ Ast.self ] end)
+      (struct
+        let initial_values = []
+        let dependencies = [ Ast.self ]
+      end)
   let () = Ast.add_monotonic_state self
   let () = Ast.add_hook_on_update clear_caches
 end

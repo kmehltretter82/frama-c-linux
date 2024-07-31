@@ -85,5 +85,3 @@ val to_stmt_list : t -> Cil_types.stmt list
 val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
 
 [@@@ api_end]
-
-val pretty_debug : Format.formatter -> t -> unit

@@ -33,7 +33,6 @@ type t = {
 include Datatype.S with type t := t
 
 val pretty_precise: Format.formatter -> t -> unit
-val pretty_debug: Format.formatter -> t -> unit
 
 (* Constructors *)
 

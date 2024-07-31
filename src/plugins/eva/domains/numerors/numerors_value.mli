@@ -22,8 +22,6 @@
 
 include Abstract_value.Leaf with type context = unit
 
-val pretty_debug : t Pretty_utils.formatter
-
 (** Reduction of an error value according to a floating-point interval. *)
 val reduce: Fval.t -> t -> t Eval.or_bottom
 

@@ -28,7 +28,6 @@ module type Value = sig
   include Abstract_value.Leaf
   val widen : t -> t -> t
   val track_variable: Cil_types.varinfo -> bool
-  val pretty_debug: t Pretty_utils.formatter
   val builtins: (string * t builtin) list
 end
 
@@ -44,11 +43,12 @@ end
 
 module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
 
-  module Initial_Values = struct let v = [] end
-  module Deps = struct let l = [Ast.self] end
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
 
-  include Hptmap.Make
-      (Base.Base) (Value) (Hptmap.Comp_unused) (Initial_Values) (Deps)
+  include Hptmap.Make (Base.Base) (Value) (Hptmap_Info)
 
   let name = Info.name
 

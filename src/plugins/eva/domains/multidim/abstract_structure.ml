@@ -75,13 +75,14 @@ struct
         let name = "Abstract_Memory.Structure.Values"
         let reprs = [ of_raw Bit.zero ]
       end)
-    let pretty_debug = pretty
   end
-  module Initial_Values = struct let v = [[]] end
-  module Deps = struct let l = Config.deps end
 
-  module FieldMap =
-    Hptmap.Make (Field) (Values) (Hptmap.Comp_unused) (Initial_Values) (Deps)
+
+  module Hptmap_Info = struct
+    let initial_values = []
+    let dependencies = [ Ast.self ]
+  end
+  module FieldMap = Hptmap.Make (Field) (Values) (Hptmap_Info)
 
   type t = {
     padding: Bit.t;

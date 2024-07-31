@@ -29,13 +29,7 @@ type prefix
 module type Id_Datatype = sig
   include Datatype.S
   val id: t -> int (** Identity of a key. Must verify [id k >= 0] and
-                       [equal k1 k2 ==> id k1 = id k2] *)
-end
-
-(** Values stored in the map *)
-module type V = sig
-  include Datatype.S
-  val pretty_debug: t Pretty_utils.formatter
+                       [equal k1 k2 <==> id k1 = id k2] *)
 end
 
 (** This functor builds {!Hptmap_sig.Shape} for maps indexed by keys [Key],
@@ -45,36 +39,18 @@ module Shape (Key : Id_Datatype): sig
   type 'a t = 'a map
 end
 
-(** A boolean information is maintained for each tree, by composing the
-    boolean on the subtrees and the value information present on each leaf.
-    Use {!Comp_unused} for a default implementation. *)
-module type Compositional_bool = sig
+(** Required information for the correctness of the hptmaps. *)
+module type Info = sig
   type key
   type v
 
-  val e : bool
-  (** Value for the empty tree *)
-
-  val f : key -> v -> bool
-  (** Value for a leaf *)
-
-  val compose : bool -> bool -> bool
-  (** Composition of the values of two subtrees *)
-end
-
-module type Initial_values = sig
-  type key
-  type v
-  val v : (key*v) list list
+  val initial_values : (key * v) list list
   (** List of the maps that must be shared between all instances of Frama-C
-      (the maps being described by the list of their elements).
+      (the maps being described by the list of their bindings).
       Must include all maps that are exported at Caml link-time when the
-      functor is applied. This usually includes at least the empty map, hence
-      [v] nearly always contains [[]]. *)
-end
+      functor is applied. *)
 
-module type Datatype_deps = sig
-  val l : State.t list
+  val dependencies : State.t list
   (** Dependencies of the hash-consing table. The table will be cleared
       whenever one of those dependencies is cleared. *)
 end
@@ -83,24 +59,44 @@ end
     to values [V]. *)
 module Make
     (Key : Id_Datatype)
-    (V : V)
-    (_ : Compositional_bool with type key := Key.t
-                             and type v := V.t)
-    (_ : Initial_values with type key := Key.t
-                         and type v := V.t)
-    (_ : Datatype_deps)
+    (V : Datatype.S)
+    (_ : Info with type key := Key.t
+               and type v := V.t)
   : Hptmap_sig.S with type key = Key.t
                   and type v = V.t
                   and type 'v map = 'v Shape(Key).map
                   and type prefix = prefix
 
-(** Default implementation for the [Compositional_bool] argument of the functor
-    {!Make}. To be used when no interesting compositional bit can be computed. *)
-module Comp_unused : sig
-  val e : bool
-  val f : 'a -> 'b -> bool
+(** An additional boolean information is computed for each tree, by composing
+    the boolean on the subtrees and the value information on each leaf. *)
+module type Compositional_bool = sig
+  type key
+  type v
+
+  val empty : bool
+  (** Value for the empty tree *)
+
+  val leaf : key -> v -> bool
+  (** Value for a leaf *)
+
   val compose : bool -> bool -> bool
+  (** Composition of the values of two subtrees *)
 end
+
+(** This functor builds the complete module of maps indexed by keys [Key]
+    to values [V], with an additional boolean information maintained for
+    each tree. *)
+module Make_with_compositional_bool
+    (Key : Id_Datatype)
+    (V : Datatype.S)
+    (_ : Compositional_bool with type key := Key.t
+                             and type v := V.t)
+    (_ : Info with type key := Key.t
+               and type v := V.t)
+  : Hptmap_sig.S with type key = Key.t
+                  and type v = V.t
+                  and type 'v map = 'v Shape(Key).map
+                  and type prefix = prefix
 
 (*
 Local Variables:

@@ -452,7 +452,6 @@ module Base = struct
         let copy = Datatype.undefined
       end)
   let id = id
-  let pretty_debug = pretty
 end
 
 include Base
@@ -461,8 +460,10 @@ module Hptshape = Hptmap.Shape (Base)
 
 module Hptset = Hptset.Make
     (Base)
-    (struct let v = [ [ ]; [Null] ] end)
-    (struct let l = [ Ast.self ] end)
+    (struct
+      let initial_values = [ [Null] ]
+      let dependencies = [ Ast.self ]
+    end)
 let () = Ast.add_monotonic_state Hptset.self
 let () = Ast.add_hook_on_update Hptset.clear_caches
 
@@ -553,9 +554,11 @@ let of_string_exp e =
 module SetLattice = Make_Hashconsed_Lattice_Set(Base)(Hptset)
 
 module BMap =
-  Hptmap.Make (Base) (Base) (Hptmap.Comp_unused)
-    (struct let v = [ [] ] end)
-    (struct let l = [ Ast.self ] end)
+  Hptmap.Make (Base) (Base)
+    (struct
+      let initial_values = []
+      let dependencies = [ Ast.self ]
+    end)
 
 type substitution = base Hptshape.map
 

@@ -141,7 +141,11 @@ struct
   let default_offsetmap b = default_offsetmap_aux b (Base.validity b)
 
   module LBase = struct
-    include Hptmap.Make(Base.Base)(LOffset)(Hptmap.Comp_unused)(struct let v = [[]] end)(struct let l = [ Ast.self ] end)
+    module Hptmap_Info = struct
+      let initial_values = []
+      let dependencies = [ Ast.self ]
+    end
+    include Hptmap.Make (Base.Base) (LOffset) (Hptmap_Info)
     let () = Ast.add_monotonic_state self
 
     (* We override [add] so that the map is canonical: no key should be
