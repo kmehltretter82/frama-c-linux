@@ -46,10 +46,16 @@ c_id_maybe_pointer = c_identifier + "[*]*"
 optional_c_id = "(?:" + c_identifier + ")?"
 non_empty_whitespace = r"[ \t\r\n]+"  # includes newline/CR
 whitespace = "[ \t\r\n]*"  # includes newline/CR
-attribute = r"__attribute__\(\("+whitespace+c_identifier+whitespace+r"\)\)"
+attribute = r"__attribute__\(\(" + whitespace + c_identifier + whitespace + r"\)\)"
 maybe_attr = "(?:" + attribute + non_empty_whitespace + ")?"
 type_prefix = (
-    maybe_attr + c_id_maybe_pointer + r"(?:\s+[*]*" + c_id_maybe_pointer + ")*" + non_empty_whitespace + "[*]*"
+    maybe_attr
+    + c_id_maybe_pointer
+    + r"(?:\s+[*]*"
+    + c_id_maybe_pointer
+    + ")*"
+    + non_empty_whitespace
+    + "[*]*"
 )
 optional_type_prefix = "(?:" + type_prefix + whitespace + ")?"
 argument_list = r"\([^)]*\)"
