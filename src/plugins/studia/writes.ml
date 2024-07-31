@@ -140,7 +140,7 @@ let inst_writes z =
 let base_inits base acc =
   match Base.to_varinfo base with
   | exception Base.Not_a_C_variable -> acc
-  | vi when vi.vglob ->
+  | vi when vi.vglob && vi.vsource ->
     let initinfo = Globals.Vars.find vi in
     GlobalInit (vi, initinfo) :: acc
   | vi when vi.vformal ->
