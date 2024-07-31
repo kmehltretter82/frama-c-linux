@@ -1285,15 +1285,6 @@ let doVisit (vis: 'visitor)
 let doVisitCil vis previsit startvisit children node =
   doVisit vis vis#plain_copy_visitor previsit startvisit children node
 
-let mapNoCopy = Extlib.map_no_copy
-[@@alert deprecated "Use [Extlib.map_no_copy] instead"]
-
-let mapNoCopyList = Extlib.map_no_copy_list
-[@@alert deprecated "Use [Extlib.map_no_copy_list] instead"]
-
-let optMapNoCopy = Extlib.opt_map_no_copy
-[@@alert deprecated "Use [Extlib.opt_map_no_copy] instead."]
-
 (* A visitor for lists *)
 let doVisitList  (vis: 'visit)
     only_copy_vis
@@ -7618,6 +7609,16 @@ let uintPtrType = uintPtrType
 let doubleType = doubleType
 let floatType = floatType
 let longDoubleType = longDoubleType
+
+(******************************************************************************)
+(** Forward Extlib copy functions                                             *)
+(******************************************************************************)
+
+let mapNoCopy = Extlib.map_no_copy
+
+let mapNoCopyList = Extlib.map_no_copy_list
+
+let optMapNoCopy = Extlib.opt_map_no_copy
 
 (*
 Local Variables:
