@@ -816,6 +816,45 @@ module Cvalue_callbacks: sig
   val register_call_results_hook: call_results_hook -> unit
 end
 
+module Eva_perf: sig
+  (** Statistics about the analysis performance. *)
+
+  (** Statistic about the analysis time of a function or a callstack. *)
+  type stat = {
+    nb_calls: int;
+    (** How many times the given function or callstack has been analyzed. *)
+    self_duration: float;
+    (** Time spent analyzing the function or callstack itself. *)
+    total_duration: float;
+    (** Total time, including the analysis of other functions called. *)
+    called: Kernel_function.Hptset.t;
+    (** Set of functions called from this function or callstack. *)
+  }
+
+  type 'a by_fun = (Cil_types.kernel_function * 'a) list
+
+  (** Returns a list of the functions with the longest total analysis time,
+      sorted by decreasing analysis time. Each function [f] is associated to
+      its stat and the unsorted list of stats of all function calls from [f]. *)
+  val compute_stat_by_fun: unit -> (stat * stat by_fun) by_fun
+
+  (** Statistics about each analyzed callstack. *)
+  module StatByCallstack : sig
+    type callstack = Cil_types.kernel_function list
+
+    (** Get the current analysis statistic for a callstack. *)
+    val get: callstack -> stat
+
+    (** Iterate on the statistic of every analyzed callstack. *)
+    val iter: (callstack -> stat -> unit) -> unit
+
+    (** Set a hook on statistics computation *)
+    val add_hook_on_change:
+      ((callstack, stat) State_builder.hashtbl_event -> unit) -> unit
+
+  end
+end
+
 module Logic_inout: sig
   (** Functions used by the Inout and From plugins to interpret predicate
       and assigns clauses. This API may change according to these plugins

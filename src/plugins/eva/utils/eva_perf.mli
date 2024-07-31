@@ -20,28 +20,64 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Call [start_call] when starting analyzing a new function call.
-    The new function is on the top of the call stack.*)
-val start_call: prev:Callstack.t option -> Callstack.t -> unit
+(** Call [start] when starting analyzing a new callstack. *)
+val start: Callstack.t -> unit
 
-(** Call [end_call] when finishing analyzing a function. The
-    function must still be on the top of the call stack. *)
-val end_call: Callstack.t -> unit
+(** Call [stop] when finishing analyzing a callstack. *)
+val stop: Callstack.t -> unit
+
+(** Reset the internal state of the module. *)
+val reset: unit -> unit
 
 (** Display a complete summary of performance informations. Can be
     called during the analysis. *)
 val display: Format.formatter -> unit
 
-(** Reset the internal state of the module; to call at the very
-    beginning of the analysis. *)
-val reset: unit -> unit
+[@@@ api_start]
+(** Statistics about the analysis performance. *)
 
-module KfList : sig
-  include Datatype.S_with_collections with type t = Kernel_function.t list
-  val pretty : ?sep:Pretty_utils.sformat -> Format.formatter ->
-    Kernel_function.t list -> unit
+(** Statistic about the analysis time of a function or a callstack. *)
+type stat = {
+  nb_calls: int;
+  (** How many times the given function or callstack has been analyzed. *)
+  self_duration: float;
+  (** Time spent analyzing the function or callstack itself. *)
+  total_duration: float;
+  (** Total time, including the analysis of other functions called. *)
+  called: Kernel_function.Hptset.t;
+  (** Set of functions called from this function or callstack. *)
+}
+
+type 'a by_fun = (Cil_types.kernel_function * 'a) list
+
+(** Returns a list of the functions with the longest total analysis time,
+    sorted by decreasing analysis time. Each function [f] is associated to
+    its stat and the unsorted list of stats of all function calls from [f]. *)
+val compute_stat_by_fun: unit -> (stat * stat by_fun) by_fun
+
+(** Statistics about each analyzed callstack. *)
+module StatByCallstack : sig
+  type callstack = Cil_types.kernel_function list
+
+  (** Get the current analysis statistic for a callstack. *)
+  val get: callstack -> stat
+
+  (** Iterate on the statistic of every analyzed callstack. *)
+  val iter: (callstack -> stat -> unit) -> unit
+
+  (** Set a hook on statistics computation *)
+  val add_hook_on_change:
+    ((callstack, stat) State_builder.hashtbl_event -> unit) -> unit
+  [@@@ api_end]
+
+  (** Sub-signature of [State_builder.Hashtbl] required by the server
+      to build synchronized arrays. *)
+
+  type key = Cil_types.kernel_function list
+  type data = stat
+  module Datatype: Datatype.S
+  val add_hook_on_update: (Datatype.t -> unit) -> unit
+  [@@@ api_start]
 end
 
-module EvaFlamegraph :
-  State_builder.Hashtbl with type key = KfList.t
-                         and type data = float * float
+[@@@ api_end]

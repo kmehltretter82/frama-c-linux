@@ -870,96 +870,43 @@ let () = Request.register ~package
     get_states
 
 
+(* ----- Flamegraph and execution times ------------------------------------- *)
 
-(* ----- Flamegraph --------------------------------------------------------- *)
-
-module Jkfstack :
-sig
-  include Data.S with type t = Eva_perf.KfList.t
-  val get : Eva_perf.KfList.t -> int
-end = Data.Index
-    (Eva_perf.KfList.Map)
-    (struct
-      let package = package
-      let name = "kfstack"
-      let descr = Markdown.plain "Kernel function stack identifier"
-    end)
-
-module Jkfs : Request.Output with type t = Eva_perf.KfList.t = struct
-
-  type t = Eva_perf.KfList.t
-
-  let jcalllink = Server.Data.declare ~package
-      ~name:"calllink" ~descr:(Markdown.plain "Kernel function list infos")
-      (Jrecord [
-          "callee" , Kernel_ast.Decl.jtype ;
-          "caller" , Joption Kernel_ast.Decl.jtype ;
-        ])
-
-  let jtype = Package.(Jarray jcalllink)
-
-  let jkfstack ~jcaller ~jcallee =
-    `Assoc [
-      "callee", jcallee ;
-      "caller", jcaller ;
-    ]
-
-  let to_json (cl : t) =
-    let aux (acc, jcaller) callee =
-      let jcallee = Kernel_ast.Decl.to_json (SFunction callee) in
-      jkfstack ~jcaller ~jcallee :: acc, jcallee
-    in
-    match cl with
-    | [] -> `List []
-    | entry :: r ->
-      let entry_point = Kernel_ast.Decl.to_json (SFunction entry) in
-      let l, _last_callee =
-        List.fold_left aux
-          ([`Assoc [ "callee", entry_point ]], entry_point)
-          (List.rev r)
-      in `List l
-
-end
+let callstack_to_string kf_list =
+  let pp_list = Pretty_utils.pp_list ~sep:":" Kernel_function.pretty in
+  Format.asprintf "%a" pp_list (List.rev kf_list)
 
 let _evaFlamegraph =
   let model = States.model () in
-  (* This field is useful for interacting with other components,
-     eg. the currently selected callstack in EVA values *)
-  States.column model ~name:"stack"
-    ~descr:(Markdown.plain "Caller list identifier")
-    ~data:(module Jkfstack) ~get:fst ;
-  (* This field contains the computation time *)
-  States.column model ~name:"time"
-    ~descr:(Markdown.plain "Computation time for the kernel function stack")
+
+  States.column model ~name:"stackNames"
+    ~descr:(Markdown.plain "Callstack as functions name list, starting from main")
+    ~data:(module Data.Jlist (Data.Jstring))
+    ~get:(fun (cs, _) -> List.rev_map Kernel_function.get_name cs);
+
+  States.column model ~name:"nbCalls"
+    ~descr:(Markdown.plain "Number of times the callstack has been analyzed")
+    ~data:(module Data.Jint)
+    ~get:(fun (_cs, stat) -> stat.Eva_perf.nb_calls);
+
+  States.column model ~name:"selfTime"
+    ~descr:(Markdown.plain "Computation time for the callstack itself")
     ~data:(module Data.Jfloat)
-    ~get:(fun (_cs, (_start, duration)) -> duration);
-  (* This field might be useful to display tooltips on the flames *)
-  States.column model ~name:"title"
-    ~descr:(Markdown.plain "Kernel function description")
-    ~data:(module Data.Jstring)
-    ~get:(fun (cl,_) -> Pretty_utils.to_string Eva_perf.KfList.pretty cl);
-  (* This field contains the name of the function on top of the
-     kernel function stack *)
-  States.column model ~name:"name"
-    ~descr:(Markdown.plain "Function name")
-    ~data:(module Data.Jstring)
-    ~get:(fun (cl,_) -> Kernel_function.get_name (List.(hd (rev cl))));
-  (* This field contains the list of the function names *)
-  States.column model ~name:"funlist"
-    ~descr:(Markdown.plain "Function list")
-    ~data:(module Data.Jstring)
-    ~get:(fun (cl,_) ->
-        Pretty_utils.to_string (Eva_perf.KfList.pretty ~sep:":") cl);
-  (* This field contains the declaration of the function on top of the
-     kernel function stack *)
-  States.column model ~name:"kfkey"
-    ~descr:(Markdown.plain "Kernel function key")
-    ~data:(module Data.Jstring)
-    ~get:(fun (cl,_) -> Kernel_ast.Decl.index (SFunction (List.(hd (rev cl)))));
-  (* Add/remove other fields if necessary... *)
+    ~get:(fun (_cs, stat) -> stat.Eva_perf.self_duration);
+
+  States.column model ~name:"totalTime"
+    ~descr:(Markdown.plain "Total computation time, including functions called")
+    ~data:(module Data.Jfloat)
+    ~get:(fun (_cs, stat) -> stat.Eva_perf.total_duration);
+
+  States.column model ~name:"kfDecl"
+    ~descr:(Markdown.plain "Declaration of the top function")
+    ~data:(module Kernel_ast.Decl)
+    ~get:(fun (cs, _) -> Printer_tag.SFunction (List.hd cs));
+
   States.register_framac_array
     ~package
-    ~name:"evaFlamegraph"
-    ~descr:(Markdown.plain "Data for Eva flamegraph")
-    ~key:(fun cl -> Format.sprintf "#%06d" @@ Jkfstack.get cl)
-    model (module Eva_perf.EvaFlamegraph)
+    ~name:"flamegraph"
+    ~descr:(Markdown.plain "Data for flamegraph: execution times by callstack")
+    ~key:callstack_to_string
+    model (module Eva_perf.StatByCallstack)

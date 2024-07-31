@@ -35,14 +35,18 @@ let file_contents filename =
   contents
 
 let extract_exported_interface s =
-  let regexp =
-    Str.regexp "\\[@@@ api_start\\]\\(\\(.\\|\n\\)*\\)\\[@@@ api_end\\]"
+  let regexp_start = Str.regexp_string "[@@@ api_start]" in
+  let regexp_end = Str.regexp " *\\[@@@ api_end\\]" in
+  let find_first_api i =
+    let _i = Str.search_forward regexp_start s i in
+    let api_start = Str.match_end () in
+    let api_end = Str.search_forward regexp_end s api_start in
+    let api = String.sub s api_start (api_end - api_start) in
+    api, Str.match_end ()
   in
   let rec iter acc i =
-    match Str.search_forward regexp s i with
-    | i ->
-      let subpart = Str.matched_group 1 s in
-      iter (acc ^ subpart) (i + String.length subpart)
+    match find_first_api i with
+    | subpart, i -> iter (acc ^ subpart) i
     | exception Not_found -> acc
   in
   String.trim (iter "" 0)
