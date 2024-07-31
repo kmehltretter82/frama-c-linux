@@ -8,9 +8,7 @@ let
     odoc = oself.callPackage ./odoc.nix {};
     odoc-parser = oself.callPackage ./odoc-parser.nix {};
     ppxlib = oself.callPackage ./ppxlib.nix {};
-    why3 = oself.callPackage ./why3.nix {
-      coqPackages = pkgs.mkCoqPackages (pkgs.coq.override { version = "8.18";});
-    };
+    why3 = oself.callPackage ./why3.nix {};
 
     # Helpers
     mk_tests = oself.callPackage ./mk_tests.nix {};
