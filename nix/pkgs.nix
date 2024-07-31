@@ -5,9 +5,6 @@ let
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     combinetura = oself.callPackage ./combinetura.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
-    odoc = oself.callPackage ./odoc.nix {};
-    odoc-parser = oself.callPackage ./odoc-parser.nix {};
-    ppxlib = oself.callPackage ./ppxlib.nix {};
     why3 = oself.callPackage ./why3.nix {};
 
     # Helpers
