@@ -129,8 +129,7 @@ let register_symbol_class nl =
     if !Lexerhack.is_typedef() then !Lexerhack.add_type
     else !Lexerhack.add_identifier
   in
-  List.iter (fun ((n, _, _, _), _) -> add n) nl;
-  !Lexerhack.reset_typedef()
+  List.iter (fun ((n, _, _, _), _) -> add n) nl
 
 let doDeclaration logic_spec (loc: cabsloc) (specs: spec_elem list) (nl: init_name list)  =
   if isTypedef specs then begin
@@ -866,10 +865,9 @@ bracket_comma_expression:
   LBRACKET comma_expression RBRACKET                   { $2 }
 ;
 
-
 /*** statements ***/
-block: /* ISO 6.8.2 */
-    block_begin local_labels block_attrs block_content RBRACE
+generic_block(content):
+    block_begin local_labels block_attrs content RBRACE
       {
        { blabels = $2;
          battrs = $3;
@@ -877,6 +875,13 @@ block: /* ISO 6.8.2 */
        $1, $5
       }
 ;
+
+block: /* ISO 6.8.2 */
+  generic_block(block_content) { $1 }
+
+main_block:
+  generic_block(main_block_content) { $1 }
+
 block_begin:
     LBRACE  { !Lexerhack.push_context (); $1 }
 ;
@@ -888,6 +893,17 @@ block_attrs:
 ;
 
 block_content: block_element_list { !Lexerhack.pop_context(); $1 }
+
+/* for the main block of a function, we must pop
+   _two_ contexts: the one of the block itself, and the one
+   introduced for the definition itself (which includes the
+   parameters and the function name)
+*/
+main_block_content: block_element_list {
+    !Lexerhack.pop_context();
+    !Lexerhack.pop_context();
+    $1
+}
 
 /* statements and declarations in a block, in any order (for C99 support) */
 block_element_list:
@@ -1072,39 +1088,18 @@ ghost_parameter:
 ;
 
 declaration:                                /* ISO 6.7.*/
-    specif=decl_spec_list decls=init_declarator_list SEMICOLON
+    spec=ioption(SPEC) specif=decl_spec_list decls=init_declarator_list? SEMICOLON
   {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc in
-    doDeclaration None loc (fst specif) decls
+    let loc = Cil_datatype.Location.of_lexing_loc ($symbolstartpos,$endpos) in
+    let decls = Option.value ~default:[] decls in
+    if !Lexerhack.is_typedef () && decls = [] then begin
+      let source = fst loc in
+      let wkey = Kernel.wkey_unnamed_typedef in
+      Kernel.warning ~source ~wkey "typedef without a name"
+    end;
+    !Lexerhack.reset_typedef();
+    doDeclaration spec loc (fst specif) decls
   }
-|   decls=decl_spec_list SEMICOLON
-      {
-        let loc = Cil_datatype.Location.of_lexing_loc $loc in
-        if !Lexerhack.is_typedef () then begin
-          let source = fst loc in
-          let wkey = Kernel.wkey_unnamed_typedef in
-          Kernel.warning ~source ~wkey "typedef without a name"
-        end;
-        !Lexerhack.reset_typedef();
-        doDeclaration None loc (fst decls) []
-      }
-|   spec=SPEC specif=decl_spec_list decls=init_declarator_list SEMICOLON
-          {
-            let loc = Cil_datatype.Location.of_lexing_loc $loc in
-            doDeclaration (Some spec) loc (fst specif) decls
-          }
-|   spec=SPEC specif=decl_spec_list SEMICOLON
-      {
-        let loc = Cil_datatype.Location.of_lexing_loc $loc in
-        if !Lexerhack.is_typedef () then begin
-          let source =
-            Cil_datatype.Position.of_lexing_pos $startpos(specif)
-          in
-          let wkey = Kernel.wkey_unnamed_typedef in
-          Kernel.warning ~source ~wkey "typedef without a name"
-        end;
-        !Lexerhack.reset_typedef();
-        doDeclaration (Some spec) loc (fst specif) [] }
 |   static_assert_declaration SEMICOLON
       { let (e, m, loc) = $1 in STATIC_ASSERT (e, m, loc) }
 ;
@@ -1502,37 +1497,29 @@ abs_direct_decl_opt:
     abs_direct_decl                 { $1 }
 |   /* empty */                     { JUSTBASE }
 ;
-function_def:  /* (* ISO 6.9.1 *) */
-  SPEC function_def_start block
-          {
-            let (loc, specs, decl) = $2 in
-            let spec_loc =
-              let loc = fst $1 in
-              Option.map
-                (fun (loc', spec) -> spec, (loc, loc'))
-                (Logic_lexer.spec $1)
-            in
-            currentFunctionName := "<__FUNCTION__ used outside any functions>";
-            !Lexerhack.pop_context (); (* The context pushed by
-                                    * announceFunctionName *)
-            doFunctionDef spec_loc loc (trd3 $3) specs decl (fst3 $3)
-          }
-|  function_def_start block
-          { let (loc, specs, decl) = $1 in
-            currentFunctionName := "<__FUNCTION__ used outside any functions>";
-            !Lexerhack.pop_context (); (* The context pushed by
-                                    * announceFunctionName *)
-            (*OCAMLYACC BUG??? Format.printf "%a@." d_cabsloc (trd3 $2);*)
-            doFunctionDef None ((*handleLoc*) loc) (trd3 $2) specs decl (fst3 $2)
-          }
 
+function_def:  /* (* ISO 6.9.1 *) */
+ s=ioption(SPEC) fn=function_def_start b=main_block
+    {
+      let (loc, specs, decl) = fn in
+      let spec_loc =
+        Option.bind s
+          (fun s ->
+             let loc = fst s in
+             Option.map
+               (fun (loc', spec) -> spec, (loc, loc'))
+               (Logic_lexer.spec s))
+      in
+      currentFunctionName := "<__FUNCTION__ used outside any functions>";
+      doFunctionDef spec_loc loc (trd3 b) specs decl (fst3 b)
+    }
+;
 
 function_def_start:  /* (* ISO 6.9.1 *) */
   decl_spec_list declarator
                             { announceFunctionName $2;
                               (fourth4 $2, fst $1, $2)
                             }
-
 /* (* Old-style function prototype *) */
 | decl_spec_list old_proto_decl
                             { announceFunctionName $2;

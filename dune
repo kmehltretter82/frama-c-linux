@@ -20,8 +20,6 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(env
-  (trace-menhir (menhir_flags --trace)))
 
 (alias (name default) (deps (alias install)))
 (dirs bin headers man share src tools tests)

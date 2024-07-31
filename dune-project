@@ -1,4 +1,4 @@
-(lang dune 3.7)
+(lang dune 3.13)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;                                                                        ;;
 ;;  This file is part of Frama-C.                                         ;;
@@ -21,6 +21,6 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(using menhir 2.1)
+(using menhir 3.0)
 (using dune_site 0.1)
 (package (name frama-c) (sites (share share) (libexec lib) (lib plugins) (lib plugins_gui)))
