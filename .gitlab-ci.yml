@@ -23,7 +23,7 @@ default:
 variables:
   DEFAULT: "master"
   OCAML: "4.13"
-  NODE: "20"
+  NODE: "22"
   PUBLISH: "no"
   RELEASE: "no"
 
@@ -132,7 +132,7 @@ frama-c:
 
 ivette:
   stage: build
-  image: node:lts-buster
+  image: node:22-bookworm
   cache:
     paths:
       - ivette/node_modules/
@@ -227,8 +227,8 @@ ivette-tests:
   when: manual
   before_script:
     - sudo apt update
-    - sudo apt install -y xvfb curl unzip libnss3 libasound2
-    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    - sudo apt install -y xvfb curl unzip libnss3 libasound2-plugins
+    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
     - export NVM_DIR="$HOME/.nvm"
     - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
     - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
@@ -236,7 +236,7 @@ ivette-tests:
     - nvm use node $NODE
     - corepack enable
   script:
-    - opam pin . -n
+    - opam pin . -n -k path
     - opam depext frama-c
     - opam install --jobs 2 --deps-only .
     - dune build -j2 @install
