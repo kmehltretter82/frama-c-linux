@@ -1,3 +1,0 @@
-[kernel] User Error: option `-add-path' is unknown.
-  use `frama-c -help' for more information.
-[kernel] Frama-C aborted: invalid user input.
