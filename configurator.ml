@@ -198,12 +198,17 @@ module Fc_version = struct
     ; name: string
     }
 
-  let get configurator =
-    let out_VERSION =
-      let out = C.Process.run configurator "cat" ["VERSION"] in
-      if out.exit_code <> 0 then C.die "Can't read VERSION." ;
-      out.stdout
-    in
+  let head1 file = (* output first line from file, without '\n' *)
+    try
+      let ic = open_in file in
+      let s = input_line ic in
+      close_in ic;
+      s
+    with _exc ->
+      C.die "Can't read " ^ file ^ "."
+
+  let get () =
+    let out_VERSION = head1 "VERSION" in
     let re_version =
       Str.regexp {|\([1-9][0-9]\)\.\([0-9]\)\(.*\)|}
     in
@@ -213,14 +218,9 @@ module Fc_version = struct
         Str.matched_group 2 out_VERSION,
         try Str.matched_group 3 out_VERSION with Not_found -> ""
       else
-        C.die "Can't read VERSION."
+        C.die "Invalid VERSION contents."
     in
-    let name =
-      let out = C.Process.run configurator "cat" ["VERSION_CODENAME"] in
-      if out.exit_code <> 0 then
-        C.die "Can't read VERSION_CODENAME." ;
-      String.sub out.stdout 0 (String.length out.stdout - 1)
-    in
+    let name = head1 "VERSION_CODENAME" in
     { major; minor; ext; name }
 
   let pp_sed fmt version =
@@ -275,7 +275,7 @@ let python_available configurator =
     with Not_found | Failure _ -> false
 
 let configure configurator =
-  let version = Fc_version.get configurator in
+  let version = Fc_version.get () in
   let cpp = Cpp.get configurator in
   let os = OS.get configurator in
   let config_sed = open_out "config.sed" in
