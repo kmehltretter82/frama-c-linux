@@ -1190,7 +1190,17 @@ decl_spec_wo_type:                         /* ISO 6.7 */
 
 decl_spec_list:
 | decl_spec_wo_type decl_spec_list_opt { fst $1 :: $2, snd $1 }
-| type_spec decl_spec_list_opt_no_named { SpecType(fst $1) :: $2, snd $1 }
+| type_spec pragma* (* pragma accepted by GCC *) decl_spec_list_opt_no_named
+  {
+    let pragmas = $2 in
+    if pragmas != [] then begin
+      let loc = Cabshelper.get_definitionloc (List.hd pragmas) in
+      Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_pragma
+        ~once:true ~source:(fst loc)
+        "Discarding _Pragma's in function declaration"
+    end;
+    SpecType(fst $1) :: $3, snd $1
+  }
 
 decl_spec_list_no_named:
 | decl_spec_wo_type decl_spec_list_opt_no_named { fst $1 :: $2, snd $1 }
