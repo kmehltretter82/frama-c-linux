@@ -34,7 +34,7 @@ For the Program Dependence Graph tests, see  ppc/tests/pdg.
    Check if we have the same result than her with her System Dependence Graph.
 
 ** tests/slicing/adpcm.c & tests/slicing/adpcm.ml
-   source code from tests/test/adpcm.c. To have a bigger example...
+   source code from adpcm.c. To have a bigger example...
 
 ** tests/slicing/ptr_fct.c
    Example given by Patrick for the specification/documentation 
