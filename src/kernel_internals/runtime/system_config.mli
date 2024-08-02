@@ -20,11 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Information about the enrivonment *)
+(** Information about the environment *)
 
 module Version : sig
   val id: string
-  (** Frama-C Version identifier. *)
+  (** Frama-C version identifier. *)
 
   val codename: string
   (** Frama-C version codename. *)
@@ -42,12 +42,12 @@ end
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Share : sig
   val dirs: Filepath.Normalized.t list
-  (** Directories where architecture independent files are in order of
+  (** Directories where architecture-independent files are located, in order of
       priority.
   *)
 
   val main: Filepath.Normalized.t
-  (** Last directory of dirs (the directory of frama-c installation) *)
+  (** Last directory of {!dirs} (the directory of frama-c installation) *)
 
   val path: string
   (** The colon-separated concatenation of {!dirs}. *)
@@ -59,7 +59,7 @@ end
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Lib : sig
   val dirs: Filepath.Normalized.t list
-  (** Directories where library and executable files are, in order of
+  (** Directories where library and executable files are located, in order of
       priority. *)
 
   val path: string
@@ -72,7 +72,7 @@ end
 (** Unless you are working in the kernel of Frama-C, you should not use this. *)
 module Plugins : sig
   val dirs: Filepath.Normalized.t list
-  (** Directories where the Frama-C dynamic plug-ins are. *)
+  (** Directories where the Frama-C dynamic plug-ins are located. *)
 
   val path: string
   (** The colon-separated concatenation of {!dirs}. *)
@@ -88,7 +88,7 @@ end
 module Preprocessor : sig
   val command: string
   (** Name of the default command to call the preprocessor.
-      If the CPP environment variable is set, use it
+      If the CPP environment variable is set, use it;
       else use the built-in default from autoconf. Usually this is
       "gcc -C -E -I."
   *)
@@ -100,7 +100,7 @@ module Preprocessor : sig
 
   val is_gnu_like: bool
   (** whether the default preprocessor accepts the same options as gcc
-      (i.e. is either gcc or clang), when this is the case, the default
+      (i.e. is either gcc or clang). When this is the case, the default
       command line for preprocessing contains more options.
   *)
 
