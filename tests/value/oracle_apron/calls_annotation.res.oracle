@@ -1,0 +1,81 @@
+57c57,60
+< [eva] calls_annotation.i:80: Reusing old results for call to incr
+---
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:80.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+89,92c92,107
+< [eva] calls_annotation.i:80: Reusing old results for call to incr
+< [eva] calls_annotation.i:82: Reusing old results for call to decr
+< [eva] calls_annotation.i:85: Reusing old results for call to decr
+< [eva] calls_annotation.i:85: Reusing old results for call to incr
+---
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:80.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+> [eva] computing for function decr <- main.
+>   Called from calls_annotation.i:82.
+> [eva] Recording results for decr
+> [eva] Done for function decr
+> [eva] computing for function decr <- main.
+>   Called from calls_annotation.i:85.
+> [eva] Recording results for decr
+> [eva] Done for function decr
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:85.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+109,110c124,131
+< [eva] calls_annotation.i:80: Reusing old results for call to incr
+< [eva] calls_annotation.i:82: Reusing old results for call to incr
+---
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:80.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:82.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+119c140,143
+< [eva] calls_annotation.i:85: Reusing old results for call to incr
+---
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:85.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+136,137c160,167
+< [eva] calls_annotation.i:80: Reusing old results for call to incr
+< [eva] calls_annotation.i:82: Reusing old results for call to decr
+---
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:80.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+> [eva] computing for function decr <- main.
+>   Called from calls_annotation.i:82.
+> [eva] Recording results for decr
+> [eva] Done for function decr
+139,141c169,180
+< [eva] calls_annotation.i:85: Reusing old results for call to square
+< [eva] calls_annotation.i:85: Reusing old results for call to decr
+< [eva] calls_annotation.i:85: Reusing old results for call to incr
+---
+> [eva] computing for function square <- main.
+>   Called from calls_annotation.i:85.
+> [eva] Recording results for square
+> [eva] Done for function square
+> [eva] computing for function decr <- main.
+>   Called from calls_annotation.i:85.
+> [eva] Recording results for decr
+> [eva] Done for function decr
+> [eva] computing for function incr <- main.
+>   Called from calls_annotation.i:85.
+> [eva] Recording results for incr
+> [eva] Done for function incr
+158c197
+<   __retres ∈ [-1..65536]
+---
+>   __retres ∈ [0..65536]
