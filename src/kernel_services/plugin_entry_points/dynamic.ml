@@ -126,7 +126,8 @@ let load_plugin m =
   (* Ok, this is ugly, but Dune Site does not give any way to catch this ...
      Note that we abort with a user error.
   *)
-  with _ -> Klog.abort "Failed to load plug-in %S" m
+  with e -> Klog.abort "Failed to load plug-in %S@.Exception: %s" m
+              (Printexc.to_string e)
 
 let load_module m =
   let base,ext = split_ext m in
