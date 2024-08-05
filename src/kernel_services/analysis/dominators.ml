@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (* This module performs dataflow analysis using [Interpreted_automata] to
-   compute the domination/postdomination dependancies between statements of a
+   compute the domination/postdomination dependencies between statements of a
    given function. *)
 
 open Cil_types
@@ -110,9 +110,9 @@ module DotGraph = Graph.Graphviz.Dot (
     let get_subgraph _v = None
   end)
 
-(* Both analysis are using this domain. It simply propagate all encountered
-   statements by adding them to the state. The [join] performs an intersection
-   which is enough to compute domination/postdomination. *)
+(* Both analyses use this domain, which propagates all encountered statements
+   by adding them to the state. The [join] performs an intersection which is
+   enough to compute domination/postdomination. *)
 module Domain = struct
   type t = StmtSet.t
 
@@ -124,7 +124,7 @@ module Domain = struct
     else
       Widening (join a b)
 
-  (* Trivial transfert function : add all visited statements to the current
+  (* Trivial transfer function: add all visited statements to the current
      state. *)
   let transfer v _ state =
     match v.vertex_start_of with
