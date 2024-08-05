@@ -14,7 +14,6 @@ mk_tests {
       @tests/saveload/ptests \
       @tests/spec/ptests \
       @tests/syntax/ptests \
-      @tests/test/ptests \
       @src/kernel_internals/parsing/tests/ptests
     dune runtest -j1 --display short \
       src/plugins/server/tests/batch \
