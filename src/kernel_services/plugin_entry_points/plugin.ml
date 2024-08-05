@@ -27,8 +27,12 @@ let empty_string = ""
 let positive_debug_ref = ref 0
 let session_is_set_ref = Extlib.mk_fun "session_is_set_ref"
 let session_ref = Extlib.mk_fun "session_ref"
+let cache_is_set_ref = Extlib.mk_fun "cache_is_set_ref"
+let cache_ref = Extlib.mk_fun "cache_ref"
 let config_is_set_ref = Extlib.mk_fun "config_is_set_ref"
 let config_ref = Extlib.mk_fun "config_ref"
+let state_is_set_ref = Extlib.mk_fun "state_is_set_ref"
+let state_ref = Extlib.mk_fun "state_ref"
 
 (* ************************************************************************* *)
 (** {2 Signatures} *)
@@ -38,9 +42,11 @@ module type S_no_log = sig
   val add_group: ?memo:bool -> string -> Cmdline.Group.t
   module Verbose: Parameter_sig.Int
   module Debug: Parameter_sig.Int
-  module Share: Parameter_sig.Specific_dir
-  module Session: Parameter_sig.Specific_dir
-  module Config: Parameter_sig.Specific_dir
+  module Share: Parameter_sig.Site_root
+  module Session: Parameter_sig.User_dir_opt
+  module Cache_dir () : Parameter_sig.User_dir_opt
+  module Config_dir () : Parameter_sig.User_dir_opt
+  module State_dir () : Parameter_sig.User_dir_opt
   val help: Cmdline.Group.t
   val messages: Cmdline.Group.t
   val add_plugin_output_aliases:
@@ -82,9 +88,6 @@ let is_share_visible () = share_visible_ref := true
 let session_visible_ref = ref false
 let is_session_visible () = session_visible_ref := true
 
-let config_visible_ref = ref false
-let is_config_visible () = config_visible_ref := true
-
 let plugin_subpath_ref = ref None
 let plugin_subpath s = plugin_subpath_ref := Some s
 
@@ -94,7 +97,6 @@ let reset_plugin () =
   kernel := false;
   share_visible_ref := false;
   session_visible_ref := false;
-  config_visible_ref := false;
   plugin_subpath_ref := None;
   default_msg_keys_ref := [];
 ;;
@@ -289,16 +291,8 @@ struct
   (** {3 Specific directories} *)
   (* ************************************************************************ *)
 
-  module Make_specific_dir
-      (O: Parameter_sig.Input_with_arg)
-      (D: sig
-         val dirs: unit -> Fc_Filepath.Normalized.t list
-         val visible_ref: bool
-       end)
-  =
-  struct
-
-    let is_visible = D.visible_ref
+  module Share : Parameter_sig.Site_root = struct
+    let is_visible = !share_visible_ref
     let is_kernel = is_kernel () (* the side effect must be applied right now *)
 
     let () =
@@ -309,193 +303,161 @@ struct
     module Dir_name =
       Filepath
         (struct
-          let option_name = prefix ^ O.option_name
-          let arg_name = O.arg_name
-          let help = if is_visible then O.help else empty_string
-          let existence = Fc_Filepath.Indifferent
+          let option_name = prefix ^ "share"
+          let arg_name = "dir"
+          let help =
+            if is_visible then
+              "set the plug-in share directory to <dir> (may be used if the \
+               plug-in is not installed at the same place as Frama-C)"
+            else empty_string
+          let existence = Fc_Filepath.Must_exist
           let file_kind = ""
         end)
-
-    let mk_dir d =
-      let d' = Fc_Filepath.Normalized.of_string d in
-      try
-        if Extlib.mkdir ~parents:true d' 0o755 then
-          L.warning "created %s directory `%a'" O.option_name Fc_Filepath.Normalized.pretty d';
-        d
-      with Unix.Unix_error _ ->
-        L.abort "cannot create %s directory `%a'" O.option_name Fc_Filepath.Normalized.pretty d'
 
     let set filepath = Dir_name.set filepath
     let get () = Dir_name.get ()
     let is_set () = Dir_name.is_set ()
 
-    let base_dirs () =
-      (* Get the specified dir if any. *)
-      let plugin_base_dir =
-        if is_visible
-        then Dir_name.get ()
-        else Datatype.Filepath.dummy
+    let add_plugin path =
+      if is_kernel then path
+      else Fc_Filepath.Normalized.concat path plugin_subpath
+
+    let dirs () =
+      if is_visible && is_set () then [ get () ]
+      else List.map add_plugin System_config.Share.dirs
+
+    let find ~is_dir relative =
+      let exception Found of Fc_Filepath.Normalized.t in
+      let check_presence dir =
+        let path = Fc_Filepath.Normalized.concat dir relative in
+        if Fc_Filepath.exists path then raise (Found path)
       in
-      if not (plugin_base_dir = Datatype.Filepath.dummy)
-      then [plugin_base_dir]
-      else begin
-        (* No specified dir: look for the default ones.
-           At least one default value must be in place. *)
-        let dirs = D.dirs () in
-        assert (dirs <> []);
-        if is_kernel
-        then dirs
-        else
-          List.map
-            (fun x -> Datatype.Filepath.concat x plugin_subpath)
-            dirs
-      end
+      try
+        List.iter check_presence (dirs ()) ;
+        L.abort
+          "Could not find %s %s in Frama-C%s share"
+          (if is_dir then "directory" else "file")
+          relative
+          (if is_kernel then "" else "/" ^ P.name)
+      with
+      | Found path when is_dir <> Fc_Filepath.is_dir path ->
+        L.abort "%a is expected to be a %s"
+          Fc_Filepath.Normalized.pretty path
+          (if is_dir then "directory" else "file")
+      | Found path -> path
 
-    let get_dir ?(mode=`Normalize_only) s =
-      match mode with
-      | `Must_exist ->
-        begin
-          let dir =
-            let exception Found of Datatype.Filepath.t in
-            try
-              List.fold_left
-                (fun dummy d ->
-                   let name = Datatype.Filepath.concat d s in
-                   if Fc_Filepath.exists name
-                   then raise (Found name)
-                   else dummy)
-                None
-                (base_dirs ())
-            with Found d ->
-              Some d
-          in
-          match dir with
-          | None ->
-            let pp_path fmt (path:Dir_name.t) =
-              Format.pp_print_string fmt (path :> string)
-            in
-            let pp_subdir fmt = function
-              | "." -> ()
-              | s -> Format.fprintf fmt " sub-directory %s in " s
-            in
-            L.abort "there is no%a %s directories: %a"
-              pp_subdir s
-              O.option_name
-              (Format.pp_print_list ~pp_sep:(fun fmt () -> Format.fprintf fmt ", ") pp_path)
-              (base_dirs ())
-          | Some d -> d
-        end
-      | _ ->
-        begin
-          (* In presence of more than one base directory, consider the first to
-             form the resulting [filepath]. *)
-          let filepath =
-            match base_dirs () with
-            | [] -> assert false
-            | d :: _ -> Datatype.Filepath.concat d s
-          in
-          match mode with
-          | `Must_exist ->
-            (* Already taken care of. *)
-            assert false
-          | `Normalize_only ->
-            filepath
-          | `Create_path ->
-            begin
-              (try
-                 if not (Fc_Filepath.is_dir filepath)
-                 then
-                   (* [filepath] already exists, and it is a file. *)
-                   L.abort
-                     "cannot create directory as file %a already exists"
-                     Datatype.Filepath.pretty filepath
-               with Sys_error _ ->
-                 (* [filepath] does not exist: create the directory path. *)
-                 ignore (mk_dir (filepath :> string)));
-              filepath
-            end
-        end
-
-    let get_file ?(mode=`Normalize_only) s =
-      let s_dirname = Filename.dirname s in
-      let base_dir = get_dir ~mode s_dirname in
-      let s_basename = Filename.basename s in
-      let filepath = Datatype.Filepath.concat base_dir s_basename in
-      match mode with
-      | `Must_exist ->
-        if Fc_Filepath.exists filepath
-        then filepath
-        else L.abort "there is no file %s in %s directories" (filepath :> string) O.option_name
-      | `Normalize_only ->
-        filepath
-      | `Create_path ->
-        (* No need to create anything here, as the path of sub-directories has
-           been already created by [get_dir] for computing [base_dir]. *)
-        filepath
-
+    let get_dir = find ~is_dir:true
+    let get_file = find ~is_dir:false
   end
 
-  module Share =
-    Make_specific_dir
-      (struct
-        let option_name = "share"
-        let arg_name = "dir"
-        let help = "set the plug-in share directory to <dir> \
-                    (may be used if the plug-in is not installed at the same place as Frama-C)"
-      end)
-      (struct
-        let dirs () = Fc_config.datadirs
-        let visible_ref = !share_visible_ref
-      end)
+  module Make_user_dir_root
+      (D: sig
+         val name : string
+         val default_root : unit -> Fc_Filepath.Normalized.t
+         val kernel_get : unit -> Fc_Filepath.Normalized.t
+         val is_visible : bool
+       end)
+  =
+  struct
+    open Fc_Filepath.Normalized
 
-  module Session =
-    Make_specific_dir
-      (struct
-        let option_name = "session"
-        let arg_name = "dir"
-        let help = "set the plug-in session directory to <dir>"
-      end)
-      (struct
-        let dirs () = [
-          if !session_is_set_ref () then !session_ref ()
-          else
-            Fc_Filepath.Normalized.of_string
-              (try Sys.getenv "FRAMAC_SESSION"
-               with Not_found -> "./.frama-c")
-        ]
-        let visible_ref = !session_visible_ref
-      end)
+    let is_visible = D.is_visible
+    let is_kernel = P.name = ""
 
-  module Config =
-    Make_specific_dir
-      (struct
-        let option_name = "config"
-        let arg_name = "dir"
-        let help = "set the plug-in config directory to <dir> \
-                    (may be used on systems with no default user directory)"
-      end)
-      (struct
-        let dirs () = [
-          let to_path = Fc_Filepath.Normalized.of_string in
-          let d, vis =
-            if !config_is_set_ref () then !config_ref (), false
+    let () =
+      Parameter_customize.set_cmdline_stage Cmdline.Extended;
+      if is_visible then Parameter_customize.is_reconfigurable ()
+      else Parameter_customize.is_invisible ()
+
+    let prefix = if is_kernel then "-" else prefix
+    let var_name =
+      Stdlib.String.uppercase_ascii
+        ("FRAMAC_" ^ (if is_kernel then "" else P.shortname ^ "_") ^ D.name)
+
+    module Dir_name =
+      Filepath
+        (struct
+          let option_name = prefix ^ D.name
+          let arg_name = "dir"
+          let help =
+            if is_visible && is_kernel
+            then Format.asprintf "set the Frama-C %s directory to <dir>" D.name
             else
-              try to_path (Sys.getenv "FRAMAC_CONFIG"), false
-              with Not_found ->
-              try to_path (Sys.getenv "USERPROFILE"), false (* Win32 *)
-              with Not_found ->
-              (* Unix like *)
-              try to_path (Sys.getenv "XDG_CONFIG_HOME"), true
-              with Not_found ->
-              try
-                Fc_Filepath.Normalized.concat
-                  (to_path (Sys.getenv "HOME")) ".config", true
-              with Not_found -> to_path ".", false
-          in
-          Fc_Filepath.Normalized.concat
-            d (if vis then "frama-c" else ".frama-c")
-        ]
-        let visible_ref = !config_visible_ref
+            if is_visible
+            then Format.asprintf "set the plug-in %s directory to <dir>" D.name
+            else empty_string
+
+          let existence = Fc_Filepath.Indifferent
+          let file_kind = ""
+        end)
+
+    let get () =
+      if Dir_name.is_set () then Dir_name.get ()
+      else match Sys.getenv_opt var_name with
+        | Some s when s <> "" -> of_string s
+        | _ when is_kernel -> D.default_root ()
+        | _ -> concat (D.kernel_get ()) P.shortname
+
+    let set = Dir_name.set
+    let is_set = Dir_name.is_set
+
+    let expected ~dir path =
+      if dir <> Fc_Filepath.is_dir path then
+        L.abort "%a is expected to be a %s"
+          pretty path (if dir then "directory" else "file")
+
+    let mk_dir d =
+      try ignore @@ Extlib.mkdir ~parents:true d 0o755
+      with Unix.Unix_error _ ->
+        L.abort "cannot create %s directory `%a'" D.name pretty d
+
+    let get_dir ?(create_path=false) s =
+      let dir = concat (get ()) s in
+      if Fc_Filepath.exists dir
+      then (expected ~dir:true dir ; dir)
+      else if create_path
+      then (mk_dir dir ; dir)
+      else dir
+
+    let get_file ?create_path s =
+      let base_dir = get_dir ?create_path @@ Filename.dirname s in
+      (* No need to create anything here, as the path of sub-directories has
+         been already created by [get_dir] for computing [base_dir]. *)
+      let path = concat base_dir @@ Filename.basename s in
+      if Fc_Filepath.exists path then expected ~dir:false path ;
+      path
+  end
+
+  module Session = Make_user_dir_root
+      (struct
+        let name = "session"
+        let default_root () = Fc_Filepath.Normalized.of_string "./.frama-c"
+        let kernel_get () = !session_ref ()
+        let is_visible = !session_visible_ref
+      end)
+
+  module Cache_dir () = Make_user_dir_root
+      (struct
+        let name = "cache"
+        let default_root = System_config.User_dirs.cache
+        let kernel_get () = !cache_ref ()
+        let is_visible = !Parameter_customize.is_visible_ref
+      end)
+
+  module Config_dir () = Make_user_dir_root
+      (struct
+        let name = "config"
+        let default_root = System_config.User_dirs.config
+        let kernel_get () = !config_ref ()
+        let is_visible = !Parameter_customize.is_visible_ref
+      end)
+
+  module State_dir () = Make_user_dir_root
+      (struct
+        let name = "state"
+        let default_root = System_config.User_dirs.state
+        let kernel_get () = !state_ref ()
+        let is_visible = !Parameter_customize.is_visible_ref
       end)
 
   let help = add_group "Getting Information"

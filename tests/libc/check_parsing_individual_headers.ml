@@ -14,7 +14,7 @@ let blacklist libc_dir =
 
 (* only goes down one level, which is enough for the libc *)
 let collect_headers () =
-  let libc_dir = Kernel.Share.get_dir ~mode:`Must_exist "libc" in
+  let libc_dir = Kernel.Share.get_dir "libc" in
   let libc_dir_files = Array.to_list (Sys.readdir (libc_dir :> string)) in
   let contents =
     List.map (Filename.concat (libc_dir :> string)) libc_dir_files

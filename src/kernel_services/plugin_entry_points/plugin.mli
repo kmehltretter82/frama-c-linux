@@ -44,16 +44,33 @@ module type S_no_log = sig
   module Debug: Parameter_sig.Int
 
   (** Handle the specific `share' directory of the plug-in.
-      @since Oxygen-20120901 *)
-  module Share: Parameter_sig.Specific_dir
+      @since Oxygen-20120901
+      @before Frama-C+dev more modes were allowed
+  *)
+  module Share: Parameter_sig.Site_root
 
   (** Handle the specific `session' directory of the plug-in.
-      @since Neon-20140301 *)
-  module Session: Parameter_sig.Specific_dir
+      @since Neon-20140301
+      @before Frama-C+dev Session was a Specific_dir.
+  *)
+  module Session: Parameter_sig.User_dir_opt
+
+  (** Handle the specific `cache' directory of the plug-in.
+      @since Frama-C+dev
+  *)
+  module Cache_dir (): Parameter_sig.User_dir_opt
 
   (** Handle the specific `config' directory of the plug-in.
-      @since Neon-20140301 *)
-  module Config: Parameter_sig.Specific_dir
+      @since Neon-20140301
+      @before Frama-C+dev this was not a functor and one could expect the
+              directory to exist
+  *)
+  module Config_dir (): Parameter_sig.User_dir_opt
+
+  (** Handle the specific `state' directory of the plug-in.
+      @since Frama-C+dev
+  *)
+  module State_dir (): Parameter_sig.User_dir_opt
 
   val help: Cmdline.Group.t
   (** The group containing option -*-help.
@@ -131,11 +148,6 @@ val is_session_visible: unit -> unit
     To be called just before applying {!Register} to create plug-in services.
     @since Neon-20140301 *)
 
-val is_config_visible: unit -> unit
-(** Make visible to the end-user the -<plug-in>-config option.
-    To be called just before applying {!Register} to create plug-in services.
-    @since Neon-20140301 *)
-
 val plugin_subpath: string -> unit
 (** Use the given string as the sub-directory in which the plugin files will
     be installed (ie. [share/frama-c/plugin_subpath]...). Relevant for
@@ -178,8 +190,14 @@ val positive_debug_ref: int ref
 val session_is_set_ref: (unit -> bool) ref
 val session_ref: (unit -> Filepath.Normalized.t) ref
 
+val cache_is_set_ref: (unit -> bool) ref
+val cache_ref: (unit -> Filepath.Normalized.t) ref
+
 val config_is_set_ref: (unit -> bool) ref
 val config_ref: (unit -> Filepath.Normalized.t) ref
+
+val state_is_set_ref: (unit -> bool) ref
+val state_ref: (unit -> Filepath.Normalized.t) ref
 
 (**/**)
 

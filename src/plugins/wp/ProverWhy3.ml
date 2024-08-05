@@ -58,7 +58,7 @@ let get_why3_conf = Conf.memoize
       let main = Why3.Whyconf.get_main config in
       let ld =
         (WpContext.directory () :> string)::
-        ((Wp_parameters.Share.get_dir ~mode:`Must_exist "why3") :> string)::
+        ((Wp_parameters.Share.get_dir "why3") :> string)::
         (Why3.Whyconf.loadpath main) in
       { env = Why3.Env.create_env ld ; config = main }
     end

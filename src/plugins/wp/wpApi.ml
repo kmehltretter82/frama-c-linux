@@ -153,7 +153,7 @@ let get_name = function
   | VCS.Why3 p -> Why3Provers.name p
 
 let get_version = function
-  | VCS.Qed | Tactical -> Fc_config.version_and_codename
+  | VCS.Qed | Tactical -> System_config.Version.id_and_codename
   | Why3 p -> Why3Provers.version p
 
 let iter_provers fn =

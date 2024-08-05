@@ -1,16 +1,16 @@
 ---
-title: 'FRAMA-C(1) 2024-04-24'
+title: 'FRAMA-C(1) 2024-07-23'
 header-includes:
 - |
   ```{=man}
   .\"------------------------------------------------------------------------
-  .\"                                                                        
-  .\"  This file is part of Frama-C documentation                            
-  .\"                                                                        
-  .\"  Copyright (C) 2007-2024                                               
-  .\"    CEA (Commissariat à l'énergie atomique et aux énergies              
-  .\"         alternatives)                                                  
-  .\"                                                                        
+  .\"
+  .\"  This file is part of Frama-C documentation
+  .\"
+  .\"  Copyright (C) 2007-2024
+  .\"    CEA (Commissariat à l'énergie atomique et aux énergies
+  .\"         alternatives)
+  .\"
   .\"  you can redistribute it and/or modify it under the terms of the
   .\"  CC-BY-SA 4.0 license
 
@@ -34,8 +34,7 @@ frama-c-gui - the graphical interface of frama-c
 
 **frama-c** is a suite of tools dedicated to the analysis of source code
 written in C. It gathers several analysis techniques in a single collaborative
-framework. This framework can be extended by additional plugins placed in the
-**$FRAMAC_PLUGIN** directory. The command
+framework. This framework can be extended by additional plugins. The command
 
 > frama-c -\-plugins
 
@@ -142,10 +141,16 @@ syntax. Defaults to yes.
 [-no]-asm-contracts-auto-validate
 : automatically marks contracts generated from asm as valid. Defaults to no.
 
+-cache *dir*
+: overrides default Frama-C cache directory
+
 [-no]-collapse-call-cast
 : allows implicit cast between the value returned by a function and the lvalue
 it is assigned to. Otherwise, a temporary variable is used and the cast is made
 explicit. Defaults to yes.
+
+-config *dir*
+: overrides default Frama-C configuration directory
 
 [-no]-constfold
 : folds all syntactically constant expressions in the code before analyses.
@@ -403,6 +408,9 @@ Defaults to no.
 [-no]-simplify-trivial-loops
 : simplifies trivial loops such as **do ... while (0)** loops. Defaults to yes.
 
+-state *dir*
+: overrides default Frama-C state directory
+
 -then
 : allows one to compose analyses: a first run of Frama-C will occur with the
 options before **-then** and a second run will be done with the options after
@@ -518,15 +526,32 @@ for the case of exit status 3) and may be reported on Frama-C's BTS (see below).
 
 # ENVIRONMENT VARIABLES
 
-It is possible to control the places where Frama-C looks for its files through
+It is possible to control the places where Frama-C looks for files through
 the following variables.
 
-FRAMAC_LIB
-: The directory where kernel's compiled interfaces are installed.
+FRAMAC_SESSION
+: equivalent to -session
 
-FRAMAC_SHARE
-: The directory where Frama-C data (e.g. its version of the standard library)
-is installed.
+FRAMAC_CACHE
+: equivalent to -cache
+
+FRAMAC_CONFIG
+: equivalent to -config
+
+FRAMAC_STATE
+: equivalent to -state
+
+XDG_CACHE_HOME
+: equivalent to FRAMAC_CACHE, but adds a sub-directory frama-c
+
+XDG_CONFIG_HOME
+: equivalent to FRAMAC_CONFIG, but adds a sub-directory frama-c
+
+XDG_STATE_HOME
+: equivalent to FRAMAC_STATE, but adds a sub-directory frama-c
+
+Options have the priority over variables. Frama-C variables have the priority
+over XDG variables.
 
 # SEE ALSO
 

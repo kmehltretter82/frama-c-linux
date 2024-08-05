@@ -448,7 +448,7 @@ let magic = 9 (* magic number *)
 
 let save_projects selection projects filename =
   let cout = open_out_bin (filename : Filepath.Normalized.t :> string) in
-  output_value cout Fc_config.version;
+  output_value cout System_config.Version.id;
   output_value cout magic;
   output_value cout !Graph.Blocks.cpt_vertex;
   let states : (t * (string * State.state_on_disk) list) list =
@@ -613,7 +613,7 @@ let load_projects ~project_under_copy selection ?name filename =
       raise (IOError s)
     end
   in
-  check_magic cin (fun x -> x) Fc_config.version;
+  check_magic cin (fun x -> x) System_config.Version.id;
   check_magic cin (fun n -> "magic number " ^ string_of_int n) magic;
   let ocamlgraph_counter = read cin in
   let pre_existing_projects = Descr.init project_under_copy in

@@ -24,7 +24,7 @@
 
 let () =
   begin
-    Wutil.share := (Fc_config.datadir :> string);
+    Wutil.share := (System_config.Share.main :> string);
     Wutil.flush := (fun msg -> Gui_parameters.warning "%s" msg);
   end
 
@@ -32,7 +32,7 @@ let framac_logo, framac_icon =
   try
     let img ext =
       Some (GdkPixbuf.from_file
-              ((Fc_config.datadir:>string) ^ "/frama-c." ^ ext))
+              ((System_config.Share.main:>string) ^ "/frama-c." ^ ext))
     in
     img "png", img "ico"
   with
@@ -48,7 +48,7 @@ let framac_logo, framac_icon =
 module Configuration = struct
   include Cilconfig
   let configuration_file () =
-    Gui_parameters.Config.get_file ~mode:`Create_path "frama-c-gui.config"
+    Gui_parameters.Config_dir.get_file ~create_path:true "frama-c-gui.config"
   let load () = loadConfiguration (configuration_file ())
   let save () = saveConfiguration (configuration_file ())
   let reset () = Extlib.safe_remove (configuration_file () :> string);

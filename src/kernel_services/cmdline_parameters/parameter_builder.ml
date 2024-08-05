@@ -538,6 +538,100 @@ struct
   end
 
   (* ************************************************************************ *)
+  (** {3 Make_*_dir} *)
+  (* ************************************************************************ *)
+
+  (** Builds a Site_dir from an existing one. The corresponding directory always
+      performs a full path resolution.
+
+      @since Frama-C+dev
+  *)
+  module Make_site_dir
+      (Parent: Parameter_sig.Site_dir)
+      (Info: sig val name: string end)
+    : Parameter_sig.Site_dir
+  =
+  struct
+    (* Note: it recursively rebuilds the path relative to the root directory,
+       until we reach the root and resolve the path. *)
+    let get_dir name = Parent.get_dir (Info.name ^ "/" ^ name)
+    let get_file name = Parent.get_file (Info.name ^ "/" ^ name)
+  end
+
+  (** Builds a User_dir from an existing one.
+
+      @since Frama-C+dev
+  *)
+  module Make_user_dir
+      (Parent: Parameter_sig.User_dir)
+      (Info: sig val name: string end)
+    : Parameter_sig.User_dir
+  =
+  struct
+    let get_dir ?create_path name =
+      Parent.get_dir ?create_path (Info.name ^ "/" ^ name)
+    let get_file ?create_path name =
+      Parent.get_file ?create_path (Info.name ^ "/" ^ name)
+  end
+
+  module Make_user_dir_opt
+      (Parent: Parameter_sig.User_dir)
+      (Info: sig
+         include Parameter_sig.Input_with_arg
+         val env: string option
+         val dirname: string
+       end): Parameter_sig.User_dir_opt
+  =
+  struct
+    open Fc_Filepath.Normalized
+
+    module Dir_name =
+      Filepath
+        (struct
+          include Info
+          let existence = Fc_Filepath.Indifferent
+          let file_kind = ""
+        end)
+
+    let get () =
+      if Dir_name.is_set () then Dir_name.get ()
+      else
+        match Option.bind Info.env Sys.getenv_opt with
+        | Some s when s <> "" -> of_string s
+        | _ -> Parent.get_dir Info.dirname
+
+    let set = Dir_name.set
+    let is_set = Dir_name.is_set
+
+    let expected ~dir path =
+      if dir <> Fc_Filepath.is_dir path then
+        P.L.abort "%a is expected to be a %s"
+          pretty path (if dir then "directory" else "file")
+
+    let mk_dir d =
+      try ignore @@ Extlib.mkdir ~parents:true d 0o755
+      with Unix.Unix_error _ ->
+        P.L.abort "cannot create %s directory `%a'" Info.dirname pretty d
+
+    let get_dir ?(create_path=false) s =
+      let dir = concat (get ()) s in
+      if Fc_Filepath.exists dir
+      then (expected ~dir:true dir ; dir)
+      else if create_path
+      then (mk_dir dir ; dir)
+      else dir
+
+    let get_file ?create_path s =
+      let base_dir = get_dir ?create_path @@ Filename.dirname s in
+      (* No need to create anything here, as the path of sub-directories has
+         been already created by [get_dir] for computing [base_dir]. *)
+      let path = concat base_dir @@ Filename.basename s in
+      if Fc_Filepath.exists path then
+        expected ~dir:false path ;
+      path
+  end
+
+  (* ************************************************************************ *)
   (** {3 Custom parameters} *)
   (* ************************************************************************ *)
 

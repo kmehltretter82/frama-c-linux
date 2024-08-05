@@ -20,13 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let () = Plugin.is_config_visible ()
 include Plugin.Register
     (struct
       let name = "GUI"
       let shortname = "gui"
       let help = "Graphical User Interface"
     end)
+
+module Config_dir = Config_dir ()
 
 let () = Parameter_customize.do_not_projectify ()
 module Project_name =

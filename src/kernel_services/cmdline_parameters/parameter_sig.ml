@@ -324,42 +324,99 @@ module type Filepath = sig
   val is_empty: unit -> bool
 end
 
-(** signature for searching files in a specific directory. *)
-module type Specific_dir = sig
+(** Dune site directories (share, lib, ...) and subdirectories.
+    They are connected to a root module (see {!Site_root}), that may not be
+    unique, and these are considered as installed files (although the user might
+    provide another location).
 
+    @since Frama-C+dev
+*)
+module type Site_dir = sig
+  val get_dir: string -> Filepath.Normalized.t
+  (** [get_dir name] tries to find the directory named [name] in the
+      site. The function aborts if: [name] cannot be found or is a file instead
+      of a directory, otherwise it returns the path.
+
+      Be careful! This function finds the first directory that exists in the
+      site path. Thus, by extending this path, we get *only* the subdirs and
+      files in this directory, not in all directories of same name.
+      {!Builder.Make_site_dir} can be used to get directories that will always
+      perform the resolution.
+  *)
+
+  val get_file: string -> Filepath.Normalized.t
+  (** [get_file name] tries to find the file named [name] in the
+      site. The function aborts if: [name] cannot be found or is a directory
+      instead of a file, otherwise it returns the path.
+  *)
+end
+
+(** Dune site roots (share, lib, ...).
+
+    @since Frama-C+dev
+*)
+module type Site_root = sig
   val set: Filepath.Normalized.t -> unit
-  (** Sets the plugin <specific-dir> directory (without creating it). *)
+  (** Sets the <dune-site-dir> directory (without creating it). *)
 
   val get: unit -> Filepath.Normalized.t
-  (** @return the plugin <specific-dir> directory (without creating it). *)
+  (** @return the <dune-site-dir> directory (without creating it). *)
 
   val is_set: unit -> bool
-  (** @return whether the plugin <specific-dir> has been set. *)
+  (** @return whether the <dune-site-dir> has been set. *)
 
-  val get_dir:
-    ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
-    string ->
-    Filepath.Normalized.t
-  (** [get_dir ?mode p] returns a (local) path [p], i.e. relative to the plugin
-      <specific-dir> directory, of a sub-directory of the plugin <specific-dir>
-      directory.
-      @param mode determines how to handle the resulting path:
-      + [Normalize_only] just normalizes the resulting path (default).
-      + [Create_path] creates the resulting path, if does not exist.
-      + [Must_exist] aborts if the resulting path does not exist. *)
-
-  val get_file:
-    ?mode:[`Normalize_only | `Create_path |  `Must_exist ] ->
-    string ->
-    Filepath.Normalized.t
-    (** [get_file ?mode p] returns a (local) path [p], i.e. relative to the
-        plugin <specific-dir> directory, of a file in the plugin <specific-dir>
-        directory.
-        @param mode determines how to handle the resulting path:
-        + [Normalize_only] just normalizes the resulting path (default).
-        + [Create_path] creates the dirname of resulting path, if does not exist.
-        + [Must_exist] aborts if the resulting path does not exist. *)
+  include Site_dir
 end
+
+(** User directories (session, config, state, ...).
+    We do not expect these directories/files to exist. Several roots are
+    provided in {!Plugin}, namely {!Plugin.Session}, {!Plugin.Cache_dir},
+    {!Plugin.Config_dir} and {!Plugin.State_dir}.
+
+    @since Frama-C+dev
+*)
+module type User_dir = sig
+  val get_dir: ?create_path:bool -> string -> Filepath.Normalized.t
+  (** [get_dir ~create_path name] tries to get the directory [name].
+      The function aborts if:
+      - a file named [name] exists,
+      - creating a the directory fails.
+
+      Otherwise returns the path, and creates it if [create_path] is true
+      (it defaults to false). Subdirectories modules can be created with
+      {!Builder.Make_user_dir} and {!Builder.Make_user_dir_opt}.
+  *)
+
+  val get_file: ?create_path:bool -> string -> Filepath.Normalized.t
+  (** [get_file ~create_path name] tries to get the file [name].
+      The function aborts if:
+      - a directory named [name] exists,
+      - creating the path to the file fails.
+
+      Otherwise returns the path, and creates the directories that lead to the
+      file if [create_path] is true (it defaults to false). The file is *not*
+      created by the function.
+  *)
+end
+
+(** Basically {!User_dir} but with an option to override the original path.
+
+    @since Frama-C+dev
+*)
+module type User_dir_opt = sig
+  include User_dir
+
+  val set: Filepath.Normalized.t -> unit
+  (** Sets the <user-dir> directory (without creating it). *)
+
+  val get: unit -> Filepath.Normalized.t
+  (** @return the <user-dir> directory (without creating it). *)
+
+  val is_set: unit -> bool
+  (** @return whether the <user-dir> has been set. *)
+end
+
+
 
 (* ************************************************************************** *)
 (** {3 Collections} *)
@@ -572,6 +629,47 @@ module type Builder = sig
       (** used in error message if the file does not exist where it should
           and vice-versa. *)
     end): Filepath
+
+  (** Builds a {!Site_dir} from an existing one. The first parameter is the
+      parent directory. The second gives the name of the directory to create.
+
+      @since Frama-C+dev
+  *)
+  module Make_site_dir
+      (_: Site_dir)
+      (_: sig val name: string end)
+    : Site_dir
+
+
+  (** Builds a {!User_dir} from an existing one. The first parameter is the
+      parent directory. The second gives the name of the directory to create.
+
+      @since Frama-C+dev
+  *)
+  module Make_user_dir
+      (_: User_dir)
+      (_: sig val name: string end)
+    : User_dir
+
+  (** Builds a {!User_dir_opt} from an existing {!User_dir}. The first parameter
+      is the parent directory. The second gives the name of the directory to
+      create (also used to create the option name), a possible environment
+      variable name and the help message for the option.
+
+      @since Frama-C+dev
+  *)
+  module Make_user_dir_opt
+      (_: User_dir)
+      (_: sig
+         include Input_with_arg
+         val env: string option
+         (** Can be used to provide an environment variable that can be used
+             instead of the option. The option has higher priority.
+         *)
+
+         val dirname: string
+         (** The name of the directory *)
+       end): User_dir_opt
 
   (** Allow using custom types as parameters.
       @since 29.0-Copper *)

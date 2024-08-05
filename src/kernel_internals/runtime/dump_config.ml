@@ -45,31 +45,31 @@ let dump_to_json () =
   let string s = `String s in
   let list f l = `List (List.map f l) in
   `Assoc [
-    "version", `String Fc_config.version ;
-    "codename", `String Fc_config.codename ;
-    "version_and_codename", `String Fc_config.version_and_codename ;
-    "major_version", `Int Fc_config.major_version ;
-    "minor_version", `Int Fc_config.minor_version ;
-    "is_gui", `Bool Fc_config.is_gui ;
-    (* "lablgtk", `String Fc_config.lablgtk ;
-     * "ocamlc", `String Fc_config.ocamlc ;
-     * "ocamlopt", `String Fc_config.ocamlopt ;
-     * "ocaml_wflags", `String Fc_config.ocaml_wflags ; *)
-    "datadir", `String (Fc_config.datadir:>string) ;
+    "version", `String System_config.Version.id ;
+    "codename", `String System_config.Version.codename ;
+    "version_and_codename", `String System_config.Version.id_and_codename ;
+    "major_version", `Int System_config.Version.major ;
+    "minor_version", `Int System_config.Version.minor ;
+    "is_gui", `Bool System_config.is_gui ;
+    (* "lablgtk", `String System_config.lablgtk ;
+     * "ocamlc", `String System_config.ocamlc ;
+     * "ocamlopt", `String System_config.ocamlopt ;
+     * "ocaml_wflags", `String System_config.ocaml_wflags ; *)
+    "datadir", `String (System_config.Share.main:>string) ;
     "datadirs",
-    list string (Filepath.Normalized.to_string_list Fc_config.datadirs) ;
-    "framac_libc", `String (Fc_config.framac_libc:>string) ;
+    list string (Filepath.Normalized.to_string_list System_config.Share.dirs) ;
+    "framac_libc", `String (System_config.Share.libc:>string) ;
     "plugin_dir",
-    list string (Filepath.Normalized.to_string_list Fc_config.plugin_dir) ;
-    "lib_dir", `String (Fc_config.libdir:>string) ;
+    list string (Filepath.Normalized.to_string_list System_config.Plugins.dirs) ;
+    "lib_dir", `String (System_config.Lib.main:>string) ;
     "lib_dirs",
-    list string (Filepath.Normalized.to_string_list Fc_config.libdirs) ;
-    "preprocessor", `String Fc_config.preprocessor ;
-    "using_default_cpp", `Bool Fc_config.using_default_cpp ;
-    "preprocessor_is_gnu_like", `Bool Fc_config.preprocessor_is_gnu_like ;
+    list string (Filepath.Normalized.to_string_list System_config.Lib.dirs) ;
+    "preprocessor", `String System_config.Preprocessor.command ;
+    "using_default_cpp", `Bool System_config.Preprocessor.is_default ;
+    "preprocessor_is_gnu_like", `Bool System_config.Preprocessor.is_gnu_like ;
     "preprocessor_supported_arch_options",
-    list string Fc_config.preprocessor_supported_arch_options ;
-    "preprocessor_keep_comments", `Bool Fc_config.preprocessor_keep_comments ;
+    list string System_config.Preprocessor.supported_arch_options ;
+    "preprocessor_keep_comments", `Bool System_config.Preprocessor.keep_comments ;
     "current_machdep", `String (Kernel.Machdep.get ()) ;
     "machdeps", list string (File.list_available_machdeps ()) ;
     "plugins", list string (list_plugin_names ()) ;

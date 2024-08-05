@@ -119,11 +119,15 @@ let load_packages pkgs =
 (* -------------------------------------------------------------------------- *)
 
 let load_plugin_path () =
-  if Fc_config.is_gui then Config_data.Plugins.Plugins_gui.load_all ();
-  Config_data.Plugins.Plugins.load_all ()
+  System_config.Plugins.load_all ()
 
 let load_plugin m =
-  Config_data.Plugins.Plugins.load m
+  try System_config.Plugins.load m
+  (* Ok, this is ugly, but Dune Site does not give any way to catch this ...
+     Note that we abort with a user error.
+  *)
+  with e -> Klog.abort "Failed to load plug-in %S@.Exception: %s" m
+              (Printexc.to_string e)
 
 let load_module m =
   let base,ext = split_ext m in

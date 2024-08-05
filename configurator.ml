@@ -234,6 +234,27 @@ module Fc_version = struct
       "s|@MINOR_VERSION@|%s|" version.minor
 end
 
+module OS = struct
+  type t = Windows | MacOS | OtherUnix
+
+  let get configurator =
+    match C.ocaml_config_var_exn configurator "os_type" with
+    | "Win32" -> Windows
+    | _ ->
+      match C.ocaml_config_var_exn configurator "system" with
+      | "macosx" -> MacOS
+      | _ -> OtherUnix
+
+  let pp_sed fmt t =
+    let module_dirs = match t with
+      | Windows   -> "Win_dirs"
+      | MacOS     -> "Macos_dirs"
+      | OtherUnix -> "Unix_dirs"
+    in
+    Format.fprintf fmt
+      "s|@FRAMAC_TARGET_SYSTEM_CONFIG_INCLUDE@|%s|" module_dirs
+end
+
 let python_available configurator =
   let result = C.Process.run configurator "python3" ["--version"] in
   if result.exit_code <> 0 then false
@@ -256,9 +277,11 @@ let python_available configurator =
 let configure configurator =
   let version = Fc_version.get configurator in
   let cpp = Cpp.get configurator in
+  let os = OS.get configurator in
   let config_sed = open_out "config.sed" in
   let fmt = Format.formatter_of_out_channel config_sed in
-  Format.fprintf fmt "%a\n%a\n" Fc_version.pp_sed version Cpp.pp_sed cpp ;
+  Format.fprintf fmt "%a\n%a\n%a\n"
+    Fc_version.pp_sed version Cpp.pp_sed cpp OS.pp_sed os ;
   close_out config_sed ;
   let python = open_out "python-3.7-available" in
   Printf.fprintf python "%b" (python_available configurator) ;

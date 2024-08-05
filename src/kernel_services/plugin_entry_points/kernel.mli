@@ -412,16 +412,26 @@ module LoadLibrary: Parameter_sig.String_list
 module AutoLoadPlugins: Parameter_sig.Bool
 (** Behavior of option "-autoload-plugins" *)
 
-module Session_dir: Parameter_sig.Filepath
+module Session_dir: Parameter_sig.User_dir
 (** Directory in which session files are searched.
     @since Neon-20140301
     @before 23.0-Vanadium parameter type was string instead of Filepath.
 *)
 
-module Config_dir: Parameter_sig.Filepath
+module Cache_dir: Parameter_sig.User_dir
+(** Directory in which cache files are searched.
+    @since Frama-C+dev
+*)
+
+module Config_dir: Parameter_sig.User_dir
 (** Directory in which config files are searched.
     @since Neon-20140301
     @before 23.0-Vanadium parameter type was string instead of Filepath.
+*)
+
+module State_dir: Parameter_sig.User_dir
+(** Directory in which state files are searched.
+    @since Frama-C+dev
 *)
 
 (* this stop special comment does not work as expected (and as explained in the

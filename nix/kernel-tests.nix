@@ -19,6 +19,7 @@ mk_tests {
     dune runtest -j1 --display short \
       src/plugins/server/tests/batch \
       tests/fc_script \
+      tests/misc \
       tests/syntax
     make -C share/machdeps check-schema
   '';
