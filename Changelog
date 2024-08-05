@@ -18,6 +18,11 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o   Kernel    [2024-08-05] Added new modules `Cache_dir` and `State_dir`
+              and additional facilities to build sub-directories in these
+-!  Kernel    [2024-08-05] Changed `Config_dir` module signature, and
+              behavior on macOS and Windows
+o!  Kernel    [2024-08-05] Changed `Share` module signature
 o   Kernel    [2024-07-30] mapNoCopy moved to Extlib and deprecated in Cil
 o   Eva       [2024-07-31] Export profiling information about the analysis
               performance via the new module Eva_perf in Eva.mli.
