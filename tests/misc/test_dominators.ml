@@ -48,11 +48,9 @@ let print_nearest f =
    (post)dominators of a statement [s] is equal to the singleton [s]. *)
 let test_strict f =
   let test s dom strict_dom =
-    match dom, strict_dom with
-    | Some dom, Some strict_dom ->
-      assert (StmtSet.diff dom strict_dom == StmtSet.singleton s)
-    | None, None -> ()
-    | _ -> assert false
+    if StmtSet.is_empty dom
+    then assert (StmtSet.is_empty strict_dom)
+    else assert (StmtSet.diff dom strict_dom == StmtSet.singleton s)
   in
   List.iter (fun s ->
       let dom = Dominators.get_dominators s in

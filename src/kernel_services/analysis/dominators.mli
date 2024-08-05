@@ -56,24 +56,24 @@ val compute_postdominators : kernel_function -> unit
     @since Frama-C+dev
 *)
 
-val get_dominators : stmt -> Cil_datatype.Stmt.Hptset.t option
-(** Return the [set] of dominators of the given statement. [None] means the
-    statement is unreachable.
+val get_dominators : stmt -> Cil_datatype.Stmt.Hptset.t
+(** Return the [set] of dominators of the given statement.
+    The empty set means the statement is unreachable.
     @since Frama-C+dev
 *)
 
-val get_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t option
-(** Return the [set] of postdominators of the given statement. [None] means the
-    statement is unreachable.
+val get_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t
+(** Return the [set] of postdominators of the given statement.
+    The empty set means the statement is unreachable.
     @since Frama-C+dev
 *)
 
-val get_strict_dominators : stmt -> Cil_datatype.Stmt.Hptset.t option
+val get_strict_dominators : stmt -> Cil_datatype.Stmt.Hptset.t
 (** Same as [get_dominators] but exclude the statement itself.
     @since Frama-C+dev
 *)
 
-val get_strict_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t option
+val get_strict_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t
 (** Same as [get_postdominators] but exclude the statement itself.
     @since Frama-C+dev
 *)

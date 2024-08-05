@@ -45,34 +45,9 @@ module StmtSet = struct
     List.find_opt f' (elements set)
 end
 
-(* Used to store the result of the analysis. [None] means the statement is
-   unreachable while [Some set] means the statement was reached with this set
-   of statements. *)
-module StmtSetOpt = struct
-  include Datatype.Option (StmtSet)
-
-  let remove s setopt =
-    Option.map (StmtSet.remove s) setopt
-
-  let mem s setopt =
-    Option.fold ~none:false ~some:(StmtSet.mem s) setopt
-
-  let inter s s' =
-    match s, s' with
-    | None, None -> None
-    | Some s, None | None, Some s -> Some s
-    | Some s, Some s' -> Some (StmtSet.inter s s')
-
-  let find_opt_for_all f setopt =
-    Option.bind setopt (StmtSet.find_opt_for_all f)
-
-  let pretty fmt setopt =
-    Pretty_utils.pp_opt ~none:"Top" StmtSet.pretty fmt setopt
-end
-
 module DotGraph = Graph.Graphviz.Dot (
   struct
-    type t = string * (StmtSetOpt.t StmtTbl.t)
+    type t = string * (StmtSet.t StmtTbl.t)
     module V = struct
       type t = stmt
       let pretty fmt v = Cil_printer.pp_stmt fmt v
@@ -87,11 +62,7 @@ module DotGraph = Graph.Graphviz.Dot (
       StmtTbl.iter (fun stmt _ -> f stmt) graph
 
     let iter_edges_e f (_, graph) =
-      let do_edges stmt set_opt =
-        let do_edge p = f (p, stmt) in
-        Option.iter (fun set -> StmtSet.iter do_edge set) set_opt
-      in
-      StmtTbl.iter do_edges graph
+      StmtTbl.iter (fun stmt -> StmtSet.iter (fun p -> f (p, stmt))) graph
 
     let graph_attributes (title, _) = [`Label title]
 
@@ -145,7 +116,7 @@ module Compute (Analysis : Analysis) = struct
 
   module Table =
     Cil_state_builder.Stmt_hashtbl
-      (StmtSetOpt)
+      (StmtSet)
       (struct
         let name = Analysis.name ^ "_table"
         let dependencies = [Ast.self]
@@ -166,11 +137,11 @@ module Compute (Analysis : Analysis) = struct
         (* Compute the analysis, initial state is empty. *)
         let result = Analysis.fixpoint kf StmtSet.empty in
         (* Fill table with all statements. *)
-        List.iter (fun stmt -> Table.add stmt None) f.sallstmts;
+        List.iter (fun stmt -> Table.add stmt StmtSet.empty) f.sallstmts;
         (* Update the table with analysis results. *)
         Analysis.Result.iter_stmt (fun s set ->
             (* A statement always (post)dominates itself, so we add it here. *)
-            Table.replace s (Some (StmtSet.add s set))
+            Table.replace s (StmtSet.add s set)
           ) result;
         Kernel.feedback ~level:2 "done for function %a"
           Kernel_function.pretty kf
@@ -190,53 +161,46 @@ module Compute (Analysis : Analysis) = struct
     | Some v -> v
 
   (* Generic function to get the set of strict (post)dominators of [stmt]. *)
-  let get_strict stmt = get stmt |> StmtSetOpt.remove stmt
+  let get_strict stmt = get stmt |> StmtSet.remove stmt
 
   (* Generic function to test the (post)domination of 2 statements. *)
-  let mem a b = get b |> StmtSetOpt.mem a
+  let mem a b = get b |> StmtSet.mem a
 
   (* Generic function to test the strict (post)domination of 2 statements. *)
-  let mem_strict a b = get_strict b |> StmtSetOpt.mem a
+  let mem_strict a b = get_strict b |> StmtSet.mem a
 
   (* The nearest common ancestor (resp. children) is the ancestor which is
      dominated (resp. postdominated) by all common ancestors, ie. the lowest
      (resp. highest) ancestor in the domination tree. *)
   let nearest stmtl =
-    let exception Unreachable in
     (* Get the set of strict (post)doms for each statement and intersect them to
-       keep the common ones. If one of them is None (unreachable), they do not
+       keep the common ones. If one of them is unreachable, they do not
        share a common ancestor/children. *)
     let common_set =
-      try
-        List.fold_left (fun acc s ->
-            match get_strict s with
-            | None -> raise Unreachable
-            | set -> StmtSetOpt.inter acc set
-          ) None stmtl
-      with Unreachable -> None
+      match stmtl with
+      | [] -> StmtSet.empty
+      | stmt :: tail ->
+        List.fold_left
+          (fun acc s -> StmtSet.inter acc (get_strict s))
+          (get_strict stmt) tail
     in
     (* Try to find a statement [s] in [common_set] which is (post)dominated by
        all statements of the [common_set]. *)
-    StmtSetOpt.find_opt_for_all (Fun.flip mem) common_set
+    StmtSet.find_opt_for_all (Fun.flip mem) common_set
 
   let pretty fmt () =
     let l = Table.to_seq () |> List.of_seq in
     Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~empty:"Empty"
       (fun fmt (k,v) ->
-         Format.fprintf fmt "Stmt:%d -> @[%a@]" k.sid StmtSetOpt.pretty v
+         Format.fprintf fmt "Stmt:%d -> @[%a@]" k.sid StmtSet.pretty v
       ) fmt l
 
   let get_set graph stmt =
     match StmtTbl.find_opt graph stmt with
-    | Some None -> assert false
-    | Some (Some l) -> l
+    | Some l -> l
     | None ->
-      match get_strict stmt with
-      | Some set ->
-        StmtTbl.add graph stmt (Some set); set
-      | None ->
-        StmtTbl.add graph stmt None;
-        raise Not_found
+      let set = get_strict stmt in
+      StmtTbl.add graph stmt set; set
 
   (* [s_set] are [s] (post)dominators, including [s]. We don't have to represent
      the relation between [s] and [s], so [get_set] removes it. And because the
@@ -246,12 +210,10 @@ module Compute (Analysis : Analysis) = struct
   let reduce graph s =
     (* Union of all (post)dominators of [s] (post)dominators [s_set]. *)
     let unions p acc = get_set graph p |> StmtSet.union acc in
-    try
-      let s_set = get_set graph s in
-      let p_sets = StmtSet.fold unions s_set StmtSet.empty in
-      let res = StmtSet.diff s_set p_sets in
-      StmtTbl.replace graph s (Some res)
-    with Not_found -> ()
+    let s_set = get_set graph s in
+    let p_sets = StmtSet.fold unions s_set StmtSet.empty in
+    let res = StmtSet.diff s_set p_sets in
+    StmtTbl.replace graph s res
 
   let build_dot filename kf =
     match kf.fundec with
