@@ -31,27 +31,12 @@ open Interpreted_automata
 module StmtTbl = Cil_datatype.Stmt.Hashtbl
 
 (* State type for our domain. *)
-module StmtSet = struct
-  include Cil_datatype.Stmt.Hptset
-  let pretty fmt set =
-    Pretty_utils.pp_iter ~pre:"@[{" ~sep:",@," ~suf:"}@]"
-      iter (fun fmt stmt -> Format.pp_print_int fmt stmt.sid)
-      fmt set
-
-  (* [find_opt_for_all f set] find the first element [a] of the [set] which
-     satisfies [f a b] on all elements [b] of [set] (including himself). *)
-  let find_opt_for_all f set =
-    let f' a = for_all (fun b -> f a b) set in
-    List.find_opt f' (elements set)
-end
+module StmtSet = Cil_datatype.Stmt.Hptset
 
 module DotGraph = Graph.Graphviz.Dot (
   struct
     type t = string * (StmtSet.t StmtTbl.t)
-    module V = struct
-      type t = stmt
-      let pretty fmt v = Cil_printer.pp_stmt fmt v
-    end
+    module V = struct type t = stmt end
     module E = struct
       type t = (V.t * V.t)
       let src = fst
@@ -71,7 +56,7 @@ module DotGraph = Graph.Graphviz.Dot (
     let vertex_name stmt = string_of_int stmt.sid
 
     let vertex_attributes stmt =
-      let txt = Format.asprintf "%a" V.pretty stmt in
+      let txt = Format.asprintf "%a" Cil_printer.pp_stmt stmt in
       [`Label txt]
 
     let default_edge_attributes _g = []
@@ -186,14 +171,19 @@ module Compute (Analysis : Analysis) = struct
     in
     (* Try to find a statement [s] in [common_set] which is (post)dominated by
        all statements of the [common_set]. *)
-    StmtSet.find_opt_for_all (Fun.flip mem) common_set
+    let is_dom_by_all a = StmtSet.for_all (fun b -> mem b a) common_set in
+    List.find_opt is_dom_by_all (StmtSet.elements common_set)
 
   let pretty fmt () =
-    let l = Table.to_seq () |> List.of_seq in
-    Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~empty:"Empty"
-      (fun fmt (k,v) ->
-         Format.fprintf fmt "Stmt:%d -> @[%a@]" k.sid StmtSet.pretty v
-      ) fmt l
+    let list = Table.to_seq () |> List.of_seq in
+    let pp_set fmt set =
+      Pretty_utils.pp_iter ~pre:"@[{" ~sep:",@," ~suf:"}@]"
+        StmtSet.iter (fun fmt stmt -> Format.pp_print_int fmt stmt.sid)
+        fmt set
+    in
+    Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~suf:"@]" ~empty:"Empty"
+      (fun fmt (s, set) -> Format.fprintf fmt "Stmt:%d -> %a" s.sid pp_set set)
+      fmt list
 
   let get_set graph stmt =
     match StmtTbl.find_opt graph stmt with
