@@ -156,13 +156,13 @@ module Compute (Analysis : Analysis) = struct
   (* Generic function to test the strict (post)domination of 2 statements. *)
   let mem_strict a b = get_strict b |> StmtSet.mem a
 
-  (* The nearest common ancestor (resp. children) is the ancestor which is
+  (* The nearest common ancestor (resp. child) is the ancestor which is
      dominated (resp. postdominated) by all common ancestors, ie. the lowest
      (resp. highest) ancestor in the domination tree. *)
   let nearest stmtl =
     (* Get the set of strict (post)doms for each statement and intersect them to
        keep the common ones. If one of them is unreachable, they do not
-       share a common ancestor/children. *)
+       share a common ancestor/child. *)
     let common_set =
       match stmtl with
       | [] -> StmtSet.empty
@@ -259,6 +259,6 @@ let get_strict_postdominators = PostDominators.get_strict
 let postdominates = PostDominators.mem
 let strictly_postdominates = PostDominators.mem_strict
 let get_ipostdom s = PostDominators.nearest [s]
-let nearest_common_children = PostDominators.nearest
+let nearest_common_child = PostDominators.nearest
 let pretty_postdominators = PostDominators.pretty
 let print_dot_postdominators = PostDominators.print_dot

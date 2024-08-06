@@ -36,7 +36,7 @@
     (post)dominator of [s] that strictly (post)dominates [s] but is
     (post)dominated by all other (post)dominators of [s].
 
-    A common ancestor (or children) of a list of statements is a (post)dominator
+    A common ancestor (or child) of a list of statements is a (post)dominator
     that (post)dominates all the statements
 
     @before Frama-C+dev This module was using [Dataflow2] instead of
@@ -112,8 +112,8 @@ val nearest_common_ancestor : stmt list -> stmt option
     raised a failed assertion in case of unreachable statement.
 *)
 
-val nearest_common_children : stmt list -> stmt option
-(** Return the closest common children of the given statement list.
+val nearest_common_child : stmt list -> stmt option
+(** Return the closest common child of the given statement list.
     @since Frama-C+dev
 *)
 

@@ -26,7 +26,7 @@ let print_immediate f =
     f.svar.vname
     (Pretty_utils.pp_list ~pre:"@[" ~sep:",@ " ~suf:"@]" pp_res) res
 
-(** For each couple of statement of [f], find their common ancestor and children
+(** For each couple of statement of [f], find their common ancestor and child
     and print the quadruplets. *)
 let print_nearest f =
   assert (Dominators.nearest_common_ancestor [] = None);
@@ -34,13 +34,13 @@ let print_nearest f =
     List.map (fun s ->
         List.map (fun s' ->
             let dom = Dominators.nearest_common_ancestor [s; s'] in
-            let postdom = Dominators.nearest_common_children [s; s'] in
+            let postdom = Dominators.nearest_common_child [s; s'] in
             [string_of_int s.sid; string_of_int s'.sid; get dom; get postdom]
           ) f.sallstmts
       ) f.sallstmts
     |> List.flatten
   in
-  Format.printf "@[<v2>Nearest common ancestors/children of %s (sid, sid, ancestor, children):@;%a@]@;"
+  Format.printf "@[<v2>Nearest common ancestors/child of %s (sid, sid, ancestor, child):@;%a@]@;"
     f.svar.vname
     (Pretty_utils.pp_list ~pre:"@[" ~sep:",@ " ~suf:"@]" pp_res) res
 
