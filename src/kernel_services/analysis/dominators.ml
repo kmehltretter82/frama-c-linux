@@ -25,7 +25,6 @@
    given function. *)
 
 open Cil_types
-open Interpreted_automata
 
 (* Datatype used to create a dot graph using analysis results. *)
 module StmtTbl = Cil_datatype.Stmt.Hashtbl
@@ -76,14 +75,14 @@ module Domain = struct
 
   let widen a b =
     if StmtSet.subset a b then
-      Fixpoint
+      Interpreted_automata.Fixpoint
     else
-      Widening (join a b)
+      Interpreted_automata.Widening (join a b)
 
   (* Trivial transfer function: add all visited statements to the current
      state. *)
   let transfer v _ state =
-    match v.vertex_start_of with
+    match v.Interpreted_automata.vertex_start_of with
     | None -> Some state
     | Some stmt -> Some (StmtSet.add stmt state)
 end
@@ -91,8 +90,9 @@ end
 (* An analysis needs a name and a starting point. *)
 module type Analysis = sig
   val name : string
+  (* May raise Kernel_function.No_Statement. *)
   val get_starting_stmt : kernel_function -> stmt
-  include DataflowAnalysis with type state = Domain.t
+  include Interpreted_automata.DataflowAnalysis with type state = Domain.t
 end
 
 (* Main module, perform the analysis, store its results and provide ways to
@@ -109,8 +109,9 @@ module Compute (Analysis : Analysis) = struct
       end)
 
   let compute kf =
-    let init_stmt = Analysis.get_starting_stmt kf in
-    match Table.find_opt init_stmt with
+    match Table.find_opt (Analysis.get_starting_stmt kf) with
+    | exception Kernel_function.No_Statement ->
+      Kernel.fatal "No statement in function %a" Kernel_function.pretty kf
     | Some _ ->
       Kernel.feedback ~level:2 "%s analysis already computed for function %a"
         Analysis.name Kernel_function.pretty kf
@@ -123,11 +124,10 @@ module Compute (Analysis : Analysis) = struct
         let result = Analysis.fixpoint kf StmtSet.empty in
         (* Fill table with all statements. *)
         List.iter (fun stmt -> Table.add stmt StmtSet.empty) f.sallstmts;
+        (* A reachable statement always (post)dominates itself, so add it here. *)
+        let add_in_table stmt set = Table.replace stmt (StmtSet.add stmt set) in
         (* Update the table with analysis results. *)
-        Analysis.Result.iter_stmt (fun s set ->
-            (* A statement always (post)dominates itself, so we add it here. *)
-            Table.replace s (StmtSet.add s set)
-          ) result;
+        Analysis.Result.iter_stmt add_in_table result;
         Kernel.feedback ~level:2 "done for function %a"
           Kernel_function.pretty kf
       (* [Analysis.get_starting_stmt] should fatal before this point. *)
@@ -140,9 +140,8 @@ module Compute (Analysis : Analysis) = struct
 
   (* Generic function to get the set of (post)dominators of [stmt]. *)
   let get stmt =
-    let kf = find_kf stmt in
     match Table.find_opt stmt with
-    | None -> compute kf; Table.find stmt
+    | None -> compute (find_kf stmt); Table.find stmt
     | Some v -> v
 
   (* Generic function to get the set of strict (post)dominators of [stmt]. *)
@@ -185,22 +184,14 @@ module Compute (Analysis : Analysis) = struct
       (fun fmt (s, set) -> Format.fprintf fmt "Stmt:%d -> %a" s.sid pp_set set)
       fmt list
 
-  let get_set graph stmt =
-    match StmtTbl.find_opt graph stmt with
-    | Some l -> l
-    | None ->
-      let set = get_strict stmt in
-      StmtTbl.add graph stmt set; set
-
   (* [s_set] are [s] (post)dominators, including [s]. We don't have to represent
      the relation between [s] and [s], so [get_set] removes it. And because the
      (post)domination relation is transitive, if [p] is in [s_set], we can
-     remove [p_set] from [s_set] in order to have a clearer graph.
-  *)
+     remove [p_set] from [s_set] in order to have a clearer graph. *)
   let reduce graph s =
     (* Union of all (post)dominators of [s] (post)dominators [s_set]. *)
-    let unions p acc = get_set graph p |> StmtSet.union acc in
-    let s_set = get_set graph s in
+    let unions p acc = StmtTbl.find graph p |> StmtSet.union acc in
+    let s_set = StmtTbl.find graph s in
     let p_sets = StmtSet.fold unions s_set StmtSet.empty in
     let res = StmtSet.diff s_set p_sets in
     StmtTbl.replace graph s res
@@ -209,6 +200,8 @@ module Compute (Analysis : Analysis) = struct
     match kf.fundec with
     | Definition (fct, _) ->
       let graph = StmtTbl.create (List.length fct.sallstmts) in
+      let copy_in_graph stmt = get_strict stmt |> StmtTbl.replace graph stmt in
+      List.iter copy_in_graph fct.sallstmts;
       List.iter (reduce graph) fct.sallstmts;
       let name = Kernel_function.get_name kf in
       let title = Format.sprintf "%s for function %s" Analysis.name name in
@@ -229,68 +222,42 @@ end
 (* --- Dominators                                                     --- *)
 (* ---------------------------------------------------------------------- *)
 
-module Dominators = struct
-  module Analysis = struct
-    include ForwardAnalysis (Domain)
-    let name = "Dominators"
-    let get_starting_stmt kf =
-      try Kernel_function.find_first_stmt kf
-      with Kernel_function.No_Statement ->
-        Kernel.fatal "No first statement in function %a"
-          Kernel_function.pretty kf
-  end
-  include Compute (Analysis)
+module ForwardAnalysis = struct
+  include Interpreted_automata.ForwardAnalysis (Domain)
+  let name = "Dominators"
+  let get_starting_stmt kf = Kernel_function.find_first_stmt kf
 end
 
+module Dominators = Compute (ForwardAnalysis)
+
 let compute_dominators = Dominators.compute
-
 let get_dominators = Dominators.get
-
 let get_strict_dominators = Dominators.get_strict
-
 let dominates = Dominators.mem
-
 let strictly_dominates = Dominators.mem_strict
-
 let get_idom s = Dominators.nearest [s]
-
 let nearest_common_ancestor = Dominators.nearest
-
 let pretty_dominators = Dominators.pretty
-
 let print_dot_dominators = Dominators.print_dot
 
 (* ---------------------------------------------------------------------- *)
 (* --- Postdominators                                                 --- *)
 (* ---------------------------------------------------------------------- *)
 
-module PostDominators = struct
-  module Analysis = struct
-    include BackwardAnalysis (Domain)
-    let name = "PostDominators"
-    let get_starting_stmt kf =
-      try Kernel_function.find_return kf
-      with Kernel_function.No_Statement ->
-        Kernel.fatal "No return statement in function %a"
-          Kernel_function.pretty kf
-  end
-  include Compute (Analysis)
+module BackwardAnalysis = struct
+  include Interpreted_automata.BackwardAnalysis (Domain)
+  let name = "PostDominators"
+  let get_starting_stmt kf = Kernel_function.find_return kf
 end
 
+module PostDominators = Compute (BackwardAnalysis)
+
 let compute_postdominators = PostDominators.compute
-
 let get_postdominators = PostDominators.get
-
 let get_strict_postdominators = PostDominators.get_strict
-
 let postdominates = PostDominators.mem
-
 let strictly_postdominates = PostDominators.mem_strict
-
 let get_ipostdom s = PostDominators.nearest [s]
-
 let nearest_common_children = PostDominators.nearest
-
 let pretty_postdominators = PostDominators.pretty
-
 let print_dot_postdominators = PostDominators.print_dot

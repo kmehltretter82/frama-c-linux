@@ -383,6 +383,6 @@ Postominators analysis:
   Empty
 
 [kernel] Failure: Statement -1 is not part of a function
-[kernel] Failure: No first statement in function stop
-[kernel] Failure: No return statement in function stop
+[kernel] Failure: No statement in function stop
+[kernel] Failure: No statement in function stop
 [kernel] Failure: cannot compute for a function without body stop

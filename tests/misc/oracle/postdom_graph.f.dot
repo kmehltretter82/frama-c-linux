@@ -24,8 +24,6 @@ else {
      ];
   4 [label="/* sid:4 */
 test: c = 42;", ];
-  5 [label="/* sid:5 */
-goto test;", ];
   53 [label="/* sid:53 */
 {
   /* sid:8 */
@@ -34,6 +32,8 @@ goto test;", ];
   goto return_label;
 }",
       ];
+  5 [label="/* sid:5 */
+goto test;", ];
   54 [label="/* sid:54 */
 goto return_label;", ];
   6 [label="/* sid:6 */
