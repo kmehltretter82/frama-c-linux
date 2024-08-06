@@ -99,11 +99,11 @@ let cover_errors () =
     | Definition _ -> ()
     | Declaration _ ->
       (* Test Kernel_function.find_first_stmt on decl. *)
-      catch Dominators.compute_dominators kf;
+      Dominators.compute_dominators kf;
       (* Test Kernel_function.find_return on decl. *)
-      catch Dominators.compute_postdominators kf;
+      Dominators.compute_postdominators kf;
       (* Test print_dot on decl. *)
-      catch (Dominators.print_dot_dominators "tmp") kf
+      Dominators.print_dot_dominators "tmp" kf
   in
   Globals.Functions.iter trigger
 

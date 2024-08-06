@@ -26,6 +26,8 @@
 
 open Cil_types
 
+let dkey = Kernel.dkey_dominators
+
 (* Datatype used to create a dot graph using analysis results. *)
 module StmtTbl = Cil_datatype.Stmt.Hashtbl
 
@@ -111,14 +113,15 @@ module Compute (Analysis : Analysis) = struct
   let compute kf =
     match Table.find_opt (Analysis.get_starting_stmt kf) with
     | exception Kernel_function.No_Statement ->
-      Kernel.fatal "No statement in function %a" Kernel_function.pretty kf
+      Kernel.warning "No statement in function %a: %s analysis cannot be done"
+        Kernel_function.pretty kf Analysis.name
     | Some _ ->
-      Kernel.feedback ~level:2 "%s analysis already computed for function %a"
+      Kernel.feedback ~dkey "%s analysis already computed for function %a"
         Analysis.name Kernel_function.pretty kf
     | None ->
       match kf.fundec with
       | Definition (f, _) ->
-        Kernel.feedback ~level:2 "computing %s analysis for function %a"
+        Kernel.feedback ~dkey "computing %s analysis for function %a"
           Analysis.name Kernel_function.pretty kf;
         (* Compute the analysis, initial state is empty. *)
         let result = Analysis.fixpoint kf StmtSet.empty in
@@ -128,8 +131,8 @@ module Compute (Analysis : Analysis) = struct
         let add_in_table stmt set = Table.replace stmt (StmtSet.add stmt set) in
         (* Update the table with analysis results. *)
         Analysis.Result.iter_stmt add_in_table result;
-        Kernel.feedback ~level:2 "done for function %a"
-          Kernel_function.pretty kf
+        Kernel.feedback ~dkey "%s analysis done for function %a"
+          Analysis.name Kernel_function.pretty kf
       (* [Analysis.get_starting_stmt] should fatal before this point. *)
       | Declaration _ -> assert false
 
@@ -196,7 +199,7 @@ module Compute (Analysis : Analysis) = struct
     let res = StmtSet.diff s_set p_sets in
     StmtTbl.replace graph s res
 
-  let build_dot filename kf =
+  let print_dot basename kf =
     match kf.fundec with
     | Definition (fct, _) ->
       let graph = StmtTbl.create (List.length fct.sallstmts) in
@@ -205,17 +208,15 @@ module Compute (Analysis : Analysis) = struct
       List.iter (reduce graph) fct.sallstmts;
       let name = Kernel_function.get_name kf in
       let title = Format.sprintf "%s for function %s" Analysis.name name in
+      let filename = basename ^ "." ^ Kernel_function.get_name kf ^ ".dot" in
       let file = open_out filename in
       DotGraph.output_graph file (title, graph);
-      close_out file
+      close_out file;
+      Kernel.result "%s: dot file generated in %s for function %a"
+        Analysis.name filename Kernel_function.pretty kf
     | Declaration _ ->
-      Kernel.fatal "cannot compute for a function without body %a"
-        Kernel_function.pretty kf
-
-  let print_dot basename kf =
-    let filename = basename ^ "." ^ Kernel_function.get_name kf ^ ".dot" in
-    build_dot filename kf;
-    Kernel.result "dot file generated in %s" filename
+      Kernel.warning "cannot compute %s for function %a without body"
+        Analysis.name Kernel_function.pretty kf
 end
 
 (* ---------------------------------------------------------------------- *)
