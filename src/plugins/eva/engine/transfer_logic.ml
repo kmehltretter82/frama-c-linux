@@ -27,7 +27,26 @@ open Eval
 let ignore_predicate named_pred =
   List.exists (fun tag -> tag = "no_eva") named_pred.Cil_types.pred_name
 
-(* -------------------------- Message emission ------------------------------ *)
+let create_conjunction l=
+  let loc = match l with
+    | [] -> None
+    | p :: _ -> Some (Logic_const.pred_of_id_pred p).pred_loc
+  in
+  Logic_const.(List.fold_right (fun p1 p2 -> pand ?loc (p1, p2)) (List.map pred_of_id_pred l) ptrue)
+
+let ip_from_precondition kf call_ki b pre =
+  let ip_precondition = Property.ip_of_requires kf Kglobal b pre in
+  match call_ki with
+  | Kglobal -> (* status of the main function. We update the global
+                  status, and pray that there is no recursion.
+                  TODO: check what the WP does.*)
+    ip_precondition
+  | Kstmt stmt ->
+    (* choose the copy of the precondition on the call point [stmt]. *)
+    Statuses_by_call.setup_precondition_proxy kf ip_precondition;
+    Statuses_by_call.precondition_at_call kf ip_precondition stmt
+
+(* --------------------- Message and status emission ------------------------ *)
 
 (* The function that puts statuses on pre- and post-conditions is essentially
    agnostic as to which kind of property it operates on. However, the messages
@@ -60,15 +79,15 @@ let post_kind kf =
     else PostLeaf
   else PostBody
 
-let conv_status = function
-  | Alarmset.False -> Property_status.False_if_reachable;
-  | Alarmset.True -> Property_status.True;
-  | Alarmset.Unknown -> Property_status.Dont_know
-
 let emit_status ppt status =
-  if status = Property_status.False_if_reachable then begin
+  let status =
+    match status with
+    | Alarmset.False -> Property_status.False_if_reachable;
+    | Alarmset.True -> Property_status.True;
+    | Alarmset.Unknown -> Property_status.Dont_know
+  in
+  if status = Property_status.False_if_reachable then
     Red_statuses.add_red_property (Property.get_kinstr ppt) ppt;
-  end;
   Property_status.emit ~distinct:true Eva_utils.emitter ~hyps:[] ppt status
 
 (* Display the message as result/warning depending on [status] *)
@@ -111,7 +130,7 @@ let pp_predicate behavior kind fmt named_pred =
   in
   Format.fprintf fmt "%a%a" pp_p_kind kind pp_predicate named_pred
 
-let emit_message_and_status kind kf behavior ~active ~empty property named_pred status =
+let emit_contract_status kind kf behavior ~active ~empty property named_pred status =
   let pp_predicate = pp_predicate behavior kind in
   let source = fst (Property.location property) in
   match kind with
@@ -124,34 +143,51 @@ let emit_message_and_status kind kf behavior ~active ~empty property named_pred 
       Alarmset.Status.pretty status
       (if active then (fun _ -> ()) else behavior_inactive)
       Eva_utils.pp_callstack;
-    emit_status property (conv_status status);
+    emit_status property status;
   | Postcondition postk ->
     (* Do not emit a status for leaf functions or builtins. Otherwise, we would
        overwrite the "considered valid" status of the kernel. *)
     if emit_postcond_status postk
-    then emit_status property (conv_status status)
+    then emit_status property status
   | Assumes ->
     (* No statuses are emitted for 'assumes' clauses, and for the moment we
        do not emit text either *) ()
 
-let create_conjunction l=
-  let loc = match l with
-    | [] -> None
-    | p :: _ -> Some (Logic_const.pred_of_id_pred p).pred_loc
-  in
-  Logic_const.(List.fold_right (fun p1 p2 -> pand ?loc (p1, p2)) (List.map pred_of_id_pred l) ptrue)
+let pp_code_annot fmt ca =
+  match ca.annot_content with
+  | AAssert (_,{ tp_kind; tp_statement }) ->
+    let kind = Cil_printer.name_of_assert tp_kind in
+    Format.fprintf fmt "%s%a" kind Description.pp_named tp_statement
+  | AInvariant (_, _, { tp_statement }) ->
+    Format.fprintf fmt "loop invariant%a" Description.pp_named tp_statement
+  | AExtended (_, _, extension) ->
+    Format.fprintf fmt "%s annotation" extension.ext_name;
+  | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _ ->
+    assert false (* currently not treated by Eva *)
 
-let ip_from_precondition kf call_ki b pre =
-  let ip_precondition = Property.ip_of_requires kf Kglobal b pre in
-  match call_ki with
-  | Kglobal -> (* status of the main function. We update the global
-                  status, and pray that there is no recursion.
-                  TODO: check what the WP does.*)
-    ip_precondition
-  | Kstmt stmt ->
-    (* choose the copy of the precondition on the call point [stmt]. *)
-    Statuses_by_call.setup_precondition_proxy kf ip_precondition;
-    Statuses_by_call.precondition_at_call kf ip_precondition stmt
+(* location of the given code annotation. If unknown, use the location of the
+   statement instead. *)
+let code_annotation_loc stmt code_annot =
+  match Cil_datatype.Code_annotation.loc code_annot with
+  | Some loc when not (Cil_datatype.Location.(equal loc unknown)) -> loc
+  | _ -> Cil_datatype.Stmt.loc stmt
+
+let emit_code_annot_status ~reduce ~empty kf stmt code_annot status =
+  let source, _ = code_annotation_loc stmt code_annot in
+  let ips = Property.ip_of_code_annot kf stmt code_annot in
+  List.iter (fun p -> emit_status p status) ips;
+  let message =
+    match status with
+    | Alarmset.Unknown -> "unknown"
+    | Alarmset.True -> "valid"
+    | Alarmset.False ->
+      "invalid" ^ (if reduce then " (stopping propagation)" else "")
+  in
+  let prefix = if empty then "no state left, " else "" in
+  msg_status status ~once:true ~source
+    "%s%a got status %s." prefix pp_code_annot code_annot message
+
+(* --------------------- Process inactive behaviors ------------------------- *)
 
 (* Emits informative messages about inactive behaviors, and emits a valid
    status for requires and ensures that have not been evaluated. *)
@@ -163,14 +199,14 @@ let process_inactive_behavior kf call_ki behavior =
         emitted := true;
         if emit_postcond_status (post_kind kf) then
           let ip = Property.ip_of_ensures kf Kglobal behavior post in
-          emit_status ip Property_status.True;
+          emit_status ip Alarmset.True;
       end
     ) behavior.b_post_cond;
   List.iter (fun pre ->
       if pre.ip_content.tp_kind <> Admit then begin
         emitted := true;
         let ip = ip_from_precondition kf call_ki behavior pre in
-        emit_status ip Property_status.True;
+        emit_status ip Alarmset.True;
       end
     ) behavior.b_requires;
   if !emitted then
@@ -192,7 +228,7 @@ let process_inactive_postconds kf inactive_bhvs =
              emitted := true;
              if emit_postcond_status (post_kind kf) then
                let ip = Property.ip_of_ensures kf Kglobal b post in
-               emit_status ip Property_status.True;
+               emit_status ip Alarmset.True;
            end
          ) b.b_post_cond;
        if !emitted then
@@ -200,6 +236,57 @@ let process_inactive_postconds kf inactive_bhvs =
            "%a: requires got status invalid; postconditions not evaluated.%t"
            (pp_header kf) b Eva_utils.pp_callstack;
     ) inactive_bhvs
+
+
+(* ---------------- Evaluation of "calls" ACSL extension  ------------------- *)
+
+let get_call term =
+  match term.term_node with
+  | TLval (TVar { lv_origin = Some v }, TNoOffset ) -> Globals.Functions.get v
+  | _ -> raise Not_found
+
+(* Returns the list of kernel functions referred to by a "calls" annotation,
+   or raise exception Not_found if it is not a proper "calls" annotation. *)
+let get_calls_kf code_annot =
+  match code_annot.annot_content with
+  | AExtended (_, _, { ext_kind = Ext_terms terms }) -> List.map get_call terms
+  | _ -> raise Not_found
+
+(* Returns the "calls" annotations at statement [stmt]. *)
+let get_calls_annotations stmt =
+  let filter code_annot =
+    match code_annot.annot_content with
+    | AExtended (_, _, e) -> e.ext_name = "calls" && e.ext_has_status
+    | _ -> false
+  in
+  Annotations.code_annot ~filter stmt
+
+(* Checks one "calls" annotation [code_annot] at statement [stmt]. *)
+let check_calls_annotation stmt called_functions code_annot =
+  match get_calls_kf code_annot with
+  | exception Not_found ->
+    Self.warning ~current:true ~once:true
+      "Ignoring invalid calls annotation: %a"
+      Printer.pp_code_annotation code_annot;
+    called_functions
+  | kfs ->
+    let length = List.length called_functions in
+    let kfs = Kernel_function.Set.of_list kfs in
+    let is_call (kf, _) = Kernel_function.Set.mem kf kfs in
+    let called_functions = List.filter is_call called_functions in
+    let status =
+      match List.length called_functions with
+      | 0 -> Alarmset.False
+      | l when l = length -> Alarmset.True
+      | _ -> Alarmset.Unknown
+    in
+    let kf = Kernel_function.find_englobing_kf stmt in
+    emit_code_annot_status ~reduce:true ~empty:false kf stmt code_annot status;
+    called_functions
+
+let check_calls_annotations stmt called_functions =
+  let calls = get_calls_annotations stmt in
+  List.fold_left (check_calls_annotation stmt) called_functions calls
 
 (* -------------------------------- Functor --------------------------------- *)
 
@@ -392,7 +479,7 @@ module Make
        the pre- and post-states. *)
   let eval_and_reduce kf behavior active kind ips states build_prop build_env =
     let limit = Eva_utils.get_slevel kf in
-    let emit = emit_message_and_status kind kf behavior ~active in
+    let emit = emit_contract_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
       let record = pred.ip_content.tp_kind <> Admit in
@@ -534,30 +621,12 @@ module Make
       let assumes = create_conjunction behavior.b_assumes in
       Domain.evaluate_predicate pre_env state assumes
 
-  let code_annotation_text ca =
-    match ca.annot_content with
-    | AAssert (_,{tp_kind}) -> Cil_printer.name_of_assert tp_kind
-    | AInvariant _ ->  "loop invariant"
-    | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
-    | AExtended _ ->
-      assert false (* currently not treated by Value *)
-
-  (* location of the given code annotation. If unknown, use the location of the
-     statement instead. *)
-  let code_annotation_loc ca stmt =
-    match Cil_datatype.Code_annotation.loc ca with
-    | Some loc when not (Cil_datatype.Location.(equal loc unknown)) -> loc
-    | _ -> Cil_datatype.Stmt.loc stmt
-
 
   (* Reduce the given states according to the given code annotations.
      If [record] is true, update the proof state of the code annotation.
      DO NOT PASS record=false unless you know what your are doing *)
   let interp_annot ~limit ~record kf ab stmt code_annot ~initial_state states =
-    let ips = Property.ip_of_code_annot kf stmt code_annot in
-    let source, _ = code_annotation_loc code_annot stmt in
     let aux_interp ~record ~reduce code_annot behav p =
-      let text = code_annotation_text code_annot in
       let in_behavior =
         match behav with
         | [] -> `True
@@ -573,36 +642,13 @@ module Make
       match in_behavior with
       | `False -> states
       | `True | `Unknown as in_behavior ->
-        let emit status =
-          let change_status st = List.iter (fun p -> emit_status p st) ips in
-          let message =
-            match status, in_behavior with
-            | Alarmset.Unknown, _ ->
-              change_status Property_status.Dont_know;
-              "unknown"
-            | Alarmset.True, _ ->
-              change_status Property_status.True;
-              "valid"
-            | Alarmset.False, `True ->
-              change_status Property_status.False_if_reachable;
-              "invalid" ^ (if reduce then " (stopping propagation)" else "")
-            | Alarmset.False, `Unknown ->
-              change_status Property_status.False_if_reachable;
-              "invalid"
-          in
-          msg_status status ~once:true ~source
-            "%s%a got status %s." text Description.pp_named p message
-        in
+        (* No reduction if the behavior might be inactive. *)
+        let reduce = reduce && in_behavior = `True in
+        let emit = emit_code_annot_status ~reduce ~empty:false kf stmt in
         let reduce_state here res accstateset =
-          match res, in_behavior with
-          | _, `Unknown ->
-            (* Cannot conclude because behavior might be inactive *)
-            States.add here accstateset
-
-          | Alarmset.False, `True -> (* Dead/invalid branch *)
-            accstateset
-
-          | (Alarmset.Unknown | Alarmset.True), `True ->
+          match res with
+          | Alarmset.False -> accstateset (* Dead/invalid branch *)
+          | Alarmset.Unknown | Alarmset.True ->
             let env = here_env ~pre:initial_state ~here in
             (* Reduce by p if it is a disjunction, or if it did not
                evaluate to True *)
@@ -618,7 +664,7 @@ module Make
                let env = here_env ~pre:initial_state ~here in
                let res = Domain.evaluate_predicate env here p in
                (* if [record] holds, emit kernel status and print a message *)
-               if record then emit res;
+               if record then emit code_annot res;
                (* if [reduce] holds, reduce the state. *)
                if reduce then reduce_state here res accstateset else accstateset)
             states States.empty
@@ -631,13 +677,9 @@ module Make
       if ignore_predicate p then
         states
       else if States.is_empty states then (
-        if record then begin
-          let text = code_annotation_text code_annot in
-          List.iter (fun p -> emit_status p Property_status.True) ips;
-          msg_status Alarmset.True ~once:true ~source
-            "no state left, %s%a got status valid."
-            text Description.pp_named p;
-        end;
+        if record then
+          emit_code_annot_status ~reduce:true ~empty:true
+            kf stmt code_annot Alarmset.True;
         states
       ) else
         aux_interp ~record ~reduce code_annot behav p

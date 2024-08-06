@@ -735,6 +735,8 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let cacheable = ref Cacheable in
     let eval =
       let+ functions = functions in
+      (* Check "calls" annotations, and reduce called functions accordingly. *)
+      let functions = Transfer_logic.check_calls_annotations stmt functions in
       let process_one_function kf valuation =
         (* The special Frama_C_ functions to print states are handled here. *)
         if apply_special_directives ~subdivnb kf args state
