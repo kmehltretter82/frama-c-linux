@@ -69,12 +69,14 @@ val get_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t
 *)
 
 val get_strict_dominators : stmt -> Cil_datatype.Stmt.Hptset.t
-(** Same as [get_dominators] but exclude the statement itself.
+(** Same as [get_dominators] but exclude the statement itself. The empty set
+    means the statement is unreachable or is only dominated by itself.
     @since Frama-C+dev
 *)
 
 val get_strict_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t
-(** Same as [get_postdominators] but exclude the statement itself.
+(** Same as [get_postdominators] but exclude the statement itself. The empty set
+    means the statement is unreachable or is only post-dominated by itself.
     @since Frama-C+dev
 *)
 
