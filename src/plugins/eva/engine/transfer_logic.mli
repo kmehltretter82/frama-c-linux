@@ -27,7 +27,7 @@ open Eval
 val process_inactive_behaviors:
   kinstr -> kernel_function -> behavior list -> unit
 
-(* Checks "calls" annotations at the given statement according to the infered
+(* Checks "calls" annotations at the given statement according to the inferred
    list of functions at this point. Reduces the given list to the functions
    referred to by "calls" annotations. *)
 val check_calls_annotations:
