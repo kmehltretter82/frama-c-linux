@@ -9,9 +9,6 @@ let get = function
 let pp_res =
   Pretty_utils.pp_list ~pre:"(" ~sep:", " ~suf:")" Format.pp_print_string
 
-let first_stmt_f = ref None
-let first_stmt_g = ref None
-
 (** For each statement of [f], find its immediate dominator and postdominator
     and print the triplets. *)
 let print_immediate f =
@@ -23,24 +20,6 @@ let print_immediate f =
       ) f.sallstmts
   in
   Format.printf "@[<v2>Immediate dominators of %s (sid, idom, ipostdom):@;%a@]@;"
-    f.svar.vname
-    (Pretty_utils.pp_list ~pre:"@[" ~sep:",@ " ~suf:"@]" pp_res) res
-
-(** For each couple of statement of [f], find their common ancestor and child
-    and print the quadruplets. *)
-let print_nearest f =
-  assert (Dominators.nearest_common_ancestor [] = None);
-  let res =
-    List.map (fun s ->
-        List.map (fun s' ->
-            let dom = Dominators.nearest_common_ancestor [s; s'] in
-            let postdom = Dominators.nearest_common_child [s; s'] in
-            [string_of_int s.sid; string_of_int s'.sid; get dom; get postdom]
-          ) f.sallstmts
-      ) f.sallstmts
-    |> List.flatten
-  in
-  Format.printf "@[<v2>Nearest common ancestors/child of %s (sid, sid, ancestor, child):@;%a@]@;"
     f.svar.vname
     (Pretty_utils.pp_list ~pre:"@[" ~sep:",@ " ~suf:"@]" pp_res) res
 
@@ -63,12 +42,46 @@ let test_strict f =
       assert (Dominators.strictly_postdominates s s = false)
     ) f.sallstmts
 
+let test_nearest kf f =
+  (* Simple test for empty list coverage of nearest function. *)
+  assert (Dominators.nearest_common_ancestor [] = None);
+  assert (Dominators.nearest_common_child [] = None);
+
+  (* Since first and last statement do not have an ancestor/child,
+     common nearest for all statements should be empty. *)
+  assert (Dominators.nearest_common_ancestor f.sallstmts = None);
+  assert (Dominators.nearest_common_child f.sallstmts = None);
+
+  if List.length f.sallstmts > 1 then begin
+
+    let first = Kernel_function.find_first_stmt kf in
+    let last = Kernel_function.find_return kf in
+    let all_but_first = List.filter (fun s -> s != first) f.sallstmts in
+    let all_but_last = List.filter (fun s -> s != last) f.sallstmts in
+
+    (* Test that all statements (except the first one) have as common ancestor
+       the first statement of f, unless one of them is unreachable. *)
+    begin match Dominators.nearest_common_ancestor all_but_first with
+      | None -> (* At leats one statement is unreachable. *) ()
+      | Some ancestor -> assert (first == ancestor)
+    end;
+
+    (* Test that all statements (except the last one) have as common child
+       the return statement of f, unless one of them is unreachable. This test
+       supposes that frama-c's normalization removed all but one return statement.
+    *)
+    begin match Dominators.nearest_common_child all_but_last with
+      | None -> (* At leats one statement is unreachable. *) ()
+      | Some child -> assert (last == child)
+    end
+  end
+
 class visitPostDom = object(self)
   inherit Visitor.frama_c_inplace
 
   method! vfunc f =
     let kf = Option.get (self#current_kf) in
-    Format.printf "@[<v>Computing for function %s:@;%a@?@;@?"
+    Format.printf "@.@[<v>Computing for function %s:@;%a@?@;@?@]"
       f.svar.vname Cil_printer.pp_block f.sbody;
 
     Dominators.compute_dominators kf;
@@ -78,37 +91,35 @@ class visitPostDom = object(self)
     Dominators.print_dot_postdominators "postdom_graph" kf;
 
     print_immediate f;
-    print_nearest f;
     test_strict f;
+    test_nearest kf f;
 
-    Format.printf "@]@.";
     SkipChildren
 end
 
-let catch f x =
-  try ignore (f x)
-  with Log.AbortFatal _ -> ()
-
 let cover_errors () =
+  Format.printf "Trigger some errors/warnings :@.";
+
+  (* Test when a statement is not in a function. *)
   let loc = Cil_datatype.Location.unknown in
-  (* Test statement not in a function. *)
   let skip = Cil_builder.Pure.(cil_stmt ~loc skip) in
-  catch Dominators.get_postdominators skip;
-  let trigger kf =
-    match kf.fundec with
-    | Definition _ -> ()
-    | Declaration _ ->
-      (* Test Kernel_function.find_first_stmt on decl. *)
-      Dominators.compute_dominators kf;
-      (* Test Kernel_function.find_return on decl. *)
-      Dominators.compute_postdominators kf;
-      (* Test print_dot on decl. *)
-      Dominators.print_dot_dominators "tmp" kf
-  in
-  Globals.Functions.iter trigger
+  try ignore (Dominators.get_postdominators skip) with Log.AbortFatal _ -> ();
+
+    let trigger kf =
+      match kf.fundec with
+      | Definition _ -> ()
+      | Declaration _ ->
+        (* Test Kernel_function.find_first_stmt on decl. *)
+        ignore @@ Dominators.compute_dominators kf;
+        (* Test Kernel_function.find_return on decl. *)
+        ignore @@ Dominators.compute_postdominators kf;
+        (* Test print_dot on decl. *)
+        ignore @@ Dominators.print_dot_dominators "tmp" kf
+    in
+    Globals.Functions.iter trigger
 
 let pretty () =
-  Format.printf "@[<v2>Dominators analysis:@;%a@]\n@."
+  Format.printf "@.@[<v2>Dominators analysis:@;%a@]\n@."
     Dominators.pretty_dominators ();
   Format.printf "@[<v2>Postominators analysis:@;%a@]\n@."
     Dominators.pretty_postdominators ()
@@ -117,7 +128,7 @@ let startup () =
   ignore (Cil.visitCilFileSameGlobals (new visitPostDom:>Cil.cilVisitor) (Ast.get ()));
   pretty ();
   Ast.mark_as_changed ();
-  Format.printf "Invalidate tables, which should now be empty\n@.";
+  Format.printf "Invalidate tables, which should now be empty\n";
   pretty ();
   cover_errors ()
 
