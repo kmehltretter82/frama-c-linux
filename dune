@@ -26,9 +26,10 @@
 
 (executable
  (name configurator)
- (libraries dune-configurator str))
+ (libraries dune-configurator str)
+ (modules configurator))
 
 (rule
- (deps VERSION VERSION_CODENAME)
- (targets config.sed python-3.7-available)
+ (deps VERSION VERSION_CODENAME src/kernel_internals/runtime/system_config.ml.in)
+ (targets python-3.7-available system_config.ml)
  (action (run ./configurator.exe)))
