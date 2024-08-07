@@ -22,7 +22,7 @@ default:
 
 variables:
   DEFAULT: "master"
-  OCAML: "4.13"
+  OCAML: "4.14"
   NODE: "22"
   PUBLISH: "no"
   RELEASE: "no"
@@ -465,13 +465,13 @@ additional-arch-release:
 .build_template: &ocaml_always_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.1"]
+      - OCAML: ["5.2"]
 
 # Uncomment this block when there are intermediate versions to check manully
 .build_template: &ocaml_manual_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["4.14"]
+      - OCAML: ["5.1"]
   when: manual
 
 .build_template: &ocaml_versions_template

@@ -375,7 +375,7 @@ To install the required dependencies, you can use opam v2.1
 or higher to do the following (assuming you are in frama-c
 root source folder):
 
-1. `opam switch create frama-c ocaml-base-compiler.4.13.1`
+1. `opam switch create frama-c ocaml-base-compiler.4.14.2`
    to create a compatible opam switch
 2. `opam pin . -n` to pin to the latest development version
 3. `opam install --deps-only .` will fetch and build all
