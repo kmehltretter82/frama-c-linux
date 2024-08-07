@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** API to perform a Dominators and Postdominators analysis for a kernel
-    function.
+(** Module to perform dominators and postdominators analyses. This module was
+    completely redesigned and provides many new functions.
 
     A dominator [d] of [s] is a statement such that all paths from the entry
     point of a function to [s] must go through [d].
@@ -39,72 +39,51 @@
     A common ancestor (or child) of a list of statements is a (post)dominator
     that (post)dominates all the statements
 
-    @before Frama-C+dev This module was using [Dataflow2] instead of
-    [Interpreted_automata]. The new version also offers more function via its
-    API.
+    @since Frama-C+dev
 *)
 
 open Cil_types
 
 val compute_dominators : kernel_function -> unit
-(** Compute the Dominators analysis and register its result.
-    @since Frama-C+dev
-*)
+(** Compute the Dominators analysis and register its result. *)
 
 val compute_postdominators : kernel_function -> unit
-(** Compute the Postdominators analysis and register its result.
-    @since Frama-C+dev
-*)
+(** Compute the Postdominators analysis and register its result. *)
 
 val get_dominators : stmt -> Cil_datatype.Stmt.Hptset.t
 (** Return the [set] of dominators of the given statement.
-    The empty set means the statement is unreachable.
-    @since Frama-C+dev
-*)
+    The empty set means the statement is unreachable. *)
 
 val get_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t
 (** Return the [set] of postdominators of the given statement.
-    The empty set means the statement is unreachable.
-    @since Frama-C+dev
-*)
+    The empty set means the statement is unreachable. *)
 
 val get_strict_dominators : stmt -> Cil_datatype.Stmt.Hptset.t
 (** Same as [get_dominators] but exclude the statement itself. The empty set
-    means the statement is unreachable or is only dominated by itself.
-    @since Frama-C+dev
-*)
+    means the statement is unreachable or is only dominated by itself. *)
 
 val get_strict_postdominators : stmt -> Cil_datatype.Stmt.Hptset.t
 (** Same as [get_postdominators] but exclude the statement itself. The empty set
-    means the statement is unreachable or is only post-dominated by itself.
-    @since Frama-C+dev
-*)
+    means the statement is unreachable or is only post-dominated by itself. *)
 
 val dominates : stmt -> stmt -> bool
 (** [dominates a b] return [true] if [a] dominates [b]. *)
 
 val postdominates : stmt -> stmt -> bool
-(** [postdominates a b] return [true] if [a] postdominates [b].
-    @since Frama-C+dev
-*)
+(** [postdominates a b] return [true] if [a] postdominates [b]. *)
 
 val strictly_dominates : stmt -> stmt -> bool
-(** [strictly_dominates a b] return [true] if [a] strictly dominates [b].
-    @since Frama-C+dev
-*)
+(** [strictly_dominates a b] return [true] if [a] strictly dominates [b]. *)
 
 val strictly_postdominates : stmt -> stmt -> bool
-(** [strictly_postdominates a b] return [true] if [a] strictly postdominates [b].
-    @since Frama-C+dev
-*)
+(** [strictly_postdominates a b] return [true] if [a] strictly postdominates
+    [b]. *)
 
 val get_idom : stmt -> stmt option
 (** Return the immediate dominator of the given statement. *)
 
 val get_ipostdom : stmt -> stmt option
-(** Return the immediate postdominator of the given statement.
-    @since Frama-C+dev
-*)
+(** Return the immediate postdominator of the given statement. *)
 
 val nearest_common_ancestor : stmt list -> stmt option
 (** Return the closest common ancestor of the given statement list.
@@ -113,28 +92,18 @@ val nearest_common_ancestor : stmt list -> stmt option
 *)
 
 val nearest_common_child : stmt list -> stmt option
-(** Return the closest common child of the given statement list.
-    @since Frama-C+dev
-*)
+(** Return the closest common child of the given statement list. *)
 
 val pretty_dominators : Format.formatter -> unit -> unit
 (** Print the result of the domination analysis. Each statement is either
-    dominated by a set of statements, or [Top] if unreachable.
-    @since Frama-C+dev
-*)
+    dominated by a set of statements, or [Top] if unreachable. *)
 
 val pretty_postdominators : Format.formatter -> unit -> unit
 (** Print the result of the postdomination analysis. Each statement is either
-    postdominated by a set of statements, or [Top] if unreachable.
-    @since Frama-C+dev
-*)
+    postdominated by a set of statements, or [Top] if unreachable. *)
 
 val print_dot_dominators : string -> kernel_function -> unit
-(** Print the domination graph in a file [basename.function_name.dot].
-    @since Frama-C+dev
-*)
+(** Print the domination graph in a file [basename.function_name.dot]. *)
 
 val print_dot_postdominators : string -> kernel_function -> unit
-(** Print the postdomination graph in a file [basename.function_name.dot].
-    @since Frama-C+dev
-*)
+(** Print the postdomination graph in a file [basename.function_name.dot]. *)
