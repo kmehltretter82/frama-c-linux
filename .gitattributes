@@ -394,4 +394,3 @@ README* header_spec=.ignore
 /share/_frama-c header_spec=CEA_LGPL
 
 /src/kernel_internals/runtime/system_config.ml.in header_spec=CEA_LGPL
-/src/libraries/stdlib/transitioning.ml.in header_spec=CEA_LGPL
