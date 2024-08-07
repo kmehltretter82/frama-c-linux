@@ -9,4 +9,4 @@ let builtin = {
 }
 
 let () =
-  Logic_builtin.add builtin
+  Logic_builtin.register builtin
