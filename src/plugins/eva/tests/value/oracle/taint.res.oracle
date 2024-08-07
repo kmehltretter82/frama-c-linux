@@ -21,7 +21,8 @@
 [eva:alarm] taint.c:33: Warning: accessing out of bounds index. assert t < 2;
 [eva] taint.c:35: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     tainted; t; u; x
   Locations (control):
@@ -34,7 +35,8 @@
 [eva:loop-unroll:auto] taint.c:49: Automatic loop unrolling.
 [eva] taint.c:50: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     \nothing
   Locations (control):
@@ -42,7 +44,8 @@
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     \nothing
   Locations (control):
@@ -50,7 +53,8 @@
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x
   Locations (control):
@@ -58,7 +62,8 @@
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x
   Locations (control):
@@ -66,7 +71,8 @@
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x
   Locations (control):
@@ -74,7 +80,8 @@
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x
   Locations (control):
@@ -82,7 +89,8 @@
   ==END OF DUMP==
 [eva] taint.c:63: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x
   Locations (control):
@@ -94,7 +102,8 @@
   Called from taint.c:197.
 [eva] taint.c:79: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x
   Locations (control):
@@ -106,7 +115,8 @@
   Called from taint.c:199.
 [eva] taint.c:91: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     x; y; t
   Locations (control):
@@ -114,19 +124,27 @@
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
-[eva] taint.c:202: Reusing old results for call to taints
+[eva] computing for function taints <- main.
+  Called from taint.c:202.
+[eva] computing for function Frama_C_interval <- taints <- main.
+  Called from taint.c:187.
+[eva] Done for function Frama_C_interval
+[eva] Recording results for taints
+[eva] Done for function taints
 [eva] computing for function taint_spec_assigns <- main.
   Called from taint.c:203.
 [eva] using specification for function taint_spec_assigns
 [eva] Done for function taint_spec_assigns
 [eva] taint.c:205: 
   Frama_C_domain_show_each:
-  l : # taint: true
+  l : # multi_taint: default
+  true
 [eva] computing for function taint_goto_1 <- main.
   Called from taint.c:208.
 [eva] taint.c:110: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     t
   Locations (control):
@@ -138,7 +156,8 @@
   Called from taint.c:209.
 [eva] taint.c:130: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     t
   Locations (control):
@@ -153,7 +172,8 @@
   Called from taint.c:138.
 [eva] taint.c:35: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     tainted; t; u; x; t
   Locations (control):
@@ -163,7 +183,8 @@
 [eva] Done for function taint_basic
 [eva] taint.c:141: 
   Frama_C_domain_show_each:
-  x : # taint: false
+  x : # multi_taint: default
+  false
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
 [eva] taint.c:214: Reusing old results for call to taints
@@ -175,7 +196,8 @@
 [eva:alarm] taint.c:157: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] taint.c:165: 
   Frama_C_dump_each:
-  # taint:
+  # multi_taint:
+  default
   Locations (data):
     tainted; t; y
   Locations (control):
@@ -191,11 +213,11 @@
 [eva] taint.c:170: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] taint.c:176: Warning: check 'true' got status unknown.
-[eva:alarm] taint.c:177: Warning: check 'false' got status unknown.
+[eva:alarm] taint.c:176: Warning: check 'true' got status invalid.
+[eva] taint.c:177: check 'false' got status valid.
 [eva:alarm] taint.c:178: Warning: check 'false' got status invalid.
 [eva] taint.c:179: check 'true' got status valid.
-[eva:alarm] taint.c:180: Warning: assertion 'unknown' got status unknown.
+[eva] taint.c:180: assertion 'unknown' got status valid.
 [eva] taint.c:181: check 'true' got status valid.
 [eva:alarm] taint.c:182: Warning: check got status invalid.
 [eva] Recording results for tainted_predicate
