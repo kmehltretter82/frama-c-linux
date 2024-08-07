@@ -165,6 +165,23 @@ void taint_infinite_while(int t) {
   Frama_C_dump_each();
 }
 
+/* Tests ACSL predicates related to taint. */
+void tainted_predicate (void) {
+  int not_tainted = Frama_C_interval(0, 20);
+  int x = undet ? not_tainted : tainted;
+  int indirect = 0;
+  if (tainted) {
+    indirect = 1;
+  }
+  //@ check true: \tainted(tainted); // unknown as over-approximation of taint
+  //@ check false: !\tainted(tainted); // unknown as over-approximation of taint
+  //@ check false: \tainted(not_tainted);
+  //@ check true: !\tainted(not_tainted);
+  //@ assert unknown: !\tainted(x);
+  //@ check true: !\tainted(x);
+  //@ check \tainted(indirect); // for now, \tainted only considers direct taint.
+}
+
 // Taints global variable 'tainted'.
 void taints (void) {
   tainted = Frama_C_interval(0, 10);
@@ -196,6 +213,9 @@ int main(void) {
 
   taints();
   taint_infinite_while(tainted);
+
+  taints();
+  tainted_predicate();
 
   return 0;
 }
