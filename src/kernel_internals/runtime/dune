@@ -20,8 +20,4 @@
 ;;                                                                        ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(rule
-  (targets system_config.ml)
-  (deps system_config.ml.in ../../../config.sed)
-  (action (with-stdout-to system_config.ml (run sed -f ../../../config.sed system_config.ml.in)))
-)
+(copy_files ../../../system_config.ml)

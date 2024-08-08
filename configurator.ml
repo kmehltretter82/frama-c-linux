@@ -177,17 +177,18 @@ int main(){}
     Format.fprintf fmt
       "%a" (Format.pp_print_list ~pp_sep pp_arch) cpp.supported_archs_opts
 
-  let pp_sed fmt cpp =
-    Format.fprintf fmt
-      "s|@FRAMAC_DEFAULT_CPP@|%a|\n" pp_default_cpp cpp ;
-    Format.fprintf fmt
-      "s|@FRAMAC_DEFAULT_CPP_ARGS@|%a|\n" pp_flags cpp.default_args ;
-    Format.fprintf fmt
-      "s|@FRAMAC_GNU_CPP@|%b|\n" cpp.is_gnu_like ;
-    Format.fprintf fmt
-      "s|@DEFAULT_CPP_KEEP_COMMENTS@|%b|\n" cpp.keep_comments ;
-    Format.fprintf fmt
-      "s|@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@|%a|" pp_archs cpp
+  let add_macros tbl cpp =
+    Hashtbl.replace tbl "@FRAMAC_DEFAULT_CPP@"
+      (Format.asprintf "%a" pp_default_cpp cpp);
+    Hashtbl.replace tbl "@FRAMAC_DEFAULT_CPP_ARGS@"
+      (Format.asprintf "%a" pp_flags cpp.default_args);
+    Hashtbl.replace tbl "@FRAMAC_GNU_CPP@" (string_of_bool cpp.is_gnu_like);
+    Hashtbl.replace tbl "@DEFAULT_CPP_KEEP_COMMENTS@"
+      (string_of_bool cpp.keep_comments);
+    Hashtbl.replace tbl "@DEFAULT_CPP_KEEP_COMMENTS@"
+      (string_of_bool cpp.keep_comments);
+    Hashtbl.replace tbl "@DEFAULT_CPP_SUPPORTED_ARCH_OPTS@"
+      (Format.asprintf "%a" pp_archs cpp);
 end
 
 module Fc_version = struct
@@ -198,12 +199,17 @@ module Fc_version = struct
     ; name: string
     }
 
-  let get configurator =
-    let out_VERSION =
-      let out = C.Process.run configurator "cat" ["VERSION"] in
-      if out.exit_code <> 0 then C.die "Can't read VERSION." ;
-      out.stdout
-    in
+  let head1 file = (* output first line from file, without '\n' *)
+    try
+      let ic = open_in file in
+      let s = input_line ic in
+      close_in ic;
+      s
+    with _exc ->
+      C.die "Can't read %s." file
+
+  let get () =
+    let out_VERSION = head1 "VERSION" in
     let re_version =
       Str.regexp {|\([1-9][0-9]\)\.\([0-9]\)\(.*\)|}
     in
@@ -213,25 +219,17 @@ module Fc_version = struct
         Str.matched_group 2 out_VERSION,
         try Str.matched_group 3 out_VERSION with Not_found -> ""
       else
-        C.die "Can't read VERSION."
+        C.die "Invalid VERSION contents."
     in
-    let name =
-      let out = C.Process.run configurator "cat" ["VERSION_CODENAME"] in
-      if out.exit_code <> 0 then
-        C.die "Can't read VERSION_CODENAME." ;
-      String.sub out.stdout 0 (String.length out.stdout - 1)
-    in
+    let name = head1 "VERSION_CODENAME" in
     { major; minor; ext; name }
 
-  let pp_sed fmt version =
-    Format.fprintf fmt
-      "s|@VERSION@|%s.%s%s|\n" version.major version.minor version.ext ;
-    Format.fprintf fmt
-      "s|@VERSION_CODENAME@|%s|\n" version.name ;
-    Format.fprintf fmt
-      "s|@MAJOR_VERSION@|%s|\n" version.major ;
-    Format.fprintf fmt
-      "s|@MINOR_VERSION@|%s|" version.minor
+  let add_macros tbl version =
+    Hashtbl.replace tbl "@VERSION@"
+      (Format.asprintf "%s.%s%s" version.major version.minor version.ext);
+    Hashtbl.replace tbl "@VERSION_CODENAME@" version.name;
+    Hashtbl.replace tbl "@MAJOR_VERSION@" version.major;
+    Hashtbl.replace tbl "@MINOR_VERSION@" version.minor
 end
 
 module OS = struct
@@ -245,14 +243,13 @@ module OS = struct
       | "macosx" -> MacOS
       | _ -> OtherUnix
 
-  let pp_sed fmt t =
+  let add_macros tbl t =
     let module_dirs = match t with
       | Windows   -> "Win_dirs"
       | MacOS     -> "Macos_dirs"
       | OtherUnix -> "Unix_dirs"
     in
-    Format.fprintf fmt
-      "s|@FRAMAC_TARGET_SYSTEM_CONFIG_INCLUDE@|%s|" module_dirs
+    Hashtbl.replace tbl "@FRAMAC_TARGET_SYSTEM_CONFIG_INCLUDE@" module_dirs
 end
 
 let python_available configurator =
@@ -274,18 +271,44 @@ let python_available configurator =
       true
     with Not_found | Failure _ -> false
 
+let re_macro = Str.regexp "@[A-Za-z0-9_]+@"
+let expand macros line =
+  let line = ref line in
+  try
+    while true do
+      ignore (Str.search_forward re_macro !line 0);
+      let key = Str.matched_string !line in
+      match Hashtbl.find_opt macros key with
+      | None -> C.die "Unknown macro: %s" key
+      | Some v ->
+        line := Str.global_replace (Str.regexp_string key) v !line
+    done;
+    assert false
+  with Not_found ->
+    !line
+
 let configure configurator =
-  let version = Fc_version.get configurator in
+  let version = Fc_version.get () in
   let cpp = Cpp.get configurator in
   let os = OS.get configurator in
-  let config_sed = open_out "config.sed" in
-  let fmt = Format.formatter_of_out_channel config_sed in
-  Format.fprintf fmt "%a\n%a\n%a\n"
-    Fc_version.pp_sed version Cpp.pp_sed cpp OS.pp_sed os ;
-  close_out config_sed ;
-  let python = open_out "python-3.7-available" in
-  Printf.fprintf python "%b" (python_available configurator) ;
-  close_out python
+  let macros = Hashtbl.create 10 in
+  Fc_version.add_macros macros version;
+  Cpp.add_macros macros cpp;
+  OS.add_macros macros os;
+  let ic = open_in "src/kernel_internals/runtime/system_config.ml.in" in
+  let oc = open_out "system_config.ml" in
+  try
+    while true; do
+      let line = expand macros (input_line ic) in
+      output_string oc line;
+      output_char oc '\n';
+    done;
+  with End_of_file ->
+    close_in ic;
+    close_out oc;
+    let python = open_out "python-3.7-available" in
+    Printf.fprintf python "%b" (python_available configurator);
+    close_out python
 
 let () =
   C.main ~name:"frama_c_config" configure
