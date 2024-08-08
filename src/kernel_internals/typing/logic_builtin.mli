@@ -22,7 +22,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Registers a builtin to be available in the environment of all projects. *)
+(** Registers a builtin to be available in the environment of all projects.
+    @since Frama-C+dev
+*)
 val register: Cil_types.builtin_logic_info -> unit
 
 (** Adds a logic builtin in the environment of the current project only. *)
