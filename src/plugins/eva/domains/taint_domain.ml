@@ -401,7 +401,7 @@ let () =
       bl_profile = ["p", a_type];
     }
   in
-  Logic_env.Builtins.extend (fun () -> Logic_builtin.add builtin_logic_info)
+  Logic_builtin.register builtin_logic_info
 
 (* Registers ACSL extension "taint" (statement annotation)
    and "taints" (behavior extension). *)

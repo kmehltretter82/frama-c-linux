@@ -27,6 +27,9 @@ open Cil_types
 let add = Logic_env.add_builtin_logic_function_gen
     Logic_utils.is_same_builtin_profile
 
+let register builtin =
+  Logic_env.Builtins.extend (fun () -> add builtin)
+
 let float_type = Ctype Cil_const.floatType
 let double_type = Ctype Cil_const.doubleType
 let long_double_type = Ctype Cil_const.longDoubleType

@@ -22,7 +22,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Registers a builtin to be available in the environment of all projects.
+    @since Frama-C+dev
+*)
+val register: Cil_types.builtin_logic_info -> unit
 
+(** Adds a logic builtin in the environment of the current project only. *)
 val add: Cil_types.builtin_logic_info -> unit
 
+(** Internal usage only: initializes kernel logic builtins. *)
 val init: unit -> unit -> unit
