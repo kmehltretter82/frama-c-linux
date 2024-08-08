@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2024-08-08] Plug-ins Dominators and Postdominators have been
+              removed and replaced by the Dominators module in the kernel.
 -   Eva       [2024-08-06] Support for 'calls' ACSL extension
 o   Kernel    [2024-08-05] Added new modules `Cache_dir` and `State_dir`
               and additional facilities to build sub-directories in these
