@@ -168,12 +168,9 @@ module TransferTaint = struct
      from the tainted assume that not go through [stmt], ie [stmt] is not a
      postdominator for the tainted assume. *)
   let filter_active_tainted_assumes stmt state =
-    let kf = Kernel_function.find_englobing_kf stmt in
     let assume_stmts =
       Stmt.Set.filter
-        (fun assume_stmt ->
-           not (Postdominators.is_postdominator kf
-                  ~opening:assume_stmt ~closing:stmt))
+        (fun assume_stmt -> not (Dominators.postdominates stmt assume_stmt))
         state.assume_stmts
     in
     { state with assume_stmts }

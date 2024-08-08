@@ -20,261 +20,245 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Computation of dominators.
-    Based on "A Simple, Fast Dominance Algorithm" by K. D. Cooper et al. *)
+(* This module performs dataflow analysis using [Interpreted_automata] to
+   compute the domination/postdomination dependencies between statements of a
+   given function. *)
 
-(* A domination tree, represented as a map from a statement to its
-   immediate dominator. The first statement in a function, and
-   statically unreachable statements (that do not have idoms), are
-   mapped to None. *)
-module Dom_tree = State_builder.Hashtbl
-    (Cil_datatype.Stmt.Hashtbl)
-    (Datatype.Option(Cil_datatype.Stmt))
-    (struct
-      let name = "Dominators.dom_tree"
-      let dependencies = [ Ast.self ]
-      let size = 197
-    end)
-;;
-
-(** Compute dominator information for the statements in a function *)
 open Cil_types
 
-(****************************************************************)
+let dkey = Kernel.dkey_dominators
 
-module type DIRECTION = sig
-  (* Number of statements in the function. *)
-  val nb_stmts: int
+(* Datatype used to create a dot graph using analysis results. *)
+module StmtTbl = Cil_datatype.Stmt.Hashtbl
 
-  (* Conversion between statements and ordered statements. *)
-  val to_ordered: stmt -> Ordered_stmt.ordered_stmt
-  val to_stmt: Ordered_stmt.ordered_stmt -> stmt
+(* State type for our domain. *)
+module StmtSet = Cil_datatype.Stmt.Hptset
 
-  (* Iterates on all the statements, except the roots of the
-     domination tree; in topological order for dominators, and reverse
-     topological order for the post-dominators. *)
-  val iter: (Ordered_stmt.ordered_stmt -> unit) -> unit
+module DotGraph = Graph.Graphviz.Dot (
+  struct
+    type t = string * (StmtSet.t StmtTbl.t)
+    module V = struct type t = stmt end
+    module E = struct
+      type t = (V.t * V.t)
+      let src = fst
+      let dst = snd
+    end
 
-  (* Entry point (for dominators) or return (for post-dominators),
-     that will be the root of the dominator/post-dominator tree. *)
-  val root_stmt: Ordered_stmt.ordered_stmt;;
+    let iter_vertex f (_, graph) =
+      StmtTbl.iter (fun stmt _ -> f stmt) graph
 
-  val is_further_from_root:
-    Ordered_stmt.ordered_stmt -> Ordered_stmt.ordered_stmt -> bool
+    let iter_edges_e f (_, graph) =
+      StmtTbl.iter (fun stmt -> StmtSet.iter (fun p -> f (p, stmt))) graph
 
-  (* List of all predecessors for the dominators, list of successors
-     for the post-dominators (for the post-dominators, it can be seen
-     as the predecessors in the reversed control flow graph that goes
-     from the sinks to the entry point). *)
-  val preds: Ordered_stmt.ordered_stmt -> Ordered_stmt.ordered_stmt list
+    let graph_attributes (title, _) = [`Label title]
 
-  val name:string
+    let default_vertex_attributes _g = [`Shape `Box; `Style `Filled]
+
+    let vertex_name stmt = string_of_int stmt.sid
+
+    let vertex_attributes stmt =
+      let txt = Format.asprintf "%a" Cil_printer.pp_stmt stmt in
+      [`Label txt]
+
+    let default_edge_attributes _g = []
+
+    let edge_attributes _s = []
+
+    let get_subgraph _v = None
+  end)
+
+(* Both analyses use this domain, which propagates all encountered statements
+   by adding them to the state. The [join] performs an intersection which is
+   enough to compute domination/postdomination. *)
+module Domain = struct
+  type t = StmtSet.t
+
+  let join = StmtSet.inter
+
+  let widen a b =
+    if StmtSet.subset a b then
+      Interpreted_automata.Fixpoint
+    else
+      Interpreted_automata.Widening (join a b)
+
+  (* Trivial transfer function: add all visited statements to the current
+     state. *)
+  let transfer v _ state =
+    match v.Interpreted_automata.vertex_start_of with
+    | None -> Some state
+    | Some stmt -> Some (StmtSet.add stmt state)
 end
 
-module Compute(D:DIRECTION) = struct
-
-  (* Computes the smallest common dominator between two statements. *)
-  let nearest_common_ancestor find_domtree ord1 ord2 =
-    Kernel.debug ~dkey:Kernel.dkey_dominators "computing common ancestor %d %d"
-      (D.to_stmt ord1).sid (D.to_stmt ord2).sid;
-    let finger1 = ref ord1 in
-    let finger2 = ref ord2 in
-    while (!finger1 != !finger2) do (
-      while ( D.is_further_from_root !finger1 !finger2) do
-        finger1 := (match find_domtree !finger1 with
-            | None -> assert false
-            | Some x -> x)
-      done;
-      while ( D.is_further_from_root !finger2 !finger1) do
-        finger2 := (match find_domtree !finger2 with
-            | None -> assert false
-            | Some x -> x)
-      done;)
-    done;
-    !finger1
-  ;;
-
-  (* Note: None means either unprocessed, or that the statement has no
-     predecessor or that all its ancestors are at None *)
-  (* based on "A Simple, Fast Dominance Algorithm" by K.D. Cooper et al *)
-  let domtree () =
-    let domtree = Array.make D.nb_stmts None in
-
-    (* Initialize the dataflow: for each root, add itself to its own
-       set of dominators. *)
-    domtree.(D.root_stmt) <- Some D.root_stmt;
-    let changed = ref true in
-    while !changed do
-      changed := false;
-      D.iter (fun b ->
-          let ordered_preds = D.preds b in
-          let processed_preds =
-            let was_processed p = match domtree.(p) with
-              | None -> false
-              | Some(_) -> true
-            in
-            List.filter was_processed ordered_preds
-          in
-          match processed_preds with
-          | [] -> () (* No predecessor (e.g. unreachable stmt): leave it to None.*)
-          | first::rest ->
-            let find i = domtree.(i) in
-            let new_idom =
-              List.fold_left (nearest_common_ancestor find) first rest
-            in
-            (match domtree.(b) with
-             | Some(old_idom) when old_idom == new_idom -> ()
-             | _ -> (domtree.(b) <- Some(new_idom); changed := true))
-        );
-    done;
-    (* The roots are not _immediate_ dominators of themselves, so revert
-       that now that the dataflow has finished. *)
-    domtree.(D.root_stmt) <- None;
-    domtree
-  ;;
-
-  let display domtree =
-    Kernel.debug ~dkey:Kernel.dkey_dominators "Root is %d" (D.to_stmt 0).sid;
-    Array.iteri (fun orig dest -> match dest with
-        | Some(x) -> Kernel.debug ~dkey:Kernel.dkey_dominators "%s of %d is %d"
-                       D.name (D.to_stmt orig).sid (D.to_stmt x).sid
-        | None -> Kernel.debug ~dkey:Kernel.dkey_dominators "no %s for %d"
-                    D.name (D.to_stmt orig).sid)
-      domtree
-  ;;
-
+(* An analysis needs a name and a starting point. *)
+module type Analysis = sig
+  val name : string
+  (* May raise Kernel_function.No_Statement. *)
+  val get_starting_stmt : kernel_function -> stmt
+  include Interpreted_automata.DataflowAnalysis with type state = Domain.t
 end
 
-let direction_dom kf =
-  let (stmt_to_ordered,ordered_to_stmt,_) =
-    Ordered_stmt.get_conversion_tables kf
-  in
-  let to_stmt = Ordered_stmt.to_stmt ordered_to_stmt in
-  let module Dominator = struct
-    let to_ordered = Ordered_stmt.to_ordered stmt_to_ordered;;
-    let to_stmt = to_stmt;;
-    let nb_stmts = Array.length ordered_to_stmt;;
-    let root_stmt = to_ordered (Kernel_function.find_first_stmt kf)
-    (* Iterate on all statements, except the entry point. *)
-    let iter f =
-      for i = 0 to nb_stmts -1 do
-        if i != root_stmt
-        then f i
-      done;;
-    let is_further_from_root p1 p2 = p1 > p2
-    let preds s = List.map to_ordered (to_stmt s).Cil_types.preds
-    let name = "dom"
-  end
-  in
-  (module Dominator: DIRECTION)
-;;
+(* Main module, perform the analysis, store its results and provide ways to
+   access them. *)
+module Compute (Analysis : Analysis) = struct
 
-(* Fill the project table with the dominators of a given function. *)
-let store_dom domtree to_stmt =
-  Array.iteri( fun ord idom ->
-      let idom = Option.map to_stmt idom in
-      let stmt = to_stmt ord in
-      Kernel.debug ~dkey:Kernel.dkey_dominators "storing dom for %d: %s"
-        stmt.sid (match idom with None -> "self" | Some s ->string_of_int s.sid);
-      Dom_tree.add stmt idom
-    ) domtree
+  module Table =
+    Cil_state_builder.Stmt_hashtbl
+      (StmtSet)
+      (struct
+        let name = Analysis.name ^ "_table"
+        let dependencies = [Ast.self]
+        let size = 503
+      end)
 
-let compute_dom kf =
-  let direction = direction_dom kf in
-  let module Dominator = (val direction: DIRECTION) in
-  let module ComputeDom = Compute(Dominator) in
-  let domtree = ComputeDom.domtree () in
-  store_dom domtree Dominator.to_stmt
-;;
+  let compute kf =
+    match Table.find_opt (Analysis.get_starting_stmt kf) with
+    | exception Kernel_function.No_Statement ->
+      Kernel.warning "No statement in function %a: %s analysis cannot be done"
+        Kernel_function.pretty kf Analysis.name
+    | Some _ ->
+      Kernel.feedback ~dkey "%s analysis already computed for function %a"
+        Analysis.name Kernel_function.pretty kf
+    | None ->
+      match kf.fundec with
+      | Definition (f, _) ->
+        Kernel.feedback ~dkey "computing %s analysis for function %a"
+          Analysis.name Kernel_function.pretty kf;
+        (* Compute the analysis, initial state is empty. *)
+        let result = Analysis.fixpoint kf StmtSet.empty in
+        (* Fill table with all statements. *)
+        List.iter (fun stmt -> Table.add stmt StmtSet.empty) f.sallstmts;
+        (* A reachable statement always (post)dominates itself, so add it here. *)
+        let add_in_table stmt set = Table.replace stmt (StmtSet.add stmt set) in
+        (* Update the table with analysis results. *)
+        Analysis.Result.iter_stmt add_in_table result;
+        Kernel.feedback ~dkey "%s analysis done for function %a"
+          Analysis.name Kernel_function.pretty kf
+      (* [Analysis.get_starting_stmt] should fatal before this point. *)
+      | Declaration _ -> assert false
 
-(* Note: The chosen semantics for postdominator is the following one: a
-   post-dominates b if all the paths from b to the return statement
-   goes through a.
+  let find_kf stmt =
+    try Kernel_function.find_englobing_kf stmt
+    with Not_found ->
+      Kernel.fatal "Statement %d is not part of a function" stmt.sid
 
-   Statements on the paths that go only into infinite loop, or to
-   __no_return function, do not have any post dominator (they are set
-   to None).
+  (* Generic function to get the set of (post)dominators of [stmt]. *)
+  let get stmt =
+    match Table.find_opt stmt with
+    | None -> compute (find_kf stmt); Table.find stmt
+    | Some v -> v
 
-   This definition of post-dominator gives a single root to the
-   post-domination tree, which is required by the Cooper algorithm
-   above. Beware that there are alternative, incompatible, definitions
-   to post-domination, e.g. saying that a post dominates b if all the
-   paths from b to any return statement or infinite loop go through
-   a. *)
-(* TODO:
-   - For each statement, associate its immediate post-dominator (if it
-     exists), and the list of sinks that dominates it
+  (* Generic function to get the set of strict (post)dominators of [stmt]. *)
+  let get_strict stmt = get stmt |> StmtSet.remove stmt
 
-   - Attempt to find the post-dominator by intersection only if the
-     list of sinks of the points is the same. Otherwise, state that
-     there is no immediate post-dominator, and that the point is
-     dominated by the union of the lists of sinks of its successors.
-*)
-let _compute_pdom kf =
-  let (stmt_to_ordered,ordered_to_stmt,_) =
-    Ordered_stmt.get_conversion_tables kf
-  in
-  let module PostDominator = struct
-    let to_ordered = Ordered_stmt.to_ordered stmt_to_ordered;;
-    let to_stmt = Ordered_stmt.to_stmt ordered_to_stmt;;
-    let nb_stmts = Array.length ordered_to_stmt;;
-    let root_stmt = to_ordered (Kernel_function.find_return kf)
-    let iter f =
-      for i = nb_stmts -1 downto 0 do
-        if i != root_stmt
-        then f i
-      done;;
-    let is_further_from_root p1 p2 = p1 < p2
-    let preds s = List.map to_ordered (to_stmt s).Cil_types.succs
-    let name = "postdom"
-  end
-  in
-  let module ComputePDom = Compute(PostDominator) in
-  let domtree = ComputePDom.domtree () in
-  ComputePDom.display domtree
-;;
+  (* Generic function to test the (post)domination of 2 statements. *)
+  let mem a b = get b |> StmtSet.mem a
 
-(****************************************************************)
-(* For each statement we maintain a set of statements that dominate it *)
+  (* Generic function to test the strict (post)domination of 2 statements. *)
+  let mem_strict a b = get_strict b |> StmtSet.mem a
 
-(* Try to find the idom, and fill the table if not already computed. *)
-let get_idom s =
-  try Dom_tree.find s
-  with Not_found ->
-    let kf = Kernel_function.find_englobing_kf s in
-    let _ = (compute_dom kf) in
-    try Dom_tree.find s
-    with _ -> assert false
-;;
-
-(** Check whether one block dominates another. This assumes that the "idom"
-    * field has been computed. *)
-let rec dominates (s1: stmt) (s2: stmt) =
-  s1.sid = s2.sid ||
-  match (get_idom s2) with
-  | None -> false
-  | Some s2idom -> dominates s1 s2idom
-
-let nearest_common_ancestor l =
-  match l with
-  | [] -> failwith ""
-  | s :: _ ->
-    let kf = Kernel_function.find_englobing_kf s in
-    let direction = direction_dom kf in
-    let module Dominator = (val direction: DIRECTION) in
-    let module ComputeDom = Compute(Dominator) in
-    (try ignore (Dom_tree.find s)
-     with Not_found ->
-       let domtree = ComputeDom.domtree () in
-       store_dom domtree Dominator.to_stmt
-    );
-    let to_ordered = Dominator.to_ordered in
-    let to_stmt = Dominator.to_stmt in
-    let find i = Option.map to_ordered (Dom_tree.find (to_stmt i)) in
-    let rec aux = function
-      | [] -> assert false
-      | [s] -> to_ordered s
-      | s :: (_ :: _ as q) ->
-        ComputeDom.nearest_common_ancestor find (to_ordered s) (aux q)
+  (* The nearest common ancestor (resp. child) is the ancestor which is
+     dominated (resp. postdominated) by all common ancestors, ie. the lowest
+     (resp. highest) ancestor in the domination tree. *)
+  let nearest stmtl =
+    (* Get the set of strict (post)doms for each statement and intersect them to
+       keep the common ones. If one of them is unreachable, they do not
+       share a common ancestor/child. *)
+    let common_set =
+      match stmtl with
+      | [] -> StmtSet.empty
+      | stmt :: tail ->
+        List.fold_left
+          (fun acc s -> StmtSet.inter acc (get_strict s))
+          (get_strict stmt) tail
     in
-    Dominator.to_stmt (aux l)
+    (* Try to find a statement [s] in [common_set] which is (post)dominated by
+       all statements of the [common_set]. *)
+    let is_dom_by_all a = StmtSet.for_all (fun b -> mem b a) common_set in
+    List.find_opt is_dom_by_all (StmtSet.elements common_set)
+
+  let pretty fmt () =
+    let list = Table.to_seq () |> List.of_seq in
+    let pp_set fmt set =
+      Pretty_utils.pp_iter ~pre:"@[{" ~sep:",@," ~suf:"}@]"
+        StmtSet.iter (fun fmt stmt -> Format.pp_print_int fmt stmt.sid)
+        fmt set
+    in
+    Pretty_utils.pp_list ~pre:"@[<v>" ~sep:"@;" ~suf:"@]" ~empty:"Empty"
+      (fun fmt (s, set) -> Format.fprintf fmt "Stmt:%d -> %a" s.sid pp_set set)
+      fmt list
+
+  (* [s_set] are [s] (post)dominators, including [s]. We don't have to represent
+     the relation between [s] and [s], so [get_set] removes it. And because the
+     (post)domination relation is transitive, if [p] is in [s_set], we can
+     remove [p_set] from [s_set] in order to have a clearer graph. *)
+  let reduce graph s =
+    (* Union of all (post)dominators of [s] (post)dominators [s_set]. *)
+    let unions p acc = StmtTbl.find graph p |> StmtSet.union acc in
+    let s_set = StmtTbl.find graph s in
+    let p_sets = StmtSet.fold unions s_set StmtSet.empty in
+    let res = StmtSet.diff s_set p_sets in
+    StmtTbl.replace graph s res
+
+  let print_dot basename kf =
+    match kf.fundec with
+    | Definition (fct, _) ->
+      let graph = StmtTbl.create (List.length fct.sallstmts) in
+      let copy_in_graph stmt = get_strict stmt |> StmtTbl.replace graph stmt in
+      List.iter copy_in_graph fct.sallstmts;
+      List.iter (reduce graph) fct.sallstmts;
+      let name = Kernel_function.get_name kf in
+      let title = Format.sprintf "%s for function %s" Analysis.name name in
+      let filename = basename ^ "." ^ Kernel_function.get_name kf ^ ".dot" in
+      let file = open_out filename in
+      DotGraph.output_graph file (title, graph);
+      close_out file;
+      Kernel.result "%s: dot file generated in %s for function %a"
+        Analysis.name filename Kernel_function.pretty kf
+    | Declaration _ ->
+      Kernel.warning "cannot compute %s for function %a without body"
+        Analysis.name Kernel_function.pretty kf
+end
+
+(* ---------------------------------------------------------------------- *)
+(* --- Dominators                                                     --- *)
+(* ---------------------------------------------------------------------- *)
+
+module ForwardAnalysis = struct
+  include Interpreted_automata.ForwardAnalysis (Domain)
+  let name = "Dominators"
+  let get_starting_stmt kf = Kernel_function.find_first_stmt kf
+end
+
+module Dominators = Compute (ForwardAnalysis)
+
+let compute_dominators = Dominators.compute
+let get_dominators = Dominators.get
+let get_strict_dominators = Dominators.get_strict
+let dominates = Dominators.mem
+let strictly_dominates = Dominators.mem_strict
+let get_idom s = Dominators.nearest [s]
+let nearest_common_ancestor = Dominators.nearest
+let pretty_dominators = Dominators.pretty
+let print_dot_dominators = Dominators.print_dot
+
+(* ---------------------------------------------------------------------- *)
+(* --- Postdominators                                                 --- *)
+(* ---------------------------------------------------------------------- *)
+
+module BackwardAnalysis = struct
+  include Interpreted_automata.BackwardAnalysis (Domain)
+  let name = "PostDominators"
+  let get_starting_stmt kf = Kernel_function.find_return kf
+end
+
+module PostDominators = Compute (BackwardAnalysis)
+
+let compute_postdominators = PostDominators.compute
+let get_postdominators = PostDominators.get
+let get_strict_postdominators = PostDominators.get_strict
+let postdominates = PostDominators.mem
+let strictly_postdominates = PostDominators.mem_strict
+let get_ipostdom s = PostDominators.nearest [s]
+let nearest_common_child = PostDominators.nearest
+let pretty_postdominators = PostDominators.pretty
+let print_dot_postdominators = PostDominators.print_dot

@@ -79,7 +79,7 @@ let show main_ui =
   let copyright (* should be automatically generated *) =
     "\t © CEA and INRIA for the Frama-C kernel\n\
      \t © CEA for the GUI and plug-ins constant propagation, from, inout, impact, \
-     metrics, occurrence pdg, postdominators, scope, security_slicing, \
+     metrics, occurrence pdg, scope, security_slicing, \
      semantic callgraph, slicing, sparecode, syntactic callgraph, users and value.\n\
      \n\
      See the particular header of each source file for details."

@@ -100,6 +100,7 @@ struct
 
   module DomTree = struct
     let dominates = Dominators.dominates
+
     let domtree_postfix_iter f =
 
       (* Reverse the normal domtree. *)

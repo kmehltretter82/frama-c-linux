@@ -477,12 +477,11 @@ struct
     (* Eliminate additional variables originating from a control-flow branching
        statement closing at [s]. *)
     let eliminate_additional s data =
-      let kf = Stack.top call_stack in
       let map = data.additional_deps_table in
       let map' =
         ZoneStmtMap.fold
           (fun k _v acc_map ->
-             if Postdominators.is_postdominator kf ~opening:k ~closing:s
+             if Dominators.postdominates s k
              then ZoneStmtMap.remove k acc_map
              else acc_map
           ) map map
