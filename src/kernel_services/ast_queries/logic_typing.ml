@@ -907,7 +907,7 @@ struct
     | 'L' -> (* L'wide_char' *)
       let content = String.sub s 2 (String.length s - 3) in
       let tokens = explode content in
-      let value = Cil.reduce_multichar Cil.theMachine.Cil.wcharType tokens
+      let value = Cil.reduce_multichar (Machine.wchar_type ()) tokens
       in
       tinteger_s64 ~loc value
     | '\'' -> (* 'char' *)
@@ -2576,7 +2576,7 @@ struct
       TConst (LStr (unescape s)), Ctype Cil_const.charPtrType
     | PLconstant (WStringConstant s) ->
       TConst (LWStr (wcharlist_of_string s)),
-      Ctype (TPtr(Cil.theMachine.wcharType,[]))
+      Ctype (TPtr(Machine.wchar_type (),[]))
     | PLvar x ->
       let old_val info =
         let typ =

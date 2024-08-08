@@ -650,8 +650,8 @@ class cil_printer () = object (self)
         | IUInt -> "U"
         | ILong -> "L"
         | IULong -> "UL"
-        | ILongLong -> if Cil.msvcMode () then "L" else "LL"
-        | IULongLong -> if Cil.msvcMode () then "UL" else "ULL"
+        | ILongLong -> if Machine.msvcMode () then "L" else "LL"
+        | IULongLong -> if Machine.msvcMode () then "UL" else "ULL"
         | IInt | IBool | IShort | IUShort | IChar | ISChar | IUChar -> ""
       in
       let prefix =
@@ -1144,7 +1144,7 @@ class cil_printer () = object (self)
       let goto =
         match ext_asm with Some { asm_gotos = _::_ } -> " goto" | _ -> ""
       in
-      if Cil.msvcMode () then
+      if Machine.msvcMode () then
         fprintf fmt "__asm%s {@[%a@]}%s"
           goto
           (Pretty_utils.pp_list ~sep:"@\n"
@@ -1426,7 +1426,7 @@ class cil_printer () = object (self)
     | Some style  ->
       let directive = match style with
         | Line_comment | Line_comment_sparse -> "//#line"
-        | Line_preprocessor_output when not (Cil.msvcMode ()) -> "#"
+        | Line_preprocessor_output when not (Machine.msvcMode ()) -> "#"
         | Line_preprocessor_output | Line_preprocessor_input -> "#line"
       in
       let pos = fst l in
@@ -1849,7 +1849,7 @@ class cil_printer () = object (self)
         (* nor 'cilnoremove' *)
         let suppress =
           not state.print_cil_input
-          && not (Cil.msvcMode ())
+          && not (Machine.msvcMode ())
           && (String.starts_with ~prefix:"box" an
               || String.starts_with ~prefix:"ccured" an
               || an = "merger"
@@ -1957,9 +1957,9 @@ class cil_printer () = object (self)
        | ILong -> "long"
        | IULong -> "unsigned long"
        | ILongLong ->
-         if Cil.msvcMode () then "__int64" else "long long"
+         if Machine.msvcMode () then "__int64" else "long long"
        | IULongLong ->
-         if Cil.msvcMode () then "unsigned __int64" else "unsigned long long"
+         if Machine.msvcMode () then "unsigned __int64" else "unsigned long long"
       )
 
   method compkind fmt ci =
@@ -1984,7 +1984,7 @@ class cil_printer () = object (self)
       | Some pp -> if space then pp_print_char fmt ' '; pp fmt in
     let printAttributes fmt (a: attributes) =
       match nameOpt with
-      | None when not state.print_cil_input && not (Cil.msvcMode ()) -> ()
+      | None when not state.print_cil_input && not (Machine.msvcMode ()) -> ()
       (* Cannot print the attributes in this case because gcc does not like them
          here, except if we are printing for CIL, or for MSVC.  In fact, for
          MSVC we MUST print attributes such as __stdcall *)
@@ -2023,7 +2023,7 @@ class cil_printer () = object (self)
        * the parenthesis. *)
       let (paren: (formatter -> unit) option), (bt': typ) =
         match bt with
-        | TFun(rt, args, isva, fa) when Cil.msvcMode () ->
+        | TFun(rt, args, isva, fa) when Machine.msvcMode () ->
           let an, af', at = Cil.partitionAttributes ~default:Cil.AttrType fa in
           (* We take the af' and we put them into the parentheses *)
           Some
@@ -2166,15 +2166,15 @@ class cil_printer () = object (self)
       (match an, args with
        | "const", [] -> self#pp_keyword fmt "const"; false
        (* Put the aconst inside the attribute list *)
-       | "aconst", [] when not (Cil.msvcMode ()) -> fprintf fmt "__const__"; true
+       | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
        | "thread", [ ACons ("c11",[]) ]
          when not state.print_cil_as_is ->
          fprintf fmt "_Thread_local"; false
-       | "thread", [] when not (Cil.msvcMode ()) -> fprintf fmt "__thread"; false
+       | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
        | "volatile", [] -> self#pp_keyword fmt "volatile"; false
        | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
        | "restrict", [] ->
-         if Cil.msvcMode () then
+         if Machine.msvcMode () then
            fprintf fmt "__restrict"
          else
            self#pp_keyword fmt "restrict";
@@ -2182,17 +2182,17 @@ class cil_printer () = object (self)
        | "missingproto", [] ->
          if self#display_comment () then fprintf fmt "/* missing proto */";
          false
-       | "cdecl", [] when Cil.msvcMode () ->
+       | "cdecl", [] when Machine.msvcMode () ->
          fprintf fmt "__cdecl"; false
-       | "stdcall", [] when Cil.msvcMode () ->
+       | "stdcall", [] when Machine.msvcMode () ->
          fprintf fmt "__stdcall"; false
-       | "fastcall", [] when Cil.msvcMode () ->
+       | "fastcall", [] when Machine.msvcMode () ->
          fprintf fmt "__fastcall"; false
-       | "declspec", args when Cil.msvcMode () ->
+       | "declspec", args when Machine.msvcMode () ->
          fprintf fmt "__declspec(%a)"
            (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
          false
-       | "w64", [] when Cil.msvcMode () ->
+       | "w64", [] when Machine.msvcMode () ->
          fprintf fmt "__w64"; false
        | "asm", args ->
          fprintf fmt "__asm__(%a)"
@@ -2240,7 +2240,7 @@ class cil_printer () = object (self)
        | _ -> (* This is the default case *)
          (* Add underscores to the name *)
          let an' =
-           if Cil.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
+           if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
          in
          (match args with
           | [] -> fprintf fmt "%s" an'

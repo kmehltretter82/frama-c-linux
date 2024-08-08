@@ -31,7 +31,7 @@ include
       let name = "AST"
 
       let dependencies =
-        [ Cil.selfMachine;
+        [ Machine.self;
           Kernel.SimplifyCfg.self;
           Kernel.KeepSwitch.self;
           Kernel.Constfold.self;
@@ -148,7 +148,7 @@ module UntypedFiles = struct
       (struct
         let name = "Untyped AST"
         let dependencies = (* the others delayed until file.ml *)
-          [ Cil.selfMachine;
+          [ Machine.self;
             self (* can't be computed without the AST *) ]
       end)
 

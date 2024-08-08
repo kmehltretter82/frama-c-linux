@@ -31,7 +31,7 @@ open Cil
 let sizeofchar () = Integer.of_int (bitsSizeOf Cil_const.charType)
 
 (** [sizeof(char* )] in bits *)
-let sizeofpointer () =  bitsSizeOf theMachine.upointType
+let sizeofpointer () =  bitsSizeOf (Machine.uintptr_type ())
 
 (** 2^(8 * sizeof( void * )) *)
 let max_byte_size () =

@@ -744,7 +744,7 @@ let type_expr metaenv env ?tr ?current e =
       let t =
         Logic_const.term
           (TConst (LWStr (Logic_typing.wcharlist_of_string s)))
-          (Ctype (TPtr(Cil.theMachine.wcharType,[])))
+          (Ctype (TPtr(Machine.wchar_type (),[])))
       in env,t,cond
     | PBinop(bop,e1,e2) ->
       let op = Logic_typing.type_binop bop in

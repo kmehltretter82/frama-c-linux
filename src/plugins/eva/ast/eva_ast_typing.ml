@@ -26,8 +26,8 @@ let type_of_const : constant -> typ = function
   | CTopInt ik -> Cil_types.TInt (ik, [])
   | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
   | CChr _ -> Cil_const.intType
-  | CString (String (_, Base.CSString _)) -> Cil.theMachine.stringLiteralType
-  | CString (String (_, Base.CSWstring _)) -> TPtr (Cil.theMachine.wcharType, [])
+  | CString (String (_, Base.CSString _)) -> Machine.string_literal_type ()
+  | CString (String (_, Base.CSWstring _)) -> TPtr (Machine.wchar_type (), [])
   | CString (_) -> assert false (* it must be a String base*)
   | CReal (_, fk, _) -> TFloat (fk, [])
   | CEnum (_ei, e) -> e.typ

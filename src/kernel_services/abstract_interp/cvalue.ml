@@ -609,7 +609,7 @@ module V = struct
       else
         (* Keep precision if we are reading all the bits of an address *)
         let ptr_size =
-          Integer.of_int (Cil.(bitsSizeOfInt theMachine.upointKind))
+          Integer.of_int (Cil.bitsSizeOfInt (Machine.uintptr_kind ()))
         in
         if Int.equal start Int.zero &&
            Int.equal (Int.succ stop) ptr_size &&
@@ -943,7 +943,7 @@ module V_Offsetmap = struct
   let from_wstring s =
     let conv v = V_Or_Uninitialized.initialized (V.of_int64 v) in
     let fold f acc l = List.fold_left (fun acc v -> f acc (conv v)) acc l in
-    let size_wchar = Integer.of_int Cil.(bitsSizeOf theMachine.wcharType) in
+    let size_wchar = Integer.of_int (Cil.bitsSizeOf (Machine.wchar_type ())) in
     of_list fold (s @ [0L]) size_wchar
 
   let from_cstring = function

@@ -86,7 +86,7 @@ let () =
 let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
   let logic_env = Env.Logic_env.get env in
   let pp = match pp with Some size_pp -> size_pp | None -> t in
-  let sizet = Cil.(theMachine.typeOfSizeOf) in
+  let sizet = Machine.sizeof_type () in
   let stmts = [] in
   (* Lower guard *)
   let stmts, env =

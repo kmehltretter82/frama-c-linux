@@ -353,11 +353,11 @@ type char = Char | Wide
 
 let bits_size = function
   | Char -> Integer.eight
-  | Wide -> Integer.of_int (Cil.bitsSizeOf Cil.theMachine.Cil.wcharType)
+  | Wide -> Integer.of_int (Cil.bitsSizeOf (Machine.wchar_type ()))
 
 let signed_char = function
-  | Char -> not Cil.(theMachine.theMachine.Cil_types.char_is_unsigned)
-  | Wide -> Cil.isSignedInteger Cil.theMachine.Cil.wcharType
+  | Char -> not (Machine.char_is_unsigned ())
+  | Wide -> Cil.isSignedInteger (Machine.wchar_type ())
 
 (* Converts the searched characters into char; needed for strchr and memchr. *)
 let searched_char ~size ~signed cvalue =

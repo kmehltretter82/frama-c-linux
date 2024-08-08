@@ -158,7 +158,7 @@ let cstring_bitlength s =
     | CSString s ->
       bitsSizeOf Cil_const.charType, (String.length s)
     | CSWstring s ->
-      bitsSizeOf theMachine.wcharType, (List.length s)
+      bitsSizeOf (Machine.wchar_type ()), (List.length s)
   in
   Int.of_int (u*(succ l))
 

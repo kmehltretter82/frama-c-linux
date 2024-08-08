@@ -69,33 +69,32 @@ let make_c_int signed = function
   | size -> WpLog.not_yet_implemented "%d-bytes integers" size
 
 let is_char = function
-  | UInt8 -> Cil.theMachine.Cil.theMachine.char_is_unsigned
-  | SInt8 -> not Cil.theMachine.Cil.theMachine.char_is_unsigned
+  | UInt8 -> Machine.char_is_unsigned ()
+  | SInt8 -> not (Machine.char_is_unsigned ())
   | UInt16 | SInt16
   | UInt32 | SInt32
   | UInt64 | SInt64
   | CBool -> false
 
 let c_int ikind =
-  let mach = Cil.theMachine.Cil.theMachine in
   match ikind with
   | IBool -> CBool
-  | IChar -> if mach.char_is_unsigned then UInt8 else SInt8
+  | IChar -> if Machine.char_is_unsigned () then UInt8 else SInt8
   | ISChar -> SInt8
   | IUChar -> UInt8
-  | IInt -> make_c_int true mach.sizeof_int
-  | IUInt -> make_c_int false mach.sizeof_int
-  | IShort -> make_c_int true mach.sizeof_short
-  | IUShort -> make_c_int false mach.sizeof_short
-  | ILong -> make_c_int true mach.sizeof_long
-  | IULong -> make_c_int false mach.sizeof_long
-  | ILongLong -> make_c_int true mach.sizeof_longlong
-  | IULongLong -> make_c_int false mach.sizeof_longlong
+  | IInt -> make_c_int true (Machine.sizeof_int ())
+  | IUInt -> make_c_int false (Machine.sizeof_int ())
+  | IShort -> make_c_int true (Machine.sizeof_short ())
+  | IUShort -> make_c_int false (Machine.sizeof_short ())
+  | ILong -> make_c_int true (Machine.sizeof_long ())
+  | IULong -> make_c_int false (Machine.sizeof_long ())
+  | ILongLong -> make_c_int true (Machine.sizeof_longlong ())
+  | IULongLong -> make_c_int false (Machine.sizeof_longlong ())
 
 let c_bool () = c_int IBool
 let c_char () = c_int IChar
 
-let p_bytes () = Cil.theMachine.Cil.theMachine.sizeof_ptr
+let p_bytes () = Machine.sizeof_ptr ()
 let p_bits () = 8 * p_bytes ()
 
 let c_ptr () = make_c_int false (p_bytes ())
@@ -124,11 +123,10 @@ let make_c_float = function
   | size -> WpLog.not_yet_implemented "%d-bits floats" (8*size)
 
 let c_float fkind =
-  let mach = Cil.theMachine.Cil.theMachine in
   match fkind with
-  | FFloat -> make_c_float mach.sizeof_float
-  | FDouble -> make_c_float mach.sizeof_double
-  | FLongDouble -> make_c_float mach.sizeof_longdouble
+  | FFloat -> make_c_float (Machine.sizeof_float ())
+  | FDouble -> make_c_float (Machine.sizeof_double ())
+  | FLongDouble -> make_c_float (Machine.sizeof_longdouble ())
 
 let equal_float f1 f2 = f_bits f1 = f_bits f2
 
@@ -251,8 +249,8 @@ let array_size = function
   | None -> None
   | Some e ->
     match constant e with
-    | 0L when Cil.gccMode () || Cil.msvcMode () -> None
-    | 0L -> Warning.error "0 sized array %s" (Cil.allowed_machdep "GCC/MSVC")
+    | 0L when Machine.(gccMode () || msvcMode ()) -> None
+    | 0L -> Warning.error "0 sized array %s" (Machdep.allowed_machdep "GCC/MSVC")
     | n  -> Some n
 
 let get_int e =

@@ -269,7 +269,7 @@ let warn_if_another_compiler_builtin name =
     Kernel.warning ~wkey:Kernel.wkey_implicit_function_declaration
       ~current:true ~once:true
       "%s is a compiler builtin, %s" name
-      (Cil.allowed_machdep (Cil_builtins.string_of_compiler compiler));
+      (Machdep.allowed_machdep (Cil_builtins.string_of_compiler compiler));
     true
   with Not_found -> false
 

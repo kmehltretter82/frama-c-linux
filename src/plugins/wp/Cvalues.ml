@@ -158,7 +158,7 @@ module OPAQUE_COMP_BYTES_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
           d_lfun = size ; d_types = 0 ; d_params = [] ;
           d_definition = Logic result ;
         } ;
-        let min_size = if Cil.acceptEmptyCompinfo () then e_zero else e_one in
+        let min_size = if Machine.acceptEmptyCompinfo () then e_zero else e_one in
         Definitions.define_lemma {
           l_kind = Admit ; l_name ;
           l_triggers = [] ; l_forall = [] ;

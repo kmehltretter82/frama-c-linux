@@ -116,7 +116,7 @@ let thread_keyword () =
   let wkey = Kernel.wkey_conditional_feature in
   let s = "__thread is a GCC extension, use a GCC-based machdep to enable it" in
   let warning () = Kernel.warning ~wkey "%s" s ; IDENT "__thread" in
-  add "__thread" (fun loc -> if Cil.gccMode () then THREAD loc else warning ())
+  add "__thread" (fun loc -> if Machine.gccMode () then THREAD loc else warning ())
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in

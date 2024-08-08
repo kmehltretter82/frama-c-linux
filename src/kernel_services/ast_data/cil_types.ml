@@ -754,9 +754,9 @@ and exp_node =
   | Const      of constant              (** Constant *)
   | Lval       of lval                  (** Lvalue *)
   | SizeOf     of typ
-  (** sizeof(<type>). Has [unsigned int] type (ISO 6.5.3.4). This is not
-      turned into a constant because some transformations might want to change
-      types *)
+  (** sizeof(<type>). Has [size_t] type (ISO 6.5.3.4) which depends on machine
+      configuration (cf. {!Machine}). This is not turned into a constant
+      because some transformations might want to change types *)
 
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
@@ -766,7 +766,8 @@ and exp_node =
       type pointer to character. *)
 
   | AlignOf    of typ
-  (** This corresponds to the GCC __alignof_. Has [unsigned int] type *)
+  (** This corresponds to the GCC __alignof_. Has [size_t] type which depends on
+      machine configuration (cf. {!Machine}). *)
 
   | AlignOfE   of exp
 
@@ -813,13 +814,13 @@ and constant =
 
   | CWStr of int64 list
   (** Wide character string constant. Note that the local interpretation of such
-      a literal depends on {!Cil.theMachine.wcharType} and
-      {!Cil.theMachine.wcharKind}.  Such a constant has type pointer to
-      {!Cil.theMachine.wcharType}. The escape characters in the string have not
-      been "interpreted" in the sense that L"A\xabcd" remains "A\xabcd" rather
-      than being represented as the wide character list with two elements: 65
-      and 43981. That "interpretation" depends on the underlying wide character
-      type. *)
+      a literal depends on {!Machine.theMachine.wcharType} and
+      {!Machine.theMachine.wcharKind}.  Such a constant has type pointer to
+      {!Machine.theMachine.wcharType}. The escape characters in the string
+      have not been "interpreted" in the sense that L"A\xabcd" remains
+      "A\xabcd" rather than being represented as the wide character list with
+      two elements: 65 and 43981. That "interpretation" depends on the
+      underlying wide character type. *)
 
   | CChr of char
   (** Character constant.  This has type int, so use charConstToInt to read the
@@ -1879,88 +1880,3 @@ type syntactic_scope =
       the block to which it is tied, will be considered.
       @since 27.0-Cobalt
   *)
-
-let yaml_dict_to_list = function
-  | `O l ->
-    let make_one acc (k,v) =
-      Result.(
-        bind acc
-          (fun l ->
-             match Yaml.Util.to_string v with
-             | Ok s -> Ok((k,s) :: l)
-             | Error (`Msg s) ->
-               Error (`Msg ("Unexpected value for key " ^ k ^ ": " ^ s))))
-    in
-    List.fold_left make_one (Ok []) l
-  | _ -> Error (`Msg "Unexpected YAML value instead of dictionary of strings")
-
-(** Definition of a machine model (architecture + compiler).
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-type mach = {
-  sizeof_short: int;      (* Size of "short" *)
-  sizeof_int: int;        (* Size of "int" *)
-  sizeof_long: int ;      (* Size of "long" *)
-  sizeof_longlong: int;   (* Size of "long long" *)
-  sizeof_ptr: int;        (* Size of pointers *)
-  sizeof_float: int;      (* Size of "float" *)
-  sizeof_double: int;     (* Size of "double" *)
-  sizeof_longdouble: int; (* Size of "long double" *)
-  sizeof_void: int;       (* Size of "void" *)
-  sizeof_fun: int;        (* Size of function. Negative if unsupported. *)
-  size_t: string;         (* Type of "sizeof(T)" *)
-  ssize_t: string;        (* representation of ssize_t *)
-  wchar_t: string;        (* Type of "wchar_t" *)
-  ptrdiff_t: string;      (* Type of "ptrdiff_t" *)
-  intptr_t: string;       (* Type of "intptr_t" *)
-  uintptr_t: string;      (* Type of "uintptr_t" *)
-  int_fast8_t: string;     (* Type of "int_fast8_t" *)
-  int_fast16_t: string;     (* Type of "int_fast16_t" *)
-  int_fast32_t: string;     (* Type of "int_fast32_t" *)
-  int_fast64_t: string;     (* Type of "int_fast64_t" *)
-  uint_fast8_t: string;     (* Type of "uint_fast8_t" *)
-  uint_fast16_t: string;     (* Type of "uint_fast16_t" *)
-  uint_fast32_t: string;     (* Type of "uint_fast32_t" *)
-  uint_fast64_t: string;     (* Type of "uint_fast64_t" *)
-  wint_t: string;          (* Type of "wint_t" *)
-  sig_atomic_t: string;   (* Type of "sig_atomic_t" *)
-  time_t: string;          (* Type of "time_t" *)
-  alignof_short: int;     (* Alignment of "short" *)
-  alignof_int: int;       (* Alignment of "int" *)
-  alignof_long: int;      (* Alignment of "long" *)
-  alignof_longlong: int;  (* Alignment of "long long" *)
-  alignof_ptr: int;       (* Alignment of pointers *)
-  alignof_float: int;     (* Alignment of "float" *)
-  alignof_double: int;    (* Alignment of "double" *)
-  alignof_longdouble: int;  (* Alignment of "long double" *)
-  alignof_str: int;       (* Alignment of strings *)
-  alignof_fun: int;       (* Alignment of function. Negative if unsupported. *)
-  char_is_unsigned: bool; (* Whether "char" is unsigned *)
-  little_endian: bool; (* whether the machine is little endian *)
-  alignof_aligned: int (* Alignment of a type with aligned attribute *);
-  has__builtin_va_list: bool (* Whether [__builtin_va_list] is a known type *);
-  compiler: string;       (* Compiler being used. Currently recognized names
-                             are 'gcc', 'msvc' and 'generic'. *)
-  cpp_arch_flags: string list;  (* Architecture-specific flags to be given to
-                                   the preprocessor (if supported) *)
-  version: string;        (* Information on this machdep *)
-  weof: string; (* expansion of WEOF macro, empty if undefined *)
-  wordsize: string; (* expansion of __WORDSIZE macro, empty if undefined *)
-  posix_version: string; (* expansion of _POSIX_VERSION macro, empty if undefined *)
-  bufsiz: string; (* expansion of BUFSIZ macro *)
-  eof: string; (* expansion of EOF macro *)
-  fopen_max: string; (* expansion of FOPEN_MAX macro *)
-  filename_max: string; (* expansion of FILENAME_MAX macro *)
-  host_name_max: string; (* expansion of HOST_NAME_MAX macro *)
-  tty_name_max: string; (* expansion of TTY_NAME_MAX macro *)
-  l_tmpnam: string; (* expansion of L_tmpnam macro *)
-  path_max: string; (* expansion of PATH_MAX macro *)
-  tmp_max: string; (* expansion of TMP_MAX macro *)
-  rand_max: string; (* expansion of RAND_MAX macro *)
-  mb_cur_max: string; (* expansion of MB_CUR_MAX macro *)
-  nsig: string; (* expansion of non-standard NSIG macro, empty if undefined *)
-  (* list of macros defining errors in errno.h*)
-  errno: (string * string) list  [@of_yaml yaml_dict_to_list];
-  machdep_name: string; (* name of the machdep *)
-  (* sequence of key/value for C macros *)
-  custom_defs: (string * string) list [@of_yaml yaml_dict_to_list];
-} [@@deriving yaml]

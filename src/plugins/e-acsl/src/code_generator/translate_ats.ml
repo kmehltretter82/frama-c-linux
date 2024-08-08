@@ -341,7 +341,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
       ty_ptr
       (fun vi e ->
          (* Handle [malloc] and [free] stmts *)
-         let lty_sizeof = Ctype Cil.(theMachine.typeOfSizeOf) in
+         let lty_sizeof = Ctype (Machine.sizeof_type ()) in
          let t_sizeof = Logic_const.term ~loc (TSizeOf ty) lty_sizeof in
          let t_size = size_from_sizes_and_shifts ~loc sizes_and_shifts in
          let t_size =

@@ -90,9 +90,9 @@ val add_special_builtin_family: (string -> bool) -> unit
 val init_builtins: unit -> unit
 
 (** A list of the built-in functions for the current compiler (GCC or
-    MSVC, depending on [!msvcMode]).  Maps the name to the
+    MSVC, depending on [!Machine.msvcMode]).  Maps the name to the
     result and argument types, and whether it is vararg.
-    Initialized by {!Cil.initCIL}. Do not add builtins directly, use
+    Initialized by {!Machine.init}. Do not add builtins directly, use
     {! add_custom_builtin } below for that.
 
     This map replaces [gccBuiltins] and [msvcBuiltins] in previous

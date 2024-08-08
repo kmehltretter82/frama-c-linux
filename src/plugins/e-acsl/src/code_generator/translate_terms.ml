@@ -820,7 +820,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     e, adata, env, Analyses_types.C_number, name
   | Tbase_addr _ -> Env.not_yet env "labeled \\base_addr"
   | Toffset(BuiltinLabel Here, t') ->
-    let size_t = Cil.theMachine.Cil.typeOfSizeOf in
+    let size_t = Machine.sizeof_type () in
     let name = "offset" in
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf name size_t env t'
@@ -829,7 +829,7 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     e, adata, env, Analyses_types.C_number, name
   | Toffset _ -> Env.not_yet env "labeled \\offset"
   | Tblock_length(BuiltinLabel Here, t') ->
-    let size_t = Cil.theMachine.Cil.typeOfSizeOf in
+    let size_t = Machine.sizeof_type () in
     let name = "block_length" in
     let e, adata, env =
       Memory_translate.call ~adata ~loc kf name size_t env t'

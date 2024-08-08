@@ -56,6 +56,7 @@ open Logic_const
 open Cil_datatype
 open Cil_types
 open Cil_const
+open Machine
 
 (* ************************************************************************* *)
 (* Reporting messages *)
@@ -75,131 +76,15 @@ let abort_context msg =
   in
   Kernel.abort ~current:true ~append msg
 
-type theMachine =
-  { mutable useLogicalOperators: bool;
-    mutable theMachine: mach;
-    (** Cil.initCil will set this to the current machine description. *)
-    mutable lowerConstants: bool; (** Do lower constants (default true) *)
-    mutable insertImplicitCasts: bool; (** Do insert implicit casts
-                                           (default true) *)
-    mutable stringLiteralType: typ;
-    mutable upointKind: ikind;
-    mutable upointType: typ;
-    mutable wcharKind: ikind; (** An integer type that fits wchar_t. *)
-    mutable wcharType: typ;
-    mutable ptrdiffKind: ikind; (** An integer type that fits ptrdiff_t. *)
-    mutable ptrdiffType: typ;
-    mutable typeOfSizeOf: typ; (** An integer type that is the type of
-                                   sizeof. *)
-    mutable kindOfSizeOf: ikind;
-  }
-
-let createMachine () = (* Contain dummy values *)
-  { useLogicalOperators = false;
-    theMachine = List.hd Cil_datatype.Machdep.reprs;
-    lowerConstants = false(*true*);
-    insertImplicitCasts = true;
-    stringLiteralType = charConstPtrType;
-    upointKind = IUChar;
-    upointType = voidType;
-    wcharKind = IChar;
-    wcharType = voidType;
-    ptrdiffKind = IChar;
-    ptrdiffType = voidType;
-    typeOfSizeOf = voidType;
-    kindOfSizeOf = IUInt;
-  }
-
-let copyMachine src dst =
-  dst.useLogicalOperators <- src.useLogicalOperators;
-  dst.theMachine <- src.theMachine;
-  dst.lowerConstants <- src.lowerConstants;
-  dst.insertImplicitCasts <- src.insertImplicitCasts;
-  dst.stringLiteralType <- src.stringLiteralType;
-  dst.upointKind <- src.upointKind;
-  dst.upointType <- src.upointType;
-  dst.wcharKind <- src.wcharKind;
-  dst.wcharType <- src.wcharType;
-  dst.ptrdiffKind <- src.ptrdiffKind;
-  dst.ptrdiffType <- src.ptrdiffType;
-  dst.typeOfSizeOf <- src.typeOfSizeOf;
-  dst.kindOfSizeOf <- src.kindOfSizeOf
-
-(* A few globals that control the interpretation of C source *)
-let theMachine = createMachine ()
-
-let msvcMode () = (theMachine.theMachine.compiler = "msvc")
-let gccMode () = (theMachine.theMachine.compiler = "gcc"
-                  || theMachine.theMachine.compiler = "clang")
-
-let acceptEmptyCompinfo = ref false
-
-let set_acceptEmptyCompinfo () = acceptEmptyCompinfo := true
-
-let acceptEmptyCompinfo () =
-  msvcMode () || gccMode () || !acceptEmptyCompinfo
-
-let allowed_machdep machdep =
-  Format.asprintf
-    "only allowed for %s machdeps; see option -machdep or \
-     run 'frama-c -machdep help' for the list of available machdeps"
-    machdep
-
-let theMachineProject = ref (createMachine ())
-
-module Machine_datatype =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = theMachine
-      let name = "theMachine"
-      let reprs = [ theMachine ]
-      let copy x =
-        let m = createMachine () in
-        copyMachine x m;
-        m
-      let mem_project = Datatype.never_any_project
-    end)
-
-module TheMachine =
-  State_builder.Register
-    (Machine_datatype)
-    (struct
-      type t = theMachine
-      let create = createMachine
-      let get () = !theMachineProject
-      let set m =
-        theMachineProject := m;
-        copyMachine !theMachineProject theMachine
-      let clear m = copyMachine (createMachine ()) m
-      let clear_some_projects _ _ = false
-    end)
-    (struct
-      let name = "theMachine"
-      let unique_name = name
-      let dependencies = [ Kernel.Machdep.self; Kernel.LogicalOperators.self ]
-    end)
-
-let selfMachine = TheMachine.self
-
-let () =
-  State_dependency_graph.add_dependencies
-    ~from:selfMachine
-    Logic_env.builtin_states
-
-let selfMachine_is_computed = TheMachine.is_computed
-
 let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
 
 let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
-
 
 let argsToList : (string * typ * attributes) list option
   -> (string * typ * attributes) list
   = function
       None -> []
     | Some al -> al
-
 
 (* A hack to allow forward reference of d_exp *)
 let pp_typ_ref = Extlib.mk_fun "Cil.pp_typ_ref"
@@ -2836,10 +2721,10 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
   | IChar | ISChar | IUChar | IBool -> 1
-  | IInt | IUInt -> theMachine.theMachine.sizeof_int
-  | IShort | IUShort -> theMachine.theMachine.sizeof_short
-  | ILong | IULong -> theMachine.theMachine.sizeof_long
-  | ILongLong | IULongLong -> theMachine.theMachine.sizeof_longlong
+  | IInt | IUInt -> sizeof_int ()
+  | IShort | IUShort -> sizeof_short ()
+  | ILong | IULong -> sizeof_long ()
+  | ILongLong | IULongLong -> sizeof_longlong ()
 
 let bitsSizeOfInt ik = 8 * bytesSizeOfInt ik
 
@@ -2847,18 +2732,18 @@ let intKindForSize (s:int) (unsigned:bool) : ikind =
   if unsigned then
     (* Test the most common sizes first *)
     if s = 1 then IUChar
-    else if s = theMachine.theMachine.sizeof_int then IUInt
-    else if s = theMachine.theMachine.sizeof_long then IULong
-    else if s = theMachine.theMachine.sizeof_short then IUShort
-    else if s = theMachine.theMachine.sizeof_longlong then IULongLong
+    else if s = sizeof_int () then IUInt
+    else if s = sizeof_long () then IULong
+    else if s = sizeof_short () then IUShort
+    else if s = sizeof_longlong () then IULongLong
     else raise Not_found
   else
     (* Test the most common sizes first *)
   if s = 1 then ISChar
-  else if s = theMachine.theMachine.sizeof_int then IInt
-  else if s = theMachine.theMachine.sizeof_long then ILong
-  else if s = theMachine.theMachine.sizeof_short then IShort
-  else if s = theMachine.theMachine.sizeof_longlong then ILongLong
+  else if s = sizeof_int () then IInt
+  else if s = sizeof_long () then ILong
+  else if s = sizeof_short () then IShort
+  else if s = sizeof_longlong () then ILongLong
   else raise Not_found
 
 let uint64_t () = TInt(intKindForSize 8 true,[])
@@ -2869,9 +2754,9 @@ let int32_t () = TInt(intKindForSize 4 false,[])
 let int16_t () = TInt(intKindForSize 2 false,[])
 
 let floatKindForSize (s:int) =
-  if s = theMachine.theMachine.sizeof_double then FDouble
-  else if s = theMachine.theMachine.sizeof_float then FFloat
-  else if s = theMachine.theMachine.sizeof_longdouble then FLongDouble
+  if s = sizeof_double () then FDouble
+  else if s = sizeof_float () then FFloat
+  else if s = sizeof_longdouble () then FLongDouble
   else raise Not_found
 
 (** Returns true if and only if the given integer type is signed. *)
@@ -2889,7 +2774,7 @@ let isSigned = function
   | ILongLong ->
     true
   | IChar ->
-    not theMachine.theMachine.Cil_types.char_is_unsigned
+    not (char_is_unsigned ())
 
 let max_signed_number nrBits =
   let n = nrBits-1 in
@@ -3596,10 +3481,10 @@ let rec typeOf (e: exp) : typ =
   (* The type of a string is a pointer to characters ! The only case when
    * you would want it to be an array is as an argument to sizeof, but we
    * have SizeOfStr for that *)
-  | Const(CStr _s) -> theMachine.stringLiteralType
+  | Const(CStr _s) -> string_literal_type ()
 
   | Const(CWStr _s) ->
-    let typ = typeAddAttributes [Attr("const",[])] theMachine.wcharType in
+    let typ = typeAddAttributes [Attr("const",[])] (wchar_type ()) in
     TPtr(typ,[])
 
   | Const(CReal (_, fk, _)) -> TFloat(fk, [])
@@ -3609,8 +3494,8 @@ let rec typeOf (e: exp) : typ =
   (* l-values used as r-values lose their qualifiers (C99 6.3.2.1:2) *)
   | Lval lv -> type_remove_qualifier_attributes (typeOfLval lv)
 
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> theMachine.typeOfSizeOf
-  | AlignOf _ | AlignOfE _ -> theMachine.typeOfSizeOf
+  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> (sizeof_type ())
+  | AlignOf _ | AlignOfE _ -> (sizeof_type ())
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
@@ -3808,11 +3693,8 @@ and isWFNonGhostType t =
     | TPtr(t, _) | TArray(t, _, _) -> isWFNonGhostType t
     | _ -> true
 
-(**
- **
- ** MACHINE DEPENDENT PART
- **
- **)
+(**** MACHINE DEPENDENT PART ****)
+
 exception SizeOfError of string * typ
 
 type sizeof_or_error =
@@ -3951,20 +3833,17 @@ let ignoreAlignmentAttrs = ref false
 let rec bytesAlignOf t =
   let alignOfType () = match t with
     | TInt((IChar|ISChar|IUChar|IBool), _) -> 1
-    | TInt((IShort|IUShort), _) -> theMachine.theMachine.alignof_short
-    | TInt((IInt|IUInt), _) -> theMachine.theMachine.alignof_int
-    | TInt((ILong|IULong), _) -> theMachine.theMachine.alignof_long
-    | TInt((ILongLong|IULongLong), _) ->
-      theMachine.theMachine.alignof_longlong
+    | TInt((IShort|IUShort), _) -> alignof_short ()
+    | TInt((IInt|IUInt), _) -> alignof_int ()
+    | TInt((ILong|IULong), _) -> alignof_long ()
+    | TInt((ILongLong|IULongLong), _) -> alignof_longlong ()
     | TEnum (ei,_) ->  bytesAlignOf (TInt(ei.ekind, []))
-    | TFloat(FFloat, _) -> theMachine.theMachine.alignof_float
-    | TFloat(FDouble, _) -> theMachine.theMachine.alignof_double
-    | TFloat(FLongDouble, _) ->
-      theMachine.theMachine.alignof_longdouble
+    | TFloat(FFloat, _) -> alignof_float ()
+    | TFloat(FDouble, _) -> alignof_double ()
+    | TFloat(FLongDouble, _) -> alignof_longdouble ()
     | TNamed (t, _) -> bytesAlignOf t.ttype
     | TArray (t, _, _) -> bytesAlignOf t
-    | TPtr _ | TBuiltin_va_list _ ->
-      theMachine.theMachine.alignof_ptr
+    | TPtr _ | TBuiltin_va_list _ -> alignof_ptr ()
 
     (* For composite types get the maximum alignment of any field inside *)
     | TComp (c, _) ->
@@ -3987,12 +3866,11 @@ let rec bytesAlignOf t =
            if not (msvcMode ()) && f.fbitfield = Some 0 then sofar else
              max sofar (alignOfField f)) 1 fields
     (* These are some error cases *)
-    | TFun _ when not (msvcMode ()) ->
-      theMachine.theMachine.alignof_fun
+    | TFun _ when not (msvcMode ()) -> alignof_fun ()
     | TFun _ as t -> raise (SizeOfError ("Undefined sizeof on a function.", t))
     | TVoid _ as t ->
-      if theMachine.theMachine.sizeof_void > 0 then
-        theMachine.theMachine.sizeof_void
+      if sizeof_void () > 0 then
+        sizeof_void ()
       else
         raise (SizeOfError ("Undefined sizeof(void).", t))
   in
@@ -4106,7 +3984,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     if rest <> [] then
       Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
         pp;
-    theMachine.theMachine.alignof_aligned
+    alignof_aligned ()
   | at::_ ->
     Kernel.warning ~current:true "alignment attribute \"%a\" not understood on %t"
       !pp_attribute_ref at pp;
@@ -4271,19 +4149,18 @@ and bitsSizeOfEmptyArray typ =
 and bitsSizeOf t =
   match t with
   | TInt (ik,_) -> 8 * (bytesSizeOfInt ik)
-  | TFloat(FDouble, _) -> 8 * theMachine.theMachine.sizeof_double
-  | TFloat(FLongDouble, _) ->
-    8 * theMachine.theMachine.sizeof_longdouble
-  | TFloat _ -> 8 * theMachine.theMachine.sizeof_float
+  | TFloat(FDouble, _) -> 8 * sizeof_double ()
+  | TFloat(FLongDouble, _) -> 8 * sizeof_longdouble ()
+  | TFloat _ -> 8 * sizeof_float ()
   | TEnum (ei,_) -> bitsSizeOf (TInt(ei.ekind, []))
-  | TPtr _ -> 8 * theMachine.theMachine.sizeof_ptr
-  | TBuiltin_va_list _ -> 8 * theMachine.theMachine.sizeof_ptr
+  | TPtr _ -> 8 * sizeof_ptr ()
+  | TBuiltin_va_list _ -> 8 * sizeof_ptr ()
   | TNamed (t, _) -> bitsSizeOf t.ttype
   | TComp ({cfields=None} as comp, _) ->
     raise
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-  | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo() ->
+  | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo () ->
     find_sizeof t (fun () -> t,0)
   | TComp ({cfields=Some[]} as comp,_) ->
     find_sizeof t
@@ -4360,13 +4237,13 @@ and bitsSizeOf t =
              raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
   | TVoid _ ->
-    if theMachine.theMachine.sizeof_void >= 0 then
-      8 * theMachine.theMachine.sizeof_void
+    if sizeof_void () >= 0 then
+      8 * sizeof_void ()
     else
       raise (SizeOfError ("Undefined sizeof(void).", t))
   | TFun _ ->
-    if theMachine.theMachine.sizeof_fun >= 0 then
-      8 * theMachine.theMachine.sizeof_fun
+    if sizeof_fun () >= 0 then
+      8 * sizeof_fun ()
     else
       raise (SizeOfError ("Undefined sizeof on a function.", t))
 
@@ -4492,20 +4369,20 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
   | SizeOf t when machdep ->
     begin
-      try kinteger ~loc theMachine.kindOfSizeOf (bytesSizeOf t)
+      try kinteger ~loc (sizeof_kind ()) (bytesSizeOf t)
       with SizeOfError _ -> e
     end
   | SizeOfE { enode = Const (CWStr l) } when machdep ->
     let len = List.length l in
-    let wchar_size = bitsSizeOfInt theMachine.wcharKind / 8 in
-    kinteger ~loc theMachine.kindOfSizeOf ((len + 1) * wchar_size)
+    let wchar_size = bitsSizeOfInt (wchar_kind ()) / 8 in
+    kinteger ~loc (sizeof_kind ()) ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
-    kinteger ~loc theMachine.kindOfSizeOf (1 + String.length s)
+    kinteger ~loc (sizeof_kind ()) (1 + String.length s)
   | AlignOf t when machdep ->
     begin
-      try kinteger ~loc theMachine.kindOfSizeOf (bytesAlignOf t)
+      try kinteger ~loc (sizeof_kind ()) (bytesAlignOf t)
       with SizeOfError _ -> e
     end
   | AlignOfE e when machdep -> begin
@@ -4513,8 +4390,7 @@ and constFold (machdep: bool) (e: exp) : exp =
        * type. I know that for strings this is not true *)
       match e.enode with
       | Const (CStr _) when not (msvcMode ()) ->
-        kinteger ~loc
-          theMachine.kindOfSizeOf theMachine.theMachine.alignof_str
+        kinteger ~loc (sizeof_kind ()) (alignof_str ())
       (* For an array, it is the alignment of the array ! *)
       | _ -> constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
     end
@@ -4771,7 +4647,7 @@ and constFoldToInt ?(machdep=true) e =
       (* Those casts are left left by constFold *)
       match constFoldToInt ~machdep e with
       | None -> None
-      | Some i as r -> if fitsInInt theMachine.upointKind i then r else None
+      | Some i as r -> if fitsInInt (uintptr_kind ()) i then r else None
     end
   | _ -> None
 
@@ -5809,7 +5685,7 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
            to be constant. If it is truncated, we consider it non-const
            in any case.
         *)
-        bytesSizeOfInt theMachine.upointKind <= bytesSizeOfInt i &&
+        bytesSizeOfInt (uintptr_kind ()) <= bytesSizeOfInt i &&
         isConstantGen is_varinfo_cst f e
       | _ -> isConstantGen is_varinfo_cst f e
     end
@@ -6307,7 +6183,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       (* ISO 6.3.2.3.1 *) ()
     | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
     | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
-      if not fromsource && newt != theMachine.upointType
+      if not fromsource && newt != uintptr_type ()
       then
         Kernel.warning
           ~wkey:Kernel.wkey_int_conversion
@@ -6607,7 +6483,7 @@ and mkBinOp ~loc op e1 e2 =
     Kernel.debug ~level:3 "Comparison of zero and va_list";
     compare_pointer ~cast1:t2 op (zero ~loc) e2
   | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isPointerType t2 ->
-    compare_pointer ~cast1:theMachine.upointType ~cast2:theMachine.upointType
+    compare_pointer ~cast1:(uintptr_type ()) ~cast2:(uintptr_type ())
       op e1 e2
   | _ ->
     Kernel.fatal
@@ -6627,8 +6503,8 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
       if isPointerType t1 && isPointerType t2
          && not (isZero e1) && not (isZero e2)
       then begin
-        mkCast ~force:true ~newt:theMachine.upointType e1,
-        mkCast ~force:true ~newt:theMachine.upointType e2
+        mkCast ~force:true ~newt:(uintptr_type ()) e1,
+        mkCast ~force:true ~newt:(uintptr_type ()) e2
       end else e1, e2
     | _ -> e1, e2
   in
@@ -6760,7 +6636,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ as t ->
     SingleInit(
-      if theMachine.insertImplicitCasts then mkCast ~newt:t (zero ~loc)
+      if (insert_implicit_casts ()) then mkCast ~newt:t (zero ~loc)
       else zero ~loc)
   | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
 
@@ -6841,20 +6717,21 @@ let rec has_flexible_array_member t =
   let is_flexible_array t =
     match unrollType t with
     | TArray (_, None, _) -> true
-    | TArray (_, Some z, _) -> (msvcMode() || gccMode()) && isZero z
+    | TArray (_, Some z, _) -> (msvcMode () || gccMode ()) && isZero z
     | _ -> false
   in
   match unrollType t with
   | TComp ({ cfields = Some ((_::_) as l) },_) ->
     let last = (Extlib.last l).ftype in
     is_flexible_array last ||
-    ((gccMode() || msvcMode()) && has_flexible_array_member last)
+    ((gccMode () || msvcMode ()) && has_flexible_array_member last)
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
    a struct (which could be a FAM, making the whole struct complete even if
    the array type isn't. *)
-let rec isCompleteType ?(allowZeroSizeArrays=gccMode()) ?(last_field=false) t =
+let rec isCompleteType ?(allowZeroSizeArrays=gccMode ())
+    ?(last_field=false) t =
   match unrollType t with
   | TVoid _ -> false (* void is an incomplete type by definition (6.2.5§19) *)
   | TArray(t, None, _) ->
@@ -7051,72 +6928,6 @@ let uniqueVarNames (f: file) : unit =
 let is_case_label l = match l with
   | Case _ | Default _ -> true
   | _ -> false
-
-let init_builtins_ref : (unit -> unit) ref = Extlib.mk_fun "init_builtins_ref"
-
-let initCIL ~initLogicBuiltins machdep =
-  if not (TheMachine.is_computed ()) then begin
-    (* Set the machine *)
-    theMachine.theMachine <- machdep;
-    (* Pick type for string literals *)
-    theMachine.stringLiteralType <- charConstPtrType;
-    (* Find the right ikind given the size *)
-    let findIkindSz (unsigned: bool) (sz: int) : ikind =
-      (* Test the most common sizes first *)
-      if sz = theMachine.theMachine.sizeof_int then
-        if unsigned then IUInt else IInt
-      else if sz = theMachine.theMachine.sizeof_long then
-        if unsigned then IULong else ILong
-      else if sz = 1 then
-        if unsigned then IUChar else IChar
-      else if sz = theMachine.theMachine.sizeof_short then
-        if unsigned then IUShort else IShort
-      else if sz = theMachine.theMachine.sizeof_longlong then
-        if unsigned then IULongLong else ILongLong
-      else
-        Kernel.fatal ~current:true "initCIL: cannot find the right ikind for size %d\n" sz
-    in
-    (* Find the right ikind given the name *)
-    let findIkindName (name: string) : ikind =
-      (* Test the most common sizes first *)
-      if name = "int" then IInt
-      else if name = "unsigned int" then IUInt
-      else if name = "long" then ILong
-      else if name = "unsigned long" then IULong
-      else if name = "short" then IShort
-      else if name = "unsigned short" then IUShort
-      else if name = "char" then IChar
-      else if name = "unsigned char" then IUChar
-      else if name = "long long" then ILongLong
-      else if name = "unsigned long long" then IULongLong
-      else
-        Kernel.fatal
-          ~current:true "initCIL: cannot find the right ikind for type %s" name
-    in
-    theMachine.upointKind <- findIkindSz true theMachine.theMachine.sizeof_ptr;
-    theMachine.upointType <- TInt(theMachine.upointKind, []);
-    theMachine.kindOfSizeOf <-
-      findIkindName theMachine.theMachine.size_t;
-    theMachine.typeOfSizeOf <- TInt(theMachine.kindOfSizeOf, []);
-    theMachine.wcharKind <- findIkindName theMachine.theMachine.wchar_t;
-    theMachine.wcharType <- TInt(theMachine.wcharKind, []);
-    theMachine.ptrdiffKind <- findIkindName theMachine.theMachine.ptrdiff_t;
-    theMachine.ptrdiffType <- TInt(theMachine.ptrdiffKind, []);
-    theMachine.useLogicalOperators <- Kernel.LogicalOperators.get() (* do not use lazy LAND and LOR *);
-    (*nextGlobalVID <- 1 ;
-      nextCompinfoKey <- 1;*)
-
-    (* Have to be marked before calling [init*Builtins] below. *)
-    TheMachine.mark_as_computed ();
-    (* projectify theMachine *)
-    copyMachine theMachine !theMachineProject;
-
-    !init_builtins_ref ();
-
-    Logic_env.Builtins.extend initLogicBuiltins;
-
-  end
-
 
 (* We want to bring all type declarations before the data declarations. This
  * is needed for code of the following form:
@@ -7619,6 +7430,19 @@ let mapNoCopy = Extlib.map_no_copy
 let mapNoCopyList = Extlib.map_no_copy_list
 
 let optMapNoCopy = Extlib.opt_map_no_copy
+
+(******************************************************************************)
+(** Forward the machine                                                       *)
+(******************************************************************************)
+
+let acceptEmptyCompinfo = acceptEmptyCompinfo
+let set_acceptEmptyCompinfo = set_acceptEmptyCompinfo
+let msvcMode = msvcMode
+let gccMode = gccMode
+
+type theMachine = machine
+
+let theMachine = theMachine [@@alert "-deprecated"]
 
 (*
 Local Variables:

@@ -493,7 +493,7 @@ let register_malloc ?replace name ?returns_null prefix region =
     Builtins.Full { c_values; c_clobbered; c_assigns = None; }
   in
   let name = "Frama_C_" ^ name in
-  let typ () = Cil_const.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf] in
+  let typ () = Cil_const.voidPtrType, [Machine.sizeof_type ()] in
   Builtins.register_builtin ?replace name NoCacheCallers builtin ~typ
 
 let () =
@@ -548,7 +548,7 @@ let () =
   let name = "Frama_C_calloc" in
   let replace = "calloc" in
   let typ () =
-    let sizeof_typ = Cil.theMachine.Cil.typeOfSizeOf in
+    let sizeof_typ = Machine.sizeof_type () in
     Cil_const.voidPtrType, [ sizeof_typ; sizeof_typ ]
   in
   Builtins.register_builtin ~replace name NoCacheCallers calloc_builtin ~typ
@@ -840,7 +840,7 @@ let realloc_builtin state args =
 let () =
   let name = "Frama_C_realloc" in
   let replace = "realloc" in
-  let typ () = Cil_const.(voidPtrType, [voidPtrType; Cil.theMachine.typeOfSizeOf]) in
+  let typ () = Cil_const.(voidPtrType, [voidPtrType; Machine.sizeof_type ()]) in
   Builtins.register_builtin ~replace name NoCacheCallers realloc_builtin ~typ
 
 let reallocarray_builtin state args =
@@ -875,7 +875,7 @@ let () =
   let replace = "reallocarray" in
   let typ () =
     Cil_const.voidPtrType,
-    [Cil_const.voidPtrType; Cil.theMachine.typeOfSizeOf; Cil.theMachine.typeOfSizeOf]
+    [Cil_const.voidPtrType; Machine.sizeof_type (); Machine.sizeof_type ()]
   in
   Builtins.register_builtin
     ~replace name NoCacheCallers reallocarray_builtin ~typ

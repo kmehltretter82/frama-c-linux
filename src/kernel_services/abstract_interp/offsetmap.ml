@@ -1032,7 +1032,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   let extract_bits ~start ~stop ~modu v =
     assert (start <=~ stop && stop <=~ modu);
     let start,stop =
-      if Cil.theMachine.Cil.theMachine.Cil_types.little_endian then
+      if Machine.little_endian () then
         start,stop
       else
         let mmodu = pred modu in
@@ -1044,7 +1044,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
   let merge_bits ~topify ~conflate_bottom ~offset ~length ~value ~total_length acc =
     assert (length +~ offset <=~ total_length);
     let offset =
-      if Cil.theMachine.Cil.theMachine.Cil_types.little_endian then
+      if Machine.little_endian () then
         offset
       else
         Int.sub (Int.sub total_length offset) length

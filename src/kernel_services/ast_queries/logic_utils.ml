@@ -2458,7 +2458,7 @@ and constFoldCastToInt ~machdep typ e =
   try
     let ik = match Cil.unrollType typ with
       | TInt (ik, _) -> ik
-      | TPtr _ -> theMachine.upointKind
+      | TPtr _ -> Machine.uintptr_kind ()
       | TEnum (ei,_) -> ei.ekind
       | _ -> raise Exit
     in

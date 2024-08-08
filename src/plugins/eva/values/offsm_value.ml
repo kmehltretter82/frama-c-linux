@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Eval
 open Cvalue
 open Abstract_interp
@@ -281,7 +280,7 @@ type shift_direction = Left | Right
 (* The value of the sign bit, expressed as a cvalue. *)
 let sign_bit size offsm =
   let sign_bit =
-    if Cil.theMachine.theMachine.little_endian
+    if Machine.little_endian ()
     then Int.pred size
     else Int.zero
   in
@@ -304,7 +303,7 @@ let shift ~size ~signed offsm shift_direction n =
   then result (* Undefined behavior: we don't care about the result. *)
   else
     let size_copy = Int.sub size n in
-    let little_endian = Cil.theMachine.theMachine.little_endian in
+    let little_endian = Machine.little_endian () in
     let start_copy, start_paste =
       if (shift_direction = Left) = little_endian
       then Int.zero, n
@@ -316,7 +315,7 @@ let shift ~size ~signed offsm shift_direction n =
 (** Casts *)
 
 let cast ~old_size ~new_size ~signed offsm =
-  let little_endian = Cil.theMachine.theMachine.little_endian in
+  let little_endian = Machine.little_endian () in
   if Int.equal old_size new_size then offsm
   else if Int.lt new_size old_size then (* Truncation *)
     let start = if little_endian then Int.zero else Int.sub old_size new_size in

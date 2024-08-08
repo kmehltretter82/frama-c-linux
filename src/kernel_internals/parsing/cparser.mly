@@ -239,7 +239,7 @@ let sizeofType () =
       else
         Kernel.fatal
           ~current:true
-          "initCIL: cannot find the right specifier for type %s" name
+          "Cparser.sizeofType: cannot find the right specifier for type %s" name
     in
     let add_one_specifier s acc =
       (Cabs.SpecType (convert_one_specifier s)) :: acc
@@ -247,7 +247,7 @@ let sizeofType () =
     let specs = Str.split (Str.regexp " +") name in
     List.fold_right add_one_specifier specs []
   in
-  findSpecifier Cil.theMachine.Cil.theMachine.Cil_types.size_t
+  findSpecifier (Machine.size_t ())
 
 
 (*
