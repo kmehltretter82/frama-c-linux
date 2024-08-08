@@ -24,11 +24,6 @@ open Cil_types
 open Dive_types
 
 module Graph = Dive_graph
-module Seq =
-struct
-  include Stdlib.Seq
-  include Transitioning.Seq
-end
 
 let dkey = Self.register_category "build"
 

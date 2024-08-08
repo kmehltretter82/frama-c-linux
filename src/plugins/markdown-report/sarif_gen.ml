@@ -179,7 +179,7 @@ let gen_results remarks =
   in
   let rules, content =
     Alarms.to_seq () |> Seq.filter keep_alarm |>
-    Transitioning.Seq.mapi treat_alarm |> Transitioning.Seq.unzip
+    Seq.mapi treat_alarm |> Seq.unzip
   in
   Datatype.String.Map.of_seq rules, List.of_seq content
 

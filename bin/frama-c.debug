@@ -49,7 +49,6 @@ $DYNLINK
 load_printer "extlib.cmo"
 load_printer "filepath.cmo"
 load_printer "integer.cmo"
-load_printer "transitioning.cmo"
 load_printer "pretty_utils.cmo"
 load_printer "cil_types_debug.cmo"
 load_printer "cabs_debug.cmo"
