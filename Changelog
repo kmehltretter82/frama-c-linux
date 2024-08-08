@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2024-08-08] New Machine module to manage theMachine and machdeps.
+              Cil functions related to theMachine are deprecated.
+-!  Kernel    [2024-08-08] New minimal OCaml version: 4.14
 o!  Kernel    [2024-08-08] Plug-ins Dominators and Postdominators have been
               removed and replaced by the Dominators module in the kernel.
 -   Eva       [2024-08-06] Support for 'calls' ACSL extension
