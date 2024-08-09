@@ -445,7 +445,7 @@ layout: default
 date: $(date +\"%d-%m-%Y\")
 short_title: $TEXTUAL_VERSION
 title: $EVENT_TITLE
-link: /fc-versions/$LOWER_CODENAME.html
+internal_link: /fc-versions/$LOWER_CODENAME.html
 ---
 
 $TEXTUAL_VERSION is out. Download it [here]($VERSION_PAGE).
