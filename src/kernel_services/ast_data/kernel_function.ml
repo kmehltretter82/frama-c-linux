@@ -540,6 +540,8 @@ let var_is_in_scope stmt vi =
   let blocks = find_all_enclosing_blocks stmt in
   let is_def_above b =
     let sdef = local_definition (find_englobing_kf stmt) vi in
+    (* If sdef == stmt, vi is in the scope. *)
+    Cil_datatype.Stmt.equal sdef stmt ||
     match b.bstmts with
     | [] -> assert false (* at least contains stmt *)
     | sfst :: _ ->
