@@ -31,6 +31,7 @@
 module Output : sig
   include Log.Messages
   val dkey: category
+  val wkey: warn_category
   (** @since Fluorine-20130401 *)
 end
 
