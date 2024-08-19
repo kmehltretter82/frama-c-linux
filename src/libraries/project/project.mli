@@ -202,7 +202,9 @@ val register_before_remove_hook: (t -> unit) -> unit
 exception IOError of string
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-val save: ?selection:State_selection.t -> ?project:t -> Filepath.t -> unit
+val save:
+  ?compress:bool -> ?selection:State_selection.t -> ?project:t ->
+  Filepath.t -> unit
 (** Save a given project in a file. Default project is [current ()].
     @raise IOError if the project cannot be saved.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -221,7 +223,8 @@ val load: ?selection:State_selection.t -> ?name:string -> Filepath.t -> t
     @return the new project containing the loaded data.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-val save_all: ?selection:State_selection.t -> Filepath.t -> unit
+val save_all:
+  ?compress:bool -> ?selection:State_selection.t -> Filepath.t -> unit
 (** Save all the projects in a file.
     @raise IOError a project cannot be saved. *)
 

@@ -140,5 +140,5 @@ val pack: 'a t -> Structural_descr.pack
 (** {2 Safe unmarshaling} *)
 (* ********************************************************************** *)
 
-val input_val: in_channel -> 'a t -> 'a
+val input_val: Channel.input -> 'a t -> 'a
 (** @since Carbon-20101201 *)

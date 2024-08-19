@@ -79,31 +79,31 @@ let id x = x;;
 (* Functions for deserializers. *)
 
 let getword ch =
-  let c3 = Char.code (input_char ch) in
-  let c2 = Char.code (input_char ch) in
-  let c1 = Char.code (input_char ch) in
-  let c0 = Char.code (input_char ch) in
+  let c3 = Char.code (Channel.input_char ch) in
+  let c2 = Char.code (Channel.input_char ch) in
+  let c1 = Char.code (Channel.input_char ch) in
+  let c0 = Char.code (Channel.input_char ch) in
   Int32.logor (Int32.shift_left (Int32.of_int c3) 24)
     (Int32.of_int ((c2 lsl 16) lor (c1 lsl 8) lor c0))
 ;;
 
 let read8s ch =
-  let c = Char.code (input_char ch) in
+  let c = Char.code (Channel.input_char ch) in
   if c < 128 then c else c lor (-1 lsl 8)
 ;;
 
 let read16s ch =
-  let c1 = Char.code (input_char ch) in
-  let c0 = Char.code (input_char ch) in
+  let c1 = Char.code (Channel.input_char ch) in
+  let c0 = Char.code (Channel.input_char ch) in
   let c1x = if c1 < 128 then c1 else c1 lor (-1 lsl 8) in
   (c1x lsl 8) lor c0
 ;;
 
 let read32s ch =
-  let c3 = Char.code (input_char ch) in
-  let c2 = Char.code (input_char ch) in
-  let c1 = Char.code (input_char ch) in
-  let c0 = Char.code (input_char ch) in
+  let c3 = Char.code (Channel.input_char ch) in
+  let c2 = Char.code (Channel.input_char ch) in
+  let c1 = Char.code (Channel.input_char ch) in
+  let c0 = Char.code (Channel.input_char ch) in
   let c3x = if c3 < 128 then c3 else c3 lor (-1 lsl 8) in
   (c3x lsl 24) lor (c2 lsl 16) lor (c1 lsl 8) lor c0
 ;;
@@ -111,14 +111,14 @@ let read32s ch =
 let read64s =
   if arch_sixtyfour then begin
     fun ch ->
-      let c7 = Char.code (input_char ch) in
-      let c6 = Char.code (input_char ch) in
-      let c5 = Char.code (input_char ch) in
-      let c4 = Char.code (input_char ch) in
-      let c3 = Char.code (input_char ch) in
-      let c2 = Char.code (input_char ch) in
-      let c1 = Char.code (input_char ch) in
-      let c0 = Char.code (input_char ch) in
+      let c7 = Char.code (Channel.input_char ch) in
+      let c6 = Char.code (Channel.input_char ch) in
+      let c5 = Char.code (Channel.input_char ch) in
+      let c4 = Char.code (Channel.input_char ch) in
+      let c3 = Char.code (Channel.input_char ch) in
+      let c2 = Char.code (Channel.input_char ch) in
+      let c1 = Char.code (Channel.input_char ch) in
+      let c0 = Char.code (Channel.input_char ch) in
       (c7 lsl 56) lor (c6 lsl 48) lor (c5 lsl 40) lor (c4 lsl 32)
       lor (c3 lsl 24) lor (c2 lsl 16) lor (c1 lsl 8) lor c0
   end else begin
@@ -126,29 +126,29 @@ let read64s =
   end
 ;;
 
-let read8u ch = Char.code (input_char ch);;
+let read8u ch = Char.code (Channel.input_char ch);;
 
 let read16u ch =
-  let c1 = Char.code (input_char ch) in
-  let c0 = Char.code (input_char ch) in
+  let c1 = Char.code (Channel.input_char ch) in
+  let c0 = Char.code (Channel.input_char ch) in
   (c1 lsl 8) lor c0
 ;;
 
 let read32u ch =
-  let c3 = Char.code (input_char ch) in
-  let c2 = Char.code (input_char ch) in
-  let c1 = Char.code (input_char ch) in
-  let c0 = Char.code (input_char ch) in
+  let c3 = Char.code (Channel.input_char ch) in
+  let c2 = Char.code (Channel.input_char ch) in
+  let c1 = Char.code (Channel.input_char ch) in
+  let c0 = Char.code (Channel.input_char ch) in
   (c3 lsl 24) lor (c2 lsl 16) lor (c1 lsl 8) lor c0
 ;;
 
 let read64u = read64s;;
 
 let readheader32 ch =
-  let c3 = Char.code (input_char ch) in
-  let c2 = Char.code (input_char ch) in
-  let c1 = Char.code (input_char ch) in
-  let c0 = Char.code (input_char ch) in
+  let c3 = Char.code (Channel.input_char ch) in
+  let c2 = Char.code (Channel.input_char ch) in
+  let c1 = Char.code (Channel.input_char ch) in
+  let c0 = Char.code (Channel.input_char ch) in
   (* fst: read32u masked by 0xFF
      snd: read32u shifted right by 10 (Wosize_hd) *)
   (c0, (c1 lsr 2) lor (c2 lsl 6) lor (c3 lsl 14))
@@ -157,14 +157,14 @@ let readheader32 ch =
 let readheader64 =
   if arch_sixtyfour then begin
     fun ch ->
-      let c7 = Char.code (input_char ch) in
-      let c6 = Char.code (input_char ch) in
-      let c5 = Char.code (input_char ch) in
-      let c4 = Char.code (input_char ch) in
-      let c3 = Char.code (input_char ch) in
-      let c2 = Char.code (input_char ch) in
-      let c1 = Char.code (input_char ch) in
-      let c0 = Char.code (input_char ch) in
+      let c7 = Char.code (Channel.input_char ch) in
+      let c6 = Char.code (Channel.input_char ch) in
+      let c5 = Char.code (Channel.input_char ch) in
+      let c4 = Char.code (Channel.input_char ch) in
+      let c3 = Char.code (Channel.input_char ch) in
+      let c2 = Char.code (Channel.input_char ch) in
+      let c1 = Char.code (Channel.input_char ch) in
+      let c0 = Char.code (Channel.input_char ch) in
       (* fst: read64u masked by 0xFF
          snd: read64u shifted right by 10 (Wosize_hd) *)
       (c0, (c1 lsr 2) lor (c2 lsl 6) lor (c3 lsl 14) lor (c4 lsl 22)
@@ -175,12 +175,12 @@ let readheader64 =
 ;;
 
 let readblock ch dest ofs len =
-  unsafe_really_input ch (Obj.obj dest : bytes) ofs len
+  Channel.unsafe_really_input ch (Obj.obj dest : bytes) ofs len
 ;;
 
 let readblock_rev ch dest ofs len =
   for i = len - 1 + ofs downto ofs do
-    Bytes.unsafe_set (Obj.obj dest : bytes) i (input_char ch);
+    Bytes.unsafe_set (Obj.obj dest : bytes) i (Channel.input_char ch);
   done
 ;;
 
@@ -238,7 +238,7 @@ let readfloat_big =
 let check_const ch s =
   try
     for i = 0 to String.length s - 1 do
-      if input_char ch <> s.[i] then raise Exit
+      if Channel.input_char ch <> s.[i] then raise Exit
     done;
     false
   with Exit -> true
@@ -252,7 +252,7 @@ let buf = Bytes.create buflen;;
 let bufs = ref [];;
 let read_customident ch =
   let rec loop i =
-    let c = input_char ch in
+    let c = Channel.input_char ch in
     if c = '\000' then begin
       if !bufs = []
       then Bytes.sub buf 0 i
@@ -274,7 +274,7 @@ let read_customident ch =
 ;;
 
 let custom_table =
-  (Hashtbl.create 13 : (string, in_channel -> Obj.t) Hashtbl.t)
+  (Hashtbl.create 13 : (string, Channel.input -> Obj.t) Hashtbl.t)
 ;;
 
 let register_custom id f = Hashtbl.add custom_table id f;;
@@ -357,11 +357,13 @@ let rec get_structure t context =
 *)
 
 let input_val ch t =
-  set_binary_mode_in ch true;
+  (* Channel.input is always opened in binary mode. *)
+  (* if not (Channel.is_binary_mode_in ch)
+     then failwith "input_value: channel not in binary mode"; *)
   let num_objects =
     if check_const ch "\x84\x95\xA6"
     then failwith "input_value: bad object";
-    let last_char = input_char ch in
+    let last_char = Channel.input_char ch in
     match last_char with
     | '\xBF' ->
       (* See

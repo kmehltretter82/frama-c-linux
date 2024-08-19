@@ -118,7 +118,7 @@ and structure =
     new data of the current type is encountered.
 *)
 
-val input_val : in_channel -> t -> 'a
+val input_val : Channel.input -> t -> 'a
 (** [input_val c t]
     Read a value from the input channel [c], applying the transformations
     described by [t].
@@ -166,19 +166,19 @@ val t_map_unchangedcompares : t -> t -> t
 
 (** {2 Functions for writing deserializers.} *)
 
-val register_custom : string -> (in_channel -> Obj.t) -> unit
+val register_custom : string -> (Channel.input -> Obj.t) -> unit
 
 val arch_sixtyfour : bool
 val arch_bigendian : bool
 
-val getword : in_channel -> Int32.t
-val read8s : in_channel -> int
-val read16s : in_channel -> int
-val read32s : in_channel -> int
-val read64s : in_channel -> int
-val read8u : in_channel -> int
-val read16u : in_channel -> int
-val read32u : in_channel -> int
-val read64u : in_channel -> int
-val readblock : in_channel -> Obj.t -> int -> int -> unit
-val readblock_rev : in_channel -> Obj.t -> int -> int -> unit
+val getword : Channel.input -> Int32.t
+val read8s : Channel.input -> int
+val read16s : Channel.input -> int
+val read32s : Channel.input -> int
+val read64s : Channel.input -> int
+val read8u : Channel.input -> int
+val read16u : Channel.input -> int
+val read32u : Channel.input -> int
+val read64u : Channel.input -> int
+val readblock : Channel.input -> Obj.t -> int -> int -> unit
+val readblock_rev : Channel.input -> Obj.t -> int -> int -> unit
