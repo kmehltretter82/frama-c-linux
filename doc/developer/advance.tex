@@ -4120,11 +4120,19 @@ version in the interface:
 
 \paragraph{External Modules.}
 \label{par:ext-modules}
+
 Finally, let us introduce how to extend \acsl
 modules with external module importers. A typical usage is to import logical
 definitions from other languages, e.g. \textsf{Coq} or \textsf{Why3}, as regular
 \acsl module definitions. From the user point the view, this takes the form
 of an extended \verb+import+ clause:
+
+\begin{lstlisting}
+//@ import <loader>: <module-name> [ \as <alias-name> ];
+\end{lstlisting}
+
+The syntax is similar to the geneal \verb+import+ annotation, except that the
+module name is prefixed with the name of the loader extension. For instance:
 
 \begin{lstlisting}[style=c]
 //@ \import Foo: foo::bar::Jazz ;
@@ -4132,10 +4140,13 @@ of an extended \verb+import+ clause:
 
 Here, \verb+Foo:+ specifies the name of the \acsl extension responsible for
 importing the module, and \verb+foo::bar::Jazz+ is the name of the module
-to be imported. To register such an \acsl extension point, a plug-in shall call
-the \verb+Acsl_extension.register_module_importer+ with a loader function, as
-follows:
+to be imported.
 
+To define such an external module loader, a plug-in shall call the
+\verb+Acsl_extension.register_module_importer+ with a suitable loader function.
+The loader function is responsible for resolving the module name and defining
+the associated \acsl logic types, functions and predicates. Here is an example
+of such a loader function:
 
 \begin{lstlisting}[language=OCaml]
 open Cil_types
@@ -4169,10 +4180,34 @@ invoked multiple times by the kernel, e.g. when a given module is imported from
 different source files. Although the loader itself can use memoization
 techniques to save time, the module builder shall be populated on every call.
 
-For debugging module importers, you can use
-\verb+-kernel-msg-key printer:imported-modules+ together with \verb+-print+.
-Using this message key, the imported modules are printed instead of the
-original \verb+import+ clause.
+When printing the internal AST from \framac command line using \verb+-print+
+option, externally imported modules are listed with one single clause for each,
+with no aliasing in order to avoid any ambiguity. For instance:
+\begin{lstlisting}
+//@ import MyLoader: foo::bar::Jazz \as _ ;
+\end{lstlisting}
+
+Alternatively, you can debug the logical definitions actually imported by any
+driver by using \verb+-print+ with the \verb+printer:imported-modules+ debugging
+key:
+\begin{lstlisting}
+> frama-c ... -print -kernel-message-key printer:imported-modules
+\end{lstlisting}
+
+With this option, the contents of the imported modules are printed like regular
+module definitions, with only a comment to mention the origin of the plug-in:
+\begin{lstlisting}
+/*@ // import MyLoader:
+    module foo::bar::Jazz {
+        ...
+    }
+  */
+\end{lstlisting}
+
+Notice that, when using the \verb+printer:imported-modules+ message key, the
+resulting file will still compile and type-check, but the plug-in extension will
+no more be aware of the external nature of those modules, and it will probably
+\emph{not} work as with the original specification.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
