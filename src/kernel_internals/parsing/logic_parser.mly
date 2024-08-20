@@ -86,19 +86,20 @@
       | (Lt|Le), (Unknown|Less) -> Less, true
       | _ -> sense, false
 
-  let module_stack = Stack.create ()
-  let module_types = Hashtbl.create 0
+  let module_types : string list ref Stack.t = Stack.create ()
 
   let push_typename t =
     Logic_env.add_typename t ;
     try
-      let m = Stack.top module_stack in
-      Hashtbl.add module_types m t
+      let r = Stack.top module_types in r := t :: !r
     with Stack.Empty -> ()
 
+  let push_module_types () =
+    Stack.push (ref []) module_types
+
   let pop_module_types () =
-    let m = Stack.pop module_stack in
-    List.iter Logic_env.remove_typename @@ Hashtbl.find_all module_types m
+    let r = Stack.pop module_types in
+    List.iter Logic_env.remove_typename !r
 
   let type_variables_stack = Stack.create ()
 
@@ -1679,7 +1680,7 @@ logic_def:
       LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
-| MODULE push_module_identifier LBRACE logic_decls RBRACE
+| MODULE push_module_name LBRACE logic_decls RBRACE
     { pop_module_types () ; LDmodule($2,$4) }
 | IMPORT mId = module_name SEMICOLON
     { LDimport(None,mId,None) }
@@ -1701,8 +1702,8 @@ module_name:
 | LONGIDENT  { $1 }
 ;
 
-push_module_identifier:
-| module_name { Stack.push $1 module_stack ; $1 }
+push_module_name:
+| module_name { push_module_types () ; $1 }
 ;
 
 deprecated_logic_decl:
