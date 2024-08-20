@@ -361,6 +361,8 @@ let rOP = [
 ]
 let comment_line = "//" [^'\n']*
 let rIdentifier = rL (rL | rD)*
+let xIdentifier = rL (rL | rD | "'")*
+let opIdentifier = (rL | rD | rOP)+
 
 (* Do not forget to update also the corresponding chr rule if you add
    a supported escape sequence here. *)
@@ -390,9 +392,8 @@ rule token = parse
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
-  | rIdentifier ( "::" rIdentifier )+                 { longident lexbuf }
-  | rIdentifier ( "::" rIdentifier )+ "'" rIdentifier { longident lexbuf }
-  | rIdentifier ( "::" rIdentifier )* "::(" rOP+ ")"  { longident lexbuf }
+  | ( rIdentifier "::")+     xIdentifier      { longident lexbuf }
+  | ( rIdentifier "::")+ "(" opIdentifier ")" { longident lexbuf }
   | rIdentifier       {
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
