@@ -27,6 +27,11 @@ Plugin E-ACSL <next-release>
 
 -* E-ACSL       [2024-08-30] fix typing exception occurring for applications
                 of axiomatically defined premises and logic functions
+-* E-ACSL       [2024-08-22] fix arity confusion of generated functions.
+                When a logic function is called from different contexts
+                requiring different return types, this was not correctly
+                taken into account, leading to functions calls with an
+                incorrect number of arguments.
 -* E-ACSL       [2024-06-20] fix typing of logic functions over rationals
 
 ###############################################################################
