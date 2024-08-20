@@ -274,8 +274,13 @@ class type extensible_printer_type = object
   method builtin_logic_info: Format.formatter -> builtin_logic_info -> unit
   method logic_type_info: Format.formatter -> logic_type_info -> unit
   method logic_ctor_info: Format.formatter -> logic_ctor_info -> unit
-  method logic_name: Format.formatter -> string -> unit
   method logic_var: Format.formatter -> logic_var -> unit
+
+  (** logic names, with full module path if needed (eg. "foo::bar::jazz")
+      Defaults to [self#varname], with the full name truncated to the currently
+      opened module, if any. *)
+  method logic_name: Format.formatter -> string -> unit
+
   method quantifiers: Format.formatter -> quantifiers -> unit
   method predicate_node: Format.formatter -> predicate_node -> unit
   method predicate: Format.formatter -> predicate -> unit

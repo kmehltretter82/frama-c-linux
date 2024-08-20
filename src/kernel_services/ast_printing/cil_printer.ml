@@ -1263,9 +1263,9 @@ class cil_printer () = object (self)
   method builtin_logic_info fmt bli =
     fprintf fmt "%a" self#varname bli.bl_name
 
-  method logic_type_info fmt s = fprintf fmt "%a" self#logic_name s.lt_name
+  method logic_type_info fmt s = self#logic_name fmt s.lt_name
 
-  method logic_ctor_info fmt ci =  fprintf fmt "%a" self#logic_name ci.ctor_name
+  method logic_ctor_info fmt ci = self#logic_name fmt ci.ctor_name
 
   method initinfo fmt io =
     match io.init with
