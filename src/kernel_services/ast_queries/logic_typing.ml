@@ -4311,11 +4311,11 @@ struct
       end;
       let name = fullname ~context id in
       let context = InModule name in
-      let change oldloc =
+      let change (_,oldloc) =
         C.error loc
           "Duplicated module %s (first occurrence at %a)"
           id Cil_printer.pp_location oldloc in
-      ignore (Logic_env.Modules.memo ~change (fun _ -> loc) name);
+      ignore (Logic_env.Modules.memo ~change (fun _ -> (None,loc)) name);
       push_imports () ;
       add_import ~current:true name ;
       let l = List.filter_map (decl ~context) decls in
@@ -4327,16 +4327,24 @@ struct
 
     | LDimport(Some driver as drv,name,alias) ->
       let annot =
-        if not @@ Logic_env.Modules.mem name then
-          begin
-            let decls = ref [] in
-            let builder = make_module_builder decls name in
-            let path = Logic_utils.longident name in
-            Extensions.importer driver ~builder ~loc path ;
-            Logic_env.Modules.add name loc ;
-            Some (Dmodule(name,List.rev !decls,[],drv,loc))
-          end
-        else None
+        match Logic_env.Modules.find name with
+        | None, oldloc ->
+          C.error loc
+            "Module %s already defined (at %a)"
+            name Cil_printer.pp_location oldloc
+        | Some odrv, oldloc ->
+          if odrv <> driver then
+            C.error loc
+              "Module %s already imported with driver %s (at %a)"
+              name odrv Cil_printer.pp_location oldloc
+          else None
+        | exception Not_found ->
+          let decls = ref [] in
+          let builder = make_module_builder decls name in
+          let path = Logic_utils.longident name in
+          Extensions.importer driver ~builder ~loc path ;
+          Logic_env.Modules.add name (drv,loc) ;
+          Some (Dmodule(name,List.rev !decls,[],drv,loc))
       in add_import ?alias name ; annot
 
     | LDtype(name,l,def) ->

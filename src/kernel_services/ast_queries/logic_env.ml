@@ -156,8 +156,13 @@ module Axiomatics =
       let size = 17
     end)
 
+module ModuleOccurence =
+  Datatype.Pair
+    (Datatype.Option(Datatype.String)) (* external driver *)
+    (Cil_datatype.Location)
+
 module Modules =
-  State_builder.Hashtbl(Datatype.String.Hashtbl)(Cil_datatype.Location)
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(ModuleOccurence)
     (struct
       let name = "Logic_env.Modules"
       let dependencies = []
