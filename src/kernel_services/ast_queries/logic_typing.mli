@@ -91,6 +91,23 @@ type logic_infos =
 
 (** Functions that can be called when type-checking an extension of ACSL.
 
+    @before Frama-C+dev The following fields have been removed:
+
+    {[
+      remove_logic_function : string -> unit;
+      remove_logic_info: logic_info -> unit;
+      remove_logic_type: string -> unit;
+      remove_logic_ctor: string -> unit;
+      add_logic_function: logic_info -> unit;
+      add_logic_type: string -> logic_type_info -> unit;
+      add_logic_ctor: string -> logic_ctor_info -> unit;
+      find_all_logic_functions: string -> logic_info list;
+      find_logic_type: string -> logic_type_info;
+      find_logic_ctor: string -> logic_ctor_info;
+    ]}
+
+    You shall now use directly functions from {!Logic_env} and {!Logic_utils}.
+
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
 type typing_context = {
@@ -202,6 +219,9 @@ sig
   val model_annot :
     location -> Logic_ptree.model_annot -> model_info
 
+  (** Some logic declaration might not introduce new global annotations
+      (eg. already imported external modules).
+      @before Frama-C+dev always return a global annotation *)
   val annot : Logic_ptree.decl -> global_annotation option
 
   (** [funspec behaviors f prms typ spec] type-checks a function contract.
