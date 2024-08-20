@@ -88,8 +88,7 @@ let rec print_logic_type name fmt typ =
   | LTenum s -> fprintf fmt "enum@ %s%t" s pname
   | LTstruct s -> fprintf fmt "struct@ %s%t" s pname
   | LTnamed (s,l) ->
-    fprintf fmt "%a%a%t"
-      print_qid s
+    fprintf fmt "%s%a%t" s
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@]>"
          (print_logic_type None)) l
       pname
