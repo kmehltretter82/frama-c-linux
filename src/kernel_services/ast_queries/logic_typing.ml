@@ -725,11 +725,6 @@ struct
     short_prefix: string; (* last '::' included *)
   }
 
-  let pp_scope fmt s =
-    Format.fprintf fmt "{ long: %S; short: %S }"
-      s.long_prefix s.short_prefix
-  [@@ warning "-32"]
-
   let scopes : (scope option * scope list) Stack.t = Stack.create ()
 
   let current_scope : scope option ref = ref None
