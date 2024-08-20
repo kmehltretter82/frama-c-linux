@@ -550,14 +550,13 @@ module Extensions = struct
 
   let is_extension name = !ref_is_extension name
 
-  let typer name ~(typing_context:typing_context) ~(loc:location) =
+  let typer name ~typing_context ~loc =
     !ref_typer name typing_context loc
 
-  let typer_block name ~(typing_context:typing_context) ~(loc:location) mId =
+  let typer_block name ~typing_context ~loc mId =
     !ref_typer_block name typing_context loc mId
 
-  let importer name ~(builder:module_builder) ~(loc:location)
-      (moduleId: string list) : unit =
+  let importer name ~builder ~loc (moduleId: string list) : unit =
     !ref_importer name builder loc moduleId
 
 end
