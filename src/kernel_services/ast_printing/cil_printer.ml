@@ -2727,9 +2727,8 @@ class cil_printer () = object (self)
   method logic_name fmt a =
     try
       let prefix = Stack.top module_stack in
-      match Extlib.string_del_prefix prefix a with
-      | Some x -> pp_print_string fmt x
-      | None -> self#varname fmt a
+      let shortname = Extlib.string_del_prefix prefix a in
+      self#varname fmt @@ Option.value ~default:a shortname
     with Stack.Empty ->
       self#varname fmt a
 
