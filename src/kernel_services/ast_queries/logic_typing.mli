@@ -181,12 +181,6 @@ sig
     Cil_types.location -> Logic_ptree.relation option ->
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
 
-  (** Open module in local environment. *)
-  val add_import : ?current:bool -> ?alias:string -> string -> unit
-  val clear_imports : unit -> unit
-  val push_imports : unit -> unit
-  val pop_imports : unit -> unit
-
   (** type-checks a term. *)
   val term : Lenv.t -> Logic_ptree.lexpr -> term
 

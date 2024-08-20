@@ -658,12 +658,6 @@ sig
   val conditional_conversion:
     Cil_types.location -> Logic_ptree.relation option ->
     Cil_types.term -> Cil_types.term -> Cil_types.logic_type
-
-  val add_import : ?current:bool -> ?alias:string -> string -> unit
-  val clear_imports : unit -> unit
-  val push_imports : unit -> unit
-  val pop_imports : unit -> unit
-
   val term : Lenv.t -> Logic_ptree.lexpr -> term
   val predicate : Lenv.t -> Logic_ptree.lexpr -> predicate
   val code_annot :
@@ -735,14 +729,9 @@ struct
     | None -> !imported_scopes
     | Some s -> s :: !imported_scopes
 
-  let clear_imports () =
-    begin
-      Stack.clear scopes ;
-      current_scope := None ;
-      imported_scopes := [] ;
-    end
   let push_imports () =
     Stack.push (!current_scope,!imported_scopes) scopes
+
   let pop_imports () =
     begin
       let c,s = Stack.pop scopes in
