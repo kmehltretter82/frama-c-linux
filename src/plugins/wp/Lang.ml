@@ -261,16 +261,16 @@ struct
       match a,b with
       | Mtype a , Mtype b -> ext_compare a b
       | Mtype _ , _ -> (-1)
-      | _ , Mtype _ -> 1
+      | _ , Mtype _ -> (+1)
       | Mrecord(a,_) , Mrecord(b,_) -> ext_compare a b
       | Mrecord _ , _ -> (-1)
-      | _ , Mrecord _ -> 1
+      | _ , Mrecord _ -> (+1)
       | Comp (a, KValue) , Comp (b, KValue)
       | Comp (a, KInit)  , Comp (b, KInit) -> Compinfo.compare a b
       | Comp (_, KValue) , Comp (_, KInit) -> (-1)
-      | Comp (_, KInit)  , Comp (_, KValue) -> 1
+      | Comp (_, KInit)  , Comp (_, KValue) -> (+1)
       | Comp _ , _ -> (-1)
-      | _ , Comp _ -> 1
+      | _ , Comp _ -> (+1)
       | Atype a , Atype b -> Logic_type_info.compare a b
 
   let equal a b = (compare a b = 0)
@@ -379,12 +379,12 @@ struct
       match f , g with
       | Mfield(_,_,f,_) , Mfield(_,_,g,_) -> String.compare f g
       | Mfield _ , Cfield _ -> (-1)
-      | Cfield _ , Mfield _ -> 1
+      | Cfield _ , Mfield _ -> (+1)
       | Cfield(f, KValue) , Cfield(g, KValue)
       | Cfield(f, KInit) , Cfield(g, KInit) ->
         Fieldinfo.compare f g
       | Cfield(_, KInit), Cfield(_, KValue) -> (-1)
-      | Cfield(_, KValue), Cfield(_, KInit) -> 1
+      | Cfield(_, KValue), Cfield(_, KInit) -> (+1)
 
   let equal f g = (compare f g = 0)
 
@@ -583,7 +583,7 @@ struct
     match c1 , c2 with
     | None , None -> 0
     | None , _ -> (-1)
-    | _ , None -> 1
+    | _ , None -> (+1)
     | Some c1 , Some c2 -> WpContext.S.compare c1 c2
 
   let compare_source s1 s2 =
@@ -594,17 +594,17 @@ struct
     | Extern f , Extern g ->
       ext_compare f g
     | Generated _ , Extern _ -> (-1)
-    | Extern _ , Generated _ -> 1
+    | Extern _ , Generated _ -> (+1)
 
   let compare f g =
     if f==g then 0 else
       match f , g with
       | FUN {m_source=mf} , FUN {m_source=mg} -> compare_source mf mg
       | FUN _ , _ -> (-1)
-      | _ , FUN _ -> 1
+      | _ , FUN _ -> (+1)
       | ACSL f , ACSL g -> Logic_info.compare f g
       | ACSL _ , _ -> (-1)
-      | _ , ACSL _ -> 1
+      | _ , ACSL _ -> (+1)
       | CTOR c , CTOR d -> Logic_ctor_info.compare c d
 
   let equal f g = (compare f g = 0)
