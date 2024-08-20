@@ -752,8 +752,13 @@ struct
 
   let add_import ?(current=false) ?alias name =
     begin
-      let short = match alias with Some "_" -> "" | Some a -> a | None ->
-        List.hd @@ List.rev @@ Logic_utils.longident name in
+      let short =
+        match alias with
+        | Some "_" -> ""
+        | Some a -> a
+        | None ->
+          List.hd @@ List.rev @@ Logic_utils.longident name
+      in
       let s = {
         long_prefix = name ^ "::";
         short_prefix = short ^ "::";
@@ -2812,8 +2817,7 @@ struct
                 in make_expr f
               with Not_found ->
                 ctxt.error loc
-                  "invalid use of overloaded function \
-                   %s as constant" x
+                  "invalid use of overloaded function %s as constant" x
       end
     | PLapp (f, labels, tl) ->
       let env = drop_qualifiers env in
@@ -3390,7 +3394,6 @@ struct
     tt
 
   and type_bool_term ctxt env t =
-    let module [@warning "-60"] C0 = struct end in
     let tt = ctxt.type_term ctxt env t in
     if not (plain_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
@@ -3398,7 +3401,6 @@ struct
     mk_cast tt (Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]))
 
   and type_num_term_option ctxt env t =
-    let module [@warning "-60"] C = struct end in
     match t with
       None -> None, Linteger (* Warning: should be an hybrid of integer
                                 and float. *)
@@ -3454,7 +3456,6 @@ struct
     | _ -> [], ctxt.type_predicate ctxt env p0
 
   let term_lval_assignable ctxt ~accept_formal ~accept_const env t =
-    let module [@warning "-60"] C = struct end in
     let t = ctxt.type_term ctxt env t in
     let mode = { lval_assignable_mode with accept_formal ; accept_const } in
     if not (check_lval_kind mode t) then
@@ -3463,7 +3464,6 @@ struct
     lift_set (term_lval (fun _ t -> t)) t
 
   let term ctxt env t =
-    let module [@warning "-60"] C = struct end in
     match t.lexpr_node with
     | PLnamed(name,t) ->
       let t = ctxt.type_term ctxt env t in
@@ -3473,7 +3473,6 @@ struct
       { term_node = t'; term_loc=t.lexpr_loc; term_type=ty; term_name = [] }
 
   let predicate ctxt env p0 =
-    let module [@warning "-60"] C = struct end in
     let loc = p0.lexpr_loc in
     let predicate = ctxt.type_predicate ctxt in
     let term = ctxt.type_term ctxt in
