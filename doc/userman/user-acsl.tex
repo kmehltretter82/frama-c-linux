@@ -33,11 +33,77 @@ indicates that the pointer \lstinline|f| can point to any one of
 
 It is in particular used by the WP plug-in (see \cite{wp} for more information).
 
-\section{External Module Importers}
+\section{Module Support}
+\label{acsl:modules}
 
-{\color{red}\paragraph{TODO.}
-There is currently no external module importer defined in the platform.
-}
+Support for \acsl modules has been introduced since \nextframacversion.
+Module definitions can be nested. Inside a module \verb+A+,
+a sub-module \verb+B+ will actually defines the module \verb+A::B+, and so on.
+
+Notice than for long-identifiers like \verb+A::B::C+ to be valid, no space is
+allowed around the \verb+:+ characters, and \verb+A+, \verb+B+, \verb+C+ must be
+regular \acsl identifiers, ie. they shall only consist of upper case or lower case letters, digits,
+underscores, and must start with a letter.
+
+Inside module \verb+M+ declaration, where \verb+M+ it the long-identifier of the
+module being declared, a logic declaration \verb+a+ will actually define the
+symbol \verb+M::a+. You shall always use the complete name of an identifier to
+avoid ambiguities in your specifications. However, in order to ease reading, is
+it also possible to use shortened names instead.
+
+The rules for shortening long identifiers generalize to any depth of nested
+modules. We only illustrate them in a simple case. Consider for instance a logic
+declaration \verb+a+ in module \verb+A::B+, depending on the context, it is possible to shorten
+its name as follows:
+\begin{itemize}
+\item Everywhere, you can use \verb+A::B::a+;
+\item Inside module \verb+A+, you can use \verb+B::a+;
+\item Inside module \verb+A::B+, you can use \verb+a+;
+\item After annotation \verb+import A::B+, you can use \verb+B::a+;
+\item After annotation \verb+import A::B as C+, you can use \verb+C::a+;
+\end{itemize}
+
+You may also use local \verb+import+ annotations inside module definitions, in
+which case the introduced aliases will be only valid until the end of the module
+scope.
+
+Depending on dedicated plug-in support, you may also import modules definitions
+from external specifications, generally from an external proof assistant like
+\textsf{Coq} or \textsf{Why3}. The \acsl extended syntax for importing external
+specifications is as follows:
+
+\begin{lstlisting}
+import <Driver>: <ModuleName> [ as <Name> ];
+\end{lstlisting}
+
+This is a generalization of the regular \acsl \verb+import+ clause just
+mentioned above. The \verb+<Driver>+ name identifies the kind of external
+specifications to be loaded. Drivers are defined by dedicated plug-in support
+only, and you shall consult the documentation of each plug-in to known which
+drivers are available.
+
+The \verb+<ModuleName>+ identifies both the name of the imported module and the
+external specification to be imported, with a \verb+<Driver>+ dependent meaning.
+
+The alias name \verb+<Name>+, if provided, has the same meaning than when
+importing regular module names (just described above) in the current scope.
+
+When importing \emph{external} specifications, depending on the \verb+<Driver>+
+used, it is possible to have logic identifiers with an extended lexical format:
+\begin{itemize}
+\item \verb+M::(op)+ where \verb+M+ is a regular module identifier, and
+  \verb+op+ any combination of letters, digits, operators, brackets, braces,
+  underscores and quotes. For instance, \verb+map::Map::([<-])+ is a syntactically
+  valid identifier, and \verb+number::Complex::(<=)(a,b)+ is a syntactically valid
+  expression.
+\item \verb+M::X+ where \verb+M+ is a regular module identifier and
+  \verb+X+ any combination of letters, digits, underscores and quotes.
+  For instance, \verb+Foo::bar'jazz+ is a syntactically valid identifier.
+\end{itemize}
+
+There is currently no support for external specification drivers from the
+standard distribution of \FramaC, although external plug-ins might define some
+using the extension API, consult the plug-in developer manual for details.
 
 %%% Local Variables:
 %%% mode: latex
