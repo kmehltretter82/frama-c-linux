@@ -730,7 +730,11 @@ struct
     | Some s -> s :: !imported_scopes
 
   let push_imports () =
-    Stack.push (!current_scope,!imported_scopes) scopes
+    let current = !current_scope in
+    let imported = !imported_scopes in
+    let all = current_scopes () in
+    Stack.push (current,imported) scopes ;
+    imported_scopes := all
 
   let pop_imports () =
     begin
