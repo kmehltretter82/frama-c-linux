@@ -405,7 +405,7 @@ let rec register ppt =
     Property.pretty ppt
     Project.pretty (Project.current ());
   if Status.mem ppt then
-    Kernel.fatal "trying to register twice property `%a'.\n\
+    Kernel.fatal "trying to register twice property @[<hov 2>'%a'@].@\n\
                   That is forbidden (kernel invariant broken)."
       Property.pretty ppt;
   let h = Emitter_with_properties.Hashtbl.create 7 in

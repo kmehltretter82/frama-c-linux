@@ -699,6 +699,7 @@ let files_to_cabs_cil files cpp_commands =
   if Kernel.UnspecifiedAccess.get () then
     Undefined_sequence.check_sequences merged_file;
   merged_file, cabs_files
+
 (* "Implicit" annotations are those added by the kernel with ACSL name
    'Frama_C_implicit_init'. Currently, this concerns statements that are
    generated to initialize local variables. *)
