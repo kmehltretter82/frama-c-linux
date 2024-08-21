@@ -1,176 +1,350 @@
 [kernel] Parsing ex_jfla.c (with preprocessing)
+[alias] analysing global variable definiton: __fc_p_fopen = __fc_fopen;
+[alias] May-aliases after global variable definition  __fc_p_fopen  are
+  { __fc_fopen; __fc_p_fopen }
+[alias] May-alias graph after global variable definition  __fc_p_fopen  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+[alias] analysing global variable definiton: __fc_p_tmpnam = __fc_tmpnam;
+[alias] May-aliases after global variable definition  __fc_p_tmpnam  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+[alias] May-alias graph after global variable definition  __fc_p_tmpnam  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+[alias] analysing global variable definiton: __fc_rand_max =
+  (unsigned long)2147483647;
+[alias] May-aliases after global variable definition  __fc_rand_max  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+[alias] May-alias graph after global variable definition  __fc_rand_max  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+[alias] analysing global variable definiton: __fc_p_random48_counter =
+  __fc_random48_counter;
+[alias] May-aliases after global variable definition  __fc_p_random48_counter  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-alias graph after global variable definition  __fc_p_random48_counter
+  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
 [alias] analysing function: create_str_t
 [alias] analysing instruction: str_t *res = malloc(sizeof(str_t));
 [alias] May-aliases after instruction  str_t *res = malloc(sizeof(str_t));  are
-  <none>
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  str_t *res = malloc(sizeof(str_t));  is
-  0:{ res } → 1:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  12:{ res } → 13:{  }
 [alias] analysing instruction: res->a = (int *)malloc(sizeof(int));
 [alias] May-aliases after instruction  res->a = (int *)malloc(sizeof(int));  are
-  <none>
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  res->a = (int *)malloc(sizeof(int));
-  is    0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   2:{  } → 3:{  }
+  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  12:{ res } → 13:{  }   13:{  } -a→ 14:{  }   14:{  } → 15:{  }
 [alias] analysing instruction: res->b = (int *)malloc(sizeof(int));
 [alias] May-aliases after instruction  res->b = (int *)malloc(sizeof(int));  are
-  <none>
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  res->b = (int *)malloc(sizeof(int));
   is
-  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{  }
-  2:{  } → 3:{  }   4:{  } → 5:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  12:{ res } → 13:{  }   13:{  } -a→ 14:{  }   13:{  } -b→ 16:{  }
+  14:{  } → 15:{  }   16:{  } → 17:{  }
 [alias] analysing instruction: *(res->a) = va;
-[alias] May-aliases after instruction  *(res->a) = va;  are  <none>
+[alias] May-aliases after instruction  *(res->a) = va;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  *(res->a) = va;  is
-  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{  }
-  2:{  } → 3:{  }   4:{  } → 5:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  12:{ res } → 13:{  }   13:{  } -a→ 14:{  }   13:{  } -b→ 16:{  }
+  14:{  } → 15:{  }   16:{  } → 17:{  }
 [alias] analysing instruction: res->b = b;
-[alias] May-aliases after instruction  res->b = b;  are  { res->b; b }
+[alias] May-aliases after instruction  res->b = b;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { res->b; b }
 [alias] May-alias graph after instruction  res->b = b;  is
-  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{ b }
-  2:{  } → 3:{  }   4:{ b } → 5:{  }
-[alias] May-aliases at the end of function create_str_t: { res->b; b }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  12:{ res } → 13:{  }   13:{  } -a→ 14:{  }   13:{  } -b→ 16:{ b }
+  14:{  } → 15:{  }   16:{ b } → 17:{  }
+[alias] May-aliases at the end of function create_str_t:
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { res->b; b }
 [alias] May-alias graph at the end of function create_str_t:
-  0:{ res } → 1:{  }   1:{  } -a→ 2:{  }   1:{  } -b→ 4:{ b }
-  2:{  } → 3:{  }   4:{ b } → 5:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  12:{ res } → 13:{  }   13:{  } -a→ 14:{  }   13:{  } -b→ 16:{ b }
+  14:{  } → 15:{  }   16:{ b } → 17:{  }
 [alias] Summary of function create_str_t:
-  formals: va  b    returns: res    state: { res->b; b }
+  formals: va  b    returns: res
+  state: { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+         { __fc_random48_counter; __fc_p_random48_counter }  { res->b; b }
 [alias] analysing function: jfla
 [alias] analysing instruction: *(s->b) = *(s->a);
-[alias] May-aliases after instruction  *(s->b) = *(s->a);  are  <none>
-[alias] May-alias graph after instruction  *(s->b) = *(s->a);  is    <empty>
+[alias] May-aliases after instruction  *(s->b) = *(s->a);  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-alias graph after instruction  *(s->b) = *(s->a);  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
 [alias] analysing instruction: s->a = i1;
-[alias] May-aliases after instruction  s->a = i1;  are  { s->a; i1 }
+[alias] May-aliases after instruction  s->a = i1;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s->a; i1 }
 [alias] May-alias graph after instruction  s->a = i1;  is
-  8:{ s } → 9:{  }   9:{  } -a→ 10:{ i1 }   10:{ i1 } → 12:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  20:{ s } → 21:{  }   21:{  } -a→ 22:{ i1 }   22:{ i1 } → 24:{  }
 [alias] analysing instruction: s->a = i2;
-[alias] May-aliases after instruction  s->a = i2;  are  { s->a; i2 }
+[alias] May-aliases after instruction  s->a = i2;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s->a; i2 }
 [alias] May-alias graph after instruction  s->a = i2;  is
-  13:{ s } → 14:{  }   14:{  } -a→ 15:{ i2 }   15:{ i2 } → 17:{  }
-[alias] May-aliases at the end of function jfla: { s->a; i1; i2 }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  25:{ s } → 26:{  }   26:{  } -a→ 27:{ i2 }   27:{ i2 } → 29:{  }
+[alias] May-aliases at the end of function jfla:
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s->a; i1; i2 }
 [alias] May-alias graph at the end of function jfla:
-  8:{ s } → 9:{  }   9:{  } -a→ 10:{ i1; i2 }   10:{ i1; i2 } → 12:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  20:{ s } → 21:{  }   21:{  } -a→ 22:{ i1; i2 }
+  22:{ i1; i2 } → 24:{  }
 [alias] Summary of function jfla:
-  formals: s  i1  i2  b    returns: <none>    state: { s->a; i1; i2 }
+  formals: s  i1  i2  b    returns: <none>
+  state: { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+         { __fc_random48_counter; __fc_p_random48_counter }  { s->a; i1; i2 }
 [alias] analysing function: main
 [alias] analysing instruction: int u = 11;
-[alias] May-aliases after instruction  int u = 11;  are  <none>
-[alias] May-alias graph after instruction  int u = 11;  is    <empty>
+[alias] May-aliases after instruction  int u = 11;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-alias graph after instruction  int u = 11;  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
 [alias] analysing instruction: int v = 12;
-[alias] May-aliases after instruction  int v = 12;  are  <none>
-[alias] May-alias graph after instruction  int v = 12;  is    <empty>
+[alias] May-aliases after instruction  int v = 12;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-alias graph after instruction  int v = 12;  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
 [alias] analysing instruction: int t[3] = {0, 1, 2};
-[alias] May-aliases after instruction  int t[3] = {0, 1, 2};  are  <none>
-[alias] May-alias graph after instruction  int t[3] = {0, 1, 2};  is    <empty>
+[alias] May-aliases after instruction  int t[3] = {0, 1, 2};  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-alias graph after instruction  int t[3] = {0, 1, 2};  is
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
 [alias] analysing instruction: int *a = & t[1];
-[alias] May-aliases after instruction  int *a = & t[1];  are  { t; a }
+[alias] May-aliases after instruction  int *a = & t[1];  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { t; a }
 [alias] May-alias graph after instruction  int *a = & t[1];  is
-  18:{ a } → 19:{  }   20:{ t } → 19:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  30:{ a } → 31:{  }   32:{ t } → 31:{  }
 [alias] analysing instruction: int *b = & u;
-[alias] May-aliases after instruction  int *b = & u;  are  { t; a }
+[alias] May-aliases after instruction  int *b = & u;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { t; a }
 [alias] May-alias graph after instruction  int *b = & u;  is
-  18:{ a } → 19:{  }   20:{ t } → 19:{  }   23:{ b } → 24:{ u }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  30:{ a } → 31:{  }   32:{ t } → 31:{  }   35:{ b } → 36:{ u }
 [alias] analysing instruction: int *c = & v;
-[alias] May-aliases after instruction  int *c = & v;  are  { t; a }
+[alias] May-aliases after instruction  int *c = & v;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { t; a }
 [alias] May-alias graph after instruction  int *c = & v;  is
-  18:{ a } → 19:{  }   20:{ t } → 19:{  }   23:{ b } → 24:{ u }
-  27:{ c } → 28:{ v }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  30:{ a } → 31:{  }   32:{ t } → 31:{  }   35:{ b } → 36:{ u }
+  39:{ c } → 40:{ v }
 [alias] analysing instruction: int **w = & a;
-[alias] May-aliases after instruction  int **w = & a;  are  { *w; t; a }
+[alias] May-aliases after instruction  int **w = & a;  are
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { *w; t; a }
 [alias] May-alias graph after instruction  int **w = & a;  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }
 [alias] analysing instruction: str_t *s1 = create_str_t(-1,b);
 [alias] May-aliases after instruction  str_t *s1 = create_str_t(-1,b);  are
-  { s1->b; b }  { *w; t; a }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; t; a }
 [alias] May-alias graph after instruction  str_t *s1 = create_str_t(-1,b);  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 38:{  }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 62:{  }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }
 [alias] analysing instruction: printf("a=%d\n",*(s1->a));
 [alias:undefined:fn] ex_jfla.c:42: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("a=%d\n",*(s1->a));  are
-  { s1->b; b }  { *w; t; a }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; t; a }
 [alias] May-alias graph after instruction  printf("a=%d\n",*(s1->a));  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 38:{  }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 62:{  }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }
 [alias] analysing instruction: printf("b=%d\n",*(s1->b));
 [alias:undefined:fn] ex_jfla.c:43: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("b=%d\n",*(s1->b));  are
-  { s1->b; b }  { *w; t; a }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; t; a }
 [alias] May-alias graph after instruction  printf("b=%d\n",*(s1->b));  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 38:{  }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 62:{  }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }
 [alias] analysing instruction: jfla(s1,a,& t[2],1);
 [alias] May-aliases after instruction  jfla(s1,a,& t[2],1);  are
-  { s1->b; b }  { *w; s1->a; t; a }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a }
 [alias] May-alias graph after instruction  jfla(s1,a,& t[2],1);  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 33:{  }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 33:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 45:{  }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 45:{  }
 [alias] analysing instruction: printf("a=%d\n",*(s1->a));
 [alias:undefined:fn] ex_jfla.c:45: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("a=%d\n",*(s1->a));  are
-  { s1->b; b }  { *w; s1->a; t; a }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a }
 [alias] May-alias graph after instruction  printf("a=%d\n",*(s1->a));  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 33:{  }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 33:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 45:{  }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 45:{  }
 [alias] analysing instruction: printf("b=%d\n",*(s1->b));
 [alias:undefined:fn] ex_jfla.c:46: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("b=%d\n",*(s1->b));  are
-  { s1->b; b }  { *w; s1->a; t; a }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a }
 [alias] May-alias graph after instruction  printf("b=%d\n",*(s1->b));  is
-  20:{ t } → 33:{  }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 33:{  }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 33:{  }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 33:{  }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 45:{  }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 45:{  }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 45:{  }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 45:{  }
 [alias] analysing instruction: jfla(s1,t,c,0);
 [alias] May-aliases after instruction  jfla(s1,t,c,0);  are
-  { s1->b; b }  { *w; s1->a; t; a; c }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a; c }
 [alias] May-alias graph after instruction  jfla(s1,t,c,0);  is
-  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 40:{ v }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 40:{ v }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 40:{ v }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 40:{ v }
 [alias] analysing instruction: printf("a=%d\n",*(s1->a));
 [alias:undefined:fn] ex_jfla.c:48: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("a=%d\n",*(s1->a));  are
-  { s1->b; b }  { *w; s1->a; t; a; c }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a; c }
 [alias] May-alias graph after instruction  printf("a=%d\n",*(s1->a));  is
-  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 40:{ v }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 40:{ v }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 40:{ v }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 40:{ v }
 [alias] analysing instruction: printf("b=%d\n",*(s1->b));
 [alias:undefined:fn] ex_jfla.c:49: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("b=%d\n",*(s1->b));  are
-  { s1->b; b }  { *w; s1->a; t; a; c }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a; c }
 [alias] May-alias graph after instruction  printf("b=%d\n",*(s1->b));  is
-  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 40:{ v }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 40:{ v }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 40:{ v }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 40:{ v }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { s1->b; b }  { *w; s1->a; t; a; c }
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a; c }
 [alias] May-alias graph after instruction  __retres = 0;  is
-  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
-[alias] May-aliases at the end of function main: { s1->b; b }  { *w; s1->a; t; a; c }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 40:{ v }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 40:{ v }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 40:{ v }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 40:{ v }
+[alias] May-aliases at the end of function main:
+  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+  { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+  { *w; s1->a; t; a; c }
 [alias] May-alias graph at the end of function main:
-  20:{ t } → 28:{ v }   23:{ b } → 24:{ u }   27:{ c } → 28:{ v }
-  31:{ w } → 32:{ a }   32:{ a } → 28:{ v }   36:{  } -a→ 37:{  }
-  36:{  } -b→ 39:{  }   37:{  } → 28:{ v }   39:{  } → 24:{ u }
-  41:{ s1 } → 36:{  }   48:{  } → 28:{ v }
+  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  8:{ __fc_random48_counter; __fc_p_random48_counter } → 9:{  }
+  32:{ t } → 40:{ v }   35:{ b } → 36:{ u }   39:{ c } → 40:{ v }
+  43:{ w } → 44:{ a }   44:{ a } → 40:{ v }   60:{  } -a→ 61:{  }
+  60:{  } -b→ 63:{  }   61:{  } → 40:{ v }   63:{  } → 36:{ u }
+  65:{ s1 } → 60:{  }   92:{  } → 40:{ v }
 [alias] Summary of function main:
   formals:     returns: __retres
-  state: { s1->b; b }  { *w; s1->a; t; a; c }
+  state: { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+         { __fc_random48_counter; __fc_p_random48_counter }  { s1->b; b }
+         { *w; s1->a; t; a; c }
 [alias] Analysis complete

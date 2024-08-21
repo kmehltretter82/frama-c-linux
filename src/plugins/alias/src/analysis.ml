@@ -66,6 +66,9 @@ module Stmt_table = struct
   type value = data
 end
 
+(* Abstract state after taking into account all global variable definitions *)
+let initial_state = ref @@ Some Abstract_state.empty
+
 let warn_unsupported_explicit_pointer pp_obj obj loc =
   Options.warning ~source:(fst loc) ~wkey:Options.Warn.unsupported_address
     "unsupported feature: explicit pointer address: %a; analysis may be unsound" pp_obj obj
@@ -82,7 +85,31 @@ let rec do_init (lv:lval) (init:init) state =
   | CompoundInit (_, l) ->
     List.fold_left (fun state (o, init) -> do_init (Cil.addOffsetLval o lv) init state) state l
 
-let doFunction f = !function_compute_ref f
+let pp_abstract_state_opt ?(debug=false) fmt v =
+  match v with
+  | None -> Format.fprintf fmt "⊥"
+  | Some a -> Abstract_state.pretty ~debug fmt a
+
+let analyse_global_var v initinfo st =
+  match initinfo.init with
+  | None -> st
+  | Some init ->
+    Options.feedback ~level:3
+      "@[analysing global variable definiton:@ @[%a@]@ =@ @[%a@];@]"
+      Printer.pp_varinfo v
+      Printer.pp_initinfo initinfo;
+    let result = do_init (Var v, NoOffset) init st in
+    Options.feedback ~level:3
+      "@[May-aliases after global variable definition@;<2>@[%a@]@;<2>are@;<2>@[%a@]@]"
+      Printer.pp_varinfo v
+      (pp_abstract_state_opt ~debug:false) result;
+    Options.debug ~level:3
+      "@[May-alias graph after global variable definition@;<2>@[%a@]@;<2>is@;<4>@[%a@]@]"
+      Printer.pp_varinfo v
+      (pp_abstract_state_opt ~debug:true) result;
+    result
+
+let analyse_function f = !function_compute_ref f
 
 let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp list) loc =
   let is_malloc (s:string) : bool =
@@ -101,7 +128,9 @@ let do_function_call (stmt:stmt) state (res : lval option) (ef : exp) (args: exp
           Some a
     end
   | _ -> (* general case *)
-    let get_function kf = try Function_table.find kf with Not_found -> doFunction kf in
+    let get_function kf =
+      try Function_table.find kf
+      with Not_found -> analyse_function kf in
     let summaries =
       match Kernel_function.get_called ef with
       | Some kf when Kernel_function.is_main kf -> []
@@ -149,11 +178,6 @@ let analyse_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_stat
       ~source:(fst loc) ~wkey:Options.Warn.unsupported_asm
       "unsupported feature: assembler code; skipping";
     a
-
-let pp_abstract_state_opt ?(debug=false) fmt v =
-  match v with
-  | None -> Format.fprintf fmt "⊥"
-  | Some a -> Abstract_state.pretty ~debug fmt a
 
 let do_instr (s:stmt) (i:instr) (a:Abstract_state.t option) : Abstract_state.t option =
   Options.feedback ~level:3 "@[analysing instruction:@ %a@]" Printer.pp_stmt s;
@@ -213,26 +237,27 @@ let do_stmt (a: Abstract_state.t) (s:stmt) :  Abstract_state.t =
   | _ -> a
 
 let analyse_function (kf:kernel_function) =
-  if not @@ Kernel_function.has_definition kf then None else begin
-    Options.feedback ~level:2 "analysing function: %a" Kernel_function.pretty kf;
-    let first_stmt =
-      try Kernel_function.find_first_stmt kf
-      with Kernel_function.No_Statement -> assert false
-    in
-    T.StmtStartData.add first_stmt (Some Abstract_state.empty);
-    F.compute [first_stmt];
-    let return_stmt = Kernel_function.find_return kf in
-    try Stmt_table.find return_stmt
-    with Not_found ->
-      let source, _ = Kernel_function.get_location kf in
-      Options.warning ~source ~wkey:Options.Warn.no_return_stmt
-        "function %a does not return; analysis may be unsound"
-        Kernel_function.pretty kf;
-      Some Abstract_state.empty
-  end
-
-let doFunction (kf:kernel_function) =
-  let final_state = analyse_function kf in
+  let final_state =
+    if not @@ Kernel_function.has_definition kf then None else
+      let () =
+        Options.feedback ~level:2 "analysing function: %a"
+          Kernel_function.pretty kf
+      in
+      let first_stmt =
+        try Kernel_function.find_first_stmt kf
+        with Kernel_function.No_Statement -> assert false
+      in
+      T.StmtStartData.add first_stmt !initial_state;
+      F.compute [first_stmt];
+      let return_stmt = Kernel_function.find_return kf in
+      try Stmt_table.find return_stmt
+      with Not_found ->
+        let source, _ = Kernel_function.get_location kf in
+        Options.warning ~source ~wkey:Options.Warn.no_return_stmt
+          "function %a does not return; analysis may be unsound"
+          Kernel_function.pretty kf;
+        !initial_state
+  in
   let level = if Kernel_function.is_main kf then 1 else 2 in
   final_state |> Option.iter (fun s ->
       Options.feedback ~level "@[May-aliases at the end of function %a:@ @[%a@]"
@@ -262,7 +287,7 @@ let doFunction (kf:kernel_function) =
   Function_table.add kf result;
   result
 
-let () = function_compute_ref := doFunction
+let () = function_compute_ref := analyse_function
 
 let make_summary (state:Abstract_state.t) (kf:kernel_function) =
   try begin match Function_table.find kf with
@@ -270,7 +295,7 @@ let make_summary (state:Abstract_state.t) (kf:kernel_function) =
     | None -> Options.fatal "not implemented"
   end
   with Not_found ->
-    begin match doFunction kf with
+    begin match analyse_function kf with
       | Some s -> (state, s)
       | None -> Options.fatal "not implemented"
     end
@@ -299,7 +324,8 @@ let print_function_table_elt fmt kf s : unit =
 
 let compute () =
   Ast.compute ();
-  Globals.Functions.iter (fun kf -> ignore @@ doFunction kf);
+  initial_state := Globals.Vars.fold_in_file_order analyse_global_var (Some Abstract_state.empty);
+  Globals.Functions.iter (fun kf -> ignore @@ analyse_function kf);
   computed_flag := true;
   if Options.ShowStmtTable.get () then
     Stmt_table.iter (print_stmt_table_elt Format.std_formatter);
@@ -308,6 +334,7 @@ let compute () =
 
 let clear () =
   computed_flag := false;
+  initial_state := Some Abstract_state.empty;
   Stmt_table.clear ()
 
 let get_state_before_stmt stmt =

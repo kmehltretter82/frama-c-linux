@@ -1,11 +1,23 @@
 [kernel] Parsing assignment3.c (with preprocessing)
+[alias] analysing global variable definiton: b = 0;
+[alias] May-aliases after global variable definition  b  are  <none>
+[alias] May-alias graph after global variable definition  b  is    <empty>
+[alias] analysing global variable definiton: a = & b;
+[alias] May-aliases after global variable definition  a  are  <none>
+[alias] May-alias graph after global variable definition  a  is
+  0:{ a } → 1:{ b }
+[alias] analysing global variable definiton: c = & b;
+[alias] May-aliases after global variable definition  c  are  { a; c }
+[alias] May-alias graph after global variable definition  c  is
+  0:{ a } → 5:{ b }   4:{ c } → 5:{ b }
 [alias] analysing function: main
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are  <none>
-[alias] May-alias graph after instruction  __retres = 0;  is    <empty>
-[alias] May-aliases at the end of function main: <none>
+[alias] May-aliases after instruction  __retres = 0;  are  { a; c }
+[alias] May-alias graph after instruction  __retres = 0;  is
+  0:{ a } → 5:{ b }   4:{ c } → 5:{ b }
+[alias] May-aliases at the end of function main: { a; c }
 [alias] May-alias graph at the end of function main:
-  <empty>
+  0:{ a } → 5:{ b }   4:{ c } → 5:{ b }
 [alias] Summary of function main:
-  formals:     returns: __retres    state: <none>
+  formals:     returns: __retres    state: { a; c }
 [alias] Analysis complete

@@ -1,134 +1,179 @@
 [kernel] Parsing nested1.c (with preprocessing)
+[alias] analysing global variable definiton: __fc_rand_max =
+  (unsigned long)2147483647;
+[alias] May-aliases after global variable definition  __fc_rand_max  are  <none>
+[alias] May-alias graph after global variable definition  __fc_rand_max  is
+  <empty>
+[alias] analysing global variable definiton: __fc_p_random48_counter =
+  __fc_random48_counter;
+[alias] May-aliases after global variable definition  __fc_p_random48_counter  are
+  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-alias graph after global variable definition  __fc_p_random48_counter
+  is    0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
 [alias] analysing function: main
 [alias] analysing instruction: st_1_t x1 = {.a = 0, .b = 1};
-[alias] May-aliases after instruction  st_1_t x1 = {.a = 0, .b = 1};  are  <none>
+[alias] May-aliases after instruction  st_1_t x1 = {.a = 0, .b = 1};  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  st_1_t x1 = {.a = 0, .b = 1};  is
-  <empty>
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
 [alias] analysing instruction: st_1_t x2 = {.a = 1, .b = 2};
-[alias] May-aliases after instruction  st_1_t x2 = {.a = 1, .b = 2};  are  <none>
+[alias] May-aliases after instruction  st_1_t x2 = {.a = 1, .b = 2};  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  st_1_t x2 = {.a = 1, .b = 2};  is
-  <empty>
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
 [alias] analysing instruction: tab_y[0] = & x1;
-[alias] May-aliases after instruction  tab_y[0] = & x1;  are  <none>
+[alias] May-aliases after instruction  tab_y[0] = & x1;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  tab_y[0] = & x1;  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1 }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1 }
 [alias] analysing instruction: tab_y[1] = & x2;
-[alias] May-aliases after instruction  tab_y[1] = & x2;  are  <none>
+[alias] May-aliases after instruction  tab_y[1] = & x2;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  tab_y[1] = & x2;  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }
 [alias] analysing instruction: st_2_t *z1 = malloc(sizeof(st_2_t));
 [alias] May-aliases after instruction  st_2_t *z1 = malloc(sizeof(st_2_t));  are
-  <none>
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  st_2_t *z1 = malloc(sizeof(st_2_t));
-  is    0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
+  is
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
 [alias] analysing instruction: st_2_t *z2 = malloc(sizeof(st_2_t));
 [alias] May-aliases after instruction  st_2_t *z2 = malloc(sizeof(st_2_t));  are
-  <none>
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  st_2_t *z2 = malloc(sizeof(st_2_t));
   is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
-  9:{ z2 } → 10:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
+  13:{ z2 } → 14:{  }
 [alias] analysing instruction: st_3_t *t = malloc(sizeof(st_3_t));
 [alias] May-aliases after instruction  st_3_t *t = malloc(sizeof(st_3_t));  are
-  <none>
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  st_3_t *t = malloc(sizeof(st_3_t));  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
-  9:{ z2 } → 10:{  }   11:{ t } → 12:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
+  13:{ z2 } → 14:{  }   15:{ t } → 16:{  }
 [alias] analysing instruction: int *a = malloc(sizeof(int));
-[alias] May-aliases after instruction  int *a = malloc(sizeof(int));  are  <none>
+[alias] May-aliases after instruction  int *a = malloc(sizeof(int));  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  int *a = malloc(sizeof(int));  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
-  9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
+  13:{ z2 } → 14:{  }   15:{ t } → 16:{  }   17:{ a } → 18:{  }
 [alias] analysing instruction: int *b = malloc(sizeof(int));
-[alias] May-aliases after instruction  int *b = malloc(sizeof(int));  are  <none>
+[alias] May-aliases after instruction  int *b = malloc(sizeof(int));  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  int *b = malloc(sizeof(int));  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
-  9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
-  15:{ b } → 16:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
+  13:{ z2 } → 14:{  }   15:{ t } → 16:{  }   17:{ a } → 18:{  }
+  19:{ b } → 20:{  }
 [alias] analysing instruction: *a = 0;
-[alias] May-aliases after instruction  *a = 0;  are  <none>
+[alias] May-aliases after instruction  *a = 0;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  *a = 0;  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
-  9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
-  15:{ b } → 16:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
+  13:{ z2 } → 14:{  }   15:{ t } → 16:{  }   17:{ a } → 18:{  }
+  19:{ b } → 20:{  }
 [alias] analysing instruction: *b = 5;
-[alias] May-aliases after instruction  *b = 5;  are  <none>
+[alias] May-aliases after instruction  *b = 5;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
 [alias] May-alias graph after instruction  *b = 5;  is
-  0:{ tab_y } → 1:{  }   1:{  } → 2:{ x1; x2 }   7:{ z1 } → 8:{  }
-  9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
-  15:{ b } → 16:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 5:{  }   5:{  } → 6:{ x1; x2 }   11:{ z1 } → 12:{  }
+  13:{ z2 } → 14:{  }   15:{ t } → 16:{  }   17:{ a } → 18:{  }
+  19:{ b } → 20:{  }
 [alias] analysing instruction: z1->s = (struct struct_1_t *)tab_y[0];
 [alias] May-aliases after instruction  z1->s = (struct struct_1_t *)tab_y[0];  are
-  { z1->s; tab_y[0..] }
+  { __fc_random48_counter; __fc_p_random48_counter }  { z1->s; tab_y[0..] }
 [alias] May-alias graph after instruction  z1->s = (struct struct_1_t *)tab_y[0];
   is
-  0:{ tab_y } → 17:{  }   7:{ z1 } → 8:{  }   8:{  } -s→ 17:{  }
-  9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
-  15:{ b } → 16:{  }   17:{  } → 2:{ x1; x2 }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 21:{  }   11:{ z1 } → 12:{  }   12:{  } -s→ 21:{  }
+  13:{ z2 } → 14:{  }   15:{ t } → 16:{  }   17:{ a } → 18:{  }
+  19:{ b } → 20:{  }   21:{  } → 6:{ x1; x2 }
 [alias] analysing instruction: z2->s = (struct struct_1_t *)tab_y[1];
 [alias] May-aliases after instruction  z2->s = (struct struct_1_t *)tab_y[1];  are
+  { __fc_random48_counter; __fc_p_random48_counter }
   { z1->s; z2->s; tab_y[0..] }
 [alias] May-alias graph after instruction  z2->s = (struct struct_1_t *)tab_y[1];
   is
-  0:{ tab_y } → 18:{  }   7:{ z1 } → 8:{  }   8:{  } -s→ 18:{  }
-  9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }   11:{ t } → 12:{  }
-  13:{ a } → 14:{  }   15:{ b } → 16:{  }   18:{  } → 2:{ x1; x2 }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   11:{ z1 } → 12:{  }   12:{  } -s→ 22:{  }
+  13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }   15:{ t } → 16:{  }
+  17:{ a } → 18:{  }   19:{ b } → 20:{  }   22:{  } → 6:{ x1; x2 }
 [alias] analysing instruction: z1->c = a;
 [alias] May-aliases after instruction  z1->c = a;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
   { z1->s; z2->s; tab_y[0..] }  { z1->c; a }
 [alias] May-alias graph after instruction  z1->c = a;  is
-  0:{ tab_y } → 18:{  }   7:{ z1 } → 8:{  }   8:{  } -s→ 18:{  }
-  8:{  } -c→ 19:{ a }   9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }
-  11:{ t } → 12:{  }   15:{ b } → 16:{  }   18:{  } → 2:{ x1; x2 }
-  19:{ a } → 14:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   11:{ z1 } → 12:{  }   12:{  } -s→ 22:{  }
+  12:{  } -c→ 23:{ a }   13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }
+  15:{ t } → 16:{  }   19:{ b } → 20:{  }   22:{  } → 6:{ x1; x2 }
+  23:{ a } → 18:{  }
 [alias] analysing instruction: z2->c = b;
 [alias] May-aliases after instruction  z2->c = b;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
   { z1->s; z2->s; tab_y[0..] }  { z1->c; a }  { z2->c; b }
 [alias] May-alias graph after instruction  z2->c = b;  is
-  0:{ tab_y } → 18:{  }   7:{ z1 } → 8:{  }   8:{  } -s→ 18:{  }
-  8:{  } -c→ 19:{ a }   9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }
-  10:{  } -c→ 20:{ b }   11:{ t } → 12:{  }   18:{  } → 2:{ x1; x2 }
-  19:{ a } → 14:{  }   20:{ b } → 16:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   11:{ z1 } → 12:{  }   12:{  } -s→ 22:{  }
+  12:{  } -c→ 23:{ a }   13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }
+  14:{  } -c→ 24:{ b }   15:{ t } → 16:{  }   22:{  } → 6:{ x1; x2 }
+  23:{ a } → 18:{  }   24:{ b } → 20:{  }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z1;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
   { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
   { (t->t)->c; z1->c; a }  { z2->c; b }
 [alias] May-alias graph after instruction  t->t = (struct struct_2_t *)z1;  is
-  0:{ tab_y } → 18:{  }   8:{  } -s→ 18:{  }   8:{  } -c→ 19:{ a }
-  9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }   10:{  } -c→ 20:{ b }
-  11:{ t } → 12:{  }   12:{  } -t→ 21:{ z1 }   18:{  } → 2:{ x1; x2 }
-  19:{ a } → 14:{  }   20:{ b } → 16:{  }   21:{ z1 } → 8:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   12:{  } -s→ 22:{  }   12:{  } -c→ 23:{ a }
+  13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }   14:{  } -c→ 24:{ b }
+  15:{ t } → 16:{  }   16:{  } -t→ 25:{ z1 }   22:{  } → 6:{ x1; x2 }
+  23:{ a } → 18:{  }   24:{ b } → 20:{  }   25:{ z1 } → 12:{  }
 [alias] analysing instruction: t->d = a;
 [alias] May-aliases after instruction  t->d = a;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
   { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
   { (t->t)->c; z1->c; t->d; a }  { z2->c; b }
 [alias] May-alias graph after instruction  t->d = a;  is
-  0:{ tab_y } → 18:{  }   8:{  } -s→ 18:{  }   8:{  } -c→ 22:{ a }
-  9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }   10:{  } -c→ 20:{ b }
-  11:{ t } → 12:{  }   12:{  } -t→ 21:{ z1 }   12:{  } -d→ 22:{ a }
-  18:{  } → 2:{ x1; x2 }   20:{ b } → 16:{  }   21:{ z1 } → 8:{  }
-  22:{ a } → 14:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   12:{  } -s→ 22:{  }   12:{  } -c→ 26:{ a }
+  13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }   14:{  } -c→ 24:{ b }
+  15:{ t } → 16:{  }   16:{  } -t→ 25:{ z1 }   16:{  } -d→ 26:{ a }
+  22:{  } → 6:{ x1; x2 }   24:{ b } → 20:{  }   25:{ z1 } → 12:{  }
+  26:{ a } → 18:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
+  { __fc_random48_counter; __fc_p_random48_counter }
   { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
   { (t->t)->c; z1->c; t->d; a }  { z2->c; b }
 [alias] May-alias graph after instruction  __retres = 0;  is
-  0:{ tab_y } → 18:{  }   8:{  } -s→ 18:{  }   8:{  } -c→ 22:{ a }
-  9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }   10:{  } -c→ 20:{ b }
-  11:{ t } → 12:{  }   12:{  } -t→ 21:{ z1 }   12:{  } -d→ 22:{ a }
-  18:{  } → 2:{ x1; x2 }   20:{ b } → 16:{  }   21:{ z1 } → 8:{  }
-  22:{ a } → 14:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   12:{  } -s→ 22:{  }   12:{  } -c→ 26:{ a }
+  13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }   14:{  } -c→ 24:{ b }
+  15:{ t } → 16:{  }   16:{  } -t→ 25:{ z1 }   16:{  } -d→ 26:{ a }
+  22:{  } → 6:{ x1; x2 }   24:{ b } → 20:{  }   25:{ z1 } → 12:{  }
+  26:{ a } → 18:{  }
 [alias] May-aliases at the end of function main:
+  { __fc_random48_counter; __fc_p_random48_counter }
   { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
   { (t->t)->c; z1->c; t->d; a }  { z2->c; b }
 [alias] May-alias graph at the end of function main:
-  0:{ tab_y } → 18:{  }   8:{  } -s→ 18:{  }   8:{  } -c→ 22:{ a }
-  9:{ z2 } → 10:{  }   10:{  } -s→ 18:{  }   10:{  } -c→ 20:{ b }
-  11:{ t } → 12:{  }   12:{  } -t→ 21:{ z1 }   12:{  } -d→ 22:{ a }
-  18:{  } → 2:{ x1; x2 }   20:{ b } → 16:{  }   21:{ z1 } → 8:{  }
-  22:{ a } → 14:{  }
+  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  4:{ tab_y } → 22:{  }   12:{  } -s→ 22:{  }   12:{  } -c→ 26:{ a }
+  13:{ z2 } → 14:{  }   14:{  } -s→ 22:{  }   14:{  } -c→ 24:{ b }
+  15:{ t } → 16:{  }   16:{  } -t→ 25:{ z1 }   16:{  } -d→ 26:{ a }
+  22:{  } → 6:{ x1; x2 }   24:{ b } → 20:{  }   25:{ z1 } → 12:{  }
+  26:{ a } → 18:{  }
 [alias] Summary of function main:
   formals:     returns: __retres
-  state: { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
+  state: { __fc_random48_counter; __fc_p_random48_counter }
+         { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
          { (t->t)->c; z1->c; t->d; a }  { z2->c; b }
 [alias] Analysis complete
