@@ -738,9 +738,15 @@ struct
 
   let pop_imports () =
     begin
-      let c,s = Stack.pop scopes in
+      let closed = !current_scope in
+      let c,cs = Stack.pop scopes in
+      let cs =
+        match closed with
+        | Some s when c <> None -> s :: cs
+        | _ -> cs
+      in
       current_scope := c ;
-      imported_scopes := s ;
+      imported_scopes := cs ;
     end
 
   let add_import ?(current=false) ?alias name =

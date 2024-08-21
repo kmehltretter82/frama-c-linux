@@ -2721,7 +2721,6 @@ class cil_printer () = object (self)
   method term_lhost fmt (lh:term_lhost) =
     self#term_lval fmt (lh, TNoOffset)
 
-
   val module_stack : string Stack.t = Stack.create ()
 
   method logic_name fmt a =
