@@ -37,19 +37,6 @@ let print_constant fmt = function
   | StringConstant s -> fprintf fmt "\"%s\"" s
   | WStringConstant s -> fprintf fmt "\"%s\"" s
 
-let module_prefix : string Stack.t = Stack.create ()
-
-let module_name a =
-  try Stack.top module_prefix ^ a with Stack.Empty -> a
-
-let print_qid fmt name =
-  try
-    let prefix = Stack.top module_prefix in
-    match Extlib.string_del_prefix ~strict:true prefix name with
-    | None -> pp_print_string fmt name
-    | Some short -> pp_print_string fmt short
-  with Stack.Empty -> pp_print_string fmt name
-
 let rec print_logic_type name fmt typ =
   let pname = match name with
     | Some d -> (fun fmt -> fprintf fmt "@ %t" d)
@@ -304,7 +291,7 @@ and print_lexpr_level n fmt e =
 let print_typedef fmt = function
   | TDsum l ->
     let print_const fmt (s,args) =
-      fprintf fmt "%a%a" print_qid s
+      fprintf fmt "%s%a" s
         (pp_list ~pre:"@ (@[" ~sep:",@ " ~suf:"@])"
            (print_logic_type None))
         args
@@ -335,33 +322,31 @@ let rec print_extended_decl fmt d =
 let rec print_decl fmt d =
   match d.decl_node with
   | LDlogic_def(name,labels,tvar,rt,prms,body) ->
-    fprintf fmt "@[<2>logic@ %a@ %a%a%a%a@ =@ %a;@]"
-      (print_logic_type None) rt print_qid name
+    fprintf fmt "@[<2>logic@ %a@ %s%a%a%a@ =@ %a;@]"
+      (print_logic_type None) rt name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~pre:"(@[" ~sep:",@ " ~suf:"@])" print_typed_ident) prms
       print_lexpr body
   | LDlogic_reads(name,labels,tvar,rt,prms,reads) ->
-    fprintf fmt "@[<2>logic@ %a@ %a%a%a%a@ =@ %a;@]"
-      (print_logic_type None) rt print_qid name
+    fprintf fmt "@[<2>logic@ %a@ %s%a%a%a@ =@ %a;@]"
+      (print_logic_type None) rt name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~pre:"(@[" ~sep:",@ " ~suf:"@])" print_typed_ident) prms
       (pp_opt ~pre:"@[<2>reads@ " (pp_list ~sep:",@ " print_lexpr)) reads
   | LDtype(name,tvar,def) ->
-    fprintf fmt "@[<2>type@ %a%a%a;@]" print_qid name
+    fprintf fmt "@[<2>type@ %s%a%a;@]" name
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_opt ~pre:"@ =@ " print_typedef) def
   | LDpredicate_reads(name,labels,tvar,prms,reads) ->
-    fprintf fmt "@[<2>predicate@ %a%a%a%a@ =@ %a;@]"
-      print_qid name
+    fprintf fmt "@[<2>predicate@ %s%a%a%a@ =@ %a;@]" name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~pre:"(@[" ~sep:",@ " ~suf:"@])" print_typed_ident) prms
       (pp_opt ~pre:"@[<2>reads@ " (pp_list ~sep:",@ " print_lexpr)) reads
   | LDpredicate_def(name,labels,tvar,prms,body) ->
-    fprintf fmt "@[<2>predicate@ %a%a%a%a@ =@ %a;@]"
-      print_qid name
+    fprintf fmt "@[<2>predicate@ %s%a%a%a@ =@ %a;@]" name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~pre:"(@[" ~sep:",@ " ~suf:"@])" print_typed_ident) prms
@@ -373,16 +358,14 @@ let rec print_decl fmt d =
         (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
         print_lexpr body
     in
-    fprintf fmt "@[<2>inductive@ %a%a%a@;(%a)@ {@\n%a@]@\n}"
-      print_qid name
+    fprintf fmt "@[<2>inductive@ %s%a%a@;(%a)@ {@\n%a@]@\n}" name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       (pp_list ~sep:",@ " print_typed_ident) prms
       (pp_list ~sep:"@\n" print_case) cases
   | LDlemma(name,labels,tvar,body) ->
-    fprintf fmt "@[<2>%a@ %a%a%a:@ %a;@]"
-      Cil_printer.pp_lemma_kind body.tp_kind
-      print_qid name
+    fprintf fmt "@[<2>%a@ %s%a%a:@ %a;@]"
+      Cil_printer.pp_lemma_kind body.tp_kind name
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       print_lexpr body.tp_statement
@@ -390,16 +373,8 @@ let rec print_decl fmt d =
     fprintf fmt "@[<2>axiomatic@ %s@ {@\n%a@]@\n}" name
       (pp_list ~sep:"@\n" print_decl) ds
   | LDmodule (name,ds) ->
-    begin
-      try
-        Stack.push (module_name name ^ "::") module_prefix ;
-        fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
-          (pp_list ~sep:"@\n" print_decl) ds ;
-        ignore @@ Stack.pop module_prefix ;
-      with err ->
-        ignore @@ Stack.pop module_prefix ;
-        raise err
-    end
+    fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
+      (pp_list ~sep:"@\n" print_decl) ds
   | LDimport (drv,mId,asId) ->
     fprintf fmt "@[<2>import" ;
     Option.iter (fprintf fmt "@ %s:") drv ;
