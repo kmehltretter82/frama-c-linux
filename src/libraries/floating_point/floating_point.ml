@@ -157,7 +157,7 @@ let smallest_denormal_float_of : type f. format:f format -> f t =
   fun ~format -> cache_floats { run } format
 
 let unit_in_the_last_place_of : type f. format:f format -> f t =
-  let run f = ldexp 1.0 (- sig_size f) |> round_to f in
+  let run fmt = ldexp 1.0 (- sig_size fmt) in
   fun ~format -> cache_floats { run } format
 
 let minimal_exponent_of : type f. format:f format -> Z.t =
