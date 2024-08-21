@@ -1,10 +1,8 @@
 // address assignment
 // {a, c} are aliased
 
-int main () {
+int b=0, *a=&b, *c=&b;
 
-  int *a=0, b=0, *c=0;
-  a = &b;
-  c = &b;
+int main () {
   return 0;
 }
