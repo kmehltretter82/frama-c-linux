@@ -23,3 +23,38 @@
 (* -------------------------------------------------------------------------- *)
 (* --- Region Analysis API                                                --- *)
 (* -------------------------------------------------------------------------- *)
+
+
+open Cil_types
+
+type region = Memory.region
+
+module R : Qed.Collection.S with type t = region =
+  Qed.Collection.Make(struct
+    type t = region
+    let hash r = Memory.id r.Memory.node
+    let equal r1 r2 = (hash r1 == hash r2)
+    let compare r1 r2 = (hash r1) - (hash r2)
+  end)
+
+
+type map = Code.domain
+let get_map (f:kernel_function) : map = Code.domain f
+
+(** @raise Not_found *)
+let cvar (map:map) (var:varinfo) : region =
+  Memory.region map.map (Memory.lval map.map ((Var var), NoOffset))
+
+let field (map:map) (region:region) (field:fieldinfo) : region =
+  Memory.region map.map (Memory.offset map.map region.node (Field (field, NoOffset)))
+
+let index (_:map) (_:region) (_:typ) : region = (* TODO *) raise Not_found
+
+
+let points_to (map:map) (region:region) : region option =
+  Option.map (Memory.region map.map) @@ Memory.cpointed map.map region.Memory.node
+
+let pointed_by (_:map) (_:region) : region list = (* TODO *) []
+
+
+let iter (_:map) (_:region -> unit) : unit = (* TODO *) ()

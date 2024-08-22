@@ -91,6 +91,8 @@ val merge_copy : map -> l:node -> r:node -> unit
 
 (** @raise Not_found *)
 val lval : map -> lval -> node
+val offset : map -> node -> offset -> node
+val cpointed : map -> node -> node option
 
 (** @raise Not_found *)
 val exp : map -> exp -> node option
