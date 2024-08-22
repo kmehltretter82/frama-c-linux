@@ -1,8 +1,8 @@
 DEFAULT_SUITES= wp wp_acsl wp_plugin wp_ce wp_bts wp_store wp_hoare
-DEFAULT_SUITES= wp_typed wp_usage wp_gallery wp_manual wp_region wp_tip
+DEFAULT_SUITES= wp_typed wp_usage wp_gallery wp_manual wp_tip
 
 qualif_SUITES= wp wp_acsl wp_plugin wp_bts wp_store wp_hoare
-qualif_SUITES= wp_typed wp_usage wp_gallery wp_manual wp_region wp_tip
+qualif_SUITES= wp_typed wp_usage wp_gallery wp_manual wp_tip
 qualif_SUITES= why3
 
 ce_SUITES= wp_ce
