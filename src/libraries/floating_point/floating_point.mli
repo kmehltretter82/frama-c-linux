@@ -88,6 +88,17 @@ val fkind_of_format : 'f format -> Cil_types.fkind
     compatibility. *)
 val round_to_single_precision_float : float -> float
 
+(** Type used to return a proof that two formats are in fact the same. *)
+type ('l, 'r) same_format =
+  | No  : ('l, 'r) same_format
+  | Yes : 'f format -> ('f, 'f) same_format
+
+(** Check if two formats are in fact the same. *)
+val same_format : 'l format -> 'r format -> ('l, 'r) same_format
+
+(** Total order on formats. *)
+val format_order : 'l format -> 'r format -> int
+
 
 
 (** {2 Typed floating point numbers} *)

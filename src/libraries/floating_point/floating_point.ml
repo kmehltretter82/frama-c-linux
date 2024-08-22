@@ -84,6 +84,27 @@ let format_of_char = function
   | 'F' | 'f' -> Format Single, true
   | _         -> Format Double, false
 
+type ('l, 'r) same_format =
+  | No  : ('l, 'r) same_format
+  | Yes : 'f format -> ('f, 'f) same_format
+
+let same_format (type l r) (l : l format) (r : r format) : (l, r) same_format =
+  match l, r with
+  | Single, Single -> Yes Single
+  | Double, Double -> Yes Double
+  | Long  , Long   -> Yes Long
+  | _, _ -> No
+
+let format_order (type l r) (l : l format) (r : r format) : int =
+  match l, r with
+  | Single, Single ->  0
+  | Single, _      -> -1
+  | _     , Single ->  1
+  | Double, Double ->  0
+  | Double, _      -> -1
+  | _     , Double ->  1
+  | Long  , Long   -> 0
+
 
 
 let single f = Float (change_format Single f, Single)
