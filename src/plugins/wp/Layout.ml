@@ -216,15 +216,6 @@ struct
 
 end
 
-module Mode(OPT : sig val get : unit -> bool end) =
-struct
-  let default = OPT.get
-  let merge a b = if default () then a && b else a || b
-end
-
-module RW = Mode(Wp.Region_rw)
-module Flat = Mode(Wp.Region_flat)
-module Pack = Mode(Wp.Region_pack)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Data Layout                                                        --- *)
