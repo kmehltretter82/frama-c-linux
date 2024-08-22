@@ -38,16 +38,25 @@ let clear_cache () =
 
 exception Explicit_pointer_address of location
 
-let check_cast_compatibility e typ =
-  let type_of_e = Cil.typeOf e in
-  (* emit a warning for unsafe casts, but not for the NULL pointer *)
-  if Cil.need_cast typ type_of_e && not (Cil.isZero e) then
+let check_cast_compatibility e to_type =
+  let rec cast_preserves_indirection_level from_type to_type =
+    let recurse = cast_preserves_indirection_level in
+    match Cil.unrollType from_type, Cil.unrollType to_type with
+    | TPtr (from_type, _), TPtr (to_type, _) -> recurse from_type to_type
+    | TPtr _, _ -> false
+    | _, TPtr _ -> false
+    | _ -> true
+  in
+  let from_type = Cil.typeOf e in
+  if Cil.need_cast to_type from_type && not (Cil.isZero e)
+     && not (cast_preserves_indirection_level from_type to_type) then
+    (* emit a warning for unsafe casts, but not for the NULL pointer *)
     Options.warning
       ~once:true
       ~source:(fst @@ e.eloc)
       ~wkey:Options.Warn.unsafe_cast
       "unsafe cast from %a to %a; analysis may be unsound"
-      Printer.pp_typ type_of_e Printer.pp_typ typ
+      Printer.pp_typ from_type Printer.pp_typ to_type
 
 let rec simplify_offset o =
   match o with

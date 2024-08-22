@@ -9,16 +9,12 @@
 [alias] May-alias graph after instruction  st_1_t x2 = {.a = 1, .b = 2};  is
   <empty>
 [alias] analysing instruction: st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};
-[alias:unsafe-cast] structure2.c:21: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction
   st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};  are  <none>
 [alias] May-alias graph after instruction
   st_2_t y = {.s = (struct struct_1_t *)(& x1), .c = 4};  is
   0:{ y } -s→ 1:{  }   1:{  } → 2:{ x1 }
 [alias] analysing instruction: y.s = (struct struct_1_t *)(& x2);
-[alias:unsafe-cast] structure2.c:23: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  y.s = (struct struct_1_t *)(& x2);  are
   <none>
 [alias] May-alias graph after instruction  y.s = (struct struct_1_t *)(& x2);  is

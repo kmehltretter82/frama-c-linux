@@ -7,15 +7,11 @@
   <empty>
 [alias] Summary of function CPS_SplitWord:
   formals: line    returns: line    state: <none>
-[alias:unsafe-cast] union_vmap.c:11: Warning: 
-  unsafe cast from char const * to char *; analysis may be unsound
 [alias] May-aliases after instruction  char *s2 = CPS_SplitWord((char *)"a");  are
   <none>
 [alias] May-alias graph after instruction  char *s2 = CPS_SplitWord((char *)"a");
   is    4:{ s2 } → 3:{  }
 [alias] analysing instruction: char *s3 = CPS_SplitWord((char *)"b");
-[alias:unsafe-cast] union_vmap.c:12: Warning: 
-  unsafe cast from char const * to char *; analysis may be unsound
 [alias] May-aliases after instruction  char *s3 = CPS_SplitWord((char *)"b");  are
   <none>
 [alias] May-alias graph after instruction  char *s3 = CPS_SplitWord((char *)"b");

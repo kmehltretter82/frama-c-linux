@@ -39,8 +39,6 @@
   0:{ y1 } → 1:{ x1 }   2:{ z } → 3:{  }   4:{ t } → 5:{  }
   6:{ a } → 7:{  }
 [alias] analysing instruction: z->s = (struct struct_1_t *)y1;
-[alias:unsafe-cast] structure5.c:41: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  z->s = (struct struct_1_t *)y1;  are
   { z->s; y1 }
 [alias] May-alias graph after instruction  z->s = (struct struct_1_t *)y1;  is
@@ -52,8 +50,6 @@
   2:{ z } → 3:{  }   3:{  } -s→ 10:{ y1 }   3:{  } -c→ 11:{ a }
   4:{ t } → 5:{  }   10:{ y1 } → 1:{ x1 }   11:{ a } → 7:{  }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z;
-[alias:unsafe-cast] structure5.c:43: Warning: 
-  unsafe cast from st_2_t * to struct struct_2_t *; analysis may be unsound
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z;  are
   { (t->t)->s; z->s; y1 }  { t->t; z }  { (t->t)->c; z->c; a }
 [alias] May-alias graph after instruction  t->t = (struct struct_2_t *)z;  is

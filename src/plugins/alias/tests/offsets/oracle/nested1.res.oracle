@@ -58,8 +58,6 @@
   9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
   15:{ b } → 16:{  }
 [alias] analysing instruction: z1->s = (struct struct_1_t *)tab_y[0];
-[alias:unsafe-cast] nested1.c:47: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  z1->s = (struct struct_1_t *)tab_y[0];  are
   { z1->s; tab_y[0..] }
 [alias] May-alias graph after instruction  z1->s = (struct struct_1_t *)tab_y[0];
@@ -68,8 +66,6 @@
   9:{ z2 } → 10:{  }   11:{ t } → 12:{  }   13:{ a } → 14:{  }
   15:{ b } → 16:{  }   17:{  } → 2:{ x1; x2 }
 [alias] analysing instruction: z2->s = (struct struct_1_t *)tab_y[1];
-[alias:unsafe-cast] nested1.c:48: Warning: 
-  unsafe cast from st_1_t * to struct struct_1_t *; analysis may be unsound
 [alias] May-aliases after instruction  z2->s = (struct struct_1_t *)tab_y[1];  are
   { z1->s; z2->s; tab_y[0..] }
 [alias] May-alias graph after instruction  z2->s = (struct struct_1_t *)tab_y[1];
@@ -94,8 +90,6 @@
   10:{  } -c→ 20:{ b }   11:{ t } → 12:{  }   18:{  } → 2:{ x1; x2 }
   19:{ a } → 14:{  }   20:{ b } → 16:{  }
 [alias] analysing instruction: t->t = (struct struct_2_t *)z1;
-[alias:unsafe-cast] nested1.c:51: Warning: 
-  unsafe cast from st_2_t * to struct struct_2_t *; analysis may be unsound
 [alias] May-aliases after instruction  t->t = (struct struct_2_t *)z1;  are
   { (t->t)->s; z1->s; z2->s; tab_y[0..] }  { t->t; z1 }
   { (t->t)->c; z1->c; a }  { z2->c; b }
