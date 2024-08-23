@@ -444,6 +444,10 @@ let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
   merge_all m [a;b]
 
+let merge_copy (m: map) ~(l: node) ~(r: node) : unit =
+  let { clayout } = get m r in
+  merge_all m [ l; Ufind.make m.store { empty with clayout } ]
+
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
 (* -------------------------------------------------------------------------- *)

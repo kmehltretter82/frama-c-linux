@@ -87,6 +87,7 @@ val shift : map -> node -> Access.acs -> unit
 
 val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
+val merge_copy : map -> l:node -> r:node -> unit
 
 (** @raise Not_found *)
 val lval : map -> lval -> node

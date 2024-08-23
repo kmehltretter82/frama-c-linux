@@ -28,7 +28,7 @@ open Memory
 (* ---  L-Values & Expressions                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-type value = { from : node option ; ptr : node option }
+type scalar = { from : node option ; ptr : node option }
 let integral = { from = None ; ptr = None }
 let pointer m v =
   match v.ptr with
@@ -57,7 +57,7 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
 
 and add_value m s e = ignore (add_exp m s e)
 
-and add_exp (m: map) (s:stmt) (e:exp) : value =
+and add_exp (m: map) (s:stmt) (e:exp) : scalar =
   match e.enode with
 
   | AddrOf lv | StartOf lv ->
@@ -119,6 +119,13 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 let add_instr (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ | Code_annot _ -> ()
+
+  | Set(lv, { enode = Lval exp }, _) ->
+    let l = add_lval m s lv in
+    let r = add_lval m s exp in
+    Memory.read m r (Lval(s,exp)) ;
+    Memory.write m l (Lval(s,lv)) ;
+    Memory.merge_copy m ~l ~r
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in
