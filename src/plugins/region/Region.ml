@@ -54,7 +54,9 @@ let index (_:map) (_:region) (_:typ) : region = (* TODO *) raise Not_found
 let points_to (map:map) (region:region) : region option =
   Option.map (Memory.region map.map) @@ Memory.cpointed map.map region.Memory.node
 
-let pointed_by (_:map) (_:region) : region list = (* TODO *) []
+let pointed_by (map:map) (region:region) : region list =
+  List.map (Memory.region map.map) @@ Memory.cpointed_by map.map region.Memory.node
 
 
-let iter (_:map) (_:region -> unit) : unit = (* TODO *) ()
+let iter (map:map) (f:region -> unit) : unit =
+  Memory.iter map.map f

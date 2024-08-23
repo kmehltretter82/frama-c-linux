@@ -49,6 +49,7 @@ and chunk = {
   cwrites: Access.Set.t ;
   cshifts: Access.Set.t ;
   clayout: layout ;
+  cpointed_by : node list;
 }
 
 type rg = node Ranges.range
@@ -149,6 +150,7 @@ let empty = {
   cwrites = Access.Set.empty ;
   cshifts = Access.Set.empty ;
   clayout = Blob ;
+  cpointed_by = [] ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -176,13 +178,17 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_chunk (m: map) ?(size=0) ?ptr () =
+let new_chunk (m: map) ?(size=0) ?ptr ?ptrby () =
   failwith_locked m "Region.Memory.new_chunk" ;
   let clayout =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
     | Some _ -> Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
-  in Ufind.make m.store { empty with clayout }
+  in let cpointed_by =
+    match ptrby with
+    | None -> []
+    | Some ptr -> [ptr]
+  in Ufind.make m.store { empty with clayout ; cpointed_by }
 
 let new_range (m: map) ?(fields=Fields.empty) ~size ~offset ~length data : node =
   failwith_locked m "Region.Memory.new_range" ;
@@ -419,6 +425,7 @@ let merge_region (m: map) (q: queue) (a : chunk) (b : chunk) : chunk = {
   cwrites = Access.Set.union a.cwrites b.cwrites ;
   cshifts = Access.Set.union a.cshifts b.cshifts ;
   clayout = merge_layout m q a.clayout b.clayout ;
+  cpointed_by = List.append a.cpointed_by b.cpointed_by ;
 }
 
 let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
@@ -471,7 +478,7 @@ let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
 
 let add_points_to (m: map) (a: node) (b : node) =
   failwith_locked m "Region.Memory.points_to" ;
-  ignore @@ merge m a @@ new_chunk m ~ptr:b ()
+  ignore @@ merge m a @@ new_chunk m ~ptr:b ~ptrby:a ()
 
 let add_value (m:map) (rv:node) (ty:typ) : node option =
   if Cil.isPointerType ty then
@@ -523,6 +530,10 @@ let cpointed m r =
   match rg.clayout with
   | Blob | Compound _ | Cell(_,None) -> None
   | Cell(_,Some r) -> Some (Ufind.find m.store r)
+
+let cpointed_by m r =
+  let rg = Ufind.get m.store r in
+  rg.cpointed_by
 
 let rec lval (m: map) (lv: lval) : node =
   let h = host m (fst lv) in
