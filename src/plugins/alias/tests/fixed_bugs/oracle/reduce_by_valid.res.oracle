@@ -5,14 +5,10 @@
   casting function to int *
 [alias] analysing function: f
 [alias] analysing instruction: int *q = (int *)(& f);
-[alias:unsafe-cast] reduce_by_valid.c:5: Warning: 
-  unsafe cast from void (*)(void) to int *; analysis may be unsound
 [alias] May-aliases after instruction  int *q = (int *)(& f);  are  <none>
 [alias] May-alias graph after instruction  int *q = (int *)(& f);  is
   0:{ q } → 1:{ f }
 [alias] analysing instruction: int *p = (int *)(& f);
-[alias:unsafe-cast] reduce_by_valid.c:5: Warning: 
-  unsafe cast from void (*)(void) to int *; analysis may be unsound
 [alias] May-aliases after instruction  int *p = (int *)(& f);  are  { q; p }
 [alias] May-alias graph after instruction  int *p = (int *)(& f);  is
   0:{ q } → 5:{ f }   4:{ p } → 5:{ f }

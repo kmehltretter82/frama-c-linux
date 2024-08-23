@@ -8,8 +8,6 @@
 [alias] analysing instruction: tmp = (void (*)(void))*((char *)(v.t));
 [alias:unsafe-cast] origin.c:8: Warning: 
   unsafe cast from char to void (*)(void); analysis may be unsound
-[alias:unsafe-cast] origin.c:8: Warning: 
-  unsafe cast from int * to char *; analysis may be unsound
 [alias] May-aliases after instruction  tmp = (void (*)(void))*((char *)(v.t));  are
   { v.t[0..]; tmp }
 [alias] May-alias graph after instruction  tmp = (void (*)(void))*((char *)(v.t));
