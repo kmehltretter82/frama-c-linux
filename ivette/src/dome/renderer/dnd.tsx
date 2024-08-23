@@ -23,7 +23,6 @@
 /**
    @packageDocumentation
    @module dome/dnd
-   @description
 
    D&D Facilities
  */

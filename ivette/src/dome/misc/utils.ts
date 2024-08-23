@@ -31,7 +31,7 @@
 
 import type { CSSProperties } from 'react';
 
-type Falsy = undefined | boolean | null | '';
+export type Falsy = undefined | boolean | null | '';
 
 export type ClassSpec = string | Falsy | { [cname: string]: true | Falsy };
 

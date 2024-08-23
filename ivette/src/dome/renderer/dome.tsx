@@ -777,7 +777,7 @@ export function useTimer(period: number, callback: () => void): void {
   }, [period, callback]);
 }
 
-type Callback<A> = (arg: A) => void;
+export type Callback<A> = (arg: A) => void;
 
 /**
  * Protected callback against unwanted dependencies and unmounted component.

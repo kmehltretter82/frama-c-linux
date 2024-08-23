@@ -64,10 +64,10 @@ As depicted in the [Quick Start](quickstart.md) tutorial, the only file you
 need to create by yourself is the main `Makefile`, with a minimal content
 limited to:
 
-```makefile
-DOME="..." ;; path to your dome installation
-include $(DOME)/template/makefile
-```
+  ```make
+  DOME="..." ;; path to your dome installation
+  include $(DOME)/template/makefile
+  ```
 
 The following table lists the main files and directories of your project, with
 the associated entity responsible for it, and whether they should be tracked by

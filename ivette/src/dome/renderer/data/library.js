@@ -27,23 +27,23 @@
 /**
    @packageDocumentation
    @module dome/data/library
-   @description
+
    This module allows to integrate data definitions within React elements.
 
    Typically, you can use it to define your own structure of logical elements
    and display them at different places in the GUI. For instance, you may
    want to define a custom list of elements, where each element
-   will be rendered twice: locally with the currenly selected item, and in a side-bar
+   will be rendered twice: locally with the currently selected item, and in a side-bar
    or in the menu-bar, or for any other purpose than rendering. You want to declare
    your list like this:
 
-   * ```jsx
-   * <MyList>
-   *   <MyItem id={A} ... >...</MyItem>
-   *   <MyItem id={B} ... >...</MyItem>
-   *   <MyItem id={C} ... >...</MyItem>
-   * </MyList>
-   * ```
+   ```jsx
+     <MyList>
+       <MyItem id={A} ... >...</MyItem>
+       <MyItem id={B} ... >...</MyItem>
+       <MyItem id={C} ... >...</MyItem>
+     </MyList>
+   ```
 
    Dome data libraries, as provided by this module, allows you to define such
    collection of data mixed with rendered elements.
@@ -70,7 +70,7 @@
    visible elements in the DOM. You may think of data elements as having a
    double rendering: mounted data items are collected into libraries, and normal visible
    elements are collected into the React virtual DOM. Each kind of data element is
-   rendered differenly with this respect:
+   rendered differently with this respect:
 
    - `<Data.Item>` renders its children within a React fragment;
    - `<Data.Node>` is like an item, with its data children stored in the registered item;
@@ -125,11 +125,11 @@ const reOrder = (items) =>
     .map((item, order) => Object.assign(item, { order }));
 
 /**
-    @summary Data Collector.
-    @description
+    Data Collector.
+
     Libraries are used to collect data through the React virtual DOM.
 */
-class Library extends EventEmitter {
+export class Library extends EventEmitter {
 
   constructor() {
     super();
@@ -147,7 +147,7 @@ class Library extends EventEmitter {
   };
 
   /**
-     @summary Register Item.
+     Register Item.
      @param {object} item - must have an `'id'` property
    */
   add(item) {
@@ -159,7 +159,7 @@ class Library extends EventEmitter {
   }
 
   /**
-     @summary Remove Item.
+     Remove Item.
      @param {string} id - the item identifier to remove
    */
   remove(id) {
@@ -168,7 +168,7 @@ class Library extends EventEmitter {
   }
 
   /**
-     @summary Bugger Contents.
+     Bugger Contents.
      @return {Array<object>} items array sorted by `'order'` and `'id'` properties.
    */
   contents() {
@@ -176,13 +176,13 @@ class Library extends EventEmitter {
   }
 
   /**
-     @summary Register callback.
+     Register callback.
      @param {function} callback - invoked when library contents changes
   **/
   on(callback) { this.on('trigger', callback); }
 
   /**
-     @summary Un-register callback.
+     Un-register callback.
      @param {function} callback - callback to unregister
   **/
   off(callback) { this.off('trigger', callback); }
@@ -190,20 +190,19 @@ class Library extends EventEmitter {
 }
 
 /**
-   @summary Creates a Data library.
+   Creates a Data library. Same as `new Library()`.
    @return {Library} a newly created, empty library.
-   @description
-   Same as `new Library()`.
  */
 export function createLibrary() { return new Library(); }
 
 /**
-   @summary Collect living items from the library (Custom React Hook).
-   @param {Library} library - the desired library
-   @return {Array<items>} items currently mounted in the library
-   @description
+   Collect living items from the library (Custom React Hook).
+
    This hook is automatically updated whenever an item is added or removed
    from the library.
+
+   @param {Library} library - the desired library
+   @return {Array} items currently mounted in the library
  */
 export function useLibrary(library) {
   const forceUpdate = Dome.useForceUpdate();
@@ -212,15 +211,15 @@ export function useLibrary(library) {
 }
 
 /**
-   @summary Use a locally created new library (Custom React Hook).
-   @return {object} `{ library, items }` the local library and its collected items
-   @description
+   Use a locally created new library (Custom React Hook).
+
    This is a combination of a locally created library _and_ its collected items.
    Same as:
-   ```
-   const library = React.useMemo( createLibrary , [] );
-   const items = useLibrary( library );
-   ```
+
+      const library = React.useMemo( createLibrary , [] );
+      const items = useLibrary( library );
+
+   @return {object} `{ library, items }` the local library and its collected items
  */
 export function useLocalLibrary() {
   const library = React.useMemo(createLibrary, []);
@@ -235,7 +234,7 @@ const makePath = (path, order) =>
   order === undefined ? path : path.slice(0, -1).concat(order);
 
 /**
-   @summary Current library (Custom React Hook).
+   Current library (Custom React Hook).
    @return {Library} in local context
  */
 export function useCurrentLibrary() {
@@ -287,25 +286,22 @@ function makeChildren(path, children) {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Data Item definition.
+   Data Item definition.
+
+   Register a new item `{ id, order, props }` in the library.
+   If not specified, the current context library is used. If no identifier nor
+   library is actually available, the item definition is skipped.
+
+   An `<Item/>` element renders its children in a nested, ordered fragment,
+   but with the same current library than the inherited one, if any.
+
    @property {Library} [lib] - data library collecting the item
    @property {string} [id] - item identifier
    @property {number} [order] - item local ordering (default: inherited)
    @property {any} [...props] - other item properties
    @property {React.Children} [children] - rendered elements
-   @description
-   Register a new item in the library:
 
-   ```
-   { id, order, props }
-   ```
-
-   If not specified, the current context library is used. If no identifier nor
-   library is actually available, the item definition is skipped.
-
-   An `<Item/>` element rendres its children in a nested, ordered fragment,
-   but with the same current library than the inherited one, if any.
-*/
+   */
 export const Item = ({ children, ...props }) => {
   let path = useLocalItem(props);
   return (<React.Fragment>{makeChildren(path, children)}</React.Fragment>);
@@ -316,22 +312,12 @@ export const Item = ({ children, ...props }) => {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Data Component definition.
-   @property {Library} [lib] - data library collecting the item (default: inherited)
-   @property {string} id - item identifier (default: skip item definition)
-   @property {number} [order] - item order (default: parent fragment ordering)
-   @property {any} [...props] - registered item properties
-   @property {React.Children} [children] - component _virtual_ elements
-   @description
-   Register a new item in the library. If enabled and not disabled,
-   the collected item data will be:
+   Data Component definition.
 
-   ```
-   { id, order, props, children: React.Children }
-   ```
+   Register a new item in the library.
 
    The specified order property is used to sort this item among its immediate
-   neighbours in the React virtual DOM. The final item order is determined with
+   neighbors in the React virtual DOM. The final item order is determined with
    respect to all the other collected items.
 
    Children elements of the `<Component/>` are _not_ mounted into the React
@@ -341,7 +327,14 @@ export const Item = ({ children, ...props }) => {
    to these children.
 
    The component element itself is rendered as `null` when mounted in the virtual DOM by React.
-*/
+
+   @property {Library} [lib] - data library collecting the item (default: inherited)
+   @property {string} id - item identifier (default: skip item definition)
+   @property {number} [order] - item order (default: parent fragment ordering)
+   @property {any} [...props] - registered item properties
+   @property {React.Children} [children] - component _virtual_ elements
+
+   */
 export const Component = ({ children, ...props }) => {
   useLocalItem(props, children);
   return null;
@@ -352,21 +345,11 @@ export const Component = ({ children, ...props }) => {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Recursive Data Item definition.
-   @property {Library} [lib] - data library collecting the item (default: inherited)
-   @property {string} id - item identifier (default: skip item definition)
-   @property {number} [order] - item order (default: parent fragment ordering)
-   @property {any} [...props] - registered item properties
-   @property {React.Children} [children] - sub-data and rendering of the item
-   @description
-   Register a new item in the library, as follows:
-
-   ```
-   { id, order, props, children: Array<item> }
-   ```
+   Recursive Data Item definition.
+   Register a new item in the library with the given children.
 
    The specified order property is used to sort this item among its immediate
-   neighbours in the React virtual DOM. The final item order is determined with
+   neighbors in the React virtual DOM. The final item order is determined with
    respect to all the other collected items.
 
    A _new_ local library is created and associated to this `<Node/>` element, and propagated
@@ -376,6 +359,12 @@ export const Component = ({ children, ...props }) => {
    Hence, children elements of the node item _are_ rendered in the virtual React DOM,
    but their data elements are collected and stored in the `children` property of the
    defined `<Node/>` item.
+
+   @property {Library} [lib] - data library collecting the item (default: inherited)
+   @property {string} id - item identifier (default: skip item definition)
+   @property {number} [order] - item order (default: parent fragment ordering)
+   @property {any} [...props] - registered item properties
+   @property {React.Children} [children] - sub-data and rendering of the item
 */
 export const Node = ({ children, ...props }) => {
   let { library, items } = useLocalLibrary();
@@ -392,7 +381,7 @@ export const Node = ({ children, ...props }) => {
 // --------------------------------------------------------------------------
 
 /**
-   @summary Ordered Data Collection.
+   Ordered Data Collection.
    @property {Library} [lib] - local library to use
    @property {Sortable} [order] - local order to use (default: inherited)
    @property {boolean} [enabled] - fragment shall be rendered (default: `true`)

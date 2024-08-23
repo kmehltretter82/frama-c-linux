@@ -48,7 +48,7 @@ export interface ToolBarProps {
 
 /**
    @class
-   @summary Container for toolbar items.
+   Container for toolbar items.
  */
 export function ToolBar(props: ToolBarProps): JSX.Element | null {
   const { children } = props;
@@ -137,7 +137,7 @@ export type ButtonKind =
   | 'default' | 'cancel' | 'warning' | 'positive' | 'negative';
 
 export interface ButtonProps<A> {
-  /** Button icon, Cf. [gallery](gallery-icons.html). */
+  /** Button icon, Cf. [gallery](../../doc/guides/icons.md). */
   icon?: string;
   /** Button label. */
   label?: string;

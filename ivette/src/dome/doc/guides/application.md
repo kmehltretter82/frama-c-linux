@@ -57,8 +57,6 @@ system events;
 responsible for rendering the application main window and
 binding callbacks to application services.
 
-<img src="dataflow.png" style="float: right; width: 30em"/>
-
 Such an architecture is typical of a _Model-View-Controller_ design, but
 revisited to scale. In particular, data flow between those three different
 layers shall follow a unique-direction pattern in order to avoid the

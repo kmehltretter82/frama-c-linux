@@ -122,7 +122,7 @@ export interface IconProps extends SVGprops {
 
 /**
    Icon Component.
-   Consult the [Icon Gallery](../guides/icons.md.html) for default icons.
+   Consult the [Icon Gallery](../../doc/guides/icons.md) for default icons.
  */
 export function Icon(props: IconProps): JSX.Element {
   const {
@@ -173,7 +173,7 @@ export interface BadgeProps {
    Rounded icon, number or letter.
    Depending on the type of value, display either a number,
    a label, or the corresponding named icon.
-   Consult the [Icon Gallery](gallery-icons.html) for default icons.
+   Consult the [Icon Gallery](../../doc/guides/icons.md) for default icons.
  */
 export function Badge(props: BadgeProps): JSX.Element {
   const { value, title, onClick } = props;

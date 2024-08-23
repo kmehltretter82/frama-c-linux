@@ -56,7 +56,7 @@ export interface CatchProps {
   children: ReactNode;
 }
 
-interface CatchState {
+export interface CatchState {
   error?: unknown;
   info?: unknown;
 }
