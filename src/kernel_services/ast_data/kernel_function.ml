@@ -519,31 +519,36 @@ let find_syntactic_callsites kf =
   try CallSites.find table kf
   with Not_found -> []
 
-let local_definition kf vi =
+let local_definition_opt kf vi =
   let locals = get_locals kf in
-  if not vi.vdefined ||
-     not (List.exists (fun vi' -> Cil_datatype.Varinfo.equal vi vi') locals)
-  then
-    Kernel.fatal
-      "%a is not a defined local variable of %a"
+  if not vi.vdefined || not (List.exists (Cil_datatype.Varinfo.equal vi) locals)
+  then None
+  else
+    try
+      List.find (fun s ->
+          match s.skind with
+          | Instr (Local_init (vi', _, _)) -> Cil_datatype.Varinfo.equal vi vi'
+          | _ -> false
+        ) (get_definition kf).sallstmts
+      |> Option.some
+    with Not_found -> assert false (* cannot occur on well-formed AST. *)
+
+let local_definition kf vi =
+  match local_definition_opt kf vi with
+  | None ->
+    Kernel.fatal "%a is not a defined local variable of %a"
       Cil_datatype.Varinfo.pretty vi pretty kf;
-  try
-    List.find
-      (fun s ->
-         match s.skind with
-         | Instr (Local_init (vi', _, _)) -> Cil_datatype.Varinfo.equal vi vi'
-         | _ -> false)
-      (get_definition kf).sallstmts
-  with Not_found -> assert false (* cannot occur on well-formed AST. *)
+  | Some sdef -> sdef
 
 let var_is_in_scope stmt vi =
   let blocks = find_all_enclosing_blocks stmt in
+  let sdef = local_definition_opt (find_englobing_kf stmt) vi in
   let is_def_above b =
-    let sdef = local_definition (find_englobing_kf stmt) vi in
-    (* If sdef == stmt, vi is in the scope. *)
-    Cil_datatype.Stmt.equal sdef stmt ||
+    (* sdef cannot be None in this context because vi is defined and in b locals
+       (so in kf locals as well) when we call is_def_above. *)
+    let sdef = Option.get sdef in
     match b.bstmts with
-    | [] -> assert false (* at least contains stmt *)
+    | [] -> assert false (* b should at least contains stmt. *)
     | sfst :: _ ->
       (* if sfst is sdef (or an unspecified sequence containing sdef), it
          is necessarily above stmt. Otherwise, we can rely on is_between to
@@ -551,10 +556,11 @@ let var_is_in_scope stmt vi =
       Cil_datatype.Stmt.equal sfst (find_enclosing_stmt_in_block b sdef) ||
       is_between b sfst sdef stmt
   in
-  List.exists
-    (fun b ->
-       List.exists (Cil_datatype.Varinfo.equal vi) b.blocals &&
-       (not vi.vdefined || is_def_above b)
+  (* If sdef is equal to stmt, vi is not in the scope yet. *)
+  Option.equal Cil_datatype.Stmt.equal sdef (Some stmt) ||
+  List.exists (fun b ->
+      List.exists (Cil_datatype.Varinfo.equal vi) b.blocals &&
+      (not vi.vdefined || is_def_above b)
     )
     blocks
 
