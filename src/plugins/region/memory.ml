@@ -185,9 +185,9 @@ let new_chunk (m: map) ?(size=0) ?ptr ?ptrby () =
     | None -> if size = 0 then Blob else Cell(size,None)
     | Some _ -> Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
   in let cpointed_by =
-    match ptrby with
-    | None -> []
-    | Some ptr -> [ptr]
+       match ptrby with
+       | None -> []
+       | Some ptr -> [ptr]
   in Ufind.make m.store { empty with clayout ; cpointed_by }
 
 let new_range (m: map) ?(fields=Fields.empty) ~size ~offset ~length data : node =
