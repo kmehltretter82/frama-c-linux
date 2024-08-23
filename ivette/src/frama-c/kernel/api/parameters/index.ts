@@ -4262,6 +4262,42 @@ const evaWideningDelay_internal: State.State<number> = {
 /** State of parameter -eva-widening-delay */
 export const evaWideningDelay: State.State<number> = evaWideningDelay_internal;
 
+/** Signal for state [`evaForcePrintSummary`](#evaforceprintsummary)  */
+export const signalEvaForcePrintSummary: Server.Signal = {
+  name: 'kernel.parameters.signalEvaForcePrintSummary',
+};
+
+const getEvaForcePrintSummary_internal: Server.GetRequest<null,boolean> = {
+  kind: Server.RqKind.GET,
+  name: 'kernel.parameters.getEvaForcePrintSummary',
+  input: Json.jNull,
+  output: Json.jBoolean,
+  fallback: false,
+  signals: [],
+};
+/** Getter for state [`evaForcePrintSummary`](#evaforceprintsummary)  */
+export const getEvaForcePrintSummary: Server.GetRequest<null,boolean>= getEvaForcePrintSummary_internal;
+
+const setEvaForcePrintSummary_internal: Server.SetRequest<boolean,null> = {
+  kind: Server.RqKind.SET,
+  name: 'kernel.parameters.setEvaForcePrintSummary',
+  input: Json.jBoolean,
+  output: Json.jNull,
+  fallback: null,
+  signals: [],
+};
+/** Setter for state [`evaForcePrintSummary`](#evaforceprintsummary)  */
+export const setEvaForcePrintSummary: Server.SetRequest<boolean,null>= setEvaForcePrintSummary_internal;
+
+const evaForcePrintSummary_internal: State.State<boolean> = {
+  name: 'kernel.parameters.evaForcePrintSummary',
+  signal: signalEvaForcePrintSummary,
+  getter: getEvaForcePrintSummary,
+  setter: setEvaForcePrintSummary,
+};
+/** State of parameter -eva-force-print-summary */
+export const evaForcePrintSummary: State.State<boolean> = evaForcePrintSummary_internal;
+
 /** Signal for state [`evaStatisticsFile`](#evastatisticsfile)  */
 export const signalEvaStatisticsFile: Server.Signal = {
   name: 'kernel.parameters.signalEvaStatisticsFile',

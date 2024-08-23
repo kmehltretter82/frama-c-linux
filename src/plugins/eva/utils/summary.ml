@@ -425,5 +425,8 @@ let print_summary fmt =
 
 let print_summary () =
   let dkey = Self.dkey_summary in
+  let level =
+    if Parameters.ForcePrintSummary.get () then 0 else 1
+  in
   let header fmt = Format.fprintf fmt " ====== ANALYSIS SUMMARY ======" in
-  Self.printf ~header ~dkey ~level:1 "  @[<v>%t@]" print_summary
+  Self.printf ~header ~dkey ~level "  @[<v>%t@]" print_summary
