@@ -764,6 +764,7 @@ and type_bound_variables ~profile (t1, lv, t2) =
   ignore(type_term ~use_gmp_opt:false ~ctx ~profile t2)
 
 and type_predicate ~profile p =
+  Options.feedback ~dkey ~level:3 "typing predicate: %a" Printer.pp_predicate p;
   let
     do_both f g = (try f() with e -> try g(); raise e with | _ -> raise e); g()
   in
@@ -774,11 +775,11 @@ and type_predicate ~profile p =
   | Pfalse | Ptrue -> ()
   | Papp(li, _, args) ->
     begin
+      List.iter
+        (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
+        args;
       match li.l_body with
       | LBpred p ->
-        List.iter
-          (fun x -> ignore (type_term ~use_gmp_opt: true ~profile x))
-          args;
         let new_profile =
           Profile.make
             li.l_profile
