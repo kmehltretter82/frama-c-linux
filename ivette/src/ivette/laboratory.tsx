@@ -48,10 +48,10 @@ import * as State from 'ivette/state';
 type tabKey = string;
 type viewId = string;
 
-interface Split { H: number, V: number }
-interface Layout { A: compId, B: compId, C: compId, D: compId }
+export interface Split { H: number, V: number }
+export interface Layout { A: compId, B: compId, C: compId, D: compId }
 
-interface TabViewState {
+export interface TabViewState {
   key: tabKey, /* viewId@custom for custom, or viewId */
   viewId: viewId,
   custom: number, /* 0: normal, n>0: custom */
@@ -59,7 +59,7 @@ interface TabViewState {
   stack: Layout[], /* current at index 0 */
 }
 
-interface LabViewState {
+export interface LabViewState {
   split: Split;
   stack: Layout[];
   panels: Set<compId>;
@@ -889,7 +889,7 @@ function LayoutMenu(): JSX.Element | null {
 /* --- Notification Stack                                                 --- */
 /* -------------------------------------------------------------------------- */
 
-type NotificationKind = 'message' | 'warning' | 'error';
+export type NotificationKind = 'message' | 'warning' | 'error';
 
 export interface Notification {
   kind: NotificationKind;
@@ -1030,7 +1030,7 @@ export function LabView(): JSX.Element {
 /* --- View Sidebar Section                                               --- */
 /* -------------------------------------------------------------------------- */
 
-interface ViewItemProps {
+export interface ViewItemProps {
   view: Ivette.ViewLayoutProps;
   selected: boolean;
   displayed: boolean;
@@ -1111,7 +1111,7 @@ function ViewSection(): JSX.Element {
 /* --- Component Sidebar Item                                             --- */
 /* -------------------------------------------------------------------------- */
 
-interface ComponentItemProps {
+export interface ComponentItemProps {
   comp: Ivette.ComponentProps;
   position: LayoutPosition | undefined;
   selected: boolean;
@@ -1165,7 +1165,7 @@ export function ComponentItem(props: ComponentItemProps): JSX.Element {
 /* --- Group Sidebar Section                                              --- */
 /* -------------------------------------------------------------------------- */
 
-interface ID { id: string }
+export interface ID { id: string }
 
 export const inGroup = (g: ID) => (e: ID) => e.id.startsWith(g.id + '.');
 export const groupOf = (e: ID) => (g: ID) => e.id.startsWith(g.id + '.');

@@ -705,8 +705,8 @@ function _signal(id: string): SignalHandler {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function onSignal(s: Signal, callback: () => void): void {
-  _signal(s.name).on(callback);
+export function onSignal(id: Signal, callback: () => void): void {
+  _signal(id.name).on(callback);
 }
 
 /**
@@ -717,8 +717,8 @@ export function onSignal(s: Signal, callback: () => void): void {
  *  @param {string} id The signal identifier that was listen to.
  *  @param {function} callback The callback to remove.
  */
-export function offSignal(s: Signal, callback: () => void): void {
-  _signal(s.name).off(callback);
+export function offSignal(id: Signal, callback: () => void): void {
+  _signal(id.name).off(callback);
 }
 
 /**
@@ -726,10 +726,10 @@ export function offSignal(s: Signal, callback: () => void): void {
  *  @param {string} id The signal identifier to listen to.
  *  @param {function} callback The callback to call upon signal.
  */
-export function useSignal(s: Signal, callback: () => void): void {
+export function useSignal(id: Signal, callback: () => void): void {
   React.useEffect(() => {
-    onSignal(s, callback);
-    return () => { offSignal(s, callback); };
+    onSignal(id, callback);
+    return () => { offSignal(id, callback); };
   });
 }
 

@@ -51,7 +51,7 @@ export function byOffset(a : Offset, b : Offset): number
   return (a.offset - b.offset);
 }
 
-type View = CM.EditorView | null;
+export type View = CM.EditorView | null;
 
 const clipRange = (a: number, value: number, b: number): number => {
   if (value < a) return a;

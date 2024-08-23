@@ -91,8 +91,8 @@ switch (process.platform) {
 }
 
 /**
-   @summary System platform.
-   @description
+   System platform.
+
    Similar to `process.platform`, but fall into fewer categories:
    - `'macos'` for Mac OSX,
    - `'windows'` for Windows (32 or 64)
@@ -187,48 +187,53 @@ export function getArguments(): string[] { return COMMAND_ARGV; }
 // --------------------------------------------------------------------------
 
 /**
-   @summary Join file paths.
+   Join file paths.
+
+   Same as [Node `path.join`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_join_paths)
+
    @param {string} [...paths] - a sequence of path segments
    @return {string} the joined filepath
-   @description
-   Same as [Node `path.join`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_join_paths)
 */
 export const { join } = path;
 
 /**
-   @summary Absolute (joined) file paths.
+   Absolute (joined) file paths.
+
+   Same as [Node `path.resolve`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_resolve_paths)
+
    @param {string} [...paths] - a sequence of path segments
    @return {string} the corresponding absolute path
-   @description
-   Same as [Node `path.resolve`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_resolve_paths)
 */
 export const { resolve } = path;
 
 /**
-   @summary Dirname of path.
+   Dirname of path.
+
+   Same as [Node `path.dirname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_dirname_path)
+
    @param {string} path - a file path
    @return {string} the dirname of the path
-   @description
-   Same as [Node `path.dirname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_dirname_path)
 */
 export const { dirname } = path;
 
 /**
-   @summary Basename of path.
+   Basename of path.
+
+   Same as [Node `path.basename`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_basename_path_ext)
+
    @param {string} path - a file path
    @param {string} [ext] - file extension to remove
    @return {string} the basename of the path
-   @description
-   Same as [Node `path.basename`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_basename_path_ext)
 */
 export const { basename } = path;
 
 /**
-   @summary File extension of path.
-   @param {string} path - a file path
-   @return {string} the file extension of the path
-   @description
+   File extension of path.
+
    Same as [Node `path.extname`](https://nodejs.org/dist/latest-v12.x/docs/api/path.html#path_path_extname_path)
+
+   @return {string} the file extension of the path
+   @param {string} path - a file path
 */
 export const { extname } = path;
 
@@ -327,10 +332,11 @@ export async function writeFile(path: string, content: string): Promise<void> {
 
 /**
    Copy file to a new path.
-   @param srcPath - the source file path
-   @param tgtPath - the target file path
 
    Promisified `fs.copyFile`.
+
+   @param srcPath - the source file path
+   @param tgtPath - the target file path
  */
 export async function copyFile(srcPath: string, tgtPath: string): Promise<void> {
   return fs.promises.copyFile(srcPath, tgtPath);
@@ -342,12 +348,12 @@ export async function copyFile(srcPath: string, tgtPath: string): Promise<void> 
 
 /**
    Reads a directory.
-   @returns directory contents (local names)
 
    Promisified `fs.readdir`.
-
    Uses `utf-8` encoding to obtain (relative) file names instead of byte buffers.
    On MacOS, `.DS_Store` entries are filtered out.
+
+   @returns directory contents (local names)
 */
 export async function readDir(path: string): Promise<string[]> {
   const filterDir = (f: string): boolean => f !== '.DS_Store';
@@ -367,9 +373,7 @@ const CREATE_DIR_OPTIONS: fs.MakeDirectoryOptions = {
 /**
    Creates a new directory. Defaults permission is recursive `0o777`.
 
-   Promisified
-   [Node `fs.mkdir`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_mkdir_path_options_callback).
-
+   Promisified `fs.mkdir`.
 */
 export function mkDir(
   path: string,
@@ -389,8 +393,7 @@ export function mkDir(
 /**
    Remove a file.
 
-   Promisified
-   [Node `fs.unlink`](https://nodejs.org/dist/latest-v12.x/docs/api/fs.html#fs_fs_unlink_path_callback)
+   Promisified `fs.unlink`.
 */
 export function remove(path: string): Promise<void> {
   return new Promise((result, reject) => {

@@ -96,7 +96,6 @@
   "include": [
     "src/**/*",
     "src/**/*.json",
-    "api/**/*",
     "tests/**/*"
   ],
   "exclude": [
@@ -120,7 +119,8 @@
       "Other"
     ],
     "hideGenerator": true,
-    "includes": "src/dome/doc/guides",
+    "highlightLanguages": [ "make", "ts", "tsx" ],
+    "projectDocuments": ["src/dome/doc/guides/*.md"],
     "customCss": "src/dome/doc/gallery.css",
     "readme": "none"
   },
