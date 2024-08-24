@@ -16,3 +16,21 @@ void f(int s) {
 int main() {
   f(2);
 }
+
+/*@
+
+axiomatic g {
+  logic ℤ g(int c)
+    reads c;
+}
+
+@*/
+
+/*@ ensures g(t) == 0; */
+int h(const int t) {
+  return 0;
+}
+
+int i() {
+  h(1);
+}
