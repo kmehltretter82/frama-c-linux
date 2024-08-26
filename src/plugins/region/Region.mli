@@ -52,9 +52,9 @@ val pp_region : Format.formatter -> region -> unit
 
 (* API ACCESS *)
 type acs = {
-    acs_read  : typ list;
-    acs_write : typ list;
-    acs_shift : typ list;
+  acs_read  : typ list;
+  acs_write : typ list;
+  acs_shift : typ list;
 }
 val empty_acs : acs
 val accesses : region -> acs

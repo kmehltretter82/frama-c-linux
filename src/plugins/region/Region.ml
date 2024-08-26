@@ -68,9 +68,9 @@ let pp_region fmt region : unit = Memory.pp_region fmt region
 
 
 type acs = {
-    acs_read  : typ list;
-    acs_write : typ list;
-    acs_shift : typ list;
+  acs_read  : typ list;
+  acs_write : typ list;
+  acs_shift : typ list;
 }
 let empty_acs = {
   acs_read  = [];
