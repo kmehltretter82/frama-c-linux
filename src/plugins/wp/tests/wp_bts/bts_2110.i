@@ -1,5 +1,5 @@
 /* run.config
-   CMD: @frama-c@ -wp -wp-msg-key shell,cluster,print-generated -wp-prover why3 -wp-gen -wp-share @PTEST_SHARE_DIR@ -wp-warn-key "pedantic-assigns=inactive"
+   CMD: @frama-c@ -wp -wp-msg-key shell,print-generated -wp-prover why3 -wp-gen -wp-share @PTEST_SHARE_DIR@ -wp-warn-key "pedantic-assigns=inactive"
    OPT:
 */
 

@@ -95,7 +95,6 @@ module MemDebug = MemDebug
 module MemEmpty = MemEmpty
 module MemLoader = MemLoader
 module MemMemory = MemMemory
-module MemRegion = MemRegion
 module MemTyped = MemTyped
 module MemVal = MemVal
 module MemVar = MemVar
@@ -123,12 +122,7 @@ module AssignsCompleteness = AssignsCompleteness
 
 (** {2 Region Analysis} *)
 
-module Region = Region
 module Layout = Layout
-module RegionAccess = RegionAccess
-module RegionAnalysis = RegionAnalysis
-module RegionAnnot = RegionAnnot
-module RegionDump = RegionDump
 
 (** {2 Compilers} *)
 

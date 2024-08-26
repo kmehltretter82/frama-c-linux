@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Region | Typed of MemTyped.pointer | Eva
+type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer | Eva
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -64,7 +64,6 @@ let descr_mtyped d = function
   | MemTyped.Fits -> ()
 
 let descr_mheap d = function
-  | Region -> main d "region"
   | ZeroAlias -> main d "zeroalias"
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
@@ -218,7 +217,6 @@ struct
   module A = LogicAssigns.Make(M)(L)
 end
 
-module Comp_Region = MakeCompiler(Register(MemVar.Static)(MemRegion))
 module Comp_MemZeroAlias = MakeCompiler(MemZeroAlias)
 module Comp_Hoare_Raw = MakeCompiler(Model_Hoare_Raw)
 module Comp_Hoare_Ref = MakeCompiler(Model_Hoare_Ref)
@@ -232,7 +230,6 @@ module Comp_MemVal = MakeCompiler(MemVal)
 let compiler mheap mvar : (module Sigs.Compiler) =
   match mheap , mvar with
   | ZeroAlias , _     -> (module Comp_MemZeroAlias)
-  | Region , _        -> (module Comp_Region)
   | _    ,   Caveat   -> (module Comp_Caveat)
   | Hoare , (Raw|Var) -> (module Comp_Hoare_Raw)
   | Hoare ,   Ref     -> (module Comp_Hoare_Ref)
@@ -248,7 +245,6 @@ let compiler mheap mvar : (module Sigs.Compiler) =
 let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
-  | Region -> MemRegion.configure ()
   | Eva -> MemVal.configure ()
   | Typed p ->
     let rollback_memtyped = MemTyped.configure () in
@@ -329,7 +325,6 @@ let split ~warning (m:string) : string list =
 
 let update_config ~warning m s = function
   | "ZEROALIAS" -> { s with mheap = ZeroAlias }
-  | "REGION" -> { s with mheap = Region }
   | "HOARE" -> { s with mheap = Hoare }
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }

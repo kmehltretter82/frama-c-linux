@@ -64,16 +64,6 @@ module Literals : Parameter_sig.Bool
 module Volatile : Parameter_sig.Bool
 module WeakIntModel : Parameter_sig.Bool
 
-module Region: Parameter_sig.Bool
-module Region_rw: Parameter_sig.Bool
-module Region_pack: Parameter_sig.Bool
-module Region_flat: Parameter_sig.Bool
-module Region_annot: Parameter_sig.Bool
-module Region_inline: Parameter_sig.Bool
-module Region_fixpoint: Parameter_sig.Bool
-module Region_cluster: Parameter_sig.Bool
-module Region_output_dot : Parameter_sig.Filepath
-
 (** {2 Computation Strategies} *)
 
 module Init: Parameter_sig.Bool

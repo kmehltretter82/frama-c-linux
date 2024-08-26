@@ -261,25 +261,4 @@ end
 (** {2 Options} *)
 (* -------------------------------------------------------------------------- *)
 
-(** Read-Write access *)
-module RW :
-sig
-  val default : unit -> bool
-  val merge : bool -> bool -> bool
-end
-
-(** Flatten arrays *)
-module Flat :
-sig
-  val default : unit -> bool
-  val merge : bool -> bool -> bool
-end
-
-(** Pack fields *)
-module Pack :
-sig
-  val default : unit -> bool
-  val merge : bool -> bool -> bool
-end
-
 (* -------------------------------------------------------------------------- *)
