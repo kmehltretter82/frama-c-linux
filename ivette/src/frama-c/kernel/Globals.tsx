@@ -82,8 +82,8 @@ function resetMode(enabled: boolean): void {
 // --- Menu item
 // --------------------------------------------------------------------------
 
-type setting = [boolean, () => void]
-function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
+export type setting = [boolean, () => void]
+export function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
   : Dome.PopupMenuItem {
   return {
     label: label,
