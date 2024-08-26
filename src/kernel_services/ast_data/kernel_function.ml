@@ -21,15 +21,15 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
 (* ************************************************************************* *)
 (** {2 Getters} *)
 (* ************************************************************************* *)
 
-let dummy () =
-  { fundec = Definition (Cil.emptyFunction "@dummy@", Location.unknown);
-    spec = List.hd Funspec.reprs }
+let dummy () = {
+  fundec = Definition (Cil.emptyFunction "@dummy@", Cil_datatype.Location.unknown);
+  spec = List.hd Cil_datatype.Funspec.reprs
+}
 
 let get_vi kf = Ast_info.Function.get_vi kf.fundec
 let get_id kf = (get_vi kf).vid
@@ -109,7 +109,11 @@ let find_defining_kf vi =
 
 module Kf =
   State_builder.Option_ref
-    (Datatype.Int.Hashtbl.Make(Datatype.Triple(Kf)(Stmt)(Datatype.List(Block))))
+    (Datatype.Int.Hashtbl.Make
+       (Datatype.Triple
+          (Cil_datatype.Kf)
+          (Cil_datatype.Stmt)
+          (Datatype.List(Cil_datatype.Block))))
     (struct
       let name = "Kernel_function.Kf"
       let dependencies = [ Ast.self ]
@@ -192,12 +196,12 @@ let blocks_closed_by_edge_aux s1 s2 =
     Kernel.fatal "Unknown statement sid:%d or sid:%d" s1.sid s2.sid
 
 let blocks_closed_by_edge s1 s2 =
-  if not (List.exists (Stmt.equal s2) s1.succs) then
+  if not (List.exists (Cil_datatype.Stmt.equal s2) s1.succs) then
     raise (Invalid_argument "Kernel_function.blocks_closed_by_edge");
   blocks_closed_by_edge_aux s1 s2
 
 let blocks_opened_by_edge s1 s2 =
-  if not (List.exists (Stmt.equal s2) s1.succs) then
+  if not (List.exists (Cil_datatype.Stmt.equal s2) s1.succs) then
     raise (Invalid_argument "Kernel_function.blocks_opened_by_edge");
   blocks_closed_by_edge_aux s2 s1
 
@@ -453,7 +457,7 @@ let get_called fct = match fct.enode with
 (** {2 CallSites} *)
 (* ************************************************************************* *)
 
-module CallSite = Datatype.Pair(Cil_datatype.Kf)(Stmt)
+module CallSite = Datatype.Pair(Cil_datatype.Kf)(Cil_datatype.Stmt)
 module CallSites = Cil_datatype.Kf.Hashtbl
 module KfCallers =
   State_builder.Option_ref(CallSites.Make(Datatype.List(CallSite)))
@@ -576,14 +580,14 @@ let has_noreturn_attr kf =
 let is_first_stmt kf stmt =
   try
     let first = find_first_stmt kf in
-    Stmt.equal stmt first
+    Cil_datatype.Stmt.equal stmt first
   with No_Statement ->
     false
 
 let is_return_stmt kf stmt =
   try
     let return = find_return kf in
-    Stmt.equal stmt return
+    Cil_datatype.Stmt.equal stmt return
   with No_Statement ->
     false
 
