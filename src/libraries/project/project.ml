@@ -151,7 +151,7 @@ module States_operations = struct
   let unserialize ?selection dst loaded_states =
     let pp_err fmt n msg_sing msg_plural =
       if n > 0 then begin
-        warning ~once:true
+        warning ~once:true ~wkey
           fmt
           n
           (if n = 1 then "" else "s")
