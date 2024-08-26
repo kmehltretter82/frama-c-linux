@@ -66,4 +66,21 @@ let pp_region fmt region : unit = Memory.pp_region fmt region
 
 
 
-let accesses (map:map) (region:region) : Access.acs list = []
+
+type acs = {
+    acs_read  : typ list;
+    acs_write : typ list;
+    acs_shift : typ list;
+}
+let empty_acs = {
+  acs_read  = [];
+  acs_write = [];
+  acs_shift = [];
+}
+
+let accesses (region:region) : acs =
+  {
+    acs_read  = List.map Access.typeof region.Memory.reads ;
+    acs_write = List.map Access.typeof region.Memory.writes ;
+    acs_shift = List.map Access.typeof region.Memory.shifts ;
+  }

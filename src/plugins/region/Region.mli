@@ -26,24 +26,35 @@
 open Cil_types
 
 
+(* General type *)
 type region
 module R : Qed.Collection.S with type t = region
-
 type map
-val get_map : kernel_function -> map
 
+(* API GETTERS *)
+val get_map : kernel_function -> map
 
 val cvar : map -> varinfo -> region
 val field : map -> region -> fieldinfo -> region
 val index : map -> region -> typ -> region
 
-
+(* API POINTERS *)
 val points_to : map -> region -> region option
 val pointed_by : map -> region -> region list
 
-
+(* API ITERATOR *)
 val iter : map -> (region -> unit) -> unit
 
+
+(* API PRINTER *)
 val pp_region : Format.formatter -> region -> unit
 
-val accesses : map -> region -> Access.acs list
+
+(* API ACCESS *)
+type acs = {
+    acs_read  : typ list;
+    acs_write : typ list;
+    acs_shift : typ list;
+}
+val empty_acs : acs
+val accesses : region -> acs
