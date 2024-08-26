@@ -24,8 +24,8 @@
 Plugin WP <next-release>
 ###############################################################################
 
-* WP          [2024-08-23] Remove wp_region
-* WP          [2024-07-02] Fixed parsing of decimal literals
+-! WP         [2024-08-23] Remove wp_region
+-* WP         [2024-07-02] Fixed parsing of decimal literals
 
 ###############################################################################
 Plugin WP 29.0 (Copper)
