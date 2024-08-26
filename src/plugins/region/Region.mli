@@ -22,13 +22,12 @@
 
 (** Interface for the Region plug-in. *)
 
-open Cil_types
 
+open Cil_types
 
 
 type region
 module R : Qed.Collection.S with type t = region
-
 
 type map
 val get_map : kernel_function -> map
@@ -44,3 +43,7 @@ val pointed_by : map -> region -> region list
 
 
 val iter : map -> (region -> unit) -> unit
+
+val pp_region : Format.formatter -> region -> unit
+
+val accesses : map -> region -> Access.acs list

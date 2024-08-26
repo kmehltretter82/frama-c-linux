@@ -60,3 +60,10 @@ let pointed_by (map:map) (region:region) : region list =
 
 let iter (map:map) (f:region -> unit) : unit =
   Memory.iter map.map f
+
+
+let pp_region fmt region : unit = Memory.pp_region fmt region
+
+
+
+let accesses (map:map) (region:region) : Access.acs list = []
