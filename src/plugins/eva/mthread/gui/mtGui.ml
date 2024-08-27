@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Mthread__MtIds
 open Mthread__MtThread
 
 type ui = Design.main_window_extension_points
@@ -48,7 +47,8 @@ let make_thread_menu_entry ui (menu: GMenu.menu) th =
   in
   ignore (th_item#connect#activate ~callback);
   let box = GPack.hbox ~packing:th_item#add () in
-  ignore (GMisc.label ~text:th.th_id.id_name ~packing:box#pack ());
+  let text = Thread.label th.th_eva_thread in
+  ignore (GMisc.label ~text ~packing:box#pack ());
   th_item
 
 (* Create the menu entries for Mthread. *)

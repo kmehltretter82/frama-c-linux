@@ -94,8 +94,8 @@
   (name mthread_gui)
   (optional)
   (public_name frama-c-eva.mthread.gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Mthread :standard )
-  (libraries eva eva.mthread frama-c.kernel frama-c.gui)
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private -open Mthread :standard )
+  (libraries eva mthread frama-c.kernel frama-c.gui)
   (instrumentation (backend landmarks))))
 
 (plugin
