@@ -168,6 +168,24 @@ class visit_assembly =
                (fun x -> (to_id_term x, From (List.map to_id_from lv_from)))
                lv_out)
         in
+        let mk_initialized x =
+          let typ = Cil.typeOfTermLval x in
+          if Logic_utils.isLogicVoidType typ then None
+          else begin
+            let t = Logic_utils.mk_logic_AddrOf ~loc x typ in
+            let pred =
+              Logic_const.(
+                new_predicate
+                  (pinitialized ~loc (here_label,t)))
+            in
+            Some (Normal, pred)
+          end
+        in
+        let initialized () =
+          if Kernel.AsmContractsInitialized.get() then begin
+            List.filter_map mk_initialized lv_out
+          end else []
+        in
         let filter ca =
           match ca.annot_content with
           (* search for a statement contract that applies to all cases. *)
@@ -178,7 +196,8 @@ class visit_assembly =
         (match contracts with
          | [] ->
            let assigns = assigns () in
-           let bhv = Cil.mk_behavior ~assigns () in
+           let post_cond = initialized () in
+           let bhv = Cil.mk_behavior ~assigns ~post_cond () in
            let spec = Cil.empty_funspec () in
            spec.spec_behavior <- [ bhv ];
            let ca =
@@ -236,6 +255,7 @@ let transform file =
 let () =
   File.add_code_transformation_after_cleanup
     ~deps:[(module Kernel.AsmContractsGenerate);
+           (module Kernel.AsmContractsInitialized);
            (module Kernel.AsmContractsAutoValidate) ]
     category
     transform

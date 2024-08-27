@@ -1359,6 +1359,17 @@ module AsmContractsGenerate =
     end)
 
 let () = Parameter_customize.set_group normalisation
+module AsmContractsInitialized =
+  False
+    (struct
+      let option_name = "-asm-contracts-ensure-init"
+      let module_name = "AsmContractsInitialized"
+      let help = "when contracts for assembly code are generated, add \
+                  postconditions stating that the output are initialized."
+    end)
+
+
+let () = Parameter_customize.set_group normalisation
 module AsmContractsAutoValidate =
   False
     (struct
