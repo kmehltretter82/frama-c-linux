@@ -384,7 +384,7 @@ module Make
 
   let may_overflow = function
     | Shiftlt | Mult | MinusPP | MinusPI | PlusPI
-    | PlusA | Div | Mod | MinusA -> true
+    | PlusA | MinusA | Div -> true
     | _ -> false
 
   let truncate_bound overflow_kind bound bound_kind expr value =
