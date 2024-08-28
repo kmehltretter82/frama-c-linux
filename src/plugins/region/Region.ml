@@ -50,6 +50,7 @@ let field (map:map) (region:region) (field:fieldinfo) : region =
 
 let index (_:map) (_:region) (_:typ) : region = (* TODO *) raise Not_found
 
+(*
 let region_of_ptr_term (map:map) (ptr:term) : region =
   match ptr.term_node with
   (* same constructs as exp *)
@@ -83,7 +84,7 @@ let region_of_ptr_term (map:map) (ptr:term) : region =
   | Tcomprehension _  -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tcomprehension")
   | Trange _          -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Trange")
   | Tlet _            -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tlet")
-
+*)
 
 let points_to (map:map) (region:region) : region option =
   Option.map (Memory.region map.map) @@ Memory.cpointed map.map region.Memory.node

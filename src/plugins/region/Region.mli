@@ -38,7 +38,6 @@ val cvar : map -> varinfo -> region
 val field : map -> region -> fieldinfo -> region
 val index : map -> region -> typ -> region
 
-val region_of_ptr_term : map -> term -> region
 
 (* API POINTERS *)
 val points_to : map -> region -> region option
