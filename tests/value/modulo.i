@@ -9,13 +9,13 @@ void main2 ()
   A = (4 * i) % 4;
   B = (4 * i + 1) % 4;
   i = v; //@ assert ((i>=-100) && (i<=100)) ;
-  E = (3*i + 1) % 12; 
+  E = (3*i + 1) % 12;
   i = v; //@ assert ((i>=0) && (i<=100)) ;
-    
+
   C = (4 * i + 1) % 4;
-  D = (3*i + 1) % 12; 
-  F = (24*i + 5) % 12;    
-  G = (24*i + 5) % 13;    
+  D = (3*i + 1) % 12;
+  F = (24*i + 5) % 12;
+  G = (24*i + 5) % 13;
   H = i % 1000;
   I = (2 * i+1101) % 1000;
   J = (5 * i - 201) % 1000;
@@ -131,7 +131,7 @@ void extract_bits_modulo(void)
 //volatile int v;
 
 // Test extraction of modulo with 'positive' semantics (ie. not nearest
-// to zero in absolute value, which is the one '%' would have used). 
+// to zero in absolute value, which is the one '%' would have used).
 void pos_rem(void) {
   int n = v;
   //@ assert -1 <= n <= 255;
@@ -147,6 +147,18 @@ void pos_rem(void) {
   int l = (int)*(signed char*)&n; // Best rem is ([0..72] \cup {255})%255, we approximate by [-128..127]
 }
 
+/* No overflow alarms should be emitted on mod operations, even on addresses. */
+void address_modulo(void) {
+  int* ptr = v ? &A : &B;
+  unsigned int uaddr = (unsigned int) ptr;
+  int addr = (int) uaddr;
+  int i = v % 100;
+  int r = addr % 16;
+  r = addr % i;
+  r = uaddr % 16;
+  r = uaddr % i;
+}
+
 void main() {
   if (v) { pgcd1(a, b); }
   if (v) { pgcd2(a, b); }
@@ -157,4 +169,5 @@ void main() {
   shift_modulo();
   extract_bits_modulo();
   pos_rem();
+  address_modulo();
 }
