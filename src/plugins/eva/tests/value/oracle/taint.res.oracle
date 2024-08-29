@@ -22,9 +22,8 @@
 [eva] taint.c:35: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    tainted; t; u; x
+  default: Locations (data):
+             tainted; t; u; x
   Locations (control):
     w; buf[0..1]
   ==END OF DUMP==
@@ -36,63 +35,56 @@
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    \nothing
+  default: Locations (data):
+             \nothing
   Locations (control):
     \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    \nothing
+  default: Locations (data):
+             \nothing
   Locations (control):
     \nothing
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     \nothing
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     y
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
 [eva] taint.c:63: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -103,9 +95,8 @@
 [eva] taint.c:79: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x
+  default: Locations (data):
+             x
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -116,9 +107,8 @@
 [eva] taint.c:91: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    x; y; t
+  default: Locations (data):
+             x; y; t
   Locations (control):
     \nothing
   ==END OF DUMP==
@@ -144,9 +134,8 @@
 [eva] taint.c:110: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    t
+  default: Locations (data):
+             t
   Locations (control):
     x
   ==END OF DUMP==
@@ -157,9 +146,8 @@
 [eva] taint.c:130: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    t
+  default: Locations (data):
+             t
   Locations (control):
     x; y
   ==END OF DUMP==
@@ -173,9 +161,8 @@
 [eva] taint.c:35: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    tainted; t; u; x; t
+  default: Locations (data):
+             tainted; t; u; x; t
   Locations (control):
     t; u; w; x; y; buf[0..1]
   ==END OF DUMP==
@@ -197,9 +184,8 @@
 [eva] taint.c:165: 
   Frama_C_dump_each:
   # multi_taint:
-  default
-  Locations (data):
-    tainted; t; y
+  default: Locations (data):
+             tainted; t; y
   Locations (control):
     w
   ==END OF DUMP==

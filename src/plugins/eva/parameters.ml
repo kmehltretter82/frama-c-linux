@@ -276,7 +276,7 @@ module AutoTaint =
 let () = add_precision_dep AutoTaint.parameter
 
 let () = Parameter_customize.set_group domains
-module TaintGroups =
+module TaintSingleton =
   String_list
     (struct
       let option_name = "-eva-taint-groups"
@@ -285,7 +285,7 @@ module TaintGroups =
                   Per default, you will only have the label 'default'."
       let arg_name = "taint_groups"
     end)
-let () = add_precision_dep TaintGroups.parameter
+let () = add_precision_dep TaintSingleton.parameter
 
 let () = Parameter_customize.set_group domains
 module IgnoreSingletons =

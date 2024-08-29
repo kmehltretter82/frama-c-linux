@@ -24,20 +24,42 @@ open Cil_types
 open Cil_datatype
 open Locations
 
+let auto_taint_functions = [
+  "fgets";
+  "gets";
+  "fread";
+  "fread_unlocked";
+  "fgets_unlocked";
+  "getline";
+  "read"
+]
+
+let auto_taint_variadic_functions = [
+  "fscanf";
+  "scanf"
+]
+
+let auto_taint_res_functions = [
+  "getchar";
+  "getc"
+]
+(* functions flagged as commonly related to user-provided input,
+therefore targeted in the option for automatic tainting *)
+
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.IgnoreSingletons.get ())
 let taint_groups () =
-  let taint_group_list = Parameters.TaintGroups.get () in
+  let taint_group_list = Parameters.TaintSingleton.get () in
   match taint_group_list with
-  | [] -> ["default"] (* in case no taint group is precised we will only have default taint *)
-  | _ when List.mem "default" taint_group_list -> taint_group_list
+  | [] -> ["default"]
+    (* in case no taint group is precised we will only have default taint *)
   | _ ->
-    if auto_taint () then
-      "default" :: taint_group_list
+    if auto_taint () && not (List.mem "auto" taint_group_list) then
+      "auto" :: taint_group_list
     else
       taint_group_list
-(* in the other cases, if we have the option autotaint we will add a default taint
-   in which we will place the automatic tainting. *)
+(* in the other cases, if we have the option autotaint we will add an
+  "auto" taint in which we will place the automatic tainting. *)
 
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
@@ -169,30 +191,20 @@ module LatticeSingleTaint = struct
 
 end
 
-module Info = struct let module_name = "TaintDomain.LatticeMultiTaint.Map" end
-module StringMap = Datatype.Map (Map.Make (Datatype.String)) (Datatype.String) (Info)
+module StringMap = struct
+  include Datatype.String.Map
+
+  let find_or_empty key map =
+    try find key map
+    with Not_found -> LatticeSingleTaint.empty
+end
 
 type multi_taint_state = taint_state StringMap.t
 
 module LatticeMultiTaint = struct
-  let fold2 f t1 t2 base =
-    StringMap.fold (fun key state1 acc ->
-        try
-          let state2 = StringMap.find key t2 in
-          f state1 state2 acc
-        with
-        | Not_found ->
-          f state1 LatticeSingleTaint.empty acc) t1 base
-
   let pp_locs_only fmt t =
-    let pp_per_taint namespace taint =
-      begin
-        Format.pp_print_string fmt namespace;
-        Format.pp_print_newline fmt ();
-        LatticeSingleTaint.pp_locs_only fmt taint
-      end
-    in
-    StringMap.iter pp_per_taint t
+    Pretty_utils.pp_iter2 ~sep:"@ " ~between:": " StringMap.iter
+      Format.pp_print_string LatticeSingleTaint.pp_locs_only fmt t
 
   let pp_state fmt t =
     let pp_per_taint namespace taint =
@@ -215,11 +227,12 @@ module LatticeMultiTaint = struct
       let reprs = [
         taint_groups ()
         |> List.map (fun t -> (t, List.hd LatticeSingleTaint.reprs))
-        |> List.fold_left (fun m (k, v) -> StringMap.add k v m) StringMap.empty
+        |> List.fold_left (fun m (k, v)
+          -> StringMap.add k v m) StringMap.empty
       ]
 
       let compare t1 t2 =
-        fold2 (fun state1 state2 acc -> acc + LatticeSingleTaint.compare state1 state2) t1 t2 0
+        StringMap.compare LatticeSingleTaint.compare t1 t2
 
       let equal = Datatype.from_compare
 
@@ -229,7 +242,8 @@ module LatticeMultiTaint = struct
         else pp_locs_only fmt t
 
       let hash t =
-        StringMap.fold (fun _ state acc -> LatticeSingleTaint.hash state + acc) t 0
+        StringMap.fold (fun _ state acc -> LatticeSingleTaint.hash state + acc)
+          t 0
 
       let copy c = c
 
@@ -241,7 +255,8 @@ module LatticeMultiTaint = struct
     let taint_namespaces = taint_groups () in
     taint_namespaces
     |> List.map (fun t -> (t, LatticeSingleTaint.top))
-    |> List.fold_left (fun m (k, v) -> StringMap.add k v m) StringMap.empty
+    |> List.fold_left (fun m (k, v) ->
+      StringMap.add k v m) StringMap.empty
 
   let join t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
@@ -255,7 +270,8 @@ module LatticeMultiTaint = struct
     let widen_per_key _key maybe_state1 maybe_state2 =
       match maybe_state1, maybe_state2 with
       | state, None | None, state -> state
-      | Some state1, Some state2 -> Some (LatticeSingleTaint.widen kf stmt state1 state2)
+      | Some state1, Some state2 ->
+        Some (LatticeSingleTaint.widen kf stmt state1 state2)
     in
     StringMap.merge widen_per_key t1 t2
 
@@ -264,13 +280,21 @@ module LatticeMultiTaint = struct
       match maybe_state1, maybe_state2 with
       | state, None | None, state -> state
       | Some state1, Some state2 ->
-        match LatticeSingleTaint.narrow state1 state2 with
-        | `Value v -> Some v
+        let `Value v = LatticeSingleTaint.narrow state1 state2 in
+        Some v
     in
     `Value (StringMap.merge merge_per_key t1 t2)
 
   let is_included t1 t2 =
-    fold2 (fun state1 state2 acc -> LatticeSingleTaint.is_included state1 state2 && acc) t1 t2 true
+    let fold2 f t1 t2 base =
+      let f key state1 acc =
+        let state2 = StringMap.find_or_empty key t2 in
+        f state1 state2 acc
+      in
+      StringMap.fold f t1 base
+    in
+    fold2 (fun state1 state2 acc ->
+      LatticeSingleTaint.is_included state1 state2 && acc) t1 t2 true
 end
 
 module TransferSingleTaint = struct
@@ -315,9 +339,11 @@ module TransferSingleTaint = struct
       in
       lv_zone, lv_indirect_zone, singleton
 
-  let bottom_loc = Precise_locs.make_precise_loc Precise_locs.bottom_location_bits ~size:Int_Base.zero
+  let bottom_loc =
+    Precise_locs.make_precise_loc Precise_locs.bottom_location_bits
+      ~size:Int_Base.zero
 
-  let zone_simplified valuation to_loc exp =
+  let zone_simplified valuation to_loc =
     let improved_to_loc lval =
       let curr_exp = Eva_ast.Build.lval lval in
       match valuation.Abstract_domain.find curr_exp with
@@ -328,21 +354,22 @@ module TransferSingleTaint = struct
         | `Value v ->
           if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
     in
-    Eva_ast.zone_of_exp improved_to_loc exp
+    improved_to_loc
 
   (* Propagates data- and control-taints for an assignement [lval = exp]. *)
   let assign_aux lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
-    let exp_zone =
+    let to_loc_choosen =
       if ignore_singletons () then
-        zone_simplified v to_loc exp
+        zone_simplified v to_loc
         (* in case we treat solely single state,
            we can operate some simplifications on taint *)
       else
-        Eva_ast.zone_of_exp to_loc exp
+        to_loc
         (* [lv] becomes data-tainted if a memory location on which the value of
            [exp] depends on is data-tainted. *)
     in
+    let exp_zone = Eva_ast.zone_of_exp to_loc_choosen exp in
     let data_tainted = Zone.intersects state.locs_data exp_zone in
     (* [lv] becomes control-tainted if:
        - the current call depends on a tainted assume statements of a caller;
@@ -413,18 +440,11 @@ module TransferSingleTaint = struct
   let is_variadic_tainting kf =
     let vi = Kernel_function.get_vi kf in
     Cil.hasAttribute "fc_stdlib_generated" vi.vattr
-    && ( vi.vorig_name = "fscanf"
-         || vi.vorig_name = "scanf")
+    && List.mem vi.vorig_name auto_taint_variadic_functions
 
   let is_tainting kf =
     let vi = Kernel_function.get_vi kf in
-    ( vi.vorig_name = "fgets"
-      || vi.vorig_name = "gets"
-      || vi.vorig_name = "fread"
-      || vi.vorig_name = "fread_unlocked"
-      || vi.vorig_name = "fgets_unlocked"
-      || vi.vorig_name = "getline"
-      || vi.vorig_name = "read")
+    List.mem vi.vorig_name auto_taint_functions
 
   let arg_to_zone arg =
     match Eval.(value_assigned arg.avalue) with
@@ -450,8 +470,7 @@ module TransferSingleTaint = struct
 
   let is_tainting_res kf =
     let vi = Kernel_function.get_vi kf in
-    ( vi.vorig_name = "getchar"
-      || vi.vorig_name = "getc")
+    List.mem vi.vorig_name auto_taint_res_functions
 
   let zone_of_return ret =
     match ret with
@@ -460,16 +479,21 @@ module TransferSingleTaint = struct
       Locations.enumerate_valid_bits Write loc
     | _ -> Zone.bottom
 
-  let finalize_call _stmt call _recursion ~pre ~post ~is_default =
+  let finalize_call _stmt _call _recursion ~pre ~post =
     (* Recover assume statements from the [pre] abstract state: we assume the
        control-dependency does not extended beyond the function scope. *)
     let return_state =
       { post with assume_stmts = pre.assume_stmts;
                   dependent_call = pre.dependent_call; }
     in
-    if not (auto_taint () && is_default) then
-      `Value return_state
-    else if is_variadic_tainting call.Eval.kf then
+    `Value return_state
+
+  let finalize_call_auto_tainted _stmt call _recursion ~pre ~post =
+    let return_state =
+      { post with assume_stmts = pre.assume_stmts;
+                  dependent_call = pre.dependent_call; }
+    in
+    if is_variadic_tainting call.Eval.kf then
       begin
         match call.arguments with
         | { concrete = { node = Const (CString (String (_, CSString s))) } } :: rest
@@ -479,7 +503,8 @@ module TransferSingleTaint = struct
             let n = get_formats_number s in
             let vars_to_taint = get_n_first zones n in
             `Value { return_state
-                     with locs_data = List.fold_left Zone.join return_state.locs_data vars_to_taint }
+                     with locs_data = List.fold_left Zone.join 
+                      return_state.locs_data vars_to_taint }
           end
         | _ -> `Value return_state
       end
@@ -488,14 +513,16 @@ module TransferSingleTaint = struct
         try
           let to_taint = find_tainted_argument call.arguments in
           let zone = arg_to_zone to_taint in
-          `Value { return_state with locs_data = Zone.join return_state.locs_data zone }
+          `Value { return_state with locs_data =
+            Zone.join return_state.locs_data zone }
         with
         | Not_found -> `Bottom
       end
     else if is_tainting_res call.kf then
       begin
         let zone = zone_of_return call.return in
-        `Value { return_state with locs_data = Zone.join return_state.locs_data zone }
+        `Value { return_state with locs_data =
+          Zone.join return_state.locs_data zone }
       end
     else
       `Value return_state
@@ -527,32 +554,30 @@ module TransferMultiTaint = struct
 
   let start_call stmt call recursion valuation state_map =
     let start_call_per_taint state =
-      get_value @@ TransferSingleTaint.start_call stmt call recursion valuation state
+      get_value @@ TransferSingleTaint.start_call stmt call
+        recursion valuation state
     in
     `Value (StringMap.map start_call_per_taint state_map)
 
   let finalize_call stmt call recursion ~pre:pre_map ~post:post_map =
-    let finalize_call_per_taint key =
-      let pre =
-        try
-          StringMap.find key pre_map
-        with
-        | Not_found -> LatticeSingleTaint.empty
-      in
-      let post =
-        try
-          StringMap.find key post_map
-        with
-        | Not_found -> LatticeSingleTaint.empty
-      in
-      TransferSingleTaint.finalize_call stmt call recursion ~pre ~post ~is_default:(key = "default")
+    let finalize_call_per_taint key finalizer =
+      let pre = StringMap.find_or_empty key pre_map in
+      let post = StringMap.find_or_empty key post_map in
+      finalizer stmt call recursion ~pre ~post
     in
     let rec recreate_map keys result =
       match keys with
       | [] -> result
       | key :: rest ->
         begin
-          let state_after_call_or_bottom = finalize_call_per_taint key in
+          let finalizer =
+            if key = "auto" && auto_taint () then
+              TransferSingleTaint.finalize_call_auto_tainted
+            else 
+              TransferSingleTaint.finalize_call
+          in
+          let state_after_call_or_bottom = finalize_call_per_taint key
+            finalizer in
           match state_after_call_or_bottom with
           | `Bottom -> `Bottom
           | `Value state ->
@@ -627,10 +652,11 @@ module Domain = struct
       List.exists single_from_contents deps
     in
     match assign with
-    | None
-    | Some ((Eval.Frees _ | Allocates _), _) ->
+    | (_, taint) when taint = LatticeSingleTaint.empty ->
       state
-    | Some (Assigns (_, deps), pre_state) ->
+    | ((Eval.Frees _ | Allocates _), _) ->
+      state
+    | (Assigns (_, deps), pre_state) ->
       if exists_tainted_from pre_state deps
       then
         let loc_zone = Precise_locs.enumerate_valid_bits Write location in
@@ -643,11 +669,9 @@ module Domain = struct
     | None -> state_map
     | Some (loc_assign, taint_map) ->
       StringMap.mapi (fun key state ->
-          try
-            let current_taint = StringMap.find key taint_map in
-            logic_assign_per_taint (Some (loc_assign, current_taint)) location state
-          with
-          | Not_found -> logic_assign_per_taint None location state) state_map
+          let current_taint = StringMap.find_or_empty key taint_map in
+          logic_assign_per_taint (loc_assign, current_taint) location state)
+            state_map
 
   (* Scoping and Initialization. *)
 
@@ -757,7 +781,8 @@ let () =
     Ext_terms (terms_of_parsed_taint_namespaces context loc args kind)
   in
   Acsl_extension.register_behavior ~plugin:"eva" "taints" (typer `Post) false;
-  Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint" (typer `Pre) false
+  Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint"
+    (typer `Pre) false
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
@@ -829,7 +854,8 @@ module TaintLogic = struct
               StringMap.find key state_map
             with
             | Not_found -> LatticeSingleTaint.empty) arg.term_name in
-        let state = List.fold_left LatticeSingleTaint.join LatticeSingleTaint.empty states_list in
+        let state = List.fold_left LatticeSingleTaint.join
+          LatticeSingleTaint.empty states_list in
         evaluate_taint_predicate cvalue_env state arg
       | Ptrue -> True
       | Pfalse -> False
