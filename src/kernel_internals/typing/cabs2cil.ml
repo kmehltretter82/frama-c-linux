@@ -6298,7 +6298,7 @@ and doExp local_env
       end
     | Cabs.CALL({ expr_node = VARIABLE "__builtin_choose_expr"},
                 args, ghost_args)
-      when Cil.gccMode() ->
+      when Machine.gccMode() ->
       (* __builtin_choose_expr is supposed to choose at compile time between
          two expressions, hence we have to handle it separately from the
          normal calls. *)
