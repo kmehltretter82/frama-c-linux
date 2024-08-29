@@ -257,5 +257,6 @@ let () =
     ~deps:[(module Kernel.AsmContractsGenerate);
            (module Kernel.AsmContractsInitialized);
            (module Kernel.AsmContractsAutoValidate) ]
+    ~before:[Inline_stmt_contracts.category]
     category
     transform
