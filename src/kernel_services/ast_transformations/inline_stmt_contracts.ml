@@ -65,10 +65,12 @@ class inline_stmt_contract =
          | [] -> Cil.DoChildren
          | _ ->
            let nop = Cil.mkStmtOneInstr ~valid_sid:true (Skip loc) in
-           List.iter (Annotations.add_code_annot emitter nop) posts;
+           let kf = Option.get self#current_kf in
+           List.iter (Annotations.add_code_annot emitter ~kf nop) posts;
            let b = Cil.mkBlockNonScoping [s; nop] in
            let b = Cil.transient_block b in
            let res = Cil.mkStmt ~valid_sid:true (Block b) in
+           Ast.mark_as_changed ();
            File.must_recompute_cfg (Option.get self#current_func);
            ChangeTo res
         )
