@@ -1380,6 +1380,16 @@ module AsmContractsAutoValidate =
     end)
 
 let () = Parameter_customize.set_group normalisation
+module InlineStmtContracts =
+  False
+    (struct
+      let option_name = "-inline-stmt-contracts"
+      let module_name = "InlineStmtContracts"
+      let help = "transforms requires/ensures clauses of statement contracts \
+                  into plain assertions"
+    end)
+
+let () = Parameter_customize.set_group normalisation
 module RemoveExn =
   False
     (struct

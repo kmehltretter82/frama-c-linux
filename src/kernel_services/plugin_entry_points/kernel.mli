@@ -541,7 +541,10 @@ module AsmContractsInitialized: Parameter_sig.Bool
 (** Behavior of option "-asm-contracts-ensure-init" *)
 
 module AsmContractsAutoValidate: Parameter_sig.Bool
-(** Behavior of option "-asm-contracts-auto-validate." *)
+(** Behavior of option "-asm-contracts-auto-validate" *)
+
+module InlineStmtContracts: Parameter_sig.Bool
+(** Behavior of option "-inline-stmt-contracts" *)
 
 module RemoveExn: Parameter_sig.Bool
 (** Behavior of option "-remove-exn" *)
