@@ -124,5 +124,9 @@
     --status-valid-under-hyp: linear-gradient(to right, var(--status-valid) 49%, var(--status-unknown) 51%);
     --status-considered-valid: linear-gradient(to right, var(--status-valid) 49%, #73BBBB 51%);
     --status-invalid-under-hyp: linear-gradient(to right, var(--status-invalid) 49%, var(--status-unknown) 51%);
+
+    --graph-node-selected-color: #F4D03F;
+    --graph-node-color: #5DADE2;
+
   }
 }
