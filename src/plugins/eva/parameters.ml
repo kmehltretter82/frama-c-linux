@@ -1118,6 +1118,14 @@ module StatisticsFile =
       let help = "Dump some internal statistics about the analysis"
     end)
 
+let () = Parameter_customize.set_group messages
+module ForcePrintSummary =
+  False
+    (struct
+      let option_name = "-eva-force-print-summary"
+      let help = "Print the analysis summary even when '-eva-verbose 0' is set"
+    end)
+
 
 (* ------------------------------------------------------------------------- *)
 (* --- Interpreter mode                                                  --- *)
