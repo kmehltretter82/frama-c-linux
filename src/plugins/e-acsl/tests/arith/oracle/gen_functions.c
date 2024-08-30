@@ -20,24 +20,24 @@ int __gen_e_acsl_p1(int x, int y);
 /*@ predicate p2(integer x, integer y) = x + y > 0;
 
 */
-int __gen_e_acsl_p2(int x, int y);
+int __gen_e_acsl_p2_5(int x, int y);
 
 int __gen_e_acsl_p2_3(int x, __e_acsl_mpz_struct * y);
 
-int __gen_e_acsl_p2_5(int x, int y);
+int __gen_e_acsl_p2(int x, int y);
 
 /*@ logic integer f1(integer x, integer y) = x + y;
 
 */
-int __gen_e_acsl_f1_3(int x, int y);
-
-void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
-                       __e_acsl_mpz_struct * y);
+long __gen_e_acsl_f1(int x, int y);
 
 void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                        __e_acsl_mpz_struct * y);
 
-long __gen_e_acsl_f1(int x, int y);
+void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int x,
+                       __e_acsl_mpz_struct * y);
+
+int __gen_e_acsl_f1_3(int x, int y);
 
 /*@ logic char h_char(char c) = c;
  */
@@ -103,11 +103,11 @@ void __gen_e_acsl_over(__e_acsl_mpq_t *__retres_arg, double a, double b);
 /*@ logic integer signum(real x) = x > 0.? 1: (x < 0.? -1: 0);
 
 */
-int __gen_e_acsl_signum_5(double x);
+int __gen_e_acsl_signum_3(__e_acsl_mpq_t x);
 
 int __gen_e_acsl_signum(double x);
 
-int __gen_e_acsl_signum_3(__e_acsl_mpq_t x);
+int __gen_e_acsl_signum_5(double x);
 
 int z = 8;
 /*@ logic integer f3{L}(integer y) = \at(z + y,L);
@@ -578,9 +578,9 @@ int main(void)
 /*@ logic integer f4(integer x) = x == 0? 0: (f4(x - 1) < 1 << 99? 1: 2);
 
 */
-int __gen_e_acsl_f4(__e_acsl_mpz_struct * x);
-
 void __gen_e_acsl_f4_2(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x);
+
+int __gen_e_acsl_f4(__e_acsl_mpz_struct * x);
 
 void test_f4(void)
 {

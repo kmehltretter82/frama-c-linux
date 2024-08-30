@@ -20,26 +20,26 @@ int __gen_e_acsl_p1(__e_acsl_mpz_struct * x, __e_acsl_mpz_struct * y);
 /*@ predicate p2(integer x, integer y) = x + y > 0;
 
 */
-int __gen_e_acsl_p2(__e_acsl_mpz_struct * x, __e_acsl_mpz_struct * y);
+int __gen_e_acsl_p2_5(__e_acsl_mpz_struct * x, __e_acsl_mpz_struct * y);
 
 int __gen_e_acsl_p2_3(__e_acsl_mpz_struct * x, __e_acsl_mpz_struct * y);
 
-int __gen_e_acsl_p2_5(__e_acsl_mpz_struct * x, __e_acsl_mpz_struct * y);
+int __gen_e_acsl_p2(__e_acsl_mpz_struct * x, __e_acsl_mpz_struct * y);
 
 /*@ logic integer f1(integer x, integer y) = x + y;
 
 */
-void __gen_e_acsl_f1_3(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
+void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
+                     __e_acsl_mpz_struct * y);
+
+void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                        __e_acsl_mpz_struct * y);
 
 void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                        __e_acsl_mpz_struct * y);
 
-void __gen_e_acsl_f1_7(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
+void __gen_e_acsl_f1_3(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
                        __e_acsl_mpz_struct * y);
-
-void __gen_e_acsl_f1(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * x,
-                     __e_acsl_mpz_struct * y);
 
 /*@ logic char h_char(char c) = c;
 

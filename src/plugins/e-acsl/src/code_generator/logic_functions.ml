@@ -363,7 +363,7 @@ end = struct
         | Ok kf -> Kernel_function.get_vi kf :: acc
         | Error _ -> acc (* Exception has already been signaled *)
       in
-      List.rev @@ Signatures.fold_sorted (fun _ -> add_fundecl) params []
+      Signatures.fold_sorted (fun _ -> add_fundecl) params []
     with Not_found -> []
 end
 
