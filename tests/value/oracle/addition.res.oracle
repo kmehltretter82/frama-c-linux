@@ -136,8 +136,11 @@
   out of bounds read. assert \valid_read(*((int **)45));
 [eva] addition.i:87: Frama_C_show_each_1: [-10..15]
 [eva] addition.i:88: assertion got status valid.
+[eva:alarm] addition.i:98: Warning: 
+  signed overflow. assert p17 / (int)(-1) ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main
+[eva] addition.i:98: assertion 'Eva,signed_overflow' got final status invalid.
 [scope:rm_asserts] removing 9 assertion(s)
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
@@ -165,7 +168,7 @@
      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
   p15 ∈ {-1}
   p16 ∈ {2949122}
-  p17 ∈ {-2147483648; 0}
+  p17 ∈ {-2147483648}
   u1 ∈ {8}
   q1 ∈ {{ &p1 }}
   quo1 ∈ {3}
@@ -363,6 +366,8 @@
 [eva:alarm] addition.i:66: Warning: 
   out of bounds read. assert \valid_read(*((int **)45));
 [eva] addition.i:87: Frama_C_show_each_1: [-10..15]
+[eva:alarm] addition.i:98: Warning: 
+  signed overflow. assert p17 / (int)(-1) ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main
 [scope:rm_asserts] removing 9 assertion(s)
@@ -393,7 +398,7 @@
      {{ garbled mix of &{p1} (origin: Misaligned read {addition.i:61}) }}
   p15 ∈ {-1}
   p16 ∈ {2; 2949122; 3014658}
-  p17 ∈ {-2147483648; 0}
+  p17 ∈ {-2147483648}
   u1 ∈ {8}
   q1 ∈ {{ &p1 }}
   quo1 ∈ {3}

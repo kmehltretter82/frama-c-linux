@@ -541,15 +541,31 @@ module Make
     let truth = Value.assume_bounded Alarms.Upper_bound size_int value in
     reduce_by_truth ~alarm (index_expr, value) truth
 
-  let assume_valid_binop typ (e1, v1 as arg1) op (e2, v2 as arg2) =
+  (* The behavior of a%b is undefined if the quotient a/b overflows
+     (according to 6.5.5,§6 in the C standard). This is checked here. *)
+  let assume_valid_mod context typ (e1, v1) (e2, v2) =
+    let expr = Eva_ast.Build.div e1 e2 in
+    let value = Value.forward_binop context typ Div v1 v2 in
+    let check_overflow value =
+      let open Evaluated.Operators in
+      (* Check overflow alarms, but the reduced value of a/b is useless here. *)
+      let+ _v = handle_overflow ~may_overflow:true context expr typ value in
+      (* We could probably reduce [v1] or [v2] in some cases. *)
+      v1, v2
+    in
+    Bottom.fold ~bottom:(return (v1, v2)) check_overflow value
+
+  let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
     let open Evaluated.Operators in
     if Cil.isIntegralType typ then
       match op with
       | Div | Mod ->
         let truth = Value.assume_non_zero v2 in
         let alarm () = Alarms.Division_by_zero (Eva_ast.to_cil_exp e2) in
-        let+ v2 = reduce_by_truth ~alarm arg2 truth in
-        v1, v2
+        let* v2 = reduce_by_truth ~alarm arg2 truth in
+        if op = Mod
+        then assume_valid_mod context typ (e1, v1) (e2, v2)
+        else return (v1, v2)
       | Shiftrt ->
         let warn_negative = Kernel.RightShiftNegative.get () in
         reduce_shift ~warn_negative typ arg1 arg2
@@ -616,7 +632,7 @@ module Make
       let e1 = if Eva_ast.is_zero_ptr e1 then None else Some e1 in
       forward_comparison ~compute typ_e1 kind (e1, v1) arg2
     | None ->
-      let& v1, v2 = assume_valid_binop typ arg1 op arg2 in
+      let& v1, v2 = assume_valid_binop context typ arg1 op arg2 in
       Value.forward_binop context typ_e1 op v1 v2
 
   let forward_unop context unop (e, v as arg) =

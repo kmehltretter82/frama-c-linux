@@ -147,7 +147,9 @@ void pos_rem(void) {
   int l = (int)*(signed char*)&n; // Best rem is ([0..72] \cup {255})%255, we approximate by [-128..127]
 }
 
-/* No overflow alarms should be emitted on mod operations, even on addresses. */
+/* On modulo, overflow alarms should only be emitted on INT_MIN % -1, which
+   is not possible on addresses. However, garbled mixes on arithmetic operations
+   involving addresses currently lose all precision and lead to false alarms. */
 void address_modulo(void) {
   int* ptr = v ? &A : &B;
   unsigned int uaddr = (unsigned int) ptr;

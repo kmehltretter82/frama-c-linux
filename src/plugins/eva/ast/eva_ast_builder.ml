@@ -202,6 +202,7 @@ struct
     | _ -> invalid_arg "unsupported construction"
 
   let add = binop PlusA
+  let div = binop Div
   let eq = binop Eq
   let ne = binop Ne
 
