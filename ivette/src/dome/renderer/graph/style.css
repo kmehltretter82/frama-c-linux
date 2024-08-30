@@ -3,5 +3,5 @@
 /* -------------------------------------------------------------------------- */
 
 .dome-xDiagram {
-    background: #eee;
+    background: var(--background);
 }

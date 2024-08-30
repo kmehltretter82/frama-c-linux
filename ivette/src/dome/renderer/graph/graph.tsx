@@ -36,9 +36,10 @@ import ForceGraph3D, {
   ForceGraphProps as ForceGraphProps3D,
 } from 'react-force-graph-3d';
 
+/** Three is a dependency of 3d-force-graph */
 import {
   CSS2DRenderer, CSS2DObject
-} from "three/examples/jsm/renderers/CSS2DRenderer";
+} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import { Size } from 'react-virtualized';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -50,6 +51,7 @@ import * as Themes from 'dome/themes';
 /* --- Graph Specifications                                               --- */
 /* -------------------------------------------------------------------------- */
 
+/** Type layout */
 export type Layout = '2D' | '3D';
 
 export interface Node {
@@ -68,15 +70,15 @@ export interface Edge {
 /* --- Force Graph Components                                             --- */
 /* -------------------------------------------------------------------------- */
 
-export interface GNode {
+interface GNode {
   id: string;
   label?: string;
 }
-export interface GLink {
+interface GLink {
   source: string;
   target: string;
 }
-export interface GData {
+interface GData {
   nodes: GNode[];
   links: GLink[];
 }
@@ -92,7 +94,7 @@ interface IGProps2D extends IGProps {
   options?: IGraphOptions;
 }
 
-export interface IGProps3D extends IGProps {
+interface IGProps3D extends IGProps {
   options?: IGraphOptions3D;
 }
 
@@ -133,7 +135,7 @@ export interface IGraphOptions {
    * If displayMode = td, the graph will be display like a tree from top to down
    * Work only if the graph has no cycle
    */
-  displayMode?: "td";
+  displayMode?: 'td';
   /** Spacing between depths level */
   depthSpacing?: number;
   /** A string[][] ref to save the cycles */
@@ -277,8 +279,8 @@ function Graph2D(props: IGProps2D): JSX.Element {
       }}
       cooldownTime={50}
       nodeColor={(node) => (node.id === selected ?
-        style.getPropertyValue("--graph-node-selected-color") :
-        style.getPropertyValue("--graph-node-color"))
+        style.getPropertyValue('--graph-bg-color-selected') :
+        style.getPropertyValue('--graph-bg-color-orange'))
       }
     />
   );
@@ -333,7 +335,7 @@ function getForceGraphOptions(
   return ret;
 }
 
-export function Graph3D(props: IGProps3D): JSX.Element {
+function Graph3D(props: IGProps3D): JSX.Element {
   const { data, onSelection, selected, size,
            options = {}
         } = props;
@@ -348,8 +350,7 @@ export function Graph3D(props: IGProps3D): JSX.Element {
   const style = Themes.useStyle();
 
   const [ , flipHorizontalSpacingIsSet ] =
-    Dome.useFlipSettings("ivette.callgraph.horizontalSpacingIsSet", true);
-
+    Dome.useFlipSettings('ivette.callgraph.horizontalSpacingIsSet', true);
 
   React.useEffect(() => {
     if (fgRef3D.current && selected) {
@@ -413,8 +414,8 @@ export function Graph3D(props: IGProps3D): JSX.Element {
         node.fz = node.z;
       }}
       nodeColor={(node) => (node.id === selected ?
-        style.getPropertyValue("--graph-node-selected-color") :
-        style.getPropertyValue("--graph-node-color"))
+        style.getPropertyValue('--graph-bg-color-selected') :
+        style.getPropertyValue('--graph-bg-color-orange'))
       }
       {...graphOptions}
     />

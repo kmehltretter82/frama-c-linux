@@ -89,7 +89,10 @@ const edges: Edge[] = [
 
 function makeCluster(s: string | undefined): Cluster {
   const color = nodes.find(n => n.id === s)?.color;
-  return { id: 'BG', title: 'Background Cluster', color };
+  return {
+    id: 'BG',
+    title: 'Background Cluster',
+    color: color ?? "default" };
 }
 
 function DiagramSample(): JSX.Element {

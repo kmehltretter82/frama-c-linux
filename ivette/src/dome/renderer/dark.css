@@ -125,8 +125,58 @@
     --status-considered-valid: linear-gradient(to right, var(--status-valid) 49%, #73BBBB 51%);
     --status-invalid-under-hyp: linear-gradient(to right, var(--status-invalid) 49%, var(--status-unknown) 51%);
 
-    --graph-node-selected-color: #F4D03F;
-    --graph-node-color: #5DADE2;
+    /* node background colors */
+    --graph-bg-color-default: #4c596b;
+    --graph-bg-color-white: #fff;
+    --graph-bg-color-grey: #ccc;
+    --graph-bg-color-dark: #666;
+    --graph-bg-color-primary: dodgerblue;
+    --graph-bg-color-selected: deepskyblue;
+    --graph-bg-color-green: lime;
+    --graph-bg-color-orange: #ffa700;
+    --graph-bg-color-red: red;
+    --graph-bg-color-yellow: yellow;
+    --graph-bg-color-blue: cyan;
+    --graph-bg-color-pink: hotpink;
+    /* cluster background colors */
+    --graph-sg-color-default: #4c596b;
+    --graph-sg-color-white: #ccc;
+    --graph-sg-color-grey: #bbb;
+    --graph-sg-color-dark: #aaa;
+    --graph-sg-color-primary: #4fc3f7;
+    --graph-sg-color-selected: #4c596b;
+    --graph-sg-color-green: #AED581;
+    --graph-sg-color-orange: #FFCC80;
+    --graph-sg-color-red: #ff6e6e;
+    --graph-sg-color-yellow: #d4cc82;
+    --graph-sg-color-blue: #bbdefb;
+    --graph-sg-color-pink: #f8bbd0;
+    /** foreground colors */
+    --graph-fg-color-default: white;
+    --graph-fg-color-white: black;
+    --graph-fg-color-grey: black;
+    --graph-fg-color-dark: white;
+    --graph-fg-color-primary: white;
+    --graph-fg-color-selected: black;
+    --graph-fg-color-green: black;
+    --graph-fg-color-orange: black;
+    --graph-fg-color-red: white;
+    --graph-fg-color-yellow: black;
+    --graph-fg-color-blue: black;
+    --graph-fg-color-pink: white;
+    /** edge colors */
+    --graph-ed-color-default: white;
+    --graph-ed-color-white: #fff;
+    --graph-ed-color-grey: #ddd;
+    --graph-ed-color-dark: black;
+    --graph-ed-color-primary: dodgerblue;
+    --graph-ed-color-selected: deepskyblue;
+    --graph-ed-color-green: green;
+    --graph-ed-color-orange: orange;
+    --graph-ed-color-red: red;
+    --graph-ed-color-yellow: #e5e100;
+    --graph-ed-color-blue: deepskyblue;
+    --graph-ed-color-pink: palevioletred1;
 
   }
 }
