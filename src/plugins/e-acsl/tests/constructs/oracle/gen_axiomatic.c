@@ -33,38 +33,26 @@ int main(void)
 }
 
 /*@ axiomatic g {
-      logic integer g(char c) 
+      logic integer g(int c) 
         reads c;
       
       }
 
 */
-/*@ ensures g(\old(s)) == 0; */
-char __gen_e_acsl_h(char const s);
+/*@ ensures g(\old(t)) == 0; */
+int __gen_e_acsl_h(int const t);
 
-char h(char const s)
+int h(int const t)
 {
-  char __retres;
-  {
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_assert_data.blocking = 1;
-    __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "\\false";
-    __gen_e_acsl_assert_data.file = "axiomatic.c";
-    __gen_e_acsl_assert_data.fct = "h";
-    __gen_e_acsl_assert_data.line = 29;
-    __gen_e_acsl_assert_data.name = "missing_return";
-    __e_acsl_assert(0,& __gen_e_acsl_assert_data);
-  }
-  /*@ assert missing_return: \false; */ ;
-  __retres = (char)0;
+  int __retres;
+  __retres = 0;
   return __retres;
 }
 
 int i(void)
 {
   int __retres;
-  __gen_e_acsl_h((char)'c');
+  __gen_e_acsl_h(1);
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_assert_data.blocking = 1;
@@ -72,7 +60,7 @@ int i(void)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "axiomatic.c";
     __gen_e_acsl_assert_data.fct = "i";
-    __gen_e_acsl_assert_data.line = 33;
+    __gen_e_acsl_assert_data.line = 36;
     __gen_e_acsl_assert_data.name = "missing_return";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
   }
@@ -81,13 +69,13 @@ int i(void)
   return __retres;
 }
 
-/*@ ensures g(\old(s)) == 0; */
-char __gen_e_acsl_h(char const s)
+/*@ ensures g(\old(t)) == 0; */
+int __gen_e_acsl_h(int const t)
 {
-  char __gen_e_acsl_at;
-  char __retres;
-  __gen_e_acsl_at = s;
-  __retres = h(s);
+  int __gen_e_acsl_at;
+  int __retres;
+  __gen_e_acsl_at = t;
+  __retres = h(t);
   return __retres;
 }
 

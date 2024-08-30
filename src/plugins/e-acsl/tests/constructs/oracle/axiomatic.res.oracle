@@ -1,9 +1,7 @@
-[kernel:CERT:MSC:37] axiomatic.c:29: Warning: 
-  Body of function h falls-through. Adding a return statement
-[kernel:CERT:MSC:37] axiomatic.c:33: Warning: 
+[kernel:CERT:MSC:37] axiomatic.c:36: Warning: 
   Body of function i falls-through. Adding a return statement
 [e-acsl] beginning translation.
-[e-acsl] axiomatic.c:28: Warning: 
+[e-acsl] axiomatic.c:29: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
