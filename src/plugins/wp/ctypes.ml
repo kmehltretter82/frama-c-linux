@@ -315,6 +315,7 @@ let rec object_of typ =
     C_int (c_int IInt)
   | TNamed (r,_)  -> object_of r.ttype
 
+
 (* ------------------------------------------------------------------------ *)
 (* --- Comparable                                                       --- *)
 (* ------------------------------------------------------------------------ *)
@@ -385,8 +386,34 @@ let () =
   end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Revert c_object to typ                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let ikinds_of cint =
+  let all_ikind = [IBool;IChar;ISChar;IUChar;IInt;IUInt;IShort;IUShort;ILong;IULong;ILongLong;IULongLong] in
+  List.filter (fun ikind -> 0 == compare_c_int cint @@ c_int ikind) all_ikind
+
+let fkinds_of cfloat =
+  let all_fkind = [FFloat;FDouble;FLongDouble] in
+  List.filter (fun fkind -> 0 == compare_c_float cfloat @@ c_float fkind) all_fkind
+
+let object_to = function
+  | C_int cint as ty when equal ty (object_of (TVoid [])) -> (TVoid []) :: (List.map (fun ik -> TInt (ik,[])) @@ ikinds_of cint)
+  | C_int cint -> List.map (fun ik -> TInt (ik,[])) @@ ikinds_of cint
+  | C_float cfloat -> List.map (fun fk -> TFloat (fk,[])) @@ fkinds_of cfloat
+  | C_pointer (TVoid [] as typ) -> [ TBuiltin_va_list [] ; TPtr (typ,[]) ]
+  | C_pointer typ -> [ TPtr (typ,[]) ]
+  | C_comp comp -> [ TComp (comp,[]) ]
+  | C_array arr ->
+    match arr.arr_flat with
+    | None -> [ TArray (arr.arr_element, None, []) ]
+    | Some _e -> [ TArray (arr.arr_element, None (* Some (Cil.integer ~loc:Cil_builder.loc @@ Int64.of_int e) *), [])]
+
+
+(* -------------------------------------------------------------------------- *)
 (* --- Accessor Utilities                                                 --- *)
 (* -------------------------------------------------------------------------- *)
+
 
 let object_of_pointed = function
     C_int _ | C_float _ | C_comp _ as o ->

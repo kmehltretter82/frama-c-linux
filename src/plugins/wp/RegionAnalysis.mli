@@ -20,43 +20,46 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Either
-open Lang.F
-open Ctypes
 open Cil_types
-open Interpreted_automata
-open Sigs
+open Ctypes
+open Lang.F
+
+(* -------------------------------------------------------------------------- *)
+(* --- Region Analysis API for Bornat Memory Model                        --- *)
+(* -------------------------------------------------------------------------- *)
+
+module type API = sig
+  type region
+  val null : unit -> region
 
 
-val partition: ('a -> ('b, 'c) Either.t) -> 'a list -> 'a list * 'a list
-val split    : ('a, 'b) Either.t list -> 'a list * 'b list
+  val hash : region -> int
+  val equal : region -> region -> bool
+  val compare : region -> region -> int
+  val pretty : Format.formatter -> region -> unit
 
-module type Dispatcher =
-sig
+  type primitive = | Int of c_int | Float of c_float | Ptr
+  type kind = Single of primitive | Many of primitive | Garbled
+  val kind : region -> kind
+  val pp_kind : Format.formatter -> kind -> unit
 
-  type loc_left
-  type loc_right
+  val tau_of_region : region -> tau
+  val points_to : region -> region option
 
-  module ML : Sigs.Model with type loc = loc_left
-  module MR : Sigs.Model with type loc = loc_right
+  val separated : region -> region -> bool
+  val included : region -> region -> bool
 
-  type loc = (loc_left, loc_right) t
+  val cvar : varinfo -> region option
+  val field : region -> fieldinfo -> region option
+  val shift : region -> c_object -> term -> region option
+  val base_addr : region -> region
 
-  val null : loc
-  val is_null : loc -> pred
-  val cvar : varinfo -> loc
-  val pointer_loc : QED.term -> loc
-  val loc_of_int : c_object -> QED.term -> loc
+  val literal : eid:int -> Cstring.cst -> region option
+  val pointer_loc : unit -> region option
+  val loc_of_int : unit -> region option
 
-  val deref_left  : loc_left  -> loc_left  -> loc
-  val deref_right : loc_right -> loc_right -> loc
-  val literal : eid:int -> Cstring.cst -> loc
-
-
-  (* utilities *)
-  val hypotheses : MemoryContext.partition -> MemoryContext.partition
-  val configure_ia: automaton -> vertex binder
-
+  val id_of_region : region -> int
+  val region_of_id : int -> region option
 end
 
-(* module Make (_: Sigs.Model) (_: Sigs.Model) : Dispatcher *)
+module R : API

@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer | Eva | Bytes
+type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer | Eva | Bytes | Bornat
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {

@@ -98,6 +98,7 @@ val c_float  : fkind -> c_float
 (** Conforms to {!Machine.theMachine} *)
 
 val object_of : typ -> c_object
+val object_to : c_object -> typ list
 
 val is_pointer : c_object -> bool
 

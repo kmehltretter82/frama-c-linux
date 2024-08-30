@@ -1130,3 +1130,17 @@ let scope seq scope xs =
            in e_set m (BASE.get x) size)
         (Sigma.value seq.pre Alloc) xs in
     [ p_equal (Sigma.value seq.post Alloc) alloc ]
+
+(* ********************************************************************** *)
+(* API with BORNAT                                                        *)
+(* ********************************************************************** *)
+
+let sizeof = protected_sizeof_object
+let last = Model.last
+let frames = Model.frames
+let eqmem_forall = Model.eqmem_forall
+let set_init = Model.set_init
+let is_init_range = Model.is_init_range
+let value_footprint = Model.value_footprint
+let init_footprint = Model.init_footprint
+let havoc = Model.havoc

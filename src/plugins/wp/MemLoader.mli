@@ -54,8 +54,10 @@ sig
 
   val value_footprint: c_object -> loc -> Sigma.domain
   val init_footprint: c_object -> loc -> Sigma.domain
+  (* toutes les fils qui ne sont pas des points_to *)
 
   val frames : c_object -> loc -> Chunk.t -> frame list
+  (* memBytes *)
 
   val last : Sigma.t -> c_object -> loc -> term
 
