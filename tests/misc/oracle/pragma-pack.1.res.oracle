@@ -21,8 +21,8 @@
   S_j ∈ {4}
   S_sizeof ∈ {16}
   PACK8_i ∈ {0}
-  PACK8_j ∈ {8}
-  PACK8_sizeof ∈ {24}
+  PACK8_j ∈ {4}
+  PACK8_sizeof ∈ {16}
   PACK1_i ∈ {0}
   PACK1_j ∈ {1}
   PACK1_sizeof ∈ {13}
