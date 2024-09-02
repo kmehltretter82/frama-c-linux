@@ -25,6 +25,15 @@ int main(void)
   tmp = cbrtf(0.0f);
   double c = (double)tmp;
   int ok5 = 0;
+  char vtc[2] = {(char)4, (char)(-3)};
+  double vtd[2] = {4.0, - 3.0};
+  double *vt = vtd;
+  int x = 3;
+  short y = (short)4;
+  x ++;
+  x --;
+  x += 10;
+  x = 10;
   __retres = 0;
   return __retres;
 }
