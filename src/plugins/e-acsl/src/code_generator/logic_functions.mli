@@ -51,9 +51,10 @@ val app_to_exp:
     of the fonction. The optional argument [tapp] is the term corresponding to
     the call, in case we are translating a term *)
 
-val add_generated_functions: global list -> global list
-(* @return the input list of globals in which the generated functions have been
-   inserted at the right places (both their declaration and their definition) *)
+val add_generated_functions_to_file: file -> unit
+(** Insert into the globals of the given file the generated kernel functions
+    (their declaration and their definition). Also registers these functions
+    using {!Globals.Functions.register}. *)
 
 (**************************************************************************)
 (********************** Forward references ********************************)

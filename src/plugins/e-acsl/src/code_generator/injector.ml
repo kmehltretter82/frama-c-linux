@@ -832,7 +832,7 @@ let inject_in_file file =
   (* extend [main] with forward initialization and put it at end *)
   if not (Global_observer.is_empty () && Literal_strings.is_empty ()) then
     inject_global_handler file main;
-  file.globals <- Logic_functions.add_generated_functions file.globals;
+  Logic_functions.add_generated_functions_to_file file;
   inject_mtracking_handler main
 
 let reset_all ast =

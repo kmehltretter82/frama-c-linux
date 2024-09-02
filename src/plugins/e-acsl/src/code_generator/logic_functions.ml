@@ -370,7 +370,7 @@ end
 
 let reset () = Gen_functions.clear ()
 
-let add_generated_functions orig_globals =
+let add_generated_functions_to_file file =
   let generated_decls_of_global = function
     | GAnnot(Dfun_or_pred(li, loc), _) ->
       let kfs = Gen_functions.kernel_functions_of_logic_info li in
@@ -381,7 +381,7 @@ let add_generated_functions orig_globals =
      function/predicate they belong to;
      the (potentially mutually recursive) definitions follow later *)
   let all_decls =
-    List.concat_map (fun g -> g :: generated_decls_of_global g) orig_globals
+    List.concat_map (fun g -> g :: generated_decls_of_global g) file.globals
   in
   let add_fundef kf acc =
     let get_fundef kf =
@@ -389,12 +389,17 @@ let add_generated_functions orig_globals =
       with Kernel_function.No_Definition -> assert false
     in
     match kf with
-    | Ok kf -> GFun (get_fundef kf, Location.unknown) :: acc
+    | Ok kf ->
+      Globals.Functions.register kf;
+      GFun (get_fundef kf, Location.unknown) :: acc
     | Error _ -> acc
   in
   (* append the generated function definitions at the end; as the declarations
      are all already above they can be mutually recursive. *)
-  all_decls @ List.rev @@ Gen_functions.fold_sorted (fun _ -> add_fundef) []
+  let new_globals =
+    all_decls @ List.rev @@ Gen_functions.fold_sorted (fun _ -> add_fundef) []
+  in
+  file.globals <- new_globals
 
 let ret_ty_of_tapp ~env = function
   | Some tapp ->
