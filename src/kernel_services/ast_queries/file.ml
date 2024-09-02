@@ -572,7 +572,9 @@ let parse_cabs cpp_command = function
     if Sys.command cpp_command <> 0 then begin
       safe_remove_file ppf;
       abort_with_detailed_pp_message f cpp_command
-    end;
+    end else
+      Kernel.debug ~dkey:Kernel.dkey_pp
+        "Full preprocessing commmand: %s" cpp_command;
     let ppf =
       if Kernel.ReadAnnot.get() &&
          ((Kernel.PreprocessAnnot.is_set () &&
