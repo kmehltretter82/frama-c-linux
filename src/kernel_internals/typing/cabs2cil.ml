@@ -5975,7 +5975,7 @@ and doExp local_env
         | Cabs.VARIABLE _ | Cabs.UNARY (Cabs.MEMOF, _) (* Regular lvalues *)
         | Cabs.CONSTANT (Cabs.CONST_STRING _) | Cabs.CONSTANT (Cabs.CONST_WSTRING _)
         | Cabs.INDEX _ | Cabs.MEMBEROF _ | Cabs.MEMBEROFPTR _
-        | Cabs.CAST (_, Cabs.COMPOUND_INIT _) ->
+        | Cabs.GENERIC _ | Cabs.CAST (_, Cabs.COMPOUND_INIT _) ->
           begin
             let (r, se, e', t) =
               doExp local_env CNoConst e (AExp None)
@@ -6021,7 +6021,7 @@ and doExp local_env
           Kernel.fatal ~current:true "normalization of unop failed"
         | (Cabs.VARIABLE _ | Cabs.UNARY (Cabs.MEMOF, _) | (* Regular lvalues *)
            Cabs.INDEX _ | Cabs.MEMBEROF _ | Cabs.MEMBEROFPTR _ |
-           Cabs.CAST _ (* A GCC extension *)) -> begin
+           Cabs.GENERIC _ | Cabs.CAST _ (* A GCC extension *)) -> begin
             let uop' = if uop = Cabs.PREINCR then PlusA else MinusA in
             if asconst = CConst then
               Kernel.warning ~current:true "PREINCR or PREDECR in constant";
@@ -6054,7 +6054,7 @@ and doExp local_env
           Kernel.fatal ~current:true "normalization of unop failed"
         | Cabs.VARIABLE _ | Cabs.UNARY (Cabs.MEMOF, _) (* Regular lvalues *)
         | Cabs.INDEX _ | Cabs.MEMBEROF _ | Cabs.MEMBEROFPTR _
-        | Cabs.CAST _ (* A GCC extension *) -> begin
+        | Cabs.GENERIC _ | Cabs.CAST _ (* A GCC extension *) -> begin
             if asconst = CConst then
               Kernel.warning ~current:true "POSTINCR or POSTDECR in constant";
             (* If we do not drop the result then we must save the value *)
@@ -6110,7 +6110,8 @@ and doExp local_env
           Kernel.fatal
             ~current:true "normalization of lval in assignment failed"
         | (Cabs.VARIABLE _ | Cabs.UNARY (Cabs.MEMOF, _) | (* Regular lvalues *)
-           Cabs.INDEX _ | Cabs.MEMBEROF _ | Cabs.MEMBEROFPTR _ ) -> begin
+           Cabs.INDEX _ | Cabs.MEMBEROF _ | Cabs.MEMBEROFPTR _ |
+           Cabs.GENERIC _ ) -> begin
             if asconst = CConst then
               Kernel.warning ~current:true "ASSIGN in constant";
             let se0 = unspecified_chunk empty in
@@ -6211,7 +6212,7 @@ and doExp local_env
           Kernel.fatal ~current:true "normalization of lval in compound assignment failed"
         | Cabs.VARIABLE _ | Cabs.UNARY (Cabs.MEMOF, _) | (* Regular lvalues *)
           Cabs.INDEX _ | Cabs.MEMBEROF _ | Cabs.MEMBEROFPTR _ |
-          Cabs.CAST _ (* GCC extension *) -> begin
+          Cabs.GENERIC _ | Cabs.CAST _ (* GCC extension *) -> begin
             if asconst = CConst then
               Kernel.warning ~current:true "op_ASSIGN in constant";
             let bop' = match bop with

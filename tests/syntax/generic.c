@@ -77,5 +77,15 @@ int main() {
   int ok4 = _Generic(p, void(*)(int): 0, void(*)(long): 1);
   double c = cbrt(0.0f);
   int ok5 = _Generic(foo, fptr: 0, int: 4, vfptr: 5);
+
+  char vtc[2] = {4, -3};
+  double vtd[2] = {4.0, -3.0};
+  double *vt = &_Generic(vt, char*: vtc[0], double*: vtd[0]);
+  int x = 3;
+  short y = 4;
+  _Generic(42, short: y, int: x)++;
+  --_Generic(42, short: y, int: x);
+  _Generic(42, short: y, int: x) += 10;
+  _Generic(42, short: y, int: x) = 10;
   return 0;
 }
