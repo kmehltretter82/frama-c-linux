@@ -21,15 +21,15 @@
 (**************************************************************************)
 
 open Cil_types
-open Cil_datatype
 
 (* ************************************************************************* *)
 (** {2 Getters} *)
 (* ************************************************************************* *)
 
-let dummy () =
-  { fundec = Definition (Cil.emptyFunction "@dummy@", Location.unknown);
-    spec = List.hd Funspec.reprs }
+let dummy () = {
+  fundec = Definition (Cil.emptyFunction "@dummy@", Cil_datatype.Location.unknown);
+  spec = List.hd Cil_datatype.Funspec.reprs
+}
 
 let get_vi kf = Ast_info.Function.get_vi kf.fundec
 let get_id kf = (get_vi kf).vid
@@ -109,7 +109,11 @@ let find_defining_kf vi =
 
 module Kf =
   State_builder.Option_ref
-    (Datatype.Int.Hashtbl.Make(Datatype.Triple(Kf)(Stmt)(Datatype.List(Block))))
+    (Datatype.Int.Hashtbl.Make
+       (Datatype.Triple
+          (Cil_datatype.Kf)
+          (Cil_datatype.Stmt)
+          (Datatype.List(Cil_datatype.Block))))
     (struct
       let name = "Kernel_function.Kf"
       let dependencies = [ Ast.self ]
@@ -192,12 +196,12 @@ let blocks_closed_by_edge_aux s1 s2 =
     Kernel.fatal "Unknown statement sid:%d or sid:%d" s1.sid s2.sid
 
 let blocks_closed_by_edge s1 s2 =
-  if not (List.exists (Stmt.equal s2) s1.succs) then
+  if not (List.exists (Cil_datatype.Stmt.equal s2) s1.succs) then
     raise (Invalid_argument "Kernel_function.blocks_closed_by_edge");
   blocks_closed_by_edge_aux s1 s2
 
 let blocks_opened_by_edge s1 s2 =
-  if not (List.exists (Stmt.equal s2) s1.succs) then
+  if not (List.exists (Cil_datatype.Stmt.equal s2) s1.succs) then
     raise (Invalid_argument "Kernel_function.blocks_opened_by_edge");
   blocks_closed_by_edge_aux s2 s1
 
@@ -453,7 +457,7 @@ let get_called fct = match fct.enode with
 (** {2 CallSites} *)
 (* ************************************************************************* *)
 
-module CallSite = Datatype.Pair(Cil_datatype.Kf)(Stmt)
+module CallSite = Datatype.Pair(Cil_datatype.Kf)(Cil_datatype.Stmt)
 module CallSites = Cil_datatype.Kf.Hashtbl
 module KfCallers =
   State_builder.Option_ref(CallSites.Make(Datatype.List(CallSite)))
@@ -515,29 +519,36 @@ let find_syntactic_callsites kf =
   try CallSites.find table kf
   with Not_found -> []
 
-let local_definition kf vi =
+let local_definition_opt kf vi =
   let locals = get_locals kf in
-  if not vi.vdefined ||
-     not (List.exists (fun vi' -> Cil_datatype.Varinfo.equal vi vi') locals)
-  then
-    Kernel.fatal
-      "%a is not a defined local variable of %a"
+  if not vi.vdefined || not (List.exists (Cil_datatype.Varinfo.equal vi) locals)
+  then None
+  else
+    try
+      List.find (fun s ->
+          match s.skind with
+          | Instr (Local_init (vi', _, _)) -> Cil_datatype.Varinfo.equal vi vi'
+          | _ -> false
+        ) (get_definition kf).sallstmts
+      |> Option.some
+    with Not_found -> assert false (* cannot occur on well-formed AST. *)
+
+let local_definition kf vi =
+  match local_definition_opt kf vi with
+  | None ->
+    Kernel.fatal "%a is not a defined local variable of %a"
       Cil_datatype.Varinfo.pretty vi pretty kf;
-  try
-    List.find
-      (fun s ->
-         match s.skind with
-         | Instr (Local_init (vi', _, _)) -> Cil_datatype.Varinfo.equal vi vi'
-         | _ -> false)
-      (get_definition kf).sallstmts
-  with Not_found -> assert false (* cannot occur on well-formed AST. *)
+  | Some sdef -> sdef
 
 let var_is_in_scope stmt vi =
   let blocks = find_all_enclosing_blocks stmt in
+  let sdef = local_definition_opt (find_englobing_kf stmt) vi in
   let is_def_above b =
-    let sdef = local_definition (find_englobing_kf stmt) vi in
+    (* sdef cannot be None in this context because vi is defined and in b locals
+       (so in kf locals as well) when we call is_def_above. *)
+    let sdef = Option.get sdef in
     match b.bstmts with
-    | [] -> assert false (* at least contains stmt *)
+    | [] -> assert false (* b should at least contains stmt. *)
     | sfst :: _ ->
       (* if sfst is sdef (or an unspecified sequence containing sdef), it
          is necessarily above stmt. Otherwise, we can rely on is_between to
@@ -545,10 +556,11 @@ let var_is_in_scope stmt vi =
       Cil_datatype.Stmt.equal sfst (find_enclosing_stmt_in_block b sdef) ||
       is_between b sfst sdef stmt
   in
-  List.exists
-    (fun b ->
-       List.exists (Cil_datatype.Varinfo.equal vi) b.blocals &&
-       (not vi.vdefined || is_def_above b)
+  (* If sdef is equal to stmt, vi is in scope. *)
+  Option.equal Cil_datatype.Stmt.equal sdef (Some stmt) ||
+  List.exists (fun b ->
+      List.exists (Cil_datatype.Varinfo.equal vi) b.blocals &&
+      (not vi.vdefined || is_def_above b)
     )
     blocks
 
@@ -576,14 +588,14 @@ let has_noreturn_attr kf =
 let is_first_stmt kf stmt =
   try
     let first = find_first_stmt kf in
-    Stmt.equal stmt first
+    Cil_datatype.Stmt.equal stmt first
   with No_Statement ->
     false
 
 let is_return_stmt kf stmt =
   try
     let return = find_return kf in
-    Stmt.equal stmt return
+    Cil_datatype.Stmt.equal stmt return
   with No_Statement ->
     false
 
