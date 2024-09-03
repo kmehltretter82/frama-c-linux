@@ -290,6 +290,9 @@ module Q = struct
         str
       else
         match String.unsafe_get str i with
+        | '-' when i = 0 ->
+          Bytes.unsafe_set buf i '-';
+          pre str len buf (i + 1)
         | '.' ->
           mid buf len;
           post str len buf (len + 1) (i + 1)
