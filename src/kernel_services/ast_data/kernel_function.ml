@@ -556,7 +556,7 @@ let var_is_in_scope stmt vi =
       Cil_datatype.Stmt.equal sfst (find_enclosing_stmt_in_block b sdef) ||
       is_between b sfst sdef stmt
   in
-  (* If sdef is equal to stmt, vi is not in the scope yet. *)
+  (* If sdef is equal to stmt, vi is in scope. *)
   Option.equal Cil_datatype.Stmt.equal sdef (Some stmt) ||
   List.exists (fun b ->
       List.exists (Cil_datatype.Varinfo.equal vi) b.blocals &&
