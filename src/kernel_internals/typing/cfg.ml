@@ -213,17 +213,9 @@ and cfgStmt env (s: stmt) next break cont =
           cfgStmt env stmt next break cont
     end
   in
-  let instrFallsThrough (i : instr) : bool = match i with
-      Call (_, {enode = Lval (Var vf, NoOffset)}, _, _) ->
-      (* See if this has the noreturn attribute *)
-      not (hasAttribute "noreturn" vf.vattr)
-    | Call (_, f, _, _) ->
-      not (typeHasAttribute "noreturn" (typeOf f))
-    | _ -> true
-  in
   match s.skind with
     Instr il  ->
-    if instrFallsThrough il then
+    if Cil.instr_falls_through il then
       addOptionSucc next
     else
       ()

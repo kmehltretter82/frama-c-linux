@@ -722,8 +722,12 @@ class cil_printer () = object (self)
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
     let stom, rest = Cil.separateStorageModifiers v.vattr in
+    (* Small hack to keep printing noreturn attribute before function type. *)
+    let noreturn_attrs = Cil.(filterAttributes "noreturn" (typeAttr v.vtype)) in
+    let stom_noreturn = stom @ noreturn_attrs in
+    let vtype_no_noreturn = Cil.typeRemoveAttributes ["noreturn"] v.vtype in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
-    let v = { v with vtype = self#no_ghost_at_first_level v.vtype } in
+    let v = { v with vtype = self#no_ghost_at_first_level vtype_no_noreturn } in
     let v =
       if v.vformal && not state.print_cil_as_is then begin
         match v.vtype with
@@ -744,10 +748,9 @@ class cil_printer () = object (self)
     fprintf fmt "%s%a%a%s%a%a"
       (if v.vinline then "__inline " else "")
       self#storage v.vstorage
-      self#attributes stom
-      (if stom = [] then "" else " ")
-      (self#typ ?fundecl name)
-      v.vtype
+      self#attributes stom_noreturn
+      (if stom_noreturn = [] then "" else " ")
+      (self#typ ?fundecl name) v.vtype
       self#attributes rest
 
   (*** L-VALUES ***)
@@ -2095,7 +2098,7 @@ class cil_printer () = object (self)
       let name' fmt =
         if a = [] then pname fmt false
         else if nameOpt = None then printAttributes fmt a
-        else fprintf fmt "(%a%a)" printAttributes a pname (a <> [])
+        else fprintf fmt "(%a%a)" printAttributes a pname true
       in
       let partition_ghosts ghost_arg args =
         match args with
@@ -2234,9 +2237,6 @@ class cil_printer () = object (self)
            not state.print_cil_as_is &&
            not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
          false
-       | "noreturn", [ ACons ("c11",[]) ]
-         when not state.print_cil_as_is ->
-         fprintf fmt "_Noreturn"; false
        | _ -> (* This is the default case *)
          (* Add underscores to the name *)
          let an' =

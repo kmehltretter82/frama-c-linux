@@ -716,7 +716,7 @@ module Computer
           Kernel_function.pretty kf;
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in
-      if Cil.hasAttribute "noreturn" f.svar.vattr && results <> [] then
+      if Cil.typeHasAttribute "noreturn" f.svar.vtype && results <> [] then
         Eva_utils.warning_once_current
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;

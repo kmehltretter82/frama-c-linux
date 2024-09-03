@@ -245,13 +245,6 @@ let last_loc block =
   try f (List.rev block.bstmts)
   with Not_found -> unknown_loc
 
-let has_noreturn_attr = function
-  | Call (_, {enode = Lval (Var vf, NoOffset)}, _, _) ->
-    Cil.hasAttribute "noreturn" vf.vattr
-  | Call (_, f, _, _) ->
-    Cil.typeHasAttribute "noreturn" (Cil.typeOf f)
-  | _ -> false
-
 module LabelMap = struct
   include Cil_datatype.Logic_label.Map
   let add_builtin name = add (BuiltinLabel name)
@@ -440,9 +433,9 @@ let build_automaton ~annotations kf =
     let dest = match stmt.skind with
       | Cil_types.Instr instr ->
         let dest =
-          if has_noreturn_attr instr
-          then exit_point
-          else control.dest
+          if Cil.instr_falls_through instr
+          then control.dest
+          else exit_point
         in
         add_edge control.src dest kinstr (Instr (instr, stmt)) loc;
         dest

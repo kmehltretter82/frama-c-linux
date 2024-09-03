@@ -1320,6 +1320,13 @@ val has_extern_local_init: block -> bool
 *)
 val is_ghost_else: block -> bool
 
+val instr_falls_through : instr -> bool
+(** returns [false] if the given instruction is a call to a function with a
+    ["noreturn"] attribute, and [true] otherwise.
+
+    @since Frama-C+dev
+*)
+
 (* ************************************************************************* *)
 (** {2 Values for manipulating attributes} *)
 (* ************************************************************************* *)
