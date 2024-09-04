@@ -156,8 +156,8 @@ let mthread_run project =
   try
     (* We analyse the main thread *)
     MtLib.clear_value_results ();
-    Eva__Private.Thread.reset_state ();
-    Eva__Private.Mutex.reset_state ();
+    Thread.reset_state ();
+    Mutex.reset_state ();
     MtOptions.feedback "*** Computing value analysis for main thread";
     Analysis.compute ();
     MtOptions.feedback "*** First value analysis for main thread done." ;

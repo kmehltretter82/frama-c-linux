@@ -120,7 +120,7 @@ module ThreadState : sig
   val hash: t -> int
 
   (** [one_creates_other th1 th2] returns [`Creates (th1, th2)]
-      if [th1] creates [the] directly or through another threads,
+      if [th1] creates [th2] directly or through another threads,
       [`Creates(th2, th1)] if [th2] creates [th1], and [`Unrelated]
       otherwise *)
   val one_creates_other: t -> t -> [`Creates of t * t | `Unrelated]

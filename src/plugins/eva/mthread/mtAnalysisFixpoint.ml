@@ -146,7 +146,7 @@ let compute_thread analysis th =
   Globals.set_entry_point (Kernel_function.get_name th.th_fun) false;
   Eva_results.set_initial_state th.th_init_state;
   Eva_results.set_main_args th.th_params;
-  Eva__Private.Thread.set_current th.th_eva_thread;
+  Thread.set_current th.th_eva_thread;
 
   Analysis.compute ();
 
