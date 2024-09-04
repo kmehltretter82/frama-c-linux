@@ -310,10 +310,10 @@
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
         Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
-          "Unregistered extension '%s' for plug-in %s" s plugin
+          "Ignoring unregistered extension '%s' of plug-in %s" s plugin
       else
         Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
-          "Ignored extensions for unloaded plug-in %s" plugin;
+          "Ignoring extension '%s' for unloaded plug-in %s" s plugin;
       IDENTIFIER_EXT s
     | EXT_CODE_ANNOT s
     | EXT_GLOBAL s
