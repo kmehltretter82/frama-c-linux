@@ -59,11 +59,13 @@ type extension_single = {
   preprocessor: extension_preprocessor ;
   typer: extension_typer ;
   status: bool ;
+  plugin: string ;
 }
 type extension_block = {
   preprocessor: extension_preprocessor_block ;
   typer: extension_typer_block ;
   status: bool ;
+  plugin: string ;
 }
 type extension_common = {
   category: ext_category ;
@@ -110,7 +112,7 @@ let make
     ?(short_printer=default_short_printer name)
     ?(is_same_ext=default_is_same_ext)
     status : extension_single*extension_common =
-  { preprocessor; typer; status},
+  { preprocessor; typer; status; plugin},
   { category; visitor; printer; short_printer; plugin; is_same_ext }
 
 let make_block
@@ -123,7 +125,7 @@ let make_block
     ?(short_printer=default_short_printer name)
     ?(is_same_ext=default_is_same_ext)
     status : extension_block*extension_common =
-  { preprocessor; typer; status},
+  { preprocessor; typer; status; plugin},
   { category; visitor; printer; short_printer; plugin; is_same_ext }
 
 module Extensions = struct
