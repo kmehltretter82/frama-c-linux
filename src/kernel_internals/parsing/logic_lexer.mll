@@ -583,30 +583,31 @@ and comment = parse
     dest_lexbuf.lex_abs_pos <- src_pos.pos_cnum
 
   let parse_from_position f (pos, s : Filepath.position * string) =
-    let output = Kernel.warning ~wkey:Kernel.wkey_annot_error
-    in
+    let open Current_loc.Operators in
     let lb = from_string s in
+    let get_loc () = Cil_datatype.Position.of_lexing_pos lb.Lexing.lex_curr_p in
+    let<> UpdatedCurrentLoc = (pos, pos) in
+    let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
     set_initial_position lb (Cil_datatype.Position.to_lexing_pos pos);
     try
       let res = f token lb in
-      Some (Cil_datatype.Position.of_lexing_pos lb.Lexing.lex_curr_p, res)
+      Some (get_loc (), res)
     with
       | Failure s -> (* raised by the lexer itself, through [f] *)
-          output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "lexing error: %s" s; None
+          warn ~source:(get_loc ()) "lexing error: %s" s; None
       | Parsing.Parse_error ->
-        output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "unexpected token '%s'" (Lexing.lexeme lb);
+        warn ~source:(get_loc ()) "unexpected token '%s'" (Lexing.lexeme lb);
         None
-      | Error (_, m) -> output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "%s" m; None
+      | Error (_, m) -> warn ~source:(get_loc ()) "%s" m; None
       | Logic_utils.Not_well_formed (loc, m) ->
-        output ~source:(fst loc) "%s" m;
-        None
+        warn ~source:(fst loc) "%s" m; None
       | Logic_utils.Unknown_ext -> None
       | Log.FeatureRequest(source,_,msg) ->
-        let source = Option.value ~default:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) source in
-        output ~source "unimplemented ACSL feature: %s" msg; None
-      | Log.AbortError _ as exn -> raise exn
+        let source = Option.value ~default:(get_loc ()) source in
+        warn ~source "unimplemented ACSL feature: %s" msg; None
+      | Log.(AbortError _ | AbortFatal _) as exn -> raise exn
       | exn ->
-        Kernel.fatal ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "Unknown error (%s)"
+        Kernel.fatal ~source:(get_loc ()) "Unknown error (%s)"
           (Printexc.to_string exn)
 
   let lexpr = parse_from_position Logic_parser.lexpr_eof
