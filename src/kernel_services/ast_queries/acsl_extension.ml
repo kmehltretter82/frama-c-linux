@@ -77,13 +77,15 @@ type extension_module_importer =
   module_builder -> location -> string list -> unit
 
 let default_printer printer fmt = function
-  | Ext_id i -> Format.fprintf fmt "%d" i
+  | Ext_id i -> Format.pp_print_int fmt i
   | Ext_terms ts -> Pretty_utils.pp_list ~sep:",@ " printer#term fmt ts
   | Ext_preds ps -> Pretty_utils.pp_list ~sep:",@ " printer#predicate fmt ps
-  | Ext_annot (_,an) -> Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
-                          printer#extended fmt an
+  | Ext_annot (_,an) ->
+    Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
+      printer#extended fmt an
 
-let default_short_printer name _printer fmt _ext_kind = Format.fprintf fmt "%s" name
+let default_short_printer name _printer fmt _ext_kind =
+  Format.pp_print_string fmt name
 
 let rec default_is_same_ext ext1 ext2 env =
   match ext1, ext2 with
@@ -161,7 +163,7 @@ module Extensions = struct
 
   let is_extension_block = Hashtbl.mem ext_block_tbl
 
-  let register cat ~plugin name
+  let register_gen ~make ~tbl cat ~plugin name
       ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext status =
     let info1,info2 =
       make ~plugin name cat ?preprocessor typer
@@ -173,25 +175,13 @@ module Extensions = struct
         name
     else
       begin
-        Hashtbl.add ext_single_tbl name info1;
+        Hashtbl.add tbl name info1;
         Hashtbl.add ext_tbl name info2
       end
 
-  let register_block cat ~plugin name
-      ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext status =
-    let info1,info2 =
-      make_block ~plugin name cat ?preprocessor typer
-        ?visitor ?printer ?short_printer ?is_same_ext status
-    in
-    if is_extension name then
-      Kernel.warning ~wkey:Kernel.wkey_acsl_extension
-        "Trying to register ACSL extension %s twice. Ignoring second extension"
-        name
-    else
-      begin
-        Hashtbl.add ext_block_tbl name info1;
-        Hashtbl.add ext_tbl name info2
-      end
+  let register = register_gen ~make ~tbl:ext_single_tbl
+
+  let register_block = register_gen ~make:make_block ~tbl:ext_block_tbl
 
   let register_module_importer name loader =
     if Hashtbl.mem ext_module_importer name then
@@ -205,10 +195,7 @@ module Extensions = struct
 
   let preprocess_block name = (find_block name).preprocessor
 
-  let typing name typing_context loc es =
-    let ext_info = find_single name in
-    let status = ext_info.status in
-    let typer =  ext_info.typer in
+  let typing_gen ~status ~typer name typing_context loc es =
     let normal_error = ref false in
     let has_error _ = normal_error := true in
     let wrapper =
@@ -221,21 +208,17 @@ module Extensions = struct
       Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
         name (Printexc.to_string exn)
 
-  let typing_block name typing_context loc es =
+  let typing name =
+    let ext_info = find_single name in
+    let status = ext_info.status in
+    let typer =  ext_info.typer in
+    typing_gen ~status ~typer name
+
+  let typing_block name =
     let ext_info = find_block name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
-    let normal_error = ref false in
-    let has_error _ = normal_error := true in
-    let wrapper =
-      typing_context.on_error (typer typing_context loc) has_error
-    in
-    try status, wrapper es
-    with
-    | (Log.AbortError _ | Log.AbortFatal _) as exn -> raise exn
-    | exn when not !normal_error ->
-      Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
-        name (Printexc.to_string exn)
+    typing_gen ~status ~typer name
 
   let visit name = (find_common name).visitor
 
