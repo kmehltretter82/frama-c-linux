@@ -9820,9 +9820,9 @@ and doBody local_env (blk: Cabs.block) : chunk =
                      s.Logic_ptree.spec_behavior,
                    true
                  | CODE_ANNOT
-                     (Logic_ptree.AExtended(_,is_loop,(name,_,_)),loc) ->
+                     (Logic_ptree.AExtended(_,is_loop,(name,plugin,_)),loc) ->
                    let source = fst loc in
-                   (match Logic_env.extension_category name, is_loop with
+                   (match Logic_env.extension_category ~plugin name, is_loop with
                     | exception Not_found ->
                       Kernel.(
                         warning

@@ -715,13 +715,13 @@ let is_trivially_true p =
 let is_annot_next_stmt c =
   match c.annot_content with
   | AStmtSpec _ -> true
-  | AExtended(_,is_loop,{ext_name}) ->
+  | AExtended(_,is_loop,{ext_name; ext_plugin}) ->
     let warn_not_a_code_annot () =
       Kernel.(
         warning ~wkey:wkey_acsl_extension
           "%s is not a code annotation extension" ext_name)
     in
-    (match Logic_env.extension_category ext_name with
+    (match Logic_env.extension_category ~plugin:ext_plugin ext_name with
      | exception Not_found -> warn_not_a_code_annot () ; false
      | Ext_code_annot (Ext_here | Ext_next_loop)-> false
      | Ext_code_annot Ext_next_stmt-> true

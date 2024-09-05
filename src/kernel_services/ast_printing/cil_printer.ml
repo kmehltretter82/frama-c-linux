@@ -76,8 +76,8 @@ let pp_predicate_kind ~kw fmt kd =
 
 module Extensions = struct
   let initialized = ref false
-  let ref_print = ref (fun _ _ _ _ -> assert false)
-  let ref_short_print = ref (fun _ _ _ _ -> assert false)
+  let ref_print = ref (fun ~plugin:_ _ _ _ _ -> assert false)
+  let ref_short_print = ref (fun ~plugin:_ _ _ _ _ -> assert false)
 
   let set_handler ~print ~short_print =
     assert (not !initialized) ;
@@ -86,11 +86,11 @@ module Extensions = struct
     initialized := true ;
     ()
 
-  let pp (printer) fmt {ext_name; ext_kind} =
-    !ref_print ext_name printer fmt ext_kind
+  let pp printer fmt {ext_name; ext_kind; ext_plugin} =
+    !ref_print ~plugin:ext_plugin ext_name printer fmt ext_kind
 
-  let pp_short (printer) fmt {ext_name; ext_kind} =
-    !ref_short_print ext_name printer fmt ext_kind
+  let pp_short printer fmt {ext_name; ext_kind; ext_plugin} =
+    !ref_short_print ~plugin:ext_plugin ext_name printer fmt ext_kind
 
 end
 let set_extension_handler = Extensions.set_handler

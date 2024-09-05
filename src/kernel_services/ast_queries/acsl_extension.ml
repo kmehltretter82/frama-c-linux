@@ -111,7 +111,7 @@ let make
     ?(printer=default_printer)
     ?(short_printer=default_short_printer name)
     ?(is_same_ext=default_is_same_ext)
-    status : extension_single*extension_common =
+    status : extension_single * extension_common =
   { preprocessor; typer; status; plugin},
   { category; visitor; printer; short_printer; plugin; is_same_ext }
 
@@ -124,46 +124,113 @@ let make_block
     ?(printer=default_printer)
     ?(short_printer=default_short_printer name)
     ?(is_same_ext=default_is_same_ext)
-    status : extension_block*extension_common =
+    status : extension_block * extension_common =
   { preprocessor; typer; status; plugin},
   { category; visitor; printer; short_printer; plugin; is_same_ext }
 
 module Extensions = struct
-  (*hash table for  category, visitor, printer and short_printer of extensions*)
-  let ext_tbl = Hashtbl.create 5
+  (* Hash table for extension_common. A name can be use by different plugins to
+     register an extension so we keep a list. *)
+  let ext_tbl : (string, extension_common list) Hashtbl.t =
+    Hashtbl.create 5
 
-  (*hash table for status, preprocessor and typer of single extensions*)
-  let ext_single_tbl = Hashtbl.create 5
+  (* Hash table for extension_single. A name can be use by different plugins to
+     register an extension so we keep a list. *)
+  let ext_single_tbl : (string, extension_single list) Hashtbl.t =
+    Hashtbl.create 5
 
-  (*hash table for status, preprocessor and typer of block extensions*)
-  let ext_block_tbl = Hashtbl.create 5
+  (* Hash table for extension_block. A name can be use by different plugins to
+     register an extension so we keep a list. *)
+  let ext_block_tbl : (string, extension_block list) Hashtbl.t =
+    Hashtbl.create 5
 
-  (*hash table for module importers*)
+  (* Hash table for module importers. *)
   let ext_module_importer = Hashtbl.create 5
 
-  let find_single name :extension_single =
-    try Hashtbl.find ext_single_tbl name with Not_found ->
-      Kernel.fatal ~current:true "unsupported clause of name '%s'" name
+  let add_to_list tbl key value =
+    match Hashtbl.find_opt tbl key with
+    | None -> Hashtbl.add tbl key [value]
+    | Some values -> Hashtbl.replace tbl key (value :: values)
 
-  let find_common name :extension_common =
-    try Hashtbl.find ext_tbl name with Not_found ->
-      Kernel.fatal ~current:true "unsupported clause of name '%s'" name
+  (* Called if we cannot discriminate between several extensions. Cannot happen
+     if the parameter [plugin] is provided to mem/find functions. *)
+  let throw_ambiguity_error ~get_plugin name l =
+    let pp_plugin fmt e = Format.fprintf fmt "%s" (get_plugin e) in
+    Kernel.abort ~current:true
+      "Conflicts on extension named '%s' registered by different \
+       plugins (%a), use '\\plugin::ext_name' syntax to avoid this ambiguity"
+      name (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:",@ " pp_plugin) l
 
-  let find_block name :extension_block =
-    try Hashtbl.find ext_block_tbl name with Not_found ->
-      Kernel.fatal ~current:true "unsupported clause of name '%s'" name
+  (* [get_plugin] is a getter to access the [plugin] field from extension_*
+     types, to keep this function generic. *)
+  let mem ~get_plugin tbl ~plugin name =
+    match Hashtbl.find_opt tbl name, plugin with
+    (* Extension is not registered. *)
+    | None, _ -> false
+    (* We do not remove extensions from this table, and always add an element
+       the first time a key is registered, so this case cannot happen. *)
+    | Some [], _ -> assert false
+    (* One extension registered, no ambiguity. *)
+    | Some [_], None -> true
+    (* One extension registered, make sure the plugin field matches. *)
+    | Some [e], Some plugin -> String.equal plugin (get_plugin e)
+    (* Ambiguity on name, look for an extension with the right plugin. *)
+    | Some l, Some plugin ->
+      List.exists (fun e -> String.equal plugin (get_plugin e)) l
+    (* Ambiguity on name without providing plugin name. *)
+    | Some l, None -> throw_ambiguity_error ~get_plugin name l
 
-  let find_importer name :extension_module_importer =
+  (* [get_plugin] is a getter to access the [plugin] field from extension_*
+     types, to keep this function generic. Can raise Not_found. *)
+  let find ~get_plugin tbl ~plugin name =
+    match Hashtbl.find tbl name, plugin with
+    (* We do not remove extensions from this table, and always add an element
+       the first time a key is registered, so this case cannot happen. *)
+    | [], _ -> assert false
+    (* One extension registered, no ambiguity. *)
+    | [e], None -> e
+    (* One extension registered, make sure the plugin field matches. *)
+    | [e], Some plugin ->
+      if String.equal plugin (get_plugin e) then e else raise Not_found
+    (* Ambiguity on name, look for an extension with the right plugin. *)
+    | l, Some plugin ->
+      List.find (fun e -> String.equal plugin (get_plugin e)) l
+    (* Ambiguity on name without providing plugin name. *)
+    | l, None -> throw_ambiguity_error ~get_plugin name l
+
+  (* Generic function for find functions, catch Not_found and throw a fatal
+     instead. *)
+  let find_gen ~get_plugin tbl ~plugin name =
+    try find ~get_plugin ~plugin tbl name
+    with Not_found ->
+      Kernel.fatal ~current:true "Unsupported clause extension named '%a%s'"
+        (Pretty_utils.pp_opt ~pre:"\\" ~suf:"::" Format.pp_print_string) plugin
+        name
+
+  let get_plugin_common (e : extension_common) = e.plugin
+
+  let get_plugin_single (e : extension_single) = e.plugin
+
+  let get_plugin_block (e : extension_block) = e.plugin
+
+  let find_single = find_gen ~get_plugin:get_plugin_single ext_single_tbl
+
+  let find_common = find_gen ~get_plugin:get_plugin_common ext_tbl
+
+  let find_block = find_gen ~get_plugin:get_plugin_block ext_block_tbl
+
+  let find_importer name : extension_module_importer =
     try Hashtbl.find ext_module_importer name with Not_found ->
-      Kernel.fatal ~current:true "unsupported module importer '%s'" name
+      Kernel.fatal ~current:true "Unsupported module importer '%s'" name
 
   (* [Logic_lexer] can ask for something that is not a category, which is not
-     a fatal error. *)
-  let category name = (Hashtbl.find ext_tbl name).category
+     a fatal error so we do not caught the Not_found exception. *)
+  let category ~plugin name =
+    (find ~get_plugin:get_plugin_common ext_tbl ~plugin name).category
 
-  let is_extension = Hashtbl.mem ext_tbl
+  let is_extension = mem ~get_plugin:get_plugin_common ext_tbl
 
-  let is_extension_block = Hashtbl.mem ext_block_tbl
+  let is_extension_block = mem ~get_plugin:get_plugin_block ext_block_tbl
 
   let register_gen ~make ~tbl cat ~plugin name
       ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext status =
@@ -171,15 +238,22 @@ module Extensions = struct
       make ~plugin name cat ?preprocessor typer
         ?visitor ?printer ?short_printer ?is_same_ext status
     in
-    if is_extension name then
+    if is_extension ~plugin:(Some "kernel") name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
-        "Trying to register ACSL extension %s twice. Ignoring second extension"
-        name
-    else
-      begin
-        Hashtbl.add tbl name info1;
-        Hashtbl.add ext_tbl name info2
+        "Trying to register ACSL extension %s reserved by frama-c. \
+         Rename this extension to avoid conflict with the kernel. Ignored \
+         extension" name
+    else begin
+      if is_extension ~plugin:(Some plugin) name then
+        Kernel.warning ~wkey:Kernel.wkey_acsl_extension
+          "Trying to register ACSL extension %s twice with plugin %s. \
+           Ignoring the second extension"
+          name plugin
+      else begin
+        add_to_list tbl name info1;
+        add_to_list ext_tbl name info2
       end
+    end
 
   let register = register_gen ~make ~tbl:ext_single_tbl
 
@@ -193,9 +267,9 @@ module Extensions = struct
     else
       Hashtbl.add ext_module_importer name loader
 
-  let preprocess name = (find_single name).preprocessor
+  let preprocess ~plugin name = (find_single ~plugin name).preprocessor
 
-  let preprocess_block name = (find_block name).preprocessor
+  let preprocess_block ~plugin name = (find_block ~plugin name).preprocessor
 
   let typing_gen ~status ~typer name typing_context loc es =
     let normal_error = ref false in
@@ -210,22 +284,22 @@ module Extensions = struct
       Kernel.fatal "Typechecking ACSL extension %s raised exception %s"
         name (Printexc.to_string exn)
 
-  let typing name =
-    let ext_info = find_single name in
+  let typing ~plugin name =
+    let ext_info = find_single ~plugin name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
-    typing_gen ~status ~typer name
+    typing_gen ~typer ~status name
 
-  let typing_block name =
-    let ext_info = find_block name in
+  let typing_block ~plugin name =
+    let ext_info = find_block ~plugin name in
     let status = ext_info.status in
     let typer =  ext_info.typer in
-    typing_gen ~status ~typer name
+    typing_gen ~typer ~status name
 
-  let visit name = (find_common name).visitor
+  let visit ~plugin name = (find_common ~plugin name).visitor
 
-  let print name printer fmt kind =
-    let ext_common = find_common name in
+  let print ~plugin name printer fmt kind =
+    let ext_common = find_common ~plugin name in
     let plugin = ext_common.plugin in
     let full_name =
       if Datatype.String.equal plugin "kernel"
@@ -239,15 +313,15 @@ module Extensions = struct
     | _ ->
       Format.fprintf fmt "@[<hov 2>%s %a;@]" full_name pp kind
 
-  let short_print name printer fmt kind =
-    let pp = (find_common name).short_printer in
+  let short_print ~plugin name printer fmt kind =
+    let pp = (find_common ~plugin name).short_printer in
     Format.fprintf fmt "%a" (pp printer) kind
 
-  let is_same_ext name ext1 ext2 =
-    let is_same = (find_common name).is_same_ext in
+  let is_same_ext ~plugin name ext1 ext2 =
+    let is_same = (find_common ~plugin name).is_same_ext in
     is_same ext1 ext2
 
-  let extension_from name = (find_common name).plugin
+  let extension_from name = (find_common ~plugin:None name).plugin
 end
 
 (* Registration functions *)

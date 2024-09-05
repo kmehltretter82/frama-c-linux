@@ -26,11 +26,11 @@ open Cil_types
 
 module Extensions = struct
   let initialized = ref false
-  let ref_is_extension = ref (fun _ -> assert false)
-  let ref_category = ref (fun _ -> assert false)
-  let ref_preprocess = ref (fun _ -> assert false)
-  let ref_is_extension_block = ref (fun _ -> assert false)
-  let ref_preprocess_block = ref (fun _ -> assert false)
+  let ref_is_extension = ref (fun ~plugin:_ _ -> assert false)
+  let ref_category = ref (fun ~plugin:_ _ -> assert false)
+  let ref_preprocess = ref (fun ~plugin:_ _ -> assert false)
+  let ref_is_extension_block = ref (fun ~plugin:_ _ -> assert false)
+  let ref_preprocess_block = ref (fun ~plugin:_ _ -> assert false)
   let ref_extension_from = ref (fun _ -> assert false)
 
   let set_extension_handler ~category ~is_extension ~preprocess
@@ -41,16 +41,16 @@ module Extensions = struct
     ref_preprocess := preprocess ;
     ref_is_extension_block := is_extension_block;
     ref_preprocess_block := preprocess_block;
-    initialized := true ;
     ref_extension_from := extension_from;
+    initialized := true ;
     ()
 
-  let is_extension s = !ref_is_extension s
-  let is_extension_block s = !ref_is_extension_block s
-  let category s = !ref_category s
-  let preprocess s = !ref_preprocess s
-  let preprocess_block s = !ref_preprocess_block s
-  let extension_from s = !ref_extension_from s
+  let is_extension ~plugin name = !ref_is_extension ~plugin name
+  let is_extension_block ~plugin name = !ref_is_extension_block ~plugin name
+  let category ~plugin name = !ref_category ~plugin name
+  let preprocess ~plugin name = !ref_preprocess ~plugin name
+  let preprocess_block ~plugin name = !ref_preprocess_block ~plugin name
+  let extension_from name = !ref_extension_from name
 end
 let set_extension_handler = Extensions.set_extension_handler
 let is_extension = Extensions.is_extension

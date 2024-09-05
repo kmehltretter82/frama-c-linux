@@ -1254,7 +1254,7 @@ ne_simple_clauses:
 | EXT_CONTRACT extension_content SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = snd $4 in
       let name, plugin = $1 in
-      let processed = Logic_env.preprocess_extension name $2 in
+      let processed = Logic_env.preprocess_extension ~plugin name $2 in
       allocation,assigns,post_cond,(name, plugin, processed)::extended
     }
 | post_cond_kind lexpr clause_kw { missing $loc($2) ";" $3 }
@@ -1477,9 +1477,9 @@ loop_grammar_extension:
   let open Cil_types in
   let ext, plugin = $2 in
   try
-    begin match Logic_env.extension_category ext with
+    begin match Logic_env.extension_category ~plugin ext with
       | Ext_code_annot (Ext_next_loop | Ext_next_both) ->
-        let processed = Logic_env.preprocess_extension ext $3 in
+        let processed = Logic_env.preprocess_extension ~plugin ext $3 in
         (ext, plugin, processed)
       | Ext_code_annot (Ext_here | Ext_next_stmt) ->
         raise
@@ -1526,9 +1526,9 @@ code_annotation:
     let open Cil_types in
     let ext, plugin = $1 in
     try
-      begin match Logic_env.extension_category ext with
+      begin match Logic_env.extension_category ~plugin ext with
         | Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both) ->
-          let processed = Logic_env.preprocess_extension ext $2 in
+          let processed = Logic_env.preprocess_extension ~plugin ext $2 in
           Logic_ptree.AExtended(bhvs,false,(ext,plugin,processed))
         | Ext_code_annot Ext_next_loop ->
           raise
@@ -1567,13 +1567,13 @@ decl:
 ext_decl:
 | EXT_GLOBAL extension_content SEMICOLON {
     let name, plugin = $1 in
-     let processed = Logic_env.preprocess_extension name $2 in
+     let processed = Logic_env.preprocess_extension ~plugin name $2 in
      Ext_lexpr(name, plugin, processed)
    }
 | EXT_GLOBAL_BLOCK any_identifier LBRACE ext_decls RBRACE {
     let name, plugin = $1 in
     let processed_id,processed_block =
-       Logic_env.preprocess_extension_block name ($2,$4)
+       Logic_env.preprocess_extension_block ~plugin name ($2,$4)
     in
     Ext_extension(name, plugin, processed_id, processed_block)
    }

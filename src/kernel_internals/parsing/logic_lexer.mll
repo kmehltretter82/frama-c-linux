@@ -189,12 +189,12 @@
         loc
       with Not_found ->
         let res =
-          match Logic_env.extension_category s with
+          match Logic_env.extension_category ~plugin s with
           | exception Not_found -> None
           | Cil_types.Ext_contract -> Some (EXT_CONTRACT (s, plugin))
           | Cil_types.Ext_global ->
             begin
-              match Logic_env.is_extension_block s with
+              match Logic_env.is_extension_block ~plugin s with
               | false -> Some (EXT_GLOBAL (s, plugin))
               | true -> Some (EXT_GLOBAL_BLOCK (s, plugin))
             end
@@ -319,14 +319,10 @@
     | EXT_GLOBAL (s, _)
     | EXT_GLOBAL_BLOCK (s, _)
     | EXT_CONTRACT (s, _) ->
-      let plugin_from = Logic_env.extension_from s in
-      if plugin_from = plugin && plugin = "kernel" then
+      if String.equal plugin "kernel" then
         Kernel.abort ~source
-          "Extension '%s' from frama-c's kernel should not be used with the syntax \
-          \\kernel::%s" s s;
-      if plugin_from <> plugin then
-        Kernel.abort ~source
-          "Extension '%s' is from %s and not %s" s plugin_from plugin;
+          "Extension '%s' from frama-c's kernel should not be used with the \
+           syntax \\kernel::%s" s s;
       tok
     | _ -> raise Parsing.Parse_error
 }

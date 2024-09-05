@@ -131,7 +131,7 @@ val is_same_predicate: predicate -> predicate -> is_same_env -> bool
 (** access custom comparison functions for ACSL extensions *)
 val set_extension_diff:
   is_same_ext:
-    (string ->
+    (plugin:string option -> string ->
      acsl_extension_kind -> acsl_extension_kind -> is_same_env -> bool)
   -> unit
 

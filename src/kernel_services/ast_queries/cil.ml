@@ -694,7 +694,7 @@ let alphafalse _ = false
 
 module Extensions = struct
   let initialized = ref false
-  let ref_visit = ref (fun _ _ _ -> assert false)
+  let ref_visit = ref (fun ~plugin:_ _ _ _ -> assert false)
 
   let set_handler ~visit =
     assert (not !initialized) ;
@@ -702,7 +702,7 @@ module Extensions = struct
     initialized := true ;
     ()
 
-  let visit name = !ref_visit name
+  let visit ~plugin name = !ref_visit ~plugin name
 
 end
 let set_extension_handler = Extensions.set_handler
@@ -1792,7 +1792,7 @@ and childrenBehavior vis b =
 
 and visitCilExtended vis orig =
   let visit = Extensions.visit orig.ext_name in
-  let e' = doVisitCil vis id (visit vis) childrenCilExtended orig.ext_kind in
+  let e' = doVisitCil vis id (visit ~plugin:orig.ext_plugin vis) childrenCilExtended orig.ext_kind in
   if Visitor_behavior.is_fresh vis#behavior then
     Logic_const.new_acsl_extension orig.ext_name orig.ext_plugin orig.ext_loc
       orig.ext_has_status e'

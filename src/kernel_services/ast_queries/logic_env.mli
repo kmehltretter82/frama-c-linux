@@ -28,18 +28,41 @@ open Cil_types
 
 (** {2 registered ACSL extensions } *)
 
-val is_extension: string -> bool
-val is_extension_block: string -> bool
+(** Return [true] if an extension is registered for the given plugin.
+    @before Frama-C+def the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
+val is_extension: plugin:string option -> string -> bool
 
-val extension_category: string -> ext_category
+(** Return [true] if an extension block is registered for the given plugin.
+    @before Frama-C+def the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
+val is_extension_block: plugin:string option -> string -> bool
 
-val preprocess_extension:
-  string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list
+(** Return the extension category.
+    @raise Not_Found if the extension is not registered
+    @before Frama-C+def the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
+val extension_category: plugin:string option -> string -> ext_category
 
+(** Return the extension preprocessor.
+    @before Frama-C+def the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
+val preprocess_extension: plugin:string option -> string ->
+  Logic_ptree.lexpr list -> Logic_ptree.lexpr list
+
+(** Return the extension block preprocessor.
+    @before Frama-C+def the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
 val preprocess_extension_block:
-  string -> string * Logic_ptree.extended_decl list -> string * Logic_ptree.extended_decl list
+  plugin:string option -> string -> string * Logic_ptree.extended_decl list ->
+  string * Logic_ptree.extended_decl list
 
-(** Return the plugin name of the extension *)
+(** Return the plugin name of the extension. *)
 val extension_from : string -> string
 
 (** {2 Global Tables} *)
@@ -222,18 +245,23 @@ val builtin_types_as_typenames: unit -> unit
 (** {2 Internal use} *)
 
 val set_extension_handler:
-  category:(string -> ext_category) ->
-  is_extension:(string -> bool) ->
-  preprocess:(string -> Logic_ptree.lexpr list -> Logic_ptree.lexpr list) ->
-  is_extension_block:(string -> bool) ->
+  category:(plugin:string option -> string -> ext_category) ->
+  is_extension:(plugin:string option -> string -> bool) ->
+  is_importer:(plugin:string option -> string -> bool) ->
+  preprocess:
+    (plugin:string option -> string -> Logic_ptree.lexpr list ->
+     Logic_ptree.lexpr list) ->
+  is_extension_block:(plugin:string option -> string -> bool) ->
   preprocess_block:
-    (string -> string * Logic_ptree.extended_decl list ->
+    (plugin:string option -> string -> string * Logic_ptree.extended_decl list ->
      string * Logic_ptree.extended_decl list) ->
   extension_from:(string -> string) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
-    If your name is not [Acsl_extension], do not call this
+    If your name is not [Acsl_extension], do not call this.
     @since 21.0-Scandium
+    @before Frama-C+dev functions did not take a [plugin] parameter.
+    [get_plugins] did not exist
 *)
 
 val init_dependencies: State.t -> unit
