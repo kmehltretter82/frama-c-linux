@@ -7,7 +7,7 @@
    OPT: -mdr-no-print-libc -mdr-out ./without-libc.sarif.unfiltered
    EXECNOW: LOG without-libc.sarif sed -e "s:@PTEST_SESSION@:PTEST_SESSION:" %{dep:without-libc.sarif.unfiltered} > without-libc.sarif 2> @DEV_NULL@
 
- ENABLED_IF: %{bin-available:check-jsonschema}
+ ENABLED_IF: (and %{bin-available:check-jsonschema} %{bin-available:jq})
  EXECNOW: LOG with-libc.sarif.checked check-jsonschema --schemafile $(jq '."$schema"' ./with-libc.sarif.unchecked -r) %{dep:with-libc.sarif.unchecked} > ./with-libc.sarif.checked
 */
 #include <string.h>

@@ -24,6 +24,7 @@
 , dune-configurator
 , dune-site
 , fpath
+, jq
 , gcc9
 , graphviz
 , lablgtk3
@@ -87,6 +88,7 @@ stdenvNoCC.mkDerivation rec {
     dune-site
     findlib
     fpath
+    jq
     gcc9
     graphviz
     lablgtk3
