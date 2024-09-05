@@ -3783,14 +3783,14 @@ struct
       old_behaviors
       behaviors
 
-  let type_extended ~typing_context ~loc (name,ps) =
+  let type_extended ~typing_context ~loc (name, plugin, ps) =
     let loc = match ps with
       | [] -> loc
       | p::_ -> p.lexpr_loc
     in
     if Extensions.is_extension name then
       let status , kind = Extensions.typer name ~typing_context ~loc ps in
-      Logic_const.new_acsl_extension name loc status kind
+      Logic_const.new_acsl_extension name plugin loc status kind
     else
       C.error
         loc "No type-checking function registered for extension %s" name
@@ -3996,8 +3996,8 @@ struct
         let env = loop_annot_env () in
         let ctxt = base_ctxt env in
         Cil_types.AAssigns(behav, type_assign ctxt ~accept_formal:true env a)
-      | AExtended (behav, is_loop, (name, _ as ext)) ->
         let kind = Logic_env.extension_category name in
+      | AExtended (behav, is_loop, (name, plugin, _ as ext)) ->
         let pre_state, post_state =
           match kind,is_loop with
           | exception Not_found ->
@@ -4497,18 +4497,18 @@ struct
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
       Some (Dvolatile (tsets, rvi_opt, wvi_opt, [], loc))
 
-    | LDextended (Ext_lexpr(kind, content)) ->
+    | LDextended (Ext_lexpr(name, plugin, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
-      let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
-      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
+      let status,tcontent = Extensions.typer name ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension name plugin loc status tcontent in
       Some (Dextended (textended, [], loc))
 
-    | LDextended (Ext_extension (kind, name, content)) ->
+    | LDextended (Ext_extension (name, plugin, kind, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent =
-        Extensions.typer_block kind ~typing_context ~loc (name,content)
+        Extensions.typer_block name ~typing_context ~loc (kind,content)
       in
-      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
+      let textended = Logic_const.new_acsl_extension name plugin loc status tcontent in
       Some (Dextended (textended, [], loc))
 
   let annot = C.on_error

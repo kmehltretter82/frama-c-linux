@@ -165,7 +165,10 @@ and lexpr_node =
 type toplevel_predicate =
   { tp_kind: Cil_types.predicate_kind; tp_statement: lexpr }
 
-type extension = string * lexpr list
+(** ACSL extension.
+    @before Frama-C+dev Was of type [string * lexpr list].
+*)
+type extension = string * string option * lexpr list
 
 (** type invariant. *)
 type type_annot =  {inv_name: string;
@@ -282,9 +285,14 @@ and allocation =
 (** variant of a loop or a recursive function. *)
 and variant = lexpr * string option
 
+
+(** Global ACSL extension. *)
 and global_extension =
-  | Ext_lexpr of string * lexpr list
-  | Ext_extension of string * string * extended_decl list
+  | Ext_lexpr of string * string option * lexpr list
+  (** @before Frama-C+dev Was of type [string * lexpr list]. *)
+
+  | Ext_extension of string * string option * string * extended_decl list
+  (** @before Frama-C+dev Was of type [string * string * extended_decl list]. *)
 
 and extended_decl = {
   extended_node : global_extension;

@@ -313,9 +313,9 @@ let print_model_annot fmt ty =
 let rec print_extended_decl fmt d =
   let aux fmt d = print_extended_decl fmt d.extended_node in
   match d with
-  | Ext_lexpr(name,d) ->
+  | Ext_lexpr(name, _plugin, d) ->
     fprintf fmt "@[<2>%s@ %a@]" name (pp_list ~sep:",@ " print_lexpr) d
-  | Ext_extension(name,id,d) ->
+  | Ext_extension(name, _plugin, id,d) ->
     fprintf fmt "@[<2>%s@ %s@ {@\n%a@]@\n}" name id
       (pp_list ~sep:"@\n" aux) d
 
@@ -458,7 +458,7 @@ let print_spec fmt spec =
        ~sep:"@\n" ~suf:"@\n" (pp_list ~sep:",@ " pp_print_string))
     spec.spec_disjoint_behaviors
 
-let print_extension fmt (name, ext) =
+let print_extension fmt (name, _plugin, ext) =
   fprintf fmt "%s %a" name (pp_list ~sep:",@ " print_lexpr) ext
 
 let print_code_annot fmt ca =

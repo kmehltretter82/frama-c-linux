@@ -1691,6 +1691,7 @@ and spec = {
 and acsl_extension = {
   ext_id : int;
   ext_name : string;
+  ext_plugin : string option; (**  @since Frama-C+dev *)
   ext_loc : location;
   ext_has_status : bool;
   ext_kind : acsl_extension_kind

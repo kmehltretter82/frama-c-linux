@@ -183,7 +183,7 @@
       ];
     List.iter (fun (x, y) -> Hashtbl.add type_kw x y)
       ["integer", INTEGER; "real", REAL; "boolean", BOOLEAN; ];
-    (fun s loc ->
+    (fun ~plugin s loc ->
       try
         (Hashtbl.find all_kw s)
         loc
@@ -191,14 +191,14 @@
         let res =
           match Logic_env.extension_category s with
           | exception Not_found -> None
-          | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
+          | Cil_types.Ext_contract -> Some (EXT_CONTRACT (s, plugin))
           | Cil_types.Ext_global ->
             begin
               match Logic_env.is_extension_block s with
-              | false -> Some (EXT_GLOBAL s)
-              | true -> Some (EXT_GLOBAL_BLOCK s)
+              | false -> Some (EXT_GLOBAL (s, plugin))
+              | true -> Some (EXT_GLOBAL_BLOCK (s, plugin))
             end
-          | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
+          | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT (s, plugin))
         in
         match res with
         | None ->
@@ -315,10 +315,10 @@
         Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
           "Ignoring extension '%s' for unloaded plug-in %s" s plugin;
       IDENTIFIER_EXT s
-    | EXT_CODE_ANNOT s
-    | EXT_GLOBAL s
-    | EXT_GLOBAL_BLOCK s
-    | EXT_CONTRACT s ->
+    | EXT_CODE_ANNOT (s, _)
+    | EXT_GLOBAL (s, _)
+    | EXT_GLOBAL_BLOCK (s, _)
+    | EXT_CONTRACT (s, _) ->
       let plugin_from = Logic_env.extension_from s in
       if plugin_from = plugin && plugin = "kernel" then
         Kernel.abort ~source
@@ -379,7 +379,7 @@ rule token = parse
   | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
      let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
-     let tok = identifier name cabsloc in
+     let tok = identifier ~plugin:(Some plugin) name cabsloc in
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
@@ -389,7 +389,7 @@ rule token = parse
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
       let s = lexeme lexbuf in
-      let curr_tok = identifier s cabsloc in
+      let curr_tok = identifier ~plugin:None s cabsloc in
       if curr_tok = CHECK || curr_tok = ADMIT then begin
         let next_tok =
           token { lexbuf with refill_buff = lexbuf.refill_buff }

@@ -290,7 +290,7 @@
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token ADMIT_REQUIRES ADMIT_LOOP ADMIT_INVARIANT ADMIT_LEMMA
 %token ADMIT_ENSURES ADMIT_EXITS ADMIT_CONTINUES ADMIT_BREAKS ADMIT_RETURNS
-%token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
+%token <string * string option> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
@@ -948,10 +948,10 @@ full_identifier:
 | EXT_SPEC_INCLUDE { "include" }
 | EXT_SPEC_AT { "at" }
 | EXT_SPEC_LET { "let" }
-| id = EXT_CODE_ANNOT { id }
-| id = EXT_CONTRACT { id }
-| id = EXT_GLOBAL { id }
-| id = EXT_GLOBAL_BLOCK { id }
+| id = EXT_CODE_ANNOT { fst id }
+| id = EXT_CONTRACT { fst id }
+| id = EXT_GLOBAL { fst id }
+| id = EXT_GLOBAL_BLOCK { fst id }
 | id = IDENTIFIER_EXT { id }
 ;
 
@@ -1181,7 +1181,7 @@ clause_kw:
 | FREES {"frees"}
 | COMPLETE {"complete"}
 | DISJOINT {"disjoint"}
-| EXT_CONTRACT { $1 }
+| EXT_CONTRACT { fst $1 }
 | id=IDENTIFIER_EXT { id }
 | EOF { "end of annotation" }
 ;
@@ -1253,8 +1253,9 @@ ne_simple_clauses:
 | unknown_extension SEMICOLON simple_clauses { snd $3 }
 | EXT_CONTRACT extension_content SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = snd $4 in
-      let processed = Logic_env.preprocess_extension $1 $2 in
-      allocation,assigns,post_cond,($1,processed)::extended
+      let name, plugin = $1 in
+      let processed = Logic_env.preprocess_extension name $2 in
+      allocation,assigns,post_cond,(name, plugin, processed)::extended
     }
 | post_cond_kind lexpr clause_kw { missing $loc($2) ";" $3 }
 | allocation clause_kw { missing $loc($1) ";" $2 }
@@ -1474,12 +1475,12 @@ loop_variant:
 loop_grammar_extension:
 | LOOP EXT_CODE_ANNOT extension_content SEMICOLON {
   let open Cil_types in
-  let ext = $2 in
+  let ext, plugin = $2 in
   try
     begin match Logic_env.extension_category ext with
       | Ext_code_annot (Ext_next_loop | Ext_next_both) ->
         let processed = Logic_env.preprocess_extension ext $3 in
-        (ext, processed)
+        (ext, plugin, processed)
       | Ext_code_annot (Ext_here | Ext_next_stmt) ->
         raise
           (Not_well_formed
@@ -1523,12 +1524,12 @@ code_annotation:
 | EXT_CODE_ANNOT extension_content SEMICOLON
   { fun bhvs ->
     let open Cil_types in
-    let ext = $1 in
+    let ext, plugin = $1 in
     try
       begin match Logic_env.extension_category ext with
         | Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both) ->
           let processed = Logic_env.preprocess_extension ext $2 in
-          Logic_ptree.AExtended(bhvs,false,(ext,processed))
+          Logic_ptree.AExtended(bhvs,false,(ext,plugin,processed))
         | Ext_code_annot Ext_next_loop ->
           raise
             (Not_well_formed
@@ -1565,14 +1566,16 @@ decl:
 
 ext_decl:
 | EXT_GLOBAL extension_content SEMICOLON {
-     let processed = Logic_env.preprocess_extension $1 $2 in
-     Ext_lexpr($1, processed)
+    let name, plugin = $1 in
+     let processed = Logic_env.preprocess_extension name $2 in
+     Ext_lexpr(name, plugin, processed)
    }
 | EXT_GLOBAL_BLOCK any_identifier LBRACE ext_decls RBRACE {
+    let name, plugin = $1 in
     let processed_id,processed_block =
-       Logic_env.preprocess_extension_block $1 ($2,$4)
+       Logic_env.preprocess_extension_block name ($2,$4)
     in
-    Ext_extension($1,processed_id,processed_block)
+    Ext_extension(name, plugin, processed_id, processed_block)
    }
 ;
 
@@ -1961,7 +1964,7 @@ post_cond:
 
 is_acsl_spec:
 | post_cond  { snd $1 }
-| EXT_CONTRACT   { $1 }
+| EXT_CONTRACT { fst $1 }
 | ASSIGNS    { "assigns" }
 | ALLOCATES  { "allocates" }
 | FREES      { "frees" }
@@ -1976,9 +1979,9 @@ is_acsl_spec:
 ;
 
 is_acsl_decl_or_code_annot:
-| EXT_CODE_ANNOT { $1 }
-| EXT_GLOBAL     { $1 }
-| EXT_GLOBAL_BLOCK     { $1 }
+| EXT_CODE_ANNOT { fst $1 }
+| EXT_GLOBAL { fst $1 }
+| EXT_GLOBAL_BLOCK { fst $1 }
 | IDENTIFIER_EXT { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
