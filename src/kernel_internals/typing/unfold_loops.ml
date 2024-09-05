@@ -757,5 +757,11 @@ let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:location) args =
     Lenv.empty () |> append_here_label |> append_init_label |> append_pre_label
   in Ext_terms (List.map (ctxt.type_term ctxt env) args)
 
-let () = Acsl_extension.register_code_annot_next_loop
+let register_extensions () =
+  Acsl_extension.register_code_annot_next_loop
     ~plugin:"kernel" "unfold" unroll_typer false
+
+let register_once, _ =
+  State_builder.apply_once "Unfold_loops.register_extensions" [] register_extensions
+
+let () = Cmdline.run_after_early_stage register_once
