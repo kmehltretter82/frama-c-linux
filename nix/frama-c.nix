@@ -47,6 +47,7 @@
 , zarith
 , zmq
 # Frama-C extra (other targets do not reconfigure)
+, check-jsonschema
 , dos2unix
 , doxygen
 , python3
@@ -80,6 +81,7 @@ stdenvNoCC.mkDerivation rec {
     bisect_ppx
     camlzip
     camomile
+    check-jsonschema
     dune_3
     dune-configurator
     dune-site
