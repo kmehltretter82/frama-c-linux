@@ -1684,11 +1684,11 @@ logic_def:
     { pop_module_types () ; LDmodule($2,$4) }
 | IMPORT mId = module_name SEMICOLON
     { LDimport(None,mId,None) }
-| IMPORT mId = module_name AS id = identifier SEMICOLON
+| IMPORT mId = module_name AS id = IDENTIFIER SEMICOLON
     { LDimport(None,mId,Some id) }
-| IMPORT drv = identifier COLON mId = module_name SEMICOLON
+| IMPORT drv = IDENTIFIER COLON mId = module_name SEMICOLON
     { LDimport(Some drv,mId,None) }
-| IMPORT drv = identifier COLON mId = module_name AS id = identifier SEMICOLON
+| IMPORT drv = IDENTIFIER COLON mId = module_name AS id = IDENTIFIER SEMICOLON
     { LDimport(Some drv,mId,Some id) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
@@ -1698,7 +1698,7 @@ logic_def:
 ;
 
 module_name:
-| identifier { $1 }
+| IDENTIFIER { $1 }
 | LONGIDENT  { $1 }
 ;
 
