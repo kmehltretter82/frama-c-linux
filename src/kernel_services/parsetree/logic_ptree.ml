@@ -245,7 +245,7 @@ and decl_node =
   (** [LDaxiomatic(id,decls)]
       represents a block of axiomatic definitions.*)
   | LDmodule of string * decl list
-  (** [LDaxiomatic(id,decls)]
+  (** [LDmodule(id,decls)]
       represents a module of axiomatic definitions.*)
   | LDimport of string option * string * string option
   (** [LDimport(driver,module,alias)]
