@@ -129,7 +129,7 @@ let generate_body ~loc kf env ret_ty ret_vi = function
   | LBnone |LBreads _ | LBinductive _ -> assert false
 
 (* Generate a kernel function from a given logic info [li] *)
-let generate_kf ~loc fname env ret_ty params_ty params_ival li =
+let generate_kf ~loc fname env params_ty ret_ty params_ival li =
   (* build the formal parameters *)
   let params, params_ty_vi =
     List.fold_right2
@@ -200,7 +200,7 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
   let kf = Globals.Functions.get fundec.svar in
   Annotations.register_funspec ~emitter:Options.emitter kf;
   (* closure generating the function's body.
-     Delay its generation after filling the memoisation table (for termination
+     Delay its generation after filling the memoization table (for termination
      of recursive function calls) *)
   let gen_body () =
     let env = Env.push env in
@@ -271,88 +271,74 @@ let generate_kf ~loc fname env ret_ty params_ty params_ival li =
   in
   vi, kf, gen_body
 
-(**************************************************************************)
 (***************************** Memoization ********************************)
-(**************************************************************************)
-type fgen = (kernel_function, exn) result
 
-(* for each logic_info, associate its possible profiles, i.e. the types of its
-   parameters + the generated varinfo for the function *)
-let memo_tbl:
-  fgen Profile.Hashtbl.t Logic_info.Hashtbl.t
-  = Logic_info.Hashtbl.create 7
+(* This module memoizes for each translated logic_info the corresponding
+   generated kernel functions. Each generated kernel function is associated
+   with its signature (profile + return type), because sometimes multiple
+   translated versions of a single logic_info are required, depending on the
+   calling context. *)
+module Gen_functions : sig
 
-let reset () = Logic_info.Hashtbl.clear memo_tbl
+  type fgen = (kernel_function, exn) result
 
-let add_generated_functions globals =
-  let rec aux acc = function
-    | [] ->
-      acc
-    | GAnnot(Dfun_or_pred(li, loc), _) as g :: l ->
-      let acc = g :: acc in
-      (try
-         (* add the declarations close to its corresponding logic function or
-            predicate *)
-         let params = Logic_info.Hashtbl.find memo_tbl li in
-         let add_fundecl kf acc =
-           let nospec = Cil.empty_funspec () in
-           match kf with
-           | Ok kf -> GFunDecl(nospec, Kernel_function.get_vi kf, loc) :: acc
-           | Error _ -> acc (* Exception has already been signaled *)
-         in
-         aux
-           (Profile.Hashtbl.fold_sorted
-              (fun _ -> add_fundecl)
-              params
-              acc)
-           l
-       with Not_found ->
-         aux acc l)
-    | g :: l ->
-      aux (g :: acc) l
-  in
-  let rev_globals = aux [] globals in
-  (* add the definitions at the end of [globals] *)
-  let add_fundec kf globals =
-    let get_fundec kf =
-      try Kernel_function.get_definition kf
-      with Kernel_function.No_Definition -> assert false
-    in
-    match kf with
-    | Ok kf ->  GFun(get_fundec kf, Location.unknown) :: globals
-    | Error _ -> globals
-  in
-  let rev_globals =
-    Logic_info.Hashtbl.fold_sorted
-      (fun _ -> Profile.Hashtbl.fold_sorted
-          (fun _ -> add_fundec))
+  val clear : unit -> unit
+
+  val fold_sorted :
+    (Profile.t * typ -> fgen -> 'a -> 'a) -> 'a -> 'a
+
+  val memo :
+    (typ ->
+     Profile.t ->
+     logic_info ->
+     varinfo * kernel_function * (unit -> unit)) ->
+    Profile.t * typ ->
+    logic_info ->
+    varinfo * (unit -> unit)
+
+  val replace : logic_info -> Profile.t * typ -> fgen -> unit
+
+  val kernel_functions_of_logic_info : logic_info -> varinfo list
+
+end = struct
+
+  module Memo_tbl = Logic_info.Hashtbl
+
+  (* The signature of generated functions depends on the profile of the logic
+     function as well as its return type. In certain contexts the return type
+     might be GMP; in these cases an additional result parameter is required. *)
+  module Profile_and_return_type =
+    Datatype.Pair_with_collections
+      (Profile)
+      (Typ) (* return type *)
+      (struct let module_name = "E_ACSL.Logic_functions.Signatures" end)
+
+  module Signatures = Profile_and_return_type.Hashtbl
+
+  type fgen = (kernel_function, exn) result
+
+  (* For each logic_info, memoize for each encountered profile and return type
+     the generated C function *)
+  let memo_tbl : fgen Signatures.t Memo_tbl.t = Memo_tbl.create 7
+
+  let clear () = Memo_tbl.clear memo_tbl
+
+  let fold_sorted f =
+    Memo_tbl.fold_sorted
+      (fun _ -> Signatures.fold_sorted f)
       memo_tbl
-      rev_globals
-  in
-  List.rev rev_globals
 
-(* Generate (and memoize) the function body and create the call to the
-   generated function. *)
-let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
-  let ret_ty =
-    match tapp with
-    | Some tapp ->
-      let logic_env = Env.Logic_env.get env in
-      Typing.get_typ ~logic_env tapp
-    | None  -> (Cil_types.TInt (IInt, []))
-  in
-  let gen tbl =
-    let vi, kf, gen_body =
-      generate_kf fname ~loc env ret_ty params_ty profile li in
-    Profile.Hashtbl.add tbl profile (Ok kf);
-    vi, gen_body
-  in
-  (* memoise the function's varinfo *)
-  let fvi, gen_body =
+  let memo f (profile, ret_ty) li =
+    let gen tbl =
+      let vi, kf, gen_body = f ret_ty profile li in
+      Signatures.add tbl (profile, ret_ty) (Ok kf);
+      vi, gen_body
+    in
+    (* memoize the function's varinfo *)
     try
-      let h = Logic_info.Hashtbl.find memo_tbl li in
+      let h = Memo_tbl.find memo_tbl li in
       try
-        let kf = Profile.Hashtbl.find h profile in
+        let kf = Signatures.find h (profile, ret_ty) in
         let kf = match kf with
           | Ok kf -> kf
           | Error exn -> raise exn
@@ -361,9 +347,73 @@ let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
         (fun () -> ()) (* body generation already planified *)
       with Not_found -> gen h
     with Not_found ->
-      let h = Profile.Hashtbl.create 7 in
-      Logic_info.Hashtbl.add memo_tbl li h;
+      let h = Signatures.create 7 in
+      Memo_tbl.add memo_tbl li h;
       gen h
+
+  let replace li (profile, ret_ty) fgen =
+    let h = Memo_tbl.find memo_tbl li in
+    Signatures.replace h (profile, ret_ty) fgen
+
+  let kernel_functions_of_logic_info li =
+    try
+      let params = Memo_tbl.find memo_tbl li in
+      let add_fundecl kf acc =
+        match kf with
+        | Ok kf -> Kernel_function.get_vi kf :: acc
+        | Error _ -> acc (* Exception has already been signaled *)
+      in
+      Signatures.fold_sorted (fun _ -> add_fundecl) params []
+    with Not_found -> []
+end
+
+
+let reset () = Gen_functions.clear ()
+
+let add_generated_functions_to_file file =
+  let generated_decls_of_global = function
+    | GAnnot(Dfun_or_pred(li, loc), _) ->
+      let kfs = Gen_functions.kernel_functions_of_logic_info li in
+      List.map (fun kf -> GFunDecl (Cil.empty_funspec (), kf, loc)) kfs
+    | _ -> []
+  in
+  (* add declarations of generated functions just below the logic
+     function/predicate they belong to;
+     the (potentially mutually recursive) definitions follow later *)
+  let all_decls =
+    List.concat_map (fun g -> g :: generated_decls_of_global g) file.globals
+  in
+  let add_fundef kf acc =
+    let get_fundef kf =
+      try Kernel_function.get_definition kf
+      with Kernel_function.No_Definition -> assert false
+    in
+    match kf with
+    | Ok kf ->
+      Globals.Functions.register kf;
+      GFun (get_fundef kf, Location.unknown) :: acc
+    | Error _ -> acc
+  in
+  (* append the generated function definitions at the end; as the declarations
+     are all already above they can be mutually recursive. *)
+  let new_globals =
+    all_decls @ List.rev @@ Gen_functions.fold_sorted (fun _ -> add_fundef) []
+  in
+  file.globals <- new_globals
+
+let ret_ty_of_tapp ~env = function
+  | Some tapp ->
+    let logic_env = Env.Logic_env.get env in
+    Typing.get_typ ~logic_env tapp
+  | None  -> Cil_const.intType
+
+(* Generate (and memoize) the function body and create the calls to the
+   generated functions. *)
+let function_to_exp ~loc ?tapp fname env kf li params_ty profile args =
+  let ret_ty = ret_ty_of_tapp ~env tapp in
+  (* memoize the function's varinfo *)
+  let fvi, gen_body =
+    Gen_functions.memo (generate_kf fname ~loc env params_ty) (profile, ret_ty) li
   in
   (* the generation of the function body must be performed after memoizing the
      kernel function in order to handle recursive calls in finite time :-) *)
@@ -515,8 +565,8 @@ let app_to_exp ~adata ~loc ?tapp kf env ?eargs li targs =
             function_to_exp ~loc ?tapp gen_fname env kf li params_ty profile args
           with exn ->
             (* Those accesses always succeed *)
-            let h = Logic_info.Hashtbl.find memo_tbl li in
-            Profile.Hashtbl.replace h profile (Error exn);
+            let ret_ty = ret_ty_of_tapp ~env tapp in
+            Gen_functions.replace li (profile, ret_ty) (Error exn);
             raise exn
         in
         vi, e, adata, env

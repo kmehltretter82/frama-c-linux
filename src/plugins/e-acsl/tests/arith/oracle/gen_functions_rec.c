@@ -13,11 +13,11 @@ predicate even(integer n) =
   n == 0? \true: (n > 0? !even(n - 1): !even(n + 1));
 
 */
-int __gen_e_acsl_even_13(int n);
+int __gen_e_acsl_even_7(int n);
 
 int __gen_e_acsl_even(int n);
 
-int __gen_e_acsl_even_7(int n);
+int __gen_e_acsl_even_13(int n);
 
 /*@
 predicate even_and_not_negative(integer n) =
@@ -28,11 +28,11 @@ int __gen_e_acsl_even_and_not_negative(int n);
 /*@ logic integer f1(integer n) = n <= 0? 0: f1(n - 1) + n;
 
 */
-int __gen_e_acsl_f1(int n);
+void __gen_e_acsl_f1_9(__e_acsl_mpz_t *__retres_arg, int n);
 
 void __gen_e_acsl_f1_5(__e_acsl_mpz_t *__retres_arg, int n);
 
-void __gen_e_acsl_f1_9(__e_acsl_mpz_t *__retres_arg, int n);
+int __gen_e_acsl_f1(int n);
 
 /*@
 logic integer f2(integer n) = n < 0? 1: (f2(n - 1) * f2(n - 2)) / f2(n - 3);
@@ -41,9 +41,9 @@ int __gen_e_acsl_f2(int n);
 
 /*@ logic integer g(integer n) = 0;
  */
-int __gen_e_acsl_g(int n);
-
 int __gen_e_acsl_g_3(int n);
+
+int __gen_e_acsl_g(int n);
 
 /*@ logic integer f3(integer n) = n > 0? g(n) * f3(n - 1) - 5: g(n + 1);
  */
@@ -58,9 +58,9 @@ unsigned long __gen_e_acsl_f4(unsigned int n);
 /*@ logic integer f5(integer n) = n >= 0? 0: f5(n + 1) + n;
 
 */
-void __gen_e_acsl_f5_5(__e_acsl_mpz_t *__retres_arg, long n);
-
 int __gen_e_acsl_f5(unsigned int n);
+
+void __gen_e_acsl_f5_5(__e_acsl_mpz_t *__retres_arg, long n);
 
 int main(void)
 {

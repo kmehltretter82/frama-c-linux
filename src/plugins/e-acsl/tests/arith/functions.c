@@ -99,3 +99,15 @@ int main(void) {
   /*@ assert signum(0.0-3.0) < 0; */
   /*@ assert signum(0.0) ≡ 0; */
 }
+
+// Function with different return types depending on the call site
+// The recursive call is in a GMP context
+// ⇒ the result needs to be passed back via an additional argument as a reference.
+// The external call is in an int context ⇒ the result is passed back normally using return.
+// This regression test there is to ensure that the two cases are not mixed
+// together resulting in the wrong number of arguments being passed to the function.
+/*@ logic ℤ f4 (ℤ x) = x ≡ 0 ? 0 : f4(x-1) < 1<<99 ? 1 : 2; */
+
+void test_f4() {
+  /*@ assert f4 (0) ≡ 0; */
+}
