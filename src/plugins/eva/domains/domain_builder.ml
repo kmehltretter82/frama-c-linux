@@ -337,6 +337,8 @@ module Restrict
 
     let join = merge (&&)
     let narrow = merge (||)
+
+    let key = Abstract.Domain.create_key "mode"
   end
 
   (* Map that binds functions to their analysis mode. *)
@@ -358,7 +360,7 @@ module Restrict
 
   let default = Domain.top, Mode.all
   let structure: t Abstract.Domain.structure =
-    Abstract.Domain.(Option ((Node (Domain.structure, Void)), default))
+    Abstract.Domain.(Option ((Node (Domain.structure, Void Mode.key)), default))
 
   type state = t
   type context = Domain.context

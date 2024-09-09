@@ -98,7 +98,7 @@ module type Shape = sig
 
   type 'a structure =
     | Unit : unit structure
-    | Void : 'a structure
+    | Void : 'a key -> 'a structure
     | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
     | Option : 'a structure * 'a -> 'a option structure
@@ -112,7 +112,7 @@ module Shape (Key: Key) (Data: sig type 'a t end) = struct
 
   type 'a structure =
     | Unit : unit structure
-    | Void : 'a structure
+    | Void : 'a key -> 'a structure
     | Leaf : 'a key * 'a data -> 'a structure
     | Node : 'a structure * 'b structure -> ('a * 'b) structure
     | Option : 'a structure * 'a -> 'a option structure
@@ -133,6 +133,7 @@ module Shape (Key: Key) (Data: sig type 'a t end) = struct
           | Some Eq -> Some Eq
           | None -> None
         end
+      | Void key1, Void key2 -> Key.eq_type key1 key2
       | Unit, Unit -> Some Eq
       | _, _ -> None
 end
@@ -185,7 +186,7 @@ module Open
 
   let rec mem : type a. 'v Shape.key -> a structure -> bool = fun key -> function
     | Unit -> false
-    | Void -> false
+    | Void _ -> false
     | Leaf (k, _) -> Shape.equal key k
     | Node (left, right) -> mem key left || mem key right
     | Option (s, _) -> mem key s
@@ -201,7 +202,7 @@ module Open
 
   let rec compute_getters : type a. a structure -> (a getter) KMap.t = function
     | Unit -> KMap.empty
-    | Void -> KMap.empty
+    | Void _ -> KMap.empty
     | Leaf (key, _) ->  KMap.singleton key (Get (key, fun (t : a) -> t))
     | Node (left, right) ->
       let l = compute_getters left and r = compute_getters right in
@@ -228,7 +229,7 @@ module Open
 
   let rec compute_setters : type a. a structure -> (a setter) KMap.t = function
     | Unit -> KMap.empty
-    | Void -> KMap.empty
+    | Void _ -> KMap.empty
     | Leaf (key, _) -> KMap.singleton key (Set (key, fun v _t -> v))
     | Node (left, right) ->
       let l = compute_setters left and r = compute_setters right in
@@ -254,7 +255,7 @@ module Open
   let rec iter: type a. a structure -> (polymorphic_iter_fun -> a -> unit) =
     function
     | Unit -> fun _ () -> ()
-    | Void -> fun _ _ -> ()
+    | Void _ -> fun _ _ -> ()
     | Leaf (key, data) -> fun poly v -> poly.iter key data v
     | Node (left, right) ->
       let left = iter left
@@ -273,7 +274,7 @@ module Open
   let rec fold: type a. a structure -> ('b polymorphic_fold_fun -> a -> 'b -> 'b) =
     function
     | Unit -> fun _ () acc -> acc
-    | Void -> fun _ _ acc -> acc
+    | Void _ -> fun _ _ acc -> acc
     | Leaf (key, data) -> fun poly v acc -> poly.fold key data v acc
     | Node (left, right) ->
       let left = fold left
@@ -292,7 +293,7 @@ module Open
   let rec map: type a. a structure -> (polymorphic_map_fun -> a -> a) =
     function
     | Unit -> fun _ () -> ()
-    | Void -> fun _ x -> x
+    | Void _ -> fun _ x -> x
     | Leaf (key, data) -> fun poly v -> poly.map key data v
     | Node (left, right) ->
       let left = map left
