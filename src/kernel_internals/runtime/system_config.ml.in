@@ -56,9 +56,26 @@ module Plugins = struct
   let load name =
     Config_data.Plugins.Plugins.load name
 
+  let try_load_list load list =
+    let list = list () in
+    List.iter (fun p ->
+        try
+          load p
+        with e ->
+          Format.printf "Warning: failed to load plugin '%s' (exception: %s)@."
+            p (Printexc.to_string e);
+          Format.printf "         Try recompiling it or \
+                         completely removing it from the plug-in load path:@.";
+          List.iter (fun path -> Format.printf "         %s@." path)
+            Config_data.Plugins.Plugins.paths
+      ) list
+
   let load_all () =
-    if is_gui then Config_data.Plugins.Plugins_gui.load_all ();
-    Config_data.Plugins.Plugins.load_all ()
+    (* avoid calling Dune_site.Plugins.load_all () directly, so we can catch
+       errors individually *)
+    let open Config_data.Plugins in
+    if is_gui then try_load_list Plugins_gui.load Plugins_gui.list;
+    try_load_list Plugins.load Plugins.list
 end
 
 module Preprocessor = struct
