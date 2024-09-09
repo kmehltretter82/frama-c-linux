@@ -130,15 +130,11 @@ $(SANDBOX): $(SANDBOXES) ./sandboxer.js ./Makefile
 # --- Frama-C API
 # --------------------------------------------------------------------------
 
-.PHONY: api check-api
+.PHONY: api
 
 api:
 	@echo "[Ivette] Generating TypeScript API"
-	./api.sh build src
-
-check-api:
-	@echo "[Ivette] Checking TypeScript API"
-	./api.sh check src
+	./api.sh src
 
 # --------------------------------------------------------------------------
 # --- Ivette Documentation
