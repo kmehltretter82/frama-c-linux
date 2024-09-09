@@ -43,6 +43,7 @@ import { Table, Column, ColumnProps, Renderer } from 'dome/table/views';
 import { RSplit } from 'dome/layout/splitters';
 
 import { TitleBar } from 'ivette';
+import { menuItem, setting } from './Globals';
 
 
 import * as Ast from 'frama-c/kernel/api/ast';
@@ -58,54 +59,87 @@ type Property = Properties.statusData |
 // --------------------------------------------------------------------------
 // --- Filters
 // --------------------------------------------------------------------------
+export enum EFilterType {
+  STATUS = "status",
+  KIND = "kind",
+  SOURCE = "source",
+  ALARMS = "alarms",
+  EVA = "eva"
+}
+export type TFilterType = `${EFilterType}`;
 
-const DEFAULTS: { [key: string]: boolean } = {
-  'currentScope': false,
-  'status.valid': true,
-  'status.valid_hyp': true,
-  'status.unknown': true,
-  'status.invalid': true,
-  'status.invalid_hyp': true,
-  'status.considered_valid': false,
-  'status.untried': false,
-  'status.dead': false,
-  'status.inconsistent': true,
-  'kind.assert': true,
-  'kind.invariant': true,
-  'kind.variant': true,
-  'kind.requires': true,
-  'kind.ensures': true,
-  'kind.instance': true,
-  'kind.assumes': true,
-  'kind.assigns': true,
-  'kind.froms': true,
-  'kind.allocates': true,
-  'kind.behavior': false,
-  'kind.reachable': false,
-  'kind.axiomatic': true,
-  'kind.pragma': true,
-  'kind.others': true,
-  'source.alarms': true, // show properties that are alarms
-  'source.others': true, // show properties that are not alarms
-  'alarms.overflow': true,
-  'alarms.division_by_zero': true,
-  'alarms.mem_access': true,
-  'alarms.index_bound': true,
-  'alarms.pointer_value': true,
-  'alarms.shift': true,
-  'alarms.ptr_comparison': true,
-  'alarms.differing_blocks': true,
-  'alarms.separation': true,
-  'alarms.overlap': true,
-  'alarms.initialization': true,
-  'alarms.dangling_pointer': true,
-  'alarms.special_float': true,
-  'alarms.float_to_int': true,
-  'alarms.function_pointer': true,
-  'alarms.bool_value': true,
-  'eva.priority_only': false,
-  'eva.data_tainted_only': false,
-  'eva.ctrl_tainted_only': false,
+interface IFilterContent {
+  value: boolean;
+  label: string;
+  title?: string;
+}
+
+function newFilter(
+  value: boolean,
+  label: string,
+  title?: string,
+): IFilterContent {
+  return { value, label, title };
+}
+
+const DEFAULTS: { [key: string]: IFilterContent } = {
+  'currentScope': newFilter(false, "Current scope"),
+   /** status */
+  'status.valid': newFilter(true, "Valid"),
+  'status.valid_hyp': newFilter(true, "Valid under hyp."),
+  'status.unknown': newFilter(true, "Unknown"),
+  'status.invalid': newFilter(true, "Invalid"),
+  'status.invalid_hyp': newFilter(true, "Invalid under hyp."),
+  'status.considered_valid': newFilter(false, "Considered valid"),
+  'status.untried': newFilter(false, "Untried"),
+  'status.dead': newFilter(false, "Dead"),
+  'status.inconsistent': newFilter(true, "Inconsistent"),
+  /** kind */
+  'kind.assert': newFilter(true, "Assertions"),
+  'kind.invariant': newFilter(true, "Invariants"),
+  'kind.variant': newFilter(true, "Variants"),
+  'kind.requires': newFilter(true, "Preconditions"),
+  'kind.ensures': newFilter(true, "Postconditions"),
+  'kind.instance': newFilter(true, "Instance"),
+  'kind.assigns': newFilter(true, "Assigns clauses"),
+  'kind.froms': newFilter(true, "From clauses"),
+  'kind.allocates': newFilter(true, "Allocates"),
+  'kind.behavior': newFilter(false, "Behaviors"),
+  'kind.reachable': newFilter(false, "Reachables"),
+  'kind.axiomatic': newFilter(true, "Axiomatics"),
+  'kind.pragma': newFilter(true, "Pragma"),
+  'kind.assumes': newFilter(true, "Assumes"),
+  'kind.others': newFilter(true, "Others"),
+  /** source */
+  'source.alarms': newFilter(true, "Alarms"),
+  'source.others': newFilter(true, "Others"),
+  /** alarms */
+  'alarms.overflow': newFilter(true, "Overflows"),
+  'alarms.division_by_zero': newFilter(true, "Divisions by zero"),
+  'alarms.shift': newFilter(true, "Shifts"),
+  'alarms.special_float': newFilter(true, "Special floats"),
+  'alarms.float_to_int': newFilter(true, "Float to int"),
+  'alarms.bool_value': newFilter(true, "_Bool values"),
+  'alarms.mem_access': newFilter(true, "Memory accesses"),
+  'alarms.index_bound': newFilter(true, "Index bounds"),
+  'alarms.initialization': newFilter(true, "Initializations"),
+  'alarms.dangling_pointer': newFilter(true, "Dangling pointers"),
+  'alarms.pointer_value': newFilter(true, "Pointer values"),
+  'alarms.function_pointer': newFilter(true, "Function pointers"),
+  'alarms.ptr_comparison': newFilter(true, "Pointer comparisons"),
+  'alarms.differing_blocks': newFilter(true, "Differing blocks"),
+  'alarms.separation': newFilter(true, "Separations"),
+  'alarms.overlap': newFilter(true, "Overlaps"),
+  /** eva */
+  'eva.priority_only': newFilter(false, "High-priority only",
+    "Show only high-priority properties for the Eva analysis"
+  ),
+  'eva.data_tainted_only': newFilter(false, "Data-tainted only",
+    "Show only data-tainted properties according to the Eva taint domain"
+  ),
+  'eva.ctrl_tainted_only': newFilter(false, "Control-tainted only",
+    "Show only control-tainted properties according to the Eva taint domain"
+  ),
 };
 
 function filter(path: string): boolean {
@@ -113,15 +147,15 @@ function filter(path: string): boolean {
   return Settings.getWindowSettings(
     `ivette.properties.filter.${path}`,
     Json.jBoolean,
-    defaultValue,
+    defaultValue.value,
   );
 }
 
-function useFilter(path: string): [boolean, () => void] {
+export function useFilter(path: string): [boolean, () => void] {
   const defaultValue = DEFAULTS[path] ?? true;
   return Dome.useFlipSettings(
     `ivette.properties.filter.${path}`,
-    defaultValue,
+    defaultValue.value,
   );
 }
 
@@ -143,7 +177,7 @@ function useFilterStr(path: string): Form.FieldState<string> {
 function resetFilters(prefix: string, b?: boolean) : void {
   for (const key in DEFAULTS) {
     if (key.startsWith(prefix)) {
-      const target = b ?? DEFAULTS[key];
+      const target = b ?? DEFAULTS[key].value;
       const path = `ivette.properties.filter.${key}`;
       Settings.setWindowSettings(path, target);
     }
@@ -278,6 +312,79 @@ function filterProperty(p: Property): boolean {
     && filterAlarm(p.alarm)
     && filterEva(p)
     && filterNames(p.names);
+}
+
+export interface IFilterState {
+  contextMenu: Dome.PopupMenuItem[],
+  show: (status: Properties.statusData) => boolean
+}
+
+function getContextMenu(
+  type: TFilterType,
+  filters: {[key: string]: setting}
+):Dome.PopupMenuItem[] {
+  const typeStr = type+".";
+  return Object.entries(DEFAULTS)
+    .filter(([k, ]) => k.startsWith(typeStr))
+    .map(([k, elt]) => menuItem(elt.label, filters[k.replace(typeStr, "")]));
+}
+
+export function useStatusFilter(): IFilterState {
+  const filters: {[key: string]: setting} = {};
+
+  filters.valid = useFilter('status.valid');
+  filters.validHyp = useFilter('status.valid_hyp');
+  filters.unknown = useFilter('status.unknown');
+  filters.invalid = useFilter('status.invalid');
+  filters.invalidHyp = useFilter('status.invalid_hyp');
+  filters.consideredValid = useFilter('status.considered_valid');
+  filters.untried = useFilter('status.untried');
+  filters.dead = useFilter('status.dead');
+  filters.inconsistent = useFilter('status.inconsistent');
+
+  return {
+    contextMenu: getContextMenu(EFilterType.STATUS, filters),
+    show: (statusData: Property) =>
+      filterStatus(statusData.status),
+  };
+}
+
+export function useKindPropertiesFilter(): IFilterState {
+  const filters: {[key: string]: setting} = {};
+
+  filters.assert = useFilter('kind.assert');
+  filters.invariant = useFilter('kind.invariant');
+  filters.variant = useFilter('kind.variant');
+  filters.requires = useFilter('kind.requires');
+  filters.ensures = useFilter('kind.ensures');
+  filters.instance = useFilter('kind.instance');
+  filters.assigns = useFilter('kind.assigns');
+  filters.froms = useFilter('kind.froms');
+  filters.allocates = useFilter('kind.allocates');
+  filters.behavior = useFilter('kind.behavior',);
+  filters.reachable = useFilter('kind.reachable',);
+  filters.axiomatic = useFilter('kind.axiomatic');
+  filters.pragma = useFilter('kind.pragma');
+  filters.assumes = useFilter('kind.assumes');
+  filters.others = useFilter('kind.others');
+
+  return {
+    contextMenu: getContextMenu(EFilterType.KIND, filters),
+    show: (statusData: Property) => filterKind(statusData.kind),
+  };
+}
+
+export function useEvaPropertiesFilter(): IFilterState {
+  const filters: {[key: string]: setting} = {};
+
+  filters.priorityOnly = useFilter('eva.priority_only');
+  filters.dataTaintedOnly = useFilter('eva.data_tainted_only');
+  filters.ctrlTaintedOnly = useFilter('eva.ctrl_tainted_only');
+
+  return {
+    contextMenu: getContextMenu(EFilterType.EVA, filters),
+    show: (statusData: Property) => filterEva(statusData),
+  };
 }
 
 // --------------------------------------------------------------------------
@@ -422,12 +529,12 @@ const Reload = new Dome.Event('ivette.properties.reload');
 
 interface SectionProps {
   label: string;
-  prefix?: string;
+  prefix?: TFilterType;
   unfold?: boolean;
   children: React.ReactNode;
 }
 
-function onContextMenu(prefix: string): void {
+export function onContextMenu(prefix: string): void {
   const items: Dome.PopupMenuItem[] = [
     {
       label: 'Reset to default',
@@ -503,9 +610,19 @@ function PropertyFilter(): JSX.Element {
     return "At least 2 characters";
   };
 
+  const getCheckBox = (type: TFilterType): JSX.Element => {
+    return <> {
+        Object.entries(DEFAULTS)
+          .filter(([key, ]) => key.startsWith(type+"."))
+          .map(([key, elt]) =>
+            <CheckField key={key} label={elt.label} path={key} title={elt.title}/>
+          )
+    }</>;
+  };
+
   return (
     <Scroll>
-      <CheckField label="Current scope" path="currentScope" />
+      <CheckField label={DEFAULTS.currentScope.label} path="currentScope" />
       <Section
         label="Search"
         defaultUnfold={true}
@@ -524,73 +641,12 @@ function PropertyFilter(): JSX.Element {
           checker={checkerNames}
         />
       </Section>
-      <FilterSection label="Status" prefix="status" unfold>
-        <CheckField label="Valid" path="status.valid" />
-        <CheckField label="Valid under hyp." path="status.valid_hyp" />
-        <CheckField label="Unknown" path="status.unknown" />
-        <CheckField label="Invalid" path="status.invalid" />
-        <CheckField label="Invalid under hyp." path="status.invalid_hyp" />
-        <CheckField label="Considered valid" path="status.considered_valid" />
-        <CheckField label="Untried" path="status.untried" />
-        <CheckField label="Dead" path="status.dead" />
-        <CheckField label="Inconsistent" path="status.inconsistent" />
-      </FilterSection>
-      <FilterSection label="Property kind" prefix="kind">
-        <CheckField label="Assertions" path="kind.assert" />
-        <CheckField label="Invariants" path="kind.invariant" />
-        <CheckField label="Variants" path="kind.variant" />
-        <CheckField label="Preconditions" path="kind.requires" />
-        <CheckField label="Postconditions" path="kind.ensures" />
-        <CheckField label="Instance" path="kind.instance" />
-        <CheckField label="Assigns clauses" path="kind.assigns" />
-        <CheckField label="From clauses" path="kind.froms" />
-        <CheckField label="Allocates" path="kind.allocates" />
-        <CheckField label="Behaviors" path="kind.behavior" />
-        <CheckField label="Reachables" path="kind.reachable" />
-        <CheckField label="Axiomatics" path="kind.axiomatic" />
-        <CheckField label="Pragma" path="kind.pragma" />
-        <CheckField label="Assumes" path="kind.assumes" />
-        <CheckField label="Others" path="kind.others" />
-      </FilterSection>
-      <FilterSection label="Source" prefix="source">
-        <CheckField label="Alarms" path="source.alarms" />
-        <CheckField label="Others" path="source.others" />
-      </FilterSection>
-      <FilterSection label="Alarms kind" prefix="alarms">
-        <CheckField label="Overflows" path="alarms.overflow" />
-        <CheckField label="Divisions by zero" path="alarms.division_by_zero" />
-        <CheckField label="Shifts" path="alarms.shift" />
-        <CheckField label="Special floats" path="alarms.special_float" />
-        <CheckField label="Float to int" path="alarms.float_to_int" />
-        <CheckField label="_Bool values" path="alarms.bool_value" />
-        <CheckField label="Memory accesses" path="alarms.mem_access" />
-        <CheckField label="Index bounds" path="alarms.index_bound" />
-        <CheckField label="Initializations" path="alarms.initialization" />
-        <CheckField label="Dangling pointers" path="alarms.dangling_pointer" />
-        <CheckField label="Pointer values" path="alarms.pointer_value" />
-        <CheckField label="Function pointers" path="alarms.function_pointer" />
-        <CheckField label="Pointer comparisons" path="alarms.ptr_comparison" />
-        <CheckField label="Differing blocks" path="alarms.differing_blocks" />
-        <CheckField label="Separations" path="alarms.separation" />
-        <CheckField label="Overlaps" path="alarms.overlap" />
-      </FilterSection>
-      <FilterSection label="Eva">
-        <CheckField
-          label="High-priority only"
-          path="eva.priority_only"
-          title="Show only high-priority properties for the Eva analysis"
-        />
-        <CheckField
-          label="Data-tainted only"
-          path="eva.data_tainted_only"
-          title="Show only data-tainted properties according to the Eva taint domain"
-        />
-        <CheckField
-          label="Control-tainted only"
-          path="eva.ctrl_tainted_only"
-          title="Show only control-tainted properties according to the Eva taint domain"
-        />
-      </FilterSection>
+
+      <FilterSection label="Status" prefix="status" unfold> { getCheckBox("status") } </FilterSection>
+      <FilterSection label="Property kind" prefix="kind"> { getCheckBox("kind") } </FilterSection>
+      <FilterSection label="Source" prefix="source"> { getCheckBox("source") } </FilterSection>
+      <FilterSection label="Alarms kind" prefix="alarms"> { getCheckBox("alarms") } </FilterSection>
+      <FilterSection label="Eva"> { getCheckBox("eva") } </FilterSection>
     </Scroll>
   );
 }
