@@ -27,15 +27,17 @@ open Cil_types
 module Extensions = struct
   let initialized = ref false
   let ref_is_extension = ref (fun ~plugin:_ _ -> assert false)
+  let ref_is_importer = ref (fun ~plugin:_ _ -> assert false)
   let ref_category = ref (fun ~plugin:_ _ -> assert false)
   let ref_preprocess = ref (fun ~plugin:_ _ -> assert false)
   let ref_is_extension_block = ref (fun ~plugin:_ _ -> assert false)
   let ref_preprocess_block = ref (fun ~plugin:_ _ -> assert false)
 
-  let set_extension_handler ~category ~is_extension ~preprocess
+  let set_extension_handler ~category ~is_extension ~is_importer ~preprocess
       ~is_extension_block ~preprocess_block =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
+    ref_is_importer := is_importer ;
     ref_category := category ;
     ref_preprocess := preprocess ;
     ref_is_extension_block := is_extension_block;
@@ -45,6 +47,7 @@ module Extensions = struct
 
   let is_extension ~plugin name = !ref_is_extension ~plugin name
   let is_extension_block ~plugin name = !ref_is_extension_block ~plugin name
+  let is_importer ~plugin name = !ref_is_importer ~plugin name
   let category ~plugin name = !ref_category ~plugin name
   let preprocess ~plugin name = !ref_preprocess ~plugin name
   let preprocess_block ~plugin name = !ref_preprocess_block ~plugin name
@@ -52,6 +55,7 @@ end
 let set_extension_handler = Extensions.set_extension_handler
 let is_extension = Extensions.is_extension
 let is_extension_block = Extensions.is_extension_block
+let is_importer = Extensions.is_importer
 let extension_category = Extensions.category
 let preprocess_extension = Extensions.preprocess
 let preprocess_extension_block = Extensions.preprocess_block
@@ -154,7 +158,10 @@ module Axiomatics =
 
 module ModuleOccurence =
   Datatype.Pair
-    (Datatype.Option(Datatype.String)) (* external driver *)
+    (Datatype.Option
+       (Datatype.Pair
+          (Datatype.String) (* external driver name *)
+          (Datatype.Option(Datatype.String)))) (* external driver plugin *)
     (Cil_datatype.Location)
 
 module Modules =

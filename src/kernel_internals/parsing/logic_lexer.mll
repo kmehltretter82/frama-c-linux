@@ -190,22 +190,25 @@
       with Not_found ->
         let res =
           match Logic_env.extension_category ~plugin s with
-          | exception Not_found -> None
+          | exception Not_found ->
+            begin
+              match Logic_env.is_importer ~plugin s, plugin with
+              | false, _ -> None
+              | true, None -> Some (EXT_IMPORTER s)
+              | true, Some _ -> Some (EXT_IMPORTER_PLUGIN (s, plugin))
+            end
           | Cil_types.Ext_contract -> Some (EXT_CONTRACT (s, plugin))
           | Cil_types.Ext_global ->
-            begin
-              match Logic_env.is_extension_block ~plugin s with
-              | false -> Some (EXT_GLOBAL (s, plugin))
-              | true -> Some (EXT_GLOBAL_BLOCK (s, plugin))
-            end
+              if Logic_env.is_extension_block ~plugin s
+              then Some (EXT_GLOBAL_BLOCK (s, plugin))
+              else Some (EXT_GLOBAL (s, plugin))
           | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT (s, plugin))
         in
         match res with
         | None ->
           if Logic_env.typename_status s then TYPENAME s
           else
-            (try
-               Hashtbl.find type_kw s
+            (try Hashtbl.find type_kw s
              with Not_found -> IDENTIFIER s)
         | Some lex -> lex
     ),
@@ -325,6 +328,24 @@
            syntax \\kernel::%s" s s;
       tok
     | _ -> raise Parsing.Parse_error
+
+  let check_ext_importer source plugin tok =
+    match tok with
+    | IDENTIFIER s ->
+      if Plugin.is_present plugin then
+        Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
+          "Ignoring unregistered importer extension '%s' of plug-in %s" s plugin
+      else
+        Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
+          "Ignoring importer extension '%s' for unloaded plug-in %s" s plugin;
+      IDENTIFIER_IMPORTER s
+    | EXT_IMPORTER_PLUGIN (s, _) ->
+      if String.equal plugin "kernel" then
+        Kernel.abort ~source
+          "Extension importer '%s' from frama-c's kernel should not be used \
+           with the syntax \\kernel::%s" s s;
+      tok
+    | _ -> raise Parsing.Parse_error
 }
 
 let space = [' ' '\t' '\012' '\r' '@' ]
@@ -372,6 +393,12 @@ rule token = parse
            then comment lexbuf
            else lex_error lexbuf "unexpected block-comment opening"
          }
+  | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) ":" {
+     let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
+     let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+     let tok = identifier ~plugin:(Some plugin) name cabsloc in
+     check_ext_importer (fst cabsloc) plugin tok
+     }
   | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
      let cabsloc = Cil_datatype.Location.of_lexing_loc loc in

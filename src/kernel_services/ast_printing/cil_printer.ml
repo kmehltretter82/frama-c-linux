@@ -3284,6 +3284,14 @@ class cil_printer () = object (self)
       (self#typ None) mfi.mi_base_type
       (self#logic_type (Some print_decl)) mfi.mi_field_type
 
+  method private pp_driver fmt (name, plugin) =
+    match plugin with
+    | None -> pp_print_string fmt name
+    | Some plugin ->
+      if Datatype.String.equal plugin "kernel"
+      then pp_print_string fmt name
+      else fprintf fmt "\\%s::%s" plugin name
+
   method global_annotation fmt = function
     | Dtype_annot (a,_) ->
       let old_label = current_label in
@@ -3415,15 +3423,16 @@ class cil_printer () = object (self)
         decls
     | Dmodule(id, _, _, Some drv, _)
       when not Kernel.(is_debug_key_enabled dkey_print_imported_modules) ->
-      fprintf fmt "@[<hov 2>%a %s: %s %a _ ;@]@\n"
-        self#pp_acsl_keyword "import" drv id
+      fprintf fmt "@[<hov 2>%a %a: %s %a _ ;@]@\n"
+        self#pp_acsl_keyword "import"
+        self#pp_driver drv id
         self#pp_acsl_keyword "\\as"
     | Dmodule(id, decls, _attr, driver, _) ->
       begin
         (* attributes are meant to be purely internal for now. *)
         fprintf fmt "@[<v 2>@[" ;
         if Kernel.(is_debug_key_enabled dkey_print_imported_modules) then
-          Option.iter (fprintf fmt "// import %s:@\n") driver ;
+          Option.iter (fprintf fmt "// import %a:@\n" self#pp_driver) driver ;
         fprintf fmt "%a %a {@]"
           self#pp_acsl_keyword "module" self#logic_name id ;
         try

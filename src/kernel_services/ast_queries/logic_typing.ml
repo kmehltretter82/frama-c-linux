@@ -538,7 +538,7 @@ module Extensions = struct
   let ref_is_extension = ref (fun ~plugin:_ _ -> assert false)
   let ref_typer = ref (fun ~plugin:_ _ _ _ _ -> assert false)
   let ref_typer_block = ref (fun ~plugin:_ _ _ _ _ -> assert false)
-  let ref_importer = ref (fun _ _ _ _ -> assert false)
+  let ref_importer = ref (fun ~plugin:_ _ _ _ _ -> assert false)
 
   let set_handler ~is_extension ~typer ~typer_block ~importer =
     assert (not !initialized) ;
@@ -556,8 +556,8 @@ module Extensions = struct
   let typer_block ~plugin name ~typing_context:typing_context ~loc =
     !ref_typer_block ~plugin name typing_context loc
 
-  let importer name ~builder ~loc (moduleId: string list) : unit =
-    !ref_importer name builder loc moduleId
+  let importer ~plugin name ~builder ~loc (moduleId: string list) : unit =
+    !ref_importer ~plugin name builder loc moduleId
 
 end
 let set_extension_handler = Extensions.set_handler
@@ -4330,24 +4330,27 @@ struct
     | LDimport(None,name,alias) ->
       add_import ?alias name ; None
 
-    | LDimport(Some driver as drv,name,alias) ->
+    | LDimport(Some (driver, plugin) as drv,name,alias) ->
       let annot =
         match Logic_env.Modules.find name with
         | None, oldloc ->
           C.error loc
             "Module %s already defined (at %a)"
             name Cil_printer.pp_location oldloc
-        | Some odrv, oldloc ->
-          if odrv <> driver then
+        | Some (driver', plugin'), oldloc ->
+          if plugin <> plugin' || driver <> driver' then
             C.error loc
-              "Module %s already imported with driver %s (at %a)"
-              name odrv Cil_printer.pp_location oldloc
+              "Module %s already imported with driver %a%s (at %a)"
+              name
+              (Pretty_utils.pp_opt ~pre:"\\" ~suf:"::" Format.pp_print_string) plugin'
+              driver'
+              Cil_printer.pp_location oldloc
           else None
         | exception Not_found ->
           let decls = ref [] in
           let builder = make_module_builder decls name in
           let path = Logic_utils.longident name in
-          Extensions.importer driver ~builder ~loc path ;
+          Extensions.importer ~plugin driver ~builder ~loc path ;
           Logic_env.Modules.add name (drv,loc) ;
           Some (Dmodule(name,List.rev !decls,[],drv,loc))
       in add_import ?alias name ; annot

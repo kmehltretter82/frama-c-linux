@@ -40,6 +40,11 @@ val is_extension: plugin:string option -> string -> bool
 *)
 val is_extension_block: plugin:string option -> string -> bool
 
+(** Return [true] if a module importer is registered for the given plugin.
+    @since Frama-C+dev
+*)
+val is_importer: plugin:string option -> string -> bool
+
 (** Return the extension category.
     @raise Not_Found if the extension is not registered
     @before Frama-C+def the function took one less argument, [plugin], which is
@@ -87,7 +92,8 @@ module Axiomatics: State_builder.Hashtbl
 (** @since Frama-C+dev *)
 module Modules: State_builder.Hashtbl
   with type key = string
-   and type data = string option * Cil_types.location (* driver, loc *)
+   (* driver (name, plugin), location *)
+   and type data = (string * string option) option * Cil_types.location
 
 val builtin_states: State.t list
 
@@ -257,7 +263,7 @@ val set_extension_handler:
     If your name is not [Acsl_extension], do not call this.
     @since 21.0-Scandium
     @before Frama-C+dev functions did not take a [plugin] parameter.
-    [get_plugins] did not exist
+    [get_plugins] and [is_importer] did not exist
 *)
 
 val init_dependencies: State.t -> unit

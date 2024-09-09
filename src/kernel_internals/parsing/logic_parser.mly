@@ -269,7 +269,7 @@
 
 %token EXT_SPEC_MODULE EXT_SPEC_FUNCTION EXT_SPEC_CONTRACT EXT_SPEC_INCLUDE
 %token EXT_SPEC_AT EXT_SPEC_LET
-%token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT
+%token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT IDENTIFIER_IMPORTER
 %token <bool*string> STRING_LITERAL
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
@@ -290,7 +290,8 @@
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token ADMIT_REQUIRES ADMIT_LOOP ADMIT_INVARIANT ADMIT_LEMMA
 %token ADMIT_ENSURES ADMIT_EXITS ADMIT_CONTINUES ADMIT_BREAKS ADMIT_RETURNS
-%token <string * string option> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
+%token <string> EXT_IMPORTER
+%token <string * string option> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT EXT_IMPORTER_PLUGIN
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
@@ -952,7 +953,10 @@ full_identifier:
 | id = EXT_CONTRACT { fst id }
 | id = EXT_GLOBAL { fst id }
 | id = EXT_GLOBAL_BLOCK { fst id }
+| id = EXT_IMPORTER { id }
+| id = EXT_IMPORTER_PLUGIN { fst id }
 | id = IDENTIFIER_EXT { id }
+| id = IDENTIFIER_IMPORTER { id }
 ;
 
 %inline unknown_extension:
@@ -1695,9 +1699,9 @@ logic_def:
     { LDimport(None,mId,None) }
 | IMPORT mId = module_name AS id = IDENTIFIER SEMICOLON
     { LDimport(None,mId,Some id) }
-| IMPORT drv = IDENTIFIER COLON mId = module_name SEMICOLON
+| IMPORT drv = ext_importer mId = module_name SEMICOLON
     { LDimport(Some drv,mId,None) }
-| IMPORT drv = IDENTIFIER COLON mId = module_name AS id = IDENTIFIER SEMICOLON
+| IMPORT drv = ext_importer mId = module_name AS id = IDENTIFIER SEMICOLON
     { LDimport(Some drv,mId,Some id) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
@@ -1714,6 +1718,17 @@ module_name:
 push_module_name:
 | module_name { push_module_types () ; $1 }
 ;
+
+ext_importer:
+| IDENTIFIER COLON {
+    Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown
+      ~source:(fst (loc $sloc))
+      "Ignoring unregistered importer extension '%s'" $1;
+    raise Unknown_ext
+  }
+| EXT_IMPORTER COLON { $1, None }
+| EXT_IMPORTER_PLUGIN { $1 }
+| IDENTIFIER_IMPORTER { raise Unknown_ext }
 
 deprecated_logic_decl:
 /* OBSOLETE: logic function declaration */
@@ -1982,7 +1997,10 @@ is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { fst $1 }
 | EXT_GLOBAL { fst $1 }
 | EXT_GLOBAL_BLOCK { fst $1 }
+| EXT_IMPORTER { $1 }
+| EXT_IMPORTER_PLUGIN { fst $1 }
 | IDENTIFIER_EXT { $1 }
+| IDENTIFIER_IMPORTER { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
 | CHECK     { "check" }

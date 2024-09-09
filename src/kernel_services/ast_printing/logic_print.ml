@@ -376,8 +376,16 @@ let rec print_decl fmt d =
     fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
       (pp_list ~sep:"@\n" print_decl) ds
   | LDimport (drv,mId,asId) ->
+    let pp_driver fmt (name, plugin) =
+      match plugin with
+      | None -> pp_print_string fmt name
+      | Some plugin ->
+        if Datatype.String.equal plugin "kernel"
+        then pp_print_string fmt name
+        else fprintf fmt "\\%s::%s" plugin name
+    in
     fprintf fmt "@[<2>import" ;
-    Option.iter (fprintf fmt "@ %s:") drv ;
+    Option.iter (fprintf fmt "%a:" pp_driver) drv ;
     fprintf fmt "@ %s" mId ;
     Option.iter (fprintf fmt "@ \\as %s") asId ;
     fprintf fmt ";@]@\n}"

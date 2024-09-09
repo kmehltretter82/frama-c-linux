@@ -318,7 +318,8 @@ val set_extension_handler:
   typer_block:(plugin:string option -> string -> typing_context -> location ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
-  importer:(string -> module_builder -> location -> string list -> unit) ->
+  importer: (plugin:string option -> string -> module_builder -> location ->
+             string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
@@ -349,7 +350,11 @@ val get_typer_block:
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
 
+(** Load the given extension importer.
+    @since Frama-C+dev
+*)
 val get_importer:
+  plugin:string option ->
   string ->
   builder:module_builder ->
   loc:Logic_ptree.location ->

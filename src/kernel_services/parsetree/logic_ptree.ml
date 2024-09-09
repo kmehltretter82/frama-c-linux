@@ -250,7 +250,7 @@ and decl_node =
   | LDmodule of string * decl list
   (** [LDmodule(id,decls)]
       represents a module of axiomatic definitions.*)
-  | LDimport of string option * string * string option
+  | LDimport of (string * string option) option * string * string option
   (** [LDimport(driver,module,alias)]
       imports symbols from module using the specified driver,
       with optional alias.*)
