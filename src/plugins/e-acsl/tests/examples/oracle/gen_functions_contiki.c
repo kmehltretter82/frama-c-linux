@@ -41,6 +41,8 @@ int main(void)
   node1.next = & node2;
   __e_acsl_initialize((void *)(& node2.next),sizeof(struct list *));
   node2.next = & node3;
+  __e_acsl_initialize((void *)(& node3.next),sizeof(struct list *));
+  node3.next = (struct list *)0;
   struct list *l = & node1;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
@@ -57,7 +59,7 @@ int main(void)
     __gen_e_acsl_assert_data.pred_txt = "length(l) == 3";
     __gen_e_acsl_assert_data.file = "functions_contiki.c";
     __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 28;
+    __gen_e_acsl_assert_data.line = 29;
     __e_acsl_assert(__gen_e_acsl_length_here_2 == 3L,
                     & __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -90,7 +92,6 @@ long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
       long __gen_e_acsl_if;
       if (n < 2147483647U) {
         long __gen_e_acsl_length_aux_here_3;
-        /*@ assert Eva: initialization: \initialized(&l->next); */
         __gen_e_acsl_length_aux_here_3 = __gen_e_acsl_length_aux_here
         (l->next,n + 1U);
         __gen_e_acsl_if = __gen_e_acsl_length_aux_here_3;
