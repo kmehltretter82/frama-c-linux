@@ -10047,7 +10047,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let loc' = convLoc loc in
     let (se, e', et) = doFullExp local_env CNoConst e (AExp None) in
     if not (Cil.isIntegralType et) then
-      Kernel.error ~once:true ~current:true "Switch on a non-integer expression.";
+      Kernel.abort ~once:true ~current:true "Switch on a non-integer expression.";
     let et' = Cil.integralPromotion et in
     let e' = mkCastT ~oldt:et ~newt:et' e' in
     enter_break_env ();
