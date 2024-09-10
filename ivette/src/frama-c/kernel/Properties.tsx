@@ -332,15 +332,15 @@ function getContextMenu(
 export function useStatusFilter(): IFilterState {
   const filters: {[key: string]: setting} = {};
 
-  filters.valid = useFilter('status.valid');
-  filters.validHyp = useFilter('status.valid_hyp');
-  filters.unknown = useFilter('status.unknown');
-  filters.invalid = useFilter('status.invalid');
-  filters.invalidHyp = useFilter('status.invalid_hyp');
-  filters.consideredValid = useFilter('status.considered_valid');
-  filters.untried = useFilter('status.untried');
-  filters.dead = useFilter('status.dead');
-  filters.inconsistent = useFilter('status.inconsistent');
+  filters['valid'] = useFilter('status.valid');
+  filters['valid_hyp'] = useFilter('status.valid_hyp');
+  filters['unknown'] = useFilter('status.unknown');
+  filters['invalid'] = useFilter('status.invalid');
+  filters['invalid_hyp' ]= useFilter('status.invalid_hyp');
+  filters['considered_valid'] = useFilter('status.considered_valid');
+  filters['untried'] = useFilter('status.untried');
+  filters['dead'] = useFilter('status.dead');
+  filters['inconsistent'] = useFilter('status.inconsistent');
 
   return {
     contextMenu: getContextMenu(EFilterType.STATUS, filters),
@@ -352,21 +352,21 @@ export function useStatusFilter(): IFilterState {
 export function useKindPropertiesFilter(): IFilterState {
   const filters: {[key: string]: setting} = {};
 
-  filters.assert = useFilter('kind.assert');
-  filters.invariant = useFilter('kind.invariant');
-  filters.variant = useFilter('kind.variant');
-  filters.requires = useFilter('kind.requires');
-  filters.ensures = useFilter('kind.ensures');
-  filters.instance = useFilter('kind.instance');
-  filters.assigns = useFilter('kind.assigns');
-  filters.froms = useFilter('kind.froms');
-  filters.allocates = useFilter('kind.allocates');
-  filters.behavior = useFilter('kind.behavior',);
-  filters.reachable = useFilter('kind.reachable',);
-  filters.axiomatic = useFilter('kind.axiomatic');
-  filters.pragma = useFilter('kind.pragma');
-  filters.assumes = useFilter('kind.assumes');
-  filters.others = useFilter('kind.others');
+  filters['assert'] = useFilter('kind.assert');
+  filters['invariant'] = useFilter('kind.invariant');
+  filters['variant'] = useFilter('kind.variant');
+  filters['requires'] = useFilter('kind.requires');
+  filters['ensures'] = useFilter('kind.ensures');
+  filters['instance'] = useFilter('kind.instance');
+  filters['assigns'] = useFilter('kind.assigns');
+  filters['froms'] = useFilter('kind.froms');
+  filters['allocates'] = useFilter('kind.allocates');
+  filters['behavior'] = useFilter('kind.behavior',);
+  filters['reachable'] = useFilter('kind.reachable',);
+  filters['axiomatic'] = useFilter('kind.axiomatic');
+  filters['pragma'] = useFilter('kind.pragma');
+  filters['assumes'] = useFilter('kind.assumes');
+  filters['others'] = useFilter('kind.others');
 
   return {
     contextMenu: getContextMenu(EFilterType.KIND, filters),
@@ -377,9 +377,9 @@ export function useKindPropertiesFilter(): IFilterState {
 export function useEvaPropertiesFilter(): IFilterState {
   const filters: {[key: string]: setting} = {};
 
-  filters.priorityOnly = useFilter('eva.priority_only');
-  filters.dataTaintedOnly = useFilter('eva.data_tainted_only');
-  filters.ctrlTaintedOnly = useFilter('eva.ctrl_tainted_only');
+  filters['priority_only'] = useFilter('eva.priority_only');
+  filters['data_tainted_only'] = useFilter('eva.data_tainted_only');
+  filters['ctrl_tainted_only'] = useFilter('eva.ctrl_tainted_only');
 
   return {
     contextMenu: getContextMenu(EFilterType.EVA, filters),
