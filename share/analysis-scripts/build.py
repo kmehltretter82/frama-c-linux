@@ -207,7 +207,7 @@ def replace_line(lines: list[str], line_pattern: str, value: str, all_occurrence
 
 # replaces '/' and '.' with '_' so that a valid target name is created
 def make_target_name(target: Path) -> str:
-    return prettify(str(target)).replace("/", "_").replace(".", "_")
+    return prettify(target).replace("/", "_").replace(".", "_")
 
 
 def rel_path(path: Path, base: Path) -> str:
@@ -295,12 +295,17 @@ def list_partition(f: Callable[[T], bool], l: list[T]) -> tuple[list[T], list[T]
 
 def pp_list(l: list[str]) -> list[str]:
     """Applies prettify to a list of sources/targets and sorts the result."""
+    return sorted([prettify(Path(e)) for e in l])
+
+
+def pp_path_list(l: list[Path]) -> list[str]:
+    """Applies prettify to a list of sources/targets and sorts the result."""
     return sorted([prettify(e) for e in l])
 
 
 # End of auxiliary functions ##################################################
 
-sources_map = dict()
+sources_map: dict[Path, list[Path]] = {}
 if sources:
     if not targets:
         sys.exit("error: option --targets is mandatory when --sources is specified")
@@ -321,8 +326,8 @@ elif os.path.isfile(jbdb_path):
         programs, other_targets = list_partition(filter_target, f["targets"])
         program_targets += programs
         non_program_targets += other_targets
-    logging.debug("program_targets: %s", pp_list(program_targets))
-    logging.debug("non_program_targets: %s", pp_list(non_program_targets))
+    logging.debug("program_targets: %s", pp_path_list(program_targets))
+    logging.debug("non_program_targets: %s", pp_path_list(non_program_targets))
     all_jbdb_targets = program_targets + non_program_targets
     if not all_jbdb_targets:
         sys.exit(f"no targets found in JBDB ({jbdb_path})")
@@ -341,8 +346,10 @@ elif os.path.isfile(jbdb_path):
                 continue  # keep looping to accumulate all invalid targets, but avoid extra work
             sources = blug_jbdb.collect_leaves(graph, [target])
             c_sources, non_c_sources = list_partition(filter_source, sources)
-            logging.debug("non_c_sources: %s", pp_list(non_c_sources))
-            sources_map[target] = c_sources
+            explicit_sources = [
+                s for s in c_sources if s in blug_jbdb.cmd_args_using_source(jbdb_path, jbdb, s)
+            ]
+            sources_map[target] = explicit_sources
     if unknown_targets_from_cmdline:
         targets_pretty = "\n".join(unknown_targets_from_cmdline)
         sys.exit("target(s) not found in JBDB:\n{targets_pretty}")
@@ -354,14 +361,14 @@ else:
 
 logging.debug(
     "sources_map: %s",
-    sorted([prettify(k) + ": " + ", ".join(pp_list(v)) for (k, v) in sources_map.items()]),
+    sorted([prettify(k) + ": " + ", ".join(pp_path_list(v)) for (k, v) in sources_map.items()]),
 )
 logging.debug("targets: %s", pp_list(targets))
 
 # check that source files exist
 unknown_sources = sorted({s for sources in sources_map.values() for s in sources if not s.exists()})
 if unknown_sources:
-    sys.exit("error: source(s) not found:\n" + "\n".join(pp_list(unknown_sources)))
+    sys.exit("error: source(s) not found:\n" + "\n".join(pp_path_list(unknown_sources)))
 
 # Check that the main function is defined exactly once per target.
 # note: this is only based on heuristics (and fails on a few real case studies),
