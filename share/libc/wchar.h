@@ -26,6 +26,7 @@
 
 #include "features.h"
 __PUSH_FC_STDLIB
+#include "__fc_define_mbstate_t.h"
 #include "__fc_define_wchar_t.h"
 #include "__fc_define_wint_t.h"
 #include "__fc_define_size_t.h"
@@ -303,11 +304,6 @@ extern int wscanf(const wchar_t * format, ...);
 extern int fwscanf(FILE * stream, const wchar_t * format, ...);
 
 extern int swscanf(const wchar_t * str, const wchar_t * format, ...);
-
-#ifndef __mbstate_t_defined
-typedef struct __fc_mbstate_t { int __count; char __value[4]; } mbstate_t;
-#define __mbstate_t_defined
-#endif
 
 __END_DECLS
 

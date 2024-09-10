@@ -20,25 +20,16 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "__fc_builtin.c"
-#include "argz.c"
-#include "assert.c"
-#include "ctype.c"
-#include "errno.c"
-#include "error.c"
-#include "fenv.c"
-#include "glob.c"
-#include "inttypes.c"
-#include "locale.c"
-#include "math.c"
-#include "netdb.c"
-#include "netinet/in.c"
-#include "pwd.c"
-#include "signal.c"
-#include "sys/socket.c"
-#include "stdatomic.c"
-#include "stdio.c"
-#include "stdlib.c"
-#include "string.c"
-#include "unistd.c"
-#include "wchar.c"
+#ifndef __FC_DEFINE_MBSTATE_T
+#define __FC_DEFINE_MBSTATE_T
+#include "features.h"
+__PUSH_FC_STDLIB
+#include "__fc_machdep.h"
+__BEGIN_DECLS
+#ifndef __mbstate_t_defined
+typedef struct __fc_mbstate_t { int __count; char __value[4]; } mbstate_t;
+#define __mbstate_t_defined
+#endif
+__END_DECLS
+__POP_FC_STDLIB
+#endif
