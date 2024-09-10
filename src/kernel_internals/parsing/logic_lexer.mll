@@ -305,13 +305,6 @@
     | ADMIT, LEMMA -> true, ADMIT_LEMMA
     | _ -> false, current
 
-  let type_to_string = function
-    | TYPENAME s -> s
-    | REAL -> "real"
-    | BOOLEAN -> "boolean"
-    | INTEGER -> "integer"
-    | _ -> assert false
-
   let check_ext_plugin source plugin tok =
     match tok with
     | IDENTIFIER s ->
@@ -335,10 +328,7 @@
         Kernel.abort ~source
           "Extension '%s' is from %s and not %s" s plugin_from plugin;
       tok
-    | _ ->
-      Kernel.abort ~source
-        "Type token \'%s\' received instead of extension identifier"
-        (type_to_string tok)
+    | _ -> raise Parsing.Parse_error
 }
 
 let space = [' ' '\t' '\012' '\r' '@' ]
