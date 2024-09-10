@@ -361,12 +361,12 @@ end = struct
   let kernel_functions_of_logic_info li =
     try
       let params = Memo_tbl.find memo_tbl li in
-      let add_fundecl kf acc =
+      let add_fundecl _ kf acc =
         match kf with
         | Ok kf -> Kernel_function.get_vi kf :: acc
         | Error _ -> acc (* Exception has already been signaled *)
       in
-      Signatures.fold_sorted (fun _ -> add_fundecl) params []
+      Signatures.fold_sorted add_fundecl params []
     with Not_found -> []
 end
 
@@ -392,7 +392,7 @@ let add_generated_functions_to_file file =
   let all_decls =
     List.concat_map (fun g -> g :: generated_decls_of_global g) file.globals
   in
-  let add_fundef kf acc =
+  let add_fundef _ kf acc =
     let get_fundef kf =
       try Kernel_function.get_definition kf
       with Kernel_function.No_Definition -> assert false
@@ -406,7 +406,7 @@ let add_generated_functions_to_file file =
   (* append the generated function definitions at the end; as the declarations
      are all already above they can be mutually recursive. *)
   let new_globals =
-    all_decls @ List.rev @@ Gen_functions.fold_sorted (fun _ -> add_fundef) []
+    all_decls @ List.rev @@ Gen_functions.fold_sorted add_fundef []
   in
   file.globals <- new_globals
 
