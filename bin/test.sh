@@ -38,6 +38,7 @@ JSON=
 
 DUNE_ALIAS=
 DUNE_OPT=
+DUNE_OPT_POST=
 DUNE_LOG=./.test-errors.log
 ALIAS_NAME=ptests
 LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
@@ -87,6 +88,12 @@ function Usage
     echo "  --coverage-xml      compute test coverage in Cobertura XML format"
     echo "  --coverage-json     compute test coverage in Coveralls JSON format"
     echo "  -h|--help           print this help"
+    echo ""
+    echo "TRAILING OPTIONS"
+    echo ""
+    echo "  All arguments passed after a double dash '--' are passed to dune"
+    echo "  For example in 'test.sh -r -u tests -- -j 12', '-j 12' will be"
+    echo "  passed as a dune argument"
     echo ""
     echo "VARIABLES"
     echo ""
@@ -224,6 +231,10 @@ do
         "eva")
             TESTS+=" tests/value tests/builtins tests/float tests/idct"
             ;;
+        "--")
+            shift
+            break
+            ;;
         *)
             if [ -f $1 ] || [ -d $1 ]; then
                 TESTS+=" $1"
@@ -238,6 +249,9 @@ do
     esac
     shift
 done
+
+# Pass all the remaining options (after '--') to dune at the end of the command
+DUNE_OPT_POST="$@"
 
 # --------------------------------------------------------------------------
 # ---  WP Cache Environment
@@ -398,13 +412,13 @@ function RunAlias
 {
     Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
-        Run dune build $DUNE_OPT $@
+        Run dune build $DUNE_OPT $@ $DUNE_OPT_POST
     elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
-        Run dune build $DUNE_OPT $@
+        Run dune build $DUNE_OPT $@ $DUNE_OPT_POST
     else
         # note: the Run function cannot performs redirection
-        echo "> dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)"
-        dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)
+        echo "> dune build $DUNE_OPT $@ $DUNE_OPT_POST 2> >(tee -a $DUNE_LOG >&2)"
+        dune build $DUNE_OPT $@ $DUNE_OPT_POST 2> >(tee -a $DUNE_LOG >&2)
     fi
 }
 
