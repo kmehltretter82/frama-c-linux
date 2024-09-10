@@ -250,8 +250,15 @@ module Extensions = struct
 
   let is_importer = mem ~get_plugin:get_plugin_importer ext_importer_tbl
 
+  let fullname plugin name =
+    if Datatype.String.equal plugin "kernel"
+    then name
+    else Format.sprintf "\\%s::%s" plugin name
+
   let register_gen ~make ~tbl cat ~plugin name
       ?preprocessor typer ?visitor ?printer ?short_printer ?is_same_ext status =
+    Kernel.debug ~dkey:Kernel.dkey_acsl_extension
+      "Registering acsl extension %s" (fullname plugin name);
     let info1,info2 =
       make ~plugin name cat ?preprocessor typer
         ?visitor ?printer ?short_printer ?is_same_ext status
@@ -278,6 +285,8 @@ module Extensions = struct
   let register_block = register_gen ~make:make_block ~tbl:ext_block_tbl
 
   let register_module_importer ~plugin name loader =
+    Kernel.debug ~dkey:Kernel.dkey_acsl_extension
+      "Registering importer extension %s" (fullname plugin name);
     if is_importer ~plugin:(Some "kernel") name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
         "Trying to register importer extension %s reserved by frama-c. \
@@ -326,11 +335,7 @@ module Extensions = struct
   let print ~plugin name printer fmt kind =
     let ext_common = find_common ~plugin name in
     let plugin = get_plugin_common ext_common in
-    let full_name =
-      if Datatype.String.equal plugin "kernel"
-      then name
-      else Format.sprintf "\\%s::%s" plugin name
-    in
+    let full_name = fullname plugin name in
     let pp = ext_common.printer printer in
     match kind with
     | Ext_annot (id,_) ->
