@@ -10,11 +10,11 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-int ( __gen_e_acsl_empty_block_here)(void *s);
+int __gen_e_acsl_empty_block_here(void *s);
 
-int ( __gen_e_acsl_valid_or_empty_here)(void *s, unsigned long n);
+int __gen_e_acsl_valid_or_empty_here(void *s, unsigned long n);
 
-int ( __gen_e_acsl_valid_read_or_empty_here)(void *s, unsigned long n);
+int __gen_e_acsl_valid_read_or_empty_here(void *s, unsigned long n);
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
     requires valid_src: valid_read_or_empty(src, n);
@@ -1041,7 +1041,7 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
   }
 }
 
-int ( __gen_e_acsl_valid_or_empty_here)(void *s, unsigned long n)
+int __gen_e_acsl_valid_or_empty_here(void *s, unsigned long n)
 {
   int __gen_e_acsl_empty_block_here_2;
   int __gen_e_acsl_or;
@@ -1098,7 +1098,7 @@ int ( __gen_e_acsl_valid_or_empty_here)(void *s, unsigned long n)
   return __gen_e_acsl_and_2;
 }
 
-int ( __gen_e_acsl_empty_block_here)(void *s)
+int __gen_e_acsl_empty_block_here(void *s)
 {
   unsigned long __gen_e_acsl_block_length;
   int __gen_e_acsl_and;
@@ -1112,7 +1112,7 @@ int ( __gen_e_acsl_empty_block_here)(void *s)
   return __gen_e_acsl_and;
 }
 
-int ( __gen_e_acsl_valid_read_or_empty_here)(void *s, unsigned long n)
+int __gen_e_acsl_valid_read_or_empty_here(void *s, unsigned long n)
 {
   int __gen_e_acsl_empty_block_here_3;
   int __gen_e_acsl_or;
