@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import { createRoot } from 'react-dom/client';
 
 import ForceGraph2D, {
   ForceGraphMethods as ForceGraphMethods2D,
@@ -32,17 +33,25 @@ import ForceGraph3D, {
   ForceGraphMethods as ForceGraphMethods3D,
   LinkObject as LinkObject3D,
   NodeObject as NodeObject3D,
+  ForceGraphProps as ForceGraphProps3D,
 } from 'react-force-graph-3d';
+
+/** Three is a dependency of 3d-force-graph */
+import {
+  CSS2DRenderer, CSS2DObject
+} from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 import { Size } from 'react-virtualized';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-// ForceGraphMethods as ForceGraphMethods3D,
+import * as Dome from 'dome';
+import * as Themes from 'dome/themes';
 
 /* -------------------------------------------------------------------------- */
 /* --- Graph Specifications                                               --- */
 /* -------------------------------------------------------------------------- */
 
+/** Type layout */
 export type Layout = '2D' | '3D';
 
 export interface Node {
@@ -55,6 +64,131 @@ export interface Node {
 export interface Edge {
   source: string /** Source node identifier */;
   target: string /** Target node identifier */;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Force Graph Components                                             --- */
+/* -------------------------------------------------------------------------- */
+
+interface GNode {
+  id: string;
+  label?: string;
+}
+interface GLink {
+  source: string;
+  target: string;
+}
+interface GData {
+  nodes: GNode[];
+  links: GLink[];
+}
+
+interface IGProps {
+  data: GData;
+  onSelection?: SelectionCallback;
+  selected: string | undefined;
+  size: Size;
+}
+
+interface IGProps2D extends IGProps {
+  options?: IGraphOptions;
+}
+
+interface IGProps3D extends IGProps {
+  options?: IGraphOptions3D;
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Graph options                                                      --- */
+/* -------------------------------------------------------------------------- */
+/** Nodes options */
+export interface INodesOptions {
+  /** visibility of the nodes */
+  visibility?: boolean | ((node: GNode) => boolean);
+}
+
+/** Links options */
+export interface ILinksOptions {
+  /** Width of the links */
+  width?: number | ((node: GLink) => number);
+  /** Color of the links */
+  color?: string | ((node: GLink) => string);
+  /** visibility of the links */
+  visibility?: boolean | ((node: GLink) => boolean);
+  /** Size of the arrows */
+  directionalArrow?: number;
+  /** Number of directional particles */
+  directionalParticle?: number;
+  /** Width of directional particles */
+  particleWidth?: number;
+  /** Color of directional particles */
+  particleColor?: string | ((node: GLink) => string)
+}
+
+/** Common options for Graph2D and Graph3D */
+export interface IGraphOptions {
+  /** Background color */
+  backgroundColor?: string;
+  /** Moves the camera to see all of the nodes if active */
+  autoCenter?: boolean;
+  /**
+   * If displayMode = td, the graph will be display like a tree from top to down
+   * Work only if the graph has no cycle
+   */
+  displayMode?: 'td';
+  /** Spacing between depths level */
+  depthSpacing?: number;
+  /** A string[][] ref to save the cycles */
+  cycles?: React.MutableRefObject<string[][]>
+  /** Nodes options */
+  nodesOptions?: INodesOptions;
+  /** Links options */
+  linkOptions?: ILinksOptions;
+}
+
+/** Specific options for graph3D */
+export interface IGraphOptions3D extends IGraphOptions {
+  /** function to create the HTML for 2D object */
+  htmlNode?: (node: NodeObject3D<GNode>) => JSX.Element;
+  /** Node repulsion */
+  horizontalSpacing?: number;
+}
+
+function getOnEngineStop(
+  fgRef: React.MutableRefObject<ForceGraphMethods3D<NodeObject3D<GNode>,
+  LinkObject3D<GNode, GLink>> | undefined>,
+  options: {
+    autoCenter?: boolean
+  }
+):() => void {
+  return () => {
+    if (options.autoCenter && fgRef.current) {
+      fgRef.current.zoomToFit(400, 20);
+    }
+  };
+}
+
+function getOnDagError(
+  cycles: React.MutableRefObject<string[][]>
+):(val: (string | number)[]) => void {
+  return (val: (string | number)[]) => cycles.current.push(val as string[]);
+}
+
+/** Tranform JSX.Element to HtmlObject */
+const jsxToHtmlObject = (jsxElement: JSX.Element): HTMLDivElement => {
+  const container = document.createElement('div');
+  createRoot(container).render(jsxElement);
+  return container;
+};
+
+/** Return a function who make an object2D */
+function getObject2DFunction(
+  getNode: (node: NodeObject3D<GNode>) => JSX.Element
+) {
+  return (node: NodeObject3D<GNode>) => {
+    const nodeEl = jsxToHtmlObject(getNode(node));
+    return new CSS2DObject(nodeEl || document.createElement('div'));
+  };
 }
 
 /* -------------------------------------------------------------------------- */
@@ -88,37 +222,19 @@ export interface GraphProps {
 
   /** Styling the Graph main div element. */
   className?: string;
-}
 
-/* -------------------------------------------------------------------------- */
-/* --- Force Graph Components                                             --- */
-/* -------------------------------------------------------------------------- */
+  /** Options graph 2D */
+  options2D?: IGraphOptions;
 
-interface GNode {
-  id: string;
-  label?: string;
-}
-interface GLink {
-  source: string;
-  target: string;
-}
-interface GData {
-  nodes: GNode[];
-  links: GLink[];
-}
-
-interface GProps {
-  data: GData;
-  onSelection?: SelectionCallback;
-  selected: string | undefined;
-  size: Size;
+  /** Options graph 3D */
+  options3D?: IGraphOptions3D;
 }
 
 /* -------------------------------------------------------------------------- */
 /* --- 2D Force Graph Component                                           --- */
 /* -------------------------------------------------------------------------- */
 
-function Graph2D(props: GProps): JSX.Element {
+function Graph2D(props: IGProps2D): JSX.Element {
   const { data, onSelection, selected, size } = props;
   const { width, height } = size;
 
@@ -126,6 +242,8 @@ function Graph2D(props: GProps): JSX.Element {
     | ForceGraphMethods2D<NodeObject2D<GNode>, LinkObject2D<GNode, GLink>>
     | undefined
   >(undefined);
+
+  const style = Themes.useStyle();
 
   React.useEffect(() => {
     if (fgRef2D.current && selected) {
@@ -160,7 +278,10 @@ function Graph2D(props: GProps): JSX.Element {
         node.fy = node.y;
       }}
       cooldownTime={50}
-      nodeColor={(node) => (node.id === selected ? '#F4D03F' : '#5DADE2')}
+      nodeColor={(node) => (node.id === selected ?
+        style.getPropertyValue('--graph-bg-color-selected') :
+        style.getPropertyValue('--graph-bg-color-orange'))
+      }
     />
   );
 }
@@ -168,15 +289,68 @@ function Graph2D(props: GProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 /* --- 3D Force Graph Component                                           --- */
 /* -------------------------------------------------------------------------- */
+function getForceGraphOptions(
+  fgRef: React.MutableRefObject<ForceGraphMethods3D<NodeObject3D<GNode>,
+  LinkObject3D<GNode, GLink>> | undefined>,
+  options: IGraphOptions3D,
+): ForceGraphProps3D<GNode, GLink> {
+  const ret: ForceGraphProps3D<GNode, GLink> = {};
 
-function Graph3D(props: GProps): JSX.Element {
-  const { data, onSelection, selected, size } = props;
+  const { linkOptions, nodesOptions } = options;
+
+  if (linkOptions) {
+    const { width, color, visibility, directionalArrow,
+      directionalParticle, particleWidth, particleColor
+    } = linkOptions;
+    if (width) ret.linkWidth = width;
+    if (color) ret.linkColor = color;
+    if (visibility) ret.linkVisibility = visibility;
+    if (directionalArrow) ret.linkDirectionalArrowLength = directionalArrow;
+    if (directionalParticle) ret.linkDirectionalParticles = directionalParticle;
+    if (particleWidth) ret.linkDirectionalParticleWidth = particleWidth;
+    if (particleColor) ret.linkDirectionalParticleColor = particleColor;
+  }
+
+  if (nodesOptions?.visibility) ret.nodeVisibility = nodesOptions?.visibility;
+
+  if(options) {
+    const {
+      backgroundColor, displayMode, depthSpacing, cycles, htmlNode, autoCenter
+    } = options;
+
+    if (displayMode) ret.dagMode = displayMode;
+    if (depthSpacing) ret.dagLevelDistance = depthSpacing;
+    if (backgroundColor) ret.backgroundColor = backgroundColor;
+
+    ret.onEngineStop = getOnEngineStop(fgRef, { autoCenter });
+    if(cycles) ret.onDagError = getOnDagError(cycles);
+
+    if(htmlNode) {
+      ret.extraRenderers = [new CSS2DRenderer()];
+      ret.nodeThreeObjectExtend = false;
+      ret.nodeThreeObject = getObject2DFunction(htmlNode);
+     }
+  }
+
+  return ret;
+}
+
+function Graph3D(props: IGProps3D): JSX.Element {
+  const { data, onSelection, selected, size,
+           options = {}
+        } = props;
   const { width, height } = size;
 
   const fgRef3D = React.useRef<
     | ForceGraphMethods3D<NodeObject3D<GNode>, LinkObject3D<GNode, GLink>>
     | undefined
   >(undefined);
+
+  const graphOptions = getForceGraphOptions(fgRef3D, options || {});
+  const style = Themes.useStyle();
+
+  const [ , flipHorizontalSpacingIsSet ] =
+    Dome.useFlipSettings('ivette.callgraph.horizontalSpacingIsSet', true);
 
   React.useEffect(() => {
     if (fgRef3D.current && selected) {
@@ -198,7 +372,23 @@ function Graph3D(props: GProps): JSX.Element {
         }
       }
     }
-  }, [selected, data]);
+  }, [fgRef3D, selected, data]);
+
+  React.useEffect(() => {
+    /** Waiting for fgRef3D.current initialization */
+    if (!fgRef3D.current) {
+      const timer = setTimeout(() => {
+        flipHorizontalSpacingIsSet();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+
+    if (options.horizontalSpacing) {
+      // Adjust node repulsion
+      fgRef3D.current.d3Force('charge')?.strength(-options.horizontalSpacing);
+    }
+    return;
+  }, [options.horizontalSpacing, flipHorizontalSpacingIsSet]);
 
   return (
     <ForceGraph3D<GNode, GLink>
@@ -223,7 +413,11 @@ function Graph3D(props: GProps): JSX.Element {
         node.fy = node.y;
         node.fz = node.z;
       }}
-      nodeColor={(node) => (node.id === selected ? '#F4D03F' : '#5DADE2')}
+      nodeColor={(node) => (node.id === selected ?
+        style.getPropertyValue('--graph-bg-color-selected') :
+        style.getPropertyValue('--graph-bg-color-orange'))
+      }
+      {...graphOptions}
     />
   );
 }
@@ -233,7 +427,8 @@ function Graph3D(props: GProps): JSX.Element {
 /* -------------------------------------------------------------------------- */
 
 export function Graph(props: GraphProps): JSX.Element {
-  const { nodes, edges, onSelection, display = true, selected } = props;
+  const { nodes, edges, onSelection,
+          display = true, selected, options3D } = props;
   const data: GData = React.useMemo(
     () => ({
       nodes: nodes.slice(),
@@ -268,6 +463,7 @@ export function Graph(props: GraphProps): JSX.Element {
                 data={data}
                 onSelection={onSelection}
                 selected={selected}
+                options={options3D}
                 size={size}
               />
             </div>

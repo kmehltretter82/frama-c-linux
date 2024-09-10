@@ -29,6 +29,7 @@
    @module dome/themes
  */
 
+import React from 'react';
 import * as Dome from 'dome';
 import * as Settings from 'dome/data/settings';
 import { State } from 'dome/data/states';
@@ -80,4 +81,13 @@ export function useColorThemeSettings(): State<ColorSettings> {
   return [jColorSettings(pref), setTheme];
 }
 
+export function useStyle(): CSSStyleDeclaration {
+  const [theme, ] = useColorTheme();
+  const style = React.useMemo(() => getComputedStyle(document.body),
+    /** style is dependent on theme but it is not used directly */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [theme]
+  );
+  return style;
+}
 /* -------------------------------------------------------------------------- */

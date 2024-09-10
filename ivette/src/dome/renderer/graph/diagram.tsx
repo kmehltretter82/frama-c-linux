@@ -23,6 +23,7 @@
 import React from 'react';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
+import { useColor, IHookColors, TColor, EColor } from '../colors';
 import { Size } from 'react-virtualized';
 import { select, selectAll } from 'd3-selection';
 import { graphviz } from 'd3-graphviz';
@@ -36,12 +37,6 @@ import './style.css';
 export type Direction = 'LR' | 'TD';
 
 export type Font = 'serif' | 'sans' | 'mono';
-
-export type Color =
-  | 'white' | 'grey' | 'dark'
-  | 'primary' | 'selected'
-  | 'green' | 'orange' | 'red'
-  | 'yellow' | 'blue' | 'pink';
 
 export type Shape =
   | 'point' | 'box'
@@ -72,7 +67,7 @@ export interface Node {
   /** Node font (label) */
   font?: Font;
   /** Node color (filled background) */
-  color?: Color;
+  color?: TColor;
   /**
    * Shape. Nested boxes alternate LR and TD directions. Initial direction is
    * orthogonal to the graph direction. Node label is ignored for box layout.
@@ -96,7 +91,7 @@ export interface Edge {
   /** Default is `solid` */
   line?: Line;
   /** Default is `dark` */
-  color?: Color;
+  color?: TColor;
   head?: Arrow;
   headLabel?: string,
   headAnchor?: Anchor;
@@ -120,7 +115,7 @@ export interface Cluster {
   /** Title (default is none) */
   title?: string;
   /** Background color (default is grey) */
-  color?: Color;
+  color?: TColor;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -152,7 +147,6 @@ export interface DiagramProps {
 
   /** Debug the generated DotModel */
   onModelChanged?: (model: string) => void;
-
 }
 
 /* -------------------------------------------------------------------------- */
@@ -163,66 +157,6 @@ const FONTNAME = {
   'serif': 'Times',
   'sans': 'sans-serif',
   'mono': 'Courier',
-};
-
-// node background colors
-const BGCOLOR = {
-  'white': '#fff',
-  'grey': '#ccc',
-  'dark': '#666',
-  'primary': 'dodgerblue',
-  'selected': 'deepskyblue',
-  'green': 'lime',
-  'orange': '#ffa700',
-  'red': 'red',
-  'yellow': 'yellow',
-  'blue': 'cyan',
-  'pink': 'hotpink',
-};
-
-// cluster background colors
-const SGCOLOR = {
-  'white': '#eee',
-  'grey': '#ccc',
-  'dark': '#aaa',
-  'primary': '#4fc3f7',
-  'selected': '#90caf9',
-  'green': '#AED581',
-  'orange': '#FFCC80',
-  'red': '#ff6e6e',
-  'yellow': '#fff59d',
-  'blue': '#bbdefb',
-  'pink': '#f8bbd0',
-};
-
-// foreground colors
-const FGCOLOR = {
-  'white': 'black',
-  'grey': 'black',
-  'dark': 'white',
-  'primary': 'white',
-  'selected': 'black',
-  'green': 'black',
-  'orange': 'black',
-  'red': 'white',
-  'yellow': 'black',
-  'blue': 'black',
-  'pink': 'white',
-};
-
-// edge colors
-const EDCOLOR = {
-  'white': '#ccc',
-  'grey': '#888',
-  'dark': 'black',
-  'primary': 'dodgerblue',
-  'selected': 'deepskyblue',
-  'green': 'green',
-  'orange': 'orange',
-  'red': 'red',
-  'yellow': '#e5e100',
-  'blue': 'deepskyblue',
-  'pink': 'palevioletred1',
 };
 
 /* -------------------------------------------------------------------------- */
@@ -242,6 +176,7 @@ type cluster = { props: Cluster; nodes: Node[]; }
 
 class Builder {
 
+  private colors: IHookColors;
   private selected: string | undefined;
   private spec = '';
 
@@ -249,6 +184,10 @@ class Builder {
   private imap = new Map<string, string>();
   private rmap = new Map<string, string>();
   private cmap = new Map<string, cluster>();
+
+  constructor(colors: IHookColors) {
+    this.colors = colors;
+  }
 
   index(id: string): string {
     const n = this.imap.get(id);
@@ -372,23 +311,24 @@ class Builder {
         .attr('shape', n.shape)
         .attr('tooltip', n.title ?? n.label ?? n.id);
     }
-    const color = n.color ?? (n.id === this.selected ? 'selected' : 'white');
+    const color = n.color ??
+      ( n.id === this.selected ? EColor.SELECTED : EColor.DEFAULT );
     this
-      .attr('fontcolor', FGCOLOR[color])
-      .attr('fillcolor', BGCOLOR[color])
+      .attr('fontcolor', this.colors.FGCOLOR[color])
+      .attr('fillcolor', this.colors.BGCOLOR[color])
       .println(' ];');
   }
 
   cluster(c: cluster): void {
     const { props: s, nodes } = c;
-    const { color = 'grey' } = s;
+    const { color = EColor.GREY } = s;
     this
       .print('  subgraph cluster_', this.index(s.id), ' {\n   ')
       .attr('style', 'filled')
       .attr('label', s.label)
       .attr('tooltip', s.title ?? s.id)
-      .attr('fontcolor', FGCOLOR[color])
-      .attr('fillcolor', SGCOLOR[color])
+      .attr('fontcolor', this.colors.FGCOLOR[color])
+      .attr('fillcolor', this.colors.SGCOLOR[color])
       .print('\n   ');
     nodes.forEach(n => this.print(' ', this.index(n.id), ';'));
     this.println('\n  }');
@@ -433,7 +373,12 @@ class Builder {
       .attr('tailtooltip', e.tailLabel ? tooltip : undefined)
       .attr('tooltip', tooltip)
       .attr('dir', DIR(head, tail))
-      .attr('color', e.color ? EDCOLOR[e.color] : undefined)
+      .attr('color', e.color ?
+        this.colors.EDCOLOR[e.color] :
+        this.colors.EDCOLOR[EColor.DEFAULT])
+      .attr('fontcolor', e.color ?
+        this.colors.EDCOLOR[e.color] :
+        this.colors.EDCOLOR[EColor.DEFAULT])
       .attr('style', line === 'solid' ? undefined : line)
       .attr('arrowhead', head === 'arrow' ? undefined : head)
       .attr('arrowtail', tail === 'arrow' ? undefined : tail)
@@ -457,9 +402,11 @@ const newDivId = (): string => `dome_xDiagram_g${++divId}`;
 interface GraphvizProps extends DiagramProps { size: Size }
 
 function GraphvizView(props: GraphvizProps): JSX.Element {
+  // Colors
+  const colors = useColor();
 
   // --- Builder Instance (unique)
-  const builder = React.useMemo(() => new Builder, []);
+  const builder = React.useMemo(() => new Builder(colors), [colors]);
 
   // --- Model Generation
   const {
