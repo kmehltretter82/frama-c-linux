@@ -185,7 +185,7 @@ do
             UPDATE=yes
             ;;
         "-v"|"--verbose")
-            DUNE_OPT+=" --display=short"
+            DUNE_OPT+=" --display=short --always-show-command-line"
             VERBOSE=yes
             ;;
         "-l"|"--logs")
