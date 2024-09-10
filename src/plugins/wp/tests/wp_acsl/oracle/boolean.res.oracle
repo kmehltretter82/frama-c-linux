@@ -5,9 +5,9 @@
 [wp] [Valid] Goal u8_is_continue_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 4 goals scheduled
-[wp] [Generated] Goal typed_u8_is_continue_assigns_part3 (Qed)
-[wp] [Generated] Goal typed_u8_is_continue_assigns_part2 (Qed)
 [wp] [Generated] Goal typed_u8_is_continue_assigns_part1 (Qed)
+[wp] [Generated] Goal typed_u8_is_continue_assigns_part2 (Qed)
+[wp] [Generated] Goal typed_u8_is_continue_assigns_part3 (Qed)
 [wp] 4 goals generated
 ------------------------------------------------------------
   Function u8_is_continue

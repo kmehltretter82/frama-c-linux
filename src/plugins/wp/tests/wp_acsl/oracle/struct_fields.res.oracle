@@ -6,6 +6,34 @@
 [wp] [Valid] Goal foo_terminates (Cfg) (Trivial)
 [wp] 2 goals scheduled
 ---------------------------------------------
+--- Context 'typed_foo' Cluster 'S1_X' 
+---------------------------------------------
+theory S1_X
+  
+  (* use why3.BuiltIn.BuiltIn *)
+  
+  (* use bool.Bool *)
+  
+  (* use int.Int *)
+  
+  (* use int.ComputerDivision *)
+  
+  (* use real.RealInfix *)
+  
+  (* use frama_c_wp.qed.Qed *)
+  
+  (* use map.Map *)
+  
+  type S1_X =
+    | S1_X1 (F1_X_a:int) (F1_X_b:int) (F1_X_c:int)
+  
+  (* use frama_c_wp.cint.Cint *)
+  
+  predicate IsS1_X (s:S1_X) =
+    (is_sint8 (F1_X_a s) /\ is_sint16 (F1_X_b s)) /\ is_sint32 (F1_X_c s)
+  
+end
+---------------------------------------------
 --- Context 'typed_foo' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk
@@ -36,34 +64,6 @@ theory Chunk
   
   predicate is_sint32_chunk (m:addr -> int) =
     forall a:addr. is_sint32 (get m a)
-  
-end
----------------------------------------------
---- Context 'typed_foo' Cluster 'S1_X' 
----------------------------------------------
-theory S1_X
-  
-  (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
-  type S1_X =
-    | S1_X1 (F1_X_a:int) (F1_X_b:int) (F1_X_c:int)
-  
-  (* use frama_c_wp.cint.Cint *)
-  
-  predicate IsS1_X (s:S1_X) =
-    (is_sint8 (F1_X_a s) /\ is_sint16 (F1_X_b s)) /\ is_sint32 (F1_X_c s)
   
 end
 ---------------------------------------------
@@ -239,25 +239,25 @@ end
     
     (* use frama_c_wp.memaddr.MemAddr *)
     
+    (* use S1_X *)
+    
     (* use Chunk *)
     
     (* use frama_c_wp.memory.Memory *)
-    
-    (* use S1_X *)
     
     (* use Compound *)
     
     goal wp_goal :
       forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-       addr -> int, a:addr.
+       addr -> int, a:addr, x:S1_X.
        region (a.base) <= 0 ->
+       IsS1_X x ->
        is_sint16_chunk t3 ->
        is_sint32_chunk t4 ->
        is_sint8_chunk t2 ->
        linked t1 ->
        sconst t2 ->
-       cinits t ->
-       valid_rd t1 a 3 -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rw t1 a 3
+       cinits t -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rd t1 a 3
     
   end
 [wp:print-generated] 
@@ -279,25 +279,25 @@ end
     
     (* use frama_c_wp.memaddr.MemAddr *)
     
-    (* use S1_X *)
-    
     (* use Chunk *)
     
     (* use frama_c_wp.memory.Memory *)
+    
+    (* use S1_X *)
     
     (* use Compound *)
     
     goal wp_goal :
       forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-       addr -> int, a:addr, x:S1_X.
+       addr -> int, a:addr.
        region (a.base) <= 0 ->
-       IsS1_X x ->
        is_sint16_chunk t3 ->
        is_sint32_chunk t4 ->
        is_sint8_chunk t2 ->
        linked t1 ->
        sconst t2 ->
-       cinits t -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rd t1 a 3
+       cinits t ->
+       valid_rd t1 a 3 -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rw t1 a 3
     
   end
 [wp] 2 goals generated
