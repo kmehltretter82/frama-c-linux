@@ -4,7 +4,7 @@
  MODULE: check_libc_naming_conventions, check_const
    OPT: -load %{dep:@PTEST_NAME@.sav} -print -cpp-extra-args='-nostdinc -I@FRAMAC_SHARE@/libc' -eva @EVA_CONFIG@ -then -lib-entry -no-print
  MODULE:
-   OPT: -print -print-libc -machdep x86_32
+   OPT: -print -print-libc -machdep x86_32 -ocode @DEV_NULL@
  MODULE: check_parsing_individual_headers
    OPT:
  MODULE: check_libc_anonymous_tags

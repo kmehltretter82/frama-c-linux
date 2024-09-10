@@ -1,4 +1,4 @@
-[kernel] Parsing std_string.c (with preprocessing)
+[kernel] Parsing std_print.c (with preprocessing)
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   
@@ -16,4 +16,4 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[mdr] Report std_string.sarif.unfiltered generated
+[mdr] Report std_print.sarif.unfiltered generated

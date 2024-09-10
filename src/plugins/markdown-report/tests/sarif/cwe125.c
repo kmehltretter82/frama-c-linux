@@ -3,7 +3,7 @@ NOFRAMAC: use execnow for proper sequencing of executions
 EXECNOW: BIN @PTEST_NAME@_parse.sav LOG @PTEST_NAME@.parse.log LOG @PTEST_NAME@.parse.err @frama-c@ @PTEST_FILE@ -save ./@PTEST_NAME@_parse.sav > ./@PTEST_NAME@.parse.log 2> ./@PTEST_NAME@.parse.err
 EXECNOW: BIN @PTEST_NAME@_eva.sav LOG @PTEST_NAME@.eva.log LOG @PTEST_NAME@.eva.err @frama-c@ -load %{dep:./@PTEST_NAME@_parse.sav} -eva -save ./@PTEST_NAME@_eva.sav > ./@PTEST_NAME@.eva.log 2> ./@PTEST_NAME@.eva.err
 EXECNOW: BIN @PTEST_NAME@.sarif.unfiltered LOG @PTEST_NAME@.sarif.log LOG @PTEST_NAME@.sarif.err @frama-c@ -load %{dep:./@PTEST_NAME@_eva.sav} -then -mdr-out ./@PTEST_NAME@.sarif.unfiltered -mdr-gen sarif -mdr-no-print-libc -mdr-sarif-deterministic > ./@PTEST_NAME@.sarif.log 2> ./@PTEST_NAME@.sarif.err
-EXECNOW: LOG @PTEST_NAME@.sarif sed -e "s:@PTEST_SESSION@:PTEST_SESSION:" %{dep:@PTEST_NAME@.sarif.unfiltered} > @PTEST_NAME@.sarif 2> @NULL
+EXECNOW: LOG @PTEST_NAME@.sarif sed -e "s:@PTEST_SESSION@:PTEST_SESSION:" %{dep:@PTEST_NAME@.sarif.unfiltered} > @PTEST_NAME@.sarif 2> @DEV_NULL@
 */
 #include "__fc_builtin.h"
 #define LENGTH 10

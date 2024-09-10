@@ -24,6 +24,7 @@
 , dune-configurator
 , dune-site
 , fpath
+, jq
 , gcc9
 , graphviz
 , lablgtk3
@@ -47,6 +48,7 @@
 , zarith
 , zmq
 # Frama-C extra (other targets do not reconfigure)
+, check-jsonschema
 , dos2unix
 , doxygen
 , python3
@@ -80,11 +82,13 @@ stdenvNoCC.mkDerivation rec {
     bisect_ppx
     camlzip
     camomile
+    check-jsonschema
     dune_3
     dune-configurator
     dune-site
     findlib
     fpath
+    jq
     gcc9
     graphviz
     lablgtk3

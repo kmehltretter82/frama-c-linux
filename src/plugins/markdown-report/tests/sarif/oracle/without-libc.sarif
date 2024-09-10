@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/master/Schemata/sarif-schema-2.1.0.json",
+  "$schema": "https://raw.githubusercontent.com/oasis-tcs/sarif-spec/main/sarif-2.1/schema/sarif-schema-2.1.0.json",
   "version": "2.1.0",
   "runs": [
     {
@@ -51,9 +51,9 @@
               "physicalLocation": {
                 "artifactLocation": { "uri": "libc.c", "uriBaseId": "PWD" },
                 "region": {
-                  "startLine": 13,
+                  "startLine": 16,
                   "startColumn": 10,
-                  "endLine": 13,
+                  "endLine": 16,
                   "endColumn": 19,
                   "byteLength": 9
                 }
