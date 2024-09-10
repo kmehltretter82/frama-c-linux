@@ -359,7 +359,7 @@ tr:first-of-type > .eva-table-callsite-box {
 /* --- Tools Eva  --- */
 .eva-tools {
   position: sticky;
-  top: 10px;
+  top: 0px;
   z-index: 10;
   background-color: var(--background-profound);
   padding: 5px;
