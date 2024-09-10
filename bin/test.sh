@@ -76,14 +76,11 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
-    echo "  -f|--force          force re-run tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         update oracles (and WP-cache) and create new"
     echo "                      test oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
-    echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
-    echo "  --watch             run dune in watch mode."
     echo "  --coverage          compute test coverage in html format"
     echo "  --coverage-xml      compute test coverage in Cobertura XML format"
     echo "  --coverage-json     compute test coverage in Coveralls JSON format"
@@ -183,28 +180,13 @@ do
         "-w"|"--wp-cache")
             PULLCACHE=yes
             ;;
-        "-f"|"--force")
-            DUNE_OPT+=" --force"
-            ;;
         "-u"|"--update")
             DUNE_OPT+=" --auto-promote"
             UPDATE=yes
             ;;
-        "--watch")
-            DUNE_OPT+=" --watch"
-            ;;
         "-v"|"--verbose")
             DUNE_OPT+=" --display=short"
             VERBOSE=yes
-            ;;
-        "-j"|"--jobs")
-            if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
-                DUNE_OPT+=" -j $2"
-                shift
-            else
-                ErrorUsage \
-                    "wrong opt ('$2') for '-j|--jobs', value 'auto' or >= 1 expected"
-            fi
             ;;
         "-l"|"--logs")
             LOGS=yes
