@@ -85,9 +85,13 @@ double __gen_e_acsl_f2(double x);
 
 /*@ predicate p_here{L}(integer x) = x > 0;
  */
+/*@ predicate __gen_e_acsl_p_here_here(integer x) = x > 0;
+ */
 int __gen_e_acsl_p_here_here(int x);
 
 /*@ logic integer f_here{L}(integer x) = x;
+ */
+/*@ logic integer __gen_e_acsl_f_here_here(integer x) = x;
  */
 int __gen_e_acsl_f_here_here(int x);
 
@@ -111,6 +115,8 @@ int __gen_e_acsl_signum_5(double x);
 
 int z = 8;
 /*@ logic integer f3{L}(integer y) = \at(z + y,L);
+ */
+/*@ logic integer __gen_e_acsl_f3_here(integer y) = z + y;
 
 */
 long __gen_e_acsl_f3_here(int y);

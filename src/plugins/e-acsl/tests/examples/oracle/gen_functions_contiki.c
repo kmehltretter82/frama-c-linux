@@ -20,9 +20,19 @@ logic integer length_aux{L}(struct list *l, integer n) =
            (n < 2147483647? length_aux(l->next, n + 1): -1)),
       L);
  */
+/*@
+logic integer __gen_e_acsl_length_aux_here(struct list *l, integer n) =
+  n < 0? -1:
+    (l == (struct list *)0? n:
+       (n < 2147483647? __gen_e_acsl_length_aux_here(l->next, n + 1): -1));
+ */
 long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n);
 
 /*@ logic integer length{L}(struct list *l) = \at(length_aux(l, 0),L);
+ */
+/*@
+logic integer __gen_e_acsl_length_here(struct list *l) =
+  __gen_e_acsl_length_aux_here(l, 0);
 
 */
 long __gen_e_acsl_length_here(struct list *l);

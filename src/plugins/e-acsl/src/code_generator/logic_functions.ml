@@ -374,13 +374,21 @@ end
 let reset () = Gen_functions.clear ()
 
 let add_generated_functions_to_file file =
-  let rec decls_of_li ?(loc = Location.unknown) li =
+  let rec decls_of_li ?(generated = false) ?(loc = Location.unknown) li =
     let dependencies =
-      List.concat_map (decls_of_li ~loc)
+      List.concat_map (decls_of_li ~generated:true ~loc)
         (Logic_normalizer.Logic_infos.generated_of li)
     in
+    let add_generated_annot =
+      if generated
+      then fun decls -> GAnnot(Dfun_or_pred(li, loc), loc) :: decls
+      else fun decls -> decls
+    in
     let kfs = Gen_functions.kernel_functions_of_logic_info li in
-    dependencies @ List.map (fun kf -> GFunDecl (Cil.empty_funspec (), kf, loc)) kfs
+    let decls =
+      List.map (fun kf -> GFunDecl (Cil.empty_funspec (), kf, loc)) kfs
+    in
+    dependencies @ add_generated_annot @@ decls
   in
   let generated_decls_of_global = function
     | GAnnot(Dfun_or_pred(li, loc), _) -> decls_of_li ~loc li
