@@ -31,17 +31,15 @@ module Extensions = struct
   let ref_preprocess = ref (fun ~plugin:_ _ -> assert false)
   let ref_is_extension_block = ref (fun ~plugin:_ _ -> assert false)
   let ref_preprocess_block = ref (fun ~plugin:_ _ -> assert false)
-  let ref_extension_from = ref (fun _ -> assert false)
 
   let set_extension_handler ~category ~is_extension ~preprocess
-      ~is_extension_block ~preprocess_block ~extension_from =
+      ~is_extension_block ~preprocess_block =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_category := category ;
     ref_preprocess := preprocess ;
     ref_is_extension_block := is_extension_block;
     ref_preprocess_block := preprocess_block;
-    ref_extension_from := extension_from;
     initialized := true ;
     ()
 
@@ -50,7 +48,6 @@ module Extensions = struct
   let category ~plugin name = !ref_category ~plugin name
   let preprocess ~plugin name = !ref_preprocess ~plugin name
   let preprocess_block ~plugin name = !ref_preprocess_block ~plugin name
-  let extension_from name = !ref_extension_from name
 end
 let set_extension_handler = Extensions.set_extension_handler
 let is_extension = Extensions.is_extension
@@ -58,7 +55,6 @@ let is_extension_block = Extensions.is_extension_block
 let extension_category = Extensions.category
 let preprocess_extension = Extensions.preprocess
 let preprocess_extension_block = Extensions.preprocess_block
-let extension_from = Extensions.extension_from
 
 let error (b,_e) fstring =
   Kernel.abort

@@ -320,8 +320,6 @@ module Extensions = struct
   let is_same_ext ~plugin name ext1 ext2 =
     let is_same = (find_common ~plugin name).is_same_ext in
     is_same ext1 ext2
-
-  let extension_from name = (find_common ~plugin:None name).plugin
 end
 
 (* Registration functions *)
@@ -351,8 +349,7 @@ let () =
     ~is_extension: Extensions.is_extension
     ~preprocess: Extensions.preprocess
     ~is_extension_block: Extensions.is_extension_block
-    ~preprocess_block: Extensions.preprocess_block
-    ~extension_from:Extensions.extension_from;
+    ~preprocess_block: Extensions.preprocess_block;
   Logic_typing.set_extension_handler
     ~is_extension: Extensions.is_extension
     ~typer: Extensions.typing
