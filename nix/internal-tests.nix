@@ -42,8 +42,10 @@
 , zmq
 # Frama-C tests
 , alt-ergo
+, check-jsonschema
 , dos2unix
 , doxygen
+, jq
 , perl
 , pkgs
 , python3
@@ -104,11 +106,14 @@ stdenvNoCC.mkDerivation rec {
     zmq
     # Tests
     alt-ergo
+    check-jsonschema
     dos2unix
     doxygen
+    jq
     perl
     pkgs.getopt
     python3
+    python3Packages.jsonschema
     python3Packages.pyaml
     yq
     swiProlog
