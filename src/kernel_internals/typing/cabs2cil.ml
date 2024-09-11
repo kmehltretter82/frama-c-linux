@@ -636,43 +636,30 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
   match !current_packing_pragma, align_pragma_for_struct fi.forig_name with
   | None, None -> check_aligned fattrs
   | Some n, apragma ->
-    begin
-      warn_incompatible_pragmas_attributes apragma (fattrs <> []);
-      match combine_aligned_attributes fattrs with
-      | None ->
-        (* No valid aligned attributes in this field.
-           – if the composite type has a packed attribute, nothing needs to be
-             done (the composite will have the "packed" attribute anyway);
-           – otherwise, align on min(n,sizeof(fi.ftyp)).
-           Drop existing "aligned" attributes, if there are invalid ones. *)
-        if Cil.hasAttribute "packed" cattr then (dropAttribute "aligned" fattrs)
-        else begin
-          let sizeof_type =
-            if Cil.isUnsizedArrayType fi.ftype
-            then
-              (* flexible array member: use size of pointer *)
-              Cil.bitsSizeOf (Machine.uintptr_type ())
-            else
-              Cil.bytesSizeOf fi.ftype
-          in
-          let align = Integer.(min n (of_int sizeof_type)) in
-          Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
-            "adding aligned(%a) attribute to field '%s.%s' due to packing pragma"
-            Integer.pretty align fi.fcomp.cname fi.fname;
-          addAttribute (Attr("aligned",[AInt align])) (dropAttribute "aligned" fattrs)
-        end
-      | Some local ->
-        (* There is an alignment attribute in this field. This may be smaller
-           than the field type alignment, so we get the maximum of both.
-           Then, we apply the pragma pack: the final alignment will be the
-           minimum between what we had and [n]. *)
-        let align = Integer.min n (Integer.max (Integer.of_int (Cil.bytesSizeOf fi.ftype)) local) in
-        Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
-          "setting aligned(%a) attribute to field '%s.%s' due to packing pragma"
-          Integer.pretty align fi.fcomp.cname fi.fname;
-        addAttribute (Attr("aligned",[AInt align]))
-          (dropAttribute "aligned" fattrs)
-    end
+    warn_incompatible_pragmas_attributes apragma (fattrs <> []);
+    let field_align = combine_aligned_attributes fattrs in
+    (* If this field has no valid aligned attributes and the composite type
+        has a packed attribute, nothing needs to be done: the composite will
+        have the "packed" attribute anyway. *)
+    if field_align = None && Cil.hasAttribute "packed" cattr then
+      dropAttribute "aligned" fattrs
+    else
+      (* Otherwise, align on min(n, max(field alignment, type alignment)):
+         the field alignment attribute (if there is one) may be smaller than
+         its type alignment, so we get the maximum of both. Then, we apply
+         the pragma pack: the final alignment will be the minimum between what
+         we had and [n]. *)
+      let type_align = Integer.of_int (Cil.bytesAlignOf fi.ftype) in
+      let existing_align =
+        Option.fold field_align ~none:type_align ~some:(Integer.max type_align)
+      in
+      let new_align = Integer.min n existing_align in
+      Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
+        "%s aligned(%a) attribute to field '%s.%s' due to packing pragma"
+        (if Option.is_none field_align then "adding" else "setting")
+        Integer.pretty new_align fi.fcomp.cname fi.fname;
+      let new_attr = Attr ("aligned", [AInt new_align]) in
+      addAttribute new_attr (dropAttribute "aligned" fattrs)
   | None, Some true ->
     dropAttribute "aligned" fattrs
   | None, Some false ->
