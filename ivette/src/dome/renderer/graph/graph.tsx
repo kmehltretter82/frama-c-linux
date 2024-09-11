@@ -120,7 +120,7 @@ export interface ILinksOptions {
   /** Number of directional particles */
   directionalParticle?: number;
   /** Width of directional particles */
-  particleWidth?: number;
+  particleWidth?: number | ((node: GLink) => number);
   /** Color of directional particles */
   particleColor?: string | ((node: GLink) => string)
 }
@@ -138,8 +138,11 @@ export interface IGraphOptions {
   displayMode?: 'td';
   /** Spacing between depths level */
   depthSpacing?: number;
-  /** A string[][] ref to save the cycles */
-  cycles?: React.MutableRefObject<string[][]>
+  /**
+   * Callback called when a cycle is detected
+   * @param val array of cycle node ids
+   * */
+  onDagError?: (val: string[]) => void;
   /** Nodes options */
   nodesOptions?: INodesOptions;
   /** Links options */
@@ -166,12 +169,6 @@ function getOnEngineStop(
       fgRef.current.zoomToFit(400, 20);
     }
   };
-}
-
-function getOnDagError(
-  cycles: React.MutableRefObject<string[][]>
-):(val: (string | number)[]) => void {
-  return (val: (string | number)[]) => cycles.current.push(val as string[]);
 }
 
 /** Tranform JSX.Element to HtmlObject */
@@ -315,7 +312,8 @@ function getForceGraphOptions(
 
   if(options) {
     const {
-      backgroundColor, displayMode, depthSpacing, cycles, htmlNode, autoCenter
+      backgroundColor, displayMode, depthSpacing,
+      onDagError, htmlNode, autoCenter
     } = options;
 
     if (displayMode) ret.dagMode = displayMode;
@@ -323,7 +321,19 @@ function getForceGraphOptions(
     if (backgroundColor) ret.backgroundColor = backgroundColor;
 
     ret.onEngineStop = getOnEngineStop(fgRef, { autoCenter });
-    if(cycles) ret.onDagError = getOnDagError(cycles);
+    ret.onDagError = (val) => {
+      if(typeof val[0] === 'number') {
+        // eslint-disable-next-line no-console
+        console.error('onDagError : ID must be a string');
+      }
+      if(onDagError) {
+        const newCycle: string[] = [];
+        val.forEach((elt) => {
+          newCycle.push(typeof elt === 'string' ? elt : elt.toString());
+        });
+        onDagError(newCycle);
+      }
+    };
 
     if(htmlNode) {
       ret.extraRenderers = [new CSS2DRenderer()];
