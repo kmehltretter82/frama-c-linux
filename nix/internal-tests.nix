@@ -19,6 +19,7 @@
 , dune_3
 , dune-configurator
 , dune-site
+, fpath
 , gcc9
 , graphviz
 , lablgtk3
@@ -35,7 +36,6 @@
 , ppx_deriving_yojson
 , unionFind
 , yojson
-, which
 , why3
 , yaml
 , zarith
@@ -44,16 +44,16 @@
 , alt-ergo
 , check-jsonschema
 , dos2unix
-, doxygen
 , jq
 , perl
-, pkgs
 , python3
 , python3Packages
-, yq
 , swiProlog
 , time
+, unixtools
+, which
 , wp-cache
+, yq
 }:
 
 # We do not use buildDunePackage because Frama-C still uses a Makefile to build
@@ -75,7 +75,6 @@ stdenvNoCC.mkDerivation rec {
 
   buildInputs = [
     apron
-    alt-ergo
     camlzip
     camomile
     clang
@@ -83,6 +82,7 @@ stdenvNoCC.mkDerivation rec {
     dune-configurator
     dune-site
     findlib
+    fpath
     gcc9
     graphviz
     lablgtk3
@@ -100,24 +100,24 @@ stdenvNoCC.mkDerivation rec {
     unionFind
     yojson
     which
-    yaml
     why3
+    yaml
     zarith
     zmq
     # Tests
     alt-ergo
     check-jsonschema
     dos2unix
-    doxygen
     jq
     perl
-    pkgs.getopt
     python3
     python3Packages.jsonschema
     python3Packages.pyaml
-    yq
     swiProlog
     time
+    unixtools.getopt
+    which
+    yq
   ];
 
   outputs = [ "out" ];

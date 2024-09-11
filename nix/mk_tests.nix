@@ -28,15 +28,18 @@
 , alt-ergo
 , cvc4
 , clang
+, check-jsonschema
+, dos2unix
 , frama-c
+, jq
 , perl
 , python3Packages
 , stdenvNoCC
 , time
 , unixtools
-, yq
 , which
 , wp-cache
+, yq
 } :
 
 { tests-name
@@ -55,13 +58,17 @@ stdenvNoCC.mkDerivation {
 
   buildInputs = frama-c.buildInputs ++ [
     clang
+    check-jsonschema
+    dos2unix
     frama-c
+    jq
     perl
     python3Packages.jsonschema
+    python3Packages.pyaml
     time
     unixtools.getopt
-    yq
     which
+    yq
   ] ++
   (if has-wp-proofs then [ alt-ergo cvc4 ] else []);
 
