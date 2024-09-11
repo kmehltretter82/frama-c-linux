@@ -38,6 +38,7 @@ JSON=
 
 DUNE_ALIAS=
 DUNE_OPT=
+DUNE_OPT_POST=
 DUNE_LOG=./.test-errors.log
 ALIAS_NAME=ptests
 LOCAL_WP_CACHE=$(pwd -P)/.wp-cache
@@ -75,18 +76,21 @@ function Usage
     echo "  -r|--clean          clean (remove all) test results (includes -p)"
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
-    echo "  -f|--force          force re-run tests"
     echo "  -l|--logs           print output of tests (single file, no diff)"
     echo "  -u|--update         update oracles (and WP-cache) and create new"
     echo "                      test oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
-    echo "  -j|--jobs <jobs>    run no more than <jobs> commands simultaneously."
-    echo "  --watch             run dune in watch mode."
     echo "  --coverage          compute test coverage in html format"
     echo "  --coverage-xml      compute test coverage in Cobertura XML format"
     echo "  --coverage-json     compute test coverage in Coveralls JSON format"
     echo "  -h|--help           print this help"
+    echo ""
+    echo "TRAILING OPTIONS"
+    echo ""
+    echo "  All arguments passed after a double dash '--' are passed to dune"
+    echo "  For example in 'test.sh -r -u tests -- -j 12', '-j 12' will be"
+    echo "  passed as a dune argument"
     echo ""
     echo "VARIABLES"
     echo ""
@@ -176,28 +180,13 @@ do
         "-w"|"--wp-cache")
             PULLCACHE=yes
             ;;
-        "-f"|"--force")
-            DUNE_OPT+=" --force"
-            ;;
         "-u"|"--update")
             DUNE_OPT+=" --auto-promote"
             UPDATE=yes
             ;;
-        "--watch")
-            DUNE_OPT+=" --watch"
-            ;;
         "-v"|"--verbose")
-            DUNE_OPT+=" --display=short"
+            DUNE_OPT+=" --display=short --always-show-command-line"
             VERBOSE=yes
-            ;;
-        "-j"|"--jobs")
-            if [[ $2 == "auto" ]] || ([[ $2 != \-* ]] && [[ $2 -ge 1 ]]); then
-                DUNE_OPT+=" -j $2"
-                shift
-            else
-                ErrorUsage \
-                    "wrong opt ('$2') for '-j|--jobs', value 'auto' or >= 1 expected"
-            fi
             ;;
         "-l"|"--logs")
             LOGS=yes
@@ -224,6 +213,10 @@ do
         "eva")
             TESTS+=" tests/value tests/builtins tests/float tests/idct"
             ;;
+        "--")
+            shift
+            break
+            ;;
         *)
             if [ -f $1 ] || [ -d $1 ]; then
                 TESTS+=" $1"
@@ -238,6 +231,9 @@ do
     esac
     shift
 done
+
+# Pass all the remaining options (after '--') to dune at the end of the command
+DUNE_OPT_POST="$@"
 
 # --------------------------------------------------------------------------
 # ---  WP Cache Environment
@@ -398,13 +394,13 @@ function RunAlias
 {
     Head "Running tests..."
     if [ "$DUNE_LOG" = "" ]; then
-        Run dune build $DUNE_OPT $@
+        Run dune build $DUNE_OPT $@ $DUNE_OPT_POST
     elif [ "$SAVE" != "yes" ] && [ "$VERBOSE" != "yes" ]; then
-        Run dune build $DUNE_OPT $@
+        Run dune build $DUNE_OPT $@ $DUNE_OPT_POST
     else
         # note: the Run function cannot performs redirection
-        echo "> dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)"
-        dune build $DUNE_OPT $@ 2> >(tee -a $DUNE_LOG >&2)
+        echo "> dune build $DUNE_OPT $@ $DUNE_OPT_POST 2> >(tee -a $DUNE_LOG >&2)"
+        dune build $DUNE_OPT $@ $DUNE_OPT_POST 2> >(tee -a $DUNE_LOG >&2)
     fi
 }
 
