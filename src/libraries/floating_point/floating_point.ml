@@ -93,10 +93,10 @@ let long   f = Float (f, Long)
 
 let represents : type f. float:float -> in_format:f format -> f t =
   fun ~float ~in_format ->
-    match in_format with
-    | Single -> single float
-    | Double -> double float
-    | Long   -> long   float
+  match in_format with
+  | Single -> single float
+  | Double -> double float
+  | Long   -> long   float
 
 let to_float (Float (n, _)) = n
 let format   (Float (_, f)) = f
@@ -304,7 +304,7 @@ let string_of_rounding_mode = function
 let ensure_round_nearest_even () =
   if Stdlib.(get_rounding_mode () <> Nearest_even) then
     let mode = string_of_rounding_mode (get_rounding_mode ()) in
-    let () = Kernel.log "pretty: rounding mode (%s) <> FE_TONEAREST" mode in
+    let () = Kernel.failure "pretty: rounding mode (%s) <> FE_TONEAREST" mode in
     set_rounding_mode Nearest_even
 
 let pretty fmt (Float (f, _) as float) =

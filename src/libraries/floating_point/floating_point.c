@@ -113,7 +113,8 @@ value frama_c_change_format(value frama_c_prec, value num) {
   case Long:
     return to_ocaml(to_long(num));
   default:
-    caml_invalid_argument("Invalid floating-point format in [frama_c_round_to]");
+    caml_invalid_argument(
+        "Invalid floating-point format in [frama_c_round_to]");
   }
 }
 

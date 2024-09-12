@@ -20,9 +20,26 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module implements a typed API over floating point numbers, allowing
-    to statically ensure that floating point formats are strictly respected
-    at each step. *)
+(** {2 Objectives and limitations}
+
+    The goal of this module is to provide a representation of floating-point
+    numbers that statically encode the format of the represented number. As
+    for now, the numbers are represented using the OCaml [float] type (which
+    are in the [binary64] format) and thus, all operations for the [Long]
+    format (or [binary80]) are unsound as they are performed using the
+    [binary64] format instead of [binary80] for x86 architectures.
+
+    This is TEMPORARY, and does not break anything in Frama-C as the historical
+    way of handling the [Long] format was to use the OCaml [float] type. Future
+    improvements of this module WILL INCLUDE a correct way to perform
+    computations in the [Long] format.
+
+    The format is nevertheless presents because Frama-C still needs to be able
+    to differentiate between the two formats. In particular, the parsing
+    process must be able to infer the correct format to store the
+    corresponding [fkind], and the logic must know the correct [fkind] to emit
+    relevant warnings that partially alleviate the incorrectness resulting
+    from Frama-C encoding of [Long] numbers. *)
 
 
 
