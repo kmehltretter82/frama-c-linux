@@ -49,6 +49,8 @@
   \return(strndup) == 0 (auto)
   \return(stpncpy) == 0 (auto)
   \return(strsignal) == 0 (auto)
+  \return(index) == 0 (auto)
+  \return(rindex) == 0 (auto)
   \return(argz_count) == 0, 6 (auto)
   \return(argz_append) == 0, 6 (auto)
   \return(argz_add) == 0, 6 (auto)

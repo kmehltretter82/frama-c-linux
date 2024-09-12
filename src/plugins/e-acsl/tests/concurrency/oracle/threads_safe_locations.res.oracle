@@ -8,48 +8,48 @@
 [e-acsl] Warning: annotating undefined function `pthread_join':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:247: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:405: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:252: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:410: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:255: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:413: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:225: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:357: Warning: 
   E-ACSL construct `\valid_function' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:223: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/pthread.h:355: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:223: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:355: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:223: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:355: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:362: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:362: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:362: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:231: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:363: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:231: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:363: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:231: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:363: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:362: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/pthread.h:230: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/pthread.h:362: Warning: 
   function __gen_e_acsl_pthread_create: postcondition 'initialization,success_or_error' got status unknown.
 [eva:alarm] threads_safe_locations.c:17: Warning: 
   accessing uninitialized left-value. assert \initialized(&t);
