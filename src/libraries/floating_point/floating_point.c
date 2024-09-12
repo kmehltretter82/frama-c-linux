@@ -60,6 +60,8 @@ int fenv_mode(value frama_c_mode) {
     return FE_DOWNWARD;
   case Toward_zero:
     return FE_TOWARDZERO;
+  default:
+    caml_invalid_argument("Invalid rounding mode in [fenv_mode]");
   }
 }
 
@@ -80,6 +82,8 @@ value frama_c_get_round_mode(value _) {
     return Val_int(Downward);
   case FE_TOWARDZERO:
     return Val_int(Toward_zero);
+  default:
+    caml_invalid_argument("Invalid rounding mode in [frama_c_get_round_mode]");
   }
 }
 
@@ -108,6 +112,8 @@ value frama_c_round_to(value frama_c_prec, value num) {
     return to_ocaml(to_double(num));
   case Long:
     return to_ocaml(to_long(num));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_round_to]");
   }
 }
 
@@ -154,7 +160,7 @@ value single_precision_of_string(value str) {
   // Because strtof does not consider optional floating-point suffixes
   // (f, F, l, L), we have to test if they are the cause of the
   // difference, and if so, ignore it.
-  if (end != s_end && (end + 1 != s_end || last != 'f' && last != 'f'))
+  if (end != s_end && (end + 1 != s_end || (last != 'f' && last != 'l')))
     caml_failwith("single_precision_of_string");
   return to_ocaml(f);
 }
@@ -167,6 +173,8 @@ value frama_c_round(value frama_c_prec, value num) {
     return to_ocaml(round(to_double(num)));
   case Long:
     return to_ocaml(roundl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_round]");
   }
 }
 
@@ -178,6 +186,8 @@ value frama_c_trunc(value frama_c_prec, value num) {
     return to_ocaml(trunc(to_double(num)));
   case Long:
     return to_ocaml(truncl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_trunc]");
   }
 }
 
@@ -189,6 +199,8 @@ value frama_c_exp(value frama_c_prec, value num) {
     return to_ocaml(exp(to_double(num)));
   case Long:
     return to_ocaml(expl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_exp]");
   }
 }
 
@@ -200,6 +212,8 @@ value frama_c_log(value frama_c_prec, value num) {
     return to_ocaml(log(to_double(num)));
   case Long:
     return to_ocaml(logl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_log]");
   }
 }
 
@@ -211,6 +225,8 @@ value frama_c_log10(value frama_c_prec, value num) {
     return to_ocaml(log10(to_double(num)));
   case Long:
     return to_ocaml(log10l(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_log10]");
   }
 }
 
@@ -222,17 +238,8 @@ value frama_c_pow(value frama_c_prec, value num, value exp) {
     return to_ocaml(pow(to_double(num), to_double(exp)));
   case Long:
     return to_ocaml(powl(to_long(num), to_long(exp)));
-  }
-}
-
-value frama_c_sqrt(value frama_c_prec, value num) {
-  switch (decode_precision(frama_c_prec)) {
-  case Single:
-    return to_ocaml(sqrtf(to_float(num)));
-  case Double:
-    return to_ocaml(sqrt(to_double(num)));
-  case Long:
-    return to_ocaml(sqrtl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_pow]");
   }
 }
 
@@ -244,6 +251,8 @@ value frama_c_fmod(value frama_c_prec, value num, value mod) {
     return to_ocaml(fmod(to_double(num), to_double(mod)));
   case Long:
     return to_ocaml(fmodl(to_long(num), to_long(mod)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_fmod]");
   }
 }
 
@@ -255,6 +264,8 @@ value frama_c_cos(value frama_c_prec, value num) {
     return to_ocaml(cos(to_double(num)));
   case Long:
     return to_ocaml(cosl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_cos]");
   }
 }
 
@@ -266,6 +277,8 @@ value frama_c_sin(value frama_c_prec, value num) {
     return to_ocaml(sin(to_double(num)));
   case Long:
     return to_ocaml(sinl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_sin]");
   }
 }
 
@@ -277,6 +290,8 @@ value frama_c_tan(value frama_c_prec, value num) {
     return to_ocaml(tan(to_double(num)));
   case Long:
     return to_ocaml(tanl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_tan]");
   }
 }
 
@@ -288,6 +303,8 @@ value frama_c_acos(value frama_c_prec, value num) {
     return to_ocaml(acos(to_double(num)));
   case Long:
     return to_ocaml(acosl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_acos]");
   }
 }
 
@@ -299,6 +316,8 @@ value frama_c_asin(value frama_c_prec, value num) {
     return to_ocaml(asin(to_double(num)));
   case Long:
     return to_ocaml(asinl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_asin]");
   }
 }
 
@@ -310,6 +329,8 @@ value frama_c_atan(value frama_c_prec, value num) {
     return to_ocaml(atan(to_double(num)));
   case Long:
     return to_ocaml(atanl(to_long(num)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_atan]");
   }
 }
 
@@ -321,5 +342,7 @@ value frama_c_atan2(value frama_c_prec, value l, value r) {
     return to_ocaml(atan2(to_double(l), to_double(r)));
   case Long:
     return to_ocaml(atan2l(to_long(l), to_long(r)));
+  default:
+    caml_invalid_argument("Invalid floating-point format in [frama_c_atan2]");
   }
 }
