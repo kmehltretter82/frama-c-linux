@@ -167,8 +167,8 @@ struct
 
   let float ~fkind f =
     let Format fmt = Floating_point.format_of_fkind fkind in
-    let f = Floating_point.(of_float fmt f |> to_float) in
-    mk_exp (Const (CReal (f, fkind, None)))
+    let f = Floating_point.represents ~float:f ~in_format:fmt in
+    mk_exp (Const (CReal (Floating_point.to_float f, fkind, None)))
 
   let cast typ exp =
     if Cil.need_cast exp.typ typ

@@ -40,10 +40,10 @@ type 'f t =
 
 
 
-external round_to : 'f format -> float -> float = "frama_c_round_to"
-external set_rounding_mode : rounding -> unit = "frama_c_set_round_mode"
-external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode"
+external change_format : 'f format -> float -> float = "frama_c_change_format"
 external single_of_string : string -> float = "single_precision_of_string"
+external set_rounding_mode : rounding -> unit = "frama_c_set_round_mode" [@@noalloc]
+external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode" [@@noalloc]
 
 external round : 'f format -> float -> float = "frama_c_round"
 external trunc : 'f format -> float -> float = "frama_c_trunc"
@@ -87,12 +87,16 @@ let format_of_char = function
 
 
 
-let single f = Float (round_to Single f, Single)
+let single f = Float (change_format Single f, Single)
 let double f = Float (f, Double)
 let long   f = Float (f, Long)
 
-let of_float : type f. f format -> float -> f t =
-  function Single -> single | Double -> double | Long -> long
+let represents : type f. float:float -> in_format:f format -> f t =
+  fun ~float ~in_format ->
+    match in_format with
+    | Single -> single float
+    | Double -> double float
+    | Long   -> long   float
 
 let to_float (Float (n, _)) = n
 let format   (Float (_, f)) = f
@@ -143,12 +147,12 @@ let exp_size : type f. f format -> int =
 let largest_finite_float_of : type f. format:f format -> f t =
   let exponent fmt = Int.shift_left 1 (exp_size fmt - 1) - 1 in
   let base fmt = 2.0 -. ldexp 1.0 (1 - sig_size fmt) in
-  let run fmt = ldexp (base fmt) (exponent fmt) |> round_to fmt in
+  let run fmt = ldexp (base fmt) (exponent fmt) |> change_format fmt in
   fun ~format -> cache_floats { run } format
 
 let smallest_normal_float_of : type f. format:f format -> f t =
   let exponent fmt = 2 - Int.shift_left 1 (exp_size fmt - 1) in
-  let run fmt = ldexp 1.0 (exponent fmt) |> round_to fmt in
+  let run fmt = ldexp 1.0 (exponent fmt) |> change_format fmt in
   fun ~format -> cache_floats { run } format
 
 let smallest_denormal_float_of : type f. format:f format -> f t =
@@ -197,12 +201,12 @@ let binary (type f) op (l : f t) (r : f t) =
   let Float (l, fmt) = l and Float (r, _) = r in Float (op fmt l r, fmt)
 
 let neg  n = unary (fun _ -> Float.neg ) n
-let sqrt n = unary (fun fmt x -> round_to fmt (Float.sqrt x)) n
-let ( + ) l r = binary (fun fmt l r -> round_to fmt (l +. r)) l r
-let ( - ) l r = binary (fun fmt l r -> round_to fmt (l -. r)) l r
-let ( * ) l r = binary (fun fmt l r -> round_to fmt (l *. r)) l r
-let ( / ) l r = binary (fun fmt l r -> round_to fmt (l /. r)) l r
-let ( mod ) l r = binary (fun fmt l r -> round_to fmt (mod_float l r)) l r
+let sqrt n = unary (fun fmt x -> change_format fmt (Float.sqrt x)) n
+let ( + ) l r = binary (fun fmt l r -> change_format fmt (l +. r)) l r
+let ( - ) l r = binary (fun fmt l r -> change_format fmt (l -. r)) l r
+let ( * ) l r = binary (fun fmt l r -> change_format fmt (l *. r)) l r
+let ( / ) l r = binary (fun fmt l r -> change_format fmt (l /. r)) l r
+let ( mod ) l r = binary (fun fmt l r -> change_format fmt (mod_float l r)) l r
 
 let round n = unary round n
 let trunc n = unary trunc n
@@ -219,7 +223,7 @@ let atan2 l r = binary atan2 l r
 let pow  base e = binary pow  base e
 let fmod base m = binary fmod base m
 
-let round_to : type a f. a t -> f format -> f t = fun number format ->
+let change_format : type a f. a t -> f format -> f t = fun number format ->
   match number, format with
   | Float (n, _), Single -> single n
   | Float (n, _), Double -> double n
@@ -344,18 +348,18 @@ let parsed = function
 let normalize_exponent_of_string ~format e =
   let exponent = Z.of_string e in
   if Z.Compare.(exponent > Z.of_int max_int) then
-    let inf = of_float format Float.infinity in
+    let inf = represents ~float:Float.infinity ~in_format:format in
     let max = largest_finite_float_of ~format in
     Shortcut { lower = max ; nearest = inf ; upper = inf ; format }
   else if Z.Compare.(exponent < Z.of_int min_int) then
-    let zero = of_float format 0.0 in
+    let zero = represents ~float:0.0 ~in_format:format in
     let min  = smallest_denormal_float_of ~format in
     Shortcut { lower = zero ; nearest = zero ; upper = min ; format }
   else Normalized (Z.to_int exponent)
 
 let normalize_zero_in_numerator ~format numerator =
   if Z.(equal numerator zero) then
-    let zero = of_float format 0.0 in
+    let zero = represents ~float:0.0 ~in_format:format in
     let lower = zero and nearest = zero and upper = zero in
     Shortcut { lower ; nearest ; upper ; format }
   else Normalized numerator
@@ -366,7 +370,7 @@ let normalize_exponent_on_format ~format exponent =
   let maximal_exponent = maximal_exponent_of ~format in
   let shifted_maximal = Z.(maximal_exponent - significant_size) in
   if Z.Compare.(exponent > shifted_maximal) then
-    let inf = of_float format Float.infinity in
+    let inf = represents ~float:Float.infinity ~in_format:format in
     let max = largest_finite_float_of ~format in
     Shortcut { lower = max ; nearest = inf ; upper = inf ; format }
   else Normalized Z.(to_int exponent)

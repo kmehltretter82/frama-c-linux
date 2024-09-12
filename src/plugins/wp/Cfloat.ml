@@ -237,8 +237,8 @@ let format = function
 
 let float_lit fmt (q : Q.t) =
   let Format fmt = format fmt in
-  let v = Floating_point.of_float fmt (Q.to_float q) in
-  let reparse s = Floating_point.of_float fmt (float_of_string s) in
+  let v = Floating_point.represents ~float:(Q.to_float q) ~in_format:fmt in
+  let reparse s = Floating_point.represents ~float:(float_of_string s) ~in_format:fmt in
   let rec lookup = function
     | [] -> Pretty_utils.to_string Floating_point.pretty v
     | pp :: pps ->

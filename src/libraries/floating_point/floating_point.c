@@ -104,7 +104,7 @@ value to_ocaml(double d) { return caml_copy_double(d); }
 
 // Round a floating-point number into a given format. It is based on
 // C implicit casts to perform the roundings.
-value frama_c_round_to(value frama_c_prec, value num) {
+value frama_c_change_format(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:
     return to_ocaml(to_float(num));

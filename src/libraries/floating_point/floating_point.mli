@@ -84,7 +84,7 @@ val long : float -> long   t
 
 (** Build a typed float of the given format given an OCaml 64-bits
     floating point number. *)
-val of_float : 'f format -> float -> 'f t
+val represents : float:float -> in_format:'f format -> 'f t
 
 (** Returns the OCaml float represented by a given typed float. *)
 val to_float : 'f t -> float
@@ -108,7 +108,7 @@ val has_suffix : Cil_types.fkind -> string -> bool
 
 (** Cast a typed floating point number to a new given format.
     Rounding operations are performed when needed. *)
-val round_to : _ t -> 'f format -> 'f t
+val change_format : _ t -> 'f format -> 'f t
 
 
 

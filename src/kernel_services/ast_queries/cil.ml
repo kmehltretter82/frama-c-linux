@@ -2691,7 +2691,8 @@ let intKindForValue i (unsigned: bool) =
 (* True is an double constant is finite for a kind *)
 let isFiniteFloat fk v =
   let Format fmt = Floating_point.format_of_fkind fk in
-  Floating_point.(of_float fmt v |> is_finite)
+  let v = Floating_point.represents ~float:v ~in_format:fmt in
+  Floating_point.is_finite v
 
 let isExactFloat fk r =
   r.r_upper = r.r_lower && isFiniteFloat fk r.r_nearest
@@ -2726,8 +2727,8 @@ let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
 let kfloat ~loc k f =
   let Format fmt = Floating_point.format_of_fkind k in
-  let f = Floating_point.(of_float fmt f |> to_float) in
-  new_exp ~loc (Const (CReal(f,k,None)))
+  let f = Floating_point.represents ~float:f ~in_format:fmt in
+  new_exp ~loc (Const (CReal (Floating_point.to_float f, k, None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -4212,7 +4213,7 @@ and constFold (machdep: bool) (e: exp) : exp =
       | Const (CReal(f,k,_)), (TInt ik | TEnum {ekind = ik}) when t.tattr = [] ->
         (* See above *)
         let Format fmt = Floating_point.format_of_fkind k in
-        let f = Floating_point.of_float fmt f in
+        let f = Floating_point.represents ~float:f ~in_format:fmt in
         let truncated i = truncateInteger64 ik i |> snd in
         begin match Floating_point.truncate_to_integer f with
           | Underflow | Overflow -> new_exp ~loc (CastE (t, e))

@@ -59,7 +59,8 @@ let is_exact = function
 
 let of_float rounding prec f =
   let<> Format fmt = using ~prec ~rounding in
-  Floating_point.(of_float fmt f |> to_float)
+  let f = Floating_point.represents ~float:f ~in_format:fmt in
+  Floating_point.to_float f
 
 let to_float f = f
 
@@ -145,11 +146,14 @@ type binary = { compute : 'f. 'f number -> 'f number -> 'f number }
 
 let unary (op : unary) rounding prec x =
   let<> Format fmt = using ~prec ~rounding in
-  Floating_point.(op.compute (of_float fmt x) |> to_float)
+  let x = Floating_point.represents ~float:x ~in_format:fmt in
+  Floating_point.(op.compute x |> to_float)
 
 let binary (op : binary) rounding prec x y =
   let<> Format fmt = using ~prec ~rounding in
-  Floating_point.(op.compute (of_float fmt x) (of_float fmt y) |> to_float)
+  let x = Floating_point.represents ~float:x ~in_format:fmt in
+  let y = Floating_point.represents ~float:y ~in_format:fmt in
+  Floating_point.(op.compute x y |> to_float)
 
 let add  = binary { compute = Floating_point.( + ) }
 let sub  = binary { compute = Floating_point.( - ) }

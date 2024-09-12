@@ -754,7 +754,8 @@ module Make
 
   let round fkind f =
     let Format fmt = Floating_point.format_of_fkind fkind in
-    Floating_point.(of_float fmt f |> to_float)
+    let f = Floating_point.represents ~float:f ~in_format:fmt in
+    Floating_point.to_float f
 
   let truncate_float_bound fkind bound bound_kind expr value =
     let next_int, prev_float, is_beyond = match bound_kind with

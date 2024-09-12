@@ -392,7 +392,8 @@ let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
       | false, _ | true, None -> alarm Upper_bound ; alarm Lower_bound
       | true, Some (f, fkind) ->
         let Format fmt = Floating_point.format_of_fkind fkind in
-        match Floating_point.(of_float fmt f |> truncate_to_integer) with
+        let f = Floating_point.represents ~float:f ~in_format:fmt in
+        match Floating_point.truncate_to_integer f with
         | Underflow -> alarm Lower_bound
         | Overflow  -> alarm Upper_bound
         | Integer i when Integer.lt i min_ty -> alarm ~invalid:true Lower_bound

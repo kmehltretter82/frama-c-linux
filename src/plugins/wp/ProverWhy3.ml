@@ -291,7 +291,7 @@ struct
     let use_hex = true in
     let qf = Q.to_float q in
     let Format fmt = format (cfloat_of_tau tau) in
-    let f = Floating_point.of_float fmt qf in
+    let f = Floating_point.represents ~float:qf ~in_format:fmt in
     let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) f in
     let s = String.lowercase_ascii s in
     if Str.string_match re_float s 0 then
