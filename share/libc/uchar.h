@@ -43,6 +43,13 @@ typedef __UINT_LEAST16_T char16_t;
 typedef __UINT_LEAST16_T char32_t;
 #endif
 
+/* POSIX 2024: "Inclusion of the <uchar.h> header may make visible all symbols
+   from the headers <stddef.h>, <stdint.h>, and <wchar.h>.
+   Note: coreutils needs this: it uses wint_t without including wchar.h. */
+#include <stddef.h>
+#include <stdint.h>
+#include <wchar.h>
+
 /* C23 7.30.1 "...If ps is a null pointer, each function uses its own
    internal mbstate_t object..."
 */
