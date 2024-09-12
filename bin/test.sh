@@ -350,7 +350,7 @@ function CheckDuneFiles
         then
             GenerateDuneFiles
         else
-            DATE_TEST_MODIFICATION=$(find $TESTS -type f \
+            DATE_TEST_MODIFICATION=$(find -L $TESTS -type f \
                                     -not -path "*/result*/*" \
                                     -not -path "*/oracle*/*" \
                                     -exec stat --printf "%Y\n" {} \+ | \
