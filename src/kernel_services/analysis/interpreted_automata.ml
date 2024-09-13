@@ -29,7 +29,7 @@ let debug_output_to_dot = false
 (* --- Graph definitions                                              --- *)
 (* ---------------------------------------------------------------------- *)
 
-type info =
+type vertex_info =
   | NoneInfo
   | LoopHead of { stmt : stmt; level : int }
 
@@ -47,7 +47,7 @@ type vertex = {
   vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
   mutable vertex_start_of : Cil_types.stmt option;
-  mutable vertex_info : info;
+  mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;
 }
 

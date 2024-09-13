@@ -25,13 +25,13 @@ open Eva_ast
 
 (* --- Vertices and Edges types --- *)
 
-type info = Interpreted_automata.info
+type vertex_info = Interpreted_automata.vertex_info
 
 type vertex = {
   vertex_kf : kernel_function;
   vertex_key : int;
   vertex_start_of : Cil_types.stmt option;
-  vertex_info : info;
+  vertex_info : vertex_info;
   mutable vertex_wto_index : vertex list;
 }
 

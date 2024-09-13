@@ -28,13 +28,13 @@
 open Cil_types
 open Eva_ast
 
-type info = Interpreted_automata.info
+type vertex_info = Interpreted_automata.vertex_info
 
 type vertex = private {
   vertex_kf : kernel_function;
   vertex_key : int;
   vertex_start_of : Cil_types.stmt option;
-  vertex_info : info;
+  vertex_info : vertex_info;
   mutable vertex_wto_index : vertex list;
 }
 
