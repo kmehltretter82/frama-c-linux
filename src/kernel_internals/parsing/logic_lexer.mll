@@ -142,7 +142,6 @@
         "for", (fun _ -> FOR);
         "global", (fun _ -> GLOBAL);
         "if", (fun _ -> IF);
-	"impact", (fun _ -> IMPACT);
 	"inductive", (fun _ -> INDUCTIVE);
 	"include", (fun _ -> INCLUDE);
         (* ACSL extension for external spec file *)
@@ -159,7 +158,6 @@
         (* ACSL extension for model fields *)
         "module", (fun _ -> MODULE);
         (* ACSL extension for external spec file *)
-        "pragma", (fun _ -> PRAGMA);
         "predicate", (fun _ -> PREDICATE);
         "reads", (fun _ -> READS);
         "requires", (fun _ -> REQUIRES);
@@ -167,7 +165,6 @@
         "short", (fun _ -> SHORT);
         "signed", (fun _ -> SIGNED);
         "sizeof", (fun _ -> SIZEOF);
-        "slice", (fun _ -> SLICE);
         "struct", (fun _ -> STRUCT);
         "terminates", (fun _ -> TERMINATES);
         "type", (fun _ -> TYPE);

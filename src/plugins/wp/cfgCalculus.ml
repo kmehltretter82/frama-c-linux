@@ -76,7 +76,7 @@ let is_selected_ca (m: mode) ~goal (ca: code_annotation) =
   | AInvariant(forb,_,_)
     -> is_selected_for m ~goal forb
   | AVariant _ -> is_default_bhv m
-  | AExtended _ | AStmtSpec _ | APragma _ ->
+  | AExtended _ | AStmtSpec _ ->
     assert false (* n/a *)
 
 let is_active_mode ~mode ~goal (p: Property.t) =

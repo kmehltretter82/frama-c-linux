@@ -91,7 +91,6 @@ let node_of_code_annotation_node = function
   | AVariant _ -> "variant"
   | AAssigns _ -> "assigns"
   | AAllocation _ -> "allocation"
-  | APragma _ -> "ca_pragma"
   | AExtended _ -> "extended"
 
 let node_of_global_annotation = function
@@ -390,8 +389,6 @@ class full_visitor = object(self)
   method! vfrees _ = Cil.DoChildren
   method! vallocates _ = Cil.DoChildren
   method! vallocation _ = Cil.DoChildren
-  method! vslice_pragma _ = Cil.DoChildren
-  method! vimpact_pragma _ = Cil.DoChildren
   method! vdeps _ = Cil.DoChildren
   method! vfrom _ = Cil.DoChildren
   method! vcode_annot _ =

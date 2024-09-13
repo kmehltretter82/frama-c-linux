@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-impact-pragma main"
+   STDOPT: +"-impact-annot main"
    */
 
 
@@ -8,7 +8,7 @@ int find(int x) { return x; }
 int main()
 {
   int a = find(1);
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   int b = find(2);
   int c = find(b);
   int d = find(3);

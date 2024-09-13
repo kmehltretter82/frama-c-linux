@@ -186,149 +186,149 @@ RESULT for main:
    -[--d]-> 8
    -[--d]-> 11
    -[--d]-> 57
- {n14}: Call113-InCtrl : modifS(a,b);
+ {n14}: Call111-InCtrl : modifS(a,b);
    -[-c-]-> 1
- {n15}: Call113-In1 : modifS(a,b);
+ {n15}: Call111-In1 : modifS(a,b);
    -[-c-]-> 1
    -[--d]-> 2
    -[--d]-> 6
    -[--d]-> 11
    -[-c-]-> 14
- {n16}: Call113-In2 : modifS(a,b);
+ {n16}: Call111-In2 : modifS(a,b);
    -[-c-]-> 1
    -[--d]-> 3
    -[--d]-> 7
    -[-c-]-> 14
- {n17}: Call113-Out(S.a) : modifS(a,b);
+ {n17}: Call111-Out(S.a) : modifS(a,b);
    -[-c-]-> 1
    -[-c-]-> 14
    -[--d]-> 15
    -[--d]-> 56
- {n18}: Call113-Out(S.b) : modifS(a,b);
+ {n18}: Call111-Out(S.b) : modifS(a,b);
    -[-c-]-> 1
    -[-c-]-> 14
    -[--d]-> 16
    -[--d]-> 55
- {n19}: Call114-InCtrl : d = new_int();
+ {n19}: Call112-InCtrl : d = new_int();
    -[-c-]-> 1
- {n20}: Call114-OutRet : d = new_int();
+ {n20}: Call112-OutRet : d = new_int();
    -[-c-]-> 1
    -[-c-]-> 19
- {n21}: Call115-InCtrl : f1(d);
+ {n21}: Call113-InCtrl : f1(d);
    -[-c-]-> 1
- {n22}: Call115-In1 : f1(d);
+ {n22}: Call113-In1 : f1(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 21
- {n23}: Call115-Out(Sa) : f1(d);
+ {n23}: Call113-Out(Sa) : f1(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 21
    -[--d]-> 22
- {n24}: Call116-InCtrl : f2(d);
+ {n24}: Call114-InCtrl : f2(d);
    -[-c-]-> 1
- {n25}: Call116-In1 : f2(d);
+ {n25}: Call114-In1 : f2(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 24
- {n26}: Call116-Out(Sa) : f2(d);
+ {n26}: Call114-Out(Sa) : f2(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 24
    -[--d]-> 25
- {n27}: Call117-InCtrl : f3(d);
+ {n27}: Call115-InCtrl : f3(d);
    -[-c-]-> 1
- {n28}: Call117-In1 : f3(d);
+ {n28}: Call115-In1 : f3(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 27
- {n29}: Call117-Out(Sa) : f3(d);
+ {n29}: Call115-Out(Sa) : f3(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 27
    -[--d]-> 28
- {n30}: Call118-InCtrl : f4(d);
+ {n30}: Call116-InCtrl : f4(d);
    -[-c-]-> 1
- {n31}: Call118-In1 : f4(d);
+ {n31}: Call116-In1 : f4(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 30
- {n32}: Call118-Out(Sa) : f4(d);
+ {n32}: Call116-Out(Sa) : f4(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 30
    -[--d]-> 31
- {n33}: Call119-InCtrl : f5(d);
+ {n33}: Call117-InCtrl : f5(d);
    -[-c-]-> 1
- {n34}: Call119-In1 : f5(d);
+ {n34}: Call117-In1 : f5(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 33
- {n35}: Call119-Out(Sa) : f5(d);
+ {n35}: Call117-Out(Sa) : f5(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 33
    -[--d]-> 34
- {n36}: Call120-InCtrl : f6(d);
+ {n36}: Call118-InCtrl : f6(d);
    -[-c-]-> 1
- {n37}: Call120-In1 : f6(d);
+ {n37}: Call118-In1 : f6(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 36
- {n38}: Call120-Out(Sa) : f6(d);
+ {n38}: Call118-Out(Sa) : f6(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 36
    -[--d]-> 37
- {n39}: Call121-InCtrl : f7(d);
+ {n39}: Call119-InCtrl : f7(d);
    -[-c-]-> 1
- {n40}: Call121-In1 : f7(d);
+ {n40}: Call119-In1 : f7(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 39
- {n41}: Call121-Out(Sa) : f7(d);
+ {n41}: Call119-Out(Sa) : f7(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 39
    -[--d]-> 40
- {n42}: Call122-InCtrl : f8(d);
+ {n42}: Call120-InCtrl : f8(d);
    -[-c-]-> 1
- {n43}: Call122-In1 : f8(d);
+ {n43}: Call120-In1 : f8(d);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 42
- {n44}: Call122-Out(S.a) : f8(d);
+ {n44}: Call120-Out(S.a) : f8(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 42
    -[--d]-> 43
- {n45}: Call122-Out(Sa) : f8(d);
+ {n45}: Call120-Out(Sa) : f8(d);
    -[-c-]-> 1
    -[--d](S.a)-> 17
    -[-c-]-> 42
    -[--d]-> 43
- {n46}: Call123-InCtrl : f9(d,a);
+ {n46}: Call121-InCtrl : f9(d,a);
    -[-c-]-> 1
- {n47}: Call123-In1 : f9(d,a);
+ {n47}: Call121-In1 : f9(d,a);
    -[-c-]-> 1
    -[--d]-> 20
    -[-c-]-> 46
- {n48}: Call123-In2 : f9(d,a);
+ {n48}: Call121-In2 : f9(d,a);
    -[-c-]-> 1
    -[--d]-> 2
    -[--d]-> 6
    -[--d]-> 11
    -[-c-]-> 46
- {n49}: Call123-Out(X9) : f9(d,a);
+ {n49}: Call121-Out(X9) : f9(d,a);
    -[-c-]-> 1
    -[-c-]-> 46
    -[--d]-> 47
    -[--d]-> 48
- {n50}: Call123-Out(Y9) : f9(d,a);
+ {n50}: Call121-Out(Y9) : f9(d,a);
    -[-c-]-> 1
    -[-c-]-> 46
    -[--d]-> 54
- {n51}: Call123-Out(Z9) : f9(d,a);
+ {n51}: Call121-Out(Z9) : f9(d,a);
    -[-c-]-> 1
    -[-c-]-> 46
    -[--d]-> 48
@@ -403,8 +403,8 @@ modifS_slice_1:
   S.a += a;
   /* <[---], [---]> */
   S.b -= b;
-  /*@ slice pragma expr S.a; */ /* <[ S ], [---]> */
-                                ;
+  /*@ \slicing::slice_preserve_expr S.a; */ /* <[ S ], [---]> */
+                                            ;
   /* <[---], [---]> */
   return;
 }
@@ -435,8 +435,8 @@ main_slice_1:
     /* <[--d], [---]> */
     a = 1;
   }
-  /*@ slice pragma expr a + b; */ /* <[ S ], [---]> */
-                                  ;
+  /*@ \slicing::slice_preserve_expr a + b; */ /* <[ S ], [---]> */
+                                              ;
   /*@ assert
       Eva: signed_overflow: (int)((int)(a + b) + c) + d ≤ 2147483647;
   */
@@ -491,7 +491,7 @@ struct Tstr S;
 void modifS_slice_1(int a)
 {
   S.a += a;
-  /*@ slice pragma expr S.a; */ ;
+  /*@ \slicing::slice_preserve_expr S.a; */ ;
   return;
 }
 
@@ -504,7 +504,7 @@ void main(void)
     /*@ assert b ≡ 0; */ ;
     a = 1;
   }
-  /*@ slice pragma expr a + b; */ ;
+  /*@ \slicing::slice_preserve_expr a + b; */ ;
   modifS_slice_1(a);
   return;
 }
@@ -535,8 +535,8 @@ modifS_slice_1:
   S.a += a;
   /* <[---], [---]> */
   S.b -= b;
-  /*@ slice pragma expr S.a; */ /* <[ S ], [---]> */
-                                ;
+  /*@ \slicing::slice_preserve_expr S.a; */ /* <[ S ], [---]> */
+                                            ;
   /* <[---], [---]> */
   return;
 }
@@ -567,8 +567,8 @@ main_slice_1:
     /* <[--d], [---]> */
     a = 1;
   }
-  /*@ slice pragma expr a + b; */ /* <[ S ], [---]> */
-                                  ;
+  /*@ \slicing::slice_preserve_expr a + b; */ /* <[ S ], [---]> */
+                                              ;
   /*@ assert
       Eva: signed_overflow: (int)((int)(a + b) + c) + d ≤ 2147483647;
   */
@@ -623,7 +623,7 @@ struct Tstr S;
 void modifS_slice_1(int a)
 {
   S.a += a;
-  /*@ slice pragma expr S.a; */ ;
+  /*@ \slicing::slice_preserve_expr S.a; */ ;
   return;
 }
 
@@ -636,7 +636,7 @@ void main(void)
     /*@ assert b ≡ 0; */ ;
     a = 1;
   }
-  /*@ slice pragma expr a + b; */ ;
+  /*@ \slicing::slice_preserve_expr a + b; */ ;
   modifS_slice_1(a);
   return;
 }

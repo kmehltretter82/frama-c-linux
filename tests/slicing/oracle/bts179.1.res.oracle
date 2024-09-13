@@ -49,7 +49,7 @@ void g_slice_1(void)
 void main(void)
 {
   g_slice_1();
-  /*@ slice pragma expr S.b; */ ;
+  /*@ \slicing::slice_preserve_expr S.b; */ ;
   return;
 }
 

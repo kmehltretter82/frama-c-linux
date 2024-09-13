@@ -167,7 +167,7 @@ struct Tstr S;
 void modifS_slice_1(int a)
 {
   S.a += a;
-  /*@ slice pragma expr S.a; */ ;
+  /*@ \slicing::slice_preserve_expr S.a; */ ;
   return;
 }
 

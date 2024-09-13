@@ -28,7 +28,7 @@ int y;
 void double_effect1(void)
 {
   int tmp;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   { /* sequence */
     tmp = y;
     y ++;

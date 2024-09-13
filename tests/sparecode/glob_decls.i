@@ -1,7 +1,7 @@
 /* run.config
   STDOPT: +"-lib-entry -sparecode-analysis "
 PLUGIN: @PTEST_PLUGIN@ slicing
-  STDOPT: +"-lib-entry -slice-pragma main -slice-return main -then-on 'Slicing export' -print"
+  STDOPT: +"-lib-entry -slice-annot main -slice-return main -then-on 'Slicing export' -print"
  STDOPT: +"-sparecode-rm-unused-globals"
 */
 
@@ -41,7 +41,7 @@ int * PX;
 
 /*@ requires S2.a > S2.b ; */
 int main (int x, Ts s) {
-  //@ slice pragma expr S2 ;
+  //@ slice_preserve_expr S2 ;
   int y = 3;
   y += Y;
   y += *PX;

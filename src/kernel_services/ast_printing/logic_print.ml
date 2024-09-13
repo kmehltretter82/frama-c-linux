@@ -450,22 +450,6 @@ let print_spec fmt spec =
        ~sep:"@\n" ~suf:"@\n" (pp_list ~sep:",@ " pp_print_string))
     spec.spec_disjoint_behaviors
 
-let print_slice_pragma fmt p =
-  match p with
-  | SPexpr e -> fprintf fmt "expr@ %a" print_lexpr e
-  | SPctrl -> pp_print_string fmt "ctrl"
-  | SPstmt -> pp_print_string fmt "stmt"
-
-let print_impact_pragma fmt p =
-  match p with
-  | IPexpr e -> fprintf fmt "expr@ %a" print_lexpr e
-  | IPstmt -> pp_print_string fmt "stmt"
-
-let print_pragma fmt p =
-  match p with
-  | Slice_pragma p -> fprintf fmt "slice@ pragma@ %a;" print_slice_pragma p
-  | Impact_pragma p -> fprintf fmt "impact@ pragma@ %a;" print_impact_pragma p
-
 let print_extension fmt (name, ext) =
   fprintf fmt "%s %a" name (pp_list ~sep:",@ " print_lexpr) ext
 
@@ -494,7 +478,6 @@ let print_code_annot fmt ca =
     fprintf fmt "%aloop@ %a" print_behaviors bhvs print_assigns a
   | AAllocation (bhvs,fa) ->
     fprintf fmt "%a%a" print_behaviors bhvs (print_allocation ~isloop:true) fa
-  | APragma p -> print_pragma fmt p
   | AExtended (bhvs, is_loop, e) ->
     fprintf fmt "%a%s%a"
       print_behaviors bhvs

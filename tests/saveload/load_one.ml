@@ -4,7 +4,7 @@ let () = at_exit (fun _ -> Sys.remove sav_file)
 
 let main () =
   let sparecode () =
-    Sparecode.Register.get ~select_annot:false ~select_slice_pragma:false
+    Sparecode.Register.get ~select_annot:false ~select_slice_annot:false
   in
   let fp = Filepath.Normalized.of_string sav_file in
   let p = sparecode () in

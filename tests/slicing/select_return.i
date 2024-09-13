@@ -14,10 +14,10 @@
   STDOPT: +"-slice-return f   -lib-entry -main g -slicing-level 1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
   STDOPT: +"-slice-return f   -lib-entry -main g -slicing-level 2 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
   STDOPT: +"-slice-return f   -lib-entry -main g -slicing-level 3 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
-  STDOPT: +"-slice-pragma f   -lib-entry -main g -slicing-level 0 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
-  STDOPT: +"-slice-pragma f   -lib-entry -main g -slicing-level 1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
-  STDOPT: +"-slice-pragma f   -lib-entry -main g -slicing-level 2 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
-  STDOPT: +"-slice-pragma f   -lib-entry -main g -slicing-level 3 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
+  STDOPT: +"-slice-annot f   -lib-entry -main g -slicing-level 0 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
+  STDOPT: +"-slice-annot f   -lib-entry -main g -slicing-level 1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
+  STDOPT: +"-slice-annot f   -lib-entry -main g -slicing-level 2 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
+  STDOPT: +"-slice-annot f   -lib-entry -main g -slicing-level 3 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
   STDOPT: +"-slice-value  H   -lib-entry -main g -slicing-level 1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
   STDOPT: +"-slice-value  H   -lib-entry -main g -slicing-level 2 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
   STDOPT: +"-slice-value  H   -lib-entry -main g -slicing-level 3 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check "
@@ -49,7 +49,7 @@ int f(int y) {
   k(0,0,0,0);
   int r = k(0,y,0,0);
   int z = k(G,0,0,0);
-  //@ slice pragma expr z;
+  //@ slice_preserve_expr z;
   send (z);
   return z;
 }

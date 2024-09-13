@@ -162,7 +162,7 @@
 void f5_slice_1(int cond)
 {
   if (cond) 
-    /*@ slice pragma expr 1; */ ;
+    /*@ \slicing::slice_preserve_expr 1; */ ;
   return;
 }
 

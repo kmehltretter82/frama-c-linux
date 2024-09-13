@@ -74,12 +74,9 @@ let compare_annotations la1 la2 =
   | AAllocation _, AAllocation _ -> total_order
   | AAllocation _, _ -> -1
 
-  | AVariant _, (APragma _ | AExtended _) -> -1
+  | AVariant _, AExtended _ -> -1
   | AVariant _, AVariant _ -> total_order
   | AVariant _, _ -> 1
-  | APragma _, AExtended _ -> -1
-  | APragma _, APragma _ -> total_order
-  | APragma _, _ -> 1
   | AExtended _, AExtended _ -> total_order
   | AExtended _, _ -> 1
 

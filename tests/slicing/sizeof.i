@@ -10,7 +10,7 @@
   STDOPT: +"-deps -slice-return SizeOfE_pt_tab_1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-return SizeOfE_pt_tab_2 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-return SizeOfE_tab_acces_1 -no-slice-callers -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
-  STDOPT: +"-deps -slice-pragma main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
+  STDOPT: +"-deps -slice-annot main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
   STDOPT: +"-deps -slice-assert main -then-on 'Slicing export' -set-project-as-default -print -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -check -no-deps"
 */
 struct St { int i, *p, tab[5] ; } st ;
@@ -101,6 +101,6 @@ int main (void) {
   r += SizeOfE_pt_tab_1 ();
   r += SizeOfE_pt_tab_2 ();
   r += SizeOfE_tab_acces_1 ();
-  //@ slice pragma expr r;
+  //@ slice_preserve_expr r;
   return r;
 }

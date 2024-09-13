@@ -126,7 +126,6 @@ let pp_code_annot fmt ca =
     Format.fprintf fmt "invariant%a%a" pp_for bs pp_top tp
   | AAssigns(bs,_) -> Format.fprintf fmt "assigns%a" pp_for bs
   | AAllocation(bs,_) -> Format.fprintf fmt "allocates_frees%a" pp_for bs
-  | APragma _ -> Format.pp_print_string fmt "pragma"
   | AVariant _ -> Format.pp_print_string fmt "variant"
   | AStmtSpec _ -> Format.pp_print_string fmt "block contract"
   | AExtended _ -> Format.pp_print_string fmt "extension"

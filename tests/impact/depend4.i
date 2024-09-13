@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-calldeps -then -impact-pragma main"
+   STDOPT: +"-calldeps -then -impact-annot main"
    */
 
 int a, r1, r2;
@@ -25,7 +25,7 @@ void g2() {
 
 void main () {
   g1();
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   f();
   g2();
 }

@@ -12,7 +12,7 @@ let main _ =
     let mark = Slicing.Api.Mark.make ~data:true ~addr:false ~ctrl:false in
     let select = Slicing.Api.Select.empty_selects in
     let select = Slicing.Api.Select.select_func_annots select mark
-        ~spare:true ~threat:false ~user_assert:false ~slicing_pragma:true
+        ~spare:true ~threat:false ~user_assert:false ~slicing_annot:true
         ~loop_inv:true ~loop_var:true kf
     in
     Slicing.Api.Request.add_persistent_selection select

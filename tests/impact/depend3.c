@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-impact-pragma main"
+   STDOPT: +"-impact-annot main"
    */
 
 #define N 32
@@ -20,7 +20,7 @@ int apply(int x,int y) { return find(x); }
 int main()
 {
   int a = apply( 1 , 100 );
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   int b = apply( 2 , 200 );
   return a+b ;
 }

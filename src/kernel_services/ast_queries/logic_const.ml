@@ -106,7 +106,7 @@ let refresh_spec s =
 let refresh_code_annotation annot =
   let content =
     match annot.annot_content with
-    | AAssert _ | AInvariant _ | AAllocation _ | AVariant _ | APragma _
+    | AAssert _ | AInvariant _ | AAllocation _ | AVariant _
     | AExtended _ as c -> c
     | AStmtSpec(l,spec) -> AStmtSpec(l, refresh_spec spec)
     | AAssigns(l,a) -> AAssigns(l, refresh_assigns a)

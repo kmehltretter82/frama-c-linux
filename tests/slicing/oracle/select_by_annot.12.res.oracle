@@ -170,7 +170,7 @@ void f8_slice_1(int cond)
       loop variant cond; */
   while (cond) {
     /*@ assert cond ≤ \at(cond,Pre); */ ;
-    /*@ slice pragma stmt; */
+    /*@ \slicing::slice_preserve_stmt ; */
     (S.a) ++;
     cond --;
   }

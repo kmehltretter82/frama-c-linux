@@ -1,6 +1,6 @@
 /* run.config
    COMMENT: also tests the parsing of cmdline options of type string_set
-   STDOPT: +"-pdg-verbose 0" +"-main main1 -impact-pragma g1" +"-then -main main2 -impact-pragma='-@all,+g2'" +"-then -main main3 -impact-pragma='-g2,+g3'" 
+   STDOPT: +"-pdg-verbose 0" +"-main main1 -impact-annot g1" +"-then -main main2 -impact-annot='-@all,+g2'" +"-then -main main3 -impact-annot='-g2,+g3'"
 */
 
 int x1, x2, y2, z2, x3;
@@ -15,7 +15,7 @@ void f1() {
 
 void g1() {
   if (c) {
-    //@ impact pragma stmt;
+    //@ impact_stmt;
     f1();
   }
 }
@@ -42,7 +42,7 @@ void aux2() {
 
 void g2() {
   if (c) {
-    //@ impact pragma stmt;
+    //@ impact_stmt;
     f2();
     if (c) aux2();
   }
@@ -65,7 +65,7 @@ void f3() {
 
 
 void g3() {
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   f3();
   if (c) {
     x3 = x3;

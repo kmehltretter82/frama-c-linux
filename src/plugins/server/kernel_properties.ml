@@ -70,7 +70,6 @@ struct
   let t_loop_assigns = t_loop "assigns"
   let t_loop_variant = t_loop "variant"
   let t_loop_allocates = t_loop "allocates"
-  let t_pragma = t_loop "pragma"
 
   let t_reachable = t_kind "reachable" "Reachable statement"
   let t_code_contract = t_kind "code_contract" "Statement contract"
@@ -119,7 +118,6 @@ struct
         | AVariant _ -> t_loop_variant
         | AAssigns _ -> t_loop_assigns
         | AAllocation _ -> t_loop_allocates
-        | APragma _ -> t_pragma
         | AExtended(_,_,{ext_name=_}) -> t_ext
       end
     | IPAllocation _ -> t_allocates

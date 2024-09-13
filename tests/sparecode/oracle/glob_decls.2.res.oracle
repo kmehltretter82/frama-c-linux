@@ -38,7 +38,7 @@ int *PX;
 int main(int x, Ts s)
 {
   int __retres;
-  /*@ slice pragma expr S2; */ ;
+  /*@ \slicing::slice_preserve_expr S2; */ ;
   int y = 3;
   y += Y;
   y += *PX;

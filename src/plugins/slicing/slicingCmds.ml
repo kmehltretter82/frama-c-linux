@@ -432,17 +432,17 @@ let select_decl_var set mark vi kf =
   let selection = SlicingSelect.select_decl_var kf vi mark in
   add_to_selection set selection
 
-let select_ZoneAnnot_pragmas set ~spare pragmas kf =
+let select_ZoneAnnot_slices set ~spare slices kf =
   let set =
     Cil_datatype.Stmt.Set.fold
-      (* selection related to statement assign and //@ slice pragma stmt *)
+      (* selection related to statement assign and //@ slice directive stmt *)
       (fun ki' acc -> select_stmt acc ~spare ki' kf)
-      pragmas.Logic_deps.stmt set
+      slices.Logic_deps.stmt set
   in
   Cil_datatype.Stmt.Set.fold
-    (* selection related to //@ slice pragma ctrl/expr *)
+    (* selection related to //@ slice directive ctrl/expr *)
     (fun ki' acc -> select_stmt_ctrl acc ~spare ki' kf)
-    pragmas.Logic_deps.ctrl
+    slices.Logic_deps.ctrl
     set
 
 let select_ZoneAnnot_zones_decl_vars set mark (zones,decl_vars) kf =
@@ -499,36 +499,36 @@ let select_stmt_term set mark term ki kf =
     Add selection of the annotations related to a statement.
     Note: add also a transparent selection on the whole statement. *)
 let select_stmt_annot set mark ~spare annot ki kf =
-  let zones_decl_vars,pragmas =
+  let zones_decl_vars, slices =
     Logic_deps.from_stmt_annot annot (ki, kf)
-  in let set = select_ZoneAnnot_pragmas set ~spare pragmas kf
+  in let set = select_ZoneAnnot_slices set ~spare slices kf
   in select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
 
 (** Registered as a slicing selection function:
     Add selection of the annotations related to a statement.
     Note: add also a transparent selection on the whole statement. *)
-let select_stmt_annots set mark ~spare  ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var ki kf =
-  let zones_decl_vars,pragmas =
+let select_stmt_annots set mark ~spare  ~threat ~user_assert ~slicing_annot ~loop_inv ~loop_var ki kf =
+  let zones_decl_vars, slices =
     Logic_deps.from_stmt_annots
       (Some (Logic_deps.code_annot_filter
-               ~threat ~user_assert ~slicing_pragma
+               ~threat ~user_assert ~slicing_annot
                ~loop_inv ~loop_var ~others:false))
       (ki, kf)
-  in let set = select_ZoneAnnot_pragmas set ~spare pragmas kf
+  in let set = select_ZoneAnnot_slices set ~spare slices kf
   in select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
 
 (** Registered as a slicing selection function:
     Add a selection of the annotations related to a function. *)
-let select_func_annots set mark ~spare ~threat ~user_assert ~slicing_pragma ~loop_inv ~loop_var kf =
+let select_func_annots set mark ~spare ~threat ~user_assert ~slicing_annot ~loop_inv ~loop_var kf =
   try
-    let zones_decl_vars,pragmas =
+    let zones_decl_vars, slices =
       Logic_deps.from_func_annots Kinstr.iter_from_func
         (Some
            (Logic_deps.code_annot_filter
-              ~threat ~user_assert ~slicing_pragma ~loop_inv
+              ~threat ~user_assert ~slicing_annot ~loop_inv
               ~loop_var ~others:false))
         kf
-    in let set = select_ZoneAnnot_pragmas set ~spare pragmas kf
+    in let set = select_ZoneAnnot_slices set ~spare slices kf
     in select_ZoneAnnot_zones_decl_vars set mark (get_or_raise zones_decl_vars) kf
   with Kernel_function.No_Definition ->
     SlicingParameters.warning ~wkey:SlicingParameters.wkey_cmdline
@@ -634,29 +634,29 @@ let add_persistent_cmdline () =
              SlicingParameters.Select.Calls.get
              select_func_calls_to;
            add_selection
-             SlicingParameters.Select.Pragma.get
+             SlicingParameters.Select.SliceAnnot.get
              (fun s -> select_func_annots s top_mark
-                 ~threat:false ~user_assert:false ~slicing_pragma:true
+                 ~threat:false ~user_assert:false ~slicing_annot:true
                  ~loop_inv:false ~loop_var:false);
            add_selection
              SlicingParameters.Select.Threat.get
              (fun s -> select_func_annots s top_mark
-                 ~threat:true ~user_assert:false ~slicing_pragma:false
+                 ~threat:true ~user_assert:false ~slicing_annot:false
                  ~loop_inv:false ~loop_var:false);
            add_selection
              SlicingParameters.Select.Assert.get
              (fun s -> select_func_annots s top_mark
-                 ~threat:false ~user_assert:true ~slicing_pragma:false
+                 ~threat:false ~user_assert:true ~slicing_annot:false
                  ~loop_inv:false ~loop_var:false);
            add_selection
              SlicingParameters.Select.LoopInv.get
              (fun s -> select_func_annots s top_mark
-                 ~threat:false ~user_assert:false ~slicing_pragma:false
+                 ~threat:false ~user_assert:false ~slicing_annot:false
                  ~loop_inv:true ~loop_var:false);
            add_selection
              SlicingParameters.Select.LoopVar.get
              (fun s -> select_func_annots s top_mark
-                 ~threat:false ~user_assert:false ~slicing_pragma:false
+                 ~threat:false ~user_assert:false ~slicing_annot:false
                  ~loop_inv:false ~loop_var:true);
         );
       if not (Datatype.String.Set.is_empty

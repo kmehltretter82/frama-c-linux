@@ -163,7 +163,7 @@ let rec strategy_ip model pool target =
     -> add_fun_task model pool ~kf ~bhvs:[bhv] ~target ()
   | IPCodeAnnot { ica_kf = kf ; ica_ca = ca } ->
     begin match ca.annot_content with
-      | AExtended _ | APragma _ -> ()
+      | AExtended _ -> ()
       | AStmtSpec(fors,_) ->
         (*TODO*) notyet target ;
         add_fun_task model pool ~kf ~bhvs:(select kf fors) ()

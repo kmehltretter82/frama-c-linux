@@ -654,8 +654,6 @@ let make_panel (main_ui:main_window_extension_points) =
       end
     | IPCodeAnnot {ica_ca={annot_content = AInvariant _}} ->
       invariant.get ()
-    | IPCodeAnnot {ica_ca={annot_content = APragma p}} ->
-      Logic_utils.is_property_pragma p (* currently always false. *)
     | IPCodeAnnot _ -> false (* status of inner nodes *)
     | IPAllocation {ial_kinstr=Kglobal} -> allocations.get ()
     | IPAllocation {ial_kinstr=Kstmt _;ial_bhv=Id_loop _} ->

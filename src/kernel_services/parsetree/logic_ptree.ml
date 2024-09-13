@@ -319,23 +319,6 @@ type spec = {
       It is possible to have more than one set of disjoint behaviors *)
 }
 
-(** Pragmas for the value analysis plugin of Frama-C. *)
-
-and slice_pragma =
-  | SPexpr of lexpr
-  | SPctrl
-  | SPstmt
-
-(** Pragmas for the impact plugin of Frama-C. *)
-and impact_pragma =
-  | IPexpr of lexpr
-  | IPstmt
-
-(** The various kinds of pragmas. *)
-and pragma =
-  | Slice_pragma of slice_pragma
-  | Impact_pragma of impact_pragma
-
 (** all annotations that can be found in the code. This type shares the name of
     its constructors with {!Cil_types.code_annotation_node}. *)
 type code_annot =
@@ -366,7 +349,6 @@ type code_annot =
       At most one clause associated to a given (statement, behavior) couple.
       @since Oxygen-20120901 when [b_allocation] has been added.  *)
 
-  | APragma of pragma (** pragma. *)
   | AExtended of string list * bool * extension
   (** extension in a code or loop (when boolean flag is true) annotation.
       @since Silicon-20161101

@@ -651,7 +651,7 @@ module Base_checker = struct
                    "%s is not a code annotation extension" ext_name);
                my_labels)
           | AAssert _ | AStmtSpec _ | AInvariant _ | AVariant _
-          | AAssigns _ | AAllocation _ | APragma _ -> my_labels
+          | AAssigns _ | AAllocation _ -> my_labels
         in
         logic_labels <- my_labels @ logic_labels;
         (* on non-normalized code, we can't really check the scope of behavior

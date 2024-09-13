@@ -1,13 +1,13 @@
 /* run.config
-   
-   STDOPT: +"-impact-pragma impact" +"-lib-entry" +"-main impact" +"-impact-slicing" +"-then-on 'impact slicing'" +"-print"
+
+   STDOPT: +"-impact-annot impact" +"-lib-entry" +"-main impact" +"-impact-slicing" +"-then-on 'impact slicing'" +"-print"
    */
 
 int a, b, c, e, x, y, z, f, w;
 
 void impact() {
   if (c) a = 18; else x = 5;
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   b = a;
   if (c) {
     x = b + c;

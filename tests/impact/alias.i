@@ -1,12 +1,12 @@
 /* run.config
-   STDOPT: +"-impact-pragma f" +"-lib-entry" +"-main f" +"-eva-remove-redundant-alarms"
+   STDOPT: +"-impact-annot f" +"-lib-entry" +"-main f" +"-eva-remove-redundant-alarms"
    */
 
 int P,c;
 
 /*@ requires \valid(x); */
 int f(int *x) {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   int *y = x+1;
   *y = 4;
   int a = *(x+1) + 2;

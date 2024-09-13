@@ -27,7 +27,7 @@ void main_bis (void) {
   if (is_ko)
     while (1) {
       loop_body () ;
-      /*@ slice pragma expr o0 ;*/
+      /*@ slice_preserve_expr o0 ;*/
       }
 }
 
@@ -35,7 +35,7 @@ void main_ter () {
   init (&is_ko);
   if (is_ko)
     while (1) {
-      /*@ slice pragma stmt ;*/
+      /*@ slice_preserve_stmt ;*/
       loop_body () ;
       }
 }

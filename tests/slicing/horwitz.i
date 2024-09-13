@@ -17,7 +17,7 @@ void incr (char * pi) {
 int A (int x, char * py) {
   x = add (x, *py);
   incr (py);
-  /*@ slice pragma expr x;*/
+  /*@ slice_preserve_expr x;*/
   return x;
 }
 int main (void) {

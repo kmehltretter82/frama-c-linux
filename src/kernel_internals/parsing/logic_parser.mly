@@ -270,7 +270,7 @@
 %token ALLOCABLE FREEABLE FRESH
 %token DOLLAR QUESTION MINUS PLUS STAR AMP SLASH PERCENT LSQUARE RSQUARE EOF
 %token GLOBAL INVARIANT VARIANT DECREASES FOR LABEL ASSERT CHECK ADMIT SEMICOLON NULL EMPTY
-%token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING SLICE IMPACT PRAGMA FROM
+%token REQUIRES ENSURES ALLOCATES FREES ASSIGNS LOOP NOTHING FROM
 %token CHECK_REQUIRES CHECK_LOOP CHECK_INVARIANT CHECK_LEMMA
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token ADMIT_REQUIRES ADMIT_LOOP ADMIT_INVARIANT ADMIT_LEMMA
@@ -895,7 +895,6 @@ full_identifier:
 | FREES { "frees" }
 | FUNCTION { "function" }
 | GLOBAL { "global" }
-| IMPACT { "impact" }
 | INDUCTIVE { "inductive" }
 | INCLUDE { "include" }
 | INVARIANT { "invariant" }
@@ -905,11 +904,9 @@ full_identifier:
 | LOOP { "loop" }
 | MODEL { "model" }
 | MODULE { "module" }
-| PRAGMA { "pragma" }
 | PREDICATE { "predicate" }
 | REQUIRES { "requires" }
 | RETURNS { "returns" }
-| SLICE { "slice" }
 | TERMINATES { "terminates" }
 | TYPE { "type" }
 | VARIANT { "variant" }
@@ -1322,8 +1319,8 @@ annotation:
         Aloop_annot (loc $sloc, l) }
 | FOR ne_behavior_name_list COLON contract_or_code_annotation
       { $4 $2 }
-| pragma_or_code_annotation { Acode_annot (loc $sloc,$1) }
-| pragma_or_code_annotation beg_pragma_or_code_annotation
+| code_annotation { Acode_annot (loc $sloc,$1 []) }
+| code_annotation beg_code_annotation
       { raise
           (Not_well_formed (loc $sloc,
                             "Only one code annotation is allowed per comment"))
@@ -1458,9 +1455,7 @@ loop_grammar_extension:
 
 /*** code annotations ***/
 
-beg_pragma_or_code_annotation:
-| IMPACT {}
-| SLICE {}
+beg_code_annotation:
 | FOR {}
 | ASSERT {}
 | CHECK {}
@@ -1471,12 +1466,6 @@ beg_pragma_or_code_annotation:
 | CHECK_LOOP {}
 | ADMIT_LOOP {}
 | EXT_CODE_ANNOT {}
-;
-
-pragma_or_code_annotation:
-| slice_pragma     { APragma (Slice_pragma $1) }
-| impact_pragma    { APragma (Impact_pragma $1) }
-| code_annotation  { $1 []  }
 ;
 
 code_annotation:
@@ -1515,25 +1504,6 @@ code_annotation:
       Kernel.fatal ~source:(pos $startpos($1))
         "%s is not a code annotation extension. Parser got wrong lexeme" ext
   }
-;
-
-slice_pragma:
-| SLICE PRAGMA any_identifier lexpr SEMICOLON
-    { if $3 = "expr" then SPexpr $4
-      else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
-| SLICE PRAGMA any_identifier SEMICOLON
-    { if $3 = "ctrl" then SPctrl
-      else if $3 = "stmt" then SPstmt
-      else raise (Not_well_formed (loc $sloc, "Unknown slice pragma")) }
-;
-
-impact_pragma:
-| IMPACT PRAGMA any_identifier lexpr SEMICOLON
-    { if $3 = "expr" then IPexpr $4
-      else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
-| IMPACT PRAGMA any_identifier SEMICOLON
-    { if $3 = "stmt" then IPstmt
-      else raise (Not_well_formed (loc $sloc, "Unknown impact pragma")) }
 ;
 
 /*** declarations and logical definitions ***/
@@ -1955,7 +1925,6 @@ is_acsl_decl_or_code_annot:
 | CHECK     { "check" }
 | ADMIT     { "admit" }
 | GLOBAL    { "global" }
-| IMPACT    { "impact" }
 | INDUCTIVE { "inductive" }
 | INVARIANT { "invariant" }
 | ADMIT_INVARIANT { "admit invariant" }
@@ -1966,9 +1935,7 @@ is_acsl_decl_or_code_annot:
 | LOOP      { "loop" }
 | ADMIT_LOOP { "admit loop" }
 | CHECK_LOOP { "check loop" }
-| PRAGMA    { "pragma" }
 | PREDICATE { "predicate" }
-| SLICE     { "slice" }
 | TYPE      { "type" }
 | MODEL     { "model" }
 | AXIOM     { "axiom" }

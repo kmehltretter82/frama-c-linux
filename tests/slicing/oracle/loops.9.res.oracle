@@ -65,7 +65,7 @@
 void loop_slice_1(void)
 {
   while (1) 
-    /*@ slice pragma ctrl; */ ;
+    /*@ \slicing::slice_preserve_ctrl ; */ ;
   return;
 }
 

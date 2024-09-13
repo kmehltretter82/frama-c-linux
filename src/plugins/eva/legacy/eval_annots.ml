@@ -32,7 +32,7 @@ let code_annotation_text ca =
   match ca.annot_content with
   | AAssert (_, {tp_kind}) -> Cil_printer.name_of_assert tp_kind
   | AInvariant _ ->  "loop invariant"
-  | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
+  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _
   | AExtended _  ->
     assert false (* currently not treated by Value *)
 
@@ -210,7 +210,7 @@ let mark_green_and_red () =
           | Eval_terms.Unknown -> ()
         end
       | AInvariant (_, false, _) | AStmtSpec _ | AVariant _ | AAssigns _
-      | AAllocation _ | APragma _ | AExtended _ -> ()
+      | AAllocation _ | AExtended _ -> ()
   in
   Annotations.iter_all_code_annot do_code_annot
 

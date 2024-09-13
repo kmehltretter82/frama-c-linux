@@ -1,8 +1,8 @@
 /* run.config
    STDOPT: +"-eva-context-valid-pointers -lib-entry -main f -slice-assert f  -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-eva-context-valid-pointers -lib-entry -main f -slice-assert f -slicing-keep-annotations -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-eva-context-valid-pointers -lib-entry -main L -slice-pragma L -slicing-keep-annotations -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-eva-context-valid-pointers -lib-entry -main L -slice-pragma L -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-eva-context-valid-pointers -lib-entry -main L -slice-annot L -slicing-keep-annotations -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-eva-context-valid-pointers -lib-entry -main L -slice-annot L -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-slice-return bts1110 -main bts1110 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
 
 
@@ -41,7 +41,7 @@ void L (float u,int nn, float dabs[], float *y) {
     *y = u - dabs[ii+1] * 2.0;
     //@ assert (\forall integer k; u<=dabs[k]);
   }
-  //@slice pragma expr *y;
+  //@slice_preserve_expr *y;
 }
 
 int bts1110(int x) {

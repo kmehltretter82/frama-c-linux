@@ -49,8 +49,8 @@ effectuer en précisant ce en quoi l'utilisateur est intéressé~:
       {\sl select the loop invariants of functions {\tt f1},...,{\tt fn}.}
 \item {\tt -slice-loop-var f1,...,fn} : 
       {\sl select the loop variants of functions {\tt f1},...,{\tt fn}.}
-\item {\tt -slice-pragma f1,...,fn} :  
-      {\sl use the slicing pragmas in the code of functions {\tt f1},...,{\tt fn} as slicing criteria.}
+\item {\tt -slice-annot f1,...,fn} :
+      {\sl use the slicing annotations in the code of functions {\tt f1},...,{\tt fn} as slicing criteria.}
 
 \item {\tt -slice-return f1,...,fn} :  
       {\sl select the result (returned value) of functions {\tt f1},...,{\tt fn}.}
@@ -84,30 +84,25 @@ Notons que l'ordre n'intervient pas dans le résultat final.
 
 Les annotations destinées à spécifier des requêtes
 de slicing se situe, comme toutes les autres annotations, dans des commentaires
-C commençant par \verb!@!. Leur identification est \verb!slice pragma!,
-et elles sont prises en compte si l'option \verb!-slice-pragma! mentionnée
+C commençant par \verb!@!. Elles sont préfixées par \verb!slice!,
+et elles sont prises en compte si l'option \verb!-slice-annot! mentionnée
 ci-dessus est utilisée.\\
 
 Il existe trois requêtes de slicing~:
 \begin{quote}
 \begin{description}
-  \item[]\verb!//@ slice pragma expr! {\it expr\_desc} \verb!;!
+  \item[]\verb!//@ slice_preserve_expr! {\it expr\_desc} \verb!;!
     correspond au critère traditionnel de slicing, à savoir préserver le passage
     au point de programme et la valeur de l'expression à ce point. Exemple~:
     \begin{center}
-    \verb!//@slice pragma expr S.a;!
+    \verb!//@slice_preserve_expr S.a;!
     \end{center}
-  \item[]\verb!//@ slice pragma ctrl;!
+  \item[]\verb!//@ slice_preserve_ctrl;!
     permet de s'intéresser uniquement au passage à un point de programme 
     (sélection des dépendances de contrôle),
-  \item[]\verb!//@ slice pragma stmt;!
+  \item[]\verb!//@ slice_preserve_stmt;!
     sélectionne l'instruction (et donc de tout ce qui permet de l'atteindre et
     de la calculer).
     Cette dernière requête est expérimentale.
 \end{description}
 \end{quote}
-
-
-
-
-

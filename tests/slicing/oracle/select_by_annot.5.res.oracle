@@ -166,7 +166,7 @@ struct Tstr {
 struct Tstr S;
 void f2_slice_1(void)
 {
-  /*@ slice pragma expr S.a; */ ;
+  /*@ \slicing::slice_preserve_expr S.a; */ ;
   return;
 }
 

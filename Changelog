@@ -18,6 +18,11 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2024-09-13] Pragma nodes in the AST have been removed
+-   Slicing   [2024-09-13] -slice-pragma is now -slice-annot
+-   Slicing   [2024-09-13] `slice pragma <elem>` is now `slice_preserve_<elem>`
+-   Impact    [2024-09-13] -impact-pragma is now -impact-annot
+-   Impact    [2024-09-13] `impact pragma stmt` is now `impact_stmt`
 -   Kernel    [2024-09-03] Place noreturn attribute on types instead of vars
 -   Alias     [2024-08-22] no longer classify virtually all casts as unsafe
 o!  Kernel    [2024-08-08] New Machine module to manage theMachine and machdeps.

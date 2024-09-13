@@ -27,7 +27,7 @@ int x;
 void test3(int c1, int c2)
 {
   if (c1 < c2) c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   x = c1;
   return;
 }

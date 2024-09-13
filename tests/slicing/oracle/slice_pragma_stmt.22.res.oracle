@@ -30,7 +30,7 @@ void test9(int c1, int c2)
 {
   if (c1 < c2) goto L;
   c1 = c2;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   {
     x = c1;
     L: c2 ++;

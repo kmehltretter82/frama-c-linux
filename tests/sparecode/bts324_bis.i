@@ -40,8 +40,7 @@ void main (int c) {
       loop_body () ;
       // note: sparecode conserve les pragmas de slicing et par conséquent ce
       // qui calcule "s0", l'option -sparecode-no-annot ni change rien
-      //@ impact pragma expr s0;
-      //@ slice pragma expr s1;
+      //@ slice_preserve_expr s1;
       }
 
 }

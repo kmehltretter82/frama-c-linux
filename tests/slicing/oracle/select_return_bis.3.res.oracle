@@ -122,7 +122,7 @@ void f_slice_1(int y)
 {
   k_slice_2(y);
   int z = k_slice_1(G);
-  /*@ slice pragma expr z; */ ;
+  /*@ \slicing::slice_preserve_expr z; */ ;
   send(z);
   return;
 }

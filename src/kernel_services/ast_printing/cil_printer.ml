@@ -3180,14 +3180,6 @@ class cil_printer () = object (self)
       (pp_list nl_complete self#complete_behaviors) complete
       (pp_list false self#disjoint_behaviors) disjoint
 
-  method private slice_pragma fmt = function
-    |SPexpr t -> fprintf fmt "expr @[%a@]" self#term t
-    | SPctrl -> Format.pp_print_string fmt "ctrl"
-    | SPstmt -> Format.pp_print_string fmt "stmt"
-
-  method private impact_pragma fmt = function
-    | IPexpr t -> fprintf fmt "expr @[%a@]" self#term t
-    | IPstmt -> Format.pp_print_string fmt "stmt"
 
   (* TODO: add the annot ID in debug mode?*)
   method code_annotation fmt ca =
@@ -3205,14 +3197,6 @@ class cil_printer () = object (self)
         pp_for_behavs behav
         self#pp_acsl_keyword (string_of_assert p.tp_kind)
         self#predicate p.tp_statement
-    | APragma (Slice_pragma sp) ->
-      fprintf fmt "@[%a@ %a;@]"
-        self#pp_acsl_keyword "slice pragma"
-        self#slice_pragma sp
-    | APragma (Impact_pragma sp) ->
-      fprintf fmt "@[%a@ %a;@]"
-        self#pp_acsl_keyword "impact pragma"
-        self#impact_pragma sp
     | AStmtSpec(for_bhv, spec) ->
       fprintf fmt "@[<hv 2>%a%a@]"
         pp_for_behavs for_bhv

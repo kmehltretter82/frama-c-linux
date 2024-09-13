@@ -15,11 +15,11 @@
   f_si[0..1] ∈ {0}
   f_so[0..1] ∈ {0}
 [eva] computing for function init <- main_bis.
-  Called from bts324_bis.i:51.
+  Called from bts324_bis.i:50.
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function loop_body <- main_bis.
-  Called from bts324_bis.i:54.
+  Called from bts324_bis.i:53.
 [eva] computing for function f <- loop_body <- main_bis.
   Called from bts324_bis.i:22.
 [eva:alarm] bts324_bis.i:10: Warning: 
@@ -34,9 +34,9 @@
 [eva] Done for function f
 [eva] Recording results for loop_body
 [eva] Done for function loop_body
-[eva] bts324_bis.i:53: starting to merge loop iterations
+[eva] bts324_bis.i:52: starting to merge loop iterations
 [eva] computing for function loop_body <- main_bis.
-  Called from bts324_bis.i:54.
+  Called from bts324_bis.i:53.
 [eva] computing for function f <- loop_body <- main_bis.
   Called from bts324_bis.i:22.
 [eva:alarm] bts324_bis.i:10: Warning: 
@@ -60,7 +60,7 @@
 [eva] Recording results for loop_body
 [eva] Done for function loop_body
 [eva] computing for function loop_body <- main_bis.
-  Called from bts324_bis.i:54.
+  Called from bts324_bis.i:53.
 [eva] computing for function f <- loop_body <- main_bis.
   Called from bts324_bis.i:22.
 [eva] Recording results for f
@@ -80,7 +80,7 @@
 [from] Computing for function f <-loop_body
 [from] Done for function f
 [from] Done for function loop_body
-[pdg] bts324_bis.i:57: Warning: no final state. Probably unreachable...
+[pdg] bts324_bis.i:56: Warning: no final state. Probably unreachable...
 [pdg] done for function main_bis
 [sparecode] add selection in function 'main_bis'
 [sparecode] selecting output zones ki[0..1]; k; s0; s1; is_ok; f_si[0..1]; f_so[0..1]

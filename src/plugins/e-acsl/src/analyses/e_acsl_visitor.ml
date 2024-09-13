@@ -520,7 +520,6 @@ class visitor cat
                ~not_yet:"allocates"
                ~f:self#visit_allocates
                allocates
-           | APragma _ -> ()
            | AExtended _ -> ()
         )
         stmt;

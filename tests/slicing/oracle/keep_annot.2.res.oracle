@@ -44,7 +44,7 @@ void L(float u, int nn, float *dabs, float *y)
     /*@ assert ∀ ℤ k; u ≤ *(dabs + k); */ ;
     ii --;
   }
-  /*@ slice pragma expr *y; */ ;
+  /*@ \slicing::slice_preserve_expr *y; */ ;
   return;
 }
 

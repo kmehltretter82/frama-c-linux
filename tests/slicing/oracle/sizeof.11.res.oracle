@@ -253,7 +253,7 @@ void main(void)
   r = (int)((unsigned int)r + tmp_7);
   tmp_8 = SizeOfE_tab_acces_1_slice_1();
   r = (int)((unsigned int)r + tmp_8);
-  /*@ slice pragma expr r; */ ;
+  /*@ \slicing::slice_preserve_expr r; */ ;
   return;
 }
 

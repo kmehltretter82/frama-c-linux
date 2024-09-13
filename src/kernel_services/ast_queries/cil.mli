@@ -1918,9 +1918,6 @@ class type cilVisitor = object
   method vallocation: allocation -> allocation visitAction
   (**   @since Oxygen-20120901 *)
 
-  method vslice_pragma: slice_pragma -> slice_pragma visitAction
-  method vimpact_pragma: impact_pragma -> impact_pragma visitAction
-
   method vdeps: deps -> deps visitAction
   method vfrom: from -> from visitAction
   method vcode_annot: code_annotation -> code_annotation visitAction
@@ -2043,11 +2040,11 @@ val visitCilBlock: cilVisitor -> block -> block
 (** Mark the given block as candidate to be flattened into its parent block,
     after returning from its visit. This is not systematic, as the environment
     might prevent it (e.g. if the preceding statement is a statement contract
-    or a slicing/pragma annotation, or if there are labels involved). Use
-    that whenever you're creating a block in order to hold multiple statements
-    as a result of visiting a single statement. If the block contains local
-    variables, it will not be marked as transient, since removing it will
-    change the scope of those variables.
+    or if there are labels involved).
+    Use that whenever you're creating a block in order to hold multiple
+    statements as a result of visiting a single statement. If the block
+    contains local variables, it will not be marked as transient, since
+    removing it will change the scope of those variables.
 
     @raise Fatal error if the given block attempts to declare local variables
     and contain definitions of local variables that are not part of the block.

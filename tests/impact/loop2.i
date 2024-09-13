@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-impact-pragma main -lib-entry -calldeps" +"-then -ulevel 10"
+   STDOPT: #"-impact-annot main -lib-entry -calldeps" +"-then -ulevel 10"
    */
 
 
@@ -20,7 +20,7 @@ void f(int i) {
 }
 
 void main() {
-  //@ impact pragma stmt;
+  //@ impact_stmt;
   init ();
   for (int i=0; i<10; i++) {
     if (t[i]) // should not be selected

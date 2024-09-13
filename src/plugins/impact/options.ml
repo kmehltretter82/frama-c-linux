@@ -27,13 +27,14 @@ include Plugin.Register
       let help = "impact analysis"
     end)
 
-module Pragma =
+module Annot =
   Kernel_function_set
     (struct
-      let option_name = "-impact-pragma"
+      let option_name = "-impact-annot"
       let arg_name = "f1, ..., fn"
-      let help = "use the impact pragmas in the code of functions f1,...,fn"
+      let help = "use the impact annotations in the code of functions f1,...,fn"
     end)
+let () = Annot.add_aliases ~visible:false ~deprecated:true ["-impact-pragma"]
 
 module Print =
   False
@@ -73,7 +74,7 @@ module Upward =
       let help = "compute compute impact in callers as well as in callees"
     end)
 
-let is_on () = not (Pragma.is_empty ())
+let is_on () = not (Annot.is_empty ())
 
 (*
 Local Variables:

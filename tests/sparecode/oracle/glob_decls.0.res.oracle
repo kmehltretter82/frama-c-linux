@@ -47,7 +47,7 @@
 [pdg] Bottom for function f
 [sparecode] pdg bottom: skip annotations
 [sparecode] look for annotations in function main
-[sparecode] selecting annotation : slice pragma expr S2;
+[sparecode] selecting annotation : \slicing::slice_preserve_expr S2;
 [sparecode] selecting annotation : assert X > 0;
 [sparecode] add selection in function 'main'
 [sparecode] finalize call input propagation
@@ -67,7 +67,7 @@ Tx X = (Tx)sizeof(Size);
 int main(int x)
 {
   int __retres;
-  /*@ slice pragma expr S2; */ ;
+  /*@ \slicing::slice_preserve_expr S2; */ ;
   /*@ assert X > 0; */ ;
   __retres = X + x;
   return __retres;

@@ -1,8 +1,8 @@
 /* run.config
-   
-   STDOPT: +"-impact-pragma main"
-   STDOPT: +"-impact-pragma main2" +"-main main2"
-   STDOPT: +"-impact-pragma main3" +"-main main3"
+
+   STDOPT: +"-impact-annot main"
+   STDOPT: +"-impact-annot main2" +"-main main2"
+   STDOPT: +"-impact-annot main3" +"-main main3"
    */
 
 /*@ ghost int G; */
@@ -19,7 +19,7 @@ void test (void) {
 /* ************************************************************************* */
 
 void main (int x) {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   X = x;
   test ();
 }
@@ -31,7 +31,7 @@ void call_test (void) {
 }
 
 void main2(int x) {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   X = x;
   call_test ();
 }
@@ -50,7 +50,7 @@ void call_test3 (void) {
 }
 
 void main3(int x) {
-  /*@ impact pragma stmt; */
+  /*@ impact_stmt; */
   X = x;
   call_test3 ();
 }

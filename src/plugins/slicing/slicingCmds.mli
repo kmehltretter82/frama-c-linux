@@ -143,7 +143,7 @@ val select_stmt_annots :
   spare:bool ->
   threat:bool ->
   user_assert:bool ->
-  slicing_pragma:bool ->
+  slicing_annot:bool ->
   loop_inv:bool ->
   loop_var:bool ->
   stmt ->
@@ -156,7 +156,7 @@ val select_func_annots :
   spare:bool ->
   threat:bool ->
   user_assert:bool ->
-  slicing_pragma:bool ->
+  slicing_annot:bool ->
   loop_inv:bool ->
   loop_var:bool ->
   kernel_function ->

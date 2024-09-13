@@ -67,7 +67,7 @@ void loop_slice_1(void)
   {
     int c;
     while (1) {
-      /*@ slice pragma ctrl; */ ;
+      /*@ \slicing::slice_preserve_ctrl ; */ ;
       c = 1;
       /*@ assert c ≡ 1; */ ;
     }

@@ -46,7 +46,7 @@ void g_slice_1(void)
 void main(void)
 {
   /*@ assert &g ≡ &g; */ ;
-  /*@ slice pragma stmt; */
+  /*@ \slicing::slice_preserve_stmt ; */
   g_slice_1();
   return;
 }

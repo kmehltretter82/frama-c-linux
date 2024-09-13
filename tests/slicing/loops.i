@@ -1,22 +1,22 @@
 /* run.config
-   STDOPT: +"-deps -lib-entry -main f1 -slice-pragma f1 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-deps -lib-entry -main f1 -slice-annot f1 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -lib-entry -main f1 -slice-assert f1 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-deps -lib-entry -main f2 -slice-pragma f2 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-deps -lib-entry -main f2 -slice-annot f2 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -lib-entry -main f2 -slice-assert f2 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main test_infinite_loop_3 -slice-value G -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main test_infinite_loop_4 -slice-value G -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main test_infinite_loop_5 -slice-value G -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main loop -slice-value Z  -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -slice-calls loop -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-deps -slice-pragma loop -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-deps -slice-annot loop -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -slice-assert loop -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main loop -slice-rd Y -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main loop -slice-rd Z -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main loop -slice-wr Y -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -main loop -slice-wr Z  -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-deps -lib-entry -main stop_f1 -slice-pragma stop_f1 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-deps -lib-entry -main stop_f1 -slice-annot stop_f1 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -lib-entry -main stop_f1 -slice-assert stop_f1 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
-   STDOPT: +"-deps -lib-entry -main stop_f2 -slice-pragma stop_f2 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
+   STDOPT: +"-deps -lib-entry -main stop_f2 -slice-annot stop_f2 -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -lib-entry -main stop_f2 -slice-assert stop_f2  -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -slice-value Z  -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
    STDOPT: +"-deps -slice-rd Y -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  -no-deps"
@@ -39,7 +39,7 @@ int f1 (int c) {
     }
   else
     x = 1;
-   //@ slice pragma stmt;
+   //@ slice_preserve_stmt;
   x ++;
   return x;
 }
@@ -52,7 +52,7 @@ void f2 (int c) {
       x1++;
     else
       x2++;
-    //@slice pragma expr x1;
+    //@slice_preserve_expr x1;
     //@ assert x2 > 0 ;
   }
 }
@@ -71,7 +71,7 @@ int stop_f1 (int c) {
     }
   else
     x = 1;
-   //@ slice pragma stmt;
+   //@ slice_preserve_stmt;
   x ++;
   return x;
 }
@@ -84,7 +84,7 @@ void stop_f2 (int c) {
       x1++;
     else
       x2++;
-    //@slice pragma expr x1;
+    //@slice_preserve_expr x1;
     //@ assert x2 > 0 ;
     stop () ; /* never loops nor returns */
     x1++;     /* dead code */
@@ -174,7 +174,7 @@ void loop (int cond) {
   if (cond) {
     int c = 0 ;
     while (1) {
-      //@ slice pragma ctrl ;
+      //@ slice_preserve_ctrl ;
       if (c) {
         X++;
         Y = Z ;

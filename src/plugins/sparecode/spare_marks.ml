@@ -321,7 +321,7 @@ class annot_visitor ~filter pdg = object (self)
     in Cil.SkipChildren
 end
 
-let select_annotations ~select_annot ~select_slice_pragma proj =
+let select_annotations ~select_annot ~select_slice_annot proj =
   let visit_fun kf =
     debug 1 "look for annotations in function %a@." Kernel_function.pretty kf;
     let pdg = Pdg.Api.get kf in
@@ -329,12 +329,14 @@ let select_annotations ~select_annot ~select_slice_pragma proj =
     else if PdgTypes.Pdg.is_bottom pdg
     then debug 1 "pdg bottom: skip annotations"
     else begin
-      let filter annot = match annot.Cil_types.annot_content with
-        | Cil_types.APragma (Cil_types.Slice_pragma _) -> select_slice_pragma
+      let filter annot =
+        match annot.Cil_types.annot_content with
         | Cil_types.AAssert _-> (* Never select alarms, they are not useful *)
           (match Alarms.find annot with
            | None -> select_annot
            | Some _ -> false)
+        | AExtended (_, _, ext) when Logic_deps.is_slice_directive ext ->
+          select_slice_annot
         | _ -> select_annot
       in
       try
@@ -354,7 +356,7 @@ let finalize proj =
   process_call_inputs proj;
   assert (!call_in_to_check = [])
 
-let select_useful_things ~select_annot ~select_slice_pragma kf_entry =
+let select_useful_things ~select_annot ~select_slice_annot kf_entry =
   let proj = new_project () in
   assert (!call_in_to_check = []);
   debug 1 "selecting function %a outputs and entry point@."
@@ -367,8 +369,8 @@ let select_useful_things ~select_annot ~select_slice_pragma kf_entry =
   else begin
     select_entry_point proj kf_entry pdg;
     select_all_outputs proj kf_entry pdg;
-    if (select_annot || select_slice_pragma) then
-      select_annotations ~select_annot ~select_slice_pragma proj;
+    if (select_annot || select_slice_annot) then
+      select_annotations ~select_annot ~select_slice_annot proj;
     finalize proj
   end;
   proj

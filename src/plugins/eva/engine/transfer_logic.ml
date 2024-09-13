@@ -162,7 +162,7 @@ let pp_code_annot fmt ca =
     Format.fprintf fmt "loop invariant%a" Description.pp_named tp_statement
   | AExtended (_, _, extension) ->
     Format.fprintf fmt "%s annotation" extension.ext_name;
-  | APragma _  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _ ->
+  | AVariant _ | AAssigns _ | AAllocation _ | AStmtSpec _ ->
     assert false (* currently not treated by Eva *)
 
 (* location of the given code annotation. If unknown, use the location of the
@@ -690,7 +690,6 @@ module Make
       let record = record && p.tp_kind <> Admit in
       let reduce = p.tp_kind <> Check in
       aux ~record ~reduce code_annot behav p.tp_statement
-    | APragma _
     | AInvariant (_, false, _)
     | AVariant _ | AAssigns _ | AAllocation _
     | AStmtSpec _ (*TODO*) -> states

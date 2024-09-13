@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: +"-slice-pragma g -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
+   STDOPT: +"-slice-annot g -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
    STDOPT: +"-slice-assert g -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
    STDOPT: +"-slice-assert main -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
    STDOPT: +"-slice-return g -then-on 'Slicing export' -set-project-as-default -print  -then -print -ocode ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i -then ./ocode_@PTEST_NUMBER@_@PTEST_NAME@.i  "
@@ -28,7 +28,7 @@ int g() {
   /* Note: y is not initialised by g. */
   /* Note: GCC without optimization gives X1 == y. */
   printf ("%d\n", y);
-  //@slice pragma expr y ;
+  //@slice_preserve_expr y ;
   //@assert X1 == y ;
   return y;
 }

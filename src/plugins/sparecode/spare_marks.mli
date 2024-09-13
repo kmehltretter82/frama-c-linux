@@ -27,7 +27,7 @@ type proj
 type fct
 
 val select_useful_things :
-  select_annot:bool -> select_slice_pragma:bool -> kernel_function -> proj
+  select_annot:bool -> select_slice_annot:bool -> kernel_function -> proj
 
 val get_marks : proj -> kernel_function -> fct option
 
