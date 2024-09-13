@@ -54,6 +54,27 @@ variables:
       - $PUBLISH == "yes"
 
 ################################################################################
+### IVETTE SETUP TEMPLATE
+
+.build_template: &ivette_setup
+  image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
+  before_script:
+    - sudo apt update
+    - sudo apt install -y xvfb curl unzip libnss3 libasound2-plugins
+    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
+    - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    - nvm install $NODE
+    - nvm use node $NODE
+    - corepack enable
+    - opam pin . -n -k path
+    - opam depext frama-c
+    - opam install headache
+    - opam install --jobs 2 --deps-only .
+    - dune build -j2 @install
+
+################################################################################
 ### PREPARE
 
 check-makefile:
@@ -132,16 +153,10 @@ frama-c:
 
 ivette:
   stage: build
-  image: node:22-bookworm
-  cache:
-    paths:
-      - ivette/node_modules/
+  <<: *ivette_setup
   script:
-    - node --version
-    - npm --version
-    - yarn --version
-    - make --version
-    - make -C ivette check-lint dome-app
+    - make -C ivette api
+    - make -C ivette dist
   tags:
     - docker
 
@@ -159,12 +174,6 @@ ivette:
   variables:
     OUT: "_bisect"
   <<: *coverage_artifacts
-
-check-ts-api:
-  stage: tests
-  script:
-    - ./nix/build-proxy.sh ts-api
-  <<: *coverage
 
 e-acsl-tests:
   stage: tests
@@ -223,23 +232,10 @@ wp-tests:
 
 ivette-tests:
   stage: tests
-  image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
   when: manual
-  before_script:
-    - sudo apt update
-    - sudo apt install -y xvfb curl unzip libnss3 libasound2-plugins
-    - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-    - export NVM_DIR="$HOME/.nvm"
-    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
-    - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
-    - nvm install $NODE
-    - nvm use node $NODE
-    - corepack enable
+  <<: *ivette_setup
   script:
-    - opam pin . -n -k path
-    - opam depext frama-c
-    - opam install --jobs 2 --deps-only .
-    - dune build -j2 @install
+    - make -C ivette api
     - make -C ivette dist
     - cd ivette
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed

@@ -17,7 +17,8 @@ yarn-error.log
 /src/dome/doc/guides/icons.md
 /Makefile.plugins
 /icon.icns
-
+/src/frama-c/kernel/api
+/src/frama-c/plugins/*/api
 # --------------------------------------------------------------------------
 /tests/test-results/
 /screenshots/*
