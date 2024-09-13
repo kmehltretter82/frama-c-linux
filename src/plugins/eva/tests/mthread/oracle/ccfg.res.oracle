@@ -587,6 +587,7 @@
 [eva:interferences] ccfg.c:29: inject threads interferences at this point
 [eva:interferences] ccfg.c:31: inject threads interferences at this point
 [eva:interferences] ccfg.c:32: inject threads interferences at this point
+[eva:interferences] ccfg.c:27: inject threads interferences at this point
 [mt] ccfg.c:22: Thread jobs[2], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[2]
 [mt] ccfg.c:22: New context for jobs[2], fun fjob, parent <main>, args {0}
@@ -595,6 +596,7 @@
 [mt] ccfg.c:22: New context for jobs[3], fun fjob, parent <main>, args {0}
 [eva:interferences] ccfg.c:24: inject threads interferences at this point
 [eva:interferences] ccfg.c:25: inject threads interferences at this point
+[eva:interferences] ccfg.c:20: inject threads interferences at this point
 [eva:interferences] ccfg.c:82: inject threads interferences at this point
 [eva:interferences] ccfg.c:82: inject threads interferences at this point
 [eva:interferences] ccfg.c:82: inject threads interferences at this point
@@ -1034,12 +1036,14 @@
 [eva:interferences] ccfg.c:29: inject threads interferences at this point
 [eva:interferences] ccfg.c:31: inject threads interferences at this point
 [eva:interferences] ccfg.c:32: inject threads interferences at this point
+[eva:interferences] ccfg.c:27: inject threads interferences at this point
 [mt] ccfg.c:22: Thread jobs[2], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[2]
 [mt] ccfg.c:22: Thread jobs[3], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[3]
 [eva:interferences] ccfg.c:24: inject threads interferences at this point
 [eva:interferences] ccfg.c:25: inject threads interferences at this point
+[eva:interferences] ccfg.c:20: inject threads interferences at this point
 [eva:interferences] ccfg.c:82: inject threads interferences at this point
 [eva:interferences] ccfg.c:82: inject threads interferences at this point
 [eva:interferences] ccfg.c:82: inject threads interferences at this point

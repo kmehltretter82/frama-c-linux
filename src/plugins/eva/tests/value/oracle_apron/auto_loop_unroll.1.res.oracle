@@ -276,10 +276,14 @@
 < [eva] auto_loop_unroll.c:304: Frama_C_show_each_top: [0..2147483647]
 ---
 > [eva] auto_loop_unroll.c:304: Frama_C_show_each_top: [23..2147483647]
-399,400d477
+386c465
+< [eva] auto_loop_unroll.c:324: Frama_C_show_each_top: [0..2147483647]
+---
+> [eva] auto_loop_unroll.c:324: Frama_C_show_each_top: [31..2147483647]
+396,397d474
 < [eva:alarm] auto_loop_unroll.c:344: Warning: 
 <   signed overflow. assert res + 1 ≤ 2147483647;
-404c481,485
+401c478,482
 < [eva:loop-unroll:auto] auto_loop_unroll.c:360: Automatic loop unrolling.
 ---
 > [eva:partition] auto_loop_unroll.c:360: starting to merge loop iterations
@@ -287,22 +291,22 @@
 >   signed overflow. assert -2147483648 ≤ i - 1;
 > [eva:alarm] auto_loop_unroll.c:360: Warning: 
 >   signed overflow. assert res + 1 ≤ 2147483647;
-414,415c495,497
+411,412c492,494
 < [eva:loop-unroll:auto] auto_loop_unroll.c:391: Automatic loop unrolling.
 < [eva] auto_loop_unroll.c:395: Frama_C_show_each_1_51: [1..51]
 ---
 > [eva:alarm] auto_loop_unroll.c:391: Warning: 
 >   signed overflow. assert res + 1 ≤ 2147483647;
 > [eva] auto_loop_unroll.c:395: Frama_C_show_each_1_51: [1..2147483647]
-425c507
+422c504
 < [eva] auto_loop_unroll.c:424: Frama_C_show_each_30: [15..45]
 ---
 > [eva] auto_loop_unroll.c:424: Frama_C_show_each_30: {30}
-433c515
+430c512
 <   j ∈ [15..45]
 ---
 >   j ∈ [15..30]
-458c540
+455c537
 <   i ∈ [-1..50]
 ---
 >   i ∈ [-2147483648..50]
