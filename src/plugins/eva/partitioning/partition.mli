@@ -94,8 +94,8 @@ type unroll_limit =
   | IntLimit of int
   (** Integer limit. *)
   | AutoUnroll of Eva_automata.loop * int * int
-  (** [AutoUnroll(stmt, min, max)] requests to find a "good" unrolling limit
-      between [min] and [max] for the loop [stmt]. *)
+  (** [AutoUnroll(loop, min, max)] requests to find a "good" unrolling limit
+      between [min] and [max] for the loop [loop]. *)
 
 (** Splits on an expression can be static or dynamic:
     - static splits are processed once: the expression is only evaluated at the

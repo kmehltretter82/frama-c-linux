@@ -185,18 +185,23 @@ module Make_Dataflow
   let e_table : tank EdgeTable.t =
     EdgeTable.create transition_count
 
-  (* Default (Initial) stores on vertex and edges *)
-  let vertex_stmt (v : vertex) : stmt option * bool =
-    (* also returns if the vertex is a loop head*)
+  let vertex_stmt (v : vertex) : stmt option =
     match v.vertex_info with
-    | LoopHead { stmt } -> Some stmt, true
-    | NoneInfo -> v.vertex_start_of, false
+    | LoopHead { stmt } -> Some stmt
+    | NoneInfo -> v.vertex_start_of
+
+  let is_loop_head (v : vertex) : bool =
+    match v.vertex_info with
+    | LoopHead _ -> true
+    | NoneInfo -> false
+
+  (* Default (initial) stores on vertex and edges *)
   let default_vertex_store (v : vertex) () : store =
-    let stmt, is_loop_head = vertex_stmt v in
+    let stmt = vertex_stmt v in
+    let is_loop_head = is_loop_head v in
     Partitioning.empty_store ~stmt ~is_loop_head
   let default_vertex_widening (v : vertex) () : widening =
-    let stmt, _is_loop_head = vertex_stmt v in
-    Partitioning.empty_widening ~stmt
+    Partitioning.empty_widening ~stmt:(vertex_stmt v)
   let default_edge_tank () : tank =
     Partitioning.empty_tank ()
 
@@ -415,7 +420,7 @@ module Make_Dataflow
       | _ -> flow
     in
     (* Loop transitions *)
-    let get_loop v = Option.get (Eva_automata.find_loop v) in
+    let get_loop v = Option.get (Eva_automata.find_loop automaton v) in
     let enter_loop f v =
       let loop = get_loop v in
       let f = Partitioning.enter_loop f loop in
@@ -471,22 +476,17 @@ module Make_Dataflow
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
-    Option.iter (fun stmt -> current_ki := Kstmt stmt) v.vertex_start_of;
-    let current_stmt =
-      match v.vertex_info with
-      | LoopHead { stmt } -> Some stmt
-      | NoneInfo -> v.vertex_start_of
-    in
+    let current_stmt = vertex_stmt v in
+    Option.iter (fun stmt -> current_ki := Kstmt stmt) current_stmt;
     let curent_location = Option.map Cil_datatype.Stmt.loc current_stmt in
     let open Current_loc.Operators in
     let<?> UpdatedCurrentLoc = curent_location in
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming states *)
-    let stmt, _is_loop_head = vertex_stmt v in
     let flow = Partitioning.join sources store in
     let flow =
-      match stmt with
+      match current_stmt with
       | Some stmt ->
         (* Callbacks *)
         call_statement_callbacks stmt flow;
@@ -499,7 +499,7 @@ module Make_Dataflow
       if widening && not (Partitioning.is_empty_flow flow) then begin
         let flow = Partitioning.widen (get_vertex_widening v) flow in
         (* Try to correct over-widenings *)
-        match stmt with
+        match current_stmt with
         | Some stmt ->
           (* Do *not* record the status after interpreting the annotation
              here. Possible unproven assertions have already been recorded
@@ -582,7 +582,7 @@ module Make_Dataflow
         not (process_vertex ~widening:true v) || !iteration_count = 0
       do
         Self.debug ~dkey "iteration %d" !iteration_count;
-        Option.iter (Statistics.incr stat_iterations) (fst (vertex_stmt v));
+        Option.iter (Statistics.incr stat_iterations) (vertex_stmt v);
         iterate_list w;
         incr iteration_count;
       done;

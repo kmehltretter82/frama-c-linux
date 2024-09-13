@@ -586,8 +586,8 @@ struct
               and source = fst cil_exp.eloc in
               eval_exp_to_int ~source x exp
             | IntLimit i -> i
-            | AutoUnroll (vertex, min_unroll, max_unroll) ->
-              match AutoLoopUnroll.compute ~max_unroll x vertex with
+            | AutoUnroll (loop, min_unroll, max_unroll) ->
+              match AutoLoopUnroll.compute ~max_unroll x loop with
               | None -> min_unroll
               | Some i ->
                 Self.warning ~once:true ~current:true

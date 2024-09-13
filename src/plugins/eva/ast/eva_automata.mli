@@ -28,9 +28,7 @@
 open Cil_types
 open Eva_ast
 
-type info =
-  | NoneInfo
-  | LoopHead of { stmt : stmt; level : int }
+type info = Interpreted_automata.info
 
 type vertex = private {
   vertex_kf : kernel_function;
@@ -100,9 +98,8 @@ type loop = {
   graph: graph; (** The complete graph of the englobing function. *)
   head: vertex; (** The head of the loop. *)
   wto: wto;     (** The wto for the loop body (without the loop head). *)
-  stmt: stmt;   (** One of the loop statement, preferabily the a while
-                    statement *)
+  stmt: stmt;   (** The statement at the loop head. *)
 }
 
 (** Builds the loop type for the englobing loop of vertex. *)
-val find_loop : vertex -> loop option
+val find_loop : automaton -> vertex -> loop option

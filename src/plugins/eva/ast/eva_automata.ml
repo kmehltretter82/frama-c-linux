@@ -25,9 +25,7 @@ open Eva_ast
 
 (* --- Vertices and Edges types --- *)
 
-type info = Interpreted_automata.info =
-  | NoneInfo
-  | LoopHead of { stmt : stmt; level : int }
+type info = Interpreted_automata.info
 
 type vertex = {
   vertex_kf : kernel_function;
@@ -345,7 +343,7 @@ let is_back_edge (v1,v2) =
   List.exists (Vertex.equal v2) (v1.vertex_wto_index)
 
 
-(* Loops identification *)
+(* Loop identification *)
 
 type loop = {
   graph: graph;
@@ -359,8 +357,7 @@ let loop_stmt head =
   | LoopHead { stmt } -> stmt
   | NoneInfo -> Option.get head.vertex_start_of
 
-let find_loop vertex =
-  let automaton = get_automaton vertex.vertex_kf in
+let find_loop (automaton: automaton) vertex =
   let graph = automaton.graph in
   match vertex.vertex_wto_index with
   | [] ->
