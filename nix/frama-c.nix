@@ -24,7 +24,6 @@
 , dune-configurator
 , dune-site
 , fpath
-, jq
 , gcc9
 , graphviz
 , lablgtk3
@@ -35,7 +34,6 @@
 , mlmpfr
 , ocaml
 , ocamlgraph
-, ocamlgraph_gtk
 , ocp-indent
 , ppx_deriving
 , ppx_deriving_yaml
@@ -47,12 +45,9 @@
 , yaml
 , zarith
 , zmq
-# Frama-C extra (other targets do not reconfigure)
-, check-jsonschema
-, dos2unix
-, doxygen
+# For Python3 tests configuration
 , python3
-, python3Packages
+# Target parameters
 , cover ? true
 , release_mode ? false
 }:
@@ -82,13 +77,11 @@ stdenvNoCC.mkDerivation rec {
     bisect_ppx
     camlzip
     camomile
-    check-jsonschema
     dune_3
     dune-configurator
     dune-site
     findlib
     fpath
-    jq
     gcc9
     graphviz
     lablgtk3
@@ -99,7 +92,6 @@ stdenvNoCC.mkDerivation rec {
     mlmpfr
     ocaml
     ocamlgraph
-    ocamlgraph_gtk
     ocp-indent
     ppx_deriving
     ppx_deriving_yaml
@@ -112,8 +104,6 @@ stdenvNoCC.mkDerivation rec {
     zarith
     zmq
     # For other CI targets
-    dos2unix
-    doxygen
     python3
   ];
 
