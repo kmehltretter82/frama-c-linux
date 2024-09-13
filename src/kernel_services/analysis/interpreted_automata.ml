@@ -22,6 +22,9 @@
 
 open Cil_types
 
+(* If enabled, all automata built by this module are printed as dot files. *)
+let debug_output_to_dot = false
+
 (* ---------------------------------------------------------------------- *)
 (* --- Graph definitions                                              --- *)
 (* ---------------------------------------------------------------------- *)
@@ -881,7 +884,7 @@ let build_automaton ~annotations kf =
   let automaton = {graph = g; entry_point; return_point; stmt_table = table} in
 
   (* Debug output *)
-  if Kernel.DebugInterpretedAutomata.get () then begin
+  if debug_output_to_dot then begin
     let function_name = Kernel_function.get_name kf in
     let file_name, file_out = Filename.open_temp_file function_name ".dot" in
     Kernel.result "Output the interpreted automaton for %s into %s"

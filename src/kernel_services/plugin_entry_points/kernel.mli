@@ -404,9 +404,6 @@ module BigIntsHex: Parameter_sig.Int
 module EagerLoadSources: Parameter_sig.Bool
 (** Behavior of option "-eager-load-sources" *)
 
-module DebugInterpretedAutomata: Parameter_sig.Bool
-(** Behavior of option "-debug-interpreted-automata" *)
-
 (* ************************************************************************* *)
 (** {2 Save/Load} *)
 (* ************************************************************************* *)
