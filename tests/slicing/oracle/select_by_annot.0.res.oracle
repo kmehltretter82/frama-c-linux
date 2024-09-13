@@ -62,6 +62,7 @@
 [eva] computing for function f8 <- main.
   Called from select_by_annot.i:148.
 [eva:alarm] select_by_annot.i:97: Warning: loop invariant got status unknown.
+[eva] select_by_annot.i:97: loop invariant got status valid.
 [eva:alarm] select_by_annot.i:100: Warning: assertion got status unknown.
 [eva:alarm] select_by_annot.i:104: Warning: 
   signed overflow. assert S.a + 1 ≤ 2147483647;
