@@ -99,12 +99,6 @@ val replace: ('a -> 'a -> bool) -> 'a -> 'a list -> 'a list
     @since Neon-20140301
 *)
 
-val fold_map: ('a -> 'b -> 'a * 'c) -> 'a -> 'b list -> 'a * 'c list
-(** Combines [fold_left] and [map] *)
-
-val fold_map_opt: ('a -> 'b -> 'a * 'c option) -> 'a -> 'b list -> 'a * 'c list
-(** Combines [filter] [fold_left] and [map] *)
-
 val product_fold: ('a -> 'b -> 'c -> 'a) -> 'a -> 'b list -> 'c list -> 'a
 (** [product f acc l1 l2] is similar to [fold_left f acc l12] with l12 the
     list of all pairs of an elt of [l1] and an elt of [l2]

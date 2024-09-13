@@ -826,7 +826,7 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
 let rec complete_graph (graph:Graph.t) =
   Graph.fold (fun k l graph ->
       let graph, l =
-        Extlib.fold_map (fun graph e ->
+        List.fold_left_map (fun graph e ->
             let m = Graph.singleton (Edge.succ e) [] in
             let e = match e.edge_trans with
               | Assign (_, _,_,_)
