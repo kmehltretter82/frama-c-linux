@@ -885,12 +885,14 @@ module TimeMargin =
          (default: %s)." default
   end)
 
+external cores : unit -> int = "caml_cores"
+
 let () = Parameter_customize.set_group wp_prover
 module Procs =
   Int(struct
     let option_name = "-wp-par"
     let arg_name = "p"
-    let default = 4
+    let default = cores ()
     let help =
       Printf.sprintf
         "Number of parallel proof process (default: %d)" default

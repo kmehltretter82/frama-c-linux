@@ -36,6 +36,28 @@ theory A_A
   predicate P_P A_InAxiomatic
   
 end
+[wp:print-generated] 
+  theory WP
+    
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use A_A *)
+    
+    goal wp_goal : forall i:A_InAxiomatic. is_InAxiomatic i -> P_P i
+    
+  end
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic1' 
 ---------------------------------------------
@@ -96,6 +118,30 @@ theory A_X
   predicate P_Q A_AtTopLevel
   
 end
+[wp:print-generated] 
+  theory WP1
+    
+    (* use why3.BuiltIn.BuiltIn *)
+    
+    (* use bool.Bool *)
+    
+    (* use int.Int *)
+    
+    (* use int.ComputerDivision *)
+    
+    (* use real.RealInfix *)
+    
+    (* use frama_c_wp.qed.Qed *)
+    
+    (* use map.Map *)
+    
+    (* use Axiomatic1 *)
+    
+    (* use A_X *)
+    
+    goal wp_goal : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
+    
+  end
 ---------------------------------------------
 --- Context 'typed' Cluster 'Axiomatic2' 
 ---------------------------------------------
@@ -158,7 +204,7 @@ theory A_Y
   
 end
 [wp:print-generated] 
-  theory WP
+  theory WP2
     
     (* use why3.BuiltIn.BuiltIn *)
     
@@ -179,52 +225,6 @@ end
     (* use A_Y *)
     
     goal wp_goal : forall r:A_Rec. is_Rec r -> P_R r
-    
-  end
-[wp:print-generated] 
-  theory WP1
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use Axiomatic1 *)
-    
-    (* use A_X *)
-    
-    goal wp_goal : forall a:A_AtTopLevel. is_AtTopLevel a -> P_Q a
-    
-  end
-[wp:print-generated] 
-  theory WP2
-    
-    (* use why3.BuiltIn.BuiltIn *)
-    
-    (* use bool.Bool *)
-    
-    (* use int.Int *)
-    
-    (* use int.ComputerDivision *)
-    
-    (* use real.RealInfix *)
-    
-    (* use frama_c_wp.qed.Qed *)
-    
-    (* use map.Map *)
-    
-    (* use A_A *)
-    
-    goal wp_goal : forall i:A_InAxiomatic. is_InAxiomatic i -> P_P i
     
   end
 [wp] 3 goals generated

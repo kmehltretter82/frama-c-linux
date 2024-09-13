@@ -9,7 +9,7 @@
 [wp] [Valid] Goal usable_lemma_terminates (Cfg) (Trivial)
 [wp] 3 goals scheduled
 ---------------------------------------------
---- Context 'typed_usable_lemma' Cluster 'Chunk' 
+--- Context 'typed' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk
   
@@ -36,7 +36,7 @@ theory Chunk
   
 end
 ---------------------------------------------
---- Context 'typed_usable_lemma' Cluster 'Compound' 
+--- Context 'typed' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound
   
@@ -60,7 +60,7 @@ theory Compound
   
 end
 ---------------------------------------------
---- Context 'typed_usable_lemma' Cluster 'A_Occ' 
+--- Context 'typed' Cluster 'A_Occ' 
 ---------------------------------------------
 theory A_Occ
   
@@ -110,40 +110,6 @@ theory A_Occ
      is_sint32 v -> is_sint32 x1 -> L_occ mint v p f x = L_occ mint v p f t
   
 end
----------------------------------------------
---- Context 'typed_usable_lemma' Cluster 'Axiomatic1' 
----------------------------------------------
-theory Axiomatic1
-  
-  (* use why3.BuiltIn.BuiltIn *)
-  
-  (* use bool.Bool *)
-  
-  (* use int.Int *)
-  
-  (* use int.ComputerDivision *)
-  
-  (* use real.RealInfix *)
-  
-  (* use frama_c_wp.qed.Qed *)
-  
-  (* use map.Map *)
-  
-  (* use frama_c_wp.memaddr.MemAddr *)
-  
-  (* use Chunk *)
-  
-  (* use A_Occ *)
-  
-  lemma Q_provable_lemma :
-    forall mint:addr -> int, v:int, p:addr, f:int, s:int, t:int.
-     f <= s ->
-     s <= t ->
-     is_sint32_chunk mint ->
-     is_sint32 v ->
-     (L_occ mint v p f s + L_occ mint v p s t) = L_occ mint v p f t
-  
-end
 [wp:print-generated] 
   theory WP
     
@@ -161,19 +127,19 @@ end
     
     (* use map.Map *)
     
-    (* use Axiomatic1 *)
+    (* use frama_c_wp.memaddr.MemAddr *)
+    
+    (* use Chunk *)
+    
+    (* use A_Occ *)
     
     goal wp_goal :
-      forall t:addr -> int, a:addr, i:int, i1:int, i2:int, i3:int.
-       i3 <= i1 ->
-       i < i3 ->
-       region (a.base) <= 0 ->
+      forall t:addr -> int, i:int, a:addr, i1:int, i2:int, i3:int.
+       i1 <= i2 ->
+       i <= i1 ->
        is_sint32_chunk t ->
-       is_uint32 i3 ->
-       is_uint32 i1 ->
-       is_uint32 i ->
-       is_sint32 i2 ->
-       (L_occ t i2 a i i3 + L_occ t i2 a i3 i1) = L_occ t i2 a i i1
+       is_sint32 i3 ->
+       (L_occ t i3 a i i1 + L_occ t i3 a i1 i2) = L_occ t i3 a i i2
     
   end
 ---------------------------------------------
@@ -283,7 +249,7 @@ end
 ---------------------------------------------
 --- Context 'typed_usable_axiom' Cluster 'Axiomatic1' 
 ---------------------------------------------
-theory Axiomatic11
+theory Axiomatic1
   
   (* use why3.BuiltIn.BuiltIn *)
   
@@ -305,7 +271,7 @@ theory Axiomatic11
   
   (* use A_Occ1 *)
   
-  lemma Q_provable_lemma1 :
+  lemma Q_provable_lemma :
     forall mint:addr1 -> int, v:int, p:addr1, f:int, s:int, t:int.
      f <=' s ->
      s <=' t ->
@@ -331,22 +297,22 @@ end
     
     (* use map.Map1 *)
     
-    (* use Axiomatic11 *)
+    (* use Axiomatic1 *)
     
     goal wp_goal :
       forall t:addr1 -> int, a:addr1, i:int, i1:int, i2:int.
        let x = (- 1) +' i1 in
        not get1 t (shift_sint321 a x) = i2 ->
        i <' i1 ->
-       region1 (a.base1) <=' 0 ->
+       region (a.base) <=' 0 ->
        i1 <=' 1000 ->
        is_sint32_chunk1 t ->
-       is_uint321 i1 ->
-       is_uint321 i -> is_sint321 i2 -> L_occ1 t i2 a i x = L_occ1 t i2 a i i1
+       is_uint32 i1 ->
+       is_uint32 i -> is_sint321 i2 -> L_occ1 t i2 a i x = L_occ1 t i2 a i i1
     
   end
 ---------------------------------------------
---- Context 'typed' Cluster 'Chunk' 
+--- Context 'typed_usable_lemma' Cluster 'Chunk' 
 ---------------------------------------------
 theory Chunk2
   
@@ -373,7 +339,7 @@ theory Chunk2
   
 end
 ---------------------------------------------
---- Context 'typed' Cluster 'Compound' 
+--- Context 'typed_usable_lemma' Cluster 'Compound' 
 ---------------------------------------------
 theory Compound2
   
@@ -397,7 +363,7 @@ theory Compound2
   
 end
 ---------------------------------------------
---- Context 'typed' Cluster 'A_Occ' 
+--- Context 'typed_usable_lemma' Cluster 'A_Occ' 
 ---------------------------------------------
 theory A_Occ2
   
@@ -449,6 +415,40 @@ theory A_Occ2
      is_sint322 x1 -> L_occ2 mint v p f x = L_occ2 mint v p f t
   
 end
+---------------------------------------------
+--- Context 'typed_usable_lemma' Cluster 'Axiomatic1' 
+---------------------------------------------
+theory Axiomatic11
+  
+  (* use why3.BuiltIn.BuiltIn *)
+  
+  (* use bool.Bool2 *)
+  
+  (* use int.Int2 *)
+  
+  (* use int.ComputerDivision2 *)
+  
+  (* use real.RealInfix2 *)
+  
+  (* use frama_c_wp.qed.Qed2 *)
+  
+  (* use map.Map2 *)
+  
+  (* use frama_c_wp.memaddr.MemAddr2 *)
+  
+  (* use Chunk2 *)
+  
+  (* use A_Occ2 *)
+  
+  lemma Q_provable_lemma1 :
+    forall mint:addr2 -> int, v:int, p:addr2, f:int, s:int, t:int.
+     f <='' s ->
+     s <='' t ->
+     is_sint32_chunk2 mint ->
+     is_sint322 v ->
+     (L_occ2 mint v p f s +'' L_occ2 mint v p s t) = L_occ2 mint v p f t
+  
+end
 [wp:print-generated] 
   theory WP2
     
@@ -466,19 +466,19 @@ end
     
     (* use map.Map2 *)
     
-    (* use frama_c_wp.memaddr.MemAddr2 *)
-    
-    (* use Chunk2 *)
-    
-    (* use A_Occ2 *)
+    (* use Axiomatic11 *)
     
     goal wp_goal :
-      forall t:addr2 -> int, i:int, a:addr2, i1:int, i2:int, i3:int.
-       i1 <='' i2 ->
-       i <='' i1 ->
+      forall t:addr2 -> int, a:addr2, i:int, i1:int, i2:int, i3:int.
+       i3 <='' i1 ->
+       i <'' i3 ->
+       region1 (a.base1) <='' 0 ->
        is_sint32_chunk2 t ->
-       is_sint322 i3 ->
-       (L_occ2 t i3 a i i1 +'' L_occ2 t i3 a i1 i2) = L_occ2 t i3 a i i2
+       is_uint321 i3 ->
+       is_uint321 i1 ->
+       is_uint321 i ->
+       is_sint322 i2 ->
+       (L_occ2 t i2 a i i3 +'' L_occ2 t i2 a i3 i1) = L_occ2 t i2 a i i1
     
   end
 [wp] 3 goals generated

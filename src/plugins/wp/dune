@@ -44,6 +44,7 @@
     (select wp_eva.ml from
       (frama-c-eva.core -> wp_eva.enabled.ml)
       (  -> wp_eva.disabled.ml)))
+  (foreign_stubs (language c) (names cores))
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx)))
 
