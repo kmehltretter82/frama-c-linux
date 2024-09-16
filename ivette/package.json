@@ -109,6 +109,7 @@
           ]
         }
       ],
+      "publish": [],
       "icon": "static/icon.png",
       "legalTrademarks": "LGPL-2.1"
     },
@@ -123,6 +124,7 @@
           ]
         }
       ],
+      "publish": [],
       "synopsis": "Frama-C GUI",
       "category": "Profiling"
     },
@@ -138,11 +140,13 @@
           ]
         }
       ],
+      "publish": [],
       "type": "distribution",
       "category": "public.app-category.developer-tools"
     },
     "dmg": {
-      "title": "Ivette ${version}"
+      "title": "Ivette ${version}",
+      "publish": []
     }
   }
 }
