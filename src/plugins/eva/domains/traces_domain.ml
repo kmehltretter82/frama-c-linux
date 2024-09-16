@@ -817,7 +817,9 @@ module GraphDot = OCamlGraph.Graphviz.Dot(struct
     let edge_attributes : E.t -> OCamlGraph.Graphviz.DotAttributes.edge list =
       function
       | Usual(_,{edge_trans = Loop _},_) -> [`Label (Format.asprintf "leave_loop")]
-      | Usual(_,e,_) -> [`Label (Format.asprintf "@[<h>%a@]" Transition.pretty e.edge_trans)]
+      | Usual(_,e,_) ->
+        [`Label (Format.asprintf "@[<h>%a@]"
+                   (Pretty_utils.pp_escaped Transition.pretty) e.edge_trans)]
       | Head _ -> []
       | Back(_,_,_) -> [`Constraint false]
   end)
