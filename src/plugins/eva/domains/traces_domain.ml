@@ -1245,9 +1245,10 @@ module D = struct
   let leave_scope kf vars state =
     Traces.add_trans state (LeaveScope (kf, vars))
 
-  let output_dot filename state =
-    let out = open_out filename in
-    Self.feedback ~dkey:log_category "@[Output dot produced to %s.@]" filename;
+  let output_dot (filename : Filepath.Normalized.t) state =
+    let out = open_out (filename :> string) in
+    Self.feedback ~dkey:log_category "@[Output dot produced to %a.@]"
+      Filepath.Normalized.pretty filename;
     GraphDot.output_graph out (complete_graph (snd (Traces.get_current state)));
     close_out out
 
@@ -1268,7 +1269,7 @@ module D = struct
         Self.failure "The trace is TOP can't generate code"
       | `Value state ->
         if not (Parameters.TracesDot.is_default ())
-        then output_dot (Parameters.TracesDot.get ():>string) state;
+        then output_dot (Parameters.TracesDot.get ()) state;
         if Parameters.TracesProject.get ()
         then project_of_cfg return_exp state
 end

@@ -64,6 +64,7 @@ c -> 5
     45 -> join -> 48
     46 -> Assign: \result<main> = tmp -> 47
     47 -> join -> 48 ]} at 48
+[eva:d-traces] Output dot produced to test1.dot.
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======

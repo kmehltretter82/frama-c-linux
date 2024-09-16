@@ -1,5 +1,6 @@
 /* run.config
-   STDOPT: #"-eva-domains traces -eva-msg-key d-traces -eva-slevel 10 -eva-traces-project" +"-then-last -eva -print -eva-msg-key=-d-traces"
+   LOG: @PTEST_NAME@.dot
+   STDOPT: #"-eva-domains traces -eva-msg-key d-traces -eva-traces-dot @PTEST_NAME@.dot -eva-slevel 10 -eva-traces-project" +"-then-last -eva -print -eva-msg-key=-d-traces"
 */
 
 extern volatile int entropy_source;
