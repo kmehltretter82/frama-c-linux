@@ -59,20 +59,26 @@ variables:
 .build_template: &ivette_setup
   image: "ocaml/opam:ubuntu-lts-ocaml-$OCAML"
   before_script:
+    # Prepare
     - sudo apt update
+    # TS
     - sudo apt install -y xvfb curl unzip libnss3 libasound2-plugins
     - sudo curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
     - export NVM_DIR="$HOME/.nvm"
-    - '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"'
-    - '[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"'
+    - . "$NVM_DIR/nvm.sh"
     - nvm install $NODE
     - nvm use node $NODE
     - corepack enable
+    # Opam
+    - opam switch create --empty .
+    - eval $(opam env --switch=. --set-switch)
     - opam pin . -n -k path
     - opam depext frama-c
     - opam install headache
     - opam install --jobs 2 --deps-only .
+    # Build Frama-C API
     - dune build -j2 @install
+    - make -C ivette api
 
 ################################################################################
 ### PREPARE
@@ -155,7 +161,6 @@ ivette:
   stage: build
   <<: *ivette_setup
   script:
-    - make -C ivette api
     - make -C ivette dist
   tags:
     - docker
@@ -235,7 +240,6 @@ ivette-tests:
   when: manual
   <<: *ivette_setup
   script:
-    - make -C ivette api
     - make -C ivette dist
     - cd ivette
     - xvfb-run --auto-servernum -e /dev/stdout -s "-screen 0 1920x1080x24 -ac -nolisten tcp -nolisten unix" dune exec -- yarn playwright test --headed
@@ -311,6 +315,49 @@ build-distrib-tarball:
       - ./*.tar.gz
     expire_in: 1 week
 
+# Build ivette apps
+
+build-ivette-linux-packages:
+  stage: distrib
+  <<: *ivette_setup
+  script:
+    - make -C ivette dist-linux
+    - mv ivette/dist/Ivette-arm64.AppImage ./frama-c-ivette-linux-ARM64.AppImage
+    - mv ivette/dist/Ivette-x86_64.AppImage ./frama-c-ivette-linux-x86-64.AppImage
+  artifacts:
+    paths:
+      - ./*.AppImage
+  tags:
+    - docker
+  <<: *when_release
+
+build-ivette-macos-packages:
+  stage: distrib
+  script:
+    # TS
+    - export NVM_DIR="$HOME/.nvm"
+    - . "$NVM_DIR/nvm.sh"
+    - nvm install $NODE
+    - nvm use $NODE
+    # Opam
+    - opam switch create --empty .
+    - eval $(opam env --switch=. --set-switch)
+    - opam pin . -n -k path
+    - opam install headache
+    - opam install --jobs 2 --deps-only .
+    # Build Frama-C API
+    - dune build -j2 @install
+    - make -C ivette api
+    # Build Ivette
+    - make -C ivette dist-macOS
+    - mv ivette/dist/Ivette-universal.dmg ./frama-c-ivette-macos-universal.dmg
+  artifacts:
+    paths:
+      - ./*.dmg
+  tags:
+    - macos-arm
+  <<: *when_release
+
 # Coverage
 
 coverage:
@@ -385,6 +432,8 @@ release-content:
   needs:
     - api-doc
     - build-distrib-tarball
+    - build-ivette-linux-packages
+    - build-ivette-macos-packages
     - manuals-for-release
   artifacts:
     paths:
