@@ -1176,7 +1176,8 @@ init_declarator:                             /* ISO 6.7 */
                                         { ($1, $3) }
 ;
 
-decl_spec_wo_type:                         /* ISO 6.7 */
+// C standard specifiers without type specifiers
+decl_spec_wo_type_nor_attr:                 /* ISO 6.7 */
                                         /* ISO 6.7.1 */
 |   TYPEDEF          { !Lexerhack.set_typedef(); SpecTypedef, $1  }
 |   EXTERN           { SpecStorage EXTERN, $1 }
@@ -1187,11 +1188,26 @@ decl_spec_wo_type:                         /* ISO 6.7 */
 |   INLINE           { SpecInline, $1 }
 |   NORETURN         { SpecAttr (("noreturn",[])), $1 }
 |   cvspec           { $1 }
+;
+
+// GCC allows attributes in decl specifiers
+decl_spec_attribute:
 |   attribute_nocv   { SpecAttr (fst $1), snd $1 }
 ;
 
+// All possible decl specifiers
+any_decl_spec:
+| decl_spec_wo_type_nor_attr { fst $1 }
+| decl_spec_attribute { fst $1 }
+| type_spec { SpecType(fst $1) }
+
+/* The specifier list of decls cannot contain only GCC attribute specifiers. It
+   must contain at least one type specifier or any other C standard specifier.
+   We loop in decl_spec_list until we get one of those, then we leave the loop
+   and allow any specifier or empty. */
 decl_spec_list:
-| decl_spec_wo_type decl_spec_list_opt { fst $1 :: $2, snd $1 }
+| decl_spec_wo_type_nor_attr decl_spec_list_opt { fst $1 :: $2, snd $1 }
+| decl_spec_attribute decl_spec_list { fst $1 :: fst $2, snd $1 }
 | type_spec pragma* (* pragma accepted by GCC *) decl_spec_list_opt_no_named
   {
     let pragmas = $2 in
@@ -1204,24 +1220,39 @@ decl_spec_list:
     SpecType(fst $1) :: $3, snd $1
   }
 
-decl_spec_list_no_named:
-| decl_spec_wo_type decl_spec_list_opt_no_named { fst $1 :: $2, snd $1 }
-| type_spec decl_spec_list_opt_no_named { SpecType(fst $1) :: $2, snd $1 }
+/* Here we can match any specifier, meaning we alreay saw at least one type or
+   C standard specifier. */
+decl_spec_list_no_restriction:
+| decl_spec_wo_type_nor_attr decl_spec_list_opt { fst $1 :: $2, snd $1 }
+| decl_spec_attribute decl_spec_list_opt { fst $1 :: $2, snd $1 }
+| type_spec pragma* (* pragma accepted by GCC *) decl_spec_list_opt_no_named
+  {
+    let pragmas = $2 in
+    if pragmas != [] then begin
+      let loc = Cabshelper.get_definitionloc (List.hd pragmas) in
+      Kernel.warning ~wkey:Kernel.wkey_parser_unsupported_pragma
+        ~once:true ~source:(fst loc)
+        "Discarding _Pragma's in function declaration"
+    end;
+    SpecType(fst $1) :: $3, snd $1
+  }
 
 /* (* In most cases if we see a NAMED_TYPE we must shift it. Thus we declare
     * NAMED_TYPE to have right associativity  *) */
 decl_spec_list_opt:
     /* empty */                         { [] } %prec NAMED_TYPE
-|   decl_spec_list                      { fst $1 }
+|   decl_spec_list_no_restriction       { fst $1 }
 ;
+
 /* (* We add this separate rule to handle the special case when an appearance
     * of NAMED_TYPE should not be considered as part of the specifiers but as
     * part of the declarator. IDENT has higher precedence than NAMED_TYPE  *)
  */
 decl_spec_list_opt_no_named:
-    /* empty */                         { [] } %prec IDENT
-|   decl_spec_list_no_named                      { fst $1 }
+    /* empty */                               { [] } %prec IDENT
+|   any_decl_spec decl_spec_list_opt_no_named { $1 :: $2 }
 ;
+
 type_spec:   /* ISO 6.7.2 */
     VOID            { Tvoid, $1}
 |   CHAR            { Tchar, $1 }
