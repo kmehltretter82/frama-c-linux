@@ -299,12 +299,15 @@ let no_ghost = List.map no_ghost_stmt
 let in_block sloc l =
   let loc = Cil_datatype.Location.of_lexing_loc sloc in
   match l with
-      [] -> no_ghost_stmt (NOP loc)
-    | [s] -> s
-    | _::_ ->
-        no_ghost_stmt (BLOCK ({ blabels = []; battrs = []; bstmts = l},
-                              get_statementloc (List.hd l),
-                              get_statementloc (Extlib.last l)))
+  (* in_block should always called on parsed statement, which cannot return an
+      empty list. *)
+  | [] ->
+    Errorloc.parse_error ~loc "empty list of statement, should not happen"
+  | [s] -> s
+  | _::_ ->
+      no_ghost_stmt (BLOCK ({ blabels = []; battrs = []; bstmts = l},
+                            get_statementloc (List.hd l),
+                            get_statementloc (Extlib.last l)))
 
 let in_ghost_block ?(battrs=[]) l =
   let l = in_ghost l in
