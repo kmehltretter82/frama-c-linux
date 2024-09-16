@@ -55,7 +55,5 @@
 (install
   (package frama-c-wp)
   (section (site (frama-c share)))
-  (files
-    (share/Makefile.resources as wp/Makefile.resources)
-    (share/wp.driver as wp/wp.driver))
+  (files (share/wp.driver as wp/wp.driver))
   (source_trees (share/why3 as wp/why3)))
