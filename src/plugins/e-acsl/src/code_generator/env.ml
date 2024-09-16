@@ -310,6 +310,7 @@ let rtl_call_to_new_var ~loc ?scope ?name env kf t ty func_name args =
   exp, env
 
 module Logic_binding = struct
+  let clear env = {env with var_mapping = Logic_var.Map.empty}
 
   let add_binding env logic_v vi =
     try

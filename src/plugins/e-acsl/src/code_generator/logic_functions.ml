@@ -203,6 +203,9 @@ let generate_kf ~loc fname env params_ty ret_ty params_ival li =
      Delay its generation after filling the memoization table (for termination
      of recursive function calls) *)
   let gen_body () =
+    let env = (* cannot use bindings from other functions (the use site) *)
+      Env.Logic_binding.clear env
+    in
     let env = Env.push env in
     (* fill the typing environment with the function's parameters
        before generating the code (code generation invokes typing) *)

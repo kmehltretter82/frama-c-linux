@@ -53,8 +53,7 @@ int __gen_e_acsl_f(int x)
     long __gen_e_acsl_if_3;
     __gen_e_acsl_f_5 = __gen_e_acsl_f_2(0);
     __gen_e_acsl_v = __gen_e_acsl_f_5;
-    /*@ assert Eva: initialization: \initialized(&__gen_e_acsl_v_2); */
-    if (0L == __gen_e_acsl_v_2) __gen_e_acsl_if_3 = x - 1L;
+    if (0L == __gen_e_acsl_v) __gen_e_acsl_if_3 = x - 1L;
     else __gen_e_acsl_if_3 = 0L;
     __gen_e_acsl_if_4 = __gen_e_acsl_if_3;
   }
