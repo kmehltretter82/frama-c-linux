@@ -132,6 +132,7 @@ depends: [
   "ocaml" { >= "4.14.0" }
   "ocamlgraph" { >= "2.0.0" }
   "ocamlgraph" { with-test & >= "2.1.0" }
+  "ocp-indent" { with-dev-setup & >= "1.8.1" }
   "odoc" { with-doc }
   "unionFind" { >= "20220107" }
   "why3" { >= "1.7.1" & (< "1.8.0" | !with-test) }
