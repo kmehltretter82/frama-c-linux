@@ -636,14 +636,14 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
   match !current_packing_pragma, align_pragma_for_struct fi.forig_name with
   | None, None -> check_aligned fattrs
   | Some n, apragma ->
-      warn_incompatible_pragmas_attributes apragma (fattrs <> []);
+    warn_incompatible_pragmas_attributes apragma (fattrs <> []);
     let field_align = combine_aligned_attributes fattrs in
     (* If this field has no valid aligned attributes and the composite type
         has a packed attribute, nothing needs to be done: the composite will
         have the "packed" attribute anyway. *)
     if field_align = None && Cil.hasAttribute "packed" cattr then
       dropAttribute "aligned" fattrs
-            else
+    else
       (* Otherwise, align on min(n, max(field alignment, type alignment)):
          the field alignment attribute (if there is one) may be smaller than
          its type alignment, so we get the maximum of both. Then, we apply
@@ -652,9 +652,9 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
       let type_align = Integer.of_int (Cil.bytesAlignOf fi.ftype) in
       let existing_align =
         Option.fold field_align ~none:type_align ~some:(Integer.max type_align)
-          in
+      in
       let new_align = Integer.min n existing_align in
-          Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
+      Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
         "%s aligned(%a) attribute to field '%s.%s' due to packing pragma"
         (if Option.is_none field_align then "adding" else "setting")
         Integer.pretty new_align fi.fcomp.cname fi.fname;
@@ -2760,7 +2760,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                       old.vattr <- attr;
                     end;
                     match old.vlogic_var_assoc with
-                     | None -> ()
+                    | None -> ()
                     | Some old_lv -> old_lv.lv_name <- name
                   end)
                old_formals_env
@@ -4807,7 +4807,7 @@ and doType (ghost:bool) (context: type_context)
              else begin
                match context with
                | `FieldDecl ->
-               Kernel.error ~once:true ~current:true
+                 Kernel.error ~once:true ~current:true
                    "\"Variable length array in structure\" extension \
                     is not supported"
                | `GlobalDecl ->
@@ -7949,19 +7949,19 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
 
   let checkArrayInit ty init =
     let init_ok =
-    if Cil.isArrayType ty then
-      match init with
+      if Cil.isArrayType ty then
+        match init with
         | COMPOUND_INIT _ -> true
         | SINGLE_INIT e ->
           (match stripParen e with
-          { expr_node =
+             { expr_node =
                  CONSTANT (CONST_STRING _ | CONST_WSTRING _)} -> true
            | _ -> false)
         | _ -> false
       else true
     in
     if not init_ok then
-        Kernel.error ~current:true ~once:true
+      Kernel.error ~current:true ~once:true
         "Array initializer must be an initializer list or string literal";
   in
   Kernel.debug ~dkey:Kernel.dkey_typing_init
@@ -8647,15 +8647,15 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
                   let<> UpdatedCurrentLoc = loc in
                   let loc = Current_loc.get () in
                   let res =
-                  try
-                    (* it can not have old behavior names, since this is the
-                       first time we see the declaration.
-                    *)
-                    Ltyping.funspec [] vi None vi.vtype spec
-                  with LogicTypeError ((source,_),msg) ->
-                    Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
-                      "%s. Ignoring specification of function %s" msg vi.vname;
-                    empty_funspec ()
+                    try
+                      (* it can not have old behavior names, since this is the
+                         first time we see the declaration.
+                      *)
+                      Ltyping.funspec [] vi None vi.vtype spec
+                    with LogicTypeError ((source,_),msg) ->
+                      Kernel.warning ~wkey:Kernel.wkey_annot_error ~source
+                        "%s. Ignoring specification of function %s" msg vi.vname;
+                      empty_funspec ()
                   in
                   res, loc
                 end
@@ -9601,11 +9601,11 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
     empty
 
   | Cabs.GLOBANNOT decls when isglobal ->
-      List.iter
-        (fun decl  ->
-           let loc = convLoc decl.Logic_ptree.decl_loc in
-           let<> UpdatedCurrentLoc = loc in
-           try
+    List.iter
+      (fun decl  ->
+         let loc = convLoc decl.Logic_ptree.decl_loc in
+         let<> UpdatedCurrentLoc = loc in
+         try
            match Ltyping.annot decl with
            | None -> ()
            | Some tdecl ->
@@ -9615,11 +9615,11 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
                  (Fun.flip Logic_utils.add_attribute_glob_annot) tdecl attr
              in
              cabsPushGlobal (GAnnot(tdecl,Current_loc.get ()))
-           with LogicTypeError ((source,_),msg) ->
-             Kernel.warning
-               ~wkey:Kernel.wkey_annot_error ~source
-               "%s. Ignoring global annotation" msg
-        )
+         with LogicTypeError ((source,_),msg) ->
+           Kernel.warning
+             ~wkey:Kernel.wkey_annot_error ~source
+             "%s. Ignoring global annotation" msg
+      )
       decls;
     empty
 

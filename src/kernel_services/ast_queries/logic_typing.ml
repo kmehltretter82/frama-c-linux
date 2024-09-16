@@ -4288,7 +4288,7 @@ struct
       begin match context with
         | Toplevel -> ()
         | InAxiomatic ->
-        (* Not supported yet. See issue 43 on ACSL's github repository. *)
+          (* Not supported yet. See issue 43 on ACSL's github repository. *)
           C.error loc "Nested axiomatic. Ignoring body of %s" id
         |  InModule _ ->
           C.error loc "Nested modules and axiomatic. Ignoring body of %s" id
