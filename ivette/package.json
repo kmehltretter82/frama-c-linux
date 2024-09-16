@@ -98,7 +98,7 @@
     "appId": "com.framac.ivette",
     "compression": "store",
     "copyright": "Copyright © 2007-2024 Frama-C. All Rights Reserved.",
-    "artifactName": "${productName}-${arch}-${version}.${ext}",
+    "artifactName": "${productName}-${arch}.${ext}",
     "win": {
       "target": [
         {
