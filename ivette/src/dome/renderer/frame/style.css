@@ -587,3 +587,76 @@ input:checked + .dome-xSwitch-slider:before {
   -ms-transform: translateX(13px);
   transform: translateX(13px);
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Side Panel                                                         --- */
+/* -------------------------------------------------------------------------- */
+.dome-sidepanel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    .dome-sidepanel-container {
+      position: absolute;
+      top:0;
+      max-width: 350px;
+      max-height: 100%;
+      overflow-y: scroll;
+      z-index: 50;
+      background-color: var(--background-interaction);
+      padding: 10px 5px;
+
+      &::-webkit-scrollbar { display: none; }
+
+      &.dome-sidepanel-container-left {
+        border-radius: 0 20px 20px 0;
+      }
+      &.dome-sidepanel-container-right {
+        right: 0;
+        border-radius: 20px 0 0 20px;
+      }
+
+      .dome-sidepanel-text {
+        color: var(--text);
+        padding-bottom: 3px;
+      }
+
+      .dome-sidepanel-actions {
+        display: flex;
+
+        button:hover,
+        button:hover label {
+          cursor: pointer;
+        }
+      }
+
+      .dome-sidepanel-list {
+        .dome-sidepanel-element {
+          margin:5px;
+          background-color: var(--background);
+          overflow-x: hidden;
+          border-radius: 0 10px 0 10px;
+
+          .dome-sidepanel-element-name {
+            background-color: var(--background-profound);
+            font-weight: bold;
+            width: 100%;
+            padding: 5px 10px;
+
+            &.action:hover {
+              cursor: pointer;
+              background-color: var(--background-profound-hover);
+            }
+          }
+
+          .dome-sidepanel-element-content {
+            padding: 4px;
+
+            &:has(*){
+              padding: 10px;
+            }
+          }
+        }
+      }
+    }
+  }
