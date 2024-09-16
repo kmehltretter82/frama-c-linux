@@ -510,9 +510,16 @@ and bal = parse
                 else LogicBuiltins.find_lib file)
               drivers in
           let default = Wp_parameters.Share.get_file "wp.driver" in
+          let membytes =
+            Wp_parameters.Share.get_file @@
+              if Machine.little_endian ()
+              then "membytes_le.driver"
+              else "membytes_be.driver"
+          in
           let feedback = Wp_parameters.Share.is_set () in
           let ontty = if feedback then `Message else `Transient in
           load_file ~ontty default;
+          load_file ~ontty membytes;
           List.iter load_file drivers
         in
         let driver = LogicBuiltins.new_driver ~id ~descr ~includes ~configure () in

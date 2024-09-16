@@ -1,0 +1,8 @@
+library membytes: memaddr
+why3.import += "frama_c_wp.membytes_le.ValueCodec";
+why3.import += "frama_c_wp.membytes_le.InitCodec";
+why3.import += "frama_c_wp.membytes_le.Offset";
+why3.import += "frama_c_wp.membytes_le.RWBytes";
+why3.import += "frama_c_wp.membytes_le.ValueBlockRW";
+why3.import += "frama_c_wp.membytes_le.InitBlockRW";
+why3.import += "frama_c_wp.membytes_le.MemBytes";

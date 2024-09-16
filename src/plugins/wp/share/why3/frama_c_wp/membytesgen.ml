@@ -197,8 +197,8 @@ let init_codec fmt () =
 (* -------------------------------------------------------------------------- *)
 
 let offset fmt () =
-  fprintf fmt
-    {|use int.Int
+  fprintf fmt {|
+  use int.Int
   type offset = int
 
   predicate sepoffset (po: offset) (lp: int) (qo: offset) (lq: int) =
@@ -213,8 +213,8 @@ let rwbytes_preambule fmt () =
   fprintf fmt "%a@,@," pp_use_list
     [ "int.Int", None ; "map.Map", Some "M" ;
       "frama_c_wp.sequence.Seq", Some "S" ; "Offset", None] ;
-  fprintf fmt
-    {|type seq   'a = S.seq 'a
+  fprintf fmt {|
+  type seq   'a = S.seq 'a
   type block 'a = M.map int 'a
 
   function bwrite_seq (b:block 'a) (o: int) (s: seq 'a) : block 'a =
@@ -227,14 +227,16 @@ let rwbytes_preambule fmt () =
     forall i: int. o <= i < o + l -> M.(get b1 i) = M.(get b2 i)
 |}
 
-let rwbytes_write fmt size =
+let rwbytes_write (le: bool) fmt size =
   let rec mline n max fmt stop =
     if n = stop
     then fprintf fmt "%s" (if max = stop then "_" else "S.L.Nil")
     else fprintf fmt "S.L.Cons b%d (%a)" n (mline (n + 1) max) stop
   in
   let rec rline n fmt stop =
-    let pp_offset fmt = function
+    let pp_offset fmt n =
+      let n = if le then n else (size / 8) - (n + 1) in
+      match n with
       | 0 -> fprintf fmt "o"
       | n -> fprintf fmt "(o+%d)" n
     in
@@ -252,11 +254,13 @@ let rwbytes_write fmt size =
   fprintf fmt "| _ -> b@," ;
   fprintf fmt "end@,@]@,"
 
-let rwbytes_read fmt size =
+let rwbytes_read (le: bool) fmt size =
   let consbyte ~last fmt n =
-    if n = 1
+    let o = if le then n else (size / 8) - (n - 1) in
+
+    if o = 1
     then fprintf fmt "(S.L.Cons M.(b[o  ])"
-    else fprintf fmt "(S.L.Cons M.(b[o+%d])" (n - 1) ;
+    else fprintf fmt "(S.L.Cons M.(b[o+%d])" (o - 1) ;
 
     if last then fprintf fmt " S.L.Nil%s" (String.init n (fun _ -> ')')) ;
     fprintf fmt "@,"
@@ -264,7 +268,10 @@ let rwbytes_read fmt size =
   let rec all_consbytes n fmt m =
     if n = m
     then consbyte ~last:true fmt n
-    else begin consbyte ~last:false fmt n ; all_consbytes (n+1) fmt m end
+    else begin
+      consbyte ~last:false fmt n ;
+      all_consbytes (n+1) fmt m
+    end
   in
   fprintf fmt "@[<v 2>function bread_%dbits (b: block 'a) (o: int) : seq 'a =@," size ;
   fprintf fmt "%a@]@," (all_consbytes 1) (size / 8)
@@ -315,10 +322,10 @@ let rwbytes_all_lemmas fmt size =
   rwbytes_read_bwrite_seq_sep fmt size ;
   List.iter (rwbytes_read_write_sep fmt size) all_sizes
 
-let rwbytes fmt () =
+let rwbytes fmt le =
   fprintf fmt "%a@," rwbytes_preambule () ;
-  List.iter (fprintf fmt "%a" rwbytes_read) all_sizes ;
-  List.iter (fprintf fmt "%a" rwbytes_write) all_sizes ;
+  List.iter (fprintf fmt "%a" (rwbytes_read le)) all_sizes ;
+  List.iter (fprintf fmt "%a" (rwbytes_write le)) all_sizes ;
   List.iter (fprintf fmt "%a" rwbytes_all_lemmas) all_sizes
 
 (* -------------------------------------------------------------------------- *)
@@ -480,8 +487,8 @@ let membytes_preambule fmt () =
     ; "ValueBlockRW", Some "VB"
     ; "InitBlockRW", Some "IB"
     ] ;
-  fprintf fmt
-    {|type memory = map int (VB.vblock)
+  fprintf fmt {|
+  type memory = map int (VB.vblock)
   type init   = map int (IB.iblock)
 
   function raw_get (m: map int (map int 'a)) (a: addr) : 'a =
@@ -630,8 +637,7 @@ let membytes_all_init_lemmas fmt size =
 
 let membytes_context fmt () =
   fprintf fmt "predicate sconst (memory)@," ;
-  fprintf fmt
-    {|
+  fprintf fmt {|
   predicate bytes(m: memory) =
     forall a: addr. 0 <= raw_get m a <= 255
 
@@ -654,9 +660,9 @@ let membytes fmt () =
 (* ---  Main                                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-let wmodule name builder fmt () =
+let wmodule name builder fmt x =
   fprintf fmt "@[<v 2>module %s@," name ;
-  fprintf fmt "%a" builder () ;
+  fprintf fmt "%a" builder x ;
   fprintf fmt "@]@.end"
 
 let file_contents filename =
@@ -665,8 +671,12 @@ let file_contents filename =
   close_in input;
   contents
 
-let () =
-  let out = open_out "membytes.mlw" in
+let create le =
+  let out =
+    if le
+    then open_out "membytes_le.mlw"
+    else open_out "membytes_be.mlw"
+  in
   let header = file_contents "Wp.header" in
   let fmt = formatter_of_out_channel out in
   fprintf fmt "%s@." header ;
@@ -676,8 +686,12 @@ let () =
   fprintf fmt "%a@.@;" (wmodule "ValueCodec" value_codec) () ;
   fprintf fmt "%a@.@;" (wmodule "InitCodec" init_codec) () ;
   fprintf fmt "%a@.@;" (wmodule "Offset" offset) () ;
-  fprintf fmt "%a@.@;" (wmodule "RWBytes" rwbytes) () ;
+  fprintf fmt "%a@.@;" (wmodule "RWBytes" rwbytes) le ;
   fprintf fmt "%a@.@;" (wmodule "ValueBlockRW" value_blockrw) () ;
   fprintf fmt "%a@.@;" (wmodule "InitBlockRW" init_blockrw) () ;
   fprintf fmt "%a@.@;" (wmodule "MemBytes" membytes) () ;
   close_out out
+
+let () =
+  create true ;
+  create false
