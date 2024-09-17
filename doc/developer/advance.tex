@@ -4135,7 +4135,7 @@ of an extended \verb+import+ clause:
 //@ import <loader>: <module-name> [ \as <alias-name> ];
 \end{lstlisting}
 
-The syntax is similar to the geneal \verb+import+ annotation, except that the
+The syntax is similar to the general ACSL \verb+import+ annotation, except that the
 module name is prefixed with the name of the loader extension. For instance:
 
 \begin{lstlisting}[style=c]
@@ -4147,11 +4147,13 @@ importing the module, and \verb+foo::bar::Jazz+ is the name of the module
 to be imported.
 
 To define such an external module loader, a plug-in shall call the
+\scodeidxdef{Acsl\_extension}{register\_module\_importer}
 \verb+Acsl_extension.register_module_importer+ with a suitable loader function.
 The loader function is responsible for resolving the module name and defining
 the associated \acsl logic types, functions and predicates. Here is an example
 of such a loader function:
 
+\scodeidx{Logic\_typing}{module\_builder}
 \begin{lstlisting}[language=OCaml]
 open Cil_types
 open Logic_typing
@@ -4187,26 +4189,26 @@ techniques to save time, the module builder shall be populated on every call.
 When printing the internal AST from \framac command line using \verb+-print+
 option, externally imported modules are listed with one single clause for each,
 with no aliasing in order to avoid any ambiguity. For instance:
-\begin{lstlisting}
+\begin{ccode}
 //@ import MyLoader: foo::bar::Jazz \as _ ;
-\end{lstlisting}
+\end{ccode}
 
 Alternatively, you can debug the logical definitions actually imported by any
 driver by using \verb+-print+ with the \verb+printer:imported-modules+ debugging
 key:
-\begin{lstlisting}
+\begin{frama-c-commands}
 > frama-c ... -print -kernel-message-key printer:imported-modules
-\end{lstlisting}
+\end{frama-c-commands}
 
 With this option, the contents of the imported modules are printed like regular
 module definitions, with only a comment to mention the origin of the plug-in:
-\begin{lstlisting}
+\begin{ccode}
 /*@ // import MyLoader:
     module foo::bar::Jazz {
         ...
     }
   */
-\end{lstlisting}
+\end{ccode}
 
 Notice that, when using the \verb+printer:imported-modules+ message key, the
 resulting file will still compile and type-check, but the plug-in extension will
