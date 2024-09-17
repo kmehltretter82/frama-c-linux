@@ -1,6 +1,6 @@
-\chapter{ACSL extensions} % here we do not use the macro (avoids a warning)
+\chapter{ACSL Extensions} % here we do not use the macro (avoids a warning)
 \label{cha:acsl-extensions}
-\section{Extension syntaxes}
+\section{Extension Syntaxes}
 \label{acsl:syntax}
 
 When a plug-in registers an extension, it can be used in \acsl annotations
@@ -16,7 +16,7 @@ ignored with a warning, whereas \lstinline|unroll _| cannot be identified as
 being supported by Eva, which means that it can only be treated as a user
 error.
 
-\section{Handling indirect calls with \texttt{calls}}
+\section{Handling Indirect Calls with \texttt{calls}}
 \label{acsl:calls}
 
 In order to help plug-ins support indirect calls (i.e. calls through
@@ -33,23 +33,23 @@ indicates that the pointer \lstinline|f| can point to any one of
 
 It is in particular used by the WP plug-in (see \cite{wp} for more information).
 
-\section{Module Support}
+\section{Importing External Module Definitions}
 \label{acsl:modules}
 
-Support for \acsl modules has been introduced since \nextframacversion.
+Support for \acsl modules has been introduced in \nextframacversion.
 Module definitions can be nested. Inside a module \verb+A+,
 a sub-module \verb+B+ will actually defines the module \verb+A::B+, and so on.
 
-Notice than for long-identifiers like \verb+A::B::C+ to be valid, no space is
+Notice than for long identifiers like \verb+A::B::C+ to be valid, no space is
 allowed around the \verb+:+ characters, and \verb+A+, \verb+B+, \verb+C+ must be
-regular \acsl identifiers, ie. they shall only consist of upper case or lower case letters, digits,
+regular \acsl identifiers, i.e.~they shall only consist of upper case or lower case letters, digits,
 underscores, and must start with a letter.
 
-Inside module \verb+M+ declaration, where \verb+M+ it the long-identifier of the
+Inside module \verb+M+ declaration, where \verb+M+ it the long identifier of the
 module being declared, a logic declaration \verb+a+ will actually define the
 symbol \verb+M::a+. You shall always use the complete name of an identifier to
-avoid ambiguities in your specifications. However, in order to ease reading, is
-it also possible to use shortened names instead.
+avoid ambiguities in your specifications. However, in order to ease reading, it
+is also possible to use shortened names instead.
 
 The rules for shortening long identifiers generalize to any depth of nested
 modules. We only illustrate them in a simple case. Consider for instance a logic
@@ -59,11 +59,12 @@ its name as follows:
 \item Everywhere, you can use \verb+A::B::a+;
 \item Inside module \verb+A+, you can use \verb+B::a+;
 \item Inside module \verb+A::B+, you can use \verb+a+;
-\item After annotation \verb+import A::B+, you can use \verb+B::a+;
-\item After annotation \verb+import A::B as C+, you can use \verb+C::a+;
+\item After annotation \lstinline[language=ACSL]|import A::B|, you can use \verb+B::a+;
+\item After annotation \lstinline[language=ACSL]|import A::B as C|, you can use \verb+C::a+;
 \end{itemize}
 
-You may also use local \verb+import+ annotations inside module definitions, in
+You may also use local \lstinline[language=ACSL]+import+ annotations inside
+module definitions, in
 which case the introduced aliases will be only valid until the end of the module
 scope.
 
@@ -72,12 +73,12 @@ from external specifications, generally from an external proof assistant like
 \textsf{Coq} or \textsf{Why3}. The \acsl extended syntax for importing external
 specifications is as follows:
 
-\begin{lstlisting}
+\begin{lstlisting}[language=ACSL]
 import <Driver>: <ModuleName> [ as <Name> ];
 \end{lstlisting}
 
-This is a generalization of the regular \acsl \verb+import+ clause just
-mentioned above. The \verb+<Driver>+ name identifies the kind of external
+This is a generalization of the regular \acsl \lstinline[language=ACSL]|import|
+clause just mentioned above. The \verb+<Driver>+ name identifies the kind of external
 specifications to be loaded. Drivers are defined by dedicated plug-in support
 only, and you shall consult the documentation of each plug-in to known which
 drivers are available.
