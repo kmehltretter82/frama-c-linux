@@ -420,8 +420,8 @@ void *__gen_e_acsl_memset(void *s, int c, size_t n)
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"s",s);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "valid_s: __gen_e_acsl_valid_or_empty_here(s, n)",
-                                 0,__gen_e_acsl_valid_or_empty_here_2);
+                                 "valid_s: valid_or_empty(s, n)",0,
+                                 __gen_e_acsl_valid_or_empty_here_2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "valid_or_empty(s, n)";
@@ -484,8 +484,8 @@ void *__gen_e_acsl_memmove(void *dest, void const *src, size_t n)
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"dest",dest);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "valid_dest: __gen_e_acsl_valid_or_empty_here(dest, n)",
-                                 0,__gen_e_acsl_valid_or_empty_here_3);
+                                 "valid_dest: valid_or_empty(dest, n)",0,
+                                 __gen_e_acsl_valid_or_empty_here_3);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "valid_or_empty(dest, n)";
@@ -504,8 +504,8 @@ void *__gen_e_acsl_memmove(void *dest, void const *src, size_t n)
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"src",
                                  (void *)src);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "valid_src: __gen_e_acsl_valid_read_or_empty_here(src, n)",
-                                 0,__gen_e_acsl_valid_read_or_empty_here_2);
+                                 "valid_src: valid_read_or_empty(src, n)",0,
+                                 __gen_e_acsl_valid_read_or_empty_here_2);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Precondition";
     __gen_e_acsl_assert_data_2.pred_txt = "valid_read_or_empty(src, n)";
@@ -594,8 +594,8 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"n",0,n);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"dest",dest);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,
-                                 "valid_dest: __gen_e_acsl_valid_or_empty_here(dest, n)",
-                                 0,__gen_e_acsl_valid_or_empty_here_4);
+                                 "valid_dest: valid_or_empty(dest, n)",0,
+                                 __gen_e_acsl_valid_or_empty_here_4);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Precondition";
     __gen_e_acsl_assert_data.pred_txt = "valid_or_empty(dest, n)";
@@ -614,8 +614,8 @@ void *__gen_e_acsl_memcpy(void * restrict dest, void const * restrict src,
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"src",
                                  (void *)src);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,
-                                 "valid_src: __gen_e_acsl_valid_read_or_empty_here(src, n)",
-                                 0,__gen_e_acsl_valid_read_or_empty_here_3);
+                                 "valid_src: valid_read_or_empty(src, n)",0,
+                                 __gen_e_acsl_valid_read_or_empty_here_3);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Precondition";
     __gen_e_acsl_assert_data_2.pred_txt = "valid_read_or_empty(src, n)";

@@ -464,9 +464,8 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_16 =
       {.values = (void *)0};
     __gen_e_acsl_p_here_here_2 = __gen_e_acsl_p_here_here(27);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,
-                                 "__gen_e_acsl_p_here_here(27)",0,
-                                 __gen_e_acsl_p_here_here_2);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_16,"p_here(27)",
+                                 0,__gen_e_acsl_p_here_here_2);
     __gen_e_acsl_assert_data_16.blocking = 1;
     __gen_e_acsl_assert_data_16.kind = "Assertion";
     __gen_e_acsl_assert_data_16.pred_txt = "p_here(27)";
@@ -482,9 +481,8 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_17 =
       {.values = (void *)0};
     __gen_e_acsl_f_here_here_2 = __gen_e_acsl_f_here_here(27);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,
-                                 "__gen_e_acsl_f_here_here(27)",0,
-                                 __gen_e_acsl_f_here_here_2);
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_17,"f_here(27)",
+                                 0,__gen_e_acsl_f_here_here_2);
     __gen_e_acsl_assert_data_17.blocking = 1;
     __gen_e_acsl_assert_data_17.kind = "Assertion";
     __gen_e_acsl_assert_data_17.pred_txt = "f_here(27) == 27";
@@ -501,8 +499,7 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_18 =
       {.values = (void *)0};
     __gen_e_acsl_f3_here_2 = __gen_e_acsl_f3_here(5);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_18,
-                                  "__gen_e_acsl_f3_here(5)",0,
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_18,"f3(5)",0,
                                   __gen_e_acsl_f3_here_2);
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Assertion";

@@ -212,7 +212,7 @@ int main(void)
     __gen_e_acsl_eq_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_3),
                                    (__e_acsl_mpz_struct const *)(__gen_e_acsl__14));
     __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data_3,
-                                 "\\sum(2, 10, \\lambda integer k; k - 2 >= 0? 1: 0)",
+                                 "\\numof(2, 10, \\lambda integer k; k - 2 >= 0)",
                                  0,
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_accumulator_3));
     __gen_e_acsl_assert_data_3.blocking = 1;

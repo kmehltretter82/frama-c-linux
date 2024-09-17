@@ -61,8 +61,7 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_length_here_2 = __gen_e_acsl_length_here(l);
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"l",(void *)l);
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,
-                                  "__gen_e_acsl_length_here(l)",0,
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"length(l)",0,
                                   __gen_e_acsl_length_here_2);
     __gen_e_acsl_assert_data.blocking = 1;
     __gen_e_acsl_assert_data.kind = "Assertion";
