@@ -39,45 +39,49 @@ module Id_predicate =
       let mem_project = Datatype.never_any_project
     end)
 
-(* Memoization module which retrieves the preprocessed form of predicates *)
-module Memo: sig
-  val memo_pred: (predicate -> predicate option) -> predicate -> unit
-  val get_pred: predicate -> predicate
-  val memo_term : (term -> term option) -> term -> unit
-  val get_term : term -> term
-  val clear: unit -> unit
-end = struct
-
-  let tbl_term = Misc.Id_term.Hashtbl.create 97
-  let tbl_pred = Id_predicate.Hashtbl.create 97
-
-  let get_pred p =
-    try Id_predicate.Hashtbl.find tbl_pred p
-    with Not_found -> p
-
-  let memo_pred process p =
-    try ignore (Id_predicate.Hashtbl.find tbl_pred p) with
-    | Not_found ->
-      match process p with
-      | Some pot -> Id_predicate.Hashtbl.add tbl_pred p pot
-      | None -> ()
-
-  let get_term t =
-    try Misc.Id_term.Hashtbl.find tbl_term t
-    with Not_found -> t
-
-  let memo_term process t =
-    try ignore (Misc.Id_term.Hashtbl.find tbl_term t) with
-    | Not_found ->
-      match process t with
-      | Some term -> Misc.Id_term.Hashtbl.add tbl_term t term
-      | None -> ()
+module BiMap (H : Hashtbl.S) = struct
+  let from_tbl = H.create 7
+  let dest_tbl = H.create 7
 
   let clear () =
-    Misc.Id_term.Hashtbl.clear tbl_term;
-    Id_predicate.Hashtbl.clear tbl_pred
+    H.clear from_tbl;
+    H.clear dest_tbl
 
+  let add from dest =
+    H.add from_tbl from dest;
+    H.add dest_tbl dest from
+
+  let dest from = H.find from_tbl from
+  let dest_opt from = H.find_opt from_tbl from
+  let from dest = H.find dest_tbl dest
+  let from_opt dest = H.find_opt dest_tbl dest
+
+  let dest_or_self from = try dest from with Not_found -> from
+  let from_or_self dest = try from dest with Not_found -> dest
 end
+
+(* Memoization modules for retrieving the preprocessed and original form of
+   predicates and terms *)
+module Memo (H : Hashtbl.S) = struct
+  module M = BiMap (H)
+
+  let clear = M.clear
+
+  let normalized x = M.dest_or_self x
+  let normalized_opt x = M.dest_opt x
+  let original x = M.from_or_self x
+  let original_opt x = M.from_opt x
+
+  let memoize process x =
+    try Some (M.dest x) with
+    | Not_found ->
+      match process x with
+      | Some y -> M.add x y; Some y
+      | None -> None
+end
+
+module Predicates = Memo (Id_predicate.Hashtbl)
+module Terms = Memo (Misc.Id_term.Hashtbl)
 
 let preprocess_pred ~loc p =
   match p.pred_content with
@@ -134,12 +138,12 @@ let preprocessor = object
 
   method !vpredicate  p =
     let loc = p.pred_loc in
-    Memo.memo_pred (preprocess_pred ~loc) p;
+    ignore @@ Predicates.memoize (preprocess_pred ~loc) p;
     Cil.DoChildren
 
   method !vterm t =
     let loc = t.term_loc in
-    Memo.memo_term (preprocess_term ~loc) t;
+    ignore @@ Terms.memoize (preprocess_term ~loc) t;
     Cil.DoChildren
 end
 
@@ -152,6 +156,11 @@ let preprocess_annot annot =
 let preprocess_predicate p =
   ignore @@ preprocessor#visit_predicate p
 
-let get_pred = Memo.get_pred
-let get_term = Memo.get_term
-let clear = Memo.clear
+let get_pred = Predicates.normalized
+let get_orig_pred = Predicates.original
+let get_term = Terms.normalized
+let get_orig_term = Terms.original
+
+let clear () =
+  Terms.clear ();
+  Predicates.clear ()

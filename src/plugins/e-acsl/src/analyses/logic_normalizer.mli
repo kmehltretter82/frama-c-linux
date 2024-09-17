@@ -44,8 +44,14 @@ val preprocess_predicate : predicate -> unit
 val get_pred : predicate -> predicate
 (** Retrieve the preprocessed form of a predicate *)
 
+val get_orig_pred : predicate -> predicate
+(** Retrieve the original form of the given predicate *)
+
 val get_term : term -> term
 (** Retrieve the preprocessed form of a term *)
+
+val get_orig_term : term -> term
+(** Retrieve the original form of the given term *)
 
 val clear: unit -> unit
 (** clear the table of normalized predicates *)
