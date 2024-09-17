@@ -1184,21 +1184,6 @@ let prover_task env prover task =
   let prover_config = Why3.Whyconf.get_prover_config config prover in
   let drv = Why3.Driver.load_driver_for_prover (Why3.Whyconf.get_main config)
       env prover_config in
-  let remove_for_prover =
-    if prover.prover_name = "Alt-Ergo"
-    then Filter_axioms.remove_for_altergo
-    else Filter_axioms.remove_for_why3
-  in
-  let trans = Why3.Trans.seq [
-      remove_for_prover;
-      Filter_axioms.trans;
-      Filter_axioms.def_into_axiom
-    ] in
-  let task =
-    if prover.prover_name = "Coq"
-    then task
-    else Why3.Trans.apply trans task
-  in
   drv , prover_config , Why3.Driver.prepare_task drv task
 
 (* -------------------------------------------------------------------------- *)

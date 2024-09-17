@@ -3,7 +3,7 @@
 */
 
 /* run.config_qualif
-   OPT: -wp-simplify-is-cint -wp-prop=-ko,-lack
+   OPT: -wp-simplify-is-cint -wp-prop=-ko,-lack -wp-timeout 3
 */
 
 /** Tests the simplification of (forall x:int. P) into (forall

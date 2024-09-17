@@ -31,26 +31,14 @@ theory Qed
   (** The definitions are in comment because its not useful for coq
       (no if-then-else on formula) and not tested on automatic provers *)
 
-  function eqb (x y : 'a) : bool (*= if x = y then True else False*)
-  axiom eqb : forall x:'a, y:'a. eqb x y = True <-> x = y
+  function eqb (x y : 'a) : bool = if x = y then True else False
+  function neqb (x y : 'a) : bool = if x <> y then True else False
 
-  axiom eqb_false : forall x:'a, y:'a. eqb x y = False <-> x <> y
-  meta "remove_for_" axiom eqb_false
+  function zlt  (x y : int) : bool = if x < y  then True else False
+  function zleq (x y : int) : bool = if x <= y then True else False
 
-  function neqb (x y : 'a) : bool(* = if x <> y then True else False*)
-  axiom neqb : forall x:'a, y:'a. neqb x y = True <-> x <> y
-
-  function zlt  (x y : int) : bool(* = if x < y  then True else False*)
-  function zleq (x y : int) : bool(* = if x <= y then True else False*)
-
-  axiom zlt  : forall x:int, y:int. zlt  x y = True <-> x < y
-  axiom zleq : forall x:int, y:int. zleq x y = True <-> x <= y
-
-  function rlt  (x y : real) : bool(* = if x <. y   then True else False*)
-  function rleq (x y : real) : bool(* = if x <=. y  then True else False*)
-
-  axiom rlt  : forall x:real, y:real. rlt  x y = True <-> x <. y
-  axiom rleq : forall x:real, y:real. rleq x y = True <-> x <=. y
+  function rlt  (x y : real) : bool = if x <. y  then True else False
+  function rleq (x y : real) : bool = if x <=. y then True else False
 
   function real_of_int (x:int) : real = FromInt.from_int x
   meta "inline:no" function real_of_int
@@ -71,5 +59,6 @@ theory Qed
     forall a,b,n:int.
     0 <= a -> 0 <= b -> 0 <= b-a < n ->
     CD.mod a n = CD.mod b n -> a = b
-
+  by b - a = n * (CD.div (b - a) n) + CD.mod (b - a) n
+  so (CD.div b n) - (CD.div a n) = CD.div (b - a) n
 end

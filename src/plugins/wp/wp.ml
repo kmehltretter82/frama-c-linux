@@ -170,7 +170,6 @@ module Filtering = Filtering
 (** {2 Prover Interface} *)
 
 module Why3Provers = Why3Provers
-module Filter_axioms = Filter_axioms
 module Prover = Prover
 module ProverTask = ProverTask
 module ProverWhy3 = ProverWhy3
