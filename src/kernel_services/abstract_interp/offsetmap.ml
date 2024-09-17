@@ -104,7 +104,19 @@ let get_plevel () = !plevel
 
 let debug = false
 
-module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
+
+module type Parameters = sig
+  val approximation_feedback: bool
+end
+
+module Default_Parameters = struct
+  let approximation_feedback = false
+end
+
+module Make
+    (V : Offsetmap_lattice_with_isotropy.S)
+    (Params: Parameters)
+= struct
 
   open Format
 
@@ -1841,8 +1853,6 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
     aux_update mn mx curr_off tree
   ;;
 
-  let imprecise_write_msg = ref "locations to update in array"
-
   exception Update_Result_is_bottom
 
   (* Returns [true] iff [update_aux_tr_offsets] will approximate the set
@@ -1880,19 +1890,19 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
       if number <=~ Integer.of_int plevel || period =~ size then
         update_itvs ~exact ~mn ~mx ~period ~size v curr_off t
       else begin
-        if size <~ period then
+        if size <~ period && Params.approximation_feedback then
           (* We are going to write the locations that are between [size+1] and
              [period] unnecessarily, warn the user *)
           Abstract_interp.feedback_approximation
-            "more than %d(%a) %s. Approximating."
-            plevel pretty_int number !imprecise_write_msg;
+            "more than %d(%a) locations to update in array. Approximating."
+            plevel pretty_int number;
         let abs_max = pred (mx +~ size) in
         let v =
           if Int.is_zero (period %~ size) then v
           else
             let origin = Origin.(current Misalign_write) in
             let v' = V.topify_with_origin origin v in
-            if not (V.equal v v') then
+            if not (V.equal v v') && Params.approximation_feedback then
               Abstract_interp.feedback_approximation
                 "approximating value to write.";
             v'
@@ -2063,7 +2073,7 @@ module Make (V : Offsetmap_lattice_with_isotropy.S) = struct
         | Node (_, _, Empty, _, Empty, _, _, v', _) -> not (V.equal v v')
         | _ -> true (* at least two nodes *)
       in
-      if imprecise then
+      if imprecise && Params.approximation_feedback then
         Abstract_interp.feedback_approximation
           "too many locations to update in array. Approximating.";
       update ~validity ~exact ~offsets ~size v dst
@@ -2216,29 +2226,27 @@ end
 (* --- Intervals                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
+module Boolean_Value = struct
+  include Datatype.Bool
+
+  let bottom = false
+  let join = (||)
+  let is_included b1 b2 = b2 || not b1
+  let merge_neutral_element = bottom
+
+  let pretty_typ _ fmt v = pretty fmt v
+
+  include FullyIsotropic
+end
+
 module Int_Intervals_Map = struct
 
-  include Make(struct
-      include Datatype.Bool
-
-      let bottom = false
-      let join = (||)
-      let is_included b1 b2 = b2 || not b1
-      let merge_neutral_element = bottom
-
-      let pretty_typ _ fmt v = pretty fmt v
-
-      include FullyIsotropic
-    end)
+  include Make (Boolean_Value) (Default_Parameters)
 
   include Make_Narrow(struct
       let top = true
       let narrow = (&&)
     end)
-
-  let () =
-    imprecise_write_msg := "elements to enumerate"
-
 
   (* In this auxiliary module, intervals are pairs [(curr_off, m)] where [m]
      has type [bool Offsetmap.t]. However, in order to avoid boxing,
@@ -2793,12 +2801,14 @@ module Make_bitwise(V: sig
     include Lattice_type.With_Top with type t := t
   end) = struct
 
-  include Make(struct
-      include V
-      include FullyIsotropic
-      let merge_neutral_element = bottom
-      let pretty_typ _ fmt v = pretty fmt v
-    end)
+  module Isotropic_Value = struct
+    include V
+    include FullyIsotropic
+    let merge_neutral_element = bottom
+    let pretty_typ _ fmt v = pretty fmt v
+  end
+
+  include Make (Isotropic_Value) (Default_Parameters)
 
   type intervals = Int_Intervals.intervals
 

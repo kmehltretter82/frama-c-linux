@@ -121,26 +121,6 @@
                       (tmp_2 from from++)
 [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + [0..--],0%32 }}
 [eva] Recording results for duff1
-[kernel:approximation] non_natural.i:23: 
-  more than 200(12501) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:23: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:24: 
-  more than 200(12501) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:24: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:25: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:26: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:27: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:28: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:29: 
-  more than 200(12500) elements to enumerate. Approximating.
-[kernel:approximation] non_natural.i:30: 
-  more than 200(12500) elements to enumerate. Approximating.
 [eva] Done for function duff1
 [eva:alarm] non_natural.i:58: Warning: 
   accessing out of bounds index. assert 0 ≤ o;
@@ -277,40 +257,8 @@
 [eva:final-states] Values at end of function main:
   
 [from] Computing for function duff1
-[kernel:approximation] non_natural.i:23: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:24: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:25: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:26: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:27: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:28: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:29: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:30: 
-  more than 200(12500) dependencies to update. Approximating.
 [from] Done for function duff1
 [from] Computing for function duff2
-[kernel:approximation] non_natural.i:39: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:40: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:41: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:42: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:43: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:44: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:45: 
-  more than 200(12500) dependencies to update. Approximating.
-[kernel:approximation] non_natural.i:46: 
-  more than 200(12500) dependencies to update. Approximating.
 [from] Done for function duff2
 [from] Computing for function main1
 [from] Done for function main1

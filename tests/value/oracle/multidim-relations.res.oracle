@@ -17,12 +17,6 @@
 [kernel:approximation] multidim-relations.c:21: 
   more than 1(175) locations to update in array. Approximating.
 [eva] Recording results for init_array
-[kernel:approximation] multidim-relations.c:19: 
-  more than 1(350) elements to enumerate. Approximating.
-[kernel:approximation] multidim-relations.c:20: 
-  more than 1(350) elements to enumerate. Approximating.
-[kernel:approximation] multidim-relations.c:21: 
-  more than 1(175) elements to enumerate. Approximating.
 [eva] Done for function init_array
 [eva] computing for function set_null <- main.
   Called from multidim-relations.c:36.
@@ -43,8 +37,6 @@
 [eva:alarm] multidim-relations.c:31: Warning: 
   out of bounds read. assert \valid_read(t[index].ptr);
 [eva] Recording results for use_array
-[kernel:approximation] multidim-relations.c:31: 
-  more than 1(350) elements to enumerate. Approximating.
 [eva] Done for function use_array
 [eva] Recording results for main
 [eva] Done for function main
@@ -156,12 +148,6 @@
    [349].ptr ∈ {{ NULL ; &g }}
   index ∈ [0..349]
 [from] Computing for function init_array
-[kernel:approximation] multidim-relations.c:19: 
-  more than 1(350) dependencies to update. Approximating.
-[kernel:approximation] multidim-relations.c:20: 
-  more than 1(350) dependencies to update. Approximating.
-[kernel:approximation] multidim-relations.c:21: 
-  more than 1(175) dependencies to update. Approximating.
 [from] Done for function init_array
 [from] Computing for function set_null
 [from] Done for function set_null

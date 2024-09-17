@@ -811,8 +811,6 @@
   has generated a garbled mix of addresses
   for assigns clause __fc_stdout->__fc_FILE_data.
 [eva] Done for function printf_va_1
-[kernel:approximation] linked_list.c:51: 
-  more than 100(128) elements to enumerate. Approximating.
 [eva] linked_list.c:50: starting to merge loop iterations
 [eva:alarm] linked_list.c:51: Warning: 
   out of bounds read. assert \valid_read(&curr->val);
@@ -820,8 +818,6 @@
   Called from linked_list.c:51.
 [eva] Done for function printf_va_1
 [eva] Recording results for main
-[kernel:approximation] linked_list.c:44: 
-  more than 100(128) elements to enumerate. Approximating.
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function malloc:
@@ -843,10 +839,6 @@
 [from] Computing for function malloc
 [from] Done for function malloc
 [from] Computing for function main
-[kernel:approximation] linked_list.c:43: 
-  more than 100(128) dependencies to update. Approximating.
-[kernel:approximation] linked_list.c:44: 
-  more than 100(128) dependencies to update. Approximating.
 [from] Computing for function printf_va_1 <-main
 [from] Done for function printf_va_1
 [from] Done for function main

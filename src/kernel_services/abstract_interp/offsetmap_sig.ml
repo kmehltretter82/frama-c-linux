@@ -284,10 +284,6 @@ module type S = sig
 
   (** {2 Misc} *)
 
-  val imprecise_write_msg: string ref
-  (** The message "more than N <imprecise_msg_write>. Approximating." is displayed
-      when the offsetmap must update too many locations in one operation. *)
-
   (** Clear the caches local to this module. Beware that they are not
       project-aware, and that you must call them at every project switch. *)
   val clear_caches: unit -> unit

@@ -229,15 +229,7 @@
 [eva:alarm] imprecise.c:116: Warning: assertion got status unknown.
 [eva] Recording results for many_writes
 [from] Computing for function many_writes
-[kernel:approximation] imprecise.c:111: 
-  more than 200(300) dependencies to update. Approximating.
-[kernel:approximation] imprecise.c:114: 
-  more than 200(300) dependencies to update. Approximating.
 [from] Done for function many_writes
-[kernel:approximation] imprecise.c:111: 
-  more than 200(300) elements to enumerate. Approximating.
-[kernel:approximation] imprecise.c:114: 
-  more than 200(300) elements to enumerate. Approximating.
 [eva] Done for function many_writes
 [eva] computing for function overlap <- main.
   Called from imprecise.c:151.

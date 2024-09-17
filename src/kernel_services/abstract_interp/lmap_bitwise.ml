@@ -85,8 +85,6 @@ module type Location_map_bitwise = sig
 
   val shape: map -> LOffset.t Hptmap.Shape(Base.Base).t
 
-  val imprecise_write_msg: string ref
-
   val clear_caches: unit -> unit
 end
 
@@ -172,8 +170,6 @@ struct
   ;;
 
   type map = LBase.t
-
-  let imprecise_write_msg = LOffset.imprecise_write_msg
 
   let find_or_default b m =
     try LBase.find b m

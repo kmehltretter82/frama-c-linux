@@ -131,10 +131,6 @@
   r : # cvalue: [--..--]
       # multidim: { .f = [-3.40282346639e+38 .. 3.40282346639e+38], .i = T }
 [eva] Recording results for main3
-[kernel:approximation] multidim.c:66: 
-  more than 1(28) elements to enumerate. Approximating.
-[kernel:approximation] multidim.c:67: 
-  more than 1(28) elements to enumerate. Approximating.
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
   Called from multidim.c:190.
@@ -202,10 +198,6 @@
 [eva] multidim.c:150: Frama_C_show_each_INT: {42}
 [eva] multidim.c:153: Frama_C_show_each_FLOAT: {42.}
 [eva] Recording results for main7
-[kernel:approximation] multidim.c:136: 
-  more than 1(1000) elements to enumerate. Approximating.
-[kernel:approximation] multidim.c:137: 
-  more than 1(1000) elements to enumerate. Approximating.
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
   Called from multidim.c:194.
@@ -229,8 +221,6 @@
 [eva] Done for function main9
 [eva] Recording results for main
 [eva] Done for function main
-[kernel:approximation] multidim.c:50: 
-  more than 1(28) elements to enumerate. Approximating.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   z[0..3] ∈ [--..--]
@@ -274,10 +264,6 @@
 [from] Computing for function main2
 [from] Done for function main2
 [from] Computing for function main3
-[kernel:approximation] multidim.c:66: 
-  more than 1(28) dependencies to update. Approximating.
-[kernel:approximation] multidim.c:67: 
-  more than 1(28) dependencies to update. Approximating.
 [from] Computing for function Frama_C_interval <-main3
 [from] Done for function Frama_C_interval
 [from] Done for function main3
@@ -288,14 +274,6 @@
 [from] Computing for function main6
 [from] Done for function main6
 [from] Computing for function main7
-[kernel:approximation] multidim.c:136: 
-  more than 1(1000) dependencies to update. Approximating.
-[kernel:approximation] multidim.c:137: 
-  more than 1(1000) dependencies to update. Approximating.
-[kernel:approximation] multidim.c:140: 
-  more than 1(1000) dependencies to update. Approximating.
-[kernel:approximation] multidim.c:141: 
-  more than 1(1000) dependencies to update. Approximating.
 [from] Done for function main7
 [from] Computing for function main8
 [from] Done for function main8

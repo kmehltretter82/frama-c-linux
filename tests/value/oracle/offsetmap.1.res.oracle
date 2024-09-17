@@ -38,8 +38,6 @@
 [eva:alarm] offsetmap.i:66: Warning: 
   accessing out of bounds index. assert i_0 < 10000000;
 [eva] Recording results for g
-[kernel:approximation] offsetmap.i:68: 
-  more than 200(10000000) elements to enumerate. Approximating.
 [eva] Done for function g
 [eva] computing for function h <- main.
   Called from offsetmap.i:110.
