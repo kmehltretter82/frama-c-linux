@@ -21,26 +21,15 @@
 /* ************************************************************************ */
 
 /**
-  This package allow us to add a side panel inside the elements.
+  This package allows us to add a panel inside positioned elements.
 
-  The main element is SidePanel.
-  This component needs two chidren :
-  ```
-  <SidePANEL>
-    <PanelContent />
-    <A />
-  </SidePanel>
-  ```
-  "A" is the content that needs a sidePanel,
-  the first child is the panel content.
-
-  This package provide some components to creating the side panel content :
+  It provides some components to create the panel content:
   * ListElement
   * Text
   * Actions
 
   @packageDocumentation
-  @module dome/frame/sidePanel
+  @module dome/frame/Panel
  */
 
 import { Label } from 'dome/controls/labels';
@@ -49,40 +38,34 @@ import { classes } from 'dome/misc/utils';
 
 
 /* --------------------------------------------------------------------------*/
-/* --- SidePanel Container                                                   */
+/* --- Panel Container                                                       */
 /* --------------------------------------------------------------------------*/
-interface SidePanelProps {
+interface PanelProps {
   className?: string;
   show?: boolean;
   position?: 'left' | 'right'
-  children: [JSX.Element, JSX.Element];
+  children: JSX.Element[];
 }
 
-export const SidePanel = (props: SidePanelProps): JSX.Element => {
+export const Panel = (props: PanelProps): JSX.Element => {
   const { show = true, className, position } = props;
-  const classContainer = 'dome-sidepanel-container';
 
   const classNames = classes(
-    classContainer,
-    position === 'left' ? classContainer+'-left' : classContainer+'-right',
+    'dome-xPanel',
+    position === 'left' ? 'dome-xPanel-left' : 'dome-xPanel-right',
+    show ? 'dome-xPanel-open' : 'dome-xPanel-close',
     className,
   );
-  const [A, panelContent] = props.children;
 
   return (
-    <div className='dome-sidepanel'>
-      { show &&
-        <div className={classNames}>
-          {panelContent}
-        </div>
-      }
-      {A}
+    <div className={classNames}>
+      {props.children}
     </div>
   );
 };
 
 /* --------------------------------------------------------------------------*/
-/* --- SidePanel List                                                        */
+/* --- Panel List                                                            */
 /* --------------------------------------------------------------------------*/
 export interface ElementProps {
   label: string;
@@ -94,17 +77,17 @@ const Element = (props: ElementProps): JSX.Element => {
   const { label, onClickName,  content } = props;
 
   const nameClasse = classes(
-    'dome-sidepanel-element-name',
+    'dome-xPanel-element-name',
     onClickName && "action"
   );
 
   return (
-    <div className='dome-sidepanel-element'>
+    <div className='dome-xPanel-element'>
       <div
         className={nameClasse}
         onClick={() => { if(onClickName) onClickName(); }}
       >{label}</div>
-      <div className='dome-sidepanel-element-content'>
+      <div className='dome-xPanel-element-content'>
         {content}
       </div>
     </div>
@@ -117,7 +100,7 @@ interface ListElementProps {
 
 export function ListElement(props: ListElementProps): JSX.Element {
   return (
-    <div className='dome-sidepanel-list'>
+    <div className='dome-xPanel-list'>
       { props.list.map((elt, k) => <Element
           key={k}
           {...elt}
@@ -128,7 +111,7 @@ export function ListElement(props: ListElementProps): JSX.Element {
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- SidePanel Text                                                        */
+/* --- Panel Text                                                            */
 /* --------------------------------------------------------------------------*/
 interface TextProps {
   label: string;
@@ -137,7 +120,7 @@ interface TextProps {
 
 export function Text(props: TextProps): JSX.Element {
   return (
-    <div className='dome-sidepanel-text'>
+    <div className='dome-xPanel-text'>
       <Label>
         {props.label}
       </Label>
@@ -147,7 +130,7 @@ export function Text(props: TextProps): JSX.Element {
 }
 
 /* --------------------------------------------------------------------------*/
-/* --- SidePanel Button                                                      */
+/* ---Panel Button                                                           */
 /* --------------------------------------------------------------------------*/
 interface ActionsProps {
   children: React.ReactNode;
@@ -155,7 +138,7 @@ interface ActionsProps {
 
 export function Actions(props: ActionsProps): JSX.Element {
   return (
-    <div className='dome-sidepanel-actions'>
+    <div className='dome-xPanel-actions'>
       {props.children}
     </div>
   );
