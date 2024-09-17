@@ -39,69 +39,85 @@ module R : Qed.Collection.S with type t = region =
 
 
 type map = Code.domain
+
+
+
+(* API GETTERS *)
 let get_map (f:kernel_function) : map = Code.domain f
+
+
+
+let get_id _map region = Memory.id region.Memory.node
+let get_region _map id = Memory.forge id
+
+
 
 (** @raise Not_found *)
 let cvar (map:map) (var:varinfo) : region =
   Memory.region map.map (Memory.lval map.map ((Var var), NoOffset))
 
+(** @raise Not_found *)
 let field (map:map) (region:region) (field:fieldinfo) : region =
   Memory.region map.map (Memory.offset map.map region.node (Field (field, NoOffset)))
 
-let index (_:map) (_:region) (_:typ) : region = (* TODO *) raise Not_found
+(** @raise Not_found *)
+let shift (_:map) region (_:typ) : region = (* TODO *) region
 
-(*
-let region_of_ptr_term (map:map) (ptr:term) : region =
-  match ptr.term_node with
-  (* same constructs as exp *)
-  | TConst _ | TLval _| TSizeOf _| TSizeOfE _ | TSizeOfStr _ | TAlignOf _
-  | TAlignOfE _ | TUnOp _ | TBinOp _ | TCast _ ->
-    begin match Memory.exp map.map @@ Logic_to_c.term_to_exp ptr with
-      | None -> raise Not_found
-      | Some node -> Memory.region map.map node
-    end
-  | TAddrOf term_lval ->
-    Memory.region map.map @@ Memory.lval map.map @@ Logic_to_c.term_lval_to_lval term_lval
-  | TStartOf term_lval ->
-    Memory.region map.map @@ Memory.lval map.map @@ Logic_to_c.term_lval_to_lval term_lval
-  (* additional constructs *)
-  | Tapp _            -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tapp")
-  | Tlambda _         -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tlambda")
-  | TDataCons _       -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: TDataCons")
-  | Tif _             -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tif")
-  | Tat _             -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tat")
-  (* logic_label * term  *)
-  | Tbase_addr _      -> (* TODO *) raise Not_found
-  | Toffset _         -> (* TODO *) raise Not_found
-  | Tblock_length _   -> (* TODO *) raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tblock_length")
-  | Tnull             -> (* TODO *) raise Not_found
-  | TUpdate _         -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: TUpdate")
-  | Ttypeof _         -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Ttypeof")
-  | Ttype _           -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Ttype")
-  | Tempty_set        -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tempty_set")
-  | Tunion _          -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tunion")
-  | Tinter _          -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tinter")
-  | Tcomprehension _  -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tcomprehension")
-  | Trange _          -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Trange")
-  | Tlet _            -> raise (Invalid_argument "Region:Region.ml:region_of_ptr_term: Tlet")
-*)
 
+let base_addr _map region = (* TODO *) region
+
+
+
+(* API POINTERS *)
 let points_to (map:map) (region:region) : region option =
   Option.map (Memory.region map.map) @@ Memory.cpointed map.map region.Memory.node
 
-let pointed_by (map:map) (region:region) : region list =
-  List.map (Memory.region map.map) @@ Memory.cpointed_by map.map region.Memory.node
 
 
+(* COMPARATOR *)
+let equal map r1 r2 = get_id map r1 == get_id map r2
+
+
+module Reachable = struct
+
+  module Imap = Map.Make(Int)
+  module Q = Queue
+  let is_reachable map source target =
+    let rec aux visited siblings_to_visit parents_to_visit =
+      if Queue.is_empty siblings_to_visit then aux visited parents_to_visit (Q.create())
+      else
+        let region = Queue.pop siblings_to_visit in
+        if Imap.mem (get_id map region) visited then aux visited siblings_to_visit parents_to_visit
+        else
+          equal map region target ||
+          let _ = List.iter (fun node -> Q.push (Memory.region map node) parents_to_visit) region.Memory.parents in
+          aux (Imap.add (get_id map region) region visited) siblings_to_visit parents_to_visit
+    in let source_queue = Q.create() in
+    let _ = Q.push source source_queue in
+    aux Imap.empty source_queue (Q.create())
+
+end
+
+let included map r1 r2 : bool = Reachable.is_reachable map r1 r2
+
+
+let separated map r1 r2 =
+  not (included map r1 r2) && not (included map r2 r1)
+
+
+
+(* API ITERATOR *)
 let iter (map:map) (f:region -> unit) : unit =
   Memory.iter map.map f
 
 
+(* API PRINTER *)
 let pp_region fmt region : unit = Memory.pp_region fmt region
 
 
 
 
+(* API ACCESS *)
 type acs = {
   acs_read  : typ list;
   acs_write : typ list;

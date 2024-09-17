@@ -34,14 +34,25 @@ type map
 (* API GETTERS *)
 val get_map : kernel_function -> map
 
+val get_id : map -> region -> int
+val get_region : map -> int -> region
+
 val cvar : map -> varinfo -> region
 val field : map -> region -> fieldinfo -> region
-val index : map -> region -> typ -> region
+val shift : map -> region -> typ -> region
+
+val base_addr : map -> region -> region
 
 
 (* API POINTERS *)
 val points_to : map -> region -> region option
 val pointed_by : map -> region -> region list
+
+
+(* COMPARATOR *)
+val separated : map -> region -> region -> bool
+val included : map -> region -> region -> bool
+val equal : map -> region -> region -> bool
 
 (* API ITERATOR *)
 val iter : map -> (region -> unit) -> unit
