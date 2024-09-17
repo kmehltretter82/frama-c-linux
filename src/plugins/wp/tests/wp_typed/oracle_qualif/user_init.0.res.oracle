@@ -1,4 +1,4 @@
-# frama-c -wp [...]
+# frama-c -wp -wp-timeout 4 [...]
 [kernel] Parsing user_init.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal init_exits (Cfg) (Unreachable)
