@@ -82,8 +82,8 @@ struct
     | Val e -> p_equal e e_zero
     | Loc l -> M.is_null l
 
-  let is_zero_float = function
-    | Val e -> p_equal e e_zero_real
+  let is_zero_float ft = function
+    | Val e -> p_equal e @@ Cfloat.float_of_real ft e_zero_real
     | Loc l -> M.is_null l
 
   let is_zero_ptr v = M.is_null (cloc v)
@@ -91,7 +91,7 @@ struct
   let rec is_zero sigma obj l =
     match obj with
     | C_int _ -> is_zero_int (M.load sigma obj l)
-    | C_float _ -> is_zero_float (M.load sigma obj l)
+    | C_float ft -> is_zero_float ft (M.load sigma obj l)
     | C_pointer _ -> is_zero_ptr (M.load sigma obj l)
     | C_comp { cfields = None } ->
       p_true (* cannot say anything interesting here *)
