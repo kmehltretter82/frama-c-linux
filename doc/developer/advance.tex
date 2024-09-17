@@ -3910,11 +3910,15 @@ different flavors, determined by the \scodeidx{Cil\_types}{ext\_code\_annot\_con
 An extension is characterized by its introducing keyword \texttt{kw}, or
 \texttt{loop kw} for a loop extension. Having the same keyword for two distinct
 extensions is not possible, especially if they belong to different categories,
-as this would lead to ambiguities in the parser. It is advised to prefix the
+as this would lead to ambiguities in the parser.
+
+Moreover, when writing extended ACSL annotations, it is advised to prefix the
 keyword with the plug-in that registers it, for example
 \lstinline{\wp::strategy}. By doing this, one ensures that when the plug-in that
 registers the extension is not available, the extension will be ignored (with a
-warning) and the parsing will continue.
+warning) and the parsing will continue. Note however that the plug-in name is
+\emph{not} part of the extension name, so that two different plug-ins cannot
+register an extension with the same keyword.
 
 Once an extension is registered with keyword \lstinline|kw|,
 a clause of the form \verb|kw e1,...,en;|,
