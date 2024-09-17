@@ -100,22 +100,6 @@ let replace cmp x l =
     | y::l -> if cmp x y then x::l else y :: aux l
   in aux l
 
-let rec fold_map f acc = function
-  | [] -> acc, []
-  | x::tl ->
-    let (acc,x) = f acc x in
-    let (acc,tl) = fold_map f acc tl in
-    (acc,x::tl)
-
-let rec fold_map_opt f acc = function
-  | [] -> acc, []
-  | x::tl ->
-    match f acc x with
-    | acc, None -> fold_map_opt f acc tl
-    | acc, Some x ->
-      let (acc,tl) = fold_map_opt f acc tl in
-      (acc,x::tl)
-
 let product_fold f acc e1 e2 =
   List.fold_left
     (fun acc e1 -> List.fold_left (fun acc e2 -> f acc e1 e2) acc e2)
