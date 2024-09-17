@@ -483,7 +483,7 @@ releases:
     - name: Source distribution
       link: /download/$TARGZ_VERSION
       help: Compilation instructions
-      help_link: /html/installations/$LOWER_CODENAME.html
+      help_link: https://git.frama-c.com/pub/frama-c/-/blob/$TAG/INSTALL.md
     - name: User manual
       link: /download/user-manual-$VERSION_AND_CODENAME.pdf
     - name: Plug-in development guide
