@@ -343,8 +343,8 @@ build-ivette-macos-packages:
     - opam switch create --empty .
     - eval $(opam env --switch=. --set-switch)
     - opam pin . -n -k path
-    - opam install headache
-    - opam install --jobs 2 --deps-only .
+    - opam install headache -y
+    - opam install --jobs 2 --deps-only . -y
     # Build Frama-C API
     - dune build -j2 @install
     - make -C ivette api
