@@ -416,7 +416,7 @@ extern long int jrand48 (unsigned short xsubi[3]);
   complete behaviors;
   disjoint behaviors; */
 extern void *calloc(size_t nmemb, size_t size);
- 
+
 /*@ allocates \result;
   @ assigns __fc_heap_status \from size, __fc_heap_status;
   @ assigns \result \from indirect:size, indirect:__fc_heap_status;
@@ -561,6 +561,16 @@ extern char *__fc_env[ARG_MAX];
     \result == \null || (\valid(\result) && valid_read_string(\result));
  */
 extern char *getenv(const char *name);
+
+// Non-POSIX, GNU extension
+/*@
+  requires valid_name: valid_read_string(name);
+  assigns \result \from __fc_env[0..], indirect:name,
+                        indirect:name[0 .. strlen(name)];
+  ensures null_or_valid_result:
+    \result == \null || (\valid(\result) && valid_read_string(\result));
+ */
+extern char *secure_getenv(const char *name);
 
 /*@
   requires valid_string: valid_read_string(string);
