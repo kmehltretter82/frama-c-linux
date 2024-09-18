@@ -39,15 +39,20 @@ module P = Plugin.Register
 include (P: Plugin.S_no_log)
 include Cmdline.Kernel_log
 
-let dkey_alpha = register_category "alpha"
+let dkey_alpha =
+  register_category ~help:"alpha conversion module (parsing)" "alpha"
 
-let dkey_alpha_undo = register_category "alpha:undo"
+let dkey_alpha_undo =
+  register_category ~help:"undoing alpha conversion (parsing)" "alpha:undo"
 
-let dkey_asm_contracts = register_category "asm:contracts"
+let dkey_asm_contracts =
+  register_category ~help:"inline assembly contracts" "asm:contracts"
 
-let dkey_ast = register_category "ast"
+let dkey_ast =
+  register_category ~help:"prints the AST juste after Ast.compute" "ast"
 
-let dkey_builtins = register_category "builtins"
+let dkey_builtins =
+  register_category ~help:"Cil builtins" "builtins"
 
 let dkey_check = register_category "check"
 
