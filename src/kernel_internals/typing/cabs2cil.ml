@@ -1425,7 +1425,7 @@ let rec isConstTrueFalse c: [ `CTrue | `CFalse ] =
   | CReal(f, _, _) ->
     if f = 0.0 then `CFalse else `CTrue
   | CEnum {eival = e} ->
-    match isExpTrueFalse e with
+    match isExpTrueFalse (Cil.constFold true e) with
     | `CTrue | `CFalse as r -> r
     | `CUnknown -> Kernel.fatal ~current:true "Non-constant enum"
 (* Evaluate expressions to `CTrue, `CFalse or `CUnknown *)
