@@ -32,34 +32,44 @@
   @module dome/frame/Panel
  */
 
-import { Label } from 'dome/controls/labels';
 import React from 'react';
 import { classes } from 'dome/misc/utils';
+import { Hbox } from 'dome/layout/boxes';
 
 
 /* --------------------------------------------------------------------------*/
 /* --- Panel Container                                                       */
 /* --------------------------------------------------------------------------*/
+export type PanelPosition = 'top' | 'bottom' | 'left' | 'right';
+
 interface PanelProps {
+  /** Additional class. */
   className?: string;
-  show?: boolean;
-  position?: 'left' | 'right'
+  /** Position to displayed the panel. Default 'tr' */
+  position?: PanelPosition;
+  /** Defaults to `true`. */
+  visible?: boolean;
+  /** Defaults to `true`. */
+  display?: boolean;
+  /** Panel children. */
   children: JSX.Element[];
 }
 
 export const Panel = (props: PanelProps): JSX.Element => {
-  const { show = true, className, position } = props;
+  const { visible = true, display = true,
+    className, position = 'right' } = props;
 
   const classNames = classes(
     'dome-xPanel',
-    position === 'left' ? 'dome-xPanel-left' : 'dome-xPanel-right',
-    show ? 'dome-xPanel-open' : 'dome-xPanel-close',
+    'dome-xPanel-'+position,
+    visible ? 'dome-xPanel-open' : 'dome-xPanel-close',
+    !display && 'dome-control-erased',
     className,
   );
 
   return (
     <div className={classNames}>
-      {props.children}
+      {props.children.map((elt, k) => <Hbox key={k}>{elt}</Hbox>)}
     </div>
   );
 };
@@ -68,77 +78,38 @@ export const Panel = (props: PanelProps): JSX.Element => {
 /* --- Panel List                                                            */
 /* --------------------------------------------------------------------------*/
 export interface ElementProps {
-  label: string;
-  onClickName?: () => void;
-  content: JSX.Element;
+  /** Selection state. */
+  selected?: boolean;
+  /** Selection callback. */
+  onSelection?: () => void;
+  /** Item element. */
+  children?: JSX.Element;
 }
 
-const Element = (props: ElementProps): JSX.Element => {
-  const { label, onClickName,  content } = props;
+export function Element(props: ElementProps): JSX.Element {
+  const { selected = true, onSelection, children } = props;
 
-  const nameClasse = classes(
-    'dome-xPanel-element-name',
-    onClickName && "action"
+  const classNames = classes(
+    'dome-xPanel-element',
+    selected ? 'dome-active' : 'dome-inactive',
   );
-
   return (
-    <div className='dome-xPanel-element'>
-      <div
-        className={nameClasse}
-        onClick={() => { if(onClickName) onClickName(); }}
-      >{label}</div>
-      <div className='dome-xPanel-element-content'>
-        {content}
-      </div>
+    <div
+      className={classNames}
+      onClick={onSelection}
+    >
+      {children}
     </div>
   );
-};
+}
 
 interface ListElementProps {
-  list: ElementProps[];
+  children: JSX.Element[];
 }
 
 export function ListElement(props: ListElementProps): JSX.Element {
   return (
     <div className='dome-xPanel-list'>
-      { props.list.map((elt, k) => <Element
-          key={k}
-          {...elt}
-        />)
-      }
-    </div>
-  );
-}
-
-/* --------------------------------------------------------------------------*/
-/* --- Panel Text                                                            */
-/* --------------------------------------------------------------------------*/
-interface TextProps {
-  label: string;
-  content?: string | JSX.Element;
-}
-
-export function Text(props: TextProps): JSX.Element {
-  return (
-    <div className='dome-xPanel-text'>
-      <Label>
-        {props.label}
-      </Label>
-      {props.content}
-    </div>
-  );
-}
-
-/* --------------------------------------------------------------------------*/
-/* ---Panel Button                                                           */
-/* --------------------------------------------------------------------------*/
-interface ActionsProps {
-  children: React.ReactNode;
-}
-
-export function Actions(props: ActionsProps): JSX.Element {
-  return (
-    <div className='dome-xPanel-actions'>
       {props.children}
     </div>
   );
