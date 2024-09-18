@@ -824,6 +824,19 @@ extern int posix_memalign(void **memptr, size_t alignment, size_t size);
 extern int mkstemp(char *templat);
 
 /*@
+  // missing: requires 'last 6 characters of template must be XXXXXX'
+  // missing: assigns \result, templat[0..] \from 'filesystem', 'RNG';
+  // missing: flags == O_APPEND || O_CLOEXEC || O_SYNC
+  requires valid_template: valid_string(templat);
+  requires template_len: strlen(templat) >= 6;
+  assigns templat[0..] \from \nothing;
+  assigns \result \from \nothing;
+  ensures result_error_or_valid_fd: \result == -1 ||
+                                    0 <= \result < __FC_FOPEN_MAX;
+ */
+extern int mkostemp(char *templat, int flags);
+
+/*@
   // missing: requires 'last (6+suffixlen) characters of template must be X's'
   // missing: assigns \result, templat[0..] \from 'filesystem', 'RNG';
   requires valid_template: valid_string(templat);
@@ -835,6 +848,20 @@ extern int mkstemp(char *templat);
                                     0 <= \result < __FC_FOPEN_MAX;
  */
 extern int mkstemps(char *templat, int suffixlen);
+
+/*@
+  // missing: requires 'last (6+suffixlen) characters of template must be X's'
+  // missing: assigns \result, templat[0..] \from 'filesystem', 'RNG';
+  // missing: flags == O_APPEND || O_CLOEXEC || O_SYNC
+  requires valid_template: valid_string(templat);
+  requires template_len: strlen(templat) >= 6 + suffixlen;
+  requires non_negative_suffixlen: suffixlen >= 0;
+  assigns templat[0..] \from \nothing;
+  assigns \result \from \nothing;
+  ensures result_error_or_valid_fd: \result == -1 ||
+                                    0 <= \result < __FC_FOPEN_MAX;
+ */
+extern int mkostemps(char *templat, int suffixlen, int flags);
 
 // 'realpath' may allocate memory for the result, which is not supported by
 // some plugins such as Eva. In such cases, it is preferable to use the stub
