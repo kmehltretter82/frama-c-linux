@@ -23,6 +23,7 @@ alignof_double: 2
 alignof_longdouble: 2
 alignof_str: 0
 alignof_fun: 0
+max_align_t: long long
 char_is_unsigned: true
 little_endian: true
 size_t: 'unsigned int'

@@ -66,6 +66,12 @@ alignof_str:
 
   type: integer
 
+max_align_t:
+
+  description: definition of 'max_align_t' (in stddef.h)
+
+  type: string
+
 bufsiz:
 
   description: value of 'BUFSIZ' macro

@@ -56,6 +56,7 @@ type mach = {
   wint_t: string;         (** Type of "wint_t" *)
   sig_atomic_t: string;   (** Type of "sig_atomic_t" *)
   time_t: string;         (** Type of "time_t" *)
+  max_align_t: string;    (** Type of "max_align_t" *)
   alignof_short: int;     (** [_AlignOf(short)] *)
   alignof_int: int;       (** [_AlignOf(int)] *)
   alignof_long: int;      (** [_AlignOf(long)] *)

@@ -20,30 +20,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_STDDEF
-#define __FC_STDDEF
-#include "features.h"
-__PUSH_FC_STDLIB
-#include "__fc_machdep.h"
-__BEGIN_DECLS
-#ifndef __ptrdiff_t_defined
-typedef __PTRDIFF_T ptrdiff_t;
-#define __ptrdiff_t_defined
-#endif
+#include "make_machdep_common.h"
+#include <stddef.h>
 
-// max_align_t is not defined in every machdeps
-#ifdef __MAX_ALIGN_T
-#ifndef __max_align_t_defined
-typedef __MAX_ALIGN_T max_align_t;
-#define __max_align_t_defined
-#endif
-#endif
-__END_DECLS
-#include "__fc_define_size_t.h"
-#include "__fc_define_ssize_t.h"
-#include "__fc_define_wchar_t.h"
-#include "__fc_define_null.h"
-#define offsetof(type, member) __builtin_offsetof(type,member)
+#define TEST_MAX_ALIGN_T_IS(type) \
+    _Static_assert(ALIGNOF(max_align_t) != ALIGNOF(type), \
+                   "max_align_t is `"#type"`");
 
-__POP_FC_STDLIB
-#endif
+TEST_MAX_ALIGN_T_IS(char)
+TEST_MAX_ALIGN_T_IS(short)
+TEST_MAX_ALIGN_T_IS(int)
+TEST_MAX_ALIGN_T_IS(long)
+TEST_MAX_ALIGN_T_IS(long long)
+TEST_MAX_ALIGN_T_IS(double)
+TEST_MAX_ALIGN_T_IS(long double)
+TEST_MAX_ALIGN_T_IS(struct {int __max_align; } __attribute__ ((aligned (8))))
+TEST_MAX_ALIGN_T_IS(struct {int __max_align; } __attribute__ ((aligned (16))))

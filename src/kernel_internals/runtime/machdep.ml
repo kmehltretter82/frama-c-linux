@@ -62,6 +62,7 @@ type mach = {
   wint_t: string;
   sig_atomic_t: string;
   time_t: string;
+  max_align_t: string;
   alignof_short: int;
   alignof_int: int;
   alignof_long: int;
@@ -127,6 +128,7 @@ let dummy = {
   wint_t = "int";
   sig_atomic_t = "int";
   time_t = "long";
+  max_align_t = "long";
   alignof_short = 2;
   alignof_int = 4;
   alignof_long = 8;
@@ -187,17 +189,17 @@ module Machdep = struct
     fprintf fmt
       "{sizeof_short=%d;sizeof_int=%d;sizeof_long=%d;sizeof_longlong=%d;\
        sizeof_ptr=%d;sizeof_float=%d;sizeof_double=%d;sizeof_longdouble=%d;\
-       sizeof_void=%d;sizeof_fun=%d;size_t=%s;ssize_t=%s;wchar_t=%s;
+       sizeof_void=%d;sizeof_fun=%d;size_t=%s;ssize_t=%s;wchar_t=%s;\
        ptrdiff_t=%s;intptr_t=%s;uintptr_t=%s;\
        int_fast8_t=%s;int_fast16_t=%s;int_fast32_t=%s;int_fast64_t=%s;\
        uint_fast8_t=%s;uint_fast16_t=%s;uint_fast32_t=%s;uint_fast64_t=%s;\
-       wint_t=%s;sig_atomic_t=%s;time_t=%s;\
+       wint_t=%s;sig_atomic_t=%s;time_t=%s;max_align_t=%s;\
        alignof_short=%d;alignof_int=%d;alignof_long=%d;alignof_longlong=%d;\
        alignof_ptr=%d;alignof_float=%d;alignof_double=%d;alignof_longdouble=%d;\
        alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;\
-       char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;
-       compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;
-       posix_version=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;
+       char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
+       compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
+       posix_version=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
        path_max=%s;tty_name_max=%s;host_name_max=%s;l_tmpnam=%s;tmp_max=%s;\
        rand_max=%s;mb_cur_max=%s;nsig=%s;errno=%a;machdep_name=%s;custom_defs=%a}"
       mach.sizeof_short
@@ -227,6 +229,7 @@ module Machdep = struct
       mach.wint_t
       mach.sig_atomic_t
       mach.time_t
+      mach.max_align_t
       mach.alignof_short
       mach.alignof_int
       mach.alignof_long
@@ -558,7 +561,6 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   gen_sizeof_std fmt mach;
   gen_char_bit fmt mach;
   gen_precise_size_type fmt mach;
-  gen_define_string fmt "__PTRDIFF_T" mach.ptrdiff_t;
   gen_define_string fmt "__SIZE_T" mach.size_t;
   gen_define_string fmt "__WCHAR_T" mach.wchar_t;
   gen_define_string fmt "__INTPTR_T" mach.intptr_t;
@@ -566,6 +568,8 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   gen_define_string fmt "__PTRDIFF_T" mach.ptrdiff_t;
   gen_define_string fmt "__WINT_T" mach.wint_t;
   gen_define_string fmt "__SSIZE_T" mach.ssize_t;
+  if String.length mach.max_align_t > 0 then
+    gen_define_string fmt "__MAX_ALIGN_T" mach.max_align_t;
   gen_intlike_max fmt "__FC_SIZE" mach.size_t mach;
   gen_intlike_min fmt "__FC_INTPTR" mach.intptr_t mach;
   gen_intlike_max fmt "__FC_INTPTR" mach.intptr_t mach;
