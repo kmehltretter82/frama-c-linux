@@ -11,8 +11,8 @@
   }
   module foo::bar {
     import Foo \as X;
-    logic t inv(X::t x);
-    logic t opN(t x, integer n) = n >= 0 ? X::opN(x,n) : opN(inv(x),-n);
+    logic X::t inv(X::t x);
+    logic X::t opN(X::t x, integer n) = n >= 0 ? X::opN(x,n) : opN(inv(x),-n);
   }
   import Foo \as A;
   import foo::bar \as B;

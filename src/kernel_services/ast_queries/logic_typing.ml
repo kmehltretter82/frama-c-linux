@@ -715,6 +715,7 @@ struct
   (* Imported Scope *)
 
   type scope = {
+    current: bool; (* accepted for non-qualified names *)
     long_prefix: string; (* last '::' included *)
     short_prefix: string; (* last '::' included *)
   }
@@ -724,15 +725,18 @@ struct
   let current_scope : scope option ref = ref None
   let imported_scopes : scope list ref = ref []
 
-  let current_scopes () =
+  let all_scopes () =
     match !current_scope with
     | None -> !imported_scopes
     | Some s -> s :: !imported_scopes
 
+  let current_scopes () =
+    List.filter (fun s -> s.current) @@ all_scopes ()
+
   let push_imports () =
     let current = !current_scope in
     let imported = !imported_scopes in
-    let all = current_scopes () in
+    let all = all_scopes () in
     Stack.push (current,imported) scopes ;
     imported_scopes := all
 
@@ -759,6 +763,7 @@ struct
           List.hd @@ List.rev @@ Logic_utils.longident name
       in
       let s = {
+        current;
         long_prefix = name ^ "::";
         short_prefix = short ^ "::";
       } in
@@ -771,14 +776,15 @@ struct
   let find_import fn a =
     let find_opt b = try Some (fn b) with Not_found -> None in
     if Logic_utils.is_qualified a then
-      let in_scope s = String.starts_with ~prefix:s.short_prefix a in
-      find_opt @@
-      match List.find_opt in_scope @@ current_scopes () with
-      | None -> a
-      | Some s ->
-        let p = String.length s.short_prefix in
-        let n = String.length a in
-        s.long_prefix ^ String.sub a p (n-p)
+      let resolved_name =
+        let has_short_prefix s = String.starts_with ~prefix:s.short_prefix a in
+        match List.find_opt has_short_prefix @@ all_scopes () with
+        | None -> a
+        | Some s ->
+          let p = String.length s.short_prefix in
+          let n = String.length a in
+          s.long_prefix ^ String.sub a p (n-p)
+      in find_opt resolved_name
     else
       let find_in_scope s = find_opt (s.long_prefix ^ a) in
       match List.find_map find_in_scope @@ current_scopes () with

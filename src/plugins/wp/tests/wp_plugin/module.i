@@ -7,8 +7,8 @@
   }
   module foo::Jazz {
     import foo::Bar \as X;
-    logic t inv(X::t x);
-    logic t opN(t x, integer n) = n >= 0 ? X::opN(x,n) : X::opN(inv(x),-n);
+    logic X::t inv(X::t x);
+    logic X::t opN(X::t x, integer n) = n >= 0 ? X::opN(x,n) : X::opN(inv(x),-n);
   }
   import foo::Bar \as A;
   import foo::Jazz \as B;
