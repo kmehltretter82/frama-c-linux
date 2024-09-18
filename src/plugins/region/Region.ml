@@ -48,7 +48,7 @@ let get_map (f:kernel_function) : map = Code.domain f
 
 
 let get_id _map region = Memory.id region.Memory.node
-let get_region _map id = Memory.forge id
+let get_region map id : region = Memory.region map.Code.map @@ Memory.forge id
 
 
 
@@ -70,9 +70,10 @@ let base_addr _map region = (* TODO *) region
 
 (* API POINTERS *)
 let points_to (map:map) (region:region) : region option =
-  Option.map (Memory.region map.map) @@ Memory.cpointed map.map region.Memory.node
+  Option.map (Memory.region map.Code.map) @@ Memory.cpointed map.map region.Memory.node
 
-let pointed_by map region = Memory.cpointed_by map region
+let pointed_by (map:map) (region:region) : region list =
+  List.map (Memory.region map.Code.map) @@ Memory.cpointed_by map.Code.map region.Memory.node
 
 
 (* COMPARATOR *)
@@ -99,7 +100,7 @@ module Reachable = struct
 
 end
 
-let included map r1 r2 : bool = Reachable.is_reachable map r1 r2
+let included map r1 r2 : bool = Reachable.is_reachable map.Code.map r1 r2
 
 
 let separated map r1 r2 =
