@@ -106,6 +106,7 @@
   let identifier, is_acsl_keyword =
     let all_kw = Hashtbl.create 37 in
     let type_kw = Hashtbl.create 3 in
+    let ext_acsl_kw kw s _ = if !ext_acsl_spec then kw else IDENTIFIER s in
     List.iter
       (fun (i,t) -> Hashtbl.add all_kw i t;)
       [
@@ -114,10 +115,7 @@
         "assert", (fun _ -> ASSERT);
         "assigns", (fun _ -> ASSIGNS);
         "assumes", (fun _ -> ASSUMES);
-        "at",
-        (fun _ ->
-          if !ext_acsl_spec then EXT_SPEC_AT
-          else IDENTIFIER "at");
+        "at", ext_acsl_kw EXT_SPEC_AT "at";
         "axiom", (fun _ -> AXIOM);
         "axiomatic", (fun _ -> AXIOMATIC);
         "behavior", (fun _ -> BEHAVIOR);
@@ -130,7 +128,7 @@
         "complete", (fun _ -> COMPLETE);
         "const", (fun _ -> CONST);
         "continues", (fun _ -> CONTINUES);
-        "contract", (fun _ -> EXT_SPEC_CONTRACT);
+        "contract", ext_acsl_kw EXT_SPEC_CONTRACT "contract";
         "decreases", (fun _ -> DECREASES);
         "disjoint", (fun _ -> DISJOINT);
         "double", (fun _ -> DOUBLE);
@@ -139,19 +137,19 @@
         "enum", (fun _ -> ENUM);
         "exits", (fun _ -> EXITS);
         "frees", (fun _ -> FREES);
-        "function", (fun _ -> EXT_SPEC_FUNCTION);
+        "function", ext_acsl_kw EXT_SPEC_FUNCTION "function";
         "float", (fun _ -> FLOAT);
         "for", (fun _ -> FOR);
         "global", (fun _ -> GLOBAL);
         "if", (fun _ -> IF);
         "import", (fun _ -> IMPORT);
         "inductive", (fun _ -> INDUCTIVE);
-        "include", (fun _ -> EXT_SPEC_INCLUDE);
+        "include", ext_acsl_kw EXT_SPEC_INCLUDE "include";
         "int", (fun _ -> INT);
         "invariant", (fun _ -> INVARIANT);
         "label", (fun _ -> LABEL);
         "lemma", (fun _ -> LEMMA);
-        "let", (fun _ -> EXT_SPEC_LET);
+        "let", ext_acsl_kw EXT_SPEC_LET "let";
         (* ACSL extension for external spec file *)
         "logic", (fun _ -> LOGIC);
         "long", (fun _ -> LONG);
