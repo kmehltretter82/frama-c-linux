@@ -71,6 +71,21 @@ extern int fchmodat(int fd, const char *path, mode_t mode, int flag);
 */
 extern int fchmod(int fildes, mode_t mode);
 
+// Non-POSIX; BSD
+/*@
+  // missing: assigns 'filesystem' \from path, path[0..], mode;
+  requires valid_path: valid_read_string(path);
+  assigns \result, __fc_errno
+          \from indirect:path, indirect:path[0 .. strlen(path)],
+                indirect:mode; //missing: \from 'filesystem'
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EACCES, EINTR, EINVAL, ELOOP,
+                                     ENAMETOOLONG, ENOENT, ENOTDIR, EPERM,
+                                     EROFS};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int lchmod(const char *path, mode_t mode);
+
 /*@
   //TODO: define proper initialization postcondition; it involves only a few
   //      specific fields, and only a few bits within those fields.
