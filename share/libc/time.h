@@ -174,6 +174,14 @@ extern struct tm *gmtime(const time_t *timer);
 extern struct tm *localtime(const time_t *timer);
 
 /*@
+  requires valid_tm: \valid(tm);
+  assigns \result, *tm \from *tm;
+  ensures result_err_or_valid: \result == -1 || \result >= 0;
+  ensures maybe_error: errno == \old(errno) || errno == EOVERFLOW;
+*/
+extern time_t timegm(struct tm *tm);
+
+/*@
   requires dst_has_room: \valid(s+(0 .. max-1));
   requires valid_format: valid_read_string(format);
   requires valid_tm: \valid_read(tm);
