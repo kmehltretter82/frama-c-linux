@@ -888,7 +888,10 @@ struct
   type warn_category = string
 
   let categories = ref Category_trie.empty
+
   let categories_help : ((string, string) Hashtbl.t) = Hashtbl.create 5
+
+  let () = Hashtbl.add categories_help "*" "All categories"
 
   let register_category ?(help="No description provided") (s:string) =
     let l = split_category s in
@@ -949,7 +952,10 @@ struct
     | Some c -> is_debug_key_enabled c
 
   let warn_categories = ref Category_trie.empty
+
   let warn_categories_help : ((string, string) Hashtbl.t) = Hashtbl.create 5
+
+  let () = Hashtbl.add warn_categories_help "*" "All warning categories"
 
   let register_warn_category ?(help="No description provided") s =
     let l = split_category s in
