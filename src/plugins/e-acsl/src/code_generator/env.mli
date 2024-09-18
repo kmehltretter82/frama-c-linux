@@ -66,6 +66,8 @@ val rtl_call_to_new_var:
 *)
 
 module Logic_binding: sig
+  val clear : t -> t
+
   val add: ?ty:typ -> t -> kernel_function -> logic_var -> varinfo * exp * t
   (* Add a new C binding to the list of bindings for the logic variable. *)
 

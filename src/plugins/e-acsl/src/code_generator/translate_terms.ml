@@ -759,7 +759,8 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   | Tapp(li, [], args)
   | Tapp(li, [BuiltinLabel Here], args) ->
     let e, adata, env =
-      Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args in
+      Logic_functions.app_to_exp ~adata ~loc ~tapp:t kf env li args
+    in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, "app"
   | Tapp(_, _ :: _, _) ->
