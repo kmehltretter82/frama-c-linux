@@ -831,9 +831,11 @@ sig
 
   val register_tag_handlers : (string -> string) * (string -> string) -> unit
 
-  val register_category: string -> category
+  val register_category: ?help:string -> string -> category
 
   val pp_category: Format.formatter -> category -> unit
+
+  val pp_all_categories: unit -> unit
 
   val dkey_name: category -> string
 
@@ -848,7 +850,7 @@ sig
 
   val is_debug_key_enabled: category -> bool
 
-  val register_warn_category: string -> warn_category
+  val register_warn_category: ?help:string -> string -> warn_category
 
   val is_warn_category: string -> bool
 
@@ -886,14 +888,20 @@ struct
   type warn_category = string
 
   let categories = ref Category_trie.empty
+  let categories_help : ((string, string) Hashtbl.t) = Hashtbl.create 5
 
-  let register_category (s:string) =
-    let res: category = s in
+  let register_category ?(help="No description provided") (s:string) =
     let l = split_category s in
     categories := Category_trie.add_structure l !categories;
-    res
+    Hashtbl.replace categories_help s help;
+    s
 
   let pp_category fmt (cat: category) = Format.pp_print_string fmt cat
+
+  let get_category_help (cat: category) =
+    match Hashtbl.find_opt categories_help cat with
+    | None -> "Not registered directly (see subcategory descriptions)"
+    | Some help -> help
 
   let get_all_categories () =
     List.map merge_category (Category_trie.suffixes [] !categories)
@@ -941,11 +949,18 @@ struct
     | Some c -> is_debug_key_enabled c
 
   let warn_categories = ref Category_trie.empty
+  let warn_categories_help : ((string, string) Hashtbl.t) = Hashtbl.create 5
 
-  let register_warn_category s =
-    warn_categories :=
-      Category_trie.add_structure (split_category s) !warn_categories;
+  let register_warn_category ?(help="No description provided") s =
+    let l = split_category s in
+    warn_categories := Category_trie.add_structure l !warn_categories;
+    Hashtbl.replace warn_categories_help s help;
     s
+
+  let get_warn_category_help (cat: category) =
+    match Hashtbl.find_opt warn_categories_help cat with
+    | None -> "Not registered directly (see subcategory descriptions)"
+    | Some help -> help
 
   let get_all_warn_categories () =
     List.map merge_category (Category_trie.suffixes [] !warn_categories)
@@ -1258,15 +1273,35 @@ struct
     else
       Pretty_utils.nullprintf text
 
+  let pp_all_categories () =
+    let l = get_all_categories () in
+    let max =
+      List.fold_left (fun m s -> max m (String.length s)) 0 l
+    in
+    let print_one_elt fmt s =
+      Format.fprintf fmt "%-*s : %s" max s (get_category_help s)
+    in
+    (* level 0 just in case user ask to display all categories
+       in an otherwise quiet run *)
+    feedback ~level:0 "@[<v 2>Message categories for %s are:@;%a@]"
+      label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
+
   let pp_all_warn_categories_status () =
     let l = get_all_warn_categories_status () in
-    let max =
-      List.fold_left (fun m (s,_) -> max m (String.length s)) 0 l
+    let (max, max_status), l =
+      (* We need the length of statuses so we convert them to string. *)
+      List.fold_left_map (fun (m, m') (s, status) ->
+          let status = Format.asprintf "%a" pp_warn_status status in
+          let max_s = max m (String.length s) in
+          let max_status = max m' (String.length status) in
+          (max_s, max_status), (s, status)
+        ) (0,0) l
     in
-    let print_one_elt fmt (cat, status) =
-      Format.fprintf fmt "%-*s : %a" max cat pp_warn_status status
+    let print_one_elt fmt (s, status) =
+      Format.fprintf fmt "%-*s : %-*s : %s" max s max_status status
+        (get_warn_category_help s)
     in
-    feedback "@[<v 2>Warning categories for %s are@;%a@]"
+    feedback ~level:0 "@[<v 2>Warning categories for %s are@;%a@]"
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end

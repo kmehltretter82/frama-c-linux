@@ -278,7 +278,7 @@ module type Messages = sig
 
   (** {3 Category management} *)
 
-  val register_category: string -> category
+  val register_category: ?help:string -> string -> category
   (** register a new debugging/verbose category.
       Note: to enable a category's messages by default, add it
       (e.g. via [add_debug_keys]) after registration.
@@ -289,6 +289,8 @@ module type Messages = sig
   (** pretty-prints a category.
       @since Chlorine-20180501
   *)
+
+  val pp_all_categories: unit -> unit
 
   val dkey_name: category -> string
   (** returns the category name as a string.
@@ -335,7 +337,7 @@ module type Messages = sig
       @since Fluorine-20130401
   *)
 
-  val register_warn_category: string -> warn_category
+  val register_warn_category: ?help:string -> string -> warn_category
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
   val is_warn_category: string -> bool

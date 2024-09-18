@@ -228,14 +228,6 @@ struct
       match get_warn_category s with
       | Some c -> set_warn_status c status
       | None -> warning "Unknown warning key %s" s
-
-    let pp_all_categories () =
-      (* level 0 just in case user ask to display all categories
-         in an otherwise quiet run *)
-      feedback ~level:0
-        "@[<v 2>Available message categories are:@;%a@]"
-        Format.(pp_print_list ~pp_sep:pp_print_cut pp_category)
-        (get_all_categories ())
   end
 
   module L =
