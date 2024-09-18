@@ -28,3 +28,9 @@ enum Foo { EN1, EN2, EN3 };
 int f() { return !EN1; }
 
 int g() { return EN1; }
+
+enum Bar { CONST_ENUM = 1 == 2 };
+
+int h() {
+  return CONST_ENUM ? 0 : 1;
+}

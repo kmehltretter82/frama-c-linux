@@ -67,6 +67,13 @@ int g(void)
   return __retres;
 }
 
+int h(void)
+{
+  int __retres;
+  __retres = 1;
+  return __retres;
+}
+
 int e2(void)
 {
   int __retres;
