@@ -63,6 +63,9 @@ struct tm {
   int tm_wday; // days since Sunday [0, 6]
   int tm_yday; // days since January 1 [0, 365]
   int tm_isdst; // Daylight Saving Time flag
+
+  long tm_gmtoff; // Seconds East of UTC
+  const char *tm_zone; // Timezone abbreviation
 };
 
 struct itimerspec {
