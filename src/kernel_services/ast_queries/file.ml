@@ -574,7 +574,7 @@ let parse_cabs cpp_command = function
       abort_with_detailed_pp_message f cpp_command
     end else
       Kernel.debug ~dkey:Kernel.dkey_pp
-        "Full preprocessing commmand: %s" cpp_command;
+        "Full preprocessing command: %s" cpp_command;
     let ppf =
       if Kernel.ReadAnnot.get() &&
          ((Kernel.PreprocessAnnot.is_set () &&
