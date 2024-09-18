@@ -85,7 +85,7 @@ type 'vertex edge = {
   edge_loc : location;
 }
 
-(* --- Dummy representives --- *)
+(* --- Dummy representatives --- *)
 
 let dummy_kf = List.hd (Cil_datatype.Kf.reprs)
 
@@ -185,12 +185,8 @@ module Edge = Datatype.Make_with_collections (struct
 module type Graph = sig
   include Graph.Sig.I
 
-  module WTO : sig
-    include Wto.S with type node = V.t
-    include Datatype.S with type t = V.t Wto.partition
-  end
-
-  type wto = WTO.t
+  type wto = V.t Wto.partition
+  module WTO : Wto.S with type node = V.t
 
   val pretty : t Pretty_utils.formatter
   val build_wto : pref:(V.t -> V.t -> int) -> t -> V.t -> wto
@@ -211,8 +207,8 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
   include G
 
   let pretty fmt g =
-    let iter_succ f = iter_succ f g in
-    Pretty_utils.pp_iter iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
+    let iter_succ f = G.iter_succ f g in
+    Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
       (fun fmt v ->
          Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
            Vertex.pretty v
@@ -220,24 +216,11 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
       )
       fmt g
 
-  module WTO = struct
-    include Wto.Make (Vertex)
-    include Datatype.Make (struct
-        include Datatype.Serializable_undefined
-        type t = vertex Wto.partition
-        let reprs = [List.map (fun s -> Wto.Node s) Vertex.reprs]
-        let pretty = pretty_partition
-        let name =
-          Format.sprintf "Interpreted_automata.MakeGraph(%s)(%s).WTO"
-            Vertex.name Edge.name
-        let copy w = w
-      end)
-  end
-
-  type wto = WTO.t
+  module WTO = Wto.Make (Vertex)
+  type wto = Vertex.t Wto.partition
 
   let build_wto ~pref graph entry_point =
-    WTO.partition ~pref ~init:entry_point ~succs:(succ graph)
+    WTO.partition ~pref ~init:entry_point ~succs:(G.succ graph)
 
   let output_to_dot ?(pp_vertex=Vertex.pretty) ?(pp_edge=Edge.pretty) ?wto
       out_channel (graph : t) =
@@ -261,11 +244,11 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
     in
     (* Build vertex attributes and subgraphs from wto if present *)
     let open Graph.Graphviz.DotAttributes in
-    let module Table = FCHashtbl.Make (V) in
-    let subgraphs = Table.create (nb_vertex graph) in
+    let module Table = FCHashtbl.Make (G.V) in
+    let subgraphs = Table.create (G.nb_vertex graph) in
     let tag =
       let c = ref 0 in
-      let h = (Table.create (nb_vertex graph)) in
+      let h = (Table.create (G.nb_vertex graph)) in
       fun v -> Table.memo h v (fun _ -> incr c; !c)
     in
     let component_count = ref 0 in
@@ -329,7 +312,7 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
       | Wto.Node (v) -> v, [component]
     in
     (* Build a table of vertices that should not be passed through to get
-        a path to an exit. At the begining it only contains the component head. *)
+       a path to an exit. At the begining it only contains the component head. *)
     let table = Hashtbl.create (G.nb_vertex graph) in
     Hashtbl.add table head ();
     (* Filter elements at the top level of the wto, in reverse order *)
@@ -933,18 +916,6 @@ type wto_index = vertex list
 
 module WTOIndex =
 struct
-  module Datatype = Datatype.Make
-      (struct
-        include Datatype.Serializable_undefined
-        type t = wto_index
-        let reprs = [Vertex.reprs]
-        let name = "Interpreted_automata.WTOIndex"
-        let pretty i =
-          Pretty_utils.pp_list ~sep:"," Vertex.pretty i
-        let copy i = i
-      end)
-
-  include Datatype
 
   let diff index1 index2 =
     let rec remove_common_prefix l1 l2 =
@@ -988,17 +959,6 @@ struct
     let is_back_edge table (v1,v2) =
       List.exists (Vertex.equal v2) (find table v1)
   end
-
-  (* --- Memoized version --- *)
-
-  module State =
-    Kernel_function.Make_Table
-      (Vertex.Hashtbl.Make (Datatype))
-      (struct
-        let size = 97
-        let name = "Interpreted_automata.WTOIndex.State"
-        let dependencies = [Ast.self]
-      end)
 end
 
 

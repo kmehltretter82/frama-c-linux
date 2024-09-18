@@ -140,10 +140,7 @@ type automaton = {
 module Automaton : Datatype.S with type t = automaton
 
 (** Datatype for WTOs *)
-module WTO : sig
-  include Wto.S with type node = vertex
-  include Datatype.S with type t = wto
-end
+module WTO : Wto.S with type node = vertex
 
 (** Build an interpreted automaton for the given kernel_function.
     If [annotations] is true, the automaton includes [Prop] transitions for
@@ -178,9 +175,7 @@ val output_to_dot :
     component heads *)
 type wto_index = vertex list
 
-(** Datatype for wto_index *)
 module WTOIndex : sig
-  include Datatype.S with type t = wto_index
 
   (** @return the components left and the components entered when going from
       one index to another *)
@@ -211,12 +206,8 @@ end
 module type Graph = sig
   include Graph.Sig.I
 
-  module WTO : sig
-    include Wto.S with type node = vertex
-    include Datatype.S with type t = V.t Wto.partition
-  end
-
-  type wto = WTO.t
+  type wto = vertex Wto.partition
+  module WTO : Wto.S with type node = vertex
 
   val pretty : t Pretty_utils.formatter
 
