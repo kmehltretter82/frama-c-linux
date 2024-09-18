@@ -99,7 +99,7 @@ let run_and_prove
 (* ---  Model Panel                                                     --- *)
 (* ------------------------------------------------------------------------ *)
 
-type memory = TREE | HOARE | TYPED | EVA
+type memory = TREE | HOARE | TYPED | EVA | BYTES
 
 class model_selector (main : Design.main_window_extension_points) =
   let dialog = new Wpane.dialog
@@ -107,6 +107,7 @@ class model_selector (main : Design.main_window_extension_points) =
   let memory = new Widget.group HOARE in
   let r_hoare  = memory#add_radio ~label:"Hoare Memory Model" ~value:HOARE () in
   let r_typed  = memory#add_radio ~label:"Typed Memory Model" ~value:TYPED () in
+  let r_bytes  = memory#add_radio ~label:"Bytes Memory Model" ~value:BYTES () in
   let r_eva    = memory#add_radio ~label:"Eva Memory Model" ~value:EVA () in
   let c_casts  = new Widget.checkbox ~label:"Unsafe casts" () in
   let c_byref  = new Widget.checkbox ~label:"Reference Arguments" () in
@@ -120,6 +121,7 @@ class model_selector (main : Design.main_window_extension_points) =
       begin
         dialog#add_row r_hoare#coerce ;
         dialog#add_row r_typed#coerce ;
+        dialog#add_row r_bytes#coerce ;
         dialog#add_row r_eva#coerce ;
         dialog#add_row c_casts#coerce ;
         dialog#add_row c_byref#coerce ;
@@ -148,6 +150,7 @@ class model_selector (main : Design.main_window_extension_points) =
          | Hoare -> memory#set HOARE
          | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)
          | Eva -> memory#set EVA
+         | Bytes -> memory#set BYTES
         ) ;
         c_byref#set (s.mvar = Ref) ;
         c_ctxt#set (s.mvar = Caveat) ;
@@ -162,6 +165,7 @@ class model_selector (main : Design.main_window_extension_points) =
         | TYPED -> Typed
                      (if c_casts#get then MemTyped.Unsafe else MemTyped.Fits)
         | EVA -> Eva
+        | BYTES -> Bytes
       in {
         mheap = m ;
         mvar = if c_ctxt#get then Caveat else if c_byref#get then Ref else Var ;
