@@ -778,9 +778,3 @@ struct
   include Plugin_log
 
 end (* Register *)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

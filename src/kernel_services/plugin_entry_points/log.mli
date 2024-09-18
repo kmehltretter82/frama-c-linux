@@ -512,11 +512,3 @@ val treat_deferred_error: unit -> unit
    - after each analysis step (as separated by -then and its derivatives),
      including the last one.
 *)
-
-(**/**)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

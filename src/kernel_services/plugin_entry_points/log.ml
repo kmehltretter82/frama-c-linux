@@ -1270,9 +1270,3 @@ struct
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
 
 end
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
