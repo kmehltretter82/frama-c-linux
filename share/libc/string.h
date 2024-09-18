@@ -106,11 +106,11 @@ extern void *memrchr(const void *s, int c, size_t n);
 /*@
   requires c_in_s: memchr((char*)s, c, \block_length(s) - 1);
   requires valid:s:
-    \valid_read(((unsigned char*)s) +
-                (0 .. memchr_off((char*)s, c, \block_length(s) - 1)));
+    \let off = \let n = \block_length(s) - 1; memchr_off((char*)s, c, n);
+    \valid_read(((char*)s) + (0 .. off));
   requires initialization:s:
-    \initialized(((unsigned char*)s) +
-                 (0 .. memchr_off((char*)s, c, \block_length(s) - 1)));
+    \let off = \let n = \block_length(s) - 1; memchr_off((char*)s, c, n);
+    \initialized(((char*)s) + (0 .. off));
   assigns \result \from s, indirect:c, indirect:((unsigned char*)s)[0..];
   ensures result_valid_read: \valid_read((char*)\result);
   ensures result_same_base: \base_addr(\result) == \base_addr(s);
