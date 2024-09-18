@@ -583,8 +583,6 @@ let build_automaton ~annotations kf =
   (* Entry and return point in the automaton *)
   let entry_point = add_vertex ()
   and return_point = add_vertex () in
-  let start_code = if annotations then add_vertex () else entry_point in
-  let end_code = if annotations then add_vertex () else return_point in
   let exit_point = add_vertex () in
 
   (* AST traversal *)
@@ -655,8 +653,8 @@ let build_automaton ~annotations kf =
           Return (opt_exp,stmt) ::
           List.map (fun b -> Leave b) exited_blocks
         in
-        build_transitions control.src end_code kinstr loc transitions;
-        end_code
+        build_transitions control.src return_point kinstr loc transitions;
+        return_point
 
       | Goto (dest_stmt, _) ->
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
@@ -805,20 +803,15 @@ let build_automaton ~annotations kf =
     StmtTable.add table stmt (control.src,dest)
   in
 
-  let loc = Kernel_function.get_location kf in
-
-  if annotations then add_edge entry_point start_code Kglobal Skip loc;
-  if annotations then add_edge end_code return_point Kglobal Skip loc;
-
   (* Iterate through the AST *)
   let control = {
-    src = start_code;
-    dest = end_code;
+    src = entry_point;
+    dest = return_point;
   }
   in
 
   let labels_body =
-    LabelMap.(add_builtin Pre start_code (add_builtin Post end_code empty))
+    LabelMap.(add_builtin Pre entry_point (add_builtin Post return_point empty))
   in
   do_block control Kglobal labels_body fundec.sbody;
 
