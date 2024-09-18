@@ -47,6 +47,14 @@ extern void setgrent(void);
 
 /* BSD function */
 extern int initgroups (const char *user, gid_t group);
+/*@
+  // missing: ... \from groups database
+  assigns \result \from indirect:user[0..], indirect:group, indirect:*ngroups;
+  assigns groups[0 .. \old(*ngroups) - 1], *ngroups
+          \from indirect:user[0..], group, *ngroups;
+*/
+extern int getgrouplist(const char *user, gid_t group,
+                        gid_t *groups, int *ngroups);
 
 __END_DECLS
 
