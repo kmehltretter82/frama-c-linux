@@ -72,6 +72,7 @@ let base_addr _map region = (* TODO *) region
 let points_to (map:map) (region:region) : region option =
   Option.map (Memory.region map.map) @@ Memory.cpointed map.map region.Memory.node
 
+let pointed_by map region = Memory.cpointed_by map region
 
 
 (* COMPARATOR *)
