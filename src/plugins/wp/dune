@@ -64,6 +64,8 @@
     (share/why3/frama_c_wp/vset.mlw as wp/why3/frama_c_wp/vset.mlw)
     (share/why3/frama_c_wp/memaddr.mlw as wp/why3/frama_c_wp/memaddr.mlw)
     (share/why3/frama_c_wp/memory.mlw as wp/why3/frama_c_wp/memory.mlw)
+    (share/why3/frama_c_wp/membytes.mlw as wp/why3/frama_c_wp/membytes.mlw)
     (share/why3/frama_c_wp/cmath.mlw as wp/why3/frama_c_wp/cmath.mlw)
     (share/why3/frama_c_wp/cfloat.mlw as wp/why3/frama_c_wp/cfloat.mlw)
+    (share/why3/frama_c_wp/sequence.mlw as wp/why3/frama_c_wp/sequence.mlw)
     (share/wp.driver as wp/wp.driver)))
