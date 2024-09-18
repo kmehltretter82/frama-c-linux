@@ -97,7 +97,7 @@ let run () =
     let fct = Kernel_function.get_definition kf in
     WpContext.on_context (model,WpContext.Kf kf)
       begin fun () ->
-        let block = Interpreted_automata.Compute.get_automaton ~annotations:true kf in
+        let block = Interpreted_automata.build_automaton ~annotations:true kf in
         let formal = List.hd (fct.sformals) in
 
         (*First call*)

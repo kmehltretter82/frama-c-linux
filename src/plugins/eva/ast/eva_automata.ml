@@ -263,7 +263,7 @@ let translate_automaton kf =
   generate_literal_strings_bases kf;
   let module Src = Interpreted_automata in
   let module VertexTable = Src.Vertex.Hashtbl in
-  let src = Interpreted_automata.get_automaton kf in
+  let src = Interpreted_automata.build_automaton ~annotations:true kf in
   let size = Src.(G.nb_vertex src.graph) in
   let graph = G.create ~size () in
   let table = VertexTable.create size in

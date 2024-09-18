@@ -757,7 +757,7 @@ struct
 
   let compute_kf kf =
     let open Interpreted_automata in
-    let autom = build_automaton kf in
+    let autom = build_automaton ~annotations:true kf in
     (* let cout = open_out (Format.sprintf "/tmp/cfg_automata_%s.dot" (Kernel_function.get_name kf)) in
      * Interpreted_automata.Compute.output_to_dot cout autom;
      * close_out cout; *)

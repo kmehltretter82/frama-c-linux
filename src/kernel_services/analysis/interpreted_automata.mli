@@ -146,18 +146,20 @@ module WTO : sig
 end
 
 (** Build an interpreted automaton for the given kernel_function.
+    If [annotations] is true, the automaton includes [Prop] transitions for
+    assertions and loop invariants of the function body.
     Note that the automata construction may lead to the build of new Cil
     expressions which will be different at each call: you may need to
-    use the memoized version [get_automaton] instead. *)
-val build_automaton : Cil_types.kernel_function -> automaton
+    memoize the results of this function. *)
+val build_automaton : annotations:bool -> Cil_types.kernel_function -> automaton
 
-(** Build a wto for the given automaton. The [pref] functions is a comparison
+(** Build a wto for the given automaton. The [pref] function is a comparison
     function used to determine what is the best vertex to use as a Wto component
     head. See [Wto.Make] for more details. *)
 val build_wto : ?pref:WTO.pref -> automaton -> wto
 
 (** Get the automaton for the given kernel_function. This is the memoized
-    version of [build_automaton]  *)
+    version of [build_automaton ~annotations:false]  *)
 val get_automaton : Cil_types.kernel_function -> automaton
 
 (** Extract an exit strategy from a component, i.e. a sub-wto where all

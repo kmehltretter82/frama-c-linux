@@ -497,8 +497,7 @@ let make_annotation kf stmt annot labels =
 (** Build an automaton from a kf. It first traverses all the statements
     recursively. The recursion does not go deeper into instructions or
     expression. After this traversal, the goto edges are added. *)
-let build_automaton kf =
-  let annotations = true in
+let build_automaton ~annotations kf =
   let fundec = Kernel_function.get_definition kf in
   (* These objects are "global" through the traversal of the function *)
   let g = G.create () in
@@ -902,7 +901,7 @@ module AutomatonState = Kernel_function.Make_Table (Automaton)
       let dependencies = [Ast.self]
     end)
 
-let get_automaton = AutomatonState.memo build_automaton
+let get_automaton = AutomatonState.memo (build_automaton ~annotations:false)
 
 
 (* ---------------------------------------------------------------------- *)

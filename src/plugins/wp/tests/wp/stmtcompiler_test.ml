@@ -93,7 +93,7 @@ let run () =
     let context = model , WpContext.Kf kf in
     WpContext.on_context context
       begin fun () ->
-        let automaton = Interpreted_automata.Compute.get_automaton ~annotations:true kf in
+        let automaton = Interpreted_automata.build_automaton ~annotations:true kf in
         (* Format.printf "@[%s body cil:%a@]@." fct Printer.pp_block block; *)
         let seq = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env = Compiler.empty_env kf  in
