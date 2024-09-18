@@ -20,18 +20,27 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_FDS
-#define __FC_DEFINE_FDS
+#ifndef __FC_DEFINE_AT
+#define __FC_DEFINE_AT
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-#include "__fc_define_max_open_files.h"
+#define AT_FDCWD -100
+#define AT_EACCESS 0x200
+#define AT_SYMLINK_NOFOLLOW 0x100
+#define AT_SYMLINK_FOLLOW 0x400
+#define AT_REMOVEDIR 0x200
 
-// __fc_fds represents the state of open file descriptors.
-extern volatile int __fc_fds[__FC_MAX_OPEN_FILES];
+// Non-POSIX (GNU extensions)
+#define AT_EMPTY_PATH 0x1000
+#define AT_RECURSIVE 0x8000
+#define AT_STATX_DONT_SYNC 0x4000
+#define AT_STATX_FORCE_SYNC 0x2000
+#define AT_STATX_SYNC_AS_STAT 0x0000
+#define AT_STATX_SYNC_TYPE 0x6000
 
 __END_DECLS
 
 __POP_FC_STDLIB
-#endif
+#endif // __FC_DEFINE_AT

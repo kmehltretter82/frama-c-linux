@@ -26,8 +26,11 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
+#include "../__fc_define_at.h"
 #include "../__fc_define_stat.h"
 #include "../__fc_string_axiomatic.h"
+#include "../__fc_define_fds.h"
+#include "../__fc_define_timespec.h"
 #include "../errno.h"
 
 /*@
@@ -158,6 +161,40 @@ extern int    stat(const char *pathname, struct stat *buf);
   assigns \result \from indirect:cmask;
 */
 extern mode_t umask(mode_t cmask);
+
+/*@ //missing: assigns 'filesystem' \from ...
+  requires valid_fd: dirfd == AT_FDCWD || 0 <= dirfd < __FC_MAX_OPEN_FILES;
+  requires valid_string_path: valid_read_string(path);
+  requires valid_flags: (flags & ~(AT_EMPTY_PATH | AT_SYMLINK_NOFOLLOW)) == 0 ||
+                        flags == 0;
+  requires valid_times_or_null:
+    \valid_read(times+(0 .. 1)) || times == \null;
+  requires initialized_times_or_null:initialization:
+    \initialized(times+(0 .. 1)) || times == \null;
+  assigns \result \from indirect:dirfd, indirect:path, indirect:path[0..],
+                        indirect:times, indirect:times[0..], indirect:flags;
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EACCES, EBADF, EFAULT, EINVAL, ELOOP,
+                                     ENAMETOOLONG, ENOENT, ENOTDIR, EPERM,
+                                     EROFS, ESRCH};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int utimensat(int dirfd, const char *path,
+                     const struct timespec times[2], int flags);
+
+/*@ //missing: assigns 'filesystem' \from ...
+  requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
+  requires valid_times_or_null:
+    \valid_read(times+(0 .. 1)) || times == \null;
+  requires initialized_times_or_null:initialization:
+    \initialized(times+(0 .. 1)) || times == \null;
+  assigns \result \from indirect:fd, indirect:times, indirect:times[0..];
+  ensures errno_set: __fc_errno == \old(__fc_errno) ||
+                     __fc_errno \in {EACCES, EBADF, EFAULT, EINVAL, EPERM,
+                                     EROFS};
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int futimens(int fd, const struct timespec times[2]);
 
 #define S_TYPEISMQ(buf) ((buf)->st_mode - (buf)->st_mode)
 #define S_TYPEISSEM(buf) ((buf)->st_mode - (buf)->st_mode)

@@ -48,6 +48,7 @@
 #include "error.h"
 #include "__fc_alloc_axiomatic.h"
 #include "__fc_builtin.h"
+#include "__fc_define_at.h"
 #include "__fc_define_blkcnt_t.h"
 #include "__fc_define_blksize_t.h"
 #include "__fc_define_clockid_t.h"

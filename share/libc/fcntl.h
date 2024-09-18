@@ -25,6 +25,7 @@
 #include "features.h"
 __PUSH_FC_STDLIB
 
+#include "__fc_define_at.h"
 #include "__fc_define_off_t.h"
 #include "__fc_define_pid_t.h"
 #include "__fc_define_mode_t.h"
@@ -82,20 +83,6 @@ __PUSH_FC_STDLIB
 #define O_RDWR 2
 //#define O_SEARCH
 #define O_WRONLY 1
-
-#define AT_FDCWD -100
-#define AT_EACCESS 0x200
-#define AT_SYMLINK_NOFOLLOW 0x100
-#define AT_SYMLINK_FOLLOW 0x400
-#define AT_REMOVEDIR 0x200
-
-// Non-POSIX (GNU extensions)
-#define AT_EMPTY_PATH 0x1000
-#define AT_RECURSIVE 0x8000
-#define AT_STATX_DONT_SYNC 0x4000
-#define AT_STATX_FORCE_SYNC 0x2000
-#define AT_STATX_SYNC_AS_STAT 0x0000
-#define AT_STATX_SYNC_TYPE 0x6000
 
 #define POSIX_FADV_DONTNEED 4
 #define POSIX_FADV_NOREUSE 5
@@ -159,7 +146,7 @@ extern int __va_fcntl_int(int fd, int cmd, int arg);
 
 /*@ requires cmd_as_flock_arg: cmd == F_GETLK || cmd == F_SETLK ||
                         cmd == F_SETLKW ;
-    requires valid_arg: \valid(arg) ; 
+    requires valid_arg: \valid(arg) ;
     assigns \result, *arg \from fd, cmd, *arg ; */
 extern int __va_fcntl_flock(int fd, int cmd, struct flock *arg);
 
