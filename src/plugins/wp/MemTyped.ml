@@ -1048,9 +1048,6 @@ struct
       F.e_fun f_havoc [fresh;current;loc;n]
     else fresh
 
-  let eqmem obj loc _chunk m1 m2 =
-    F.p_call p_eqmem [m1;m2;loc;length_of_object obj]
-
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = F.e_var xp in
@@ -1065,8 +1062,8 @@ struct
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
-  let set_init_atom sigma l v = updated sigma T_init l v
-  let is_init_atom sigma l = F.e_get (Sigma.value sigma T_init) l
+  let set_init_atom sigma _obj l v = updated sigma T_init l v
+  let is_init_atom sigma _ l = F.e_get (Sigma.value sigma T_init) l
 
   let is_init_range sigma obj loc length =
     let n = F.e_mul (length_of_object obj) length in
