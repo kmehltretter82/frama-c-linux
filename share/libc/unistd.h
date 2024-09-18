@@ -37,6 +37,7 @@ __PUSH_FC_STDLIB
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_intptr_t.h"
 #include "__fc_define_fds.h"
+#include "fcntl.h"
 #include "limits.h"
 
 #ifndef __FC_POSIX_VERSION
@@ -736,6 +737,34 @@ enum __fc_confstr_name
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
 extern int          access(const char *path, int amode);
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
+    //                               ENOTDIR, EROFS, ETXTBSY
+    //                               (EINVAL prevented by precondition)
+    // missing: assigns \result \from 'filesystem, permissions'
+  requires valid_string_path: valid_read_string(path);
+  requires valid_amode: (amode & ~(R_OK | W_OK | X_OK)) == 0 ||
+                        amode == F_OK;
+  assigns \result \from indirect:path, indirect:path[0..], indirect:amode;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          euidaccess(const char *path, int amode);
+
+/*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
+    //                               ENOTDIR, EROFS, ETXTBSY
+    //                               (EINVAL prevented by precondition)
+    // missing: assigns \result \from 'filesystem, permissions'
+  requires valid_fd: fd == AT_FDCWD || 0 <= fd < __FC_MAX_OPEN_FILES;
+  requires valid_string_path: valid_read_string(path);
+  requires valid_amode: (amode & ~(R_OK | W_OK | X_OK)) == 0 ||
+                        amode == F_OK;
+  requires valid_flag: (flag & ~AT_EACCESS) == 0 ||
+                       flag == 0;
+  assigns \result \from indirect:fd, indirect:path, indirect:path[0..],
+                        indirect:amode, indirect:flag;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int          faccessat(int fd, const char *path, int amode, int flag);
 
 extern unsigned int alarm(unsigned int);
 extern int          brk(void *);
