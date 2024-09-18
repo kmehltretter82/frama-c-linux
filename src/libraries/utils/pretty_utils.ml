@@ -132,6 +132,10 @@ let pp_pair
 
 let escape_underscores = Str.global_replace (Str.regexp_string "_") "__"
 
+let pp_escaped pp fmt e =
+  let s = Format.asprintf "%a" pp e in
+  Format.fprintf fmt "%s" (String.escaped s)
+
 let pp_flowlist ?(left=format_of_string "(") ?(sep=format_of_string ",") ?(right=format_of_string ")") f out =
   function
   | [] -> Format.fprintf out "%(%)%(%)" left right

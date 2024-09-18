@@ -143,6 +143,10 @@ val pp_trail : 'a formatter -> 'a formatter
 (** pretty-prints its contents inside an '(** ... **)' horizontal block trailed
     with '*' *)
 
+val pp_escaped: 'a formatter -> 'a formatter
+(** [pp_escaped pp e] pretty-prints [e] with [String.escaped].
+    @since Frama-C+dev *)
+
 (* ********************************************************************** *)
 (** {2 Description Lists (margins)} *)
 (* ********************************************************************** *)
