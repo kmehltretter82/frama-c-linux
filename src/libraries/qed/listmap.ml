@@ -95,7 +95,10 @@ struct
       | [] -> (match f k v None with None -> l | Some w -> l @ [k,w])
       | ((k',v') as a)::next->
         let c = K.compare k k' in
-        if c < 0 then l
+        if c < 0 then
+          match f k v None with
+          | None -> l
+          | Some w -> append_until a l ((k, w) :: next)
         else if c = 0 then
           match f k v (Some v') with
           | None -> append_until a l next
