@@ -114,7 +114,10 @@
         "assert", (fun _ -> ASSERT);
         "assigns", (fun _ -> ASSIGNS);
         "assumes", (fun _ -> ASSUMES);
-        "at", (fun _ -> EXT_SPEC_AT);
+        "at",
+        (fun _ ->
+          if !ext_acsl_spec then EXT_SPEC_AT
+          else IDENTIFIER "at");
         "axiom", (fun _ -> AXIOM);
         "axiomatic", (fun _ -> AXIOMATIC);
         "behavior", (fun _ -> BEHAVIOR);

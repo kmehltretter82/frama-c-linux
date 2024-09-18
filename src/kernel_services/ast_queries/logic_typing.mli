@@ -91,7 +91,7 @@ type logic_infos =
 
 (** Functions that can be called when type-checking an extension of ACSL.
 
-    @before Frama-C+dev The following fields have been removed:
+    @before Frama-C+dev The following fields were present:
 
     {[
       remove_logic_function : string -> unit;

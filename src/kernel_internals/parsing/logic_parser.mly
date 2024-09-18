@@ -567,6 +567,12 @@ lexpr_inner:
 | INTER LPAR lexpr_list RPAR { info $sloc (PLinter $3) }
 | LBRACE RBRACE
       { info $sloc (PLset []) }
+/* because LONGIDENT can be both a type name or a plain identifier,
+   we can't have a full lexpr here, as there would be an ambiguity
+   in { x | a::b * ...: should a::b be considered as a type (hence
+   we are parsing a comprehension with a binder), or an identifier
+   (hence, we are still parsing an lexpr).
+*/
 | LBRACE lexpr_inner RBRACE
       { info $sloc (PLset [$2]) }
 | LBRACE lexpr_inner COMMA lexpr_list RBRACE

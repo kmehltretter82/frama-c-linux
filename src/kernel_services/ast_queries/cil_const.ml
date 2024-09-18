@@ -193,8 +193,3 @@ let make_logic_type name = {
   lt_attr = [] ;
 }
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
