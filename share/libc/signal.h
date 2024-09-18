@@ -133,7 +133,7 @@ extern void __fc_sig_err(int);
 /*@ assigns \nothing; */
 extern void (*signal(int sig, void (*func)(int)))(int);
 
-/*@ 
+/*@
   assigns \nothing;
   ensures never_terminates: \false; */
 extern int raise(int sig);
@@ -254,6 +254,22 @@ extern int sigaction(int signum, const struct sigaction *restrict act,
 */
 extern int sigprocmask(int how, const sigset_t * restrict set,
                        sigset_t *restrict oldset);
+
+/*@ // missing: assigns *oldset \from 'previous mask in process'
+  requires valid_set_or_null: set == \null || \valid_read(set);
+  requires valid_how: set != \null ==>
+                      how \in {SIG_BLOCK, SIG_SETMASK, SIG_UNBLOCK};
+  requires valid_oldset_or_null: oldset == \null || \valid(oldset);
+  requires separation: (set == oldset == \null) ||
+                       \separated(set, oldset);
+  assigns \result \from indirect:how, indirect:set, indirect:oldset;
+  assigns *oldset \from indirect:how, indirect:oldset;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+  ensures initialization:oldset_initialized:
+    oldset != \null && \result == 0 ==> \initialized(oldset);
+*/
+extern int pthread_sigmask(int how, const sigset_t * restrict set,
+                           sigset_t *restrict oldset);
 
 /*@ // missing: assigns 'current signal mask'
     // missing: assigns \result from 'possible thread interruption'
