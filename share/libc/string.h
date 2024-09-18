@@ -107,6 +107,22 @@ extern void *memchr(const void *s, int c, size_t n);
 */
 extern void *memrchr(const void *s, int c, size_t n);
 
+// Non-POSIX; GNU extension
+// Note: these specifications are simplified w.r.t memchr's
+/*@
+  requires c_in_s: memchr((char*)s, c, \block_length(s) - 1);
+  requires valid:s:
+    \valid_read(((unsigned char*)s) +
+                (0 .. memchr_off((char*)s, c, \block_length(s) - 1)));
+  requires initialization:s:
+    \initialized(((unsigned char*)s) +
+                 (0 .. memchr_off((char*)s, c, \block_length(s) - 1)));
+  assigns \result \from s, indirect:c, indirect:((unsigned char*)s)[0..];
+  ensures result_valid_read: \valid_read((char*)\result);
+  ensures result_same_base: \base_addr(\result) == \base_addr(s);
+*/
+extern void *rawmemchr(const void *s, int c);
+
 // Copy memory
 
 /*@ requires valid_dest: valid_or_empty(dest, n);
@@ -427,7 +443,7 @@ extern char *strerror(int errnum);
   @*/
 extern char *strcpy(char *restrict dest, const char *restrict src);
 
-/*@ 
+/*@
   @ requires valid_nstring_src: valid_read_nstring(src, n);
   @ requires room_nstring: \valid(dest+(0 .. n-1));
   @ requires separation:

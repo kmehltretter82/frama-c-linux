@@ -94,6 +94,7 @@ let unsupported_specifications =
     "vfscanf", "stdio.c";
     "vscanf", "stdio.c";
     "wcsdup", "wchar.c";
+    "rawmemchr", "string.c";
   ]
 
 let unsupported_specs_tbl =

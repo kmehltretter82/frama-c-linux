@@ -286,6 +286,17 @@ void *memrchr(const void *s, int c, size_t n)
   return NULL;
 }
 
+void *rawmemchr(const void *s, int c)
+{
+  const unsigned char ch = c;
+  const unsigned char *ss = (const unsigned char *)s;
+  size_t i = 0;
+  while (ss[i] != ch) {
+    ++i;
+  }
+  return (void *)&ss[i];
+}
+
 char *strstr(const char *haystack, const char *needle)
 {
   // special case: empty string starts everywhere
