@@ -200,7 +200,10 @@ and pp_block fmt bl =
 
 (* Warning : printing for ASM, CODE_ANNOT and CODE_SPEC is not complete *)
 and pp_raw_stmt fmt = function
-  |     NOP loc -> fprintf fmt "@[<hov 2>NOP loc(%a)@]" pp_cabsloc loc
+  |     NOP (attr, loc) ->
+    fprintf fmt "@[<hov 2>NOP %a, loc(%a)@]"
+      (Format.pp_print_option pp_attr) attr
+      pp_cabsloc loc
   |     COMPUTATION (exp, loc) ->
     fprintf fmt "@[<hov 2>COMPUTATION exp(%a, loc(%a))@]" pp_exp exp pp_cabsloc loc
   |     BLOCK  (bl, loc1, loc2) ->
