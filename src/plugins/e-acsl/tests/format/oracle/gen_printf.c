@@ -736,11 +736,13 @@ void test_specifier_application(char const *allowed, char const *fmt,
 char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
 {
   unsigned long __gen_e_acsl_strcpy_src_size;
+  char const *__gen_e_acsl_at_2;
   char *__gen_e_acsl_at;
   char *__retres;
   __e_acsl_store_block((void *)(& src),8UL);
   __e_acsl_store_block((void *)(& dest),8UL);
   __gen_e_acsl_at = dest;
+  __gen_e_acsl_at_2 = src;
   __gen_e_acsl_strcpy_src_size = __e_acsl_builtin_strlen(src);
   __retres = strcpy(dest,src);
   {
@@ -945,8 +947,10 @@ char *__gen_e_acsl_strchr(char const *s, int c)
  */
 size_t __gen_e_acsl_strlen(char const *s)
 {
+  char const *__gen_e_acsl_at;
   size_t __retres;
   __e_acsl_store_block((void *)(& s),8UL);
+  __gen_e_acsl_at = s;
   __retres = strlen(s);
   __e_acsl_delete_block((void *)(& s));
   return __retres;

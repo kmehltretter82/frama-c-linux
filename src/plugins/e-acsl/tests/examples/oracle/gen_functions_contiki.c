@@ -20,9 +20,23 @@ logic integer length_aux{L}(struct list *l, integer n) =
            (n < 2147483647? length_aux(l->next, n + 1): -1)),
       L);
  */
+/*@
+logic integer __gen_e_acsl_length_aux_here(struct list *l, integer n) =
+  n < 0? -1:
+    (l == (struct list *)0? n:
+       (n < 2147483647? __gen_e_acsl_length_aux_here(l->next, n + 1): -1));
+ */
+long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n);
+
 /*@ logic integer length{L}(struct list *l) = \at(length_aux(l, 0),L);
+ */
+/*@
+logic integer __gen_e_acsl_length_here(struct list *l) =
+  __gen_e_acsl_length_aux_here(l, 0);
 
 */
+long __gen_e_acsl_length_here(struct list *l);
+
 int main(void)
 {
   int __retres;
@@ -37,9 +51,28 @@ int main(void)
   node1.next = & node2;
   __e_acsl_initialize((void *)(& node2.next),sizeof(struct list *));
   node2.next = & node3;
+  __e_acsl_initialize((void *)(& node3.next),sizeof(struct list *));
+  node3.next = (struct list *)0;
   struct list *l = & node1;
   __e_acsl_store_block((void *)(& l),8UL);
   __e_acsl_full_init((void *)(& l));
+  {
+    long __gen_e_acsl_length_here_2;
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_length_here_2 = __gen_e_acsl_length_here(l);
+    __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"l",(void *)l);
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"length(l)",0,
+                                  __gen_e_acsl_length_here_2);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "length(l) == 3";
+    __gen_e_acsl_assert_data.file = "functions_contiki.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 29;
+    __e_acsl_assert(__gen_e_acsl_length_here_2 == 3L,
+                    & __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+  }
   /*@ assert length(l) == 3; */ ;
   __retres = 0;
   __e_acsl_delete_block((void *)(& l));
@@ -48,6 +81,36 @@ int main(void)
   __e_acsl_delete_block((void *)(& node1));
   __e_acsl_memory_clean();
   return __retres;
+}
+
+long __gen_e_acsl_length_here(struct list *l)
+{
+  long __gen_e_acsl_length_aux_here_4;
+  __gen_e_acsl_length_aux_here_4 = __gen_e_acsl_length_aux_here(l,0U);
+  return __gen_e_acsl_length_aux_here_4;
+}
+
+long __gen_e_acsl_length_aux_here(struct list *l, unsigned int n)
+{
+  long __gen_e_acsl_if_3;
+  if (n < 0U) __gen_e_acsl_if_3 = -1;
+  else {
+    long __gen_e_acsl_if_2;
+    if (l == (struct list *)0) __gen_e_acsl_if_2 = n;
+    else {
+      long __gen_e_acsl_if;
+      if (n < 2147483647U) {
+        long __gen_e_acsl_length_aux_here_3;
+        __gen_e_acsl_length_aux_here_3 = __gen_e_acsl_length_aux_here
+        (l->next,n + 1U);
+        __gen_e_acsl_if = __gen_e_acsl_length_aux_here_3;
+      }
+      else __gen_e_acsl_if = -1;
+      __gen_e_acsl_if_2 = __gen_e_acsl_if;
+    }
+    __gen_e_acsl_if_3 = __gen_e_acsl_if_2;
+  }
+  return __gen_e_acsl_if_3;
 }
 
 

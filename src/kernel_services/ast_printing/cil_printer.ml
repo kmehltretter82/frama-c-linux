@@ -2077,10 +2077,8 @@ class cil_printer () = object (self)
       in
       let name' fmt =
         if filter_printing_attributes a = [] then pname fmt false
-        else if nameOpt = None then
-          printAttributes fmt a
-        else
-          fprintf fmt "(%a%a)" printAttributes a pname true
+        else if nameOpt = None then printAttributes fmt a
+        else fprintf fmt "(%a%a)" printAttributes a pname true
       in
       self#typ
         (Some (fun fmt ->
@@ -2096,7 +2094,7 @@ class cil_printer () = object (self)
 
     | TFun (restyp, args, isvararg, a) ->
       let name' fmt =
-        if a = [] then pname fmt false
+        if filter_printing_attributes a = [] then pname fmt false
         else if nameOpt = None then printAttributes fmt a
         else fprintf fmt "(%a%a)" printAttributes a pname true
       in

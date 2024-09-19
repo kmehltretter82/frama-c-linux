@@ -2,33 +2,20 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:148: Warning: 
   no assigns clause generated for function valid_or_empty because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/string.h:49: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
-  Ignoring annotation.
+  no assigns clause generated for function empty_block because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/string.h:148: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:151: Warning: 
   E-ACSL construct `datacons' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:137: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:138: Warning: 
   no assigns clause generated for function valid_read_or_empty because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:52: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:137: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:141: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:112: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:113: Warning: 
-  E-ACSL construct `predicates with labels' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:112: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
@@ -38,6 +25,14 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
+[eva:alarm] FRAMAC_SHARE/libc/string.h:148: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:148: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:148: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:152: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
@@ -82,6 +77,24 @@
 [eva:alarm] mem.c:19: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:112: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:112: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:112: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:52: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:113: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:113: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:113: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:115: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
@@ -119,6 +132,22 @@
 [eva:alarm] mem.c:25: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:137: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:137: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:137: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:138: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:138: Warning: 
+  function __e_acsl_assert_register_int: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:138: Warning: 
+  function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:142: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

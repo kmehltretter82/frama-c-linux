@@ -75,7 +75,8 @@ let rec get_assigns_from ~loc env lprofile lv =
       Options.warning ~current:true "no assigns clause generated for \
                                      function %a because pointers as arguments \
                                      is not yet supported"
-        Printer.pp_logic_var lv;
+        Printer.pp_logic_var
+        (Logic_normalizer.Logic_infos.origin_of_lv lv);
       raise NoAssigns
     end
 

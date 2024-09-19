@@ -203,7 +203,10 @@ let register ~loc ?(force=false) name e adata =
     adata
 
 let register_term ~loc ?force t e adata =
-  let name = Format.asprintf "@[%a@]" Printer.pp_term t in
+  let name =
+    Format.asprintf "@[%a@]"
+      Printer.pp_term (Logic_normalizer.get_orig_term t)
+  in
   register ~loc name ?force e adata
 
 let register_pred ~loc env ?force p e adata =
@@ -212,6 +215,7 @@ let register_pred ~loc env ?force p e adata =
        because they should be the only predicate in an assertion clause. *)
     adata
   else
+    let p = Logic_normalizer.get_orig_pred p in
     let name = Format.asprintf "@[%a@]" Printer.pp_predicate p in
     register ~loc name ?force e adata
 

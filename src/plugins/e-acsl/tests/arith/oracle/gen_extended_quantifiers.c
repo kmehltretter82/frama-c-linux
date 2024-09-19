@@ -404,7 +404,7 @@ int main(void)
       }
     }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_8,
-                                 "\\sum(2, 10, \\lambda integer k; k - 2 >= 0? 1: 0)",
+                                 "\\numof(2, 10, \\lambda integer k; k - 2 >= 0)",
                                  0,__gen_e_acsl_accumulator_8);
     __gen_e_acsl_assert_data_8.blocking = 1;
     __gen_e_acsl_assert_data_8.kind = "Assertion";
@@ -450,7 +450,7 @@ int main(void)
       }
     }
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_9,
-                                 "\\sum(4294967295U - 5, 4294967295U, \\lambda integer k; k % 2 == 1? 1: 0)",
+                                 "\\numof(4294967295U - 5, 4294967295U, \\lambda integer k; k % 2 == 1)",
                                  0,__gen_e_acsl_accumulator_9);
     __gen_e_acsl_assert_data_9.blocking = 1;
     __gen_e_acsl_assert_data_9.kind = "Assertion";
