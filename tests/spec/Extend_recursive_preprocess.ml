@@ -12,12 +12,12 @@ let ext_typing_fooo _typing_context _loc l =
 
 let ext_typing_block typing_context loc_here node =
   match node.extended_node with
-  | Ext_lexpr (name,data)  ->
-    let status,kind = Logic_typing.get_typer name ~typing_context ~loc:node.extended_loc data in
-    Logic_const.new_acsl_extension name loc_here status kind
-  | Ext_extension (name, id, data) ->
-    let status,kind = Logic_typing.get_typer_block name ~typing_context ~loc:node.extended_loc (id,data) in
-    Logic_const.new_acsl_extension name loc_here status kind
+  | Ext_lexpr (name,plugin,data)  ->
+    let status,kind = Logic_typing.get_typer ~plugin name ~typing_context ~loc:node.extended_loc data in
+    Logic_const.new_acsl_extension name plugin loc_here status kind
+  | Ext_extension (name, plugin, id, data) ->
+    let status,kind = Logic_typing.get_typer_block ~plugin name ~typing_context ~loc:node.extended_loc (id,data) in
+    Logic_const.new_acsl_extension name plugin loc_here status kind
 
 let  ext_typing_foo typing_context loc (s,d) =
   let block = List.map (ext_typing_block typing_context loc) d in

@@ -81,6 +81,21 @@ logic integer z = b::a; // KO
     import foo::jazz ;
     logic a f_ko(a x) = bar::f(x);  // KO, ill typed
   }
- */
+*/
 
+/*@
+  // Duplicated module
+  module Foo {
+    type t;
+  }
+*/
+
+/*@
+  // Nested module in axiomatix is not supported yet
+  axiomatic p {
+    module Bar {
+      type t;
+    }
+  }
+*/
 #endif
