@@ -35,11 +35,11 @@ type map
 val get_map : kernel_function -> map
 
 val get_id : map -> region -> int
-val get_region : map -> int -> region
+val get_region : map -> int -> region option
 
-val cvar : map -> varinfo -> region
-val field : map -> region -> fieldinfo -> region
-val shift : map -> region -> typ -> region
+val cvar : map -> varinfo -> region option
+val field : map -> region -> fieldinfo -> region option
+val shift : map -> region -> typ -> region option
 
 val base_addr : map -> region -> region
 

@@ -48,20 +48,23 @@ let get_map (f:kernel_function) : map = Code.domain f
 
 
 let get_id _map region = Memory.id region.Memory.node
-let get_region map id : region = Memory.region map.Code.map @@ Memory.forge id
+let get_region map id =
+  try Some (Memory.region map.Code.map @@ Memory.forge id)
+with Not_found -> None
 
 
 
-(** @raise Not_found *)
-let cvar (map:map) (var:varinfo) : region =
-  Memory.region map.map (Memory.lval map.map ((Var var), NoOffset))
+let cvar (map:map) (var:varinfo) =
+  try Some (Memory.region map.Code.map (Memory.lval map.Code.map ((Var var), NoOffset)))
+with Not_found -> None
 
-(** @raise Not_found *)
-let field (map:map) (region:region) (field:fieldinfo) : region =
-  Memory.region map.map (Memory.offset map.map region.node (Field (field, NoOffset)))
+let field (map:map) (region:region) (field:fieldinfo) =
+  try Some (Memory.region map.Code.map (Memory.offset map.Code.map region.node (Field (field, NoOffset))))
+with Not_found -> None
 
-(** @raise Not_found *)
-let shift (_:map) region (_:typ) : region = (* TODO *) region
+let shift (_map:map) region (_ty:typ) = (* TODO *)
+  try Some region
+  with Not_found -> None
 
 
 let base_addr _map region = (* TODO *) region
@@ -105,7 +108,8 @@ let included map r1 r2 : bool = Reachable.is_reachable map.Code.map r1 r2
 
 
 let separated map r1 r2 =
-  not (included map r1 r2) && not (included map r2 r1)
+  not (Reachable.is_reachable map.Code.map r1 r2)
+  && not (Reachable.is_reachable map.Code.map r2 r1)
 
 
 
