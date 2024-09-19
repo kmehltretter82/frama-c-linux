@@ -201,8 +201,7 @@ module WTOIndex : sig
 end
 
 
-(** This functor can be used to build generic controlf flow graphs *)
-
+(** Generic control flow graphs *)
 module type Graph = sig
   include Graph.Sig.I
 
@@ -211,7 +210,7 @@ module type Graph = sig
 
   val pretty : t Pretty_utils.formatter
 
-  (** Build a wto for the given automaton. The [pref] functions is a comparison
+  (** Build a wto for the given automaton. The [pref] function is a comparison
       function used to determine what is the best vertex to use as a Wto component
       head. See [Wto.Make] for more details. *)
   val build_wto : pref:WTO.pref -> t -> V.t -> wto
@@ -228,27 +227,26 @@ module type Graph = sig
   val exit_strategy : t -> V.t Wto.component -> wto
 end
 
+(** This functor can be used to build generic control flow graphs *)
 module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) : Graph
   with type V.t = Vertex.t
-   and  type E.t = Vertex.t * Edge.t * Vertex.t
-   and  type V.label = Vertex.t
-   and  type E.label = Edge.t
+   and type E.t = Vertex.t * Edge.t * Vertex.t
+   and type V.label = Vertex.t
+   and type E.label = Edge.t
 
 
-(* Control flow graphs where unnatural loops are modified such that all paths
-   entering a loop enters it by its head. *)
-
+(** Control flow graphs where unnatural loops are modified such that all paths
+    entering a loop enters it by its head. *)
 module UnrollUnnatural : sig
   module Vertex_Set:
     Datatype.S_with_collections with type t = Vertex.Set.t
   module Version:
     Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
 
-  include Graph with
-    type V.t = Version.t
-                 and  type E.t = Version.t * Version.t edge * Version.t
-                 and  type V.label = Version.t
-                 and  type E.label = Version.t edge
+  include Graph with type V.t = Version.t
+                 and type E.t = Version.t * Version.t edge * Version.t
+                 and type V.label = Version.t
+                 and type E.label = Version.t edge
 
   val build : automaton -> G.vertex Wto.partition -> WTOIndex.Table.t -> t
 end
