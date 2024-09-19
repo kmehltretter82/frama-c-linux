@@ -715,7 +715,7 @@ struct
   (* Imported Scope *)
 
   type scope = {
-    current: bool; (* accepted for non-qualified names *)
+    unqualified: bool; (* accepted for non-qualified names *)
     long_prefix: string; (* last '::' included *)
     short_prefix: string; (* last '::' included *)
   }
@@ -730,8 +730,8 @@ struct
     | None -> !imported_scopes
     | Some s -> s :: !imported_scopes
 
-  let current_scopes () =
-    List.filter (fun s -> s.current) @@ all_scopes ()
+  let unqualified_scopes () =
+    List.filter (fun s -> s.unqualified) @@ all_scopes ()
 
   let push_imports () =
     let current = !current_scope in
@@ -763,7 +763,7 @@ struct
           List.hd @@ List.rev @@ Logic_utils.longident name
       in
       let s = {
-        current;
+        unqualified = current || alias = None;
         long_prefix = name ^ "::";
         short_prefix = short ^ "::";
       } in
@@ -787,7 +787,7 @@ struct
       in find_opt resolved_name
     else
       let find_in_scope s = find_opt (s.long_prefix ^ a) in
-      match List.find_map find_in_scope @@ current_scopes () with
+      match List.find_map find_in_scope @@ unqualified_scopes () with
       | None -> find_opt a
       | Some _ as result -> result
 
