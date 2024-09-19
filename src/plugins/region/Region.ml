@@ -83,20 +83,21 @@ let equal map r1 r2 = get_id map r1 == get_id map r2
 module Reachable = struct
 
   module Imap = Map.Make(Int)
-  module Q = Queue
+
   let is_reachable map source target =
-    let rec aux visited siblings_to_visit parents_to_visit =
-      if Queue.is_empty siblings_to_visit then aux visited parents_to_visit (Q.create())
-      else
-        let region = Queue.pop siblings_to_visit in
-        if Imap.mem (get_id map region) visited then aux visited siblings_to_visit parents_to_visit
-        else
-          equal map region target ||
-          let _ = List.iter (fun node -> Q.push (Memory.region map node) parents_to_visit) region.Memory.parents in
-          aux (Imap.add (get_id map region) region visited) siblings_to_visit parents_to_visit
-    in let source_queue = Q.create() in
-    let _ = Q.push source source_queue in
-    aux Imap.empty source_queue (Q.create())
+    let accessible = ref false in
+    let q = Queue.create () in
+    Queue.push source q ;
+    let visited = ref Imap.empty in
+    while not !accessible && not @@ Queue.is_empty q do
+      let region = Queue.pop q in
+      if not @@ Imap.mem (get_id map region) !visited then begin
+        visited := Imap.add (get_id map region) region !visited ;
+        List.iter (fun r -> Queue.push (Memory.region map r) q) region.Memory.parents ;
+        accessible := equal map target region ;
+      end
+    done;
+    !accessible
 
 end
 
