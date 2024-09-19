@@ -50,17 +50,17 @@ let get_map (f:kernel_function) : map = Code.domain f
 let get_id _map region = Memory.id region.Memory.node
 let get_region map id =
   try Some (Memory.region map.Code.map @@ Memory.forge id)
-with Not_found -> None
+  with Not_found -> None
 
 
 
 let cvar (map:map) (var:varinfo) =
   try Some (Memory.region map.Code.map (Memory.lval map.Code.map ((Var var), NoOffset)))
-with Not_found -> None
+  with Not_found -> None
 
 let field (map:map) (region:region) (field:fieldinfo) =
   try Some (Memory.region map.Code.map (Memory.offset map.Code.map region.node (Field (field, NoOffset))))
-with Not_found -> None
+  with Not_found -> None
 
 let shift (_map:map) region (_ty:typ) = (* TODO *)
   try Some region
