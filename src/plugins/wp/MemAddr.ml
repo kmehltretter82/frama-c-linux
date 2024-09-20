@@ -79,6 +79,8 @@ let p_linked = Lang.extern_fp ~coloring:true ~library "linked"
 (* --- API                                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+(* Basic constructors and getters *)
+
 let base addr = e_fun f_base [ addr ]
 let offset addr = e_fun f_offset [ addr ]
 let null = constant (e_fun f_null [])
@@ -86,11 +88,29 @@ let global base = e_fun f_global [ base ]
 let shift addr offset = e_fun f_shift [ addr ; offset ]
 let mk_addr base offset = shift (global base) offset
 
+(* Comparisons *)
+
 let addr_lt addr1 addr2 = p_call p_addr_lt [ addr1 ; addr2 ]
 let addr_le addr1 addr2 = p_call p_addr_le [ addr1 ; addr2 ]
 
+(* Regions *)
+
+let region base = e_fun f_region [ base ]
+let linked memory = p_call p_linked [ memory ]
+
+(* Validity *)
+
+let valid_rd alloc addr size = p_call p_valid_rd [ alloc ; addr ; size ]
+let valid_rw alloc addr size = p_call p_valid_rw [ alloc ; addr ; size ]
+let valid_obj alloc addr size = p_call p_valid_obj [ alloc ; addr ; size ]
+let invalid alloc addr size = p_call p_invalid [ alloc ; addr ; size ]
+
+(* Physical addresses *)
+
 let addr_of_int i = e_fun f_addr_of_int [ i ]
 let int_of_addr addr = e_fun f_int_of_addr [ addr ]
+
+(* Table of offsets *)
 
 let base_offset base offset =
   let offset_index = e_fun f_table_of_base [base] in
@@ -98,13 +118,6 @@ let base_offset base offset =
 (** Returns the offset in {i bytes} from the {i logic} offset
     (which is a memory cell index, actually) *)
 
-let valid_rd alloc addr size = p_call p_valid_rd [ alloc ; addr ; size ]
-let valid_rw alloc addr size = p_call p_valid_rw [ alloc ; addr ; size ]
-let valid_obj alloc addr size = p_call p_valid_obj [ alloc ; addr ; size ]
-let invalid alloc addr size = p_call p_invalid [ alloc ; addr ; size ]
-
-let region base = e_fun f_region [ base ]
-let linked memory = p_call p_linked [ memory ]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Qed Simplifiers                                                    --- *)
@@ -293,10 +306,7 @@ let phi_int_of_addr p =
     | _ -> raise Not_found
 
 let phi_addr_of_int p =
-  if p == e_zero then null else
-    match repr p with
-    | Fun(f,[a]) when f == f_int_of_addr -> a
-    | _ -> raise Not_found
+  if p == e_zero then null else raise Not_found
 
 (* -------------------------------------------------------------------------- *)
 (* --- Simplifier for (in)validity                                        --- *)
