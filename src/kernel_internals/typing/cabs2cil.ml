@@ -4199,7 +4199,11 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
     | [Cabs.Tunsigned; Cabs.Tshort] -> TInt(IUShort, [])
     | [Cabs.Tunsigned; Cabs.Tshort; Cabs.Tint] -> TInt(IUShort, [])
 
-    | [] -> TInt(IInt, [])
+    | [] ->
+      Kernel.warning ~current:true ~wkey:Kernel.wkey_implicit_int
+        "type specifier missing, defaults to 'int'; ISO C99 and later do not \
+         support implicit int";
+      TInt(IInt, [])
     | [Cabs.Tint] -> TInt(IInt, [])
     | [Cabs.Tsigned] -> TInt(IInt, [])
     | [Cabs.Tsigned; Cabs.Tint] -> TInt(IInt, [])

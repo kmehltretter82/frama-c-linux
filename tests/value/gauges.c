@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 
-volatile v;
+volatile int v;
 
 void main0() {
   int i = 1;

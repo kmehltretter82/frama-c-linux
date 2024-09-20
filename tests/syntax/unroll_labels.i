@@ -4,7 +4,7 @@ PLUGIN: eva,inout,scope
   STDOPT: +"-eva @EVA_CONFIG@ -main main2 -eva-slevel 3"
 */
 enum { SIX = 6 } ;
-volatile foo;
+volatile int foo;
 void main () {
   int j = 0;
   /*@ loop unfold "completely", 4; */

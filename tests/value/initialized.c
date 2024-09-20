@@ -12,7 +12,7 @@ void f(int m, int* t, int n) {
       t[i]=i;
 }
 
-volatile rand;
+volatile int rand;
 
 void g1 (){
   int t1[20], t2[20], t3[20], t4[20], t5[20], t6[20], i, j;

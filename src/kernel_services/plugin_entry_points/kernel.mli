@@ -174,6 +174,8 @@ val wkey_linker_weak: warn_category
 
 val wkey_implicit_conv_void_ptr: warn_category
 
+val wkey_implicit_int: warn_category
+
 val wkey_incompatible_types_call: warn_category
 
 val wkey_incompatible_pointer_types: warn_category

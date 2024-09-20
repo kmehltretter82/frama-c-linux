@@ -1,4 +1,4 @@
-volatile v;
+volatile int v;
 
 void main1() {
   int c = 0;
@@ -16,7 +16,7 @@ void main1() {
 
 
 void duff1(int *to, int *from, int count) {
-  register n = (count + 7) / 8;
+  register int n = (count + 7) / 8;
   switch(count % 8) {
     case 0: do {
               Frama_C_show_each(to);
@@ -33,7 +33,7 @@ void duff1(int *to, int *from, int count) {
 }
 
 void duff2(int *to, int *from, int count) {
-  register n = (count + 7) / 8;
+  register int n = (count + 7) / 8;
   switch(count % 8) {
   case 0: L: { Frama_C_show_each(to);
                     *to++ = *from++;

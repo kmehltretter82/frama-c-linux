@@ -17,7 +17,7 @@ struct s {
   unsigned j: 5;
 };
 
-volatile v;
+volatile int v;
 
 void main1(void) {
   sz = sx + sy;

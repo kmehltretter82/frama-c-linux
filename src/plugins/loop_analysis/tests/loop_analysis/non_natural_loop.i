@@ -1,5 +1,5 @@
 void duff(int *to, int *from, int count) {
-  register n = (count + 7) / 8;
+  register int n = (count + 7) / 8;
   switch(count % 8) {
   case 0: do {
       Frama_C_show_each(to);

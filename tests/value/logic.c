@@ -1,7 +1,7 @@
 #include "__fc_builtin.h"
 int t[10], u[11];
 struct ts { int f1; int f2; } s1, s2, s3[10];
-unsigned int x; volatile v;
+unsigned int x; volatile int v;
 
 struct s1{
   int x;

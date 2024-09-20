@@ -204,6 +204,9 @@ let () = set_warn_status wkey_jcdb Log.Wonce
 let wkey_implicit_function_declaration = register_warn_category
     "typing:implicit-function-declaration"
 
+let wkey_implicit_int = register_warn_category "typing:implicit-int"
+let () = set_warn_status wkey_implicit_int Log.Werror
+
 let wkey_no_proto = register_warn_category "typing:no-proto"
 
 let wkey_missing_spec = register_warn_category "annot:missing-spec"

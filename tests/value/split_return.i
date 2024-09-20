@@ -128,7 +128,7 @@ void main5() {
   }
 }
 
-volatile v;
+volatile int v;
 
 int f6() {
   int i = v;
@@ -141,7 +141,7 @@ void main6() {
   }
 }
 
-volatile v;
+volatile int v;
 int v7;
 
 int* f7() {

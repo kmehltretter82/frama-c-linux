@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-volatile c;
+volatile int c;
 
 int f() {
   if (c) {

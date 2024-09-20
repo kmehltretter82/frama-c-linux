@@ -6,7 +6,7 @@ int main(){
   char *string = "foo";
   wchar_t *wstring = L"bar";
 
-  volatile nondet = 0;
+  volatile int nondet = 0;
 
   // Wrong pointers are passed to printf and this must be detected by value
   switch (nondet)

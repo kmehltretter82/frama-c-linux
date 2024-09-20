@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-volatile v;
+volatile int v;
 
 static void copy(void *dst_, void *src_, size_t off, size_t len)
 {

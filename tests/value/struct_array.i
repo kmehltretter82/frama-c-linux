@@ -2,7 +2,7 @@
    STDOPT: +" -then -unsafe-arrays"
 */
 
-volatile v;
+volatile int v;
 
 struct st1 {
   long a;

@@ -5,7 +5,7 @@
 float f;
 double d;
 
-volatile v;
+volatile int v;
 
 // Conversion from binary integer representation to float
 void main1() {

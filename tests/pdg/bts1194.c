@@ -3,7 +3,7 @@ PLUGIN: @EVA_PLUGINS@ pdg slicing
   STDOPT: +"-eva -inout -pdg -calldeps -deps -then -slice-return main -then-last -print @EVA_OPTIONS@"
 */
 int Y, X;
-volatile v;
+volatile int v;
 
 //@ assigns \result \from \nothing;
 int input(void);

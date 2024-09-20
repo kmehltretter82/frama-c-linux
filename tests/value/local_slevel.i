@@ -30,7 +30,7 @@ void g() {// Do not crash when loop unrolling clears the dependencies of the AST
 }
 
 int t[100];
-volatile vol;
+volatile int vol;
 
 void main2() {
   for (int i = 0; i < 100; i++) {

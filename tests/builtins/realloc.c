@@ -137,7 +137,7 @@ void main9() {
   free (q);
 }
 
-volatile v;
+volatile int v;
 
 void f(int x) {
   Frama_C_show_each(x);

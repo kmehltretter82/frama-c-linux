@@ -2,8 +2,8 @@
    STDOPT: +"-eva-domains symbolic-locations -eva-msg-key d-symblocs"
 */
 
-volatile v;
-int t[10]; extern u[10];
+volatile int v;
+int t[10]; extern int u[10];
 
 void main1() {
   unsigned int i = v;

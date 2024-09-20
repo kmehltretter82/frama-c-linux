@@ -41,7 +41,7 @@ void main(int c, char **v)
 
 
 
-volatile v;
+volatile int v;
 
 void main_log_exp(double d) {
   double l1, l2, l3, l4, l5, l6, l7, l8;

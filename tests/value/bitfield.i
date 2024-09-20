@@ -60,7 +60,7 @@ struct A {
 
 void leaf (struct A *p1);
 
-volatile foo;
+volatile int foo;
 
 void imprecise_bts_1671 ()
 {

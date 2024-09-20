@@ -266,7 +266,7 @@ int* reduced_garbled_mix (int *p);
 /* Tests reduction of garbled mix values by \valid and \valid_read. */
 void main12(void) {
   int x;
-  const y = 16;
+  const int y = 16;
   int a[5];
   int *p = v ? &x : &a[0];
   p = garbled_mix(p);

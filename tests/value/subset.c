@@ -35,7 +35,7 @@ void main1(int i, int j) {
   //@ assert p == \null || \valid(p);
 }
 
-volatile v;
+volatile int v;
 
 void main2() {
   int x = 1;

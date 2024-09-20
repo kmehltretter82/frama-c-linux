@@ -37,7 +37,7 @@ int t,u,v,w,x,y,z,t2,v2,*PTR1,*PTR2,*PTR3,*PTR4,*PTR5, *PTR6;
 volatile int c,c1,c2,c3,c4;
 
 void main (void) {
-  volatile vol=0;
+  volatile int vol=0;
 
   /* SECTION 1 */
   A=1;

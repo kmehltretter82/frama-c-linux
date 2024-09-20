@@ -8,7 +8,7 @@ int *gpi;
 /*@ assigns \result \from indirect:x, gpi; */
 int *f_star_int(int x);
 
-int ****G; volatile v;
+int ****G; volatile int v;
 int G0,*G1;
 
 typedef int (*pfun)(int *p1, const int *p2);

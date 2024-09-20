@@ -8,7 +8,7 @@ void *malloc(size_t size);
 //@ assigns \nothing; frees p;
 void free(void *p);
 
-volatile v;
+volatile int v;
 
 void* main1() {
   int i, *p;

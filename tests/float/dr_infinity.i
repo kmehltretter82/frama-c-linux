@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: #"-kernel-warn-key parser:decimal-float=active -float-hex"
 */
-volatile v;
+volatile int v;
 void main(void)
 {
         float x; double d;
