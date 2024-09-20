@@ -49,13 +49,12 @@ let p_addr_lt = Lang.extern_p ~library ~bool:"addr_lt_bool" ~prop:"addr_lt" ()
 let p_addr_le = Lang.extern_p ~library ~bool:"addr_le_bool" ~prop:"addr_le" ()
 
 let f_addr_of_int = Lang.extern_f
-    ~category:Qed.Logic.Injection
     ~library ~result:t_addr "addr_of_int"
 
 let f_int_of_addr = Lang.extern_f
-    ~category:Qed.Logic.Injection
     ~library ~result:Qed.Logic.Int "int_of_addr"
 
+let p_statically_allocated = Lang.extern_fp ~library "statically_allocated"
 
 let f_table_of_base = Lang.extern_f ~library
     ~category:Qed.Logic.Function ~result:t_table "table_of_base"
@@ -109,6 +108,15 @@ let invalid alloc addr size = p_call p_invalid [ alloc ; addr ; size ]
 
 let addr_of_int i = e_fun f_addr_of_int [ i ]
 let int_of_addr addr = e_fun f_int_of_addr [ addr ]
+
+let statically_allocated addr = p_call p_statically_allocated [ addr ]
+(* This last function is not exposed, it does not have a particular meaning in
+   ACSL, and is used only for int/addr conversions.
+*)
+
+let in_uintptr_range addr =
+  p_hyps [ statically_allocated @@ base addr ] @@
+  Cint.range (Ctypes.c_ptr ()) @@ int_of_addr addr
 
 (* Table of offsets *)
 

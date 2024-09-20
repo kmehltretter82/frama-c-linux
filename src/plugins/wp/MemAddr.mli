@@ -68,6 +68,17 @@ val int_of_addr : term -> term
     Abstract: Conversion from address to integer
 *)
 
+val in_uintptr_range : term -> pred
+(** [in_uintptr_range (a: addr)] =
+    [statically_allocated(a.base) -> in_range(int_of_addr a)]
+
+    Assuming that the base of a statically exists, the conversion of the pointer
+    to a an integer produces a value that fits in [uintptr_t].
+
+    @since Frama-C+dev
+*)
+
+
 val base_offset : term -> term -> term
 (** [base_offset(base: int)(offset: int) : int]
     Converts a {i logic} offset (which is actually the address of a memory cell
