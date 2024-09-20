@@ -343,14 +343,17 @@ let ( let* ) normalizing f =
 let parsed = function
   | Shortcut r | Normalized r -> Parsed r
 
+let pos_inf_shortcut ~format =
+  let inf = represents ~float:Float.infinity ~in_format:format in
+  let max = largest_finite_float_of ~format in
+  Shortcut { lower = max ; nearest = inf ; upper = inf ; format }
+
 
 
 let normalize_exponent_of_string ~format e =
   let exponent = Z.of_string e in
   if Z.Compare.(exponent > Z.of_int max_int) then
-    let inf = represents ~float:Float.infinity ~in_format:format in
-    let max = largest_finite_float_of ~format in
-    Shortcut { lower = max ; nearest = inf ; upper = inf ; format }
+    pos_inf_shortcut ~format
   else if Z.Compare.(exponent < Z.of_int min_int) then
     let zero = represents ~float:0.0 ~in_format:format in
     let min  = smallest_denormal_float_of ~format in
@@ -369,10 +372,8 @@ let normalize_exponent_on_format ~format exponent =
   let significant_size = Stdlib.(sig_size format - 1) |> Z.of_int in
   let maximal_exponent = maximal_exponent_of ~format in
   let shifted_maximal = Z.(maximal_exponent - significant_size) in
-  if Z.Compare.(exponent > shifted_maximal) then
-    let inf = represents ~float:Float.infinity ~in_format:format in
-    let max = largest_finite_float_of ~format in
-    Shortcut { lower = max ; nearest = inf ; upper = inf ; format }
+  if Z.Compare.(exponent > shifted_maximal)
+  then pos_inf_shortcut ~format
   else Normalized Z.(to_int exponent)
 
 let normalize sign integral fractional exponent format =
@@ -417,7 +418,16 @@ let normalize sign integral fractional exponent format =
      the computations instead. At the end of those two loops, [n] and [d] are
      such that [ 2 ^ (m - 1) ≤ n / d ≤ 2 ^ m ] and [e] has been updated to
      guarantee that the number we want to normalize is still equal to the
-     number [ (n / d) * 2 ^ e ]. *)
+     number [ (n / d) * 2 ^ e ]. However, the [log] approach can still be
+     useful as an underapproximation of the resulting exponent. If that
+     number is larger than the largest exponent in the format, we can already
+     take a shortcut, the result will be infinity. This fix an old issue where
+     the parser were stuck for a long time on numbers like 1e99999. *)
+  let delta = Stdlib.(sig_size - Z.log2 !numerator + Z.log2 !denominator + 1) in
+  let max_exponent_in_format = maximal_exponent_of ~format |> Z.to_int in
+  let exponent_underapprox = Stdlib.(!exponent - delta) in
+  let is_infinity = Stdlib.(max_exponent_in_format < exponent_underapprox) in
+  let* () = if is_infinity then pos_inf_shortcut ~format else Normalized () in
   let shifted_denom () = Z.shift_left !denominator sig_size in
   let denom_can_grow () = Z.Compare.(!numerator >= shifted_denom ()) in
   let exponent_too_small () = Stdlib.(!exponent < minimal_exponent) in
