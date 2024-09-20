@@ -1,7 +1,7 @@
 /* The name of this file is probably historical, as Value no longer degenerates 
    on anything in it */
 
-volatile v;
+volatile int v;
 
 void main (int c,int d) {
 void *A,*B,*C,*D, *E;

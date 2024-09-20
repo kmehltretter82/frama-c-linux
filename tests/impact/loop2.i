@@ -3,7 +3,7 @@
    */
 
 
-volatile v;
+volatile int v;
 
 int t[10], u[10], w[10];
 

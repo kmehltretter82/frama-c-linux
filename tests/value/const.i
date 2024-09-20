@@ -5,7 +5,7 @@ extern const int G;
 extern const int I=2;
 int J = 8;
 
-volatile v;
+volatile int v;
 int X;
 
 const struct {

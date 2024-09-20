@@ -2,7 +2,7 @@
    STDOPT: #" -eva-alloc-builtin fresh"
 */
 #include "stdlib.h" 
-volatile v;
+volatile int v;
 
 void main1() {
   int *p = malloc(40);

@@ -4,7 +4,7 @@
 
 // Comments are given for cases where -eva-warn-copy-indeterminate is not set
 
-volatile v;
+volatile int v;
 
 void main() {
   int x;

@@ -19,7 +19,7 @@ int G3 = 75, G4;
 
 int R;
 
-volatile v;
+volatile int v;
 
 enum  Bool {
   FALSE = 0,

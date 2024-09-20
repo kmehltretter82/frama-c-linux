@@ -1,4 +1,4 @@
-volatile v;
+volatile int v;
 
 //@ requires c; assigns \nothing;
 void __assert(int c);

@@ -2,7 +2,7 @@
 
 int main(){
   struct flock fl;
-  volatile choice = 0;
+  volatile int choice = 0;
 
   // Normal usage
   int flags = fcntl(0, F_GETFD);

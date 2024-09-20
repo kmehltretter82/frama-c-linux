@@ -9,7 +9,7 @@ unsigned int ua,ub,uc,ud,ue,uf;
 
 
 char t[10];
-volatile v;
+volatile int v;
 
 int main(int c, int z, int zz) {
   a=5024;

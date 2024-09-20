@@ -2,7 +2,7 @@
    STDOPT: #"-eva-slevel-function pgcd1:100,pgcd2:100,pgcd3:100"
 */
 int A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R;
-volatile v;
+volatile int v;
 
 void main2 ()
 { int i = v;

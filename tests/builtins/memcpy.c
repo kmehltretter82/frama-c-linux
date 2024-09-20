@@ -24,7 +24,7 @@ void init () {
   for (j=0;j<100;j++) dst5[j] = -1;
 }
 
-volatile maybe;
+volatile int maybe;
 
 void buggy () {
   char c;

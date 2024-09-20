@@ -5,7 +5,7 @@
 #include "string.h"
 
 
-volatile v;
+volatile int v;
 
 int x;
 

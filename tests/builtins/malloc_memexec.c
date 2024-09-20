@@ -7,7 +7,7 @@ void f(int *p, int i) {
   *p = i;
 }
 
-volatile v;
+volatile int v;
 
 void main() {
   /*@ eva_allocate fresh; */

@@ -65,7 +65,7 @@
         "parser:unsupported:pragma", "plugin-not-loaded", "pp",
         "pp:compilation-db", "pp:line-directive", "project",
         "too-large-array", "typing", "typing:implicit-conv-void-ptr",
-        "typing:implicit-function-declaration",
+        "typing:implicit-function-declaration", "typing:implicit-int",
         "typing:incompatible-pointer-types",
         "typing:incompatible-types-call", "typing:inconsistent-specifier",
         "typing:int-conversion", "typing:merge-conversion", "typing:no-proto"

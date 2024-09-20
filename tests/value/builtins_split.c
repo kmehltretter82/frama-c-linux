@@ -5,7 +5,7 @@
 int *p;
 int x, y, t[10];
 
-volatile v;
+volatile int v;
 
 //@ assigns \result \from i;
 long long Frama_C_abstract_cardinal(long long i);

@@ -10,7 +10,7 @@ void* my_calloc (int s, int n) {
   return malloc (s*n);
 }
 
-volatile foo;
+volatile int foo;
 
 void main () {
   char *p1 = my_calloc (0, 0);

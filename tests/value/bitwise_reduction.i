@@ -3,7 +3,7 @@
    STDOPT: +"-big-ints-hex 255 -machdep ppc_32"
 */
 
-volatile v;
+volatile int v;
 
 void main1() {
   int t[2];

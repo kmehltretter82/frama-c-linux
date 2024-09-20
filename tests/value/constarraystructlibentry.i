@@ -24,8 +24,8 @@ const int t4[12] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 ss t5[7] = {{1, 2}, {3}, 5, 6, 7, 8, 9, 10};
 ss2 t6[6] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-extern const t7[5]; // Do not initialize to 0
-extern const t8[5] = {1, 2}; // Ignore extern (done by Cil)
+extern const int t7[5]; // Do not initialize to 0
+extern const int t8[5] = {1, 2}; // Ignore extern (done by Cil)
 
 struct ts1 {int b; char c;};
 struct ts2 {struct ts1 a; char c;};

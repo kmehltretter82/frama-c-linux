@@ -1,2 +1,2 @@
 //@ requires x < 10;
-static f(int x);
+static int f(int x);

@@ -4,7 +4,7 @@
    OPT: -then -main main2
 */
 /* bug 971: */
-volatile foo;
+volatile int foo;
 int v;
 void f1 () {
   v += 1;

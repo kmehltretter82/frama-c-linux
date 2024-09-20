@@ -11,7 +11,7 @@
 
 #define N 10
 
-volatile nondet;
+volatile int nondet;
 
 void test_unroll()
 {

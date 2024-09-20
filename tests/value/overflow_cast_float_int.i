@@ -2,7 +2,7 @@
 
 */
 
-volatile v;
+volatile int v;
 
 int main()
 {

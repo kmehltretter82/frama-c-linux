@@ -1,7 +1,7 @@
 /* run.config*
    STDOPT: #"-calldeps"
 */
-volatile maybe;
+volatile int maybe;
 
 typedef struct {
   short ts;

@@ -21,7 +21,7 @@ int f(void)
   return 0;
 }
 
-volatile v;
+volatile int v;
 
 /*@ 
   ensures P_not_Const: \valid(&p);

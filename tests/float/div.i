@@ -1,4 +1,4 @@
-volatile v;
+volatile int v;
 
 void main() {
   double d1, d2;

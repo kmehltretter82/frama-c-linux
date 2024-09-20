@@ -9,7 +9,7 @@ float f;
 double d, big;
 unsigned long long ull;
 double fd(void);
-volatile rand;
+volatile int rand;
 
 void main1 (long long l){
   u1.l = l;

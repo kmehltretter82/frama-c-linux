@@ -1,4 +1,4 @@
-volatile c;
+volatile int c;
 
 unsigned int j, k;
 

@@ -2,7 +2,7 @@
    STDOPT: #"-kernel-warn-key parser:decimal-float=active -float-hex"
 */
 
-volatile v;
+volatile int v;
 
 int main() {
   if (v) {

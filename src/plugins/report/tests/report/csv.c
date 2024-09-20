@@ -4,7 +4,7 @@ PLUGIN: report from,inout,scope,eva
    OPT: -eva-warn-copy-indeterminate=-main4 -eva -eva-show-progress -eva-remove-redundant-alarms -eva-warn-key=alarm=inactive -then -report-csv @PTEST_RESULT@/csv.csv -report-no-proven -then -report-csv= -eva-warn-key=alarm -eva-slevel 1
    COMMENT: first, do an analysis without any message, but check that the .csv is complete. Then, redo the analysis with value warnings. slevel 1 is just there to force Value to restart
 */
-volatile v;
+volatile int v;
 void main1(int x) {
   int t[10];
   int u[15];

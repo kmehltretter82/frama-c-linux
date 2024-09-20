@@ -9,6 +9,6 @@ inline int f(int x) { return x; }
 inline int f1() { return 1; }
 
 // this time, f2 is a normal external definition.
-extern inline f2() { return 3; }
+extern inline int f2() { return 3; }
 
 int g(int x) { return f(x) + f1() + f2 (); }

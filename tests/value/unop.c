@@ -16,7 +16,7 @@ void main2(int i) {
   }
 }
 
-volatile v;
+volatile int v;
 
 void main() {
   main1((float)v);
