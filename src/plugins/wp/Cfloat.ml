@@ -139,7 +139,7 @@ let () = Context.register
 (* --- Literals                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let rfloat f = Floating_point.(single f |> to_float)
+let rfloat f = Floating_point.round_to_single_precision_float f
 
 let fmake ulp value = match ulp with
   | Float32 -> F.e_fun ~result:t32 fq32 [F.e_float (rfloat value)]

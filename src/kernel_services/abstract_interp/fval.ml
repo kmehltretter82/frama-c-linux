@@ -133,7 +133,7 @@ module F = struct
     | Double -> f
     | Single ->
       Floating_point.set_rounding_mode Upward ;
-      let f = Floating_point.(single f |> to_float) in
+      let f = Floating_point.round_to_single_precision_float f in
       Floating_point.set_rounding_mode Nearest_even ;
       f
 
@@ -144,7 +144,7 @@ module F = struct
     | Double -> f
     | Single ->
       Floating_point.set_rounding_mode Downward ;
-      let f = Floating_point.(single f |> to_float) in
+      let f = Floating_point.round_to_single_precision_float f in
       Floating_point.set_rounding_mode Nearest_even ;
       f
 end
@@ -163,7 +163,7 @@ let zeros = inject ~nan:false (-0.) 0.
    32-bit representations: lower bits are 0, and the value fits inside
    a 32-bit float. *)
 let check_representability prec b e =
-  let single f = Floating_point.(single f |> to_float) in
+  let single f = Floating_point.round_to_single_precision_float f in
   let this_one fmt x = if single x <> x then Format.pp_print_string fmt "->" in
   if prec = Single && (single b <> b || single e <> e) then
     Kernel.fatal "Ival: invalid float32, %ab=%g (%a) %ae=%g (%a)"

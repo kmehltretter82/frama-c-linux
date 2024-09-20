@@ -4221,7 +4221,7 @@ and constFold (machdep: bool) (e: exp) : exp =
           | Integer i -> kinteger64 ~loc ~kind:ik i
         end
       | Const (CReal(f,_,_)), TFloat FFloat when t.tattr = [] ->
-        let f = Floating_point.(single f |> to_float) in
+        let f = Floating_point.round_to_single_precision_float f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CReal(f,_,_)), TFloat FDouble when t.tattr = [] ->
         new_exp ~loc (Const (CReal (f,FDouble,None)))
@@ -4229,7 +4229,7 @@ and constFold (machdep: bool) (e: exp) : exp =
          how to handle this type anyway. *)
       | Const (CInt64(i,_,_)), TFloat FFloat when t.tattr = [] ->
         let f = Integer.to_float i in
-        let f = Floating_point.(single f |> to_float) in
+        let f = Floating_point.round_to_single_precision_float f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CInt64(i,_,_)), TFloat FDouble when t.tattr = [] ->
         let f = Integer.to_float i in

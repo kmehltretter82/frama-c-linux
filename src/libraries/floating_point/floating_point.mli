@@ -82,6 +82,12 @@ val format_of_fkind : Cil_types.fkind -> resulting_format
 (** Returns the [fkind] corresponding to the given format. *)
 val fkind_of_format : 'f format -> Cil_types.fkind
 
+(** Rounds the given float to the [Single] format and return it without types.
+    This call is equivalent to [single f |> to_float] and is proposed to
+    minimize modifications in the rest of the code base and ensure backward
+    compatibility. *)
+val round_to_single_precision_float : float -> float
+
 
 
 (** {2 Typed floating point numbers} *)

@@ -101,6 +101,9 @@ let represents : type f. float:float -> in_format:f format -> f t =
 let to_float (Float (n, _)) = n
 let format   (Float (_, f)) = f
 
+let round_to_single_precision_float f =
+  single f |> to_float
+
 let is_finite (Float (n, _)) =
   match classify_float n with
   | FP_infinite | FP_nan -> false
