@@ -2,8 +2,8 @@
 [kernel] Parsing multiple_file_2.c (with preprocessing)
 [kernel:typing:int-conversion] multiple_file_2.c:28: Warning: 
   Array type comparison succeeds only based on machine-dependent constant evaluation: int [sizeof(struct i_s2)] and int [sizeof(struct i_s2)]
-[kernel:typing:merge-conversion] Warning: 
-  Conflicting definitions are between files multiple_file_1.c and multiple_file_2.c
+[kernel:typing:merge-conversion] multiple_file_2.c:28: Warning: 
+  Conflicting definitions for types 'int [sizeof(struct i_s2)]' and 'int [sizeof(struct i_s2)]' (previous definition was in file multiple_file_1.c).
 [kernel:typing:int-conversion] multiple_file_2.c:36: Warning: 
   Array type comparison succeeds only based on machine-dependent constant evaluation: int [sizeof(void *)] and int [sizeof(struct i_s2)]
 [kernel:typing:int-conversion] multiple_file_2.c:38: Warning: 
