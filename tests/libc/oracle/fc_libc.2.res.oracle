@@ -1,6 +1,7 @@
 [kernel] Parsing fc_libc.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_alloc_axiomatic.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_builtin.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_define_at.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_blkcnt_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_blksize_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_clockid_t.h (with preprocessing)

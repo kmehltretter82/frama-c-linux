@@ -53,6 +53,8 @@
   function utimes: precondition 'valid_path' got status valid.
 [eva] sys_time_h.c:22: 
   function utimes: precondition 'valid_times_or_null' got status valid.
+[eva] sys_time_h.c:22: 
+  function utimes: precondition 'intialized_times_or_null,initialization' got status valid.
 [eva] Done for function utimes
 [eva] computing for function utimes <- main.
   Called from sys_time_h.c:28.
@@ -60,6 +62,8 @@
   function utimes: precondition 'valid_path' got status valid.
 [eva] sys_time_h.c:28: 
   function utimes: precondition 'valid_times_or_null' got status valid.
+[eva] sys_time_h.c:28: 
+  function utimes: precondition 'intialized_times_or_null,initialization' got status valid.
 [eva] Done for function utimes
 [eva] Recording results for main
 [eva] Done for function main

@@ -1,32 +1,32 @@
-[variadic] FRAMAC_SHARE/libc/wchar.h:295: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:309: 
   Declaration of variadic function fwprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:297: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:311: 
   Declaration of variadic function swprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:299: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:313: 
   Declaration of variadic function wprintf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:302: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:316: 
   Declaration of variadic function wscanf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:304: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:318: 
   Declaration of variadic function fwscanf.
-[variadic] FRAMAC_SHARE/libc/wchar.h:306: 
+[variadic] FRAMAC_SHARE/libc/wchar.h:320: 
   Declaration of variadic function swscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:207: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:244: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:209: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:246: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:211: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:248: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:212: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:249: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:213: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:250: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:215: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:252: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:217: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:254: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:550: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:587: 
   Declaration of variadic function dprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:610: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:649: 
   Declaration of variadic function asprintf.
 [variadic] wchar.c:11: 
   Translating call to wprintf to a call to the specialized version wprintf_va_1.

@@ -9,7 +9,7 @@
 [eva] FRAMAC_SHARE/libc/stdlib.c:118: Call to builtin strchr
 [eva] FRAMAC_SHARE/libc/stdlib.c:118: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:202: 
+[eva] FRAMAC_SHARE/libc/string.h:218: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] FRAMAC_SHARE/libc/stdlib.c:119: 
   assertion 'string_contains_separator' got status valid.
@@ -109,7 +109,7 @@
   function strcpy: precondition 'room_string' got status valid.
 [eva] stdlib_c_env.c:15: 
   function strcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:425: 
+[eva] FRAMAC_SHARE/libc/string.h:441: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strcmp
 [eva] Done for function strcpy
 [eva] computing for function getenv <- main.

@@ -161,7 +161,7 @@ Prove: included(a_2, 1, a, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 116) in 'memcpy':
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 132) in 'memcpy':
 Effect at line 38
 Prove: true.
 
@@ -793,47 +793,47 @@ Prove: included(a_2, 1, a, n).
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove':
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove':
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (1/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (1/7):
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (2/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (2/7):
 Effect at line 90
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (3/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (3/7):
 Call Result at line 93
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (4/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (4/7):
 Effect at line 101
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (5/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (5/7):
 Effect at line 113
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (6/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (6/7):
 Effect at line 115
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 139) in 'memmove' (7/7):
+Goal Assigns (file FRAMAC_SHARE/libc/string.h, line 155) in 'memmove' (7/7):
 Effect at line 117
 Prove: true.
 

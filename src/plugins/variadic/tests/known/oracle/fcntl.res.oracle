@@ -1,7 +1,7 @@
-[variadic] FRAMAC_SHARE/libc/fcntl.h:128: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
   Declaration of variadic function fcntl.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:131: Declaration of variadic function open.
-[variadic] FRAMAC_SHARE/libc/fcntl.h:138: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:118: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
   Declaration of variadic function openat.
 [variadic] fcntl.c:8: 
   Translating call to the specialized version fcntl(int, int).

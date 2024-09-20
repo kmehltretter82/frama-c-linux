@@ -133,7 +133,7 @@
   Called from socket.c:103.
 [eva] using specification for function memset
 [eva] socket.c:103: function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:151: 
+[eva] FRAMAC_SHARE/libc/string.h:167: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] Done for function memset
 [eva] computing for function bind <- test_server_echo <- main.

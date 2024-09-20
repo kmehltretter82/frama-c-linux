@@ -590,7 +590,7 @@ char *__gen_e_acsl_strdup(char const *s)
       __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_4.fct = "strdup";
-      __gen_e_acsl_assert_data_4.line = 580;
+      __gen_e_acsl_assert_data_4.line = 596;
       __gen_e_acsl_assert_data_4.name = "no_allocation/result_null";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -632,7 +632,7 @@ pid_t __gen_e_acsl_fork(void)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
-    __gen_e_acsl_assert_data.line = 854;
+    __gen_e_acsl_assert_data.line = 883;
     __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);

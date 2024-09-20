@@ -85,7 +85,7 @@ time_t __gen_e_acsl_time(time_t *timer)
       __gen_e_acsl_assert_data.pred_txt = "\\valid(timer)";
       __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data.fct = "time";
-      __gen_e_acsl_assert_data.line = 120;
+      __gen_e_acsl_assert_data.line = 123;
       __gen_e_acsl_assert_data.name = "not_null/valid_timer";
       __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -102,7 +102,7 @@ time_t __gen_e_acsl_time(time_t *timer)
       __gen_e_acsl_assert_data_2.pred_txt = "all behaviors complete";
       __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data_2.fct = "time";
-      __gen_e_acsl_assert_data_2.line = 113;
+      __gen_e_acsl_assert_data_2.line = 116;
       __e_acsl_assert(__gen_e_acsl_active_bhvrs >= 1,
                       & __gen_e_acsl_assert_data_2);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -111,7 +111,7 @@ time_t __gen_e_acsl_time(time_t *timer)
       __gen_e_acsl_assert_data_3.pred_txt = "all behaviors disjoint";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data_3.fct = "time";
-      __gen_e_acsl_assert_data_3.line = 113;
+      __gen_e_acsl_assert_data_3.line = 116;
       __e_acsl_assert(__gen_e_acsl_active_bhvrs <= 1,
                       & __gen_e_acsl_assert_data_3);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -140,7 +140,7 @@ time_t __gen_e_acsl_time(time_t *timer)
       __gen_e_acsl_assert_data_4.pred_txt = "\\initialized(\\old(timer))";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/time.h";
       __gen_e_acsl_assert_data_4.fct = "time";
-      __gen_e_acsl_assert_data_4.line = 122;
+      __gen_e_acsl_assert_data_4.line = 125;
       __gen_e_acsl_assert_data_4.name = "not_null/initialization/timer";
       __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -161,7 +161,7 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_interrupted));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
     __e_acsl_full_init((void *)(& __fc_p_time_tm));
-    __e_acsl_store_block((void *)(& __fc_time_tm),36UL);
+    __e_acsl_store_block((void *)(& __fc_time_tm),56UL);
     __e_acsl_full_init((void *)(& __fc_time_tm));
     __e_acsl_store_block((void *)(& __fc_p_ctime),8UL);
     __e_acsl_full_init((void *)(& __fc_p_ctime));

@@ -774,7 +774,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     __gen_e_acsl_assert_data_6.pred_txt = "__gen_e_acsl_strcpy_src_size + 1 <= 18446744073709551615";
     __gen_e_acsl_assert_data_6.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_6.fct = "strcpy";
-    __gen_e_acsl_assert_data_6.line = 419;
+    __gen_e_acsl_assert_data_6.line = 435;
     __gen_e_acsl_assert_data_6.name = "size_lesser_or_eq_than_SIZE_MAX";
     __e_acsl_assert(__gen_e_acsl_le <= 0,& __gen_e_acsl_assert_data_6);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_6);
@@ -797,7 +797,7 @@ char *__gen_e_acsl_strcpy(char * restrict dest, char const * restrict src)
     __gen_e_acsl_assert_data_8.pred_txt = "\\result == \\old(dest)";
     __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
     __gen_e_acsl_assert_data_8.fct = "strcpy";
-    __gen_e_acsl_assert_data_8.line = 426;
+    __gen_e_acsl_assert_data_8.line = 442;
     __gen_e_acsl_assert_data_8.name = "result_ptr";
     __e_acsl_assert(__retres == __gen_e_acsl_at,& __gen_e_acsl_assert_data_8);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
@@ -885,7 +885,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read(__retres)";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_4.fct = "strchr";
-      __gen_e_acsl_assert_data_4.line = 198;
+      __gen_e_acsl_assert_data_4.line = 214;
       __gen_e_acsl_assert_data_4.name = "mem_access";
       __e_acsl_assert(__gen_e_acsl_and,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -908,7 +908,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_5.pred_txt = "\\base_addr(\\result) == \\base_addr(\\old(s))";
       __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_5.fct = "strchr";
-      __gen_e_acsl_assert_data_5.line = 199;
+      __gen_e_acsl_assert_data_5.line = 215;
       __gen_e_acsl_assert_data_5.name = "found/result_same_base";
       __e_acsl_assert(__gen_e_acsl_base_addr == __gen_e_acsl_base_addr_2,
                       & __gen_e_acsl_assert_data_5);
@@ -918,7 +918,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_3.pred_txt = "*\\result == (char)\\old(c)";
       __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_3.fct = "strchr";
-      __gen_e_acsl_assert_data_3.line = 198;
+      __gen_e_acsl_assert_data_3.line = 214;
       __gen_e_acsl_assert_data_3.name = "found/result_char";
       __e_acsl_assert((int)*__retres == (int)((char)__gen_e_acsl_at_5),
                       & __gen_e_acsl_assert_data_3);
@@ -936,7 +936,7 @@ char *__gen_e_acsl_strchr(char const *s, int c)
       __gen_e_acsl_assert_data_8.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_8.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_8.fct = "strchr";
-      __gen_e_acsl_assert_data_8.line = 205;
+      __gen_e_acsl_assert_data_8.line = 221;
       __gen_e_acsl_assert_data_8.name = "not_found/result_null";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_8);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_8);
@@ -996,7 +996,7 @@ pid_t __gen_e_acsl_fork(void)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
-    __gen_e_acsl_assert_data.line = 854;
+    __gen_e_acsl_assert_data.line = 883;
     __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -3456,7 +3456,7 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& valid_specifiers));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
     __e_acsl_full_init((void *)(& __fc_p_time_tm));
-    __e_acsl_store_block((void *)(& __fc_time_tm),36UL);
+    __e_acsl_store_block((void *)(& __fc_time_tm),56UL);
     __e_acsl_full_init((void *)(& __fc_time_tm));
   }
   return;

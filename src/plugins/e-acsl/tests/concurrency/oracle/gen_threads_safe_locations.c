@@ -438,7 +438,7 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_interrupted));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
     __e_acsl_full_init((void *)(& __fc_p_time_tm));
-    __e_acsl_store_block((void *)(& __fc_time_tm),36UL);
+    __e_acsl_store_block((void *)(& __fc_time_tm),56UL);
     __e_acsl_full_init((void *)(& __fc_time_tm));
     __e_acsl_store_block((void *)(& __fc_p_ctime),8UL);
     __e_acsl_full_init((void *)(& __fc_p_ctime));

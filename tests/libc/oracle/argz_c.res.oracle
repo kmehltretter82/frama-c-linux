@@ -20,11 +20,13 @@
   \return(realloc) == 0 (auto)
   \return(reallocarray) == 0 (auto)
   \return(getenv) == 0 (auto)
+  \return(secure_getenv) == 0 (auto)
   \return(bsearch) == 0 (auto)
   \return(realpath) == 0 (auto)
   \return(canonicalize_file_name) == 0 (auto)
   \return(memchr) == 0 (auto)
   \return(memrchr) == 0 (auto)
+  \return(rawmemchr) == 0 (auto)
   \return(memcpy) == 0 (auto)
   \return(mempcpy) == 0 (auto)
   \return(memmove) == 0 (auto)
@@ -141,7 +143,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] FRAMAC_SHARE/libc/argz.c:279: 
   function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
@@ -236,7 +238,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:135: Call to builtin strchr
 [eva] FRAMAC_SHARE/libc/argz.c:135: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:202: 
+[eva] FRAMAC_SHARE/libc/string.h:218: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
@@ -264,15 +266,15 @@
 [eva] Done for function strstr
 [eva] computing for function strndup <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:85.
-[eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:336: Automatic loop unrolling.
-[eva] FRAMAC_SHARE/libc/string.c:339: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/string.c:339: allocating variable __malloc_strndup_l339
-[eva] FRAMAC_SHARE/libc/string.c:344: Call to builtin memcpy
-[eva] FRAMAC_SHARE/libc/string.c:344: 
+[eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:347: Automatic loop unrolling.
+[eva] FRAMAC_SHARE/libc/string.c:350: Call to builtin malloc
+[eva] FRAMAC_SHARE/libc/string.c:350: allocating variable __malloc_strndup_l350
+[eva] FRAMAC_SHARE/libc/string.c:355: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/string.c:355: 
   function memcpy: precondition 'valid_dest' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:344: 
+[eva] FRAMAC_SHARE/libc/string.c:355: 
   function memcpy: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:344: 
+[eva] FRAMAC_SHARE/libc/string.c:355: 
   function memcpy: precondition 'separation' got status valid.
 [eva] Recording results for strndup
 [eva] Done for function strndup
@@ -414,10 +416,10 @@
 [eva] Done for function strstr
 [eva] computing for function strndup <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:85.
-[eva] FRAMAC_SHARE/libc/string.c:339: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/string.c:339: 
-  allocating variable __malloc_strndup_l339_0
-[eva] FRAMAC_SHARE/libc/string.c:344: Call to builtin memcpy
+[eva] FRAMAC_SHARE/libc/string.c:350: Call to builtin malloc
+[eva] FRAMAC_SHARE/libc/string.c:350: 
+  allocating variable __malloc_strndup_l350_0
+[eva] FRAMAC_SHARE/libc/string.c:355: Call to builtin memcpy
 [eva] Recording results for strndup
 [eva] Done for function strndup
 [eva] computing for function str_append <- argz_replace <- main.
@@ -516,7 +518,7 @@
   function memmove: precondition 'valid_dest' got status valid.
 [eva] FRAMAC_SHARE/libc/argz.c:192: 
   function memmove: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:141: 
+[eva] FRAMAC_SHARE/libc/string.h:157: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for argz_delete
 [eva] Done for function argz_delete
@@ -1195,10 +1197,10 @@
   __fc_errno ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   l ∈ {0}
-  p ∈ {{ NULL ; &__malloc_strndup_l339 ; &__malloc_strndup_l339_0 }}
-  __retres ∈ {{ NULL ; &__malloc_strndup_l339 ; &__malloc_strndup_l339_0 }}
-  __malloc_strndup_l339 ∈ {0}
-  __malloc_strndup_l339_0 ∈ {0}
+  p ∈ {{ NULL ; &__malloc_strndup_l350 ; &__malloc_strndup_l350_0 }}
+  __retres ∈ {{ NULL ; &__malloc_strndup_l350 ; &__malloc_strndup_l350_0 }}
+  __malloc_strndup_l350 ∈ {0}
+  __malloc_strndup_l350_0 ∈ {0}
 [eva:final-states] Values at end of function strstr:
   __retres ∈ {{ NULL ; &__realloc_argz_append_l277_1{[7], [18]} }}
 [eva:final-states] Values at end of function argz_replace:

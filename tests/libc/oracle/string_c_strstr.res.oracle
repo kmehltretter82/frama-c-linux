@@ -10,7 +10,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_c_strstr.c:52: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:263: 
+[eva] FRAMAC_SHARE/libc/string.h:279: 
   function strstr: postcondition 'result_null_or_in_haystack' got status valid.
 [eva] Recording results for strstr
 [eva] Done for function strstr
@@ -68,7 +68,7 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_c_strstr.c:59: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:295: starting to merge loop iterations
+[eva] FRAMAC_SHARE/libc/string.c:306: starting to merge loop iterations
 [eva] Recording results for strstr
 [eva] Done for function strstr
 [eva] computing for function strstr <- main.
@@ -101,9 +101,9 @@
   function strstr: precondition 'valid_string_haystack' got status valid.
 [eva] string_c_strstr.c:64: 
   function strstr: precondition 'valid_string_needle' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:266: 
+[eva] FRAMAC_SHARE/libc/string.h:282: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
-[eva:alarm] FRAMAC_SHARE/libc/string.h:263: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:279: Warning: 
   function strstr: postcondition 'result_null_or_in_haystack' got status unknown.
 [eva] Recording results for strstr
 [eva] Done for function strstr

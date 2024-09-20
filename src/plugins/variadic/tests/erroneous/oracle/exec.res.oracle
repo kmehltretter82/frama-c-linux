@@ -1,8 +1,13 @@
-[variadic] FRAMAC_SHARE/libc/unistd.h:807: 
+[variadic] FRAMAC_SHARE/libc/fcntl.h:115: 
+  Declaration of variadic function fcntl.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:118: Declaration of variadic function open.
+[variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
+  Declaration of variadic function openat.
+[variadic] FRAMAC_SHARE/libc/unistd.h:836: 
   Declaration of variadic function execl.
-[variadic] FRAMAC_SHARE/libc/unistd.h:812: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:841: 
   Declaration of variadic function execle.
-[variadic] FRAMAC_SHARE/libc/unistd.h:817: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:846: 
   Declaration of variadic function execlp.
 [variadic:typing] exec.c:5: Warning: 
   Incorrect type for argument 3. The argument will be cast from int to char *.

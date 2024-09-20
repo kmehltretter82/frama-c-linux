@@ -29,7 +29,7 @@
   function memcpy: precondition 'valid_dest' got status unknown.
 [eva] memcpy.c:32: function memcpy: precondition 'valid_src' got status valid.
 [eva] memcpy.c:32: function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:118: 
+[eva] FRAMAC_SHARE/libc/string.h:134: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for buggy
 [from] Computing for function buggy
@@ -1073,6 +1073,21 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
+--- Properties of Function 'rawmemchr'
+--------------------------------------------------------------------------------
+
+[ Extern  ] Post-condition 'result_valid_read'
+            Unverifiable but considered Valid.
+[ Extern  ] Post-condition 'result_same_base'
+            Unverifiable but considered Valid.
+[ Extern  ] Assigns nothing
+            Unverifiable but considered Valid.
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 120)
+            Unverifiable but considered Valid.
+[  Valid  ] Default behavior
+            by Frama-C kernel.
+
+--------------------------------------------------------------------------------
 --- Properties of Function 'memcpy'
 --------------------------------------------------------------------------------
 
@@ -1086,11 +1101,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 116)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 132)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 116)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 132)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 117)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 133)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1103,11 +1118,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_next_byte'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 129)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 145)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 129)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 145)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 130)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 146)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1120,11 +1135,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 139)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 155)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 139)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 155)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 140)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 156)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1137,11 +1152,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 149)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 165)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 149)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 165)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 150)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 166)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1154,7 +1169,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 159)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 175)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1167,7 +1182,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 165)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 181)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1180,7 +1195,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 172)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 188)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1193,7 +1208,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 180)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 196)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1204,7 +1219,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 187)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 203)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1227,7 +1242,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 194)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 210)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1246,7 +1261,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 213)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 229)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1259,7 +1274,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 221)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 237)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1272,7 +1287,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 231)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 247)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1285,7 +1300,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 240)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 256)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1298,7 +1313,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 249)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 265)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1311,7 +1326,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 260)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 276)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1324,7 +1339,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 273)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 289)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1345,31 +1360,31 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'resume_str' 'ptr_same_base'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 289)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 305)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 304)
+[ Extern  ] Assigns for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 320)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 316)
+[ Extern  ] Assigns for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 332)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 289)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 305)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 291)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 307)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 293)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 309)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 295)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 311)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 304)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 320)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 306)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 322)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 307)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 323)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 316)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 332)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 319)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 335)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 322)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 338)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1394,31 +1409,31 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'resume_str' 'saveptr_same_base'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 341)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 357)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 356)
+[ Extern  ] Assigns for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 372)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 369)
+[ Extern  ] Assigns for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 385)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 341)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 357)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 343)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 359)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 345)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 361)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 347)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 363)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 356)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 372)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 358)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 374)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 359)
+[ Extern  ] Froms for 'new_str' (file FRAMAC_SHARE/libc/string.h, line 375)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 369)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 385)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 372)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 388)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 375)
+[ Extern  ] Froms for 'resume_str' (file FRAMAC_SHARE/libc/string.h, line 391)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1435,11 +1450,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'valid_stringp' 'valid_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 391)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 407)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 391)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 407)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 392)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 408)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1460,7 +1475,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 410)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 426)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1473,11 +1488,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 423)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 439)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 423)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 439)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 424)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 440)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1494,11 +1509,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'partial' 'equal_prefix'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 435)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 451)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 435)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 451)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 436)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 452)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'complete'
             by Frama-C kernel.
@@ -1515,11 +1530,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'bounded_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 456)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 472)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 456)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 472)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 457)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 473)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1532,11 +1547,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'points_to_end'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 468)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 484)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 468)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 484)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 469)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 485)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1553,11 +1568,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition 'result_ptr'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 481)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 497)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 481)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 497)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 484)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 500)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1572,23 +1587,23 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'partial' 'sum_of_bounded_lengths'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'complete' (file FRAMAC_SHARE/libc/string.h, line 508)
+[ Extern  ] Assigns for 'complete' (file FRAMAC_SHARE/libc/string.h, line 524)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 502)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 518)
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'partial' (file FRAMAC_SHARE/libc/string.h, line 515)
+[ Extern  ] Assigns for 'partial' (file FRAMAC_SHARE/libc/string.h, line 531)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'complete' (file FRAMAC_SHARE/libc/string.h, line 508)
+[ Extern  ] Froms for 'complete' (file FRAMAC_SHARE/libc/string.h, line 524)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'complete' (file FRAMAC_SHARE/libc/string.h, line 510)
+[ Extern  ] Froms for 'complete' (file FRAMAC_SHARE/libc/string.h, line 526)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 502)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 518)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 503)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 519)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'partial' (file FRAMAC_SHARE/libc/string.h, line 515)
+[ Extern  ] Froms for 'partial' (file FRAMAC_SHARE/libc/string.h, line 531)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'partial' (file FRAMAC_SHARE/libc/string.h, line 517)
+[ Extern  ] Froms for 'partial' (file FRAMAC_SHARE/libc/string.h, line 533)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'complete'
             by Frama-C kernel.
@@ -1603,11 +1618,11 @@
 
 [ Extern  ] Post-condition 'bounded_result'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 532)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 548)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 532)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 548)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 533)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 549)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1616,11 +1631,11 @@
 --- Properties of Function 'strxfrm'
 --------------------------------------------------------------------------------
 
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 542)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 558)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 542)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 558)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 543)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 559)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1635,7 +1650,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 551)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 567)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1650,19 +1665,19 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'no_allocation' 'result_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 570)
+[ Extern  ] Assigns for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 586)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'no_allocation' nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 570)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 586)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 572)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 588)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 567)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 583)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'no_allocation' (file FRAMAC_SHARE/libc/string.h, line 579)
+[ Extern  ] Froms for 'no_allocation' (file FRAMAC_SHARE/libc/string.h, line 595)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'allocation'
             by Frama-C kernel.
@@ -1670,7 +1685,7 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'no_allocation'
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/string.h, line 566) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/string.h, line 582) 
             Unverifiable but considered Valid.
 [ Extern  ] Frees/Allocates for 'no_allocation' nothing/nothing 
             Unverifiable but considered Valid.
@@ -1685,19 +1700,19 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'no_allocation' 'result_null'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 594)
+[ Extern  ] Assigns for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 610)
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
 [ Extern  ] Assigns for 'no_allocation' nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 594)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 610)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 595)
+[ Extern  ] Froms for 'allocation' (file FRAMAC_SHARE/libc/string.h, line 611)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 590)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 606)
             Unverifiable but considered Valid.
-[ Extern  ] Froms for 'no_allocation' (file FRAMAC_SHARE/libc/string.h, line 605)
+[ Extern  ] Froms for 'no_allocation' (file FRAMAC_SHARE/libc/string.h, line 621)
             Unverifiable but considered Valid.
 [  Valid  ] Behavior 'allocation'
             by Frama-C kernel.
@@ -1705,7 +1720,7 @@
             by Frama-C kernel.
 [  Valid  ] Behavior 'no_allocation'
             by Frama-C kernel.
-[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/string.h, line 589) 
+[ Extern  ] Frees/Allocates nothing/(file FRAMAC_SHARE/libc/string.h, line 605) 
             Unverifiable but considered Valid.
 [ Extern  ] Frees/Allocates for 'no_allocation' nothing/nothing 
             Unverifiable but considered Valid.
@@ -1728,11 +1743,11 @@
             Unverifiable but considered Valid.
 [ Extern  ] Post-condition for 'src_too_long' 'result_points_to_end'
             Unverifiable but considered Valid.
-[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 615)
+[ Extern  ] Assigns (file FRAMAC_SHARE/libc/string.h, line 631)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 615)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 631)
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 616)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 632)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1753,7 +1768,7 @@
             Unverifiable but considered Valid.
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 642)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/string.h, line 658)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -2268,9 +2283,9 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   174 Completely validated
+   175 Completely validated
      1 Locally validated
-   277 Considered valid
+   281 Considered valid
     36 To be validated
-   488 Total
+   493 Total
 --------------------------------------------------------------------------------
