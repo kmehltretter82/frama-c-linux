@@ -1651,6 +1651,9 @@ procedures thanks to the following option:
 \subsection{Linking \textsf{ACSL} Symbols to External Libraries}
 \label{drivers}
 
+\paragraph{DEPRECATED.} You shall now import a Why3 module
+instead of using custom drivers. See Section~\ref{importer} for details.
+
 Besides additional proof libraries, it is also possible to
 \emph{link} declared \textsf{ACSL} symbols to external or predefined
 symbols. In such case, the corresponding \textsf{ACSL} definitions,
@@ -1660,7 +1663,6 @@ External linkage is specified in \emph{driver files}. It is possible
 to load one or several drivers with the following \textsf{WP} plug-in option:
 \begin{description}
 \item[\tt -wp-driver <file,\ldots>] load specified driver files.
-
 \end{description}
 
 \newcommand{\ccc}{\texttt{,}\ldots\texttt{,}}
@@ -1781,6 +1783,48 @@ by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-dr
 \caption{Driver Property Tags}
 \label{wp-driver-tags}
 \end{figure}
+
+\pagebreak
+\subsection{Importing Why3 Modules}
+\label{importer}
+
+The \textsf{WP} plug-in provides an \textsf{ACSL} module loader that
+can import \textsf{Why3} theories and modules into \textsf{ACSL}.
+See \textsf{Frama-C} user manual, Section § 6.3 for details.
+Here is an example of use:
+
+\begin{lstlisting}
+//@ import why3: number::Gcd;
+
+/*@
+  assigns \nothing;
+  ensures \result == Gcd::gcd(a,b);
+*/
+int euclid(int a, int b)
+{
+  int r;
+  /*@
+    loop assigns a, b, r;
+    loop invariant Gcd::gcd(a,b) == \at( Gcd::gcd(a,b), Pre );
+    loop variant \abs(b);
+  */
+  while( b != 0 ) {
+    r = b ;
+    b = a % b ;
+    a = r ;
+  }
+  return a < 0 ? -a : a;
+}
+\end{lstlisting}
+
+\noindent
+The Why3 load-path can be specified from the command-line:
+\begin{description}
+  \item[\tt -wp-library <dir,\ldots>] add the specified directory to the Why3 load-path.
+\end{description}
+
+\noindent
+Notice that the Why3 standard library is already in the load-path by default.
 
 \clearpage
 \subsection{Proof Session \& Cache}
