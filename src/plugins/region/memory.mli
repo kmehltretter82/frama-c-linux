@@ -70,8 +70,10 @@ val node : map -> node -> node
 val nodes : map -> node list -> node list
 
 val iter : map -> (region -> unit) -> unit
+val iter_node : map -> (node -> unit) -> unit
 val region : map -> node -> region
 val regions : map -> region list
+val parents : map -> node -> node list
 
 val new_chunk : map -> ?size:int -> ?ptr:node -> ?ptrby:node -> unit -> node
 val add_root : map -> Cil_types.varinfo -> node
@@ -97,3 +99,11 @@ val cpointed_by : map -> node -> node list
 
 (** @raise Not_found *)
 val exp : map -> exp -> node option
+
+(** @raise Not_found *)
+val field : map -> node -> fieldinfo -> node
+val cvar : map -> varinfo -> node
+
+val eq_node : map -> node -> node -> bool
+
+val accesses : map -> node -> typ list * typ list * typ list

@@ -344,10 +344,31 @@ let iter (m:map) (f: region -> unit) =
   let h = Hashtbl.create 0 in
   Vmap.iter (fun _x n -> walk h m f n) m.roots
 
+  let rec walk_node h m (f: node -> unit) n =
+    let n = Ufind.find m.store n in
+    let id = Store.id n in
+    try Hashtbl.find h id with Not_found ->
+      Hashtbl.add h id () ;
+      f n ;
+      let r = Ufind.get m.store n in
+      match r.clayout with
+      | Blob -> ()
+      | Cell(_,p) -> Option.iter (walk_node h m f) p
+      | Compound(_,_,rg) -> Ranges.iter (walk_node h m f) rg
+
+  let iter_node (m:map) (f: node -> unit) =
+    let h = Hashtbl.create 0 in
+    Vmap.iter (fun _x n -> walk_node h m f n) m.roots
+
 let regions map =
   let pool = ref [] in
   iter map (fun r -> pool := r :: !pool) ;
   List.rev !pool
+
+
+let parents (m: map) (r: node) =
+  let node = Ufind.get m.store r in
+  nodes m node.cparents
 
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
@@ -535,13 +556,27 @@ let cpointed_by m r =
   let rg = Ufind.get m.store r in
   rg.cpointed_by
 
+let cvar (m: map) (v: varinfo) : node =
+  Ufind.find m.store @@ Vmap.find v m.roots
+
+let field (m: map) (r: node) (fd: fieldinfo) : node =
+  if fd.fcomp.cstruct then
+    let _, rgs = cranges m r in
+    let (p,w) = Cil.fieldBitsOffset fd in
+    let rg = Ranges.find p rgs in
+    if rg.offset <= p && p+w <= rg.offset + rg.length then
+      Ufind.find m.store rg.data
+    else raise Not_found
+  else r
+
+
 let rec lval (m: map) (lv: lval) : node =
   let h = host m (fst lv) in
   offset m h (snd lv)
 
 and host (m: map) (h: lhost) : node =
   match h with
-  | Var x -> Ufind.find m.store @@ Vmap.find x m.roots
+  | Var x -> cvar m x
   | Mem e ->
     match exp m e with
     | None -> raise Not_found
@@ -551,13 +586,7 @@ and offset (m: map) (r: node) (ofs: offset) : node =
   match ofs with
   | NoOffset -> Ufind.find m.store r
   | Field (fd, ofs) ->
-    if fd.fcomp.cstruct then
-      let _, rgs = cranges m r in
-      let (p,w) = Cil.fieldBitsOffset fd in
-      let rg = Ranges.find p rgs in
-      if rg.offset <= p && p+w <= rg.offset + rg.length then
-        offset m rg.data ofs
-      else raise Not_found
+    if fd.fcomp.cstruct then offset m (field m r fd) ofs
     else r
   | Index (_, ofs) ->
     let s, rgs = cranges m r in
@@ -577,3 +606,12 @@ and exp (m: map) (e: exp) : node option =
   | UnOp (_, _, _) | BinOp (_, _, _, _) -> None
 
 (* -------------------------------------------------------------------------- *)
+
+
+let eq_node (m: map) = Ufind.eq m.store
+
+let accesses (m : map) (r:node) =
+  let node = Ufind.get m.store r in
+  List.map Access.typeof @@ Access.Set.elements node.creads,
+  List.map Access.typeof @@ Access.Set.elements node.cwrites,
+  List.map Access.typeof @@ Access.Set.elements node.cshifts
