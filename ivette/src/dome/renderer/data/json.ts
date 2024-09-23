@@ -57,7 +57,7 @@ export class JsonError extends Error {
   }
 }
 
-class JsonTypeError extends JsonError {
+export class JsonTypeError extends JsonError {
   expected: string;
 
   constructor(expected: string, given: json) {

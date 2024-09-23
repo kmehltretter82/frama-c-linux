@@ -45,7 +45,6 @@ import { RSplit } from 'dome/layout/splitters';
 import { TitleBar } from 'ivette';
 import { menuItem, setting } from './Globals';
 
-
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import * as Properties from 'frama-c/kernel/api/properties';
@@ -306,7 +305,7 @@ function filterNames(names: string[]): boolean {
   return regex.test(strNames);
 }
 
-function filterProperty(p: Property): boolean {
+export function filterProperty(p: Property): boolean {
   return filterStatus(p.status)
     && filterKind(p.kind)
     && filterAlarm(p.alarm)
@@ -417,7 +416,7 @@ const renderPriority: Renderer<boolean> =
   (prio: boolean): JSX.Element | null =>
     (prio ? <Icon id="ATTENTION" /> : null);
 
-const renderTaint: Renderer<States.Tag> =
+export const renderTaint: Renderer<States.Tag> =
   (taint: States.Tag): JSX.Element | null => {
     let id = null;
     let color = 'black';

@@ -570,6 +570,7 @@ export function Spinner(props: SpinnerProps): JSX.Element {
   return (
     <input
       id={props.id}
+      title={props.title}
       type="number"
       value={props.value}
       min={props.vmin}
