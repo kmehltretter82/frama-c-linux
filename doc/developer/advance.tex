@@ -4145,15 +4145,21 @@ registering the module importer extension. For instance:
 \end{lstlisting}
 
 Here, \verb+Foo:+ specifies the name of the \acsl extension responsible for
-importing the module, and \verb+foo::bar::Jazz+ is the name of the module
-to be imported.
+importing the module, and \verb+foo::bar::Jazz+ is the name of the module to be
+imported. Like \acsl extensions, an extended syntax with a plugin name (required
+when registering the extension) can be used to avoid ambiguities if two or
+more plugins choose the same name for an importer extension:
 
-To define such an external module loader, a plug-in shall call the
+\begin{lstlisting}[style=c]
+  //@ import \myplugin::Foo: foo::bar::Jazz ;
+\end{lstlisting}
+
+To define such an external module importer, a plug-in shall call the
 \scodeidxdef{Acsl\_extension}{register\_module\_importer}
-\verb+Acsl_extension.register_module_importer+ with a suitable importer
-function. The importer function is responsible for resolving the module name and
-defining the associated \acsl logic types, functions and predicates. Here is an
-example of such a importer function:
+\verb+Acsl_extension.register_module_importer+ with a suitable plugin name and
+importer function. The importer function is responsible for resolving the module
+name and defining the associated \acsl logic types, functions and predicates.
+Here is an example of such a loader function:
 
 \scodeidx{Logic\_typing}{module\_builder}
 \begin{lstlisting}[language=OCaml]
@@ -4175,7 +4181,7 @@ let importer (ctxt: module_builder) (loc: location) (path: string list) =
     (* ... *)
   end
 
-let () = Acsl_extension.register_module_importer "Foo" importer
+let () = Acsl_extension.register_module_importer ~plugin:"myplugin" "Foo" importer
 \end{lstlisting}
 
 Added types and functions shall use local names, as in the example above.
@@ -4193,7 +4199,7 @@ When printing the internal AST from \framac command line using \verb+-print+
 option, externally imported modules are listed with one single clause for each,
 with no aliasing in order to avoid any ambiguity. For instance:
 \begin{ccode}
-//@ import Foo: foo::bar::Jazz \as _ ;
+//@ import \myplugin::Foo: foo::bar::Jazz \as _ ;
 \end{ccode}
 
 Alternatively, you can debug the logical definitions actually imported by any
@@ -4206,7 +4212,7 @@ key:
 With this option, the contents of the imported modules are printed like regular
 module definitions, with only a comment to mention the origin of the plug-in:
 \begin{ccode}
-/*@ // import Foo:
+/*@ // import \myplugin::Foo:
     module foo::bar::Jazz {
         ...
     }

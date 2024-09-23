@@ -75,14 +75,17 @@ from external specifications, generally from an external proof assistant like
 specifications is as follows:
 
 \begin{lstlisting}[language=ACSL]
-import <Loader>: <ModuleName> [ as <Name> ];
+import <Loader>: <ModuleName> [ \as <Name> ];
 \end{lstlisting}
 
 This is a generalization of the regular \acsl \lstinline[language=ACSL]|import|
 clause just mentioned above. The \verb+<Loader>+ name identifies the kind of
 external specifications to be loaded. Loaders are defined by dedicated plug-in
 support only, and you shall consult the documentation of each plug-in to known
-which loaders are available.
+which loaders are available. A loader syntax can be either just a name, used
+when the extension was registered, or \verb+<\plugin::name>+. The second syntax
+is useful to avoid ambiguities if several plug-ins register a module importer
+extension with the same name.
 
 The \verb+<ModuleName>+ identifies both the name of the imported module and the
 external specification to be imported, with a \verb+<Loader>+ dependent meaning.
