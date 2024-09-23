@@ -375,8 +375,8 @@ let rec print_decl fmt d =
   | LDmodule (name,ds) ->
     fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
       (pp_list ~sep:"@\n" print_decl) ds
-  | LDimport (drv,mId,asId) ->
-    let pp_driver fmt (name, plugin) =
+  | LDimport (loader,mId,asId) ->
+    let pp_loader fmt (name, plugin) =
       match plugin with
       | None -> pp_print_string fmt name
       | Some plugin ->
@@ -385,7 +385,7 @@ let rec print_decl fmt d =
         else fprintf fmt "\\%s::%s" plugin name
     in
     fprintf fmt "@[<2>import" ;
-    Option.iter (fprintf fmt "%a:" pp_driver) drv ;
+    Option.iter (fprintf fmt "%a:" pp_loader) loader ;
     fprintf fmt "@ %s" mId ;
     Option.iter (fprintf fmt "@ \\as %s") asId ;
     fprintf fmt ";@]@\n}"

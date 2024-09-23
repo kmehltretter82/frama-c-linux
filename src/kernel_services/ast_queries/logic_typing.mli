@@ -350,7 +350,7 @@ val get_typer_block:
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
 
-(** Load the given extension importer.
+(** Load the given module importer extension.
     @since Frama-C+dev
 *)
 val get_importer:

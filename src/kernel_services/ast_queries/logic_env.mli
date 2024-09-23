@@ -40,8 +40,8 @@ val is_extension: plugin:string option -> string -> bool
 *)
 val is_extension_block: plugin:string option -> string -> bool
 
-(** Return [true] if a module importer is registered for the given plugin.
-    @since Frama-C+dev
+(** Return [true] if a module importer is registered for the given name and
+    plugin. @since Frama-C+dev
 *)
 val is_importer: plugin:string option -> string -> bool
 
@@ -92,7 +92,7 @@ module Axiomatics: State_builder.Hashtbl
 (** @since Frama-C+dev *)
 module Modules: State_builder.Hashtbl
   with type key = string
-   (* driver (name, plugin), location *)
+   (* loader (name, plugin), location *)
    and type data = (string * string option) option * Cil_types.location
 
 val builtin_states: State.t list

@@ -2219,12 +2219,12 @@ module Global_annotation = struct
             if res = 0 then Attributes.compare attr1 attr2 else res
           | Daxiomatic _, _ -> -1
           | _, Daxiomatic _ -> 1
-          | Dmodule (m1,g1,attr1,drv1,_), Dmodule (m2,g2,attr2,drv2,_) ->
+          | Dmodule (m1,g1,attr1,loader1,_), Dmodule (m2,g2,attr2,loader2,_) ->
             let res = String.compare m1 m2 in
             if res = 0 then
               let res = compare_list compare g1 g2 in
               if res = 0 then
-                let res =  Stdlib.compare drv1 drv2 in
+                let res =  Stdlib.compare loader1 loader2 in
                 if res = 0 then Attributes.compare attr1 attr2
                 else res
               else res

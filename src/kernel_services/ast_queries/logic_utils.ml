@@ -739,9 +739,9 @@ let rec add_attribute_glob_annot a g =
   | Daxiomatic(n,l,al,loc) ->
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
                Cil.addAttribute a al,loc)
-  | Dmodule(n,l,al,drv,loc) ->
+  | Dmodule(n,l,al,loader,loc) ->
     Dmodule(n,List.map (add_attribute_glob_annot a) l,
-            Cil.addAttribute a al,drv,loc)
+            Cil.addAttribute a al,loader,loc)
   | Dtype(ti,_) -> ti.lt_attr <- Cil.addAttribute a ti.lt_attr; g
   | Dlemma(n,labs,t,p,al,l) ->
     Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
@@ -1230,8 +1230,8 @@ let rec is_same_global_annotation ga1 ga2 =
   | Daxiomatic (id1,ga1,attr1,_), Daxiomatic (id2,ga2,attr2,_) ->
     id1 = id2 && is_same_list is_same_global_annotation ga1 ga2
     && is_same_attributes attr1 attr2
-  | Dmodule (id1,ga1,attr1,drv1,_), Dmodule (id2,ga2,attr2,drv2,_) ->
-    id1 = id2 && is_same_list is_same_global_annotation ga1 ga2 && drv1 = drv2
+  | Dmodule (id1,ga1,attr1,loader1,_), Dmodule (id2,ga2,attr2,loader2,_) ->
+    id1 = id2 && is_same_list is_same_global_annotation ga1 ga2 && loader1 = loader2
     && is_same_attributes attr1 attr2
   | Dtype (t1,_), Dtype (t2,_) -> is_same_logic_type_info t1 t2
   | Dlemma(n1,labs1,typs1,st1,attr1,_),

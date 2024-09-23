@@ -251,8 +251,8 @@ and decl_node =
   (** [LDmodule(id,decls)]
       represents a module of axiomatic definitions.*)
   | LDimport of (string * string option) option * string * string option
-  (** [LDimport(driver,module,alias)]
-      imports symbols from module using the specified driver,
+  (** [LDimport(loader,module,alias)]
+      imports symbols from module using the specified loader,
       with optional alias.*)
   | LDinvariant of string * lexpr (** global invariant. *)
   | LDtype_annot of type_annot    (** type invariant. *)

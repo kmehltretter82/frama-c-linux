@@ -194,8 +194,8 @@
             begin
               match Logic_env.is_importer ~plugin s, plugin with
               | false, _ -> None
-              | true, None -> Some (EXT_IMPORTER s)
-              | true, Some _ -> Some (EXT_IMPORTER_PLUGIN (s, plugin))
+              | true, None -> Some (EXT_LOADER s)
+              | true, Some _ -> Some (EXT_LOADER_PLUGIN (s, plugin))
             end
           | Cil_types.Ext_contract -> Some (EXT_CONTRACT (s, plugin))
           | Cil_types.Ext_global ->
@@ -334,16 +334,17 @@
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
         Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
-          "Ignoring unregistered importer extension '%s' of plug-in %s" s plugin
+          "Ignoring unregistered module importer extension '%s' of plug-in %s"
+          s plugin
       else
         Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
-          "Ignoring importer extension '%s' for unloaded plug-in %s" s plugin;
-      IDENTIFIER_IMPORTER s
-    | EXT_IMPORTER_PLUGIN (s, _) ->
+          "Ignoring module importer extension '%s' for unloaded plug-in %s" s plugin;
+      IDENTIFIER_LOADER s
+    | EXT_LOADER_PLUGIN (s, _) ->
       if String.equal plugin "kernel" then
         Kernel.abort ~source
-          "Extension importer '%s' from frama-c's kernel should not be used \
-           with the syntax \\kernel::%s" s s;
+          "Module importer extension '%s' from frama-c's kernel should not be \
+           used with the syntax \\kernel::%s" s s;
       tok
     | _ -> raise Parsing.Parse_error
 }

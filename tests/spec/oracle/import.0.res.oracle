@@ -14,9 +14,9 @@
 [kernel:acsl-extension] Registering acsl extension \eva::taints
 [kernel:acsl-extension] Registering acsl extension \eva::taint
 [test-import] Linking.
-[kernel:acsl-extension] Registering importer extension \myplugin1::foo
-[kernel:acsl-extension] Registering importer extension \myplugin1::bar
-[kernel:acsl-extension] Registering importer extension \myplugin2::foo
+[kernel:acsl-extension] Registering module importer extension \myplugin1::foo
+[kernel:acsl-extension] Registering module importer extension \myplugin1::bar
+[kernel:acsl-extension] Registering module importer extension \myplugin2::foo
 [kernel] Parsing import.i (no preprocessing)
 [test-import:7] Loading A::B.
 [test-import:15] Loading X.

@@ -1919,10 +1919,10 @@ and childrenAnnotation vis a =
     let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
     let attr' = visitCilAttributes vis attr in
     if l' != l || attr != attr' then Daxiomatic(id,l',attr',loc) else a
-  | Dmodule(id,l,attr,drv,loc) ->
+  | Dmodule(id,l,attr,loader,loc) ->
     let l' = Extlib.map_no_copy (visitCilAnnotation vis) l in
     let attr' = visitCilAttributes vis attr in
-    if l' != l || attr != attr' then Dmodule(id,l',attr',drv,loc) else a
+    if l' != l || attr != attr' then Dmodule(id,l',attr',loader,loc) else a
   | Dextended (e,attr,loc) ->
     let e' = visitCilExtended vis e in
     let attr' = visitCilAttributes vis attr in

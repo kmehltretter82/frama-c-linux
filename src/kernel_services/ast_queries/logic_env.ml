@@ -160,8 +160,8 @@ module ModuleOccurence =
   Datatype.Pair
     (Datatype.Option
        (Datatype.Pair
-          (Datatype.String) (* external driver name *)
-          (Datatype.Option(Datatype.String)))) (* external driver plugin *)
+          (Datatype.String) (* external loader name *)
+          (Datatype.Option(Datatype.String)))) (* external loader plugin *)
     (Cil_datatype.Location)
 
 module Modules =

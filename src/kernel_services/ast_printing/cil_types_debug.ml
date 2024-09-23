@@ -971,14 +971,14 @@ and pp_global_annotation fmt = function
     Format.fprintf fmt "Daxiomatic(%a,%a,%a,%a)"  pp_string string
       (pp_list pp_global_annotation) global_annotation_list
       pp_attributes attributes  pp_location location
-  | Dmodule(string,global_annotation_list,attributes,driver,location) ->
-    let pp_driver fmt (name, plugin) =
+  | Dmodule(string,global_annotation_list,attributes,loader,location) ->
+    let pp_loader fmt (name, plugin) =
       Format.fprintf fmt "(%s, %a)" name (pp_option pp_string) plugin
     in
     Format.fprintf fmt "Dmodule(%a,%a,%a,%a,%a)"  pp_string string
       (pp_list pp_global_annotation) global_annotation_list
       pp_attributes attributes
-      (pp_option pp_driver) driver
+      (pp_option pp_loader) loader
       pp_location location
   | Dtype(logic_type_info,location) ->
     Format.fprintf fmt "Dtype(%a,%a)"  pp_logic_type_info logic_type_info  pp_location location

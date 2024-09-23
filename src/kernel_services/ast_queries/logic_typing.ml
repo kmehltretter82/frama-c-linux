@@ -4327,33 +4327,33 @@ struct
       pop_imports () ;
       Some (Dmodule(name,l,[],None,loc))
 
-    | LDimport(None,name,alias) ->
-      add_import ?alias name ; None
+    | LDimport(None,id,alias) ->
+      add_import ?alias id ; None
 
-    | LDimport(Some (driver, plugin) as drv,name,alias) ->
+    | LDimport(Some (name, plugin) as loader,id,alias) ->
       let annot =
-        match Logic_env.Modules.find name with
+        match Logic_env.Modules.find id with
         | None, oldloc ->
           C.error loc
             "Module %s already defined (at %a)"
-            name Cil_printer.pp_location oldloc
-        | Some (driver', plugin'), oldloc ->
-          if plugin <> plugin' || driver <> driver' then
+            id Cil_printer.pp_location oldloc
+        | Some (name', plugin'), oldloc ->
+          if plugin <> plugin' || name <> name' then
             C.error loc
-              "Module %s already imported with driver %a%s (at %a)"
-              name
+              "Module %s already imported with loader %a%s (at %a)"
+              id
               (Pretty_utils.pp_opt ~pre:"\\" ~suf:"::" Format.pp_print_string) plugin'
-              driver'
+              name'
               Cil_printer.pp_location oldloc
           else None
         | exception Not_found ->
           let decls = ref [] in
-          let builder = make_module_builder decls name in
-          let path = Logic_utils.longident name in
-          Extensions.importer ~plugin driver ~builder ~loc path ;
-          Logic_env.Modules.add name (drv,loc) ;
-          Some (Dmodule(name,List.rev !decls,[],drv,loc))
-      in add_import ?alias name ; annot
+          let builder = make_module_builder decls id in
+          let path = Logic_utils.longident id in
+          Extensions.importer ~plugin name ~builder ~loc path ;
+          Logic_env.Modules.add id (loader,loc) ;
+          Some (Dmodule(id,List.rev !decls,[],loader,loc))
+      in add_import ?alias id ; annot
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in

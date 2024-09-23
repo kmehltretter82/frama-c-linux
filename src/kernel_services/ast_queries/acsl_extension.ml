@@ -284,21 +284,21 @@ module Extensions = struct
 
   let register_block = register_gen ~make:make_block ~tbl:ext_block_tbl
 
-  let register_module_importer ~plugin name loader =
+  let register_module_importer ~plugin name importer =
     Kernel.debug ~dkey:Kernel.dkey_acsl_extension
-      "Registering importer extension %s" (fullname plugin name);
+      "Registering module importer extension %s" (fullname plugin name);
     if is_importer ~plugin:(Some "kernel") name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
-        "Trying to register importer extension %s reserved by frama-c. \
+        "Trying to register module importer extension %s reserved by frama-c. \
          Rename to avoid conflict with the kernel. Ignored module importer" name
     else
       begin
         if is_importer ~plugin:(Some plugin) name then
           Kernel.warning ~wkey:Kernel.wkey_acsl_extension
-            "Trying to register importer extension %s twice with plugin %s. \
-             Ignoring the second extension" name plugin
+            "Trying to register module importer extension %s twice with plugin \
+             %s. Ignoring the second extension" name plugin
         else
-          add_to_list ext_importer_tbl name (make_importer ~plugin loader)
+          add_to_list ext_importer_tbl name (make_importer ~plugin importer)
       end
 
   let preprocess ~plugin name = (find_single ~plugin name).preprocessor
