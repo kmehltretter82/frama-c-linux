@@ -86,6 +86,21 @@
       | (Lt|Le), (Unknown|Less) -> Less, true
       | _ -> sense, false
 
+  let module_types : string list ref Stack.t = Stack.create ()
+
+  let push_typename t =
+    Logic_env.add_typename t ;
+    try
+      let r = Stack.top module_types in r := t :: !r
+    with Stack.Empty -> ()
+
+  let push_module_types () =
+    Stack.push (ref []) module_types
+
+  let pop_module_types () =
+    let r = Stack.pop module_types in
+    List.iter Logic_env.remove_typename !r
+
   let type_variables_stack = Stack.create ()
 
   let enter_type_variables_scope l =
@@ -252,9 +267,9 @@
 /* Otherwise, the token will not be usable inside a contract.                */
 /*****************************************************************************/
 
-%token MODULE FUNCTION CONTRACT INCLUDE EXT_AT EXT_LET
-/* ACSL extension for external spec  file */
-%token <string> IDENTIFIER TYPENAME IDENTIFIER_EXT
+%token EXT_SPEC_MODULE EXT_SPEC_FUNCTION EXT_SPEC_CONTRACT EXT_SPEC_INCLUDE
+%token EXT_SPEC_AT EXT_SPEC_LET
+%token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT
 %token <bool*string> STRING_LITERAL
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
@@ -263,7 +278,7 @@
 %token LPAR RPAR IF ELSE COLON COLON2 COLONCOLON DOT DOTDOT DOTDOTDOT
 %token INT INTEGER REAL BOOLEAN BOOL FLOAT LT GT LE GE EQ NE COMMA ARROW EQUAL
 %token FORALL EXISTS IFF IMPLIES AND OR NOT SEPARATED
-%token TRUE FALSE OLD AT RESULT
+%token TRUE FALSE OLD AS AT RESULT
 %token BLOCK_LENGTH BASE_ADDR OFFSET VALID VALID_READ VALID_INDEX VALID_RANGE
 %token OBJECT_POINTER VALID_FUNCTION
 %token ALLOCATION STATIC REGISTER AUTOMATIC DYNAMIC UNALLOCATED
@@ -278,7 +293,8 @@
 %token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
-%token LOGIC PREDICATE INDUCTIVE AXIOMATIC AXIOM LEMMA LBRACE RBRACE
+%token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
+%token AXIOMATIC MODULE IMPORT
 %token GHOST MODEL CASE
 %token VOID CHAR SIGNED UNSIGNED SHORT LONG DOUBLE STRUCT ENUM UNION
 %token BSUNION INTER
@@ -528,13 +544,13 @@ lexpr_inner:
 | RESULT { info $sloc PLresult }
 | SEPARATED LPAR ne_lexpr_list RPAR
       { info $sloc (PLseparated $3) }
-| full_identifier LPAR ne_lexpr_list RPAR
+| symbol_identifier LPAR ne_lexpr_list RPAR
       { info $sloc (PLapp ($1, [], $3)) }
-| full_identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
+| symbol_identifier LBRACE ne_label_args RBRACE LPAR ne_lexpr_list RPAR
       { info $sloc (PLapp ($1, $3, $6)) }
-| full_identifier LBRACE ne_label_args RBRACE
+| symbol_identifier LBRACE ne_label_args RBRACE
       { info $sloc (PLapp ($1, $3, [])) }
-| full_identifier  { info $sloc (PLvar $1) }
+| symbol_identifier  { info $sloc (PLvar $1) }
 | PI  { info $sloc (PLvar "\\pi") }
 | lexpr_inner GTGT lexpr_inner { info $sloc (PLbinop ($1, Brshift, $3))}
 | lexpr_inner LTLT lexpr_inner { info $sloc (PLbinop ($1, Blshift, $3))}
@@ -549,18 +565,28 @@ lexpr_inner:
 | EMPTY { info $sloc PLempty }
 | BSUNION LPAR lexpr_list RPAR { info $sloc (PLunion $3) }
 | INTER LPAR lexpr_list RPAR { info $sloc (PLinter $3) }
-| LBRACE lexpr_list RBRACE
-      { info $sloc (PLset ($2)) }
-| LBRACE lexpr PIPE binders RBRACE
+| LBRACE RBRACE
+      { info $sloc (PLset []) }
+/* because LONGIDENT can be both a type name or a plain identifier,
+   we can't have a full lexpr here, as there would be an ambiguity
+   in { x | a::b * ...: should a::b be considered as a type (hence
+   we are parsing a comprehension with a binder), or an identifier
+   (hence, we are still parsing an lexpr).
+*/
+| LBRACE lexpr_inner RBRACE
+      { info $sloc (PLset [$2]) }
+| LBRACE lexpr_inner COMMA lexpr_list RBRACE
+      { info $sloc (PLset ($2 :: $4)) }
+| LBRACE lexpr_inner PIPE binders RBRACE
       { info $sloc (PLcomprehension ($2,$4,None)) }
-| LBRACE lexpr PIPE binders SEMICOLON lexpr RBRACE
+| LBRACE lexpr_inner PIPE binders SEMICOLON lexpr RBRACE
       { info $sloc (PLcomprehension ($2,$4,Some $6)) }
     /* Aggregated object initialization */
 | LBRACE field_init RBRACE
       { info $sloc (PLinitField($2)) }
 | LBRACE array_init RBRACE
       { info $sloc (PLinitIndex($2)) }
-| LBRACE lexpr WITH update RBRACE
+| LBRACE lexpr_inner WITH update RBRACE
       { List.fold_left
 	  (fun a (path,upd_val) -> info $sloc (PLupdate(a,path,upd_val))) $2 $4 }
 /*
@@ -653,7 +679,7 @@ binders_reentrance:
 ;
 
 decl_spec:
-| type_spec(typename) var_spec { ($1, let (modif, name) = $2 in (modif $1, name))  }
+| type_spec(typesymbol) var_spec { ($1, let (modif, name) = $2 in (modif $1, name))  }
 ;
 
 var_spec:
@@ -731,10 +757,15 @@ logic_type_gen(tname):
 
 typename:
 | name = TYPENAME { name }
+;
+
+typesymbol:
+| name = TYPENAME { name }
+| name = LONGIDENT { name }
 /* TODO treat the case of an ACSL keyword that is also a typedef */
 ;
 
-logic_type: logic_type_gen(typename) { $1 }
+logic_type: logic_type_gen(typesymbol) { $1 }
 
 cv:
   CONST { cv_const }
@@ -742,16 +773,16 @@ cv:
 | BSGHOST { cv_ghost }
 ;
 
-type_spec_cv(tname):
-     type_spec(tname) cv_after { $2 $1 }
-|    cv type_spec_cv(tname) { LTattribute ($2, $1) }
+type_spec_cv:
+     type_spec(TYPENAME) cv_after { $2 $1 }
+|    cv type_spec_cv { LTattribute ($2, $1) }
 
 cv_after:
   /* empty */ { fun t -> t }
 | cv cv_after { fun t -> $2 (LTattribute (t,$1)) }
 
 cast_logic_type:
- | type_spec_cv(TYPENAME) abs_spec_cv_option { $2 $1 }
+ | type_spec_cv abs_spec_cv_option { $2 $1 }
 ;
 
 logic_rt_type:
@@ -872,6 +903,11 @@ ne_logic_type_list(tname):
 | l = separated_nonempty_list(COMMA,logic_type_gen(tname)) { l }
 ;
 
+symbol_identifier:
+| id = full_identifier { id }
+| name = LONGIDENT { name }
+;
+
 full_identifier:
 | id = identifier { id }
 | ADMIT { "admit" }
@@ -879,7 +915,6 @@ full_identifier:
 | ASSERT { "assert" }
 | ASSIGNS { "assigns" }
 | ASSUMES { "assumes" }
-| EXT_AT { "at" }
 | AXIOM { "axiom" }
 | AXIOMATIC { "axiomatic" }
 | BEHAVIOR { "behavior" }
@@ -887,19 +922,16 @@ full_identifier:
 | CHECK { "check" }
 | COMPLETE { "complete" }
 | CONTINUES { "continues" }
-| CONTRACT { "contract" }
 | DECREASES { "decreases" }
 | DISJOINT { "disjoint" }
 | ENSURES { "ensures" }
 | EXITS { "exits" }
 | FREES { "frees" }
-| FUNCTION { "function" }
 | GLOBAL { "global" }
+| IMPORT { "import" }
 | INDUCTIVE { "inductive" }
-| INCLUDE { "include" }
 | INVARIANT { "invariant" }
 | LEMMA { "lemma" }
-| EXT_LET { "let" }
 | LOGIC { "logic" }
 | LOOP { "loop" }
 | MODEL { "model" }
@@ -910,6 +942,12 @@ full_identifier:
 | TERMINATES { "terminates" }
 | TYPE { "type" }
 | VARIANT { "variant" }
+| EXT_SPEC_MODULE { "module" }
+| EXT_SPEC_FUNCTION { "function" }
+| EXT_SPEC_CONTRACT { "contract" }
+| EXT_SPEC_INCLUDE { "include" }
+| EXT_SPEC_AT { "at" }
+| EXT_SPEC_LET { "let" }
 | id = EXT_CODE_ANNOT { id }
 | id = EXT_CONTRACT { id }
 | id = EXT_GLOBAL { id }
@@ -939,9 +977,10 @@ ext_global_clauses:
 
 ext_global_clause:
 | decl  { Ext_decl (loc_decl $sloc $1) }
-| EXT_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (false, $2, $4) }
-| GLOBAL EXT_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (true, $3, $5) }
-| INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc $sloc) }
+| GLOBAL
+  EXT_SPEC_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (true, $3, $5) }
+| EXT_SPEC_LET any_identifier EQUAL lexpr SEMICOLON { Ext_macro (false, $2, $4) }
+| EXT_SPEC_INCLUDE string SEMICOLON { let b,s = $2 in Ext_include(b,s, loc $sloc) }
 ;
 
 ext_global_specs_opt:
@@ -1020,15 +1059,15 @@ ext_identifier:
 ;
 
 ext_module_markup:
-| MODULE ext_identifier COLON { $2 }
+| EXT_SPEC_MODULE ext_identifier COLON { $2 }
 ;
 
 ext_function_markup:
-| FUNCTION ext_identifier COLON { $2, loc $sloc }
+| EXT_SPEC_FUNCTION ext_identifier COLON { $2, loc $sloc }
 ;
 
 ext_contract_markup:
-| CONTRACT ext_identifier_opt COLON { $2 }
+| EXT_SPEC_CONTRACT ext_identifier_opt COLON { $2 }
 ;
 
 stmt_markup:
@@ -1042,7 +1081,7 @@ stmt_markup_attr:
 ;
 
 ext_at_stmt_markup:
-| EXT_AT stmt_markup_attr COLON { $2 }
+| EXT_SPEC_AT stmt_markup_attr COLON { $2 }
 ;
 
 /*** function and statement contracts ***/
@@ -1182,8 +1221,8 @@ ne_decreases:
 ;
 
 variant:
-| lexpr FOR any_identifier { ($1, Some $3) }
-| lexpr                    { ($1, None) }
+| lexpr FOR full_identifier { ($1, Some $3) }
+| lexpr                     { ($1, None) }
 ;
 
 simple_clauses:
@@ -1453,8 +1492,8 @@ loop_grammar_extension:
 }
 ;
 
-/*** code annotations ***/
 
+/*** code annotations ***/
 beg_code_annotation:
 | FOR {}
 | ASSERT {}
@@ -1589,14 +1628,14 @@ poly_id_type:
 | full_identifier
     { enter_type_variables_scope []; ($1,[]) }
 | full_identifier LT ne_tvar_list GT
-        { enter_type_variables_scope $3; ($1,$3) }
+    { enter_type_variables_scope $3; ($1,$3) }
 ;
 
 /* we need to recognize the typename as soon as it has been declared,
   so that it can be used in data constructors in the type definition itself
 */
 poly_id_type_add_typename:
-| poly_id_type { let (id,_) = $1 in Logic_env.add_typename id; $1 }
+| poly_id_type { push_typename (fst $1) ; $1 }
 ;
 
 poly_id:
@@ -1647,11 +1686,30 @@ logic_def:
       LDlemma (id, labels, tvars, toplevel_pred Admit $4) }
 | AXIOMATIC any_identifier LBRACE logic_decls RBRACE
     { LDaxiomatic($2,$4) }
+| MODULE push_module_name LBRACE logic_decls RBRACE
+    { pop_module_types () ; LDmodule($2,$4) }
+| IMPORT mId = module_name SEMICOLON
+    { LDimport(None,mId,None) }
+| IMPORT mId = module_name AS id = IDENTIFIER SEMICOLON
+    { LDimport(None,mId,Some id) }
+| IMPORT drv = IDENTIFIER COLON mId = module_name SEMICOLON
+    { LDimport(Some drv,mId,None) }
+| IMPORT drv = IDENTIFIER COLON mId = module_name AS id = IDENTIFIER SEMICOLON
+    { LDimport(Some drv,mId,Some id) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();
           LDtype(id,tvars,Some $4)
         }
+;
+
+module_name:
+| IDENTIFIER { $1 }
+| LONGIDENT  { $1 }
+;
+
+push_module_name:
+| module_name { push_module_types () ; $1 }
 ;
 
 deprecated_logic_decl:
@@ -1672,7 +1730,7 @@ deprecated_logic_decl:
 /* OBSOLETE: type declaration */
 | TYPE poly_id_type SEMICOLON
     { let (id,tvars) = $2 in
-      Logic_env.add_typename id;
+      Logic_env.add_typename id ; (* not in a module! *)
       exit_type_variables_scope ();
       let source = pos $symbolstartpos in
       obsolete "logic type declaration" ~source ~now:"an axiomatic block";
@@ -1710,8 +1768,8 @@ logic_decl:
 /* type declaration */
 | TYPE poly_id_type SEMICOLON
     { let (id,tvars) = $2 in
-      Logic_env.add_typename id;
       exit_type_variables_scope ();
+      push_typename id;
       LDtype(id,tvars,None) }
 /* axiom */
 | AXIOM poly_id COLON lexpr SEMICOLON
@@ -1822,12 +1880,14 @@ any_identifier:
 
 identifier_or_typename:
 | TYPENAME { $1 }
+| LONGIDENT { $1 }
 | full_identifier { $1 }
-
+;
 
 identifier_or_typename_full: /* allowed as C field names */
 | is_acsl_typename  { $1 }
-| identifier_or_typename { $1 }
+| TYPENAME { $1 }
+| full_identifier { $1 }
 ;
 
 identifier: /* part included into 'identifier_or_typename', but duplicated to avoid parsing conflicts */
@@ -1901,7 +1961,7 @@ post_cond:
 
 is_acsl_spec:
 | post_cond  { snd $1 }
-| EXT_CONTRACT { $1 }
+| EXT_CONTRACT   { $1 }
 | ASSIGNS    { "assigns" }
 | ALLOCATES  { "allocates" }
 | FREES      { "frees" }
@@ -1917,8 +1977,8 @@ is_acsl_spec:
 
 is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { $1 }
-| EXT_GLOBAL { $1 }
-| EXT_GLOBAL_BLOCK { $1 }
+| EXT_GLOBAL     { $1 }
+| EXT_GLOBAL_BLOCK     { $1 }
 | IDENTIFIER_EXT { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
@@ -1941,6 +2001,8 @@ is_acsl_decl_or_code_annot:
 | AXIOM     { "axiom" }
 | VARIANT   { "variant" }
 | AXIOMATIC { "axiomatic" }
+| MODULE    { "module" }
+| IMPORT    { "import" }
 ;
 
 is_acsl_typename:
@@ -1949,12 +2011,12 @@ is_acsl_typename:
 ;
 
 is_ext_spec:
-| CONTRACT { "contract" }
-| FUNCTION { "function" }
-| MODULE   { "module" }
-| INCLUDE  { "include" }
-| EXT_AT   { "at" }
-| EXT_LET  { "let" }
+| EXT_SPEC_MODULE   { "module" }
+| EXT_SPEC_FUNCTION { "function" }
+| EXT_SPEC_CONTRACT { "contract" }
+| EXT_SPEC_INCLUDE  { "include" }
+| EXT_SPEC_AT       { "at" }
+| EXT_SPEC_LET      { "let" }
 ;
 
 keyword:
@@ -1975,6 +2037,7 @@ bs_keyword:
 | ALLOCATION { () }
 | AUTOMATIC { () }
 | AT { () }
+| AS { () }
 | BASE_ADDR { () }
 | BLOCK_LENGTH { () }
 | BSGHOST { () }
@@ -2013,6 +2076,7 @@ bs_keyword:
 
 wildcard:
 | any_identifier { () }
+| LONGIDENT { () }
 | bs_keyword { () }
 | AMP { () }
 | AND { () }
@@ -2077,9 +2141,3 @@ any:
 ;
 
 %%
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

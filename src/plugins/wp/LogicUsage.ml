@@ -223,7 +223,7 @@ let ip_of_axiomatic g =
   | Some ip -> ip
 
 let axiomatic_of_global ~context = function
-  | Daxiomatic(name,globals,_,loc) as g ->
+  | (Daxiomatic(name,globals,_,loc) | Dmodule(name,globals,_,_,loc)) as g ->
     let a = {
       ax_name = name ;
       ax_position = fst loc ;
@@ -234,8 +234,7 @@ let axiomatic_of_global ~context = function
     List.iter (populate a ~context) globals ;
     a.ax_types <- List.rev a.ax_types ;
     a.ax_logics <- List.rev a.ax_logics ;
-    a.ax_lemmas <- List.rev a.ax_lemmas ;
-    a
+    a.ax_lemmas <- List.rev a.ax_lemmas ; a
   | _ -> assert false
 
 let register_logic d section l =
@@ -365,9 +364,9 @@ class visitor =
     method! vannotation global =
       match global with
 
-      (* --- AXIOMATICS --- *)
+      (* --- AXIOMATICS & MODULES --- *)
 
-      | Daxiomatic _ ->
+      | Daxiomatic _ | Dmodule _ ->
         begin
           let pf = database.proofcontext in
           let ax = axiomatic_of_global ~context:pf global in

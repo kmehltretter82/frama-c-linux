@@ -643,7 +643,7 @@ let lfEq = LogicMerging.create_eq_table 111 (* Logic functions *)
 let ltEq = PlainMerging.create_eq_table 111 (* Logic types *)
 let lcEq = PlainMerging.create_eq_table 111 (* Logic constructors *)
 
-let laEq = PlainMerging.create_eq_table 111 (* Axiomatics *)
+let laEq = PlainMerging.create_eq_table 111 (* Axiomatics & Modules *)
 let llEq = PlainMerging.create_eq_table 111 (* Lemmas *)
 
 let lvEq = VolatileMerging.create_eq_table 111
@@ -858,6 +858,9 @@ let rec global_annot_without_irrelevant_attributes ga =
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
+  | Dmodule(n,l,attr,drv,loc) ->
+    Dmodule(n,List.map global_annot_without_irrelevant_attributes l,
+            drop_attributes_for_merge attr,drv,loc)
   | Dlemma (id,labs,typs,st,attr,loc) ->
     Dlemma (id,labs,typs,st,drop_attributes_for_merge attr,loc)
   | Dtype (lti,loc) ->
@@ -893,7 +896,11 @@ let rec global_annot_pass1 g =
          if Option.is_some wvi then process_term_kind (x,W))
       hs
   | Daxiomatic(id,decls,_,l) ->
-    ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls)
+    ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls,None)
+              (Some (l,!currentDeclIdx)));
+    List.iter global_annot_pass1 decls
+  | Dmodule(id,decls,_,drv,l) ->
+    ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls,drv)
               (Some (l,!currentDeclIdx)));
     List.iter global_annot_pass1 decls
   | Dfun_or_pred (li,l) ->
@@ -1436,17 +1443,17 @@ let matchLogicCtor oldfidx oldpi fidx pi =
       "invalid multiple logic constructors declarations %s" pi.ctor_name
 
 (* ignores irrelevant attributes such as __fc_stdlib *)
-let matchLogicAxiomatic oldfidx (oldid,_ as oldnode) fidx (id,_ as node) =
+let matchLogicAxiomatic oldfidx (oldid,_,_ as oldnode) fidx (id,_,_ as node) =
   let oldanode = PlainMerging.getNode laEq laSyn oldfidx oldid oldnode None in
   let anode = PlainMerging.getNode laEq laSyn fidx id node None in
   if oldanode != anode then begin
-    let _, oldax = oldanode.ndata in
+    let _, oldax, odrv = oldanode.ndata in
     let oldaidx = oldanode.nfidx in
-    let _, ax = anode.ndata in
+    let _, ax, drv = anode.ndata in
     let aidx = anode.nfidx in
     let ax = List.map global_annot_without_irrelevant_attributes ax in
     let oldax = List.map global_annot_without_irrelevant_attributes oldax in
-    if Logic_utils.is_same_axiomatic oldax ax then begin
+    if Logic_utils.is_same_axiomatic oldax ax && odrv = drv then begin
       if oldaidx < aidx then
         anode.nrep <- oldanode.nrep
       else
@@ -2194,7 +2201,22 @@ class renameInlineVisitorClass = object(self)
 end
 let renameInlinesVisitor = new renameInlineVisitorClass
 
-let rec logic_annot_pass2 ~in_axiomatic g a =
+type context = Toplevel of global | InAxiomatic | InModule
+
+let errorContext context toplevel =
+  Kernel.abort ~current:true "%s not allowed inside %s" toplevel context
+
+let checkContext ~toplevel = function
+  | Toplevel _ -> ()
+  | InAxiomatic -> errorContext "axiomatic" toplevel
+  | InModule -> errorContext "module" toplevel
+
+let pushGlobal ?toplevel = function
+  | Toplevel g -> mergePushGlobals (visitCilGlobal renameVisitor g)
+  | InAxiomatic -> Option.iter (errorContext "axiomatic") toplevel
+  | InModule -> Option.iter (errorContext "module") toplevel
+
+let rec logic_annot_pass2 context a =
   let open Current_loc.Operators in
   let<> UpdatedCurrentLoc = Cil_datatype.Global_annotation.loc a in
   match a with
@@ -2202,8 +2224,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match LogicMerging.findReplacement true lfEq !currentFidx li with
       | None ->
-        if not in_axiomatic then
-          mergePushGlobals (visitCilGlobal renameVisitor g);
+        pushGlobal context ;
         Logic_utils.add_logic_function li;
       | Some _ -> ()
       (* FIXME: should we perform same actions
@@ -2213,27 +2234,23 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match PlainMerging.findReplacement true ltEq !currentFidx t.lt_name with
       | None ->
-        if not in_axiomatic then
-          mergePushGlobals (visitCilGlobal renameVisitor g);
-        let def =
-          (PlainMerging.find_eq_table ltEq (!currentFidx,t.lt_name)).ndata
-        in
+        pushGlobal context ;
+        let node = PlainMerging.find_eq_table ltEq (!currentFidx,t.lt_name) in
+        let def = node.ndata in
         Logic_env.add_logic_type t.lt_name def;
-        (match def.lt_def with
-         | Some (LTsum l) ->
-           List.iter (fun c -> Logic_env.add_logic_ctor c.ctor_name c) l
-         | Some (LTsyn _)
-         | None -> ()
-        )
+        begin
+          match def.lt_def with
+          | Some (LTsum l) ->
+            List.iter (fun c -> Logic_env.add_logic_ctor c.ctor_name c) l
+          | Some (LTsyn _) | None -> ()
+        end
       | Some _ -> ()
     end
   | Dinvariant (li, _) ->
     begin
       match LogicMerging.findReplacement true lfEq !currentFidx li with
       | None ->
-        if in_axiomatic then Kernel.abort ~current:true
-            "nested axiomatics are not allowed in ACSL";
-        mergePushGlobals (visitCilGlobal renameVisitor g);
+        pushGlobal ~toplevel:"invariant" context ;
         Logic_utils.add_logic_function
           (LogicMerging.find_eq_table lfEq (!currentFidx,li)).ndata
       | Some _ -> ()
@@ -2242,9 +2259,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     begin
       match LogicMerging.findReplacement true lfEq !currentFidx n with
       | None ->
-        let g = visitCilGlobal renameVisitor g in
-        if not in_axiomatic then
-          mergePushGlobals g;
+        pushGlobal context ;
         Logic_utils.add_logic_function
           (LogicMerging.find_eq_table lfEq (!currentFidx,n)).ndata
       | Some _ -> ()
@@ -2275,9 +2290,8 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
             (!currentFidx,(mf'.mi_name,mf'.mi_base_type))
             my_node';
         end;
-        if not in_axiomatic then begin
-          mergePushGlobals [GAnnot (Dmodel_annot(mf',l),l)];
-        end;
+        checkContext ~toplevel:"model annotation" context ;
+        mergePushGlobal (GAnnot (Dmodel_annot(mf',l),l)) ;
         Logic_env.add_model_field
           (ModelMerging.find_eq_table
              mfEq (!currentFidx,(mf'.mi_name,mf'.mi_base_type))).ndata;
@@ -2286,9 +2300,7 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
   | Dlemma (n, _, _, _, _, _) ->
     begin
       match PlainMerging.findReplacement true llEq !currentFidx n with
-        None ->
-        if not in_axiomatic then
-          mergePushGlobals (visitCilGlobal renameVisitor g)
+        None -> pushGlobal context
       | Some _ -> ()
     end
   | Dvolatile(vi, rd, wr, attr, loc) ->
@@ -2335,8 +2347,9 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
     let no_drop, full_representative, only_reads, only_writes =
       List.fold_left check_one_location (true,[],[],[]) vi
     in
-    if no_drop then mergePushGlobals (visitCilGlobal renameVisitor g)
+    if no_drop then pushGlobal ~toplevel:"volatile" context
     else begin
+      checkContext ~toplevel:"volatile" context;
       push_volatile full_representative rd wr;
       if Option.is_some rd then push_volatile only_reads rd None;
       if Option.is_some wr then push_volatile only_writes None wr
@@ -2344,19 +2357,27 @@ let rec logic_annot_pass2 ~in_axiomatic g a =
   | Daxiomatic(n, l, _, _) ->
     begin
       match PlainMerging.findReplacement true laEq !currentFidx n with
+      | None ->
+        pushGlobal context ;
+        List.iter (logic_annot_pass2 InAxiomatic) l
+      | Some _ -> ()
+    end
+  | Dmodule(n, l, _, _, _) ->
+    begin
+      match PlainMerging.findReplacement true laEq !currentFidx n with
         None ->
-        if in_axiomatic then Kernel.abort ~current:true
-            "nested axiomatics are not allowed in ACSL";
-        mergePushGlobals (visitCilGlobal renameVisitor g);
-        List.iter (logic_annot_pass2 ~in_axiomatic:true g) l
+        pushGlobal context ;
+        List.iter (logic_annot_pass2 InModule) l
       | Some _ -> ()
     end
   | Dextended(ext, _, _) ->
-    (match ExtMerging.findReplacement true extEq !currentFidx ext with
-     | None -> mergePushGlobals (visitCilGlobal renameVisitor g);
-     | Some _ -> ())
+    begin
+      match ExtMerging.findReplacement true extEq !currentFidx ext with
+      | None -> pushGlobal context
+      | Some _ -> ()
+    end
 
-let global_annot_pass2 g a = logic_annot_pass2 ~in_axiomatic:false g a
+let global_annot_pass2 g a = logic_annot_pass2 (Toplevel g) a
 
 (* sm: First attempt at a semantic checksum for function bodies.
  * Ideally, two function's checksums would be equal only when their

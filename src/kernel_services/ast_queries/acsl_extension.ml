@@ -73,6 +73,8 @@ type extension_common = {
   plugin: string;
   is_same_ext: extension_same;
 }
+type extension_module_importer =
+  module_builder -> location -> string list -> unit
 
 let default_printer printer fmt = function
   | Ext_id i -> Format.fprintf fmt "%d" i
@@ -132,6 +134,9 @@ module Extensions = struct
   (*hash table for status, preprocessor and typer of block extensions*)
   let ext_block_tbl = Hashtbl.create 5
 
+  (*hash table for module importers*)
+  let ext_module_importer = Hashtbl.create 5
+
   let find_single name :extension_single =
     try Hashtbl.find ext_single_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
@@ -143,6 +148,10 @@ module Extensions = struct
   let find_block name :extension_block =
     try Hashtbl.find ext_block_tbl name with Not_found ->
       Kernel.fatal ~current:true "unsupported clause of name '%s'" name
+
+  let find_importer name :extension_module_importer =
+    try Hashtbl.find ext_module_importer name with Not_found ->
+      Kernel.fatal ~current:true "unsupported module importer '%s'" name
 
   (* [Logic_lexer] can ask for something that is not a category, which is not
      a fatal error. *)
@@ -183,6 +192,14 @@ module Extensions = struct
         Hashtbl.add ext_block_tbl name info1;
         Hashtbl.add ext_tbl name info2
       end
+
+  let register_module_importer name loader =
+    if Hashtbl.mem ext_module_importer name then
+      Kernel.warning ~wkey:Kernel.wkey_acsl_extension
+        "Trying to register module importer %s twice. Ignoring second importer"
+        name
+    else
+      Hashtbl.add ext_module_importer name loader
 
   let preprocess name = (find_single name).preprocessor
 
@@ -264,6 +281,8 @@ let register_code_annot_next_loop =
   Extensions.register (Ext_code_annot Ext_next_loop)
 let register_code_annot_next_both =
   Extensions.register (Ext_code_annot Ext_next_both)
+let register_module_importer =
+  Extensions.register_module_importer
 
 (* Setup global references *)
 
@@ -278,7 +297,8 @@ let () =
   Logic_typing.set_extension_handler
     ~is_extension: Extensions.is_extension
     ~typer: Extensions.typing
-    ~typer_block: Extensions.typing_block ;
+    ~typer_block: Extensions.typing_block
+    ~importer: Extensions.find_importer;
   Cil.set_extension_handler
     ~visit: Extensions.visit ;
   Cil_printer.set_extension_handler

@@ -228,6 +228,7 @@ let rec pp_prop kfopt kiopt kloc fmt = function
   | IPTypeInvariant {iti_name=s} -> Format.fprintf fmt "Type invariant '%s'" s
   | IPGlobalInvariant {igi_name=s} -> Format.fprintf fmt "Global invariant '%s'" s
   | IPAxiomatic {iax_name=s} -> Format.fprintf fmt "Axiomatic '%s'" s
+  | IPModule {im_name=s} -> Format.fprintf fmt "Module '%s'" s
   | IPOther {io_name=s;io_loc=le} ->
     Format.fprintf fmt "%a%a" pp_capitalize s (pp_other_loc kfopt kiopt kloc) le
   | IPPredicate {ip_kind; ip_kf; ip_kinstr=Kglobal; ip_pred} ->
@@ -497,7 +498,8 @@ let loop_order = function
 
 let rec ip_order = function
   | IPAxiomatic {iax_name=a} -> [I 0;S a]
-  | IPLemma {il_name=a} -> [I 1;S a]
+  | IPModule {im_name=a} -> [I 1;S a]
+  | IPLemma {il_name=a} -> [I 2;S a]
   | IPOther {io_name=s;io_loc=OLContract kf} -> [I 3;F kf;S s]
   | IPOther {io_name=s;io_loc=OLStmt (kf, stmt)} -> [I 4;F kf;K (Kstmt stmt);S s]
   | IPOther {io_name=s;io_loc=OLGlob _} -> [I 5; S s]

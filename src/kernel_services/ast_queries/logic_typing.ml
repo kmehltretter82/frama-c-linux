@@ -27,7 +27,6 @@ open Cil
 open Logic_ptree
 open Logic_const
 open Logic_utils
-open Format
 
 exception Backtrack
 
@@ -495,6 +494,10 @@ module Type_namespace =
     let hash : t -> int = Hashtbl.hash
   end)
 
+type logic_infos =
+  | Ctor of logic_ctor_info
+  | Lfun of logic_info list
+
 type typing_context = {
   is_loop: unit -> bool;
   anonCompFieldName : string;
@@ -505,16 +508,6 @@ type typing_context = {
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
   find_label : string -> stmt ref;
-  remove_logic_function : string -> unit;
-  remove_logic_info: logic_info -> unit;
-  remove_logic_type: string -> unit;
-  remove_logic_ctor: string -> unit;
-  add_logic_function: logic_info -> unit;
-  add_logic_type: string -> logic_type_info -> unit;
-  add_logic_ctor: string -> logic_ctor_info -> unit;
-  find_all_logic_functions: string -> logic_info list;
-  find_logic_type: string -> logic_type_info;
-  find_logic_ctor: string -> logic_ctor_info;
   pre_state:Lenv.t;
   post_state:Cil_types.termination_kind list -> Lenv.t;
   assigns_env:Lenv.t;
@@ -531,8 +524,13 @@ type typing_context = {
     accept_formal:bool ->
     Lenv.t ->
     Logic_ptree.assigns -> Cil_types.assigns;
-  error: 'a 'b. location -> ('a,formatter,unit,'b) format4 -> 'a;
+  error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
+}
+
+type module_builder = {
+  add_logic_type : location -> logic_type_info -> unit ;
+  add_logic_function : location -> logic_info -> unit ;
 }
 
 module Extensions = struct
@@ -540,26 +538,32 @@ module Extensions = struct
   let ref_is_extension = ref (fun _ -> assert false)
   let ref_typer = ref (fun _ _ _ _ -> assert false)
   let ref_typer_block = ref (fun _ _ _ _ -> assert false)
+  let ref_importer = ref (fun _ _ _ _ -> assert false)
 
-  let set_handler ~is_extension ~typer ~typer_block =
+  let set_handler ~is_extension ~typer ~typer_block ~importer =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
     ref_typer := typer ;
     ref_typer_block := typer_block;
+    ref_importer := importer ;
     initialized := true
 
   let is_extension name = !ref_is_extension name
 
-  let typer name ~typing_context:typing_context ~loc =
+  let typer name ~typing_context ~loc =
     !ref_typer name typing_context loc
 
-  let typer_block name ~typing_context:typing_context ~loc =
-    !ref_typer_block name typing_context loc
+  let typer_block name ~typing_context ~loc mId =
+    !ref_typer_block name typing_context loc mId
+
+  let importer name ~builder ~loc (moduleId: string list) : unit =
+    !ref_importer name builder loc moduleId
 
 end
 let set_extension_handler = Extensions.set_handler
 let get_typer = Extensions.typer
 let get_typer_block = Extensions.typer_block
+let get_importer = Extensions.importer
 
 let rec arithmetic_conversion ty1 ty2 =
   match unroll_type ty1, unroll_type ty2 with
@@ -661,7 +665,7 @@ sig
     Cil_types.logic_type -> Logic_ptree.code_annot -> code_annotation
   val type_annot : location -> Logic_ptree.type_annot -> logic_info
   val model_annot : location -> Logic_ptree.model_annot -> model_info
-  val annot : Logic_ptree.decl -> global_annotation
+  val annot : Logic_ptree.decl -> global_annotation option
   val funspec :
     string list ->
     varinfo -> (varinfo list) option -> typ -> Logic_ptree.spec -> funspec
@@ -679,18 +683,8 @@ module Make
        val find_comp_field: compinfo -> string -> offset
        val find_type : type_namespace -> string -> typ
        val find_label : string -> stmt ref
-       val remove_logic_function : string -> unit
-       val remove_logic_info: logic_info -> unit
-       val remove_logic_type: string -> unit
-       val remove_logic_ctor: string -> unit
-       val add_logic_function: logic_info -> unit
-       val add_logic_type: string -> logic_type_info -> unit
-       val add_logic_ctor: string -> logic_ctor_info -> unit
-       val find_all_logic_functions: string -> logic_info list
-       val find_logic_type: string -> logic_type_info
-       val find_logic_ctor: string -> logic_ctor_info
        val integral_cast: Cil_types.typ -> Cil_types.term -> Cil_types.term
-       val error: location -> ('a,formatter,unit, 'b) format4 -> 'a
+       val error: location -> ('a,Format.formatter,unit, 'b) format4 -> 'a
        val on_error: ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
      end) =
 struct
@@ -714,19 +708,102 @@ struct
     find_comp_field = C.find_comp_field;
     find_type = C.find_type ;
     find_label = C.find_label;
-    remove_logic_function = C.remove_logic_function;
-    remove_logic_info = C.remove_logic_info;
-    remove_logic_type = C.remove_logic_type;
-    remove_logic_ctor = C.remove_logic_ctor;
-    add_logic_function = C.add_logic_function;
-    add_logic_type = C.add_logic_type;
-    add_logic_ctor = C.add_logic_ctor;
-    find_all_logic_functions = C.find_all_logic_functions;
-    find_logic_type = C.find_logic_type;
-    find_logic_ctor = C.find_logic_ctor;
     error = C.error;
     on_error = C.on_error;
   }
+
+  (* Imported Scope *)
+
+  type scope = {
+    unqualified: bool; (* accepted for non-qualified names *)
+    long_prefix: string; (* last '::' included *)
+    short_prefix: string; (* last '::' included *)
+  }
+
+  let scopes : (scope option * scope list) Stack.t = Stack.create ()
+
+  let current_scope : scope option ref = ref None
+  let imported_scopes : scope list ref = ref []
+
+  let all_scopes () =
+    match !current_scope with
+    | None -> !imported_scopes
+    | Some s -> s :: !imported_scopes
+
+  let unqualified_scopes () =
+    List.filter (fun s -> s.unqualified) @@ all_scopes ()
+
+  let push_imports () =
+    let current = !current_scope in
+    let imported = !imported_scopes in
+    let all = all_scopes () in
+    Stack.push (current,imported) scopes ;
+    imported_scopes := all
+
+  let pop_imports () =
+    begin
+      let closed = !current_scope in
+      let c,cs = Stack.pop scopes in
+      let cs =
+        match closed with
+        | Some s when c <> None -> s :: cs
+        | _ -> cs
+      in
+      current_scope := c ;
+      imported_scopes := cs ;
+    end
+
+  let add_import ?(current=false) ?alias name =
+    begin
+      let short =
+        match alias with
+        | Some "_" -> ""
+        | Some a -> a
+        | None ->
+          List.hd @@ List.rev @@ Logic_utils.longident name
+      in
+      let s = {
+        unqualified = current || alias = None;
+        long_prefix = name ^ "::";
+        short_prefix = short ^ "::";
+      } in
+      if current then
+        current_scope := Some s
+      else
+        imported_scopes := s :: !imported_scopes ;
+    end
+
+  let find_import fn a =
+    let find_opt b = try Some (fn b) with Not_found -> None in
+    if Logic_utils.is_qualified a then
+      let resolved_name =
+        let has_short_prefix s = String.starts_with ~prefix:s.short_prefix a in
+        match List.find_opt has_short_prefix @@ all_scopes () with
+        | None -> a
+        | Some s ->
+          let p = String.length s.short_prefix in
+          let n = String.length a in
+          s.long_prefix ^ String.sub a p (n-p)
+      in find_opt resolved_name
+    else
+      let find_in_scope s = find_opt (s.long_prefix ^ a) in
+      match List.find_map find_in_scope @@ unqualified_scopes () with
+      | None -> find_opt a
+      | Some _ as result -> result
+
+  let resolve_ltype =
+    find_import Logic_env.find_logic_type
+
+  let resolve_lapp f env =
+    try Some (Lfun [Lenv.find_logic_info f env]) with Not_found ->
+      find_import
+        begin fun a ->
+          try
+            Ctor (Logic_env.find_logic_ctor a)
+          with Not_found ->
+            let ls = Logic_env.find_all_logic_functions a in
+            if ls <> [] then Lfun ls else raise Not_found
+        end f
 
   let rollback = Queue.create ()
 
@@ -739,25 +816,68 @@ struct
 
   let add_rollback_action f x = Queue.add (fun () -> f x) rollback
 
-  let add_logic_function loc li =
-    let l = Logic_env.find_all_logic_functions li.l_var_info.lv_name in
-    if List.exists (Logic_utils.is_same_logic_profile li) l then begin
-      C.error loc
-        "%s %s is already declared with the same profile"
-        (match li.l_type with None -> "predicate" | Some _ -> "logic function")
-        li.l_var_info.lv_name
-    end else begin
-      C.add_logic_function li;
-      add_rollback_action C.remove_logic_info li
-    end
-
-  let add_logic_type loc info =
+  let add_logic_info loc lf =
+    let lv = lf.l_var_info in
     try
-      ignore (C.find_logic_type info.lt_name);
-      C.error loc "logic type %s is already defined" info.lt_name
+      let _ = Logic_env.find_logic_ctor lv.lv_name in
+      C.error loc "constructor %s is already defined" lv.lv_name
     with Not_found ->
-      C.add_logic_type info.lt_name info;
-      add_rollback_action C.remove_logic_type info.lt_name
+      if Logic_utils.mem_logic_function lf then
+        begin
+          C.error loc
+            "%s %s is already declared with the same profile"
+            (match lf.l_type with None -> "predicate" | Some _ -> "logic function")
+            lv.lv_name
+        end
+      else
+        begin
+          Logic_utils.add_logic_function lf;
+          add_rollback_action Logic_utils.remove_logic_function lf
+        end
+
+  let add_logic_type loc lt =
+    try
+      ignore (Logic_env.find_logic_type lt.lt_name);
+      C.error loc "logic type %s is already defined" lt.lt_name
+    with Not_found ->
+      Logic_env.add_logic_type lt.lt_name lt;
+      add_rollback_action Logic_env.remove_logic_type lt.lt_name
+
+  let add_logic_ctor loc ct =
+    try
+      ignore (Logic_env.find_logic_ctor ct.ctor_name);
+      C.error loc "type constructor %s is already defined" ct.ctor_name
+    with Not_found ->
+      let lfs = Logic_env.find_all_logic_functions ct.ctor_name in
+      if lfs <> [] then
+        C.error loc "logic function %s is already defined" ct.ctor_name
+      else
+        begin
+          Logic_env.add_logic_ctor ct.ctor_name ct;
+          add_rollback_action Logic_env.remove_logic_ctor ct.ctor_name ;
+        end
+
+  let make_module_builder (decls : global_annotation list ref) moduleId =
+    let prefix = moduleId ^ "::" in
+    let wrap s =
+      if String.starts_with ~prefix s then s else prefix ^ s in
+    let add_logic_ctor loc ct =
+      ct.ctor_name <- wrap ct.ctor_name ;
+      add_logic_ctor loc ct in
+    let add_logic_type loc lt =
+      lt.lt_name <- wrap lt.lt_name ;
+      add_logic_type loc lt ;
+      begin
+        match lt.lt_def with
+        | Some (LTsum cts) -> List.iter (add_logic_ctor loc) cts
+        | Some (LTsyn _) | None -> ()
+      end ;
+      decls := (Dtype(lt,loc)) :: !decls in
+    let add_logic_function loc lf =
+      lf.l_var_info.lv_name <- wrap lf.l_var_info.lv_name ;
+      add_logic_info loc lf ;
+      decls := (Dfun_or_pred(lf,loc)) :: !decls in
+    { add_logic_type ; add_logic_function }
 
   let check_non_void_ptr loc ty =
     if Logic_utils.isLogicVoidPointerType ty then
@@ -937,6 +1057,7 @@ struct
     | LTint ikind -> Ctype (TInt (ikind, []))
     | LTfloat fkind -> Ctype (TFloat (fkind, []))
     | LTarray (ty,length) ->
+
       let size = match length with
         | ASnone -> None
         | ASinteger s ->
@@ -966,8 +1087,8 @@ struct
             in size_exp size
           with Not_found ->
             ctxt.error loc "size of array must be an integral value";
-      in
-      Ctype (TArray (ctype ty, size,[]))
+      in Ctype (TArray (ctype ty, size,[]))
+
     | LTpointer ty -> Ctype (TPtr (ctype ty, []))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
@@ -978,35 +1099,43 @@ struct
     | LTunion u ->
       (try Ctype (ctxt.find_type Union u)
        with Not_found -> ctxt.error loc "no such union %s" u)
+
     | LTarrow (prms,rt) ->
       (* For now, our only function types are C function pointers. *)
       let prms = List.map (fun x -> "", ctype x, []) prms in
       let rt = ctype rt in
-      (match prms with
-         [] -> Ctype (TFun(rt,None,false,[]))
-       | [(_,arg_typ,_)] when isVoidType arg_typ ->
-         (* Same invariant as in C *)
-         Ctype (TFun(rt,Some [],false,[]))
-       | _ -> Ctype (TFun(rt,Some prms,false,[])))
+      begin
+        match prms with
+        | [] -> Ctype (TFun(rt,None,false,[]))
+        | [(_,arg_typ,_)] when isVoidType arg_typ ->
+          (* Same invariant as in C *)
+          Ctype (TFun(rt,Some [],false,[]))
+        | _ -> Ctype (TFun(rt,Some prms,false,[]))
+      end
+
     | LTnamed (id,[]) ->
-      (try Lenv.find_type_var id env
-       with Not_found ->
-       try Ctype (ctxt.find_type Typedef id) with Not_found ->
-       try
-         let info = ctxt.find_logic_type id in
-         if info.lt_params <> [] then
-           ctxt.error loc "wrong number of parameter for type %s" id
-         else Ltype (info,[])
-       with Not_found ->
-         ctxt.error loc "no such type %s" id)
+      begin
+        try Lenv.find_type_var id env
+        with Not_found ->
+        try Ctype (ctxt.find_type Typedef id) with Not_found ->
+        match resolve_ltype id with
+        | Some info ->
+          if info.lt_params <> [] then
+            ctxt.error loc "wrong number of parameter for type %s" id
+          else Ltype (info,[])
+        | None -> ctxt.error loc "no such type %s" id
+      end
+
     | LTnamed(id,l) ->
-      (try
-         let info = ctxt.find_logic_type id in
-         if List.length info.lt_params <> List.length l then
-           ctxt.error loc "wrong number of parameter for type %s" id
-         else Ltype (info,List.map ltype l)
-       with Not_found ->
-         ctxt.error loc "no such type %s" id)
+      begin
+        match resolve_ltype id with
+        | Some info ->
+          if List.length info.lt_params <> List.length l then
+            ctxt.error loc "wrong number of parameter for type %s" id
+          else Ltype (info,List.map ltype l)
+        | None -> ctxt.error loc "no such type %s" id
+      end
+
     | LTinteger -> Linteger
     | LTreal -> Lreal
     | LTattribute (ty,attr) ->
@@ -1286,7 +1415,7 @@ struct
         c_mk_cast ~force e oldt newt
       | t1, Ltype ({lt_name = name},[])
         when name = Utf8_logic.boolean && is_integral_type t1 ->
-        let t2 = Ltype (C.find_logic_type Utf8_logic.boolean,[]) in
+        let t2 = Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]) in
         let e = mk_cast e Linteger in
         Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) t2
       | t1, Linteger when Logic_const.is_boolean_type t1 && explicit ->
@@ -1841,10 +1970,10 @@ struct
          prefer boolean as common type when doing comparison. *)
       | Ltype({lt_name = name},[]), t
         when is_integral_type t && name = Utf8_logic.boolean ->
-        Ltype(C.find_logic_type Utf8_logic.boolean,[])
+        Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[])
       | t, Ltype({lt_name = name},[])
         when is_integral_type t && name = Utf8_logic.boolean ->
-        Ltype(C.find_logic_type Utf8_logic.boolean,[])
+        Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[])
       | Lreal, Ctype ty | Ctype ty, Lreal when isArithmeticType ty -> Lreal
       | Ltype (s1,l1), Ltype (s2,l2)
         when s1.lt_name = s2.lt_name && List.for_all2 is_same_type l1 l2 ->
@@ -1992,10 +2121,10 @@ struct
   let rename_variable t v1 v2 =
     visitCilTerm (new rename_variable v1 v2) t
 
-  let find_logic_info v env =
+  let find_lv_logic_info v env =
     try Lenv.find_logic_info v.lv_name env
     with Not_found ->
-      let l = C.find_all_logic_functions v.lv_name in
+      let l = Logic_env.find_all_logic_functions v.lv_name in
       (* Data constructors can not be in eta-reduced form. v must be
          a logic function, so that List.find can not fail here.
       *)
@@ -2030,7 +2159,7 @@ struct
                              to suppose that v has no label (this is checked
                              when type-checking v as a variable)
                           *)
-                          Tapp(find_logic_info v env,[],args);
+                          Tapp(find_lv_logic_info v env,[],args);
                         term_type = rt});
         term_type = v.lv_type}
     | _ -> { term_loc = loc; term_name = names;
@@ -2494,8 +2623,9 @@ struct
     let locs = List.rev_map (make_set_conversion convert_ptr) locs in
     locs,typ
   and lfun_app ctxt env loc f labels ttl =
-    try
-      let info = ctxt.find_logic_ctor f in
+    match resolve_lapp f env with
+    | None -> C.error loc "unbound logic function %s" f
+    | Some (Ctor info) ->
       if labels <> [] then begin
         if ctxt.silent then raise Backtrack;
         ctxt.error loc
@@ -2503,18 +2633,13 @@ struct
            It cannot have logic labels" f;
       end;
       let params = List.map fresh info.ctor_params in
-      let env, tl =
-        type_arguments ~overloaded:false env loc params ttl
-      in
-      let t = Ltype(info.ctor_type,
-                    List.map fresh_type_var
-                      info.ctor_type.lt_params)
-      in
-      let t = instantiate env t in
+      let env, tl = type_arguments ~overloaded:false env loc params ttl in
+      let alphas = List.map fresh_type_var info.ctor_type.lt_params in
+      let t = instantiate env @@ Ltype(info.ctor_type,alphas) in
       TDataCons(info,tl), t
-    with Not_found ->
+    | Some (Lfun infos) ->
       let info, label_assoc, tl, t =
-        type_logic_app env loc f labels ttl
+        type_logic_app_infos env loc f infos labels ttl
       in
       match t with
       | None ->
@@ -2641,63 +2766,63 @@ struct
             | _ -> assert false
           end
         with Not_found ->
-        try
           fresh_type#reset ();
-          let info = ctxt.find_logic_ctor x in
-          match info.ctor_params with
-            [] ->
-            TDataCons(info,[]),
-            Ltype(info.ctor_type,
-                  List.map fresh_type_var
-                    info.ctor_type.lt_params)
-          | _ ->
-            ctxt.error loc "Data constructor %s needs arguments"
-              info.ctor_name
-        with Not_found ->
-          (* We have a global logic variable. It may depend on
-             a single state (multiple labels need to be explicitly
-             instantiated and are treated as PLapp below).
-             NB: for now, if we have a real function (with parameters
-             other than labels) and a label,
-             we end up with a Tapp with no argument, which is not
-             exactly good. Either TVar should take an optional label
-             for this particular case, or we should definitely move
-             to partial app everywhere (since we have support for
-             \lambda, this is not a very big step anyway)
-          *)
-          let make_expr f =
-            let typ =
-              match f.l_type, f.l_profile with
-              | Some t, [] -> t
-              | Some t, l -> Larrow (List.map (fun x -> x.lv_type) l, t)
-              | None, _ ->
-                if ctxt.silent then raise Backtrack;
-                ctxt.error loc "%s is not a logic variable" x
+          match resolve_lapp x env with
+          | None -> ctxt.error loc "unbound logic variable %s" x
+          | Some (Ctor info) ->
+            begin
+              match info.ctor_params with
+                [] ->
+                TDataCons(info,[]),
+                Ltype(info.ctor_type,
+                      List.map fresh_type_var
+                        info.ctor_type.lt_params)
+              | _ ->
+                ctxt.error loc "Data constructor %s needs arguments"
+                  info.ctor_name
+            end
+          | Some (Lfun ls) ->
+            (* We have a global logic variable. It may depend on
+               a single state (multiple labels need to be explicitly
+               instantiated and are treated as PLapp below).
+               NB: for now, if we have a real function (with parameters
+               other than labels) and a label,
+               we end up with a Tapp with no argument, which is not
+               exactly good. Either TVar should take an optional label
+               for this particular case, or we should definitely move
+               to partial app everywhere (since we have support for
+               \lambda, this is not a very big step anyway)
+            *)
+            let make_expr f =
+              let typ =
+                match f.l_type, f.l_profile with
+                | Some t, [] -> t
+                | Some t, l -> Larrow (List.map (fun x -> x.lv_type) l, t)
+                | None, _ ->
+                  if ctxt.silent then raise Backtrack;
+                  ctxt.error loc "%s is not a logic variable" x
+              in
+              let typ = fresh typ in
+              match f.l_labels with
+                [] ->
+                TLval (TVar(f.l_var_info),TNoOffset), typ
+              | [_] ->
+                let curr = find_current_label loc env in
+                Tapp(f,[curr],[]), typ
+              | _ ->
+                ctxt.error loc
+                  "%s labels must be explicitly instantiated" x
             in
-            let typ = fresh typ in
-            match f.l_labels with
-              [] ->
-              TLval (TVar(f.l_var_info),TNoOffset), typ
-            | [_] ->
-              let curr = find_current_label loc env in
-              Tapp(f,[curr],[]), typ
-            | _ ->
-              ctxt.error loc
-                "%s labels must be explicitly instantiated" x
-          in
-          match ctxt.find_all_logic_functions x with
-
-            [] -> ctxt.error loc "unbound logic variable %s" x
-          | [f] -> make_expr f
-          | l ->
-            (try
-               let f =
-                 List.find (fun info -> info.l_profile = []) l
-               in make_expr f
-             with Not_found ->
-               ctxt.error loc
-                 "invalid use of overloaded function \
-                  %s as constant" x)
+            match ls with
+            | [f] -> make_expr f
+            | l ->
+              try
+                let f =
+                  List.find (fun info -> info.l_profile = []) l
+                in make_expr f
+              with Not_found ->
+                ctxt.error loc
+                  "invalid use of overloaded function %s as constant" x
       end
     | PLapp (f, labels, tl) ->
       let env = drop_qualifiers env in
@@ -2959,14 +3084,14 @@ struct
       let env = drop_qualifiers env in
       let f _ op t1 t2 =
         (TBinOp(binop_of_rel op, t1, t2),
-         Ltype(ctxt.find_logic_type Utf8_logic.boolean,[]))
+         Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[]))
       in
       type_relation ctxt env f t1 op t2
     | PLtrue ->
-      let ctrue = ctxt.find_logic_ctor "\\true" in
+      let ctrue = Logic_env.find_logic_ctor "\\true" in
       TDataCons(ctrue,[]), Ltype(ctrue.ctor_type,[])
     | PLfalse ->
-      let cfalse = ctxt.find_logic_ctor "\\false" in
+      let cfalse = Logic_env.find_logic_ctor "\\false" in
       TDataCons(cfalse,[]), Ltype(cfalse.ctor_type,[])
     | PLlambda(prms,e) ->
       let env = drop_qualifiers env in
@@ -2976,24 +3101,24 @@ struct
     | PLnot t ->
       let env = drop_qualifiers env in
       let t = type_bool_term ctxt env t in
-      TUnOp(LNot,t), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
+      TUnOp(LNot,t), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
     | PLand (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LAnd,t1,t2), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LAnd,t1,t2), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
     | PLor (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LOr,t1,t2), Ltype (ctxt.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LOr,t1,t2), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
     | PLtypeof t1 ->
       let env = drop_qualifiers env in
       let t1 = term env t1 in
-      Ttypeof t1, Ltype (ctxt.find_logic_type "typetag",[])
+      Ttypeof t1, Ltype (Logic_env.find_logic_type "typetag",[])
     | PLtype ty ->
-      begin match logic_type  ctxt loc env ty with
-        | Ctype ty -> Ttype ty, Ltype (ctxt.find_logic_type "typetag",[])
+      begin match logic_type ctxt loc env ty with
+        | Ctype ty -> Ttype ty, Ltype (Logic_env.find_logic_type "typetag",[])
         | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
           ctxt.error loc "cannot take type tag of logic type"
       end
@@ -3086,7 +3211,7 @@ struct
       let t1,ty1 = type_num_term_option ctxt env t1 in
       let t2,ty2 = type_num_term_option ctxt env t2 in
       (Trange(t1,t2),
-       Ltype(ctxt.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
+       Ltype(Logic_env.find_logic_type "set", [arithmetic_conversion ty1 ty2]))
     | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
     | PLfresh _ | PLallocable _ | PLfreeable _
     | PLinitialized _ | PLdangling _ | PLexists _ | PLforall _
@@ -3199,26 +3324,26 @@ struct
       | TAddrOf lv
       | Tat ({term_node = TAddrOf lv}, _) ->
         f lv t
-      | _ -> C.error t.term_loc "not a dependency value: %a"
-               Cil_printer.pp_term t
+      | _ ->
+        C.error t.term_loc "not a dependency value: %a" Cil_printer.pp_term t
     in
     lift_set check_from t
 
   and type_logic_app env loc f labels ttl =
-    (* support for overloading *)
-    let infos =
-      try [Lenv.find_logic_info f env]
-      with Not_found ->
-        C.find_all_logic_functions f in
+    match resolve_lapp f env with
+    | Some (Lfun infos) -> type_logic_app_infos env loc f infos labels ttl
+    | Some (Ctor info) ->
+      C.error loc "not a predicate: constructor %s" info.ctor_name
+    | None ->
+      C.error loc "unbound logic predicate %s" f
+
+  and type_logic_app_infos env loc f (infos : logic_info list) labels ttl =
     match infos with
-    | [] -> C.error loc "unbound logic function %s" f
     | [info] ->
       begin
         let labels = List.map (find_logic_label loc env) labels in
         let params = List.map (fun x -> fresh x.lv_type) info.l_profile in
-        let env, tl =
-          type_arguments ~overloaded:false env loc params ttl
-        in
+        let env, tl = type_arguments ~overloaded:false env loc params ttl in
         let label_assoc = labels_assoc loc f env info.l_labels labels in
         match info.l_type with
         | Some t ->
@@ -3236,26 +3361,19 @@ struct
              try
                let labels = List.map (find_logic_label loc env) labels in
                let params =
-                 List.map (fun x -> fresh x.lv_type) info.l_profile
-               in
+                 List.map (fun x -> fresh x.lv_type) info.l_profile in
                let env, tl =
-                 type_arguments ~overloaded:true env loc params ttl
-               in
-               let tl =
-                 List.combine (List.map (instantiate env) params) tl
-               in
-               let label_assoc = labels_assoc loc f env info.l_labels labels
-               in
+                 type_arguments ~overloaded:true env loc params ttl in
+               let tl = List.combine (List.map (instantiate env) params) tl in
+               let label_assoc = labels_assoc loc f env info.l_labels labels in
                match info.l_type with
                | Some t ->
                  let t = fresh t in
                  let t =
                    try instantiate env t
                    with _ -> raise Not_applicable
-                 in
-                 (info, label_assoc, tl, Some t)::acc
-               | None ->
-                 (info, label_assoc, tl, None)::acc
+                 in (info, label_assoc, tl, Some t)::acc
+               | None -> (info, label_assoc, tl, None)::acc
              with Not_applicable -> acc)
           [] infos
       in
@@ -3281,15 +3399,13 @@ struct
     tt
 
   and type_bool_term ctxt env t =
-    let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
     if not (plain_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
-    mk_cast tt (Ltype (ctxt.find_logic_type Utf8_logic.boolean,[]))
+    mk_cast tt (Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]))
 
   and type_num_term_option ctxt env t =
-    let module [@warning "-60"] C = struct end in
     match t with
       None -> None, Linteger (* Warning: should be an hybrid of integer
                                 and float. *)
@@ -3345,7 +3461,6 @@ struct
     | _ -> [], ctxt.type_predicate ctxt env p0
 
   let term_lval_assignable ctxt ~accept_formal ~accept_const env t =
-    let module [@warning "-60"] C = struct end in
     let t = ctxt.type_term ctxt env t in
     let mode = { lval_assignable_mode with accept_formal ; accept_const } in
     if not (check_lval_kind mode t) then
@@ -3354,7 +3469,6 @@ struct
     lift_set (term_lval (fun _ t -> t)) t
 
   let term ctxt env t =
-    let module [@warning "-60"] C = struct end in
     match t.lexpr_node with
     | PLnamed(name,t) ->
       let t = ctxt.type_term ctxt env t in
@@ -3364,7 +3478,6 @@ struct
       { term_node = t'; term_loc=t.lexpr_loc; term_type=ty; term_name = [] }
 
   let predicate ctxt env p0 =
-    let module [@warning "-60"] C = struct end in
     let loc = p0.lexpr_loc in
     let predicate = ctxt.type_predicate ctxt in
     let term = ctxt.type_term ctxt in
@@ -3401,7 +3514,7 @@ struct
          prel ~loc (Cil_types.Req, t, Cil.lzero ~loc ())
        | p -> pnot ~loc p)
     | PLapp (p, labels, tl) ->
-      let ttl= List.map (term env) tl in
+      let ttl = List.map (term env) tl in
       let info, label_assoc, tl, t = type_logic_app env loc p labels ttl in
       begin
         match t with
@@ -3502,7 +3615,7 @@ struct
               let info =
                 List.find
                   (fun x -> x.l_profile = [])
-                  (ctxt.find_all_logic_functions x)
+                  (Logic_env.find_all_logic_functions x)
               in make_app info
             with Not_found -> boolean_to_predicate ctxt env p0))
     | PLlet(x,def,body) ->
@@ -3747,8 +3860,7 @@ struct
               ~logic_type
               ~type_predicate
               ~type_term
-              ~type_assigns:type_assign
-          in
+              ~type_assigns:type_assign in
           let b_assumes = List.map (id_predicate env) bas in
           let b_requires= List.map (id_predicate_top env) br in
           let b_post_cond =
@@ -4008,7 +4120,17 @@ struct
     in
     labels,env
 
-  let logic_decl loc f labels poly ?return_type p =
+  type context =
+    | Toplevel
+    | InAxiomatic
+    | InModule of string
+
+  let fullname ~context name =
+    match context with
+    | Toplevel | InAxiomatic -> name
+    | InModule m -> Format.sprintf "%s::%s" m name
+
+  let logic_decl loc ~context f labels poly ?return_type p =
     let labels,env = annot_env loc labels poly in
     let t = match return_type with
       | None -> None;
@@ -4016,7 +4138,7 @@ struct
     in
     let p, env = formals loc env p in
     check_polymorphism loc ?return_type:t p;
-    let info = Cil_const.make_logic_info f in
+    let info = Cil_const.make_logic_info (fullname ~context f) in
     (* Should we add implicitly a default label for the declaration? *)
     let labels = match !Lenv.default_label with
         None -> labels
@@ -4033,24 +4155,29 @@ struct
     info.l_profile <- p;
     info.l_type <- t;
     info.l_labels <- labels;
-    add_logic_function loc info;
+    add_logic_info loc info;
     env,info
 
   let type_annot loc ti =
     let p = ti.this_type, ti.this_name in
     (* Note: Logic_decl registers the logic function *)
-    let env, info = logic_decl loc ti.inv_name [] [] [p] in
+    let env, info = logic_decl loc ~context:Toplevel ti.inv_name [] [] [p] in
     let body = predicate env ti.inv in
     info.l_body <- LBpred body;
     update_info_wrt_default_label info;
     info
 
-  let type_datacons loc env type_info (name,params) =
+  let type_datacons loc env type_info ~context (name,params) =
+    let name = fullname ~context name in
     (try
-       let info = C.find_logic_ctor name in
+       let info = Logic_env.find_logic_ctor name in
        C.error loc "type constructor %s is already used by type %s"
          name info.ctor_type.lt_name
-     with Not_found -> ());
+     with Not_found ->
+       let infos = Logic_env.find_all_logic_functions name in
+       if infos <> [] then
+         C.error loc "logic function %s is already defined" name
+    );
     let tparams = List.map (plain_logic_type loc env) params in
     let my_info =
       { ctor_name = name;
@@ -4058,21 +4185,22 @@ struct
         ctor_params = tparams
       }
     in
-    C.add_logic_ctor name my_info;
+    Logic_env.add_logic_ctor name my_info;
     my_info
 
-  let typedef loc env my_info def =
+  let typedef loc ~context env my_info def =
     match def with
-    | TDsum cons -> LTsum (List.map (type_datacons loc env my_info) cons)
+    | TDsum cons -> LTsum (List.map (type_datacons loc env my_info ~context) cons)
     | TDsyn typ -> LTsyn (plain_logic_type loc env typ)
 
-  let rec annot in_axiomatic a =
+  let rec decl ~context a =
     let open Current_loc.Operators in
     let loc = a.decl_loc in
     let<> UpdatedCurrentLoc = loc in
     match a.decl_node with
+
     | LDlogic_reads (f, labels, poly, t, p, l) ->
-      let env,info = logic_decl loc f labels poly ~return_type:t p in
+      let env,info = logic_decl loc ~context f labels poly ~return_type:t p in
       info.l_body <-
         (match l with
          | Some l ->
@@ -4085,9 +4213,10 @@ struct
          | None -> LBnone);
       (* potential creation of label w.r.t. reads clause *)
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDpredicate_reads (f, labels, poly, p, l) ->
-      let env,info = logic_decl loc f labels poly p in
+      let env,info = logic_decl loc ~context f labels poly p in
       info.l_body <-
         (match l with
          | Some l ->
@@ -4100,9 +4229,10 @@ struct
          | None -> LBnone);
       (* potential creation of label w.r.t. reads clause *)
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDlogic_def(f, labels, poly,t,p,e) ->
-      let env,info = logic_decl loc f labels poly ~return_type:t p in
+      let env,info = logic_decl loc ~context f labels poly ~return_type:t p in
       let rt = match info.l_type with
         | None -> assert false
         | Some t -> t
@@ -4114,22 +4244,23 @@ struct
         info.l_body <- LBterm (update_term_wrt_default_label new_term);
         (* potential creation of label w.r.t. def *)
         update_info_wrt_default_label info;
-        Dfun_or_pred (info,loc)
+        Some (Dfun_or_pred (info,loc))
       end else
         C.error loc
-          "return type of logic function %s is %a but %a was expected"
-          f
+          "return type of logic function %s is %a but %a was expected" f
           Cil_printer.pp_logic_type new_typ
           Cil_printer.pp_logic_type rt
+
     | LDpredicate_def (f, labels, poly, p, e) ->
-      let env,info = logic_decl loc f labels poly p in
+      let env,info = logic_decl loc ~context f labels poly p in
       let e = update_predicate_wrt_default_label (predicate env e) in
       info.l_body <- LBpred e;
       (* potential creation of label w.r.t. def *)
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDinductive_def (f, input_labels, poly, p, indcases) ->
-      let _env,info = logic_decl loc f input_labels poly p in
+      let _env,info = logic_decl loc ~context f input_labels poly p in
       (* env is ignored: because params names are indeed useless...*)
       let (global_default, l) =
         List.fold_left
@@ -4154,50 +4285,99 @@ struct
          Update the inductive cases that need it (i.e. do not define
          their own label(s)).
       *)
-      let l =
-        List.rev_map update_ind_case_wrt_default_label l
-      in
+      let l = List.rev_map update_ind_case_wrt_default_label l in
       info.l_body <- LBinductive l;
       update_info_wrt_default_label info;
-      Dfun_or_pred (info,loc)
+      Some (Dfun_or_pred (info,loc))
+
     | LDaxiomatic(id,decls) ->
-      if in_axiomatic then
-        (* Not supported yet. See issue 43 on ACSL's github repository. *)
-        C.error loc "Nested axiomatic. Ignoring body of %s" id
-      else begin
-        let change oldloc =
+      begin match context with
+        | Toplevel -> ()
+        | InAxiomatic ->
+          (* Not supported yet. See issue 43 on ACSL's github repository. *)
+          C.error loc "Nested axiomatic. Ignoring body of %s" id
+        |  InModule _ ->
+          C.error loc "Nested modules and axiomatic. Ignoring body of %s" id
+      end;
+      let change oldloc =
+        C.error loc
+          "Duplicated axiomatics %s (first occurrence at %a)"
+          id Cil_printer.pp_location oldloc in
+      ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
+      let l = List.filter_map (decl ~context:InAxiomatic) decls in
+      Some (Daxiomatic(id,l,[],loc))
+
+    | LDmodule(id,decls) ->
+      begin match context with
+        | Toplevel | InModule _ -> ()
+        | InAxiomatic ->
+          (* Not supported yet. See issue 43 on ACSL's github repository. *)
+          C.error loc "Nested module and axiomatic. Ignoring body of %s" id
+      end;
+      let name = fullname ~context id in
+      let context = InModule name in
+      let change (_,oldloc) =
+        C.error loc
+          "Duplicated module %s (first occurrence at %a)"
+          id Cil_printer.pp_location oldloc in
+      ignore (Logic_env.Modules.memo ~change (fun _ -> (None,loc)) name);
+      push_imports () ;
+      add_import ~current:true name ;
+      let l = List.filter_map (decl ~context) decls in
+      pop_imports () ;
+      Some (Dmodule(name,l,[],None,loc))
+
+    | LDimport(None,name,alias) ->
+      add_import ?alias name ; None
+
+    | LDimport(Some driver as drv,name,alias) ->
+      let annot =
+        match Logic_env.Modules.find name with
+        | None, oldloc ->
           C.error loc
-            "Duplicated axiomatics %s (first occurrence at %a)"
-            id Cil_printer.pp_location oldloc
-        in
-        let l = List.map (annot true) decls in
-        ignore (Logic_env.Axiomatics.memo ~change (fun _ -> loc) id);
-        Daxiomatic(id,l,[],loc)
-      end
-    | LDtype(s,l,def) ->
+            "Module %s already defined (at %a)"
+            name Cil_printer.pp_location oldloc
+        | Some odrv, oldloc ->
+          if odrv <> driver then
+            C.error loc
+              "Module %s already imported with driver %s (at %a)"
+              name odrv Cil_printer.pp_location oldloc
+          else None
+        | exception Not_found ->
+          let decls = ref [] in
+          let builder = make_module_builder decls name in
+          let path = Logic_utils.longident name in
+          Extensions.importer driver ~builder ~loc path ;
+          Logic_env.Modules.add name (drv,loc) ;
+          Some (Dmodule(name,List.rev !decls,[],drv,loc))
+      in add_import ?alias name ; annot
+
+    | LDtype(name,l,def) ->
       let env = init_type_variables loc l in
+      let name = fullname ~context name in
       let my_info =
-        { lt_name = s;
+        { lt_name = name;
           lt_params = l;
           lt_def = None; (* will be updated later *)
           lt_attr = [];
-        }
-      in
+        } in
       add_logic_type loc my_info;
-      let tdef = Option.map (typedef loc env my_info) def in
-      if is_cyclic_typedef s tdef then
-        C.error loc "Definition of %s is cyclic" s;
+      let tdef = Option.map (typedef loc ~context env my_info) def in
+      if is_cyclic_typedef name tdef then
+        C.error loc "Definition of %s is cyclic" name;
       my_info.lt_def <- tdef;
-      Dtype (my_info,loc)
-    | LDlemma (x,labels, poly, {tp_kind = kind; tp_statement = e}) ->
-      if Logic_env.Lemmas.mem x then begin
-        let old_def = Logic_env.Lemmas.find x in
+      Some (Dtype (my_info,loc))
+
+    | LDlemma (name,labels, poly, {tp_kind = kind; tp_statement = e}) ->
+      let name = fullname ~context name in
+      if Logic_env.Lemmas.mem name then begin
+        let old_def = Logic_env.Lemmas.find name in
         let old_kind = match old_def with
           | Dlemma(_,_,_,{tp_kind },_,_) -> tp_kind
           | _ -> Assert in
         let old_loc = Cil_datatype.Global_annotation.loc old_def in
         C.error loc "%a %s is already registered as %a (%a)"
-          Cil_printer.pp_lemma_kind kind x
+          Cil_printer.pp_lemma_kind kind name
           Cil_printer.pp_lemma_kind old_kind
           Cil_datatype.Location.pretty old_loc
       end;
@@ -4207,9 +4387,10 @@ struct
         | None -> labels
         | Some lab -> [lab]
       in
-      let def = Dlemma (x,labels, poly,  p, [], loc) in
-      Logic_env.Lemmas.add x def;
-      def
+      let def = Dlemma (name,labels, poly,  p, [], loc) in
+      Logic_env.Lemmas.add name def;
+      Some def
+
     | LDinvariant (s, e) ->
       let labels,env = annot_env loc [] [] in
       let li = Cil_const.make_logic_info s in
@@ -4220,13 +4401,13 @@ struct
       in
       li.l_labels <- labels;
       li.l_body <- LBpred p;
-      add_logic_function loc li;
+      add_logic_info loc li;
       update_info_wrt_default_label li;
-      Dinvariant (li,loc)
-    | LDtype_annot l ->
-      Dtype_annot (type_annot loc l,loc)
-    | LDmodel_annot l ->
-      Dmodel_annot (model_annot loc l,loc);
+      Some (Dinvariant (li,loc))
+
+    | LDtype_annot l -> Some (Dtype_annot (type_annot loc l,loc))
+    | LDmodel_annot l -> Some (Dmodel_annot (model_annot loc l,loc))
+
     | LDvolatile (tsets, (rd_opt, wr_opt)) ->
       let env = keep_qualifiers (Lenv.empty ()) in
       let ctxt = base_ctxt env in
@@ -4304,7 +4485,7 @@ struct
       let get_volatile_fct checks_type = function
         | None -> None
         | Some fct ->
-          try (match (C.find_var fct).lv_origin
+          try (match (ctxt.find_var fct).lv_origin
                with
                | None -> raise Not_found
                | Some vi as vi_opt-> checks_type fct vi.vtype ; vi_opt)
@@ -4314,31 +4495,27 @@ struct
       let tsets = List.map (Logic_const.new_identified_term) tsets in
       let rvi_opt = get_volatile_fct checks_reads_fct rd_opt in
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
-      Dvolatile (tsets, rvi_opt, wvi_opt, [], loc)
+      Some (Dvolatile (tsets, rvi_opt, wvi_opt, [], loc))
+
     | LDextended (Ext_lexpr(kind, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
-      Dextended (textended, [], loc)
+      Some (Dextended (textended, [], loc))
+
     | LDextended (Ext_extension (kind, name, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent =
         Extensions.typer_block kind ~typing_context ~loc (name,content)
       in
       let textended = Logic_const.new_acsl_extension kind loc status tcontent in
-      Dextended (textended, [], loc)
+      Some (Dextended (textended, [], loc))
 
-  let annot a =
-    start_transaction ();
-    let res = annot false a in
-    finish_transaction (); res
-
-  let annot = C.on_error annot (fun _ -> rollback_transaction ())
+  let annot = C.on_error
+      (fun a ->
+         start_transaction ();
+         let res = decl ~context:Toplevel a in
+         finish_transaction (); res)
+      (fun _ -> rollback_transaction ())
 
 end
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
- *)

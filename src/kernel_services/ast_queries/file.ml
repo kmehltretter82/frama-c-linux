@@ -699,6 +699,7 @@ let files_to_cabs_cil files cpp_commands =
   if Kernel.UnspecifiedAccess.get () then
     Undefined_sequence.check_sequences merged_file;
   merged_file, cabs_files
+
 (* "Implicit" annotations are those added by the kernel with ACSL name
    'Frama_C_implicit_init'. Currently, this concerns statements that are
    generated to initialize local variables. *)
@@ -1255,7 +1256,7 @@ let extract_logic_infos g =
     | Dfun_or_pred (li,_) | Dinvariant (li,_) | Dtype_annot (li,_) -> li :: acc
     | Dvolatile _ | Dtype _ | Dlemma _
     | Dmodel_annot _ | Dextended _ -> acc
-    | Daxiomatic(_,l,_,_) -> List.fold_left aux acc l
+    | Daxiomatic(_,l,_,_) | Dmodule(_,l,_,_,_) -> List.fold_left aux acc l
   in aux [] g
 
 let find_logic_info_decl li =

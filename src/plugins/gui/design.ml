@@ -504,6 +504,9 @@ let to_do_on_select
     | PIP(IPAxiomatic _ as ip) ->
       main_ui#pretty_information "This is an axiomatic.@.";
       main_ui#view_original (location ip)
+    | PIP(IPModule _ as ip) ->
+      main_ui#pretty_information "This is an ACSL module.@.";
+      main_ui#view_original (location ip)
     | PIP(IPLemma { il_pred } as ip) ->
       main_ui#pretty_information "This is a %a.@."
         Cil_printer.pp_lemma_kind il_pred.tp_kind;

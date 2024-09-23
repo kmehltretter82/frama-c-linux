@@ -697,13 +697,6 @@ struct
   let find_type _ = raise Not_found
   let find_label _ = raise Not_found
 
-  include Logic_env
-  let add_logic_function =
-    add_logic_function_gen Logic_utils.is_same_logic_profile
-
-  let remove_logic_info =
-    remove_logic_info_gen Logic_utils.is_same_logic_profile
-
   let integral_cast ty t =
     Aorai_option.abort
       "term %a has type %a, but %a is expected."

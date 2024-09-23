@@ -64,6 +64,11 @@ module Lemmas: State_builder.Hashtbl
 module Axiomatics: State_builder.Hashtbl
   with type key = string and type data = Cil_types.location
 
+(** @since Frama-C+dev *)
+module Modules: State_builder.Hashtbl
+  with type key = string
+   and type data = string option * Cil_types.location (* driver, loc *)
+
 val builtin_states: State.t list
 
 (** {2 Shortcuts to the functions of the modules above} *)

@@ -405,7 +405,7 @@ let rec register ppt =
     Property.pretty ppt
     Project.pretty (Project.current ());
   if Status.mem ppt then
-    Kernel.fatal "trying to register twice property `%a'.\n\
+    Kernel.fatal "trying to register twice property @[<hov 2>'%a'@].@\n\
                   That is forbidden (kernel invariant broken)."
       Property.pretty ppt;
   let h = Emitter_with_properties.Hashtbl.create 7 in
@@ -525,7 +525,7 @@ and unsafe_emit_and_get e ~hyps ~auto ppt ?(distinct=false) s =
   | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _
   | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _
   | Property.IPAllocation _ | Property.IPDecrease _ | Property.IPBehavior _
-  | Property.IPAxiomatic _ | Property.IPLemma _
+  | Property.IPAxiomatic _ | Property.IPModule _ | Property.IPLemma _
   | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _
   | Property.IPExtended _ ->
     Kernel.fatal "unregistered property %a" Property.pretty ppt
@@ -693,7 +693,7 @@ and get_status ?(must_register=true) ppt =
   | Property.IPPredicate _ | Property.IPCodeAnnot _ | Property.IPComplete _
   | Property.IPDisjoint _ | Property.IPAssigns _ | Property.IPFrom _
   | Property.IPDecrease _ | Property.IPAllocation _
-  | Property.IPAxiomatic _ | Property.IPLemma _
+  | Property.IPAxiomatic _ | Property.IPModule _ | Property.IPLemma _
   | Property.IPTypeInvariant _ | Property.IPGlobalInvariant _ ->
     Kernel.fatal "trying to get status of unregistered property `%a'.\n\
                   That is forbidden (kernel invariant broken)."

@@ -134,6 +134,8 @@ let rec strategy_ip model pool target =
     add_lemma_task pool (LogicUsage.logic_lemma il_name)
   | IPAxiomatic { iax_props } ->
     List.iter (strategy_ip model pool) iax_props
+  | IPModule { im_props } ->
+    List.iter (strategy_ip model pool) im_props
   | IPBehavior { ib_kf = kf ; ib_bhv = bhv } ->
     add_fun_task model pool ~kf ~bhvs:[bhv] ()
   | IPPredicate { ip_kf = kf ; ip_kind ; ip_kinstr = ki } ->

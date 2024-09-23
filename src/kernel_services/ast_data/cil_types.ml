@@ -1800,6 +1800,8 @@ and global_annotation =
       * attributes * location
   (** associated terms, reading function, writing function *)
   | Daxiomatic of string * global_annotation list * attributes * location
+  (** last string option is the external importer responsible for the module *)
+  | Dmodule of string * global_annotation list * attributes * string option * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
       string * logic_label list * string list *

@@ -58,6 +58,9 @@ type extension_printer =
 type extension_same =
   acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
 
+type extension_module_importer =
+  module_builder -> location -> string list -> unit
+
 (** type of functions that register new ACSL extensions to be used in place of
     various kinds of ACSL annotations.
 
@@ -97,20 +100,20 @@ type extension_same =
     status or not.
 
     Here is a basic example:
-    [
-    let count = ref 0
-    let foo_typer typing_context loc = function
-      | p :: [] ->
-        Ext_preds
-        [ (typing_context.type_predicate
-             typing_context
-             (typing_context.post_state [Normal])
-             p)])
-      | [] -> let id = !count in incr count; Ext_id id
-      | _ -> typing_context.error loc "expecting a predicate after keyword FOO"
-    let () =
-      Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
-    ]
+    {[
+      let count = ref 0
+      let foo_typer ctxt loc = function
+        | [] ->
+          let id = !count in incr count;
+          Ext_id id
+        | [p] ->
+          Ext_preds [ctxt.type_predicate ctxt (ctxt.post_state [Normal]) p]
+        | _ ->
+          typing_context.error loc "expecting a predicate after keyword FOO"
+
+      let () =
+        Acsl_extension.register_behavior ~plugin:"myplugin" "FOO" foo_typer false
+    ]}
     @before 29.0-Copper parameters [plugin] and [is_same_ext] were not present
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
@@ -153,3 +156,28 @@ val register_code_annot_next_loop: register_extension
 
 (** Registers extension both for code and loop annotations. *)
 val register_code_annot_next_both: register_extension
+
+(**
+   Module importer extensions allow extending the import clause with external
+   loaders. For instance, consider the following declaration:
+   {[
+     //@ import A: foo::bar;
+   ]}
+
+   This import clause will invoke an external module importer named ["A"]
+   provided it has been properly registered.
+
+   A module importer extension is a function that receives a [module_builder]
+   parameter to be populated with contents of the module. The module name is
+   provided as list (See {!Logic_utils.longident} for details).
+
+   New type and function symbols shall be created with `Cil.make_xxx` functions.
+   The registered symbols {i will} be automatically prefixed with the name of
+   the imported module if necessary.
+
+   The register module importer function might be invoked several times,
+   typically when a given module is imported from several files. Although
+   external module importers might use memoization internally, the provided
+   module builder shall be populated on every call.
+*)
+val register_module_importer : string -> extension_module_importer -> unit

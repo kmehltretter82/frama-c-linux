@@ -133,6 +133,7 @@ module Refreshers: sig
   val instances: check
   val lemmas: check
   val axiomatic: check
+  val modules: check
   val typeInvariants: check
   val globalInvariants: check
 
@@ -274,6 +275,8 @@ struct
       ~hint:"Show lemmas" ()
   let axiomatic = add ~name:"Axiomatic" ~default:false
       ~hint:"Show global axiomatics" ()
+  let modules = add ~name:"Module" ~default:false
+      ~hint:"Show global modules" ()
   let instances = add ~name:"Instances"
       ~hint:"Show properties that are instances of root properties" ()
   let typeInvariants = add ~name:"Type invariants"
@@ -387,6 +390,7 @@ struct
     terminates.add hb;
     stmtSpec.add hb;
     axiomatic.add hb;
+    modules.add hb;
     lemmas.add hb;
     typeInvariants.add hb;
     globalInvariants.add hb;
@@ -639,6 +643,7 @@ let make_panel (main_ui:main_window_extension_points) =
     | IPTypeInvariant _ -> typeInvariants.get()
     | IPGlobalInvariant _ -> globalInvariants.get()
     | IPAxiomatic _ -> axiomatic.get () && not (onlyCurrent.get ())
+    | IPModule _ -> modules.get () && not (onlyCurrent.get ())
     | IPLemma _ -> lemmas.get ()
     | IPComplete _ -> complete_disjoint.get ()
     | IPDisjoint _ -> complete_disjoint.get ()
@@ -842,9 +847,3 @@ let extend (main_ui:main_window_extension_points) =
   main_ui#register_source_highlighter highlighter
 
 let () = Design.register_extension extend
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

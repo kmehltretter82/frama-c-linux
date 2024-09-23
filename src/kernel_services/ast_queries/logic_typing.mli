@@ -77,7 +77,6 @@ module Lenv : sig
   val find_type_var: string -> t -> Cil_types.logic_type
   val find_logic_info: string -> t -> Cil_types.logic_info
   val find_logic_label: string -> t -> Cil_types.logic_label
-
 end
 
 type type_namespace = Typedef | Struct | Union | Enum
@@ -86,7 +85,28 @@ type type_namespace = Typedef | Struct | Union | Enum
 
 module Type_namespace: Datatype.S with type t = type_namespace
 
+type logic_infos =
+  | Ctor of logic_ctor_info
+  | Lfun of logic_info list
+
 (** Functions that can be called when type-checking an extension of ACSL.
+
+    @before Frama-C+dev The following fields were present:
+
+    {[
+      remove_logic_function : string -> unit;
+      remove_logic_info: logic_info -> unit;
+      remove_logic_type: string -> unit;
+      remove_logic_ctor: string -> unit;
+      add_logic_function: logic_info -> unit;
+      add_logic_type: string -> logic_type_info -> unit;
+      add_logic_ctor: string -> logic_ctor_info -> unit;
+      find_all_logic_functions: string -> logic_info list;
+      find_logic_type: string -> logic_type_info;
+      find_logic_ctor: string -> logic_ctor_info;
+    ]}
+
+    You shall now use directly functions from {!Logic_env} and {!Logic_utils}.
 
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
 *)
@@ -104,16 +124,6 @@ type typing_context = {
   find_comp_field: compinfo -> string -> offset;
   find_type : type_namespace -> string -> typ;
   find_label : string -> stmt ref;
-  remove_logic_function : string -> unit;
-  remove_logic_info: logic_info -> unit;
-  remove_logic_type: string -> unit;
-  remove_logic_ctor: string -> unit;
-  add_logic_function: logic_info -> unit;
-  add_logic_type: string -> logic_type_info -> unit;
-  add_logic_ctor: string -> logic_ctor_info -> unit;
-  find_all_logic_functions: string -> logic_info list;
-  find_logic_type: string -> logic_type_info;
-  find_logic_ctor: string -> logic_ctor_info;
   pre_state:Lenv.t;
   post_state:termination_kind list -> Lenv.t;
   assigns_env: Lenv.t;
@@ -135,7 +145,6 @@ type typing_context = {
     accept_formal:bool ->
     Lenv.t -> Logic_ptree.assigns -> assigns;
   error: 'a 'b. location -> ('a,Format.formatter,unit,'b) format4 -> 'a;
-
   on_error: 'a 'b. ('a -> 'b) -> ((location * string) -> unit) -> 'a -> 'b
   (** [on_error f rollback x] will attempt to evaluate [f x]. If this triggers
       an error while in [-kernel-warn-key annot-error] mode, [rollback
@@ -148,6 +157,14 @@ type typing_context = {
   *)
 }
 
+(** Functions that can be called when importing external modules into ACSL.
+    See {!Acsl_extension.register_module_importer} for details.
+    @since Frama-C+dev
+*)
+type module_builder = {
+  add_logic_type : location -> logic_type_info -> unit ;
+  add_logic_function : location -> logic_info -> unit ;
+}
 
 module type S =
 sig
@@ -202,7 +219,10 @@ sig
   val model_annot :
     location -> Logic_ptree.model_annot -> model_info
 
-  val annot : Logic_ptree.decl -> global_annotation
+  (** Some logic declaration might not introduce new global annotations
+      (eg. already imported external modules).
+      @before Frama-C+dev always return a global annotation *)
+  val annot : Logic_ptree.decl -> global_annotation option
 
   (** [funspec behaviors f prms typ spec] type-checks a function contract.
       @param behaviors list of existing behaviors (outside of the current
@@ -236,19 +256,6 @@ module Make
        val find_type : type_namespace -> string -> typ
        val find_comp_field: compinfo -> string -> offset
        val find_label : string -> stmt ref
-
-       val remove_logic_function : string -> unit
-       val remove_logic_info: logic_info -> unit
-       val remove_logic_type: string -> unit
-       val remove_logic_ctor: string -> unit
-
-       val add_logic_function: logic_info -> unit
-       val add_logic_type: string -> logic_type_info -> unit
-       val add_logic_ctor: string -> logic_ctor_info -> unit
-
-       val find_all_logic_functions : string -> Cil_types.logic_info list
-       val find_logic_type: string -> logic_type_info
-       val find_logic_ctor: string -> logic_ctor_info
 
        (** What to do when we have a term of type Integer in a context
            expecting a C integral type.
@@ -308,10 +315,10 @@ val set_extension_handler:
   is_extension:(string -> bool) ->
   typer:(string -> typing_context -> location -> Logic_ptree.lexpr list ->
          (bool * acsl_extension_kind)) ->
-  typer_block:(string -> typing_context ->
-               Filepath.position * Filepath.position ->
+  typer_block:(string -> typing_context -> location ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
+  importer:(string -> module_builder -> location -> string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this
@@ -321,7 +328,7 @@ val set_extension_handler:
 val get_typer :
   string ->
   typing_context:typing_context ->
-  loc:Filepath.position * Filepath.position ->
+  loc:location ->
   Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
 
 val get_typer_block:
@@ -331,8 +338,8 @@ val get_typer_block:
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+val get_importer:
+  string ->
+  builder:module_builder ->
+  loc:Logic_ptree.location ->
+  string list -> unit

@@ -1517,8 +1517,10 @@ let rec gannot_correspondence =
   | Dvolatile _ -> ()
   (* reading and writing function themselves will be checked elsewhere. *)
 
-  | Daxiomatic(_,l,_,_) ->
+  | Daxiomatic(_,l,_,_) | Dmodule(_,l,_,_,_) ->
     List.iter gannot_correspondence l
+  (* TODO: for modules, we should check the driver if it exists. But like
+     for lemmas, we don't have an appropriate structure to store the info *)
   | Dtype (ti,loc) -> ignore (logic_type_correspondence ~loc ti empty_env)
   | Dlemma _ -> ()
   (* TODO: we currently do not have any appropriate structure for

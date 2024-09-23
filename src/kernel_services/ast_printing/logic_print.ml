@@ -75,8 +75,7 @@ let rec print_logic_type name fmt typ =
   | LTenum s -> fprintf fmt "enum@ %s%t" s pname
   | LTstruct s -> fprintf fmt "struct@ %s%t" s pname
   | LTnamed (s,l) ->
-    fprintf fmt "%s%a%t"
-      s
+    fprintf fmt "%s%a%t" s
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@]>"
          (print_logic_type None)) l
       pname
@@ -370,9 +369,18 @@ let rec print_decl fmt d =
       (pp_list ~pre:"{@[" ~sep:",@ " ~suf:"@]}" pp_print_string) labels
       (pp_list ~pre:"<@[" ~sep:",@ " ~suf:"@>}" pp_print_string) tvar
       print_lexpr body.tp_statement
-  | LDaxiomatic (s,d) ->
-    fprintf fmt "@[<2>axiomatic@ %s@ {@\n%a@]@\n}" s
-      (pp_list ~sep:"@\n" print_decl) d
+  | LDaxiomatic (name,ds) ->
+    fprintf fmt "@[<2>axiomatic@ %s@ {@\n%a@]@\n}" name
+      (pp_list ~sep:"@\n" print_decl) ds
+  | LDmodule (name,ds) ->
+    fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
+      (pp_list ~sep:"@\n" print_decl) ds
+  | LDimport (drv,mId,asId) ->
+    fprintf fmt "@[<2>import" ;
+    Option.iter (fprintf fmt "@ %s:") drv ;
+    fprintf fmt "@ %s" mId ;
+    Option.iter (fprintf fmt "@ \\as %s") asId ;
+    fprintf fmt ";@]@\n}"
   | LDinvariant (s,e) ->
     fprintf fmt "@[<2>invariant@ %s:@ %a;@]" s print_lexpr e
   | LDtype_annot ty -> print_type_annot fmt ty
@@ -483,8 +491,3 @@ let print_code_annot fmt ca =
       print_behaviors bhvs
       (if is_loop then " loop " else "")
       print_extension e
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

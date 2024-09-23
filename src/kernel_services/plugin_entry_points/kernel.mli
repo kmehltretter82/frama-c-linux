@@ -102,6 +102,8 @@ val dkey_print_logic_coercions: category
 
 val dkey_print_logic_types: category
 
+val dkey_print_imported_modules: category
+
 val dkey_print_sid: category
 
 val dkey_print_unspecified: category

@@ -739,6 +739,9 @@ let rec add_attribute_glob_annot a g =
   | Daxiomatic(n,l,al,loc) ->
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
                Cil.addAttribute a al,loc)
+  | Dmodule(n,l,al,drv,loc) ->
+    Dmodule(n,List.map (add_attribute_glob_annot a) l,
+            Cil.addAttribute a al,drv,loc)
   | Dtype(ti,_) -> ti.lt_attr <- Cil.addAttribute a ti.lt_attr; g
   | Dlemma(n,labs,t,p,al,l) ->
     Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
@@ -867,7 +870,17 @@ let is_same_builtin_profile l1 l2 =
   is_same_list (fun (_,t1) (_,t2) -> is_same_type t1 t2)
     l1.bl_profile l2.bl_profile
 
+let is_qualified a =
+  try ignore @@ String.index a ':' ; true with Not_found -> false
+
+let longident = Str.split @@ Str.regexp_string "::"
+
+let mem_logic_function f =
+  List.exists (is_same_logic_profile f) @@
+  Logic_env.find_all_logic_functions f.l_var_info.lv_name
+
 let add_logic_function = Logic_env.add_logic_function_gen is_same_logic_profile
+let remove_logic_function = Logic_env.remove_logic_info_gen is_same_logic_profile
 
 let is_same_logic_ctor_info ci1 ci2 =
   ci1.ctor_name = ci2.ctor_name &&
@@ -1217,6 +1230,9 @@ let rec is_same_global_annotation ga1 ga2 =
   | Daxiomatic (id1,ga1,attr1,_), Daxiomatic (id2,ga2,attr2,_) ->
     id1 = id2 && is_same_list is_same_global_annotation ga1 ga2
     && is_same_attributes attr1 attr2
+  | Dmodule (id1,ga1,attr1,drv1,_), Dmodule (id2,ga2,attr2,drv2,_) ->
+    id1 = id2 && is_same_list is_same_global_annotation ga1 ga2 && drv1 = drv2
+    && is_same_attributes attr1 attr2
   | Dtype (t1,_), Dtype (t2,_) -> is_same_logic_type_info t1 t2
   | Dlemma(n1,labs1,typs1,st1,attr1,_),
     Dlemma(n2,labs2,typs2,st2,attr2,_) ->
@@ -1233,10 +1249,10 @@ let rec is_same_global_annotation ga1 ga2 =
     is_same_opt (fun x y -> x.vname = y.vname) w1 w2 &&
     is_same_attributes attr1 attr2
   | Dextended(id1,_,_), Dextended(id2,_,_) -> id1 = id2
-  | (Dfun_or_pred _ | Daxiomatic _ | Dtype _ | Dlemma _
+  | (Dfun_or_pred _ | Daxiomatic _ | Dmodule _ | Dtype _ | Dlemma _
     | Dinvariant _ | Dtype_annot _ | Dmodel_annot _
     | Dvolatile _ | Dextended _),
-    (Dfun_or_pred _ | Daxiomatic _ | Dtype _ | Dlemma _
+    (Dfun_or_pred _ | Daxiomatic _ | Dmodule _ | Dtype _ | Dlemma _
     | Dinvariant _ | Dtype_annot _ | Dmodel_annot _
     | Dvolatile _ | Dextended _) -> false
 
@@ -2670,9 +2686,3 @@ class simplify_const_lval global_find_init = object (self)
 end
 
 let () = Cil_datatype.punrollLogicType := unroll_type
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

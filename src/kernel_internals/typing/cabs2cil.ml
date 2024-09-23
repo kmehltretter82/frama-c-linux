@@ -2739,7 +2739,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          prototypes. Logic specifications refer to the varinfo in this table. *)
       begin
         match vi.vtype with
-        | TFun (_,Some formals , _, _ ) ->
+        | TFun (_,Some formals , _, _) ->
           (try
              let old_formals_env = getFormalsDecl oldvi in
              List.iter2
@@ -3583,14 +3583,6 @@ struct
     | Logic_typing.Enum -> findCompType true "enum" s []
 
   include Logic_labels
-
-  include Logic_env
-
-  let add_logic_function =
-    add_logic_function_gen Logic_utils.is_same_logic_profile
-
-  let remove_logic_info =
-    remove_logic_info_gen Logic_utils.is_same_logic_profile
 
   let integral_cast = integral_cast
 
@@ -6487,7 +6479,7 @@ and doExp local_env
              *)
              if not isSpecialBuiltin && not are_ghost then begin
                warn_no_proto f;
-               let typ = TFun (resType, Some [], false, attrs) in
+               let typ = TFun (resType, Some [], false,attrs) in
                Cil.update_var_type f typ;
              end
            | None, _ (* TODO: treat function pointers. *)
@@ -9612,27 +9604,27 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       dl;
     empty
 
-  | Cabs.GLOBANNOT (decl) when isglobal ->
-    begin
-      List.iter
-        (fun decl  ->
-           let loc = convLoc decl.Logic_ptree.decl_loc in
-           let<> UpdatedCurrentLoc = loc in
-           try
-             let tdecl = Ltyping.annot decl in
+  | Cabs.GLOBANNOT decls when isglobal ->
+    List.iter
+      (fun decl  ->
+         let loc = convLoc decl.Logic_ptree.decl_loc in
+         let<> UpdatedCurrentLoc = loc in
+         try
+           match Ltyping.annot decl with
+           | None -> ()
+           | Some tdecl ->
              let attr = fc_stdlib_attribute [] in
              let tdecl =
                List.fold_left
                  (Fun.flip Logic_utils.add_attribute_glob_annot) tdecl attr
              in
              cabsPushGlobal (GAnnot(tdecl,Current_loc.get ()))
-           with LogicTypeError ((source,_),msg) ->
-             Kernel.warning
-               ~wkey:Kernel.wkey_annot_error ~source
-               "%s. Ignoring global annotation" msg
-        )
-        decl;
-    end;
+         with LogicTypeError ((source,_),msg) ->
+           Kernel.warning
+             ~wkey:Kernel.wkey_annot_error ~source
+             "%s. Ignoring global annotation" msg
+      )
+      decls;
     empty
 
   | Cabs.GLOBANNOT _ | Cabs.PRAGMA _ | Cabs.GLOBASM _ | Cabs.FUNDEF _ ->
@@ -10424,9 +10416,3 @@ let convFile (path, f) =
 
 (* export function without internal `relaxed' argument. *)
 let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)

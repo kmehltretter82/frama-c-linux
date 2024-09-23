@@ -263,7 +263,8 @@ let property_evaluation_point = function
   | IPAssigns {ias_kf = kf} | IPFrom {if_kf = kf} ->
     Pre kf
   | IPPredicate _ | IPComplete _ | IPDisjoint _ | IPDecrease _
-  | IPAxiomatic _ | IPLemma _ | IPTypeInvariant _ | IPGlobalInvariant _
+  | IPAxiomatic _ | IPModule _ | IPLemma _
+  | IPTypeInvariant _ | IPGlobalInvariant _
   | IPOther _ | IPAllocation _ | IPReachable _ | IPExtended _ | IPBehavior _ ->
     raise Not_found
 

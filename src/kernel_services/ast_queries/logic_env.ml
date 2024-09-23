@@ -156,6 +156,19 @@ module Axiomatics =
       let size = 17
     end)
 
+module ModuleOccurence =
+  Datatype.Pair
+    (Datatype.Option(Datatype.String)) (* external driver *)
+    (Cil_datatype.Location)
+
+module Modules =
+  State_builder.Hashtbl(Datatype.String.Hashtbl)(ModuleOccurence)
+    (struct
+      let name = "Logic_env.Modules"
+      let dependencies = []
+      let size = 17
+    end)
+
 module Model_info =
   State_builder.Hashtbl
     (Datatype.String.Hashtbl)
@@ -175,6 +188,7 @@ let init_dependencies from =
       Logic_ctor_info.self;
       Lemmas.self;
       Axiomatics.self;
+      Modules.self;
       Model_info.self;
     ]
 
@@ -342,6 +356,7 @@ let prepare_tables () =
   Logic_info.clear ();
   Lemmas.clear ();
   Axiomatics.clear();
+  Modules.clear();
   Model_info.clear ();
   Logic_type_builtin.iter Logic_type_info.add;
   Logic_ctor_builtin.iter Logic_ctor_info.add;

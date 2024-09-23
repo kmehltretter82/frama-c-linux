@@ -470,6 +470,7 @@ let user_prop_names p =
   | IPFrom _
   | IPAllocation _
   | IPAxiomatic _
+  | IPModule _
   | IPBehavior _
   | IPReachable _
   | IPPropertyInstance _
@@ -659,9 +660,9 @@ let property_hints hs =
     | IPCodeAnnot {ica_ca} -> annot_hints hs ica_ca.annot_content
     | IPAssigns {ias_froms} -> assigns_hints hs ias_froms
     | IPAllocation _ (* TODO *)
-    | IPFrom _ | Property.IPDecrease _  | Property.IPPropertyInstance _
-    | IPReachable _ | Property.IPAxiomatic _ | Property.IPOther _
-    | IPTypeInvariant _ | Property.IPGlobalInvariant _ -> ()
+    | IPFrom _ | IPDecrease _  | IPPropertyInstance _
+    | IPReachable _ | IPAxiomatic _ | IPModule _ | IPOther _
+    | IPTypeInvariant _ | IPGlobalInvariant _ -> ()
 
 let prop_id_keys p =
   begin
