@@ -344,21 +344,21 @@ let iter (m:map) (f: region -> unit) =
   let h = Hashtbl.create 0 in
   Vmap.iter (fun _x n -> walk h m f n) m.roots
 
-  let rec walk_node h m (f: node -> unit) n =
-    let n = Ufind.find m.store n in
-    let id = Store.id n in
-    try Hashtbl.find h id with Not_found ->
-      Hashtbl.add h id () ;
-      f n ;
-      let r = Ufind.get m.store n in
-      match r.clayout with
-      | Blob -> ()
-      | Cell(_,p) -> Option.iter (walk_node h m f) p
-      | Compound(_,_,rg) -> Ranges.iter (walk_node h m f) rg
+let rec walk_node h m (f: node -> unit) n =
+  let n = Ufind.find m.store n in
+  let id = Store.id n in
+  try Hashtbl.find h id with Not_found ->
+    Hashtbl.add h id () ;
+    f n ;
+    let r = Ufind.get m.store n in
+    match r.clayout with
+    | Blob -> ()
+    | Cell(_,p) -> Option.iter (walk_node h m f) p
+    | Compound(_,_,rg) -> Ranges.iter (walk_node h m f) rg
 
-  let iter_node (m:map) (f: node -> unit) =
-    let h = Hashtbl.create 0 in
-    Vmap.iter (fun _x n -> walk_node h m f n) m.roots
+let iter_node (m:map) (f: node -> unit) =
+  let h = Hashtbl.create 0 in
+  Vmap.iter (fun _x n -> walk_node h m f n) m.roots
 
 let regions map =
   let pool = ref [] in

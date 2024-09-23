@@ -29,48 +29,48 @@ open Cil_types
 (* Lower level API - more efficient *)
 module Node : sig
   (* General type *)
-    type node
-    type map
+  type node
+  type map
 
-    (* API GETTERS *)
-    val get_map : kernel_function -> map
+  (* API GETTERS *)
+  val get_map : kernel_function -> map
 
-    val get_id : map -> node -> int
-    val get_node : map -> int -> node
+  val get_id : map -> node -> int
+  val get_node : map -> int -> node
 
-    val cvar : map -> varinfo -> node
-    val field : map -> node -> fieldinfo -> node
-    val shift : map -> node -> typ -> node
+  val cvar : map -> varinfo -> node
+  val field : map -> node -> fieldinfo -> node
+  val shift : map -> node -> typ -> node
 
-    val base_addr : map -> node -> node
-
-
-    (* API POINTERS *)
-    val points_to : map -> node -> node option
-    val pointed_by : map -> node -> node list
+  val base_addr : map -> node -> node
 
 
-    (* COMPARATOR *)
-    val separated : map -> node -> node -> bool
-    val included : map -> node -> node -> bool
-    val equal : map -> node -> node -> bool
-
-    (* API ITERATOR *)
-    val iter : map -> (node -> unit) -> unit
+  (* API POINTERS *)
+  val points_to : map -> node -> node option
+  val pointed_by : map -> node -> node list
 
 
-    (* API PRINTER *)
-    val pp_node : Format.formatter -> node -> unit
+  (* COMPARATOR *)
+  val separated : map -> node -> node -> bool
+  val included : map -> node -> node -> bool
+  val equal : map -> node -> node -> bool
+
+  (* API ITERATOR *)
+  val iter : map -> (node -> unit) -> unit
 
 
-    (* API ACCESS *)
-    type acs = {
-      acs_read  : typ list;
-      acs_write : typ list;
-      acs_shift : typ list;
-    }
-    val empty_acs : acs
-    val accesses : map -> node -> acs
+  (* API PRINTER *)
+  val pp_node : Format.formatter -> node -> unit
+
+
+  (* API ACCESS *)
+  type acs = {
+    acs_read  : typ list;
+    acs_write : typ list;
+    acs_shift : typ list;
+  }
+  val empty_acs : acs
+  val accesses : map -> node -> acs
 end
 
 
@@ -78,7 +78,7 @@ end
 
 (* High level API *)
 module Region : sig
-(* General type *)
+  (* General type *)
   type region
   type map
 
