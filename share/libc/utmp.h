@@ -115,16 +115,16 @@ extern void setutent (void);
 extern void endutent (void);
 
 /*@
-  assigns \result \from &__fc_get, indirect:__fc_utmp, indirect:*id;
-  assigns __fc_get \from __fc_get, indirect:__fc_utmp, indirect:*id;
+  assigns \result \from &__fc_get, indirect:__fc_utmp, indirect:*ut;
+  assigns __fc_get \from __fc_get, indirect:__fc_utmp, indirect:*ut;
 */
-extern struct utmp *getutid (const struct utmp *id);
+extern struct utmp *getutid (const struct utmp *ut);
 
 /*@
-  assigns \result \from &__fc_get, indirect:__fc_utmp, indirect:*line;
-  assigns __fc_get \from __fc_get, indirect:__fc_utmp, indirect:*line;
+  assigns \result \from &__fc_get, indirect:__fc_utmp, indirect:*ut;
+  assigns __fc_get \from __fc_get, indirect:__fc_utmp, indirect:*ut;
 */
-extern struct utmp *getutline (const struct utmp *line);
+extern struct utmp *getutline (const struct utmp *ut);
 
 /*@
   assigns __fc_utmp \from __fc_utmp, *utmp_ptr;
@@ -134,26 +134,26 @@ extern struct utmp *pututline (const struct utmp *utmp_ptr);
 
 /*@
   assigns \result \from indirect:__fc_utmp;
-  assigns *buffer \from __fc_utmp;
-  assigns *result \from &__fc_utmp;
+  assigns *ubuf \from __fc_utmp;
+  assigns *ubufp \from &__fc_utmp;
 */
-extern int getutent_r (struct utmp *buffer, struct utmp **result);
+extern int getutent_r (struct utmp *ubuf, struct utmp **ubufp);
 
 /*@
-  assigns \result \from indirect:*id, indirect:__fc_utmp;
-  assigns *buffer \from indirect:*id, __fc_utmp;
-  assigns *result \from indirect:*id, &__fc_utmp;
+  assigns \result \from indirect:*ut, indirect:__fc_utmp;
+  assigns *ubuf \from indirect:*ut, __fc_utmp;
+  assigns *ubufp \from indirect:*ut, &__fc_utmp;
 */
-extern int getutid_r (const struct utmp *id, struct utmp *buffer,
-                      struct utmp **result);
+extern int getutid_r (const struct utmp *ut, struct utmp *ubuf,
+                      struct utmp **ubufp);
 
 /*@
-  assigns \result \from indirect:*line, indirect:__fc_utmp;
-  assigns *buffer \from indirect:*line, __fc_utmp;
-  assigns *result \from indirect:*line, &__fc_utmp;
+  assigns \result \from indirect:*ut, indirect:__fc_utmp;
+  assigns *ubuf \from indirect:*ut, __fc_utmp;
+  assigns *ubufp \from indirect:*ut, &__fc_utmp;
 */
-extern int getutline_r (const struct utmp *line,
-                        struct utmp *buffer, struct utmp **result);
+extern int getutline_r (const struct utmp *ut,
+                        struct utmp *ubuf, struct utmp **ubufp);
 
 
 __END_DECLS

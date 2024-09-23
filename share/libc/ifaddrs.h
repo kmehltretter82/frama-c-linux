@@ -26,6 +26,7 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_define_sockaddr.h"
+#include "errno.h"
 
 __BEGIN_DECLS
 
@@ -59,7 +60,8 @@ struct ifmaddrs {
 
 /*@
   allocates *ifap;
-  assigns \result, *ifap \from \nothing; // missing: \from 'system interfaces'
+  assigns \result, *ifap, errno \from \nothing;
+    // missing: \from 'system interfaces'
 */
 extern int getifaddrs(struct ifaddrs **ifap);
 
@@ -71,7 +73,8 @@ extern void freeifaddrs(struct ifaddrs *ifa);
 
 /*@
   allocates *ifmap;
-  assigns \result, *ifmap \from \nothing; // missing: \from 'system interfaces'
+  assigns \result, *ifmap, errno \from \nothing;
+    // missing: \from 'system interfaces'
 */
 extern int getifmaddrs(struct ifmaddrs **ifmap);
 
