@@ -54,7 +54,17 @@ void compound(void)
   //@check G:   \object_pointer(&(p->g));
   //@check F2:  \object_pointer(&(p->f)+2);
   //@check G2: !\object_pointer(&(p->g)+2);
+  //@check E:   \object_pointer(p+1);
   int k ;
   struct A a ;
   //@check AM: (0 <= k <= 10) <==> \object_pointer(&a.m[k]);
+}
+
+void dangling(void){
+  int *p ;
+  {
+    int l ;
+    p = &l ;
+  }
+  //@ check !\object_pointer(p);
 }
