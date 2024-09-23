@@ -46,12 +46,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -111,12 +106,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -176,12 +166,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -241,12 +226,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -306,12 +286,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -371,12 +346,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -436,12 +406,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_75 <- 8][L_i64_0_76 <- 8][L_i32_0_77 <- 4]
-                    [L_i32_1_78 <- 4][L_i16_0_79 <- 2][L_i16_1_80 <- 2]
-                    [L_i16_2_81 <- 2][L_i16_3_82 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -504,12 +469,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -569,12 +529,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -634,12 +589,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -699,12 +649,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -764,12 +709,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -829,12 +769,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -894,12 +829,7 @@ Assume {
       is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
       is_sint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_65 <- 8][L_i64_0_66 <- 8][L_i32_0_67 <- 4]
-                    [L_i32_1_68 <- 4][L_i16_0_69 <- 2][L_i16_1_70 <- 2]
-                    [L_i16_2_71 <- 2][L_i16_3_72 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -962,12 +892,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1027,12 +952,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1092,12 +1012,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1157,12 +1072,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1222,12 +1132,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1287,12 +1192,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1352,12 +1252,7 @@ Assume {
       is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
       is_uint32(x_8).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_array_55 <- 8][L_u64_0_56 <- 8][L_u32_0_57 <- 4]
-                    [L_u32_1_58 <- 4][L_u16_0_59 <- 2][L_u16_1_60 <- 2]
-                    [L_u16_2_61 <- 2][L_u16_3_62 <- 2]).
+  Type: framed(mem_0) /\ sconst(mem_0).
   (* Initializer *)
   Init: read_uint8(mem_0, a_1) = 17.
   (* Initializer *)
@@ -1406,10 +1301,7 @@ Assume {
       is_sint16(read_sint16(m, a_1)) /\
       is_sint32(read_sint32(m, shift_sint32(a, 1))) /\ is_sint64(x).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_50 <- 8][L_u16_51 <- 2][L_write_52 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-9141687925025114232)) /\ (x < 0).
 
@@ -1425,10 +1317,7 @@ Assume {
       is_sint16(read_sint16(m, a_1)) /\ is_sint32(x) /\
       is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_50 <- 8][L_u16_51 <- 2][L_write_52 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-2128465084)) /\ (x < 0).
 
@@ -1444,10 +1333,7 @@ Assume {
       is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
       is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_50 <- 8][L_u16_51 <- 2][L_write_52 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-32382)) /\ (x < 0).
 
@@ -1463,10 +1349,7 @@ Assume {
       is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
       is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_50 <- 8][L_u16_51 <- 2][L_write_52 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-127)) /\ (x < 0).
 
@@ -1485,10 +1368,7 @@ Assume {
       is_sint16(read_sint16(m, a_1)) /\
       is_sint32(read_sint32(m, shift_sint32(a, 1))) /\ is_sint64(x).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_45 <- 8][L_u16_46 <- 2][L_write_47 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 81684111829661576) /\ (0 < x).
 
@@ -1504,10 +1384,7 @@ Assume {
       is_sint16(read_sint16(m, a_1)) /\ is_sint32(x) /\
       is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_45 <- 8][L_u16_46 <- 2][L_write_47 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 19018564) /\ (0 < x).
 
@@ -1523,10 +1400,7 @@ Assume {
       is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
       is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_45 <- 8][L_u16_46 <- 2][L_write_47 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 290) /\ (0 < x).
 
@@ -1542,10 +1416,7 @@ Assume {
       is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
       is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_45 <- 8][L_u16_46 <- 2][L_write_47 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 1) /\ (0 < x).
 
@@ -1555,14 +1426,7 @@ Prove: (x = 1) /\ (0 < x).
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 79):
-Let a = global(L_m64_38).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
-}
+Let a = global(L_m64_38). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               a, true),
@@ -1575,14 +1439,7 @@ Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 80):
-Let a = global(L_m32_39).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
-}
+Let a = global(L_m32_39). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_m64_38),
@@ -1594,14 +1451,7 @@ Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 81):
-Let a = global(L_m16_40).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
-}
+Let a = global(L_m16_40). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_m64_38),
@@ -1614,14 +1464,7 @@ Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 82):
-Let a = global(L_m8_41).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
-}
+Let a = global(L_m8_41). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
                                                            write_init64(init_0,
                                                              global(L_m64_38),
@@ -1648,11 +1491,7 @@ Assume {
   Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
       is_sint32(read_sint32(m, a_1)) /\ is_sint64(x).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-81684111829661576)) /\ (x < 0).
 
@@ -1673,11 +1512,7 @@ Assume {
   Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
       is_sint32(x) /\ is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-19018564)) /\ (x < 0).
 
@@ -1698,11 +1533,7 @@ Assume {
   Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(x) /\
       is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-290)) /\ (x < 0).
 
@@ -1723,11 +1554,7 @@ Assume {
   Type: is_sint8(x) /\ is_sint16(read_sint16(m, a_2)) /\
       is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_m64_38 <- 8][L_m32_39 <- 4][L_m16_40 <- 2]
-                    [L_m8_41 <- 1][L_write_42 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = (-1)) /\ (x < 0).
 
@@ -1737,14 +1564,7 @@ Prove: (x = (-1)) /\ (x < 0).
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 54):
-Let a = global(L_p64_31).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
-}
+Let a = global(L_p64_31). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               a, true),
@@ -1757,14 +1577,7 @@ Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 55):
-Let a = global(L_p32_32).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
-}
+Let a = global(L_p32_32). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_p64_31),
@@ -1776,14 +1589,7 @@ Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 56):
-Let a = global(L_p16_33).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
-}
+Let a = global(L_p16_33). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_p64_31),
@@ -1796,14 +1602,7 @@ Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 57):
-Let a = global(L_p8_34).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
-}
+Let a = global(L_p8_34). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
                                                            write_init64(init_0,
                                                              global(L_p64_31),
@@ -1830,11 +1629,7 @@ Assume {
   Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
       is_sint32(read_sint32(m, a_1)) /\ is_sint64(x).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 81684111829661576) /\ (0 < x).
 
@@ -1855,11 +1650,7 @@ Assume {
   Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
       is_sint32(x) /\ is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 19018564) /\ (0 < x).
 
@@ -1880,11 +1671,7 @@ Assume {
   Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(x) /\
       is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 290) /\ (0 < x).
 
@@ -1905,11 +1692,7 @@ Assume {
   Type: is_sint8(x) /\ is_sint16(read_sint16(m, a_2)) /\
       is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_p64_31 <- 8][L_p32_32 <- 4][L_p16_33 <- 2]
-                    [L_p8_34 <- 1][L_write_35 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x = 1) /\ (0 < x).
 
@@ -1919,14 +1702,7 @@ Prove: (x = 1) /\ (0 < x).
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 29):
-Let a = global(L_u64_22).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
-}
+Let a = global(L_u64_22). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               a, true),
@@ -1939,14 +1715,7 @@ Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 30):
-Let a = global(L_u32_23).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
-}
+Let a = global(L_u32_23). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_u64_22),
@@ -1958,14 +1727,7 @@ Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 31):
-Let a = global(L_u16_24).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
-}
+Let a = global(L_u16_24). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
                                                             write_init64(init_0,
                                                               global(L_u64_22),
@@ -1978,14 +1740,7 @@ Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
 ------------------------------------------------------------
 
 Goal Check (file integers.i, line 32):
-Let a = global(L_u8_25).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ cinits(init_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
-}
+Let a = global(L_u8_25). Assume { (* Heap *) Type: cinits(init_0). }
 Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
                                                            write_init64(init_0,
                                                              global(L_u64_22),
@@ -2012,11 +1767,7 @@ Assume {
   Type: is_uint8(read_uint8(m, a_3)) /\ is_uint16(read_uint16(m, a_2)) /\
       is_uint32(read_uint32(m, a_1)) /\ is_uint64(x).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: x = 1234605616436508552.
 
@@ -2037,11 +1788,7 @@ Assume {
   Type: is_uint8(read_uint8(m, a_3)) /\ is_uint16(read_uint16(m, a_2)) /\
       is_uint32(x) /\ is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: x = 287454020.
 
@@ -2062,11 +1809,7 @@ Assume {
   Type: is_uint8(read_uint8(m, a_3)) /\ is_uint16(x) /\
       is_uint32(read_uint32(m, a_1)) /\ is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: x = 4386.
 
@@ -2087,11 +1830,7 @@ Assume {
   Type: is_uint8(x) /\ is_uint16(read_uint16(m, a_2)) /\
       is_uint32(read_uint32(m, a_1)) /\ is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_u64_22 <- 8][L_u32_23 <- 4][L_u16_24 <- 2]
-                    [L_u8_25 <- 1][L_write_26 <- 4]).
+  Type: framed(mem_0) /\ sconst(mem_0).
 }
 Prove: x = 17.
 

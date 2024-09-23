@@ -1,43 +1,51 @@
 typedef unsigned char      uint8 ;
 
-int x ;
+void null(void){
+  uint8 buffer[sizeof(int*)] ;
+  *((int**) buffer) = (void*) 0 ;
+
+  int* r = *((int**) buffer) ;
+  //@ check r == \null ;
+}
+
+int g ;
 
 void addr_glob(void){
   uint8 buffer[sizeof(int*)] ;
-  *((int**) buffer) = &x ;
+  *((int**) buffer) = &g ;
 
   int* r = *((int**) buffer) ;
-  //@ check r == &x ;
+  //@ check r == &g ;
 }
 
-void addr_formal(int x){
+void addr_formal(int f){
   uint8 buffer[sizeof(int*)] ;
-  *((int**) buffer) = &x ;
+  *((int**) buffer) = &f ;
   int* r = *((int**) buffer) ;
 
-  //@ check r == &x ;
+  //@ check r == &f ;
 }
 
 void addr_local_ok(void){
-  int x = 0;
+  int l = 0;
 
   uint8 buffer[sizeof(int*)] ;
-  *((int**) buffer) = &x ;
+  *((int**) buffer) = &l ;
 
   int* r = *((int**) buffer) ;
-  //@ check P: r == &x ;
+  //@ check P: r == &l ;
 }
 
 void addr_local_ko(void){
   uint8 buffer[sizeof(int*)] ;
 
   {
-    int x ;
-    *((int**) buffer) = &x ;
+    int l ;
+    *((int**) buffer) = &l ;
   }
 
   int* r = *((int**) buffer) ;
-  //@ check r == &x ;
+  //@ check ! \valid(r) ;
 }
 
 //@ requires \valid(f);

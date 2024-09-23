@@ -12,13 +12,7 @@
 
 Goal Assertion (file floats.i, line 14):
 Let a = shift_uint8(global(L_buffer_30), 0).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_buffer_30 <- 8]).
-}
+Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: of_f64(int_to_float64(read_uint64(write_uint64(mem_0, a,
                                            float64_to_int(d)), a)))
          = of_f64(d).
@@ -30,13 +24,7 @@ Prove: of_f64(int_to_float64(read_uint64(write_uint64(mem_0, a,
 
 Goal Assertion (file floats.i, line 7):
 Let a = shift_uint8(global(L_buffer_23), 0).
-Assume {
-  (* Heap *)
-  Type: linked(alloc_0) /\ wf_malloc(alloc_0) /\ sconst(mem_0) /\
-      framed(alloc_0, mem_0).
-  (* Block In *)
-  Have: wf_malloc(alloc_0[L_buffer_23 <- 4]).
-}
+Assume { (* Heap *) Type: framed(mem_0) /\ sconst(mem_0). }
 Prove: of_f32(int_to_float32(read_uint32(write_uint32(mem_0, a,
                                            float32_to_int(f)), a)))
          = of_f32(f).

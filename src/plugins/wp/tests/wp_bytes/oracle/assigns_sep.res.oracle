@@ -24,7 +24,7 @@ Let x_1 = read_uint32(write_uint8(mem_0, shift_uint8(array_0, 7), 0),
 Assume {
   Type: is_uint32(x) /\ is_uint32(x_1).
   (* Heap *)
-  Type: (region(array_0.base) <= 0) /\ sconst(mem_0).
+  Type: (region(array_0.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
 }
 Prove: x_1 = x.
 
@@ -52,7 +52,7 @@ Let x_2 = read_uint32(havoc(mem_undef_0, m, shift_uint8(array_0, 4), 4),
 Assume {
   Type: is_uint32(x) /\ is_uint32(x_1) /\ is_uint32(x_2).
   (* Heap *)
-  Type: (region(array_0.base) <= 0) /\ sconst(mem_0).
+  Type: (region(array_0.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
 }
 Prove: (x_1 = x) /\ (x_2 = x_1).
 
@@ -67,7 +67,7 @@ Assume {
   Type: is_uint32(x) /\ is_uint32(read_uint32(mem_0, array_0)) /\
       is_uint32(read_uint32(m, array_0)) /\ is_uint32(x_1).
   (* Heap *)
-  Type: (region(array_0.base) <= 0) /\ sconst(mem_0).
+  Type: (region(array_0.base) <= 0) /\ framed(mem_0) /\ sconst(mem_0).
   (* Call Effects *)
   Have: forall a_1 : addr.
       ((forall i : Z. (((i = 4) \/ (i = 6)) ->

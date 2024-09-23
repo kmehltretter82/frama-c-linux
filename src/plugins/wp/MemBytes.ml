@@ -738,6 +738,15 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
 
       open Cil_types
 
+      let static_alloc prefix base =
+        let name = prefix ^ "_static_alloc" in
+        Definitions.define_lemma {
+          l_kind = Admit ;
+          l_name = name ; l_triggers = [] ; l_forall = [] ;
+          l_lemma = MemAddr.static_alloc base ;
+          l_cluster = cluster_globals () ;
+        }
+
       let region prefix x base =
         let name = prefix ^ "_region" in
         let region =
@@ -810,6 +819,7 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
         let prefix = Lang.Fun.debug lfun in
         let base = e_fun lfun [] in
         RegisterBASE.define lfun vi ;
+        static_alloc prefix base ;
         region prefix vi base ;
         alloc prefix vi base ;
         pointer_type prefix base ;

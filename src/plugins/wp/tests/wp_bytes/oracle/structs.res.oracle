@@ -20,7 +20,8 @@ Let a_1 = Load_S2_Y(u, havoc(mem_undef_0, mem_0, y, 32)).
 Assume {
   Type: IsS2_Y(a) /\ IsS2_Y(a_1).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ (region(y.base) <= 0) /\ sconst(mem_0).
+  Type: (region(u.base) <= 0) /\ (region(y.base) <= 0) /\ framed(mem_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: separated(u, 32, y, 32).
 }

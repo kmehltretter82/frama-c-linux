@@ -22,8 +22,8 @@ Assume {
   Type: is_uint32(read_uint32(m, shiftfield_F2_U_s(u))) /\
       is_uint32(read_uint32(m, shiftfield_F1_X_u(a))) /\ is_sint32(x).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -39,8 +39,8 @@ Assume {
   Type: is_uint32(read_uint32(m, shiftfield_F2_U_s(u))) /\ is_uint32(x) /\
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -56,8 +56,8 @@ Assume {
       is_uint32(read_uint32(m, shiftfield_F1_X_u(a))) /\
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 3).
   (* Pre-condition *)
@@ -75,8 +75,8 @@ Assume {
       is_uint32(read_uint32(m, shiftfield_F1_X_u(a))) /\
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Goal *)
   When: (4 <= i) /\ (i <= 7).
   (* Pre-condition *)
@@ -94,8 +94,8 @@ Assume {
   Type: is_uint32(x) /\ is_uint32(read_uint32(m, shiftfield_F1_X_u(a))) /\
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -129,8 +129,8 @@ Assume {
       is_uint32(read_uint32(m, shiftfield_F1_X_u(a_1))) /\
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\ is_uint64(x).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -161,8 +161,8 @@ Assume {
       is_uint32(read_uint32(m, shiftfield_F1_X_u(a_1))) /\ is_sint32(x) /\
       is_uint64(read_uint64(m, shiftfield_F2_U_u(u))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -193,8 +193,8 @@ Assume {
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\
       is_uint64(read_uint64(m, shiftfield_F2_U_u(u))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -225,8 +225,8 @@ Assume {
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\
       is_uint64(read_uint64(m, shiftfield_F2_U_u(u))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -247,8 +247,8 @@ Assume {
   Type: is_uint32(read_uint32(m, shiftfield_F1_X_u(a_1))) /\
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\ is_uint64(x).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -266,8 +266,8 @@ Assume {
   Type: is_uint32(read_uint32(m, shiftfield_F1_X_u(a_1))) /\ is_sint32(x) /\
       is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -285,8 +285,8 @@ Assume {
   Type: is_uint32(x) /\ is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\
       is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
 }
@@ -304,8 +304,8 @@ Assume {
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\
       is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 3).
   (* Pre-condition *)
@@ -325,8 +325,8 @@ Assume {
       is_sint32(read_sint32(m, shiftfield_F1_X_i(a_1))) /\
       is_uint64(read_uint64(m, a)).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Goal *)
   When: (4 <= i) /\ (i <= 7).
   (* Pre-condition *)
@@ -346,8 +346,8 @@ Let x = read_uint64(a_1, shiftfield_F2_U_u(u)).
 Assume {
   Type: is_uint32(read_uint32(a_1, shiftfield_F2_U_s(u))) /\ is_uint64(x).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
   (* Initializer *)
@@ -366,8 +366,8 @@ Assume {
   Type: is_uint32(read_uint32(a_1, shiftfield_F2_U_s(u))) /\
       is_uint64(read_uint64(a_1, shiftfield_F2_U_u(u))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Goal *)
   When: (0 <= i) /\ (i <= 3).
   (* Pre-condition *)
@@ -388,8 +388,8 @@ Assume {
   Type: is_uint32(read_uint32(a_1, shiftfield_F2_U_s(u))) /\
       is_uint64(read_uint64(a_1, shiftfield_F2_U_u(u))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Goal *)
   When: (4 <= i) /\ (i <= 7).
   (* Pre-condition *)
@@ -410,8 +410,8 @@ Let x = read_uint32(a_1, shiftfield_F2_U_s(u)).
 Assume {
   Type: is_uint32(x) /\ is_uint64(read_uint64(a_1, shiftfield_F2_U_u(u))).
   (* Heap *)
-  Type: (region(u.base) <= 0) /\ linked(alloc_0) /\ wf_malloc(alloc_0) /\
-      sconst(mem_0) /\ framed(alloc_0, mem_0).
+  Type: (region(u.base) <= 0) /\ framed(mem_0) /\ linked(alloc_0) /\
+      sconst(mem_0).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, u, 8).
   (* Initializer *)
