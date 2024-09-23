@@ -109,13 +109,13 @@ let invalid alloc addr size = p_call p_invalid [ alloc ; addr ; size ]
 let addr_of_int i = e_fun f_addr_of_int [ i ]
 let int_of_addr addr = e_fun f_int_of_addr [ addr ]
 
-let statically_allocated addr = p_call p_statically_allocated [ addr ]
+let static_alloc addr = p_call p_statically_allocated [ addr ]
 (* This last function is not exposed, it does not have a particular meaning in
    ACSL, and is used only for int/addr conversions.
 *)
 
 let in_uintptr_range addr =
-  p_hyps [ statically_allocated @@ base addr ] @@
+  p_hyps [ static_alloc @@ base addr ] @@
   Cint.range (Ctypes.c_ptr ()) @@ int_of_addr addr
 
 (* Table of offsets *)

@@ -52,11 +52,23 @@ val global : term -> term
 val shift : term -> term -> term
 (** [shift (a: addr) (k: int) : addr = { a with offset = a.offset + k } ]*)
 
+(** {2 Comparisons} *)
+
 val addr_lt : term -> term -> pred
 (** [addr_lt(a: addr) (b: addr) = a < b] *)
 
 val addr_le : term -> term -> pred
 (** [addr_le(a: addr) (b: addr) = a <= b] *)
+
+(** {2 Physical addresses} *)
+
+val static_alloc : term -> pred
+(** [statically_allocated (base: int)]
+    The base has an associated static allocation, guaranteeing that the
+    addresses that use this base can be translated to integers and back.
+
+    @since Frama-C+dev
+*)
 
 val addr_of_int : term -> term
 (** [addr_of_int(i: int) : addr]
