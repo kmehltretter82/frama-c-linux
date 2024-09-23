@@ -30,7 +30,7 @@ File "spec_memory.why", line 49, characters 4-59:
 Goal valid_rw_null.
 Prover result is: Valid.
 
-File "spec_memory.why", line 52, characters 4-34:
+File "spec_memory.why", line 52, characters 4-30:
 Goal valid_obj_null.
 Prover result is: Valid.
 

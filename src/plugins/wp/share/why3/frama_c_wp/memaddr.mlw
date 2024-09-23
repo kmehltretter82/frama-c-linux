@@ -70,9 +70,8 @@ theory MemAddr
   predicate valid_rd (m: malloc) (p: addr) (n: int) =
     n > 0 -> ( 0 <> p.base /\ 0 <= p.offset /\ p.offset + n <= m[p.base] )
 
-  predicate valid_obj (m: malloc) (p: addr) (n: int) =
-    n > 0 -> ( p = null \/
-             ( 0 <> p.base /\ 0 <= p.offset /\ p.offset + n <= 1 + m[p.base] ))
+  predicate valid_obj (m: malloc) (p: addr) =
+    p = null \/ (0 <> p.base /\ 0 <= p.offset /\ p.offset <= m[p.base])
 
   predicate invalid (m : malloc) (p:addr) (n:int) =
     n <= 0 \/ p.base = 0 \/ m[p.base] <= p.offset \/ p.offset + n <= 0

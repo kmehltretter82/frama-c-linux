@@ -101,7 +101,7 @@ let linked memory = p_call p_linked [ memory ]
 
 let valid_rd alloc addr size = p_call p_valid_rd [ alloc ; addr ; size ]
 let valid_rw alloc addr size = p_call p_valid_rw [ alloc ; addr ; size ]
-let valid_obj alloc addr size = p_call p_valid_obj [ alloc ; addr ; size ]
+let valid_obj alloc addr = p_call p_valid_obj [ alloc ; addr ]
 let invalid alloc addr size = p_call p_invalid [ alloc ; addr ; size ]
 
 (* Physical addresses *)
@@ -334,7 +334,7 @@ let r_valid_unref = function
 
 (* - lemma valid_obj_null: forall m n. valid_obj m null n *)
 let r_valid_obj = function
-  | [_; p; _] when decide (e_eq p null) -> e_true
+  | [_; p] when decide (e_eq p null) -> e_true
   | _ -> raise Not_found
 
 (* - lemma invalid_null: forall m n p. p.base = 0 -> invalid m p n *)

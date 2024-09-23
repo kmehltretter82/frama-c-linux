@@ -1126,7 +1126,7 @@ let s_valid sigma acs p n =
   let valid = match acs with
     | RW -> MemAddr.valid_rw
     | RD -> MemAddr.valid_rd
-    | OBJ -> MemAddr.valid_obj
+    | OBJ -> (fun m p _ -> MemAddr.valid_obj m p)
   in
   valid (Sigma.value sigma T_alloc) p n
 
