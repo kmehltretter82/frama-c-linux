@@ -4126,18 +4126,19 @@ version in the interface:
 \paragraph{External Modules.}
 \label{par:ext-modules}
 
-Finally, let us introduce how to extend \acsl
-modules with external module importers. A typical usage is to import logical
-definitions from other languages, e.g. \textsf{Coq} or \textsf{Why3}, as regular
-\acsl module definitions. From the user point the view, this takes the form
-of an extended \verb+import+ clause:
+Finally, let us introduce how to extend \acsl modules with external module
+importers. A typical usage is to import logical definitions from other
+languages, e.g. \textsf{Coq} or \textsf{Why3}, as regular \acsl module
+definitions. From the user point the view, this takes the form of an extended
+\verb+import+ clause:
 
 \begin{lstlisting}
 //@ import <loader>: <module-name> [ \as <alias-name> ];
 \end{lstlisting}
 
-The syntax is similar to the general ACSL \verb+import+ annotation, except that the
-module name is prefixed with the name of the loader extension. For instance:
+The syntax is similar to the general ACSL \verb+import+ annotation, except that
+the module name is prefixed with a loader corresponding to the name used when
+registering the module importer extension. For instance:
 
 \begin{lstlisting}[style=c]
 //@ import Foo: foo::bar::Jazz ;
@@ -4149,17 +4150,17 @@ to be imported.
 
 To define such an external module loader, a plug-in shall call the
 \scodeidxdef{Acsl\_extension}{register\_module\_importer}
-\verb+Acsl_extension.register_module_importer+ with a suitable loader function.
-The loader function is responsible for resolving the module name and defining
-the associated \acsl logic types, functions and predicates. Here is an example
-of such a loader function:
+\verb+Acsl_extension.register_module_importer+ with a suitable importer
+function. The importer function is responsible for resolving the module name and
+defining the associated \acsl logic types, functions and predicates. Here is an
+example of such a importer function:
 
 \scodeidx{Logic\_typing}{module\_builder}
 \begin{lstlisting}[language=OCaml]
 open Cil_types
 open Logic_typing
 
-let loader (ctxt: module_builder) (loc: location) (path: string list) =
+let importer (ctxt: module_builder) (loc: location) (path: string list) =
   begin
     (* in the example above, path is ["foo","bar","Jazz"] *)
     (* ... read some file .. *)
@@ -4174,7 +4175,7 @@ let loader (ctxt: module_builder) (loc: location) (path: string list) =
     (* ... *)
   end
 
-let () = Acsl_extension.register_module_importer "Foo" loader
+let () = Acsl_extension.register_module_importer "Foo" importer
 \end{lstlisting}
 
 Added types and functions shall use local names, as in the example above.
@@ -4184,14 +4185,15 @@ in the example above.
 
 As explained in the \framac source documentation, module importers might be
 invoked multiple times by the kernel, e.g. when a given module is imported from
-different source files. Although the loader itself can use memoization
-techniques to save time, the module builder shall be populated on every call.
+different source files. Although the importer function itself can use
+memoization techniques to save time, the module builder shall be populated on
+every call.
 
 When printing the internal AST from \framac command line using \verb+-print+
 option, externally imported modules are listed with one single clause for each,
 with no aliasing in order to avoid any ambiguity. For instance:
 \begin{ccode}
-//@ import MyLoader: foo::bar::Jazz \as _ ;
+//@ import Foo: foo::bar::Jazz \as _ ;
 \end{ccode}
 
 Alternatively, you can debug the logical definitions actually imported by any
@@ -4204,7 +4206,7 @@ key:
 With this option, the contents of the imported modules are printed like regular
 module definitions, with only a comment to mention the origin of the plug-in:
 \begin{ccode}
-/*@ // import MyLoader:
+/*@ // import Foo:
     module foo::bar::Jazz {
         ...
     }
