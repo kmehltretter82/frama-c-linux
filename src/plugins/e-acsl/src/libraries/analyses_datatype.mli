@@ -28,6 +28,10 @@ open Cil_datatype
 
 module Annotation_kind: Datatype.S with type t = annotation_kind
 
+(** Predicate or term. Note that the notion of egality for predicates is
+    structural but for terms it is physical (using [Misc.Id_term]). That means
+    that comparison is undefined and that [Map] and [Set] cannot be used. See
+    [Misc.Id_term] for more information. *)
 module Pred_or_term: Datatype.S_with_collections with type t = pred_or_term
 
 module At_data: sig

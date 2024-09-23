@@ -56,7 +56,7 @@ module Pred_or_term =
           List.fold_left
             (fun reprs t -> PoT_term t :: reprs)
             []
-            Term.reprs
+            Misc.Id_term.reprs
         in
         List.fold_left
           (fun reprs p -> PoT_pred p :: reprs)
@@ -65,18 +65,19 @@ module Pred_or_term =
 
       include Datatype.Undefined
 
-      let compare pot1 pot2 =
-        match pot1, pot2 with
-        | PoT_pred _, PoT_term _ -> -1
-        | PoT_term _, PoT_pred _ -> 1
-        | PoT_pred p1, PoT_pred p2 -> PredicateStructEq.compare p1 p2
-        | PoT_term t1, PoT_term t2 -> Term.compare t1 t2
+      let compare _ _ =
+        (* see [Misc.Id_term.compare] *)
+        Kernel.fatal "Pred_or_term: comparison undefined (and undefinable)"
 
-      let equal = Datatype.from_compare
+      let equal pot1 pot2 =
+        match pot1, pot2 with
+        | PoT_pred p1, PoT_pred p2 -> PredicateStructEq.equal p1 p2
+        | PoT_term t1, PoT_term t2 -> Misc.Id_term.equal t1 t2
+        | _ -> false
 
       let hash = function
         | PoT_pred p -> 7 * PredicateStructEq.hash p
-        | PoT_term t -> 97 * Term.hash t
+        | PoT_term t -> 97 * Misc.Id_term.hash t
 
       let pretty fmt = function
         | PoT_pred p -> Printer.pp_predicate fmt p
@@ -151,11 +152,10 @@ let basic_pp_kinstr fmt kinstr =
 (** Basic comparison for two [kinstr], i.e. two [Kstmt] are always equal
     regardless of the statement value (contrary to [Cil_datatype.Kinstr.compare]
     where two [Kstmt] are compared with their included statement's [sid]). *)
-let basic_kinstr_compare kinstr1 kinstr2 =
+let basic_kinstr_equal kinstr1 kinstr2 =
   match kinstr1, kinstr2 with
-  | Kglobal, Kglobal | Kstmt _, Kstmt _ -> 0
-  | Kglobal, _ -> 1
-  | _, Kglobal -> -1
+  | Kglobal, Kglobal | Kstmt _, Kstmt _ -> true
+  | _ -> false
 
 (** Basic hash function for a [kinstr], i.e. contrary to
     [Cil_datatype.Kinstr.hash] the statement of the [Kstmt] is not considered
@@ -195,39 +195,20 @@ module At_data = struct
 
         include Datatype.Undefined
 
-        let compare
-            { kf = kf1;
-              kinstr = kinstr1;
-              lscope = lscope1;
-              pot = pot1;
-              label = label1 }
-            { kf = kf2;
-              kinstr = kinstr2;
-              lscope = lscope2;
-              pot = pot2;
-              label = label2 }
-          =
-          let cmp = Kf.compare kf1 kf2 in
-          let cmp =
-            if cmp = 0 then
-              basic_kinstr_compare kinstr1 kinstr2
-            else cmp
-          in
-          let cmp =
-            if cmp = 0 then Lscope.D.compare lscope1 lscope2
-            else cmp
-          in
-          let cmp =
-            if cmp = 0 then Pred_or_term.compare pot1 pot2
-            else cmp
-          in
-          if cmp = 0 then
-            let elabel1 = Ext_logic_label.get kinstr1 label1 in
-            let elabel2 = Ext_logic_label.get kinstr2 label2 in
-            Ext_logic_label.compare elabel1 elabel2
-          else cmp
+        let compare _ _ =
+          (* see [Misc.Id_term.compare] *)
+          Kernel.fatal "At_data: comparison undefined (and undefinable)"
 
-        let equal = Datatype.from_compare
+        let equal
+            {kf = kf1; kinstr = kinstr1; lscope = ls1; pot = pot1; label = l1}
+            {kf = kf2; kinstr = kinstr2; lscope = ls2; pot = pot2; label = l2} =
+          Kf.equal kf1 kf2 &&
+          basic_kinstr_equal kinstr1 kinstr2 &&
+          Lscope.D.equal ls1 ls2 &&
+          Pred_or_term.equal pot1 pot2 &&
+          let elabel1 = Ext_logic_label.get kinstr1 l1 in
+          let elabel2 = Ext_logic_label.get kinstr2 l2 in
+          Ext_logic_label.equal elabel1 elabel2
 
         let hash { kf; kinstr; lscope; pot; label } =
           let elabel = Ext_logic_label.get kinstr label in
