@@ -1237,27 +1237,31 @@ let matchTypeInfoGen (combineF : combineFunction)
 let conflict_detected = ref false
 
 let combines = {
-  typ_combine = (fun combF ->
+  typ_combine = (fun combF ~strictInteger ~strictReturnTypes what t1 t2 ->
       let find_names_file = H.find fileNames in
       let oldfidx = Fidx.get_oldfidx () in
       let fidx = Fidx.get_fidx () in
       let old_file = find_names_file oldfidx in
-      let new_file = find_names_file fidx in
-      let old_name_file = Filepath.Normalized.to_pretty_string old_file in
-      let new_name_file = Filepath.Normalized.to_pretty_string new_file in
-      let pre_msg = "Conflicting definitions are between files "^
-                    old_name_file^" and "^new_name_file in
+      let pre_msg =
+        Format.asprintf
+          "Conflicting definitions for types '%a' and '%a' \
+           (previous definition was in file %s)."
+          Cil_printer.pp_typ t1
+          Cil_printer.pp_typ t2
+          (Filepath.Normalized.to_pretty_string old_file)
+      in
       let emitwith _ =
         if (not !conflict_detected) && oldfidx <> fidx
         then
           begin
             conflict_detected := true;
-            Kernel.warning
+            Kernel.warning ~current:true
               ~wkey:Kernel.wkey_merge_conversion
               "%s" pre_msg
           end
       in
-      combineTypesGen ~emitwith combF);
+      combineTypesGen
+        ~emitwith combF ~strictInteger ~strictReturnTypes what t1 t2);
   enum_combine = (fun _ oldei ei ->
       matchEnumInfoGen oldei ei;
       oldei);
