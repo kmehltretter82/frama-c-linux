@@ -67,10 +67,10 @@ val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
 (** creates a new acsl_extension with a fresh id.
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
     @since Chlorine-20180501
-    @begore the function took one less argument, [string option] which is now
+    @before the function took one less argument, [~plugin] which is now
     used to set the [ext_plugin] field.
 *)
-val new_acsl_extension: string -> string option -> location -> bool ->
+val new_acsl_extension: plugin:string option -> string -> location -> bool ->
   acsl_extension_kind -> acsl_extension
 
 (** Gives a new id to an existing predicate.

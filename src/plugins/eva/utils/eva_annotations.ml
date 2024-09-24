@@ -116,7 +116,7 @@ struct
     let param = M.export annot in
     let plugin = Some "eva" in
     let extension =
-      Logic_const.new_acsl_extension name plugin loc false param
+      Logic_const.new_acsl_extension ~plugin name loc false param
     in
     let annot_node = Cil_types.AExtended ([], kind = Loop, extension) in
     let code_annotation = Logic_const.new_code_annotation annot_node in

@@ -695,7 +695,10 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
             (Logic_const.term (TConst (LStr "done")) (Ctype Cil_const.charPtrType)) ;
             Logic_const.tinteger number
           ] in
-        let ext = Logic_const.new_acsl_extension "unfold" (Some "kernel") loc false kind in
+        let ext =
+          Logic_const.new_acsl_extension ~plugin:(Some "kernel") "unfold" loc
+            false kind
+        in
         let annot =Logic_const.new_code_annotation (AExtended([],true,ext)) in
         Annotations.add_code_annot
           Emitter.end_user ~kf:(Option.get self#current_kf) sloop annot;

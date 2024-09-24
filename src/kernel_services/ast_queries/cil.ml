@@ -1794,8 +1794,8 @@ and visitCilExtended vis orig =
   let visit = Extensions.visit orig.ext_name in
   let e' = doVisitCil vis id (visit ~plugin:orig.ext_plugin vis) childrenCilExtended orig.ext_kind in
   if Visitor_behavior.is_fresh vis#behavior then
-    Logic_const.new_acsl_extension orig.ext_name orig.ext_plugin orig.ext_loc
-      orig.ext_has_status e'
+    Logic_const.new_acsl_extension ~plugin:orig.ext_plugin orig.ext_name
+      orig.ext_loc orig.ext_has_status e'
   else if orig.ext_kind == e' then orig else {orig with ext_kind = e'}
 
 and childrenCilExtended vis p =

@@ -3790,7 +3790,7 @@ struct
     in
     if Extensions.is_extension ~plugin name then
       let status , kind = Extensions.typer name ~plugin ~typing_context ~loc ps in
-      Logic_const.new_acsl_extension name plugin loc status kind
+      Logic_const.new_acsl_extension ~plugin name loc status kind
     else
       C.error
         loc "No type-checking function registered for extension %s" name
@@ -4502,8 +4502,8 @@ struct
 
     | LDextended (Ext_lexpr(name, plugin, content)) ->
       let typing_context = base_ctxt (Lenv.empty ()) in
-      let status,tcontent = Extensions.typer name ~plugin ~typing_context ~loc content in
-      let textended = Logic_const.new_acsl_extension name plugin loc status tcontent in
+      let status,tcontent = Extensions.typer ~plugin name ~typing_context ~loc content in
+      let textended = Logic_const.new_acsl_extension ~plugin name loc status tcontent in
       Some (Dextended (textended, [], loc))
 
     | LDextended (Ext_extension (name, plugin, kind, content)) ->
@@ -4511,7 +4511,7 @@ struct
       let status,tcontent =
         Extensions.typer_block name ~plugin ~typing_context ~loc (kind,content)
       in
-      let textended = Logic_const.new_acsl_extension name plugin loc status tcontent in
+      let textended = Logic_const.new_acsl_extension ~plugin name loc status tcontent in
       Some (Dextended (textended, [], loc))
 
   let annot = C.on_error

@@ -58,7 +58,7 @@ let refresh_predicate p = { p with ip_id = PredicateId.next () }
 let new_identified_term t =
   { it_id = TermId.next (); it_content = t }
 
-let new_acsl_extension ext_name ext_plugin ext_loc ext_has_status ext_kind = {
+let new_acsl_extension ~plugin:ext_plugin ext_name ext_loc ext_has_status ext_kind = {
   ext_id = ExtendedId.next ();
   ext_name;
   ext_plugin;
