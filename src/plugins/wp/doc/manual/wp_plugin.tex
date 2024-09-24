@@ -1387,8 +1387,8 @@ See \texttt{-wp-interactive <mode>} option for details.
 \item[\tt -wp-gen] only generates proof obligations, does not run provers.
   See option \texttt{-wp-out} to obtain the generated proof obligations.
 \item[\tt -wp-par <n>] limits the number of parallel process runs for
-  decision procedures. Default is 4 processes. With
-  \texttt{-wp-par~1}, the order of logged results is fixed. With more
+  decision procedures. Default is the number of logical cores on the machine.
+  With \texttt{-wp-par~1}, the order of logged results is fixed. With more
   processes, the order is runtime dependent.
 \item[\tt -wp-filename-truncation <n>] truncates the basename of proof
   obligation files to the first \texttt{n} characters.
