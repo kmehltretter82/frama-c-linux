@@ -18,6 +18,11 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2024-09-23] Support for ACSL modules.
+-   Kernel    [2024-09-23] Extension for importing external modules in ACSL
+o   Kernel    [2024-09-23] API to register ACSL extern modules import functions
+o!  Kernel    [2024-09-23] Move functions for finding logic types, functions,
+              predicates and constructors from Logic_typing to Logic_env.
 -   Kernel    [2024-09-20] New warning category typing:implicit-int, allowing
               to omit type specifiers in declarations (default is error).
 o!  Kernel    [2024-09-13] Pragma nodes in the AST have been removed
@@ -56,9 +61,6 @@ Open Source Release 29.0 (Copper)
               use array > SIZE_MAX by changing its status (default is error).
 -   Eva       [2024-04-26] Improve builtins memcpy, memmove and memset when
               arguments are imprecise.
--   Kernel    [2024-04-22] Support for ACSL modules.
-o!  Dev       [2024-04-22] Move functions for finding logic types, functions,
-              predicates and constructors from Logic_typing to Logic_env.
 o   Dev       [2024-04-22] Remove frama-c-build-scripts.sh; add a section in
               the user manual about how to manually replace it.
 -!  Kernel    [2024-04-19] Change format of custom_defs field in machdep schema
