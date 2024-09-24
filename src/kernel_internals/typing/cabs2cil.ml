@@ -6408,7 +6408,7 @@ and doExp local_env
                 (* Add a prototype to the environment *)
                 let proto, _ =
                   makeGlobalVarinfo false
-                    (makeGlobalVar ~temp:false n ftype) in
+                    (makeGlobalVar ~temp:false ~loc:f.expr_loc n ftype) in
                 (* Make it EXTERN *)
                 proto.vstorage <- Extern;
                 proto.vdecl <- f.expr_loc;

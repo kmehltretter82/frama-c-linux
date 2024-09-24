@@ -10,7 +10,7 @@
 [kernel] syntactic_hook.i:16: New global node introducing identifier t(35)
 [kernel] First occurrence of t
 [kernel] syntactic_hook.i:16: Warning: [SH]: definition of local function t
-[kernel] :0: New global node introducing identifier g(37)
+[kernel] syntactic_hook.i:20: New global node introducing identifier g(37)
 [kernel] First occurrence of g
 [kernel:typing:implicit-function-declaration] syntactic_hook.i:20: Warning: 
   Calling undeclared function g. Old style K&R code?
