@@ -52,6 +52,11 @@ module Node = struct
     @@ Memory.offset map.Code.map node (Field (field, NoOffset))
 
   let shift (_map:map) node (_ty:typ) = (* TODO *) node
+  let index (map:map) node = Memory.index map.Code.map node
+
+  let literal _map ~eid:_eid (_cst : Base.cstring) = raise Not_found
+  let logical_node _map = raise Not_found
+  let of_int_node _map = raise Not_found
 
 
   let base_addr _map node = (* TODO *) node
@@ -169,6 +174,7 @@ module Region = struct
   let shift (map:map) region (ty:typ) = (* TODO *)
     try Some (Memory.region map.Code.map @@ Node.shift map region.Memory.node ty)
     with Not_found -> None
+
 
 
   let base_addr _map region = (* TODO *) region

@@ -569,6 +569,11 @@ let field (m: map) (r: node) (fd: fieldinfo) : node =
     else raise Not_found
   else r
 
+let index (m : map) (r: node) : node =
+  let s, rgs = cranges m r in
+  match rgs with
+  | R [rg] when rg.offset = 0 && rg.length = s -> rg.data
+  | _ -> raise Not_found
 
 let rec lval (m: map) (lv: lval) : node =
   let h = host m (fst lv) in
@@ -588,12 +593,7 @@ and offset (m: map) (r: node) (ofs: offset) : node =
   | Field (fd, ofs) ->
     if fd.fcomp.cstruct then offset m (field m r fd) ofs
     else r
-  | Index (_, ofs) ->
-    let s, rgs = cranges m r in
-    match rgs with
-    | R [rg] when rg.offset = 0 && rg.length = s ->
-      offset m rg.data ofs
-    | _ -> raise Not_found
+  | Index (_, ofs) -> offset m (index m r) ofs
 
 and exp (m: map) (e: exp) : node option =
   match e.enode with

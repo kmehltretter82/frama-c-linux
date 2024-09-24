@@ -41,8 +41,14 @@ module Node : sig
   val cvar : map -> varinfo -> node
   val field : map -> node -> fieldinfo -> node
   val shift : map -> node -> typ -> node
+  val index : map -> node -> node
 
   val base_addr : map -> node -> node
+
+  val literal : map -> eid:int -> Base.cstring -> node
+  val logical_node : map -> node
+  val of_int_node : map -> node
+
 
 
   (* API POINTERS *)
