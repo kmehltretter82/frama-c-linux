@@ -272,6 +272,7 @@ let spawn spawn_point name entry_points arguments =
 let reset_state () =
   last_thread_id := 1;
   ThreadsById.clear ();
+  Identities.clear ();
   State.clear ();
   set_current main
 

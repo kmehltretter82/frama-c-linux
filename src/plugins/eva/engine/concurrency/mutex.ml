@@ -127,4 +127,5 @@ let create creation_point name =
 
 let reset_state () =
   last_mutex_id := 0;
-  MutexesById.clear ()
+  MutexesById.clear ();
+  Identities.clear ()
