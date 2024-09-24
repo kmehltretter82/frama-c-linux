@@ -310,14 +310,21 @@ let print_model_annot fmt ty =
     (print_logic_type None) ty.model_type
     ty.model_name
 
+let print_plugin_ext fmt (plugin,name) =
+  match plugin with
+  | None -> pp_print_string fmt name
+  | Some "kernel" -> pp_print_string fmt name
+  | Some plugin -> fprintf fmt "\\%s::%s" plugin name
+
 let rec print_extended_decl fmt d =
   let aux fmt d = print_extended_decl fmt d.extended_node in
   match d with
-  | Ext_lexpr(name, _plugin, d) ->
-    fprintf fmt "@[<2>%s@ %a@]" name (pp_list ~sep:",@ " print_lexpr) d
-  | Ext_extension(name, _plugin, id,d) ->
-    fprintf fmt "@[<2>%s@ %s@ {@\n%a@]@\n}" name id
-      (pp_list ~sep:"@\n" aux) d
+  | Ext_lexpr(name, plugin, d) ->
+    fprintf fmt "@[<2>%a@ %a@]"
+      print_plugin_ext (plugin,name) (pp_list ~sep:",@ " print_lexpr) d
+  | Ext_extension(name, plugin, id,d) ->
+    fprintf fmt "@[<2>%a@ %s@ {@\n%a@]@\n}"
+      print_plugin_ext (plugin,name) id (pp_list ~sep:"@\n" aux) d
 
 let rec print_decl fmt d =
   match d.decl_node with
@@ -466,8 +473,9 @@ let print_spec fmt spec =
        ~sep:"@\n" ~suf:"@\n" (pp_list ~sep:",@ " pp_print_string))
     spec.spec_disjoint_behaviors
 
-let print_extension fmt (name, _plugin, ext) =
-  fprintf fmt "%s %a" name (pp_list ~sep:",@ " print_lexpr) ext
+let print_extension fmt (name, plugin, ext) =
+  fprintf fmt "%a %a"
+    print_plugin_ext (plugin,name) (pp_list ~sep:",@ " print_lexpr) ext
 
 let print_code_annot fmt ca =
   let print_behaviors fmt bhvs =
