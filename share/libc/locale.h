@@ -149,7 +149,11 @@ extern char *setlocale(int category, const char *locale);
 */
 extern struct lconv *localeconv(void);
 
-extern locale_t duplocale(locale_t);
+/*@
+  allocates \result;
+  assigns *\result \from *locobj;
+ */
+extern locale_t duplocale(locale_t locobj);
 extern void freelocale(locale_t);
 extern locale_t newlocale(int, const char *, locale_t);
 extern locale_t uselocale(locale_t);

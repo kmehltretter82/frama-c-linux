@@ -51,50 +51,86 @@ typedef struct DIR {
 DIR __fc_opendir[__FC_FOPEN_MAX];
 DIR* const __fc_p_opendir = __fc_opendir;
 
-extern int            alphasort(const struct dirent **, const struct dirent **);
+/*@
+  assigns \result \from indirect:*a[0..], indirect:*b[0..];
+*/
+extern int alphasort(const struct dirent **a, const struct dirent **b);
 
 /*@
   requires dirp_valid_dir_stream: \subset(dirp,&__fc_opendir[0 .. __FC_FOPEN_MAX-1]);
   assigns \result \from dirp, *dirp, __fc_p_opendir;
-  assigns __fc_errno \from dirp, *dirp, __fc_p_opendir;
+  assigns errno \from dirp, *dirp, __fc_p_opendir;
   assigns *dirp \from dirp, *dirp, __fc_p_opendir;
   ensures err_or_closed_on_success: 
     (\result == 0 && dirp->__fc_dir_inode == \null) || \result == -1;
 */
-extern int            closedir(DIR *dirp);
-extern int            dirfd(DIR *);
-extern DIR           *fdopendir(int);
+extern int closedir(DIR *dirp);
+
+/*@
+  assigns \result \from *fd;
+*/
+extern int dirfd(DIR *fd);
+
+/*@
+  assigns \result \from __fc_p_opendir;
+  assigns errno \from indirect:__fc_opendir[0 .. __FC_FOPEN_MAX-1];
+  assigns __fc_opendir[0 .. __FC_FOPEN_MAX-1] \from __fc_opendir[0 .. __FC_FOPEN_MAX-1];
+*/
+extern DIR *fdopendir(int fd);
 
 /*@
   assigns \result \from path[0..], __fc_p_opendir;
-  assigns __fc_errno \from path[0..], __fc_p_opendir;
+  assigns errno \from path[0..], __fc_p_opendir;
   ensures result_null_or_valid: \result == \null || \valid(\result);
   ensures valid_dir_stream_on_success: 
     \result != \null ==> \result == &__fc_opendir[\result->__fc_dir_id];
   ensures stream_positioned_on_success:
 	\result != \null ==> \result->__fc_dir_inode != \null;
 */
-extern DIR           *opendir(const char *path);
+extern DIR *opendir(const char *path);
 
 /*@
   requires dirp_valid_dir_stream: \subset(dirp, &__fc_opendir[0 .. __FC_FOPEN_MAX-1]);
   assigns \result \from *dirp, __fc_p_opendir;
   assigns dirp->__fc_dir_position \from dirp->__fc_dir_position;
-  assigns __fc_errno \from dirp, *dirp, __fc_p_opendir;
+  assigns errno \from dirp, *dirp, __fc_p_opendir;
   ensures result_null_or_valid: \result == \null || \valid(\result);
 */
 extern struct dirent *readdir(DIR *dirp);
 
-extern int            readdir_r(DIR * dirp, struct dirent * entry,
-			 struct dirent ** result);
-extern void           rewinddir(DIR *);
-extern int            scandir(const char *, struct dirent ***,
-                   int (*)(const struct dirent *),
-                   int (*)(const struct dirent **,
-                   const struct dirent **));
+/*@
+  assigns \result \from *dirp, __fc_p_opendir;
+  assigns *dirp, *entry \from *dirp;
+  assigns *result \from entry;
+  assigns errno \from indirect:*dirp, indirect:*entry;
+*/
+extern int readdir_r(DIR * dirp, struct dirent * entry,
+                     struct dirent ** result);
 
-extern void           seekdir(DIR *, long);
-extern long           telldir(DIR *);
+/*@
+  assigns *dirp \from *dirp;
+*/
+extern void rewinddir(DIR *dirp);
+
+/*@
+  allocates *namelist;
+  assigns \result, *namelist
+    \from indirect:dir[0..], indirect:sel, indirect:compar;
+*/
+extern int scandir(const char *dir, struct dirent ***namelist,
+                   int (*sel)(const struct dirent *),
+                   int (*compar)(const struct dirent **,
+                                 const struct dirent **));
+
+/*@
+  assigns *dirp \from *dirp, loc;
+*/
+extern void seekdir(DIR *dirp, long loc);
+
+/*@
+  assigns \result \from *dirp;
+*/
+extern long telldir(DIR *dirp);
 
 
 

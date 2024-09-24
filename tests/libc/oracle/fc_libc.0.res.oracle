@@ -5,10 +5,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] fc_libc.c:209: assertion got status valid.
 [eva] fc_libc.c:210: assertion got status valid.
 [eva] fc_libc.c:211: assertion got status valid.
 [eva] fc_libc.c:212: assertion got status valid.
+[eva] fc_libc.c:213: assertion got status valid.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -21,6 +21,7 @@
 #include "__fc_gcc_builtins.h"
 #include "__fc_integer.h"
 #include "__fc_select.h"
+#include "__fc_utmp_constants.h"
 #include "alloca.h"
 #include "argz.c"
 #include "argz.h"
@@ -41,6 +42,7 @@
 #include "glob.c"
 #include "glob.h"
 #include "iconv.h"
+#include "ifaddrs.h"
 #include "inttypes.c"
 #include "inttypes.h"
 #include "libgen.h"
@@ -55,9 +57,12 @@
 #include "pthread.h"
 #include "pwd.c"
 #include "pwd.h"
+#include "sched.h"
+#include "semaphore.h"
 #include "setjmp.h"
 #include "signal.c"
 #include "signal.h"
+#include "spawn.h"
 #include "stdarg.h"
 #include "stdatomic.c"
 #include "stdatomic.h"
@@ -90,6 +95,8 @@
 #include "uchar.h"
 #include "unistd.c"
 #include "unistd.h"
+#include "utmp.h"
+#include "utmpx.h"
 #include "wchar.c"
 #include "wchar.h"
 void main(void)

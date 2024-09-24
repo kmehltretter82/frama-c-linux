@@ -47,8 +47,13 @@ typedef void (*__fc_sighandler_t) (int);
 /* for BSD 4.4 */
 typedef __fc_sighandler_t sig_t;
 
+/*@ assigns \nothing; */
 extern void __fc_sig_dfl(int);
+
+/*@ assigns \nothing; */
 extern void __fc_sig_ign(int);
+
+/*@ assigns \nothing; */
 extern void __fc_sig_err(int);
 
 #define SIG_DFL (&__fc_sig_dfl)     /* default signal handling */

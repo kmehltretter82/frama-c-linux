@@ -4,5 +4,5 @@
 [kernel] Parsing glibc_functions.json
 [kernel] Parsing posix_identifiers.json
 [kernel] Parsing nonstandard_identifiers.json
-[kernel] Warning: <uchar.h>:c8rtomb : unknown identifier
 [kernel] Warning: <uchar.h>:mbrtoc8 : unknown identifier
+[kernel] Warning: <uchar.h>:c8rtomb : unknown identifier

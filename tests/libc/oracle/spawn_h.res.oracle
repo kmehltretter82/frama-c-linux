@@ -11,30 +11,18 @@
   The specification of function getopt has generated a garbled mix of addresses
   for assigns clause \result.
 [eva] Done for function getopt
-[kernel:annot:missing-spec] spawn_h.c:43: Warning: 
-  Neither code nor specification for function posix_spawn_file_actions_init,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawn_file_actions_init <- main.
   Called from spawn_h.c:43.
 [eva] using specification for function posix_spawn_file_actions_init
 [eva] Done for function posix_spawn_file_actions_init
-[kernel:annot:missing-spec] spawn_h.c:47: Warning: 
-  Neither code nor specification for function posix_spawn_file_actions_addclose,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawn_file_actions_addclose <- main.
   Called from spawn_h.c:47.
 [eva] using specification for function posix_spawn_file_actions_addclose
 [eva] Done for function posix_spawn_file_actions_addclose
-[kernel:annot:missing-spec] spawn_h.c:60: Warning: 
-  Neither code nor specification for function posix_spawnattr_init,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_init <- main.
   Called from spawn_h.c:60.
 [eva] using specification for function posix_spawnattr_init
 [eva] Done for function posix_spawnattr_init
-[kernel:annot:missing-spec] spawn_h.c:63: Warning: 
-  Neither code nor specification for function posix_spawnattr_setflags,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_setflags <- main.
   Called from spawn_h.c:63.
 [eva] using specification for function posix_spawnattr_setflags
@@ -45,9 +33,6 @@
 [eva] spawn_h.c:67: 
   function sigfillset: precondition 'valid_set' got status valid.
 [eva] Done for function sigfillset
-[kernel:annot:missing-spec] spawn_h.c:68: Warning: 
-  Neither code nor specification for function posix_spawnattr_setsigmask,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_setsigmask <- main.
   Called from spawn_h.c:68.
 [eva] using specification for function posix_spawnattr_setsigmask
@@ -104,9 +89,6 @@
   out of bounds read. assert \valid_read(argv + optind);
 [eva:garbled-mix:write] spawn_h.c:82: 
   Assigning imprecise value to file because of misaligned read of addresses.
-[kernel:annot:missing-spec] spawn_h.c:82: Warning: 
-  Neither code nor specification for function posix_spawnp,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnp <- main.
   Called from spawn_h.c:82.
 [eva] using specification for function posix_spawnp
@@ -116,9 +98,6 @@
 [eva] spawn_h.c:85: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
-[kernel:annot:missing-spec] spawn_h.c:90: Warning: 
-  Neither code nor specification for function posix_spawnattr_destroy,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawnattr_destroy <- main.
   Called from spawn_h.c:90.
 [eva] using specification for function posix_spawnattr_destroy
@@ -128,9 +107,6 @@
 [eva] spawn_h.c:92: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
-[kernel:annot:missing-spec] spawn_h.c:96: Warning: 
-  Neither code nor specification for function posix_spawn_file_actions_destroy,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function posix_spawn_file_actions_destroy <- main.
   Called from spawn_h.c:96.
 [eva] using specification for function posix_spawn_file_actions_destroy

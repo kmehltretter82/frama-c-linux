@@ -47,6 +47,7 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_libc.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_select.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_string_axiomatic.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_utmp_constants.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/aio.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/alloca.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/argz.h (with preprocessing)

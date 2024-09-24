@@ -46,6 +46,8 @@
   \return(strndup) == 0 (auto)
   \return(stpncpy) == 0 (auto)
   \return(strsignal) == 0 (auto)
+  \return(index) == 0 (auto)
+  \return(rindex) == 0 (auto)
   \return(bind) == 0 (auto)
   \return(socket) == -1 (auto)
   \return(signal) == 0 (auto)
@@ -57,7 +59,18 @@
   \return(Frama_C_malloc_fresh) == 0 (auto)
   \return(gai_strerror) == 0 (auto)
   \return(getaddrinfo) == 0 (auto)
+  \return(gethostbyaddr) == 0 (auto)
   \return(gethostbyname) == 0 (auto)
+  \return(gethostent) == 0 (auto)
+  \return(getnetbyaddr) == 0 (auto)
+  \return(getnetbyname) == 0 (auto)
+  \return(getnetent) == 0 (auto)
+  \return(getprotobyname) == 0 (auto)
+  \return(getprotobynumber) == 0 (auto)
+  \return(getprotoent) == 0 (auto)
+  \return(getservbyname) == 0 (auto)
+  \return(getservbyport) == 0 (auto)
+  \return(getservent) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

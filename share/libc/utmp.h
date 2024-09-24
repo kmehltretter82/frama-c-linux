@@ -28,21 +28,11 @@
 __PUSH_FC_STDLIB
 
 #include "__fc_define_pid_t.h"
+#include "__fc_utmp_constants.h"
 #include "sys/time.h"
 #include "stdint.h"
 
 __BEGIN_DECLS
-
-#define _PATH_UTMP "/var/run/utmp"
-#define UTMP_FILE     _PATH_UTMP
-#define UTMP_FILENAME _PATH_UTMP
-#define _PATH_WTMP "/var/log/wtmp"
-#define WTMP_FILE     _PATH_WTMP
-#define WTMP_FILENAME _PATH_WTMP
-
-#define UT_LINESIZE  32
-#define UT_NAMESIZE  32
-#define UT_HOSTSIZE  256
 
 struct lastlog
 {
@@ -72,38 +62,98 @@ struct utmp
   char __glibc_reserved[20]; // used by who.c
 };
 
-#define ut_name ut_user
-#define ut_time ut_tv.tv_sec
-
+/*@
+  assigns \result, __fc_fopen[fd] \from __fc_fopen[fd], fd;
+*/
 extern int login_tty (int fd);
-extern void login (const struct utmp *entry);
+
+// static storage used by some getter functions
+extern struct utmp __fc_get;
+
+/*@
+  assigns __fc_utmp \from __fc_utmp, *ut;
+  assigns __fc_wtmp \from __fc_wtmp, *ut;
+*/
+extern void login (const struct utmp *ut);
+
+/*@
+  assigns __fc_utmp \from __fc_wtmp, *ut_line;
+  assigns \result \from indirect:__fc_wtmp, indirect:*ut_line;
+*/
 extern int logout (const char *ut_line);
+
+/*@
+  assigns __fc_wtmp \from __fc_wtmp, ut_line[0..], ut_name[0..], ut_host[0..];
+*/
 extern void logwtmp (const char *ut_line, const char *ut_name,
                      const char *ut_host);
 
+/*@
+  assigns \nothing; // missing: assigns 'file named wtmp_file in the filesystem' \from *utmp;
+*/
 extern void updwtmp (const char *wtmp_file, const struct utmp *utmp);
 
+/*@
+  assigns \result \from file[0..]; // missing: assigns 'file named file in the filesystem';
+*/
 extern int utmpname (const char *file);
 
+/*@
+  assigns \result \from &__fc_get, indirect:__fc_utmp;
+  assigns __fc_get \from __fc_get, indirect:__fc_utmp;
+*/
 extern struct utmp *getutent (void);
 
+/*@
+  assigns __fc_utmp \from __fc_utmp;
+*/
 extern void setutent (void);
 
+/*@
+  assigns __fc_utmp \from __fc_utmp;
+*/
 extern void endutent (void);
 
-extern struct utmp *getutid (const struct utmp *id);
+/*@
+  assigns \result \from &__fc_get, indirect:__fc_utmp, indirect:*ut;
+  assigns __fc_get \from __fc_get, indirect:__fc_utmp, indirect:*ut;
+*/
+extern struct utmp *getutid (const struct utmp *ut);
 
-extern struct utmp *getutline (const struct utmp *line);
+/*@
+  assigns \result \from &__fc_get, indirect:__fc_utmp, indirect:*ut;
+  assigns __fc_get \from __fc_get, indirect:__fc_utmp, indirect:*ut;
+*/
+extern struct utmp *getutline (const struct utmp *ut);
 
+/*@
+  assigns __fc_utmp \from __fc_utmp, *utmp_ptr;
+  assigns \result \from utmp_ptr;
+*/
 extern struct utmp *pututline (const struct utmp *utmp_ptr);
 
-extern int getutent_r (struct utmp *buffer, struct utmp **result);
+/*@
+  assigns \result \from indirect:__fc_utmp;
+  assigns *ubuf \from __fc_utmp;
+  assigns *ubufp \from &__fc_utmp;
+*/
+extern int getutent_r (struct utmp *ubuf, struct utmp **ubufp);
 
-extern int getutid_r (const struct utmp *id, struct utmp *buffer,
-                      struct utmp **result);
+/*@
+  assigns \result \from indirect:*ut, indirect:__fc_utmp;
+  assigns *ubuf \from indirect:*ut, __fc_utmp;
+  assigns *ubufp \from indirect:*ut, &__fc_utmp;
+*/
+extern int getutid_r (const struct utmp *ut, struct utmp *ubuf,
+                      struct utmp **ubufp);
 
-extern int getutline_r (const struct utmp *line,
-                        struct utmp *buffer, struct utmp **result);
+/*@
+  assigns \result \from indirect:*ut, indirect:__fc_utmp;
+  assigns *ubuf \from indirect:*ut, __fc_utmp;
+  assigns *ubufp \from indirect:*ut, &__fc_utmp;
+*/
+extern int getutline_r (const struct utmp *ut,
+                        struct utmp *ubuf, struct utmp **ubufp);
 
 
 __END_DECLS

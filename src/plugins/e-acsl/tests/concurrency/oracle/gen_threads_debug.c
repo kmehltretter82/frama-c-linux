@@ -113,6 +113,12 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
  */
 int __gen_e_acsl_pthread_mutex_lock(pthread_mutex_t *mutex);
 
+/*@ assigns \result, *mutex;
+    assigns \result \from *mutex;
+    assigns *mutex \from *mutex;
+ */
+int __gen_e_acsl_pthread_mutex_trylock(pthread_mutex_t *mutex);
+
 /*@ requires mutex_valid: \valid(mutex);
     ensures success_or_error: \result == 0 || \result == 1;
     assigns *mutex, \result;
@@ -510,7 +516,7 @@ int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(mutex)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_mutex_unlock";
-    __gen_e_acsl_assert_data.line = 313;
+    __gen_e_acsl_assert_data.line = 499;
     __gen_e_acsl_assert_data.name = "mutex_valid";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -533,7 +539,7 @@ int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == 1";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_mutex_unlock";
-    __gen_e_acsl_assert_data_2.line = 316;
+    __gen_e_acsl_assert_data_2.line = 502;
     __gen_e_acsl_assert_data_2.name = "success_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -541,6 +547,21 @@ int __gen_e_acsl_pthread_mutex_unlock(pthread_mutex_t *mutex)
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
+}
+
+/*@ assigns \result, *mutex;
+    assigns \result \from *mutex;
+    assigns *mutex \from *mutex;
+ */
+int __gen_e_acsl_pthread_mutex_trylock(pthread_mutex_t *mutex)
+{
+  int __retres;
+  __e_acsl_store_block((void *)(& __retres),4UL);
+  __e_acsl_store_block((void *)(& mutex),8UL);
+  __retres = pthread_mutex_trylock(mutex);
+  __e_acsl_delete_block((void *)(& mutex));
+  __e_acsl_delete_block((void *)(& __retres));
+  return __retres;
 }
 
 /*@ requires mutex_valid: \valid(mutex);
@@ -574,7 +595,7 @@ int __gen_e_acsl_pthread_mutex_lock(pthread_mutex_t *mutex)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(mutex)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_mutex_lock";
-    __gen_e_acsl_assert_data.line = 295;
+    __gen_e_acsl_assert_data.line = 467;
     __gen_e_acsl_assert_data.name = "mutex_valid";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -611,7 +632,7 @@ int __gen_e_acsl_pthread_mutex_lock(pthread_mutex_t *mutex)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == 11 || \\result == 22 || \\result == 35";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_mutex_lock";
-    __gen_e_acsl_assert_data_2.line = 299;
+    __gen_e_acsl_assert_data_2.line = 471;
     __gen_e_acsl_assert_data_2.name = "success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_3,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -659,7 +680,7 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
     __gen_e_acsl_assert_data.pred_txt = "\\valid(mutex)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_mutex_init";
-    __gen_e_acsl_assert_data.line = 279;
+    __gen_e_acsl_assert_data.line = 451;
     __gen_e_acsl_assert_data.name = "mutex_valid";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -689,7 +710,7 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
     __gen_e_acsl_assert_data_2.pred_txt = "attrs == \\null || \\valid_read(attrs)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_mutex_init";
-    __gen_e_acsl_assert_data_2.line = 280;
+    __gen_e_acsl_assert_data_2.line = 452;
     __gen_e_acsl_assert_data_2.name = "attrs_valid_or_null";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -749,7 +770,7 @@ int __gen_e_acsl_pthread_mutex_init(pthread_mutex_t * restrict mutex,
     __gen_e_acsl_assert_data_3.pred_txt = "(\\result == 0 && \\initialized(\\old(mutex))) || \\result == 11 || \\result == 12 ||\n\\result == 1 || \\result == 22";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_3.fct = "pthread_mutex_init";
-    __gen_e_acsl_assert_data_3.line = 285;
+    __gen_e_acsl_assert_data_3.line = 457;
     __gen_e_acsl_assert_data_3.name = "initialization/success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -811,7 +832,7 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     __gen_e_acsl_assert_data.pred_txt = "retval == \\null || \\valid(retval)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_join";
-    __gen_e_acsl_assert_data.line = 247;
+    __gen_e_acsl_assert_data.line = 405;
     __gen_e_acsl_assert_data.name = "valid_or_null_retval";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -854,7 +875,7 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == 35 || \\result == 22 || \\result == 3";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_join";
-    __gen_e_acsl_assert_data_2.line = 251;
+    __gen_e_acsl_assert_data_2.line = 409;
     __gen_e_acsl_assert_data_2.name = "success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_4,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -909,7 +930,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data.pred_txt = "\\valid(thread)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_create";
-    __gen_e_acsl_assert_data.line = 223;
+    __gen_e_acsl_assert_data.line = 355;
     __gen_e_acsl_assert_data.name = "valid_thread";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -939,7 +960,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data_2.pred_txt = "attr == \\null || \\valid_read(attr)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_create";
-    __gen_e_acsl_assert_data_2.line = 224;
+    __gen_e_acsl_assert_data_2.line = 356;
     __gen_e_acsl_assert_data_2.name = "valid_null_attr";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -964,7 +985,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data_4.pred_txt = "arg == \\null || \\valid((char *)arg)";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_4.fct = "pthread_create";
-    __gen_e_acsl_assert_data_4.line = 226;
+    __gen_e_acsl_assert_data_4.line = 358;
     __gen_e_acsl_assert_data_4.name = "valid_null_arg";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -1016,7 +1037,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data_5.pred_txt = "(\\result == 0 && \\initialized(\\old(thread))) || \\result == 11 ||\n\\result == 22 || \\result == 1";
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_5.fct = "pthread_create";
-    __gen_e_acsl_assert_data_5.line = 230;
+    __gen_e_acsl_assert_data_5.line = 362;
     __gen_e_acsl_assert_data_5.name = "initialization/success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -1060,7 +1081,7 @@ int __gen_e_acsl_pthread_cond_wait(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data.pred_txt = "\\valid(cond)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_cond_wait";
-    __gen_e_acsl_assert_data.line = 203;
+    __gen_e_acsl_assert_data.line = 317;
     __gen_e_acsl_assert_data.name = "valid_cond";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -1081,7 +1102,7 @@ int __gen_e_acsl_pthread_cond_wait(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data_2.pred_txt = "\\valid(mutex)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_cond_wait";
-    __gen_e_acsl_assert_data_2.line = 204;
+    __gen_e_acsl_assert_data_2.line = 318;
     __gen_e_acsl_assert_data_2.name = "valid_mutex";
     __e_acsl_assert(__gen_e_acsl_valid_2,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -1097,7 +1118,7 @@ int __gen_e_acsl_pthread_cond_wait(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data_3.pred_txt = "\\result == 0";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_3.fct = "pthread_cond_wait";
-    __gen_e_acsl_assert_data_3.line = 206;
+    __gen_e_acsl_assert_data_3.line = 320;
     __gen_e_acsl_assert_data_3.name = "success";
     __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -1143,7 +1164,7 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data.pred_txt = "\\valid(cond)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_cond_init";
-    __gen_e_acsl_assert_data.line = 187;
+    __gen_e_acsl_assert_data.line = 294;
     __gen_e_acsl_assert_data.name = "valid_cond";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -1173,7 +1194,7 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data_2.pred_txt = "attr == \\null || \\valid_read(attr)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_cond_init";
-    __gen_e_acsl_assert_data_2.line = 188;
+    __gen_e_acsl_assert_data_2.line = 295;
     __gen_e_acsl_assert_data_2.name = "valid_null_attr";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -1198,7 +1219,7 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data_3.pred_txt = "\\initialized(\\old(cond))";
     __gen_e_acsl_assert_data_3.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_3.fct = "pthread_cond_init";
-    __gen_e_acsl_assert_data_3.line = 191;
+    __gen_e_acsl_assert_data_3.line = 298;
     __gen_e_acsl_assert_data_3.name = "initialization/cond";
     __e_acsl_assert(__gen_e_acsl_initialized,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
@@ -1211,7 +1232,7 @@ int __gen_e_acsl_pthread_cond_init(pthread_cond_t * restrict cond,
     __gen_e_acsl_assert_data_4.pred_txt = "\\result == 0";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_4.fct = "pthread_cond_init";
-    __gen_e_acsl_assert_data_4.line = 192;
+    __gen_e_acsl_assert_data_4.line = 299;
     __gen_e_acsl_assert_data_4.name = "success";
     __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -1249,7 +1270,7 @@ int __gen_e_acsl_pthread_cond_broadcast(pthread_cond_t *cond)
     __gen_e_acsl_assert_data.pred_txt = "\\valid(cond)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_cond_broadcast";
-    __gen_e_acsl_assert_data.line = 173;
+    __gen_e_acsl_assert_data.line = 280;
     __gen_e_acsl_assert_data.name = "valid_cond";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -1265,7 +1286,7 @@ int __gen_e_acsl_pthread_cond_broadcast(pthread_cond_t *cond)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_cond_broadcast";
-    __gen_e_acsl_assert_data_2.line = 175;
+    __gen_e_acsl_assert_data_2.line = 282;
     __gen_e_acsl_assert_data_2.name = "sucess";
     __e_acsl_assert(__retres == 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -1508,7 +1529,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& i));
   }
   while (1) {
-    int res = pthread_mutex_trylock(& write_mutex);
+    int res = __gen_e_acsl_pthread_mutex_trylock(& write_mutex);
     __e_acsl_store_block((void *)(& res),4UL);
     __e_acsl_full_init((void *)(& res));
     if (res == 0) {
@@ -1529,7 +1550,7 @@ int main(void)
     __e_acsl_delete_block((void *)(& res));
   }
   while (1) {
-    int res_0 = pthread_mutex_trylock(& read_mutex);
+    int res_0 = __gen_e_acsl_pthread_mutex_trylock(& read_mutex);
     __e_acsl_store_block((void *)(& res_0),4UL);
     __e_acsl_full_init((void *)(& res_0));
     if (res_0 == 0) {
