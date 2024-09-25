@@ -46,6 +46,13 @@ struct statvfs {
   unsigned long f_namemax; // Maximum filename length.
 };
 
+enum {
+  ST_RDONLY = 1,
+#define ST_RDONLY    ST_RDONLY
+  ST_NOSUID = 2
+#define ST_NOSUID    ST_NOSUID
+};
+
 extern int fstatvfs(int fildes, struct statvfs *buf);
 
 extern int statvfs(const char *restrict path, struct statvfs *restrict buf);

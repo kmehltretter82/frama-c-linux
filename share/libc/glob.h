@@ -38,6 +38,16 @@ __PUSH_FC_STDLIB
 #define	GLOB_PERIOD	(1 << 7)/* Leading `.' can be matched by metachars.  */
 #define	GLOB_MAGCHAR	(1 << 8)/* GNU-specific */
 
+// Non-POSIX
+#define GLOB_MAGCHAR (1 << 8)
+#define GLOB_ALTDIRFUNC (1 << 9)
+#define GLOB_BRACE (1 << 10)
+#define GLOB_NOMAGIC (1 << 11)
+#define GLOB_TILDE (1 << 12)
+#define GLOB_ONLYDIR (1 << 13)
+#define GLOB_TILDE_CHECK (1 << 14)
+
+
 #define	GLOB_NOSPACE	1	/* Ran out of memory.  */
 #define	GLOB_ABORTED	2	/* Read error.  */
 #define	GLOB_NOMATCH	3	/* No matches found.  */
