@@ -70,7 +70,7 @@ val new_predicate: ?kind:predicate_kind -> predicate -> identified_predicate
     @before the function took one less argument, [~plugin] which is now
     used to set the [ext_plugin] field.
 *)
-val new_acsl_extension: plugin:string option -> string -> location -> bool ->
+val new_acsl_extension: plugin:string -> string -> location -> bool ->
   acsl_extension_kind -> acsl_extension
 
 (** Gives a new id to an existing predicate.

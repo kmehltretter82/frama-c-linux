@@ -72,9 +72,9 @@ val print_global: Cil_types.global -> bool
 (**/**)
 
 val set_extension_handler:
-  print:(plugin:string option -> string -> Printer_api.extensible_printer_type ->
+  print:(plugin:string -> string -> Printer_api.extensible_printer_type ->
          Format.formatter -> Cil_types.acsl_extension_kind -> unit) ->
-  short_print:(plugin:string option -> string -> Printer_api.extensible_printer_type ->
+  short_print:(plugin:string -> string -> Printer_api.extensible_printer_type ->
                Format.formatter -> Cil_types.acsl_extension_kind -> unit) ->
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.

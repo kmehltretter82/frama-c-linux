@@ -622,11 +622,6 @@ module Base_checker = struct
           match ca.annot_content with
           | AExtended (_, is_loop, {ext_name; ext_plugin}) ->
             (match Logic_env.extension_category ~plugin:ext_plugin ext_name, is_loop with
-             | exception Not_found ->
-               Kernel.(
-                 warning ~wkey:wkey_acsl_extension
-                   "%s is not a known extension" ext_name);
-               my_labels
              | Ext_code_annot (Ext_next_stmt | Ext_next_both), false ->
                Logic_const.post_label :: my_labels
              | Ext_code_annot Ext_here, false -> my_labels

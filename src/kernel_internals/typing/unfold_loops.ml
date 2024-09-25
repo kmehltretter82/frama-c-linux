@@ -696,7 +696,7 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
             Logic_const.tinteger number
           ] in
         let ext =
-          Logic_const.new_acsl_extension ~plugin:(Some "kernel") "unfold" loc
+          Logic_const.new_acsl_extension ~plugin:"kernel" "unfold" loc
             false kind
         in
         let annot =Logic_const.new_code_annotation (AExtended([],true,ext)) in

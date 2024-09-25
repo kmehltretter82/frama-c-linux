@@ -1691,7 +1691,7 @@ and spec = {
 and acsl_extension = {
   ext_id : int;
   ext_name : string;
-  ext_plugin : string option; (**  @since Frama-C+dev *)
+  ext_plugin : string; (**  @since Frama-C+dev *)
   ext_loc : location;
   ext_has_status : bool;
   ext_kind : acsl_extension_kind
@@ -1802,7 +1802,7 @@ and global_annotation =
   (** associated terms, reading function, writing function *)
   | Daxiomatic of string * global_annotation list * attributes * location
   (** last option is the external loader responsible for the module importer *)
-  | Dmodule of string * global_annotation list * attributes * (string * string option) option * location
+  | Dmodule of string * global_annotation list * attributes * (string * string) option * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
       string * logic_label list * string list *

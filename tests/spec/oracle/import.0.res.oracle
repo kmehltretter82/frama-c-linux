@@ -36,7 +36,7 @@
  */
 /*@ predicate check5(X::t x) = X::check(x, 0);
  */
-/*@ import bar: X::Y \as _ ;
+/*@ import \myplugin1::bar: X::Y \as _ ;
  */
 /*@ predicate check6(X::Y::t x) = X::Y::check(x, 0);
  */

@@ -103,6 +103,38 @@
     let c = Utf8_logic.from_unichar !code in
     find_utf8 c
 
+  let extension ~plugin name =
+    try
+      (* extension_from will raise Not_found or fatal, if extension does not
+         exist or if there are ambiguities between extension names and the
+         plugin is not provided. *)
+      let plugin = Logic_env.extension_from ?plugin name in
+      match Logic_env.extension_category ~plugin name with
+      | Cil_types.Ext_contract -> Some (EXT_CONTRACT (name, plugin))
+      | Cil_types.Ext_global ->
+          if Logic_env.is_extension_block ~plugin name
+          then Some (EXT_GLOBAL_BLOCK (name, plugin))
+          else Some (EXT_GLOBAL (name, plugin))
+      | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT (name, plugin))
+    with Not_found ->
+      (* We need to distinguish here which token was parsed (with or without
+         plugin) to help the parser (cf. ext_loader rule). *)
+      match plugin with
+      | None ->
+        begin
+          try
+            (* importer_from will raise Not_found or fatal, if extension does not
+              exist or if there are ambiguities between extension names and the
+              plugin is not provided. *)
+            let plugin = Logic_env.importer_from name in
+            Some (EXT_LOADER (name, plugin))
+          with Not_found -> None
+        end
+      | Some plugin ->
+        if Logic_env.is_importer ~plugin name then
+          Some (EXT_LOADER_PLUGIN (name, plugin))
+        else None
+
   let identifier, is_acsl_keyword =
     let all_kw = Hashtbl.create 37 in
     let type_kw = Hashtbl.create 3 in
@@ -188,23 +220,7 @@
         (Hashtbl.find all_kw s)
         loc
       with Not_found ->
-        let res =
-          match Logic_env.extension_category ~plugin s with
-          | exception Not_found ->
-            begin
-              match Logic_env.is_importer ~plugin s, plugin with
-              | false, _ -> None
-              | true, None -> Some (EXT_LOADER s)
-              | true, Some _ -> Some (EXT_LOADER_PLUGIN (s, plugin))
-            end
-          | Cil_types.Ext_contract -> Some (EXT_CONTRACT (s, plugin))
-          | Cil_types.Ext_global ->
-              if Logic_env.is_extension_block ~plugin s
-              then Some (EXT_GLOBAL_BLOCK (s, plugin))
-              else Some (EXT_GLOBAL (s, plugin))
-          | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT (s, plugin))
-        in
-        match res with
+        match extension ~plugin s with
         | None ->
           if Logic_env.typename_status s then TYPENAME s
           else

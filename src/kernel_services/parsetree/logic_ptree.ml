@@ -168,7 +168,7 @@ type toplevel_predicate =
 (** ACSL extension.
     @before Frama-C+dev Was of type [string * lexpr list].
 *)
-type extension = string * string option * lexpr list
+type extension = string * string * lexpr list
 
 (** type invariant. *)
 type type_annot =  {inv_name: string;
@@ -250,7 +250,7 @@ and decl_node =
   | LDmodule of string * decl list
   (** [LDmodule(id,decls)]
       represents a module of axiomatic definitions.*)
-  | LDimport of (string * string option) option * string * string option
+  | LDimport of (string * string) option * string * string option
   (** [LDimport(loader,module,alias)]
       imports symbols from module using the specified loader,
       with optional alias.*)
@@ -288,10 +288,10 @@ and variant = lexpr * string option
 
 (** Global ACSL extension. *)
 and global_extension =
-  | Ext_lexpr of string * string option * lexpr list
+  | Ext_lexpr of string * string * lexpr list
   (** @before Frama-C+dev Was of type [string * lexpr list]. *)
 
-  | Ext_extension of string * string option * string * extended_decl list
+  | Ext_extension of string * string * string * extended_decl list
   (** @before Frama-C+dev Was of type [string * string * extended_decl list]. *)
 
 and extended_decl = {

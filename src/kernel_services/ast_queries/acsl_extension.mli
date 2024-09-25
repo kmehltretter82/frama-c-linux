@@ -128,7 +128,7 @@ type register_extension =
 (** same as {!register_extension}, but for extensions that parse an axiomatic
     block, resulting in a {!Cil_types.Ext_annot}. *)
 type register_extension_block =
-  plugin: string -> string ->
+  plugin:string -> string ->
   ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer ->

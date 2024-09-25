@@ -2465,7 +2465,7 @@ val pp_from_ref: (Format.formatter -> from -> unit) ref
 val pp_behavior_ref: (Format.formatter -> behavior -> unit) ref
 
 val set_extension_handler:
-  visit:(plugin:string option -> string -> cilVisitor -> acsl_extension_kind ->
+  visit:(plugin:string -> string -> cilVisitor -> acsl_extension_kind ->
          acsl_extension_kind visitAction) ->
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.

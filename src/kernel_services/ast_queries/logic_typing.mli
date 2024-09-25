@@ -312,13 +312,13 @@ val post_state_env: termination_kind -> logic_type -> Lenv.t
 (** {2 Internal use} *)
 
 val set_extension_handler:
-  is_extension:(plugin:string option -> string -> bool) ->
-  typer: (plugin:string option -> string -> typing_context -> location ->
+  is_extension:(plugin:string -> string -> bool) ->
+  typer: (plugin:string -> string -> typing_context -> location ->
           Logic_ptree.lexpr list -> (bool * acsl_extension_kind)) ->
-  typer_block:(plugin:string option -> string -> typing_context -> location ->
+  typer_block:(plugin:string -> string -> typing_context -> location ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
-  importer: (plugin:string option -> string -> module_builder -> location ->
+  importer: (plugin:string -> string -> module_builder -> location ->
              string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
@@ -332,7 +332,7 @@ val set_extension_handler:
     now used to avoid ambiguity if plugins use the same name for an extension
 *)
 val get_typer :
-  plugin:string option ->
+  plugin:string ->
   string ->
   typing_context:typing_context ->
   loc:location ->
@@ -343,7 +343,7 @@ val get_typer :
     now used to avoid ambiguity if plugins use the same name for an extension
 *)
 val get_typer_block:
-  plugin:string option ->
+  plugin:string ->
   string ->
   typing_context:typing_context ->
   loc:Logic_ptree.location ->
@@ -354,7 +354,7 @@ val get_typer_block:
     @since Frama-C+dev
 *)
 val get_importer:
-  plugin:string option ->
+  plugin:string ->
   string ->
   builder:module_builder ->
   loc:Logic_ptree.location ->

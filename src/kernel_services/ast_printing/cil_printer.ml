@@ -3285,12 +3285,9 @@ class cil_printer () = object (self)
       (self#logic_type (Some print_decl)) mfi.mi_field_type
 
   method private pp_loader fmt (name, plugin) =
-    match plugin with
-    | None -> pp_print_string fmt name
-    | Some plugin ->
-      if Datatype.String.equal plugin "kernel"
-      then pp_print_string fmt name
-      else fprintf fmt "\\%s::%s" plugin name
+    if Datatype.String.equal plugin "kernel"
+    then pp_print_string fmt name
+    else fprintf fmt "\\%s::%s" plugin name
 
   method global_annotation fmt = function
     | Dtype_annot (a,_) ->

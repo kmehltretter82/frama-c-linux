@@ -172,50 +172,26 @@ module Extensions = struct
 
   (* [get_plugin] is a getter to access the [plugin] field from extension_*
      types, to keep this function generic. *)
-  let mem ~get_plugin tbl ~plugin name =
-    match Hashtbl.find_opt tbl name, plugin with
-    (* Extension is not registered. *)
-    | None, _ -> false
-    (* We do not remove extensions from this table, and always add an element
-       the first time a key is registered, so this case cannot happen. *)
-    | Some [], _ -> assert false
-    (* One extension registered, no ambiguity. *)
-    | Some [_], None -> true
-    (* One extension registered, make sure the plugin field matches. *)
-    | Some [e], Some plugin -> String.equal plugin (get_plugin e)
+  let mem_gen ~get_plugin tbl ~plugin name =
+    match Hashtbl.find_opt tbl name with
+    | None -> false
+    | Some [] -> assert false
+    | Some [e] -> String.equal plugin (get_plugin e)
     (* Ambiguity on name, look for an extension with the right plugin. *)
-    | Some l, Some plugin ->
-      List.exists (fun e -> String.equal plugin (get_plugin e)) l
-    (* Ambiguity on name without providing plugin name. *)
-    | Some l, None -> throw_ambiguity_error ~get_plugin name l
-
-  (* [get_plugin] is a getter to access the [plugin] field from extension_*
-     types, to keep this function generic. Can raise Not_found. *)
-  let find ~get_plugin tbl ~plugin name =
-    match Hashtbl.find tbl name, plugin with
-    (* We do not remove extensions from this table, and always add an element
-       the first time a key is registered, so this case cannot happen. *)
-    | [], _ -> assert false
-    (* One extension registered, no ambiguity. *)
-    | [e], None -> e
-    (* One extension registered, make sure the plugin field matches. *)
-    | [e], Some plugin ->
-      if String.equal plugin (get_plugin e) then e else raise Not_found
-    (* Ambiguity on name, look for an extension with the right plugin. *)
-    | l, Some plugin ->
-      List.find (fun e -> String.equal plugin (get_plugin e)) l
-    (* Ambiguity on name without providing plugin name. *)
-    | l, None -> throw_ambiguity_error ~get_plugin name l
+    | Some l -> List.exists (fun e -> String.equal plugin (get_plugin e)) l
 
   (* Generic function for find functions, catch Not_found and throw a fatal
-     instead. *)
+     instead. [get_plugin] is a getter to access the [plugin] field from
+     extension_* types, to keep this function generic. *)
   let find_gen ~get_plugin data tbl ~plugin name =
-    try find ~get_plugin ~plugin tbl name
+    try
+      match Hashtbl.find tbl name with
+      | [] -> assert false
+      | [e] -> if String.equal plugin (get_plugin e) then e else raise Not_found
+      | l -> List.find (fun e -> String.equal plugin (get_plugin e)) l
     with Not_found ->
-      Kernel.fatal ~current:true "Unsupported %s extension named '%a%s'"
-        data
-        (Pretty_utils.pp_opt ~pre:"\\" ~suf:"::" Format.pp_print_string) plugin
-        name
+      Kernel.fatal ~current:true "Unsupported %s extension named '\\%s::%s'"
+        data plugin name
 
   let get_plugin_common (e : extension_common) = e.plugin
 
@@ -235,20 +211,17 @@ module Extensions = struct
     find_gen ~get_plugin:get_plugin_block "clause" ext_block_tbl
 
   let find_importer =
-    find_gen ~get_plugin:get_plugin_importer "importer" ext_importer_tbl
+    find_gen ~get_plugin:get_plugin_importer "module importer" ext_importer_tbl
 
-  (* [Logic_lexer] can ask for something that is not a category, which is not
-     a fatal error so we do not caught the Not_found exception. *)
-  let category ~plugin name =
-    (find ~get_plugin:get_plugin_common ext_tbl ~plugin name).category
+  let category ~plugin name = (find_common ~plugin name).category
 
   let importer ~plugin name = (find_importer ~plugin name).importer
 
-  let is_extension = mem ~get_plugin:get_plugin_common ext_tbl
+  let is_extension = mem_gen ~get_plugin:get_plugin_common ext_tbl
 
-  let is_extension_block = mem ~get_plugin:get_plugin_block ext_block_tbl
+  let is_extension_block = mem_gen ~get_plugin:get_plugin_block ext_block_tbl
 
-  let is_importer = mem ~get_plugin:get_plugin_importer ext_importer_tbl
+  let is_importer = mem_gen ~get_plugin:get_plugin_importer ext_importer_tbl
 
   let fullname plugin name =
     if Datatype.String.equal plugin "kernel"
@@ -263,13 +236,13 @@ module Extensions = struct
       make ~plugin name cat ?preprocessor typer
         ?visitor ?printer ?short_printer ?is_same_ext status
     in
-    if is_extension ~plugin:(Some "kernel") name then
+    if is_extension ~plugin:"kernel" name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
         "Trying to register ACSL extension %s reserved by frama-c. \
          Rename this extension to avoid conflict with the kernel. Ignored \
          extension" name
     else begin
-      if is_extension ~plugin:(Some plugin) name then
+      if is_extension ~plugin name then
         Kernel.warning ~wkey:Kernel.wkey_acsl_extension
           "Trying to register ACSL extension %s twice with plugin %s. \
            Ignoring the second extension"
@@ -287,13 +260,13 @@ module Extensions = struct
   let register_module_importer ~plugin name importer =
     Kernel.debug ~dkey:Kernel.dkey_acsl_extension
       "Registering module importer extension %s" (fullname plugin name);
-    if is_importer ~plugin:(Some "kernel") name then
+    if is_importer ~plugin:"kernel" name then
       Kernel.warning ~wkey:Kernel.wkey_acsl_extension
         "Trying to register module importer extension %s reserved by frama-c. \
          Rename to avoid conflict with the kernel. Ignored module importer" name
     else
       begin
-        if is_importer ~plugin:(Some plugin) name then
+        if is_importer ~plugin name then
           Kernel.warning ~wkey:Kernel.wkey_acsl_extension
             "Trying to register module importer extension %s twice with plugin \
              %s. Ignoring the second extension" name plugin
@@ -350,6 +323,24 @@ module Extensions = struct
   let is_same_ext ~plugin name ext1 ext2 =
     let is_same = (find_common ~plugin name).is_same_ext in
     is_same ext1 ext2
+
+  let find_plugin ~get_plugin tbl ~plugin name =
+    match plugin with
+    | Some plugin ->
+      if mem_gen ~get_plugin tbl ~plugin name then plugin
+      else raise Not_found
+    | None ->
+      match Hashtbl.find_opt tbl name with
+      | None -> raise Not_found
+      | Some [] -> assert false
+      | Some [e] -> get_plugin e
+      | Some l -> throw_ambiguity_error ~get_plugin name l
+
+  let extension_from ?plugin name =
+    find_plugin ~get_plugin:get_plugin_common ext_tbl ~plugin name
+
+  let importer_from ?plugin name =
+    find_plugin ~get_plugin:get_plugin_importer ext_importer_tbl ~plugin name
 end
 
 (* Registration functions *)
@@ -380,7 +371,9 @@ let () =
     ~is_importer:Extensions.is_importer
     ~preprocess: Extensions.preprocess
     ~is_extension_block: Extensions.is_extension_block
-    ~preprocess_block: Extensions.preprocess_block;
+    ~preprocess_block: Extensions.preprocess_block
+    ~extension_from: Extensions.extension_from
+    ~importer_from: Extensions.importer_from;
   Logic_typing.set_extension_handler
     ~is_extension: Extensions.is_extension
     ~typer: Extensions.typing

@@ -49,13 +49,14 @@ module A::B {
  */
 /*@ predicate check5(X::t x) = X::check(x, 0);
  */
-/*@ // import bar:
-    module X::Y {
-      type t;
-      
-      predicate check(t x, ℤ k) ;
-      
-      }
+/*@
+// import \myplugin1::bar:
+module X::Y {
+  type t;
+  
+  predicate check(t x, ℤ k) ;
+  
+  }
  */
 /*@ predicate check6(X::Y::t x) = X::Y::check(x, 0);
  */

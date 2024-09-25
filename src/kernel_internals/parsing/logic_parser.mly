@@ -290,8 +290,7 @@
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token ADMIT_REQUIRES ADMIT_LOOP ADMIT_INVARIANT ADMIT_LEMMA
 %token ADMIT_ENSURES ADMIT_EXITS ADMIT_CONTINUES ADMIT_BREAKS ADMIT_RETURNS
-%token <string> EXT_LOADER
-%token <string * string option> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT EXT_LOADER_PLUGIN
+%token <string * string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT EXT_LOADER EXT_LOADER_PLUGIN
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
@@ -953,7 +952,7 @@ full_identifier:
 | id = EXT_CONTRACT { fst id }
 | id = EXT_GLOBAL { fst id }
 | id = EXT_GLOBAL_BLOCK { fst id }
-| id = EXT_LOADER { id }
+| id = EXT_LOADER { fst id }
 | id = EXT_LOADER_PLUGIN { fst id }
 | id = IDENTIFIER_EXT { id }
 | id = IDENTIFIER_LOADER { id }
@@ -1726,7 +1725,7 @@ ext_loader:
       "Ignoring unregistered module importer extension '%s'" $1;
     raise Unknown_ext
   }
-| EXT_LOADER COLON  { $1, None }
+| EXT_LOADER COLON  { $1 }
 | EXT_LOADER_PLUGIN { $1 }
 | IDENTIFIER_LOADER { raise Unknown_ext }
 
@@ -1997,7 +1996,7 @@ is_acsl_decl_or_code_annot:
 | EXT_CODE_ANNOT { fst $1 }
 | EXT_GLOBAL { fst $1 }
 | EXT_GLOBAL_BLOCK { fst $1 }
-| EXT_LOADER { $1 }
+| EXT_LOADER { fst $1 }
 | EXT_LOADER_PLUGIN { fst $1 }
 | IDENTIFIER_EXT { $1 }
 | IDENTIFIER_LOADER { $1 }

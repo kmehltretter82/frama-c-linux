@@ -4340,10 +4340,8 @@ struct
         | Some (name', plugin'), oldloc ->
           if plugin <> plugin' || name <> name' then
             C.error loc
-              "Module %s already imported with loader %a%s (at %a)"
-              id
-              (Pretty_utils.pp_opt ~pre:"\\" ~suf:"::" Format.pp_print_string) plugin'
-              name'
+              "Module %s already imported with loader \\%s::%s (at %a)"
+              id plugin' name'
               Cil_printer.pp_location oldloc
           else None
         | exception Not_found ->

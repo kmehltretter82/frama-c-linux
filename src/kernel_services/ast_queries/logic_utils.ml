@@ -722,7 +722,6 @@ let is_annot_next_stmt c =
           "%s is not a code annotation extension" ext_name)
     in
     (match Logic_env.extension_category ~plugin:ext_plugin ext_name with
-     | exception Not_found -> warn_not_a_code_annot () ; false
      | Ext_code_annot (Ext_here | Ext_next_loop)-> false
      | Ext_code_annot Ext_next_stmt-> true
      | Ext_code_annot Ext_next_both-> not is_loop

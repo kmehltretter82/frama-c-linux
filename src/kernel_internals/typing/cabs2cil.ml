@@ -9823,12 +9823,6 @@ and doBody local_env (blk: Cabs.block) : chunk =
                      (Logic_ptree.AExtended(_,is_loop,(name,plugin,_)),loc) ->
                    let source = fst loc in
                    (match Logic_env.extension_category ~plugin name, is_loop with
-                    | exception Not_found ->
-                      Kernel.(
-                        warning
-                          ~source ~wkey:wkey_acsl_extension
-                          "%s is not a known extension" name);
-                      [], false
                     | Ext_code_annot Ext_here, false -> [], false
                     | Ext_code_annot Ext_next_stmt, false -> [], true
                     | Ext_code_annot Ext_next_loop, true -> [], false
