@@ -62,6 +62,7 @@ module Plugins = struct
         try
           load p
         with e ->
+          (* We don't have access to Kernel's log mechanisms here. *)
           Format.printf "Warning: failed to load plugin '%s' (exception: %s)@."
             p (Printexc.to_string e);
           Format.printf "         Try recompiling it or \
