@@ -1,7 +1,7 @@
 /* run.config
  MODULE: @PTEST_NAME@
  EXIT: 1
-   STDOPT: +"-no-autoload-plugins"
+   STDOPT:
 */
 
 

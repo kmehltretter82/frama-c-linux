@@ -6401,14 +6401,14 @@ and doExp local_env
                     "Function %s is a ghost symbol. \
                      It cannot be used in non-ghost context. \
                      Did you forget a /*@@ ghost ... /?" n ;
-                Kernel.debug ~level:3
+                Kernel.debug ~dkey:Kernel.dkey_typing_global
                   "Calling function %s without prototype." n ;
                 let ftype = TFun(intType, None, false,
                                  [Attr("missingproto",[])]) in
                 (* Add a prototype to the environment *)
                 let proto, _ =
                   makeGlobalVarinfo false
-                    (makeGlobalVar ~temp:false n ftype) in
+                    (makeGlobalVar ~temp:false ~loc:f.expr_loc n ftype) in
                 (* Make it EXTERN *)
                 proto.vstorage <- Extern;
                 proto.vdecl <- f.expr_loc;
