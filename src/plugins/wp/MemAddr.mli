@@ -52,11 +52,23 @@ val global : term -> term
 val shift : term -> term -> term
 (** [shift (a: addr) (k: int) : addr = { a with offset = a.offset + k } ]*)
 
+(** {2 Comparisons} *)
+
 val addr_lt : term -> term -> pred
 (** [addr_lt(a: addr) (b: addr) = a < b] *)
 
 val addr_le : term -> term -> pred
 (** [addr_le(a: addr) (b: addr) = a <= b] *)
+
+(** {2 Physical addresses} *)
+
+val static_alloc : term -> pred
+(** [statically_allocated (base: int)]
+    The base has an associated static allocation, guaranteeing that the
+    addresses that use this base can be translated to integers and back.
+
+    @since Frama-C+dev
+*)
 
 val addr_of_int : term -> term
 (** [addr_of_int(i: int) : addr]
@@ -67,6 +79,17 @@ val int_of_addr : term -> term
 (** [int_of_addr (a: addr) : int]
     Abstract: Conversion from address to integer
 *)
+
+val in_uintptr_range : term -> pred
+(** [in_uintptr_range (a: addr)] =
+    [statically_allocated(a.base) -> in_range(int_of_addr a)]
+
+    Assuming that the base of a statically exists, the conversion of the pointer
+    to a an integer produces a value that fits in [uintptr_t].
+
+    @since Frama-C+dev
+*)
+
 
 val base_offset : term -> term -> term
 (** [base_offset(base: int)(offset: int) : int]

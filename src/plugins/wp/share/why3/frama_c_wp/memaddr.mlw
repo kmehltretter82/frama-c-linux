@@ -136,8 +136,28 @@ theory MemAddr
 
   (* Physical Address *)
 
+  function static_malloc int : int
+
+  predicate statically_allocated (base: int) =
+    base = 0 \/ static_malloc base > 0
+
+  (* Note: for now, we cannot prove that but Why3 does not see that the function
+     statically allocated uses static_malloc which is abstract. *)
+  lemma valid_pointers_are_statically_allocated:
+    forall a: addr, m: malloc, n: int.
+      valid_rd m a n -> statically_allocated (a.base)
+
   function int_of_addr addr: int
   function addr_of_int int: addr
+
+  axiom addr_of_null :
+    int_of_addr null = 0
+
+  axiom addr_of_int_bijection :
+    forall p:addr.
+      statically_allocated p.base -> addr_of_int (int_of_addr p) = p
+
+  (* Table of offsets *)
 
   type table (* abstract for now, but can be more elaborated later on *)
   function table_of_base int: table
@@ -149,14 +169,5 @@ theory MemAddr
   axiom table_to_offset_monotonic:
     forall t: table. forall o1 o2: int.
       o1 <= o2 <-> table_to_offset t o1 <= table_to_offset t o2
-
-  axiom int_of_addr_bijection :
-    forall a:int. int_of_addr (addr_of_int a) = a
-
-  axiom addr_of_int_bijection :
-    forall p:addr. addr_of_int (int_of_addr p) = p
-
-  axiom addr_of_null :
-    int_of_addr null = 0
 
 end
