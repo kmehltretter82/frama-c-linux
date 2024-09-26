@@ -1405,12 +1405,13 @@ end
 
 let rec compare_logic_type config v1 v2 =
   let rank = function
-    | Linteger -> 0
-    | Lreal -> 1
-    | Ctype _ -> 2
-    | Lvar _ -> 3
-    | Ltype _ -> 4
-    | Larrow _ -> 5
+    | Lboolean -> 0
+    | Linteger -> 1
+    | Lreal -> 2
+    | Ctype _ -> 3
+    | Lvar _ -> 4
+    | Ltype _ -> 5
+    | Larrow _ -> 6
   in
   let v1 = if config.unroll then !punrollLogicType v1 else v1 in
   let v2 = if config.unroll then !punrollLogicType v2 else v2 in
@@ -1426,6 +1427,7 @@ let rec compare_logic_type config v1 v2 =
       if c <> 0 then c
       else compare_list (compare_logic_type config) ts1 ts2
     | Lvar x1, Lvar x2 -> Datatype.String.compare x1 x2
+    | Lboolean, Lboolean -> 0
     | Linteger, Linteger -> 0
     | Lreal, Lreal -> 0
     | Larrow(l1, t1), Larrow(l2, t2) ->
@@ -1434,8 +1436,9 @@ let rec compare_logic_type config v1 v2 =
     | _ -> assert false
 
 let rec hash_logic_type config = function
-  | Linteger -> 0
-  | Lreal -> 1
+  | Lboolean -> 0
+  | Linteger -> 1
+  | Lreal -> 2
   | Ctype ty -> hash_type config ty
   | Ltype({ lt_def = Some (LTsyn t)},_) when config.unroll ->
     hash_logic_type config t
@@ -1593,19 +1596,21 @@ let compare_logic_real r1 r2 =
         String.compare r1.r_literal r2.r_literal
 
 let compare_logic_constant c1 c2 = match c1,c2 with
+  | Boolean b1, Boolean b2 -> compare b1 b2
   | Integer (i1,_), Integer(i2,_) -> Integer.compare i1 i2
   | LStr s1, LStr s2 -> Datatype.String.compare s1 s2
   | LWStr s1, LWStr s2 -> compare_list Datatype.Int64.compare s1 s2
   | LChr c1, LChr c2 -> Datatype.Char.compare c1 c2
   | LReal r1, LReal r2 -> compare_logic_real r1 r2
   | LEnum e1, LEnum e2 -> Enumitem.compare e1 e2
+  | Boolean _,(Integer _ | LStr _|LWStr _ |LChr _|LReal _|LEnum _) -> 1
   | Integer _,(LStr _|LWStr _ |LChr _|LReal _|LEnum _) -> 1
   | LStr _ ,(LWStr _ |LChr _|LReal _|LEnum _) -> 1
   | LWStr _ ,(LChr _|LReal _|LEnum _) -> 1
   | LChr _,(LReal _|LEnum _) -> 1
   | LReal _,LEnum _ -> 1
-  | (LStr _|LWStr _ |LChr _|LReal _|LEnum _),
-    (Integer _|LStr _|LWStr _ |LChr _|LReal _) -> -1
+  | (Integer _ |LStr _|LWStr _ |LChr _|LReal _|LEnum _),
+    (Boolean _ |Integer _|LStr _|LWStr _ |LChr _|LReal _) -> -1
 
 let rec compare_term t1 t2 =
   let r1 = rank_term t1.term_node in
@@ -1813,6 +1818,7 @@ let hash_logic_constant = function
   | LStr s -> Datatype.String.hash s
   | LWStr l -> hash_list Datatype.Int64.hash l
   | LChr c  -> Datatype.Char.hash c
+  | Boolean b -> Datatype.Bool.hash b
   | Integer(n, _) -> Integer.hash n
   | LReal r ->
     if is_exact_float r then Datatype.Float.hash r.r_lower

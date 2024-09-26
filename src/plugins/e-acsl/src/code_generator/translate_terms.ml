@@ -51,6 +51,8 @@ let constant_to_exp ~loc env t c =
     Cil.mkString ~loc s, Analyses_types.Str_R
   in
   match c with
+  | Boolean b ->
+    (if b then Cil.one ~loc else Cil.zero ~loc), Analyses_types.C_number
   | Integer(n, _repr) ->
     let logic_env = Env.Logic_env.get env in
     let ity = Typing.get_number_ty ~logic_env t in

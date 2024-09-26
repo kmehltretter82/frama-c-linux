@@ -272,6 +272,8 @@ let env_of_li ~adata ~loc kf env li =
       | Real -> Error.not_yet "real number"
     in
     adata, Env.add_stmt env stmt
+  | Lboolean ->
+    Env.not_yet env "booleans"
   | Ltype _ ->
     Env.not_yet env "user-defined logic type"
   | Lvar _ ->

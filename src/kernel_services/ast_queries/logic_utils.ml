@@ -33,7 +33,8 @@ let rec unroll_type ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
     unroll_type ~unroll_typedef (Logic_const.unroll_ltdef ty)
   | Ctype ty when unroll_typedef -> Ctype (Cil.unrollType ty)
-  | Linteger | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty  -> ty
+  | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
+    ty
 
 let is_instance_of vars t1 t2 =
   let rec aux map t1 t2 =
@@ -56,7 +57,7 @@ let is_instance_of vars t1 t2 =
         (Cil.typeDeepDropAllAttributes t1)
         (Cil.typeDeepDropAllAttributes t2),
       map
-    | (Lvar _ | Ctype _ | Linteger | Lreal | Ltype _ | Larrow _), _ ->
+    | (Lvar _ | Ctype _ | Lboolean | Linteger | Lreal | Ltype _ | Larrow _), _ ->
       Cil_datatype.Logic_type.equal t1 t2, map
   and aux_list map l1 l2 =
     match l1, l2 with
@@ -290,6 +291,8 @@ let constant_to_lconstant c = match c with
     LReal (real_of_float s f)
 
 let lconstant_to_constant c = match c with
+  | Boolean b ->
+    CInt64 ((if b then Integer.one else Integer.zero), IBool, None)
   | Integer (i,s) ->
     begin
       try
@@ -379,8 +382,7 @@ let is_zero_comparable t =
   match unroll_type t.term_type with
   | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TEnum _) -> true
   | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _) -> false
-  | Linteger | Lreal -> true
-  | Ltype ({lt_name},[]) -> lt_name = Utf8_logic.boolean
+  | Linteger | Lreal | Lboolean -> true
   | Ltype _ -> false
   | Lvar _ | Larrow _ -> false
 
@@ -393,8 +395,7 @@ let scalar_term_conversion conversion t =
   let ptr_conversion t =
     conversion ~loc false t (Logic_const.term ~loc Tnull t.term_type) in
   let bool_conversion t =
-    let ctrue = Logic_env.Logic_ctor_info.find "\\true" in
-    conversion ~loc true t (term ~loc (TDataCons(ctrue,[])) boolean_type) in
+    conversion ~loc true t (Logic_const.tboolean ~loc true) in
   match unroll_type t.term_type with
   | Ctype (TInt _ | TEnum _) -> int_conversion t
   | Ctype (TFloat _) as ltyp -> real_conversion ~ltyp t
@@ -405,8 +406,7 @@ let scalar_term_conversion conversion t =
   (* decay as pointer *)
   | Linteger -> int_conversion t
   | Lreal -> real_conversion t
-  | Ltype ({lt_name = name},[]) when name = Utf8_logic.boolean ->
-    bool_conversion t
+  | Lboolean -> bool_conversion t
   | Ltype _ | Lvar _ | Larrow _
   | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _)
     -> Kernel.fatal
@@ -421,7 +421,7 @@ let scalar_term_to_predicate =
 let scalar_term_to_boolean =
   let conversion ~loc is_eq t1 t2 =
     let op = if is_eq then Eq else Ne in
-    term ~loc (TBinOp(op,t1,t2)) Logic_const.boolean_type
+    term ~loc (TBinOp(op,t1,t2)) Lboolean
   in
   scalar_term_conversion conversion
 
@@ -545,7 +545,7 @@ and offset_to_term_offset = function
 
 and expr_to_boolean e =
   let open Cil_types in
-  let tbool n = Logic_const.term n Logic_const.boolean_type in
+  let tbool n = Logic_const.term n Lboolean in
   let tnot t = tbool @@ TUnOp(LNot, t) in
   let tcompare op a b =
     let va = expr_to_term ~coerce:true a in
@@ -1280,6 +1280,7 @@ let rec is_same_pl_type t1 t2 =
   let open Logic_ptree in
   match t1, t2 with
   | LTvoid, LTvoid
+  | LTboolean, LTboolean
   | LTinteger, LTinteger
   | LTreal, LTreal -> true
   | LTint k1, LTint k2 ->
@@ -1315,7 +1316,7 @@ let rec is_same_pl_type t1 t2 =
     is_same_list is_same_pl_type prms1 prms2 && is_same_pl_type t1 t2
   | LTattribute(t1,attr1), LTattribute(t2,attr2) ->
     is_same_pl_type t1 t2 && attr1 = attr2
-  | (LTvoid | LTinteger | LTreal | LTint _ | LTfloat _ | LTarrow _
+  | (LTvoid | LTboolean | LTinteger | LTreal | LTint _ | LTfloat _ | LTarrow _
     | LTarray _ | LTpointer _ | LTenum _
     | LTunion _ | LTnamed _ | LTstruct _ | LTattribute _),_ ->
     false
@@ -2209,7 +2210,7 @@ let lhost_c_type thost =
       | Ctype typ -> Some typ
       | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
         get (unroll_ltdef ty)
-      | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ -> None
+      | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
     in
     match Logic_const.plain_or_set get lty with
     | None ->
@@ -2394,6 +2395,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
   | TUnOp(unop, e) -> constFoldUnOpToInt ~machdep unop e
   | TConst(LChr c) -> Some (charConstToInt c)
   | TConst(LEnum {eival = v}) -> Cil.constFoldToInt ~machdep v
+  | TConst (Boolean b) -> Some (if b then Z.one else Z.zero)
   | TConst (Integer (i, _)) -> Some i
   | TConst (LReal _ | LWStr _ | LStr _) -> None
   | TSizeOf typ -> constFoldSizeOfToInt ~machdep typ

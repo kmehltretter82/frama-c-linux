@@ -49,6 +49,10 @@ let rec print_logic_type name fmt typ =
     in
     print_logic_type (Some pname) fmt t
   | LTvoid -> fprintf fmt "void%t" pname
+  | LTboolean ->
+    fprintf fmt "%s%t"
+      (if Kernel.Unicode.get () then Utf8_logic.boolean else "boolean")
+      pname
   | LTinteger ->
     fprintf fmt "%s%t"
       (if Kernel.Unicode.get () then Utf8_logic.integer else "integer")

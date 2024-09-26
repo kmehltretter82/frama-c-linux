@@ -47,6 +47,7 @@ open Cil_types
 (* Types *)
 
 let voidType = TVoid([])
+let boolType = TInt(IBool,[])
 let intType = TInt(IInt,[])
 let uintType = TInt(IUInt,[])
 let shortType = TInt(IShort, [])
@@ -192,4 +193,3 @@ let make_logic_type name = {
   lt_def = None ;
   lt_attr = [] ;
 }
-

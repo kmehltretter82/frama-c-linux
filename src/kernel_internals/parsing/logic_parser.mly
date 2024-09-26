@@ -872,7 +872,7 @@ tabs:
 type_spec(tname):
 | INTEGER        { LTinteger }
 | REAL           { LTreal }
-| BOOLEAN        { LTnamed (Utf8_logic.boolean,[]) }
+| BOOLEAN        { LTboolean }
 | VOID           { LTvoid }
 | BOOL           { LTint IBool }
 | CHAR           { LTint IChar }       /** [char] */

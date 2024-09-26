@@ -222,8 +222,7 @@ end = struct
            let v =
              match v.lv_type with
              | Ctype ty when Cil.isIntegralType ty -> v
-             | Linteger -> v
-             | Ltype _ as ty when Logic_const.is_boolean_type ty -> v
+             | Linteger | Lboolean -> v
              | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ ->
                Error.not_yet
                  (error_msg

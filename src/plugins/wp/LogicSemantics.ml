@@ -284,7 +284,7 @@ struct
   let eqsort_of_type t =
     match Logic_utils.unroll_type ~unroll_typedef:false t with
     | Ltype({lt_name="set"},[_]) -> EQ_set
-    | Linteger | Lreal | Lvar _ | Larrow _ | Ltype _ -> EQ_plain
+    | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ | Ltype _ -> EQ_plain
     | Ctype t ->
       match Ctypes.object_of t with
       | C_pointer _ -> EQ_loc
@@ -462,6 +462,7 @@ struct
 
   let rec cvsort_of_ltype src_ltype =
     match Logic_utils.unroll_type ~unroll_typedef:false src_ltype with
+    | Lboolean -> L_bool
     | Linteger -> L_integer
     | Lreal -> L_real
     | Ctype src_ctype ->
@@ -598,14 +599,14 @@ struct
       L.map Cmath.int_of_bool (C.logic env t)
     | L_real | L_cfloat _ | L_pointer _ | L_array _ ->
       Warning.error "@[Logic cast from (%a) to (%a) not implemented yet@]"
-        Printer.pp_logic_type src_ltype Printer.pp_logic_type Logic_const.boolean_type
+        Printer.pp_logic_type src_ltype Printer.pp_logic_type Lboolean
 
   let rec term_cast_to_ltype env dst_ltype t =
     match Logic_utils.unroll_type ~unroll_typedef:false dst_ltype with
     | Ctype typ-> term_cast_to_ctype env typ t
+    | Lboolean -> term_cast_to_boolean env t
     | Linteger -> term_cast_to_integer env t
     | Lreal -> term_cast_to_real env t
-    | Ltype _ as b when Logic_const.is_boolean_type b -> term_cast_to_boolean env t
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting, set of elements ? *)
       term_cast_to_ltype env elt_ltype t
     | (Ltype _ | Lvar _ | Larrow _) as dst_ltype ->
@@ -690,9 +691,6 @@ struct
 
     | Tlambda _ ->
       Warning.error "Lambda-functions not yet implemented"
-
-    | TDataCons({ctor_name="\\true"},_) -> Vexp(e_true)
-    | TDataCons({ctor_name="\\false"},_) -> Vexp(e_false)
 
     | TDataCons(c,ts) ->
       let es = List.map (val_of_term env) ts in

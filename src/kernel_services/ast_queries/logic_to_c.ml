@@ -32,8 +32,7 @@ let rec logic_type_to_typ = function
   | Linteger -> TInt(ILongLong,[]) (*TODO: to have an unlimited integer type
                                      in the logic interpretation*)
   | Lreal -> TFloat(FDouble,[]) (* TODO: handle reals, not floats... *)
-  | Ltype({lt_name = name},[]) when name = Utf8_logic.boolean  ->
-    TInt(ILongLong,[])
+  | Lboolean  -> TInt(ILongLong,[])
   | Ltype({lt_name = "set"},[t]) -> logic_type_to_typ t
   | Ltype _ | Lvar _ | Larrow _ -> error_lval ()
 

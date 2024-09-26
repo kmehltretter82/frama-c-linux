@@ -53,9 +53,6 @@ let init =
         (*
           let tvar v = new_identified_term (tvar v) in
          *)
-        let boolean =
-          { lt_name=Utf8_logic.boolean; lt_params=[]; lt_def=None; lt_attr=[] }
-        in
         let set =
           { lt_name = "set"; lt_params=["elem"]; lt_def=None; lt_attr=[] }
         in
@@ -72,7 +69,7 @@ let init =
           {lt_name = "rounding_mode"; lt_params = []; lt_def = None; lt_attr=[]}
         in
         List.iter (fun x -> Logic_env.add_builtin_logic_type x.lt_name x)
-          [ boolean; set; typetag; sign; float_format; rounding_mode ];
+          [ set; typetag; sign; float_format; rounding_mode ];
         (* constructors *)
         List.iter
           (fun (typename, constrs) ->
@@ -88,15 +85,13 @@ let init =
                  constrs
              in
              typename.lt_def <- Some (LTsum l))
-          [ boolean, ["\\true"; "\\false"];
-            sign , [ "\\Positive"; "\\Negative"] ;
+          [ sign , [ "\\Positive"; "\\Negative"] ;
             float_format, [ "\\Single"; "\\Double"; "\\Quad" ] ;
             rounding_mode, [ "\\Up"; "\\Down"; "\\ToZero"; "\\NearestAway";
                              "\\NearestEven" ];
           ];
         (* logic types used by the builtins *)
         let a_name, a_type = polymorphic_type "a" in
-        let boolean = Ltype(boolean,[]) in
         let sign = Ltype(sign,[]) in
         let float_format = Ltype(float_format,[]) in
         let rounding_mode = Ltype(rounding_mode,[]) in
@@ -255,7 +250,7 @@ let init =
                           "f",(Larrow ([Linteger],Lreal))], Lreal ;
             "\\numof", [], ["min",Linteger;
                             "max", Linteger;
-                            "f",(Larrow ([Linteger],boolean))], Linteger ;
+                            "f",(Larrow ([Linteger],Lboolean))], Linteger ;
 
 
             (* for floats special values *)

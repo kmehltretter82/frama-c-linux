@@ -259,7 +259,7 @@ module rec Transfer
 
   let may_alias li = match li.l_var_info.lv_type with
     | Ctype ty -> is_ptr_or_array ty
-    | Linteger | Lreal -> false
+    | Lboolean | Linteger | Lreal -> false
     | Ltype _ -> Error.not_yet "user defined type"
     | Lvar _ -> Error.not_yet "named type"
     | Larrow _ -> Error.not_yet "functional type"

@@ -111,7 +111,8 @@ let typ_of_lty = function
   | Ctype cty -> cty
   | Linteger -> Gmp_types.Z.t ()
   | Lreal -> Error.not_yet "real type"
-  | Ltype _ | Lvar _ | Larrow _ -> Options.fatal "unexpected logic type"
+  | Lboolean | Ltype _ | Lvar _ | Larrow _ ->
+    Options.fatal "unexpected logic type"
 
 (******************************************************************************)
 (** Memoization *)
@@ -277,6 +278,7 @@ let ty_of_logic_ty ?term ~profile lty =
     | Ctype ty -> number_ty_of_typ ~post:false ty
     | Lreal -> Real
     | Larrow _ -> Nan
+    | Lboolean -> Error.not_yet "boolean logic type"
     | Ltype _ -> Error.not_yet "user-defined logic type"
     | Lvar _ -> Error.not_yet "type variable"
   in
@@ -361,7 +363,7 @@ let rec type_term
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
     match t.term_node with
-    | TConst (Integer _ | LChr _ | LEnum _ | LReal _)
+    | TConst (Boolean _ | Integer _ | LChr _ | LEnum _ | LReal _)
     | TSizeOf _
     | TSizeOfStr _
     | TAlignOf _ ->
@@ -521,7 +523,7 @@ let rec type_term
               |_ -> if Options.Gmp_only.get() then Some Gmpz else None
             end
           | Lreal -> Some Real
-          | Ctype _| Ltype _| Larrow _ | Lvar _ -> None
+          | Lboolean | Ctype _ | Ltype _ | Larrow _ | Lvar _ -> None
         in
         ignore
           (type_term
@@ -615,7 +617,7 @@ let rec type_term
                          | TNamed _
                          | TComp _
                          | TBuiltin_va_list _))
-           | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+           | Some (Lboolean | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
              ty_of_interv
                ?ctx:ctx_body
                ~use_gmp_opt:(gmp && use_gmp_opt)
@@ -909,7 +911,7 @@ let extract_typ t ty =
   with Not_a_number ->
   match t.term_type with
   | Ctype _ as lty -> Logic_utils.logicCType lty
-  | Linteger | Lreal ->
+  | Lboolean | Linteger | Lreal ->
     Options.fatal "unexpected context NaN for term %a" Printer.pp_term t
   | Ltype _ -> Error.not_yet "unsupported logic type: user-defined type"
   | Lvar _ -> Error.not_yet "unsupported logic type: type variable"

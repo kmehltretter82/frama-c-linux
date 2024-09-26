@@ -2358,6 +2358,8 @@ class cil_printer () = object (self)
     (* ******************************************************************* *)
 
   method logic_constant fmt = function
+    | Boolean true -> self#pp_acsl_keyword fmt "\\true"
+    | Boolean false -> self#pp_acsl_keyword fmt "\\false"
     | Integer(_, Some s) when print_as_source s ->
       fprintf fmt "%s" s (* Always print the text if there is one, unless
                             we want to print it as hexa *)
@@ -2389,6 +2391,11 @@ class cil_printer () = object (self)
     in
     function
     | Ctype typ -> self#typ name fmt typ
+    | Lboolean ->
+      let res =
+        if Kernel.Unicode.get () then Utf8_logic.boolean else "boolean"
+      in
+      Format.fprintf fmt "%s%t" res pname
     | Linteger ->
       let res =
         if Kernel.Unicode.get () then Utf8_logic.integer else "integer"
@@ -2397,11 +2404,6 @@ class cil_printer () = object (self)
     | Lreal ->
       let res =
         if Kernel.Unicode.get () then Utf8_logic.real else "real"
-      in
-      Format.fprintf fmt "%s%t" res pname
-    | Ltype ({ lt_name = name},[]) when name = Utf8_logic.boolean ->
-      let res =
-        if Kernel.Unicode.get () then Utf8_logic.boolean else "boolean"
       in
       Format.fprintf fmt "%s%t" res pname
     | Ltype (s,l) ->

@@ -48,6 +48,10 @@ open Cil_types
 (** void *)
 val voidType: typ
 
+(** bool
+    @since Frama-C+dev *)
+val boolType: typ
+
 (** int
     @since Frama-C+dev *)
 val intType: typ

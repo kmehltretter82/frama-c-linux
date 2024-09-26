@@ -854,15 +854,13 @@ struct
   let rec logic_type t =
     match Logic_utils.unroll_type ~unroll_typedef:false t with
     | Ctype _ -> ()
-    | Linteger | Lreal | Lvar _ | Larrow _ -> ()
+    | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> ()
     | Ltype(lt,ps) ->
       List.iter logic_type ps ;
       if not (Typedefs.mem lt) then
         begin
           Typedefs.update lt None ;
-          if not (Lang.is_builtin lt) &&
-             not (Logic_const.is_boolean_type t)
-          then
+          if not (Lang.is_builtin lt) then
             let section = LogicUsage.section_of_type lt in
             let cluster = Definitions.section section in
             match section with

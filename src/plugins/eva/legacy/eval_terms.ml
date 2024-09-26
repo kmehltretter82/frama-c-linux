@@ -503,11 +503,10 @@ let rec isLogicNonCompositeType t =
   match t with
   | Lvar _ | Larrow _ -> false
   | Ltype (info, _) ->
-    Logic_const.is_boolean_type t ||
     info.lt_name = "sign" ||
     (try isLogicNonCompositeType (Logic_const.type_of_element t)
      with Failure _ -> false)
-  | Linteger | Lreal -> true
+  | Lboolean | Linteger | Lreal -> true
   | Ctype t -> Cil.isScalarType t
 
 let rec infer_type = function
@@ -517,6 +516,7 @@ let rec infer_type = function
      | TFloat _ -> Cil_const.doubleType
      | _ -> t)
   | Lvar _ -> Cil_const.voidPtrType (* For polymorphic empty sets *)
+  | Lboolean -> Cil_const.boolType
   | Linteger -> Cil_const.intType
   | Lreal -> Cil_const.doubleType
   | Ltype _ | Larrow _ as t ->
@@ -1008,6 +1008,8 @@ let rec eval_term ~alarm_mode env t =
     ignore (env_state env lab);
     eval_term ~alarm_mode { env with e_cur = lab } t
 
+  | TConst (Boolean true) -> einteger Cvalue.V.singleton_one
+  | TConst (Boolean false) -> einteger Cvalue.V.singleton_zero
   | TConst (Integer (v, _)) -> einteger (Cvalue.V.inject_int v)
   | TConst (LEnum e) ->
     (match Cil.constFoldToInt e.eival with
@@ -1318,8 +1320,6 @@ let rec eval_term ~alarm_mode env t =
       match ctor_info.ctor_name with
       | "\\Positive" -> einteger positive_cvalue
       | "\\Negative" -> einteger negative_cvalue
-      | "\\true" -> einteger Cvalue.V.singleton_one
-      | "\\false" -> einteger Cvalue.V.singleton_zero
       | _ -> unsupported "logic inductive types"
     end
 

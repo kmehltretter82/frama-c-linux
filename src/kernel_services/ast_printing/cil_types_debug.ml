@@ -596,6 +596,8 @@ and pp_if_loc_known prefix suffix fmt loc =
   else ()
 
 and pp_logic_constant fmt = function
+  | Boolean b ->
+    Format.fprintf fmt "Boolean(%b)" b
   | Integer(integer,string_option) ->
     Format.fprintf fmt "Integer(%a,%a)"  pp_integer integer  (pp_option pp_string) string_option
   | LStr(string) -> Format.fprintf fmt "LStr(%a)"  pp_string string
@@ -616,6 +618,7 @@ and pp_logic_type fmt = function
   | Ltype(logic_type_info,logic_type_list) ->
     Format.fprintf fmt "Ltype(%a,%a)"  pp_logic_type_info logic_type_info  (pp_list pp_logic_type) logic_type_list
   | Lvar(string) -> Format.fprintf fmt "Lvar(%a)"  pp_string string
+  | Lboolean -> Format.fprintf fmt "Lboolean"
   | Linteger -> Format.fprintf fmt "Linteger"
   | Lreal -> Format.fprintf fmt "Lreal"
   | Larrow(logic_type_list,logic_type) ->

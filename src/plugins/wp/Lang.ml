@@ -158,6 +158,7 @@ let sort_of_ctype t = sort_of_object (Ctypes.object_of t)
 let sort_of_ltype t = match Logic_utils.unroll_type ~unroll_typedef:false t with
   | Ctype typ -> sort_of_ctype typ
   | Ltype _ | Lvar _ | Larrow _ -> Logic.Sdata
+  | Lboolean -> Logic.Sbool
   | Linteger -> Logic.Sint
   | Lreal -> Logic.Sreal
 
@@ -215,6 +216,7 @@ let atype lt ts =
 
 let rec tau_of_ltype t =
   match Logic_utils.unroll_type ~unroll_typedef:false t with
+  | Lboolean -> Logic.Bool
   | Linteger -> Logic.Int
   | Lreal -> Logic.Real
   | Ctype typ -> tau_of_ctype typ
@@ -222,7 +224,6 @@ let rec tau_of_ltype t =
   | Larrow _ ->
     Warning.error "array type non-supported(%a)"
       Printer.pp_logic_type t
-  | Ltype _ as b when Logic_const.is_boolean_type b -> Logic.Bool
   | Ltype(lt,lts) -> atype lt (List.map tau_of_ltype lts)
 
 let tau_of_return = function None -> Logic.Prop | Some t -> tau_of_ltype t

@@ -1014,7 +1014,7 @@ struct
     | Ctype t -> t
     | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
       c_type_of loc (unroll_ltdef ty)
-    | Ltype _ | Linteger | Lreal | Lvar _ | Larrow _ ->
+    | Ltype _ | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ ->
       C.error loc "not a C type"
 
   let parseInt loc s =
@@ -1136,6 +1136,7 @@ struct
         | None -> ctxt.error loc "no such type %s" id
       end
 
+    | LTboolean -> Lboolean
     | LTinteger -> Linteger
     | LTreal -> Lreal
     | LTattribute (ty,attr) ->
@@ -1413,15 +1414,16 @@ struct
       with
       | Ctype oldt, Ctype newt ->
         c_mk_cast ~force e oldt newt
-      | t1, Ltype ({lt_name = name},[])
-        when name = Utf8_logic.boolean && is_integral_type t1 ->
-        let t2 = Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]) in
+      | t1, Lboolean when is_integral_type t1 ->
         let e = mk_cast e Linteger in
-        Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) t2
-      | t1, Linteger when Logic_const.is_boolean_type t1 && explicit ->
+        Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) Lboolean
+      | Lboolean, Linteger when explicit ->
         logic_coerce Linteger e
-      | t1, Ctype t2 when Logic_const.is_boolean_type t1
-                       && is_integral_type newt && explicit ->
+      | Lboolean, (Linteger|Lreal) ->
+        C.error loc "invalid implicit cast from %a to %a"
+          Cil_printer.pp_logic_type e.term_type
+          Cil_printer.pp_logic_type newt
+      | Lboolean, Ctype t2 when is_integral_type newt && explicit ->
         Logic_const.term ~loc (TCast (false, Ctype t2,e)) newt
       | ty1, Ltype({lt_name="set"},[ty2])
         when is_pointer_type ty1 &&
@@ -1438,14 +1440,14 @@ struct
       | _ , Ltype({lt_name =  "set"},[ ty2 ]) ->
         let e = mk_cast e ty2 in
         logic_coerce (make_set_type e.term_type) e
-      | Linteger, Linteger | Lreal, Lreal -> e
+      | Lboolean, Lboolean | Linteger, Linteger | Lreal, Lreal -> e
       | Linteger, Ctype t when isLogicPointerType newt && isLogicNull e ->
         c_mk_cast ~force e Cil_const.intType t
       | Linteger, (Ctype newt) | Lreal, (Ctype newt) when explicit ->
         Logic_utils.mk_cast ~loc newt e
       | Linteger, Ctype t when isIntegralType t ->
         (try C.integral_cast t e with Failure s -> C.error loc "%s" s)
-      | Linteger, Ctype _ | Lreal, Ctype _ ->
+      | Linteger, Ctype _ | Lreal, Ctype _ | Lboolean, Ctype _ ->
         C.error loc "invalid implicit cast from %a to C type %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt
@@ -1454,7 +1456,7 @@ struct
         Logic_const.term
           ~loc (Tapp(truncate_info,[], [logic_coerce Lreal e])) Linteger
       | Ctype t, Lreal when isArithmeticType t -> logic_coerce Lreal e
-      | Ctype _, (Lreal | Linteger) ->
+      | Ctype _, (Lreal | Linteger | Lboolean ) ->
         C.error loc "invalid implicit cast from %a to logic type %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt
@@ -1465,6 +1467,10 @@ struct
       | Lreal, Linteger ->
         C.error loc
           "invalid cast from real to integer. \
+           Use conversion functions instead"
+      | (Linteger | Lreal), Lboolean ->
+        C.error loc
+          "invalid cast arithmetic logic type to boolean. \
            Use conversion functions instead"
       | Larrow (args1,_), Larrow(args2,rt2) ->
         (match e.term_node with
@@ -1561,6 +1567,7 @@ struct
       else
         C.error loc "invalid implicit conversion from '%a' to '%a'"
           Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
+    | Ctype ty, Lboolean when Cil.isBoolType ty -> Lboolean, oterm
     | Ctype ty, Linteger when Cil.isIntegralType ty -> Linteger, oterm
     | Ctype ty, Lreal when Cil.isArithmeticType ty -> Lreal, oterm
     | Linteger, Lreal -> Lreal, oterm
@@ -1600,7 +1607,7 @@ struct
         else term
       in
       stype, term
-    | Linteger, Linteger | Lreal, Lreal -> ot, oterm
+    | Lboolean, Lboolean | Linteger, Linteger | Lreal, Lreal -> ot, oterm
     | Lvar s1, Lvar s2 when s1 = s2 -> ot, oterm
     | Larrow(args1,rt1), Larrow(args2,rt2)
       when List.length args1 = List.length args2 ->
@@ -1613,8 +1620,8 @@ struct
       in
       let rt,_ = implicit_conversion ~overloaded loc oterm rt1 rt2 in
       Larrow(args,rt), oterm
-    | ((Ctype _| Linteger | Lreal | Ltype _ | Lvar _ | Larrow _),
-       (Ctype _| Linteger | Lreal | Ltype _ | Lvar _ | Larrow _)) ->
+    | ((Ctype _| Lboolean | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _),
+       (Ctype _| Lboolean | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _)) ->
       if overloaded then raise Not_applicable
       else
         C.error loc "invalid implicit conversion from %a to %a"
@@ -1632,13 +1639,9 @@ struct
       else
         C.error loc "incompatible types %a and %a@."
           Cil_printer.pp_typ ot Cil_printer.pp_typ nt
-    | Ctype ot, (Ltype({lt_name = n},[]) as nt) when
-        n = Utf8_logic.boolean && Cil.isIntegralType ot -> nt
-    | Ltype({lt_name = n},[]) as ot, Ctype nt when
-        n = Utf8_logic.boolean && Cil.isIntegralType nt -> ot
-    | (Linteger, (Ltype({lt_name = n},[]) as t)
-      | (Ltype({lt_name = n},[]) as t), Linteger)
-      when n = Utf8_logic.boolean -> t
+    | Ctype ot, (Lboolean as nt) when Cil.isIntegralType ot -> nt
+    | Lboolean as ot, Ctype nt when Cil.isIntegralType nt -> ot
+    | (Linteger, (Lboolean as t) | (Lboolean as t), Linteger) -> t
     | Ltype(ot,oprms), Ltype(nt,nprms) when ot == nt ->
       let res =
         List.map2 (find_supertype ~overloaded loc t) oprms nprms
@@ -1659,6 +1662,7 @@ struct
     | Ctype ot, Linteger when Cil.isIntegralType ot -> Linteger
     | Ctype ot, Linteger when Cil.isPointerType ot && isLogicNull t ->
       Ctype ot
+    | Lboolean, Lboolean -> Lboolean
     | Linteger, Linteger -> Linteger
     | Linteger, Lreal -> Lreal
     | Linteger, Ctype nt when Cil.isArithmeticType nt -> Lreal
@@ -1672,7 +1676,7 @@ struct
       let ret = find_supertype ~overloaded loc t oret nret in
       let args = List.map2 (find_supertype ~overloaded loc t) nargs oargs in
       Larrow(args,ret)
-    | (Ctype _ | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _), _ ->
+    | (Ctype _ | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _), _ ->
       if overloaded then raise Not_applicable
       else
         C.error loc "incompatible types %a and %a"
@@ -1768,8 +1772,8 @@ struct
       env, make_set_type ot, make_set_type nt
     | t1,t2 when plain_boolean_type t1 && plain_boolean_type t2 ->
       env,ot,nt
-    | ((Ctype _ | Linteger | Lreal | Ltype ({lt_name = "boolean"},[])),
-       (Ctype _ | Linteger | Lreal | Ltype ({ lt_name = "boolean"},[]))) ->
+    | ((Ctype _ | Linteger | Lreal | Lboolean),
+       (Ctype _ | Linteger | Lreal | Lboolean)) ->
       env,ot,nt
     | (Ltype _|Larrow _|Lvar _), _ | _, (Larrow _| Ltype _|Lvar _) ->
       if overloaded then raise Not_applicable
@@ -1857,18 +1861,17 @@ struct
            Cil_printer.pp_logic_type t)
     | Ltype ({lt_name="set"} as lt,[t]) ->
       Ltype(lt,[logic_arithmetic_promotion t])
-    | Ltype _ | Lvar _ | Larrow _ ->
+    | Lboolean | Ltype _ | Lvar _ | Larrow _ ->
       Kernel.fatal ~current:true
         "logic arithmetic promotion on non-arithmetic type %a"
         Cil_printer.pp_logic_type t
 
   let rec integral_promotion t =
     match unroll_type t with
-    | Ctype ty when isIntegralType ty ->
-      Linteger
+    | Ctype ty when isIntegralType ty -> Linteger
     | Linteger -> Linteger
     | Ltype ({lt_name="set"} as lt,[t]) -> Ltype(lt,[integral_promotion t])
-    | Ltype _ | Lreal | Lvar _ | Larrow _ | Ctype _ ->
+    | Lboolean | Ltype _ | Lreal | Lvar _ | Larrow _ | Ctype _ ->
       Kernel.fatal ~current:true
         "logic integral promotion on non-integral type %a"
         Cil_printer.pp_logic_type t
@@ -1968,12 +1971,8 @@ struct
         when Cil.isArithmeticType t -> Lreal
       (* In ACSL, you can convert implicitely from integral to boolean =>
          prefer boolean as common type when doing comparison. *)
-      | Ltype({lt_name = name},[]), t
-        when is_integral_type t && name = Utf8_logic.boolean ->
-        Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[])
-      | t, Ltype({lt_name = name},[])
-        when is_integral_type t && name = Utf8_logic.boolean ->
-        Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[])
+      | Lboolean, t when is_integral_type t -> Lboolean
+      | t, Lboolean when is_integral_type t -> Lboolean
       | Lreal, Ctype ty | Ctype ty, Lreal when isArithmeticType ty -> Lreal
       | Ltype (s1,l1), Ltype (s2,l2)
         when s1.lt_name = s2.lt_name && List.for_all2 is_same_type l1 l2 ->
@@ -3083,16 +3082,11 @@ struct
     | PLrel (t1, (Eq | Neq | Lt | Le | Gt | Ge as op), t2) ->
       let env = drop_qualifiers env in
       let f _ op t1 t2 =
-        (TBinOp(binop_of_rel op, t1, t2),
-         Ltype(Logic_env.find_logic_type Utf8_logic.boolean,[]))
+        (TBinOp(binop_of_rel op, t1, t2), Lboolean)
       in
       type_relation ctxt env f t1 op t2
-    | PLtrue ->
-      let ctrue = Logic_env.find_logic_ctor "\\true" in
-      TDataCons(ctrue,[]), Ltype(ctrue.ctor_type,[])
-    | PLfalse ->
-      let cfalse = Logic_env.find_logic_ctor "\\false" in
-      TDataCons(cfalse,[]), Ltype(cfalse.ctor_type,[])
+    | PLtrue -> TConst(Boolean true), Lboolean
+    | PLfalse -> TConst(Boolean false), Lboolean
     | PLlambda(prms,e) ->
       let env = drop_qualifiers env in
       let (prms, env) = add_quantifiers ctxt loc ~kind:LVFormal prms env in
@@ -3101,17 +3095,17 @@ struct
     | PLnot t ->
       let env = drop_qualifiers env in
       let t = type_bool_term ctxt env t in
-      TUnOp(LNot,t), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
+      TUnOp(LNot,t), Lboolean
     | PLand (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LAnd,t1,t2), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LAnd,t1,t2), Lboolean
     | PLor (t1,t2) ->
       let env = drop_qualifiers env in
       let t1 = type_bool_term ctxt env t1 in
       let t2 = type_bool_term ctxt env t2 in
-      TBinOp(LOr,t1,t2), Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[])
+      TBinOp(LOr,t1,t2), Lboolean
     | PLtypeof t1 ->
       let env = drop_qualifiers env in
       let t1 = term env t1 in
@@ -3119,7 +3113,7 @@ struct
     | PLtype ty ->
       begin match logic_type ctxt loc env ty with
         | Ctype ty -> Ttype ty, Ltype (Logic_env.find_logic_type "typetag",[])
-        | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
+        | Lboolean | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _ ->
           ctxt.error loc "cannot take type tag of logic type"
       end
     | PLlet (ident, def, body) ->
@@ -3403,7 +3397,7 @@ struct
     if not (plain_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
-    mk_cast tt (Ltype (Logic_env.find_logic_type Utf8_logic.boolean,[]))
+    mk_cast tt Lboolean
 
   and type_num_term_option ctxt env t =
     match t with
