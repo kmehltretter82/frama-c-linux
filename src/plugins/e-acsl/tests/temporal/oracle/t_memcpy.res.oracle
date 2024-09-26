@@ -7,7 +7,9 @@
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:151: Warning: 
-  E-ACSL construct `datacons' is not yet supported. Ignoring annotation.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:113: Warning: 
   no assigns clause generated for function valid_read_or_empty because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/string.h:112: Warning: 
