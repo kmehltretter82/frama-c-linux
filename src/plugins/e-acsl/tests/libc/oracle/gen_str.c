@@ -65,8 +65,8 @@ char *__gen_e_acsl_strncpy(char * restrict dest, char const * restrict src,
     assigns *(dest +
               (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
             \result;
-    assigns
-    *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
+    assigns *(dest +
+              (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
     assigns \result \from dest;
  */
@@ -96,8 +96,8 @@ char *__gen_e_acsl_strcat(char * restrict dest, char const * restrict src);
       assigns *(dest +
                 (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
               \result;
-      assigns
-      *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
+      assigns *(dest +
+                (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
         \from *(src + (0 .. strlen{Old}(src) - 1));
       assigns \result \from dest;
     
@@ -143,8 +143,8 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
       assigns *(dest +
                 (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
               \result;
-      assigns
-      *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
+      assigns *(dest +
+                (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
         \from *(src + (0 .. strlen{Old}(src) - 1));
       assigns \result \from dest;
     
@@ -273,8 +273,8 @@ char *__gen_e_acsl_strncat(char * restrict dest, char const * restrict src,
     assigns *(dest +
               (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src))),
             \result;
-    assigns
-    *(dest + (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
+    assigns *(dest +
+              (strlen{Old}(dest) .. strlen{Old}(dest) + strlen{Old}(src)))
       \from *(src + (0 .. strlen{Old}(src)));
     assigns \result \from dest;
  */
