@@ -14,7 +14,7 @@
   Called from widen_overflow.i:9.
 [eva] using specification for function u
 [eva] Done for function u
-[eva] widen_overflow.i:9: starting to merge loop iterations
+[eva:partition] widen_overflow.i:9: starting to merge loop iterations
 [eva] computing for function u <- main.
   Called from widen_overflow.i:9.
 [eva] Done for function u

@@ -54,7 +54,7 @@
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva] stdlib_c.c:32: starting to merge loop iterations
+[eva:partition] stdlib_c.c:32: starting to merge loop iterations
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
 [eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc

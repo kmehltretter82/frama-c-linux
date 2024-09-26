@@ -107,15 +107,15 @@ let dkey_widening =
   register_category "widening"
     ~help:"print a message at each point where the analysis applies a widening"
 
-let dkey_recursion =
-  register_category "recursion"
-    ~help:"print a message for each recursive call"
+let dkey_partition =
+  register_category "partition"
+    ~help:"messages about states partitioning"
 
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
     [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
-     dkey_recursion; ]
+     dkey_partition]
 
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
@@ -145,3 +145,5 @@ let wkey_unknown_size = register_warn_category "unknown-size"
 let wkey_ensures_false = register_warn_category "ensures-false"
 let wkey_watchpoint = register_warn_category "watchpoint"
 let () = set_warn_status wkey_watchpoint Log.Wfeedback
+let wkey_recursion = register_warn_category "recursion"
+let () = set_warn_status wkey_recursion Log.Wfeedback

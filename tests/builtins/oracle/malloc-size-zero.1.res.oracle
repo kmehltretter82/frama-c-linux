@@ -19,7 +19,7 @@
 [eva:malloc:new] malloc-size-zero.c:10: allocating variable __malloc_main_l29
 [eva] Recording results for my_calloc
 [eva] Done for function my_calloc
-[eva] malloc-size-zero.c:27: starting to merge loop iterations
+[eva:partition] malloc-size-zero.c:27: starting to merge loop iterations
 [eva] computing for function my_calloc <- main.
   Called from malloc-size-zero.c:29.
 [eva] malloc-size-zero.c:10: Call to builtin malloc

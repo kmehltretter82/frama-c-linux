@@ -15,7 +15,7 @@
 [eva] computing for function g <- main.
   Called from behavior_assert.c:91.
 [eva] behavior_assert.c:30: assertion got status valid.
-[eva] behavior_assert.c:28: starting to merge loop iterations
+[eva:partition] behavior_assert.c:28: starting to merge loop iterations
 [eva] behavior_assert.c:24: 
   function g, behavior be: postcondition got status valid. (Behavior may be inactive, no reduction performed.)
 [eva] Recording results for g

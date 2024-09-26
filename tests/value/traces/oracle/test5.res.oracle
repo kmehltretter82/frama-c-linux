@@ -49,7 +49,7 @@
 [eva] computing for function my_switch <- main.
   Called from test5.i:21.
 [eva] Done for function my_switch
-[eva] test5.i:20: starting to merge loop iterations
+[eva:partition] test5.i:20: starting to merge loop iterations
 [eva] computing for function my_switch <- main.
   Called from test5.i:21.
 [eva] Done for function my_switch
@@ -89,7 +89,7 @@
 [eva] computing for function my_switch <- main.
   Called from test5.i:21.
 [eva] Done for function my_switch
-[eva] test5.i:19: starting to merge loop iterations
+[eva:partition] test5.i:19: starting to merge loop iterations
 [eva] computing for function my_switch <- main.
   Called from test5.i:21.
 [eva] Done for function my_switch

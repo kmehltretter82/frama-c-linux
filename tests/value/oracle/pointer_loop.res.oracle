@@ -15,7 +15,7 @@
       [1] ∈ {0}
   ACtrl[0] ∈ {{ &Ctrl[0] }}
        [1] ∈ {{ &Ctrl[1] }}
-[eva] pointer_loop.i:13: starting to merge loop iterations
+[eva:partition] pointer_loop.i:13: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -6,8 +6,8 @@
   G1 ∈ {0}
   G1b ∈ {0}
   G2 ∈ {0}
-[eva] csmith.i:168: starting to merge loop iterations
-[eva] csmith.i:169: starting to merge loop iterations
+[eva:partition] csmith.i:168: starting to merge loop iterations
+[eva:partition] csmith.i:169: starting to merge loop iterations
 [eva] Recording results for bts906b
 [eva] Done for function bts906b
 [pdg] computing for function bts906b

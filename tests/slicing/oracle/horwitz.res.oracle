@@ -20,7 +20,7 @@
 [eva] Done for function incr
 [eva] Recording results for A
 [eva] Done for function A
-[eva] horwitz.i:26: starting to merge loop iterations
+[eva:partition] horwitz.i:26: starting to merge loop iterations
 [eva] computing for function A <- main.
   Called from horwitz.i:27.
 [eva] computing for function add <- A <- main.

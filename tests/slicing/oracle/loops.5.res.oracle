@@ -13,7 +13,7 @@
   signed overflow. assert -2147483648 ≤ G + data2;
 [eva:alarm] loops.i:141: Warning: 
   signed overflow. assert G + data2 ≤ 2147483647;
-[eva] loops.i:125: starting to merge loop iterations
+[eva:partition] loops.i:125: starting to merge loop iterations
 [eva:alarm] loops.i:126: Warning: 
   signed overflow. assert -2147483648 ≤ G + data1;
 [eva:alarm] loops.i:126: Warning: 

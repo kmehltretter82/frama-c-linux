@@ -15,19 +15,19 @@
 [eva] widen_hints_float.c:17: 
   function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] widen_hints_float.c:20: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:20: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
   Called from widen_hints_float.c:24.
 [eva] widen_hints_float.c:24: 
   function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] widen_hints_float.c:27: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:27: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- parabola <- main.
   Called from widen_hints_float.c:31.
 [eva] widen_hints_float.c:31: 
   function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] widen_hints_float.c:33: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:33: starting to merge loop iterations
 [eva:alarm] widen_hints_float.c:34: Warning: 
   non-finite double value.
   assert
@@ -45,7 +45,7 @@
 [eva] widen_hints_float.c:42: Call to builtin sin
 [eva] widen_hints_float.c:42: 
   function sin: precondition 'finite_arg' got status valid.
-[eva] widen_hints_float.c:41: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:41: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- trigo <- main.
   Called from widen_hints_float.c:42.
 [eva] Done for function Frama_C_double_interval
@@ -75,7 +75,7 @@
 [eva] widen_hints_float.c:49: 
   function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] widen_hints_float.c:48: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:48: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
   Called from widen_hints_float.c:49.
 [eva] Done for function Frama_C_double_interval
@@ -96,7 +96,7 @@
 [eva] widen_hints_float.c:54: 
   function Frama_C_double_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_double_interval
-[eva] widen_hints_float.c:53: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:53: starting to merge loop iterations
 [eva] computing for function Frama_C_double_interval <- first_order_filter <- main.
   Called from widen_hints_float.c:54.
 [eva] Done for function Frama_C_double_interval
@@ -116,8 +116,8 @@
 [eva] Done for function first_order_filter
 [eva] computing for function newton_sqrt <- main.
   Called from widen_hints_float.c:73.
-[eva] widen_hints_float.c:59: starting to merge loop iterations
-[eva] widen_hints_float.c:64: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:59: starting to merge loop iterations
+[eva:partition] widen_hints_float.c:64: starting to merge loop iterations
 [eva] Recording results for newton_sqrt
 [eva] Done for function newton_sqrt
 [eva] Recording results for main

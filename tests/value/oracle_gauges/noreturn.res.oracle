@@ -1,8 +1,8 @@
 8a9
-> [eva] noreturn.i:20: starting to merge loop iterations
+> [eva:partition] noreturn.i:20: starting to merge loop iterations
 16a18
-> [eva] noreturn.i:16: starting to merge loop iterations
+> [eva:partition] noreturn.i:16: starting to merge loop iterations
 20a23
-> [eva] noreturn.i:13: starting to merge loop iterations
+> [eva:partition] noreturn.i:13: starting to merge loop iterations
 30a34
-> [eva] noreturn.i:7: starting to merge loop iterations
+> [eva:partition] noreturn.i:7: starting to merge loop iterations

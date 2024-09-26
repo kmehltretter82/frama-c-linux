@@ -232,7 +232,7 @@
 [eva] strlen.c:270: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] strlen.c:271: assertion got status valid.
-[eva] strlen.c:269: starting to merge loop iterations
+[eva:partition] strlen.c:269: starting to merge loop iterations
 [eva] strlen.c:270: Call to builtin strlen
 [eva] strlen.c:270: Call to builtin strlen
 [eva] strlen.c:270: Call to builtin strlen
@@ -303,7 +303,7 @@
 [eva] Done for function big_array
 [eva] computing for function negative_offsets <- main.
   Called from strlen.c:360.
-[eva] strlen.c:310: starting to merge loop iterations
+[eva:partition] strlen.c:310: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
   Called from strlen.c:314.
 [eva] strlen.c:314: 

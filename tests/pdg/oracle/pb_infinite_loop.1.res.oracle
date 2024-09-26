@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   G ∈ [--..--]
-[eva] pb_infinite_loop.c:32: starting to merge loop iterations
+[eva:partition] pb_infinite_loop.c:32: starting to merge loop iterations
 [eva:alarm] pb_infinite_loop.c:34: Warning: 
   signed overflow. assert G + 1 ≤ 2147483647;
 [eva:alarm] pb_infinite_loop.c:35: Warning: 

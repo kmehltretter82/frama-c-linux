@@ -17,7 +17,7 @@
   Called from dataflow_order.i:25.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] dataflow_order.i:17: starting to merge loop iterations
+[eva:partition] dataflow_order.i:17: starting to merge loop iterations
 [eva] dataflow_order.i:18: Frama_C_show_each_1: {0; 1}, {0; 1}
 [eva] dataflow_order.i:21: Frama_C_show_each_then: {1; 2}, {0; 1}
 [eva] computing for function f <- main.

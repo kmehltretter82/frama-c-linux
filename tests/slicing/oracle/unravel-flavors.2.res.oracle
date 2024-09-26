@@ -44,7 +44,7 @@
   signed overflow. assert -2147483648 ≤ red * green;
 [eva:alarm] unravel-flavors.i:52: Warning: 
   signed overflow. assert red * green ≤ 2147483647;
-[eva] unravel-flavors.i:54: starting to merge loop iterations
+[eva:partition] unravel-flavors.i:54: starting to merge loop iterations
 [eva:alarm] unravel-flavors.i:55: Warning: 
   signed overflow. assert -2147483648 ≤ sour + green;
 [eva:alarm] unravel-flavors.i:55: Warning: 

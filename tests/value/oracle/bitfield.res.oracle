@@ -118,7 +118,7 @@
   .bitf ∈ {0}
   .[bits 65 to 95] ∈
   {{ garbled mix of &{b} (origin: Misaligned read {bitfield.i:70}) }}
-[eva] bitfield.i:69: starting to merge loop iterations
+[eva:partition] bitfield.i:69: starting to merge loop iterations
 [eva] computing for function leaf <- imprecise_bts_1671 <- main.
   Called from bitfield.i:70.
 [eva] Done for function leaf

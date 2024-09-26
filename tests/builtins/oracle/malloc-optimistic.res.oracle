@@ -1784,7 +1784,7 @@
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:88: starting to merge loop iterations
+[eva:partition] malloc-optimistic.c:88: starting to merge loop iterations
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/543) to fit 0..511/575
@@ -2979,7 +2979,7 @@
 [eva] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:101: starting to merge loop iterations
+[eva:partition] malloc-optimistic.c:101: starting to merge loop iterations
 [eva] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/543) to fit 0..511/575
@@ -3374,7 +3374,7 @@
   Called from malloc-optimistic.c:123.
 [eva] Recording results for main9_aux
 [eva] Done for function main9_aux
-[eva] malloc-optimistic.c:118: starting to merge loop iterations
+[eva:partition] malloc-optimistic.c:118: starting to merge loop iterations
 [eva] malloc-optimistic.c:119: Call to builtin malloc
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {30; 31}, {{ &__malloc_w_main9_l119 }}

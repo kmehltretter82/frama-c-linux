@@ -10,7 +10,7 @@
   Called from statistics.i:13.
 [eva] Recording results for g
 [eva] Done for function g
-[eva] statistics.i:12: starting to merge loop iterations
+[eva:partition] statistics.i:12: starting to merge loop iterations
 [eva] computing for function g <- f <- main.
   Called from statistics.i:13.
 [eva] Recording results for g

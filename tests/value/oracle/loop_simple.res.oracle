@@ -8,14 +8,14 @@
   k ∈ {0}
   n ∈ {0}
   r ∈ {0}
-[eva] loop_simple.i:26: starting to merge loop iterations
+[eva:partition] loop_simple.i:26: starting to merge loop iterations
 [eva:alarm] loop_simple.i:27: Warning: 
   signed overflow. assert (int)((int)(i + j) + k) + r ≤ 2147483647;
 [eva:alarm] loop_simple.i:27: Warning: 
   signed overflow.
   assert (int)((int)((int)(i + j) + k) + r) + 1 ≤ 2147483647;
-[eva] loop_simple.i:25: starting to merge loop iterations
-[eva] loop_simple.i:24: starting to merge loop iterations
+[eva:partition] loop_simple.i:25: starting to merge loop iterations
+[eva:partition] loop_simple.i:24: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -55,7 +55,7 @@
 [eva] stdlib_c.c:33: Call to builtin Frama_C_calloc for function calloc
 [eva:malloc] stdlib_c.c:33: 
   resizing variable `__calloc_w_main_l33' (0..31/159) to fit 0..191
-[eva] stdlib_c.c:32: starting to merge loop iterations
+[eva:partition] stdlib_c.c:32: starting to merge loop iterations
 [eva] stdlib_c.c:33: Call to builtin Frama_C_calloc for function calloc
 [eva:malloc] stdlib_c.c:33: 
   resizing variable `__calloc_w_main_l33' (0..31/191) to fit 0..191/223

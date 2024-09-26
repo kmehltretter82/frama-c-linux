@@ -6,10 +6,10 @@
 [eva] using specification for function exit
 [eva] FRAMAC_SHARE/libc/string.h:167: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
-[eva] cwe126.c:63: starting to merge loop iterations
+[eva:partition] cwe126.c:63: starting to merge loop iterations
 [eva:malloc:new] cwe126.c:41: 
   allocating variable __malloc_CWE126_Buffer_Overread__malloc_char_loop_64_bad_l41
-[eva] cwe126.c:27: starting to merge loop iterations
+[eva:partition] cwe126.c:27: starting to merge loop iterations
 [eva:alarm] cwe126.c:29: Warning: 
   out of bounds read. assert \valid_read(data + i);
 [eva] ====== VALUES COMPUTED ======

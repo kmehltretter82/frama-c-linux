@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   after ∈ [--..--]
-[eva] loops.c:75: starting to merge loop iterations
+[eva:partition] loops.c:75: starting to merge loop iterations
 [eva:alarm] loops.c:76: Warning: signed overflow. assert s + 2 ≤ 2147483647;
 [eva] Recording results for infinite2
 [eva] Done for function infinite2

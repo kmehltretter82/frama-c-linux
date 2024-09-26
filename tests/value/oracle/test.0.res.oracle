@@ -11,11 +11,11 @@
   out of bounds read. assert \valid_read(v + (int)(j + ecart));
 [eva:alarm] test.i:14: Warning: 
   out of bounds write. assert \valid(v + (int)(j + ecart));
-[eva] test.i:11: starting to merge loop iterations
-[eva] test.i:10: starting to merge loop iterations
+[eva:partition] test.i:11: starting to merge loop iterations
+[eva:partition] test.i:10: starting to merge loop iterations
 [eva:alarm] test.i:11: Warning: 
   signed overflow. assert j + ecart ≤ 2147483647;
-[eva] test.i:9: starting to merge loop iterations
+[eva:partition] test.i:9: starting to merge loop iterations
 [eva] Recording results for inst_F6
 [eva] Done for function inst_F6
 [scope:rm_asserts] removing 1 assertion(s)

@@ -1,4 +1,4 @@
-139,144c139,162
+138,143c138,161
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
@@ -30,7 +30,7 @@
 >   Called from ieee_1180_1990.c:85.
 > [eva] Recording results for IEEE_1180_1990_rand
 > [eva] Done for function IEEE_1180_1990_rand
-354,359c372,395
+353,358c371,394
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
@@ -62,7 +62,7 @@
 >   Called from ieee_1180_1990.c:85.
 > [eva] Recording results for IEEE_1180_1990_rand
 > [eva] Done for function IEEE_1180_1990_rand
-362,364c398,409
+361,363c397,408
 < [eva] ieee_1180_1990.c:258: Reusing old results for call to IEEE_1180_1990_dctf
 < [eva] ieee_1180_1990.c:259: Reusing old results for call to IEEE_1180_1990_idctf
 < [eva] ieee_1180_1990.c:260: Reusing old results for call to idct
@@ -79,7 +79,7 @@
 >   Called from ieee_1180_1990.c:260.
 > [eva] Recording results for idct
 > [eva] Done for function idct
-389,391c434,445
+388,390c433,444
 < [eva] ieee_1180_1990.c:282: Reusing old results for call to IEEE_1180_1990_dctf
 < [eva] ieee_1180_1990.c:283: Reusing old results for call to IEEE_1180_1990_idctf
 < [eva] ieee_1180_1990.c:284: Reusing old results for call to idct
@@ -96,7 +96,7 @@
 >   Called from ieee_1180_1990.c:284.
 > [eva] Recording results for idct
 > [eva] Done for function idct
-418,423c472,495
+417,422c471,494
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
@@ -128,7 +128,7 @@
 >   Called from ieee_1180_1990.c:85.
 > [eva] Recording results for IEEE_1180_1990_rand
 > [eva] Done for function IEEE_1180_1990_rand
-426,428c498,509
+425,427c497,508
 < [eva] ieee_1180_1990.c:304: Reusing old results for call to IEEE_1180_1990_dctf
 < [eva] ieee_1180_1990.c:305: Reusing old results for call to IEEE_1180_1990_idctf
 < [eva] ieee_1180_1990.c:306: Reusing old results for call to idct
@@ -145,7 +145,7 @@
 >   Called from ieee_1180_1990.c:306.
 > [eva] Recording results for idct
 > [eva] Done for function idct
-453,455c534,545
+452,454c533,544
 < [eva] ieee_1180_1990.c:328: Reusing old results for call to IEEE_1180_1990_dctf
 < [eva] ieee_1180_1990.c:329: Reusing old results for call to IEEE_1180_1990_idctf
 < [eva] ieee_1180_1990.c:330: Reusing old results for call to idct
@@ -162,7 +162,7 @@
 >   Called from ieee_1180_1990.c:330.
 > [eva] Recording results for idct
 > [eva] Done for function idct
-479,485c569,1736
+478,484c568,1735
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
 < [eva] ieee_1180_1990.c:85: Reusing old results for call to IEEE_1180_1990_rand
@@ -1339,7 +1339,7 @@
 >   Called from ieee_1180_1990.c:85.
 > [eva] Recording results for IEEE_1180_1990_rand
 > [eva] Done for function IEEE_1180_1990_rand
-518,661c1769,1896
+517,660c1768,1895
 < [eva] ieee_1180_1990.c:214: Reusing old results for call to idct
 < [eva] ieee_1180_1990.c:236: Reusing old results for call to IEEE_1180_1990_dctf
 < [eva] ieee_1180_1990.c:237: Reusing old results for call to IEEE_1180_1990_idctf

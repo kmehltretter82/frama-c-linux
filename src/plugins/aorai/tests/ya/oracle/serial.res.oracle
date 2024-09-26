@@ -14,19 +14,19 @@
   aorai_StatesHistory_1 ∈ {19}
   aorai_StatesHistory_2 ∈ {19}
 [eva] using specification for function Frama_C_interval
-[eva] serial.c:58: starting to merge loop iterations
-[eva] serial.c:63: Trace partitioning superposing up to 100 states
-[eva] serial.c:63: Trace partitioning superposing up to 200 states
+[eva:partition] serial.c:58: starting to merge loop iterations
+[eva:partition] serial.c:63: Trace partitioning superposing up to 100 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 200 states
 [eva:alarm] serial.c:33: Warning: 
   assertion 'Aorai,aorai_smoke_test' got status invalid (stopping propagation).
 [aorai] serial.c:92: Wait1 <- Wait1 <- Complete
 [aorai] serial.c:92: n in {5},x in [0..16383],y in [0..16383]
-[eva] serial.c:63: Trace partitioning superposing up to 400 states
-[eva] serial.c:63: Trace partitioning superposing up to 600 states
-[eva] serial.c:63: Trace partitioning superposing up to 800 states
-[eva] serial.c:63: Trace partitioning superposing up to 900 states
-[eva] serial.c:63: Trace partitioning superposing up to 1000 states
-[eva] serial.c:63: Trace partitioning superposing up to 1100 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 400 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 600 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 800 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 900 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 1000 states
+[eva:partition] serial.c:63: Trace partitioning superposing up to 1100 states
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function input_data_post_func:
   aorai_x1 ∈ [0..127]

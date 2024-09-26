@@ -25,8 +25,8 @@
   s[0..9999999] ∈ {0}
 [eva] computing for function f <- main.
   Called from offsetmap.i:108.
-[eva] offsetmap.i:19: starting to merge loop iterations
-[eva] offsetmap.i:29: starting to merge loop iterations
+[eva:partition] offsetmap.i:19: starting to merge loop iterations
+[eva:partition] offsetmap.i:29: starting to merge loop iterations
 [eva:alarm] offsetmap.i:51: Warning: 
   pointer downcast. assert (unsigned int)(&x2) ≤ 2147483647;
 [eva] Recording results for f

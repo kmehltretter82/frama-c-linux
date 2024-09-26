@@ -8,7 +8,8 @@
   nondet ∈ [--..--]
 [eva] computing for function init <- main.
   Called from octagons-pointers-intermediate.c:38.
-[eva] octagons-pointers-intermediate.c:18: starting to merge loop iterations
+[eva:partition] octagons-pointers-intermediate.c:18: 
+  starting to merge loop iterations
 [eva] Recording results for init
 [eva] Done for function init
 [eva] computing for function cmdRead <- main.

@@ -83,7 +83,7 @@
 [eva] allocated.c:76: Frama_C_show_each_p0: {1}
 [eva] allocated.c:77: Call to builtin free
 [eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
-[eva] allocated.c:72: starting to merge loop iterations
+[eva:partition] allocated.c:72: starting to merge loop iterations
 [eva] allocated.c:73: Call to builtin malloc
 [eva] allocated.c:75: Frama_C_show_each_p: {{ &__malloc_main_l73 }}
 [eva] allocated.c:76: Frama_C_show_each_p0: {1; 2}
@@ -105,10 +105,10 @@
 [eva:malloc] allocated.c:82: 
   resizing variable `__malloc_w_main_l82' (0..-1) to fit 0..31
 [eva:alarm] allocated.c:85: Warning: out of bounds write. assert \valid(p + j);
-[eva] allocated.c:84: starting to merge loop iterations
+[eva:partition] allocated.c:84: starting to merge loop iterations
 [eva] allocated.c:87: Call to builtin free
 [eva:malloc] allocated.c:87: weak free on bases: {__malloc_w_main_l82}
-[eva] allocated.c:81: starting to merge loop iterations
+[eva:partition] allocated.c:81: starting to merge loop iterations
 [eva] allocated.c:82: Call to builtin malloc
 [eva:malloc] allocated.c:82: 
   resizing variable `__malloc_w_main_l82' (0..-1/31) to fit 0..31/63
@@ -162,12 +162,12 @@
 [eva] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31) to fit 0..63
-[eva] allocated.c:128: starting to merge loop iterations
+[eva:partition] allocated.c:128: starting to merge loop iterations
 [eva:alarm] allocated.c:129: Warning: out of bounds write. assert \valid(a + j);
 [eva] allocated.c:131: Frama_C_show_each: {0; 1}
 [eva] allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}
-[eva] allocated.c:126: starting to merge loop iterations
+[eva:partition] allocated.c:126: starting to merge loop iterations
 [eva] allocated.c:127: Call to builtin __fc_vla_alloc
 [eva:malloc] allocated.c:127: 
   resizing variable `__malloc_main_l127' (0..31/63) to fit 0..63/95

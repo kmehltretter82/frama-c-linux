@@ -9,7 +9,7 @@
   h ∈ {1}
 [eva] computing for function init_array <- main.
   Called from multidim-relations.c:35.
-[eva] multidim-relations.c:18: starting to merge loop iterations
+[eva:partition] multidim-relations.c:18: starting to merge loop iterations
 [kernel:approximation] multidim-relations.c:19: 
   more than 1(350) locations to update in array. Approximating.
 [kernel:approximation] multidim-relations.c:20: 

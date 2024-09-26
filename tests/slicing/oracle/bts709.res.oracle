@@ -34,7 +34,7 @@
 [eva] Done for function __FC_assert
 [eva] Recording results for func
 [eva] Done for function func
-[eva] bts709.c:46: starting to merge loop iterations
+[eva:partition] bts709.c:46: starting to merge loop iterations
 [eva] bts709.c:47: Reusing old results for call to inputsOf_testcase_func
 [eva] Recording results for main
 [eva] Done for function main

@@ -24,7 +24,7 @@
   Called from postcondition.i:20.
 [eva] using specification for function u
 [eva] Done for function u
-[eva] postcondition.i:18: starting to merge loop iterations
+[eva:partition] postcondition.i:18: starting to merge loop iterations
 [eva] computing for function u <- get_index <- main.
   Called from postcondition.i:20.
 [eva] Done for function u

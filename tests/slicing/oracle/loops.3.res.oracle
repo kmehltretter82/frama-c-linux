@@ -10,7 +10,7 @@
   Y ∈ [--..--]
   Z ∈ [--..--]
 [eva:alarm] loops.i:56: Warning: assertion got status unknown.
-[eva] loops.i:50: starting to merge loop iterations
+[eva:partition] loops.i:50: starting to merge loop iterations
 [eva:alarm] loops.i:52: Warning: signed overflow. assert x1 + 1 ≤ 2147483647;
 [eva:alarm] loops.i:54: Warning: signed overflow. assert x2 + 1 ≤ 2147483647;
 [eva] Recording results for f2

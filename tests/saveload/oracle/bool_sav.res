@@ -8,7 +8,7 @@
 [eva] computing for function f <- main.
   Called from bool.c:27.
 [eva] bool.c:19: assertion got status valid.
-[eva] bool.c:20: starting to merge loop iterations
+[eva:partition] bool.c:20: starting to merge loop iterations
 [eva:alarm] bool.c:20: Warning: signed overflow. assert -2147483648 ≤ i - 1;
 [eva] Recording results for f
 [eva] Done for function f

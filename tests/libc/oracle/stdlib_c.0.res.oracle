@@ -39,7 +39,7 @@
   resizing variable `__calloc_w_main_l33' (0..31) to fit 0..63
 [eva:alarm] stdlib_c.c:34: Warning: 
   out of bounds write. assert \valid(s + (size_t)(i - 1));
-[eva] stdlib_c.c:32: starting to merge loop iterations
+[eva:partition] stdlib_c.c:32: starting to merge loop iterations
 [eva] stdlib_c.c:33: Call to builtin Frama_C_calloc for function calloc
 [eva:malloc] stdlib_c.c:33: 
   resizing variable `__calloc_w_main_l33' (0..31/63) to fit 0..63/95

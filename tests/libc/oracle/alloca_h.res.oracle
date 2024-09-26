@@ -31,7 +31,7 @@
   Called from alloca_h.c:43.
 [eva] alloca_h.c:23: Call to builtin alloca
 [eva:malloc:new] alloca_h.c:23: allocating variable __alloca_loop_l23
-[eva] alloca_h.c:22: starting to merge loop iterations
+[eva:partition] alloca_h.c:22: starting to merge loop iterations
 [eva] alloca_h.c:23: Call to builtin alloca
 [eva] alloca_h.c:23: Call to builtin alloca
 [eva] alloca_h.c:23: Call to builtin alloca

@@ -8,7 +8,7 @@
   Called from postdom.c:23.
 [eva] Recording results for __VERIFIER_assert
 [eva] Done for function __VERIFIER_assert
-[eva] postdom.c:20: starting to merge loop iterations
+[eva:partition] postdom.c:20: starting to merge loop iterations
 [eva] computing for function __VERIFIER_assert <- main.
   Called from postdom.c:23.
 [eva] Recording results for __VERIFIER_assert

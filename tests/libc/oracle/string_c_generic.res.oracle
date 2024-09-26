@@ -160,7 +160,8 @@
   function strncpy: precondition 'room_nstring' got status valid.
 [eva] string_c_generic.c:73: 
   function strncpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:249: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/string.c:249: 
+  starting to merge loop iterations
 [eva] FRAMAC_SHARE/libc/string.h:453: 
   function strncpy: postcondition 'result_ptr' got status valid.
 [eva] FRAMAC_SHARE/libc/string.h:454: 
@@ -211,7 +212,8 @@
   function strncmp: precondition 'valid_string_s1' got status valid.
 [eva] string_c_generic.c:82: 
   function strncmp: precondition 'valid_string_s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:154: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/string.c:154: 
+  starting to merge loop iterations
 [eva] FRAMAC_SHARE/libc/string.h:197: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function strncmp
 [eva:alarm] FRAMAC_SHARE/libc/string.h:197: Warning: 
@@ -323,7 +325,8 @@
 [eva] string_c_generic.c:94: 
   function strrchr: precondition 'valid_string_s' got status valid.
 [eva] FRAMAC_SHARE/libc/string.c:266: Reusing old results for call to strlen
-[eva] FRAMAC_SHARE/libc/string.c:266: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/string.c:266: 
+  starting to merge loop iterations
 [eva] Recording results for strrchr
 [eva] Done for function strrchr
 [eva] Recording results for main

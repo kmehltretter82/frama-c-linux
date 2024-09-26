@@ -73,7 +73,7 @@
   Called from bts1768.i:46.
 [eva] Recording results for fsm_transition
 [eva] Done for function fsm_transition
-[eva] bts1768.i:44: starting to merge loop iterations
+[eva:partition] bts1768.i:44: starting to merge loop iterations
 [eva] bts1768.i:45: Reusing old results for call to lecture
 [eva] computing for function fsm_transition <- main.
   Called from bts1768.i:46.

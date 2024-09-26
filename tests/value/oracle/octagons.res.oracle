@@ -149,7 +149,7 @@
 [eva] octagons.c:129: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] octagons.c:133: starting to merge loop iterations
+[eva:partition] octagons.c:133: starting to merge loop iterations
 [eva:alarm] octagons.c:134: Warning: 
   signed overflow. assert a + 2 ≤ 2147483647;
 [eva:alarm] octagons.c:135: Warning: 
@@ -292,20 +292,20 @@
 [eva] octagons.c:250: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] octagons.c:251: starting to merge loop iterations
+[eva:partition] octagons.c:251: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- arrays <- main.
   Called from octagons.c:256.
 [eva] octagons.c:256: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] octagons.c:258: starting to merge loop iterations
+[eva:partition] octagons.c:258: starting to merge loop iterations
 [eva] computing for function Frama_C_float_interval <- arrays <- main.
   Called from octagons.c:265.
 [eva] using specification for function Frama_C_float_interval
 [eva] octagons.c:265: 
   function Frama_C_float_interval, behavior finite: precondition 'order' got status valid.
 [eva] Done for function Frama_C_float_interval
-[eva] octagons.c:267: starting to merge loop iterations
+[eva:partition] octagons.c:267: starting to merge loop iterations
 [eva] Recording results for arrays
 [eva] Done for function arrays
 [eva] Recording results for main

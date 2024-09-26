@@ -43,21 +43,21 @@
   pointer downcast.
   assert (unsigned int)tmp ≤ 2147483647;
   (tmp from malloc(sizeof(int)))
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 100 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 200 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 300 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 400 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 500 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 600 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 700 states
-[eva] alloc_weak.c:40: Trace partitioning superposing up to 800 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 100 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 200 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 300 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 400 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 500 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 600 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 700 states
+[eva:partition] alloc_weak.c:40: Trace partitioning superposing up to 800 states
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from alloc_weak.c:95.
 [eva] alloc_weak.c:51: Call to builtin malloc
 [eva:malloc:new] alloc_weak.c:51: allocating variable __malloc_main3_l51
-[eva] alloc_weak.c:50: starting to merge loop iterations
+[eva:partition] alloc_weak.c:50: starting to merge loop iterations
 [eva] alloc_weak.c:51: Call to builtin malloc
 [eva:malloc:weak] alloc_weak.c:51: marking variable `__malloc_main3_l51' as weak
 [eva] alloc_weak.c:51: Call to builtin malloc
@@ -80,7 +80,7 @@
 [eva] alloc_weak.c:82: Call to builtin calloc
 [eva:malloc:new] alloc_weak.c:82: 
   allocating variable __calloc_convergence_issue_l82
-[eva] alloc_weak.c:74: starting to merge loop iterations
+[eva:partition] alloc_weak.c:74: starting to merge loop iterations
 [eva:alarm] alloc_weak.c:80: Warning: 
   out of bounds read. assert \valid_read((p + size) - 1);
 [eva] alloc_weak.c:82: Call to builtin calloc

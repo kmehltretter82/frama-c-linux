@@ -102,7 +102,7 @@
 [eva] computing for function main10_loop <- main.
   Called from downcast.c:187.
 [eva:alarm] downcast.c:173: Warning: signed downcast. assert bf.b ≤ 127;
-[eva] downcast.c:171: starting to merge loop iterations
+[eva:partition] downcast.c:171: starting to merge loop iterations
 [eva] Recording results for main10_loop
 [eva] Done for function main10_loop
 [eva] Recording results for main

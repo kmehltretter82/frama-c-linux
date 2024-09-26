@@ -13,7 +13,7 @@
 [eva] empty_struct.c:79: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc:new] empty_struct.c:79: allocating variable __realloc_main3_l79
-[eva] empty_struct.c:81: starting to merge loop iterations
+[eva:partition] empty_struct.c:81: starting to merge loop iterations
 [eva] empty_struct.c:86: Call to builtin free
 [eva] empty_struct.c:86: 
   function free: precondition 'freeable' got status valid.

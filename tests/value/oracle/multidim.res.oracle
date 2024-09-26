@@ -85,7 +85,7 @@
 [eva] Done for function main1
 [eva] computing for function main2 <- main.
   Called from multidim.c:188.
-[eva] multidim.c:55: starting to merge loop iterations
+[eva:partition] multidim.c:55: starting to merge loop iterations
 [eva:alarm] multidim.c:58: Warning: check got status unknown.
 [eva] multidim.c:59: 
   Frama_C_domain_show_each:
@@ -95,8 +95,8 @@
 [eva] Done for function main2
 [eva] computing for function main3 <- main.
   Called from multidim.c:189.
-[eva] multidim.c:65: starting to merge loop iterations
-[eva] multidim.c:64: starting to merge loop iterations
+[eva:partition] multidim.c:65: starting to merge loop iterations
+[eva:partition] multidim.c:64: starting to merge loop iterations
 [kernel:approximation] multidim.c:66: 
   more than 1(20) locations to update in array. Approximating.
 [kernel:approximation] multidim.c:67: 
@@ -135,8 +135,8 @@
 [eva] computing for function main4 <- main.
   Called from multidim.c:190.
 [eva:loop-unroll:partial] multidim.c:81: loop not completely unrolled
-[eva] multidim.c:81: starting to merge loop iterations
-[eva] multidim.c:83: starting to merge loop iterations
+[eva:partition] multidim.c:81: starting to merge loop iterations
+[eva:partition] multidim.c:83: starting to merge loop iterations
 [eva] multidim.c:88: 
   Frama_C_domain_show_each:
   t : # cvalue: {42}
@@ -145,7 +145,7 @@
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
   Called from multidim.c:191.
-[eva] multidim.c:96: starting to merge loop iterations
+[eva:partition] multidim.c:96: starting to merge loop iterations
 [eva] multidim.c:104: 
   Frama_C_domain_show_each:
   t : # cvalue: [0..9] ∈ {0; 1}
@@ -155,7 +155,7 @@
 [eva] Done for function main5
 [eva] computing for function main6 <- main.
   Called from multidim.c:192.
-[eva] multidim.c:114: Trace partitioning superposing up to 100 states
+[eva:partition] multidim.c:114: Trace partitioning superposing up to 100 states
 [eva] multidim.c:118: 
   Frama_C_domain_show_each:
   t : # cvalue: {0}
@@ -173,7 +173,7 @@
 [eva] Done for function main6
 [eva] computing for function main7 <- main.
   Called from multidim.c:193.
-[eva] multidim.c:134: starting to merge loop iterations
+[eva:partition] multidim.c:134: starting to merge loop iterations
 [kernel:approximation] multidim.c:136: 
   more than 1(1000) locations to update in array. Approximating.
 [kernel:approximation] multidim.c:137: 
@@ -201,7 +201,7 @@
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
   Called from multidim.c:194.
-[eva] multidim.c:165: starting to merge loop iterations
+[eva:partition] multidim.c:165: starting to merge loop iterations
 [eva] multidim.c:169: 
   Frama_C_domain_show_each:
   t : # cvalue: {0; 1}
@@ -210,7 +210,7 @@
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
   Called from multidim.c:195.
-[eva] multidim.c:176: starting to merge loop iterations
+[eva:partition] multidim.c:176: starting to merge loop iterations
 [eva] multidim.c:182: 
   Frama_C_domain_show_each:
   t1 : # cvalue: {0} or UNINITIALIZED

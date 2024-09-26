@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] n1.i:6: starting to merge loop iterations
+[eva:partition] n1.i:6: starting to merge loop iterations
 [eva:alarm] n1.i:7: Warning: signed overflow. assert res + i ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main

@@ -38,7 +38,7 @@
   Called from intra.i:86.
 [eva] intra.i:64: assertion got status valid.
 [eva] intra.i:65: loop invariant got status valid.
-[eva] intra.i:67: starting to merge loop iterations
+[eva:partition] intra.i:67: starting to merge loop iterations
 [eva] Recording results for loop
 [eva] Done for function loop
 [eva] computing for function assign <- main.

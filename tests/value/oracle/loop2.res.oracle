@@ -11,7 +11,7 @@
   r ∈ {0}
   G[0..4] ∈ {0}
   Reg5 ∈ {0}
-[eva] loop2.i:8: starting to merge loop iterations
+[eva:partition] loop2.i:8: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

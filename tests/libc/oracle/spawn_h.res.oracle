@@ -37,7 +37,7 @@
   Called from spawn_h.c:68.
 [eva] using specification for function posix_spawnattr_setsigmask
 [eva] Done for function posix_spawnattr_setsigmask
-[eva] spawn_h.c:36: starting to merge loop iterations
+[eva:partition] spawn_h.c:36: starting to merge loop iterations
 [eva] computing for function getopt <- main.
   Called from spawn_h.c:36.
 [eva] Done for function getopt
@@ -151,7 +151,7 @@
   Called from spawn_h.c:118.
 [eva] spawn_h.c:118: function printf_va_6: precondition got status valid.
 [eva] Done for function printf_va_6
-[eva] spawn_h.c:105: starting to merge loop iterations
+[eva:partition] spawn_h.c:105: starting to merge loop iterations
 [eva] computing for function waitpid <- main.
   Called from spawn_h.c:106.
 [eva] Done for function waitpid

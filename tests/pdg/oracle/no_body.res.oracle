@@ -17,7 +17,7 @@
   Called from no_body.c:16.
 [eva] Done for function f
 [eva:alarm] no_body.c:18: Warning: signed overflow. assert G + 1 ≤ 2147483647;
-[eva] no_body.c:16: starting to merge loop iterations
+[eva:partition] no_body.c:16: starting to merge loop iterations
 [eva] computing for function f <- loop <- main.
   Called from no_body.c:16.
 [eva] Done for function f

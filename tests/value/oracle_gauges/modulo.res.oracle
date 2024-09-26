@@ -172,5 +172,5 @@
 >   Frama_C_show_each_3: {-3; -2; -1; 1; 2; 3}, {-2; -1; 1; 2}, {-1; 0; 1}
 > [eva] modulo.i:64: Frama_C_show_each_3: {-2; -1; 1; 2}, {-1; 1}, {0}
 73a244,245
-> [eva] modulo.i:95: starting to merge loop iterations
-> [eva] modulo.i:82: starting to merge loop iterations
+> [eva:partition] modulo.i:95: starting to merge loop iterations
+> [eva:partition] modulo.i:82: starting to merge loop iterations

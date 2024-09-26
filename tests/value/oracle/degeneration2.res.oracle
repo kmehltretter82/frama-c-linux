@@ -18,7 +18,7 @@
   accessing uninitialized left-value. assert \initialized((int *)A);
 [eva:alarm] degeneration2.i:17: Warning: 
   out of bounds read. assert \valid_read((int *)A);
-[eva] degeneration2.i:16: starting to merge loop iterations
+[eva:partition] degeneration2.i:16: starting to merge loop iterations
 [eva:alarm] degeneration2.i:25: Warning: 
   accessing uninitialized left-value. assert \initialized(&offset_uninit);
 [eva] Recording results for main

@@ -8,7 +8,7 @@
   n ∈ {1}
 [eva] computing for function loop <- main.
   Called from reevaluate_alarms.i:34.
-[eva] reevaluate_alarms.i:13: starting to merge loop iterations
+[eva:partition] reevaluate_alarms.i:13: starting to merge loop iterations
 [eva:alarm] reevaluate_alarms.i:14: Warning: 
   signed overflow. assert S + i ≤ 2147483647;
 [eva:alarm] reevaluate_alarms.i:14: Warning: 
@@ -18,7 +18,7 @@
 [eva] Done for function loop
 [eva] computing for function compute_n <- main.
   Called from reevaluate_alarms.i:36.
-[eva] reevaluate_alarms.i:19: starting to merge loop iterations
+[eva:partition] reevaluate_alarms.i:19: starting to merge loop iterations
 [eva:alarm] reevaluate_alarms.i:20: Warning: 
   signed overflow. assert n * i ≤ 2147483647;
 [eva] Recording results for compute_n

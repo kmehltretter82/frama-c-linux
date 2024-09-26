@@ -65,14 +65,14 @@
 [eva] Done for function Frama_C_unsigned_char_interval
 [eva] Recording results for fgetc
 [eva] Done for function fgetc
-[eva] FRAMAC_SHARE/libc/stdio.c:85: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:85: starting to merge loop iterations
 [eva] FRAMAC_SHARE/libc/stdio.c:86: Reusing old results for call to fgetc
 [eva] FRAMAC_SHARE/libc/stdio.c:106: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/stdio.c:106: 
   function realloc: precondition 'freeable' got status valid.
 [eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:106: 
   allocating variable __realloc_getline_l106
-[eva] FRAMAC_SHARE/libc/stdio.c:84: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:84: starting to merge loop iterations
 [eva] computing for function ferror <- getline <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:84.
 [eva] Done for function ferror
@@ -122,7 +122,7 @@
 [eva:alarm] stdio_c.c:21: Warning: assertion 'read_bytes' got status unknown.
 [eva:alarm] stdio_c.c:22: Warning: 
   assertion 'allocated_enough' got status unknown.
-[eva] stdio_c.c:18: starting to merge loop iterations
+[eva:partition] stdio_c.c:18: starting to merge loop iterations
 [eva] computing for function getline <- main.
   Called from stdio_c.c:18.
 [eva] computing for function ferror <- getline <- main.
@@ -328,7 +328,7 @@
 [eva] FRAMAC_SHARE/libc/stdio.c:167: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:158: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:158: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- fgets <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:161.
 [eva] Done for function Frama_C_interval
@@ -365,16 +365,16 @@
   Called from stdio_c.c:79.
 [eva] computing for function vfscanf <- vscanf <- caller_stub_for_vscanf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:513.
-[eva] FRAMAC_SHARE/libc/stdio.c:265: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:265: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
                           caller_stub_for_vscanf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:350.
 [eva] FRAMAC_SHARE/libc/stdio.c:350: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdio.c:256: starting to merge loop iterations
-[eva] FRAMAC_SHARE/libc/stdio.c:280: starting to merge loop iterations
-[eva] FRAMAC_SHARE/libc/stdio.c:338: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:256: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:280: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:338: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
                           caller_stub_for_vscanf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:350.
@@ -674,7 +674,7 @@
                        (tmp_31 from vararg)
 [eva:alarm] FRAMAC_SHARE/libc/stdio.c:256: Warning: 
   out of bounds read. assert \valid_read(p);
-[eva] FRAMAC_SHARE/libc/stdio.c:291: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdio.c:291: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- vfscanf <- vscanf <- 
                           caller_stub_for_vscanf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:350.

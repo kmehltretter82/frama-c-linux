@@ -70,7 +70,7 @@
 [from] Computing for function fs163_f
 [from] Done for function fs163_f
 [eva] Done for function fs163_f
-[eva] callwise.i:29: starting to merge loop iterations
+[eva:partition] callwise.i:29: starting to merge loop iterations
 [eva] computing for function fs163_f <- fs163_main <- main.
   Called from callwise.i:30.
 [eva] Recording results for fs163_f

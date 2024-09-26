@@ -6,7 +6,7 @@
   t[0..1999] ∈ {0}
 [eva] computing for function f <- main.
   Called from memexec-malloc.c:23.
-[eva] memexec-malloc.c:10: starting to merge loop iterations
+[eva:partition] memexec-malloc.c:10: starting to merge loop iterations
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- main.

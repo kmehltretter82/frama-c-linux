@@ -8,8 +8,8 @@
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] ilevel.c:15: starting to merge loop iterations
-[eva] ilevel.c:18: starting to merge loop iterations
+[eva:partition] ilevel.c:15: starting to merge loop iterations
+[eva:partition] ilevel.c:18: starting to merge loop iterations
 [eva:alarm] ilevel.c:26: Warning: assertion got status unknown.
 [eva:alarm] ilevel.c:28: Warning: assertion got status unknown.
 [eva] ilevel.c:30: Frama_C_show_each: [0..9]
@@ -48,8 +48,8 @@
   j ∈ {0}
   k ∈ {0}
   l ∈ {0}
-[eva] ilevel.c:15: starting to merge loop iterations
-[eva] ilevel.c:18: starting to merge loop iterations
+[eva:partition] ilevel.c:15: starting to merge loop iterations
+[eva:partition] ilevel.c:18: starting to merge loop iterations
 [eva:alarm] ilevel.c:32: Warning: 
   signed overflow. assert (int)((int)(i + j) + k) + l ≤ 2147483647;
 [eva] Recording results for main

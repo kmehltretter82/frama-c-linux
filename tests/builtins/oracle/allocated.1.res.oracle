@@ -221,10 +221,10 @@
 [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_29
 [eva] allocated.c:82: Call to builtin malloc
 [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_30
-[eva] allocated.c:84: Trace partitioning superposing up to 100 states
-[eva] allocated.c:84: Trace partitioning superposing up to 200 states
-[eva] allocated.c:84: Trace partitioning superposing up to 300 states
-[eva] allocated.c:84: Trace partitioning superposing up to 400 states
+[eva:partition] allocated.c:84: Trace partitioning superposing up to 100 states
+[eva:partition] allocated.c:84: Trace partitioning superposing up to 200 states
+[eva:partition] allocated.c:84: Trace partitioning superposing up to 300 states
+[eva:partition] allocated.c:84: Trace partitioning superposing up to 400 states
 [eva] allocated.c:87: Call to builtin free
 [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_30}
 [eva] allocated.c:87: Call to builtin free
