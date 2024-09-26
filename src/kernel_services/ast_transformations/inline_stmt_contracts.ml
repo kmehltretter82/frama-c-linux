@@ -125,7 +125,7 @@ class inline_stmt_contract =
            let b = Cil.mkBlockNonScoping [s; nop] in
            let b = Cil.transient_block b in
            let res = Cil.mkStmt ~valid_sid:true (Block b) in
-           Ast.mark_as_changed ();
+           Ast.mark_as_grown ();
            File.must_recompute_cfg (Option.get self#current_func);
            ChangeTo res
         )
