@@ -211,10 +211,12 @@ class visit_assembly =
                Property.ip_assigns_of_behavior kf (Kstmt stmt) ~active bhv in
              let ip_from =
                Property.ip_from_of_behavior kf (Kstmt stmt) ~active bhv in
+             let ip_init =
+               Property.ip_ensures_of_behavior kf (Kstmt stmt) bhv
+             in
              List.iter
-               Property_status.(
-                 fun x -> emit emitter ~hyps:[] x True)
-               (Option.to_list ip_assigns @ ip_from)
+               Property_status.(fun x -> emit emitter ~hyps:[] x True)
+               (Option.to_list ip_assigns @ ip_from @ ip_init)
            end
          | [ { annot_content = AStmtSpec ([], spec) } ] ->
            (* Already existing contracts. Just add assigns clause for

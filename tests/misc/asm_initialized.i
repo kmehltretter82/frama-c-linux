@@ -1,6 +1,6 @@
 /* run.config*
-PLUGIN: @EVA_PLUGINS@
-STDOPT: #"-asm-contracts-ensure-init -inline-stmt-contracts -absolute-valid-range 0x10000000-0xf00000000 -print"
+PLUGIN: @EVA_PLUGINS@ report
+STDOPT: #"-asm-contracts-ensure-init -asm-contracts-auto-validate -inline-stmt-contracts -absolute-valid-range 0x10000000-0xf00000000 -print -report"
 */
 
 int main() {
