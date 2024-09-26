@@ -3077,18 +3077,12 @@ class cil_printer () = object (self)
 
   method from kw fmt (base,deps) = match deps with
     | FromAny -> ()
-    | From [] ->
+    | From l ->
       fprintf fmt "@[<hv 2>@[<h>%a@ %a@]@ @[<h>%a %a@];@]"
         self#pp_acsl_keyword kw
         self#identified_term base
         self#pp_acsl_keyword "\\from"
-        self#pp_acsl_keyword "\\nothing"
-    | From l ->
-      fprintf fmt "@[<hv 2>@[%a@ %a@]@ @[<h>%a %a@];@]"
-        self#pp_acsl_keyword kw
-        self#identified_term base
-        self#pp_acsl_keyword "\\from"
-        (Pretty_utils.pp_list ~sep:",@ " self#identified_term) l
+        (Pretty_utils.pp_list ~sep:",@ " ~empty:"\\nothing" self#identified_term) l
 
   (* not enclosed in a box *)
   method private terminates_decreases ~extra_nl nl fmt (terminates, variant) =
