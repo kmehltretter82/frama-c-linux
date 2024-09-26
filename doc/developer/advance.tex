@@ -1338,12 +1338,12 @@ output can be associated to a debugging key with the optional argument
 \lstinline{~dkey} which takes an argument of abstract type
 \lstinline|category|.
 Each category must be registered through the \lstinline|register_category|
-function which takes an optionnal parameter \lstinline|help| to provide a
+function which takes an optional parameter \lstinline|help| to provide a
 short description for this category. You can define subcategories by putting
 colons in the registered name. For instance \lstinline|a:b:c| defines a
 subcategory \lstinline|c| of \lstinline|a:b|, itself a subcategory of
-\lstinline|a|. User can then choose to output debugging messages belonging to a
-given category (and its subcategories) with the
+\lstinline|a|. The user can then choose to output debugging messages belonging
+to a given category (and its subcategories) with the
 \lstinline{-plugin-msg-key <category>} option.
 
 In order to decide whether a message should be output, both level and category
@@ -1371,7 +1371,7 @@ abstract type \sscodeidxdef{Log}{Messages}{warn\_category}
 \lstinline|warn_category|. Warning categories are distinct from plain
 categories, and must be registered with the
 \sscodeidxdef{Log}{Messages}{register\_warn\_category}
-\lstinline|register_warn_category| function which takes an optionnal parameter
+\lstinline|register_warn_category| function which takes an optional parameter
 \lstinline|help| to provide a short description for this warning category. As
 explained in the user manual~\cite{userman}, each category can be associated
 with a status that controls what will happen when a warning is triggered, from

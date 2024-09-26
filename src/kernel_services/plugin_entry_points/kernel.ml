@@ -49,7 +49,7 @@ let dkey_asm_contracts =
   register_category ~help:"inline assembly contracts" "asm:contracts"
 
 let dkey_ast =
-  register_category ~help:"prints the AST juste after Ast.compute" "ast"
+  register_category ~help:"prints the AST just after Ast.compute" "ast"
 
 let dkey_builtins =
   register_category ~help:"Cil builtins" "builtins"

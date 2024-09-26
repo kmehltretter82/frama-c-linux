@@ -1287,7 +1287,7 @@ struct
     let print_one_elt fmt s =
       Format.fprintf fmt "%-*s : %s" max s (get_category_help s)
     in
-    (* level 0 just in case user ask to display all categories
+    (* level 0 just in case user asks to display all categories
        in an otherwise quiet run *)
     feedback ~level:0 "@[<v 2>Message categories for %s are:@;%a@]"
       label Format.(pp_print_list ~pp_sep:pp_print_cut print_one_elt) l
@@ -1295,7 +1295,7 @@ struct
   let pp_all_warn_categories_status () =
     let l = get_all_warn_categories_status () in
     let (max, max_status), l =
-      (* We need the length of statuses so we convert them to string. *)
+      (* We need the length of statuses, so we convert them to strings. *)
       List.fold_left_map (fun (m, m') (s, status) ->
           let status = Format.asprintf "%a" pp_warn_status status in
           let max_s = max m (String.length s) in
