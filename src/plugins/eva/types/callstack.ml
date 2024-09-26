@@ -23,6 +23,7 @@
 let stable_hash x = Hashtbl.seeded_hash 0 x
 
 let dkey_callstack = Self.register_category "callstack"
+    ~help:"additionally print the current callstack in some messages"
 
 module Thread = Int (* Threads are identified by integers *)
 module Kf = Kernel_function

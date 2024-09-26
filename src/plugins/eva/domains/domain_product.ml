@@ -24,7 +24,8 @@ open Eval
 
 let counter = ref 0
 
-let product_category = Self.register_category "domain_product"
+let product_category =
+  Self.register_category "domain_product" ~help:"inactive category"
 
 module Make
     (Context  : Abstract_context.S)

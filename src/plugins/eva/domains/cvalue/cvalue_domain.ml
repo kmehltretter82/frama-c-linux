@@ -23,6 +23,8 @@
 open Eval
 
 let dkey_card = Self.register_category "cardinal"
+    ~help:"estimate the number of concrete states approximated by the analysis \
+           at the end of each function"
 
 module State = struct
 

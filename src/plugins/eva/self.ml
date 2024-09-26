@@ -75,14 +75,41 @@ let is_computed () =
   | NotComputed | Computing -> false
 
 (* Debug categories. *)
-let dkey_initial_state = register_category "initial-state"
-let dkey_final_states = register_category "final-states"
-let dkey_summary = register_category "summary"
-let dkey_pointer_comparison = register_category "pointer-comparison"
-let dkey_cvalue_domain = register_category "d-cvalue"
-let dkey_iterator = register_category "iterator"
-let dkey_widening = register_category "widening"
-let dkey_recursion = register_category "recursion"
+let dkey_initial_state =
+  register_category "initial-state"
+    ~help:"at the start of the analysis, \
+           print the initial value of global variables"
+
+let dkey_final_states =
+  register_category "final-states"
+    ~help:"at the end of the analysis, print final values inferred \
+           at the return point of each analyzed function "
+
+let dkey_summary =
+  register_category "summary"
+    ~help:"print a summary of the analysis at the end, including coverage \
+           and alarm numbers"
+
+let dkey_pointer_comparison =
+  register_category "pointer-comparison"
+    ~help:"messages about the evaluation of pointer comparisons"
+
+let dkey_cvalue_domain =
+  register_category "d-cvalue"
+    ~help:"print states of the cvalue domain on some user directives"
+
+let dkey_iterator =
+  register_category "iterator"
+    ~help:"debug messages about the fixpoint engine on the control-flow graph \
+           of functions"
+
+let dkey_widening =
+  register_category "widening"
+    ~help:"print a message at each point where the analysis applies a widening"
+
+let dkey_recursion =
+  register_category "recursion"
+    ~help:"print a message for each recursive call"
 
 let () =
   let activate dkey = add_debug_keys dkey in

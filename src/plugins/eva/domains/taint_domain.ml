@@ -44,6 +44,7 @@ type taint_state = {
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
 let dkey_debug = Self.register_category "d-taint-debug"
+    ~help:"debug print of the taint domain"
 
 let wkey = Self.register_warn_category "taint"
 

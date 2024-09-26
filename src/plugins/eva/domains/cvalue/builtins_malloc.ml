@@ -27,6 +27,7 @@ open Cvalue
 open Lattice_bounds
 
 let dkey = Self.register_category "malloc"
+    ~help:"messages from the builtins interpreting dynamic allocations"
 
 let wkey_weak_alloc = Self.register_warn_category "malloc:weak"
 let () = Self.set_warn_status wkey_weak_alloc Log.Winactive
