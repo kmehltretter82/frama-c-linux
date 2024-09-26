@@ -15,7 +15,8 @@
 [eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/glob.c:66: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66
+[eva:malloc:new] FRAMAC_SHARE/libc/glob.c:66: 
+  allocating variable __realloc_glob_l66
 [eva] FRAMAC_SHARE/libc/glob.c:71: starting to merge loop iterations
 [eva] FRAMAC_SHARE/libc/glob.c:73: starting to merge loop iterations
 [eva:alarm] FRAMAC_SHARE/libc/glob.c:74: Warning: 
@@ -60,7 +61,8 @@
   Called from FRAMAC_SHARE/libc/glob.c:32.
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66_0
+[eva:malloc:new] FRAMAC_SHARE/libc/glob.c:66: 
+  allocating variable __realloc_glob_l66_0
 [eva] computing for function Frama_C_nondet <- glob <- main.
   Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] Done for function Frama_C_nondet
@@ -89,9 +91,11 @@
 [eva] FRAMAC_SHARE/libc/glob.c:50: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/glob.c:50: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/glob.c:50: allocating variable __realloc_glob_l50
+[eva:malloc:new] FRAMAC_SHARE/libc/glob.c:50: 
+  allocating variable __realloc_glob_l50
 [eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66_1
+[eva:malloc:new] FRAMAC_SHARE/libc/glob.c:66: 
+  allocating variable __realloc_glob_l66_1
 [eva] computing for function Frama_C_nondet <- glob <- main.
   Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] Done for function Frama_C_nondet
@@ -118,10 +122,12 @@
   Called from FRAMAC_SHARE/libc/glob.c:32.
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/glob.c:50: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/glob.c:50: allocating variable __realloc_glob_l50_0
+[eva:malloc:new] FRAMAC_SHARE/libc/glob.c:50: 
+  allocating variable __realloc_glob_l50_0
 [eva] FRAMAC_SHARE/libc/glob.c:54: starting to merge loop iterations
 [eva] FRAMAC_SHARE/libc/glob.c:66: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/glob.c:66: allocating variable __realloc_glob_l66_2
+[eva:malloc:new] FRAMAC_SHARE/libc/glob.c:66: 
+  allocating variable __realloc_glob_l66_2
 [eva] computing for function Frama_C_nondet <- glob <- main.
   Called from FRAMAC_SHARE/libc/glob.c:77.
 [eva] Done for function Frama_C_nondet

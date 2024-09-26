@@ -11,7 +11,7 @@
   (unsigned int)(sizeof(unsigned char [1]) + sizeof(int));
 [eva] array_sizeof.i:14: assertion 'alloca_bounds' got status valid.
 [eva] array_sizeof.i:14: Call to builtin __fc_vla_alloc
-[eva] array_sizeof.i:14: allocating variable __malloc_main_l14
+[eva:malloc:new] array_sizeof.i:14: allocating variable __malloc_main_l14
 [eva:alarm] array_sizeof.i:15: Warning: 
   accessing uninitialized left-value. assert \initialized(buf_0 + x);
 [eva] Recording results for main

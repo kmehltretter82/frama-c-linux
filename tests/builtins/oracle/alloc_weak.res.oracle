@@ -9,7 +9,7 @@
 [eva] computing for function main1 <- main.
   Called from alloc_weak.c:93.
 [eva] alloc_weak.c:23: Call to builtin malloc
-[eva] alloc_weak.c:23: allocating variable __malloc_main1_l23
+[eva:malloc:new] alloc_weak.c:23: allocating variable __malloc_main1_l23
 [eva] alloc_weak.c:23: Call to builtin malloc
 [eva:malloc:weak] alloc_weak.c:23: marking variable `__malloc_main1_l23' as weak
 [eva] computing for function copy <- main1 <- main.
@@ -38,7 +38,7 @@
 [eva] computing for function main2 <- main.
   Called from alloc_weak.c:94.
 [eva] alloc_weak.c:37: Call to builtin malloc
-[eva] alloc_weak.c:37: allocating variable __malloc_main2_l37
+[eva:malloc:new] alloc_weak.c:37: allocating variable __malloc_main2_l37
 [eva:alarm] alloc_weak.c:37: Warning: 
   pointer downcast.
   assert (unsigned int)tmp ≤ 2147483647;
@@ -56,7 +56,7 @@
 [eva] computing for function main3 <- main.
   Called from alloc_weak.c:95.
 [eva] alloc_weak.c:51: Call to builtin malloc
-[eva] alloc_weak.c:51: allocating variable __malloc_main3_l51
+[eva:malloc:new] alloc_weak.c:51: allocating variable __malloc_main3_l51
 [eva] alloc_weak.c:50: starting to merge loop iterations
 [eva] alloc_weak.c:51: Call to builtin malloc
 [eva:malloc:weak] alloc_weak.c:51: marking variable `__malloc_main3_l51' as weak
@@ -75,9 +75,11 @@
 [eva] computing for function convergence_issue <- main.
   Called from alloc_weak.c:96.
 [eva] alloc_weak.c:73: Call to builtin calloc
-[eva] alloc_weak.c:73: allocating variable __calloc_convergence_issue_l73
+[eva:malloc:new] alloc_weak.c:73: 
+  allocating variable __calloc_convergence_issue_l73
 [eva] alloc_weak.c:82: Call to builtin calloc
-[eva] alloc_weak.c:82: allocating variable __calloc_convergence_issue_l82
+[eva:malloc:new] alloc_weak.c:82: 
+  allocating variable __calloc_convergence_issue_l82
 [eva] alloc_weak.c:74: starting to merge loop iterations
 [eva:alarm] alloc_weak.c:80: Warning: 
   out of bounds read. assert \valid_read((p + size) - 1);

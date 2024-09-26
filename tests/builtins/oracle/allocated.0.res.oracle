@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] allocated.c:25: Call to builtin malloc
-[eva] allocated.c:25: allocating variable __malloc_main_l25
+[eva:malloc:new] allocated.c:25: allocating variable __malloc_main_l25
 [eva] allocated.c:25: assertion got status valid.
 [eva:alarm] allocated.c:27: Warning: 
   out of bounds read. assert \valid_read(p + 1);
@@ -18,7 +18,7 @@
 [eva:malloc] allocated.c:31: strong free on bases: {__malloc_main_l25}
 [eva] allocated.c:32: Frama_C_show_each_p_after_free: ⊥
 [eva] allocated.c:36: Call to builtin malloc
-[eva] allocated.c:36: allocating variable __malloc_main_l36
+[eva:malloc:new] allocated.c:36: allocating variable __malloc_main_l36
 [eva] allocated.c:36: assertion got status valid.
 [eva] allocated.c:40: Frama_C_show_each_p: {{ &__malloc_main_l36 }}
 [eva] allocated.c:41: Frama_C_show_each_p0: {13}
@@ -38,7 +38,7 @@
 [kernel] allocated.c:46: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] allocated.c:50: Call to builtin malloc
-[eva] allocated.c:50: allocating variable __malloc_main_l50
+[eva:malloc:new] allocated.c:50: allocating variable __malloc_main_l50
 [eva] allocated.c:50: assertion got status valid.
 [eva:alarm] allocated.c:53: Warning: out of bounds write. assert \valid(p + 2);
 [eva] allocated.c:54: Frama_C_show_each_p: {{ &__malloc_main_l50 }}
@@ -49,7 +49,7 @@
 [eva] allocated.c:58: function free: precondition 'freeable' got status valid.
 [eva:malloc] allocated.c:58: strong free on bases: {__malloc_main_l50}
 [eva] allocated.c:63: Call to builtin malloc
-[eva] allocated.c:63: allocating variable __malloc_main_l63
+[eva:malloc:new] allocated.c:63: allocating variable __malloc_main_l63
 [eva] allocated.c:63: assertion got status valid.
 [eva] allocated.c:65: Frama_C_show_each_p: {{ &__malloc_main_l63 }}
 [eva] allocated.c:66: Frama_C_show_each_p0: {0}
@@ -72,7 +72,7 @@
 [eva] allocated.c:67: Call to builtin free
 [eva:malloc] allocated.c:67: strong free on bases: {__malloc_main_l63}
 [eva] allocated.c:73: Call to builtin malloc
-[eva] allocated.c:73: allocating variable __malloc_main_l73
+[eva:malloc:new] allocated.c:73: allocating variable __malloc_main_l73
 [eva] allocated.c:75: Frama_C_show_each_p: {{ &__malloc_main_l73 }}
 [eva] allocated.c:76: Frama_C_show_each_p0: {0}
 [eva] allocated.c:77: Call to builtin free
@@ -95,7 +95,7 @@
 [eva] allocated.c:77: Call to builtin free
 [eva:malloc] allocated.c:77: strong free on bases: {__malloc_main_l73}
 [eva] allocated.c:82: Call to builtin malloc
-[eva] allocated.c:82: allocating variable __malloc_main_l82
+[eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82
 [eva] allocated.c:82: assertion got status valid.
 [eva] allocated.c:87: Call to builtin free
 [eva] allocated.c:87: function free: precondition 'freeable' got status valid.
@@ -123,14 +123,14 @@
 [eva:malloc] allocated.c:82: 
   resizing variable `__malloc_w_main_l82' (0..-1/95) to fit 0..31/95
 [eva] allocated.c:91: Call to builtin malloc
-[eva] allocated.c:91: allocating variable __malloc_main_l91
+[eva:malloc:new] allocated.c:91: allocating variable __malloc_main_l91
 [eva] allocated.c:91: assertion got status valid.
 [eva] allocated.c:92: Call to builtin free
 [eva] allocated.c:92: function free: precondition 'freeable' got status valid.
 [eva:malloc] allocated.c:92: strong free on bases: {__malloc_main_l91}
 [eva:alarm] allocated.c:96: Warning: assertion 'Assume' got status unknown.
 [eva] allocated.c:97: Call to builtin malloc
-[eva] allocated.c:97: allocating variable __malloc_main_l97
+[eva:malloc:new] allocated.c:97: allocating variable __malloc_main_l97
 [eva] allocated.c:97: Frama_C_show_each: {{ &__malloc_main_l97 }}
 [eva:alarm] allocated.c:98: Warning: out of bounds write. assert \valid(p);
 [eva] allocated.c:110: Frama_C_show_each: {0}
@@ -139,7 +139,7 @@
 [eva:malloc] allocated.c:111: strong free on bases: {__malloc_main_l97}
 [eva:alarm] allocated.c:113: Warning: assertion got status unknown.
 [eva] allocated.c:114: Call to builtin malloc
-[eva] allocated.c:114: allocating variable __malloc_main_l114
+[eva:malloc:new] allocated.c:114: allocating variable __malloc_main_l114
 [eva] allocated.c:114: Frama_C_show_each: {{ &__malloc_main_l114 }}
 [eva:alarm] allocated.c:115: Warning: out of bounds write. assert \valid(p);
 [eva] allocated.c:117: Frama_C_show_each: {0}
@@ -147,7 +147,7 @@
 [eva] allocated.c:118: function free: precondition 'freeable' got status valid.
 [eva:malloc] allocated.c:118: strong free on bases: {__malloc_main_l114}
 [eva] allocated.c:120: Call to builtin malloc
-[eva] allocated.c:120: allocating variable __malloc_main_l120
+[eva:malloc:new] allocated.c:120: allocating variable __malloc_main_l120
 [eva] allocated.c:120: Frama_C_show_each: {{ &__malloc_main_l120 }}
 [eva] allocated.c:123: Frama_C_show_each: ⊥
 [eva] allocated.c:125: Call to builtin free
@@ -155,7 +155,7 @@
 [eva:malloc] allocated.c:125: strong free on bases: {__malloc_main_l120}
 [eva] allocated.c:127: assertion 'alloca_bounds' got status valid.
 [eva] allocated.c:127: Call to builtin __fc_vla_alloc
-[eva] allocated.c:127: allocating variable __malloc_main_l127
+[eva:malloc:new] allocated.c:127: allocating variable __malloc_main_l127
 [eva] allocated.c:131: Frama_C_show_each: {0}
 [eva] allocated.c:127: Call to builtin __fc_vla_free
 [eva:malloc] allocated.c:127: strong free on bases: {__malloc_main_l127}

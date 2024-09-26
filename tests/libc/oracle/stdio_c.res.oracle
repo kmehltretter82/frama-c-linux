@@ -26,7 +26,8 @@
   function feof: precondition 'valid_stream' got status valid.
 [eva] Done for function feof
 [eva] FRAMAC_SHARE/libc/stdio.c:75: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/stdio.c:75: allocating variable __malloc_getline_l75
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:75: 
+  allocating variable __malloc_getline_l75
 [eva] computing for function ferror <- getline <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:84.
 [eva] FRAMAC_SHARE/libc/stdio.c:84: 
@@ -69,7 +70,8 @@
 [eva] FRAMAC_SHARE/libc/stdio.c:106: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/stdio.c:106: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/stdio.c:106: allocating variable __realloc_getline_l106
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:106: 
+  allocating variable __realloc_getline_l106
 [eva] FRAMAC_SHARE/libc/stdio.c:84: starting to merge loop iterations
 [eva] computing for function ferror <- getline <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:84.
@@ -226,7 +228,8 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/stdio.c:124: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/stdio.c:124: allocating variable __malloc_vasprintf_l124
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:124: 
+  allocating variable __malloc_vasprintf_l124
 [eva] computing for function Frama_C_make_unknown <- vasprintf <- asprintf <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:129.
 [eva] using specification for function Frama_C_make_unknown
@@ -256,7 +259,8 @@
 [eva] Recording results for is_valid_mode
 [eva] Done for function is_valid_mode
 [eva] FRAMAC_SHARE/libc/stdio.c:231: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/stdio.c:231: allocating variable __malloc_fmemopen_l231
+[eva:malloc:new] FRAMAC_SHARE/libc/stdio.c:231: 
+  allocating variable __malloc_fmemopen_l231
 [eva] computing for function Frama_C_interval <- fmemopen <- main.
   Called from FRAMAC_SHARE/libc/stdio.c:239.
 [eva] FRAMAC_SHARE/libc/stdio.c:239: 

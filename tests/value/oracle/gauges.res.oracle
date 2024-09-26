@@ -715,7 +715,7 @@
 [eva] computing for function main17 <- main.
   Called from gauges.c:369.
 [eva] gauges.c:343: Call to builtin malloc
-[eva] gauges.c:343: allocating variable __malloc_main17_l343
+[eva:malloc:new] gauges.c:343: allocating variable __malloc_main17_l343
 [eva] gauges.c:342: starting to merge loop iterations
 [eva] gauges.c:343: Call to builtin malloc
 [eva] Recording results for main17

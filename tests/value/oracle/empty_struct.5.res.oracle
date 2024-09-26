@@ -8,11 +8,11 @@
   nondet ∈ [--..--]
   pgs ∈ {{ &gs }}
 [eva] empty_struct.c:78: Call to builtin malloc
-[eva] empty_struct.c:78: allocating variable __malloc_main3_l78
+[eva:malloc:new] empty_struct.c:78: allocating variable __malloc_main3_l78
 [eva] empty_struct.c:79: Call to builtin realloc
 [eva] empty_struct.c:79: 
   function realloc: precondition 'freeable' got status valid.
-[eva] empty_struct.c:79: allocating variable __realloc_main3_l79
+[eva:malloc:new] empty_struct.c:79: allocating variable __realloc_main3_l79
 [eva] empty_struct.c:81: starting to merge loop iterations
 [eva] empty_struct.c:86: Call to builtin free
 [eva] empty_struct.c:86: 

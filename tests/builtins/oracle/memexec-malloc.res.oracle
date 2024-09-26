@@ -21,13 +21,13 @@
 [eva] computing for function alloc <- main.
   Called from memexec-malloc.c:31.
 [eva] memexec-malloc.c:15: Call to builtin malloc
-[eva] memexec-malloc.c:15: allocating variable __malloc_main_l31
+[eva:malloc:new] memexec-malloc.c:15: allocating variable __malloc_main_l31
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] computing for function alloc <- main.
   Called from memexec-malloc.c:32.
 [eva] memexec-malloc.c:15: Call to builtin malloc
-[eva] memexec-malloc.c:15: allocating variable __malloc_main_l32
+[eva:malloc:new] memexec-malloc.c:15: allocating variable __malloc_main_l32
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] computing for function k <- main.
@@ -35,7 +35,7 @@
 [eva] computing for function alloc <- k <- main.
   Called from memexec-malloc.c:19.
 [eva] memexec-malloc.c:15: Call to builtin malloc
-[eva] memexec-malloc.c:15: allocating variable __malloc_k_l19
+[eva:malloc:new] memexec-malloc.c:15: allocating variable __malloc_k_l19
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] Recording results for k
@@ -45,7 +45,7 @@
 [eva] computing for function alloc <- k <- main.
   Called from memexec-malloc.c:19.
 [eva] memexec-malloc.c:15: Call to builtin malloc
-[eva] memexec-malloc.c:15: allocating variable __malloc_k_l19_0
+[eva:malloc:new] memexec-malloc.c:15: allocating variable __malloc_k_l19_0
 [eva] Recording results for alloc
 [eva] Done for function alloc
 [eva] Recording results for k

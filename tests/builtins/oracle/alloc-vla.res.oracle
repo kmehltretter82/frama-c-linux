@@ -8,7 +8,7 @@
   Called from alloc-vla.c:12.
 [eva] alloc-vla.c:6: assertion 'alloca_bounds' got status valid.
 [eva] alloc-vla.c:6: Call to builtin __fc_vla_alloc
-[eva] alloc-vla.c:6: allocating variable __malloc_f_l6
+[eva:malloc:new] alloc-vla.c:6: allocating variable __malloc_f_l6
 [eva] alloc-vla.c:7: Call to builtin free
 [eva:alarm] alloc-vla.c:7: Warning: 
   function free: precondition 'freeable' got status invalid.

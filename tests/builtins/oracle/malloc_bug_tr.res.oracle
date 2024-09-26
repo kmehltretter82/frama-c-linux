@@ -11,7 +11,7 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] malloc_bug_tr.c:12: Call to builtin malloc
-[eva] malloc_bug_tr.c:12: allocating variable __malloc_main_l12
+[eva:malloc:new] malloc_bug_tr.c:12: allocating variable __malloc_main_l12
 [eva] malloc_bug_tr.c:13: Call to builtin memcpy
 [eva] malloc_bug_tr.c:13: 
   function memcpy: precondition 'valid_dest' got status valid.

@@ -5,17 +5,17 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] calloc.c:14: Call to builtin calloc
-[eva] calloc.c:14: allocating variable __calloc_main_l14
+[eva:malloc:new] calloc.c:14: allocating variable __calloc_main_l14
 [eva] calloc.c:17: Call to builtin calloc
-[eva] calloc.c:17: allocating variable __calloc_main_l17
+[eva:malloc:new] calloc.c:17: allocating variable __calloc_main_l17
 [eva] calloc.c:20: Call to builtin calloc
-[eva] calloc.c:20: allocating variable __calloc_main_l20
+[eva:malloc:new] calloc.c:20: allocating variable __calloc_main_l20
 [eva] calloc.c:23: Call to builtin calloc
-[eva] calloc.c:23: allocating variable __calloc_main_l23
+[eva:malloc:new] calloc.c:23: allocating variable __calloc_main_l23
 [eva] calloc.c:26: assertion got status valid.
 [eva] calloc.c:27: assertion got status valid.
 [eva] calloc.c:30: Call to builtin calloc
-[eva] calloc.c:30: allocating variable __calloc_main_l30
+[eva:malloc:new] calloc.c:30: allocating variable __calloc_main_l30
 [eva] calloc.c:33: assertion got status valid.
 [eva] calloc.c:34: assertion got status valid.
 [eva] calloc.c:35: assertion got status valid.

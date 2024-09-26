@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   v ∈ [--..--]
 [eva] malloc_memexec.c:14: Call to builtin malloc
-[eva] malloc_memexec.c:14: allocating variable __malloc_main_l14
+[eva:malloc:new] malloc_memexec.c:14: allocating variable __malloc_main_l14
 [eva] computing for function f <- main.
   Called from malloc_memexec.c:16.
 [eva] Recording results for f
@@ -19,7 +19,8 @@
 [eva] Recording results for f
 [eva] Done for function f
 [eva] malloc_memexec.c:23: Call to builtin malloc
-[eva] malloc_memexec.c:23: allocating weak variable __malloc_w_main_l23
+[eva:malloc:new] malloc_memexec.c:23: 
+  allocating weak variable __malloc_w_main_l23
 [eva] computing for function f <- main.
   Called from malloc_memexec.c:25.
 [eva] Recording results for f

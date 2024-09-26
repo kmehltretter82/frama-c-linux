@@ -85,9 +85,11 @@
 [eva] computing for function getaddrinfo <- main.
   Called from netdb_c.c:34.
 [eva] FRAMAC_SHARE/libc/netdb.c:56: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/netdb.c:56: allocating variable __malloc_getaddrinfo_l56
+[eva:malloc:new] FRAMAC_SHARE/libc/netdb.c:56: 
+  allocating variable __malloc_getaddrinfo_l56
 [eva] FRAMAC_SHARE/libc/netdb.c:58: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/netdb.c:58: allocating variable __malloc_getaddrinfo_l58
+[eva:malloc:new] FRAMAC_SHARE/libc/netdb.c:58: 
+  allocating variable __malloc_getaddrinfo_l58
 [eva] computing for function Frama_C_interval <- getaddrinfo <- main.
   Called from FRAMAC_SHARE/libc/netdb.c:60.
 [eva] using specification for function Frama_C_interval
@@ -149,7 +151,8 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/netdb.c:72: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/netdb.c:72: allocating variable __malloc_getaddrinfo_l72
+[eva:malloc:new] FRAMAC_SHARE/libc/netdb.c:72: 
+  allocating variable __malloc_getaddrinfo_l72
 [eva] computing for function strcpy <- getaddrinfo <- main.
   Called from FRAMAC_SHARE/libc/netdb.c:74.
 [eva] using specification for function strcpy
