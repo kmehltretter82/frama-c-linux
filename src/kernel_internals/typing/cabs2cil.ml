@@ -3193,14 +3193,14 @@ let rec collectInitializer
         Cil_datatype.Typ.pretty thistype !pMaxIdx;
       (* Find the field to initialize *)
       let rec findField (idx: int) = function
-        | [] -> Kernel.fatal ~current:true "collectInitializer: union"
+        | [] -> [], reads
         | _ :: rest when idx < !pMaxIdx && !pArray.(idx) = NoInitPre ->
           findField (idx + 1) rest
         | f :: _ when idx = !pMaxIdx ->
           let init, reads =
             collectFieldInitializer reads !pArray.(idx) f ~parenttype:thistype
           in
-          (Field(f, NoOffset), init), reads
+          [ (Field(f, NoOffset), init) ], reads
 
         | _ ->
           abort_context "Can initialize only one field for union"
@@ -3209,7 +3209,7 @@ let rec collectInitializer
         Kernel.warning ~current:true
           "On MSVC we can initialize only the first field of a union";
       let init, reads = findField 0 (Option.value ~default:[] comp.cfields) in
-      CompoundInit (thistype, [ init ]), thistype, reads
+      CompoundInit (thistype, init), thistype, reads
 
     | _ -> Kernel.fatal ~current:true "collectInitializer"
 
