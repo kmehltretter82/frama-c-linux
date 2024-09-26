@@ -23,8 +23,6 @@
 open Eval
 open Lattice_bounds
 
-let dkey = Self.register_category "d-multidim"
-
 let map_to_singleton map =
   let aux base offset = function
     | None -> Some (base, offset)
@@ -376,8 +374,6 @@ struct
   type location = Precise_locs.precise_location
   type mdlocation = Location.t (* should be = to location *)
   type origin
-
-  let log_category = dkey
 
   let cache_name s =
     Hptmap_sig.PersistentCache ("Multidim_domain." ^ s)

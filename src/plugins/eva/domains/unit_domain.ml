@@ -20,15 +20,12 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let log_key = Self.register_category "unit-domain"
-
 module Static = struct
   module D = struct
     include Datatype.Unit
     type state = t
 
     let name = "unit"
-    let log_category = log_key
     let structure = Abstract.Domain.Unit
 
     let top = ()

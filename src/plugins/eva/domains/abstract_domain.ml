@@ -498,7 +498,7 @@ module type S = sig
   include Reuse with type t := t
 
   (** Category for the messages about the domain.
-      Must be created through {!Self.register_category}. *)
+      Created by {!Domain_builder.Complete} using the domain name. *)
   val log_category : Self.category
 
   (** This function is called after the analysis. The argument is the state

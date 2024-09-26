@@ -1177,8 +1177,6 @@ module State = struct
           Format.fprintf fmt "@[%a@]" Octagons.pretty octagons
       end)
 
-  let log_category = Self.register_category "d-octagon"
-
   let pretty_debug fmt { octagons; intervals; relations; deps } =
     Format.fprintf fmt
       "@[<v> Octagons: %a@; Intervals: %a@; Relations: %a@; Dependencies: %a@.]"

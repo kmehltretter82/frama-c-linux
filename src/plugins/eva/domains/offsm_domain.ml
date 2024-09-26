@@ -30,8 +30,6 @@ let store_redundant = false
     unsoundnesses in the domain through testing, because many more expressions
     end up being handled. *)
 
-let dkey = Self.register_category "d-bitwise"
-
 module Default_offsetmap = struct
   open Cvalue
 
@@ -110,8 +108,6 @@ module D : Abstract_domain.Leaf
            end)
 
   include Domain_builder.Complete (Memory)
-
-  let log_category = dkey
 
   let empty _ = Memory.empty_map
 

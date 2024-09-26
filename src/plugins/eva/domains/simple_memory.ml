@@ -196,8 +196,6 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   let value_dependencies = Abstract_value.Leaf (module Value)
   let location_dependencies = Main_locations.ploc
 
-  let log_category = Self.register_category ("d-" ^ Info.name)
-
   let widen _kf _stmt = widen
 
   (* This function returns the information known about the location

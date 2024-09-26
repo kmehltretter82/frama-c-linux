@@ -38,8 +38,6 @@ let call_init_state kf =
   | "none" -> ISEmpty
   | _ -> assert false
 
-let dkey = Self.register_category "d-equality"
-
 open Hcexprs
 
 (* ------------------------- Dependences ------------------------------------ *)
@@ -121,8 +119,6 @@ module Internal = struct
   type state = t
 
   let name = "equality"
-
-  let log_category = dkey
 
   let pretty fmt (eqs, _, _) = Equality.Set.pretty fmt eqs
 

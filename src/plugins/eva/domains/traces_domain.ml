@@ -1103,8 +1103,6 @@ module D = struct
 
   include Domain_builder.Complete (Traces)
 
-  let log_category = Self.register_category "d-traces"
-
   let assign ki lv e _v _valuation state =
     let cil_lval = Eva_ast.to_cil_lval lv.Eval.lval in
     let cil_exp = Eva_ast.to_cil_exp e in

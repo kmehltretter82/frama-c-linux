@@ -24,8 +24,6 @@ open Eval
 open Eva_ast
 open Apron
 
-let dkey = Self.register_category "d-apron"
-
 let debug = false
 
 let abort exclog =
@@ -347,6 +345,7 @@ let ival_to_interval = function
 module type Input = sig
   type t
   val manager: t Manager.t
+  val name: string
 end
 
 module Make (Man : Input) = struct
@@ -360,7 +359,6 @@ module Make (Man : Input) = struct
   let location_dependencies = Main_locations.ploc
 
   let man = Man.manager
-  let log_category = dkey
 
   let empty_env = Environment.make [||] [||]
 
@@ -371,7 +369,7 @@ module Make (Man : Input) = struct
     struct
       include Datatype.Undefined
       type t = state
-      let name = Manager.get_library Man.manager
+      let name = Man.name
       let reprs = [top]
       let structural_descr = Structural_descr.t_unknown
 
@@ -689,44 +687,49 @@ end
 module Apron_Octagon = struct
   type t = Oct.t
   let manager = Oct.manager_alloc ()
+  let name = "apron-octagon"
 end
 
 module Apron_Box = struct
   type t = Box.t
   let manager = Box.manager_alloc ()
+  let name = "apron-box"
 end
 
 module Apron_Polka_Loose = struct
   type t = Polka.loose Polka.t
   let manager = Polka.manager_alloc_loose ()
+  let name = "apron-polka-loose"
 end
 module Apron_Polka_Strict = struct
   type t = Polka.strict Polka.t
   let manager = Polka.manager_alloc_strict ()
+  let name = "apron-polka-strict"
 end
 module Apron_Polka_Equalities = struct
   type t = Polka.equalities Polka.t
   let manager = Polka.manager_alloc_equalities ()
+  let name = "apron-polka-equality"
 end
 
 (** Apron manager allocation changes the rounding mode. *)
 let () = Floating_point.set_round_nearest_even ()
 
-let make name (module Man: Input) =
+let make (module Man: Input) =
   let module Domain = Make (Man) in
-  let name = "apron-" ^ name and experimental = true and priority = 1 in
+  let experimental = true and priority = 1 in
   let descr =
-    "Binding to the " ^ name ^ " domain of the Apron library. " ^
+    "Binding to the " ^ Man.name ^ " domain of the Apron library. " ^
     "See http://apron.cri.ensmp.fr/library for more details."
   in
-  Abstractions.Domain.register ~name ~descr ~experimental ~priority
+  Abstractions.Domain.register ~name:Man.name ~descr ~experimental ~priority
     (module Domain)
 
-let octagon = make "octagon" (module Apron_Octagon)
-let box = make "box" (module Apron_Box)
-let polka_loose = make "polka-loose" (module Apron_Polka_Loose)
-let polka_strict = make "polka-strict" (module Apron_Polka_Strict)
-let polka_equality = make "polka-equality" (module Apron_Polka_Equalities)
+let octagon = make (module Apron_Octagon)
+let box = make (module Apron_Box)
+let polka_loose = make (module Apron_Polka_Loose)
+let polka_strict = make (module Apron_Polka_Strict)
+let polka_equality = make (module Apron_Polka_Equalities)
 
 (* When the value abstraction contains both a cvalue and an interval
    component (coming currently from an Apron domain), reduce them from each
