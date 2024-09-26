@@ -259,6 +259,23 @@
   let cv_ghost = Attr("ghost", [])
 
   let toplevel_pred tp_kind tp_statement = { tp_kind; tp_statement }
+
+  let extension ext_name ext_plugin ext_content =
+    {ext_name; ext_plugin; ext_content}
+
+  let global_extension gext_name gext_plugin gext_kind gext_content =
+    Ext_extension {gext_name; gext_plugin; gext_kind; gext_content}
+
+  let import loader module_name module_alias =
+    let import_loader =
+      match loader with
+      | None -> None
+      | Some (loader_name, loader_plugin) ->
+          Some {loader_name;loader_plugin}
+    in
+    LDimport { import_loader; module_name; module_alias}
+
+
 %}
 
 /*****************************************************************************/
@@ -1258,7 +1275,8 @@ ne_simple_clauses:
     { let allocation,assigns,post_cond,extended = snd $4 in
       let name, plugin = $1 in
       let processed = Logic_env.preprocess_extension ~plugin name $2 in
-      allocation,assigns,post_cond,(name, plugin, processed)::extended
+      let ext = extension name plugin processed in
+      allocation,assigns,post_cond,ext::extended
     }
 | post_cond_kind lexpr clause_kw { missing $loc($2) ";" $3 }
 | allocation clause_kw { missing $loc($1) ";" $2 }
@@ -1478,21 +1496,21 @@ loop_variant:
 loop_grammar_extension:
 | LOOP EXT_CODE_ANNOT extension_content SEMICOLON {
   let open Cil_types in
-  let ext, plugin = $2 in
+  let name, plugin = $2 in
   try
-    begin match Logic_env.extension_category ~plugin ext with
+    begin match Logic_env.extension_category ~plugin name with
       | Ext_code_annot (Ext_next_loop | Ext_next_both) ->
-        let processed = Logic_env.preprocess_extension ~plugin ext $3 in
-        (ext, plugin, processed)
+        let processed = Logic_env.preprocess_extension ~plugin name $3 in
+        {ext_name = name; ext_plugin = plugin; ext_content = processed}
       | Ext_code_annot (Ext_here | Ext_next_stmt) ->
         raise
           (Not_well_formed
-            (loc $loc($2), ext ^ " is not a loop annotation extension"))
+            (loc $loc($2), name ^ " is not a loop annotation extension"))
       | _ -> raise Not_found
     end
   with Not_found ->
     Kernel.fatal ~source:(pos $startpos($2))
-      "%s is not a code annotation extension. Parser got wrong lexeme." ext
+      "%s is not a code annotation extension. Parser got wrong lexeme." name
 }
 ;
 
@@ -1527,12 +1545,13 @@ code_annotation:
 | EXT_CODE_ANNOT extension_content SEMICOLON
   { fun bhvs ->
     let open Cil_types in
-    let ext, plugin = $1 in
+    let name, plugin = $1 in
     try
-      begin match Logic_env.extension_category ~plugin ext with
+      begin match Logic_env.extension_category ~plugin name with
         | Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both) ->
-          let processed = Logic_env.preprocess_extension ~plugin ext $2 in
-          Logic_ptree.AExtended(bhvs,false,(ext,plugin,processed))
+          let processed = Logic_env.preprocess_extension ~plugin name $2 in
+          let ext = extension name plugin processed in
+          Logic_ptree.AExtended(bhvs,false,ext)
         | Ext_code_annot Ext_next_loop ->
           raise
             (Not_well_formed
@@ -1540,12 +1559,12 @@ code_annotation:
                 Printf.sprintf
                   "%s is a loop annotation extension. It can't be used as a \
                    plain code annotation extension. Did you mean 'loop %s'?"
-                  ext ext))
+                  name name))
         | _ -> raise Not_found
       end
     with Not_found ->
       Kernel.fatal ~source:(pos $startpos($1))
-        "%s is not a code annotation extension. Parser got wrong lexeme" ext
+        "%s is not a code annotation extension. Parser got wrong lexeme" name
   }
 ;
 
@@ -1571,14 +1590,15 @@ ext_decl:
 | EXT_GLOBAL extension_content SEMICOLON {
     let name, plugin = $1 in
      let processed = Logic_env.preprocess_extension ~plugin name $2 in
-     Ext_lexpr(name, plugin, processed)
+     let ext = extension name plugin processed in
+     Ext_lexpr ext
    }
 | EXT_GLOBAL_BLOCK any_identifier LBRACE ext_decls RBRACE {
     let name, plugin = $1 in
     let processed_id,processed_block =
        Logic_env.preprocess_extension_block ~plugin name ($2,$4)
     in
-    Ext_extension(name, plugin, processed_id, processed_block)
+    global_extension name plugin processed_id processed_block
    }
 ;
 
@@ -1695,13 +1715,13 @@ logic_def:
 | MODULE push_module_name LBRACE logic_decls RBRACE
     { pop_module_types () ; LDmodule($2,$4) }
 | IMPORT mId = module_name SEMICOLON
-    { LDimport(None,mId,None) }
+    { import None mId None }
 | IMPORT mId = module_name AS id = IDENTIFIER SEMICOLON
-    { LDimport(None,mId,Some id) }
+    { import None mId (Some id) }
 | IMPORT loader = ext_loader mId = module_name SEMICOLON
-    { LDimport(Some loader,mId,None) }
+    { import (Some loader) mId None }
 | IMPORT loader = ext_loader mId = module_name AS id = IDENTIFIER SEMICOLON
-    { LDimport(Some loader,mId,Some id) }
+    { import (Some loader) mId (Some id) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();

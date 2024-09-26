@@ -1793,6 +1793,14 @@ and code_annotation = {
 (** behavior of a function. *)
 and funbehavior = behavior
 
+(** loader type used by Dmodules.
+    @since Frama-c+dev
+*)
+and loader = {
+  loader_name: string;
+  loader_plugin: string;
+}
+
 (** global annotations, not attached to a statement or a function. *)
 and global_annotation =
   | Dfun_or_pred of logic_info * location
@@ -1801,8 +1809,10 @@ and global_annotation =
       * attributes * location
   (** associated terms, reading function, writing function *)
   | Daxiomatic of string * global_annotation list * attributes * location
-  (** last option is the external loader responsible for the module importer *)
-  | Dmodule of string * global_annotation list * attributes * (string * string) option * location
+  (** last option is the external loader(name, plugin) responsible for the
+      module importer *)
+  | Dmodule of
+      string * global_annotation list * attributes * loader option * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
       string * logic_label list * string list *

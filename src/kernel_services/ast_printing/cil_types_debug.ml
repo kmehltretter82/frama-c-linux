@@ -972,8 +972,8 @@ and pp_global_annotation fmt = function
       (pp_list pp_global_annotation) global_annotation_list
       pp_attributes attributes  pp_location location
   | Dmodule(string,global_annotation_list,attributes,loader,location) ->
-    let pp_loader fmt (name, plugin) =
-      Format.fprintf fmt "(%s, %s)" name plugin
+    let pp_loader fmt loader =
+      Format.fprintf fmt "(%s, %s)" loader.loader_name loader.loader_plugin
     in
     Format.fprintf fmt "Dmodule(%a,%a,%a,%a,%a)" pp_string string
       (pp_list pp_global_annotation) global_annotation_list

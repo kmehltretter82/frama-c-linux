@@ -278,7 +278,7 @@ module Extensions = struct
 
   let preprocess_block ~plugin name = (find_block ~plugin name).preprocessor
 
-  let typing_gen ~status ~typer name typing_context loc es =
+  let typing_gen ~typer ~status name typing_context loc es =
     let normal_error = ref false in
     let has_error _ = normal_error := true in
     let wrapper =

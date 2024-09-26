@@ -3783,17 +3783,20 @@ struct
       old_behaviors
       behaviors
 
-  let type_extended ~typing_context ~loc (name, plugin, ps) =
-    let loc = match ps with
+  let type_extended ~typing_context ~loc {ext_name; ext_plugin; ext_content} =
+    let loc = match ext_content with
       | [] -> loc
       | p::_ -> p.lexpr_loc
     in
-    if Extensions.is_extension ~plugin name then
-      let status , kind = Extensions.typer name ~plugin ~typing_context ~loc ps in
-      Logic_const.new_acsl_extension ~plugin name loc status kind
+    if Extensions.is_extension ~plugin:ext_plugin ext_name then
+      let status , kind =
+        Extensions.typer ext_name ~plugin:ext_plugin ~typing_context ~loc
+          ext_content
+      in
+      Logic_const.new_acsl_extension ~plugin:ext_plugin ext_name loc status kind
     else
       C.error
-        loc "No type-checking function registered for extension %s" name
+        loc "No type-checking function registered for extension %s" ext_name
 
   (* This module is used to sort the list of behaviors in [complete] and
      [disjoint] clauses, in order to remove duplicate clauses. *)
@@ -3996,7 +3999,8 @@ struct
         let env = loop_annot_env () in
         let ctxt = base_ctxt env in
         Cil_types.AAssigns(behav, type_assign ctxt ~accept_formal:true env a)
-      | AExtended (behav, is_loop, (name, plugin, _ as ext)) ->
+      | AExtended (behav, is_loop, ext) ->
+        let name, plugin = ext.ext_name, ext.ext_plugin in
         let kind = Logic_env.extension_category ~plugin name in
         let pre_state, post_state =
           match kind,is_loop with
@@ -4327,10 +4331,12 @@ struct
       pop_imports () ;
       Some (Dmodule(name,l,[],None,loc))
 
-    | LDimport(None,id,alias) ->
-      add_import ?alias id ; None
+    | LDimport ({import_loader = None; _} as import) ->
+      add_import ?alias:import.module_alias import.module_name ; None
 
-    | LDimport(Some (name, plugin) as loader,id,alias) ->
+    | LDimport ({import_loader = Some loader; _} as import) ->
+      let name, plugin = loader.loader_name, loader.loader_plugin in
+      let id = import.module_name in
       let annot =
         match Logic_env.Modules.find id with
         | None, oldloc ->
@@ -4349,9 +4355,12 @@ struct
           let builder = make_module_builder decls id in
           let path = Logic_utils.longident id in
           Extensions.importer ~plugin name ~builder ~loc path ;
-          Logic_env.Modules.add id (loader,loc) ;
-          Some (Dmodule(id,List.rev !decls,[],loader,loc))
-      in add_import ?alias id ; annot
+          Logic_env.Modules.add id (Some (name, plugin),loc) ;
+          let loader : Cil_types.loader =
+            {loader_name = name; loader_plugin = plugin}
+          in
+          Some (Dmodule(id,List.rev !decls,[],Some loader,loc))
+      in add_import ?alias:import.module_alias id ; annot
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in
@@ -4498,16 +4507,21 @@ struct
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
       Some (Dvolatile (tsets, rvi_opt, wvi_opt, [], loc))
 
-    | LDextended (Ext_lexpr(name, plugin, content)) ->
+    | LDextended (Ext_lexpr ext) ->
+      let plugin, name = ext.ext_plugin, ext.ext_name in
       let typing_context = base_ctxt (Lenv.empty ()) in
-      let status,tcontent = Extensions.typer ~plugin name ~typing_context ~loc content in
+      let status,tcontent =
+        Extensions.typer ~plugin name ~typing_context ~loc ext.ext_content
+      in
       let textended = Logic_const.new_acsl_extension ~plugin name loc status tcontent in
       Some (Dextended (textended, [], loc))
 
-    | LDextended (Ext_extension (name, plugin, kind, content)) ->
+    | LDextended (Ext_extension gext) ->
+      let plugin, name = gext.gext_plugin, gext.gext_name in
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent =
-        Extensions.typer_block name ~plugin ~typing_context ~loc (kind,content)
+        Extensions.typer_block name ~plugin ~typing_context ~loc
+          (gext.gext_kind,gext.gext_content)
       in
       let textended = Logic_const.new_acsl_extension ~plugin name loc status tcontent in
       Some (Dextended (textended, [], loc))

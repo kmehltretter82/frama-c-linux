@@ -168,7 +168,11 @@ type toplevel_predicate =
 (** ACSL extension.
     @before Frama-C+dev Was of type [string * lexpr list].
 *)
-type extension = string * string * lexpr list
+type extension = {
+  ext_name: string;
+  ext_plugin: string;
+  ext_content: lexpr list;
+}
 
 (** type invariant. *)
 type type_annot =  {inv_name: string;
@@ -188,6 +192,14 @@ type typedef =
   | TDsum of (string * logic_type list) list
   (** sum type, list of constructors *)
   | TDsyn of logic_type (** synonym of an existing type *)
+
+type loader = {
+  loader_name: string;
+  loader_plugin: string;
+}
+(** loader type used by module importers.
+    @since Frama-C+dev
+*)
 
 (** global declarations. *)
 type decl = {
@@ -250,7 +262,11 @@ and decl_node =
   | LDmodule of string * decl list
   (** [LDmodule(id,decls)]
       represents a module of axiomatic definitions.*)
-  | LDimport of (string * string) option * string * string option
+  | LDimport of {
+      import_loader: loader option;
+      module_name: string;
+      module_alias: string option;
+    }
   (** [LDimport(loader,module,alias)]
       imports symbols from module using the specified loader,
       with optional alias.*)
@@ -288,10 +304,15 @@ and variant = lexpr * string option
 
 (** Global ACSL extension. *)
 and global_extension =
-  | Ext_lexpr of string * string * lexpr list
+  | Ext_lexpr of extension
   (** @before Frama-C+dev Was of type [string * lexpr list]. *)
 
-  | Ext_extension of string * string * string * extended_decl list
+  | Ext_extension of {
+      gext_name:string;
+      gext_plugin:string;
+      gext_kind: string;
+      gext_content: extended_decl list;
+    }
   (** @before Frama-C+dev Was of type [string * string * extended_decl list]. *)
 
 and extended_decl = {
