@@ -160,6 +160,18 @@ lvalue it is assigned to.
 Otherwise, a temporary variable is used and the cast is made explicit.
 Defaults to yes.
 .TP
+\-generated\-spec\-mode \f[I]mode\f[R]
+selects which \f[I]mode\f[R] will be used to generate missing
+specifications.
+Can be one of: \f[I]frama\-c\f[R], \f[I]acsl\f[R], \f[I]safe\f[R], or
+the name of a custom registered in plug\-in.
+.TP
+\-generated\-spec\-custom \f[I]c_1:m_1,\&...,c_n:m_n\f[R]
+fine\-tunes missing specification generation by manually selecting modes
+for each clause.
+Can be one of: \f[I]frama\-c\f[R], \f[I]acsl\f[R], \f[I]safe\f[R],
+\f[I]skip\f[R], or the name of a custom registered mode.
+.TP
 \-config \f[I]dir\f[R]
 overrides default Frama\-C configuration directory
 .TP
