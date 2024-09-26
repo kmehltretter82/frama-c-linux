@@ -52,6 +52,9 @@ extern void bzero(void *s, size_t n);
 */
 extern int ffs(int i);
 
+#if _POSIX_C_SOURCE < 200809L
+// index and rindex were removed in POSIX-1.2008
+
 /*@
   assigns \result \from s, indirect:s[0 .. strlen(s)], indirect:c;
 */
@@ -61,6 +64,7 @@ extern char *index(const char *s, int c);
   assigns \result \from s, indirect:s[0 .. strlen(s)], indirect:c;
 */
 extern char *rindex(const char *s, int c);
+#endif
 
 /*@
   requires valid_string_s1: valid_read_string(s1);

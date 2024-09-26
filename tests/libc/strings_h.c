@@ -1,3 +1,9 @@
+/* run.config
+  STDOPT: #"-cpp-extra-args=\"-D_POSIX_C_SOURCE=200809L\""
+ EXIT: 1
+  STDOPT:
+*/
+
 #include <strings.h>
 
 volatile int nondet;
@@ -18,3 +24,6 @@ void main() {
   bzero(s4, 10);
   //@ assert s4[9] == s4[8] == 0;
 }
+
+// Check that 'index' is not defined when _POSIX_C_SOURCE >= 200809L
+static int index = 42;
