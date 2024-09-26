@@ -42,7 +42,7 @@
 [kernel:annot:missing-spec] exec.c:15: Warning: 
   Neither code nor specification for function execlp_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
-[eva] using specification for function execlp_fallback_1
+[eva] using specification for function execlp
 [eva:invalid-assigns] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.

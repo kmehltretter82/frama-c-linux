@@ -23,7 +23,7 @@
   Assigning imprecise value to b because of arithmetic operation on addresses.
 [eva:alarm] printf_garbled_mix.c:7: Warning: 
   pointer downcast. assert (unsigned long)b ≤ 2147483647;
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva] printf_garbled_mix.c:8: 
   Frama_C_show_each_nb_printed: [-2147483648..2147483647]
 [eva:garbled-mix:summary] 

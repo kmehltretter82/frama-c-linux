@@ -48,7 +48,7 @@
   out of bounds read. assert \valid_read((struct element **)node);
 [eva] computing for function fprintf_va_1 <- main.
   Called from search_h.c:36.
-[eva] using specification for function fprintf_va_1
+[eva] using specification for function fprintf
 [eva] search_h.c:36: function fprintf_va_1: precondition got status valid.
 [eva] Done for function fprintf_va_1
 [eva] computing for function exit <- main.

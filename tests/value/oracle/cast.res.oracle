@@ -29,7 +29,7 @@
 [eva] Done for function any_int_4
 [eva] computing for function printf_va_1 <- main1 <- main.
   Called from cast.i:46.
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva:alarm] cast.i:46: Warning: 
   function printf_va_1: precondition got status unknown.
 [eva] Done for function printf_va_1
@@ -39,7 +39,6 @@
   Called from cast.i:74.
 [eva] computing for function printf_va_2 <- main2 <- main.
   Called from cast.i:67.
-[eva] using specification for function printf_va_2
 [eva:alarm] cast.i:67: Warning: 
   function printf_va_2: precondition got status unknown.
 [eva] Done for function printf_va_2
@@ -55,7 +54,6 @@
 [eva] Done for function printf_va_2
 [eva] computing for function printf_va_3 <- main2 <- main.
   Called from cast.i:69.
-[eva] using specification for function printf_va_3
 [eva:alarm] cast.i:69: Warning: 
   function printf_va_3: precondition got status unknown.
 [eva] Done for function printf_va_3

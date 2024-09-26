@@ -173,7 +173,7 @@
 [eva] Done for function gai_strerror
 [eva] computing for function fprintf_va_1 <- main.
   Called from netdb_c.c:36.
-[eva] using specification for function fprintf_va_1
+[eva] using specification for function fprintf
 [eva] netdb_c.c:36: 
   function fprintf_va_1: precondition valid_read_string(param0) got status valid.
 [eva] netdb_c.c:36: 
@@ -198,7 +198,6 @@
 [eva] Done for function close
 [eva] computing for function fprintf_va_2 <- main.
   Called from netdb_c.c:57.
-[eva] using specification for function fprintf_va_2
 [eva] netdb_c.c:57: function fprintf_va_2: precondition got status valid.
 [eva] Done for function fprintf_va_2
 [eva] computing for function exit <- main.

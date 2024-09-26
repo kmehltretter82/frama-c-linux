@@ -94,12 +94,11 @@
 [eva] ieee_1180_1990.c:189: starting to merge loop iterations
 [eva] computing for function printf_va_1 <- main.
   Called from ieee_1180_1990.c:195.
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva] ieee_1180_1990.c:195: function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
 [eva] computing for function printf_va_2 <- main.
   Called from ieee_1180_1990.c:196.
-[eva] using specification for function printf_va_2
 [eva] ieee_1180_1990.c:196: function printf_va_2: precondition got status valid.
 [eva] Done for function printf_va_2
 [eva] computing for function IEEE_1180_1990_mkbk <- main.

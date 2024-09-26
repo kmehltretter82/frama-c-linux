@@ -8,7 +8,7 @@
 [variadic:typing] printf_redefined.i:7: Warning: 
   Incorrect type for argument 2. The argument will be cast from long to size_t.
 [eva] Analyzing a complete application starting at main
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   x ∈ {0}

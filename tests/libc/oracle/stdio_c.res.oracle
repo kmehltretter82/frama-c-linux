@@ -244,7 +244,7 @@
 [eva] Done for function asprintf
 [eva] computing for function printf_va_1 <- main.
   Called from stdio_c.c:33.
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva:alarm] stdio_c.c:33: Warning: 
   function printf_va_1: precondition valid_read_string(param0) got status unknown.
 [eva] stdio_c.c:33: 

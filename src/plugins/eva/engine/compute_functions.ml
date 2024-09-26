@@ -235,8 +235,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let compute_using_spec spec kinstr call state =
     if Parameters.InterpreterMode.get ()
     then Self.abort "Library function call. Stopping.";
+    (* Use vorig_name in message to avoid variadic renaming *)
+    let kf_orig_name = (Kernel_function.get_vi call.kf).vorig_name in
     Self.feedback ~once:true
-      "@[using specification for function %a@]" Kernel_function.pretty call.kf;
+      "@[using specification for function %s@]" kf_orig_name;
     let vi = Kernel_function.get_vi call.kf in
     if Cil.is_in_libc vi.vattr then
       Library_functions.warn_unsupported_spec vi.vorig_name;
