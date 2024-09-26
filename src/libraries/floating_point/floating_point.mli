@@ -103,7 +103,7 @@ val single : float -> single t
 val double : float -> double t
 
 (** Returns a typed long precision float. *)
-val long : float -> long   t
+val long : float -> long t
 
 (** Build a typed float of the given format given an OCaml 64-bits
     floating point number. *)

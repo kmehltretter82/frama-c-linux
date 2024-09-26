@@ -147,25 +147,6 @@ value float_is_negative(value v) {
   return (Val_int((int)((uv.i) >> 63)));
 }
 
-// Some compilers apply the C90 standard strictly and do not prototype
-// strtof() although it is available in the C library.
-float strtof(const char *, char **);
-
-// Convert a string into a single precision float.
-value single_precision_of_string(value str) {
-  const char *s = (const char *)str;
-  const char *s_end = s + caml_string_length(str);
-  char *end;
-  float f = strtof(s, &end);
-  char last = tolower(*end);
-  // Because strtof does not consider optional floating-point suffixes
-  // (f, F, l, L), we have to test if they are the cause of the
-  // difference, and if so, ignore it.
-  if (end != s_end && (end + 1 != s_end || (last != 'f' && last != 'l')))
-    caml_failwith("single_precision_of_string");
-  return to_ocaml(f);
-}
-
 value frama_c_round(value frama_c_prec, value num) {
   switch (decode_precision(frama_c_prec)) {
   case Single:

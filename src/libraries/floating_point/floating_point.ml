@@ -41,7 +41,6 @@ type 'f t =
 
 
 external change_format : 'f format -> float -> float = "frama_c_change_format"
-external single_of_string : string -> float = "single_precision_of_string"
 external set_rounding_mode : rounding -> unit = "frama_c_set_round_mode" [@@noalloc]
 external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode" [@@noalloc]
 
@@ -477,14 +476,20 @@ let normalize integral fractional exponent format =
 let is_hexadecimal s =
   Stdlib.(String.length s >= 2 && s.[0] = '0' && (s.[1] = 'X' || s.[1] = 'x'))
 
-let parse_hexadecimal (type f) ~(format : f format) s : f parsed_float option =
+let parse_hexadecimal (type f) ~(format : f format) s =
   let open Option.Operators in
-  let constant f = { lower = f ; nearest = f ; upper = f ; format } in
-  let single s = single_of_string s |> single in
-  match format with
-  | Long   -> let+ n = float_of_string_opt s in constant (long n)
-  | Double -> let+ n = float_of_string_opt s in constant (double n)
-  | Single -> try Some (single s |> constant) with Failure _ -> None
+  let current  = get_rounding_mode () in
+  set_rounding_mode Nearest_even ;
+  let* nearest = float_of_string_opt s in
+  let  nearest = represents ~float:nearest ~in_format:format in
+  set_rounding_mode Downward ;
+  let* lower   = float_of_string_opt s in
+  let  lower   = represents ~float:lower   ~in_format:format in
+  set_rounding_mode Upward ;
+  let* upper   = float_of_string_opt s in
+  let  upper   = represents ~float:upper   ~in_format:format in
+  set_rounding_mode current ;
+  Some { lower ; nearest ; upper ; format }
 
 
 
