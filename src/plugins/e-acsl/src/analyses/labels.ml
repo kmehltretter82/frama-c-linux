@@ -65,6 +65,9 @@ let at_data_for_stmts: At_data.t list ref Stmt.Hashtbl.t =
     statement [stmt]. *)
 let add_at_for_stmt data stmt =
   let stmt = get_first_inner_stmt stmt in
+  (* Note that the error field is not taken into account in At_data.equal.
+     Therefore we cannot just write:
+       At_data.Hashtbl.replace ats_tbl data data; let old_data = data in *)
   let ats_ref =
     try
       Stmt.Hashtbl.find at_data_for_stmts stmt
