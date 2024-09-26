@@ -52,8 +52,6 @@
   too many locations to update in array. Approximating.
 [kernel:approximation] memcpy.c:53: 
   more than 150(1000) locations to update in array. Approximating.
-[kernel:approximation] memcpy.c:53: 
-  more than 150(1000) elements to enumerate. Approximating.
 [eva] memcpy.c:57: Call to builtin memcpy
 [eva] memcpy.c:57: function memcpy: precondition 'valid_dest' got status valid.
 [eva] memcpy.c:57: function memcpy: precondition 'valid_src' got status valid.

@@ -137,8 +137,6 @@ module type Location_map_bitwise = sig
 
   val shape: map -> LOffset.t Hptmap.Shape(Base.Base).t
 
-  val imprecise_write_msg: string ref
-
   (** Clear the caches local to this module. Beware that they are not
       project-aware, and that you must call them at every project switch. *)
   val clear_caches: unit -> unit

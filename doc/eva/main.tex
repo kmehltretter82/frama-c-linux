@@ -4144,8 +4144,8 @@ Instead, if the range of indices to be accessed is larger than {\em plevel},
 some approximations are made and a message is emitted:
 
 \begin{listing-log}
-[kernel] arrays.c:32:
-  more than 200(300) elements to enumerate. Approximating.
+[kernel:approximation] arrays.c:32:
+  more than 200(300) locations to update in array. Approximating.
 \end{listing-log}
 
 This message means that the array to be updated had 300 elements, and
@@ -4155,7 +4155,7 @@ could be caused by the imprecision. In other cases, however, there is little
 hope of obtaining a reasonable bound:
 
 \begin{listing-log}
-more than 200(0x20000000) elements to enumerate. Approximating.
+more than 200(0x20000000) locations to update in array. Approximating.
 \end{listing-log}
 
 In some cases, lowering the plevel can improve performance, but it is rarely

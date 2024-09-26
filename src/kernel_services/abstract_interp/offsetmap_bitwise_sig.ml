@@ -157,9 +157,4 @@ module type S = sig
       project-aware, and that you must call them at every project switch. *)
   val clear_caches: unit -> unit
 
-
-  (**/**)
-
-  val imprecise_write_msg: string ref
-
 end

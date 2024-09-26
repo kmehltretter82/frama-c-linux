@@ -196,8 +196,6 @@ let collapse_return x = x
 
 (* ----- Pretty-printing ---------------------------------------------------- *)
 
-let () = imprecise_write_msg := "dependencies to update"
-
 let pretty_skip = function
   | DepsOrUnassigned.DepsBottom -> true
   | DepsOrUnassigned.Unassigned -> true

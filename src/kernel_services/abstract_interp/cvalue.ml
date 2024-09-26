@@ -925,7 +925,11 @@ module V_Or_Uninitialized = struct
 end
 
 module V_Offsetmap = struct
-  include Offsetmap.Make(V_Or_Uninitialized)
+  module Params = struct
+    let approximation_feedback = true
+  end
+
+  include Offsetmap.Make (V_Or_Uninitialized) (Params)
 
   let from_string s =
     (* Iterate on s + null terminator; same signature as List.fold_left *)
