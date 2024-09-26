@@ -464,9 +464,12 @@ module LF_env
          Logic_var.Map.update
            lv
            (fun m -> match m with
-              | Some m ->
-                Some (Misc.Id_term.Map.update t (fun _ -> Some profile) m)
-              | None -> Some (Misc.Id_term.Map.(add t profile empty)))
+              | Some tbl ->
+                Misc.Id_term.Hashtbl.replace tbl t profile; Some tbl
+              | None ->
+                let tbl = Misc.Id_term.Hashtbl.create 9 in
+                Misc.Id_term.Hashtbl.add tbl t profile;
+                Some tbl)
            map)
       map
       li.l_profile

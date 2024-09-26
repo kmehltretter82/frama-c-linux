@@ -217,7 +217,7 @@ let replace_all_args_ival li args_ival =
   List.iter
     (fun x ->
        let i = Logic_var.Map.find x args_ival in
-       (Misc.Id_term.Map.iter
+       (Misc.Id_term.Hashtbl.iter
           (fun t profile -> Memo.replace profile t i)
           (Logic_var.Map.find x args_map)))
     li.l_profile
