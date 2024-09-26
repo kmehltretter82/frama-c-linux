@@ -173,6 +173,7 @@ value frama_c_round(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(round(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_round]");
     return to_ocaml(roundl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_round]");
@@ -186,6 +187,7 @@ value frama_c_trunc(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(trunc(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_trunc]");
     return to_ocaml(truncl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_trunc]");
@@ -199,6 +201,7 @@ value frama_c_exp(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(exp(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_exp]");
     return to_ocaml(expl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_exp]");
@@ -212,6 +215,7 @@ value frama_c_log(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(log(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_log]");
     return to_ocaml(logl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_log]");
@@ -225,6 +229,7 @@ value frama_c_log10(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(log10(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_log10]");
     return to_ocaml(log10l(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_log10]");
@@ -238,6 +243,7 @@ value frama_c_pow(value frama_c_prec, value num, value exp) {
   case Double:
     return to_ocaml(pow(to_double(num), to_double(exp)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_pow]");
     return to_ocaml(powl(to_long(num), to_long(exp)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_pow]");
@@ -251,6 +257,7 @@ value frama_c_fmod(value frama_c_prec, value num, value mod) {
   case Double:
     return to_ocaml(fmod(to_double(num), to_double(mod)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_fmod]");
     return to_ocaml(fmodl(to_long(num), to_long(mod)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_fmod]");
@@ -264,6 +271,7 @@ value frama_c_cos(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(cos(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_cos]");
     return to_ocaml(cosl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_cos]");
@@ -277,6 +285,7 @@ value frama_c_sin(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(sin(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_sin]");
     return to_ocaml(sinl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_sin]");
@@ -290,6 +299,7 @@ value frama_c_tan(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(tan(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_tan]");
     return to_ocaml(tanl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_tan]");
@@ -303,6 +313,7 @@ value frama_c_acos(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(acos(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_acos]");
     return to_ocaml(acosl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_acos]");
@@ -316,6 +327,7 @@ value frama_c_asin(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(asin(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_asin]");
     return to_ocaml(asinl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_asin]");
@@ -329,6 +341,7 @@ value frama_c_atan(value frama_c_prec, value num) {
   case Double:
     return to_ocaml(atan(to_double(num)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_atan]");
     return to_ocaml(atanl(to_long(num)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_atan]");
@@ -342,6 +355,7 @@ value frama_c_atan2(value frama_c_prec, value l, value r) {
   case Double:
     return to_ocaml(atan2(to_double(l), to_double(r)));
   case Long:
+    caml_failwith("Long double support is not implemented in [frama_c_atan2]");
     return to_ocaml(atan2l(to_long(l), to_long(r)));
   default:
     caml_invalid_argument("Invalid floating-point format in [frama_c_atan2]");

@@ -343,8 +343,14 @@ let ( let* ) normalizing f =
   | Shortcut parsed -> Shortcut parsed
   | Normalized v -> f v
 
-let parsed = function
-  | Shortcut r | Normalized r -> Parsed r
+let parsed sign = function
+  | Shortcut r | Normalized r ->
+    if Stdlib.(sign = "-") then
+      let upper   = neg r.lower   in
+      let lower   = neg r.upper   in
+      let nearest = neg r.nearest in
+      Parsed { lower ; nearest ; upper ; format = r.format }
+    else Parsed r
 
 let pos_inf_shortcut ~format =
   let inf = represents ~float:Float.infinity ~in_format:format in
@@ -379,7 +385,7 @@ let normalize_exponent_on_format ~format exponent =
   then pos_inf_shortcut ~format
   else Normalized Z.(to_int exponent)
 
-let normalize sign integral fractional exponent format =
+let normalize integral fractional exponent format =
   (* Concats the integral and fractional parts to produce [ i x 10 ^ l + f ]
      with i (reps. f) the integral (resp. fractional) part and l the length
      of the fractional part. This number is the numerator. To compensate,
@@ -450,26 +456,21 @@ let normalize sign integral fractional exponent format =
   let numerator = !numerator and denominator = !denominator in
   let* exponent = normalize_exponent_on_format ~format !exponent in
   let significant, reminder = Integer.e_div_rem numerator denominator in
-  let significant = Integer.to_int64_exn significant in
-  let lower_bound = Float.ldexp Int64.(to_float significant) exponent in
-  let upper_bound = Float.ldexp Int64.(succ significant |> to_float) exponent in
+  let lower_bound = Float.ldexp Integer.(to_float significant) exponent in
+  let upper_bound = Float.ldexp Integer.(succ significant |> to_float) exponent in
   (* Determining if the rounding to nearest comes down to round down. *)
   let double_reminder = Z.shift_left reminder 1 in
   let is_zero = Z.(equal double_reminder zero) in
   let is_half_denominator = Z.(equal double_reminder denominator) in
   let less_than_half_denominator = Z.Compare.(double_reminder < denominator) in
-  let is_last_bit_zero = Int64.(equal (logand significant one) zero) in
+  let is_last_bit_zero = Integer.(equal (logand significant one) zero) in
   let tie_to_even = is_half_denominator && is_last_bit_zero in
   let nearest_is_down = is_zero || less_than_half_denominator || tie_to_even in
   (* Assigning each floating-point number to one of the computed bound. *)
   let lower = Float (lower_bound, format) in
   let upper = if is_zero then lower else Float (upper_bound, format) in
   let nearest = if nearest_is_down then lower else upper in
-  let return lower nearest upper = Normalized { lower ; nearest ; upper ; format } in
-  (* Reversing the sign of the three floating-point numbers and inversing the
-     lower and upper bound if the parsed number is negative. *)
-  if Stdlib.(sign <> "-") then return lower nearest upper
-  else return (neg upper) (neg nearest) (neg lower)
+  Normalized { lower ; nearest ; upper ; format }
 
 
 
@@ -532,21 +533,21 @@ let parse str =
     let fractional    = Str.matched_group 3 str in
     let exponent      = Str.matched_group 4 str in
     let Format format = Str.matched_group 5 str |> format_of_string in
-    normalize sign integral fractional exponent format |> parsed
+    normalize integral fractional exponent format |> parsed sign
   else if Str.string_match num_dot_frac str 0 then
     let sign          = Str.matched_group 1 str in
     let integral      = Str.matched_group 2 str in
     let fractional    = Str.matched_group 3 str in
     let exponent      = "0" in
     let Format format = Str.matched_group 4 str |> format_of_string in
-    normalize sign integral fractional exponent format |> parsed
+    normalize integral fractional exponent format |> parsed sign
   else if Str.string_match num_exp str 0 then
     let sign          = Str.matched_group 1 str in
     let integral      = Str.matched_group 2 str in
     let fractional    = "" in
     let exponent      = Str.matched_group 3 str in
     let Format format = Str.matched_group 4 str |> format_of_string in
-    normalize sign integral fractional exponent format |> parsed
+    normalize integral fractional exponent format |> parsed sign
   else
     let Format format = format_of_string (String.make 1 str.[length]) in
     cannot_be_parsed str format
