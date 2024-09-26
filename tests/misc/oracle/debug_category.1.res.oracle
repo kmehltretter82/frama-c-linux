@@ -1,11 +1,6 @@
-[kernel] Parsing debug_category.i (no preprocessing)
-[test] Warning: Uncategorized warning
-[test:a] A is enabled
-[test:a:b] B is enabled
-[test:a:b:c] C is enabled
-[test:a] A is enabled
-[test:a:b] B is enabled
-[test:a:b:c] C is enabled
-[test:a] A is enabled
-[test:a:b] B is enabled
-[test:a:b:c] C is enabled
+[test] Warning categories for test are
+    *            : active   : All warning categories
+    a            : inactive : A short description for a
+    test-failure : inactive : A short description for test-failure
+    test-inv-err : inactive : A short description for test-inv-err
+    test-vis-err : inactive : A short description for test-vis-err
