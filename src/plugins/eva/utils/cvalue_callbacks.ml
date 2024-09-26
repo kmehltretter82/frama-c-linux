@@ -22,8 +22,6 @@
 
 open Cil_types
 
-let dkey = Self.dkey_callbacks
-
 type state = Cvalue.Model.t
 
 type analysis_kind = [ `Builtin | `Spec | `Body | `Reuse ]
@@ -65,8 +63,6 @@ let register_call_results_hook f =
     (fun (callstack, kf, state, results) -> f callstack kf state results)
 
 let apply_call_results_hooks callstack kf state call_results =
-  if Parameters.ValShowProgress.get () && not (Call_Results.is_empty ())
-  then Self.debug ~dkey "now calling Call_Results callbacks";
   Call_Results.apply (callstack, kf, state, call_results)
 
 

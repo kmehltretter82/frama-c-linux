@@ -23,8 +23,6 @@
 open Cil_types
 open Eval
 
-let dkey = Self.register_category "callbacks"
-
 (* Clear Eva's various caches. Some operations of Eva depend on parameters,
    such as -ilevel or -plevel, so clearing those caches ensures that those
    options have the expected effect.
@@ -216,12 +214,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         let ab = Logic.create init_state call.kf in
         ignore (Logic.check_fct_preconditions kinstr call.kf ab init_state);
       end;
-      if Parameters.ValShowProgress.get () then begin
+      if Parameters.ValShowProgress.get () then
         Self.feedback ~current:true
           "Reusing old results for call to %a" Kernel_function.pretty call.kf;
-        Self.debug ~dkey
-          "calling Record_Value_New callbacks on saved previous result";
-      end;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
       Transfer.{ states; cacheable = Cacheable; }
