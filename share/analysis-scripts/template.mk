@@ -54,6 +54,7 @@ FCFLAGS     += \
 ## Eva-specific flags
 EVAFLAGS    += \
   -eva-warn-key builtins:missing-spec=abort \
+  -eva-warn-key libc:unsupported-spec=abort \
 
 ## WP-specific flags
 WPFLAGS    += \
