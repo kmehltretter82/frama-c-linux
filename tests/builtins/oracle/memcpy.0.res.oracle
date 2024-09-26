@@ -1814,7 +1814,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 56)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 59)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1825,7 +1825,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 61)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 64)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1836,7 +1836,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 68)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 72)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
@@ -1847,7 +1847,7 @@
 
 [ Extern  ] Assigns nothing
             Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 75)
+[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 79)
             Unverifiable but considered Valid.
 [  Valid  ] Default behavior
             by Frama-C kernel.
