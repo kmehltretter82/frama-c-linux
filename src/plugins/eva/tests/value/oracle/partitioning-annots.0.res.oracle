@@ -22,10 +22,6 @@
 [eva:partition] partitioning-annots.c:49: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:54: loop not completely unrolled
 [eva:partition] partitioning-annots.c:54: starting to merge loop iterations
-[eva:loop-unroll:partial] partitioning-annots.c:72: loop not completely unrolled
-[eva:partition] partitioning-annots.c:72: starting to merge loop iterations
-[eva:loop-unroll:partial] partitioning-annots.c:85: loop not completely unrolled
-[eva:partition] partitioning-annots.c:85: starting to merge loop iterations
 [eva] Recording results for test_unroll
 [eva] Done for function test_unroll
 [eva] computing for function test_split <- main.
@@ -246,9 +242,8 @@
    [7] ∈ {36}
    [8] ∈ {9}
    [9] ∈ {1}
-  f[0] ∈ {2; 3; 4} or UNINITIALIZED
-   [1..9] ∈ {2; 3; 4}
-  g[0] ∈ {0} or UNINITIALIZED
+  f[0..9] ∈ {2; 3; 4}
+  g[0] ∈ {0}
    [1..9] ∈ {1}
   i_4 ∈ {0}
 [eva:final-states] Values at end of function main:

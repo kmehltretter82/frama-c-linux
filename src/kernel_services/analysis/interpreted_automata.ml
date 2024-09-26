@@ -408,6 +408,22 @@ let is_goto stmt = match stmt.skind with Goto _ -> true | _ -> false
 
 let is_goto_destination stmt = List.exists is_goto stmt.preds
 
+let is_stmt_in_block block stmt =
+  let exception Found in
+  let visitor = object
+    inherit Cil.nopCilVisitor
+    method! vstmt s =
+      if Cil_datatype.Stmt.equal s stmt then raise Found else Cil.DoChildren
+  end in
+  try ignore (Cil.visitCilBlock visitor block); false
+  with Found -> true
+
+(* Returns true if [loop] is a loop whose body contains [stmt]. *)
+let is_loop_containing_stmt ~loop stmt =
+  match loop.skind with
+  | Cil_types.Loop (_, block, _, _, _) -> is_stmt_in_block block stmt
+  | _ -> false
+
 let stmt_loc stmt =
   Cil_datatype.Stmt.loc stmt
 
@@ -488,6 +504,7 @@ let build_automaton ~annotations kf =
   (* These objects are "global" through the traversal of the function *)
   let g = G.create () in
   let table : (vertex * vertex) StmtTable.t = StmtTable.create 17 in
+  let loop_head_table : vertex StmtTable.t = StmtTable.create 4 in
   let gotos : goto_list = ref [] in
   let loop_level = ref 0 in
 
@@ -739,6 +756,7 @@ let build_automaton ~annotations kf =
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
             let loop_head_point = add_vertex () in
+            StmtTable.add loop_head_table stmt loop_head_point;
             add_edge control.src loop_head_point kinstr Skip loc;
             loop_head_point.vertex_info <- LoopHead {stmt; level = !loop_level};
             let labels =
@@ -801,7 +819,15 @@ let build_automaton ~annotations kf =
   (* Handle gotos *)
   List.iter
     begin fun (src,src_stmt,dest_stmt) ->
-      let dest,_ = StmtTable.find table dest_stmt in
+      let dest =
+        (* On gotos from a loop body to the loop itself, the destination should
+           be the loop head instead of the first vertex of the loop statement,
+           which represents [loop_entry] and is actually not in the graph loop.
+           This is especially important for [continue] statements. *)
+        if annotations && is_loop_containing_stmt ~loop:dest_stmt src_stmt
+        then StmtTable.find loop_head_table dest_stmt
+        else fst (StmtTable.find table dest_stmt)
+      in
       build_stmt_transition src dest src_stmt dest_stmt Skip
     end !gotos;
 
