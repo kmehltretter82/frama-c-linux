@@ -386,3 +386,4 @@ let () =
     ~short_print:Extensions.short_print;
   Ast_diff.set_extension_diff
     ~is_same_ext: Extensions.is_same_ext
+[@@alert "-acsl_extension_handler"]

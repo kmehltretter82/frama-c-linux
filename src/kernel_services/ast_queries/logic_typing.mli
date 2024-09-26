@@ -322,10 +322,12 @@ val set_extension_handler:
              string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
-    If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
-    @before Frama-C+dev functions did not take a [plugin] parameter
+    @before Frama-C+dev functions did not take a [plugin:string] parameter and
+    the function [importer] did not exists.
 *)
+[@@alert acsl_extension_handler
+    "This function can only be called by Acsl_extension"]
 
 (** Type the given extension.
     @before Frama-C+dev the function took one less argument, [plugin], which is

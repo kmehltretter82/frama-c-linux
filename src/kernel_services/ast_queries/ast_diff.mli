@@ -128,12 +128,16 @@ val is_same_term: term -> term -> is_same_env -> bool
 
 val is_same_predicate: predicate -> predicate -> is_same_env -> bool
 
-(** access custom comparison functions for ACSL extensions *)
 val set_extension_diff:
   is_same_ext:
     (plugin:string -> string ->
      acsl_extension_kind -> acsl_extension_kind -> is_same_env -> bool)
   -> unit
+(** access custom comparison functions for ACSL extensions
+    @before Frama-C+dev This function did not take a [plugin:string] parameter
+*)
+[@@alert acsl_extension_handler
+    "This function can only be called by Acsl_extension"]
 
 (** performs a comparison of AST between the current and the original
     project, which must have been set beforehand.

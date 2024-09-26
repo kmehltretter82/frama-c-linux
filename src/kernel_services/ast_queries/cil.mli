@@ -2469,9 +2469,11 @@ val set_extension_handler:
          acsl_extension_kind visitAction) ->
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.
-    If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
+    @before Frama-C+dev This function did not take a [plugin:string] parameter
 *)
+[@@alert acsl_extension_handler
+    "This function can only be called by Acsl_extension"]
 
 (** void
     @deprecated Frama-C+dev *)

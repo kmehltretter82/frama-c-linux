@@ -67,10 +67,20 @@ val preprocess_extension_block:
   plugin:string -> string -> string * Logic_ptree.extended_decl list ->
   string * Logic_ptree.extended_decl list
 
-(** Return the plugin name of the ACSL extension *)
+(** Return the plugin name of the ACSL extension. If [plugin] is [None], we try
+    to find an extension with this [name] in our tables (can crash in case of
+    ambiguity), if it is [Some] we check that this extension exists.
+    @before Frama-C+dev The [plugin] parameter did not exist and the function
+    only performed the [None] case.
+*)
 val extension_from : ?plugin:string -> string -> string
 
-(** Return the plugin name of the module importer extension *)
+(** Return the plugin name of the module importer extension. If [plugin] is
+    [None], we try to find an extension with this [name] in our tables (can
+    crash in case of ambiguity), if it is [Some] we check that this extension
+    exists.
+    @since Frama-C+dev
+*)
 val importer_from : ?plugin:string -> string -> string
 
 (** {2 Global Tables} *)
@@ -269,9 +279,12 @@ val set_extension_handler:
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this.
     @since 21.0-Scandium
-    @before Frama-C+dev functions did not take a [plugin] parameter.
-    [get_plugins], [is_importer] and [importer_from] did not exist
+    @before Frama-C+dev functions did not take a [plugin:string] parameter.
+    [get_plugins], [is_importer] and [importer_from] did not exist, and
+    [extension_from] did not take an optional plugin parameter.
 *)
+[@@alert acsl_extension_handler
+    "This function can only be called by Acsl_extension"]
 
 val init_dependencies: State.t -> unit
 (** Used to postpone dependency of Lenv global tables wrt Cil_state, which
