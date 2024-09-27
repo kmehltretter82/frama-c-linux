@@ -489,7 +489,7 @@
     \\tainted,
     Here,LoopCurrent,LoopEntry,Pre,Post,Old,
     \\Cons,\\Down,\\NearestAway,\\NearestEven,\\Nil,\\ToZero,\\Up,
-    \\at,\\allocable,\\allocation,\\automatic,\\base_addr,\\block_length,\\dangling,
+    \\as,\\at,\\allocable,\\allocation,\\automatic,\\base_addr,\\block_length,\\dangling,
     \\dynamic,\\exists,\\exit_status,\\false,\\forall,\\freeable,\\fresh,\\from,
     \\in,\\initialized,\\lambda,\\let,\\list,\\match,\\nothing,\\null,\\numof,
     \\object_pointer,\\offset,\\old,\\register,\\result,\\separated,\\static,

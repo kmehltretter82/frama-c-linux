@@ -1382,7 +1382,7 @@ be changed by using the
 \paragraph{Source Options.} By default, a message is not localized. You may
 specify a source location, either specifically or by using the current
 location of an \texttt{AST} visitor.
-\lstset{style=frama-c-style}
+\lstset{style=frama-c-style,language=}
 \begin{itemize}
 \item[] \lstinline{~source:$s$} use the source position $s$ (see \texttt{Log.mli})
 \item[] \lstinline{~current:true} use the source location
@@ -4131,8 +4131,8 @@ definitions from other languages, e.g. \textsf{Coq} or \textsf{Why3}, as regular
 \acsl module definitions. From the user point the view, this takes the form
 of an extended \verb+import+ clause:
 
-\begin{lstlisting}
-//@ import <loader>: <module-name> [ \as <alias-name> ];
+\begin{lstlisting}[style=c]
+//@ import <loader>: <module_name> [ \as <alias-name> ];
 \end{lstlisting}
 
 The syntax is similar to the general ACSL \verb+import+ annotation, except that the
