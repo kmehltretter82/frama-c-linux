@@ -49,9 +49,7 @@ val dkey_summary : category
 
 val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
-val dkey_incompatible_states: category
 val dkey_iterator : category
-val dkey_callbacks : category
 val dkey_widening : category
 val dkey_recursion : category
 

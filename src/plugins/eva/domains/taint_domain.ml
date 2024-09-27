@@ -41,11 +41,10 @@ type taint_state = {
   dependent_call: bool;
 }
 
-let dkey = Self.register_category "d-taint"
-
 (* Debug key to also include [assume_stmts] in the output of the
    Frama_C_domain_show_each directive. *)
 let dkey_debug = Self.register_category "d-taint-debug"
+    ~help:"debug print of the taint domain"
 
 let wkey = Self.register_warn_category "taint"
 
@@ -315,8 +314,6 @@ module Domain = struct
             and type value := value
             and type location := location
             and type origin := origin)
-
-  let log_category = dkey
 
 
   (* Logic. *)

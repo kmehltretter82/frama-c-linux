@@ -66,6 +66,8 @@ module type LeafDomain = sig
 
   module Store: Domain_store.S with type t := t
 
+  val log_category: Self.category
+
   val key: t Abstract_domain.key
 end
 
@@ -97,6 +99,13 @@ module Complete (Domain: InputDomain) = struct
 
   module Store = Domain_store.Make (Domain)
 
+  let log_category =
+    let help =
+      Format.asprintf
+        "print states of the %s domain on some user directives" Domain.name
+    in
+    Self.register_category ("d-" ^ Domain.name) ~help
+
   let key: Domain.t Structure.Key_Domain.key =
     Structure.Key_Domain.create_key Domain.name
 end
@@ -124,8 +133,6 @@ module Make_Minimal
 = struct
 
   include Domain
-
-  let log_category = Self.register_category ("d-" ^ name)
 
   type value = Value.t
   type location = Location.location
@@ -239,8 +246,6 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
       (Datatype.With_collections
          (Domain) (struct let module_name = Domain.name end)
        : Datatype.S_with_collections with type t := t)
-
-    let log_category = Self.register_category ("d-" ^ name)
 
     type value = Cvalue.V.t
     type location = Precise_locs.precise_location

@@ -146,16 +146,10 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
          a bug."
         fmt
 
-  let report_unreachability state (result, alarms) fmt =
+  let report_unreachability _state (result, alarms) fmt =
     if result = `Bottom && Alarmset.is_empty alarms
-    then begin
-      Self.debug ~current:true ~once:true ~level:1
-        ~dkey:Self.dkey_incompatible_states
-        "State without concretization: %a" Domain.pretty state;
-      notify_unreachability fmt
-    end
-    else
-      Format.ifprintf Format.std_formatter fmt
+    then notify_unreachability fmt
+    else Format.ifprintf Format.std_formatter fmt
 
   (* The three functions below call evaluation functions and notify the user
      if they lead to bottom without alarms. *)

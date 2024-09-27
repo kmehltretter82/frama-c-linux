@@ -24,8 +24,6 @@ open Eval
 open Eva_ast
 open Locations
 
-let dkey = Self.register_category "d-symblocs"
-
 module K = Hcexprs
 module V = Cvalue.V (* TODO: functorize (with locations too ?) *)
 
@@ -469,8 +467,6 @@ module D : Abstract_domain.Leaf
            end)
 
   include Domain_builder.Complete (Memory)
-
-  let log_category = dkey
 
   let empty _ = Memory.empty_map
 

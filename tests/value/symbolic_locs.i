@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-eva-domains symbolic-locations -eva-msg-key d-symblocs"
+   STDOPT: +"-eva-domains symbolic-locations -eva-msg-key d-symbolic-locations"
 */
 
 volatile int v;
@@ -9,10 +9,10 @@ void main1() {
   unsigned int i = v;
   int k = v;
 
-  t[i] = 3; 
+  t[i] = 3;
   t[i] = t[i]+1; // The equality domain loses information here
   u[k] = t[i] + 2; Frama_C_dump_each();
-  int j = t[i] + u[k]; 
+  int j = t[i] + u[k];
 
   int *p = &t[i]; Frama_C_dump_each();
   int q = *p+1; // Does not write without adding something here, because otherwise we do a copy...

@@ -23,6 +23,7 @@
 open Cil_types
 
 let dkey = Self.register_category "widen-hints"
+    ~help:"debug messages when failing to use widen_hints annotations"
 
 let error ?msg loc typing_context =
   typing_context.Logic_typing.error loc

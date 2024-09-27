@@ -1107,8 +1107,6 @@ module G = struct
 
 end
 
-let dkey = Self.register_category "d-gauges"
-
 module D : Abstract_domain.Leaf
   with type state = G.t
    and type value = Cvalue.V.t
@@ -1124,8 +1122,6 @@ module D : Abstract_domain.Leaf
 
   include G
   include Domain_builder.Complete (struct include G let top = empty end)
-
-  let log_category = dkey
 
   let empty _ = G.empty
 

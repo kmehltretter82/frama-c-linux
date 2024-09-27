@@ -30,6 +30,8 @@ let register_builtin name ?replace builtin =
   Builtins.register_builtin name ?replace Cacheable builtin
 
 let dkey = Self.register_category "imprecision"
+    ~help:"messages related to possible imprecision of builtins interpreting \
+           memcpy, memmove and memset"
 
 let rec pretty_lval_of_address exp =
   match exp.node with
