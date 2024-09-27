@@ -1,10 +1,10 @@
 [e-acsl] beginning translation.
-[e-acsl] at_on-purely-logic-variables.c:22: Warning: 
+[e-acsl] at_on-purely-logic-variables.c:67: Warning: 
   E-ACSL construct
   `\at on purely logic variables that needs to allocate too much memory (bigger than int_max bytes)'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] at_on-purely-logic-variables.c:22: Warning: 
+[e-acsl] at_on-purely-logic-variables.c:70: Warning: 
   E-ACSL construct `\at with logic variable linked to C variable'
   is not yet supported.
   Ignoring annotation.

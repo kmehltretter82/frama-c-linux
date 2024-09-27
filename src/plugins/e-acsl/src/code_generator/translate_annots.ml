@@ -48,7 +48,6 @@ let pre_funspec kf env funspec =
     env
   in
   let loc = Kernel_function.get_location kf in
-  Current_loc.set loc;
   let env = convert_unsupported_clauses env in
   let contract = Contract.create ~loc funspec in
   Env.with_params
@@ -91,6 +90,8 @@ let pre_code_annotation kf stmt env annot =
         ~f:(fun env -> Contract.translate_preconditions kf env contract)
         env
     | AInvariant(l, loop_invariant, p) ->
+      let open Current_loc.Operators in
+      let<> UpdatedCurrentLoc = p.tp_statement.pred_loc in
       if Translate_utils.must_translate
           (Property.ip_of_code_annot_single kf stmt annot) then
         let env = Env.set_annotation_kind env Invariant in
@@ -109,6 +110,8 @@ let pre_code_annotation kf stmt env annot =
       else
         env
     | AVariant (t, measure) ->
+      let open Current_loc.Operators in
+      let<> UpdatedCurrentLoc = t.term_loc in
       if Translate_utils.must_translate
           (Property.ip_of_code_annot_single kf stmt annot)
       then Env.set_loop_variant env ?measure t

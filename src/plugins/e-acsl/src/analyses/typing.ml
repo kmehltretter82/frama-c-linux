@@ -340,6 +340,8 @@ let rec type_term
     ~profile
     t =
   Options.feedback ~dkey ~level:5 "typing (sub-)term %a" Printer.pp_term t;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = t.term_loc in
   let ctx = Option.map (mk_ctx ~use_gmp_opt) ctx in
   let compute_ctx ?ctx i =
     (* in order to get a minimal amount of generated casts for operators, the
@@ -355,7 +357,6 @@ let rec type_term
       mk_ctx ~use_gmp_opt:true (ty_of_interv i)
   in
   let infer t =
-    Current_loc.set t.term_loc;
     (* this pattern matching implements the formal rules of the JFLA's paper
        (and of course also covers the missing cases). Also enforce the invariant
        that every subterm is typed, even if it is not an integer. *)
@@ -771,7 +772,8 @@ and type_predicate ~profile p =
     do_both f g = (try f() with e -> try g(); raise e with | _ -> raise e); g()
   in
   let p = Logic_normalizer.get_pred p in
-  Current_loc.set p.pred_loc;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = p.pred_loc in
   (* this pattern matching also follows the formal rules of the JFLA's paper *)
   match p.pred_content with
   | Pfalse | Ptrue -> ()

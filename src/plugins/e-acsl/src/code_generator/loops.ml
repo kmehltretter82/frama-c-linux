@@ -69,6 +69,8 @@ let handle_annotations env kf stmt =
              let logic_env = Env.Logic_env.get env in
              Typing.preprocess_term ~use_gmp_opt:true ~logic_env t;
              let ty = Typing.get_typ ~logic_env t in
+             let open Current_loc.Operators in
+             let<> UpdatedCurrentLoc = t.term_loc in
              if Gmp_types.is_t ty then Error.not_yet "loop variant using GMP";
              let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
              let vi_old, e_old, env =

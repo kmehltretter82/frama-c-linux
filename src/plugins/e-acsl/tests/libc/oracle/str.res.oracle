@@ -17,9 +17,9 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:500: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:501: Warning: 
   no assigns clause generated for function strnlen because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:500: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:300: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
@@ -38,15 +38,9 @@
 [e-acsl] FRAMAC_SHARE/libc/string.h:496: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:504: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:511: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:511: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:518: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'

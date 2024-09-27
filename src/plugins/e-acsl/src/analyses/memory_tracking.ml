@@ -782,7 +782,8 @@ let consolidated_must_monitor_vi vi =
 let concurrent_function_ref = ref None
 
 let abort_because_of_concurrent ~loc vi =
-  Current_loc.set loc;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = loc in
   Options.abort
     ~current:true
     "Found concurrent function %a and monitored memory properties.\n\

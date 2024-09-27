@@ -592,6 +592,9 @@ let add_malloc_and_free_stmts kf fundec =
 let inject_in_fundec main fundec =
   let vi = fundec.svar in
   let kf = try Globals.Functions.get vi with Not_found -> assert false in
+  let loc = Kernel_function.get_location kf in
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = loc in
   (* convert ghost variables *)
   vi.vghost <- false;
   let unghost_local vi =
