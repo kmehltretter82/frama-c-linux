@@ -11,10 +11,6 @@
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:556: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:561: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.h:561: Warning: 
   function __gen_e_acsl_getenv: postcondition 'null_or_valid_result' got status unknown.

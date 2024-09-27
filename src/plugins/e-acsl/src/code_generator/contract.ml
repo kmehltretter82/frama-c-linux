@@ -22,6 +22,7 @@
 
 open Cil_types
 open Contract_types
+open Current_loc.Operators
 module Error = Translation_error
 
 (**************************************************************************)
@@ -778,6 +779,7 @@ let translate_preconditions kf env contract =
 let translate_postconditions kf env =
   let env = Env.set_annotation_kind env Postcondition in
   let contract, env = Env.pop_and_get_contract env in
+  let<> UpdatedCurrentLoc = contract.location in
   let do_it env =
     let env = check_post_conds kf env contract in
     env
