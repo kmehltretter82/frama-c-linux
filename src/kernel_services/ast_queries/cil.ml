@@ -4796,6 +4796,16 @@ let () = Cil_datatype.drop_non_logic_attributes :=
 let () = Cil_datatype.drop_fc_internal_attributes :=
     dropAttributes fc_internal_attributes
 
+let () =
+  Cil_datatype.drop_unknown_attributes :=
+    let is_annot_or_known_attr = function
+      | Attr (name, _) -> isKnownAttribute name
+      (* Attribute annotations are always known. *)
+      | AttrAnnot _ -> true
+    in
+    (fun attributes ->
+       List.filter is_annot_or_known_attr attributes)
+
 let need_cast ?(force=false) oldt newt =
   let oldt = type_remove_attributes_for_c_cast (unrollType oldt) in
   let newt = type_remove_attributes_for_c_cast (unrollType newt) in
