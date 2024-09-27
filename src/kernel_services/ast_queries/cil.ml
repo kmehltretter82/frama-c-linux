@@ -160,7 +160,7 @@ let stmt_of_instr_list ?(loc=Location.unknown) = function
 
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
 
-let anonymous_attribute_name = "__fc_anonymous"
+let anonymous_attribute_name = "fc_anonymous"
 let anonymous_attribute = Attr(anonymous_attribute_name, [])
 
 (** Construct sorted lists of attributes ***)
@@ -408,7 +408,11 @@ type attributeClass =
   (* Attribute of a function type. If argument is true and we are on
    * MSVC then the attribute is printed just before the function name *)
 
-  | AttrType  (* Attribute of a type *)
+  | AttrType
+  (* Attribute of a type *)
+
+  | AttrIgnored
+  (** Attribute that does not correspond to either of the above classes. *)
 
 (* This table contains the mapping of predefined attributes to classes.
  * Extend this table with more attributes as you need. This table is used to
@@ -420,8 +424,8 @@ let attributeHash: (string, attributeClass) Hashtbl.t =
     [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
       "no_instrument_function"; "alias"; "no_check_memory_usage";
       "exception"; "model"; (* "restrict"; *)
-      "aconst"; "__asm__" (* Gcc uses this to specify the name to be used in
-                           * assembly for a global  *)];
+      "aconst"; "asm" (* Gcc uses this to specify the name to be used in
+                       * assembly for a global  *)];
   (* Now come the MSVC declspec attributes *)
   List.iter (fun a -> Hashtbl.add table a (AttrName true))
     [ "thread"; "naked"; "dllimport"; "dllexport";
@@ -432,12 +436,31 @@ let attributeHash: (string, attributeClass) Hashtbl.t =
   List.iter (fun a -> Hashtbl.add table a (AttrFunType true))
     [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
   List.iter (fun a -> Hashtbl.add table a AttrType)
-    [ "const"; "volatile"; "restrict"; "mode" ];
+    ("mode" :: qualifier_attributes);
   table
 
-let attributeClass = Hashtbl.find attributeHash
+let isKnownAttribute = Hashtbl.mem attributeHash
 
-let registerAttribute = Hashtbl.add attributeHash
+let attributeClass ~default name =
+  match Hashtbl.find attributeHash name with
+  | exception Not_found -> default
+  | AttrIgnored -> default
+  | ac -> ac
+
+let registerAttribute an ac =
+  if Hashtbl.mem attributeHash an then begin
+    let pp fmt c =
+      match c with
+      | AttrName b -> Format.fprintf fmt "(AttrName %B)" b
+      | AttrFunType b -> Format.fprintf fmt "(AttrFunType %B)" b
+      | AttrType -> Format.fprintf fmt "AttrType"
+      | AttrIgnored -> Format.fprintf fmt "AttrIgnored"
+    in
+    Kernel.warning
+      "Replacing existing class for attribute %s: was %a, now %a"
+      an pp (Hashtbl.find attributeHash an) pp ac
+  end;
+  Hashtbl.replace attributeHash an ac
 let removeAttribute = Hashtbl.remove attributeHash
 
 (** Partition the attributes into classes *)
@@ -448,38 +471,39 @@ let partitionAttributes
   let rec loop (n,f,t) = function
       [] -> n, f, t
     | (Attr(an, _) | AttrAnnot an as a) :: rest ->
-      match (try Hashtbl.find attributeHash an with Not_found -> default) with
+      match attributeClass ~default an with
         AttrName _ -> loop (addAttribute a n, f, t) rest
       | AttrFunType _ ->
         loop (n, addAttribute a f, t) rest
       | AttrType -> loop (n, f, addAttribute a t) rest
+      | AttrIgnored -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
 
-let frama_c_ghost_else = "__fc_ghost_else"
+let frama_c_ghost_else = "fc_ghost_else"
 let () = registerAttribute frama_c_ghost_else (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_ghost_else) (AttrName false)
 
-let frama_c_ghost_formal = "__fc_ghost_formal"
+let frama_c_ghost_formal = "fc_ghost_formal"
 let () = registerAttribute frama_c_ghost_formal (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_ghost_formal) (AttrName false)
 
-let frama_c_init_obj = "__fc_initialized_object"
+let frama_c_init_obj = "fc_initialized_object"
 let () = registerAttribute frama_c_init_obj (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_init_obj) (AttrName false)
 
-let frama_c_mutable = "__fc_mutable"
+let frama_c_mutable = "fc_mutable"
 let () = registerAttribute frama_c_mutable (AttrName false)
-let () =
-  registerAttribute (Extlib.strip_underscore frama_c_mutable) (AttrName false)
 
-let frama_c_inlined = "__fc_inlined"
+let frama_c_inlined = "fc_inlined"
 let () = registerAttribute frama_c_inlined (AttrName false)
+
 let () =
-  registerAttribute (Extlib.strip_underscore frama_c_inlined) (AttrName false)
+  registerAttribute bitfield_attribute_name AttrType;
+  registerAttribute anonymous_attribute_name AttrIgnored;
+  List.iter
+    (fun a -> registerAttribute a AttrIgnored)
+    fc_internal_attributes;
+  List.iter
+    (fun a -> registerAttribute a AttrType)
+    cast_irrelevant_attributes
 
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =

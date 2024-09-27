@@ -1340,7 +1340,11 @@ type attributeClass =
   | AttrFunType of bool
   (** Attribute of a function type. If argument is true and we are on
       MSVC then the attribute is printed just before the function name *)
-  | AttrType  (** Attribute of a type *)
+  | AttrType
+  (** Attribute of a type *)
+  | AttrIgnored
+  (** Attribute that does not correspond to either of the above classes and is
+      ignored by functions [attributeClass] and [partitionAttributes]. *)
 
 val registerAttribute: string -> attributeClass -> unit
 (** Add a new attribute with a specified class *)
@@ -1348,11 +1352,17 @@ val registerAttribute: string -> attributeClass -> unit
 val removeAttribute: string -> unit
 (** Remove an attribute previously registered. *)
 
-val attributeClass: string -> attributeClass
-(** Return the class of an attributes. *)
+val isKnownAttribute: string -> bool
+(** [isKnownAttribute attrname] returns true if the attribute named [attrname]
+    is known by Frama-C. *)
 
-(** Partition the attributes into classes:name attributes, function type,
-    and type attributes *)
+val attributeClass: default:attributeClass -> string -> attributeClass
+(** Return the class of an attributes. The class `default' is returned for
+    unknown and ignored attributes. *)
+
+(** Partition the attributes into classes: name attributes, function type and
+    type attributes. Unknown and ignored attributes are returned in the
+    `default` attribute class. *)
 val partitionAttributes:  default:attributeClass ->
   attributes -> attribute list * (* AttrName *)
                 attribute list * (* AttrFunType *)

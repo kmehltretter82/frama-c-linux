@@ -93,6 +93,19 @@ let unsupported_attributes = ["vector_size"]
 (* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
    attributes can refer to erased functions and make the code un-reparsable *)
 let erased_attributes = ["malloc"]
+let () =
+   List.iter
+    (fun a -> Cil.registerAttribute a AttrIgnored)
+    erased_attributes
+
+(* JS: return [Some s] if the attribute string is the attribute annotation [s]
+   and [None] if it is not an annotation. *)
+let attrAnnot s =
+  let r = Str.regexp "~attrannot:\\(.+\\)" in
+  if Str.string_match r s 0 then
+    try Some (Str.matched_group 1 s) with Not_found -> assert false
+  else
+    None
 
 let stripUnderscore ?(checkUnsupported=true) s =
   if String.length s = 1 then begin
@@ -110,17 +123,33 @@ let stripUnderscore ?(checkUnsupported=true) s =
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block
+let () = Cil.registerAttribute frama_c_keep_block AttrIgnored
 
 let fc_stdlib = "fc_stdlib"
 let fc_stdlib_generated = "fc_stdlib_generated"
 let () = Cil_printer.register_shallow_attribute fc_stdlib
 let () = Cil_printer.register_shallow_attribute fc_stdlib_generated
+(* fc_stdlib attribute already registered in cil.ml *)
+let () = Cil.registerAttribute fc_stdlib_generated AttrIgnored
 
 let fc_local_static = "fc_local_static"
 let () = Cil_printer.register_shallow_attribute fc_local_static
+let () = Cil.registerAttribute fc_local_static AttrIgnored
 
-let frama_c_destructor = "__fc_destructor"
+let frama_c_destructor = "fc_destructor"
 let () = Cil_printer.register_shallow_attribute frama_c_destructor
+let () = Cil.registerAttribute frama_c_destructor (AttrName false)
+
+let () =
+   Cil.registerAttribute "packed" AttrIgnored;
+   Cil.registerAttribute "aligned" AttrIgnored;
+   Cil.registerAttribute "fc_float" (AttrName false);
+   Cil.registerAttribute "fc_assign" AttrIgnored;
+   Cil.registerAttribute "warn_unused_result" (AttrFunType false);
+   Cil.registerAttribute "FC_OLDSTYLEPROTO" AttrIgnored;
+   Cil.registerAttribute "static" AttrIgnored;
+   Cil.registerAttribute "missingproto" AttrIgnored;
+   Cil.registerAttribute "dummy" AttrIgnored
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
@@ -3672,15 +3701,6 @@ let continueUsed () =
 
 (****** TYPE SPECIFIERS *******)
 
-(* JS: return [Some s] if the attribute string is the attribute annotation [s]
-   and [None] if it is not an annotation. *)
-let attrAnnot s =
-  let r = Str.regexp "~attrannot:\\(.+\\)" in
-  if Str.string_match r s 0 then
-    try Some (Str.matched_group 1 s) with Not_found -> assert false
-  else
-    None
-
 
 type local_env =
   { authorized_reads: Lval.Set.t;
@@ -4628,12 +4648,15 @@ and cabsPartitionAttributes
       let kind = match doAttr ghost a with
         | [] -> default
         | (Attr(an, _) | AttrAnnot an)::_ ->
-          (try attributeClass an with Not_found -> default)
+          (* doAttr already strip underscores of the attribute if necessary so
+             we do not need to strip then before calling attributeClass here. *)
+          attributeClass ~default an
       in
       match kind with
       | AttrName _ -> loop (a::n, f, t) rest
       | AttrFunType _ -> loop (n, a::f, t) rest
       | AttrType -> loop (n, f, a::t) rest
+      | AttrIgnored -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
 
