@@ -1456,7 +1456,7 @@ struct
         Logic_const.term
           ~loc (Tapp(truncate_info,[], [logic_coerce Lreal e])) Linteger
       | Ctype t, Lreal when isArithmeticType t -> logic_coerce Lreal e
-      | Ctype _, (Lreal | Linteger | Lboolean ) ->
+      | Ctype _, (Lreal | Linteger | Lboolean) ->
         C.error loc "invalid implicit cast from %a to logic type %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt

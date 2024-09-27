@@ -299,7 +299,9 @@ val term : ?loc:Location.t -> term_node -> logic_type -> term
 (** [..] of integers *)
 val trange: ?loc:Location.t -> term option * term option -> term
 
-(** boolean constant *)
+(** boolean constant
+    @since Frama-C+dev
+*)
 val tboolean: ?loc:Location.t -> bool -> term
 
 (** integer constant *)
