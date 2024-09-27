@@ -6,15 +6,15 @@ include
     let help = "test"
   end)
 
-let akey = register_category "a"
-let ckey = register_category "a:b:c"
-let bkey = register_category "a:b"
-let dkey = register_category "d"
+let akey = register_category ~help:"A short description for a" "a"
+let ckey = register_category ~help:"A short description for a::b::c" "a:b:c"
+let bkey = register_category ~help:"A short description for a::b" "a:b"
+let dkey = register_category ~help:"A short description for d" "d"
 
-let wkey = register_warn_category "a"
-let wkey_vis_err = register_warn_category "test-vis-err"
-let wkey_inv_err = register_warn_category "test-inv-err"
-let wkey_failure = register_warn_category "test-failure"
+let wkey = register_warn_category ~help:"A short description for a" "a"
+let wkey_vis_err = register_warn_category ~help:"A short description for test-vis-err" "test-vis-err"
+let wkey_inv_err = register_warn_category ~help:"A short description for test-inv-err" "test-inv-err"
+let wkey_failure = register_warn_category ~help:"A short description for test-failure" "test-failure"
 let () = set_warn_status wkey_vis_err Log.Winactive
 let () = set_warn_status wkey_inv_err Log.Winactive
 let () = set_warn_status wkey_failure Log.Winactive

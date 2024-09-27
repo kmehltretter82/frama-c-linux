@@ -278,16 +278,22 @@ module type Messages = sig
 
   (** {3 Category management} *)
 
-  val register_category: string -> category
+  val register_category: ?help:string -> string -> category
   (** register a new debugging/verbose category.
       Note: to enable a category's messages by default, add it
       (e.g. via [add_debug_keys]) after registration.
       @since Fluorine-20130401
+      @before Frama-C+dev [?help] parameter was not present
   *)
 
   val pp_category: Format.formatter -> category -> unit
   (** pretty-prints a category.
       @since Chlorine-20180501
+  *)
+
+  val pp_all_categories: unit -> unit
+  (** pretty-prints all categories.
+      @since Frama-C+dev
   *)
 
   val dkey_name: category -> string
@@ -335,8 +341,10 @@ module type Messages = sig
       @since Fluorine-20130401
   *)
 
-  val register_warn_category: string -> warn_category
-  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+  val register_warn_category: ?help:string -> string -> warn_category
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+      @before Frama-C+dev [?help] parameter was not present
+  *)
 
   val is_warn_category: string -> bool
 
@@ -511,12 +519,4 @@ val treat_deferred_error: unit -> unit
    - after each command-line stage.
    - after each analysis step (as separated by -then and its derivatives),
      including the last one.
-*)
-
-(**/**)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
 *)

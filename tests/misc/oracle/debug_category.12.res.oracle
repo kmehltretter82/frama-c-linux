@@ -1,5 +1,5 @@
 [kernel] Parsing debug_category.i (no preprocessing)
 [test] Warning: Uncategorized warning
-[test:a] 
+[test:a] Warning: 
   Warning A
-  (warn-feedback-once: no further messages from category 'a' will be emitted)
+  (warn-once: no further messages from category 'a' will be emitted)

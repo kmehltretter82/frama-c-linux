@@ -1,7 +1,8 @@
 /* run.config*
 MODULE: Debug_category
 EXIT: 0
-  OPT: -test-msg-key help -test-warn-key="a=inactive"
+  OPT: -test-msg-key help
+  OPT: -test-warn-key help -test-warn-key="a=inactive"
   OPT: -test-msg-key a -test-warn-key="a=inactive"
   OPT: -test-msg-key a -test-msg-key="-a:b" -test-warn-key="a=inactive"
   OPT: -test-msg-key a -test-msg-key="-a:b" -test-msg-key a:b:c -test-warn-key="a=inactive"

@@ -198,11 +198,3 @@ val config_ref: (unit -> Filepath.Normalized.t) ref
 
 val state_is_set_ref: (unit -> bool) ref
 val state_ref: (unit -> Filepath.Normalized.t) ref
-
-(**/**)
-
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
