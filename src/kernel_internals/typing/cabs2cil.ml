@@ -107,7 +107,7 @@ let attrAnnot s =
   else
     None
 
-let stripUnderscore ?(checkUnsupported=true) s =
+let stripUnderscore ?(checkUnsupported=true) ?(checkUnknown=true) s =
   if String.length s = 1 then begin
     if s = "_" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
@@ -117,7 +117,18 @@ let stripUnderscore ?(checkUnsupported=true) s =
     if res = "" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
     if checkUnsupported && List.mem res unsupported_attributes then
-      Kernel.error ~current:true "unsupported attribute: %s" s;
+      Kernel.error ~current:true "unsupported attribute: %s" s
+    else if checkUnknown then begin
+      match attrAnnot res with
+      | Some _ ->
+        (* Attribute annotation are always considered known *)
+        ()
+      | None ->
+        if not (Cil.isKnownAttribute res) then
+          Kernel.warning
+            ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+            "Unknown attribute: %s" s
+    end;
     res
   end
 
