@@ -140,7 +140,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:43: inject threads interferences at this point
 [eva:interferences] interrupt.c:44: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -167,7 +166,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:47: inject threads interferences at this point
 [eva:interferences] interrupt.c:48: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -276,7 +274,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:43: inject threads interferences at this point
 [eva:interferences] interrupt.c:44: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -303,7 +300,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:47: inject threads interferences at this point
 [eva:interferences] interrupt.c:48: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -411,7 +407,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:43: inject threads interferences at this point
 [eva:interferences] interrupt.c:44: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -438,7 +433,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:47: inject threads interferences at this point
 [eva:interferences] interrupt.c:48: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -547,7 +541,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:43: inject threads interferences at this point
 [eva:interferences] interrupt.c:44: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -574,7 +567,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:47: inject threads interferences at this point
 [eva:interferences] interrupt.c:48: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [eva:alarm] interrupt.c:47: Warning: 
   signed overflow. assert interrupt_received_a + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
@@ -688,7 +680,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:43: inject threads interferences at this point
 [eva:interferences] interrupt.c:44: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [eva:alarm] interrupt.c:43: Warning: 
   signed overflow. assert interrupt_received_b + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis

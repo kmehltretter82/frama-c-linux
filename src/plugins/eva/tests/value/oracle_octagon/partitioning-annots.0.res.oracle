@@ -1,4 +1,242 @@
-194,195c194,195
+9,18c9
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:352.
+< [eva:partition] partitioning-annots.c:243: starting to merge loop iterations
+< [eva:partition] partitioning-annots.c:248: starting to merge loop iterations
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:289.
+< [eva:partition] partitioning-annots.c:243: starting to merge loop iterations
+< [eva:partition] partitioning-annots.c:248: starting to merge loop iterations
+< =======
+<   Called from partitioning-annots.c:313.
+---
+>   Called from partitioning-annots.c:376.
+21d11
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+25,31c15
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:353.
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:290.
+< =======
+<   Called from partitioning-annots.c:314.
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+---
+>   Called from partitioning-annots.c:377.
+48,104c32
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:354.
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:291.
+< =======
+<   Called from partitioning-annots.c:315.
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+< [eva] computing for function Frama_C_interval <- test_split <- main.
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:73.
+< [eva] using specification for function Frama_C_interval
+< [eva] partitioning-annots.c:73: 
+<   function Frama_C_interval: precondition 'order' got status valid.
+< [eva] Done for function Frama_C_interval
+< [eva] computing for function Frama_C_interval <- test_split <- main.
+<   Called from partitioning-annots.c:74.
+< [eva] partitioning-annots.c:74: 
+<   function Frama_C_interval: precondition 'order' got status valid.
+< [eva] Done for function Frama_C_interval
+< [eva] partitioning-annots.c:80: 
+<   Frama_C_show_each_before_first_split: {0; 1}, {0; 1; 2}, {0}
+< [eva] partitioning-annots.c:83: 
+<   Frama_C_show_each_before_second_split: {1}, {0; 1; 2}, {1}
+< [eva] partitioning-annots.c:83: 
+<   Frama_C_show_each_before_second_split: {0}, {0; 1; 2}, {0}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {1}, {2}, {1}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {1}, {1}, {1}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {1}, {0}, {1}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {0}, {2}, {0}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {0}, {1}, {0}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {0}, {0}, {0}
+< [eva] partitioning-annots.c:87: 
+<   Frama_C_show_each_before_second_merge: {0; 1}, {2}, {0; 1}
+< [eva] partitioning-annots.c:87: 
+<   Frama_C_show_each_before_second_merge: {0; 1}, {1}, {0; 1}
+< [eva] partitioning-annots.c:87: 
+<   Frama_C_show_each_before_second_merge: {0; 1}, {0}, {0; 1}
+< [eva] partitioning-annots.c:89: Frama_C_show_each_end: {0; 1}, {0; 1; 2}, {0; 1}
+< [eva] Recording results for test_split
+< [eva] Done for function test_split
+< [eva] computing for function test_dynamic_split <- main.
+<   Called from partitioning-annots.c:355.
+< [eva] partitioning-annots.c:95: Warning: 
+<   this partitioning parameter cannot be evaluated safely on all states
+< [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:73.
+< [eva] using specification for function Frama_C_interval
+< [eva] partitioning-annots.c:73: 
+<   function Frama_C_interval: precondition 'order' got status valid.
+< [eva] Done for function Frama_C_interval
+---
+>   Called from partitioning-annots.c:378.
+106,143d33
+<   Called from partitioning-annots.c:74.
+< [eva] partitioning-annots.c:74: 
+<   function Frama_C_interval: precondition 'order' got status valid.
+< [eva] Done for function Frama_C_interval
+< [eva] partitioning-annots.c:80: 
+<   Frama_C_show_each_before_first_split: {0; 1}, {0; 1; 2}, {0}
+< [eva] partitioning-annots.c:83: 
+<   Frama_C_show_each_before_second_split: {1}, {0; 1; 2}, {1}
+< [eva] partitioning-annots.c:83: 
+<   Frama_C_show_each_before_second_split: {0}, {0; 1; 2}, {0}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {1}, {2}, {1}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {1}, {1}, {1}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {1}, {0}, {1}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {0}, {2}, {0}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {0}, {1}, {0}
+< [eva] partitioning-annots.c:85: 
+<   Frama_C_show_each_before_first_merge: {0}, {0}, {0}
+< [eva] partitioning-annots.c:87: 
+<   Frama_C_show_each_before_second_merge: {0; 1}, {2}, {0; 1}
+< [eva] partitioning-annots.c:87: 
+<   Frama_C_show_each_before_second_merge: {0; 1}, {1}, {0; 1}
+< [eva] partitioning-annots.c:87: 
+<   Frama_C_show_each_before_second_merge: {0; 1}, {0}, {0; 1}
+< [eva] partitioning-annots.c:89: Frama_C_show_each_end: {0; 1}, {0; 1; 2}, {0; 1}
+< [eva] Recording results for test_split
+< [eva] Done for function test_split
+< [eva] computing for function test_dynamic_split <- main.
+<   Called from partitioning-annots.c:292.
+< [eva] partitioning-annots.c:95: Warning: 
+<   this partitioning parameter cannot be evaluated safely on all states
+< [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
+< =======
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+183c73
+<   Called from partitioning-annots.c:316.
+---
+>   Called from partitioning-annots.c:379.
+208,215c98
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:356.
+< [eva:partition] partitioning-annots.c:124: starting to merge loop iterations
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:293.
+< [eva:partition] partitioning-annots.c:124: starting to merge loop iterations
+< =======
+<   Called from partitioning-annots.c:317.
+---
+>   Called from partitioning-annots.c:380.
+217d99
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+221,227c103
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:357.
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:294.
+< =======
+<   Called from partitioning-annots.c:318.
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+---
+>   Called from partitioning-annots.c:381.
+252,261c128
+< <<<<<<< HEAD:src/plugins/eva/tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:358.
+< [eva:loop-unroll:auto] partitioning-annots.c:280: Automatic loop unrolling.
+< [eva:partition] partitioning-annots.c:284: starting to merge loop iterations
+< ||||||| parent of f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+<   Called from partitioning-annots.c:295.
+< [eva:loop-unroll:auto] partitioning-annots.c:280: Automatic loop unrolling.
+< [eva:partition] partitioning-annots.c:284: starting to merge loop iterations
+< =======
+<   Called from partitioning-annots.c:319.
+---
+>   Called from partitioning-annots.c:382.
+264d130
+< >>>>>>> f5ec41e9c2 ([Eva] Adds a test illustrating a bug from interpreted automata.):tests/value/oracle/partitioning-annots.0.res.oracle
+268c134
+<   Called from partitioning-annots.c:359.
+---
+>   Called from partitioning-annots.c:383.
+270c136
+<   Called from partitioning-annots.c:315.
+---
+>   Called from partitioning-annots.c:339.
+273c139
+< [eva:alarm] partitioning-annots.c:316: Warning: 
+---
+> [eva:alarm] partitioning-annots.c:340: Warning: 
+276c142
+<   Called from partitioning-annots.c:317.
+---
+>   Called from partitioning-annots.c:341.
+279c145
+<   Called from partitioning-annots.c:321.
+---
+>   Called from partitioning-annots.c:345.
+282c148
+<   Called from partitioning-annots.c:326.
+---
+>   Called from partitioning-annots.c:350.
+285c151
+< [eva:alarm] partitioning-annots.c:327: Warning: 
+---
+> [eva:alarm] partitioning-annots.c:351: Warning: 
+288c154
+<   Called from partitioning-annots.c:328.
+---
+>   Called from partitioning-annots.c:352.
+291c157
+<   Called from partitioning-annots.c:332.
+---
+>   Called from partitioning-annots.c:356.
+295c161
+<   Called from partitioning-annots.c:337.
+---
+>   Called from partitioning-annots.c:361.
+298c164
+< [eva] partitioning-annots.c:338: Frama_C_show_each: [-99..99], {-2; -1; 0; 1}
+---
+> [eva] partitioning-annots.c:362: Frama_C_show_each: [-99..99], {-2; -1; 0; 1}
+301c167
+<   Called from partitioning-annots.c:341.
+---
+>   Called from partitioning-annots.c:365.
+303,306c169,172
+< [eva] partitioning-annots.c:342: Frama_C_show_each: [1..10], {0}
+< [eva] partitioning-annots.c:342: Frama_C_show_each: [11..99], {1}
+< [eva] partitioning-annots.c:342: Frama_C_show_each: [-99..-1], {-1}
+< [eva] partitioning-annots.c:342: Frama_C_show_each: {0}, {-2}
+---
+> [eva] partitioning-annots.c:366: Frama_C_show_each: [1..10], {0}
+> [eva] partitioning-annots.c:366: Frama_C_show_each: [11..99], {1}
+> [eva] partitioning-annots.c:366: Frama_C_show_each: [-99..-1], {-1}
+> [eva] partitioning-annots.c:366: Frama_C_show_each: {0}, {-2}
+309c175
+<   Called from partitioning-annots.c:345.
+---
+>   Called from partitioning-annots.c:369.
+311,314c177,180
+< [eva] partitioning-annots.c:347: Frama_C_show_each: [11..99], {1}
+< [eva] partitioning-annots.c:347: Frama_C_show_each: [1..10], {0}
+< [eva] partitioning-annots.c:347: Frama_C_show_each: [-99..-1], {-1}
+< [eva] partitioning-annots.c:347: Frama_C_show_each: {0}, {-2}
+---
+> [eva] partitioning-annots.c:371: Frama_C_show_each: [11..99], {1}
+> [eva] partitioning-annots.c:371: Frama_C_show_each: [1..10], {0}
+> [eva] partitioning-annots.c:371: Frama_C_show_each: [-99..-1], {-1}
+> [eva] partitioning-annots.c:371: Frama_C_show_each: {0}, {-2}
+333,334c199,200
 <   x ∈ [0..44]
 <   y ∈ [0..44]
 ---

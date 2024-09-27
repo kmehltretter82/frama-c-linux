@@ -109,7 +109,6 @@
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:31: inject threads interferences at this point
 [eva:interferences] interrupt.c:32: inject threads interferences at this point
-[eva:interferences] interrupt.c:30: inject threads interferences at this point
 [eva:alarm] interrupt.c:31: Warning: 
   signed overflow. assert interrupt_received + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
