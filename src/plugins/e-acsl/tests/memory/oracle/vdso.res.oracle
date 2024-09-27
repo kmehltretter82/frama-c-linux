@@ -2,10 +2,10 @@
 [e-acsl] Warning: annotating undefined function `time':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/time.h:95: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/time.h:113: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/time.h:98: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/time.h:116: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

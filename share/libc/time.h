@@ -73,9 +73,27 @@ struct itimerspec {
 
 // Note: macros and specifications in this file consider that no
 // other clocks exist (CLOCK_*_CPUTIME_ID and Linux-specific clocks)
-#define CLOCK_REALTIME 666
+#define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 1
 #define TIMER_ABSTIME 1
+
+// In POSIX, but optional (CPT extension)
+#define CLOCK_PROCESS_CPUTIME_ID 2
+#define CLOCK_THREAD_CPUTIME_ID 3
+
+// Non-POSIX
+#define CLOCK_MONOTONIC_RAW 4
+#define CLOCK_REALTIME_COARSE 5
+#define CLOCK_MONOTONIC_COARSE 6
+#define CLOCK_BOOTTIME 7
+#define CLOCK_REALTIME_ALARM 8
+#define CLOCK_BOOTTIME_ALARM 9
+#define CLOCK_SGI_CYCLE 10
+#define CLOCK_TAI 11
+#define MAX_CLOCKS 16
+#define CLOCKS_MASK (CLOCK_REALTIME | CLOCK_MONOTONIC)
+#define CLOCKS_MONO CLOCK_MONOTONIC
+
 
 //@ ghost volatile unsigned int __fc_time;
 
