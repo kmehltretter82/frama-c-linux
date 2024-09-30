@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2024-09-30] ACSL extensions are now associated to a plug-in,
+              allowing the registration of several extensions with the same name
+              from different plug-ins
 -   Kernel    [2024-09-23] Support for ACSL modules.
 -   Kernel    [2024-09-23] Extension for importing external modules in ACSL
 o   Kernel    [2024-09-23] API to register ACSL extern modules import functions
