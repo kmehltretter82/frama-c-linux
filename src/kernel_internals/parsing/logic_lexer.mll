@@ -134,6 +134,7 @@
         if Logic_env.is_importer ~plugin name then
           Some (EXT_LOADER_PLUGIN (name, plugin))
         else None
+  [@@alert "-acsl_extension_from"]
 
   let identifier, is_acsl_keyword =
     let all_kw = Hashtbl.create 37 in

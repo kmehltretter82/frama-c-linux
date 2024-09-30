@@ -67,21 +67,32 @@ val preprocess_extension_block:
   plugin:string -> string -> string * Logic_ptree.extended_decl list ->
   string * Logic_ptree.extended_decl list
 
-(** Return the plugin name of the ACSL extension. If [plugin] is [None], we try
+(** Return the plugin name of the ACSL extension. If [~plugin] is [None], we try
     to find an extension with this [name] in our tables (can crash in case of
     ambiguity), if it is [Some] we check that this extension exists.
-    @before Frama-C+dev The [plugin] parameter did not exist and the function
+    @raise Not_Found If the extension does not exist
+    @raise Log.AbortFatal If [~plugin] is [None] and two or more extensions have
+    the same name
+    @before Frama-C+dev The [~plugin] parameter did not exist and the function
     only performed the [None] case.
 *)
 val extension_from : ?plugin:string -> string -> string
+[@@alert acsl_extension_from
+    "extension_from is for internal uses only to disambiguate usages of \
+     acsl extensions during the lexing phase."]
 
-(** Return the plugin name of the module importer extension. If [plugin] is
-    [None], we try to find an extension with this [name] in our tables (can
-    crash in case of ambiguity), if it is [Some] we check that this extension
-    exists.
+(** Return the plugin name of the module importer extension. If [~plugin] is
+    [None] we try to find an extension with this [name] in our tables, if it
+    is [Some] we check that this extension exists.
+    @raise Not_Found If the importer does not exist
+    @raise Log.AbortFatal If [~plugin] is [None] and two or more extensions have
+    the same name
     @since Frama-C+dev
 *)
 val importer_from : ?plugin:string -> string -> string
+[@@alert acsl_extension_from
+    "importer_from is for internal uses only to disambiguate usages of \
+     module importer extensions during the lexing phase."]
 
 (** {2 Global Tables} *)
 module Logic_info: State_builder.Hashtbl

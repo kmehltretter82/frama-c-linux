@@ -161,15 +161,6 @@ module Extensions = struct
     | None -> Hashtbl.add tbl key [value]
     | Some values -> Hashtbl.replace tbl key (value :: values)
 
-  (* Called if we cannot discriminate between several extensions. Cannot happen
-     if the parameter [plugin] is provided to mem/find functions. *)
-  let throw_ambiguity_error ~get_plugin name l =
-    let pp_plugin fmt e = Format.fprintf fmt "%s" (get_plugin e) in
-    Kernel.abort ~current:true
-      "Conflicts on extension named '%s' registered by different \
-       plugins (%a), use '\\plugin::ext_name' syntax to avoid this ambiguity"
-      name (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:",@ " pp_plugin) l
-
   (* [get_plugin] is a getter to access the [plugin] field from extension_*
      types, to keep this function generic. *)
   let mem_gen ~get_plugin tbl ~plugin name =
@@ -323,6 +314,15 @@ module Extensions = struct
   let is_same_ext ~plugin name ext1 ext2 =
     let is_same = (find_common ~plugin name).is_same_ext in
     is_same ext1 ext2
+
+  (* Called if we cannot discriminate between several extensions. Cannot happen
+     if the parameter [plugin] is provided to mem/find functions. *)
+  let throw_ambiguity_error ~get_plugin name l =
+    let pp_plugin fmt e = Format.fprintf fmt "%s" (get_plugin e) in
+    Kernel.abort ~current:true
+      "Conflicts on extension named '%s' registered by different \
+       plugins (%a), use '\\plugin::ext_name' syntax to avoid this ambiguity"
+      name (Pretty_utils.pp_list ~pre:"" ~suf:"" ~sep:",@ " pp_plugin) l
 
   let find_plugin ~get_plugin tbl ~plugin name =
     match plugin with
