@@ -312,33 +312,51 @@ val post_state_env: termination_kind -> logic_type -> Lenv.t
 (** {2 Internal use} *)
 
 val set_extension_handler:
-  is_extension:(string -> bool) ->
-  typer:(string -> typing_context -> location -> Logic_ptree.lexpr list ->
-         (bool * acsl_extension_kind)) ->
-  typer_block:(string -> typing_context -> location ->
+  is_extension:(plugin:string -> string -> bool) ->
+  typer: (plugin:string -> string -> typing_context -> location ->
+          Logic_ptree.lexpr list -> (bool * acsl_extension_kind)) ->
+  typer_block:(plugin:string -> string -> typing_context -> location ->
                string * Logic_ptree.extended_decl list ->
                bool * Cil_types.acsl_extension_kind) ->
-  importer:(string -> module_builder -> location -> string list -> unit) ->
+  importer: (plugin:string -> string -> module_builder -> location ->
+             string list -> unit) ->
   unit
 (** Used to setup references related to the handling of ACSL extensions.
-    If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
+    @before Frama-C+dev functions did not take a [plugin:string] parameter and
+    the function [importer] did not exists.
 *)
+[@@alert acsl_extension_handler
+    "This function can only be called by Acsl_extension"]
 
+(** Type the given extension.
+    @before Frama-C+dev the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
 val get_typer :
+  plugin:string ->
   string ->
   typing_context:typing_context ->
   loc:location ->
   Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
 
+(** Type the given extension block.
+    @before Frama-C+dev the function took one less argument, [plugin], which is
+    now used to avoid ambiguity if plugins use the same name for an extension
+*)
 val get_typer_block:
+  plugin:string ->
   string ->
   typing_context:typing_context ->
   loc:Logic_ptree.location ->
   string * Logic_ptree.extended_decl list ->
   bool * Cil_types.acsl_extension_kind
 
+(** Load the given module importer extension.
+    @since Frama-C+dev
+*)
 val get_importer:
+  plugin:string ->
   string ->
   builder:module_builder ->
   loc:Logic_ptree.location ->

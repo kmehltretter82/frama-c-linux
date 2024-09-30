@@ -2465,13 +2465,15 @@ val pp_from_ref: (Format.formatter -> from -> unit) ref
 val pp_behavior_ref: (Format.formatter -> behavior -> unit) ref
 
 val set_extension_handler:
-  visit:(string -> cilVisitor -> acsl_extension_kind ->
+  visit:(plugin:string -> string -> cilVisitor -> acsl_extension_kind ->
          acsl_extension_kind visitAction) ->
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.
-    If your name is not [Acsl_extension], do not call this
     @since 21.0-Scandium
+    @before Frama-C+dev This function did not take a [plugin:string] parameter
 *)
+[@@alert acsl_extension_handler
+    "This function can only be called by Acsl_extension"]
 
 (** void
     @deprecated Frama-C+dev *)

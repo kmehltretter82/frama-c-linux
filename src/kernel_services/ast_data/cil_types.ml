@@ -1691,6 +1691,7 @@ and spec = {
 and acsl_extension = {
   ext_id : int;
   ext_name : string;
+  ext_plugin : string; (** @since Frama-C+dev *)
   ext_loc : location;
   ext_has_status : bool;
   ext_kind : acsl_extension_kind
@@ -1792,6 +1793,14 @@ and code_annotation = {
 (** behavior of a function. *)
 and funbehavior = behavior
 
+(** loader type used by Dmodules.
+    @since Frama-c+dev
+*)
+and loader = {
+  loader_name: string;
+  loader_plugin: string;
+}
+
 (** global annotations, not attached to a statement or a function. *)
 and global_annotation =
   | Dfun_or_pred of logic_info * location
@@ -1800,8 +1809,8 @@ and global_annotation =
       * attributes * location
   (** associated terms, reading function, writing function *)
   | Daxiomatic of string * global_annotation list * attributes * location
-  (** last string option is the external importer responsible for the module *)
-  | Dmodule of string * global_annotation list * attributes * string option * location
+  | Dmodule of
+      string * global_annotation list * attributes * loader option * location
   | Dtype of logic_type_info * location (** declaration of a logic type. *)
   | Dlemma of
       string * logic_label list * string list *

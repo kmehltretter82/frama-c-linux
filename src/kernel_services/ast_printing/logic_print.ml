@@ -310,14 +310,23 @@ let print_model_annot fmt ty =
     (print_logic_type None) ty.model_type
     ty.model_name
 
+let print_plugin fmt (name, plugin) =
+  if Datatype.String.equal plugin "kernel"
+  then pp_print_string fmt name
+  else fprintf fmt "\\%s::%s" plugin name
+
 let rec print_extended_decl fmt d =
   let aux fmt d = print_extended_decl fmt d.extended_node in
   match d with
-  | Ext_lexpr(name,d) ->
-    fprintf fmt "@[<2>%s@ %a@]" name (pp_list ~sep:",@ " print_lexpr) d
-  | Ext_extension(name,id,d) ->
-    fprintf fmt "@[<2>%s@ %s@ {@\n%a@]@\n}" name id
-      (pp_list ~sep:"@\n" aux) d
+  | Ext_lexpr ext ->
+    fprintf fmt "@[<2>%a@ %a@]"
+      print_plugin (ext.ext_name, ext.ext_plugin)
+      (pp_list ~sep:",@ " print_lexpr) ext.ext_content
+  | Ext_extension ext ->
+    fprintf fmt "@[<2>%a@ %s@ {@\n%a@]@\n}"
+      print_plugin (ext.gext_name, ext.gext_plugin)
+      ext.gext_kind
+      (pp_list ~sep:"@\n" aux) ext.gext_content
 
 let rec print_decl fmt d =
   match d.decl_node with
@@ -375,11 +384,14 @@ let rec print_decl fmt d =
   | LDmodule (name,ds) ->
     fprintf fmt "@[<2>module@ %s@ {@\n%a@]@\n}" name
       (pp_list ~sep:"@\n" print_decl) ds
-  | LDimport (drv,mId,asId) ->
+  | LDimport import ->
     fprintf fmt "@[<2>import" ;
-    Option.iter (fprintf fmt "@ %s:") drv ;
-    fprintf fmt "@ %s" mId ;
-    Option.iter (fprintf fmt "@ \\as %s") asId ;
+    Option.iter (fun loader ->
+        let name, plugin = loader.loader_name, loader.loader_plugin in
+        fprintf fmt "%a:" print_plugin (name, plugin)
+      ) import.import_loader ;
+    fprintf fmt "@ %s" import.module_name ;
+    Option.iter (fprintf fmt "@ \\as %s") import.module_alias ;
     fprintf fmt ";@]@\n}"
   | LDinvariant (s,e) ->
     fprintf fmt "@[<2>invariant@ %s:@ %a;@]" s print_lexpr e
@@ -458,8 +470,9 @@ let print_spec fmt spec =
        ~sep:"@\n" ~suf:"@\n" (pp_list ~sep:",@ " pp_print_string))
     spec.spec_disjoint_behaviors
 
-let print_extension fmt (name, ext) =
-  fprintf fmt "%s %a" name (pp_list ~sep:",@ " print_lexpr) ext
+let print_extension fmt ext =
+  fprintf fmt "%a %a" print_plugin (ext.ext_name, ext.ext_plugin)
+    (pp_list ~sep:",@ " print_lexpr) ext.ext_content
 
 let print_code_annot fmt ca =
   let print_behaviors fmt bhvs =

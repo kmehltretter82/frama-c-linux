@@ -9820,15 +9820,12 @@ and doBody local_env (blk: Cabs.block) : chunk =
                      s.Logic_ptree.spec_behavior,
                    true
                  | CODE_ANNOT
-                     (Logic_ptree.AExtended(_,is_loop,(name,_)),loc) ->
+                     (Logic_ptree.AExtended(_,is_loop,ext),loc) ->
                    let source = fst loc in
-                   (match Logic_env.extension_category name, is_loop with
-                    | exception Not_found ->
-                      Kernel.(
-                        warning
-                          ~source ~wkey:wkey_acsl_extension
-                          "%s is not a known extension" name);
-                      [], false
+                   let kind =
+                     Logic_env.extension_category ~plugin:ext.ext_plugin ext.ext_name
+                   in
+                   (match kind, is_loop with
                     | Ext_code_annot Ext_here, false -> [], false
                     | Ext_code_annot Ext_next_stmt, false -> [], true
                     | Ext_code_annot Ext_next_loop, true -> [], false
@@ -9838,20 +9835,20 @@ and doBody local_env (blk: Cabs.block) : chunk =
                         warning
                           ~source ~wkey:wkey_acsl_extension
                           "%s is a code annotation extension, \
-                           but used here as a loop annotation" name);
+                           but used here as a loop annotation" ext.ext_name);
                       [], false
                     | Ext_code_annot Ext_next_loop, false ->
                       Kernel.(
                         warning
                           ~source ~wkey:wkey_acsl_extension
                           "%s is a loop annotation extension, \
-                           but used here as a code annotation" name);
+                           but used here as a code annotation" ext.ext_name);
                       [], false
                     | (Ext_global | Ext_contract), _ ->
                       Kernel.(
                         warning
                           ~source ~wkey:wkey_acsl_extension
-                          "%s is not a code annotation extension" name);
+                          "%s is not a code annotation extension" ext.ext_name);
                       [], false)
                  | _ -> [], false
                in

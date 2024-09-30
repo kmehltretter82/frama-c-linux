@@ -899,9 +899,9 @@ and pp_spec fmt spec =
 
 and pp_acsl_extension fmt ext =
   Format.fprintf fmt
-    "{ext_id=%d;ext_name=%s;ext_loc=%a;ext_has_status=%B;ext_kind=%a}"
-    ext.ext_id ext.ext_name pp_location ext.ext_loc ext.ext_has_status
-    pp_acsl_extension_kind ext.ext_kind
+    "{ext_id=%d; ext_name=%s; ext_plugin=%s; ext_loc=%a; ext_has_status=%B; ext_kind=%a}"
+    ext.ext_id ext.ext_name ext.ext_plugin pp_location ext.ext_loc
+    ext.ext_has_status pp_acsl_extension_kind ext.ext_kind
 
 and pp_acsl_extension_kind fmt = function
   | Ext_id(int) -> Format.fprintf fmt "Ext_id(%a)"  pp_int int
@@ -971,10 +971,15 @@ and pp_global_annotation fmt = function
     Format.fprintf fmt "Daxiomatic(%a,%a,%a,%a)"  pp_string string
       (pp_list pp_global_annotation) global_annotation_list
       pp_attributes attributes  pp_location location
-  | Dmodule(string,global_annotation_list,attributes,driver,location) ->
-    Format.fprintf fmt "Dmodule(%a,%a,%a,%a,%a)"  pp_string string
+  | Dmodule(string,global_annotation_list,attributes,loader,location) ->
+    let pp_loader fmt loader =
+      Format.fprintf fmt "(%s, %s)" loader.loader_name loader.loader_plugin
+    in
+    Format.fprintf fmt "Dmodule(%a,%a,%a,%a,%a)" pp_string string
       (pp_list pp_global_annotation) global_annotation_list
-      pp_attributes attributes (pp_option pp_string) driver pp_location location
+      pp_attributes attributes
+      (pp_option pp_loader) loader
+      pp_location location
   | Dtype(logic_type_info,location) ->
     Format.fprintf fmt "Dtype(%a,%a)"  pp_logic_type_info logic_type_info  pp_location location
   | Dlemma(string,logic_label_list,string_list,predicate,attributes,location) ->

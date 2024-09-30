@@ -695,7 +695,10 @@ class do_it global_find_init ((force:bool),(times:int)) = object(self)
             (Logic_const.term (TConst (LStr "done")) (Ctype Cil_const.charPtrType)) ;
             Logic_const.tinteger number
           ] in
-        let ext = Logic_const.new_acsl_extension "unfold" loc false kind in
+        let ext =
+          Logic_const.new_acsl_extension ~plugin:"kernel" "unfold" loc
+            false kind
+        in
         let annot =Logic_const.new_code_annotation (AExtended([],true,ext)) in
         Annotations.add_code_annot
           Emitter.end_user ~kf:(Option.get self#current_kf) sloop annot;
@@ -757,5 +760,11 @@ let unroll_typer (ctxt: Logic_typing.typing_context) (_loc:location) args =
     Lenv.empty () |> append_here_label |> append_init_label |> append_pre_label
   in Ext_terms (List.map (ctxt.type_term ctxt env) args)
 
-let () = Acsl_extension.register_code_annot_next_loop
+let register_extensions () =
+  Acsl_extension.register_code_annot_next_loop
     ~plugin:"kernel" "unfold" unroll_typer false
+
+let register_once, _ =
+  State_builder.apply_once "Unfold_loops.register_extensions" [] register_extensions
+
+let () = Cmdline.run_after_early_stage register_once

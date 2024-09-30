@@ -1,0 +1,8 @@
+[test-extend_errors] Linking.
+[kernel] Parsing Extend_errors.c (with preprocessing)
+[kernel:extension-unknown] Extend_errors.c:32: Warning: 
+  Ignoring unregistered extension 'bar' of plug-in myplugin1
+[kernel:plugin-not-loaded] Extend_errors.c:33: Warning: 
+  Ignoring extension 'bar' for unloaded plug-in unknown_plugin
+[kernel] Warning: warning extension-unknown treated as deferred error. See above messages for more information.
+[kernel] Frama-C aborted: invalid user input.

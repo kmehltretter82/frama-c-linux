@@ -535,10 +535,10 @@ type module_builder = {
 
 module Extensions = struct
   let initialized = ref false
-  let ref_is_extension = ref (fun _ -> assert false)
-  let ref_typer = ref (fun _ _ _ _ -> assert false)
-  let ref_typer_block = ref (fun _ _ _ _ -> assert false)
-  let ref_importer = ref (fun _ _ _ _ -> assert false)
+  let ref_is_extension = ref (fun ~plugin:_ _ -> assert false)
+  let ref_typer = ref (fun ~plugin:_ _ _ _ _ -> assert false)
+  let ref_typer_block = ref (fun ~plugin:_ _ _ _ _ -> assert false)
+  let ref_importer = ref (fun ~plugin:_ _ _ _ _ -> assert false)
 
   let set_handler ~is_extension ~typer ~typer_block ~importer =
     assert (not !initialized) ;
@@ -548,16 +548,16 @@ module Extensions = struct
     ref_importer := importer ;
     initialized := true
 
-  let is_extension name = !ref_is_extension name
+  let is_extension ~plugin name = !ref_is_extension ~plugin name
 
-  let typer name ~typing_context ~loc =
-    !ref_typer name typing_context loc
+  let typer ~plugin name ~typing_context:typing_context ~loc =
+    !ref_typer ~plugin name typing_context loc
 
-  let typer_block name ~typing_context ~loc mId =
-    !ref_typer_block name typing_context loc mId
+  let typer_block ~plugin name ~typing_context:typing_context ~loc =
+    !ref_typer_block ~plugin name typing_context loc
 
-  let importer name ~builder ~loc (moduleId: string list) : unit =
-    !ref_importer name builder loc moduleId
+  let importer ~plugin name ~builder ~loc (moduleId: string list) : unit =
+    !ref_importer ~plugin name builder loc moduleId
 
 end
 let set_extension_handler = Extensions.set_handler
@@ -3783,17 +3783,20 @@ struct
       old_behaviors
       behaviors
 
-  let type_extended ~typing_context ~loc (name,ps) =
-    let loc = match ps with
+  let type_extended ~typing_context ~loc {ext_name; ext_plugin; ext_content} =
+    let loc = match ext_content with
       | [] -> loc
       | p::_ -> p.lexpr_loc
     in
-    if Extensions.is_extension name then
-      let status , kind = Extensions.typer name ~typing_context ~loc ps in
-      Logic_const.new_acsl_extension name loc status kind
+    if Extensions.is_extension ~plugin:ext_plugin ext_name then
+      let status , kind =
+        Extensions.typer ext_name ~plugin:ext_plugin ~typing_context ~loc
+          ext_content
+      in
+      Logic_const.new_acsl_extension ~plugin:ext_plugin ext_name loc status kind
     else
       C.error
-        loc "No type-checking function registered for extension %s" name
+        loc "No type-checking function registered for extension %s" ext_name
 
   (* This module is used to sort the list of behaviors in [complete] and
      [disjoint] clauses, in order to remove duplicate clauses. *)
@@ -3996,8 +3999,9 @@ struct
         let env = loop_annot_env () in
         let ctxt = base_ctxt env in
         Cil_types.AAssigns(behav, type_assign ctxt ~accept_formal:true env a)
-      | AExtended (behav, is_loop, (name, _ as ext)) ->
-        let kind = Logic_env.extension_category name in
+      | AExtended (behav, is_loop, ext) ->
+        let name, plugin = ext.ext_name, ext.ext_plugin in
+        let kind = Logic_env.extension_category ~plugin name in
         let pre_state, post_state =
           match kind,is_loop with
           | exception Not_found ->
@@ -4327,30 +4331,36 @@ struct
       pop_imports () ;
       Some (Dmodule(name,l,[],None,loc))
 
-    | LDimport(None,name,alias) ->
-      add_import ?alias name ; None
+    | LDimport ({import_loader = None; _} as import) ->
+      add_import ?alias:import.module_alias import.module_name ; None
 
-    | LDimport(Some driver as drv,name,alias) ->
+    | LDimport ({import_loader = Some loader; _} as import) ->
+      let name, plugin = loader.loader_name, loader.loader_plugin in
+      let id = import.module_name in
       let annot =
-        match Logic_env.Modules.find name with
+        match Logic_env.Modules.find id with
         | None, oldloc ->
           C.error loc
             "Module %s already defined (at %a)"
-            name Cil_printer.pp_location oldloc
-        | Some odrv, oldloc ->
-          if odrv <> driver then
+            id Cil_printer.pp_location oldloc
+        | Some (name', plugin'), oldloc ->
+          if plugin <> plugin' || name <> name' then
             C.error loc
-              "Module %s already imported with driver %s (at %a)"
-              name odrv Cil_printer.pp_location oldloc
+              "Module %s already imported with loader \\%s::%s (at %a)"
+              id plugin' name'
+              Cil_printer.pp_location oldloc
           else None
         | exception Not_found ->
           let decls = ref [] in
-          let builder = make_module_builder decls name in
-          let path = Logic_utils.longident name in
-          Extensions.importer driver ~builder ~loc path ;
-          Logic_env.Modules.add name (drv,loc) ;
-          Some (Dmodule(name,List.rev !decls,[],drv,loc))
-      in add_import ?alias name ; annot
+          let builder = make_module_builder decls id in
+          let path = Logic_utils.longident id in
+          Extensions.importer ~plugin name ~builder ~loc path ;
+          Logic_env.Modules.add id (Some (name, plugin),loc) ;
+          let loader : Cil_types.loader =
+            {loader_name = name; loader_plugin = plugin}
+          in
+          Some (Dmodule(id,List.rev !decls,[],Some loader,loc))
+      in add_import ?alias:import.module_alias id ; annot
 
     | LDtype(name,l,def) ->
       let env = init_type_variables loc l in
@@ -4497,18 +4507,23 @@ struct
       let wvi_opt = get_volatile_fct checks_writes_fct wr_opt in
       Some (Dvolatile (tsets, rvi_opt, wvi_opt, [], loc))
 
-    | LDextended (Ext_lexpr(kind, content)) ->
-      let typing_context = base_ctxt (Lenv.empty ()) in
-      let status,tcontent = Extensions.typer kind ~typing_context ~loc content in
-      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
-      Some (Dextended (textended, [], loc))
-
-    | LDextended (Ext_extension (kind, name, content)) ->
+    | LDextended (Ext_lexpr ext) ->
+      let plugin, name = ext.ext_plugin, ext.ext_name in
       let typing_context = base_ctxt (Lenv.empty ()) in
       let status,tcontent =
-        Extensions.typer_block kind ~typing_context ~loc (name,content)
+        Extensions.typer ~plugin name ~typing_context ~loc ext.ext_content
       in
-      let textended = Logic_const.new_acsl_extension kind loc status tcontent in
+      let textended = Logic_const.new_acsl_extension ~plugin name loc status tcontent in
+      Some (Dextended (textended, [], loc))
+
+    | LDextended (Ext_extension gext) ->
+      let plugin, name = gext.gext_plugin, gext.gext_name in
+      let typing_context = base_ctxt (Lenv.empty ()) in
+      let status,tcontent =
+        Extensions.typer_block name ~plugin ~typing_context ~loc
+          (gext.gext_kind,gext.gext_content)
+      in
+      let textended = Logic_const.new_acsl_extension ~plugin name loc status tcontent in
       Some (Dextended (textended, [], loc))
 
   let annot = C.on_error

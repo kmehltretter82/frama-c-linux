@@ -46,6 +46,9 @@ type extension_preprocessor_block =
 type extension_typer_block =
   typing_context -> location -> string * extended_decl list -> acsl_extension_kind
 
+type extension_module_importer =
+  module_builder -> location -> string list -> unit
+
 (** Pretty printers for ACSL extensions *)
 type extension_printer =
   Printer_api.extensible_printer_type -> Format.formatter ->
@@ -57,9 +60,6 @@ type extension_printer =
 *)
 type extension_same =
   acsl_extension_kind -> acsl_extension_kind -> Ast_diff.is_same_env -> bool
-
-type extension_module_importer =
-  module_builder -> location -> string list -> unit
 
 (** type of functions that register new ACSL extensions to be used in place of
     various kinds of ACSL annotations.
@@ -128,7 +128,7 @@ type register_extension =
 (** same as {!register_extension}, but for extensions that parse an axiomatic
     block, resulting in a {!Cil_types.Ext_annot}. *)
 type register_extension_block =
-  plugin: string -> string ->
+  plugin:string -> string ->
   ?preprocessor:extension_preprocessor_block -> extension_typer_block ->
   ?visitor:extension_visitor ->
   ?printer:extension_printer -> ?short_printer:extension_printer ->
@@ -161,11 +161,11 @@ val register_code_annot_next_both: register_extension
    Module importer extensions allow extending the import clause with external
    loaders. For instance, consider the following declaration:
    {[
-     //@ import A: foo::bar;
+     //@ import \myplugin::A: foo::bar;
    ]}
 
    This import clause will invoke an external module importer named ["A"]
-   provided it has been properly registered.
+   provided it has been properly registered by plugin [myplugin].
 
    A module importer extension is a function that receives a [module_builder]
    parameter to be populated with contents of the module. The module name is
@@ -180,4 +180,5 @@ val register_code_annot_next_both: register_extension
    external module importers might use memoization internally, the provided
    module builder shall be populated on every call.
 *)
-val register_module_importer : string -> extension_module_importer -> unit
+val register_module_importer :
+  plugin:string -> string -> extension_module_importer -> unit

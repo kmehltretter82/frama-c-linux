@@ -858,9 +858,9 @@ let rec global_annot_without_irrelevant_attributes ga =
   | Daxiomatic(n,l,attr,loc) ->
     Daxiomatic(n,List.map global_annot_without_irrelevant_attributes l,
                drop_attributes_for_merge attr,loc)
-  | Dmodule(n,l,attr,drv,loc) ->
+  | Dmodule(n,l,attr,loader,loc) ->
     Dmodule(n,List.map global_annot_without_irrelevant_attributes l,
-            drop_attributes_for_merge attr,drv,loc)
+            drop_attributes_for_merge attr,loader,loc)
   | Dlemma (id,labs,typs,st,attr,loc) ->
     Dlemma (id,labs,typs,st,drop_attributes_for_merge attr,loc)
   | Dtype (lti,loc) ->
@@ -899,8 +899,8 @@ let rec global_annot_pass1 g =
     ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls,None)
               (Some (l,!currentDeclIdx)));
     List.iter global_annot_pass1 decls
-  | Dmodule(id,decls,_,drv,l) ->
-    ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls,drv)
+  | Dmodule(id,decls,_,loader,l) ->
+    ignore (PlainMerging.getNode laEq laSyn !currentFidx id (id,decls,loader)
               (Some (l,!currentDeclIdx)));
     List.iter global_annot_pass1 decls
   | Dfun_or_pred (li,l) ->
@@ -1451,13 +1451,13 @@ let matchLogicAxiomatic oldfidx (oldid,_,_ as oldnode) fidx (id,_,_ as node) =
   let oldanode = PlainMerging.getNode laEq laSyn oldfidx oldid oldnode None in
   let anode = PlainMerging.getNode laEq laSyn fidx id node None in
   if oldanode != anode then begin
-    let _, oldax, odrv = oldanode.ndata in
+    let _, oldax, oloader = oldanode.ndata in
     let oldaidx = oldanode.nfidx in
-    let _, ax, drv = anode.ndata in
+    let _, ax, loader = anode.ndata in
     let aidx = anode.nfidx in
     let ax = List.map global_annot_without_irrelevant_attributes ax in
     let oldax = List.map global_annot_without_irrelevant_attributes oldax in
-    if Logic_utils.is_same_axiomatic oldax ax && odrv = drv then begin
+    if Logic_utils.is_same_axiomatic oldax ax && oloader = loader then begin
       if oldaidx < aidx then
         anode.nrep <- oldanode.nrep
       else

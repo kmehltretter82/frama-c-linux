@@ -76,8 +76,8 @@ let pp_predicate_kind ~kw fmt kd =
 
 module Extensions = struct
   let initialized = ref false
-  let ref_print = ref (fun _ _ _ _ -> assert false)
-  let ref_short_print = ref (fun _ _ _ _ -> assert false)
+  let ref_print = ref (fun ~plugin:_ _ _ _ _ -> assert false)
+  let ref_short_print = ref (fun ~plugin:_ _ _ _ _ -> assert false)
 
   let set_handler ~print ~short_print =
     assert (not !initialized) ;
@@ -86,11 +86,11 @@ module Extensions = struct
     initialized := true ;
     ()
 
-  let pp (printer) fmt {ext_name; ext_kind} =
-    !ref_print ext_name printer fmt ext_kind
+  let pp printer fmt {ext_name; ext_kind; ext_plugin} =
+    !ref_print ~plugin:ext_plugin ext_name printer fmt ext_kind
 
-  let pp_short (printer) fmt {ext_name; ext_kind} =
-    !ref_short_print ext_name printer fmt ext_kind
+  let pp_short printer fmt {ext_name; ext_kind; ext_plugin} =
+    !ref_short_print ~plugin:ext_plugin ext_name printer fmt ext_kind
 
 end
 let set_extension_handler = Extensions.set_handler
@@ -3284,6 +3284,11 @@ class cil_printer () = object (self)
       (self#typ None) mfi.mi_base_type
       (self#logic_type (Some print_decl)) mfi.mi_field_type
 
+  method private pp_loader fmt loader =
+    if Datatype.String.equal loader.loader_plugin "kernel"
+    then pp_print_string fmt loader.loader_name
+    else fprintf fmt "\\%s::%s" loader.loader_plugin loader.loader_name
+
   method global_annotation fmt = function
     | Dtype_annot (a,_) ->
       let old_label = current_label in
@@ -3413,17 +3418,18 @@ class cil_printer () = object (self)
         (Pretty_utils.pp_list ~pre:"@[<v 0>" ~suf:"@]@\n" ~sep:"@\n"
            self#global_annotation)
         decls
-    | Dmodule(id, _, _, Some drv, _)
+    | Dmodule(id, _, _, Some loader, _)
       when not Kernel.(is_debug_key_enabled dkey_print_imported_modules) ->
-      fprintf fmt "@[<hov 2>%a %s: %s %a _ ;@]@\n"
-        self#pp_acsl_keyword "import" drv id
+      fprintf fmt "@[<hov 2>%a %a: %s %a _ ;@]@\n"
+        self#pp_acsl_keyword "import"
+        self#pp_loader loader id
         self#pp_acsl_keyword "\\as"
-    | Dmodule(id, decls, _attr, driver, _) ->
+    | Dmodule(id, decls, _attr, loader, _) ->
       begin
         (* attributes are meant to be purely internal for now. *)
         fprintf fmt "@[<v 2>@[" ;
         if Kernel.(is_debug_key_enabled dkey_print_imported_modules) then
-          Option.iter (fprintf fmt "// import %s:@\n") driver ;
+          Option.iter (fprintf fmt "// import %a:@\n" self#pp_loader) loader ;
         fprintf fmt "%a %a {@]"
           self#pp_acsl_keyword "module" self#logic_name id ;
         try

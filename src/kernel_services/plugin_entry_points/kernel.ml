@@ -39,6 +39,10 @@ module P = Plugin.Register
 include (P: Plugin.S_no_log)
 include Cmdline.Kernel_log
 
+let dkey_acsl_extension =
+  register_category "acsl-extension"
+    ~help:"print a message when registering a new ACSL extension"
+
 let dkey_alpha =
   register_category ~help:"alpha conversion module (parsing)" "alpha"
 

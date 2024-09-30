@@ -259,6 +259,23 @@
   let cv_ghost = Attr("ghost", [])
 
   let toplevel_pred tp_kind tp_statement = { tp_kind; tp_statement }
+
+  let extension ext_name ext_plugin ext_content =
+    {ext_name; ext_plugin; ext_content}
+
+  let global_extension gext_name gext_plugin gext_kind gext_content =
+    Ext_extension {gext_name; gext_plugin; gext_kind; gext_content}
+
+  let import loader module_name module_alias =
+    let import_loader =
+      match loader with
+      | None -> None
+      | Some (loader_name, loader_plugin) ->
+          Some {loader_name;loader_plugin}
+    in
+    LDimport { import_loader; module_name; module_alias}
+
+
 %}
 
 /*****************************************************************************/
@@ -269,7 +286,7 @@
 
 %token EXT_SPEC_MODULE EXT_SPEC_FUNCTION EXT_SPEC_CONTRACT EXT_SPEC_INCLUDE
 %token EXT_SPEC_AT EXT_SPEC_LET
-%token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT
+%token <string> LONGIDENT IDENTIFIER TYPENAME IDENTIFIER_EXT IDENTIFIER_LOADER
 %token <bool*string> STRING_LITERAL
 %token <string> INT_CONSTANT
 %token <string> FLOAT_CONSTANT
@@ -290,7 +307,7 @@
 %token CHECK_ENSURES CHECK_EXITS CHECK_CONTINUES CHECK_BREAKS CHECK_RETURNS
 %token ADMIT_REQUIRES ADMIT_LOOP ADMIT_INVARIANT ADMIT_LEMMA
 %token ADMIT_ENSURES ADMIT_EXITS ADMIT_CONTINUES ADMIT_BREAKS ADMIT_RETURNS
-%token <string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT
+%token <string * string> EXT_CODE_ANNOT EXT_GLOBAL EXT_GLOBAL_BLOCK EXT_CONTRACT EXT_LOADER EXT_LOADER_PLUGIN
 %token EXITS BREAKS CONTINUES RETURNS
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
@@ -948,11 +965,14 @@ full_identifier:
 | EXT_SPEC_INCLUDE { "include" }
 | EXT_SPEC_AT { "at" }
 | EXT_SPEC_LET { "let" }
-| id = EXT_CODE_ANNOT { id }
-| id = EXT_CONTRACT { id }
-| id = EXT_GLOBAL { id }
-| id = EXT_GLOBAL_BLOCK { id }
+| id = EXT_CODE_ANNOT { fst id }
+| id = EXT_CONTRACT { fst id }
+| id = EXT_GLOBAL { fst id }
+| id = EXT_GLOBAL_BLOCK { fst id }
+| id = EXT_LOADER { fst id }
+| id = EXT_LOADER_PLUGIN { fst id }
 | id = IDENTIFIER_EXT { id }
+| id = IDENTIFIER_LOADER { id }
 ;
 
 %inline unknown_extension:
@@ -1181,7 +1201,7 @@ clause_kw:
 | FREES {"frees"}
 | COMPLETE {"complete"}
 | DISJOINT {"disjoint"}
-| EXT_CONTRACT { $1 }
+| EXT_CONTRACT { fst $1 }
 | id=IDENTIFIER_EXT { id }
 | EOF { "end of annotation" }
 ;
@@ -1253,8 +1273,10 @@ ne_simple_clauses:
 | unknown_extension SEMICOLON simple_clauses { snd $3 }
 | EXT_CONTRACT extension_content SEMICOLON simple_clauses
     { let allocation,assigns,post_cond,extended = snd $4 in
-      let processed = Logic_env.preprocess_extension $1 $2 in
-      allocation,assigns,post_cond,($1,processed)::extended
+      let name, plugin = $1 in
+      let processed = Logic_env.preprocess_extension ~plugin name $2 in
+      let ext = extension name plugin processed in
+      allocation,assigns,post_cond,ext::extended
     }
 | post_cond_kind lexpr clause_kw { missing $loc($2) ";" $3 }
 | allocation clause_kw { missing $loc($1) ";" $2 }
@@ -1474,21 +1496,21 @@ loop_variant:
 loop_grammar_extension:
 | LOOP EXT_CODE_ANNOT extension_content SEMICOLON {
   let open Cil_types in
-  let ext = $2 in
+  let name, plugin = $2 in
   try
-    begin match Logic_env.extension_category ext with
+    begin match Logic_env.extension_category ~plugin name with
       | Ext_code_annot (Ext_next_loop | Ext_next_both) ->
-        let processed = Logic_env.preprocess_extension ext $3 in
-        (ext, processed)
+        let processed = Logic_env.preprocess_extension ~plugin name $3 in
+        {ext_name = name; ext_plugin = plugin; ext_content = processed}
       | Ext_code_annot (Ext_here | Ext_next_stmt) ->
         raise
           (Not_well_formed
-            (loc $loc($2), ext ^ " is not a loop annotation extension"))
+            (loc $loc($2), name ^ " is not a loop annotation extension"))
       | _ -> raise Not_found
     end
   with Not_found ->
     Kernel.fatal ~source:(pos $startpos($2))
-      "%s is not a code annotation extension. Parser got wrong lexeme." ext
+      "%s is not a code annotation extension. Parser got wrong lexeme." name
 }
 ;
 
@@ -1523,12 +1545,13 @@ code_annotation:
 | EXT_CODE_ANNOT extension_content SEMICOLON
   { fun bhvs ->
     let open Cil_types in
-    let ext = $1 in
+    let name, plugin = $1 in
     try
-      begin match Logic_env.extension_category ext with
+      begin match Logic_env.extension_category ~plugin name with
         | Ext_code_annot (Ext_here | Ext_next_stmt | Ext_next_both) ->
-          let processed = Logic_env.preprocess_extension ext $2 in
-          Logic_ptree.AExtended(bhvs,false,(ext,processed))
+          let processed = Logic_env.preprocess_extension ~plugin name $2 in
+          let ext = extension name plugin processed in
+          Logic_ptree.AExtended(bhvs,false,ext)
         | Ext_code_annot Ext_next_loop ->
           raise
             (Not_well_formed
@@ -1536,12 +1559,12 @@ code_annotation:
                 Printf.sprintf
                   "%s is a loop annotation extension. It can't be used as a \
                    plain code annotation extension. Did you mean 'loop %s'?"
-                  ext ext))
+                  name name))
         | _ -> raise Not_found
       end
     with Not_found ->
       Kernel.fatal ~source:(pos $startpos($1))
-        "%s is not a code annotation extension. Parser got wrong lexeme" ext
+        "%s is not a code annotation extension. Parser got wrong lexeme" name
   }
 ;
 
@@ -1565,14 +1588,17 @@ decl:
 
 ext_decl:
 | EXT_GLOBAL extension_content SEMICOLON {
-     let processed = Logic_env.preprocess_extension $1 $2 in
-     Ext_lexpr($1, processed)
+    let name, plugin = $1 in
+     let processed = Logic_env.preprocess_extension ~plugin name $2 in
+     let ext = extension name plugin processed in
+     Ext_lexpr ext
    }
 | EXT_GLOBAL_BLOCK any_identifier LBRACE ext_decls RBRACE {
+    let name, plugin = $1 in
     let processed_id,processed_block =
-       Logic_env.preprocess_extension_block $1 ($2,$4)
+       Logic_env.preprocess_extension_block ~plugin name ($2,$4)
     in
-    Ext_extension($1,processed_id,processed_block)
+    global_extension name plugin processed_id processed_block
    }
 ;
 
@@ -1689,13 +1715,13 @@ logic_def:
 | MODULE push_module_name LBRACE logic_decls RBRACE
     { pop_module_types () ; LDmodule($2,$4) }
 | IMPORT mId = module_name SEMICOLON
-    { LDimport(None,mId,None) }
+    { import None mId None }
 | IMPORT mId = module_name AS id = IDENTIFIER SEMICOLON
-    { LDimport(None,mId,Some id) }
-| IMPORT drv = IDENTIFIER COLON mId = module_name SEMICOLON
-    { LDimport(Some drv,mId,None) }
-| IMPORT drv = IDENTIFIER COLON mId = module_name AS id = IDENTIFIER SEMICOLON
-    { LDimport(Some drv,mId,Some id) }
+    { import None mId (Some id) }
+| IMPORT loader = ext_loader mId = module_name SEMICOLON
+    { import (Some loader) mId None }
+| IMPORT loader = ext_loader mId = module_name AS id = IDENTIFIER SEMICOLON
+    { import (Some loader) mId (Some id) }
 | TYPE poly_id_type_add_typename EQUAL typedef SEMICOLON
         { let (id,tvars) = $2 in
           exit_type_variables_scope ();
@@ -1711,6 +1737,17 @@ module_name:
 push_module_name:
 | module_name { push_module_types () ; $1 }
 ;
+
+ext_loader:
+| IDENTIFIER COLON {
+    Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown
+      ~source:(fst (loc $sloc))
+      "Ignoring unregistered module importer extension '%s'" $1;
+    raise Unknown_ext
+  }
+| EXT_LOADER COLON  { $1 }
+| EXT_LOADER_PLUGIN { $1 }
+| IDENTIFIER_LOADER { raise Unknown_ext }
 
 deprecated_logic_decl:
 /* OBSOLETE: logic function declaration */
@@ -1961,7 +1998,7 @@ post_cond:
 
 is_acsl_spec:
 | post_cond  { snd $1 }
-| EXT_CONTRACT   { $1 }
+| EXT_CONTRACT { fst $1 }
 | ASSIGNS    { "assigns" }
 | ALLOCATES  { "allocates" }
 | FREES      { "frees" }
@@ -1976,10 +2013,13 @@ is_acsl_spec:
 ;
 
 is_acsl_decl_or_code_annot:
-| EXT_CODE_ANNOT { $1 }
-| EXT_GLOBAL     { $1 }
-| EXT_GLOBAL_BLOCK     { $1 }
+| EXT_CODE_ANNOT { fst $1 }
+| EXT_GLOBAL { fst $1 }
+| EXT_GLOBAL_BLOCK { fst $1 }
+| EXT_LOADER { fst $1 }
+| EXT_LOADER_PLUGIN { fst $1 }
 | IDENTIFIER_EXT { $1 }
+| IDENTIFIER_LOADER { $1 }
 | ASSUMES   { "assumes" }
 | ASSERT    { "assert" }
 | CHECK     { "check" }

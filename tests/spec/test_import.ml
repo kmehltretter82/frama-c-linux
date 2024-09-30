@@ -1,6 +1,23 @@
 open Cil_types
 open Logic_typing
 
+
+module Plugin1 =
+  Plugin.Register
+    (struct
+      let name = "MyPlugin1"
+      let shortname = "myplugin1"
+      let help = ""
+    end)
+
+module Plugin2 =
+  Plugin.Register
+    (struct
+      let name = "MyPlugin2"
+      let shortname = "myplugin2"
+      let help = ""
+    end)
+
 let () = Format.printf "[test-import] Linking.@."
 
 let loader (ctxt: module_builder) (loc: location) (m: string list) =
@@ -17,9 +34,10 @@ let loader (ctxt: module_builder) (loc: location) (m: string list) =
   end
 
 let register () =
-  begin
-    Format.printf "[test-import] Registering 'foo'.@." ;
-    Acsl_extension.register_module_importer "foo" loader ;
-  end
+  Acsl_extension.register_module_importer ~plugin:"myplugin1" "foo" loader;
+  Acsl_extension.register_module_importer ~plugin:"myplugin1" "bar" loader;
+  Acsl_extension.register_module_importer ~plugin:"myplugin2" "foo" loader;
+  if Kernel.GeneralDebug.get () = 1 then
+    Acsl_extension.register_module_importer ~plugin:"myplugin1" "foo" loader
 
 let () = Cmdline.run_after_extended_stage register

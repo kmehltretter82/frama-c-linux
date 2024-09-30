@@ -103,6 +103,39 @@
     let c = Utf8_logic.from_unichar !code in
     find_utf8 c
 
+  let extension ~plugin name =
+    try
+      (* extension_from will raise Not_found or fatal, if extension does not
+         exist or if there are ambiguities between extension names and the
+         plugin is not provided. *)
+      let plugin = Logic_env.extension_from ?plugin name in
+      match Logic_env.extension_category ~plugin name with
+      | Cil_types.Ext_contract -> Some (EXT_CONTRACT (name, plugin))
+      | Cil_types.Ext_global ->
+          if Logic_env.is_extension_block ~plugin name
+          then Some (EXT_GLOBAL_BLOCK (name, plugin))
+          else Some (EXT_GLOBAL (name, plugin))
+      | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT (name, plugin))
+    with Not_found ->
+      (* We need to distinguish here which token was parsed (with or without
+         plugin) to help the parser (cf. ext_loader rule). *)
+      match plugin with
+      | None ->
+        begin
+          try
+            (* importer_from will raise Not_found or fatal, if extension does not
+              exist or if there are ambiguities between extension names and the
+              plugin is not provided. *)
+            let plugin = Logic_env.importer_from name in
+            Some (EXT_LOADER (name, plugin))
+          with Not_found -> None
+        end
+      | Some plugin ->
+        if Logic_env.is_importer ~plugin name then
+          Some (EXT_LOADER_PLUGIN (name, plugin))
+        else None
+  [@@alert "-acsl_extension_from"]
+
   let identifier, is_acsl_keyword =
     let all_kw = Hashtbl.create 37 in
     let type_kw = Hashtbl.create 3 in
@@ -183,29 +216,16 @@
       ];
     List.iter (fun (x, y) -> Hashtbl.add type_kw x y)
       ["integer", INTEGER; "real", REAL; "boolean", BOOLEAN; ];
-    (fun s loc ->
+    (fun ~plugin s loc ->
       try
         (Hashtbl.find all_kw s)
         loc
       with Not_found ->
-        let res =
-          match Logic_env.extension_category s with
-          | exception Not_found -> None
-          | Cil_types.Ext_contract -> Some (EXT_CONTRACT s)
-          | Cil_types.Ext_global ->
-            begin
-              match Logic_env.is_extension_block s with
-              | false -> Some (EXT_GLOBAL s)
-              | true -> Some (EXT_GLOBAL_BLOCK s)
-            end
-          | Cil_types.Ext_code_annot _ -> Some (EXT_CODE_ANNOT s)
-        in
-        match res with
+        match extension ~plugin s with
         | None ->
           if Logic_env.typename_status s then TYPENAME s
           else
-            (try
-               Hashtbl.find type_kw s
+            (try Hashtbl.find type_kw s
              with Not_found -> IDENTIFIER s)
         | Some lex -> lex
     ),
@@ -305,40 +325,45 @@
     | ADMIT, LEMMA -> true, ADMIT_LEMMA
     | _ -> false, current
 
-  let type_to_string = function
-    | TYPENAME s -> s
-    | REAL -> "real"
-    | BOOLEAN -> "boolean"
-    | INTEGER -> "integer"
-    | _ -> assert false
-
   let check_ext_plugin source plugin tok =
     match tok with
     | IDENTIFIER s ->
       if Plugin.is_present plugin then
         Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
-          "Unregistered extension '%s' for plug-in %s" s plugin
+          "Ignoring unregistered extension '%s' of plug-in %s" s plugin
       else
         Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
-          "Ignored extensions for unloaded plug-in %s" plugin;
+          "Ignoring extension '%s' for unloaded plug-in %s" s plugin;
       IDENTIFIER_EXT s
-    | EXT_CODE_ANNOT s
-    | EXT_GLOBAL s
-    | EXT_GLOBAL_BLOCK s
-    | EXT_CONTRACT s ->
-      let plugin_from = Logic_env.extension_from s in
-      if plugin_from = plugin && plugin = "kernel" then
+    | EXT_CODE_ANNOT (s, _)
+    | EXT_GLOBAL (s, _)
+    | EXT_GLOBAL_BLOCK (s, _)
+    | EXT_CONTRACT (s, _) ->
+      if String.equal plugin "kernel" then
         Kernel.abort ~source
-          "Extension '%s' from frama-c's kernel should not be used with the syntax \
-          \\kernel::%s" s s;
-      if plugin_from <> plugin then
-        Kernel.abort ~source
-          "Extension '%s' is from %s and not %s" s plugin_from plugin;
+          "Extension '%s' from frama-c's kernel should not be used with the \
+           syntax \\kernel::%s" s s;
       tok
-    | _ ->
-      Kernel.abort ~source
-        "Type token \'%s\' received instead of extension identifier"
-        (type_to_string tok)
+    | _ -> raise Parsing.Parse_error
+
+  let check_ext_importer source plugin tok =
+    match tok with
+    | IDENTIFIER s ->
+      if Plugin.is_present plugin then
+        Kernel.warning ~once:true ~wkey:Kernel.wkey_extension_unknown ~source
+          "Ignoring unregistered module importer extension '%s' of plug-in %s"
+          s plugin
+      else
+        Kernel.warning ~once:true ~wkey:Kernel.wkey_plugin_not_loaded ~source
+          "Ignoring module importer extension '%s' for unloaded plug-in %s" s plugin;
+      IDENTIFIER_LOADER s
+    | EXT_LOADER_PLUGIN (s, _) ->
+      if String.equal plugin "kernel" then
+        Kernel.abort ~source
+          "Module importer extension '%s' from frama-c's kernel should not be \
+           used with the syntax \\kernel::%s" s s;
+      tok
+    | _ -> raise Parsing.Parse_error
 }
 
 let space = [' ' '\t' '\012' '\r' '@' ]
@@ -386,10 +411,16 @@ rule token = parse
            then comment lexbuf
            else lex_error lexbuf "unexpected block-comment opening"
          }
+  | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) ":" {
+     let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
+     let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
+     let tok = identifier ~plugin:(Some plugin) name cabsloc in
+     check_ext_importer (fst cabsloc) plugin tok
+     }
   | '\\' (rIdentifier as plugin) "::" (rIdentifier as name) {
      let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
      let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
-     let tok = identifier name cabsloc in
+     let tok = identifier ~plugin:(Some plugin) name cabsloc in
      check_ext_plugin (fst cabsloc) plugin tok
      }
   | '\\' rIdentifier { bs_identifier lexbuf }
@@ -399,7 +430,7 @@ rule token = parse
       let loc = Lexing.(lexeme_start_p lexbuf, lexeme_end_p lexbuf) in
       let cabsloc = Cil_datatype.Location.of_lexing_loc loc in
       let s = lexeme lexbuf in
-      let curr_tok = identifier s cabsloc in
+      let curr_tok = identifier ~plugin:None s cabsloc in
       if curr_tok = CHECK || curr_tok = ADMIT then begin
         let next_tok =
           token { lexbuf with refill_buff = lexbuf.refill_buff }
@@ -593,30 +624,31 @@ and comment = parse
     dest_lexbuf.lex_abs_pos <- src_pos.pos_cnum
 
   let parse_from_position f (pos, s : Filepath.position * string) =
-    let output = Kernel.warning ~wkey:Kernel.wkey_annot_error
-    in
+    let open Current_loc.Operators in
     let lb = from_string s in
+    let get_loc () = Cil_datatype.Position.of_lexing_pos lb.Lexing.lex_curr_p in
+    let<> UpdatedCurrentLoc = (pos, pos) in
+    let warn = Kernel.warning ~wkey:Kernel.wkey_annot_error in
     set_initial_position lb (Cil_datatype.Position.to_lexing_pos pos);
     try
       let res = f token lb in
-      Some (Cil_datatype.Position.of_lexing_pos lb.Lexing.lex_curr_p, res)
+      Some (get_loc (), res)
     with
       | Failure s -> (* raised by the lexer itself, through [f] *)
-          output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "lexing error: %s" s; None
+          warn ~source:(get_loc ()) "lexing error: %s" s; None
       | Parsing.Parse_error ->
-        output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "unexpected token '%s'" (Lexing.lexeme lb);
+        warn ~source:(get_loc ()) "unexpected token '%s'" (Lexing.lexeme lb);
         None
-      | Error (_, m) -> output ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "%s" m; None
+      | Error (_, m) -> warn ~source:(get_loc ()) "%s" m; None
       | Logic_utils.Not_well_formed (loc, m) ->
-        output ~source:(fst loc) "%s" m;
-        None
+        warn ~source:(fst loc) "%s" m; None
       | Logic_utils.Unknown_ext -> None
       | Log.FeatureRequest(source,_,msg) ->
-        let source = Option.value ~default:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) source in
-        output ~source "unimplemented ACSL feature: %s" msg; None
-      | Log.AbortError _ as exn -> raise exn
+        let source = Option.value ~default:(get_loc ()) source in
+        warn ~source "unimplemented ACSL feature: %s" msg; None
+      | Log.(AbortError _ | AbortFatal _) as exn -> raise exn
       | exn ->
-        Kernel.fatal ~source:(Cil_datatype.Position.of_lexing_pos lb.lex_curr_p) "Unknown error (%s)"
+        Kernel.fatal ~source:(get_loc ()) "Unknown error (%s)"
           (Printexc.to_string exn)
 
   let lexpr = parse_from_position Logic_parser.lexpr_eof

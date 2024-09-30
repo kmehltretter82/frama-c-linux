@@ -114,7 +114,9 @@ struct
   let add ~emitter stmt annot =
     let loc = Cil_datatype.Stmt.loc stmt in
     let param = M.export annot in
-    let extension = Logic_const.new_acsl_extension name loc false param in
+    let extension =
+      Logic_const.new_acsl_extension ~plugin:"eva" name loc false param
+    in
     let annot_node = Cil_types.AExtended ([], kind = Loop, extension) in
     let code_annotation = Logic_const.new_code_annotation annot_node in
     Annotations.add_code_annot emitter stmt code_annotation

@@ -33,6 +33,8 @@ include Plugin.S
 (** {2 Message and warning categories} *)
 (* ************************************************************************* *)
 
+val dkey_acsl_extension: category
+
 val dkey_alpha: category
 
 val dkey_alpha_undo: category

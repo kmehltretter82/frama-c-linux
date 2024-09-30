@@ -250,15 +250,13 @@ let get ?bhv stmt =
 (* --- Registry                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let register =
-  let once = ref false in
-  fun () ->
-    if (not !once) then begin
-      once := true;
-      Acsl_extension.register_code_annot_next_stmt ~plugin:"kernel"
-        "calls" typecheck true ;
-      Acsl_extension.register_behavior ~plugin:"kernel"
-        "instanceof" typecheck true ;
-    end
+let register_extensions () =
+  Acsl_extension.register_code_annot_next_stmt ~plugin:"kernel"
+    "calls" typecheck true;
+  Acsl_extension.register_behavior ~plugin:"kernel"
+    "instanceof" typecheck true
 
-let () = Cmdline.run_after_configuring_stage register
+let register_once, _ =
+  State_builder.apply_once "Dyncall.register_extensions" [] register_extensions
+
+let () = Cmdline.run_after_early_stage register_once

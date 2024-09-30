@@ -26,39 +26,48 @@ open Cil_types
 
 module Extensions = struct
   let initialized = ref false
-  let ref_is_extension = ref (fun _ -> assert false)
-  let ref_category = ref (fun _ -> assert false)
-  let ref_preprocess = ref (fun _ -> assert false)
-  let ref_is_extension_block = ref (fun _ -> assert false)
-  let ref_preprocess_block = ref (fun _ -> assert false)
-  let ref_extension_from = ref (fun _ -> assert false)
+  let ref_is_extension = ref (fun ~plugin:_ _ -> assert false)
+  let ref_is_importer = ref (fun ~plugin:_ _ -> assert false)
+  let ref_category = ref (fun ~plugin:_ _ -> assert false)
+  let ref_preprocess = ref (fun ~plugin:_ _ -> assert false)
+  let ref_is_extension_block = ref (fun ~plugin:_ _ -> assert false)
+  let ref_preprocess_block = ref (fun ~plugin:_ _ -> assert false)
+  let ref_extension_from = ref (fun ?plugin:_ _ -> assert false)
+  let ref_importer_from = ref (fun  ?plugin:_ _ -> assert false)
 
-  let set_extension_handler ~category ~is_extension ~preprocess
-      ~is_extension_block ~preprocess_block ~extension_from =
+  let set_extension_handler ~category ~is_extension ~is_importer ~preprocess
+      ~is_extension_block ~preprocess_block ~extension_from ~importer_from =
     assert (not !initialized) ;
     ref_is_extension := is_extension ;
+    ref_is_importer := is_importer ;
     ref_category := category ;
     ref_preprocess := preprocess ;
     ref_is_extension_block := is_extension_block;
     ref_preprocess_block := preprocess_block;
-    initialized := true ;
     ref_extension_from := extension_from;
+    ref_importer_from := importer_from;
+    initialized := true ;
     ()
 
-  let is_extension s = !ref_is_extension s
-  let is_extension_block s = !ref_is_extension_block s
-  let category s = !ref_category s
-  let preprocess s = !ref_preprocess s
-  let preprocess_block s = !ref_preprocess_block s
-  let extension_from s = !ref_extension_from s
+  let is_extension ~plugin name = !ref_is_extension ~plugin name
+  let is_extension_block ~plugin name = !ref_is_extension_block ~plugin name
+  let is_importer ~plugin name = !ref_is_importer ~plugin name
+  let category ~plugin name = !ref_category ~plugin name
+  let preprocess ~plugin name = !ref_preprocess ~plugin name
+  let preprocess_block ~plugin name = !ref_preprocess_block ~plugin name
+  let extension_from ?plugin name = !ref_extension_from ?plugin name
+  let importer_from ?plugin name = !ref_importer_from ?plugin name
 end
+
 let set_extension_handler = Extensions.set_extension_handler
 let is_extension = Extensions.is_extension
 let is_extension_block = Extensions.is_extension_block
+let is_importer = Extensions.is_importer
 let extension_category = Extensions.category
 let preprocess_extension = Extensions.preprocess
 let preprocess_extension_block = Extensions.preprocess_block
 let extension_from = Extensions.extension_from
+let importer_from = Extensions.importer_from
 
 let error (b,_e) fstring =
   Kernel.abort
@@ -158,7 +167,10 @@ module Axiomatics =
 
 module ModuleOccurence =
   Datatype.Pair
-    (Datatype.Option(Datatype.String)) (* external driver *)
+    (Datatype.Option
+       (Datatype.Pair
+          (Datatype.String) (* external loader name *)
+          (Datatype.String))) (* external loader plugin *)
     (Cil_datatype.Location)
 
 module Modules =
@@ -413,9 +425,3 @@ let iter_builtin_logic_function f =
   Logic_builtin.iter (fun _ info -> List.iter f info)
 let iter_builtin_logic_type f = Logic_type_builtin.iter (fun _ info -> f info)
 let iter_builtin_logic_ctor f = Logic_ctor_builtin.iter (fun _ info -> f info)
-
-(*
-  Local Variables:
-  compile-command: "make -C ../../.."
-  End:
-*)

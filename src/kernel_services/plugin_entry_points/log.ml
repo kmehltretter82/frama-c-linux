@@ -241,12 +241,15 @@ let rec echo_lines ?(prefix=false) output text p q =
 let add_source buffer = function
   | None -> ()
   | Some src ->
-    begin
+    (* Avoid printing ':0:' if the position is unknown. *)
+    if Filepath.is_empty_pos src
+    then Buffer.add_string buffer "<unknown location> "
+    else begin
       Buffer.add_string buffer
         (Filepath.Normalized.to_pretty_string src.Filepath.pos_path);
       Buffer.add_string buffer ":" ;
       Buffer.add_string buffer (string_of_int src.Filepath.pos_lnum);
-      Buffer.add_string buffer ": " ;
+      Buffer.add_string buffer ": "
     end
 
 let add_category buffer = function

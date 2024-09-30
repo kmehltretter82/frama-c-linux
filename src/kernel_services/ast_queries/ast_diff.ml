@@ -195,16 +195,15 @@ type is_same_env =
     enumitem: enumitem Cil_datatype.Enumitem.Map.t;
   }
 
-let is_same_acsl_extension_kind:
-  (string->acsl_extension_kind->acsl_extension_kind->is_same_env->bool) ref
-  = Extlib.mk_fun "Ast_diff.is_same_acsl_extension"
+let is_same_acsl_extension_kind = ref (fun ~plugin:_ _ _ _ _ -> assert false)
 
 let set_extension_diff ~is_same_ext =
   is_same_acsl_extension_kind := is_same_ext
 
 let is_same_acsl_extension ext1 ext2 env =
   ext1.ext_name = ext2.ext_name &&
-  !is_same_acsl_extension_kind ext1.ext_name ext1.ext_kind ext2.ext_kind env
+  ext1.ext_plugin = ext2.ext_plugin &&
+  !is_same_acsl_extension_kind ~plugin:ext1.ext_plugin ext1.ext_name ext1.ext_kind ext2.ext_kind env
 
 module type Correspondence_table = sig
   include State_builder.Hashtbl
@@ -1519,7 +1518,7 @@ let rec gannot_correspondence =
 
   | Daxiomatic(_,l,_,_) | Dmodule(_,l,_,_,_) ->
     List.iter gannot_correspondence l
-  (* TODO: for modules, we should check the driver if it exists. But like
+  (* TODO: for modules, we should check the loader if it exists. But like
      for lemmas, we don't have an appropriate structure to store the info *)
   | Dtype (ti,loc) -> ignore (logic_type_correspondence ~loc ti empty_env)
   | Dlemma _ -> ()
