@@ -75,12 +75,6 @@
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:405: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:410: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/pthread.h:413: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:357: Warning: 
   E-ACSL construct `\valid_function' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:355: Warning: 

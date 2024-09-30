@@ -22,6 +22,7 @@
 
 open Cil_types
 open Contract_types
+open Current_loc.Operators
 module Error = Translation_error
 
 (**************************************************************************)
@@ -243,7 +244,7 @@ let setup_assumes kf env contract =
           else
             let assumes = assumes_predicate env b.b_assumes in
             let loc = assumes.pred_loc in
-            Current_loc.set loc;
+            let<> UpdatedCurrentLoc = loc in
             let idx = get_bhvr_idx contract b.b_name in
             Rtl_call.set_assumes ~loc env kf contract_e idx assumes
         with exn ->
@@ -320,8 +321,7 @@ let check_default_requires kf env contract =
          if Translate_utils.must_translate
              (Property.ip_of_requires kf kinstr b ip_requires) then
            let tp_requires = ip_requires.ip_content in
-           let loc = tp_requires.tp_statement.pred_loc in
-           Current_loc.set loc;
+           let<> UpdatedCurrentLoc = tp_requires.tp_statement.pred_loc in
            Translate_predicates.do_it kf env tp_requires
          else
            env)
@@ -355,7 +355,7 @@ let check_other_requires kf env contract =
                | Assert | Check ->
                  let requires = tp_requires.tp_statement in
                  let loc = requires.pred_loc in
-                 Current_loc.set loc;
+                 let<> UpdatedCurrentLoc = loc in
                  (* Prepend the name of the behavior *)
                  let requires =
                    { requires with pred_name = b.b_name :: requires.pred_name }
@@ -406,7 +406,7 @@ let check_other_requires kf env contract =
         (* Generate a predicate that will retrieve and test the
            already computed assumes value for the behavior *)
         let loc = assumes.pred_loc in
-        Current_loc.set loc;
+        let<> UpdatedCurrentLoc = loc in
         let assumes_vi, assumes_e, env =
           get_or_create_assumes_var ~loc env
         in
@@ -439,7 +439,7 @@ type translate_ppt =
 let check_active_behaviors ~ppt_to_translate ~get_or_create_var kf env contract clauses =
   let kinstr = Env.get_kinstr env in
   let loc = contract.location in
-  Current_loc.set loc;
+  let<> UpdatedCurrentLoc = loc in
   let do_clause env bhvrs =
     let bhvrs_list = Datatype.String.Set.elements bhvrs in
     let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
@@ -612,7 +612,7 @@ let check_complete_and_disjoint kf env contract =
     let env = check_bhvrs env Disjoint disjoints in
     env
   else begin
-    Current_loc.set contract.location;
+    let<> UpdatedCurrentLoc = contract.location in
     Options.warning
       ~current:true
       "@[Some assumes clauses could not be translated.@ Ignoring complete and \
@@ -622,6 +622,7 @@ let check_complete_and_disjoint kf env contract =
 
 (** Insert ensures check for the given contract in the environement *)
 let check_post_conds kf env contract =
+  let<> UpdatedCurrentLoc = contract.location in
   let get_or_create_assumes_var =
     mk_get_or_create_var kf Cil_const.intType "assumes_value"
   in
@@ -644,8 +645,7 @@ let check_post_conds kf env contract =
            if Translate_utils.must_translate
                (Property.ip_of_ensures kf kinstr b tp) then
              let tp_post_cond = ip_post_cond.ip_content in
-             let loc = tp_post_cond.tp_statement.pred_loc in
-             Current_loc.set loc;
+             let<> UpdatedCurrentLoc = tp_post_cond.tp_statement.pred_loc in
              match termination with
              | Normal ->
                (* If translating the default behavior, directly translate the
@@ -674,7 +674,7 @@ let check_post_conds kf env contract =
                | Assert | Check -> begin
                    let post_cond = tp_post_cond.tp_statement in
                    let loc = post_cond.pred_loc in
-                   Current_loc.set loc;
+                   let<> UpdatedCurrentLoc = loc in
                    match termination with
                    | Normal ->
                      (* Prepend the name of the behavior *)
@@ -778,6 +778,7 @@ let translate_preconditions kf env contract =
 let translate_postconditions kf env =
   let env = Env.set_annotation_kind env Postcondition in
   let contract, env = Env.pop_and_get_contract env in
+  let<> UpdatedCurrentLoc = contract.location in
   let do_it env =
     let env = check_post_conds kf env contract in
     env

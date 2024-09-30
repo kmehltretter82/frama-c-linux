@@ -261,6 +261,8 @@ and extended_quantifier_to_exp ~adata ~loc kf env t t_min t_max lambda name =
 
 and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
   let loc = t.term_loc in
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = loc in
   let logic_env = Env.Logic_env.get env in
   match t.term_node with
   | TConst c ->

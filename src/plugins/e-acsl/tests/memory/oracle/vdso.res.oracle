@@ -5,7 +5,4 @@
 [e-acsl] FRAMAC_SHARE/libc/time.h:113: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/time.h:116: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

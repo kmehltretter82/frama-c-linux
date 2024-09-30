@@ -20,26 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type location = Cil_datatype.Location.t
+
 (** Internal module holding the exception of [Error].
 
     The module is included into [Make_with_opt] later and should not be used
     directly. However we need to have a separate module for the exception so
     that every exception built by [Make] is the exact same type. *)
 module Exn = struct
-  exception Typing_error of Options.category option * string
-  exception Not_yet of Options.category option * string
-  exception Not_memoized of Options.category option
+  exception Typing_error of location * Options.category option * string
+  exception Not_yet of location * Options.category option * string
+  exception Not_memoized of location * Options.category option
 end
 
 module type S = sig
   type 'a result = ('a, exn) Result.t
   include module type of Exn
-  val make_untypable: string -> exn
-  val make_not_yet: string -> exn
-  val make_not_memoized: unit -> exn
-  val untypable: string -> 'a
-  val not_yet: string -> 'a
-  val not_memoized: unit -> 'a
+  val make_untypable: ?loc:Cil_datatype.Location.t -> string -> exn
+  val make_not_yet: ?loc:Cil_datatype.Location.t -> string -> exn
+  val make_not_memoized: ?loc:Cil_datatype.Location.t -> unit -> exn
+  val untypable: ?loc:Cil_datatype.Location.t -> string -> 'a
+  val not_yet: ?loc:Cil_datatype.Location.t -> string -> 'a
+  val not_memoized: ?loc:Cil_datatype.Location.t -> unit -> 'a
   val print_not_yet: string -> unit
   val handle: ('a -> 'a) -> 'a -> 'a
   val generic_handle: ('a -> 'b) -> 'b -> 'a -> 'b
@@ -63,13 +65,16 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   type 'a result = ('a, exn) Result.t
   include Exn
 
-  let make_untypable msg = Typing_error (P.phase, msg)
-  let make_not_yet msg = Not_yet (P.phase, msg)
-  let make_not_memoized () = Not_memoized P.phase
+  let make_untypable ?(loc = Current_loc.get ()) msg =
+    Typing_error (loc, P.phase, msg)
+  let make_not_yet ?(loc = Current_loc.get ()) msg =
+    Not_yet (loc, P.phase, msg)
+  let make_not_memoized ?(loc = Current_loc.get ()) () =
+    Not_memoized (loc, P.phase)
 
-  let untypable msg = raise (make_untypable msg)
-  let not_yet msg = raise (make_not_yet msg)
-  let not_memoized () = raise (make_not_memoized ())
+  let untypable ?loc msg = raise (make_untypable ?loc msg)
+  let not_yet ?loc msg = raise (make_not_yet ?loc msg)
+  let not_memoized ?loc () = raise (make_not_memoized ?loc ())
 
   let pp_phase fmt phase =
     match phase with
@@ -92,11 +97,14 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
   let print_not_yet msg =
     do_print_not_yet P.phase msg
 
+  let with_loc loc f = Current_loc.with_loc loc f ()
+
   let generic_handle f res x =
     try
       f x
     with
-    | Typing_error (phase, s) ->
+    | Typing_error (loc, phase, s) ->
+      with_loc loc @@ fun () ->
       let msg =
         Format.asprintf "@[invalid E-ACSL construct@ `%s'%a.@]"
           s
@@ -106,7 +114,8 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
         ~once:true ~current:true
         "@[%s@ Ignoring annotation.@]" msg;
       res
-    | Not_yet (phase, s) ->
+    | Not_yet (loc, phase, s) ->
+      with_loc loc @@ fun () ->
       do_print_not_yet phase s;
       res
 
@@ -117,7 +126,8 @@ module Make_with_opt(P: sig val phase:Options.category option end): S = struct
       match getter parameter with
       | Result.Ok res -> res
       | Result.Error exn -> raise exn
-    with Not_memoized phase ->
+    with Not_memoized (loc, phase) ->
+      with_loc loc @@ fun () ->
       Options.fatal
         "@[%s was not performed on construct %a%a@]"
         analyse_name

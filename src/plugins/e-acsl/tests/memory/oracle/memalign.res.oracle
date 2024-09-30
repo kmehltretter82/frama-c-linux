@@ -20,7 +20,4 @@
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:802: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:803: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".

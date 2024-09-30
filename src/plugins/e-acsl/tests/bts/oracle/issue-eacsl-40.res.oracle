@@ -14,10 +14,6 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:151: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:149: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.

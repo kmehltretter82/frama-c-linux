@@ -26,33 +26,33 @@ module type S = sig
   type 'a result = ('a, exn) Result.t
   (** Represent either a result of type ['a] or an error with an exception. *)
 
-  exception Typing_error of Options.category option * string
+  exception Typing_error of Cil_datatype.Location.t * Options.category option * string
   (** Typing error where the first element is the phase where the error occured
       and the second element is the error message. *)
 
-  exception Not_yet of Options.category option * string
+  exception Not_yet of Cil_datatype.Location.t * Options.category option * string
   (** "Not yet supported" error where the first element is the phase where the
       error occured and the second element is the error message. *)
 
-  exception Not_memoized of Options.category option
+  exception Not_memoized of Cil_datatype.Location.t * Options.category option
   (** "Not memoized" error with the phase where the error occured. *)
 
-  val make_untypable: string -> exn
+  val make_untypable: ?loc:Cil_datatype.Location.t -> string -> exn
   (** Make a [Typing_error] exception with the given message. *)
 
-  val make_not_yet: string -> exn
+  val make_not_yet: ?loc:Cil_datatype.Location.t -> string -> exn
   (** Make a [Not_yet] exception with the given message. *)
 
-  val make_not_memoized: unit -> exn
+  val make_not_memoized: ?loc:Cil_datatype.Location.t -> unit -> exn
   (** Make a [Not_memoized] exception with the given message. *)
 
-  val untypable: string -> 'a
+  val untypable: ?loc:Cil_datatype.Location.t -> string -> 'a
   (** @raise Typing_error with the given message for the current phase. *)
 
-  val not_yet: string -> 'a
+  val not_yet: ?loc:Cil_datatype.Location.t -> string -> 'a
   (** @raise Not_yet with the given message for the current phase. *)
 
-  val not_memoized: unit -> 'a
+  val not_memoized: ?loc:Cil_datatype.Location.t -> unit -> 'a
   (** @raise Not_memoized for the current phase. *)
 
   val print_not_yet: string -> unit

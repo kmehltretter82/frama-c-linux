@@ -73,7 +73,8 @@ let relation_to_binop = function
 let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
   let loc = p.pred_loc in
   let logic_env = Env.Logic_env.get env in
-  Current_loc.set loc;
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = loc in
   let of_bool = function true -> Cil.one ~loc | false -> Cil.zero ~loc in
   match p.pred_content with
   | Pfalse -> Cil.zero ~loc, adata, env
@@ -332,6 +333,8 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
     - [env]: the current environment.
     - [p]: the predicate to translate. *)
 and to_exp ~adata ?inplace ?name kf ?rte env p =
+  let open Current_loc.Operators in
+  let<> UpdatedCurrentLoc = p.pred_loc in
   Assert.push_pending_register_data();
   let p = Logic_normalizer.get_pred p in
   let rte = match rte with None -> Env.generate_rte env | Some b -> b in
