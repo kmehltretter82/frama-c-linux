@@ -37,7 +37,7 @@
  (name Region)
  (public_name frama-c-region.core)
  (flags -open Frama_c_kernel :standard -w -9)
- (libraries qed frama-c.kernel frama-c-server.core unionFind)
+ (libraries frama-c.kernel frama-c-server.core unionFind)
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx)))
 

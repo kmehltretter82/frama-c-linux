@@ -43,13 +43,13 @@ and layout =
 
 and chunk = {
   cparents: node list ;
+  cpointed: node list ;
   croots: Vset.t ;
   clabels: Lset.t ;
   creads: Access.Set.t ;
   cwrites: Access.Set.t ;
   cshifts: Access.Set.t ;
   clayout: layout ;
-  cpointed_by : node list;
 }
 
 type rg = node Ranges.range
@@ -144,13 +144,13 @@ let copy ?locked m = {
 
 let empty = {
   cparents = [] ;
+  cpointed = [] ;
   croots = Vset.empty ;
   clabels = Lset.empty ;
   creads = Access.Set.empty ;
   cwrites = Access.Set.empty ;
   cshifts = Access.Set.empty ;
   clayout = Blob ;
-  cpointed_by = [] ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -159,6 +159,7 @@ let empty = {
 
 let id = Store.id
 let forge = Store.forge
+let equal (m: map) = Ufind.eq m.store
 
 let node map node =
   try Ufind.find map.store node
@@ -178,17 +179,19 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_chunk (m: map) ?(size=0) ?ptr ?ptrby () =
+let new_chunk (m: map) ?(size=0) ?ptr ?pointed () =
   failwith_locked m "Region.Memory.new_chunk" ;
   let clayout =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
     | Some _ -> Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
-  in let cpointed_by =
-       match ptrby with
-       | None -> []
-       | Some ptr -> [ptr]
-  in Ufind.make m.store { empty with clayout ; cpointed_by }
+  in
+  let cpointed =
+    match pointed with
+    | None -> []
+    | Some ptr -> [ptr]
+  in
+  Ufind.make m.store { empty with clayout ; cpointed }
 
 let new_range (m: map) ?(fields=Fields.empty) ~size ~offset ~length data : node =
   failwith_locked m "Region.Memory.new_range" ;
@@ -440,13 +443,13 @@ let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
 
 let merge_region (m: map) (q: queue) (a : chunk) (b : chunk) : chunk = {
   cparents = nodes m @@ Store.bag a.cparents b.cparents ;
+  cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
   clabels = Lset.union a.clabels b.clabels ;
   croots = Vset.union a.croots b.croots ;
   creads = Access.Set.union a.creads b.creads ;
   cwrites = Access.Set.union a.cwrites b.cwrites ;
   cshifts = Access.Set.union a.cshifts b.cshifts ;
   clayout = merge_layout m q a.clayout b.clayout ;
-  cpointed_by = List.append a.cpointed_by b.cpointed_by ;
 }
 
 let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
@@ -498,14 +501,20 @@ let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
   ignore @@ merge m r rc ; re
 
 let add_points_to (m: map) (a: node) (b : node) =
-  failwith_locked m "Region.Memory.points_to" ;
-  ignore @@ merge m a @@ new_chunk m ~ptr:b ~ptrby:a ()
+  begin
+    failwith_locked m "Region.Memory.points_to" ;
+    ignore @@ merge m a @@ new_chunk m ~ptr:b () ;
+    ignore @@ merge m b @@ new_chunk m ~pointed:a () ;
+  end
 
 let add_value (m:map) (rv:node) (ty:typ) : node option =
   if Cil.isPointerType ty then
-    let rp = new_chunk m () in
-    add_points_to m rv rp ;
-    Some rp
+    begin
+      failwith_locked m "Region.Memory.add_value" ;
+      let rp = new_chunk m ~pointed:rv () in
+      ignore @@ merge m rv @@ new_chunk m ~ptr:rp () ;
+      Some rp
+    end
   else
     None
 
@@ -540,66 +549,60 @@ let shift (m: map) (a: node) from =
 (* --- Lookup                                                            ---- *)
 (* -------------------------------------------------------------------------- *)
 
-let cranges m r =
-  let rg = Ufind.get m.store r in
-  match rg.clayout with
-  | Blob | Cell _ -> raise Not_found
-  | Compound(s,_,rgs) -> s, rgs
-
-let cpointed m r =
+let points_to m (r : node) : node option =
   let rg = Ufind.get m.store r in
   match rg.clayout with
   | Blob | Compound _ | Cell(_,None) -> None
   | Cell(_,Some r) -> Some (Ufind.find m.store r)
 
-let cpointed_by m r =
-  let rg = Ufind.get m.store r in
-  rg.cpointed_by
+let pointed_by m (r : node) =
+  let rg = Ufind.get m.store r in rg.cpointed
 
 let cvar (m: map) (v: varinfo) : node =
   Ufind.find m.store @@ Vmap.find v m.roots
 
+let rec move (m: map) (r: node) (p: int) (s: int) =
+  let c = Ufind.get m.store r in
+  match c.clayout with
+  | Blob | Cell _ -> r
+  | Compound(s0,_,rgs) ->
+    if s0 <= s then r else
+      let rg = Ranges.find p rgs in
+      move m rg.data (p - rg.offset) s
+
 let field (m: map) (r: node) (fd: fieldinfo) : node =
-  if fd.fcomp.cstruct then
-    let _, rgs = cranges m r in
-    let (p,w) = Cil.fieldBitsOffset fd in
-    let rg = Ranges.find p rgs in
-    if rg.offset <= p && p+w <= rg.offset + rg.length then
-      Ufind.find m.store rg.data
-    else raise Not_found
-  else r
+  let s = Cil.bitsSizeOf fd.ftype in
+  let (p,_) = Cil.fieldBitsOffset fd in
+  move m r p s
 
-let index (m : map) (r: node) : node =
-  let s, rgs = cranges m r in
-  match rgs with
-  | R [rg] when rg.offset = 0 && rg.length = s -> rg.data
-  | _ -> raise Not_found
+let index (m : map) (r: node) (ty:typ) : node =
+  move m r 0 (Cil.bitsSizeOf ty)
 
-let rec lval (m: map) (lv: lval) : node =
-  let h = host m (fst lv) in
-  offset m h (snd lv)
+let rec lval (m: map) (h,ofs) : node =
+  offset m (lhost m h) (Cil.typeOfLhost h) ofs
 
-and host (m: map) (h: lhost) : node =
+and lhost (m: map) (h: lhost) : node =
   match h with
   | Var x -> cvar m x
   | Mem e ->
     match exp m e with
-    | None -> raise Not_found
     | Some r -> r
+    | None -> raise Not_found
 
-and offset (m: map) (r: node) (ofs: offset) : node =
+and offset (m: map) (r: node) (ty: typ) (ofs: offset) : node =
   match ofs with
   | NoOffset -> Ufind.find m.store r
   | Field (fd, ofs) ->
-    if fd.fcomp.cstruct then offset m (field m r fd) ofs
-    else r
-  | Index (_, ofs) -> offset m (index m r) ofs
+    offset m (field m r fd) fd.ftype ofs
+  | Index (_, ofs) ->
+    let te = Cil.typeOf_array_elem ty in
+    offset m (index m r te) te ofs
 
 and exp (m: map) (e: exp) : node option =
   match e.enode with
   | Const _
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> None
-  | Lval lv -> cpointed m @@ lval m lv
+  | Lval lv -> points_to m @@ lval m lv
   | AddrOf lv | StartOf lv -> Some (lval m lv)
   | CastE(_, e) -> exp m e
   | BinOp((PlusPI|MinusPI),p,_,_) -> exp m p
@@ -607,11 +610,44 @@ and exp (m: map) (e: exp) : node option =
 
 (* -------------------------------------------------------------------------- *)
 
+let included map source target : bool =
+  let exception Reached in
+  try
+    let q = Queue.create () in (* only marked nodes *)
+    let push r =
+      let r = node map r in
+      if equal map target r then raise Reached else Queue.push r q
+    in
+    push source ;
+    let visited = Hashtbl.create 0 in
+    while true do
+      let node = Queue.pop q in
+      if equal map target node then raise Exit else
+        let id = id node in
+        if not @@ Hashtbl.mem visited id then
+          begin
+            Hashtbl.add visited id () ;
+            List.iter push (parents map node) ;
+          end
+    done ;
+    assert false
+  with
+  | Queue.Empty -> false
+  | Reached -> true
 
-let eq_node (m: map) = Ufind.eq m.store
+let separated map r1 r2 =
+  not (included map r1 r2) && not (included map r2 r1)
 
-let accesses (m : map) (r:node) =
+(* -------------------------------------------------------------------------- *)
+
+let reads (m : map) (r:node) =
   let node = Ufind.get m.store r in
-  List.map Access.typeof @@ Access.Set.elements node.creads,
-  List.map Access.typeof @@ Access.Set.elements node.cwrites,
+  List.map Access.typeof @@ Access.Set.elements node.creads
+
+let writes (m : map) (r:node) =
+  let node = Ufind.get m.store r in
+  List.map Access.typeof @@ Access.Set.elements node.cwrites
+
+let shifts (m : map) (r:node) =
+  let node = Ufind.get m.store r in
   List.map Access.typeof @@ Access.Set.elements node.cshifts
