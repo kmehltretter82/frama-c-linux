@@ -56,10 +56,11 @@ let get_why3_conf = Conf.memoize
     begin fun () ->
       let config = Why3Provers.config () in
       let main = Why3.Whyconf.get_main config in
-      let ld =
-        (WpContext.directory () :> string)::
-        ((Wp_parameters.Share.get_dir "why3") :> string)::
-        (Why3.Whyconf.loadpath main) in
+      let ctx = (WpContext.directory () :> string) in
+      let wp = ((Wp_parameters.Share.get_dir "why3") :> string) in
+      let user = (Wp_parameters.Library.get () :> string list) in
+      let why3 = Why3.Whyconf.loadpath main in
+      let ld = ctx :: wp :: (user @ why3) in
       { env = Why3.Env.create_env ld ; config = main }
     end
 
@@ -506,8 +507,9 @@ let rec of_term ~cnv expected t : Why3.Term.term =
       coerce ~cnv sort expected $
       t_app' ~cnv ~f:["map"] ~l:"Const" ~p:["const"] [of_term ~cnv vsort v] (of_tau ~cnv sort)
     (* Generic *)
-    | Fun (FUN({m_source=Wsymbol(f,l,p)}),ls), _, _ ->
-      t_app ~cnv ~f ~l ~p $ List.map (of_term' cnv) ls
+    | Fun (FUN({m_source=Wsymbol(f,l,p)}),ls), tau, expected ->
+      coerce ~cnv sort expected $
+      t_app' ~cnv ~f ~l ~p (List.map (of_term' cnv) ls) (of_tau ~cnv tau)
 
     | Fun (f,l), _, _ -> begin
         let t_app ls l r  =
@@ -520,12 +522,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
               Why3.Theory.(ns_find_ls (get_namespace cnv.th) (cut_path s))
           in
           match find s, expected with
-          | ls, (Prop | Bool) ->
-            coerce ~cnv sort expected $
-            t_app ls l (of_tau ~cnv sort)
-          | ls, _ ->
-            coerce ~cnv sort expected $
-            t_app ls l (of_tau ~cnv sort)
+          | ls, _ -> coerce ~cnv sort expected $ t_app ls l (of_tau ~cnv sort)
           | exception Not_found -> why3_failure "Can't find '%s' in why3 namespace" s
         in
         let apply_from_ns' s l =
