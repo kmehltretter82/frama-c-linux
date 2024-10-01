@@ -370,8 +370,11 @@ let regions map =
 
 
 let parents (m: map) (r: node) =
-  let node = Ufind.get m.store r in
-  nodes m node.cparents
+  let chunk = Ufind.get m.store r in
+  nodes m chunk.cparents
+
+let roots (m: map) (r: node) =
+  let chunk = Ufind.get m.store r in Vset.elements chunk.croots
 
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)

@@ -75,6 +75,7 @@ val iter_node : map -> (node -> unit) -> unit
 val region : map -> node -> region
 val regions : map -> region list
 val parents : map -> node -> node list
+val roots : map -> node -> varinfo list
 
 val new_chunk : map -> ?size:int -> ?ptr:node -> ?pointed:node -> unit -> node
 val add_root : map -> Cil_types.varinfo -> node
