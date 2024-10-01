@@ -34,6 +34,7 @@ let catch msg f x =
 let cover_errors () =
   catch "User Error" Logic_env.extension_from "foo";
   catch "Unsupported" (Logic_env.preprocess_extension ~plugin:"myplugin1") "bar"
+[@@alert "-acsl_extension_from"]
 
 let cover_warnings () =
   Acsl_extension.register_behavior ~plugin:"myplugin1" "foo" type_foo false;
