@@ -32,7 +32,10 @@ module WConf = Why3.Whyconf
 module LB = LogicBuiltins
 module LT = Logic_typing
 
-let dkey = L.register_category "why3.import"
+let dkey =
+  L.register_category
+    ~help:"Importer Why3 -> ACSL"
+    "why3:import"
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Why3 Environment                                                --- *)

@@ -22,8 +22,14 @@
 
 let dkey = Wp_parameters.register_category "prover"
 let dkey_pp_task = Wp_parameters.register_category "prover:pp_task"
-let dkey_api = Wp_parameters.register_category "why3_api"
-let dkey_model = Wp_parameters.register_category "why3_model"
+let dkey_compile =
+  Wp_parameters.register_category
+    ~help:"WP -> Why3 compilation"
+    "why3:compile"
+let dkey_model =
+  Wp_parameters.register_category
+    ~help:"Counter examples model variable"
+    "why3:model"
 
 let option_file = LogicBuiltins.create_option
     ~sanitizer:(fun ~driver_dir x -> Filename.concat driver_dir x)
@@ -357,7 +363,7 @@ let rec of_term ~cnv expected t : Why3.Term.term =
     with Not_found ->
       why3_failure "@[<hov 2>Untyped term: %a@]" Lang.F.pp_term t
   in
-  Wp_parameters.debug ~dkey:dkey_api
+  Wp_parameters.debug ~dkey:dkey_compile
     "of_term %a:%a (expected %a)@."
     Lang.F.pp_term t Lang.F.Tau.pretty sort Lang.F.Tau.pretty expected
   ;
@@ -747,7 +753,7 @@ class visitor (ctx:context) c =
 
     method on_cluster c =
       let name = Definitions.cluster_id c in
-      Wp_parameters.debug ~dkey:dkey_api "Start on_cluster %s@." name;
+      Wp_parameters.debug ~dkey:dkey_compile "Start on_cluster %s@." name;
       let th_name = String.capitalize_ascii name in
       let thy =
         let age = try fst (CLUSTERS.find c) with Not_found -> (-1) in
@@ -775,7 +781,7 @@ class visitor (ctx:context) c =
       let th = Why3.Theory.open_scope th name in
       let th = Why3.Theory.use_export th thy in
       let th = Why3.Theory.close_scope th ~import:true in
-      Wp_parameters.debug ~dkey:dkey_api "End  on_cluster %s@." name;
+      Wp_parameters.debug ~dkey:dkey_compile "End  on_cluster %s@." name;
       ctx.th <- th
 
     method on_theory file thy =
@@ -797,7 +803,7 @@ class visitor (ctx:context) c =
       self#add_import_use ~import:false file thy name
 
     method add_import_use ~import file thy name =
-      Wp_parameters.debug ~dkey:dkey_api
+      Wp_parameters.debug ~dkey:dkey_compile
         "@[use@ %s@ @[%a.%s@]@ as@ %s@]"
         (if import then "import" else "")
         Why3.Pp.(print_list (Why3.Pp.constant_string ".") string) file
@@ -976,7 +982,7 @@ class visitor (ctx:context) c =
         ctx.th <- Why3.Theory.add_decl ~warn:false ctx.th decl
 
     method on_dfun d =
-      Wp_parameters.debug ~dkey:dkey_api "Define %a@." Lang.Fun.pretty d.d_lfun ;
+      Wp_parameters.debug ~dkey:dkey_compile "Define %a@." Lang.Fun.pretty d.d_lfun ;
       let cnv = empty_cnv ctx in
       List.iter (Lang.F.add_var cnv.pool) d.d_params;
       begin
@@ -1132,7 +1138,7 @@ let prove_goal ~id ~title ~name ?axioms ?(probes=Probe.Map.empty) t =
   let goal = Definitions.cluster ~id ~title () in
   let ctx = empty_context name in
   let v = new visitor ctx goal in
-  Wp_parameters.debug ~dkey:dkey_api "%t"
+  Wp_parameters.debug ~dkey:dkey_compile "%t"
     begin fun fmt ->
       Format.fprintf fmt "---------------------------------------------@\n" ;
       Format.fprintf fmt "EXPORT GOAL %s@." id ;
@@ -1569,7 +1575,7 @@ let build_proof_task ?(mode=VCS.Batch) ?timeout ?steplimit ?memlimit
         automated ~config ~probes ~timeout ~steplimit ~memlimit
           wpo pconf drv prover task
   with exn ->
-    if Wp_parameters.has_dkey dkey_api then
+    if Wp_parameters.has_dkey dkey_compile then
       Wp_parameters.fatal "[Why3 Error] %a@\n%s"
         Why3.Exn_printer.exn_printer exn
         Printexc.(raw_backtrace_to_string @@ get_raw_backtrace ())
