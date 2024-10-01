@@ -66,14 +66,18 @@ val unlock : map -> unit
 
 val id : node -> int
 val forge : int -> node
+val equal : map -> node -> node -> bool
 val node : map -> node -> node
 val nodes : map -> node list -> node list
 
 val iter : map -> (region -> unit) -> unit
+val iter_node : map -> (node -> unit) -> unit
 val region : map -> node -> region
 val regions : map -> region list
+val parents : map -> node -> node list
+val roots : map -> node -> varinfo list
 
-val new_chunk : map -> ?size:int -> ?ptr:node -> unit -> node
+val new_chunk : map -> ?size:int -> ?ptr:node -> ?pointed:node -> unit -> node
 val add_root : map -> Cil_types.varinfo -> node
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
@@ -89,8 +93,18 @@ val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
 val merge_copy : map -> l:node -> r:node -> unit
 
-(** @raise Not_found *)
+val cvar : map -> varinfo -> node
+val field : map -> node -> fieldinfo -> node
+val index : map -> node -> typ -> node
 val lval : map -> lval -> node
-
-(** @raise Not_found *)
 val exp : map -> exp -> node option
+
+val points_to : map -> node -> node option
+val pointed_by : map -> node -> node list
+
+val included : map -> node -> node -> bool
+val separated : map -> node -> node -> bool
+
+val reads : map -> node -> typ list
+val writes : map -> node -> typ list
+val shifts : map -> node -> typ list

@@ -1,9 +1,9 @@
 [kernel] Parsing comp.c (with preprocessing)
 [region] Analyzing regions
 [region] Function f:
-  R0003: --- s 192b { .x: R0004; #32b; .z: R0008; .arr: R000c; } ;
+  R0003: --- s 192b { .x: R0004; #32b; .z: R0008; .arr: R000d; } ;
   R0004: -W- (int) 32b ;
   R0008: -W- (int *) 64b (*R0001) ;
   R0001: RW- a (int) 32b ;
-  R000c: --- 64b { #64b: R000e[4]; } ;
-  R000e: -W- (short) 16b ;
+  R000d: --- 64b { #64b: R000f[4]; } ;
+  R000f: -W- (short) 16b ;

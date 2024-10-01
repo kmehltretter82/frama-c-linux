@@ -23,3 +23,11 @@
 (* -------------------------------------------------------------------------- *)
 (* --- Region Analysis API                                                --- *)
 (* -------------------------------------------------------------------------- *)
+
+let get_map kf = (Code.domain kf).map
+let get_id m n = Memory.id @@ Memory.node m n
+let get_node m id = Memory.node m @@ Memory.forge id
+
+include Memory
+
+let iter = Memory.iter_node
