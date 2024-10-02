@@ -28,6 +28,7 @@
 
 import * as filepath from 'path';
 import { ipcRenderer } from 'electron';
+import { modal } from 'dome';
 import * as System from 'dome/system';
 
 // --------------------------------------------------------------------------
@@ -302,5 +303,11 @@ export async function showOpenDir(
     return undefined;
   });
 }
+
+// --------------------------------------------------------------------------
+// --- Modal
+// --------------------------------------------------------------------------
+export function showModal(val: React.ReactNode): void { modal.setValue(val); }
+export function closeModal(): void { showModal(undefined); }
 
 // --------------------------------------------------------------------------

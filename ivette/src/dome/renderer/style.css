@@ -211,3 +211,30 @@ input[type="checkbox"]:checked {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Modal                                                              --- */
+/* -------------------------------------------------------------------------- */
+.dome-xModal {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: solid var(--border) 2px;
+  border-radius: 10px;
+  background-color: var(--background);
+  max-width: calc(100% - 100px);
+  max-height: calc(100% - 50px);
+  overflow: hidden;
+}
+
+.dome-xModal-overlay {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(50, 50, 50, .4);
+}
+/* -------------------------------------------------------------------------- */
