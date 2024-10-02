@@ -92,6 +92,18 @@ why3.import := "frama_c_wp.memaddr.MemAddr";
 library memory: memaddr
 why3.import := "frama_c_wp.memory.Memory";
 
+library membytes: memaddr
+why3.import += "frama_c_wp.membytes.ValueCodec";
+why3.import += "frama_c_wp.membytes.InitCodec";
+why3.import += "frama_c_wp.membytes.Offset";
+why3.import += "frama_c_wp.membytes.RWBytes";
+why3.import += "frama_c_wp.membytes.ValueBlockRW";
+why3.import += "frama_c_wp.membytes.InitBlockRW";
+why3.import += "frama_c_wp.membytes.MemBytes";
+
+library sequence: sequence
+why3.import := "frama_c_wp.sequence.Seq";
+
 library sqrt: cmath
 why3.import += "real.Square";
 why3.import += "frama_c_wp.cmath.Square";

@@ -1,0 +1,1837 @@
+# frama-c -wp -wp-model 'Bytes (Raw)' [...]
+[kernel] Parsing integers.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal cast_from_bytes_to_signed_neg_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_from_bytes_to_signed_neg_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+[wp] [Valid] Goal cast_from_bytes_to_signed_pos_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_from_bytes_to_signed_pos_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal cast_from_bytes_to_unsigned_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_from_bytes_to_unsigned_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal cast_unsigned_signed_neg_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_unsigned_signed_neg_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal cast_unsigned_signed_pos_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal cast_unsigned_signed_pos_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal signed_neg_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal signed_neg_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal signed_pos_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal signed_pos_terminates (Cfg) (Trivial)
+[wp] [Valid] Goal unsigned_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal unsigned_terminates (Cfg) (Trivial)
+------------------------------------------------------------
+  Function cast_from_bytes_to_signed_neg
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 175):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_13 = (-8613268060474473967)) /\ (x_13 < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 176):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_11 = (-2076999151)) /\ (x_11 < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 177):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_9 = (-2005432747)) /\ (x_9 < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 178):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_7 = (-32239)) /\ (x_7 < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 179):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_5 = (-31693)) /\ (x_5 < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 180):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_3 = (-31147)) /\ (x_3 < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 181):
+Let a = global(L_array_75).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_82)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_81)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_80)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_79)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_78)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_77)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_76)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 130.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 132.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 134.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_1 = (-30601)) /\ (x_1 < 0).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function cast_from_bytes_to_signed_pos
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 153):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_13 = 609963236744430097) /\ (0 < x_13).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 154):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_11 = 70451729) /\ (0 < x_11).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 155):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_9 = 142018133) /\ (0 < x_9).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 156):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_7 = 529) /\ (0 < x_7).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 157):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_5 = 1075) /\ (0 < x_5).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 158):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_3 = 1621) /\ (0 < x_3).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 159):
+Let a = global(L_array_65).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_sint16(mem_0, shift_sint16(a_1, 3)).
+Let x_1 = read_sint16(mem_0, global(L_i16_3_72)).
+Let x_2 = read_sint16(mem_0, shift_sint16(a_1, 2)).
+Let x_3 = read_sint16(mem_0, global(L_i16_2_71)).
+Let x_4 = read_sint16(mem_0, shift_sint16(a_1, 1)).
+Let x_5 = read_sint16(mem_0, global(L_i16_1_70)).
+Let x_6 = read_sint16(mem_0, a_1).
+Let x_7 = read_sint16(mem_0, global(L_i16_0_69)).
+Let x_8 = read_sint32(mem_0, shift_sint32(a_1, 1)).
+Let x_9 = read_sint32(mem_0, global(L_i32_1_68)).
+Let x_10 = read_sint32(mem_0, a_1).
+Let x_11 = read_sint32(mem_0, global(L_i32_0_67)).
+Let x_12 = read_sint64(mem_0, a_1).
+Let x_13 = read_sint64(mem_0, global(L_i64_0_66)).
+Assume {
+  Type: is_sint16(x_7) /\ is_sint16(x_5) /\ is_sint16(x_3) /\
+      is_sint16(x_1) /\ is_sint32(x_11) /\ is_sint32(x_9) /\
+      is_sint64(x_13) /\ is_sint16(x_6) /\ is_sint32(x_10) /\
+      is_sint64(x_12) /\ is_sint16(x_4) /\ is_sint16(x_2) /\ is_sint16(x) /\
+      is_sint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 2.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 4.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 6.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 8.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: (x_1 = 2167) /\ (0 < x_1).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function cast_from_bytes_to_unsigned
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 131):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_13 = 9833440827789222417.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 132):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_11 = 1144201745.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 133):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_9 = 2289526357.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 134):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_7 = 8721.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 135):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_5 = 17459.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 136):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_3 = 26197.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 137):
+Let a = global(L_array_55).
+Let a_1 = shift_uint8(a, 0).
+Let x = read_uint16(mem_0, shift_uint16(a_1, 3)).
+Let x_1 = read_uint16(mem_0, global(L_u16_3_62)).
+Let x_2 = read_uint16(mem_0, shift_uint16(a_1, 2)).
+Let x_3 = read_uint16(mem_0, global(L_u16_2_61)).
+Let x_4 = read_uint16(mem_0, shift_uint16(a_1, 1)).
+Let x_5 = read_uint16(mem_0, global(L_u16_1_60)).
+Let x_6 = read_uint16(mem_0, a_1).
+Let x_7 = read_uint16(mem_0, global(L_u16_0_59)).
+Let x_8 = read_uint32(mem_0, shift_uint32(a_1, 1)).
+Let x_9 = read_uint32(mem_0, global(L_u32_1_58)).
+Let x_10 = read_uint32(mem_0, a_1).
+Let x_11 = read_uint32(mem_0, global(L_u32_0_57)).
+Let x_12 = read_uint64(mem_0, a_1).
+Let x_13 = read_uint64(mem_0, global(L_u64_0_56)).
+Assume {
+  Type: is_uint16(x_7) /\ is_uint16(x_5) /\ is_uint16(x_3) /\
+      is_uint16(x_1) /\ is_uint32(x_11) /\ is_uint32(x_9) /\
+      is_uint64(x_13) /\ is_uint16(x_6) /\ is_uint32(x_10) /\
+      is_uint64(x_12) /\ is_uint16(x_4) /\ is_uint16(x_2) /\ is_uint16(x) /\
+      is_uint32(x_8).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+  (* Initializer *)
+  Init: read_uint8(mem_0, a_1) = 17.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 1)) = 34.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 2)) = 51.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 3)) = 68.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 4)) = 85.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 5)) = 102.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 6)) = 119.
+  (* Initializer *)
+  Init: read_uint8(mem_0, shift_uint8(a, 7)) = 136.
+  (* Initializer *)
+  Init: x_12 = x_13.
+  (* Initializer *)
+  Init: x_10 = x_11.
+  (* Initializer *)
+  Init: x_8 = x_9.
+  (* Initializer *)
+  Init: x_6 = x_7.
+  (* Initializer *)
+  Init: x_4 = x_5.
+  (* Initializer *)
+  Init: x_2 = x_3.
+  (* Initializer *)
+  Init: x = x_1.
+}
+Prove: x_1 = 34935.
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function cast_unsigned_signed_neg
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 112):
+Let a = global(L_u64_50).
+Let a_1 = global(L_u16_51).
+Let m = write_uint16(write_uint64(mem_0, a, 9305056148684437384), a_1, 33154).
+Let x = read_sint64(m, a).
+Assume {
+  Type: is_sint8(read_sint8(m, shift_sint8(a_1, 1))) /\
+      is_sint16(read_sint16(m, a_1)) /\
+      is_sint32(read_sint32(m, shift_sint32(a, 1))) /\ is_sint64(x).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-9141687925025114232)) /\ (x < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 113):
+Let a = global(L_u64_50).
+Let a_1 = global(L_u16_51).
+Let m = write_uint16(write_uint64(mem_0, a, 9305056148684437384), a_1, 33154).
+Let x = read_sint32(m, shift_sint32(a, 1)).
+Assume {
+  Type: is_sint8(read_sint8(m, shift_sint8(a_1, 1))) /\
+      is_sint16(read_sint16(m, a_1)) /\ is_sint32(x) /\
+      is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-2128465084)) /\ (x < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 114):
+Let a = global(L_u64_50).
+Let a_1 = global(L_u16_51).
+Let m = write_uint16(write_uint64(mem_0, a, 9305056148684437384), a_1, 33154).
+Let x = read_sint16(m, a_1).
+Assume {
+  Type: is_sint8(read_sint8(m, shift_sint8(a_1, 1))) /\ is_sint16(x) /\
+      is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
+      is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-32382)) /\ (x < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 115):
+Let a = global(L_u64_50).
+Let a_1 = global(L_u16_51).
+Let m = write_uint16(write_uint64(mem_0, a, 9305056148684437384), a_1, 33154).
+Let x = read_sint8(m, shift_sint8(a_1, 1)).
+Assume {
+  Type: is_sint8(x) /\ is_sint16(read_sint16(m, a_1)) /\
+      is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
+      is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-127)) /\ (x < 0).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function cast_unsigned_signed_pos
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 98):
+Let a = global(L_u64_45).
+Let a_1 = global(L_u16_46).
+Let m = write_uint16(write_uint64(mem_0, a, 81684111829661576), a_1, 290).
+Let x = read_sint64(m, a).
+Assume {
+  Type: is_sint8(read_sint8(m, shift_sint8(a_1, 1))) /\
+      is_sint16(read_sint16(m, a_1)) /\
+      is_sint32(read_sint32(m, shift_sint32(a, 1))) /\ is_sint64(x).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 81684111829661576) /\ (0 < x).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 99):
+Let a = global(L_u64_45).
+Let a_1 = global(L_u16_46).
+Let m = write_uint16(write_uint64(mem_0, a, 81684111829661576), a_1, 290).
+Let x = read_sint32(m, shift_sint32(a, 1)).
+Assume {
+  Type: is_sint8(read_sint8(m, shift_sint8(a_1, 1))) /\
+      is_sint16(read_sint16(m, a_1)) /\ is_sint32(x) /\
+      is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 19018564) /\ (0 < x).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 100):
+Let a = global(L_u64_45).
+Let a_1 = global(L_u16_46).
+Let m = write_uint16(write_uint64(mem_0, a, 81684111829661576), a_1, 290).
+Let x = read_sint16(m, a_1).
+Assume {
+  Type: is_sint8(read_sint8(m, shift_sint8(a_1, 1))) /\ is_sint16(x) /\
+      is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
+      is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 290) /\ (0 < x).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 101):
+Let a = global(L_u64_45).
+Let a_1 = global(L_u16_46).
+Let m = write_uint16(write_uint64(mem_0, a, 81684111829661576), a_1, 290).
+Let x = read_sint8(m, shift_sint8(a_1, 1)).
+Assume {
+  Type: is_sint8(x) /\ is_sint16(read_sint16(m, a_1)) /\
+      is_sint32(read_sint32(m, shift_sint32(a, 1))) /\
+      is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 1) /\ (0 < x).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function signed_neg
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 79):
+Let a = global(L_m64_38). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              a, true),
+                                                            global(L_m32_39),
+                                                            true),
+                                               global(L_m16_40), true),
+                                   global(L_m8_41), true),
+                      global(L_write_42), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 80):
+Let a = global(L_m32_39). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              global(L_m64_38),
+                                                              true), a, true),
+                                               global(L_m16_40), true),
+                                   global(L_m8_41), true),
+                      global(L_write_42), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 81):
+Let a = global(L_m16_40). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              global(L_m64_38),
+                                                              true),
+                                                            global(L_m32_39),
+                                                            true), a, true),
+                                   global(L_m8_41), true),
+                      global(L_write_42), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 82):
+Let a = global(L_m8_41). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_m64_38),
+                                                             true),
+                                                           global(L_m32_39),
+                                                           true),
+                                              global(L_m16_40), true), a,
+                                  true), global(L_write_42), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 84):
+Let a = global(L_m64_38).
+Let a_1 = global(L_m32_39).
+Let a_2 = global(L_m16_40).
+Let a_3 = global(L_m8_41).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             -81684111829661576),
+                                                a_1, -19018564), a_2, -290),
+                       a_3, -1), global(L_write_42), 0).
+Let x = read_sint64(m, a).
+Assume {
+  Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
+      is_sint32(read_sint32(m, a_1)) /\ is_sint64(x).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-81684111829661576)) /\ (x < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 85):
+Let a = global(L_m64_38).
+Let a_1 = global(L_m32_39).
+Let a_2 = global(L_m16_40).
+Let a_3 = global(L_m8_41).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             -81684111829661576),
+                                                a_1, -19018564), a_2, -290),
+                       a_3, -1), global(L_write_42), 0).
+Let x = read_sint32(m, a_1).
+Assume {
+  Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
+      is_sint32(x) /\ is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-19018564)) /\ (x < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 86):
+Let a = global(L_m64_38).
+Let a_1 = global(L_m32_39).
+Let a_2 = global(L_m16_40).
+Let a_3 = global(L_m8_41).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             -81684111829661576),
+                                                a_1, -19018564), a_2, -290),
+                       a_3, -1), global(L_write_42), 0).
+Let x = read_sint16(m, a_2).
+Assume {
+  Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(x) /\
+      is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-290)) /\ (x < 0).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 87):
+Let a = global(L_m64_38).
+Let a_1 = global(L_m32_39).
+Let a_2 = global(L_m16_40).
+Let a_3 = global(L_m8_41).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             -81684111829661576),
+                                                a_1, -19018564), a_2, -290),
+                       a_3, -1), global(L_write_42), 0).
+Let x = read_sint8(m, a_3).
+Assume {
+  Type: is_sint8(x) /\ is_sint16(read_sint16(m, a_2)) /\
+      is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = (-1)) /\ (x < 0).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function signed_pos
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 54):
+Let a = global(L_p64_31). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              a, true),
+                                                            global(L_p32_32),
+                                                            true),
+                                               global(L_p16_33), true),
+                                   global(L_p8_34), true),
+                      global(L_write_35), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 55):
+Let a = global(L_p32_32). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              global(L_p64_31),
+                                                              true), a, true),
+                                               global(L_p16_33), true),
+                                   global(L_p8_34), true),
+                      global(L_write_35), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 56):
+Let a = global(L_p16_33). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              global(L_p64_31),
+                                                              true),
+                                                            global(L_p32_32),
+                                                            true), a, true),
+                                   global(L_p8_34), true),
+                      global(L_write_35), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 57):
+Let a = global(L_p8_34). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_p64_31),
+                                                             true),
+                                                           global(L_p32_32),
+                                                           true),
+                                              global(L_p16_33), true), a,
+                                  true), global(L_write_35), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 59):
+Let a = global(L_p64_31).
+Let a_1 = global(L_p32_32).
+Let a_2 = global(L_p16_33).
+Let a_3 = global(L_p8_34).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             81684111829661576),
+                                                a_1, 19018564), a_2, 290),
+                       a_3, 1), global(L_write_35), 0).
+Let x = read_sint64(m, a).
+Assume {
+  Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
+      is_sint32(read_sint32(m, a_1)) /\ is_sint64(x).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 81684111829661576) /\ (0 < x).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 60):
+Let a = global(L_p64_31).
+Let a_1 = global(L_p32_32).
+Let a_2 = global(L_p16_33).
+Let a_3 = global(L_p8_34).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             81684111829661576),
+                                                a_1, 19018564), a_2, 290),
+                       a_3, 1), global(L_write_35), 0).
+Let x = read_sint32(m, a_1).
+Assume {
+  Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(read_sint16(m, a_2)) /\
+      is_sint32(x) /\ is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 19018564) /\ (0 < x).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 61):
+Let a = global(L_p64_31).
+Let a_1 = global(L_p32_32).
+Let a_2 = global(L_p16_33).
+Let a_3 = global(L_p8_34).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             81684111829661576),
+                                                a_1, 19018564), a_2, 290),
+                       a_3, 1), global(L_write_35), 0).
+Let x = read_sint16(m, a_2).
+Assume {
+  Type: is_sint8(read_sint8(m, a_3)) /\ is_sint16(x) /\
+      is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 290) /\ (0 < x).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 62):
+Let a = global(L_p64_31).
+Let a_1 = global(L_p32_32).
+Let a_2 = global(L_p16_33).
+Let a_3 = global(L_p8_34).
+Let m = write_uint32(write_sint8(write_sint16(write_sint32(write_sint64(mem_0,
+                                                             a,
+                                                             81684111829661576),
+                                                a_1, 19018564), a_2, 290),
+                       a_3, 1), global(L_write_35), 0).
+Let x = read_sint8(m, a_3).
+Assume {
+  Type: is_sint8(x) /\ is_sint16(read_sint16(m, a_2)) /\
+      is_sint32(read_sint32(m, a_1)) /\ is_sint64(read_sint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: (x = 1) /\ (0 < x).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function unsigned_
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 29):
+Let a = global(L_u64_22). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init64(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              a, true),
+                                                            global(L_u32_23),
+                                                            true),
+                                               global(L_u16_24), true),
+                                   global(L_u8_25), true),
+                      global(L_write_26), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 30):
+Let a = global(L_u32_23). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init32(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              global(L_u64_22),
+                                                              true), a, true),
+                                               global(L_u16_24), true),
+                                   global(L_u8_25), true),
+                      global(L_write_26), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 31):
+Let a = global(L_u16_24). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init16(write_init32(write_init8(write_init16(write_init32(
+                                                            write_init64(init_0,
+                                                              global(L_u64_22),
+                                                              true),
+                                                            global(L_u32_23),
+                                                            true), a, true),
+                                   global(L_u8_25), true),
+                      global(L_write_26), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 32):
+Let a = global(L_u8_25). Assume { (* Heap *) Type: cinits(init_0). }
+Prove: (read_init8(write_init32(write_init8(write_init16(write_init32(
+                                                           write_init64(init_0,
+                                                             global(L_u64_22),
+                                                             true),
+                                                           global(L_u32_23),
+                                                           true),
+                                              global(L_u16_24), true), a,
+                                  true), global(L_write_26), true), a)=true).
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 34):
+Let a = global(L_u64_22).
+Let a_1 = global(L_u32_23).
+Let a_2 = global(L_u16_24).
+Let a_3 = global(L_u8_25).
+Let m = write_uint32(write_uint8(write_uint16(write_uint32(write_uint64(mem_0,
+                                                             a,
+                                                             1234605616436508552),
+                                                a_1, 287454020), a_2, 4386),
+                       a_3, 17), global(L_write_26), 0).
+Let x = read_uint64(m, a).
+Assume {
+  Type: is_uint8(read_uint8(m, a_3)) /\ is_uint16(read_uint16(m, a_2)) /\
+      is_uint32(read_uint32(m, a_1)) /\ is_uint64(x).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: x = 1234605616436508552.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 35):
+Let a = global(L_u64_22).
+Let a_1 = global(L_u32_23).
+Let a_2 = global(L_u16_24).
+Let a_3 = global(L_u8_25).
+Let m = write_uint32(write_uint8(write_uint16(write_uint32(write_uint64(mem_0,
+                                                             a,
+                                                             1234605616436508552),
+                                                a_1, 287454020), a_2, 4386),
+                       a_3, 17), global(L_write_26), 0).
+Let x = read_uint32(m, a_1).
+Assume {
+  Type: is_uint8(read_uint8(m, a_3)) /\ is_uint16(read_uint16(m, a_2)) /\
+      is_uint32(x) /\ is_uint64(read_uint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: x = 287454020.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 36):
+Let a = global(L_u64_22).
+Let a_1 = global(L_u32_23).
+Let a_2 = global(L_u16_24).
+Let a_3 = global(L_u8_25).
+Let m = write_uint32(write_uint8(write_uint16(write_uint32(write_uint64(mem_0,
+                                                             a,
+                                                             1234605616436508552),
+                                                a_1, 287454020), a_2, 4386),
+                       a_3, 17), global(L_write_26), 0).
+Let x = read_uint16(m, a_2).
+Assume {
+  Type: is_uint8(read_uint8(m, a_3)) /\ is_uint16(x) /\
+      is_uint32(read_uint32(m, a_1)) /\ is_uint64(read_uint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: x = 4386.
+
+------------------------------------------------------------
+
+Goal Check (file integers.i, line 37):
+Let a = global(L_u64_22).
+Let a_1 = global(L_u32_23).
+Let a_2 = global(L_u16_24).
+Let a_3 = global(L_u8_25).
+Let m = write_uint32(write_uint8(write_uint16(write_uint32(write_uint64(mem_0,
+                                                             a,
+                                                             1234605616436508552),
+                                                a_1, 287454020), a_2, 4386),
+                       a_3, 17), global(L_write_26), 0).
+Let x = read_uint8(m, a_3).
+Assume {
+  Type: is_uint8(x) /\ is_uint16(read_uint16(m, a_2)) /\
+      is_uint32(read_uint32(m, a_1)) /\ is_uint64(read_uint64(m, a)).
+  (* Heap *)
+  Type: framed(mem_0) /\ sconst(mem_0).
+}
+Prove: x = 17.
+
+------------------------------------------------------------

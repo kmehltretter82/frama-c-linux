@@ -32,6 +32,16 @@ open Lang.F
 val t_addr : Lang.tau
 (** Pointer type : addr *)
 
+val t_malloc : Lang.tau
+(** Allocation table : [int[base] -> int]
+
+    Note: this is not a binding with the symbol in the theory but the exact same
+    definition, we need this so that Qed knows the underlying type.
+
+    @since Frama-C+dev
+*)
+
+
 (** {2 Basic constructors} *)
 
 val base : term -> term

@@ -34,6 +34,7 @@ let library = "memaddr"
 
 let t_addr = Qed.Logic.Data(Lang.datatype ~library "addr",[])
 let t_table = Qed.Logic.Data(Lang.datatype ~library "table",[])
+let t_malloc = Qed.Logic.Array(Qed.Logic.Int, Qed.Logic.Int)
 
 let f_base   = Lang.extern_f ~library ~result:Qed.Logic.Int
     ~link:(Qed.Engine.F_subst ("base", "%1.base")) "base"

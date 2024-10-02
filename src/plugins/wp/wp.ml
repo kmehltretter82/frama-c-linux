@@ -95,6 +95,7 @@ module MemDebug = MemDebug
 module MemEmpty = MemEmpty
 module MemLoader = MemLoader
 module MemMemory = MemMemory
+module MemBytes = MemBytes
 module MemTyped = MemTyped
 module MemVal = MemVal
 module MemVar = MemVar

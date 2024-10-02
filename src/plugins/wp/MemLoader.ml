@@ -66,8 +66,6 @@ sig
   val havoc : c_object -> loc -> length:term ->
     Chunk.t -> fresh:term -> current:term -> term
 
-  val eqmem : c_object -> loc -> Chunk.t -> term -> term -> pred
-
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
 
@@ -79,9 +77,9 @@ sig
   val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
 
-  val is_init_atom : Sigma.t -> loc -> term
+  val is_init_atom : Sigma.t -> c_object -> loc -> term
   val is_init_range : Sigma.t -> c_object -> loc -> term -> pred
-  val set_init_atom : Sigma.t -> loc -> term -> Chunk.t * term
+  val set_init_atom : Sigma.t -> c_object -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
   (* val monotonic_init : Sigma.t -> Sigma.t -> pred *)
@@ -549,7 +547,7 @@ struct
 
   let initialized_loc sigma obj loc =
     match obj with
-    | C_int _ | C_float _ | C_pointer _ -> p_bool (M.is_init_atom sigma loc)
+    | C_int _ | C_float _ | C_pointer _ -> p_bool (M.is_init_atom sigma obj loc)
     | C_comp ci -> initialized_comp sigma ci loc
     | C_array a -> initialized_array sigma a loc
 
@@ -571,9 +569,9 @@ struct
   module INIT_LOADER =
     LOADER_GEN
       (struct
-        let load_int sigma _ = M.is_init_atom sigma
-        let load_float sigma _ = M.is_init_atom sigma
-        let load_pointer sigma _ = M.is_init_atom sigma
+        let load_int sigma ikind = M.is_init_atom sigma (C_int ikind)
+        let load_float sigma fkind = M.is_init_atom sigma (C_float fkind)
+        let load_pointer sigma typ = M.is_init_atom sigma (C_pointer typ)
       end)(COMP_INIT)(ARRAY_INIT)
 
   let load_init = INIT_LOADER.load
@@ -618,8 +616,8 @@ struct
   (* --- Stored & Copied                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let updated_init_atom seq loc value =
-    let chunk_init,mem_init = M.set_init_atom seq.pre loc value in
+  let updated_init_atom seq obj loc value =
+    let chunk_init,mem_init = M.set_init_atom seq.pre obj loc value in
     Set(Sigma.value seq.post chunk_init,mem_init)
 
   let updated_atom seq obj loc value =
@@ -642,7 +640,7 @@ struct
   let stored_init seq obj loc value =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-      [ updated_init_atom seq loc value ]
+      [ updated_init_atom seq obj loc value ]
     | C_comp _ | C_array _ ->
       Set(load_init seq.post obj loc, value) :: havoc_init seq obj loc
 
@@ -659,7 +657,7 @@ struct
     | C_int _ | C_float _ | C_pointer _ ->
       let value = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
       let init = Lang.freshvar ~basename:"i" (Lang.init_of_object obj) in
-      [ updated_init_atom seq loc (e_var init) ;
+      [ updated_init_atom seq obj loc (e_var init) ;
         updated_atom seq obj loc (e_var value) ]
     | C_comp _ | C_array _ ->
       havoc seq obj loc @ havoc_init seq obj loc

@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer | Eva
+type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer | Eva | Bytes
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -68,6 +68,7 @@ let descr_mheap d = function
   | Hoare -> main d "hoare"
   | Typed p -> main d "typed" ; descr_mtyped d p
   | Eva -> main d "eva"
+  | Bytes -> main d "bytes"
 
 let descr_mvar d = function
   | Var -> ()
@@ -205,6 +206,8 @@ module Model_Hoare_Raw = Register(MemVar.Raw)(MemEmpty)
 module Model_Hoare_Ref = Register(Ref)(MemEmpty)
 module Model_Typed_Var = Register(Var)(MemTyped)
 module Model_Typed_Ref = Register(Ref)(MemTyped)
+module Model_Bytes_Var = Register(Var)(MemBytes)
+module Model_Bytes_Ref = Register(Ref)(MemBytes)
 module Model_Caveat = Register(Caveat)(MemTyped)
 
 module MemVal = MemVal.Make(MemVal.Eva)
@@ -218,12 +221,20 @@ struct
 end
 
 module Comp_MemZeroAlias = MakeCompiler(MemZeroAlias)
+
 module Comp_Hoare_Raw = MakeCompiler(Model_Hoare_Raw)
 module Comp_Hoare_Ref = MakeCompiler(Model_Hoare_Ref)
+
 module Comp_MemTyped = MakeCompiler(MemTyped)
 module Comp_Typed_Var = MakeCompiler(Model_Typed_Var)
 module Comp_Typed_Ref = MakeCompiler(Model_Typed_Ref)
+
 module Comp_Caveat = MakeCompiler(Model_Caveat)
+
+module Comp_MemBytes = MakeCompiler(MemBytes)
+module Comp_Bytes_Var = MakeCompiler(Model_Bytes_Var)
+module Comp_Bytes_Ref = MakeCompiler(Model_Bytes_Ref)
+
 module Comp_MemVal = MakeCompiler(MemVal)
 
 
@@ -237,6 +248,10 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Typed _ , Var     -> (module Comp_Typed_Var)
   | Typed _ , Ref     -> (module Comp_Typed_Ref)
   | Eva, _            -> (module Comp_MemVal)
+  | Bytes, Raw        -> (module Comp_MemBytes)
+  | Bytes, Var        -> (module Comp_Bytes_Var)
+  | Bytes, Ref        -> (module Comp_Bytes_Ref)
+
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuning                                                             --- *)
@@ -246,6 +261,7 @@ let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
   | Eva -> MemVal.configure ()
+  | Bytes -> MemBytes.configure ()
   | Typed p ->
     let rollback_memtyped = MemTyped.configure () in
     let orig_memtyped_pointer = Context.push MemTyped.pointer p in
@@ -330,6 +346,7 @@ let update_config ~warning m s = function
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }
   | "NOCAST" -> { s with mheap = Typed MemTyped.NoCast }
   | "EVA" -> { s with mheap = Eva }
+  | "BYTES" -> { s with mheap = Bytes }
   | "CAVEAT" -> { s with mvar = Caveat }
   | "RAW" -> { s with mvar = Raw }
   | "REF" -> { s with mvar = Ref }

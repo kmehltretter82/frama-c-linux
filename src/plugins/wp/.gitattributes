@@ -64,5 +64,5 @@ MakeDoc header_spec=CEA_WP
 /doc/manual/nullable.c header_spec=.ignore
 /doc/manual/*.tex header_spec=.ignore
 
-
+/share/why3/frama_c_wp/Wp.header header_spec=.ignore
 /tests/**/* header_spec=.ignore
