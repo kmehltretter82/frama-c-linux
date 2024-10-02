@@ -122,6 +122,7 @@ class model_selector (main : Design.main_window_extension_points) =
         dialog#add_row r_hoare#coerce ;
         dialog#add_row r_typed#coerce ;
         dialog#add_row r_bytes#coerce ;
+        r_bytes#set_visible false ;
         dialog#add_row r_eva#coerce ;
         dialog#add_row c_casts#coerce ;
         dialog#add_row c_byref#coerce ;
