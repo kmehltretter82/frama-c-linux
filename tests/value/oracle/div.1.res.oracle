@@ -56,8 +56,6 @@
 [eva:alarm] div.i:33: Warning: 
   pointer downcast. assert (unsigned int)(&Z2) ≤ 2147483647;
 [eva:alarm] div.i:33: Warning: 
-  signed overflow. assert -2147483648 ≤ (int)(&Z2) / Z2;
-[eva:alarm] div.i:33: Warning: 
   signed overflow. assert (int)(&Z2) / Z2 ≤ 2147483647;
 [eva:garbled-mix:write] div.i:33: 
   Assigning imprecise value to b because of arithmetic operation on addresses.
@@ -68,10 +66,6 @@
 [eva:alarm] div.i:34: Warning: 
   pointer downcast. assert (unsigned int)(&X + 2) ≤ 2147483647;
 [eva:alarm] div.i:34: Warning: division by zero. assert (int)(&X + 2) ≢ 0;
-[eva:alarm] div.i:34: Warning: 
-  signed overflow. assert -2147483648 ≤ 100 / (int)(&X + 2);
-[eva:alarm] div.i:34: Warning: 
-  signed overflow. assert 100 / (int)(&X + 2) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:34: 
   Assigning imprecise value to d2 because of arithmetic operation on addresses.
 [eva:alarm] div.i:35: Warning: 
@@ -79,10 +73,6 @@
 [eva] div.i:35: assertion 'rte,division_by_zero' got status valid.
 [eva:alarm] div.i:35: Warning: 
   pointer downcast. assert (unsigned int)(&X + 1) ≤ 2147483647;
-[eva:alarm] div.i:35: Warning: 
-  signed overflow. assert -2147483648 ≤ 100 / (int)(&X + 1);
-[eva:alarm] div.i:35: Warning: 
-  signed overflow. assert 100 / (int)(&X + 1) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:35: 
   Assigning imprecise value to d1 because of arithmetic operation on addresses.
 [eva:alarm] div.i:36: Warning: 
@@ -90,10 +80,6 @@
 [eva] div.i:36: assertion 'rte,division_by_zero' got status valid.
 [eva:alarm] div.i:36: Warning: 
   pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
-[eva:alarm] div.i:36: Warning: 
-  signed overflow. assert -2147483648 ≤ 100 / (int)(&X);
-[eva:alarm] div.i:36: Warning: 
-  signed overflow. assert 100 / (int)(&X) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:36: 
   Assigning imprecise value to d0 because of arithmetic operation on addresses.
 [eva:alarm] div.i:37: Warning: 

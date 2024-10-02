@@ -342,6 +342,12 @@ module Make
                     Forward Operations, Alarms and Reductions
      ------------------------------------------------------------------------ *)
 
+  (* Applies function [f] on the optional value in a truth. *)
+  let apply_on_truth f = function
+    | `Unknown v -> `Unknown (f v)
+    | `TrueReduced v -> `TrueReduced (f v)
+    | `True | `False | `Unreachable as x -> x
+
   (* Handles the result of an [assume] function from value abstractions (see
      abstract_values.mli for more details), applied to the initial [value].
      If the value could have been reduced, [reduce] is applied on the new value.
@@ -369,22 +375,37 @@ module Make
     let reduce = reduce_argument (expr, value) in
     process_truth ~reduce ~alarm value truth
 
-  (* Processes the results of assume_comparable, that affects both arguments of
-     the comparison. *)
-  let reduce_by_double_truth ~alarm (e1, v1) (e2, v2) truth =
+  (* Interprets a [truth] about a pair of values (v1, v2), and reduce both
+     values accordingly. Used on the result of [Value.assume_comparable], which
+     affects both arguments of the comparison. *)
+  let reduce_both_by_truth ~alarm (e1, v1) (e2, v2) truth =
     let reduce (new_value1, new_value2) =
       Option.iter (fun e1 -> reduce_argument (e1, v1) new_value1) e1;
       reduce_argument (e2, v2) new_value2;
     in
     process_truth ~reduce ~alarm (v1, v2) truth
 
+  (* Creates a disjunctive truth about the pair of values (v1, v2). *)
+  let disjunctive_truth (v1, truth1) (v2, truth2) =
+    match truth1, truth2 with
+    | (`True | `TrueReduced _), _
+    | _, (`True | `TrueReduced _) -> `True
+    | `Unreachable, _ | _, `Unreachable -> `Unreachable
+    | `False, `False -> `False
+    | `False, `Unknown v2 -> `Unknown (v1, v2)
+    | `Unknown v1, `False -> `Unknown (v1, v2)
+    | `Unknown _, `Unknown _ ->
+      (* [v1] (resp. [v2]) cannot be reduced as [truth2] (resp. [truth1])
+         might be true for some values. *)
+      `Unknown (v1, v2)
+
   let is_true = function
     | `True | `TrueReduced _ -> true
     | _ -> false
 
+  (* Overflow of div is processed separately in [assume_valid_div]. *)
   let may_overflow = function
-    | Shiftlt | Mult | MinusPP | MinusPI | PlusPI
-    | PlusA | MinusA | Div -> true
+    | Shiftlt | Mult | MinusPP | MinusPI | PlusPI | PlusA | MinusA -> true
     | _ -> false
 
   let truncate_bound overflow_kind bound bound_kind expr value =
@@ -541,19 +562,33 @@ module Make
     let truth = Value.assume_bounded Alarms.Upper_bound size_int value in
     reduce_by_truth ~alarm (index_expr, value) truth
 
-  (* The behavior of a%b is undefined if the quotient a/b overflows
-     (according to 6.5.5,§6 in the C standard). This is checked here. *)
-  let assume_valid_mod context typ (e1, v1) (e2, v2) =
-    let expr = Eva_ast.Build.div e1 e2 in
-    let value = Value.forward_binop context typ Div v1 v2 in
-    let check_overflow value =
-      let open Evaluated.Operators in
-      (* Check overflow alarms, but the reduced value of a/b is useless here. *)
-      let+ _v = handle_overflow ~may_overflow:true context expr typ value in
-      (* We could probably reduce [v1] or [v2] in some cases. *)
-      v1, v2
-    in
-    Bottom.fold ~bottom:(return (v1, v2)) check_overflow value
+  (* If [typ] is a signed integer type, emits an alarm for a division overflow
+     if [v1] can be equal to min_int AND [v2] can be equal to [-1].
+     Also reduces the values of [v1] or [v2] accordingly when possible. *)
+  let assume_valid_div context typ (e1, v1) (e2, v2) =
+    match Eval_typ.integer_range ~ptr:false typ with
+    | Some range when range.i_signed ->
+      let min_int = Eval_typ.range_lower_bound range in
+      let max_int = Eval_typ.range_upper_bound range in
+      let alarm () =
+        let expr = Eva_ast.Build.div e1 e2 in
+        let cil_expr = Eva_ast.to_cil_exp expr in
+        Alarms.(Overflow (Signed, cil_expr, max_int, Upper_bound))
+      in
+      let forward_binop = Value.forward_binop context typ in
+      (* Bottom should never happen on addition or subtraction. *)
+      let add v1 v2 = Bottom.non_bottom (forward_binop PlusA v1 v2) in
+      let sub v1 v2 = Bottom.non_bottom (forward_binop MinusA v1 v2) in
+      let assume_non_equal value i =
+        let v_i = Value.inject_int typ i in
+        let truth = Value.assume_non_zero (sub value v_i) in
+        apply_on_truth (fun value -> add value v_i) truth
+      in
+      let truth1 = assume_non_equal v1 min_int in
+      let truth2 = assume_non_equal v2 Integer.minus_one in
+      let truth = disjunctive_truth (v1, truth1) (v2, truth2) in
+      reduce_both_by_truth ~alarm (Some e1, v1) (e2, v2) truth
+    | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
     let open Evaluated.Operators in
@@ -563,9 +598,7 @@ module Make
         let truth = Value.assume_non_zero v2 in
         let alarm () = Alarms.Division_by_zero (Eva_ast.to_cil_exp e2) in
         let* v2 = reduce_by_truth ~alarm arg2 truth in
-        if op = Mod
-        then assume_valid_mod context typ (e1, v1) (e2, v2)
-        else return (v1, v2)
+        assume_valid_div context typ (e1, v1) (e2, v2)
       | Shiftrt ->
         let warn_negative = Kernel.RightShiftNegative.get () in
         reduce_shift ~warn_negative typ arg1 arg2
@@ -579,7 +612,7 @@ module Make
           Alarms.Differing_blocks (Eva_ast.to_cil_exp e1, Eva_ast.to_cil_exp e2)
         in
         let arg1 = Some e1, v1 in
-        reduce_by_double_truth ~alarm arg1 arg2 truth
+        reduce_both_by_truth ~alarm arg1 arg2 truth
       | _ -> return (v1, v2)
     else return (v1, v2)
 
@@ -603,7 +636,7 @@ module Make
       if warn_pointer_comparison typ then
         if propagate_all
         then `Value (v1, v2), snd (interpret_truth ~alarm (v1, v2) truth)
-        else reduce_by_double_truth ~alarm (e1, v1) (e2, v2) truth
+        else reduce_both_by_truth ~alarm (e1, v1) (e2, v2) truth
       else `Value (v1, v2), Alarmset.none
     in
     let result = let* v1, v2 = args in compute v1 v2 in

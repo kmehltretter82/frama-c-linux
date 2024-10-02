@@ -96,15 +96,9 @@
 [eva] Done for function pos_rem
 [eva] computing for function address_modulo <- main.
   Called from modulo.i:174.
-[eva:alarm] modulo.i:158: Warning: 
-  signed overflow. assert -2147483648 ≤ addr / 16;
-[eva:alarm] modulo.i:158: Warning: 
-  signed overflow. assert addr / 16 ≤ 2147483647;
 [eva:garbled-mix:write] modulo.i:158: 
   Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] modulo.i:159: Warning: division by zero. assert i ≢ 0;
-[eva:alarm] modulo.i:159: Warning: 
-  signed overflow. assert -2147483648 ≤ addr / i;
 [eva:alarm] modulo.i:159: Warning: 
   signed overflow. assert addr / i ≤ 2147483647;
 [eva:garbled-mix:write] modulo.i:159: 
