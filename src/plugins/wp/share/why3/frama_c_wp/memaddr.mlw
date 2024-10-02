@@ -70,9 +70,8 @@ theory MemAddr
   predicate valid_rd (m: malloc) (p: addr) (n: int) =
     n > 0 -> ( 0 <> p.base /\ 0 <= p.offset /\ p.offset + n <= m[p.base] )
 
-  predicate valid_obj (m: malloc) (p: addr) (n: int) =
-    n > 0 -> ( p = null \/
-             ( 0 <> p.base /\ 0 <= p.offset /\ p.offset + n <= 1 + m[p.base] ))
+  predicate valid_obj (m: malloc) (p: addr) =
+    p = null \/ (0 <> p.base /\ 0 <= p.offset /\ p.offset <= m[p.base] /\ m[p.base] > 0)
 
   predicate invalid (m : malloc) (p:addr) (n:int) =
     n <= 0 \/ p.base = 0 \/ m[p.base] <= p.offset \/ p.offset + n <= 0
@@ -145,7 +144,7 @@ theory MemAddr
      statically allocated uses static_malloc which is abstract. *)
   lemma valid_pointers_are_statically_allocated:
     forall a: addr, m: malloc, n: int.
-      valid_rd m a n -> statically_allocated (a.base)
+      n > 0 -> valid_rd m a n -> statically_allocated (a.base)
 
   function int_of_addr addr: int
   function addr_of_int int: addr

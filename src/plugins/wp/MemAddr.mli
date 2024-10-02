@@ -105,8 +105,8 @@ val valid_rd : term -> term -> term -> pred
 val valid_rw : term -> term -> term -> pred
 (** [valid_rw(m: malloc)(a: addr)(l: length)] *)
 
-val valid_obj : term -> term -> term -> pred
-(** [valid_obj(m: malloc)(a: addr)(l: length)] *)
+val valid_obj : term -> term -> pred
+(** [valid_obj(m: malloc)(a: addr)] *)
 
 val invalid : term -> term -> term -> pred
 (** [invalid(m: malloc)(a: addr)(l: length)]
