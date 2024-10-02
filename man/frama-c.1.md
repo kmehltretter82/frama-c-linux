@@ -149,6 +149,16 @@ syntax. Defaults to yes.
 it is assigned to. Otherwise, a temporary variable is used and the cast is made
 explicit. Defaults to yes.
 
+-generated-spec-mode *mode*
+: selects which *mode* will be used to generate missing specifications.
+Can be one of: *frama-c*, *acsl*, *safe*, or the name of a custom
+registered in plug-in.
+
+-generated-spec-custom *c_1:m_1,...,c_n:m_n*
+: fine-tunes missing specification generation by manually selecting
+modes for each clause. Can be one of: *frama-c*, *acsl*, *safe*, *skip*, or
+the name of a custom registered mode.
+
 -config *dir*
 : overrides default Frama-C configuration directory
 
