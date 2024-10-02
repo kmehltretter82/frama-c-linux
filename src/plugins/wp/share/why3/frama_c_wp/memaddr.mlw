@@ -144,7 +144,7 @@ theory MemAddr
      statically allocated uses static_malloc which is abstract. *)
   lemma valid_pointers_are_statically_allocated:
     forall a: addr, m: malloc, n: int.
-      valid_rd m a n -> statically_allocated (a.base)
+      n > 0 -> valid_rd m a n -> statically_allocated (a.base)
 
   function int_of_addr addr: int
   function addr_of_int int: addr
