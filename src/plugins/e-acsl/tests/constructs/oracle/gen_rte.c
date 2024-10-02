@@ -61,8 +61,8 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
   int __gen_e_acsl_at;
   {
     int __gen_e_acsl_assumes_value;
-    __gen_e_acsl_at = b;
-    __gen_e_acsl_at_2 = e;
+    __gen_e_acsl_at = e;
+    __gen_e_acsl_at_2 = b;
     __gen_e_acsl_contract = __e_acsl_contract_init(1UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
@@ -334,25 +334,25 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_19 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_19,
-                                 "__gen_e_acsl_at",0,__gen_e_acsl_at);
+                                 "__gen_e_acsl_at_2",0,__gen_e_acsl_at_2);
     __gen_e_acsl_assert_data_19.blocking = 1;
     __gen_e_acsl_assert_data_19.kind = "RTE";
-    __gen_e_acsl_assert_data_19.pred_txt = "__gen_e_acsl_at != 0";
+    __gen_e_acsl_assert_data_19.pred_txt = "__gen_e_acsl_at_2 != 0";
     __gen_e_acsl_assert_data_19.file = "rte.i";
     __gen_e_acsl_assert_data_19.fct = "test";
     __gen_e_acsl_assert_data_19.line = 8;
     __gen_e_acsl_assert_data_19.name = "division_by_zero";
-    __e_acsl_assert(__gen_e_acsl_at != 0,& __gen_e_acsl_assert_data_19);
+    __e_acsl_assert(__gen_e_acsl_at_2 != 0,& __gen_e_acsl_assert_data_19);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_19);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_18,"\\old(b)",0,
-                                 __gen_e_acsl_at);
+                                 __gen_e_acsl_at_2);
     __gen_e_acsl_assert_data_18.blocking = 1;
     __gen_e_acsl_assert_data_18.kind = "Postcondition";
     __gen_e_acsl_assert_data_18.pred_txt = "1 % \\old(b) == 1";
     __gen_e_acsl_assert_data_18.file = "rte.i";
     __gen_e_acsl_assert_data_18.fct = "test";
     __gen_e_acsl_assert_data_18.line = 8;
-    __e_acsl_assert(1 % __gen_e_acsl_at == 1,& __gen_e_acsl_assert_data_18);
+    __e_acsl_assert(1 % __gen_e_acsl_at_2 == 1,& __gen_e_acsl_assert_data_18);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_18);
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
@@ -362,18 +362,18 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __e_acsl_assert_data_t __gen_e_acsl_assert_data_21 =
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_21,
-                                   "__gen_e_acsl_at_2",0,__gen_e_acsl_at_2);
+                                   "__gen_e_acsl_at",0,__gen_e_acsl_at);
       __gen_e_acsl_assert_data_21.blocking = 1;
       __gen_e_acsl_assert_data_21.kind = "RTE";
-      __gen_e_acsl_assert_data_21.pred_txt = "__gen_e_acsl_at_2 != 0";
+      __gen_e_acsl_assert_data_21.pred_txt = "__gen_e_acsl_at != 0";
       __gen_e_acsl_assert_data_21.file = "rte.i";
       __gen_e_acsl_assert_data_21.fct = "test";
       __gen_e_acsl_assert_data_21.line = 18;
       __gen_e_acsl_assert_data_21.name = "division_by_zero";
-      __e_acsl_assert(__gen_e_acsl_at_2 != 0,& __gen_e_acsl_assert_data_21);
+      __e_acsl_assert(__gen_e_acsl_at != 0,& __gen_e_acsl_assert_data_21);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_21);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_20,"\\old(e)",
-                                   0,__gen_e_acsl_at_2);
+                                   0,__gen_e_acsl_at);
       __gen_e_acsl_assert_data_20.blocking = 1;
       __gen_e_acsl_assert_data_20.kind = "Postcondition";
       __gen_e_acsl_assert_data_20.pred_txt = "1 % \\old(e) == 1";
@@ -381,8 +381,7 @@ void __gen_e_acsl_test(int a, int b, int c, int d, int e, int f, int g,
       __gen_e_acsl_assert_data_20.fct = "test";
       __gen_e_acsl_assert_data_20.line = 18;
       __gen_e_acsl_assert_data_20.name = "bhvr";
-      __e_acsl_assert(1 % __gen_e_acsl_at_2 == 1,
-                      & __gen_e_acsl_assert_data_20);
+      __e_acsl_assert(1 % __gen_e_acsl_at == 1,& __gen_e_acsl_assert_data_20);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_20);
     }
     __e_acsl_contract_clean(__gen_e_acsl_contract);

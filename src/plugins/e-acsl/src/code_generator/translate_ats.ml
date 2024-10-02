@@ -484,8 +484,8 @@ let for_stmt env kf stmt =
 
   (* Translate the [\at()]. *)
   let stmt_translations = Pred_or_term.Hashtbl.create 7 in
-  At_data.Set.fold
-    (fun ({ lscope; pot; error } as at_data) env ->
+  List.fold_left
+    (fun env ({ lscope; pot; error } as at_data) ->
        let open Current_loc.Operators in
        let<> UpdatedCurrentLoc = match pot with
          | PoT_pred p -> p.pred_loc
@@ -519,8 +519,8 @@ let for_stmt env kf stmt =
        Pred_or_term.Hashtbl.replace stmt_translations pot vi_or_err;
        At_data.Hashtbl.replace translations at_data vi_or_err;
        env)
-    at_for_stmt
     env
+    at_for_stmt
 
 let to_exp ~loc ~adata kf env pot label =
   let kinstr = Env.get_kinstr env in

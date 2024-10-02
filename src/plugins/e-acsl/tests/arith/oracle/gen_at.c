@@ -28,8 +28,8 @@ void f(void)
   __gen_e_acsl_at_2 = A;
   __gen_e_acsl_at_3 = A;
   A = 1;
-  F: __gen_e_acsl_at_4 = A;
-     __gen_e_acsl_at_5 = __gen_e_acsl_at_2;
+  F: __gen_e_acsl_at_4 = __gen_e_acsl_at_2;
+     __gen_e_acsl_at_5 = A;
      A = 2;
   {
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
@@ -49,14 +49,14 @@ void f(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\at(A,F)",0,
-                                 __gen_e_acsl_at_4);
+                                 __gen_e_acsl_at_5);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\at(A,F) == 1";
     __gen_e_acsl_assert_data_2.file = "at.i";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 17;
-    __e_acsl_assert(__gen_e_acsl_at_4 == 1,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert(__gen_e_acsl_at_5 == 1,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \at(A,F) == 1; */ ;
@@ -78,14 +78,14 @@ void f(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_4,
-                                 "\\at(\\at(A,Pre),F)",0,__gen_e_acsl_at_5);
+                                 "\\at(\\at(A,Pre),F)",0,__gen_e_acsl_at_4);
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "Assertion";
     __gen_e_acsl_assert_data_4.pred_txt = "\\at(\\at(A,Pre),F) == 0";
     __gen_e_acsl_assert_data_4.file = "at.i";
     __gen_e_acsl_assert_data_4.fct = "f";
     __gen_e_acsl_assert_data_4.line = 19;
-    __e_acsl_assert(__gen_e_acsl_at_5 == 0,& __gen_e_acsl_assert_data_4);
+    __e_acsl_assert(__gen_e_acsl_at_4 == 0,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
   }
   /*@ assert \at(\at(A,Pre),F) == 0; */ ;
@@ -405,8 +405,8 @@ void i(void)
 
 int main(void)
 {
-  long __gen_e_acsl_at_3;
-  int __gen_e_acsl_at_2;
+  int __gen_e_acsl_at_3;
+  long __gen_e_acsl_at_2;
   long __gen_e_acsl_at;
   int __retres;
   int x;
@@ -419,8 +419,8 @@ int main(void)
   L:
   {
     __gen_e_acsl_at = (long)x;
-    __gen_e_acsl_at_2 = x;
-    __gen_e_acsl_at_3 = x + 1L;
+    __gen_e_acsl_at_2 = x + 1L;
+    __gen_e_acsl_at_3 = x;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"x",0,x);
     __gen_e_acsl_assert_data.blocking = 1;
@@ -442,14 +442,14 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_2,"\\at(x,L)",0,
-                                 __gen_e_acsl_at_2);
+                                 __gen_e_acsl_at_3);
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
     __gen_e_acsl_assert_data_2.pred_txt = "\\at(x,L) == 0";
     __gen_e_acsl_assert_data_2.file = "at.i";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 77;
-    __e_acsl_assert(__gen_e_acsl_at_2 == 0,& __gen_e_acsl_assert_data_2);
+    __e_acsl_assert(__gen_e_acsl_at_3 == 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
   }
   /*@ assert \at(x,L) == 0; */ ;
@@ -457,14 +457,14 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_3 =
       {.values = (void *)0};
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_3,
-                                  "\\at(x + 1,L)",0,__gen_e_acsl_at_3);
+                                  "\\at(x + 1,L)",0,__gen_e_acsl_at_2);
     __gen_e_acsl_assert_data_3.blocking = 1;
     __gen_e_acsl_assert_data_3.kind = "Assertion";
     __gen_e_acsl_assert_data_3.pred_txt = "\\at(x + 1,L) == 1";
     __gen_e_acsl_assert_data_3.file = "at.i";
     __gen_e_acsl_assert_data_3.fct = "main";
     __gen_e_acsl_assert_data_3.line = 78;
-    __e_acsl_assert(__gen_e_acsl_at_3 == 1L,& __gen_e_acsl_assert_data_3);
+    __e_acsl_assert(__gen_e_acsl_at_2 == 1L,& __gen_e_acsl_assert_data_3);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_3);
   }
   /*@ assert \at(x + 1,L) == 1; */ ;
