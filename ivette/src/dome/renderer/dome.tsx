@@ -822,6 +822,19 @@ export function useProtected<A>(fn: Callback<A> | undefined): Callback<A> {
 }
 
 /**
+ * A hook to retrieve text from a file.
+ * The update is protected by the useProtected() hook.
+ */
+export function useFileContent(
+  path: string,
+): string {
+  const [ fileContent, setFileContent ] = React.useState("");
+  const callback = useProtected(setFileContent);
+  System.getFileContent(path, callback);
+  return fileContent;
+}
+
+/**
    Debounced callback (waiting time in milliseconds).
    The returned callback will be only fired when the component is mounted.
    The provided callback need not be memoized.
