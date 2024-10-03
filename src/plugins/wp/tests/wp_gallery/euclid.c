@@ -29,6 +29,7 @@ int euclid_gcd(int a, int b)
   int r;
   /*@
     loop assigns a, b, r;
+    loop invariant \abs(a) <= INT_MAX && \abs(b) <= INT_MAX ;
     loop invariant gcd(a,b) == \at( gcd(a,b), Pre );
     loop variant \abs(b);
   */
