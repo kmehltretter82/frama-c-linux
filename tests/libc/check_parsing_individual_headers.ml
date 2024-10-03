@@ -8,9 +8,7 @@ let is_header f = Str.string_match header_re f 0
 
 (* Files which are *not* supposed to be parsed *)
 let blacklist libc_dir =
-  List.map (fun f ->
-      Datatype.Filepath.concat libc_dir f)
-    ["tgmath.h"; "complex.h"; "__fc_machdep_linux_shared.h"]
+  List.map (Datatype.Filepath.concat libc_dir) ["tgmath.h"; "complex.h"]
 
 (* only goes down one level, which is enough for the libc *)
 let collect_headers () =
