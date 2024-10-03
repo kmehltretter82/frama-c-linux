@@ -215,15 +215,15 @@ class annot_visitor kf flags on_alarm = object (self)
     | _ ->
       let generate () =
         match exp.enode with
-        | BinOp((Div | Mod) as op, lexp, rexp, ty) ->
+        | BinOp((Div | Mod), lexp, rexp, ty) ->
           (match Cil.unrollType ty with
            | TInt(kind,_) ->
              (* add assertion "divisor not zero" *)
              if self#do_div_mod () then
                self#generate_assertion Rte.divmod_assertion rexp;
-             if self#do_signed_overflow () && op = Div && Cil.isSigned kind then
-               (* treat the special case of signed division overflow
-                  (no signed modulo overflow) *)
+             if self#do_signed_overflow () && Cil.isSigned kind then
+               (* treat the special case of signed division/modulo overflow *)
+               let exp = { exp with enode = BinOp (Div, lexp, rexp, ty) } in
                self#generate_assertion Rte.signed_div_assertion (exp, lexp, rexp)
            | TFloat(fkind,_) when self#do_finite_float () ->
              self#generate_assertion Rte.finite_float_assertion (fkind,exp);

@@ -234,10 +234,7 @@ let signed_div_assertion ~remove_trivial ~on_alarm (exp, lexp, rexp) =
      the minimum (negative) value for the signed integer type,
      and divisor is equal to -1. Under the hypothesis (cf Value) that
      integers are represented in two's complement.
-     Nothing done for modulo (the result of TYPE_MIN % -1 is 0, which does not
-     overflow).
-     Still it may be dangerous on a number of compilers / architectures
-     (modulo may be performed in parallel with division) *)
+  *)
   let t = Cil.unrollType (Cil.typeOf rexp) in
   let size = Cil.bitsSizeOf t in
   (* check dividend_expr / divisor_expr : if constants ... *)

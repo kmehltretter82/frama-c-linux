@@ -4,6 +4,10 @@
   guaranteed RTE:
   assert
   signed_overflow: (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
+[rte] divmod_typedef.c:16: Warning: 
+  guaranteed RTE:
+  assert
+  signed_overflow: (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
 [rte] divmod_typedef.c:18: Warning: 
   guaranteed RTE: assert division_by_zero: 0 ≢ 0;
 [rte] divmod_typedef.c:19: Warning: 
@@ -39,6 +43,10 @@ int main(void)
         (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
   */
   z = (-2147483647 - 1) / -1;
+  /*@ assert
+      rte: signed_overflow:
+        (int)((int)(-2147483647) - 1) / (int)(-1) ≤ 2147483647;
+  */
   z = (-2147483647 - 1) % -1;
   /*@ assert rte: division_by_zero: 0 ≢ 0; */
   uz = (tuint)(1 / 0);
