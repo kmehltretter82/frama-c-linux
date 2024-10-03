@@ -29,72 +29,8 @@
    @module ivette/display
  */
 
-import React from 'react';
-import { VIEW, COMPONENT, LayoutPosition } from 'ivette';
-import * as State from './state';
+import { LayoutPosition } from 'ivette';
 import * as Laboratory from './laboratory';
-
-export interface ItemProps {
-  id: string;
-  selected?: boolean;
-}
-
-/**
-   A sidebar item for controlling an Ivette view.
- */
-export function ViemItem(props: ItemProps): JSX.Element | null {
-  const { id, selected = false } = props;
-  const view = State.useElement(VIEW, id);
-  const state = Laboratory.useState();
-  if (!view) return null;
-  const status = Laboratory.getViewStatus(state, id);
-  return (
-    <Laboratory.ViewItem
-      view={view}
-      selected={selected}
-      {...status}
-    />
-  );
-}
-
-/**
-   A sidebar item for controlling an Ivette component.
- */
-export function ComponentItem(props: ItemProps): JSX.Element | null {
-  const { id, selected = false } = props;
-  const comp = State.useElement(COMPONENT, id);
-  const state = Laboratory.useState();
-  if (!comp) return null;
-  const status = Laboratory.getComponentStatus(state, id);
-  return (
-    <Laboratory.ComponentItem
-      comp={comp}
-      selected={selected}
-      {...status}
-    />
-  );
-}
-
-export interface GroupItemsProps {
-  id: string;
-  selected?: string;
-}
-
-/**
-   A bundle of sidebar items for controlling an Ivette group of components.
- */
-export function GroupItems(props: GroupItemsProps): JSX.Element | null {
-  const items =
-    State.useElements(COMPONENT)
-      .filter(Laboratory.inGroup(props))
-      .map(({ id }) => (
-        <ComponentItem
-          key={id}
-          id={id}
-          selected={id === props.selected} />
-      ));
-  return <>{items}</>;
-}
 
 /** Switch display to specified view. */
 export function switchToView(id: string): void {
