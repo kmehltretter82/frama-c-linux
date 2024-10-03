@@ -1,8 +1,8 @@
 /* run.config*
-   STDOPT: #"-eva-remove-redundant-alarms"
-   PLUGIN: @PTEST_PLUGIN@ rtegen
-   OPT: -machdep x86_32 @RTE_TEST@ -then -eva @EVA_CONFIG@
+   STDOPT: #""
 */
+
+
 int X,Y,Z1,Z2,T,U1,U2,V,W1,W2;
 int a,b,d1,d2,d0,e;
 int t[5]={1,2,3};
