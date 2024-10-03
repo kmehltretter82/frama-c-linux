@@ -24,7 +24,7 @@
 (* --- Model Factory                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mheap = Hoare | ZeroAlias | Typed of MemTyped.pointer | Eva | Bytes | Bornat
+type mheap = Hoare | ZeroAlias | Eva | Bytes | Region | Typed of MemTyped.pointer
 type mvar = Raw | Var | Ref | Caveat
 
 type setup = {
@@ -69,7 +69,7 @@ let descr_mheap d = function
   | Typed p -> main d "typed" ; descr_mtyped d p
   | Eva -> main d "eva"
   | Bytes -> main d "bytes"
-  | Bornat -> main d "bornat"
+  | Region -> main d "region"
 
 let descr_mvar d = function
   | Var -> ()
@@ -207,7 +207,7 @@ module Register(V : MemVar.VarUsage)(M : Sigs.Model)
 module Model_Hoare_Raw = Register(MemVar.Raw)(MemEmpty)
 module Model_Hoare_Ref = Register(Ref)(MemEmpty)
 
-module Model_Typed_Var = Register(Var)(MemTyped) (* modèle de base, mettre MemBornat *)
+module Model_Typed_Var = Register(Var)(MemTyped)
 module Model_Typed_Ref = Register(Ref)(MemTyped)
 module Model_Bytes_Var = Register(Var)(MemBytes)
 module Model_Bytes_Ref = Register(Ref)(MemBytes)
@@ -240,11 +240,11 @@ module Comp_Bytes_Var = MakeCompiler(Model_Bytes_Var)
 module Comp_Bytes_Ref = MakeCompiler(Model_Bytes_Ref)
 
 module Comp_MemVal = MakeCompiler(MemVal)
-module Comp_Bornat =
+module Comp_Region =
   MakeCompiler
     (MemVar.Make
        (MemVar.Static)
-       (MemBornat.MemMake(RegionAnalysis.R)(MemBytes)))
+       (MemRegion.MemMake(RegionAnalysis.R)(MemBytes)))
 
 
 let compiler mheap mvar : (module Sigs.Compiler) =
@@ -260,7 +260,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Bytes, Raw        -> (module Comp_MemBytes)
   | Bytes, Var        -> (module Comp_Bytes_Var)
   | Bytes, Ref        -> (module Comp_Bytes_Ref)
-  | Bornat, _         -> (module Comp_Bornat)
+  | Region, _         -> (module Comp_Region)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Tuning                                                             --- *)
@@ -279,7 +279,7 @@ let configure_mheap = function
       Context.pop MemTyped.pointer orig_memtyped_pointer
     in
     rollback
-  | Bornat -> MemBytes.configure ()
+  | Region -> MemBytes.configure ()
 
 let configure_driver setup driver () =
   let rollback_mheap = configure_mheap setup.mheap in
@@ -355,7 +355,7 @@ let update_config ~warning m s = function
   | "TYPED" -> { s with mheap = Typed MemTyped.Fits }
   | "CAST" -> { s with mheap = Typed MemTyped.Unsafe }
   | "NOCAST" -> { s with mheap = Typed MemTyped.NoCast }
-  | "BORNAT" -> { s with mheap = Bornat }
+  | "REGION" -> { s with mheap = Region }
   | "EVA" -> { s with mheap = Eva }
   | "BYTES" -> { s with mheap = Bytes }
   | "CAVEAT" -> { s with mvar = Caveat }

@@ -25,7 +25,7 @@ open Ctypes
 open Lang.F
 
 (* -------------------------------------------------------------------------- *)
-(* --- Region Analysis API for Bornat Memory Model                        --- *)
+(* --- Region Analysis API for Region Memory Model                        --- *)
 (* -------------------------------------------------------------------------- *)
 
 module type API = sig

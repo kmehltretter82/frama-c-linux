@@ -1132,7 +1132,7 @@ let scope seq scope xs =
     [ p_equal (Sigma.value seq.post Alloc) alloc ]
 
 (* ********************************************************************** *)
-(* API with BORNAT                                                        *)
+(* API with Region                                                        *)
 (* ********************************************************************** *)
 
 let sizeof = protected_sizeof_object

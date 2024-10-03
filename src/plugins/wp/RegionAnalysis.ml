@@ -26,7 +26,7 @@ open Lang.F
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Region Analysis API for Bornat Memory Model                        --- *)
+(* --- Region Analysis API for Region Memory Model                        --- *)
 (* -------------------------------------------------------------------------- *)
 
 module type API = sig
@@ -65,7 +65,7 @@ end
 
 
 (* -------------------------------------------------------------------------- *)
-(* --- Region Analysis for Bornat Memory Model                            --- *)
+(* --- Region Analysis for Region Memory Model                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 module R (*: API*) =
