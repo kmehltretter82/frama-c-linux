@@ -42,7 +42,7 @@ install::
 	@echo "  (no PREFIX, nor OPAM_SWITCH_PREFIX)"
 else
 FULLPREFIX := $(if ${DESTDIR},$(patsubst %/,%,${DESTDIR})/${PREFIX},${PREFIX})
-install::
+install:: ivette-api
 	@echo "Installing Ivette to ${FULLPREFIX}"
 	@mkdir -p "${FULLPREFIX}/bin"
 	@install ivette/ivette-bootstrap.sh "${FULLPREFIX}/bin/ivette"
