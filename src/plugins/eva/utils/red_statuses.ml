@@ -91,17 +91,13 @@ let add_red_ap kinstr ap =
 
 let add_red_alarm ki a = add_red_ap ki (Alarm a)
 
-let add_red_property ki ip =
-  if false then
-    add_red_ap ki (Prop ip)
-  else
-    (* Collapses preconditions-at-callsites into the precondition itself,
-       by modifying the callstack. Results in a better display *)
-    let open Property in
-    match ip with
-    | IPPropertyInstance {ii_ip=IPPredicate {ip_kind=PKRequires _} as ip'} ->
-      add_red_ap Kglobal (Prop ip')
-    | _ -> add_red_ap ki (Prop ip)
+let add_red_property ki (ip: Property.identified_property) =
+  add_red_ap ki (Prop ip);
+  (* If [ip] is an instance of a precondition [ip'], also add [ip'] itself. *)
+  match ip with
+  | IPPropertyInstance {ii_ip = IPPredicate {ip_kind = PKRequires _} as ip'} ->
+    add_red_ap Kglobal (Prop ip')
+  | _ -> ()
 
 let is_red ip =
   let kinstr = Property.get_kinstr ip in
