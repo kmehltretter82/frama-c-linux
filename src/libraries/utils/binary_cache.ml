@@ -71,173 +71,94 @@ sig
   val sentinel : t
 end
 
+(** The Array_k modules (k = 2, 3, 4) below provide a small interface to arrays
+    of k-tuples. However, for performance reasons, they are implemented as
+    k-tuples of arrays of the same size. (The difference can be up to 10% on
+    some benchmarks.)
+
+    Note that there used to be an even faster implementation (about 2% on the
+    same benchmarks) as a flattened array of k times the size. It relied on a
+    precise understanding of the low-level OCaml memory model (and the Obj
+    module). However, that made some maintainers worry on the rare occasions
+    they had to look at this file.
+*)
+
+module Array = struct
+  include Stdlib.Array
+  let clear : 'a t -> 'a -> unit
+    = fun t a -> fill t 0 (length t) a
+end
+
 module Array_2 =
 struct
-  type ('a, 'b) t
+  type ('a, 'b) t = 'a array * 'b array
 
   let (clear : ('a, 'b) t -> 'a -> 'b -> unit)
-    = fun t a b ->
-      let t = Obj.repr t in
-      let size2 = Obj.size t in
-      let i = ref 0 in
-      while (!i < size2)
-      do
-        let base = !i in
-        Obj.set_field t (base)   (Obj.repr a);
-        Obj.set_field t (base+1) (Obj.repr b);
-        i := base + 2;
-      done
+    = fun (ta, tb) a b -> Array.(clear ta a; clear tb b)
 
   let (make : int -> 'a -> 'b -> ('a, 'b) t)
-    = fun size a b ->
-      let size2 = 2 * size in
-      let t  = Obj.obj (Obj.new_block 0 size2) in
-      clear t a b;
-      t
+    = fun size a b -> Array.(make size a, make size b)
 
   let (set : ('a, 'b) t -> int -> 'a -> 'b -> unit)
-    = fun t i a b ->
-      let t = Obj.repr t in
-      let base = 2 * i in
-      Obj.set_field t (base)   (Obj.repr a);
-      Obj.set_field t (base+1) (Obj.repr b)
+    = fun (ta, tb) i a b -> Array.(set ta i a; set tb i b)
 
-  let (get0 :
-         ('a, 'b) t -> int -> 'a)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 2 * i in
-      Obj.obj (Obj.field t (base))
+  let (get0 : ('a, 'b) t -> int -> 'a)
+    = fun (ta, _) i -> Array.get ta i
 
   let (get1 : ('a, 'b) t -> int -> 'b)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 2 * i in
-      Obj.obj (Obj.field t (base+1))
+    = fun (_, tb) i -> Array.get tb i
 end
 
 module Array_3 =
 struct
-  type ('a, 'b, 'c) t
+  type ('a, 'b, 'c) t = 'a array * 'b array * 'c array
 
-  let (clear : ('a, 'b, 'c) t ->
-       'a -> 'b -> 'c -> unit)
-    = fun t a b c ->
-      let t = Obj.repr t in
-      let size3 = Obj.size t in
-      let i = ref 0 in
-      while (!i < size3)
-      do
-        let base = !i in
-        Obj.set_field t (base)   (Obj.repr a);
-        Obj.set_field t (base+1) (Obj.repr b);
-        Obj.set_field t (base+2) (Obj.repr c);
-        i := base + 3;
-      done
+  let (clear : ('a, 'b, 'c) t -> 'a -> 'b -> 'c -> unit)
+    = fun (ta, tb, tc) a b c -> Array.(clear ta a; clear tb b; clear tc c)
 
   let (make : int -> 'a -> 'b -> 'c -> ('a, 'b, 'c) t)
-    = fun size a b c ->
-      let size3 = 3 * size in
-      let t  = Obj.obj (Obj.new_block 0 size3) in
-      clear t a b c;
-      t
+    = fun size a b c -> Array.(make size a, make size b, make size c)
 
   let (set : ('a, 'b, 'c) t -> int -> 'a -> 'b -> 'c -> unit)
-    = fun t i a b c ->
-      let t = Obj.repr t in
-      let base = 3 * i in
-      Obj.set_field t (base)   (Obj.repr a);
-      Obj.set_field t (base+1) (Obj.repr b);
-      Obj.set_field t (base+2) (Obj.repr c)
+    = fun (ta, tb, tc) i a b c -> Array.(set ta i a; set tb i b; set tc i c)
 
-  let (get0 :
-         ('a, 'b, 'c) t -> int -> 'a)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 3 * i in
-      Obj.obj (Obj.field t (base))
+  let (get0 : ('a, 'b, 'c) t -> int -> 'a)
+    = fun (ta, _, _) i -> Array.get ta i
 
   let (get1 : ('a, 'b, 'c) t -> int -> 'b)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 3 * i in
-      Obj.obj (Obj.field t (base+1))
+    = fun (_, tb, _) i -> Array.get tb i
 
-  let (get2 :
-         ('a, 'b, 'c) t -> int -> 'c)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 3 * i in
-      Obj.obj (Obj.field t (base+2))
+  let (get2 : ('a, 'b, 'c) t -> int -> 'c)
+    = fun (_, _, tc) i -> Array.get tc i
 end
 
 module Array_4 =
 struct
-  type ('a, 'b, 'c, 'd) t
+  type ('a, 'b, 'c, 'd) t = 'a array * 'b array * 'c array * 'd array
 
-  let (clear : ('a , 'b , 'c , 'd) t ->
-       'a -> 'b -> 'c -> 'd -> unit)
-    = fun t a b c d ->
-      let t = Obj.repr t in
-      let size4 = Obj.size t in
-      let i = ref 0 in
-      while (!i < size4)
-      do
-        let base = !i in
-        Obj.set_field t (base)   (Obj.repr a);
-        Obj.set_field t (base+1) (Obj.repr b);
-        Obj.set_field t (base+2) (Obj.repr c);
-        Obj.set_field t (base+3) (Obj.repr d);
-        i := base + 7;
-      done
+  let (clear : ('a , 'b , 'c , 'd) t -> 'a -> 'b -> 'c -> 'd -> unit)
+    = fun (ta, tb, tc, td) a b c d ->
+      Array.(clear ta a; clear tb b; clear tc c; clear td d)
 
-  let (make : int -> 'a -> 'b -> 'c -> 'd ->
-       ('a , 'b , 'c , 'd) t)
+  let (make : int -> 'a -> 'b -> 'c -> 'd -> ('a , 'b , 'c , 'd) t)
     = fun size a b c d ->
-      let size4 = 4 * size in
-      let t  = Obj.obj (Obj.new_block 0 size4) in
-      clear t a b c d;
-      t
+      Array.(make size a, make size b, make size c, make size d)
 
-  let (set :
-         ('a, 'b, 'c, 'd) t -> int ->
-       'a -> 'b -> 'c -> 'd -> unit)
-    = fun t i a b c d ->
-      let t = Obj.repr t in
-      let base = 4 * i in
-      Obj.set_field t (base)   (Obj.repr a);
-      Obj.set_field t (base+1) (Obj.repr b);
-      Obj.set_field t (base+2) (Obj.repr c);
-      Obj.set_field t (base+3) (Obj.repr d);
-  ;;
+  let (set : ('a, 'b, 'c, 'd) t -> int -> 'a -> 'b -> 'c -> 'd -> unit)
+    = fun (ta, tb, tc, td) i a b c d ->
+      Array.(set ta i a; set tb i b; set tc i c; set td i d)
 
-  let (get0 :
-         ('a, 'b, 'c, 'd) t -> int -> 'a)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 4 * i in
-      Obj.obj (Obj.field t (base))
+  let (get0 : ('a, 'b, 'c, 'd) t -> int -> 'a)
+    = fun (ta, _, _, _) i -> Array.get ta i
 
-  let (get1 :
-         ('a, 'b, 'c, 'd) t -> int -> 'b)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 4 * i in
-      Obj.obj (Obj.field t (base+1))
+  let (get1 : ('a, 'b, 'c, 'd) t -> int -> 'b)
+    = fun (_, tb, _, _) i -> Array.get tb i
 
-  let (get2 :
-         ('a, 'b, 'c, 'd) t -> int -> 'c)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 4 * i in
-      Obj.obj (Obj.field t (base+2))
+  let (get2 : ('a, 'b, 'c, 'd) t -> int -> 'c)
+    = fun (_, _, tc, _) i -> Array.get tc i
 
-  let (get3 :
-         ('a, 'b, 'c, 'd) t -> int -> 'd)
-    = fun t i ->
-      let t = Obj.repr t in
-      let base = 4 * i in
-      Obj.obj (Obj.field t (base+3))
+  let (get3 : ('a, 'b, 'c, 'd) t -> int -> 'd)
+    = fun (_, _, _, td) i -> Array.get td i
 end
 
 module Symmetric_Binary (H: Cacheable) (R: Result) =
