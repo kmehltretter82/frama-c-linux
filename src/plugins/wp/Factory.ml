@@ -193,6 +193,10 @@ struct
   let iter = refusage_iter
 end
 
+module Static = MemVar.Static
+module MemRegion = MemRegion.Make(RegionAnalysis)(MemBytes)
+module MemEva = MemVal.Make(MemVal.Eva)
+
 (* -------------------------------------------------------------------------- *)
 (* --- Generator & Model                                                  --- *)
 (* -------------------------------------------------------------------------- *)
@@ -200,20 +204,17 @@ end
 (* Each model must be instanciated statically because of registered memory
    models identifiers and Frama-C states *)
 
-module Register(V : MemVar.VarUsage)(M : Sigs.Model)
+module MakeVar(V : MemVar.VarUsage)(M : Sigs.Model)
   = MemVar.Make(MakeVarUsage(V))(M)
 
-
-module Model_Hoare_Raw = Register(MemVar.Raw)(MemEmpty)
-module Model_Hoare_Ref = Register(Ref)(MemEmpty)
-
-module Model_Typed_Var = Register(Var)(MemTyped)
-module Model_Typed_Ref = Register(Ref)(MemTyped)
-module Model_Bytes_Var = Register(Var)(MemBytes)
-module Model_Bytes_Ref = Register(Ref)(MemBytes)
-module Model_Caveat = Register(Caveat)(MemTyped)
-
-module MemVal = MemVal.Make(MemVal.Eva)
+module Model_Hoare_Raw = MakeVar(MemVar.Raw)(MemEmpty)
+module Model_Hoare_Ref = MakeVar(Ref)(MemEmpty)
+module Model_Typed_Var = MakeVar(Var)(MemTyped)
+module Model_Typed_Ref = MakeVar(Ref)(MemTyped)
+module Model_Bytes_Var = MakeVar(Var)(MemBytes)
+module Model_Bytes_Ref = MakeVar(Ref)(MemBytes)
+module Model_Caveat = MakeVar(Caveat)(MemTyped)
+module Model_Region = MakeVar(Static)(MemRegion)
 
 module MakeCompiler(M:Sigs.Model) =
 struct
@@ -223,7 +224,6 @@ struct
   module A = LogicAssigns.Make(M)(L)
 end
 
-
 module Comp_MemZeroAlias = MakeCompiler(MemZeroAlias)
 
 module Comp_Hoare_Raw = MakeCompiler(Model_Hoare_Raw)
@@ -232,20 +232,12 @@ module Comp_Hoare_Ref = MakeCompiler(Model_Hoare_Ref)
 module Comp_MemTyped = MakeCompiler(MemTyped)
 module Comp_Typed_Var = MakeCompiler(Model_Typed_Var)
 module Comp_Typed_Ref = MakeCompiler(Model_Typed_Ref)
-
 module Comp_Caveat = MakeCompiler(Model_Caveat)
-
 module Comp_MemBytes = MakeCompiler(MemBytes)
 module Comp_Bytes_Var = MakeCompiler(Model_Bytes_Var)
 module Comp_Bytes_Ref = MakeCompiler(Model_Bytes_Ref)
-
-module Comp_MemVal = MakeCompiler(MemVal)
-module Comp_Region =
-  MakeCompiler
-    (MemVar.Make
-       (MemVar.Static)
-       (MemRegion.Make(RegionAnalysis.R)(MemBytes)))
-
+module Comp_Region = MakeCompiler(Model_Region)
+module Comp_MemEva = MakeCompiler(MemEva)
 
 let compiler mheap mvar : (module Sigs.Compiler) =
   match mheap , mvar with
@@ -256,7 +248,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
   | Typed _ , Raw     -> (module Comp_MemTyped)
   | Typed _ , Var     -> (module Comp_Typed_Var)
   | Typed _ , Ref     -> (module Comp_Typed_Ref)
-  | Eva, _            -> (module Comp_MemVal)
+  | Eva, _            -> (module Comp_MemEva)
   | Bytes, Raw        -> (module Comp_MemBytes)
   | Bytes, Var        -> (module Comp_Bytes_Var)
   | Bytes, Ref        -> (module Comp_Bytes_Ref)
@@ -269,7 +261,7 @@ let compiler mheap mvar : (module Sigs.Compiler) =
 let configure_mheap = function
   | Hoare -> MemEmpty.configure ()
   | ZeroAlias -> MemZeroAlias.configure ()
-  | Eva -> MemVal.configure ()
+  | Eva -> MemEva.configure ()
   | Bytes -> MemBytes.configure ()
   | Typed p ->
     let rollback_memtyped = MemTyped.configure () in

@@ -29,6 +29,41 @@ open Sigs
 (* --- Region Memory Model                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+module type RegionProxy =
+sig
+  type region
+  val null : unit -> region
+
+  val hash : region -> int
+  val equal : region -> region -> bool
+  val compare : region -> region -> int
+  val pretty : Format.formatter -> region -> unit
+
+  type primitive = | Int of c_int | Float of c_float | Ptr
+  type kind = Single of primitive | Many of primitive | Garbled
+  val kind : region -> kind
+  val pp_kind : Format.formatter -> kind -> unit
+
+  val tau_of_region : region -> tau
+  val points_to : region -> region option
+
+  val separated : region -> region -> bool
+  val included : region -> region -> bool
+
+  val cvar : varinfo -> region option
+  val field : region -> fieldinfo -> region option
+  val shift : region -> c_object -> term -> region option
+  val base_addr : region -> region
+
+  val literal : eid:int -> Cstring.cst -> region option
+  val pointer_loc : unit -> region option
+  val loc_of_int : unit -> region option
+
+  val id_of_region : region -> int
+  val region_of_id : int -> region option
+
+end
+
 module type ModelWithLoader =
 sig
   include Sigs.Model
@@ -59,4 +94,4 @@ sig
   val init_footprint : c_object -> loc -> domain
 end
 
-module Make : RegionAnalysis.API -> ModelWithLoader -> Sigs.Model
+module Make : RegionProxy -> ModelWithLoader -> Sigs.Model
