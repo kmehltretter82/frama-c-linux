@@ -1386,7 +1386,8 @@ module InlineStmtContracts =
       let option_name = "-inline-stmt-contracts"
       let module_name = "InlineStmtContracts"
       let help = "transforms requires/ensures clauses of statement contracts \
-                  into plain assertions"
+                  into plain assertions, enabling their verification \
+                  by plug-ins with incomplete support for statement contracts."
     end)
 
 let () = Parameter_customize.set_group normalisation
