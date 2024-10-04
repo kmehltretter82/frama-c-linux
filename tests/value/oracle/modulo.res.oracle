@@ -26,8 +26,8 @@
   b ∈ [--..--]
   i2 ∈ [--..--]
 [eva] computing for function pgcd1 <- main.
-  Called from modulo.i:207.
-[eva:alarm] modulo.i:207: Warning: 
+  Called from modulo.i:210.
+[eva:alarm] modulo.i:210: Warning: 
   function pgcd1: precondition got status unknown.
 [eva] modulo.i:37: loop invariant got status valid.
 [eva] modulo.i:38: loop invariant got status valid.
@@ -40,8 +40,8 @@
 [eva] Recording results for pgcd1
 [eva] Done for function pgcd1
 [eva] computing for function pgcd2 <- main.
-  Called from modulo.i:208.
-[eva:alarm] modulo.i:208: Warning: 
+  Called from modulo.i:211.
+[eva:alarm] modulo.i:211: Warning: 
   function pgcd2: precondition got status unknown.
 [eva] modulo.i:50: loop invariant got status valid.
 [eva] modulo.i:53: Frama_C_show_each_2: [-10..10], [1..10], [-9..9]
@@ -49,15 +49,15 @@
 [eva] Recording results for pgcd2
 [eva] Done for function pgcd2
 [eva] computing for function pgcd3 <- main.
-  Called from modulo.i:209.
-[eva:alarm] modulo.i:209: Warning: 
+  Called from modulo.i:212.
+[eva:alarm] modulo.i:212: Warning: 
   function pgcd3: precondition got status unknown.
 [eva:alarm] modulo.i:63: Warning: division by zero. assert b_0 ≢ 0;
 [eva] modulo.i:64: Frama_C_show_each_3: [-10..10], [-10..10], [-9..9]
 [eva] Recording results for pgcd3
 [eva] Done for function pgcd3
 [eva] computing for function main2 <- main.
-  Called from modulo.i:211.
+  Called from modulo.i:214.
 [eva:alarm] modulo.i:9: Warning: signed overflow. assert -2147483648 ≤ 4 * i;
 [eva:alarm] modulo.i:9: Warning: signed overflow. assert 4 * i ≤ 2147483647;
 [eva:alarm] modulo.i:10: Warning: signed overflow. assert -2147483648 ≤ 4 * i;
@@ -69,12 +69,12 @@
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] computing for function simultaneous_congruences <- main.
-  Called from modulo.i:212.
+  Called from modulo.i:215.
 [eva:alarm] modulo.i:76: Warning: assertion got status unknown.
 [eva] Recording results for simultaneous_congruences
 [eva] Done for function simultaneous_congruences
 [eva] computing for function shift_modulo <- main.
-  Called from modulo.i:213.
+  Called from modulo.i:216.
 [eva:alarm] modulo.i:100: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:103: Warning: 
   signed overflow. assert (int)((int)(i * 12) + 5) << 25 ≤ 2147483647;
@@ -83,19 +83,19 @@
 [eva] Recording results for shift_modulo
 [eva] Done for function shift_modulo
 [eva] computing for function extract_bits_modulo <- main.
-  Called from modulo.i:214.
+  Called from modulo.i:217.
 [eva:alarm] modulo.i:109: Warning: assertion got status unknown.
 [eva] Recording results for extract_bits_modulo
 [eva] Done for function extract_bits_modulo
 [eva] computing for function pos_rem <- main.
-  Called from modulo.i:215.
+  Called from modulo.i:218.
 [eva:alarm] modulo.i:137: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:142: Warning: assertion got status unknown.
 [eva:alarm] modulo.i:146: Warning: assertion got status unknown.
 [eva] Recording results for pos_rem
 [eva] Done for function pos_rem
 [eva] computing for function address_modulo <- main.
-  Called from modulo.i:216.
+  Called from modulo.i:219.
 [eva:garbled-mix:write] modulo.i:158: 
   Assigning imprecise value to r because of arithmetic operation on addresses.
 [eva:alarm] modulo.i:159: Warning: division by zero. assert i ≢ 0;
@@ -112,7 +112,7 @@
 [eva] Recording results for address_modulo
 [eva] Done for function address_modulo
 [eva] computing for function test_overflow_alarms <- main.
-  Called from modulo.i:217.
+  Called from modulo.i:220.
 [eva:alarm] modulo.i:176: Warning: 
   signed overflow. assert a_0 / b_0 ≤ 2147483647;
 [eva] modulo.i:178: Frama_C_show_each: {-2147483648; 10}, {-1; 2}
@@ -131,6 +131,8 @@
 [eva] modulo.i:198: Frama_C_show_each: [-2147483648..2147483647]
 [eva:alarm] modulo.i:201: Warning: 
   signed overflow. assert min_int / min_one ≤ 2147483647;
+[eva:alarm] modulo.i:206: Warning: division by zero. assert y ≢ 0;
+[eva:alarm] modulo.i:206: Warning: signed overflow. assert x / y ≤ 2147483647;
 [eva] Recording results for test_overflow_alarms
 [eva] Done for function test_overflow_alarms
 [eva] Recording results for main
@@ -217,7 +219,7 @@
   b_0 ∈ {-1; 2}
   x ∈ [--..--]
   y ∈ [--..--]
-  r ∈ [-2147483647..0]
+  r ∈ [--..--]
 [eva:final-states] Values at end of function main:
   A ∈ {0}
   B ∈ {-3; 1}

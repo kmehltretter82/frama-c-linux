@@ -201,6 +201,9 @@ void test_overflow_alarms (void) {
     r = min_int % min_one; // Invalid alarm.
     Frama_C_show_each_BOTTOM(min_int, min_one);
   }
+  // Overflow alarm and division by zero alarm,
+  // no possible reduction: [x] and [y] must be top_int as the end.
+  r = x / y;
 }
 
 void main() {
