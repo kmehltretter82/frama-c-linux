@@ -110,6 +110,10 @@
 
 div.cg-spinner {
   padding-left: 5px;
+
+  .dome-xSpinner {
+    width: 60px;
+  }
 }
 
 .cg-three-states {

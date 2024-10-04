@@ -81,13 +81,13 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
   }
 
   const selectMenuItems: Dome.PopupMenuItem[] = [
-    menuItem('Select unproven properties',
+    menuItem('Select functions with unproven properties',
       () => updateNodes(unprovenPropertiesFunctions),
       unprovenPropertiesFunctions.size !== 0),
-    menuItem('Select scope from studia',
+    menuItem('Select functions listed in the Locations panel',
       () => updateNodes(selectedFunctions),
       selectedFunctions.size !== 0),
-    menuItem('Select tainted scope',
+    menuItem('Select functions with tainted properties',
       () => updateNodes(new Set(taintedFunctions)),
       taintedFunctions.length !== 0),
     menuItem('Select cycles',
@@ -101,16 +101,19 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
         <ButtonGroup className='show-mode-button-group'>
           <Button
             label='all'
+            title='show all nodes'
             selected={displayMode === 'all'}
             onClick={() => setDisplayMode("all")}
             />
           <Button
             label='linked'
+            title='only show nodes linked to the selected ones'
             selected={displayMode === 'linked'}
             onClick={() => setDisplayMode("linked")}
             />
           <Button
             label='selected'
+            title='only show selected nodes, their parents and their childrens'
             selected={displayMode === 'selected'}
             onClick={() => setDisplayMode("selected")}
             />
@@ -134,9 +137,8 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
       </div>
 
       <Button
-        label="select"
-        icon={'TUNINGS'}
-        title={`Select nodes`}
+        label="Select"
+        title={`Nodes selection`}
         onClick={() => Dome.popupMenu(selectMenuItems)}
       />
 
@@ -146,7 +148,6 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
         hor: <Spinner
         value={horizontalSpacing}
         title="Distance between the different graph depths"
-        className='cg-spinner-hor'
         vmin={0}
         vstep={100}
         onChange={setHorizontalSpacing}
@@ -159,7 +160,6 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
           "Disabled if the graph has cycles":
           "Distance between the different graph depths"}
         value={verticalSpacing}
-        className='cg-spinner-ver'
         vmin={0}
         vstep={20}
         onChange={setVerticalSpacing}

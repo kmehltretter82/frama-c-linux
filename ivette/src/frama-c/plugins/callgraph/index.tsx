@@ -220,7 +220,7 @@ function Callgraph(): JSX.Element {
   const [ verticalSpacing, setVerticalSpacing ] = Dome.useNumberSettings("ivette.callgraph.verticalspacing", 75);
   const [ horizontalSpacing, setHorizontalSpacing ] = Dome.useNumberSettings("ivette.callgraph.horizontalspacing", 500);
   const [ autoCenter, flipAutoCenter ] = Dome.useFlipSettings("eva.callgraph.autocenter", true);
-  const [ autoSelect, flipAutoSelect ] = Dome.useFlipSettings('eva.callgraph.autoselect', false);
+  const [ autoSelect, flipAutoSelect ] = Dome.useFlipSettings('eva.callgraph.autoselect', true);
   /* eslint-enable max-len */
 
   const style = Themes.useStyle();

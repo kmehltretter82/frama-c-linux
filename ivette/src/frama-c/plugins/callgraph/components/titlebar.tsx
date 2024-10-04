@@ -26,6 +26,30 @@ import * as Ivette from 'ivette';
 import * as Dome from 'dome';
 
 import { IconButton } from 'dome/controls/buttons';
+import { Inset } from 'dome/frame/toolbars';
+import * as Dialogs from 'dome/dialogs';
+
+// Help popup
+async function displayShortcuts(): Promise<void> {
+  await Dialogs.showMessageBox({
+    buttons: [{ label: "Ok" }],
+    details: (
+      'In the graph:\n' +
+      '  - Left-click: rotate the graph\n' +
+      '  - Right-click: move in the graph\n' +
+      '  - Mouse-wheel: zoom\n' +
+      '\n' +
+      'On nodes:\n' +
+      '  - Left-Click: select node (in the graph)\n'+
+      '  - Ctrl+click: add node to the selected nodes (multi-selection)\n' +
+      '  - Alt+click: select function (in all Ivette components)\n' +
+      '\n' +
+      'Function filters (in the titlebar of this component) are synchronized ' +
+      'with the filter of the functions sidebar.'
+    ),
+    message: 'Callgraph Help',
+  });
+}
 
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph titlebar component                                       --- */
@@ -48,30 +72,29 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
     <Ivette.TitleBar>
       <IconButton
         icon={'TUNINGS'}
-        title={`Functions filter`}
+        title={`Filter functions appearing in the graph`}
         onClick={() => Dome.popupMenu(contextMenuItems)}
       />
+      <Inset />
       <IconButton
         icon={"TARGET"}
         onClick={flipAutoCenter}
         kind={autoCenter ? "positive" : "default"}
-        title={
-          "If selected, the camera will be moved to show "+
-          "each node after each render"}
+        title={"Move the camera to show each node after each render"}
       />
       <IconButton
         icon={"PIN"}
         onClick={flipAutoSelect}
         kind={autoSelect ? "positive" : "default"}
-        title={"Selected nodes is sync with the current scope"}
+        title={"Automatically select node of the function selected in AST"}
       />
+      <Inset />
       <IconButton
-        icon={"HELP"}
-        title={"click: select element\n"+
-          "ctrl+click: Multiselection\n"+
-          "alt+click: change scope"}
-        className="titlebar-thin-icon"
+        icon="HELP"
+        onClick={displayShortcuts}
+        title='Callgraph help'
       />
+      <Inset />
     </Ivette.TitleBar>
   );
 }
