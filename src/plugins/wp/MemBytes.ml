@@ -198,12 +198,8 @@ type sigma = Sigma.t
 type domain = Sigma.domain
 type segment = loc rloc
 
-let comp_cluster () =
-  Definitions.cluster ~id:"Compound" ~title:"Memory Compound Loader" ()
-
 let shift_cluster () =
   Definitions.cluster ~id:"Shifts" ~title:"Shifts Definitions" ()
-
 
 (* ********************************************************************** *)
 (* SIZE                                                                   *)
@@ -676,9 +672,6 @@ module Model = struct
       let n = e_mul (e_int @@ sizeof_object obj) length in
       Why3.havoc fresh current loc n
     else fresh
-
-  let eqmem obj loc _chunk m1 m2 =
-    Why3.eqmem m1 m2 loc @@ sizeof obj
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in

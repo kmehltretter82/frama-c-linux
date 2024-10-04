@@ -33,7 +33,7 @@ open MemMemory
 
 module L = Qed.Logic
 
-module type ModelLoader = sig
+module type ModelWithLoader = sig
   include Sigs.Model
 
   val sizeof : c_object -> term
@@ -62,42 +62,16 @@ module type ModelLoader = sig
   val init_footprint : c_object -> loc -> Sigma.domain
 end
 
-module Make (R:RegionAnalysis.API) (M:ModelLoader) (* : Sigs.Model *) =
+module Make (R:RegionAnalysis.API) (M:ModelWithLoader) (* : Sigs.Model *) =
 struct
 
   type region = R.region
-
-  (***************************************************************************)
-  (*                                                                          *)
-  (*                               Extern API                                 *)
-  (*                                                                          *)
-  (***************************************************************************)
   let datatype = "MemRegion.Make"
   (* For projectification. Must be unique among models. *)
 
-  let configure () =
-    begin
-      let rollback () =
-        M.configure () () ;
-      in
-      rollback
-    end
-  (* Initializers to be run before using the model.
-      Typically push {i Context} values and returns a function to rollback.
-  *)
-
-  let configure_ia ia = (* TODO *) M.configure_ia ia
-  (* Given an automaton, return a vertex's binder.
-      Currently used by the automata compiler to bind current vertex.
-
-  *)
-
-  let hypotheses p = M.hypotheses p
-  (* Computes the memory model partitionning of the memory locations.
-      This function typically adds new elements to the partition received
-      in input (that can be empty).
-      ============================> TODO <======================================
-  *)
+  let configure = M.configure
+  let configure_ia = M.configure_ia
+  let hypotheses = M.hypotheses
 
   module BChunk = struct
 
@@ -110,7 +84,6 @@ struct
       | CGhost of R.region
 
     let self = "MemRegion.Make.RegionChunk"
-
 
     let hash = function
       | CVal r -> 0x02 * R.hash r
@@ -152,7 +125,6 @@ struct
       | CGhost _ -> "GhostChunk"
       | CVal   _ -> "ValueChunk"
       | CInit  _ -> "InitChunk"
-    (* Used when generating fresh variables for a chunk. *)
 
     let is_framed _ = false
 
@@ -171,7 +143,6 @@ struct
       | CRegion of BChunk.t
 
     let self = "MemRegion.Make.Chunk"
-    (* Chunk names, for pretty-printing. *)
 
     let hash = function
       | CModel c -> M.Chunk.hash c
@@ -200,25 +171,8 @@ struct
     let is_framed = function
       | CModel c -> M.Chunk.is_framed c
       | CRegion _ -> false
-      (* Whether the chunk is local to a function call.
 
-          Means the chunk is separated from anyother call side-effects.
-          If [true], entails that a function assigning everything can not modify
-          the chunk. Only used for optimisation, it would be safe to always
-          return [false]. *)
   end
-  (* Memory Chunks.
-
-      The concrete memory is partionned into a vector of abstract data.
-      Each component of the partition is called a {i memory chunk} and
-      holds an abstract representation of some part of the memory.
-
-      Remark: memory chunks are not required to be independant from each other,
-      provided the memory model implementation is consistent with the chosen
-      representation. Conversely, a given object might be represented by
-      several memory chunks.
-
-  *)
 
   module Heap = Qed.Collection.Make(Chunk)
 
@@ -389,11 +343,6 @@ struct
     let union = Chunk.Set.union
 
   end
-
-  (* ************************************************************************ *)
-  (* ***   MemLoader instanciation from the implementation of MemTyped    *** *)
-  (* ************************************************************************ *)
-
 
   (***************************************************************************)
   (* module Region : MemLoader.Module                                       **)
@@ -673,8 +622,6 @@ struct
                   R.pretty region R.pp_kind k Printer.pp_typ ty
               in assert false
           in Loc { repr ; region = r }
-
-
 
     (* ---------------------------------------------------------------------- *)
     (* --- Store                                                          --- *)
@@ -1027,16 +974,6 @@ struct
   let initialized = LOADER.initialized
   let domain = LOADER.domain
 
-(*
-  let sloc_oget = function
-  | Sloc None -> Sloc M.null, None
-  | Sloc (Some { Region.repr = repr }) -> Sloc repr
-  | Sarray (None,a,b) ->
-  | Srange (None,_,_,_)
-  | Sdescr (_,None,_) ->
-  |
-*)
-
   let assigned seq ty sloc = match sloc with
     | Sloc (Region.Null) | Sarray (Region.Null,_,_)
     | Srange (Region.Null,_,_,_) | Sdescr (_,Region.Null,_) ->
@@ -1348,7 +1285,7 @@ struct
       if R.separated region1 region2 then p_true
       else M.separated rl1 rl2
 
-  let chunk_is_well_formed sigma chunk = match chunk with
+  let is_well_formed_chunk sigma chunk = match chunk with
     | Chunk.CModel _ | Chunk.CRegion (B.CInit _)
     | Chunk.CRegion (B.CGhost _) -> p_true
     | Chunk.CRegion (B.CVal region) -> match R.kind region with
@@ -1362,10 +1299,11 @@ struct
       | R.Single (R.Int cint) ->
         Cint.range cint @@ Sigma.value sigma chunk
 
-
   let is_well_formed sigma =
-    p_and (M.is_well_formed sigma.Tuple.model)
-    @@ p_conj @@ Sigma.Chunk.Set.fold (fun c l -> chunk_is_well_formed sigma c :: l) (Sigma.domain sigma) []
-
+    p_conj @@
+    Sigma.Chunk.Set.fold
+      (fun c l -> is_well_formed_chunk sigma c :: l)
+      (Sigma.domain sigma)
+      [M.is_well_formed sigma.model]
 
 end
