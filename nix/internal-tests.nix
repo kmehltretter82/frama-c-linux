@@ -11,6 +11,12 @@
 , writeText
 # Generic
 , findlib
+# Frama-Clang
+, cmake
+, camlp5
+, camlp-streams
+, gnused
+, llvmPackages
 # Frama-C build
 , apron
 , camlzip
@@ -68,6 +74,9 @@ stdenvNoCC.mkDerivation rec {
 
   src = gitignoreSource ./..;
 
+  # Prevent CMake from doing stuff without being asked
+  dontUseCmakeConfigure=true;
+
   nativeBuildInputs = [
     which
     wrapGAppsHook
@@ -75,18 +84,24 @@ stdenvNoCC.mkDerivation rec {
 
   buildInputs = [
     apron
+    camlp5
+    camlp-streams
     camlzip
     camomile
     clang
+    cmake
     dune_3
     dune-configurator
     dune-site
     findlib
     fpath
     gcc9
+    gnused
     graphviz
     lablgtk3
     lablgtk3-sourceview3
+    llvmPackages.llvm.dev
+    llvmPackages.clang-unwrapped.dev
     ltl2ba
     menhir
     menhirLib
