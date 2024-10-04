@@ -348,6 +348,17 @@ module Make
     | `TrueReduced v -> `TrueReduced (f v)
     | `True | `False | `Unreachable as x -> x
 
+  (* Assumes that the abstract value [value] represents only values
+     different from integer [i]. *)
+  let assume_non_equal context typ value i =
+    let forward_binop = Value.forward_binop context typ in
+    (* Bottom should never happen on addition or subtraction. *)
+    let add v1 v2 = Bottom.non_bottom (forward_binop PlusA v1 v2) in
+    let sub v1 v2 = Bottom.non_bottom (forward_binop MinusA v1 v2) in
+    let v_i = Value.inject_int typ i in
+    let truth = Value.assume_non_zero (sub value v_i) in
+    apply_on_truth (fun value -> add value v_i) truth
+
   (* Handles the result of an [assume] function from value abstractions (see
      abstract_values.mli for more details), applied to the initial [value].
      If the value could have been reduced, [reduce] is applied on the new value.
@@ -562,10 +573,15 @@ module Make
     let truth = Value.assume_bounded Alarms.Upper_bound size_int value in
     reduce_by_truth ~alarm (index_expr, value) truth
 
-  (* If [typ] is a signed integer type, emits an alarm for a division overflow
-     if [v1] can be equal to min_int AND [v2] can be equal to [-1].
+  (* Checks the arguments of a division and creates a division by zero alarm
+     if [v2] can be equal to 0, and an overflow alarm if [typ] is a signed
+     integer type, [v1] can be equal to min_int AND [v2] can be equal to -1.
      Also reduces the values of [v1] or [v2] accordingly when possible. *)
   let assume_valid_div context typ (e1, v1) (e2, v2) =
+    let open Evaluated.Operators in
+    let truth = Value.assume_non_zero v2 in
+    let alarm () = Alarms.Division_by_zero (Eva_ast.to_cil_exp e2) in
+    let* v2 = reduce_by_truth ~alarm (e2, v2) truth in
     match Eval_typ.integer_range ~ptr:false typ with
     | Some range when range.i_signed ->
       let min_int = Eval_typ.range_lower_bound range in
@@ -575,30 +591,19 @@ module Make
         let cil_expr = Eva_ast.to_cil_exp expr in
         Alarms.(Overflow (Signed, cil_expr, max_int, Upper_bound))
       in
-      let forward_binop = Value.forward_binop context typ in
-      (* Bottom should never happen on addition or subtraction. *)
-      let add v1 v2 = Bottom.non_bottom (forward_binop PlusA v1 v2) in
-      let sub v1 v2 = Bottom.non_bottom (forward_binop MinusA v1 v2) in
-      let assume_non_equal value i =
-        let v_i = Value.inject_int typ i in
-        let truth = Value.assume_non_zero (sub value v_i) in
-        apply_on_truth (fun value -> add value v_i) truth
-      in
-      let truth1 = assume_non_equal v1 min_int in
-      let truth2 = assume_non_equal v2 Integer.minus_one in
+      let truth1 = assume_non_equal context typ v1 min_int in
+      let truth2 = assume_non_equal context typ v2 Integer.minus_one in
       let truth = disjunctive_truth (v1, truth1) (v2, truth2) in
       reduce_both_by_truth ~alarm (Some e1, v1) (e2, v2) truth
     | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
-    let open Evaluated.Operators in
     if Cil.isIntegralType typ then
       match op with
       | Div | Mod ->
-        let truth = Value.assume_non_zero v2 in
-        let alarm () = Alarms.Division_by_zero (Eva_ast.to_cil_exp e2) in
-        let* v2 = reduce_by_truth ~alarm arg2 truth in
-        assume_valid_div context typ (e1, v1) (e2, v2)
+        (* The behavior of a%b is undefined if the behavior of a/b is undefined,
+           according to section 6.5.5 §5 and §6 of the C standard. *)
+        assume_valid_div context typ arg1 arg2
       | Shiftrt ->
         let warn_negative = Kernel.RightShiftNegative.get () in
         reduce_shift ~warn_negative typ arg1 arg2
