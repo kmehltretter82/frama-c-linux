@@ -74,7 +74,7 @@ struct
   type region = Region.node
 
   let get_map () = match WpContext.get_scope () with
-    | WpContext.Kf f   -> Region.get_map f
+    | WpContext.Kf f   -> Region.map f
     | WpContext.Global -> Wp_parameters.not_yet_implemented "[WP/RegionAnalysis.ml] get_map: No global region analysis yet"
 
   let null () : region =
@@ -83,19 +83,19 @@ struct
     Wp_parameters.not_yet_implemented "[WP/RegionAnalysis.ml] null: cannot create null region"
 
 
-  let id_of_region region = Region.get_uid (get_map ()) region
+  let id_of_region region = Region.uid (get_map ()) region
 
   let region_of_id id =
-    try Some (Region.get_node (get_map ()) id)
+    try Some (Region.find (get_map ()) id)
     with Not_found -> None
 
-  let hash = Region.get_id
+  let hash = Region.id
 
-  let equal r1 r2 = (Region.get_id r1 = Region.get_id r2)
+  let equal r1 r2 = (Region.id r1 = Region.id r2)
 
-  let compare r1 r2 = Int.compare (Region.get_id r1) (Region.get_id r2)
+  let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
 
-  let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.get_id r
+  let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
 
   type primitive = | Int of c_int | Float of c_float | Ptr
   type kind = Single of primitive | Many of primitive | Garbled

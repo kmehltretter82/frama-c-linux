@@ -70,12 +70,12 @@ val equal : map -> node -> node -> bool
 val node : map -> node -> node
 val nodes : map -> node list -> node list
 
-val iter : map -> (region -> unit) -> unit
-val iter_node : map -> (node -> unit) -> unit
+val iter : map -> (node -> unit) -> unit
 val region : map -> node -> region
 val regions : map -> region list
 val parents : map -> node -> node list
 val roots : map -> node -> varinfo list
+val labels : map -> node -> string list
 
 val new_chunk : map -> ?size:int -> ?ptr:node -> ?pointed:node -> unit -> node
 val add_root : map -> Cil_types.varinfo -> node

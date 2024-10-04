@@ -314,6 +314,8 @@ let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
   }
 
 let make_region (m: map) (n: node) (r: chunk) : region =
+  let types = types r in
+  let sizeof = sizeof r.clayout in
   let fields = fields r.clayout in
   {
     node = n ;
@@ -323,31 +325,14 @@ let make_region (m: map) (n: node) (r: chunk) : region =
     reads = Access.Set.elements r.creads ;
     writes = Access.Set.elements r.cwrites ;
     shifts = Access.Set.elements r.cshifts ;
-    types = types r ;
-    sizeof = sizeof r.clayout ;
-    fields ; ranges = List.map (make_range m fields) @@ ranges r.clayout ;
+    types ; sizeof ; fields ;
+    ranges = List.map (make_range m fields) (ranges r.clayout) ;
     pointed = Option.map (node m) (pointed r.clayout) ;
   }
 
 let region map n = make_region map n (get map n)
 
-let rec walk h m f n =
-  let n = Ufind.find m.store n in
-  let id = Store.id n in
-  try Hashtbl.find h id with Not_found ->
-    Hashtbl.add h id () ;
-    let r = Ufind.get m.store n in
-    f (make_region m n r) ;
-    match r.clayout with
-    | Blob -> ()
-    | Cell(_,p) -> Option.iter (walk h m f) p
-    | Compound(_,_,rg) -> Ranges.iter (walk h m f) rg
-
-let iter (m:map) (f: region -> unit) =
-  let h = Hashtbl.create 0 in
-  Vmap.iter (fun _x n -> walk h m f n) m.roots
-
-let rec walk_node h m (f: node -> unit) n =
+let rec walk h m (f: node -> unit) n =
   let n = Ufind.find m.store n in
   let id = Store.id n in
   try Hashtbl.find h id with Not_found ->
@@ -356,25 +341,26 @@ let rec walk_node h m (f: node -> unit) n =
     let r = Ufind.get m.store n in
     match r.clayout with
     | Blob -> ()
-    | Cell(_,p) -> Option.iter (walk_node h m f) p
-    | Compound(_,_,rg) -> Ranges.iter (walk_node h m f) rg
+    | Cell(_,p) -> Option.iter (walk h m f) p
+    | Compound(_,_,rg) -> Ranges.iter (walk h m f) rg
 
-let iter_node (m:map) (f: node -> unit) =
+let iter (m:map) (f: node -> unit) =
   let h = Hashtbl.create 0 in
-  Vmap.iter (fun _x n -> walk_node h m f n) m.roots
+  Vmap.iter (fun _x n -> walk h m f n) m.roots
 
 let regions map =
   let pool = ref [] in
-  iter map (fun r -> pool := r :: !pool) ;
+  iter map (fun r -> pool := region map r :: !pool) ;
   List.rev !pool
 
-
 let parents (m: map) (r: node) =
-  let chunk = Ufind.get m.store r in
-  nodes m chunk.cparents
+  nodes m (Ufind.get m.store r).cparents
 
 let roots (m: map) (r: node) =
-  let chunk = Ufind.get m.store r in Vset.elements chunk.croots
+  Vset.elements (Ufind.get m.store r).croots
+
+let labels (m: map) (r: node) =
+  Lset.elements (Ufind.get m.store r).clabels
 
 (* -------------------------------------------------------------------------- *)
 (* --- Merge                                                              --- *)
