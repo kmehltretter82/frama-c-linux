@@ -36,14 +36,11 @@ val pp_kind : Format.formatter -> kind -> unit
 module type RegionProxy =
 sig
   type region
-  val null : unit -> region
-
-  val hash : region -> int
-  val equal : region -> region -> bool
-  val compare : region -> region -> int
-  val pretty : Format.formatter -> region -> unit
+  module Type : Sigs.Type with type t = region
 
   val kind : region -> kind
+
+  val null : unit -> region
 
   val tau_of_region : region -> tau
   val points_to : region -> region option
@@ -60,7 +57,7 @@ sig
   val pointer_loc : unit -> region option
   val loc_of_int : unit -> region option
 
-  val id_of_region : region -> int
+  val id : region -> int
   val region_of_id : int -> region option
 
 end

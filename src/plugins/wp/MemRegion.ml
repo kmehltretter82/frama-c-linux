@@ -26,7 +26,6 @@
 
 open Cil_types
 open Ctypes
-open Lang
 open Lang.F
 open Sigs
 open MemMemory
@@ -37,15 +36,16 @@ type kind = Single of primitive | Many of primitive | Garbled
 let pp_prim fmt = function
   | Int i -> Ctypes.pp_int fmt i
   | Float f -> Ctypes.pp_float fmt f
-  | Ptr -> Format.pp_print_string fmt "void*"
+  | Ptr -> Format.pp_print_string fmt "ptr"
+
 let pp_kind fmt = function
   | Single p -> pp_prim fmt p
   | Many p -> Format.fprintf fmt "[%a]" pp_prim p
   | Garbled -> Format.pp_print_string fmt "[bytes]"
 
-let tau_of_primitive = function
+let tau_of_prim = function
   | Int _ -> Qed.Logic.Int
-  | Float c_float -> Cfloat.tau_of_float c_float
+  | Float f -> Cfloat.tau_of_float f
   | Ptr -> MemAddr.t_addr
 
 (* -------------------------------------------------------------------------- *)
@@ -55,12 +55,8 @@ let tau_of_primitive = function
 module type RegionProxy =
 sig
   type region
+  module Type : Sigs.Type with type t = region
   val null : unit -> region
-
-  val hash : region -> int
-  val equal : region -> region -> bool
-  val compare : region -> region -> int
-  val pretty : Format.formatter -> region -> unit
 
   val kind : region -> kind
 
@@ -72,15 +68,15 @@ sig
 
   val cvar : varinfo -> region option
   val field : region -> fieldinfo -> region option
-  val shift : region -> c_object -> term -> region option
+  val shift : region -> c_object -> region option
   val base_addr : region -> region
 
   val literal : eid:int -> Cstring.cst -> region option
   val pointer_loc : unit -> region option
   val loc_of_int : unit -> region option
 
-  val id_of_region : region -> int
-  val region_of_id : int -> region option
+  val id : region -> int
+  val of_id : int -> region option
 
 end
 
@@ -122,7 +118,7 @@ end
 (* --- Region Memory Model                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Make (R:RegionProxy) (M:ModelWithLoader) : Sigs.Model =
+module Make (R:RegionProxy) (M:ModelWithLoader) (*: Sigs.Model*) =
 struct
 
   type region = R.region
@@ -133,268 +129,191 @@ struct
   let configure_ia = M.configure_ia
   let hypotheses = M.hypotheses
 
-  module BChunk = struct
+  module MChunk = M.Chunk
+  module RChunk =
+  struct
+    let self = "MemRegion.RChunk"
 
-    (* Do not warn on unused constructors, even if they are not used yet. *)
-    [@@@ warning "-37" ]
+    type mu = Value of primitive | Array of primitive | ValInit | ArrInit
+    type t = { mu : mu ; region : R.region }
 
-    type t =
-      | CVal of R.region
-      | CInit of R.region
-      | CGhost of R.region
+    let pp_mu fmt = function
+      | Value p -> Format.fprintf fmt "µ%a" pp_prim p
+      | Array p -> Format.fprintf fmt "µ%a[]" pp_prim p
+      | ValInit -> Format.pp_print_string fmt "µinit"
+      | ArrInit -> Format.pp_print_string fmt "µinit[]"
 
-    let self = "MemRegion.Make.RegionChunk"
+    let hash { mu ; region } = Hashtbl.hash (mu, R.Type.hash region)
+    let equal a b = Stdlib.(=) a.mu b.mu && R.Type.equal a.region b.region
+    let compare a b =
+      let cmp = Stdlib.compare a.mu b.mu in
+      if cmp <> 0 then cmp else R.Type.compare a.region b.region
 
-    let hash = function
-      | CVal r -> 0x02 * R.hash r
-      | CInit r -> 0x100 * R.hash r
-      | CGhost r -> 0x10000 * R.hash r
+    let pretty fmt { mu ; region } =
+      Format.fprintf fmt "%a@%03d" pp_mu mu (R.id region)
 
-    let equal c1 c2 = match c1, c2 with
-      | CVal r1, CVal r2 | CInit r1, CInit r2 | CGhost r1, CGhost r2 -> R.equal r1 r2
-      | _ -> false
+    let tau_of_chunk { mu } =
+      match mu with
+      | Value p -> tau_of_prim p
+      | ValInit -> Qed.Logic.Bool
+      | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
+      | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
 
-    let compare c1 c2 = hash c1 - hash c2
-
-    let pretty fmt = function
-      | CVal   _ -> Format.fprintf fmt "Value"
-      | CInit  _ -> Format.fprintf fmt "Init"
-      | CGhost _ -> Format.fprintf fmt "Ghost"
-
-    let tau_of_chunk = function
-      | CVal r | CGhost r ->
-        begin match R.kind r with
-          | Single p -> tau_of_primitive p
-          | Many   p -> Qed.Logic.Array (MemAddr.t_addr, tau_of_primitive p)
-          | Garbled  -> assert false
-        end
-      | CInit  r ->
-        begin match R.kind r with
-          | Single _ -> t_bool
-          | Many   _ -> t_init
-          | Garbled -> assert false
-        end
-
-    let basename_of_chunk = function
-      | CGhost _ -> "GhostChunk"
-      | CVal   _ -> "ValueChunk"
-      | CInit  _ -> "InitChunk"
+    let basename_of_chunk { mu } =
+      match mu with
+      | Value p -> Format.asprintf "V%a" pp_prim p
+      | Array p -> Format.asprintf "M%a" pp_prim p
+      | ValInit -> "Vinit"
+      | ArrInit -> "Minit"
 
     let is_framed _ = false
 
   end
 
-  module B = BChunk
+  module MHeap = M.Heap
+  module MSigma = M.Sigma
 
-  module BHeap = Qed.Collection.Make(B)
+  module RHeap = Qed.Collection.Make(RChunk)
+  module RSigma = Sigma.Make(RChunk)(RHeap)
 
-  module BSigma = Sigma.Make(BChunk)(BHeap)
+  type chunk =
+    | M of MChunk.t
+    | R of RChunk.t
+
+  let cmap f g (m,r) = (f m, g r)
+  let cmap2 f g (m1,r1) (m2,r2) = (f m1 m2, g r1 r2)
+  let capply f g (m,r) = function M c -> f m c, r | R c -> m, g r c
+  let cmerge f g c (m,r) = match c with M c -> f m c | R c -> g r c
 
   module Chunk =
   struct
-    type t =
-      | CModel of M.chunk
-      | CRegion of BChunk.t
-
     let self = "MemRegion.Make.Chunk"
 
+    type t = chunk
+
     let hash = function
-      | CModel c -> M.Chunk.hash c
-      | CRegion c -> 0x1000 * (B.hash c)
+      | M c -> 3 * MChunk.hash c
+      | R c -> 5 * RChunk.hash c
 
     let equal ca cb = match ca, cb with
-      | CModel  c1, CModel  c2 -> M.Chunk.equal c1 c2
-      | CRegion c1, CRegion c2 -> B.equal       c1 c2
-      | CModel _, CRegion _ | CRegion _, CModel _ -> false
+      | M c1, M c2 -> MChunk.equal c1 c2
+      | R c1, R c2 -> RChunk.equal c1 c2
+      | M _, R _ | R _, M _ -> false
 
-    let compare c1 c2 = (hash c1) - (hash c2)
+    let compare c1 c2 =
+      match c1, c2 with
+      | M m1, M m2 -> MChunk.compare m1 m2
+      | R r1, R r2 -> RChunk.compare r1 r2
+      | M _, R _ -> (-1)
+      | R _, M _ -> (+1)
 
     let pretty fmt = function
-      | CModel  c -> Format.fprintf fmt "CModel.%a" M.Chunk.pretty c
-      | CRegion c -> Format.fprintf fmt "CRegion.%a" B.pretty c
+      | M c -> MChunk.pretty fmt c
+      | R c -> RChunk.pretty fmt c
 
     let tau_of_chunk = function
-      | CModel c -> M.Chunk.tau_of_chunk c
-      | CRegion c -> B.tau_of_chunk c
+      | M c -> MChunk.tau_of_chunk c
+      | R c -> RChunk.tau_of_chunk c
 
     let basename_of_chunk = function
-      | CModel  _ -> "Model"
-      | CRegion _ -> "Region"
-    (* Used when generating fresh variables for a chunk. *)
+      | M c -> MChunk.basename_of_chunk c
+      | R c -> RChunk.basename_of_chunk c
 
     let is_framed = function
-      | CModel c -> M.Chunk.is_framed c
-      | CRegion _ -> false
+      | M c -> MChunk.is_framed c
+      | R c -> RChunk.is_framed c
 
   end
 
   module Heap = Qed.Collection.Make(Chunk)
 
-  module Tuple = struct
-    type ('a, 'b) tuple = {
-      model  : 'a ;
-      region : 'b ;
-    }
+  type sigma = MSigma.t * RSigma.t
+  type domain = Heap.Set.t
 
-    let create f1 f2 input = {
-      model  = f1 input ;
-      region = f2 input ;
-    }
+  module Sigma =
+  struct
 
-    let iter f1 f2 tuple =
-      f1 tuple.model  ;
-      f2 tuple.region ;
-      ()
-
-    let iter2 f1 f2 t1 t2 =
-      f1 t1.model  t2.model  ;
-      f2 t1.region t2.region ;
-      ()
-
-    let choose_apply f1 f2 tuple = function
-      | Chunk.CModel  c -> f1 tuple.model  c
-      | Chunk.CRegion c -> f2 tuple.region c
-
-    let choose_map f1 f2 tuple = function
-      | Chunk.CModel  c -> { tuple with model  = f1 tuple.model  c }
-      | Chunk.CRegion c -> { tuple with region = f2 tuple.region c }
-
-    let map f1 f2 tuple = {
-      model  = f1 tuple.model  ;
-      region = f2 tuple.region ;
-    }
-
-    let map2 f1 f2 t1 t2 = {
-      model = f1 t1.model t2.model ;
-      region = f2 t1.region t2.region ;
-    }
-
-    let sequence_map f1 f2 seq = {
-      model  = f1 { pre = seq.pre.model  ; post = seq.post.model  } ;
-      region = f2 { pre = seq.pre.region ; post = seq.post.region } ;
-    }
-  end
-
-  type sigma = (M.sigma, BSigma.t) Tuple.tuple
-
-  module Sigma = (* Sigma.Make(Chunk)(Heap) *) struct
-
-    open Tuple
     type t = sigma
     type chunk = Chunk.t
+    module Chunk = Chunk
 
-    open Chunk
+    let create () : sigma = (MSigma.create (), RSigma.create ())
 
-    type domain = Heap.set
-
-    type dom = (M.Sigma.domain, BSigma.domain) Tuple.tuple
-
-    (* local *)
-    let chunk_split_list l =
-      let rec aux acc1 acc2 = function
-        | [] -> { model = List.rev acc1 ; region = List.rev acc2 }
-        | CModel  c :: rest -> aux (c::acc1) acc2 rest
-        | CRegion c :: rest -> aux acc1 (c::acc2) rest
-      in aux [] [] l
-
-    let of_domain (domain:domain) : dom =
-      Tuple.map
-        M.Sigma.Chunk.Set.of_list
-        BSigma.Chunk.Set.of_list
-      @@ chunk_split_list
-      @@ Heap.Set.elements domain
-
-    let to_domain (dom:dom) : domain =
-      let cmodel = M.Heap.Set.elements dom.model in
-      let cRegion = BSigma.Chunk.Set.elements dom.region in
-      let model = Heap.Set.of_list (List.map (fun c -> CModel  c) cmodel) in
-      let region = Heap.Set.of_list (List.map (fun c -> CRegion c) cRegion) in
-      Heap.Set.union model region
-
-    module Chunk = Heap
-
-
-    let create = Tuple.create M.Sigma.create BSigma.create
-
-    let pretty fmt sigma =
-      Format.fprintf fmt "@[{@[%a@];@[%a@]}@]"
-        M.Sigma.pretty sigma.model
-        BSigma.pretty sigma.region
+    let pretty fmt (m,r) =
+      Format.fprintf fmt "@[<hv 0>{@[<hv 2>@ %a;@ %a;@]@ }@]"
+        MSigma.pretty m
+        RSigma.pretty r
 
     let empty : domain = Heap.Set.empty
+    let mem = cmerge MSigma.mem RSigma.mem
+    let get = cmerge MSigma.get RSigma.get
+    let value = cmerge MSigma.value RSigma.value
+    let copy = cmap MSigma.copy RSigma.copy
+    let choose = cmap2 MSigma.choose RSigma.choose
+    let havoc_chunk = cmap MSigma.havoc_chunk RSigma.havoc_chunk
+    let havoc_any ~call = cmap (MSigma.havoc_any ~call) (RSigma.havoc_any ~call)
 
-    let mem = Tuple.choose_apply M.Sigma.mem BSigma.mem
+    let merge (m1,r1) (m2,r2) =
+      let m,p1,p2 = MSigma.merge m1 m2 in
+      let r,q1,q2 = RSigma.merge r1 r2 in
+      (m,r), Passive.union p1 q1, Passive.union p2 q2
 
-    let get = Tuple.choose_apply M.Sigma.get BSigma.get
+    let merge_list l =
+      let m,p = MSigma.merge_list @@ List.map fst l in
+      let r,q = RSigma.merge_list @@ List.map snd l in
+      (m,r), List.map2 Passive.union p q
 
-    let writes sigma = to_domain @@ Tuple.sequence_map M.Sigma.writes BSigma.writes sigma
+    let join (m1,r1) (m2,r2) =
+      Passive.union (MSigma.join m1 m2) (RSigma.join r1 r2)
 
-    let value = Tuple.choose_apply M.Sigma.value BSigma.value
+    let iter f (m,r) =
+      begin
+        MSigma.iter (fun c -> f (M c)) m ;
+        RSigma.iter (fun c -> f (R c)) r ;
+      end
 
-    let copy = Tuple.map M.Sigma.copy BSigma.copy
+    let iter2 f (m1,r1) (m2,r2) =
+      begin
+        MSigma.iter2 (fun c -> f (M c)) m1 m2 ;
+        RSigma.iter2 (fun c -> f (R c)) r1 r2 ;
+      end
 
-    let join sigma1 sigma2 =
-      let r = Tuple.map2 M.Sigma.join BSigma.join sigma1 sigma2 in
-      Passive.union r.model r.region
+    let mdomain d =
+      MHeap.Set.fold (fun c s -> Heap.Set.add (M c) s) d Heap.Set.empty
+    let rdomain d =
+      RHeap.Set.fold (fun c s -> Heap.Set.add (R c) s) d Heap.Set.empty
 
-    let assigned ~pre:sigma1 ~post:sigma2 domain =
-      let dom = of_domain domain in
-      Bag.concat (M.Sigma.assigned ~pre:sigma1.model ~post:sigma2.model dom.model)
-      @@ BSigma.assigned ~pre:sigma1.region ~post:sigma2.region dom.region
+    let dsplit d =
+      let m = ref MHeap.Set.empty in
+      let r = ref RHeap.Set.empty in
+      Heap.Set.iter
+        (function
+          | M c -> m := MHeap.Set.add c !m
+          | R c -> r := RHeap.Set.add c !r
+        ) d ;
+      !m, !r
 
-    let choose = Tuple.map2 M.Sigma.choose BSigma.choose
+    let assigned ~pre:(m1,r1) ~post:(m2,r2) d =
+      let m,r = dsplit d in
+      let hm = MSigma.assigned ~pre:m1 ~post:m2 m in
+      let hr = RSigma.assigned ~pre:r1 ~post:r2 r in
+      Bag.concat hm hr
 
-    let merge s1 s2 =
-      let (sm, pm1, pm2) = M.Sigma.merge s1.model s2.model in
-      let (sb, pb1, pb2) = BSigma.merge s1.region s2.region in
-      let s = { model = sm ; region = sb } in
-      let p1 = Passive.union pm1 pb1 in
-      let p2 = Passive.union pm2 pb2 in
-      (s,p1,p2)
+    let havoc (m,r) d =
+      let dm,dr = dsplit d in
+      MSigma.havoc m dm, RSigma.havoc r dr
 
-    let merge_list ls = (* TOCHECK *)
-      let f (s1,lp) s2 =
-        let (s,p1,p2) = merge s1 s2 in
-        (s, p1::p2::lp)
-      in
-      match ls with
-      | [] -> (create (), [])
-      | [ s ] -> (s, [ Passive.empty ])
-      | _ -> List.fold_left f (create (), []) ls
+    let remove_chunks (m,r) d =
+      let dm,dr = dsplit d in
+      MSigma.remove_chunks m dm, RSigma.remove_chunks r dr
 
-    let iter f =
-      Tuple.iter
-        (M.Sigma.iter (fun c -> f (CModel c)))
-        (BSigma.iter (fun c -> f (CRegion c)))
+    let domain (m,r) =
+      Heap.Set.union (mdomain @@ MSigma.domain m) (rdomain @@ RSigma.domain r)
 
-    let iter2 f =
-      Tuple.iter2
-        (M.Sigma.iter2 (fun c -> f (CModel c)))
-        (BSigma.iter2 (fun c -> f (CRegion c)))
-
-    let havoc_chunk = Tuple.choose_map M.Sigma.havoc_chunk BSigma.havoc_chunk
-
-    let havoc sigma domain =
-      let dom = of_domain domain in
-      Tuple.map2 M.Sigma.havoc BSigma.havoc sigma dom
-
-    let havoc_any ~call:call =
-      Tuple.map (M.Sigma.havoc_any ~call) (BSigma.havoc_any ~call)
-
-    let remove_chunks sigma domain =
-      let dom = of_domain domain in
-      Tuple.map2 M.Sigma.remove_chunks BSigma.remove_chunks sigma dom
-
-    let dom = Tuple.map M.Sigma.domain BSigma.domain
-
-    let domain sigma =
-      let dom = dom sigma in
-      Chunk.Set.of_list
-      @@ List.append
-        (List.map (fun l -> CModel l) (M.Heap.Set.elements dom.model))
-        (List.map (fun c -> CRegion c) (BHeap.Set.elements dom.region))
-
-    let union = Chunk.Set.union
+    let writes { pre = (m1,r1) ; post = (m2,r2) } =
+      let m = { pre = m1 ; post = m2 } in
+      let r = { pre = r1 ; post = r2 } in
+      Heap.Set.union (mdomain @@ MSigma.writes m) (rdomain @@ RSigma.writes r)
 
   end
 
@@ -409,273 +328,133 @@ struct
 
     type loc =
       | Null
-      | Raw of { repr : M.loc }
-      | Loc   of { repr : M.loc ; region : region }
+      | Raw of M.loc
+      | Loc of M.loc * region
 
+    let make a = function None -> Raw a | Some r -> Loc(a,r)
+    let loc = function Null -> M.null | Raw a | Loc(a,_) -> a
+    let reg = function Null | Raw _ -> None | Loc(_,r) -> Some r
+    let kind = function Null | Raw _ -> Garbled | Loc(_,r) -> R.kind r
+    let rid = function Null | Raw _ -> 0 | Loc(_,r) -> R.id r
+    let rfold f = function Null | Raw _ -> None | Loc(_,r) -> f r
+    let rmap f = function Null | Raw _ -> None | Loc(_,r) -> Some (f r)
 
     (* ---------------------------------------------------------------------- *)
     (* --- Utilities on locations                                         --- *)
     (* ---------------------------------------------------------------------- *)
 
-    let last sigma ty = function
-      | Null ->
-        Warning.emit ~severe:false ~source:"MemRegion.Region.last"
-          ~effect:"Loc is NULL" "loc=NULL" ;
-        M.pointer_val M.null
-      | Raw { repr } ->
-        Warning.emit ~severe:false ~source:"MemRegion.Region.last"
-          ~effect:"Loc is Raw" "loc=%a" M.pretty repr ;
-        M.last sigma.Tuple.model ty repr
-      | Loc { repr } -> M.last sigma.Tuple.model ty repr
+    let last sigma ty l = M.last (fst sigma) ty (loc l)
+    let pointer_val l = M.pointer_val (loc l)
 
-    (* Conversion among loc, t_pointer terms and t_addr terms *)
-    let to_addr = function
-      | Null -> M.pointer_val M.null
-      | Raw { repr } -> M.pointer_val repr
-      | Loc { repr } -> M.pointer_val repr
-
-    let to_region_pointer = function
-      | Null -> (0, M.pointer_val M.null)
-      | Raw { repr } -> (0, M.pointer_val repr)
-      | Loc { repr ; region } -> (R.id_of_region region, M.pointer_val repr)
-
-    let of_region_pointer id _ty term =
-      if id == 0 then
-        if QED.equal term (M.pointer_val M.null) then Null else
-          let _ =
-            Warning.emit ~severe:false ~source:"MemRegion.Region.of_region_pointer"
-              ~effect:"No region has been found" "Region_id is zero for loc=%a"
-              QED.pretty term
-          in Raw { repr = M.pointer_loc term }
-      else match R.region_of_id id with
-        | None ->
-          let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.of_region_pointer"
-              ~effect:"No region has been found" "Region_id=%d for term=%a" id
-              QED.pretty term
-          in Raw { repr = M.pointer_loc term }
-        | Some region -> Loc { repr = M.pointer_loc term ; region }
-
-    (* Basic operations *)
     let sizeof ty = M.sizeof ty
 
-    let field loc field : loc = (* TODO: reconstruction *) match loc with
-      | Null -> Null
-      | Raw { repr } ->
-        let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.field"
-            ~effect:"Loc is Raw" "(%a).(%a)"
-            M.pretty repr Printer.pp_field field
-        in Raw { repr = M.field repr field }
-      | Loc { repr ; region } ->
-        match R.field region field with
-        | None ->
-          let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.field"
-              ~effect:"No region for field" "(%a in %a).(%a)"
-              M.pretty repr R.pretty region Printer.pp_field field
-          in Raw { repr = M.field repr field }
-        | Some region -> Loc { repr = M.field repr field ; region }
+    let field l fd =
+      make (M.field (loc l) fd) (rfold (fun r -> R.field r fd) l)
 
-    let shift loc ty offset = match loc with
-      | Null -> Null
-      | Raw { repr } ->
-        let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.shift"
-            ~effect:"Loc is Raw" "No region for (%a).[%a : %a]"
-            M.pretty repr QED.pretty offset Ctypes.pp_object ty
-        in Raw { repr = M.shift repr ty offset }
-      | Loc { repr ; region } ->
-        match R.shift region ty offset with
-        | None ->
-          let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.field"
-              ~effect:"No region for shift" "No region for (%a in %a).[%a : %a]"
-              M.pretty repr R.pretty region QED.pretty offset Ctypes.pp_object ty
-          in Raw { repr = M.shift repr ty offset }
-        | Some region ->
-          Loc { repr = M.shift repr ty offset ; region }
+    let shift l obj ofs =
+      make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
 
-    let frames_repr_region ty mloc r c =
-      match R.kind r with
-      | Single Ptr | Many Ptr ->
+    let frames ty l c =
+      match kind l with
+      | Single Ptr | Many Ptr | Garbled ->
         let offset = M.sizeof ty in
-        let sizeof = F.e_one in
+        let sizeof = Lang.F.e_one in
         let tau = Chunk.tau_of_chunk c in
         let basename = Chunk.basename_of_chunk c in
-        MemMemory.frames ~addr:(M.pointer_val mloc) ~offset ~sizeof ~basename tau
+        MemMemory.frames ~addr:(pointer_val l) ~offset ~sizeof ~basename tau
       | _ -> []
 
-    let frames ty loc chunk =
-      match loc with
-      | Null -> []
-      | Raw { repr } -> begin match chunk with
-          | Chunk.CModel c ->
-            let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.frames"
-                ~effect:"Loc is Raw" "Frames %a" M.pretty repr
-            in M.frames ty repr c
-          | Chunk.CRegion (B.CVal r | B.CInit r | B.CGhost r) ->
-            frames_repr_region ty repr r chunk
-        end
-      | Loc { repr ; region } -> frames_repr_region ty repr region chunk
-          (*
-        begin match R.kind r with
-        | Single Ptr | Many Ptr -> [MemMemory.framed (Sigma.value chunk)]
-        | _ -> []
-        end *)
-      (*
-      si chunk = CVal r et R.tau_of_region == ptr then the predicate MemMemory.framed (Sigma.value chunk)
-      si chunk = CInit r then MemMemory.cinits (Sigma.value chunk)
-      *)
+    let havoc ty l ~length chunk ~fresh ~current =
+      match chunk with
+      | M c -> M.havoc ty (loc l) ~length c ~fresh ~current
+      | R c ->
+        match c.mu with
+        | Value _ | ValInit -> fresh
+        | Array _ | ArrInit -> e_fun f_havoc [fresh;current;pointer_val l;length]
 
-    let havoc ty loc ~length chunk ~fresh ~current = match loc with
-      | Null ->
-        F.e_fun f_havoc [fresh;current;M.pointer_val M.null;length]
-      | Raw { repr } ->
-        let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.havoc"
-            ~effect:"Loc is Raw" "havoc of Raw=%a"
-            M.pretty repr
-        in F.e_fun f_havoc [fresh;current;M.pointer_val repr;length]
-      | Loc { repr } ->
-        (* TO CHECK *) assert (QED.equal length F.e_one) ;
-        match chunk with
-        | Chunk.CModel c -> M.havoc ty repr ~length c ~fresh ~current
-        | Chunk.CRegion _ ->
-          F.e_fun f_havoc [fresh;current;M.pointer_val repr;length]
-
-
-    let eqmem_forall ty loc chunk m1 m2 = match loc, chunk with
-      | Null, Chunk.CModel  c -> M.eqmem_forall ty M.null c m1 m2
-      | Null, Chunk.CRegion _ ->
-        let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.eqmem_forall"
-            ~effect:"Loc is NULL" "Los is Null in eqmem_forall"
-        in [], p_true, p_true
-      | (Raw { repr } | Loc { repr }), Chunk.CModel  c ->
-        M.eqmem_forall ty repr c m1 m2
-      | (Raw { repr } | Loc { repr }), Chunk.CRegion _ ->
-        let xp = Lang.freshvar ~basename:"b" MemAddr.t_addr in
-        let p = F.e_var xp in
-        let n = M.sizeof ty in
-        let separated = F.p_call MemAddr.p_separated [p;e_one;M.pointer_val repr;n] in
-        let equal = p_equal (e_get m1 p) (e_get m2 p) in
-        [xp],separated,equal
+    let eqmem_forall ty l chunk m1 m2 =
+      match chunk with
+      | M c -> M.eqmem_forall ty (loc l) c m1 m2
+      | R c ->
+        match c.mu with
+        | Value _ | ValInit -> [], p_true, p_equal m1 m2
+        | Array _ | ArrInit ->
+          let xp = Lang.freshvar ~basename:"b" MemAddr.t_addr in
+          let p = e_var xp in
+          let n = M.sizeof ty in
+          let separated =
+            p_call MemAddr.p_separated [p;e_one;pointer_val l;n] in
+          let equal = p_equal (e_get m1 p) (e_get m2 p) in
+          [xp],separated,equal
 
     (* ---------------------------------------------------------------------- *)
     (* --- Load                                                           --- *)
     (* ---------------------------------------------------------------------- *)
 
-    let load_int sigma (c_int:c_int) loc : term = match loc with
+    let localized action = function
       | Null ->
-        let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.load_int"
-            ~effect:"Loc is Null" "Attempt to load_int inside Null"
-        in M.load_int sigma.Tuple.model c_int M.null
-      | Raw { repr } ->
-        let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.load_int"
-            ~effect:"Loc is Raw" "load_int(Raw %a)" M.pretty repr
-        in M.load_int sigma.Tuple.model c_int repr
-      | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CVal region) in
-        match R.kind region with
-        | Many (Int c_int') ->
-          if compare_c_int c_int c_int' = 0
-          then F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-          else
-            let _ =
-              Warning.emit ~severe:false ~source:"MemRegion.Region.load_int"
-                ~effect:"C_int type is not the same in chunk and in argument"
-                "%a!=%a" Ctypes.pp_int c_int Ctypes.pp_int c_int'
-            in F.e_get (Sigma.value sigma c)
-            @@ M.pointer_val repr
-        | Single (Int c_int') ->
-          if compare_c_int c_int c_int' = 0
-          then Sigma.value sigma c
-          else
-            let _ =
-              Warning.emit ~severe:false ~source:"MemRegion.Region.load_int"
-                ~effect:"C_int type is not the same in chunk and in argument"
-                "%a!=%a" Ctypes.pp_int c_int Ctypes.pp_int c_int'
-            in Sigma.value sigma c
-        | Garbled -> M.load_int sigma.model c_int repr
-        | k ->
-          let _ =
-            Warning.emit ~severe:false ~source:"MemRegion.Region.load_int"
-              ~effect:"Region's kind is not Int" "%a : %a != %a"
-              R.pretty region pp_kind k Ctypes.pp_int c_int
-          in assert false
+        Warning.error ~source:"MemRegion"
+          "Attempt to %s at NULL" action
+      | Raw a ->
+        Warning.error ~source:"MemRegion"
+          "Attempt to %s without region (%a)" action M.pretty a
+      | Loc(l,r) -> l,r
 
-    let load_float sigma (c_float:c_float) loc : term = match loc with
-      | Null ->
-        let _ = Warning.emit ~severe:false
-            ~source:"MemRegion.Region.load_float"
-            ~effect:"Loc is Null" "Attempt to load_float inside Null"
-        in M.load_float sigma.Tuple.model c_float M.null
-      | Raw { repr } ->
-        let _ = Warning.emit ~severe:false
-            ~source:"MemRegion.Region.load_float"
-            ~effect:"Loc is Raw" "load_float(Raw %a)" M.pretty repr
-        in M.load_float sigma.Tuple.model c_float repr
-      | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CVal region) in
-        match R.kind region with
-        | Many (Float c_float') ->
-          if compare_c_float c_float c_float' = 0
-          then F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-          else
-            let _ = Warning.emit ~severe:false
-                ~source:"MemRegion.Region.load_float"
-                ~effect:"Type is not the same in chunk and in argument" "%a!=%a"
-                Ctypes.pp_float c_float Ctypes.pp_float c_float'
-            in F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-        | Single (Float c_float') ->
-          if compare_c_float c_float c_float' = 0
-          then Sigma.value sigma c
-          else
-            let _ = Warning.emit ~severe:false
-                ~source:"MemRegion.Region.load_float"
-                ~effect:"Type is not the same in chunk and in argument" "%a!=%a"
-                Ctypes.pp_float c_float Ctypes.pp_float c_float'
-            in Sigma.value sigma c
-        | Garbled -> M.load_float sigma.model c_float repr
-        | k ->
-          let _ =
-            Warning.emit ~severe:false ~source:"MemRegion.Region.load_float"
-              ~effect:"Region's kind is not Float" "%a : %a != %a"
-              R.pretty region pp_kind k Ctypes.pp_float c_float
-          in assert false
+    let check action (p:primitive) (q:primitive) =
+      if Stdlib.(<>) p q then
+        Warning.error ~source:"MemRegion"
+          "Inconsistent %s (%a <> %a)"
+          action pp_prim p pp_prim q
 
-    let load_pointer sigma ty loc : loc = match loc with
-      | Null ->
-        let _ = Warning.emit ~severe:false
-            ~source:"MemRegion.Region.load_float"
-            ~effect:"Loc is Null" "Attempt to load_float inside Null"
-        in let mloc = M.load_pointer sigma.Tuple.model ty M.null in
-        if QED.equal (M.pointer_val mloc) (M.pointer_val M.null)
-        then Null else Raw { repr = mloc }
-      | Raw { repr } ->
-        let _ = Warning.emit ~severe:false
-            ~source:"MemRegion.Region.load_pointer"
-            ~effect:"Loc is Raw" "load_pointer(Raw %a : *%a)"
-            M.pretty repr Printer.pp_typ ty
-        in Raw { repr = M.load_pointer sigma.Tuple.model ty repr }
-      | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CVal region) in
-        match R.points_to region with
-        | None ->
-          let _ = Warning.emit ~severe:false
-              ~source:"MemRegion.Region.load_pointer"
-              ~effect:"No region pointed" "No region for *(%a in %a)"
-              M.pretty repr R.pretty region
-          in Raw { repr = M.load_pointer sigma.Tuple.model ty repr }
-        | Some r ->
-          let repr = match R.kind region with
-            | Many (Ptr) ->
-              M.pointer_loc
-              @@ F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-            | Single (Ptr) -> M.pointer_loc @@ Sigma.value sigma c
-            | Garbled -> M.load_pointer sigma.Tuple.model ty repr
-            | k ->
-              let _ = Warning.emit ~severe:false
-                  ~source:"MemRegion.Region.load_pointer"
-                  ~effect:"Kind of region is not a pointer"
-                  "Region %a : %a != %a"
-                  R.pretty region pp_kind k Printer.pp_typ ty
-              in assert false
-          in Loc { repr ; region = r }
+    let load_int sigma iota loc : term =
+      let l,r = localized "load int" loc in
+      match R.kind r with
+      | Garbled -> M.load_int (fst sigma) iota l
+      | Single p ->
+        check "load" p (Int iota) ;
+        RSigma.value (snd sigma) { mu = Value p ; region = r }
+      | Many p ->
+        check "load" p (Int iota) ;
+        e_get
+          (RSigma.value (snd sigma) { mu = Array p ; region = r})
+          (M.pointer_val l)
+
+    let load_float sigma flt loc : term =
+      let l,r = localized "load float" loc in
+      match R.kind r with
+      | Garbled -> M.load_float (fst sigma) flt l
+      | Single p ->
+        check "load" p (Float flt) ;
+        RSigma.value (snd sigma) { mu = Value p ; region = r }
+      | Many p ->
+        check "load" p (Float flt) ;
+        e_get
+          (RSigma.value (snd sigma) { mu = Array p ; region = r})
+          (M.pointer_val l)
+
+    let load_pointer sigma ty loc : loc =
+      let l,r = localized "load float" loc in
+      match R.points_to r with
+      | None ->
+        Warning.error ~source:"MemRegion"
+          "Attempt to load pointer without points-to@\n\
+           (addr %a, region %a)"
+          M.pretty l R.Type.pretty r
+      | Some _ as rp ->
+        let loc =
+          match R.kind r with
+          | Garbled -> M.load_pointer (fst sigma) ty l
+          | Single p ->
+            check "load" p Ptr ;
+            M.pointer_loc @@
+            RSigma.value (snd sigma) { mu = Value p ; region = r }
+          | Many p ->
+            check "load" p Ptr ;
+            M.pointer_loc @@
+            e_get
+              (RSigma.value (snd sigma) { mu = Array p ; region = r})
+              (M.pointer_val l)
+        in make loc rp
 
     (* ---------------------------------------------------------------------- *)
     (* --- Store                                                          --- *)
@@ -686,14 +465,14 @@ struct
         let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.store_int"
             ~effect:"Loc is Null" "Attempt to store_int inside Null"
         in let c, t = M.store_int sigma.Tuple.model c_int M.null v in
-        Chunk.CModel c, t
+        M c, t
       | Raw { repr } ->
         let _ = Warning.emit ~severe:false ~source:"MemRegion.Region.store_int"
             ~effect:"Loc is Raw" "store_int(Raw %a)" M.pretty repr
         in let c, t = M.store_int sigma.Tuple.model c_int repr v in
-        Chunk.CModel c, t
+        M c, t
       | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CVal region) in
+        let c = R (B.CVal region) in
         match R.kind region with
         | Many (Int c_int') as k ->
           if compare_c_int c_int c_int' = 0
@@ -717,7 +496,7 @@ struct
             in (c, v)
         | Garbled ->
           let (c', v) = M.store_int sigma.model c_int repr v in
-          (Chunk.CModel c', v)
+          (M c', v)
         | k ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.store_int"
@@ -732,15 +511,15 @@ struct
             ~source:"MemRegion.Region.store_float"
             ~effect:"Loc is Null" "Attempt to store_float inside Null"
         in let c, t = M.store_float sigma.Tuple.model c_float M.null v in
-        Chunk.CModel c, t
+        M c, t
       | Raw { repr } ->
         let _ = Warning.emit ~severe:false
             ~source:"MemRegion.Region.store_float"
             ~effect:"Loc is Raw" "store_float(Raw %a)" M.pretty repr
         in let c, t = M.store_float sigma.Tuple.model c_float repr v in
-        Chunk.CModel c, t
+        M c, t
       | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CVal region) in
+        let c = R (B.CVal region) in
         match R.kind region with
         | Many (Float c_float') as k ->
           if compare_c_float c_float c_float' = 0
@@ -764,7 +543,7 @@ struct
             in (c, v)
         | Garbled ->
           let (c, t) = M.store_float sigma.Tuple.model c_float repr v in
-          (Chunk.CModel c, t)
+          (M c, t)
         | k ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.store_float"
@@ -779,23 +558,23 @@ struct
             ~source:"MemRegion.Region.store_pointer"
             ~effect:"Loc is Null" "Attempt to store_pointer inside Null"
         in let c, t = M.store_pointer sigma.Tuple.model ty M.null v in
-        Chunk.CModel c, t
+        M c, t
       | Raw { repr } ->
         let _ = Warning.emit ~severe:false
             ~source:"MemRegion.Region.store_pointer"
             ~effect:"Loc is Raw" "store_pointer(Raw %a : *%a)"
             M.pretty repr Printer.pp_typ ty
         in let c, t = M.store_pointer sigma.Tuple.model ty repr v in
-        Chunk.CModel c, t
+        M c, t
       | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CVal region) in
+        let c = R (B.CVal region) in
         match R.kind region with
         | Many (Ptr) ->
           c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v
         | Single (Ptr) -> c,v
         | Garbled ->
           let (c, repr) = M.store_pointer sigma.Tuple.model ty repr v in
-          (Chunk.CModel c, repr)
+          (M c, repr)
         | k ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.store_pointer"
@@ -814,22 +593,22 @@ struct
             ~source:"MemRegion.Region.set_init_atom"
             ~effect:"Loc is Null" "Attempt to set_init_atom with Null"
         in let (c, t) = M.set_init_atom sigma.Tuple.model ty M.null v in
-        (Chunk.CModel c, t)
+        (M c, t)
       | Raw { repr } ->
         let _ = Warning.emit ~severe:false
             ~source:"MemRegion.Region.set_init_atom"
             ~effect:"Loc is Raw" "set_init_atom(Raw %a <- %a)"
             M.pretty repr QED.pretty v
         in let (c, t) = M.set_init_atom sigma.Tuple.model ty repr v in
-        (Chunk.CModel c, t)
+        (M c, t)
       | Loc { repr ; region }->
         match R.kind region with
         | Garbled ->
           let (c, t) = M.set_init_atom sigma.Tuple.model ty repr v in
-          (Chunk.CModel c, t)
-        | Single _-> Chunk.CRegion (B.CInit region), v
+          (M c, t)
+        | Single _-> R (B.CInit region), v
         | Many _ ->
-          let c = Chunk.CRegion (B.CInit region) in
+          let c = R (B.CInit region) in
           c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v
 
     let is_init_atom sigma ty loc : term = match loc with
@@ -845,7 +624,7 @@ struct
             M.pretty repr
         in M.is_init_atom sigma.Tuple.model ty repr
       | Loc { repr ; region } ->
-        let c = Chunk.CRegion (B.CInit region) in
+        let c = R (B.CInit region) in
         match R.kind region with
         | Garbled -> M.is_init_atom sigma.Tuple.model ty repr
         | Many _ -> F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
@@ -867,7 +646,7 @@ struct
         match R.kind region with
         | Garbled -> M.is_init_range sigma.Tuple.model ty repr length
         | Many _ ->
-          let c = Chunk.CRegion (B.CInit region) in
+          let c = R (B.CInit region) in
           let n = F.e_mul (M.sizeof ty) length in
           F.p_call p_is_init_r [Sigma.value sigma c;M.pointer_val repr;n]
         | Single _ as k ->
@@ -880,7 +659,7 @@ struct
 
 
     let set_init ty loc ~length chunk ~current : term = match loc, chunk with
-      | Null, Chunk.CModel c ->
+      | Null, M c ->
         let _ = Warning.emit ~severe:false
             ~source:"MemRegion.Region.set_init"
             ~effect:"Loc is Null" "set_init(Null)"
@@ -890,7 +669,7 @@ struct
             ~source:"MemRegion.Region.set_init"
             ~effect:"Loc is Null" "set_init(Null) and Chunk is Region"
         in assert false
-      | Raw { repr }, Chunk.CModel c ->
+      | Raw { repr }, M c ->
         let _ = Warning.emit ~severe:false
             ~source:"MemRegion.Region.set_init"
             ~effect:"Loc is Null" "set_init(Raw %a)"
@@ -902,7 +681,7 @@ struct
             ~effect:"Loc is Null" "set_init(Raw %a) and Chunk is Region"
             M.pretty repr
         in assert false
-      | Loc { repr }, Chunk.CModel c -> M.set_init ty repr ~length c ~current
+      | Loc { repr }, M c -> M.set_init ty repr ~length c ~current
       | Loc { repr ; region }, Chunk.CRegion c ->
         match R.kind region, c with
         | Garbled, ( B.CVal _ | B.CInit _| B.CGhost _) ->
@@ -938,23 +717,23 @@ struct
             M.pretty repr Ctypes.pp_object ty
         in
         let model = M.value_footprint ty repr in
-        Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
+        Sigma.to_domain Tuple.{ model ; region = RegionSigma.empty }
       | Loc { repr ; region } ->
         match R.kind region, ty with
         | Garbled, (C_int _ | C_float _ | C_pointer _) ->
           let model = M.value_footprint ty repr in
-          Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
+          Sigma.to_domain Tuple.{ model ; region = RegionSigma.empty }
         | (Many (Int   _) | Single (Int   _)), C_int _
         | (Many (Float _) | Single (Float _)), C_float _
         | (Many (Ptr    ) | Single (Ptr    )), C_pointer _->
-          Heap.Set.singleton (Chunk.CRegion (B.CVal region))
+          Heap.Set.singleton (R (B.CVal region))
         | (Many _ | Single _) as k, (C_int _ | C_float _ | C_pointer _) ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.value_footprint"
               ~effect:"Type is not the same in chunk and in argument"
               "value_footprint(%a : %a in %a : %a)"
               M.pretty repr Ctypes.pp_object ty R.pretty region pp_kind k
-          in Heap.Set.singleton @@ Chunk.CRegion (B.CVal region)
+          in Heap.Set.singleton @@ R (B.CVal region)
         | _, C_comp { cfields } ->
           let none = Heap.Set.empty in
           let f_fold acc fd =
@@ -977,23 +756,23 @@ struct
             "init_footprint(Raw %a : %a)"
             M.pretty repr Ctypes.pp_object ty
         in let model = M.init_footprint ty repr in
-        Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
+        Sigma.to_domain Tuple.{ model ; region = RegionSigma.empty }
       | Loc { repr ; region } ->
         match R.kind region, ty with
         | Garbled, (C_int _ | C_float _ | C_pointer _) ->
           let model =  M.init_footprint ty repr in
-          Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
+          Sigma.to_domain Tuple.{ model ; region = RegionSigma.empty }
         | (Many (Int   _) | Single (Int   _)), C_int _
         | (Many (Float _) | Single (Float _)), C_float _
         | (Many (Ptr    ) | Single (Ptr    )), C_pointer _->
-          Heap.Set.singleton @@ Chunk.CRegion (B.CInit region)
+          Heap.Set.singleton @@ R (B.CInit region)
         | (Many _ | Single _) as k, (C_int _ | C_float _ | C_pointer _) ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.init_footprint"
               ~effect:"Type is not the same in chunk and in argument"
               "init_footprint(%a : %a in %a : %a)"
               M.pretty repr Ctypes.pp_object ty R.pretty region pp_kind k
-          in Heap.Set.singleton @@ Chunk.CRegion (B.CInit region)
+          in Heap.Set.singleton @@ R (B.CInit region)
         | _, C_comp { cfields } ->
           let none = Heap.Set.empty in
           let f_fold acc fd =
@@ -1047,7 +826,7 @@ struct
         | Sdescr (_,(Region.Null|Region.Raw _),_) -> assert false
       in
       Assert (MemMemory.cinits
-              @@ Sigma.value seq.post @@ Chunk.CRegion (B.CInit region)) ::
+              @@ Sigma.value seq.post @@ R (B.CInit region)) ::
       LOADER.assigned seq ty sloc
 
   (* {2 Reversing the Model} *)
@@ -1293,9 +1072,9 @@ struct
         | Garbled | Many (Int _ | Float _)
         | Single (Int _ | Float _) -> p_true
     in
-    BSigma.Chunk.Set.fold
+    RegionSigma.Chunk.Set.fold
       (fun c l -> region_frame sigma c :: l)
-      (BSigma.domain sigma.region)
+      (RegionSigma.domain sigma.region)
     @@ M.frame sigma.model
   (* Assert the memory is a proper heap state preceeding the function
       entry point. *)
@@ -1340,7 +1119,7 @@ struct
       else M.separated rl1 rl2
 
   let is_well_formed_chunk sigma chunk = match chunk with
-    | Chunk.CModel _ | Chunk.CRegion (B.CInit _)
+    | M _ | Chunk.CRegion (B.CInit _)
     | Chunk.CRegion (B.CGhost _) -> p_true
     | Chunk.CRegion (B.CVal region) -> match R.kind region with
       | Garbled -> p_true

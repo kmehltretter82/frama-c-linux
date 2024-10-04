@@ -96,6 +96,7 @@ val merge_copy : map -> l:node -> r:node -> unit
 val cvar : map -> varinfo -> node
 val field : map -> node -> fieldinfo -> node
 val index : map -> node -> typ -> node
+val sindex : map -> node -> int -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 

@@ -125,3 +125,7 @@ val field : map -> node -> fieldinfo -> node
 
 (** Unormalized. @raises Not_found *)
 val index : map -> node -> typ -> node
+
+(** The size if the size of elements of the array, in bits.
+    Unormalized. @raises Not_found *)
+val shift : map -> node -> size:int -> node

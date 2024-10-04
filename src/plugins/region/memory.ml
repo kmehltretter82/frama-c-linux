@@ -567,6 +567,9 @@ let field (m: map) (r: node) (fd: fieldinfo) : node =
 let index (m : map) (r: node) (ty:typ) : node =
   move m r 0 (Cil.bitsSizeOf ty)
 
+let sindex (m: map) (r: node) (size:int) : node =
+  move m r 0 size
+
 let rec lval (m: map) (h,ofs) : node =
   offset m (lhost m h) (Cil.typeOfLhost h) ofs
 

@@ -35,19 +35,20 @@ let null () : region =
     ~effect:"Create null pointer value" "NULL" ;
   Wp_parameters.not_yet_implemented "[WP/RegionAnalysis.ml] null: cannot create null region"
 
-let id_of_region region = Region.uid (get_map ()) region
+let id region = Region.uid (get_map ()) region
 
 let region_of_id id =
   try Some (Region.find (get_map ()) id)
   with Not_found -> None
 
-let hash = Region.id
-
-let equal r1 r2 = (Region.id r1 = Region.id r2)
-
-let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
-
-let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
+module Type =
+struct
+  type t = region
+  let hash = Region.id
+  let equal r1 r2 = (Region.id r1 = Region.id r2)
+  let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
+  let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
+end
 
 let types r =
   let module Tset = Cil_datatype.Typ.Set in
@@ -60,13 +61,7 @@ let types r =
   Tset.elements !pool
 
 (* Keeping track of the decision to apply which memory model to each region *)
-module Kind = WpContext.Generator
-    (struct
-      (* Key : WPContext.Key *)
-      type t = region
-      let compare = compare
-      let pretty = pretty
-    end)
+module Kind = WpContext.Generator(Type)
     (struct
       (* Data : WpContext.Data with type key = Key.t *)
       type key = region
@@ -113,7 +108,7 @@ let field (region: region) (fd: fieldinfo) : region option =
       ~source:"RegionAnalysis.field"
       ~effect:"No region found for field"
       "No region for field %a from region %a"
-      Printer.pp_field fd pretty region;
+      Printer.pp_field fd Type.pretty region;
     None
 
 let shift region ty offset =
@@ -123,7 +118,7 @@ let shift region ty offset =
         ~source:"RegionAnalysis.shift"
         ~effect:"No region found"
         "No region for shift %a from region %a"
-        QED.pretty offset pretty region;
+        QED.pretty offset Type.pretty region;
       None
     | typ :: rest ->
       try Some (Region.index (get_map ()) region typ)
