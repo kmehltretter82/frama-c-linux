@@ -620,8 +620,8 @@ function updateIndex(settings: LabSettings): void {
   if (theTab) {
     applyTab(tabKeyOf(theTab.view, theTab.custom));
   } else {
-    const console = VIEW.getElement('fc.kernel.console');
-    if (console !== undefined) applyView(console);
+    const views = VIEW.getElements();
+    views.forEach(view => { if (view.defaultView) applyView(view); });
   }
   setCurrentNone();
 }
