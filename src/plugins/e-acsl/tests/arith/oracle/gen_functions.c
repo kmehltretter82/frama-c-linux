@@ -613,6 +613,128 @@ void test_f4(void)
   return;
 }
 
+/*@ behavior a:
+      ensures 1 == -\old(j);
+    
+    behavior b:
+      ensures 2 == \old(j); */
+int __gen_e_acsl_f5(long j);
+
+int f5(long j)
+{
+  int __retres;
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\false";
+    __gen_e_acsl_assert_data.file = "functions.c";
+    __gen_e_acsl_assert_data.fct = "f5";
+    __gen_e_acsl_assert_data.line = 122;
+    __gen_e_acsl_assert_data.name = "missing_return";
+    __e_acsl_assert(0,& __gen_e_acsl_assert_data);
+  }
+  /*@ assert missing_return: \false; */ ;
+  __retres = 0;
+  return __retres;
+}
+
+int test_f5(void)
+{
+  int __retres;
+  __gen_e_acsl_f5((long)1);
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "\\false";
+    __gen_e_acsl_assert_data.file = "functions.c";
+    __gen_e_acsl_assert_data.fct = "test_f5";
+    __gen_e_acsl_assert_data.line = 126;
+    __gen_e_acsl_assert_data.name = "missing_return";
+    __e_acsl_assert(0,& __gen_e_acsl_assert_data);
+  }
+  /*@ assert missing_return: \false; */ ;
+  __retres = 0;
+  return __retres;
+}
+
+/*@ behavior a:
+      ensures 1 == -\old(j);
+    
+    behavior b:
+      ensures 2 == \old(j); */
+int __gen_e_acsl_f5(long j)
+{
+  __e_acsl_contract_t *__gen_e_acsl_contract;
+  __e_acsl_mpz_t __gen_e_acsl_at_2;
+  long __gen_e_acsl_at;
+  int __retres;
+  {
+    __e_acsl_mpz_t __gen_e_acsl_j;
+    __gen_e_acsl_at = j;
+    __gmpz_init_set_si(__gen_e_acsl_j,j);
+    __gmpz_init_set(__gen_e_acsl_at_2,
+                    (__e_acsl_mpz_struct const *)(__gen_e_acsl_j));
+    __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,1);
+    __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,1UL,1);
+    __gmpz_clear(__gen_e_acsl_j);
+  }
+  __retres = f5(j);
+  {
+    int __gen_e_acsl_assumes_value;
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_mpz_t __gen_e_acsl_;
+      __e_acsl_mpz_t __gen_e_acsl_neg;
+      int __gen_e_acsl_eq;
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data =
+        {.values = (void *)0};
+      __gmpz_init_set_si(__gen_e_acsl_,1L);
+      __gmpz_init(__gen_e_acsl_neg);
+      __gmpz_neg(__gen_e_acsl_neg,
+                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_at_2));
+      __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_),
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_neg));
+      __e_acsl_assert_register_mpz(& __gen_e_acsl_assert_data,"\\old(j)",0,
+                                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_at_2));
+      __gen_e_acsl_assert_data.blocking = 1;
+      __gen_e_acsl_assert_data.kind = "Postcondition";
+      __gen_e_acsl_assert_data.pred_txt = "1 == -\\old(j)";
+      __gen_e_acsl_assert_data.file = "functions.c";
+      __gen_e_acsl_assert_data.fct = "f5";
+      __gen_e_acsl_assert_data.line = 118;
+      __gen_e_acsl_assert_data.name = "a";
+      __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+      __gmpz_clear(__gen_e_acsl_);
+      __gmpz_clear(__gen_e_acsl_neg);
+    }
+    __gen_e_acsl_assumes_value = __e_acsl_contract_get_behavior_assumes
+    ((__e_acsl_contract_t const *)__gen_e_acsl_contract,1UL);
+    if (__gen_e_acsl_assumes_value) {
+      __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
+        {.values = (void *)0};
+      __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_2,"\\old(j)",
+                                    0,__gen_e_acsl_at);
+      __gen_e_acsl_assert_data_2.blocking = 1;
+      __gen_e_acsl_assert_data_2.kind = "Postcondition";
+      __gen_e_acsl_assert_data_2.pred_txt = "2 == \\old(j)";
+      __gen_e_acsl_assert_data_2.file = "functions.c";
+      __gen_e_acsl_assert_data_2.fct = "f5";
+      __gen_e_acsl_assert_data_2.line = 120;
+      __gen_e_acsl_assert_data_2.name = "b";
+      __e_acsl_assert(2L == __gen_e_acsl_at,& __gen_e_acsl_assert_data_2);
+      __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
+    }
+    __e_acsl_contract_clean(__gen_e_acsl_contract);
+    __gmpz_clear(__gen_e_acsl_at_2);
+    return __retres;
+  }
+}
+
 /*@ requires k_pred(x); */
 void __gen_e_acsl_k(int x)
 {

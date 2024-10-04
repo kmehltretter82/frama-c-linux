@@ -38,12 +38,11 @@ int main(void)
 /*@ ensures *\old(item) == \old(*item); */
 void __gen_e_acsl_f(struct X *item)
 {
-  struct X __gen_e_acsl_at_2;
-  struct X *__gen_e_acsl_at;
+  struct X *__gen_e_acsl_at_2;
+  struct X __gen_e_acsl_at;
   {
     int __gen_e_acsl_valid_read;
     __e_acsl_store_block((void *)(& item),8UL);
-    __gen_e_acsl_at = item;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __gen_e_acsl_valid_read = __e_acsl_valid_read((void *)item,
                                                   sizeof(struct X),
@@ -62,7 +61,8 @@ void __gen_e_acsl_f(struct X *item)
     __gen_e_acsl_assert_data.name = "mem_access";
     __e_acsl_assert(__gen_e_acsl_valid_read,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-    __gen_e_acsl_at_2 = *item;
+    __gen_e_acsl_at = *item;
+    __gen_e_acsl_at_2 = item;
   }
   f(item);
   __e_acsl_delete_block((void *)(& item));

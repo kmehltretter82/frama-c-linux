@@ -35,7 +35,7 @@ val get_first_inner_stmt: stmt -> stmt
 (** If the given statement has a label, return the first statement of the block.
     Otherwise return the given statement. *)
 
-val at_for_stmt: stmt -> At_data.Set.t Error.result
+val at_for_stmt: stmt -> At_data.t list Error.result
 (** @return the set of labeled predicates and terms to be translated on the
     given statement.
     @raise Not_memoized if the labels pre-analysis was not run. *)

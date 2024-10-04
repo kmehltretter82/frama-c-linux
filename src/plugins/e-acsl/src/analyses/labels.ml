@@ -58,34 +58,36 @@ let preprocess_done = ref false
 
 (** Associate a statement with the [at_data] that need to be translated on
     this statement. *)
-let at_data_for_stmts: At_data.Set.t ref Stmt.Hashtbl.t =
+let at_data_for_stmts: At_data.t list ref Stmt.Hashtbl.t =
   Stmt.Hashtbl.create 17
 
 (** Add [data] to the list of [at_data] that must be translated on the
     statement [stmt]. *)
 let add_at_for_stmt data stmt =
   let stmt = get_first_inner_stmt stmt in
+  (* Note that the error field is not taken into account in At_data.equal.
+     Therefore we cannot just write:
+       At_data.Hashtbl.replace ats_tbl data data; let old_data = data in *)
   let ats_ref =
     try
       Stmt.Hashtbl.find at_data_for_stmts stmt
     with Not_found ->
-      let ats_ref = ref At_data.Set.empty in
+      let ats_ref = ref [] in
       Stmt.Hashtbl.add at_data_for_stmts stmt ats_ref;
       ats_ref
   in
   let old_data =
     try
-      At_data.Set.find data !ats_ref
+      List.find (At_data.equal data) !ats_ref
     with Not_found ->
-      ats_ref := At_data.Set.add data !ats_ref;
+      ats_ref := data :: !ats_ref;
       data
   in
   match old_data.error, data.error with
   | Some _, None ->
     (* Replace the old data that has an error with the new data that do not
        have one. *)
-    ats_ref := At_data.Set.remove old_data !ats_ref;
-    ats_ref := At_data.Set.add data !ats_ref
+    ats_ref := data :: List.filter (fun d -> not @@ At_data.equal d old_data) !ats_ref;
   | Some _, Some _
   | None, Some _
   | None, None ->
@@ -97,7 +99,7 @@ let add_at_for_stmt data stmt =
 let at_for_stmt stmt =
   if !preprocess_done then
     let ats_ref =
-      Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref At_data.Set.empty)
+      Stmt.Hashtbl.find_def at_data_for_stmts stmt (ref [])
     in
     Result.Ok !ats_ref
   else
@@ -558,7 +560,7 @@ let _debug () =
        Options.feedback ~level:2 "| - stmt %d at %a"
          stmt.sid
          Printer.pp_location (Stmt.loc stmt);
-       At_data.Set.iter
+       List.iter
          (fun at ->
             Options.feedback ~level:2 "|    - at %a"
               At_data.pretty at)

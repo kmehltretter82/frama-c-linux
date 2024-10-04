@@ -229,11 +229,19 @@ int main(void)
 void __gen_e_acsl_o(void)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  int __gen_e_acsl_at_5;
+  int __gen_e_acsl_at_4;
+  int __gen_e_acsl_at_3;
+  int __gen_e_acsl_at_2;
   int __gen_e_acsl_at;
   {
     int __gen_e_acsl_assumes_value;
     int __gen_e_acsl_active_bhvrs;
     __gen_e_acsl_at = Y;
+    __gen_e_acsl_at_2 = Y;
+    __gen_e_acsl_at_3 = Y;
+    __gen_e_acsl_at_4 = Y;
+    __gen_e_acsl_at_5 = Y;
     __gen_e_acsl_contract = __e_acsl_contract_init(4UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"X",0,X);
@@ -390,14 +398,14 @@ void __gen_e_acsl_o(void)
       {.values = (void *)0};
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"X",0,X);
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"\\old(Y)",0,
-                                 __gen_e_acsl_at);
+                                 __gen_e_acsl_at_5);
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Postcondition";
     __gen_e_acsl_assert_data_12.pred_txt = "X == \\old(Y)";
     __gen_e_acsl_assert_data_12.file = "function_contract.i";
     __gen_e_acsl_assert_data_12.fct = "o";
     __gen_e_acsl_assert_data_12.line = 94;
-    __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_12);
+    __e_acsl_assert(X == __gen_e_acsl_at_5,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
     ((__e_acsl_contract_t const *)__gen_e_acsl_contract,0UL);
@@ -406,7 +414,7 @@ void __gen_e_acsl_o(void)
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"X",0,X);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_13,"\\old(Y)",
-                                   0,__gen_e_acsl_at);
+                                   0,__gen_e_acsl_at_4);
       __gen_e_acsl_assert_data_13.blocking = 1;
       __gen_e_acsl_assert_data_13.kind = "Postcondition";
       __gen_e_acsl_assert_data_13.pred_txt = "X == \\old(Y)";
@@ -414,7 +422,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_13.fct = "o";
       __gen_e_acsl_assert_data_13.line = 99;
       __gen_e_acsl_assert_data_13.name = "neg";
-      __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_13);
+      __e_acsl_assert(X == __gen_e_acsl_at_4,& __gen_e_acsl_assert_data_13);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_13);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
@@ -424,7 +432,7 @@ void __gen_e_acsl_o(void)
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"X",0,X);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_14,"\\old(Y)",
-                                   0,__gen_e_acsl_at);
+                                   0,__gen_e_acsl_at_3);
       __gen_e_acsl_assert_data_14.blocking = 1;
       __gen_e_acsl_assert_data_14.kind = "Postcondition";
       __gen_e_acsl_assert_data_14.pred_txt = "X == \\old(Y)";
@@ -432,7 +440,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_14.fct = "o";
       __gen_e_acsl_assert_data_14.line = 104;
       __gen_e_acsl_assert_data_14.name = "pos";
-      __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_14);
+      __e_acsl_assert(X == __gen_e_acsl_at_3,& __gen_e_acsl_assert_data_14);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_14);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes
@@ -442,7 +450,7 @@ void __gen_e_acsl_o(void)
         {.values = (void *)0};
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"X",0,X);
       __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"\\old(Y)",
-                                   0,__gen_e_acsl_at);
+                                   0,__gen_e_acsl_at_2);
       __gen_e_acsl_assert_data_15.blocking = 1;
       __gen_e_acsl_assert_data_15.kind = "Postcondition";
       __gen_e_acsl_assert_data_15.pred_txt = "X == \\old(Y)";
@@ -450,7 +458,7 @@ void __gen_e_acsl_o(void)
       __gen_e_acsl_assert_data_15.fct = "o";
       __gen_e_acsl_assert_data_15.line = 109;
       __gen_e_acsl_assert_data_15.name = "odd";
-      __e_acsl_assert(X == __gen_e_acsl_at,& __gen_e_acsl_assert_data_15);
+      __e_acsl_assert(X == __gen_e_acsl_at_2,& __gen_e_acsl_assert_data_15);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
     }
     __gen_e_acsl_assumes_value_2 = __e_acsl_contract_get_behavior_assumes

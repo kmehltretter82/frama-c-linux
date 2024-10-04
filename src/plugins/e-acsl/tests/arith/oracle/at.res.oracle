@@ -11,6 +11,12 @@
 [eva:alarm] at.i:77: Warning: assertion got status unknown.
 [eva:alarm] at.i:78: Warning: assertion got status unknown.
 [eva:alarm] at.i:79: Warning: assertion got status unknown.
+[eva:alarm] at.i:43: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] at.i:41: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
 [eva:alarm] at.i:39: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
                                                         \valid(data->values) got status unknown.

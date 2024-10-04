@@ -71,8 +71,8 @@ void *memchr(void const *buf, int c, size_t n)
 void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
-  int __gen_e_acsl_at_2;
-  void const *__gen_e_acsl_at;
+  void const *__gen_e_acsl_at_2;
+  int __gen_e_acsl_at;
   void *__retres;
   __e_acsl_store_block((void *)(& __retres),8UL);
   {
@@ -81,8 +81,8 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
     int __gen_e_acsl_forall;
     int __gen_e_acsl_k;
     __e_acsl_store_block((void *)(& buf),8UL);
-    __gen_e_acsl_at = buf;
-    __gen_e_acsl_at_2 = c;
+    __gen_e_acsl_at = c;
+    __gen_e_acsl_at_2 = buf;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __gen_e_acsl_exists = 0;
     __gen_e_acsl_i = 0;
@@ -186,20 +186,20 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           int __gen_e_acsl_valid_read_3;
           __e_acsl_assert_data_t __gen_e_acsl_assert_data_4 =
             {.values = (void *)0};
-          __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)__gen_e_acsl_at + __gen_e_acsl_j),
+          __gen_e_acsl_valid_read_3 = __e_acsl_valid_read((void *)((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j),
                                                           sizeof(char),
-                                                          (void *)__gen_e_acsl_at,
-                                                          (void *)(& __gen_e_acsl_at));
+                                                          (void *)__gen_e_acsl_at_2,
+                                                          (void *)(& __gen_e_acsl_at_2));
           __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_4,
-                                       "__gen_e_acsl_at",
-                                       (void *)__gen_e_acsl_at);
+                                       "__gen_e_acsl_at_2",
+                                       (void *)__gen_e_acsl_at_2);
           __e_acsl_assert_register_uint(& __gen_e_acsl_assert_data_4,
                                         "__gen_e_acsl_j",0,__gen_e_acsl_j);
           __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_4,
                                          "sizeof(char)",0,sizeof(char));
           __gen_e_acsl_assert_data_4.blocking = 1;
           __gen_e_acsl_assert_data_4.kind = "RTE";
-          __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read((char *)__gen_e_acsl_at + __gen_e_acsl_j)";
+          __gen_e_acsl_assert_data_4.pred_txt = "\\valid_read((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j)";
           __gen_e_acsl_assert_data_4.file = "bts1390.c";
           __gen_e_acsl_assert_data_4.fct = "memchr";
           __gen_e_acsl_assert_data_4.line = 9;
@@ -207,7 +207,7 @@ void *__gen_e_acsl_memchr(void const *buf, int c, size_t n)
           __e_acsl_assert(__gen_e_acsl_valid_read_3,
                           & __gen_e_acsl_assert_data_4);
           __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
-          if ((int)*((char *)__gen_e_acsl_at + __gen_e_acsl_j) != __gen_e_acsl_at_2) 
+          if ((int)*((char *)__gen_e_acsl_at_2 + __gen_e_acsl_j) != __gen_e_acsl_at) 
             ;
           else {
             __gen_e_acsl_forall_2 = 0;

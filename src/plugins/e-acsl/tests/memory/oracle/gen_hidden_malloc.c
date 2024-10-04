@@ -162,12 +162,16 @@ char *__gen_e_acsl_realpath(char const * restrict file_name,
                             char * restrict resolved_name)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  char *__gen_e_acsl_at_3;
+  char *__gen_e_acsl_at_2;
   char *__gen_e_acsl_at;
   char *__retres;
   {
     int __gen_e_acsl_or;
     __e_acsl_store_block((void *)(& resolved_name),8UL);
     __gen_e_acsl_at = resolved_name;
+    __gen_e_acsl_at_2 = resolved_name;
+    __gen_e_acsl_at_3 = resolved_name;
     __gen_e_acsl_contract = __e_acsl_contract_init(5UL);
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};

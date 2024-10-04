@@ -111,3 +111,16 @@ int main(void) {
 void test_f4() {
   /*@ assert f4 (0) ≡ 0; */
 }
+
+// same term \at(j, Old) twice in different typing contexts
+/*@
+  behavior a:
+    ensures 1 == -j;
+  behavior b:
+    ensures 2 == j;
+ */
+int f5(long int j) {}
+
+int test_f5() {
+  f5(1);
+}

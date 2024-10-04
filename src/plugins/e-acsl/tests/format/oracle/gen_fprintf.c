@@ -156,12 +156,14 @@ pid_t __gen_e_acsl_fork(void)
 pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
 {
   __e_acsl_contract_t *__gen_e_acsl_contract;
+  int *__gen_e_acsl_at_2;
   int *__gen_e_acsl_at;
   pid_t __retres;
   {
     int __gen_e_acsl_assumes_value;
     __e_acsl_store_block((void *)(& stat_loc),8UL);
     __gen_e_acsl_at = stat_loc;
+    __gen_e_acsl_at_2 = stat_loc;
     __gen_e_acsl_contract = __e_acsl_contract_init(2UL);
     __e_acsl_contract_set_behavior_assumes(__gen_e_acsl_contract,0UL,
                                            stat_loc == (int *)0);
@@ -223,8 +225,9 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
                                  __retres);
     if (__retres >= 0) {
       __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_3,
-                                   "\\old(stat_loc)",(void *)__gen_e_acsl_at);
-      __gen_e_acsl_and = __gen_e_acsl_at != (int *)0;
+                                   "\\old(stat_loc)",
+                                   (void *)__gen_e_acsl_at_2);
+      __gen_e_acsl_and = __gen_e_acsl_at_2 != (int *)0;
     }
     else __gen_e_acsl_and = 0;
     if (! __gen_e_acsl_and) __gen_e_acsl_implies = 1;
