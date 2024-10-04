@@ -31,7 +31,26 @@ open Lang.F
 open Sigs
 open MemMemory
 
-module L = Qed.Logic
+type primitive = Int of c_int | Float of c_float | Ptr
+type kind = Single of primitive | Many of primitive | Garbled
+
+let pp_prim fmt = function
+  | Int i -> Ctypes.pp_int fmt i
+  | Float f -> Ctypes.pp_float fmt f
+  | Ptr -> Format.pp_print_string fmt "void*"
+let pp_kind fmt = function
+  | Single p -> pp_prim fmt p
+  | Many p -> Format.fprintf fmt "[%a]" pp_prim p
+  | Garbled -> Format.pp_print_string fmt "[bytes]"
+
+let tau_of_primitive = function
+  | Int _ -> Qed.Logic.Int
+  | Float c_float -> Cfloat.tau_of_float c_float
+  | Ptr -> MemAddr.t_addr
+
+(* -------------------------------------------------------------------------- *)
+(* --- Region Analysis Proxy                                              --- *)
+(* -------------------------------------------------------------------------- *)
 
 module type RegionProxy =
 sig
@@ -43,10 +62,7 @@ sig
   val compare : region -> region -> int
   val pretty : Format.formatter -> region -> unit
 
-  type primitive = | Int of c_int | Float of c_float | Ptr
-  type kind = Single of primitive | Many of primitive | Garbled
   val kind : region -> kind
-  val pp_kind : Format.formatter -> kind -> unit
 
   val tau_of_region : region -> tau
   val points_to : region -> region option
@@ -67,6 +83,10 @@ sig
   val region_of_id : int -> region option
 
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Underlying Model (Handles Addresses & Garbled)                     --- *)
+(* -------------------------------------------------------------------------- *)
 
 module type ModelWithLoader = sig
   include Sigs.Model
@@ -95,7 +115,12 @@ module type ModelWithLoader = sig
 
   val value_footprint : c_object -> loc -> Sigma.domain
   val init_footprint : c_object -> loc -> Sigma.domain
+
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Region Memory Model                                                --- *)
+(* -------------------------------------------------------------------------- *)
 
 module Make (R:RegionProxy) (M:ModelWithLoader) : Sigs.Model =
 struct
@@ -136,24 +161,18 @@ struct
       | CInit  _ -> Format.fprintf fmt "Init"
       | CGhost _ -> Format.fprintf fmt "Ghost"
 
-    let tau_of_primitive = function
-      | R.Int _ -> L.Int
-      | R.Float c_float -> Cfloat.tau_of_float c_float
-      | R.Ptr -> MemAddr.t_addr
-
     let tau_of_chunk = function
-      | CVal   r | CGhost r ->
+      | CVal r | CGhost r ->
         begin match R.kind r with
-          | R.Single p -> tau_of_primitive p
-          | R.Many   p -> L.Array (MemAddr.t_addr, tau_of_primitive p)
-          | R.Garbled  -> assert false
+          | Single p -> tau_of_primitive p
+          | Many   p -> Qed.Logic.Array (MemAddr.t_addr, tau_of_primitive p)
+          | Garbled  -> assert false
         end
-      (* | CAlloc r -> t_malloc *)
       | CInit  r ->
         begin match R.kind r with
-          | R.Single _ -> t_bool
-          | R.Many   _ -> t_init
-          | R.Garbled  -> assert false
+          | Single _ -> t_bool
+          | Many   _ -> t_init
+          | Garbled -> assert false
         end
 
     let basename_of_chunk = function
@@ -474,7 +493,7 @@ struct
 
     let frames_repr_region ty mloc r c =
       match R.kind r with
-      | R.Single R.Ptr | R.Many R.Ptr ->
+      | Single Ptr | Many Ptr ->
         let offset = M.sizeof ty in
         let sizeof = F.e_one in
         let tau = Chunk.tau_of_chunk c in
@@ -496,7 +515,7 @@ struct
       | Loc { repr ; region } -> frames_repr_region ty repr region chunk
           (*
         begin match R.kind r with
-        | R.Single R.Ptr | R.Many R.Ptr -> [MemMemory.framed (Sigma.value chunk)]
+        | Single Ptr | Many Ptr -> [MemMemory.framed (Sigma.value chunk)]
         | _ -> []
         end *)
       (*
@@ -552,7 +571,7 @@ struct
       | Loc { repr ; region } ->
         let c = Chunk.CRegion (B.CVal region) in
         match R.kind region with
-        | R.Many (R.Int c_int') ->
+        | Many (Int c_int') ->
           if compare_c_int c_int c_int' = 0
           then F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
           else
@@ -562,7 +581,7 @@ struct
                 "%a!=%a" Ctypes.pp_int c_int Ctypes.pp_int c_int'
             in F.e_get (Sigma.value sigma c)
             @@ M.pointer_val repr
-        | R.Single (R.Int c_int') ->
+        | Single (Int c_int') ->
           if compare_c_int c_int c_int' = 0
           then Sigma.value sigma c
           else
@@ -571,12 +590,12 @@ struct
                 ~effect:"C_int type is not the same in chunk and in argument"
                 "%a!=%a" Ctypes.pp_int c_int Ctypes.pp_int c_int'
             in Sigma.value sigma c
-        | R.Garbled -> M.load_int sigma.model c_int repr
+        | Garbled -> M.load_int sigma.model c_int repr
         | k ->
           let _ =
             Warning.emit ~severe:false ~source:"MemRegion.Region.load_int"
               ~effect:"Region's kind is not Int" "%a : %a != %a"
-              R.pretty region R.pp_kind k Ctypes.pp_int c_int
+              R.pretty region pp_kind k Ctypes.pp_int c_int
           in assert false
 
     let load_float sigma (c_float:c_float) loc : term = match loc with
@@ -593,7 +612,7 @@ struct
       | Loc { repr ; region } ->
         let c = Chunk.CRegion (B.CVal region) in
         match R.kind region with
-        | R.Many (R.Float c_float') ->
+        | Many (Float c_float') ->
           if compare_c_float c_float c_float' = 0
           then F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
           else
@@ -602,7 +621,7 @@ struct
                 ~effect:"Type is not the same in chunk and in argument" "%a!=%a"
                 Ctypes.pp_float c_float Ctypes.pp_float c_float'
             in F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-        | R.Single (R.Float c_float') ->
+        | Single (Float c_float') ->
           if compare_c_float c_float c_float' = 0
           then Sigma.value sigma c
           else
@@ -611,12 +630,12 @@ struct
                 ~effect:"Type is not the same in chunk and in argument" "%a!=%a"
                 Ctypes.pp_float c_float Ctypes.pp_float c_float'
             in Sigma.value sigma c
-        | R.Garbled -> M.load_float sigma.model c_float repr
+        | Garbled -> M.load_float sigma.model c_float repr
         | k ->
           let _ =
             Warning.emit ~severe:false ~source:"MemRegion.Region.load_float"
               ~effect:"Region's kind is not Float" "%a : %a != %a"
-              R.pretty region R.pp_kind k Ctypes.pp_float c_float
+              R.pretty region pp_kind k Ctypes.pp_float c_float
           in assert false
 
     let load_pointer sigma ty loc : loc = match loc with
@@ -644,17 +663,17 @@ struct
           in Raw { repr = M.load_pointer sigma.Tuple.model ty repr }
         | Some r ->
           let repr = match R.kind region with
-            | R.Many (R.Ptr) ->
+            | Many (Ptr) ->
               M.pointer_loc
               @@ F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-            | R.Single (R.Ptr) -> M.pointer_loc @@ Sigma.value sigma c
-            | R.Garbled -> M.load_pointer sigma.Tuple.model ty repr
+            | Single (Ptr) -> M.pointer_loc @@ Sigma.value sigma c
+            | Garbled -> M.load_pointer sigma.Tuple.model ty repr
             | k ->
               let _ = Warning.emit ~severe:false
                   ~source:"MemRegion.Region.load_pointer"
                   ~effect:"Kind of region is not a pointer"
                   "Region %a : %a != %a"
-                  R.pretty region R.pp_kind k Printer.pp_typ ty
+                  R.pretty region pp_kind k Printer.pp_typ ty
               in assert false
           in Loc { repr ; region = r }
 
@@ -676,7 +695,7 @@ struct
       | Loc { repr ; region } ->
         let c = Chunk.CRegion (B.CVal region) in
         match R.kind region with
-        | R.Many (R.Int c_int') as k ->
+        | Many (Int c_int') as k ->
           if compare_c_int c_int c_int' = 0
           then (c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v)
           else
@@ -684,9 +703,9 @@ struct
                 ~source:"MemRegion.Region.store_int"
                 ~effect:"Int types are not the same"
                 "(%a in %a : %a != %a)"
-                M.pretty repr R.pretty region R.pp_kind k Ctypes.pp_int c_int
+                M.pretty repr R.pretty region pp_kind k Ctypes.pp_int c_int
             in (c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v)
-        | R.Single (R.Int c_int') as k ->
+        | Single (Int c_int') as k ->
           if compare_c_int c_int c_int' = 0
           then (c, v)
           else
@@ -694,9 +713,9 @@ struct
                 ~source:"MemRegion.Region.store_int"
                 ~effect:"Int types are not the same"
                 "(%a in %a : %a != %a)"
-                M.pretty repr R.pretty region R.pp_kind k Ctypes.pp_int c_int
+                M.pretty repr R.pretty region pp_kind k Ctypes.pp_int c_int
             in (c, v)
-        | R.Garbled ->
+        | Garbled ->
           let (c', v) = M.store_int sigma.model c_int repr v in
           (Chunk.CModel c', v)
         | k ->
@@ -704,7 +723,7 @@ struct
               ~source:"MemRegion.Region.store_int"
               ~effect:"Int types are not the same"
               "(%a in %a : %a != %a)"
-              M.pretty repr R.pretty region R.pp_kind k Ctypes.pp_int c_int
+              M.pretty repr R.pretty region pp_kind k Ctypes.pp_int c_int
           in assert false
 
     let store_float sigma c_float loc v : Chunk.t * term = match loc with
@@ -723,7 +742,7 @@ struct
       | Loc { repr ; region } ->
         let c = Chunk.CRegion (B.CVal region) in
         match R.kind region with
-        | R.Many (R.Float c_float') as k ->
+        | Many (Float c_float') as k ->
           if compare_c_float c_float c_float' = 0
           then (c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v)
           else
@@ -731,9 +750,9 @@ struct
                 ~source:"MemRegion.Region.store_float"
                 ~effect:"Float types are not the same"
                 "(%a in %a : %a != %a)"
-                M.pretty repr R.pretty region R.pp_kind k Ctypes.pp_float c_float
+                M.pretty repr R.pretty region pp_kind k Ctypes.pp_float c_float
             in (c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v)
-        | R.Single (R.Float c_float') as k ->
+        | Single (Float c_float') as k ->
           if compare_c_float c_float c_float' = 0
           then (c, v)
           else
@@ -741,9 +760,9 @@ struct
                 ~source:"MemRegion.Region.store_float"
                 ~effect:"Float types are not the same"
                 "(%a in %a : %a != %a)"
-                M.pretty repr R.pretty region R.pp_kind k Ctypes.pp_float c_float
+                M.pretty repr R.pretty region pp_kind k Ctypes.pp_float c_float
             in (c, v)
-        | R.Garbled ->
+        | Garbled ->
           let (c, t) = M.store_float sigma.Tuple.model c_float repr v in
           (Chunk.CModel c, t)
         | k ->
@@ -751,7 +770,7 @@ struct
               ~source:"MemRegion.Region.store_float"
               ~effect:"Float types are not the same"
               "(%a in %a : %a != %a)"
-              M.pretty repr R.pretty region R.pp_kind k Ctypes.pp_float c_float
+              M.pretty repr R.pretty region pp_kind k Ctypes.pp_float c_float
           in assert false
 
     let store_pointer sigma ty loc v : Chunk.t * term = match loc with
@@ -771,10 +790,10 @@ struct
       | Loc { repr ; region } ->
         let c = Chunk.CRegion (B.CVal region) in
         match R.kind region with
-        | R.Many (R.Ptr) ->
+        | Many (Ptr) ->
           c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v
-        | R.Single (R.Ptr) -> c,v
-        | R.Garbled ->
+        | Single (Ptr) -> c,v
+        | Garbled ->
           let (c, repr) = M.store_pointer sigma.Tuple.model ty repr v in
           (Chunk.CModel c, repr)
         | k ->
@@ -782,7 +801,7 @@ struct
               ~source:"MemRegion.Region.store_pointer"
               ~effect:"This is not a region with pointer type"
               "(%a in %a : %a != *%a)"
-              M.pretty repr R.pretty region R.pp_kind k Printer.pp_typ ty
+              M.pretty repr R.pretty region pp_kind k Printer.pp_typ ty
           in assert false
 
     (* ---------------------------------------------------------------------- *)
@@ -805,11 +824,11 @@ struct
         (Chunk.CModel c, t)
       | Loc { repr ; region }->
         match R.kind region with
-        | R.Garbled ->
+        | Garbled ->
           let (c, t) = M.set_init_atom sigma.Tuple.model ty repr v in
           (Chunk.CModel c, t)
-        | R.Single _-> Chunk.CRegion (B.CInit region), v
-        | R.Many _ ->
+        | Single _-> Chunk.CRegion (B.CInit region), v
+        | Many _ ->
           let c = Chunk.CRegion (B.CInit region) in
           c, F.e_set (Sigma.value sigma c) (M.pointer_val repr) v
 
@@ -828,9 +847,9 @@ struct
       | Loc { repr ; region } ->
         let c = Chunk.CRegion (B.CInit region) in
         match R.kind region with
-        | R.Garbled -> M.is_init_atom sigma.Tuple.model ty repr
-        | R.Many _ -> F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
-        | R.Single _ -> Sigma.value sigma c
+        | Garbled -> M.is_init_atom sigma.Tuple.model ty repr
+        | Many _ -> F.e_get (Sigma.value sigma c) @@ M.pointer_val repr
+        | Single _ -> Sigma.value sigma c
 
     let is_init_range sigma ty loc length : pred = match loc with
       | Null ->
@@ -846,16 +865,16 @@ struct
         in M.is_init_range sigma.Tuple.model ty repr length
       | Loc { repr ; region } ->
         match R.kind region with
-        | R.Garbled -> M.is_init_range sigma.Tuple.model ty repr length
-        | R.Many _ ->
+        | Garbled -> M.is_init_range sigma.Tuple.model ty repr length
+        | Many _ ->
           let c = Chunk.CRegion (B.CInit region) in
           let n = F.e_mul (M.sizeof ty) length in
           F.p_call p_is_init_r [Sigma.value sigma c;M.pointer_val repr;n]
-        | R.Single _ as k ->
+        | Single _ as k ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.is_init_range"
               ~effect:"Region is Single kind" "is_init_range(%a in %a : %a, ty=%a, length=%a)"
-              M.pretty repr R.pretty region R.pp_kind k
+              M.pretty repr R.pretty region pp_kind k
               Ctypes.pp_object ty QED.pretty length
           in (* TODO *) assert false
 
@@ -886,17 +905,17 @@ struct
       | Loc { repr }, Chunk.CModel c -> M.set_init ty repr ~length c ~current
       | Loc { repr ; region }, Chunk.CRegion c ->
         match R.kind region, c with
-        | R.Garbled, ( B.CVal _ | B.CInit _| B.CGhost _) ->
+        | Garbled, ( B.CVal _ | B.CInit _| B.CGhost _) ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.set_init"
               ~effect:"Garbled is not associated to low memory model"
               "set_init(%a in %a : Garbled)"
               M.pretty repr R.pretty region
           in assert false
-        | R.Many _, _ ->
+        | Many _, _ ->
           let n = F.e_mul (M.sizeof ty) length in
           F.e_fun f_set_init [current;M.pointer_val repr;n]
-        | R.Single _, _ ->
+        | Single _, _ ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.set_init"
               ~effect:"Single is not supported"
@@ -922,19 +941,19 @@ struct
         Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
       | Loc { repr ; region } ->
         match R.kind region, ty with
-        | R.Garbled, (C_int _ | C_float _ | C_pointer _) ->
+        | Garbled, (C_int _ | C_float _ | C_pointer _) ->
           let model = M.value_footprint ty repr in
           Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
-        | (R.Many (R.Int   _) | R.Single (R.Int   _)), C_int _
-        | (R.Many (R.Float _) | R.Single (R.Float _)), C_float _
-        | (R.Many (R.Ptr    ) | R.Single (R.Ptr    )), C_pointer _->
+        | (Many (Int   _) | Single (Int   _)), C_int _
+        | (Many (Float _) | Single (Float _)), C_float _
+        | (Many (Ptr    ) | Single (Ptr    )), C_pointer _->
           Heap.Set.singleton (Chunk.CRegion (B.CVal region))
-        | (R.Many _ | R.Single _) as k, (C_int _ | C_float _ | C_pointer _) ->
+        | (Many _ | Single _) as k, (C_int _ | C_float _ | C_pointer _) ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.value_footprint"
               ~effect:"Type is not the same in chunk and in argument"
               "value_footprint(%a : %a in %a : %a)"
-              M.pretty repr Ctypes.pp_object ty R.pretty region R.pp_kind k
+              M.pretty repr Ctypes.pp_object ty R.pretty region pp_kind k
           in Heap.Set.singleton @@ Chunk.CRegion (B.CVal region)
         | _, C_comp { cfields } ->
           let none = Heap.Set.empty in
@@ -961,19 +980,19 @@ struct
         Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
       | Loc { repr ; region } ->
         match R.kind region, ty with
-        | R.Garbled, (C_int _ | C_float _ | C_pointer _) ->
+        | Garbled, (C_int _ | C_float _ | C_pointer _) ->
           let model =  M.init_footprint ty repr in
           Sigma.to_domain Tuple.{ model ; region = BSigma.empty }
-        | (R.Many (R.Int   _) | R.Single (R.Int   _)), C_int _
-        | (R.Many (R.Float _) | R.Single (R.Float _)), C_float _
-        | (R.Many (R.Ptr    ) | R.Single (R.Ptr    )), C_pointer _->
+        | (Many (Int   _) | Single (Int   _)), C_int _
+        | (Many (Float _) | Single (Float _)), C_float _
+        | (Many (Ptr    ) | Single (Ptr    )), C_pointer _->
           Heap.Set.singleton @@ Chunk.CRegion (B.CInit region)
-        | (R.Many _ | R.Single _) as k, (C_int _ | C_float _ | C_pointer _) ->
+        | (Many _ | Single _) as k, (C_int _ | C_float _ | C_pointer _) ->
           let _ = Warning.emit ~severe:false
               ~source:"MemRegion.Region.init_footprint"
               ~effect:"Type is not the same in chunk and in argument"
               "init_footprint(%a : %a in %a : %a)"
-              M.pretty repr Ctypes.pp_object ty R.pretty region R.pp_kind k
+              M.pretty repr Ctypes.pp_object ty R.pretty region pp_kind k
           in Heap.Set.singleton @@ Chunk.CRegion (B.CInit region)
         | _, C_comp { cfields } ->
           let none = Heap.Set.empty in
@@ -1269,10 +1288,10 @@ struct
       | B.CInit region ->
         MemMemory.cinits @@ Sigma.value sigma @@ Chunk.CRegion (B.CInit region)
       | B.CVal region | B.CGhost region ->  match R.kind region with
-        | R.Many R.Ptr | R.Single R.Ptr ->
+        | Many Ptr | Single Ptr ->
           MemMemory.framed @@ Sigma.value sigma @@ Chunk.CRegion (B.CVal region)
-        | R.Garbled | R.Many (R.Int _ | R.Float _)
-        | R.Single (R.Int _ | R.Float _) -> p_true
+        | Garbled | Many (Int _ | Float _)
+        | Single (Int _ | Float _) -> p_true
     in
     BSigma.Chunk.Set.fold
       (fun c l -> region_frame sigma c :: l)
@@ -1324,14 +1343,14 @@ struct
     | Chunk.CModel _ | Chunk.CRegion (B.CInit _)
     | Chunk.CRegion (B.CGhost _) -> p_true
     | Chunk.CRegion (B.CVal region) -> match R.kind region with
-      | R.Garbled -> p_true
-      | R.Many (R.Float _ | R.Ptr )
-      | R.Single (R.Float _ | R.Ptr ) -> p_true
-      | R.Many (R.Int cint) ->
+      | Garbled -> p_true
+      | Many (Float _ | Ptr )
+      | Single (Float _ | Ptr ) -> p_true
+      | Many (Int cint) ->
         let l = Lang.freshvar ~basename:"l" (Lang.t_addr()) in
         let m = Sigma.value sigma chunk in
         p_forall [l] (Cint.range cint (F.e_get m (e_var l)))
-      | R.Single (R.Int cint) ->
+      | Single (Int cint) ->
         Cint.range cint @@ Sigma.value sigma chunk
 
   let is_well_formed sigma =

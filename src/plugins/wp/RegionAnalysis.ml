@@ -49,18 +49,6 @@ let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
 
 let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
 
-type primitive = | Int of c_int | Float of c_float | Ptr
-type kind = Single of primitive | Many of primitive | Garbled
-
-let pp_primitive fmt = function
-  | Int i -> Ctypes.pp_int fmt i
-  | Float f -> Ctypes.pp_float fmt f
-  | Ptr -> Format.pp_print_string fmt "void*"
-let pp_kind fmt = function
-  | Many p -> Format.fprintf fmt "[%a]" pp_primitive p
-  | Single p -> pp_primitive fmt p
-  | Garbled -> Format.pp_print_string fmt "Garbled"
-
 let types r =
   let module Tset = Cil_datatype.Typ.Set in
   let pool = ref Tset.empty in
@@ -82,9 +70,10 @@ module Kind = WpContext.Generator
     (struct
       (* Data : WpContext.Data with type key = Key.t *)
       type key = region
-      type data = kind
+      type data = MemRegion.kind
       let name = "Wp.RegionAnalysis.R"
-      let compile region : kind =
+      let compile region =
+        let open MemRegion in
         match types region with
         | [ty] ->
           begin

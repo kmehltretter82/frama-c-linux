@@ -25,6 +25,10 @@ open Ctypes
 open Lang.F
 open Sigs
 
+type primitive = | Int of c_int | Float of c_float | Ptr
+type kind = Single of primitive | Many of primitive | Garbled
+val pp_kind : Format.formatter -> kind -> unit
+
 (* -------------------------------------------------------------------------- *)
 (* --- Region Memory Model                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -39,10 +43,7 @@ sig
   val compare : region -> region -> int
   val pretty : Format.formatter -> region -> unit
 
-  type primitive = | Int of c_int | Float of c_float | Ptr
-  type kind = Single of primitive | Many of primitive | Garbled
   val kind : region -> kind
-  val pp_kind : Format.formatter -> kind -> unit
 
   val tau_of_region : region -> tau
   val points_to : region -> region option
