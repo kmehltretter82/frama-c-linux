@@ -86,3 +86,7 @@ type scalar_typ =
 
 (* Classifies a cil type as a scalar type; returns None for non-scalar types. *)
 val classify_as_scalar: typ -> scalar_typ option
+
+(* Returns the range of a cil integer type; returns None for non-integer types.
+   Pointers are considered as integer types if [ptr] is true. *)
+val integer_range: ptr:bool -> typ -> integer_range option

@@ -73,6 +73,7 @@ sig
 
   val cast: typ -> exp -> exp (* (typ)x *)
   val add: exp -> exp -> exp (* x + y *)
+  val div: exp -> exp -> exp (* x / y *)
   val eq: exp -> exp -> exp (* x == y *)
   val ne: exp -> exp -> exp (* x != y *)
 

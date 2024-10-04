@@ -342,6 +342,23 @@ module Make
                     Forward Operations, Alarms and Reductions
      ------------------------------------------------------------------------ *)
 
+  (* Applies function [f] on the optional value in a truth. *)
+  let apply_on_truth f = function
+    | `Unknown v -> `Unknown (f v)
+    | `TrueReduced v -> `TrueReduced (f v)
+    | `True | `False | `Unreachable as x -> x
+
+  (* Assumes that the abstract value [value] represents only values
+     different from integer [i]. *)
+  let assume_non_equal context typ value i =
+    let forward_binop = Value.forward_binop context typ in
+    (* Bottom should never happen on addition or subtraction. *)
+    let add v1 v2 = Bottom.non_bottom (forward_binop PlusA v1 v2) in
+    let sub v1 v2 = Bottom.non_bottom (forward_binop MinusA v1 v2) in
+    let v_i = Value.inject_int typ i in
+    let truth = Value.assume_non_zero (sub value v_i) in
+    apply_on_truth (fun value -> add value v_i) truth
+
   (* Handles the result of an [assume] function from value abstractions (see
      abstract_values.mli for more details), applied to the initial [value].
      If the value could have been reduced, [reduce] is applied on the new value.
@@ -369,22 +386,37 @@ module Make
     let reduce = reduce_argument (expr, value) in
     process_truth ~reduce ~alarm value truth
 
-  (* Processes the results of assume_comparable, that affects both arguments of
-     the comparison. *)
-  let reduce_by_double_truth ~alarm (e1, v1) (e2, v2) truth =
+  (* Interprets a [truth] about a pair of values (v1, v2), and reduce both
+     values accordingly. Used on the result of [Value.assume_comparable], which
+     affects both arguments of the comparison. *)
+  let reduce_both_by_truth ~alarm (e1, v1) (e2, v2) truth =
     let reduce (new_value1, new_value2) =
       Option.iter (fun e1 -> reduce_argument (e1, v1) new_value1) e1;
       reduce_argument (e2, v2) new_value2;
     in
     process_truth ~reduce ~alarm (v1, v2) truth
 
+  (* Creates a disjunctive truth about the pair of values (v1, v2). *)
+  let disjunctive_truth (v1, truth1) (v2, truth2) =
+    match truth1, truth2 with
+    | (`True | `TrueReduced _), _
+    | _, (`True | `TrueReduced _) -> `True
+    | `Unreachable, _ | _, `Unreachable -> `Unreachable
+    | `False, `False -> `False
+    | `False, `Unknown v2 -> `Unknown (v1, v2)
+    | `Unknown v1, `False -> `Unknown (v1, v2)
+    | `Unknown _, `Unknown _ ->
+      (* [v1] (resp. [v2]) cannot be reduced as [truth2] (resp. [truth1])
+         might be true for some values. *)
+      `Unknown (v1, v2)
+
   let is_true = function
     | `True | `TrueReduced _ -> true
     | _ -> false
 
+  (* Overflow of div is processed separately in [assume_valid_div]. *)
   let may_overflow = function
-    | Shiftlt | Mult | MinusPP | MinusPI | PlusPI
-    | PlusA | MinusA | Div -> true
+    | Shiftlt | Mult | MinusPP | MinusPI | PlusPI | PlusA | MinusA -> true
     | _ -> false
 
   let truncate_bound overflow_kind bound bound_kind expr value =
@@ -541,15 +573,37 @@ module Make
     let truth = Value.assume_bounded Alarms.Upper_bound size_int value in
     reduce_by_truth ~alarm (index_expr, value) truth
 
-  let assume_valid_binop typ (e1, v1 as arg1) op (e2, v2 as arg2) =
+  (* Checks the arguments of a division and creates a division by zero alarm
+     if [v2] can be equal to 0, and an overflow alarm if [typ] is a signed
+     integer type, [v1] can be equal to min_int AND [v2] can be equal to -1.
+     Also reduces the values of [v1] or [v2] accordingly when possible. *)
+  let assume_valid_div context typ (e1, v1) (e2, v2) =
     let open Evaluated.Operators in
+    let truth = Value.assume_non_zero v2 in
+    let alarm () = Alarms.Division_by_zero (Eva_ast.to_cil_exp e2) in
+    let* v2 = reduce_by_truth ~alarm (e2, v2) truth in
+    match Eval_typ.integer_range ~ptr:false typ with
+    | Some range when range.i_signed ->
+      let min_int = Eval_typ.range_lower_bound range in
+      let max_int = Eval_typ.range_upper_bound range in
+      let alarm () =
+        let expr = Eva_ast.Build.div e1 e2 in
+        let cil_expr = Eva_ast.to_cil_exp expr in
+        Alarms.(Overflow (Signed, cil_expr, max_int, Upper_bound))
+      in
+      let truth1 = assume_non_equal context typ v1 min_int in
+      let truth2 = assume_non_equal context typ v2 Integer.minus_one in
+      let truth = disjunctive_truth (v1, truth1) (v2, truth2) in
+      reduce_both_by_truth ~alarm (Some e1, v1) (e2, v2) truth
+    | _ -> return (v1, v2)
+
+  let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
     if Cil.isIntegralType typ then
       match op with
       | Div | Mod ->
-        let truth = Value.assume_non_zero v2 in
-        let alarm () = Alarms.Division_by_zero (Eva_ast.to_cil_exp e2) in
-        let+ v2 = reduce_by_truth ~alarm arg2 truth in
-        v1, v2
+        (* The behavior of a%b is undefined if the behavior of a/b is undefined,
+           according to section 6.5.5 §5 and §6 of the C standard. *)
+        assume_valid_div context typ arg1 arg2
       | Shiftrt ->
         let warn_negative = Kernel.RightShiftNegative.get () in
         reduce_shift ~warn_negative typ arg1 arg2
@@ -563,7 +617,7 @@ module Make
           Alarms.Differing_blocks (Eva_ast.to_cil_exp e1, Eva_ast.to_cil_exp e2)
         in
         let arg1 = Some e1, v1 in
-        reduce_by_double_truth ~alarm arg1 arg2 truth
+        reduce_both_by_truth ~alarm arg1 arg2 truth
       | _ -> return (v1, v2)
     else return (v1, v2)
 
@@ -587,7 +641,7 @@ module Make
       if warn_pointer_comparison typ then
         if propagate_all
         then `Value (v1, v2), snd (interpret_truth ~alarm (v1, v2) truth)
-        else reduce_by_double_truth ~alarm (e1, v1) (e2, v2) truth
+        else reduce_both_by_truth ~alarm (e1, v1) (e2, v2) truth
       else `Value (v1, v2), Alarmset.none
     in
     let result = let* v1, v2 = args in compute v1 v2 in
@@ -616,7 +670,7 @@ module Make
       let e1 = if Eva_ast.is_zero_ptr e1 then None else Some e1 in
       forward_comparison ~compute typ_e1 kind (e1, v1) arg2
     | None ->
-      let& v1, v2 = assume_valid_binop typ arg1 op arg2 in
+      let& v1, v2 = assume_valid_binop context typ arg1 op arg2 in
       Value.forward_binop context typ_e1 op v1 v2
 
   let forward_unop context unop (e, v as arg) =

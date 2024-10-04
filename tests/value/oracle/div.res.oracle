@@ -3,6 +3,7 @@
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
+  nondet ∈ [--..--]
   X ∈ {0}
   Y ∈ {0}
   Z1 ∈ {0}
@@ -24,6 +25,8 @@
    [2] ∈ {3}
    [3..4] ∈ {0}
   p ∈ {0}
+[eva] computing for function test <- main.
+  Called from div.i:86.
 [eva:alarm] div.i:14: Warning: signed overflow. assert c + 1 ≤ 2147483647;
 [eva:alarm] div.i:17: Warning: signed overflow. assert c + 2 ≤ 2147483647;
 [eva] div.i:14: starting to merge loop iterations
@@ -34,34 +37,20 @@
 [eva:alarm] div.i:33: Warning: 
   pointer downcast. assert (unsigned int)(&Z2) ≤ 2147483647;
 [eva:alarm] div.i:33: Warning: 
-  signed overflow. assert -2147483648 ≤ (int)(&Z2) / Z2;
-[eva:alarm] div.i:33: Warning: 
   signed overflow. assert (int)(&Z2) / Z2 ≤ 2147483647;
 [eva:garbled-mix:write] div.i:33: 
   Assigning imprecise value to b because of arithmetic operation on addresses.
 [eva:alarm] div.i:34: Warning: 
   pointer downcast. assert (unsigned int)(&X + 2) ≤ 2147483647;
 [eva:alarm] div.i:34: Warning: division by zero. assert (int)(&X + 2) ≢ 0;
-[eva:alarm] div.i:34: Warning: 
-  signed overflow. assert -2147483648 ≤ 100 / (int)(&X + 2);
-[eva:alarm] div.i:34: Warning: 
-  signed overflow. assert 100 / (int)(&X + 2) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:34: 
   Assigning imprecise value to d2 because of arithmetic operation on addresses.
 [eva:alarm] div.i:35: Warning: 
   pointer downcast. assert (unsigned int)(&X + 1) ≤ 2147483647;
-[eva:alarm] div.i:35: Warning: 
-  signed overflow. assert -2147483648 ≤ 100 / (int)(&X + 1);
-[eva:alarm] div.i:35: Warning: 
-  signed overflow. assert 100 / (int)(&X + 1) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:35: 
   Assigning imprecise value to d1 because of arithmetic operation on addresses.
 [eva:alarm] div.i:36: Warning: 
   pointer downcast. assert (unsigned int)(&X) ≤ 2147483647;
-[eva:alarm] div.i:36: Warning: 
-  signed overflow. assert -2147483648 ≤ 100 / (int)(&X);
-[eva:alarm] div.i:36: Warning: 
-  signed overflow. assert 100 / (int)(&X) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:36: 
   Assigning imprecise value to d0 because of arithmetic operation on addresses.
 [eva:alarm] div.i:37: Warning: 
@@ -72,11 +61,37 @@
   signed overflow. assert -((int)(&X)) ≤ 2147483647;
 [eva:garbled-mix:write] div.i:37: 
   Assigning imprecise value to e because of arithmetic operation on addresses.
+[eva] Recording results for test
+[eva] Done for function test
+[eva] computing for function test_overflow_alarms <- main.
+  Called from div.i:87.
+[eva:alarm] div.i:52: Warning: signed overflow. assert a_0 / b_0 ≤ 2147483647;
+[eva] div.i:54: Frama_C_show_each: {-2147483648; 10}, {-1; 2}
+[eva:alarm] div.i:57: Warning: 
+  signed overflow. assert a_0 / min_one ≤ 2147483647;
+[eva] div.i:59: Frama_C_show_each_ten: {10}
+[eva:alarm] div.i:62: Warning: 
+  signed overflow. assert min_int / b_0 ≤ 2147483647;
+[eva] div.i:64: Frama_C_show_each_two: {2}
+[eva:alarm] div.i:67: Warning: 
+  signed overflow. assert x / min_one ≤ 2147483647;
+[eva] div.i:69: Frama_C_show_each: [-2147483647..2147483647]
+[eva:alarm] div.i:72: Warning: division by zero. assert x ≢ 0;
+[eva:alarm] div.i:72: Warning: 
+  signed overflow. assert min_int / x ≤ 2147483647;
+[eva] div.i:74: Frama_C_show_each: [-2147483648..2147483647]
+[eva:alarm] div.i:77: Warning: 
+  signed overflow. assert min_int / min_one ≤ 2147483647;
+[eva:alarm] div.i:82: Warning: division by zero. assert y ≢ 0;
+[eva:alarm] div.i:82: Warning: signed overflow. assert x / y ≤ 2147483647;
+[eva] Recording results for test_overflow_alarms
+[eva] Done for function test_overflow_alarms
 [eva] Recording results for main
 [eva] Done for function main
+[eva] div.i:77: assertion 'Eva,signed_overflow' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
-[eva:final-states] Values at end of function main:
+[eva:final-states] Values at end of function test:
   X ∈ [--..--]
   Y ∈ [-126..333],9%27
   Z1 ∈ [-42..111],3%9
@@ -95,10 +110,60 @@
   e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37}) }}
   p ∈ {{ &t[3] }}
   c ∈ [--..--]
+[eva:final-states] Values at end of function test_overflow_alarms:
+  min_int ∈ {-2147483648}
+  min_one ∈ {-1}
+  a_0 ∈ {-2147483648; 10}
+  b_0 ∈ {-1; 2}
+  x ∈ [--..--]
+  y ∈ [--..--]
+  r ∈ [--..--]
+[eva:final-states] Values at end of function main:
+  X ∈ [--..--]
+  Y ∈ [-126..333],9%27
+  Z1 ∈ [-42..111],3%9
+  Z2 ∈ [-25..66]
+  T ∈ [34..493],7%27
+  U1 ∈ [11..164],2%9
+  U2 ∈ [6..98]
+  V ∈ [-125..334],10%27
+  W1 ∈ [-41..111]
+  W2 ∈ [-25..66]
+  a ∈ [-40000..40000]
+  b ∈ {{ garbled mix of &{Z2} (origin: Arithmetic {div.i:33}) }}
+  d1 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:35}) }}
+  d2 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:34}) }}
+  d0 ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:36}) }}
+  e ∈ {{ garbled mix of &{X} (origin: Arithmetic {div.i:37}) }}
+  p ∈ {{ &t[3] }}
+[from] Computing for function test
+[from] Done for function test
+[from] Computing for function test_overflow_alarms
+[from] Done for function test_overflow_alarms
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
+[from] Function test:
+  X FROM X (and SELF)
+  Y FROM X
+  Z1 FROM X
+  Z2 FROM X
+  T FROM X
+  U1 FROM X
+  U2 FROM X
+  V FROM X
+  W1 FROM X
+  W2 FROM X
+  a FROM X
+  b FROM X
+  d1 FROM \nothing
+  d2 FROM \nothing
+  d0 FROM \nothing
+  e FROM \nothing
+  p FROM \nothing
+[from] Function test_overflow_alarms:
+  NO EFFECTS
 [from] Function main:
   X FROM X (and SELF)
   Y FROM X
@@ -118,7 +183,15 @@
   e FROM \nothing
   p FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
-[inout] Out (internal) for function main:
+[inout] Out (internal) for function test:
     X; Y; Z1; Z2; T; U1; U2; V; W1; W2; a; b; d1; d2; d0; e; p; c
-[inout] Inputs for function main:
+[inout] Inputs for function test:
     X; Y; Z2; T; V
+[inout] Out (internal) for function test_overflow_alarms:
+    min_int; min_one; a_0; tmp; b_0; tmp_0; x; y; r
+[inout] Inputs for function test_overflow_alarms:
+    nondet
+[inout] Out (internal) for function main:
+    X; Y; Z1; Z2; T; U1; U2; V; W1; W2; a; b; d1; d2; d0; e; p
+[inout] Inputs for function main:
+    nondet; X; Y; Z2; T; V

@@ -147,7 +147,9 @@ void pos_rem(void) {
   int l = (int)*(signed char*)&n; // Best rem is ([0..72] \cup {255})%255, we approximate by [-128..127]
 }
 
-/* No overflow alarms should be emitted on mod operations, even on addresses. */
+/* On modulo, overflow alarms should only be emitted on INT_MIN % -1, which
+   is not possible on addresses. However, garbled mixes on arithmetic operations
+   involving addresses currently lose all precision and lead to false alarms. */
 void address_modulo(void) {
   int* ptr = v ? &A : &B;
   unsigned int uaddr = (unsigned int) ptr;
@@ -157,6 +159,51 @@ void address_modulo(void) {
   r = addr % i;
   r = uaddr % 16;
   r = uaddr % i;
+}
+
+/* Tests the emission of overflow alarms on operation x%y only if [x] may be
+   equal to MIN_INT and [y] may be equal to -1. Also tests the reduction of the
+   possible values of [x] or [y] when possible. Similar test in file div.i. */
+void test_overflow_alarms (void) {
+  int min_int = -2147483648;
+  int min_one = -1;
+  int a = v ? min_int : 10;
+  int b = v ? -1 : 2;
+  int x = v;
+  int y = v;
+  int r = 0;
+  if (v) {
+    r = a % b; // Overflow alarm.
+    // No reduction as [a] and [b] cannot be reduced simultaneously.
+    Frama_C_show_each(a, b);
+  }
+  if (v) {
+    r = a % min_one; // Overflow alarm.
+    r = a % min_one; // No alarm if [a] has been reduced.
+    Frama_C_show_each_ten(a); // Check the reduction of [a].
+  }
+  if (v) {
+    r = min_int % b; // Overflow alarm.
+    r = min_int % b; // No alarm if [b] has been reduced.
+    Frama_C_show_each_two(b); // Check the reduction of [b]
+  }
+  if (v) {
+    r = x % min_one; // Overflow alarm.
+    r = x % min_one; // No alarm if [x] has been reduced.
+    Frama_C_show_each(x); // All integers except MIN_INT.
+  }
+  if (v) {
+    r = min_int % x; // Overflow alarm and division by zero alarm.
+    // All integers except -1 and 0, but not representable as an interval.
+    Frama_C_show_each(x);
+  }
+  if (v) {
+    r = min_int % min_one; // Invalid alarm.
+    Frama_C_show_each_BOTTOM(min_int, min_one);
+  }
+  // Overflow alarm and division by zero alarm,
+  // no possible reduction: [x] and [y] must be top_int as the end.
+  r = x / y;
 }
 
 void main() {
@@ -170,4 +217,5 @@ void main() {
   extract_bits_modulo();
   pos_rem();
   address_modulo();
+  test_overflow_alarms();
 }

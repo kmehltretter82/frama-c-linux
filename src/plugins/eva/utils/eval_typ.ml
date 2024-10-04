@@ -191,6 +191,13 @@ let classify_as_scalar typ =
   | TFloat (fk, _) -> Some (TSFloat fk)
   | _ -> None
 
+let integer_range ~ptr typ =
+  match Cil.unrollType typ with
+  | TInt (ik, attrs) | TEnum ({ekind=ik}, attrs) ->
+    Some (ik_attrs_range ik attrs)
+  | TPtr _ when ptr -> Some (pointer_range ())
+  | _ -> None
+
 let need_cast t1 t2 =
   match classify_as_scalar t1, classify_as_scalar t2 with
   | None, None -> Cil.need_cast t1 t2

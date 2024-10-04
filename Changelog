@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+*   RTE       [2024-10-04] Fixed missing assertion on modulo signed overflow.
+*   Eva       [2024-10-04] Fixed missing signed overflow alarm on modulo.
+-   Eva       [2024-10-04] Fewer false alarms of signed overflow on divisions.
 o!  Kernel    [2024-09-30] ACSL extensions are now associated to a plug-in,
               allowing the registration of several extensions with the same name
               from different plug-ins
