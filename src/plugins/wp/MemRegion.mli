@@ -59,5 +59,4 @@ module type ModelLoader = sig
 end
 
 
-(* module Make (_:RegionAnalysis.API) (_:ModelLoader) : Sigs.Model *)
-module MemMake (_:RegionAnalysis.API) (_:ModelLoader) : Sigs.Model
+module Make (_:RegionAnalysis.API) (_:ModelLoader) : Sigs.Model

@@ -28,7 +28,8 @@ module Logic = Qed.Logic
 
 (* Why3 symbols *)
 
-module Why3 = struct
+module Why3 =
+struct
   let library = "membytes"
 
   let t_vblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Int)

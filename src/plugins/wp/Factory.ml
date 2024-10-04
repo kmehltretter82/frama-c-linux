@@ -244,7 +244,7 @@ module Comp_Region =
   MakeCompiler
     (MemVar.Make
        (MemVar.Static)
-       (MemRegion.MemMake(RegionAnalysis.R)(MemBytes)))
+       (MemRegion.Make(RegionAnalysis.R)(MemBytes)))
 
 
 let compiler mheap mvar : (module Sigs.Compiler) =
