@@ -54,10 +54,8 @@ sig
 
   val value_footprint: c_object -> loc -> Sigma.domain
   val init_footprint: c_object -> loc -> Sigma.domain
-  (* toutes les fils qui ne sont pas des points_to *)
 
   val frames : c_object -> loc -> Chunk.t -> frame list
-  (* memBytes *)
 
   val last : Sigma.t -> c_object -> loc -> term
 
@@ -80,7 +78,6 @@ sig
   val set_init_atom : Sigma.t -> c_object -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
-  (* val monotonic_init : Sigma.t -> Sigma.t -> pred *)
 
 end
 

@@ -99,7 +99,7 @@ let run_and_prove
 (* ---  Model Panel                                                     --- *)
 (* ------------------------------------------------------------------------ *)
 
-type memory = TREE | HOARE | TYPED | EVA | BYTES | Region
+type memory = TREE | HOARE | TYPED | EVA | BYTES | REGION
 
 class model_selector (main : Design.main_window_extension_points) =
   let dialog = new Wpane.dialog
@@ -152,7 +152,7 @@ class model_selector (main : Design.main_window_extension_points) =
          | Typed m -> memory#set TYPED ; c_casts#set (m = MemTyped.Unsafe)
          | Eva -> memory#set EVA
          | Bytes -> memory#set BYTES
-         | Region -> memory#set Region
+         | Region -> memory#set REGION
         ) ;
         c_byref#set (s.mvar = Ref) ;
         c_ctxt#set (s.mvar = Caveat) ;
@@ -168,7 +168,7 @@ class model_selector (main : Design.main_window_extension_points) =
                      (if c_casts#get then MemTyped.Unsafe else MemTyped.Fits)
         | EVA -> Eva
         | BYTES -> Bytes
-        | Region -> Region
+        | REGION -> Region
       in {
         mheap = m ;
         mvar = if c_ctxt#get then Caveat else if c_byref#get then Ref else Var ;

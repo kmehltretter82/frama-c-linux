@@ -82,7 +82,6 @@ sig
   val set_init_atom : Sigma.t -> c_object -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
-  (* val monotonic_init : Sigma.t -> Sigma.t -> pred *)
 
 end
 

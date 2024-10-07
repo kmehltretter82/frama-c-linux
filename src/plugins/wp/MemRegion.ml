@@ -666,18 +666,14 @@ struct
   let invalid sigma r = M.invalid (fst sigma) (rloc r)
 
   let included (a : segment) (b : segment) =
-    let sa = rloc a in
-    let sb = rloc b in
     match rloc_region a, rloc_region b with
     | Some ra, Some rb when R.separated ra rb -> p_false
-    | _ -> M.included sa sb
+    | _ -> M.included (rloc a) (rloc b)
 
   let separated (a : segment) (b : segment) =
-    let sa = rloc a in
-    let sb = rloc b in
     match rloc_region a, rloc_region b with
     | Some ra, Some rb when R.separated ra rb -> p_true
-    | _ -> M.separated sa sb
+    | _ -> M.separated (rloc a) (rloc b)
 
   let alloc sigma vars =
     if vars = [] then sigma else
@@ -712,8 +708,9 @@ struct
          | ValInit | ArrInit -> ()
          | Value (Int iota) -> assume @@ Cint.range iota (e_var m)
          | Array (Int iota) ->
-
-           assume @@ Cint.range iota (e_var m)
+           let a = Lang.freshvar ~basename:"p" @@ Lang.t_addr () in
+           let b = e_get (e_var m) (e_var a) in
+           assume @@ p_forall [a] (Cint.range iota b)
          | Value (Float _ | Ptr) | Array (Float _ | Ptr) -> ()
       ) (snd sigma) ;
     p_conj !pool

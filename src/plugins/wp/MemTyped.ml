@@ -1269,7 +1269,6 @@ let updates seq domain =
 let sizeof = MODEL.sizeof
 let last = MODEL.last
 let havoc = MODEL.havoc
-let sizeof_havoc _ _ = F.e_one
 let eqmem_forall = MODEL.eqmem_forall
 let load_int = MODEL.load_int
 let load_float = MODEL.load_float
