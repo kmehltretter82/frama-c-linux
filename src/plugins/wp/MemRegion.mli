@@ -40,6 +40,7 @@ sig
   val id : region -> int
   val of_id : int -> region option
   val kind : region -> kind
+  val name : region -> string option
   val cvar : varinfo -> region option
   val field : region -> fieldinfo -> region option
   val shift : region -> c_object -> region option

@@ -356,7 +356,7 @@ let regions map =
 let size (m: map) (r: node) =
   sizeof (Ufind.get m.store r).clayout
 
-  let parents (m: map) (r: node) =
+let parents (m: map) (r: node) =
   nodes m (Ufind.get m.store r).cparents
 
 let roots (m: map) (r: node) =

@@ -59,6 +59,7 @@ sig
   val id : region -> int
   val of_id : int -> region option
   val kind : region -> kind
+  val name : region -> string option
   val cvar : varinfo -> region option
   val field : region -> fieldinfo -> region option
   val shift : region -> c_object -> region option
@@ -146,12 +147,15 @@ struct
       | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
       | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
 
-    let basename_of_chunk { mu } =
+    let basename_of_chunk { mu ; region } =
       match mu with
-      | Value p -> Format.asprintf "V%a" pp_prim p
-      | Array p -> Format.asprintf "M%a" pp_prim p
       | ValInit -> "Vinit"
       | ArrInit -> "Minit"
+      | Array p -> Format.asprintf "M%a" pp_prim p
+      | Value p ->
+        match R.name region with
+        | Some a -> a
+        | None -> Format.asprintf "V%a" pp_prim p
 
     let is_framed _ = false
 

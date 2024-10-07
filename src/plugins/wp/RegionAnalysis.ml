@@ -55,29 +55,53 @@ let types map r =
   List.iter add @@ Region.shifts map r ;
   Tset.elements !pool
 
+let rec singleton map r =
+  match Region.parents map r with
+  | [] -> List.length @@ Region.roots map r = 1
+  | [r] -> Region.roots map r = [] && singleton map r
+  | _ -> false
+
 (* Keeping track of the decision to apply which memory model to each region *)
 module Kind = WpContext.Generator(Type)
     (struct
       (* Data : WpContext.Data with type key = Key.t *)
       type key = region
       type data = MemRegion.kind
-      let name = "Wp.RegionAnalysis.R"
+      let name = "Wp.RegionAnalysis.Kind"
       let compile r =
         let open MemRegion in
         let map = get_map () in
         match types map r with
         | [ty] when Cil.bitsSizeOf ty >= Region.size map r ->
           begin
+            let pkind p = if singleton map r then Single p else Many p in
             match Ctypes.object_of ty with
-            | C_int i -> Many (Int i)
-            | C_float f -> Many (Float f)
-            | C_pointer _ -> Many Ptr
+            | C_int i -> pkind (Int i)
+            | C_float f -> pkind (Float f)
+            | C_pointer _ -> pkind Ptr
             | _ -> Garbled
           end
         | _ -> Garbled
     end)
 
+module Name = WpContext.Generator(Type)
+    (struct
+      (* Data : WpContext.Data with type key = Key.t *)
+      type key = region
+      type data = string option
+      let name = "Wp.RegionAnalysis.Name"
+      let compile r =
+        let map = get_map () in
+        match Region.labels map r with
+        | label::_ -> Some label
+        | [] ->
+          match Region.roots map r with
+          | v::_ -> Some v.vorig_name
+          | _ -> None
+    end)
+
 let kind = Kind.get
+let name = Name.get
 let points_to region = Region.points_to (get_map ()) region
 let separated r1 r2 = Region.separated (get_map ()) r1 r2
 let included r1 r2 = Region.included (get_map ()) r1 r2
