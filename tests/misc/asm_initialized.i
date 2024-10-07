@@ -5,7 +5,7 @@ STDOPT: #"-asm-contracts-ensure-init -asm-contracts-auto-validate -inline-stmt-c
 
 int main() {
   int* sp;
-  int x;
+  int x = 2;
   asm volatile ("mov %%rsp, %0;":"=r"(sp));
   *(sp - 2) = 3;
   return x;
