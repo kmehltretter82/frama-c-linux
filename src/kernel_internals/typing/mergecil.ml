@@ -65,17 +65,9 @@ let mergeSynonyms = true
 (** Whether to use path compression *)
 let usePathCompression = true
 
-(* Try to merge definitions of inline functions. They can appear in multiple
- * files and we would like them all to be the same. This can slow down the
- * merger an order of magnitude !!! *)
-let mergeInlines = true
-
-let mergeInlinesRepeat = mergeInlines && true
-
 (* The default value has been changed to false after Boron to fix bts#524.
    But this behavior is very convenient to parse the Linux kernel. *)
-let mergeInlinesWithAlphaConvert () =
-  mergeInlines && Kernel.AggressiveMerging.get ()
+let mergeInlinesWithAlphaConvert () = Kernel.AggressiveMerging.get ()
 
 
 (* when true, merge duplicate definitions of externally-visible functions;
@@ -1745,7 +1737,7 @@ let oneFilePass1 (f:file) : unit =
       if fdec.svar.vstorage <> Static then begin
         matchVarinfo ~fromGFun:true fdec.svar (l, !currentDeclIdx)
       end else begin
-        if fdec.svar.vinline && mergeInlines then
+        if fdec.svar.vinline && mergeInlinesWithAlphaConvert() then
           (* Just create the nodes for inline functions *)
           ignore (PlainMerging.getNode iEq iSyn !currentFidx
                     fdec.svar.vname fdec.svar (Some (l, !currentDeclIdx)))
@@ -2751,10 +2743,7 @@ let oneFilePass2 (f: file) =
           setFormals fdec fdec.sformals
         end;
         (* See if we can remove this inline function *)
-        if fdec'.svar.vinline && mergeInlines then begin
-          let mergeInlinesWithAlphaConvert =
-            mergeInlinesWithAlphaConvert ()
-          in
+        if fdec'.svar.vinline && mergeInlinesWithAlphaConvert() then begin
           let printout =
             (* Temporarily turn of printing of lines *)
             let oldprintln =
@@ -2765,8 +2754,7 @@ let oneFilePass2 (f: file) =
             (* If we must do alpha conversion then temporarily set the
              * names of the function, local variables and formals in a
              * standard way *)
-            if mergeInlinesWithAlphaConvert then
-              fdec'.svar.vname <- "@@alphaname@@";
+            fdec'.svar.vname <- "@@alphaname@@";
             let nameId = ref 0 in
             let oldNames : string list ref = ref [] in
             let renameOne (v: varinfo) =
@@ -2783,27 +2771,23 @@ let oneFilePass2 (f: file) =
             in
             (* Remember the original type *)
             let origType = fdec'.svar.vtype in
-            if mergeInlinesWithAlphaConvert then begin
-              (* Rename the formals *)
-              List.iter renameOne fdec'.sformals;
-              (* Reflect in the type *)
-              setFormals fdec' fdec'.sformals;
-              (* Now do the locals *)
-              List.iter renameOne fdec'.slocals
-            end;
+            (* Rename the formals *)
+            List.iter renameOne fdec'.sformals;
+            (* Reflect in the type *)
+            setFormals fdec' fdec'.sformals;
+            (* Now do the locals *)
+            List.iter renameOne fdec'.slocals;
             (* Now print it *)
             let res = Format.asprintf "%a" Cil_printer.pp_global g' in
             Cil_printer.state.Printer_api.line_directive_style
             <- oldprintln;
             fdec'.svar.vname <- newname;
-            if mergeInlinesWithAlphaConvert then begin
-              (* Do the locals in reverse order *)
-              List.iter undoRenameOne (List.rev fdec'.slocals);
-              (* Do the formals in reverse order *)
-              List.iter undoRenameOne (List.rev fdec'.sformals);
-              (* Restore the type *)
-              Cil.update_var_type fdec'.svar origType;
-            end;
+            (* Do the locals in reverse order *)
+            List.iter undoRenameOne (List.rev fdec'.slocals);
+            (* Do the formals in reverse order *)
+            List.iter undoRenameOne (List.rev fdec'.sformals);
+            (* Restore the type *)
+            Cil.update_var_type fdec'.svar origType;
             res
           in
           (* Make a node for this inline function using the original
@@ -2836,7 +2820,7 @@ let oneFilePass2 (f: file) =
              * We should reuse this, but watch for the case when the inline
              * was already used. *)
             if H.mem varUsedAlready fdec'.svar.vname then begin
-              if mergeInlinesRepeat then begin
+              if mergeInlinesWithAlphaConvert() then begin
                 repeatPass2 := true
               end else begin
                 Kernel.warning ~current:true
@@ -3065,7 +3049,7 @@ let oneFilePass2 (f: file) =
   (* See if we must re-visit the globals in this file because an inline that
    * is being removed was used before we saw the definition and we decided to
    * remove it *)
-  if mergeInlinesRepeat && !repeatPass2 then begin
+  if mergeInlinesWithAlphaConvert() && !repeatPass2 then begin
     Kernel.feedback "Repeat final merging phase: %a"
       Datatype.Filepath.pretty f.fileName;
     (* We are going to rescan the globals we have added while processing this
@@ -3310,7 +3294,7 @@ let merge (files: file list) (newname: string) : file =
     doMergeSynonyms llSyn matchLogicLemma;
     VolatileMerging.doMergeSynonyms lvSyn matchVolatileClause;
     ModelMerging.doMergeSynonyms mfSyn matchModelField;
-    if mergeInlines then begin
+    if mergeInlinesWithAlphaConvert() then begin
       (* Copy all the nodes from the iEq to vEq as well. This is needed
        * because vEq will be used for variable renaming *)
       PlainMerging.iter_eq_table
@@ -3325,7 +3309,7 @@ let merge (files: file list) (newname: string) : file =
     dumpGraph "struct and union" sEq;
     EnumMerging.dumpGraph "enum" eEq;
     dumpGraph "variable" vEq;
-    if mergeInlines then dumpGraph "inline" iEq;
+    if mergeInlinesWithAlphaConvert() then dumpGraph "inline" iEq;
   end;
   (* Make the second pass over the files. This is when we start rewriting the
    * file *)
