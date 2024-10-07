@@ -24,7 +24,7 @@
 (* --- Typed Memory Model                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-include MemRegion.ModelWithLoader
-
 type pointer = NoCast | Fits | Unsafe
 val pointer : pointer Context.value
+
+include Sigs.Model

@@ -1265,18 +1265,3 @@ let updates seq domain =
   !pool
 
 (* -------------------------------------------------------------------------- *)
-
-let sizeof = MODEL.sizeof
-let last = MODEL.last
-let havoc = MODEL.havoc
-let eqmem_forall = MODEL.eqmem_forall
-let load_int = MODEL.load_int
-let load_float = MODEL.load_float
-let load_pointer = MODEL.load_pointer
-let store_int = MODEL.store_int
-let store_float = MODEL.store_float
-let store_pointer = MODEL.store_pointer
-let set_init_atom = MODEL.set_init_atom
-let set_init = MODEL.set_init
-let is_init_atom = MODEL.is_init_atom
-let is_init_range = MODEL.is_init_range
