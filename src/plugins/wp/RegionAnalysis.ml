@@ -46,11 +46,10 @@ struct
   let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
 end
 
-let types r =
+let types map r =
   let module Tset = Cil_datatype.Typ.Set in
   let pool = ref Tset.empty in
   let add ty = pool := Tset.add ty !pool in
-  let map = get_map () in
   List.iter add @@ Region.reads map r ;
   List.iter add @@ Region.writes map r ;
   List.iter add @@ Region.shifts map r ;
@@ -63,10 +62,11 @@ module Kind = WpContext.Generator(Type)
       type key = region
       type data = MemRegion.kind
       let name = "Wp.RegionAnalysis.R"
-      let compile region =
+      let compile r =
         let open MemRegion in
-        match types region with
-        | [ty] ->
+        let map = get_map () in
+        match types map r with
+        | [ty] when Cil.bitsSizeOf ty >= Region.size map r ->
           begin
             match Ctypes.object_of ty with
             | C_int i -> Many (Int i)

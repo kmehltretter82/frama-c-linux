@@ -74,6 +74,8 @@ val nodes : map -> node list -> node list
 
 val points_to : map -> node -> node option
 val pointed_by : map -> node -> node list
+
+val size : map -> node -> int
 val parents : map -> node -> node list
 val roots : map -> node -> varinfo list
 val labels: map -> node -> string list

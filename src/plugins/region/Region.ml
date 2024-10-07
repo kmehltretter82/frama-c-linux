@@ -36,6 +36,7 @@ let nodes = Memory.nodes
 let equal = Memory.equal
 let included = Memory.included
 let separated = Memory.separated
+let size = Memory.size
 let roots = Memory.roots
 let labels = Memory.labels
 let reads = Memory.reads

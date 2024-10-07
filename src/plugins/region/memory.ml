@@ -353,7 +353,10 @@ let regions map =
   iter map (fun r -> pool := region map r :: !pool) ;
   List.rev !pool
 
-let parents (m: map) (r: node) =
+let size (m: map) (r: node) =
+  sizeof (Ufind.get m.store r).clayout
+
+  let parents (m: map) (r: node) =
   nodes m (Ufind.get m.store r).cparents
 
 let roots (m: map) (r: node) =
