@@ -11,15 +11,15 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file swap.i, line 20) in 'swap_aliased':
-Let a = ValueChunk_2[global(P_b_33)].
-Let a_1 = ValueChunk_1[global(P_a_32)].
-Let x = ValueChunk_0[a_1].
-Let x_1 = ValueChunk_0[a].
-Let x_2 = ValueChunk_0[a_1 <- x_1][a <- x][a_1].
+Let a = Mptr_1[global(P_b_33)].
+Let a_1 = Mptr_0[global(P_a_32)].
+Let x = Msint32_0[a_1].
+Let x_1 = Msint32_0[a].
+Let x_2 = Msint32_0[a_1 <- x_1][a <- x][a_1].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2).
   (* Heap *)
-  Type: linked(alloc_0) /\ framed(ValueChunk_1) /\ framed(ValueChunk_2).
+  Type: linked(alloc_0) /\ framed(Mptr_0) /\ framed(Mptr_1).
   (* Pre-condition *)
   Have: valid_rw(alloc_0, a_1, 4).
   (* Pre-condition *)

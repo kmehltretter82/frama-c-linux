@@ -97,8 +97,14 @@ val c_int    : ikind -> c_int
 val c_float  : fkind -> c_float
 (** Conforms to {!Machine.theMachine} *)
 
+val to_ikind : c_int -> ikind
+(** @raises Not_found *)
+
+val to_fkind : c_float -> fkind
+(** @raises Not_found *)
+
 val object_of : typ -> c_object
-val object_to : c_object -> typ list
+val object_to : c_object -> typ
 
 val is_pointer : c_object -> bool
 

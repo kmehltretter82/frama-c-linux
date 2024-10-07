@@ -20,24 +20,20 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Ctypes
-open Lang.F
+(* -------------------------------------------------------------------------- *)
+(* --- Proxy to Region Analysis for Region Model                          --- *)
+(* -------------------------------------------------------------------------- *)
 
 type region = Region.node
 
-let get_map () = match WpContext.get_scope () with
-  | WpContext.Kf f   -> Region.map f
-  | WpContext.Global -> Wp_parameters.not_yet_implemented "[WP/RegionAnalysis.ml] get_map: No global region analysis yet"
-
-let null () : region =
-  Warning.emit ~severe:false ~source:"Region Memory Model"
-    ~effect:"Create null pointer value" "NULL" ;
-  Wp_parameters.not_yet_implemented "[WP/RegionAnalysis.ml] null: cannot create null region"
+let get_map () =
+  match WpContext.get_scope () with
+  | Kf kf -> Region.map kf
+  | Global -> Wp_parameters.not_yet_implemented "[region] logic context"
 
 let id region = Region.uid (get_map ()) region
 
-let region_of_id id =
+let of_id id =
   try Some (Region.find (get_map ()) id)
   with Not_found -> None
 
@@ -82,50 +78,20 @@ module Kind = WpContext.Generator(Type)
     end)
 
 let kind = Kind.get
-
-let tau_of_region region : tau =
-  match types region with
-  | [ ty ] -> Lang.tau_of_ctype ty
-  | _ -> (*TODO*) assert false
-
 let points_to region = Region.points_to (get_map ()) region
-
 let separated r1 r2 = Region.separated (get_map ()) r1 r2
-
 let included r1 r2 = Region.included (get_map ()) r1 r2
 
 let cvar var =
   try Some (Region.cvar (get_map ()) var)
-  with Not_found ->
-    Warning.emit ~severe:false ~source:"RegionAnalysis.cvar"
-      ~effect:"No region found for C variable" "%a" Printer.pp_varinfo var ;
-    None
+  with Not_found -> None
 
-let field (region: region) (fd: fieldinfo) : region option =
-  try Some (Region.field (get_map ()) region fd)
-  with Not_found ->
-    Warning.emit ~severe:false
-      ~source:"RegionAnalysis.field"
-      ~effect:"No region found for field"
-      "No region for field %a from region %a"
-      Printer.pp_field fd Type.pretty region;
-    None
+let field r fd =
+  try Some (Region.field (get_map ()) r fd)
+  with Not_found -> None
 
-let shift region ty offset =
-  let rec aux = function
-    | [] ->
-      Warning.emit ~severe:false
-        ~source:"RegionAnalysis.shift"
-        ~effect:"No region found"
-        "No region for shift %a from region %a"
-        QED.pretty offset Type.pretty region;
-      None
-    | typ :: rest ->
-      try Some (Region.index (get_map ()) region typ)
-      with Not_found -> aux rest
-  in aux @@ Ctypes.object_to ty
+let shift r obj =
+  try Some (Region.index (get_map ()) r (Ctypes.object_to obj))
+  with Not_found -> None
 
-let base_addr _ = assert false
-let literal ~eid _ = ignore eid ; assert false
-let pointer_loc () = assert false
-let loc_of_int () = assert false
+let literal ~eid _ = ignore eid ; None

@@ -37,38 +37,24 @@ module type RegionProxy =
 sig
   type region
   module Type : Sigs.Type with type t = region
-
+  val id : region -> int
+  val of_id : int -> region option
   val kind : region -> kind
-
-  val null : unit -> region
-
-  val tau_of_region : region -> tau
-  val points_to : region -> region option
-
-  val separated : region -> region -> bool
-  val included : region -> region -> bool
-
   val cvar : varinfo -> region option
   val field : region -> fieldinfo -> region option
-  val shift : region -> c_object -> term -> region option
-  val base_addr : region -> region
-
+  val shift : region -> c_object -> region option
+  val points_to : region -> region option
   val literal : eid:int -> Cstring.cst -> region option
-  val pointer_loc : unit -> region option
-  val loc_of_int : unit -> region option
-
-  val id : region -> int
-  val region_of_id : int -> region option
-
+  val separated : region -> region -> bool
+  val included : region -> region -> bool
 end
 
 module type ModelWithLoader =
 sig
   include Sigs.Model
-
   val sizeof : c_object -> term
-  val last : sigma -> c_object -> loc -> term
 
+  val last : sigma -> c_object -> loc -> term
   val frames : c_object -> loc -> chunk -> frame list
 
   val havoc : c_object -> loc -> length:term -> chunk -> fresh:term -> current:term -> term

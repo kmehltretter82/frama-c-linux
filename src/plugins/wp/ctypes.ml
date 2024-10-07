@@ -389,26 +389,30 @@ let () =
 (* --- Revert c_object to typ                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let ikinds_of cint =
-  let all_ikind = [IBool;IChar;ISChar;IUChar;IInt;IUInt;IShort;IUShort;ILong;IULong;ILongLong;IULongLong] in
-  List.filter (fun ikind -> 0 == compare_c_int cint @@ c_int ikind) all_ikind
+let ikinds = [
+  IBool;IChar;
+  ISChar;IUChar;
+  IInt;IUInt;
+  IShort;IUShort;
+  ILong;IULong;
+  ILongLong;IULongLong
+]
+let fkinds = [FFloat;FDouble;FLongDouble]
 
-let fkinds_of cfloat =
-  let all_fkind = [FFloat;FDouble;FLongDouble] in
-  List.filter (fun fkind -> 0 == compare_c_float cfloat @@ c_float fkind) all_fkind
+let to_ikind iota =
+  List.find (fun ik -> c_int ik = iota) ikinds
+
+let to_fkind flt =
+  List.find (fun fk -> c_float fk = flt) fkinds
 
 let object_to = function
-  | C_int cint as ty when equal ty (object_of (TVoid [])) -> (TVoid []) :: (List.map (fun ik -> TInt (ik,[])) @@ ikinds_of cint)
-  | C_int cint -> List.map (fun ik -> TInt (ik,[])) @@ ikinds_of cint
-  | C_float cfloat -> List.map (fun fk -> TFloat (fk,[])) @@ fkinds_of cfloat
-  | C_pointer (TVoid [] as typ) -> [ TBuiltin_va_list [] ; TPtr (typ,[]) ]
-  | C_pointer typ -> [ TPtr (typ,[]) ]
-  | C_comp comp -> [ TComp (comp,[]) ]
-  | C_array arr ->
-    match arr.arr_flat with
-    | None -> [ TArray (arr.arr_element, None, []) ]
-    | Some _e -> [ TArray (arr.arr_element, None (* Some (Cil.integer ~loc:Cil_builder.loc @@ Int64.of_int e) *), [])]
-
+  | C_int i -> TInt(to_ikind i,[])
+  | C_float f -> TFloat(to_fkind f,[])
+  | C_pointer typ -> TPtr(typ,[])
+  | C_comp comp -> TComp(comp,[])
+  | C_array { arr_element = elt ; arr_flat = None } -> TArray(elt,None,[])
+  | C_array { arr_element = elt ; arr_flat = Some { arr_size = size } } ->
+    TArray(elt,Some (Cil.integer ~loc:Location.unknown size),[])
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessor Utilities                                                 --- *)
