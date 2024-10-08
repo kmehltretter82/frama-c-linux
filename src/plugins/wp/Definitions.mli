@@ -120,6 +120,7 @@ class virtual visitor : cluster ->
     method vlemma : logic_lemma -> unit
     method vcluster : cluster -> unit
     method vlibrary : string -> unit
+    method vtheory : string list -> string -> unit
     method vgoal : axioms option -> F.pred -> unit
 
     method vtypes : unit
@@ -141,6 +142,9 @@ class virtual visitor : cluster ->
 
     method virtual on_library : string -> unit
     (** External library to import *)
+
+    method virtual on_theory : string list -> string -> unit
+    (** External Why3 theory to import *)
 
     method virtual on_cluster : cluster -> unit
     (** Outer cluster to import *)

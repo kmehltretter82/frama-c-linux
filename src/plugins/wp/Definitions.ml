@@ -271,6 +271,11 @@ module DT = Logic_type_info.Set
 module DR = Compinfo.Set
 module DS = Datatype.String.Set
 module DF = Set.Make(Lang.Fun)
+module DW = Set.Make
+    (struct
+      type t = string list * string
+      let compare = Stdlib.compare
+    end)
 module DC = Set.Make
     (struct
       type t = cluster
@@ -294,7 +299,8 @@ class virtual visitor main =
     val mutable dlemmas  = DS.empty
     val mutable lemmas   = DS.empty
     val mutable clusters = DC.empty
-    val mutable theories = DS.empty
+    val mutable libraries = DS.empty
+    val mutable theories = DW.empty
     val mutable locals = DC.add main DC.empty
 
     method set_local c = locals <- DC.add c locals
@@ -374,6 +380,7 @@ class virtual visitor main =
       | Comp(r, KValue) -> self#vcomp r
       | Comp(r, KInit) -> self#vicomp r
       | Atype t -> self#vtype t
+      | Wtype(p,m,_) -> self#vtheory p m
 
     method vtau = function
       | Prop | Bool | Int | Real | Tvar _ -> ()
@@ -461,6 +468,7 @@ class virtual visitor main =
         begin
           symbols <- DF.add f symbols ;
           match f with
+          | FUN { m_source = Wsymbol(p,m,_) } -> self#vtheory p m
           | FUN { m_source = Extern e  } -> self#vlibrary e.ext_library
           | FUN { m_source = Generated _ } | ACSL _ -> self#vlfun f
           | CTOR c -> self#vadt (Lang.adt c.ctor_type)
@@ -512,17 +520,24 @@ class virtual visitor main =
           self#on_cluster c ;
         end
 
-    method vlibrary thy =
-      if not (DS.mem thy theories) then
+    method vlibrary lib =
+      if not (DS.mem lib libraries) then
         begin
-          theories <- DS.add thy theories ;
+          libraries <- DS.add lib libraries ;
           try
-            let deps = LogicBuiltins.dependencies thy in
+            let deps = LogicBuiltins.dependencies lib in
             List.iter self#vlibrary deps ;
-            self#on_library thy ;
+            self#on_library lib ;
           with Not_found ->
             Wp_parameters.fatal
-              ~current:false "Unknown library '%s'" thy
+              ~current:false "Unknown library '%s'" lib
+        end
+
+    method vtheory p m =
+      if not (DW.mem (p,m) theories) then
+        begin
+          theories <- DW.add (p,m) theories ;
+          self#on_theory p m
         end
 
     method vgoal (axioms : axioms option) prop =
@@ -562,6 +577,7 @@ class virtual visitor main =
       end
 
     method virtual section : string -> unit
+    method virtual on_theory : string list -> string -> unit
     method virtual on_library : string -> unit
     method virtual on_cluster : cluster -> unit
     method virtual on_type : logic_type_info -> typedef -> unit

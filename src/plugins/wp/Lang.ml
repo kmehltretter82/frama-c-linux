@@ -113,6 +113,7 @@ type adt =
   | Mrecord of mdt * fields (* Model record-type *)
   | Atype of logic_type_info (* Logic Type *)
   | Comp of compinfo * datakind (* C-code struct or union *)
+  | Wtype of string list * string * string list (** Why3 imported type *)
 
 (** name to print to the provers *)
 and mdt = string extern
@@ -197,7 +198,10 @@ let rec varpoly k x = function
   | [] -> Warning.error "Unbound type parameter <%s>" x
   | y::ys -> if x = y then k else varpoly (succ k) x ys
 
-type t_builtin = E_mdt of mdt | E_poly of (tau list -> tau)
+type t_builtin =
+  | E_mdt of mdt
+  | E_why3 of string list * string * string list
+  | E_poly of (tau list -> tau)
 let builtin_types = Context.create "Wp.Lang.builtin_types"
 
 let find_builtin name = Context.get builtin_types name
@@ -205,12 +209,14 @@ let find_builtin name = Context.get builtin_types name
 let adt lt =
   try match find_builtin lt.lt_name with
     | E_mdt m -> Mtype m
+    | E_why3(p,m,s) -> Wtype(p,m,s)
     | E_poly _ -> assert false
   with Not_found -> Atype lt
 
 let atype lt ts =
   try match find_builtin lt.lt_name with
     | E_mdt m -> Logic.Data(Mtype m,ts)
+    | E_why3(p,m,s) -> Logic.Data(Wtype(p,m,s),ts)
     | E_poly ftau -> ftau ts
   with Not_found -> Logic.Data(Atype lt,ts)
 
@@ -243,6 +249,8 @@ struct
     | Comp (c,KValue) -> basename (if c.cstruct then "S" else "U") c.corig_name
     | Comp (c,KInit) -> basename (if c.cstruct then "IS" else "IU") c.corig_name
     | Atype lt -> basename "A" lt.lt_name
+    | Wtype(_,_,s) ->
+      let rec base def = function [] -> def | w::ws -> base w ws in base "w" s
 
   let debug = function
     | Mtype a -> a.ext_debug
@@ -250,12 +258,14 @@ struct
     | Comp (c, KValue) -> comp_id c
     | Comp (c, KInit) -> comp_init_id c
     | Atype lt -> type_id lt
+    | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
 
   let hash = function
     | Mtype a | Mrecord(a,_) -> FCHashtbl.hash a
     | Comp (c, KValue) -> Compinfo.hash c
     | Comp (c, KInit) -> 13 * Compinfo.hash c
     | Atype lt -> Logic_type_info.hash lt
+    | Wtype(p,m,s) -> Hashtbl.hash @@ (p @ m :: s)
 
   let compare a b =
     if a==b then 0 else
@@ -273,6 +283,9 @@ struct
       | Comp _ , _ -> (-1)
       | _ , Comp _ -> (+1)
       | Atype a , Atype b -> Logic_type_info.compare a b
+      | Atype _ , _ -> (-1)
+      | _ , Atype _ -> (+1)
+      | Wtype(p,m,s), Wtype(p',m',s') -> Stdlib.compare (p,m,s) (p',m',s')
 
   let equal a b = (compare a b = 0)
 
@@ -287,6 +300,7 @@ end
 let get_builtin_type ~name =
   match find_builtin name with
   | E_mdt m -> Mtype m
+  | E_why3(p,m,s) -> Wtype(p,m,s)
   | E_poly _ -> assert false
 
 let mem_builtin_type ~name =
@@ -300,6 +314,13 @@ let is_builtin_type ~name = function
     begin
       try match find_builtin name with
         | E_mdt m0 -> m == m0
+        | _ -> false
+      with Not_found -> false
+    end
+  | Data(Wtype(p,m,s),_) ->
+    begin
+      try match find_builtin name with
+        | E_why3(p0,m0,s0) -> (p,m,s) = (p0,m0,s0)
         | _ -> false
       with Not_found -> false
     end
@@ -422,6 +443,7 @@ and lsymbol = {
 and source =
   | Generated of WpContext.context option * string
   | Extern of Engine.link extern
+  | Wsymbol of string list * string * string list (* package, module, name *)
 
 let lfun_observers = ref []
 let lfun_observe lf = List.iter (fun k -> k lf) !lfun_observers ; lf
@@ -563,6 +585,20 @@ let generated_p ?context ?(coloring=false) name =
 let extern_t name ~link ~library =
   new_extern ~link ~library ~debug:name
 
+let imported_t ~package ~theory ~name =
+  Wtype(package,theory,name)
+
+let imported_f ~package ~theory ~name
+    ?(params=[]) ?(result=Logic.Sprop) ?(typecheck=not_found) () =
+  lsymbol {
+    m_category = Logic.Function ;
+    m_params = params ;
+    m_result = result ;
+    m_typeof = typecheck ;
+    m_source = Wsymbol(package,theory,name) ;
+    m_coloring = false ;
+  }
+
 module Fun =
 struct
 
@@ -572,13 +608,16 @@ struct
     | ACSL f -> logic_id f
     | CTOR c -> ctor_id c
     | FUN({m_source=Generated(_,n)}) -> n
-    | FUN({m_source=Extern e})    -> e.ext_debug
+    | FUN({m_source=Extern e}) -> e.ext_debug
+    | FUN({m_source=Wsymbol(p,m,s)}) -> String.concat "." (p @ m :: s)
 
   let hash = function
     | ACSL f -> Logic_info.hash f
     | CTOR c -> Logic_ctor_info.hash c
     | FUN({m_source=Generated(_,n)}) -> Datatype.String.hash n
-    | FUN({m_source=Extern e})    -> e.ext_id
+    | FUN({m_source=Extern e}) -> e.ext_id
+    | FUN({m_source=Wsymbol(p,m,s)}) ->
+      Datatype.String.hash @@ String.concat "." (p @ m :: s)
 
   let compare_context c1 c2 =
     match c1 , c2 with
@@ -592,10 +631,14 @@ struct
     | Generated(m1,f1), Generated(m2,f2) ->
       let cmp = String.compare f1 f2 in
       if cmp<>0 then cmp else compare_context m1 m2
+    | Generated _, _ -> (-1)
+    | _, Generated _ -> (+1)
     | Extern f , Extern g ->
       ext_compare f g
-    | Generated _ , Extern _ -> (-1)
-    | Extern _ , Generated _ -> (+1)
+    | Extern _ , _ -> (-1)
+    | _ , Extern _ -> (+1)
+    | Wsymbol(p,m,s) , Wsymbol(p',m',s') ->
+      Stdlib.compare (p,m,s) (p',m',s')
 
   let compare f g =
     if f==g then 0 else
@@ -648,15 +691,20 @@ class virtual idprinting =
       | Comp(c, KValue) -> self#sanitize_type (comp_id c)
       | Comp(c, KInit) -> self#sanitize_type (comp_init_id c)
       | Atype lt -> self#sanitize_type (type_id lt)
+      | Wtype(p,m,s) -> String.concat "." (p @ m :: s)
+
     method field = function
       | Mfield(_,_,f,_) -> self#sanitize_field f
       | Cfield(f, KValue) -> self#sanitize_field (field_id f)
       | Cfield(f, KInit) -> self#sanitize_field (field_init_id f)
+
     method link = function
       | ACSL f -> Engine.F_call (self#sanitize_fun (logic_id f))
       | CTOR c -> Engine.F_call (self#sanitize_fun (ctor_id c))
       | FUN({m_source=Generated(_,n)}) -> Engine.F_call (self#sanitize_fun n)
       | FUN({m_source=Extern e}) -> e.ext_link
+      | FUN({m_source=Wsymbol(p,m,s)}) ->
+        Engine.F_call (String.concat "." (p @ m :: s))
   end
 
 let name_of_lfun = function
@@ -664,10 +712,11 @@ let name_of_lfun = function
   | CTOR c -> ctor_id c
   | FUN({m_source=Generated(_,f)}) -> f
   | FUN({m_source=Extern e}) -> e.ext_debug
+  | FUN({m_source=Wsymbol(p,m,s)}) -> String.concat "." (p @ m :: s)
 
 let context_of_lfun = function
   | ACSL _ | CTOR _
-  | FUN({m_source=Extern _}) -> None
+  | FUN({m_source=(Extern _|Wsymbol _)}) -> None
   | FUN({m_source=Generated(ctxt,_)}) -> ctxt
 
 let name_of_field = function

@@ -44,6 +44,7 @@ class browser ?on_cluster f cluster =
     inherit Definitions.visitor cluster
     method section _ = ()
     method on_library _ = ()
+    method on_theory _ _ = ()
     method on_type _ _ = ()
     method on_comp _ _ = ()
     method on_icomp _ _ = ()

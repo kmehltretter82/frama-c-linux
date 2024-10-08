@@ -29,18 +29,21 @@ module T = Why3.Theory
 module F = Filepath.Normalized
 module W = Why3
 module WConf = Why3.Whyconf
+module LB = LogicBuiltins
+module LT = Logic_typing
 
-let dkey = L.register_category "why3.import"
+let dkey =
+  L.register_category
+    ~help:"Importer Why3 -> ACSL"
+    "why3:import"
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Why3 Environment                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let create_why3_env loadpath =
+let why3_env loadpath =
   let main = WConf.get_main @@ WConf.read_config None in
   W.Env.create_env @@ WConf.loadpath main @ F.to_string_list loadpath
-
-
 
 let extract_path thname =
   let segments = String.split_on_char '.' thname in
@@ -59,57 +62,24 @@ let of_infix s =
       else unwrap_any s others
   in unwrap_any s ["prefix ";"infix ";"mixfix "]
 
-let construct_acsl_name (id : W.Ident.ident) =
-  let (paths,name,scopes) = T.restore_path id in
-  match List.rev scopes with
+let acsl_name (id : W.Ident.ident) =
+  let (path,name,scope) = T.restore_path id in
+  match List.rev scope with
   | (t::q) ->
-    String.concat "::" (paths @ name :: List.rev_append q [of_infix t])
+    String.concat "::" (path @ name :: List.rev_append q [of_infix t])
   | [] -> ""
 
-(* For debug only*)
-let pp_id fmt (id: W.Ident.ident) =
-  Format.pp_print_string fmt id.id_string
-
-(* For debug only*)
-let pp_tys fmt (tys: W.Ty.tysymbol) =
-  W.Pretty.print_ty_decl fmt tys
-
-(* For debug only*)
-let pp_ls fmt ls =
-  W.Pretty.print_ls fmt ls
-
-(* For debug only*)
-let pp_id_loc fmt (id : W.Ident.ident) =
-  match id.id_loc with
-  | Some loc -> W.Loc.pp_position fmt loc
-  | None -> L.error "No location found"
-
-(* For debug only*)
-let pp_lti fmt (lti : C.logic_type_info) =
-  Cpp.pp_logic_type_info fmt lti
-
-(* For debug only*)
-let pp_li fmt (li : C.logic_info) =
-  Cpp.pp_logic_info fmt li
-
-(* For debug only*)
-let pp_lvs fmt (lvs : C.logic_var list) =
-  List.iter (fun (lv: C.logic_var) ->
-      Format.fprintf fmt "@ %a: %a"
-        Cpp.pp_logic_var lv Cpp.pp_logic_type lv.lv_type
-    ) lvs
+let pp_id fmt (id: W.Ident.ident) = Format.pp_print_string fmt id.id_string
 
 (* -------------------------------------------------------------------------*)
 (* ---    Types                                                           - *)
 (* -------------------------------------------------------------------------*)
 
-
 type tvars = C.logic_type W.Ty.Mtv.t
 
 type why3module = {
-  paths : string list;
-  types : C.logic_type_info list;
-  logics : C.logic_info list;
+  types : (C.logic_type_info * C.location) list;
+  logics : (C.logic_info * C.location) list;
 }
 
 type env = {
@@ -117,22 +87,24 @@ type env = {
   tenv : C.logic_type_info W.Ty.Hts.t;
   lenv : C.logic_info W.Term.Hls.t;
   lils : W.Term.lsymbol Logic_info.Hashtbl.t;
-  ltits : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
-  menv : why3module Datatype.String.Hashtbl.t
+  lcts : W.Term.lsymbol Logic_ctor_info.Hashtbl.t;
+  ltts : W.Ty.tysymbol Logic_type_info.Hashtbl.t;
+  menv : why3module Datatype.String.Hashtbl.t;
 }
 
 type menv = {
-  mutable lti : C.logic_type_info list;
-  mutable li : C.logic_info list;
+  mutable lti : (C.logic_type_info * C.location) list;
+  mutable li : (C.logic_info * C.location) list;
 }
 
-let create_empty_env wenv =
+let create wenv =
   let tenv  = W.Ty.Hts.create 0 in
   let lenv  = W.Term.Hls.create 0 in
   let lils  = Logic_info.Hashtbl.create 0 in
-  let ltits  = Logic_type_info.Hashtbl.create 0 in
+  let lcts  = Logic_ctor_info.Hashtbl.create 0 in
+  let ltts  = Logic_type_info.Hashtbl.create 0 in
   let menv  = Datatype.String.Hashtbl.create 0 in
-  { wenv; tenv; lenv; lils; ltits; menv }
+  { wenv; tenv; lenv; lils; lcts; ltts; menv }
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Built-in                                                        --- *)
@@ -153,11 +125,32 @@ let add_builtins env =
   begin
     let ts_list = find_ts env ["list"] "List" ["list"] in
     let ts_set = find_ts env ["set"] "Set" ["set"] in
-    add_builtin env.tenv W.Ty.ts_bool Utf8_logic.boolean [];
     add_builtin env.tenv ts_list "\\list" ["A"];
     add_builtin env.tenv ts_set "set" ["A"];
   end
 
+(* -------------------------------------------------------------------------- *)
+(* ---    Location handling                                               --- *)
+(* -------------------------------------------------------------------------- *)
+
+let convert_location (wloc : Why3.Loc.position option) : C.location =
+  match wloc with
+  | Some loc ->
+    let (file,lstart,cstart,lend,cend) = Why3.Loc.get loc in
+    let pstart = {
+      Filepath.pos_path = F.of_string file;
+      pos_lnum = lstart;
+      pos_bol = 0;
+      pos_cnum = cstart;
+    }  in
+    let pend = {
+      Filepath.pos_path = F.of_string file;
+      pos_lnum = lend;
+      pos_bol = 0;
+      pos_cnum = cend;
+    } in (pstart, pend)
+  | None ->
+    (Position.unknown, Position.unknown)
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Type conversion                                                 --- *)
@@ -172,158 +165,204 @@ let tvars_of_txs (txs: W.Ty.tvsymbol list) : string list * tvars =
        x :: txs, W.Ty.Mtv.add tv (C.Lvar x) tvs
     ) txs ([], W.Ty.Mtv.empty)
 
-let rec lt_of_ty (env : env) (menv) (tvs : tvars)  (ty: W.Ty.ty) : C.logic_type =
+let rec lt_of_ty env menv (tvs : tvars)  (ty: W.Ty.ty) : C.logic_type =
   match ty.ty_node with
   | Tyvar x -> W.Ty.Mtv.find x tvs
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_int) -> C.Linteger
   | Tyapp(s,[]) when W.Ty.(ts_equal s ts_real) -> C.Lreal
-  | Tyapp(s,ts) -> C.Ltype( lti_of_ts env menv s ,
-                            List.map (lt_of_ty env menv tvs ) ts)
+  | Tyapp(s,[]) when W.Ty.(ts_equal s ts_bool) -> C.Lboolean
+  | Tyapp(s,ts) ->
+    C.Ltype(lt_of_ts env menv s [], List.map (lt_of_ty env menv tvs ) ts)
 
-and lti_of_ts (env : env) (menv : menv) (ts : W.Ty.tysymbol) : C.logic_type_info =
+and lt_of_ts env menv (ts : W.Ty.tysymbol) (cs: W.Decl.constructor list) : C.logic_type_info =
   try W.Ty.Hts.find env.tenv ts with Not_found ->
-    let (lt_params,tvars) = tvars_of_txs ts.ts_args in
-    let lt_def =
-      match ts.ts_def with
-      | NoDef | Range _ | Float _ -> None
-      | Alias ty -> Some (C.LTsyn (lt_of_ty env menv tvars ty))
-    in
-    let lti =
-      C.{
-        lt_name =  construct_acsl_name ts.ts_name;
-        lt_params ; lt_def ;
-        lt_attr = [];
-      }
-    in W.Ty.Hts.add env.tenv ts lti ;
-    menv.lti <- lti :: menv.lti;
-    Logic_type_info.Hashtbl.add env.ltits lti ts;
+    let lt_params,tvars = tvars_of_txs ts.ts_args in
+    let lt_name = acsl_name ts.ts_name in
+    let lti = C.{ lt_name ; lt_params ; lt_def = None ; lt_attr = []; } in
+    lti.lt_def <-
+      (match ts.ts_def with
+       | Range _ | Float _ -> None
+       | NoDef -> Some (C.LTsum (List.map (cli_of_constr env menv lti) cs))
+       | Alias ty -> Some (C.LTsyn (lt_of_ty env menv tvars ty))
+      );
+    W.Ty.Hts.add env.tenv ts lti ;
+    menv.lti <- (lti, (convert_location ts.ts_name.id_loc) ) :: menv.lti;
+    Logic_type_info.Hashtbl.add env.ltts lti ts;
     lti
+
+and cli_of_constr env menv ctor_type (ls, _: W.Decl.constructor) : C.logic_ctor_info =
+  let _,tvars =
+    tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
+  let l_profile = List.mapi (lv_of_ty env menv tvars ) ls.ls_args in
+  let ctor_params = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
+  let ctor_name = acsl_name ls.ls_name in
+  let ctor = Cil_types.{ ctor_name ; ctor_type ; ctor_params } in
+  Logic_ctor_info.Hashtbl.add env.lcts ctor ls ;
+  ctor
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Functions conversion                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-let lv_of_ty (env:env) (menv : menv) (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
+and lv_of_ty env menv (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
   Cil_const.make_logic_var_formal (Printf.sprintf "x%d" index)
   @@ (lt_of_ty env menv tvars ty)
 
-let lt_of_ty_opt (lt_opt) =
+and lt_of_ty_opt (lt_opt) =
   match lt_opt with
   | None -> C.Ctype (C.TVoid []) (* Same as logic_typing *)
   | Some tr -> tr
 
-let li_of_ls (env:env) (menv : menv) (ls : W.Term.lsymbol)  : C.logic_info =
+let li_of_ls env menv (ls : W.Term.lsymbol) : C.logic_info =
   let l_tparams,tvars =
     tvars_of_txs @@ W.Ty.Stv.elements @@  W.Term.ls_ty_freevars ls in
   let l_type = Option.map (lt_of_ty  env menv tvars ) ls.ls_value in
   let l_profile = List.mapi (lv_of_ty env menv tvars ) ls.ls_args in
   let l_args = List.map ( fun (lv:C.logic_var) -> lv.lv_type) l_profile in
-  let signature = C.Larrow (l_args, lt_of_ty_opt l_type) in
-  let li =
-    C.{
-      l_var_info = Cil_const.make_logic_var_global
-          (construct_acsl_name ls.ls_name)
-          signature;
-      l_labels = [];
-      l_tparams;
-      l_type;
-      l_profile ;
+  let l_result = lt_of_ty_opt l_type in
+  let l_params = if l_args = [] then l_result else C.Larrow (l_args, l_result) in
+  let l_name = acsl_name ls.ls_name in
+  let lv = Cil_const.make_logic_var_global l_name l_params in
+  let li = C.{
+      l_var_info = lv ;
+      l_labels = []; l_tparams; l_type; l_profile ;
       l_body = C.LBnone;
     } in W.Term.Hls.add env.lenv ls li;
-  menv.li <- li :: menv.li;
+  menv.li <- (li, (convert_location ls.ls_name.id_loc) ):: menv.li;
   Logic_info.Hashtbl.add env.lils li ls; li
+
+let add_ts env menv (ts : W.Ty.tysymbol) (cs: W.Decl.constructor list)=
+  L.debug ~dkey "Importing type %a: %s" pp_id ts.ts_name (acsl_name ts.ts_name);
+  ignore @@ lt_of_ts env menv ts cs
+let add_ls env menv (ls : W.Term.lsymbol) =
+  L.debug ~dkey "Importing logic %a: %s" pp_id ls.ls_name (acsl_name ls.ls_name);
+  ignore @@ li_of_ls env menv ls
 
 (* -------------------------------------------------------------------------- *)
 (* ---    Theory                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let import_theory (env : env) thname =
-  let theory_name, theory_path = extract_path thname in
-  try
-    let menv : menv = {li = []; lti = []} in
-    let theory = W.Env.read_theory env.wenv theory_path theory_name in
+let get_theory env (theory_name) (theory_path) =
+  try W.Env.read_theory env.wenv theory_path theory_name
+  with W.Env.LibraryNotFound _ ->
+    L.error "Library %s not found" theory_name; W.Theory.ignore_theory
+
+let parse_theory env (theory:W.Theory.theory) (menv) =
+  begin
     List.iter (fun (tdecl : T.tdecl) ->
         match tdecl.td_node with
         | Decl decl ->
           begin
             match decl.d_node with
-            | Dtype ts ->
-              L.debug ~dkey "Decl and type %a"  pp_id ts.ts_name;
-              L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
-              let lti =  lti_of_ts env menv ts in
-              L.debug ~dkey "Correspondign LTI %a" pp_lti lti;
-            | Ddata ddatas ->
-              List.iter
-                (fun ((ts, _) : W.Decl.data_decl) ->
-                   L.debug ~dkey "Decl and data %a" pp_id  ts.ts_name;
-                   L.debug ~dkey "Location %a"  pp_id_loc ts.ts_name;
-                   let lti =  lti_of_ts env menv ts  in
-                   L.debug ~dkey "Correspondign data LTI %a" pp_lti lti;
-                ) ddatas
-            | Dparam ls ->
-              L.debug ~dkey "Decl and dparam %a" pp_id ls.ls_name;
-              L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name
-            | Dlogic dlogics ->
-              List.iter
-                (fun ((ls,_):W.Decl.logic_decl) ->
-                   L.debug ~dkey "Decl and dlogic %a" pp_id ls.ls_name;
-                   L.debug ~dkey "Location %a"  pp_id_loc ls.ls_name;
-                   let li = li_of_ls env menv ls in
-                   L.debug ~dkey "Corresponding dlogic LTI %a" pp_li li;
-                ) dlogics
-            | _ -> L.debug ~dkey "Other type of Decl"
+            | Dtype ts -> add_ts env menv ts []
+            | Dparam ls -> add_ls env menv ls
+            | Ddata ds -> List.iter (fun (ts, cs) -> add_ts env menv ts cs) ds
+            | Dlogic ds -> List.iter (fun (ls,_) -> add_ls env menv ls) ds
+            | Dind (_,ds) -> List.iter (fun (ls,_) -> add_ls env menv ls) ds
+            | Dprop _ -> ()
           end
-        | Use _| Clone _| Meta _ -> L.debug ~dkey ""
+        | Use _ | Clone _ | Meta _ -> ()
       ) theory.th_decls;
-    Datatype.String.Hashtbl.add env.menv thname
-      { logics =  List.rev menv.li;
-        types = List.rev menv.lti;
-        paths = theory_path };
-  with W.Env.LibraryNotFound _ ->
-    L.error "Library %s not found" thname
+  end
+
+let kind_of_lt (lt : C.logic_type) : LB.kind =
+  match lt with
+  | C.Linteger -> LB.Z
+  | C.Lreal -> LB.R
+  | C.Lboolean -> LB.B
+  | _ -> LB.A
+
+let sort_of_lt (lt : C.logic_type) : Qed.Logic.sort =
+  match lt with
+  | C.Linteger -> Qed.Logic.Sint
+  | C.Lreal -> Qed.Logic.Sreal
+  | _ -> Qed.Logic.Sdata
+
+let sort_of_result = function
+  | Some lt -> sort_of_lt lt
+  | None -> Qed.Logic.Sprop
+
+let register_builtin env m =
+  begin
+    let add_builtin (ls: W.Term.lsymbol) acsl_name profile result =
+      let (package, theory, name) = T.restore_path ls.ls_name in
+      let kinds = List.map kind_of_lt profile in
+      let params = List.map sort_of_lt profile in
+      LB.add_builtin acsl_name kinds @@
+      Lang.imported_f ~package ~theory ~name ~params ~result  ()
+    in
+    let add_builtin_li li =
+      let ls = Logic_info.Hashtbl.find env.lils li in
+      let profile = List.map (fun lv -> lv.C.lv_type) li.l_profile in
+      let result = sort_of_result li.l_type in
+      add_builtin ls li.l_var_info.lv_name profile result
+    in
+    let add_builtin_ctor ctor =
+      let ls = Logic_ctor_info.Hashtbl.find env.lcts ctor in
+      let profile = ctor.Cil_types.ctor_params in
+      let result = Qed.Logic.Sdata in
+      add_builtin ls ctor.ctor_name profile result
+    in
+    let add_builtin_t lti =
+      let ty = Logic_type_info.Hashtbl.find env.ltts lti in
+      let (package,theory,name) = T.restore_path ty.ts_name in
+      LB.add_builtin_type lti.lt_name @@
+      Lang.imported_t ~package ~theory ~name ;
+      begin match lti.lt_def with
+        | Some C.LTsum ctors -> List.iter add_builtin_ctor ctors
+        | _ -> ()
+      end
+    in
+    List.iter (fun (lti, _) -> add_builtin_t lti) m.types;
+    List.iter (fun (li, _) -> add_builtin_li li) m.logics;
+  end
+
+let import_theory env thname =
+  try
+    Datatype.String.Hashtbl.find env.menv thname
+  with Not_found ->
+    L.debug ~dkey "Parsing Why3 theory %s.@." thname ;
+    let theory_name, theory_path = extract_path thname in
+    let menv : menv = {li = []; lti = []} in
+    let theory = get_theory env theory_name theory_path in
+    parse_theory env theory menv;
+    let m = { types = List.rev menv.lti; logics =  List.rev menv.li } in
+    Datatype.String.Hashtbl.add env.menv thname m;
+    register_builtin env m; m
 
 (* -------------------------------------------------------------------------- *)
-(* ---    Main                                                            --- *)
+(* ---    Module registration                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let () =
-  Boot.Main.extend
-    begin fun () ->
-      let libs = L.Library.get() in
-      let imports = L.Import.get() in
-      if libs <> [] || imports <> [] then
-        begin
-          let wenv = create_why3_env @@ libs in
-          let env : env = create_empty_env wenv in
-          add_builtins env;
-          List.iter (import_theory env) @@ imports;
-          W.Ty.Hts.iter (fun (tys) (lti) ->
-              L.result "Why3 type symbol : %a" pp_tys tys;
-              L.result "Corresponding CIL logic type info %a" pp_lti lti;
-            ) env.tenv;
-          W.Term.Hls.iter (fun (ls) (li) ->
-              L.result "Why3 logic symbol : %a" pp_ls ls;
-              L.result "Corresponding CIL logic info : %a" pp_li li;
-              L.result "Associated parameters : @[<hov2>%a@]" pp_lvs li.l_profile;
-            ) env.lenv;
-          Datatype.String.Hashtbl.iter (fun (s) (why3mod) ->
-              L.result "@[Module %s at %s@]" s (String.concat "::" why3mod.paths);
-              List.iter (fun (li) ->
-                  L.result "Logic : @[<hov1>%a@]" pp_li li)
-                why3mod.logics;
-              List.iter (fun (lti) ->
-                  L.result "Type : @[<hov1>%a@]" pp_lti lti)
-                why3mod.types;
-            ) env.menv;
-          Logic_type_info.Hashtbl.iter ( fun (lti) (ts) ->
-              L.result "Logic type info : %a is associated to ts : %a "
-                pp_lti lti pp_tys ts )
-            env.ltits;
-          Logic_info.Hashtbl.iter ( fun (li) (ls) ->
-              L.result "Logic info %a is associated to ls : %a "
-                pp_li li pp_ls ls )
-            env.lils;
-        end
+module Env = WpContext.StaticGenerator
+    (Datatype.Unit)
+    (struct
+      type key = unit
+      type data = env
+      let name = "Wp.Why3Import.Env"
+      let compile () =
+        let env = create @@ why3_env @@ L.Library.get () in
+        add_builtins env ; env
+    end)
+
+let importer (ctxt: LT.module_builder) (_: C.location) (m: string list) =
+  begin
+    L.debug ~dkey "Importing Why3 theory %s.@." (String.concat "::" m) ;
+    let thname = String.concat "." m in
+    let m = import_theory (Env.get ()) thname in
+    List.iter (fun (lti,loc) -> ctxt.add_logic_type loc lti) m.types ;
+    List.iter (fun (li, loc) -> ctxt.add_logic_function loc li) m.logics ;
+  end
+
+let registered = ref false
+
+let register () =
+  if not !registered then
+    begin
+      registered := true ;
+      Acsl_extension.register_module_importer ~plugin:"wp" "why3" importer ;
     end
+
+let () = Cmdline.run_after_extended_stage register
 
 (* -------------------------------------------------------------------------- *)

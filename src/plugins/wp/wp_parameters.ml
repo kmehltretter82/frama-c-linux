@@ -751,17 +751,6 @@ module Tactics = String_list
 let () = on_reset Tactics.clear
 
 let () = Parameter_customize.set_group wp_prover
-let () = Parameter_customize.is_invisible ()
-module Import =
-  String_list
-    (struct
-      let option_name = "-wp-import"
-      let arg_name = "thy,..."
-      let help = "Import Why3 theories"
-    end)
-
-let () = Parameter_customize.set_group wp_prover
-let () = Parameter_customize.is_invisible ()
 module Library =
   Filepath_list
     (struct
