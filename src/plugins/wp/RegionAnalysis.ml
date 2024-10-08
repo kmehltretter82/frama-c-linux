@@ -46,50 +46,33 @@ struct
   let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
 end
 
-let types map r =
-  let module Tset = Cil_datatype.Typ.Set in
-  let pool = ref Tset.empty in
-  let add ty = pool := Tset.add ty !pool in
-  List.iter add @@ Region.reads map r ;
-  List.iter add @@ Region.writes map r ;
-  List.iter add @@ Region.shifts map r ;
-  Tset.elements !pool
-
-let rec singleton map r =
-  match Region.parents map r with
-  | [] -> List.length @@ Region.roots map r = 1
-  | [r] -> Region.roots map r = [] && singleton map r
-  | _ -> false
-
 (* Keeping track of the decision to apply which memory model to each region *)
 module Kind = WpContext.Generator(Type)
     (struct
-      (* Data : WpContext.Data with type key = Key.t *)
-      type key = region
-      type data = MemRegion.kind
+      open MemRegion
       let name = "Wp.RegionAnalysis.Kind"
+      type key = region
+      type data = kind
+      let kind map r p = if Region.singleton map r then Single p else Many p
       let compile r =
-        let open MemRegion in
         let map = get_map () in
-        match types map r with
-        | [ty] when Cil.bitsSizeOf ty >= Region.size map r ->
+        match Region.typed map r with
+        | Some ty ->
           begin
-            let pkind p = if singleton map r then Single p else Many p in
             match Ctypes.object_of ty with
-            | C_int i -> pkind (Int i)
-            | C_float f -> pkind (Float f)
-            | C_pointer _ -> pkind Ptr
+            | C_int i -> kind map r (Int i)
+            | C_float f -> kind map r (Float f)
+            | C_pointer _ -> kind map r Ptr
             | _ -> Garbled
           end
-        | _ -> Garbled
+        | None -> Garbled
     end)
 
 module Name = WpContext.Generator(Type)
     (struct
-      (* Data : WpContext.Data with type key = Key.t *)
+      let name = "Wp.RegionAnalysis.Name"
       type key = region
       type data = string option
-      let name = "Wp.RegionAnalysis.Name"
       let compile r =
         let map = get_map () in
         match Region.labels map r with

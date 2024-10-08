@@ -82,6 +82,10 @@ val labels: map -> node -> string list
 val reads : map -> node -> typ list
 val writes : map -> node -> typ list
 val shifts : map -> node -> typ list
+
+val typed : map -> node -> typ option
+(** Full-sized cells with unique type access *)
+
 val iter : map -> (node -> unit) -> unit
 
 (** {2 Alias Analysis} *)
@@ -100,6 +104,11 @@ val included : map -> node -> node -> bool
       can {i never} be aliased.
 *)
 val separated : map -> node -> node -> bool
+
+
+(** [singleton m a] returns [true] when node [a] is guaranteed to have only
+    one single address in its equivalence class. *)
+val singleton : map -> node -> bool
 
 (** [lval m lv] is region where the address of [l] lives in.
     The returned region is normalized.

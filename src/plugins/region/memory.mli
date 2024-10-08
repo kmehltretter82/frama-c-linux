@@ -105,7 +105,9 @@ val pointed_by : map -> node -> node list
 
 val included : map -> node -> node -> bool
 val separated : map -> node -> node -> bool
+val singleton : map -> node -> bool
 
 val reads : map -> node -> typ list
 val writes : map -> node -> typ list
 val shifts : map -> node -> typ list
+val typed : map -> node -> typ option

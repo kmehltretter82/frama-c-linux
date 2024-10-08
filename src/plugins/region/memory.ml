@@ -630,16 +630,55 @@ let included map source target : bool =
 let separated map r1 r2 =
   not (included map r1 r2) && not (included map r2 r1)
 
+let single_path m r0 r s =
+  match (Ufind.get m.store r0).clayout with
+  | Blob -> true
+  | Cell(s0,_) -> s = s0
+  | Compound(_,_,R rgs) ->
+    List.for_all
+      (fun (rg : node Ranges.range) ->
+         not (Ufind.eq m.store r rg.data) || rg.length = s
+      ) rgs
+
+let rec singleton m r =
+  let node = Ufind.get m.store r in
+  (* normalized parents *)
+  match nodes m node.cparents with
+  | [] -> Vset.cardinal node.croots = 1
+  | [r0] ->
+    Vset.is_empty node.croots &&
+    single_path m r0 r (sizeof node.clayout) &&
+    singleton m r0
+  | _ -> false
+
 (* -------------------------------------------------------------------------- *)
 
-let reads (m : map) (r:node) =
+let reads (m:map) (r:node) =
   let node = Ufind.get m.store r in
   List.map Access.typeof @@ Access.Set.elements node.creads
 
-let writes (m : map) (r:node) =
+let writes (m:map) (r:node) =
   let node = Ufind.get m.store r in
   List.map Access.typeof @@ Access.Set.elements node.cwrites
 
-let shifts (m : map) (r:node) =
+let shifts (m:map) (r:node) =
   let node = Ufind.get m.store r in
   List.map Access.typeof @@ Access.Set.elements node.cshifts
+
+let typed (m:map) (r:node) =
+  let types = ref None in
+  let node = Ufind.get m.store r in
+  let size = sizeof node.clayout in
+  try
+    let check acs =
+      let t = Access.typeof acs in
+      if Cil.bitsSizeOf t > size then raise Exit ;
+      match !types with
+      | None -> types := Some t
+      | Some t0 -> if not @@ Cil_datatype.Typ.equal t0 t then raise Exit
+    in
+    Access.Set.iter check node.creads ;
+    Access.Set.iter check node.cwrites ;
+    Access.Set.iter check node.cshifts ;
+    !types
+  with Exit -> None
