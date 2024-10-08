@@ -1359,6 +1359,17 @@ module AsmContractsGenerate =
     end)
 
 let () = Parameter_customize.set_group normalisation
+module AsmContractsInitialized =
+  False
+    (struct
+      let option_name = "-asm-contracts-ensure-init"
+      let module_name = "AsmContractsInitialized"
+      let help = "when contracts for assembly code are generated, add \
+                  postconditions stating that the output are initialized."
+    end)
+
+
+let () = Parameter_customize.set_group normalisation
 module AsmContractsAutoValidate =
   False
     (struct
@@ -1366,6 +1377,17 @@ module AsmContractsAutoValidate =
       let module_name = "AsmContractsAutoValidate"
       let help = "automatically mark contracts generated from asm as valid \
                   (defaults to false)"
+    end)
+
+let () = Parameter_customize.set_group normalisation
+module InlineStmtContracts =
+  False
+    (struct
+      let option_name = "-inline-stmt-contracts"
+      let module_name = "InlineStmtContracts"
+      let help = "transforms requires/ensures clauses of statement contracts \
+                  into plain assertions, enabling their verification \
+                  by plug-ins with incomplete support for statement contracts."
     end)
 
 let () = Parameter_customize.set_group normalisation
