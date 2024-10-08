@@ -107,7 +107,7 @@ let attrAnnot s =
   else
     None
 
-let stripUnderscore ?(checkUnsupported=true) ?(checkUnknown=true) s =
+let stripUnderscore s =
   if String.length s = 1 then begin
     if s = "_" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
@@ -116,9 +116,9 @@ let stripUnderscore ?(checkUnsupported=true) ?(checkUnknown=true) s =
     let res = Extlib.strip_underscore s in
     if res = "" then
       Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
-    if checkUnsupported && List.mem res unsupported_attributes then
+    if List.mem res unsupported_attributes then
       Kernel.error ~current:true "unsupported attribute: %s" s
-    else if checkUnknown then begin
+    else begin
       match attrAnnot res with
       | Some _ ->
         (* Attribute annotation are always considered known *)
