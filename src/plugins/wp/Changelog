@@ -24,7 +24,7 @@
 Plugin WP <next-release>
 ###############################################################################
 
-- WP          [2024-09-24] Why3 module importer (See manual § 2.4.13)
+- WP          [2024-10-08] Why3 module importer (See manual § 2.4.13)
 -  WP         [2024-09-13] -wp-par now defaults to the number of logical cores
 -! WP         [2024-08-23] Remove wp_region
 -* WP         [2024-07-02] Fixed parsing of decimal literals
