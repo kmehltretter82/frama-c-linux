@@ -120,35 +120,31 @@ They shall succeed. Collect the artifacts of the following targets:
 \begin{itemize}
   \item api-doc
   \item build-distrib-tarball
+  \item build-ivette-linux-packages
+  \item build-ivette-macos-packages
   \item manuals
 \end{itemize}
 
 \noindent Check that these artifacts are as expected. In particular:
 \begin{itemize}
-  \item API documentatation:
+  \item API documentation:
     \begin{itemize}
       \item check that you can browse the API documentation
       \item if there are minor bugs/typos, note them for later, but it's not
         worth delaying the release to fix them.
     \end{itemize}
-  \item Check versions in manuals
   \item Tarball
     \begin{itemize}
-      \item Check that no non-free components are distributed (note: unless
-      someone inadvertently added non-free code, \FramaC does not contain any,
-      this check is obsolete).
-      \item Check that no \texttt{/home/user} path can be found in the distribution,
-      \item Build and test
-        \begin{itemize}
-          \item on Linux (the CI has already done it, but the GUI is not tested)
-          \item on MacOS \expertise{André, Loïc}
-          \item on Windows (WSL) \expertise{Allan, André}
-        \end{itemize}
       \item consider decompressing both the current and the previous release
          archives in different directories, then using \texttt{meld} to compare
          them. This allows spotting if some files were unexpectedly added, for
          instance.
     \end{itemize}
+  \item Ivette packages
+    \begin{itemize}
+      \item check that the packages can be run on each system
+    \end{itemize}
+  \item Check versions in the manuals
 \end{itemize}
 
 \noindent Alternatively, you can use \texttt{docker} to compile the archive against a

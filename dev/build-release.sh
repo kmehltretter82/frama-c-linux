@@ -27,6 +27,9 @@
 # Thus, it expects to be run from the root of the Frama-C directory and that
 # some CI artifacts are available. Namely:
 #   - 'frama-c.tar.gz'
+#   - 'frama-c-ivette-linux-ARM64.AppImage'
+#   - 'frama-c-ivette-linux-x86-64.AppImage'
+#   - 'frama-c-ivette-macos-universal.dmg'
 #   - 'api' directory (with api archives inside)
 #   - 'manuals' directory (with all manuals incl. acsl + version text files)
 # Availability of the files is checked when the script starts. The script also
@@ -160,6 +163,18 @@ for file in "${API_FILES[@]}"; do
   prepare_file "$API_DIR/$file-api.tar.gz"
 done
 
+show_step "Searching for Ivette packages"
+
+IVETTE=(
+  "frama-c-ivette-linux-ARM64.AppImage"
+  "frama-c-ivette-linux-x86-64.AppImage"
+  "frama-c-ivette-macos-universal.dmg"
+)
+
+for package in "${IVETTE[@]}"; do
+  prepare_file "$package"
+done
+
 show_step "Searching for manuals"
 
 MANUALS=(
@@ -237,6 +252,12 @@ function copy_manual_e_acsl {
   cp "$MANUALS_DIR/$1.$2" "$EACSL_TARGET_DIR/$(version_name "$1").$2"
 }
 
+function copy_ivette_package {
+  name="${1%%.*}"
+  ext="${1#*.}"
+  cp "$1" "$PKGS_TARGET_DIR/$(version_name "$name").$ext"
+}
+
 function copy_api {
   if [ "$FINAL_RELEASE" = "yes" ]; then
     cp "$API_DIR/$1-api.$2" "$MANS_TARGET_DIR/$1-api.$2"
@@ -258,15 +279,18 @@ function copy_files {
   for api in "${API_FILES[@]}"; do
     copy_api "$api" "tar.gz"
   done
+  for package in "${IVETTE[@]}"; do
+    copy_ivette_package "$package"
+  done
 
   # Eva has an old manual name that might be in use:
   if [ "$FINAL_RELEASE" = "yes" ]; then
     cp "$MANS_TARGET_DIR/frama-c-eva-manual.pdf" "$MANS_TARGET_DIR/frama-c-value-analysis.pdf"
   fi
 
-  cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_VERSION"
+  cp $TARGZ_BASE "$PKGS_TARGET_DIR/$TARGZ_VERSION"
   if [ "$FINAL_RELEASE" = "yes" ]; then
-    cp $TARGZ_BASE "$GZ_TARGET_DIR/$TARGZ_GENERIC"
+    cp $TARGZ_BASE "$PKGS_TARGET_DIR/$TARGZ_GENERIC"
   fi
 }
 
@@ -338,6 +362,13 @@ for archive in "${COMPANIONS[@]}"; do
   echo "- [$archive]($FRAMAC_COM_DOWNLOAD/$NAME.tar.gz)" >> $WIKI_PAGE
 done
 echo "" >> $WIKI_PAGE
+echo "## Ivette packages" >> $WIKI_PAGE
+for package in "${IVETTE[@]}"; do
+  NAME="${package%%.*}"
+  EXT="${package#*.}"
+  echo "- [$NAME]($FRAMAC_COM_DOWNLOAD/$(version_name $NAME).$EXT)" >> $WIKI_PAGE
+done
+echo "" >> $WIKI_PAGE
 echo "## Main changes" >> $WIKI_PAGE
 sed 's/\(\#.*\)/##\1/' $CHANGES >> $WIKI_PAGE
 
@@ -371,6 +402,21 @@ cat >$JSON_DATA <<EOL
         "name": "Official source archive",
         "url": "https://frama-c.com/download/$TARGZ_VERSION",
         "link_type":"other"
+      },
+      {
+        "name": "Ivette (Linux ARM64)",
+        "url": "https://frama-c.com/download/frama-c-ivette-linux-ARM64-$VERSION_AND_CODENAME.AppImage",
+        "link_type":"other"
+      },
+      {
+        "name": "Ivette (Linux x86-64)",
+        "url": "https://frama-c.com/download/frama-c-ivette-linux-x86-64-$VERSION_AND_CODENAME.AppImage",
+        "link_type":"other"
+      },
+      {
+        "name": "Ivette (macOS universal)",
+        "url": "https://frama-c.com/download/frama-c-ivette-macos-universal-$VERSION_AND_CODENAME.dmg",
+        "link_type":"other"
       }
     ]
   },
@@ -387,7 +433,6 @@ show_step "Building website"
 
 WEBSITE_DIR="./website"
 WEBSITE_DL_DIR="$WEBSITE_DIR/download"
-WEBSITE_INST_DIR="$WEBSITE_DIR/html/installations"
 WEBSITE_EVENTS_DIR="$WEBSITE_DIR/_events"
 WEBSITE_VERSIONS_DIR="$WEBSITE_DIR/_fc-versions"
 
@@ -398,30 +443,12 @@ mkdir -p $WEBSITE_DIR
 mkdir -p $WEBSITE_DL_DIR
 mkdir -p $WEBSITE_DL_DIR/e-acsl
 
-GZ_TARGET_DIR=$WEBSITE_DL_DIR
+PKGS_TARGET_DIR=$WEBSITE_DL_DIR
 MANS_TARGET_DIR=$WEBSITE_DL_DIR
 
 copy_files
 
 echo "Download directory built"
-
-# Install
-
-mkdir -p $WEBSITE_INST_DIR
-
-INSTALL_WEBPAGE="$WEBSITE_INST_DIR/$LOWER_CODENAME.md"
-EXT="$CODENAME (released on $(date +%Y-%m-%d))"
-
-cat >$INSTALL_WEBPAGE <<EOL
----
-layout: installation_page
-version: $LOWER_CODENAME
-title: Installation instructions for Frama-C $VERSION ($CODENAME)
----
-EOL
-sed ./INSTALL.md -e "s/^\(# Installing Frama-C\)$/\1 $EXT/" >>$INSTALL_WEBPAGE
-
-echo "Installation file built"
 
 # Event
 
@@ -469,6 +496,9 @@ else
   ACSL_OR_BETA="acsl: $ACSL_VERSION_WEBSITE"
 fi
 
+INSTALL_WEBPAGE="https://git.frama-c.com/pub/frama-c/-/blob/$TAG/INSTALL.md"
+IVETTE_INSTALL="$INSTALL_WEBPAGE#installing-ivette-via-the-online-packages-on-"
+
 cat >$VERSION_WEBPAGE <<EOL
 ---
 layout: version
@@ -483,7 +513,7 @@ releases:
     - name: Source distribution
       link: /download/$TARGZ_VERSION
       help: Compilation instructions
-      help_link: https://git.frama-c.com/pub/frama-c/-/blob/$TAG/INSTALL.md
+      help_link: $INSTALL_WEBPAGE
     - name: User manual
       link: /download/user-manual-$VERSION_AND_CODENAME.pdf
     - name: Plug-in development guide
@@ -513,6 +543,20 @@ releases:
       link: /download/wp-manual-$VERSION_AND_CODENAME.pdf
     - name: E-ACSL manual
       link: /download/e-acsl/e-acsl-manual-$VERSION_AND_CODENAME.pdf
+  - name: Ivette Packages (experimental)
+    files:
+    - name: Linux x86-64 AppImage
+      link: /download/frama-c-ivette-linux-x86-64-$VERSION_AND_CODENAME.AppImage
+      help: Installation instructions
+      help_link: ${IVETTE_INSTALL}linux
+    - name: Linux ARM64 AppImage
+      link: /download/frama-c-ivette-linux-ARM64-$VERSION_AND_CODENAME.AppImage
+      help: Installation instructions
+      help_link: ${IVETTE_INSTALL}linux
+    - name: macOS universal
+      link: /download/frama-c-ivette-macOS-universal-$VERSION_AND_CODENAME.dmg
+      help: Installation instructions
+      help_link: ${IVETTE_INSTALL}macos
 ---
 EOL
 

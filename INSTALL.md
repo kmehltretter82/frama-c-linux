@@ -8,6 +8,9 @@
         - [Installing Custom Versions of Frama-C](#installing-custom-versions-of-frama-c)
         - [Installing Frama-C on Windows via WSL](#installing-frama-c-on-windows-via-wsl)
         - [Installing Frama-C on macOS](#installing-frama-c-on-macos)
+    - [Installing Ivette via the online packages](#installing-ivette-via-the-online-packages)
+        - [On Linux](#installing-ivette-via-the-online-packages-on-linux)
+        - [On macOS](#installing-ivette-via-the-online-packages-on-macos)
     - [Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)](#installing-frama-c-via-your-linux-distribution-debianubuntufedora)
     - [Compiling from source](#compiling-from-source)
         - [Quick Start](#quick-start)
@@ -300,6 +303,52 @@ We highly recommend to rely on it for the installation of Frama-C.
    Instructions on installing and running it are presented by opam when
    the `frama-c` package is installed. Follow them to get Ivette running.
 
+## Installing Ivette via the online packages
+
+**Warning:** if you already have an `ivette` script along with `frama-c`, that
+script is used for bootstrapping the installation of Ivette from source through
+your internet connection.  The instructions provided here are intended to
+_replace_ the installation procedure from source. Hence, it is highly
+recommended for you to remove the bootstrapping `ivette` script if you want to
+use the binary distribution of Ivette.
+
+Only stable distributions are available online for now.
+Download the Ivette distribution that corresponds to your version of Frama-C.
+
+### Installing Ivette via the online packages on Linux
+
+Requirement: libfuse2 must be installed.
+
+Download the binary distribution (for now, only x86-64 and ARM64 are supported).
+Install it wherever you want:
+
+```sh
+cp frama-c-ivette-linux-<arch>-<version>.AppImage <IVETTE-INSTALL-PATH>/ivette.AppImage
+```
+
+Then add an alias `ivette` that just runs the AppImage:
+
+```sh
+alias ivette=<ABSOLUTE-IVETTE-INSTALL-PATH>/ivette.AppImage
+```
+
+### Installing Ivette via the online packages on macOS
+
+Download the universal binary distribution of Ivette and install it, typically
+in `/Applications/Ivette.app`. To launch Ivette from the command line, you will
+need your own `ivette` script, like the following one:
+
+```sh
+#! /usr/bin/env sh
+exec open -na <IVETTE-INSTALL>/Ivette.app --args\
+  --command <FRAMAC-INSTALL>/frama-c\
+  --working $PWD $*
+```
+
+Simply replace `<IVETTE-INSTALL>` and `<FRAMAC-INSTALL>` in the code above with
+the (absolute) paths to your `Ivette.app` and `frama-c` binaries,
+respectively. Then, make your `ivette` script executable and simply use it like
+the `frama-c` command-line binary!
 
 ## Installing Frama-C via your Linux distribution (Debian/Ubuntu/Fedora)
 
