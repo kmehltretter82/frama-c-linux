@@ -597,7 +597,7 @@ and pp_if_loc_known prefix suffix fmt loc =
 
 and pp_logic_constant fmt = function
   | Boolean b ->
-    Format.fprintf fmt "Boolean(%b)" b
+    Format.fprintf fmt "Boolean(%B)" b
   | Integer(integer,string_option) ->
     Format.fprintf fmt "Integer(%a,%a)"  pp_integer integer  (pp_option pp_string) string_option
   | LStr(string) -> Format.fprintf fmt "LStr(%a)"  pp_string string
