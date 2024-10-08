@@ -345,7 +345,7 @@ module Env = WpContext.StaticGenerator
         add_builtins env ; env
     end)
 
-let loader (ctxt: LT.module_builder) (_: C.location) (m: string list) =
+let importer (ctxt: LT.module_builder) (_: C.location) (m: string list) =
   begin
     L.debug ~dkey "Importing Why3 theory %s.@." (String.concat "::" m) ;
     let thname = String.concat "." m in
@@ -360,7 +360,7 @@ let register () =
   if not !registered then
     begin
       registered := true ;
-      Acsl_extension.register_module_importer ~plugin:"wp" "why3" loader ;
+      Acsl_extension.register_module_importer ~plugin:"wp" "why3" importer ;
     end
 
 let () = Cmdline.run_after_extended_stage register

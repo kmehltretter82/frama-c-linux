@@ -1788,13 +1788,13 @@ by a link (`\user{link};'). The available tags are depicted on figure~\ref{wp-dr
 \subsection{Importing Why3 Modules}
 \label{importer}
 
-The \textsf{WP} plug-in provides an \textsf{ACSL} module loader that
+The \textsf{WP} plug-in provides an \textsf{ACSL} module importer that
 can import \textsf{Why3} theories and modules into \textsf{ACSL}.
 See \textsf{Frama-C} user manual, Section § 6.3 for details.
 Here is an example of use:
 
 \begin{lstlisting}
-//@ import why3: number::Gcd;
+//@ import \wp::why3: number::Gcd;
 
 /*@
   assigns \nothing;
