@@ -66,11 +66,11 @@ type map = {
 (* -------------------------------------------------------------------------- *)
 
 let sizeof = function Blob -> 0 | Cell(s,_) | Compound(s,_,_) -> s
-let ranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs
-let fields = function Blob | Cell _ -> Fields.empty | Compound(_,fds,_) -> fds
-let pointed = function Blob | Compound _ -> None | Cell(_,p) -> p
+let cranges = function Blob | Cell _ -> [] | Compound(_,_,R rs) -> rs
+let cfields = function Blob | Cell _ -> Fields.empty | Compound(_,fds,_) -> fds
+let cpointed = function Blob | Compound _ -> None | Cell(_,p) -> p
 
-let types (m : chunk) : typ list =
+let ctypes (m : chunk) : typ list =
   let pool = ref Typ.Set.empty in
   let add acs =
     pool := Typ.Set.add (Cil.unrollType @@ Access.typeof acs) !pool in
@@ -111,7 +111,7 @@ let pp_chunk fmt (n: node) (m: chunk) =
     let acs r s = if Access.Set.is_empty s then '-' else r in
     Format.fprintf fmt "@[<hov 2>%a: %c%c%c" pp_node n
       (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
-    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (types m) ;
+    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
     Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
     Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.croots ;
     if Options.debug_atleast 1 then
@@ -221,117 +221,6 @@ let add_label (m: map) a =
 (* --- Iterator                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type range = {
-  label: string ; (* pretty printed fields *)
-  offset: int ;
-  length: int ;
-  cells: int ;
-  data: node ;
-}
-
-type region = {
-  node: node ;
-  parents: node list ;
-  roots: varinfo list ;
-  labels: string list ;
-  types: typ list ;
-  fields: Fields.domain ;
-  reads: Access.acs list ;
-  writes: Access.acs list ;
-  shifts: Access.acs list ;
-  sizeof: int ;
-  ranges: range list ;
-  pointed: node option ;
-}
-
-let pp_cells fmt = function
-  | 1 -> ()
-  | 0 -> Format.fprintf fmt "[…]"
-  | n -> Format.fprintf fmt "[%d]" n
-
-type slice =
-  | Padding of int
-  | Range of range
-
-let pad p q s =
-  let n = q - p in
-  if n > 0 then Padding n :: s else s
-
-let rec span k s = function
-  | [] -> pad k s []
-  | r::rs -> pad k r.offset @@ Range r :: span (r.offset + r.length) s rs
-
-let pp_slice fields fmt = function
-  | Padding n ->
-    Format.fprintf fmt "@ %a;" Fields.pp_bits n
-  | Range r ->
-    Format.fprintf fmt "@ %t: %a%a;"
-      (Fields.pslice ~fields ~offset:r.offset ~length:r.length)
-      pp_node r.data
-      pp_cells r.cells
-
-let pp_range fmt (r: range) =
-  Format.fprintf fmt "@ %d..%d: %a%a;"
-    r.offset (r.offset + r.length) pp_node r.data pp_cells r.cells
-
-let pp_region fmt (m: region) =
-  begin
-    let acs r s = if s = [] then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%a: %c%c%c"
-      pp_node m.node
-      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
-    List.iter (Format.fprintf fmt "@ %s:") m.labels ;
-    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.roots ;
-    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
-    Format.fprintf fmt "@ %db" m.sizeof ;
-    Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
-    if m.ranges <> [] then
-      begin
-        Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
-        if Options.debug_atleast 1 then
-          List.iter (pp_range fmt) m.ranges
-        else
-          List.iter (pp_slice m.fields fmt) (span 0 m.sizeof m.ranges) ;
-        Format.fprintf fmt "@]@ }@]" ;
-      end ;
-    if Options.debug_atleast 1 then
-      begin
-        List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
-        List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
-        List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
-      end ;
-    Format.fprintf fmt " ;@]" ;
-  end
-
-let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
-  let s = sizeof (get m data).clayout in
-  let p = Fields.pslice ~fields ~offset ~length in
-  {
-    label = Format.asprintf "%t" p ;
-    offset ; length ;
-    cells = if s = 0 then 0 else length / s ;
-    data = node m data ;
-  }
-
-let make_region (m: map) (n: node) (r: chunk) : region =
-  let types = types r in
-  let sizeof = sizeof r.clayout in
-  let fields = fields r.clayout in
-  {
-    node = n ;
-    parents = nodes m r.cparents ;
-    roots = Vset.elements r.croots ;
-    labels = Lset.elements r.clabels ;
-    reads = Access.Set.elements r.creads ;
-    writes = Access.Set.elements r.cwrites ;
-    shifts = Access.Set.elements r.cshifts ;
-    types ; sizeof ; fields ;
-    ranges = List.map (make_range m fields) (ranges r.clayout) ;
-    pointed = Option.map (node m) (pointed r.clayout) ;
-  }
-
-let region map n = make_region map n (get map n)
-
 let rec walk h m (f: node -> unit) n =
   let n = Ufind.find m.store n in
   let id = Store.id n in
@@ -347,11 +236,6 @@ let rec walk h m (f: node -> unit) n =
 let iter (m:map) (f: node -> unit) =
   let h = Hashtbl.create 0 in
   Vmap.iter (fun _x n -> walk h m f n) m.roots
-
-let regions map =
-  let pool = ref [] in
-  iter map (fun r -> pool := region map r :: !pool) ;
-  List.rev !pool
 
 let size (m: map) (r: node) =
   sizeof (Ufind.get m.store r).clayout
@@ -665,6 +549,8 @@ let shifts (m:map) (r:node) =
   let node = Ufind.get m.store r in
   List.map Access.typeof @@ Access.Set.elements node.cshifts
 
+let types (m:map) (r:node) = ctypes @@ Ufind.get m.store r
+
 let typed (m:map) (r:node) =
   let types = ref None in
   let node = Ufind.get m.store r in
@@ -682,3 +568,136 @@ let typed (m:map) (r:node) =
     Access.Set.iter check node.cshifts ;
     !types
   with Exit -> None
+
+(* -------------------------------------------------------------------------- *)
+(* --- High-Level API                                                     --- *)
+(* -------------------------------------------------------------------------- *)
+
+type range = {
+  label: string ; (* pretty printed fields *)
+  offset: int ;
+  length: int ;
+  cells: int ;
+  data: node ;
+}
+
+type region = {
+  node: node ;
+  parents: node list ;
+  roots: varinfo list ;
+  labels: string list ;
+  types: typ list ;
+  typed : typ option ;
+  fields: Fields.domain ;
+  reads: Access.acs list ;
+  writes: Access.acs list ;
+  shifts: Access.acs list ;
+  sizeof: int ;
+  singleton : bool ;
+  ranges: range list ;
+  pointed: node option ;
+}
+
+let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
+  let s = sizeof (get m data).clayout in
+  let p = Fields.pslice ~fields ~offset ~length in
+  {
+    label = Format.asprintf "%t" p ;
+    offset ; length ;
+    cells = if s = 0 then 0 else length / s ;
+    data = node m data ;
+  }
+
+let ranges (m:map) (r:node) =
+  let node = Ufind.get m.store r in
+  let fields = cfields node.clayout in
+  List.map (make_range m fields) (cranges node.clayout)
+
+let make_region (m: map) (n: node) (r: chunk) : region =
+  let types = ctypes r in
+  let typed = typed m n in
+  let sizeof = sizeof r.clayout in
+  let fields = cfields r.clayout in
+  let singleton = singleton m n in
+  {
+    node = n ;
+    parents = nodes m r.cparents ;
+    roots = Vset.elements r.croots ;
+    labels = Lset.elements r.clabels ;
+    reads = Access.Set.elements r.creads ;
+    writes = Access.Set.elements r.cwrites ;
+    shifts = Access.Set.elements r.cshifts ;
+    ranges = List.map (make_range m fields) (cranges r.clayout) ;
+    pointed = Option.map (node m) (cpointed r.clayout) ;
+    types ; typed ; singleton ; sizeof ; fields ;
+  }
+
+let region map n = make_region map n (get map n)
+
+let regions map =
+  let pool = ref [] in
+  iter map (fun r -> pool := region map r :: !pool) ;
+  List.rev !pool
+
+(* -------------------------------------------------------------------------- *)
+(* --- Pretty Printers                                                    --- *)
+(* -------------------------------------------------------------------------- *)
+
+let pp_cells fmt = function
+  | 1 -> ()
+  | 0 -> Format.fprintf fmt "[…]"
+  | n -> Format.fprintf fmt "[%d]" n
+
+type slice =
+  | Padding of int
+  | Range of range
+
+let pad p q s =
+  let n = q - p in
+  if n > 0 then Padding n :: s else s
+
+let rec span k s = function
+  | [] -> pad k s []
+  | r::rs -> pad k r.offset @@ Range r :: span (r.offset + r.length) s rs
+
+let pp_slice fields fmt = function
+  | Padding n ->
+    Format.fprintf fmt "@ %a;" Fields.pp_bits n
+  | Range r ->
+    Format.fprintf fmt "@ %t: %a%a;"
+      (Fields.pslice ~fields ~offset:r.offset ~length:r.length)
+      pp_node r.data
+      pp_cells r.cells
+
+let pp_range fmt (r: range) =
+  Format.fprintf fmt "@ %d..%d: %a%a;"
+    r.offset (r.offset + r.length) pp_node r.data pp_cells r.cells
+
+let pp_region fmt (m: region) =
+  begin
+    let acs r s = if s = [] then '-' else r in
+    Format.fprintf fmt "@[<hov 2>%a: %c%c%c"
+      pp_node m.node
+      (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
+    List.iter (Format.fprintf fmt "@ %s:") m.labels ;
+    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.roots ;
+    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
+    Format.fprintf fmt "@ %db" m.sizeof ;
+    Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
+    if m.ranges <> [] then
+      begin
+        Format.fprintf fmt "@ @[<hv 0>@[<hv 2>{" ;
+        if Options.debug_atleast 1 then
+          List.iter (pp_range fmt) m.ranges
+        else
+          List.iter (pp_slice m.fields fmt) (span 0 m.sizeof m.ranges) ;
+        Format.fprintf fmt "@]@ }@]" ;
+      end ;
+    if Options.debug_atleast 1 then
+      begin
+        List.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.reads ;
+        List.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.writes ;
+        List.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.shifts ;
+      end ;
+    Format.fprintf fmt " ;@]" ;
+  end

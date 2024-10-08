@@ -38,11 +38,13 @@ type region = {
   roots: varinfo list ;
   labels: string list ;
   types: typ list ;
+  typed : typ option ;
   fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   shifts: Access.acs list ;
   sizeof: int ;
+  singleton : bool ;
   ranges: range list ;
   pointed: node option ;
 }
@@ -100,6 +102,7 @@ val index : map -> node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 
+val ranges : map -> node -> range list
 val points_to : map -> node -> node option
 val pointed_by : map -> node -> node list
 
@@ -110,4 +113,5 @@ val singleton : map -> node -> bool
 val reads : map -> node -> typ list
 val writes : map -> node -> typ list
 val shifts : map -> node -> typ list
+val types : map -> node -> typ list
 val typed : map -> node -> typ option

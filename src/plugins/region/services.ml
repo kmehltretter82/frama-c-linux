@@ -114,6 +114,7 @@ struct
 
   let label (m: Memory.region) =
     let buffer = Buffer.create 4 in
+    if m.singleton then Buffer.add_string buffer "!" ;
     if m.reads <> [] then Buffer.add_char buffer 'R' ;
     if m.writes <> [] then Buffer.add_char buffer 'W' ;
     if m.pointed <> None then Buffer.add_char buffer '*'
@@ -133,7 +134,7 @@ struct
       Typ.pretty fmt ty
 
   let title (m: Memory.region) =
-    Format.asprintf "%t (%db)"
+    Format.asprintf "%t (%db)%t"
       begin fun fmt ->
         match m.types with
         | [] -> Format.pp_print_string fmt "Compound"
@@ -141,7 +142,11 @@ struct
         | ty::ts ->
           pp_typ_layout 0 fmt ty ;
           List.iter (Format.fprintf fmt ", %a" (pp_typ_layout 0)) ts ;
-      end m.sizeof
+      end
+      m.sizeof
+      begin fun fmt ->
+        if m.singleton then Format.pp_print_string fmt " (singleton)"
+      end
 
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
@@ -154,7 +159,8 @@ struct
       "pointed", NodeOpt.jtype ;
       "reads", Jboolean ;
       "writes", Jboolean ;
-      "bytes", Jboolean ;
+      "typed", Jboolean ;
+      "singleton", Jboolean ;
       "label", Jstring ;
       "title", Jstring ;
     ]
@@ -170,7 +176,8 @@ struct
       "pointed", NodeOpt.to_json @@ m.pointed ;
       "reads", Json.of_bool (m.reads <> []) ;
       "writes", Json.of_bool (m.writes <> []) ;
-      "bytes", Json.of_bool (List.length m.types > 1) ;
+      "typed", Json.of_bool (m.typed <> None) ;
+      "singleton", Json.of_bool m.singleton ;
       "label", Json.of_string @@ label m ;
       "title", Json.of_string @@ title m ;
     ]

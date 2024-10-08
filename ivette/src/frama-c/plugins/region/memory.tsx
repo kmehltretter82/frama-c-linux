@@ -70,7 +70,7 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     const id = `n${r.node}`;
     // --- Color
     const color =
-      r.bytes ? 'red' :
+      !r.typed ? 'red' :
         r.pointed !== undefined
           ? (r.writes ? 'orange' : 'yellow')
           : (r.writes && r.reads) ? 'green' :
@@ -81,19 +81,17 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     const shape = cells.length > 0 ? cells : undefined;
     nodes.push({ id, font, color, label: r.label, title: r.title, shape });
     // --- Labels
-    const L: Dot.Node =
-      { id: '', shape: 'note', font: 'mono' };
+    const L: Dot.Node = { id: '', shape: 'note', font: 'mono' };
     r.labels.forEach(a => {
       const lid = `L${a}`;
       nodes.push({ ...L, id: lid, label: `${a}:` });
       edges.push({
         source: lid, target: id, aligned: true,
-        headAnchor: 'n', head: 'none', color: 'grey'
+        headAnchor: 's', head: 'none', color: 'grey'
       });
     });
     // --- Roots
-    const R: Dot.Node =
-      { id: '', shape: 'cds', font: 'mono' };
+    const R: Dot.Node = { id: '', shape: 'cds', font: 'mono' };
     r.roots.forEach(x => {
       const xid = `X${x}`;
       nodes.push({ ...R, id: xid, label: x });
