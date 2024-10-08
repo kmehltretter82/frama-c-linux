@@ -57,7 +57,7 @@ let range ?(offset=0) ?(length=1) data = singleton { offset ; length ; data }
 let rec find (k: int) = function
   | [] -> raise Not_found
   | ({ offset ; length } as r) :: rs ->
-    if offset <= k && k <= offset + length then r else find k rs
+    if offset <= k && k < offset + length then r else find k rs
 
 let find k (R rs) = find k rs
 
@@ -70,7 +70,7 @@ let rec merge f ra rb =
     if a' <= b.offset then
       a :: merge f wa rb
     else
-    if b' < a.offset then
+    if b' <= a.offset then
       b :: merge f ra wb
     else
       let offset = min a.offset b.offset in
