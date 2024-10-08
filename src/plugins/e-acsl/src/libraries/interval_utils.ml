@@ -272,6 +272,7 @@ let interv_of_logic_typ = function
   | Ctype ty -> interv_of_typ ty
   | Linteger -> top_ival
   | Lreal -> Real
+  | Lboolean -> Error.not_yet "boolean"
   | Ltype _ -> Error.not_yet "user-defined logic type"
   | Lvar _ -> Error.not_yet "type variable"
   | Larrow _ -> Nan

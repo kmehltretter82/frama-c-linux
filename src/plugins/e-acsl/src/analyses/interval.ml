@@ -349,6 +349,7 @@ let rec infer ~force ~logic_env t =
   in
   let compute t =
     match t.term_node with
+    | TConst (Boolean b) -> singleton (if b then Z.one else Z.zero)
     | TConst (Integer (n, _)) -> singleton n
     | TConst (LChr c) ->
       let n = Cil.charConstToInt c in
@@ -488,7 +489,7 @@ let rec infer ~force ~logic_env t =
                | Some (Ctype typ) ->
                  ignore ((infer ~force ~logic_env t'));
                  interv_of_typ typ;
-               | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+               | None | Some _ ->
                  get_res (infer ~force ~logic_env t'))
             | _ -> assert false)
        | LBnone when li.l_var_info.lv_name = "\\sum" ||
@@ -585,7 +586,7 @@ and initiate_fixpoint ~logic_env li args_ival args =
       (match li.l_type with
        | Some (Ctype typ) ->
          interv_of_typ typ, PoT_term t
-       | None | Some (Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
+       | None | Some _ ->
          Ival (Ival.bottom), PoT_term t)
     | _ -> assert false
   in
@@ -625,11 +626,13 @@ and infer_term_host ~force ~logic_env thost =
   | TVar v ->
     (try Logic_env.find logic_env v with Not_found ->
      match v.lv_type with
+     | Lboolean -> ival Z.zero Z.one
      | Linteger -> top_ival
      | Ctype (TFloat(fk, _)) -> Float(fk, None)
      | Lreal -> Real
      | Ctype _ -> interv_of_typ (Logic_utils.logicCType v.lv_type)
-     | Ltype _ | Lvar _ | Larrow _ -> Options.fatal "unexpected logic type")
+     | Ltype _ | Lvar _ | Larrow _ ->
+       Options.fatal "unexpected logic type")
   | TResult ty ->
     interv_of_typ ty
   | TMem t ->
@@ -733,7 +736,7 @@ and infer_bound_variable ~loc ~logic_env (t1, lv, t2) =
   let i = unify (join i1 i2) in
   let t1, t2, i =
     match lv.lv_type with
-    | Ltype _ | Lvar _ | Lreal | Larrow _ ->
+    | Ltype _ | Lvar _ | Lreal | Lboolean | Larrow _ ->
       Error.not_yet "quantification over non-integer type"
     | Linteger -> t1, t2, i
     | Ctype ty ->

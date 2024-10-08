@@ -1334,6 +1334,7 @@ and location = Filepath.position * Filepath.position
 (** {1 Abstract syntax trees for annotations} *)
 
 and logic_constant =
+  | Boolean of bool
   | Integer of Integer.t * string option
   (** Integer constant with a textual representation.  *)
   | LStr of string (** String constant. *)
@@ -1356,6 +1357,7 @@ and logic_type =
   | Ltype of logic_type_info * logic_type list
   (** an user-defined logic type with its parameters *)
   | Lvar of string (** a type variable. *)
+  | Lboolean (** booleans *)
   | Linteger (** mathematical integers, {i i.e.} Z *)
   | Lreal    (** mathematical reals, {i i.e.} R *)
   | Larrow of logic_type list * logic_type (** (n-ary) function type *)

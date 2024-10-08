@@ -165,7 +165,7 @@ let is_bitfield_pointers lty =
         | _ ->
           false
       end
-    | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ ->
+    | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ ->
       false
   in
   if Logic_const.is_set_type lty then

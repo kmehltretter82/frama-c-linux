@@ -37,6 +37,7 @@ type builtin =
   | HACK of (F.term list -> F.term)
 
 type kind =
+  | B (* boolean *)
   | Z (* integer *)
   | R (* real *)
   | I of Ctypes.c_int
@@ -53,6 +54,7 @@ let okind = function
 let ckind typ = okind (object_of typ)
 
 let skind = function
+  | B -> Logic.Sbool
   | I _ | Z -> Logic.Sint
   | F _ | R -> Logic.Sreal
   | A -> Logic.Sdata
@@ -63,16 +65,19 @@ let rec lkind t =
   | Ltype({lt_name="set"},[t]) -> lkind t
   | Lreal -> R
   | Linteger -> Z
+  | Lboolean -> B
   | Ltype _ | Larrow _ | Lvar _ -> A
 
 let kind_of_tau = function
   | Qed.Logic.Int -> Z
   | Qed.Logic.Real -> R
+  | Qed.Logic.Bool -> B
   | _ -> A
 
 let pp_kind fmt = function
   | I i -> Ctypes.pp_int fmt i
   | F f -> Ctypes.pp_float fmt f
+  | B -> Format.pp_print_string fmt "bool"
   | Z -> Format.pp_print_string fmt "int"
   | R -> Format.pp_print_string fmt "real"
   | A -> Format.pp_print_string fmt "_"

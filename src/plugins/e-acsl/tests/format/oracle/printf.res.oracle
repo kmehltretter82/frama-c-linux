@@ -46,9 +46,13 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:196: Warning: 
-  E-ACSL construct `datacons' is not yet supported. Ignoring annotation.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:204: Warning: 
-  E-ACSL construct `datacons' is not yet supported. Ignoring annotation.
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:192: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.

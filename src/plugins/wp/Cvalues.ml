@@ -52,6 +52,8 @@ let rec constant = function
   | CStr _ | CWStr _ -> Warning.error "String constants not yet implemented"
 
 and logic_constant = function
+  | Boolean true -> e_true
+  | Boolean false -> e_false
   | Integer(z,_) -> e_bigint z
   | LChr c -> e_int64 (Ctypes.char c)
   | LReal r -> Cfloat.acsl_lit r
@@ -320,7 +322,7 @@ let cdomain obj =
 let ldomain ltype =
   match Logic_utils.unroll_type ~unroll_typedef:false ltype with
   | Ctype typ -> cdomain (Ctypes.object_of typ)
-  | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _ -> None
+  | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Volatile                                                           --- *)

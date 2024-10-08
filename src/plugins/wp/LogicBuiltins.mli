@@ -30,6 +30,7 @@ open Lang
 type category = Lang.lfun Qed.Logic.category
 
 type kind =
+  | B                   (** boolean *)
   | Z                   (** integer *)
   | R                   (** real *)
   | I of Ctypes.c_int   (** C-ints *)

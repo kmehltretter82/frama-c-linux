@@ -75,7 +75,7 @@ let is_non_null_expr e =
 
 let is_integral_logic_const = function
   | Integer _ | LEnum _ | LChr _ -> true
-  | LStr _ | LWStr _ | LReal _ -> false
+  | LStr _ | LWStr _ | LReal _ | Boolean _ -> false
 
 let possible_value_of_integral_logic_const = function
   | Integer(i,_) -> Some i

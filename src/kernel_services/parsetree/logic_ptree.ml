@@ -40,6 +40,7 @@ type array_size =
 (** logic types. *)
 type logic_type =
   | LTvoid (** C void *)
+  | LTboolean (** booleans *)
   | LTinteger (** mathematical integers. *)
   | LTreal (** mathematical real. *)
   | LTint of Cil_types.ikind (** C integral type.*)

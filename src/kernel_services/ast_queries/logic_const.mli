@@ -289,9 +289,6 @@ val make_arrow_type: logic_var list -> logic_type -> logic_type
 (** @return true if the argument is the boolean type. *)
 val is_boolean_type: logic_type -> bool
 
-(** @since Sodium-20150201 *)
-val boolean_type: logic_type
-
 (* ************************************************************************** *)
 (** {1 Logic Terms} *)
 (* ************************************************************************** *)
@@ -301,6 +298,11 @@ val term : ?loc:Location.t -> term_node -> logic_type -> term
 
 (** [..] of integers *)
 val trange: ?loc:Location.t -> term option * term option -> term
+
+(** boolean constant
+    @since Frama-C+dev
+*)
+val tboolean: ?loc:Location.t -> bool -> term
 
 (** integer constant *)
 val tinteger: ?loc:Location.t -> int -> term

@@ -80,13 +80,13 @@
   ------------------------------------------------------------
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 55) in 'test_step_peq':
-  Assume { (* Pre-condition *) Have: L_LQ = L_LP. }
+  Assume { (* Pre-condition *) Have: (L_LQ=true) <-> (L_LP=true). }
   Prove: P_S.
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 59) in 'test_step_pneq':
-  Assume { (* Pre-condition *) Have: L_LQ != L_LP. }
+  Assume { (* Pre-condition *) Have: !((L_LQ=true) <-> (L_LP=true)). }
   Prove: P_S.
   
   ------------------------------------------------------------
@@ -195,13 +195,13 @@
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 107) in 'test_goal_eq':
   Assume { (* Pre-condition *) Have: P_S. }
-  Prove: L_LQ = L_LP.
+  Prove: (L_LQ=true) <-> (L_LP=true).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
   Goal Post-condition (file split.i, line 111) in 'test_goal_neq':
   Assume { (* Pre-condition *) Have: P_S. }
-  Prove: L_LQ != L_LP.
+  Prove: !((L_LQ=true) <-> (L_LP=true)).
   
   ------------------------------------------------------------
 [wp:script:allgoals] 
@@ -330,7 +330,7 @@
   typed_test_step_pneq_ensures subgoal:
   
   Goal Wp.Tactical.typed_test_step_pneq_ensures-0 (generated):
-  Assume { (* True/False *) When: (L_LQ=true) /\ (L_LP=false). }
+  Assume { (* True/False *) When: (L_LP=false) /\ (L_LQ=true). }
   Prove: P_S.
   
   ------------------------------------------------------------

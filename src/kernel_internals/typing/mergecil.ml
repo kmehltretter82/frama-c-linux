@@ -1834,7 +1834,7 @@ let pp_profiles fmt li =
 
 let logic_info_of_logic_var lv =
   let rec extract_tparams tparams = function
-    | Ctype _ | Linteger | Lreal -> tparams
+    | Ctype _ | Linteger | Lreal | Lboolean -> tparams
     | Ltype (_,l) -> List.fold_left extract_tparams tparams l
     | Lvar s -> Datatype.String.Set.add s tparams
     | Larrow (l,t) ->

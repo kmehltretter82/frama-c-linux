@@ -545,7 +545,7 @@ and is_same_logic_constant c c' env =
      | `Same ei'' -> Cil_datatype.Enumitem.equal ei' ei''
      | `Not_present -> false)
   | LEnum _, _ | _, LEnum _ -> false
-  | (Integer _ | LStr _ | LWStr _ | LChr _ | LReal _), _ ->
+  | (Boolean _ | Integer _ | LStr _ | LWStr _ | LChr _ | LReal _), _ ->
     Cil_datatype.Logic_constant.equal c c'
 
 and is_same_term t t' env =
@@ -763,12 +763,14 @@ and is_same_logic_type t t' env =
     is_matching_logic_type_info t t' env &&
     is_same_list is_same_logic_type prms prms' env
   | Lvar s, Lvar s' -> is_matching_logic_type_var s s' env
+  | Lboolean, Lboolean -> true
   | Linteger, Linteger -> true
   | Lreal, Lreal -> true
   | Larrow(args,rt), Larrow(args', rt')  ->
     is_same_list is_same_logic_type args args' env &&
     is_same_logic_type rt rt' env
-  | (Ctype _ | Ltype _ | Lvar _ | Linteger | Lreal | Larrow _),_ -> false
+  | (Ctype _ | Ltype _ | Lvar _ | Linteger | Lboolean | Lreal | Larrow _),_ ->
+    false
 
 and is_same_inductive_case (_,labs,tprms,p) (_,labs',tprms',p') env =
   let res, env =

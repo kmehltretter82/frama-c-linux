@@ -1508,7 +1508,7 @@ and childrenLogicType vis ty =
     Ctype t ->
     let t' = visitCilType vis t in
     if t != t' then Ctype t' else ty
-  | Linteger | Lreal -> ty
+  | Lboolean | Linteger | Lreal -> ty
   | Ltype (s,l) ->
     let s' = doVisitCil vis (Visitor_behavior.Get.logic_type_info vis#behavior)
         vis#vlogic_type_info_use alphabetabeta s in
@@ -3276,9 +3276,8 @@ let isIntegralOrPointerType t =
 let rec isLogicBooleanType t =
   match t with
   | Ctype ty -> isIntegralType ty
-  | Linteger -> true
-  | Ltype ({lt_name = name} as tdef,_) ->
-    name = Utf8_logic.boolean ||
+  | Lboolean | Linteger -> true
+  | Ltype (tdef,_) ->
     ( is_unrollable_ltdef tdef && isLogicBooleanType (unroll_ltdef t))
   | Lreal | Lvar _ | Larrow _ -> false
 
@@ -3289,14 +3288,15 @@ let isBoolType typ = match unrollType typ with
 let rec isLogicPureBooleanType t =
   match t with
   | Ctype t -> isBoolType t
-  | Ltype ({lt_name = name} as def,_) ->
-    name = Utf8_logic.boolean ||
+  | Lboolean -> true
+  | Ltype (def,_) ->
     (is_unrollable_ltdef def && isLogicPureBooleanType (unroll_ltdef t))
   | _ -> false
 
 let rec isLogicIntegralType t =
   match t with
   | Ctype t -> isIntegralType t
+  | Lboolean -> false
   | Linteger -> true
   | Lreal -> false
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
@@ -3311,6 +3311,7 @@ let isFloatingType t =
 let isLogicFloatType t =
   match t with
   | Ctype t -> isFloatingType t
+  | Lboolean -> false
   | Linteger -> false
   | Lreal -> false
   | Lvar _ | Ltype _ | Larrow _ -> false
@@ -3318,6 +3319,7 @@ let isLogicFloatType t =
 let rec isLogicRealOrFloatType t =
   match t with
   | Ctype t -> isFloatingType t
+  | Lboolean -> false
   | Linteger -> false
   | Lreal -> true
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
@@ -3327,6 +3329,7 @@ let rec isLogicRealOrFloatType t =
 let rec isLogicRealType t =
   match t with
   | Ctype _ -> false
+  | Lboolean -> false
   | Linteger -> false
   | Lreal -> true
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
@@ -3350,7 +3353,7 @@ let rec isLogicArithmeticType t =
   | Linteger | Lreal -> true
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
     isLogicArithmeticType (unroll_ltdef ty)
-  | Lvar _ | Ltype _ | Larrow _ -> false
+  | Lboolean | Lvar _ | Ltype _ | Larrow _ -> false
 
 let isFunctionType t =
   match unrollTypeSkel t with
@@ -3541,7 +3544,7 @@ let rec typeOfTermLval = function
               Kernel.fatal ~current:true
                 "typeOfTermLval: Mem on a non-pointer"
           end
-        | Linteger | Lreal ->
+        | Lboolean | Linteger | Lreal ->
           Kernel.fatal ~current:true "typeOfTermLval: Mem on a logic type"
         | Ltype (s,_) as ty when is_unrollable_ltdef s ->
           type_of_pointed (unroll_ltdef ty)
@@ -3565,7 +3568,7 @@ and typeTermOffset basetyp =
     let rec putAttributes = function
       | Ctype typ ->
         Ctype (typeAddAttributes contagious typ)
-      | Linteger | Lreal ->
+      | Lboolean | Linteger | Lreal ->
         Kernel.fatal ~current:true
           "typeTermOffset: Attribute on a logic type"
       | Ltype (s,_) as ty when is_unrollable_ltdef s ->
@@ -3596,7 +3599,8 @@ and typeTermOffset basetyp =
               Kernel.fatal ~current:true
                 "typeTermOffset: Index on a non-array"
           end
-        | Linteger | Lreal -> Kernel.fatal ~current:true "typeTermOffset: Index on a logic type"
+        | Lboolean | Linteger | Lreal ->
+          Kernel.fatal ~current:true "typeTermOffset: Index on a logic type"
         | Ltype (s,_) as ty when is_unrollable_ltdef s ->
           elt_type (unroll_ltdef ty)
         | Ltype (s,_) ->
@@ -3617,7 +3621,8 @@ and typeTermOffset basetyp =
             blendAttributes baseAttrs fieldType
           | _ ->  Kernel.fatal ~current:true "typeTermOffset: Field on a non-compound"
         end
-      | Linteger | Lreal -> Kernel.fatal ~current:true "typeTermOffset: Field on a logic type"
+      | Lboolean | Linteger | Lreal ->
+        Kernel.fatal ~current:true "typeTermOffset: Field on a logic type"
       | Ltype (s,_) as ty when is_unrollable_ltdef s ->
         elt_type (unroll_ltdef ty)
       | Ltype (s,_) ->
@@ -3640,7 +3645,7 @@ let isVolatileType typ_lval = typeHasAttributeMemoryBlock "volatile" typ_lval
 
 let rec isVolatileLogicType = function
   | Ctype typ -> isVolatileType typ
-  | Linteger | Lreal | Lvar _ | Larrow _ -> false
+  | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
     isVolatileLogicType (unroll_ltdef ty)
   | Ltype _ -> false

@@ -329,7 +329,7 @@ module Logic_binding = struct
       | None -> match logic_v.lv_type with
         | Ctype ty -> ty
         | Linteger -> Gmp_types.Z.t ()
-        | Ltype _ as ty when Logic_const.is_boolean_type ty -> Cil_const.charType
+        | Lboolean -> Cil_const.charType
         | Ltype _ | Lvar _ | Lreal | Larrow _ as lty ->
           let msg =
             Format.asprintf

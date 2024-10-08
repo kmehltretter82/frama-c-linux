@@ -149,7 +149,7 @@ let rec instantiate subst = function
     (* This is an application of type parameters:
        no need to recursively substitute in the resulting type. *)
     (try List.assoc v subst with Not_found -> ty)
-  | Ctype _ | Linteger | Lreal as ty -> ty
+  | Ctype _ | Linteger | Lreal | Lboolean as ty -> ty
 
 let is_unrollable_ltdef = function
   | {lt_def=Some (LTsyn _)} -> true
@@ -166,12 +166,12 @@ let rec unroll_ltdef = function
     unroll_ltdef (instantiate subst ty)
   | Ltype ({lt_def= None},_)
   | Ltype ({lt_def= Some (LTsum _)},_)
-  | Linteger | Lreal | Lvar _ | Larrow _ | Ctype _ as ty  -> ty
+  | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ as ty  -> ty
 
 let rec isLogicCType f = function
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
     isLogicCType f (unroll_ltdef ty)
-  | Ltype _ | Linteger | Lreal | Lvar _ | Larrow _ -> false
+  | Ltype _ | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ -> false
   | Ctype cty  -> f cty
 
 let rec is_list_type = function
@@ -238,12 +238,10 @@ let make_arrow_type args rt =
   | _ -> Larrow(List.map (fun x -> x.lv_type) args, rt)
 
 let rec is_boolean_type = function
-  | Ltype ({ lt_name = s }, []) when s = Utf8_logic.boolean -> true
+  | Lboolean -> true
   | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
     is_boolean_type (unroll_ltdef ty)
   | _ -> false
-
-let boolean_type = Ltype ({ lt_name = Utf8_logic.boolean ; lt_params = [] ; lt_def = None; lt_attr = [] } , [])
 
 (** {2 Offsets} *)
 
@@ -278,6 +276,9 @@ let term ?(loc=Cil_datatype.Location.unknown) term typ =
 let trange ?(loc=Cil_datatype.Location.unknown) (low,high) =
   term ~loc (Trange(low,high))
     (Ltype(Logic_env.find_logic_type "set",[Linteger]))
+
+let tboolean ?(loc=Cil_datatype.Location.unknown) b =
+  term ~loc (TConst (Boolean b)) Lboolean
 
 (** An integer constant (of type integer). *)
 let tinteger ?(loc=Cil_datatype.Location.unknown) i =
