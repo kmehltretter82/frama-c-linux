@@ -367,20 +367,20 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
     let rf = new_chunk m () in
     let fields = Fields.singleton fd in
     let rc = new_range m ~fields ~size ~offset ~length rf in
-    ignore @@ merge m r rc ; rf
+    merge m r rc ; rf
   else r
 
 let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
   let s = Cil.bitsSizeOf ty * n in
   let re = new_chunk m () in
   let rc = new_range m ~size:s ~offset:0 ~length:s re in
-  ignore @@ merge m r rc ; re
+  merge m r rc ; re
 
 let add_points_to (m: map) (a: node) (b : node) =
   begin
     failwith_locked m "Region.Memory.points_to" ;
-    ignore @@ merge m a @@ new_chunk m ~ptr:b () ;
-    ignore @@ merge m b @@ new_chunk m ~pointed:a () ;
+    merge m a @@ new_chunk m ~ptr:b () ;
+    merge m b @@ new_chunk m ~pointed:a () ;
   end
 
 let add_value (m:map) (rv:node) (ty:typ) : node option =
@@ -388,7 +388,7 @@ let add_value (m:map) (rv:node) (ty:typ) : node option =
     begin
       failwith_locked m "Region.Memory.add_value" ;
       let rp = new_chunk m ~pointed:rv () in
-      ignore @@ merge m rv @@ new_chunk m ~ptr:rp () ;
+      merge m rv @@ new_chunk m ~ptr:rp () ;
       Some rp
     end
   else
@@ -403,23 +403,23 @@ let sized (m:map) (a:node) (ty: typ) =
   let size = Ranges.gcd sr (Cil.bitsSizeOf ty) in
   if sr <> size then ignore (merge m a (new_chunk m ~size ()))
 
-let read (m: map) (a: node) from =
+let add_read (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.read" ;
   let r = get m a in
-  Ufind.set m.store a { r with creads = Access.Set.add from r.creads } ;
-  sized m a (Access.typeof from)
+  Ufind.set m.store a { r with creads = Access.Set.add acs r.creads } ;
+  sized m a (Access.typeof acs)
 
-let write (m: map) (a: node) from =
+let add_write (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.write" ;
   let r = get m a in
-  Ufind.set m.store a { r with cwrites = Access.Set.add from r.cwrites } ;
-  sized m a (Access.typeof from)
+  Ufind.set m.store a { r with cwrites = Access.Set.add acs r.cwrites } ;
+  sized m a (Access.typeof acs)
 
-let shift (m: map) (a: node) from =
+let add_shift (m: map) (a: node) acs =
   failwith_locked m "Region.Memory.shift" ;
   let r = get m a in
-  Ufind.set m.store a { r with cshifts = Access.Set.add from r.cshifts } ;
-  sized m a (Access.typeof from)
+  Ufind.set m.store a { r with cshifts = Access.Set.add acs r.cshifts } ;
+  sized m a (Access.typeof acs)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Lookup                                                            ---- *)

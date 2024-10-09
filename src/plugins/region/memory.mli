@@ -88,9 +88,9 @@ val add_index : map -> node -> typ -> int -> node
 val add_points_to : map -> node -> node -> unit
 val add_value : map -> node -> typ -> node option
 
-val read : map -> node -> Access.acs -> unit
-val write : map -> node -> Access.acs -> unit
-val shift : map -> node -> Access.acs -> unit
+val add_read : map -> node -> Access.acs -> unit
+val add_write : map -> node -> Access.acs -> unit
+val add_shift : map -> node -> Access.acs -> unit
 
 val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
