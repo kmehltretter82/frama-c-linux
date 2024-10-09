@@ -54,7 +54,7 @@ function makeRecord(
     cells.push({ label, port });
   });
   if (offset !== sizeof)
-    cells.push(`#${sizeof-offset}b`);
+    cells.push(`#${sizeof - offset}b`);
   return cells;
 }
 
@@ -70,11 +70,12 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     const id = `n${r.node}`;
     // --- Color
     const color =
-      !r.typed ? 'red' :
-        r.pointed !== undefined
-          ? (r.writes ? 'orange' : 'yellow')
-          : (r.writes && r.reads) ? 'green' :
-            r.writes ? 'pink' : r.reads ? 'grey' : 'white';
+      (!r.writes && !r.reads) ? undefined :
+        !r.typed ? 'red' :
+          r.pointed !== undefined
+            ? (r.writes ? 'orange' : 'yellow')
+            : (r.writes && r.reads) ? 'green' :
+              r.writes ? 'pink' : 'grey';
     // --- Shape
     const font = r.ranges.length > 0 ? 'mono' : 'sans';
     const cells = makeRecord(edges, id, r.sizeof, r.ranges);
