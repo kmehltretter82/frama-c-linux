@@ -370,11 +370,10 @@ let add_field (m:map) (r:node) (fd:fieldinfo) : node =
     merge m r rc ; rf
   else r
 
-let add_index (m:map) (r:node) (ty:typ) (n:int) : node =
-  let s = Cil.bitsSizeOf ty * n in
-  let re = new_chunk m () in
-  let rc = new_range m ~size:s ~offset:0 ~length:s re in
-  merge m r rc ; re
+let add_index (m:map) (r:node) (ty:typ) : node =
+  let size = Cil.bitsSizeOf ty in
+  let re = new_chunk m ~size () in
+  merge m r re ; re
 
 let add_points_to (m: map) (a: node) (b : node) =
   begin

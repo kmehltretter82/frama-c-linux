@@ -51,9 +51,8 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field m r fd) fd.ftype ofs
   | Index(_,ofs) ->
-    let elt,size = Cil.typeOf_array_elem_size ty in
-    let n = Z.to_int @@ Option.get size in
-    add_loffset m s (add_index m r elt n) elt ofs
+    let elt = Cil.typeOf_array_elem ty in
+    add_loffset m s (add_index m r elt) elt ofs
 
 and add_value m s e = ignore (add_exp m s e)
 

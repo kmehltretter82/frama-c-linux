@@ -84,7 +84,7 @@ val new_chunk : map -> ?size:int -> ?ptr:node -> ?pointed:node -> unit -> node
 val add_root : map -> Cil_types.varinfo -> node
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
-val add_index : map -> node -> typ -> int -> node
+val add_index : map -> node -> typ -> node
 val add_points_to : map -> node -> node -> unit
 val add_value : map -> node -> typ -> node option
 
