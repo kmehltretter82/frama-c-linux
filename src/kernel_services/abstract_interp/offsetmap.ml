@@ -1738,11 +1738,11 @@ module Make
       topification of [v]. The parameter [validity] is respected, and so is the
       current size of [offsm]: each interval already present in [offsm] and valid
       is overwritten. Interval already present but not valid are bound to
-      [V.bottom]. *)
-  (* TODO: the convention to write bottom on non-valid locations is strange,
-     and only useful for the NULL base in Lmap.ml. It would be simpler an more
-     elegant to keep the existing value on non-valid ranges instead. This
-     function should also be written as a call to fold_between *)
+      [V.bottom].
+      This function used to write bottom on non-valid locations, but this was
+      unnecessary as values on non-valid locations should never be accessed
+      anyway. *)
+  (* TODO: this function should also be written as a call to fold_between *)
   let update_imprecise_everywhere ~validity o v offsm =
     let v = V.topify_with_origin o v in
     if Base.Validity.equal validity Base.Invalid then
@@ -1750,23 +1750,13 @@ module Make
     else
       let clip = clip_by_validity validity in
       let r = fold
-          (fun (min, max as itv) (bound_v, _, _) acc ->
+          (fun itv (bound_v, _, _) acc ->
              let new_v = V.topify_with_origin o (V.join bound_v v) in
              let new_min, new_max = clip itv in
              if new_min <=~ new_max then (* [min..max] and validity intersect *)
-               let acc =
-                 if min <~ new_min (* Before validity *)
-                 then append_basic_itv ~min ~max:(pred new_min) ~v:V.bottom acc
-                 else acc
-               in
-               let acc = append_basic_itv ~min:new_min ~max:new_max ~v:new_v acc in
-               let acc =
-                 if new_max <~ max (* After validity *)
-                 then append_basic_itv ~min:(succ new_max) ~max ~v:V.bottom acc
-                 else acc
-               in acc
+               append_basic_itv ~min:new_min ~max:new_max ~v:new_v acc
              else
-               append_basic_itv ~min ~max ~v:V.bottom acc
+              acc
           ) offsm m_empty
       in
       `Value r
