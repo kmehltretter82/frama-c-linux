@@ -162,6 +162,7 @@ let search_offsetmap_range kind offsetmap validity ~min ~max ~v_size acc =
       let rem = Integer.e_rem min modu in
       let offsets = make_interval ~min ~max ~rem ~modu in
       let cvalue = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsetmap in
+      let cvalue = Cvalue.V_Or_Uninitialized.inject_or_bottom cvalue in
       (* Be careful to not use this result [t] for the reads of the next
          characters, as the reduction of [acc.from] assumes that the reads at
          [offset] are consecutive, which is not the case here. Thus, we always

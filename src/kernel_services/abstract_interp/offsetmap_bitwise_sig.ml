@@ -60,8 +60,8 @@ module type S = sig
 
   (** {2 Finding values} *)
 
-  val find : Int_Intervals_sig.itv -> t -> v
-  val find_iset : validity:Base.validity -> intervals -> t -> v
+  val find : Int_Intervals_sig.itv -> t -> v Lattice_bounds.or_bottom
+  val find_iset : validity:Base.validity -> intervals -> t -> v Lattice_bounds.or_bottom
 
 
   (** {2 Adding values} *)

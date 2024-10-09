@@ -768,6 +768,10 @@ module V_Or_Uninitialized = struct
   let uninitialized = C_uninit_noesc V.bottom
   let initialized v = C_init_noesc v
 
+  let inject_or_bottom = function
+    | `Bottom -> bottom
+    | `Value v -> v
+
   let is_included t1 t2 =
     (*    (t2.initialized ==> t1.initialized) &&
           (t2.no_escaping_adr ==> t1.no_escaping_adr) &&
@@ -1052,7 +1056,7 @@ module Model = struct
   include Make_Narrow(V_Or_Uninitialized)
 
   let find_indeterminate ?(conflate_bottom=true) state loc =
-    find ~conflate_bottom state loc
+    find ~conflate_bottom state loc |> V_Or_Uninitialized.inject_or_bottom
 
   let find ?(conflate_bottom=true) state loc =
     let v = find_indeterminate ~conflate_bottom state loc in

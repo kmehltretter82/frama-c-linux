@@ -379,6 +379,7 @@ let memset_typ_offsm_int full_typ i =
         let find size =
           V_Offsetmap.find ~validity
             ~offsets:(Ival.inject_singleton offset) ~size full_offsm
+          |> V_Or_Uninitialized.inject_or_bottom
         in
         (* Update [full_offsm] between [offset] and [offset+size-1], and store
            exactly [v] there *)

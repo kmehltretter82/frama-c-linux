@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Abstract_interp
+module Bottom = Lattice_bounds.Bottom
 
 (* This module uses Bigints everywhere. Set up some notations *)
 let pretty_int = Int.pretty
@@ -1368,32 +1369,33 @@ module Make
   let find_imprecise_between (first_bit, last_bit) tree =
     let rec aux tree_offset tree =
       match tree with
-      | Empty -> V.bottom
+      | Empty -> `Bottom
       | Node (max, offl, subl, offr, subr, _rem, _m, v, _) ->
         let abs_max = max +~ tree_offset in
         let subl_value =
           if first_bit <~ tree_offset then
             let subl_abs_offset = tree_offset +~ offl in
             aux subl_abs_offset subl
-          else V.bottom
+          else `Bottom
         in
         let subr_value =
           if last_bit >~ abs_max then
             let subr_abs_offset = tree_offset +~ offr in
             aux subr_abs_offset subr
-          else V.bottom
+          else `Bottom
         in
         let current_node_value =
           if last_bit <~ tree_offset || first_bit >~ abs_max
-          then V.bottom
+          then `Bottom
           else
           if V.is_isotropic v
-          then v
+          then `Value v
           else
             let origin = Origin.(current Misalign_read) in
-            V.topify_with_origin origin v
+            `Value (V.topify_with_origin origin v)
         in
-        V.join subl_value (V.join subr_value current_node_value)
+        let join = Bottom.join V.join in
+        join subl_value (join subr_value current_node_value)
     in
     aux Integer.zero tree
 
@@ -1460,14 +1462,14 @@ module Make
      whose period is [period]. [size] is the size of each read. [read_value] and
      [read_nodes] are used to read the offsetmap (see read_itv for details).
      [join] is used to merge the result of each read, starting with [acc]. *)
-  let read_series_itv ~min ~max ~period ~size tree ~read_value ~read_nodes ~join acc =
+  let read_series_itv ~min ~max ~period ~size tree ~read_value ~read_nodes ~join =
     let r = min %~ period in
     let since_and_period = min, period in
     let rec read_series start acc =
       let read_ahead, v =
         read_itv ~since_and_period ~start ~size tree ~read_value ~read_nodes
       in
-      let acc = join v acc in
+      let acc = Bottom.join join (`Value v) acc in
       (* Compute the offset of the next read. By default, add the [period] to the
          current [start], unless we can jump to the end of the current node. *)
       let next = match read_ahead with
@@ -1488,26 +1490,27 @@ module Make
       then read_series next acc
       else acc
     in
-    read_series min acc
+    read_series min `Bottom
 
   (* Reads [tree] at each offset of [offsets]. [size] is the size of each read.
      [read_value] and [read_nodes] perform the reads; [join] merges the result
      of each read, starting with [acc]. *)
-  let read ~offsets ~size tree ~read_value ~read_nodes ~join acc =
+  let read ~offsets ~size tree ~read_value ~read_nodes ~join =
     match offsets with
     | Tr_offset.Interval (min, max, period) ->
       read_series_itv
-        ~min ~max ~period ~size tree ~read_value ~read_nodes ~join acc
+        ~min ~max ~period ~size tree ~read_value ~read_nodes ~join
     | Tr_offset.Set s ->
       List.fold_left
         (fun acc start ->
            let t = read_one_itv ~start ~size tree ~read_value ~read_nodes in
-           join acc t)
-        acc s
+           Bottom.join join acc (`Value t))
+        `Bottom s
     | Tr_offset.Overlap(min, max, _origin) ->
-      let v = find_imprecise_between (min, max) tree in
-      read_value v size
-    | Tr_offset.Invalid -> acc
+      let open Bottom.Operators in
+      let* v = find_imprecise_between (min, max) tree in
+      `Value (read_value v size)
+    | Tr_offset.Invalid -> `Bottom
 
   (* Transforms a function reading one node into a function reading successive
      nodes. The resulting function can be supplied to the [read_itv] function.
@@ -1544,7 +1547,7 @@ module Make
     let read_nodes = read_successive_nodes ~read_one_node neutral in
     let read_value v _size = v in
     let join = V.join in
-    read ~offsets ~size tree ~read_value ~read_nodes ~join V.bottom
+    read ~offsets ~size tree ~read_value ~read_nodes ~join
 
   (* Copies the node [node] at the end of the offsetmap [acc], as part of the
      larger copy of the interval [start..start+size-1] from the englobing
@@ -1584,9 +1587,7 @@ module Make
         let neutral = m_empty in
         let read_nodes = read_successive_nodes ~read_one_node neutral in
         let read_value v size = interval_aux (pred size) Rel.zero size v in
-        let init = isotropic_interval size V.bottom in
-        let t = read ~offsets ~size tree ~read_value ~read_nodes ~join init in
-        `Value t
+        read ~offsets ~size tree ~read_value ~read_nodes ~join
 
   (* Keep the part of the tree strictly under (i.e. strictly on the left) of a
      given offset. *)
@@ -2004,8 +2005,9 @@ module Make
       let res, success = Ival.fold_int aux offsets (dst, false) in
       if success then `Value res else `Bottom
     with Not_less_than ->
+      let open Bottom.Operators in
       (* Value to paste, since we cannot be precise *)
-      let v =
+      let* v =
         (* Under this size, this may be an integer. Try to be a bit precise
            when doing 'find' *)
         if size <=~ Integer.of_int 128 then
@@ -2141,11 +2143,11 @@ module Make
       find_imprecise_between (min, max) m
     | Base.Variable variable_v ->
       find_imprecise_between (Int.zero, variable_v.Base.max_alloc) m
-    | Base.Invalid | Base.Empty -> V.bottom
+    | Base.Invalid | Base.Empty -> `Bottom
 
   let find_imprecise_everywhere m =
     match m with
-    | Empty -> V.bottom
+    | Empty -> `Bottom
     | Node _ ->
       let bounds = bounds_offset Int.zero m in
       find_imprecise_between bounds m
@@ -2824,8 +2826,8 @@ module Make_bitwise(V: sig
 
   let find_iset ~validity itvs m =
     try
-      let aux_itv i acc =  V.join acc (find i m) in
-      Int_Intervals.fold aux_itv itvs V.bottom
+      let aux_itv i acc = Bottom.join V.join acc (find i m) in
+      Int_Intervals.fold aux_itv itvs `Bottom
     with Error_Top -> find_imprecise ~validity m
 
   module V_Hashtbl = FCHashtbl.Make(V)

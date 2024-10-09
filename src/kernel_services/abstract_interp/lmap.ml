@@ -180,21 +180,23 @@ struct
 
     (* may raise Error_Top in the case Top Top. Make sure to annotate callers *)
     let find ?(conflate_bottom=true) mem {loc ; size} =
+      let open Bottom.Operators in
       let handle_imprecise_base base acc =
-        match find_or_default base mem with
-        | `Bottom -> acc
-        | `Value offsetmap ->
-          V.join (Offsetmap.find_imprecise_everywhere offsetmap) acc
+        let v =
+          let* offsetmap = find_or_default base mem in
+          Offsetmap.find_imprecise_everywhere offsetmap
+        in
+        Bottom.join V.join v acc
       in
       match loc with
-      | Location_Bits.Top (Base.SetLattice.Top, _) -> vtop ()
+      | Location_Bits.Top (Base.SetLattice.Top, _) -> `Value (vtop ())
       | Location_Bits.Top (Base.SetLattice.Set s, _) ->
-        Base.SetLattice.O.fold handle_imprecise_base s V.bottom
+        Base.SetLattice.O.fold handle_imprecise_base s `Bottom
       | Location_Bits.Map loc_map -> begin
           match size with
           | Int_Base.Top ->
             let aux base _ acc = handle_imprecise_base base acc in
-            Location_Bits.M.fold aux loc_map V.bottom
+            Location_Bits.M.fold aux loc_map `Bottom
           | Int_Base.Value size ->
             let aux_base base offsets acc_v =
               let validity = Base.validity base in
@@ -205,9 +207,9 @@ struct
                   Offsetmap.find
                     ~conflate_bottom ~validity ~offsets ~size offsetmap
                 in
-                V.join new_v acc_v
+                Bottom.join V.join new_v acc_v
             in
-            Location_Bits.M.fold aux_base loc_map V.bottom
+            Location_Bits.M.fold aux_base loc_map `Bottom
         end
 
     (* Internal function for join and widen, that handles efficiently the
@@ -497,8 +499,9 @@ struct
             Base.SetLattice.pretty top
             Origin.pretty_as_reason orig;
         let validity = Base.validity_from_size size in
-        let v = Offsetmap.find_imprecise ~validity from in
-        add_binding ~exact:false m loc_dst v
+        match Offsetmap.find_imprecise ~validity from with
+        | `Bottom -> false, m
+        | `Value v -> add_binding ~exact:false m loc_dst v
 
     let top_offsetmap size =
       let top = vtop () in
@@ -667,8 +670,8 @@ struct
 
   let find ?(conflate_bottom=true) m loc =
     match m with
-    | Bottom -> V.bottom
-    | Top -> vtop ()
+    | Bottom -> `Bottom
+    | Top -> `Value (vtop ())
     | Map m -> M.find ~conflate_bottom m loc
 
   let join mm1 mm2 = match mm1, mm2 with

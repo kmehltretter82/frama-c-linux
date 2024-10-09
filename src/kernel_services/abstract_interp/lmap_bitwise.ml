@@ -394,6 +394,7 @@ struct
         else
           let offsetmap = find_or_default base m in
           let v = LOffset.find_iset ~validity itvs offsetmap in
+          let v = Lattice_bounds.Bottom.value ~bottom:V.bottom v in
           V.join acc v
       in
       Zone.fold_i treat_offset loc V.bottom

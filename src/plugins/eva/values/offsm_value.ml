@@ -63,6 +63,7 @@ let basic_find ?(start=Int.zero) ~size o =
   let validity = enough_validity ~start ~size in
   let offsets = Ival.inject_singleton start in
   let v = V_Offsetmap.find ~validity ~offsets ~size o in
+  let v = V_Or_Uninitialized.inject_or_bottom v in
   V_Or_Uninitialized.map (fun v -> V.reinterpret_as_int ~signed:false ~size v) v
 
 (* Paste [v] of size [size] at position [start] in [o] *)
