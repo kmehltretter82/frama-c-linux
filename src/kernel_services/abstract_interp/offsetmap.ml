@@ -510,11 +510,11 @@ module Make
              / \         iter f t   = f n1; fn0; f n2;
             n1  n2
   *)
-  let fold_offset f o t acc =
+  let fold_offset f ~offset t acc =
     if t = Empty then
       acc
     else
-      let o, n, z = leftmost_child o End t in
+      let o, n, z = leftmost_child offset End t in
       let rec aux_fold o t z pre =
         match t with
         | Empty -> pre
@@ -528,7 +528,7 @@ module Make
       aux_fold o n z acc
   ;;
 
-  let fold f t = fold_offset f Integer.zero t
+  let fold = fold_offset ~offset:Integer.zero
   ;;
 
   let iter_offset f o t =
@@ -1722,47 +1722,6 @@ module Make
 
   let update_itv = update_itv_with_rem ~rem:Rel.zero ~once:false
 
-  (* This should be in Int_Intervals, but is currently needed here.
-     Returns an interval with reversed bounds when the intersection is empty. *)
-  let clip_by_validity = function
-    | Base.Empty | Base.Invalid ->
-      (fun _-> Int.one, Int.zero (* reversed interval -> no intersection*))
-    | Base.Known (min, max)
-    | Base.Unknown (min, _, max) ->
-      (fun (min', max') -> Integer.max min min', Integer.min max max')
-    | Base.Variable variable_v ->
-      (fun (min', max') -> Integer.max Int.zero min',
-                           Integer.min variable_v.Base.max_alloc max')
-
-  (** This function does a weak update of the entire [offsm], by adding the
-      topification of [v]. The parameter [validity] is respected, and so is the
-      current size of [offsm]: each interval already present in [offsm] and valid
-      is overwritten. Interval already present but not valid are bound to
-      [V.bottom].
-      This function used to write bottom on non-valid locations, but this was
-      unnecessary as values on non-valid locations should never be accessed
-      anyway. *)
-  (* TODO: this function should also be written as a call to fold_between *)
-  let update_imprecise_everywhere ~validity o v offsm =
-    let v = V.topify_with_origin o v in
-    if Base.Validity.equal validity Base.Invalid then
-      `Bottom
-    else
-      let clip = clip_by_validity validity in
-      let r = fold
-          (fun itv (bound_v, _, _) acc ->
-             let new_v = V.topify_with_origin o (V.join bound_v v) in
-             let new_min, new_max = clip itv in
-             if new_min <=~ new_max then (* [min..max] and validity intersect *)
-               append_basic_itv ~min:new_min ~max:new_max ~v:new_v acc
-             else
-              acc
-          ) offsm m_empty
-      in
-      `Value r
-  ;;
-
-
   (** Update a set of intervals in a given rangemap all offsets starting from
       mn ending in mx must be updated with value v, every period *)
   let update_itvs ~exact ~mn ~mx ~period ~size v curr_off tree =
@@ -1961,7 +1920,7 @@ module Make
     | Node(_, _, Empty, _, Empty, _, _, v', _) -> V.equal v v'
     | _ -> false
 
-  let fold_between ?(direction=`LTR) ~entire (imin, imax) f t acc =
+  let fold_between_offset ?(direction=`LTR) ~entire (imin, imax) f ~offset t acc =
     let rec aux curr_off t acc = match t with
       | Empty -> acc
       | Node (max, offl, subl, offr, subr, rem, modu, v, _) ->
@@ -1998,8 +1957,10 @@ module Make
         | `LTR -> acc_right (acc_middle (acc_left acc))
         | `RTL -> acc_left (acc_middle (acc_right acc))
     in
-    aux Integer.zero t acc
-  ;;
+    aux offset t acc
+
+  let fold_between = fold_between_offset ~offset:Integer.zero
+
 
   (* weak validity should be handled caller *)
   let paste_slice_itv ~exact from stop start_dest to_ =
@@ -2188,6 +2149,26 @@ module Make
     | Node _ ->
       let bounds = bounds_offset Int.zero m in
       find_imprecise_between bounds m
+
+  (** This function does a weak update of the entire [offsm], by adding the
+      topification of [v]. The parameter [validity] is respected, and so is the
+      current size of [offsm]: each interval already present in [offsm] and valid
+      is overwritten. Interval already present but not valid are bound to
+      [V.bottom].
+      This function used to write bottom on non-valid locations, but this was
+      unnecessary as values on non-valid locations should never be accessed
+      anyway. *)
+  let update_imprecise_everywhere ~validity o v offsm =
+    match Base.valid_range validity with
+    | Invalid_range -> `Bottom
+    | Valid_range None -> `Value offsm
+    | Valid_range (Some itv) ->
+      let v = V.topify_with_origin o v in
+      let topify (min, max) (bound_v, _, _) acc =
+        let new_v = V.topify_with_origin o (V.join bound_v v) in
+        append_basic_itv ~min ~max ~v:new_v acc
+      in
+      `Value (fold_between ~entire:false itv topify offsm m_empty)
 
 
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches_ref
@@ -2624,7 +2605,7 @@ module Int_Intervals = struct
         let co, i = Int_Intervals_Map.diff (co1, i1) coi2' in
         normalize_itv co i
 
-  let fold f m acc =
+  let generic_fold ~fold_offset f m acc =
     match m with
     | Bottom -> acc
     | Top -> raise Error_Top
@@ -2632,7 +2613,14 @@ module Int_Intervals = struct
       let aux_itv itv (v, _, _) acc =
         if v then f itv acc else acc
       in
-      Int_Intervals_Map.fold_offset aux_itv curr_off i acc
+      fold_offset aux_itv ~offset:curr_off i acc
+
+  let fold f m acc =
+    generic_fold ~fold_offset:Int_Intervals_Map.fold_offset f m acc
+
+  let fold_between ~entire itv f m acc =
+    let fold_offset = Int_Intervals_Map.fold_between_offset ~entire itv in
+    generic_fold ~fold_offset f m acc
 
   (* Could be slightly improved *)
   let inject l =
@@ -2810,16 +2798,14 @@ module Make_bitwise(V: sig
     try
       match Base.valid_range validity with
       | Base.Invalid_range -> `Bottom
-      | Base.Valid_range None -> (* empty validity *) `Value m
-      | Base.Valid_range (Some _) ->
-        let clip = clip_by_validity validity in
+      | Base.Valid_range None -> `Value m (* empty validity *)
+      | Base.Valid_range (Some itv) ->
         let aux_itv itv m =
-          let itv = clip itv in
           if Int.le (fst itv) (snd itv) then
             add ~exact itv (v_size_mod v) m
           else m
         in
-        `Value (Int_Intervals.fold aux_itv itvs m)
+        `Value (Int_Intervals.fold_between ~entire:false itv aux_itv itvs m)
     with Error_Top ->
       update_imprecise_everywhere ~validity Origin.(current Misalign_write) v m
 
