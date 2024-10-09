@@ -93,7 +93,7 @@ let cast _ _l = ()
 let loc_of_int _ _ = ()
 let int_of_loc _ () = e_zero
 
-let domain _obj _l = Sigma.Chunk.Set.empty
+let domain _obj _l = Sigma.Heap.Set.empty
 let is_well_formed _s = p_true
 
 let source = "Empty Model"

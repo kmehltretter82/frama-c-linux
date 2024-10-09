@@ -390,13 +390,13 @@ struct
       let heap = List.fold_left
           (fun m x ->
              let obj = object_of x.vtype in
-             M.Sigma.Chunk.Set.union m (M.domain obj (M.cvar x))
-          ) M.Sigma.Chunk.Set.empty vars
+             M.Sigma.Heap.Set.union m (M.domain obj (M.cvar x))
+          ) M.Sigma.Heap.Set.empty vars
       in List.fold_left
         (fun acc l ->
            let label = Clabels.of_logic l in
            let sigma = Sigma.create () in
-           M.Sigma.Chunk.Set.fold_sorted
+           M.Sigma.Heap.Set.fold_sorted
              (fun chunk (parm,sigm) ->
                 let x = Sigma.get sigma chunk in
                 let s = Sig_chunk (chunk,label) in
@@ -455,7 +455,7 @@ struct
         let (parm,sigm) =
           LabelMap.fold
             (fun label sigma acc ->
-               M.Sigma.Chunk.Set.fold_sorted
+               M.Sigma.Heap.Set.fold_sorted
                  (fun chunk acc ->
                     if filter result (Sigma.get sigma chunk) then
                       let (parm,sigm) = acc in

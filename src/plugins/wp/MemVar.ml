@@ -219,7 +219,7 @@ struct
   struct
     type t = sigma
     type chunk = Chunk.t
-    module Chunk = Heap
+    module Heap = Heap
     type domain = Heap.set
     let empty = Heap.Set.empty
     let union = Heap.Set.union

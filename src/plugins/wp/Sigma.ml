@@ -29,12 +29,12 @@ open Lang.F
 module Make
     (C : Sigs.Chunk)
     (H : Qed.Collection.S with type t = C.t) :
-  Sigs.Sigma with type chunk = C.t
-              and module Chunk = H =
+  Sigs.Sigma with type chunk = C.t and module Heap = H
+=
 struct
 
   type chunk = C.t
-  module Chunk = H
+  module Heap = H
   type domain = H.Set.t
 
   let empty = H.Set.empty

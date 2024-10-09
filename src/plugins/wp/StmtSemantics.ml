@@ -290,7 +290,7 @@ struct
         let pred = L.in_frame frame (L.pred polarity lenv) p in
         (* Remove the sigmas not used for the compilation, but here must stay *)
         let nsigmas = Cfg.Node.Map.filter (fun _ s ->
-            s == here || not (Sigma.Chunk.Set.is_empty (Sigma.domain s))
+            s == here || not (Sigma.Heap.Set.is_empty (Sigma.domain s))
           ) nsigmas
         in
         (Cfg.P.create nsigmas pred)

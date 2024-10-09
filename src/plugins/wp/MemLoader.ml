@@ -92,7 +92,7 @@ struct
 
   module Chunk = M.Chunk
   module Sigma = M.Sigma
-  module Domain = M.Sigma.Chunk.Set
+  module Domain = M.Sigma.Heap.Set
 
   let signature ft =
     let s = Sigma.create () in
@@ -106,7 +106,7 @@ struct
     List.rev !xs , List.rev !cs , s
 
   let domain obj loc =
-    M.Sigma.Chunk.Set.union
+    M.Sigma.Heap.Set.union
       (M.value_footprint obj loc)
       (M.init_footprint obj loc)
 

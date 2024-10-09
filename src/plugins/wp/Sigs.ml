@@ -186,10 +186,10 @@ sig
   type chunk
   (** The type of memory chunks. *)
 
-  module Chunk : Qed.Collection.S with type t = chunk
+  module Heap : Qed.Collection.S with type t = chunk
 
   (** Memory footprint. *)
-  type domain = Chunk.Set.t
+  type domain = Heap.Set.t
 
   (** Environment assigning logic variables to chunk.
 
@@ -282,10 +282,10 @@ sig
       That is, the set of accessed chunks so far in the environment. *)
 
   val union : domain -> domain -> domain
-  (** Same as [Chunk.Set.union] *)
+  (** Same as [Heap.Set.union] *)
 
   val empty : domain
-  (** Same as [Chunk.Set.empty] *)
+  (** Same as [Heap.Set.empty] *)
 
   val writes : t sequence -> domain
   (** [writes s] indicates which chunks are new in [s.post] compared
@@ -324,7 +324,7 @@ sig
 
   module Sigma : Sigma
     with type chunk = Chunk.t
-     and module Chunk = Heap
+     and module Heap = Heap
   (** Model Environments. *)
 
   type loc

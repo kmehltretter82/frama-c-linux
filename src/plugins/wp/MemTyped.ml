@@ -1012,7 +1012,7 @@ let is_chunk sigma = function
 
 let is_well_formed sigma =
   let open Sigma in
-  p_conj (Chunk.Set.fold (fun c l -> is_chunk sigma c :: l) (domain sigma) [])
+  p_conj (Heap.Set.fold (fun c l -> is_chunk sigma c :: l) (domain sigma) [])
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loader                                                             --- *)

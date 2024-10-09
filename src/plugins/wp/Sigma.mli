@@ -27,5 +27,4 @@
 module Make
     (C : Sigs.Chunk)
     (H : Qed.Collection.S with type t = C.t) :
-  Sigs.Sigma with type chunk = C.t
-              and module Chunk = H
+  Sigs.Sigma with type chunk = C.t and module Heap = H

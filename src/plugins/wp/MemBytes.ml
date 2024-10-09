@@ -632,8 +632,8 @@ module Model = struct
   let to_region_pointer l = 0,l
   let of_region_pointer _r _obj l = l
 
-  let value_footprint _ _ = Sigma.Chunk.Set.singleton Chunk.Mem
-  let init_footprint _ _ = Sigma.Chunk.Set.singleton Chunk.Init
+  let value_footprint _ _ = Sigma.Heap.Set.singleton Chunk.Mem
+  let init_footprint _ _ = Sigma.Heap.Set.singleton Chunk.Init
 
   let frames  ~addr:p ~offset:n ?(basename="mem") tau =
     let t_block = Qed.Logic.Array (Qed.Logic.Int, tau) in
@@ -1026,7 +1026,7 @@ let int_of_loc _ loc =
 
 (* -------------------------------------------------------------------------- *)
 
-let domain _ _ = Sigma.Chunk.Set.of_list [ Init ; Mem ]
+let domain _ _ = Sigma.Heap.Set.of_list [ Init ; Mem ]
 
 let is_null = p_equal null
 let loc_eq = p_equal

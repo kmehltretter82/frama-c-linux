@@ -856,7 +856,7 @@ struct
         ) subst subst', env
 
   let allocate domain sigma =
-    S.Chunk.Set.iter (fun chunk -> ignore (S.get sigma chunk)) domain
+    S.Heap.Set.iter (fun chunk -> ignore (S.get sigma chunk)) domain
 
   let domains (env : restricted_env) reads pre : localised_env * S.t Node.Map.t =
     let visited = ref Node.Map.empty in
