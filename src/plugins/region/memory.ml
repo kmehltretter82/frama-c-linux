@@ -447,9 +447,11 @@ let rec move (m: map) (r: node) (p: int) (s: int) =
       move m rg.data (p - rg.offset) s
 
 let field (m: map) (r: node) (fd: fieldinfo) : node =
-  let s = Cil.bitsSizeOf fd.ftype in
-  let (p,_) = Cil.fieldBitsOffset fd in
-  move m r p s
+  if fd.fcomp.cstruct then
+    let s = Cil.bitsSizeOf fd.ftype in
+    let (p,_) = Cil.fieldBitsOffset fd in
+    move m r p s
+  else r
 
 let index (m : map) (r: node) (ty:typ) : node =
   move m r 0 (Cil.bitsSizeOf ty)
