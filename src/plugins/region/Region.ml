@@ -26,7 +26,7 @@
 
 type map = Memory.map
 type node = Memory.node
-let map kf = (Code.domain kf).map
+let map kf = (Analysis.get kf).map
 let id n = Memory.id n
 let uid m n = Memory.id @@ Memory.node m n
 let iter = Memory.iter

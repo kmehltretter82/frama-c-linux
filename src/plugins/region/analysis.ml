@@ -56,16 +56,6 @@ let get kf =
     Options.feedback ~ontty:`Transient "Function %a…" Kernel_function.pretty kf ;
     let domain = Code.domain kf in
     STATE.add kf domain ;
-    Options.result "@[<v 2>Function %a:%t@]@."
-      Kernel_function.pretty kf
-      begin fun fmt ->
-        List.iter
-          begin fun r ->
-            Format.pp_print_newline fmt () ;
-            Memory.pp_region fmt r ;
-          end @@
-        Memory.regions domain.map
-      end ;
     domain
 
 let compute kf = ignore @@ get kf
