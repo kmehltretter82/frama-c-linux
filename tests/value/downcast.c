@@ -70,16 +70,12 @@ void main4_pointer() {
   us = (unsigned short)q;
   char c = (char)p;
   c = (char)q;
-  /* No alarm should be emitted as all pointer values fit in [uintptr_t]. */
+  /* No alarm should be emitted as pointer values can always be converted to
+     "uintptr_t" or "intptr_t", even if all pointer values do not fit in it. */
   uintptr_t uintptr = (uintptr_t)p;
   uintptr = (uintptr_t)q;
-  /* No alarm should be emitted as valid pointers can always be converted to
-     "intptr_t", even if all pointer values do not fit in it.*/
   intptr_t intptr = (intptr_t)p;
-  /* Alarm must be emitted as [q] may be an invalid pointer and all pointer
-     values do not fit in the "intptr_t" type. */
   intptr = (intptr_t)q;
-  intptr = (intptr_t)q; // No alarm if [q] has been reduced at the line before.
 }
 
 // Perform a computation that overflows on signed integers without alarm. The assertions can be proven with enough slevel

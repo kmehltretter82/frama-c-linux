@@ -14,19 +14,19 @@
   s ∈ [--..--]
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from downcast.c:182.
+  Called from downcast.c:178.
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2_bitfield <- main.
-  Called from downcast.c:183.
+  Called from downcast.c:179.
 [eva] Recording results for main2_bitfield
 [eva] Done for function main2_bitfield
 [eva] computing for function main3_reduction <- main.
-  Called from downcast.c:184.
+  Called from downcast.c:180.
 [eva] Recording results for main3_reduction
 [eva] Done for function main3_reduction
 [eva] computing for function main4_pointer <- main.
-  Called from downcast.c:185.
+  Called from downcast.c:181.
 [eva] computing for function Frama_C_interval <- main4_pointer <- main.
   Called from downcast.c:54.
 [eva] using specification for function Frama_C_interval
@@ -45,51 +45,49 @@
   pointer downcast. assert (unsigned int)p ≤ 127;
 [eva:alarm] downcast.c:72: Warning: 
   pointer downcast. assert (unsigned int)q ≤ 127;
-[eva:alarm] downcast.c:81: Warning: 
-  invalid pointer creation. assert \object_pointer(q);
 [eva] Recording results for main4_pointer
 [eva] Done for function main4_pointer
 [eva] computing for function main5_wrap_signed <- main.
-  Called from downcast.c:186.
-[eva:alarm] downcast.c:88: Warning: assertion 'ASSUME' got status unknown.
-[eva] downcast.c:89: assertion got status valid.
-[eva] downcast.c:93: 
+  Called from downcast.c:182.
+[eva:alarm] downcast.c:84: Warning: assertion 'ASSUME' got status unknown.
+[eva] downcast.c:85: assertion got status valid.
+[eva] downcast.c:89: 
   Frama_C_show_each:
   [2147483503..2147483647],
   [2147483648..2147483792],
   [-2147483648..-2147483504]
-[eva] downcast.c:93: 
+[eva] downcast.c:89: 
   Frama_C_show_each:
   [100000..2147483502], [100145..2147483647], [100145..2147483647]
-[eva] downcast.c:94: assertion got status valid.
+[eva] downcast.c:90: assertion got status valid.
 [eva] Recording results for main5_wrap_signed
 [eva] Done for function main5_wrap_signed
 [eva] computing for function main6_val_warn_converted_signed <- main.
-  Called from downcast.c:187.
-[eva:alarm] downcast.c:121: Warning: 
+  Called from downcast.c:183.
+[eva:alarm] downcast.c:117: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
-[eva:alarm] downcast.c:122: Warning: 
+[eva:alarm] downcast.c:118: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 32767;
-[eva:alarm] downcast.c:123: Warning: 
+[eva:alarm] downcast.c:119: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 65535;
 [eva] Recording results for main6_val_warn_converted_signed
 [eva] Done for function main6_val_warn_converted_signed
 [eva] computing for function main7_signed_upcast <- main.
-  Called from downcast.c:188.
+  Called from downcast.c:184.
 [eva] Recording results for main7_signed_upcast
 [eva] Done for function main7_signed_upcast
 [eva] computing for function main8_bitfields <- main.
-  Called from downcast.c:189.
+  Called from downcast.c:185.
 [eva] Recording results for main8_bitfields
 [eva] Done for function main8_bitfields
 [eva] computing for function main9_bitfield <- main.
-  Called from downcast.c:190.
-[eva] downcast.c:164: assertion got status valid.
+  Called from downcast.c:186.
+[eva] downcast.c:160: assertion got status valid.
 [eva] Recording results for main9_bitfield
 [eva] Done for function main9_bitfield
 [eva] computing for function main10_loop <- main.
-  Called from downcast.c:191.
-[eva] downcast.c:175: starting to merge loop iterations
+  Called from downcast.c:187.
+[eva] downcast.c:171: starting to merge loop iterations
 [eva] Recording results for main10_loop
 [eva] Done for function main10_loop
 [eva] Recording results for main
@@ -121,7 +119,7 @@
   Frama_C_entropy_source ∈ [--..--]
   i ∈ [0..9]
   p ∈ {{ NULL ; &x_0 ; &a + [0..36],0%4 }}
-  q ∈ {{ NULL ; &x_0 + {0; 4} ; &a + [0..40],0%4 }}
+  q ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
   lli ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
   ui ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
   si ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
@@ -129,7 +127,7 @@
   c ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
   uintptr ∈
          {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
-  intptr ∈ {{ NULL ; &x_0 + {0; 4} ; &a + [0..40],0%4 }}
+  intptr ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
 [eva:final-states] Values at end of function main5_wrap_signed:
   x_0 ∈ [100000..2147483647]
   y ∈ [100145..2147483792]

@@ -703,20 +703,6 @@ module Make
     then truncate_upper_bound overflow_kind expr dst value
     else return value
 
-  (* Special case of a pointer converted to intptr_t or uintptr_t:
-     the pointer must be a valid object pointer. *)
-  let cast_pointer_to_intptr context expr ~dst value =
-    let open Evaluated.Operators in
-    let+ value =
-      if Kernel.PointerDowncast.get () then
-        let truth = Value.assume_pointer value in
-        let alarm () = Alarms.Invalid_pointer (Eva_ast.to_cil_exp expr) in
-        reduce_by_truth ~alarm (expr, value) truth
-      else
-        return value
-    in
-    Value.rewrap_integer context dst value
-
   (* Relaxed semantics for downcasts into signed types:
      first converts the value to the signed counterpart of the source type, and
      then downcasts it into the signed destination type. Emits only alarms for
@@ -735,9 +721,8 @@ module Make
 
   (* The type of alarms emitted for a conversion depends on whether the source
      type is an integer or a pointer. As a special case, conversions from a
-     pointer to "intptr_t" or "uintptr_t" only require the source pointer
-     to be a valid pointer to an object. *)
-  type conversion_alarm = IntDowncast | PtrDowncast | Pointer
+     pointer type to "intptr_t" or "uintptr_t" never lead to alarms. *)
+  type conversion_alarm = IntDowncast | PtrDowncast | NoAlarm
 
   let cast_int_to_int context expr ~alarm ~src ~dst value =
     (* Regain some precision in case a transfer function was imprecise.
@@ -749,18 +734,17 @@ module Make
     in
     if Eval_typ.range_inclusion src dst then
       return value (* Upcast, nothing to check. *)
-    else if alarm = Pointer then
-      (* Conversion of a pointer to intptr_t or uintptr_t. *)
-      cast_pointer_to_intptr context expr ~dst value
     else
       let overflow_kind, warn =
-        if alarm = PtrDowncast
-        then Alarms.Pointer_downcast, Kernel.PointerDowncast.get
-        else if dst.i_signed
-        then Alarms.Signed_downcast, Kernel.SignedDowncast.get
-        else Alarms.Unsigned_downcast, Kernel.UnsignedDowncast.get
+        match alarm with
+        | NoAlarm -> Alarms.Pointer_downcast, false
+        | PtrDowncast -> Alarms.Pointer_downcast, Kernel.PointerDowncast.get ()
+        | IntDowncast ->
+          if dst.i_signed
+          then Alarms.Signed_downcast, Kernel.SignedDowncast.get ()
+          else Alarms.Unsigned_downcast, Kernel.UnsignedDowncast.get ()
       in
-      if warn ()
+      if warn
       then cast_integer overflow_kind expr ~src ~dst value
       else if dst.i_signed && Parameters.WarnSignedConvertedDowncast.get ()
       then relaxed_signed_downcast context expr ~src ~dst value
@@ -813,7 +797,7 @@ module Make
       let& value =
         match src_type, dst_type with
         | TSPtr src, TSInt dst ->
-          let alarm = if is_intptr_type dst_typ then Pointer else PtrDowncast in
+          let alarm = if is_intptr_type dst_typ then NoAlarm else PtrDowncast in
           cast_int_to_int context ~alarm ~src ~dst expr value
         | TSInt src, (TSInt dst | TSPtr dst) ->
           cast_int_to_int context ~alarm:IntDowncast ~src ~dst expr value
