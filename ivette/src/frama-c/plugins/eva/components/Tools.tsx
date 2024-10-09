@@ -44,7 +44,17 @@ export default function EvaTools(
   const countErrors = remote.getErrors();
   remote.resetNotified();
 
-  const compute = (): void => { Server.send(Eva.compute, null); };
+  const startAnalysis = () => {
+    setTimeout(() => {
+      if(!remote.hasReset()) Server.send(Eva.compute, null);
+      else startAnalysis();
+    }, 150);
+  }
+
+  const compute = (): void => {
+    if(remote.hasReset()) remote.commit();
+    startAnalysis();
+  };
   const abort = (): void => { Server.send(Eva.abort, null); };
   const syncFromFC = (): void => { remote.reset(); };
   const syncToFC = (): void => { remote.commit(); };
@@ -54,9 +64,9 @@ export default function EvaTools(
       <Hbox className='eva-tools-actions'>
         <IconButton
           icon="MEDIA.PLAY"
-          title="Launch Eva analysis"
+          title="Commit changes and launch Eva analysis"
           size={iconSize}
-          disabled={evaComputed !== "not_computed"}
+          disabled={evaComputed === "computing"}
           onClick={compute}
         />
         <IconButton
