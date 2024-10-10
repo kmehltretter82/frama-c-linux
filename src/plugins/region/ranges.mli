@@ -36,9 +36,12 @@ val empty : 'a t
 val singleton : 'a range -> 'a t
 val range : ?offset:int -> ?length:int -> 'a -> 'a t
 val merge : ('a range -> 'a range -> 'a) -> 'a t -> 'a t -> 'a t
-val squash : ('a -> 'a -> 'a) -> 'a t -> 'a option
 
 val find : int -> 'a t -> 'a range
+
 val map : ('a -> 'b) -> 'a t -> 'b t
+val mapi : ('a range -> 'b range) -> 'a t -> 'b t
 val iter : ('a -> unit) -> 'a t -> unit
 val iteri : ('a range -> unit) -> 'a t -> unit
+val fold : ('b -> 'a -> 'b) -> 'b -> 'a t -> 'b
+val foldi : ('b -> 'a range -> 'b) -> 'b -> 'a t -> 'b

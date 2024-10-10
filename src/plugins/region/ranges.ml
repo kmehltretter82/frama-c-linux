@@ -83,12 +83,11 @@ let rec merge f ra rb =
 
 let merge f (R x) (R y) = R (merge f x y)
 
-let squash f = function
-  | R [] -> None
-  | R (x::xs) -> Some (List.fold_left (fun w r -> f w r.data) x.data xs)
-
 let iteri f (R xs) = List.iter f xs
+let foldi f w (R xs) = List.fold_left f w xs
 let iter f (R xs) = List.iter (fun r -> f r.data) xs
+let fold f w (R xs) = List.fold_left (fun w r -> f w r.data) w xs
+let mapi f (R xs) = R (List.map f xs)
 let map f (R xs) = R (List.map (fun r -> { r with data = f r.data }) xs)
 
 (* -------------------------------------------------------------------------- *)

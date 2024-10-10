@@ -254,13 +254,16 @@ let labels (m: map) (r: node) =
 (* -------------------------------------------------------------------------- *)
 
 type queue = (node * node) Queue.t
+type cell = { mutable size : int ; mutable ptr : node option }
+let new_cell ?(size=0) ?ptr () = { size ; ptr }
+let cell_layout { size ; ptr } =
+  if size = 0 && ptr = None then Blob else Cell(size,ptr)
 
-let singleton ~size = function
-  | None -> Ranges.empty
-  | Some r -> Ranges.range ~length:size r
+let merge_push (m: map) (q: queue) (a: node) (b: node) : unit =
+  if not @@ Ufind.eq m.store a b then Queue.push (a,b) q
 
 let merge_node (m: map) (q: queue) (a: node) (b: node) : node =
-  if not @@ Ufind.eq m.store a b then Queue.push (a,b) q ;
+  merge_push m q a b ;
   Ufind.find m.store (min a b)
 
 let merge_opt (m: map) (q: queue)
@@ -268,6 +271,16 @@ let merge_opt (m: map) (q: queue)
   match pa, pb with
   | None, p | p, None -> p
   | Some pa, Some pb -> Some (merge_node m q pa pb)
+
+let merge_cell (m:map) (q:queue) cell root r =
+  let node = Ufind.get m.store r in
+  let s = sizeof node.clayout in
+  let p = cpointed node.clayout in
+  begin
+    merge_push m q root r ;
+    cell.size <- Ranges.gcd cell.size s ;
+    cell.ptr <- merge_opt m q cell.ptr p ;
+  end
 
 let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
   let na = ra.data in
@@ -283,7 +296,7 @@ let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
   if size = sa && size = sb then data else
     merge_node m q (new_chunk m ~size ()) data
 
-let merge_ranges (m: map) (q: queue)
+let merge_ranges (m: map) (q: queue) (root: node)
     (sa : int) (fa : Fields.domain) (wa : node Ranges.t)
     (sb : int) (fb : Fields.domain) (wb : node Ranges.t)
   : layout =
@@ -292,32 +305,29 @@ let merge_ranges (m: map) (q: queue)
     Compound(sa, fields, Ranges.merge (merge_range m q) wa wb)
   else
     let size = Ranges.gcd sa sb in
-    let ra = Ranges.squash (merge_node m q) wa in
-    let rb = Ranges.squash (merge_node m q) wb in
-    Compound(size, fields, singleton ~size @@ merge_opt m q ra rb)
+    let cell = new_cell ~size () in
+    Ranges.iter (merge_cell m q cell root) wa ;
+    Ranges.iter (merge_cell m q cell root) wb ;
+    cell_layout cell
 
-let merge_layout (m: map) (q: queue) (a : layout) (b : layout) : layout =
+let merge_layout (m:map) (q:queue) (root:node) (a:layout) (b:layout) : layout =
   match a, b with
   | Blob, c | c, Blob -> c
 
   | Cell(sa,pa) , Cell(sb,pb) -> Cell(Ranges.gcd sa sb, merge_opt m q pa pb)
 
   | Compound(sa,fa,wa), Compound(sb,fb,wb) ->
-    merge_ranges m q sa fa wa sb fb wb
+    merge_ranges m q root sa fa wa sb fb wb
 
-  | Compound(sr,fr,wr), Cell(sx,None)
-  | Cell(sx,None), Compound(sr,fr,wr) ->
+  | Compound(sr,_,wr), Cell(sx,ptr)
+  | Cell(sx,ptr), Compound(sr,_,wr) ->
     let size = Ranges.gcd sx sr in
-    Compound(size, fr, singleton ~size @@ Ranges.squash (merge_node m q) wr)
+    let cell = new_cell ~size ?ptr () in
+    Ranges.iter (merge_cell m q cell root) wr ;
+    cell_layout cell
 
-  | Compound(sr,fr,wr), Cell(sx,Some ptr)
-  | Cell(sx,Some ptr), Compound(sr,fr,wr) ->
-    let rp = new_chunk m ~size:sx ~ptr () in
-    let fx = Fields.empty in
-    let wx = Ranges.range ~length:sx rp in
-    merge_ranges m q sx fx wx sr fr wr
-
-let merge_region (m: map) (q: queue) (a : chunk) (b : chunk) : chunk = {
+let merge_chunk (m: map) (q:queue) (root:node)
+    (a : chunk) (b : chunk) : chunk = {
   cparents = nodes m @@ Store.bag a.cparents b.cparents ;
   cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
   clabels = Lset.union a.clabels b.clabels ;
@@ -325,16 +335,16 @@ let merge_region (m: map) (q: queue) (a : chunk) (b : chunk) : chunk = {
   creads = Access.Set.union a.creads b.creads ;
   cwrites = Access.Set.union a.cwrites b.cwrites ;
   cshifts = Access.Set.union a.cshifts b.cshifts ;
-  clayout = merge_layout m q a.clayout b.clayout ;
+  clayout = merge_layout m q root a.clayout b.clayout ;
 }
 
 let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
   begin
-    let ra = Ufind.get m.store a in
-    let rb = Ufind.get m.store b in
-    let rx = Ufind.union m.store a b in
-    let rc = merge_region m q ra rb in
-    Ufind.set m.store rx rc ;
+    let ca = Ufind.get m.store a in
+    let cb = Ufind.get m.store b in
+    let rt = Ufind.union m.store a b in
+    let ck = merge_chunk m q rt ca cb in
+    Ufind.set m.store rt ck ;
   end
 
 let merge_all (m:map) = function
