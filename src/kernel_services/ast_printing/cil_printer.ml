@@ -2336,7 +2336,7 @@ class cil_printer () = object (self)
               Format.pp_print_string fmt in__attr__;
             if not block (* reversed so that highlighting matches *)
             then fprintf fmt "))"
-            else fprintf fmt ") %s" (for_cil "*/")
+            else fprintf fmt ") %s@\n" (for_cil "*/")
           end
       | x :: rest ->
         let buff = Buffer.create 17 in
