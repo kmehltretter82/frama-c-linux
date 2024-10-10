@@ -94,7 +94,7 @@ let unsupported_attributes = ["vector_size"]
    attributes can refer to erased functions and make the code un-reparsable *)
 let erased_attributes = ["malloc"]
 let () =
-   List.iter
+  List.iter
     (fun a -> Cil.registerAttribute a AttrIgnored)
     erased_attributes
 
@@ -152,15 +152,15 @@ let () = Cil_printer.register_shallow_attribute frama_c_destructor
 let () = Cil.registerAttribute frama_c_destructor (AttrName false)
 
 let () =
-   Cil.registerAttribute "packed" AttrIgnored;
-   Cil.registerAttribute "aligned" AttrIgnored;
-   Cil.registerAttribute "fc_float" (AttrName false);
-   Cil.registerAttribute "fc_assign" AttrIgnored;
-   Cil.registerAttribute "warn_unused_result" (AttrFunType false);
-   Cil.registerAttribute "FC_OLDSTYLEPROTO" AttrIgnored;
-   Cil.registerAttribute "static" AttrIgnored;
-   Cil.registerAttribute "missingproto" AttrIgnored;
-   Cil.registerAttribute "dummy" AttrIgnored
+  Cil.registerAttribute "packed" AttrIgnored;
+  Cil.registerAttribute "aligned" AttrIgnored;
+  Cil.registerAttribute "fc_float" (AttrName false);
+  Cil.registerAttribute "fc_assign" AttrIgnored;
+  Cil.registerAttribute "warn_unused_result" (AttrFunType false);
+  Cil.registerAttribute "FC_OLDSTYLEPROTO" AttrIgnored;
+  Cil.registerAttribute "static" AttrIgnored;
+  Cil.registerAttribute "missingproto" AttrIgnored;
+  Cil.registerAttribute "dummy" AttrIgnored
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
