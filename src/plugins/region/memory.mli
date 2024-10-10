@@ -80,7 +80,10 @@ val region : map -> node -> region
 val regions : map -> region list
 val iter : map -> (node -> unit) -> unit
 
-val new_chunk : map -> ?size:int -> ?ptr:node -> ?pointed:node -> unit -> node
+val new_chunk : map ->
+  ?parent:node -> ?size:int -> ?ptr:node -> ?pointed:node ->
+  unit -> node
+
 val add_root : map -> Cil_types.varinfo -> node
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node

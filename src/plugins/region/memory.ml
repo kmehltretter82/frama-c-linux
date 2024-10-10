@@ -40,6 +40,7 @@ and layout =
   | Blob
   | Cell of int * node option
   | Compound of int * Fields.domain * node Ranges.t
+  (* must only contain strict sub-ranges *)
 
 and chunk = {
   cparents: node list ;
@@ -79,7 +80,7 @@ let ctypes (m : chunk) : typ list =
   Typ.Set.elements !pool
 
 let failwith_locked m fn =
-  if m.locked then raise (Invalid_argument fn)
+  if m.locked then raise (Invalid_argument (fn ^ ": locked"))
 
 let lock m = m.locked <- true
 let unlock m = m.locked <- false
@@ -179,29 +180,17 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-let new_chunk (m: map) ?(size=0) ?ptr ?pointed () =
+let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   failwith_locked m "Region.Memory.new_chunk" ;
   let clayout =
     match ptr with
     | None -> if size = 0 then Blob else Cell(size,None)
-    | Some _ -> Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
+    | Some _ ->
+      Cell(Ranges.gcd size (Cil.bitsSizeOf Cil_const.voidPtrType), ptr)
   in
-  let cpointed =
-    match pointed with
-    | None -> []
-    | Some ptr -> [ptr]
-  in
-  Ufind.make m.store { empty with clayout ; cpointed }
-
-let new_range (m: map) ?(fields=Fields.empty) ~size ~offset ~length data : node =
-  failwith_locked m "Region.Memory.new_range" ;
-  let last = offset + length in
-  if not (0 <= offset && offset < last && last <= size) then
-    raise (Invalid_argument "Region.Memory.add_range") ;
-  let ranges = Ranges.singleton { offset ; length ; data } in
-  let clayout = Compound(size, fields, ranges) in
-  let n = Ufind.make m.store { empty with clayout } in
-  update m data (fun r -> { r with cparents = nodes m @@ n :: r.cparents }) ; n
+  let cparents = match parent with None -> [] | Some root -> [root] in
+  let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
+  Ufind.make m.store { empty with clayout ; cpointed ; cparents }
 
 let add_root (m: map) v =
   try Vmap.find v m.roots with Not_found ->
@@ -300,9 +289,13 @@ let merge_ranges (m: map) (q: queue) (root: node)
     (sa : int) (fa : Fields.domain) (wa : node Ranges.t)
     (sb : int) (fb : Fields.domain) (wb : node Ranges.t)
   : layout =
-  let fields = Fields.union fa fb in
   if sa = sb then
-    Compound(sa, fields, Ranges.merge (merge_range m q) wa wb)
+    match Ranges.merge (merge_range m q) wa wb with
+    | R [{ offset = 0 ; length ; data }] when length = sa ->
+      merge_push m q root data ; Cell(sa,None)
+    | ranges ->
+      let fields = Fields.union fa fb in
+      Compound(sa, fields, ranges)
   else
     let size = Ranges.gcd sa sb in
     let cell = new_cell ~size () in
@@ -371,14 +364,16 @@ let merge_copy (m: map) ~(l: node) ~(r: node) : unit =
 
 let add_field (m:map) (r:node) (fd:fieldinfo) : node =
   let ci = fd.fcomp in
-  if ci.cstruct then
+  if not ci.cstruct then r else
     let size = Cil.bitsSizeOf (TComp(ci,[])) in
     let offset, length = Cil.fieldBitsOffset fd in
-    let rf = new_chunk m () in
-    let fields = Fields.singleton fd in
-    let rc = new_range m ~fields ~size ~offset ~length rf in
-    merge m r rc ; rf
-  else r
+    if offset = 0 && size = length then r else
+      let data = new_chunk m ~parent:r () in
+      let ranges = Ranges.singleton { offset ; length ; data } in
+      let fields = Fields.singleton fd in
+      let clayout = Compound(size,fields,ranges) in
+      let nc = Ufind.make m.store { empty with clayout } in
+      merge m r nc ; data
 
 let add_index (m:map) (r:node) (ty:typ) : node =
   let size = Cil.bitsSizeOf ty in
