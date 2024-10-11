@@ -233,15 +233,13 @@ let pretty fmt sigma =
 (* --- Chunks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let uid = ref 0
-
 module Make(C : Sigs.Chunk) =
 struct
   type mu += Mu of C.t
   module T =
   struct
     let self = C.self
-    let tag = incr uid ; !uid
+    let tag = Obj.Extension_constructor.id [%extension_constructor Mu]
     let map f = function Mu m -> f m | _ -> assert false
     let map2 f a b =
       match a,b with Mu a, Mu b -> f a b | _ -> assert false
