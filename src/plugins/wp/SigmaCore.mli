@@ -25,8 +25,12 @@
 (* -------------------------------------------------------------------------- *)
 
 type sigma
+type chunk
 
-include Sigs.Sigma with type t = sigma
+type mu = private ..
+val mu : chunk -> mu
+
+include Sigs.Sigma with type t = sigma and type chunk := chunk
 module F = Lang.F
 
 type state
@@ -35,7 +39,9 @@ val apply : (F.term -> F.term) -> state -> state
 
 module Make(C : Sigs.Chunk) :
 sig
+  type mu += Mu of C.t
   val chunk : C.t -> chunk
+  val singleton : C.t -> domain
   val mem : sigma -> C.t -> bool
   val get : sigma -> C.t -> F.var
   val value : sigma -> C.t -> F.term

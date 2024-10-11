@@ -36,6 +36,7 @@ end
 
 (* memory chunks *)
 type chunk = { tag : (module Tag) ; mu : mu }
+let mu c = c.mu
 
 module Chunk =
 struct
@@ -256,6 +257,7 @@ struct
   let mem sigma c = mem sigma @@ chunk c
   let get sigma c = get sigma @@ chunk c
   let value sigma c = value sigma @@ chunk c
+  let singleton c = Heap.Set.singleton @@ chunk c
   let find state t =
     let c = F.Tmap.find t state in
     match c.mu with Mu chunk -> chunk | _ -> raise Not_found
