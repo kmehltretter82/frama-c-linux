@@ -411,6 +411,9 @@ type attributeClass =
   | AttrType
   (* Attribute of a type *)
 
+  | AttrStmt
+  (* Attribute of a statement or block *)
+
   | AttrIgnored
   (** Attribute that does not correspond to either of the above classes. *)
 
@@ -455,6 +458,7 @@ let registerAttribute an ac =
       | AttrFunType b -> Format.fprintf fmt "(AttrFunType %B)" b
       | AttrType -> Format.fprintf fmt "AttrType"
       | AttrIgnored -> Format.fprintf fmt "AttrIgnored"
+      | AttrStmt -> Format.fprintf fmt "AttrStmt"
     in
     Kernel.warning
       "Replacing existing class for attribute %s: was %a, now %a"
@@ -476,12 +480,15 @@ let partitionAttributes
       | AttrFunType _ ->
         loop (n, addAttribute a f, t) rest
       | AttrType -> loop (n, f, addAttribute a t) rest
+      | AttrStmt ->
+        Kernel.warning "unexpected statement attribute %s" an;
+        loop (n,f,t) rest
       | AttrIgnored -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
 
 let frama_c_ghost_else = "fc_ghost_else"
-let () = registerAttribute frama_c_ghost_else (AttrName false)
+let () = registerAttribute frama_c_ghost_else (AttrStmt)
 
 let frama_c_ghost_formal = "fc_ghost_formal"
 let () = registerAttribute frama_c_ghost_formal (AttrName false)
@@ -493,7 +500,7 @@ let frama_c_mutable = "fc_mutable"
 let () = registerAttribute frama_c_mutable (AttrName false)
 
 let frama_c_inlined = "fc_inlined"
-let () = registerAttribute frama_c_inlined (AttrName false)
+let () = registerAttribute frama_c_inlined (AttrFunType false)
 
 let () =
   registerAttribute bitfield_attribute_name AttrType;

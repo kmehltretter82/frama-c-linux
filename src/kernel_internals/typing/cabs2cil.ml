@@ -4656,17 +4656,22 @@ and cabsPartitionAttributes
   let rec loop (n,f,t) = function
       [] -> n, f, t
     | a :: rest ->
-      let kind = match doAttr ghost a with
-        | [] -> default
+      let an, kind = match doAttr ghost a with
+        | [] -> "", default
         | (Attr(an, _) | AttrAnnot an)::_ ->
           (* doAttr already strip underscores of the attribute if necessary so
              we do not need to strip then before calling attributeClass here. *)
-          attributeClass ~default an
+          an, attributeClass ~default an
       in
       match kind with
       | AttrName _ -> loop (a::n, f, t) rest
       | AttrFunType _ -> loop (n, a::f, t) rest
       | AttrType -> loop (n, f, a::t) rest
+      | AttrStmt ->
+        Kernel.warning
+          ~current:true "Ignoring statement attribute %s found in declaration"
+          an;
+        loop (n,f,t) rest
       | AttrIgnored -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
