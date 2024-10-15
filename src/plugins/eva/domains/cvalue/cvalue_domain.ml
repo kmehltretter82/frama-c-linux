@@ -22,9 +22,44 @@
 
 open Eval
 
-let dkey_card = Self.register_category "cardinal"
+let dkey_cardinal = Self.register_category "cardinal"
     ~help:"estimate the number of concrete states approximated by the analysis \
            at the end of each function"
+
+(* Do not pretty Cil-generated variables or out-of-scope local variables *)
+let filter_generated_and_locals kf =
+  let fundec = Kernel_function.get_definition kf in
+  (* only locals of outermost block *)
+  let is_innerblock_local vi =
+    Kernel_function.is_local vi kf
+    && not (List.exists (Cil_datatype.Varinfo.equal vi) fundec.sbody.blocals)
+  in
+  function
+  | Base.Var (vi, _) ->
+    if vi.vtemp then vi.vname = "__retres" else not (is_innerblock_local vi)
+  | _ -> true
+
+(* Prints the final state [values] of function [kf] with outputs [outs]. *)
+let print_final_state kf values =
+  let outs = Eva_dynamic.Inout.kf_outputs kf in
+  let outs = Locations.Zone.filter_base (filter_generated_and_locals kf) outs in
+  let print_cardinal fmt =
+    if Self.is_debug_key_enabled dkey_cardinal then
+      Format.fprintf fmt " (~%a states)"
+        Cvalue.CardinalEstimate.pretty (Cvalue.Model.cardinal_estimate values)
+  in
+  let header fmt =
+    Format.fprintf fmt "Values at end of function %a:%t"
+      Kernel_function.pretty kf print_cardinal
+  in
+  let body fmt =
+    if Locations.Zone.(equal outs top) then
+      Format.fprintf fmt
+        "Cannot filter: dumping raw memory (including unchanged variables)@\n";
+    Format.fprintf fmt "@[  %t@]"
+      (fun fmt -> Cvalue.Model.pretty_filter fmt values outs)
+  in
+  Self.printf ~dkey:Self.dkey_final_states ~header "%t" body
 
 module State = struct
 
@@ -401,63 +436,19 @@ module State = struct
     | `Bottom -> Cvalue.Model.bottom
     | `Value v -> v
 
-  let display ?fmt kf =
-    let open Cil_types in
-    (* Do not pretty Cil-generated variables or out-of-scope local variables *)
-    let filter_generated_and_locals base =
-      match base with
-      | Base.Var (v, _) ->
-        if v.vtemp then v.vname = "__retres"
-        else
-          ((not (Kernel_function.is_local v kf))
-           (* only locals of outermost block *)
-           || List.exists (fun x -> x.vid = v.vid)
-             (Kernel_function.get_definition kf).sbody.blocals )
-      | _ -> true
-    in
+  let display_final_state kf =
     try
       let values = get_state_before (Kernel_function.find_return kf) in
       let fst_values = get_state_before (Kernel_function.find_first_stmt kf) in
-      if Cvalue.Model.is_reachable fst_values
-      && not (Cvalue.Model.is_top fst_values)
-      then begin
-        let print_cardinal = Self.is_debug_key_enabled dkey_card in
-        let estimate =
-          if print_cardinal
-          then Cvalue.Model.cardinal_estimate values
-          else Cvalue.CardinalEstimate.one
-        in
-        let outs = Eva_dynamic.Inout.kf_outputs kf in
-        let outs = Locations.Zone.filter_base filter_generated_and_locals outs in
-        let header fmt =
-          Format.fprintf fmt "Values at end of function %a:%t"
-            Kernel_function.pretty kf
-            (fun fmt ->
-               if print_cardinal then
-                 Format.fprintf fmt " (~%a states)"
-                   Cvalue.CardinalEstimate.pretty estimate)
-        in
-        let body fmt =
-          Format.fprintf fmt "@[%t@]@[  %t@]"
-            (fun fmt ->
-               match outs with
-               | Locations.Zone.Top (Base.SetLattice.Top, _) ->
-                 Format.fprintf fmt "@[Cannot filter: dumping raw memory \
-                                     (including unchanged variables)@]@\n"
-               | _ -> ())
-            (fun fmt -> Cvalue.Model.pretty_filter fmt values outs) in
-        match fmt with
-        | None -> Self.printf
-                    ~dkey:Self.dkey_final_states ~header "%t" body
-        | Some fmt -> Format.fprintf fmt "%t@.%t@," header body
-      end
+      if Cvalue.Model.(is_reachable fst_values && not (is_top fst_values))
+      then print_final_state kf values
     with Kernel_function.No_Statement -> ()
 
   let display_results () =
     Self.result "====== VALUES COMPUTED ======";
     if Plugin.is_present "inout"
     && Self.is_debug_key_enabled Self.dkey_final_states
-    then Eva_dynamic.Callgraph.iter_in_rev_order display;
+    then Eva_dynamic.Callgraph.iter_in_rev_order display_final_state;
     Self.result "%t" Eva_perf.display
 
   let post_analysis _state =
