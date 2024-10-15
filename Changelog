@@ -18,6 +18,7 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2024-10-15] Warn when encountering an unknown attribute
 -   Kernel    [2024-10-08] Asm contracts can now have \initialized ensures.
               See option -asm-contracts-ensure-init
 -   Kernel    [2024-10-08] Option for converting stmt contracts into
