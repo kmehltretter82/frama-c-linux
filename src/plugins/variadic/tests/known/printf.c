@@ -73,4 +73,9 @@ int main()
   char hashes[4] = "####"; // no terminator
   printf("%.*s", 4, hashes); // ok
   printf("%.4s", hashes); // ok
+
+  printf("%*c", 4, '#'); // ok
+  printf("%4c", '#'); // ok
+  printf("%*p", 20, (void*)string); // ok
+  printf("%20p", (void*)string); // ok
 }
