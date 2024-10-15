@@ -1742,7 +1742,7 @@ module Make
           let cil_args = Option.map (List.map Eva_ast.to_cil_exp) args in
           let alarm = Alarms.Function_pointer (cil_v, cil_args) in
           let alarms = Alarmset.singleton ~status alarm in
-          Bottom.bot_of_list list, alarms
+          Bottom.return list, alarms
       end
     | _ -> assert false
 end

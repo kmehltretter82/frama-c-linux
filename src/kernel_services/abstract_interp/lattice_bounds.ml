@@ -20,14 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
+
+
+(** Types definitions *)
+
 type 'a or_bottom = [ `Value of 'a | `Bottom ]
 type 'a or_top = [ `Value of 'a | `Top ]
 type 'a or_top_bottom = [ `Value of 'a | `Bottom | `Top ]
 
+
+
 (** Common functions *)
 
-module Common =
-struct
+module Common = struct
 
   (* Pretty-printing *)
 
@@ -82,19 +87,22 @@ struct
     | `Value vx, `Value vy -> is_included vx vy
 
   (* Iterator *)
+
   let iter f = function
     | `Bottom | `Top -> ()
     | `Value v -> f v
 
   (* Conversion *)
+
   let to_option = function
     | `Bottom | `Top -> None
     | `Value x -> Some x
 
 end
 
+
+
 module Bottom = struct
-  type 'a t = 'a or_bottom
 
   include Common
 
@@ -110,40 +118,37 @@ module Bottom = struct
 
   (* Lattice operators *)
 
-  let join join x y = match x, y with
-    | `Value vx, `Value vy    -> `Value (join vx vy)
+  let join join x y =
+    match x, y with
+    | `Value vx, `Value vy -> `Value (join vx vy)
     | `Bottom, (`Value _ as v)
     | (`Value _ as v), `Bottom
     | (`Bottom as v), `Bottom -> v
 
-  let join_list j l = List.fold_left (join j) `Bottom l
-
-  let narrow narrow x y = match x, y with
-    | `Value vx, `Value vy    -> narrow vx vy
+  let narrow narrow x y =
+    match x, y with
+    | `Value vx, `Value vy -> narrow vx vy
     | `Bottom, `Value _
     | `Value _, `Bottom
     | `Bottom, `Bottom -> `Bottom
 
-  (* Iterators *)
-
-  let bind f = function
-    | `Bottom -> `Bottom
-    | `Value v -> f v
-
-  let fold ~bottom f = function
-    | `Bottom -> bottom
-    | `Value v -> f v
-
-  let map f = function
-    | `Bottom -> `Bottom
-    | `Value v -> `Value (f v)
+  let join_list f = List.fold_left (join f) `Bottom
 
   (* Combination *)
 
   let zip x y =
     match x, y with
-    | `Bottom, #t | #t, `Bottom -> `Bottom
+    | `Bottom, _ | _, `Bottom -> `Bottom
     | `Value x, `Value y -> `Value (x,y)
+
+  (* Monadic operations *)
+
+  include Monad.Extend_Kleisli_with_product (struct
+      type 'a t = 'a or_bottom
+      let return x = `Value x
+      let bind f = function `Bottom -> `Bottom | `Value x -> f x
+      let product l r = zip l r
+    end)
 
   (** Conversion *)
 
@@ -155,41 +160,19 @@ module Bottom = struct
     | `Bottom  -> []
     | `Value v -> [v]
 
-  let bot_of_list = function
-    | [] -> `Bottom
-    | l  -> `Value l
-
-  let list_of_bot = function
-    | `Bottom  -> []
-    | `Value l -> l
-
-  let add_to_list elt list = match elt with
+  let add_to_list elt list =
+    match elt with
     | `Bottom    -> list
     | `Value elt -> elt :: list
 
   let list_values l =
     List.fold_left (fun l elt -> add_to_list elt l) [] l
 
-  (** Operators *)
-
-  module Operators =
-  struct
-    let (>>-) x f = bind f x
-    let (>>-:) x f = map f x
-    let (let+) x f = map f x
-    let (and+) = zip
-    let (let*) x f = bind f x
-    let (and*) = zip
-  end
-
   (** Datatype construction *)
+
   let counter = ref 0
 
-  module Make_Datatype
-      (Domain: Datatype.S)
-    =
-    Datatype.Make (
-    struct
+  module Make_Datatype (Domain: Datatype.S) = Datatype.Make (struct
       include Datatype.Serializable_undefined
       type t = Domain.t or_bottom
       let () = incr counter
@@ -207,21 +190,18 @@ module Bottom = struct
 
   (* Bound lattice *)
 
-  module Bound_Lattice
-      (Lattice: Lattice_type.Join_Semi_Lattice)
-  = struct
+  module Bound_Lattice (Lattice: Lattice_type.Join_Semi_Lattice) = struct
     include Make_Datatype (Lattice)
-
     let bottom = `Bottom
     let join = join Lattice.join
     let is_included = is_included Lattice.is_included
   end
+
 end
 
 
-module Top =
-struct
-  type 'a t = 'a or_top
+
+module Top = struct
 
   include Common
 
@@ -235,6 +215,12 @@ struct
     | `Value v -> v
     | `Top -> top
 
+  (** Conversion. *)
+
+  let of_option = function
+    | None -> `Top
+    | Some x -> `Value x
+
   (** Lattice *)
 
   let join join_value x y =
@@ -247,52 +233,88 @@ struct
     | `Top, v | v, `Top -> v
     | `Value vx, `Value vy -> `Value (narrow_value vx vy)
 
-  (* Iterators *)
+  (** Combination *)
 
-  let bind f = function
-    | `Top -> `Top
-    | `Value v -> f v
+  let zip x y =
+    match x, y with
+    | `Top, _ | _, `Top -> `Top
+    | `Value x, `Value y -> `Value (x,y)
 
-  let fold ~top f = function
-    | `Top -> top
-    | `Value v -> f v
+  (** Monadic operators *)
 
-  let map f = function
-    | `Top -> `Top
-    | `Value v -> `Value (f v)
+  include Monad.Extend_Kleisli_with_product (struct
+      type 'a t = 'a or_top
+      let return x = `Value x
+      let bind f = function `Top -> `Top | `Value x -> f x
+      let product l r = zip l r
+    end)
+
+  (** Datatype construction *)
+
+  let counter = ref 0
+
+  module Make_Datatype (Domain: Datatype.S) = Datatype.Make (struct
+      include Datatype.Serializable_undefined
+      type t = Domain.t or_top
+      let () = incr counter
+      let name = Domain.name ^ "+top(" ^ string_of_int !counter ^ ")"
+      let reprs = `Top :: (List.map (fun v -> `Value v) Domain.reprs)
+      let structural_descr = Structural_descr.t_unknown
+      let hash = Common.hash Domain.hash
+      let equal = (Common.equal Domain.equal :> t -> t -> bool)
+      let compare = Common.compare Domain.compare
+      let rehash = Datatype.identity
+      let copy = map Domain.copy
+      let pretty = Common.pretty Domain.pretty
+      let mem_project = Datatype.never_any_project
+    end)
+
+end
+
+
+
+module TopBottom = struct
+
+  type 'a t = 'a or_top_bottom
+  include Common
 
   (** Combination *)
 
   let zip x y =
     match x, y with
+    | `Bottom, #t | #t, `Bottom -> `Bottom
     | `Top, #t | #t, `Top -> `Top
     | `Value x, `Value y -> `Value (x,y)
 
-  (** Conversion. *)
+  (** Monadic operators. We have to redefines every operators to ensure
+      subtyping properties. *)
 
-  let of_option = function
-    | None -> `Top
-    | Some x -> `Value x
+  let return x = `Value x
+  let product l r = zip l r
 
-  (** Operators *)
+  let bind f = function
+    | `Bottom -> `Bottom
+    | `Top -> `Top
+    | `Value x -> f x
 
-  module Operators =
-  struct
-    let (>>-) x f = bind f x
-    let (>>-:) x f = map f x
-    let (let+) x f = map f x
-    let (and+) = zip
-    let (let*) x f = bind f x
-    let (and*) = zip
+  let map f = function
+    | `Bottom -> `Bottom
+    | `Top -> `Top
+    | `Value x -> `Value (f x)
+
+  let flatten = function
+    | `Bottom | `Value `Bottom -> `Bottom
+    | `Top | `Value `Top -> `Top
+    | `Value `Value x -> `Value x
+
+  module Operators = struct
+    let ( >>-  ) (m : [< 'a t]) (f : 'a -> ([> 'b t] as 'c)) : 'c = bind f m
+    let ( let* ) (m : [< 'a t]) (f : 'a -> ([> 'b t] as 'c)) : 'c = bind f m
+    let ( and* ) (l : [< 'a t]) (r : [< 'b t]) : [> ('a * 'b) t] = product l r
+    let ( >>-: ) (m : [< 'a t]) (f : 'a -> 'b) : [> 'b t] = map f m
+    let ( let+ ) (m : [< 'a t]) (f : 'a -> 'b) : [> 'b t] = map f m
+    let ( and+ ) (l : [< 'a t]) (r : [< 'b t]) : [> ('a * 'b) t] = product l r
   end
-end
-
-
-module TopBottom =
-struct
-  type 'a t = 'a or_top_bottom
-
-  include Common
 
   (* Lattice operators *)
 
@@ -306,40 +328,24 @@ struct
     | `Bottom, _ | _, `Bottom -> `Bottom
     | `Value vx, `Value vy -> (narrow_value vx vy :> 'a t)
 
-  (* Iterators *)
+  (** Datatype construction *)
 
-  let bind f = function
-    | `Top -> `Top
-    | `Bottom -> `Bottom
-    | `Value v -> f v
+  let counter = ref 0
 
-  let fold ~top ~bottom f = function
-    | `Top -> top
-    | `Bottom -> bottom
-    | `Value v -> f v
+  module Make_Datatype (Domain: Datatype.S) = Datatype.Make (struct
+      include Datatype.Serializable_undefined
+      type t = Domain.t or_top_bottom
+      let () = incr counter
+      let name = Domain.name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
+      let reprs = `Bottom :: `Top :: (List.map (fun v -> `Value v) Domain.reprs)
+      let structural_descr = Structural_descr.t_unknown
+      let hash = Common.hash Domain.hash
+      let equal = (Common.equal Domain.equal :> t -> t -> bool)
+      let compare = Common.compare Domain.compare
+      let rehash = Datatype.identity
+      let copy = map Domain.copy
+      let pretty = Common.pretty Domain.pretty
+      let mem_project = Datatype.never_any_project
+    end)
 
-  let map f = function
-    | `Top -> `Top
-    | `Bottom -> `Bottom
-    | `Value v -> `Value (f v)
-
-  (** Combination *)
-
-  let zip x y =
-    match x, y with
-    | `Bottom, #t | #t, `Bottom -> `Bottom
-    | `Top, #t | #t, `Top -> `Top
-    | `Value x, `Value y -> `Value (x,y)
-
-  (** Operators *)
-
-  module Operators =
-  struct
-    let (>>-) x f = bind f x
-    let (>>-:) x f = map f x
-    let (let+) x f = map f x
-    let (and+) = zip
-    let (let*) x f = bind f x
-    let (and*) = zip
-  end
 end

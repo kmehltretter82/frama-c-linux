@@ -20,13 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Stdlib.Option
+(* Extend the [option] type to a full fleshed monad. *)
+include module type of Stdlib.Option
+include Monad.S_with_product with type 'a t = 'a option
 
-let zip l r = match l, r with Some l, Some r -> Some (l, r) | _ -> None
-
-module Operators = struct
-  let ( let* ) m f = bind m f
-  let ( let+ ) m f = map f m
-  let ( and* ) l r = zip l r
-  let ( and+ ) l r = zip l r
-end
+(* The bind is reversed for retrocompatibility reasons. *)
+val bind : 'a t -> ('a -> 'b t) -> 'b t

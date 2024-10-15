@@ -20,16 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Adding let binding operators to the Option module. See
-   https://v2.ocaml.org/manual/bindingops.html for more information. *)
+include Stdlib.Option
 
-include module type of Stdlib.Option
-
-val zip : 'a option -> 'b option -> ('a * 'b) option
-
-module Operators : sig
-  val ( let* ) : 'a option -> ('a -> 'b option) -> 'b option
-  val ( let+ ) : 'a option -> ('a -> 'b) -> 'b option
-  val ( and* ) : 'a option -> 'b option -> ('a * 'b) option
-  val ( and+ ) : 'a option -> 'b option -> ('a * 'b) option
+module Minimal = struct
+  type 'a t = 'a option
+  let return v = Some v
+  let bind f m = bind m f
+  let product l r = match l, r with Some l, Some r -> Some (l, r) | _ -> None
 end
+
+include Monad.Extend_Kleisli_with_product (Minimal)
+let bind m f = bind f m
