@@ -9,7 +9,7 @@
 void f(char const * __attribute__((__whatever__)) a,
        char * __attribute__((__p__)) b)
 {
-  /*@ assert p((char *)b); */ ;
+  /*@ assert p(b); */ ;
   return;
 }
 

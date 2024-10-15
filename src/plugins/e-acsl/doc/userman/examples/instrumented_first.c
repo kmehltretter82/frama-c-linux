@@ -36,7 +36,7 @@ extern size_t __e_acsl_heap_allocation_size;
 
 extern size_t __e_acsl_heap_allocated_blocks;
 
-/*@ ghost extern int __fc_heap_status __attribute__((__FRAMA_C_MODEL__)); */
+/*@ ghost extern int __fc_heap_status; */
 
 /*@ ghost extern int __e_acsl_init; */
 

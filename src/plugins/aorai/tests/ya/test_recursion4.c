@@ -2,8 +2,6 @@
    STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -aorai-acceptance
 */
 
-# pragma JessieIntegerModel(math)
-
 /*@ requires \valid(t+(0..size-1));
   @ requires size>=0;
   @ decreases size;
