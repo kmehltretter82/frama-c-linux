@@ -656,17 +656,14 @@ struct
     | Map m -> Map (M.add_base_value base ~size v ~size_v m)
 
   let add_binding ~exact m loc v =
-    (* TODO: this should depend on bottom being strict. *)
-    if V.equal v V.bottom then Bottom
-    else
-      match m with
-      | Top -> Top
-      | Bottom -> Bottom
-      | Map m ->
-        try
-          let non_bottom, r = M.add_binding ~exact m loc v in
-          if non_bottom then Map r else Bottom
-        with M.Result_is_top -> Top
+    match m with
+    | Top -> Top
+    | Bottom -> Bottom
+    | Map m ->
+      try
+        let non_bottom, r = M.add_binding ~exact m loc v in
+        if non_bottom then Map r else Bottom
+      with M.Result_is_top -> Top
 
   let find ?(conflate_bottom=true) m loc =
     match m with

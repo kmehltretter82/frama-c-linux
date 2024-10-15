@@ -1058,6 +1058,11 @@ module Model = struct
     let v = find_indeterminate ~conflate_bottom state loc in
     V_Or_Uninitialized.get_v v
 
+  let add_binding ~exact mem loc v =
+    if V_Or_Uninitialized.is_bottom v
+    then bottom
+    else add_binding ~exact mem loc v
+
   let add_indeterminate_binding ~exact mem loc v =
     add_binding ~exact mem loc v
 
