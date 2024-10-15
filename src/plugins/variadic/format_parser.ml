@@ -55,13 +55,13 @@ let check_flag spec flag =
       pp_cs (spec.f_conversion_specifier,spec.f_capitalize);
     raise Invalid_format
 
-let check_cs_compatibility cs capitalized has_field_width has_precision =
+let check_cs_compatibility cs capitalized ~field_width ~precision =
   match cs with
-  | (`n | `c | `p) as cs when has_precision ->
+  | (`n | `c | `p) as cs when precision <> None ->
     warn "Conversion specifier %a does not expect a precision."
       pp_cs (cs, capitalized) ;
     raise Invalid_format
-  | `n when has_field_width ->
+  | `n when field_width <> None ->
     warn "Conversion specifier n does not expect a field width.";
     raise Invalid_format
   | _ -> ()
@@ -83,7 +83,7 @@ let find_typedef : Format_typer.typdef_finder =
 let check_f_specification spec =
   (* Check the correctness of precision and field width fields *)
   check_cs_compatibility spec.f_conversion_specifier spec.f_capitalize
-    (spec.f_field_width <> None) (spec.f_precision <> None);
+    ~field_width:spec.f_field_width ~precision:spec.f_precision;
   (* Check the combination of conversion specifier and length modifier *)
   begin
     try ignore (Format_typer.type_f_specifier ~find_typedef spec)
@@ -102,7 +102,7 @@ let check_f_specification spec =
 let check_s_specification spec =
   (* Check the correctness of field width *)
   check_cs_compatibility spec.s_conversion_specifier false
-    (spec.s_field_width <> None) false;
+    ~field_width:spec.s_field_width ~precision:None;
   (* Check the combination of conversion specifier and length modifier *)
   begin
     try ignore (Format_typer.type_s_specifier ~find_typedef spec)
