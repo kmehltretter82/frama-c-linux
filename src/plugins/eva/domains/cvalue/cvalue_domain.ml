@@ -43,6 +43,21 @@ let filter_generated_and_locals kf =
 let print_final_state kf values =
   let outs = Eva_dynamic.Inout.kf_outputs kf in
   let outs = Locations.Zone.filter_base (filter_generated_and_locals kf) outs in
+  let print_filtered_state fmt =
+    if Cvalue.Model.(equal values bottom)
+    then Format.fprintf fmt "@[  NON TERMINATING FUNCTION@]"
+    else
+      let values =
+        match outs with
+        | Top (Top, _) ->
+          Format.fprintf fmt "Cannot filter: dumping raw memory \
+                              (including unchanged variables)@\n";
+          values
+        | Top (Set set, _) -> Cvalue.Model.filter_by_shape set values
+        | Map m -> Cvalue.Model.filter_by_shape (Locations.Zone.shape m) values
+      in
+      Format.fprintf fmt "@[  %a@]" Cvalue.Model.pretty values
+  in
   let print_cardinal fmt =
     if Self.is_debug_key_enabled dkey_cardinal then
       Format.fprintf fmt " (~%a states)"
@@ -52,14 +67,7 @@ let print_final_state kf values =
     Format.fprintf fmt "Values at end of function %a:%t"
       Kernel_function.pretty kf print_cardinal
   in
-  let body fmt =
-    if Locations.Zone.(equal outs top) then
-      Format.fprintf fmt
-        "Cannot filter: dumping raw memory (including unchanged variables)@\n";
-    Format.fprintf fmt "@[  %t@]"
-      (fun fmt -> Cvalue.Model.pretty_filter fmt values outs)
-  in
-  Self.printf ~dkey:Self.dkey_final_states ~header "%t" body
+  Self.printf ~dkey:Self.dkey_final_states ~header "%t" print_filtered_state
 
 module State = struct
 
