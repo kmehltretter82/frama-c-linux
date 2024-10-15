@@ -10,7 +10,7 @@ Thanks to this approach, Frama-C provides sophisticated tools, including:
 - an analyzer based on abstract interpretation (Eva plug-in);
 - a program proof framework based on weakest precondition calculus (WP plug-in);
 - a program slicer (Slicing plug-in);
-- a tool for verification of temporal (LTL) properties (Aoraï plug-in);
+- a tool for verification of automata-based properties (Aoraï plug-in);
 - a runtime verification tool (E-ACSL plug-in);
 - several tools for code base exploration and dependency analysis
   (plug-ins From, Impact, Metrics, Occurrence, Scope, etc.).
@@ -80,7 +80,7 @@ dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
 doc: "https://frama-c.com/download/user-manual-30.0-beta-Zinc.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
-  "deductive"
+  "deductive verification"
   "program verification"
   "formal specification"
   "automated theorem prover"
