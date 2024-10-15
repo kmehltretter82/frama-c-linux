@@ -227,7 +227,7 @@ struct
 
     type t = sigma
     type chunk = Chunk.t
-    module Chunk = Heap
+    module Heap = Heap
 
     type domain = Domain.t
 

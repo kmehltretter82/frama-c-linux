@@ -38,9 +38,10 @@ end
 type chunk = { tag : (module Tag) ; mu : mu }
 let mu c = c.mu
 
-module Chunk =
+module Chunk : Sigs.Chunk with type t = chunk =
 struct
   type t = chunk
+  let self = "Core"
   let hash c =
     let module T = (val c.tag) in Qed.Hcons.hash_pair T.tag @@ T.hash c.mu
   let equal a b =
@@ -52,6 +53,14 @@ struct
     let module B = (val b.tag) in
     let cmp = Int.compare A.tag B.tag in
     if cmp <> 0 then cmp else A.compare a.mu b.mu
+  let pretty fmt c =
+    let module T = (val c.tag) in T.pretty fmt c.mu
+  let tau_of_chunk c =
+    let module T = (val c.tag) in T.tau_of_chunk c.mu
+  let basename_of_chunk c =
+    let module T = (val c.tag) in T.basename_of_chunk c.mu
+  let is_framed c =
+    let module T = (val c.tag) in T.is_framed c.mu
 end
 
 module Heap = Qed.Collection.Make(Chunk)

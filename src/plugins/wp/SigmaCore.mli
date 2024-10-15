@@ -25,15 +25,16 @@
 (* -------------------------------------------------------------------------- *)
 
 type sigma
-type chunk
+
+include Sigs.Sigma with type t = sigma
+module Chunk : Sigs.Chunk with type t = chunk
+
+module F = Lang.F
 
 type mu = private ..
 val mu : chunk -> mu
 
-include Sigs.Sigma with type t = sigma and type chunk := chunk
-module F = Lang.F
-
-type state
+type state = chunk F.Tmap.t
 val state : sigma -> state
 val apply : (F.term -> F.term) -> state -> state
 

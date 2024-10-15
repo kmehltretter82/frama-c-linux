@@ -116,7 +116,7 @@ let pointer = Context.create "MemTyped.pointer"
 (* --- Chunks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type chunk =
+type mchunk =
   | M_int of Ctypes.c_int
   | M_f32
   | M_f64
@@ -124,9 +124,9 @@ type chunk =
   | T_alloc
   | T_init
 
-module Chunk =
+module MChunk =
 struct
-  type t = chunk
+  type t = mchunk
   let self = "typed"
   let int_rank = function
     | CBool -> 0
@@ -178,8 +178,10 @@ struct
   let is_framed _ = false
 end
 
-module Heap = Qed.Collection.Make(Chunk)
-module Sigma = Sigma.Make(Chunk)(Heap)
+module Sigma = SigmaCore
+module Heap = SigmaCore.Heap
+module Chunk = SigmaCore.Chunk
+module State = SigmaCore.Make(MChunk)
 
 type loc = term (* of type addr *)
 
@@ -190,30 +192,22 @@ type loc = term (* of type addr *)
 let m_float = function Float32 -> M_f32 | Float64 -> M_f64
 
 let rec footprint = function
-  | C_int i -> Heap.Set.singleton (M_int i)
-  | C_float f -> Heap.Set.singleton (m_float f)
-  | C_pointer _ -> Heap.Set.singleton M_pointer
+  | C_int i -> State.singleton (M_int i)
+  | C_float f -> State.singleton (m_float f)
+  | C_pointer _ -> State.singleton M_pointer
   | C_array a -> footprint (object_of a.arr_element)
   | C_comp c -> footprint_comp c
 
 and footprint_comp { cfields } =
   match cfields with
-  | None -> all_value_chunks ()
+  | None -> Sigma.empty
   | Some fields ->
     List.fold_left
       (fun ft f ->
-         Heap.Set.union ft (footprint (object_of f.ftype))
-      ) Heap.Set.empty fields
+         Sigma.union ft (footprint (object_of f.ftype))
+      ) Sigma.empty fields
 
-and all_value_chunks () =
-  let ints =
-    List.fold_left (fun l i -> M_int i :: l) []
-      [ Ctypes.CBool ;
-        SInt8 ; UInt8 ; SInt16 ; UInt16 ; SInt32 ; UInt32 ; SInt64 ; UInt64 ]
-  in
-  Heap.Set.of_list (M_pointer :: M_f32 :: M_f64 :: ints)
-
-let init_footprint _ _ = Heap.Set.singleton T_init
+let init_footprint _ _ = State.singleton T_init
 let value_footprint obj _l = footprint obj
 
 (* Note that it is the length in MemTyped and not the occupied bytes *)
@@ -283,6 +277,7 @@ let position_of_field f =
 (* -------------------------------------------------------------------------- *)
 
 type sigma = Sigma.t
+type chunk = Chunk.t
 type domain = Sigma.domain
 type segment = loc rloc
 
@@ -453,7 +448,7 @@ module STRING = WpContext.Generator(LITERAL)
 
       let linked prefix base cst =
         let name = prefix ^ "_linked" in
-        let a = Lang.freshvar ~basename:"alloc" (Chunk.tau_of_chunk T_alloc) in
+        let a = Lang.freshvar ~basename:"alloc" (MChunk.tau_of_chunk T_alloc) in
         let m = e_var a in
         let m_linked = MemAddr.linked m in
         let alloc = F.e_get m base in (* The size is alloc-1 *)
@@ -484,7 +479,7 @@ module STRING = WpContext.Generator(LITERAL)
         let ikind = Ctypes.c_char () in
         let addr = shift (MemAddr.global base) (C_int ikind) (e_var i) in
         let m =
-          Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk (M_int ikind)) in
+          Lang.freshvar ~basename:"mchar" (MChunk.tau_of_chunk (M_int ikind)) in
         let m_sconst = MemMemory.sconst (e_var m) in
         let v = F.e_get (e_var m) addr in
         let read = F.p_equal c v in
@@ -641,7 +636,7 @@ let cvar x = MemAddr.global (BASE.get x)
 let pointer_loc t = t
 let pointer_val t = t
 
-let allocated sigma l = F.e_get (Sigma.value sigma T_alloc) (MemAddr.base l)
+let allocated sigma l = F.e_get (State.value sigma T_alloc) (MemAddr.base l)
 
 let base_addr l = MemAddr.mk_addr (MemAddr.base l) e_zero
 let base_offset l = MemAddr.base_offset (MemAddr.base l) (MemAddr.offset l)
@@ -961,23 +956,25 @@ let int_of_loc _ l = MemAddr.int_of_addr l
 (* --- Frames                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let frames obj addr = function
-  | T_alloc -> []
-  | m ->
+let frames obj addr chunk =
+  match Sigma.mu chunk with
+  | State.Mu T_alloc -> []
+  | State.Mu m ->
     let offset = length_of_object obj in
     let sizeof = F.e_one in
-    let tau = Chunk.val_of_chunk m in
-    let basename = Chunk.basename_of_chunk m in
+    let tau = MChunk.val_of_chunk m in
+    let basename = MChunk.basename_of_chunk m in
     MemMemory.frames ~addr ~offset ~sizeof ~basename tau
+  | _ -> []
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk element type                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-module ChunkContent = WpContext.Generator(Chunk)
+module ChunkContent = WpContext.Generator(MChunk)
     (struct
       let name = "MemTyped.ChunkContent"
-      type key = Chunk.t
+      type key = MChunk.t
       type data = lfun
 
       let int_kind = function
@@ -986,7 +983,7 @@ module ChunkContent = WpContext.Generator(Chunk)
 
       let generate c =
         let k = int_kind c in
-        let p = Lang.freshvar ~basename:"m" (Chunk.tau_of_chunk c) in
+        let p = Lang.freshvar ~basename:"m" (MChunk.tau_of_chunk c) in
         let m = e_var p in
         let name = Format.asprintf "is_%a_chunk" Ctypes.pp_int k in
         let lfun = Lang.generated_p ~coloring:true name in
@@ -1004,15 +1001,15 @@ module ChunkContent = WpContext.Generator(Chunk)
       let compile = Lang.local generate
     end)
 
-let is_chunk sigma = function
-  | M_int _ as m ->
-    F.p_call (ChunkContent.get m) [ Sigma.value sigma m ]
-  | _ ->
-    p_true
-
 let is_well_formed sigma =
-  let open Sigma in
-  p_conj (Heap.Set.fold (fun c l -> is_chunk sigma c :: l) (domain sigma) [])
+  let pool = ref [] in
+  Sigma.iter (fun c x ->
+      match Sigma.mu c with
+      | State.Mu (M_int _ as chunk) ->
+        pool := F.p_call (ChunkContent.get chunk) [F.e_var x] :: !pool
+      | _ -> ()
+    ) sigma ;
+  F.p_conj !pool
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loader                                                             --- *)
@@ -1020,8 +1017,8 @@ let is_well_formed sigma =
 
 module MODEL =
 struct
-  module Chunk = Chunk
   module Sigma = Sigma
+  module Chunk = Chunk
   let name = "MemTyped.LOADER"
   type nonrec loc = loc
   let field = field
@@ -1034,19 +1031,21 @@ struct
   let to_region_pointer l = 0,l
   let of_region_pointer _ _ l = l
 
-  let load_int sigma i l = F.e_get (Sigma.value sigma (M_int i)) l
-  let load_float sigma f l = F.e_get (Sigma.value sigma (m_float f)) l
-  let load_pointer sigma _t l = F.e_get (Sigma.value sigma M_pointer) l
+  let load_int sigma i l = F.e_get (State.value sigma (M_int i)) l
+  let load_float sigma f l = F.e_get (State.value sigma (m_float f)) l
+  let load_pointer sigma _t l = F.e_get (State.value sigma M_pointer) l
 
   let last sigma obj l =
     let n = length_of_object obj in
     e_sub (F.e_div (allocated sigma l) n) e_one
 
   let havoc obj loc ~length chunk ~fresh ~current =
-    if chunk <> T_alloc then
+    match Sigma.mu chunk with
+    | State.Mu T_alloc -> fresh
+    | State.Mu _ ->
       let n = F.e_mul (length_of_object obj) length in
       F.e_fun f_havoc [fresh;current;loc;n]
-    else fresh
+    | _ -> assert false
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
@@ -1056,28 +1055,22 @@ struct
     let equal = p_equal (e_get m1 p) (e_get m2 p) in
     [xp],separated,equal
 
-  let updated sigma c l v = c , F.e_set (Sigma.value sigma c) l v
+  let updated sigma c l v = State.chunk c , F.e_set (State.value sigma c) l v
 
   let store_int sigma i l v = updated sigma (M_int i) l v
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
 
   let set_init_atom sigma _obj l v = updated sigma T_init l v
-  let is_init_atom sigma _ l = F.e_get (Sigma.value sigma T_init) l
+  let is_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
 
   let is_init_range sigma obj loc length =
     let n = F.e_mul (length_of_object obj) length in
-    F.p_call p_is_init_r [ Sigma.value sigma T_init ; loc ; n ]
+    F.p_call p_is_init_r [ State.value sigma T_init ; loc ; n ]
 
   let set_init obj loc ~length _chunk ~current =
     let n = F.e_mul (length_of_object obj) length in
     F.e_fun f_set_init [current;loc;n]
-(*
-  let monotonic_init s1 s2 =
-    let m1 = Sigma.value s1 T_init in
-    let m2 = Sigma.value s2 T_init in
-    F.p_call p_monotonic [m1; m2]
-*)
 end
 
 module LOADER = MemLoader.Make(MODEL)
@@ -1093,7 +1086,7 @@ let domain = LOADER.domain
 
 let assigned seq obj loc =
   (* Maintain always initialized values initialized *)
-  Assert (MemMemory.cinits (Sigma.value seq.post T_init)) ::
+  Assert (MemMemory.cinits (State.value seq.post T_init)) ::
   LOADER.assigned seq obj loc
 
 (* -------------------------------------------------------------------------- *)
@@ -1125,10 +1118,10 @@ let s_valid sigma acs p n =
     | RD -> MemAddr.valid_rd
     | OBJ -> (fun m p _ -> MemAddr.valid_obj m p)
   in
-  valid (Sigma.value sigma T_alloc) p n
+  valid (State.value sigma T_alloc) p n
 
 let s_invalid sigma p n =
-  MemAddr.invalid (Sigma.value sigma T_alloc) p n
+  MemAddr.invalid (State.value sigma T_alloc) p n
 
 let segment phi = function
   | Rloc(obj,l) ->
@@ -1147,8 +1140,8 @@ let invalid sigma = segment (s_invalid sigma)
 
 let frame sigma =
   let wellformed_frame phi chunk =
-    if Sigma.mem sigma chunk
-    then [ phi (Sigma.value sigma chunk) ]
+    if State.mem sigma chunk
+    then [ phi (State.value sigma chunk) ]
     else []
   in
   wellformed_frame MemAddr.linked T_alloc @
@@ -1157,7 +1150,7 @@ let frame sigma =
   wellformed_frame MemMemory.framed M_pointer
 
 let alloc sigma xs =
-  if xs = [] then sigma else Sigma.havoc_chunk sigma T_alloc
+  if xs = [] then sigma else Sigma.havoc_chunk sigma (State.chunk T_alloc)
 
 let scope seq scope xs =
   if xs = [] then [] else
@@ -1168,8 +1161,8 @@ let scope seq scope xs =
              | Sigs.Leave -> e_zero
              | Sigs.Enter -> length_of_typ x.vtype
            in F.e_set m (BASE.get x) size)
-        (Sigma.value seq.pre T_alloc) xs in
-    [ p_equal (Sigma.value seq.post T_alloc) alloc ]
+        (State.value seq.pre T_alloc) xs in
+    [ p_equal (State.value seq.post T_alloc) alloc ]
 
 let global _sigma p = p_leq MemAddr.(region @@ base p) e_zero
 
@@ -1191,7 +1184,7 @@ let separated =
 (* --- State Model                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-type state = chunk Tmap.t
+type state = SigmaCore.state
 
 let rec lookup_a e =
   match F.repr e with
@@ -1210,30 +1203,32 @@ and lookup_f f es =
 and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
 
 let mchunk c =
-  match c with
-  | T_init -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KInit)
-  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
+  match Sigma.mu c with
+  | State.Mu mc ->
+    let kind = if mc = T_init then KInit else KValue in
+    Sigs.Mchunk (Pretty_utils.to_string MChunk.pretty mc, kind)
+  | _ -> Sigs.Mterm
 
 let lookup s e =
-  try mchunk (Tmap.find e s)
+  try mchunk @@ Tmap.find e s
   with Not_found ->
   try match F.repr e with
     | L.Fun( f , es ) -> Sigs.Maddr (lookup_f f es)
-    | L.Aget( m , k ) when Tmap.find m s = T_init ->
-      Sigs.Mlval (lookup_lv k, KInit)
-    | L.Aget( m , k ) when Tmap.find m s <> T_alloc ->
-      Sigs.Mlval (lookup_lv k, KValue)
+    | L.Aget( m , k ) ->
+      begin
+        match Sigma.mu @@ Tmap.find m s with
+        | State.Mu T_alloc -> Sigs.Mterm
+        | State.Mu T_init -> Sigs.Mlval (lookup_lv k, KInit)
+        | State.Mu _ -> Sigs.Mlval (lookup_lv k, KValue)
+        | _ -> Sigs.Mterm
+      end
     | _ -> Sigs.Mterm
   with Not_found -> Sigs.Mterm
 
-let apply f s =
-  Tmap.fold (fun m c w -> Tmap.add (f m) c w) s Tmap.empty
+let apply = SigmaCore.apply
+let state = SigmaCore.state
 
 let iter f s = Tmap.iter (fun m c -> f (mchunk c) m) s
-
-let state (sigma : sigma) =
-  let s = ref Tmap.empty in
-  Sigma.iter (fun c x -> s := Tmap.add (e_var x) c !s) sigma ; !s
 
 let heap domain state =
   Tmap.fold (fun m c w ->
@@ -1257,10 +1252,15 @@ let updates seq domain =
   let post = heap domain seq.post in
   Heap.Map.iter2
     (fun chunk v1 v2 ->
-       if chunk <> T_alloc then
-         match v1 , v2 with
-         | Some v1 , Some v2 -> pool := Bag.concat (diff v1 v2) !pool
-         | _ -> ())
+       match Sigma.mu chunk with
+       | State.Mu mc ->
+         begin
+           if mc <> T_alloc then
+             match v1 , v2 with
+             | Some v1 , Some v2 -> pool := Bag.concat (diff v1 v2) !pool
+             | _ -> ()
+         end
+       | _ -> ())
     pre post ;
   !pool
 
