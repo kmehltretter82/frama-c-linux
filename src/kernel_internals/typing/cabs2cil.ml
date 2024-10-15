@@ -134,32 +134,33 @@ let stripUnderscore s =
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block
-let () = Cil.registerAttribute frama_c_keep_block AttrIgnored
+let () = Cil.registerAttribute frama_c_keep_block AttrStmt
 
 let fc_stdlib = "fc_stdlib"
 let fc_stdlib_generated = "fc_stdlib_generated"
 let () = Cil_printer.register_shallow_attribute fc_stdlib
 let () = Cil_printer.register_shallow_attribute fc_stdlib_generated
 (* fc_stdlib attribute already registered in cil.ml *)
-let () = Cil.registerAttribute fc_stdlib_generated AttrIgnored
+let () = Cil.registerAttribute fc_stdlib_generated (AttrName false)
 
 let fc_local_static = "fc_local_static"
 let () = Cil_printer.register_shallow_attribute fc_local_static
-let () = Cil.registerAttribute fc_local_static AttrIgnored
+let () = Cil.registerAttribute fc_local_static (AttrName false)
 
 let frama_c_destructor = "fc_destructor"
 let () = Cil_printer.register_shallow_attribute frama_c_destructor
 let () = Cil.registerAttribute frama_c_destructor (AttrName false)
 
 let () =
+  (* packed and aligned are treated separately, we ignore them
+     during standard processing.
+  *)
   Cil.registerAttribute "packed" AttrIgnored;
   Cil.registerAttribute "aligned" AttrIgnored;
-  Cil.registerAttribute "fc_float" (AttrName false);
-  Cil.registerAttribute "fc_assign" AttrIgnored;
   Cil.registerAttribute "warn_unused_result" (AttrFunType false);
-  Cil.registerAttribute "FC_OLDSTYLEPROTO" AttrIgnored;
-  Cil.registerAttribute "static" AttrIgnored;
-  Cil.registerAttribute "missingproto" AttrIgnored;
+  Cil.registerAttribute "FC_OLDSTYLEPROTO" (AttrName false);
+  Cil.registerAttribute "static" (AttrName false);
+  Cil.registerAttribute "missingproto" (AttrName false);
   Cil.registerAttribute "dummy" AttrIgnored
 
 (** A hook into the code that creates temporary local vars.  By default this
