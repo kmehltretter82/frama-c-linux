@@ -137,38 +137,6 @@ struct
     let filter_base f m =
       fold (fun k v acc -> if f k then add k v acc else acc) m empty
 
-    let offsetmap_all_bottom m =
-      let f v =
-        if not (V.equal V.bottom v) then raise Exit
-      in
-      try Offsetmap.iter_on_values f m; true
-      with Exit -> false
-
-    (* Display only the bases present in [filter], but including those
-       that are bound to their default value. *)
-    let pretty_filter fmt m zfilter =
-      let first = ref true in
-      let filter base _itvs () =
-        match find_or_default base m with
-        | `Bottom -> ()
-        | `Value offsm ->
-          if not (offsetmap_all_bottom offsm)
-          then begin
-            if !first then first := false else Format.fprintf fmt "@ ";
-            let typ = Base.typeof base in
-            Format.fprintf fmt "@[%a%a@]"
-              Base.pretty base
-              (Offsetmap.pretty_generic ?typ ()) offsm
-          end
-      in
-      match zfilter with
-      | Zone.Top (Base.SetLattice.Top, _) ->
-        pretty fmt m (* fallback *)
-      | _ ->
-        Format.fprintf fmt "@[<v>";
-        Zone.fold_topset_ok filter zfilter ();
-        Format.fprintf fmt "@]"
-
     let add_base_value base ~size v ~size_v m =
       add base (Offsetmap.create ~size v ~size_v) m
 
@@ -681,12 +649,6 @@ struct
   let is_reachable = function
     | Bottom -> false
     | Top | Map _ -> true
-
-  let pretty_filter fmt m zfilter =
-    match m with
-    | Bottom -> Format.fprintf fmt "@[NON TERMINATING FUNCTION@]"
-    | Top -> Format.fprintf fmt "@[NO INFORMATION@]"
-    | Map m -> M.pretty_filter fmt m zfilter
 
   let add_base_value base ~size v ~size_v = function
     | Bottom -> Bottom

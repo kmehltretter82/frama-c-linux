@@ -45,9 +45,6 @@ module type S = sig
 
   val pretty: Format.formatter -> t -> unit
   val pretty_debug: Format.formatter -> t -> unit
-  val pretty_filter: Format.formatter -> t -> Zone.t -> unit
-  (** [pretty_filter m z] pretties only the part of [m] that correspond to
-      the bases present in [z] *)
 
   val pretty_diff: Format.formatter -> t -> t -> unit
 
