@@ -3304,6 +3304,18 @@ let isIntegralOrPointerType t =
   | TInt _ | TEnum _ | TPtr _ -> true
   | _ -> false
 
+(* Don't completely unroll here, as we do not want to identify
+   intptr_t with its supporting integer type. *)
+let rec is_intptr_t = function
+  | TNamed(t,_) ->
+    t.tname = "intptr_t" || is_intptr_t t.ttype
+  | _ -> false
+
+let rec is_uintptr_t = function
+  | TNamed (t,_) ->
+    t.tname = "uintptr_t" || is_uintptr_t t.ttype
+  | _ -> false
+
 let rec isLogicBooleanType t =
   match t with
   | Ctype ty -> isIntegralType ty

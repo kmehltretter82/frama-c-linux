@@ -169,11 +169,6 @@ let rec signed_counterpart typ =
   | TPtr _ -> signed_counterpart ((Machine.uintptr_type ()))
   | _ -> assert false
 
-let rec is_intptr_type = function
-  | TNamed ({torig_name = name} as t, _) ->
-    name = "intptr_t" || name = "uintptr_t" || is_intptr_type t.ttype
-  | _ -> false
-
 let return t = `Value t, Alarmset.none
 
 (* Intersects [alarms] with the only possible alarms from the dereference of
@@ -797,7 +792,11 @@ module Make
       let& value =
         match src_type, dst_type with
         | TSPtr src, TSInt dst ->
-          let alarm = if is_intptr_type dst_typ then NoAlarm else PtrDowncast in
+          let alarm =
+            if Cil.is_intptr_t dst_typ || Cil.is_uintptr_t dst_typ
+            then NoAlarm
+            else PtrDowncast
+          in
           cast_int_to_int context ~alarm ~src ~dst expr value
         | TSInt src, (TSInt dst | TSPtr dst) ->
           cast_int_to_int context ~alarm:IntDowncast ~src ~dst expr value

@@ -330,10 +330,6 @@ let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, r
     end
     else overflow_alarm ()
 
-let rec is_intptr_t = function
-  | Cil_types.TNamed(t,_) -> t.tname = "intptr_t" || is_intptr_t t.ttype
-  | _ -> false
-
 (* Assertion for downcasts. *)
 let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
   let src_type = Cil.typeOf exp in
@@ -342,7 +338,8 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
   let src_size = Cil.bitsSizeOf src_type in
   let dst_size = Cil.bitsSizeOfBitfield dst_type in
   if (dst_size < src_size || dst_size == src_size && dst_signed <> src_signed)
-  && not (Cil.isPointerType src_type && is_intptr_t dst_type)
+  && not (Cil.isPointerType src_type &&
+          (Cil.is_intptr_t dst_type || Cil.is_uintptr_t dst_type))
   then
     let dst_min, dst_max =
       if dst_signed
