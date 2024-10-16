@@ -273,7 +273,7 @@ struct
     module Make_Narrow (X: sig
         include Lattice_type.With_Top with type t := V.t
         include Lattice_type.With_Narrow with type t := V.t
-        val bottom_is_strict: bool
+        val bottom: V.t
       end) = struct
 
       exception NarrowReturnsBottom
@@ -281,16 +281,12 @@ struct
       module OffsetmapNarrow = Offsetmap.Make_Narrow(struct
           let top = X.top
 
-          (* If bottom is strict, catch results of [narrow] that are bottom
-             and raise an exception instead *)
-          let narrow =
-            if X.bottom_is_strict then
-              fun x y ->
-                let r = X.narrow x y in
-                if V.(equal bottom r) then raise NarrowReturnsBottom;
-                r
-            else
-              fun x y -> X.narrow x y
+          (* Catch results of [narrow] that are bottom and raise an exception
+             instead. *)
+          let narrow x y =
+            let r = X.narrow x y in
+            if V.equal X.bottom r then raise NarrowReturnsBottom;
+            r
         end)
 
       (* may raise {!NarrowReturnsBottom} when Bottom is strict *)
@@ -683,7 +679,7 @@ struct
   module Make_Narrow (X: sig
       include Lattice_type.With_Top with type t := v
       include Lattice_type.With_Narrow with type t := v
-      val bottom_is_strict: bool
+      val bottom: v
     end) = struct
 
     include M.Make_Narrow(X)

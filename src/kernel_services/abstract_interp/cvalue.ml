@@ -924,8 +924,6 @@ module V_Or_Uninitialized = struct
     | C_uninit_noesc(v) | C_init_esc(v) -> Integer.add Integer.one (vcard v)
     | C_uninit_esc(v) -> Integer.add Integer.two (vcard v)
 
-  let bottom_is_strict = true
-
 end
 
 module V_Offsetmap = struct

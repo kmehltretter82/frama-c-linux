@@ -74,7 +74,7 @@ module type S = sig
   module Make_Narrow(_: sig
       include Lattice_type.With_Top with type t := v
       include Lattice_type.With_Narrow with type t := v
-      val bottom_is_strict: bool
+      val bottom: v
     end): sig
     val narrow : t -> t -> t
   end
