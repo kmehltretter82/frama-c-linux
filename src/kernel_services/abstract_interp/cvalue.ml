@@ -995,6 +995,9 @@ module V_Offsetmap = struct
     try `Value (OffsetmapNarrow.narrow_reinterpret x y)
     with NarrowReturnsBottom -> `Bottom
 
+  (* By default, skip bottom values. *)
+  let pretty_generic ?typ ?pretty_v ?(skip_v=V_Or_Uninitialized.is_bottom) =
+    pretty_generic ?typ ?pretty_v ~skip_v
 end
 
 module Default_offsetmap = struct

@@ -2051,9 +2051,9 @@ module Make
       | _ ->
         paste_slice_not_contiguous ~validity ~exact ~from:src ~size ~offsets dst
 
-  let skip_v v = V.equal V.bottom v
+  let default_skip _v = false
 
-  let pretty_generic ?typ ?(pretty_v=V.pretty_typ) ?(skip_v=skip_v) ?(sep=Unicode.inset_string ()) () fmt m =
+  let pretty_generic ?typ ?(pretty_v=V.pretty_typ) ?(skip_v=default_skip) ?(sep=Unicode.inset_string ()) () fmt m =
     let is_first = ref true in
     let pretty_binding fmt (bk, ek) (v, modu, rel_offs) =
       if not (skip_v v) then begin
