@@ -181,6 +181,7 @@ module V_Or_Uninitialized : sig
 
   val inject_or_bottom: t Lattice_bounds.or_bottom -> t
 
+  val bottom: t
   val is_bottom: t -> bool
 
   (** [is_initialized v = true] implies [v] is definitely initialized.
