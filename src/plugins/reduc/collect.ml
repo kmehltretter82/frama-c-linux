@@ -128,11 +128,11 @@ class inout_vis
       let zone = enumerate_bits (loc_of_varinfo vi) in
       Zone.intersects out zone
     in
-    let effect =
+    let stmt_effect =
       if self#is_first_stmt stmt then vars
       else List.filter filter_out vars
     in
-    let vars = List.fold_left collect_varinfo [] effect in
+    let vars = List.fold_left collect_varinfo [] stmt_effect in
     env := env_with_stmt_vars !env stmt vars;
     super#vstmt stmt
 end
