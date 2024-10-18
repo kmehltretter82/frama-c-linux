@@ -2776,7 +2776,7 @@ end
 
 
 module Make_bitwise(V: sig
-    include Lattice_type.Bounded_Join_Semi_Lattice
+    include Lattice_type.Join_Semi_Lattice
     include Lattice_type.With_Narrow with type t := t
     include Lattice_type.With_Top with type t := t
   end) = struct
@@ -2784,7 +2784,11 @@ module Make_bitwise(V: sig
   module Isotropic_Value = struct
     include V
     include FullyIsotropic
-    let merge_neutral_element = bottom
+
+    (* Should not be used on isotropic values anyway: [merge_distinct_bits] is
+       defined as [assert false] above. *)
+    let merge_neutral_element = top
+
     let pretty_typ _ fmt v = pretty fmt v
   end
 

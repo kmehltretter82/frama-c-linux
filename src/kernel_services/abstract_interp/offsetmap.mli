@@ -43,7 +43,7 @@ module Int_Intervals: Int_Intervals_sig.S
 (** Maps from intervals to simple values. The documentation of the returned
     maps is in module {!Offsetmap_bitwise_sig}. *)
 module Make_bitwise(V: sig
-    include Lattice_type.Bounded_Join_Semi_Lattice
+    include Lattice_type.Join_Semi_Lattice
     include Lattice_type.With_Narrow with type t := t
     include Lattice_type.With_Top with type t := t
   end) :
