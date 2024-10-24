@@ -610,7 +610,7 @@ input:checked + .dome-xSwitch-slider:before {
 /* -------------------------------------------------------------------------- */
 .dome-xPanel {
   position: absolute;
-  z-index: 50;
+  z-index: 1000;
   background-color: var(--background-intense);
   padding: 10px 5px;
   transition: transform .5s ease-in-out, opacity .5s;
@@ -706,5 +706,80 @@ input:checked + .dome-xSwitch-slider:before {
         background-color: var(--background-profound);
       }
     }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Tree                                                               --- */
+/* -------------------------------------------------------------------------- */
+@keyframes dome-xTree-arrow {
+  to { rotate: -90deg; fill:var(--activated-button-color); }
+}
+@keyframes dome-xTree-arrow-down { from { rotate: -90deg; } }
+
+.dome-xTree {
+  width: 100%;
+  background-color: var(--background-intense);
+  overflow-y: auto;
+  max-height: 100%;
+  padding-bottom: 5px;
+
+  li.dome-xTree-node {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    background-color: var(--background-intense);
+
+    &>div {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 2px;
+    }
+
+    &.dome-xTree-has-subtree {
+
+      &>div {
+        margin-top: 5px;
+        border-radius: 7px;
+        background-color: var(--background-softer);
+      }
+
+    }
+
+    &>div:hover,
+    &>div div:hover {
+      cursor: pointer;
+      background-color: var(--background-softer);
+    }
+
+    .dome-xTree-node-actions {
+      display: flex;
+      justify-content: center;
+      padding-left: 10px;
+    }
+
+    ul {
+      transition: max-height .3s linear;
+      margin-left: 7px;
+      overflow: hidden;
+
+      &:not(:has(ul)) {
+        border-left: solid 1px var(--background-softer);
+      }
+    }
+
+    &.dome-xTree-show-children {
+      &>div .dome-xTree-folding-button svg {
+        animation: dome-xTree-arrow-down .3s linear;
+      }
+    }
+    &.dome-xTree-hide-children {
+      &>div .dome-xTree-folding-button svg {
+        animation: forwards dome-xTree-arrow .3s linear;
+      }
+    }
+
   }
 }
