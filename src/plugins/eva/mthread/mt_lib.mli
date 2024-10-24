@@ -41,3 +41,8 @@ val mthread_h: unit -> Filepath.t
 
 (** Remove specialchars forbidden in file names *)
 val sanitize_filename: ?char:char -> string -> string
+
+(** Threading library stubbed by Mthread. *)
+type threads_lib =
+  | BuiltinsOnly (** Only Mthread built-ins are available. *)
+  | Pthreads (** Pthreads stubs and Mthread built-ins. *)

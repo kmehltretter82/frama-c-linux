@@ -22,6 +22,9 @@ module ToDiskPrefix: Parameter_sig.String
 (** behavior of option -mt-ignore-null. *)
 module IgnoreNull: Parameter_sig.Bool
 
+(** behavior of option -mt-threads-lib. *)
+module ThreadsLib: Parameter_sig.S with type t = Mt_lib.threads_lib
+
 (** behavior of option -mt-write-races. *)
 module WriteWriteRaces: Parameter_sig.Bool
 

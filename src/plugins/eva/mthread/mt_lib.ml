@@ -100,3 +100,7 @@ let sanitize_filename ?(char='_') s =
     | _ -> false
   in
   String.map (fun c -> if is_invalid c then char else c) s
+
+type threads_lib =
+  | BuiltinsOnly
+  | Pthreads
