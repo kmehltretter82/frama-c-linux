@@ -1,11 +1,12 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main_thread_loop
 [mt] New thread: <main>, fun main_thread_loop
 [eva] interferences.c:126: Frama_C_show_each_main_start: {0}, {0}
@@ -17,9 +18,9 @@
 [mt] interferences.c:130: Start thread joblooped
 [mt] interferences.c:130: 
   Thread joblooped, fun fjoblooped, parent <main>, args {0}
-[eva] FRAMAC_SHARE/mthread_pthread.c:13: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
-[eva] FRAMAC_SHARE/mthread_pthread.c:16: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
@@ -134,9 +135,9 @@
 [mt] interferences.c:130: 
   Thread joblooped, fun fjoblooped, parent <main>, args {0}
 [mt] interferences.c:130: Start thread joblooped
-[eva] FRAMAC_SHARE/mthread_pthread.c:13: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
-[eva] FRAMAC_SHARE/mthread_pthread.c:16: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0}, {0}
@@ -331,9 +332,9 @@
 [mt] interferences.c:130: Start thread joblooped
 [mt] interferences.c:130: 
   New context for joblooped, fun fjoblooped, parent <main>, args {0}
-[eva] FRAMAC_SHARE/mthread_pthread.c:13: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
-[eva] FRAMAC_SHARE/mthread_pthread.c:16: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1}
@@ -525,9 +526,9 @@
 [mt] interferences.c:130: Start thread joblooped
 [mt] interferences.c:130: 
   New context for joblooped, fun fjoblooped, parent <main>, args {0}
-[eva] FRAMAC_SHARE/mthread_pthread.c:13: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
-[eva] FRAMAC_SHARE/mthread_pthread.c:16: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, {0; 1; 2}
@@ -718,9 +719,9 @@
 [mt] interferences.c:130: Start thread joblooped
 [mt] interferences.c:130: 
   New context for joblooped, fun fjoblooped, parent <main>, args {0}
-[eva] FRAMAC_SHARE/mthread_pthread.c:13: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
-[eva] FRAMAC_SHARE/mthread_pthread.c:16: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
@@ -922,9 +923,9 @@
 [mt] interferences.c:130: 
   Thread joblooped, fun fjoblooped, parent <main>, args {0}
 [mt] interferences.c:130: Start thread joblooped
-[eva] FRAMAC_SHARE/mthread_pthread.c:13: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:17: Warning: 
   The thread joblooped is already registered.
-[eva] FRAMAC_SHARE/mthread_pthread.c:16: Warning: 
+[eva] FRAMAC_SHARE/mt/mthread_pthread.c:20: Warning: 
   The thread joblooped is already running.
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]
 [eva] interferences.c:135: Frama_C_show_each_main_end: {0; 1}, [0..2147483647]

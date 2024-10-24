@@ -1,11 +1,12 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing interferences.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] New thread: <interrupt_handler interrupt>, fun interrupt
@@ -665,8 +666,6 @@
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:31 (for shared_a; shared_b; shared_c)
-  interferences.c:56 (for shared_a; shared_b; shared_c)
   interferences.c:30 (for shared_c)
   interferences.c:28 (for shared_a; shared_b; shared_c)
   interferences.c:52 (for shared_c)
@@ -680,6 +679,8 @@
   interferences.c:16 (for shared_a; shared_b; shared_c)
   interferences.c:36 (for shared_a; shared_b; shared_c)
   interferences.c:14 (for shared_a; shared_b; shared_c)
+  interferences.c:31 (for shared_a; shared_b; shared_c)
+  interferences.c:56 (for shared_a; shared_b; shared_c)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
 [mt] *** Computing thread <main>, iteration 3
@@ -1109,8 +1110,6 @@
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:31 (for shared_a; shared_b; shared_c)
-  interferences.c:56 (for shared_a; shared_b; shared_c)
   interferences.c:30 (for shared_c)
   interferences.c:28 (for shared_a; shared_b; shared_c)
   interferences.c:52 (for shared_c)
@@ -1124,6 +1123,8 @@
   interferences.c:16 (for shared_a; shared_b; shared_c)
   interferences.c:36 (for shared_a; shared_b; shared_c)
   interferences.c:14 (for shared_a; shared_b; shared_c)
+  interferences.c:31 (for shared_a; shared_b; shared_c)
+  interferences.c:56 (for shared_a; shared_b; shared_c)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
 [mt] *** Computing thread <main>, iteration 4
@@ -1541,8 +1542,6 @@
     Read by <main>, Write by job3: unprotected
     Read by <main>, Write by job2: unprotected
 [mt] Statements needing manual synchronisation
-  interferences.c:31 (for shared_a; shared_b; shared_c)
-  interferences.c:56 (for shared_a; shared_b; shared_c)
   interferences.c:30 (for shared_c)
   interferences.c:28 (for shared_a; shared_b; shared_c)
   interferences.c:52 (for shared_c)
@@ -1556,5 +1555,7 @@
   interferences.c:16 (for shared_a; shared_b; shared_c)
   interferences.c:36 (for shared_a; shared_b; shared_c)
   interferences.c:14 (for shared_a; shared_b; shared_c)
+  interferences.c:31 (for shared_a; shared_b; shared_c)
+  interferences.c:56 (for shared_a; shared_b; shared_c)
 [mt] ***** Shared variables computed
 [mt] ******* Analysis performed, 4 iterations

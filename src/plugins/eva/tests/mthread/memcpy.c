@@ -4,8 +4,9 @@
 
 // Make sure that Mthread respects options -val-builtin and -val-use-spec
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
+#include <mthread.h>
 
 pthread_t        tjob0, tjob1, tjob2;
 int shared;

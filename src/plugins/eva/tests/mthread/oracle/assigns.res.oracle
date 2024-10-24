@@ -1,11 +1,12 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing assigns.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] assigns.c:30: New thread: jobs1, fun f1, parent <main>, args {0}
@@ -18,10 +19,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -110,10 +111,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -238,10 +239,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -362,10 +363,10 @@
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   jobs1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:30 <- main
   jobs2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: assigns.c:31 <- main
 [mt] * shared variables computed
 [eva:interferences] 

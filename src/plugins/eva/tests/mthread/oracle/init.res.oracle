@@ -1,11 +1,11 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with builtins only
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
 [kernel] Parsing init.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] init.c:22: Initializing mutex locks[0]

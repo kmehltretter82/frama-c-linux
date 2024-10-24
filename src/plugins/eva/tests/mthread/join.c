@@ -1,6 +1,5 @@
-#include "mthread_pthread.h"
-#include "mthread_queue.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 
 
 pthread_mutex_t*  lock;
@@ -9,10 +8,12 @@ pthread_t        th2;
 
 void *t1 (void* _) {
   pthread_exit((void*) 1);
+  return NULL;
 }
 
 void *t2 (void* _) {
   pthread_exit((void*) 2);
+  return NULL;
 }
 
 

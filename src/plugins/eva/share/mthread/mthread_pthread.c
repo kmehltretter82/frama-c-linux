@@ -6,7 +6,11 @@
 /*                                                                        */
 /**************************************************************************/
 
-#include "mthread_pthread.h"
+/* Stubs for analyzing programs using the POSIX threads library
+   Redefining useful parts of pthread.h */
+
+#include <mthread.h>
+#include <pthread.h>
 
 int pthread_create(pthread_t *thread, const pthread_attr_t *attr,
                    void *(*start_routine)(void *), void *arg) {
@@ -31,7 +35,7 @@ int pthread_mutex_init(pthread_mutex_t *restrict mutex,
                        const pthread_mutexattr_t *restrict attr) {
   int result = Frama_C_mutex_init(mutex);
   if (result > 0) {
-    *mutex = result;
+    mutex->_fc = result;
     return 0;
   } else {
     return 22; /* EINVAL */
@@ -39,17 +43,17 @@ int pthread_mutex_init(pthread_mutex_t *restrict mutex,
 }
 
 int pthread_mutex_lock(pthread_mutex_t *mutex) {
-  int result = Frama_C_mutex_lock(*mutex);
+  int result = Frama_C_mutex_lock(mutex->_fc);
   return (result != -1 ? 0 : 22 /* EINVAL */);
 }
 
 int pthread_mutex_trylock(pthread_mutex_t *mutex) {
-  int result = Frama_C_mutex_lock(*mutex);
+  int result = Frama_C_mutex_lock(mutex->_fc);
   return (result != -1 ? 0 : 22 /* EINVAL */);
 }
 
 int pthread_mutex_unlock(pthread_mutex_t *mutex) {
-  int result = Frama_C_mutex_unlock(*mutex);
+  int result = Frama_C_mutex_unlock(mutex->_fc);
   return (result != -1 ? 0 : 22 /* EINVAL */);
 }
 

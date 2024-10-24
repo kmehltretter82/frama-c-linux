@@ -5,16 +5,14 @@
   until the ---- line and then run the following command to generate the log
   file and the HTML summary:
 
-  frama-c -mthread -eva-domains mthread -mt-shared-values 2 \
+  frama-c -mthread -mt-threads-lib pthreads -mt-shared-values 2 \
     -mt-shared-accesses-synchronization \
-    -cpp-extra-args="-I$(frama-c-config -print-share-path)/mt" \
-    $(frama-c-config -print-share-path)/mt/mthread_pthread.c \
     -eva-verbose 0 -mt-extract html \
     -eva-slevel 15 matrix2.c > output.txt
 */
 /* -------------------------------------------------------------------------- */
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 #define S 150
 #define N 5
 

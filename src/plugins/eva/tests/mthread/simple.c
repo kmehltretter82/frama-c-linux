@@ -4,8 +4,8 @@
    STDOPT: +"-mt-full-cfg @LOG_MT_DOT_FILES_OPTS@"
 */
 
-#include "mthread_pthread.h"
-#define NULL (void*)0
+#include <stddef.h>
+#include <pthread.h>
 
 int a, b, c, d, e, v;
 

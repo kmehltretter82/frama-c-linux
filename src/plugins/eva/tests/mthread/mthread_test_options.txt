@@ -1,15 +1,12 @@
 # Parameters of the mthread tests, shared by all test configurations.
 
 -mthread
--eva-domains mthread
 -eva-slevel 15
 -mt-shared-values 2
 -mt-shared-accesses-synchronization
 # Parsing
--add-symbolic-path ../../../share/mthread:FRAMAC_SHARE
--cpp-extra-args -I../../../share/mthread
-../../../share/mthread/mthread_pthread.c
-../../../share/mthread/mthread_queue.c
+-mt-threads-lib pthreads
+-add-symbolic-path ../../../share/mthread:"FRAMAC_SHARE/mt"
 # Verbosity options
 -mt-verbose 3
 -eva-verbose 1

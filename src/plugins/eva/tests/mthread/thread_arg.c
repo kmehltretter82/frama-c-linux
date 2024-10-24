@@ -12,8 +12,8 @@
 */
 
 #include <stddef.h>
+#include <pthread.h>
 #include <__fc_builtin.h>
-#include "mthread_pthread.h"
 
 #define N 2
 pthread_mutex_t locks[N];

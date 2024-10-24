@@ -1,17 +1,18 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing nice_offsets.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
-[mt] nice_offsets.c:20: Initializing mutex t[0].a1
-[mt] nice_offsets.c:21: Initializing mutex t[1].b1[2].a0
-[mt] nice_offsets.c:22: Initializing mutex t[1].b1[4].b0
-[mt] nice_offsets.c:23: Initializing mutex t[2].c1
+[mt] nice_offsets.c:19: Initializing mutex t[0].a1
+[mt] nice_offsets.c:20: Initializing mutex t[1].b1[2].a0
+[mt] nice_offsets.c:21: Initializing mutex t[1].b1[4].b0
+[mt] nice_offsets.c:22: Initializing mutex t[2].c1
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

@@ -1,14 +1,14 @@
 /* run.config*
    EXIT: 1
-   STDOPT:
+   STDOPT: @PTEST_SHARE_DIR@/mthread/mthread_queue.c
  */
 /* This example tests a very specific error message withing message, a call
    through a function pointer calls simultaneously a standard function
    and an mthread function. */
 
-#include "mthread_pthread.h"
+#include <stddef.h>
+#include <pthread.h>
 #include "mthread_queue.h"
-#define NULL ((void*)0)
 void** q;
 pthread_t        th1, th2;
 int random(void);

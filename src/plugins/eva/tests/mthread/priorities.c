@@ -1,5 +1,6 @@
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
+#include <mthread.h>
 
 int s1 = 0;
 int s2 = 0;

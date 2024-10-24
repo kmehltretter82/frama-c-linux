@@ -1,7 +1,7 @@
 /* run.config*
-  STDOPT: +"-main main_interrupt_one_shot -mt-interrupt-handlers interrupt_oneshot"
-  STDOPT: +"-main main_interrupt_incr -mt-interrupt-handlers interrupt_incr"
-  STDOPT: +"-main main_interrupt_cross_incr -mt-interrupt-handlers interrupt_cross_incr1,interrupt_cross_incr2"
+  STDOPT: +"-main main_interrupt_one_shot -mt-interrupt-handlers interrupt_oneshot -mt-threads-lib builtins-only"
+  STDOPT: +"-main main_interrupt_incr -mt-interrupt-handlers interrupt_incr -mt-threads-lib builtins-only"
+  STDOPT: +"-main main_interrupt_cross_incr -mt-interrupt-handlers interrupt_cross_incr1,interrupt_cross_incr2 -mt-threads-lib builtins-only"
 */
 int interrupt_received;
 

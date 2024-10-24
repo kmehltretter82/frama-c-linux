@@ -1,11 +1,12 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing manysharedvars.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
 [mt] manysharedvars.c:42: Initializing mutex lock
@@ -64,9 +65,9 @@
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}: read by <main> at manysharedvars.c:48 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
+    read by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
       pthread_mutex_lock :: manysharedvars.c:46 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
+    read by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:49 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -140,9 +141,9 @@
     read by jobs at manysharedvars.c:30 <- f
     write by jobs at manysharedvars.c:30 <- f
   lock:
-    read by jobs at FRAMAC_SHARE/mthread_pthread.c:42 <-
+    read by jobs at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
       pthread_mutex_lock :: manysharedvars.c:28 <- f
-    read by jobs at FRAMAC_SHARE/mthread_pthread.c:52 <-
+    read by jobs at FRAMAC_SHARE/mt/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:31 <- f
 [mt] * shared variables computed
 [eva:interferences] 
@@ -230,9 +231,9 @@
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}: read by <main> at manysharedvars.c:48 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
+    read by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
       pthread_mutex_lock :: manysharedvars.c:46 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
+    read by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:49 <- main
 [mt] * shared variables computed
 [eva:interferences] 
@@ -310,9 +311,9 @@
     read by jobs at manysharedvars.c:30 <- f
     write by jobs at manysharedvars.c:30 <- f
   lock:
-    read by jobs at FRAMAC_SHARE/mthread_pthread.c:42 <-
+    read by jobs at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
       pthread_mutex_lock :: manysharedvars.c:28 <- f
-    read by jobs at FRAMAC_SHARE/mthread_pthread.c:52 <-
+    read by jobs at FRAMAC_SHARE/mt/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:31 <- f
 [mt] * shared variables computed
 [eva:interferences] 
@@ -2314,9 +2315,9 @@
     [122].data2; [123].data2; [124].data2; [125].data2; [126].data2;
     [127].data2}: read by <main> at manysharedvars.c:48 <- main
   lock:
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:42 <-
+    read by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:46 <-
       pthread_mutex_lock :: manysharedvars.c:46 <- main
-    read by <main> at FRAMAC_SHARE/mthread_pthread.c:52 <-
+    read by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:56 <-
       pthread_mutex_unlock :: manysharedvars.c:49 <- main
 [mt] * shared variables computed
 [eva:interferences] 

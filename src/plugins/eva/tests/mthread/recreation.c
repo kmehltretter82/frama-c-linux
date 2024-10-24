@@ -2,8 +2,8 @@
    manner (all thread uses the function main, but depending on their
    argument, they create other threads or not) */
 
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 #define N 3
 #define P N*N+N
 

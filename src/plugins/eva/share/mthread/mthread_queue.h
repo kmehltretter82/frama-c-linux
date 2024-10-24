@@ -11,10 +11,10 @@
 
 #include <mthread.h>
 
-typedef int msgqueue_t;
+typedef __fc_mthread_id msgqueue_t;
 
-int queuecreate(__fc_mthread_name q, int size);
-int msgsnd(int msgqid, const char *mess, int size);
-int msgrcv(int msgqid, int size, char *mess);
+int queuecreate(msgqueue_t *q, int size);
+int msgsnd(msgqueue_t msgqid, const char *mess, int size);
+int msgrcv(msgqueue_t msgqid, int size, char *mess);
 
 #endif

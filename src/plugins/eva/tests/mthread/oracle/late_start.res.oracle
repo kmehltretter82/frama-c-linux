@@ -1,15 +1,16 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing late_start.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
-[mt] late_start.c:31: New thread: job1, fun f1, parent <main>, args {0}
-[mt] late_start.c:32: New thread: job2, fun f2, parent <main>, args {0}
+[mt] late_start.c:32: New thread: job1, fun f1, parent <main>, args {0}
+[mt] late_start.c:33: New thread: job2, fun f2, parent <main>, args {0}
 [mt] Start thread job2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
@@ -34,12 +35,12 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of f2 for thread job2
-[mt] late_start.c:26: Start thread job1
+[mt] late_start.c:27: Start thread job1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
-  job1: read by job2 at late_start.c:26 <- f2
+  job1: read by job2 at late_start.c:27 <- f2
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread job2

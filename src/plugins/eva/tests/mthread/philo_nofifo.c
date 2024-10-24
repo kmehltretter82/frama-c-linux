@@ -1,8 +1,8 @@
 /* Simple dining philosophers example.
    No messages are exchanged between the merry company at the table.
 */
-#include "mthread_pthread.h"
-#define NULL ((void*)0)
+#include <stddef.h>
+#include <pthread.h>
 #define N 5
 
 pthread_mutex_t  locks[N];

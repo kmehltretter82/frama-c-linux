@@ -1,28 +1,29 @@
 [kernel] Expanding arguments from mthread_test_options.txt
-[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[mt] Preparing sources for Mthread with lib pthreads
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mt/mthread_pthread.c (with preprocessing)
 [kernel] Parsing join.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
-[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
+[eva] Found concurrency builtins: enabling mthread domain
 [eva] Analyzing a complete application starting at main
 [mt] New thread: <main>, fun main
-[mt] join.c:20: New thread: th1, fun t1, parent <main>, args {0}
-[mt] join.c:20: Start thread th1
-[mt] join.c:21: New thread: th2, fun t2, parent <main>, args {0}
-[mt] join.c:21: Start thread th2
+[mt] join.c:21: New thread: th1, fun t1, parent <main>, args {0}
+[mt] join.c:21: Start thread th1
+[mt] join.c:22: New thread: th2, fun t2, parent <main>, args {0}
+[mt] join.c:22: Start thread th2
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
 [mt] Globals accessed by thread:
   th1:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
-      pthread_create :: join.c:20 <- main
-  th2:
-    write by <main> at FRAMAC_SHARE/mthread_pthread.c:15 <-
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
       pthread_create :: join.c:21 <- main
+  th2:
+    write by <main> at FRAMAC_SHARE/mt/mthread_pthread.c:19 <-
+      pthread_create :: join.c:22 <- main
 [mt] * shared variables computed
 [eva:interferences] 
   Interferences from thread <main>
@@ -40,7 +41,7 @@
 [eva] Initial state supplied by user
 [eva:interferences] 
   inject threads interferences at the start of t1 for thread th1
-[mt] join.c:11: Thread exiting with value {1}
+[mt] join.c:10: Thread exiting with value {1}
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
