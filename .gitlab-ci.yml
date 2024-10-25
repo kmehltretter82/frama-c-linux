@@ -21,7 +21,7 @@ default:
 ### VARIABLES
 
 variables:
-  DEFAULT: "master"
+  DEFAULT: "stable/zinc"
   OCAML: "4.14"
   NODE: "22"
   PUBLISH: "no"
