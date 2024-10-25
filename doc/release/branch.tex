@@ -9,23 +9,6 @@ Create the milestone for the next releases on \textsf{Gitlab},
 in the Frama-C group. They will be used for development that will not
 be integrated into the upcoming release.
 \expertise{François, Julien}.
-
-\section{``Freezing'' master}
-
-When the ``freeze'' period arrives (usually a few weeks before the beta
-release), the release manager may decide to prevent direct merges to the
-\texttt{master} branch, until the \texttt{stable} branch is created. If so, then
-the branch should be protected such that Developers can no longer push and merge
-to it, without asking for a Maintainer to do it. In Gitlab, this is done via:
-Frama-C project $\rightarrow$ Settings $\rightarrow$ Repository $\rightarrow$
-Protected Branches.\\
-
-\textbf{The \texttt{master} branch must be protected \emph{at all times}.
-  Parameters
-  \texttt{Allowed to merge} and \texttt{Allowed to push} must be set to
-  \texttt{Developers + Maintainers} during non-freeze times, and to
-  \texttt{Maintainers} during freeze time.}
-
 \section{Creating the branch}
 
 \textbf{Note:} You must be member of the GitLab groups "frama-c", "dev" and have
@@ -56,6 +39,17 @@ allowed to push/merge).
 
 \textbf{Note:} If there are still merge requests tagged for this release, make
 sure to set their targeted branch to \texttt{stable/release}.
+
+\section{Retargeting Merge Requests}
+
+Another command of \texttt{frama-ci} allows retargeting
+the opened merge requests associated to the milestone corresponding
+to this release so that they will be merged to \texttt{stable/release}
+and not \texttt{master}. Run the command
+\begin{shell}
+frama-ci-retarget-merge-requests --token=$TOKEN \
+--branch=stable/release --milestone="number (release)"
+\end{shell}
 
 \section{GitLab issues}
 
