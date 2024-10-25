@@ -714,7 +714,12 @@ module Make
     in
     cast_integer Alarms.Signed_downcast expr ~src ~dst value
 
-  let cast_int_to_int context expr ~ptr ~src ~dst value =
+  (* The type of alarms emitted for a conversion depends on whether the source
+     type is an integer or a pointer. As a special case, conversions from a
+     pointer type to "intptr_t" or "uintptr_t" never lead to alarms. *)
+  type conversion_alarm = IntDowncast | PtrDowncast | NoAlarm
+
+  let cast_int_to_int context expr ~alarm ~src ~dst value =
     (* Regain some precision in case a transfer function was imprecise.
        This should probably be done in the transfer function, though. *)
     let value =
@@ -722,17 +727,19 @@ module Make
       then Value.rewrap_integer context src value
       else value
     in
-    if Eval_typ.range_inclusion src dst
-    then return value (* Upcast, nothing to check. *)
+    if Eval_typ.range_inclusion src dst then
+      return value (* Upcast, nothing to check. *)
     else
       let overflow_kind, warn =
-        if ptr
-        then Alarms.Pointer_downcast, Kernel.PointerDowncast.get
-        else if dst.i_signed
-        then Alarms.Signed_downcast, Kernel.SignedDowncast.get
-        else Alarms.Unsigned_downcast, Kernel.UnsignedDowncast.get
+        match alarm with
+        | NoAlarm -> Alarms.Pointer_downcast, false
+        | PtrDowncast -> Alarms.Pointer_downcast, Kernel.PointerDowncast.get ()
+        | IntDowncast ->
+          if dst.i_signed
+          then Alarms.Signed_downcast, Kernel.SignedDowncast.get ()
+          else Alarms.Unsigned_downcast, Kernel.UnsignedDowncast.get ()
       in
-      if warn ()
+      if warn
       then cast_integer overflow_kind expr ~src ~dst value
       else if dst.i_signed && Parameters.WarnSignedConvertedDowncast.get ()
       then relaxed_signed_downcast context expr ~src ~dst value
@@ -776,18 +783,23 @@ module Make
     let bound_kind = Alarms.Lower_bound in
     truncate_float_bound fkind min_bound bound_kind expr value
 
-  let forward_cast context ~dst expr value =
+  let forward_cast context ~dst_typ expr value =
     let open Evaluated.Operators in
-    let src = expr.typ in
-    match Eval_typ.(classify_as_scalar src, classify_as_scalar dst) with
+    let src_typ = expr.typ in
+    match Eval_typ.(classify_as_scalar src_typ, classify_as_scalar dst_typ) with
     | None, _ | _, None -> return value (* Unclear whether this happens. *)
     | Some src_type, Some dst_type ->
       let& value =
         match src_type, dst_type with
         | TSPtr src, TSInt dst ->
-          cast_int_to_int context ~ptr:true ~src ~dst expr value
+          let alarm =
+            if Cil.is_intptr_t dst_typ || Cil.is_uintptr_t dst_typ
+            then NoAlarm
+            else PtrDowncast
+          in
+          cast_int_to_int context ~alarm ~src ~dst expr value
         | TSInt src, (TSInt dst | TSPtr dst) ->
-          cast_int_to_int context ~ptr:false ~src ~dst expr value
+          cast_int_to_int context ~alarm:IntDowncast ~src ~dst expr value
         | TSFloat src, (TSInt dst | TSPtr dst)  ->
           let reduce = true and assume_finite = true in
           let* value = restrict_float ~reduce ~assume_finite expr src value in
@@ -955,10 +967,10 @@ module Make
       let v = handle_overflow ~may_overflow env.context expr typ v in
       compute_reduction v (volatile1 || volatile2)
 
-    | CastE (dst, e) ->
+    | CastE (dst_typ, e) ->
       let* value, volatile = root_forward_eval env e in
-      let v = forward_cast env.context ~dst e value in
-      let v = match Cil.unrollType dst with
+      let v = forward_cast env.context ~dst_typ e value in
+      let v = match Cil.unrollType dst_typ with
         | TFloat (fkind, _) -> let* v in remove_special_float expr fkind v
         | TPtr _ -> let* v in assume_pointer env.context expr v
         | _ -> v

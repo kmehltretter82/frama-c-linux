@@ -6,6 +6,9 @@
    STDOPT: +"-lib-entry -no-warn-signed-downcast -no-warn-unsigned-downcast -no-warn-pointer-downcast"
 */
 
+#include <__fc_builtin.h>
+#include <stdint.h>
+
 signed char sx,sy,sz;
 unsigned char uc;
 int x;
@@ -45,22 +48,41 @@ void main3_reduction() {
   unsigned char d = y;
 }
 
-/* The cvalue abstraction does not represent how an address is represented in a
-   C type. Thus alarms should always be emitted on a downcast of pointer values,
-   as we don't known if they fit in the destination type. */
+/* Tests conversions of pointer values to various integer types. */
 void main4_pointer() {
-  int x;
-  long long int p = (long long int)(&x);
-  p += 100;
-  unsigned int q = p;
-  signed int r = p;
+  int x, a[10];
+  int i = Frama_C_interval(0, 9);
+  int *p = &x;
+  if (v) p = &a[i];
+  if (v) p = 0;
+  int *q = p + i; // Invalid pointer.
+  /* On conversions below, no alarm should be emitted as all pointer values
+     fit in the destination type. */
+  long long int lli = (long long int)p;
+  lli = (long long int)q;
+  unsigned int ui = (unsigned int)p;
+  ui = (unsigned int)q;
+  /* On conversions below, downcast alarms must be emitted as all pointers do
+     not fit into the destination type. [q] and [p] cannot be reduced. */
+  signed int si = (signed int)p;
+  si = (signed int)q;
+  unsigned short us = (unsigned short)p;
+  us = (unsigned short)q;
+  char c = (char)p;
+  c = (char)q;
+  /* No alarm should be emitted as pointer values can always be converted to
+     "uintptr_t" or "intptr_t", even if all pointer values do not fit in it. */
+  uintptr_t uintptr = (uintptr_t)p;
+  uintptr = (uintptr_t)q;
+  intptr_t intptr = (intptr_t)p;
+  intptr = (intptr_t)q;
 }
 
 // Perform a computation that overflows on signed integers without alarm. The assertions can be proven with enough slevel
 void main5_wrap_signed() {
   int x = v;
   //@ assert ASSUME: x >= 100000;
-  //@ assert x > 0x7FFFFFFF-145 || x <= 0x7FFFFFFF-145; 
+  //@ assert x > 0x7FFFFFFF-145 || x <= 0x7FFFFFFF-145;
   unsigned int y = x;
   y += 145;
   int z = y;

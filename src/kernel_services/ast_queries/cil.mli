@@ -416,6 +416,16 @@ val isIntegralType: typ -> bool
 *)
 val isBoolType: typ -> bool
 
+(** True if the argument is [intptr_t] (but _not_ its underlying integer type)
+    @since Frama-C+dev
+*)
+val is_intptr_t: typ -> bool
+
+(** True if the argument is [uintptr_t] (but _not_ its underlying integer type)
+    @since Frama-C+dev
+*)
+val is_uintptr_t: typ -> bool
+
 (** True if the argument is [_Bool] or [boolean].
     @since 19.0-Potassium
 *)
