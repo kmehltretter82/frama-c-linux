@@ -167,7 +167,7 @@ type toplevel_predicate =
   { tp_kind: Cil_types.predicate_kind; tp_statement: lexpr }
 
 (** ACSL extension.
-    @before Frama-C+dev Was of type [string * lexpr list].
+    @before 30.0-Zinc Was of type [string * lexpr list].
 *)
 type extension = {
   ext_name: string;
@@ -199,7 +199,7 @@ type loader = {
   loader_plugin: string;
 }
 (** loader type used by module importers.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 (** global declarations. *)
@@ -306,7 +306,7 @@ and variant = lexpr * string option
 (** Global ACSL extension. *)
 and global_extension =
   | Ext_lexpr of extension
-  (** @before Frama-C+dev Was of type [string * lexpr list]. *)
+  (** @before 30.0-Zinc Was of type [string * lexpr list]. *)
 
   | Ext_extension of {
       gext_name:string;
@@ -314,7 +314,7 @@ and global_extension =
       gext_kind: string;
       gext_content: extended_decl list;
     }
-  (** @before Frama-C+dev Was of type [string * string * extended_decl list]. *)
+  (** @before 30.0-Zinc Was of type [string * string * extended_decl list]. *)
 
 and extended_decl = {
   extended_node : global_extension;

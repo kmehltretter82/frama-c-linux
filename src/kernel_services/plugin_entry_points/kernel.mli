@@ -429,7 +429,7 @@ module Session_dir: Parameter_sig.User_dir
 
 module Cache_dir: Parameter_sig.User_dir
 (** Directory in which cache files are searched.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 module Config_dir: Parameter_sig.User_dir
@@ -440,7 +440,7 @@ module Config_dir: Parameter_sig.User_dir
 
 module State_dir: Parameter_sig.User_dir
 (** Directory in which state files are searched.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 (* this stop special comment does not work as expected (and as explained in the

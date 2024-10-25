@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+###############################################################################
+Open Source Release 30.0 (Zinc)
+###############################################################################
+
 -   Kernel    [2024-10-15] Warn when encountering an unknown attribute
 o!  Kernel    [2024-10-08] introduce logic type Lboolean and constants
 -   Kernel    [2024-10-08] Asm contracts can now have \initialized ensures.

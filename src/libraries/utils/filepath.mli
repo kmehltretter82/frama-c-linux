@@ -207,7 +207,7 @@ type position =
   }
 
 (** Empty position, used as 'dummy' for [Cil_datatype.Position].
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val empty_pos : position
 
@@ -217,7 +217,7 @@ val empty_pos : position
 val pp_pos : Format.formatter -> position -> unit
 
 (** Return true if the given position is the empty position.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val is_empty_pos : position -> bool
 

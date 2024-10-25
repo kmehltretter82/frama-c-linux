@@ -1693,7 +1693,7 @@ and spec = {
 and acsl_extension = {
   ext_id : int;
   ext_name : string;
-  ext_plugin : string; (** @since Frama-C+dev *)
+  ext_plugin : string; (** @since 30.0-Zinc *)
   ext_loc : location;
   ext_has_status : bool;
   ext_kind : acsl_extension_kind
@@ -1796,7 +1796,7 @@ and code_annotation = {
 and funbehavior = behavior
 
 (** loader type used by Dmodules.
-    @since Frama-c+dev
+    @since 30.0-Zinc
 *)
 and loader = {
   loader_name: string;

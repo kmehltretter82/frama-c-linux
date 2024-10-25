@@ -45,30 +45,30 @@ module type S_no_log = sig
 
   (** Handle the specific `share' directory of the plug-in.
       @since Oxygen-20120901
-      @before Frama-C+dev more modes were allowed
+      @before 30.0-Zinc more modes were allowed
   *)
   module Share: Parameter_sig.Site_root
 
   (** Handle the specific `session' directory of the plug-in.
       @since Neon-20140301
-      @before Frama-C+dev Session was a Specific_dir.
+      @before 30.0-Zinc Session was a Specific_dir.
   *)
   module Session: Parameter_sig.User_dir_opt
 
   (** Handle the specific `cache' directory of the plug-in.
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module Cache_dir (): Parameter_sig.User_dir_opt
 
   (** Handle the specific `config' directory of the plug-in.
       @since Neon-20140301
-      @before Frama-C+dev this was not a functor and one could expect the
+      @before 30.0-Zinc this was not a functor and one could expect the
               directory to exist
   *)
   module Config_dir (): Parameter_sig.User_dir_opt
 
   (** Handle the specific `state' directory of the plug-in.
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module State_dir (): Parameter_sig.User_dir_opt
 

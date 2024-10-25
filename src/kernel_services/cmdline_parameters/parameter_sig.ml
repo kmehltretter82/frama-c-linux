@@ -329,7 +329,7 @@ end
     unique, and these are considered as installed files (although the user might
     provide another location).
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 module type Site_dir = sig
   val get_dir: string -> Filepath.Normalized.t
@@ -353,7 +353,7 @@ end
 
 (** Dune site roots (share, lib, ...).
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 module type Site_root = sig
   val set: Filepath.Normalized.t -> unit
@@ -373,7 +373,7 @@ end
     provided in {!Plugin}, namely {!Plugin.Session}, {!Plugin.Cache_dir},
     {!Plugin.Config_dir} and {!Plugin.State_dir}.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 module type User_dir = sig
   val get_dir: ?create_path:bool -> string -> Filepath.Normalized.t
@@ -401,7 +401,7 @@ end
 
 (** Basically {!User_dir} but with an option to override the original path.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 module type User_dir_opt = sig
   include User_dir
@@ -633,7 +633,7 @@ module type Builder = sig
   (** Builds a {!Site_dir} from an existing one. The first parameter is the
       parent directory. The second gives the name of the directory to create.
 
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module Make_site_dir
       (_: Site_dir)
@@ -644,7 +644,7 @@ module type Builder = sig
   (** Builds a {!User_dir} from an existing one. The first parameter is the
       parent directory. The second gives the name of the directory to create.
 
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module Make_user_dir
       (_: User_dir)
@@ -656,7 +656,7 @@ module type Builder = sig
       create (also used to create the option name), a possible environment
       variable name and the help message for the option.
 
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module Make_user_dir_opt
       (_: User_dir)

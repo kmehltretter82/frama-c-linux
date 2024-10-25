@@ -544,7 +544,7 @@ struct
   (** Builds a Site_dir from an existing one. The corresponding directory always
       performs a full path resolution.
 
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module Make_site_dir
       (Parent: Parameter_sig.Site_dir)
@@ -560,7 +560,7 @@ struct
 
   (** Builds a User_dir from an existing one.
 
-      @since Frama-C+dev
+      @since 30.0-Zinc
   *)
   module Make_user_dir
       (Parent: Parameter_sig.User_dir)

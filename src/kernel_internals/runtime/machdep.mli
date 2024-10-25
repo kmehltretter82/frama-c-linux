@@ -94,10 +94,10 @@ type mach = {
   machdep_name: string; (** name of the machdep *)
   custom_defs: (string * string) list; (** sequence of key/value for C macros *)
 } [@@deriving yaml]
-(** @since Frama-C+dev  *)
+(** @since 30.0-Zinc  *)
 
 module Machdep: Datatype.S_with_collections with type t = mach
-(** @since Frama-C+dev  *)
+(** @since 30.0-Zinc  *)
 
 (* ***********************************************************************)
 (** {2 Compiler }                                                        *)
@@ -105,16 +105,16 @@ module Machdep: Datatype.S_with_collections with type t = mach
 
 val msvcMode: mach -> bool
 (** Short for [machdep.compiler = "msvc"]
-    @since Frama-C+dev  *)
+    @since 30.0-Zinc  *)
 
 val gccMode: mach -> bool
 (** Short for [machdep.compiler = "gcc"]
-    @since Frama-C+dev  *)
+    @since 30.0-Zinc  *)
 
 val allowed_machdep: string -> string
 (** [allowed_machdep "machdep family"] provides a standard message for features
     only allowed for a particular machdep.
-    @since Frama-C+dev  *)
+    @since 30.0-Zinc  *)
 
 (* ***********************************************************************)
 (** {2 Generation }                                                      *)

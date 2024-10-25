@@ -39,7 +39,7 @@
     A common ancestor (or child) of a list of statements is a (post)dominator
     that (post)dominates all the statements
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 open Cil_types
@@ -87,7 +87,7 @@ val get_ipostdom : stmt -> stmt option
 
 val nearest_common_ancestor : stmt list -> stmt option
 (** Return the closest common ancestor of the given statement list.
-    @before Frama-C+dev previous implementation always returned a statement and
+    @before 30.0-Zinc previous implementation always returned a statement and
     raised a failed assertion in case of unreachable statement.
 *)
 

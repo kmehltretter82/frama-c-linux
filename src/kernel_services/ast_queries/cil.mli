@@ -58,23 +58,23 @@ open Cil_datatype
 
 type theMachine = Machine.machine
 
-(** @deprecated Frama-C+dev *)
+(** @deprecated 30.0-Zinc *)
 val theMachine : theMachine
 [@@alert deprecated "Use Machine getter functions instead"]
 
-(** @deprecated Frama-C+dev *)
+(** @deprecated 30.0-Zinc *)
 val msvcMode: unit -> bool
 [@@alert deprecated "Use Machine.msvcMode instead"]
 
-(** @deprecated Frama-C+dev *)
+(** @deprecated 30.0-Zinc *)
 val gccMode: unit -> bool
 [@@alert deprecated "Use Machine.gccMode instead"]
 
-(** @deprecated Frama-C+dev *)
+(** @deprecated 30.0-Zinc *)
 val set_acceptEmptyCompinfo: unit -> unit
 [@@alert deprecated "Use Machine.set_acceptEmptyCompinfo instead"]
 
-(** @deprecated Frama-C+dev *)
+(** @deprecated 30.0-Zinc *)
 val acceptEmptyCompinfo: unit -> bool
 [@@alert deprecated "Use Machine.acceptEmptyCompinfo instead"]
 
@@ -417,12 +417,12 @@ val isIntegralType: typ -> bool
 val isBoolType: typ -> bool
 
 (** True if the argument is [intptr_t] (but _not_ its underlying integer type)
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val is_intptr_t: typ -> bool
 
 (** True if the argument is [uintptr_t] (but _not_ its underlying integer type)
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val is_uintptr_t: typ -> bool
 
@@ -1161,7 +1161,7 @@ val typeOf_array_elem_size : typ -> typ * Z.t option
 (** Returns the type of the array elements of the given type, and the size
     of the array, if any.
     Asserts it is an array type.
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 
 val is_fully_arithmetic: typ -> bool
 (** Returns [true] whenever the type contains only arithmetic types *)
@@ -1334,7 +1334,7 @@ val instr_falls_through : instr -> bool
 (** returns [false] if the given instruction is a call to a function with a
     ["noreturn"] attribute, and [true] otherwise.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 (* ************************************************************************* *)
@@ -1342,7 +1342,7 @@ val instr_falls_through : instr -> bool
 (* ************************************************************************* *)
 
 (** Various classes of attributes
-    @before Frama-C+dev [AttrStmt] and [AttrIgnored] didn't exist
+    @before 30.0-Zinc [AttrStmt] and [AttrIgnored] didn't exist
 *)
 type attributeClass =
     AttrName of bool
@@ -1369,19 +1369,19 @@ val removeAttribute: string -> unit
 val isKnownAttribute: string -> bool
 (** [isKnownAttribute attrname] returns true if the attribute named [attrname]
     is known by Frama-C.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 val attributeClass: default:attributeClass -> string -> attributeClass
 (** Return the class of an attributes. The class `default' is returned for
     unknown and ignored attributes.
-    @before Frama-C+dev no [default] argument
+    @before 30.0-Zinc no [default] argument
 *)
 
 (** Partition the attributes into classes: name attributes, function type and
     type attributes. Unknown and ignored attributes are returned in the
     `default` attribute class.
-    @before Frama-C+dev no [default] argument
+    @before 30.0-Zinc no [default] argument
 *)
 val partitionAttributes:  default:attributeClass ->
   attributes -> attribute list * (* AttrName *)
@@ -2381,17 +2381,17 @@ val bitsOffset: typ -> offset -> int * int
 val fieldBitsOffset: fieldinfo -> int * int
 
 (** Like map but try not to make a copy of the list
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val mapNoCopy: ('a -> 'a) -> 'a list -> 'a list
 [@@alert deprecated "Use [Extlib.map_no_copy] instead."]
 
 (** same as mapNoCopy for options
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val optMapNoCopy: ('a -> 'a) -> 'a option -> 'a option
 [@@alert deprecated "Use [Extlib.opt_map_no_copy] instead."]
 
 (** Like map but each call can return a list. Try not to make a copy of the list
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val mapNoCopyList: ('a -> 'a list) -> 'a list -> 'a list
 [@@alert deprecated "Use [Extlib.map_no_copy_list] instead."]
 
@@ -2500,123 +2500,123 @@ val set_extension_handler:
   unit
 (** Used to setup a reference related to the handling of ACSL extensions.
     @since 21.0-Scandium
-    @before Frama-C+dev This function did not take a [plugin:string] parameter
+    @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
 [@@alert acsl_extension_handler
     "This function can only be called by Acsl_extension"]
 
 (** void
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val voidType: typ
 [@@alert deprecated "Use Cil_const.voidType types instead."]
 
 (** int
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val intType: typ
 [@@alert deprecated "Use Cil_const.intType types instead."]
 
 (** unsigned int
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val uintType: typ
 [@@alert deprecated "Use Cil_const.uintType types instead."]
 
 (** short
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val shortType : typ
 [@@alert deprecated "Use Cil_const.shortType  types instead."]
 
 (** unsigned short
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val ushortType : typ
 [@@alert deprecated "Use Cil_const.ushortType  types instead."]
 
 (** long
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val longType: typ
 [@@alert deprecated "Use Cil_const.longType types instead."]
 
 (** long long
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val longLongType: typ
 [@@alert deprecated "Use Cil_const.longLongType types instead."]
 
 (** unsigned long
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val ulongType: typ
 [@@alert deprecated "Use Cil_const.ulongType types instead."]
 
 (** unsigned long long
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val ulongLongType: typ
 [@@alert deprecated "Use Cil_const.ulongLongType types instead."]
 
 (** char
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val charType: typ
 [@@alert deprecated "Use Cil_const.charType types instead."]
 
 (** signed char
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val scharType: typ
 [@@alert deprecated "Use Cil_const.scharType types instead."]
 
 (** unsigned char
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val ucharType: typ
 [@@alert deprecated "Use Cil_const.ucharType types instead."]
 
 (** char *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val charPtrType: typ
 [@@alert deprecated "Use Cil_const.charPtrType types instead."]
 
 (** signed char *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val scharPtrType: typ
 [@@alert deprecated "Use Cil_const.scharPtrType types instead."]
 
 (** unsigned char *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val ucharPtrType: typ
 [@@alert deprecated "Use Cil_const.ucharPtrType types instead."]
 
 (** char const *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val charConstPtrType: typ
 [@@alert deprecated "Use Cil_const.charConstPtrType types instead."]
 
 (** void *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val voidPtrType: typ
 [@@alert deprecated "Use Cil_const.voidPtrType types instead."]
 
 (** void const *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val voidConstPtrType: typ
 [@@alert deprecated "Use Cil_const.voidConstPtrType types instead."]
 
 (** int *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val intPtrType: typ
 [@@alert deprecated "Use Cil_const.intPtrType types instead."]
 
 (** unsigned int *
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val uintPtrType: typ
 [@@alert deprecated "Use Cil_const.uintPtrType types instead."]
 
 (** float
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val floatType: typ
 [@@alert deprecated "Use Cil_const.floatType types instead."]
 
 (** double
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val doubleType: typ
 [@@alert deprecated "Use Cil_const.doubleType types instead."]
 
 (** long double
-    @deprecated Frama-C+dev *)
+    @deprecated 30.0-Zinc *)
 val longDoubleType: typ
 [@@alert deprecated "Use Cil_const.longDoubleType types instead."]
 

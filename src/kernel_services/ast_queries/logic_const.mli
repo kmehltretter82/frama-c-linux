@@ -300,7 +300,7 @@ val term : ?loc:Location.t -> term_node -> logic_type -> term
 val trange: ?loc:Location.t -> term option * term option -> term
 
 (** boolean constant
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val tboolean: ?loc:Location.t -> bool -> term
 
