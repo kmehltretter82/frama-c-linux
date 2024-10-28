@@ -559,7 +559,8 @@ module LoopContract = WpContext.StaticGenerator(CodeKey)
             | AVariant(term, Some rel) ->
               let vrel = mk_variant_relation_property kf stmt ca term rel in
               let vrel = variant_as_inv ~loc:term.term_loc vrel in
-              { l with loop_invariants = vrel :: l.loop_invariants }
+              { l with loop_terminates = None ;
+                       loop_invariants = vrel :: l.loop_invariants }
             | AAssigns(_,WritesAny) ->
               let asgn = WpPropId.mk_loop_any_assigns_info stmt in
               { l with loop_assigns = asgn :: l.loop_assigns }

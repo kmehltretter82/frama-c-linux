@@ -7,22 +7,27 @@
 [kernel:annot:missing-spec] terminates_formulae.i:41: Warning: 
   Neither code nor explicit exits for function call_param,
    generating default clauses. See -generated-spec-* options for more info
-[kernel:annot:missing-spec] terminates_formulae.i:97: Warning: 
+[kernel:annot:missing-spec] terminates_formulae.i:71: Warning: 
+  Neither code nor specification for function with_call,
+   generating default exits, assigns and terminates. See -generated-spec-* options for more info
+[kernel:annot:missing-spec] terminates_formulae.i:109: Warning: 
   Neither code nor explicit exits for function local_init_P,
    generating default clauses. See -generated-spec-* options for more info
 [wp] Warning: Missing RTE guards
-[wp:hypothesis] terminates_formulae.i:84: Warning: 
+[wp:hypothesis] terminates_formulae.i:96: Warning: 
   'Rel' relation must be well-founded
 [wp:hypothesis] terminates_formulae.i:67: Warning: 
   'Rel' relation must be well-founded
 [wp] [Valid] Goal general_variant_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal general_variant_terminates (Cfg) (Trivial)
+[wp:hypothesis] terminates_formulae.i:76: Warning: 
+  'Rel' relation must be well-founded
 [wp] [Valid] Goal no_variant_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal variant_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal variant_terminates (Cfg) (Trivial)
-[wp] terminates_formulae.i:91: Warning: 
+[wp] terminates_formulae.i:103: Warning: 
   Missing decreases clause on recursive function no_decreases, call must be unreachable
-[wp] 28 goals scheduled
+[wp] 32 goals scheduled
 [wp] [Unsuccess] typed_base_call_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_base_call_exits (Qed)
 [wp] [Valid] typed_call_same_terminates (Qed)
@@ -38,6 +43,10 @@
 [wp] [Valid] typed_variant_loop_variant_positive (Qed)
 [wp] [Valid] typed_general_variant_loop_assigns (Qed)
 [wp] [Valid] typed_general_variant_loop_variant_relation (Alt-Ergo) (Cached)
+[wp] [Valid] typed_general_variant_call_terminates (Qed)
+[wp] [Valid] typed_general_variant_call_exits (Qed)
+[wp] [Valid] typed_general_variant_call_loop_assigns (Qed)
+[wp] [Valid] typed_general_variant_call_loop_variant_relation (Alt-Ergo) (Cached)
 [wp] [Unsuccess] typed_no_variant_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_no_variant_loop_assigns (Qed)
 [wp] [Valid] typed_decreases_terminates (Qed)
@@ -51,11 +60,11 @@
 [wp] [Valid] typed_no_decreases_exits (Qed)
 [wp] [Unsuccess] typed_local_init_call_terminates (Alt-Ergo) (Cached)
 [wp] [Valid] typed_local_init_call_exits (Qed)
-[wp] Proved goals:   27 / 33
+[wp] Proved goals:   31 / 37
   Terminating:     2
   Unreachable:     3
-  Qed:            18
-  Alt-Ergo:        4
+  Qed:            21
+  Alt-Ergo:        5
   Unsuccess:       6
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
@@ -66,6 +75,7 @@
   call_param_change         1        -        2      50.0%
   variant                   2        1        3       100%
   general_variant           1        1        2       100%
+  general_variant_call      3        1        4       100%
   no_variant                1        -        2      50.0%
   decreases                 2        1        3       100%
   general_decreases         2        1        3       100%

@@ -68,6 +68,18 @@ void general_variant(unsigned x) {
   while (x > 0) x --;
 }
 
+void with_call(void);
+
+//@ terminates Q ;
+void general_variant_call(unsigned x) {
+  /*@ loop assigns x ;
+      loop variant x for Rel; */
+  while (x > 0){
+    with_call();
+    x --;
+  }
+}
+
 //@ terminates Q ;
 void no_variant(void){
   //@ loop assigns i ;

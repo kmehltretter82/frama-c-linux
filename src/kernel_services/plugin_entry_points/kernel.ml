@@ -252,6 +252,8 @@ let () = set_warn_status wkey_c11 Log.Winactive
 
 let wkey_line_directive = register_warn_category "pp:line-directive"
 
+let wkey_unknown_attribute = register_warn_category "unknown-attribute"
+
 (* ************************************************************************* *)
 (** {2 Specialised functors for building kernel parameters} *)
 (* ************************************************************************* *)

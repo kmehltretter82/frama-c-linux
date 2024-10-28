@@ -1,8 +1,46 @@
 [kernel] Parsing attributes-declarations-definitions.c (with preprocessing)
+[kernel:unknown-attribute] attributes-declarations-definitions.c:7: Warning: 
+  Unknown attribute: tret1
+[kernel:unknown-attribute] attributes-declarations-definitions.c:7: Warning: 
+  Unknown attribute: f1
+[kernel:unknown-attribute] attributes-declarations-definitions.c:7: Warning: 
+  Unknown attribute: arg1
+[kernel:unknown-attribute] attributes-declarations-definitions.c:10: Warning: 
+  Unknown attribute: tret2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:10: Warning: 
+  Unknown attribute: f2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:10: Warning: 
+  Unknown attribute: arg2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:13: Warning: 
+  Unknown attribute: tret3
+[kernel:unknown-attribute] attributes-declarations-definitions.c:13: Warning: 
+  Unknown attribute: arg3
 [kernel] attributes-declarations-definitions.c:12: Warning: 
   found two contracts (old location: attributes-declarations-definitions.c:6). Merging them
+[kernel:unknown-attribute] attributes-declarations-definitions.c:21: Warning: 
+  Unknown attribute: tret4
+[kernel:unknown-attribute] attributes-declarations-definitions.c:21: Warning: 
+  Unknown attribute: f4
+[kernel:unknown-attribute] attributes-declarations-definitions.c:21: Warning: 
+  Unknown attribute: arg4
 [kernel] attributes-declarations-definitions.c:21: Warning: 
   found two contracts (old location: attributes-declarations-definitions.c:13). Merging them
+[kernel:unknown-attribute] attributes-declarations-definitions.c:23: Warning: 
+  Unknown attribute: tret5
+[kernel:unknown-attribute] attributes-declarations-definitions.c:23: Warning: 
+  Unknown attribute: f5
+[kernel:unknown-attribute] attributes-declarations-definitions.c:25: Warning: 
+  Unknown attribute: a1
+[kernel:unknown-attribute] attributes-declarations-definitions.c:33: Warning: 
+  Unknown attribute: a2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
+  Unknown attribute: p1
+[kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
+  Unknown attribute: p2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:56: Warning: 
+  Unknown attribute: _n
+[kernel:unknown-attribute] attributes-declarations-definitions.c:58: Warning: 
+  Unknown attribute: e_
 [kernel] attributes-declarations-definitions.c:62: User Error: 
   unsupported attribute: vector_size
 [kernel] User Error: stopping on file "attributes-declarations-definitions.c" that has errors. Add
