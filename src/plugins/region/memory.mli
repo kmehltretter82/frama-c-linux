@@ -38,11 +38,13 @@ type region = {
   roots: varinfo list ;
   labels: string list ;
   types: typ list ;
+  typed : typ option ;
   fields: Fields.domain ;
   reads: Access.acs list ;
   writes: Access.acs list ;
   shifts: Access.acs list ;
   sizeof: int ;
+  singleton : bool ;
   ranges: range list ;
   pointed: node option ;
 }
@@ -70,24 +72,28 @@ val equal : map -> node -> node -> bool
 val node : map -> node -> node
 val nodes : map -> node list -> node list
 
-val iter : map -> (region -> unit) -> unit
-val iter_node : map -> (node -> unit) -> unit
-val region : map -> node -> region
-val regions : map -> region list
+val size : map -> node -> int
 val parents : map -> node -> node list
 val roots : map -> node -> varinfo list
+val labels : map -> node -> string list
+val region : map -> node -> region
+val regions : map -> region list
+val iter : map -> (node -> unit) -> unit
 
-val new_chunk : map -> ?size:int -> ?ptr:node -> ?pointed:node -> unit -> node
+val new_chunk : map ->
+  ?parent:node -> ?size:int -> ?ptr:node -> ?pointed:node ->
+  unit -> node
+
 val add_root : map -> Cil_types.varinfo -> node
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
-val add_index : map -> node -> typ -> int -> node
+val add_index : map -> node -> typ -> node
 val add_points_to : map -> node -> node -> unit
 val add_value : map -> node -> typ -> node option
 
-val read : map -> node -> Access.acs -> unit
-val write : map -> node -> Access.acs -> unit
-val shift : map -> node -> Access.acs -> unit
+val add_read : map -> node -> Access.acs -> unit
+val add_write : map -> node -> Access.acs -> unit
+val add_shift : map -> node -> Access.acs -> unit
 
 val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
@@ -99,12 +105,16 @@ val index : map -> node -> typ -> node
 val lval : map -> lval -> node
 val exp : map -> exp -> node option
 
+val ranges : map -> node -> range list
 val points_to : map -> node -> node option
 val pointed_by : map -> node -> node list
 
 val included : map -> node -> node -> bool
 val separated : map -> node -> node -> bool
+val singleton : map -> node -> bool
 
 val reads : map -> node -> typ list
 val writes : map -> node -> typ list
 val shifts : map -> node -> typ list
+val types : map -> node -> typ list
+val typed : map -> node -> typ option

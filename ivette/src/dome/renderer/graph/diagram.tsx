@@ -349,7 +349,7 @@ class Builder {
   // --- Edge
   edge(e: Edge): void {
     const { line = 'solid', head = 'arrow', tail = 'none' } = e;
-    const tooltip = e.title ?? e.label ?? `${e.source} -> ${e.target}`;
+    const tooltip = e.title ?? e.label;
     if (e.aligned === true)
       this
         .print('{ rank=same; ')

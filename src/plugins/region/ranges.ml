@@ -57,7 +57,7 @@ let range ?(offset=0) ?(length=1) data = singleton { offset ; length ; data }
 let rec find (k: int) = function
   | [] -> raise Not_found
   | ({ offset ; length } as r) :: rs ->
-    if offset <= k && k <= offset + length then r else find k rs
+    if offset <= k && k < offset + length then r else find k rs
 
 let find k (R rs) = find k rs
 
@@ -70,7 +70,7 @@ let rec merge f ra rb =
     if a' <= b.offset then
       a :: merge f wa rb
     else
-    if b' < a.offset then
+    if b' <= a.offset then
       b :: merge f ra wb
     else
       let offset = min a.offset b.offset in
@@ -83,12 +83,11 @@ let rec merge f ra rb =
 
 let merge f (R x) (R y) = R (merge f x y)
 
-let squash f = function
-  | R [] -> None
-  | R (x::xs) -> Some (List.fold_left (fun w r -> f w r.data) x.data xs)
-
 let iteri f (R xs) = List.iter f xs
+let foldi f w (R xs) = List.fold_left f w xs
 let iter f (R xs) = List.iter (fun r -> f r.data) xs
+let fold f w (R xs) = List.fold_left (fun w r -> f w r.data) w xs
+let mapi f (R xs) = R (List.map f xs)
 let map f (R xs) = R (List.map (fun r -> { r with data = f r.data }) xs)
 
 (* -------------------------------------------------------------------------- *)

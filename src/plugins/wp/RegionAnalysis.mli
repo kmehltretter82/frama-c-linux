@@ -21,10 +21,7 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- Typed Memory Model                                                 --- *)
+(* --- Region Analysis API for Region Memory Model                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-type pointer = NoCast | Fits | Unsafe
-val pointer : pointer Context.value
-
-include Sigs.Model
+include MemRegion.RegionProxy

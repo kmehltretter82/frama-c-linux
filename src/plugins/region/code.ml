@@ -51,9 +51,8 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field m r fd) fd.ftype ofs
   | Index(_,ofs) ->
-    let elt,size = Cil.typeOf_array_elem_size ty in
-    let n = Z.to_int @@ Option.get size in
-    add_loffset m s (add_index m r elt n) elt ofs
+    let elt = Cil.typeOf_array_elem ty in
+    add_loffset m s (add_index m r elt) elt ofs
 
 and add_value m s e = ignore (add_exp m s e)
 
@@ -66,14 +65,14 @@ and add_exp (m: map) (s:stmt) (e:exp) : scalar =
 
   | Lval lv ->
     let rv = add_lval m s lv in
-    Memory.read m rv (Lval(s,lv)) ;
+    Memory.add_read m rv (Lval(s,lv)) ;
     let ptr = Memory.add_value m rv @@ Cil.typeOfLval lv in
     { from = Some rv ; ptr }
 
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     add_value m s k ;
     let v = add_exp m s p in
-    Option.iter (fun r -> Memory.shift m r (Exp(s,e))) v.from ; v
+    Option.iter (fun r -> Memory.add_shift m r (Exp(s,e))) v.from ; v
 
   | UnOp(_,e,_) ->
     add_value m s e ; integral
@@ -102,7 +101,7 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
 
   | SingleInit e ->
     let r = add_lval m s lv in
-    Memory.write m r acs ;
+    Memory.add_write m r acs ;
     Option.iter (Memory.add_points_to m r) (add_exp m s e).ptr
 
   | CompoundInit(_,fvs) ->
@@ -123,14 +122,14 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
   | Set(lv, { enode = Lval exp }, _) ->
     let l = add_lval m s lv in
     let r = add_lval m s exp in
-    Memory.read m r (Lval(s,exp)) ;
-    Memory.write m l (Lval(s,lv)) ;
+    Memory.add_read m r (Lval(s,exp)) ;
+    Memory.add_write m l (Lval(s,lv)) ;
     Memory.merge_copy m ~l ~r
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in
     let v = add_exp m s e in
-    Memory.write m r (Lval(s,lv)) ;
+    Memory.add_write m r (Lval(s,lv)) ;
     Option.iter (Memory.add_points_to m r) v.ptr
 
   | Local_init(x,AssignInit iv,_) ->
@@ -143,7 +142,7 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
     Option.iter
       (fun lv ->
          let r = add_lval m s lv in
-         Memory.write m r (Lval(s,lv))
+         Memory.add_write m r (Lval(s,lv))
       ) lr ;
     Options.warning ~source:(fst @@ Stmt.loc s) "Incomplete call analysis"
 

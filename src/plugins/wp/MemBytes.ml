@@ -28,7 +28,8 @@ module Logic = Qed.Logic
 
 (* Why3 symbols *)
 
-module Why3 = struct
+module Why3 =
+struct
   let library = "membytes"
 
   let t_vblock = Qed.Logic.Array (Qed.Logic.Int, Qed.Logic.Int)
@@ -197,12 +198,8 @@ type sigma = Sigma.t
 type domain = Sigma.domain
 type segment = loc rloc
 
-let comp_cluster () =
-  Definitions.cluster ~id:"Compound" ~title:"Memory Compound Loader" ()
-
 let shift_cluster () =
   Definitions.cluster ~id:"Shifts" ~title:"Shifts Definitions" ()
-
 
 (* ********************************************************************** *)
 (* SIZE                                                                   *)
@@ -676,9 +673,6 @@ module Model = struct
       Why3.havoc fresh current loc n
     else fresh
 
-  let eqmem obj loc _chunk m1 m2 =
-    Why3.eqmem m1 m2 loc @@ sizeof obj
-
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = e_var xp in
@@ -1130,3 +1124,17 @@ let scope seq scope xs =
            in e_set m (BASE.get x) size)
         (Sigma.value seq.pre Alloc) xs in
     [ p_equal (Sigma.value seq.post Alloc) alloc ]
+
+(* ********************************************************************** *)
+(* API with Region                                                        *)
+(* ********************************************************************** *)
+
+let sizeof = protected_sizeof_object
+let last = Model.last
+let frames = Model.frames
+let eqmem_forall = Model.eqmem_forall
+let set_init = Model.set_init
+let is_init_range = Model.is_init_range
+let value_footprint = Model.value_footprint
+let init_footprint = Model.init_footprint
+let havoc = Model.havoc

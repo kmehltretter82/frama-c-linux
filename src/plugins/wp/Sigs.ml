@@ -129,6 +129,15 @@ type update = Mstore of s_lval * term
 (** {1 Memory Models} *)
 (* -------------------------------------------------------------------------- *)
 
+module type Type =
+sig
+  type t
+  val hash : t -> int
+  val equal : t -> t -> bool
+  val compare : t -> t -> int
+  val pretty : Format.formatter -> t -> unit
+end
+
 (** Memory Chunks.
 
     The concrete memory is partionned into a vector of abstract data.
@@ -148,10 +157,7 @@ sig
   val self : string
   (** Chunk names, for pretty-printing. *)
 
-  val hash : t -> int
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-  val pretty : Format.formatter -> t -> unit
+  include Type with type t := t
 
   val tau_of_chunk : t -> tau
   (** The type of data hold in a chunk. *)

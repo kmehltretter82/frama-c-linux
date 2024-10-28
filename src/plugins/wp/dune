@@ -40,6 +40,7 @@
     frama-c.kernel
     frama-c-rtegen.core
     frama-c-server.core
+    frama-c-region.core
     qed why3 zarith ocamlgraph
     (select wp_eva.ml from
       (frama-c-eva.core -> wp_eva.enabled.ml)

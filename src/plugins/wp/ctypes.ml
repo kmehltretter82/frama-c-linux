@@ -385,6 +385,35 @@ let () =
   end
 
 (* -------------------------------------------------------------------------- *)
+(* --- Revert c_object to typ                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let ikinds = [
+  IBool;IChar;
+  ISChar;IUChar;
+  IInt;IUInt;
+  IShort;IUShort;
+  ILong;IULong;
+  ILongLong;IULongLong
+]
+let fkinds = [FFloat;FDouble;FLongDouble]
+
+let to_ikind iota =
+  List.find (fun ik -> c_int ik = iota) ikinds
+
+let to_fkind flt =
+  List.find (fun fk -> c_float fk = flt) fkinds
+
+let object_to = function
+  | C_int i -> TInt(to_ikind i,[])
+  | C_float f -> TFloat(to_fkind f,[])
+  | C_pointer typ -> TPtr(typ,[])
+  | C_comp comp -> TComp(comp,[])
+  | C_array { arr_element = elt ; arr_flat = None } -> TArray(elt,None,[])
+  | C_array { arr_element = elt ; arr_flat = Some { arr_size = size } } ->
+    TArray(elt,Some (Cil.integer ~loc:Location.unknown size),[])
+
+(* -------------------------------------------------------------------------- *)
 (* --- Accessor Utilities                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 

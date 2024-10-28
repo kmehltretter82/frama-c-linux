@@ -1,8 +1,12 @@
-DEFAULT_SUITES= wp wp_acsl wp_plugin wp_ce wp_bts wp_store wp_hoare
-DEFAULT_SUITES= wp_typed wp_bytes wp_usage wp_gallery wp_manual wp_tip
+## General Purpose
+DEFAULT_SUITES= wp wp_manual wp_usage wp_plugin wp_gallery wp_tip wp_bts
+qualif_SUITES=  wp wp_manual wp_usage wp_plugin wp_gallery wp_tip wp_bts
 
-qualif_SUITES= wp wp_acsl wp_plugin wp_bts wp_store wp_hoare
-qualif_SUITES= wp_typed wp_bytes wp_usage wp_gallery wp_manual wp_tip
-qualif_SUITES= why3
+## Memory Models
+DEFAULT_SUITES= wp_acsl wp_hoare wp_store wp_typed wp_bytes wp_region
+qualif_SUITES=  wp_acsl wp_hoare wp_store wp_typed wp_bytes wp_region
 
-ce_SUITES= wp_ce
+## Specific Objectives
+qualif_SUITES=  why3
+DEFAULT_SUITES= wp_ce
+ce_SUITES=      wp_ce
