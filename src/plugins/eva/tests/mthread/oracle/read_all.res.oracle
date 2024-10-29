@@ -101,7 +101,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
 [mt] read_all.c:19: User Error: 
   read of the whole memory. Ignoring to allow Mthread to continue, but the

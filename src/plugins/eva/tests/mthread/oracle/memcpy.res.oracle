@@ -125,7 +125,22 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread tjob1, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread tjob0, iteration 2 (interferences changed)
+[mt] * Computing value analysis for thread tjob0
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b, c, d}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread tjob0 computed
+[mt] *** Computing thread tjob1, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob1
 [eva:interferences] memcpy.c:26: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
@@ -142,7 +157,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob1 computed
-[mt] *** Computing thread tjob2, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread tjob2, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob2
 [eva:interferences] memcpy.c:31: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis

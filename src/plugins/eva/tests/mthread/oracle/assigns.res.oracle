@@ -77,8 +77,6 @@
 [mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
-[eva] assigns.c:30: Warning: imprecise memory footprint computed at this point
-[eva:interferences] assigns.c:30: inject threads interferences at this point
 [mt] assigns.c:30: Thread jobs1, fun f1, parent <main>, args {0}
 [mt] assigns.c:30: Start thread jobs1
 [mt] assigns.c:31: Thread jobs2, fun f2, parent <main>, args {0}
@@ -97,7 +95,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs1, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs1, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs1
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
@@ -113,7 +112,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
-[mt] *** Computing thread jobs2, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs2, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs2
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

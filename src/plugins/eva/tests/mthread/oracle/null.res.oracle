@@ -80,7 +80,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread tjob0, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread tjob0, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread tjob0
 [eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
 [eva:interferences] null.c:15: inject threads interferences at this point
@@ -122,7 +123,8 @@
   NULL[100..200]: Read by <main>, Write by tjob0: unprotected
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
+[mt] *** Computing thread <main>, iteration 3
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
 [mt] null.c:23: Thread tjob0, fun job0, parent <main>, args {0}
@@ -145,6 +147,25 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
+[mt] *** Computing thread tjob0, iteration 3 (interferences changed)
+[mt] * Computing value analysis for thread tjob0
+[eva:alarm] null.c:15: Warning: out of bounds write. assert \valid((char *)i);
+[eva:interferences] null.c:15: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  NULL[100..200]: write by tjob0 at null.c:15
+  v: read by tjob0 at null.c:14
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: /*@ assert Eva: mem_access: \valid((char *)i); */
+                     *((char *)i) = (char)1; <- job0
+  shared bases: {NULL}
+  interferences: {  } -> # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread tjob0 computed
 [mt] ***** Threads computed for iteration 3.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -163,4 +184,46 @@
 [mt] Detailed shared zones protections
   NULL[100..200]: Read by <main>, Write by tjob0: unprotected
 [mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 3 iterations
+[mt] ***** Iteration 4
+[mt] *** Computing thread <main>, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] null.c:23: Thread tjob0, fun job0, parent <main>, args {0}
+[mt] null.c:23: Start thread tjob0
+[eva:alarm] null.c:26: Warning: 
+  out of bounds read. assert \valid_read((char *)i);
+[eva:interferences] null.c:26: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  NULL[100..200]: read by <main> at null.c:26
+  v: read by <main> at null.c:25
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: /*@ assert Eva: mem_access: \valid_read((char *)i); */
+                     x = (int)*((char *)i); <- main
+  shared bases: {NULL}
+  interferences: {  } -> # cvalue: NULL[rbits 800 to 1607] ∈ [--..--]
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] ***** Threads computed for iteration 4.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: NULL[100..200]
+[mt] <main> reads  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:26 main
+[mt] tjob0 writes  NULL[rbits 800 to 1607] ∈ [--..--]  // null.c:15 job0
+[mt] Possible read/write data races:
+  NULL[100..200]:
+    read by <main> at null.c:26, unprotected
+    write by tjob0 at null.c:15, unprotected
+[mt] Shared memory: NULL[100..200]
+[mt] Write summary for tjob0: NULL[rbits 800 to 1607] ∈ [--..--]
+[mt] Mutexes for concurrent accesses:
+  NULL[100..200]  unprotected
+[mt] Detailed shared zones protections
+  NULL[100..200]: Read by <main>, Write by tjob0: unprotected
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 4 iterations
