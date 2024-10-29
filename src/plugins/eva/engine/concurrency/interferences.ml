@@ -75,6 +75,10 @@ let structure_mismatch () =
 
 (* Interference registration *)
 
+type add_result =
+  | Updated
+  | NoChanges
+
 let add_last_analysis
     (type a)
     ~(domain: a domain)
@@ -82,7 +86,7 @@ let add_last_analysis
     interferences thread concurrent_writes shared_bases =
   let module Dom = (val domain) in
   match Dom.get MtDomain.Domain.key with
-  | None -> () (* Domain disabled, no interference computation *)
+  | None -> NoChanges (* Domain disabled, no interference computation *)
   | Some extract ->
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
     (* Add interferences one by one *)
@@ -122,8 +126,20 @@ let add_last_analysis
     match Abstract.Domain.eq_structure structure Dom.structure with
     | None -> structure_mismatch ()
     | Some Eq ->
-      ThreadTable.replace states thread new_interferences;
-      interferences.shared_bases <- shared_bases
+      let same_mutexes_map =
+        let old = ThreadTable.find_def states thread MutexesMap.empty in
+        MutexesMap.equal (Eval.Top.equal Dom.equal)
+          old new_interferences
+      in
+      let same_shared_bases =
+        Base.Hptset.equal interferences.shared_bases shared_bases
+      in
+      if not (same_mutexes_map && same_shared_bases) then begin
+        ThreadTable.replace states thread new_interferences;
+        interferences.shared_bases <- shared_bases;
+        Updated
+      end else
+        NoChanges
 
 
 (* Interference injection *)
