@@ -35,6 +35,7 @@ type recompute_reason =
   | SharedVarsValuesChanged
   | InitialArgsChanged
   | InitialEnvChanged
+  | InterferencesChanged
 ;;
 
 module RecomputeReason: sig
