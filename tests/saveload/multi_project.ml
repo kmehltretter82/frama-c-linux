@@ -4,11 +4,12 @@ let check name test =
     (Project.from_unique_name name)
     (fun () -> assert (test (Kernel.Files.get ()) [])) ()
 
-let main () =
+let main ~compress () =
+  Format.printf "MAIN (compressed: %B):@." compress;
   ignore (Project.create_by_copy ~last:false "foo");
   ignore (Project.create "foobar");
   let fp = Filepath.of_string "foo.sav" in
-  Project.save_all fp;
+  Project.save_all ~compress fp;
   check "foo" (<>);
   check "foobar" (=);
   check "default" (<>);
@@ -23,4 +24,5 @@ let main () =
   check "default" (<>);
   check "bar" (<>)
 
-let () = Boot.Main.extend main
+let () = Boot.Main.extend (main ~compress:false)
+let () = Boot.Main.extend (main ~compress:true)
