@@ -128,6 +128,7 @@ depends: [
   "dune-configurator"
   "dune-site" { > "3.13.0" }
   ( "alt-ergo-free" | "alt-ergo" )
+  "camlzip"
   "conf-graphviz" { post }
   "conf-time" { with-test }
   "menhir" { >= "20181006" & build }
