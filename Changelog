@@ -31,6 +31,10 @@ o!  Kernel    [2024-10-08] introduce logic type Lboolean and constants
 -   Kernel    [2024-10-08] Option for converting stmt contracts into
               ACSL assert for plug-ins with incomplete stmt contract support
               See option -inline-stmt-contracts
+-   Ivette    [2024-10-07] Complete rewriting of the callgraph, improving its
+              readability and usability and adding new features: filtering
+              and selecting functions, showing alarms by function, and more.
+-   Ivette    [2024-10-04] Show the "Source Code" view at first launch.
 *   RTE       [2024-10-04] Fixed missing assertion on modulo signed overflow.
 *   Eva       [2024-10-04] Fixed missing signed overflow alarm on modulo.
 -   Eva       [2024-10-04] Fewer false alarms of signed overflow on divisions.
@@ -75,9 +79,14 @@ o   Eva       [2024-07-31] Export profiling information about the analysis
 -*  Eva       [2024-06-21] Fixes possible unsoundness when writing 0 on a set of
               contiguous and non-overlapping locations containing a value with a
               different size or alignment than the write.
+-   Ivette    [2024-06-12] Include global initializations in the list of writes
+              of a global variable.
+-   Ivette    [2024-06-04] In the sidebar, global variables and types are sorted
+              by name.
 -   Kernel    [2024-05-20] New ACSL extension loop unfold (replaces loop pragma UNROLL)
 -!  Kernel    [2024-05-20] Removed loop pragma UNROLL annotations
 o!  Kernel    [2024-05-20] Renamed module Unroll_loop into Unfold_loop
+-   Ivette    [2024-05-17] Improved colored status bullets in AST view.
 
 ###############################################################################
 Open Source Release 29.0 (Copper)
