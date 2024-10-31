@@ -22,6 +22,8 @@ Open Source Release <next-release>
 Open Source Release 30.0 (Zinc)
 ###############################################################################
 
+-   Eva       [2024-10-25] Never emit alarms on pointer conversions to intptr_t
+              or uintptr_t.
 -   Kernel    [2024-10-15] Warn when encountering an unknown attribute
 o!  Kernel    [2024-10-08] introduce logic type Lboolean and constants
 -   Kernel    [2024-10-08] Asm contracts can now have \initialized ensures.
@@ -35,6 +37,8 @@ o!  Kernel    [2024-10-08] introduce logic type Lboolean and constants
 o!  Kernel    [2024-09-30] ACSL extensions are now associated to a plug-in,
               allowing the registration of several extensions with the same name
               from different plug-ins
+-   Eva       [2024-09-26] Removes approximation messages "more than N elements
+              to enumerate".
 -   Kernel    [2024-09-23] Support for ACSL modules.
 -   Kernel    [2024-09-23] Extension for importing external modules in ACSL
 o   Kernel    [2024-09-23] API to register ACSL extern modules import functions
@@ -65,6 +69,12 @@ o   Eva       [2024-07-31] Export profiling information about the analysis
               performance via the new module Eva_perf in Eva.mli.
 -   Ivette    [2024-07-26] New flamegraph component to visualize Eva analysis
               time by C functions, in the "Eva Summary" view by default.
+-   Ivette    [2024-07-19] New left sidebar to configure and run Eva analyses.
+-*  Eva       [2024-07-18] Fixes number of sure alarms by function shown in
+              Ivette.
+-*  Eva       [2024-06-21] Fixes possible unsoundness when writing 0 on a set of
+              contiguous and non-overlapping locations containing a value with a
+              different size or alignment than the write.
 -   Kernel    [2024-05-20] New ACSL extension loop unfold (replaces loop pragma UNROLL)
 -!  Kernel    [2024-05-20] Removed loop pragma UNROLL annotations
 o!  Kernel    [2024-05-20] Renamed module Unroll_loop into Unfold_loop
