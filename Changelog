@@ -35,8 +35,8 @@ o!  Kernel    [2024-10-08] introduce logic type Lboolean and constants
               readability and usability and adding new features: filtering
               and selecting functions, showing alarms by function, and more.
 -   Ivette    [2024-10-04] Show the "Source Code" view at first launch.
-*   RTE       [2024-10-04] Fixed missing assertion on modulo signed overflow.
-*   Eva       [2024-10-04] Fixed missing signed overflow alarm on modulo.
+-*  RTE       [2024-10-04] Fixed missing assertion on modulo signed overflow.
+-*  Eva       [2024-10-04] Fixed missing signed overflow alarm on modulo.
 -   Eva       [2024-10-04] Fewer false alarms of signed overflow on divisions.
 o!  Kernel    [2024-09-30] ACSL extensions are now associated to a plug-in,
               allowing the registration of several extensions with the same name
