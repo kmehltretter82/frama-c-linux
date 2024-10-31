@@ -29,3 +29,16 @@ pointer whose region's accesses are not heterogenous, the Region memory
 model behaves the same way as the Typed memory model ; whereas for all
 regions with heterogenous accesses, the Region memory model sends off all
 its pointers to the Bytes memory model.
+
+\paragraph{Limitations.} The Region memory model is presented with the
+following limitations:
+\begin{itemize}
+    \item Function calls are not implemented in the Region plugin.
+    \item A structure copy may be unsound if the structure contains fields
+    with pointers.
+    \item Logic is not included and only C code is currently analysed by the
+    Region plugin. Accesses (read, write, and cast) happening only inside ACSL
+    annotations are not included in the analysis. As a consequence, developers
+    and formalists shall add (dead) C code for field accesses that only appear
+    inside ACSL annotations.
+\end{itemize}
