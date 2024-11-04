@@ -941,9 +941,9 @@ statement:
 /* GCC's Label and Statement Attributes can only happen on empty statement.
    Due to conflicts with declaration, for now we only accept a single attribute
    per statement, whereas GCC allows an attribute specifier list. */
-| attr=attribute_nocv? SEMICOLON {
+| attr=attribute_nocv? loc=SEMICOLON {
     let attr = Option.map fst attr in
-    no_ghost [NOP (attr, $2)]
+    no_ghost [NOP (attr, loc)]
   }
 | SPEC annotated_statement {
     let bs = $2 in
@@ -982,12 +982,12 @@ statement:
     let last = Cil_datatype.Position.of_lexing_pos $endpos in
     no_ghost [FOR ($1, $4, $5, $7, in_block $loc($9) $9, (first,last))]
   }
-| id_or_typename_as_id COLON annotated_statement {
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-    match $3 with
+| id = id_or_typename_as_id COLON s = annotated_statement {
+    let loc = Cil_datatype.Location.of_lexing_loc $loc(id) in
+    match s with
     | [] -> (* should not happen if grammar is written correctly *)
       Errorloc.parse_error ~loc "empty statement after label"
-    | s :: others -> no_ghost [LABEL($1,s,loc)] @ others
+    | s :: others -> no_ghost [LABEL(id,s,loc)] @ others
   }
 | CASE expression COLON annotated_statement {
     let loc = Cil_datatype.Location.of_lexing_loc $sloc in
