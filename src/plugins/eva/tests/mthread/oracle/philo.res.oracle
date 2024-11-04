@@ -282,7 +282,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs[0], iteration 3 (potential shared vars changed)
+[mt] *** Computing thread jobs[0], iteration 3
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] philo.c:19: Lock locks[4]
 [mt] philo.c:20: Lock locks[1]
@@ -309,7 +310,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
-[mt] *** Computing thread jobs[1], iteration 3 (potential shared vars changed)
+[mt] *** Computing thread jobs[1], iteration 3
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [mt] philo.c:19: Lock locks[0]
 [mt] philo.c:20: Lock locks[2]
@@ -330,7 +332,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
-[mt] *** Computing thread jobs[2], iteration 3 (potential shared vars changed)
+[mt] *** Computing thread jobs[2], iteration 3
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
 [mt] philo.c:19: Lock locks[1]
 [mt] philo.c:20: Lock locks[3]
@@ -357,7 +360,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
-[mt] *** Computing thread jobs[3], iteration 3 (potential shared vars changed)
+[mt] *** Computing thread jobs[3], iteration 3
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
 [mt] philo.c:19: Lock locks[2]
 [mt] philo.c:20: Lock locks[4]
@@ -384,7 +388,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
-[mt] *** Computing thread jobs[4], iteration 3 (potential shared vars changed)
+[mt] *** Computing thread jobs[4], iteration 3
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[4]
 [mt] philo.c:19: Lock locks[3]
 [mt] philo.c:20: Lock locks[0]
@@ -448,7 +453,8 @@
     Read by <main>, Write by jobs[0]: unprotected
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 4
-[mt] *** Computing thread <main>, iteration 4 (shared vars values changed)
+[mt] *** Computing thread <main>, iteration 4
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
 [mt] philo.c:46: Initializing mutex locks[0]
@@ -499,8 +505,35 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
+[mt] *** Computing thread jobs[0], iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs[0]
+[mt] philo.c:19: Lock locks[4]
+[mt] philo.c:20: Lock locks[1]
+[eva:interferences] philo.c:24: inject threads interferences at this point
+[mt] philo.c:25: 
+  Sending message on queue, content [0] ∈ {1}
+                                    [1] ∈ UNINITIALIZED
+[mt] philo.c:27: Release locks[1]
+[mt] philo.c:28: Release locks[4]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  end2: write by jobs[0] at philo.c:24
+  locks{[1]; [4]}:
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
+  queue: read by jobs[0] at philo.c:25
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs[0] computed
 [mt] *** Computing thread jobs[1], iteration 4
-    (thread initial memory state changed)
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [mt] philo.c:19: Lock locks[0]
 [mt] philo.c:20: Lock locks[2]
@@ -522,7 +555,7 @@
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
 [mt] *** Computing thread jobs[2], iteration 4
-    (thread initial memory state changed)
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
 [mt] philo.c:19: Lock locks[1]
 [mt] philo.c:20: Lock locks[3]
@@ -550,7 +583,7 @@
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
 [mt] *** Computing thread jobs[3], iteration 4
-    (thread initial memory state changed)
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
 [mt] philo.c:19: Lock locks[2]
 [mt] philo.c:20: Lock locks[4]
@@ -578,7 +611,7 @@
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
 [mt] *** Computing thread jobs[4], iteration 4
-    (thread initial memory state changed)
+    (thread initial memory state changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[4]
 [mt] philo.c:19: Lock locks[3]
 [mt] philo.c:20: Lock locks[0]
@@ -637,4 +670,132 @@
     Read by <main>, Write by jobs[2]: unprotected
     Read by <main>, Write by jobs[0]: unprotected
 [mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 4 iterations
+[mt] ***** Iteration 5
+[mt] *** Computing thread <main>, iteration 5 (interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] philo.c:46: Initializing mutex locks[0]
+[mt] philo.c:46: Initializing mutex locks[1]
+[mt] philo.c:46: Initializing mutex locks[2]
+[mt] philo.c:46: Initializing mutex locks[3]
+[mt] philo.c:46: Initializing mutex locks[4]
+[mt] philo.c:51: Thread jobs[0], fun job, parent <main>, args {0}
+[mt] philo.c:51: Start thread jobs[0]
+[mt] philo.c:51: Thread jobs[1], fun job, parent <main>, args {1}
+[mt] philo.c:51: Start thread jobs[1]
+[mt] philo.c:51: Thread jobs[2], fun job, parent <main>, args {2}
+[mt] philo.c:51: Start thread jobs[2]
+[mt] philo.c:51: Thread jobs[3], fun job, parent <main>, args {3}
+[mt] philo.c:51: Start thread jobs[3]
+[mt] philo.c:51: Thread jobs[4], fun job, parent <main>, args {4}
+[mt] philo.c:51: Start thread jobs[4]
+[mt] philo.c:54: 
+  Receiving message on queue, max size 2, stored in &end. Possible  values:
+  From thread jobs[0]: [0] ∈ {1}
+                       [1] ∈ UNINITIALIZED
+  From thread jobs[2]: [0] ∈ {3}
+                       [1] ∈ UNINITIALIZED
+  From thread jobs[3]: [0] ∈ {4}
+                       [1] ∈ UNINITIALIZED
+  From thread jobs[4]: [0] ∈ {5}
+                       [1] ∈ UNINITIALIZED
+[eva:interferences] philo.c:53: inject threads interferences at this point
+[eva:interferences] <unknown location>: 
+  inject threads interferences at this point
+[eva:interferences] philo.c:53: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  end2: read by <main> at philo.c:53
+  jobs[0..4]: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  queue: read by <main> at philo.c:54
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end2}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread jobs[0], iteration 5 (interferences changed)
+[mt] * Computing value analysis for thread jobs[0]
+[mt] philo.c:19: Lock locks[4]
+[mt] philo.c:20: Lock locks[1]
+[eva:interferences] philo.c:24: inject threads interferences at this point
+[mt] philo.c:25: 
+  Sending message on queue, content [0] ∈ {1}
+                                    [1] ∈ UNINITIALIZED
+[mt] philo.c:27: Release locks[1]
+[mt] philo.c:28: Release locks[4]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  end2: write by jobs[0] at philo.c:24
+  locks{[1]; [4]}:
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs[0] at FRAMAC_SHARE/mthread_pthread.c:66
+  queue: read by jobs[0] at philo.c:25
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: end2 = 1; <- aux :: philo.c:37 <- job
+  shared bases: {end2}
+  interferences: {  } -> # cvalue: end2 ∈ {1}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs[0] computed
+[mt] *** Computing thread jobs[1], iteration 5 (interferences changed)
+[mt] * Computing value analysis for thread jobs[1]
+[mt] philo.c:19: Lock locks[0]
+[mt] philo.c:20: Lock locks[2]
+[mt] philo.c:27: Release locks[2]
+[mt] philo.c:28: Release locks[0]
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  locks{[0]; [2]}:
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs[1] at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {end2}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs[1] computed
+[mt] ***** Threads computed for iteration 5.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: end2
+[mt] <main> reads  end2 ∈ {0; 1}  // philo.c:53 main
+[mt] jobs[2] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[3] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[4] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] jobs[0] writes  end2 ∈ {1}  // philo.c:24 aux :: philo.c:37 <- job
+[mt] Possible read/write data races:
+  end2:
+    read by <main> at philo.c:53, unprotected
+    write by jobs[2] at philo.c:24, protected by locks[1] locks[3]
+    write by jobs[3] at philo.c:24, protected by locks[2] locks[4]
+    write by jobs[4] at philo.c:24, protected by locks[0] locks[3]
+    write by jobs[0] at philo.c:24, protected by locks[1] locks[4]
+[mt] Shared memory: end2
+[mt] Write summary for jobs[0]: end2 ∈ {1}
+[mt] Write summary for jobs[2]: end2 ∈ {1}
+[mt] Write summary for jobs[3]: end2 ∈ {1}
+[mt] Write summary for jobs[4]: end2 ∈ {1}
+[mt] Mutexes for concurrent accesses:
+  end2  write protected by (?)locks[0] (?)locks[1] (?)locks[2] (?)locks[3]
+        (?)locks[4], read unprotected
+[mt] Detailed shared zones protections
+  end2:
+    Read by <main>, Write by jobs[4]: unprotected
+    Read by <main>, Write by jobs[3]: unprotected
+    Read by <main>, Write by jobs[2]: unprotected
+    Read by <main>, Write by jobs[0]: unprotected
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 5 iterations

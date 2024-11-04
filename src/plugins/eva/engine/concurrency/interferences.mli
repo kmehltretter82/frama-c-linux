@@ -31,12 +31,16 @@ val current : t ref
     domain*)
 val initial : 'a domain -> t
 
+type add_result =
+  | Updated
+  | NoChanges
+
 (** Add the last Eva analysis results to the given interferences abstract
     representation. *)
 val add_last_analysis :
   domain:'a domain ->
   get_state:(Analysis_location.local -> 'a Lattice_bounds.or_top_bottom) ->
-  t -> Thread.t -> Analysis_location.local list -> Base.Hptset.t -> unit
+  t -> Thread.t -> Analysis_location.local list -> Base.Hptset.t -> add_result
 
 (** Inject current interferences to an abstract state. If activated,
     the Mthread domain helps filtering applicable interferences. This function

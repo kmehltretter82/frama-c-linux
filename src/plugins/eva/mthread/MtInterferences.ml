@@ -93,5 +93,13 @@ let add_last_analysis analysis_state interferences =
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
-  Interferences.add_last_analysis ~domain ~get_state
-    interferences thread writes bases
+  let res =
+    Interferences.add_last_analysis ~domain ~get_state
+      interferences thread writes bases
+  in
+  match res with
+  | Updated ->
+    MtThread.iter_threads analysis_state
+      (fun th -> MtThread.ThreadState.recompute_because th InterferencesChanged)
+  | NoChanges ->
+    ()

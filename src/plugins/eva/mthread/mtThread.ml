@@ -37,6 +37,7 @@ type recompute_reason =
   | SharedVarsValuesChanged
   | InitialArgsChanged
   | InitialEnvChanged
+  | InterferencesChanged
 ;;
 
 
@@ -51,9 +52,11 @@ module RecomputeReason = struct
     | PotentialSharedVarsChanged, PotentialSharedVarsChanged
     | InitialArgsChanged, InitialArgsChanged
     | InitialEnvChanged, InitialEnvChanged
+    | InterferencesChanged, InterferencesChanged
       -> 0
     | (FirstIteration | NewMsgReceived | SharedVarsValuesChanged
-      | PotentialSharedVarsChanged | InitialArgsChanged | InitialEnvChanged),
+      | PotentialSharedVarsChanged | InitialArgsChanged | InitialEnvChanged
+      | InterferencesChanged),
       _ ->
       MtLib.compare_tag r1 r2
 
@@ -68,6 +71,7 @@ module RecomputeReason = struct
                               "thread@ initial@ arguments@ changed"
     | InitialEnvChanged -> Format.fprintf fmt
                              "thread@ initial@ memory@ state@ changed"
+    | InterferencesChanged -> Format.fprintf fmt "interferences@ changed"
 
 end
 

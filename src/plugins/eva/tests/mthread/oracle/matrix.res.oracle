@@ -460,7 +460,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs[0], iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs[0], iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [mt] matrix.c:25: Lock locks[0]
 [mt] matrix.c:30: Release locks[0]
@@ -492,7 +493,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
-[mt] *** Computing thread jobs[1], iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs[1], iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[1]
 [mt] matrix.c:25: Lock locks[1]
 [mt] matrix.c:30: Release locks[1]
@@ -524,7 +526,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
-[mt] *** Computing thread jobs[2], iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs[2], iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[2]
 [mt] matrix.c:25: Lock locks[2]
 [mt] matrix.c:30: Release locks[2]
@@ -556,7 +559,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
-[mt] *** Computing thread jobs[3], iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs[3], iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[3]
 [mt] matrix.c:25: Lock locks[3]
 [mt] matrix.c:30: Release locks[3]
@@ -588,7 +592,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
-[mt] *** Computing thread jobs[4], iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs[4], iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[4]
 [mt] matrix.c:25: Lock locks[4]
 [mt] matrix.c:30: Release locks[4]

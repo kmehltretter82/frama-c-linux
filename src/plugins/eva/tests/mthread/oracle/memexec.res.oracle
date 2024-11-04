@@ -77,7 +77,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread th1, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread th1, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread th1
 [eva:interferences] memexec.c:14: inject threads interferences at this point
 [eva:interferences] memexec.c:10: inject threads interferences at this point
@@ -151,7 +152,8 @@
   memexec.c:33 (for a; c)
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
+[mt] *** Computing thread <main>, iteration 3
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
 [mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
@@ -172,6 +174,29 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
+[mt] *** Computing thread th1, iteration 3 (interferences changed)
+[mt] * Computing value analysis for thread th1
+[eva:interferences] memexec.c:14: inject threads interferences at this point
+[eva:interferences] memexec.c:10: inject threads interferences at this point
+[eva:interferences] memexec.c:11: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  v: read by th1 at memexec.c:15
+     read by th1 at memexec.c:24
+  a: write by th1 at memexec.c:14
+  c: write by th1 at memexec.c:10
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1,
+                     a = 1; <- f :: memexec.c:25 <- t1
+  shared bases: {a, c}
+  interferences: {  } -> # cvalue: a ∈ {0; 1}
+                                   c ∈ {0; 2}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread th1 computed
 [mt] ***** Threads computed for iteration 3.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
@@ -179,19 +204,19 @@
 [mt] Imprecise locations to watch: a; c
 [mt] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
 [mt] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:27 <- t1
-[mt] th1 writes  a ∈ {1}  // memexec.c:14 f :: memexec.c:25 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
+[mt] th1 writes  a ∈ {0; 1}  // memexec.c:14 f :: memexec.c:27 <- t1
+[mt] th1 writes  a ∈ {0; 1}  // memexec.c:14 f :: memexec.c:25 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
   g :: memexec.c:19 <- f :: memexec.c:27 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
   g :: memexec.c:18 <- f :: memexec.c:27 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
   g :: memexec.c:16 <- f :: memexec.c:27 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
   g :: memexec.c:19 <- f :: memexec.c:25 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
   g :: memexec.c:18 <- f :: memexec.c:25 <- t1
-[mt] th1 writes  c ∈ {2}  // memexec.c:10
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
   g :: memexec.c:16 <- f :: memexec.c:25 <- t1
 [mt] Possible read/write data races:
   c:
@@ -207,8 +232,8 @@
     write by th1 at memexec.c:14, unprotected
     write by th1 at memexec.c:14, unprotected
 [mt] Shared memory: a; c
-[mt] Write summary for th1: a ∈ {1}
-                         c ∈ {2}
+[mt] Write summary for th1 (updated): a ∈ {0; 1}
+                                   c ∈ {0; 2}
 [mt] Mutexes for concurrent accesses:
   a  unprotected
   c  unprotected
@@ -218,4 +243,73 @@
 [mt] Statements needing manual synchronisation
   memexec.c:33 (for a; c)
 [mt] ***** Shared variables computed
-[mt] ******* Analysis performed, 3 iterations
+[mt] ***** Iteration 4
+[mt] *** Computing thread <main>, iteration 4
+    (shared vars values changed, interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] memexec.c:32: Thread th1, fun t1, parent <main>, args {0}
+[mt] memexec.c:32: Start thread th1
+[eva:interferences] memexec.c:33: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: read by <main> at memexec.c:33
+  c: read by <main> at memexec.c:33
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int b = a + c; <- main
+  shared bases: {a, c}
+  interferences: {  } -> # cvalue: a ∈ {0; 1}
+                                   c ∈ {0; 2}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] ***** Threads computed for iteration 4.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: a; c
+[mt] <main> reads  a ∈ {0; 1}  // memexec.c:33 main
+[mt] <main> reads  c ∈ {0; 2}  // memexec.c:33 main
+[mt] th1 writes  a ∈ {0; 1}  // memexec.c:14 f :: memexec.c:27 <- t1
+[mt] th1 writes  a ∈ {0; 1}  // memexec.c:14 f :: memexec.c:25 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
+  g :: memexec.c:19 <- f :: memexec.c:27 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
+  g :: memexec.c:18 <- f :: memexec.c:27 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
+  g :: memexec.c:16 <- f :: memexec.c:27 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
+  g :: memexec.c:19 <- f :: memexec.c:25 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
+  g :: memexec.c:18 <- f :: memexec.c:25 <- t1
+[mt] th1 writes  c ∈ {0; 2}  // memexec.c:10
+  g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+[mt] Possible read/write data races:
+  c:
+    read by <main> at memexec.c:33, unprotected
+    write by th1 at memexec.c:10, unprotected
+    write by th1 at memexec.c:10, unprotected
+    write by th1 at memexec.c:10, unprotected
+    write by th1 at memexec.c:10, unprotected
+    write by th1 at memexec.c:10, unprotected
+    write by th1 at memexec.c:10, unprotected
+  a:
+    read by <main> at memexec.c:33, unprotected
+    write by th1 at memexec.c:14, unprotected
+    write by th1 at memexec.c:14, unprotected
+[mt] Shared memory: a; c
+[mt] Write summary for th1: a ∈ {0; 1}
+                         c ∈ {0; 2}
+[mt] Mutexes for concurrent accesses:
+  a  unprotected
+  c  unprotected
+[mt] Detailed shared zones protections
+  c: Read by <main>, Write by th1: unprotected
+  a: Read by <main>, Write by th1: unprotected
+[mt] Statements needing manual synchronisation
+  memexec.c:33 (for a; c)
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 4 iterations

@@ -224,7 +224,8 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs, iteration 2 (potential shared vars changed)
+[mt] *** Computing thread jobs, iteration 2
+    (potential shared vars changed, interferences changed)
 [mt] * Computing value analysis for thread jobs
 [mt] manysharedvars.c:28: Lock lock
 [eva:interferences] manysharedvars.c:29: 
@@ -1700,7 +1701,8 @@
     Read by <main>, Write by jobs: protected by lock
 [mt] ***** Shared variables computed
 [mt] ***** Iteration 3
-[mt] *** Computing thread <main>, iteration 3 (shared vars values changed)
+[mt] *** Computing thread <main>, iteration 3
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
 [mt] manysharedvars.c:42: Initializing mutex lock
