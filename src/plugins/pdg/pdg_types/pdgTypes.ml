@@ -113,6 +113,7 @@ let () = Ast.add_monotonic_state NodeSet.self
 module NodeSetLattice = struct
   include Abstract_interp.Make_Lattice_Set (Node) (Node.Set)
   let default : t = empty
+  let default_is_bottom = true
 end
 
 module LocInfo = Lmap_bitwise.Make_bitwise (NodeSetLattice)

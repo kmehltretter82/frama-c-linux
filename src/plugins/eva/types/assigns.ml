@@ -67,8 +67,6 @@ module DepsOrUnassigned = struct
     | MaybeAssignedFrom fd1, MaybeAssignedFrom fd2 ->
       MaybeAssignedFrom (Deps.join fd1 fd2)
 
-  let narrow _ _ = assert false (* not used yet *)
-
   let is_included d1 d2 = match d1, d2 with
     | DepsBottom, (DepsBottom | Unassigned | AssignedFrom _ |
                    MaybeAssignedFrom _)
@@ -82,9 +80,9 @@ module DepsOrUnassigned = struct
     | AssignedFrom _, MaybeAssignedFrom _ ->
       false
 
-  let bottom = DepsBottom
   let top = MaybeAssignedFrom Deps.top
   let default = Unassigned
+  let default_is_bottom = false
 
   let to_zone = function
     | DepsBottom | Unassigned -> Locations.Zone.bottom
