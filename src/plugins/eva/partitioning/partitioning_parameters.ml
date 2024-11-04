@@ -74,14 +74,16 @@ struct
         "%s loop without unroll annotation" loop_kind
 
   let unroll stmt =
-    let default =
-      if auto_loop_unroll > min_loop_unroll
-      then Partition.AutoUnroll (stmt, min_loop_unroll, auto_loop_unroll)
+    let automatic_unrolling i =
+      if i > min_loop_unroll
+      then Partition.AutoUnroll (stmt, min_loop_unroll, i)
       else Partition.IntLimit min_loop_unroll
     in
+    let default = automatic_unrolling auto_loop_unroll in
     match get_unroll_annot stmt with
     | [] -> warn_no_loop_unroll stmt; default
     | [UnrollFull] -> Partition.IntLimit default_loop_unroll
+    | [UnrollAuto i] -> automatic_unrolling i
     | [UnrollAmount t] -> begin
         (* Inlines the value of const variables in [t]. *)
         let global_init vi =
@@ -98,8 +100,8 @@ struct
           warn "invalid loop unrolling parameter; ignoring";
           default
       end
-    | _ ->
-      warn "invalid unroll annotation; ignoring";
+    | _ :: _ :: _ ->
+      warn "more than one loop unroll annotation; ignoring";
       default
 
   let history_size = HistoryPartitioning.get ()

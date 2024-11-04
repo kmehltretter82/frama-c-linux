@@ -43,6 +43,8 @@ type slevel_annotation =
 type unroll_annotation =
   | UnrollAmount of Cil_types.term (** Unroll the n first iterations. *)
   | UnrollFull (** Unroll amount defined by -eva-default-loop-unroll. *)
+  | UnrollAuto of int (** Use the automatic loop unrolling with the given limit,
+                          as if -eva-auto-loop-unroll N was locally set. *)
 
 type split_kind = Static | Dynamic
 

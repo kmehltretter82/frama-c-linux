@@ -273,6 +273,17 @@ void test_slevel()
   }
 }
 
+void test_auto_limit()
+{
+  // This loop should be unrolled
+  //@ loop unroll auto, 30;
+  for (int i = 0; i < 20; i++) {}
+
+  // This loop should not be unrolled
+  //@ loop unroll auto, 5;
+  for (int i = 0; i < 20; i++) {}
+}
+
 void main(void)
 {
   test_slevel();
@@ -281,4 +292,5 @@ void main(void)
   test_dynamic_split();
   test_dynamic_split_predicate();
   test_splits_post_call();
+  test_auto_limit();
 }

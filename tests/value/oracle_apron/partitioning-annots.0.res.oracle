@@ -10,7 +10,7 @@
 >   Called from partitioning-annots.c:212.
 > [eva] Recording results for body
 > [eva] Done for function body
-136,137c142,143
+144,145c150,151
 <   x ∈ [0..44]
 <   y ∈ [0..44]
 ---
