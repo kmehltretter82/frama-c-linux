@@ -3,7 +3,7 @@
   syntax error:
   Location: line 14, column 58, before or at token: ;
   12    
-  13      #ifdef TO_MANY_ATTRIBUTES
+  13      #ifdef TOO_MANY_ATTRIBUTES
   14      __attribute__((assume(42))) __attribute__((fallthrough));
                                                                   ^
   15      #endif
