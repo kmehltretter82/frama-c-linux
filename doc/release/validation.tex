@@ -5,21 +5,35 @@ Final validation before running the release pipeline.
 
 \section{Prerequisites on dependencies}
 
-Install all dependencies of Frama-C, including recommended ones.
+Run the \texttt{opam-pin} and \texttt{opam-pin-minimal}
+targets on the CI on the \texttt{HEAD} of the branch for the release.
+This ensures that the depencies in \texttt{opam} file are up to date.
 
 Check coherence between:
 \begin{itemize}
-  \item \texttt{opam} \todo{Should always be up to date}
+  \item \texttt{opam}
   \item \texttt{reference-configuration.md} \todo{Should always be up to date}
 \end{itemize}
 
+Install all dependencies of Frama-C, including recommended ones.
+
 Run the command:
 \begin{itemize}
-  \item \texttt{dune build @frama-c-configure}
+  \item \texttt{dune build @frama-c-configure | grep -e false}
 \end{itemize}
-all plugins should be enabled. Check dependencies in case they have changed.
+
+All plugins should be enabled, i.e.,~\texttt{grep} should fail.
+If this is not the case, check dependencies in case they have changed.
 If you don't know them, ask plug-in developers to verify them.
 
+Use the script \texttt{bin/check-reference-configuration.sh} to either:
+\todo{Decide on what is the best choice}
+\begin{itemize}
+\item ensure that Frama-C can be compiled with the versions of the package
+  that are mentioned in the reference configuration;
+\item or update the reference configuration to the version of the packages
+  in your current opam switch
+\end{itemize}
 \section{Prerequisites on installation}
 
 \begin{itemize}
