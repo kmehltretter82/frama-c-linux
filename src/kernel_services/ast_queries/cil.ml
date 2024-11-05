@@ -440,6 +440,9 @@ let attributeHash: (string, attributeClass) Hashtbl.t =
     [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
   List.iter (fun a -> Hashtbl.add table a AttrType)
     ("mode" :: qualifier_attributes);
+  (* GCC label and statement attributes. *)
+  List.iter (fun a -> Hashtbl.add table a AttrStmt)
+    [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ];
   table
 
 let isKnownAttribute = Hashtbl.mem attributeHash

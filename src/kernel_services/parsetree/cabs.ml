@@ -196,7 +196,7 @@ and asm_details =
   }
 
 and raw_statement =
-  | NOP of cabsloc
+  | NOP of attribute option * cabsloc
   | COMPUTATION of expression * cabsloc
   | BLOCK of block * cabsloc * cabsloc
   | SEQUENCE of statement * statement * cabsloc

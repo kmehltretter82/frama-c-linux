@@ -22,6 +22,8 @@ Open Source Release <next-release>
 Open Source Release 30.0 (Zinc)
 ###############################################################################
 
+-!  Kernel    [2024-11-04] Add partial parsing support for statement/label
+              attributes
 -   Eva       [2024-10-25] Never emit alarms on pointer conversions to intptr_t
               or uintptr_t.
 -   Kernel    [2024-10-15] Warn when encountering an unknown attribute
