@@ -3210,7 +3210,10 @@ let rec collectInitializer
         | _ ->
           abort_context "Can initialize only one field for union"
       in
-      if Machine.msvcMode () && !pMaxIdx != 0 then
+      (* CompoundPre is initialized with pMaxId = -1 for empty compound init
+         (cf. empty_preinit), so we need to check if it is greater than 0
+         instead of different. *)
+      if Machine.msvcMode () && !pMaxIdx > 0 then
         Kernel.warning ~current:true
           "On MSVC we can initialize only the first field of a union";
       let init, reads = findField 0 (Option.value ~default:[] comp.cfields) in
