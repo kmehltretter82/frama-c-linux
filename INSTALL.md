@@ -313,7 +313,8 @@ recommended for you to remove the bootstrapping `ivette` script if you want to
 use the binary distribution of Ivette.
 
 Only stable distributions are available online for now.
-Download the Ivette distribution that corresponds to your version of Frama-C.
+Download the Ivette distribution that corresponds to your version of Frama-C,
+following the appropriate link from this page: https://frama-c.com/html/framac-versions.html
 
 ### Installing Ivette via the online packages on Linux
 
