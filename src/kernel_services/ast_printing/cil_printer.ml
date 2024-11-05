@@ -911,7 +911,7 @@ class cil_printer () = object (self)
         | _ -> Kernel.fatal "Trying to print malformed initializer"
       in
       if not (Cil.isArrayType t) then
-        Pretty_utils.pp_list ~pre:"{@[<hv>" ~sep:",@ " ~suf:"@]}"
+        Pretty_utils.pp_list ~pre:"{@[<hv>" ~sep:",@ " ~suf:"@]}" ~empty:"{}"
           designated_init fmt initl
       else begin
         let print_index prev_index (designator,init as di) =
