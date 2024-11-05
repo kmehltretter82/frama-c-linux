@@ -9,6 +9,7 @@ alignof_longlong: 4
 alignof_ptr: 4
 alignof_short: 2
 alignof_str: 1
+max_align_t: struct {int __max_align; } __attribute__ ((aligned (16)))
 bufsiz: '8192'
 char_is_unsigned: false
 compiler: gcc

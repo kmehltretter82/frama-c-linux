@@ -1,30 +1,30 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:207: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:244: 
   Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:209: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:246: 
   Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:211: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:248: 
   Declaration of variadic function printf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:212: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:249: 
   Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:213: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:250: 
   Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:215: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:252: 
   Declaration of variadic function sprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:217: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:254: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:550: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:587: 
   Declaration of variadic function dprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:610: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:649: 
   Declaration of variadic function asprintf.
 [variadic] snprintf.c:12: 
   Translating call to snprintf to a call to the specialized version snprintf_va_1.
 [variadic] snprintf.c:15: 
   Translating call to snprintf to a call to the specialized version snprintf_va_2.
 [eva] Analyzing a complete application starting at main
-[eva] FRAMAC_SHARE/libc/string.h:151: 
+[eva] FRAMAC_SHARE/libc/string.h:167: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf_va_1
-[eva] FRAMAC_SHARE/libc/stdio.h:213: 
+[eva] FRAMAC_SHARE/libc/stdio.h:250: 
   Cannot evaluate range bound format_length(format) - 1
   (unsupported ACSL construct: logic function format_length). Approximating
 [eva:alarm] snprintf.c:12: Warning: 

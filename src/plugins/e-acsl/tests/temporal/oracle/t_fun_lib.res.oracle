@@ -2,29 +2,29 @@
 [e-acsl] Warning: annotating undefined function `realpath':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:842: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:879: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:844: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:881: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:842: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:879: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:842: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:879: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:864: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:901: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:880: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:917: Warning: 
   no assigns clause generated for function valid_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:274: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:892: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:929: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.

@@ -26,10 +26,7 @@
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
-// arbitrary number
-#ifndef __FC_MAX_OPEN_FILES
-#define __FC_MAX_OPEN_FILES 1024
-#endif
+#include "__fc_define_max_open_files.h"
 
 // __fc_fds represents the state of open file descriptors.
 extern volatile int __fc_fds[__FC_MAX_OPEN_FILES];

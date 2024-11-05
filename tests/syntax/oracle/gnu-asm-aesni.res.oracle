@@ -8,7 +8,7 @@
 #include "string.h"
 #include "strings.h"
 typedef unsigned short byte;
-union __anonunion_PROPERLY_ALIGNED_TYPE_1 {
+union __anonunion_PROPERLY_ALIGNED_TYPE_2 {
    int a ;
    short b ;
    char c[1] ;
@@ -16,23 +16,23 @@ union __anonunion_PROPERLY_ALIGNED_TYPE_1 {
    float f ;
    double g ;
 };
-typedef union __anonunion_PROPERLY_ALIGNED_TYPE_1 PROPERLY_ALIGNED_TYPE;
-union __anonunion_u1_3 {
+typedef union __anonunion_PROPERLY_ALIGNED_TYPE_2 PROPERLY_ALIGNED_TYPE;
+union __anonunion_u1_4 {
    PROPERLY_ALIGNED_TYPE dummy ;
    byte keyschedule[14 + 1][4][4] ;
 };
-union __anonunion_u2_4 {
+union __anonunion_u2_5 {
    PROPERLY_ALIGNED_TYPE dummy ;
    byte keyschedule[14 + 1][4][4] ;
 };
-struct __anonstruct_RIJNDAEL_context_2 {
-   union __anonunion_u1_3 u1 ;
-   union __anonunion_u2_4 u2 ;
+struct __anonstruct_RIJNDAEL_context_3 {
+   union __anonunion_u1_4 u1 ;
+   union __anonunion_u2_5 u2 ;
    int rounds ;
    unsigned int decryption_prepared : 1 ;
    unsigned int use_aesni : 1 ;
 };
-typedef struct __anonstruct_RIJNDAEL_context_2 RIJNDAEL_context;
+typedef struct __anonstruct_RIJNDAEL_context_3 RIJNDAEL_context;
 __inline static void do_aesni_enc(RIJNDAEL_context const *ctx,
                                   unsigned char *b, unsigned char const *a)
 {

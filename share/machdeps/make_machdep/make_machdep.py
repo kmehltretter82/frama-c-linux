@@ -217,6 +217,7 @@ source_files = [
     ("ssize_t.c", "type"),
     ("wchar_t.c", "type"),
     ("ptrdiff_t.c", "type"),
+    ("max_align_t.c", "type"),
     ("intptr_t.c", "type"),
     ("uintptr_t.c", "type"),
     ("int_fast8_t.c", "type"),

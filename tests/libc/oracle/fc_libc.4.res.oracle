@@ -4,5 +4,10 @@
 [kernel] Parsing glibc_functions.json
 [kernel] Parsing posix_identifiers.json
 [kernel] Parsing nonstandard_identifiers.json
+[kernel] Warning: <stdlib.h>:mkostemps : unknown identifier
 [kernel] Warning: <uchar.h>:mbrtoc8 : unknown identifier
+[kernel] Warning: <stdlib.h>:mkostemp : unknown identifier
 [kernel] Warning: <uchar.h>:c8rtomb : unknown identifier
+[kernel] Warning: <sys/stat.h>:lchmod : unknown identifier
+[kernel] Warning: <unistd.h>:euidaccess : unknown identifier
+[kernel] Warning: <stdio.h>:renameat2 : unknown identifier

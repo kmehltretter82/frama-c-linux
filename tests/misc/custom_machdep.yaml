@@ -9,6 +9,7 @@ alignof_longlong: 4
 alignof_ptr: 4
 alignof_short: 2
 alignof_str: 1
+max_align_t: long double
 char_is_unsigned: false
 compiler: bar
 cpp_arch_flags: []

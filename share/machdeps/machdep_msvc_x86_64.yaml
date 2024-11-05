@@ -9,6 +9,7 @@ alignof_longlong: 8
 alignof_ptr: 8
 alignof_short: 2
 alignof_str: 1
+max_align_t: ''
 char_is_unsigned: false
 compiler: msvc
 cpp_arch_flags:
@@ -50,7 +51,7 @@ wordsize: '64'
 posix_version: ''
 
 # NB: except for l_tmpnam, the following macros are not defined in the old
-# __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been 
+# __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been
 # taken from gnu
 bufsiz: '8192'
 eof: '(-1)'

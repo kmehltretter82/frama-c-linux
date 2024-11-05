@@ -39,13 +39,15 @@ __BEGIN_DECLS
 #define UT_HOSTSIZE  256
 
 #define EMPTY 0
+#define RUN_LVL 1
 #define BOOT_TIME 2
-#define OLD_TIME 4
 #define NEW_TIME 3
-#define USER_PROCESS 7
+#define OLD_TIME 4
 #define INIT_PROCESS 5
 #define LOGIN_PROCESS 6
+#define USER_PROCESS 7
 #define DEAD_PROCESS 8
+#define ACCOUNTING 9
 
 #define ut_name ut_user
 #ifndef _NO_UT_TIME

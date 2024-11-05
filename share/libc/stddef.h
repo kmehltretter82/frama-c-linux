@@ -30,6 +30,14 @@ __BEGIN_DECLS
 typedef __PTRDIFF_T ptrdiff_t;
 #define __ptrdiff_t_defined
 #endif
+
+// max_align_t is not defined in every machdeps
+#ifdef __MAX_ALIGN_T
+#ifndef __max_align_t_defined
+typedef __MAX_ALIGN_T max_align_t;
+#define __max_align_t_defined
+#endif
+#endif
 __END_DECLS
 #include "__fc_define_size_t.h"
 #include "__fc_define_ssize_t.h"

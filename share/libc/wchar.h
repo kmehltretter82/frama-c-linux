@@ -290,6 +290,20 @@ extern int wcscasecmp(const wchar_t *ws1, const wchar_t *ws2);
 */
 extern wchar_t *wcsdup(const wchar_t *ws);
 
+/*@
+  requires valid_mbstate:initialization:
+    ps == \null || (\valid_read(ps) && \initialized(ps));
+  assigns \result \from indirect:ps, indirect:*ps;
+  ensures ok_or_error: \result >= 0;
+*/
+extern int mbsinit(const mbstate_t *ps);
+
+/*@
+  assigns \result, *pwc, *ps \from indirect:s[0 .. n], indirect:n, indirect:ps;
+*/
+extern size_t mbrtowc(wchar_t *restrict pwc, const char *restrict s, size_t n,
+                      mbstate_t *restrict ps);
+
 /* It is unclear whether these are more often in wchar.h or stdio.h */
 
 extern int fwprintf(FILE * stream, const wchar_t * format, ...);

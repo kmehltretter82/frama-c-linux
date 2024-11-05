@@ -38,7 +38,7 @@
 [e-acsl] Warning: annotating undefined function `usleep':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:1150: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:1179: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
@@ -51,13 +51,13 @@
   E-ACSL construct `abnormal termination case in behavior'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:486: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:523: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdio.h:485: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdio.h:522: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:498: Warning: 
@@ -181,6 +181,6 @@
 [eva:alarm] FRAMAC_SHARE/libc/pthread.h:502: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:1153: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:1182: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

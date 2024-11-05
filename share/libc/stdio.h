@@ -30,6 +30,8 @@ __PUSH_FC_STDLIB
 #include "stdarg.h"
 #include "stddef.h"
 #include "errno.h"
+#include "__fc_define_at.h"
+#include "__fc_define_fds.h"
 #include "__fc_define_stat.h"
 #include "__fc_define_fpos_t.h"
 #include "__fc_define_file.h"
@@ -87,6 +89,41 @@ extern int remove(const char *filename);
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
 extern int rename(const char *old_name, const char *new_name);
+
+/*@ // missing: assigns 'filesystem' \from old_name[0..], new_name[0..];
+    // missing: assigns errno one of 21 different possible values
+  requires valid_olddirfd: olddirfd == AT_FDCWD ||
+                           0 <= olddirfd < __FC_MAX_OPEN_FILES;
+  requires valid_newdirfd: olddirfd == AT_FDCWD ||
+                           0 <= newdirfd < __FC_MAX_OPEN_FILES;
+  requires valid_old_name: valid_read_string(old_name);
+  requires valid_new_name: valid_read_string(new_name);
+  assigns \result \from indirect:old_name[0..strlen(old_name)],
+                        indirect:new_name[0..strlen(new_name)],
+                        indirect:olddirfd, indirect:newdirfd;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int renameat(int olddirfd, const char *old_name,
+                    int newdirfd, const char *new_name);
+
+/*@ // missing: assigns 'filesystem' \from old_name[0..], new_name[0..];
+    // missing: assigns errno one of 21 different possible values
+    // missing: specific flags validation
+  requires valid_olddirfd: olddirfd == AT_FDCWD ||
+                           0 <= olddirfd < __FC_MAX_OPEN_FILES;
+  requires valid_newdirfd: olddirfd == AT_FDCWD ||
+                           0 <= newdirfd < __FC_MAX_OPEN_FILES;
+  requires valid_old_name: valid_read_string(old_name);
+  requires valid_new_name: valid_read_string(new_name);
+  requires valid_flags: flags >= 0;
+  assigns \result \from indirect:old_name[0..strlen(old_name)],
+                        indirect:new_name[0..strlen(new_name)],
+                        indirect:olddirfd, indirect:newdirfd;
+  ensures result_ok_or_error: \result == 0 || \result == -1;
+*/
+extern int renameat2(int olddirfd, const char *old_name,
+                     int newdirfd, const char *new_name,
+                     int flags);
 
 FILE __fc_fopen[__FC_FOPEN_MAX];
 FILE* const __fc_p_fopen = __fc_fopen;
@@ -153,7 +190,7 @@ extern int fflush(FILE *stream);
                         indirect:mode[0..strlen(mode)], __fc_p_fopen;
   ensures result_null_or_valid_fd:
     \result==\null || (\subset(\result,&__fc_fopen[0 .. __FC_FOPEN_MAX-1])) ;
-*/ 
+*/
 extern FILE *fopen(const char * restrict filename,
      const char * restrict mode);
 
@@ -224,7 +261,7 @@ extern int vfprintf(FILE * restrict stream,
      const char * restrict format,
      va_list arg);
 
-/*@ assigns *stream \from format[..], *stream; 
+/*@ assigns *stream \from format[..], *stream;
 // TODO: assign arg too. */
 extern int vfscanf(FILE * restrict stream,
      const char * restrict format,
@@ -234,18 +271,18 @@ extern int vfscanf(FILE * restrict stream,
 extern int vprintf(const char * restrict format,
      va_list arg);
 
-/*@ assigns *__fc_stdin \from format[..]; 
+/*@ assigns *__fc_stdin \from format[..];
 // TODO: assign arg too. */
 extern int vscanf(const char * restrict format,
      va_list arg);
 
-/*@ assigns s[0..n-1] \from format[..], arg; 
+/*@ assigns s[0..n-1] \from format[..], arg;
  */
 extern int vsnprintf(char * restrict s, size_t n,
      const char * restrict format,
      va_list arg);
 
-/*@ assigns s[0..] \from format[..], arg; 
+/*@ assigns s[0..] \from format[..], arg;
  */
 extern int vsprintf(char * restrict s,
      const char * restrict format,
@@ -583,6 +620,8 @@ extern int pclose(FILE *stream);
 #ifdef __FC_POSIX_VERSION
 /*@ assigns (*lineptr)[0 .. *n-1], *n, *stream, \result \from *stream; */
 extern ssize_t getline(char **lineptr, size_t *n, FILE *stream);
+/*@ assigns (*lineptr)[0 .. *n-1], *n, *stream, \result \from *stream; */
+extern ssize_t getdelim(char **lineptr, size_t *n, int delim, FILE *stream);
 #endif
 
 // POSIX extension

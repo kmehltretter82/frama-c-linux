@@ -63,6 +63,9 @@ struct tm {
   int tm_wday; // days since Sunday [0, 6]
   int tm_yday; // days since January 1 [0, 365]
   int tm_isdst; // Daylight Saving Time flag
+
+  long tm_gmtoff; // Seconds East of UTC
+  const char *tm_zone; // Timezone abbreviation
 };
 
 struct itimerspec {
@@ -169,6 +172,14 @@ extern struct tm *gmtime(const time_t *timer);
   ensures maybe_error: errno == \old(errno) || errno == EOVERFLOW;
 */
 extern struct tm *localtime(const time_t *timer);
+
+/*@
+  requires valid_tm: \valid(tm);
+  assigns \result, *tm \from *tm;
+  ensures result_err_or_valid: \result == -1 || \result >= 0;
+  ensures maybe_error: errno == \old(errno) || errno == EOVERFLOW;
+*/
+extern time_t timegm(struct tm *tm);
 
 /*@
   requires dst_has_room: \valid(s+(0 .. max-1));

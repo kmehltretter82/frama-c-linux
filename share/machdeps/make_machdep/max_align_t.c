@@ -20,44 +20,19 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_GRP_H
-#define __FC_GRP_H
-#include "features.h"
-__PUSH_FC_STDLIB
-#include "__fc_define_uid_and_gid.h"
-#include "__fc_define_size_t.h"
+#include "make_machdep_common.h"
+#include <stddef.h>
 
-__BEGIN_DECLS
+#define TEST_MAX_ALIGN_T_IS(type) \
+    _Static_assert(ALIGNOF(max_align_t) != ALIGNOF(type), \
+                   "max_align_t is `"#type"`");
 
-struct group {
-  char   *gr_name;
-  gid_t   gr_gid;
-  char  **gr_mem;
-};
-
-extern struct group  *getgrgid(gid_t);
-extern struct group  *getgrnam(const char *);
-extern int getgrgid_r(gid_t, struct group *, char *,
- size_t, struct group **);
-extern int getgrnam_r(const char *, struct group *, char *,
- size_t , struct group **);
-extern struct group *getgrent(void);
-extern void endgrent(void);
-extern void setgrent(void);
-
-/* BSD function */
-extern int initgroups (const char *user, gid_t group);
-/*@
-  // missing: ... \from groups database
-  assigns \result \from indirect:user[0..], indirect:group, indirect:*ngroups;
-  assigns groups[0 .. \old(*ngroups) - 1], *ngroups
-          \from indirect:user[0..], group, *ngroups;
-*/
-extern int getgrouplist(const char *user, gid_t group,
-                        gid_t *groups, int *ngroups);
-
-__END_DECLS
-
-__POP_FC_STDLIB
-#endif
-
+TEST_MAX_ALIGN_T_IS(char)
+TEST_MAX_ALIGN_T_IS(short)
+TEST_MAX_ALIGN_T_IS(int)
+TEST_MAX_ALIGN_T_IS(long)
+TEST_MAX_ALIGN_T_IS(long long)
+TEST_MAX_ALIGN_T_IS(double)
+TEST_MAX_ALIGN_T_IS(long double)
+TEST_MAX_ALIGN_T_IS(struct {int __max_align; } __attribute__ ((aligned (8))))
+TEST_MAX_ALIGN_T_IS(struct {int __max_align; } __attribute__ ((aligned (16))))

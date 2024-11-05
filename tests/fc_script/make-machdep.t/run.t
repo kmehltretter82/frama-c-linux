@@ -10,6 +10,7 @@
   alignof_ptr: 8
   alignof_short: 2
   alignof_str: 1
+  max_align_t: long double
   bufsiz: '8192'
   char_is_unsigned: false
   compiler: clang
