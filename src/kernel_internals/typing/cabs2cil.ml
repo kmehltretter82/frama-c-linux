@@ -3193,7 +3193,12 @@ let rec collectInitializer
         Cil_datatype.Typ.pretty thistype !pMaxIdx;
       (* Find the field to initialize *)
       let rec findField (idx: int) = function
-        | [] -> [], reads
+        | [] ->
+          (* This code should only be reachable with GCC/MSVC machdeps *)
+          if Machine.(gccMode () || msvcMode ()) then
+            [], reads
+          else
+            Kernel.fatal ~current:true "collectInitializer: union"
         | _ :: rest when idx < !pMaxIdx && !pArray.(idx) = NoInitPre ->
           findField (idx + 1) rest
         | f :: _ when idx = !pMaxIdx ->
