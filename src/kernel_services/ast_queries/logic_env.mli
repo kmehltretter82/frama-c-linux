@@ -41,7 +41,7 @@ val is_extension: plugin:string -> string -> bool
 val is_extension_block: plugin:string -> string -> bool
 
 (** Return [true] if a module importer is registered for the given name and
-    plugin. @since Frama-C+dev
+    plugin. @since 30.0-Zinc
 *)
 val is_importer: plugin:string -> string -> bool
 
@@ -73,7 +73,7 @@ val preprocess_extension_block:
     @raise Not_Found If the extension does not exist
     @raise Log.AbortFatal If [~plugin] is [None] and two or more extensions have
     the same name
-    @before Frama-C+dev The [~plugin] parameter did not exist and the function
+    @before 30.0-Zinc The [~plugin] parameter did not exist and the function
     only performed the [None] case.
 *)
 val extension_from : ?plugin:string -> string -> string
@@ -87,7 +87,7 @@ val extension_from : ?plugin:string -> string -> string
     @raise Not_Found If the importer does not exist
     @raise Log.AbortFatal If [~plugin] is [None] and two or more extensions have
     the same name
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val importer_from : ?plugin:string -> string -> string
 [@@alert acsl_extension_from
@@ -116,7 +116,7 @@ module Lemmas: State_builder.Hashtbl
 module Axiomatics: State_builder.Hashtbl
   with type key = string and type data = Cil_types.location
 
-(** @since Frama-C+dev *)
+(** @since 30.0-Zinc *)
 module Modules: State_builder.Hashtbl
   with type key = string
    (* loader (name, plugin), location *)
@@ -290,7 +290,7 @@ val set_extension_handler:
 (** Used to setup references related to the handling of ACSL extensions.
     If your name is not [Acsl_extension], do not call this.
     @since 21.0-Scandium
-    @before Frama-C+dev functions did not take a [plugin:string] parameter.
+    @before 30.0-Zinc functions did not take a [plugin:string] parameter.
     [get_plugins], [is_importer] and [importer_from] did not exist, and
     [extension_from] did not take an optional plugin parameter.
 *)

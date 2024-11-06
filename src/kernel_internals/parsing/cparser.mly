@@ -923,7 +923,7 @@ annotated_statement:
 else_part:
 | /* empty */ {
     let loc = Cil_datatype.Location.of_lexing_loc $sloc in
-    no_ghost_stmt (NOP loc)
+    no_ghost_stmt (NOP (None, loc))
   }
   %prec if_no_else /* To attach the next else to the current if */
 | ELSE annotated_statement { in_block $loc($2) $2 }
@@ -938,7 +938,13 @@ else_part:
   }
 
 statement:
-| SEMICOLON { no_ghost [NOP $1] }
+/* GCC's Label and Statement Attributes can only happen on empty statement.
+   Due to conflicts with declaration, for now we only accept a single attribute
+   per statement, whereas GCC allows an attribute specifier list. */
+| attr=attribute_nocv? loc=SEMICOLON {
+    let attr = Option.map fst attr in
+    no_ghost [NOP (attr, loc)]
+  }
 | SPEC annotated_statement {
     let bs = $2 in
     match Logic_lexer.spec $1 with
@@ -976,16 +982,12 @@ statement:
     let last = Cil_datatype.Position.of_lexing_pos $endpos in
     no_ghost [FOR ($1, $4, $5, $7, in_block $loc($9) $9, (first,last))]
   }
-| id_or_typename_as_id COLON attribute_nocv_list annotated_statement {
-    (* The only attribute that should appear here is "unused". For now, we drop
-       this on the floor, since unused labels are usually removed anyways by
-       Rmtmps.
-    *)
-    let loc = Cil_datatype.Location.of_lexing_loc $loc($1) in
-    match $4 with
+| id = id_or_typename_as_id COLON s = annotated_statement {
+    let loc = Cil_datatype.Location.of_lexing_loc $loc(id) in
+    match s with
     | [] -> (* should not happen if grammar is written correctly *)
       Errorloc.parse_error ~loc "empty statement after label"
-    | s :: others -> no_ghost [LABEL($1,s,loc)] @ others
+    | s :: others -> no_ghost [LABEL(id,s,loc)] @ others
   }
 | CASE expression COLON annotated_statement {
     let loc = Cil_datatype.Location.of_lexing_loc $sloc in

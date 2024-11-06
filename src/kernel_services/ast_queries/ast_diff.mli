@@ -134,7 +134,7 @@ val set_extension_diff:
      acsl_extension_kind -> acsl_extension_kind -> is_same_env -> bool)
   -> unit
 (** access custom comparison functions for ACSL extensions
-    @before Frama-C+dev This function did not take a [plugin:string] parameter
+    @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
 [@@alert acsl_extension_handler
     "This function can only be called by Acsl_extension"]

@@ -91,7 +91,7 @@ type logic_infos =
 
 (** Functions that can be called when type-checking an extension of ACSL.
 
-    @before Frama-C+dev The following fields were present:
+    @before 30.0-Zinc The following fields were present:
 
     {[
       remove_logic_function : string -> unit;
@@ -159,7 +159,7 @@ type typing_context = {
 
 (** Functions that can be called when importing external modules into ACSL.
     See {!Acsl_extension.register_module_importer} for details.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 type module_builder = {
   add_logic_type : location -> logic_type_info -> unit ;
@@ -221,7 +221,7 @@ sig
 
   (** Some logic declaration might not introduce new global annotations
       (eg. already imported external modules).
-      @before Frama-C+dev always return a global annotation *)
+      @before 30.0-Zinc always return a global annotation *)
   val annot : Logic_ptree.decl -> global_annotation option
 
   (** [funspec behaviors f prms typ spec] type-checks a function contract.
@@ -323,14 +323,14 @@ val set_extension_handler:
   unit
 (** Used to setup references related to the handling of ACSL extensions.
     @since 21.0-Scandium
-    @before Frama-C+dev functions did not take a [plugin:string] parameter and
+    @before 30.0-Zinc functions did not take a [plugin:string] parameter and
     the function [importer] did not exists.
 *)
 [@@alert acsl_extension_handler
     "This function can only be called by Acsl_extension"]
 
 (** Type the given extension.
-    @before Frama-C+dev the function took one less argument, [plugin], which is
+    @before 30.0-Zinc the function took one less argument, [plugin], which is
     now used to avoid ambiguity if plugins use the same name for an extension
 *)
 val get_typer :
@@ -341,7 +341,7 @@ val get_typer :
   Logic_ptree.lexpr list -> bool * Cil_types.acsl_extension_kind
 
 (** Type the given extension block.
-    @before Frama-C+dev the function took one less argument, [plugin], which is
+    @before 30.0-Zinc the function took one less argument, [plugin], which is
     now used to avoid ambiguity if plugins use the same name for an extension
 *)
 val get_typer_block:
@@ -353,7 +353,7 @@ val get_typer_block:
   bool * Cil_types.acsl_extension_kind
 
 (** Load the given module importer extension.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val get_importer:
   plugin:string ->

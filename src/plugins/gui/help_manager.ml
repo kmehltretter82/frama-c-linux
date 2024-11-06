@@ -48,6 +48,7 @@ let show main_ui =
     "Alexander Kogtenkov";
     "Remi Lazarini";
     "Tristan Le Gall";
+    "Kilyan Le Gallic";
     "Jean-Christophe Léchenet";
     "Matthieu Lemerre";
     "Dara Ly";
@@ -70,6 +71,7 @@ let show main_ui =
     "Virgile Robles";
     "Jan Rochel";
     "Muriel Roger";
+    "Cécile Ruet-Cros";
     "Julien Signoles";
     "Nicolas Stouls";
     "Kostyantyn Vorobyov";

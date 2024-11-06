@@ -1529,6 +1529,11 @@ class cil_printer () = object (self)
         (fun fmt -> self#line_directive fmt) l
         self#pp_keyword "continue"
 
+    | Instr (Skip loc) ->
+      fprintf fmt "@[%a%a;@]"
+        (fun fmt -> self#line_directive fmt) loc
+        self#attributes sattr
+
     | Instr i ->
       self#instr fmt i
 

@@ -40,7 +40,7 @@ val is_qualified : string -> bool
 (** Split a long-identifier into the list of its components.
     eg. ["A::B::(<:)"] is split into [["A";"B";"(<:)"]].
     Returns a singleton for regular identifiers.
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val longident : string -> string list
 
 (** basic utilities for logic terms and predicates. See also {! Logic_const}
@@ -48,18 +48,18 @@ val longident : string -> string list
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (** Check if there is a logic function with same profile in the environment.
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val mem_logic_function : logic_info -> bool
 
 (** Add a logic function in the environment.
     Replaces any existing logic function with the same profile.
     See {!Logic_env.add_logic_function_gen}
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val add_logic_function : logic_info -> unit
 
 (** remove any logic function with the same profile from the environment.
     See {!Logic_env.remove_logic_function_gen}
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val remove_logic_function : logic_info -> unit
 
 (** {2 Types} *)

@@ -38,7 +38,7 @@ val t_malloc : Lang.tau
     Note: this is not a binding with the symbol in the theory but the exact same
     definition, we need this so that Qed knows the underlying type.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 
@@ -77,7 +77,7 @@ val static_alloc : term -> pred
     The base has an associated static allocation, guaranteeing that the
     addresses that use this base can be translated to integers and back.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 val addr_of_int : term -> term
@@ -97,7 +97,7 @@ val in_uintptr_range : term -> pred
     Assuming that the base of a statically exists, the conversion of the pointer
     to a an integer produces a value that fits in [uintptr_t].
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 

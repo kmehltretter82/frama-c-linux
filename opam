@@ -1,7 +1,7 @@
 opam-version: "2.0"
 name: "frama-c"
 synopsis: "Platform dedicated to the analysis of source code written in C"
-version: "29.0+dev"
+version: "30.0~beta"
 description:"""
 Frama-C gathers several analysis techniques in a single collaborative
 framework, based on analyzers (called "plug-ins") that can build upon the
@@ -45,6 +45,7 @@ authors: [
   "Alexander Kogtenkov"
   "Remi Lazarini"
   "Tristan Le Gall"
+  "Kilyan Le Gallic"
   "Jean-Christophe Léchenet"
   "Matthieu Lemerre"
   "Dara Ly"
@@ -67,6 +68,7 @@ authors: [
   "Virgile Robles"
   "Jan Rochel"
   "Muriel Roger"
+  "Cécile Ruet-Cros"
   "Julien Signoles"
   "Nicolas Stouls"
   "Kostyantyn Vorobyov"
@@ -75,7 +77,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "http://frama-c.com/download/user-manual-29.0-Copper.pdf"
+doc: "http://frama-c.com/download/user-manual-30.0-Zinc.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive"

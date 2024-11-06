@@ -23,7 +23,7 @@
 (** This module handle the machine configuration. Previous Frama-C
     versions handled this in {!Cil}.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 open Cil_types
@@ -165,16 +165,16 @@ val insert_implicit_casts: unit -> bool
 
 val msvcMode: unit -> bool
 (** Short for [Machdep.msvcMode (get_machdep ())]
-    @since Frama-C+dev  *)
+    @since 30.0-Zinc  *)
 
 val gccMode: unit -> bool
 (** Short for [Machdep.gccMode (get_machdep ())]
-    @since Frama-C+dev  *)
+    @since 30.0-Zinc  *)
 
 val acceptEmptyCompinfo: unit -> bool
 (** whether we accept empty struct. Implied by {!msvcMode} and {!gccMode}, and
     can be forced by {!set_acceptEmptyCompinfo} otherwise.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 val set_acceptEmptyCompinfo: unit -> unit
@@ -185,7 +185,7 @@ val set_acceptEmptyCompinfo: unit -> unit
     Note that if the selected machdep is GCC or MSVC, this call has no effect
     as these modes already allow empty compinfos.
 
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 
 (* ***********************************************************************)

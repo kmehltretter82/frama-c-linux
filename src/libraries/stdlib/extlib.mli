@@ -151,11 +151,11 @@ val list_slice: ?first:int -> ?last:int -> 'a list -> 'a list
 
 val map_no_copy: ('a -> 'a) -> 'a list -> 'a list
 (** Like map but try not to make a copy of the list
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 
 val map_no_copy_list: ('a -> 'a list) -> 'a list -> 'a list
 (** Like map but each call can return a list. Try not to make a copy of the list
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 
 (* ************************************************************************* *)
 (** {2 Options} *)
@@ -193,7 +193,7 @@ val opt_map2: ('a -> 'b -> 'c) -> 'a option -> 'b option -> 'c option
 
 val opt_map_no_copy: ('a -> 'a) -> 'a option -> 'a option
 (** same as map_no_copy for options.
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 
 (* ************************************************************************* *)
 (** {2 Strings} *)

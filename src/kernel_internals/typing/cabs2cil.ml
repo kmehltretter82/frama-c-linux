@@ -1132,7 +1132,7 @@ let newAlphaName
 (*** In order to process GNU_BODY expressions we must record that a given
  *** COMPUTATION is interesting *)
 let gnu_body_result : (Cabs.statement * ((exp * typ) option ref)) ref
-  = ref ({stmt_ghost = false; stmt_node = Cabs.NOP (cabslu "_NOP")}, ref None)
+  = ref ({stmt_ghost = false; stmt_node = Cabs.NOP (None, cabslu "_NOP")}, ref None)
 
 (*** When we do statements we need to know the current return type *)
 let dummy_function = emptyFunction "@dummy@"
@@ -7389,7 +7389,7 @@ and doExp local_env
         let lastComp, isvoidbody =
           match what with
           | ADrop -> (* We are dropping the result *)
-            {stmt_ghost = local_env.is_ghost; stmt_node = Cabs.NOP loc}, true
+            {stmt_ghost = local_env.is_ghost; stmt_node = Cabs.NOP (None, loc)}, true
           | _ ->
             try findLastComputation (List.rev b.Cabs.bstmts), false
             with Not_found ->
@@ -9943,9 +9943,10 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   let local_env = { local_env with is_ghost = ghost } in
   let<> UpdatedCurrentLoc = convLoc (get_statementloc s) in
   match s.stmt_node with
-  | Cabs.NOP loc ->
-    { empty
-      with stmts = [mkEmptyStmt ~ghost ~valid_sid ~loc (), [],[],[],[]]}
+  | Cabs.NOP (attr, loc) ->
+    let sattr = Option.fold ~none:[] ~some:(doAttr local_env.is_ghost) attr in
+    let stmt = mkEmptyStmt ~ghost ~valid_sid ~sattr ~loc () in
+    { empty with stmts = [stmt,[],[],[],[]] }
   | Cabs.COMPUTATION (e, loc) ->
     let (lasts, data) = !gnu_body_result in
     if lasts == s then begin      (* This is the last in a GNU_BODY *)

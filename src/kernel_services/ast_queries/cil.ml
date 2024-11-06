@@ -440,6 +440,9 @@ let attributeHash: (string, attributeClass) Hashtbl.t =
     [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
   List.iter (fun a -> Hashtbl.add table a AttrType)
     ("mode" :: qualifier_attributes);
+  (* GCC label and statement attributes. *)
+  List.iter (fun a -> Hashtbl.add table a AttrStmt)
+    [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ];
   table
 
 let isKnownAttribute = Hashtbl.mem attributeHash
@@ -3302,6 +3305,18 @@ let isIntegralType t =
 let isIntegralOrPointerType t =
   match unrollTypeSkel t with
   | TInt _ | TEnum _ | TPtr _ -> true
+  | _ -> false
+
+(* Don't completely unroll here, as we do not want to identify
+   intptr_t with its supporting integer type. *)
+let rec is_intptr_t = function
+  | TNamed(t,_) ->
+    t.tname = "intptr_t" || is_intptr_t t.ttype
+  | _ -> false
+
+let rec is_uintptr_t = function
+  | TNamed (t,_) ->
+    t.tname = "uintptr_t" || is_uintptr_t t.ttype
   | _ -> false
 
 let rec isLogicBooleanType t =

@@ -49,95 +49,95 @@ open Cil_types
 val voidType: typ
 
 (** bool
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val boolType: typ
 
 (** int
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val intType: typ
 
 (** unsigned
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val uintType: typ
 
 (** short
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val shortType : typ
 
 (** unsigned short
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val ushortType : typ
 
 (** long
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val longType: typ
 
 (** long long
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val longLongType: typ
 
 (** unsigned long
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val ulongType: typ
 
 (** unsigned long long
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val ulongLongType: typ
 
 (** char
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val charType: typ
 
 (** signed char
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val scharType: typ
 
 (** unsigned char
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val ucharType: typ
 
 (** char *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val charPtrType: typ
 
 (** signed char *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val scharPtrType: typ
 
 (** unisgned char *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val ucharPtrType: typ
 
 (** char const *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val charConstPtrType: typ
 
 (** void *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val voidPtrType: typ
 
 (** void const *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val voidConstPtrType: typ
 
 (** int *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val intPtrType: typ
 
 (** unsigned int *
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val uintPtrType: typ
 
 (** float
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val floatType: typ
 
 (** double
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val doubleType: typ
 
 (** long double
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 val longDoubleType: typ
 
 module Vid: sig val next: unit -> int end
@@ -223,6 +223,6 @@ val make_logic_info : string -> logic_info
 val make_logic_info_local : string -> logic_info
 
 (** Create a logic type info given its name.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val make_logic_type : string -> logic_type_info

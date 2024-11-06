@@ -23,7 +23,7 @@
 (**************************************************************************)
 
 (** Registers a builtin to be available in the environment of all projects.
-    @since Frama-C+dev
+    @since 30.0-Zinc
 *)
 val register: Cil_types.builtin_logic_info -> unit
 

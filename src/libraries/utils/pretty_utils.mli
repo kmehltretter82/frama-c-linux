@@ -145,7 +145,7 @@ val pp_trail : 'a formatter -> 'a formatter
 
 val pp_escaped: 'a formatter -> 'a formatter
 (** [pp_escaped pp e] pretty-prints [e] with [String.escaped].
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 
 (* ********************************************************************** *)
 (** {2 Description Lists (margins)} *)

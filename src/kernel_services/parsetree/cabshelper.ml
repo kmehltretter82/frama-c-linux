@@ -164,7 +164,7 @@ let get_definitionloc (d : definition) : cabsloc =
 let get_statementloc (s : statement) : cabsloc =
   begin
     match s.stmt_node with
-    | NOP(loc) -> loc
+    | NOP(_, loc) -> loc
     | COMPUTATION(_,loc) -> loc
     | BLOCK(_,loc,_) -> loc
     | SEQUENCE(_,_,loc) -> loc

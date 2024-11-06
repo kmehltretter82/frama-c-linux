@@ -1,4 +1,4 @@
-[kernel] Parsing downcast.i (no preprocessing)
+[kernel] Parsing downcast.c (with preprocessing)
 [eva] Analyzing an incomplete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -14,84 +14,98 @@
   s ∈ [--..--]
   v ∈ [--..--]
 [eva] computing for function main1 <- main.
-  Called from downcast.i:156.
-[eva:alarm] downcast.i:24: Warning: 
+  Called from downcast.c:178.
+[eva:alarm] downcast.c:27: Warning: 
   unsigned downcast. assert 0 ≤ (int)((int)sx + (int)sy);
-[eva:alarm] downcast.i:25: Warning: unsigned downcast. assert 0 ≤ x;
-[eva:alarm] downcast.i:25: Warning: unsigned downcast. assert x ≤ 255;
-[eva:alarm] downcast.i:28: Warning: 
+[eva:alarm] downcast.c:28: Warning: unsigned downcast. assert 0 ≤ x;
+[eva:alarm] downcast.c:28: Warning: unsigned downcast. assert x ≤ 255;
+[eva:alarm] downcast.c:31: Warning: 
   unsigned downcast. assert (unsigned int)(uy + uz) ≤ 65535;
 [eva] Recording results for main1
 [eva] Done for function main1
 [eva] computing for function main2_bitfield <- main.
-  Called from downcast.i:157.
-[eva:alarm] downcast.i:37: Warning: unsigned downcast. assert j ≤ 31;
+  Called from downcast.c:179.
+[eva:alarm] downcast.c:40: Warning: unsigned downcast. assert j ≤ 31;
 [eva] Recording results for main2_bitfield
 [eva] Done for function main2_bitfield
 [eva] computing for function main3_reduction <- main.
-  Called from downcast.i:158.
-[eva:alarm] downcast.i:44: Warning: unsigned downcast. assert 0 ≤ v;
-[eva:alarm] downcast.i:45: Warning: unsigned downcast. assert y ≤ 255;
+  Called from downcast.c:180.
+[eva:alarm] downcast.c:47: Warning: unsigned downcast. assert 0 ≤ v;
+[eva:alarm] downcast.c:48: Warning: unsigned downcast. assert y ≤ 255;
 [eva] Recording results for main3_reduction
 [eva] Done for function main3_reduction
 [eva] computing for function main4_pointer <- main.
-  Called from downcast.i:159.
-[eva:alarm] downcast.i:54: Warning: 
-  signed overflow. assert -9223372036854775808 ≤ p + 100;
-[eva:alarm] downcast.i:54: Warning: 
-  signed overflow. assert p + 100 ≤ 9223372036854775807;
-[eva:alarm] downcast.i:55: Warning: unsigned downcast. assert 0 ≤ p;
-[eva:alarm] downcast.i:55: Warning: unsigned downcast. assert p ≤ 4294967295;
+  Called from downcast.c:181.
+[eva] computing for function Frama_C_interval <- main4_pointer <- main.
+  Called from downcast.c:54.
+[eva] using specification for function Frama_C_interval
+[eva] downcast.c:54: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva:alarm] downcast.c:67: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 2147483647;
+[eva:alarm] downcast.c:68: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 2147483647;
+[eva:alarm] downcast.c:69: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 65535;
+[eva:alarm] downcast.c:70: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 65535;
+[eva:alarm] downcast.c:71: Warning: 
+  pointer downcast. assert (unsigned int)p ≤ 127;
+[eva:alarm] downcast.c:72: Warning: 
+  pointer downcast. assert (unsigned int)q ≤ 127;
 [eva] Recording results for main4_pointer
 [eva] Done for function main4_pointer
 [eva] computing for function main5_wrap_signed <- main.
-  Called from downcast.i:160.
-[eva:alarm] downcast.i:62: Warning: assertion 'ASSUME' got status unknown.
-[eva] downcast.i:63: assertion got status valid.
-[eva] downcast.i:67: 
+  Called from downcast.c:182.
+[eva:alarm] downcast.c:84: Warning: assertion 'ASSUME' got status unknown.
+[eva] downcast.c:85: assertion got status valid.
+[eva] downcast.c:89: 
   Frama_C_show_each:
   [100000..2147483647], [100145..2147483792], [-2147483648..2147483647]
-[eva:alarm] downcast.i:68: Warning: assertion got status unknown.
+[eva:alarm] downcast.c:90: Warning: assertion got status unknown.
 [eva] Recording results for main5_wrap_signed
 [eva] Done for function main5_wrap_signed
 [eva] computing for function main6_val_warn_converted_signed <- main.
-  Called from downcast.i:161.
-[eva:alarm] downcast.i:85: Warning: unsigned downcast. assert 0 ≤ (int)(-12);
-[eva:alarm] downcast.i:90: Warning: 
+  Called from downcast.c:183.
+[eva:alarm] downcast.c:107: Warning: unsigned downcast. assert 0 ≤ (int)(-12);
+[eva:alarm] downcast.c:112: Warning: 
   unsigned downcast. assert 0 ≤ (int)(-64000);
-[eva:alarm] downcast.i:95: Warning: 
+[eva:alarm] downcast.c:117: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
-[eva:alarm] downcast.i:96: Warning: 
+[eva:alarm] downcast.c:118: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 32767;
-[eva:alarm] downcast.i:97: Warning: 
+[eva:alarm] downcast.c:119: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 65535;
 [eva] Recording results for main6_val_warn_converted_signed
 [eva] Done for function main6_val_warn_converted_signed
 [eva] computing for function main7_signed_upcast <- main.
-  Called from downcast.i:162.
+  Called from downcast.c:184.
 [eva] Recording results for main7_signed_upcast
 [eva] Done for function main7_signed_upcast
 [eva] computing for function main8_bitfields <- main.
-  Called from downcast.i:163.
+  Called from downcast.c:185.
 [eva] Recording results for main8_bitfields
 [eva] Done for function main8_bitfields
 [eva] computing for function main9_bitfield <- main.
-  Called from downcast.i:164.
-[eva] downcast.i:138: assertion got status valid.
+  Called from downcast.c:186.
+[eva] downcast.c:160: assertion got status valid.
 [eva] Recording results for main9_bitfield
 [eva] Done for function main9_bitfield
 [eva] computing for function main10_loop <- main.
-  Called from downcast.i:165.
-[eva:alarm] downcast.i:150: Warning: unsigned downcast. assert 0 ≤ v;
-[eva:alarm] downcast.i:150: Warning: unsigned downcast. assert v ≤ 1023;
-[eva] downcast.i:149: starting to merge loop iterations
+  Called from downcast.c:187.
+[eva:alarm] downcast.c:172: Warning: unsigned downcast. assert 0 ≤ v;
+[eva:alarm] downcast.c:172: Warning: unsigned downcast. assert v ≤ 1023;
+[eva] downcast.c:171: starting to merge loop iterations
 [eva] Recording results for main10_loop
 [eva] Done for function main10_loop
 [eva] Recording results for main
 [eva] Done for function main
-[eva] downcast.i:37: assertion 'Eva,unsigned_downcast' got final status invalid.
-[eva] downcast.i:85: assertion 'Eva,unsigned_downcast' got final status invalid.
-[eva] downcast.i:90: assertion 'Eva,unsigned_downcast' got final status invalid.
+[eva] downcast.c:40: assertion 'Eva,unsigned_downcast' got final status invalid.
+[eva] downcast.c:107: 
+  assertion 'Eva,unsigned_downcast' got final status invalid.
+[eva] downcast.c:112: 
+  assertion 'Eva,unsigned_downcast' got final status invalid.
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main1:
   sz ∈ [--..--]
@@ -115,9 +129,18 @@
   y ∈ [0..255]
   d ∈ [--..--]
 [eva:final-states] Values at end of function main4_pointer:
-  p ∈ {{ &x_0 + {100} }}
-  q ∈ {{ &x_0 + {100} }}
-  r ∈ {{ &x_0 + {100} }}
+  Frama_C_entropy_source ∈ [--..--]
+  i ∈ [0..9]
+  p ∈ {{ NULL ; &x_0 ; &a + [0..36],0%4 }}
+  q ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  lli ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  ui ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  si ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  us ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  c ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  uintptr ∈
+         {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
+  intptr ∈ {{ NULL + [0..36],0%4 ; &x_0 + [0..36],0%4 ; &a + [0..72],0%4 }}
 [eva:final-states] Values at end of function main5_wrap_signed:
   x_0 ∈ [100000..2147483647]
   y ∈ [100145..2147483792]
@@ -137,6 +160,7 @@
     .[bits 11 to 31] ∈ UNINITIALIZED
   c ∈ {112} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
+  Frama_C_entropy_source ∈ [--..--]
   sz ∈ [--..--]
   uc ∈ [--..--]
   x ∈ [--..--]
@@ -151,6 +175,8 @@
 [from] Computing for function main3_reduction
 [from] Done for function main3_reduction
 [from] Computing for function main4_pointer
+[from] Computing for function Frama_C_interval <-main4_pointer
+[from] Done for function Frama_C_interval
 [from] Done for function main4_pointer
 [from] Computing for function main5_wrap_signed
 [from] Done for function main5_wrap_signed
@@ -166,6 +192,9 @@
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
+[from] Function Frama_C_interval:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
+  \result FROM Frama_C_entropy_source; min; max
 [from] Function main1:
   sz FROM sx; sy
   uc FROM x
@@ -179,7 +208,7 @@
 [from] Function main3_reduction:
   NO EFFECTS
 [from] Function main4_pointer:
-  NO EFFECTS
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
 [from] Function main5_wrap_signed:
   NO EFFECTS
 [from] Function main6_val_warn_converted_signed:
@@ -191,6 +220,7 @@
 [from] Function main9_bitfield:
   NO EFFECTS
 [from] Function main:
+  Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
   sz FROM sx; sy
   uc FROM x
   x FROM uy; uz
@@ -214,9 +244,9 @@
 [inout] Inputs for function main3_reduction:
     v
 [inout] Out (internal) for function main4_pointer:
-    p; q; r
+    Frama_C_entropy_source; i; p; q; lli; ui; si; us; c; uintptr; intptr
 [inout] Inputs for function main4_pointer:
-    \nothing
+    Frama_C_entropy_source; v
 [inout] Out (internal) for function main5_wrap_signed:
     x_0; y; z
 [inout] Inputs for function main5_wrap_signed:
@@ -238,6 +268,6 @@
 [inout] Inputs for function main9_bitfield:
     v
 [inout] Out (internal) for function main:
-    sz; uc; x; ux; s
+    Frama_C_entropy_source; sz; uc; x; ux; s
 [inout] Inputs for function main:
-    sx; sy; x; uy; uz; v
+    Frama_C_entropy_source; sx; sy; x; uy; uz; v

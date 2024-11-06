@@ -184,7 +184,7 @@ val is_in_libc : t -> bool
 
 val has_noreturn_attr : t -> bool
 (** @return true iff the given function contain the noreturn attribute.
-    @since Frama-C+dev *)
+    @since 30.0-Zinc *)
 
 val is_not_called: t -> bool
 (** @return true if the given function is not called in the program.
