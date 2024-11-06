@@ -80,7 +80,11 @@ by issuing \texttt{make check-devguide}\todo{Fix this}.
 \subsection{Manuals}
 
 Manuals are built by the continuous integration. However, the Release Manager
-should check whether a new version of ACSL or E-ACSL must be released.
+should check whether a new version of ACSL or E-ACSL must be released. Note that
+an ACSL release must be accompanied by an E-ACSL (the language, not the plug-in)
+release, at least to acknowledge the fact that the changes in ACSL do not impact
+E-ACSL. It might also be useful to check that the table of contents of both manuals
+coincide\todo{Provide a script for that}.
 
 Also, most of the manuals include an appendix with the list of changes that have
 happened, divided by version of Frama-C. Make sure that the first section has
