@@ -317,7 +317,7 @@ build-distrib-tarball:
 
 # Build ivette apps
 
-build-ivette-linux-packages:
+.build_template: &ivette_linux_build_template
   stage: distrib
   <<: *ivette_setup
   script:
@@ -329,9 +329,16 @@ build-ivette-linux-packages:
       - ./*.AppImage
   tags:
     - docker
+
+build-ivette-linux-packages:
+  <<: *ivette_linux_build_template
+  <<: *manual_when_not_special_pipeline
+
+build-ivette-linux-packages-release:
+  <<: *ivette_linux_build_template
   <<: *when_release
 
-build-ivette-macos-packages:
+.build_template: &ivette_macos_build_template
   stage: distrib
   script:
     # TS
@@ -356,6 +363,13 @@ build-ivette-macos-packages:
       - ./*.dmg
   tags:
     - macos-arm
+
+build-ivette-macos-packages:
+  <<: *ivette_macos_build_template
+  <<: *manual_when_not_special_pipeline
+
+build-ivette-macos-packages-release:
+  <<: *ivette_macos_build_template
   <<: *when_release
 
 # Coverage
@@ -432,8 +446,8 @@ release-content:
   needs:
     - api-doc
     - build-distrib-tarball
-    - build-ivette-linux-packages
-    - build-ivette-macos-packages
+    - build-ivette-linux-packages-release
+    - build-ivette-macos-packages-release
     - manuals-for-release
   artifacts:
     paths:
