@@ -128,6 +128,10 @@ class pseq :
   pcond:#pcond ->
   object
     method reset : unit
+
+    method update_ce_models : Wpo.t -> unit
+    method get_ce_mode : bool
+    method set_ce_mode : bool -> unit
     method get_focus_mode : bool
     method set_focus_mode : bool -> unit
     method get_state_mode : bool

@@ -375,6 +375,13 @@ module PRINTER = State_builder.Ref
       let default () = Hashtbl.create 0
     end)
 
+let () = Wpo.add_modified_hook
+    (fun wpo ->
+       let registry = PRINTER.get () in
+       let printer = Hashtbl.find_opt registry wpo.po_gid in
+       Option.iter (fun pp -> pp#update_ce_models wpo) printer
+    )
+
 let () = Wpo.add_removed_hook
     (fun wpo ->
        let registry = PRINTER.get () in
@@ -389,8 +396,13 @@ let lookup (node : ProofEngine.node) : printer =
   let tree = ProofEngine.tree node in
   let wpo = ProofEngine.main tree in
   let registry = PRINTER.get () in
-  try Hashtbl.find registry wpo.po_gid with Not_found ->
+  try
+    let printer = Hashtbl.find registry wpo.po_gid in
+    printer#update_ce_models wpo ;
+    printer
+  with Not_found ->
     let pp = new printer () in
+    pp#update_ce_models wpo ;
     pp#on_selection (fun () -> R.emit printStatus) ;
     Hashtbl.add registry wpo.po_gid pp ; pp
 
@@ -429,6 +441,8 @@ let () =
       ~descr:(Md.plain "Integer constants format") iformat in
   let get_rformat = R.param_opt printSequent ~name:"rformat"
       ~descr:(Md.plain "Real constants format") rformat in
+  let get_showce = R.param_opt printSequent ~name:"showce"
+      ~descr:(Md.plain "Display counter examples") (module D.Jbool) in
   let get_autofocus = R.param_opt printSequent ~name:"autofocus"
       ~descr:(Md.plain "Auto-focus mode") (module D.Jbool) in
   let get_unmangled = R.param_opt printSequent ~name:"unmangled"
@@ -447,6 +461,7 @@ let () =
         let margin = get_margin rq in
         Option.iter pp#set_iformat (get_iformat rq) ;
         Option.iter pp#set_rformat (get_rformat rq) ;
+        Option.iter pp#set_ce_mode (get_showce rq) ;
         Option.iter pp#set_focus_mode (get_autofocus rq) ;
         Option.iter pp#set_unmangled (get_unmangled rq) ;
         D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)

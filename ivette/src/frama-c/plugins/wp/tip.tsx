@@ -285,6 +285,7 @@ export function TIPView(props: TIPProps): JSX.Element {
   // --- printer settings
   const [autofocus, setAF] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [memory, setMEM] = Dome.useBoolSettings('wp.tip.unmangled', true);
+  const [showCE, setSCE] = Dome.useBoolSettings('wp.tip.show-ce', false);
   const [iformat, setIformat] = Dome.useWindowSettings<TIP.iformat>(
     'wp.tip.iformat', TIP.jIformat, 'dec'
   );
@@ -454,6 +455,9 @@ export function TIPView(props: TIPProps): JSX.Element {
               className='wp-printer-locked'
               display={locked} />
             <AFormatSelector
+              value={showCE} setValue={setSCE}
+              label='CE' title='Show counter examples.' />
+            <AFormatSelector
               value={autofocus} setValue={setAF}
               label='AF' title='Autofocus mode.' />
             <AFormatSelector
@@ -465,6 +469,7 @@ export function TIPView(props: TIPProps): JSX.Element {
           <GoalView
             node={current}
             locked={locked}
+            showce={showCE}
             autofocus={autofocus}
             unmangled={!memory}
             iformat={iformat}

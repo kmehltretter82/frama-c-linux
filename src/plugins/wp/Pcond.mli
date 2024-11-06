@@ -102,6 +102,10 @@ class engine : #Plang.engine ->
     (** Print the sequent in the given environment.
         The environment is enriched with the shared terms. *)
 
+    method get_ce_mode : bool
+    method set_ce_mode : bool -> unit
+    method update_ce_models : (VCS.prover, VCS.model) Hashtbl.t -> unit
+
   end
 
 (* -------------------------------------------------------------------------- *)

@@ -219,10 +219,38 @@ class engine (lang : #Plang.engine) =
       Format.fprintf fmt "@[<hov 4>%a %a%s@]"
         self#pp_clause clause lang#pp_pred p dot
 
+    val mutable showce = false
+    method get_ce_mode = showce
+    method set_ce_mode ce = showce <- ce
+
+    val mutable models = Hashtbl.create 1
+
+    method update_ce_models (table: (VCS.prover, VCS.model) Hashtbl.t) =
+      models <- table
+
+    method private pp_probe_model fmt p =
+      if showce then
+        let models =
+          Hashtbl.fold
+            (fun prover map l -> (prover, Probe.Map.find_opt p map) :: l)
+            models []
+        in
+        let pp_prover_model fmt (p, model) =
+          Format.fprintf fmt "= %a (%s)"
+            (Pretty_utils.pp_opt ~none:"?" Why3Provers.pp_model) model
+            (VCS.title_of_prover ~version:false p)
+        in
+        Format.fprintf fmt " @{<wp:comment>(* %a *)@}"
+          (Pretty_utils.pp_list ~sep:", " pp_prover_model)
+          models
+
     method pp_probe fmt p t =
       begin
-        Format.fprintf fmt "@[<hov 4>%a %a = %a.@]"
-          self#pp_clause "Probe" Probe.pretty p lang#pp_term t
+        Format.fprintf fmt "@[<hov 4>%a %a = %a%a.@]"
+          self#pp_clause "Probe"
+          Probe.pretty p
+          lang#pp_term t
+          self#pp_probe_model p
       end
 
     (* -------------------------------------------------------------------------- *)

@@ -157,6 +157,7 @@ class Sequent {
 export interface GoalViewProps {
   node: Node;
   locked: boolean;
+  showce: boolean;
   autofocus: boolean;
   unmangled: boolean;
   iformat: TIP.iformat;
