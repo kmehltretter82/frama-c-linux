@@ -476,6 +476,19 @@ class pseq
     method get_focus_mode = autofocus#get_autofocus
     method set_focus_mode = autofocus#set_autofocus
 
+    method get_ce_mode = pcond#get_ce_mode
+    method set_ce_mode ce = pcond#set_ce_mode ce
+
+    method update_ce_models (po: Wpo.t) =
+      let models = Hashtbl.create 7 in
+      List.iter
+        begin fun (p, r) ->
+          if not @@ Probe.Map.is_empty r.VCS.prover_model then
+            Hashtbl.add models p r.VCS.prover_model
+        end
+        (Wpo.get_results po) ;
+      pcond#update_ce_models models
+
     method get_state_mode = pcond#get_state
     method set_state_mode = pcond#set_state
     method set_unmangled m = pcond#set_state (not m)
