@@ -127,8 +127,13 @@ List of external plugins repo names:
 \end{itemize}
 For each one of them, check that versions in the \texttt{dune-project} files are
 coherent with \FramaC's new release. If not, update them and run \verb+make+ to
-generate the new opam file. Create a new branch, commit and push. Create a merge
-request targetting \texttt{stable/copper} on each plugin and assign your co-rm.
+generate the new opam file, or, in the case of Frama-Clang, run the
+\texttt{./bin/set-version.sh} script, which takes three arguments: the
+new Frama-Clang version number, the new Frama-C version number, and the new
+Frama-C version name.
+
+Create a new branch, commit and push. Create a merge
+request targetting \texttt{stable/release} on each plugin and assign your co-rm.
 This changes will need to be merged on master's branches later.
 
 \section{Copyright}
