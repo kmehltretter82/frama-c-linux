@@ -67,6 +67,7 @@ sig
   val literal : eid:int -> Cstring.cst -> region option
   val separated : region -> region -> bool
   val included : region -> region -> bool
+  val footprint : region -> region list
 end
 
 (* -------------------------------------------------------------------------- *)

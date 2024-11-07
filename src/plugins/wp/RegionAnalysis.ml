@@ -102,3 +102,5 @@ let shift r obj =
   with Not_found -> None
 
 let literal ~eid _ = ignore eid ; None
+
+let footprint r = Region.footprint (get_map ()) r
