@@ -52,3 +52,4 @@ let exp m e = Option.map (Memory.node m) @@ Memory.exp m e
 let cvar = Memory.cvar
 let field = Memory.field
 let index = Memory.index
+let footprint = Memory.footprint
