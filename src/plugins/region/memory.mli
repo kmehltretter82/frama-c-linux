@@ -109,6 +109,8 @@ val ranges : map -> node -> range list
 val points_to : map -> node -> node option
 val pointed_by : map -> node -> node list
 
+val footprint : map -> node -> node list
+
 val included : map -> node -> node -> bool
 val separated : map -> node -> node -> bool
 val singleton : map -> node -> bool

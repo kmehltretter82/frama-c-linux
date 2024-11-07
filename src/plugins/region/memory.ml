@@ -457,6 +457,17 @@ let field (m: map) (r: node) (fd: fieldinfo) : node =
     move m r p s
   else r
 
+let footprint (m: map) (r: node) : node list =
+  let leafs = ref [] in
+  let rec store_leafs (r: node) : unit =
+    let rg = Ufind.get m.store r in
+    match rg.clayout with
+    | Blob | Cell (_,_) -> leafs := r :: !leafs
+    | Compound (_, _, range) ->
+      Ranges.iter store_leafs range
+  in store_leafs r ;
+  !leafs
+
 let index (m : map) (r: node) (ty:typ) : node =
   move m r 0 (Cil.bitsSizeOf ty)
 
