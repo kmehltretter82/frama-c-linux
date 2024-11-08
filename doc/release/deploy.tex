@@ -183,9 +183,15 @@ Check if other \FramaC (and related) repositories need to be updated:
 
 \begin{itemize}
 \item \texttt{acsl-language/acsl} (if last minute patches were applied)
-\item \texttt{pub/open-source-case-studies}
-\item \texttt{pub/sate-6}
-\item other \texttt{pub} repositories related to Frama-C...
+\item \texttt{pub/open-source-case-studies} (\expertise{André})
+\begin{itemize}
+\item update the reference commit of the frama-c submodule to the tag of the release
+\item \texttt{make framac}
+\item \texttt{make clean}
+\item \texttt{make all}
+\end{itemize}
+\item \texttt{pub/sate-6} (\expertise{André})
+\item other \texttt{pub} repositories related to Frama-C...\todo{which ones?}
 \end{itemize}
 
 \section{Docker image preparation}
