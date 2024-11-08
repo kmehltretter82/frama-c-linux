@@ -47,7 +47,13 @@ at the end of Chapter.~\ref{chap:validation}, and to force-push this new referen
 \section{Check the website}
 \label{sec:check-website}
 
-Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}.
+Once the pipeline for the website has run, open \url{https://pub.frama-c.com}.
+
+\textbf{Note:} \texttt{https://pub.frama-c.com/} serves the content of the latest
+commit successfully compiled by the CI. If there is a delay between the moment where
+you launch the pipeline and the moment you inspect the website, it may not be up-to-date.
+You can either serve the content locally on your machine (instructions are provided
+on the README of the website's repo), or by re-running the pages jobs on the relevant pipeline
 
 \begin{itemize}
   \item \texttt{index.html} must display:
