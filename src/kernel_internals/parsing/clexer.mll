@@ -79,10 +79,6 @@ let unsupported key =
   let msg f k = Format.fprintf f "%s is currently unsupported by Frama-C." k in
   add key (fun loc -> Kernel.abort ~source:(fst loc) "%a" msg key)
 
-let warning_C11 key builder =
-  let warning () = Kernel.(warning ~wkey:wkey_c11 "%s is a C11 keyword" key) in
-  add key (fun loc -> warning () ; builder loc)
-
 let thread_keyword () =
   let wkey = Kernel.wkey_conditional_feature in
   let s = "__thread is a GCC extension, use a GCC-based machdep to enable it" in
@@ -143,8 +139,8 @@ let init_lexicon () =
   valid "__inline__" (fun loc -> INLINE loc) ;
   valid "inline" (fun loc -> INLINE loc) ;
   valid "__inline" (fun loc -> INLINE loc) ;
-  warning_C11 "_Noreturn" (fun loc -> NORETURN loc) ;
-  warning_C11 "_Static_assert" (fun loc -> STATIC_ASSERT loc) ;
+  valid "_Noreturn" (fun loc -> NORETURN loc) ;
+  valid "_Static_assert" (fun loc -> STATIC_ASSERT loc) ;
   valid "__attribute__" (fun loc -> ATTRIBUTE loc) ;
   valid "__attribute" (fun loc -> ATTRIBUTE loc) ;
   valid "_Nullable" (fun loc -> NOP_ATTRIBUTE loc) ;
@@ -184,7 +180,7 @@ let init_lexicon () =
   valid "__builtin_va_arg" (fun loc -> BUILTIN_VA_ARG loc) ;
   valid "__builtin_types_compatible_p" (fun loc -> BUILTIN_TYPES_COMPAT loc) ;
   valid "__builtin_offsetof" (fun loc -> BUILTIN_OFFSETOF loc) ;
-  warning_C11 "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
+  valid "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
   (* We recognize __thread for GCC machdeps *)
   thread_keyword () ;
   filename_keyword () ;
@@ -196,7 +192,7 @@ let init_lexicon () =
   unsupported "_Complex" ;
   unsupported "_Decimal32" ;
   unsupported "_Decimal64" ;
-  warning_C11 "_Generic" (fun loc -> GENERIC loc) ;
+  valid "_Generic" (fun loc -> GENERIC loc) ;
   unsupported "_Imaginary" ;
   unsupported "__int128" ;
   unsupported "__uint128_t"
