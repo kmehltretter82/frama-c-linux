@@ -33,6 +33,10 @@ following:
   on \texttt{pub} (it must be started manually and requires the branch).
 \end{description}
 
+\textbf{Important note:}~If the version is a whole number (\texttt{X0.0}),
+a special step must be taken before starting \texttt{release-create}: add
+\texttt{X*} as a tag that maintainers can create on \texttt{pub/frama-c}.
+
 After running \texttt{release-branch} and \texttt{release-create}, either the
 tag indicates a beta release and then this tag is pushed on the public GitLab
 repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
