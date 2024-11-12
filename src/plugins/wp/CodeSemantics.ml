@@ -345,7 +345,7 @@ struct
     Warning.handle
       ~handler:exp_undefined
       ~severe:false
-      ~effect:"Hide sub-term definition"
+      ~fallback:"Hide sub-term definition"
       (exp_node env) e
 
   (* -------------------------------------------------------------------------- *)
@@ -440,7 +440,7 @@ struct
   let init_value ~sigma lv typ init =
     let obj = Ctypes.object_of typ in
     let outcome = Warning.catch
-        ~severe:false ~effect:"Skip initializer"
+        ~severe:false ~fallback:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
            let value_hyp = match init with
@@ -468,7 +468,7 @@ struct
   let init_range ~sigma lv typ low up value =
     let obj = Ctypes.object_of typ in
     let outcome = Warning.catch
-        ~severe:false ~effect:"Skip initializer"
+        ~severe:false ~fallback:"Skip initializer"
         (fun () ->
            let l = lval sigma lv in
            let e = Option.map (exp sigma) value in
