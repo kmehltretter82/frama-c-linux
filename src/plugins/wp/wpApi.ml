@@ -179,6 +179,19 @@ let _ : VCS.prover S.array =
     ~iter:iter_provers model
 
 (* -------------------------------------------------------------------------- *)
+(* --- Counter Examples                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _ =
+  S.register_state ~package
+    ~name:"counterExamples"
+    ~descr:(Md.plain "Enabled Counter Examples")
+    ~data:(module D.Jbool)
+    ~get:Wp_parameters.CounterExamples.get
+    ~set:Wp_parameters.CounterExamples.set
+    ~add_hook:Wp_parameters.CounterExamples.add_hook_on_update ()
+
+(* -------------------------------------------------------------------------- *)
 (* --- Results and Stats                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 

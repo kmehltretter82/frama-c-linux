@@ -59,10 +59,11 @@ interface Selector<A> {
 interface BoolSelector extends Selector<boolean> {
   label: string;
   title: string;
+  disabled?: boolean;
 }
 
 function AFormatSelector(props: BoolSelector): JSX.Element {
-  const { value, setValue } = props;
+  const { value, setValue, disabled } = props;
   const className = classes(
     'wp-printer-field wp-printer-button',
     value && 'selected'
@@ -72,9 +73,12 @@ function AFormatSelector(props: BoolSelector): JSX.Element {
       className={className}
       label={props.label}
       title={props.title}
-      onClick={() => setValue(!value)}
+      onClick={(): void => { if (!disabled) { setValue(!value); } }}
     >
-      <Icon id={value ? 'SWITCH.ON' : 'SWITCH.OFF'} />
+      <Icon
+        id={value ? 'SWITCH.ON' : 'SWITCH.OFF'}
+        kind={disabled ? 'disabled' : 'default'}
+      />
     </Item>
   );
 }
@@ -285,7 +289,13 @@ export function TIPView(props: TIPProps): JSX.Element {
   // --- printer settings
   const [autofocus, setAF] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [memory, setMEM] = Dome.useBoolSettings('wp.tip.unmangled', true);
-  const [showCE, setSCE] = Dome.useBoolSettings('wp.tip.show-ce', false);
+
+  const [enabledCE, _] = States.useSyncState(WP.counterExamples);
+  const [showCE, setSCE] = React.useState(enabledCE);
+  const ceTitle =
+    'Show counter examples.' +
+    (!enabledCE ? ' (disabled, use -wp-counter-examples)' : '');
+
   const [iformat, setIformat] = Dome.useWindowSettings<TIP.iformat>(
     'wp.tip.iformat', TIP.jIformat, 'dec'
   );
@@ -455,8 +465,8 @@ export function TIPView(props: TIPProps): JSX.Element {
               className='wp-printer-locked'
               display={locked} />
             <AFormatSelector
-              value={showCE} setValue={setSCE}
-              label='CE' title='Show counter examples.' />
+              value={showCE} setValue={setSCE} disabled={!enabledCE}
+              label='CE' title={ceTitle} />
             <AFormatSelector
               value={autofocus} setValue={setAF}
               label='AF' title='Autofocus mode.' />
