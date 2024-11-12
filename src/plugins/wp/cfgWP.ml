@@ -136,7 +136,7 @@ struct
   end
 
   (* Authorized written region from an assigns specification *)
-  type effect = {
+  type assigns_effect = {
     e_pid : P.t ; (* Assign Property *)
     e_post : bool ; (* Requires post effects (loop-assigns or post-assigns) *)
     e_label : c_label ; (* scope for collection *)
@@ -147,7 +147,7 @@ struct
 
   module EFFECT =
   struct
-    type t = effect
+    type t = assigns_effect
     let compare e1 e2 = P.compare e1.e_pid e2.e_pid
     let pretty fmt e =
       Format.fprintf fmt "@[<hov 2>EFFECT %a:@ %a@]"
@@ -500,7 +500,7 @@ struct
   (* --- Compilation of Effects                                           --- *)
   (* ------------------------------------------------------------------------ *)
 
-  let cc_effect env pid (ainfo:WpPropId.assigns_desc) : effect option =
+  let cc_effect env pid (ainfo:WpPropId.assigns_desc) : assigns_effect option =
     let from = ainfo.WpPropId.a_label in
     let sigma = L.mem_frame from in
     let authorized_region =
@@ -614,7 +614,7 @@ struct
   (* --- WP RULE : use assigns clause                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let assigns_condition (region : L.region) (e:effect) : F.pred =
+  let assigns_condition (region : L.region) (e:assigns_effect) : F.pred =
     let unfold = Wp_parameters.UnfoldAssigns.get () in
     L.check_assigns ~unfold e.e_valid ~written:region ~assignable:e.e_region
 
