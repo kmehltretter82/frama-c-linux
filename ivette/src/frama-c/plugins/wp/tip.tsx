@@ -290,8 +290,8 @@ export function TIPView(props: TIPProps): JSX.Element {
   const [autofocus, setAF] = Dome.useBoolSettings('wp.tip.autofocus', true);
   const [memory, setMEM] = Dome.useBoolSettings('wp.tip.unmangled', true);
 
-  const [showCE, setSCE] = Dome.useBoolSettings('wp.tip.show-ce', false);
   const [enabledCE, _] = States.useSyncState(WP.counterExamples);
+  const [showCE, setSCE] = React.useState(enabledCE);
   const ceTitle =
     'Show counter examples.' +
     (!enabledCE ? ' (disabled, use -wp-counter-examples)' : '');
