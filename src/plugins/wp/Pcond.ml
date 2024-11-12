@@ -241,7 +241,7 @@ class engine (lang : #Plang.engine) =
             (VCS.title_of_prover ~version:false p)
         in
         Format.fprintf fmt " @{<wp:comment>(* %a *)@}"
-          (Pretty_utils.pp_list ~sep:", " pp_prover_model)
+          (Pretty_utils.pp_list ~sep:", " ~empty:"no model" pp_prover_model)
           models
 
     method pp_probe fmt p t =
