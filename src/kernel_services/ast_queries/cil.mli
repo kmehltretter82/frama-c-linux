@@ -53,32 +53,6 @@ open Cil_types
 open Cil_datatype
 
 (* ************************************************************************* *)
-(** {2 Customization} *)
-(* ************************************************************************* *)
-
-type theMachine = Machine.machine
-
-(** @deprecated 30.0-Zinc *)
-val theMachine : theMachine
-[@@alert deprecated "Use Machine getter functions instead"]
-
-(** @deprecated 30.0-Zinc *)
-val msvcMode: unit -> bool
-[@@alert deprecated "Use Machine.msvcMode instead"]
-
-(** @deprecated 30.0-Zinc *)
-val gccMode: unit -> bool
-[@@alert deprecated "Use Machine.gccMode instead"]
-
-(** @deprecated 30.0-Zinc *)
-val set_acceptEmptyCompinfo: unit -> unit
-[@@alert deprecated "Use Machine.set_acceptEmptyCompinfo instead"]
-
-(** @deprecated 30.0-Zinc *)
-val acceptEmptyCompinfo: unit -> bool
-[@@alert deprecated "Use Machine.acceptEmptyCompinfo instead"]
-
-(* ************************************************************************* *)
 (** {2 Values for manipulating globals} *)
 (* ************************************************************************* *)
 
@@ -2380,21 +2354,6 @@ val bitsOffset: typ -> offset -> int * int
     this after you call {!Machine.init}. *)
 val fieldBitsOffset: fieldinfo -> int * int
 
-(** Like map but try not to make a copy of the list
-    @deprecated 30.0-Zinc *)
-val mapNoCopy: ('a -> 'a) -> 'a list -> 'a list
-[@@alert deprecated "Use [Extlib.map_no_copy] instead."]
-
-(** same as mapNoCopy for options
-    @deprecated 30.0-Zinc *)
-val optMapNoCopy: ('a -> 'a) -> 'a option -> 'a option
-[@@alert deprecated "Use [Extlib.opt_map_no_copy] instead."]
-
-(** Like map but each call can return a list. Try not to make a copy of the list
-    @deprecated 30.0-Zinc *)
-val mapNoCopyList: ('a -> 'a list) -> 'a list -> 'a list
-[@@alert deprecated "Use [Extlib.map_no_copy_list] instead."]
-
 (* ************************************************************************* *)
 (** {2 Misc} *)
 (* ************************************************************************* *)
@@ -2502,123 +2461,6 @@ val set_extension_handler:
     @since 21.0-Scandium
     @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
-[@@alert acsl_extension_handler
-    "This function can only be called by Acsl_extension"]
-
-(** void
-    @deprecated 30.0-Zinc *)
-val voidType: typ
-[@@alert deprecated "Use Cil_const.voidType types instead."]
-
-(** int
-    @deprecated 30.0-Zinc *)
-val intType: typ
-[@@alert deprecated "Use Cil_const.intType types instead."]
-
-(** unsigned int
-    @deprecated 30.0-Zinc *)
-val uintType: typ
-[@@alert deprecated "Use Cil_const.uintType types instead."]
-
-(** short
-    @deprecated 30.0-Zinc *)
-val shortType : typ
-[@@alert deprecated "Use Cil_const.shortType  types instead."]
-
-(** unsigned short
-    @deprecated 30.0-Zinc *)
-val ushortType : typ
-[@@alert deprecated "Use Cil_const.ushortType  types instead."]
-
-(** long
-    @deprecated 30.0-Zinc *)
-val longType: typ
-[@@alert deprecated "Use Cil_const.longType types instead."]
-
-(** long long
-    @deprecated 30.0-Zinc *)
-val longLongType: typ
-[@@alert deprecated "Use Cil_const.longLongType types instead."]
-
-(** unsigned long
-    @deprecated 30.0-Zinc *)
-val ulongType: typ
-[@@alert deprecated "Use Cil_const.ulongType types instead."]
-
-(** unsigned long long
-    @deprecated 30.0-Zinc *)
-val ulongLongType: typ
-[@@alert deprecated "Use Cil_const.ulongLongType types instead."]
-
-(** char
-    @deprecated 30.0-Zinc *)
-val charType: typ
-[@@alert deprecated "Use Cil_const.charType types instead."]
-
-(** signed char
-    @deprecated 30.0-Zinc *)
-val scharType: typ
-[@@alert deprecated "Use Cil_const.scharType types instead."]
-
-(** unsigned char
-    @deprecated 30.0-Zinc *)
-val ucharType: typ
-[@@alert deprecated "Use Cil_const.ucharType types instead."]
-
-(** char *
-    @deprecated 30.0-Zinc *)
-val charPtrType: typ
-[@@alert deprecated "Use Cil_const.charPtrType types instead."]
-
-(** signed char *
-    @deprecated 30.0-Zinc *)
-val scharPtrType: typ
-[@@alert deprecated "Use Cil_const.scharPtrType types instead."]
-
-(** unsigned char *
-    @deprecated 30.0-Zinc *)
-val ucharPtrType: typ
-[@@alert deprecated "Use Cil_const.ucharPtrType types instead."]
-
-(** char const *
-    @deprecated 30.0-Zinc *)
-val charConstPtrType: typ
-[@@alert deprecated "Use Cil_const.charConstPtrType types instead."]
-
-(** void *
-    @deprecated 30.0-Zinc *)
-val voidPtrType: typ
-[@@alert deprecated "Use Cil_const.voidPtrType types instead."]
-
-(** void const *
-    @deprecated 30.0-Zinc *)
-val voidConstPtrType: typ
-[@@alert deprecated "Use Cil_const.voidConstPtrType types instead."]
-
-(** int *
-    @deprecated 30.0-Zinc *)
-val intPtrType: typ
-[@@alert deprecated "Use Cil_const.intPtrType types instead."]
-
-(** unsigned int *
-    @deprecated 30.0-Zinc *)
-val uintPtrType: typ
-[@@alert deprecated "Use Cil_const.uintPtrType types instead."]
-
-(** float
-    @deprecated 30.0-Zinc *)
-val floatType: typ
-[@@alert deprecated "Use Cil_const.floatType types instead."]
-
-(** double
-    @deprecated 30.0-Zinc *)
-val doubleType: typ
-[@@alert deprecated "Use Cil_const.doubleType types instead."]
-
-(** long double
-    @deprecated 30.0-Zinc *)
-val longDoubleType: typ
-[@@alert deprecated "Use Cil_const.longDoubleType types instead."]
 
 (*
 Local Variables:

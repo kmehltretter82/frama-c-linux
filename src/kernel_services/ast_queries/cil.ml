@@ -7427,61 +7427,6 @@ let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
 
-(******************************************************************************)
-(** Forward Cil_const types                                                   *)
-(******************************************************************************)
-
-let voidType = voidType
-let intType = intType
-let uintType = uintType
-let shortType = shortType
-let ushortType = ushortType
-let longType = longType
-let longLongType = longLongType
-let ulongType = ulongType
-let ulongLongType = ulongLongType
-let charType = charType
-let ucharType = ucharType
-let scharType = scharType
-
-let charPtrType = charPtrType
-let ucharPtrType = ucharPtrType
-let scharPtrType = scharPtrType
-let charConstPtrType = charConstPtrType
-
-let voidPtrType = voidPtrType
-let voidConstPtrType = voidConstPtrType
-
-let intPtrType = intPtrType
-let uintPtrType = uintPtrType
-
-let doubleType = doubleType
-let floatType = floatType
-let longDoubleType = longDoubleType
-
-(******************************************************************************)
-(** Forward Extlib copy functions                                             *)
-(******************************************************************************)
-
-let mapNoCopy = Extlib.map_no_copy
-
-let mapNoCopyList = Extlib.map_no_copy_list
-
-let optMapNoCopy = Extlib.opt_map_no_copy
-
-(******************************************************************************)
-(** Forward the machine                                                       *)
-(******************************************************************************)
-
-let acceptEmptyCompinfo = acceptEmptyCompinfo
-let set_acceptEmptyCompinfo = set_acceptEmptyCompinfo
-let msvcMode = msvcMode
-let gccMode = gccMode
-
-type theMachine = machine
-
-let theMachine = theMachine [@@alert "-deprecated"]
-
 (*
 Local Variables:
 compile-command: "make -C ../../.."
