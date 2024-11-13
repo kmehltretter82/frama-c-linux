@@ -55,7 +55,6 @@
 open Logic_const
 open Cil_datatype
 open Cil_types
-open Cil_const
 open Machine
 
 (* ************************************************************************* *)
@@ -3216,7 +3215,7 @@ let mkForIncr ?sattr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
   in
   mkFor ?sattr
     ~start:[ mkStmtOneInstr ~valid_sid:true (Set (var iter, first, first.eloc)) ]
-    ~guard:(new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, intType)))
+    ~guard:(new_exp ~loc:stopat.eloc (BinOp(Lt, evar iter, stopat, Cil_const.intType)))
     ~next:[ mkStmtOneInstr ~valid_sid:true
               (Set
                  (var iter,
@@ -3498,7 +3497,7 @@ let rec typeOf (e: exp) : typ =
   (* Character constants have type int.  ISO/IEC 9899:1999 (E),
    * section 6.4.4.4 [Character constants], paragraph 10, if you
    * don't believe me. *)
-  | Const(CChr _) -> intType
+  | Const(CChr _) -> Cil_const.intType
 
   (* The type of a string is a pointer to characters ! The only case when
    * you would want it to be an array is as an argument to sizeof, but we
@@ -3732,7 +3731,7 @@ module SizeOfOrError = Datatype.Make(struct
     type t  = sizeof_or_error
     let reprs = [
       Size 0 ;
-      Error ("", voidType)
+      Error ("", Cil_const.voidType)
     ]
     let compare a b =
       match a, b with
@@ -3935,7 +3934,7 @@ and intOfAttrparam (a:attrparam) : int option =
   let rec doit a : int =
     match a with
     | AInt(n) ->
-      Extlib.the ~exn:(SizeOfError ("Overflow in integer attribute.", voidType))
+      Extlib.the ~exn:(SizeOfError ("Overflow in integer attribute.", Cil_const.voidType))
         (Integer.to_int_opt n)
     | ABinOp(PlusA, a1, a2) -> doit a1 + doit a2
     | ABinOp(MinusA, a1, a2) -> doit a1 - doit a2
@@ -3957,7 +3956,7 @@ and intOfAttrparam (a:attrparam) : int option =
       bs / 8
     | AAlignOf(t) ->
       bytesAlignOf t
-    | _ -> raise (SizeOfError ("Cannot convert an attribute to int.", voidType))
+    | _ -> raise (SizeOfError ("Cannot convert an attribute to int.", Cil_const.voidType))
   in
   (* Use ignoreAlignmentAttrs here to prevent stack overflow if a buggy
      program does something like
@@ -4726,10 +4725,10 @@ let reduce_multichar typ : int64 list -> int64 =
     Int64.zero
 
 let interpret_character_constant char_list =
-  let value = reduce_multichar charType char_list in
+  let value = reduce_multichar Cil_const.charType char_list in
   if value < (Int64.of_int 256) then
     (* ISO C 6.4.4.4.10: single-character constants have type int *)
-    (CChr(Char.chr (Int64.to_int value))), intType
+    (CChr(Char.chr (Int64.to_int value))), Cil_const.intType
   else begin
     let orig_rep = None (* Some("'" ^ (String.escaped str) ^ "'") *) in
     if value <= (Int64.of_int32 Int32.max_int) then
@@ -5029,7 +5028,7 @@ let emptyFunctionFromVI vi =
 (* Make an empty function *)
 let emptyFunction name =
   let vi =
-    makeGlobalVar ~temp:false name (TFun(voidType, Some [], false,[]))
+    makeGlobalVar ~temp:false name (TFun(Cil_const.voidType, Some [], false,[]))
   in emptyFunctionFromVI vi
 
 let dummyFile =
@@ -5588,7 +5587,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
     TInt(IInt, a)
   | TInt (IUChar|IUShort as k, a) ->
     let a = remove_attributes_for_integral_promotion a in
-    if bitsSizeOfInt k < bitsSizeOf intType then
+    if bitsSizeOfInt k < bitsSizeOf Cil_const.intType then
       TInt(IInt, a)
     else
       TInt(IUInt,a)
@@ -5600,7 +5599,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
       | [AInt size] ->
         (* This attribute always fits in int. *)
         let size = Integer.to_int_exn size in
-        let sizeofint = bitsSizeOf intType in
+        let sizeofint = bitsSizeOf Cil_const.intType in
         let attrs = remove_attributes_for_integral_promotion a in
         let kind =
           if size < sizeofint then IInt
@@ -6452,7 +6451,7 @@ and mkBinOp ~loc op e1 e2 =
   in
   let doArithmeticComp () =
     let tres = arithmeticConversion t1 t2 in
-    make_expr tres intType
+    make_expr tres Cil_const.intType
   in
   let doIntegralArithmetic () =
     let tres = arithmeticConversion t1 t2 in
@@ -6463,7 +6462,7 @@ and mkBinOp ~loc op e1 e2 =
         ~current:true
         "@[mkBinOp: unsupported non integral result type for integral \
          arithmetic@ %a@]"
-        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
+        !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
   in
   let compare_pointer op ?cast1 ?cast2 e1 e2 =
     let do_cast e = function
@@ -6476,7 +6475,7 @@ and mkBinOp ~loc op e1 e2 =
       else
         e1, e2
     in
-    constFoldBinOp ~loc machdep op e1 e2 intType
+    constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
   in
   let check_scalar op e t =
     if not (isScalarType t) then
@@ -6489,7 +6488,7 @@ and mkBinOp ~loc op e1 e2 =
   | LAnd | LOr ->
     check_scalar "logical operator" e1 t1;
     check_scalar "logical operator" e2 t2;
-    constFoldBinOp ~loc machdep op e1 e2 intType
+    constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
   | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
     if msvcMode () then
@@ -6506,7 +6505,7 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp ~loc machdep op e1 e2 t1
   | MinusPP when isPointerType t1 && isPointerType t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
-    constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) intType
+    constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) Cil_const.intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
     when isArithmeticType t1 && isArithmeticType t2 ->
     doArithmeticComp ()
@@ -6528,7 +6527,7 @@ and mkBinOp ~loc op e1 e2 =
       ~current:true
       "@[mkBinOp: unsupported operator for such operands@ \
        %a@ (type of e1: %a,@ type of e2: %a)@]"
-      !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,intType)))
+      !pp_exp_ref (dummy_exp(BinOp(op,e1,e2,Cil_const.intType)))
       !pp_typ_ref t1
       !pp_typ_ref t2
 
