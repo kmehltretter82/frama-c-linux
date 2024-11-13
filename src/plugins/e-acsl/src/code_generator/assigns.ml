@@ -30,21 +30,21 @@ exception NoAssigns
 
 (* If an argument contains a pointer type, then it is undecidable which assigns
    clause should be generated, so skip the assigns generation in this case *)
-let rec is_ptr_free typ = match Cil.unrollType typ with
-  | TVoid _
-  | TInt (_, _)
-  | TFloat (_, _) -> true
-  | TPtr (_, _) -> false
-  | TArray (ty, _, _) -> is_ptr_free ty
-  | TFun (_, _, _, _) ->
+let rec is_ptr_free typ = match Cil.unrollTypeNode typ with
+  | TVoid
+  | TInt _
+  | TFloat _ -> true
+  | TPtr _ -> false
+  | TArray (ty, _) -> is_ptr_free ty
+  | TFun (_, _, _) ->
     (* a function cannot be an argument of a function *)
     assert false
-  | TNamed (_, _) ->
+  | TNamed _ ->
     (* The named types are unfolded with [Cil.unrolltype] *)
     assert false
-  | TEnum (_, _)
-  | TBuiltin_va_list _ -> true
-  | TComp (cinfo, _) ->
+  | TEnum _
+  | TBuiltin_va_list -> true
+  | TComp cinfo ->
     match cinfo.cfields with
     | None -> raise NoAssigns
     | Some fields ->

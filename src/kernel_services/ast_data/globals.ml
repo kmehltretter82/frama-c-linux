@@ -777,30 +777,30 @@ module Types = struct
     let aux_glob g = match g with
       | GType (ti, _loc) ->
         let name_tag = (ti.tname, Logic_typing.Typedef) in
-        Types.replace name_tag (TNamed (ti, []));
+        Types.replace name_tag (Cil_const.mk_tnamed ti);
         TypeNameToGlobal.replace name_tag g
 
       | GEnumTag (ei, _loc) ->
         let name_tag = (ei.ename, Logic_typing.Enum) in
-        Types.add name_tag (TEnum (ei, []));
+        Types.add name_tag (Cil_const.mk_tenum ei);
         List.iter aux_ei ei.eitems;
         TypeNameToGlobal.replace name_tag g
 
       | GEnumTagDecl (ei, _) ->
         let name_tag = (ei.ename, Logic_typing.Enum) in
-        Types.add name_tag (TEnum (ei, []));
+        Types.add name_tag (Cil_const.mk_tenum ei);
         List.iter aux_ei ei.eitems
 
       | GCompTag (ci, _loc) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, []));
+        Types.add name_tag (Cil_const.mk_tcomp ci);
         TypeNameToGlobal.replace name_tag g
 
       | GCompTagDecl (ci, _) ->
         let kind = Logic_typing.(if ci.cstruct then Struct else Union) in
         let name_tag = (ci.cname, kind) in
-        Types.add name_tag (TComp (ci, []))
+        Types.add name_tag (Cil_const.mk_tcomp ci)
 
       | _ -> ()
     in

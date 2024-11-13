@@ -71,8 +71,8 @@ let extended_integer_typenames =
    "int_fast64_t"; "uint_fast64_t"]
 
 let is_extended_integer_type t =
-  match t with
-  | TNamed (ti, _) -> List.mem ti.tname extended_integer_typenames
+  match t.tnode with
+  | TNamed ti -> List.mem ti.tname extended_integer_typenames
   | _ -> false
 
 let integral_rep ikind =
@@ -89,12 +89,14 @@ type castability = Strict      (* strictly allowed by the C standard *)
                  | Never       (* never allowed *)
 
 let can_cast given expected =
-  match expose given, expose expected with
-  | t1, t2 when Cil_datatype.Typ.equal t1 t2 -> Strict
-  | (TInt (i1,a1) | TEnum({ekind=i1},a1)),
-    (TInt (i2,a2) | TEnum({ekind=i2},a2)) ->
+  let t1 = expose given
+  and t2 = expose expected in
+  match t1.tnode, t2.tnode with
+  | _, _ when Cil_datatype.Typ.equal t1 t2 -> Strict
+  | (TInt i1 | TEnum {ekind=i1}),
+    (TInt i2 | TEnum {ekind=i2}) ->
     if integral_rep i1 <> integral_rep i2 ||
-       not (Cil_datatype.Attributes.equal a1 a2) then
+       not (Cil_datatype.Attributes.equal t1.tattr t2.tattr) then
       Never
     else if is_extended_integer_type given then
       Tolerated
@@ -106,17 +108,17 @@ let can_cast given expected =
   | _, _ -> Never
 
 let does_fit exp typ =
-  match Cil.constFoldToInt exp, Cil.unrollType typ with
-  | Some i, (TInt (ekind,_) | TEnum({ekind},_)) ->
+  match Cil.constFoldToInt exp, Cil.unrollTypeNode typ with
+  | Some i, (TInt ekind | TEnum {ekind}) ->
     Cil.fitsInInt ekind i
   | _ -> false
 
 (* Variant of [pp_typ] which details the underlying type for enums *)
 let pretty_typ fmt t =
-  match Cil.unrollType t with
-  | TEnum (ei, _) ->
+  match Cil.unrollTypeNode t with
+  | TEnum ei ->
     Format.fprintf fmt "%a (%a)" Printer.pp_typ t
-      Printer.pp_typ (TInt (ei.ekind, []))
+      Printer.pp_typ (Cil_const.mk_tint ei.ekind)
   | _ -> Printer.pp_typ fmt t
 
 (* cast the i-th argument exp to paramtyp *)
@@ -309,10 +311,10 @@ let aggregator_call ~builder aggregator vf args =
 (* ************************************************************************ *)
 
 let rec check_arg_matching expected given =
-  match Cil.unrollType given, Cil.unrollType expected with
+  match Cil.unrollTypeNode given, Cil.unrollTypeNode expected with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TPtr _, _ when Cil.isVoidPtrType expected -> true
-  | TPtr (t1, _), TPtr (t2, _) -> check_arg_matching t1 t2
+  | TPtr t1, TPtr t2 -> check_arg_matching t1 t2
   | _, _ -> not (Cil.need_cast given expected)
 
 
@@ -419,9 +421,9 @@ let find_field env structname fieldname =
     raise Not_found
 
 let find_predicate_by_width typ narrow_name wide_name =
-  match Cil.unrollTypeDeep typ with
-  | TPtr (TInt(IChar, _), _) -> find_predicate narrow_name
-  | TPtr (t, _) when
+  match Cil.(unrollTypeDeep typ).tnode with
+  | TPtr { tnode = TInt IChar } -> find_predicate narrow_name
+  | TPtr t when
       (* drop attributes to remove 'const' qualifiers and fc_stdlib attributes *)
       Cil_datatype.Typ.equal
         (Cil.typeDeepDropAllAttributes (Cil.unrollTypeDeep t))
@@ -640,17 +642,17 @@ let format_of_fkind k = function
   | FLongDouble -> Some `L, `f
 
 let rec format_of_type vf k t =
-  match t with
-  | TInt (ikind,_) | TEnum ({ekind = ikind},_) -> format_of_ikind ikind
-  | TFloat (fkind,_) -> format_of_fkind k fkind
-  | TPtr(_,_) ->
+  match t.tnode with
+  | TInt ikind | TEnum {ekind = ikind} -> format_of_ikind ikind
+  | TFloat fkind -> format_of_fkind k fkind
+  | TPtr _ ->
     (* technically, we might still want to write/read the actual pointer,
        but this is not the most likely possibility. *)
     if Cil.isCharPtrType t then
       None, `s
     else
       None, `p
-  | TNamed ({tname;ttype},_) ->
+  | TNamed {tname; ttype} ->
     (match tname with
      | "size_t" -> Some `z, `u
      | "ptrdiff_t" -> Some `t, `d
@@ -665,13 +667,13 @@ let rec format_of_type vf k t =
      the format string itself, but this can't really be checked
      here.
   *)
-  | TVoid _ -> raise (Translate_call_exn vf.vf_decl)
+  | TVoid -> raise (Translate_call_exn vf.vf_decl)
 
   (* these cases should not happen anyway *)
   | TComp _
   | TFun _
   | TArray _
-  | TBuiltin_va_list _ -> raise (Translate_call_exn vf.vf_decl)
+  | TBuiltin_va_list -> raise (Translate_call_exn vf.vf_decl)
 
 let infer_format_from_args vf format_fun args =
   let args = List.drop (format_fun.f_format_pos + 1) args in

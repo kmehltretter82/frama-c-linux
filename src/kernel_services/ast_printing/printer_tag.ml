@@ -275,12 +275,13 @@ let declaration_of_global = function
     Some(SFunction (Globals.Functions.get vi))
   | GAsm _ | GPragma _ | GText _ | GAnnot _ -> None
 
-let declaration_of_type = function
-  | TVoid _ | TInt _ | TFloat _ | TPtr _
-  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
-  | TNamed(ti, _) -> Some (SType ti)
-  | TComp (ci, _) -> Some (SComp ci)
-  | TEnum (ei, _) -> Some (SEnum ei)
+let declaration_of_type t =
+  match t.tnode with
+  | TVoid | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list -> None
+  | TNamed ti -> Some (SType ti)
+  | TComp  ci -> Some (SComp ci)
+  | TEnum  ei -> Some (SEnum ei)
 
 let declaration_of_property ip =
   match Property.get_kf ip with
@@ -305,12 +306,13 @@ let declaration_of_localizable = function
   | PLval(None,_,_) | PExp(None,_,_)
   | PType _ -> None
 
-let definition_of_type = function
-  | TVoid _ | TInt _ | TFloat _ | TPtr _
-  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
-  | TNamed(ti, _) -> Some (PGlobal(GType(ti,Location.unknown)))
-  | TComp (ci, _) -> Some (PGlobal(GCompTag(ci,Location.unknown)))
-  | TEnum (ei, _) -> Some (PGlobal(GEnumTag(ei,Location.unknown)))
+let definition_of_type t =
+  match t.tnode with
+  | TVoid | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list -> None
+  | TNamed ti -> Some (PGlobal(GType(ti,Location.unknown)))
+  | TComp  ci -> Some (PGlobal(GCompTag(ci,Location.unknown)))
+  | TEnum  ei -> Some (PGlobal(GEnumTag(ei,Location.unknown)))
 
 let definition_of_localizable = function
   | PLval(kf,ki,(Var vi,NoOffset))
@@ -332,12 +334,13 @@ let name_of_declaration = function
   | SGlobal vi -> vi.vname
   | SFunction kf -> Kernel_function.get_name kf
 
-let name_of_type = function
-  | TVoid _ | TInt _ | TFloat _ | TPtr _
-  | TArray _ | TFun _ | TBuiltin_va_list _ -> None
-  | TNamed(ti, _) -> Some ti.tname
-  | TComp (ci, _) -> Some ci.cname
-  | TEnum (ei, _) -> Some ei.ename
+let name_of_type t =
+  match t.tnode with
+  | TVoid | TInt _ | TFloat _ | TPtr _
+  | TArray _ | TFun _ | TBuiltin_va_list -> None
+  | TNamed ti -> Some ti.tname
+  | TComp  ci -> Some ci.cname
+  | TEnum  ei -> Some ei.ename
 
 let name_of_global g =
   Option.map name_of_declaration @@ declaration_of_global g
@@ -440,9 +443,9 @@ let localizable_of_global g =
 let localizable_of_declaration = function
   | SFunction kf -> localizable_of_kf kf
   | SGlobal vi -> PVDecl(None,Kglobal,vi)
-  | SComp ci -> PType(TComp(ci,[]))
-  | SEnum ei -> PType(TEnum(ei,[]))
-  | SType ti -> PType(TNamed(ti,[]))
+  | SComp ci -> PType(Cil_const.mk_tcomp ci)
+  | SEnum ei -> PType(Cil_const.mk_tenum ei)
+  | SType ti -> PType(Cil_const.mk_tnamed ti)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Find localizable at a Filepath.position                            --- *)

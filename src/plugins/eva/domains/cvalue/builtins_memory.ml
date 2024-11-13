@@ -388,7 +388,7 @@ let memset_typ_offsm_int full_typ i =
           let vinit = V_Or_Uninitialized.initialized v in
           V_Offsetmap.add bounds (vinit, size, Rel.zero) offsm
         in
-        match Cil.unrollType styp with
+        match Cil.unrollTypeNode styp with
         | TInt _ | TEnum _ | TPtr _ ->
           let size = Eval_typ.sizeof_lval_typ styp (* handles bitfields *) in
           let size = Int_Base.project size in
@@ -404,16 +404,16 @@ let memset_typ_offsm_int full_typ i =
           (* Do not produce NaN or infinites here (unless they are accepted
              by the engine). *)
           if Fval.is_finite f = True then update size v' else update size v
-        | TComp ({ cstruct = true ; cfields = l}, _) -> (* struct *)
+        | TComp { cstruct = true ; cfields = l} -> (* struct *)
           let aux_field offsm fi =
             let offset_fi = Int.of_int (fst (Cil.fieldBitsOffset fi)) in
             aux fi.ftype (Int.add offset offset_fi) offsm
           in
           List.fold_left aux_field offsm (Option.value ~default:[] l)
-        | TComp ({ cstruct = false ; cfields = l}, _) -> (* union *)
+        | TComp { cstruct = false ; cfields = l} -> (* union *)
           (* Use only the first field. This is somewhat arbitrary *)
           aux (List.hd (Option.get l)).ftype offset offsm
-        | TArray (typelt, nb, _) -> begin
+        | TArray (typelt, nb) -> begin
             let nb = Cil.lenOfArray64 nb in (* always succeeds, we computed the
                                                size of the entire type earlier *)
             if Integer.(gt nb zero) then begin
@@ -451,7 +451,7 @@ let memset_typ_offsm_int full_typ i =
             else offsm (* size = 0. Do nothing, this is supposed to be invalid
                           anyway *)
           end
-        | TVoid _ | TFun _ | TBuiltin_va_list _ ->
+        | TVoid | TFun _ | TBuiltin_va_list ->
           raise (ImpreciseMemset UnsupportedType)
         | TNamed _ -> assert false (* unrolled *)
       in

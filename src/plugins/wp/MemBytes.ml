@@ -268,7 +268,7 @@ module RegisterShift = WpContext.Static
     end)
 
 let field_offset ci field =
-  let comp = Cil_types.TComp(ci, []) in
+  let comp = Cil_const.mk_tcomp ci in
   let field = Cil_types.Field(field, NoOffset) in
   let bits_offset, bits_size = Cil.bitsOffset comp field in
   if 0 <> bits_offset mod 8 || 0 <> bits_size mod 8 then

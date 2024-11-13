@@ -388,8 +388,8 @@ let height_alarm = let open Eva_utils in function
     | Alarms.Overlap (lv1,lv2) -> max (height_lval lv1) (height_lval lv2) + 1
     | Alarms.Is_nan_or_infinite (e, fkind)
     | Alarms.Is_nan (e, fkind) ->
-      let trivial = match Cil.typeOf e with
-        | TFloat (fk, _) -> fk = fkind
+      let trivial = match Cil.(typeOf e).tnode with
+        | TFloat fk -> fk = fkind
         | _ -> false
       in
       if trivial then height_expr e else height_expr e + 1

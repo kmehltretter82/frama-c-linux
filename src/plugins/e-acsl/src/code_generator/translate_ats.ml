@@ -330,7 +330,7 @@ let pretranslate_to_exp_with_lscope ~loc ~lscope kf env pot =
           Error.not_yet "\\at on purely logic variables and over gmp type"
       end
   in
-  let ty_ptr = TPtr(ty, []) in
+  let ty_ptr = Cil_const.mk_tptr ty in
   let vi_at, e_at, env = Env.new_var
       ~loc
       ~name:"at"

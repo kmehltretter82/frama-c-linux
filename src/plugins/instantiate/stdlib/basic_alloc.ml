@@ -28,10 +28,10 @@ open Extlib
 let unexpected = Options.fatal "Stdlib.Basic_alloc: unexpected: %s"
 
 let valid_size ?loc typ size =
-  let p = match typ with
-    | TComp (ci, _) when Cil.has_flexible_array_member typ ->
-      let elem = match (last (Option.value ~default:[] ci.cfields)).ftype with
-        | TArray(t, _, _) -> tinteger ?loc (Cil.bytesSizeOf t)
+  let p = match typ.tnode with
+    | TComp ci when Cil.has_flexible_array_member typ ->
+      let elem = match (last (Option.value ~default:[] ci.cfields)).ftype.tnode with
+        | TArray (t, _) -> tinteger ?loc (Cil.bytesSizeOf t)
         | _ -> unexpected "non array last field on flexible structure"
       in
       let base = tinteger ?loc (Cil.bytesSizeOf typ) in

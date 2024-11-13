@@ -102,8 +102,8 @@ let access_elts ~loc ?size tlv =
 
 let extract_mem_term ~loc acc tlv =
   match Logic_utils.unroll_type (Cil.typeOfTermLval tlv) with
-  | Ctype (TPtr _ ) -> access_ptr_elts ~loc tlv :: acc
-  | Ctype (TArray(_,e,_)) ->
+  | Ctype { tnode = TPtr _ } -> access_ptr_elts ~loc tlv :: acc
+  | Ctype { tnode = TArray (_,e) } ->
     let size = Option.bind e (Cil.constFoldToInt ~machdep:true) in
     access_elts ~loc ?size tlv :: acc
   | _ -> acc

@@ -65,10 +65,10 @@ module CVal = struct
 
   let forward_binop _context typ binop v1 v2 =
     let value =
-      match typ with
-      | Cil_types.TFloat (fkind, _) ->
+      match typ.Cil_types.tnode with
+      | TFloat fkind ->
         Cvalue_forward.forward_binop_float (Fval.kind fkind) v1 binop v2
-      | TInt _ | TPtr _ | _ as typ ->
+      | TInt _ | TPtr _ | _ ->
         Cvalue_forward.forward_binop_int ~typ v1 binop v2
     in
     if Cvalue.V.is_bottom value

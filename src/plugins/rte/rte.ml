@@ -83,8 +83,8 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
       (* Mark that we went through a struct field, then recurse *)
       check_array_access default off fi.ftype true
     | Index (e, off) ->
-      match Cil.unrollType typ with
-      | TArray (bt, Some size, _) ->
+      match Cil.unrollTypeNode typ with
+      | TArray (bt, Some size) ->
         if Kernel.SafeArrays.get () || not in_struct then begin
           (* Generate an assertion for this access, then go deeper in
              case other accesses exist *)
@@ -95,7 +95,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
              [-unsafe-arrays]. Honor the option and generate only
              the default [\valid] assertion *)
           check_array_access true off bt in_struct
-      | TArray (bt, None, _) -> check_array_access true off bt in_struct
+      | TArray (bt, None) -> check_array_access true off bt in_struct
       | _ -> assert false
   in
   match lv with
@@ -372,8 +372,8 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
 (* assertion for casting a floating-point value to an integer *)
 let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
   let e_typ = Cil.unrollType (Cil.typeOf exp) in
-  match e_typ, ty with
-  | TFloat _, TInt (ikind,_) ->
+  match e_typ.tnode, ty.tnode with
+  | TFloat _, TInt ikind ->
     let szTo = Cil.bitsSizeOfBitfield ty in
     let min_ty, max_ty =
       if Cil.isSigned ikind then

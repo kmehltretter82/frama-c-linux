@@ -161,11 +161,12 @@ let signed_ikind = function
   | ILongLong | IULongLong  -> ILongLong
 
 let rec signed_counterpart typ =
-  match Cil.unrollType typ with
-  | TInt (ik, attrs) -> TInt (signed_ikind ik, attrs)
-  | TEnum ({ekind = ik} as info, attrs) ->
-    let info = { info with ekind = signed_ikind ik} in
-    TEnum (info, attrs)
+  let typ = Cil.unrollType typ in
+  match typ.tnode with
+  | TInt ik -> Cil_const.mk_tint ~tattr:typ.tattr (signed_ikind ik)
+  | TEnum ei ->
+    let info = { ei with ekind = signed_ikind ei.ekind } in
+    Cil_const.mk_tenum ~tattr:typ.tattr info
   | TPtr _ -> signed_counterpart ((Machine.uintptr_type ()))
   | _ -> assert false
 
@@ -510,12 +511,12 @@ module Make
   let assume_valid_value context lval res =
     let open Evaluated.Operators in
     let* value, origin = res in
-    match Cil.unrollType lval.typ with
-    | TFloat (fkind, _) ->
+    match Cil.unrollTypeNode lval.typ with
+    | TFloat fkind ->
       let expr = Eva_ast.Build.lval lval in
       let+ new_value = remove_special_float expr fkind value in
       new_value, origin
-    | TInt (IBool, _) when Kernel.InvalidBool.get () ->
+    | TInt IBool when Kernel.InvalidBool.get () ->
       let one = Abstract_value.Int Integer.one in
       let truth = Value.assume_bounded Alarms.Upper_bound one value in
       let alarm () = Alarms.Invalid_bool (Eva_ast.to_cil_lval lval) in
@@ -970,8 +971,8 @@ module Make
     | CastE (dst_typ, e) ->
       let* value, volatile = root_forward_eval env e in
       let v = forward_cast env.context ~dst_typ e value in
-      let v = match Cil.unrollType dst_typ with
-        | TFloat (fkind, _) -> let* v in remove_special_float expr fkind v
+      let v = match Cil.unrollTypeNode dst_typ with
+        | TFloat fkind -> let* v in remove_special_float expr fkind v
         | TPtr _ -> let* v in assume_pointer env.context expr v
         | _ -> v
       in
@@ -1083,7 +1084,7 @@ module Make
       let open Evaluated.Operators in
       let typ_pointed, array_size =
         match Cil.unrollType typ with
-        | TArray (t, size, _) -> t, size
+        | { tnode = TArray (t, size) } -> t, size
         | t -> Self.fatal ~current:true "Got type '%a'" Printer.pp_typ t
       in
       let eval = eval_offset env ~reduce_valid_index typ_pointed remaining in

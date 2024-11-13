@@ -208,8 +208,8 @@ let guess_intended_malloc_type stack sizev constant_size =
     else None
   in
   let mk_typed_size t =
-    match Cil.unrollType t with
-    | TPtr (t, _) when not (Cil.isVoidType t) ->
+    match Cil.unrollTypeNode t with
+    | TPtr t when not (Cil.isVoidType t) ->
       let s = Int.of_int (Cil.bytesSizeOf t) in
       if Int.(equal s zero) ||
          (Int.equal (Int.e_rem size_min s) Int.zero &&
@@ -239,22 +239,23 @@ let guess_intended_malloc_type stack sizev constant_size =
 let type_from_nb_elems tsize =
   let typ = tsize.elem_typ in
   match tsize.nb_elems with
-  | None -> TArray (typ, None, [])
+  | None -> Cil_const.mk_tarray typ None
   | Some nb ->
     if Int.equal Int.one nb
     then typ
     else
       let loc = Current_loc.get () in
       let esize_arr = Cil.kinteger64 ~loc nb in (* [nb] fits in size_t *)
-      TArray (typ, Some esize_arr, [])
+      Cil_const.mk_tarray typ (Some esize_arr)
 
 (* Generalize a type into an array type without size. Useful for variables
    whose size is mutated. *)
 let weaken_type typ =
   match Cil.unrollType typ with
-  | TArray (_, None, _) -> typ
-  | TArray (typ, Some _, _) | typ ->
-    TArray (typ, None, [])
+  | { tnode = TArray (_, None) } -> typ
+  | { tnode = TArray (typ, Some _) }
+  | typ ->
+    Cil_const.mk_tarray typ None
 
 (* size for which the base is certain to be valid *)
 let size_sure_valid b = match Base.validity b with
@@ -385,9 +386,7 @@ let string_of_region = function
 (* Only called when the 'weakest base' needs to be allocated. *)
 let create_weakest_base region =
   let stack = { (Eva_utils.current_call_stack ()) with stack = [] } in
-  let type_base =
-    TArray (Cil_const.charType, None, [])
-  in
+  let type_base = Cil_const.(mk_tarray charType None) in
   let var = create_new_var stack "alloc" type_base Weak in
   Self.warning ~wkey:wkey_imprecise_alloc ~current:true ~once:true
     "allocating a single weak variable for ALL dynamic allocations %s: %a"

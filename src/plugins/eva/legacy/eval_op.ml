@@ -66,9 +66,9 @@ let backward_comp_float_left fkind positive comp l r =
 
 let backward_comp_left_from_type = function
   | Ctype typ -> begin
-      match Cil.unrollType typ with
+      match Cil.unrollTypeNode typ with
       | TInt _ | TEnum _ | TPtr _ -> backward_comp_int_left
-      | TFloat (fk, _) -> backward_comp_float_left (Fval.kind fk)
+      | TFloat fk -> backward_comp_float_left (Fval.kind fk)
       | _ -> (fun _ _ v _ -> v) (* should never occur anyway *)
     end
   | Linteger -> backward_comp_int_left

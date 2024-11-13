@@ -519,22 +519,23 @@ module VolatileMerging =
     end)
 
 let hash_type t =
-  let rec aux acc depth = function
-    | TVoid _ -> acc
-    | TInt (ikind,_) -> 3 * acc + Hashtbl.hash ikind
-    | TFloat (fkind,_) -> 5 * acc + Hashtbl.hash fkind
-    | TPtr(t,_) when depth < 5 -> aux (7*acc) (depth+1) t
+  let rec aux acc depth t =
+    match t.tnode with
+    | TVoid -> acc
+    | TInt ikind -> 3 * acc + Hashtbl.hash ikind
+    | TFloat fkind -> 5 * acc + Hashtbl.hash fkind
+    | TPtr t when depth < 5 -> aux (7*acc) (depth+1) t
     | TPtr _ -> 7 * acc
-    | TArray (t,_,_) when depth < 5 -> aux (9*acc) (depth+1) t
+    | TArray (t, _) when depth < 5 -> aux (9*acc) (depth+1) t
     | TArray _ -> 9 * acc
-    | TFun (r,_,_,_) when depth < 5 -> aux (11*acc) (depth+1) r
+    | TFun (r, _, _) when depth < 5 -> aux (11*acc) (depth+1) r
     | TFun _ -> 11 * acc
-    | TNamed (t,_) -> 13 * acc + Hashtbl.hash t.tname
-    | TComp(c,_) ->
-      let mul = if c.cstruct then 17 else 19 in
-      mul * acc + Hashtbl.hash c.cname
-    | TEnum (e,_) -> 23 * acc + Hashtbl.hash e.ename
-    | TBuiltin_va_list _ -> 29 * acc
+    | TNamed ti -> 13 * acc + Hashtbl.hash ti.tname
+    | TComp ci ->
+      let mul = if ci.cstruct then 17 else 19 in
+      mul * acc + Hashtbl.hash ci.cname
+    | TEnum ei -> 23 * acc + Hashtbl.hash ei.ename
+    | TBuiltin_va_list -> 29 * acc
   in
   aux 117 0 t
 
@@ -1319,8 +1320,8 @@ let update_compinfo ci =
   node.ndata
 
 let rec update_type_repr t =
-  match t with
-  | TNamed (ti,attrs) ->
+  match t.tnode with
+  | TNamed ti ->
     ti.ttype <- update_type_repr ti.ttype;
     let node =
       PlainMerging.getNode tEq tSyn !currentFidx ti.tname ti None
@@ -1356,9 +1357,9 @@ let rec update_type_repr t =
       node.nrep <- node;
       PlainMerging.add_eq_table tEq (oldnode.nfidx, n) renamed_node;
     end;
-    TNamed(node.ndata,attrs)
-  | TComp (ci,attrs) ->
-    TComp (update_compinfo ci, attrs)
+    Cil_const.mk_tnamed ~tattr:t.tattr node.ndata
+  | TComp ci ->
+    Cil_const.mk_tcomp ~tattr:t.tattr (update_compinfo ci)
   | _ -> t
 
 let static_var_visitor = object
@@ -1752,14 +1753,14 @@ let oneFilePass1 (f:file) : unit =
                   (Some (l, !currentDeclIdx)))
       else begin (* Go inside and clean the referenced flag for the
                   * declared tags *)
-        match t.ttype with
-          TComp (ci, _ ) ->
+        match t.ttype.tnode with
+          TComp ci ->
           ci.creferenced <- false;
           (* Create a node for it *)
           ignore
             (PlainMerging.getNode sEq sSyn !currentFidx ci.cname ci None)
 
-        | TEnum (ei, _) ->
+        | TEnum ei ->
           ei.ereferenced <- false;
           ignore
             (EnumMerging.getNode eEq eSyn !currentFidx ei ei None)
@@ -1843,9 +1844,9 @@ let logic_info_of_logic_var lv =
   let tparams = extract_tparams Datatype.String.Set.empty lv.lv_type in
   let rt, args =
     match lv.lv_type with
-    | Larrow (l, Ctype (TVoid _)) -> None, l
+    | Larrow (l, Ctype { tnode = TVoid }) -> None, l
     | Larrow(l,t) -> Some t, l
-    | Ctype (TVoid _) -> None, []
+    | Ctype { tnode = TVoid } -> None, []
     | t -> Some t, []
   in
   { l_var_info = lv;
@@ -2011,8 +2012,8 @@ class renameVisitorClass =
     (* The use of a type. Change only those types whose underlying info
      * is not a root. *)
     method! vtype (t: typ) =
-      match t with
-        TComp (ci, a) when not ci.creferenced -> begin
+      match t.tnode with
+      | TComp ci when not ci.creferenced -> begin
           match PlainMerging.findReplacement true sEq !currentFidx ci.cname with
             None ->
             Kernel.debug ~dkey:Kernel.dkey_linker "No renaming needed %s(%d)"
@@ -2022,28 +2023,31 @@ class renameVisitorClass =
             Kernel.debug ~dkey:Kernel.dkey_linker
               "Renaming use of %s(%d) to %s(%d)"
               ci.cname !currentFidx ci'.cname oldfidx;
-            ChangeTo (TComp (ci', visitCilAttributes (self :> cilVisitor) a))
+            let tattr = visitCilAttributes (self :> cilVisitor) t.tattr in
+            ChangeTo (Cil_const.mk_tcomp ~tattr ci')
         end
-      | TComp(ci,_) ->
+      | TComp ci ->
         Kernel.debug ~dkey:Kernel.dkey_linker
           "%s(%d) referenced. No change" ci.cname !currentFidx;
         DoChildren
-      | TEnum (ei, a) when not ei.ereferenced -> begin
+      | TEnum ei when not ei.ereferenced -> begin
           match EnumMerging.findReplacement true eEq !currentFidx ei with
             None -> DoChildren
           | Some (ei', _) ->
+            let tattr = visitCilAttributes (self :> cilVisitor) t.tattr in
             if ei' == intEnumInfo then
               (* This is actually our friend intEnumInfo *)
-              ChangeTo (TInt(IInt, visitCilAttributes (self :> cilVisitor) a))
+              ChangeTo (Cil_const.mk_tint ~tattr IInt)
             else
-              ChangeTo (TEnum (ei', visitCilAttributes (self :> cilVisitor) a))
+              ChangeTo (Cil_const.mk_tenum ~tattr ei')
         end
 
-      | TNamed (ti, a) when not ti.treferenced -> begin
+      | TNamed ti when not ti.treferenced -> begin
           match PlainMerging.findReplacement true tEq !currentFidx ti.tname with
             None -> DoChildren
           | Some (ti', _) ->
-            ChangeTo (TNamed (ti', visitCilAttributes (self :> cilVisitor) a))
+            let tattr = visitCilAttributes (self :> cilVisitor) t.tattr in
+            ChangeTo (Cil_const.mk_tnamed ~tattr ti')
         end
 
       | _ -> DoChildren

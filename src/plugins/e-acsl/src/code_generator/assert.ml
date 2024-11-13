@@ -144,19 +144,20 @@ let add_pending_register_data ~loc { data_ptr } name e =
     else if Gmp_types.Q.is_t ty then
       "mpq", [ e ]
     else
-      match Cil.unrollType ty with
-      | TInt (ikind, _) -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
-      | TFloat (FFloat, _) -> "float", [ e ]
-      | TFloat (FDouble, _) -> "double", [ e ]
-      | TFloat (FLongDouble, _) -> "longdouble", [ e ]
+      let ty = Cil.unrollType ty in
+      match ty.tnode with
+      | TInt ikind -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
+      | TFloat FFloat -> "float", [ e ]
+      | TFloat FDouble -> "double", [ e ]
+      | TFloat FLongDouble -> "longdouble", [ e ]
       | TPtr _ -> "ptr", [ e ]
       | TArray _ -> "array", [ e ]
       | TFun _ -> "fun", []
-      | TComp ({ cstruct = true }, _) -> "struct", []
-      | TComp ({ cstruct = false }, _) -> "union", []
-      | TEnum ({ ekind }, _) -> ikind_to_string ekind, [ Cil.one ~loc; e ]
-      | TVoid _
-      | TBuiltin_va_list _ -> "other", []
+      | TComp { cstruct = true} -> "struct", []
+      | TComp { cstruct = false } -> "union", []
+      | TEnum { ekind } -> ikind_to_string ekind, [ Cil.one ~loc; e ]
+      | TVoid
+      | TBuiltin_va_list -> "other", []
       | TNamed _ ->
         Options.fatal
           "named types in '%a' should have been unrolled"

@@ -60,7 +60,7 @@ let arity2 fk caml_fun _state actuals =
 let register_arity2 c_name fk f =
   let name = "Frama_C_" ^ c_name in
   let replace = c_name in
-  let t = Cil_types.TFloat (fk, []) in
+  let t = Cil_const.mk_tfloat fk in
   let typ () = t, [t; t] in
   Builtins.register_builtin name ~replace ~typ Cacheable (arity2 fk f)
 
@@ -99,7 +99,7 @@ let arity1 name fk caml_fun _state actuals =
 let register_arity1 c_name fk f =
   let name = "Frama_C_" ^ c_name in
   let replace = c_name in
-  let t = Cil_types.TFloat (fk, []) in
+  let t = Cil_const.mk_tfloat fk in
   let typ () = t, [t] in
   Builtins.register_builtin name ~replace ~typ Cacheable (arity1 name fk f)
 

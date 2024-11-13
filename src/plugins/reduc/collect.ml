@@ -78,16 +78,16 @@ class stmts_vis
 end
 
 let rec collect_off typ =
-  match typ with
+  match typ.tnode with
   | TInt _ | TFloat _ -> [ NoOffset ]
-  | TComp ({cfields = Some flds}, _) ->
+  | TComp {cfields = Some flds} ->
     List.fold_left collect_fields [] flds
-  | TArray (arrtyp, e_opt, _) ->
+  | TArray (arrtyp, e_opt) ->
     debug "Array of length %a" (Pretty_utils.pp_opt Printer.pp_exp) e_opt;
     begin try collect_array arrtyp [] (Cil.lenOfArray64 e_opt)
       with Cil.LenOfArray _ -> [] end
-  | TVoid _ | TFun _ | TPtr _ | TEnum _ | TNamed _ | TBuiltin_va_list _
-  | TComp ({cfields = None}, _)-> []
+  | TVoid | TFun _ | TPtr _ | TEnum _ | TNamed _ | TBuiltin_va_list
+  | TComp {cfields = None} -> []
 
 and collect_fields acc fld =
   let offs = collect_off fld.ftype in

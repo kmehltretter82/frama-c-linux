@@ -324,9 +324,15 @@ val has_flexible_array_member: typ -> bool
     @before 24.0-Chromium this function didn't take in account the GCC/MSVC mode
 *)
 
-(** Unroll a type until it exposes a non
-    [TNamed]. Will collect all attributes appearing in [TNamed]!!! *)
+(** Unroll a type until it exposes a non [TNamed]. Will collect all attributes
+    appearing in [TNamed] and add them to the final type using
+    {!Cil.typeAddAttributes}. *)
 val unrollType: typ -> typ
+
+(** Same than {!Cil.unrollType} but discard the final type attributes and only
+    return its node.
+    @since Frama-c+Dev *)
+val unrollTypeNode: typ -> typ_node
 
 (** Unroll all the TNamed in a type (even under type constructors such as
     [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
@@ -1464,14 +1470,8 @@ val findAttribute: string -> attribute list -> attrparam list
     of the type structure, in case of composite, enumeration and named types *)
 val typeAttrs: typ -> attribute list
 
-(** Returns the attributes of a type. *)
-val typeAttr: typ -> attribute list
-
-(** Sets the attributes of the type to the given list. Previous attributes
-    are discarded. *)
-val setTypeAttrs: typ -> attributes -> typ
-
-(** Add some attributes to a type.
+(** Add some attributes to a type. Qualifiers attributes are recursively pushed
+    into array elements type until a non-array type is found.
     [combine] explains how to combine attributes. Default is [addAttributes].
 
     @before 28.0-Nickel [combine] does not exist *)
@@ -2462,6 +2462,17 @@ val set_extension_handler:
     @since 21.0-Scandium
     @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
+
+(** Returns the attributes of a type.
+    @deprecated Frama-C+dev *)
+val typeAttr: typ -> attribute list
+[@@alert deprecated "Use [t.tattr] instead."]
+
+(** Sets the attributes of the type to the given list. Previous attributes
+    are discarded.
+    @deprecated Frama-C+dev *)
+val setTypeAttrs: typ -> attributes -> typ
+[@@alert deprecated "Use [{t with tattr = ...}] instead."]
 
 (*
 Local Variables:

@@ -21,7 +21,6 @@
 (**************************************************************************)
 
 open Format_types
-open Cil_types
 
 exception Type_not_found of string
 exception Invalid_specifier
@@ -40,8 +39,7 @@ let get_typedef ?(find_typedef = Globals.Types.find_type) s =
   with Not_found ->
     raise (Type_not_found s)
 
-let ptr typ = TPtr (typ, [])
-
+let ptr = Cil_const.mk_tptr
 
 let type_f_specifier ?find_typedef spec =
   match spec.f_conversion_specifier, spec.f_length_modifier with

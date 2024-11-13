@@ -42,16 +42,16 @@ module With_collection = struct
 end
 
 let rec any_char_composed_type t =
-  match t with
-  | t when Cil.isAnyCharType t -> true
-  | TArray(t, _, _) -> any_char_composed_type t
+  match t.tnode with
+  | _ when Cil.isAnyCharType t -> true
+  | TArray (t, _) -> any_char_composed_type t
   | _ -> false
 
 let rec base_char_type t =
   assert (any_char_composed_type t) ;
-  match t with
-  | t when Cil.isAnyCharType t -> t
-  | TArray(t, _, _) -> base_char_type t
+  match t.tnode with
+  | _ when Cil.isAnyCharType t -> t
+  | TArray (t, _) -> base_char_type t
   | _ -> assert false
 
 
@@ -66,9 +66,9 @@ let pset_len_bytes_to_value ?loc ptr value bytes_len =
 let pset_len_bytes_to_zero ?loc ptr bytes_len =
   let eq_value ?loc t =
     let value = match Logic_utils.unroll_type t.term_type with
-      | Ctype(TPtr(_)) -> term Tnull t.term_type
-      | Ctype(TFloat(_)) -> treal ?loc 0.
-      | Ctype(TInt(_) | TEnum (_)) -> tinteger ?loc 0
+      | Ctype { tnode = TPtr _ } -> term Tnull t.term_type
+      | Ctype { tnode = TFloat _ } -> treal ?loc 0.
+      | Ctype { tnode = (TInt _ | TEnum _) } -> tinteger ?loc 0
       | _ -> unexpected "non atomic type during equality generation"
     in
     prel ?loc (Req, t, value)
@@ -85,11 +85,11 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
   let find_nan_for_type t = List.find (of_type t) nans in
   let all_bits_to_one ?loc t =
     match Logic_utils.unroll_type t.term_type with
-    | Ctype(TFloat(_)) ->
+    | Ctype { tnode = TFloat _ } ->
       papp ?loc ((find_nan_for_type t.term_type), [], [t])
-    | Ctype(TPtr(_)) ->
+    | Ctype { tnode = TPtr _ } ->
       pnot ?loc (pvalid_read ?loc (here_label, t))
-    | Ctype((TInt(kind, _) | TEnum({ ekind = kind }, _)) as typ) ->
+    | Ctype ({ tnode = (TInt kind | TEnum { ekind = kind }) } as typ) ->
       let is_signed = Cil.isSigned kind in
       let bits = Cil.bitsSizeOfInt kind in
       let value =
@@ -117,7 +117,7 @@ let generate_requires loc ptr value len =
           with pred_name = ["aligned_end"] } ]
     | Some value ->
       let low, up = match Logic_utils.unroll_type value.term_type with
-        | Ctype(TInt((IChar|ISChar|IUChar) as kind, _)) ->
+        | Ctype { tnode = TInt ((IChar|ISChar|IUChar) as kind) } ->
           let bits = bitsSizeOfInt kind in
           let plus_one = Integer.add (Integer.of_int 1) in
           let low, up = if (isSigned kind) then
@@ -185,12 +185,12 @@ let memset_value e =
   | _ -> None
 
 let rec contains_union_type t =
-  match Cil.unrollType t with
-  | TComp({ cstruct = false }, _) ->
+  match Cil.unrollTypeNode t with
+  | TComp { cstruct = false } ->
     true
-  | TComp({ cfields = Some fields }, _) ->
+  | TComp { cfields = Some fields } ->
     List.exists contains_union_type (List.map (fun f -> f.ftype) fields)
-  | TArray(t, _, _) ->
+  | TArray (t, _) ->
     contains_union_type t
   | _ -> false
 
@@ -219,18 +219,18 @@ let key_from_call _ret _fct = function
 let char_prototype t =
   assert (any_char_composed_type t) ;
   let params = [
-    ("ptr", ptr_of t, []) ;
+    ("ptr", Cil_const.mk_tptr t, []) ;
     ("value", base_char_type t, []) ;
     ("len", size_t(), [])
   ] in
-  TFun (ptr_of t, Some params, false, [])
+  Cil_const.(mk_tfun (mk_tptr t) (Some params) false)
 
 let non_char_prototype t =
   let params = [
-    ("ptr", (ptr_of t), []) ;
+    ("ptr", Cil_const.mk_tptr t, []) ;
     ("len", size_t(), [])
   ] in
-  TFun ((ptr_of t), Some params, false, [])
+  Cil_const.(mk_tfun (mk_tptr t) (Some params) false)
 
 let generate_prototype = function
   | t, _ when any_char_composed_type t ->

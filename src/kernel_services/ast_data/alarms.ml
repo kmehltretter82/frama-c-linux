@@ -514,8 +514,9 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = best_loc ~loc e2.eloc in
       let t1 = match e1 with
         | None -> begin
-            let typ = match Cil.unrollTypeDeep (Cil.typeOf e2) with
-              | TPtr (TFun _, _) -> TPtr (TFun(Cil_const.voidType, None, false, []), [])
+            let typ = match Cil.(unrollTypeDeep (typeOf e2)).tnode with
+              | TPtr { tnode = TFun _ } ->
+                Cil_const.(mk_tptr (mk_tfun voidType None false))
               | _ -> Cil_const.voidPtrType
             in
             let zero = Cil.lzero () in
@@ -618,14 +619,15 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = e.eloc in
       let t = Cil.typeOf e in
       let e =
-        match Cil.unrollTypeDeep t, args with
-        | TPtr (TFun (_, Some _, _, _), _), _
-        | TPtr (TFun _, _), None -> e
-        | TPtr (TFun (ret, None, var, attrs), _), Some args ->
+        let t' = Cil.unrollTypeDeep t in
+        match t'.tnode, args with
+        | TPtr { tnode = TFun (_, Some _, _) }, _
+        | TPtr { tnode = TFun _ }, None -> e
+        | TPtr { tnode = TFun (ret, None, var); tattr }, Some args ->
           let ltyps = List.map (fun arg -> "", Cil.typeOf arg, []) args in
-          let typ = TFun (ret, Some ltyps, var, attrs) in
-          Cil.mkCast ~newt:(TPtr (typ, [])) e
-        | t', _ ->
+          let typ = Cil_const.mk_tfun ~tattr ret (Some ltyps) var in
+          Cil.mkCast ~newt:(Cil_const.mk_tptr typ) e
+        | _, _ ->
           Kernel.fatal
             "Trying to emit a Function_pointer alarm over expression %a \
              that has unexpected type %a (unrolled as %a)"

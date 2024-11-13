@@ -42,9 +42,6 @@ val ttype_of_pointed: logic_type -> logic_type
 
 (** {2 C} *)
 
-(** For a type [T], returns [T*] *)
-val ptr_of: typ -> typ
-
 (** For a type [T], returns [T const] *)
 val const_of: typ -> typ
 

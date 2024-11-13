@@ -210,7 +210,7 @@ and lv_of_ty env menv (tvars:tvars) (index) (ty:W.Ty.ty) : C.logic_var =
 
 and lt_of_ty_opt (lt_opt) =
   match lt_opt with
-  | None -> C.Ctype (C.TVoid []) (* Same as logic_typing *)
+  | None -> C.Ctype Cil_const.voidType (* Same as logic_typing *)
   | Some tr -> tr
 
 let li_of_ls env menv (ls : W.Term.lsymbol) : C.logic_info =

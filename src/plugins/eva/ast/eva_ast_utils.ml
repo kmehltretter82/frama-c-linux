@@ -116,13 +116,14 @@ let is_mutable (lval : lval) : bool =
   let (lhost, offset) = lval.node in
   let rec aux base_mutable typ off =
     let base_mutable = base_mutable && not (Cil.isConstType typ) in
-    match Cil.unrollType typ, off with
+    let typ = Cil.unrollType typ in
+    match typ.tnode, off with
     | _, NoOffset -> base_mutable
     | _, Field (fi, off) ->
       let base_mutable = base_mutable || Cil.(hasAttribute frama_c_mutable fi.fattr) in
       aux base_mutable fi.ftype off
-    | TArray(typ, _, _), Index(_, off) -> aux base_mutable typ off
-    | typ, Index _ ->
+    | TArray(typ, _), Index(_, off) -> aux base_mutable typ off
+    | _, Index _ ->
       Self.fatal "Index on non-array type %a" Printer.pp_typ typ
   in
   aux false (Eva_ast_typing.type_of_lhost lhost) offset
@@ -308,9 +309,9 @@ let to_value exp =
   | _ -> `None
 
 let type_kind typ =
-  match Cil.unrollType typ with
-  | TInt (ikind, _) | TEnum ({ekind = ikind}, _) -> `Int ikind
-  | TFloat (fkind, _) -> `Float fkind
+  match Cil.unrollTypeNode typ with
+  | TInt ikind | TEnum {ekind = ikind} -> `Int ikind
+  | TFloat fkind -> `Float fkind
   | _ -> `None
 
 (* These functions are largely based on Cil.constFold. See there for details. *)
@@ -329,7 +330,7 @@ let rec const_fold (exp: exp) : exp =
 and const_fold_cast (t : typ) (e : exp) : exp  =
   let e = const_fold e in
   let default () = mk_exp (CastE (t, e)) in
-  if Cil.typeAttr t <> [] then
+  if t.tattr <> [] then
     default ()
   else
     match to_value e, type_kind t with

@@ -33,12 +33,12 @@ class transform prj = object(_self)
         begin match l with
           | (GFunDecl (_fspec, vi, _loc) as g) :: [] ->
             if not (Cil_builtins.Frama_c_builtins.mem vi.vname) then
-              begin match vi.vtype with
-                | TFun(typ, args, varity, attr) ->
+              begin match vi.vtype.tnode with
+                | TFun(typ, args, varity) ->
                   let vtype = Cil.argsToList args in
-                  let new_fun_typ =  TFun(
-                      typ, Some (vtype @ [ "ok", Cil_const.intType, [] ]),
-                      varity, attr)
+                  let args =Some (vtype @ [ "ok", Cil_const.intType, [] ]) in
+                  let new_fun_typ =
+                    Cil_const.mk_tfun ~tattr:vi.vtype.tattr typ args varity
                   in
                   Cil.update_var_type vi new_fun_typ;
                   Project.on

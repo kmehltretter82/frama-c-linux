@@ -254,13 +254,7 @@ module Attributes: S_with_collections with type t = attributes
 
 
 (** Types, with comparison over struct done by key and unrolling of typedefs. *)
-module Typ: sig
-  include S_with_collections_pretty with type t = typ
-  val toplevel_attr: t -> attributes
-  (** returns the attributes associated to the toplevel type, without adding
-      attributes from compinfo, enuminfo or typeinfo. Use {!Cil.typeAttrs}
-      to retrieve the complete set of attributes. *)
-end
+module Typ:  S_with_collections_pretty with type t = typ
 
 (** Types, with comparison over struct done by name and no unrolling. *)
 module TypByName: S_with_collections_pretty with type t = typ

@@ -381,8 +381,8 @@ let create_var_vertex var s =
   let s = {graph = G.add_vertex s.graph v;
            varmap = VarMap.add var v s.varmap;
            vmap = VMap.add v (VarSet.singleton var) s.vmap} in
-  let rec create_typ_vertex s v ty = match ty with
-    | TArray (ty, _, _) | TPtr (ty, _) ->
+  let rec create_typ_vertex s v ty = match ty.tnode with
+    | TArray (ty, _) | TPtr ty ->
       (* create more vertices for each level of dereferentiation *)
       let v', s = create_empty_vertex s in
       let s = {s with graph = G.add_edge s.graph v v'} in

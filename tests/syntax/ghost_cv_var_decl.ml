@@ -5,7 +5,7 @@ let rec ghost_status fmt lval =
   let ghost = Cil.isGhostType t in
 
   Format.fprintf fmt "%s" (if ghost then "ghost" else "normal") ;
-  match t with
+  match t.tnode with
   | TPtr(_) ->
     Format.fprintf fmt " -> %a" pointed_ghost_status lval
   | TArray(_) ->
@@ -23,8 +23,8 @@ and in_array_ghost_status fmt lval =
   let lval = Cil.addOffsetLval (Index((Cil.zero ~loc), NoOffset)) lval in
   Format.fprintf fmt "%a" ghost_status lval
 and comp_ghost_status fmt lval =
-  match Cil.typeOfLval lval with
-  | TComp({ cfields }, _) ->
+  match (Cil.typeOfLval lval).tnode with
+  | TComp { cfields } ->
     Format.fprintf fmt "{ " ;
     List.iter (field_ghost_status fmt lval) (Option.value ~default:[] cfields) ;
     Format.fprintf fmt " }"

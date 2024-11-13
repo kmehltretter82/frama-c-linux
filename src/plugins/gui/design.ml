@@ -572,7 +572,7 @@ let to_do_on_select
         | Some i ->
           begin match e.enode with
             | Const (CEnum {eihost}) ->
-              let typ_enum = TEnum (eihost, []) in
+              let typ_enum = Cil_const.mk_tenum eihost in
               main_ui#pretty_information
                 "This is a C enumeration constant, \
                  defined in %a with a value of %a.@."
@@ -1769,15 +1769,15 @@ class main_window () : main_window_extension_points =
       let pp_def_loc pp typ =
         try
           let opt_tag_name =
-            match typ with
-            | TNamed (ti, _) -> Some (Logic_typing.Typedef, ti.torig_name)
-            | TComp (ci, _) ->
+            match typ.tnode with
+            | TNamed ti -> Some (Logic_typing.Typedef, ti.torig_name)
+            | TComp ci ->
               let tag = if ci.cstruct then Logic_typing.Struct
                 else Logic_typing.Union
               in
               let name = if ci.corig_name <> "" then ci.corig_name else ci.cname in
               Some (tag, name)
-            | TEnum (ei, _) ->
+            | TEnum ei ->
               let name = if ei.eorig_name <> "" then ei.eorig_name else ei.ename in
               Some (Logic_typing.Enum, name)
             | _ -> None
@@ -1818,7 +1818,7 @@ class main_window () : main_window_extension_points =
              try
                (* Retrieve a potential typ from the selection *)
                let typ = Gui_printers.typ_of_link s in
-               match typ with
+               match typ.tnode with
                | TComp _ | TEnum _ | TPtr _ | TArray _ | TNamed _ ->
                  let base_type = Gui_printers.get_type_specifier typ in
                  let sizeof_str =

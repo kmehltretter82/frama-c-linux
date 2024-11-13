@@ -54,19 +54,19 @@ let get_retres_vi = Retres.memo
 
 let returned_value kf =
   let return_type = Cil.unrollType (Kernel_function.get_return_type kf) in
-  match return_type with
+  match return_type.tnode with
   | TComp _ when Cil.is_fully_arithmetic return_type -> Cvalue.V.top_int
   | TPtr _ | TComp _ -> Cvalue.V.inject Base.null Ival.zero
   | TInt _ | TEnum _ ->  Cvalue.V.top_int
-  | TFloat (FFloat, _) -> Cvalue.V.top_single_precision_float
-  | TFloat (FDouble, _)
-  | TFloat (FLongDouble, _) -> Cvalue.V.top_float
-  | TBuiltin_va_list _ ->
+  | TFloat FFloat -> Cvalue.V.top_single_precision_float
+  | TFloat FDouble
+  | TFloat FLongDouble -> Cvalue.V.top_float
+  | TBuiltin_va_list ->
     Self.error ~current:true ~once:true
       "functions returning variadic arguments must be stubbed%t"
       Eva_utils.pp_callstack;
     Cvalue.V.top_int
-  | TVoid _ -> Cvalue.V.top (* this value will never be used *)
+  | TVoid -> Cvalue.V.top (* this value will never be used *)
   | TFun _ | TNamed _ | TArray _ -> assert false
 
 

@@ -44,8 +44,8 @@ class collect_visitor = object (self)
 
   inherit Visitor.frama_c_inplace
 
-  method! vtype t = match t with
-    | TNamed(ti,_) ->
+  method! vtype t = match t.tnode with
+    | TNamed ti ->
       (* we use the type name because direct typeinfo comparison
        * doesn't wok. Anyway, CIL renames types if several type have the same
        * name... *)
@@ -56,13 +56,13 @@ class collect_visitor = object (self)
         ignore (visitCilType (self:>Cil.cilVisitor) ti.ttype);
         DoChildren
       end
-    | TEnum(ei,_) ->
+    | TEnum ei ->
       if Hashtbl.mem used_enuminfo ei.ename then SkipChildren
       else begin
         debug "add used enum %s@." ei.ename;
         Hashtbl.add used_enuminfo ei.ename (); DoChildren
       end
-    | TComp(ci,_) ->
+    | TComp ci ->
       if Hashtbl.mem used_compinfo ci.cname then SkipChildren
       else begin
         debug "add used comp %s@." ci.cname;

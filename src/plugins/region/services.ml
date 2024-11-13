@@ -119,17 +119,17 @@ struct
     | FDouble | FLongDouble -> 'd'
 
   let typ_to_char (ty: Cil_types.typ) =
-    match ty with
-    | TVoid _ -> 'b'
+    match ty.tnode with
+    | TVoid -> 'b'
     | TPtr _ -> 'p'
-    | TInt(ik,_) -> ikind_to_char ik
-    | TFloat(fk,_) -> fkind_to_char fk
-    | TComp({ cstruct }, _) -> if cstruct then 'S' else 'U'
+    | TInt ik -> ikind_to_char ik
+    | TFloat fk -> fkind_to_char fk
+    | TComp { cstruct } -> if cstruct then 'S' else 'U'
     | TArray _ -> 'A'
     | TNamed _ -> 'T'
     | TEnum _ -> 'E'
     | TFun _ -> 'F'
-    | TBuiltin_va_list _ -> 'x'
+    | TBuiltin_va_list -> 'x'
 
   let typs_to_char (typs : Cil_types.typ list) =
     match typs with

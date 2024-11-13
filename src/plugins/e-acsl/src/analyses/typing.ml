@@ -57,9 +57,9 @@ let ty_of_interv = Interval.ty_of_interv
 
 let join_cty ty1 ty2 =
   let ty = Cil.arithmeticConversion ty1 ty2 in
-  match ty with
-  | TInt(i, _) -> C_integer i
-  | TFloat(f, _) -> C_float f
+  match ty.tnode with
+  | TInt ik -> C_integer ik
+  | TFloat fk -> C_float fk
   | _ ->
     Options.fatal "[typing] join failure: unexpected result %a"
       Printer.pp_typ ty
@@ -87,20 +87,20 @@ let join ty1 ty2 =
     | C_integer _, Gmpz ->
       Gmpz
     | C_float f1, C_float f2 ->
-      join_cty (TFloat(f1, [])) (TFloat(f2, []))
+      join_cty (Cil_const.mk_tfloat f1) (Cil_const.mk_tfloat f2)
     | C_float f, C_integer n
     | C_integer n, C_float f ->
-      join_cty (TFloat(f, [])) (TInt(n, []))
+      join_cty (Cil_const.mk_tfloat f) (Cil_const.mk_tint n)
     | C_integer i1, C_integer i2 ->
       if Options.Gmp_only.get () then Gmpz
-      else join_cty (TInt(i1, [])) (TInt(i2, []))
+      else join_cty (Cil_const.mk_tint i1) (Cil_const.mk_tint i2)
 
 exception Not_a_number
 let typ_of_number_ty = function
   | C_integer _ when Options.Gmp_only.get () -> Gmp_types.Z.t ()
-  | C_integer ik -> TInt(ik, [])
+  | C_integer ik -> Cil_const.mk_tint ik
   | C_float _ when Options.Gmp_only.get () -> Gmp_types.Q.t ()
-  | C_float fk -> TFloat(fk, [])
+  | C_float fk -> Cil_const.mk_tfloat fk
   | Gmpz -> Gmp_types.Z.t ()
   (* for the time being, no reals but rationals instead *)
   | Rational -> Gmp_types.Q.t ()
@@ -266,10 +266,10 @@ let number_ty_of_typ ~post ty =
   if post && Gmp_types.Z.is_t ty then Gmpz
   else if post && Gmp_types.Q.is_t ty then Rational
   else
-    match Cil.unrollType ty with
-    | TInt(ik, _) | TEnum({ ekind = ik }, _) -> C_integer ik
-    | TFloat(fk, _) -> C_float fk
-    | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ -> Nan
+    match Cil.unrollTypeNode ty with
+    | TInt ik | TEnum { ekind = ik } -> C_integer ik
+    | TFloat fk -> C_float fk
+    | TVoid | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list -> Nan
     | TNamed _ -> assert false
 
 let ty_of_logic_ty ?term ~profile lty =
@@ -311,15 +311,15 @@ let c_type_or_int_in_ival_of t i =
   let t = Logic_utils.remove_logic_coerce t in
   match t.term_type with
   | Ctype typ ->
-    (match Cil.unrollType typ with
-     | TInt (ik, _) | TEnum({ ekind = ik }, _) when
+    (match Cil.unrollTypeNode typ with
+     | TInt ik | TEnum { ekind = ik } when
          Interval.is_included_in_typ i typ
        ->
        if Cil.intTypeIncluded ik IInt
        then Some (C_integer IInt)
        else Some (C_integer ik)
-     | TInt _ | TEnum _ | TFloat _ | TVoid _ | TPtr _ | TArray _ | TFun _
-     | TComp _ | TBuiltin_va_list _ -> None
+     | TInt _ | TEnum _ | TFloat _ | TVoid | TPtr _ | TArray _ | TFun _
+     | TComp _ | TBuiltin_va_list -> None
      | TNamed _ -> assert false)
   | _ -> None
 
@@ -372,7 +372,7 @@ let rec type_term
          if the infered context for the lambda is gmp *)
       ty_of_interv ?ctx ~use_gmp_opt:under_lambda i
 
-    | TLval ((TVar {lv_type = Ctype (TInt (ik, _))}, _) as tlv) ->
+    | TLval ((TVar {lv_type = Ctype { tnode = TInt ik }}, _) as tlv) ->
       type_term_lval ~profile tlv;
       C_integer ik
 
@@ -604,19 +604,20 @@ let rec type_term
              function returning this type, otherwise we use the interval
              inference *)
           (match li.l_type with
-           | Some (Ctype (TInt (ikind, _))) ->
+           | Some (Ctype { tnode = TInt ikind }) ->
              C_integer ikind
-           | Some (Ctype (TFloat (fkind, _))) ->
+           | Some (Ctype { tnode = TFloat fkind }) ->
              C_float fkind
            | None
-           | Some (Ctype (TVoid _
-                         | TPtr _
-                         | TEnum _
-                         | TArray _
-                         | TFun _
-                         | TNamed _
-                         | TComp _
-                         | TBuiltin_va_list _))
+           | Some (Ctype { tnode =
+                             ( TVoid
+                             | TPtr _
+                             | TEnum _
+                             | TArray _
+                             | TFun _
+                             | TNamed _
+                             | TComp _
+                             | TBuiltin_va_list) })
            | Some (Lboolean | Linteger | Lreal | Ltype _ | Lvar _ | Larrow _) ->
              ty_of_interv
                ?ctx:ctx_body
@@ -747,12 +748,13 @@ and number_ty_bound_variable ~profile (t1, lv, t2) =
       | None -> ty_of_interv ~ctx:Gmpz i
     in mk_ctx ~use_gmp_opt:true ty
   | Ctype ty ->
-    (match Cil.unrollType ty with
-     | TInt(ik, _) | TEnum({ ekind = ik}, _) ->
+    let ty = Cil.unrollType ty in
+    (match ty.tnode with
+     | TInt ik | TEnum { ekind = ik} ->
        join
          (ty_of_interv i)
          (mk_ctx ~use_gmp_opt:true (C_integer ik))
-     | ty ->
+     | _ ->
        Options.fatal "unexpected C type %a for quantified variable %a"
          Printer.pp_typ ty
          Printer.pp_logic_var lv)

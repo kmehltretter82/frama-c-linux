@@ -499,7 +499,7 @@ struct
         Value.inject_float (Fval.singleton (Fval.F.of_float f))
       | UnOp (op, e, typ) ->
         Value.forward_unop typ op (oracle e)
-      | BinOp (op, e1, e2, TFloat (fkind, _)) ->
+      | BinOp (op, e1, e2, { tnode = TFloat fkind }) ->
         Value.forward_binop_float (Fval.kind fkind) (oracle e1) op (oracle e2)
       | BinOp (op, e1, e2, typ) ->
         Value.forward_binop_int ~typ (oracle e1) op (oracle e2)
@@ -824,8 +824,8 @@ struct
       begin match Location.of_term env arg with
         | `Top -> `Value state (* can't resolve location, ignore *)
         | `Value (loc,typ) ->
-          begin match Cil.unrollType (Logic_utils.logicCType typ) with
-            | TFloat (fkind,_) ->
+          begin match Cil.unrollTypeNode (Logic_utils.logicCType typ) with
+            | TFloat fkind ->
               let update = Value.backward_is_finite positive fkind
               and oracle = mk_oracle state in
               reinforce ~oracle (Value_or_Uninitialized.map' update) state loc

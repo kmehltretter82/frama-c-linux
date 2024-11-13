@@ -295,13 +295,8 @@ module Select (Eval: Eval) = struct
     let selection = ev.Eval.expr_to_gui_selection v in
     Eval.display_data_by_callstack loc selection data
 
-  let is_scalar typ =
-    match Cil.unrollType typ with
-    | TInt _ | TEnum _ | TPtr _ | TFloat _ -> true
-    | _ -> false
-
   let select_lv main_ui loc lv =
-    if is_scalar (Cil.typeOfLval lv)
+    if Cil.isScalarType (Cil.typeOfLval lv)
     then select_loc main_ui Eval.lval_ev loc lv
     else select_loc main_ui Eval.lval_as_offsm_ev loc lv
   let select_null main_ui loc =

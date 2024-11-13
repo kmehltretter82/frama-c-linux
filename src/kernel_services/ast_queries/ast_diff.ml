@@ -350,7 +350,7 @@ let find_candidate_compinfo ?loc:_loc ci =
   let su = if ci.cstruct then Logic_typing.Struct else Logic_typing.Union in
   if Globals.Types.mem_type su ci.cname then begin
     match Globals.Types.find_type su ci.cname with
-    | TComp(ci', _) -> Some ci'
+    | { tnode = TComp ci' } -> Some ci'
     | t ->
       Kernel.fatal
         "Expected compinfo instead of %a"
@@ -360,7 +360,7 @@ let find_candidate_compinfo ?loc:_loc ci =
 let find_candidate_enuminfo ?loc:_loc ei =
   if Globals.Types.mem_type Logic_typing.Enum ei.ename then begin
     match Globals.Types.find_type Logic_typing.Enum ei.ename with
-    | TEnum(ei,_) -> Some ei
+    | { tnode = TEnum ei } -> Some ei
     | t ->
       Kernel.fatal
         "Expected enuminfo instead of %a"
@@ -830,44 +830,44 @@ and is_same_model_info mi mi' env =
   Cil_datatype.Attributes.equal mi.mi_attr mi'.mi_attr
 
 and is_same_type t t' env =
-  match t, t' with
-  | TVoid a, TVoid a' -> Cil_datatype.Attributes.equal a a'
-  | TInt (ik,a), TInt(ik',a') ->
-    equal_ikind ik ik' && Cil_datatype.Attributes.equal a a'
-  | TFloat (fk,a), TFloat(fk', a') ->
-    equal_fkind fk fk' && Cil_datatype.Attributes.equal a a'
-  | TBuiltin_va_list a, TBuiltin_va_list a' ->
-    Cil_datatype.Attributes.equal a a'
-  | TPtr(t,a), TPtr(t',a') ->
-    is_same_type t t' env && Cil_datatype.Attributes.equal a a'
-  | TArray(t,s,a), TArray(t',s',a') ->
-    is_same_type t t' env &&
+  let is_same_tattr () = Cil_datatype.Attributes.equal t.tattr t'.tattr in
+  match t.tnode, t'.tnode with
+  | TVoid, TVoid -> is_same_tattr ()
+  | TInt ik, TInt ik' ->
+    equal_ikind ik ik' && is_same_tattr ()
+  | TFloat fk, TFloat fk' ->
+    equal_fkind fk fk' && is_same_tattr ()
+  | TBuiltin_va_list, TBuiltin_va_list -> is_same_tattr ()
+  | TPtr bt, TPtr bt' ->
+    is_same_type bt bt' env && is_same_tattr ()
+  | TArray (bt, s), TArray (bt', s') ->
+    is_same_type bt bt' env &&
     is_same_opt is_same_exp s s' env &&
-    Cil_datatype.Attributes.equal a a'
-  | TFun(rt,l,var,a), TFun(rt', l', var', a') ->
+    is_same_tattr ()
+  | TFun (rt, l, var), TFun(rt', l', var') ->
     is_same_type rt rt' env &&
     is_same_opt (is_same_list is_same_formal) l l' env &&
     (var = var') &&
-    Cil_datatype.Attributes.equal a a'
-  | TNamed(t,a), TNamed(t',a') ->
-    let correspondence = typeinfo_correspondence t env in
+    is_same_tattr ()
+  | TNamed ti, TNamed ti' ->
+    let correspondence = typeinfo_correspondence ti env in
     (match correspondence with
      | `Not_present -> false
-     | `Same t'' -> Cil_datatype.Typeinfo.equal t' t'') &&
-    Cil_datatype.Attributes.equal a a'
-  | TComp(c,a), TComp(c', a') ->
-    let correspondence = compinfo_correspondence c env in
+     | `Same ti'' -> Cil_datatype.Typeinfo.equal ti' ti'') &&
+    is_same_tattr ()
+  | TComp ci, TComp ci' ->
+    let correspondence = compinfo_correspondence ci env in
     (match correspondence with
      | `Not_present -> false
-     | `Same c'' -> Cil_datatype.Compinfo.equal c' c'') &&
-    Cil_datatype.Attributes.equal a a'
-  | TEnum(e,a), TEnum(e',a') ->
-    let correspondence = enuminfo_correspondence e env in
+     | `Same ci'' -> Cil_datatype.Compinfo.equal ci' ci'') &&
+    is_same_tattr ()
+  | TEnum ei, TEnum ei' ->
+    let correspondence = enuminfo_correspondence ei env in
     (match correspondence with
      | `Not_present -> false
-     | `Same e'' -> Cil_datatype.Enuminfo.equal e' e'') &&
-    Cil_datatype.Attributes.equal a a'
-  | (TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _ | TPtr _ | TArray _
+     | `Same ei'' -> Cil_datatype.Enuminfo.equal ei' ei'') &&
+    is_same_tattr ()
+  | (TVoid | TInt _ | TFloat _ | TBuiltin_va_list | TPtr _ | TArray _
     | TFun _ | TNamed _ | TComp _ | TEnum _), _ -> false
 
 and is_same_compinfo ci ci' env =

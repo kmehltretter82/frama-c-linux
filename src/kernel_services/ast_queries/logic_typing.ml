@@ -885,8 +885,8 @@ struct
 
   let check_fun_ptr loc ty =
     let is_fun_ptr t =
-      match Cil.unrollType t with
-      | TPtr(t,_) when Cil.isFunctionType t -> true
+      match Cil.unrollTypeNode t with
+      | TPtr t when Cil.isFunctionType t -> true
       | _ -> false
     in
     if not (Logic_utils.isLogicType is_fun_ptr ty) then
@@ -895,8 +895,8 @@ struct
 
   let check_object_ptr loc ty =
     let is_object_ptr t =
-      match Cil.unrollType t with
-      | TPtr(t,_) when not (Cil.isFunctionType t) -> true
+      match Cil.unrollTypeNode t with
+      | TPtr t when not (Cil.isFunctionType t) -> true
       | _ -> false
     in
     if not (Logic_utils.isLogicType is_object_ptr ty) then
@@ -919,19 +919,19 @@ struct
     try
       ignore (Logic_env.find_model_field f ty); true
     with Not_found ->
-      (match Cil.unrollType ty with
-       | TComp(comp,_) ->
+      (match Cil.unrollTypeNode ty with
+       | TComp ci ->
          List.exists
            (fun x -> x.fname = f)
-           (Option.value ~default:[] comp.cfields)
+           (Option.value ~default:[] ci.cfields)
        | _ -> false)
 
   let plain_type_of_c_field loc f ty =
     match Cil.unrollType ty with
-    | TComp (comp, attrs) ->
+    | { tnode = TComp ci; tattr } ->
       (try
-         let attrs = Cil.filter_qualifier_attributes attrs in
-         let field = C.find_comp_field comp f in
+         let attrs = Cil.filter_qualifier_attributes tattr in
+         let field = C.find_comp_field ci f in
          let typ = Cil.typeOffset ty field in
          Logic_utils.offset_to_term_offset field,
          Ctype (Cil.typeAddAttributes attrs typ)
@@ -956,7 +956,7 @@ struct
       let offs,typ = plain_type_of_field loc f t in offs, Ltype(lt,[typ])
     | t -> type_of_c_field loc f t
 
-  let c_void_star = Ctype (TPtr (TVoid [], []))
+  let c_void_star = Ctype Cil_const.voidPtrType
 
   (* keep in sync with fresh_type below *)
   let generated_var s = String.contains s '#'
@@ -1053,9 +1053,9 @@ struct
     let ltype t = ctxt.logic_type ctxt loc env t in
     let ctype t = ltype t |> c_type_of loc in
     match t with
-    | LTvoid -> Ctype (TVoid [])
-    | LTint ikind -> Ctype (TInt (ikind, []))
-    | LTfloat fkind -> Ctype (TFloat (fkind, []))
+    | LTvoid -> Ctype Cil_const.voidType
+    | LTint ikind -> Ctype (Cil_const.mk_tint ikind)
+    | LTfloat fkind -> Ctype (Cil_const.mk_tfloat fkind)
     | LTarray (ty,length) ->
 
       let size = match length with
@@ -1087,9 +1087,9 @@ struct
             in size_exp size
           with Not_found ->
             ctxt.error loc "size of array must be an integral value";
-      in Ctype (TArray (ctype ty, size,[]))
+      in Ctype (Cil_const.mk_tarray (ctype ty) size)
 
-    | LTpointer ty -> Ctype (TPtr (ctype ty, []))
+    | LTpointer ty -> Ctype (Cil_const.mk_tptr (ctype ty))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
        with Not_found -> ctxt.error loc "no such enum %s" e)
@@ -1106,11 +1106,11 @@ struct
       let rt = ctype rt in
       begin
         match prms with
-        | [] -> Ctype (TFun(rt,None,false,[]))
+        | [] -> Ctype (Cil_const.mk_tfun rt None false)
         | [(_,arg_typ,_)] when isVoidType arg_typ ->
           (* Same invariant as in C *)
-          Ctype (TFun(rt,Some [],false,[]))
-        | _ -> Ctype (TFun(rt,Some prms,false,[]))
+          Ctype (Cil_const.mk_tfun rt (Some []) false)
+        | _ -> Ctype (Cil_const.mk_tfun rt (Some prms) false)
       end
 
     | LTnamed (id,[]) ->
@@ -1277,10 +1277,10 @@ struct
       end else if isPointerType oldt && isArrayType newt then
         (* transforms '(T[size])ptr' into an equivalent '*(T( * )[size])ptr'
            to get an explicit access to the memory *)
-        mk_mem (c_mk_cast ~force e oldt (TPtr(newt,[]))) TNoOffset
+        mk_mem (c_mk_cast ~force e oldt (Cil_const.mk_tptr newt)) TNoOffset
       else begin
-        match Cil.unrollType newt, e.term_node with
-        | TEnum (ei,[]), TConst (LEnum { eihost = ei'})
+        match Cil.unrollTypeNode newt, e.term_node with
+        | TEnum ei, TConst (LEnum { eihost = ei'})
           when ei.ename = ei'.ename && not force -> e
         | _ ->
           { e with term_node =
@@ -1349,7 +1349,7 @@ struct
 
   let is_enum_cst e t =
     match e.term_node with
-    | TConst (LEnum ei) -> is_same_type (Ctype (TEnum (ei.eihost,[]))) t
+    | TConst (LEnum ei) -> is_same_type (Ctype (Cil_const.mk_tenum ei.eihost)) t
     | _ -> false
 
   let logic_coerce t e =
@@ -1500,12 +1500,12 @@ struct
     else
       begin
         Cil.checkCast ot nt;
-        match Cil.unrollType ot, Cil.unrollType nt with
+        match Cil.unrollTypeNode ot, Cil.unrollTypeNode nt with
         | TPtr _, TPtr _ when isVoidPtrType nt ->
           nt, e
-        | (TInt _ | TEnum _ | TPtr _ ), TVoid _ ->
+        | (TInt _ | TEnum _ | TPtr _ ), TVoid ->
           ot, e
-        | TComp (comp1, _), TComp (comp2, _) when comp1.ckey = comp2.ckey ->
+        | TComp comp1, TComp comp2 when comp1.ckey = comp2.ckey ->
           nt, e
         | _ -> nt, mk_cast e (Ctype nt)
       end
@@ -1538,8 +1538,8 @@ struct
           C.error loc "invalid implicit conversion from '%a' to '%a'"
             Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
       end else if is_implicit_pointer_conversion oterm ty1 ty2
-               || (match unrollType ty1, unrollType ty2 with
-                   | (TFloat (f1,_), TFloat (f2,_)) ->
+               || (match unrollTypeNode ty1, unrollTypeNode ty2 with
+                   | TFloat f1, TFloat f2 ->
                      f1 <= f2
                    (*[BM]
                      relies on internal representation of OCaml constant
@@ -1853,8 +1853,8 @@ struct
     | Linteger -> Linteger
     | Lreal -> Lreal
     | Ctype ty ->
-      (match Cil.unrollType ty with
-         TFloat _ -> Lreal
+      (match Cil.unrollTypeNode ty with
+       | TFloat _ -> Lreal
        | _ ->
          Kernel.fatal ~current:true
            "logic arithmetic promotion on non-arithmetic type %a"
@@ -1941,10 +1941,10 @@ struct
                 | None -> lty1
                 | Some rel ->
                   let kind =
-                    match Cil.unrollType ty1 with
-                    | TFloat (FFloat,_) -> "float"
-                    | TFloat (FDouble,_) -> "double"
-                    | TFloat (FLongDouble,_) -> "long double"
+                    match Cil.unrollTypeNode ty1 with
+                    | TFloat FFloat -> "float"
+                    | TFloat FDouble -> "double"
+                    | TFloat FLongDouble -> "long double"
                     | _ -> Kernel.fatal "floating point type expected"
                   in
                   let source = fst loc in
@@ -2700,7 +2700,7 @@ struct
       TConst (LStr (unescape s)), Ctype Cil_const.charPtrType
     | PLconstant (WStringConstant s) ->
       TConst (LWStr (wcharlist_of_string s)),
-      Ctype (TPtr(Machine.wchar_type (),[]))
+      Ctype (Cil_const.mk_tptr (Machine.wchar_type ()))
     | PLvar x ->
       let old_val info =
         let typ =
@@ -2736,7 +2736,7 @@ struct
           *)
           let lv = Lenv.find_var x env in
           (match lv.lv_type with
-           | Ctype (TVoid _)->
+           | Ctype ({ tnode = TVoid })->
              if ctxt.silent then raise Backtrack;
              ctxt.error (Current_loc.get())
                "Variable %s is bound to a predicate, not a term" x
@@ -2752,9 +2752,9 @@ struct
              lv.vreferenced <- true
            | None -> ());
           (match info.lv_type with
-           | Ctype(TFun _ as t) ->
+           | Ctype ({ tnode = TFun _ } as t) ->
              (* function decays as a pointer *)
-             TAddrOf (TVar info, TNoOffset), Ctype (TPtr (t,[]))
+             TAddrOf (TVar info, TNoOffset), Ctype (Cil_const.mk_tptr t)
            | _ -> old_val info)
         with Not_found ->
         try

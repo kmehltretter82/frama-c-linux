@@ -11,7 +11,7 @@ class vis prj = object(self)
     if create then begin
       let f = Visitor_behavior.Get.fundec
           self#behavior (Option.get self#current_func) in
-      let y = Cil.makeLocalVar f ~scope:b "y" (TInt(IInt,[])) in
+      let y = Cil.makeLocalVar f ~scope:b "y" Cil_const.intType in
       my_var <- Some y;
       let loc = Cil_datatype.Location.unknown in
       let s2 =

@@ -30,12 +30,12 @@ let add_throw_test f exn_type test init =
 
 let add_my_exn my_exn f =
   let c = Cil.evar (List.hd f.sformals) in
-  let exn_type = TComp(my_exn,[]) in
+  let exn_type = Cil_const.mk_tcomp my_exn in
   let loc = Cil_datatype.Location.unknown in
   let my_field = List.hd (Option.get my_exn.cfields) in
   let kind =
-    match my_field.ftype with
-    | TInt(ik,_) -> ik
+    match my_field.ftype.tnode with
+    | TInt ik -> ik
     | _ -> Kernel.fatal "Unexpected struct for the test"
   in
   let init =
@@ -65,8 +65,8 @@ let add_int_ptr_exn glob f =
   add_throw_test f Cil_const.intPtrType test init
 
 let add_catch my_exn my_exn2 f =
-  let exn_type = TComp(my_exn, []) in
-  let exn_type2 = TComp(my_exn2, []) in
+  let exn_type = Cil_const.mk_tcomp my_exn in
+  let exn_type2 = Cil_const.mk_tcomp my_exn2 in
   let exn_field = List.hd (Option.get my_exn.cfields) in
   let exn_field_offset = Field(exn_field,NoOffset) in
   let exn2_field = List.hd (Option.get my_exn2.cfields) in

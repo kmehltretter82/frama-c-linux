@@ -228,8 +228,8 @@ let slicing_selector (popup_factory:GMenu.menu GMenu.factory)
          (Extlib.opt_filter
             (fun kf ->
                let is_not_void_kf x =
-                 match x.Cil_types.vtype with
-                 | Cil_types.TFun (Cil_types.TVoid (_),_,_,_) -> false
+                 match x.Cil_types.vtype.tnode with
+                 | TFun ({ tnode = TVoid },_,_) -> false
                  | _ -> true
                in is_not_void_kf (Kernel_function.get_vi kf))
             kf_opt)

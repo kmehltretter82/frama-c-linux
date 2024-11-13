@@ -42,6 +42,7 @@ struct
   and ('value,'shape) typ = ('value,'shape) morphology * Cil_types.logic_type
 
   open Cil_types
+  open Cil_const
 
   (* Logic types *)
 
@@ -51,26 +52,26 @@ struct
 
   (* C base types *)
 
-  let of_ctyp t = Single, Ctype t
-  let void = Single, Ctype (TVoid [])
-  let bool = Single, Ctype (TInt (IBool, []))
-  let char = Single, Ctype (TInt (IChar, []))
-  let schar = Single, Ctype (TInt (ISChar, []))
-  let uchar = Single, Ctype (TInt (IUChar, []))
-  let int = Single, Ctype (TInt (IInt, []))
-  let uint = Single, Ctype (TInt (IUInt, []))
-  let short = Single, Ctype (TInt (IShort, []))
-  let ushort = Single, Ctype (TInt (IUShort, []))
-  let long = Single, Ctype (TInt (ILong, []))
-  let ulong = Single, Ctype (TInt (IULong, []))
-  let longlong = Single, Ctype (TInt (ILongLong, []))
-  let ulonglong = Single, Ctype (TInt (IULongLong, []))
-  let float = Single, Ctype (TFloat (FFloat, []))
-  let double = Single, Ctype (TFloat (FDouble, []))
-  let longdouble = Single, Ctype (TFloat (FLongDouble, []))
+  let of_ctyp t  = Single, Ctype t
+  let void       = Single, Ctype voidType
+  let bool       = Single, Ctype boolType
+  let char       = Single, Ctype charType
+  let schar      = Single, Ctype scharType
+  let uchar      = Single, Ctype ucharType
+  let int        = Single, Ctype intType
+  let uint       = Single, Ctype uintType
+  let short      = Single, Ctype shortType
+  let ushort     = Single, Ctype ushortType
+  let long       = Single, Ctype longType
+  let ulong      = Single, Ctype ulongType
+  let longlong   = Single, Ctype longLongType
+  let ulonglong  = Single, Ctype ulongLongType
+  let float      = Single, Ctype floatType
+  let double     = Single, Ctype doubleType
+  let longdouble = Single, Ctype longDoubleType
 
   let ptr = function
-    | _, Ctype t -> Single, Ctype (TPtr (t, []))
+    | _, Ctype t -> Single, Ctype (mk_tptr t)
     | _, _ -> raise NotACType
 
   let array ?size = function
@@ -78,33 +79,21 @@ struct
       let to_exp = Cil.integer ~loc:unknown_loc in
       let size = Option.map to_exp size in
       Listed typ,
-      Ctype (TArray (t, size, []))
+      Ctype (mk_tarray t size)
     | _, _ -> raise NotACType
 
   let structure compinfo f =
-    Record f, Ctype (TComp (compinfo, []))
+    Record f, Ctype (mk_tcomp compinfo)
 
   (* Attrbutes *)
 
-  let attribute (s,t) name params =
-    let add_to = Cil.addAttribute (Attr (name, params)) in
-    let t = match t with
-      | Ctype t -> t
-      | _ -> raise NotACType
-    in
-    let t = match t with
-      | TVoid l -> TVoid (add_to l)
-      | TInt (kind, l) -> TInt (kind, add_to l)
-      | TFloat (kind, l) -> TFloat (kind, add_to l)
-      | TPtr (typ, l) -> TPtr (typ, add_to l)
-      | TArray (typ, size, l) -> TArray (typ, size, add_to l)
-      | TFun (typ, args, variadic, l) -> TFun (typ, args, variadic, add_to l)
-      | TNamed (typeinfo, l) -> TNamed (typeinfo, add_to l)
-      | TComp (compinfo, l) -> TComp (compinfo, add_to l)
-      | TEnum (enuminfo, l) -> TEnum (enuminfo, add_to l)
-      | TBuiltin_va_list l -> TBuiltin_va_list (add_to l)
-    in
-    (s,Ctype t)
+  let attribute (s, t) name params =
+    match t with
+    | Ctype t ->
+      let tattr = Cil.addAttribute (Attr (name, params)) t.tattr in
+      s, Ctype { t with tattr }
+    | _ -> raise NotACType
+
 
   let const typ = attribute typ "const" []
   let stdlib_generated typ = attribute typ "fc_stdlib_generated" []
@@ -444,10 +433,10 @@ struct
 
   let of_init i = `init (CilInit i)
   let compound t l =
-    match t with
-    | Cil_types.TArray _ ->
+    match t.Cil_types.tnode with
+    | TArray _ ->
       `init (ArrayInit (t, List.map harden_init l))
-    | Cil_types.TComp (comp,_) ->
+    | TComp comp ->
       let field_init field init =
         field, harden_init init
       in
@@ -459,7 +448,7 @@ struct
     match ty with
     | Single, Ctype _ -> x
     | Listed sub, Ctype t-> compound t (List.map (values sub) x)
-    | Record f, Ctype (TComp (comp,_) as t) ->
+    | Record f, Ctype (Cil_types.{ tnode = TComp comp } as t) ->
       let field_init field =
         field, harden_init (f field x)
       in
@@ -516,7 +505,7 @@ struct
     | Index (lv, e) ->
       let (host, offset) as lv' = build_lval ~scope ~loc lv
       and e' = build_exp ~scope ~loc e in
-      begin match Cil.(unrollType (typeOfLval lv')) with
+      begin match Cil.(unrollTypeNode (typeOfLval lv')) with
         | TArray _ ->
           let offset' = Cil_types.Index (e', NoOffset) in
           host, Cil.addOffset offset' offset
@@ -529,9 +518,9 @@ struct
       end
     | (Field (lv,_) | FieldNamed (lv,_)) as e ->
       let (host, offset) as lv' = build_lval ~scope ~loc lv in
-      let host', offset', ci = match Cil.(unrollTypeDeep (typeOfLval lv')) with
-        | TComp (ci,_) -> host, offset, ci
-        | TPtr (TComp (ci,_),_) ->
+      let host', offset', ci = match Cil.(unrollTypeDeep (typeOfLval lv')).tnode with
+        | TComp ci -> host, offset, ci
+        | TPtr { tnode = TComp ci } ->
           Mem (Cil.new_exp ~loc (Lval lv')), Cil_types.NoOffset, ci
         | _ -> typing_error "trying to get a field of an lvalue which is not \
                              of composite type or pointer to a composite type"
@@ -592,10 +581,10 @@ struct
       and t' = build_term ~scope ~loc ~restyp t in
       let lty = Cil.typeOfTermLval tlv' in
       begin match Logic_utils.unroll_type lty with
-        | Ctype (TArray _) ->
+        | Ctype { tnode = TArray _ } ->
           let offset' = Cil_types.(TIndex (t', TNoOffset)) in
           host, Logic_const.addTermOffset offset' offset
-        | Ctype (TPtr _) ->
+        | Ctype { tnode = TPtr _ } ->
           let base = Logic_const.term ~loc (TLval tlv') lty in
           let addr = Logic_const.term ~loc (TBinOp (PlusPI,base,t')) lty in
           TMem addr, TNoOffset
@@ -609,8 +598,8 @@ struct
         | lty -> lty
       in
       let host', offset', ci = match lty with
-        | Ctype (TComp (ci,_)) -> host, offset, ci
-        | Ctype (TPtr (TComp (ci,_),_)) ->
+        | Ctype { tnode = TComp ci } -> host, offset, ci
+        | Ctype { tnode = TPtr { tnode = TComp ci } } ->
           TMem (Logic_const.term ~loc (Cil_types.TLval tlv') lty), TNoOffset, ci
         | _ -> typing_error "trying to get a field of an lvalue which is not \
                              of composite type or pointer to a composite type"

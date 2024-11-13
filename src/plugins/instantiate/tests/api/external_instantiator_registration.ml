@@ -18,15 +18,15 @@ let retype_args _ = function
 
 let generate_function_type t =
   let params = [
-    ("x", Cil_types.TPtr(t, []), [])
+    ("x", Cil_const.mk_tptr t, [])
   ] in
-  Cil_types.TFun(Cil_const.voidType, Some params, false, [])
+  Cil_const.(mk_tfun voidType (Some params) false)
 
 let generate_prototype t =
   let fun_type = generate_function_type t in
-  let name = function_name ^ "_" ^ match t with
-    | Cil_types.TInt(_) -> "int"
-    | Cil_types.TFloat(_) -> "float"
+  let name = function_name ^ "_" ^ match t.Cil_types.tnode with
+    | TInt(_) -> "int"
+    | TFloat(_) -> "float"
     | _ -> assert false (* nothing else in our test *)
   in
   name, fun_type

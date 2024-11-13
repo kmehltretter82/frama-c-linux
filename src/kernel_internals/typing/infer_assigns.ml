@@ -49,7 +49,7 @@ let from_prototype kf =
          let loc = vi.vdecl in
          let t = tvar (cvar_to_lvar vi) in
          let typ = vi.vtype in
-         if Cil.isVoidPtrType typ then
+         if isVoidPtrType typ then
            let const = typeHasAttribute "const" (Cil.typeOf_pointed typ) in
            let typ' = if const then Cil_const.charConstPtrType else Cil_const.charPtrType in
            (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
@@ -72,12 +72,12 @@ let from_prototype kf =
     (* Generate the required numbers of [[..]] until with find a non-array
        type *)
     let rec mk_offset set typ =
-      match Cil.unrollType typ with
-      | TArray (typ_elem, size, _) ->
+      match unrollTypeNode typ with
+      | TArray (typ_elem, size) ->
         let range = match size with
           | None -> make_range None
           | Some size ->
-            make_range (Cil.constFoldToInt size)
+            make_range (constFoldToInt size)
         in
         let offs, typ = mk_offset true typ_elem in
         TIndex (range, offs), typ
@@ -87,16 +87,16 @@ let from_prototype kf =
     in
     (* make_set_type (Ctype typ_pointed) *)
 
-    let typ_pointed = Cil.typeOf_pointed typ in
+    let typ_pointed = typeOf_pointed typ in
     (* Generate the initial term: [*(t+(0..))] for array types or char*
        pointers, *t for other pointer types. It would have been better to
        recognize formals with type [typ[]] instead of [typ *], but this
        information is lost during normalization *)
     let t_range_node, set =
-      match findAttribute "arraylen" (typeAttr typ) with
+      match findAttribute "arraylen" typ.tattr with
       | [AInt length] -> TBinOp (PlusPI, t, make_range (Some length)), true
       | _ ->
-        if Cil.isAnyCharPtrType typ
+        if isAnyCharPtrType typ
         then TBinOp (PlusPI, t, make_range None), true
         else t.term_node, false
     in
@@ -144,8 +144,8 @@ let from_prototype kf =
       (fun (g, content) -> content, From (inputs g))
       to_assign
   in
-  match rtyp with
-  | TVoid _ ->
+  match rtyp.tnode with
+  | TVoid ->
     (* assigns all pointer args from basic args and content of pointer args *)
     arguments
   | _ ->

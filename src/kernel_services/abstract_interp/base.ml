@@ -250,9 +250,10 @@ let is_weak = function
   | _ -> false
 
 (* Does a C type end by an empty struct? *)
-let rec final_empty_struct = function
-  | TArray (typ, _, _) -> final_empty_struct typ
-  | TComp (compinfo, _) ->
+let rec final_empty_struct t =
+  match t.tnode with
+  | TArray (typ, _) -> final_empty_struct typ
+  | TComp compinfo ->
     begin
       match compinfo.cfields with
       | Some [] | None -> true
@@ -261,9 +262,9 @@ let rec final_empty_struct = function
         try Cil.bitsSizeOf last_field.ftype = 0
         with Cil.SizeOfError _ -> false
     end
-  | TNamed (typeinfo, _) -> final_empty_struct typeinfo.ttype
-  | TVoid _ | TInt _ | TFloat _ | TPtr _ | TEnum _
-  | TFun _ | TBuiltin_va_list _ -> false
+  | TNamed typeinfo -> final_empty_struct typeinfo.ttype
+  | TVoid | TInt _ | TFloat _ | TPtr _ | TEnum _
+  | TFun _ | TBuiltin_va_list -> false
 
 (* Does a base end by an empty struct? *)
 let final_empty_struct = function

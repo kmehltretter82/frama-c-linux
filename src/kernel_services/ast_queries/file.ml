@@ -1428,13 +1428,13 @@ class reorder_ast: Visitor.frama_c_visitor =
     *)
 
     method! vtype ty =
-      (match ty with
-       | TVoid _ | TInt _ | TFloat _ | TPtr _
-       | TFun _ | TBuiltin_va_list _ | TArray _ -> ()
+      (match ty.tnode with
+       | TVoid | TInt _ | TFloat _ | TPtr _
+       | TFun _ | TBuiltin_va_list | TArray _ -> ()
 
-       | TNamed (ty,_) ->
-         let g = find_typeinfo ty in
-         if not (Cil_datatype.Typeinfo.Set.mem ty known_typeinfo) then begin
+       | TNamed ti ->
+         let g = find_typeinfo ti in
+         if not (Cil_datatype.Typeinfo.Set.mem ti known_typeinfo) then begin
            self#add_needed_decl g;
            Stack.push g typedefs;
            Stack.push true subvisit;
@@ -1449,14 +1449,14 @@ class reorder_ast: Visitor.frama_c_visitor =
                  Kernel.fatal
                    "Globals' reordering failed: \
                     recursive definition of type %s"
-                   ty.tname)
+                   ti.tname)
              typedefs
-       | TComp(ci,_) ->
+       | TComp ci ->
          if not (Cil_datatype.Compinfo.Set.mem ci known_compinfo) then begin
            self#add_needed_decl(GCompTagDecl(ci,Cil_datatype.Location.unknown));
            self#add_known_compinfo ci
          end
-       | TEnum(ei,_) ->
+       | TEnum ei ->
          if not (Cil_datatype.Enuminfo.Set.mem ei known_enuminfo) then begin
            self#add_needed_decl(GEnumTagDecl(ei,Cil_datatype.Location.unknown));
            self#add_known_enuminfo ei

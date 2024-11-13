@@ -82,13 +82,13 @@ let find_type (env : t) (namespace : Logic_typing.type_namespace)
     (tname : string) : typ =
   match namespace with
   | Logic_typing.Typedef ->
-    TNamed (find_typedef env tname, [])
+    Cil_const.mk_tnamed (find_typedef env tname)
   | Logic_typing.Struct ->
-    TComp (find_struct env tname, [])
+    Cil_const.mk_tcomp  (find_struct env tname)
   | Logic_typing.Union ->
-    TComp (find_union env tname, [])
+    Cil_const.mk_tcomp  (find_union env tname)
   | Logic_typing.Enum ->
-    TEnum (find_enum env tname, [])
+    Cil_const.mk_tenum  (find_enum env tname)
 
 let mem_global (env : t) (vname : string) : bool =
   Table.mem env.globals vname

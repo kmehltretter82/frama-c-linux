@@ -212,8 +212,8 @@ struct
 
   let field (base : lval) (field : Cil_types.fieldinfo) : lval =
     let field_belongs_to_typ fi typ =
-      match typ with
-      | Cil_types.TComp (ci,_attr) -> ci == fi.Cil_types.fcomp
+      match typ.Cil_types.tnode with
+      | TComp ci -> ci == fi.Cil_types.fcomp
       | _ -> false
     in
     assert (field_belongs_to_typ field base.typ);
@@ -237,15 +237,15 @@ end
 (* --- Condition normalization --- *)
 
 let zero_typed (typ : Cil_types.typ) =
-  match typ with
-  | TFloat (fk, _) -> mk_exp (Const (CReal (0., fk, None)))
-  | TEnum ({ekind = ik },_)
-  | TInt (ik, _) -> mk_exp (Const (CInt64 (Integer.zero, ik, None)))
+  match typ.tnode with
+  | TFloat fk -> mk_exp (Const (CReal (0., fk, None)))
+  | TEnum {ekind = ik }
+  | TInt ik -> mk_exp (Const (CInt64 (Integer.zero, ik, None)))
   | TPtr _ ->
     let ik = Machine.uintptr_kind () in
     let zero = mk_exp (Const (CInt64 (Integer.zero, ik, None))) in
     Build.cast typ zero
-  | typ ->
+  | _ ->
     Self.fatal ~current:true "non-scalar type %a" Printer.pp_typ typ
 
 (* Transform an expression supposed to be [positive] into an equivalent

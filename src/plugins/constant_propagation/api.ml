@@ -86,9 +86,10 @@ class propagate project fnames ~cast_intro = object(self)
     let oldt, newt =
       if ignore_const_cast then
         match Cil.unrollType oldt, Cil.unrollType newt with
-        | TPtr(typ, attrs), TPtr(typ', attrs') ->
+        | { tnode = TPtr typ; tattr = attrs }, { tnode = TPtr typ'; tattr =  attrs' } ->
           let drop_const ty = Cil.typeRemoveAttributes ["const"] ty in
-          TPtr(drop_const typ, attrs), TPtr(drop_const typ', attrs')
+          Cil_const.mk_tptr ~tattr:attrs  (drop_const typ),
+          Cil_const.mk_tptr ~tattr:attrs' (drop_const typ')
         | _ -> oldt, newt
       else
         oldt, newt
@@ -124,11 +125,8 @@ class propagate project fnames ~cast_intro = object(self)
       let loc = expr.eloc in
       let typ = Cil.typeOf expr in
       let typ_e = Cil.unrollType typ in
-      begin match typ_e with
-        | (TInt _
-          | TFloat _
-          | TPtr _
-          | TEnum _) -> ()
+      begin match typ_e.tnode with
+        | TInt _ | TFloat _ | TPtr _ | TEnum _ -> ()
         | _ -> raise Cannot_expand
       end;
       let stmt = match self#current_stmt with
@@ -233,9 +231,9 @@ class propagate project fnames ~cast_intro = object(self)
             with Fval.Not_Singleton_Float->
               raise Cannot_expand
           in
-          (match typ_e with
-           | TFloat (fkind, _) -> const_float m fkind
-           | TInt (ikind, _) | TEnum ({ ekind = ikind}, _) ->
+          (match typ_e.tnode with
+           | TFloat fkind -> const_float m fkind
+           | TInt ikind | TEnum { ekind = ikind} ->
              const_integer m ikind
            | _ -> raise Cannot_expand)
 

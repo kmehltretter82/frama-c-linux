@@ -505,8 +505,8 @@ let model_fields ?emitter t =
           with Not_found -> acc
       with Not_found -> acc
     in
-    match t with
-    | TNamed (ty,_) -> aux self_fields ty.ttype
+    match t.tnode with
+    | TNamed ti -> aux self_fields ti.ttype
     | _ -> self_fields
   in
   aux [] t

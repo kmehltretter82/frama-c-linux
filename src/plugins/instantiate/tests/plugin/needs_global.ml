@@ -13,13 +13,13 @@ let retype_args _ = function
   | _ -> assert false
 
 let generate_function_type t =
-  let params = [("x", Cil_types.TPtr(t, []), [])] in
-  Cil_types.TFun(Cil_const.voidType, Some params, false, [])
+  let params = [("x", Cil_const.mk_tptr t, [])] in
+  Cil_const.(mk_tfun voidType (Some params) false)
 
 let generate_prototype function_name t =
   let fun_type = generate_function_type t in
-  let name = function_name ^ "_" ^ match t with
-    | Cil_types.TInt(_) -> "int"
+  let name = function_name ^ "_" ^ match t.Cil_types.tnode with
+    | TInt(_) -> "int"
     | _ -> assert false (* nothing else in our test *)
   in
   name, fun_type

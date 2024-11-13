@@ -638,10 +638,11 @@ let unghost_vi vi =
   if vi.vstorage <> Extern then vi.vghost <- false;
   Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
   match Cil.unrollType vi.vtype with
-  | TFun(res, Some l, va, attr) ->
+  | { tnode = TFun (res, Some l, va); tattr } ->
     (* unghostify function's parameters *)
     let retype (n, t, a) = n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a in
-    Cil.update_var_type vi (TFun(res, Some (List.map retype l), va, attr))
+    Cil.update_var_type vi
+      (Cil_const.mk_tfun ~tattr res (Some (List.map retype l)) va)
   | _ ->
     ()
 

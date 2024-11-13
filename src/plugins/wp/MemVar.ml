@@ -327,7 +327,7 @@ struct
     match m with
     | CVAL | HEAP -> x.vtype
     | CTXT _ | CREF -> Cil.typeOf_pointed x.vtype
-    | CARR _ -> Ast_info.array_type (Cil.typeOf_pointed x.vtype)
+    | CARR _ -> Cil_const.mk_tarray (Cil.typeOf_pointed x.vtype) None
 
   let vobject m x = Ctypes.object_of (vtype m x)
 
@@ -936,18 +936,18 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec forall_pointers phi v t =
-    match Cil.unrollType t with
-    | TInt _ | TFloat _ | TVoid _ | TEnum _ | TNamed _ | TBuiltin_va_list _
+    match Cil.unrollTypeNode t with
+    | TInt _ | TFloat _ | TVoid | TEnum _ | TNamed _ | TBuiltin_va_list
       -> F.p_true
     | TPtr _ | TFun _ -> phi v
-    | TComp({ cfields = None },_) ->
+    | TComp { cfields = None } ->
       F.p_true
-    | TComp({ cfields = Some fields },_) ->
+    | TComp { cfields = Some fields } ->
       F.p_all
         (fun fd ->
            forall_pointers phi (e_getfield v (cfield fd)) fd.ftype)
         fields
-    | TArray(elt,_,_) ->
+    | TArray (elt, _) ->
       let k = Lang.freshvar Qed.Logic.Int in
       F.p_forall [k] (forall_pointers phi (e_get v (e_var k)) elt)
 

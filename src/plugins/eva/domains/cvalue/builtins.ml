@@ -133,8 +133,8 @@ let inconsistent_builtin_typ kf = function
   | None -> false (* No expected type provided with the builtin, no check. *)
   | Some typ ->
     let expected_result, expected_args = typ () in
-    match Kernel_function.get_type kf with
-    | TFun (result, args, _, _) ->
+    match (Kernel_function.get_type kf).tnode with
+    | TFun (result, args, _) ->
       (* If a builtin expects a void pointer, then accept all pointer types. *)
       let need_cast typ expected =
         Cil.need_cast typ expected

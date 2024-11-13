@@ -33,12 +33,12 @@ class tags_visitor = object
 
   method! vtype typ =
     begin
-      match typ with
-      | TEnum (ei, _) when ei.eorig_name = "" && !in_stdlib ->
+      match typ.tnode with
+      | TEnum ei when ei.eorig_name = "" && !in_stdlib ->
         Kernel.warning ~current:true ~once:true
           "anonymous enum in Frama-C stdlib";
         ()
-      | TComp (ci, _) when ci.corig_name = "" && !in_stdlib ->
+      | TComp ci when ci.corig_name = "" && !in_stdlib ->
         Kernel.warning ~current:true ~once:true
           "anonymous %s in Frama-C stdlib"
           (if ci.cstruct then "struct" else "union")

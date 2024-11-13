@@ -40,8 +40,8 @@ let subscript ~loc array idx =
       array
 
 let ptr_sizeof ~loc typ =
-  match Cil.unrollType typ with
-  | TPtr (t', _) -> Cil.new_exp ~loc (SizeOf t')
+  match Cil.unrollTypeNode typ with
+  | TPtr t' -> Cil.new_exp ~loc (SizeOf t')
   | _ -> assert false
 
 let lnot ~loc e =
@@ -69,7 +69,7 @@ let lnot ~loc e =
     Cil.zero ~loc
 
 let null ~loc =
-  Cil.mkCast ~newt:(TPtr (TVoid [], [])) (Cil.zero ~loc)
+  Cil.mkCast ~newt:Cil_const.voidPtrType (Cil.zero ~loc)
 
 let mem ~loc vi =
   lval

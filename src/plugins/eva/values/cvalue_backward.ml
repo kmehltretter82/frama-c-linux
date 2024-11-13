@@ -60,11 +60,11 @@ let backward_float_relation fkind ~positive op v1 v2 =
   Some (v1', v2')
 
 let backward_relation typ ~positive op =
-  match Cil.unrollType typ with
+  match Cil.unrollTypeNode typ with
   | TInt _ | TEnum _ | TPtr _ ->
     let op = if positive then op else Abstract_interp.Comp.inv op in
     backward_int_relation typ op
-  | TFloat (fk, _) ->
+  | TFloat fk ->
     backward_float_relation (Fval.kind fk) ~positive op
   | _ -> assert false (* should never occur anyway *)
 
@@ -259,12 +259,12 @@ let backward_lor ~v1 ~v2 ~res =
 
 let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
   let typ = Cil.unrollType typ_res in
-  match binop, typ with
+  match binop, typ.tnode with
   | Eva_ast.PlusA, TInt _ ->  backward_add_int typ ~res_value ~v1 ~v2 true
   | MinusA, TInt _ -> backward_add_int typ ~res_value ~v1 ~v2 false
 
-  | PlusA, TFloat (fk, _) ->  backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Add
-  | MinusA, TFloat (fk, _) -> backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Sub
+  | PlusA, TFloat fk ->  backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Add
+  | MinusA, TFloat fk -> backward_add_float (Fval.kind fk) ~res_value ~v1 ~v2 `Sub
 
   | PlusPI, TPtr _ -> backward_add_ptr typ ~res_value ~v1 ~v2 true
   | MinusPI, TPtr _ ->            backward_add_ptr typ ~res_value ~v1 ~v2 false
@@ -355,8 +355,9 @@ let backward_unop ~typ_arg op ~arg:_ ~res =
     with V.Not_based_on_null -> None
 
 (* ikind of an (unrolled) integer type *)
-let ikind = function
-  | TInt (ik, _) | TEnum ({ekind = ik}, _) -> ik
+let ikind t =
+  match t.tnode with
+  | TInt ik | TEnum {ekind = ik} -> ik
   | TPtr _ -> Machine.uintptr_kind ()
   | _ -> assert false
 
@@ -380,7 +381,7 @@ let downcast_enabled ~ik_src ~ik_dst =
 let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
   (*  Kernel.result "%a %a %a %a" Printer.pp_typ src_typ Printer.pp_typ dst_typ
       V.pretty src_val V.pretty dst_val; *)
-  match dst_typ, src_typ with
+  match dst_typ.tnode, src_typ.tnode with
   | (TInt _  | TEnum _ | TPtr _), (TInt _  | TEnum _ | TPtr _) ->
     let ik_dst = ikind dst_typ in
     let ik_src = ikind src_typ in
@@ -393,7 +394,7 @@ let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
       Some dst_val
     else None
 
-  | TFloat (fk_dst, _), TFloat (fk_src, _) -> begin
+  | TFloat fk_dst, TFloat fk_src -> begin
       let f_dst = Fval.kind fk_dst in
       let f_src = Fval.kind fk_src in
       match V.project_float dst_val with
@@ -414,11 +415,11 @@ let backward_cast ~src_typ ~dst_typ ~src_val ~dst_val =
           Some dst_val
     end
 
-  | TInt _, TFloat (fkind, _) ->
+  | TInt _, TFloat fkind ->
     let single_precision = fkind = FFloat in
     V.cast_float_to_int_inverse ~single_precision dst_val
 
-  | TFloat (fkind, _), TInt _ ->
+  | TFloat fkind, TInt _ ->
     let single_precision = fkind = FFloat in
     V.cast_int_to_float_inverse ~single_precision dst_val
 

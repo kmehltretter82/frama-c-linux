@@ -65,9 +65,9 @@ let mk_aggregator env fun_name a_pos pname a_type =
 
       (* Get the aggregate type of elements *)
       let _,ptyp,_ = List.nth params a_pos in
-      let a_param = pname, match ptyp with
-        | TArray (typ,_,_)
-        | TPtr (typ, _) -> typ
+      let a_param = pname, match ptyp.tnode with
+        | TArray (typ, _)
+        | TPtr typ -> typ
         | _ ->
           Self.warning ~current:true ~wkey:wkey_libc
             "The parameter %d of standard function %s should be \
@@ -169,8 +169,8 @@ let classify_std env vi = match vi.vname with
   | _ -> Unknown
 
 let is_variadic_function vi =
-  match Cil.unrollType vi.vtype with
-  | TFun (_, _, b, _) -> b
+  match Cil.unrollTypeNode vi.vtype with
+  | TFun (_, _, b) -> b
   |  _ -> false
 
 let classify env vi =

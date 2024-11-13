@@ -108,7 +108,7 @@ end = struct
       | false -> "pull_return"
     in
     (* TODO: Returning structs is unsupported so far *)
-    (match (Cil.typeOf lhs) with
+    (match Cil.(typeOf lhs).tnode with
      | TPtr _ -> ()
      | _ -> Error.not_yet "Struct in return");
     Smart_stmt.rtl_call ~loc ~prefix fname [ lhs ]
@@ -145,7 +145,7 @@ let assign ?(ltype) lhs rhs loc =
     | Some l -> l
     | None -> Cil.typeOfLval lhs
   in
-  match Cil.unrollType ltype with
+  match Cil.unrollTypeNode ltype with
   | TPtr _ ->
     let base = Misc.ptr_base ~loc:rhs.eloc rhs in
     let rhs, flow =
@@ -199,10 +199,10 @@ let assign ?(ltype) lhs rhs loc =
     in Some (lhs, rhs, Copy)
   (* va_list is a builtin type, we assume it has no pointers here and treat
      it as a "big" integer rather than a struct *)
-  | TBuiltin_va_list _ -> None
+  | TBuiltin_va_list -> None
   | TArray _ -> Some (lhs, rhs, Direct)
   (* void type should not happen as we are dealing with assignments *)
-  | TVoid _ -> Options.fatal "Void type in assignment"
+  | TVoid -> Options.fatal "Void type in assignment"
   | TFun _ -> Options.fatal "TFun type in assignment"
 
 (* Generate a statement tracking temporal metadata associated with assignment
@@ -399,14 +399,14 @@ end
    associated with adding a function argument to a stack frame *)
 let track_argument ?(typ) param index env =
   let typ = Option.value ~default:param.vtype typ in
-  match Cil.unrollType typ with
+  match Cil.unrollTypeNode typ with
   | TPtr _
   | TComp _ ->
     let stmt = Mk.pull_param ~loc:Location.unknown param index in
     Env.add_stmt ~post:false env stmt
-  | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list _ -> env
+  | TInt _ | TFloat _ | TEnum _ | TBuiltin_va_list -> env
   | TNamed _ -> assert false
-  | TVoid _ |TArray _ | TFun _ ->
+  | TVoid |TArray _ | TFun _ ->
     Options.fatal "Failed to handle function parameter"
 (* }}} *)
 

@@ -324,8 +324,8 @@ let find_model_field s typ =
          unrollType will unroll until it finds something other
          than TNamed. We want to go step by step.
       *)
-      (match typ with
-       | TNamed(ti,_) -> find_cons ti.ttype
+      (match typ.tnode with
+       | TNamed ti -> find_cons ti.ttype
        | _ -> raise e)
   in find_cons typ
 

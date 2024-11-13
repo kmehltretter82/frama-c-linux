@@ -334,8 +334,8 @@ let is_function_type vi = isFunctionType vi.vtype
 
 module Function = struct
 
-  let formal_args called_vinfo = match called_vinfo.vtype with
-    | TFun (_,Some argl,_,_) ->
+  let formal_args called_vinfo = match called_vinfo.vtype.tnode with
+    | TFun (_,Some argl,_) ->
       argl
     | TFun _ ->
       []
@@ -421,45 +421,44 @@ let block_of_local (fdec:fundec) vi =
 (** {2 Types} *)
 (* ************************************************************************** *)
 
-let array_type ?length ?(attr=[]) ty = TArray(ty,length,attr)
-
 let direct_array_size ty =
-  match unrollType ty with
-  | TArray(_ty,Some size,_) -> value_of_integral_expr size
-  | TArray(_ty,None,_) -> Integer.zero
+  match unrollTypeNode ty with
+  | TArray(_ty,Some size) -> value_of_integral_expr size
+  | TArray(_ty,None) -> Integer.zero
   | _ -> assert false
 
 let rec array_size ty =
-  match unrollType ty with
-  | TArray(elemty,Some _,_) ->
+  match unrollTypeNode ty with
+  | TArray(elemty,Some _) ->
     if isArrayType elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)
     else direct_array_size ty
-  | TArray(_,None,_) -> Integer.zero
+  | TArray(_,None) -> Integer.zero
   | _ -> assert false
 
-let direct_element_type ty = match unrollType ty with
-  | TArray(eltyp,_,_) -> eltyp
+let direct_element_type ty = match unrollTypeNode ty with
+  | TArray(eltyp,_) -> eltyp
   | _ -> assert false
 
 let element_type ty =
-  let rec elem_type ty = match unrollType ty with
-    | TArray(eltyp,_,_) -> elem_type eltyp
+  let rec elem_type ty = match unrollTypeNode ty with
+    | TArray(eltyp,_) -> elem_type eltyp
     | _ -> ty
   in
-  match unrollType ty with
-  | TArray(eltyp,_,_) -> elem_type eltyp
+  match unrollTypeNode ty with
+  | TArray (eltyp,_) -> elem_type eltyp
   | _ -> assert false
 
 let direct_pointed_type ty =
-  match unrollType ty with
-  | TPtr(elemty,_) -> elemty
+  match unrollTypeNode ty with
+  | TPtr elemty -> elemty
   | _ -> assert false
 
 let pointed_type ty =
-  match unrollType (direct_pointed_type ty) with
-  | TArray _ as arrty -> element_type arrty
-  | ty -> ty
+  let ty' = unrollType (direct_pointed_type ty) in
+  match ty'.tnode with
+  | TArray _ -> element_type ty'
+  | _ -> ty'
 
 (* ************************************************************************** *)
 (** {2 Predefined} *)
@@ -495,6 +494,9 @@ let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
 
 let is_frama_c_builtin v =
   Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
+
+let array_type ?length ?(attr=[]) ty =
+  Cil_const.mk_tarray ~tattr:attr ty length
 
 
 (*

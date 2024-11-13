@@ -712,27 +712,28 @@ class cil_printer () = object (self)
     end;
     self#varname fmt v.vname
 
-  method private no_ghost_at_first_level = function
-    | TArray(t, e, a) ->
-      let t = Cil.typeRemoveAttributes [ "ghost" ] t in
-      let a = Cil.dropAttribute "ghost" a in
-      TArray (t, e, a)
-    | t -> Cil.typeRemoveAttributes [ "ghost" ] t
+  method private no_ghost_at_first_level t =
+    match t.tnode with
+    | TArray (bt, e) ->
+      let bt' = Cil.typeRemoveAttributes [ "ghost" ] bt in
+      let tattr = Cil.dropAttribute "ghost" t.tattr in
+      Cil_const.mk_tarray ~tattr bt' e
+    | _ -> Cil.typeRemoveAttributes [ "ghost" ] t
 
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
     let stom, rest = Cil.separateStorageModifiers v.vattr in
     (* Small hack to keep printing noreturn attribute before function type. *)
-    let noreturn_attrs = Cil.(filterAttributes "noreturn" (typeAttr v.vtype)) in
+    let noreturn_attrs = Cil.(filterAttributes "noreturn" v.vtype.tattr) in
     let stom_noreturn = stom @ noreturn_attrs in
     let vtype_no_noreturn = Cil.typeRemoveAttributes ["noreturn"] v.vtype in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
     let v = { v with vtype = self#no_ghost_at_first_level vtype_no_noreturn } in
     let v =
       if v.vformal && not state.print_cil_as_is then begin
-        match v.vtype with
-        | TPtr(t,a) when Cil.hasAttribute "arraylen" a ->
-          { v with vtype = TArray(t, None, a)}
+        match v.vtype.tnode with
+        | TPtr t when Cil.hasAttribute "arraylen" v.vtype.tattr ->
+          { v with vtype = Cil_const.mk_tarray ~tattr:v.vtype.tattr t None}
         | _ -> v
       end
       else v
@@ -961,8 +962,8 @@ class cil_printer () = object (self)
          fprintf fmt "%a = " self#lval lv;
          (* Maybe we need to print a cast *)
          (let destt = Cil.typeOfLval lv in
-          match Cil.unrollType (Cil.typeOf e) with
-          | TFun(rt, _, _, _) when (Cil.need_cast rt destt) ->
+          match Cil.(unrollTypeNode (typeOf e)) with
+          | TFun(rt, _, _) when (Cil.need_cast rt destt) ->
             fprintf fmt "(%a)" (self#typ None) destt
           | _ -> ()));
       (* Now the function name *)
@@ -1774,7 +1775,7 @@ class cil_printer () = object (self)
         if verbose then
           fprintf fmt "/* Following enum is equivalent to %a */@\n"
             (self#typ None)
-            (TInt(enum.ekind,[]));
+            (Cil_const.mk_tint enum.ekind);
         fprintf fmt "%a@[ %a {@\n%a@]@\n}%a;@\n"
           self#pp_keyword "enum"
           (self#typedef g self#enumname) enum
@@ -1790,7 +1791,7 @@ class cil_printer () = object (self)
         self#line_directive fmt l;
         fprintf fmt "%a %a;@\n"
           self#pp_keyword "enum"
-          (self#typeref (TEnum(enum,[])) self#enumname) enum
+          (self#typeref (Cil_const.mk_tenum enum) self#enumname) enum
 
       | GCompTag (comp, l) -> (* This is a definition of a tag *)
         let sto_mod, rest_attr = Cil.separateStorageModifiers comp.cattr in
@@ -1807,7 +1808,7 @@ class cil_printer () = object (self)
         self#line_directive fmt l;
         fprintf fmt "%a %a;@\n"
           self#compkind comp
-          (self#typeref (TComp(comp,[])) self#compname) comp
+          (self#typeref (Cil_const.mk_tcomp comp) self#compname) comp
 
       | GVar (vi, io, l) ->
         self#line_directive ~forcefile:true fmt l;
@@ -1999,52 +2000,56 @@ class cil_printer () = object (self)
       (* if pa = nil then nil else text "/*" ++ pa ++ text "*/"*)
       | _ ->  self#attributes fmt a
     in
-    match t with
-    | TVoid a -> fprintf fmt "void%a%a" self#attributes a pname true
+    match t.tnode with
+    | TVoid -> fprintf fmt "void%a%a" self#attributes t.tattr pname true
 
-    | TInt (ikind,a) ->
+    | TInt ikind ->
       fprintf fmt "%a%a%a"
-        (self#typeref t self#ikind) ikind self#attributes a pname true
+        (self#typeref t self#ikind) ikind
+        self#attributes t.tattr
+        pname true
 
-    | TFloat(fkind, a) ->
+    | TFloat fkind ->
       fprintf fmt "%a%a%a"
-        (self#typeref t self#fkind) fkind self#attributes a pname true
+        (self#typeref t self#fkind) fkind
+        self#attributes t.tattr
+        pname true
 
-    | TComp (comp, a) -> (* A reference to a struct *)
+    | TComp comp -> (* A reference to a struct *)
       fprintf fmt "%a %a%a%a"
         self#compkind comp
         (self#typeref t self#compname) comp
-        self#attributes a
+        self#attributes t.tattr
         pname true
 
-    | TEnum (enum, a) ->
+    | TEnum enum ->
       fprintf fmt "%a %a%a%a"
         self#pp_keyword "enum"
         (self#typeref t self#enumname) enum
-        self#attributes a
+        self#attributes t.tattr
         pname true
 
-    | TPtr (bt, a) ->
+    | TPtr bt ->
       (* Parenthesize the ( * attr name) if a pointer to a function or an
        * array. However, on MSVC the __stdcall modifier must appear right
        * before the pointer constructor "(__stdcall *f)". We push them into
        * the parenthesis. *)
       let (paren: (formatter -> unit) option), (bt': typ) =
-        match bt with
-        | TFun(rt, args, isva, fa) when Machine.msvcMode () ->
-          let an, af', at = Cil.partitionAttributes ~default:Cil.AttrType fa in
+        match bt.tnode with
+        | TFun(rt, args, isva) when Machine.msvcMode () ->
+          let an, af', at = Cil.partitionAttributes ~default:Cil.AttrType bt.tattr in
           (* We take the af' and we put them into the parentheses *)
           Some
             (fun fmt ->
                fprintf fmt
                  "(%a"
                  printAttributes af'),
-          TFun(rt, args, isva, Cil.addAttributes an at)
+          Cil_const.mk_tfun ~tattr:(Cil.addAttributes an at) rt args isva
         | TFun _ | TArray _ -> (Some (fun fmt -> fprintf fmt "(")), bt
         | _ -> None, bt
       in
       let name' =
-        fun fmt -> fprintf fmt "*%a%a" printAttributes a pname (a <> [])
+        fun fmt -> fprintf fmt "*%a%a" printAttributes t.tattr pname (t.tattr <> [])
       in
       let name'' =
         fun fmt ->
@@ -2055,8 +2060,8 @@ class cil_printer () = object (self)
       in
       self#typ (Some name'') fmt bt'
 
-    | TArray (elemt, lo, a) ->
-      let atts_elem, a = Cil.splitArrayAttributes a in
+    | TArray (elemt, lo) ->
+      let atts_elem, a = Cil.splitArrayAttributes t.tattr in
       let size_info,a =
         List.partition
           (fun a -> List.mem (Cil.attributeName a) ["arraylen"; "static"]) a
@@ -2097,11 +2102,11 @@ class cil_printer () = object (self)
         fmt
         elemt
 
-    | TFun (restyp, args, isvararg, a) ->
+    | TFun (restyp, args, isvararg) ->
       let name' fmt =
-        if filter_printing_attributes a = [] then pname fmt false
-        else if nameOpt = None then printAttributes fmt a
-        else fprintf fmt "(%a%a)" printAttributes a pname true
+        if filter_printing_attributes t.tattr = [] then pname fmt false
+        else if nameOpt = None then printAttributes fmt t.tattr
+        else fprintf fmt "(%a%a)" printAttributes t.tattr pname true
       in
       let partition_ghosts ghost_arg args =
         match args with
@@ -2150,15 +2155,15 @@ class cil_printer () = object (self)
       in
       self#typ (Some pp_params) fmt restyp
 
-    | TNamed (ti, a) ->
+    | TNamed ti ->
       fprintf fmt "%a%a%a"
         (self#typeref t self#typename) ti
-        self#attributes a
+        self#attributes t.tattr
         pname true
 
-    | TBuiltin_va_list a ->
+    | TBuiltin_va_list ->
       fprintf fmt "__builtin_va_list%a%a"
-        self#attributes a
+        self#attributes t.tattr
         pname true
 
   (**** PRINTING ATTRIBUTES *********)
@@ -2563,8 +2568,8 @@ class cil_printer () = object (self)
     | TBinOp (op,l,r) ->
       fprintf fmt "@[%a@ %a@ %a@]" term l self#term_binop op term r
     | TCast (false, Ctype ty,t) ->
-      begin match ty, t.term_node with
-        | TFloat(fk,_) , TConst(LReal r as cst) when
+      begin match ty.tnode, t.term_node with
+        | TFloat fk , TConst(LReal r as cst) when
             not Kernel.(is_debug_key_enabled dkey_print_logic_coercions) &&
             Floating_point.has_suffix fk r.r_literal ->
           self#logic_constant fmt cst

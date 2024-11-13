@@ -374,7 +374,7 @@ let merge_copy (m: map) ~(l: node) ~(r: node) : unit =
 let add_field (m:map) (r:node) (fd:fieldinfo) : node =
   let ci = fd.fcomp in
   if not ci.cstruct then r else
-    let size = Cil.bitsSizeOf (TComp(ci,[])) in
+    let size = Cil.bitsSizeOf (Cil_const.mk_tcomp ci) in
     let offset, length = Cil.fieldBitsOffset fd in
     if offset = 0 && size = length then r else
       let data = new_chunk m ~parent:r () in

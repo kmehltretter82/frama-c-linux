@@ -38,8 +38,8 @@ let compare (a : field) (b : field) =
   if cmp <> 0 then cmp else
     let cmp = a.length - b.length in
     if cmp <> 0 then cmp else
-      let sa = Cil.bitsSizeOf (TComp(a.data.fcomp,[])) in
-      let sb = Cil.bitsSizeOf (TComp(b.data.fcomp,[])) in
+      let sa = Cil.bitsSizeOf (Cil_const.mk_tcomp a.data.fcomp) in
+      let sb = Cil.bitsSizeOf (Cil_const.mk_tcomp b.data.fcomp) in
       sb - sa
 
 let find_all (fields: domain) (rg : _ range) =

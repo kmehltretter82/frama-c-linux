@@ -819,14 +819,14 @@ end = struct
         Varinfo.Hashtbl.add fi_table new_var finfo;
         debug "@[[build_cil_proto] -> %s@\n@]@." new_var.vname;
         let action =
-          let (rt,args,va,attrs) = Cil.splitFunctionType new_var.vtype in
+          let (rt,args,va,tattr) = Cil.splitFunctionType new_var.vtype in
           (match args with
            | None -> ()
            | Some args ->
              let old_formals = Kernel_function.get_formals kf in
              let old_formals = filter_params finfo old_formals in
              let args = filter_params finfo args in
-             let mytype = TFun(rt,Some args,va,attrs) in
+             let mytype = Cil_const.mk_tfun ~tattr  rt (Some args) va in
              let new_formals = List.map makeFormalsVarDecl args in
              self#add_formals_bindings new_var new_formals;
              Cil.update_var_type new_var mytype;

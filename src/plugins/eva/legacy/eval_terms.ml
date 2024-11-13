@@ -486,7 +486,7 @@ let rec isLogicNonCompositeType t =
 
 let rec infer_type = function
   | Ctype t ->
-    (match t with
+    (match t.tnode with
      | TInt _ -> Cil_const.intType
      | TFloat _ -> Cil_const.doubleType
      | _ -> t)
@@ -503,17 +503,17 @@ let rec infer_type = function
    differences in integer and floating-point sizes, that are meaningless
    in the logic *)
 let same_etype t1 t2 =
-  match Cil.unrollType t1, Cil.unrollType t2 with
+  match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TFloat _, TFloat _ -> true
-  | TPtr (p1, _), TPtr (p2, _) -> Cil_datatype.Typ.equal p1 p2
+  | TPtr p1, TPtr p2 -> Cil_datatype.Typ.equal p1 p2
   | _, _ -> Cil_datatype.Typ.equal t1 t2
 
 (* Returns the kind of floating-point represented by a logic type, or None. *)
 let logic_type_fkind = function
   | Ctype typ -> begin
-      match Cil.unrollType typ with
-      | TFloat (fkind, _) -> Some fkind
+      match Cil.unrollTypeNode typ with
+      | TFloat fkind -> Some fkind
       | _ -> None
     end
   | _ -> None
@@ -563,8 +563,9 @@ let is_noop_cast ~src_typ ~dst_typ =
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
   match Logic_utils.unroll_type typ, Logic_utils.unroll_type trm.term_type with
-  | Linteger, Ctype (TInt _ | TEnum _) -> () (* Always inclusion *)
-  | Ctype (TInt _ | TEnum _ as typ), Ctype (TInt _ | TEnum _ as typeoftrm) ->
+  | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
+  | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
+    Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
     let sztyp = Bit_utils.sizeof typ in
     let szexpr = Bit_utils.sizeof typeoftrm in
     let styp, sexpr =
@@ -579,8 +580,8 @@ let pass_logic_cast exn typ trm =
     then ()
     else raise exn
 
-  | Lreal,  Ctype (TFloat _) -> () (* Always inclusion *)
-  | Ctype (TFloat (f1,_)), Ctype (TFloat (f2, _)) ->
+  | Lreal,  Ctype { tnode = (TFloat _) } -> () (* Always inclusion *)
+  | Ctype { tnode = (TFloat f1) }, Ctype { tnode = (TFloat f2) } ->
     if Cil.frank f1 < Cil.frank f2
     then raise exn
 
@@ -765,7 +766,7 @@ let cast_to_bool r =
   and contains_non_zero = V.contains_non_zero r.eover in
   let eover = V.interp_boolean ~contains_zero ~contains_non_zero in
   { eover; eunder = under_from_over eover; empty = r.empty;
-    ldeps = r.ldeps; etype = TInt (IBool, []) }
+    ldeps = r.ldeps; etype = Cil_const.boolType }
 
 (* Note: "charlen" stands for either strlen or wcslen *)
 
@@ -809,7 +810,7 @@ let eval_logic_charchr builtin env s c ldeps_s ldeps_c =
   let eunder = under_from_over eover in
   (* the C strchr function has type char*, but the logic strchr predicate has
      type 𝔹 *)
-  let etype = TInt (IBool, []) in
+  let etype = Cil_const.boolType in
   let ldeps = join_logic_deps ldeps_s ldeps_c in
   { etype; ldeps; eover; empty = false; eunder }
 
@@ -957,9 +958,9 @@ let eval_dangling state r =
 exception Reduce_to_bottom
 
 let int_or_float_op typ int_op float_op =
-  match typ with
+  match typ.tnode with
   | TInt _ | TPtr _ | TEnum _ -> int_op
-  | TFloat (_fkind, _) -> float_op
+  | TFloat _fk -> float_op
   | _ -> ast_error (Format.asprintf
                       "binop on incorrect type %a" Printer.pp_typ typ)
 
@@ -1006,7 +1007,7 @@ let rec eval_term ~alarm_mode env t =
 
   | TAddrOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
-    { etype = TPtr (r.etype, []);
+    { etype = Cil_const.mk_tptr r.etype;
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover;
@@ -1014,7 +1015,7 @@ let rec eval_term ~alarm_mode env t =
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
-    { etype = TPtr (Cil.typeOf_array_elem r.etype, []);
+    { etype = Cil_const.mk_tptr (Cil.typeOf_array_elem r.etype);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover;
@@ -1662,8 +1663,8 @@ and eval_tlhost ~alarm_mode env lv =
      | None -> no_result ())
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
-    let tres = match Cil.unrollType r.etype with
-      | TPtr (t, _) -> t
+    let tres = match Cil.unrollTypeNode r.etype with
+      | TPtr t -> t
       | _ -> ast_error "*p where p is not a pointer"
     in
     { etype = tres;
@@ -1681,8 +1682,8 @@ and eval_toffset ~alarm_mode env typ toffset =
       eover = Ival.zero;
       empty = false; }
   | TIndex (idx, remaining) ->
-    let typ_e, size = match Cil.unrollType typ with
-      | TArray (t, size, _) -> t, size
+    let typ_e, size = match Cil.unrollTypeNode typ with
+      | TArray (t, size) -> t, size
       | _ -> ast_error "index on a non-array"
     in
     let idx = constraint_trange idx size in

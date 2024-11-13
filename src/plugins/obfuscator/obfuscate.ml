@@ -36,8 +36,9 @@ class visitor = object
   val logic_vars_visited = Logic_var.Hashtbl.create 7
   val id_pred_visited = Identified_predicate.Hashtbl.create 7
 
-  method! vtype = function
-    | TFun(t, args, variadic, attrs) ->
+  method! vtype t =
+    match t.tnode with
+    | TFun(rt, args, variadic) ->
       let args' =
         match args with
         | None -> None
@@ -47,7 +48,7 @@ class visitor = object
                (fun (s,t,a) ->
                   (Dictionary.fresh Obfuscator_kind.Formal_in_type s, t, a)) l)
       in
-      Cil.ChangeDoChildrenPost(TFun(t,args',variadic,attrs), Fun.id)
+      Cil.ChangeDoChildrenPost(Cil_const.mk_tfun ~tattr:t.tattr rt args' variadic, Fun.id)
     | _ -> Cil.DoChildren
 
   method! vglob_aux = function

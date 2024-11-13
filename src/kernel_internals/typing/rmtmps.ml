@@ -274,7 +274,7 @@ let isExportedRoot global =
       v.vname, true, "has FC_BUILTIN attribute"
     | GAnnot _ -> "", true, "global annotation"
     | GType (t, _) when
-        Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype) ->
+        Cil.hasAttribute "FC_BUILTIN" t.ttype.tattr ->
       t.tname, true, "has FC_BUILTIN attribute"
     | GCompTag (c,_) | GCompTagDecl (c,_) when
         Cil.hasAttribute "FC_BUILTIN" c.cattr ->
@@ -446,12 +446,12 @@ class markReachableVisitor
       ignore (visitCilAttributes (self :> cilVisitor) attrs)
 
     method! vtype typ =
-      (match typ with
-       | TEnum(e, attrs) ->
-         self#visitAttrs attrs;
+      (match typ.tnode with
+       | TEnum e ->
+         self#visitAttrs typ.tattr;
          self#mark_enum e
 
-       | TComp(c, attrs) ->
+       | TComp c ->
          let old = is_reachable reachable_tbl (Comp c) in
          if not old then
            begin
@@ -462,11 +462,11 @@ class markReachableVisitor
              (* to recurse, we must ask explicitly *)
              let recurse f = ignore (self#vtype f.ftype) in
              List.iter recurse (Option.value ~default:[] c.cfields);
-             self#visitAttrs attrs;
+             self#visitAttrs typ.tattr;
              self#visitAttrs c.cattr
            end;
 
-       | TNamed(ti, attrs) ->
+       | TNamed ti ->
          let old = (is_reachable reachable_tbl (Type ti)) in
          if not old then
            begin
@@ -476,19 +476,19 @@ class markReachableVisitor
              (* recurse deeper into the type referred-to by the typedef *)
              (* to recurse, we must ask explicitly *)
              ignore (self#vtype ti.ttype);
-             self#visitAttrs attrs
+             self#visitAttrs typ.tattr
            end;
 
-       | TVoid a | TInt (_,a) | TFloat (_,a) | TBuiltin_va_list a ->
-         self#visitAttrs a
-       | TPtr(ty,a) -> ignore (self#vtype ty); self#visitAttrs a
-       | TArray(ty,sz, a) ->
-         ignore (self#vtype ty); self#visitAttrs a;
+       | TVoid | TInt _ | TFloat _ | TBuiltin_va_list ->
+         self#visitAttrs typ.tattr
+       | TPtr ty -> ignore (self#vtype ty); self#visitAttrs typ.tattr
+       | TArray (ty, sz) ->
+         ignore (self#vtype ty); self#visitAttrs typ.tattr;
          Option.iter (ignore $ (visitCilExpr (self:>cilVisitor))) sz
-       | TFun (ty, args,_,a) ->
+       | TFun (ty, args, _) ->
          ignore (self#vtype ty);
          Option.iter (List.iter (fun (_,ty,_) -> ignore (self#vtype ty))) args;
-         self#visitAttrs a
+         self#visitAttrs typ.tattr
       );
       SkipChildren
 
@@ -620,32 +620,33 @@ class markReferencedVisitor = object (self)
       SkipChildren
     | _ -> SkipChildren
 
-  method! vtype = function
-    | TNamed (ti, _) ->
+  method! vtype t =
+    match t.tnode with
+    | TNamed ti ->
       if not (Stack.is_empty inside_typ) then begin
         Kernel.debug ~current:true ~dkey "referenced: type %s" ti.tname;
         ti.treferenced <- true;
       end;
       DoChildren
-    | TComp (ci, _) ->
+    | TComp ci ->
       if not (Stack.is_empty inside_typ) then begin
         Kernel.debug ~current:true ~dkey "referenced: comp %s" ci.cname;
         ci.creferenced <- true;
       end;
       DoChildren
-    | TEnum (ei, _) ->
+    | TEnum ei ->
       if not (Stack.is_empty inside_typ) then begin
         Kernel.debug ~current:true ~dkey "referenced: enum %s" ei.ename;
         ei.ereferenced <- true;
       end;
       DoChildren
-    | TVoid _
+    | TVoid
     | TInt _
     | TFloat _
     | TPtr _
     | TArray _
     | TFun _
-    | TBuiltin_va_list _ -> DoChildren
+    | TBuiltin_va_list -> DoChildren
 
   method! vexpr e =
     match e.enode with
@@ -823,7 +824,7 @@ let removeUnmarked isRoot ast reachable_tbl =
     (* unused global types, variables, and functions are simply removed *)
     | GType (t, _) ->
       is_reachable reachable_tbl (Type t) ||
-      Cil.hasAttribute "FC_BUILTIN" (Cil.typeAttr t.ttype)
+      Cil.hasAttribute "FC_BUILTIN" t.ttype.tattr
       || isRoot global
     | GCompTag (c,_) | GCompTagDecl (c,_) ->
       is_reachable reachable_tbl (Comp c) ||

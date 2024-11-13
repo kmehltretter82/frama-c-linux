@@ -56,8 +56,8 @@ let pretty_node ?(key=false) fmt n =
 
 let is_variadic kf =
   let varf = Kernel_function.get_vi kf in
-  match varf.vtype with
-  | TFun (_, _, is_variadic, _) -> is_variadic
+  match varf.vtype.tnode with
+  | TFun (_, _, is_variadic) -> is_variadic
   | _ -> Pdg_parameters.fatal
            "The variable of a kernel_function has to be a function !"
 

@@ -163,7 +163,7 @@ class visit_adding_code_for_synchronisation =
          - what about varargs?
       *)
       let (rettype,args,varargs,_) = Cil.splitFunctionTypeVI vi_pre in
-      Cil.update_var_type vi_pre (TFun(Cil_const.voidType, args, varargs,[]));
+      Cil.update_var_type vi_pre Cil_const.(mk_tfun voidType args varargs);
       vi_pre.vattr <- [];
 
       (* in particular get rid of __no_return if set in vi*)
@@ -176,7 +176,7 @@ class visit_adding_code_for_synchronisation =
       let vi_post =
         Cil.makeGlobalVar ~ghost:true
           (Data_for_aorai.get_fresh (vi.vname ^ "_post_func"))
-          (TFun(Cil_const.voidType,Some arg,false,[]))
+          Cil_const.(mk_tfun voidType (Some arg) false)
       in
       Kernel_function.Hashtbl.add aux_post_table kf vi_post;
       Aux_funcs.(add vi_post (Post kf));
@@ -186,9 +186,9 @@ class visit_adding_code_for_synchronisation =
          we have to update the function's formals. Search
          for LBLsformals. *)
       Cil.setFunctionTypeMakeFormals
-        fun_dec_pre (TFun(Cil_const.voidType, args, varargs,[]));
+        fun_dec_pre Cil_const.(mk_tfun voidType args varargs);
       Cil.setFunctionTypeMakeFormals
-        fun_dec_post (TFun(Cil_const.voidType, Some arg, false,[]));
+        fun_dec_post Cil_const.(mk_tfun voidType (Some arg) false);
       (* We will now fill the function with the result
          of the automaton's analysis. *)
       Globals.Functions.replace_by_definition

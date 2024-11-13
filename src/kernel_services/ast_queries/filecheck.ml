@@ -25,8 +25,8 @@ open Cil_datatype
 
 
 let same_integral_types t1 t2 =
-  match Cil.unrollType t1, Cil.unrollType t2 with
-  | TInt(ik1,[]), TInt(ik2,[]) ->
+  match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
+  | TInt ik1, TInt ik2 ->
     Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2 &&
     Cil.isSigned ik1 = Cil.isSigned ik2
   | _ -> false
@@ -36,8 +36,8 @@ let is_admissible_conversion e ot nt =
   let nt' = Cil.typeDeepDropAllAttributes nt in
   not (Cil.need_cast ot' nt') ||
   same_integral_types ot' nt' ||
-  (match e.enode, Cil.unrollType nt with
-   | Const(CEnum { eihost = ei }), TEnum(ei',_) -> ei.ename = ei'.ename
+  (match e.enode, Cil.unrollTypeNode nt with
+   | Const(CEnum { eihost = ei }), TEnum ei' -> ei.ename = ei'.ename
    | _ -> false)
 
 let pretty_logic_var_kind fmt = function
@@ -1322,15 +1322,15 @@ module Base_checker = struct
         | _ -> Cil.DoChildren
 
       method! vtype ty =
-        match ty with
-        | TArray (_, _, la) ->
-          let elt, _ = Cil.splitArrayAttributes la in
+        match ty.tnode with
+        | TArray _ ->
+          let elt, _ = Cil.splitArrayAttributes ty.tattr in
           if elt != [] then
             Kernel.fatal
               "Element attribute on array type itself: %a"
               Printer.pp_attributes elt;
           Cil.DoChildren
-        | TFun(rt, _, _, attrs) ->
+        | TFun(rt, _, _) ->
           (* we do not visit parameters. This is handled elsewhere, and it
              is not possible to perform a sensible check for dependent types
              at this level, e.g. for
@@ -1340,7 +1340,7 @@ module Base_checker = struct
              arr[10][n] is well formed.
           *)
           ignore (Cil.visitCilType (self:>Cil.cilVisitor) rt);
-          ignore (Cil.visitCilAttributes (self:>Cil.cilVisitor) attrs);
+          ignore (Cil.visitCilAttributes (self:>Cil.cilVisitor) ty.tattr);
           Cil.SkipChildren
         | _ -> Cil.DoChildren
 

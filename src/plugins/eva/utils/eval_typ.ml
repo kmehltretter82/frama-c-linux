@@ -30,8 +30,8 @@ let bitfield_size_attributes attrs =
 
 let sizeof_lval_typ typlv =
   match Cil.unrollType typlv with
-  | TInt (_, attrs) | TEnum (_, attrs) as t ->
-    (match Cil.findAttribute Cil.bitfield_attribute_name attrs with
+  | { tnode = (TInt _ | TEnum _); tattr } as t ->
+    (match Cil.findAttribute Cil.bitfield_attribute_name tattr with
      | [AInt i] -> Int_Base.Value i
      | _ -> Bit_utils.sizeof t)
   | t -> Bit_utils.sizeof t
@@ -44,7 +44,7 @@ let offsetmap_matches_type typ_lv o =
       try typ_matches (V.project_ival_bottom v)
       with V.Not_based_on_null -> true (* Do not mess with pointers *)
   in
-  match Cil.unrollType typ_lv with
+  match Cil.unrollTypeNode typ_lv with
   | TFloat _ -> aux Ival.is_float
   | TInt _ | TEnum _ | TPtr _ -> aux Ival.is_int
   | _ -> true
@@ -62,22 +62,23 @@ let is_compatible_function ~typ_pointed ~typ_fun =
      - enums and integer types with the same signedness and size are equal *)
   let weak_compatible t1 t2 =
     Cabs2cil.areCompatibleTypes t1 t2 ||
-    match Cil.unrollType t1, Cil.unrollType t2 with
-    | TVoid _, TVoid _ -> true
+    match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
+    | TVoid, TVoid -> true
     | TPtr _, TPtr _ -> true
-    | (TInt (ik1, _) | TEnum ({ekind = ik1}, _)),
-      (TInt (ik2, _) | TEnum ({ekind = ik2}, _)) ->
+    | (TInt ik1 | TEnum {ekind = ik1}),
+      (TInt ik2 | TEnum {ekind = ik2}) ->
       Cil.isSigned ik1 = Cil.isSigned ik2 &&
       Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2
-    | TFloat (fk1, _), TFloat (fk2, _) -> fk1 = fk2
-    | TComp (ci1, _), TComp (ci2, _) ->
+    | TFloat fk1, TFloat fk2 -> fk1 = fk2
+    | TComp ci1, TComp ci2 ->
       Cil_datatype.Compinfo.equal ci1 ci2
     | _ -> false
   in
   if Cabs2cil.areCompatibleTypes typ_fun typ_pointed then Compatible
   else
-    let continue = match Cil.unrollType typ_pointed, Cil.unrollType typ_fun with
-      | TFun (ret1, args1, var1, _), TFun (ret2, args2, var2, _) ->
+    let continue =
+      match Cil.unrollTypeNode typ_pointed, Cil.unrollTypeNode typ_fun with
+      | TFun (ret1, args1, var1), TFun (ret2, args2, var2) ->
         (* Either both functions are variadic, or none. Otherwise, it
            will be too complicated to make the argument match *)
         var1 = var2 &&
@@ -104,10 +105,10 @@ let is_compatible_function ~typ_pointed ~typ_fun =
 
 let refine_fun_ptr typ args =
   match Cil.unrollType typ, args with
-  | TFun (_, Some _, _, _), _ | _, None -> typ
-  | TFun (ret, None, var, attrs), Some l ->
+  | { tnode = TFun (_, Some _, _) }, _ | _, None -> typ
+  | { tnode = TFun (ret, None, var); tattr }, Some l ->
     let ltyps = List.map (fun arg -> "", arg, []) l in
-    TFun (ret, Some ltyps, var, attrs)
+    Cil_const.mk_tfun ~tattr ret (Some ltyps) var
   | _ -> assert false
 
 (* Filters the list of kernel function [kfs] to only keep functions compatible
@@ -177,17 +178,17 @@ let pointer_range () =
 
 let classify_as_scalar typ =
   match Cil.unrollType typ with
-  | TInt (ik, attrs) | TEnum ({ekind=ik}, attrs) ->
-    Some (TSInt (ik_attrs_range ik attrs))
-  | TPtr _ -> Some (TSPtr (pointer_range ()))
-  | TFloat (fk, _) -> Some (TSFloat fk)
+  | { tnode = (TInt ik | TEnum { ekind = ik }); tattr } ->
+    Some (TSInt (ik_attrs_range ik tattr))
+  | { tnode = TPtr _ } -> Some (TSPtr (pointer_range ()))
+  | { tnode = TFloat fk } -> Some (TSFloat fk)
   | _ -> None
 
 let integer_range ~ptr typ =
   match Cil.unrollType typ with
-  | TInt (ik, attrs) | TEnum ({ekind=ik}, attrs) ->
-    Some (ik_attrs_range ik attrs)
-  | TPtr _ when ptr -> Some (pointer_range ())
+  | { tnode = (TInt ik | TEnum { ekind = ik }); tattr } ->
+    Some (ik_attrs_range ik tattr)
+  | { tnode = TPtr _ } when ptr -> Some (pointer_range ())
   | _ -> None
 
 let need_cast t1 t2 =

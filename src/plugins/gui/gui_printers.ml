@@ -70,7 +70,7 @@ module ResolveLoc =
    (adding it to the maps if needed).
    Only typedefs, composite types and enumerations are linked. *)
 let tid_of_typ typ =
-  match typ with
+  match typ.tnode with
   | TNamed _ | TComp _ | TEnum _ ->
     (try
        Some (ResolveTypId.find typ)
@@ -96,8 +96,8 @@ let lid_of_loc loc =
 (* Returns the base type for a pointer/array, otherwise [t] itself.
    E.g. for [t = int***], returns [int]. *)
 let rec get_type_specifier (t:typ) =
-  match t with
-  | TPtr (bt, _) | TArray (bt, _, _) -> get_type_specifier bt
+  match t.tnode with
+  | TPtr bt | TArray (bt, _) -> get_type_specifier bt
   | _ -> t
 
 let pp_tcomp_unfolded fmt comp attrs =
@@ -118,20 +118,20 @@ let pp_enum_unfolded fmt enum attrs =
    (hence we cannot say that this function is the method [typ] itself),
    and we cannot add new public methods in extensible printers. *)
 let pp_typ_unfolded fmt (t : typ) =
-  match t with
-  | TNamed (ty, attrs) ->
+  match t.tnode with
+  | TNamed ti ->
     begin
       (* unfolds the typedef, and one step further if it is a TComp/TEnum *)
-      match ty.ttype with
-      | TComp (comp, cattrs) ->
-        pp_tcomp_unfolded fmt comp (Cil.addAttributes attrs cattrs)
-      | TEnum (enum, eattrs) ->
-        pp_enum_unfolded fmt enum (Cil.addAttributes attrs eattrs)
+      match ti.ttype.tnode with
+      | TComp ci ->
+        pp_tcomp_unfolded fmt ci (Cil.addAttributes t.tattr ti.ttype.tattr)
+      | TEnum ei ->
+        pp_enum_unfolded  fmt ei (Cil.addAttributes t.tattr ti.ttype.tattr)
       | _ ->
-        Printer.pp_typ fmt (Cil.typeAddAttributes attrs ty.ttype)
+        Printer.pp_typ fmt (Cil.typeAddAttributes t.tattr ti.ttype)
     end
-  | TComp (comp, attrs) -> pp_tcomp_unfolded fmt comp attrs
-  | TEnum (enum, attrs) -> pp_enum_unfolded fmt enum attrs
+  | TComp ci -> pp_tcomp_unfolded fmt ci t.tattr
+  | TEnum ei -> pp_enum_unfolded  fmt ei t.tattr
   | _ -> Printer.pp_typ fmt t
 
 let pp_typ fmt typ =

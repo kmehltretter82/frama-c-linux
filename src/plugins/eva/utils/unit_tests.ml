@@ -119,7 +119,7 @@ module Sign = struct
     List.iter (fun x -> List.iter (test x) values) values
 
   let test_typ ikind =
-    let typ = TInt (ikind, [])
+    let typ = Cil_const.mk_tint ikind
     and values = make_cvalue (test_values ikind) in
     let apply f op = f op typ values in
     List.iter (apply test_unop) [Neg; BNot; LNot];
