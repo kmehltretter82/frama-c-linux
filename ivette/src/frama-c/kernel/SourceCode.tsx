@@ -167,6 +167,7 @@ function useSourceFileContents(file: string | undefined): string {
 // Necessary extensions.
 const extensions: Editor.Extension[] = [
   Source,
+  Editor.GotoLine,
   Editor.Search,
   Editor.ReadOnly,
   Editor.Selection,
@@ -200,6 +201,10 @@ export default function SourceCode(): JSX.Element {
   const [cursor, setCursor] = React.useState<SourceCursor>(noCursor);
   const markerAtCursor = States.useRequestResponse(Ast.getMarkerAt, cursor);
   const { sloc: slocAtCursor } = States.useMarker(markerAtCursor);
+
+  const toggleSearchPanel = React.useCallback(() => {
+    if (view) Editor.toggleSearchPanel(view);
+  }, [view]);
 
   const openFile = React.useCallback(() => {
     if (file) openSourceFile(command, file, getCursorPosition(view));
@@ -242,12 +247,19 @@ export default function SourceCode(): JSX.Element {
       <Ivette.TitleBar>
         <Buttons.IconButton
           icon="DUPLICATE"
-          visible={!file}
+          visible={!!file}
           onClick={openFile}
-          title='externalEditorTitle'
+          title='Open file in external editor'
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
         <Toolbars.Filler />
+        <Buttons.IconButton
+          icon="SEARCH"
+          enabled={!!file}
+          onClick={toggleSearchPanel}
+          title='Search in source code'
+        />
+        <Toolbars.Inset />
         <Buttons.IconButton
           icon="HELP"
           onClick={displayShortcuts}
