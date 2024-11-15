@@ -29,6 +29,7 @@ import * as Utils from 'dome/data/arrays';
 import * as States from 'frama-c/states';
 import * as Settings from 'dome/data/settings';
 import { IconButton } from 'dome/controls/buttons';
+import { Inset } from 'dome/frame/toolbars';
 import * as Ast from 'frama-c/kernel/api/ast';
 import { text } from 'frama-c/kernel/api/data';
 import * as Eva from 'frama-c/plugins/eva/api/general';
@@ -712,9 +713,21 @@ export default function ASTview(): JSX.Element {
   const taints = useTaints(scope);
   React.useEffect(() => TaintedLvalues.set(view, taints), [view, taints]);
 
+  // Toggle search panel
+  const toggleSearchPanel = React.useCallback(() => {
+    if (view) Editor.toggleSearchPanel(view);
+  }, [view]);
+
   return (
     <>
       <TitleBar>
+        <IconButton
+          icon="SEARCH"
+          enabled={!!scope}
+          onClick={toggleSearchPanel}
+          title='Search in AST'
+        />
+        <Inset />
         <IconButton
           icon={icon}
           onClick={unFoldButtonClicked}

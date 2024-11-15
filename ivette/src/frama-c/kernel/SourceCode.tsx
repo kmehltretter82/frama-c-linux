@@ -202,6 +202,10 @@ export default function SourceCode(): JSX.Element {
   const markerAtCursor = States.useRequestResponse(Ast.getMarkerAt, cursor);
   const { sloc: slocAtCursor } = States.useMarker(markerAtCursor);
 
+  const toggleSearchPanel = React.useCallback(() => {
+    if (view) Editor.toggleSearchPanel(view);
+  }, [view]);
+
   const openFile = React.useCallback(() => {
     if (file) openSourceFile(command, file, getCursorPosition(view));
   }, [ command, file, view ]
@@ -249,6 +253,13 @@ export default function SourceCode(): JSX.Element {
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
         <Toolbars.Filler />
+        <Buttons.IconButton
+          icon="SEARCH"
+          enabled={!!file}
+          onClick={toggleSearchPanel}
+          title='Search in source code'
+        />
+        <Toolbars.Inset />
         <Buttons.IconButton
           icon="HELP"
           onClick={displayShortcuts}
