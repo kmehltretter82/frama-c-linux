@@ -526,11 +526,13 @@ additional-arch-release:
     matrix:
       - OCAML: ["5.2"]
 
-# Uncomment this block when there are intermediate versions to check manully
+# Uncomment this block when there are intermediate versions to check manually
+# Beware that some targets may fail if the target job does not provide the
+# version (for example Opam provide version N but Nix does not)
 .build_template: &ocaml_manual_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.1"]
+      - OCAML: ["5.1", "5.3"]
   when: manual
 
 .build_template: &ocaml_versions_template
@@ -573,6 +575,10 @@ ocaml-versions-nightly:
 opam-pin:
   <<: *opam_pin_template
   <<: *manual_when_not_special_pipeline
+
+opam-pin-manual:
+  <<: *opam_pin_template
+  <<: *ocaml_manual_additional_versions_template
 
 opam-pin-nightly:
   <<: *opam_pin_template
