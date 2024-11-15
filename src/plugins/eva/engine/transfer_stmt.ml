@@ -111,6 +111,8 @@ module Make (Engine: Engine_sig.S) = struct
   module Location = Engine.Loc
   module Domain = Engine.Dom
   module Eval = Engine.Eval
+  module EvaAstDeps = Eva_ast.MakeDepsOf (Location)
+  module Transfer_inout = Transfer_inout.Make (Engine)
   include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
@@ -258,6 +260,8 @@ module Make (Engine: Engine_sig.S) = struct
       if is_ret then assert (Alarmset.is_empty alarms);
       Alarmset.emit kinstr alarms;
       let* assigned, valuation = eval in
+      let aloc = Analysis_location.of_kinstr_lval kinstr lval in
+      Transfer_inout.add_assign_lval aloc valuation lval expr;
       let domain_valuation = Eval.to_domain_valuation valuation in
       let lvalue = { lval; lloc } in
       Domain.assign kinstr lvalue expr assigned domain_valuation state
@@ -275,6 +279,8 @@ module Make (Engine: Engine_sig.S) = struct
     (* TODO: check not comparable. *)
     Alarmset.emit (Kstmt stmt) alarms;
     let* valuation = eval in
+    let aloc = Analysis_location.of_stmt stmt in
+    Transfer_inout.add_read_exp aloc valuation expr;
     Domain.assume stmt expr positive (Eval.to_domain_valuation valuation) state
 
 
@@ -305,9 +311,6 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* ------------------- Retro propagation on formals ----------------------- *)
 
-
-  let get_precise_location = Location.get Main_locations.PLoc.key
-
   (* [is_safe_argument valuation expr] is true iff the expression [expr] could
      not have been written during the last call.
      If the Location module includes precise_locs, and if the inout plugins
@@ -317,22 +320,14 @@ module Make (Engine: Engine_sig.S) = struct
      written by the called function.
      If precise_locs or the callwise inout is not available, a syntactic
      criterion is used. See {!Backward_formals.safe_argument}. *)
-  let is_safe_argument =
-    let default _ expr = Backward_formals.safe_argument expr in
-    match get_precise_location with
-    | None -> default
-    | Some get ->
-      fun valuation expr ->
-        match InOutCallback.get_option () with
-        | None -> default valuation expr
-        | Some inout ->
-          let find_loc lval =
-            Eval.Valuation.find_loc_def valuation lval
-            |> get
-          in
-          let expr_zone = Eva_ast.PreciseDepsOf.zone_of_exp find_loc expr in
-          let written_zone = inout.Inout_type.over_outputs_if_termination in
-          not (Locations.Zone.intersects expr_zone written_zone)
+  let is_safe_argument valuation expr =
+    match InOutCallback.get_option () with
+    | None -> Backward_formals.safe_argument expr
+    | Some inout ->
+      let find_loc lval = Eval.Valuation.find_loc_def valuation lval in
+      let expr_zone = EvaAstDeps.zone_of_exp find_loc expr in
+      let written_zone = inout.Inout_type.over_outputs_if_termination in
+      not (Locations.Zone.intersects expr_zone written_zone)
 
   (* Removes from the list of arguments of a call the arguments whose concrete
      or formal argument could have been written during the call, as well as
@@ -726,15 +721,21 @@ module Make (Engine: Engine_sig.S) = struct
       Engine_sig.{ states = []; cacheable = Cacheable; kind = `Bottom }
     in
     let process_one_function kf valuation =
+      (* Create the call. *)
+      let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
+      let _ =
+        (* Register call arguments to Inout_memory *)
+        let aloc = Analysis_location.of_stmt stmt in
+        let+ call, _, valuation = eval in
+        Transfer_inout.add_call_args aloc valuation call
+      in
       (* The special Frama_C_ functions to print states are handled here. *)
       if apply_special_directives ~subdivnb kf args state
       then
         let () = apply_cvalue_callback kf stmt state in
         let states = [(Partition.Key.empty, state)] in
         Engine_sig.{ states; cacheable = Cacheable; kind = `Internal }
-      else
-        (* Create the call. *)
-        let eval, alarms = make_call ~subdivnb stmt kf args valuation state in
+      else begin
         Alarmset.emit ki_call alarms;
         match eval with
         | `Bottom -> bottom
@@ -747,6 +748,7 @@ module Make (Engine: Engine_sig.S) = struct
             else Cacheable
           in
           Engine_sig.{ call_result with cacheable }
+      end
     in
     match functions with
     | `Bottom -> bottom
