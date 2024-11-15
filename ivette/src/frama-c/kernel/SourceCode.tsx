@@ -243,9 +243,9 @@ export default function SourceCode(): JSX.Element {
       <Ivette.TitleBar>
         <Buttons.IconButton
           icon="DUPLICATE"
-          visible={!file}
+          visible={!!file}
           onClick={openFile}
-          title='externalEditorTitle'
+          title='Open file in external editor'
         />
         <Labels.Code title={file}>{filename}</Labels.Code>
         <Toolbars.Filler />
