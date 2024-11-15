@@ -62,34 +62,6 @@ val vars_in_exp : exp -> Cil_datatype.Varinfo.Set.t
 val vars_in_lval : lval -> Cil_datatype.Varinfo.Set.t
 
 
-(** Dependences of expressions and lvalues. *)
-
-val zone_of_exp:
-  (lval -> Precise_locs.precise_location) -> exp -> Locations.Zone.t
-(** Given a function computing the location of lvalues, computes the memory zone
-    on which the value of an expression depends. *)
-
-val zone_of_lval:
-  (lval -> Precise_locs.precise_location) -> lval -> Locations.Zone.t
-(** Given a function computing the location of lvalues, computes the memory zone
-    on which the value of an lvalue depends. *)
-
-val indirect_zone_of_lval:
-  (lval -> Precise_locs.precise_location) -> lval -> Locations.Zone.t
-(** Given a function computing the location of lvalues, computes the memory zone
-    on which the offset and the pointer expression (if any) of an lvalue depend.
-*)
-
-val deps_of_exp:
-  (lval -> Precise_locs.precise_location) -> exp -> Deps.t
-(** Given a function computing the location of lvalues, computes the memory
-    dependencies of an expression. *)
-
-val deps_of_lval: (lval -> Precise_locs.precise_location) -> lval -> Deps.t
-(** Given a function computing the location of lvalues, computes the memory
-    dependencies of an lvalue. *)
-
-
 (** Constant conversion and folding. *)
 
 val const_fold: exp -> exp

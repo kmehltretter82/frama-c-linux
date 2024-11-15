@@ -373,7 +373,9 @@ module Memory = struct
     else
       let k = K.HCE.of_lval lv in
       let z_lv = Precise_locs.enumerate_valid_bits Locations.Read (get_z lv) in
-      let z_lv_indirect = Eva_ast.indirect_zone_of_lval get_z lv in
+      let z_lv_indirect =
+        Eva_ast.PreciseDepsOf.indirect_zone_of_lval get_z lv
+      in
       if Locations.Zone.intersects z_lv z_lv_indirect then
         (* The location of [lv] intersects with the zones needed to compute
            itself, the equality would not hold. *)
@@ -389,7 +391,7 @@ module Memory = struct
       state
     else
       let k = K.HCE.of_exp e in
-      let z = Eva_ast.zone_of_exp get_z e in
+      let z = Eva_ast.PreciseDepsOf.zone_of_exp get_z e in
       add_key k v z state
 
   let find k state =

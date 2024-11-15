@@ -331,7 +331,7 @@ module Make (Engine: Engine_sig.S) = struct
             | `Top -> Precise_locs.loc_top
             | `Value record -> get record.loc
           in
-          let expr_zone = Eva_ast.zone_of_exp find_loc expr in
+          let expr_zone = Eva_ast.PreciseDepsOf.zone_of_exp find_loc expr in
           let written_zone = inout.Inout_type.over_outputs_if_termination in
           not (Locations.Zone.intersects expr_zone written_zone)
 

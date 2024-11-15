@@ -692,6 +692,7 @@ module Eva_ast: sig
   include module type of Eva_ast_printer
   include module type of Eva_ast_datatype
   include module type of Eva_ast_builder
+  include module type of Eva_ast_deps
   include module type of Eva_ast_utils
   include module type of Eva_ast_visitor
 end
