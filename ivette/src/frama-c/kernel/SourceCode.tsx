@@ -167,6 +167,7 @@ function useSourceFileContents(file: string | undefined): string {
 // Necessary extensions.
 const extensions: Editor.Extension[] = [
   Source,
+  Editor.GotoLine,
   Editor.Search,
   Editor.ReadOnly,
   Editor.Selection,

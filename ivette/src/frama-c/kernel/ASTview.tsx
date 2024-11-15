@@ -663,6 +663,7 @@ const extensions: Editor.Extension[] = [
   Editor.ReadOnly,
   Editor.FoldGutter,
   Editor.LanguageHighlighter,
+  Editor.Search,
 ];
 
 // The component in itself.
