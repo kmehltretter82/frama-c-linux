@@ -59,7 +59,10 @@ sig
   val last : sigma -> c_object -> loc -> term
   val frames : c_object -> loc -> chunk -> frame list
 
-  val havoc : c_object -> loc -> length:term -> chunk -> fresh:term -> current:term -> term
+  val havoc : c_object -> loc -> length:term ->
+    chunk -> fresh:term -> current:term -> term
+  val memcpy : c_object -> lsrc:loc -> ldst:loc -> length:term ->
+    chunk -> msrc:term -> mdst:term -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 

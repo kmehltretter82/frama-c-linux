@@ -65,6 +65,8 @@ sig
 
   val havoc : c_object -> loc -> length:term ->
     Chunk.t -> fresh:term -> current:term -> term
+  val memcpy : c_object -> lsrc:loc -> ldst:loc -> length:term ->
+    Chunk.t -> msrc:term -> mdst:term -> term
 
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
@@ -577,10 +579,30 @@ struct
   let () = INIT_LOAD_INFO.load_rec := load_init
 
   (* -------------------------------------------------------------------------- *)
+  (* --- Memcpy                                                             --- *)
+  (* -------------------------------------------------------------------------- *)
+
+  (*let gen_memcpy_length get_domain s obj ~lsrc ~ldst length =
+    let ps = ref [] in
+    Domain.iter
+      (fun chunk ->
+        let pre  = Sigma.value s.pre  chunk in
+        let post = Sigma.value s.post chunk in
+        let tau = Chunk.tau_of_chunk chunk in
+        let basename = Chunk.basename_of_chunk chunk ^ "_undef" in
+        let mdst = F.e_var (Lang.freshvar ~basename tau) in
+        let havoc = M.memcpy obj ~ldst ~lsrc ~length chunk ~mdst ~msrc:pre in
+        ps := Set(post,havoc) :: !ps
+     ) (get_domain obj ldst) ; !ps
+  *)
+  (* -------------------------------------------------------------------------- *)
   (* --- Havocs                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
   let gen_havoc_length get_domain s obj loc length =
+(*
+    gen_memcpy_length get_domain s obj ~ldst:loc ~lsrc:loc length
+*)
     let ps = ref [] in
     Domain.iter
       (fun chunk ->

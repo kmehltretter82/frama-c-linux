@@ -41,9 +41,16 @@ struct
     | Some l :: _ -> l
     | _ -> raise Not_found
   let l_havoc = Qed.Engine.F_call "havoc"
-  let f_havoc = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
+  let f_havoc =
+    Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
   let havoc fresh current loc n =
     Lang.F.e_fun f_havoc [fresh;current;loc;n]
+
+  let l_memcpy = Qed.Engine.F_call "memcpy"
+  let f_memcpy =
+    Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
+  let memcpy mdst msrc ldst lsrc n =
+    Lang.F.e_fun f_memcpy [mdst;msrc;ldst;lsrc;n]
 
   let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits"
   let cinits m = p_call p_cinits [m]
@@ -673,6 +680,12 @@ module Model = struct
       Why3.havoc fresh current loc n
     else fresh
 
+  let memcpy obj ~lsrc ~ldst ~length chunk ~msrc ~mdst =
+    if chunk <> Chunk.Alloc then
+      let n = e_mul (e_int @@ sizeof_object obj) length in
+      Why3.memcpy mdst msrc ldst lsrc n
+    else msrc
+
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = e_var xp in
@@ -1138,3 +1151,4 @@ let is_init_range = Model.is_init_range
 let value_footprint = Model.value_footprint
 let init_footprint = Model.init_footprint
 let havoc = Model.havoc
+let memcpy = Model.memcpy

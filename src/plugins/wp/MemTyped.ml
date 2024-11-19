@@ -1048,6 +1048,12 @@ struct
       F.e_fun f_havoc [fresh;current;loc;n]
     else fresh
 
+  let memcpy obj ~lsrc ~ldst ~length chunk ~msrc ~mdst =
+    if chunk <> T_alloc then
+      let n = F.e_mul (length_of_object obj) length in
+      F.e_fun f_memcpy [mdst;msrc;ldst;lsrc;n]
+    else msrc
+
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = F.e_var xp in

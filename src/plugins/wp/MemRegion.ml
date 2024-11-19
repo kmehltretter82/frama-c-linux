@@ -83,6 +83,8 @@ module type ModelWithLoader = sig
   val frames : c_object -> loc -> chunk -> frame list
 
   val havoc : c_object -> loc -> length:term -> chunk -> fresh:term -> current:term -> term
+  val memcpy : c_object -> lsrc:loc -> ldst:loc -> length:term ->
+    chunk -> msrc:term -> mdst:term -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 
@@ -368,6 +370,16 @@ struct
         match c.mu with
         | Value _ | ValInit -> fresh
         | Array _ | ArrInit -> e_fun f_havoc [fresh;current;to_addr l;length]
+
+    let memcpy ty ~lsrc ~ldst ~length chunk ~msrc ~mdst =
+      match chunk with
+      | M c ->
+        M.memcpy ty ~lsrc:(loc lsrc) ~ldst:(loc ldst) ~length c ~msrc ~mdst
+      | R c ->
+        match c.mu with
+        | Value _ | ValInit -> msrc
+        | Array _ | ArrInit ->
+          e_fun f_memcpy [mdst;msrc;to_addr ldst;to_addr lsrc;length]
 
     let eqmem_forall ty l chunk m1 m2 =
       match chunk with

@@ -61,6 +61,8 @@ sig
 
   val havoc : c_object -> loc -> length:term ->
     Chunk.t -> fresh:term -> current:term -> term
+  val memcpy : c_object -> lsrc:loc -> ldst:loc -> length:term ->
+    Chunk.t -> msrc:term -> mdst:term -> term
 
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred

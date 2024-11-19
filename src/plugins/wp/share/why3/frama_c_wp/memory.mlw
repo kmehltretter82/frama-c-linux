@@ -36,7 +36,16 @@ theory Memory
   predicate eqmem (m1 m2 : map addr 'a) (p:addr) (a:int) =
     forall q:addr [m1[p]|m2[q]]. included q 1 p a -> m1[q] = m2[q]
 
-  function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a
+
+  (* copies the [s] bytes from [m1].[b1] into [m0].[m0] *)
+  function memcpy (m0 m1: map addr 'a) (b0 b1:addr) (s:int) : map addr 'a =
+    fun (p:addr) ->
+    if separated p 1 b0 s then m0 p else
+    let offset = b1.offset - b0.offset + p.offset in
+    m1 { b1 with offset = offset }
+
+  function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a =
+    memcpy m1 m0 p p a
 
   lemma eqmem_included :
     forall m1 m2 : map addr 'a.
@@ -51,7 +60,7 @@ theory Memory
     forall a : int.
     eqmem m1 m2 p a -> eqmem m2 m1 p a
 
-  axiom havoc_access :
+  lemma havoc_access :
     forall m0 m1 : map addr 'a.
     forall q p : addr.
     forall a : int.

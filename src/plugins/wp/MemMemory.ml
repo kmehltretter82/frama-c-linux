@@ -36,10 +36,12 @@ let ty_fst_arg = function
   | _ -> raise Not_found
 
 let l_havoc = Qed.Engine.F_call "havoc"
+let l_memcpy = Qed.Engine.F_call "memcpy"
 let l_set_init = Qed.Engine.F_call "set_init"
 
 let p_eqmem = Lang.extern_fp ~library "eqmem"
 let f_havoc = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
+let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
 let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* m-pointer -> prop *)
 let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
 let f_set_init =
