@@ -44,12 +44,12 @@ export default function EvaTools(
   const countErrors = remote.getErrors();
   remote.resetNotified();
 
-  const startAnalysis = () => {
+  const startAnalysis = (): void => {
     setTimeout(() => {
       if(!remote.hasReset()) Server.send(Eva.compute, null);
       else startAnalysis();
     }, 150);
-  }
+  };
 
   const compute = (): void => {
     if(remote.hasReset()) remote.commit();
