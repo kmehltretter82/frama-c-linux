@@ -6,13 +6,13 @@
   nondet ∈ [--..--]
   k ∈ {0}
 [eva] computing for function test_slevel <- main.
-  Called from partitioning-annots.c:278.
+  Called from partitioning-annots.c:289.
 [eva] partitioning-annots.c:243: starting to merge loop iterations
 [eva] partitioning-annots.c:248: starting to merge loop iterations
 [eva] Recording results for test_slevel
 [eva] Done for function test_slevel
 [eva] computing for function test_unroll <- main.
-  Called from partitioning-annots.c:279.
+  Called from partitioning-annots.c:290.
 [eva:loop-unroll:partial] partitioning-annots.c:26: loop not completely unrolled
 [eva] partitioning-annots.c:26: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:34: loop not completely unrolled
@@ -25,7 +25,7 @@
 [eva] Recording results for test_unroll
 [eva] Done for function test_unroll
 [eva] computing for function test_split <- main.
-  Called from partitioning-annots.c:280.
+  Called from partitioning-annots.c:291.
 [eva] computing for function Frama_C_interval <- test_split <- main.
   Called from partitioning-annots.c:73.
 [eva] using specification for function Frama_C_interval
@@ -65,7 +65,7 @@
 [eva] Recording results for test_split
 [eva] Done for function test_split
 [eva] computing for function test_dynamic_split <- main.
-  Called from partitioning-annots.c:281.
+  Called from partitioning-annots.c:292.
 [eva] partitioning-annots.c:95: Warning: 
   this partitioning parameter cannot be evaluated safely on all states
 [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
@@ -90,12 +90,12 @@
 [eva] Recording results for test_dynamic_split
 [eva] Done for function test_dynamic_split
 [eva] computing for function test_dynamic_split_predicate <- main.
-  Called from partitioning-annots.c:282.
+  Called from partitioning-annots.c:293.
 [eva] partitioning-annots.c:124: starting to merge loop iterations
 [eva] Recording results for test_dynamic_split_predicate
 [eva] Done for function test_dynamic_split_predicate
 [eva] computing for function test_splits_post_call <- main.
-  Called from partitioning-annots.c:283.
+  Called from partitioning-annots.c:294.
 [eva] computing for function Frama_C_interval <- test_splits_post_call <- main.
   Called from partitioning-annots.c:205.
 [eva] partitioning-annots.c:205: 
@@ -119,6 +119,12 @@
 [eva] partitioning-annots.c:217: Frama_C_show_each_body: {-1}, [-1000..1000]
 [eva] Recording results for test_splits_post_call
 [eva] Done for function test_splits_post_call
+[eva] computing for function test_auto_limit <- main.
+  Called from partitioning-annots.c:295.
+[eva:loop-unroll:auto] partitioning-annots.c:280: Automatic loop unrolling.
+[eva] partitioning-annots.c:284: starting to merge loop iterations
+[eva] Recording results for test_auto_limit
+[eva] Done for function test_auto_limit
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -128,6 +134,8 @@
   state ∈ {-1; 0; 1}
   y ∈ [-1000..1000] or UNINITIALIZED
   __retres ∈ [-510..510]
+[eva:final-states] Values at end of function test_auto_limit:
+  
 [eva:final-states] Values at end of function test_dynamic_split:
   Frama_C_entropy_source ∈ [--..--]
   a ∈ {0}
@@ -185,6 +193,8 @@
   k ∈ {0; 1}
 [from] Computing for function body
 [from] Done for function body
+[from] Computing for function test_auto_limit
+[from] Done for function test_auto_limit
 [from] Computing for function test_dynamic_split
 [from] Computing for function Frama_C_interval <-test_dynamic_split
 [from] Done for function Frama_C_interval
@@ -214,6 +224,8 @@
 [from] Function spec:
   x FROM i
   \result FROM i
+[from] Function test_auto_limit:
+  NO EFFECTS
 [from] Function test_dynamic_split:
   Frama_C_entropy_source FROM Frama_C_entropy_source; nondet (and SELF)
 [from] Function test_dynamic_split_predicate:
@@ -235,6 +247,10 @@
     i2; absolute; tmp; state; y; __retres
 [inout] Inputs for function body:
     nondet
+[inout] Out (internal) for function test_auto_limit:
+    i; i_0
+[inout] Inputs for function test_auto_limit:
+    \nothing
 [inout] Out (internal) for function test_dynamic_split:
     Frama_C_entropy_source; a; b
 [inout] Inputs for function test_dynamic_split:

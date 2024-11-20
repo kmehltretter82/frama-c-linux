@@ -32,6 +32,7 @@ type slevel_annotation =
 type unroll_annotation =
   | UnrollAmount of Cil_types.term
   | UnrollFull
+  | UnrollAuto of int
 
 type split_kind = Static | Dynamic
 type split_term =
@@ -180,20 +181,35 @@ module Unroll = Register (struct
         let open Logic_typing in
         UnrollAmount
           (typing_context.type_term typing_context typing_context.pre_state t)
+      | [{lexpr_node = PLvar "auto"};
+         {lexpr_node = PLconstant (IntConstant i)}] ->
+        let i = match int_of_string i with
+          | i when i >= 0 -> i
+          | _i -> raise Parse_error
+          | exception Failure _ -> raise Parse_error
+        in
+        UnrollAuto i
       | _ -> raise Parse_error
 
     let export = function
       | UnrollFull -> Ext_terms []
       | UnrollAmount t -> Ext_terms [t]
+      | UnrollAuto i ->
+        Ext_terms [Logic_const.tstring "auto"; Logic_const.tinteger i]
 
     let import = function
       | Ext_terms [] -> UnrollFull
       | Ext_terms [t] -> UnrollAmount t
+      | Ext_terms [
+          {term_node = TConst (LStr "auto")};
+          {term_node = TConst (Integer (i, _))}] ->
+        UnrollAuto (Integer.to_int_exn i)
       | _ -> assert false
 
     let print fmt = function
       | UnrollFull -> ()
       | UnrollAmount t -> Printer.pp_term fmt t
+      | UnrollAuto i -> Format.fprintf fmt "auto, %d" i
   end)
 
 module SplitTermAnnotation =
