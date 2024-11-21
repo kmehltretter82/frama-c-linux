@@ -21,7 +21,7 @@
 [eva:alarm] taint.c:33: Warning: accessing out of bounds index. assert t < 2;
 [eva] taint.c:35: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              tainted; t; u; x
   Locations (control):
@@ -34,7 +34,7 @@
 [eva:loop-unroll:auto] taint.c:49: Automatic loop unrolling.
 [eva] taint.c:50: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              \nothing
   Locations (control):
@@ -42,7 +42,7 @@
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              \nothing
   Locations (control):
@@ -50,7 +50,7 @@
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x
   Locations (control):
@@ -58,7 +58,7 @@
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x
   Locations (control):
@@ -66,7 +66,7 @@
   ==END OF DUMP==
 [eva] taint.c:50: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x
   Locations (control):
@@ -74,7 +74,7 @@
   ==END OF DUMP==
 [eva] taint.c:53: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x
   Locations (control):
@@ -82,7 +82,7 @@
   ==END OF DUMP==
 [eva] taint.c:63: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x
   Locations (control):
@@ -94,7 +94,7 @@
   Called from taint.c:197.
 [eva] taint.c:79: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x
   Locations (control):
@@ -106,7 +106,7 @@
   Called from taint.c:199.
 [eva] taint.c:91: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              x; y; t
   Locations (control):
@@ -127,13 +127,13 @@
 [eva] Done for function taint_spec_assigns
 [eva] taint.c:205: 
   Frama_C_domain_show_each:
-  l : # multi_taint: default
+  l : # taint: default
   true
 [eva] computing for function taint_goto_1 <- main.
   Called from taint.c:208.
 [eva] taint.c:110: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              t
   Locations (control):
@@ -145,7 +145,7 @@
   Called from taint.c:209.
 [eva] taint.c:130: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              t
   Locations (control):
@@ -160,7 +160,7 @@
   Called from taint.c:138.
 [eva] taint.c:35: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              tainted; t; u; x; t
   Locations (control):
@@ -170,7 +170,7 @@
 [eva] Done for function taint_basic
 [eva] taint.c:141: 
   Frama_C_domain_show_each:
-  x : # multi_taint: default
+  x : # taint: default
   false
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
@@ -183,7 +183,7 @@
 [eva:alarm] taint.c:157: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] taint.c:165: 
   Frama_C_dump_each:
-  # multi_taint:
+  # taint:
   default: Locations (data):
              tainted; t; y
   Locations (control):

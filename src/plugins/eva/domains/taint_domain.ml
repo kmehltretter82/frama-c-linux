@@ -111,7 +111,7 @@ module LatticeSingleTaint = struct
 
       type t = taint_state
 
-      let name = "taint"
+      let name = "single-taint"
 
       let reprs =
         [ { locs_data = List.hd Zone.reprs;
@@ -222,7 +222,7 @@ module LatticeMultiTaint = struct
 
       type t = multi_taint_state
 
-      let name = "multi_taint"
+      let name = "taint"
 
       let reprs = [
         taint_groups ()
