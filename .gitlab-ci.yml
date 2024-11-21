@@ -532,7 +532,7 @@ additional-arch-release:
 .build_template: &ocaml_manual_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.1", "5.3"]
+      - OCAML: ["5.1", "5.3-beta1"]
   when: manual
 
 .build_template: &ocaml_versions_template
@@ -564,10 +564,10 @@ ocaml-versions-nightly:
   stage: compatibility
   image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
   script:
+    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
+    - opam init --reinit -ni
     - sudo apt update
-    - opam update
     - opam pin . -n -k path
-    - opam depext frama-c --with-test
     - opam install --jobs 2 frama-c --with-test --with-doc
     - frama-c --plugins
   tags:
