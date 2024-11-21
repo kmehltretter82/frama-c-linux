@@ -55,7 +55,9 @@ export interface CallGraphFunc {
   /** Get link visibility */
   getLinkVisibility: (node: LinkObject3D<CGNode, CGLink>) => boolean;
   /** Get link width */
-  getLinkWidth: (node: LinkObject3D<CGNode, CGLink>) => number;
+  getLinkWidth: (
+    node: LinkObject3D<CGNode, CGLink>, linkThickness: number
+  ) => number;
   /** Get node visibility */
   getNodeVisibility: (id: string) => boolean;
 }
@@ -89,6 +91,31 @@ function getIDFromLink(link: LinkObject3D<CGNode, CGLink>)
   const targetId = typeof link.target === 'string' ?
     link.target : (link.target as NodeObject3D<CGNode>).id;
   return { sourceId, targetId };
+}
+
+export function changeLinkColor(hex: string, amount: number): string {
+  function hexToRgb(hex: string): [number, number, number] {
+    hex = hex.replace('#', '');
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return [r, g, b];
+  }
+  function rgbToHex(r: number, g: number, b: number): string {
+    return `#${((1 << 24) + (r << 16) + (g << 8) + b)
+      .toString(16)
+      .slice(1)
+      .toUpperCase()}`;
+  }
+  let [r, g, b] = hexToRgb(hex);
+  r = Math.min(255, r + Math.round(255 * (amount / 100)));
+  g = Math.min(255, g + Math.round(255 * (amount / 100)));
+  b = Math.min(255, b + Math.round(255 * (amount / 100)));
+  r = r < 0 ? 0 : r;
+  g = g < 0 ? 0 : g;
+  b = b < 0 ? 0 : b;
+  return rgbToHex(r, g, b);
 }
 
 export const callGraphFunction = (
@@ -199,9 +226,13 @@ export const callGraphFunction = (
     }
   };
 
-  const getLinkWidth = (node: LinkObject3D<CGNode, CGLink>): number => {
+  const getLinkWidth = (
+    node: LinkObject3D<CGNode, CGLink>, linkThickness: number
+  ): number => {
     const { sourceId, targetId } = getIDFromLink(node);
-    return (isSelectedNode(sourceId) || isSelectedNode(targetId)) ? 2 : 1;
+    return (isSelectedNode(sourceId) || isSelectedNode(targetId)) ?
+      (linkThickness + 1):
+      linkThickness;
   };
 
   const getNodeVisibility = (id: string): boolean => {
