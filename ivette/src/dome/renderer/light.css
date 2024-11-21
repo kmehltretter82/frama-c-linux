@@ -165,17 +165,17 @@
     --graph-fg-color-blue: black;
     --graph-fg-color-pink: white;
     /** edge colors */
-    --graph-ed-color-default: #000000;
+    --graph-ed-color-default: #000000; /* black */
     --graph-ed-color-white: #CCCCCC;
     --graph-ed-color-grey: #888888;
-    --graph-ed-color-dark: #000000;
-    --graph-ed-color-primary: #1E90FF;
-    --graph-ed-color-selected: #00BFFF;
-    --graph-ed-color-green: #00FF00;
-    --graph-ed-color-orange: #FFA500;
-    --graph-ed-color-red: #FF0000;
+    --graph-ed-color-dark: #000000; /* black */
+    --graph-ed-color-primary: #1E90FF; /* dodgerblue */
+    --graph-ed-color-selected: #00BFFF; /* deepskyblue */
+    --graph-ed-color-green: #00FF00; /* green */
+    --graph-ed-color-orange: #FFA500; /* orange */
+    --graph-ed-color-red: #FF0000; /* red */
     --graph-ed-color-yellow: #E5E100;
-    --graph-ed-color-blue: #00BFFF;
-    --graph-ed-color-pink: #FF82AB;
+    --graph-ed-color-blue: #00BFFF; /* deepskyblue */
+    --graph-ed-color-pink: #FF82AB; /* palevioletred1 */
   }
 }

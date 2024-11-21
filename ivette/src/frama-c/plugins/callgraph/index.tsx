@@ -46,7 +46,7 @@ import {
   callGraphFunction, SelectedNodes, ModeDisplay,
   CGNode, CGLink, CGData,
   CallGraphFunc, SelectedNodesData,
-  changeLinkColor
+  transformColor
 } from "frama-c/plugins/callgraph/definitions";
 
 import './callgraph.css';
@@ -291,7 +291,7 @@ function Callgraph(): JSX.Element {
       return (C.getLinkWidth(link, linkThickness) * 150 / 100);
     },
     particleColor: (link) => {
-      return changeLinkColor(
+      return transformColor(
         C.getLinkColor(link), theme[0] === "light" ? -50 : 50
       );
     },

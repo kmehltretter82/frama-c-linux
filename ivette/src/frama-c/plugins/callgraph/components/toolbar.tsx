@@ -147,9 +147,9 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
       <Filler/>
 
       <div className='cg-spinner'>
-        edges: <Spinner
+        Edges: <Spinner
         value={linkThickness}
-        title="Tickness of edges"
+        title="Thickness of edges"
         vmin={1}
         vmax={10}
         vstep={1}
