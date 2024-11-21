@@ -285,16 +285,23 @@ plug-in, which makes \textsf{WP} complementary to \textsf{Jessie}.
   However, variants of the \texttt{Typed} model enable limited forms of casts.
   See chapter~\ref{wp-models} for details.
 
-\item[\texttt{Bytes} model. (Not Implemented Yet).] This is a
-  low-level memory model, where the heap is represented as a wide
-  array of bytes. Pointer values are exactly translated into memory
-  addresses. Read and write operations from/to the heap are translated
-  into manipulation of ranges of bits in the heap.\par
+\item[\texttt{Bytes} model. (Experimental).] This is a low-level memory model,
+  where the heap is represented as an array from pointer base to array of bytes.
+  Read and write operations from/to the heap are translated  into manipulation
+  of ranges of bytes in the heap.\par
 
-  This model is very \emph{precise} in the sense that all the details
-  of the program are represented. This comes at the cost of huge proof
-  obligations that are very difficult to discharge by automated
-  provers, and generally require an interactive proof assistant.
+  By default, it behaves like the \texttt{Typed} model, using the \texttt{Hoare}
+  model to counterbalance the huge complexity of generated formulas, but it
+  comes with important limitations listed in Section~\ref{sec:bytes-model}.
+
+\item[\texttt{Region} model. (Experimental)] This model relies on a region
+  analysis to maximize the memory separation hypothesis and enable with the
+  possibility to use different ways of modeling the memory in each
+  \textit{region}. It basically combines the capabilities of the \texttt{Typed}
+  and \texttt{Bytes} models.\par
+
+  This model is currently experimental and comes with limitations that are
+  detailed in Section~\ref{sec:region-model}.
 
 \end{description}
 

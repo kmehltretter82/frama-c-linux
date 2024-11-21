@@ -202,13 +202,15 @@ module Model =
       let help = "Memory model selection. Available selectors:\n\
                   * 'Hoare' logic variables only\n\
                   * 'Typed' typed pointers only\n\
+                  * 'Bytes' (experimental) low-level model\n\
+                  * 'Region' (experimental) based on the region plug-in\n\
                   * '+nocast' no pointer cast\n\
                   * '+cast' unsafe pointer casts\n\
                   * '+raw' no logic variable\n\
                   * '+ref' by-reference-style pointers detection\n\
                   * '+nat/+int' natural / machine-integers arithmetics\n\
                   * '+real/+float' real / IEEE floating point arithmetics\n\
-                  * 'Eva' (experimental) based on the results from Eva plugin"
+                  * 'Eva' (experimental) based on the results from Eva plug-in"
     end)
 
 let () = Parameter_customize.set_group wp_model

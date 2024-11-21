@@ -108,6 +108,7 @@ class model_selector (main : Design.main_window_extension_points) =
   let r_hoare  = memory#add_radio ~label:"Hoare Memory Model" ~value:HOARE () in
   let r_typed  = memory#add_radio ~label:"Typed Memory Model" ~value:TYPED () in
   let r_bytes  = memory#add_radio ~label:"Bytes Memory Model" ~value:BYTES () in
+  let r_region = memory#add_radio ~label:"Region Memory Model" ~value:REGION () in
   let r_eva    = memory#add_radio ~label:"Eva Memory Model" ~value:EVA () in
   let c_casts  = new Widget.checkbox ~label:"Unsafe casts" () in
   let c_byref  = new Widget.checkbox ~label:"Reference Arguments" () in
@@ -122,7 +123,7 @@ class model_selector (main : Design.main_window_extension_points) =
         dialog#add_row r_hoare#coerce ;
         dialog#add_row r_typed#coerce ;
         dialog#add_row r_bytes#coerce ;
-        r_bytes#set_visible false ;
+        dialog#add_row r_region#coerce ;
         dialog#add_row r_eva#coerce ;
         dialog#add_row c_casts#coerce ;
         dialog#add_row c_byref#coerce ;

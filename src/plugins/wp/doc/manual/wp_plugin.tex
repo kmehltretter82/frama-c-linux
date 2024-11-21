@@ -981,6 +981,8 @@ which are defined below:
     \hline
     \texttt{\bf Hoare} & Select Hoare memory model. \\
     \texttt{\bf Typed} & Select Typed memory model with limited casts.\\
+    \texttt{\bf Region} & Select Region memory model with limitations described in its section.\\
+    \texttt{\bf Bytes} & Select Bytes memory model.\\
     \texttt{cast}  & Select Typed memory model with unlimited casts (unsound). \\
     \texttt{nocast} & Select Typed memory model with \emph{no} casts. \\
     \hline
@@ -1000,6 +1002,8 @@ which are defined below:
 
 Refer to Section~\ref{wp-model-arith} for details on arithmetic models and
 Chapter~\ref{wp-models} for a description of memory models.
+
+\clearpage
 
 The available \textsf{WP} command-line options related to model selection are:
 \begin{description}
