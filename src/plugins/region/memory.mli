@@ -109,7 +109,12 @@ val ranges : map -> node -> range list
 val points_to : map -> node -> node option
 val pointed_by : map -> node -> node list
 
-val footprint : map -> node -> node list
+module SNode : sig
+  val update_map : map -> unit
+  include Set.S with type elt = node
+end
+
+val footprint : map -> node -> SNode.t
 
 val included : map -> node -> node -> bool
 val separated : map -> node -> node -> bool

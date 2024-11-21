@@ -67,6 +67,12 @@ val node : map -> node -> node
 (** Normalized list of nodes (normalized, uniques, sorted by id) *)
 val nodes : map -> node list -> node list
 
+(** Node sets *)
+module SNode : sig
+  val update_map : map -> unit
+  include Set.S with type elt = node
+end
+
 (** {2 Region Properties}
 
     All functions in this section provide normalized nodes
@@ -138,4 +144,4 @@ val field : map -> node -> fieldinfo -> node
 val index : map -> node -> typ -> node
 
 (** Unormalized. *)
-val footprint : map -> node -> node list
+val footprint : map -> node -> SNode.t
