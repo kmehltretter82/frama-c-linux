@@ -108,9 +108,8 @@ struct
 
     let default_or_bottom b =
       let open Bottom.Operators in
-      match Base.validity b with
-      | Base.Invalid when Base.(equal b null) -> `Bottom
-      | v -> let+ size = size_from_validity v in create ~size V.default
+      let+ size = size_from_validity (Base.validity b) in
+      create ~size V.default
 
     let default b =
       match default_or_bottom b with
@@ -219,15 +218,15 @@ struct
   let is_bottom x = x = Bottom
 
   let fold f m acc =
-    let on_offset k itvs = f (Zone.inject k itvs) in
-    let on_base k = LOffset.fold (on_offset k) in
+    let on_offset base itvs = f (Zone.inject base itvs) in
+    let on_base base = LOffset.fold (on_offset base) in
     LBase.fold on_base m acc
 
   let fold_base f m acc = LBase.fold f m acc
 
   let fold_fuse_same f m acc =
-    let on_offset k itvs = f (Zone.inject k itvs) in
-    let f' b = LOffset.fold_fuse_same (on_offset b) in
+    let on_offset base itvs = f (Zone.inject base itvs) in
+    let f' base = LOffset.fold_fuse_same (on_offset base) in
     fold_base f' m acc
 
   let fold_join_zone ~both ~conv ~empty_map ~join ~empty =
@@ -264,17 +263,17 @@ struct
       Map (LBase.fold add_if m LBase.empty)
 
 
-  let add_base_offset add v base offs m =
+  let add_base_offset add v base offset m =
     let open Bottom.Operators in
     let validity = Base.validity base in
     let result =
       let* offsm = LBase.find base m in
-      let+ new_offsm = add validity offs v offsm in
+      let+ new_offsm = add ~validity offset v offsm in
       LBase.add base new_offsm m
     in Bottom.value ~bottom:m result
 
   let add_binding ~exact m (loc:Zone.t) v  =
-    let add validity = LOffset.add_binding_intervals ~validity ~exact in
+    let add ~validity = LOffset.add_binding_intervals ~validity ~exact in
     let aux_base_offset = add_base_offset add v in
     match loc, m with
     | Zone.Top (Base.SetLattice.Top, _), _ | _, Top -> Top
@@ -282,7 +281,8 @@ struct
     | _, Map m -> Map (Zone.fold_topset_ok aux_base_offset loc m)
 
   let add_binding_loc ~exact m loc v =
-    let add v = LOffset.add_binding_ival ~validity:v ~exact ~size:loc.size in
+    let size = loc.size in
+    let add ~validity = LOffset.add_binding_ival ~validity ~exact ~size in
     let aux_base_offset = add_base_offset add v in
     match loc.loc, m with
     | Location_Bits.Top (Base.SetLattice.Top, _), _ | _, Top -> Top

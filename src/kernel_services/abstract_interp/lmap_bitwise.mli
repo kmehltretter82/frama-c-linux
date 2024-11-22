@@ -24,7 +24,6 @@
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 open Locations
-open Lattice_bounds
 
 exception Bitwise_cannot_copy
 
@@ -64,7 +63,7 @@ module type Location_map_bitwise = sig
   val add_base: Base.t -> LOffset.t -> t -> t
   val remove_base: Base.t -> t -> t
 
-  val find : t -> Zone.t -> v or_bottom
+  val find : t -> Zone.t -> v Lattice_bounds.or_bottom
 
   val filter_base : (Base.t -> bool) -> t -> t
 
