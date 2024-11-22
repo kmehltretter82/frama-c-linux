@@ -44,7 +44,7 @@ let auto_taint_res_functions = [
   "getc"
 ]
 (* functions flagged as commonly related to user-provided input,
-therefore targeted in the option for automatic tainting *)
+   therefore targeted in the option for automatic tainting *)
 
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.IgnoreSingletons.get ())
@@ -52,14 +52,14 @@ let taint_groups () =
   let taint_group_list = Parameters.TaintSingleton.get () in
   match taint_group_list with
   | [] -> ["default"]
-    (* in case no taint group is precised we will only have default taint *)
+  (* in case no taint group is precised we will only have default taint *)
   | _ ->
     if auto_taint () && not (List.mem "auto" taint_group_list) then
       "auto" :: taint_group_list
     else
       taint_group_list
 (* in the other cases, if we have the option autotaint we will add an
-  "auto" taint in which we will place the automatic tainting. *)
+   "auto" taint in which we will place the automatic tainting. *)
 
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
@@ -228,7 +228,7 @@ module LatticeMultiTaint = struct
         taint_groups ()
         |> List.map (fun t -> (t, List.hd LatticeSingleTaint.reprs))
         |> List.fold_left (fun m (k, v)
-          -> StringMap.add k v m) StringMap.empty
+                            -> StringMap.add k v m) StringMap.empty
       ]
 
       let compare t1 t2 =
@@ -256,7 +256,7 @@ module LatticeMultiTaint = struct
     taint_namespaces
     |> List.map (fun t -> (t, LatticeSingleTaint.top))
     |> List.fold_left (fun m (k, v) ->
-      StringMap.add k v m) StringMap.empty
+        StringMap.add k v m) StringMap.empty
 
   let join t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
@@ -294,7 +294,7 @@ module LatticeMultiTaint = struct
       StringMap.fold f t1 base
     in
     fold2 (fun state1 state2 acc ->
-      LatticeSingleTaint.is_included state1 state2 && acc) t1 t2 true
+        LatticeSingleTaint.is_included state1 state2 && acc) t1 t2 true
 end
 
 module TransferSingleTaint = struct
@@ -503,8 +503,8 @@ module TransferSingleTaint = struct
             let n = get_formats_number s in
             let vars_to_taint = get_n_first zones n in
             `Value { return_state
-                     with locs_data = List.fold_left Zone.join 
-                      return_state.locs_data vars_to_taint }
+                     with locs_data = List.fold_left Zone.join
+                              return_state.locs_data vars_to_taint }
           end
         | _ -> `Value return_state
       end
@@ -514,7 +514,7 @@ module TransferSingleTaint = struct
           let to_taint = find_tainted_argument call.arguments in
           let zone = arg_to_zone to_taint in
           `Value { return_state with locs_data =
-            Zone.join return_state.locs_data zone }
+                                       Zone.join return_state.locs_data zone }
         with
         | Not_found -> `Bottom
       end
@@ -522,7 +522,7 @@ module TransferSingleTaint = struct
       begin
         let zone = zone_of_return call.return in
         `Value { return_state with locs_data =
-          Zone.join return_state.locs_data zone }
+                                     Zone.join return_state.locs_data zone }
       end
     else
       `Value return_state
@@ -573,11 +573,11 @@ module TransferMultiTaint = struct
           let finalizer =
             if key = "auto" && auto_taint () then
               TransferSingleTaint.finalize_call_auto_tainted
-            else 
+            else
               TransferSingleTaint.finalize_call
           in
           let state_after_call_or_bottom = finalize_call_per_taint key
-            finalizer in
+              finalizer in
           match state_after_call_or_bottom with
           | `Bottom -> `Bottom
           | `Value state ->
@@ -671,7 +671,7 @@ module Domain = struct
       StringMap.mapi (fun key state ->
           let current_taint = StringMap.find_or_empty key taint_map in
           logic_assign_per_taint (loc_assign, current_taint) location state)
-            state_map
+        state_map
 
   (* Scoping and Initialization. *)
 
@@ -855,7 +855,7 @@ module TaintLogic = struct
             with
             | Not_found -> LatticeSingleTaint.empty) arg.term_name in
         let state = List.fold_left LatticeSingleTaint.join
-          LatticeSingleTaint.empty states_list in
+            LatticeSingleTaint.empty states_list in
         evaluate_taint_predicate cvalue_env state arg
       | Ptrue -> True
       | Pfalse -> False
