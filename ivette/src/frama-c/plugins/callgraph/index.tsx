@@ -45,7 +45,8 @@ import * as Eva from 'frama-c/plugins/eva/api/general';
 import {
   callGraphFunction, SelectedNodes, ModeDisplay,
   CGNode, CGLink, CGData,
-  CallGraphFunc, SelectedNodesData
+  CallGraphFunc, SelectedNodesData,
+  transformColor
 } from "frama-c/plugins/callgraph/definitions";
 
 import './callgraph.css';
@@ -219,11 +220,13 @@ function Callgraph(): JSX.Element {
   const panelVisibleState = Dome.useFlipSettings("ivette.callgraph.panelVisible", true);
   const [ verticalSpacing, setVerticalSpacing ] = Dome.useNumberSettings("ivette.callgraph.verticalspacing", 75);
   const [ horizontalSpacing, setHorizontalSpacing ] = Dome.useNumberSettings("ivette.callgraph.horizontalspacing", 500);
+  const [ linkThickness, setLinkThickness ] = Dome.useNumberSettings("ivette.callgraph.linkThickness", 1);
   const [ autoCenter, flipAutoCenter ] = Dome.useFlipSettings("eva.callgraph.autocenter", true);
   const [ autoSelect, flipAutoSelect ] = Dome.useFlipSettings('eva.callgraph.autoselect', true);
   /* eslint-enable max-len */
 
   const style = Themes.useStyle();
+  const theme = Themes.useColorTheme();
 
   const C = React.useMemo<CallGraphFunc>(() => {
     return callGraphFunction(
@@ -279,13 +282,19 @@ function Callgraph(): JSX.Element {
   };
 
   const linkOptions: ILinksOptions = {
-    width: (link) => { return C.getLinkWidth(link); },
+    width: (link) => { return C.getLinkWidth(link, linkThickness); },
     color: (link) => { return C.getLinkColor(link); },
     visibility: (link) => { return C.getLinkVisibility(link); },
     directionalArrow: 3,
     directionalParticle: 3,
-    particleWidth: (link) => { return C.getLinkWidth(link); },
-    particleColor: (link) => { return C.getLinkColor(link); },
+    particleWidth: (link) => {
+      return (C.getLinkWidth(link, linkThickness) * 150 / 100);
+    },
+    particleColor: (link) => {
+      return transformColor(
+        C.getLinkColor(link), theme[0] === "light" ? -50 : 50
+      );
+    },
   };
 
   const options3D: IGraphOptions3D = {
@@ -315,6 +324,7 @@ function Callgraph(): JSX.Element {
         panelVisibleState={panelVisibleState}
         verticalSpacingState={[ verticalSpacing, setVerticalSpacing ]}
         horizontalSpacingState={[ horizontalSpacing, setHorizontalSpacing ]}
+        linkThicknessState={[ linkThickness, setLinkThickness ]}
         selectedFunctions={selectedFunctions}
         taintedFunctions={taintedFunctions}
         unprovenPropertiesFunctions={unprovenPropertiesFunctions}

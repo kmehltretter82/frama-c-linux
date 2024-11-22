@@ -47,6 +47,7 @@ interface CallgraphToolsBarProps {
   panelVisibleState: [boolean, () => void],
   verticalSpacingState: State<number>,
   horizontalSpacingState: State<number>,
+  linkThicknessState: State<number>,
   selectedFunctions:SelectedNodesData,
   taintedFunctions: string[],
   unprovenPropertiesFunctions: SelectedNodesData,
@@ -60,7 +61,7 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
   const {
     displayModeState, selectedParentsState,
     selectedChildrenState, panelVisibleState,
-    verticalSpacingState, horizontalSpacingState,
+    verticalSpacingState, horizontalSpacingState, linkThicknessState,
     selectedFunctions, taintedFunctions,
     unprovenPropertiesFunctions, cycleFunctions, dagMode,
     updateNodes
@@ -70,6 +71,7 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
   const [showInfos, flipShowInfos] = panelVisibleState;
   const [verticalSpacing, setVerticalSpacing] = verticalSpacingState;
   const [horizontalSpacing, setHorizontalSpacing] = horizontalSpacingState;
+  const [linkThickness, setLinkThickness] = linkThicknessState;
 
   function menuItem(label: string, onClick: ()=>void, enabled?: boolean)
     : Dome.PopupMenuItem {
@@ -144,6 +146,16 @@ export function CallgraphToolsBar(props: CallgraphToolsBarProps): JSX.Element {
 
       <Filler/>
 
+      <div className='cg-spinner'>
+        Edges: <Spinner
+        value={linkThickness}
+        title="Thickness of edges"
+        vmin={1}
+        vmax={10}
+        vstep={1}
+        onChange={setLinkThickness}
+        />
+      </div>
       <div className='cg-spinner'>
         hor: <Spinner
         value={horizontalSpacing}
