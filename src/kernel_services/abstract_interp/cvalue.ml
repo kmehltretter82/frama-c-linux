@@ -768,6 +768,10 @@ module V_Or_Uninitialized = struct
   let uninitialized = C_uninit_noesc V.bottom
   let initialized v = C_init_noesc v
 
+  let inject_or_bottom = function
+    | `Bottom -> bottom
+    | `Value v -> v
+
   let is_included t1 t2 =
     (*    (t2.initialized ==> t1.initialized) &&
           (t2.no_escaping_adr ==> t1.no_escaping_adr) &&
@@ -920,8 +924,6 @@ module V_Or_Uninitialized = struct
     | C_uninit_noesc(v) | C_init_esc(v) -> Integer.add Integer.one (vcard v)
     | C_uninit_esc(v) -> Integer.add Integer.two (vcard v)
 
-  let bottom_is_strict = true
-
 end
 
 module V_Offsetmap = struct
@@ -991,6 +993,9 @@ module V_Offsetmap = struct
     try `Value (OffsetmapNarrow.narrow_reinterpret x y)
     with NarrowReturnsBottom -> `Bottom
 
+  (* By default, skip bottom values. *)
+  let pretty_generic ?typ ?pretty_v ?(skip_v=V_Or_Uninitialized.is_bottom) =
+    pretty_generic ?typ ?pretty_v ~skip_v
 end
 
 module Default_offsetmap = struct
@@ -1052,11 +1057,16 @@ module Model = struct
   include Make_Narrow(V_Or_Uninitialized)
 
   let find_indeterminate ?(conflate_bottom=true) state loc =
-    find ~conflate_bottom state loc
+    find ~conflate_bottom state loc |> V_Or_Uninitialized.inject_or_bottom
 
   let find ?(conflate_bottom=true) state loc =
     let v = find_indeterminate ~conflate_bottom state loc in
     V_Or_Uninitialized.get_v v
+
+  let add_binding ~exact mem loc v =
+    if V_Or_Uninitialized.is_bottom v
+    then bottom
+    else add_binding ~exact mem loc v
 
   let add_indeterminate_binding ~exact mem loc v =
     add_binding ~exact mem loc v

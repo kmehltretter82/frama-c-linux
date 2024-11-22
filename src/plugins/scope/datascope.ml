@@ -55,6 +55,7 @@ module StmtSetLattice = struct
   include Abstract_interp.Make_Hashconsed_Lattice_Set(StmtDefault)(Cil_datatype.Stmt.Hptset)
 
   let default: t = empty
+  let default_is_bottom = true
 
   let single s = inject_singleton s
 
@@ -68,7 +69,9 @@ module InitSid = struct
   let () = Ast.add_hook_on_update LM.clear_caches
 
   let empty = LM.empty
-  let find = LM.find
+  let find lm zone =
+    let bottom = StmtSetLattice.bottom in
+    LM.find lm zone |> Lattice_bounds.Bottom.value ~bottom
 
   let add_zone lmap zone sid =
     let new_val = StmtSetLattice.single sid in

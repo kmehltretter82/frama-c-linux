@@ -63,7 +63,7 @@ module type Location_map_bitwise = sig
   val add_base: Base.t -> LOffset.t -> t -> t
   val remove_base: Base.t -> t -> t
 
-  val find : t -> Zone.t -> v
+  val find : t -> Zone.t -> v Lattice_bounds.or_bottom
 
   val filter_base : (Base.t -> bool) -> t -> t
 
@@ -144,10 +144,10 @@ module type Location_map_bitwise = sig
 end
 
 module type With_default = sig
-  include Lattice_type.Bounded_Join_Semi_Lattice
+  include Lattice_type.Join_Semi_Lattice
   include Lattice_type.With_Top with type t := t
-  include Lattice_type.With_Narrow with type t := t
   val default: t
+  val default_is_bottom : bool
 end
 
 module Make_bitwise(V : With_default) : Location_map_bitwise with type v = V.t

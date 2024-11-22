@@ -194,11 +194,11 @@ let pretty_stitched_offsetmap fmt typ o =
   if Cil.isScalarType typ &&
      not (Cvalue.V_Offsetmap.is_single_interval o)
   then
-    let v = v_uninit_of_offsetmap ~typ o in
-    if not (Cvalue.V_Or_Uninitialized.is_isotropic v)
-    then
+    match v_uninit_of_offsetmap ~typ o with
+    | `Value v when not (Cvalue.V_Or_Uninitialized.is_isotropic v) ->
       Format.fprintf fmt "@\nThis amounts to: %a"
         Cvalue.V_Or_Uninitialized.pretty v
+    | _ -> ()
 
 let pretty_offsetmap typ fmt offsm =
   (* YYY: catch pointers to arrays, and print the contents of the array *)
@@ -229,6 +229,7 @@ let find_offsm_under validity ival size offsm acc =
     let find acc offset =
       let offsets = Ival.inject_singleton offset in
       let value = Cvalue.V_Offsetmap.find ~validity ~offsets ~size offsm in
+      let value = Cvalue.V_Or_Uninitialized.inject_or_bottom value in
       add_if_singleton value acc
     in
     List.fold_left find acc list

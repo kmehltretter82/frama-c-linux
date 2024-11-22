@@ -26,7 +26,7 @@ open Lattice_type
 
 module type S = sig
 
-  include Bounded_Join_Semi_Lattice
+  include Join_Semi_Lattice
   include With_Cardinal_One with type t := t
 
   (** Hints for the widening. *)

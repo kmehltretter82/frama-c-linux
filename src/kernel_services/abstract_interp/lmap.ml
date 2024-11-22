@@ -137,38 +137,6 @@ struct
     let filter_base f m =
       fold (fun k v acc -> if f k then add k v acc else acc) m empty
 
-    let offsetmap_all_bottom m =
-      let f v =
-        if not (V.equal V.bottom v) then raise Exit
-      in
-      try Offsetmap.iter_on_values f m; true
-      with Exit -> false
-
-    (* Display only the bases present in [filter], but including those
-       that are bound to their default value. *)
-    let pretty_filter fmt m zfilter =
-      let first = ref true in
-      let filter base _itvs () =
-        match find_or_default base m with
-        | `Bottom -> ()
-        | `Value offsm ->
-          if not (offsetmap_all_bottom offsm)
-          then begin
-            if !first then first := false else Format.fprintf fmt "@ ";
-            let typ = Base.typeof base in
-            Format.fprintf fmt "@[%a%a@]"
-              Base.pretty base
-              (Offsetmap.pretty_generic ?typ ()) offsm
-          end
-      in
-      match zfilter with
-      | Zone.Top (Base.SetLattice.Top, _) ->
-        pretty fmt m (* fallback *)
-      | _ ->
-        Format.fprintf fmt "@[<v>";
-        Zone.fold_topset_ok filter zfilter ();
-        Format.fprintf fmt "@]"
-
     let add_base_value base ~size v ~size_v m =
       add base (Offsetmap.create ~size v ~size_v) m
 
@@ -212,21 +180,23 @@ struct
 
     (* may raise Error_Top in the case Top Top. Make sure to annotate callers *)
     let find ?(conflate_bottom=true) mem {loc ; size} =
+      let open Bottom.Operators in
       let handle_imprecise_base base acc =
-        match find_or_default base mem with
-        | `Bottom -> acc
-        | `Value offsetmap ->
-          V.join (Offsetmap.find_imprecise_everywhere offsetmap) acc
+        let v =
+          let* offsetmap = find_or_default base mem in
+          Offsetmap.find_imprecise_everywhere offsetmap
+        in
+        Bottom.join V.join v acc
       in
       match loc with
-      | Location_Bits.Top (Base.SetLattice.Top, _) -> vtop ()
+      | Location_Bits.Top (Base.SetLattice.Top, _) -> `Value (vtop ())
       | Location_Bits.Top (Base.SetLattice.Set s, _) ->
-        Base.SetLattice.O.fold handle_imprecise_base s V.bottom
+        Base.SetLattice.O.fold handle_imprecise_base s `Bottom
       | Location_Bits.Map loc_map -> begin
           match size with
           | Int_Base.Top ->
             let aux base _ acc = handle_imprecise_base base acc in
-            Location_Bits.M.fold aux loc_map V.bottom
+            Location_Bits.M.fold aux loc_map `Bottom
           | Int_Base.Value size ->
             let aux_base base offsets acc_v =
               let validity = Base.validity base in
@@ -237,9 +207,9 @@ struct
                   Offsetmap.find
                     ~conflate_bottom ~validity ~offsets ~size offsetmap
                 in
-                V.join new_v acc_v
+                Bottom.join V.join new_v acc_v
             in
-            Location_Bits.M.fold aux_base loc_map V.bottom
+            Location_Bits.M.fold aux_base loc_map `Bottom
         end
 
     (* Internal function for join and widen, that handles efficiently the
@@ -303,7 +273,7 @@ struct
     module Make_Narrow (X: sig
         include Lattice_type.With_Top with type t := V.t
         include Lattice_type.With_Narrow with type t := V.t
-        val bottom_is_strict: bool
+        val bottom: V.t
       end) = struct
 
       exception NarrowReturnsBottom
@@ -311,16 +281,12 @@ struct
       module OffsetmapNarrow = Offsetmap.Make_Narrow(struct
           let top = X.top
 
-          (* If bottom is strict, catch results of [narrow] that are bottom
-             and raise an exception instead *)
-          let narrow =
-            if X.bottom_is_strict then
-              fun x y ->
-                let r = X.narrow x y in
-                if V.(equal bottom r) then raise NarrowReturnsBottom;
-                r
-            else
-              fun x y -> X.narrow x y
+          (* Catch results of [narrow] that are bottom and raise an exception
+             instead. *)
+          let narrow x y =
+            let r = X.narrow x y in
+            if V.equal X.bottom r then raise NarrowReturnsBottom;
+            r
         end)
 
       (* may raise {!NarrowReturnsBottom} when Bottom is strict *)
@@ -529,8 +495,9 @@ struct
             Base.SetLattice.pretty top
             Origin.pretty_as_reason orig;
         let validity = Base.validity_from_size size in
-        let v = Offsetmap.find_imprecise ~validity from in
-        add_binding ~exact:false m loc_dst v
+        match Offsetmap.find_imprecise ~validity from with
+        | `Bottom -> false, m
+        | `Value v -> add_binding ~exact:false m loc_dst v
 
     let top_offsetmap size =
       let top = vtop () in
@@ -682,34 +649,25 @@ struct
     | Bottom -> false
     | Top | Map _ -> true
 
-  let pretty_filter fmt m zfilter =
-    match m with
-    | Bottom -> Format.fprintf fmt "@[NON TERMINATING FUNCTION@]"
-    | Top -> Format.fprintf fmt "@[NO INFORMATION@]"
-    | Map m -> M.pretty_filter fmt m zfilter
-
   let add_base_value base ~size v ~size_v = function
     | Bottom -> Bottom
     | Top -> Top
     | Map m -> Map (M.add_base_value base ~size v ~size_v m)
 
   let add_binding ~exact m loc v =
-    (* TODO: this should depend on bottom being strict. *)
-    if V.equal v V.bottom then Bottom
-    else
-      match m with
-      | Top -> Top
-      | Bottom -> Bottom
-      | Map m ->
-        try
-          let non_bottom, r = M.add_binding ~exact m loc v in
-          if non_bottom then Map r else Bottom
-        with M.Result_is_top -> Top
+    match m with
+    | Top -> Top
+    | Bottom -> Bottom
+    | Map m ->
+      try
+        let non_bottom, r = M.add_binding ~exact m loc v in
+        if non_bottom then Map r else Bottom
+      with M.Result_is_top -> Top
 
   let find ?(conflate_bottom=true) m loc =
     match m with
-    | Bottom -> V.bottom
-    | Top -> vtop ()
+    | Bottom -> `Bottom
+    | Top -> `Value (vtop ())
     | Map m -> M.find ~conflate_bottom m loc
 
   let join mm1 mm2 = match mm1, mm2 with
@@ -721,7 +679,7 @@ struct
   module Make_Narrow (X: sig
       include Lattice_type.With_Top with type t := v
       include Lattice_type.With_Narrow with type t := v
-      val bottom_is_strict: bool
+      val bottom: v
     end) = struct
 
     include M.Make_Narrow(X)

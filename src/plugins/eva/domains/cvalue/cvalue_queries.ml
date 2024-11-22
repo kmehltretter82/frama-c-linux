@@ -110,7 +110,10 @@ module Queries = struct
       match offsm with
       | `Bottom -> `Bottom, Alarmset.none
       | `Value offsm ->
-        let value = Cvalue.V_Offsetmap.find_imprecise_everywhere offsm in
+        let open Eval.Evaluated.Operators in
+        let* value =
+          Cvalue.V_Offsetmap.find_imprecise_everywhere offsm, Alarmset.none
+        in
         let alarms = indeterminate_alarms lval value in
         let v = Cvalue.V_Or_Uninitialized.get_v value in
         read_garbled_mix v;

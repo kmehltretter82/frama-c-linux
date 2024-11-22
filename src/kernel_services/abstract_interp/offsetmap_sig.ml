@@ -186,15 +186,15 @@ module type S = sig
     validity:Base.validity ->
     ?conflate_bottom:bool ->
     offsets:Ival.t -> size:Integer.t ->
-    t -> v
+    t -> v Lattice_bounds.or_bottom
   (** Find the value bound to a set of intervals, expressed as an ival, in the
       given rangemap. *)
 
-  val find_imprecise: validity:Base.validity-> t -> v
+  val find_imprecise: validity:Base.validity-> t -> v Lattice_bounds.or_bottom
   (** [find_imprecise ~validity m] returns an imprecise join of the values bound
       in [m], in the range described by [validity].  *)
 
-  val find_imprecise_everywhere: t -> v
+  val find_imprecise_everywhere: t -> v Lattice_bounds.or_bottom
   (** Returns an imprecise join of all the values bound in the offsetmap. *)
 
   val copy_slice:

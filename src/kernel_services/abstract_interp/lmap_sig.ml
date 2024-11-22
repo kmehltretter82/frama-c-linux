@@ -24,6 +24,7 @@
     to be those of the [Offsetmap] module. *)
 
 open Locations
+open Lattice_bounds
 
 module type S = sig
 
@@ -45,9 +46,6 @@ module type S = sig
 
   val pretty: Format.formatter -> t -> unit
   val pretty_debug: Format.formatter -> t -> unit
-  val pretty_filter: Format.formatter -> t -> Zone.t -> unit
-  (** [pretty_filter m z] pretties only the part of [m] that correspond to
-      the bases present in [z] *)
 
   val pretty_diff: Format.formatter -> t -> t -> unit
 
@@ -76,7 +74,7 @@ module type S = sig
   module Make_Narrow(_: sig
       include Lattice_type.With_Top with type t := v
       include Lattice_type.With_Narrow with type t := v
-      val bottom_is_strict: bool
+      val bottom: v
     end): sig
     val narrow : t -> t -> t
   end
@@ -95,12 +93,12 @@ module type S = sig
 
   (** {2 Finding values} *)
 
-  val find: ?conflate_bottom:bool -> t -> location -> v
+  val find: ?conflate_bottom:bool -> t -> location -> v or_bottom
   (** @raise Error_Top when the location or the state are Top, and there
       is no Top value in the type {!v}. *)
 
   val copy_offsetmap :
-    Location_Bits.t -> Integer.t -> t -> offsetmap Lattice_bounds.or_bottom
+    Location_Bits.t -> Integer.t -> t -> offsetmap or_bottom
   (** [copy_offsetmap alarms loc size m] returns the superposition of the
       ranges of [size] bits starting at [loc] within [m]. [size] must be
       strictly greater than zero. Return [None] if all pointed addresses are
@@ -109,11 +107,11 @@ module type S = sig
       @raise Error_Top when the location or the state are Top, and there
       is no Top value in the type {!v}. *)
 
-  val find_base : Base.t -> t -> offsetmap Lattice_bounds.or_top_bottom
+  val find_base : Base.t -> t -> offsetmap or_top_bottom
   (** @raise Not_found if the varid is not present in the map. *)
 
   val find_base_or_default :
-    Base.t -> t -> offsetmap Lattice_bounds.or_top_bottom
+    Base.t -> t -> offsetmap or_top_bottom
   (** Same as [find_base], but return the default values for bases
       that are not currently present in the map. Prefer the use of this function
       to [find_base], unless you explicitly want to see if the base is bound. *)

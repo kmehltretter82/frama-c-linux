@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Abstract_interp
+module Bottom = Lattice_bounds.Bottom
 
 (* This module uses Bigints everywhere. Set up some notations *)
 let pretty_int = Int.pretty
@@ -510,11 +511,11 @@ module Make
              / \         iter f t   = f n1; fn0; f n2;
             n1  n2
   *)
-  let fold_offset f o t acc =
+  let fold_offset f ~offset t acc =
     if t = Empty then
       acc
     else
-      let o, n, z = leftmost_child o End t in
+      let o, n, z = leftmost_child offset End t in
       let rec aux_fold o t z pre =
         match t with
         | Empty -> pre
@@ -528,7 +529,7 @@ module Make
       aux_fold o n z acc
   ;;
 
-  let fold f t = fold_offset f Integer.zero t
+  let fold = fold_offset ~offset:Integer.zero
   ;;
 
   let iter_offset f o t =
@@ -1368,32 +1369,33 @@ module Make
   let find_imprecise_between (first_bit, last_bit) tree =
     let rec aux tree_offset tree =
       match tree with
-      | Empty -> V.bottom
+      | Empty -> `Bottom
       | Node (max, offl, subl, offr, subr, _rem, _m, v, _) ->
         let abs_max = max +~ tree_offset in
         let subl_value =
           if first_bit <~ tree_offset then
             let subl_abs_offset = tree_offset +~ offl in
             aux subl_abs_offset subl
-          else V.bottom
+          else `Bottom
         in
         let subr_value =
           if last_bit >~ abs_max then
             let subr_abs_offset = tree_offset +~ offr in
             aux subr_abs_offset subr
-          else V.bottom
+          else `Bottom
         in
         let current_node_value =
           if last_bit <~ tree_offset || first_bit >~ abs_max
-          then V.bottom
+          then `Bottom
           else
           if V.is_isotropic v
-          then v
+          then `Value v
           else
             let origin = Origin.(current Misalign_read) in
-            V.topify_with_origin origin v
+            `Value (V.topify_with_origin origin v)
         in
-        V.join subl_value (V.join subr_value current_node_value)
+        let join = Bottom.join V.join in
+        join subl_value (join subr_value current_node_value)
     in
     aux Integer.zero tree
 
@@ -1460,14 +1462,14 @@ module Make
      whose period is [period]. [size] is the size of each read. [read_value] and
      [read_nodes] are used to read the offsetmap (see read_itv for details).
      [join] is used to merge the result of each read, starting with [acc]. *)
-  let read_series_itv ~min ~max ~period ~size tree ~read_value ~read_nodes ~join acc =
+  let read_series_itv ~min ~max ~period ~size tree ~read_value ~read_nodes ~join =
     let r = min %~ period in
     let since_and_period = min, period in
     let rec read_series start acc =
       let read_ahead, v =
         read_itv ~since_and_period ~start ~size tree ~read_value ~read_nodes
       in
-      let acc = join v acc in
+      let acc = Bottom.join join (`Value v) acc in
       (* Compute the offset of the next read. By default, add the [period] to the
          current [start], unless we can jump to the end of the current node. *)
       let next = match read_ahead with
@@ -1488,26 +1490,27 @@ module Make
       then read_series next acc
       else acc
     in
-    read_series min acc
+    read_series min `Bottom
 
   (* Reads [tree] at each offset of [offsets]. [size] is the size of each read.
      [read_value] and [read_nodes] perform the reads; [join] merges the result
      of each read, starting with [acc]. *)
-  let read ~offsets ~size tree ~read_value ~read_nodes ~join acc =
+  let read ~offsets ~size tree ~read_value ~read_nodes ~join =
     match offsets with
     | Tr_offset.Interval (min, max, period) ->
       read_series_itv
-        ~min ~max ~period ~size tree ~read_value ~read_nodes ~join acc
+        ~min ~max ~period ~size tree ~read_value ~read_nodes ~join
     | Tr_offset.Set s ->
       List.fold_left
         (fun acc start ->
            let t = read_one_itv ~start ~size tree ~read_value ~read_nodes in
-           join acc t)
-        acc s
+           Bottom.join join acc (`Value t))
+        `Bottom s
     | Tr_offset.Overlap(min, max, _origin) ->
-      let v = find_imprecise_between (min, max) tree in
-      read_value v size
-    | Tr_offset.Invalid -> acc
+      let open Bottom.Operators in
+      let* v = find_imprecise_between (min, max) tree in
+      `Value (read_value v size)
+    | Tr_offset.Invalid -> `Bottom
 
   (* Transforms a function reading one node into a function reading successive
      nodes. The resulting function can be supplied to the [read_itv] function.
@@ -1544,7 +1547,7 @@ module Make
     let read_nodes = read_successive_nodes ~read_one_node neutral in
     let read_value v _size = v in
     let join = V.join in
-    read ~offsets ~size tree ~read_value ~read_nodes ~join V.bottom
+    read ~offsets ~size tree ~read_value ~read_nodes ~join
 
   (* Copies the node [node] at the end of the offsetmap [acc], as part of the
      larger copy of the interval [start..start+size-1] from the englobing
@@ -1584,9 +1587,7 @@ module Make
         let neutral = m_empty in
         let read_nodes = read_successive_nodes ~read_one_node neutral in
         let read_value v size = interval_aux (pred size) Rel.zero size v in
-        let init = isotropic_interval size V.bottom in
-        let t = read ~offsets ~size tree ~read_value ~read_nodes ~join init in
-        `Value t
+        read ~offsets ~size tree ~read_value ~read_nodes ~join
 
   (* Keep the part of the tree strictly under (i.e. strictly on the left) of a
      given offset. *)
@@ -1721,57 +1722,6 @@ module Make
   ;;
 
   let update_itv = update_itv_with_rem ~rem:Rel.zero ~once:false
-
-  (* This should be in Int_Intervals, but is currently needed here.
-     Returns an interval with reversed bounds when the intersection is empty. *)
-  let clip_by_validity = function
-    | Base.Empty | Base.Invalid ->
-      (fun _-> Int.one, Int.zero (* reversed interval -> no intersection*))
-    | Base.Known (min, max)
-    | Base.Unknown (min, _, max) ->
-      (fun (min', max') -> Integer.max min min', Integer.min max max')
-    | Base.Variable variable_v ->
-      (fun (min', max') -> Integer.max Int.zero min',
-                           Integer.min variable_v.Base.max_alloc max')
-
-  (** This function does a weak update of the entire [offsm], by adding the
-      topification of [v]. The parameter [validity] is respected, and so is the
-      current size of [offsm]: each interval already present in [offsm] and valid
-      is overwritten. Interval already present but not valid are bound to
-      [V.bottom]. *)
-  (* TODO: the convention to write bottom on non-valid locations is strange,
-     and only useful for the NULL base in Lmap.ml. It would be simpler an more
-     elegant to keep the existing value on non-valid ranges instead. This
-     function should also be written as a call to fold_between *)
-  let update_imprecise_everywhere ~validity o v offsm =
-    let v = V.topify_with_origin o v in
-    if Base.Validity.equal validity Base.Invalid then
-      `Bottom
-    else
-      let clip = clip_by_validity validity in
-      let r = fold
-          (fun (min, max as itv) (bound_v, _, _) acc ->
-             let new_v = V.topify_with_origin o (V.join bound_v v) in
-             let new_min, new_max = clip itv in
-             if new_min <=~ new_max then (* [min..max] and validity intersect *)
-               let acc =
-                 if min <~ new_min (* Before validity *)
-                 then append_basic_itv ~min ~max:(pred new_min) ~v:V.bottom acc
-                 else acc
-               in
-               let acc = append_basic_itv ~min:new_min ~max:new_max ~v:new_v acc in
-               let acc =
-                 if new_max <~ max (* After validity *)
-                 then append_basic_itv ~min:(succ new_max) ~max ~v:V.bottom acc
-                 else acc
-               in acc
-             else
-               append_basic_itv ~min ~max ~v:V.bottom acc
-          ) offsm m_empty
-      in
-      `Value r
-  ;;
-
 
   (** Update a set of intervals in a given rangemap all offsets starting from
       mn ending in mx must be updated with value v, every period *)
@@ -1971,7 +1921,7 @@ module Make
     | Node(_, _, Empty, _, Empty, _, _, v', _) -> V.equal v v'
     | _ -> false
 
-  let fold_between ?(direction=`LTR) ~entire (imin, imax) f t acc =
+  let fold_between_offset ?(direction=`LTR) ~entire (imin, imax) f ~offset t acc =
     let rec aux curr_off t acc = match t with
       | Empty -> acc
       | Node (max, offl, subl, offr, subr, rem, modu, v, _) ->
@@ -2008,8 +1958,10 @@ module Make
         | `LTR -> acc_right (acc_middle (acc_left acc))
         | `RTL -> acc_left (acc_middle (acc_right acc))
     in
-    aux Integer.zero t acc
-  ;;
+    aux offset t acc
+
+  let fold_between = fold_between_offset ~offset:Integer.zero
+
 
   (* weak validity should be handled caller *)
   let paste_slice_itv ~exact from stop start_dest to_ =
@@ -2053,8 +2005,9 @@ module Make
       let res, success = Ival.fold_int aux offsets (dst, false) in
       if success then `Value res else `Bottom
     with Not_less_than ->
+      let open Bottom.Operators in
       (* Value to paste, since we cannot be precise *)
-      let v =
+      let* v =
         (* Under this size, this may be an integer. Try to be a bit precise
            when doing 'find' *)
         if size <=~ Integer.of_int 128 then
@@ -2098,9 +2051,9 @@ module Make
       | _ ->
         paste_slice_not_contiguous ~validity ~exact ~from:src ~size ~offsets dst
 
-  let skip_v v = V.equal V.bottom v
+  let default_skip _v = false
 
-  let pretty_generic ?typ ?(pretty_v=V.pretty_typ) ?(skip_v=skip_v) ?(sep=Unicode.inset_string ()) () fmt m =
+  let pretty_generic ?typ ?(pretty_v=V.pretty_typ) ?(skip_v=default_skip) ?(sep=Unicode.inset_string ()) () fmt m =
     let is_first = ref true in
     let pretty_binding fmt (bk, ek) (v, modu, rel_offs) =
       if not (skip_v v) then begin
@@ -2190,14 +2143,34 @@ module Make
       find_imprecise_between (min, max) m
     | Base.Variable variable_v ->
       find_imprecise_between (Int.zero, variable_v.Base.max_alloc) m
-    | Base.Invalid | Base.Empty -> V.bottom
+    | Base.Invalid | Base.Empty -> `Bottom
 
   let find_imprecise_everywhere m =
     match m with
-    | Empty -> V.bottom
+    | Empty -> `Bottom
     | Node _ ->
       let bounds = bounds_offset Int.zero m in
       find_imprecise_between bounds m
+
+  (** This function does a weak update of the entire [offsm], by adding the
+      topification of [v]. The parameter [validity] is respected, and so is the
+      current size of [offsm]: each interval already present in [offsm] and valid
+      is overwritten. Interval already present but not valid are bound to
+      [V.bottom].
+      This function used to write bottom on non-valid locations, but this was
+      unnecessary as values on non-valid locations should never be accessed
+      anyway. *)
+  let update_imprecise_everywhere ~validity o v offsm =
+    match Base.valid_range validity with
+    | Invalid_range -> `Bottom
+    | Valid_range None -> `Value offsm
+    | Valid_range (Some itv) ->
+      let v = V.topify_with_origin o v in
+      let topify (min, max) (bound_v, _, _) acc =
+        let new_v = V.topify_with_origin o (V.join bound_v v) in
+        append_basic_itv ~min ~max ~v:new_v acc
+      in
+      `Value (fold_between ~entire:false itv topify offsm m_empty)
 
 
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches_ref
@@ -2634,7 +2607,7 @@ module Int_Intervals = struct
         let co, i = Int_Intervals_Map.diff (co1, i1) coi2' in
         normalize_itv co i
 
-  let fold f m acc =
+  let generic_fold ~fold_offset f m acc =
     match m with
     | Bottom -> acc
     | Top -> raise Error_Top
@@ -2642,7 +2615,14 @@ module Int_Intervals = struct
       let aux_itv itv (v, _, _) acc =
         if v then f itv acc else acc
       in
-      Int_Intervals_Map.fold_offset aux_itv curr_off i acc
+      fold_offset aux_itv ~offset:curr_off i acc
+
+  let fold f m acc =
+    generic_fold ~fold_offset:Int_Intervals_Map.fold_offset f m acc
+
+  let fold_between ~entire itv f m acc =
+    let fold_offset = Int_Intervals_Map.fold_between_offset ~entire itv in
+    generic_fold ~fold_offset f m acc
 
   (* Could be slightly improved *)
   let inject l =
@@ -2796,15 +2776,18 @@ end
 
 
 module Make_bitwise(V: sig
-    include Lattice_type.Bounded_Join_Semi_Lattice
-    include Lattice_type.With_Narrow with type t := t
+    include Lattice_type.Join_Semi_Lattice
     include Lattice_type.With_Top with type t := t
   end) = struct
 
   module Isotropic_Value = struct
     include V
     include FullyIsotropic
-    let merge_neutral_element = bottom
+
+    (* Should not be used on isotropic values anyway: [merge_distinct_bits] is
+       defined as [assert false] above. *)
+    let merge_neutral_element = top
+
     let pretty_typ _ fmt v = pretty fmt v
   end
 
@@ -2820,16 +2803,14 @@ module Make_bitwise(V: sig
     try
       match Base.valid_range validity with
       | Base.Invalid_range -> `Bottom
-      | Base.Valid_range None -> (* empty validity *) `Value m
-      | Base.Valid_range (Some _) ->
-        let clip = clip_by_validity validity in
+      | Base.Valid_range None -> `Value m (* empty validity *)
+      | Base.Valid_range (Some itv) ->
         let aux_itv itv m =
-          let itv = clip itv in
           if Int.le (fst itv) (snd itv) then
             add ~exact itv (v_size_mod v) m
           else m
         in
-        `Value (Int_Intervals.fold aux_itv itvs m)
+        `Value (Int_Intervals.fold_between ~entire:false itv aux_itv itvs m)
     with Error_Top ->
       update_imprecise_everywhere ~validity Origin.(current Misalign_write) v m
 
@@ -2848,8 +2829,8 @@ module Make_bitwise(V: sig
 
   let find_iset ~validity itvs m =
     try
-      let aux_itv i acc =  V.join acc (find i m) in
-      Int_Intervals.fold aux_itv itvs V.bottom
+      let aux_itv i acc = Bottom.join V.join acc (find i m) in
+      Int_Intervals.fold aux_itv itvs `Bottom
     with Error_Top -> find_imprecise ~validity m
 
   module V_Hashtbl = FCHashtbl.Make(V)

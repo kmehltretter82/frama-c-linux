@@ -281,7 +281,6 @@
   __retres ∈ {5}
 [eva:final-states] Values at end of function odd:
   __retres ∈ {0; 1}
-  __retres ∈ UNINITIALIZED
 [eva:final-states] Values at end of function odd_ptr:
   y ∈ [--..--]
   a ∈ [--..--]
