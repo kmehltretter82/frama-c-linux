@@ -180,17 +180,10 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
 (* --- Nodes Set                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-module SNode = struct
-  let map : map ref = ref (create ())
-  let update_map m = map := m
-
-  include Set.Make(struct
-      type t = node
-      let compare r1 r2 =
-        if equal !map r1 r2 then 0
-        else id (node !map r1) - id (node !map r2)
-    end)
-end
+module SNode = Set.Make(struct
+    type t = node
+    let compare r1 r2 = Int.compare (id r1) (id r2)
+  end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk Constructors                                                 --- *)
@@ -473,19 +466,20 @@ let field (m: map) (r: node) (fd: fieldinfo) : node =
     move m r p s
   else r
 
-let footprint (m: map) (r: node) : SNode.t =
-  SNode.update_map m ;
+let footprint (m: map) (r: node) : node list =
   try
-    let leafs = ref SNode.empty in
-    let rec store_leafs (r: node) : unit =
-      let rg = (* raises Not_found *) Ufind.get m.store r in
-      match rg.clayout with
-      | Blob | Cell (_,_) -> leafs := SNode.add r !leafs
-      | Compound (_, _, range) ->
-        Ranges.iter store_leafs range
-    in store_leafs r ;
-    !leafs
-  with Not_found -> SNode.empty
+    let visited = ref SNode.empty (* set of visited&normalized nodes *) in
+    let leafs = ref [] (* lsit of leafs *) in
+    let rec visit (r: node) : unit =
+      let n = node m r in (* normalized node *)
+      if SNode.mem n !visited then () else
+        let _ = visited := SNode.add n !visited in
+        let rg = (* raises Not_found *) Ufind.get m.store n in
+        match rg.clayout with
+        | Compound (_, _, range) -> Ranges.iter visit range
+        | Blob | Cell (_,_) -> leafs := n :: !leafs
+    in visit r ; !leafs
+  with Not_found -> []
 
 let index (m : map) (r: node) (ty:typ) : node =
   move m r 0 (Cil.bitsSizeOf ty)
