@@ -92,7 +92,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes: interrupt_received = 1; <-
-                     interrupt :: interrupt.c:12 <- interrupt_stub_loop
+                       interrupt :: interrupt.c:12 <- interrupt_stub_loop
   shared bases: {interrupt_received}
   interferences: {  } -> # cvalue: interrupt_received ∈ {1}
 [mt] * Computing cfg
@@ -153,10 +153,10 @@
     write by <main> at interrupt.c:28
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: Frama_C_show_each(interrupt_received); <- main,
-                     interrupt_received = 0; <- main,
+  concurrent writes: Frama_C_show_each_locked(interrupt_received); <- main,
                      Frama_C_show_each(interrupt_received); <- main,
-                     Frama_C_show_each_locked(interrupt_received); <- main
+                     interrupt_received = 0; <- main,
+                     Frama_C_show_each(interrupt_received); <- main
   shared bases: {interrupt_received}
   interferences: {  } -> # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
@@ -174,7 +174,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes: interrupt_received = 1; <-
-                     interrupt :: interrupt.c:12 <- interrupt_stub_loop
+                       interrupt :: interrupt.c:12 <- interrupt_stub_loop
   shared bases: {interrupt_received}
   interferences: {  } -> # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg
@@ -240,10 +240,10 @@
     write by <main> at interrupt.c:28
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: Frama_C_show_each(interrupt_received); <- main,
-                     interrupt_received = 0; <- main,
+  concurrent writes: Frama_C_show_each_locked(interrupt_received); <- main,
                      Frama_C_show_each(interrupt_received); <- main,
-                     Frama_C_show_each_locked(interrupt_received); <- main
+                     interrupt_received = 0; <- main,
+                     Frama_C_show_each(interrupt_received); <- main
   shared bases: {interrupt_received}
   interferences: {  } -> # cvalue: interrupt_received ∈ {0; 1}
 [mt] * Computing cfg

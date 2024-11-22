@@ -343,7 +343,8 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int j = s2; <- main, s1 = 1; <- main
+  concurrent writes: s1 = 1; <- main,
+                     int j = s2; <- main
   shared bases: {s1, s2}
   interferences: {  } -> # cvalue: s1 ∈ {0; 1}
                                    s2 ∈ {0; 3}
@@ -503,7 +504,8 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int j = s2; <- main, s1 = 1; <- main
+  concurrent writes: s1 = 1; <- main,
+                     int j = s2; <- main
   shared bases: {s1, s2}
   interferences: {  } -> # cvalue: s1 ∈ {0; 1}
                                    s2 ∈ {0; 3}

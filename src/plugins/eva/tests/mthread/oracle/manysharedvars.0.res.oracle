@@ -299,13 +299,13 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes: /*@ assert
-                         Eva: signed_overflow: s[i].data2 + 3 ≤ 2147483647;
-                     */
-                     s[i].data2 += 3; <- f,
-                     /*@ assert
                          Eva: signed_overflow: s[i].data + 1 ≤ 2147483647;
                      */
-                     (s[i].data) ++; <- f
+                     (s[i].data) ++; <- f,
+                     /*@ assert
+                         Eva: signed_overflow: s[i].data2 + 3 ≤ 2147483647;
+                     */
+                     s[i].data2 += 3; <- f
   shared bases: {s}
   interferences: { lock } -> # cvalue:
                  s[0].data ∈ {1}

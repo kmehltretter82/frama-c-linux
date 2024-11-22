@@ -222,11 +222,15 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: f = 1; <- main, e = 1; <- main, d = 1; <- main, c = 1; <-
-                     main, b = 1; <- main, a = 1; <- main, *(v + 1) = 2; <-
-                     g2 :: ccfg.c:78 <- main, *v = 1; <-
-                     g2 :: ccfg.c:78 <- main, *v = 1; <-
-                     g1 :: ccfg.c:77 <- main
+  concurrent writes: *v = 1; <- g1 :: ccfg.c:77 <- main,
+                     *v = 1; <- g2 :: ccfg.c:78 <- main,
+                     *(v + 1) = 2; <- g2 :: ccfg.c:78 <- main,
+                     a = 1; <- main,
+                     b = 1; <- main,
+                     c = 1; <- main,
+                     d = 1; <- main,
+                     e = 1; <- main,
+                     f = 1; <- main
   shared bases: {global1, global2, a, b, c, d, e, f}
   interferences: {  } -> # cvalue:
                  global1 ∈ {0; 1}
@@ -577,7 +581,6 @@
 [mt] Thread <main>, fun main
 [mt] ccfg.c:22: Thread jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[0]
-[mt] ccfg.c:22: New context for jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Thread jobs[1], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[1]
 [mt] ccfg.c:22: New context for jobs[1], fun fjob, parent <main>, args {0}
@@ -642,32 +645,37 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647;
+  concurrent writes: *v = 1; <- g1 :: ccfg.c:77 <- main,
+                     *v = 1; <- g2 :: ccfg.c:78 <- main,
+                     *(v + 1) = 2; <- g2 :: ccfg.c:78 <- main,
+                     a = 1; <- main,
+                     b = 1; <- main,
+                     c = 1; <- main,
+                     d = 1; <- main,
+                     e = 1; <- main,
+                     f = 1; <- main,
+                     sum += a; <- main,
+                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b;
                      */
-                     sum += f; <- main,
-                     /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647;
+                     /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647;
                      */
-                     sum += e; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647;
-                     */
-                     sum += d; <- main,
+                     sum += b; <- main,
                      /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + c;
                      */
                      /*@ assert Eva: signed_overflow: sum + c ≤ 2147483647;
                      */
                      sum += c; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b;
+                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d;
                      */
-                     /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647;
+                     /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647;
                      */
-                     sum += b; <- main, sum += a; <- main, f = 1; <- main,
-                     e = 1; <- main, d = 1; <- main, c = 1; <- main, b = 1; <-
-                     main, a = 1; <- main, *(v + 1) = 2; <-
-                     g2 :: ccfg.c:78 <- main, *v = 1; <-
-                     g2 :: ccfg.c:78 <- main, *v = 1; <-
-                     g1 :: ccfg.c:77 <- main
+                     sum += d; <- main,
+                     /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647;
+                     */
+                     sum += e; <- main,
+                     /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647;
+                     */
+                     sum += f; <- main
   shared bases: {global1, global2, a, b, c, d, e, f}
   interferences: {  } -> # cvalue:
                  global1 ∈ {0; 1}
@@ -683,8 +691,7 @@
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
 [mt] *** Computing thread jobs[0], iteration 3
-    (shared vars values changed, thread initial memory state changed,
-     interferences changed)
+    (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread jobs[0]
 [eva:interferences] ccfg.c:16: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
@@ -873,16 +880,16 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:16 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:16 fjob
 [mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
 [mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
 [mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
 [mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
 [mt] <main> reads  a ∈ [--..--]  // ccfg.c:88 main
@@ -1020,8 +1027,6 @@
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
-[eva] ccfg.c:69: Warning: imprecise memory footprint computed at this point
-[eva:interferences] ccfg.c:69: inject threads interferences at this point
 [mt] ccfg.c:22: Thread jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[0]
 [mt] ccfg.c:22: Thread jobs[1], fun fjob, parent <main>, args {0}
@@ -1083,32 +1088,37 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647;
+  concurrent writes: *v = 1; <- g1 :: ccfg.c:77 <- main,
+                     *v = 1; <- g2 :: ccfg.c:78 <- main,
+                     *(v + 1) = 2; <- g2 :: ccfg.c:78 <- main,
+                     a = 1; <- main,
+                     b = 1; <- main,
+                     c = 1; <- main,
+                     d = 1; <- main,
+                     e = 1; <- main,
+                     f = 1; <- main,
+                     sum += a; <- main,
+                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b;
                      */
-                     sum += f; <- main,
-                     /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647;
+                     /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647;
                      */
-                     sum += e; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647;
-                     */
-                     sum += d; <- main,
+                     sum += b; <- main,
                      /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + c;
                      */
                      /*@ assert Eva: signed_overflow: sum + c ≤ 2147483647;
                      */
                      sum += c; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b;
+                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d;
                      */
-                     /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647;
+                     /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647;
                      */
-                     sum += b; <- main, sum += a; <- main, f = 1; <- main,
-                     e = 1; <- main, d = 1; <- main, c = 1; <- main, b = 1; <-
-                     main, a = 1; <- main, *(v + 1) = 2; <-
-                     g2 :: ccfg.c:78 <- main, *v = 1; <-
-                     g2 :: ccfg.c:78 <- main, *v = 1; <-
-                     g1 :: ccfg.c:77 <- main
+                     sum += d; <- main,
+                     /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647;
+                     */
+                     sum += e; <- main,
+                     /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647;
+                     */
+                     sum += f; <- main
   shared bases: {global1, global2, a, b, c, d, e, f}
   interferences: {  } -> # cvalue:
                  global1 ∈ {0; 1}
@@ -1307,16 +1317,16 @@
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: global1; global2[0..1]; a; b; c; d; e; f
-[mt] jobs[0] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
+[mt] jobs[0] reads  global1 ∈ {0}  // ccfg.c:16 fjob
+[mt] jobs[1] reads  global1 ∈ {0}  // ccfg.c:16 fjob
 [mt] jobs[2] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
 [mt] jobs[3] reads  global1 ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
+[mt] jobs[0] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
+[mt] jobs[1] reads  global2[0] ∈ {0}  // ccfg.c:16 fjob
 [mt] jobs[2] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
 [mt] jobs[3] reads  global2[0] ∈ {0; 1}  // ccfg.c:16 fjob
-[mt] jobs[0] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
-[mt] jobs[1] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
+[mt] jobs[0] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
+[mt] jobs[1] reads  global2[1] ∈ {0}  // ccfg.c:16 fjob
 [mt] jobs[2] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
 [mt] jobs[3] reads  global2[1] ∈ {0; 2}  // ccfg.c:16 fjob
 [mt] <main> reads  a ∈ [--..--]  // ccfg.c:88 main

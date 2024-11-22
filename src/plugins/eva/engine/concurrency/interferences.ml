@@ -84,13 +84,14 @@ let add_last_analysis
     ~(domain: a domain)
     ~(get_state : Analysis_location.local -> a or_top_bottom)
     interferences thread concurrent_writes shared_bases =
+  let module ALoc = Analysis_location in
   let module Dom = (val domain) in
   match Dom.get MtDomain.Domain.key with
   | None -> NoChanges (* Domain disabled, no interference computation *)
   | Some extract ->
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
     (* Add interferences one by one *)
-    let add_to_map acc_map aloc =
+    let add_to_map aloc acc_map =
       let open TopBottom.Operators in
       let state =
         (* Retrieve state at analysis location *)
@@ -113,12 +114,15 @@ let add_last_analysis
         MutexesMap.update mutexes update acc_map
     in
     let new_interferences =
-      List.fold_left add_to_map MutexesMap.empty concurrent_writes
+      ALoc.Local.Set.fold add_to_map concurrent_writes MutexesMap.empty
     in
-    let pp_aloc = Analysis_location.Local.pretty in
+    let pp_aloc fmt = Format.fprintf fmt "@[<hov 2>%a@]" ALoc.Local.pretty in
+    let pp_aloc_set =
+      Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:",@ " ALoc.Local.Set.iter pp_aloc
+    in
     Self.debug ~dkey
       "concurrent writes: @[%a@]@.shared bases: @[%a@]@.interferences: @[%a@]@."
-      (Pretty_utils.pp_list ~sep:",@ " pp_aloc) concurrent_writes
+      pp_aloc_set concurrent_writes
       Base.Hptset.pretty shared_bases
       (MutexesMap.pretty Dom.pretty) new_interferences;
     (* Add the computed interferences to the table *)

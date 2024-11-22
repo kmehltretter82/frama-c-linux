@@ -32,9 +32,10 @@ let initial () =
 
 let concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
+  let module ALoc = Analysis_location in
   match Analyzer.Dom.get MtDomain.Domain.key with
   (* Domain disabled, no information about writes *)
-  | None -> []
+  | None -> ALoc.Local.Set.empty
   (* Domain enabled *)
   | Some extract ->
     let add_aloc stmt cs state acc =
@@ -42,7 +43,7 @@ let concurrent_writes shared_bases =
       let { MtDomain.written } = MtDomain.Domain.memory mt_state in
       let written_bases = Locations.Zone.get_bases written in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
-      then (stmt, cs) :: acc
+      then ALoc.Local.Set.add (stmt, cs) acc
       else acc
     in
     let add_stmt acc stmt =
@@ -63,7 +64,7 @@ let concurrent_writes shared_bases =
       | Definition (fundec,_) ->
         List.fold_left add_stmt acc fundec.Cil_types.sallstmts
     in
-    Globals.Functions.fold add_kf []
+    Globals.Functions.fold add_kf ALoc.Local.Set.empty
 
 let shared_bases analysis_state =
   let shared_zones = analysis_state.MtThread.concurrent_accesses in

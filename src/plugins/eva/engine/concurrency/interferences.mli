@@ -40,7 +40,7 @@ type add_result =
 val add_last_analysis :
   domain:'a domain ->
   get_state:(Analysis_location.local -> 'a Lattice_bounds.or_top_bottom) ->
-  t -> Thread.t -> Analysis_location.local list -> Base.Hptset.t -> add_result
+  t -> Thread.t -> Analysis_location.Local.Set.t -> Base.Hptset.t -> add_result
 
 (** Inject current interferences to an abstract state. If activated,
     the Mthread domain helps filtering applicable interferences. This function
