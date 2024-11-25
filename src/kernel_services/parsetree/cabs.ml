@@ -199,7 +199,6 @@ and raw_statement =
   | NOP of attribute option * cabsloc
   | COMPUTATION of expression * cabsloc
   | BLOCK of block * cabsloc * cabsloc
-  | SEQUENCE of statement * statement * cabsloc
   | IF of expression * statement * statement * cabsloc
   | WHILE of loop_invariant * expression * statement * cabsloc
   | DOWHILE of loop_invariant * expression * statement * cabsloc

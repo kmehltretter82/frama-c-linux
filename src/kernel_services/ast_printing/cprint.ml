@@ -435,8 +435,6 @@ and print_statement fmt stat =
   | NOP _ -> pp_print_string fmt ";"
   | COMPUTATION (exp,_) -> fprintf fmt "%a;" print_expression exp
   | BLOCK (blk, _,_) -> print_block fmt blk
-  | SEQUENCE (s1, s2,_) ->
-    fprintf fmt "%a;@ %a" print_statement s1 print_statement s2
   | IF (exp, s1, s2, _) ->
     fprintf fmt "@[<hov 2>if@ (@[%a@])@ %a@."
       print_expression exp print_substatement s1;
@@ -537,7 +535,6 @@ and print_block fmt blk =
 and print_substatement fmt stat =
   match stat.stmt_node with
     IF _
-  | SEQUENCE _
   | DOWHILE _ ->
     fprintf fmt "@ {@ @[%a@]@ }" print_statement stat
   | _ ->

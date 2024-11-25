@@ -7368,7 +7368,6 @@ and doExp local_env
         let findLastComputation = function
             s :: _  ->
             let rec findLast st = match st.stmt_node with
-              | Cabs.SEQUENCE (_, s, _) -> findLast s
               | CASE (_, s, _) -> findLast s
               | CASERANGE (_, _, s, _) -> findLast s
               | LABEL (_, s, _) -> findLast s
@@ -9976,11 +9975,6 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     b.battrs <- addAttributes [Attr(frama_c_keep_block,[])] b.battrs;
     let res = s2c (mkStmt ~ghost ~valid_sid (Block b)) in
     { res with cases = c.cases }
-
-  | Cabs.SEQUENCE (s1, s2, _) ->
-    let c1 = doStatement local_env s1 in
-    let c2 = doStatement local_env s2 in
-    c1 @@@ (c2, ghost)
 
   | Cabs.IF(e, st, sf, _) ->
     let st' = doStatement local_env st in
