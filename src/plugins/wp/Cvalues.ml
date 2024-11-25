@@ -332,7 +332,7 @@ let volatile ?warn () =
   Wp_parameters.Volatile.get () ||
   ( Option.iter
       (fun w -> Warning.emit ~severe:false
-          ~effect:"ignore volatile attribute" "%s" w)
+          ~fallback:"ignore volatile attribute" "%s" w)
       warn ; false )
 
 (* -------------------------------------------------------------------------- *)

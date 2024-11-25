@@ -23,6 +23,7 @@ default:
 variables:
   DEFAULT: "stable/zinc"
   OCAML: "4.14"
+  OPAM_OPTS: "--with-test --with-doc"
   NODE: "22"
   PUBLISH: "no"
   RELEASE: "no"
@@ -526,11 +527,15 @@ additional-arch-release:
     matrix:
       - OCAML: ["5.2"]
 
-# Uncomment this block when there are intermediate versions to check manully
+# Uncomment this block when there are intermediate versions to check manually
+# Beware that some targets may fail if the target job does not provide the
+# version (for example Opam provide version N but Nix does not)
 .build_template: &ocaml_manual_additional_versions_template
   parallel:
     matrix:
       - OCAML: ["5.1"]
+      - OCAML: ["5.3-beta1"]
+        OPAM_OPTS: [ "--with-test" ] # odoc not ported to 5.3 for now
   when: manual
 
 .build_template: &ocaml_versions_template
@@ -562,10 +567,11 @@ ocaml-versions-nightly:
   stage: compatibility
   image: 'ocaml/opam:ubuntu-20.04-ocaml-$OCAML'
   script:
+    - sudo ln -f /usr/bin/opam-2.1 /usr/bin/opam
+    - opam init --reinit -ni
     - sudo apt update
     - opam pin . -n -k path
-    - opam depext frama-c --with-test
-    - opam install --jobs 2 frama-c --with-test --with-doc
+    - opam install --jobs 2 frama-c $OPAM_OPTS
     - frama-c --plugins
   tags:
     - docker
@@ -573,6 +579,10 @@ ocaml-versions-nightly:
 opam-pin:
   <<: *opam_pin_template
   <<: *manual_when_not_special_pipeline
+
+opam-pin-manual:
+  <<: *opam_pin_template
+  <<: *ocaml_manual_additional_versions_template
 
 opam-pin-nightly:
   <<: *opam_pin_template

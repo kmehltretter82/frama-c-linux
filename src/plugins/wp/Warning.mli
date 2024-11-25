@@ -33,7 +33,7 @@ type t = {
   severe : bool ;
   source : string ;
   reason : string ;
-  effect : string ;
+  fallback : string ;
 }
 
 val compare : t -> t -> int
@@ -50,25 +50,27 @@ val context : ?source:string -> unit -> context
 val flush : context -> Set.t
 val add : t -> unit
 
-val create : ?log:bool -> ?severe:bool -> ?source:string -> effect:string ->
+val create : ?log:bool -> ?severe:bool -> ?source:string -> fallback:string ->
   ('a,Format.formatter,unit,t) format4 -> 'a
 
-val emit : ?severe:bool -> ?source:string -> effect:string ->
+val emit : ?severe:bool -> ?source:string -> fallback:string ->
   ('a,Format.formatter,unit) format -> 'a
 (** Emit a warning in current context.
     Defaults: [severe=true], [source="wp"]. *)
 
-val handle : ?severe:bool -> effect:string -> handler:('a -> 'b) -> ('a -> 'b) -> 'a -> 'b
-(** Handle the error and emit a warning with specified severity and effect
+val handle : ?severe:bool -> fallback:string -> handler:('a -> 'b) -> ('a -> 'b) -> 'a -> 'b
+(** Handle the error and emit a warning with specified severity and fallback
     if a context has been set.
     Otherwise, a WP-fatal error is raised instead.
-    Default for [severe] is false. *)
+    Default for [severe] is false.
+    @before Frama-C+dev [fallback] was [effect]
+*)
 
 type 'a outcome =
   | Result of Set.t * 'a
   | Failed of Set.t
 
-val catch : ?source:string -> ?severe:bool -> effect:string -> ('a -> 'b) -> 'a -> 'b outcome
+val catch : ?source:string -> ?severe:bool -> fallback:string -> ('a -> 'b) -> 'a -> 'b outcome
 (** Set up a context for the job. If non-handled errors are raised,
-    then a warning is emitted with specified severity and effect.
+    then a warning is emitted with specified severity and fallback.
     Default for [severe] is [true]. *)

@@ -118,7 +118,7 @@ struct
   let guard' nc c nt = (Cfg.guard' nc c nt) |> paths_of_cfg
   let either n ns = (Cfg.either n ns) |> paths_of_cfg
   let implies n ns = (Cfg.implies n ns) |> paths_of_cfg
-  let effect n1 e n2 = (Cfg.effect n1 e n2) |> paths_of_cfg
+  let memory_effect n1 e n2 = (Cfg.memory_effect n1 e n2) |> paths_of_cfg
   let assume p = (Cfg.assume p) |> paths_of_cfg
 
   let current env sigma =
@@ -195,7 +195,7 @@ struct
         Cfg.E.pretty e
     in
     meta ~descr (env @: Clabels.here)
-    @^ effect (env @: Clabels.here) e (env @: Clabels.next)
+    @^ memory_effect (env @: Clabels.here) e (env @: Clabels.next)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiler: Assignment                                               --- *)
@@ -217,7 +217,7 @@ struct
     let descr = Format.asprintf "Set: @[%a = %a@]"
         Printer.pp_lval lv Printer.pp_exp exp in
     meta ~descr (env @: Clabels.here)
-    @^ effect ( env @: Clabels.here ) e (env @: Clabels.next)
+    @^ memory_effect ( env @: Clabels.here ) e (env @: Clabels.next)
 
   (* -------------------------------------------------------------------------- *)
   (* --- Compiler: Return                                                   --- *)
@@ -358,7 +358,7 @@ struct
               (C.cast tr env.return (Val (Lang.F.e_var env.result)))
           in
           let e = Cfg.E.create { pre; post } p in
-          effect (env @: Clabels.here) e (env @: Clabels.next)
+          memory_effect (env @: Clabels.here) e (env @: Clabels.next)
       in
 
       let old_status = env.status in
@@ -367,7 +367,7 @@ struct
         let p = Lang.F.p_equal (Lang.F.e_var old_status) (Lang.F.e_var env.status) in
         let s = M.Sigma.create () in
         let e = Cfg.E.create {pre=s;post=s} p in
-        effect (env @: Clabels.here) e (env @: Clabels.next)
+        memory_effect (env @: Clabels.here) e (env @: Clabels.next)
       in
 
       let subst_formals = List.fold_left2
@@ -420,7 +420,7 @@ struct
       let hyp_value = Lang.F.p_all (fun (_, h) -> fst h) init in
       let hyp_init =  Lang.F.p_all (fun (_, h) -> snd h) init in
       let hyp = Lang.F.p_and hyp_init hyp_value in
-      effect (env @: Clabels.here) (Cfg.E.create {pre=here; post=next} hyp) (env @: Clabels.next)
+      memory_effect (env @: Clabels.here) (Cfg.E.create {pre=here; post=next} hyp) (env @: Clabels.next)
     | Skip _ | Code_annot _ -> goto (env @: Clabels.here) (env @: Clabels.next)
 
   (* -------------------------------------------------------------------------- *)
@@ -487,7 +487,7 @@ struct
       let next = M.Sigma.havoc here domain in
       let seq = { pre = here; post = next } in
       let preds = A.apply_assigns seq region in
-      effect (env @: Clabels.here) (Cfg.E.create seq (Lang.F.p_conj preds)) (env @: Clabels.next)
+      memory_effect (env @: Clabels.here) (Cfg.E.create seq (Lang.F.p_conj preds)) (env @: Clabels.next)
 
   and froms : env -> from list -> paths = fun env froms ->
     assigns env (Writes froms)
@@ -639,7 +639,7 @@ struct
           let _,paths = do_list ~fresh_nodes:true paths nodes n_loop invariants in
           (* arbitrary number of loop *)
           let n_havoc = Cfg.node () in
-          let havoc = Cfg.havoc n ~effects:{pre=n_havoc;post=n_loop} n_havoc in
+          let havoc = Cfg.havoc n ~memory_effects:{pre=n_havoc;post=n_loop} n_havoc in
           let paths = (havoc |> paths_of_cfg) @^ paths in
           (* body *)
           let invariants_as_assumes = as_assumes invariants in
@@ -707,7 +707,7 @@ struct
             ) nop
         else nop
       in
-      cfg_init @^ effect ninit havoc nconst @^ consts @^ goto nconst (env @: Clabels.here)
+      cfg_init @^ memory_effect ninit havoc nconst @^ consts @^ goto nconst (env @: Clabels.here)
 
   let pre_spec env spec =
     let pre_cond polarity env p =

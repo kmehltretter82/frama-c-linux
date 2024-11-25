@@ -961,19 +961,19 @@ struct
     Warning.handle
       ~handler:term_undefined
       ~severe:false
-      ~effect:"Hide sub-term definition"
+      ~fallback:"Hide sub-term definition"
       (term_node env) t
 
   let pred_protected polarity env p =
     match polarity with
     | `Positive ->
       Warning.handle
-        ~effect:"Target turned to False"
+        ~fallback:"Target turned to False"
         ~severe:true ~handler:(fun _ -> p_false)
         (predicate `Positive env) p
     | `Negative ->
       Warning.handle
-        ~effect:"Ignored Hypothesis"
+        ~fallback:"Ignored Hypothesis"
         ~severe:false ~handler:(fun _ -> p_true)
         (predicate `Negative env) p
     | `NoPolarity ->

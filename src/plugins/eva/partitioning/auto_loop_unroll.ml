@@ -166,9 +166,9 @@ type loop_effect =
     assembly: bool; }
 
 (* Adds a written variable to a loop_effect. *)
-let add_written_var vi effect =
-  let written_vars = Cil_datatype.Varinfo.Set.add vi effect.written_vars in
-  { effect with written_vars }
+let add_written_var vi loop_effect =
+  let written_vars = Cil_datatype.Varinfo.Set.add vi loop_effect.written_vars in
+  { loop_effect with written_vars }
 
 let is_frama_c_builtin (exp : Eva_ast.exp) =
   match exp.node with
@@ -176,20 +176,20 @@ let is_frama_c_builtin (exp : Eva_ast.exp) =
     Ast_info.start_with_frama_c_builtin vi.vname
   | _ -> false
 
-let compute_transition_effect effect = function
+let compute_transition_effect loop_effect = function
   | Eva_automata.Assign ({node = (Var varinfo, _)}, _, _) ->
-    add_written_var varinfo effect
+    add_written_var varinfo loop_effect
   | Assign ({node = (Mem _, _)}, _, _) ->
-    { effect with pointer_writes = true }
+    { loop_effect with pointer_writes = true }
   | Call (Some {node = Var varinfo, _}, _, _, _) ->
-    { (add_written_var varinfo effect) with call = true; }
+    { (add_written_var varinfo loop_effect) with call = true; }
   | Call (Some {node = Mem _, _}, _, _, _) ->
-    { effect with pointer_writes = true; call = true; }
+    { loop_effect with pointer_writes = true; call = true; }
   | Call (None, exp, _, _) when not (is_frama_c_builtin exp) ->
-    { effect with call = true }
+    { loop_effect with call = true }
   | Asm _ ->
-    { effect with assembly = true }
-  | _ -> effect
+    { loop_effect with assembly = true }
+  | _ -> loop_effect
 
 (* Computes the [loop_effect] of a [loop], by scanning all instructions of the
    loop body. *)
@@ -200,8 +200,8 @@ let compute_loop_effect loop =
       call = false;
       assembly = false; }
   in
-  let effect = Graph.fold_transitions compute_transition_effect loop acc in
-  if effect.assembly then None else Some effect
+  let loop_effect = Graph.fold_transitions compute_transition_effect loop acc in
+  if loop_effect.assembly then None else Some loop_effect
 
 (* The status of a lvalue for the automatic loop unroll heuristic. *)
 type var_status =

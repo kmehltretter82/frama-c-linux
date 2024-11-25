@@ -136,7 +136,7 @@ struct
   end
 
   (* Authorized written region from an assigns specification *)
-  type effect = {
+  type assigns_effect = {
     e_pid : P.t ; (* Assign Property *)
     e_post : bool ; (* Requires post effects (loop-assigns or post-assigns) *)
     e_label : c_label ; (* scope for collection *)
@@ -147,7 +147,7 @@ struct
 
   module EFFECT =
   struct
-    type t = effect
+    type t = assigns_effect
     let compare e1 e2 = P.compare e1.e_pid e2.e_pid
     let pretty fmt e =
       Format.fprintf fmt "@[<hov 2>EFFECT %a:@ %a@]"
@@ -500,7 +500,7 @@ struct
   (* --- Compilation of Effects                                           --- *)
   (* ------------------------------------------------------------------------ *)
 
-  let cc_effect env pid (ainfo:WpPropId.assigns_desc) : effect option =
+  let cc_effect env pid (ainfo:WpPropId.assigns_desc) : assigns_effect option =
     let from = ainfo.WpPropId.a_label in
     let sigma = L.mem_frame from in
     let authorized_region =
@@ -539,7 +539,7 @@ struct
       (fun env wp ->
          let outcome =
            Warning.catch
-             ~severe:false ~effect:"Skip probe"
+             ~severe:false ~fallback:"Skip probe"
              (L.term env) term in
          match outcome with
          | Warning.Failed _warn -> wp
@@ -551,7 +551,7 @@ struct
   let add_hyp ?for_pid wenv (hpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
-             ~severe:false ~effect:"Skip hypothesis"
+             ~severe:false ~fallback:"Skip hypothesis"
              (L.pred `Negative env) predicate in
          let warn,hs = match outcome with
            | Warning.Result(warn,p) -> warn , [p]
@@ -567,7 +567,7 @@ struct
   let add_goal wenv (gpid,predicate) wp = in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
-             ~severe:true ~effect:"Degenerated goal"
+             ~severe:true ~fallback:"Degenerated goal"
              (L.pred `Positive env) predicate in
          let warn,goal = match outcome with
            | Warning.Result(warn,goal) -> warn,goal
@@ -580,7 +580,7 @@ struct
     in_wenv wenv wp
       (fun env wp ->
          let outcome = Warning.catch
-             ~severe:true ~effect:"Degenerated goal"
+             ~severe:true ~fallback:"Degenerated goal"
              (L.pred `Positive env) predicate in
          let warn,goal = match outcome with
            | Warning.Result(warn,goal) -> warn,goal
@@ -593,7 +593,7 @@ struct
   let add_assigns wenv (gpid,ainfo) wp = in_wenv wenv wp
       begin fun env wp ->
         let outcome = Warning.catch
-            ~severe:true ~effect:"Degenerated goal"
+            ~severe:true ~fallback:"Degenerated goal"
             (cc_effect env gpid) ainfo
         in match outcome with
         | Warning.Result (_,None) -> wp
@@ -614,7 +614,7 @@ struct
   (* --- WP RULE : use assigns clause                                       --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let assigns_condition (region : L.region) (e:effect) : F.pred =
+  let assigns_condition (region : L.region) (e:assigns_effect) : F.pred =
     let unfold = Wp_parameters.UnfoldAssigns.get () in
     L.check_assigns ~unfold e.e_valid ~written:region ~assignable:e.e_region
 
@@ -709,7 +709,7 @@ struct
         | Writes froms ->
           let kind = ainfo.WpPropId.a_kind in
           let outcome =
-            Warning.catch ~severe:true ~effect:"Assigns everything"
+            Warning.catch ~severe:true ~fallback:"Assigns everything"
               (cc_assigned env kind) froms
           in
           match outcome with
@@ -806,7 +806,7 @@ struct
   let assign wenv stmt lv expr wp = in_wenv wenv wp
       begin fun env wp ->
         let outcome = Warning.catch
-            ~severe:true ~effect:"Assigns everything (unknown l-value)"
+            ~severe:true ~fallback:"Assigns everything (unknown l-value)"
             (cc_lval env) lv in
         match outcome with
         | Warning.Failed warn ->
@@ -818,7 +818,7 @@ struct
           (* L-Value has been translated *)
           let assigned = [obj,Sloc loc] in
           let outcome = Warning.catch
-              ~severe:false ~effect:"Havoc l-value (unknown r-value)"
+              ~severe:false ~fallback:"Havoc l-value (unknown r-value)"
               (cc_stored lv seq loc obj) expr in
           match outcome with
           | Warning.Failed r_warn
@@ -862,7 +862,7 @@ struct
             let tr = L.return () in
             p_equal (C.result sigma tr vr) (C.return sigma tr exp) in
           let outcome = Warning.catch
-              ~severe:false ~effect:"Result value discarded (unknown)"
+              ~severe:false ~fallback:"Result value discarded (unknown)"
               compile () in
           let warn, condition =
             match outcome with
@@ -899,7 +899,7 @@ struct
          let sigma,pa1,pa2 = sigma_union wp1.sigma wp2.sigma in
          let warn,cond =
            match Warning.catch ~source:"Condition"
-                   ~severe:false ~effect:"Skip condition value"
+                   ~severe:false ~fallback:"Skip condition value"
                    (C.cond sigma) exp
            with
            | Warning.Result(warn,cond) -> warn,cond
@@ -989,7 +989,7 @@ struct
          let sigma = Sigma.havoc (Sigma.create ()) domain in
          let warn,value =
            match Warning.catch ~source:"Switch"
-                   ~severe:false ~effect:"Skip switched value"
+                   ~severe:false ~fallback:"Skip switched value"
                    (C.val_of_exp sigma) exp
            with
            | Warning.Result(warn,value) -> warn,value
@@ -1043,7 +1043,7 @@ struct
 
   let call_pointer sigma fct =
     let outcome = Warning.catch
-        ~severe:true ~effect:"Degenerated goal"
+        ~severe:true ~fallback:"Degenerated goal"
         (C.call sigma) fct in
     match outcome with
     | Warning.Failed warn -> warn,None
@@ -1093,7 +1093,7 @@ struct
       (fun env wp ->
          let sigma = L.current env in
          let outcome = Warning.catch
-             ~severe:true ~effect:"Can not prove call preconditions"
+             ~severe:true ~fallback:"Can not prove call preconditions"
              (List.map (C.exp sigma)) es in
          match outcome with
          | Warning.Failed warn ->
@@ -1109,7 +1109,7 @@ struct
            let vcs = List.fold_left
                (fun vcs (gid,p) ->
                   let outcome = Warning.catch
-                      ~severe:true ~effect:"Can not prove call precondition"
+                      ~severe:true ~fallback:"Can not prove call precondition"
                       (L.in_frame call_f (L.pred `Positive call_e)) p in
                   match outcome with
                   | Warning.Result(warn2,goal) ->
@@ -1130,7 +1130,7 @@ struct
       (fun env wp ->
          let outcome = Warning.catch
              ~severe:true
-             ~effect:"Considering that call must always terminate"
+             ~fallback:"Considering that call must always terminate"
              (L.pred `Positive env) caller_t
          in
          let warn, caller_t = match outcome with
@@ -1143,7 +1143,7 @@ struct
          let sigma = L.current env in
          let outcome = Warning.catch
              ~severe:true
-             ~effect:"Considering non terminating callee"
+             ~fallback:"Considering non terminating callee"
              (List.map (C.exp sigma)) args in
          match outcome with
          | Warning.Failed warn2 ->
@@ -1167,7 +1167,7 @@ struct
            in
            let outcome =
              Warning.catch
-               ~severe:true ~effect:"Considering non terminating callee"
+               ~severe:true ~fallback:"Considering non terminating callee"
                compile_callee callee_t
            in
            let warn2, callee_t = match outcome with
@@ -1193,7 +1193,7 @@ struct
          in
          let outcome = Warning.catch
              ~severe:true
-             ~effect:"Considering that call must always decrease"
+             ~fallback:"Considering that call must always decrease"
              compile_caller_t caller_t
          in
          let warn, caller_t = match outcome with
@@ -1206,7 +1206,7 @@ struct
          let sigma = L.current env in
          let outcome = Warning.catch
              ~severe:true
-             ~effect:"Considering non decreasing call"
+             ~fallback:"Considering non decreasing call"
              (List.map (C.exp sigma)) args in
          match outcome with
          | Warning.Failed warn2 ->
@@ -1250,7 +1250,7 @@ struct
            in
            let outcome =
              Warning.catch
-               ~severe:true ~effect:"Considering non decreasing call"
+               ~severe:true ~fallback:"Considering non decreasing call"
                compile_decreases (caller_d, callee_d)
            in
            let warn2, pred = match outcome with
@@ -1389,7 +1389,7 @@ struct
         let value = C.result call.sigma_pre tr re in
         [ C.equal_typ tr vr (C.cast tr te (Val value)) ]
       in
-      Warning.handle ~handler ~severe:false ~effect:"Hide \\result" compile ()
+      Warning.handle ~handler ~severe:false ~fallback:"Hide \\result" compile ()
 
   let cc_status f_caller f_callee =
     p_equal
@@ -1441,7 +1441,7 @@ struct
     = L.in_frame wenv.frame
       (fun () ->
          let outcome = Warning.catch
-             ~severe:true ~effect:"Call assigns everything"
+             ~severe:true ~fallback:"Call assigns everything"
              (call_proper wenv stmt lvr kf es
                 ~pre ~post ~pexit ~assigns ~p_post ~p_exit) () in
          match outcome with
