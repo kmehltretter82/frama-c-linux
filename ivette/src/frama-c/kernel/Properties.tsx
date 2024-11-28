@@ -82,7 +82,11 @@ function newFilter(
 }
 
 const DEFAULTS: { [key: string]: IFilterContent } = {
-  'currentScope': newFilter(false, "Current scope"),
+  /** source */
+  'source.currentScope': newFilter(false, "Current scope"),
+  'source.alarms': newFilter(true, "Alarms"),
+  'source.libc': newFilter(true, "Libc specifications"),
+  'source.others': newFilter(true, "Others"),
    /** status */
   'status.valid': newFilter(true, "Valid"),
   'status.valid_hyp': newFilter(true, "Valid under hyp."),
@@ -109,9 +113,6 @@ const DEFAULTS: { [key: string]: IFilterContent } = {
   'kind.pragma': newFilter(true, "Pragma"),
   'kind.assumes': newFilter(true, "Assumes"),
   'kind.others': newFilter(true, "Others"),
-  /** source */
-  'source.alarms': newFilter(true, "Alarms"),
-  'source.others': newFilter(true, "Others"),
   /** alarms */
   'alarms.overflow': newFilter(true, "Overflows"),
   'alarms.division_by_zero': newFilter(true, "Divisions by zero"),
@@ -248,31 +249,43 @@ function filterKind(
   }
 }
 
+function filterSource(p: Property, currentScope: States.Scope): boolean {
+  const filtering = currentScope && filter('source.currentScope');
+  const filterScope = filtering ? p.scope === currentScope : true;
+
+  const condAlarms = Boolean(p.alarm)
+  const condLibc = Boolean(
+    p.source.dir.endsWith('share/libc') || p.source.dir === 'FRAMAC_SHARE/libc'
+  )
+  const others = Boolean(!condAlarms && !condLibc);
+
+  return filterScope
+    && (filter('source.libc') || !condLibc)
+    && (filter('source.alarms') || !condAlarms)
+    && (filter('source.others') || !others);
+}
+
 function filterAlarm(alarm: string | undefined): boolean {
-  if (alarm) {
-    if (!filter('source.alarms')) return false;
-    switch (alarm) {
-      case 'overflow': return filter('alarms.overflow');
-      case 'division_by_zero': return filter('alarms.division_by_zero');
-      case 'mem_access': return filter('alarms.mem_access');
-      case 'index_bound': return filter('alarms.index_bound');
-      case 'pointer_value': return filter('alarms.pointer_value');
-      case 'shift': return filter('alarms.shift');
-      case 'ptr_comparison': return filter('alarms.ptr_comparison');
-      case 'differing_blocks': return filter('alarms.differing_blocks');
-      case 'separation': return filter('alarms.separation');
-      case 'overlap': return filter('alarms.overlap');
-      case 'initialization': return filter('alarms.initialization');
-      case 'dangling_pointer': return filter('alarms.dangling_pointer');
-      case 'is_nan_or_infinite':
-      case 'is_nan': return filter('alarms.special_float');
-      case 'float_to_int': return filter('alarms.float_to_int');
-      case 'function_pointer': return filter('alarms.function_pointer');
-      case 'bool_value': return filter('alarms.bool_value');
-      default: return false;
-    }
+  switch (alarm) {
+    case 'overflow': return filter('alarms.overflow');
+    case 'division_by_zero': return filter('alarms.division_by_zero');
+    case 'mem_access': return filter('alarms.mem_access');
+    case 'index_bound': return filter('alarms.index_bound');
+    case 'pointer_value': return filter('alarms.pointer_value');
+    case 'shift': return filter('alarms.shift');
+    case 'ptr_comparison': return filter('alarms.ptr_comparison');
+    case 'differing_blocks': return filter('alarms.differing_blocks');
+    case 'separation': return filter('alarms.separation');
+    case 'overlap': return filter('alarms.overlap');
+    case 'initialization': return filter('alarms.initialization');
+    case 'dangling_pointer': return filter('alarms.dangling_pointer');
+    case 'is_nan_or_infinite':
+    case 'is_nan': return filter('alarms.special_float');
+    case 'float_to_int': return filter('alarms.float_to_int');
+    case 'function_pointer': return filter('alarms.function_pointer');
+    case 'bool_value': return filter('alarms.bool_value');
+    default: return true;
   }
-  return filter('source.others');
 }
 
 function filterEva(p: Property): boolean {
@@ -508,14 +521,11 @@ class PropertyModel extends Arrays.CompactModel<PropKey, Property> {
 
   setFilterScope(scope: States.Scope): void {
     this.filterScope = scope;
-    if (filter('currentScope')) this.reload();
+    if (filter('source.currentScope')) this.reload();
   }
 
   filterItem(prop: Property): boolean {
-    const current = this.filterScope;
-    const filtering = current && filter('currentScope');
-    const filterScope = filtering ? prop.scope === current : true;
-    return filterScope && filterProperty(prop);
+    return  filterSource(prop, this.filterScope) && filterProperty(prop);
   }
 
 }
@@ -621,7 +631,6 @@ function PropertyFilter(): JSX.Element {
 
   return (
     <Scroll>
-      <CheckField label={DEFAULTS.currentScope.label} path="currentScope" />
       <Section
         label="Search"
         defaultUnfold={true}
@@ -641,9 +650,9 @@ function PropertyFilter(): JSX.Element {
         />
       </Section>
 
+      <FilterSection label="Source" prefix="source"> { getCheckBox("source") } </FilterSection>
       <FilterSection label="Status" prefix="status" unfold> { getCheckBox("status") } </FilterSection>
       <FilterSection label="Property kind" prefix="kind"> { getCheckBox("kind") } </FilterSection>
-      <FilterSection label="Source" prefix="source"> { getCheckBox("source") } </FilterSection>
       <FilterSection label="Alarms kind" prefix="alarms"> { getCheckBox("alarms") } </FilterSection>
       <FilterSection label="Eva"> { getCheckBox("eva") } </FilterSection>
     </Scroll>
