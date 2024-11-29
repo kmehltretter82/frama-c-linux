@@ -48,7 +48,7 @@ import * as State from 'ivette/state';
 type tabKey = string;
 type viewId = string;
 
-export interface Split { H: number, V: number }
+export interface Split { HTOP: number, HBOTTOM: number, V: number }
 export interface Layout { A: compId, B: compId, C: compId, D: compId }
 
 export interface TabViewState {
@@ -71,7 +71,7 @@ export interface LabViewState {
   sideComp: compId; // from Sidebar selection
 }
 
-const defaultSplit: Split = { H: 0.5, V: 0.5 };
+const defaultSplit: Split = { HTOP: 0.5, HBOTTOM: 0.5, V: 0.5 };
 const defaultLayout: Layout = { A: '', B: '', C: '', D: '' };
 
 const LAB = new States.GlobalState<LabViewState>({
@@ -118,7 +118,8 @@ const jLayout: Json.Decoder<Layout> =
 
 const jSplit: Json.Decoder<Split> =
   Json.jObject({
-    H: Json.jRange(0, 1, 0.5),
+    HTOP: Json.jRange(0, 1, 0.5),
+    HBOTTOM: Json.jRange(0, 1, 0.5),
     V: Json.jRange(0, 1, 0.5),
   });
 
@@ -1005,12 +1006,13 @@ function Pane(props: PaneProps): JSX.Element | null {
 export function LabView(): JSX.Element {
   const [state] = States.useGlobalState(LAB);
   const setPosition = React.useCallback(
-    (H: number, V: number) => LAB.setValue({ ...state, split: { H, V } }),
+    (HTOP: number, HBOTTOM: number, V: number) =>
+      LAB.setValue({ ...state, split: { HTOP, HBOTTOM, V } }),
     [state]
   );
   const layout = state.stack[0] ?? defaultLayout;
   const { A, B, C, D } = layout;
-  const { H, V } = state.split;
+  const { HTOP, HBOTTOM, V } = state.split;
   const panels: JSX.Element[] = [];
   state.panels.forEach((id) => panels.push(<Pane key={id} compId={id} />));
   return (
@@ -1019,7 +1021,7 @@ export function LabView(): JSX.Element {
       <Notifications />
       <QSplit
         className='labview-container'
-        A={A} B={B} C={C} D={D} H={H} V={V}
+        A={A} B={B} C={C} D={D} HTOP={HTOP} HBOTTOM={HBOTTOM} V={V}
         setPosition={setPosition}
       >{panels}</QSplit>
     </>
