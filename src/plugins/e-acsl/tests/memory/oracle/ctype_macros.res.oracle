@@ -1,7 +1,4 @@
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `isupper':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/ctype.h:173: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.

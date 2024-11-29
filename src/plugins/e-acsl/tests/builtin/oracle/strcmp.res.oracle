@@ -1,18 +1,6 @@
 [variadic] strcmp.c:18: Warning: 
   Call to function fprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `abort':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `exit':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `waitpid':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `fork':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `strdup':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.

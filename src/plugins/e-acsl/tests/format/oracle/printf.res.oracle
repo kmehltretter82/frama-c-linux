@@ -2,24 +2,6 @@
   Floating-point constant 0.2 is not represented exactly. Will use 0x1.999999999999ap-3.
   (warn-once: no further messages from category 'parser:decimal-float' will be emitted)
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `abort':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `exit':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `waitpid':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `fork':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strlen':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `strchr':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
