@@ -1,10 +1,4 @@
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `fclose':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `fopen':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/stdio.h:389: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.

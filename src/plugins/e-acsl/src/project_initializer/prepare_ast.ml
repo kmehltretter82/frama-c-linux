@@ -605,6 +605,24 @@ let spec_has_only_terminates spec =
   spec.spec_disjoint_behaviors = [] &&
   spec.spec_complete_behaviors = []
 
+let spec_contains_mem_property spec =
+  List.exists (fun behavior ->
+      List.exists (fun (_, pred) ->
+          let node = pred.ip_content.tp_statement.pred_content in
+          match node with
+          (* check postconditions for memory properties*)
+          | Pvalid (_,_) | Pvalid_read (_,_) | Pvalid_function _
+          | Pobject_pointer (_,_) | Pinitialized (_,_) | Pfresh(_,_,_,_)
+          | Pdangling (_,_) | Pallocable (_,_) | Pfreeable (_,_)
+          | Pseparated _ -> true
+          | _ -> false) behavior.b_post_cond
+      ||
+      (* check contract for \allocates predicates *)
+      match behavior.b_allocation with
+      | FreeAlloc ([], []) -> false
+      | FreeAlloc(_,_) -> true
+      | FreeAllocAny -> false) spec.spec_behavior
+
 let must_duplicate kf vi =
   (* it is not already duplicated *)
   not (Dup_functions.mem vi)
@@ -636,7 +654,8 @@ let prepare_global (globals, new_defs) = function
       let new_vi = Dup_functions.generate_vi vi in
       if Kernel_function.is_definition kf then
         prepare_fundec kf
-      else if not (!is_libc_writing_memory_ref vi) then
+      else if not (!is_libc_writing_memory_ref vi)
+           && (spec_contains_mem_property (Annotations.funspec kf)) then
         (* Only display the warning for functions where E-ACSL does not
            explicitely update its memory model. *)
         (* TODO: this warning could be more precise if emitted during code

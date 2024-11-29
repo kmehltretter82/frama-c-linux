@@ -1,16 +1,4 @@
 [e-acsl] beginning translation.
-[e-acsl] Warning: annotating undefined function `abort':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `exit':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `waitpid':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `fork':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] Warning: annotating undefined function `strdup':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.

@@ -2,12 +2,6 @@
 [e-acsl] Due to the large number of function pointers in concurrent
   code, the memory tracking dataflow analysis is deactivated
   when activating the concurrency support of E-ACSL.
-[e-acsl] Warning: annotating undefined function `pthread_create':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
-[e-acsl] Warning: annotating undefined function `pthread_join':
-  the generated program may miss memory instrumentation
-  if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/pthread.h:405: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
