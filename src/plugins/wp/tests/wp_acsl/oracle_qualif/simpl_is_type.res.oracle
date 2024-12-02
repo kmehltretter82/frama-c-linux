@@ -1,4 +1,4 @@
-# frama-c -wp -wp-timeout 3 [...]
+# frama-c -wp -wp-timeout 10 [...]
 [kernel] Parsing simpl_is_type.i (no preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal check_acsl_exits (Cfg) (Unreachable)
