@@ -43,6 +43,7 @@ import React from 'react';
 import Emitter from 'events';
 import { createRoot } from 'react-dom/client';
 import { ipcRenderer } from 'electron';
+import { join } from 'path';
 
 import SYS, * as System from 'dome/system';
 import { State, GlobalState, useGlobalState } from './data/states';
@@ -830,9 +831,25 @@ export function useFileContent(
 ): string {
   const [ fileContent, setFileContent ] = React.useState("");
   const callback = useProtected(setFileContent);
-  System.getFileContent(path, callback);
+  System.readFile(path)
+    .then((response) => callback(response.toString()))
+    .catch((error) => {
+      // eslint-disable-next-line no-console
+      console.error('Error while loading the file :', error);
+    });
   return fileContent;
 }
+
+/**
+ * A hook to retrieve text from a doc file.
+ * @param path Path from ivette's 'doc' directory
+ */
+export function useDocContent(
+  path: string,
+): string {
+  return useFileContent(join(process.cwd(), 'ivette/doc/', path));
+}
+
 
 /**
    Debounced callback (waiting time in milliseconds).

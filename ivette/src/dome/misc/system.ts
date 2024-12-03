@@ -658,27 +658,3 @@ export default {
 };
 
 // --------------------------------------------------------------------------
-// --- Get filecontent
-// --------------------------------------------------------------------------
-
-export function getFileContent(
-  path: string,
-  callback: (val: string) => void
-): void {
-  fetch(path)
-    .then((response) => {
-        if (!response.ok) {
-          // Statut HTTP 404 ou autre erreur
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.text();
-    })
-    .then(callback)
-    .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.error('Error while loading the file :', error);
-    }
-  );
-}
-
-// --------------------------------------------------------------------------
