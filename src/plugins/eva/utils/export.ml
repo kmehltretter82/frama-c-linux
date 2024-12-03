@@ -131,7 +131,7 @@ let fmax ~kind (exp : Exp.exp) (b : Fval.F.t) : pred =
   else True
 
 let frange ~kind (exp : Exp.exp) = function
-  | None -> True
+  | None -> False
   | Some(a,b) -> pand (fmin ~kind exp a) (fmax ~kind exp b)
 
 let fval typ (exp : Exp.exp) (fval : Fval.t) : pred =
