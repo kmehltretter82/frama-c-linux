@@ -268,7 +268,7 @@ let generated = Emitter.create "Eva_domain"
     ~correctness:[]
     ~tuning:[]
 
-class generator =
+let generator () : visitor =
   object(self)
     inherit Visitor.frama_c_inplace
     val mutable dead = Stmts.empty (* annotated as dead *)
@@ -300,13 +300,11 @@ class generator =
 
   end
 
-let generator () = (new generator :> visitor)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Annotation Removal                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-class cleaner =
+let cleaner () : visitor =
   object(self)
     inherit Visitor.frama_c_inplace
 
@@ -326,8 +324,6 @@ class cleaner =
 
   end
 
-let cleaner () = (new cleaner :> visitor)
-
 (* -------------------------------------------------------------------------- *)
 (* --- Command Line Option                                                --- *)
 (* -------------------------------------------------------------------------- *)
@@ -340,7 +336,7 @@ let main () =
       let cleaner = cleaner () in
       Self.feedback ~ontty:`Transient "Cleaning annotations..." ;
       Visitor.visitFramacFile cleaner ast ;
-      new generator
+      generator ()
     end
   in Parameters.Annot.iter
     begin fun kf ->
