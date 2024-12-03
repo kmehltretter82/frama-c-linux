@@ -134,14 +134,13 @@ let frange ~kind (exp : Exp.exp) = function
   | None -> True
   | Some(a,b) -> pand (fmin ~kind exp a) (fmax ~kind exp b)
 
-let fval ~kind (exp : Exp.exp) (fval : Fval.t) : pred =
+let fval typ (exp : Exp.exp) (fval : Fval.t) : pred =
+  let kind =
+    match typ with
+    | TFloat(kind,_) -> kind
+    | _ -> assert false in
   let range,isNaN = Fval.min_and_max fval in
   por (fNaN exp isNaN) (frange ~kind exp range)
-
-let fkind (typ : typ) =
-  match typ with
-  | TFloat(kind,_) -> kind
-  | _ -> assert false
 
 (* -------------------------------------------------------------------------- *)
 (* --- Values                                                             --- *)
@@ -151,14 +150,10 @@ type value = Results.value Results.evaluation
 
 let domain (exp : Exp.exp) typ (value : value) : pred =
   if Cil.isIntegralType typ then
-    match Results.as_ival value with
-    | Ok v -> ival exp v
-    | Error err -> error err
+    Results.as_ival value |> Result.fold ~error ~ok:(ival exp)
   else
   if Cil.isFloatingType typ then
-    match Results.as_fval value with
-    | Ok v -> fval ~kind:(fkind typ) exp v
-    | Error err -> error err
+    Results.as_fval value |> Result.fold ~error ~ok:(fval typ exp)
   else True
 
 (* -------------------------------------------------------------------------- *)
