@@ -578,13 +578,7 @@ struct
     | Addr lv ->
       Cil.mkAddrOrStartOf ~loc (build_lval ~scope ~loc lv)
 
-  let coerce_term_exp ~restyp exp =
-    match restyp with
-    | None ->
-      Logic_utils.expr_to_term ~coerce:true exp
-    | Some newt ->
-      Logic_utils.expr_to_term ~coerce:false @@ Cil.mkCast ~newt exp
-
+  (* restyp is the type of result *)
   let rec build_term_lval ~scope ~loc ~restyp = function
     | Result -> Cil_types.(TResult (Option.get restyp), TNoOffset)
     | CilLval lv -> Logic_utils.lval_to_term_lval lv
@@ -631,8 +625,10 @@ struct
 
   and build_term ~scope ~loc ~restyp = function
     | Const (CilConstant c) ->
-      coerce_term_exp ~restyp @@ Cil.new_exp ~loc (Cil_types.Const c)
-    | CilExp exp | CilExpCopy exp -> coerce_term_exp ~restyp exp
+      Logic_utils.expr_to_term ~coerce:false @@
+      Cil.new_exp ~loc (Cil_types.Const c)
+    | CilExp exp | CilExpCopy exp ->
+      Logic_utils.expr_to_term ~coerce:true exp
     | Pred _ as e ->
       raise (NotATerm (`exp e))
     | CilTerm term -> term
