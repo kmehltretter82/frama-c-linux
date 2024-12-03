@@ -26,17 +26,22 @@ import ReactMarkdown, { Components, Options } from 'react-markdown';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 
-export interface IReplacement {
-  regex: RegExp,
-  transform: (key: number, match?: RegExpExecArray) => JSX.Element | null
+export interface Pattern {
+  pattern: RegExp,
+  replace: (key: number, match?: RegExpExecArray) => JSX.Element | null
 }
 
-export const iconTagReplacement: IReplacement = {
-  regex: /\[icon-([^\]]+)\]/g,
-  transform: (key: number, match?: RegExpExecArray) => {
+export const iconTag: Pattern = {
+  pattern: /\[icon-([^\]]+)\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
     return match ? <Icon key={key} id={match[1]}/> : null;
   }
 };
+
+class Counter {
+  private val: number = 0;
+  increment(): number { return this.val++; }
+}
 
 // --------------------------------------------------------------------------
 // --- Replacement function
@@ -47,28 +52,31 @@ export const iconTagReplacement: IReplacement = {
  */
 function replaceTagsByElement(
   text: string,
-  replacement?: IReplacement[]
+  counter: Counter,
+  patterns?: Pattern[],
 ): (string | JSX.Element | null)[] {
-  if(!replacement || replacement.length < 1) return [text];
+  if(!patterns || patterns.length < 1) return [text];
 
-  const { regex, transform } = replacement[0];
-  replacement.shift();
+  const { pattern, replace } = patterns[0];
+  patterns.shift();
 
   const newContent = [];
   let match;
   let lastIndex = 0;
-  while ((match = regex.exec(text)) !== null) {
+
+  while ((match = pattern.exec(text)) !== null) {
     if (match.index > lastIndex) {
       const before = replaceTagsByElement(
-        text.slice(lastIndex, match.index), replacement
+        text.slice(lastIndex, match.index), counter, patterns
       );
       before.forEach((elt) => newContent.push(elt));
     }
-    newContent.push(transform(Math.random(), match));
-    lastIndex = regex.lastIndex;
+    newContent.push(replace(counter.increment(), match));
+    lastIndex = pattern.lastIndex;
   }
   if (lastIndex < text.length) {
-    const after = replaceTagsByElement(text.slice(lastIndex), replacement);
+    const after = replaceTagsByElement(
+      text.slice(lastIndex), counter, patterns);
     after.forEach((elt) => newContent.push(elt));
   }
   return newContent;
@@ -76,13 +84,14 @@ function replaceTagsByElement(
 
 function replaceTags(
   children: React.ReactNode,
-  replacement: IReplacement[]
+  patterns: Pattern[],
+  counter: Counter
 ): React.ReactNode {
   const childrenTab = React.Children.toArray(children);
 
   const newContent = childrenTab.map((child) => {
     if (typeof child === 'string') {
-      return replaceTagsByElement(child, replacement.slice());
+      return replaceTagsByElement(child, counter, patterns.slice());
     }
     return child;
   });
@@ -101,7 +110,7 @@ interface MarkdownProps {
   /** html tag of the markdown to be processed and possible replacement */
   htmlTag?: tagHtmlList;
   /** Tab of tag replacement */
-  replacement?: IReplacement[];
+  pattern?: Pattern[];
   /** Children */
   children?: string | null;
 }
@@ -109,14 +118,15 @@ interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, replacement, htmlTag, children } = props;
+  const { className, pattern, htmlTag, children } = props;
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages",
     className,
   );
 
+  const counter = new Counter();
   const transformChildren = (c: React.ReactNode): React.ReactNode => {
-    return !replacement ? c : replaceTags(c, replacement);
+    return !pattern ? c : replaceTags(c, pattern, counter);
   };
 
   const getComponentsOption = (): Components | null => {
