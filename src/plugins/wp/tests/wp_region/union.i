@@ -1,3 +1,7 @@
+/* run.config_qualif
+   OPT: -wp-model region -wp-timeout 5
+ */
+
 union U {
     short s[2];
     int i;

@@ -1,10 +1,10 @@
-# frama-c -wp -wp-model 'Region' [...]
+# frama-c -wp -wp-model 'Region' -wp-timeout 5 [...]
 [kernel] Parsing heterogenous_cast.c (with preprocessing)
 [wp] Running WP plugin...
 [wp] [Valid] Goal g_exits (Cfg) (Unreachable)
 [wp] [Valid] Goal g_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
-[region] heterogenous_cast.c:9: Warning: Annotations not analyzed
+[region] heterogenous_cast.c:11: Warning: Annotations not analyzed
 [wp] 4 goals scheduled
 [wp] [Valid] region_g_assert (Alt-Ergo) (Cached)
 [wp] [Valid] region_g_assigns_part1 (Qed)

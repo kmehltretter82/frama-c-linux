@@ -45,8 +45,8 @@
     "why3": {
         "branch": "master",
         "repo": "https://gitlab.inria.fr/why3/why3.git",
-        "rev": "ee474fdf493de18a702f9c503e104cea58dc22af",
+        "rev": "1343338d3bb1941c0d4f134283bb0790816113c4",
         "type": "git",
-        "version": "1.7.1"
+        "version": "1.7.2"
     }
 }
