@@ -72,7 +72,7 @@ let predicate ~loc ?(name=[]) (p : pred) : predicate =
       let ts = List.map (Exp.cil_term ~loc) es in
       let ls = Logic_env.find_all_logic_functions f in
       match List.find_opt (matches_params ts) ls with
-      | None -> invalid_arg "Eva.Export.predicate"
+      | None -> Self.fatal "[Export] Unknown predicate '%s'" f
       | Some li -> Logic_const.papp ~loc (li,[],ts)
   in { (aux p) with pred_name = name }
 
