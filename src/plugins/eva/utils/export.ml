@@ -149,7 +149,7 @@ let fkind (typ : typ) =
 
 type value = Results.value Results.evaluation
 
-let value (exp : Exp.exp) typ (value : value) : pred =
+let domain (exp : Exp.exp) typ (value : value) : pred =
   if Cil.isIntegralType typ then
     match Results.as_ival value with
     | Ok v -> ival exp v
@@ -167,83 +167,65 @@ let value (exp : Exp.exp) typ (value : value) : pred =
 
 let eval_value ~loc ?name lv request =
   Results.eval_lval lv request
-  |> value (Exp.of_lval lv) (Cil.typeOfLval lv)
+  |> domain (Exp.of_lval lv) (Cil.typeOfLval lv)
   |> predicate ?name ~loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Instructions                                                       --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Slv = Cil_datatype.LvalStructEq.Set
+module Lvs = Cil_datatype.LvalStructEq.Set
 
-class evaluator request =
+class collector =
   object(self)
     inherit Visitor.frama_c_inplace
+    val mutable marked = Lvs.empty
+    val mutable collected = []
 
-    val mutable locked = Slv.empty
-    val mutable domain : pred list = []
+    method private add lv =
+      if not @@ Lvs.mem lv marked then
+        ( marked <- Lvs.add lv marked ; collected <- lv :: collected )
 
-    method add p = if p <> True then domain <- p::domain
-    method flush = List.rev domain
+    method flush = collected
 
-    method !vlval lv =
-      if not @@ Slv.mem lv locked then
-        begin
-          locked <- Slv.add lv locked ;
-          self#add @@ value (Exp.of_lval lv) (Cil.typeOfLval lv) @@
-          Results.eval_lval lv request ;
-          Cil.DoChildren
-        end
-      else Cil.SkipChildren
+    method! vlval lv = self#add lv ; DoChildren
+    method! vterm_lval lv =
+      begin
+        match Logic_to_c.term_lval_to_lval lv with
+        | exception Logic_to_c.No_conversion -> ()
+        | lv -> self#add lv
+      end ; DoChildren
 
-    method !vterm_lval lv =
-      try
-        let _ = self#vlval @@ Logic_to_c.term_lval_to_lval lv in
-        DoChildren
-      with Logic_to_c.No_conversion ->
-        DoChildren
+    method add_lhs lv =
+      ignore @@ Visitor.visitFramacOffset (self :> visitor) (snd lv) ;
+      match fst lv with Var _ -> () | Mem e -> self#add_expr e
 
-    method private visit_expr e =
+    method add_expr e =
       ignore @@ Visitor.visitFramacExpr (self :> visitor) e
 
-    method private visit_offset ofs =
-      ignore @@ Visitor.visitFramacOffset (self :> visitor) ofs
-
-    method private visit_host = function
-      | Var _ -> ()
-      | Mem e -> self#visit_expr e
-
-    method private visit_lset lv =
-      begin
-        self#visit_host (fst lv) ;
-        self#visit_offset (snd lv) ;
-      end
-
-    method !vinst = function
-      | Set(lv,exp,_) ->
-        self#visit_lset lv ;
-        self#visit_expr exp ;
-        SkipChildren
-      | Call(lr,_,es,_) ->
-        Option.iter self#visit_lset lr ;
-        List.iter self#visit_expr es ;
-        SkipChildren
-      | Local_init _ | Asm _ | Skip _ | Code_annot _ ->
-        DoChildren
-
-    method !vstmt_aux stmt =
-      match stmt.skind with
-      (* Instructions *)
-      | Instr _ | Return _ -> DoChildren
-      (* Branching expressions *)
-      | If(e,_,_,_) | Switch(e,_,_,_) -> self#visit_expr e ; SkipChildren
-      (* Blocks & Jumps *)
-      | Goto _ | Break _ | Continue _
-      | Loop _ | Block _ | UnspecifiedSequence _
-      | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
-        -> SkipChildren
+    method add_instr instr =
+      ignore @@ Visitor.visitFramacInstr (self :> visitor) instr
 
   end
+
+let collect stmt =
+  let acc = new collector in
+  begin
+    match stmt.skind with
+    (* Instructions *)
+    | Instr (Set(lv,e,_)) ->
+      acc#add_lhs lv ; acc#add_expr e
+    | Instr instr -> acc#add_instr instr
+    (* Branching expressions *)
+    | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> acc#add_expr e
+    (* Others *)
+    | Return(None,_) -> ()
+    | Goto _ | Break _ | Continue _
+    | Loop _ | Block _ | UnspecifiedSequence _
+    | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
+      -> ()
+  end ;
+  acc#flush
 
 let eval_instr ?callstack ?name stmt =
   let request =
@@ -253,9 +235,12 @@ let eval_instr ?callstack ?name stmt =
     | Some c -> Results.in_callstack c r in
   List.map (predicate ?name ~loc:(Cil_datatype.Stmt.loc stmt)) @@
   if Results.is_empty request then [False] else
-    let engine = new evaluator request in
-    let _ = Visitor.visitFramacStmt (engine :> visitor) stmt in
-    engine#flush
+    List.fold_left
+      (fun ps lv ->
+         let e = Results.eval_lval lv request in
+         let p = domain (Exp.of_lval lv) (Cil.typeOfLval lv) e in
+         if p <> True then p :: ps else ps
+      ) [] (collect stmt)
 
 let is_dead stmt = Results.is_empty @@ Results.before stmt
 
