@@ -72,7 +72,7 @@ let predicate ~loc ?(name=[]) (p : pred) : predicate =
       let ts = List.map (Exp.cil_term ~loc) es in
       let ls = Logic_env.find_all_logic_functions f in
       match List.find_opt (matches_params ts) ls with
-      | None -> raise (Invalid_argument ("Eva.Annot." ^ f))
+      | None -> invalid_arg "Eva.Export.predicate"
       | Some li -> Logic_const.papp ~loc (li,[],ts)
   in { (aux p) with pred_name = name }
 
@@ -333,26 +333,30 @@ let cleaner () = (new cleaner :> visitor)
 (* -------------------------------------------------------------------------- *)
 
 let main () =
-  if Analysis.is_computed () then
-    let ast = Ast.get () in
-    let cleaner = cleaner () in
-    Self.feedback ~ontty:`Transient "Cleaning annotations..." ;
-    Visitor.visitFramacFile cleaner ast ;
-    let generator = new generator in
-    Parameters.Annot.iter
-      begin fun kf ->
-        if Kernel_function.has_definition kf then
-          if Results.are_available kf then
-            let fundec = Kernel_function.get_definition kf in
-            Self.feedback "Annotate %a" Kernel_function.pretty kf ;
-            ignore @@ Visitor.visitFramacFunction generator fundec
-          else
-            Self.warning "Can not annotate %a (no available results)"
-              Kernel_function.pretty kf
+  let generator = lazy
+    begin
+      Analysis.compute () ;
+      let ast = Ast.get () in
+      let cleaner = cleaner () in
+      Self.feedback ~ontty:`Transient "Cleaning annotations..." ;
+      Visitor.visitFramacFile cleaner ast ;
+      new generator
+    end
+  in Parameters.Annot.iter
+    begin fun kf ->
+      let generator = Lazy.force generator in
+      if Kernel_function.has_definition kf then
+        if Results.are_available kf then
+          let fundec = Kernel_function.get_definition kf in
+          Self.feedback "Annotate %a" Kernel_function.pretty kf ;
+          ignore @@ Visitor.visitFramacFunction generator fundec
         else
-          Self.warning "Can not annotate %a (no definition)"
+          Self.warning "Can not annotate %a (no available results)"
             Kernel_function.pretty kf
-      end
+      else
+        Self.warning "Can not annotate %a (no definition)"
+          Kernel_function.pretty kf
+    end
 
 let () = Boot.Main.extend main
 
