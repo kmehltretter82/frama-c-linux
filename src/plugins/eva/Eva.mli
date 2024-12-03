@@ -961,7 +961,7 @@ module Unit_tests: sig
   val run: unit -> unit
 end
 
-module Annot: sig
+module Export: sig
   open Cil_types
 
   (* -------------------------------------------------------------------------- *)
