@@ -56,30 +56,33 @@ function replaceTagsByElement(
   patterns?: Pattern[],
 ): (string | JSX.Element | null)[] {
   if(!patterns || patterns.length < 1) return [text];
-
-  const { pattern, replace } = patterns[0];
-  patterns.shift();
-
-  const newContent = [];
+  type Content = string | JSX.Element | null;
+  let newContent: (Content|Content[])[] = [text];
   let match;
-  let lastIndex = 0;
+  let lastIndex: number;
 
-  while ((match = pattern.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      const before = replaceTagsByElement(
-        text.slice(lastIndex, match.index), counter, patterns
-      );
-      before.forEach((elt) => newContent.push(elt));
-    }
-    newContent.push(replace(counter.increment(), match));
-    lastIndex = pattern.lastIndex;
-  }
-  if (lastIndex < text.length) {
-    const after = replaceTagsByElement(
-      text.slice(lastIndex), counter, patterns);
-    after.forEach((elt) => newContent.push(elt));
-  }
-  return newContent;
+  patterns.forEach(({ pattern, replace }) => {
+    newContent = newContent.flat();
+    newContent.slice().forEach((content, i) => {
+      if(typeof content === "string") {
+        const contentTab: (string | JSX.Element | null)[] = [];
+        lastIndex = 0;
+        while ((match = pattern.exec(content)) !== null) {
+          if (match.index > lastIndex) {
+            contentTab.push(content.slice(lastIndex, match.index));
+          }
+          contentTab.push(replace(counter.increment(), match));
+          lastIndex = pattern.lastIndex;
+        }
+        if (lastIndex < content.length) {
+          contentTab.push(content.slice(lastIndex));
+        }
+        newContent.splice(i, 1, contentTab);
+      }
+    });
+  });
+
+  return newContent.flat();
 }
 
 function replaceTags(
