@@ -27,6 +27,7 @@ Plugin E-ACSL <next-release>
 
 -* E-ACSL	[2024-11-12] reduce the number of "annotating undefined
 		function" warnings for functions that do not affect memory
+
 ###############################################################################
 Plugin E-ACSL 30.0 (Zinc)
 ###############################################################################
