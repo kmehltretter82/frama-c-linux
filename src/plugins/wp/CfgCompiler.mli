@@ -220,12 +220,12 @@ sig
   *)
 
 
-  val effect : node -> E.t -> node -> cfg
+  val memory_effect : node -> E.t -> node -> cfg
   (** Represents all execution trace [T] such that, if [T] contains node [a],
       then [T] also contains [b] with the given effect on corresponding
       memory states.
 
-      Formally: [| effect a e b |]_I iff (( I(a) iff I(b) ) /\ [| e |]_I )
+      Formally: [| memory_effect a e b |]_I iff (( I(a) iff I(b) ) /\ [| e |]_I )
   *)
 
   val assume : P.t -> cfg
@@ -237,7 +237,7 @@ sig
       Formally: [| assume P |]_I iff [| P |]_I
   *)
 
-  val havoc : node -> effects:node sequence -> node -> cfg
+  val havoc : node -> memory_effects:node sequence -> node -> cfg
   (** Inserts an assigns effect between nodes [a] and [b], correspondings
       to all the written memory chunks accessible in execution paths delimited
       by the [effects] sequence of nodes.

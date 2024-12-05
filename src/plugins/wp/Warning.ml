@@ -32,7 +32,7 @@ struct
     severe : bool ;
     source : string ;
     reason : string ;
-    effect : string ;
+    fallback : string ;
   }
 
   let compare w1 w2 =
@@ -66,9 +66,9 @@ let pretty fmt w =
       w.source ;
     if w.severe then
       Format.fprintf fmt " - Warning: %s, looking for context inconsistency"
-        w.effect
+        w.fallback
     else
-      Format.fprintf fmt " - Warning: %s" w.effect ;
+      Format.fprintf fmt " - Warning: %s" w.fallback ;
     Format.fprintf fmt "@\n   Reason: %s@]" w.reason ;
   end
 
@@ -115,7 +115,7 @@ let add w =
   let c = Context.get collector in
   c.warnings <- Set.add w c.warnings
 
-let kprintf phi ?(log=true) ?(severe=false) ?source ~effect message =
+let kprintf phi ?(log=true) ?(severe=false) ?source ~fallback message =
   let source = match source with Some s -> s | None -> default () in
   let buffer = Buffer.create 80 in
   Format.kfprintf
@@ -129,23 +129,23 @@ let kprintf phi ?(log=true) ?(severe=false) ?source ~effect message =
          loc = fst loc ;
          severe = severe ;
          source = source ;
-         effect = effect ;
+         fallback = fallback ;
          reason = text ;
        })
     (Format.formatter_of_buffer buffer)
     message
 
-let create ?log ?severe ?source ~effect msg =
-  kprintf (fun w -> w) ?log ?severe ?source ~effect msg
+let create ?log ?severe ?source ~fallback msg =
+  kprintf (fun w -> w) ?log ?severe ?source ~fallback msg
 
-let emit ?severe ?source ~effect msg =
-  kprintf add ~log:true ?severe ?source ~effect msg
+let emit ?severe ?source ~fallback msg =
+  kprintf add ~log:true ?severe ?source ~fallback msg
 
-let handle ?(severe=false) ~effect ~handler cc x =
+let handle ?(severe=false) ~fallback ~handler cc x =
   try cc x
   with Error(source,reason) ->
     if Context.defined collector then
-      ( emit ~severe ~source ~effect "%s" reason ; handler x )
+      ( emit ~severe ~source ~fallback "%s" reason ; handler x )
     else
     if source <> "wp" then
       Wp_parameters.fatal ~current:true "[%s] %s" source reason
@@ -156,9 +156,9 @@ type 'a outcome =
   | Result of Set.t * 'a
   | Failed of Set.t
 
-let catch ?source ?(severe=true) ~effect cc x =
+let catch ?source ?(severe=true) ~fallback cc x =
   let wrn = context ?source () in
   try let y = cc x in Result(flush wrn,y) (* DO NOT inline this let *)
   with Error(source,reason) ->
-    emit ~severe ~source ~effect "%s" reason ;
+    emit ~severe ~source ~fallback "%s" reason ;
     Failed (flush wrn)

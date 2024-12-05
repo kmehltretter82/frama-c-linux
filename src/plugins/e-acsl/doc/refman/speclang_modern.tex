@@ -348,9 +348,7 @@ clauses. Section~\ref{sec:termination} explains why \eacsl has no
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{Built-in constructs %
-  \texorpdfstring{\old}{\textbackslash{}old} %
- and \texorpdfstring{\result}{\textbackslash{}result}}
+\subsection{Pre- and Post- state}
 \label{sec:builtinconstructs}
 
 \nodiff
@@ -622,6 +620,9 @@ Figure~\ref{fig:gram:stcontracts} shows the grammar of statement contracts.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\subsection{Measure}
+\nodiff
+
 \subsection{\notimplemented{Integer measures}}
 \label{sec:integermeasures}
 \indexttbs{decreases}\indexttbs{variant}
@@ -643,6 +644,9 @@ Figure~\ref{fig:gram:stcontracts} shows the grammar of statement contracts.
 \subsection{Non-terminating functions}
 \absentwhy{whether a function is guaranteed to terminate if some predicate $p$
   holds is not a monitorable property}
+
+\subsection{Measures and non-terminating functions}
+\nodiff
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

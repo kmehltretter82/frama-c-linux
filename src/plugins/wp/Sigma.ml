@@ -170,7 +170,7 @@ struct
     end
 
   let writes seq =
-    let effect = ref Chunk.Set.empty in
+    let writes = ref Chunk.Set.empty in
     iter2
       (fun chunk u v ->
          let written =
@@ -180,8 +180,8 @@ struct
            | Some _ , None -> false (* no need to create a new so it is the same *)
            | None, None -> assert false
          in
-         if written then effect := Chunk.Set.add chunk !effect
+         if written then writes := Chunk.Set.add chunk !writes
       ) seq.Sigs.pre seq.Sigs.post ;
-    !effect
+    !writes
 
 end

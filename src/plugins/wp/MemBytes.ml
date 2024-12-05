@@ -758,7 +758,7 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
       let sizeof x =
         Warning.handle
           ~handler:(fun _ -> None)
-          ~effect:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
+          ~fallback:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
           (fun obj -> Some (protected_sizeof_object obj))
           (Ctypes.object_of x.vtype)
 

@@ -113,9 +113,9 @@ sig
   val guard' : node -> C.t -> node -> cfg
   val either : node -> node list -> cfg
   val implies : node -> (C.t * node) list -> cfg
-  val effect : node -> E.t -> node -> cfg
+  val memory_effect : node -> E.t -> node -> cfg
   val assume : P.t -> cfg
-  val havoc : node -> effects:node sequence -> node -> cfg
+  val havoc : node -> memory_effects:node sequence -> node -> cfg
 
   val compile : ?name:string -> ?mode:mode -> node -> Node.Set.t -> S.domain Node.Map.t ->
     cfg -> F.pred Node.Map.t * S.t Node.Map.t * Conditions.sequence
@@ -563,7 +563,7 @@ struct
     | [g,dest] -> guard node g dest
     | node_list -> edge node (Implies(node_list))
 
-  let effect node1 e node2 =
+  let memory_effect node1 e node2 =
     edge node1 (Effect(e, node2))
 
   let assume (predicate:P.t) =
@@ -571,7 +571,7 @@ struct
     then nop
     else new_env ~assumes:(Bag.elt predicate) ()
 
-  let havoc node1 ~effects:node_seq node2 =
+  let havoc node1 ~memory_effects:node_seq node2 =
     edge node1 (Havoc(node_seq,node2))
 
   let option_bind ~f = function
@@ -617,9 +617,9 @@ struct
            (fun acc (_,node2) -> union_opt_or S.union
                acc (effects env post node2))
            None l)
-      | Effect (effect , node2) ->
+      | Effect (memory_effect , node2) ->
         add_only_if_alive S.union
-          (E.writes effect)
+          (E.writes memory_effect)
           (effects env post node2)
       | Havoc (m, node2) ->
         union_opt_and S.union
@@ -925,13 +925,13 @@ struct
             in
             add_edge node (Implies l);
             s1
-          | Effect (effect , node2) ->
+          | Effect (memory_effect , node2) ->
             let s2 = aux node2 in
-            let s1 = S.remove_chunks s2 (E.writes effect) in
+            let s1 = S.remove_chunks s2 (E.writes memory_effect) in
             allocate dom s1;
-            allocate (E.reads effect) s1;
-            let effect = E.relocate {pre=s1;post=s2} effect in
-            add_edge node (Effect(effect,node2));
+            allocate (E.reads memory_effect) s1;
+            let memory_effect = E.relocate {pre=s1;post=s2} memory_effect in
+            add_edge node (Effect(memory_effect,node2));
             s1
           | Havoc (eff, node2) ->
             let s2 = aux node2 in
@@ -1431,7 +1431,7 @@ struct
             Node.Set.fold (fun p cfg ->
                 let s = {pre=S.create();post=S.create()} in
                 let e =  s,Lang.F.p_true in
-                let goto = effect p e final_node in
+                let goto = memory_effect p e final_node in
                 concat goto cfg
               ) posts env
           in

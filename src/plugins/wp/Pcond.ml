@@ -209,7 +209,7 @@ class engine (lang : #Plang.engine) =
     method pp_warning fmt w =
       let open Warning in
       Format.fprintf fmt "@[<hov 0>@{<wp:warning>Warning@}[%s]: %s@ (%s).@]"
-        w.source w.reason w.effect
+        w.source w.reason w.fallback
 
     method pp_definition fmt x e =
       Format.fprintf fmt "@[<hov 4>%a %a = %a.@]"

@@ -556,7 +556,7 @@ module BASE = WpContext.Generator(Varinfo)
       let sizeof x =
         Warning.handle
           ~handler:(fun _ -> None)
-          ~effect:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
+          ~fallback:(Printf.sprintf "No allocation size for variable '%s'" x.vname)
           (fun t -> Some (length_of_object @@ Ctypes.object_of t))
           x.vtype
 
@@ -950,7 +950,7 @@ let cast s l =
       | Unsafe ->
         if not (Layout.fits ~dst:s.post ~src:s.pre) then
           Warning.emit ~severe:false ~source:"Typed Model"
-            ~effect:"Keep pointer value"
+            ~fallback:"Keep pointer value"
             "%a" pp_mismatch s ; l
     end
 
