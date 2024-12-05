@@ -46,19 +46,6 @@ Use the script \texttt{bin/check-reference-configuration.sh} to either:
 
 The tasks listed in this section are performed by the Release Manager.
 
-\subsection{Versions in documentation files}
-
-For final release only, remove \texttt{\textasciitilde{}beta} and
-\texttt{-beta} mentions in the following files :
-\begin{itemize}
-  \item \texttt{VERSION}
-  \item \texttt{opam}
-    \begin{itemize}
-      \item in version field
-      \item in the doc link
-    \end{itemize}
-\end{itemize}
-
 \subsection{Versions in source: API documentation}
 
 Check that no \verb|+dev| suffix remains inside comments:
@@ -188,7 +175,7 @@ you might want to install the
   \item \texttt{bin/frama-c-gui} for the old GUI.
   \item \texttt{bin/ivette} for the new GUI.
 \end{itemize}
-\Eva can be tested with \texttt{<gui> -eva tests/idtc/*.c} and \Wp with
+\Eva can be tested with \texttt{<gui> -eva tests/idct/*.c} and \Wp with
 \texttt{<gui> -wp -wp-rte src/plugins/wp/tests/wp\_gallery/find.i}. Try to
 navigate in the code, check some values with \Eva, check that \Wp prove some
 annotations, this should be enough.
