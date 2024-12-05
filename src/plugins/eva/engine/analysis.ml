@@ -177,9 +177,16 @@ let () =
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
 
+let tune_gc () =
+  if Sys.ocaml_release.major >= 5 then
+    let minor_heap_size = 8192000 in
+    let space_overhead = 40 in
+    Gc.(set { (get ()) with minor_heap_size; space_overhead; })
+
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
   Ast.compute ();
+  tune_gc ();
   Parameters.configure_precision ();
   if not (Kernel.AuditCheck.is_empty ()) then
     Eva_audit.check_configuration (Kernel.AuditCheck.get ());
