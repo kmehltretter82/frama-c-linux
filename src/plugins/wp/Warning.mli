@@ -63,7 +63,7 @@ val handle : ?severe:bool -> fallback:string -> handler:('a -> 'b) -> ('a -> 'b)
     if a context has been set.
     Otherwise, a WP-fatal error is raised instead.
     Default for [severe] is false.
-    @before Frama-C+dev [fallback] was [effect]
+    @before 30.0-Zinc [fallback] was [effect]
 *)
 
 type 'a outcome =
