@@ -146,15 +146,16 @@ let fval typ (exp : Exp.exp) (fval : Fval.t) : pred =
 (* --- Values                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type value = Results.value Results.evaluation
-
-let domain (exp : Exp.exp) typ (value : value) : pred =
+let domain lv value =
+  let exp = Exp.of_lval lv in
+  let typ = Cil.typeOfLval lv in
   if Cil.isIntegralType typ then
     Results.as_ival value |> Result.fold ~error ~ok:(ival exp)
   else
   if Cil.isFloatingType typ then
     Results.as_fval value |> Result.fold ~error ~ok:(fval typ exp)
-  else True
+  else
+    True
 
 (* -------------------------------------------------------------------------- *)
 (* --- Evalutation                                                        --- *)
@@ -162,7 +163,7 @@ let domain (exp : Exp.exp) typ (value : value) : pred =
 
 let eval_value ~loc ?name lv request =
   Results.eval_lval lv request
-  |> domain (Exp.of_lval lv) (Cil.typeOfLval lv)
+  |> domain lv
   |> predicate ?name ~loc
 
 (* -------------------------------------------------------------------------- *)
@@ -232,8 +233,7 @@ let eval_instr ?callstack ?name stmt =
   if Results.is_empty request then [False] else
     List.fold_left
       (fun ps lv ->
-         let e = Results.eval_lval lv request in
-         let p = domain (Exp.of_lval lv) (Cil.typeOfLval lv) e in
+         let p = domain lv @@ Results.eval_lval lv request in
          if p <> True then p :: ps else ps
       ) [] (collect stmt)
 
