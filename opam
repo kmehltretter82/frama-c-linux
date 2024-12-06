@@ -77,7 +77,7 @@ authors: [
 homepage: "https://frama-c.com/"
 license: "LGPL-2.1-only"
 dev-repo: "git+https://git.frama-c.com/pub/frama-c.git"
-doc: "https://frama-c.com/download/user-manual-30.0-beta-Zinc.pdf"
+doc: "https://frama-c.com/download/user-manual-30.0-Zinc.pdf"
 bug-reports: "https://git.frama-c.com/pub/frama-c/issues"
 tags: [
   "deductive verification"

@@ -3,17 +3,17 @@ compiling Frama-C 30.0.
 
 - OCaml 4.14.2
 - alt-ergo.2.5.4 (for wp, optional)
-- dune.3.13.1
-- dune-configurator.3.13.1
-- dune-site.3.13.1
-- lablgtk3.3.1.3
-- lablgtk3-sourceview3.3.1.3
-- menhir.20211230
+- dune.3.16.1
+- dune-configurator.3.16.1
+- dune-site.3.16.1
+- lablgtk3.3.1.5
+- lablgtk3-sourceview3.3.1.5
+- menhir.20240715
 - ocamlfind.1.9.6
 - ocamlgraph.2.1.0
-- ppx_deriving_yaml.0.2.1
-- ppx_deriving_yojson.3.7.0
+- ppx_deriving_yaml.0.3.0
+- ppx_deriving_yojson.3.9.0
 - unionFind.20220122
 - why3.1.7.2
-- yojson.2.0.2
-- zarith.1.12
+- yojson.2.2.2
+- zarith.1.14

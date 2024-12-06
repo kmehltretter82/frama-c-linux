@@ -347,6 +347,7 @@ build-ivette-linux-packages-release:
     - . "$NVM_DIR/nvm.sh"
     - nvm install $NODE
     - nvm use $NODE
+    - corepack enable
     # Opam
     - opam switch create --empty .
     - eval $(opam env --switch=. --set-switch)
