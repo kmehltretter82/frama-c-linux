@@ -91,8 +91,7 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
   const updateError = Dome.useProtected(setError);
 
   // Fetch Request
-  const trigger: () => void =
-    React.useCallback(
+  const trigger = Dome.useProtected<void>(
       async function (): Promise<void> {
         updateError(undefined);
         updateResponse(undefined);
@@ -112,7 +111,18 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
         } finally {
           killer.current = NOP;
         }
-      }, [ rq, prm, updateStable, updateResponse, updateError ]);
+      }
+  );
+
+  // Use Fallback
+  const fallback = Dome.useProtected<void>(
+    (): void => {
+      setResponse(undefined);
+      setStable(rq.fallback);
+      setError(undefined);
+      killer.current = NOP;
+    }
+  );
 
   // Server & Cache Management
   const running = Server.isRunningStatus(Server.useStatus());
@@ -121,12 +131,9 @@ export function useRequestStatus<Kd extends Server.RqKind, In, Out>(
     if (cached !== null) {
       trigger();
     } else {
-      setResponse(undefined);
-      setStable(rq.fallback);
-      setError(undefined);
-      killer.current = NOP;
+      fallback();
     }
-  }, [rq, trigger, cached] );
+  }, [cached, trigger, fallback] );
 
   // Signal Management
   const rqsignals = rq.signals.concat(signals);
