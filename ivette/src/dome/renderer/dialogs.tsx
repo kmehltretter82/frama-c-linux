@@ -26,10 +26,14 @@
    @module dome/dialogs
  */
 
+import React from 'react';
 import * as filepath from 'path';
 import { ipcRenderer } from 'electron';
 import { modal } from 'dome';
 import * as System from 'dome/system';
+import { classes } from 'dome/misc/utils';
+import { Label } from './controls/labels';
+import { IconButton } from './controls/buttons';
 
 // --------------------------------------------------------------------------
 // --- Message Box
@@ -307,7 +311,49 @@ export async function showOpenDir(
 // --------------------------------------------------------------------------
 // --- Modal
 // --------------------------------------------------------------------------
+
 export function showModal(val: React.ReactNode): void { modal.setValue(val); }
 export function closeModal(): void { showModal(undefined); }
+
+interface ModalProps {
+  /** Text of the label. Prepend to other children elements. */
+  label: string;
+  /** Icon identifier. Displayed on the left side of the label. */
+  icon?: string;
+  /** Tool-tip description. */
+  title?: string;
+  /** custom Classes name */
+  className?: string;
+  /** Function onClose */
+  onClose?: () => void
+  /** Modal content */
+  children: JSX.Element;
+}
+
+export function Modal(
+  props: ModalProps
+): JSX.Element {
+  const { label, title, icon, className, onClose, children } = props;
+
+  const contentClasses = classes('dome-xModal-content', className);
+  const onCloseModal = (): void => {
+    closeModal();
+    if(onClose) onClose();
+  };
+
+  return (
+    <div className={contentClasses}>
+      <div className='dome-xModal-header'>
+        <Label className='dome-xModal-title'
+          label={label} icon={icon} title={title}
+        />
+        <IconButton icon='CROSS' size={18} onClick={onCloseModal} />
+      </div>
+      <div className='dome-xModal-body dome-xBoxes-vbox dome-xBoxes-box'>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 // --------------------------------------------------------------------------

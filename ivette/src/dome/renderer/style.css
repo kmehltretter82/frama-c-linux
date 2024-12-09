@@ -213,6 +213,7 @@ input[type="checkbox"]:checked {
 /* -------------------------------------------------------------------------- */
 /* --- Modal                                                              --- */
 /* -------------------------------------------------------------------------- */
+
 .dome-xModal {
   position: absolute;
   display: flex;
@@ -226,6 +227,44 @@ input[type="checkbox"]:checked {
   max-width: calc(100% - 100px);
   max-height: calc(100% - 50px);
   overflow: hidden;
+
+  .dome-xModal-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--background-profound);
+    padding: 5px;
+    font-size: medium;
+    align-items: center;
+
+    .dome-xModal-title {
+      margin-right: 20px;
+
+      .dome-xIcon {
+        padding-right: .3em;
+
+        svg {
+          height: 16px;
+        }
+      }
+    }
+
+    &>.dome-xIcon:hover {
+      cursor: pointer;
+    }
+  }
+
+  .dome-xModal-body {
+      background-color: var(--background);
+
+      .dome-xModal-waiting {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+
+        svg { bottom: 0 !important; }
+      }
+  }
 }
 
 .dome-xModal-overlay {

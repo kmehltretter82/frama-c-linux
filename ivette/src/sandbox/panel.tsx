@@ -36,6 +36,7 @@ import { Button, ButtonGroup } from 'dome/frame/toolbars';
 import { Icon } from 'dome/controls/icons';
 import './style.css';
 import { Label } from 'dome/controls/labels';
+import { Modal, showModal } from 'dome/dialogs';
 
 /* -------------------------------------------------------------------------- */
 /* --- Use Panel                                                          --- */
@@ -54,6 +55,10 @@ function UsePanel(): JSX.Element {
       ]
     }
   );
+  const [modalTestOpen, setModalTestOpen] = React.useState(false);
+  // eslint-disable-next-line max-len
+  const modalText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi eros ligula, fermentum vitae turpis sed, semper rutrum nisl. Morbi non lacus scelerisque, facilisis urna sit amet, dapibus lorem. Sed ultrices pulvinar molestie. Duis semper condimentum lectus sed egestas. Quisque faucibus nisl vel nisi mattis volutpat. Curabitur aliquet arcu a diam semper, commodo efficitur purus placerat. Integer dapibus non urna eget pretium. Pellentesque in feugiat magna, ut condimentum lectus.";
+
 
   return (
     <>
@@ -79,6 +84,23 @@ function UsePanel(): JSX.Element {
       </TitleBar>
       <div style={{ position: 'relative', height: '100%' }}>
         <Panel visible={visible} position={position}>
+          <Label label="Open test modal">
+            <Button
+              label='Open'
+              kind={modalTestOpen ? 'positive' : 'default'}
+              onClick={() => {
+                setModalTestOpen(true);
+                showModal(<Modal
+                  label="Test modal title"
+                  className='sandbox-modal'
+                  onClose={() => setModalTestOpen(false)}
+                >
+                  <div>{ modalText }</div>
+                </Modal>); }
+              }
+            />
+          </Label>
+
           <Label
             label="label"
             title="Text Component"
@@ -175,7 +197,7 @@ function UsePanel(): JSX.Element {
 
 registerSandbox({
   id: 'sandbox.panel',
-  label: 'Panel',
+  label: 'Panel + Modal',
   children: <UsePanel />,
 });
 

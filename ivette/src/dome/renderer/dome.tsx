@@ -321,20 +321,17 @@ export function setTitle(title: string): void {
 }
 
 // --------------------------------------------------------------------------
-// --- Window Modal
+// --- Window Modal Container
 // --------------------------------------------------------------------------
 
 export const modal = new GlobalState<React.ReactNode | undefined>(undefined);
 
-function Modal(): JSX.Element | null {
-  const [ modalContent, setModalContent ] = useGlobalState(modal);
+function ModalContainer(): JSX.Element | null {
+  const [ modalContent, ] = useGlobalState(modal);
 
   if(modalContent === undefined) return null;
   return (
-    <div
-      className="dome-xModal-overlay"
-      onClick={() => setModalContent(undefined)}
-    >
+    <div className="dome-xModal-overlay" >
       <div
         className="dome-xModal"
         onClick={(event) => event.stopPropagation()}
@@ -355,7 +352,7 @@ function setContainer(
   Settings.synchronize();
   const appNode = setContextAppNode();
   if (appNode) {
-    createRoot(appNode).render(<><Component /><Modal /></>);
+    createRoot(appNode).render(<><Component /><ModalContainer /></>);
   }
   else
     // eslint-disable-next-line no-console
