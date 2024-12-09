@@ -17,3 +17,12 @@
 .sandbox-panel-button-position-top {
     transform: rotate(270deg);
 }
+
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox Modal                                                      --- */
+/* -------------------------------------------------------------------------- */
+.sandbox-modal {
+    .dome-xModal-body {
+        padding: 10px;
+    }
+}

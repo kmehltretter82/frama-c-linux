@@ -45,7 +45,7 @@ import { createRoot } from 'react-dom/client';
 import { ipcRenderer } from 'electron';
 
 import SYS, * as System from 'dome/system';
-import { State } from './data/states';
+import { State, GlobalState, useGlobalState } from './data/states';
 import * as Json from 'dome/data/json';
 import * as Settings from 'dome/data/settings';
 
@@ -321,6 +321,28 @@ export function setTitle(title: string): void {
 }
 
 // --------------------------------------------------------------------------
+// --- Window Modal Container
+// --------------------------------------------------------------------------
+
+export const modal = new GlobalState<React.ReactNode | undefined>(undefined);
+
+function ModalContainer(): JSX.Element | null {
+  const [ modalContent, ] = useGlobalState(modal);
+
+  if(modalContent === undefined) return null;
+  return (
+    <div className="dome-xModal-overlay" >
+      <div
+        className="dome-xModal"
+        onClick={(event) => event.stopPropagation()}
+      >
+        {modalContent}
+      </div>
+    </div>
+  );
+}
+
+// --------------------------------------------------------------------------
 // --- Window Container
 // --------------------------------------------------------------------------
 
@@ -329,8 +351,9 @@ function setContainer(
 ): void {
   Settings.synchronize();
   const appNode = setContextAppNode();
-  if (appNode)
-    createRoot(appNode).render(<Component />);
+  if (appNode) {
+    createRoot(appNode).render(<><Component /><ModalContainer /></>);
+  }
   else
     // eslint-disable-next-line no-console
     console.error('[Dome] root element #root not found.');

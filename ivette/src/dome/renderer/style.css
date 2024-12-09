@@ -211,3 +211,69 @@ input[type="checkbox"]:checked {
 }
 
 /* -------------------------------------------------------------------------- */
+/* --- Modal                                                              --- */
+/* -------------------------------------------------------------------------- */
+
+.dome-xModal {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: solid var(--border) 2px;
+  border-radius: 10px;
+  background-color: var(--background);
+  max-width: calc(100% - 100px);
+  max-height: calc(100% - 50px);
+  overflow: hidden;
+
+  .dome-xModal-header {
+    display: flex;
+    justify-content: space-between;
+    background-color: var(--background-profound);
+    padding: 5px;
+    font-size: medium;
+    align-items: center;
+
+    .dome-xModal-title {
+      margin-right: 20px;
+
+      .dome-xIcon {
+        padding-right: .3em;
+
+        svg {
+          height: 16px;
+        }
+      }
+    }
+
+    &>.dome-xIcon:hover {
+      cursor: pointer;
+    }
+  }
+
+  .dome-xModal-body {
+      background-color: var(--background);
+
+      .dome-xModal-waiting {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+
+        svg { bottom: 0 !important; }
+      }
+  }
+}
+
+.dome-xModal-overlay {
+  z-index: 100;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(50, 50, 50, .4);
+}
+/* -------------------------------------------------------------------------- */
