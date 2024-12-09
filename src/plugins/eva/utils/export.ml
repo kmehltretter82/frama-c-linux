@@ -176,21 +176,25 @@ class collector =
   object(self)
     inherit Visitor.frama_c_inplace
     val mutable marked = Lvs.empty
-    val mutable collected = []
+    val mutable collected : lval list = []
 
-    method private add lv =
-      if not @@ Lvs.mem lv marked then
-        ( marked <- Lvs.add lv marked ; collected <- lv :: collected )
+    method private add : 'a. lval -> 'a Cil.visitAction =
+      fun lv ->
+      if Lvs.mem lv marked then SkipChildren else
+        begin
+          marked <- Lvs.add lv marked ;
+          DoChildrenPost(fun r -> collected <- lv :: collected ; r)
+        end
 
     method flush = collected
 
-    method! vlval lv = self#add lv ; DoChildren
+    method! vlval lv = self#add lv
     method! vterm_lval lv =
       begin
         match Logic_to_c.term_lval_to_lval lv with
-        | exception Logic_to_c.No_conversion -> ()
+        | exception Logic_to_c.No_conversion -> DoChildren
         | lv -> self#add lv
-      end ; DoChildren
+      end
 
     method add_lhs lv =
       ignore @@ Visitor.visitFramacOffset (self :> visitor) (snd lv) ;
@@ -199,8 +203,16 @@ class collector =
     method add_expr e =
       ignore @@ Visitor.visitFramacExpr (self :> visitor) e
 
-    method add_instr instr =
-      ignore @@ Visitor.visitFramacInstr (self :> visitor) instr
+    method add_instr = function
+      | Set(lv,e,_) ->
+        self#add_lhs lv ;
+        self#add_expr e
+      | Call(lv,e,es,_) ->
+        Option.iter self#add_lhs lv ;
+        self#add_expr e ;
+        List.iter self#add_expr es
+      | instr ->
+        ignore @@ Visitor.visitFramacInstr (self :> visitor) instr
 
   end
 
@@ -209,8 +221,6 @@ let collect stmt =
   begin
     match stmt.skind with
     (* Instructions *)
-    | Instr (Set(lv,e,_)) ->
-      acc#add_lhs lv ; acc#add_expr e
     | Instr instr -> acc#add_instr instr
     (* Branching expressions *)
     | Return (Some e,_) | If(e,_,_,_) | Switch(e,_,_,_) -> acc#add_expr e
