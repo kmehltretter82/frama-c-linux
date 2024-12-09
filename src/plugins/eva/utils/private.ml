@@ -49,6 +49,7 @@ module Eval_terms = Eval_terms
 module Eval_typ = Eval_typ
 module Eva_ast = Eva_ast
 module Function_calls = Function_calls
+module Inout_memory = Inout_memory
 module Interferences = Interferences
 module Logic_inout = Logic_inout
 module Main_locations = Main_locations
@@ -63,3 +64,5 @@ module Self = Self
 module Simple_memory = Simple_memory
 module Structure = Structure
 module Thread = Thread
+module Eva_automata = Eva_automata
+
