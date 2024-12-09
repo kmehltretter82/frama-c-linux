@@ -32,6 +32,8 @@ Plugin E-ACSL <next-release>
 Plugin E-ACSL 30.0 (Zinc)
 ###############################################################################
 
+- E-ACSL        [2025-02-28] automatically activate Frama-C's concurrency
+                support when the use of pthread is detected
 -* E-ACSL       [2024-09-26] fix usage of structural equality of terms;
                 By using physical equality we ensure that structurally
                 identical terms are translated according to their context.
