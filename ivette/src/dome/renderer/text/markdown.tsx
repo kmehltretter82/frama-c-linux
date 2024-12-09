@@ -21,7 +21,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import ReactMarkdown, { Components, Options } from 'react-markdown';
+import ReactMarkdown, { Options } from 'react-markdown';
 
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
@@ -38,82 +38,67 @@ export const iconTag: Pattern = {
   }
 };
 
-class Counter {
-  private val: number = 0;
-  increment(): number { return this.val++; }
-}
-
 // --------------------------------------------------------------------------
 // --- Replacement function
 // --------------------------------------------------------------------------
+
 /**
- * Replace all tag in the text.
+ * Replace all tag in children.
  * This function doesn't replace any tags added by a previous replacement.
  */
-function replaceTagsByElement(
-  text: string,
-  counter: Counter,
-  patterns?: Pattern[],
-): (string | JSX.Element | null)[] {
-  if(!patterns || patterns.length < 1) return [text];
-  type Content = string | JSX.Element | null;
-  let newContent: (Content|Content[])[] = [text];
-  let match;
-  let lastIndex: number;
-
-  patterns.forEach(({ pattern, replace }) => {
-    newContent = newContent.flat();
-    newContent.slice().forEach((content, i) => {
-      if(typeof content === "string") {
-        const contentTab: (string | JSX.Element | null)[] = [];
-        lastIndex = 0;
-        while ((match = pattern.exec(content)) !== null) {
-          if (match.index > lastIndex) {
-            contentTab.push(content.slice(lastIndex, match.index));
-          }
-          contentTab.push(replace(counter.increment(), match));
-          lastIndex = pattern.lastIndex;
-        }
-        if (lastIndex < content.length) {
-          contentTab.push(content.slice(lastIndex));
-        }
-        newContent.splice(i, 1, contentTab);
-      }
-    });
-  });
-
-  return newContent.flat();
-}
-
 function replaceTags(
   children: React.ReactNode,
   patterns: Pattern[],
-  counter: Counter
 ): React.ReactNode {
+  if(patterns.length < 1) return children;
+
+  const buffer: React.ReactNode[] = [];
+  let counter = 0;
   const childrenTab = React.Children.toArray(children);
 
-  const newContent = childrenTab.map((child) => {
-    if (typeof child === 'string') {
-      return replaceTagsByElement(child, counter, patterns.slice());
+  const makeReplace = (text: string, index: number): void => {
+    if(index >= patterns.length) {
+      buffer.push(text);
+      return;
     }
-    return child;
+    const { pattern, replace } = patterns[index];
+
+    let match;
+    let lastIndex = 0;
+    while ((match = pattern.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        makeReplace(text.slice(lastIndex, match.index), index+1);
+      }
+      buffer.push(replace(counter++, match));
+      lastIndex = pattern.lastIndex;
+    }
+    if (lastIndex < text.length) {
+      makeReplace(text.slice(lastIndex), index+1);
+    }
+  };
+
+  /** makeReplace is applied if child is a string,
+   * otherwise it is pushed into the buffer
+   */
+  childrenTab.forEach((child) => {
+    if (typeof child === 'string') {
+      return makeReplace(child, 0);
+    }
+    return buffer.push(child);
   });
 
-  return newContent;
+  return buffer;
 }
 
 // --------------------------------------------------------------------------
 // --- Markdown component
 // --------------------------------------------------------------------------
-type tagHtmlList = [ k: keyof Components, v: keyof Components ][]
 
 interface MarkdownProps {
   /** classes for Markdown component */
   className?: string;
-  /** html tag of the markdown to be processed and possible replacement */
-  htmlTag?: tagHtmlList;
-  /** Tab of tag replacement */
-  pattern?: Pattern[];
+  /** Tab of patterns */
+  patterns?: Pattern[];
   /** Children */
   children?: string | null;
 }
@@ -121,41 +106,15 @@ interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, pattern, htmlTag, children } = props;
+  const { className, patterns, children } = props;
   const markdownClasses = classes(
-    "dome-xMarkdown", "dome-pages",
-    className,
+    "dome-xMarkdown", "dome-pages", className
   );
 
-  const counter = new Counter();
-  const transformChildren = (c: React.ReactNode): React.ReactNode => {
-    return !pattern ? c : replaceTags(c, pattern, counter);
-  };
-
-  const getComponentsOption = (): Components | null => {
-    if(!htmlTag) return null;
-
-    const getDynamicElement = (
-      tagName: keyof JSX.IntrinsicElements,
-      children: React.ReactNode
-    ): JSX.Element => {
-      const Tag = tagName;
-      return <Tag>{children}</Tag>;
-    };
-
-    const component = [];
-    for (const [key, val] of htmlTag) {
-      component.push([key, ({ children }: {
-        children: React.ReactNode;
-      }) => getDynamicElement(val, transformChildren(children))]);
-    }
-
-    return Object.fromEntries(component);
-  };
-
-  const options: Options = {
-    className: markdownClasses,
-    components: getComponentsOption()
+  const options: Options = { className: markdownClasses };
+  if(patterns && patterns.length > 0) options.components = {
+    p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
+    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>
   };
 
   return <ReactMarkdown {...options}>{ children }</ReactMarkdown>;
