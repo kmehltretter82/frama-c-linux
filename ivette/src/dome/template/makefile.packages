@@ -58,6 +58,7 @@ DOME_APP_PACKAGES= \
 	react-force-graph-2d@^1.25.4 \
 	react-force-graph-3d@^1.24.2 \
 	d3-selection@^3 \
-	d3-graphviz@^5
+	d3-graphviz@^5 \
+	react-markdown@9.0.1 \
 
 # --------------------------------------------------------------------------
