@@ -20,4 +20,13 @@
 /*                                                                          */
 /* ************************************************************************ */
 
+// Declare markdown files
+declare module '*.md?raw' {
+  const content: string;
+  export default content;
+}
+
+declare module 'react-flame-graph';
+declare module 'react-pivottable/PivotTableUI';
 declare module 'three/examples/jsm/renderers/CSS2DRenderer';
+declare module 'react-cytoscapejs';
