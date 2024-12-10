@@ -37,14 +37,27 @@ struct
 
   let pretty pp_state =
     Pretty_utils.pp_iter2 ~sep:"@ " ~between:" -> "
-      iter Mutex.Set.pretty (Top.pretty pp_state)
+      iter Mutex.Set.pretty pp_state
 end
 
+type 'a widening = {
+  widening_counter : int;
+}
+type 'a with_widening = 'a * 'a widening
+
 type 'a interferences = {
-  states : (('a or_top) MutexesMap.t) ThreadTable.t;
+  states : ('a with_widening or_top MutexesMap.t) ThreadTable.t;
   structure : 'a Abstract.Domain.structure;
   mutable shared_bases : Base.Hptset.t;
 }
+
+let get_state : 'a with_widening or_top -> 'a or_top = function
+  | `Top -> `Top
+  | `Value (state, _) -> `Value state
+
+let pp_state pp_dom fmt (state : 'a with_widening or_top) =
+  let pp_aux fmt (dom_state, _) = pp_dom fmt dom_state in
+  Format.fprintf fmt "%a" (Top.pretty pp_aux) state
 
 type t = Interferences : 'a interferences -> t
 
@@ -89,8 +102,9 @@ let add_last_analysis
   match Dom.get MtDomain.Domain.key with
   | None -> NoChanges (* Domain disabled, no interference computation *)
   | Some extract ->
-    let dom_join s1 s2 = `Value (Dom.join s1 s2) in
-    (* Add interferences one by one *)
+    let widening_delay = Parameters.WideningDelay.get () in
+    let widening_period = Parameters.WideningPeriod.get () in
+
     let add_to_map aloc acc_map =
       let open TopBottom.Operators in
       let state =
@@ -108,37 +122,89 @@ let add_last_analysis
         MutexesMap.add Mutex.Set.empty `Top acc_map
       | `Value (state, mutexes) ->
         let update = function
-          | None -> Some (`Value state)
-          | Some previous -> Some (Top.join dom_join previous (`Value state))
+          | Some `Top -> Some `Top
+          | None ->
+            let widening_counter = widening_delay - 1 in
+            Some (`Value (state, { widening_counter }))
+          | Some `Value (previous, w) ->
+            Some (`Value (Dom.join previous state, w))
         in
         MutexesMap.update mutexes update acc_map
     in
-    let new_interferences =
-      ALoc.Local.Set.fold add_to_map concurrent_writes MutexesMap.empty
+
+    let widen_interference_states prev_states curr_states =
+      let equal = ref true in
+      let widen_one_state key curr_value =
+        let previous_value = MutexesMap.find_opt key prev_states in
+        match curr_value, previous_value with
+        | _, Some `Top -> `Top
+        | `Top, _ ->
+          equal := false;
+          `Top
+        | `Value v, None ->
+          equal := false;
+          `Value v
+        | `Value (curr, _), Some `Value (previous, { widening_counter }) ->
+          let next, widening_counter =
+            if widening_counter > 0 then
+              (* No widening *)
+              Dom.join previous curr, widening_counter
+            else begin
+              (* Widen the interferences between the previous and current
+                 state. Use the widen hints on the concurrent writes. *)
+              let widened_state =
+                ALoc.Local.Set.fold
+                  (fun (stmt, cs) acc ->
+                     let kf = Callstack.top_kf cs in
+                     let widened =
+                       Dom.widen kf stmt previous (Dom.join previous curr)
+                     in
+                     Dom.join widened acc)
+                  concurrent_writes
+                  previous
+              in
+              widened_state, widening_period
+            end
+          in
+          let widening_counter = widening_counter - 1 in
+          equal := !equal && (Dom.equal previous next);
+          `Value (next, { widening_counter })
+      in
+      let next_states = MutexesMap.mapi widen_one_state curr_states in
+      next_states, !equal
     in
-    let pp_aloc fmt = Format.fprintf fmt "@[<hov 2>%a@]" ALoc.Local.pretty in
-    let pp_aloc_set =
-      Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:",@ " ALoc.Local.Set.iter pp_aloc
-    in
-    Self.debug ~dkey
-      "concurrent writes: @[%a@]@.shared bases: @[%a@]@.interferences: @[%a@]@."
-      pp_aloc_set concurrent_writes
-      Base.Hptset.pretty shared_bases
-      (MutexesMap.pretty Dom.pretty) new_interferences;
-    (* Add the computed interferences to the table *)
+
     let Interferences ({ states; structure } as interferences) = interferences in
     match Abstract.Domain.eq_structure structure Dom.structure with
     | None -> structure_mismatch ()
     | Some Eq ->
-      let same_mutexes_map =
-        let old = ThreadTable.find_def states thread MutexesMap.empty in
-        MutexesMap.equal (Eval.Top.equal Dom.equal)
-          old new_interferences
+      (* Compute new interferences and check that they are different than the
+         previous computed interferences. *)
+      let old_interferences =
+        ThreadTable.find_def states thread MutexesMap.empty
+      in
+      let new_interferences =
+        ALoc.Local.Set.fold add_to_map concurrent_writes MutexesMap.empty
+      in
+      let new_interferences, same_mutexes_map =
+        widen_interference_states old_interferences new_interferences
       in
       let same_shared_bases =
         Base.Hptset.equal interferences.shared_bases shared_bases
       in
+      let pp_aloc fmt = Format.fprintf fmt "@[<hov 2>%a@]" ALoc.Local.pretty in
+      let pp_aloc_set =
+        Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:",@ " ALoc.Local.Set.iter pp_aloc
+      in
+      Self.debug ~dkey
+        "concurrent writes: @[%a@]@.\
+         shared bases: @[%a@]@.\
+         interferences: @[%a@]@."
+        pp_aloc_set concurrent_writes
+        Base.Hptset.pretty shared_bases
+        (MutexesMap.pretty (pp_state Dom.pretty)) new_interferences;
       if not (same_mutexes_map && same_shared_bases) then begin
+        (* Add the computed interferences to the table *)
         ThreadTable.replace states thread new_interferences;
         interferences.shared_bases <- shared_bases;
         Updated
@@ -166,6 +232,7 @@ let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
   | Some Eq ->
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
     let add mutexes' state' acc_state =
+      let state' = get_state state' in
       if Mutex.Set.disjoint mutexes mutexes'
       (* No mutexes in common, this interference is applicable *)
       then TopBottom.join dom_join acc_state (state' :> _ or_top_bottom)
