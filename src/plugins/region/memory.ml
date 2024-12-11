@@ -177,6 +177,15 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
   Ufind.set m.store n (f r)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Nodes Set                                                          --- *)
+(* -------------------------------------------------------------------------- *)
+
+module SNode = Set.Make(struct
+    type t = node
+    let compare r1 r2 = Int.compare (id r1) (id r2)
+  end)
+
+(* -------------------------------------------------------------------------- *)
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -456,6 +465,21 @@ let field (m: map) (r: node) (fd: fieldinfo) : node =
     let (p,_) = Cil.fieldBitsOffset fd in
     move m r p s
   else r
+
+let footprint (m: map) (r: node) : node list =
+  try
+    let visited = ref SNode.empty (* set of visited & normalized nodes *) in
+    let leaves = ref [] (* returned leaves *) in
+    let rec visit (r: node) : unit =
+      let n = node m r in (* normalized node *)
+      if SNode.mem n !visited then () else
+        let () = visited := SNode.add n !visited in
+        let rg = (* raises Not_found *) Ufind.get m.store n in
+        match rg.clayout with
+        | Compound (_, _, range) -> Ranges.iter visit range
+        | Blob | Cell (_,_) -> leaves := n :: !leaves
+    in visit r ; !leaves
+  with Not_found -> []
 
 let index (m : map) (r: node) (ty:typ) : node =
   move m r 0 (Cil.bitsSizeOf ty)

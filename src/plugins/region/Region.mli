@@ -136,3 +136,6 @@ val field : map -> node -> fieldinfo -> node
 
 (** Unormalized. @raises Not_found *)
 val index : map -> node -> typ -> node
+
+(** Normalized list of leaf nodes. *)
+val footprint : map -> node -> node list
