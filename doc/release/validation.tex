@@ -5,21 +5,35 @@ Final validation before running the release pipeline.
 
 \section{Prerequisites on dependencies}
 
-Install all dependencies of Frama-C, including recommended ones.
+Run the \texttt{opam-pin} and \texttt{opam-pin-minimal}
+targets on the CI on the \texttt{HEAD} of the branch for the release.
+This ensures that the depencies in \texttt{opam} file are up to date.
 
 Check coherence between:
 \begin{itemize}
-  \item \texttt{opam} \todo{Should always be up to date}
+  \item \texttt{opam}
   \item \texttt{reference-configuration.md} \todo{Should always be up to date}
 \end{itemize}
 
+Install all dependencies of Frama-C, including recommended ones.
+
 Run the command:
 \begin{itemize}
-  \item \texttt{dune build @frama-c-configure}
+  \item \texttt{dune build @frama-c-configure | grep -e false}
 \end{itemize}
-all plugins should be enabled. Check dependencies in case they have changed.
+
+All plugins should be enabled, i.e.,~\texttt{grep} should fail.
+If this is not the case, check dependencies in case they have changed.
 If you don't know them, ask plug-in developers to verify them.
 
+Use the script \texttt{bin/check-reference-configuration.sh} to either:
+\todo{Decide on what is the best choice}
+\begin{itemize}
+\item ensure that Frama-C can be compiled with the versions of the package
+  that are mentioned in the reference configuration;
+\item or update the reference configuration to the version of the packages
+  in your current opam switch
+\end{itemize}
 \section{Prerequisites on installation}
 
 \begin{itemize}
@@ -31,19 +45,6 @@ If you don't know them, ask plug-in developers to verify them.
 \label{sec:validation:version}
 
 The tasks listed in this section are performed by the Release Manager.
-
-\subsection{Versions in documentation files}
-
-For final release only, remove \texttt{\textasciitilde{}beta} and
-\texttt{-beta} mentions in the following files :
-\begin{itemize}
-  \item \texttt{VERSION}
-  \item \texttt{opam}
-    \begin{itemize}
-      \item in version field
-      \item in the doc link
-    \end{itemize}
-\end{itemize}
 
 \subsection{Versions in source: API documentation}
 
@@ -66,7 +67,11 @@ by issuing \texttt{make check-devguide}\todo{Fix this}.
 \subsection{Manuals}
 
 Manuals are built by the continuous integration. However, the Release Manager
-should check whether a new version of ACSL or E-ACSL must be released.
+should check whether a new version of ACSL or E-ACSL must be released. Note that
+an ACSL release must be accompanied by an E-ACSL (the language, not the plug-in)
+release, at least to acknowledge the fact that the changes in ACSL do not impact
+E-ACSL. It might also be useful to check that the table of contents of both manuals
+coincide\todo{Provide a script for that}.
 
 Also, most of the manuals include an appendix with the list of changes that have
 happened, divided by version of Frama-C. Make sure that the first section has
@@ -102,6 +107,11 @@ sed -n 's/^author //p' | sort -f | uniq -ic | sort -nr
 
 \textbf{Note:} This requires to install the package \texttt{parallel}. Source
 for the command: \url{https://gist.github.com/amitchhajer/4461043}.
+
+\textbf{Note:} For various reasons, people who contributed more than 100 LoC in
+a release might not be cited as contributor. Check
+\url{https://git.frama-c.com/frama-c/frama-c/-/wikis/Non-contributors} to see
+if this is the case before adding someone (and edit the wiki if needed).
 
 \subsection{Commit}
 
@@ -165,7 +175,7 @@ you might want to install the
   \item \texttt{bin/frama-c-gui} for the old GUI.
   \item \texttt{bin/ivette} for the new GUI.
 \end{itemize}
-\Eva can be tested with \texttt{<gui> -eva tests/idtc/*.c} and \Wp with
+\Eva can be tested with \texttt{<gui> -eva tests/idct/*.c} and \Wp with
 \texttt{<gui> -wp -wp-rte src/plugins/wp/tests/wp\_gallery/find.i}. Try to
 navigate in the code, check some values with \Eva, check that \Wp prove some
 annotations, this should be enough.
@@ -174,7 +184,7 @@ annotations, this should be enough.
 
 Create the main changes file in the directory \texttt{releases}. This file must
 be named <VERSION without ext>.md (e.g. \texttt{25.0}: \texttt{25.0.md},
-\texttt{25.0~beta}: \texttt{25.0.md}, \texttt{25.1}: \texttt{25.1.md}). The
+\texttt{25.0\~{}beta}: \texttt{25.0.md}, \texttt{25.1}: \texttt{25.1.md}). The
 expected format is:
 
 \begin{lstlisting}
@@ -194,7 +204,7 @@ expected format is:
 It should only list main changes, that will be displayed on the event section of
 the website and the wiki page.
 
-\textbf{Note:} Make sure to use markdown code formating \verb+``+ if the texte
+\textbf{Note:} Make sure to use markdown code formating (\verb+``+) if the text
 contains things that could be affected by markdown formatting (for example
 \verb+\word1_word2+ will be displayed as \verb+word2+ without code formatting.
 

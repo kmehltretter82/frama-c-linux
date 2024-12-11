@@ -49,6 +49,7 @@ fi
 CURRENT=$(cat VERSION)
 CURRENT_MAJOR=$(echo "$CURRENT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
 CURRENT_MINOR=$(echo "$CURRENT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
+CURRENT_SUFFIX=$(echo "$CURRENT"| $SED -e s/[0-9]*.[0-9]*\\\(.*\\\)/\\1/)
 CURRENT_CODENAME=$(grep "$CURRENT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
 
 if [[ $NEXT == "dev" ]]; then
@@ -67,11 +68,13 @@ if [[ $NEXT == "dev" ]]; then
 else
   NEXT_MAJOR=$(echo "$NEXT" | $SED -e s/\\\([0-9]*\\\).[0-9]*.*/\\1/)
   NEXT_MINOR=$(echo "$NEXT" | $SED -e s/[0-9]*.\\\([0-9]*\\\).*/\\1/)
+  NEXT_SUFFIX=$(echo "$NEXT"| $SED -e s/[0-9]*.[0-9]*\\\(.*\\\)/\\1/)
   NEXT_CODENAME=$(grep "$NEXT_MAJOR " ./doc/release/periodic-elements.txt | cut -d " " -f2)
 
   echo "NEXT VERSION is:"
   echo "- MAJOR:    $NEXT_MAJOR"
   echo "- MINOR:    $NEXT_MINOR"
+  echo "- SUFFIX:   $NEXT_SUFFIX"
   echo "- CODENAME: $NEXT_CODENAME"
 
   echo ""
@@ -92,28 +95,39 @@ else
 
   # Opam files
   $SED -i "s/^version: .*/version: \"$NEXT\"/g" opam
-  $SED -i "s/\(.*\)$CURRENT_MAJOR.$CURRENT_MINOR-$CURRENT_CODENAME\(.*\)/\1$NEXT_MAJOR.$NEXT_MINOR-$NEXT_CODENAME\2/g" opam
+  CURRENT_OPAM_DOC=$CURRENT_MAJOR.$CURRENT_MINOR$(tr '~' '-' <<< $CURRENT_SUFFIX)
+  NEXT_OPAM_DOC=$NEXT_MAJOR.$NEXT_MINOR$(tr '~' '-' <<< $NEXT_SUFFIX)
+  $SED -i "s/\(.*\)$CURRENT_OPAM_DOC-$CURRENT_CODENAME\(.*\)/\1$NEXT_OPAM_DOC-$NEXT_CODENAME\2/g" opam
 
   $SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" tools/lint/frama-c-lint.opam
   $SED -i "s/^version: .*/version: \"$NEXT_MAJOR.$NEXT_MINOR\"/g" tools/hdrck/frama-c-hdrck.opam
 
   # Changelogs
 
+  FC_CHANGELOG="Changelog"
   FC_CL_MSG_FUTURE="Open Source Release <next-release>"
   FC_CL_MSG_NEXT="Open Source Release $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
   FC_CL_LIN="###############################################################################"
 
-  $SED -i "s/\($FC_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT/g" Changelog
+  if ! grep -q -e " *$FC_CL_MSG_NEXT" $FC_CHANGELOG; then
+      $SED -i "s/\($FC_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$FC_CL_MSG_NEXT/g" $FC_CHANGELOG;
+  fi
 
+  EA_CHANGELOG="src/plugins/e-acsl/doc/Changelog"
   EA_CL_MSG_FUTURE="Plugin E-ACSL <next-release>"
   EA_CL_MSG_NEXT="Plugin E-ACSL $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
-  $SED -i "s/\($EA_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT/g" src/plugins/e-acsl/doc/Changelog
+  if ! grep -q -e " *$EA_CL_MSG_NEXT" $EA_CHANGELOG; then
+      $SED -i "s/\($EA_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$EA_CL_MSG_NEXT/g" $EA_CHANGELOG
+  fi
 
+  WP_CHANGELOG="src/plugins/wp/Changelog"
   WP_CL_MSG_FUTURE="Plugin WP <next-release>"
   WP_CL_MSG_NEXT="Plugin WP $NEXT_MAJOR.$NEXT_MINOR ($NEXT_CODENAME)"
 
-  $SED -i "s/\($WP_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT/g" src/plugins/wp/Changelog
+  if ! grep -q -e " *$WP_CL_MSG_NEXT" $WP_CHANGELOG; then
+      $SED -i "s/\($WP_CL_MSG_FUTURE\)/\1\n$FC_CL_LIN\n\n$FC_CL_LIN\n$WP_CL_MSG_NEXT/g" $WP_CHANGELOG;
+  fi
 
   # API doc
   find src -name '*.ml*' -exec $SED -i -e "s/Frama-C+dev/${NEXT_MAJOR}.${NEXT_MINOR}-${NEXT_CODENAME}/gI" '{}' ';'
