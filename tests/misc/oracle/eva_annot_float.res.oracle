@@ -53,32 +53,32 @@ double main(void)
   {
     int i = 0;
     while (1) {
-      /*@ assert Eva_domain: 0 ≤ i ≤ 20; */
+      /*@ assert Eva_export: 0 ≤ i ≤ 20; */
       if (! (i < 20)) break;
       {
         double v = value();
-        /*@ assert Eva_domain: 0 ≤ i ≤ 19; */
+        /*@ assert Eva_export: 0 ≤ i ≤ 19; */
         /*@ assert
-            Eva_domain:
+            Eva_export:
               -0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d;
         */
         a[i] = v;
         /*@ assert
-            Eva_domain:
+            Eva_export:
               0.0000000000000000e+00d ≤ s ≤ 1.9000000000000000e+03d;
         */
         /*@ assert
-            Eva_domain:
+            Eva_export:
               -0.0000000000000000e+00d ≤ v ≤ 1.0000000000000000e+02d;
         */
         s += v;
       }
-      /*@ assert Eva_domain: 0 ≤ i ≤ 19; */
+      /*@ assert Eva_export: 0 ≤ i ≤ 19; */
       i ++;
     }
   }
   /*@ assert
-      Eva_domain: 0.0000000000000000e+00d ≤ s ≤ 2.0000000000000000e+03d;
+      Eva_export: 0.0000000000000000e+00d ≤ s ≤ 2.0000000000000000e+03d;
   */
   return s;
 }

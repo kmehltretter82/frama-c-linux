@@ -71,23 +71,23 @@ float main(void)
   {
     int i = 0;
     while (1) {
-      /*@ assert Eva_domain: 0 ≤ i ≤ 20; */
+      /*@ assert Eva_export: 0 ≤ i ≤ 20; */
       if (! (i < 20)) break;
       {
-        /*@ assert Eva_domain: 0 ≤ i ≤ 19; */
+        /*@ assert Eva_export: 0 ≤ i ≤ 19; */
         int v = value(i + 1);
-        /*@ assert Eva_domain: 0 ≤ i ≤ 19; */
-        /*@ assert Eva_domain: 0 ≤ v ≤ 100; */
+        /*@ assert Eva_export: 0 ≤ i ≤ 19; */
+        /*@ assert Eva_export: 0 ≤ v ≤ 100; */
         a[i] = i + v;
-        /*@ assert Eva_domain: 0.00000000e+00f ≤ s ≤ 1.90000000e+03f; */
-        /*@ assert Eva_domain: 0 ≤ v ≤ 100; */
+        /*@ assert Eva_export: 0.00000000e+00f ≤ s ≤ 1.90000000e+03f; */
+        /*@ assert Eva_export: 0 ≤ v ≤ 100; */
         s += (float)v;
       }
-      /*@ assert Eva_domain: 0 ≤ i ≤ 19; */
+      /*@ assert Eva_export: 0 ≤ i ≤ 19; */
       i ++;
     }
   }
-  /*@ assert Eva_domain: 0.00000000e+00f ≤ s ≤ 2.00000000e+03f; */
+  /*@ assert Eva_export: 0.00000000e+00f ≤ s ≤ 2.00000000e+03f; */
   return s;
 }
 

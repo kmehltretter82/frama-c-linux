@@ -985,7 +985,7 @@ module Export: sig
     ?callstack:Callstack.t -> ?name:string list -> stmt -> predicate list
 
   (** Emitter used for generating domain assertions. *)
-  val generated : Emitter.t
+  val emitter : Emitter.t
 
   (**
      Creates a visitor that can be used to generate new annotations for all

@@ -253,7 +253,7 @@ let is_dead stmt = Results.is_empty @@ Results.before stmt
 (* --- Annotation Generator                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-let generated = Emitter.create "Eva_domain"
+let emitter = Emitter.create "Eva_export"
     [ Emitter.Code_annot ]
     ~correctness:[]
     ~tuning:[]
@@ -273,11 +273,11 @@ let generator () : visitor =
         if not @@ List.for_all (fun s -> Stmts.mem s dead) stmt.preds then
           begin
             List.iter
-              (Annotations.add_assert generated ~kf stmt)
+              (Annotations.add_assert emitter ~kf stmt)
               (eval_instr stmt) ;
             Annotations.iter_code_annot
               (fun e ca ->
-                 if Emitter.equal e generated then
+                 if Emitter.equal e emitter then
                    List.iter
                      (fun ip ->
                         Property_status.emit Analysis.emitter ~hyps:[] ip True
@@ -307,7 +307,7 @@ let cleaner () : visitor =
       | Some kf ->
         Annotations.iter_code_annot
           (fun e ca ->
-             if Emitter.equal e generated then
+             if Emitter.equal e emitter then
                Annotations.remove_code_annot e ~kf stmt ca
           ) stmt ;
         DoChildren
