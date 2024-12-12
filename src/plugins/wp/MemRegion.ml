@@ -82,9 +82,8 @@ module type ModelWithLoader = sig
   val last : sigma -> c_object -> loc -> term
   val frames : c_object -> loc -> chunk -> frame list
 
-  val havoc : c_object -> loc -> length:term -> chunk -> fresh:term -> current:term -> term
-  val memcpy : c_object -> lsrc:loc -> ldst:loc -> length:term ->
-    chunk -> msrc:term -> mdst:term -> term
+  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
+    length:term -> Chunk.t -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 
@@ -363,23 +362,15 @@ struct
         MemMemory.frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
       | _ -> []
 
-    let havoc ty l ~length chunk ~fresh ~current =
-      match chunk with
-      | M c -> M.havoc ty (loc l) ~length c ~fresh ~current
-      | R c ->
-        match c.mu with
-        | Value _ | ValInit -> fresh
-        | Array _ | ArrInit -> e_fun f_havoc [fresh;current;to_addr l;length]
-
-    let memcpy ty ~lsrc ~ldst ~length chunk ~msrc ~mdst =
+    let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
       match chunk with
       | M c ->
-        M.memcpy ty ~lsrc:(loc lsrc) ~ldst:(loc ldst) ~length c ~msrc ~mdst
+        M.memcpy ty ~mtgt ~msrc ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length c
       | R c ->
         match c.mu with
         | Value _ | ValInit -> msrc
         | Array _ | ArrInit ->
-          e_fun f_memcpy [mdst;msrc;to_addr ldst;to_addr lsrc;length]
+          e_fun f_memcpy [mtgt;msrc;to_addr ltgt;to_addr lsrc;length]
 
     let eqmem_forall ty l chunk m1 m2 =
       match chunk with

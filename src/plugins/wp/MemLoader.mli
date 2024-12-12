@@ -59,10 +59,8 @@ sig
 
   val last : Sigma.t -> c_object -> loc -> term
 
-  val havoc : c_object -> loc -> length:term ->
-    Chunk.t -> fresh:term -> current:term -> term
-  val memcpy : c_object -> lsrc:loc -> ldst:loc -> length:term ->
-    Chunk.t -> msrc:term -> mdst:term -> term
+  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
+    length:term -> Chunk.t -> term
 
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
@@ -93,8 +91,8 @@ sig
   val load_init : M.Sigma.t -> c_object -> M.loc -> term
   val load_value : M.Sigma.t -> c_object -> M.loc -> term
 
-  val havoc : M.Sigma.t sequence -> c_object -> M.loc -> equation list
-  val havoc_length : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
+  val memcpy : M.Sigma.t sequence -> c_object -> ?lsrc:M.loc -> M.loc -> equation list
+  val memcpy_length : M.Sigma.t sequence -> c_object -> ?lsrc:M.loc -> M.loc -> term -> equation list
 
   val stored : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
   val stored_init : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
