@@ -255,8 +255,8 @@ let is_dead stmt = Results.is_empty @@ Results.before stmt
 
 let emitter = Emitter.create "Eva_export"
     [ Emitter.Code_annot ]
-    ~correctness:[]
-    ~tuning:[]
+    ~correctness:Parameters.parameters_correctness
+    ~tuning:Parameters.parameters_tuning
 
 let generator () : visitor =
   object(self)
