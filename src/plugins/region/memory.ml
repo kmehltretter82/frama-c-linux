@@ -603,18 +603,24 @@ let typed (m:map) (r:node) =
 (* --- High-Level API                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-type range = {
-  label: string ; (* pretty printed fields *)
-  offset: int ;
-  length: int ;
-  cells: int ;
-  data: node ;
-}
+type root = Root of {
+    label: string ; (* pretty printed root *)
+    cvar : varinfo ;
+    cells : int ;
+  }
+
+type range = Range of {
+    label: string ; (* pretty printed fields *)
+    offset: int ;
+    length: int ;
+    cells: int ;
+    data: node ;
+  }
 
 type region = {
   node: node ;
   parents: node list ;
-  roots: varinfo list ;
+  roots: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;
@@ -628,47 +634,6 @@ type region = {
   pointed: node option ;
 }
 
-let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
-  let s = sizeof (get m data).clayout in
-  let p = Fields.pslice ~fields ~offset ~length in
-  {
-    label = Format.asprintf "%t" p ;
-    offset ; length ;
-    cells = if s = 0 then 0 else length / s ;
-    data = node m data ;
-  }
-
-let ranges (m:map) (r:node) =
-  let node = Ufind.get m.store r in
-  let fields = cfields node.clayout in
-  List.map (make_range m fields) (cranges node.clayout)
-
-let make_region (m: map) (n: node) (r: chunk) : region =
-  let types = ctypes r in
-  let typed = typed m n in
-  let sizeof = sizeof r.clayout in
-  let fields = cfields r.clayout in
-  let singleton = singleton m n in
-  {
-    node = n ;
-    parents = nodes m r.cparents ;
-    roots = Vset.elements r.croots ;
-    labels = Lset.elements r.clabels ;
-    reads = Access.Set.elements r.creads ;
-    writes = Access.Set.elements r.cwrites ;
-    shifts = Access.Set.elements r.cshifts ;
-    ranges = List.map (make_range m fields) (cranges r.clayout) ;
-    pointed = Option.map (node m) (cpointed r.clayout) ;
-    types ; typed ; singleton ; sizeof ; fields ;
-  }
-
-let region map n = make_region map n (get map n)
-
-let regions map =
-  let pool = ref [] in
-  iter map (fun r -> pool := region map r :: !pool) ;
-  List.rev !pool
-
 (* -------------------------------------------------------------------------- *)
 (* --- Pretty Printers                                                    --- *)
 (* -------------------------------------------------------------------------- *)
@@ -680,7 +645,7 @@ let pp_cells fmt = function
 
 type slice =
   | Padding of int
-  | Range of range
+  | Slice of range
 
 let pad p q s =
   let n = q - p in
@@ -688,20 +653,24 @@ let pad p q s =
 
 let rec span k s = function
   | [] -> pad k s []
-  | r::rs -> pad k r.offset @@ Range r :: span (r.offset + r.length) s rs
+  | (Range rg as r)::rs ->
+    pad k rg.offset @@ Slice r :: span (rg.offset + rg.length) s rs
 
 let pp_slice fields fmt = function
   | Padding n ->
     Format.fprintf fmt "@ %a;" Fields.pp_bits n
-  | Range r ->
+  | Slice (Range r) ->
     Format.fprintf fmt "@ %t: %a%a;"
       (Fields.pslice ~fields ~offset:r.offset ~length:r.length)
       pp_node r.data
       pp_cells r.cells
 
-let pp_range fmt (r: range) =
+let pp_range fmt (Range r) =
   Format.fprintf fmt "@ %d..%d: %a%a;"
     r.offset (r.offset + r.length) pp_node r.data pp_cells r.cells
+
+let pp_root fmt (Root r) =
+  Format.fprintf fmt "%a%a" Varinfo.pretty r.cvar pp_cells r.cells
 
 let pp_region fmt (m: region) =
   begin
@@ -710,7 +679,7 @@ let pp_region fmt (m: region) =
       pp_node m.node
       (acs 'R' m.reads) (acs 'W' m.writes) (acs 'A' m.shifts) ;
     List.iter (Format.fprintf fmt "@ %s:") m.labels ;
-    List.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.roots ;
+    List.iter (Format.fprintf fmt "@ %a" pp_root) m.roots ;
     List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) m.types ;
     Format.fprintf fmt "@ %db" m.sizeof ;
     Option.iter (Format.fprintf fmt "@ (*%a)" pp_node) m.pointed ;
@@ -731,3 +700,52 @@ let pp_region fmt (m: region) =
       end ;
     Format.fprintf fmt " ;@]" ;
   end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Consolidated Accessors                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let make_root s (v : Cil_types.varinfo) : root =
+  let cells = if s = 0 then 0 else Cil.bitsSizeOf v.vtype / s in
+  let label = Format.asprintf "%a%a" Varinfo.pretty v pp_cells cells in
+  Root { cvar = v ; cells ; label }
+
+let make_range (m: map) fields Ranges.{ length ; offset ; data } : range =
+  let s = sizeof (get m data).clayout in
+  let cells = if s = 0 then 0 else length / s in
+  let label = Format.asprintf "%t%a"
+      (Fields.pslice ~fields ~offset ~length) pp_cells cells
+  in Range { offset ; length ; cells ; label ; data = node m data }
+
+let ranges (m:map) (r:node) =
+  let node = Ufind.get m.store r in
+  let fields = cfields node.clayout in
+  List.map (make_range m fields) (cranges node.clayout)
+
+let make_region (m: map) (n: node) (r: chunk) : region =
+  let types = ctypes r in
+  let typed = typed m n in
+  let sizeof = sizeof r.clayout in
+  let fields = cfields r.clayout in
+  let singleton = singleton m n in
+  {
+    node = n ;
+    parents = nodes m r.cparents ;
+    roots = List.map (make_root sizeof) @@ Vset.elements r.croots ;
+    labels = Lset.elements r.clabels ;
+    reads = Access.Set.elements r.creads ;
+    writes = Access.Set.elements r.cwrites ;
+    shifts = Access.Set.elements r.cshifts ;
+    ranges = List.map (make_range m fields) (cranges r.clayout) ;
+    pointed = Option.map (node m) (cpointed r.clayout) ;
+    types ; typed ; singleton ; sizeof ; fields ;
+  }
+
+let region map n = make_region map n (get map n)
+
+let regions map =
+  let pool = ref [] in
+  iter map (fun r -> pool := region map r :: !pool) ;
+  List.rev !pool
+
+(* -------------------------------------------------------------------------- *)
