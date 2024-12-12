@@ -62,6 +62,7 @@ export default defineConfig({
         "dome/controls": path.resolve(DOME, "renderer", "controls"),
         "dome/data": path.resolve(DOME, "renderer", "data"),
         "dome/dialogs": path.resolve(DOME, "renderer", "dialogs"),
+        "dome/help": path.resolve(DOME, "renderer", "help"),
         "dome/dnd": path.resolve(DOME, "renderer", "dnd"),
         "dome/errors": path.resolve(DOME, "renderer", "errors"),
         "dome/frame": path.resolve(DOME, "renderer", "frame"),

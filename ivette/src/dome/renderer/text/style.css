@@ -75,6 +75,21 @@
 
 }
 
+.dome-pages a
+{
+  color: var(--text-highlighted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.dome-pages code {
+  &.code-inline {
+    background-color: var(--background-interaction);
+    padding: 1px 5px;
+    border-radius: 5px;
+  }
+}
+
 /* -------------------------------------------------------------------------- */
 /* --- Styling CodeMirror 6 editor                                        --- */
 /* -------------------------------------------------------------------------- */

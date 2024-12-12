@@ -23,18 +23,24 @@
 import React from 'react';
 import ReactMarkdown, { Options } from 'react-markdown';
 
+import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-
+import {
+  CodeBlock, atomOneDark, atomOneLight
+} from "react-code-blocks";
 export interface Pattern {
   pattern: RegExp,
   replace: (key: number, match?: RegExpExecArray) => JSX.Element | null
 }
 
 export const iconTag: Pattern = {
-  pattern: /\[icon-([^\]]+)\]/g,
+  pattern: /(\[ex:\])?\[icon-([^\]]+)\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
-    return match ? <Icon key={key} id={match[1]}/> : null;
+    if(match && match[1] === "[ex:]") {
+      return <span key={key}>{`[icon-${match[2]}]`}</span>;
+    }
+    return match ? <Icon key={key} id={match[2]}/> : null;
   }
 };
 
@@ -99,6 +105,9 @@ interface MarkdownProps {
   className?: string;
   /** Tab of patterns */
   patterns?: Pattern[];
+  /** Anchors ref */
+  anchorsRef: React.MutableRefObject<
+    {[key: string] : HTMLHeadingElement | null}>;
   /** Children */
   children?: string | null;
 }
@@ -106,15 +115,51 @@ interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, patterns, children } = props;
+  const { className, patterns, anchorsRef, children } = props;
+  const theme = Themes.useColorTheme()[0];
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages", className
   );
 
+  /**
+   * If children is a string this function return the
+   * heading element with an id and save ref in anchorsRef
+   */
+  const getHtmlTitle = (
+    children: React.ReactNode,
+    tag: "h1" | "h2" = 'h1'
+  ): JSX.Element => {
+    const Tag = tag;
+    const id = typeof children === "string" ?
+      children.toLowerCase().replaceAll(' ', '-') : undefined;
+
+    return id ?
+      <Tag id={id} ref={(el) => anchorsRef.current[id] = el}>{children}</Tag>:
+      <Tag>{children}</Tag>;
+  };
+
   const options: Options = { className: markdownClasses };
   if(patterns && patterns.length > 0) options.components = {
     p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
-    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>
+    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>,
+    h1: ({ children }) => getHtmlTitle(children),
+    h2: ({ children }) => getHtmlTitle(children, 'h2'),
+    /** Uses codeBlock if ```` is used in markdown with a language,
+     *  otherwise the code-inline class is added */
+    code: ({ className, children }) => {
+      if (className && className.includes("language-")
+        && typeof children === "string"
+      ) {
+        const language = className.split("language-")[1];
+        return <CodeBlock
+          text={children}
+          language={language}
+          showLineNumbers={false}
+          theme={theme === 'dark' ? atomOneDark : atomOneLight}
+        />;
+      }
+      return <code className='code-inline'>{children}</code>;
+    },
   };
 
   return <ReactMarkdown {...options}>{ children }</ReactMarkdown>;

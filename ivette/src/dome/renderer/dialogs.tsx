@@ -315,7 +315,7 @@ export async function showOpenDir(
 export function showModal(val: React.ReactNode): void { modal.setValue(val); }
 export function closeModal(): void { showModal(undefined); }
 
-interface ModalProps {
+export interface ModalProps {
   /** Text of the label. Prepend to other children elements. */
   label: string;
   /** Icon identifier. Displayed on the left side of the label. */
