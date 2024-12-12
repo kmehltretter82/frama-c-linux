@@ -29,7 +29,7 @@ open Cil_types
 (* -------------------------------------------------------------------------- *)
 
 (** Generates a predicate characterizing the domain of the l-value. *)
-val eval_value :
+val export_value :
   loc:location -> ?name:string list -> lval -> Results.request -> predicate
 
 (**
@@ -41,7 +41,7 @@ val eval_value :
    left-hand-side are not visited, but their inner l-values are visited; any
    l-value from the right-hand-side of the instruction is also visited.
 *)
-val eval_instr :
+val export_stmt :
   ?callstack:Callstack.t -> ?name:string list -> stmt -> predicate list
 
 (** Emitter used for generating domain assertions. *)

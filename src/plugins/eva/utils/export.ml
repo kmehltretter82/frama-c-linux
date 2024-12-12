@@ -161,7 +161,7 @@ let domain lv value =
 (* --- Evalutation                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let eval_value ~loc ?name lv request =
+let export_value ~loc ?name lv request =
   Results.eval_lval lv request
   |> domain lv
   |> predicate ?name ~loc
@@ -233,7 +233,7 @@ let collect stmt =
   end ;
   acc#flush
 
-let eval_instr ?callstack ?name stmt =
+let export_stmt ?callstack ?name stmt =
   let request =
     let r = Results.before stmt in
     match callstack with
@@ -274,7 +274,7 @@ let generator () : visitor =
           begin
             List.iter
               (Annotations.add_assert emitter ~kf stmt)
-              (eval_instr stmt) ;
+              (export_stmt stmt) ;
             Annotations.iter_code_annot
               (fun e ca ->
                  if Emitter.equal e emitter then
