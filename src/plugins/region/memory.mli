@@ -24,18 +24,24 @@ open Cil_types
 
 type node
 
-type range = {
-  label: string ;
-  offset: int ;
-  length: int ;
-  cells: int ;
-  data: node ;
-}
+type root = Root of {
+    label : string ;
+    cvar : varinfo ;
+    cells : int ;
+  }
+
+type range = Range of {
+    label : string ;
+    offset : int ;
+    length : int ;
+    cells : int ;
+    data : node ;
+  }
 
 type region = {
   node: node ;
   parents: node list ;
-  roots: varinfo list ;
+  roots: root list ;
   labels: string list ;
   types: typ list ;
   typed : typ option ;

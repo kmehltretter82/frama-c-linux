@@ -47,10 +47,7 @@ function makeRecord(
     if (offset !== rg.offset)
       cells.push(`#${rg.offset - offset}b`);
     offset = rg.offset + rg.length;
-    const label =
-      rg.cells < 1 ? `${rg.label} […]` :
-        rg.cells > 1 ? `${rg.label} [${rg.cells}]` :
-          rg.label;
+    const label = rg.label;
     cells.push({ label, port });
   });
   if (offset !== sizeof)
@@ -93,9 +90,9 @@ function makeDiagram(regions: readonly Region.region[]): Diagram {
     });
     // --- Roots
     const R: Dot.Node = { id: '', shape: 'cds', font: 'mono' };
-    r.roots.forEach(x => {
-      const xid = `X${x}`;
-      nodes.push({ ...R, id: xid, label: x });
+    r.roots.forEach(r => {
+      const xid = `X${r.name}`;
+      nodes.push({ ...R, id: xid, label: r.label, title: r.title });
       edges.push({
         source: xid, target: id,
         headAnchor: "e", head: 'none', color: 'grey'

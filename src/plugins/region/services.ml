@@ -41,6 +41,34 @@ end
 module NodeOpt = Data.Joption(Node)
 module NodeList = Data.Jlist(Node)
 
+module Root : Data.S with type t = Memory.root =
+struct
+  type t = Memory.root
+  let jtype = Data.declare ~package ~name:"root" @@
+    Jrecord [
+      "name", Jstring ;
+      "label", Jstring ;
+      "title", Jstring ;
+      "cells", Jnumber ;
+    ]
+
+  let title (Memory.Root r) =
+    Format.asprintf "%a (%db) (%d cells)"
+      Typ.pretty r.cvar.vtype
+      (Cil.bitsSizeOf r.cvar.vtype)
+      r.cells
+
+  let to_json (Memory.Root r as root) =
+    Json.of_fields [
+      "name", Json.of_string r.cvar.vname ;
+      "label", Json.of_string r.label ;
+      "title", Json.of_string (title root) ;
+      "cells", Json.of_int r.cells ;
+    ]
+  let of_json _ = failwith "Region.Root.of_json"
+end
+
+
 module Range : Data.S with type t = Memory.range =
 struct
   type t = Memory.range
@@ -53,7 +81,7 @@ struct
       "data", Node.jtype ;
     ]
 
-  let to_json (rg : Memory.range) =
+  let to_json (Memory.Range rg) =
     Json.of_fields [
       "label", Json.of_string rg.label ;
       "offset", Json.of_int rg.offset ;
@@ -64,15 +92,12 @@ struct
   let of_json _ = failwith "Region.Range.of_json"
 end
 
+module Roots = Data.Jlist(Root)
 module Ranges = Data.Jlist(Range)
 
 module Region: Data.S with type t = Memory.region =
 struct
   type t = Memory.region
-
-  let roots_to_json vs =
-    let open Cil_types in
-    Json.of_list @@ List.map (fun v -> Json.of_string v.vname) vs
 
   let labels_to_json ls =
     Json.of_list @@ List.map Json.of_string ls
@@ -114,7 +139,7 @@ struct
 
   let label (m: Memory.region) =
     let buffer = Buffer.create 4 in
-    if m.singleton then Buffer.add_string buffer "!" ;
+    (* if m.singleton then Buffer.add_string buffer "!" ; *)
     if m.reads <> [] then Buffer.add_char buffer 'R' ;
     if m.writes <> [] then Buffer.add_char buffer 'W' ;
     if m.pointed <> None then Buffer.add_char buffer '*'
@@ -151,7 +176,7 @@ struct
   let jtype = Data.declare ~package ~name:"region" @@
     Jrecord [
       "node", Node.jtype ;
-      "roots", Jarray Jalpha ;
+      "roots", Roots.jtype ;
       "labels", Jarray Jalpha ;
       "parents", NodeList.jtype ;
       "sizeof", Jnumber ;
@@ -168,7 +193,7 @@ struct
   let to_json (m: Memory.region) =
     Json.of_fields [
       "node", Node.to_json m.node ;
-      "roots", roots_to_json m.roots ;
+      "roots", Roots.to_json m.roots ;
       "labels", labels_to_json m.labels ;
       "parents", NodeList.to_json m.parents ;
       "sizeof", Json.of_int @@ m.sizeof ;
