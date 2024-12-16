@@ -1200,8 +1200,6 @@ let prover_task env prover task =
 (* --- Prover Call                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-let altergo_step_limit = Str.regexp "^Steps limit reached:"
-
 type prover_call = {
   prover : Why3Provers.t ;
   call : Why3.Call_provers.prover_call ;
@@ -1226,8 +1224,7 @@ let debug_model (res:Why3.Call_provers.prover_result) =
         begin fun (res,model) ->
           Format.fprintf fmt "@[<hov 2>model %a: %a@]@\n"
             Why3.Call_provers.print_prover_answer res
-            (Why3.Model_parser.print_model_human
-               ~filter_similar:false
+            (Why3.Model_parser.print_model
                ~print_attrs:true) model
         end
         res.pr_models
@@ -1297,14 +1294,7 @@ let ping_prover_call ~config ~probes p =
         debug_model pr;
         VCS.result ~model:(get_model probes pr) VCS.Unknown
       | _ when p.interrupted -> VCS.timeout p.timeout
-      | Failure s -> VCS.failed s
-      | HighFailure ->
-        let alt_ergo_hack =
-          p.prover.prover_name = "Alt-Ergo" &&
-          Str.string_match altergo_step_limit pr.pr_output 0
-        in
-        if alt_ergo_hack then VCS.result ?steps:p.steps VCS.Stepout
-        else VCS.failed "Unknown error"
+      | Failure msg | HighFailure msg -> VCS.failed msg
     in
     Wp_parameters.debug ~dkey
       "@[@[Why3 result for %a:@] @[%a@] and @[%a@]@."
@@ -1374,11 +1364,11 @@ let run_batch pconf driver ~config
     ?(probes=Probe.Map.empty)
     prover task =
   let steps = match steplimit with Some 0 -> None | _ -> steplimit in
-  let limit =
+  let limits =
     let config = Why3.Whyconf.get_main @@ Why3Provers.config () in
     let config_mem = Why3.Whyconf.memlimit config in
     let config_time = Why3.Whyconf.timelimit config in
-    let config_steps = Why3.Call_provers.empty_limit.limit_steps in
+    let config_steps = Why3.Call_provers.empty_limits.limit_steps in
     Why3.Call_provers.{
       limit_time = Option.value ~default:config_time timeout;
       limit_steps = Option.value ~default:config_steps steps;
@@ -1398,7 +1388,7 @@ let run_batch pconf driver ~config
   let inplace = if script <> None then Some true else None in
   let call =
     Why3.Driver.prove_task_prepared ?old:(script :> string option) ?inplace
-      ~command ~limit ~config driver task in
+      ~command ~limits ~config driver task in
   call_prover_task ~config ~timeout ~steps ~probes prover call
 
 (* -------------------------------------------------------------------------- *)
