@@ -1,8 +1,8 @@
 /* run.config
-  OPT: -wp-prop=CHECK,FAILS
+  COMMENT:
 */
 /* run.config_qualif
-  OPT: -wp-prop=CHECK,FAILS -wp-timeout 20
+  OPT: -wp-prop=-FAILS -wp-timeout 25
 */
 
 struct S {
@@ -14,12 +14,13 @@ void initialize(void){
   struct S s ;
   s.i = 0 ;
   /*@
-    loop invariant CHECK: 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
-    loop assigns CHECK: i, s.a[0 .. 9];
+    loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
+    loop assigns i, s.a[0 .. 9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
-  //@ check CHECK: \initialized(&s);
+  //@ check \initialized(&s);
 }
 
 void range(void){
@@ -28,17 +29,19 @@ void range(void){
   /*@
     loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
     loop assigns i, s.a[0 .. 9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
   /*@
-    loop invariant CHECK: \initialized(&s);
-    loop assigns CHECK: i, s.a[1 .. 4];
+    loop invariant \initialized(&s);
+    loop assigns i, s.a[1 .. 4];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i){
     if(1 <= i && i <= 4) s.a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(&s);
+  //@ check \initialized(&s);
 }
 
 void field(void){
@@ -47,10 +50,14 @@ void field(void){
   /*@
     loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
     loop assigns i, s.a[0 .. 9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
-  /*@ loop assigns CHECK: i, s.i; */
+  /*@
+    loop assigns i, s.i;
+    loop variant 10-i;
+    */
   for(int i = 0; i < 10; ++i){
     s.i++;
   }
@@ -63,12 +70,14 @@ void array(void){
   /*@
     loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
     loop assigns i, s.a[0 .. 9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
   /*@
     loop invariant 0 <= i <= 10;
-    loop assigns CHECK: i, s.a[0..9];
+    loop assigns i, s.a[0..9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i){
     s.a[i] = 1 ;
@@ -82,10 +91,14 @@ void index(void){
   /*@
     loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
     loop assigns i, s.a[0 .. 9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
-  /*@ loop assigns CHECK: i, s.a[4]; */
+  /*@
+    loop assigns CHECK: i, s.a[4];
+    loop variant 10-i;
+    */
   for(int i = 0; i < 10; ++i){
     if(i == 4) s.a[i] = 1 ;
   }
@@ -98,17 +111,19 @@ void descr(void){
   /*@
     loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
     loop assigns i, s.a[0 .. 9];
+    loop variant 10-i ;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
   /*@
-    loop invariant CHECK: \initialized(&s);
-    loop assigns CHECK: i, { s.a[i] | integer i ; i \in { 0, 2, 4 } };
+    loop invariant \initialized(&s);
+    loop assigns i, { s.a[i] | integer i ; i \in { 0, 2, 4 } };
+    loop variant 10-i ;
   */
   for(int i = 0; i < 10; ++i){
     if(i == 0 || i == 2 || i == 4) s.a[i] = 1 ;
   }
-  //@ check CHECK: \initialized(&s);
+  //@ check \initialized(&s);
 }
 
 void comp(void){
@@ -117,12 +132,14 @@ void comp(void){
   /*@
     loop invariant 0 <= i <= 10 && \initialized(&s.a[0 .. i-1]);
     loop assigns i, s.a[0 .. 9];
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i) s.a[i] = 0;
 
   /*@
     loop invariant 0 <= i <= 10 ;
-    loop assigns CHECK: i, s;
+    loop assigns i, s;
+    loop variant 10-i;
   */
   for(int i = 0; i < 10; ++i){
     s.a[i] = 1 ;

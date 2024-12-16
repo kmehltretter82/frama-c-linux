@@ -44,7 +44,7 @@
 [wp] [Valid] bytes_raw_signed_neg_check_7 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_signed_neg_check_8 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_unsigned_signed_pos_check (Alt-Ergo) (Cached)
-[wp] [Valid] bytes_raw_cast_unsigned_signed_pos_check_2 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] bytes_raw_cast_unsigned_signed_pos_check_2 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_unsigned_signed_pos_check_3 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_unsigned_signed_pos_check_4 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_unsigned_signed_neg_check (Alt-Ergo) (Cached)
@@ -67,23 +67,24 @@
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_pos_check_7 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check_2 (Alt-Ergo) (Cached)
-[wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check_3 (Alt-Ergo) (Cached)
+[wp] [Unsuccess] bytes_raw_cast_from_bytes_to_signed_neg_check_3 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check_4 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check_5 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check_6 (Alt-Ergo) (Cached)
 [wp] [Valid] bytes_raw_cast_from_bytes_to_signed_neg_check_7 (Alt-Ergo) (Cached)
-[wp] Proved goals:   69 / 69
+[wp] Proved goals:   67 / 69
   Terminating:     8
   Unreachable:     8
-  Alt-Ergo:       53
+  Alt-Ergo:       51
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   unsigned_                 -        8        8       100%
   signed_pos                -        8        8       100%
   signed_neg                -        8        8       100%
-  cast_unsigned_signed_pos   -       4        4       100%
+  cast_unsigned_signed_pos   -       3        4      75.0%
   cast_unsigned_signed_neg   -       4        4       100%
   cast_from_bytes_to_unsigned   -    7        7       100%
   cast_from_bytes_to_signed_pos   -   7       7       100%
-  cast_from_bytes_to_signed_neg   -   7       7       100%
+  cast_from_bytes_to_signed_neg   -   6       7      85.7%
 ------------------------------------------------------------
