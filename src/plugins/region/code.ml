@@ -50,8 +50,9 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | NoOffset -> r
   | Field(fd,ofs) ->
     add_loffset m s (add_field m r fd) fd.ftype ofs
-  | Index(_,ofs) ->
+  | Index(e,ofs) ->
     let elt = Cil.typeOf_array_elem ty in
+    ignore @@ add_exp m s e ;
     add_loffset m s (add_index m r elt) elt ofs
 
 and add_value m s e = ignore (add_exp m s e)
