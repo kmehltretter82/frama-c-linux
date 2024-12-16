@@ -22,6 +22,7 @@
 
 import React from 'react';
 import ReactMarkdown, { Options } from 'react-markdown';
+import remarkCustomHeaderId from 'remark-custom-header-id';
 
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
@@ -54,9 +55,9 @@ export const iconTag: Pattern = {
  */
 function replaceTags(
   children: React.ReactNode,
-  patterns: Pattern[],
+  patterns?: Pattern[],
 ): React.ReactNode {
-  if(patterns.length < 1) return children;
+  if(!patterns || patterns.length < 1) return children;
 
   const buffer: React.ReactNode[] = [];
   let counter = 0;
@@ -100,14 +101,13 @@ function replaceTags(
 // --- Markdown component
 // --------------------------------------------------------------------------
 
-interface MarkdownProps {
+export interface MarkdownProps {
   /** classes for Markdown component */
   className?: string;
   /** Tab of patterns */
   patterns?: Pattern[];
-  /** Anchors ref */
-  anchorsRef: React.MutableRefObject<
-    {[key: string] : HTMLHeadingElement | null}>;
+  /** scroll to the chosen id */
+  scrollTo?: string;
   /** Children */
   children?: string | null;
 }
@@ -115,36 +115,27 @@ interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, patterns, anchorsRef, children } = props;
+  const { className, scrollTo, patterns, children } = props;
   const theme = Themes.useColorTheme()[0];
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages", className
   );
 
-  /**
-   * If children is a string this function return the
-   * heading element with an id and save ref in anchorsRef
-   */
-  const getHtmlTitle = (
-    children: React.ReactNode,
-    tag: "h1" | "h2" = 'h1'
-  ): JSX.Element => {
-    const Tag = tag;
-    const id = typeof children === "string" ?
-      children.toLowerCase().replaceAll(' ', '-') : undefined;
-
-    return id ?
-      <Tag id={id} ref={(el) => anchorsRef.current[id] = el}>{children}</Tag>:
-      <Tag>{children}</Tag>;
+  const scroll = (id: string): void => {
+    const elt = document.getElementById(id);
+    if(elt) elt.scrollIntoView({ behavior: "smooth" });
   };
 
-  const options: Options = { className: markdownClasses };
-  if(patterns && patterns.length > 0) options.components = {
+  React.useEffect(() => { if(scrollTo) scroll(scrollTo); }, [scrollTo]);
+
+  const options: Options = {
+    className: markdownClasses,
+    remarkPlugins: [remarkCustomHeaderId],
+  };
+  options.components = {
     p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
     li: ({ children }) => <li>{replaceTags(children, patterns)}</li>,
-    h1: ({ children }) => getHtmlTitle(children),
-    h2: ({ children }) => getHtmlTitle(children, 'h2'),
-    /** Uses codeBlock if ```` is used in markdown with a language,
+    /** Uses codeBlock if ``` is used in markdown with a language,
      *  otherwise the code-inline class is added */
     code: ({ className, children }) => {
       if (className && className.includes("language-")
@@ -159,6 +150,19 @@ export function Markdown(
         />;
       }
       return <code className='code-inline'>{children}</code>;
+    },
+    /** Change the behavior of links on anchors */
+    a: ({ href, children }) => {
+      if (href && href.startsWith("#")) {
+        const id = href.slice(1);
+        return ( <a href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            scroll(id);
+          }}>{children}</a>
+        );
+      }
+      return <a href={href}>{children}</a>;
     },
   };
 

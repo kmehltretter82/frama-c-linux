@@ -26,23 +26,42 @@
 
 import React from 'react';
 import { registerSandbox, TitleBar } from 'ivette';
-import { HelpMarkdown, IconHelpModalMd } from 'dome/help';
-import docSandbox from './sandbox.md?raw';
+import { HelpIcon } from 'dome/help';
+import helpSandbox from './sandbox.md?raw';
 
 // --------------------------------------------------------------------------
 // --- Main force graph component
 // --------------------------------------------------------------------------
 
 function SandboxHelp(): JSX.Element {
+  const style = {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+    fontSize: '1.5em'
+  };
+
   return (
     <>
       <TitleBar>
-        <IconHelpModalMd
-          modal={{ label: 'docsandbox - Help' }}
-          initialScrollTo={'help'}
-        >{ docSandbox }</IconHelpModalMd>
+        <HelpIcon
+          label='Sandbox - Help'
+          scrollTo={'sandbox-help'}
+        >{ helpSandbox }</HelpIcon>
       </TitleBar>
-      <HelpMarkdown initialScrollTo={'help'}>{ docSandbox }</HelpMarkdown>
+      <div style={style}>
+        <>
+          Click the help button to display help : here
+          <HelpIcon
+            label='Sandbox - Help'
+            size={18}
+            scrollTo={'sandbox-help'}
+            >{ helpSandbox }</HelpIcon>
+          or on the toolbar
+        </>
+      </div>
     </>
   );
 }

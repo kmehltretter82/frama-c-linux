@@ -26,95 +26,44 @@
  */
 
 import React from 'react';
-import { classes } from 'dome/misc/utils';
-import { IconButton, IconButtonKind } from './controls/buttons';
-import { Modal, showModal, ModalProps } from './dialogs';
+import { IconButton } from './controls/buttons';
+import { Modal, showModal } from './dialogs';
 import { iconTag, Markdown, Pattern } from './text/markdown';
 
 /* --------------------------------------------------------------------------*/
-/* --- Panel List                                                            */
+/* --- Help                                                                  */
 /* --------------------------------------------------------------------------*/
-interface HelpMarkdownProps {
-  /** classes for Doc component */
-  className?: string;
+
+interface HelpIconProps {
+  /** icon size */
+  size?: number;
   /** Tab of patterns */
   patterns?: Pattern[];
-  /**
-   * scroll to title h1 or h2 when component is render.
-   * The value must be the id of the balise html.
-   * Id is calculate by title.toLowerCase().replaceAll(' ','-')
-   * where title is the content of h1 or h2 if it is a string
-  */
-  initialScrollTo?: string;
-  /** Markdown content. */
-  children?: string;
+  /** Initial scroll to the chosen id */
+  scrollTo?: string;
+  /** Text of the label. Prepend to other children elements. */
+  label: string;
+  /** Function onClose */
+  onClose?: () => void
+  /** children */
+  children: string;
 }
 
-export function HelpMarkdown(props: HelpMarkdownProps): JSX.Element {
-  const { patterns = [iconTag], className, initialScrollTo, children } = props;
-  const classNames = classes('dome-xHelp', className);
-
-  const scrollableDivRef = React.useRef<HTMLDivElement>(null);
-  const anchorsRef = React.useRef<{
-    [key: string] : HTMLHeadingElement | null
-  }>({});
-
-  const scrollToAnchor = (id: string): void => {
-    const scrollableDiv = scrollableDivRef.current;
-    const anchor = anchorsRef.current[id];
-    const top = scrollableDiv?.offsetTop || 0;
-
-    if (scrollableDiv && anchor) {
-      const anchorPosition = anchor.offsetTop - top;
-      scrollableDiv.scrollTo({
-        top: anchorPosition,
-        behavior: 'smooth',
-      });
-    }
-  };
-
-  React.useEffect(() => {
-    if(initialScrollTo) scrollToAnchor(initialScrollTo);
-  }, [initialScrollTo]);
-
-  return (
-    <div ref={scrollableDivRef} className={classNames}>
-      <Markdown
-        patterns={patterns || [iconTag]}
-        anchorsRef={anchorsRef}
-      >{ children }</Markdown>
-    </div>
-  );
-}
-
-interface IconModalMdProps extends HelpMarkdownProps {
-  /** Icon props */
-  kind?: IconButtonKind;
-  title?: string;
-  size?: number;
-  /** Properties of Modal component */
-  modal: Omit<ModalProps, 'children'>;
-}
-
-export function IconHelpModalMd(props: IconModalMdProps): JSX.Element {
-  const { title, kind, size,
-    patterns, initialScrollTo,
-    modal, children
-  } = props;
+export function HelpIcon(props: HelpIconProps): JSX.Element {
+  const { size, patterns, scrollTo, label, onClose, children } = props;
 
   return (
     <IconButton
       icon='HELP'
-      className='dome-xDoc-icon'
-      title={title}
-      kind={kind}
       size={size}
+      className='dome-xDoc-icon'
+      title={'Help'}
       onClick={() => showModal(
-        <Modal {...modal} >
-          <HelpMarkdown
-            patterns={patterns}
-            initialScrollTo={initialScrollTo}
-          >{ children }</HelpMarkdown>
+        <Modal label= {label} onClose={onClose} >
+          <Markdown
+            patterns={patterns || [iconTag]}
+            scrollTo={scrollTo}
+          >{ children }</Markdown>
         </Modal>)
       }
     />

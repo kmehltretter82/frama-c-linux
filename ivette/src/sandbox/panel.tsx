@@ -37,7 +37,7 @@ import { Icon } from 'dome/controls/icons';
 import './style.css';
 import { Label } from 'dome/controls/labels';
 import { Modal, showModal } from 'dome/dialogs';
-import { IconHelpModalMd } from 'dome/help';
+import { HelpIcon } from 'dome/help';
 import docSandbox from './sandbox.md?raw';
 
 /* -------------------------------------------------------------------------- */
@@ -82,14 +82,12 @@ function UsePanel(): JSX.Element {
           title={"show or hide the panel"}
           onClick={flipVisible}
         />
-        <IconHelpModalMd
-          modal={{
-            label: 'docsandbox - Panel'
-          }}
-          initialScrollTo={'panel'}
+        <HelpIcon
+          label='Sandbox - Panel'
+          scrollTo={'sandbox-panel'}
         >
           { docSandbox }
-        </IconHelpModalMd>
+        </HelpIcon>
       </TitleBar>
       <div style={{ position: 'relative', height: '100%' }}>
         <Panel visible={visible} position={position}>
