@@ -76,12 +76,12 @@ type graph_diff = {
   removed_nodes: node list;
 }
 
-type 'a range = {
-  backward: 'a;
-  forward: 'a;
+type range = {
+  backward: int option;
+  forward: int option;
 }
 
 type window = {
-  perception: int option range; (* depth of exploration *)
-  horizon: int option range; (* hide beyond horizon ; None for infinite *)
+  perception: range; (* depth of exploration *)
+  horizon: range; (* hide beyond horizon ; None for infinite *)
 }
