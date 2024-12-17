@@ -10,8 +10,8 @@ Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 69):
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = havoc(Init_undef_0, m, a_1, 10).
-Let a_3 = havoc(Init_undef_1, m, a_1, 10).
+Let a_2 = memcpy(m, Init_undef_0, a_1, a_1, 10).
+Let a_3 = memcpy(m, Init_undef_1, a_1, a_1, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
@@ -63,25 +63,26 @@ Prove: IsInit_S1_S(global(G_glob_82), Init_0).
 
 Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 129):
 Let a = shiftfield_F1_S_a(pg_0).
-Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(pg_0) <- true],
-            shift_sint32(a, 0), 10).
+Let a_1 = shift_sint32(a, 0).
+Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(pg_0) <- true], Init_undef_0, a_1,
+            a_1, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
   Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
       cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_1).
+  Have: cinits(a_2).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-       (a_1[shift_sint32(a, i_1)]=true)))).
+       (a_2[shift_sint32(a, i_1)]=true)))).
   (* Then *)
   Have: i <= 9.
 }
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
-     (a_1[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
+     (a_2[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
 
 ------------------------------------------------------------
 
@@ -92,20 +93,21 @@ Prove: true.
 
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 142):
 Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
-Let a = havoc(Init_undef_0, m, pg_0, 11).
+Let a = memcpy(m, Init_undef_0, pg_0, pg_0, 11).
 Let a_1 = shiftfield_F1_S_a(pg_0).
-Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
+Let a_2 = shift_sint32(a_1, 0).
+Let a_3 = memcpy(m, Init_undef_1, a_2, a_2, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
       cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_2).
+  Have: cinits(a_3).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_2[shift_sint32(a_1, i_2)]=true)))).
+       (a_3[shift_sint32(a_1, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
@@ -121,20 +123,21 @@ Prove: IsInit_S1_S(pg_0, a).
 
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 143):
 Let m = Init_0[shiftfield_F1_S_i(pg_0) <- true].
-Let a = havoc(Init_undef_0, m, pg_0, 11).
+Let a = memcpy(m, Init_undef_0, pg_0, pg_0, 11).
 Let a_1 = shiftfield_F1_S_a(pg_0).
-Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
+Let a_2 = shift_sint32(a_1, 0).
+Let a_3 = memcpy(m, Init_undef_1, a_2, a_2, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(G_glob_82) <= 0) /\ (region(pg_0.base) <= 0) /\
       cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_2).
+  Have: cinits(a_3).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_2[shift_sint32(a_1, i_2)]=true)))).
+       (a_3[shift_sint32(a_1, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
@@ -187,19 +190,20 @@ Prove: true.
 
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 118):
 Let m = Init_0[shiftfield_F1_S_i(s) <- true].
-Let a = havoc(Init_undef_0, m, s, 11).
+Let a = memcpy(m, Init_undef_0, s, s, 11).
 Let a_1 = shiftfield_F1_S_a(s).
-Let a_2 = havoc(Init_undef_1, m, shift_sint32(a_1, 0), 10).
+Let a_2 = shift_sint32(a_1, 0).
+Let a_3 = memcpy(m, Init_undef_1, a_2, a_2, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a_2).
+  Have: cinits(a_3).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_2[shift_sint32(a_1, i_2)]=true)))).
+       (a_3[shift_sint32(a_1, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
@@ -237,7 +241,7 @@ Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 99):
 Let a = shiftfield_F1_S_a(s).
 Let a_1 = shiftfield_F1_S_i(s).
 Let a_2 = shift_sint32(a, 0).
-Let a_3 = havoc(Init_undef_0, Init_1[a_1 <- true], a_2, 10).
+Let a_3 = memcpy(Init_1[a_1 <- true], Init_undef_0, a_2, a_2, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
@@ -259,7 +263,8 @@ Assume {
       (forall a_4 : addr.
        ((forall i_2 : Z. (((i_2 = 0) \/ (i_2 = 2) \/ (i_2 = 4)) ->
          (shift_sint32(a, i_2) != a_4))) ->
-       (havoc(Mint_undef_0, Mint_0[a_1 <- 0], a_2, 10)[a_4] = Mint_1[a_4]))).
+       (memcpy(Mint_0[a_1 <- 0], Mint_undef_0, a_2, a_2, 10)[a_4] =
+        Mint_1[a_4]))).
   (* Else *)
   Have: 10 <= i_1.
 }
@@ -275,6 +280,7 @@ Prove: true.
 Goal Loop assigns 'CHECK' (2/5):
 Effect at line 96
 Let a = shiftfield_F1_S_a(s).
+Let a_1 = shift_sint32(a, 0).
 Assume {
   Type: is_sint32(i_2) /\ is_sint32(i_3).
   (* Heap *)
@@ -288,11 +294,11 @@ Assume {
   (* Else *)
   Have: 10 <= i_2.
   (* Loop assigns 'CHECK' *)
-  Have: forall a_1 : addr.
+  Have: forall a_2 : addr.
       ((forall i_5 : Z. (((i_5 = 0) \/ (i_5 = 2) \/ (i_5 = 4)) ->
-        (shift_sint32(a, i_5) != a_1))) ->
-      (havoc(Mint_undef_0, Mint_0[shiftfield_F1_S_i(s) <- 0],
-         shift_sint32(a, 0), 10)[a_1] = Mint_1[a_1])).
+        (shift_sint32(a, i_5) != a_2))) ->
+      (memcpy(Mint_0[shiftfield_F1_S_i(s) <- 0], Mint_undef_0, a_1, a_1, 10)
+         [a_2] = Mint_1[a_2])).
   (* Then *)
   Have: i_3 <= 9.
 }
@@ -325,26 +331,27 @@ Prove: true.
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 51):
 Let a = shiftfield_F1_S_i(s).
 Let a_1 = shiftfield_F1_S_a(s).
-Let a_2 = havoc(Init_undef_0, Init_0[a <- true], shift_sint32(a_1, 0), 10).
-Let a_3 = a_2[a <- i].
+Let a_2 = shift_sint32(a_1, 0).
+Let a_3 = memcpy(Init_0[a <- true], Init_undef_0, a_2, a_2, 10).
+Let a_4 = a_3[a <- i].
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i_2).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a_2).
+  Have: cinits(a_3).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10) /\
       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) ->
-       (a_2[shift_sint32(a_1, i_3)]=true)))).
+       (a_3[shift_sint32(a_1, i_3)]=true)))).
   (* Else *)
   Have: 10 <= i_1.
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_3).
+  Have: cinits(a_4).
   (* Else *)
   Have: 10 <= i_2.
 }
-Prove: IsInit_S1_S(s, a_3).
+Prove: IsInit_S1_S(s, a_4).
 
 ------------------------------------------------------------
 
@@ -364,27 +371,28 @@ Prove: true.
 
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 84):
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
-            shift_sint32(a, 0), 10).
-Let a_2 = a_1[shift_sint32(a, 4) <- i].
+Let a_1 = shift_sint32(a, 0).
+Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], Init_undef_0, a_1,
+            a_1, 10).
+Let a_3 = a_2[shift_sint32(a, 4) <- i].
 Assume {
   Type: is_sint32(i_1) /\ is_sint32(i_2).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a_1).
+  Have: cinits(a_2).
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= 10) /\
       (forall i_3 : Z. ((0 <= i_3) -> ((i_3 < i_1) ->
-       (a_1[shift_sint32(a, i_3)]=true)))).
+       (a_2[shift_sint32(a, i_3)]=true)))).
   (* Else *)
   Have: 10 <= i_1.
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_2).
+  Have: cinits(a_3).
   (* Else *)
   Have: 10 <= i_2.
 }
-Prove: IsInit_S1_S(s, a_2).
+Prove: IsInit_S1_S(s, a_3).
 
 ------------------------------------------------------------
 
@@ -410,24 +418,25 @@ Prove: true.
 
 Goal Preservation of Invariant 'CHECK' (file assigned_initialized_memtyped.i, line 16):
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
-            shift_sint32(a, 0), 10).
+Let a_1 = shift_sint32(a, 0).
+Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], Init_undef_0, a_1,
+            a_1, 10).
 Assume {
   Type: is_sint32(i) /\ is_sint32(1 + i).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_1).
+  Have: cinits(a_2).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-       (a_1[shift_sint32(a, i_1)]=true)))).
+       (a_2[shift_sint32(a, i_1)]=true)))).
   (* Then *)
   Have: i <= 9.
 }
 Prove: ((-1) <= i) /\
     (forall i_1 : Z. ((i_1 <= i) -> ((0 <= i_1) ->
-     (a_1[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
+     (a_2[shift_sint32(a, i) <- true][shift_sint32(a, i_1)]=true)))).
 
 ------------------------------------------------------------
 
@@ -438,22 +447,23 @@ Prove: true.
 
 Goal Check 'CHECK' (file assigned_initialized_memtyped.i, line 21):
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_0, Init_0[shiftfield_F1_S_i(s) <- true],
-            shift_sint32(a, 0), 10).
+Let a_1 = shift_sint32(a, 0).
+Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], Init_undef_0, a_1,
+            a_1, 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_1).
+  Have: cinits(a_2).
   (* Invariant 'CHECK' *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-       (a_1[shift_sint32(a, i_1)]=true)))).
+       (a_2[shift_sint32(a, i_1)]=true)))).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInit_S1_S(s, a_1).
+Prove: IsInit_S1_S(s, a_2).
 
 ------------------------------------------------------------
 
@@ -479,27 +489,29 @@ Prove: true.
 
 Goal Check 'FAILS' (file assigned_initialized_memtyped.i, line 36):
 Let a = shiftfield_F1_S_a(s).
-Let a_1 = havoc(Init_undef_1, Init_0[shiftfield_F1_S_i(s) <- true],
-            shift_sint32(a, 0), 10).
-Let a_2 = havoc(Init_undef_0, a_1, shift_sint32(a, 1), 4).
+Let a_1 = shift_sint32(a, 0).
+Let a_2 = memcpy(Init_0[shiftfield_F1_S_i(s) <- true], Init_undef_0, a_1,
+            a_1, 10).
+Let a_3 = shift_sint32(a, 1).
+Let a_4 = memcpy(a_2, Init_undef_1, a_3, a_3, 4).
 Assume {
   Type: is_sint32(i) /\ is_sint32(i_1).
   (* Heap *)
   Type: (region(s.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a_1).
+  Have: cinits(a_2).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 10) /\
       (forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-       (a_1[shift_sint32(a, i_2)]=true)))).
+       (a_2[shift_sint32(a, i_2)]=true)))).
   (* Else *)
   Have: 10 <= i.
   (* Loop assigns 'CHECK' *)
-  Have: cinits(a_2).
+  Have: cinits(a_4).
   (* Else *)
   Have: 10 <= i_1.
 }
-Prove: IsInit_S1_S(s, a_2).
+Prove: IsInit_S1_S(s, a_4).
 
 ------------------------------------------------------------
 

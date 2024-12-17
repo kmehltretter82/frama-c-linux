@@ -25,7 +25,7 @@ Prove: true.
 
 Goal Preservation of Invariant (file looplabels.i, line 19):
 Let a_1 = shift_sint32(b, 0).
-Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
+Let a_2 = memcpy(Mint_0, Mint_undef_0, a_1, a_1, n).
 Let a_3 = shift_sint32(a, 0).
 Let x = 1 + i.
 Assume {
@@ -89,7 +89,7 @@ Prove: true.
 Goal Loop assigns (file looplabels.i, line 20) (3/3):
 Effect at line 24
 Let a_1 = shift_sint32(b, 0).
-Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, n).
+Let a_2 = memcpy(Mint_0, Mint_undef_0, a_1, a_1, n).
 Let x = i - 1.
 Let a_3 = shift_sint32(b, x).
 Let a_4 = shift_sint32(a, 0).

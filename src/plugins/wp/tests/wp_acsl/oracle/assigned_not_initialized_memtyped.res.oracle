@@ -7,17 +7,18 @@
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file assigned_not_initialized_memtyped.i, line 28):
-Let a = havoc(Init_undef_0, Init_0, shift_sint32(array_0, 0), 10).
+Let a = shift_sint32(array_0, 0).
+Let a_1 = memcpy(Init_0, Init_undef_0, a, a, 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
   Type: (region(array_0.base) <= 0) /\ cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a).
+  Have: cinits(a_1).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInitArray_sint32(array_0, 10, a).
+Prove: IsInitArray_sint32(array_0, 10, a_1).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -25,38 +26,41 @@ Prove: IsInitArray_sint32(array_0, 10, a).
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file assigned_not_initialized_memtyped.i, line 60):
-Let a = havoc(Init_undef_1, Init_0, shift_sint32(global(G_glob_array_51), 0),
-          10).
-Let a_1 = havoc(Init_undef_0, a, shift_sint32(pg_array_0, 0), 10).
+Let a = shift_sint32(global(G_glob_array_51), 0).
+Let a_1 = memcpy(Init_0, Init_undef_0, a, a, 10).
+Let a_2 = shift_sint32(pg_array_0, 0).
+Let a_3 = memcpy(a_1, Init_undef_1, a_2, a_2, 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
   Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0) /\
       cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a) /\ cinits(a_1).
+  Have: cinits(a_1) /\ cinits(a_3).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInitArray_sint32(pg_array_0, 10, a_1).
+Prove: IsInitArray_sint32(pg_array_0, 10, a_3).
 
 ------------------------------------------------------------
 
 Goal Check 'OK' (file assigned_not_initialized_memtyped.i, line 61):
 Let a = global(G_glob_array_51).
-Let a_1 = havoc(Init_undef_1, Init_0, shift_sint32(a, 0), 10).
-Let a_2 = havoc(Init_undef_0, a_1, shift_sint32(pg_array_0, 0), 10).
+Let a_1 = shift_sint32(a, 0).
+Let a_2 = memcpy(Init_0, Init_undef_0, a_1, a_1, 10).
+Let a_3 = shift_sint32(pg_array_0, 0).
+Let a_4 = memcpy(a_2, Init_undef_1, a_3, a_3, 10).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
   Type: (region(G_glob_array_51) <= 0) /\ (region(pg_array_0.base) <= 0) /\
       cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a_1) /\ cinits(a_2).
+  Have: cinits(a_2) /\ cinits(a_4).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInitArray_sint32(a, 10, a_2).
+Prove: IsInitArray_sint32(a, 10, a_4).
 
 ------------------------------------------------------------
 ------------------------------------------------------------
@@ -97,26 +101,27 @@ Prove: (m_1[a]=true).
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file assigned_not_initialized_memtyped.i, line 49):
-Let a = havoc(Init_undef_1, Init_0, global(G_glob_comp_45), 11).
-Let a_1 = havoc(Init_undef_0, a, pg_comp_0, 11).
+Let a = global(G_glob_comp_45).
+Let a_1 = memcpy(Init_0, Init_undef_0, a, a, 11).
+Let a_2 = memcpy(a_1, Init_undef_1, pg_comp_0, pg_comp_0, 11).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
   Type: (region(G_glob_comp_45) <= 0) /\ (region(pg_comp_0.base) <= 0) /\
       cinits(Init_0).
   (* Loop assigns ... *)
-  Have: cinits(a) /\ cinits(a_1).
+  Have: cinits(a_1) /\ cinits(a_2).
   (* Else *)
   Have: 10 <= i.
 }
-Prove: IsInit_S1_S(pg_comp_0, a_1).
+Prove: IsInit_S1_S(pg_comp_0, a_2).
 
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file assigned_not_initialized_memtyped.i, line 50):
 Let a = global(G_glob_comp_45).
-Let a_1 = havoc(Init_undef_1, Init_0, a, 11).
-Let a_2 = havoc(Init_undef_0, a_1, pg_comp_0, 11).
+Let a_1 = memcpy(Init_0, Init_undef_0, a, a, 11).
+Let a_2 = memcpy(a_1, Init_undef_1, pg_comp_0, pg_comp_0, 11).
 Assume {
   Type: is_sint32(i).
   (* Heap *)
@@ -144,7 +149,7 @@ Prove: (i=true).
 ------------------------------------------------------------
 
 Goal Check 'FAIL' (file assigned_not_initialized_memtyped.i, line 22):
-Let a = havoc(Init_undef_0, Init_0, s, 11).
+Let a = memcpy(Init_0, Init_undef_0, s, s, 11).
 Assume {
   Type: is_sint32(i).
   (* Heap *)

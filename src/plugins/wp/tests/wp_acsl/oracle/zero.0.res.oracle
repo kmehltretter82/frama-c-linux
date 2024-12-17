@@ -30,7 +30,8 @@ Assume {
   Have: (0 <= i) /\ (i <= 10).
   (* Invariant 'is_zero' *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      (of_f64(havoc(Mf64_undef_0, Mf64_0, a, 10)[shift_float64(s, i_1)]) = .0))).
+      (of_f64(memcpy(Mf64_0, Mf64_undef_0, a, a, 10)[shift_float64(s, i_1)])
+         = .0))).
   (* Then *)
   Have: i <= 9.
 }
@@ -46,7 +47,7 @@ Prove: true.
 Goal Preservation of Invariant 'is_zero' (file zero.i, line 25):
 Let x = to_uint32(1 + i).
 Let a = shift_float64(s, 0).
-Let a_1 = havoc(Mf64_undef_0, Mf64_0, a, 10).
+Let a_1 = memcpy(Mf64_0, Mf64_undef_0, a, a, 10).
 Assume {
   Type: is_uint32(i).
   (* Heap *)
@@ -101,7 +102,7 @@ Prove: true.
 Goal Decreasing of Loop variant at loop (file zero.i, line 29):
 Let x = to_uint32(1 + i).
 Let a = shift_float64(s, 0).
-Let a_1 = havoc(Mf64_undef_0, Mf64_0, a, 10).
+Let a_1 = memcpy(Mf64_0, Mf64_undef_0, a, a, 10).
 Assume {
   Type: is_uint32(i).
   (* Heap *)
