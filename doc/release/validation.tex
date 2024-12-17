@@ -219,6 +219,16 @@ Note that an extra pipeline will be run when the tag is pushed, and it will
 likely fail due to external plugins. This is not a problem (if you really want
 to avoid it, you can create and push the tag to each external plug-in).
 
+\section{External Plug-in Validation}
+
+In case a release of Frama-Clang and/or MetAcsl is scheduled together with the
+Frama-C release itself, their respective \texttt{CHANGELOG.md} must be checked to confirm
+that they contain a section corresponding to the upcoming release.
+
+For Frama-Clang, the files \texttt{FCLANG\_VERSION}, \texttt{FC\_VERSION}, and
+\texttt{FC\_VERSION\_NAME} must also be checked. If you have applied the
+appropriate script in Sect.~\ref{sec:external-plugins}, this should be the case.
+
 %%%Local Variables:
 %%%TeX-master: "release"
 %%%End:

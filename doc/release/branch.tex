@@ -4,12 +4,15 @@
 That is the procedure for forking the release from \texttt{master}.
 
 \section{Creating the milestones}
+\label{sec:creating-milestones}
 
 Create the milestone for the next releases on \textsf{Gitlab},
 in the Frama-C group. They will be used for development that will not
 be integrated into the upcoming release.
 \expertise{François, Julien}.
+
 \section{Creating the branch}
+\label{sec:creating-branch}
 
 \textbf{Note:} You must be member of the GitLab groups "frama-c", "dev" and have
 access to each plugin of continuous integration.
@@ -41,6 +44,7 @@ allowed to push/merge).
 sure to set their targeted branch to \texttt{stable/release}.
 
 \section{Retargeting Merge Requests}
+\label{sec:retarg-merge-requ}
 
 Another command of \texttt{frama-ci} allows retargeting
 the opened merge requests associated to the milestone corresponding
@@ -52,6 +56,7 @@ frama-ci-retarget-merge-requests --token=$TOKEN \
 \end{shell}
 
 \section{GitLab issues}
+\label{sec:gitlab-issues}
 
 {\em This is currently done periodically in specific Frama-C meetings, so only
   a final check is usually necessary.}~\\
@@ -66,6 +71,7 @@ severity, the issues should be tagged with the current release, or with the next
 one.
 
 \section{Version}
+\label{sec:version}
 
 On the new \texttt{stable} branch, execute the script:
 \begin{verbatim}
@@ -100,6 +106,7 @@ This will:
 Commit this change and push.
 
 \section{External plugins}
+\label{sec:external-plugins}
 
 List of external plugins repo names:
 \begin{itemize}
@@ -127,6 +134,7 @@ request targetting \texttt{stable/release} on each plugin and assign your co-rm.
 This changes will need to be merged on master's branches later.
 
 \section{Copyright}
+\label{sec:copyright}
 
 Check that the date in copyright headers is correct. If not then:
 \begin{itemize}
@@ -143,6 +151,9 @@ Check that the date in copyright headers is correct. If not then:
   \end{itemize}
   \item Check if some copyrights are left to update by \texttt{grep}-ing the date in the sources: \texttt{grep -r -e "-yyyy" .}
 \end{itemize}
+
+This must also be checked for Frama-Clang and MetAcsl if they are also to be
+released.
 
 %%%Local Variables:
 %%%TeX-master: "release"

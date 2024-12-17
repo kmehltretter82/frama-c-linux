@@ -6,6 +6,7 @@ starting this stage. The tasks listed in this section are mostly performed by
 the Release Manager.
 
 \section{Release pipeline}
+\label{sec:release-pipeline}
 
 Go to the Build $\rightarrow$ Pipelines section of GitLab. Start the release pipeline:
 \begin{itemize}
@@ -40,6 +41,7 @@ release and the release should be available in
 version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
 
 \section{Check the website}
+\label{sec:check-website}
 
 Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}.
 
@@ -102,13 +104,37 @@ If everything is fine, merge the website and ask a website maintainer to put it
 online (\expertise{Allan, Augustin}).
 
 \section{Public GitLab}
+\label{sec:public-gitlab}
 
 Open the generated wiki page (visible in the public website activity). Check the
 links (files are available only once the website has been put online). If
 everything is fine, edit the main wiki page and the sidebar with a link to the
 page (\url{https://git.frama-c.com/pub/frama-c/-/wikis/home}).
 
+\section{External Plug-in Release}
+\label{sec:ext-plug-ins-release}
+
+If a release of Frama-Clang and MetAcsl is scheduled together
+with the main Frama-C release, you can now launch the release pipelines
+on their respective repositories (\texttt{frama-c/frama-clang} and
+\texttt{frama-c/meta}), with the same protocol as for the main
+Frama-C repository described in Sect.~\ref{sec:release-pipeline}.
+The only difference is that there is only a single \texttt{release}
+\todo{it would be good to split the script in several sub-jobs} task.
+Then, check the website MR that have been created (one for each
+plug-in), and merge them if everything is alright.
+
+In particular, the \texttt{\_fc-plugins/frama-clang.md} needs manual
+update\todo{reword this page to avoid this manual step}.
+
+Note that these releases can be done at a later point and independently from
+Frama-C. If you happen to release a plug-ins after the PR for Frama-C has been
+merged on opam repository (see Sect.~\ref{sec:opam-package}), a new PR will be
+opened for the plug-in. Otherwise, the same branch will be used to create all
+the packages.
+
 \section{Announcements}
+\label{sec:announcements}
 
 \begin{itemize}
 \item Send an e-mail to \texttt{frama-c-discuss} announcing the release.
@@ -119,6 +145,7 @@ page (\url{https://git.frama-c.com/pub/frama-c/-/wikis/home}).
 \end{itemize}
 
 \section{Opam package}
+\label{sec:opam-package}
 
 You'll need a GitHub account to create a pull request on the official opam
 repository\footnote{\texttt{ocaml/opam-repository.git}}. Go to the \FramaC
@@ -126,7 +153,17 @@ GitHub organization opam repository (\url{https://github.com/Frama-C/opam-reposi
 Find the branch corresponding to the release and create the pull-request on the
 official opam repository.
 
+As mentioned in Sect.~\ref{sec:ext-plug-ins-release}, the PR can contain
+plug-in(s) package(s) in addition to the Frama-C package itself if plug-ins
+have also been released.
+
+Once the PR has been merged, make sure that the branch is removed from
+the fork in
+\texttt{Frama-C/opam-repository}\todo{If possible in github's REST API,
+make sure that the merge will erase the branch automatically}.
+
 \section{Other repositories to update}
+\label{sec:other-repos-update}
 
 Check if other \FramaC (and related) repositories need to be updated:
 
@@ -138,6 +175,7 @@ Check if other \FramaC (and related) repositories need to be updated:
 \end{itemize}
 
 \section{Docker image preparation}
+\label{sec:dock-image-prep}
 
 This section only applies to non-beta releases.
 
