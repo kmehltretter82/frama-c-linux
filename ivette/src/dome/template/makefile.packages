@@ -60,5 +60,7 @@ DOME_APP_PACKAGES= \
 	d3-selection@^3 \
 	d3-graphviz@^5 \
 	react-markdown@9.0.1 \
+	react-code-blocks@0.1.6 \
+	remark-custom-header-id@1.0.0
 
 # --------------------------------------------------------------------------

@@ -22,19 +22,26 @@
 
 import React from 'react';
 import ReactMarkdown, { Options } from 'react-markdown';
+import remarkCustomHeaderId from 'remark-custom-header-id';
 
+import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
-
+import {
+  CodeBlock, atomOneDark, atomOneLight
+} from "react-code-blocks";
 export interface Pattern {
   pattern: RegExp,
   replace: (key: number, match?: RegExpExecArray) => JSX.Element | null
 }
 
 export const iconTag: Pattern = {
-  pattern: /\[icon-([^\]]+)\]/g,
+  pattern: /(\[ex:\])?\[icon-([^\]]+)\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
-    return match ? <Icon key={key} id={match[1]}/> : null;
+    if(match && match[1] === "[ex:]") {
+      return <span key={key}>{`[icon-${match[2]}]`}</span>;
+    }
+    return match ? <Icon key={key} id={match[2]}/> : null;
   }
 };
 
@@ -48,9 +55,9 @@ export const iconTag: Pattern = {
  */
 function replaceTags(
   children: React.ReactNode,
-  patterns: Pattern[],
+  patterns?: Pattern[],
 ): React.ReactNode {
-  if(patterns.length < 1) return children;
+  if(!patterns || patterns.length < 1) return children;
 
   const buffer: React.ReactNode[] = [];
   let counter = 0;
@@ -94,11 +101,13 @@ function replaceTags(
 // --- Markdown component
 // --------------------------------------------------------------------------
 
-interface MarkdownProps {
+export interface MarkdownProps {
   /** classes for Markdown component */
   className?: string;
   /** Tab of patterns */
   patterns?: Pattern[];
+  /** scroll to the chosen id */
+  scrollTo?: string;
   /** Children */
   children?: string | null;
 }
@@ -106,15 +115,55 @@ interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, patterns, children } = props;
+  const { className, scrollTo, patterns, children } = props;
+  const theme = Themes.useColorTheme()[0];
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages", className
   );
 
-  const options: Options = { className: markdownClasses };
-  if(patterns && patterns.length > 0) options.components = {
+  const scroll = (id: string): void => {
+    const elt = document.getElementById(id);
+    if(elt) elt.scrollIntoView({ behavior: "smooth" });
+  };
+
+  React.useEffect(() => { if(scrollTo) scroll(scrollTo); }, [scrollTo]);
+
+  const options: Options = {
+    className: markdownClasses,
+    remarkPlugins: [remarkCustomHeaderId],
+  };
+  options.components = {
     p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
-    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>
+    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>,
+    /** Uses codeBlock if ``` is used in markdown with a language,
+     *  otherwise the code-inline class is added */
+    code: ({ className, children }) => {
+      if (className && className.includes("language-")
+        && typeof children === "string"
+      ) {
+        const language = className.split("language-")[1];
+        return <CodeBlock
+          text={children}
+          language={language}
+          showLineNumbers={false}
+          theme={theme === 'dark' ? atomOneDark : atomOneLight}
+        />;
+      }
+      return <code className='code-inline'>{children}</code>;
+    },
+    /** Change the behavior of links on anchors */
+    a: ({ href, children }) => {
+      if (href && href.startsWith("#")) {
+        const id = href.slice(1);
+        return ( <a href={href}
+          onClick={(e) => {
+            e.preventDefault();
+            scroll(id);
+          }}>{children}</a>
+        );
+      }
+      return <a href={href}>{children}</a>;
+    },
   };
 
   return <ReactMarkdown {...options}>{ children }</ReactMarkdown>;
