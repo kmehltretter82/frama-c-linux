@@ -747,20 +747,20 @@ let () =
   Logic_builtin.register builtin_logic_info
 
 let rec parse_lval kind typing_context loc arg =
-  let open Logic_ptree in
-  let open Logic_typing in
-  let get_state context =
-    match kind with
-    | `Pre -> context.pre_state
-    | `Post -> context.post_state [Normal]
-  in
-  match arg.lexpr_node with
-  | PLnamed (name, node) -> (* eg. : default:x to taint variable x in default namespace *)
+  match arg.Logic_ptree.lexpr_node with
+  | PLnamed (name, node) ->
+    (* name:x to taint variable x in 'name' namespace *)
     let term = parse_lval kind typing_context loc node in
     { term with term_name = [name] }
   | PLconstant (StringConstant str) ->
     Logic_const.tstring ~loc str
   | _ ->
+    let open Logic_typing in
+    let get_state context =
+      match kind with
+      | `Pre -> context.pre_state
+      | `Post -> context.post_state [Normal]
+    in
     typing_context.type_term typing_context (get_state typing_context) arg
 
 let terms_of_parsed_taint_namespaces typing_context loc args kind =
