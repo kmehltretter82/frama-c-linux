@@ -199,11 +199,11 @@
 [eva] taint.c:170: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva:alarm] taint.c:176: Warning: check 'true' got status invalid.
-[eva] taint.c:177: check 'false' got status valid.
+[eva:alarm] taint.c:176: Warning: check 'true' got status unknown.
+[eva:alarm] taint.c:177: Warning: check 'false' got status unknown.
 [eva:alarm] taint.c:178: Warning: check 'false' got status invalid.
 [eva] taint.c:179: check 'true' got status valid.
-[eva] taint.c:180: assertion 'unknown' got status valid.
+[eva:alarm] taint.c:180: Warning: assertion 'unknown' got status unknown.
 [eva] taint.c:181: check 'true' got status valid.
 [eva:alarm] taint.c:182: Warning: check got status invalid.
 [eva] Recording results for tainted_predicate

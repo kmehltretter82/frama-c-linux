@@ -780,6 +780,11 @@ let () =
   Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint"
     (typer `Pre) false
 
+(* The taint name of a term is stored as the term name.
+   If no term name is present, use "default". *)
+let term_taint_names term =
+  if term.term_name = [] then ["default"] else term.term_name
+
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
 
@@ -826,8 +831,9 @@ module TaintLogic = struct
       join state1 state2
     | _, Pnot p -> reduce_by_predicate cvalue_env state_map p (not positive)
     | _, Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
+      let taint_names = term_taint_names arg in
       StringMap.mapi (fun key state ->
-          if List.mem key arg.term_name then
+          if List.mem key taint_names then
             reduce_by_taint_predicate cvalue_env state arg positive
           else
             state) state_map
@@ -845,13 +851,16 @@ module TaintLogic = struct
     let rec evaluate predicate =
       match predicate.pred_content with
       | Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-        let states_list = List.map (fun key ->
-            try
-              StringMap.find key state_map
-            with
-            | Not_found -> LatticeSingleTaint.empty) arg.term_name in
-        let state = List.fold_left LatticeSingleTaint.join
-            LatticeSingleTaint.empty states_list in
+        let taint_names = term_taint_names arg in
+        let states_list =
+          List.map
+            (fun key -> StringMap.find_or_empty key state_map)
+            taint_names
+        in
+        let state =
+          List.fold_left LatticeSingleTaint.join
+            LatticeSingleTaint.empty states_list
+        in
         evaluate_taint_predicate cvalue_env state arg
       | Ptrue -> True
       | Pfalse -> False
@@ -881,13 +890,13 @@ module TaintLogic = struct
     evaluate predicate
 
   let interpret_taint_extension cvalue_env taint_map terms =
-    let taint_term taint term =
+    let taint_term state term =
       match eval_tlval_zone cvalue_env term with
       | None ->
         Self.warning ~wkey ~current:true ~once:true
           "Cannot evaluate term %a in taint annotation; ignoring."
           Printer.pp_term term;
-        taint
+        state
       | Some (under, over) ->
         if not (Zone.equal under over)
         then
@@ -895,10 +904,15 @@ module TaintLogic = struct
             "Cannot precisely evaluate term %a in taint annotation; \
              over-approximating."
             Printer.pp_term term;
-        { taint with locs_data = Zone.join taint.locs_data over }
+        let taint_names = term_taint_names term in
+        let add_taint state name =
+          let taint = StringMap.find_or_empty name state in
+          let locs_data = Zone.join taint.locs_data over in
+          StringMap.add name { taint with locs_data } state
+        in
+        List.fold_left add_taint state taint_names
     in
-    StringMap.map (fun taint_state ->
-        List.fold_left taint_term taint_state terms) taint_map
+    List.fold_left taint_term taint_map terms
 end
 
 let interpret_taint_logic

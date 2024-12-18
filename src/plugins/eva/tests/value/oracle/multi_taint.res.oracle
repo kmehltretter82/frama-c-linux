@@ -23,7 +23,7 @@
 [eva] computing for function multi_taint_test <- main.
   Called from multi_taint.c:35.
 [eva:alarm] multi_taint.c:21: Warning: check got status unknown.
-[eva:alarm] multi_taint.c:25: Warning: check got status unknown.
+[eva] multi_taint.c:25: check got status valid.
 [eva] Recording results for multi_taint_test
 [eva] Done for function multi_taint_test
 [eva] Recording results for main
