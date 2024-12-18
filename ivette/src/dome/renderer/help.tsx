@@ -43,14 +43,12 @@ interface HelpIconProps {
   scrollTo?: string;
   /** Text of the label. Prepend to other children elements. */
   label: string;
-  /** Function onClose */
-  onClose?: () => void
   /** children */
   children: string;
 }
 
 export function HelpIcon(props: HelpIconProps): JSX.Element {
-  const { size, patterns, scrollTo, label, onClose, children } = props;
+  const { size, patterns, scrollTo, label, children } = props;
 
   return (
     <IconButton
@@ -59,7 +57,7 @@ export function HelpIcon(props: HelpIconProps): JSX.Element {
       className='dome-xDoc-icon'
       title={'Help'}
       onClick={() => showModal(
-        <Modal label= {label} onClose={onClose} >
+        <Modal label= {label} >
           <Markdown
             patterns={patterns || [iconTag]}
             scrollTo={scrollTo}
