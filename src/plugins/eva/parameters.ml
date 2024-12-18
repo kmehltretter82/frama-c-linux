@@ -276,29 +276,31 @@ module AutoTaint =
 let () = add_precision_dep AutoTaint.parameter
 
 let () = Parameter_customize.set_group domains
-module TaintSingleton =
+module TaintNames =
   String_list
     (struct
-      let option_name = "-eva-taint-groups"
-      let help = "Choose the amount of taint groups you want\
-                  by choosing their label names.\
-                  Per default, you will only have the label 'default'."
-      let arg_name = "taint_groups"
+      let option_name = "-eva-taint-names"
+      let help = "Enables a set of taint names which will be tracked by the \
+                  taint domain. \
+                  By default, only the 'default' taint is enabled."
+      let arg_name = "taint_names"
     end)
-let () = add_precision_dep TaintSingleton.parameter
+let () = add_precision_dep TaintNames.parameter
 
 let () = Parameter_customize.set_group domains
-module IgnoreSingletons =
+let () = Parameter_customize.is_invisible ()
+module TaintSingletons =
   Bool
     (struct
       let option_name = "-eva-taint-singletons"
-      let help = "Operates simplifications to have more precise \
-                  informations on tainting. Should not be used in case \
-                  of state splitting due to incompatibility. \
-                  Use -eva-no-taint-singletons to activate."
+      let help = "By default, variables which can only have one value can be \
+                  seen as tainted by the taint domain. \
+                  Use -eva-no-taint-singletons to never taint such variables. \
+                  This can be unsound in presence of some states partitioning \
+                  (such as split annotations)."
       let default = true
     end)
-let () = add_precision_dep IgnoreSingletons.parameter
+let () = add_precision_dep TaintSingletons.parameter
 
 let () = Parameter_customize.set_group domains
 module Numerors_Real_Size =

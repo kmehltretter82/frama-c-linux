@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +" -eva-domains taint -eva-auto-taint -eva-no-taint-singletons -eva-taint-groups \"test default\" "
+   STDOPT: +" -eva-domains taint -eva-auto-taint -eva-no-taint-singletons -eva-taint-names test,default "
 */
 #include <stdio.h>
 

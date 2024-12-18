@@ -47,9 +47,9 @@ let auto_taint_res_functions = [
    therefore targeted in the option for automatic tainting *)
 
 let auto_taint () = Parameters.AutoTaint.get ()
-let ignore_singletons () = not (Parameters.IgnoreSingletons.get ())
+let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 let taint_groups () =
-  let taint_group_list = Parameters.TaintSingleton.get () in
+  let taint_group_list = Parameters.TaintNames.get () in
   match taint_group_list with
   | [] -> ["default"]
   (* in case no taint group is precised we will only have default taint *)
