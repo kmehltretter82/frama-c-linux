@@ -137,7 +137,6 @@ module LatticeMutexes = struct
 
   let default = bottom
   let default_is_bottom = true
-
 end
 
 
