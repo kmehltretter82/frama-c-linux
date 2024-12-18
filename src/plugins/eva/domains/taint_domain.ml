@@ -274,7 +274,7 @@ module LatticeMultiTaint = struct
   let narrow t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
       match maybe_state1, maybe_state2 with
-      | state, None | None, state -> state
+      | _, None | None, _ -> None
       | Some state1, Some state2 ->
         let `Value v = LatticeSingleTaint.narrow state1 state2 in
         Some v
