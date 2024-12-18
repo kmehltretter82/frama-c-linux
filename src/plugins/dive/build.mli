@@ -38,4 +38,4 @@ val explore_backward : depth:int -> t -> node -> unit
 val show : t -> node -> unit
 val hide : t -> node -> unit
 
-val reduce_to_horizon : t -> int option range -> node -> unit
+val reduce_to_horizon : t -> range -> node -> unit

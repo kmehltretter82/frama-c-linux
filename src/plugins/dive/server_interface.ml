@@ -69,7 +69,7 @@ let origin_to_locations = function
       callsites
 
 
-module Range : Data.S with type t = int option range =
+module Range : Data.S with type t = range =
 struct
   include Record ()
 
@@ -80,7 +80,7 @@ struct
 
   let descr = "Parametrization of the exploration range."
   include (val publish "range" ~descr)
-  type t = int option range
+  type t = range
 
   let to_json r=
     default |>
