@@ -48,18 +48,14 @@ let auto_taint_res_functions = [
 
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
-let taint_groups () =
-  let taint_group_list = Parameters.TaintNames.get () in
-  match taint_group_list with
-  | [] -> ["default"]
-  (* in case no taint group is precised we will only have default taint *)
-  | _ ->
-    if auto_taint () && not (List.mem "auto" taint_group_list) then
-      "auto" :: taint_group_list
-    else
-      taint_group_list
-(* in the other cases, if we have the option autotaint we will add an
-   "auto" taint in which we will place the automatic tainting. *)
+let taint_names () =
+  let taint_names = Parameters.TaintNames.get () in
+  (* If no taint name is specified, include the default taint. *)
+  let taint_names = if taint_names = [] then ["default"] else taint_names in
+  (* If -eva-auto-taint is enabled, adds 'auto' to the enabled taint names. *)
+  if auto_taint () && not (List.mem "auto" taint_names)
+  then "auto" :: taint_names
+  else taint_names
 
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
@@ -225,7 +221,7 @@ module LatticeMultiTaint = struct
       let name = "taint"
 
       let reprs = [
-        taint_groups ()
+        taint_names ()
         |> List.map (fun t -> (t, List.hd LatticeSingleTaint.reprs))
         |> List.fold_left (fun m (k, v)
                             -> StringMap.add k v m) StringMap.empty
@@ -252,7 +248,7 @@ module LatticeMultiTaint = struct
   let empty = StringMap.empty
 
   let top =
-    let taint_namespaces = taint_groups () in
+    let taint_namespaces = taint_names () in
     taint_namespaces
     |> List.map (fun t -> (t, LatticeSingleTaint.top))
     |> List.fold_left (fun m (k, v) ->
@@ -589,7 +585,7 @@ module TransferMultiTaint = struct
         end
     in
     let result_map = LatticeMultiTaint.empty in
-    let keys_list = taint_groups () in
+    let keys_list = taint_names () in
     recreate_map keys_list (`Value result_map)
 
   let show_expr valuation state_map fmt exp =
