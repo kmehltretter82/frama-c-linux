@@ -589,7 +589,7 @@ module Provers = String_list
          - 'none' (no prover run)\n\
          - 'script' (replay all session scripts)\n\
          - 'tip' (replay or init scripts for failed goals)\n\
-         - '<why3-prover>' (any Why-3 prover, see -wp-detect)\n\
+         - '<why3-prover>' (any Why3 prover, see -wp-detect)\n\
         "
     end)
 
@@ -600,7 +600,7 @@ module Interactive = String
       let arg_name = "mode"
       let default = "batch"
       let help =
-        "WP mode for interactive Why-3 provers (eg: Coq):\n\
+        "WP mode for interactive Why3 provers (eg: Coq):\n\
          - 'batch': check current proof (default)\n\
          - 'update': check updated proof\n\
          - 'edit': edit current proof\n\
