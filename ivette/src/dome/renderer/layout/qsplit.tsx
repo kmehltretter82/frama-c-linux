@@ -51,12 +51,14 @@ export interface QSplitProps {
   C?: string;
   /** Q-Pane to layout in D-quarter. */
   D?: string;
-  /** Horizontal panes ratio (range `0..1`, default `0.5`). */
-  H?: number;
+  /** Horizontal top panes ratio (range `0..1`, default `0.5`). */
+  HTOP?: number;
+  /** Horizontal bottom panes ratio (range `0..1`, default `0.5`). */
+  HBOTTOM?: number;
   /** Vertical panes ratio (range `0..1`, default `0.5`). */
   V?: number;
   /** Dragging ratios callback. */
-  setPosition?: (H: number, V: number) => void;
+  setPosition?: (HTOP: number, HBOTTOM: number, V: number) => void;
   /** Q-Split contents. Shall be (possibly packed) Q-Panes.
      Other components would be layout as they are in the
      positionned `<div/>` of the Q-Split. */
@@ -262,35 +264,80 @@ const fullOf = (A: Pid, B: Pid, C: Pid, D: Pid): Pid => {
 };
 
 function QSplitEngine(props: QSplitEngineProps): JSX.Element {
-  const [dragX, setDragX] = React.useState<Dragging>();
+  const [dragXTop, setDragXTop] = React.useState<Dragging>();
+  const [dragXBottom, setDragXBottom] = React.useState<Dragging>();
   const [dragY, setDragY] = React.useState<Dragging>();
   const layout: QSplitLayout = new Map();
-  let hsplit: React.CSSProperties = NODISPLAY;
+  let hsplitTop: React.CSSProperties = NODISPLAY;
+  let hsplitBottom: React.CSSProperties = NODISPLAY;
   let vsplit: React.CSSProperties = NODISPLAY;
-  let hvsplit: React.CSSProperties = NODISPLAY;
-  const { A, B, C, D, H = 0.5, V = 0.5, size, setPosition } = props;
+  let hvsplittop: React.CSSProperties = NODISPLAY;
+  let hvsplitbottom: React.CSSProperties = NODISPLAY;
+
+  const { A, B, C, D,
+    HTOP = 0.5, HBOTTOM = 0.5, V = 0.5, size, setPosition } = props;
   const { width, height } = size;
-  const setX = React.useCallback((X: number) => {
-    if (setPosition) setPosition(getRatio(X, width), V);
-  }, [setPosition, width, V]);
+
+  const maxGap = 0.005; // 0.5% max
+  function isSmallGap(a: number, b: number): boolean {
+    return (a < b && a > (b - maxGap)) || (a > b && a < (b + maxGap));
+  }
+
+  const setXTop = React.useCallback((X: number) => {
+    if (setPosition) {
+      const top = getRatio(X, width);
+      const bottom = isSmallGap(top, HBOTTOM) ? top : HBOTTOM;
+      setPosition(top, bottom, V);
+    }
+  }, [setPosition, width, HBOTTOM, V]);
+  const setXBottom = React.useCallback((X: number) => {
+    if (setPosition) {
+      const bottom = getRatio(X, width);
+      const top = isSmallGap(bottom, HTOP) ? bottom : HTOP;
+      setPosition(top, bottom, V);
+    }
+  }, [setPosition, width, HTOP, V]);
   const setY = React.useCallback((Y: number) => {
-    if (setPosition) setPosition(H, getRatio(Y, height));
-  }, [setPosition, height, H]);
+    if (setPosition) setPosition(HTOP, HBOTTOM, getRatio(Y, height));
+  }, [setPosition, height, HTOP, HBOTTOM]);
+  const setXYTop = React.useCallback((X: number, Y: number) => {
+    if (setPosition) {
+      const top = getRatio(X, width);
+      const bottom = isSmallGap(top, HBOTTOM) ? top : HBOTTOM;
+      setPosition(top, bottom, getRatio(Y, height));
+    }
+  }, [setPosition, HBOTTOM, width, height]);
+  const setXYBottom = React.useCallback((X: number, Y: number) => {
+    if (setPosition) {
+      const bottom = getRatio(X, width);
+      const top = isSmallGap(bottom, HTOP) ? bottom : HTOP;
+      setPosition(top, bottom, getRatio(Y, height));
+    }
+  }, [setPosition, HTOP, width, height]);
   const setXY = React.useCallback((X: number, Y: number) => {
-    if (setPosition) setPosition(getRatio(X, width), getRatio(Y, height));
+    if (setPosition) {
+      const x = getRatio(X, width);
+      setPosition(x, x, getRatio(Y, height));
+    }
   }, [setPosition, width, height]);
-  const resetX = React.useCallback(() => {
-    if (setPosition) setPosition(0.5, V);
+  const resetXTop = React.useCallback(() => {
+    if (setPosition) setPosition(0.5, 0.5, V);
+  }, [setPosition, V]);
+  const resetXBottom = React.useCallback(() => {
+    if (setPosition) setPosition(0.5, 0.5, V);
   }, [setPosition, V]);
   const resetY = React.useCallback(() => {
-    if (setPosition) setPosition(H, 0.5);
-  }, [setPosition, H]);
+    if (setPosition) setPosition(HTOP, HBOTTOM, 0.5);
+  }, [setPosition, HTOP, HBOTTOM]);
   const resetXY = React.useCallback(() => {
-    if (setPosition) setPosition(0.5, 0.5);
+    if (setPosition) setPosition(0.5, 0.5, 0.5);
   }, [setPosition]);
-  const X = getPosition(dragX, width, H);
+
+  const XTop = getPosition(dragXTop, width, HTOP);
+  const XBottom = getPosition(dragXBottom, width, HBOTTOM);
   const Y = getPosition(dragY, height, V);
-  const RX = width - X - 1;
+  const RXTop = width - XTop - 1;
+  const RXBottom = width - XBottom - 1;
   const RY = height - Y - 1;
   const AB = sameOf(A, B);
   const AC = sameOf(A, C);
@@ -315,77 +362,100 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
   // [ AC | BD ]
   // ---------------------------------------
   else if (AC && BD) {
-    hsplit = HSPLIT(X, 0, height);
-    DISPLAY(layout, BD, X + 1, RX, 0, height);
-    DISPLAY(layout, AC, 0, X, 0, height);
+    hsplitTop = HSPLIT(XTop, 0, height);
+    DISPLAY(layout, BD, XTop + 1, RXTop, 0, height);
+    DISPLAY(layout, AC, 0, XTop, 0, height);
   }
   // ----------------------------------------
   // [ AB -- C | D ]
   // ----------------------------------------
   else if (AB) {
-    hsplit = HSPLIT(X, Y, RY);
+    hsplitTop = HSPLIT(XTop, Y, RY);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
-    DISPLAY(layout, C, 0, X, Y + 1, RY);
+    DISPLAY(layout, D, XTop + 1, RXTop, Y + 1, RY);
+    DISPLAY(layout, C, 0, XTop, Y + 1, RY);
     DISPLAY(layout, AB, 0, width, 0, Y);
   }
   // ----------------------------------------
   // [ AC | B -- D ]
   // ----------------------------------------
   else if (AC) {
-    hsplit = HSPLIT(X, 0, height);
-    vsplit = VSPLIT(X, Y, RY);
-    DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
-    DISPLAY(layout, B, X + 1, RX, 0, Y);
-    DISPLAY(layout, AC, 0, X, 0, height);
+    hsplitTop = HSPLIT(XTop, 0, height);
+    vsplit = VSPLIT(XTop, Y, RY);
+    DISPLAY(layout, D, XTop + 1, RXTop, Y + 1, RY);
+    DISPLAY(layout, B, XTop + 1, RXTop, 0, Y);
+    DISPLAY(layout, AC, 0, XTop, 0, height);
   }
   // ----------------------------------------
   // [ A -- C | BD ]
   // ----------------------------------------
   else if (BD) {
-    hsplit = HSPLIT(X, 0, height);
-    vsplit = VSPLIT(0, Y, X);
-    DISPLAY(layout, C, 0, X, Y + 1, RY);
-    DISPLAY(layout, A, 0, X, 0, Y);
-    DISPLAY(layout, BD, X + 1, RX, 0, height);
+    hsplitTop = HSPLIT(XTop, 0, height);
+    vsplit = VSPLIT(0, Y, XTop);
+    DISPLAY(layout, C, 0, XTop, Y + 1, RY);
+    DISPLAY(layout, A, 0, XTop, 0, Y);
+    DISPLAY(layout, BD, XTop + 1, RXTop, 0, height);
   }
   // ----------------------------------------
   // [ A | B -- CD ]
   // ----------------------------------------
   else if (CD) {
-    hsplit = HSPLIT(X, 0, Y);
+    hsplitTop = HSPLIT(XTop, 0, Y);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, B, X + 1, RX, 0, Y);
-    DISPLAY(layout, A, 0, X, 0, Y);
+    DISPLAY(layout, B, XTop + 1, RXTop, 0, Y);
+    DISPLAY(layout, A, 0, XTop, 0, Y);
     DISPLAY(layout, CD, 0, width, Y + 1, RY);
   }
   // ----------------------------------------
   // [ A, B, C, D ]
   // ----------------------------------------
   else {
-    hsplit = HSPLIT(X, 0, height);
+    hsplitTop = HSPLIT(XTop, 0, Y);
+    hsplitBottom = HSPLIT(XBottom, Y + 1, height - Y);
     vsplit = VSPLIT(0, Y, width);
-    DISPLAY(layout, D, X + 1, RX, Y + 1, RY);
-    DISPLAY(layout, C, 0, X, Y + 1, RY);
-    DISPLAY(layout, B, X + 1, RX, 0, Y);
-    DISPLAY(layout, A, 0, X, 0, Y);
+    DISPLAY(layout, D, XBottom + 1, RXBottom, Y + 1, RY);
+    DISPLAY(layout, C, 0, XBottom, Y + 1, RY);
+    DISPLAY(layout, B, XTop + 1, RXTop, 0, Y);
+    DISPLAY(layout, A, 0, XTop, 0, Y);
   }
   // ----------------------------------------
-  if (hsplit !== NODISPLAY && vsplit !== NODISPLAY)
-    hvsplit = { display: 'block', left: X, top: Y };
+  if (hsplitTop !== NODISPLAY)
+    hvsplittop = { display: 'block', left: XTop, top: Y };
+
+  if (hsplitBottom !== NODISPLAY && vsplit !== NODISPLAY)
+    hvsplitbottom = { display: 'block', left: XBottom, top: Y };
+
+  /** CSplitter HVSPLIT should only be displayed if XTop === XBottom and if
+    * all or none of the splitters slide.
+   */
+  const noDragging = Boolean(!(dragXTop || dragXBottom || dragY));
+  const allDragging = Boolean(dragXTop && dragXBottom && dragY);
+  const csplitter = Boolean(!hsplitBottom ||
+    (XTop === XBottom && (noDragging || allDragging))
+  );
+
   // ----------------------------------------
   // Rendering
   // ----------------------------------------
   return (
     <QSplitContext.Provider value={layout}>
       <BSplitter
-        key='HSPLIT'
+        key='HSPLITTOP'
         hsplit={true}
-        dragging={dragX}
-        setDragging={setDragX}
-        setPosition={setX}
-        resetPosition={resetX}
-        style={hsplit}
+        dragging={dragXTop}
+        setDragging={setDragXTop}
+        setPosition={setXTop}
+        resetPosition={resetXTop}
+        style={hsplitTop}
+      />
+      <BSplitter
+        key='HSPLITBOTTOM'
+        hsplit={true}
+        dragging={dragXBottom}
+        setDragging={setDragXBottom}
+        setPosition={setXBottom}
+        resetPosition={resetXBottom}
+        style={hsplitBottom}
       />
       <BSplitter
         key='VSPLIT'
@@ -396,16 +466,43 @@ function QSplitEngine(props: QSplitEngineProps): JSX.Element {
         resetPosition={resetY}
         style={vsplit}
       />
-      <CSplitter
-        key='HVSPLIT'
-        dragX={dragX}
-        dragY={dragY}
-        setDragX={setDragX}
-        setDragY={setDragY}
-        setPosition={setXY}
-        resetPosition={resetXY}
-        style={hvsplit}
-      />
+      { csplitter ?
+        <CSplitter
+          key='HVSPLITOP'
+          dragX={dragXTop}
+          dragY={dragY}
+          setDragX={(v: Dragging) => {
+            setDragXTop(v);
+            setDragXBottom(v);
+          }}
+          setDragY={setDragY}
+          setPosition={setXY}
+          resetPosition={resetXY}
+          style={hvsplittop}
+        /> :
+        <>
+          <CSplitter
+            key='HVSPLITTOP'
+            dragX={dragXTop}
+            dragY={dragY}
+            setDragX={setDragXTop}
+            setDragY={setDragY}
+            setPosition={setXYTop}
+            resetPosition={resetXY}
+            style={hvsplittop}
+            />
+          <CSplitter
+            key='HVSPLITBOTTOM'
+            dragX={dragXBottom}
+            dragY={dragY}
+            setDragX={setDragXBottom}
+            setDragY={setDragY}
+            setPosition={setXYBottom}
+            resetPosition={resetXY}
+            style={hvsplitbottom}
+          />
+        </>
+      }
       {props.children}
     </QSplitContext.Provider>
   );
