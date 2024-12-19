@@ -379,20 +379,20 @@ let value_blockrw_read_write_sep fmt rt wt =
   fprintf fmt "forall b: vblock, or ow: int, v: int [%a].@," read_write () ;
   fprintf fmt "%a ->@,  %a@,@]@," guard () eq ()
 
-let value_blockrw_read_havoc_sep fmt rt =
+let value_blockrw_read_copy_sep fmt rt =
   let guard fmt () =
     fprintf fmt "sepoffset or %d ho (Seq.length u)" ((snd rt) / 8) in
-  let read_havoc fmt () =
+  let read_copy fmt () =
     fprintf fmt "bread_%a (bwrite_seq b ho u) or" pp_type rt
   in
-  let eq fmt () = fprintf fmt "%a = bread_%a b or" read_havoc () pp_type rt in
-  fprintf fmt "@[<v 2>lemma bread_%a_bhavoc_sep:@," pp_type rt ;
-  fprintf fmt "forall b: vblock, u: S.seq int, or ho: int [%a].@," read_havoc () ;
+  let eq fmt () = fprintf fmt "%a = bread_%a b or" read_copy () pp_type rt in
+  fprintf fmt "@[<v 2>lemma bread_%a_bcopy_sep:@," pp_type rt ;
+  fprintf fmt "forall b: vblock, u: S.seq int, or ho: int [%a].@," read_copy () ;
   fprintf fmt "%a ->@,  %a@,@]@," guard () eq ()
 
 let value_blockrw_all_lemmas fmt size =
   value_blockrw_read_write_eq fmt size ;
-  value_blockrw_read_havoc_sep fmt size ;
+  value_blockrw_read_copy_sep fmt size ;
   List.iter (value_blockrw_read_write_sep fmt size) all_types
 
 let value_blockrw fmt () =
@@ -445,20 +445,20 @@ let init_blockrw_read_write_sep fmt rsize wsize =
   fprintf fmt "forall b: iblock, or ow: int, init: bool [%a].@," read_write () ;
   fprintf fmt "%a ->@,  %a@,@]@," guard () eq ()
 
-let init_blockrw_read_havoc_sep fmt rsize =
+let init_blockrw_read_copy_sep fmt rsize =
   let guard fmt () =
     fprintf fmt "sepoffset or %d ho (Seq.length u)" (rsize / 8) in
-  let read_havoc fmt () =
+  let read_copy fmt () =
     fprintf fmt "bread_init%d (bwrite_seq b ho u) or" rsize
   in
-  let eq fmt () = fprintf fmt "%a = bread_init%d b or" read_havoc () rsize in
-  fprintf fmt "@[<v 2>lemma bread_init%d_bhavoc_sep:@," rsize ;
-  fprintf fmt "forall b: iblock, u: S.seq bool, or ho: int [%a].@," read_havoc () ;
+  let eq fmt () = fprintf fmt "%a = bread_init%d b or" read_copy () rsize in
+  fprintf fmt "@[<v 2>lemma bread_init%d_bcopy_sep:@," rsize ;
+  fprintf fmt "forall b: iblock, u: S.seq bool, or ho: int [%a].@," read_copy () ;
   fprintf fmt "%a ->@,  %a@,@]@," guard () eq ()
 
 let init_blockrw_all_lemmas fmt size =
   init_blockrw_read_write_eq fmt size ;
-  init_blockrw_read_havoc_sep fmt size ;
+  init_blockrw_read_copy_sep fmt size ;
   List.iter (init_blockrw_read_write_sep fmt size) all_sizes
 
 let init_blockrw fmt () =
@@ -504,8 +504,8 @@ let membytes_preambule fmt () =
   function init_seq (s: int) : S.seq bool =
     S.create True s
 
-  function havoc (fresh cur: map int (block 'a)) (a: addr) (size: int): map int (block 'a) =
-    set cur a.base (bwrite_seq (get cur a.base) a.offset (to_seq fresh[a.base] 0 size))
+  function memcpy (mtgt msrc: map int (block 'a)) (ptgt psrc: addr) (size: int): map int (block 'a) =
+    set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size
@@ -561,19 +561,19 @@ let membytes_read_write_sep fmt rt wt =
   fprintf fmt "forall m: memory, ar aw: addr, v: int [%a].@," read_write () ;
   fprintf fmt "%a ->@,  %a@,@]@," guard () eq ()
 
-let membytes_read_havoc_sep fmt rt =
-  let guard fmt () =
+let membytes_read_copy_sep fmt rt =
+  let guard fmt =
     fprintf fmt "separated ar %d aw size" ((snd rt) / 8) in
-  let read_havoc fmt () =
-    fprintf fmt "read_%a (havoc fresh cur aw size) ar" pp_type rt
+  let result fmt =
+    fprintf fmt "read_%a (memcpy mw mc aw ac size) ar" pp_type rt
   in
-  let eq fmt () = fprintf fmt "%a = read_%a cur ar" read_havoc () pp_type rt in
-  fprintf fmt "@[<v 2>lemma read_%a_havoc_sep:@," pp_type rt ;
-  fprintf fmt "forall fresh cur: memory, size: int, ar aw: addr [%a].@," read_havoc () ;
-  fprintf fmt "%a ->@,  %a@," guard () eq () ;
+  let eq fmt = fprintf fmt "%t = read_%a mw ar" result pp_type rt in
+  fprintf fmt "@[<v 2>lemma read_%a_copy_sep:@," pp_type rt ;
+  fprintf fmt "forall mw mc: memory, size: int, ar aw ac: addr [%t].@," result ;
+  fprintf fmt "%t ->@,  %t@," guard eq ;
   fprintf fmt "@[<v 2>by@," ;
-  fprintf fmt "let ob = cur[aw.base] in@," ;
-  fprintf fmt "let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in@," ;
+  fprintf fmt "let ob = mw[aw.base] in@," ;
+  fprintf fmt "let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in@," ;
   fprintf fmt "aw.base = ar.base -> " ;
   fprintf fmt "VB.bread_uint%d nb ar.offset = VB.bread_uint%d ob ar.offset@]@,"
     (snd rt) (snd rt) ;
@@ -581,7 +581,7 @@ let membytes_read_havoc_sep fmt rt =
 
 let membytes_all_lemmas fmt size =
   membytes_read_write_eq fmt size ;
-  membytes_read_havoc_sep fmt size ;
+  membytes_read_copy_sep fmt size ;
   List.iter (membytes_read_write_sep fmt size) all_types
 
 let membytes_write_init fmt size =
@@ -612,19 +612,19 @@ let membytes_read_write_init_sep fmt rsize wsize =
   fprintf fmt "forall m: init, ar aw: addr, i: bool [%a].@," read_write () ;
   fprintf fmt "%a ->@,  %a@,@]@," guard () eq ()
 
-let membytes_read_havoc_init_sep fmt rsize =
-  let guard fmt () =
+let membytes_read_copy_init_sep fmt rsize =
+  let guard fmt =
     fprintf fmt "separated ar %d aw size" (rsize / 8) in
-  let read_havoc fmt () =
-    fprintf fmt "read_init%d (havoc fresh cur aw size) ar" rsize
+  let read_copy fmt =
+    fprintf fmt "read_init%d (memcpy mw mc aw ac size) ar" rsize
   in
-  let eq fmt () = fprintf fmt "%a = read_init%d cur ar" read_havoc () rsize in
-  fprintf fmt "@[<v 2>lemma read_init%d_havoc_sep:@," rsize ;
-  fprintf fmt "forall fresh cur: init, size: int, ar aw: addr [%a].@," read_havoc () ;
-  fprintf fmt "%a ->@,  %a@," guard () eq () ;
+  let eq fmt = fprintf fmt "%t = read_init%d mw ar" read_copy rsize in
+  fprintf fmt "@[<v 2>lemma read_init%d_copy_sep:@," rsize ;
+  fprintf fmt "forall mw mc: init, size: int, ar aw ac: addr [%t].@," read_copy ;
+  fprintf fmt "%t ->@,  %t@," guard eq ;
   fprintf fmt "@[<v 2>by@," ;
-  fprintf fmt "let ob = cur[aw.base] in@," ;
-  fprintf fmt "let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in@," ;
+  fprintf fmt "let ob = mw[aw.base] in@," ;
+  fprintf fmt "let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in@," ;
   fprintf fmt "aw.base = ar.base -> " ;
   fprintf fmt "IB.bread_init%d nb ar.offset = IB.bread_init%d ob ar.offset@]@,"
     rsize rsize ;
@@ -632,7 +632,7 @@ let membytes_read_havoc_init_sep fmt rsize =
 
 let membytes_all_init_lemmas fmt size =
   membytes_read_write_init_eq fmt size ;
-  membytes_read_havoc_init_sep fmt size ;
+  membytes_read_copy_init_sep fmt size ;
   List.iter (membytes_read_write_init_sep fmt size) all_sizes
 
 let membytes_context fmt () =
