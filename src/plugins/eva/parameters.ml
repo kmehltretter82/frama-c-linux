@@ -276,18 +276,6 @@ module AutoTaint =
 let () = add_precision_dep AutoTaint.parameter
 
 let () = Parameter_customize.set_group domains
-module TaintNames =
-  String_list
-    (struct
-      let option_name = "-eva-taint-names"
-      let help = "Enables a set of taint names which will be tracked by the \
-                  taint domain. \
-                  By default, only the 'default' taint is enabled."
-      let arg_name = "taint_names"
-    end)
-let () = add_precision_dep TaintNames.parameter
-
-let () = Parameter_customize.set_group domains
 let () = Parameter_customize.is_invisible ()
 module TaintSingletons =
   Bool

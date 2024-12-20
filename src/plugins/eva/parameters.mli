@@ -40,7 +40,6 @@ module OctagonCall: Parameter_sig.Bool
 
 module AutoTaint: Parameter_sig.Bool
 module TaintSingletons: Parameter_sig.Bool
-module TaintNames: Parameter_sig.String_list
 
 module TracesUnrollLoop: Parameter_sig.Bool
 module TracesUnifyLoop: Parameter_sig.Bool

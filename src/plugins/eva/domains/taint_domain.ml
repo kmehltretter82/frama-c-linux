@@ -48,14 +48,9 @@ let auto_taint_res_functions = [
 
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
-let taint_names () =
-  let taint_names = Parameters.TaintNames.get () in
-  (* If no taint name is specified, include the default taint. *)
-  let taint_names = if taint_names = [] then ["default"] else taint_names in
-  (* If -eva-auto-taint is enabled, adds 'auto' to the enabled taint names. *)
-  if auto_taint () && not (List.mem "auto" taint_names)
-  then "auto" :: taint_names
-  else taint_names
+
+(* Default name for taints, when no custum name is provided by the user. *)
+let default_taint_name = "default"
 
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
@@ -220,12 +215,7 @@ module LatticeMultiTaint = struct
 
       let name = "taint"
 
-      let reprs = [
-        taint_names ()
-        |> List.map (fun t -> (t, List.hd LatticeSingleTaint.reprs))
-        |> List.fold_left (fun m (k, v)
-                            -> StringMap.add k v m) StringMap.empty
-      ]
+      let reprs = [ StringMap.empty ]
 
       let compare t1 t2 =
         StringMap.compare LatticeSingleTaint.compare t1 t2
@@ -247,12 +237,10 @@ module LatticeMultiTaint = struct
 
   let empty = StringMap.empty
 
-  let top =
-    let taint_namespaces = taint_names () in
-    taint_namespaces
-    |> List.map (fun t -> (t, LatticeSingleTaint.top))
-    |> List.fold_left (fun m (k, v) ->
-        StringMap.add k v m) StringMap.empty
+  (* TODO: this is an unsound top value, as custom taint names are not bound
+     to top. It cannot be represented as a map and should be replaced by a
+     special TOP value. *)
+  let top = StringMap.singleton default_taint_name LatticeSingleTaint.top
 
   let join t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
@@ -773,7 +761,7 @@ let () =
 (* The taint name of a term is stored as the term name.
    If no term name is present, use "default". *)
 let term_taint_names term =
-  if term.term_name = [] then ["default"] else term.term_name
+  if term.term_name = [] then [ default_taint_name ] else term.term_name
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
