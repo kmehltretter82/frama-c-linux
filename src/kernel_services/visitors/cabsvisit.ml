@@ -292,10 +292,6 @@ and childrenStatement vis s =
   | BLOCK (b, l, l') ->
     let b' = visitCabsBlock vis b in
     if b' != b then {s with stmt_node = BLOCK (b', l, l')} else s
-  | SEQUENCE (s1, s2, l) ->
-    let s1' = vs l s1 in
-    let s2' = vs l s2 in
-    if s1' != s1 || s2' != s2 then {s with stmt_node = SEQUENCE (s1', s2', l)} else s
   | IF (e, s1, s2, l) ->
     let e' = ve e in
     let s1' = vs l s1 in

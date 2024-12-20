@@ -207,7 +207,6 @@ class metricsCabsVisitor = object(self)
      | COMPGOTO _ -> self#incr_both_metrics incr_gotos;
      | DEFINITION _
      | ASM _
-     | SEQUENCE _
      | TRY_CATCH _
      | CODE_ANNOT _
      | CODE_SPEC _ -> ());
@@ -347,10 +346,6 @@ module Halstead = struct
       | BLOCK _ ->
         update_val_incr "{" operator_tbl.otherop_tbl;
         update_val_incr "}" operator_tbl.otherop_tbl;
-        Cil.DoChildren;
-      | SEQUENCE _ ->
-        print_string "seq\n";
-        update_val_incr ";" operator_tbl.otherop_tbl;
         Cil.DoChildren;
       | IF _ -> self#add_paren (); reserved "if";
       | WHILE _ -> self#add_paren (); reserved "while";

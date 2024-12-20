@@ -209,8 +209,6 @@ and pp_raw_stmt fmt = function
   |     BLOCK  (bl, loc1, loc2) ->
     fprintf fmt "@[<hov 2>BLOCK loc1(%a), loc2(%a) {%a} @]"
       pp_cabsloc loc1 pp_cabsloc loc2 pp_block bl
-  |     SEQUENCE (stmt1, stmt2, loc) ->
-    fprintf fmt "@[<hov 2>SEQUENCE stmt(%a), stmt(%a), loc(%a)@]" pp_stmt stmt1 pp_stmt stmt2 pp_cabsloc loc
   |     IF (exp, stmt1, stmt2, loc) ->
     fprintf fmt "@[<hov 2>IF cond(%a), stmt(%a), stmt(%a), loc(%a)@]"
       pp_exp exp pp_stmt stmt1 pp_stmt stmt2 pp_cabsloc loc

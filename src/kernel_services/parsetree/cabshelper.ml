@@ -167,7 +167,6 @@ let get_statementloc (s : statement) : cabsloc =
     | NOP(_, loc) -> loc
     | COMPUTATION(_,loc) -> loc
     | BLOCK(_,loc,_) -> loc
-    | SEQUENCE(_,_,loc) -> loc
     | IF(_,_,_,loc) -> loc
     | WHILE(_,_,_,loc) -> loc
     | DOWHILE(_,_,_,loc) -> loc
