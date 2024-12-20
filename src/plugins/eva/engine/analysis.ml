@@ -78,28 +78,27 @@ module type Results = sig
 end
 
 module type S = sig
-  include Abstractions.S_with_evaluation
+  include Engine_sig.S
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location
 end
 
-module type Analyzer = sig
-  include S
-  val compute_from_entry_point : kernel_function -> lib_entry:bool -> unit
-  (* val compute_from_init_state: kernel_function -> Dom.t -> unit *)
-end
-
-
 module Make (Abstract: Abstractions.S) = struct
 
-  module Abstract = struct
+  module rec Engine : Engine_sig.S
+    with module Ctx = Abstract.Ctx
+     and module Val = Abstract.Val
+     and module Loc = Abstract.Loc
+     and module Dom = Abstract.Dom =
+  struct
     include Abstract
     module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
+    module Compute = C
   end
+  and C : Engine_sig.Compute = Compute_functions.Make (Engine)
 
-  include Abstract
-  include Compute_functions.Make (Abstract)
+  include Engine
 
   let find stmt f =
     if is_computed ()
@@ -115,15 +114,15 @@ module Make (Abstract: Abstractions.S) = struct
     find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
 
   let get_stmt_state_by_callstack ?selection ~after stmt =
-    find stmt (Abstract.Dom.Store.get_stmt_state_by_callstack ?selection ~after)
+    find stmt (Dom.Store.get_stmt_state_by_callstack ?selection ~after)
 
   let get_global_state () =
-    (Abstract.Dom.Store.get_global_state () :> Dom.t or_top_bottom)
+    (Dom.Store.get_global_state () :> Dom.t or_top_bottom)
 
   let get_initial_state kf =
     if is_computed () then
       if Function_calls.is_called kf
-      then (Abstract.Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
+      then (Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
       else `Bottom
     else `Top
 
@@ -154,15 +153,15 @@ module Make (Abstract: Abstractions.S) = struct
 end
 
 
-
 let default = Abstractions.Config.of_list [Cvalue_domain.registered, None]
-module Default : Analyzer = Make (val Abstractions.make default)
+module DefaultAbstractions = (val Abstractions.make default)
+module Default : S = Make (DefaultAbstractions)
 
 
 (* Reference to the current configuration (built by Abstractions.configure from
    the parameters of Eva regarding the abstractions used in the analysis) and
    the current Analyzer module. *)
-let ref_analyzer = ref (default, (module Default : Analyzer))
+let ref_analyzer = ref (default, (module Default : S))
 
 (* Returns the current Analyzer module. *)
 let current_analyzer () = (module (val (snd !ref_analyzer)): S)
@@ -176,7 +175,7 @@ let register_hook = Analyzer_Hook.extend
 
 (* Sets the current Analyzer module for a given configuration.
    Calls the hooks above. *)
-let set_current_analyzer config (analyzer: (module Analyzer)) =
+let set_current_analyzer config (analyzer: (module S)) =
   Analyzer_Hook.apply (module (val analyzer): S);
   ref_analyzer := (config, analyzer)
 
@@ -184,7 +183,7 @@ let set_current_analyzer config (analyzer: (module Analyzer)) =
    and sets it as the current analyzer. *)
 let make_analyzer config =
   let analyzer =
-    if Abstractions.Config.(equal config default) then (module Default : Analyzer)
+    if Abstractions.Config.(equal config default) then (module Default : S)
     else
       let module Abstract = (val Abstractions.make config) in
       let module Analyzer = Make (Abstract) in
@@ -217,7 +216,7 @@ let force_compute () =
   (* The new analyzer can be accesed through hooks *)
   Self.ComputationState.set Computing;
   let module Analyzer = (val snd !ref_analyzer) in
-  try Analyzer.compute_from_entry_point ~lib_entry kf
+  try Analyzer.Compute.compute_from_entry_point ~lib_entry kf
   with Self.Abort ->
     Self.(ComputationState.set Aborted);
     Self.error "The analysis has been aborted: results are incomplete."

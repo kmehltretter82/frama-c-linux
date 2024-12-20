@@ -48,23 +48,18 @@ module type Results = sig
 end
 
 
-module Make (Abstract: Abstractions.S) : sig
-
-  val compute_from_entry_point : kernel_function -> lib_entry:bool -> unit
-  val compute_from_init_state: kernel_function -> Abstract.Dom.t -> unit
-
-  include Results with type state := Abstract.Dom.state
-                   and type value := Abstract.Val.t
-                   and type location := Abstract.Loc.location
-end
-
-
 module type S = sig
-  include Abstractions.S_with_evaluation
+  include Engine_sig.S
   include Results with type state := Dom.state
                    and type value := Val.t
                    and type location := Loc.location
 end
+
+module Make (Abstract: Abstractions.S) : S
+  with module Ctx = Abstract.Ctx
+   and module Val = Abstract.Val
+   and module Loc = Abstract.Loc
+   and module Dom = Abstract.Dom
 
 val current_analyzer : unit -> (module S)
 (** The abstractions used in the latest analysis, and its results. *)

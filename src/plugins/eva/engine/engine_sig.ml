@@ -23,33 +23,43 @@
 open Cil_types
 open Eval
 
-val current_kf_inout: unit -> Inout_type.t option
+type 'state call_result = {
+  states: (Partition.key * 'state) list;
+  cacheable: cacheable;
+}
 
-module type S = sig
-
+module type Compute =
+sig
   type state
-  type value
   type loc
+  type value
 
-  val assign: state -> kinstr -> lval -> exp -> state or_bottom
+  (** Compute a call to the main function. *)
+  val compute_from_entry_point: kernel_function -> lib_entry:bool -> unit
 
-  val assume: state -> stmt -> exp -> bool -> state or_bottom
+  (** Compute a call to the main function from the given initial state. *)
+  val compute_from_init_state: kernel_function -> state -> unit
 
-  val call:
-    stmt -> lval option -> exp -> exp list -> state ->
-    (Partition.key * state) list * Eval.cacheable
-
-  val check_unspecified_sequence:
-    Cil_types.stmt ->
-    state ->
-    (* TODO *)
-    (stmt * lval list * lval list * lval list * stmt ref list) list ->
-    unit or_bottom
-
-  val enter_scope: kernel_function -> varinfo list -> state -> state
+  (** Compute a call during an analysis *)
+  val compute_call:
+    stmt -> (loc, value) call -> recursion option -> state -> state call_result
 end
 
-module Make (Abstract: Engine_sig.S)
-  : S with type state = Abstract.Dom.t
-       and type value = Abstract.Val.t
-       and type loc = Abstract.Loc.location
+
+module type S = sig
+  (* The four abstractions (values, locations, states and evaluation context). *)
+  include Abstractions.S
+
+  (* The evaluator for these abstractions *)
+  module Eval : Evaluation_sig.S
+    with type state = Dom.t
+     and type context = Ctx.t
+     and type value = Val.t
+     and type loc = Loc.location
+     and type origin = Dom.origin
+
+  module Compute : Compute
+    with type state = Dom.t
+     and type value = Val.t
+     and type loc = Loc.location
+end
