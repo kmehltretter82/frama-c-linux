@@ -505,6 +505,49 @@ module Html = struct
     unicode
   ;;
 
+  let append_file ~input ~output ~name =
+    let copy cin cout =
+      let rec aux cin cout =
+        let line = input_line cin in
+        Printf.fprintf cout "%s\n" line;
+        aux cin cout
+      in
+      try
+        Printf.fprintf cout "// Graph for %s\n" name;
+        aux cin cout
+      with End_of_file ->
+        output_string cout "\n"
+    in
+    let with_open_in = In_channel.with_open_text input in
+    let with_open_out f =
+      if Sys.file_exists output then
+        Out_channel.with_open_gen
+          [Open_text; Open_wronly; Open_append]
+          0o666
+          output
+          f
+      else
+        let print_header cout =
+          Printf.fprintf cout
+            "// Concatenated dot files. Generate all graphs with \
+             `dot -Tpng -O file.dot`\n\
+             // They will be named file.dot.png, file.dot.2.png, ...\n\n"
+        in
+        Out_channel.with_open_text
+          output
+          (fun cout ->
+             print_header cout;
+             f cout)
+    in
+    try
+      with_open_out (fun cout ->
+          with_open_in (fun cin ->
+              copy cin cout))
+    with e ->
+      MtOptions.error
+        "Error while appending %s to %s: %s"
+        input output (Printexc.to_string e)
+
   let mk_graph_img th =
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
@@ -513,6 +556,11 @@ module Html = struct
     let fmt = Format.formatter_of_out_channel otmp in
     MtCfg.dot_fprint_graph fmt th.th_cfg f_stmt;
     close_out otmp;
+    if not (MtOptions.ConcatDotFilesTo.is_empty ()) then begin
+      let name = Thread.label th.th_eva_thread in
+      let output = (MtOptions.ConcatDotFilesTo.get () :> string) in
+      append_file ~input:tmp_file ~output ~name
+    end;
     let dot_output_format = "svg" in
     let link_fname =
       (Format.asprintf "%s.%s" thread_name dot_output_format) in
