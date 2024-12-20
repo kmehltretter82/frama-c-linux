@@ -98,6 +98,13 @@ let apply_analysis_hooks () =
 let mthread_run project =
   MtOptions.warning
     "Mthread is an experimental plugin and is still in development.";
+
+  if not (MtOptions.ConcatDotFilesTo.is_empty ()) &&
+     not (MtOptions.ExtractModels.mem "html") then
+    MtOptions.error "Option %S needs option \"%s html\" to work."
+      MtOptions.ConcatDotFilesTo.option_name
+      MtOptions.ExtractModels.option_name;
+
   let old_project = Project.current () in
   Project.set_current project;
   let hook_builtins = Lazy.force hook_builtins in
