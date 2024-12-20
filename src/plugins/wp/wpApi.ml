@@ -159,8 +159,7 @@ let get_version = function
 let iter_provers fn =
   List.iter
     (fun p ->
-       if Why3Provers.is_auto p && Why3Provers.is_mainstream p then
-         fn (VCS.Why3 p))
+       if Why3Provers.is_mainstream p then fn (VCS.Why3 p))
   @@ Why3Provers.provers ()
 
 let _ : VCS.prover S.array =
@@ -177,6 +176,50 @@ let _ : VCS.prover S.array =
     ~keyName:"prover"
     ~keyType:Prover.jtype
     ~iter:iter_provers model
+
+(* -------------------------------------------------------------------------- *)
+(* --- Interactive provers                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+let _ =
+  R.register
+    ~package ~kind:`GET ~name:"isInteractiveProver"
+    ~descr:(Md.plain "Tells whether the prover is interactive")
+    ~input:(module Prover)
+    ~output:(module D.Jbool)
+    (fun p -> not @@ VCS.is_auto p)
+
+module InteractiveMode =
+struct
+  include D.Enum
+
+  let dictionary : VCS.mode dictionary = dictionary ()
+
+  let tag name descr value = tag ~name ~descr:(Md.plain descr) ~value dictionary
+
+  let batch  = tag "batch"  "Batch"     VCS.Batch
+  let update = tag "update" "Update"    VCS.Update
+  let edit   = tag "edit"   "Edit"      VCS.Edit
+  let fix    = tag "fix"    "Fix"       VCS.Fix
+  let fixup  = tag "fixup"  "FixUpdate" VCS.FixUpdate
+
+  let lookup = function
+    | VCS.Batch -> batch
+    | VCS.Update -> update
+    | VCS.Edit -> edit
+    | VCS.Fix -> fix
+    | VCS.FixUpdate -> fixup
+
+  let () =
+    set_lookup dictionary lookup
+
+  include
+    (val publish
+        ~package
+        ~descr:(Md.plain "interactive mode")
+        ~name:"InteractiveMode"
+        dictionary)
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Counter Examples                                                   --- *)

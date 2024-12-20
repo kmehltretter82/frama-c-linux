@@ -532,7 +532,7 @@ let () =
 (* --- Prover Scheduling                                                  --- *)
 (* -------------------------------------------------------------------------- *)
 
-let runProvers ?timeout ?provers node =
+let runProvers ?mode ?timeout ?provers node =
   let wpo = ProofEngine.goal node in
   let provers = match provers with
     | Some ps -> ps
@@ -540,6 +540,10 @@ let runProvers ?timeout ?provers node =
   let timeout = match timeout with
     | Some t -> t
     | None -> Wp_parameters.Timeout.get () in
+  let mode = match mode with
+    | Some mode -> mode
+    | None -> VCS.parse_mode @@ Wp_parameters.Interactive.get () in
+  Kernel.feedback "Run prover with mode %a" VCS.pp_mode mode ;
   let config =
     let cfg = VCS.current () in
     { cfg with timeout = Some (float timeout) } in
@@ -552,7 +556,7 @@ let runProvers ?timeout ?provers node =
              Wpo.set_result wpo prv VCS.no_result
            else if not @@ VCS.is_verdict r then
              Wpo.set_result wpo prv backup in
-         let process () = Prover.prove ~config ~result wpo prv in
+         let process () = Prover.prove ~config ~mode ~result wpo prv in
          let thread = Task.thread @@ Task.later process () in
          let status = VCS.computing (fun () -> Task.cancel thread) in
          Wpo.set_result wpo prv status ;
@@ -571,6 +575,9 @@ let () =
   let get_provers = R.param_opt iRunProvers (module WpApi.Provers)
       ~name:"provers"
       ~descr:(Md.plain "Prover selection (default: current") in
+  let get_mode = R.param_opt iRunProvers (module WpApi.InteractiveMode)
+      ~name:"mode"
+      ~descr:(Md.plain "Interactive provers mode") in
   R.register_sig iRunProvers ~package ~kind:`SET
     ~name:"runProvers"
     ~descr:(Md.plain "Schedule provers on proof node")
@@ -578,7 +585,8 @@ let () =
       let node = get_node rq in
       let provers = get_provers rq in
       let timeout = get_timeout rq in
-      runProvers ?timeout ?provers node
+      let mode = get_mode rq in
+      runProvers ?mode ?timeout ?provers node
     end
 
 let killProvers ?provers node =

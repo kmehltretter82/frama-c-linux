@@ -33,6 +33,7 @@ val selection : ProofEngine.node -> Tactical.selection
 val setSelection : ProofEngine.node -> Tactical.selection -> unit
 
 val runProvers :
+  ?mode:VCS.mode ->
   ?timeout:int ->
   ?provers:VCS.prover list ->
   ProofEngine.node -> unit

@@ -21,6 +21,7 @@
 /* ************************************************************************ */
 
 import React, { Fragment } from 'react';
+
 import { classes } from 'dome/misc/utils';
 import { Icon } from 'dome/controls/icons';
 import { IconButton, IconButtonKind } from 'dome/controls/buttons';
@@ -39,6 +40,7 @@ type Goal = WP.goal | undefined;
 type Node = TIP.node | undefined;
 type Prover = WP.prover | undefined;
 type Tactic = TIP.tactic | undefined;
+type Mode = WP.InteractiveMode;
 
 /* -------------------------------------------------------------------------- */
 /* --- Use Actions                                                        --- */
@@ -58,6 +60,12 @@ function sendProverTime( node: Node, prover: Prover, timeout: number): void
 {
   if (node && prover && timeout > 0) {
     Server.send(TIP.runProvers, { node, timeout, provers: [prover] });
+  }
+}
+
+function sendProverInteractive(node: Node, prover: Prover, mode: Mode): void {
+  if (node && prover) {
+    Server.send(TIP.runProvers, { node, mode, provers: [prover] });
   }
 }
 
@@ -372,10 +380,10 @@ function Parameter(props: ParameterProps): JSX.Element | null
 }
 
 /* -------------------------------------------------------------------------- */
-/* --- Prover Configuration                                               --- */
+/* --- Automatic Prover Configuration                                     --- */
 /* -------------------------------------------------------------------------- */
 
-export function ConfigureProver(props: ProverSelection): JSX.Element {
+export function ConfigureAutoProver(props: ProverSelection): JSX.Element {
   const { node, selected: prover, setSelected } = props;
   const { descr } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
   const result = States.useRequestStable(TIP.getResult, { node, prover });
@@ -385,7 +393,8 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
     getProverActions(result);
   const [fwdTime, setFwdTime] = React.useState(0);
   const [fwdArmed, setFwdArmed] = React.useState(false);
-  const display = !!prover;
+  const auto = !States.useRequestStable(WP.isInteractiveProver, prover);
+  const display = auto && !!prover;
   const action = running ? TIP.killProvers : TIP.runProvers;
   const onPlay = (): void => sendProver(action, node, prover);
   const onClear = (): void => sendProver(TIP.clearProvers, node, prover);
@@ -414,6 +423,25 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
       className="dome-xToolBar dome-color-frame wp-configure"
       display={display}
     >
+      <Item
+        key='prover'
+        title='Selected Prover Configuration'
+        className="wp-config-tactic"
+        label={descr} />
+      <Separator />
+      <IconButton
+        key='clear'
+        icon='TRASH'
+        kind='negative'
+        enabled={clear}
+        title='Clear Prover Result'
+        onClick={onClear}
+        />
+      <Item
+        icon={icon}
+        kind={kind}
+        label={result.descr} />
+      <Filler />
       <Label
         icon='SETTINGS'
         label='Process' title='Server Processes (shared by all provers)'
@@ -441,25 +469,7 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
         />
       </Label>
       <Separator />
-      <Item
-        key='prover'
-        title='Selected Prover Configuration'
-        className="wp-config-tactic"
-        label={descr} />
-      <Item
-        icon={icon}
-        kind={kind}
-        label={result.descr} />
-      <Filler />
       <Hbox>
-        <IconButton
-          key='clear'
-          icon='MEDIA.PREV'
-          kind='negative'
-          enabled={clear}
-          title='Clear Prover Result'
-          onClick={onClear}
-        />
         <IconButton
           key='play'
           icon={running ? 'MEDIA.STOP' : 'MEDIA.PLAY'}
@@ -475,6 +485,104 @@ export function ConfigureProver(props: ProverSelection): JSX.Element {
           enabled={forward > 0}
           title={forwardTitle}
           onClick={onForward}
+        />
+      </Hbox>
+      <IconButton
+        key='close'
+        icon='CIRC.CLOSE'
+        title='Close Prover Configuration Panel'
+        onClick={onClose} />
+    </Hbox>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Interactive Prover Configuration                                   --- */
+/* -------------------------------------------------------------------------- */
+
+export function ConfigureInteractiveProver(sel: ProverSelection): JSX.Element {
+  const { node, selected: prover, setSelected } = sel;
+  const { descr } = States.useSyncArrayElt(WP.ProverInfos, prover) ?? {};
+  const result = States.useRequestStable(TIP.getResult, { node, prover });
+  const interactive = States.useRequestStable(WP.isInteractiveProver, prover);
+  const [process = 1, setProcess] = States.useSyncState(WP.process);
+  const [timeout = 1, setTimeout] = States.useSyncState(WP.timeout);
+
+  const { icon, kind, clear=true, running=false } =
+    getProverActions(result);
+  const display = interactive && !!prover;
+  const kill =
+    (): void => sendProver(TIP.killProvers, node, prover);
+  const batch =
+    (): void => sendProverInteractive(node, prover, WP.InteractiveMode.batch);
+  const edit =
+    (): void => sendProverInteractive(node, prover, WP.InteractiveMode.edit);
+
+  const onClear = (): void => sendProver(TIP.clearProvers, node, prover);
+  const onClose = (): void => setSelected(undefined);
+  return (
+    <Hbox
+      className="dome-xToolBar dome-color-frame wp-configure"
+      display={display}
+    >
+      <Item
+        key='prover'
+        title='Selected Prover Configuration'
+        className="wp-config-tactic"
+        label={descr} />
+      <Separator />
+      <IconButton
+        key='clear'
+        icon='TRASH'
+        kind='negative'
+        enabled={clear}
+        title='Clear Prover Result'
+        onClick={onClear}
+        />
+      <Item
+        icon={icon}
+        kind={kind}
+        label={result.descr} />
+      <Filler />
+      <Label
+        icon='SETTINGS'
+        label='Process' title='Server Processes (shared by all provers)'
+      >
+        <Spinner
+          className="wp-config-field wp-config-spinner"
+          onChange={setProcess}
+          value={process}
+          vmin={1}
+          vmax={36}
+          vstep={1}
+        />
+      </Label>
+      <Label
+        label='Timeout' title='Prover Timeout (shared by all provers)'
+      >
+        <Spinner
+          className="wp-config-field wp-config-spinner"
+          onChange={setTimeout}
+          value={timeout}
+          vmin={1}
+          vmax={3600}
+          vstep={1}
+        />
+      </Label>
+      <Separator/>
+      <Hbox>
+        <IconButton
+          key='play'
+          icon={running ? 'MEDIA.STOP' : 'MEDIA.PLAY'}
+          title={running ? 'Stop Prover' : 'Run Prover'}
+          onClick={running ? kill : batch}
+        />
+        <IconButton
+          key='edit'
+          icon={'PAINTBRUSH'}
+          title={'Edit Prover Script'}
+          enabled={!running}
+          onClick={edit}
         />
       </Hbox>
       <IconButton
@@ -570,6 +678,7 @@ export function ConfigureTactic(props: TacticSelection): JSX.Element {
         title='Tactic Status'
         {...statusDescr} />
       <Fragment key='params'>{parameters}</Fragment>
+      <Separator/>
       <IconButton
         key='play'
         icon={locked ? 'LOCK' : 'MEDIA.PLAY'}
