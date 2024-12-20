@@ -114,13 +114,7 @@
   ==END OF DUMP==
 [eva] Recording results for taint_undet_locs
 [eva] Done for function taint_undet_locs
-[eva] computing for function taints <- main.
-  Called from taint.c:202.
-[eva] computing for function Frama_C_interval <- taints <- main.
-  Called from taint.c:187.
-[eva] Done for function Frama_C_interval
-[eva] Recording results for taints
-[eva] Done for function taints
+[eva] taint.c:202: Reusing old results for call to taints
 [eva] computing for function taint_spec_assigns <- main.
   Called from taint.c:203.
 [eva] using specification for function taint_spec_assigns
@@ -174,7 +168,13 @@
   false
 [eva] Recording results for taint_call
 [eva] Done for function taint_call
-[eva] taint.c:214: Reusing old results for call to taints
+[eva] computing for function taints <- main.
+  Called from taint.c:214.
+[eva] computing for function Frama_C_interval <- taints <- main.
+  Called from taint.c:187.
+[eva] Done for function Frama_C_interval
+[eva] Recording results for taints
+[eva] Done for function taints
 [eva] computing for function taint_infinite_while <- main.
   Called from taint.c:215.
 [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.

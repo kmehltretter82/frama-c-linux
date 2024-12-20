@@ -478,17 +478,12 @@ module TransferSingleTaint = struct
   let finalize_call _stmt _call _recursion ~pre ~post =
     (* Recover assume statements from the [pre] abstract state: we assume the
        control-dependency does not extended beyond the function scope. *)
-    let return_state =
-      { post with assume_stmts = pre.assume_stmts;
-                  dependent_call = pre.dependent_call; }
-    in
-    `Value return_state
+    { post with assume_stmts = pre.assume_stmts;
+                dependent_call = pre.dependent_call; }
 
-  let finalize_call_auto_tainted _stmt call _recursion ~pre ~post =
-    let return_state =
-      { post with assume_stmts = pre.assume_stmts;
-                  dependent_call = pre.dependent_call; }
-    in
+  (* Adds automatic taint from [call] to [state] for some libc functions.
+     Should be called after [finalize_call] only if -eva-auto-taint is set. *)
+  let add_call_auto_taint call state =
     if is_variadic_tainting call.Eval.kf then
       begin
         match call.arguments with
@@ -498,30 +493,27 @@ module TransferSingleTaint = struct
             let zones = List.map arg_to_zone rest in
             let n = get_formats_number s in
             let vars_to_taint = get_n_first zones n in
-            `Value { return_state
-                     with locs_data = List.fold_left Zone.join
-                              return_state.locs_data vars_to_taint }
+            let locs_data = List.fold_left Zone.join state.locs_data vars_to_taint in
+            { state with locs_data }
           end
-        | _ -> `Value return_state
+        | _ -> state
       end
     else if is_tainting call.kf then
       begin
         try
           let to_taint = find_tainted_argument call.arguments in
           let zone = arg_to_zone to_taint in
-          `Value { return_state with locs_data =
-                                       Zone.join return_state.locs_data zone }
+          { state with locs_data = Zone.join state.locs_data zone }
         with
-        | Not_found -> `Bottom
+        | Not_found -> state
       end
     else if is_tainting_res call.kf then
       begin
         let zone = zone_of_return call.return in
-        `Value { return_state with locs_data =
-                                     Zone.join return_state.locs_data zone }
+        { state with locs_data = Zone.join state.locs_data zone }
       end
     else
-      `Value return_state
+      state
 
   let show_expr valuation state fmt exp =
     let to_loc = loc_of_lval valuation in
@@ -555,38 +547,33 @@ module TransferMultiTaint = struct
     in
     `Value (StringMap.map start_call_per_taint state_map)
 
-  let finalize_call stmt call recursion ~pre:pre_map ~post:post_map =
-    let finalize_call_per_taint key finalizer =
-      let pre = StringMap.find_or_empty key pre_map in
-      let post = StringMap.find_or_empty key post_map in
-      finalizer stmt call recursion ~pre ~post
+
+  let finalize_call stmt call recursion ~pre ~post =
+    let get_or_empty = function
+      | None -> LatticeSingleTaint.empty
+      | Some state -> state
     in
-    let rec recreate_map keys result =
-      match keys with
-      | [] -> result
-      | key :: rest ->
-        begin
-          let finalizer =
-            if key = "auto" && auto_taint () then
-              TransferSingleTaint.finalize_call_auto_tainted
-            else
-              TransferSingleTaint.finalize_call
-          in
-          let state_after_call_or_bottom = finalize_call_per_taint key
-              finalizer in
-          match state_after_call_or_bottom with
-          | `Bottom -> `Bottom
-          | `Value state ->
-            match result with
-            | `Bottom -> `Bottom (* should not happen *)
-            | `Value v ->
-              let new_map = StringMap.add key state v in
-              recreate_map rest (`Value new_map)
-        end
+    (* Finalizes taint state for each taint label. *)
+    let merge_per_key _key pre_opt post_opt =
+      let pre = get_or_empty pre_opt
+      and post = get_or_empty post_opt in
+      let state =
+        TransferSingleTaint.finalize_call stmt call recursion ~pre ~post
+      in
+      if LatticeSingleTaint.(equal empty state) then None else Some state
     in
-    let result_map = LatticeMultiTaint.empty in
-    let keys_list = taint_names () in
-    recreate_map keys_list (`Value result_map)
+    let map_state = StringMap.merge merge_per_key pre post in
+    (* Adds auto taints if -eva-auto-taint is set. *)
+    let map_state =
+      if auto_taint () then
+        let auto_state = StringMap.find_or_empty "auto" map_state in
+        let auto_state =
+          TransferSingleTaint.add_call_auto_taint call auto_state
+        in
+        StringMap.add "auto" auto_state map_state
+      else map_state
+    in
+    `Value map_state
 
   let show_expr valuation state_map fmt exp =
     let show_expr_per_taint namespace state =

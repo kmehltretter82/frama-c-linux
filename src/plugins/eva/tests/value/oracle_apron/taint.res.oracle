@@ -1,20 +1,20 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
-156c155,161
-< [eva] taint.c:211: Reusing old results for call to taints
+117c116,122
+< [eva] taint.c:202: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
->   Called from taint.c:211.
+>   Called from taint.c:202.
 > [eva] computing for function Frama_C_interval <- taints <- main.
 >   Called from taint.c:187.
 > [eva] Done for function Frama_C_interval
 > [eva] Recording results for taints
 > [eva] Done for function taints
-177c182,188
-< [eva] taint.c:214: Reusing old results for call to taints
+150c155,161
+< [eva] taint.c:211: Reusing old results for call to taints
 ---
 > [eva] computing for function taints <- main.
->   Called from taint.c:214.
+>   Called from taint.c:211.
 > [eva] computing for function Frama_C_interval <- taints <- main.
 >   Called from taint.c:187.
 > [eva] Done for function Frama_C_interval
