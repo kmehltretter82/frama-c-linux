@@ -165,10 +165,7 @@
 
   let preprocess_annots suffix cpp outfile =
     if !has_annot then begin
-      let debug =
-        Kernel.debug_atleast 3 ||
-          Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files
-      in
+      let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
       let ppname =
         try Extlib.temp_file_cleanup_at_exit ~debug "ppannot" suffix
         with Extlib.Temp_file_error s ->
