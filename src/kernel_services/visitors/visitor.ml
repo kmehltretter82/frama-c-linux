@@ -631,8 +631,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
     method! vglob g =
       let fundec, has_kf = match g with
         | GFunDecl(_,v,_) ->
-          let ov = Visitor_behavior.Get_orig.varinfo self#behavior v in
-          let kf = try Globals.Functions.get ov with Not_found ->
+          let kf = try Globals.Functions.get v with Not_found ->
             Kernel.fatal "No kernel function for %s(%d)" v.vname v.vid
           in
           (* Just make a copy of current kernel function in case it is needed *)
@@ -642,7 +641,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
           self#set_current_kf kf;
           None, true
         | GFun(f,_) ->
-          let v = Visitor_behavior.Get_orig.varinfo self#behavior f.svar in
+          let v = f.svar in
           let kf =
             try Globals.Functions.get v
             with Not_found ->
