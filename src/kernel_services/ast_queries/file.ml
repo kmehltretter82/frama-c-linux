@@ -380,7 +380,7 @@ let create_temp_file ?debug name suffix =
     Kernel.abort "cannot create temporary file: %s" s
 
 let safe_remove_file (f : Datatype.Filepath.t) =
-  if not (Kernel.is_debug_key_enabled Kernel.dkey_parser) then
+  if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
     Extlib.safe_remove (f :> string)
 
 let cpp_name cmd =
@@ -463,7 +463,7 @@ let build_cpp_cmd = function
     if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
-    let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
+    let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
     let add_if_gnu opt =
       match is_gnu_like with
       | Gnu -> [opt]

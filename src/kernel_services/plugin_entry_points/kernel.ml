@@ -97,7 +97,10 @@ let dkey_linker_find = register_category "linker:find"
 
 let dkey_loops = register_category "natural-loops"
 
-let dkey_parser = register_category "parser"
+let dkey_pp_keep_temp_files =
+  register_category
+    ~help:"keep temporary preprocessor intermediate output files"
+    "pp:keep-temp-files"
 let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 

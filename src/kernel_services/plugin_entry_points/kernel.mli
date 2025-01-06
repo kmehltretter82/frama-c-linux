@@ -88,7 +88,7 @@ val dkey_linker_find: category
 
 val dkey_loops: category
 
-val dkey_parser: category
+val dkey_pp_keep_temp_files: category
 
 val dkey_pp: category
 
