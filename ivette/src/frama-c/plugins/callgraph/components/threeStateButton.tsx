@@ -32,14 +32,16 @@ export interface IThreeStateButton {
   value: number,
 }
 
+export type TThreesButtonState = [
+  IThreeStateButton,
+  (newValue: IThreeStateButton) => void
+];
+
 interface ThreeStateButtonProps {
   label?: string;
   icon?: string;
   title?: string;
-  buttonState: [
-    IThreeStateButton,
-    (newValue: IThreeStateButton) => void
-  ];
+  buttonState: TThreesButtonState;
 }
 
 export function ThreeStateButton(

@@ -26,30 +26,26 @@ import * as Ivette from 'ivette';
 import * as Dome from 'dome';
 
 import { IconButton } from 'dome/controls/buttons';
-import { Inset } from 'dome/frame/toolbars';
-import * as Dialogs from 'dome/dialogs';
+import { Button, Inset } from 'dome/frame/toolbars';
+import { HelpIcon } from 'dome/help';
+import docPlugins from '../../plugins.md?raw';
+import { DocShowNodesButton } from './toolbar';
+import { ledTag, iconTag } from 'dome/text/markdown';
 
-// Help popup
-async function displayShortcuts(): Promise<void> {
-  await Dialogs.showMessageBox({
-    buttons: [{ label: "Ok" }],
-    details: (
-      'In the graph:\n' +
-      '  - Left-click: rotate the graph\n' +
-      '  - Right-click: move in the graph\n' +
-      '  - Mouse-wheel: zoom\n' +
-      '\n' +
-      'On nodes:\n' +
-      '  - Left-Click: select node (in the graph)\n'+
-      '  - Ctrl+click: add node to the selected nodes (multi-selection)\n' +
-      '  - Alt+click: select function (in all Ivette components)\n' +
-      '\n' +
-      'Function filters (in the titlebar of this component) are synchronized ' +
-      'with the filter of the functions sidebar.'
-    ),
-    message: 'Callgraph Help',
-  });
-}
+export const TSButtonTag = {
+  pattern: /\[button-displaymode\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
+    return match ? <span key={key}>{DocShowNodesButton()}</span> : null;
+  }
+};
+
+export const selectBtnTag = {
+  pattern: /\[button-select\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
+    return match ? <Button key={key} label="Select" title={`Nodes selection`}/>
+      : null;
+  }
+};
 
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph titlebar component                                       --- */
@@ -89,11 +85,11 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
         title={"Automatically select node of the function selected in AST"}
       />
       <Inset />
-      <IconButton
-        icon="HELP"
-        onClick={displayShortcuts}
-        title='Callgraph help'
-      />
+      <HelpIcon
+        label='Plugins - Callgraph'
+        scrollTo={'plugins-callgraph'}
+        patterns={[iconTag, ledTag, selectBtnTag, TSButtonTag]}
+      >{ docPlugins }</HelpIcon>
       <Inset />
     </Ivette.TitleBar>
   );

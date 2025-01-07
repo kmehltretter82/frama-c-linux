@@ -62,8 +62,11 @@ export function LCD(props: LabelProps): JSX.Element {
 // --- Led
 // --------------------------------------------------------------------------
 
-export type LEDstatus =
-  undefined | 'inactive' | 'active' | 'positive' | 'negative' | 'warning';
+export const LEDStatusList = [
+  'active', 'inactive', 'positive', 'negative', 'warning'
+] as const;
+
+export type LEDstatus = typeof LEDStatusList[number] | undefined;
 
 export interface LEDprops {
   /**

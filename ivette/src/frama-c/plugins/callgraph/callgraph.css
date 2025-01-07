@@ -82,7 +82,6 @@
   .node-graph {
     display: flex;
     align-items: center;
-    display: flex;
     background-color: rgb(from var(--background-profound) r g b / .5);
     padding: .5em;
     border-radius: .5em;
@@ -95,10 +94,6 @@
 
     &.node-selected {
       border: solid var(--activated-button-color) 2px;
-    }
-
-    .dome-xButton-led {
-      display: block;
     }
   }
 

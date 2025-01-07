@@ -26,22 +26,37 @@ import remarkCustomHeaderId from 'remark-custom-header-id';
 
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
-import { Icon } from 'dome/controls/icons';
+import { Icon, iconKindList } from 'dome/controls/icons';
 import {
   CodeBlock, atomOneDark, atomOneLight
 } from "react-code-blocks";
+import { LED, LEDStatusList } from 'dome/controls/displays';
+
 export interface Pattern {
   pattern: RegExp,
   replace: (key: number, match?: RegExpExecArray) => JSX.Element | null
 }
 
 export const iconTag: Pattern = {
-  pattern: /(\[ex:\])?\[icon-([^\]]+)\]/g,
+  pattern: /(\[ex:\])?\[icon-([^-\]]+)(-([^\]]+))?\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
-    if(match && match[1] === "[ex:]") {
-      return <span key={key}>{`[icon-${match[2]}]`}</span>;
+    if(!match) return null;
+    const id = match[2];
+    const kind = iconKindList.find(elt => elt === match[4]);
+    const color = !kind ? match[4] : undefined;
+    if(match[1] === "[ex:]") {
+      return <span key={key}>{`[icon-${id}-${match[4]}]`}</span>;
     }
-    return match ? <Icon key={key} id={match[2]}/> : null;
+    return <Icon key={key} id={id} kind={kind} fill={color}/>;
+  }
+};
+
+export const ledTag: Pattern = {
+  pattern: /\[led-([^\]]+)\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
+    if(!match) return null;
+    const status = LEDStatusList.find(elt => elt === match[1]);
+    return <LED key={key} status={status} />;
   }
 };
 
@@ -120,6 +135,7 @@ export function Markdown(
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages", className
   );
+  let liKey: number = 0;
 
   const scroll = (id: string): void => {
     const elt = document.getElementById(id);
@@ -134,7 +150,9 @@ export function Markdown(
   };
   options.components = {
     p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
-    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>,
+    li: ({ children }) => {
+      return <li key={liKey++}>{replaceTags(children, patterns)}</li>;
+    },
     /** Uses codeBlock if ``` is used in markdown with a language,
      *  otherwise the code-inline class is added */
     code: ({ className, children }) => {
