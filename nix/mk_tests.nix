@@ -33,6 +33,7 @@
 , frama-c
 , jq
 , perl
+, pkgs
 , python3Packages
 , socat
 , stdenvNoCC
@@ -64,6 +65,7 @@ stdenvNoCC.mkDerivation {
     frama-c
     jq
     perl
+    pkgs.fontconfig
     python3Packages.jsonschema
     python3Packages.pyaml
     socat
@@ -89,10 +91,14 @@ stdenvNoCC.mkDerivation {
     else "" ;
 
   preBuild =
+    ''
+    mkdir home
+    export HOME=$(pwd)/home
+    export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+    export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts/"
+    '' +
     (if has-wp-proofs
      then ''
-         mkdir home
-         HOME=$(pwd)/home
          why3 config detect
          export FRAMAC_WP_CACHE=offline
          export FRAMAC_WP_CACHEDIR=$wp_cache
