@@ -188,7 +188,7 @@ Check if other \FramaC (and related) repositories need to be updated:
 \item update the reference commit of the frama-c submodule to the tag of the release
 \item \texttt{make framac}
 \item \texttt{make clean}
-\item \texttt{make all}
+\item \texttt{make -j $(nproc) all}
 \end{itemize}
 \item \texttt{pub/sate-6} (\expertise{André})
 \item other \texttt{pub} repositories related to Frama-C...\todo{which ones?}
