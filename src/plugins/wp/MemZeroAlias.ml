@@ -54,7 +54,7 @@ let hypotheses p = p
 (* --- Chunks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type chunk = varinfo * path list (* from left to right *)
+type mchunk = varinfo * path list (* from left to right *)
 and path = S | I | F of fieldinfo
 
 let hash_path = function S -> 1 | I -> 2 | F fd -> Fieldinfo.hash fd
@@ -92,9 +92,9 @@ let rec dim_of_path t = function
   | S :: p | F _ :: p -> dim_of_path t p
   | I :: p -> dim_of_path Qed.Logic.(Array(Int,t)) p
 
-module Chunk =
+module MChunk =
 struct
-  type t = chunk
+  type t = mchunk
   let self = "mtree"
   let hash (x,p) = Qed.Hcons.hash_list hash_path (Varinfo.hash x) p
   let equal (x,p) (y,q) = Varinfo.equal x y && Qed.Hcons.equal_list equal_path p q
@@ -118,8 +118,10 @@ struct
   let is_framed (x,p) = not x.vglob && p = []
 end
 
-module Heap = Qed.Collection.Make(Chunk)
-module Sigma = Sigma.Make(Chunk)(Heap)
+module Sigma = SigmaCore
+module Heap = SigmaCore.Heap
+module Chunk = SigmaCore.Chunk
+module State = SigmaCore.Make(MChunk)
 
 type loc =
   | Null
@@ -128,6 +130,7 @@ type loc =
   | Array of loc * F.term
   | Field of loc * fieldinfo
 
+type chunk = Chunk.t
 type sigma = Sigma.t
 type domain = Sigma.domain
 type segment = loc rloc
@@ -180,14 +183,14 @@ let rec walk ps ks = function
 let access l = walk [] [] l
 
 let domain _obj l =
-  try Heap.Set.singleton (fst (access l))
-  with _ -> Heap.Set.empty
+  try State.singleton (fst (access l))
+  with _ -> Sigma.empty
 
 let is_well_formed _s = p_true
 
 let value sigma l =
   let m,ks = access l in
-  let x = Sigma.get sigma m in
+  let x = State.get sigma m in
   List.fold_left F.e_get (e_var x) ks
 
 let rec update a ks v =
@@ -195,7 +198,7 @@ let rec update a ks v =
   | [] -> v
   | k::ks -> F.e_set a k (update (F.e_get a k) ks v)
 
-let set s m ks v = if ks = [] then v else update (e_var (Sigma.get s m)) ks v
+let set s m ks v = if ks = [] then v else update (State.value s m) ks v
 
 let load sigma obj l =
   if Ctypes.is_pointer obj then Loc (Star l) else Val(value sigma l)
@@ -204,7 +207,7 @@ let load_init _sigma _obj _l = Warning.error ~source "Mem0Alias: No initialized"
 
 let stored seq _obj l e =
   let m,ks = access l in
-  let x = F.e_var (Sigma.get seq.post m) in
+  let x = State.value seq.post m in
   [Set( x , set seq.pre m ks e )]
 
 let stored_init _seq _obj _l _e = Warning.error ~source "Mem0Alias: No initialized"
@@ -250,15 +253,20 @@ let updates seq domain =
   let pool = ref Bag.empty in
   Heap.Map.iter2
     (fun c v1 v2 ->
-       try
-         match v1,v2 with
-         | _,None -> ()
-         | None,Some v ->
-           pool := Bag.add (Mstore(ilval c,v)) !pool
-         | Some v1,Some v2 ->
-           if v2 != v1 then
-             pool := Bag.add (Mstore (ilval c,v2)) !pool
-       with Not_found -> ()
+       match Sigma.mu c with
+       | State.Mu m ->
+         begin
+           try
+             match v1,v2 with
+             | _,None -> ()
+             | None,Some v ->
+               pool := Bag.add (Mstore(ilval m,v)) !pool
+             | Some v1,Some v2 ->
+               if v2 != v1 then
+                 pool := Bag.add (Mstore (ilval m,v2)) !pool
+           with Not_found -> ()
+         end
+       | _ -> ()
     ) pre post ;
   !pool
 
