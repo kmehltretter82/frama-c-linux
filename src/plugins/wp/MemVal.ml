@@ -225,52 +225,47 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* ---  Chunk                                                             --- *)
   (* -------------------------------------------------------------------------- *)
-  type chunk =
-    | M_base of Base.t
 
-  module Chunk =
+  module MChunk =
   struct
-    type t = chunk
+    type t = Base.t
     let self = "MemVal.Chunk"
-    let hash = function
-      | M_base b -> 5 * Base.hash b
-    let equal c1 c2 = match c1, c2 with
-      | M_base b1, M_base b2 -> Base.equal b1 b2
-    let compare c1 c2 = match c1, c2 with
-      | M_base b1, M_base b2 -> Base.compare b1 b2
-    let pretty fmt = function
-      | M_base b -> Base.pretty fmt b
-    let tau_of_chunk = function
-      | M_base _ -> t_words
-    let basename_of_base = function
+    let hash = Base.hash
+    let equal = Base.equal
+    let compare = Base.compare
+    let pretty = Base.pretty
+    let tau_of_chunk _base = t_words
+    let basename_of_chunk = function
       | Base.Var (vi, _) -> Format.sprintf "MVar_%s" (LogicUsage.basename vi)
       | Base.CLogic_Var (_, _, _) -> assert false (* not supposed to append. *)
       | Base.Null -> "MNull"
       | Base.String (eid, _) -> Format.sprintf "MStr_%d" eid
       | Base.Allocated (vi, _dealloc, _) ->
         Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
-    let basename_of_chunk = function
-      | M_base b -> basename_of_base b
-    let is_framed = function
-      | M_base b ->
-        try
-          (match WpContext.get_scope () with
-           | WpContext.Global -> assert false
-           | WpContext.Kf kf -> Base.is_formal_or_local b (Kernel_function.get_definition kf))
-        with Invalid_argument _ | Kernel_function.No_Definition ->
-          assert false (* by context. *)
+    let is_framed b =
+      try
+        (match WpContext.get_scope () with
+         | WpContext.Global -> assert false
+         | WpContext.Kf kf -> Base.is_formal_or_local b (Kernel_function.get_definition kf))
+      with Invalid_argument _ | Kernel_function.No_Definition ->
+        assert false (* by context. *)
+
   end
 
   let cluster () = Definitions.cluster ~id:"MemVal"  ()
 
-  module Heap = Qed.Collection.Make(Chunk)
-  module Sigma = Sigma.Make(Chunk)(Heap)
+  module Sigma = SigmaCore
+  module Heap = SigmaCore.Heap
+  module Chunk = SigmaCore.Chunk
+  module State = SigmaCore.Make(MChunk)
+
 
   type loc = {
     loc_v : V.t;
     loc_t : term (* of type addr *)
   }
 
+  type chunk = Chunk.t
   type sigma = Sigma.t
   type segment = loc rloc
 
@@ -513,7 +508,7 @@ struct
     let d = V.domain l.loc_v in
     assert (d <> []);
     List.fold_left
-      (fun acc b -> Heap.Set.add (M_base b) acc)
+      (fun acc b -> Heap.Set.add (State.chunk b) acc)
       Heap.Set.empty d
 
   (* -------------------------------------------------------------------------- *)
@@ -521,7 +516,7 @@ struct
   (* -------------------------------------------------------------------------- *)
   let load_value sigma obj l =
     let load_base base =
-      let mem = Sigma.value sigma (M_base base) in
+      let mem = State.value sigma base in
       let offset = a_offset l.loc_t in
       read obj ~mem ~offset
     in
@@ -534,7 +529,7 @@ struct
 
   let load_loc ~assume sigma obj l =
     let load_base v' base =
-      let mem = Sigma.value sigma (M_base base) in
+      let mem = State.value sigma base in
       let offset = a_offset l.loc_t in
       let rd = read obj ~mem ~offset in
       if assume then begin
@@ -566,8 +561,8 @@ struct
   (* -------------------------------------------------------------------------- *)
   let stored : sigma sequence -> c_object -> loc -> term -> equation list = fun seq obj l v ->
     let mk_write cond base =
-      let wpre = Sigma.value seq.pre (M_base base) in
-      let wpost = Sigma.value seq.post (M_base base) in
+      let wpre = State.value seq.pre base in
+      let wpost = State.value seq.post base in
       let write = write obj ~mem:wpre ~offset:(a_offset l.loc_t) ~value:v in
       F.p_equal wpost (F.e_if cond write wpre)
     in
@@ -689,7 +684,7 @@ struct
   (* -------------------------------------------------------------------------- *)
   let alloc_sigma : sigma -> varinfo list -> sigma = fun sigma xs ->
     let alloc sigma x =
-      let havoc s c = Sigma.havoc_chunk s (M_base c) in
+      let havoc s b = Sigma.havoc_chunk s (State.chunk b) in
       let v = V.cvar x in
       List.fold_left havoc sigma (V.domain v)
     in
@@ -717,7 +712,6 @@ struct
 
   let global : sigma -> term (*addr*) -> pred = fun _ _ ->
     F.p_true (* True is harmless and WP never call this function... *)
-
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Separation                                                        --- *)
