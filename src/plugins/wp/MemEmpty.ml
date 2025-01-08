@@ -45,21 +45,9 @@ let configure_ia _ = no_binder
 
 let hypotheses p = p
 
-module Chunk =
-struct
-  type t = unit
-  let self = "empty"
-  let hash () = 0
-  let equal () () = true
-  let compare () () = 0
-  let pretty _fmt () = ()
-  let tau_of_chunk () = Logic.Int
-  let basename_of_chunk () = "u"
-  let is_framed () = true
-end
-
-module Heap = Qed.Collection.Make(Chunk)
-module Sigma = Sigma.Make(Chunk)(Heap)
+module Sigma = SigmaCore
+module Heap = SigmaCore.Heap
+module Chunk = SigmaCore.Chunk
 
 type loc = unit
 type chunk = Chunk.t
