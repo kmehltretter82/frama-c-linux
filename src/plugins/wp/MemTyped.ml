@@ -200,12 +200,26 @@ let rec footprint = function
 
 and footprint_comp { cfields } =
   match cfields with
-  | None -> Sigma.empty
+  | None -> all_value_chunks ()
   | Some fields ->
     List.fold_left
       (fun ft f ->
          Sigma.union ft (footprint (object_of f.ftype))
       ) Sigma.empty fields
+
+and all_value_chunks () =
+  let pool = ref Heap.Set.empty in
+  let add c = pool := Heap.Set.add (State.chunk c) !pool in
+  let addi i = add (M_int i) in
+  begin
+    add M_pointer ;
+    add M_f32 ; add M_f64 ;
+    addi Ctypes.CBool ;
+    addi SInt8  ; addi UInt8 ;
+    addi SInt16 ; addi UInt16 ;
+    addi SInt32 ; addi UInt32 ;
+    addi SInt64 ; addi UInt64 ;
+  end ; !pool
 
 let init_footprint _ _ = State.singleton T_init
 let value_footprint obj _l = footprint obj
