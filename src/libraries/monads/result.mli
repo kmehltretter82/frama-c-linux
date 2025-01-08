@@ -20,8 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Adding let binding operators to the Result module. See
-   https://v2.ocaml.org/manual/bindingops.html for more information. *)
+(** Adding let binding operators to the Result module.
+    @see <https://v2.ocaml.org/manual/bindingops.html>
+    This module does not use the generic monad interface (cf. {!Monad}) because
+    of the error type, which would require another layer of functors.
+*)
 
 include module type of Stdlib.Result
 

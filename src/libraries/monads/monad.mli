@@ -20,6 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** This module provides a generic monad interface based on Keisli and Categoric
+    defintion of monads. *)
 
 
 (** {2 Kleisli triple signature for a monadic type constructor ['a t]}
@@ -115,7 +117,9 @@ end
     nested applications of the monad. It must also satisfy some laws :
 
     2. ∀m:('a t t t), [map flatten (flatten m) ≣ flatten (flatten m)]
+
     3. ∀m:('a t), [flatten (map return m) ≣ flatten (return m) ≣ m]
+
     4. ∀m:('a t t), ∀f: ('a -> 'b), [flatten (map (map f) m) ≣ map f (flatten m)]
 
     As there is no way in the OCaml type system to enforce those properties,
@@ -162,7 +166,9 @@ end
     using the operations required by the others. Indeed :
 
     1. ∀m:('a t), ∀f:('a -> 'b), [map f m ≣ bind (fun x -> return (f x)) m]
+
     2. ∀m:('a t t), [flatten m ≣ bind identity m]
+
     3. ∀m:('a t), ∀f:('a -> 'b t), [bind f m ≣ flatten (map f m)]
 
     All required laws expressed in both minimal signatures are respected
