@@ -120,14 +120,15 @@ let merge a b =
       pa := Passive.bind ~fresh:z ~bound:x !pa ;
       pb := Passive.bind ~fresh:z ~bound:y !pb ;
       z in
-  ref @@ Heap.Map.union merge_chunk !a !b, !pa, !pb
+  let merged = Heap.Map.union merge_chunk !a !b in
+  ref merged , !pa, !pb
 
 let choose a b =
   let merge_chunck _ x y = if F.Var.compare x y <= 0 then x else y in
   ref @@ Heap.Map.union merge_chunck !a !b
 
 let join a b =
-  if !a == !b then Passive.empty else
+  if a == b then Passive.empty else
     let p = ref Passive.empty in
     Heap.Map.iter2
       (fun chunk x y ->
@@ -239,6 +240,7 @@ let pretty fmt sigma =
       !sigma ;
     Format.fprintf fmt "@]}" ;
   end
+
 (* -------------------------------------------------------------------------- *)
 (* --- Chunks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
