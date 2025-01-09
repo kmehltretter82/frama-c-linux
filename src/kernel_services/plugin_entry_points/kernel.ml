@@ -200,6 +200,12 @@ let wkey_int_conversion =
 let wkey_merge_conversion =
   register_warn_category "typing:merge-conversion"
 
+let wkey_forward_enum =
+  register_warn_category
+    ~help:"forward enum declaration (non-standard compiler extension)"
+    "typing:forward-enum"
+let () = set_warn_status wkey_forward_enum Log.Winactive
+
 let wkey_cert_exp_46 = register_warn_category "CERT:EXP:46"
 
 let wkey_cert_msc_37 = register_warn_category "CERT:MSC:37"
