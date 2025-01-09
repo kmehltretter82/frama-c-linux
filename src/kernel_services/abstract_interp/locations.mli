@@ -149,8 +149,7 @@ module Location_Bytes : sig
       @raise Error_Top in the cases [Top _]. *)
 
   val cached_fold:
-    cache_name:string ->
-    temporary:bool ->
+    cache:Hptmap_sig.cache_type ->
     f:(Base.t -> Ival.t -> 'a) ->
     projection:(Base.t -> Ival.t) ->
     joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
@@ -288,8 +287,7 @@ module Zone : sig
       @raise Error_Top in the case [Top Top]. *)
 
   val cached_fold :
-    cache_name:string ->
-    temporary:bool ->
+    cache:Hptmap_sig.cache_type ->
     f:(Base.t -> Int_Intervals.t -> 'b) ->
     projection:(Base.t -> Int_Intervals.t) ->
     joiner:('b -> 'b -> 'b) -> empty:'b -> t -> 'b

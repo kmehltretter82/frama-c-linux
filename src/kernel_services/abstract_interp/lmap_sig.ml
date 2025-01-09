@@ -187,8 +187,8 @@ module type S = sig
       modules, as they create persistent caches. *)
 
   val cached_fold :
+    cache:Hptmap_sig.cache_type ->
     f:(Base.t -> offsetmap -> 'a) ->
-    cache_name:string -> temporary:bool ->
     joiner:('a -> 'a -> 'a) -> empty:'a -> map -> 'a
 
   val cached_map :

@@ -339,48 +339,32 @@ module Shape(Key: Id_Datatype) = struct
   let register_clear_cache f = clear_caches_ref := f :: !clear_caches_ref
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches_ref
 
-  let cached_fold ~cache_name ~temporary ~f ~joiner ~empty =
-    if debug_cache then Format.eprintf "CACHE cached_fold %s@." cache_name;
-    let cache_size = Binary_cache.cache_size in
-    let cache = Array.make cache_size (Empty, empty) in
-    let hash t = abs (hash t mod cache_size) in
-    let reset () = Array.fill cache 0 cache_size (Empty, empty) in
-    if not temporary then register_clear_cache reset;
-    fun m ->
-      let rec traverse t =
-        let mem result =
-          cache.(hash t) <- (t, result);
-          result
-        in
-        let find () =
-          let t', r = cache.(hash t) in
-          if equal t t' then r
-          else raise Not_found
-        in
-        match t with
-        | Empty -> empty
-        | Leaf(key, value, _) ->
-          (try
-             find ()
-           with Not_found ->
-             mem (f key value)
-          )
-        | Branch(_p, _m, s0, s1, _) ->
-          try
-            find ()
-          with Not_found ->
-            let result0 = traverse s0 in
-            let result1 = traverse s1 in
-            mem (joiner result0 result1)
-      in
-      traverse m
-
   module Cacheable (X: sig type v end) = struct
     type t = (key, X.v) tree
     let hash : t -> int = hash_generic
     let sentinel : t = Empty
     let equal : t -> t -> bool = (==)
   end
+
+  let is_persistent_cache = function
+    | Hptmap_sig.PersistentCache _ -> true
+    | _ -> false
+
+  let make_unary_cache (type v result) empty name cache =
+    match cache with
+    | Hptmap_sig.NoCache -> (fun f x -> f x)
+    | Hptmap_sig.TemporaryCache cache_name
+    | Hptmap_sig.PersistentCache cache_name ->
+      if debug_cache
+      then Format.eprintf "Hptmap CACHE %s : %s@." name cache_name;
+      let module Arg = Cacheable (struct type nonrec v = v end) in
+      let module R = struct
+        type t = result
+        let sentinel : t = empty
+      end in
+      let module Cache = Binary_cache.Arity_One (Arg) (R) in
+      if is_persistent_cache cache then register_clear_cache Cache.clear;
+      Cache.merge
 
   type ('v1, 'v2, 'result) cache_type =
     | Any: ('v1, 'v2, 'result) cache_type
@@ -417,9 +401,19 @@ module Shape(Key: Id_Datatype) = struct
           let module Cache = Binary_cache.Symmetric_Binary_Predicate (Arg1) in
           Cache.clear, Cache.merge
       in
-      if cache = Hptmap_sig.PersistentCache cache_name
-      then register_clear_cache clear_cache;
+      if is_persistent_cache cache then register_clear_cache clear_cache;
       merge_cache
+
+  let cached_fold ~cache ~f ~joiner ~empty =
+    let cache_merge = make_unary_cache empty "cached_fold" cache in
+    let rec compute t = cache_merge traverse t
+    and traverse t =
+      match t with
+      | Empty -> empty
+      | Leaf (key, value, _) -> f key value
+      | Branch (_p, _m, s0, s1, _) -> joiner (compute s0) (compute s1)
+    in
+    compute
 
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =
     let cache_merge = make_binary_cache empty "fold2" cache in

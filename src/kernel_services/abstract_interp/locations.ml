@@ -272,10 +272,10 @@ module Location_Bytes = struct
   let contains_addresses_of_any_locals =
     let f base _offsets = Base.is_any_formal_or_local base in
     let projection _base = Ival.top in
+    let cache = Hptmap_sig.PersistentCache "loc_top_any_locals" in
     let cached_f =
       cached_fold
-        ~cache_name:"loc_top_any_locals"
-        ~temporary:false
+        ~cache
         ~f
         ~projection
         ~joiner:(||)

@@ -24,12 +24,6 @@
     you understand what happens in this module, and do not forget that
     those caches are not aware of projects. *)
 
-val memory_footprint_var_name: string
-
-val cache_size: int
-(** Size of the caches. Controlled by environment variable
-    [memory_footprint_var_name]. *)
-
 module type Cacheable = sig
   type t
   val hash : t -> int

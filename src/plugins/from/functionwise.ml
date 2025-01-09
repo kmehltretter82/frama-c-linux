@@ -66,9 +66,9 @@ module To_Use = struct
       in
       let joiner = Zone.join in
       let projection _ = Int_Intervals.top in
+      let cache = Hptmap_sig.TemporaryCache "from cleanup" in
       let zone_substitution =
-        Zone.cached_fold ~cache_name:"from cleanup" ~temporary:true
-          ~f ~joiner ~empty:Zone.bottom ~projection
+        Zone.cached_fold ~cache ~f ~joiner ~empty:Zone.bottom ~projection
       in
       let zone_substitution x =
         try

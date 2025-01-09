@@ -400,12 +400,11 @@ module Set = struct
       fmt map
 
   let keys =
-    let cache_name = "Equality.Set.keys" in
-    let temporary = false in
+    let cache = Hptmap_sig.PersistentCache "Equality.Set.keys" in
     let f k _ = if HCE.is_lval k then Leaf k else Empty in
     let joiner t1 t2 = Node (t1, t2) in
     let empty = Empty in
-    cached_fold ~cache_name ~temporary ~f ~joiner ~empty
+    cached_fold ~cache ~f ~joiner ~empty
 
   let lvalues_only_left =
     let cache = Hptmap_sig.PersistentCache "Equality.Set.elements_only_left" in

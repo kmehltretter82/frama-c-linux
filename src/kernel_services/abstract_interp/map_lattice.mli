@@ -125,7 +125,7 @@ module type MapSet_Lattice = sig
   val fold : (key -> v -> 'a -> 'a) -> t -> 'a -> 'a
 
   val cached_fold:
-    cache_name:string -> temporary:bool ->
+    cache:Hptmap_sig.cache_type ->
     f:(key -> v -> 'a) ->
     projection:(key -> v) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
 
