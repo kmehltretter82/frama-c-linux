@@ -81,8 +81,7 @@ module type MapSet_Lattice = sig
   val fold : (key -> v -> 'a -> 'a) -> t -> 'a -> 'a
   val cached_fold:
     cache:Hptmap_sig.cache_type ->
-    f:(key -> v -> 'a) ->
-    projection:(key -> v) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
+    f:(key -> v -> 'a) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
   val for_all: (key -> v -> bool) -> t -> bool
   val exists: (key -> v -> bool) -> t -> bool
   val pretty_debug : Format.formatter -> t -> unit
@@ -436,15 +435,12 @@ module Make_MapSet_Lattice
     | Top (s, _) -> KSet.fold (fun x acc -> f x Value.top acc) s acc
     | Map m      -> KVMap.fold f m acc
 
-  let cached_fold ~cache ~f ~projection ~joiner ~empty =
+  let cached_fold ~cache ~f ~joiner ~empty =
     let folded_f = KVMap.cached_fold ~cache ~f ~joiner ~empty in
     function
     | Top (KSet.Top, _) -> raise Abstract_interp.Error_Top
     | Top (KSet.Set s, _) ->
-      let f_base base acc =
-        let total_itvs = projection base in
-        joiner (f base total_itvs) acc
-      in
+      let f_base base acc = joiner (f base Value.top) acc in
       KSet.O.fold f_base s empty
     | Map m -> folded_f m
 

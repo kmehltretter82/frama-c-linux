@@ -65,10 +65,9 @@ module To_Use = struct
         else Zone.bottom
       in
       let joiner = Zone.join in
-      let projection _ = Int_Intervals.top in
       let cache = Hptmap_sig.TemporaryCache "from cleanup" in
       let zone_substitution =
-        Zone.cached_fold ~cache ~f ~joiner ~empty:Zone.bottom ~projection
+        Zone.cached_fold ~cache ~f ~joiner ~empty:Zone.bottom
       in
       let zone_substitution x =
         try

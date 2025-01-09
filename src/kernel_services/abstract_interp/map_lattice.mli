@@ -126,8 +126,7 @@ module type MapSet_Lattice = sig
 
   val cached_fold:
     cache:Hptmap_sig.cache_type ->
-    f:(key -> v -> 'a) ->
-    projection:(key -> v) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
+    f:(key -> v -> 'a) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
 
   (** [for_all p t] checks if all binding of [t] satisfy [p] . Always false if
       [t] is top.  *)
