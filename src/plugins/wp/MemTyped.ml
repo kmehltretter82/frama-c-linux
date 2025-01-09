@@ -147,7 +147,7 @@ struct
     | T_alloc -> 12
     | T_init -> 13
   let hash = rank
-  let basename = function
+  let basename_of_chunk = function
     | M_int i when Ctypes.is_char i -> "Mchar"
     | M_int _ -> "Mint"
     | M_f32 -> "Mf32"
@@ -159,7 +159,7 @@ struct
   let equal = (=)
   let pretty fmt = function
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
-    | m -> Format.pp_print_string fmt (basename m)
+    | m -> Format.pp_print_string fmt (basename_of_chunk m)
   let val_of_chunk = function
     | M_int _ -> L.Int
     | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
@@ -174,7 +174,7 @@ struct
     | M_f64 -> L.Array(MemAddr.t_addr,Cfloat.tau_of_float Ctypes.Float64)
     | T_alloc -> t_malloc
     | T_init -> t_init
-  let basename_of_chunk = basename
+  let is_init = function T_init -> true | _ -> false
   let is_framed _ = false
 end
 
@@ -1212,12 +1212,12 @@ let lookup s e =
   | L.Aget( m , k ) ->
     begin
       match Sigma.mu @@ F.Tmap.find m s with
-      | State.Mu T_alloc -> Memory.Mterm
+      | State.Mu T_alloc -> raise Not_found
       | State.Mu T_init -> Memory.Minit (lookup_lv k)
       | State.Mu _ -> Memory.Mlval (lookup_lv k)
-      | _ -> Memory.Mterm
+      | _ -> raise Not_found
     end
-  | _ -> Memory.Mterm
+  | _ -> raise Not_found
 
 let heap domain state =
   F.Tmap.fold (fun m c w ->

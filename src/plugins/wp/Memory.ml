@@ -116,7 +116,6 @@ and s_offset = Mfield of fieldinfo | Mindex of term
 
 (** Reversed abstract value *)
 type mval =
-  | Mterm (** Not a state-related value *)
   | Maddr of s_lval (** The value is the address of an l-value in current memory *)
   | Mlval of s_lval (** The value is the value of an l-value in current memory *)
   | Minit of s_lval (** The value is the init state of an l-value in current memory *)

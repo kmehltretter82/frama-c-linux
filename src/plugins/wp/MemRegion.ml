@@ -156,6 +156,11 @@ struct
         | Some a -> a
         | None -> Format.asprintf "V%a" pp_prim p
 
+    let is_init c =
+      match c.data with
+      | ValInit | ArrInit -> true
+      | Array _ | Value _ -> false
+
     let is_framed _ = false
 
   end
@@ -453,7 +458,7 @@ struct
 
   (* {2 Reversing the Model} *)
 
-  let lookup s e = M.lookup s e
+  let lookup = M.lookup (*TODO: lookups in MemRegion *)
 
   let updates = M.updates (*TODO: updates in MemRegion *)
 

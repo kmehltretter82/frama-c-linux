@@ -107,6 +107,7 @@ struct
       | _ -> x.vtype
     let tau_of_chunk x = Lang.tau_of_ctype (typ_of_chunk x)
     let is_framed = is_framed_var
+    let is_init _ = false
     let basename_of_chunk = LogicUsage.basename
   end
 
@@ -125,6 +126,7 @@ struct
         "ra_" ^ LogicUsage.basename x
       | NotUsed | ByValue | ByShift | ByAddr | InContext _ | InArray _ ->
         "ta_" ^ LogicUsage.basename x
+    let is_init _ = false
     let is_framed = is_framed_var
   end
 
@@ -141,6 +143,7 @@ struct
       | ByRef -> Cil.typeOf_pointed x.vtype
       | _ -> x.vtype
     let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
+    let is_init _ = true
     let is_framed = is_framed_var
     let basename_of_chunk x = "Init_" ^ (LogicUsage.basename x)
   end
@@ -209,11 +212,14 @@ struct
   let iref x = if is_ref x then Iref x else Ivar x
 
   let lookup (s : Sigma.state) e =
-    match Sigma.mu @@ Tmap.find e s with
-    | SVAR.Mu x -> imval (iref x)
-    | SINIT.Mu x -> imval (Iinit x)
-    | SALLOC.Mu _ -> Memory.Mterm
-    | _ -> M.lookup s e
+    try
+      match Sigma.mu @@ Tmap.find e s with
+      | SVAR.Mu x -> imval (iref x)
+      | SINIT.Mu x -> imval (Iinit x)
+      | SALLOC.Mu _ -> raise Not_found
+      | _ -> raise Not_found
+    with Not_found ->
+      M.lookup s e
 
   let icmap domain istate =
     Tmap.fold

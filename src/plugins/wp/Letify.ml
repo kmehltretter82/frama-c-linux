@@ -148,7 +148,7 @@ end
 (* --- Generalized Substitution                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Sigma :
+module Subst :
 sig
   type t
   val equal : t -> t -> bool
@@ -488,7 +488,7 @@ let elements xs = Vars.fold XS.add xs XS.empty
 let iter f xs = XS.iter f (elements xs)
 
 let rec extract defs sref cycle x =
-  if not (Vars.mem x cycle) && not (Sigma.mem x !sref) then
+  if not (Vars.mem x cycle) && not (Subst.mem x !sref) then
     try
       let cycle = Vars.add x cycle in
       let ds = Vmap.find x defs in (* if no defs, exit early *)
@@ -501,13 +501,13 @@ let rec extract defs sref cycle x =
              match F.repr e with
              | Fvar y ->
                begin
-                 try let d = Sigma.find y !sref in rs := d :: !rs
+                 try let d = Subst.find y !sref in rs := d :: !rs
                  with Not_found -> ys := y :: !ys
                end
              | _ -> es := e :: !es
         ) ds ;
       (* Now choose the represent of x and the dependencies *)
-      let select d = sref := Sigma.add x d !sref ; d , F.vars d in
+      let select d = sref := Subst.add x d !sref ; d , F.vars d in
       let ceq , depends =
         match List.sort F.compare !rs with
         | r :: _ -> select r
@@ -515,7 +515,7 @@ let rec extract defs sref cycle x =
           | e :: _ -> select e
           | [] -> e_var x , Vars.empty
       in
-      List.iter (fun y -> sref := Sigma.add y ceq !sref) !ys ;
+      List.iter (fun y -> sref := Subst.add y ceq !sref) !ys ;
       iter (extract defs sref cycle) depends
     with Not_found -> ()
 
@@ -526,7 +526,7 @@ let bind sigma defs xs =
 
 let get_class sigma xs x =
   List.sort Var.compare
-    (List.filter (fun y -> Vars.mem y xs) (Sigma.class_of sigma x))
+    (List.filter (fun y -> Vars.mem y xs) (Subst.class_of sigma x))
 
 let rec add_eq ps y = function
   | z::zs -> add_eq (p_equal (e_var y) (e_var z) :: ps) y zs
@@ -540,7 +540,7 @@ let add_definitions sigma defs xs ps =
   Vars.fold
     (fun x ps ->
        let ps = add_equals (get_class sigma xs x) ps in
-       try F.p_equal (e_var x) (Sigma.find x sigma) :: ps
+       try F.p_equal (e_var x) (Subst.find x sigma) :: ps
        with Not_found -> ps
     ) xs ps
 

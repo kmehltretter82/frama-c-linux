@@ -115,6 +115,7 @@ struct
     let te = Lang.tau_of_object (object_of_rpath x (List.rev p)) in
     dim_of_path te p
   let basename_of_chunk (x,_) = LogicUsage.basename x
+  let is_init _ = false
   let is_framed (x,p) = not x.vglob && p = []
 end
 
@@ -225,7 +226,7 @@ let ilval (x,p) = ipath (Mvar x,[]) p
 let lookup (s : Sigma.state) (e : F.term) =
   match Sigma.mu @@ Lang.F.Tmap.find e s with
   | State.Mu lv -> Mlval (ilval lv)
-  | _ -> Mterm
+  | _ -> raise Not_found
 
 module Hmap = Sigma.Heap.Map
 

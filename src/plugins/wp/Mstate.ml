@@ -66,9 +66,9 @@ let apply f = function STATE { model ; state } ->
 let lookup s e =
   match s with STATE { model ; state } ->
     let module M = (val model) in
-    match M.lookup state e with
-    | Mterm -> (try Mchunk (Lang.F.Tmap.find e state) with Not_found -> Mterm)
-    | mval -> mval
+    try M.lookup state e
+    with Not_found ->
+      Mchunk (Lang.F.Tmap.find e state)
 
 let updates seq vars =
   match seq.pre, seq.post with
@@ -82,9 +82,9 @@ let iter f s =
     let module M = (val model) in
     Lang.F.Tmap.iter
       (fun value chunk ->
-         match M.lookup state value with
-         | Mterm -> f (Mchunk chunk) value
-         | mval -> f mval value
+        match M.lookup state value with
+        | exception Not_found -> f (Mchunk chunk) value
+        | mval -> f mval value
       ) state
 
 (* -------------------------------------------------------------------------- *)

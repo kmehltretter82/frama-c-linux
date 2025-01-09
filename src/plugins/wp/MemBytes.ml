@@ -178,6 +178,7 @@ struct
     | Init -> "init"
     | Alloc -> "alloc"
 
+  let is_init = function Init -> true | Mem | Alloc -> false
   let is_framed _ = false
 end
 
@@ -949,12 +950,12 @@ let lookup s e =
   | Aget( m , k ) ->
     begin
       match Sigma.mu @@ Tmap.find m s with
-      | State.Mu Alloc -> Memory.Mterm
+      | State.Mu Alloc -> raise Not_found
       | State.Mu Init -> Memory.Minit (lookup_lv k)
       | State.Mu _ -> Memory.Mlval (lookup_lv k)
-      | _ -> Memory.Mterm
+      | _ -> raise Not_found
     end
-  | _ -> Memory.Mterm
+  | _ -> raise Not_found
 
 let updates _ _ = Bag.empty
 

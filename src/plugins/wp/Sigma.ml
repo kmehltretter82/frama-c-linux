@@ -36,6 +36,7 @@ sig
   val pretty : Format.formatter -> t -> unit
   val tau_of_chunk : t -> F.tau
   val basename_of_chunk : t -> string
+  val is_init : t -> bool
   val is_framed : t -> bool
 end
 
@@ -76,6 +77,9 @@ struct
     let module T = (val c.tag) in T.tau_of_chunk c.mu
   let basename_of_chunk c =
     let module T = (val c.tag) in T.basename_of_chunk c.mu
+
+  let is_init c =
+    let module T = (val c.tag) in T.is_init c.mu
   let is_framed c =
     let module T = (val c.tag) in T.is_framed c.mu
 end
@@ -167,6 +171,9 @@ let remove_chunks sigma domain =
 let havoc_chunk sigma c =
   let x = newchunk c in
   ref @@ Heap.Map.add c x !sigma
+
+let is_init c =
+  let module T = (val c.tag) in T.is_init c.mu
 
 let is_framed c =
   let module T = (val c.tag) in T.is_framed c.mu
@@ -273,6 +280,7 @@ struct
     let hash = map C.hash
     let equal = map2 C.equal
     let compare = map2 C.compare
+    let is_init = map C.is_init
     let is_framed = map C.is_framed
     let tau_of_chunk = map C.tau_of_chunk
     let basename_of_chunk = map C.basename_of_chunk

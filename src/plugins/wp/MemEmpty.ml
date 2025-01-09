@@ -47,7 +47,7 @@ let hypotheses p = p
 
 type loc = unit
 type segment = loc rloc
-let lookup _ _ = Mterm
+let lookup _ _ = raise Not_found
 let updates _ _ = Bag.empty
 
 let pretty _fmt () = ()

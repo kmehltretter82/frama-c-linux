@@ -91,8 +91,8 @@ let rec find env e =
 and lookup env e = function
   | [] -> Term
   | lbl :: others ->
-    try match Mstate.lookup lbl.state e with
-      | Memory.Mterm -> raise Not_found
+    try
+      match Mstate.lookup lbl.state e with
       | Memory.Maddr lv -> Addr lv
       | Memory.Mlval lv -> Lval(lv,flag lbl)
       | Memory.Minit lv -> Init(lv,flag lbl)

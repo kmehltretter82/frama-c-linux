@@ -76,6 +76,9 @@ sig
   val basename_of_chunk : t -> string
   (** Used when generating fresh variables for a chunk. *)
 
+  val is_init : t -> bool
+  (** Whether the chunk is an initialized chunk (used for filtering). *)
+
   val is_framed : t -> bool
   (** Whether the chunk is local to a function call.
 
@@ -208,6 +211,12 @@ val havoc_any : call:bool -> sigma -> sigma
 val remove_chunks : sigma -> domain -> sigma
 (** Return a copy of the environment where chunks in the footprint
     have been removed. Keep the original environment unchanged. *)
+
+val is_init : chunk -> bool
+(** Shortcut to [Chunk.is_init] *)
+
+val is_framed : chunk -> bool
+(** Shortcut to [Chunk.is_framed] *)
 
 val domain : sigma -> domain
 (** Footprint of a memory environment.

@@ -241,6 +241,8 @@ struct
       | Base.String (eid, _) -> Format.sprintf "MStr_%d" eid
       | Base.Allocated (vi, _dealloc, _) ->
         Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
+
+    let is_init _ = false
     let is_framed b =
       try
         (match WpContext.get_scope () with
@@ -262,7 +264,7 @@ struct
 
   type segment = loc rloc
 
-  let lookup _ _ = Mterm
+  let lookup _ _ = raise Not_found
   let updates _ _ = Bag.empty
 
   let pretty fmt l =
