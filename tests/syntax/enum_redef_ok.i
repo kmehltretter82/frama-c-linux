@@ -6,3 +6,4 @@
 
 enum e { U };
 enum e;
+enum e x = U;
