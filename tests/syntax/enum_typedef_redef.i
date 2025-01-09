@@ -9,3 +9,11 @@
 typedef enum h { Z } h;
 typedef enum h { Z } h;
 h hh = Z;
+
+// other problematic case, even though the enum is compatible with int
+
+typedef enum { E } t;
+typedef int t;
+
+typedef int q;
+typedef enum { F } q;

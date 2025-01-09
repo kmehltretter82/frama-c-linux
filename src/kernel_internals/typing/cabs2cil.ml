@@ -9811,10 +9811,20 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                        error_conflicting_types ()
                      else
                        warn_c11_redefinition ()
+                   | TInt _ -> error_conflicting_types ()
                    | t ->
                      Kernel.fatal
                        ~current:true "typeinfo.ttype (%a) should be an Enum"
                        Cil_datatype.Typ.pretty t)
+                | TInt _ ->
+                  (match typeinfo.ttype with
+                   | TInt _ -> warn_c11_redefinition ()
+                   | TEnum _ -> error_conflicting_types ()
+                   | t ->
+                     Kernel.fatal
+                       ~current:true "typeinfo.ttype (%a) should be an int"
+                       Cil_datatype.Typ.pretty t
+                  )
                 | _ -> (* redeclaration in same scope valid only in C11 *)
                   warn_c11_redefinition ()
               end
