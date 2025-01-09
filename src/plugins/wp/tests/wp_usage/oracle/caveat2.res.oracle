@@ -25,11 +25,8 @@ Assume {
   When: (0 <= i) /\ (i < n).
   (* Pre-condition *)
   Have: n <= 3.
-  Have: ({ Init_p_0 with Init_F1_S_n = true }) = Init_p_0.
   (* Invariant *)
   Have: 0 <= n.
-  (* Loop assigns ... *)
-  Have: ({ Init_p_0 with Init_F1_S_a = v_1 }) = Init_p_0.
   (* Invariant *)
   Have: (0 <= i_1) /\ (i_1 <= n).
   (* Invariant *)
@@ -60,11 +57,8 @@ Assume {
   When: (i_1 <= i) /\ (0 <= i_1).
   (* Pre-condition *)
   Have: n <= 3.
-  Have: ({ Init_p_0 with Init_F1_S_n = true }) = Init_p_0.
   (* Invariant *)
   Have: 0 <= n.
-  (* Loop assigns ... *)
-  Have: ({ Init_p_0 with Init_F1_S_a = v_1 }) = Init_p_0.
   (* Invariant *)
   Have: (0 <= i) /\ (i <= n).
   (* Invariant *)

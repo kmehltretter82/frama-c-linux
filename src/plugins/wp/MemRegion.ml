@@ -161,6 +161,11 @@ struct
       | ValInit | ArrInit -> true
       | Array _ | Value _ -> false
 
+    let is_single c =
+      match c.data with
+      | Value _ -> true
+      | ValInit | ArrInit | Array _ -> false
+
     let is_framed _ = false
 
   end

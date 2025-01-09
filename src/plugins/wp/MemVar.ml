@@ -108,6 +108,7 @@ struct
     let tau_of_chunk x = Lang.tau_of_ctype (typ_of_chunk x)
     let is_framed = is_framed_var
     let is_init _ = false
+    let is_single _ = true
     let basename_of_chunk = LogicUsage.basename
   end
 
@@ -127,6 +128,7 @@ struct
       | NotUsed | ByValue | ByShift | ByAddr | InContext _ | InArray _ ->
         "ta_" ^ LogicUsage.basename x
     let is_init _ = false
+    let is_single _ = false
     let is_framed = is_framed_var
   end
 
@@ -144,6 +146,7 @@ struct
       | _ -> x.vtype
     let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
     let is_init _ = true
+    let is_single _ = false
     let is_framed = is_framed_var
     let basename_of_chunk x = "Init_" ^ (LogicUsage.basename x)
   end

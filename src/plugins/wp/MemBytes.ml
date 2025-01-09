@@ -179,6 +179,7 @@ struct
     | Alloc -> "alloc"
 
   let is_init = function Init -> true | Mem | Alloc -> false
+  let is_single _ = false
   let is_framed _ = false
 end
 

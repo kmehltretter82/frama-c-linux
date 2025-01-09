@@ -79,6 +79,12 @@ sig
   val is_init : t -> bool
   (** Whether the chunk is an initialized chunk (used for filtering). *)
 
+  val is_single : t -> bool
+  (** Used to sort memory chunk parameters in ACSL symbols.
+
+      Single chunks represents values of variables or individual l-values.
+      They are sorted last among memory chunk parameters. *)
+
   val is_framed : t -> bool
   (** Whether the chunk is local to a function call.
 

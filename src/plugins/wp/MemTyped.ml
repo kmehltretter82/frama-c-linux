@@ -175,6 +175,7 @@ struct
     | T_alloc -> t_malloc
     | T_init -> t_init
   let is_init = function T_init -> true | _ -> false
+  let is_single _ = false
   let is_framed _ = false
 end
 

@@ -37,6 +37,7 @@ sig
   val tau_of_chunk : t -> F.tau
   val basename_of_chunk : t -> string
   val is_init : t -> bool
+  val is_single : t -> bool
   val is_framed : t -> bool
 end
 
@@ -69,17 +70,23 @@ struct
   let compare a b =
     let module A = (val a.tag) in
     let module B = (val b.tag) in
-    let cmp = Int.compare A.tag B.tag in
-    if cmp <> 0 then cmp else A.compare a.mu b.mu
+    match A.is_single a.mu, B.is_single b.mu with
+    | true, false -> (-1)
+    | false, true -> (+1)
+    | true, true | false, false ->
+      let cmp = Int.compare A.tag B.tag in
+      if cmp <> 0 then cmp else A.compare a.mu b.mu
+
   let pretty fmt c =
     let module T = (val c.tag) in T.pretty fmt c.mu
   let tau_of_chunk c =
     let module T = (val c.tag) in T.tau_of_chunk c.mu
   let basename_of_chunk c =
     let module T = (val c.tag) in T.basename_of_chunk c.mu
-
   let is_init c =
     let module T = (val c.tag) in T.is_init c.mu
+  let is_single c =
+    let module T = (val c.tag) in T.is_single c.mu
   let is_framed c =
     let module T = (val c.tag) in T.is_framed c.mu
 end
@@ -281,6 +288,7 @@ struct
     let equal = map2 C.equal
     let compare = map2 C.compare
     let is_init = map C.is_init
+    let is_single = map C.is_single
     let is_framed = map C.is_framed
     let tau_of_chunk = map C.tau_of_chunk
     let basename_of_chunk = map C.basename_of_chunk

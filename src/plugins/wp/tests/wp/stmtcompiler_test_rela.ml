@@ -14,7 +14,7 @@ let run () =
   let model = Factory.instance setup driver in
   let module C = (val (Factory.compiler setup.mheap setup.mvar)) in
   let module Compiler = StmtSemantics.Make(C) in
-  let module Cfg = Compiler.Cfg in
+  let module Cfg = CfgCompiler in
 
   let provers =
     List.fold_right
@@ -108,7 +108,7 @@ let run () =
         let cfg1 = path1.Compiler.paths_cfg in
         let node1 = Cfg.T.init' seq1.pre (reads_formal formal) in
         let (_,sigma1,sequence1) =
-          Compiler.Cfg.compile seq1.pre
+          Cfg.compile seq1.pre
             (Cfg.Node.Set.singleton seq1.post) (Cfg.T.reads node1) cfg1 in
         let node1 = Cfg.T.relocate sigma1 node1 in
         let term_1 = Cfg.T.get node1 in
@@ -121,7 +121,7 @@ let run () =
         let cfg2 = path2.Compiler.paths_cfg in
         let node2 = Cfg.T.init' seq2.pre (reads_formal formal) in
         let (_,sigma2,sequence2) =
-          Compiler.Cfg.compile
+          Cfg.compile
             seq2.pre (Cfg.Node.Set.singleton seq2.post)
             (Cfg.T.reads node2) cfg2 in
         let node2 = Cfg.T.relocate sigma2 node2 in

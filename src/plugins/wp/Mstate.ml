@@ -82,9 +82,9 @@ let iter f s =
     let module M = (val model) in
     Lang.F.Tmap.iter
       (fun value chunk ->
-        match M.lookup state value with
-        | exception Not_found -> f (Mchunk chunk) value
-        | mval -> f mval value
+         match M.lookup state value with
+         | exception Not_found -> f (Mchunk chunk) value
+         | mval -> f mval value
       ) state
 
 (* -------------------------------------------------------------------------- *)

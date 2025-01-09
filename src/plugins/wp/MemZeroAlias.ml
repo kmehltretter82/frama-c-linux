@@ -116,6 +116,7 @@ struct
     dim_of_path te p
   let basename_of_chunk (x,_) = LogicUsage.basename x
   let is_init _ = false
+  let is_single _ = true
   let is_framed (x,p) = not x.vglob && p = []
 end
 

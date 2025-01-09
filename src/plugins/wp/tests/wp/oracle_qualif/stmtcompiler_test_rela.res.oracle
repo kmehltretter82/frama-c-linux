@@ -76,7 +76,7 @@ Sequent: Assume {
              Then { Have: (node_17=true). }
              Else { Have: (node_18=true). }
            }
-           (* Entering scope [tmp]: effect: (not Init_tmp_3) /\ (not ta_tmp_6) /\ ta_tmp_7 *)
+           (* Entering scope [tmp]: effect: (not Init_tmp_2) /\ (not ta_tmp_6) /\ ta_tmp_7 *)
            If (node_19=true)
            Then {
              Have: (Init_tmp_1=false) /\ (ta_tmp_4=true) /\ (ta_tmp_5=false).
