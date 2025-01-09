@@ -373,14 +373,15 @@ let pretty_machdep ?fmt ?machdep () =
 (** {2 Initializations} *)
 (* ************************************************************************* *)
 
-let create_temp_file ?debug name suffix =
+let create_temp_file name suffix =
+  let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
   let of_string = Filepath.Normalized.of_string in
-  try of_string (Extlib.temp_file_cleanup_at_exit ?debug name suffix)
+  try of_string (Extlib.temp_file_cleanup_at_exit ~debug name suffix)
   with Extlib.Temp_file_error s ->
     Kernel.abort "cannot create temporary file: %s" s
 
 let safe_remove_file (f : Datatype.Filepath.t) =
-  if not (Kernel.is_debug_key_enabled Kernel.dkey_parser) then
+  if not (Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files) then
     Extlib.safe_remove (f :> string)
 
 let cpp_name cmd =
@@ -463,7 +464,6 @@ let build_cpp_cmd = function
     if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
-    let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
     let add_if_gnu opt =
       match is_gnu_like with
       | Gnu -> [opt]
@@ -479,7 +479,7 @@ let build_cpp_cmd = function
           opt;
         [opt]
     in
-    let ppf = create_temp_file ~debug (Filename.basename (f :> string)) ".i" in
+    let ppf = create_temp_file (Filename.basename (f :> string)) ".i" in
     (* Hypothesis: the preprocessor is POSIX compliant,
        hence understands -I and -D. *)
     let fc_include_args =
@@ -1905,8 +1905,7 @@ let create_rebuilt_project_from_visitor
     let f =
       let name = "frama_c_project_" ^ prj_name ^ "_" in
       let ext = if preprocess then ".c" else ".i" in
-      let debug = Kernel.Debug.get () > 0 in
-      create_temp_file ~debug name ext
+      create_temp_file name ext
     in
     let cout = open_out (f :> string) in
     let fmt = Format.formatter_of_out_channel cout in
