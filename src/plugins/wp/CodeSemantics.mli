@@ -25,4 +25,4 @@
 (* -------------------------------------------------------------------------- *)
 
 
-module Make(M : Sigs.Model) : Sigs.CodeSemantics with module M = M
+module Make(M : Memory.Model) : Memory.CodeSemantics with module M = M

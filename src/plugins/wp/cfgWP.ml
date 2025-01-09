@@ -30,10 +30,10 @@ open Cil_datatype
 open WpPropId
 open Clabels
 open Qed
-open Lang
 open Lang.F
-open Sigs
 open Wpo
+open Memory
+open Sigma
 
 module type VCgen =
 sig
@@ -43,15 +43,13 @@ sig
   val compile_wp : Wpo.index -> t_prop -> Wpo.t Bag.t
 end
 
-module VC( C : Sigs.Compiler ) : VCgen =
+module VC( C : Memory.Compiler ) : VCgen =
 struct
 
   open C
   open C.M
   module V = Vars
   module P = WpPropId.PropId
-
-  let state = Mstate.create (module M)
 
   type target =
     | Gprop of P.t
@@ -140,7 +138,7 @@ struct
     e_pid : P.t ; (* Assign Property *)
     e_post : bool ; (* Requires post effects (loop-assigns or post-assigns) *)
     e_label : c_label ; (* scope for collection *)
-    e_valid : L.sigma ; (* sigma where locations are filtered for validity *)
+    e_valid : sigma ; (* sigma where locations are filtered for validity *)
     e_region : L.region ; (* expected from spec *)
     e_warn : Warning.Set.t ; (* from translation *)
   }
@@ -182,7 +180,7 @@ struct
   }
 
   type t_prop = {
-    sigma : L.sigma option ;
+    sigma : sigma option ;
     effects : Eset.t ;
     vcs : vc Splitter.t Gmap.t ;
   }
@@ -441,7 +439,7 @@ struct
     let frame = wenv.frame in
     let init = L.mem_at_frame frame Clabels.init in
     let domain = Sigma.domain init in
-    not (M.Heap.Set.is_empty domain)
+    not (Domain.is_empty domain)
 
   let merge wenv wp1 wp2 =
     L.in_frame wenv.frame
@@ -741,7 +739,7 @@ struct
         | None | Some { labels=[] } -> None
         | Some { labels = lbl::_ } ->
           Some (Pretty_utils.to_string Printer.pp_label lbl) in
-      let state = Mstate.state state sigma in
+      let state = Mstate.create (module M) sigma in
       gmap (state_vc ?descr ?stmt sigma state) vcs
     with Not_found -> vcs
 
@@ -831,8 +829,8 @@ struct
           | Warning.Result(r_warn,Some stored) ->
             (* R-Value and effects has been translated *)
             let warn = Warning.Set.union l_warn r_warn in
-            let ft = M.Heap.Set.fold_sorted
-                (fun chunk ft -> M.Sigma.get seq.post chunk :: ft) dom []
+            let ft = Domain.fold_sorted
+                (fun chunk ft -> Sigma.get seq.post chunk :: ft) dom []
             in
             let update vc =
               if List.exists (occurs_vc vc) ft
@@ -1285,7 +1283,7 @@ struct
       let tr = Cil.typeOfLval lv in
       let lr = C.lval dummy lv in
       Some (M.domain (Ctypes.object_of tr) lr)
-    | None -> Some (M.Heap.Set.empty)
+    | None -> Some Domain.empty
 
   let cc_call_domain env0 kf es = function
     | WritesAny -> None

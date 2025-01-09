@@ -26,9 +26,9 @@
 
 open Cil_types
 open Ctypes
-open Lang
 open Lang.F
 open Interpreted_automata
+open Sigma
 
 (* -------------------------------------------------------------------------- *)
 (** {1 General Definitions} *)
@@ -118,8 +118,9 @@ and s_offset = Mfield of fieldinfo | Mindex of term
 type mval =
   | Mterm (** Not a state-related value *)
   | Maddr of s_lval (** The value is the address of an l-value in current memory *)
-  | Mlval of s_lval * datakind (** The value is the value of an l-value in current memory *)
-  | Mchunk of string * datakind (** The value is an abstract memory chunk (description) *)
+  | Mlval of s_lval (** The value is the value of an l-value in current memory *)
+  | Minit of s_lval (** The value is the init state of an l-value in current memory *)
+  | Mchunk of Chunk.t (** The value is an abstract memory chunk (description) *)
 
 (** Reversed update *)
 type update = Mstore of s_lval * term
@@ -128,169 +129,6 @@ type update = Mstore of s_lval * term
 (* -------------------------------------------------------------------------- *)
 (** {1 Memory Models} *)
 (* -------------------------------------------------------------------------- *)
-
-module type Type =
-sig
-  type t
-  val hash : t -> int
-  val equal : t -> t -> bool
-  val compare : t -> t -> int
-  val pretty : Format.formatter -> t -> unit
-end
-
-(** Memory Chunks.
-
-    The concrete memory is partionned into a vector of abstract data.
-    Each component of the partition is called a {i memory chunk} and
-    holds an abstract representation of some part of the memory.
-
-    Remark: memory chunks are not required to be independant from each other,
-    provided the memory model implementation is consistent with the chosen
-    representation. Conversely, a given object might be represented by
-    several memory chunks. See {!Model.domain}.
-
-*)
-module type Chunk =
-sig
-
-  type t
-  val self : string
-  (** Chunk names, for pretty-printing. *)
-
-  include Type with type t := t
-
-  val tau_of_chunk : t -> tau
-  (** The type of data hold in a chunk. *)
-
-  val basename_of_chunk : t -> string
-  (** Used when generating fresh variables for a chunk. *)
-
-  val is_framed : t -> bool
-  (** Whether the chunk is local to a function call.
-
-      Means the chunk is separated from anyother call side-effects.
-      If [true], entails that a function assigning everything can not modify
-      the chunk. Only used for optimisation, it would be safe to always
-      return [false]. *)
-
-end
-
-(** Memory Environments.
-
-    Represents the content of the memory, {i via} a vector of logic
-    variables for each memory chunk.
-*)
-module type Sigma =
-sig
-
-  type chunk
-  (** The type of memory chunks. *)
-
-  module Heap : Qed.Collection.S with type t = chunk
-
-  (** Memory footprint. *)
-  type domain = Heap.Set.t
-
-  (** Environment assigning logic variables to chunk.
-
-      Memory chunk variables are assigned lazily. Hence, the vector is
-      empty unless a chunk is accessed. Pay attention to this
-      when you merge or havoc chunks.
-
-      New chunks are generated from the context pool of {!Lang.freshvar}.
-  *)
-  type t
-
-  val pretty : Format.formatter -> t -> unit
-  (** For debugging purpose *)
-
-  val create : unit -> t
-  (** Initially empty environment. *)
-
-  val mem : t -> chunk -> bool
-  (** Whether a chunk has been assigned. *)
-
-  val get : t -> chunk -> var
-  (** Lazily get the variable for a chunk. *)
-
-  val value : t -> chunk -> term
-  (** Same as [Lang.F.e_var] of [get]. *)
-
-  val copy : t -> t (** Duplicate the environment. Fresh chunks in the copy
-                        are {i not} duplicated into the source environment. *)
-
-  val join : t -> t -> Passive.t
-  (** Make two environment pairwise equal {i via} the passive form.
-
-      Missing chunks in one environment are added with the corresponding
-      variable of the other environment. When both environments don't agree
-      on a chunk, their variables are added to the passive form. *)
-
-  val assigned : pre:t -> post:t -> domain -> pred Bag.t
-  (** Make chunks equal outside of some domain.
-
-      This is similar to [join], but outside the given footprint of an
-      assigns clause. Although, the function returns the equality
-      predicates instead of a passive form.
-
-      Like in [join], missing chunks are reported from one side to the
-      other one, and common chunks are added to the equality bag. *)
-
-  val choose : t -> t -> t
-  (** Make the union of each sigma, choosing the minimal variable
-      in case of conflict.
-      Both initial environments are kept unchanged. *)
-
-  val merge : t -> t -> t * Passive.t * Passive.t
-  (** Make the union of each sigma, choosing a {i new} variable for
-      each conflict, and returns the corresponding joins.
-      Both initial environments are kept unchanged. *)
-
-  val merge_list : t list -> t * Passive.t list
-  (** Same than {!merge} but for a list of sigmas. Much more efficient
-      than folding merge step by step. *)
-
-  val iter : (chunk -> var -> unit) -> t -> unit
-  (** Iterates over the chunks and associated variables already
-      accessed so far in the environment. *)
-
-  val iter2 : (chunk -> var option -> var option -> unit) -> t -> t -> unit
-  (** Same as [iter] for both environments. *)
-
-  val havoc_chunk : t -> chunk -> t
-  (** Generate a new fresh variable for the given chunk. *)
-
-  val havoc : t -> domain -> t
-  (** All the chunks in the provided footprint are generated and made fresh.
-
-      Existing chunk variables {i outside} the footprint are copied into the new
-      environment. The original environement itself is kept unchanged. More
-      efficient than iterating [havoc_chunk] over the footprint.
-  *)
-
-  val havoc_any : call:bool -> t -> t
-  (** All the chunks are made fresh. As an optimisation,
-      when [~call:true] is set, only non-local chunks are made fresh.
-      Local chunks are those for which [Chunk.is_frame] returns [true]. *)
-
-  val remove_chunks : t -> domain -> t
-  (** Return a copy of the environment where chunks in the footprint
-      have been removed. Keep the original environment unchanged. *)
-
-  val domain : t -> domain
-  (** Footprint of a memory environment.
-      That is, the set of accessed chunks so far in the environment. *)
-
-  val union : domain -> domain -> domain
-  (** Same as [Heap.Set.union] *)
-
-  val empty : domain
-  (** Same as [Heap.Set.empty] *)
-
-  val writes : t sequence -> domain
-  (** [writes s] indicates which chunks are new in [s.post] compared
-      to [s.pre]. *)
-end
 
 (** Memory Models. *)
 module type Model =
@@ -315,33 +153,12 @@ sig
       This function typically adds new elements to the partition received
       in input (that can be empty). *)
 
-  module Chunk : Chunk
-  (** Memory model chunks. *)
-
-  module Heap : Qed.Collection.S
-    with type t = Chunk.t
-  (** Chunks Sets and Maps. *)
-
-  module Sigma : Sigma
-    with type chunk = Chunk.t
-     and module Heap = Heap
-  (** Model Environments. *)
-
   type loc
   (** Representation of the memory location in the model. *)
 
-  type chunk = Chunk.t
-  type sigma = Sigma.t
-  type domain = Sigma.domain
   type segment = loc rloc
 
   (** {2 Reversing the Model} *)
-
-  type state
-  (** Internal (private) memory state description for later reversing the model. *)
-
-  (** Returns a memory state description from a memory environement. *)
-  val state : sigma -> state
 
   (** Try to interpret a term as an in-memory operation
       located at this program point. Only best-effort
@@ -355,16 +172,10 @@ sig
 
   (** Try to interpret a sequence of states into updates.
 
-      The result shall be exhaustive with respect to values that are printed as [Sigs.mval]
+      The result shall be exhaustive with respect to values that are printed as [Memory.mval]
       values at [post] label {i via} the [lookup] function.
       Otherwise, those values would not be pretty-printed to the user. *)
   val updates : state sequence -> Vars.t -> update Bag.t
-
-  (** Propagate a sequent substitution inside the memory state. *)
-  val apply : (term -> term) -> state -> state
-
-  (** Debug *)
-  val iter : (mval -> term -> unit) -> state -> unit
 
   val pretty : Format.formatter -> loc -> unit
   (** pretty printing of memory location *)
@@ -558,7 +369,6 @@ sig
   type loc = M.loc
   type nonrec value = loc value
   type nonrec result = loc result
-  type sigma = M.Sigma.t
 
   val pp_value : Format.formatter -> value -> unit
 
@@ -638,28 +448,27 @@ sig
     value option ->
     pred
 
-  val unchanged : M.sigma -> M.sigma -> varinfo -> pred
+  val unchanged : sigma -> sigma -> varinfo -> pred
   (** Express that a given variable has the same value in two memory states. *)
 
   type warned_hyp = Warning.Set.t * (pred * pred)
 
-  val init :
-    sigma:M.sigma -> varinfo -> init option -> warned_hyp list
-    (** Express that some variable has some initial value at the
-        given memory state. The first predicate states the value,
-        the second, the initialization status.
+  val init : sigma:sigma -> varinfo -> init option -> warned_hyp list
+  (** Express that some variable has some initial value at the
+      given memory state. The first predicate states the value,
+      the second, the initialization status.
 
-        Note: we DO NOT merge values and initialization status
-        hypotheses as the factorization performed by Qed can make
-        predicates too hard to simplify later.
+      Note: we DO NOT merge values and initialization status
+      hypotheses as the factorization performed by Qed can make
+      predicates too hard to simplify later.
 
-        Remark: [None] initializer are interpreted as zeroes. This is consistent
-        with the [init option] associated with global variables in CIL,
-        for which the default initializer are zeroes. This function is called
-        for global initializers and local initializers ([Cil.Local_init]).
-        It is not called for local variables without initializers as they do not
-        have a [Cil.init option].
-    *)
+      Remark: [None] initializer are interpreted as zeroes. This is consistent
+      with the [init option] associated with global variables in CIL,
+      for which the default initializer are zeroes. This function is called
+      for global initializers and local initializers ([Cil.Local_init]).
+      It is not called for local variables without initializers as they do not
+      have a [Cil.init option].
+  *)
 
 end
 
@@ -674,7 +483,6 @@ sig
   type nonrec logic  = M.loc logic
   type nonrec region = M.loc region
   type nonrec result = M.loc result
-  type sigma = M.Sigma.t
 
   (** {2 Frames}
 

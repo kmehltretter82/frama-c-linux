@@ -1685,7 +1685,7 @@ struct
         if Lang.F.is_primitive t then ()
         else
           match Mstate.lookup s t with
-          | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
+          | Minit _ -> raise Found
           | _ -> ()
       in
       if Tset.mem t !visited then ()

@@ -2,7 +2,7 @@
 
 open Wp
 open Factory
-open Sigs
+open Memory
 
 let run () =
   let setup : Factory.setup = { mheap = Hoare;
@@ -101,7 +101,7 @@ let run () =
         let formal = List.hd (fct.sformals) in
 
         (*First call*)
-        let seq1 = {Sigs.pre = Cfg.node (); post = Cfg.node ()} in
+        let seq1 = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env1 = Compiler.empty_env kf  in
         let env1 = Compiler.(env1 @* [Clabels.here,seq1.pre;Clabels.next,seq1.post]) in
         let path1 = Compiler.automaton env1 block in
@@ -114,7 +114,7 @@ let run () =
         let term_1 = Cfg.T.get node1 in
 
         (*Seconde call*)
-        let seq2 = {Sigs.pre = Cfg.node (); post = Cfg.node ()} in
+        let seq2 = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env2 = Compiler.empty_env kf  in
         let env2 = Compiler.(env2 @* [Clabels.here,seq2.pre;Clabels.next,seq2.post]) in
         let path2 = Compiler.automaton env2 block in

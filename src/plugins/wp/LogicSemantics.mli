@@ -24,4 +24,4 @@
 (* --- ACSL Translation                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Make(M : Sigs.Model) : Sigs.LogicSemantics with module M = M
+module Make(M : Memory.Model) : Memory.LogicSemantics with module M = M

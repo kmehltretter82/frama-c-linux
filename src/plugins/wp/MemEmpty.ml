@@ -25,7 +25,7 @@
 (* -------------------------------------------------------------------------- *)
 
 open Lang.F
-open Sigs
+open Memory
 
 module Logic = Qed.Logic
 
@@ -45,21 +45,10 @@ let configure_ia _ = no_binder
 
 let hypotheses p = p
 
-module Sigma = SigmaCore
-module Heap = SigmaCore.Heap
-module Chunk = SigmaCore.Chunk
-
 type loc = unit
-type chunk = Chunk.t
-type sigma = Sigma.t
-type domain = Sigma.domain
 type segment = loc rloc
-type state = unit
-let state _ = ()
-let iter _ _ = ()
 let lookup _ _ = Mterm
 let updates _ _ = Bag.empty
-let apply _ _ = ()
 
 let pretty _fmt () = ()
 let vars _l = Vars.empty
@@ -81,7 +70,7 @@ let cast _ _l = ()
 let loc_of_int _ _ = ()
 let int_of_loc _ () = e_zero
 
-let domain _obj _l = Sigma.Heap.Set.empty
+let domain _obj _l = Sigma.Domain.empty
 let is_well_formed _s = p_true
 
 let source = "Empty Model"

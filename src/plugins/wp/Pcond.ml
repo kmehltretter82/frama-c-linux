@@ -162,7 +162,7 @@ class state =
 
     method updates seq = Pcfg.updates env seq domain
 
-    method pp_update lbl fmt = function Sigs.Mstore(lv,v) ->
+    method pp_update lbl fmt = function Memory.Mstore(lv,v) ->
       let stack = context in
       context <- AtLabel lbl ;
       Format.fprintf fmt "@[<hov 2>%a =@ %a;@]"
@@ -391,13 +391,13 @@ class seqengine (lang : #state) =
       | Some lbl ->
         let before = match Pcfg.prev lbl with
           | [ pre ] when (Pcfg.branching pre) ->
-            let seq = Sigs.{ pre ; post = lbl } in
+            let seq = Memory.{ pre ; post = lbl } in
             let upd = lang#updates seq in
             Some(pre,upd)
           | _ -> None in
         let after = match Pcfg.next lbl with
           | [ post ] ->
-            let seq = Sigs.{ pre = lbl ; post } in
+            let seq = Memory.{ pre = lbl ; post } in
             let upd = lang#updates seq in
             Some(lbl,upd)
           | _ -> None in

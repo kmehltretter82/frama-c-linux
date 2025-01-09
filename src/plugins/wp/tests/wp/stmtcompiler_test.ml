@@ -2,7 +2,7 @@
 
 open Wp
 open Factory
-open Sigs
+open Memory
 
 let mode = `Tree
 
@@ -95,7 +95,7 @@ let run () =
       begin fun () ->
         let automaton = Interpreted_automata.Compute.get_automaton ~annotations:true kf in
         (* Format.printf "@[%s body cil:%a@]@." fct Printer.pp_block block; *)
-        let seq = {Sigs.pre = Cfg.node (); post = Cfg.node ()} in
+        let seq = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env = Compiler.empty_env kf  in
         let env = Compiler.(env @* [Clabels.here,seq.pre;
                                     Clabels.next,seq.post]) in

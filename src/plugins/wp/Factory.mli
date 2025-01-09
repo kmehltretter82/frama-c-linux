@@ -38,7 +38,7 @@ type driver = LogicBuiltins.driver
 
 val ident : setup -> string
 val descr : setup -> string
-val compiler : mheap -> mvar -> (module Sigs.Compiler)
+val compiler : mheap -> mvar -> (module Memory.Compiler)
 val configure_driver : setup -> driver -> unit -> WpContext.rollback
 val instance : setup -> driver -> WpContext.model
 val default : setup (** ["Var,Typed,Nat,Real"] memory model. *)

@@ -28,8 +28,8 @@ open Cil_types
 open Cil_datatype
 open Ctypes
 open Lang
-open Lang.F
-open Sigs
+open Sigma
+open Memory
 open Definitions
 open MemMemory
 
@@ -46,7 +46,7 @@ let hypotheses p = p
 let configure () =
   begin
     let orig_pointer = Context.push Lang.pointer MemAddr.t_addr in
-    let orig_null    = Context.push Cvalues.null (p_equal MemAddr.null) in
+    let orig_null    = Context.push Cvalues.null (F.p_equal MemAddr.null) in
     let rollback () =
       Context.pop Lang.pointer orig_pointer ;
       Context.pop Cvalues.null orig_null ;
@@ -116,7 +116,7 @@ let pointer = Context.create "MemTyped.pointer"
 (* --- Chunks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mchunk =
+type chunk =
   | M_int of Ctypes.c_int
   | M_f32
   | M_f64
@@ -124,9 +124,9 @@ type mchunk =
   | T_alloc
   | T_init
 
-module MChunk =
+module Chunk =
 struct
-  type t = mchunk
+  type t = chunk
   let self = "typed"
   let int_rank = function
     | CBool -> 0
@@ -178,12 +178,9 @@ struct
   let is_framed _ = false
 end
 
-module Sigma = SigmaCore
-module Heap = SigmaCore.Heap
-module Chunk = SigmaCore.Chunk
-module State = SigmaCore.Make(MChunk)
+module State = Sigma.Make(Chunk)
 
-type loc = term (* of type addr *)
+type loc = F.term (* of type addr *)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities on locations                                             --- *)
@@ -208,8 +205,8 @@ and footprint_comp { cfields } =
       ) Sigma.empty fields
 
 and all_value_chunks () =
-  let pool = ref Heap.Set.empty in
-  let add c = pool := Heap.Set.add (State.chunk c) !pool in
+  let pool = ref Domain.empty in
+  let add c = pool := Domain.add (State.chunk c) !pool in
   let addi i = add (M_int i) in
   begin
     add M_pointer ;
@@ -249,19 +246,19 @@ module OPAQUE_COMP_LENGTH = WpContext.Generator(Cil_datatype.Compinfo)
           l_name = "Positive_Length_of_" ^ Lang.comp_id c ;
           l_triggers = [] ; l_forall = [] ;
           l_cluster = Definitions.compinfo c ;
-          l_lemma = Lang.F.(p_lt e_zero (e_fun size []))
+          l_lemma = F.p_lt F.e_zero (F.e_fun size [])
         } ;
         size
     end)
 
 let rec length_of_object = function
-  | C_int _ | C_float _ | C_pointer _ -> e_one
+  | C_int _ | C_float _ | C_pointer _ -> F.e_one
   | C_comp c -> length_of_comp c
   | C_array { arr_flat = Some { arr_size = n } ; arr_element = elt } ->
-    e_mul (e_int n) (length_of_typ elt)
+    F.e_mul (F.e_int n) (length_of_typ elt)
   | C_array _ as a ->
     if Wp_parameters.ExternArrays.get () then
-      e_int max_int
+      F.e_int max_int
     else
       Warning.error ~source:"Typed Model"
         "Undefined array-size (%a)" Ctypes.pretty a
@@ -271,28 +268,25 @@ and length_of_field f = length_of_typ f.ftype
 and length_of_comp c =
   match c.cfields with
   | None ->
-    Lang.F.e_fun (OPAQUE_COMP_LENGTH.get c) []
+    F.e_fun (OPAQUE_COMP_LENGTH.get c) []
   | Some fields ->
     (* union field are considered as struct field *)
-    e_sum (List.map length_of_field fields)
+    F.e_sum (List.map length_of_field fields)
 
 let position_of_field f =
   let rec fnext k f = function
     | [] -> assert false
     | g::gs ->
       if Fieldinfo.equal f g then k
-      else fnext (e_add k (length_of_field g)) f gs
+      else fnext (F.e_add k (length_of_field g)) f gs
       (* Just as we fail if the field does not exists, we fail
          if we try to get a field position in an opaque struct. *)
-  in fnext e_zero f (Option.get f.fcomp.cfields)
+  in fnext F.e_zero f (Option.get f.fcomp.cfields)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities on loc-as-term                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type sigma = Sigma.t
-type chunk = Chunk.t
-type domain = Sigma.domain
 type segment = loc rloc
 
 let pretty fmt l = F.pp_term fmt l
@@ -307,19 +301,19 @@ let cluster_globals () =
   Definitions.cluster ~id:"Globals" ~title:"Global Variables" ()
 
 type shift =
-  | RS_Field of fieldinfo * term (* offset of the field *)
-  | RS_Index of term  (* size of the shift *)
+  | RS_Field of fieldinfo * F.term (* offset of the field *)
+  | RS_Index of F.term  (* size of the shift *)
 
 let phi_base = function
   | p::_ -> MemAddr.base p
   | _ -> raise Not_found
 
 let phi_field offset = function
-  | [p] -> e_add (MemAddr.offset p) offset
+  | [p] -> F.e_add (MemAddr.offset p) offset
   | _ -> raise Not_found
 
 let phi_index size = function
-  | [p;k] -> e_add (MemAddr.offset p) (F.e_mul size k)
+  | [p;k] -> F.e_add (MemAddr.offset p) (F.e_mul size k)
   | _ -> raise Not_found
 
 module RegisterShift = WpContext.Static
@@ -342,7 +336,7 @@ module ShiftFieldDef = WpContext.StaticGenerator(Cil_datatype.Fieldinfo)
         let position = position_of_field f in
         (* Since its a generated it is the unique name given *)
         let xloc = Lang.freshvar ~basename:"p" MemAddr.t_addr in
-        let loc = e_var xloc in
+        let loc = F.e_var xloc in
         let def = MemAddr.shift loc position in
         let dfun = Definitions.Function( result , Def , def) in
         RegisterShift.define lfun (RS_Field(f,position)) ;
@@ -403,9 +397,9 @@ module ShiftGen = WpContext.StaticGenerator(Cobj)
         let size = length_of_object obj in
         (* Since its a generated it is the unique name given *)
         let xloc = Lang.freshvar ~basename:"p" MemAddr.t_addr in
-        let loc = e_var xloc in
+        let loc = F.e_var xloc in
         let xk = Lang.freshvar ~basename:"k" Qed.Logic.Int in
-        let k = e_var xk in
+        let k = F.e_var xk in
         let def = MemAddr.shift loc (F.e_mul size k) in
         let dfun = Definitions.Function( result , Def , def) in
         RegisterShift.define shift (RS_Index size) ;
@@ -436,9 +430,9 @@ module Shift = WpContext.Generator(Cobj)
 
 let field l f =
   MemMemory.unsupported_union f ;
-  e_fun (ShiftField.get f) [l]
+  F.e_fun (ShiftField.get f) [l]
 
-let shift l obj k = e_fun (Shift.get obj) [l;k]
+let shift l obj k = F.e_fun (Shift.get obj) [l;k]
 
 module LITERAL =
 struct
@@ -458,12 +452,12 @@ module STRING = WpContext.Generator(LITERAL)
     (struct
       let name = "MemTyped.STRING"
       type key = LITERAL.t
-      type data = term
+      type data = F.term
 
       let linked prefix base cst =
         let name = prefix ^ "_linked" in
-        let a = Lang.freshvar ~basename:"alloc" (MChunk.tau_of_chunk T_alloc) in
-        let m = e_var a in
+        let a = Lang.freshvar ~basename:"alloc" (Chunk.tau_of_chunk T_alloc) in
+        let m = F.e_var a in
         let m_linked = MemAddr.linked m in
         let alloc = F.e_get m base in (* The size is alloc-1 *)
         let sized = Cstring.str_len cst (F.e_add alloc F.e_minus_one) in
@@ -471,7 +465,7 @@ module STRING = WpContext.Generator(LITERAL)
           l_kind = Admit ;
           l_name = name ;
           l_triggers = [] ; l_forall = [] ;
-          l_lemma = p_forall [a] (p_imply m_linked sized) ;
+          l_lemma = F.p_forall [a] (F.p_imply m_linked sized) ;
           l_cluster = Cstring.cluster () ;
         }
 
@@ -481,7 +475,7 @@ module STRING = WpContext.Generator(LITERAL)
         Definitions.define_lemma {
           l_kind = Admit ;
           l_name = name ; l_triggers = [] ; l_forall = [] ;
-          l_lemma = p_equal (MemAddr.region base) (e_int re) ;
+          l_lemma = F.p_equal (MemAddr.region base) (F.e_int re) ;
           l_cluster = Cstring.cluster () ;
         }
 
@@ -489,13 +483,13 @@ module STRING = WpContext.Generator(LITERAL)
         (* describe the content of literal strings *)
         let name = prefix ^ "_literal" in
         let i = Lang.freshvar ~basename:"i" L.Int in
-        let c = Cstring.char_at cst (e_var i) in
+        let c = Cstring.char_at cst (F.e_var i) in
         let ikind = Ctypes.c_char () in
-        let addr = shift (MemAddr.global base) (C_int ikind) (e_var i) in
+        let addr = shift (MemAddr.global base) (C_int ikind) (F.e_var i) in
         let m =
-          Lang.freshvar ~basename:"mchar" (MChunk.tau_of_chunk (M_int ikind)) in
-        let m_sconst = MemMemory.sconst (e_var m) in
-        let v = F.e_get (e_var m) addr in
+          Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk (M_int ikind)) in
+        let m_sconst = MemMemory.sconst (F.e_var m) in
+        let v = F.e_get (F.e_var m) addr in
         let read = F.p_equal c v in
         Definitions.define_lemma {
           l_kind = Admit ;
@@ -550,7 +544,7 @@ module BASE = WpContext.Generator(Varinfo)
     (struct
       let name = "MemTyped.BASE"
       type key = varinfo
-      type data = term
+      type data = F.term
 
       let region prefix x base =
         let name = prefix ^ "_region" in
@@ -558,7 +552,7 @@ module BASE = WpContext.Generator(Varinfo)
         Definitions.define_lemma {
           l_kind = Admit ;
           l_name = name ; l_triggers = [] ; l_forall = [] ;
-          l_lemma = p_equal (MemAddr.region base) (e_int re) ;
+          l_lemma = F.p_equal (MemAddr.region base) (F.e_int re) ;
           l_cluster = cluster_globals () ;
         }
 
@@ -571,19 +565,19 @@ module BASE = WpContext.Generator(Varinfo)
 
       let linked prefix x base =
         let name = prefix ^ "_linked" in
-        let size = if x.vglob then sizeof x else Some e_zero in
+        let size = if x.vglob then sizeof x else Some F.e_zero in
         match size with
         | None -> ()
         | Some size ->
           let a = Lang.freshvar ~basename:"alloc" t_malloc in
-          let m = e_var a in
+          let m = F.e_var a in
           let m_linked = MemAddr.linked m in
-          let base_size = p_equal (F.e_get m base) size in
+          let base_size = F.p_equal (F.e_get m base) size in
           Definitions.define_lemma {
             l_kind = Admit ;
             l_name = name ;
             l_triggers = [] ; l_forall = [] ;
-            l_lemma = p_forall [a] (p_imply m_linked base_size) ;
+            l_lemma = F.p_forall [a] (F.p_imply m_linked base_size) ;
             l_cluster = cluster_globals () ;
           }
 
@@ -591,15 +585,15 @@ module BASE = WpContext.Generator(Varinfo)
         match sizeof x with
         | Some size when Cvalues.always_initialized x ->
           let a = Lang.freshvar ~basename:"init" t_init in
-          let m = e_var a in
+          let m = F.e_var a in
           let init_access =
-            if size = e_one then
-              p_bool (F.e_get m (MemAddr.mk_addr base e_zero))
+            if size = F.e_one then
+              F.p_bool (F.e_get m (MemAddr.mk_addr base F.e_zero))
             else
-              F.p_call p_is_init_r [ m ; MemAddr.mk_addr base e_zero ; size ]
+              F.p_call p_is_init_r [ m ; MemAddr.mk_addr base F.e_zero ; size ]
           in
           let m_init = MemMemory.cinits m in
-          let init_prop = p_forall [a] (p_imply m_init init_access) in
+          let init_prop = F.p_forall [a] (F.p_imply m_init init_access) in
           Definitions.define_lemma {
             l_kind = Admit ;
             l_name = prefix ^ "_init" ;
@@ -621,12 +615,12 @@ module BASE = WpContext.Generator(Varinfo)
         (* Since its a generated it is the unique name given *)
         let prefix = Lang.Fun.debug lfun in
         let vid = if acs_rd then (-x.vid-1) else succ x.vid in
-        let dfun = Definitions.Function( L.Int , Def , e_int vid ) in
+        let dfun = Definitions.Function( L.Int , Def , F.e_int vid ) in
         Definitions.define_symbol {
           d_lfun = lfun ; d_types = 0 ; d_params = [] ; d_definition = dfun ;
           d_cluster = cluster_globals () ;
         } ;
-        let base = e_fun lfun [] in
+        let base = F.e_fun lfun [] in
         RegisterBASE.define lfun x ;
         region prefix x base ;
         linked prefix x base ;
@@ -643,7 +637,7 @@ module BASE = WpContext.Generator(Varinfo)
 let null = MemAddr.null (* as a loc *)
 
 let literal ~eid cst =
-  shift (MemAddr.global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) e_zero
+  shift (MemAddr.global (STRING.get (eid,cst))) (C_int (Ctypes.c_char ())) F.e_zero
 
 let cvar x = MemAddr.global (BASE.get x)
 
@@ -652,15 +646,15 @@ let pointer_val t = t
 
 let allocated sigma l = F.e_get (State.value sigma T_alloc) (MemAddr.base l)
 
-let base_addr l = MemAddr.mk_addr (MemAddr.base l) e_zero
+let base_addr l = MemAddr.mk_addr (MemAddr.base l) F.e_zero
 let base_offset l = MemAddr.base_offset (MemAddr.base l) (MemAddr.offset l)
 let block_length sigma obj l =
-  let n_cells = e_div (allocated sigma l) (length_of_object obj) in
+  let n_cells = F.e_div (allocated sigma l) (length_of_object obj) in
   match obj with
   | C_comp ({ cfields = None } as c) ->
-    e_mul (Cvalues.bytes_length_of_opaque_comp c) n_cells
+    F.e_mul (Cvalues.bytes_length_of_opaque_comp c) n_cells
   | _ ->
-    e_fact (Ctypes.sizeof_object obj) n_cells
+    F.e_fact (Ctypes.sizeof_object obj) n_cells
 
 (* -------------------------------------------------------------------------- *)
 (* --- Cast                                                               --- *)
@@ -976,8 +970,8 @@ let frames obj addr chunk =
   | State.Mu m ->
     let offset = length_of_object obj in
     let sizeof = F.e_one in
-    let tau = MChunk.val_of_chunk m in
-    let basename = MChunk.basename_of_chunk m in
+    let tau = Chunk.val_of_chunk m in
+    let basename = Chunk.basename_of_chunk m in
     MemMemory.frames ~addr ~offset ~sizeof ~basename tau
   | _ -> []
 
@@ -985,10 +979,10 @@ let frames obj addr chunk =
 (* --- Chunk element type                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-module ChunkContent = WpContext.Generator(MChunk)
+module ChunkContent = WpContext.Generator(Chunk)
     (struct
       let name = "MemTyped.ChunkContent"
-      type key = MChunk.t
+      type key = Chunk.t
       type data = lfun
 
       let int_kind = function
@@ -997,13 +991,13 @@ module ChunkContent = WpContext.Generator(MChunk)
 
       let generate c =
         let k = int_kind c in
-        let p = Lang.freshvar ~basename:"m" (MChunk.tau_of_chunk c) in
-        let m = e_var p in
+        let p = Lang.freshvar ~basename:"m" (Chunk.tau_of_chunk c) in
+        let m = F.e_var p in
         let name = Format.asprintf "is_%a_chunk" Ctypes.pp_int k in
         let lfun = Lang.generated_p ~coloring:true name in
         let l = Lang.freshvar ~basename:"l" (Lang.t_addr()) in
         let is_int = Cint.range k in
-        let def = p_forall [l] (is_int (F.e_get m (e_var l))) in
+        let def = F.p_forall [l] (is_int (F.e_get m (F.e_var l))) in
         Definitions.define_symbol {
           d_lfun = lfun ; d_types = 0 ;
           d_params = [p] ;
@@ -1031,10 +1025,8 @@ let is_well_formed sigma =
 
 module MODEL =
 struct
-  module Sigma = Sigma
-  module Chunk = Chunk
   let name = "MemTyped.LOADER"
-  type nonrec loc = loc
+  type loc = F.term
   let field = field
   let shift = shift
   let sizeof = length_of_object
@@ -1051,7 +1043,7 @@ struct
 
   let last sigma obj l =
     let n = length_of_object obj in
-    e_sub (F.e_div (allocated sigma l) n) e_one
+    F.e_sub (F.e_div (allocated sigma l) n) F.e_one
 
   let havoc obj loc ~length chunk ~fresh ~current =
     match Sigma.mu chunk with
@@ -1065,8 +1057,8 @@ struct
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = F.e_var xp in
     let n = length_of_object obj in
-    let separated = F.p_call MemAddr.p_separated [p;e_one;loc;n] in
-    let equal = p_equal (e_get m1 p) (e_get m2 p) in
+    let separated = F.p_call MemAddr.p_separated [p;F.e_one;loc;n] in
+    let equal = F.p_equal (F.e_get m1 p) (F.e_get m2 p) in
     [xp],separated,equal
 
   let updated sigma c l v = State.chunk c , F.e_set (State.value sigma c) l v
@@ -1112,15 +1104,15 @@ let loc_compare f_cmp i_cmp p q =
   | L.Yes -> i_cmp (MemAddr.offset p) (MemAddr.offset q)
   | L.Maybe | L.No -> f_cmp p q
 
-let is_null l = p_equal l null
-let loc_eq = p_equal
-let loc_neq = p_neq
-let loc_lt = loc_compare MemAddr.addr_lt p_lt
-let loc_leq = loc_compare MemAddr.addr_le p_leq
+let is_null l = F.p_equal l null
+let loc_eq = F.p_equal
+let loc_neq = F.p_neq
+let loc_lt = loc_compare MemAddr.addr_lt F.p_lt
+let loc_leq = loc_compare MemAddr.addr_le F.p_leq
 let loc_diff obj p q =
-  let delta = e_sub (MemAddr.offset p) (MemAddr.offset q) in
+  let delta = F.e_sub (MemAddr.offset p) (MemAddr.offset q) in
   let size = length_of_object obj in
-  e_div delta size
+  F.e_div delta size
 
 (* -------------------------------------------------------------------------- *)
 (* --- Validity                                                           --- *)
@@ -1142,7 +1134,7 @@ let segment phi = function
     phi l (length_of_object obj)
   | Rrange(l,obj,Some a,Some b) ->
     let l = shift l obj a in
-    let n = e_mul (length_of_object obj) (e_range a b) in
+    let n = F.e_mul (length_of_object obj) (F.e_range a b) in
     phi l n
   | Rrange(l,_,a,b) ->
     Wp_parameters.abort ~current:true
@@ -1172,13 +1164,13 @@ let scope seq scope xs =
       List.fold_left
         (fun m x ->
            let size = match scope with
-             | Sigs.Leave -> e_zero
-             | Sigs.Enter -> length_of_typ x.vtype
+             | Memory.Leave -> F.e_zero
+             | Memory.Enter -> length_of_typ x.vtype
            in F.e_set m (BASE.get x) size)
         (State.value seq.pre T_alloc) xs in
-    [ p_equal (State.value seq.post T_alloc) alloc ]
+    [ F.p_equal (State.value seq.post T_alloc) alloc ]
 
-let global _sigma p = p_leq MemAddr.(region @@ base p) e_zero
+let global _sigma p = F.p_leq MemAddr.(region @@ base p) F.e_zero
 
 (* -------------------------------------------------------------------------- *)
 (* --- Segments                                                           --- *)
@@ -1198,8 +1190,6 @@ let separated =
 (* --- State Model                                                        --- *)
 (* -------------------------------------------------------------------------- *)
 
-type state = SigmaCore.state
-
 let rec lookup_a e =
   match F.repr e with
   | L.Fun( f , [e] ) when MemAddr.is_f_global f -> lookup_a e
@@ -1212,41 +1202,26 @@ and lookup_f f es =
     | RS_Index _ , [e;k] -> Mstate.index (lookup_lv e) k
     | _ -> raise Not_found
   with Not_found when es = [] ->
-    Sigs.(Mvar (RegisterBASE.find f),[])
+    Memory.(Mvar (RegisterBASE.find f),[])
 
-and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
-
-let mchunk c =
-  match Sigma.mu c with
-  | State.Mu mc ->
-    let kind = if mc = T_init then KInit else KValue in
-    Sigs.Mchunk (Pretty_utils.to_string MChunk.pretty mc, kind)
-  | _ -> Sigs.Mterm
+and lookup_lv e = try lookup_a e with Not_found -> Memory.(Mmem e,[])
 
 let lookup s e =
-  try mchunk @@ Tmap.find e s
-  with Not_found ->
-  try match F.repr e with
-    | L.Fun( f , es ) -> Sigs.Maddr (lookup_f f es)
-    | L.Aget( m , k ) ->
-      begin
-        match Sigma.mu @@ Tmap.find m s with
-        | State.Mu T_alloc -> Sigs.Mterm
-        | State.Mu T_init -> Sigs.Mlval (lookup_lv k, KInit)
-        | State.Mu _ -> Sigs.Mlval (lookup_lv k, KValue)
-        | _ -> Sigs.Mterm
-      end
-    | _ -> Sigs.Mterm
-  with Not_found -> Sigs.Mterm
-
-let apply = SigmaCore.apply
-let state = SigmaCore.state
-
-let iter f s = Tmap.iter (fun m c -> f (mchunk c) m) s
+  match F.repr e with
+  | L.Fun( f , es ) -> Memory.Maddr (lookup_f f es)
+  | L.Aget( m , k ) ->
+    begin
+      match Sigma.mu @@ F.Tmap.find m s with
+      | State.Mu T_alloc -> Memory.Mterm
+      | State.Mu T_init -> Memory.Minit (lookup_lv k)
+      | State.Mu _ -> Memory.Mlval (lookup_lv k)
+      | _ -> Memory.Mterm
+    end
+  | _ -> Memory.Mterm
 
 let heap domain state =
-  Tmap.fold (fun m c w ->
-      if Vars.intersect (F.vars m) domain
+  F.Tmap.fold (fun m c w ->
+      if F.Vars.intersect (F.vars m) domain
       then Heap.Map.add c m w else w
     ) state Heap.Map.empty
 

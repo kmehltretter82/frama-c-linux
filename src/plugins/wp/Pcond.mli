@@ -123,9 +123,9 @@ class state :
 
     method domain : Vars.t
     method label_at : id:int -> Pcfg.label
-    method updates : Pcfg.label Sigs.sequence -> Sigs.update Bag.t
+    method updates : Pcfg.label Memory.sequence -> Memory.update Bag.t
     method pp_at : Format.formatter -> Pcfg.label -> unit
-    method pp_update : Pcfg.label -> Format.formatter -> Sigs.update -> unit
+    method pp_update : Pcfg.label -> Format.formatter -> Memory.update -> unit
     method pp_value : Format.formatter -> term -> unit
   end
 

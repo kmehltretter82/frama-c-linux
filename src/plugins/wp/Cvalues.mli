@@ -26,10 +26,11 @@
 
 open Cil_types
 open Ctypes
-open Sigs
 open Lang.F
+open Memory
+open Sigma
 
-val equation : Sigs.equation -> pred
+val equation : Memory.equation -> pred
 
 (** {2 Pretty Printing} *)
 
@@ -113,10 +114,10 @@ val bytes_length_of_opaque_comp: compinfo -> term
 
 (** {2 Lifting Operations over Memory Values} *)
 
-val map_sloc : ('a -> 'b) -> 'a Sigs.sloc -> 'b Sigs.sloc
-val map_value : ('a -> 'b) -> 'a Sigs.value -> 'b Sigs.value
-val map_logic : ('a -> 'b) -> 'a Sigs.logic -> 'b Sigs.logic
-val plain : logic_type -> term -> 'a Sigs.logic
+val map_sloc : ('a -> 'b) -> 'a Memory.sloc -> 'b Memory.sloc
+val map_value : ('a -> 'b) -> 'a Memory.value -> 'b Memory.value
+val map_logic : ('a -> 'b) -> 'a Memory.logic -> 'b Memory.logic
+val plain : logic_type -> term -> 'a Memory.logic
 
 (** {2 ACSL Utilities} *)
 
@@ -126,13 +127,13 @@ val plain : logic_type -> term -> 'a Sigs.logic
 type polarity = [ `Positive | `Negative | `NoPolarity ]
 val negate : polarity -> polarity
 
-module Logic(M : Sigs.Model) :
+module Logic(M : Memory.Model) :
 sig
 
   open M
-  type logic = M.loc Sigs.logic
-  type segment = c_object * loc Sigs.sloc
-  type region = loc Sigs.region
+  type logic = M.loc Memory.logic
+  type segment = c_object * loc Memory.sloc
+  type region = loc Memory.region
 
   (** {3 Projections} *)
 
@@ -158,7 +159,7 @@ sig
 
   val field : logic -> fieldinfo -> logic
   val shift : logic -> c_object -> ?size:int -> logic -> logic
-  val load : Sigma.t -> c_object -> logic -> logic
+  val load : sigma -> c_object -> logic -> logic
 
   (** {3 Sets of loc-or-values} *)
 
@@ -170,8 +171,8 @@ sig
 
   val separated : region list -> pred
   val included : segment -> segment -> pred
-  val valid : Sigma.t -> acs -> segment -> pred
-  val invalid : Sigma.t -> segment -> pred
-  val initialized : Sigma.t -> segment -> pred
+  val valid : sigma -> acs -> segment -> pred
+  val invalid : sigma -> segment -> pred
+  val initialized : sigma -> segment -> pred
 
 end

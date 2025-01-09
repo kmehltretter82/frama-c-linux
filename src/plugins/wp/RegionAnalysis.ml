@@ -36,18 +36,18 @@ let id region = Region.uid (get_map ()) region
 let of_id id =
   try Some (Region.find (get_map ()) id)
   with Not_found -> None
+let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
+let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
 
-module Type =
+module R =
 struct
   type t = region
-  let hash = Region.id
-  let equal r1 r2 = (Region.id r1 = Region.id r2)
-  let compare r1 r2 = Int.compare (Region.id r1) (Region.id r2)
-  let pretty fmt r = Format.fprintf fmt "R%03d" @@ Region.id r
+  let compare = compare
+  let pretty = pretty
 end
 
 (* Keeping track of the decision to apply which memory model to each region *)
-module Kind = WpContext.Generator(Type)
+module Kind = WpContext.Generator(R)
     (struct
       open MemRegion
       let name = "Wp.RegionAnalysis.Kind"
@@ -68,7 +68,7 @@ module Kind = WpContext.Generator(Type)
         | None -> Garbled
     end)
 
-module Name = WpContext.Generator(Type)
+module Name = WpContext.Generator(R)
     (struct
       let name = "Wp.RegionAnalysis.Name"
       type key = region

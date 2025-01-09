@@ -88,7 +88,7 @@ sig
   val pretty : Format.formatter -> t -> unit
 end
 
-module Make(_ : Value) : Sigs.Model
+module Make(_ : Value) : Memory.Model
 
 (** The glue between WP and EVA. **)
 module Eva : Value

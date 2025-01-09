@@ -127,7 +127,7 @@ module Layout = Layout
 
 (** {2 Compilers} *)
 
-module Sigs = Sigs
+module Memory = Memory
 module Driver = Driver
 module Context = Context
 module Ctypes = Ctypes

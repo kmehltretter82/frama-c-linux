@@ -60,7 +60,7 @@ val framed : term -> pred
 *)
 
 val frames : addr:term -> offset:term -> sizeof:term ->
-  ?basename:string -> tau -> Sigs.frame list
+  ?basename:string -> tau -> Memory.frame list
 
 (** {2 Unsupported Union Fields} *)
 

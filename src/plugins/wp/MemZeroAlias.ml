@@ -28,7 +28,7 @@ open Cil_types
 open Cil_datatype
 open Lang
 open Lang.F
-open Sigs
+open Memory
 
 module Logic = Qed.Logic
 
@@ -54,7 +54,7 @@ let hypotheses p = p
 (* --- Chunks                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mchunk = varinfo * path list (* from left to right *)
+type chunk = varinfo * path list (* from left to right *)
 and path = S | I | F of fieldinfo
 
 let hash_path = function S -> 1 | I -> 2 | F fd -> Fieldinfo.hash fd
@@ -92,9 +92,9 @@ let rec dim_of_path t = function
   | S :: p | F _ :: p -> dim_of_path t p
   | I :: p -> dim_of_path Qed.Logic.(Array(Int,t)) p
 
-module MChunk =
+module Chunk =
 struct
-  type t = mchunk
+  type t = chunk
   let self = "mtree"
   let hash (x,p) = Qed.Hcons.hash_list hash_path (Varinfo.hash x) p
   let equal (x,p) (y,q) = Varinfo.equal x y && Qed.Hcons.equal_list equal_path p q
@@ -118,10 +118,7 @@ struct
   let is_framed (x,p) = not x.vglob && p = []
 end
 
-module Sigma = SigmaCore
-module Heap = SigmaCore.Heap
-module Chunk = SigmaCore.Chunk
-module State = SigmaCore.Make(MChunk)
+module State = Sigma.Make(Chunk)
 
 type loc =
   | Null
@@ -130,9 +127,6 @@ type loc =
   | Array of loc * F.term
   | Field of loc * fieldinfo
 
-type chunk = Chunk.t
-type sigma = Sigma.t
-type domain = Sigma.domain
 type segment = loc rloc
 
 let rec pretty fmt = function
@@ -219,18 +213,6 @@ let copied_init _seq _obj _a _b = Warning.error ~source "Mem0Alias: No initializ
 
 let assigned _s _obj _sloc = []
 
-type state = Chunk.t Tmap.t
-let state (s:sigma) =
-  let m = ref Tmap.empty in
-  Sigma.iter (fun c x -> m := Tmap.add (F.e_var x) c !m) s ; !m
-
-let imval c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
-let iter f s = Tmap.iter (fun v c -> f (imval c) v) s
-let lookup (s : state) (e : Lang.F.term) = imval (F.Tmap.find e s)
-let apply f s =
-  let m = ref Tmap.empty in
-  Tmap.iter (fun e c -> m := Tmap.add (f e) c !m) s ; !m
-
 let rec ipath lv = function
   | [] -> lv
   | S::w -> ipath (Mval lv,[]) w
@@ -240,18 +222,25 @@ let rec ipath lv = function
     ipath (host, path @ [Mfield f]) w
 let ilval (x,p) = ipath (Mvar x,[]) p
 
+let lookup (s : Sigma.state) (e : F.term) =
+  match Sigma.mu @@ Lang.F.Tmap.find e s with
+  | State.Mu lv -> Mlval (ilval lv)
+  | _ -> Mterm
+
+module Hmap = Sigma.Heap.Map
+
 let heap domain state =
   Tmap.fold
     (fun m c w ->
        if Vars.intersect (F.vars m) domain
-       then Heap.Map.add c m w else w
-    ) state Heap.Map.empty
+       then Hmap.add c m w else w
+    ) state Hmap.empty
 
 let updates seq domain =
   let pre = heap domain seq.pre in
   let post = heap domain seq.post in
   let pool = ref Bag.empty in
-  Heap.Map.iter2
+  Hmap.iter2
     (fun c v1 v2 ->
        match Sigma.mu c with
        | State.Mu m ->

@@ -22,7 +22,7 @@
 
 open Cil_datatype
 open Lang.F
-open Sigs
+open Memory
 
 (* ------------------------------------------------------------------------ *)
 (* ----  Pretty-printers                                               ---- *)
@@ -79,23 +79,15 @@ let debug_access = Wp_parameters.debug ~dkey:dkey_access
 let debug_valid = Wp_parameters.debug ~dkey:dkey_valid
 let debug_alias = Wp_parameters.debug ~dkey:dkey_alias
 
-module Make(M : Sigs.Model) =
+module Make(M : Memory.Model) =
 struct
   let datatype = "MemDebug." ^ M.datatype
   let configure = M.configure
 
   let hypotheses = M.hypotheses
 
-  module Chunk = M.Chunk
-
-  module Heap = M.Heap
-  module Sigma = M.Sigma
-
   type loc = M.loc
-  type chunk = M.chunk
-  type sigma = M.sigma
   type segment = M.segment
-  type state = M.state
 
   (* ---------------------------------------------------------------------- *)
   (* ----  Pretty-printing                                             ---- *)
@@ -103,11 +95,8 @@ struct
 
   let pretty = M.pretty
 
-  let state = M.state
-  let iter = M.iter
   let lookup = M.lookup
   let updates = M.updates
-  let apply = M.apply
 
   let vars = M.vars
   let occurs = M.occurs
@@ -273,7 +262,6 @@ struct
   let frame = M.frame
   let is_well_formed = M.is_well_formed
   let base_offset = M.base_offset
-  type domain = M.domain
   let configure_ia = M.configure_ia
 
 end
