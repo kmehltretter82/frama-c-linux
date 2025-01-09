@@ -24,6 +24,10 @@
     you understand what happens in this module, and do not forget that
     those caches are not aware of projects. *)
 
+(** [set_cache_size n] sets the size cache to 2^(8+n).
+    Does not resize already created caches. *)
+val set_cache_size: int -> unit
+
 module type Cacheable = sig
   type t
   val hash : t -> int

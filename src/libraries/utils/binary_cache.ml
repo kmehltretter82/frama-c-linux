@@ -20,25 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let memory_footprint_var_name = "FRAMA_C_MEMORY_FOOTPRINT"
+let compute_cache_size i = 1 lsl (8 + i)
+let default_value = 2
 
-let memory_footprint =
-  let error () =
-    Cmdline.Kernel_log.error
-      "@[Bad value for environment variable@ %s.@ Expected value: \
-       integer between@ 1 and 10.@ Using@ default value@ of 2.@]"
-      memory_footprint_var_name;
-    2
-  in
-  try
-    let i = int_of_string (Sys.getenv memory_footprint_var_name) in
-    if i <= 0 || i > 10 then error ()
-    else i
-  with
-  | Not_found -> 2
-  | Failure _ -> error ()
+(* Should not be used to create cache before the value from -eva-cache-size
+   has been set by Eva. *)
+let cache_size = ref (compute_cache_size default_value)
 
-let cache_size = 1 lsl (8 + memory_footprint)
+(* Set by Eva, according to the -eva-cache-size parameter. *)
+let set_cache_size i = cache_size := compute_cache_size i
 
 (** The caches of this module are lazy, for two reasons:
 
@@ -55,7 +45,6 @@ let cache_size = 1 lsl (8 + memory_footprint)
       (This is not perfect: once a lazy cache has been forced, each 'clear'
       operation becomes costly again.)
 *)
-let (!!) = Lazy.force
 
 module type Cacheable =
 sig
@@ -163,18 +152,23 @@ end
 
 module Symmetric_Binary (H: Cacheable) (R: Result) =
 struct
-  let size = cache_size
-  let cache = lazy (Array_3.make size H.sentinel H.sentinel R.sentinel)
 
-  let mask = pred size
+  let create () =
+    let size = !cache_size in
+    let array = Array_3.make size H.sentinel H.sentinel R.sentinel in
+    array, pred size
+
+  let cache = lazy (create ())
 
   let clear () =
     if Lazy.is_val cache then
-      Array_3.clear !!cache H.sentinel H.sentinel R.sentinel
+      let array, _ = Lazy.force cache in
+      Array_3.clear array H.sentinel H.sentinel R.sentinel
 
   let hash = H.hash
 
   let merge f a0 a1 =
+    let array, mask = Lazy.force cache in
     let a0', a1', h0, h1 =
       let h0 = hash a0 in
       let h1 = hash a1 in
@@ -185,106 +179,114 @@ struct
     let has = h1 lsl 5 - h1 + h0
     in
     let has = has land mask in
-
-    if H.equal (Array_3.get0 !!cache has) a0'
-    && H.equal (Array_3.get1 !!cache has) a1'
-    then begin
-      (*      Format.printf "Cache O@.";  *)
-      Array_3.get2 !!cache has
-    end
+    if H.equal (Array_3.get0 array has) a0'
+    && H.equal (Array_3.get1 array has) a1'
+    then
+      Array_3.get2 array has
     else
       let result = f a0 a1 in
-      (*      Format.printf "Cache N@."; *)
-      Array_3.set !!cache has a0' a1' result;
+      Array_3.set array has a0' a1' result;
       result
 end
 
 module Arity_One (H: Cacheable) (R: Result) =
 struct
-  let size = cache_size
-  let cache = lazy (Array_2.make size H.sentinel R.sentinel)
 
-  let mask = pred size
+  (* Creates the array used for the cache, and the mask to be used on keys
+     according to the array size. *)
+  let create () =
+    let size = !cache_size in
+    let array = Array_2.make size H.sentinel R.sentinel in
+    array, pred size
+
+  let cache = lazy (create ())
 
   let clear () =
     if Lazy.is_val cache then
-      Array_2.clear !!cache H.sentinel R.sentinel
+      let array, _ = Lazy.force cache in
+      Array_2.clear array H.sentinel R.sentinel
 
   let merge f a0 =
+    let array, mask = Lazy.force cache in
     let h0 = H.hash a0 in
     let has = h0 land mask in
-    if H.equal (Array_2.get0 !!cache has) a0
-    then begin
-      (*      Format.printf "Cache O@.";  *)
-      Array_2.get1 !!cache has
-    end
+    if H.equal (Array_2.get0 array has) a0
+    then
+      Array_2.get1 array has
     else
       let result = f a0 in
-      (*      Format.printf "Cache N@."; *)
-      Array_2.set !!cache has a0 result;
+      Array_2.set array has a0 result;
       result
 end
 
 module Arity_Two (H0: Cacheable) (H1: Cacheable) (R: Result) =
 struct
 
-  let size = cache_size
-  let cache = lazy (Array_3.make size H0.sentinel H1.sentinel R.sentinel)
-  let mask = pred size
+  (* Creates the array used for the cache, and the mask to be used on keys
+     according to the array size. *)
+  let create () =
+    let size = !cache_size in
+    let array = Array_3.make size H0.sentinel H1.sentinel R.sentinel in
+    array, pred size
+
+  let cache = lazy (create ())
 
   let clear () =
     if Lazy.is_val cache then
-      Array_3.clear !!cache H0.sentinel H1.sentinel R.sentinel
+      let array, _ = Lazy.force cache in
+      Array_3.clear array H0.sentinel H1.sentinel R.sentinel
 
   let merge f a0 a1 =
+    let array, mask = Lazy.force cache in
     let h0 = H0.hash a0 in
     let h1 = H1.hash a1 in
     let has = h1 lsl 5 - h1 + h0
     in
     let has = has land mask in
-
-    if H0.equal (Array_3.get0 !!cache has) a0
-    && H1.equal (Array_3.get1 !!cache has) a1
-    then begin
-      (*      Format.printf "Cache O@.";  *)
-      Array_3.get2 !!cache has
-    end
+    if H0.equal (Array_3.get0 array has) a0
+    && H1.equal (Array_3.get1 array has) a1
+    then
+      Array_3.get2 array has
     else
       let result = f a0 a1 in
-      (*      Format.printf "Cache N@."; *)
-      Array_3.set !!cache has a0 a1 result;
+      Array_3.set array has a0 a1 result;
       result
 end
 
 module Arity_Three (H0: Cacheable) (H1: Cacheable) (H2: Cacheable) (R: Result) =
 struct
-  let size = cache_size
-  let cache =
-    lazy (Array_4.make size H0.sentinel H1.sentinel H2.sentinel R.sentinel)
-  let mask = pred size
+
+  (* Creates the array used for the cache, and the mask to be used on keys
+     according to the array size. *)
+  let create () =
+    let size = !cache_size in
+    let array =
+      Array_4.make size H0.sentinel H1.sentinel H2.sentinel R.sentinel
+    in
+    array, pred size
+
+  let cache = lazy (create ())
 
   let clear () =
     if Lazy.is_val cache then
-      Array_4.clear !!cache H0.sentinel H1.sentinel H2.sentinel R.sentinel
+      let array, _ = Lazy.force cache in
+      Array_4.clear array H0.sentinel H1.sentinel H2.sentinel R.sentinel
 
   let merge f a0 a1 a2 =
+    let array, mask = Lazy.force cache in
     let h0 = H0.hash a0 in
     let h1 = H1.hash a1 in
     let h2 = H2.hash a2 in
     let has = h0 + 117 * h1 + 2375 * h2 in
     let has = has land mask in
-
-    if H0.equal (Array_4.get0 !!cache has) a0
-    && H1.equal (Array_4.get1 !!cache has) a1
-    && H2.equal (Array_4.get2 !!cache has) a2
-    then begin
-      (*      Format.printf "Cache O@.";  *)
-      Array_4.get3 !!cache has
-    end
+    if H0.equal (Array_4.get0 array has) a0
+    && H1.equal (Array_4.get1 array has) a1
+    && H2.equal (Array_4.get2 array has) a2
+    then
+      Array_4.get3 array has
     else
       let result = f a0 a1 a2 in
-      (*      Format.printf "Cache N@."; *)
-      Array_4.set !!cache has a0 a1 a2 result;
+      Array_4.set array has a0 a1 a2 result;
       result
 end
 
@@ -320,55 +322,65 @@ end
 
 module Binary_Predicate (H0: Cacheable) (H1: Cacheable) =
 struct
-  let size = cache_size
-  let cache = lazy (Array_2.make size H0.sentinel H1.sentinel)
-  let result = lazy (Array_Bit.make size)
-  let mask = pred size
+
+  (* Creates two arrays (one for the arguments, one for the boolean result),
+     and the mask to be used on keys according to the array size. *)
+  let create () =
+    let size = !cache_size in
+    let array_args = Array_2.make size H0.sentinel H1.sentinel in
+    let array_result = Array_Bit.make size in
+    array_args, array_result, pred size
+
+  let cache = lazy (create ())
 
   let clear () =
     if Lazy.is_val cache then
-      Array_2.clear !!cache H0.sentinel H1.sentinel;
-    if Lazy.is_val result then
-      Array_Bit.clear !!result
+      let array_args, array_result, _ = Lazy.force cache in
+      Array_2.clear array_args H0.sentinel H1.sentinel;
+      Array_Bit.clear array_result
 
   let merge f a0 a1 =
+    let array_args, array_result, mask = Lazy.force cache in
     let has =
       let h0 = H0.hash a0 in
       let h1 = H1.hash a1 in
       599 * h0 + h1
     in
     let has = has land mask in
-
-    if H0.equal (Array_2.get0 !!cache has) a0
-    && H1.equal (Array_2.get1 !!cache has) a1
-    then begin
-      (*      Format.printf "Cache O@.";  *)
-      Array_Bit.get !!result has
-    end
+    if H0.equal (Array_2.get0 array_args has) a0
+    && H1.equal (Array_2.get1 array_args has) a1
+    then
+      Array_Bit.get array_result has
     else
       let r = f a0 a1 in
-      (*      Format.printf "Cache N@."; *)
-      Array_2.set !!cache has a0 a1;
-      Array_Bit.set !!result has r;
+      Array_2.set array_args has a0 a1;
+      Array_Bit.set array_result has r;
       r
 end
 
 module Symmetric_Binary_Predicate (H0: Cacheable) =
 struct
-  let size = cache_size
-  let cache = lazy (Array_2.make size H0.sentinel H0.sentinel)
-  let result = lazy (Array_Bit.make size)
-  let mask = pred size
+
+  (* Creates two arrays (one for the arguments, one for the boolean result),
+     and the mask to be used on keys according to the array size. *)
+  let create () =
+    let size = !cache_size in
+    let array_args = Array_2.make size H0.sentinel H0.sentinel in
+    let array_result = Array_Bit.make size in
+    array_args, array_result, pred size
+
+  let cache = lazy (create ())
 
   let clear () =
     if Lazy.is_val cache then
-      Array_2.clear !!cache H0.sentinel H0.sentinel;
-    if Lazy.is_val result then
-      Array_Bit.clear !!result
+      let array_args, array_result, _ = Lazy.force cache in
+      Array_2.clear array_args H0.sentinel H0.sentinel;
+      Array_Bit.clear array_result
 
   let hash = H0.hash
 
   let merge f a0 a1 =
+    let array_args, array_result, mask = Lazy.force cache in
     let a0, a1, h0, h1 =
       let h0 = hash a0 in
       let h1 = hash a1 in
@@ -379,18 +391,14 @@ struct
     let has = h1 lsl 5 - h1 + h0
     in
     let has = has land mask in
-
-    if H0.equal (Array_2.get0 !!cache has) a0
-    && H0.equal (Array_2.get1 !!cache has) a1
-    then begin
-      (*      Format.printf "Cache O@.";  *)
-      Array_Bit.get !!result has
-    end
+    if H0.equal (Array_2.get0 array_args has) a0
+    && H0.equal (Array_2.get1 array_args has) a1
+    then
+      Array_Bit.get array_result has
     else
       let r = f a0 a1 in
-      (*      Format.printf "Cache N@."; *)
-      Array_2.set !!cache has a0 a1;
-      Array_Bit.set !!result has r;
+      Array_2.set array_args has a0 a1;
+      Array_Bit.set array_result has r;
       r
 end
 
