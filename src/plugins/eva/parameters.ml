@@ -398,6 +398,20 @@ module JoinResults =
       let default = true
     end)
 
+let () = Parameter_customize.set_group performance
+module MemoryFootprint =
+  Int
+    (struct
+      let default = 6
+      let option_name = "-eva-memory-footprint"
+      let arg_name = "n"
+      let help =
+        "Control the memory usage of the analysis. \
+         With smaller values, the analysis consumes much less memory but is \
+         also slightly slower. Must be between 1 and 10; default is 6."
+    end)
+let () = MemoryFootprint.set_range ~min:1 ~max:10
+
 (* ------------------------------------------------------------------------- *)
 (* --- Non-standard alarms                                               --- *)
 (* ------------------------------------------------------------------------- *)
