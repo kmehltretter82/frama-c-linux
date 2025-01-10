@@ -358,16 +358,6 @@ tr:first-of-type > .eva-table-callsite-box {
 /* ------------------ */
 /* --- Tools Eva  --- */
 .eva-tools {
-  position: sticky;
-  top: 0px;
-  z-index: 10;
-  background-color: var(--background-profound);
-  padding: 5px;
-  border-bottom: solid 1px var(--border-discrete);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
 
   .eva-tools-actions {
     display: flex;

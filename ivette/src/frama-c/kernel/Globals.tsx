@@ -31,7 +31,9 @@ import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
 import { Section, Item } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
-import { Label } from 'dome/controls/labels';
+import { Label, Title } from 'dome/controls/labels';
+import * as Toolbar from 'dome/frame/toolbars';
+import { Hbox } from 'dome/layout/boxes';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import * as Ivette from 'ivette';
@@ -108,8 +110,31 @@ type ListProps = {
   children: JSX.Element[];
 } & InfiniteScrollableListProps
 
-function List(props: ListProps): JSX.Element {
+type InfiniteScrollListProps = {
+  children: JSX.Element[];
+} & InfiniteScrollableListProps
+
+function InfiniteScrollList(props: InfiniteScrollListProps): JSX.Element {
   const [displayedCount, setDisplayedCount] = React.useState(100);
+  const { children, scrollableParent } = props;
+  const count = children.length;
+  return (
+    // @ts-expect-error (incompatibility due to @types/react versions)
+    <InfiniteScroll
+      pageStart={0}
+      loadMore={() => setDisplayedCount(displayedCount + 100)}
+      hasMore={displayedCount < count}
+      loader={<Label key={-1}>Loading more...</Label>}
+      useWindow={false}
+      getScrollParent={() => scrollableParent.current}
+    >
+      {children.slice(0, displayedCount)}
+    </InfiniteScroll>
+  );
+
+}
+
+function List(props: ListProps): JSX.Element {
   const { name, total, filteringMenuItems, children, scrollableParent } = props;
   const Name = name.charAt(0).toUpperCase() + name.slice(1);
   const count = children.length;
@@ -140,18 +165,9 @@ function List(props: ListProps): JSX.Element {
       </div>;
   }
   else {
-    contents =
-      // @ts-expect-error (incompatibility due to @types/react versions)
-      <InfiniteScroll
-        pageStart={0}
-        loadMore={() => setDisplayedCount(displayedCount + 100)}
-        hasMore={displayedCount < count}
-        loader={<Label key={-1}>Loading more...</Label>}
-        useWindow={false}
-        getScrollParent={() => scrollableParent.current}
-      >
-        {children.slice(0, displayedCount)}
-      </InfiniteScroll>;
+    contents = <InfiniteScrollList scrollableParent={scrollableParent}>
+        {children}
+      </InfiniteScrollList>;
   }
 
   return (
@@ -177,6 +193,7 @@ function List(props: ListProps): JSX.Element {
 interface FctItemProps {
   fct: functionsData;
   current: string | undefined;
+  icon?: string;
 }
 
 function FctItem(props: FctItemProps): JSX.Element {
@@ -191,6 +208,7 @@ function FctItem(props: FctItemProps): JSX.Element {
   );
   return (
     <Item
+      icon={props.icon}
       className={className}
       label={name}
       title={signature}
@@ -357,11 +375,13 @@ export function Functions(props: FunctionProps): JSX.Element {
 function makeVarItem(
   scope: States.Scope,
   props: Ast.globalsData,
+  icon?: string
 ): JSX.Element {
   const { name, type, decl } = props;
   return (
     <Item
       key={decl}
+      icon={icon}
       label={name}
       title={type}
       selected={decl === scope}
@@ -372,64 +392,94 @@ function makeVarItem(
 
 type VariablesProps = InfiniteScrollableListProps
 
-export function Variables(props: VariablesProps): JSX.Element {
-
-  // Hooks
-  const scope = States.useCurrentScope();
-  const variables = States.useSyncArrayData(Ast.globals);
-
+interface VariablesFilterRet {
+  contextMenuItems: Dome.PopupMenuItem[],
+  showVariable: (vi: Ast.globalsData) => boolean,
+}
+export function useVariableFilter(): VariablesFilterRet {
   // Filter settings
   function useFlipSettings(label: string, b: boolean): setting {
     return Dome.useFlipSettings('ivette.globals.' + label, b);
   }
-  const stdlib = useFlipSettings('stdlib', false);
-  const extern = useFlipSettings('extern', true);
-  const nonExtern = useFlipSettings('non-extern', true);
-  const isConst = useFlipSettings('const', true);
-  const nonConst = useFlipSettings('non-const', true);
-  const volatile = useFlipSettings('volatile', true);
-  const nonVolatile = useFlipSettings('non-volatile', true);
-  const ghost = useFlipSettings('ghost', true);
-  const nonGhost = useFlipSettings('non-ghost', true);
-  const init = useFlipSettings('init', true);
-  const nonInit = useFlipSettings('non-init', true);
-  const source = useFlipSettings('source', true);
-  const nonSource = useFlipSettings('non-source', false);
+  const stdlibState = useFlipSettings('stdlib', false);
+  const externState = useFlipSettings('extern', true);
+  const nonExternState = useFlipSettings('non-extern', true);
+  const isConstState = useFlipSettings('const', true);
+  const nonConstState = useFlipSettings('non-const', true);
+  const volatileState = useFlipSettings('volatile', true);
+  const nonVolatileState = useFlipSettings('non-volatile', true);
+  const ghostState = useFlipSettings('ghost', true);
+  const nonGhostState = useFlipSettings('non-ghost', true);
+  const initState = useFlipSettings('init', true);
+  const nonInitState = useFlipSettings('non-init', true);
+  const sourceState = useFlipSettings('source', true);
+  const nonSourceState = useFlipSettings('non-source', false);
 
-  function showVariable(vi: Ast.globalsData): boolean {
-    const visible =
-      (stdlib[0] || !vi.stdlib)
-      && (extern[0] || !vi.extern) && (nonExtern[0] || vi.extern)
-      && (isConst[0] || !vi.const) && (nonConst[0] || vi.const)
-      && (volatile[0] || !vi.volatile) && (nonVolatile[0] || vi.volatile)
-      && (ghost[0] || !vi.ghost) && (nonGhost[0] || vi.ghost)
-      && (init[0] || !vi.init) && (nonInit[0] || vi.init)
-      && (source[0] || !vi.source) && (nonSource[0] || vi.source);
-    return !!visible;
-  }
+  const [stdlib, ] = stdlibState;
+  const [extern, ] = externState;
+  const [nonExtern, ] = nonExternState;
+  const [isConst, ] = isConstState;
+  const [nonConst, ] = nonConstState;
+  const [volatile, ] = volatileState;
+  const [nonVolatile, ] = nonVolatileState;
+  const [ghost, ] = ghostState;
+  const [nonGhost, ] = nonGhostState;
+  const [init, ] = initState;
+  const [nonInit, ] = nonInitState;
+  const [source, ] = sourceState;
+  const [nonSource, ] = nonSourceState;
+
+  const showVariable = React.useMemo(() => {
+    return (vi: Ast.globalsData): boolean => {
+      const visible =
+        (stdlib || !vi.stdlib)
+        && (extern || !vi.extern) && (nonExtern || vi.extern)
+        && (isConst || !vi.const) && (nonConst || vi.const)
+        && (volatile || !vi.volatile) && (nonVolatile || vi.volatile)
+        && (ghost || !vi.ghost) && (nonGhost || vi.ghost)
+        && (init || !vi.init) && (nonInit || vi.init)
+        && (source || !vi.source) && (nonSource || vi.source);
+      return !!visible;
+    };
+  }, [stdlib, extern, nonExtern, isConst,
+      nonConst, volatile, nonVolatile, ghost,
+      nonGhost, init, nonInit, source, nonSource
+  ]);
 
   // Context menu to change filter settings
   const contextMenuItems: Dome.PopupMenuItem[] = [
-    menuItem('Show stdlib variables', stdlib),
+    menuItem('Show stdlib variables', stdlibState),
     'separator',
-    menuItem('Show extern variables', extern),
-    menuItem('Show non-extern variables', nonExtern),
+    menuItem('Show extern variables', externState),
+    menuItem('Show non-extern variables', nonExternState),
     'separator',
-    menuItem('Show const variables', isConst),
-    menuItem('Show non-const variables', nonConst),
+    menuItem('Show const variables', isConstState),
+    menuItem('Show non-const variables', nonConstState),
     'separator',
-    menuItem('Show volatile variables', volatile),
-    menuItem('Show non-volatile variables', nonVolatile),
+    menuItem('Show volatile variables', volatileState),
+    menuItem('Show non-volatile variables', nonVolatileState),
     'separator',
-    menuItem('Show ghost variables', ghost),
-    menuItem('Show non-ghost variables', nonGhost),
+    menuItem('Show ghost variables', ghostState),
+    menuItem('Show non-ghost variables', nonGhostState),
     'separator',
-    menuItem('Show variables with explicit initializer', init),
-    menuItem('Show variables without explicit initializer', nonInit),
+    menuItem('Show variables with explicit initializer', initState),
+    menuItem('Show variables without explicit initializer', nonInitState),
     'separator',
-    menuItem('Show variables from the source code', source),
-    menuItem('Show variables generated from analyses', nonSource),
+    menuItem('Show variables from the source code', sourceState),
+    menuItem('Show variables generated from analyses', nonSourceState),
   ];
+
+  return {
+    contextMenuItems: contextMenuItems,
+    showVariable: showVariable
+  };
+}
+
+export function Variables(props: VariablesProps): JSX.Element {
+  // Hooks
+  const scope = States.useCurrentScope();
+  const variables = States.useSyncArrayData(Ast.globals);
+  const { showVariable, contextMenuItems } = useVariableFilter();
 
   // Filtered
   const items =
@@ -534,8 +584,146 @@ export function Types(): JSX.Element {
 }
 
 // --------------------------------------------------------------------------
+// --- Files Section
+// --------------------------------------------------------------------------
+
+type FilesProps = InfiniteScrollableListProps
+
+export function Files(props: FilesProps): JSX.Element {
+  const { scrollableParent } = props;
+  // Hooks
+  const scope = States.useCurrentScope();
+  const { kind, name } = States.useDeclaration(scope);
+
+  // functions
+  const ker = States.useSyncArrayProxy(Ast.functions);
+  const eva = States.useSyncArrayProxy(Eva.functions);
+  const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
+  const { showFunction, contextMenuItems: contextFctMenuItem }
+    = useFunctionFilter();
+  const [showFcts, flipShowFcts]
+    = Dome.useFlipSettings('ivette.show.functions', true);
+
+  // Variables
+  const variables = States.useSyncArrayData(Ast.globals);
+  const { showVariable, contextMenuItems: contextVarMenuItem }
+    = useVariableFilter();
+  const [showVars, flipShowVars]
+    = Dome.useFlipSettings('ivette.show.globals', true);
+
+  // Currently selected function.
+  const current = (scope && kind === 'FUNCTION') ? name : undefined;
+
+  interface InfosFile {
+    label: string,
+    fcts: functionsData[],
+    vars: Ast.globalsData[]
+  }
+
+  type InfosFileList = {[key: string]: InfosFile };
+  const files = React.useMemo(() => {
+    const newFiles: InfosFileList = {};
+
+    fcts.filter(showFunction)
+    .sort((f, g) => alpha(f.name, g.name))
+    .forEach((fct) => {
+      if(newFiles[fct.sloc.file]) newFiles[fct.sloc.file].fcts.push(fct);
+      else newFiles[fct.sloc.file]
+        = { label: fct.sloc.base, fcts: [fct], vars: [] };
+    });
+
+    variables.filter(showVariable)
+      .sort((v1, v2) => alpha(v1.name, v2.name))
+      .forEach((elt) => {
+        if(newFiles[elt.sloc.file]) newFiles[elt.sloc.file].vars.push(elt);
+        else newFiles[elt.sloc.file]
+          = { label: elt.sloc.base, fcts: [], vars: [elt] };
+      });
+
+    return newFiles;
+  }, [fcts, showFunction, variables, showVariable]);
+
+  function getList([path, infos]: [string, InfosFile]): JSX.Element | null {
+    const { label, fcts, vars } = infos;
+    const fctsComp: JSX.Element[] = showFcts ?
+      fcts.map(elt => <FctItem
+        key={elt.key}
+        icon="FUNCTION"
+        fct={elt}
+        current={current} />)
+      : [];
+    const varsComp: JSX.Element[] = showVars ?
+      vars.map((v) => makeVarItem(scope, v, "VARIABLE"))
+      : [];
+    const items = fctsComp.concat(varsComp);
+    if(items.length === 0) return null;
+
+    return (
+      <Section
+        key={path}
+        label={label}
+        title={path}
+        settings={`frama-c.sidebar.files.${path}`}
+        className='globals-section'
+      >
+        <InfiniteScrollList
+          scrollableParent={scrollableParent}
+        >{items}</InfiniteScrollList>
+      </Section>
+    );
+  }
+
+  return <>
+    <Hbox className='dome-xSideBar-title'  >
+      <Hbox style={{ flexWrap: 'wrap', alignContent: 'center' }}>
+        <Title label='Files' />
+      </Hbox>
+      <Hbox>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            icon="FUNCTION"
+            title={'Show functions'}
+            selected={showFcts}
+            onClick={() => flipShowFcts()}
+            />
+          <Toolbar.Button
+            icon='TUNINGS'
+            onClick={() => Dome.popupMenu(contextFctMenuItem)}
+            />
+        </Toolbar.ButtonGroup>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            icon="VARIABLE"
+            title={'Show variables'}
+            selected={showVars}
+            onClick={() => flipShowVars()}
+            />
+          <Toolbar.Button
+            icon='TUNINGS'
+            onClick={() => Dome.popupMenu(contextVarMenuItem)}
+            />
+        </Toolbar.ButtonGroup>
+      </Hbox>
+    </Hbox>
+
+    { Object.entries(files).sort((v1, v2) => alpha(v1[1].label, v2[1].label))
+      .map(elt => getList(elt))
+    }
+  </>;
+}
+
+// --------------------------------------------------------------------------
 // --- All globals
 // --------------------------------------------------------------------------
+
+export function GlobalsFiles(): JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
+  return (
+    <div ref={scrollableArea} className="globals-scrollable-area">
+      <Files scrollableParent={scrollableArea} />
+    </div>
+  );
+}
 
 export default function Globals(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
