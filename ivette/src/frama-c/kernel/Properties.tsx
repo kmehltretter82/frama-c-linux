@@ -82,8 +82,8 @@ function newFilter(
 }
 
 const DEFAULTS: { [key: string]: IFilterContent } = {
+  'currentScope': newFilter(false, "Current scope"),
   /** source */
-  'source.currentScope': newFilter(false, "Current scope"),
   'source.alarms': newFilter(true, "Alarms"),
   'source.libc': newFilter(true, "Libc specifications"),
   'source.others': newFilter(true, "Others"),
@@ -249,18 +249,12 @@ function filterKind(
   }
 }
 
-function filterSource(p: Property, currentScope: States.Scope): boolean {
-  const filtering = currentScope && filter('source.currentScope');
-  const filterScope = filtering ? p.scope === currentScope : true;
-
-  const condAlarms = Boolean(p.alarm)
-  const condLibc = Boolean(
-    p.source.dir.endsWith('share/libc') || p.source.dir === 'FRAMAC_SHARE/libc'
-  )
+function filterSource(p: Property): boolean {
+  const condAlarms = Boolean(p.alarm);
+  const condLibc = p.from_libc;
   const others = Boolean(!condAlarms && !condLibc);
 
-  return filterScope
-    && (filter('source.libc') || !condLibc)
+  return (filter('source.libc') || !condLibc)
     && (filter('source.alarms') || !condAlarms)
     && (filter('source.others') || !others);
 }
@@ -521,11 +515,14 @@ class PropertyModel extends Arrays.CompactModel<PropKey, Property> {
 
   setFilterScope(scope: States.Scope): void {
     this.filterScope = scope;
-    if (filter('source.currentScope')) this.reload();
+    if (filter('currentScope')) this.reload();
   }
 
   filterItem(prop: Property): boolean {
-    return  filterSource(prop, this.filterScope) && filterProperty(prop);
+    const current = this.filterScope;
+    const filtering = current && filter('currentScope');
+    const filterScope = filtering ? prop.scope === current : true;
+    return filterScope && filterSource(prop) && filterProperty(prop);
   }
 
 }
@@ -621,25 +618,24 @@ function PropertyFilter(): JSX.Element {
 
   const getCheckBox = (type: TFilterType): JSX.Element => {
     return <> {
-        Object.entries(DEFAULTS)
-          .filter(([key, ]) => key.startsWith(type+"."))
-          .map(([key, elt]) =>
-            <CheckField key={key} label={elt.label} path={key} title={elt.title}/>
-          )
+      Object.entries(DEFAULTS)
+        .filter(([key, ]) => key.startsWith(type+"."))
+        .map(([key, elt]) =>
+          <CheckField key={key} label={elt.label} path={key} title={elt.title}/>
+        )
     }</>;
   };
 
   return (
     <Scroll>
+      <CheckField label={DEFAULTS.currentScope.label} path="currentScope" />
       <Section
         label="Search"
         defaultUnfold={true}
         className="properties-section-names"
         infos={Form.isValid(namesState.error) && namesState.value.length >= 2 ? "Active" : ""}
         summary={!Form.isValid(namesState.error) ?
-          <IconButton icon='WARNING' kind="warning" title={`Errors in section`}/>
-          : undefined
-        }
+          <Icon id='WARNING' kind="warning" title={`Errors in section`}/> : undefined }
       >
         <Form.TextField
           label={""}

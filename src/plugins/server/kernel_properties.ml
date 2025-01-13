@@ -296,7 +296,7 @@ let () = States.column model ~name:"source"
     ~data:(module Kernel_ast.Position)
     ~get:(fun ip -> Property.location ip |> fst)
 
-let () = States.column model ~name:"libc"
+let () = States.column model ~name:"from_libc"
     ~descr:(Md.plain "Is the property from the Frama-C libc?")
     ~data:(module Jbool)
     ~get:is_libc
