@@ -83,6 +83,7 @@ module Ground: Parameter_sig.Bool
 module Reduce: Parameter_sig.Bool
 module ExtEqual : Parameter_sig.Bool
 module UnfoldAssigns : Parameter_sig.Int
+module Havoc: Parameter_sig.Bool
 module SplitBranch: Parameter_sig.Bool
 module SplitSwitch: Parameter_sig.Bool
 module SplitMax: Parameter_sig.Int

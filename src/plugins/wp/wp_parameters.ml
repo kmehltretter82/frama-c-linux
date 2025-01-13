@@ -407,6 +407,15 @@ module UnfoldAssigns =
   end)
 
 let () = Parameter_customize.set_group wp_strategy
+module Havoc =
+  True(struct
+    let option_name = "-wp-havoc"
+    let help = "Specify the behavior of copying aggregates (struct/union/arrays):
+                - true (old, default): keep using havoc functionnality
+                - false (new): start using memcpy on aggregates"
+  end)
+
+let () = Parameter_customize.set_group wp_strategy
 let () = Parameter_customize.is_invisible ()
 module DynCall =
   True(struct
