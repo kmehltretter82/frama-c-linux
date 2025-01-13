@@ -109,6 +109,10 @@ stdenvNoCC.mkDerivation rec {
 
   outputs = [ "out" "build_dir" ];
 
+  postPatch = ''
+    patchShebangs .
+  '';
+
   preConfigure = ''
     dune build @frama-c-configure
   '';
