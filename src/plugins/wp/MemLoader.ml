@@ -636,7 +636,13 @@ struct
     | C_comp _ | C_array _ ->
       Set(load_init seq.post obj loc, value) :: memcpy_init seq obj loc
 
-  let copied s obj p q = stored s obj p (load_value s.pre obj q)
+  let copied s obj p q = match obj with
+    | C_int _ | C_float _ | C_pointer _ ->
+      stored s obj p (load_value s.pre obj q)
+    | C_comp _ | C_array _ ->
+      Set(load_value s.post obj p, load_value s.pre obj q)
+      :: memcpy s obj ~lsrc:q p
+
 
   let copied_init s obj p q = stored_init s obj p (load_init s.pre obj q)
 
@@ -652,11 +658,12 @@ struct
       [ updated_init_atom seq obj loc (e_var init) ;
         updated_atom seq obj loc (e_var value) ]
     | C_comp _ | C_array _ ->
-      memcpy seq obj loc @ memcpy_init seq obj loc
+      memcpy seq obj ~lsrc:loc loc @ memcpy_init seq obj loc
 
   let assigned_range s obj l a b =
-    memcpy_length s obj (M.shift l obj a) (e_range a b) @
-    memcpy_init_length s obj (M.shift l obj a) (e_range a b)
+    let loc = M.shift l obj a in
+    memcpy_length s obj loc (e_range a b) @
+    memcpy_init_length s obj loc (e_range a b)
 
   let assigned seq obj sloc =
     (* Assert (M.monotonic_init seq.pre seq.post) :: *)

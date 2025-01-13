@@ -40,13 +40,7 @@ struct
   let ty_fst_arg = function
     | Some l :: _ -> l
     | _ -> raise Not_found
-    (*
-  let l_havoc = Qed.Engine.F_call "havoc"
-  let f_havoc =
-    Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
-  let havoc fresh current loc n =
-    Lang.F.e_fun f_havoc [fresh;current;loc;n]
-  *)
+
   let l_memcpy = Qed.Engine.F_call "memcpy"
   let f_memcpy =
     Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
