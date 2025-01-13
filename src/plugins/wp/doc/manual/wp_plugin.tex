@@ -1100,6 +1100,27 @@ weakest precondition calculus.
   it is generally not necessary and it can generates a large number of
   verifications for structures with many (nested) fields. \texttt{-1} enables
   full unfolding.
+\item[\tt -wp-(no-)havoc] selects the behavior of the copy of compounds (default is \texttt{yes}).\\
+  Starting from version \dots, \texttt{havoc}\footnote{it copies of a memory
+  segment from a source map \texttt{msrc} to a target map \texttt{mtgt},
+  starting at the same location \texttt{loc} of size \texttt{length}, it is
+  mainly used with a fresh source map in the context of an \texttt{assign}.}
+  has been replaced by \texttt{memcpy}\footnote{it copies of a memory segment
+  from a source map \texttt{msrc} at a source location \texttt{lsrc} to a target
+  map \texttt{mtgt} at a target location \texttt{ltgt} of size \texttt{length}.}.\\
+  Originally, the operation \texttt{havoc} was exclusively used instead of
+  \texttt{memcpy}, where the main difference lies in the possibility to
+  specify different locations as source and target.\\
+  When this option is set as \texttt{yes}, the semantics of replacing \texttt{havoc}
+  by \texttt{memcpy} is unchanged. The copy of compounds still interprets as a
+  load from the source followed by a store on a fresh map that is then assumed
+  to be equal to the target. \\
+  When this option is set as \texttt{no}, the semantics of the copy of compounds
+  is a direct \texttt{memcpy} from source map/location to target map/location.
+  Therefore, it no longer uses an intermediate fresh map and lemmas expliciting
+  equality between the modified pre map and the post map.
+
+
 \item[\tt -wp-(no)-variant-with-terminates] prove \texttt{loop variant} under
   the termination hypothesis (thus, under a
   \texttt{terminates \textbackslash{}false}, any loop variant proof is trivial)
