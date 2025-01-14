@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module provides a generic monad interface based on Keisli and Categoric
-    defintion of monads. *)
+(** This module provides a generic monad interface based on Keisli and
+    Categoric definitions of monads. *)
 
 
 (** {2 Kleisli triple signature for a monadic type constructor ['a t]}
