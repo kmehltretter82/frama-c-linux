@@ -18,7 +18,7 @@
     "dist:all": "yarn run electron-builder -wlm --dir -c.compression=store -c.mac.identity=null",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "electron-vite build",
+    "build": "electron-vite build --logLevel warn",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
