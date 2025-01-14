@@ -9,7 +9,7 @@
 [eva] forall_loop_invariant.i:10: loop invariant got status valid.
 [eva] forall_loop_invariant.i:11: loop invariant got status valid.
 [eva] forall_loop_invariant.i:12: loop invariant got status valid.
-[eva] forall_loop_invariant.i:14: starting to merge loop iterations
+[eva:partition] forall_loop_invariant.i:14: starting to merge loop iterations
 [eva:alarm] forall_loop_invariant.i:11: Warning: 
   loop invariant got status unknown.
 [eva:alarm] forall_loop_invariant.i:12: Warning: 

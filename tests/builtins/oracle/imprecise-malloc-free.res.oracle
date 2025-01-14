@@ -21,11 +21,14 @@
   Assigning imprecise value to size
   because of arithmetic operation on addresses.
 [eva] imprecise-malloc-free.c:14: Call to builtin malloc
-[eva] imprecise-malloc-free.c:14: allocating variable __malloc_main_l14
+[eva:malloc:new] imprecise-malloc-free.c:14: 
+  allocating variable __malloc_main_l14
 [eva] imprecise-malloc-free.c:15: Call to builtin malloc
-[eva] imprecise-malloc-free.c:15: allocating variable __malloc_main_l15
+[eva:malloc:new] imprecise-malloc-free.c:15: 
+  allocating variable __malloc_main_l15
 [eva] imprecise-malloc-free.c:16: Call to builtin malloc
-[eva] imprecise-malloc-free.c:16: allocating variable __malloc_main_l16
+[eva:malloc:new] imprecise-malloc-free.c:16: 
+  allocating variable __malloc_main_l16
 [eva] imprecise-malloc-free.c:18: 
   Frama_C_show_each:
   {{ &__malloc_main_l14 }}, {{ &__malloc_main_l15 }}, {{ &__malloc_main_l16 }}

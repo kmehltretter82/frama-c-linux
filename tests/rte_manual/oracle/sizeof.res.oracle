@@ -8,11 +8,12 @@
   Called from sizeof.c:14.
 [eva] sizeof.c:9: assertion 'alloca_bounds' got status valid.
 [eva] sizeof.c:9: Call to builtin __fc_vla_alloc
-[eva] sizeof.c:9: allocating variable __malloc_fsize3_l9
+[eva:malloc:new] sizeof.c:9: allocating variable __malloc_fsize3_l9
 [eva] sizeof.c:9: Call to builtin __fc_vla_free
 [eva] Recording results for fsize3
 [eva] Done for function fsize3
-[eva] sizeof.c:14: freeing automatic bases: {__malloc_fsize3_l9}
+[eva:malloc:automatic-free] sizeof.c:14: 
+  freeing automatic bases: {__malloc_fsize3_l9}
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

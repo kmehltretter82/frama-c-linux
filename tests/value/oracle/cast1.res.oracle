@@ -9,8 +9,8 @@
    [1..4] ∈ {0}
   I[0] ∈ {1}
    [1..4] ∈ {0}
-[eva] cast1.i:7: starting to merge loop iterations
-[eva] cast1.i:8: starting to merge loop iterations
+[eva:partition] cast1.i:7: starting to merge loop iterations
+[eva:partition] cast1.i:8: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

@@ -26,7 +26,7 @@
   Called from call.i:20.
 [eva] using specification for function leaf_fun_charp
 [eva] Done for function leaf_fun_charp
-[eva] call.i:23: starting to merge loop iterations
+[eva:partition] call.i:23: starting to merge loop iterations
 [eva] computing for function f <- main.
   Called from call.i:39.
 [eva] Recording results for f

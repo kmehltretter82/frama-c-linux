@@ -1,5 +1,5 @@
 39a40,53
-> [eva] octagons-pointers-simple.c:43: starting to merge loop iterations
+> [eva:partition] octagons-pointers-simple.c:43: starting to merge loop iterations
 > [eva] octagons-pointers-simple.c:46: 
 >   Frama_C_dump_each:
 >   # octagon:

@@ -10,7 +10,7 @@
   Y ∈ {0}
   Z ∈ {0}
 [eva] loops.i:183: assertion got status valid.
-[eva] loops.i:176: starting to merge loop iterations
+[eva:partition] loops.i:176: starting to merge loop iterations
 [eva:alarm] loops.i:179: Warning: signed overflow. assert X + 1 ≤ 2147483647;
 [eva] Recording results for loop
 [eva] Done for function loop

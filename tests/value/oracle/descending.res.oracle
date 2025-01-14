@@ -8,7 +8,7 @@
   Called from descending.i:33.
 [eva] computing for function f <- test1 <- main.
   Called from descending.i:12.
-[eva] descending.i:4: starting to merge loop iterations
+[eva:partition] descending.i:4: starting to merge loop iterations
 [eva] Recording results for f
 [eva] Done for function f
 [eva:alarm] descending.i:13: Warning: 
@@ -19,7 +19,7 @@
 [eva] Done for function test1
 [eva] computing for function test2 <- main.
   Called from descending.i:34.
-[eva] descending.i:22: starting to merge loop iterations
+[eva:partition] descending.i:22: starting to merge loop iterations
 [eva:alarm] descending.i:28: Warning: 
   accessing out of bounds index. assert j < 33;
 [eva] Recording results for test2

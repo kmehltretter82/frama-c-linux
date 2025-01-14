@@ -7,9 +7,9 @@
 [eva] computing for function main1 <- main.
   Called from free.c:44.
 [eva] free.c:8: Call to builtin malloc
-[eva] free.c:8: allocating variable __malloc_main1_l8
+[eva:malloc:new] free.c:8: allocating variable __malloc_main1_l8
 [eva] free.c:10: Call to builtin malloc
-[eva] free.c:10: allocating variable __malloc_main1_l10
+[eva:malloc:new] free.c:10: allocating variable __malloc_main1_l10
 [eva] free.c:13: 
   Frama_C_dump_each:
   # cvalue:
@@ -49,7 +49,7 @@
 [eva:malloc] free.c:14: 
   weak free on bases: {__malloc_main1_l8, __malloc_main1_l10}
 [eva] free.c:16: Call to builtin malloc
-[eva] free.c:16: allocating variable __malloc_main1_l16
+[eva:malloc:new] free.c:16: allocating variable __malloc_main1_l16
 [eva] free.c:18: Call to builtin free
 [eva] free.c:18: function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:18: strong free on bases: {__malloc_main1_l16}
@@ -57,7 +57,7 @@
 [eva] free.c:21: function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:21: strong free on bases: {}
 [eva] free.c:23: Call to builtin malloc
-[eva] free.c:23: allocating variable __malloc_main1_l23
+[eva:malloc:new] free.c:23: allocating variable __malloc_main1_l23
 [eva] free.c:26: Call to builtin free
 [eva] free.c:26: function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:26: weak free on bases: {__malloc_main1_l23}
@@ -66,7 +66,7 @@
 [eva] computing for function main2 <- main.
   Called from free.c:45.
 [eva] free.c:35: Call to builtin malloc
-[eva] free.c:35: allocating variable __malloc_main2_l35
+[eva:malloc:new] free.c:35: allocating variable __malloc_main2_l35
 [eva] free.c:39: Call to builtin free
 [eva] free.c:39: function free: precondition 'freeable' got status valid.
 [eva:malloc] free.c:39: strong free on bases: {__malloc_main2_l35}

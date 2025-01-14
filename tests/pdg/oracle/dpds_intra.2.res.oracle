@@ -52,7 +52,7 @@
   (tmp_4 from test_goto_else())
 [eva] computing for function test_simple_loop <- main.
   Called from dpds_intra.c:131.
-[eva] dpds_intra.c:99: starting to merge loop iterations
+[eva:partition] dpds_intra.c:99: starting to merge loop iterations
 [eva:alarm] dpds_intra.c:100: Warning: 
   signed overflow. assert s + 1 ≤ 2147483647;
 [eva] Recording results for test_simple_loop

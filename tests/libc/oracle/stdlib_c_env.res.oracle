@@ -29,7 +29,7 @@
 [eva] FRAMAC_SHARE/libc/stdlib.c:93: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/stdlib.c:92: starting to merge loop iterations
+[eva:partition] FRAMAC_SHARE/libc/stdlib.c:92: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- __fc_initenv <- putenv <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:93.
 [eva] Done for function Frama_C_interval

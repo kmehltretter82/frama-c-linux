@@ -407,7 +407,7 @@
   pointer subtraction. assert \base_addr(_ss_1) ≡ \base_addr(s1);
 [eva] memchr.c:341: Frama_C_show_each_mymemchr: {3; 4}
 [eva] memchr.c:342: assertion got status valid.
-[eva] memchr.c:340: starting to merge loop iterations
+[eva:partition] memchr.c:340: starting to merge loop iterations
 [eva] memchr.c:341: Call to builtin memchr
 [eva] memchr.c:341: Frama_C_show_each_mymemchr: {3; 4}
 [eva] memchr.c:341: Call to builtin memchr

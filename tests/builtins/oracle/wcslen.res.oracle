@@ -232,7 +232,7 @@
 [eva] wcslen.c:270: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] wcslen.c:271: assertion got status valid.
-[eva] wcslen.c:269: starting to merge loop iterations
+[eva:partition] wcslen.c:269: starting to merge loop iterations
 [eva] wcslen.c:270: Call to builtin wcslen
 [eva] wcslen.c:270: Call to builtin wcslen
 [eva] wcslen.c:270: Call to builtin wcslen
@@ -309,7 +309,7 @@
 [eva] Done for function big_array
 [eva] computing for function negative_offsets <- main.
   Called from wcslen.c:380.
-[eva] wcslen.c:314: starting to merge loop iterations
+[eva:partition] wcslen.c:314: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- negative_offsets <- main.
   Called from wcslen.c:318.
 [eva] wcslen.c:318: 

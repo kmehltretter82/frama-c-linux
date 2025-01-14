@@ -12,7 +12,7 @@
   s ∈ {{ "Bla" }}
   ==END OF DUMP==
 [eva] strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" }}
-[eva] strings_cond.i:4: starting to merge loop iterations
+[eva:partition] strings_cond.i:4: starting to merge loop iterations
 [eva] strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" + {0; 1} }}
 [eva] strings_cond.i:4: Frama_C_show_each_s: {{ "Bla" + {0; 1; 2} }}
 [eva] Recording results for foo

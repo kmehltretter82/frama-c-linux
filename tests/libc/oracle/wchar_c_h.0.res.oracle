@@ -188,7 +188,8 @@
 [eva] FRAMAC_SHARE/libc/wchar.c:98: 
   function wcslen: precondition 'valid_string_s' got status valid.
 [eva] FRAMAC_SHARE/libc/wchar.c:99: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/wchar.c:99: allocating variable __malloc_wcsdup_l99
+[eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:99: 
+  allocating variable __malloc_wcsdup_l99
 [eva] computing for function wmemcpy <- wcsdup <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:104.
 [eva] Recording results for wmemcpy
@@ -199,7 +200,8 @@
   Called from wchar_c_h.c:75.
 [eva] FRAMAC_SHARE/libc/wchar.c:98: Call to builtin wcslen
 [eva] FRAMAC_SHARE/libc/wchar.c:99: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/wchar.c:99: allocating variable __malloc_wcsdup_l99_0
+[eva:malloc:new] FRAMAC_SHARE/libc/wchar.c:99: 
+  allocating variable __malloc_wcsdup_l99_0
 [eva] computing for function wmemcpy <- wcsdup <- main.
   Called from FRAMAC_SHARE/libc/wchar.c:104.
 [eva] Recording results for wmemcpy

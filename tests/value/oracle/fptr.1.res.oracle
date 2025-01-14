@@ -31,7 +31,7 @@
 [eva] Done for function h
 [eva] Recording results for f
 [eva] Done for function f
-[eva] fptr.i:66: starting to merge loop iterations
+[eva:partition] fptr.i:66: starting to merge loop iterations
 [eva] fptr.i:67: Frama_C_show_each_F: {{ &h ; &hh }}
 [eva] computing for function f <- main_uninit.
   Called from fptr.i:68.

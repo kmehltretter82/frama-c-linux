@@ -9,7 +9,7 @@
   w[0..9] ∈ [--..--]
 [eva] computing for function init <- main.
   Called from loop2.i:24.
-[eva] loop2.i:11: starting to merge loop iterations
+[eva:partition] loop2.i:11: starting to merge loop iterations
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init
@@ -20,7 +20,7 @@
 [from] Computing for function f
 [from] Done for function f
 [eva] Done for function f
-[eva] loop2.i:25: starting to merge loop iterations
+[eva:partition] loop2.i:25: starting to merge loop iterations
 [eva] computing for function f <- main.
   Called from loop2.i:27.
 [eva] Recording results for f

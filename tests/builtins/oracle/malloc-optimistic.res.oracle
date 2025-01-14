@@ -9,7 +9,7 @@
 [eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {0}
 [eva] malloc-optimistic.c:16: Frama_C_show_each_1_1: {1}
 [eva] malloc-optimistic.c:17: Call to builtin malloc
-[eva] malloc-optimistic.c:17: allocating variable __malloc_main1_l17
+[eva:malloc:new] malloc-optimistic.c:17: allocating variable __malloc_main1_l17
 [eva] malloc-optimistic.c:17: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:17: 
   resizing variable `__malloc_main1_l17' (0..31) to fit 0..63
@@ -26,7 +26,7 @@
 [eva] malloc-optimistic.c:26: Frama_C_show_each_2_1: {2}
 [eva] malloc-optimistic.c:26: Frama_C_show_each_2_1: {1}
 [eva] malloc-optimistic.c:27: Call to builtin malloc
-[eva] malloc-optimistic.c:27: allocating variable __malloc_main2_l27
+[eva:malloc:new] malloc-optimistic.c:27: allocating variable __malloc_main2_l27
 [eva] malloc-optimistic.c:27: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:27: 
   resizing variable `__malloc_main2_l27' (0..95) to fit 0..63
@@ -43,7 +43,8 @@
 [eva] computing for function main_3_aux <- main3 <- main.
   Called from malloc-optimistic.c:48.
 [eva] malloc-optimistic.c:34: Call to builtin malloc
-[eva] malloc-optimistic.c:34: allocating variable __malloc_main_3_aux_l34
+[eva:malloc:new] malloc-optimistic.c:34: 
+  allocating variable __malloc_main_3_aux_l34
 [eva] Recording results for main_3_aux
 [eva] Done for function main_3_aux
 [eva] computing for function main_3_aux <- main3 <- main.
@@ -65,7 +66,8 @@
 [eva] computing for function main_4_aux <- main4 <- main.
   Called from malloc-optimistic.c:56.
 [eva] malloc-optimistic.c:40: Call to builtin malloc
-[eva] malloc-optimistic.c:40: allocating variable __malloc_main_4_aux_l40
+[eva:malloc:new] malloc-optimistic.c:40: 
+  allocating variable __malloc_main_4_aux_l40
 [eva] Recording results for main_4_aux
 [eva] Done for function main_4_aux
 [eva] computing for function main_4_aux <- main4 <- main.
@@ -83,7 +85,7 @@
 [eva] computing for function main5 <- main.
   Called from malloc-optimistic.c:144.
 [eva] malloc-optimistic.c:64: Call to builtin malloc
-[eva] malloc-optimistic.c:64: allocating variable __malloc_main5_l64
+[eva:malloc:new] malloc-optimistic.c:64: allocating variable __malloc_main5_l64
 [eva] malloc-optimistic.c:64: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:64: 
   resizing variable `__malloc_main5_l64' (0..31) to fit 0..63
@@ -449,7 +451,7 @@
 [eva] computing for function main6 <- main.
   Called from malloc-optimistic.c:145.
 [eva] malloc-optimistic.c:77: Call to builtin malloc
-[eva] malloc-optimistic.c:77: allocating variable __malloc_main6_l77
+[eva:malloc:new] malloc-optimistic.c:77: allocating variable __malloc_main6_l77
 [eva] malloc-optimistic.c:77: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:77: 
   resizing variable `__malloc_main6_l77' (0..31) to fit 0..63
@@ -880,7 +882,7 @@
 [eva] computing for function main7 <- main.
   Called from malloc-optimistic.c:148.
 [eva] malloc-optimistic.c:90: Call to builtin malloc
-[eva] malloc-optimistic.c:90: allocating variable __malloc_main7_l90
+[eva:malloc:new] malloc-optimistic.c:90: allocating variable __malloc_main7_l90
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31) to fit 0..63
@@ -1782,7 +1784,7 @@
   ==END OF DUMP==
 [eva] malloc-optimistic.c:94: Call to builtin free
 [eva:malloc] malloc-optimistic.c:94: strong free on bases: {__malloc_main7_l90}
-[eva] malloc-optimistic.c:88: starting to merge loop iterations
+[eva:partition] malloc-optimistic.c:88: starting to merge loop iterations
 [eva] malloc-optimistic.c:90: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:90: 
   resizing variable `__malloc_main7_l90' (0..31/543) to fit 0..511/575
@@ -1875,7 +1877,8 @@
 [eva] computing for function main8 <- main.
   Called from malloc-optimistic.c:149.
 [eva] malloc-optimistic.c:103: Call to builtin malloc
-[eva] malloc-optimistic.c:103: allocating variable __malloc_main8_l103
+[eva:malloc:new] malloc-optimistic.c:103: 
+  allocating variable __malloc_main8_l103
 [eva] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_main8_l103' (0..31) to fit 0..63
@@ -2976,7 +2979,7 @@
 [eva] malloc-optimistic.c:107: Call to builtin free
 [eva:malloc] malloc-optimistic.c:107: 
   weak free on bases: {__malloc_w_main8_l103}
-[eva] malloc-optimistic.c:101: starting to merge loop iterations
+[eva:partition] malloc-optimistic.c:101: starting to merge loop iterations
 [eva] malloc-optimistic.c:103: Call to builtin malloc
 [eva:malloc] malloc-optimistic.c:103: 
   resizing variable `__malloc_w_main8_l103' (0..31/543) to fit 0..511/575
@@ -3120,7 +3123,8 @@
 [eva] computing for function main9 <- main.
   Called from malloc-optimistic.c:150.
 [eva] malloc-optimistic.c:119: Call to builtin malloc
-[eva] malloc-optimistic.c:119: allocating variable __malloc_main9_l119
+[eva:malloc:new] malloc-optimistic.c:119: 
+  allocating variable __malloc_main9_l119
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {0}, {{ &__malloc_main9_l119 }}
 [eva] malloc-optimistic.c:122: Frama_C_show_each: {0}
@@ -3370,7 +3374,7 @@
   Called from malloc-optimistic.c:123.
 [eva] Recording results for main9_aux
 [eva] Done for function main9_aux
-[eva] malloc-optimistic.c:118: starting to merge loop iterations
+[eva:partition] malloc-optimistic.c:118: starting to merge loop iterations
 [eva] malloc-optimistic.c:119: Call to builtin malloc
 [eva] malloc-optimistic.c:120: 
   Frama_C_show_each: {30; 31}, {{ &__malloc_w_main9_l119 }}

@@ -8,13 +8,14 @@
 [eva] computing for function simple_loops <- main.
   Called from auto_loop_unroll.c:428.
 [eva:loop-unroll:auto] auto_loop_unroll.c:24: Automatic loop unrolling.
-[eva] auto_loop_unroll.c:24: Trace partitioning superposing up to 100 states
+[eva:partition] auto_loop_unroll.c:24: 
+  Trace partitioning superposing up to 100 states
 [eva] auto_loop_unroll.c:27: Frama_C_show_each_auto: {100}
-[eva] auto_loop_unroll.c:30: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:30: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:31: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:33: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] auto_loop_unroll.c:38: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:38: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:39: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:41: Frama_C_show_each_imprecise: [0..2147483647]
@@ -30,7 +31,8 @@
 [eva:loop-unroll:auto] auto_loop_unroll.c:67: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:72: Frama_C_show_each_80: {80}
 [eva:loop-unroll:auto] auto_loop_unroll.c:75: Automatic loop unrolling.
-[eva] auto_loop_unroll.c:75: Trace partitioning superposing up to 100 states
+[eva:partition] auto_loop_unroll.c:75: 
+  Trace partitioning superposing up to 100 states
 [eva] auto_loop_unroll.c:82: Frama_C_show_each_32_80: [32..80]
 [eva] computing for function Frama_C_interval <- various_loops <- main.
   Called from auto_loop_unroll.c:86.
@@ -276,7 +278,7 @@
 [eva] auto_loop_unroll.c:122: Frama_C_show_each_32_64: [32..64]
 [eva:loop-unroll:auto] auto_loop_unroll.c:125: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:132: Frama_C_show_each_1_28: [1..28]
-[eva] auto_loop_unroll.c:134: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:134: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:139: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:141: Frama_C_show_each_top: [0..2147483647]
@@ -284,21 +286,21 @@
 [eva] Done for function various_loops
 [eva] computing for function complex_loops <- main.
   Called from auto_loop_unroll.c:430.
-[eva] auto_loop_unroll.c:152: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:152: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:154: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:156: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] auto_loop_unroll.c:160: starting to merge loop iterations
-[eva] auto_loop_unroll.c:161: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:160: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:161: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:165: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:168: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] auto_loop_unroll.c:171: starting to merge loop iterations
-[eva] auto_loop_unroll.c:172: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:171: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:172: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:176: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:179: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] auto_loop_unroll.c:183: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:183: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:186: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:188: Frama_C_show_each_imprecise: [0..2147483647]
@@ -306,7 +308,7 @@
   Called from auto_loop_unroll.c:193.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
-[eva] auto_loop_unroll.c:192: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:192: starting to merge loop iterations
 [eva] computing for function incr_g <- complex_loops <- main.
   Called from auto_loop_unroll.c:193.
 [eva] Recording results for incr_g
@@ -324,11 +326,11 @@
 [eva:alarm] auto_loop_unroll.c:195: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:197: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] auto_loop_unroll.c:202: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:202: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:204: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:206: Frama_C_show_each_imprecise: [0..2147483647]
-[eva] auto_loop_unroll.c:210: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:210: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:212: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:alarm] auto_loop_unroll.c:211: Warning: 
@@ -349,7 +351,8 @@
 [eva:loop-unroll:auto] auto_loop_unroll.c:245: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:250: Frama_C_show_each_0_15: [0..15]
 [eva:loop-unroll:auto] auto_loop_unroll.c:252: Automatic loop unrolling.
-[eva] auto_loop_unroll.c:252: Trace partitioning superposing up to 100 states
+[eva:partition] auto_loop_unroll.c:252: 
+  Trace partitioning superposing up to 100 states
 [eva] auto_loop_unroll.c:257: Frama_C_show_each_11_111: [11..111]
 [eva:loop-unroll:auto] auto_loop_unroll.c:262: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:265: Frama_C_show_each_16: {16}
@@ -365,7 +368,7 @@
 [eva] auto_loop_unroll.c:288: Frama_C_show_each_22: {22}
 [eva:loop-unroll:auto] auto_loop_unroll.c:291: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:296: Frama_C_show_each_23: {23}
-[eva] auto_loop_unroll.c:299: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:299: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:302: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva:alarm] auto_loop_unroll.c:299: Warning: 
@@ -378,10 +381,11 @@
 [eva:loop-unroll:auto] auto_loop_unroll.c:310: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:315: Frama_C_show_each_30: {30}
 [eva:loop-unroll:auto] auto_loop_unroll.c:319: Automatic loop unrolling.
-[eva] auto_loop_unroll.c:319: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:319: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:320: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
-[eva] auto_loop_unroll.c:319: Trace partitioning superposing up to 100 states
+[eva:partition] auto_loop_unroll.c:319: 
+  Trace partitioning superposing up to 100 states
 [eva] auto_loop_unroll.c:324: Frama_C_show_each_top: [31..2147483647]
 [eva:loop-unroll:auto] auto_loop_unroll.c:327: Automatic loop unrolling.
 [eva] auto_loop_unroll.c:333: Frama_C_show_each_32: {32}
@@ -391,7 +395,7 @@
 [eva] auto_loop_unroll.c:341: Frama_C_show_each_33_inf: [33..2147483647]
 [eva:alarm] auto_loop_unroll.c:345: Warning: 
   signed overflow. assert i + 1 ≤ 2147483647;
-[eva] auto_loop_unroll.c:344: starting to merge loop iterations
+[eva:partition] auto_loop_unroll.c:344: starting to merge loop iterations
 [eva:alarm] auto_loop_unroll.c:344: Warning: 
   signed overflow. assert res + 1 ≤ 2147483647;
 [eva] auto_loop_unroll.c:349: Frama_C_show_each_top: [0..2147483647]

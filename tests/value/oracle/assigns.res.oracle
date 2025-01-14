@@ -31,7 +31,7 @@
   Called from assigns.i:49.
 [eva] using specification for function f
 [eva] Done for function f
-[eva] assigns.i:48: starting to merge loop iterations
+[eva:partition] assigns.i:48: starting to merge loop iterations
 [eva] computing for function f <- main1 <- main.
   Called from assigns.i:49.
 [eva] Done for function f

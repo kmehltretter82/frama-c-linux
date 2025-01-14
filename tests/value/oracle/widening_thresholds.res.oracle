@@ -11,7 +11,7 @@
   Called from widening_thresholds.i:21.
 [eva] Recording results for incr_modulo
 [eva] Done for function incr_modulo
-[eva] widening_thresholds.i:18: starting to merge loop iterations
+[eva:partition] widening_thresholds.i:18: starting to merge loop iterations
 [eva] computing for function incr_modulo <- modulo <- main.
   Called from widening_thresholds.i:21.
 [eva] Recording results for incr_modulo

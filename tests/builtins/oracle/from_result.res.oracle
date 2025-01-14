@@ -7,13 +7,13 @@
 [eva] computing for function bar <- main.
   Called from from_result.c:32.
 [eva] from_result.c:18: Call to builtin malloc
-[eva] from_result.c:18: allocating variable __malloc_bar_l18
+[eva:malloc:new] from_result.c:18: allocating variable __malloc_bar_l18
 [eva] Recording results for bar
 [eva] Done for function bar
 [eva] computing for function bar <- main.
   Called from from_result.c:33.
 [eva] from_result.c:18: Call to builtin malloc
-[eva] from_result.c:18: allocating variable __malloc_bar_l18_0
+[eva:malloc:new] from_result.c:18: allocating variable __malloc_bar_l18_0
 [eva] Recording results for bar
 [eva] Done for function bar
 [eva] computing for function create_t <- main.

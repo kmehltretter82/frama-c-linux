@@ -15,7 +15,7 @@
 [eva] absorb.c:19: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] absorb.c:22: starting to merge loop iterations
+[eva:partition] absorb.c:22: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

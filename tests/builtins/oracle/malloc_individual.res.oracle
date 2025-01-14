@@ -8,7 +8,7 @@
   B ∈ {0}
   C ∈ {0}
 [eva] malloc_individual.c:12: Call to builtin malloc
-[eva] malloc_individual.c:12: allocating variable __malloc_main_l12
+[eva:malloc:new] malloc_individual.c:12: allocating variable __malloc_main_l12
 [eva:alarm] malloc_individual.c:15: Warning: 
   accessing uninitialized left-value. assert \initialized(p);
 [eva] Recording results for main

@@ -10,7 +10,7 @@
   Y ∈ [--..--]
   Z ∈ [--..--]
 [eva] loops.i:68: assertion got status valid.
-[eva] loops.i:66: starting to merge loop iterations
+[eva:partition] loops.i:66: starting to merge loop iterations
 [kernel:annot:missing-spec] loops.i:70: Warning: 
   Neither code nor specification for function stop,
    generating default assigns. See -generated-spec-* options for more info

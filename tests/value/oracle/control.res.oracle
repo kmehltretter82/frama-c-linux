@@ -7,7 +7,7 @@
   y ∈ {0}
   c ∈ {0}
   d ∈ {0}
-[eva] control.i:11: starting to merge loop iterations
+[eva:partition] control.i:11: starting to merge loop iterations
 [eva:alarm] control.i:14: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for f
 [eva] Done for function f

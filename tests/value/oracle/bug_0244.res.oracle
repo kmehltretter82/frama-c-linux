@@ -7,7 +7,7 @@
   p ∈ {0}
 [eva:locals-escaping] bug_0244.i:10: Warning: 
   locals {u} escaping the scope of a block of main through p
-[eva] bug_0244.i:7: starting to merge loop iterations
+[eva:partition] bug_0244.i:7: starting to merge loop iterations
 [eva:alarm] bug_0244.i:12: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);

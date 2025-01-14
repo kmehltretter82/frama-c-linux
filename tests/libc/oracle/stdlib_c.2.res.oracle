@@ -7,7 +7,8 @@
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:15.
 [eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: allocating variable __malloc_calloc_l72
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:72: 
+  allocating variable __malloc_calloc_l72
 [eva] computing for function memset <- calloc <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:73.
 [eva] using specification for function memset
@@ -28,7 +29,8 @@
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:22.
 [eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: allocating variable __malloc_calloc_l72_0
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:72: 
+  allocating variable __malloc_calloc_l72_0
 [eva] computing for function memset <- calloc <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:73.
 [eva:alarm] FRAMAC_SHARE/libc/stdlib.c:73: Warning: 
@@ -45,13 +47,14 @@
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
 [eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:72: allocating variable __malloc_calloc_l72_1
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:72: 
+  allocating variable __malloc_calloc_l72_1
 [eva] computing for function memset <- calloc <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:73.
 [eva] Done for function memset
 [eva] Recording results for calloc
 [eva] Done for function calloc
-[eva] stdlib_c.c:32: starting to merge loop iterations
+[eva:partition] stdlib_c.c:32: starting to merge loop iterations
 [eva] computing for function calloc <- main.
   Called from stdlib_c.c:33.
 [eva] FRAMAC_SHARE/libc/stdlib.c:72: Call to builtin Frama_C_malloc
@@ -99,7 +102,7 @@
 [eva] FRAMAC_SHARE/libc/stdlib.c:200: 
   assertion 'alignment_is_a_suitable_power_of_two' got status valid.
 [eva] FRAMAC_SHARE/libc/stdlib.c:203: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:203: 
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:203: 
   allocating variable __malloc_posix_memalign_l203
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
@@ -112,7 +115,7 @@
 [eva] computing for function posix_memalign <- main.
   Called from stdlib_c.c:40.
 [eva] FRAMAC_SHARE/libc/stdlib.c:203: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:203: 
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:203: 
   allocating variable __malloc_posix_memalign_l203_0
 [eva] Recording results for posix_memalign
 [eva] Done for function posix_memalign
@@ -122,7 +125,7 @@
 [eva] stdlib_c.c:41: function free: precondition 'freeable' got status valid.
 [eva] Done for function free
 [eva] stdlib_c.c:44: Call to builtin Frama_C_malloc
-[eva] stdlib_c.c:44: allocating variable __malloc_main_l44
+[eva:malloc:new] stdlib_c.c:44: allocating variable __malloc_main_l44
 [eva] computing for function realpath <- main.
   Called from stdlib_c.c:46.
 [eva] computing for function Frama_C_interval <- realpath <- main.
@@ -166,7 +169,8 @@
   Called from FRAMAC_SHARE/libc/stdlib.c:226.
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/stdlib.c:228: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:228: allocating variable __malloc_realpath_l228
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:228: 
+  allocating variable __malloc_realpath_l228
 [eva] computing for function Frama_C_make_unknown <- realpath <- main.
   Called from FRAMAC_SHARE/libc/stdlib.c:234.
 [eva] Done for function Frama_C_make_unknown
@@ -185,7 +189,7 @@
   Called from FRAMAC_SHARE/libc/stdlib.c:226.
 [eva] Done for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/stdlib.c:228: Call to builtin Frama_C_malloc
-[eva] FRAMAC_SHARE/libc/stdlib.c:228: 
+[eva:malloc:new] FRAMAC_SHARE/libc/stdlib.c:228: 
   allocating variable __malloc_realpath_l228_0
 [eva] computing for function Frama_C_make_unknown <- realpath <- 
                           canonicalize_file_name <- main.

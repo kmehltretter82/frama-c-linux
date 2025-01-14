@@ -14,7 +14,7 @@
 [eva] computing for function Frama_C_interval <- test_loop_split.
   Called from partitioning-annots.c:145.
 [eva] Done for function Frama_C_interval
-[eva] partitioning-annots.c:143: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:143: starting to merge loop iterations
 [eva] computing for function Frama_C_interval <- test_loop_split.
   Called from partitioning-annots.c:145.
 [eva] Done for function Frama_C_interval

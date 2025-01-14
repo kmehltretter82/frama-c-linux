@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   p ∈ {0}
 [eva] memset_malloc_0.c:17: Call to builtin malloc
-[eva] memset_malloc_0.c:17: allocating variable __malloc_main_l17
+[eva:malloc:new] memset_malloc_0.c:17: allocating variable __malloc_main_l17
 [eva] memset_malloc_0.c:18: Call to builtin memset
 [eva] memset_malloc_0.c:18: 
   function memset: precondition 'valid_s' got status valid.

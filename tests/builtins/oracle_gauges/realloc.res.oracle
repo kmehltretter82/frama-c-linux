@@ -260,7 +260,7 @@
 >   __realloc_w_main10_l152[0] ∈ {4}
 >                          [1] ∈ UNINITIALIZED
 >   ==END OF DUMP==
-> [eva] realloc.c:150: starting to merge loop iterations
+> [eva:partition] realloc.c:150: starting to merge loop iterations
 > [eva] realloc.c:152: Call to builtin realloc
 > [eva:malloc] bases_to_realloc: {__realloc_w_main10_l152}
 > [eva:malloc] realloc.c:152: weak free on bases: {__realloc_w_main10_l152}
@@ -380,7 +380,7 @@
 >   marking variable `__realloc_main11_l171' as weak
 > [eva:malloc] realloc.c:171: strong free on bases: {}
 > [eva] realloc.c:172: Frama_C_show_each_p: {{ NULL ; &__realloc_w_main11_l171 }}
-> [eva] realloc.c:163: starting to merge loop iterations
+> [eva:partition] realloc.c:163: starting to merge loop iterations
 > [eva] realloc.c:165: Call to builtin reallocarray
 > [eva:malloc] bases_to_realloc: {__realloc_w_main11_l171}
 > [eva:malloc] realloc.c:165: weak free on bases: {__realloc_w_main11_l171}

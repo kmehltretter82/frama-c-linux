@@ -51,16 +51,16 @@
   Called from red_alarms.i:97.
 [eva:alarm] red_alarms.i:45: Warning: 
   accessing out of bounds index. assert i < 32;
-[eva] red_alarms.i:47: starting to merge loop iterations
+[eva:partition] red_alarms.i:47: starting to merge loop iterations
 [eva:alarm] red_alarms.i:48: Warning: out of bounds write. assert \valid(p);
-[eva] red_alarms.i:52: starting to merge loop iterations
+[eva:partition] red_alarms.i:52: starting to merge loop iterations
 [eva:alarm] red_alarms.i:53: Warning: 
   accessing out of bounds index. assert i < 32;
 [eva:alarm] red_alarms.i:57: Warning: 
   accessing out of bounds index. assert i < 32;
 [kernel] red_alarms.i:57: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
-[eva] red_alarms.i:60: starting to merge loop iterations
+[eva:partition] red_alarms.i:60: starting to merge loop iterations
 [eva:alarm] red_alarms.i:61: Warning: 
   accessing out of bounds index. assert i < 32;
 [kernel] red_alarms.i:61: Warning: 

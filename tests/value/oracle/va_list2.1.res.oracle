@@ -30,7 +30,7 @@
                           (tmp_0 from vararg)
 [eva] va_list2.c:21: 
   Frama_C_show_each_f: [-3.40282346639e+38 .. 3.40282346639e+38]
-[eva] va_list2.c:12: starting to merge loop iterations
+[eva:partition] va_list2.c:12: starting to merge loop iterations
 [eva:alarm] va_list2.c:13: Warning: out of bounds read. assert \valid_read(fmt);
 [eva] computing for function __builtin_va_arg <- main.
   Called from va_list2.c:15.

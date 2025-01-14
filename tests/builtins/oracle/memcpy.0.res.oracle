@@ -64,7 +64,7 @@
 [eva] Done for function many
 [eva] computing for function init <- test <- main.
   Called from memcpy.c:69.
-[eva] memcpy.c:24: Trace partitioning superposing up to 100 states
+[eva:partition] memcpy.c:24: Trace partitioning superposing up to 100 states
 [eva] Recording results for init
 [from] Computing for function init
 [from] Done for function init
@@ -143,7 +143,7 @@
   function memcpy: precondition 'separation' got status unknown.
 [eva:imprecision] memcpy.c:100: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva] memcpy.c:99: starting to merge loop iterations
+[eva:partition] memcpy.c:99: starting to merge loop iterations
 [eva] memcpy.c:100: Call to builtin memcpy
 [eva] memcpy.c:105: Call to builtin memcpy
 [eva] memcpy.c:105: function memcpy: precondition 'valid_dest' got status valid.
@@ -156,7 +156,7 @@
 [eva] memcpy.c:109: function memcpy: precondition 'separation' got status valid.
 [eva:imprecision] memcpy.c:109: 
   In memcpy builtin: too many sizes to enumerate, possible loss of precision
-[eva] memcpy.c:114: starting to merge loop iterations
+[eva:partition] memcpy.c:114: starting to merge loop iterations
 [eva] memcpy.c:118: Call to builtin memcpy
 [eva:alarm] memcpy.c:118: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -164,7 +164,7 @@
 [eva] memcpy.c:118: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:118: 
   too many locations to update in array. Approximating.
-[eva] memcpy.c:122: starting to merge loop iterations
+[eva:partition] memcpy.c:122: starting to merge loop iterations
 [eva] memcpy.c:126: Call to builtin memcpy
 [eva:alarm] memcpy.c:126: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -172,7 +172,7 @@
 [eva] memcpy.c:126: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:126: 
   too many locations to update in array. Approximating.
-[eva] memcpy.c:130: starting to merge loop iterations
+[eva:partition] memcpy.c:130: starting to merge loop iterations
 [eva] memcpy.c:135: Call to builtin memcpy
 [eva:alarm] memcpy.c:135: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.
@@ -180,7 +180,7 @@
 [eva] memcpy.c:135: function memcpy: precondition 'separation' got status valid.
 [kernel:approximation] memcpy.c:135: 
   too many locations to update in array. Approximating.
-[eva] memcpy.c:139: starting to merge loop iterations
+[eva:partition] memcpy.c:139: starting to merge loop iterations
 [eva] memcpy.c:144: Call to builtin memcpy
 [eva:alarm] memcpy.c:144: Warning: 
   function memcpy: precondition 'valid_dest' got status unknown.

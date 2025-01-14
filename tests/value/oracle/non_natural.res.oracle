@@ -49,7 +49,7 @@
   accessing uninitialized left-value.
   assert \initialized(tmp_14);
   (tmp_14 from from++)
-[eva] non_natural.i:21: starting to merge loop iterations
+[eva:partition] non_natural.i:21: starting to merge loop iterations
 [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + {0; 32} }}
 [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + {0; 32; 64} }}
 [eva] non_natural.i:22: Frama_C_show_each: {{ &p2 + {0; 32; 64; 96} }}

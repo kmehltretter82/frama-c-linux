@@ -6,7 +6,7 @@
   G ∈ {0}
   GHOST ∈ {0}
   H ∈ {0}
-[eva] ghost.i:16: starting to merge loop iterations
+[eva:partition] ghost.i:16: starting to merge loop iterations
 [eva:alarm] ghost.i:17: Warning: signed overflow. assert G + 1 ≤ 2147483647;
 [eva] Recording results for main
 [eva] Done for function main

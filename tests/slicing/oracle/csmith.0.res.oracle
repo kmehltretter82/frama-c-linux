@@ -45,7 +45,7 @@
 [eva] Done for function bts879b
 [eva] computing for function bts899 <- main.
   Called from csmith.i:243.
-[eva] csmith.i:135: starting to merge loop iterations
+[eva:partition] csmith.i:135: starting to merge loop iterations
 [eva:alarm] csmith.i:141: Warning: signed overflow. assert x + 1 ≤ 2147483647;
 [eva] Recording results for bts899
 [eva] Done for function bts899
@@ -54,8 +54,8 @@
                    (tmp_5 from bts899())
 [eva] computing for function bts906 <- main.
   Called from csmith.i:244.
-[eva] csmith.i:149: starting to merge loop iterations
-[eva] csmith.i:150: starting to merge loop iterations
+[eva:partition] csmith.i:149: starting to merge loop iterations
+[eva:partition] csmith.i:150: starting to merge loop iterations
 [eva] Recording results for bts906
 [eva] Done for function bts906
 [eva:alarm] csmith.i:244: Warning: 
@@ -63,8 +63,8 @@
                    (tmp_6 from bts906())
 [eva] computing for function bts906b <- main.
   Called from csmith.i:245.
-[eva] csmith.i:168: starting to merge loop iterations
-[eva] csmith.i:169: starting to merge loop iterations
+[eva:partition] csmith.i:168: starting to merge loop iterations
+[eva:partition] csmith.i:169: starting to merge loop iterations
 [eva] Recording results for bts906b
 [eva] Done for function bts906b
 [eva:alarm] csmith.i:245: Warning: 
@@ -72,7 +72,7 @@
                    (tmp_7 from bts906b())
 [eva] computing for function bts963 <- main.
   Called from csmith.i:247.
-[eva] csmith.i:211: starting to merge loop iterations
+[eva:partition] csmith.i:211: starting to merge loop iterations
 [eva] Recording results for bts963
 [eva] Done for function bts963
 [eva:alarm] csmith.i:247: Warning: 
@@ -80,7 +80,7 @@
                    (tmp_8 from bts963())
 [eva] computing for function bts963b <- main.
   Called from csmith.i:248.
-[eva] csmith.i:223: starting to merge loop iterations
+[eva:partition] csmith.i:223: starting to merge loop iterations
 [eva] Recording results for bts963b
 [eva] Done for function bts963b
 [eva:alarm] csmith.i:248: Warning: 

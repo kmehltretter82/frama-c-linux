@@ -9,7 +9,7 @@
 [eva] bug0196.c:8: assertion got status valid.
 [eva] bug0196.c:11: cannot evaluate ACSL term, \at() on a C label is unsupported
 [eva:alarm] bug0196.c:11: Warning: assertion got status unknown.
-[eva] bug0196.c:7: starting to merge loop iterations
+[eva:partition] bug0196.c:7: starting to merge loop iterations
 [eva:alarm] bug0196.c:10: Warning: 
   signed overflow. assert r * tmp ≤ 2147483647;
                    (tmp from n--)

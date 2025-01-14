@@ -171,7 +171,7 @@
   Called from taint.c:215.
 [eva:loop-unroll:auto] taint.c:157: Automatic loop unrolling.
 [eva:loop-unroll:partial] taint.c:157: loop not completely unrolled
-[eva] taint.c:157: starting to merge loop iterations
+[eva:partition] taint.c:157: starting to merge loop iterations
 [eva:alarm] taint.c:157: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] taint.c:165: 
   Frama_C_dump_each:

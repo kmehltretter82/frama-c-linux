@@ -47,7 +47,7 @@
         "garbled-mix:assigns", "garbled-mix:summary", "garbled-mix:write",
         "invalid-assigns", "loop-unroll:auto", "loop-unroll:missing",
         "loop-unroll:missing:for", "loop-unroll:partial", "malloc:weak",
-        "watchpoint"
+        "recursion", "watchpoint"
       ]
     }
   },

@@ -30,9 +30,7 @@
 [variadic] scanf.c:25: 
   Fallback translation of call scanf to a call to the specialized version scanf_fallback_1.
 [eva] Analyzing a complete application starting at main
-[eva] using specification for function scanf_va_1
-[eva] using specification for function scanf_va_2
-[eva] using specification for function scanf_va_3
+[eva] using specification for function scanf
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   c[0] ∈ [--..--]

@@ -48,7 +48,7 @@
 [from] Computing for function loop_body
 [from] Done for function loop_body
 [eva] Done for function loop_body
-[eva] bts334.i:53: starting to merge loop iterations
+[eva:partition] bts334.i:53: starting to merge loop iterations
 [eva] computing for function loop_body <- process <- main_init.
   Called from bts334.i:53.
 [eva] computing for function f <- loop_body <- process <- main_init.

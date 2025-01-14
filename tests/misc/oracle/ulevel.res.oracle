@@ -2,8 +2,8 @@
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   
-[eva] ulevel.i:13: starting to merge loop iterations
-[eva] ulevel.i:12: starting to merge loop iterations
+[eva:partition] ulevel.i:13: starting to merge loop iterations
+[eva:partition] ulevel.i:12: starting to merge loop iterations
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {4}

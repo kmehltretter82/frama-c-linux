@@ -11,8 +11,8 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] for_loops.c:30: Frama_C_show_each_F: {0}
-[eva] for_loops.c:27: starting to merge loop iterations
-[eva] for_loops.c:29: starting to merge loop iterations
+[eva:partition] for_loops.c:27: starting to merge loop iterations
+[eva:partition] for_loops.c:29: starting to merge loop iterations
 [eva] for_loops.c:30: Frama_C_show_each_F: {0; 1}
 [eva] for_loops.c:30: Frama_C_show_each_F: {0; 1; 2}
 [eva] for_loops.c:30: Frama_C_show_each_F: [0..2147483647]

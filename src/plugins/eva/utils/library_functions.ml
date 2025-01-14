@@ -109,9 +109,9 @@ let warn_unsupported_spec name =
     let header = Hashtbl.find unsupported_specs_tbl name in
     Self.warning ~once:true ~current:true
       ~wkey:Self.wkey_libc_unsupported_spec
-      "@[The specification of function '%s' is currently not supported by Eva.@ \
+      "@[The specification of function '%a' is currently not supported by Eva.@ \
        Consider adding '%a'@ to the analyzed source files.@]"
-      name Filepath.Normalized.pretty
+      Printer.pp_varname name Filepath.Normalized.pretty
       (Filepath.Normalized.concat System_config.Share.libc header)
   with Not_found -> ()
 

@@ -29,6 +29,14 @@ open Lattice_bounds
 let dkey = Self.register_category "malloc"
     ~help:"messages from the builtins interpreting dynamic allocations"
 
+let dkey_new = Self.register_category "malloc:new"
+    ~help:"messages emitted at the creation of new bases"
+let () = Self.add_debug_keys dkey_new
+
+let dkey_auto_free = Self.register_category "malloc:automatic-free"
+    ~help:"messages emitted when bases are automatically freed (alloca or VLA)"
+let () = Self.add_debug_keys dkey_auto_free
+
 let wkey_weak_alloc = Self.register_warn_category "malloc:weak"
 let () = Self.set_warn_status wkey_weak_alloc Log.Winactive
 
@@ -322,7 +330,7 @@ let alloc_fresh weak deallocation prefix sizev _state =
   let tsize = guess_intended_malloc_type stack sizev (weak = Strong) in
   let type_base = type_from_nb_elems tsize in
   let var = create_new_var stack prefix type_base weak in
-  Self.result ~current:true ~once:true
+  Self.result ~dkey:dkey_new ~current:true ~once:true
     "@[allocating %svariable %a@]%t"
     (if weak = Weak then "weak " else "") Printer.pp_varinfo var
     Eva_utils.pp_callstack;
@@ -688,7 +696,7 @@ let free_automatic_bases stack state =
   in
   if Base.Hptset.is_empty bases_to_free then state
   else begin
-    Self.result ~current:true ~once:true
+    Self.result ~dkey:dkey_auto_free ~current:true ~once:true
       "freeing automatic bases: %a" Base.Hptset.pretty bases_to_free;
     let state', _changed = free_aux state ~strong:true bases_to_free in
     (* TODO: propagate 'freed' bases for From? *)

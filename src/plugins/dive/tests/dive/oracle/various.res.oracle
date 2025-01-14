@@ -1,6 +1,6 @@
 [kernel] Parsing various.i (no preprocessing)
 [eva] Analyzing a complete application starting at main
-[eva] various.i:10: starting to merge loop iterations
+[eva:partition] various.i:10: starting to merge loop iterations
 [eva:alarm] various.i:13: Warning: 
   non-finite float value.
   assert \is_finite((float)\mul_double((double)y, (double)2.0));

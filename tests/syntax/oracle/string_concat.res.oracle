@@ -3,7 +3,7 @@
 [eva:initial-state] Values of globals at initialization
   test[0..65535] ∈ {97}
       [65536] ∈ {0}
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __retres ∈ {0}

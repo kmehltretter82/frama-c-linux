@@ -12,7 +12,7 @@
   Called from semaphore.i:31.
 [eva] using specification for function V
 [eva] Done for function V
-[eva] semaphore.i:29: starting to merge loop iterations
+[eva:partition] semaphore.i:29: starting to merge loop iterations
 [eva] computing for function V <- g.
   Called from semaphore.i:31.
 [eva] Done for function V
@@ -22,7 +22,7 @@
 [eva] computing for function V <- g.
   Called from semaphore.i:31.
 [eva] Done for function V
-[eva] semaphore.i:28: starting to merge loop iterations
+[eva:partition] semaphore.i:28: starting to merge loop iterations
 [kernel:annot:missing-spec] semaphore.i:34: Warning: 
   Neither code nor specification for function P,
    generating default assigns. See -generated-spec-* options for more info

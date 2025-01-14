@@ -7,10 +7,10 @@
 [eva] computing for function f <- main.
   Called from hierarchical_convergence.c:19.
 [eva] hierarchical_convergence.c:8: Frama_C_show_each: {0}
-[eva] hierarchical_convergence.c:7: starting to merge loop iterations
+[eva:partition] hierarchical_convergence.c:7: starting to merge loop iterations
 [eva] hierarchical_convergence.c:8: Frama_C_show_each: {0; 1}
 [eva] hierarchical_convergence.c:10: Frama_C_show_each: {1}, {0}
-[eva] hierarchical_convergence.c:9: starting to merge loop iterations
+[eva:partition] hierarchical_convergence.c:9: starting to merge loop iterations
 [eva] hierarchical_convergence.c:8: Frama_C_show_each: {0; 1; 2}
 [eva] hierarchical_convergence.c:10: Frama_C_show_each: {1; 2}, {0}
 [eva] hierarchical_convergence.c:10: Frama_C_show_each: {1; 2}, {0; 1}

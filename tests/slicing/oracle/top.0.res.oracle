@@ -10,7 +10,7 @@
 [eva] computing for function strlen <- main.
   Called from top.i:27.
 [eva:alarm] top.i:21: Warning: out of bounds read. assert \valid_read(q);
-[eva] top.i:21: starting to merge loop iterations
+[eva:partition] top.i:21: starting to merge loop iterations
 [eva:alarm] top.i:21: Warning: signed overflow. assert k + 1 ≤ 2147483647;
 [eva] Recording results for strlen
 [eva] Done for function strlen

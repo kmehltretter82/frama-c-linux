@@ -16,7 +16,7 @@
   x ∈ {0}
 [eva] computing for function strchr <- main.
   Called from threat_redundant.c:19.
-[eva] threat_redundant.c:8: starting to merge loop iterations
+[eva:partition] threat_redundant.c:8: starting to merge loop iterations
 [eva:alarm] threat_redundant.c:8: Warning: 
   out of bounds read. assert \valid_read(s);
 [eva] Recording results for strchr

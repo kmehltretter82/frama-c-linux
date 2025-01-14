@@ -35,7 +35,7 @@
 [from] Computing for function f4
 [from] Done for function f4
 [eva] Done for function f4
-[eva] bts336.i:77: starting to merge loop iterations
+[eva:partition] bts336.i:77: starting to merge loop iterations
 [eva] computing for function f4 <- main4.
   Called from bts336.i:78.
 [eva] Recording results for f4

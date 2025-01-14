@@ -5,8 +5,9 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   r ∈ {1}
-[eva] if_many_values.i:8: Trace partitioning superposing up to 100 states
-[eva] if_many_values.i:8: starting to merge loop iterations
+[eva:partition] if_many_values.i:8: 
+  Trace partitioning superposing up to 100 states
+[eva:partition] if_many_values.i:8: starting to merge loop iterations
 [eva:alarm] if_many_values.i:11: Warning: 
   signed overflow. assert r + 1 ≤ 2147483647;
 [eva] Recording results for main

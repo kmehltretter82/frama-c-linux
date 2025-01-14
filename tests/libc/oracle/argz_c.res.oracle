@@ -75,7 +75,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:246: Call to builtin strlen
 [eva] FRAMAC_SHARE/libc/argz.c:246: Call to builtin strlen
 [eva] FRAMAC_SHARE/libc/argz.c:251: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/argz.c:251: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:251: 
   allocating variable __malloc_argz_create_l251
 [eva] computing for function stpcpy <- argz_create <- main.
   Called from FRAMAC_SHARE/libc/argz.c:256.
@@ -100,7 +100,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:202: 
   function strlen: precondition 'valid_string_s' got status valid.
 [eva] FRAMAC_SHARE/libc/argz.c:208: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/argz.c:208: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:208: 
   allocating variable __malloc_argz_create_sep_l208
 [eva] Recording results for argz_create_sep
 [eva] Done for function argz_create_sep
@@ -134,7 +134,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/argz.c:277: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] FRAMAC_SHARE/libc/argz.c:279: 
@@ -162,7 +162,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:299: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/argz.c:299: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:299: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:299: 
   allocating variable __realloc_argz_add_sep_l299
 [eva] Recording results for argz_add_sep
 [eva] Done for function argz_add_sep
@@ -189,7 +189,7 @@
 [eva] computing for function argz_append <- main.
   Called from argz_c.c:38.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_0
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -205,7 +205,7 @@
 [eva] computing for function argz_append <- argz_add <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_1
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -268,7 +268,8 @@
   Called from FRAMAC_SHARE/libc/argz.c:85.
 [eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:347: Automatic loop unrolling.
 [eva] FRAMAC_SHARE/libc/string.c:350: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/string.c:350: allocating variable __malloc_strndup_l350
+[eva:malloc:new] FRAMAC_SHARE/libc/string.c:350: 
+  allocating variable __malloc_strndup_l350
 [eva] FRAMAC_SHARE/libc/string.c:355: Call to builtin memcpy
 [eva] FRAMAC_SHARE/libc/string.c:355: 
   function memcpy: precondition 'valid_dest' got status valid.
@@ -283,7 +284,8 @@
 [eva] FRAMAC_SHARE/libc/argz.c:55: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/argz.c:55: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:55: allocating variable __realloc_str_append_l55
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:55: 
+  allocating variable __realloc_str_append_l55
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:58.
 [eva:loop-unroll:auto] FRAMAC_SHARE/libc/string.c:54: Automatic loop unrolling.
@@ -304,7 +306,7 @@
 [eva] computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:95.
 [eva] FRAMAC_SHARE/libc/argz.c:55: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:55: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:55: 
   allocating variable __realloc_str_append_l55_0
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:58.
@@ -316,7 +318,7 @@
 [eva] computing for function argz_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:104.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_2
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -327,7 +329,7 @@
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_3
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -354,7 +356,7 @@
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_4
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -376,7 +378,7 @@
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_5
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -398,7 +400,7 @@
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_6
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -417,7 +419,7 @@
 [eva] computing for function strndup <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:85.
 [eva] FRAMAC_SHARE/libc/string.c:350: Call to builtin malloc
-[eva] FRAMAC_SHARE/libc/string.c:350: 
+[eva:malloc:new] FRAMAC_SHARE/libc/string.c:350: 
   allocating variable __malloc_strndup_l350_0
 [eva] FRAMAC_SHARE/libc/string.c:355: Call to builtin memcpy
 [eva] Recording results for strndup
@@ -425,7 +427,7 @@
 [eva] computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:88.
 [eva] FRAMAC_SHARE/libc/argz.c:55: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:55: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:55: 
   allocating variable __realloc_str_append_l55_1
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:58.
@@ -442,7 +444,7 @@
 [eva] computing for function str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:95.
 [eva] FRAMAC_SHARE/libc/argz.c:55: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:55: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:55: 
   allocating variable __realloc_str_append_l55_2
 [eva] computing for function mempcpy <- str_append <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:58.
@@ -457,7 +459,7 @@
 [eva] computing for function argz_append <- argz_add <- argz_replace <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_7
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append
@@ -569,7 +571,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:163: Call to builtin realloc
 [eva] FRAMAC_SHARE/libc/argz.c:163: 
   function realloc: precondition 'freeable' got status valid.
-[eva] FRAMAC_SHARE/libc/argz.c:163: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:163: 
   allocating variable __realloc_argz_insert_l163
 [eva] FRAMAC_SHARE/libc/argz.c:167: Call to builtin memmove
 [eva] FRAMAC_SHARE/libc/argz.c:167: 
@@ -596,7 +598,7 @@
 [eva] computing for function argz_append <- argz_add <- argz_insert <- main.
   Called from FRAMAC_SHARE/libc/argz.c:288.
 [eva] FRAMAC_SHARE/libc/argz.c:277: Call to builtin realloc
-[eva] FRAMAC_SHARE/libc/argz.c:277: 
+[eva:malloc:new] FRAMAC_SHARE/libc/argz.c:277: 
   allocating variable __realloc_argz_append_l277_8
 [eva] FRAMAC_SHARE/libc/argz.c:279: Call to builtin memcpy
 [eva] Recording results for argz_append

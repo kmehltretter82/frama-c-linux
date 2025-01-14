@@ -51,11 +51,10 @@
   G2 ∈ {0}
 [eva] computing for function h_slice_2 <- main2.
   Called from use_spec.i:38.
-[eva] using specification for function h_slice_2
+[eva] using specification for function h
 [eva] Done for function h_slice_2
 [eva] computing for function h_slice_1 <- main2.
   Called from use_spec.i:40.
-[eva] using specification for function h_slice_1
 [eva] Done for function h_slice_1
 [eva:alarm] use_spec.i:41: Warning: 
   signed overflow. assert -2147483648 ≤ tmp + G2;

@@ -25,7 +25,7 @@
                    (tmp_0 from t2())
 [eva] computing for function t3 <- main.
   Called from shift_big.i:65.
-[eva] shift_big.i:22: starting to merge loop iterations
+[eva:partition] shift_big.i:22: starting to merge loop iterations
 [eva] shift_big.i:25: assertion got status valid.
 [eva] Recording results for t3
 [eva] Done for function t3
@@ -36,7 +36,7 @@
 [eva] Done for function t4
 [eva] computing for function t5 <- main.
   Called from shift_big.i:67.
-[eva] shift_big.i:37: starting to merge loop iterations
+[eva:partition] shift_big.i:37: starting to merge loop iterations
 [eva] shift_big.i:40: assertion got status valid.
 [eva] Recording results for t5
 [eva] Done for function t5

@@ -7,7 +7,7 @@
    [1..2] ∈ {0}
   u[0] ∈ {2}
    [1..2] ∈ {0}
-[eva] enum.i:16: starting to merge loop iterations
+[eva:partition] enum.i:16: starting to merge loop iterations
 [eva] enum.i:20: assertion got status valid.
 [eva] Recording results for f
 [eva] Done for function f

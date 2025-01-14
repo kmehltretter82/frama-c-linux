@@ -34,7 +34,7 @@
   Translating call to swprintf to a call to the specialized version swprintf_va_2.
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function wmemset
-[eva] using specification for function swprintf_va_1
+[eva] using specification for function swprintf
 [eva] FRAMAC_SHARE/libc/wchar.h:311: 
   Cannot evaluate range bound wformat_length(format) - 1
   (unsupported ACSL construct: logic function wformat_length). Approximating
@@ -44,7 +44,6 @@
                                               (0 .. wformat_length(format) - 1)) got status unknown.
 [eva:alarm] swprintf.c:13: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] using specification for function swprintf_va_2
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   data[0..98] ∈ {65}

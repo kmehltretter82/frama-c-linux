@@ -9,7 +9,7 @@
 [eva] computing for function main1 <- main.
   Called from local_slevel.i:48.
 [eva] local_slevel.i:18: Frama_C_show_each: {-1}, {0}, {0}
-[eva] local_slevel.i:10: starting to merge loop iterations
+[eva:partition] local_slevel.i:10: starting to merge loop iterations
 [eva] local_slevel.i:18: Frama_C_show_each: {1}, {1}, {0; 1}
 [eva] local_slevel.i:18: Frama_C_show_each: {-1}, {0}, {0; 1}
 [eva] local_slevel.i:18: Frama_C_show_each: {1}, {1}, {0; 1; 2}
@@ -78,7 +78,8 @@
 [eva] local_slevel.i:37: Frama_C_show_each: {47}
 [eva] local_slevel.i:37: Frama_C_show_each: {48}
 [eva] local_slevel.i:37: Frama_C_show_each: {49}
-[eva] local_slevel.i:42: Trace partitioning superposing up to 100 states
+[eva:partition] local_slevel.i:42: 
+  Trace partitioning superposing up to 100 states
 [eva] local_slevel.i:37: Frama_C_show_each: {50}
 [eva] local_slevel.i:37: Frama_C_show_each: {51}
 [eva] local_slevel.i:37: Frama_C_show_each: {52}
@@ -129,7 +130,8 @@
 [eva] local_slevel.i:37: Frama_C_show_each: {97}
 [eva] local_slevel.i:37: Frama_C_show_each: {98}
 [eva] local_slevel.i:37: Frama_C_show_each: {99}
-[eva] local_slevel.i:42: Trace partitioning superposing up to 200 states
+[eva:partition] local_slevel.i:42: 
+  Trace partitioning superposing up to 200 states
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
@@ -377,7 +379,7 @@ void main(void)
 [eva] computing for function main1 <- main.
   Called from local_slevel.i:48.
 [eva] local_slevel.i:18: Frama_C_show_each: {-1}, {0}, {0}
-[eva] local_slevel.i:10: starting to merge loop iterations
+[eva:partition] local_slevel.i:10: starting to merge loop iterations
 [eva] local_slevel.i:18: Frama_C_show_each: {1}, {1}, {0; 1}
 [eva] local_slevel.i:18: Frama_C_show_each: {-1}, {0}, {0; 1}
 [eva] local_slevel.i:18: Frama_C_show_each: {1}, {1}, {0; 1; 2}
@@ -446,7 +448,8 @@ void main(void)
 [eva] local_slevel.i:37: Frama_C_show_each: {47}
 [eva] local_slevel.i:37: Frama_C_show_each: {48}
 [eva] local_slevel.i:37: Frama_C_show_each: {49}
-[eva] local_slevel.i:42: Trace partitioning superposing up to 100 states
+[eva:partition] local_slevel.i:42: 
+  Trace partitioning superposing up to 100 states
 [eva] local_slevel.i:37: Frama_C_show_each: {50}
 [eva] local_slevel.i:37: Frama_C_show_each: {51}
 [eva] local_slevel.i:37: Frama_C_show_each: {52}
@@ -497,7 +500,8 @@ void main(void)
 [eva] local_slevel.i:37: Frama_C_show_each: {97}
 [eva] local_slevel.i:37: Frama_C_show_each: {98}
 [eva] local_slevel.i:37: Frama_C_show_each: {99}
-[eva] local_slevel.i:42: Trace partitioning superposing up to 200 states
+[eva:partition] local_slevel.i:42: 
+  Trace partitioning superposing up to 200 states
 [eva] Recording results for main2
 [eva] Done for function main2
 [eva] Recording results for main
