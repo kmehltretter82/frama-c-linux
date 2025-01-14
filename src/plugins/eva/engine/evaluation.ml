@@ -1723,16 +1723,13 @@ module Make
         match kfs with
         | `Top -> top_function_pointer funcexp
         | `Value kfs ->
+          let open Bottom.Operators in
           let args_types = Option.map (List.map (fun e -> e.typ)) args in
-          let kfs, alarm' =
-            Eval_typ.compatible_functions funcexp.typ ?args:args_types kfs
-          in
+          let compatible_funcs = Eval_typ.compatible_functions funcexp.typ in
+          let kfs, alarm' = compatible_funcs ?args:args_types kfs in
           let reduce = backward_function_pointer valuation state v in
-          let process acc kf =
-            let res = reduce kf >>-: fun valuation -> kf, valuation in
-            Bottom.add_to_list res acc
-          in
-          let list = List.fold_left process [] kfs in
+          let process acc kf = let+ acc and+ v = reduce kf in (kf, v) :: acc in
+          let valuations = List.fold_left process (`Value []) kfs in
           let status =
             if kfs = [] then Alarmset.False
             else if alarm || alarm' then Alarmset.Unknown
@@ -1742,7 +1739,7 @@ module Make
           let cil_args = Option.map (List.map Eva_ast.to_cil_exp) args in
           let alarm = Alarms.Function_pointer (cil_v, cil_args) in
           let alarms = Alarmset.singleton ~status alarm in
-          Bottom.return list, alarms
+          valuations, alarms
       end
     | _ -> assert false
 end
