@@ -79,10 +79,10 @@ endif
 
 .PHONY: ivette ivette-api ivette-dev
 
-ivette: ivette-api
+ivette: all
 	@$(MAKE) -C ivette
 
-ivette-dev: ivette-api
+ivette-dev: all
 	@$(MAKE) -C ivette dev
 
 ivette-api: all
