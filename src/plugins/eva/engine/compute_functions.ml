@@ -358,6 +358,8 @@ module Make (Engine: Engine_sig.S) = struct
       then compute_and_cache_call compute kinstr call state
       else compute kinstr call state
 
+  (* Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
+     interpreting a call statement. *)
   let compute_call stmt = compute_call' (Kstmt stmt)
 
   (* ----- Main call -------------------------------------------------------- *)
