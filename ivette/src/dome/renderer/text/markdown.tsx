@@ -26,36 +26,56 @@ import remarkCustomHeaderId from 'remark-custom-header-id';
 
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
-import { Icon, iconKindList } from 'dome/controls/icons';
+import { Icon, jIconKind } from 'dome/controls/icons';
 import {
   CodeBlock, atomOneDark, atomOneLight
 } from "react-code-blocks";
-import { LED, LEDStatusList } from 'dome/controls/displays';
+import { jLEDstatus, LED } from 'dome/controls/displays';
 
 export interface Pattern {
   pattern: RegExp,
   replace: (key: number, match?: RegExpExecArray) => JSX.Element | null
 }
 
+/**
+ * iconTag allows you to replace the tag with an icon.
+ *
+ * The associated regex is `/(\[ex:\])?(\[icon-([^-\]]+)(-([^\]]+))?\])/g`.
+ *
+ * * first capture `[ex:]` (option): allows to write the second group without
+ * applying a replacement if exist
+ * * second capture : represents the icon with `ID` and `kind | color`
+ *   * capture 3 : the icon Id
+ *   * capture 4-5 (option): the kind or color of the icon
+ *
+ * Exemple :
+ * `[icon-TUNINGS-#FF0000]` this tag will be replaced by a red TUNINGS icon
+ */
 export const iconTag: Pattern = {
-  pattern: /(\[ex:\])?\[icon-([^-\]]+)(-([^\]]+))?\]/g,
+  pattern: /(\[ex:\])?(\[icon-([^-\]]+)(-([^\]]+))?\])/g,
   replace: (key: number, match?: RegExpExecArray) => {
     if(!match) return null;
-    const id = match[2];
-    const kind = iconKindList.find(elt => elt === match[4]);
-    const color = !kind ? match[4] : undefined;
+    const id = match[3];
+    const kind = jIconKind(match[5]);
+    const color = !kind ? match[5] : undefined;
     if(match[1] === "[ex:]") {
-      return <span key={key}>{`[icon-${id}-${match[4]}]`}</span>;
+      return <span key={key}>{match[2]}</span>;
     }
     return <Icon key={key} id={id} kind={kind} fill={color}/>;
   }
 };
 
+/**
+ * ledTag allows you to replace the tag with an LED.
+ * The associated regex is `/\[led-([^\]]+)\]/g`.
+ *
+ * The capture `([^\]]+)` represents the LEDStatus.
+ */
 export const ledTag: Pattern = {
   pattern: /\[led-([^\]]+)\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
     if(!match) return null;
-    const status = LEDStatusList.find(elt => elt === match[1]);
+    const status = jLEDstatus(match[1]);
     return <LED key={key} status={status} />;
   }
 };
@@ -67,6 +87,10 @@ export const ledTag: Pattern = {
 /**
  * Replace all tag in children.
  * This function doesn't replace any tags added by a previous replacement.
+ *
+ * Patterns added to the table will be processed to make replacements
+ * in the markdown file. Markdown component provides two patterns,
+ * iconTag and ledTag
  */
 function replaceTags(
   children: React.ReactNode,

@@ -101,6 +101,7 @@ You can used patterns to replace parts of the text by JSX Element.
 There is one basic pattern to replace tags by an `Icon`, it name `iconTag`  in markdown component .
 
 * [icon-TUNINGS] : [ex:][icon-TUNINGS]
+* [icon-TUNINGS-#ff0000] : [ex:][icon-TUNINGS-#ff0000]
 * [icon-TARGET] : [ex:][icon-TARGET]
 * [icon-PIN] : [ex:][icon-PIN]
 

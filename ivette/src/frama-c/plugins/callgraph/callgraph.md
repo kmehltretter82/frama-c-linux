@@ -1,6 +1,4 @@
-# Plugins {#plugins}
-
-## Callgraph {#plugins-callgraph}
+# Callgraph {#callgraph}
 
 This module provides a graphical display of the callgraph and makes it easy to highlight certain data, such as :
 
@@ -21,7 +19,7 @@ Below is a list of shortcuts:
 
 This component is divided into 4 parts, the [titlebar](#plugins-callgraph-titlebar), the [toolbar](#plugins-callgraph-toolbar), a [panel](#plugins-callgraph-panel) and a [graph](#plugins-callgraph-graph).
 
-### Titlebar {#plugins-callgraph-titlebar}
+### Titlebar {#callgraph-titlebar}
 
 The titlebar contains the name of the module on the left and the following buttons on the right:
 
@@ -30,7 +28,7 @@ The titlebar contains the name of the module on the left and the following butto
 * [icon-PIN] : Automatically select node of the function selected in AST.
 * [icon-HELP] : show this help modal.
 
-### Toolbar {#plugins-callgraph-toolbar}
+##Toolbar {#plugins-callgraph-toolbar}
 
 The toolbar contains display and selection parameters on the left and graph management parameters on the right.
 On the far right is the button for opening the side panel.
@@ -46,14 +44,14 @@ On the right:
 * Horizontal and vertical distance management between graph nodes.
 * [icon-SIDEBAR] : Opens or closes the side panel.
 
-### Panel {#plugins-callgraph-panel}
+## Panel {#callgraph-panel}
 
 The panel displays additional information about the graph in general and about the properties of the selected nodes.
 The filters above the list can be used to limit the amount of information, and are synchronised with the filters in the `Properties` component.
 
 At the top right, 2 buttons allow you to change the side of the panel and close it.
 
-### Graph {#plugins-callgraph-graph}
+## Graph {#callgraph-graph}
 
 The graph is in 3D but is displayed as a tree. This type of display prevents cycles from appearing in the graph.
 
@@ -62,7 +60,7 @@ If a cycle is detected :
 * In the case of a recursive function: The link is deleted and the [icon-REDO-orange] icon is added to the node.
 * In the case of a cycle on several functions: The cycles will be pre-selected and will appear in the selection button.
 
-#### Nodes
+### Nodes
 
 The nodes display the name of the function and the following elements:
 
@@ -71,7 +69,7 @@ The nodes display the name of the function and the following elements:
 * [icon-REDO-orange] : The function is recursive.
 * [icon-DROP.FILLED-#882288][icon-DROP.FILLED-#73BBBB]: The function contains tainted properties.
 
-#### Edges
+### Edges
 
 The edges are oriented and can take on different colours depending on the nodes selected.
 

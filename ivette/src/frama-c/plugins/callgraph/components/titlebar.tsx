@@ -28,7 +28,7 @@ import * as Dome from 'dome';
 import { IconButton } from 'dome/controls/buttons';
 import { Button, Inset } from 'dome/frame/toolbars';
 import { HelpIcon } from 'dome/help';
-import docPlugins from '../../plugins.md?raw';
+import docCallgraph from '../callgraph.md?raw';
 import { DocShowNodesButton } from './toolbar';
 import { ledTag, iconTag } from 'dome/text/markdown';
 
@@ -86,10 +86,10 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
       />
       <Inset />
       <HelpIcon
-        label='Plugins - Callgraph'
-        scrollTo={'plugins-callgraph'}
+        label='Callgraph'
+        scrollTo={'callgraph'}
         patterns={[iconTag, ledTag, selectBtnTag, TSButtonTag]}
-      >{ docPlugins }</HelpIcon>
+      >{ docCallgraph }</HelpIcon>
       <Inset />
     </Ivette.TitleBar>
   );
