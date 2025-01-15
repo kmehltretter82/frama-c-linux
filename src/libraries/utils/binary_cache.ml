@@ -23,11 +23,11 @@
 let compute_cache_size i = 1 lsl (8 + i)
 let default_value = 2
 
-(* Should not be used to create cache before the value from -eva-cache-size
-   has been set by Eva. *)
+(* Should not be used to create cache before the value from -cache-size
+   has been set. *)
 let cache_size = ref (compute_cache_size default_value)
 
-(* Set by Eva, according to the -eva-cache-size parameter. *)
+(* Set by the kernel, according to the -cache-size parameter. *)
 let set_cache_size i = cache_size := compute_cache_size i
 
 (** The caches of this module are lazy, for two reasons:

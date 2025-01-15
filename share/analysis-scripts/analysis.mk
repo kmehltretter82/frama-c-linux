@@ -125,7 +125,7 @@ EVAFLAGS   ?= \
   -no-deps-print -no-calldeps-print \
   -eva-warn-key garbled-mix=active,garbled-mix:write=active \
   -calldeps -from-verbose 0 \
-	-eva-cache-size 8 \
+	-cache-size 8 \
   $(if $(EVABUILTINS), -eva-builtin=$(call fc_list,$(EVABUILTINS)),) \
   $(if $(EVAUSESPECS), -eva-use-spec $(call fc_list,$(EVAUSESPECS)),)
 WPFLAGS    ?=

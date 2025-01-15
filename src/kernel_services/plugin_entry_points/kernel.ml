@@ -1847,6 +1847,26 @@ module MemoryFootprint =
     end)
 let () = MemoryFootprint.set_range ~min:1 ~max:10
 
+let () = Parameter_customize.set_group performance
+let () = Parameter_customize.do_not_reset_on_copy ()
+module CacheSize =
+  Int
+    (struct
+      let module_name = "CacheSize"
+      let default = 2
+      let option_name = "-cache-size"
+      let arg_name = "n"
+      let help =
+        "Control the amount of memory allocated to some internal caches. \
+         Must be between 1 and 10; default value is 2. \
+         Each increase of 1 doubles the size of these caches. \
+         Small values are most suitable for the analysis of small programs \
+         (less than 1000 lines). Higher values (around 7-8) can speed up the \
+         analysis of large code bases."
+    end)
+let () = CacheSize.set_range ~min:1 ~max:10
+let () = CacheSize.add_update_hook (fun _ i -> Binary_cache.set_cache_size i)
+
 (* ************************************************************************* *)
 (** {2 Other options} *)
 (* ************************************************************************* *)
