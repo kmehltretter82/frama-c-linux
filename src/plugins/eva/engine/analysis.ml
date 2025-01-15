@@ -53,36 +53,8 @@ let save_results kf =
   try Function_calls.save_results (Kernel_function.get_definition kf)
   with Kernel_function.No_Definition -> false
 
-module type Results = sig
-  type state
-  type value
-  type location
 
-  val get_global_state: unit -> state or_top_bottom
-  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
-  val get_initial_state:
-    kernel_function -> state or_top_bottom
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
-
-  val eval_expr : state -> exp -> value evaluated
-  val copy_lvalue: state -> lval -> value flagged_value evaluated
-  val eval_lval_to_loc: state -> lval -> location evaluated
-  val eval_function_exp:
-    state -> ?args:exp list -> exp ->  kernel_function list evaluated
-  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
-end
-
-module type S = sig
-  include Engine_sig.S
-  include Results with type state := Dom.state
-                   and type value := Val.t
-                   and type location := Loc.location
-end
+module type Engine = Engine_sig.S_with_results
 
 module Make (Abstract: Abstractions.S) = struct
 
@@ -155,35 +127,35 @@ end
 
 let default = Abstractions.Config.of_list [Cvalue_domain.registered, None]
 module DefaultAbstractions = (val Abstractions.make default)
-module Default : S = Make (DefaultAbstractions)
+module Default : Engine = Make (DefaultAbstractions)
 
 
 (* Reference to the current configuration (built by Abstractions.configure from
    the parameters of Eva regarding the abstractions used in the analysis) and
    the current Analyzer module. *)
-let ref_analyzer = ref (default, (module Default : S))
+let ref_analyzer = ref (default, (module Default : Engine))
 
 (* Returns the current Analyzer module. *)
-let current_analyzer () = (module (val (snd !ref_analyzer)): S)
+let current_analyzer () = (module (val (snd !ref_analyzer)): Engine)
 
 (* Set of hooks called whenever the current Analyzer module is changed.
    Useful for the GUI parts that depend on it. *)
-module Analyzer_Hook = Hook.Build (struct type t = (module S) end)
+module Analyzer_Hook = Hook.Build (struct type t = (module Engine) end)
 
 (* Register a new hook. *)
 let register_hook = Analyzer_Hook.extend
 
 (* Sets the current Analyzer module for a given configuration.
    Calls the hooks above. *)
-let set_current_analyzer config (analyzer: (module S)) =
-  Analyzer_Hook.apply (module (val analyzer): S);
+let set_current_analyzer config (analyzer: (module Engine)) =
+  Analyzer_Hook.apply (module (val analyzer): Engine);
   ref_analyzer := (config, analyzer)
 
 (* Builds the Analyzer module corresponding to a given configuration,
    and sets it as the current analyzer. *)
 let make_analyzer config =
   let analyzer =
-    if Abstractions.Config.(equal config default) then (module Default : S)
+    if Abstractions.Config.(equal config default) then (module Default : Engine)
     else
       let module Abstract = (val Abstractions.make config) in
       let module Analyzer = Make (Abstract) in

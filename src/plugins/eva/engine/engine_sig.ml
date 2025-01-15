@@ -71,3 +71,35 @@ module type S = sig
      and type value = Val.t
      and type loc = Loc.location
 end
+
+
+module type Results = sig
+  type state
+  type value
+  type location
+
+  val get_global_state: unit -> state or_top_bottom
+  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
+  val get_stmt_state_by_callstack:
+    ?selection:Callstack.t list ->
+    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
+  val get_initial_state:
+    kernel_function -> state or_top_bottom
+  val get_initial_state_by_callstack:
+    ?selection:Callstack.t list ->
+    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
+
+  val eval_expr : state -> exp -> value evaluated
+  val copy_lvalue: state -> lval -> value flagged_value evaluated
+  val eval_lval_to_loc: state -> lval -> location evaluated
+  val eval_function_exp:
+    state -> ?args:exp list -> exp -> kernel_function list evaluated
+  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
+end
+
+module type S_with_results = sig
+  include S
+  include Results with type state := Dom.state
+                   and type value := Val.t
+                   and type location := Loc.location
+end

@@ -20,51 +20,18 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
-open Eval
+module type Engine = Engine_sig.S_with_results
 
-module type Results = sig
-  type state
-  type value
-  type location
-
-  val get_global_state: unit -> state or_top_bottom
-  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
-  val get_initial_state:
-    kernel_function -> state or_top_bottom
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
-
-  val eval_expr : state -> exp -> value evaluated
-  val copy_lvalue: state -> lval -> value flagged_value evaluated
-  val eval_lval_to_loc: state -> lval -> location evaluated
-  val eval_function_exp:
-    state -> ?args:exp list -> exp -> kernel_function list evaluated
-  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
-end
-
-
-module type S = sig
-  include Engine_sig.S
-  include Results with type state := Dom.state
-                   and type value := Val.t
-                   and type location := Loc.location
-end
-
-module Make (Abstract: Abstractions.S) : S
+module Make (Abstract: Abstractions.S) : Engine
   with module Ctx = Abstract.Ctx
    and module Val = Abstract.Val
    and module Loc = Abstract.Loc
    and module Dom = Abstract.Dom
 
-val current_analyzer : unit -> (module S)
+val current_analyzer : unit -> (module Engine_sig.S_with_results)
 (** The abstractions used in the latest analysis, and its results. *)
 
-val register_hook: ((module S) -> unit) -> unit
+val register_hook: ((module Engine_sig.S_with_results) -> unit) -> unit
 (** Registers a hook that will be called each time the [current] analyzer
     is changed. This happens when a new analysis is run with different
     abstractions than before, or when the current project is changed. *)
