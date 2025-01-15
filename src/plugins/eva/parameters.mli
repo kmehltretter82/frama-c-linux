@@ -58,8 +58,6 @@ module ResultsAll: Parameter_sig.Bool
 
 module JoinResults: Parameter_sig.Bool
 
-module MemoryFootprint: Parameter_sig.Int
-
 module WarnSignedConvertedDowncast: Parameter_sig.Bool
 module WarnPointerSubstraction: Parameter_sig.Bool
 module WarnCopyIndeterminate: Parameter_sig.Kernel_function_set

@@ -177,20 +177,8 @@ let () =
     ~user_only:true (fun _ -> reset_analyzer ());
   Project.register_after_global_load_hook reset_analyzer
 
-(* Configure the OCaml Garbage Collector according to the
-   -eva-memory-footprint parameter (only if it has been set). *)
-let configure_ocaml_gc () =
-  if Parameters.MemoryFootprint.is_set () then
-    let gc_control = Gc.get () in
-    let n = Parameters.MemoryFootprint.get () in
-    let values = [| 24; 30; 40; 60; 90; 120; 150; 190; 240; 300 |] in
-    let space_overhead = values.(n-1) in
-    if space_overhead <> gc_control.space_overhead then
-      Gc.set { gc_control with space_overhead }
-
 (* Builds the analyzer if needed, and run the analysis. *)
 let force_compute () =
-  configure_ocaml_gc ();
   Ast.compute ();
   Parameters.configure_precision ();
   if not (Kernel.AuditCheck.is_empty ()) then

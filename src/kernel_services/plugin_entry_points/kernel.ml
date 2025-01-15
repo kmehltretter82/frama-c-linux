@@ -1825,6 +1825,29 @@ module TypeCheck =
   end)
 
 (* ************************************************************************* *)
+(** {2 Performance options} *)
+(* ************************************************************************* *)
+
+let performance = add_group "Performance"
+
+let () = Parameter_customize.set_group performance
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module MemoryFootprint =
+  Int
+    (struct
+      let module_name = "MemoryFootprint"
+      let default = 6
+      let option_name = "-memory-footprint"
+      let arg_name = "n"
+      let help =
+        "Control the memory usage of Frama-C. \
+         With smaller values, analyses consume much less memory but are \
+         also slightly slower. Must be between 1 and 10; default is 6."
+    end)
+let () = MemoryFootprint.set_range ~min:1 ~max:10
+
+(* ************************************************************************* *)
 (** {2 Other options} *)
 (* ************************************************************************* *)
 
