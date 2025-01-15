@@ -151,28 +151,32 @@ let register_signal_handler () =
   let restore_sigint = register_handler Sys.sigint interrupt in
   fun () -> restore_sigusr1 (); restore_sigint ()
 
-module Make (Abstract: Abstractions.S_with_evaluation) = struct
+module Make (Engine: Engine_sig.S) = struct
 
-  module PowersetDomain = Powerset.Make (Abstract.Dom)
+  module PowersetDomain = Powerset.Make (Engine.Dom)
 
-  module Transfer = Transfer_stmt.Make (Abstract)
-  module Logic = Transfer_logic.Make (Abstract.Dom) (PowersetDomain)
-  module Spec = Transfer_specification.Make (Abstract) (PowersetDomain) (Logic)
-  module Init = Initialization.Make (Abstract.Dom) (Abstract.Eval) (Transfer)
+  module Transfer = Transfer_stmt.Make (Engine)
+  module Logic = Transfer_logic.Make (Engine.Dom) (PowersetDomain)
+  module Spec = Transfer_specification.Make (Engine) (PowersetDomain) (Logic)
+  module Init = Initialization.Make (Engine.Dom) (Engine.Eval) (Transfer)
 
   module Computer =
     Iterator.Computer
-      (Abstract) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
+      (Engine) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
 
-  include Cvalue_domain.Getters (Abstract.Dom)
+  include Cvalue_domain.Getters (Engine.Dom)
+
+  type state = Engine.Dom.t
+  type loc = Engine.Loc.location
+  type value = Engine.Val.t
 
   let get_cval =
-    match Abstract.Val.get Main_values.CVal.key with
+    match Engine.Val.get Main_values.CVal.key with
     | None -> fun _ -> assert false
     | Some get -> fun value -> get value
 
   let get_ploc =
-    match Abstract.Loc.get Main_locations.PLoc.key with
+    match Engine.Loc.get Main_locations.PLoc.key with
     | None -> fun _ -> assert false
     | Some get -> fun location -> get location
 
@@ -186,7 +190,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
 
   (* ----- Mem Exec cache --------------------------------------------------- *)
 
-  module MemExec = Mem_exec.Make (Abstract.Val) (Abstract.Dom)
+  module MemExec = Mem_exec.Make (Engine.Val) (Engine.Dom)
 
   let compute_and_cache_call compute kinstr call init_state =
     let args =
@@ -196,9 +200,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     | None ->
       let call_result = compute kinstr call init_state in
       let () =
-        if call_result.Transfer.cacheable = Eval.Cacheable
+        if call_result.Engine_sig.cacheable = Eval.Cacheable
         then
-          let final_states = call_result.Transfer.states in
+          let final_states = call_result.states in
           MemExec.store_computed_call call.kf init_state args final_states
       in
       call_result
@@ -219,7 +223,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           "Reusing old results for call to %a" Kernel_function.pretty call.kf;
       apply_call_results_hooks call init_state (`Reuse i);
       (* call can be cached since it was cached once *)
-      Transfer.{ states; cacheable = Cacheable; }
+      Engine_sig.{ states; cacheable = Cacheable; }
 
   (* ----- Body or specification analysis ----------------------------------- *)
 
@@ -274,7 +278,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     if Parameters.ValShowProgress.get () then
       Self.feedback
         "Done for function %a" Kernel_function.pretty call.kf;
-    Transfer.{ states = resulting_states; cacheable; }
+    Engine_sig.{ states = resulting_states; cacheable; }
 
   (* ----- Use of cvalue builtins ------------------------------------------- *)
 
@@ -293,7 +297,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let join_states = function
     | [] -> `Bottom
     | (_k,s) :: l  ->
-      `Value (List.fold_left Abstract.Dom.join s (List.map snd l))
+      `Value (List.fold_left Engine.Dom.join s (List.map snd l))
 
   (* Interprets a call to [kf] at callsite [kinstr] in the state [state]
      by using a cvalue builtin. *)
@@ -311,7 +315,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     match final_state with
     | `Bottom ->
       apply_call_results_hooks call state (`Builtin ([], None));
-      Transfer.{ states; cacheable = Eval.Cacheable; }
+      Engine_sig.{ states; cacheable = Cacheable; }
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in
       let post = get_cvalue_or_top final_state in
@@ -321,17 +325,17 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       in
       let insert cvalue_state =
         Partition.Key.empty,
-        Abstract.Dom.set Cvalue_domain.State.key cvalue_state final_state
+        Engine.Dom.set Cvalue_domain.State.key cvalue_state final_state
       in
       let states = List.map insert cvalue_states in
-      Transfer.{ states; cacheable; }
+      Engine_sig.{ states; cacheable; }
 
   (* Uses cvalue builtin only if the cvalue domain is available. Otherwise, only
      use the called function specification. *)
   let compute_builtin =
-    if Abstract.Dom.mem Cvalue_domain.State.key
-    && Abstract.Val.mem Main_values.CVal.key
-    && Abstract.Loc.mem Main_locations.PLoc.key
+    if Engine.Dom.mem Cvalue_domain.State.key
+    && Engine.Val.mem Main_values.CVal.key
+    && Engine.Loc.mem Main_locations.PLoc.key
     then compute_builtin
     else fun (_, _, _, spec) -> compute_using_spec_or_body (`Spec spec)
 
@@ -340,7 +344,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (* Interprets a [call] at callsite [kinstr] in the state [state],
      using a builtin, the specification or the body of the called function,
      according to [Function_calls.register]. *)
-  let compute_call kinstr call recursion state =
+  let compute_call' kinstr call recursion state =
     let recursion_depth = Option.map (fun r -> r.depth) recursion in
     let target =
       Function_calls.define_analysis_target ?recursion_depth kinstr call.kf
@@ -354,7 +358,9 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       then compute_and_cache_call compute kinstr call state
       else compute kinstr call state
 
-  let () = Transfer.compute_call_ref := (fun stmt -> compute_call (Kstmt stmt))
+  (* Exported in [Engine_sig.Compute] and used by [Transfer_stmt] when
+     interpreting a call statement. *)
+  let compute_call stmt = compute_call' (Kstmt stmt)
 
   (* ----- Main call -------------------------------------------------------- *)
 
@@ -362,22 +368,22 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let restore_signals = register_signal_handler () in
     let compute () =
       let callstack = Eva_utils.init_call_stack kf in
-      Abstract.Dom.Store.register_initial_state callstack kf init_state;
+      Engine.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
-      let final_result = compute_call Kglobal call None init_state in
-      let final_states = List.map snd (final_result.Transfer.states) in
+      let final_result = compute_call' Kglobal call None init_state in
+      let final_states = List.map snd (final_result.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.clear_call_stack ();
-      Abstract.Dom.Store.mark_as_computed ();
+      Engine.Dom.Store.mark_as_computed ();
       Self.(ComputationState.set Computed);
       post_analysis ();
-      Abstract.Dom.post_analysis final_state;
+      Engine.Dom.post_analysis final_state;
       Summary.print_summary ();
       Statistics.export_as_csv ();
       restore_signals ()
     in
     let cleanup () =
-      Abstract.Dom.Store.mark_as_computed ();
+      Engine.Dom.Store.mark_as_computed ();
       Self.(ComputationState.set Aborted);
       post_analysis_cleanup ~aborted:true
     in
@@ -395,7 +401,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     match initial_state with
     | `Bottom ->
-      Abstract.Dom.Store.mark_as_computed ();
+      Engine.Dom.Store.mark_as_computed ();
       Self.(ComputationState.set Aborted);
       Self.result "Eva not started because globals \
                    initialization is not computable.";
@@ -406,7 +412,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   let compute_from_init_state kf init_state =
     pre_analysis ();
     let b = Parameters.ResultsAll.get () in
-    Abstract.Dom.Store.register_global_state b (`Value init_state);
+    Engine.Dom.Store.register_global_state b (`Value init_state);
     compute kf init_state
 end
 
