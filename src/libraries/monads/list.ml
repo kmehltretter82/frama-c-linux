@@ -30,4 +30,4 @@ module Minimal = struct
   let product ls rs = combine ls rs
 end
 
-include Monad.Extend_Categoric_with_product (Minimal)
+include Monad.Make_based_on_map_with_product (Minimal)

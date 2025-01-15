@@ -43,7 +43,7 @@ module Make (Env : Datatype.S_with_collections) = struct
 
   end
 
-  include Monad.Extend_Kleisli (Minimal)
+  include Monad.Make_based_on_bind (Minimal)
   let get_environment : env t = None, fun env -> env, env
   let set_environment (env : env) : unit t = None, fun _ -> (), env
   let resolve (m : 'a t) (env : env) : 'a * env = Minimal.compute m env

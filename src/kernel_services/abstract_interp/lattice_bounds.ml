@@ -143,7 +143,7 @@ module Bottom = struct
 
   (* Monadic operations *)
 
-  include Monad.Extend_Kleisli_with_product (struct
+  include Monad.Make_based_on_bind_with_product (struct
       type 'a t = 'a or_bottom
       let return x = `Value x
       let bind f = function `Bottom -> `Bottom | `Value x -> f x
@@ -242,7 +242,7 @@ module Top = struct
 
   (** Monadic operators *)
 
-  include Monad.Extend_Kleisli_with_product (struct
+  include Monad.Make_based_on_bind_with_product(struct
       type 'a t = 'a or_top
       let return x = `Value x
       let bind f = function `Top -> `Top | `Value x -> f x

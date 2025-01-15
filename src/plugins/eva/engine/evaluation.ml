@@ -1729,7 +1729,8 @@ module Make
           let kfs, alarm' = compatible_funcs ?args:args_types kfs in
           let reduce = backward_function_pointer valuation state v in
           let process acc kf = let+ acc and+ v = reduce kf in (kf, v) :: acc in
-          let valuations = List.fold_left process (`Value []) kfs in
+          let bottom_if_empty = function `Value [] -> `Bottom | res -> res in
+          let res = List.fold_left process (`Value []) kfs |> bottom_if_empty in
           let status =
             if kfs = [] then Alarmset.False
             else if alarm || alarm' then Alarmset.Unknown
@@ -1739,7 +1740,7 @@ module Make
           let cil_args = Option.map (List.map Eva_ast.to_cil_exp) args in
           let alarm = Alarms.Function_pointer (cil_v, cil_args) in
           let alarms = Alarmset.singleton ~status alarm in
-          valuations, alarms
+          res, alarms
       end
     | _ -> assert false
 end

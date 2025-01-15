@@ -29,5 +29,5 @@ module Minimal = struct
   let product l r = match l, r with Some l, Some r -> Some (l, r) | _ -> None
 end
 
-include Monad.Extend_Kleisli_with_product (Minimal)
+include Monad.Make_based_on_bind_with_product (Minimal)
 let bind m f = bind f m

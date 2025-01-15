@@ -22,21 +22,6 @@
 
 
 
-(* Kleisli triple minimal signature *)
-module type Kleisli = sig
-  type 'a t
-  val return : 'a -> 'a t
-  val bind : ('a -> 'b t) -> 'a t -> 'b t
-end
-
-(* Categoric minimal signature *)
-module type Categoric = sig
-  type 'a t
-  val return : 'a -> 'a t
-  val map : ('a -> 'b) -> 'a t -> 'b t
-  val flatten : 'a t t -> 'a t
-end
-
 (* Complete signature *)
 module type S = sig
   type 'a t
@@ -50,56 +35,6 @@ module type S = sig
     val ( >>-: ) : 'a t -> ('a -> 'b) -> 'b t
     val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
   end
-end
-
-(** Extend a Kleisli triple monad *)
-module Extend_Kleisli (M : Kleisli) = struct
-  type 'a t = 'a M.t
-  let return x = M.return x
-  let bind f m = M.bind f m
-  let flatten m = bind (fun x -> x) m
-  let map f m = bind (fun x -> return (f x)) m
-  module Operators = struct
-    let ( >>-  ) m f = bind f m
-    let ( let* ) m f = bind f m
-    let ( >>-: ) m f = map  f m
-    let ( let+ ) m f = map  f m
-  end
-end
-
-(** Extend a categoric monad *)
-module Extend_Categoric (M : Categoric) = struct
-  type 'a t = 'a M.t
-  let return x = M.return x
-  let map f m = M.map f m
-  let flatten m = M.flatten m
-  let bind f m = flatten (map f m)
-  module Operators = struct
-    let ( >>-  ) m f = bind f m
-    let ( let* ) m f = bind f m
-    let ( >>-: ) m f = map  f m
-    let ( let+ ) m f = map  f m
-  end
-end
-
-
-
-(* Product on monads *)
-module type Product = sig
-  type 'a t
-  val product : 'a t -> 'b t -> ('a * 'b) t
-end
-
-(* Kleisli triple with a product *)
-module type Kleisli_with_product = sig
-  include Kleisli
-  include Product with type 'a t := 'a t
-end
-
-(* Categoric monad with a product *)
-module type Categoric_with_product = sig
-  include Categoric
-  include Product with type 'a t := 'a t
 end
 
 (* Complete signature with a product *)
@@ -120,8 +55,74 @@ module type S_with_product = sig
   end
 end
 
-(** Extend a Kleisli triple monad with a product *)
-module Extend_Kleisli_with_product (M : Kleisli_with_product) = struct
+
+
+(* Minimal signature based on bind *)
+module type Based_on_bind = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val bind : ('a -> 'b t) -> 'a t -> 'b t
+end
+
+(* Minimal signature based on bind with product *)
+module type Based_on_bind_with_product = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val bind : ('a -> 'b t) -> 'a t -> 'b t
+  val product : 'a t -> 'b t -> ('a * 'b) t
+end
+
+(* Minimal definition based on map *)
+module type Based_on_map = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val map : ('a -> 'b) -> 'a t -> 'b t
+  val flatten : 'a t t -> 'a t
+end
+
+(* Minimal signature based on map with product *)
+module type Based_on_map_with_product = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val map : ('a -> 'b) -> 'a t -> 'b t
+  val flatten : 'a t t -> 'a t
+  val product : 'a t -> 'b t -> ('a * 'b) t
+end
+
+
+
+(* Extend a based on bind minimal monad *)
+module Make_based_on_bind (M : Based_on_bind) = struct
+  type 'a t = 'a M.t
+  let return x = M.return x
+  let bind f m = M.bind f m
+  let flatten m = bind (fun x -> x) m
+  let map f m = bind (fun x -> return (f x)) m
+  module Operators = struct
+    let ( >>-  ) m f = bind f m
+    let ( let* ) m f = bind f m
+    let ( >>-: ) m f = map  f m
+    let ( let+ ) m f = map  f m
+  end
+end
+
+(* Extend a based on map minimal monad *)
+module Make_based_on_map (M : Based_on_map) = struct
+  type 'a t = 'a M.t
+  let return x = M.return x
+  let map f m = M.map f m
+  let flatten m = M.flatten m
+  let bind f m = flatten (map f m)
+  module Operators = struct
+    let ( >>-  ) m f = bind f m
+    let ( let* ) m f = bind f m
+    let ( >>-: ) m f = map  f m
+    let ( let+ ) m f = map  f m
+  end
+end
+
+(* Extend a based on bind monad with a product *)
+module Make_based_on_bind_with_product (M : Based_on_bind_with_product) = struct
   type 'a t = 'a M.t
   let return x = M.return x
   let bind f m = M.bind f m
@@ -138,8 +139,8 @@ module Extend_Kleisli_with_product (M : Kleisli_with_product) = struct
   end
 end
 
-(** Extend a categoric monad with a product *)
-module Extend_Categoric_with_product (M : Categoric_with_product) = struct
+(** Extend a based on map monad with a product *)
+module Make_based_on_map_with_product (M : Based_on_map_with_product) = struct
   type 'a t = 'a M.t
   let return x = M.return x
   let map f m = M.map f m

@@ -20,18 +20,113 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** This module provides a generic monad interface based on Keisli and
-    Categoric definitions of monads. *)
+(** This module provides generic signatures for monads along with tools
+    to build them based on minimal definitions. Those tools are provided
+    for advanced users that would like to define their own monads. Any
+    user that only wants to use the monads provided by the kernel can
+    completly ignore them. *)
 
 
-(** {2 Kleisli triple signature for a monadic type constructor ['a t]}
 
-    This is the usual minimal definition of a monadic type constructor.
-    The [return] function embeds a value {m x} in the monad. The [bind]
-    function, also called the "combinator", corresponds to the idea of
-    "sequence" in the monadic world, i.e the call [bind f m] comes down
-    to performing the computation [m] before applying the next computation
-    step, represented by the function [f], to the resulting value.
+(** {2 Monad signature with let-bindings}
+
+    This signature provides all the usual monadic operators along with
+    let-bindings definitions used to simplify codes relying on monads.
+    The provides operators are as follows:
+    - [return] embeds a value [x] in the monad.
+    - [bind] encodes the idea of "sequence" in the monadic world, i.e the
+      call [bind f m] comes down to performing the computation [m] before
+      applying the next computation step, represented by the function [f],
+      to the resulting value.
+    - [map] applies a function through the monad. One can examplify it by
+      making a parallel with the list [map] operator.
+    - [flatten] is used to handle nested applications of the monad.
+
+    The provided let-bindings operators can be used to write simpler and
+    cleaner code. For example, one can write [let+ v = compute x in v + 1]
+    instead of [map (fun v -> v + 1) (compute x)]. The more monadic steps,
+    the more simpler the code will get when written using those operators.
+    In this module, [>>-] and [let*] always correspond to the [bind]
+    operator while [>>-:] and [let+] always correspond to the [map].
+    All those operators are provided in an [Operators] module to avoid
+    spacename conflicts. Indeed, one can use the expression
+    [let open Monad.Operators in] to use all the let-bindings without
+    risking conflicts by including the other definitions, which have
+    rather common names. This idiom also helps indicate which monad is
+    currently used in a code. *)
+module type S = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val flatten : 'a t t -> 'a t
+  val map  : ('a -> 'b  ) -> 'a t -> 'b t
+  val bind : ('a -> 'b t) -> 'a t -> 'b t
+  module Operators : sig
+    val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( >>-: ) : 'a t -> ('a -> 'b) -> 'b t
+    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
+  end
+end
+
+
+
+(** {2 Monad signature with product}
+
+    In a computational point of view, a monad is an abstraction of a sequence
+    of operations. But sometimes, one may need to specify that two operations
+    can be perform in *any* order, for instance when dealing with concurrency
+    or generic errors handling using the [option] type. To do so, one needs
+    a *product* on monadic values, i.e a way to combine two monads into a new
+    one. Thus a second signature is provided, including a product operator
+    and two the let-bindings [and*] and [and+]. *)
+module type S_with_product = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val flatten : 'a t t -> 'a t
+  val map  : ('a -> 'b  ) -> 'a t -> 'b t
+  val bind : ('a -> 'b t) -> 'a t -> 'b t
+  val product : 'a t -> 'b t -> ('a * 'b) t
+  module Operators : sig
+    val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( and* ) : 'a t -> 'b t -> ('a * 'b) t
+    val ( >>-: ) : 'a t -> ('a -> 'b) -> 'b t
+    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
+    val ( and+ ) : 'a t -> 'b t -> ('a * 'b) t
+  end
+end
+
+
+
+(** {2 Building monads from minimal signatures}
+
+    From now on, all provided definitions are designed for advanced users
+    that would like to build their own monads. Each monad can be build
+    by directly implementing all required operators in the previous
+    signatures. However, this is a tedious and error prone work, in
+    particular for the let-binging operators which are just syntactic
+    sugars for other operators.
+
+    To simplify this, two minimal definitions and the corresponding
+    functors are provided to alleviate this as much as possible. Both
+    definitions lead to strictly equivalent monads, as all operators of
+    one definition can be build from the other. Therefore, one can use
+    the simplest one to implement for their monad. 
+
+    In depth explanations on those minimal definitions and the properties
+    they should respect are given. A huge effort has been made to make
+    those explanations as simple as possible even if deep down, monads
+    take roots in the category theory, a notoriously difficult topic. *)
+
+
+(** {3 Minimal signature based on bind}
+
+    This is the usual minimal definition of a monadic type constructor, also
+    called a Kleisli triple. The [return] function embeds a value {m x} in
+    the monad. The [bind] function, also called the "combinator", corresponds
+    to the idea of "sequence" in the monadic world, i.e the call [bind f m]
+    comes down to performing the computation [m] before applying the next
+    computation step, represented by the function [f], to the resulting value.
 
     To fully qualify as a monad, these three parts must respect the three
     following laws :
@@ -49,15 +144,25 @@
     As there is no way in the OCaml type system to enforce those properties,
     users have to trust the implemented monad when using it, and developpers
     have to manually check that they are respected. *)
-module type Kleisli = sig
+module type Based_on_bind = sig
   type 'a t
   val return : 'a -> 'a t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
 end
 
 
+(** {3 Minimal signature based on bind with product}
 
-(** {2 Categoric signature for a monadic type constructor ['a t]}
+    This signature simply extends the previous one with a product operator. *)
+module type Based_on_bind_with_product = sig
+  type 'a t
+  val return : 'a -> 'a t
+  val bind : ('a -> 'b t) -> 'a t -> 'b t
+  val product : 'a t -> 'b t -> ('a * 'b) t
+end
+
+
+(** {3 Minimal definition based on map}
 
     In a computer science context, this is a rarer definition of a monadic
     type constructor. It is however equivalent to the Kleisli triple one,
@@ -125,7 +230,7 @@ end
     As there is no way in the OCaml type system to enforce those properties,
     users have to trust the implemented monad when using it, and developpers
     have to manually check that they are respected. *)
-module type Categoric = sig
+module type Based_on_map = sig
   type 'a t
   val return : 'a -> 'a t
   val map : ('a -> 'b) -> 'a t -> 'b t
@@ -133,35 +238,22 @@ module type Categoric = sig
 end
 
 
+(** {3 Minimal signature based on map with product}
 
-(** {2 Extended signature with let-bindings}
-
-    The minimal definitions of a monad are not that useful when one tries to
-    develop clean monadic code. To help alleviate this, one should instead
-    uses monads respecting this extended signature, that combines both the
-    Kleisli triple and categoric definitions and provides two let-binding
-    operators. The operator [let*] corresponds to the [bind] function
-    while the operator [let+] corresponds to the [map]. *)
-module type S = sig
+    This signature simply extends the previous one with a product operator. *)
+module type Based_on_map_with_product = sig
   type 'a t
   val return : 'a -> 'a t
+  val map : ('a -> 'b) -> 'a t -> 'b t
   val flatten : 'a t t -> 'a t
-  val map  : ('a -> 'b  ) -> 'a t -> 'b t
-  val bind : ('a -> 'b t) -> 'a t -> 'b t
-  module Operators : sig
-    val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
-    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
-    val ( >>-: ) : 'a t -> ('a -> 'b) -> 'b t
-    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
-  end
+  val product : 'a t -> 'b t -> ('a * 'b) t
 end
 
 
-
-(** {2 Extend minimal signature}
+(** {3 Functors extending minimal signatures}
 
     Those functors provide a way to extend a minimal signature into a full
-    monad that satisfies the signature defined above. This is possible
+    monad that satisfies the signatures defined above. This is possible
     because one can defines operations from one monadic definition
     using the operations required by the others. Indeed :
 
@@ -174,97 +266,18 @@ end
     All required laws expressed in both minimal signatures are respected
     using those definitions. *)
 
-(** Extend a Kleisli triple monad *)
-module Extend_Kleisli (M : Kleisli) : S with type 'a t = 'a M.t
+(** Extend a minimal monad based on bind *)
+module Make_based_on_bind (M : Based_on_bind) :
+  S with type 'a t = 'a M.t
 
-(** Extend a categoric monad *)
-module Extend_Categoric (M : Categoric) : S with type 'a t = 'a M.t
+(** Extend a minimal monad based on map *)
+module Make_based_on_map (M : Based_on_map) :
+  S with type 'a t = 'a M.t
 
-
-
-(** {2 Product on monads}
-
-    In a computational point of view, a monad is an abstraction of a sequence
-    of operations. But sometimes, one may need to specify that two operations
-    can be perform in *any* order, for instance when dealing with concurrency
-    or generic errors handling using the [option] type. To do so, one needs
-    to specify a *product* on monadic values, i.e a way to combine two monads
-    into a new one. The concept of a product has also deep roots in category
-    theory, but there is no need to dive into this for the purpose of this
-    module. *)
-module type Product = sig
-  type 'a t
-  val product : 'a t -> 'b t -> ('a * 'b) t
-end
-
-
-
-(** {3 Product on Kleisli triple monads}
-
-    When combined with a Kleisli triple monad, the product should respect
-    the following property if one wants it to truly encode that computations
-    can be performed in *any* order :
-
-    1. ∀l:('a t), ∀r:('b t), ∀f:(('a * 'b) -> 'c t),
-       [bind f (product l r) ≣ bind (fun (b, a) -> f (a, b)) (product r l)]
-
-    However, in some cases, this property is not feasible. In those cases, it
-    should be explicitly stated. *)
-module type Kleisli_with_product = sig
-  include Kleisli
-  include Product with type 'a t := 'a t
-end
-
-
-
-(** {3 Product on Categoric monads}
-
-    When combined with a Categoric monad, the product should respect the
-    following property if one wants it to truly encode that computations
-    can be performed in *any* order :
-
-    1. ∀l:('a t), ∀r:('b t), ∀f:(('a * 'b) -> 'c),
-       [map f (product l r) ≣ map (fun (b, a) -> f (a, b)) (product r l)]
-
-    However, in some cases, this property is not feasible. In those cases, it
-    should be explicitly stated.*)
-module type Categoric_with_product = sig
-  include Categoric
-  include Product with type 'a t := 'a t
-end
-
-
-
-(** {3 Extended monads with product}
-
-    Extended monads that provides a product also provides two and-binding
-    operators implementing it, the [and*] and [and+] operators.
-
-    Take note that a generic implementation of the product can be given
-    as [bind (fun a -> map (fun b -> (a, b)) r) l]. However, this
-    definition may not be symmetric, which is why one is required to
-    provide a custom product. *)
-module type S_with_product = sig
-  type 'a t
-  val return : 'a -> 'a t
-  val flatten : 'a t t -> 'a t
-  val map  : ('a -> 'b  ) -> 'a t -> 'b t
-  val bind : ('a -> 'b t) -> 'a t -> 'b t
-  val product : 'a t -> 'b t -> ('a * 'b) t
-  module Operators : sig
-    val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
-    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
-    val ( and* ) : 'a t -> 'b t -> ('a * 'b) t
-    val ( >>-: ) : 'a t -> ('a -> 'b) -> 'b t
-    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
-    val ( and+ ) : 'a t -> 'b t -> ('a * 'b) t
-  end
-end
-
-(** Extend a Kleisli triple monad with product *)
-module Extend_Kleisli_with_product (M : Kleisli_with_product) :
+(** Extend a minimal monad based on bind with product *)
+module Make_based_on_bind_with_product (M : Based_on_bind_with_product) :
   S_with_product with type 'a t = 'a M.t
 
-(** Extend a categoric monad *)
-module Extend_Categoric_with_product (M : Categoric_with_product) :
+(** Extend a minimal monad based on map with product *)
+module Make_based_on_map_with_product (M : Based_on_map_with_product) :
   S_with_product with type 'a t = 'a M.t
