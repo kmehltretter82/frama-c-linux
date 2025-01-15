@@ -408,11 +408,11 @@ module UnfoldAssigns =
 
 let () = Parameter_customize.set_group wp_strategy
 module Havoc =
-  True(struct
+  False(struct
     let option_name = "-wp-havoc"
     let help = "Specify the behavior of copying aggregates (struct/union/arrays):
-                - true (old, default): keep using havoc functionnality
-                - false (new): start using memcpy on aggregates"
+                - true (old): keep using havoc functionnality
+                - false (new, default): start using memcpy on aggregates"
   end)
 
 let () = Parameter_customize.set_group wp_strategy

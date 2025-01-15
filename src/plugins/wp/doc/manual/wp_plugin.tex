@@ -654,7 +654,10 @@ The use select an expression $e\equiv a[k_1\mapsto v][k_2]$. Then:
 }\]
 
 \paragraph{Havoc} Go Through Assigns \\
-This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc} predicate generate by complex assigns clause. The user select an address, and if the address is not assigned by the \texttt{Havoc} clause, the memory at this address is unchanged.
+This is a variant of the \texttt{Lemma} tactic dedicated to \texttt{Havoc}
+predicate generate by complex assigns clause. The user select an address, and
+if the address is not assigned by the \texttt{Havoc} clause, the memory at this
+address is unchanged.
 
 \paragraph{Separated} Expand Separation Cases\\
 This tactic decompose a \texttt{separated}$(a,n,b,m)$ predicate into its four base cases: $a$ and $b$ have different bases, $a+n \leq b$, $b+m \leq a$, and $a[0..n-1]$ and $b[0..m-1]$ overlaps. The regions are separated in the first three cases, and not separated in the overlapping case. This is kind of normal disjunctive form of the separation clause.

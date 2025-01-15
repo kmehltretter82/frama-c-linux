@@ -658,9 +658,7 @@ struct
       [ updated_init_atom seq obj loc (e_var init) ;
         updated_atom seq obj loc (e_var value) ]
     | C_comp _ | C_array _ ->
-      if Wp_parameters.Havoc.get () then
-        memcpy seq obj loc @ memcpy_init seq obj loc
-      else memcpy seq obj ~lsrc:loc loc @ memcpy_init seq obj loc
+      memcpy seq obj loc @ memcpy_init seq obj loc
 
   let assigned_range s obj l a b =
     let loc = M.shift l obj a in
