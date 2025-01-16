@@ -50,7 +50,7 @@
     operator while [>>-:] and [let+] always correspond to the [map].
     All those operators are provided in an [Operators] module to avoid
     spacename conflicts. Indeed, one can use the expression
-    [let open Monad.Operators in] to use all the let-bindings without
+    [let open MyMonad.Operators in] to use all the let-bindings without
     risking conflicts by including the other definitions, which have
     rather common names. This idiom also helps indicate which monad is
     currently used in a code. *)
@@ -104,7 +104,7 @@ end
     that would like to build their own monads. Each monad can be build
     by directly implementing all required operators in the previous
     signatures. However, this is a tedious and error prone work, in
-    particular for the let-binging operators which are just syntactic
+    particular for the let-binding operators which are just syntactic
     sugars for other operators.
 
     To simplify this, two minimal definitions and the corresponding
@@ -116,7 +116,10 @@ end
     In depth explanations on those minimal definitions and the properties
     they should respect are given. A huge effort has been made to make
     those explanations as simple as possible even if deep down, monads
-    take roots in the category theory, a notoriously difficult topic. *)
+    take roots in the category theory, a notoriously difficult topic.
+
+    For an example of monad implementation based on this module, see 
+    {!Option}. *)
 
 
 (** {3 Minimal signature based on bind}
@@ -142,7 +145,7 @@ end
        [bind (fun x -> bind g (f x)) m ≣ bind g (bind f m)]
 
     As there is no way in the OCaml type system to enforce those properties,
-    users have to trust the implemented monad when using it, and developpers
+    users have to trust the implemented monad when using it, and developers
     have to manually check that they are respected. *)
 module type Based_on_bind = sig
   type 'a t
@@ -228,7 +231,7 @@ end
     4. ∀m:('a t t), ∀f: ('a -> 'b), [flatten (map (map f) m) ≣ map f (flatten m)]
 
     As there is no way in the OCaml type system to enforce those properties,
-    users have to trust the implemented monad when using it, and developpers
+    users have to trust the implemented monad when using it, and developers
     have to manually check that they are respected. *)
 module type Based_on_map = sig
   type 'a t
