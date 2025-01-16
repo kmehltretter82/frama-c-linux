@@ -59,12 +59,14 @@ let options_ok () =
   check Parameters.EqualityCallFunction.get;
   let check_assigns kf =
     if need_assigns kf then
-      Self.error "@[no assigns@ specified@ for function '%a',@ for \
-                  which@ a builtin@ or the specification@ will be used.@ \
-                  Potential unsoundness.@]" Kernel_function.pretty kf
+      Self.warning ~wkey:Self.wkey_missing_assigns
+        "@[No assigns specified for function '%a', for which a builtin will be \
+         used. Potential unsoundness.@]"
+        Kernel_function.pretty kf
   in
-  Parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf);
-  Parameters.UsePrototype.iter (fun kf -> check_assigns kf)
+  Parameters.BuiltinsOverrides.iter (fun (kf, _) -> check_assigns kf)
+
+(* Parameters.UsePrototype.iter (fun kf -> check_assigns kf) *)
 
 let plugins_ok () =
   if not (Plugin.is_present "inout") then
@@ -77,8 +79,9 @@ let plugins_ok () =
 let generate_specs () =
   let aux kf =
     if need_assigns kf then begin
-      Self.warning "Generating potentially incorrect assigns \
-                    for function '%a' for which option %s is set"
+      Self.warning ~wkey:Self.wkey_missing_assigns
+        "@[No assigns specified for function '%a' for which option %s is set. \
+         Generating potentially incorrect assigns.@]"
         Kernel_function.pretty kf Parameters.UsePrototype.option_name;
       Populate_spec.populate_funspec ~do_body:true kf [`Assigns];
     end
