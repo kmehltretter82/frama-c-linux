@@ -100,26 +100,10 @@ end
 
 (** {2 Building monads from minimal signatures}
 
-    From now on, all provided definitions are designed for advanced users
-    that would like to build their own monads. Each monad can be built
-    by directly implementing all required operators in the previous
-    signatures. However, this is a tedious and error prone work, in
-    particular for the let-binding operators which are just syntactic
-    sugars for other operators.
-
-    To simplify this, two minimal definitions and the corresponding
-    functors are provided to alleviate this as much as possible. Both
-    definitions lead to strictly equivalent monads, as all operators of
-    one definition can be build from the other. Therefore, one can use
-    the simplest one to implement for their monad. 
-
-    In depth explanations on those minimal definitions and the properties
-    they should respect are given. A huge effort has been made to make
-    those explanations as simple as possible even if deep down, monads
-    take roots in the category theory, a notoriously difficult topic.
-
-    For an example of monad implementation based on this module, see 
-    {!Option}. *)
+    Below are functors for creating monads (with or without product). Both
+    gives a strictly equivalent implementation but differ from the primitives
+    given as argument. For an example of monad implementation based on this
+    module, see  {!Option}. *)
 
 
 (** {3 Minimal signature based on bind}
@@ -171,58 +155,17 @@ end
     type constructor. It is however equivalent to the Kleisli triple one,
     and may be simpler to use for certain monads, such as the [list] one.
 
-    To be pedantic, this approach defines a monad as a categoric functor
-    equipped with two natural transformations. This does sounds frightening
-    but this breaks down to rather simple concepts.
+    This approach requires three monadic operations. The first one, as in
+    the Kleisli triple approach, is a [return] function, allowing to plundge
+    values into the monad. The second one is a [map], that can be understand
+    as a parallel of the [map] on list, i.e a way to apply a function through
+    the monad. Finally, the third one is a [flatten] function, which allows
+    to handle nested applications of the monad.
 
-    Let's start at the beginning. A category is just a collection of objets
-    and arrows (or morphisms) between those objets that satisfies two
-    properties: there exists a morphism from all objects to themselves, i.e
-    an identity, and if there is a morphism between objects [a] and [b] and
-    a morphism between objects [b] and [c], then there must be a morphism
-    between [a] and [c], i.e morphisms are associative.
-
-    There is a strong parallel between categories and type systems. Indeed,
-    if one uses the collection of all types as objects, then for all types
-    ['a] and ['b], the function [f : 'a -> 'b] can be seen as a morphism
-    between the objets ['a] and ['b]. As functions are naturally associative
-    and, for any type ['a], one can trivially defines the identity function
-    ['a -> 'a], one can conclude that types along with all functions of
-    arithy one forms a category.
-
-    Next, there is the idea of functors. In the category theory, a functor
-    is a mapping between categories. That means that, given two categories
-    [A] and [B], a functor maps all objects of [A] to an object of [B] and
-    maps all morphisms of [A] into a morphims of [B]. But, not all mappings
-    are functors. Indeed, to be a valid functor, one as to preserve the
-    identity morphisms and the composition of morphims.
-
-    The idea of functors can also be seen in a type systems. At least, the
-    more restricted but enough here of an endofunctor, a functor from a
-    category to itself. Indeed, for any type [v] and for any parametric
-    type ['a t], the type [v t] can be seen as a mapping from values of
-    type [v] to values of type [v t]. Thus the type ['a t] encodes the first
-    part of what a functor is, a mapping from objects of the Type category
-    to objects of the Type category. For the second part, we need a way to
-    transform morphisms of the Type category, i.e functions of type ['a -> 'b],
-    in a way that preserves categoric properties. Expressed as a type, this
-    transformation can be seen as a higher-order function [map] with the
-    type [map : ('a -> 'b) -> ('a t -> 'b t)].
-
-    Finally, this definition of a monad requires two natural transformations.
-    Simply put, a natural transformation is a mapping between functors that
-    preserves the structures of all the underlying categories (mathematicians
-    and naming conventions...). That may be quite complicated to grasp, but in
-    this case, the two required transformations are quite simple and intuitive.
-
-    The first one, as in a Kleisli triple, is a [return] function that embeds
-    values {m x} of type [v] into the monad. This function must satisfies
-    similar laws than in a Kleisli triple, but expressed in terms of [map] :
+    As in the Kleisli triple approach, all those functions must satisfy some
+    laws to fully qualify as a monad :
 
     1. ∀x:'a, ∀f:('a -> 'b), [return (f x) ≣ map f (return x)]
-
-    The second one is called [flatten], and can be seen as a way to "flatten"
-    nested applications of the monad. It must also satisfy some laws :
 
     2. ∀m:('a t t t), [map flatten (flatten m) ≣ flatten (flatten m)]
 
@@ -232,7 +175,10 @@ end
 
     As there is no way in the OCaml type system to enforce those properties,
     users have to trust the implemented monad when using it, and developers
-    have to manually check that they are respected. *)
+    have to manually check that they are respected.
+
+    More explanations on this approach on monads and its deep roots in the
+    category theory can be found at the end of this file. *)
 module type Based_on_map = sig
   type 'a t
   val return : 'a -> 'a t
@@ -284,3 +230,59 @@ module Make_based_on_bind_with_product (M : Based_on_bind_with_product) :
 (** Extend a minimal monad based on map with product *)
 module Make_based_on_map_with_product (M : Based_on_map_with_product) :
   S_with_product with type 'a t = 'a M.t
+
+
+
+(** {3 Detailled explanations and category theory}
+
+    To be pedantic, the map based approach defines a monad as a categoric
+    functor equipped with two natural transformations. This does sounds
+    frightening but this breaks down to rather simple concepts.
+
+    Let's start at the beginning. A category is just a collection of objets
+    and arrows (or morphisms) between those objets that satisfies two
+    properties: there exists a morphism from all objects to themselves, i.e
+    an identity, and if there is a morphism between objects [a] and [b] and
+    a morphism between objects [b] and [c], then there must be a morphism
+    between [a] and [c], i.e morphisms are associative.
+
+    There is a strong parallel between categories and type systems. Indeed,
+    if one uses the collection of all types as objects, then for all types
+    ['a] and ['b], the function [f : 'a -> 'b] can be seen as a morphism
+    between the objets ['a] and ['b]. As functions are naturally associative
+    and, for any type ['a], one can trivially defines the identity function
+    ['a -> 'a], one can conclude that types along with all functions of
+    arithy one forms a category.
+
+    Next, there is the idea of functors. In the category theory, a functor
+    is a mapping between categories. That means that, given two categories
+    [A] and [B], a functor maps all objects of [A] to an object of [B] and
+    maps all morphisms of [A] into a morphims of [B]. But, not all mappings
+    are functors. Indeed, to be a valid functor, one as to preserve the
+    identity morphisms and the composition of morphims.
+
+    The idea of functors can also be seen in a type systems. At least, the
+    more restricted but enough here of an endofunctor, a functor from a
+    category to itself. Indeed, for any type [v] and for any parametric
+    type ['a t], the type [v t] can be seen as a mapping from values of
+    type [v] to values of type [v t]. Thus the type ['a t] encodes the first
+    part of what a functor is, a mapping from objects of the Type category
+    to objects of the Type category. For the second part, we need a way to
+    transform morphisms of the Type category, i.e functions of type ['a -> 'b],
+    in a way that preserves categoric properties. Expressed as a type, this
+    transformation can be seen as a higher-order function [map] with the
+    type [map : ('a -> 'b) -> ('a t -> 'b t)].
+
+    Finally, this definition of a monad requires two natural transformations.
+    Simply put, a natural transformation is a mapping between functors that
+    preserves the structures of all the underlying categories (mathematicians
+    and naming conventions...). That may be quite complicated to grasp, but in
+    this case, the two required transformations are quite simple and intuitive.
+
+    The first one is the [return] function that embeds values into the monad,
+    which can be seen as a natural transformation from the identity functor
+    to the monad functor. The second one is the [flatten] function, which
+    is a transformation from two applications of the monad functor to the
+    monad functor. With this two transformations, any number of application
+    of the monad functor can be taken down to a unique application of the
+    monad. *)

@@ -29,7 +29,9 @@ let zip l r =
   | _, Error e -> Error e
 
 module Operators = struct
+  let ( >>-  ) r f = bind r f
   let ( let* ) r f = bind r f
+  let ( >>-: ) r f = map f r
   let ( let+ ) r f = map f r
   let ( and* ) l r = zip l r
   let ( and+ ) l r = zip l r
