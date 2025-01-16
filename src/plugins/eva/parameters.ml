@@ -265,28 +265,25 @@ let () = add_precision_dep OctagonCall.parameter
 
 let () = Parameter_customize.set_group domains
 module AutoTaint =
-  Bool
+  False
     (struct
       let option_name = "-eva-auto-taint"
       let help = "Automatically taints the function parameters of \
-                  user input based functions (scanf, fgets, etc).\
-                  Disabled by default."
-      let default = false
+                  user input based functions (scanf, fgets, etc)."
     end)
 let () = add_precision_dep AutoTaint.parameter
 
 let () = Parameter_customize.set_group domains
 let () = Parameter_customize.is_invisible ()
 module TaintSingletons =
-  Bool
+  True
     (struct
       let option_name = "-eva-taint-singletons"
-      let help = "By default, variables which can only have one value can be \
-                  seen as tainted by the taint domain. \
+      let help = "By default, variables may be tainted by the taint domain \
+                  regardless of whether they have a single value. \
                   Use -eva-no-taint-singletons to never taint such variables. \
-                  This can be unsound in presence of some states partitioning \
+                  This may be unsound in presence of some state partitioning \
                   (such as split annotations)."
-      let default = true
     end)
 let () = add_precision_dep TaintSingletons.parameter
 
