@@ -72,28 +72,66 @@ module type S = sig
      and type loc = Loc.location
 end
 
-
+(** Access to analysis results, built by [Analysis] and used by [Results],
+    which defines the final and complete API to access Eva results. *)
 module type Results = sig
   type state
   type value
   type location
 
+  (** {2 Access to abstract states inferred by the analysis} *)
+
+  (** Return the abstract state computed at the start of the analysis,
+      as entry point of the main function, after the initialization of global
+      variables and main arguments. *)
   val get_global_state: unit -> state or_top_bottom
+
+  (** Return the abstract state inferred before or after a given statement.
+      This is the join of the states inferred for each callstack. *)
   val get_stmt_state : after:bool -> stmt -> state or_top_bottom
+
+  (** Return the abstract state inferred before or after a given statement,
+      for each callstack in which the analysis has reached the statement.
+      The optional argument [selection] allows selecting only some callstacks:
+      it is more efficient to select fewer callstacks, if not all are needed. *)
   val get_stmt_state_by_callstack:
     ?selection:Callstack.t list ->
     after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
+
+  (** Return the abstract state inferred at start of a given function.
+      This is the join of states inferred for each callstack. *)
   val get_initial_state:
     kernel_function -> state or_top_bottom
+
+  (** Return the abstract state inferred as entry point of the given function,
+      for each callstack in which the function has been analyzed.
+      The optional argument [selection] allows selecting only some callstacks:
+      it is more efficient to select fewer callstacks, if not all are needed. *)
   val get_initial_state_by_callstack:
     ?selection:Callstack.t list ->
     kernel_function -> state Callstack.Hashtbl.t or_top_bottom
 
+  (** {2 Shortcuts for the evaluation in an abstract state} *)
+
+  (** Evaluates the value of an expression in the given state. *)
   val eval_expr : state -> exp -> value evaluated
+
+  (** Evaluates the value of an lvalue in the given state, with possible
+      indeterminateness: non-initialization or escaping addresses. *)
   val copy_lvalue: state -> lval -> value flagged_value evaluated
+
+  (** Evaluates the location of an lvalue in the given state, for a read
+      access (invalid location for a read access are ignored). *)
   val eval_lval_to_loc: state -> lval -> location evaluated
+
+  (** Evaluates the function argument of a [Call] constructor. *)
   val eval_function_exp:
     state -> ?args:exp list -> exp -> kernel_function list evaluated
+
+  (** [assume_cond stmt state expr b] reduces the given abstract state
+      by assuming [exp] evaluates to:
+      - a non-zero value if [b] is true;
+      - zero if [b] is false. *)
   val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
 end
 
