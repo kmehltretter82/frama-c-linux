@@ -7,7 +7,7 @@
   
 [eva] computing for function scanf_va_1 <- main.
   Called from multi_taint.c:30.
-[eva] using specification for function scanf_va_1
+[eva] using specification for function scanf
 [eva] multi_taint.c:30: 
   function scanf_va_1: precondition \valid(param0) got status valid.
 [eva] multi_taint.c:30: 
