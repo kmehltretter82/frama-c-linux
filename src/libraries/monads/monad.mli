@@ -32,7 +32,7 @@
 
     This signature provides all the usual monadic operators along with
     let-bindings definitions used to simplify codes relying on monads.
-    The provides operators are as follows:
+    The provided operators are as follows:
     - [return] embeds a value [x] in the monad.
     - [bind] encodes the idea of "sequence" in the monadic world, i.e the
       call [bind f m] comes down to performing the computation [m] before
@@ -45,11 +45,11 @@
     The provided let-bindings operators can be used to write simpler and
     cleaner code. For example, one can write [let+ v = compute x in v + 1]
     instead of [map (fun v -> v + 1) (compute x)]. The more monadic steps,
-    the more simpler the code will get when written using those operators.
+    the simpler the code will get when written using those operators.
     In this module, [>>-] and [let*] always correspond to the [bind]
     operator while [>>-:] and [let+] always correspond to the [map].
     All those operators are provided in an [Operators] module to avoid
-    spacename conflicts. Indeed, one can use the expression
+    namespace conflicts. Indeed, one can use the expression
     [let open MyMonad.Operators in] to use all the let-bindings without
     risking conflicts by including the other definitions, which have
     rather common names. This idiom also helps indicate which monad is
@@ -74,11 +74,11 @@ end
 
     In a computational point of view, a monad is an abstraction of a sequence
     of operations. But sometimes, one may need to specify that two operations
-    can be perform in *any* order, for instance when dealing with concurrency
+    can be performed in *any* order, for instance when dealing with concurrency
     or generic errors handling using the [option] type. To do so, one needs
     a *product* on monadic values, i.e a way to combine two monads into a new
     one. Thus a second signature is provided, including a product operator
-    and two the let-bindings [and*] and [and+]. *)
+    and the two let-bindings [and*] and [and+]. *)
 module type S_with_product = sig
   type 'a t
   val return : 'a -> 'a t
@@ -101,7 +101,7 @@ end
 (** {2 Building monads from minimal signatures}
 
     From now on, all provided definitions are designed for advanced users
-    that would like to build their own monads. Each monad can be build
+    that would like to build their own monads. Each monad can be built
     by directly implementing all required operators in the previous
     signatures. However, this is a tedious and error prone work, in
     particular for the let-binding operators which are just syntactic
