@@ -1,5 +1,5 @@
 /* run.config*
-   STDOPT: +"-print -inout"
+   STDOPT: +"-print -inout -eva-warn-key assigns:missing=active"
 */
 volatile int v;
 int G;
@@ -50,7 +50,7 @@ void main1(void)
 
   g(2 * (int)(&T) );
   h((int*)(2 * (int)(&t3)));
-  
+
   j((int*)(T+9));
 
   assigns_post(18);

@@ -7,7 +7,7 @@
 [eva] computing for function mbrtoc8 <- main.
   Called from uchar_h.c:10.
 [eva] using specification for function mbrtoc8
-[eva:invalid-assigns] uchar_h.c:10: 
+[eva:assigns:invalid-location] uchar_h.c:10: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function mbrtoc8
 [eva] computing for function mbrtoc8 <- main.
@@ -15,14 +15,14 @@
 [eva] Done for function mbrtoc8
 [eva] computing for function mbrtoc8 <- main.
   Called from uchar_h.c:12.
-[eva:invalid-assigns] uchar_h.c:12: 
+[eva:assigns:invalid-location] uchar_h.c:12: 
   Completely invalid destination for assigns clause *(pc8 + 0). Ignoring.
 [eva] Done for function mbrtoc8
 [eva] computing for function mbrtoc8 <- main.
   Called from uchar_h.c:13.
-[eva:invalid-assigns] uchar_h.c:13: 
+[eva:assigns:invalid-location] uchar_h.c:13: 
   Completely invalid destination for assigns clause *(pc8 + 0). Ignoring.
-[eva:invalid-assigns] uchar_h.c:13: 
+[eva:assigns:invalid-location] uchar_h.c:13: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function mbrtoc8
 [eva] computing for function c8rtomb <- main.
@@ -31,22 +31,22 @@
 [eva] Done for function c8rtomb
 [eva] computing for function c8rtomb <- main.
   Called from uchar_h.c:15.
-[eva:invalid-assigns] uchar_h.c:15: 
+[eva:assigns:invalid-location] uchar_h.c:15: 
   Completely invalid destination for assigns clause *(s + (0 .. 16 - 1)).
   Ignoring.
 [eva] Done for function c8rtomb
 [eva] computing for function c8rtomb <- main.
   Called from uchar_h.c:16.
-[eva:invalid-assigns] uchar_h.c:16: 
+[eva:assigns:invalid-location] uchar_h.c:16: 
   Completely invalid destination for assigns clause *(s + (0 .. 16 - 1)).
   Ignoring.
-[eva:invalid-assigns] uchar_h.c:16: 
+[eva:assigns:invalid-location] uchar_h.c:16: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function c8rtomb
 [eva] computing for function mbrtoc16 <- main.
   Called from uchar_h.c:20.
 [eva] using specification for function mbrtoc16
-[eva:invalid-assigns] uchar_h.c:20: 
+[eva:assigns:invalid-location] uchar_h.c:20: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function mbrtoc16
 [eva] computing for function mbrtoc16 <- main.
@@ -54,14 +54,14 @@
 [eva] Done for function mbrtoc16
 [eva] computing for function mbrtoc16 <- main.
   Called from uchar_h.c:22.
-[eva:invalid-assigns] uchar_h.c:22: 
+[eva:assigns:invalid-location] uchar_h.c:22: 
   Completely invalid destination for assigns clause *(pc16 + 0). Ignoring.
 [eva] Done for function mbrtoc16
 [eva] computing for function mbrtoc16 <- main.
   Called from uchar_h.c:23.
-[eva:invalid-assigns] uchar_h.c:23: 
+[eva:assigns:invalid-location] uchar_h.c:23: 
   Completely invalid destination for assigns clause *(pc16 + 0). Ignoring.
-[eva:invalid-assigns] uchar_h.c:23: 
+[eva:assigns:invalid-location] uchar_h.c:23: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function mbrtoc16
 [eva] computing for function c16rtomb <- main.
@@ -70,22 +70,22 @@
 [eva] Done for function c16rtomb
 [eva] computing for function c16rtomb <- main.
   Called from uchar_h.c:25.
-[eva:invalid-assigns] uchar_h.c:25: 
+[eva:assigns:invalid-location] uchar_h.c:25: 
   Completely invalid destination for assigns clause *(s + (0 .. 16 - 1)).
   Ignoring.
 [eva] Done for function c16rtomb
 [eva] computing for function c16rtomb <- main.
   Called from uchar_h.c:26.
-[eva:invalid-assigns] uchar_h.c:26: 
+[eva:assigns:invalid-location] uchar_h.c:26: 
   Completely invalid destination for assigns clause *(s + (0 .. 16 - 1)).
   Ignoring.
-[eva:invalid-assigns] uchar_h.c:26: 
+[eva:assigns:invalid-location] uchar_h.c:26: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function c16rtomb
 [eva] computing for function mbrtoc32 <- main.
   Called from uchar_h.c:30.
 [eva] using specification for function mbrtoc32
-[eva:invalid-assigns] uchar_h.c:30: 
+[eva:assigns:invalid-location] uchar_h.c:30: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function mbrtoc32
 [eva] computing for function mbrtoc32 <- main.
@@ -93,14 +93,14 @@
 [eva] Done for function mbrtoc32
 [eva] computing for function mbrtoc32 <- main.
   Called from uchar_h.c:32.
-[eva:invalid-assigns] uchar_h.c:32: 
+[eva:assigns:invalid-location] uchar_h.c:32: 
   Completely invalid destination for assigns clause *(pc32 + 0). Ignoring.
 [eva] Done for function mbrtoc32
 [eva] computing for function mbrtoc32 <- main.
   Called from uchar_h.c:33.
-[eva:invalid-assigns] uchar_h.c:33: 
+[eva:assigns:invalid-location] uchar_h.c:33: 
   Completely invalid destination for assigns clause *(pc32 + 0). Ignoring.
-[eva:invalid-assigns] uchar_h.c:33: 
+[eva:assigns:invalid-location] uchar_h.c:33: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function mbrtoc32
 [eva] computing for function c32rtomb <- main.
@@ -109,16 +109,16 @@
 [eva] Done for function c32rtomb
 [eva] computing for function c32rtomb <- main.
   Called from uchar_h.c:35.
-[eva:invalid-assigns] uchar_h.c:35: 
+[eva:assigns:invalid-location] uchar_h.c:35: 
   Completely invalid destination for assigns clause *(s + (0 .. 16 - 1)).
   Ignoring.
 [eva] Done for function c32rtomb
 [eva] computing for function c32rtomb <- main.
   Called from uchar_h.c:36.
-[eva:invalid-assigns] uchar_h.c:36: 
+[eva:assigns:invalid-location] uchar_h.c:36: 
   Completely invalid destination for assigns clause *(s + (0 .. 16 - 1)).
   Ignoring.
-[eva:invalid-assigns] uchar_h.c:36: 
+[eva:assigns:invalid-location] uchar_h.c:36: 
   Completely invalid destination for assigns clause *ps. Ignoring.
 [eva] Done for function c32rtomb
 [eva] Recording results for main

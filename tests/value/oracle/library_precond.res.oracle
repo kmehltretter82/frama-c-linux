@@ -7,7 +7,7 @@
 [eva] computing for function mxml <- main.
   Called from library_precond.i:9.
 [eva] using specification for function mxml
-[eva] library_precond.i:5: Warning: 
+[eva:assigns:missing-result] library_precond.i:5: Warning: 
   no 'assigns \result \from ...' clause specified for function mxml
 [eva:alarm] library_precond.i:9: Warning: 
   function mxml: precondition got status invalid.

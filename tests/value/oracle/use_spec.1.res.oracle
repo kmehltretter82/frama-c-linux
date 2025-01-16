@@ -1,7 +1,6 @@
 [kernel] Parsing use_spec.i (no preprocessing)
-[eva] User Error: no assigns specified for function 'f', for which a builtin
-  or the specification will be used. Potential unsoundness.
-[eva] Warning: Generating potentially incorrect assigns for function 'f' for which option -eva-use-spec is set
+[eva:assigns:missing] Warning: 
+  No assigns specified for function 'f' for which option -eva-use-spec is set. Generating potentially incorrect assigns.
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -75,5 +74,5 @@
     x; y
   Sure outputs:
     w; z
-[eva] User Error: Deferred error message was emitted during execution. See above messages for more information.
+[eva] Warning: warning assigns:missing treated as deferred error. See above messages for more information.
 [kernel] Plug-in eva aborted: invalid user input.

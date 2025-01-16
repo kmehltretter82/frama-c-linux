@@ -43,7 +43,7 @@
   Neither code nor specification for function execlp_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
 [eva] using specification for function execlp
-[eva:invalid-assigns] exec.c:15: 
+[eva:assigns:invalid-location] exec.c:15: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.
 [eva] ====== VALUES COMPUTED ======

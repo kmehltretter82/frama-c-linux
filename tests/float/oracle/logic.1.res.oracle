@@ -336,7 +336,7 @@
 [eva] computing for function my_ratio <- test_is_finite <- main.
   Called from logic.i:181.
 [eva] using specification for function my_ratio
-[eva] logic.i:153: Warning: 
+[eva:assigns:missing-result] logic.i:153: Warning: 
   no 'assigns \result \from ...' clause specified for function my_ratio
 [eva] Done for function my_ratio
 [eva] computing for function my_ratio_body <- test_is_finite <- main.

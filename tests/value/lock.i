@@ -18,7 +18,7 @@
 /*@
   requires !(locked(m));
   ensures locked(m);
-  assigns ghost_loctable[0..99];
+  assigns ghost_loctable[0..99] \from indirect:*m;
 
  */
 void acquire_lock(struct mutex *m);
@@ -26,14 +26,14 @@ void acquire_lock(struct mutex *m);
 /*@
   requires locked(m);
   ensures !(locked(m));
-  assigns ghost_loctable[..];
+  assigns ghost_loctable[..] \from indirect:*m;
 
  */
 void release_lock(struct mutex *m);
 
 /*@
   requires !(locked(m));
-  assigns ghost_loctable[..];
+  assigns ghost_loctable[..] \from indirect:*m;
   behavior success:
   ensures (\result != 0) ==> locked(m);
 
@@ -43,11 +43,12 @@ void release_lock(struct mutex *m);
  */
 int try_acquire_lock(struct mutex *m);
 
-struct mutex *pmutex;
+struct mutex { int __id; };
+extern struct mutex mutex;
 
-/*@ requires !(locked(pmutex)); */
+/*@ requires !(locked(&mutex)); */
 void locks0_good(int flag)
 {
-    acquire_lock(pmutex);
-    release_lock(pmutex);
+    acquire_lock(&mutex);
+    release_lock(&mutex);
 }

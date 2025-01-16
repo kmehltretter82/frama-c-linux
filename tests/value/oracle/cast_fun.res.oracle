@@ -41,7 +41,7 @@
 [eva] computing for function f1 <- main.
   Called from cast_fun.i:60.
 [eva] using specification for function f1
-[eva] cast_fun.i:6: Warning: 
+[eva:assigns:missing-result] cast_fun.i:6: Warning: 
   no 'assigns \result \from ...' clause specified for function f1
 [eva] Done for function f1
 [eva:alarm] cast_fun.i:65: Warning: 
@@ -49,13 +49,13 @@
 [eva] computing for function f2 <- main.
   Called from cast_fun.i:65.
 [eva] using specification for function f2
-[eva] cast_fun.i:8: Warning: 
+[eva:assigns:missing-result] cast_fun.i:8: Warning: 
   no 'assigns \result \from ...' clause specified for function f2
 [eva] Done for function f2
 [eva] computing for function f3 <- main.
   Called from cast_fun.i:70.
 [eva] using specification for function f3
-[eva] cast_fun.i:10: Warning: 
+[eva:assigns:missing-result] cast_fun.i:10: Warning: 
   no 'assigns \result \from ...' clause specified for function f3
 [eva] Done for function f3
 [eva] computing for function f3 <- main.

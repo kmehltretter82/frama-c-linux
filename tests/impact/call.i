@@ -38,7 +38,7 @@ void main2(int x) {
 
 /* ************************************************************************* */
 
-/*@ assigns G; */
+/*@ assigns G \from \nothing; */
 void p3 (int);
 
 void test3 (void) {

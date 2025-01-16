@@ -12,17 +12,17 @@ enum states {
 };
 
 // contract with missing "complete behaviors"
-/*@ 
+/*@
     ensures \true;
     behavior from_init:
       assumes auto_states[Init] == 1;
       ensures (auto_states[Copy] == 1) && (auto_states[Init] == 0);
-      assigns auto_states[Init], auto_states[Copy];
+      assigns auto_states[Init], auto_states[Copy] \from \nothing;
 
     behavior from_other:
       assumes (auto_states[Init] == 0);
       assigns \nothing;
-     
+
 */
 void copy(int x);
 

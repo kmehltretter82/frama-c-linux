@@ -1,5 +1,5 @@
 /* run.config*
-  STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -then-last -eva
+  STDOPT: -aorai-automata %{dep:@PTEST_DIR@/@PTEST_NAME@.ya} -then-last -eva -eva-warn-key assigns:missing=active
 */
 
 //@ assigns \result \from x, n;

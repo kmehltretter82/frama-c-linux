@@ -14,9 +14,10 @@
   Analysis of function square_root_aux is thus incomplete and its soundness
   relies on the written specification.
 [eva] using specification for function square_root_aux
-[eva] floats.i:6: Warning: 
-  no \from part
-  for clause 'assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;'
+[eva:assigns:missing] floats.i:6: Warning: 
+  no \from part for clause
+  'assigns aorai_CurOpStatus, aorai_CurOperation, aorai_CurStates;'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva:alarm] <unknown location> Warning: 
   function square_root_aux, behavior Buchi_property_behavior: postcondition got status unknown.
 [eva:alarm] floats.i:11: Warning: 

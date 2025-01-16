@@ -41,7 +41,7 @@
 [eva] computing for function tsearch <- main.
   Called from search_h.c:34.
 [eva] using specification for function tsearch
-[eva:invalid-assigns] search_h.c:34: 
+[eva:assigns:invalid-location] search_h.c:34: 
   Completely invalid destination for assigns clause *compar. Ignoring.
 [eva] Done for function tsearch
 [eva:alarm] search_h.c:40: Warning: 
@@ -61,7 +61,7 @@
 [eva] computing for function twalk <- main.
   Called from search_h.c:46.
 [eva] using specification for function twalk
-[eva:invalid-assigns] search_h.c:46: 
+[eva:assigns:invalid-location] search_h.c:46: 
   Completely invalid destination for assigns clause *action. Ignoring.
 [eva] Done for function twalk
 [eva] Recording results for main
