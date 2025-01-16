@@ -23,10 +23,10 @@ This component is divided into 4 parts, the [titlebar](#plugins-callgraph-titleb
 
 The titlebar contains the name of the module on the left and the following buttons on the right:
 
-* [icon-TUNINGS] : Filter functions appearing in the graph. Ce filtre est synchronisé avec celui de la sidebar.
-* [icon-TARGET] : Move the camera to show each node after each render.
-* [icon-PIN] : Automatically select node of the function selected in AST.
-* [icon-HELP] : show this help modal.
+* [icon-tunings] : Filter functions appearing in the graph. Ce filtre est synchronisé avec celui de la sidebar.
+* [icon-target] : Move the camera to show each node after each render.
+* [icon-pin] : Automatically select node of the function selected in AST.
+* [icon-help] : show this help modal.
 
 ##Toolbar {#plugins-callgraph-toolbar}
 
@@ -42,7 +42,7 @@ On the left, there is a group of buttons for selecting the nodes that will appea
 On the right:
 
 * Horizontal and vertical distance management between graph nodes.
-* [icon-SIDEBAR] : Opens or closes the side panel.
+* [icon-sidebar] : Opens or closes the side panel.
 
 ## Panel {#callgraph-panel}
 
@@ -57,7 +57,7 @@ The graph is in 3D but is displayed as a tree. This type of display prevents cyc
 
 If a cycle is detected :
 
-* In the case of a recursive function: The link is deleted and the [icon-REDO-orange] icon is added to the node.
+* In the case of a recursive function: The link is deleted and the [icon-redo-orange] icon is added to the node.
 * In the case of a cycle on several functions: The cycles will be pre-selected and will appear in the selection button.
 
 ### Nodes
@@ -66,8 +66,8 @@ The nodes display the name of the function and the following elements:
 
 * [led-warning] : The function contains unproven properties, a tooltip gives the quantity.
 * [led-negative] : The function contains false properties, a tooltip gives the quantity.
-* [icon-REDO-orange] : The function is recursive.
-* [icon-DROP.FILLED-#882288][icon-DROP.FILLED-#73BBBB]: The function contains tainted properties.
+* [icon-redo-orange] : The function is recursive.
+* [icon-drop.filled-#882288][icon-drop.filled-#73BBBB]: The function contains tainted properties.
 
 ### Edges
 

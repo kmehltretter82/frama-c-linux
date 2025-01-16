@@ -95,7 +95,7 @@ export function SVG(props: SVGprops): null | JSX.Element {
 // --- Icon Component
 // --------------------------------------------------------------------------
 
-const iconKindList = [
+export const iconKindList = [
   'disabled', 'selected', 'positive', 'negative', 'warning', 'default'
 ] as const;
 

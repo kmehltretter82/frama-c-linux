@@ -26,11 +26,13 @@ import remarkCustomHeaderId from 'remark-custom-header-id';
 
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
-import { Icon, jIconKind } from 'dome/controls/icons';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { Icon, jIconKind, IconKind } from 'dome/controls/icons';
 import {
   CodeBlock, atomOneDark, atomOneLight
 } from "react-code-blocks";
-import { jLEDstatus, LED } from 'dome/controls/displays';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { jLEDstatus, LED, LEDstatus } from 'dome/controls/displays';
 
 export interface Pattern {
   pattern: RegExp,
@@ -38,39 +40,37 @@ export interface Pattern {
 }
 
 /**
- * iconTag allows you to replace the tag with an icon.
+ * iconTag allows you to replace the tag with an {@link Icon}.
  *
- * The associated regex is `/(\[ex:\])?(\[icon-([^-\]]+)(-([^\]]+))?\])/g`.
+ * `[icon-<id>(-<kind | color>)?]` :
  *
- * * first capture `[ex:]` (option): allows to write the second group without
- * applying a replacement if exist
- * * second capture : represents the icon with `ID` and `kind | color`
- *   * capture 3 : the icon Id
- *   * capture 4-5 (option): the kind or color of the icon
+ * * Id : case-insensitive, consult [Icon Gallery](../../doc/guides/icons.md)
+ * * kind : {@link IconKind}
+ * * color : Hexa or html
  *
- * Exemple :
- * `[icon-TUNINGS-#FF0000]` this tag will be replaced by a red TUNINGS icon
+ * @example
+ * [icon-tunings-#FF0000] : this tag will be replaced by a red TUNINGS icon
  */
+
 export const iconTag: Pattern = {
-  pattern: /(\[ex:\])?(\[icon-([^-\]]+)(-([^\]]+))?\])/g,
+  pattern: /(\[icon-([^-\]]+)(-([^\]]+))?\])/g,
   replace: (key: number, match?: RegExpExecArray) => {
     if(!match) return null;
-    const id = match[3];
-    const kind = jIconKind(match[5]);
-    const color = !kind ? match[5] : undefined;
-    if(match[1] === "[ex:]") {
-      return <span key={key}>{match[2]}</span>;
-    }
-    return <Icon key={key} id={id} kind={kind} fill={color}/>;
+    const kind = jIconKind(match[4]);
+    const color = !kind ? match[4] : undefined;
+    return <Icon key={key}
+     id={match[2].toUpperCase()}
+     kind={kind}
+     fill={color}
+    />;
   }
 };
 
 /**
- * ledTag allows you to replace the tag with an LED.
- * The associated regex is `/\[led-([^\]]+)\]/g`.
+ * ledTag allows you to replace the tag with an {@link LED}.
  *
- * The capture `([^\]]+)` represents the LEDStatus.
- */
+ * `[led-<status>]` : {@link LEDstatus}
+ * */
 export const ledTag: Pattern = {
   pattern: /\[led-([^\]]+)\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
