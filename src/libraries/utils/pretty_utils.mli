@@ -57,9 +57,6 @@ val to_string: ?margin:int -> (Format.formatter -> 'a -> unit) -> 'a -> string
 
 (** {2 separators} *)
 
-val pp_print_string_fill : Format.formatter -> string -> unit
-(** transforms every space in a string in breakable spaces.*)
-
 val escape_underscores : string -> string
 
 (* ********************************************************************** *)

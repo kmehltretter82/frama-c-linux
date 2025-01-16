@@ -37,15 +37,6 @@ let to_string ?margin pp x =
   Format.pp_print_flush f () ;
   Buffer.contents b
 
-let rec pp_print_string_fill out s =
-  if String.contains s ' ' then begin
-    let i = String.index s ' ' in
-    let l = String.length s in
-    let s1 = String.sub s 0 i in
-    let s2 = String.sub s (i+1) (l - i - 1) in
-    Format.fprintf out "%s@ %a" s1 pp_print_string_fill s2
-  end else Format.pp_print_string out s
-
 type sformat = (unit,Format.formatter,unit) format
 type 'a formatter = Format.formatter -> 'a -> unit
 type ('a,'b) formatter2 = Format.formatter -> 'a -> 'b -> unit
