@@ -63,9 +63,6 @@ module Bottom : sig
   (* Iterators *)
   val iter : ('a -> unit) -> 'a t -> unit
 
-  (* Combination *)
-  val zip : 'a t -> 'b t -> ('a * 'b) t (* `Bottom if any is `Bottom *)
-
   (** In a lattice where the elements are lists of non-bottom values,
       the empty list is the bottom case. *)
 
@@ -112,9 +109,6 @@ module Top : sig
 
   (* Iterators *)
   val iter : ('a -> unit) -> 'a t -> unit
-
-  (** Combination *)
-  val zip : 'a t -> 'b t -> ('a * 'b) t (* `Top if any is `Top *)
 
   (** Conversion *)
   val to_option : 'a t -> 'a option
