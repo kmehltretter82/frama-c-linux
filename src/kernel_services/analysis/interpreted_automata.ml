@@ -398,6 +398,8 @@ type goto_list = (vertex * stmt * stmt) list ref
 type control_points = {
   src: vertex;
   dest: vertex;
+  continue: vertex;
+  break: vertex;
 }
 
 
@@ -407,22 +409,6 @@ let is_loop stmt = match stmt.skind with Loop _ -> true | _ -> false
 let is_goto stmt = match stmt.skind with Goto _ -> true | _ -> false
 
 let is_goto_destination stmt = List.exists is_goto stmt.preds
-
-let is_stmt_in_block block stmt =
-  let exception Found in
-  let visitor = object
-    inherit Cil.nopCilVisitor
-    method! vstmt s =
-      if Cil_datatype.Stmt.equal s stmt then raise Found else Cil.DoChildren
-  end in
-  try ignore (Cil.visitCilBlock visitor block); false
-  with Found -> true
-
-(* Returns true if [loop] is a loop whose body contains [stmt]. *)
-let is_loop_containing_stmt ~loop stmt =
-  match loop.skind with
-  | Cil_types.Loop (_, block, _, _, _) -> is_stmt_in_block block stmt
-  | _ -> false
 
 let stmt_loc stmt =
   Cil_datatype.Stmt.loc stmt
@@ -504,7 +490,6 @@ let build_automaton ~annotations kf =
   (* These objects are "global" through the traversal of the function *)
   let g = G.create () in
   let table : (vertex * vertex) StmtTable.t = StmtTable.create 17 in
-  let loop_head_table : vertex StmtTable.t = StmtTable.create 4 in
   let gotos : goto_list = ref [] in
   let loop_level = ref 0 in
 
@@ -597,7 +582,7 @@ let build_automaton ~annotations kf =
       in
       add_edge control.src block_start kinstr (Enter block) loc_start;
       add_edge block_end control.dest kinstr (Leave block) loc_end;
-      let block_control = {src = block_start; dest = block_end} in
+      let block_control = {control with src = block_start; dest = block_end} in
       do_list do_stmt block_control labels block.bstmts
     end
 
@@ -660,10 +645,16 @@ let build_automaton ~annotations kf =
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
         control.src
 
-      | Break _ | Continue _ ->
+      | Break _ | Continue _ as skind ->
         assert (List.length stmt.succs = 1);
         let dest_stmt = List.hd stmt.succs in
-        gotos := (control.src,stmt,dest_stmt) :: !gotos;
+        let dest =
+          match skind with
+          | Break _ -> control.break
+          | Continue _ -> control.continue
+          | _ -> assert false
+        in
+        build_stmt_transition control.src dest stmt dest_stmt Skip;
         control.src
 
       | If (exp, then_block, else_block, _) ->
@@ -691,6 +682,7 @@ let build_automaton ~annotations kf =
         let block_control = {
           control with
           src = add_vertex ();
+          break = control.dest;
         } in
         do_block block_control kinstr labels block;
         (* Then link the cases *)
@@ -751,12 +743,13 @@ let build_automaton ~annotations kf =
           if not annotations
           then
             { src = control.src;
-              dest = control.src; }
+              dest = control.src;
+              break = control.dest;
+              continue = control.src; }
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
             let loop_head_point = add_vertex () in
-            StmtTable.add loop_head_table stmt loop_head_point;
             add_edge control.src loop_head_point kinstr Skip loc;
             loop_head_point.vertex_info <- LoopHead {stmt; level = !loop_level};
             let labels =
@@ -777,8 +770,10 @@ let build_automaton ~annotations kf =
               do_annot_list {control with src = loop_end_point} labels end_annot
             in
             add_edge loop_back loop_head_point kinstr Skip loc;
-            { src=loop_start_body;
-              dest=loop_end_point; }
+            { src = loop_start_body;
+              dest = loop_end_point;
+              break = control.dest;
+              continue = loop_head_point  }
         in
         do_block loop_control kinstr labels block;
         decr loop_level;
@@ -808,6 +803,8 @@ let build_automaton ~annotations kf =
   let control = {
     src = entry_point;
     dest = return_point;
+    break = dummy_vertex;
+    continue = dummy_vertex;
   }
   in
 
@@ -819,15 +816,7 @@ let build_automaton ~annotations kf =
   (* Handle gotos *)
   List.iter
     begin fun (src,src_stmt,dest_stmt) ->
-      let dest =
-        (* On gotos from a loop body to the loop itself, the destination should
-           be the loop head instead of the first vertex of the loop statement,
-           which represents [loop_entry] and is actually not in the graph loop.
-           This is especially important for [continue] statements. *)
-        if annotations && is_loop_containing_stmt ~loop:dest_stmt src_stmt
-        then StmtTable.find loop_head_table dest_stmt
-        else fst (StmtTable.find table dest_stmt)
-      in
+      let dest = fst (StmtTable.find table dest_stmt) in
       build_stmt_transition src dest src_stmt dest_stmt Skip
     end !gotos;
 
