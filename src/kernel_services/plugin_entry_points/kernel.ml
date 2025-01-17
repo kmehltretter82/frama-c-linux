@@ -1867,14 +1867,7 @@ module CacheSize =
 let () = CacheSize.set_range ~min:1 ~max:10
 let () = CacheSize.add_update_hook (fun _ i -> Binary_cache.set_cache_size i)
 
-(* ************************************************************************* *)
-(** {2 Other options} *)
-(* ************************************************************************* *)
-
-[@@@warning "-60"]
-(* Warning: these options are parsed and used directly from Cmdline *)
-
-let () = Parameter_customize.set_group project
+let () = Parameter_customize.set_group performance
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 module Deterministic =
@@ -1885,6 +1878,10 @@ module Deterministic =
       let option_name = "-deterministic"
       let help = ""
     end)
+
+(* ************************************************************************* *)
+(** {2 Other options} *)
+(* ************************************************************************* *)
 
 let () = Parameter_customize.set_group checks
 let () = Parameter_customize.do_not_projectify ()
@@ -1898,8 +1895,6 @@ module Permissive =
       let help =
         "perform less verifications on validity of command-line options"
     end)
-
-[@@@warning "+60"]
 
 (*
 Local Variables:
