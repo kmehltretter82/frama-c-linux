@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-01-17] New option -memory-footprint to configure the memory
+              usage of analyses.
 o!  Kernel    [2024-12-20] Remove Cabs.SEQUENCE statement
 
 ###############################################################################
