@@ -35,11 +35,19 @@ open Cil_types
     of the type structure, in case of composite, enumeration and named types *)
 val get_attributes : typ -> attributes
 
-(** Add some attributes to a type.
-    [combine] explains how to combine attributes.
-    Default is {!Ast_attributes.add_list}.
+(** Add some attributes to a type. [combine] explains how to combine attributes
+    (defaults to {!Ast_attributes.add_list}). [push_qualifiers] determines
+    if type qualifiers are pushed to the elements type. It defaults to
+    [true] and should not be set to [false] unless you known what you are
+    doing. In Frama-C this is useful for formals (see C11 6.7.6.3#7), so
+    [push_qualifiers] is turned off when typing array formals before they
+    are changed into pointers.
+
+    @before Frama-C+dev In Cil [push_qualifiers] was not present, which caused
+    a bug in cabs2cil.
 *)
 val add_attributes :
+  ?push_qualifiers:bool ->
   ?combine:(attribute list ->
             attributes -> attributes) ->
   attribute list -> typ -> typ

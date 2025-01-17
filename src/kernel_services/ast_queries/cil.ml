@@ -6738,7 +6738,7 @@ let separateStorageModifiers = Ast_attributes.split_storage_modifiers
 let typeAttr { tattr } = tattr
 let typeAttrs = Ast_types.get_attributes
 let setTypeAttrs t a = { t with tattr =  a }
-let typeAddAttributes = Ast_types.add_attributes
+let typeAddAttributes = Ast_types.add_attributes ~push_qualifiers:true
 
 let typeHasAttribute = Ast_types.has_attribute
 let typeHasQualifier = Ast_types.has_qualifier
