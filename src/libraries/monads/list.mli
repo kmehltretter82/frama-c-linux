@@ -20,7 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Extend the [list] type to a full fleshed monad. This monad can be used
-   to represent non-deterministic computations. *)
+(** Extend the [list] type to a full fleshed monad. This monad can be used
+    to represent non-deterministic computations.
+    @since Frama-C+dev *)
+
 include module type of Stdlib.List
 include Monad.S_with_product with type 'a t = 'a list

@@ -53,7 +53,8 @@
     [let open MyMonad.Operators in] to use all the let-bindings without
     risking conflicts by including the other definitions, which have
     rather common names. This idiom also helps indicate which monad is
-    currently used in a code. *)
+    currently used in a code.
+    @since Frama-C+dev *)
 module type S = sig
   type 'a t
   val return : 'a -> 'a t
@@ -78,7 +79,8 @@ end
     or generic errors handling using the [option] type. To do so, one needs
     a *product* on monadic values, i.e a way to combine two monads into a new
     one. Thus a second signature is provided, including a product operator
-    and the two let-bindings [and*] and [and+]. *)
+    and the two let-bindings [and*] and [and+].
+    @since Frama-C+dev *)
 module type S_with_product = sig
   type 'a t
   val return : 'a -> 'a t
@@ -130,7 +132,8 @@ end
 
     As there is no way in the OCaml type system to enforce those properties,
     users have to trust the implemented monad when using it, and developers
-    have to manually check that they are respected. *)
+    have to manually check that they are respected.
+    @since Frama-C+dev *)
 module type Based_on_bind = sig
   type 'a t
   val return : 'a -> 'a t
@@ -140,7 +143,8 @@ end
 
 (** {3 Minimal signature based on bind with product}
 
-    This signature simply extends the previous one with a product operator. *)
+    This signature simply extends the previous one with a product operator.
+    @since Frama-C+dev *)
 module type Based_on_bind_with_product = sig
   type 'a t
   val return : 'a -> 'a t
@@ -178,7 +182,8 @@ end
     have to manually check that they are respected.
 
     More explanations on this approach on monads and its deep roots in the
-    category theory can be found at the end of this file. *)
+    category theory can be found at the end of this file.
+    @since Frama-C+dev *)
 module type Based_on_map = sig
   type 'a t
   val return : 'a -> 'a t
@@ -189,7 +194,8 @@ end
 
 (** {3 Minimal signature based on map with product}
 
-    This signature simply extends the previous one with a product operator. *)
+    This signature simply extends the previous one with a product operator.
+    @since Frama-C+dev *)
 module type Based_on_map_with_product = sig
   type 'a t
   val return : 'a -> 'a t
@@ -215,19 +221,23 @@ end
     All required laws expressed in both minimal signatures are respected
     using those definitions. *)
 
-(** Extend a minimal monad based on bind *)
+(** Extend a minimal monad based on bind.
+    @since Frama-C+dev *)
 module Make_based_on_bind (M : Based_on_bind) :
   S with type 'a t = 'a M.t
 
-(** Extend a minimal monad based on map *)
+(** Extend a minimal monad based on map.
+    @since Frama-C+dev *)
 module Make_based_on_map (M : Based_on_map) :
   S with type 'a t = 'a M.t
 
-(** Extend a minimal monad based on bind with product *)
+(** Extend a minimal monad based on bind with product.
+    @since Frama-C+dev *)
 module Make_based_on_bind_with_product (M : Based_on_bind_with_product) :
   S_with_product with type 'a t = 'a M.t
 
-(** Extend a minimal monad based on map with product *)
+(** Extend a minimal monad based on map with product.
+    @since Frama-C+dev *)
 module Make_based_on_map_with_product (M : Based_on_map_with_product) :
   S_with_product with type 'a t = 'a M.t
 

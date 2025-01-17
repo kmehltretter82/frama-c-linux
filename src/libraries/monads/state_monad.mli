@@ -21,7 +21,9 @@
 (**************************************************************************)
 
 (** The State monad represents computations relying on a global mutable
-    state but implemented in a functionnal way. *)
+    state but implemented in a functionnal way.
+    @since Frama-C+dev *)
+
 module Make (Env : Datatype.S_with_collections) : sig
   include Monad.S
   type env = Env.t

@@ -44,7 +44,8 @@
     Note here that trying to reverse the order of the Option and State
     monads makes the [swap] function way harder to write. Moreover, the
     resulting function does not actually satisfy the required axioms.
-    More details on this at the end of this file. *)
+    More details on this at the end of this file.
+    @since Frama-C+dev *)
 
 module type Axiom = sig
   type 'a interior and 'a exterior
@@ -52,16 +53,18 @@ module type Axiom = sig
 end
 
 module Make
-    (Int : Monad.S)
-    (Ext : Monad.S)
-    (_ : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-  : Monad.S with type 'a t = 'a Int.t Ext.t
+    (Interior : Monad.S)
+    (Exterior : Monad.S)
+    (_ : Axiom with type 'a interior = 'a Interior.t
+                and type 'a exterior = 'a Exterior.t)
+  : Monad.S with type 'a t = 'a Interior.t Exterior.t
 
 module Make_with_product
-    (Int : Monad.S_with_product)
-    (Ext : Monad.S_with_product)
-    (_ : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-  : Monad.S_with_product with type 'a t = 'a Int.t Ext.t
+    (Interior : Monad.S_with_product)
+    (Exterior : Monad.S_with_product)
+    (_ : Axiom with type 'a interior = 'a Interior.t
+                and type 'a exterior = 'a Exterior.t)
+  : Monad.S_with_product with type 'a t = 'a Interior.t Exterior.t
 
 
 (** {3 Notes}
