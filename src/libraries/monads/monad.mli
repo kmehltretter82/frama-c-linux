@@ -203,7 +203,7 @@ end
 
     Those functors provide a way to extend a minimal signature into a full
     monad that satisfies the signatures defined above. This is possible
-    because one can defines operations from one monadic definition
+    because one can define operations from one monadic definition
     using the operations required by the others. Indeed :
 
     1. ∀m:('a t), ∀f:('a -> 'b), [map f m ≣ bind (fun x -> return (f x)) m]
@@ -236,7 +236,7 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
 (** {3 Detailled explanations and category theory}
 
     To be pedantic, the map based approach defines a monad as a categoric
-    functor equipped with two natural transformations. This does sounds
+    functor equipped with two natural transformations. This does sound
     frightening but this breaks down to rather simple concepts.
 
     Let's start at the beginning. A category is just a collection of objets
@@ -252,13 +252,13 @@ module Make_based_on_map_with_product (M : Based_on_map_with_product) :
     between the objets ['a] and ['b]. As functions are naturally associative
     and, for any type ['a], one can trivially defines the identity function
     ['a -> 'a], one can conclude that types along with all functions of
-    arithy one forms a category.
+    arity one forms a category.
 
     Next, there is the idea of functors. In the category theory, a functor
     is a mapping between categories. That means that, given two categories
     [A] and [B], a functor maps all objects of [A] to an object of [B] and
-    maps all morphisms of [A] into a morphims of [B]. But, not all mappings
-    are functors. Indeed, to be a valid functor, one as to preserve the
+    maps any morphism of [A] into a morphism of [B]. But, not all mappings
+    are functors. Indeed, to be a valid functor, one has to preserve the
     identity morphisms and the composition of morphims.
 
     The idea of functors can also be seen in a type systems. At least, the
