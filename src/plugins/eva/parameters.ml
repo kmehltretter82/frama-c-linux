@@ -1280,6 +1280,7 @@ let () = add_precision_dep MallocLevel.parameter
 (* --- Annotations Generator options                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
+let () = Parameter_customize.set_group messages
 module Annot =
   Kernel_function_set
     (struct
