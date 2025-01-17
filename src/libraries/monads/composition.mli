@@ -20,6 +20,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** This module exposes two functors that, given a monad M called the
+    "interior monad" and a monad N called the "exterior monad", build
+    a monad of type ['a M.t N.t]. To be able to do so, one has to provide
+    a [swap] function that, simply put, swap the exterior monad out of
+    the interior one. In other word, this function allows to fix
+    "badly ordered" monads compositions, in the sens that they are
+    applied in the opposite order as the desired one.
+
+    For example, one may want to combine the State monad and the Option
+    monad to represent a stateful computation that may fail. To do so,
+    one can either rewrite all the needed monadic operations, which may
+    prove difficult, or use the provided functors of this module. Using
+    the Option monad as the interior and the State monad as the exterior,
+    one can trivially provide the following swap function:
+    ```ocaml
+    let swap (m : 'a State.t Option.t) : 'a Option.t State.t =
+      match m with
+      | None -> State.return None
+      | Some s -> State.map Option.return s
+    ```
+
+    Note here that trying to reverse the order of the Option and State
+    monads makes the [swap] function way harder to write. Moreover, the
+    resulting function does not actually satisfy the required axioms.
+    More details on this at the end of this file. *)
+
 module type Axiom = sig
   type 'a interior and 'a exterior
   val swap : 'a exterior interior -> 'a interior exterior
@@ -36,3 +62,17 @@ module Make_with_product
     (Ext : Monad.S_with_product)
     (_ : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
   : Monad.S_with_product with type 'a t = 'a Int.t Ext.t
+
+
+(** {3 Notes}
+
+    Monads composition is a notoriously difficult topic, and no general
+    approach exists. The one provided in this module is, in theory,
+    quite restrictive as the [swap] function, also called a distributive
+    law, has to satisfy four axioms to guarantee that a valid monad can
+    be built. Roughly speaking, those axioms enforce the idea that
+    the distributive law must preserve all structures in the two monads.
+
+    @see Jon Beck paper "Distributive laws" for more details on this topic.
+    @see Alexandre Goy thesis "On the compositionality of monads via weak
+    distributive laws" for details on how to relax some of those axioms. *)
