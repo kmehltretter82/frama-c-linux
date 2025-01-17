@@ -34,12 +34,12 @@
     prove difficult, or use the provided functors of this module. Using
     the Option monad as the interior and the State monad as the exterior,
     one can trivially provide the following swap function:
-    ```ocaml
-    let swap (m : 'a State.t Option.t) : 'a Option.t State.t =
-      match m with
-      | None -> State.return None
-      | Some s -> State.map Option.return s
-    ```
+    {[
+      let swap (m : 'a State.t Option.t) : 'a Option.t State.t =
+        match m with
+        | None -> State.return None
+        | Some s -> State.map Option.return s
+    ]}
 
     Note here that trying to reverse the order of the Option and State
     monads makes the [swap] function way harder to write. Moreover, the
