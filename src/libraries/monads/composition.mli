@@ -24,7 +24,7 @@
     "interior monad" and a monad N called the "exterior monad", build
     a monad of type ['a M.t N.t]. To be able to do so, one has to provide
     a [swap] function that, simply put, swap the exterior monad out of
-    the interior one. In other word, this function allows to fix
+    the interior one. In other word, this function allows fixing
     "badly ordered" monads compositions, in the sens that they are
     applied in the opposite order as the desired one.
 
