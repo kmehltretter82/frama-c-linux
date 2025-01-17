@@ -167,7 +167,7 @@ end
 
     1. ∀x:'a, ∀f:('a -> 'b), [return (f x) ≣ map f (return x)]
 
-    2. ∀m:('a t t t), [map flatten (flatten m) ≣ flatten (flatten m)]
+    2. ∀m:('a t t t), [flatten (map flatten m) ≣ flatten (flatten m)]
 
     3. ∀m:('a t), [flatten (map return m) ≣ flatten (return m) ≣ m]
 
