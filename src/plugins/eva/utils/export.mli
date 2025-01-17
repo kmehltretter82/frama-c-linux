@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -37,7 +37,7 @@ val export_value :
    instruction or the branching condition of the statement. Other kinds of
    statements, like loops, blocks and exceptions are not visited.
 
-   More precisely, for set and call instructions: the writen l-values from
+   More precisely, for set and call instructions: the written l-values from
    left-hand-side are not visited, but their inner l-values are visited; any
    l-value from the right-hand-side of the instruction is also visited.
 *)
@@ -50,14 +50,13 @@ val emitter : Emitter.t
 (**
    Creates a visitor that can be used to generate new annotations for all
    visited instructions. The generated assertions are associated with the local
-   {!generated} emitter. They are all assigned a valid status by
-   {!Analysis.emitter}.
+   {!emitter}. They are all assigned a valid status by {!Analysis.emitter}.
 *)
 val generator : unit -> Visitor.frama_c_inplace
 
 (**
    Creates a visitor that can be used to remove all generated annotations from
-   {!generated} emitter. This will also remove their associated status.
+   {!emitter}. This will also remove their associated status.
 *)
 val cleaner : unit -> Visitor.frama_c_inplace
 
