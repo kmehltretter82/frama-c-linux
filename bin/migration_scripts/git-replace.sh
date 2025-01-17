@@ -21,6 +21,9 @@
 #                                                                        #
 ##########################################################################
 
+# Patch old private git history to the new public git history.
+# (only useful on private frama-c/frama-c repository)
+
 git replace fbe13264f29d59b5388096281f98f05116b17f76 8e6afe71d01b1bc4f4d778a5326d0a2e1f2998b3
 git replace cef5bf08946dccaf6b51e515eea76443976e6550 8bd30e2d47ffab72507d5ea291bdbd9f0fea0384
 git replace dbdd833de897111300f4525844170643fa8b5986 38863fe7d7d53aaf9e31703b738170f743b0b172
