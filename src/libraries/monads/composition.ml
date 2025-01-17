@@ -29,20 +29,20 @@ module Make
     (Int : Monad.S)
     (Ext : Monad.S)
     (X : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-= Monad.Make_based_on_map (struct
+  = Monad.Make_based_on_map (struct
     type 'a t = 'a Int.t Ext.t
     let return  x = Ext.return (Int.return x)
     let map   f m = Ext.map (Int.map f) m
     let flatten m = Ext.map X.swap m |> Ext.flatten |> Ext.map Int.flatten
-end)
+  end)
 
 module Make_with_product
     (Int : Monad.S_with_product) (Ext : Monad.S_with_product)
     (X : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-= Monad.Make_based_on_map_with_product (struct
+  = Monad.Make_based_on_map_with_product (struct
     type 'a t = 'a Int.t Ext.t
     let return  x = Ext.return (Int.return x)
     let map   f m = Ext.map (Int.map f) m
     let flatten m = Ext.map X.swap m |> Ext.flatten |> Ext.map Int.flatten
     let product l r = Ext.product l r |> Ext.map (fun (l, r) -> Int.product l r)
-end)
+  end)

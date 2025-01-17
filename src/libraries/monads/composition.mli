@@ -29,10 +29,10 @@ module Make
     (Int : Monad.S)
     (Ext : Monad.S)
     (_ : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-: Monad.S with type 'a t = 'a Int.t Ext.t
+  : Monad.S with type 'a t = 'a Int.t Ext.t
 
 module Make_with_product
     (Int : Monad.S_with_product)
     (Ext : Monad.S_with_product)
     (_ : Axiom with type 'a interior = 'a Int.t and type 'a exterior = 'a Ext.t)
-: Monad.S_with_product with type 'a t = 'a Int.t Ext.t
+  : Monad.S_with_product with type 'a t = 'a Int.t Ext.t
