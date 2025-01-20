@@ -23,14 +23,6 @@
 open Cil_types
 open Cvalue
 
-let is_bitfield typlv =
-  match Cil.unrollType typlv with
-  | TInt (_, attrs) | TEnum (_, attrs) ->
-    (match Cil.findAttribute Cil.bitfield_attribute_name attrs with
-     | [AInt _] -> true
-     | _ -> false)
-  | _ -> false
-
 let bitfield_size_attributes attrs =
   match Cil.findAttribute Cil.bitfield_attribute_name attrs with
   | [AInt size] -> Some size

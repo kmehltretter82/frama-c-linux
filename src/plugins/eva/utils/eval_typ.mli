@@ -24,9 +24,6 @@ open Cil_types
 
 (** Functions related to type conversions *)
 
-(** Bitfields *)
-val is_bitfield: typ -> bool
-
 val sizeof_lval_typ: typ -> Int_Base.t
 (** Size of the type of a lval, taking into account that the lval might have
     been a bitfield. *)
