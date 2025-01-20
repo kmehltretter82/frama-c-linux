@@ -46,7 +46,18 @@ let warn_empty_assigns () =
 
 (* Warn for assigns clauses without \from. *)
 let warn_empty_from list =
-  let no_from = List.filter (fun (_, from) -> from = FromAny) list in
+  let is_empty_set it =
+    match it with
+    | { it_content = { term_node = Tempty_set }} -> true
+    | _ -> false
+  in
+  let no_from =
+    List.filter
+      (fun (it, from) ->
+         (* Ignore assigns \empty with no \from. *)
+         not (is_empty_set it) && from = FromAny)
+      list
+  in
   match no_from with
   | [] -> ()
   | (out, _) :: _ ->
