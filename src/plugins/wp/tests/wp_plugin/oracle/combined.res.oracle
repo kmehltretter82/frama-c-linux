@@ -39,7 +39,8 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file combined.c, line 30):
-Let a = havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50).
+Let a = shift_sint32(t, 0).
+Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, 50).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(v) /\ is_sint32(1 + i).
   (* Heap *)
@@ -52,7 +53,7 @@ Assume {
   Have: (0 <= i) /\ (i <= 50).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      P_P(a[shift_sint32(t, i_2)]))).
+      P_P(a_1[shift_sint32(t, i_2)]))).
   (* Then *)
   Have: i <= 49.
   (* Call 'f' *)
@@ -60,7 +61,7 @@ Assume {
   (* Invariant *)
   Have: (-1) <= i.
 }
-Prove: P_P(a[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
+Prove: P_P(a_1[shift_sint32(t, i) <- v][shift_sint32(t, i_1)]).
 
 ------------------------------------------------------------
 
@@ -70,6 +71,7 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file combined.c, line 36):
+Let a = shift_sint32(t, 0).
 Let x = 1 + j.
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(x).
@@ -81,8 +83,7 @@ Assume {
   Have: (0 <= i) /\ (i <= 50).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
-            [shift_sint32(t, i_1)]))).
+      P_P(memcpy(Mint_0, Mint_undef_0, a, a, 50)[shift_sint32(t, i_1)]))).
   (* Else *)
   Have: 50 <= i.
   (* Invariant *)
@@ -100,7 +101,9 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Assertion (file combined.c, line 42):
-Let a = havoc(Mint_undef_1, Mint_0, shift_sint32(t, 0), 50).
+Let a = shift_sint32(t, 0).
+Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, 50).
+Let a_2 = shift_sint32(t, A).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i_1) /\ is_sint32(j).
   (* Heap *)
@@ -113,7 +116,7 @@ Assume {
   Have: (0 <= i_1) /\ (i_1 <= 50).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i_1) ->
-      P_P(a[shift_sint32(t, i_2)]))).
+      P_P(a_1[shift_sint32(t, i_2)]))).
   (* Else *)
   Have: 50 <= i_1.
   (* Invariant *)
@@ -121,8 +124,7 @@ Assume {
   (* Else *)
   Have: 100 <= j.
 }
-Prove: P_P(havoc(Mint_undef_0, a, shift_sint32(t, A), 100 - A)
-             [shift_sint32(t, i)]).
+Prove: P_P(memcpy(a_1, Mint_undef_1, a_2, a_2, 100 - A)[shift_sint32(t, i)]).
 
 ------------------------------------------------------------
 
@@ -156,22 +158,22 @@ Prove: true.
 
 Goal Loop assigns (file combined.c, line 37) (3/3):
 Call Result at line 40
+Let a = shift_sint32(t, 0).
 Let x = j - 1.
-Let a = shift_sint32(t, x).
+Let a_1 = shift_sint32(t, x).
 Assume {
   Type: is_sint32(A) /\ is_sint32(i) /\ is_sint32(j) /\ is_sint32(x).
   (* Heap *)
   Type: (region(t.base) <= 0) /\ linked(Malloc_0).
   (* Goal *)
-  When: !invalid(Malloc_0, a, 1).
+  When: !invalid(Malloc_0, a_1, 1).
   (* Assertion *)
   Have: (50 <= A) /\ (A <= 100).
   (* Invariant *)
   Have: (0 <= i) /\ (i <= 50).
   (* Invariant *)
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
-      P_P(havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), 50)
-            [shift_sint32(t, i_1)]))).
+      P_P(memcpy(Mint_0, Mint_undef_0, a, a, 50)[shift_sint32(t, i_1)]))).
   (* Else *)
   Have: 50 <= i.
   (* Invariant *)
@@ -179,7 +181,7 @@ Assume {
   (* Then *)
   Have: j <= 100.
 }
-Prove: included(a, 1, shift_sint32(t, A), 100 - A).
+Prove: included(a_1, 1, shift_sint32(t, A), 100 - A).
 
 ------------------------------------------------------------
 

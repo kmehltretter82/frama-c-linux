@@ -48,6 +48,7 @@ sig
   val literal : eid:int -> Cstring.cst -> region option
   val separated : region -> region -> bool
   val included : region -> region -> bool
+  val footprint : region -> region list
 end
 
 module type ModelWithLoader =
@@ -58,7 +59,8 @@ sig
   val last : sigma -> c_object -> loc -> term
   val frames : c_object -> loc -> chunk -> frame list
 
-  val havoc : c_object -> loc -> length:term -> chunk -> fresh:term -> current:term -> term
+  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
+    length:term -> Chunk.t -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 

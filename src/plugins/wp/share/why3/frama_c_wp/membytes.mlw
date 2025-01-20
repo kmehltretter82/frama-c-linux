@@ -516,7 +516,7 @@ module ValueBlockRW
     is_sint8 v ->
       bread_uint8 (bwrite_sint8 b o v) o = to_uint8 v
     
-  lemma bread_uint8_bhavoc_sep:
+  lemma bread_uint8_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_uint8 (bwrite_seq b ho u) or].
     sepoffset or 1 ho (Seq.length u) ->
       bread_uint8 (bwrite_seq b ho u) or = bread_uint8 b or
@@ -571,7 +571,7 @@ module ValueBlockRW
     is_sint16 v ->
       bread_uint16 (bwrite_sint16 b o v) o = to_uint16 v
     
-  lemma bread_uint16_bhavoc_sep:
+  lemma bread_uint16_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_uint16 (bwrite_seq b ho u) or].
     sepoffset or 2 ho (Seq.length u) ->
       bread_uint16 (bwrite_seq b ho u) or = bread_uint16 b or
@@ -626,7 +626,7 @@ module ValueBlockRW
     is_sint32 v ->
       bread_uint32 (bwrite_sint32 b o v) o = to_uint32 v
     
-  lemma bread_uint32_bhavoc_sep:
+  lemma bread_uint32_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_uint32 (bwrite_seq b ho u) or].
     sepoffset or 4 ho (Seq.length u) ->
       bread_uint32 (bwrite_seq b ho u) or = bread_uint32 b or
@@ -681,7 +681,7 @@ module ValueBlockRW
     is_sint64 v ->
       bread_uint64 (bwrite_sint64 b o v) o = to_uint64 v
     
-  lemma bread_uint64_bhavoc_sep:
+  lemma bread_uint64_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_uint64 (bwrite_seq b ho u) or].
     sepoffset or 8 ho (Seq.length u) ->
       bread_uint64 (bwrite_seq b ho u) or = bread_uint64 b or
@@ -736,7 +736,7 @@ module ValueBlockRW
     is_uint8 v ->
       bread_sint8 (bwrite_uint8 b o v) o = to_sint8 v
     
-  lemma bread_sint8_bhavoc_sep:
+  lemma bread_sint8_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_sint8 (bwrite_seq b ho u) or].
     sepoffset or 1 ho (Seq.length u) ->
       bread_sint8 (bwrite_seq b ho u) or = bread_sint8 b or
@@ -791,7 +791,7 @@ module ValueBlockRW
     is_uint16 v ->
       bread_sint16 (bwrite_uint16 b o v) o = to_sint16 v
     
-  lemma bread_sint16_bhavoc_sep:
+  lemma bread_sint16_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_sint16 (bwrite_seq b ho u) or].
     sepoffset or 2 ho (Seq.length u) ->
       bread_sint16 (bwrite_seq b ho u) or = bread_sint16 b or
@@ -846,7 +846,7 @@ module ValueBlockRW
     is_uint32 v ->
       bread_sint32 (bwrite_uint32 b o v) o = to_sint32 v
     
-  lemma bread_sint32_bhavoc_sep:
+  lemma bread_sint32_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_sint32 (bwrite_seq b ho u) or].
     sepoffset or 4 ho (Seq.length u) ->
       bread_sint32 (bwrite_seq b ho u) or = bread_sint32 b or
@@ -901,7 +901,7 @@ module ValueBlockRW
     is_uint64 v ->
       bread_sint64 (bwrite_uint64 b o v) o = to_sint64 v
     
-  lemma bread_sint64_bhavoc_sep:
+  lemma bread_sint64_bcopy_sep:
     forall b: vblock, u: S.seq int, or ho: int [bread_sint64 (bwrite_seq b ho u) or].
     sepoffset or 8 ho (Seq.length u) ->
       bread_sint64 (bwrite_seq b ho u) or = bread_sint64 b or
@@ -989,7 +989,7 @@ module InitBlockRW
     forall b: iblock, o: int, init: bool [bread_init8 (bwrite_init8 b o init) o].
     bread_init8 (bwrite_init8 b o init) o = init
     
-  lemma bread_init8_bhavoc_sep:
+  lemma bread_init8_bcopy_sep:
     forall b: iblock, u: S.seq bool, or ho: int [bread_init8 (bwrite_seq b ho u) or].
     sepoffset or 1 ho (Seq.length u) ->
       bread_init8 (bwrite_seq b ho u) or = bread_init8 b or
@@ -1018,7 +1018,7 @@ module InitBlockRW
     forall b: iblock, o: int, init: bool [bread_init16 (bwrite_init16 b o init) o].
     bread_init16 (bwrite_init16 b o init) o = init
     
-  lemma bread_init16_bhavoc_sep:
+  lemma bread_init16_bcopy_sep:
     forall b: iblock, u: S.seq bool, or ho: int [bread_init16 (bwrite_seq b ho u) or].
     sepoffset or 2 ho (Seq.length u) ->
       bread_init16 (bwrite_seq b ho u) or = bread_init16 b or
@@ -1047,7 +1047,7 @@ module InitBlockRW
     forall b: iblock, o: int, init: bool [bread_init32 (bwrite_init32 b o init) o].
     bread_init32 (bwrite_init32 b o init) o = init
     
-  lemma bread_init32_bhavoc_sep:
+  lemma bread_init32_bcopy_sep:
     forall b: iblock, u: S.seq bool, or ho: int [bread_init32 (bwrite_seq b ho u) or].
     sepoffset or 4 ho (Seq.length u) ->
       bread_init32 (bwrite_seq b ho u) or = bread_init32 b or
@@ -1076,7 +1076,7 @@ module InitBlockRW
     forall b: iblock, o: int, init: bool [bread_init64 (bwrite_init64 b o init) o].
     bread_init64 (bwrite_init64 b o init) o = init
     
-  lemma bread_init64_bhavoc_sep:
+  lemma bread_init64_bcopy_sep:
     forall b: iblock, u: S.seq bool, or ho: int [bread_init64 (bwrite_seq b ho u) or].
     sepoffset or 8 ho (Seq.length u) ->
       bread_init64 (bwrite_seq b ho u) or = bread_init64 b or
@@ -1135,8 +1135,8 @@ module MemBytes
   function init_seq (s: int) : S.seq bool =
     S.create True s
 
-  function havoc (fresh cur: map int (block 'a)) (a: addr) (size: int): map int (block 'a) =
-    set cur a.base (bwrite_seq (get cur a.base) a.offset (to_seq fresh[a.base] 0 size))
+  function memcpy (mtgt msrc: map int (block 'a)) (ptgt psrc: addr) (size: int): map int (block 'a) =
+    set mtgt ptgt.base (bwrite_seq (get msrc psrc.base) ptgt.offset (to_seq msrc[psrc.base] psrc.offset size))
 
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size
@@ -1205,13 +1205,13 @@ module MemBytes
     is_sint8 v ->
       read_uint8 (write_sint8 m a v) a = to_uint8 v
     
-  lemma read_uint8_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_uint8 (havoc fresh cur aw size) ar].
+  lemma read_uint8_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint8 (memcpy mw mc aw ac size) ar].
     separated ar 1 aw size ->
-      read_uint8 (havoc fresh cur aw size) ar = read_uint8 cur ar
+      read_uint8 (memcpy mw mc aw ac size) ar = read_uint8 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint8 nb ar.offset = VB.bread_uint8 ob ar.offset
     
   lemma read_uint8_write_uint8_sep:
@@ -1264,13 +1264,13 @@ module MemBytes
     is_sint16 v ->
       read_uint16 (write_sint16 m a v) a = to_uint16 v
     
-  lemma read_uint16_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_uint16 (havoc fresh cur aw size) ar].
+  lemma read_uint16_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint16 (memcpy mw mc aw ac size) ar].
     separated ar 2 aw size ->
-      read_uint16 (havoc fresh cur aw size) ar = read_uint16 cur ar
+      read_uint16 (memcpy mw mc aw ac size) ar = read_uint16 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint16 nb ar.offset = VB.bread_uint16 ob ar.offset
     
   lemma read_uint16_write_uint8_sep:
@@ -1323,13 +1323,13 @@ module MemBytes
     is_sint32 v ->
       read_uint32 (write_sint32 m a v) a = to_uint32 v
     
-  lemma read_uint32_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_uint32 (havoc fresh cur aw size) ar].
+  lemma read_uint32_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint32 (memcpy mw mc aw ac size) ar].
     separated ar 4 aw size ->
-      read_uint32 (havoc fresh cur aw size) ar = read_uint32 cur ar
+      read_uint32 (memcpy mw mc aw ac size) ar = read_uint32 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint32 nb ar.offset = VB.bread_uint32 ob ar.offset
     
   lemma read_uint32_write_uint8_sep:
@@ -1382,13 +1382,13 @@ module MemBytes
     is_sint64 v ->
       read_uint64 (write_sint64 m a v) a = to_uint64 v
     
-  lemma read_uint64_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_uint64 (havoc fresh cur aw size) ar].
+  lemma read_uint64_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_uint64 (memcpy mw mc aw ac size) ar].
     separated ar 8 aw size ->
-      read_uint64 (havoc fresh cur aw size) ar = read_uint64 cur ar
+      read_uint64 (memcpy mw mc aw ac size) ar = read_uint64 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint64 nb ar.offset = VB.bread_uint64 ob ar.offset
     
   lemma read_uint64_write_uint8_sep:
@@ -1441,13 +1441,13 @@ module MemBytes
     is_uint8 v ->
       read_sint8 (write_uint8 m a v) a = to_sint8 v
     
-  lemma read_sint8_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_sint8 (havoc fresh cur aw size) ar].
+  lemma read_sint8_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint8 (memcpy mw mc aw ac size) ar].
     separated ar 1 aw size ->
-      read_sint8 (havoc fresh cur aw size) ar = read_sint8 cur ar
+      read_sint8 (memcpy mw mc aw ac size) ar = read_sint8 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint8 nb ar.offset = VB.bread_uint8 ob ar.offset
     
   lemma read_sint8_write_uint8_sep:
@@ -1500,13 +1500,13 @@ module MemBytes
     is_uint16 v ->
       read_sint16 (write_uint16 m a v) a = to_sint16 v
     
-  lemma read_sint16_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_sint16 (havoc fresh cur aw size) ar].
+  lemma read_sint16_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint16 (memcpy mw mc aw ac size) ar].
     separated ar 2 aw size ->
-      read_sint16 (havoc fresh cur aw size) ar = read_sint16 cur ar
+      read_sint16 (memcpy mw mc aw ac size) ar = read_sint16 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint16 nb ar.offset = VB.bread_uint16 ob ar.offset
     
   lemma read_sint16_write_uint8_sep:
@@ -1559,13 +1559,13 @@ module MemBytes
     is_uint32 v ->
       read_sint32 (write_uint32 m a v) a = to_sint32 v
     
-  lemma read_sint32_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_sint32 (havoc fresh cur aw size) ar].
+  lemma read_sint32_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint32 (memcpy mw mc aw ac size) ar].
     separated ar 4 aw size ->
-      read_sint32 (havoc fresh cur aw size) ar = read_sint32 cur ar
+      read_sint32 (memcpy mw mc aw ac size) ar = read_sint32 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint32 nb ar.offset = VB.bread_uint32 ob ar.offset
     
   lemma read_sint32_write_uint8_sep:
@@ -1618,13 +1618,13 @@ module MemBytes
     is_uint64 v ->
       read_sint64 (write_uint64 m a v) a = to_sint64 v
     
-  lemma read_sint64_havoc_sep:
-    forall fresh cur: memory, size: int, ar aw: addr [read_sint64 (havoc fresh cur aw size) ar].
+  lemma read_sint64_copy_sep:
+    forall mw mc: memory, size: int, ar aw ac: addr [read_sint64 (memcpy mw mc aw ac size) ar].
     separated ar 8 aw size ->
-      read_sint64 (havoc fresh cur aw size) ar = read_sint64 cur ar
+      read_sint64 (memcpy mw mc aw ac size) ar = read_sint64 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> VB.bread_uint64 nb ar.offset = VB.bread_uint64 ob ar.offset
     
   lemma read_sint64_write_uint8_sep:
@@ -1695,13 +1695,13 @@ module MemBytes
     forall m: init, a: addr, i: bool [read_init8 (write_init8 m a i) a].
     read_init8 (write_init8 m a i) a = i
     
-  lemma read_init8_havoc_sep:
-    forall fresh cur: init, size: int, ar aw: addr [read_init8 (havoc fresh cur aw size) ar].
+  lemma read_init8_copy_sep:
+    forall mw mc: init, size: int, ar aw ac: addr [read_init8 (memcpy mw mc aw ac size) ar].
     separated ar 1 aw size ->
-      read_init8 (havoc fresh cur aw size) ar = read_init8 cur ar
+      read_init8 (memcpy mw mc aw ac size) ar = read_init8 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> IB.bread_init8 nb ar.offset = IB.bread_init8 ob ar.offset
     
   lemma read_init8_write_init8_sep:
@@ -1728,13 +1728,13 @@ module MemBytes
     forall m: init, a: addr, i: bool [read_init16 (write_init16 m a i) a].
     read_init16 (write_init16 m a i) a = i
     
-  lemma read_init16_havoc_sep:
-    forall fresh cur: init, size: int, ar aw: addr [read_init16 (havoc fresh cur aw size) ar].
+  lemma read_init16_copy_sep:
+    forall mw mc: init, size: int, ar aw ac: addr [read_init16 (memcpy mw mc aw ac size) ar].
     separated ar 2 aw size ->
-      read_init16 (havoc fresh cur aw size) ar = read_init16 cur ar
+      read_init16 (memcpy mw mc aw ac size) ar = read_init16 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> IB.bread_init16 nb ar.offset = IB.bread_init16 ob ar.offset
     
   lemma read_init16_write_init8_sep:
@@ -1761,13 +1761,13 @@ module MemBytes
     forall m: init, a: addr, i: bool [read_init32 (write_init32 m a i) a].
     read_init32 (write_init32 m a i) a = i
     
-  lemma read_init32_havoc_sep:
-    forall fresh cur: init, size: int, ar aw: addr [read_init32 (havoc fresh cur aw size) ar].
+  lemma read_init32_copy_sep:
+    forall mw mc: init, size: int, ar aw ac: addr [read_init32 (memcpy mw mc aw ac size) ar].
     separated ar 4 aw size ->
-      read_init32 (havoc fresh cur aw size) ar = read_init32 cur ar
+      read_init32 (memcpy mw mc aw ac size) ar = read_init32 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> IB.bread_init32 nb ar.offset = IB.bread_init32 ob ar.offset
     
   lemma read_init32_write_init8_sep:
@@ -1794,13 +1794,13 @@ module MemBytes
     forall m: init, a: addr, i: bool [read_init64 (write_init64 m a i) a].
     read_init64 (write_init64 m a i) a = i
     
-  lemma read_init64_havoc_sep:
-    forall fresh cur: init, size: int, ar aw: addr [read_init64 (havoc fresh cur aw size) ar].
+  lemma read_init64_copy_sep:
+    forall mw mc: init, size: int, ar aw ac: addr [read_init64 (memcpy mw mc aw ac size) ar].
     separated ar 8 aw size ->
-      read_init64 (havoc fresh cur aw size) ar = read_init64 cur ar
+      read_init64 (memcpy mw mc aw ac size) ar = read_init64 mw ar
     by
-      let ob = cur[aw.base] in
-      let nb = bwrite_seq ob aw.offset (to_seq fresh[aw.base] 0 size) in
+      let ob = mw[aw.base] in
+      let nb = bwrite_seq ob aw.offset (to_seq mc[ac.base] ac.offset size) in
       aw.base = ar.base -> IB.bread_init64 nb ar.offset = IB.bread_init64 ob ar.offset
     
   lemma read_init64_write_init8_sep:

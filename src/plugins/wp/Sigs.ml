@@ -195,7 +195,7 @@ sig
 
       Memory chunk variables are assigned lazily. Hence, the vector is
       empty unless a chunk is accessed. Pay attention to this
-      when you merge or havoc chunks.
+      when you merge or havoc chunks (using memcpy).
 
       New chunks are generated from the context pool of {!Lang.freshvar}.
   *)

@@ -26,9 +26,9 @@ open Ctypes
 
 module Logic = Qed.Logic
 
-(* Why3 symbols *)
+(* Why3 symbols of generated membytes.mlw *)
 
-module Why3 =
+module WBytes =
 struct
   let library = "membytes"
 
@@ -40,10 +40,12 @@ struct
   let ty_fst_arg = function
     | Some l :: _ -> l
     | _ -> raise Not_found
-  let l_havoc = Qed.Engine.F_call "havoc"
-  let f_havoc = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
-  let havoc fresh current loc n =
-    Lang.F.e_fun f_havoc [fresh;current;loc;n]
+
+  let l_memcpy = Qed.Engine.F_call "memcpy"
+  let f_memcpy =
+    Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
+  let memcpy mtgt msrc ltgt lsrc length =
+    Lang.F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;length]
 
   let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits"
   let cinits m = p_call p_cinits [m]
@@ -161,8 +163,8 @@ struct
     | Init -> Format.fprintf fmt "Init"
     | Alloc -> Format.fprintf fmt "Alloc"
 
-  let tau_of_memory = Why3.t_memory
-  let tau_of_init = Why3.t_init
+  let tau_of_memory = WBytes.t_memory
+  let tau_of_init = WBytes.t_init
 
   let tau_of_chunk = function
     | Mem -> tau_of_memory
@@ -544,15 +546,15 @@ let int_to_float fkind f =
 
 let load_int_raw memory kind addr =
   let read = match kind with
-    | CBool -> Why3.read_uint8
-    | UInt8 -> Why3.read_uint8
-    | SInt8 -> Why3.read_sint8
-    | UInt16 -> Why3.read_uint16
-    | SInt16 -> Why3.read_sint16
-    | UInt32 -> Why3.read_uint32
-    | SInt32 -> Why3.read_sint32
-    | UInt64 -> Why3.read_uint64
-    | SInt64 -> Why3.read_sint64
+    | CBool -> WBytes.read_uint8
+    | UInt8 -> WBytes.read_uint8
+    | SInt8 -> WBytes.read_sint8
+    | UInt16 -> WBytes.read_uint16
+    | SInt16 -> WBytes.read_sint16
+    | UInt32 -> WBytes.read_uint32
+    | SInt32 -> WBytes.read_sint32
+    | UInt64 -> WBytes.read_uint64
+    | SInt64 -> WBytes.read_sint64
   in
   read memory addr
 
@@ -570,10 +572,10 @@ let load_pointer sigma _ty loc =
 
 let load_init memory size loc =
   match size with
-  | 1 -> Why3.read_init8  memory loc
-  | 2 -> Why3.read_init16 memory loc
-  | 4 -> Why3.read_init32 memory loc
-  | 8 -> Why3.read_init64 memory loc
+  | 1 -> WBytes.read_init8  memory loc
+  | 2 -> WBytes.read_init16 memory loc
+  | 4 -> WBytes.read_init32 memory loc
+  | 8 -> WBytes.read_init64 memory loc
   | _ -> assert false
 
 let is_init_atom sigma obj loc =
@@ -583,15 +585,15 @@ let is_init_atom sigma obj loc =
 
 let store_int sigma kind addr v =
   let write = match kind with
-    | CBool -> Why3.write_uint8
-    | UInt8 -> Why3.write_uint8
-    | SInt8 -> Why3.write_sint8
-    | UInt16 -> Why3.write_uint16
-    | SInt16 -> Why3.write_sint16
-    | UInt32 -> Why3.write_uint32
-    | SInt32 -> Why3.write_sint32
-    | UInt64 -> Why3.write_uint64
-    | SInt64 -> Why3.write_sint64
+    | CBool -> WBytes.write_uint8
+    | UInt8 -> WBytes.write_uint8
+    | SInt8 -> WBytes.write_sint8
+    | UInt16 -> WBytes.write_uint16
+    | SInt16 -> WBytes.write_sint16
+    | UInt32 -> WBytes.write_uint32
+    | SInt32 -> WBytes.write_sint32
+    | UInt64 -> WBytes.write_uint64
+    | SInt64 -> WBytes.write_sint64
   in
   Chunk.Mem, write (Sigma.value sigma Mem) addr v
 
@@ -603,10 +605,10 @@ let store_pointer sigma _kind addr v =
 
 let store_init_raw m size loc v =
   let write = match size with
-    | 1 -> Why3.write_init8
-    | 2 -> Why3.write_init16
-    | 4 -> Why3.write_init32
-    | 8 -> Why3.write_init64
+    | 1 -> WBytes.write_init8
+    | 2 -> WBytes.write_init16
+    | 4 -> WBytes.write_init32
+    | 8 -> WBytes.write_init64
     | _ -> assert false
   in
   write m loc v
@@ -642,15 +644,15 @@ module Model = struct
     let m' = e_var (Lang.freshvar ~basename t_mem) in
     let p' = e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
     let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-    let mh = Why3.havoc m' m p' n' in
+    let mh = WBytes.memcpy m m' p' p' n' in
     let v' = e_var (Lang.freshvar ~basename:"v" tau) in
-    let meq = Why3.eqmem m m' p' n' in
+    let meq = WBytes.eqmem m m' p' n' in
     let diff = p_call MemAddr.p_separated [p;n;p';e_one] in
     let sep = p_call MemAddr.p_separated [p;n;p';n'] in
     let inc = p_call MemAddr.p_included [p;n;p';n'] in
     let teq = Definitions.Trigger.of_pred meq in
     [
-      "update" , []    , [diff]    , m , Why3.raw_set m p' v' ;
+      "update" , []    , [diff]    , m , WBytes.raw_set m p' v' ;
       "eqmem"  , [teq] , [inc;meq] , m , m' ;
       "havoc"  , []    , [sep]     , m , mh ;
     ]
@@ -667,11 +669,11 @@ module Model = struct
     let n = protected_sizeof_object obj in
     e_sub (e_div (allocated sigma l) n) e_one
 
-  let havoc obj loc ~length chunk ~fresh ~current =
+  let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
     if chunk <> Chunk.Alloc then
       let n = e_mul (e_int @@ sizeof_object obj) length in
-      Why3.havoc fresh current loc n
-    else fresh
+      WBytes.memcpy mtgt msrc ltgt lsrc n
+    else msrc
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
@@ -681,7 +683,7 @@ module Model = struct
       MemAddr.separated
         ~shift ~addrof ~sizeof (Rloc (C_int UInt8, p)) (Rloc (obj, loc))
     in
-    let equal = p_equal (Why3.raw_get m1 p) (Why3.raw_get m2 p) in
+    let equal = p_equal (WBytes.raw_get m1 p) (WBytes.raw_get m2 p) in
     [xp],separated,equal
 
   let load_int = load_int
@@ -695,12 +697,12 @@ module Model = struct
   let is_init_atom = is_init_atom
   let is_init_range sigma obj loc length =
     let n = e_mul (sizeof obj) length in
-    Why3.is_init_range (Sigma.value sigma Init) loc n
+    WBytes.is_init_range (Sigma.value sigma Init) loc n
 
   let set_init_atom = set_init_atom
   let set_init obj loc ~length _chunk ~current =
     let n = e_mul (sizeof obj) length in
-    Why3.set_init_range current loc n
+    WBytes.set_init_range current loc n
 
 end
 
@@ -879,7 +881,7 @@ module STRING = WpContext.Generator(LITERAL)
           l_name = name ; l_triggers = [] ;
           l_forall = [m;i] ;
           l_cluster = Cstring.cluster () ;
-          l_lemma = Lang.F.p_imply (Why3.sconst @@ e_var m) read ;
+          l_lemma = Lang.F.p_imply (WBytes.sconst @@ e_var m) read ;
         }
 
       let fresh () =
@@ -1060,7 +1062,7 @@ module PointersProperties = WpContext.Generator(Datatype.Unit)
 
       let compile () =
         let lfun = Lang.generated_p "framed" in
-        let m = Lang.freshvar ~basename:"m" Why3.t_memory in
+        let m = Lang.freshvar ~basename:"m" WBytes.t_memory in
         let a = Lang.freshvar ~basename:"a" MemAddr.t_addr in
         let p = load_pointer_raw (e_var m) (Cil_const.voidPtrType) (e_var a) in
         let ba = MemAddr.base (e_var a) and bp = MemAddr.base p in
@@ -1089,13 +1091,13 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked Alloc @
-  wellformed_frame Why3.cinits Init @
-  wellformed_frame Why3.sconst Mem @
+  wellformed_frame WBytes.cinits Init @
+  wellformed_frame WBytes.sconst Mem @
   [ framed (Sigma.value sigma Mem) ]
 
 let is_well_formed s =
   Wp_parameters.debug ~level:2 ~dkey:dkey_model "%s.is_well_formed _" datatype ;
-  Why3.bytes (Sigma.value s Mem)
+  WBytes.bytes (Sigma.value s Mem)
 
 (* ********************************************************************** *)
 (* ALLOCATION                                                             *)
@@ -1137,4 +1139,4 @@ let set_init = Model.set_init
 let is_init_range = Model.is_init_range
 let value_footprint = Model.value_footprint
 let init_footprint = Model.init_footprint
-let havoc = Model.havoc
+let memcpy = Model.memcpy

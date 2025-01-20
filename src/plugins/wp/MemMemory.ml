@@ -35,11 +35,12 @@ let ty_fst_arg = function
   | Some l :: _ -> l
   | _ -> raise Not_found
 
-let l_havoc = Qed.Engine.F_call "havoc"
+
+let l_memcpy = Qed.Engine.F_call "memcpy"
 let l_set_init = Qed.Engine.F_call "set_init"
 
 let p_eqmem = Lang.extern_fp ~library "eqmem"
-let f_havoc = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_havoc "havoc"
+let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
 let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* m-pointer -> prop *)
 let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
 let f_set_init =
@@ -67,15 +68,18 @@ let framed memory = p_call p_framed [ memory ]
 (* havoc(m_undef, havoc(_undef,m0,p0,a0), p1,a1) =
    - havoc(m_undef, m0, p1,a1) WHEN included (p1,a1,p0,a0) *)
 let r_havoc = function
-  | [undef1;m1;p1;a1] -> begin
-      match F.repr m1 with
-      | L.Fun( f , [_undef0;m0;p0;a0] ) when f == f_havoc -> begin
-          let open Qed.Logic in
-          match MemAddr.is_included [p0;a0;p1;a1] with
-          | Yes -> F.e_fun f_havoc [undef1;m0;p1;a1]
-          | _ -> raise Not_found
-        end
-      | _ -> raise Not_found
+  | [m1;undef1;p1;p2;a1] -> begin
+      if equal p1 p2 then
+        match F.repr m1 with
+        | L.Fun( f , [m0;_undef0;p01;p02;a0] ) when f == f_memcpy ->
+          if equal p01 p02 then begin
+            let open Qed.Logic in
+            match MemAddr.is_included [p01;a0;p1;a1] with
+            | Yes -> F.e_fun f_memcpy [m0;undef1;p1;p2;a1]
+            | _ -> raise Not_found
+          end else raise Not_found
+        | _ -> raise Not_found
+      else raise Not_found
     end
   | _ -> raise Not_found
 
@@ -85,13 +89,13 @@ let r_havoc = function
 *)
 let r_get_havoc es ks =
   match es, ks with
-  | [undef;m;p;a],[k] ->
-    begin
-      match MemAddr.is_separated [p;a;k;e_one] with
+  | [m;undef;p1;p2;a],[k] ->
+    if equal p1 p2 then begin
+      match MemAddr.is_separated [p1;a;k;e_one] with
       | L.Yes -> F.e_get m k
       | L.No  -> F.e_get undef k
       | _ -> raise Not_found
-    end
+    end else raise Not_found
   | _ -> raise Not_found
 
 (* -------------------------------------------------------------------------- *)
@@ -100,8 +104,8 @@ let r_get_havoc es ks =
 
 let () = Context.register
     begin fun () ->
-      F.set_builtin f_havoc r_havoc ;
-      F.set_builtin_get f_havoc r_get_havoc ;
+      F.set_builtin f_memcpy r_havoc ;
+      F.set_builtin_get f_memcpy r_get_havoc ;
     end
 
 (* -------------------------------------------------------------------------- *)
@@ -116,7 +120,7 @@ let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
   let m' = F.e_var (Lang.freshvar ~basename t_mem) in
   let p' = F.e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
   let n' = F.e_var (Lang.freshvar ~basename:"n" L.Int) in
-  let mh = F.e_fun f_havoc [m';m;p';n'] in
+  let mh = F.e_fun f_memcpy [m;m';p';p';n'] in
   let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
   let meq = F.p_call p_eqmem [m;m';p';n'] in
   let diff = F.p_call MemAddr.p_separated [p;n;p';s] in

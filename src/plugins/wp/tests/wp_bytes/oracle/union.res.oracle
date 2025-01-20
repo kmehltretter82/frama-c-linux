@@ -341,7 +341,7 @@ Prove: read_uint8(m, shift_uint8(shiftfield_F2_U_a(u), i)) = 0.
 
 Goal Check (file union.i, line 70):
 Let a = shiftfield_F2_U_x(u).
-Let a_1 = havoc(mem_undef_0, mem_0, a, 8).
+Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 8).
 Let x = read_uint64(a_1, shiftfield_F2_U_u(u)).
 Assume {
   Type: is_uint32(read_uint32(a_1, shiftfield_F2_U_s(u))) /\ is_uint64(x).
@@ -361,7 +361,7 @@ Prove: x = 4294967295.
 
 Goal Check (file union.i, line 72):
 Let a = shiftfield_F2_U_x(u).
-Let a_1 = havoc(mem_undef_0, mem_0, a, 8).
+Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 8).
 Assume {
   Type: is_uint32(read_uint32(a_1, shiftfield_F2_U_s(u))) /\
       is_uint64(read_uint64(a_1, shiftfield_F2_U_u(u))).
@@ -383,7 +383,7 @@ Prove: read_uint8(a_1, shift_uint8(shiftfield_F2_U_a(u), i)) = 255.
 
 Goal Check (file union.i, line 73):
 Let a = shiftfield_F2_U_x(u).
-Let a_1 = havoc(mem_undef_0, mem_0, a, 8).
+Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 8).
 Assume {
   Type: is_uint32(read_uint32(a_1, shiftfield_F2_U_s(u))) /\
       is_uint64(read_uint64(a_1, shiftfield_F2_U_u(u))).
@@ -405,7 +405,7 @@ Prove: read_uint8(a_1, shift_uint8(shiftfield_F2_U_a(u), i)) = 0.
 
 Goal Check (file union.i, line 75):
 Let a = shiftfield_F2_U_x(u).
-Let a_1 = havoc(mem_undef_0, mem_0, a, 8).
+Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 8).
 Let x = read_uint32(a_1, shiftfield_F2_U_s(u)).
 Assume {
   Type: is_uint32(x) /\ is_uint64(read_uint64(a_1, shiftfield_F2_U_u(u))).

@@ -82,9 +82,9 @@ theory Compound
   
   axiom Q_Load_S2_A_havoc_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, n:int, p:addr, q:addr
-     [Load_S2_A p (havoc mint1 mint q n)].
+     [Load_S2_A p (memcpy mint mint1 q q n)].
      separated p 1 q n ->
-     Load_S2_A p (havoc mint1 mint q n) = Load_S2_A p mint
+     Load_S2_A p (memcpy mint mint1 q q n) = Load_S2_A p mint
   
 end
 [wp:print-generated] 
@@ -113,7 +113,7 @@ end
        let a2 = shiftfield_F1_FD_pos a1 in
        let x = get t a2 in
        let a3 = Load_S2_A a t in
-       let a4 = Load_S2_A a (set (havoc t1 t a 1) a2 i) in
+       let a4 = Load_S2_A a (set (memcpy t t1 a a 1) a2 i) in
        not x = i ->
        region (a1.base) <= 0 ->
        region (a.base) <= 0 ->
