@@ -156,10 +156,11 @@ let save_binary error_extension =
       | None -> filename
       | Some err_ext ->
         let s = (filename:>string) ^ err_ext in
+        let path = Filepath.Normalized.of_string s in
         Kernel.warning
           "attempting to save on non-zero exit code: \
-           modifying filename into `%s'." s;
-        Filepath.Normalized.of_string s
+           modifying filename into `%s'." (Filepath.relativize s);
+        path
     in
     try
       Project.save_all realname
