@@ -58,7 +58,6 @@ module Statement = struct
   let alias_sets_lvals ~stmt = get_list ~stmt Abstract_state.alias_sets_lvals
   let alias_vars ~stmt lv = vars ~stmt (Abstract_state.alias_vars lv)
   let alias_lvals ~stmt lv = lset ~stmt (Abstract_state.alias_lvals lv)
-  let aliases = alias_lvals (* deprecated *)
 
   let new_aliases_lvals ~stmt lv =
     let get_set state =
@@ -76,12 +75,8 @@ module Statement = struct
 
   let are_aliased ~stmt (lv1: lval) (lv2:lval) : bool =
     (* TODO: more efficient algorithm: do they share a successor? *)
-    LSet.mem lv2 @@ aliases ~stmt lv1
+    LSet.mem lv2 @@ alias_lvals ~stmt lv1
 end
-
-let points_to_set_stmt _kf stmt = Statement.points_to_lvals ~stmt
-
-let aliases_stmt _kf stmt = Statement.aliases ~stmt
 
 module Function = struct
   let return_stmt kf =
@@ -95,7 +90,6 @@ module Function = struct
   let alias_sets_lvals ~kf = Statement.alias_sets_lvals ~stmt:(return_stmt kf)
   let alias_vars ~kf = Statement.alias_vars ~stmt:(return_stmt kf)
   let alias_lvals ~kf = Statement.alias_lvals ~stmt:(return_stmt kf)
-  let aliases = alias_lvals (* deprecated *)
   let are_aliased ~kf = Statement.are_aliased ~stmt:(return_stmt kf)
 
   let fundec_stmts ~kf lv =
@@ -108,37 +102,13 @@ module Function = struct
       Options.abort "fundec_stmts: function %a has no definition" Kernel_function.pretty kf
 end
 
-let points_to_set_kf kf = Function.points_to_lvals ~kf
-
-let aliases_kf kf = Function.aliases ~kf
-
-let fundec_stmts kf = Function.fundec_stmts ~kf
-
-
-let fold_points_to_set f_fold acc kf s lv =
-  LSet.fold (fun e a -> f_fold a e) (points_to_set_stmt kf s lv) acc
-
-let fold_aliases_stmt f_fold acc kf s lv =
-  LSet.fold (fun e a -> f_fold a e) (aliases_stmt kf s lv) acc
-
-let fold_new_aliases_stmt f_fold acc _kf s lv =
-  LSet.fold (fun e a -> f_fold a e) (Statement.new_aliases_lvals ~stmt:s lv) acc
-
-let fold_points_to_set_kf (f_fold: 'a -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
-  LSet.fold (fun e a -> f_fold a e) (points_to_set_kf kf lv) acc
-
-let fold_aliases_kf (f_fold : 'a -> lval -> 'a) (acc : 'a) kf lv : 'a =
-  LSet.fold (fun e a -> f_fold a e) (aliases_kf kf lv) acc
-
 let fold_fundec_stmts (f_fold: 'a -> stmt -> lval -> 'a) (acc: 'a) (kf:kernel_function) (lv:lval) : 'a =
   List.fold_left
     (fun acc (s, set) ->
        LSet.fold (fun lv a -> f_fold a s lv) set acc
     )
     acc
-    (fundec_stmts kf lv)
-
-let are_aliased (_kf: kernel_function) stmt = Statement.are_aliased ~stmt
+    (Function.fundec_stmts ~kf lv)
 
 let fold_vertex (f_fold : 'a -> G.V.t -> lval -> 'a) (acc: 'a) (_kf: kernel_function) (s:stmt) (lv: lval) : 'a =
   check_computed ();
