@@ -106,9 +106,6 @@ let pretty_actuals fmt actuals =
 let pretty_current_cfunction_name fmt =
   Kernel_function.pretty fmt (current_kf())
 
-let warning_once_current fmt =
-  Self.warning ~current:true ~once:true fmt
-
 (* Emit alarms in "non-warning" mode *)
 let alarm_report ?current ?source ?emitwith ?echo ?once ?append =
   Self.warning ~wkey:Self.wkey_alarm

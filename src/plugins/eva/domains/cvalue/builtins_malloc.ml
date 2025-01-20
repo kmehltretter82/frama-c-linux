@@ -535,7 +535,7 @@ let calloc_builtin state args =
   let size = Cvalue.V.mul nmemb sizev in
   let size_ok = alloc_size_ok size in
   if size_ok <> Alarmset.True then
-    Eva_utils.warning_once_current
+    Self.warning ~current:true ~once:true
       "calloc out of bounds: assert(nmemb * size <= SIZE_MAX)";
   let c_values =
     if size_ok = Alarmset.False (* size always overflows *)
@@ -861,7 +861,7 @@ let reallocarray_builtin state args =
   let size = Cvalue.V.mul nmemb sizev in
   let size_ok = alloc_size_ok size in
   if size_ok <> Alarmset.True then
-    Eva_utils.warning_once_current
+    Self.warning ~current:true ~once:true
       "reallocarray out of bounds: assert(nmemb * size <= SIZE_MAX)";
   if size_ok = Alarmset.False (* size always overflows *)
   then Builtins.Result [Cvalue.V.singleton_zero]
@@ -920,7 +920,8 @@ let check_leaked_malloced_bases state _ =
   let alloced_bases = Dynamic_Alloc_Bases.get () in
   Base_hptmap.iter
     (fun base _ -> if check_if_base_is_leaked base state then
-        Eva_utils.warning_once_current "memory leak detected for %a"
+        Self.warning ~current:true ~once:true
+          "memory leak detected for %a"
           Base.pretty base)
     alloced_bases;
   let c_clobbered = Base.SetLattice.bottom in

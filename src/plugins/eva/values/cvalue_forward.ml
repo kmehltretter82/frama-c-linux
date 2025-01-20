@@ -540,8 +540,9 @@ let eval_float_constant f fkind fstring =
         if Fc_float.is_infinite f_lower && Fc_float.is_infinite f_upper
         then
           begin
-            Eva_utils.warning_once_current
-              "cannot parse floating-point constant, returning imprecise result";
+            Self.warning ~current:true ~once:true
+              "cannot parse floating-point constant, \
+               returning imprecise result";
             neg_infinity, infinity
           end
         else f_lower, f_upper

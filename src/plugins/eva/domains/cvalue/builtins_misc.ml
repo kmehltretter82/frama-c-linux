@@ -20,13 +20,11 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Eva_utils
-
 open Lattice_bounds.Bottom.Operators
 
 let frama_C_assert state actuals =
   let do_bottom () =
-    warning_once_current "Frama_C_assert: false";
+    Self.warning ~current:true ~once:true "Frama_C_assert: false";
     Cvalue.Model.bottom
   in
   match actuals with
@@ -42,11 +40,13 @@ let frama_C_assert state actuals =
           Cvalue_transfer.update valuation state
         in
         match state with
-        | `Value state -> warning_once_current "Frama_C_assert: unknown"; state
+        | `Value state ->
+          Self.warning ~current:true ~once:true "Frama_C_assert: unknown";
+          state
         | `Bottom -> do_bottom ()
       end
       else begin
-        warning_once_current "Frama_C_assert: true";
+        Self.warning ~current:true ~once:true "Frama_C_assert: true";
         state
       end
     in
