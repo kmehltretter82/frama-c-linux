@@ -11,6 +11,7 @@ t[0..63] ∈ [--..--] or UNINITIALIZED
  [65..99] ∈ [--..--] or UNINITIALIZED
 b1 ∈ {0; 1}
 b2 ∈ {0; 1}
+scalar ∈ UNINITIALIZED
 # equality:
 {k = ((i - j) + 1) + j}
 # symbolic-locations:
@@ -66,5 +67,6 @@ a[bits 0 to 2] ∈ {0}
           },
             {})
     b1 -> ({0; 1}, {})
-    b2 -> ({0; 1}, {}) ]},
+    b2 -> ({0; 1}, {})
+    scalar -> (UNINITIALIZED, {}) ]},
    None)

@@ -50,4 +50,9 @@ void main (int a) {
   Frama_C_domain_show_each(a, i, j, k, r);
   Frama_C_dump_each();
   Frama_C_dump_each_file_domains_dump();
+
+  /* Tests printing offsetmap of scalar value. */
+  int scalar = 65537;
+  *(((char *)&scalar)+1) = 42;
+  Frama_C_domain_show_each(scalar);
 }

@@ -62,6 +62,7 @@
    [65..99] ∈ [--..--] or UNINITIALIZED
   b1 ∈ {0; 1}
   b2 ∈ {0; 1}
+  scalar ∈ UNINITIALIZED
   # equality:
   {k = ((i - j) + 1) + j}
   # symbolic-locations:
@@ -117,10 +118,24 @@
             },
               {})
       b1 -> ({0; 1}, {})
-      b2 -> ({0; 1}, {}) ]},
+      b2 -> ({0; 1}, {})
+      scalar -> (UNINITIALIZED, {}) ]},
      None)
   ==END OF DUMP==
 [eva] domains.i:52: Dumping state in file 'domains_dump_0'
+[eva] domains.i:57: 
+  Frama_C_domain_show_each:
+  scalar : # cvalue: [bits 0 to 7]# ∈ {65537}%32, bits 0 to 7 
+                     [bits 8 to 15] ∈ {42}
+                     [bits 16 to 31]# ∈ {65537}%32, bits 16 to 31 
+                     This amounts to: {76289}
+           # equality: 
+           # symbolic-locations: (not implemented)
+           # octagon: (not implemented)
+           # gauges: (not implemented)
+           # sign: -0+
+           # bitwise: (not implemented)
+           # multidim: T
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -135,6 +150,9 @@
    [65..99] ∈ [--..--] or UNINITIALIZED
   b1 ∈ {0; 1}
   b2 ∈ {0; 1}
+  scalar[bits 0 to 7]# ∈ {65537}%32, bits 0 to 7 
+        [bits 8 to 15] ∈ {42}
+        [bits 16 to 31]# ∈ {65537}%32, bits 16 to 31 
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -143,6 +161,6 @@
   NO EFFECTS
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function main:
-    a; i; j; k; r; t[0..99]; b1; b2
+    a; i; j; k; r; t[0..99]; b1; b2; scalar
 [inout] Inputs for function main:
     nondet
