@@ -613,7 +613,7 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
 let generate_machdep_header ?censored_macros mach =
-  let debug = Kernel.(is_debug_key_enabled dkey_pp) in
+  let debug = Kernel.(is_debug_key_enabled dkey_pp_keep_temp_files) in
   let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
   let file = Filepath.Normalized.concat temp "__fc_machdep.h" in
   let chan = open_out (file:>string) in
