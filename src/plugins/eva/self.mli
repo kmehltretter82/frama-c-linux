@@ -70,6 +70,7 @@ val wkey_missing_loop_unroll_for : warn_category
 val wkey_signed_overflow : warn_category
 val wkey_invalid_assigns : warn_category
 val wkey_missing_assigns : warn_category
+val wkey_missing_assigns_result : warn_category
 val wkey_experimental : warn_category
 val wkey_unknown_size : warn_category
 val wkey_ensures_false : warn_category
