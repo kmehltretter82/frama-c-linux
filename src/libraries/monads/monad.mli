@@ -24,7 +24,8 @@
     to build them based on minimal definitions. Those tools are provided
     for advanced users that would like to define their own monads. Any
     user that only wants to use the monads provided by the kernel can
-    completly ignore them. *)
+    completly ignore them.
+    @since Frama-C+dev *)
 
 
 
