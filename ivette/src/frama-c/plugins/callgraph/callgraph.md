@@ -1,78 +1,104 @@
 # Callgraph {#callgraph}
 
-This module provides a graphical display of the callgraph and makes it easy to highlight certain data, such as :
+The callgraph represents calling relationships between functions of the program.
+Each node represents a C function, and each edge from f to g indicates that
+f contains a call to g.
 
-* The location of unproven properties.
-* Functions containing tainted properties.
-* ...
+The graph also highlights some functions, such as functions containing unproven
+properties.
+The [panel](#callgraph-panel) displays more information on selected functions.
+The [titlebar](#callgraph-titlebar) and [toolbar](#callgraph-toolbar) contain
+various options to configure the graph and show/hide some functions.
 
-Below is a list of shortcuts:
+## Titlebar {#callgraph-titlebar}
+
+The titlebar contains the following buttons:
+
+* [icon-tunings]: filter functions appearing in the graph.
+  This filter is synchronized with the sidebar function filter.
+* [icon-target]: move the camera to show each node after each render.
+* [icon-pin]: automatically select in the graph the node of the function
+  selected in the AST.
+* [icon-help]: show this help modal.
+
+## Toolbar {#callgraph-toolbar}
+
+The toolbar contains display and selection parameters on the left and graph
+management parameters on the right.
+
+On the left:
+
+* The first group of buttons can hide nodes from the graph, according to their
+  relation to the currently selected nodes (which are always shown).
+  + Try it yourself: [button-displaymode]
+* [button-select]: select in the graph a list of functions according to some
+  criteria:
+  + functions containing unproven properties;
+  + functions selected in the `Locations` component, if a multi-selection is
+    currently active;
+  + functions containing tainted variables, if an Eva taint analysis has been
+    performed;
+  + functions within cycle in the callgraph.
+
+On the right:
+
+* Horizontal and vertical distance management between graph nodes.
+* [icon-sidebar]: opens or closes the side [panel](#callgraph-panel).
+
+## Graph {#callgraph-graph}
+
+### Nodes
+
+Each node represents a C function and may have the following icons:
+
+* [led-warning]: the function contains unproven properties
+  (the number of which is given in a tooltip).
+* [led-negative]: the function contains invalid properties
+  (the number of which is given in a tooltip);
+* [icon-redo-orange]: the function is recursive;
+* [icon-drop.filled-#882288] or [icon-drop.filled-#73BBBB]:
+  the function contains tainted properties.
+
+### Edges
+
+Edges are oriented from caller to callees, and may have different colors
+depending on the selected nodes:
+
+* A green edge connects two selected functions.
+* A red edge links a selected function node and one of its callers.
+* A blue edge links a selected function node and one of its callees.
+
+### Cycle
+
+The graph is in 3D but is displayed as a tree, which prevents cycles from
+appearing in the graph.
+
+If a cycle is detected:
+
+* Nodes of recursive functions have the [icon-redo-orange] icon.
+* If cycles between several functions are detected, such functions can be
+  selected via the [button-select] button in the [toolbar](#callgraph-toolbar).
+
+## Panel {#callgraph-panel}
+
+The panel displays additional information about the graph in general,
+and lists the logical properties from each function selected in the graph.
+
+The buttons above the list can be used to filter the kind of properties
+shown in this panel. They are synchronised with the filters in the `Properties`
+component.
+
+At the top right, two buttons allow changing the side of the panel,
+and closing it (it can be reopen via the far-right button in the toolbar).
+
+## Shortcuts {#callgraph-shortcuts}
 
 * In the graph:
   * Left-click: rotate the graph
   * Right-click: move in the graph
   * Mouse-wheel: zoom
+ 
 * On nodes:
-  * Left-Click: select node (in the graph)
-  * Ctrl+click: add node to the selected nodes (multi-selection)
-  * Alt+click: select function (in all Ivette components)
-
-This component is divided into 4 parts, the [titlebar](#plugins-callgraph-titlebar), the [toolbar](#plugins-callgraph-toolbar), a [panel](#plugins-callgraph-panel) and a [graph](#plugins-callgraph-graph).
-
-### Titlebar {#callgraph-titlebar}
-
-The titlebar contains the name of the module on the left and the following buttons on the right:
-
-* [icon-tunings] : Filter functions appearing in the graph. Ce filtre est synchronisé avec celui de la sidebar.
-* [icon-target] : Move the camera to show each node after each render.
-* [icon-pin] : Automatically select node of the function selected in AST.
-* [icon-help] : show this help modal.
-
-##Toolbar {#plugins-callgraph-toolbar}
-
-The toolbar contains display and selection parameters on the left and graph management parameters on the right.
-On the far right is the button for opening the side panel.
-
-On the left, there is a group of buttons for selecting the nodes that will appear in the graph :
-
-* The first group of buttons is used to select the nodes that will appear in the graph...
-  *  Try yourself : [button-displaymode]
-* [button-select] :This button allows you to select a list of predefined nodes (nodes with unproven properties, with tainted variables, etc.).
-
-On the right:
-
-* Horizontal and vertical distance management between graph nodes.
-* [icon-sidebar] : Opens or closes the side panel.
-
-## Panel {#callgraph-panel}
-
-The panel displays additional information about the graph in general and about the properties of the selected nodes.
-The filters above the list can be used to limit the amount of information, and are synchronised with the filters in the `Properties` component.
-
-At the top right, 2 buttons allow you to change the side of the panel and close it.
-
-## Graph {#callgraph-graph}
-
-The graph is in 3D but is displayed as a tree. This type of display prevents cycles from appearing in the graph.
-
-If a cycle is detected :
-
-* In the case of a recursive function: The link is deleted and the [icon-redo-orange] icon is added to the node.
-* In the case of a cycle on several functions: The cycles will be pre-selected and will appear in the selection button.
-
-### Nodes
-
-The nodes display the name of the function and the following elements:
-
-* [led-warning] : The function contains unproven properties, a tooltip gives the quantity.
-* [led-negative] : The function contains false properties, a tooltip gives the quantity.
-* [icon-redo-orange] : The function is recursive.
-* [icon-drop.filled-#882288][icon-drop.filled-#73BBBB]: The function contains tainted properties.
-
-### Edges
-
-The edges are oriented and can take on different colours depending on the nodes selected.
-
-* Green: the edge connects 2 selected nodes.
-* Red: the edge links a selected node and one of its parents.
-* Blue: the edge links a selected node and one of its children.
+  * Left-Click: select node in the graph
+  * Ctrl+click: add node to the selected graph nodes (multi-selection)
+  * Alt+click: select the function in all Ivette components
