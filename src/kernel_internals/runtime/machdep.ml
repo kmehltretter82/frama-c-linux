@@ -301,9 +301,12 @@ let gen_define_macro fmt macro def =
   else gen_define_string fmt macro def
 
 let gen_define_custom_macros fmt censored key_values =
+  let is_same_macro m1 m2 =
+    Extlib.strip_underscore m1 = Extlib.strip_underscore m2
+  in
   List.iter
     (fun (k,v) ->
-       if not (Datatype.String.Set.mem (Extlib.strip_underscore k) censored)
+       if not (Datatype.String.Set.exists (is_same_macro k) censored)
        then begin
          gen_undef fmt k;
          gen_define_macro fmt k v

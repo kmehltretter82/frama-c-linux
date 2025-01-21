@@ -31,7 +31,7 @@
 // test functions are declared here to minimize shifting oracles in case of changes
 void tests1(void); void tests2(void);
 
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__FRAMAC__)
 // This main function is not used when testing MSVC on Visual C++;
 // instead, _tmain (defined at the end) is used
 int main() {
@@ -340,7 +340,7 @@ typedef struct {
 } barcode_bmp_t;
 #pragma pack(pop)
 
-#ifndef __GNUC__
+#if !defined(__GNUC__) && !defined(__FRAMAC__)
 // For MSVC testing on Visual C++
 int _tmain(int argc, _TCHAR* argv[]) {
   tests1();

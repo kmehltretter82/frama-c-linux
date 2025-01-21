@@ -330,10 +330,21 @@ let get_machdep () =
   | Error (`Msg s) ->
     Kernel.abort "Error during machdep parsing: %s" s
 
+(* Macros that are defined by gcc even in presence of -undef.
+   Specifically use -U on the command line to silence them.
+*)
+let unsupported_libc_macros =
+  [
+    "__STDC_IEC_559_COMPLEX__";
+    "__STDC_IEC_60559_COMPLEX__";
+    "__STDC_ISO_10646__";
+    "__STDC_UTF16__";
+    "__STDC_UTF32__";
+  ]
 
 let unsupported_float_type_macros acc name =
   List.fold_left
-    (fun acc s -> Datatype.String.Set.add (name ^ "_" ^ s) acc)
+    (fun acc s -> Datatype.String.Set.add ("__" ^ name ^ "_" ^ s ^ "__") acc)
     acc
     [ "DECIMAL_DIG"; "DENORM_MIN"; "DIG"; "HAS_DENORM"; "HAS_INFINITY";
       "HAS_QUIET_NAN"; "IS_IEC_60559"; "MANT_DIG";
@@ -348,7 +359,10 @@ let unsupported_float_types =
     [ "BFLT16"; "FLT16"; "FLT128"; "LDBL"; ]
 
 let known_bad_macros =
-  Datatype.String.Set.add_seq (List.to_seq ["SIZEOF_INT128"; "SSE" ])
+  Datatype.String.Set.add_seq
+    (List.to_seq
+       (["__GCC_IEC_559_COMPLEX"; "__SIZEOF_INT128__"; "__SSE__" ]
+        @ unsupported_libc_macros))
     unsupported_float_types
 
 let print_machdep_header () =
@@ -505,6 +519,10 @@ let build_cpp_cmd = function
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
     in
+    let no_builtin_macros =
+      if Kernel.FramaCStdLib.get () then add_if_gnu "-undef"
+      else []
+    in
     let output_defines_arg =
       let open Kernel in
       match ReadAnnot.get (), PreprocessAnnot.is_set (), PreprocessAnnot.get () with
@@ -513,17 +531,22 @@ let build_cpp_cmd = function
       | true, false, _ -> add_if_gnu "-dD"
       | _, _, _ -> []
     in
-    let gnu_implicit_args = output_defines_arg @ nostdinc_arg in
-    let string_of_supp_args extra includes defines =
-      Format.asprintf "%s%s%s"
+    let gnu_implicit_args =
+      output_defines_arg @ nostdinc_arg @ no_builtin_macros
+    in
+    let string_of_supp_args extra includes undef defines =
+      Format.asprintf "%s%s%s%s"
         (concat_strs ~pre:"-I" ~sep:" -I" includes)
+        (concat_strs ~pre:" -U" ~sep:" -U" undef)
         (concat_strs ~pre:" -D" ~sep:" -D" defines)
         (concat_strs ~pre:" " ~sep:" " extra)
     in
     let supp_args =
       string_of_supp_args
         (gnu_implicit_args @ machdep_no_warn @ clang_no_warn @ extra_args)
-        fc_include_args fc_define_args
+        fc_include_args
+        unsupported_libc_macros
+        fc_define_args
     in
     let cpp_command =
       replace_in_cpp_cmd cmdl supp_args (f:>string) (ppf:>string)
