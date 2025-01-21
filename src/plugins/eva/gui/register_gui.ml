@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -675,7 +675,7 @@ let add_keybord_shortcut_evaluate main_ui =
    analysis. This needs to be done each time the abstractions are changed.
    The module [A] is the current analysis module; it contains the
    abstractions used by Eva for the current analysis. *)
-let reset (main_ui:main_ui) (module A: Analysis.S) =
+let reset (main_ui:main_ui) (module A: Analysis.Engine) =
   (* Types of the GUI depending on the abstractions used for the analysis. *)
   let module Gui_Types = Gui_types.Make (A.Val) in
   (* Evaluation functions for the GUI. *)

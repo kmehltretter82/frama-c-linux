@@ -5,7 +5,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] test4.i:9: starting to merge loop iterations
+[eva:partition] test4.i:9: starting to merge loop iterations
 [eva:alarm] test4.i:11: Warning: signed overflow. assert tmp + 1 ≤ 2147483647;
 [eva:alarm] test4.i:14: Warning: signed overflow. assert tmp + 1 ≤ 2147483647;
 [eva:alarm] test4.i:17: Warning: signed overflow. assert tmp + 1 ≤ 2147483647;

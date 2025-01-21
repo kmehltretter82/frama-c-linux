@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva] basic.i:20: assertion got status valid.
-[eva] basic.i:21: starting to merge loop iterations
+[eva:partition] basic.i:21: starting to merge loop iterations
 [eva:alarm] basic.i:21: Warning: signed overflow. assert -2147483648 ≤ i - 1;
 [eva] Recording results for main
 [eva] Done for function main

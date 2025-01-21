@@ -285,7 +285,7 @@
   pointer subtraction. assert \base_addr(_ss) ≡ \base_addr(s1);
 [eva] strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
 [eva] strchr.c:336: assertion got status valid.
-[eva] strchr.c:334: starting to merge loop iterations
+[eva:partition] strchr.c:334: starting to merge loop iterations
 [eva] strchr.c:335: Call to builtin strchr
 [eva] strchr.c:335: Frama_C_show_each_mystrchr: {3; 4}
 [eva] strchr.c:335: Call to builtin strchr

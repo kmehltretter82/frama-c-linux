@@ -7,21 +7,21 @@
   c ∈ [--..--]
   r ∈ {0}
   H ∈ {0}
-[eva] undefined_sequence.i:36: starting to merge loop iterations
-[eva] undefined_sequence.i:38: starting to merge loop iterations
-[eva] undefined_sequence.i:40: starting to merge loop iterations
+[eva:partition] undefined_sequence.i:36: starting to merge loop iterations
+[eva:partition] undefined_sequence.i:38: starting to merge loop iterations
+[eva:partition] undefined_sequence.i:40: starting to merge loop iterations
 [eva:alarm] undefined_sequence.i:40: Warning: 
   signed overflow.
   assert G[tmp_2] + G[tmp_3] ≤ 2147483647;
   (tmp_2 from j++, tmp_3 from i++)
-[eva] undefined_sequence.i:43: starting to merge loop iterations
+[eva:partition] undefined_sequence.i:43: starting to merge loop iterations
 [eva:alarm] undefined_sequence.i:50: Warning: 
   signed overflow. assert G[j] + G[tmp_6] ≤ 2147483647;
                    (tmp_6 from j++)
 [eva:alarm] undefined_sequence.i:51: Warning: 
   signed overflow. assert G[tmp_7] + G[i] ≤ 2147483647;
                    (tmp_7 from i++)
-[eva] undefined_sequence.i:49: starting to merge loop iterations
+[eva:partition] undefined_sequence.i:49: starting to merge loop iterations
 [eva] computing for function g <- main.
   Called from undefined_sequence.i:53.
 [eva] Recording results for g

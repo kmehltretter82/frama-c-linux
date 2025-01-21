@@ -11,7 +11,7 @@
 [eva] Done for function getchar
 [eva] value_rte.c:13: assertion 'rte,index_bound' got status valid.
 [eva] value_rte.c:15: assertion 'rte,signed_overflow' got status valid.
-[eva] value_rte.c:11: starting to merge loop iterations
+[eva:partition] value_rte.c:11: starting to merge loop iterations
 [eva] computing for function getchar <- main.
   Called from value_rte.c:12.
 [eva] Done for function getchar

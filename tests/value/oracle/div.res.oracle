@@ -29,7 +29,7 @@
   Called from div.i:86.
 [eva:alarm] div.i:14: Warning: signed overflow. assert c + 1 ≤ 2147483647;
 [eva:alarm] div.i:17: Warning: signed overflow. assert c + 2 ≤ 2147483647;
-[eva] div.i:14: starting to merge loop iterations
+[eva:partition] div.i:14: starting to merge loop iterations
 [eva:alarm] div.i:17: Warning: signed overflow. assert -2147483648 ≤ X - 1;
 [eva:alarm] div.i:16: Warning: signed overflow. assert X + 1 ≤ 2147483647;
 [eva:alarm] div.i:32: Warning: division by zero. assert Z2 ≢ 0;

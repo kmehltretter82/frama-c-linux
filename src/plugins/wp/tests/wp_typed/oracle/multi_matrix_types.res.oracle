@@ -132,9 +132,9 @@ theory Compound
   
   axiom Q_Array_uint32_havoc_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, q:addr
-     [Array_uint32 p n (havoc mint1 mint q n1)].
+     [Array_uint32 p n (memcpy mint mint1 q q n1)].
      separated p 1 q n1 ->
-     Array_uint32 p n (havoc mint1 mint q n1) = Array_uint32 p n mint
+     Array_uint32 p n (memcpy mint mint1 q q n1) = Array_uint32 p n mint
   
   axiom Q_Array_sint64_access :
     forall mint:addr -> int, i:int, n:int, p:addr
@@ -156,9 +156,9 @@ theory Compound
   
   axiom Q_Array_sint64_havoc_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, q:addr
-     [Array_sint64 p n (havoc mint1 mint q n1)].
+     [Array_sint64 p n (memcpy mint mint1 q q n1)].
      separated p 1 q n1 ->
-     Array_sint64 p n (havoc mint1 mint q n1) = Array_sint64 p n mint
+     Array_sint64 p n (memcpy mint mint1 q q n1) = Array_sint64 p n mint
   
   axiom Q_Load_S1_S_update_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr, q:
@@ -178,9 +178,9 @@ theory Compound
   axiom Q_Load_S1_S_havoc_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
      -> int, n:int, p:addr, q:addr
-     [Load_S1_S p (havoc mint1 mint q n) mint2 mint3].
+     [Load_S1_S p (memcpy mint mint1 q q n) mint2 mint3].
      separated p 11 q n ->
-     Load_S1_S p (havoc mint1 mint q n) mint2 mint3 =
+     Load_S1_S p (memcpy mint mint1 q q n) mint2 mint3 =
      Load_S1_S p mint mint2 mint3
   
   axiom Q_Load_S1_S_update_Mint1 :
@@ -201,9 +201,9 @@ theory Compound
   axiom Q_Load_S1_S_havoc_Mint1 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
      -> int, n:int, p:addr, q:addr
-     [Load_S1_S p mint3 (havoc mint2 mint1 q n) mint].
+     [Load_S1_S p mint3 (memcpy mint1 mint2 q q n) mint].
      separated p 11 q n ->
-     Load_S1_S p mint3 (havoc mint2 mint1 q n) mint =
+     Load_S1_S p mint3 (memcpy mint1 mint2 q q n) mint =
      Load_S1_S p mint3 mint1 mint
   
   axiom Q_Load_S1_S_update_Mint2 :
@@ -224,9 +224,9 @@ theory Compound
   axiom Q_Load_S1_S_havoc_Mint2 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
      -> int, n:int, p:addr, q:addr
-     [Load_S1_S p mint1 mint (havoc mint3 mint2 q n)].
+     [Load_S1_S p mint1 mint (memcpy mint2 mint3 q q n)].
      separated p 11 q n ->
-     Load_S1_S p mint1 mint (havoc mint3 mint2 q n) =
+     Load_S1_S p mint1 mint (memcpy mint2 mint3 q q n) =
      Load_S1_S p mint1 mint mint2
   
 end

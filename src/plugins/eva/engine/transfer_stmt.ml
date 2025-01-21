@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -38,12 +38,6 @@ module type S = sig
     state -> (stmt * lval list * lval list * lval list * stmt ref list) list ->
     unit or_bottom
   val enter_scope: kernel_function -> varinfo list -> state -> state
-  type call_result = {
-    states: (Partition.key * state) list;
-    cacheable: Eval.cacheable;
-  }
-  val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
 (* Reference filled in by the callwise-inout callback *)
@@ -111,12 +105,12 @@ let substitution_visitor table =
   in
   { Eva_ast.Rewrite.default with rewrite_varinfo }
 
-module Make (Abstract: Abstractions.S_with_evaluation) = struct
+module Make (Engine: Engine_sig.S) = struct
 
-  module Value = Abstract.Val
-  module Location = Abstract.Loc
-  module Domain = Abstract.Dom
-  module Eval = Abstract.Eval
+  module Value = Engine.Val
+  module Location = Engine.Loc
+  module Domain = Engine.Dom
+  module Eval = Engine.Eval
   include Cvalue_domain.Getters (Domain)
 
   type state = Domain.t
@@ -288,17 +282,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
   (*                             Function Calls                               *)
   (* ------------------------------------------------------------------------ *)
 
-  type call_result = {
-    states: (Partition.key * state) list;
-    cacheable: cacheable;
-  }
-
-  (* Forward reference to [Eval_funs.compute_call] *)
-  let compute_call_ref :
-    (stmt -> (loc, value) call -> recursion option -> state ->
-     call_result) ref
-    = ref (fun _ -> assert false)
-
   (* Returns the result of a call. *)
   let process_call stmt call recursion valuation state =
     Eva_utils.push_call_stack call.kf stmt;
@@ -310,7 +293,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         | `Value state ->
           let callstack = Eva_utils.current_call_stack () in
           Domain.Store.register_initial_state callstack call.kf state;
-          !compute_call_ref stmt call recursion state
+          Engine.Compute.compute_call stmt call recursion state
         | `Bottom ->
           { states = []; cacheable = Cacheable; }
       in

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -57,8 +57,8 @@ sig
 
   val last : sigma -> c_object -> loc -> term
 
-  val havoc : c_object -> loc -> length:term ->
-    Chunk.t -> fresh:term -> current:term -> term
+  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
+    length:term -> Chunk.t -> term
 
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
@@ -89,8 +89,8 @@ sig
   val load_init : sigma -> c_object -> M.loc -> term
   val load_value : sigma -> c_object -> M.loc -> term
 
-  val havoc : sigma sequence -> c_object -> M.loc -> equation list
-  val havoc_length : sigma sequence -> c_object -> M.loc -> term -> equation list
+  val memcpy : sigma sequence -> c_object -> ?lsrc:M.loc -> M.loc -> equation list
+  val memcpy_length : sigma sequence -> c_object -> ?lsrc:M.loc -> M.loc -> term -> equation list
 
   val stored : sigma sequence -> c_object -> M.loc -> term -> equation list
   val stored_init : sigma sequence -> c_object -> M.loc -> term -> equation list

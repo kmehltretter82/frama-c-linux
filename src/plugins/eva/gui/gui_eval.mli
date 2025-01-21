@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -56,7 +56,7 @@ val gui_selection_data_empty: 'a gui_selection_data
     currently available in Eva. *)
 module type S = sig
 
-  module Analysis : Analysis.S
+  module Analysis : Analysis.Engine
 
   (** This is the record that encapsulates all evaluation functions *)
   type ('env, 'expr, 'v) evaluation_functions = {
@@ -118,4 +118,4 @@ module type S = sig
     (gui_callstack * Analysis.Val.t gui_selection_data) list * exn list
 end
 
-module Make (X: Analysis.S) : S with module Analysis = X
+module Make (X: Analysis.Engine) : S with module Analysis = X

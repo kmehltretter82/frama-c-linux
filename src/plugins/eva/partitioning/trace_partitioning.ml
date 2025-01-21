@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -24,6 +24,8 @@ open Cil_types
 open Partition
 
 let stat_max_widenings = Statistics.register_statement_stat "max-widenings"
+
+let dkey = Self.dkey_partition
 
 module Make
     (Abstract: Abstractions.S_with_evaluation)
@@ -241,7 +243,7 @@ struct
       if x >= !max_displayed + slevel_display_step
       then
         let rounded = x / slevel_display_step * slevel_display_step in
-        Self.feedback ~once:true ~current:true
+        Self.feedback ~dkey ~once:true ~current:true
           "Trace partitioning superposing up to %d states"
           rounded;
         max_displayed := rounded
@@ -301,7 +303,7 @@ struct
             else begin
               (* Propagate the join of the two states *)
               if is_loop_head then
-                Self.feedback ~level:1 ~once:true ~current:true
+                Self.feedback ~dkey ~level:1 ~once:true ~current:true
                   "starting to merge loop iterations";
               Some (Domain.join previous_state current_state)
             end

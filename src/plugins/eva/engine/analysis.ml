@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -53,53 +53,24 @@ let save_results kf =
   try Function_calls.save_results (Kernel_function.get_definition kf)
   with Kernel_function.No_Definition -> false
 
-module type Results = sig
-  type state
-  type value
-  type location
 
-  val get_global_state: unit -> state or_top_bottom
-  val get_stmt_state : after:bool -> stmt -> state or_top_bottom
-  val get_stmt_state_by_callstack:
-    ?selection:Callstack.t list ->
-    after:bool -> stmt -> state Callstack.Hashtbl.t or_top_bottom
-  val get_initial_state:
-    kernel_function -> state or_top_bottom
-  val get_initial_state_by_callstack:
-    ?selection:Callstack.t list ->
-    kernel_function -> state Callstack.Hashtbl.t or_top_bottom
-
-  val eval_expr : state -> exp -> value evaluated
-  val copy_lvalue: state -> lval -> value flagged_value evaluated
-  val eval_lval_to_loc: state -> lval -> location evaluated
-  val eval_function_exp:
-    state -> ?args:exp list -> exp ->  kernel_function list evaluated
-  val assume_cond : stmt -> state -> exp -> bool -> state or_bottom
-end
-
-module type S = sig
-  include Abstractions.S_with_evaluation
-  include Results with type state := Dom.state
-                   and type value := Val.t
-                   and type location := Loc.location
-end
-
-module type Analyzer = sig
-  include S
-  val compute_from_entry_point : kernel_function -> lib_entry:bool -> unit
-  (* val compute_from_init_state: kernel_function -> Dom.t -> unit *)
-end
-
+module type Engine = Engine_sig.S_with_results
 
 module Make (Abstract: Abstractions.S) = struct
 
-  module Abstract = struct
+  module rec Engine : Engine_sig.S
+    with module Ctx = Abstract.Ctx
+     and module Val = Abstract.Val
+     and module Loc = Abstract.Loc
+     and module Dom = Abstract.Dom =
+  struct
     include Abstract
     module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
+    module Compute = C
   end
+  and C : Engine_sig.Compute = Compute_functions.Make (Engine)
 
-  include Abstract
-  include Compute_functions.Make (Abstract)
+  include Engine
 
   let find stmt f =
     if is_computed ()
@@ -115,15 +86,15 @@ module Make (Abstract: Abstractions.S) = struct
     find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
 
   let get_stmt_state_by_callstack ?selection ~after stmt =
-    find stmt (Abstract.Dom.Store.get_stmt_state_by_callstack ?selection ~after)
+    find stmt (Dom.Store.get_stmt_state_by_callstack ?selection ~after)
 
   let get_global_state () =
-    (Abstract.Dom.Store.get_global_state () :> Dom.t or_top_bottom)
+    (Dom.Store.get_global_state () :> Dom.t or_top_bottom)
 
   let get_initial_state kf =
     if is_computed () then
       if Function_calls.is_called kf
-      then (Abstract.Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
+      then (Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
       else `Bottom
     else `Top
 
@@ -154,37 +125,37 @@ module Make (Abstract: Abstractions.S) = struct
 end
 
 
-
 let default = Abstractions.Config.of_list [Cvalue_domain.registered, None]
-module Default : Analyzer = Make (val Abstractions.make default)
+module DefaultAbstractions = (val Abstractions.make default)
+module Default : Engine = Make (DefaultAbstractions)
 
 
 (* Reference to the current configuration (built by Abstractions.configure from
    the parameters of Eva regarding the abstractions used in the analysis) and
    the current Analyzer module. *)
-let ref_analyzer = ref (default, (module Default : Analyzer))
+let ref_analyzer = ref (default, (module Default : Engine))
 
 (* Returns the current Analyzer module. *)
-let current_analyzer () = (module (val (snd !ref_analyzer)): S)
+let current_analyzer () = (module (val (snd !ref_analyzer)): Engine)
 
 (* Set of hooks called whenever the current Analyzer module is changed.
    Useful for the GUI parts that depend on it. *)
-module Analyzer_Hook = Hook.Build (struct type t = (module S) end)
+module Analyzer_Hook = Hook.Build (struct type t = (module Engine) end)
 
 (* Register a new hook. *)
 let register_hook = Analyzer_Hook.extend
 
 (* Sets the current Analyzer module for a given configuration.
    Calls the hooks above. *)
-let set_current_analyzer config (analyzer: (module Analyzer)) =
-  Analyzer_Hook.apply (module (val analyzer): S);
+let set_current_analyzer config (analyzer: (module Engine)) =
+  Analyzer_Hook.apply (module (val analyzer): Engine);
   ref_analyzer := (config, analyzer)
 
 (* Builds the Analyzer module corresponding to a given configuration,
    and sets it as the current analyzer. *)
 let make_analyzer config =
   let analyzer =
-    if Abstractions.Config.(equal config default) then (module Default : Analyzer)
+    if Abstractions.Config.(equal config default) then (module Default : Engine)
     else
       let module Abstract = (val Abstractions.make config) in
       let module Analyzer = Make (Abstract) in
@@ -217,7 +188,7 @@ let force_compute () =
   (* The new analyzer can be accesed through hooks *)
   Self.ComputationState.set Computing;
   let module Analyzer = (val snd !ref_analyzer) in
-  try Analyzer.compute_from_entry_point ~lib_entry kf
+  try Analyzer.Compute.compute_from_entry_point ~lib_entry kf
   with Self.Abort ->
     Self.(ComputationState.set Aborted);
     Self.error "The analysis has been aborted: results are incomplete."

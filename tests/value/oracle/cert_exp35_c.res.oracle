@@ -11,7 +11,7 @@
 [eva] Done for function addressee
 [eva] computing for function printf_va_1 <- main.
   Called from cert_exp35_c.i:24.
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva:alarm] cert_exp35_c.i:24: Warning: 
   function printf_va_1: precondition valid_read_string(param0) got status unknown.
 [eva:alarm] cert_exp35_c.i:24: Warning: 

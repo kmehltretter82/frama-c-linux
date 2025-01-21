@@ -14,7 +14,7 @@
   i6 ∈ [--..--]
 [eva] computing for function g1 <- main.
   Called from initialized.c:193.
-[eva] initialized.c:19: starting to merge loop iterations
+[eva:partition] initialized.c:19: starting to merge loop iterations
 [eva:alarm] initialized.c:21: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:22: Warning: assertion got status unknown.
 [eva] computing for function Frama_C_interval <- g1 <- main.
@@ -159,7 +159,7 @@
   accessing uninitialized left-value. assert \initialized(&x3);
 [eva] computing for function f <- g3 <- main.
   Called from initialized.c:98.
-[eva] initialized.c:11: starting to merge loop iterations
+[eva:partition] initialized.c:11: starting to merge loop iterations
 [eva:alarm] initialized.c:8: Warning: 
   function f: postcondition got status invalid.
 [eva:alarm] initialized.c:8: Warning: 
@@ -226,7 +226,7 @@
 [eva:alarm] initialized.c:178: Warning: check 'unknown' got status unknown.
 [eva:alarm] initialized.c:182: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:183: Warning: check 'invalid' got status unknown.
-[eva] initialized.c:186: starting to merge loop iterations
+[eva:partition] initialized.c:186: starting to merge loop iterations
 [eva:alarm] initialized.c:188: Warning: assertion got status unknown.
 [eva:alarm] initialized.c:189: Warning: check 'unknown' got status unknown.
 [eva] Recording results for reduce_by_negation

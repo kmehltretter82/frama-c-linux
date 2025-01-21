@@ -23,7 +23,7 @@
   non-finite float value. assert \is_finite(x[i]);
 [eva:alarm] unravel-variance.i:36: Warning: 
   non-finite float value. assert \is_finite(\mul_float(x[i], x[i]));
-[eva] unravel-variance.i:32: starting to merge loop iterations
+[eva:partition] unravel-variance.i:32: starting to merge loop iterations
 [eva] computing for function scanf <- main.
   Called from unravel-variance.i:34.
 [eva] Done for function scanf
@@ -94,7 +94,7 @@
   non-finite float value. assert \is_finite(\sub_float(x[i], avg));
 [eva:alarm] unravel-variance.i:48: Warning: 
   non-finite float value. assert \is_finite(\mul_float(dev, dev));
-[eva] unravel-variance.i:44: starting to merge loop iterations
+[eva:partition] unravel-variance.i:44: starting to merge loop iterations
 [eva:alarm] unravel-variance.i:47: Warning: 
   non-finite float value. assert \is_finite(\add_float(t2, dev));
 [eva:alarm] unravel-variance.i:48: Warning: 

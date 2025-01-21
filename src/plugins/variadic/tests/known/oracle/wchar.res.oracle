@@ -49,16 +49,10 @@
 [variadic] wchar.c:23: 
   Translating call to swscanf to a call to the specialized version swscanf_va_1.
 [eva] Analyzing a complete application starting at main
-[eva] using specification for function wprintf_va_1
-[eva] using specification for function wprintf_va_2
-[eva] using specification for function wprintf_va_3
-[eva] using specification for function wprintf_va_4
-[eva] using specification for function wprintf_va_5
-[eva] using specification for function wprintf_va_6
-[eva] using specification for function swprintf_va_1
-[eva] using specification for function wscanf_va_1
-[eva] using specification for function wscanf_va_2
-[eva] using specification for function swscanf_va_1
+[eva] using specification for function wprintf
+[eva] using specification for function swprintf
+[eva] using specification for function wscanf
+[eva] using specification for function swscanf
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   input[0] ∈ {102}

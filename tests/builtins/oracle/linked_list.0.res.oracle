@@ -85,7 +85,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] linked_list.c:39: starting to merge loop iterations
+[eva:partition] linked_list.c:39: starting to merge loop iterations
 [eva] linked_list.c:40: 
   Frama_C_dump_each:
   # cvalue:
@@ -2298,10 +2298,10 @@
   ==END OF DUMP==
 [eva] computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva] linked_list.c:51: function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
-[eva] linked_list.c:50: starting to merge loop iterations
+[eva:partition] linked_list.c:50: starting to merge loop iterations
 [eva] computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
 [eva] Done for function printf_va_1

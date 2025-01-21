@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -22,14 +22,7 @@
 
 (** Value analysis of entire functions, using Eva engine. *)
 
-open Cil_types
-
-module Make (Abstract: Abstractions.S_with_evaluation)
-  : sig
-
-    (** Compute a call to the main function. *)
-    val compute_from_entry_point: kernel_function -> lib_entry:bool -> unit
-
-    (** Compute a call to the main function from the given initial state. *)
-    val compute_from_init_state: kernel_function -> Abstract.Dom.t -> unit
-  end
+module Make (Engine : Engine_sig.S) : Engine_sig.Compute
+  with type state = Engine.Dom.t
+   and type value = Engine.Val.t
+   and type loc = Engine.Loc.location

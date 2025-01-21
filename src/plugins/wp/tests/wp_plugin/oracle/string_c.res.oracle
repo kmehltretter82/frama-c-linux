@@ -7,7 +7,7 @@
 
 Goal Post-condition 'copied_contents' in 'memcpy':
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Assume {
   Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
@@ -29,8 +29,8 @@ Assume {
   (* Else *)
   Have: n <= i.
 }
-Prove: L_memcmp(Mchar_0, havoc(Mchar_undef_0, Mchar_0, a, i), dest_0, src_0,
-         i) = 0.
+Prove: L_memcmp(Mchar_0, memcpy(Mchar_0, Mchar_undef_0, a, a, i), dest_0,
+         src_0, i) = 0.
 
 ------------------------------------------------------------
 
@@ -41,7 +41,7 @@ Prove: true.
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 33):
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Assume {
   Type: is_uint64(i) /\ is_uint64(n).
   (* Heap *)
@@ -75,7 +75,7 @@ Prove: true.
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 34):
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = a_1[shift_sint8(dest_0, i) <- a_1[shift_sint8(src_0, i)]].
 Assume {
   Type: is_uint64(i) /\ is_uint64(n).
@@ -126,7 +126,7 @@ Goal Loop assigns (file FRAMAC_SHARE/libc/string.c, line 35) (3/3):
 Effect at line 39
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = shift_sint8(dest_0, i).
 Let a_3 = a_1[a_2 <- a_1[shift_sint8(src_0, i)]].
 Assume {
@@ -170,7 +170,7 @@ Prove: true.
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 38):
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = a_1[shift_sint8(dest_0, i) <- a_1[shift_sint8(src_0, i)]].
 Assume {
   Type: is_uint64(i) /\ is_uint64(n).
@@ -242,7 +242,7 @@ Assume {
       (* Invariant 'no_eva' *)
       Have: 0 <= n.
       (* Loop assigns ... *)
-      Have: havoc(Mchar_undef_0, Mchar_0, a, n) = Mchar_1.
+      Have: memcpy(Mchar_0, Mchar_undef_0, a, a, n) = Mchar_1.
       (* Invariant 'no_eva' *)
       Have: (0 <= i) /\ (i <= n).
       (* Invariant 'no_eva' *)
@@ -267,7 +267,7 @@ Assume {
           (Mchar_0[shift_sint8(src_0, i_3)]
              = Mchar_0[shift_sint8(dest_0, i_3)]))).
       (* Loop assigns ... *)
-      Have: havoc(Mchar_undef_1, Mchar_0, a, n) = Mchar_2.
+      Have: memcpy(Mchar_0, Mchar_undef_1, a, a, n) = Mchar_2.
       (* Invariant 'no_eva' *)
       Have: (0 <= i_1) /\ (i_1 < n).
       (* Invariant 'no_eva' *)
@@ -299,7 +299,7 @@ Prove: true.
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 95):
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
@@ -345,7 +345,7 @@ Prove: true.
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 96):
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = shift_sint8(s, 0).
 Assume {
   Type: is_sint32(memoverlap_0) /\ is_uint64(i) /\ is_uint64(n).
@@ -396,7 +396,7 @@ Prove: true.
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 97):
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
 Let a_3 = shift_sint8(s, 0).
 Let a_4 = shift_sint8(s, i_1).
@@ -450,7 +450,7 @@ Prove: true.
 
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 107):
 Let a = shift_sint8(dest_0, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let x = to_uint64(n - 1).
 Let a_2 = shift_sint8(src_0, 0).
 Assume {
@@ -521,7 +521,7 @@ Prove: to_uint64(n - 1) < n.
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 108):
 Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let x_1 = to_uint64(n - 1).
 Let a_2 = shift_sint8(s, 0).
 Assume {
@@ -603,7 +603,7 @@ Prove: Mchar_0[shift_sint8(src_0, i)] = Mchar_0[shift_sint8(dest_0, i)].
 Goal Preservation of Invariant 'no_eva' (file FRAMAC_SHARE/libc/string.c, line 109):
 Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
 Let x_1 = to_uint64(n - 1).
 Let a_3 = shift_sint8(s, 0).
@@ -674,7 +674,7 @@ Goal Loop assigns (file FRAMAC_SHARE/libc/string.c, line 98) (3/3):
 Effect at line 102
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = shift_sint8(d, i).
 Let a_3 = a_1[a_2 <- a_1[shift_sint8(s, i)]].
 Let a_4 = shift_sint8(s, 0).
@@ -739,7 +739,7 @@ Goal Loop assigns (file FRAMAC_SHARE/libc/string.c, line 110) (3/3):
 Effect at line 114
 Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = shift_sint8(d, i).
 Let a_3 = a_1[a_2 <- a_1[shift_sint8(s, i)]].
 Let x_1 = to_uint64(n - 1).
@@ -842,7 +842,7 @@ Prove: true.
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 101):
 Let x = to_uint64(1 + i).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
 Let a_3 = shift_sint8(s, 0).
 Assume {
@@ -897,7 +897,7 @@ Prove: true.
 Goal Decreasing of Loop variant at loop (file FRAMAC_SHARE/libc/string.c, line 113):
 Let x = to_uint64(i - 1).
 Let a = shift_sint8(d, 0).
-Let a_1 = havoc(Mchar_undef_0, Mchar_0, a, n).
+Let a_1 = memcpy(Mchar_0, Mchar_undef_0, a, a, n).
 Let a_2 = a_1[shift_sint8(d, i) <- a_1[shift_sint8(s, i)]].
 Let x_1 = to_uint64(n - 1).
 Let a_3 = shift_sint8(s, 0).

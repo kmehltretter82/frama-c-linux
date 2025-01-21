@@ -4,8 +4,10 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] string_c_strchr.c:57: Trace partitioning superposing up to 100 states
-[eva] string_c_strchr.c:59: Trace partitioning superposing up to 200 states
+[eva:partition] string_c_strchr.c:57: 
+  Trace partitioning superposing up to 100 states
+[eva:partition] string_c_strchr.c:59: 
+  Trace partitioning superposing up to 200 states
 [eva] computing for function strchr <- main.
   Called from string_c_strchr.c:62.
 [eva] string_c_strchr.c:62: 
@@ -42,7 +44,7 @@
   Called from string_c_strchr.c:67.
 [eva] string_c_strchr.c:67: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:258: 
+[eva:partition] FRAMAC_SHARE/libc/string.c:258: 
   Trace partitioning superposing up to 100 states
 [eva] Recording results for strchr
 [eva] Done for function strchr
@@ -170,7 +172,7 @@
   Called from string_c_strchr.c:87.
 [eva] string_c_strchr.c:87: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.c:258: 
+[eva:partition] FRAMAC_SHARE/libc/string.c:258: 
   Trace partitioning superposing up to 200 states
 [eva] Recording results for strchr
 [eva] Done for function strchr

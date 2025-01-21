@@ -16,7 +16,7 @@
 [kernel:annot:missing-spec] open_wrong.c:13: Warning: 
   Neither code nor specification for function open_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
-[eva] using specification for function open_fallback_1
+[eva] using specification for function open
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   file ∈ {{ "file" }}

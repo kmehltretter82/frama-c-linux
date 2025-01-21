@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -380,6 +380,18 @@ let parse known_options_list then_expected options_list =
 
 let non_initial_options_ref = ref []
 
+(* Configure the OCaml Garbage Collector. *)
+let configure_ocaml_gc n =
+  if n < 1 || n > 10 then
+    Kernel_log.warning "Ignoring option -memory-footprint %i, \
+                        its argument should be between 1 and 10." n
+  else
+    let gc_control = Gc.get () in
+    let values = [| 24; 30; 40; 60; 90; 120; 150; 190; 240; 300 |] in
+    let space_overhead = values.(n-1) in
+    if space_overhead <> gc_control.space_overhead then
+      Gc.set { gc_control with space_overhead }
+
 let () =
   let first_parsing_stage () =
     parse
@@ -394,6 +406,7 @@ let () =
         "-kernel-debug", Int (fun n -> Kernel_debug_level.set n);
         "-deterministic", Unit (fun () -> deterministic := true);
         "-permissive", Unit (fun () -> permissive := true);
+        "-memory-footprint", Int configure_ocaml_gc
       ]
       false
       all_options

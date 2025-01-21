@@ -11,7 +11,7 @@
   Called from gauges.c:350.
 [eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
-[eva] gauges.c:18: starting to merge loop iterations
+[eva:partition] gauges.c:18: starting to merge loop iterations
 [eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
 [eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
@@ -23,7 +23,7 @@
 [eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
 [eva:alarm] gauges.c:23: Warning: signed overflow. assert -2147483648 ≤ j - 4;
-[eva] gauges.c:16: starting to merge loop iterations
+[eva:partition] gauges.c:16: starting to merge loop iterations
 [eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:21: Frama_C_show_each_1: {{ "in" }}
 [eva] gauges.c:19: Frama_C_show_each_0: {{ "in" }}
@@ -41,7 +41,7 @@
   Called from gauges.c:351.
 [eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
-[eva] gauges.c:40: starting to merge loop iterations
+[eva:partition] gauges.c:40: starting to merge loop iterations
 [eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
 [eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
@@ -53,7 +53,7 @@
 [eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
 [eva:alarm] gauges.c:45: Warning: signed overflow. assert -2147483648 ≤ j - 4;
-[eva] gauges.c:38: starting to merge loop iterations
+[eva:partition] gauges.c:38: starting to merge loop iterations
 [eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
 [eva] gauges.c:43: Frama_C_show_each_1: {{ "in" }}
 [eva] gauges.c:41: Frama_C_show_each_0: {{ "in" }}
@@ -70,7 +70,7 @@
 [eva] computing for function main1 <- main.
   Called from gauges.c:352.
 [eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
-[eva] gauges.c:57: starting to merge loop iterations
+[eva:partition] gauges.c:57: starting to merge loop iterations
 [eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
 [eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
 [eva] gauges.c:59: Frama_C_show_each: {{ "in" }}
@@ -83,7 +83,7 @@
 [eva] computing for function main2 <- main.
   Called from gauges.c:353.
 [eva] gauges.c:72: Frama_C_show_each:
-[eva] gauges.c:70: starting to merge loop iterations
+[eva:partition] gauges.c:70: starting to merge loop iterations
 [eva] gauges.c:72: Frama_C_show_each:
 [eva] gauges.c:72: Frama_C_show_each:
 [eva] gauges.c:72: Frama_C_show_each:
@@ -99,7 +99,7 @@
 [eva] computing for function main3 <- main.
   Called from gauges.c:354.
 [eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
-[eva] gauges.c:79: starting to merge loop iterations
+[eva:partition] gauges.c:79: starting to merge loop iterations
 [eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
 [eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
 [eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
@@ -108,7 +108,7 @@
 [eva:alarm] gauges.c:81: Warning: signed overflow. assert k + 1 ≤ 2147483647;
 [eva] gauges.c:83: Frama_C_show_each: {{ "outer" }}
 [eva:alarm] gauges.c:84: Warning: signed overflow. assert k + 1 ≤ 2147483647;
-[eva] gauges.c:78: starting to merge loop iterations
+[eva:partition] gauges.c:78: starting to merge loop iterations
 [eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
 [eva] gauges.c:83: Frama_C_show_each: {{ "outer" }}
 [eva] gauges.c:80: Frama_C_show_each: {{ "inner" }}
@@ -123,7 +123,7 @@
 [eva] computing for function main4_search <- main4 <- main.
   Called from gauges.c:107.
 [eva] gauges.c:97: Frama_C_show_each:
-[eva] gauges.c:96: starting to merge loop iterations
+[eva:partition] gauges.c:96: starting to merge loop iterations
 [eva] gauges.c:97: Frama_C_show_each:
 [eva] gauges.c:97: Frama_C_show_each:
 [eva] gauges.c:97: Frama_C_show_each:
@@ -137,7 +137,7 @@
 [eva] computing for function main5 <- main.
   Called from gauges.c:356.
 [eva] gauges.c:116: Frama_C_show_each: {{ &x }}
-[eva] gauges.c:113: starting to merge loop iterations
+[eva:partition] gauges.c:113: starting to merge loop iterations
 [eva] gauges.c:116: Frama_C_show_each: {{ &x + {0; 4} }}
 [eva] gauges.c:116: Frama_C_show_each: {{ &x + {0; 4; 8} }}
 [eva] gauges.c:116: Frama_C_show_each: {{ &x + {0; 4; 8; 12} ; &y }}
@@ -159,7 +159,7 @@
 [eva] gauges.c:129: Frama_C_show_each: {{ &x + {8} }}
 [eva] gauges.c:129: Frama_C_show_each: {{ &y }}
 [eva] gauges.c:129: Frama_C_show_each: {{ &y + {4} }}
-[eva] gauges.c:126: starting to merge loop iterations
+[eva:partition] gauges.c:126: starting to merge loop iterations
 [eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8} }}
 [eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12} }}
 [eva] gauges.c:129: Frama_C_show_each: {{ &y + {4; 8; 12; 16} }}
@@ -171,7 +171,7 @@
 [eva] Done for function main5_bis
 [eva] computing for function main6 <- main.
   Called from gauges.c:358.
-[eva] gauges.c:138: starting to merge loop iterations
+[eva:partition] gauges.c:138: starting to merge loop iterations
 [eva:alarm] gauges.c:140: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] Recording results for main6
 [eva] Done for function main6
@@ -180,7 +180,7 @@
 [eva] computing for function main7_aux <- main7 <- main.
   Called from gauges.c:164.
 [eva] gauges.c:145: Frama_C_show_each:
-[eva] gauges.c:147: starting to merge loop iterations
+[eva:partition] gauges.c:147: starting to merge loop iterations
 [eva:alarm] gauges.c:149: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p--)
@@ -189,7 +189,7 @@
 [eva] computing for function main7_aux2 <- main7 <- main.
   Called from gauges.c:165.
 [eva] gauges.c:154: Frama_C_show_each:
-[eva] gauges.c:156: starting to merge loop iterations
+[eva:partition] gauges.c:156: starting to merge loop iterations
 [eva:alarm] gauges.c:158: Warning: 
   out of bounds write. assert \valid(tmp);
                        (tmp from p--)
@@ -206,7 +206,7 @@
 [eva] gauges.c:172: Frama_C_show_each: {0}
 [eva] gauges.c:172: Frama_C_show_each: {4294967295}
 [eva] gauges.c:172: Frama_C_show_each: {4294967294}
-[eva] gauges.c:171: starting to merge loop iterations
+[eva:partition] gauges.c:171: starting to merge loop iterations
 [eva] gauges.c:172: Frama_C_show_each: {4294967293; 4294967294}
 [eva] gauges.c:172: Frama_C_show_each: {4294967292; 4294967293; 4294967294}
 [eva] gauges.c:172: Frama_C_show_each: [2147483647..4294967294]
@@ -225,7 +225,7 @@
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
   Called from gauges.c:361.
-[eva] gauges.c:186: starting to merge loop iterations
+[eva:partition] gauges.c:186: starting to merge loop iterations
 [eva:alarm] gauges.c:188: Warning: 
   pointer downcast. assert (unsigned int)p ≤ 2147483647;
 [eva:alarm] gauges.c:188: Warning: 
@@ -245,7 +245,7 @@
   Called from gauges.c:362.
 [eva] computing for function main10_aux <- main10 <- main.
   Called from gauges.c:211.
-[eva] gauges.c:201: starting to merge loop iterations
+[eva:partition] gauges.c:201: starting to merge loop iterations
 [eva:alarm] gauges.c:202: Warning: 
   out of bounds read. assert \valid_read(tmp);
                       (tmp from A++)
@@ -269,7 +269,7 @@
 [eva] computing for function main11 <- main.
   Called from gauges.c:363.
 [eva] gauges.c:218: Frama_C_show_each:
-[eva] gauges.c:217: starting to merge loop iterations
+[eva:partition] gauges.c:217: starting to merge loop iterations
 [eva] gauges.c:218: Frama_C_show_each:
 [eva] gauges.c:218: Frama_C_show_each:
 [eva] gauges.c:218: Frama_C_show_each:
@@ -284,7 +284,7 @@
 [eva] Done for function main11
 [eva] computing for function main12 <- main.
   Called from gauges.c:364.
-[eva] gauges.c:225: starting to merge loop iterations
+[eva:partition] gauges.c:225: starting to merge loop iterations
 [eva:alarm] gauges.c:225: Warning: signed overflow. assert i + 1 ≤ 2147483647;
 [eva] Recording results for main12
 [eva] Done for function main12
@@ -292,7 +292,7 @@
   Called from gauges.c:365.
 [eva] computing for function main13_1 <- main13 <- main.
   Called from gauges.c:280.
-[eva] gauges.c:238: starting to merge loop iterations
+[eva:partition] gauges.c:238: starting to merge loop iterations
 [eva:alarm] gauges.c:240: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] gauges.c:242: 
   Frama_C_show_each: {45; 46; 47; 48; 49; 50; 51}, [0..2147483647]
@@ -300,7 +300,7 @@
 [eva] Done for function main13_1
 [eva] computing for function main13_2 <- main13 <- main.
   Called from gauges.c:281.
-[eva] gauges.c:249: starting to merge loop iterations
+[eva:partition] gauges.c:249: starting to merge loop iterations
 [eva:alarm] gauges.c:251: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] gauges.c:254: 
   Frama_C_show_each: {48; 49; 50; 51; 52; 53; 54}, [0..2147483647]
@@ -308,7 +308,7 @@
 [eva] Done for function main13_2
 [eva] computing for function main13_3 <- main13 <- main.
   Called from gauges.c:282.
-[eva] gauges.c:261: starting to merge loop iterations
+[eva:partition] gauges.c:261: starting to merge loop iterations
 [eva:alarm] gauges.c:263: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] gauges.c:265: 
   Frama_C_show_each: {-59; -58; -57; -56; -55; -54; -53}, [0..2147483647]
@@ -316,7 +316,7 @@
 [eva] Done for function main13_3
 [eva] computing for function main13_4 <- main13 <- main.
   Called from gauges.c:283.
-[eva] gauges.c:272: starting to merge loop iterations
+[eva:partition] gauges.c:272: starting to merge loop iterations
 [eva:alarm] gauges.c:274: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] gauges.c:276: 
   Frama_C_show_each: {-64; -63; -62; -61; -60; -59; -58}, [0..2147483647]
@@ -326,7 +326,7 @@
 [eva] Done for function main13
 [eva] computing for function main14 <- main.
   Called from gauges.c:366.
-[eva] gauges.c:291: starting to merge loop iterations
+[eva:partition] gauges.c:291: starting to merge loop iterations
 [eva:alarm] gauges.c:293: Warning: signed overflow. assert j + 1 ≤ 2147483647;
 [eva] gauges.c:297: 
   Frama_C_show_each: {-593; -592; -591; -590; -589; -588}, [0..2147483647]
@@ -395,7 +395,7 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] gauges.c:304: starting to merge loop iterations
+[eva:partition] gauges.c:304: starting to merge loop iterations
 [eva] gauges.c:306: 
   Frama_C_dump_each:
   # cvalue:
@@ -583,8 +583,8 @@
 [eva] Done for function main15
 [eva] computing for function main16 <- main.
   Called from gauges.c:368.
-[eva] gauges.c:323: starting to merge loop iterations
-[eva] gauges.c:324: starting to merge loop iterations
+[eva:partition] gauges.c:323: starting to merge loop iterations
+[eva:partition] gauges.c:324: starting to merge loop iterations
 [eva] gauges.c:325: 
   Frama_C_dump_each:
   # cvalue:
@@ -646,8 +646,8 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] gauges.c:326: starting to merge loop iterations
-[eva] gauges.c:321: starting to merge loop iterations
+[eva:partition] gauges.c:326: starting to merge loop iterations
+[eva:partition] gauges.c:321: starting to merge loop iterations
 [eva] gauges.c:325: 
   Frama_C_dump_each:
   # cvalue:
@@ -709,14 +709,14 @@
   S_0___fc_env[0..1] ∈ [--..--]
   S_1___fc_env[0..1] ∈ [--..--]
   ==END OF DUMP==
-[eva] gauges.c:327: starting to merge loop iterations
+[eva:partition] gauges.c:327: starting to merge loop iterations
 [eva] Recording results for main16
 [eva] Done for function main16
 [eva] computing for function main17 <- main.
   Called from gauges.c:369.
 [eva] gauges.c:343: Call to builtin malloc
-[eva] gauges.c:343: allocating variable __malloc_main17_l343
-[eva] gauges.c:342: starting to merge loop iterations
+[eva:malloc:new] gauges.c:343: allocating variable __malloc_main17_l343
+[eva:partition] gauges.c:342: starting to merge loop iterations
 [eva] gauges.c:343: Call to builtin malloc
 [eva] Recording results for main17
 [eva] Done for function main17

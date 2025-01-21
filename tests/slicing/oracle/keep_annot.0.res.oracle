@@ -7,7 +7,7 @@
   
 [eva] computing for function g <- f.
   Called from keep_annot.i:26.
-[eva] keep_annot.i:15: starting to merge loop iterations
+[eva:partition] keep_annot.i:15: starting to merge loop iterations
 [eva:alarm] keep_annot.i:20: Warning: assertion got status unknown.
 [eva:alarm] keep_annot.i:21: Warning: assertion got status unknown.
 [eva] Recording results for g

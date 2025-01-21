@@ -207,7 +207,7 @@ Prove: exists i : Z. forall i_1 : Z. (is_uint8(i_1) ->
 
 Goal Post-condition (file simpl_is_type.i, line 17) in 'f':
 Let a = shift_sint32(t, 0).
-Let a_1 = havoc(Mint_undef_0, Mint_0, a, size_0).
+Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0).
   (* Heap *)
@@ -230,7 +230,7 @@ Assume {
   (* Else *)
   Have: size_0 <= i.
 }
-Prove: 0 < havoc(Mint_undef_0, Mint_0, a, i)[shift_sint32(t, i_1)].
+Prove: 0 < memcpy(Mint_0, Mint_undef_0, a, a, i)[shift_sint32(t, i_1)].
 
 ------------------------------------------------------------
 
@@ -245,12 +245,13 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file simpl_is_type.i, line 23):
-Let a = havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), size_0).
-Let a_1 = shift_sint32(t, i).
-Let a_2 = a[a_1].
+Let a = shift_sint32(t, 0).
+Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
+Let a_2 = shift_sint32(t, i).
+Let a_3 = a_1[a_2].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i) /\
-      is_sint32(a_2).
+      is_sint32(a_3).
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
@@ -264,16 +265,16 @@ Assume {
   Have: (0 <= i) /\ (i <= size_0).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (0 < a[shift_sint32(t, i_2)]))).
+      (0 < a_1[shift_sint32(t, i_2)]))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i <= i_2) -> ((i_2 < size_0) ->
-      (a[shift_sint32(t, i_2)] < 0))).
+      (a_1[shift_sint32(t, i_2)] < 0))).
   (* Then *)
   Have: i < size_0.
   (* Invariant *)
   Have: (-1) <= i.
 }
-Prove: 0 < a[a_1 <- -a_2][shift_sint32(t, i_1)].
+Prove: 0 < a_1[a_2 <- -a_3][shift_sint32(t, i_1)].
 
 ------------------------------------------------------------
 
@@ -283,13 +284,14 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Preservation of Invariant (file simpl_is_type.i, line 24):
-Let a = havoc(Mint_undef_0, Mint_0, shift_sint32(t, 0), size_0).
-Let a_1 = shift_sint32(t, i).
-Let a_2 = a[a_1].
-Let a_3 = a[a_1 <- -a_2].
+Let a = shift_sint32(t, 0).
+Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
+Let a_2 = shift_sint32(t, i).
+Let a_3 = a_1[a_2].
+Let a_4 = a_1[a_2 <- -a_3].
 Assume {
   Type: is_sint32(i) /\ is_sint32(size_0) /\ is_sint32(1 + i) /\
-      is_sint32(a_2).
+      is_sint32(a_3).
   (* Heap *)
   Type: region(t.base) <= 0.
   (* Goal *)
@@ -303,19 +305,19 @@ Assume {
   Have: (0 <= i) /\ (i <= size_0).
   (* Invariant *)
   Have: forall i_2 : Z. ((0 <= i_2) -> ((i_2 < i) ->
-      (0 < a[shift_sint32(t, i_2)]))).
+      (0 < a_1[shift_sint32(t, i_2)]))).
   (* Invariant *)
   Have: forall i_2 : Z. ((i <= i_2) -> ((i_2 < size_0) ->
-      (a[shift_sint32(t, i_2)] < 0))).
+      (a_1[shift_sint32(t, i_2)] < 0))).
   (* Then *)
   Have: i < size_0.
   (* Invariant *)
   Have: (-1) <= i.
   (* Invariant *)
   Have: forall i_2 : Z. ((i_2 <= i) -> ((0 <= i_2) ->
-      (0 < a_3[shift_sint32(t, i_2)]))).
+      (0 < a_4[shift_sint32(t, i_2)]))).
 }
-Prove: a_3[shift_sint32(t, i_1)] < 0.
+Prove: a_4[shift_sint32(t, i_1)] < 0.
 
 ------------------------------------------------------------
 
@@ -350,7 +352,7 @@ Prove: true.
 Goal Loop assigns (file simpl_is_type.i, line 25) (3/3):
 Effect at line 29
 Let a = shift_sint32(t, 0).
-Let a_1 = havoc(Mint_undef_0, Mint_0, a, size_0).
+Let a_1 = memcpy(Mint_0, Mint_undef_0, a, a, size_0).
 Let x = i - 1.
 Let a_2 = shift_sint32(t, x).
 Let a_3 = a_1[a_2].

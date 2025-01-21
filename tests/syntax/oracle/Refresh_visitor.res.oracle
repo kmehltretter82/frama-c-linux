@@ -10,8 +10,8 @@ Start
 [eva] Refresh_visitor.i:24: loop invariant got status valid.
 [eva] Refresh_visitor.i:29: loop invariant got status valid.
 [eva] Refresh_visitor.i:30: loop invariant got status valid.
-[eva] Refresh_visitor.i:32: starting to merge loop iterations
-[eva] Refresh_visitor.i:26: starting to merge loop iterations
+[eva:partition] Refresh_visitor.i:32: starting to merge loop iterations
+[eva:partition] Refresh_visitor.i:26: starting to merge loop iterations
 [eva:alarm] Refresh_visitor.i:14: Warning: 
   function main: postcondition got status unknown.
 [eva] Recording results for main

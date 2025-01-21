@@ -19,7 +19,7 @@
 [eva] Done for function pthread_create
 [eva] computing for function printf_va_2 <- main.
   Called from pthread_h.c:22.
-[eva] using specification for function printf_va_2
+[eva] using specification for function printf
 [eva] pthread_h.c:22: function printf_va_2: precondition got status valid.
 [eva] Done for function printf_va_2
 [eva] computing for function printf_va_2 <- main.
@@ -30,7 +30,6 @@
 [eva] Done for function printf_va_2
 [eva] computing for function printf_va_3 <- main.
   Called from pthread_h.c:25.
-[eva] using specification for function printf_va_3
 [eva] pthread_h.c:25: function printf_va_3: precondition got status valid.
 [eva] Done for function printf_va_3
 [eva] computing for function pthread_setname_np <- main.
@@ -47,7 +46,6 @@
 [eva] Done for function pthread_getname_np
 [eva] computing for function printf_va_4 <- main.
   Called from pthread_h.c:30.
-[eva] using specification for function printf_va_4
 [eva:alarm] pthread_h.c:30: Warning: 
   function printf_va_4: precondition valid_read_string(param0) got status unknown.
 [eva] pthread_h.c:30: 
@@ -57,7 +55,6 @@
   Called from pthread_h.c:35.
 [eva] computing for function printf_va_1 <- start_routine <- main.
   Called from pthread_h.c:11.
-[eva] using specification for function printf_va_1
 [eva] pthread_h.c:11: function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
 [eva] Recording results for start_routine
@@ -70,7 +67,6 @@
 [eva] Done for function pthread_join
 [eva] computing for function printf_va_5 <- main.
   Called from pthread_h.c:39.
-[eva] using specification for function printf_va_5
 [eva] pthread_h.c:39: function printf_va_5: precondition got status valid.
 [eva] Done for function printf_va_5
 [eva] computing for function printf_va_5 <- main.
@@ -83,7 +79,6 @@
   out of bounds read. assert \valid_read(retv);
 [eva] computing for function printf_va_6 <- main.
   Called from pthread_h.c:42.
-[eva] using specification for function printf_va_6
 [eva] pthread_h.c:42: function printf_va_6: precondition got status valid.
 [eva] Done for function printf_va_6
 [eva] Recording results for main

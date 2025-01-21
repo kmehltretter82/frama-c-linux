@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -88,7 +88,7 @@ val dkey_linker_find: category
 
 val dkey_loops: category
 
-val dkey_parser: category
+val dkey_pp_keep_temp_files: category
 
 val dkey_pp: category
 

@@ -16,7 +16,7 @@ Prove: true.
 
 Goal Post-condition (file structs.i, line 18) in 'caller':
 Let a = Load_S2_Y(u, mem_0).
-Let a_1 = Load_S2_Y(u, havoc(mem_undef_0, mem_0, y, 32)).
+Let a_1 = Load_S2_Y(u, memcpy(mem_0, mem_undef_0, y, y, 32)).
 Assume {
   Type: IsS2_Y(a) /\ IsS2_Y(a_1).
   (* Heap *)

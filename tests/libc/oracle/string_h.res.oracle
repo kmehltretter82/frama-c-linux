@@ -63,7 +63,7 @@
 [eva] Done for function test_strstr
 [eva] computing for function test_strncat <- main.
   Called from string_h.c:160.
-[eva] string_h.c:34: Trace partitioning superposing up to 100 states
+[eva:partition] string_h.c:34: Trace partitioning superposing up to 100 states
 [eva] computing for function strncat <- test_strncat <- main.
   Called from string_h.c:36.
 [eva] using specification for function strncat

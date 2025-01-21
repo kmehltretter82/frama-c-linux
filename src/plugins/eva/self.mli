@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -51,7 +51,7 @@ val dkey_pointer_comparison: category
 val dkey_cvalue_domain: category
 val dkey_iterator : category
 val dkey_widening : category
-val dkey_recursion : category
+val dkey_partition : category
 
 (** {2 Warning categories.} *)
 
@@ -73,3 +73,4 @@ val wkey_experimental : warn_category
 val wkey_unknown_size : warn_category
 val wkey_ensures_false : warn_category
 val wkey_watchpoint : warn_category
+val wkey_recursion : warn_category

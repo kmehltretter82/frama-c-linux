@@ -4,7 +4,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[eva] unroll_simple.i:8: starting to merge loop iterations
+[eva:partition] unroll_simple.i:8: starting to merge loop iterations
 [eva:alarm] unroll_simple.i:11: Warning: 
   signed overflow. assert -2147483648 ≤ j - 1;
 [eva:alarm] unroll_simple.i:9: Warning: 

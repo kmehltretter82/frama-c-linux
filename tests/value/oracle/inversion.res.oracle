@@ -22,8 +22,8 @@
     [2].p ∈ {{ &px }}
     [3..4] ∈ {0}
   ii[0..1] ∈ {0}
-[eva] inversion.i:23: starting to merge loop iterations
-[eva] inversion.i:30: starting to merge loop iterations
+[eva:partition] inversion.i:23: starting to merge loop iterations
+[eva:partition] inversion.i:30: starting to merge loop iterations
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

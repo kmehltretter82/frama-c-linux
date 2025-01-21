@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -102,3 +102,5 @@ let shift r obj =
   with Not_found -> None
 
 let literal ~eid _ = ignore eid ; None
+
+let footprint r = Region.footprint (get_map ()) r

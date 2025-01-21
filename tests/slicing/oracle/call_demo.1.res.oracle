@@ -9,7 +9,7 @@
   Called from call_demo.i:23.
 [eva] Recording results for oper
 [eva] Done for function oper
-[eva] call_demo.i:22: starting to merge loop iterations
+[eva:partition] call_demo.i:22: starting to merge loop iterations
 [eva] computing for function oper <- main.
   Called from call_demo.i:23.
 [eva] Recording results for oper

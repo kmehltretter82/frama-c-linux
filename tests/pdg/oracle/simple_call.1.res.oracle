@@ -13,7 +13,7 @@
   signed overflow. assert G + y ≤ 2147483647;
 [eva] Recording results for call
 [eva] Done for function call
-[eva] simple_call.c:51: starting to merge loop iterations
+[eva:partition] simple_call.c:51: starting to merge loop iterations
 [eva] computing for function call <- call_in_loop.
   Called from simple_call.c:52.
 [eva] Recording results for call

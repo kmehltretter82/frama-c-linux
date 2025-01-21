@@ -967,7 +967,7 @@
   ==END OF DUMP==
 [eva] computing for function printf_va_1 <- main.
   Called from linked_list.c:51.
-[eva] using specification for function printf_va_1
+[eva] using specification for function printf
 [eva] linked_list.c:51: function printf_va_1: precondition got status valid.
 [eva] Done for function printf_va_1
 [eva] computing for function printf_va_1 <- main.

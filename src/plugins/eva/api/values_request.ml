@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -359,7 +359,7 @@ module type EvaProxy = sig
   val evaluate : probe -> Callstack.t option -> evaluations
 end
 
-module Proxy(A : Analysis.S) : EvaProxy = struct
+module Proxy(A : Analysis.Engine) : EvaProxy = struct
 
   include Cvalue_domain.Getters (A.Dom)
 
@@ -527,7 +527,7 @@ module Proxy(A : Analysis.S) : EvaProxy = struct
 end
 
 let proxy =
-  let make (a : (module Analysis.S)) = (module Proxy(val a) : EvaProxy) in
+  let make (a : (module Analysis.Engine)) = (module Proxy(val a) : EvaProxy) in
   let current = ref (make @@ Analysis.current_analyzer ()) in
   let hook a = current := make a ; Request.emit signal in
   Analysis.register_hook hook ;

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -97,7 +97,10 @@ let dkey_linker_find = register_category "linker:find"
 
 let dkey_loops = register_category "natural-loops"
 
-let dkey_parser = register_category "parser"
+let dkey_pp_keep_temp_files =
+  register_category
+    ~help:"keep temporary preprocessor intermediate output files"
+    "pp:keep-temp-files"
 let dkey_rmtmps = register_category "parser:rmtmps"
 let dkey_referenced = register_category "parser:referenced"
 
@@ -1820,6 +1823,29 @@ module TypeCheck =
     let option_name = "-typecheck"
     let help = "forces typechecking of the source files"
   end)
+
+(* ************************************************************************* *)
+(** {2 Performance options} *)
+(* ************************************************************************* *)
+
+let performance = add_group "Performance"
+
+let () = Parameter_customize.set_group performance
+let () = Parameter_customize.do_not_projectify ()
+let () = Parameter_customize.set_cmdline_stage Cmdline.Early
+module MemoryFootprint =
+  Int
+    (struct
+      let module_name = "MemoryFootprint"
+      let default = 6
+      let option_name = "-memory-footprint"
+      let arg_name = "n"
+      let help =
+        "Control the memory usage of Frama-C. \
+         With smaller values, analyses consume much less memory but are \
+         also slightly slower. Must be between 1 and 10; default is 6."
+    end)
+let () = MemoryFootprint.set_range ~min:1 ~max:10
 
 (* ************************************************************************* *)
 (** {2 Other options} *)

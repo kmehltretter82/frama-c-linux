@@ -34,7 +34,7 @@
 [eva] Done for function f
 [eva] Recording results for loop_body
 [eva] Done for function loop_body
-[eva] bts324_bis.i:52: starting to merge loop iterations
+[eva:partition] bts324_bis.i:52: starting to merge loop iterations
 [eva] computing for function loop_body <- main_bis.
   Called from bts324_bis.i:53.
 [eva] computing for function f <- loop_body <- main_bis.

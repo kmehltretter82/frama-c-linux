@@ -38,7 +38,8 @@
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
   Called from invalid_pointer.c:191.
-[eva] invalid_pointer.c:43: Trace partitioning superposing up to 100 states
+[eva:partition] invalid_pointer.c:43: 
+  Trace partitioning superposing up to 100 states
 [eva:alarm] invalid_pointer.c:52: Warning: 
   invalid pointer creation. assert \object_pointer(q - 1);
 [eva] Recording results for pointer_in_loops

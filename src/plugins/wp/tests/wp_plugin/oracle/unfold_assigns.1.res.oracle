@@ -386,7 +386,7 @@ Prove: true.
 
 Goal Post-condition (file unfold_assigns.i, line 52) in 'USE_ASSIGN_UNFOLD_KO':
 Let a = Load_S1_S(q, Mint_0).
-Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
+Let a_1 = Load_S1_S(q, memcpy(Mint_0, Mint_undef_0, p, p, 2)).
 Assume {
   Type: IsS1_S(a) /\ IsS1_S(a_1).
   (* Heap *)
@@ -425,7 +425,7 @@ Prove: true.
 
 Goal Post-condition (file unfold_assigns.i, line 43) in 'USE_ASSIGN_UNFOLD_OK':
 Let a = Load_S1_S(q, Mint_0).
-Let a_1 = Load_S1_S(q, havoc(Mint_undef_0, Mint_0, p, 2)).
+Let a_1 = Load_S1_S(q, memcpy(Mint_0, Mint_undef_0, p, p, 2)).
 Assume {
   Type: IsS1_S(a) /\ IsS1_S(a_1).
   (* Heap *)

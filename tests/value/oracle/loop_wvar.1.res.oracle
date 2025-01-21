@@ -6,7 +6,7 @@
   
 [eva] computing for function main_unhelpful <- main3.
   Called from loop_wvar.i:80.
-[eva] loop_wvar.i:48: starting to merge loop iterations
+[eva:partition] loop_wvar.i:48: starting to merge loop iterations
 [eva:alarm] loop_wvar.i:53: Warning: 
   signed overflow. assert next + 1 ≤ 2147483647;
 [eva] Recording results for main_unhelpful
@@ -14,7 +14,7 @@
 [eva] computing for function main_multiple_hints <- main3.
   Called from loop_wvar.i:81.
 [eva] loop_wvar.i:67: Frama_C_show_each: {0}, {0}, {0}
-[eva] loop_wvar.i:65: starting to merge loop iterations
+[eva:partition] loop_wvar.i:65: starting to merge loop iterations
 [eva] loop_wvar.i:67: Frama_C_show_each: {0; 1}, {0; 1}, {0; 1}
 [eva] loop_wvar.i:67: Frama_C_show_each: {0; 1; 2}, {0; 1; 2}, {0; 1; 2}
 [eva] loop_wvar.i:67: Frama_C_show_each: [0..9], {0; 1; 2; 3}, {0; 1; 2; 3}

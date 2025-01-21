@@ -149,9 +149,9 @@ theory Compound
   axiom Q_Load_S1_X_havoc_Mchar0 :
     forall mchar:addr -> int, mchar1:addr -> int, mint:addr -> int, mint1:
      addr -> int, n:int, p:addr, q:addr
-     [Load_S1_X p (havoc mchar1 mchar q n) mint mint1].
+     [Load_S1_X p (memcpy mchar mchar1 q q n) mint mint1].
      separated p 3 q n ->
-     Load_S1_X p (havoc mchar1 mchar q n) mint mint1 =
+     Load_S1_X p (memcpy mchar mchar1 q q n) mint mint1 =
      Load_S1_X p mchar mint mint1
   
   axiom Q_Load_S1_X_update_Mint1 :
@@ -172,9 +172,9 @@ theory Compound
   axiom Q_Load_S1_X_havoc_Mint1 :
     forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, mint2:addr
      -> int, n:int, p:addr, q:addr
-     [Load_S1_X p mchar (havoc mint2 mint1 q n) mint].
+     [Load_S1_X p mchar (memcpy mint1 mint2 q q n) mint].
      separated p 3 q n ->
-     Load_S1_X p mchar (havoc mint2 mint1 q n) mint =
+     Load_S1_X p mchar (memcpy mint1 mint2 q q n) mint =
      Load_S1_X p mchar mint1 mint
   
   axiom Q_Load_S1_X_update_Mint2 :
@@ -195,9 +195,9 @@ theory Compound
   axiom Q_Load_S1_X_havoc_Mint2 :
     forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, mint2:addr
      -> int, n:int, p:addr, q:addr
-     [Load_S1_X p mchar mint (havoc mint2 mint1 q n)].
+     [Load_S1_X p mchar mint (memcpy mint1 mint2 q q n)].
      separated p 3 q n ->
-     Load_S1_X p mchar mint (havoc mint2 mint1 q n) =
+     Load_S1_X p mchar mint (memcpy mint1 mint2 q q n) =
      Load_S1_X p mchar mint mint1
   
   axiom Q_Load_Init_S1_X_update_Init0 :
@@ -215,9 +215,9 @@ theory Compound
   
   axiom Q_Load_Init_S1_X_havoc_Init0 :
     forall init:addr -> bool, init1:addr -> bool, n:int, p:addr, q:addr
-     [Load_Init_S1_X p (havoc init1 init q n)].
+     [Load_Init_S1_X p (memcpy init init1 q q n)].
      separated p 3 q n ->
-     Load_Init_S1_X p (havoc init1 init q n) = Load_Init_S1_X p init
+     Load_Init_S1_X p (memcpy init init1 q q n) = Load_Init_S1_X p init
   
 end
 [wp:print-generated] 

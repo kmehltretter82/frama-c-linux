@@ -77,19 +77,7 @@
 [variadic:typing] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
-[eva] using specification for function printf_va_1
-[eva] using specification for function printf_va_2
-[eva] using specification for function printf_va_3
-[eva] using specification for function printf_va_4
-[eva] using specification for function printf_va_5
-[eva] using specification for function printf_va_6
-[eva] using specification for function printf_va_7
-[eva] using specification for function printf_va_8
-[eva] using specification for function printf_va_9
-[eva] using specification for function printf_va_10
-[eva] using specification for function printf_va_11
-[eva] using specification for function printf_va_12
-[eva] using specification for function printf_va_13
+[eva] using specification for function printf
 [eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
 [eva] ====== VALUES COMPUTED ======
@@ -484,19 +472,7 @@ int main(void)
 [variadic:typing] printf_wrong_types.c:36: Warning: 
   Incorrect type for argument 2. The argument will be cast from RC (unsigned int) to int.
 [eva] Analyzing a complete application starting at main
-[eva] using specification for function printf_va_1
-[eva] using specification for function printf_va_2
-[eva] using specification for function printf_va_3
-[eva] using specification for function printf_va_4
-[eva] using specification for function printf_va_5
-[eva] using specification for function printf_va_6
-[eva] using specification for function printf_va_7
-[eva] using specification for function printf_va_8
-[eva] using specification for function printf_va_9
-[eva] using specification for function printf_va_10
-[eva] using specification for function printf_va_11
-[eva] using specification for function printf_va_12
-[eva] using specification for function printf_va_13
+[eva] using specification for function printf
 [eva:alarm] printf_wrong_types.c:30: Warning: 
   function printf_va_13: precondition valid_read_string(param0) got status invalid.
 [eva] ====== VALUES COMPUTED ======

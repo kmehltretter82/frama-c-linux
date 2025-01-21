@@ -7,21 +7,21 @@
   k ∈ {0}
 [eva] computing for function test_slevel <- main.
   Called from partitioning-annots.c:289.
-[eva] partitioning-annots.c:243: starting to merge loop iterations
-[eva] partitioning-annots.c:248: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:243: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:248: starting to merge loop iterations
 [eva] Recording results for test_slevel
 [eva] Done for function test_slevel
 [eva] computing for function test_unroll <- main.
   Called from partitioning-annots.c:290.
 [eva:loop-unroll:partial] partitioning-annots.c:26: loop not completely unrolled
-[eva] partitioning-annots.c:26: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:26: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:34: loop not completely unrolled
-[eva] partitioning-annots.c:34: starting to merge loop iterations
-[eva] partitioning-annots.c:36: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:34: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:36: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:49: loop not completely unrolled
-[eva] partitioning-annots.c:49: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:49: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:54: loop not completely unrolled
-[eva] partitioning-annots.c:54: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:54: starting to merge loop iterations
 [eva] Recording results for test_unroll
 [eva] Done for function test_unroll
 [eva] computing for function test_split <- main.
@@ -91,7 +91,7 @@
 [eva] Done for function test_dynamic_split
 [eva] computing for function test_dynamic_split_predicate <- main.
   Called from partitioning-annots.c:293.
-[eva] partitioning-annots.c:124: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:124: starting to merge loop iterations
 [eva] Recording results for test_dynamic_split_predicate
 [eva] Done for function test_dynamic_split_predicate
 [eva] computing for function test_splits_post_call <- main.
@@ -122,7 +122,7 @@
 [eva] computing for function test_auto_limit <- main.
   Called from partitioning-annots.c:295.
 [eva:loop-unroll:auto] partitioning-annots.c:280: Automatic loop unrolling.
-[eva] partitioning-annots.c:284: starting to merge loop iterations
+[eva:partition] partitioning-annots.c:284: starting to merge loop iterations
 [eva] Recording results for test_auto_limit
 [eva] Done for function test_auto_limit
 [eva] Recording results for main

@@ -24,13 +24,13 @@
   Called from bts383.c:60.
 [eva:alarm] bts383.c:20: Warning: out of bounds read. assert \valid_read(p);
 [eva:alarm] bts383.c:22: Warning: out of bounds read. assert \valid_read(p);
-[eva] bts383.c:21: starting to merge loop iterations
+[eva:partition] bts383.c:21: starting to merge loop iterations
 [eva] Recording results for loop1
 [eva] Done for function loop1
 [eva] computing for function loop2 <- main.
   Called from bts383.c:61.
 [eva:alarm] bts383.c:28: Warning: out of bounds read. assert \valid_read(p);
-[eva] bts383.c:27: starting to merge loop iterations
+[eva:partition] bts383.c:27: starting to merge loop iterations
 [eva:alarm] bts383.c:30: Warning: out of bounds read. assert \valid_read(p);
 [eva] Recording results for loop2
 [eva] Done for function loop2
@@ -45,7 +45,7 @@
   Called from bts383.c:36.
 [eva] using specification for function out_char
 [eva] Done for function out_char
-[eva] bts383.c:35: starting to merge loop iterations
+[eva:partition] bts383.c:35: starting to merge loop iterations
 [eva] computing for function out_char <- out_string <- main.
   Called from bts383.c:36.
 [eva] Done for function out_char

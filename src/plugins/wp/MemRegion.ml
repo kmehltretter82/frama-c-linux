@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -68,6 +68,7 @@ sig
   val literal : eid:int -> Cstring.cst -> region option
   val separated : region -> region -> bool
   val included : region -> region -> bool
+  val footprint : region -> region list
 end
 
 (* -------------------------------------------------------------------------- *)
@@ -81,7 +82,8 @@ module type ModelWithLoader = sig
   val last : sigma -> c_object -> loc -> term
   val frames : c_object -> loc -> chunk -> frame list
 
-  val havoc : c_object -> loc -> length:term -> chunk -> fresh:term -> current:term -> term
+  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
+    length:term -> Chunk.t -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 
@@ -217,15 +219,17 @@ struct
         MemMemory.frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
       | _ -> []
 
-    let havoc ty l ~length chunk ~fresh ~current =
+    let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
       match Sigma.mu chunk with
       | State.Mu { data } ->
         begin
           match data with
-          | Value _ | ValInit -> fresh
-          | Array _ | ArrInit -> e_fun f_havoc [fresh;current;to_addr l;length]
+          | Value _ | ValInit -> msrc
+          | Array _ | ArrInit ->
+            e_fun f_memcpy [mtgt;msrc;to_addr ltgt;to_addr lsrc;length]
         end
-      | _ -> M.havoc ty (loc l) ~length chunk ~fresh ~current
+      | _ ->
+        M.memcpy ty ~mtgt ~msrc ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length chunk
 
     let eqmem_forall ty l chunk m1 m2 =
       match Sigma.mu chunk with

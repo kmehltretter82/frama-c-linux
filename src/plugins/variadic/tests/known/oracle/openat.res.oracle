@@ -23,7 +23,7 @@
 [kernel:annot:missing-spec] openat.c:10: Warning: 
   Neither code nor specification for function openat_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
-[eva] using specification for function openat_fallback_1
+[eva] using specification for function openat
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   flag ∈ {0}

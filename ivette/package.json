@@ -18,7 +18,7 @@
     "dist:all": "yarn run electron-builder -wlm --dir -c.compression=store -c.mac.identity=null",
     "start": "electron-vite preview",
     "dev": "electron-vite dev",
-    "build": "electron-vite build",
+    "build": "electron-vite build --logLevel warn",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -100,7 +100,7 @@
   "build": {
     "appId": "com.framac.ivette",
     "compression": "store",
-    "copyright": "Copyright © 2007-2024 Frama-C. All Rights Reserved.",
+    "copyright": "Copyright © 2007-2025 Frama-C. All Rights Reserved.",
     "artifactName": "${productName}-${arch}.${ext}",
     "win": {
       "target": [

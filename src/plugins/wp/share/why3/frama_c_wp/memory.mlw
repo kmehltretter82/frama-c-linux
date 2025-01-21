@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -36,8 +36,17 @@ theory Memory
   predicate eqmem (m1 m2 : map addr 'a) (p:addr) (a:int) =
     forall q:addr [m1[p]|m2[q]]. included q 1 p a -> m1[q] = m2[q]
 
-  function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a
 
+  (* copies the [s] bytes from [m1].[b1] into [m0].[m0] *)
+  function memcpy (m0 m1: map addr 'a) (b0 b1:addr) (s:int) : map addr 'a =
+    fun (p:addr) ->
+    if separated p 1 b0 s then m0 p else
+    let offset = b1.offset - b0.offset + p.offset in
+    m1 { b1 with offset = offset }
+(*
+  function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a =
+    memcpy m1 m0 p p a
+*)
   lemma eqmem_included :
     forall m1 m2 : map addr 'a.
     forall p q : addr.
@@ -51,11 +60,11 @@ theory Memory
     forall a : int.
     eqmem m1 m2 p a -> eqmem m2 m1 p a
 
-  axiom havoc_access :
+  lemma havoc_access :
     forall m0 m1 : map addr 'a.
     forall q p : addr.
     forall a : int.
-    (Map.([]) (havoc m0 m1 p a) (q)) =
+    (Map.([]) (memcpy m1 m0 p p a) (q)) =
       (if (separated q 1 p a) then (Map.([]) (m1) (q)) else (Map.([]) (m0) (q)))
 
   (* Initialization memory *)

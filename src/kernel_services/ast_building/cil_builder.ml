@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -578,9 +578,10 @@ struct
     | Addr lv ->
       Cil.mkAddrOrStartOf ~loc (build_lval ~scope ~loc lv)
 
+  (* restyp is the type of result *)
   let rec build_term_lval ~scope ~loc ~restyp = function
     | Result -> Cil_types.(TResult (Option.get restyp), TNoOffset)
-    | CilLval _ as lv -> raise (CInLogic (`lval lv))
+    | CilLval lv -> Logic_utils.lval_to_term_lval lv
     | Var v ->
       Cil_types.(TVar (Cil.cvar_to_lvar (build_var ~scope v)), TNoOffset)
     | Mem t ->
@@ -623,8 +624,11 @@ struct
       host', Logic_const.addTermOffset offset'' offset'
 
   and build_term ~scope ~loc ~restyp = function
-    | Const (CilConstant _) | CilExp _ | CilExpCopy _ as e ->
-      raise (CInLogic (`exp e))
+    | Const (CilConstant c) ->
+      Logic_utils.expr_to_term ~coerce:false @@
+      Cil.new_exp ~loc (Cil_types.Const c)
+    | CilExp exp | CilExpCopy exp ->
+      Logic_utils.expr_to_term ~coerce:true exp
     | Pred _ as e ->
       raise (NotATerm (`exp e))
     | CilTerm term -> term

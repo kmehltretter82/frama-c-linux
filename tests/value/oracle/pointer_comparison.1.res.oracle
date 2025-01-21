@@ -44,7 +44,7 @@
 [eva:pointer-comparison] pointer_comparison.c:23: 
   evaluating condition to {0; 1} instead of {0} because of UPCPA
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20} }}
-[eva] pointer_comparison.c:23: starting to merge loop iterations
+[eva:partition] pointer_comparison.c:23: starting to merge loop iterations
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24} }}
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + {20; 24; 28} }}
 [eva] pointer_comparison.c:23: Frama_C_show_each_6: {{ &x + [20..--],0%4 }}

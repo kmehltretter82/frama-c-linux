@@ -8,13 +8,13 @@
   Called from vla.c:20.
 [eva] vla.c:6: assertion 'alloca_bounds' got status valid.
 [eva] vla.c:6: Call to builtin __fc_vla_alloc
-[eva] vla.c:6: allocating variable __malloc_f_l6
+[eva:malloc:new] vla.c:6: allocating variable __malloc_f_l6
 [eva] vla.c:7: Frama_C_show_each: {{ &__malloc_f_l6 }}
 [eva] vla.c:6: Call to builtin __fc_vla_free
 [eva:malloc] vla.c:6: strong free on bases: {__malloc_f_l6}
 [eva] Recording results for f
 [eva] Done for function f
-[eva] vla.c:20: freeing automatic bases: {__malloc_f_l6}
+[eva:malloc:automatic-free] vla.c:20: freeing automatic bases: {__malloc_f_l6}
 [eva:malloc] vla.c:20: strong free on bases: {__malloc_f_l6}
 [eva] computing for function f <- main.
   Called from vla.c:20.

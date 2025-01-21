@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1275,6 +1275,22 @@ module MallocLevel =
     end)
 let () = MallocLevel.set_range ~min:0 ~max:max_int
 let () = add_precision_dep MallocLevel.parameter
+
+(* -------------------------------------------------------------------------- *)
+(* --- Annotations Generator options                                      --- *)
+(* -------------------------------------------------------------------------- *)
+
+let () = Parameter_customize.set_group messages
+module Annot =
+  Kernel_function_set
+    (struct
+      let option_name = "-eva-annot"
+      let arg_name = "f"
+      let help =
+        "Populate the specified functions with assertions \
+         representing the range of values computed by Eva \
+         on l-values read by the code, when available."
+    end)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Deprecated options and aliases                                     --- *)

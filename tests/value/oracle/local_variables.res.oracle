@@ -37,7 +37,7 @@
 [eva] Done for function v
 [eva:locals-escaping] local_variables.i:35: Warning: 
   locals {x} escaping the scope of a block of main through p
-[eva] local_variables.i:43: starting to merge loop iterations
+[eva:partition] local_variables.i:43: starting to merge loop iterations
 [eva:alarm] local_variables.i:47: Warning: 
   accessing left-value that contains escaping addresses.
   assert ¬\dangling(&p);

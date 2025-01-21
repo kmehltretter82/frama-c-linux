@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -89,7 +89,7 @@ let clear_caches () =
   Assigns.Memory.clear_caches ()
 
 module type S = sig
-  module Analysis : Analysis.S
+  module Analysis : Analysis.Engine
 
   type ('env, 'expr, 'v) evaluation_functions = {
     eval_and_warn: 'env -> 'expr -> 'v * bool (* alarm *) * bool (* red *);
@@ -136,7 +136,7 @@ module type S = sig
 end
 
 
-module Make (X: Analysis.S) = struct
+module Make (X: Analysis.Engine) = struct
 
   module Analysis = X
   include Cvalue_domain.Getters (X.Dom)

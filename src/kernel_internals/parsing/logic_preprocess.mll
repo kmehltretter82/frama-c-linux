@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA   (Commissariat à l'énergie atomique et aux énergies            *)
 (*           alternatives)                                                *)
 (*    INRIA (Institut National de Recherche en Informatique et en         *)
@@ -165,10 +165,7 @@
 
   let preprocess_annots suffix cpp outfile =
     if !has_annot then begin
-      let debug =
-        Kernel.debug_atleast 3 ||
-          Kernel.is_debug_key_enabled Kernel.dkey_parser
-      in
+      let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
       let ppname =
         try Extlib.temp_file_cleanup_at_exit ~debug "ppannot" suffix
         with Extlib.Temp_file_error s ->
@@ -535,7 +532,7 @@ parse
 {
   let file suffix cpp filename =
     reset ();
-    let debug = Kernel.is_debug_key_enabled Kernel.dkey_parser in
+    let debug = Kernel.is_debug_key_enabled Kernel.dkey_pp_keep_temp_files in
     let scan_references = Kernel.EagerLoadSources.get () in
     match Parse_env.open_source ~scan_references filename with
     | Error msg -> Kernel.abort "logic_preprocess: %s" msg

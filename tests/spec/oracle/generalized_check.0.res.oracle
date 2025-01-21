@@ -14,7 +14,7 @@
   check 'main_p_content_ko' got status unknown.
 [eva:alarm] generalized_check.i:32: Warning: 
   loop invariant 'false_but_preserved' got status invalid.
-[eva] generalized_check.i:35: starting to merge loop iterations
+[eva:partition] generalized_check.i:35: starting to merge loop iterations
 [eva:alarm] generalized_check.i:36: Warning: 
   check 'implied_by_false_invariant' got status invalid.
 [eva] ====== VALUES COMPUTED ======

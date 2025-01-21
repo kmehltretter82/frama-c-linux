@@ -11,7 +11,7 @@
 Goal Post-condition 'P,todo' in 'f':
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
-Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
+Let a_2 = memcpy(Mint_0, Mint_undef_0, a_1, a_1, i - a).
 Let x_1 = 1 + b.
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i).
@@ -38,7 +38,7 @@ Prove: P_P(a_2, t, a, b).
 Goal Post-condition 'Q' in 'f':
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
-Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
+Let a_2 = memcpy(Mint_0, Mint_undef_0, a_1, a_1, i - a).
 Let x_1 = 1 + b.
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i).
@@ -81,7 +81,9 @@ Assume {
   Have: (a <= i) /\ (i <= x_1).
   (* Invariant 'Positive' *)
   Have: forall i_1 : Z. ((a <= i_1) -> ((i_1 < i) ->
-      (0 < havoc(Mint_undef_0, Mint_0, a_1, i - a)[shift_sint32(t, i_1)]))).
+      (0
+         < memcpy(Mint_0, Mint_undef_0, a_1, a_1, i - a)
+             [shift_sint32(t, i_1)]))).
   (* Then *)
   Have: i <= b.
 }
@@ -107,7 +109,7 @@ Goal Preservation of Invariant 'Positive' (file axioms.i, line 31):
 Let x = 1 + i.
 Let a_1 = shift_sint32(t, a).
 Let x_1 = -a.
-Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
+Let a_2 = memcpy(Mint_0, Mint_undef_0, a_1, a_1, i - a).
 Let x_2 = 1 + b.
 Assume {
   Type: is_sint32(a) /\ is_sint32(b) /\ is_sint32(i) /\ is_sint32(x).
@@ -155,7 +157,7 @@ Goal Loop assigns (file axioms.i, line 32) (3/3):
 Effect at line 35
 Let a_1 = shift_sint32(t, a).
 Let x = -a.
-Let a_2 = havoc(Mint_undef_0, Mint_0, a_1, i - a).
+Let a_2 = memcpy(Mint_0, Mint_undef_0, a_1, a_1, i - a).
 Let a_3 = shift_sint32(t, i).
 Let x_1 = 1 + i.
 Let x_2 = 1 + b.

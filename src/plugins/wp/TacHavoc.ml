@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,8 +35,10 @@ let lookup_havoc e =
   | L.Aget( m , p ) ->
     begin
       match F.repr m with
-      | L.Fun( f , [m_undef;m_sep;a;n] ) when f == MemMemory.f_havoc ->
-        Some( m_undef , m_sep , a , n , p )
+      | L.Fun( f , [m_sep;m_undef;a;b;n] )
+        when f == MemMemory.f_memcpy ->
+        if F.equal a b then Some( m_sep , m_undef , a , n , p )
+        else None
       | _ -> None
     end
   | _ -> None
@@ -53,7 +55,7 @@ class havoc =
       let e = Tactical.selected sel in
       match lookup_havoc e with
       | None -> Not_applicable
-      | Some(mr,m0,a,n,p) ->
+      | Some(m0,mr,a,n,p) ->
         let separated =
           F.p_call MemAddr.p_separated
             [ p ; F.e_int 1 ; a ; n ] in

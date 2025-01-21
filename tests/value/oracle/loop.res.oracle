@@ -10,7 +10,7 @@
   r ∈ {0}
   G ∈ {0}
 [eva] loop.i:8: Frama_C_show_each_F: {0}
-[eva] loop.i:7: starting to merge loop iterations
+[eva:partition] loop.i:7: starting to merge loop iterations
 [eva] loop.i:8: Frama_C_show_each_F: {0; 2}
 [eva] loop.i:8: Frama_C_show_each_F: {0; 2; 4}
 [eva] loop.i:8: Frama_C_show_each_F: [0..48],0%2

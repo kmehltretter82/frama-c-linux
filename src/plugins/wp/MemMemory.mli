@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -35,7 +35,8 @@ val t_init : tau (** initialization tables *)
 
 val t_mem : tau -> tau (** t_addr indexed array *)
 
-val f_havoc : lfun
+(* val f_havoc : lfun *)
+val f_memcpy : lfun
 val f_set_init : lfun
 
 val p_is_init_r : lfun

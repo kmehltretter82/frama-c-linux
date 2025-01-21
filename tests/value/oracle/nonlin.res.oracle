@@ -123,7 +123,7 @@
 [eva] computing for function subdivide_table <- main.
   Called from nonlin.c:128.
 [eva] nonlin.c:93: loop invariant got status valid.
-[eva] nonlin.c:94: starting to merge loop iterations
+[eva:partition] nonlin.c:94: starting to merge loop iterations
 [eva:nonlin] nonlin.c:95: non-linear '(4 + ((x >> 2) * 3 << 2)) + x % 4', lv 'x'
 [eva:nonlin] nonlin.c:95: subdividing on x
 [eva] Recording results for subdivide_table

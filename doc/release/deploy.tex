@@ -33,6 +33,10 @@ following:
   on \texttt{pub} (it must be started manually and requires the branch).
 \end{description}
 
+\textbf{Important note:}~If the version is a whole number (\texttt{X0.0}),
+a special step must be taken before starting \texttt{release-create}: add
+\texttt{X*} as a tag that maintainers can create on \texttt{pub/frama-c}.
+
 After running \texttt{release-branch} and \texttt{release-create}, either the
 tag indicates a beta release and then this tag is pushed on the public GitLab
 repository (\url{https://git.frama-c.com/pub/frama-c/-/tags}), or it is a final
@@ -40,10 +44,20 @@ release and the release should be available in
 \url{https://git.frama-c.com/pub/frama-c/-/releases}, as well as the tag of the
 version in \url{https://git.frama-c.com/pub/frama-c/-/tags}.
 
+\textbf{Important note:}~If for some reason the pipeline fails and you push new
+commits to the branch to fix the issue, do not forget to update the tag created
+at the end of Chapter.~\ref{chap:validation}, and to force-push this new reference.
+
 \section{Check the website}
 \label{sec:check-website}
 
-Once the pipeline for the website has run, open \texttt{https://pub.frama-c.com}.
+Once the pipeline for the website has run, open \url{https://pub.frama-c.com}.
+
+\textbf{Note:} \texttt{https://pub.frama-c.com/} serves the content of the latest
+commit successfully compiled by the CI. If there is a delay between the moment where
+you launch the pipeline and the moment you inspect the website, it may not be up-to-date.
+You can either serve the content locally on your machine (instructions are provided
+on the README of the website's repo), or by re-running the pages jobs on the relevant pipeline
 
 \begin{itemize}
   \item \texttt{index.html} must display:
@@ -169,9 +183,15 @@ Check if other \FramaC (and related) repositories need to be updated:
 
 \begin{itemize}
 \item \texttt{acsl-language/acsl} (if last minute patches were applied)
-\item \texttt{pub/open-source-case-studies}
-\item \texttt{pub/sate-6}
-\item other \texttt{pub} repositories related to Frama-C...
+\item \texttt{pub/open-source-case-studies} (\expertise{André})
+\begin{itemize}
+\item update the reference commit of the frama-c submodule to the tag of the release
+\item \texttt{make framac}
+\item \texttt{make clean}
+\item \texttt{make -j $(nproc) all}
+\end{itemize}
+\item \texttt{pub/sate-6} (\expertise{André})
+\item other \texttt{pub} repositories related to Frama-C...\todo{which ones?}
 \end{itemize}
 
 \section{Docker image preparation}

@@ -20,7 +20,7 @@
   S_data_0_S_repositories[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
   S_data_1_S_repositories[bits 0 to ..] ∈ [--..--] or UNINITIALIZED
 [eva] abstract_struct_1.c:13: Call to builtin calloc
-[eva] abstract_struct_1.c:13: allocating variable __calloc_main_l13
+[eva:malloc:new] abstract_struct_1.c:13: allocating variable __calloc_main_l13
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

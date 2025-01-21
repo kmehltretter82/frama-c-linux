@@ -69,7 +69,7 @@
 [eva:alarm] relations2.i:34: Warning: 
   accessing out of bounds index.
   assert (unsigned int)(i - (unsigned int)(t + 1)) < 514;
-[eva] relations2.i:32: starting to merge loop iterations
+[eva:partition] relations2.i:32: starting to merge loop iterations
 [eva] relations2.i:33: 
   Frama_C_dump_each:
   # cvalue:

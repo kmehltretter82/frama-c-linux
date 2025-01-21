@@ -7,8 +7,8 @@
 [eva] computing for function memchr_bug <- main.
   Called from str_allocated.c:19.
 [eva] str_allocated.c:12: Call to builtin malloc
-[eva] str_allocated.c:12: allocating variable __malloc_memchr_bug_l12
-[eva] str_allocated.c:11: starting to merge loop iterations
+[eva:malloc:new] str_allocated.c:12: allocating variable __malloc_memchr_bug_l12
+[eva:partition] str_allocated.c:11: starting to merge loop iterations
 [eva] str_allocated.c:12: Call to builtin malloc
 [eva:malloc:weak] str_allocated.c:12: 
   marking variable `__malloc_memchr_bug_l12' as weak

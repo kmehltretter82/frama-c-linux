@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2024                                               #
+#  Copyright (C) 2007-2025                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -79,10 +79,10 @@ endif
 
 .PHONY: ivette ivette-api ivette-dev
 
-ivette: ivette-api
+ivette: all
 	@$(MAKE) -C ivette
 
-ivette-dev: ivette-api
+ivette-dev: all
 	@$(MAKE) -C ivette dev
 
 ivette-api: all

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -248,6 +248,13 @@ let find_alarm = function
   | Property.IPCodeAnnot annot -> Alarms.find annot.ica_ca
   | _ -> None
 
+let is_libc ip =
+  match Property.source ip with
+  | None -> false
+  | Some position ->
+    let libc_path = Kernel.Share.get_dir "libc" in
+    Filepath.is_relative ~base_name:libc_path position.pos_path
+
 let model = States.model ()
 
 let () = States.column model ~name:"descr"
@@ -288,6 +295,11 @@ let () = States.column model ~name:"source"
     ~descr:(Md.plain "Position")
     ~data:(module Kernel_ast.Position)
     ~get:(fun ip -> Property.location ip |> fst)
+
+let () = States.column model ~name:"from_libc"
+    ~descr:(Md.plain "Is the property from the Frama-C libc?")
+    ~data:(module Jbool)
+    ~get:is_libc
 
 let () = States.column model ~name:"alarm"
     ~descr:(Md.plain "Alarm name (if the property is an alarm)")

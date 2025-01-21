@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of WP plug-in of Frama-C.                           *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat a l'energie atomique et aux energies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -1046,12 +1046,12 @@ struct
     let n = length_of_object obj in
     F.e_sub (F.e_div (allocated sigma l) n) F.e_one
 
-  let havoc obj loc ~length chunk ~fresh ~current =
+  let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
     match Sigma.mu chunk with
-    | State.Mu T_alloc -> fresh
+    | State.Mu T_alloc -> msrc
     | State.Mu _ ->
       let n = F.e_mul (length_of_object obj) length in
-      F.e_fun f_havoc [fresh;current;loc;n]
+      F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
     | _ -> assert false
 
   let eqmem_forall obj loc _chunk m1 m2 =

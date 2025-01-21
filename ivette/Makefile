@@ -2,7 +2,7 @@
 #                                                                        #
 #  This file is part of Frama-C.                                         #
 #                                                                        #
-#  Copyright (C) 2007-2024                                               #
+#  Copyright (C) 2007-2025                                               #
 #    CEA (Commissariat à l'énergie atomique et aux énergies              #
 #         alternatives)                                                  #
 #                                                                        #
@@ -37,7 +37,7 @@ COPYRIGHT=CEA LIST / LSL
 
 .PHONY: all app dev
 
-all: pkg lint app
+all: api pkg lint dome-app
 app: api dome-app
 dev: api dome-dev
 

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2024                                               *)
+(*  Copyright (C) 2007-2025                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -47,23 +47,9 @@ module type S = sig
     unit or_bottom
 
   val enter_scope: kernel_function -> varinfo list -> state -> state
-
-  type call_result = {
-    states: (Partition.key * state) list;
-    cacheable: Eval.cacheable;
-  }
-
-  val compute_call_ref:
-    (stmt -> (loc, value) call -> recursion option -> state -> call_result) ref
 end
 
-module Make (Abstract: Abstractions.S_with_evaluation)
+module Make (Abstract: Engine_sig.S)
   : S with type state = Abstract.Dom.t
        and type value = Abstract.Val.t
        and type loc = Abstract.Loc.location
-
-(*
-Local Variables:
-compile-command: "make -C ../../../.."
-End:
-*)
