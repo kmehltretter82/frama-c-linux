@@ -259,7 +259,7 @@ module Make_Dataflow
     let asm_contracts = Annotations.code_annot stmt in
     match Logic_utils.extract_contract asm_contracts with
     | [] ->
-      Eva_utils.warning_once_current
+      Self.warning ~current:true ~once:true
         "assuming assembly code has no effects in function %t"
         Eva_utils.pretty_current_cfunction_name;
       id
@@ -717,7 +717,7 @@ module Computer
       Dataflow.merge_results ~save_results;
       let f = Kernel_function.get_definition kf in
       if Cil.typeHasAttribute "noreturn" f.svar.vtype && results <> [] then
-        Eva_utils.warning_once_current
+        Self.warning ~current:true ~once:true
           "function %a may terminate but has the noreturn attribute"
           Kernel_function.pretty kf;
       results, !Dataflow.cacheable

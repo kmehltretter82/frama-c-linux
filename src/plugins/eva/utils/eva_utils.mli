@@ -63,7 +63,6 @@ val get_subdivision: stmt -> int
 val pretty_actuals :
   Format.formatter -> (Eva_ast.exp * Cvalue.V.t) list -> unit
 val pretty_current_cfunction_name : Format.formatter -> unit
-val warning_once_current : ('a, Format.formatter, unit) format -> 'a
 
 (** Emit an alarm, either as warning or as a result, according to
     status associated to {!Self.wkey_alarm} *)

@@ -40,7 +40,7 @@ let find_default_behavior spec =
   List.find (fun b' -> b'.b_name = Cil.default_behavior_name) spec.spec_behavior
 
 let warn_empty_assigns () =
-  Eva_utils.warning_once_current
+  Self.warning ~current:true ~once:true
     "Cannot handle empty assigns clause. Assuming assigns \\nothing: \
      be aware this is probably incorrect."
 
@@ -164,7 +164,7 @@ let precise_loc_of_assign env kind term =
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
   with Eval_terms.LogicEvalError e ->
-    Eva_utils.warning_once_current
+    Self.warning ~current:true ~once:true
       "@[<hov 0>@[<hov 2>cannot interpret %a@]%a;@ effects will be ignored@]"
       pp_assign_clause (kind, term) pp_eval_error e;
     None
