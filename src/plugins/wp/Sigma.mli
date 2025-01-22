@@ -62,8 +62,8 @@ sig
 
   type t
 
-  (** Chunk type name for datatype registration. *)
   val self : string
+  (** Chunk type name for datatype registration. *)
 
   val hash : t -> int
   val equal : t -> t -> bool
@@ -77,7 +77,7 @@ sig
   (** Used when generating fresh variables for a chunk. *)
 
   val is_init : t -> bool
-  (** Whether the chunk is an initialized chunk (used for filtering). *)
+  (** Whether the chunk tracks memory initialization (used for filtering). *)
 
   val is_single : t -> bool
   (** Used to sort memory chunk parameters in ACSL symbols.
@@ -121,20 +121,20 @@ sig
   (** Chunk Extension. *)
   type mu += Mu of C.t
 
-  (** Individual promotion of a model chunk to a uniform chunk. *)
   val chunk : C.t -> chunk
+  (** Individual promotion of a model chunk to a uniform chunk. *)
 
-  (** Promoted [Domain.singleton]. *)
   val singleton : C.t -> domain
+  (** Promoted [Domain.singleton]. *)
 
-  (** Specialized [Sigma.mem], equivalent to [Sigma.mem s (chunk c)]. *)
   val mem : sigma -> C.t -> bool
+  (** Specialized [Sigma.mem], equivalent to [Sigma.mem s (chunk c)]. *)
 
-  (** Specialized [Sigma.get], equivalent to [Sigma.get s (chunk c)]. *)
   val get : sigma -> C.t -> F.var
+  (** Specialized [Sigma.get], equivalent to [Sigma.get s (chunk c)]. *)
 
-  (** Specialized [Sigma.value], equivalent to [Sigma.value s (chunk c)]. *)
   val value : sigma -> C.t -> F.term
+  (** Specialized [Sigma.value], equivalent to [Sigma.value s (chunk c)]. *)
 
 end
 
@@ -155,8 +155,9 @@ val get : sigma -> chunk -> F.var
 val value : sigma -> chunk -> F.term
 (** Same as [Lang.F.e_var] of [get]. *)
 
-val copy : sigma -> sigma (** Duplicate the environment. Fresh chunks in the copy
-                              are {i not} duplicated into the source environment. *)
+val copy : sigma -> sigma
+(** Duplicate the environment. Fresh chunks in the copy
+    are {i not} duplicated into the source environment. *)
 
 val join : sigma -> sigma -> Passive.t
 (** Make two environment pairwise equal {i via} the passive form.
