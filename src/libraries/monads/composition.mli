@@ -86,7 +86,7 @@ module Make_with_product
 
     Distributive laws, their application to monads composition and weakenings
     of their axioms are a broad topic with profound implications in category
-    theory. Even if none of this formal knowledge us required to use this
+    theory. Even if none of this formal knowledge is required to use this
     module, one can check the following references to satisfy their curiosity.
 
     @see Jon Beck paper "Distributive laws" for more details on this topic.
