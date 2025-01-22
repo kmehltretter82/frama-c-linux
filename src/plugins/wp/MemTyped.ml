@@ -175,7 +175,7 @@ struct
     | T_alloc -> t_malloc
     | T_init -> t_init
   let is_init = function T_init -> true | _ -> false
-  let is_single _ = false
+  let is_primary _ = false
   let is_framed _ = false
 end
 
@@ -966,7 +966,7 @@ let int_of_loc _ l = MemAddr.int_of_addr l
 (* -------------------------------------------------------------------------- *)
 
 let frames obj addr chunk =
-  match Sigma.mu chunk with
+  match Sigma.ckind chunk with
   | State.Mu T_alloc -> []
   | State.Mu m ->
     let offset = length_of_object obj in
@@ -1013,7 +1013,7 @@ module ChunkContent = WpContext.Generator(Chunk)
 let is_well_formed sigma =
   let pool = ref [] in
   Sigma.iter (fun c x ->
-      match Sigma.mu c with
+      match Sigma.ckind c with
       | State.Mu (M_int _ as chunk) ->
         pool := F.p_call (ChunkContent.get chunk) [F.e_var x] :: !pool
       | _ -> ()
@@ -1047,7 +1047,7 @@ struct
     F.e_sub (F.e_div (allocated sigma l) n) F.e_one
 
   let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.mu chunk with
+    match Sigma.ckind chunk with
     | State.Mu T_alloc -> msrc
     | State.Mu _ ->
       let n = F.e_mul (length_of_object obj) length in
@@ -1212,7 +1212,7 @@ let lookup s e =
   | L.Fun( f , es ) -> Memory.Maddr (lookup_f f es)
   | L.Aget( m , k ) ->
     begin
-      match Sigma.mu @@ F.Tmap.find m s with
+      match Sigma.ckind @@ F.Tmap.find m s with
       | State.Mu T_alloc -> raise Not_found
       | State.Mu T_init -> Memory.Minit (lookup_lv k)
       | State.Mu _ -> Memory.Mlval (lookup_lv k)
@@ -1242,7 +1242,7 @@ let updates seq domain =
   let post = heap domain seq.post in
   Heap.Map.iter2
     (fun chunk v1 v2 ->
-       match Sigma.mu chunk with
+       match Sigma.ckind chunk with
        | State.Mu mc ->
          begin
            if mc <> T_alloc then

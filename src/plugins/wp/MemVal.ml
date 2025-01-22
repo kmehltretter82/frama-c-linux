@@ -243,7 +243,7 @@ struct
         Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
 
     let is_init _ = false
-    let is_single = function Base.Var _ -> true | _ -> false
+    let is_primary = function Base.Var _ -> true | _ -> false
 
     let is_framed b =
       try

@@ -163,7 +163,7 @@ struct
       | ValInit | ArrInit -> true
       | Array _ | Value _ -> false
 
-    let is_single c =
+    let is_primary c =
       match c.data with
       | Value _ -> true
       | ValInit | ArrInit | Array _ -> false
@@ -220,7 +220,7 @@ struct
       | _ -> []
 
     let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-      match Sigma.mu chunk with
+      match Sigma.ckind chunk with
       | State.Mu { data } ->
         begin
           match data with
@@ -232,7 +232,7 @@ struct
         M.memcpy ty ~mtgt ~msrc ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length chunk
 
     let eqmem_forall ty l chunk m1 m2 =
-      match Sigma.mu chunk with
+      match Sigma.ckind chunk with
       | State.Mu { data } ->
         begin
           match data with
@@ -538,7 +538,7 @@ struct
     let assume p = pool := p :: !pool in
     Sigma.iter
       (fun c m ->
-         match Sigma.mu c with
+         match Sigma.ckind c with
          | State.Mu { data } ->
            begin
              match data with
@@ -557,7 +557,7 @@ struct
     let assume p = pool := p :: !pool in
     Sigma.iter
       (fun c m ->
-         match Sigma.mu c with
+         match Sigma.ckind c with
          | State.Mu { data } ->
            begin
              match data with

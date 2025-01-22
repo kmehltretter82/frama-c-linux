@@ -37,7 +37,7 @@ sig
   val tau_of_chunk : t -> F.tau
   val basename_of_chunk : t -> string
   val is_init : t -> bool
-  val is_single : t -> bool
+  val is_primary : t -> bool
   val is_framed : t -> bool
 end
 
@@ -45,50 +45,50 @@ end
 (* --- Generic Sigma Factory                                              --- *)
 (* -------------------------------------------------------------------------- *)
 
-type mu = ..
+type ckind = ..
 
 module type Tag =
 sig
   val tag : int
-  include ChunkType with type t := mu
+  include ChunkType with type t := ckind
 end
 
 (* memory chunks *)
-type chunk = { tag : (module Tag) ; mu : mu }
-let mu c = c.mu
+type chunk = { tag : (module Tag) ; ckind : ckind }
+let ckind c = c.ckind
 
 module Chunk : ChunkType with type t = chunk =
 struct
   type t = chunk
   let self = "Core"
   let hash c =
-    let module T = (val c.tag) in Qed.Hcons.hash_pair T.tag @@ T.hash c.mu
+    let module T = (val c.tag) in Qed.Hcons.hash_pair T.tag @@ T.hash c.ckind
   let equal a b =
     let module A = (val a.tag) in
     let module B = (val b.tag) in
-    A.tag = B.tag && A.equal a.mu b.mu
+    A.tag = B.tag && A.equal a.ckind b.ckind
   let compare a b =
     let module A = (val a.tag) in
     let module B = (val b.tag) in
-    match A.is_single a.mu, B.is_single b.mu with
+    match A.is_primary a.ckind, B.is_primary b.ckind with
     | true, false -> (-1)
     | false, true -> (+1)
     | true, true | false, false ->
       let cmp = Int.compare A.tag B.tag in
-      if cmp <> 0 then cmp else A.compare a.mu b.mu
+      if cmp <> 0 then cmp else A.compare a.ckind b.ckind
 
   let pretty fmt c =
-    let module T = (val c.tag) in T.pretty fmt c.mu
+    let module T = (val c.tag) in T.pretty fmt c.ckind
   let tau_of_chunk c =
-    let module T = (val c.tag) in T.tau_of_chunk c.mu
+    let module T = (val c.tag) in T.tau_of_chunk c.ckind
   let basename_of_chunk c =
-    let module T = (val c.tag) in T.basename_of_chunk c.mu
+    let module T = (val c.tag) in T.basename_of_chunk c.ckind
   let is_init c =
-    let module T = (val c.tag) in T.is_init c.mu
-  let is_single c =
-    let module T = (val c.tag) in T.is_single c.mu
+    let module T = (val c.tag) in T.is_init c.ckind
+  let is_primary c =
+    let module T = (val c.tag) in T.is_primary c.ckind
   let is_framed c =
-    let module T = (val c.tag) in T.is_framed c.mu
+    let module T = (val c.tag) in T.is_framed c.ckind
 end
 
 module Heap = Qed.Collection.Make(Chunk)
@@ -121,8 +121,8 @@ let create () = ref Heap.Map.empty
 let copy sigma = ref !sigma
 let newchunk c =
   let module T = (val c.tag) in
-  let basename = T.basename_of_chunk c.mu in
-  let tau = T.tau_of_chunk c.mu in
+  let basename = T.basename_of_chunk c.ckind in
+  let tau = T.tau_of_chunk c.ckind in
   Lang.freshvar ~basename tau
 
 let mem (sigma : sigma) c = Heap.Map.mem c !sigma
@@ -180,10 +180,10 @@ let havoc_chunk sigma c =
   ref @@ Heap.Map.add c x !sigma
 
 let is_init c =
-  let module T = (val c.tag) in T.is_init c.mu
+  let module T = (val c.tag) in T.is_init c.ckind
 
 let is_framed c =
-  let module T = (val c.tag) in T.is_framed c.mu
+  let module T = (val c.tag) in T.is_framed c.ckind
 
 let havoc_any ~call sigma =
   let framer c x = if call && is_framed c then x else newchunk c in
@@ -265,7 +265,7 @@ let pretty fmt sigma =
     Heap.Map.iter
       (fun c x ->
          let module T = (val c.tag) in
-         Format.fprintf fmt "@ %a:%a" T.pretty c.mu F.Var.pretty x)
+         Format.fprintf fmt "@ %a:%a" T.pretty c.ckind F.Var.pretty x)
       !sigma ;
     Format.fprintf fmt "@]}" ;
   end
@@ -276,7 +276,7 @@ let pretty fmt sigma =
 
 module Make(C : ChunkType) =
 struct
-  type mu += Mu of C.t
+  type ckind += Mu of C.t
   module T =
   struct
     let self = C.self
@@ -288,14 +288,14 @@ struct
     let equal = map2 C.equal
     let compare = map2 C.compare
     let is_init = map C.is_init
-    let is_single = map C.is_single
+    let is_primary = map C.is_primary
     let is_framed = map C.is_framed
     let tau_of_chunk = map C.tau_of_chunk
     let basename_of_chunk = map C.basename_of_chunk
     let pretty fmt = map (C.pretty fmt)
   end
   let tag = (module T : Tag)
-  let chunk c = { tag ; mu = Mu c }
+  let chunk c = { tag ; ckind = Mu c }
   let mem sigma c = mem sigma @@ chunk c
   let get sigma c = get sigma @@ chunk c
   let value sigma c = value sigma @@ chunk c

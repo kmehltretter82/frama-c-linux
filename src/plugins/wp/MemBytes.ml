@@ -181,7 +181,7 @@ struct
     | Alloc -> "alloc"
 
   let is_init = function Init -> true | Mem | Alloc -> false
-  let is_single _ = false
+  let is_primary _ = false
   let is_framed _ = false
 end
 
@@ -649,7 +649,7 @@ module Model = struct
     ]
 
   let frames obj addr chunk =
-    match Sigma.mu chunk with
+    match Sigma.ckind chunk with
     | State.Mu Alloc -> []
     | State.Mu m ->
       let offset = sizeof obj in
@@ -663,7 +663,7 @@ module Model = struct
     e_sub (e_div (allocated sigma l) n) e_one
 
   let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.mu chunk with
+    match Sigma.ckind chunk with
     | State.Mu Alloc -> msrc
     | State.Mu _ ->
       let n = e_mul (e_int @@ sizeof_object obj) length in
@@ -952,7 +952,7 @@ let lookup s e =
   | Fun( f , es ) -> Memory.Maddr (lookup_f f es)
   | Aget( m , k ) ->
     begin
-      match Sigma.mu @@ Tmap.find m s with
+      match Sigma.ckind @@ Tmap.find m s with
       | State.Mu Alloc -> raise Not_found
       | State.Mu Init -> Memory.Minit (lookup_lv k)
       | State.Mu _ -> Memory.Mlval (lookup_lv k)

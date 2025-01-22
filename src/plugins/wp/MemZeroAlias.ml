@@ -116,7 +116,7 @@ struct
     dim_of_path te p
   let basename_of_chunk (x,_) = LogicUsage.basename x
   let is_init _ = false
-  let is_single _ = true
+  let is_primary _ = true
   let is_framed (x,p) = not x.vglob && p = []
 end
 
@@ -225,7 +225,7 @@ let rec ipath lv = function
 let ilval (x,p) = ipath (Mvar x,[]) p
 
 let lookup (s : Sigma.state) (e : F.term) =
-  match Sigma.mu @@ Lang.F.Tmap.find e s with
+  match Sigma.ckind @@ Lang.F.Tmap.find e s with
   | State.Mu lv -> Mlval (ilval lv)
   | _ -> raise Not_found
 
@@ -244,7 +244,7 @@ let updates seq domain =
   let pool = ref Bag.empty in
   Hmap.iter2
     (fun c v1 v2 ->
-       match Sigma.mu c with
+       match Sigma.ckind c with
        | State.Mu m ->
          begin
            try

@@ -108,7 +108,7 @@ struct
     let tau_of_chunk x = Lang.tau_of_ctype (typ_of_chunk x)
     let is_framed = is_framed_var
     let is_init _ = false
-    let is_single _ = true
+    let is_primary _ = true
     let basename_of_chunk = LogicUsage.basename
   end
 
@@ -128,7 +128,7 @@ struct
       | NotUsed | ByValue | ByShift | ByAddr | InContext _ | InArray _ ->
         "ta_" ^ LogicUsage.basename x
     let is_init _ = false
-    let is_single _ = false
+    let is_primary _ = false
     let is_framed = is_framed_var
   end
 
@@ -146,7 +146,7 @@ struct
       | _ -> x.vtype
     let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
     let is_init _ = true
-    let is_single _ = false
+    let is_primary _ = false
     let is_framed = is_framed_var
     let basename_of_chunk x = "Init_" ^ (LogicUsage.basename x)
   end
@@ -216,7 +216,7 @@ struct
 
   let lookup (s : Sigma.state) e =
     try
-      match Sigma.mu @@ Tmap.find e s with
+      match Sigma.ckind @@ Tmap.find e s with
       | SVAR.Mu x -> imval (iref x)
       | SINIT.Mu x -> imval (Iinit x)
       | SALLOC.Mu _ -> raise Not_found
@@ -229,7 +229,7 @@ struct
       (fun m c w ->
          if Vars.intersect (F.vars m) domain
          then
-           match Sigma.mu c with
+           match Sigma.ckind c with
            | SVAR.Mu x -> Icmap.add (iref x) m w
            | SINIT.Mu x -> Icmap.add (Iinit x) m w
            | _ -> w
@@ -955,7 +955,7 @@ struct
     let hs = ref [] in
     Sigma.iter
       begin fun chunk value ->
-        match Sigma.mu chunk with
+        match Sigma.ckind chunk with
         | SVAR.Mu x when not @@ is_ref x ->
           (if (x.vglob || x.vformal) then
              let t = VAR.typ_of_chunk x in
@@ -1368,7 +1368,7 @@ struct
     let cstrs = ref [] in
     Sigma.iter
       (fun chunk value ->
-         match Sigma.mu chunk with
+         match Sigma.ckind chunk with
          | SVAR.Mu x when not @@ is_ref x ->
            cstrs := Cvalues.has_ctype x.vtype (e_var value) :: !cstrs
          | _ -> ())

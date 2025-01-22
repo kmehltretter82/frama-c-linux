@@ -79,7 +79,7 @@ sig
   val is_init : t -> bool
   (** Whether the chunk tracks memory initialization (used for filtering). *)
 
-  val is_single : t -> bool
+  val is_primary : t -> bool
   (** Used to sort memory chunk parameters in ACSL symbols.
 
       Single chunks represents values of variables or individual l-values.
@@ -104,12 +104,12 @@ module Domain = Heap.Set
 (** Memory footprint, ie. set of memory model chunk types. *)
 type domain = Domain.t
 
-(** Internal representation of chunks.
+(** Internal representation of chunks (chunk-kind).
     This type can only be extended via functor {!Make}. *)
-type mu = private ..
+type ckind = private ..
 
 (** Access to internal chunk representation. *)
-val mu : chunk -> mu
+val ckind : chunk -> ckind
 
 (** Chunk Extension functor.
 
@@ -119,7 +119,7 @@ val mu : chunk -> mu
 module Make(C : ChunkType) :
 sig
   (** Chunk Extension. *)
-  type mu += Mu of C.t
+  type ckind += Mu of C.t
 
   val chunk : C.t -> chunk
   (** Individual promotion of a model chunk to a uniform chunk. *)
