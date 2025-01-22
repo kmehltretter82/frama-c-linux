@@ -27,124 +27,16 @@ import * as Dome from 'dome';
 import { State } from 'dome/data/states';
 import {  Spinner } from 'dome/controls/buttons';
 import { ToolBar, ButtonGroup, Button, Filler } from 'dome/frame/toolbars';
-import * as Themes from 'dome/themes';
 
 import {
   ModeDisplay, SelectedNodesData
 } from "frama-c/plugins/callgraph/definitions";
 
-import {
-  IThreeStateButton, ThreeStateButton, TThreesButtonState
-} from "./threeStateButton";
+import { IThreeStateButton, ThreeStateButton } from "./threeStateButton";
 
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph Toolsbar component                                       --- */
 /* -------------------------------------------------------------------------- */
-interface ShowNodesButtonProps {
-  displayModeState: [ModeDisplay, (newValue: ModeDisplay) => void],
-  selectedParentsState: TThreesButtonState,
-  selectedChildrenState: TThreesButtonState,
-}
-
-function ShowNodesButton(props: ShowNodesButtonProps): JSX.Element {
-  const {
-    displayModeState, selectedParentsState, selectedChildrenState
-  } = props;
-  const [ displayMode, setDisplayMode] = displayModeState;
-
-  return (
-    <ButtonGroup>
-      <Button
-        label='all'
-        title='show all nodes'
-        selected={displayMode === 'all'}
-        onClick={() => setDisplayMode("all")}
-        />
-      <Button
-        label='linked'
-        title='only show nodes linked to the selected ones'
-        selected={displayMode === 'linked'}
-        onClick={() => setDisplayMode("linked")}
-        />
-      <Button
-        label='selected'
-        title='only show selected nodes, their parents and their childrens'
-        selected={displayMode === 'selected'}
-        onClick={() => setDisplayMode("selected")}
-        />
-      { displayMode === "selected" ? (
-          <>
-            <ThreeStateButton
-              label={"Parents"}
-              title={"Choose how many parents you want to see."}
-              buttonState={selectedParentsState}
-              />
-            <ThreeStateButton
-              label={"Children"}
-              title={"Choose how many children you want to see."}
-              buttonState={selectedChildrenState}
-              />
-          </>
-        ) : <></>
-      }
-    </ButtonGroup>
-  );
-}
-
-export function DocShowNodesButton(): JSX.Element {
-  const displayModeState = React.useState<ModeDisplay>("all");
-  const selectedParentsState = React.useState<IThreeStateButton>(
-      { active: false, max: false, value: 1 });
-  const selectedChildrenState = React.useState<IThreeStateButton>(
-      { active: true, max: true, value: 1 });
-  const [ displayMode, ] = displayModeState;
-  const [ parent, ] = selectedParentsState;
-  const [ children, ] = selectedChildrenState;
-
-  const style = Themes.useStyle();
-  const infosStyle = { color: style.getPropertyValue('--text-highlighted') };
-
-  function getDocSelected(
-    parent: IThreeStateButton,
-    children: IThreeStateButton
-  ):JSX.Element {
-    function getDocTSB(name: string, tsb: IThreeStateButton):string {
-      return !tsb.active ? '' :
-        tsb.max ? ` all ${name}` :
-          tsb.value > 0 ?
-            (tsb.value+' level'+(tsb.value > 1 ? 's':'')+` of ${name}`):
-            "";
-    }
-    const p = getDocTSB('parents', parent);
-    const c = getDocTSB('children', children);
-
-    return (
-      <div style={infosStyle}>
-        Selected nodes displayed { (p || c) && " with " }
-        { p }{ p && c && " and " }{ c }
-        { !p && !c && " only " }.
-      </div>
-    );
-  }
-
-  const docAll = <div style={infosStyle}>All nodes displayed.</div>;
-  const docLinked = <div style={infosStyle}>Hide unlinked nodes.</div>;
-  const docSelected = getDocSelected(parent, children);
-
-  return (
-    <>
-      <ShowNodesButton
-        displayModeState={displayModeState}
-        selectedParentsState={selectedParentsState}
-        selectedChildrenState={selectedChildrenState}
-      />
-      { displayMode === 'all' ? docAll :
-        displayMode === 'linked' ? docLinked :
-        docSelected
-      }
-    </>
-  );
-}
 
 interface CallgraphToolsBarProps {
   /* eslint-disable max-len */

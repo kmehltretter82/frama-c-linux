@@ -68,7 +68,7 @@ export const LEDStatusList = [
 
 export type LEDstatus = typeof LEDStatusList[number] | undefined;
 
-export function jLEDstatus(js : string) : LEDstatus | undefined {
+export function jLEDstatus(js : string) : LEDstatus {
   return LEDStatusList.find(elt => elt === js);
 }
 
