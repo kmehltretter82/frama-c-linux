@@ -336,10 +336,21 @@ export function Modal(
   const { label, title, icon, className, onClose, children } = props;
 
   const contentClasses = classes('dome-xModal-content', className);
-  const onCloseModal = (): void => {
+  const onCloseModal = React.useCallback((): void => {
     closeModal();
     if(onClose) onClose();
-  };
+  }, [onClose]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
+      if (event.key === "Escape") onCloseModal();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onCloseModal]);
 
   return (
     <div className={contentClasses}>
