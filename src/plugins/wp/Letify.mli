@@ -42,7 +42,7 @@ sig
 
 end
 
-module Sigma :
+module Subst :
 sig
   type t
   val equal : t -> t -> bool
@@ -68,12 +68,12 @@ sig
   val domain : t -> Vars.t
 end
 
-val bind : Sigma.t -> Defs.t -> Vars.t -> Sigma.t
+val bind : Subst.t -> Defs.t -> Vars.t -> Subst.t
 (** [bind sigma defs xs] select definitions in [defs]
     targeting variables [xs]. The result is a new substitution that
     potentially augment [sigma] with definitions for [xs] (and others). *)
 
-val add_definitions : Sigma.t -> Defs.t -> Vars.t -> pred list -> pred list
+val add_definitions : Subst.t -> Defs.t -> Vars.t -> pred list -> pred list
 (** [add_definitions sigma defs xs ps] keep all
     definitions of variables [xs] from [sigma] that comes from [defs].
     They are added to [ps]. *)

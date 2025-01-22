@@ -34,21 +34,18 @@ open Ctypes
 open Lang
 open Lang.F
 open Definitions
-open Sigs
+open Memory
 
-module Make(M : Sigs.Model) =
+module Make(M : Memory.Model) =
 struct
 
-  module M = M
-  open M
-
   type loc = M.loc
-  type value = loc Sigs.value
-  type logic = loc Sigs.logic
-  type result = loc Sigs.result
-  type region = loc Sigs.region
-  type sigma = Sigma.t
+  type value = loc Memory.value
+  type logic = loc Memory.logic
+  type result = loc Memory.result
+  type region = loc Memory.region
 
+  module M = M
   module L = Cvalues.Logic(M)
   module C = LogicCompiler.Make(M)
 
@@ -200,9 +197,9 @@ struct
     match lhost with
     | TResult ty ->
       begin match C.result () with
-        | Sigs.R_var x ->
+        | Memory.R_var x ->
           access_offset env (Vexp (e_var x)) loffset
-        | Sigs.R_loc l ->
+        | Memory.R_loc l ->
           load_loc env ty l loffset
       end
     | TMem e ->

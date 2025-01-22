@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Sigs
+open Memory
 open Lang
 open Lang.F
 
@@ -32,19 +32,19 @@ type value =
   | Addr of s_lval
   | Lval of s_lval * label
   | Init of s_lval * label
-  | Chunk of string * label
+  | Chunk of Sigma.chunk * label
 
 val create : unit -> env
 val register : Conditions.sequence -> env
 
 val at : env -> id:int -> label
 val find : env -> F.term -> value
-val updates : env -> label Sigs.sequence -> Vars.t -> Sigs.update Bag.t
+val updates : env -> label Memory.sequence -> Vars.t -> Memory.update Bag.t
 val visible : label -> bool
 val subterms : env -> (F.term -> unit) -> F.term -> bool
 val prev : label -> label list
 val next : label -> label list
-val iter : (Sigs.mval -> term -> unit) -> label -> unit
+val iter : (Memory.mval -> term -> unit) -> label -> unit
 val branching : label -> bool
 
 class virtual engine :
@@ -67,5 +67,5 @@ class virtual engine :
 
     method pp_label : Format.formatter -> label -> unit (** label name *)
 
-    method pp_chunk : Format.formatter -> string -> unit (** chunk name *)
+    method pp_chunk : Format.formatter -> Sigma.chunk -> unit (** chunk name *)
   end

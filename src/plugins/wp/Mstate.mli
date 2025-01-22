@@ -21,7 +21,8 @@
 (**************************************************************************)
 
 open Lang.F
-open Sigs
+open Memory
+open Sigma
 
 (* -------------------------------------------------------------------------- *)
 (* --- L-Val Utility                                                      --- *)
@@ -35,11 +36,9 @@ val equal : s_lval -> s_lval -> bool
 (* --- Memory State Pretty Printing Information                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a model
 type state
 
-val create : (module Model with type Sigma.t = 'a) -> 'a model
-val state : 'a model -> 'a -> state
+val create : (module Memory.Model) -> sigma -> state
 
 val lookup : state -> term -> mval
 val apply : (term -> term) -> state -> state

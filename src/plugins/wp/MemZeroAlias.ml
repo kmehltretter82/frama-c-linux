@@ -28,7 +28,7 @@ open Cil_types
 open Cil_datatype
 open Lang
 open Lang.F
-open Sigs
+open Memory
 
 module Logic = Qed.Logic
 
@@ -115,11 +115,12 @@ struct
     let te = Lang.tau_of_object (object_of_rpath x (List.rev p)) in
     dim_of_path te p
   let basename_of_chunk (x,_) = LogicUsage.basename x
+  let is_init _ = false
+  let is_primary _ = true
   let is_framed (x,p) = not x.vglob && p = []
 end
 
-module Heap = Qed.Collection.Make(Chunk)
-module Sigma = Sigma.Make(Chunk)(Heap)
+module State = Sigma.Make(Chunk)
 
 type loc =
   | Null
@@ -128,8 +129,6 @@ type loc =
   | Array of loc * F.term
   | Field of loc * fieldinfo
 
-type sigma = Sigma.t
-type domain = Sigma.domain
 type segment = loc rloc
 
 let rec pretty fmt = function
@@ -180,14 +179,14 @@ let rec walk ps ks = function
 let access l = walk [] [] l
 
 let domain _obj l =
-  try Heap.Set.singleton (fst (access l))
-  with _ -> Heap.Set.empty
+  try State.singleton (fst (access l))
+  with _ -> Sigma.empty
 
 let is_well_formed _s = p_true
 
 let value sigma l =
   let m,ks = access l in
-  let x = Sigma.get sigma m in
+  let x = State.get sigma m in
   List.fold_left F.e_get (e_var x) ks
 
 let rec update a ks v =
@@ -195,7 +194,7 @@ let rec update a ks v =
   | [] -> v
   | k::ks -> F.e_set a k (update (F.e_get a k) ks v)
 
-let set s m ks v = if ks = [] then v else update (e_var (Sigma.get s m)) ks v
+let set s m ks v = if ks = [] then v else update (State.value s m) ks v
 
 let load sigma obj l =
   if Ctypes.is_pointer obj then Loc (Star l) else Val(value sigma l)
@@ -204,7 +203,7 @@ let load_init _sigma _obj _l = Warning.error ~source "Mem0Alias: No initialized"
 
 let stored seq _obj l e =
   let m,ks = access l in
-  let x = F.e_var (Sigma.get seq.post m) in
+  let x = State.value seq.post m in
   [Set( x , set seq.pre m ks e )]
 
 let stored_init _seq _obj _l _e = Warning.error ~source "Mem0Alias: No initialized"
@@ -216,18 +215,6 @@ let copied_init _seq _obj _a _b = Warning.error ~source "Mem0Alias: No initializ
 
 let assigned _s _obj _sloc = []
 
-type state = Chunk.t Tmap.t
-let state (s:sigma) =
-  let m = ref Tmap.empty in
-  Sigma.iter (fun c x -> m := Tmap.add (F.e_var x) c !m) s ; !m
-
-let imval c = Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
-let iter f s = Tmap.iter (fun v c -> f (imval c) v) s
-let lookup (s : state) (e : Lang.F.term) = imval (F.Tmap.find e s)
-let apply f s =
-  let m = ref Tmap.empty in
-  Tmap.iter (fun e c -> m := Tmap.add (f e) c !m) s ; !m
-
 let rec ipath lv = function
   | [] -> lv
   | S::w -> ipath (Mval lv,[]) w
@@ -237,28 +224,40 @@ let rec ipath lv = function
     ipath (host, path @ [Mfield f]) w
 let ilval (x,p) = ipath (Mvar x,[]) p
 
+let lookup (s : Sigma.state) (e : F.term) =
+  match Sigma.ckind @@ Lang.F.Tmap.find e s with
+  | State.Mu lv -> Mlval (ilval lv)
+  | _ -> raise Not_found
+
+module Hmap = Sigma.Heap.Map
+
 let heap domain state =
   Tmap.fold
     (fun m c w ->
        if Vars.intersect (F.vars m) domain
-       then Heap.Map.add c m w else w
-    ) state Heap.Map.empty
+       then Hmap.add c m w else w
+    ) state Hmap.empty
 
 let updates seq domain =
   let pre = heap domain seq.pre in
   let post = heap domain seq.post in
   let pool = ref Bag.empty in
-  Heap.Map.iter2
+  Hmap.iter2
     (fun c v1 v2 ->
-       try
-         match v1,v2 with
-         | _,None -> ()
-         | None,Some v ->
-           pool := Bag.add (Mstore(ilval c,v)) !pool
-         | Some v1,Some v2 ->
-           if v2 != v1 then
-             pool := Bag.add (Mstore (ilval c,v2)) !pool
-       with Not_found -> ()
+       match Sigma.ckind c with
+       | State.Mu m ->
+         begin
+           try
+             match v1,v2 with
+             | _,None -> ()
+             | None,Some v ->
+               pool := Bag.add (Mstore(ilval m,v)) !pool
+             | Some v1,Some v2 ->
+               if v2 != v1 then
+                 pool := Bag.add (Mstore (ilval m,v2)) !pool
+           with Not_found -> ()
+         end
+       | _ -> ()
     ) pre post ;
   !pool
 

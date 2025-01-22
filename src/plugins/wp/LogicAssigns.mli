@@ -21,6 +21,6 @@
 (**************************************************************************)
 
 module Make
-    ( M : Sigs.Model )
-    ( L : Sigs.LogicSemantics with module M = M ) :
-  Sigs.LogicAssigns with module M = M and module L = L
+    ( M : Memory.Model )
+    ( L : Memory.LogicSemantics with module M = M ) :
+  Memory.LogicAssigns with module M = M and module L = L

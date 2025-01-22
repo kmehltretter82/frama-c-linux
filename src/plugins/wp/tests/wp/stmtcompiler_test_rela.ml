@@ -2,7 +2,7 @@
 
 open Wp
 open Factory
-open Sigs
+open Memory
 
 let run () =
   let setup : Factory.setup = { mheap = Hoare;
@@ -14,7 +14,7 @@ let run () =
   let model = Factory.instance setup driver in
   let module C = (val (Factory.compiler setup.mheap setup.mvar)) in
   let module Compiler = StmtSemantics.Make(C) in
-  let module Cfg = Compiler.Cfg in
+  let module Cfg = CfgCompiler in
 
   let provers =
     List.fold_right
@@ -101,27 +101,27 @@ let run () =
         let formal = List.hd (fct.sformals) in
 
         (*First call*)
-        let seq1 = {Sigs.pre = Cfg.node (); post = Cfg.node ()} in
+        let seq1 = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env1 = Compiler.empty_env kf  in
         let env1 = Compiler.(env1 @* [Clabels.here,seq1.pre;Clabels.next,seq1.post]) in
         let path1 = Compiler.automaton env1 block in
         let cfg1 = path1.Compiler.paths_cfg in
         let node1 = Cfg.T.init' seq1.pre (reads_formal formal) in
         let (_,sigma1,sequence1) =
-          Compiler.Cfg.compile seq1.pre
+          Cfg.compile seq1.pre
             (Cfg.Node.Set.singleton seq1.post) (Cfg.T.reads node1) cfg1 in
         let node1 = Cfg.T.relocate sigma1 node1 in
         let term_1 = Cfg.T.get node1 in
 
         (*Seconde call*)
-        let seq2 = {Sigs.pre = Cfg.node (); post = Cfg.node ()} in
+        let seq2 = {Memory.pre = Cfg.node (); post = Cfg.node ()} in
         let env2 = Compiler.empty_env kf  in
         let env2 = Compiler.(env2 @* [Clabels.here,seq2.pre;Clabels.next,seq2.post]) in
         let path2 = Compiler.automaton env2 block in
         let cfg2 = path2.Compiler.paths_cfg in
         let node2 = Cfg.T.init' seq2.pre (reads_formal formal) in
         let (_,sigma2,sequence2) =
-          Compiler.Cfg.compile
+          Cfg.compile
             seq2.pre (Cfg.Node.Set.singleton seq2.post)
             (Cfg.T.reads node2) cfg2 in
         let node2 = Cfg.T.relocate sigma2 node2 in

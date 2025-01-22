@@ -42,4 +42,4 @@ module Raw : VarUsage
 module Static : VarUsage
 
 (** Create a mixed Hoare Memory Model from VarUsage instance. *)
-module Make(_ : VarUsage)(_ : Sigs.Model) : Sigs.Model
+module Make(_ : VarUsage)(_ : Memory.Model) : Memory.Model

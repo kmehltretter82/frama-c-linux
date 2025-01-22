@@ -27,4 +27,4 @@
 type pointer = NoCast | Fits | Unsafe
 val pointer : pointer Context.value
 
-include Sigs.Model
+include Memory.Model

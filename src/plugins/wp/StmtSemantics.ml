@@ -20,20 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Sigs
+open Memory
 open Cil_types
 open Cil_datatype
 open Clabels
+module Cfg = CfgCompiler
 
 let not_yet = Wp_parameters.not_yet_implemented
 
-module Make(Compiler:Sigs.Compiler) =
+module Make(Compiler:Memory.Compiler) =
 struct
 
   module Compiler = Compiler
-  module Cfg = CfgCompiler.Cfg(Compiler.M.Sigma)
   module M = Compiler.M
-  module Sigma = Compiler.M.Sigma
   module C  = Compiler.C
   module L = Compiler.L
   module A = Compiler.A
@@ -242,7 +241,7 @@ struct
   let mk_frame ~descr env =
     let nsigmas =
       LabelMap.fold
-        (fun _ (n : node) (nmap : M.sigma Cfg.Node.Map.t) ->
+        (fun _ (n : node) (nmap : Sigma.sigma Cfg.Node.Map.t) ->
            if Cfg.Node.Map.mem n nmap then nmap
            else Cfg.Node.Map.add n (Sigma.create ()) nmap)
         env.flow
@@ -271,14 +270,14 @@ struct
     let frame =
       L.mk_frame
         ~labels:lsigmas ~kf:env.kf
-        ~result:(Sigs.R_var env.result)
+        ~result:(Memory.R_var env.result)
         ~status:env.status
         ~formals ~descr ()
     in
     frame, nsigmas, lsigmas
 
   let pred
-    : env -> Sigs.polarity -> predicate -> _
+    : env -> Memory.polarity -> predicate -> _
     = fun env polarity p ->
       (* Format.printf "env.flow: %a@." *)
       (*   (Pretty_utils.pp_iter2 LabelMap.iter Label.pretty Cfg.Node.pp) *)
@@ -290,7 +289,7 @@ struct
         let pred = L.in_frame frame (L.pred polarity lenv) p in
         (* Remove the sigmas not used for the compilation, but here must stay *)
         let nsigmas = Cfg.Node.Map.filter (fun _ s ->
-            s == here || not (Sigma.Chunk.Set.is_empty (Sigma.domain s))
+            s == here || not (Sigma.Domain.is_empty (Sigma.domain s))
           ) nsigmas
         in
         (Cfg.P.create nsigmas pred)
@@ -311,7 +310,7 @@ struct
 
 
   let assume_
-    : env -> Sigs.polarity -> predicate -> paths
+    : env -> Memory.polarity -> predicate -> paths
     = fun env polarity p ->
       assume (pred env polarity p)
 
@@ -365,7 +364,7 @@ struct
 
       let exit_status (env:env) =
         let p = Lang.F.p_equal (Lang.F.e_var old_status) (Lang.F.e_var env.status) in
-        let s = M.Sigma.create () in
+        let s = Sigma.create () in
         let e = Cfg.E.create {pre=s;post=s} p in
         memory_effect (env @: Clabels.here) e (env @: Clabels.next)
       in
@@ -484,7 +483,7 @@ struct
     | None -> goto (env @: Clabels.here) (env @: Clabels.next)
     | Some region ->
       let domain = A.domain region in
-      let next = M.Sigma.havoc here domain in
+      let next = Sigma.havoc here domain in
       let seq = { pre = here; post = next } in
       let preds = A.apply_assigns seq region in
       memory_effect (env @: Clabels.here) (Cfg.E.create seq (Lang.F.p_conj preds)) (env @: Clabels.next)
@@ -525,8 +524,8 @@ struct
       match tr with
       | Skip | Enter { blocals = [] } | Leave { blocals = [] } ->
         goto (env @: Clabels.here) (env @: Clabels.next)
-      | Enter {blocals} -> scope env Sigs.Enter blocals
-      | Leave {blocals} -> scope env Sigs.Leave blocals
+      | Enter {blocals} -> scope env Memory.Enter blocals
+      | Leave {blocals} -> scope env Memory.Leave blocals
       | Return (r,_) -> return env r
       | Prop ({kind = Assert|Invariant} as a, _) ->
         let env = Logic_label.Map.fold

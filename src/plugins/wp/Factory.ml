@@ -204,7 +204,7 @@ module MemEva = MemVal.Make(MemVal.Eva)
 (* Each model must be instanciated statically because of registered memory
    models identifiers and Frama-C states *)
 
-module MakeVar(V : MemVar.VarUsage)(M : Sigs.Model)
+module MakeVar(V : MemVar.VarUsage)(M : Memory.Model)
   = MemVar.Make(MakeVarUsage(V))(M)
 
 module Model_Hoare_Raw = MakeVar(MemVar.Raw)(MemEmpty)
@@ -216,7 +216,7 @@ module Model_Bytes_Ref = MakeVar(Ref)(MemBytes)
 module Model_Caveat = MakeVar(Caveat)(MemTyped)
 module Model_Region = MakeVar(Static)(MemRegion)
 
-module MakeCompiler(M:Sigs.Model) =
+module MakeCompiler(M:Memory.Model) =
 struct
   module M = M
   module C = CodeSemantics.Make(M)
@@ -239,7 +239,7 @@ module Comp_Bytes_Ref = MakeCompiler(Model_Bytes_Ref)
 module Comp_Region = MakeCompiler(Model_Region)
 module Comp_MemEva = MakeCompiler(MemEva)
 
-let compiler mheap mvar : (module Sigs.Compiler) =
+let compiler mheap mvar : (module Memory.Compiler) =
   match mheap , mvar with
   | ZeroAlias , _     -> (module Comp_MemZeroAlias)
   | _    ,   Caveat   -> (module Comp_Caveat)

@@ -23,7 +23,7 @@
 open Cil_types
 open Lang
 open Lang.F
-open Sigs
+open Memory
 
 (* -------------------------------------------------------------------------- *)
 (* --- State Registry                                                     --- *)
@@ -43,7 +43,7 @@ type value =
   | Addr of s_lval
   | Lval of s_lval * label
   | Init of s_lval * label
-  | Chunk of string * label
+  | Chunk of Sigma.chunk * label
 
 module Imap = Datatype.Int.Map
 
@@ -91,12 +91,12 @@ let rec find env e =
 and lookup env e = function
   | [] -> Term
   | lbl :: others ->
-    try match Mstate.lookup lbl.state e with
-      | Sigs.Mterm -> raise Not_found
-      | Sigs.Maddr lv -> Addr lv
-      | Sigs.Mlval (lv, KValue) -> Lval(lv,flag lbl)
-      | Sigs.Mlval (lv, KInit) -> Init(lv,flag lbl)
-      | Sigs.Mchunk (m, _) -> Chunk(m,flag lbl)
+    try
+      match Mstate.lookup lbl.state e with
+      | Memory.Maddr lv -> Addr lv
+      | Memory.Mlval lv -> Lval(lv,flag lbl)
+      | Memory.Minit lv -> Init(lv,flag lbl)
+      | Memory.Mchunk m -> Chunk(m,flag lbl)
     with Not_found -> lookup env e others
 
 let is_ref x k = (k == F.e_zero) && Cil.isPointerType x.vtype
@@ -108,7 +108,7 @@ let is_atomic = function
 let iter f lbl = Mstate.iter f lbl.state
 
 let is_copy env lbl = function
-  | Sigs.Mstore( lv , value ) ->
+  | Memory.Mstore( lv , value ) ->
     begin
       match find env value with
       | Lval(lv0,lbl0) -> lbl0 == lbl && Mstate.equal lv lv0
@@ -218,9 +218,9 @@ class virtual engine =
     method pp_offset fmt fs = List.iter (self#pp_ofs fmt) fs
 
     method pp_host fmt = function
-      | Sigs.Mvar x -> Format.pp_print_string fmt x.vname
-      | Sigs.Mmem p -> self#pp_atom fmt p
-      | Sigs.Mval lv -> self#pp_lval fmt lv
+      | Memory.Mvar x -> Format.pp_print_string fmt x.vname
+      | Memory.Mmem p -> self#pp_atom fmt p
+      | Memory.Mval lv -> self#pp_lval fmt lv
 
     method pp_lval fmt = function
       | Mvar x , [] ->
@@ -251,11 +251,11 @@ class virtual engine =
     method pp_label fmt lbl =
       Format.pp_print_string fmt lbl.name
 
-    method pp_chunk fmt m = Format.fprintf fmt "µ:%s" m
+    method pp_chunk fmt mu = Format.fprintf fmt "µ:%a" Sigma.Chunk.pretty mu
 
   end
 
-open Sigs
+open Memory
 
 let rec lv_iter f (h,ofs) = host_iter f h ; List.iter (ofs_iter f) ofs
 and host_iter f = function Mvar _ -> () | Mmem e -> f e | Mval lv -> lv_iter f lv

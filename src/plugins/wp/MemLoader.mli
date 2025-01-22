@@ -28,16 +28,14 @@ open Cil_types
 open Definitions
 open Ctypes
 open Lang.F
-open Sigs
+open Memory
+open Sigma
 
 val cluster : unit -> cluster
 
 (** Loader Model for Atomic Values *)
 module type Model =
 sig
-
-  module Chunk : Chunk
-  module Sigma : Sigma with type chunk = Chunk.t
 
   val name : string
 
@@ -52,12 +50,12 @@ sig
   val to_region_pointer : loc -> int * term
   val of_region_pointer : int -> c_object -> term -> loc
 
-  val value_footprint: c_object -> loc -> Sigma.domain
-  val init_footprint: c_object -> loc -> Sigma.domain
+  val value_footprint: c_object -> loc -> domain
+  val init_footprint: c_object -> loc -> domain
 
-  val frames : c_object -> loc -> Chunk.t -> frame list
+  val frames : c_object -> loc -> chunk -> frame list
 
-  val last : Sigma.t -> c_object -> loc -> term
+  val last : sigma -> c_object -> loc -> term
 
   val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
     length:term -> Chunk.t -> term
@@ -65,17 +63,17 @@ sig
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
 
-  val load_int : Sigma.t -> c_int -> loc -> term
-  val load_float : Sigma.t -> c_float -> loc -> term
-  val load_pointer : Sigma.t -> typ -> loc -> loc
+  val load_int : sigma -> c_int -> loc -> term
+  val load_float : sigma -> c_float -> loc -> term
+  val load_pointer : sigma -> typ -> loc -> loc
 
-  val store_int : Sigma.t -> c_int -> loc -> term -> Chunk.t * term
-  val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
-  val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
+  val store_int : sigma -> c_int -> loc -> term -> Chunk.t * term
+  val store_float : sigma -> c_float -> loc -> term -> Chunk.t * term
+  val store_pointer : sigma -> typ -> loc -> term -> Chunk.t * term
 
-  val is_init_atom : Sigma.t -> c_object -> loc -> term
-  val is_init_range : Sigma.t -> c_object -> loc -> term -> pred
-  val set_init_atom : Sigma.t -> c_object -> loc -> term -> Chunk.t * term
+  val is_init_atom : sigma -> c_object -> loc -> term
+  val is_init_range : sigma -> c_object -> loc -> term -> pred
+  val set_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
 
@@ -85,23 +83,23 @@ end
 module Make (M : Model) :
 sig
 
-  val domain : c_object -> M.loc -> M.Sigma.domain
+  val domain : c_object -> M.loc -> domain
 
-  val load : M.Sigma.t -> c_object -> M.loc -> M.loc Sigs.value
-  val load_init : M.Sigma.t -> c_object -> M.loc -> term
-  val load_value : M.Sigma.t -> c_object -> M.loc -> term
+  val load : sigma -> c_object -> M.loc -> M.loc Memory.value
+  val load_init : sigma -> c_object -> M.loc -> term
+  val load_value : sigma -> c_object -> M.loc -> term
 
-  val memcpy : M.Sigma.t sequence -> c_object -> ?lsrc:M.loc -> M.loc -> equation list
-  val memcpy_length : M.Sigma.t sequence -> c_object -> ?lsrc:M.loc -> M.loc -> term -> equation list
+  val memcpy : sigma sequence -> c_object -> ?lsrc:M.loc -> M.loc -> equation list
+  val memcpy_length : sigma sequence -> c_object -> ?lsrc:M.loc -> M.loc -> term -> equation list
 
-  val stored : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
-  val stored_init : M.Sigma.t sequence -> c_object -> M.loc -> term -> equation list
-  val copied : M.Sigma.t sequence -> c_object -> M.loc -> M.loc -> equation list
-  val copied_init : M.Sigma.t sequence -> c_object -> M.loc -> M.loc -> equation list
+  val stored : sigma sequence -> c_object -> M.loc -> term -> equation list
+  val stored_init : sigma sequence -> c_object -> M.loc -> term -> equation list
+  val copied : sigma sequence -> c_object -> M.loc -> M.loc -> equation list
+  val copied_init : sigma sequence -> c_object -> M.loc -> M.loc -> equation list
 
-  val assigned : M.Sigma.t sequence -> c_object -> M.loc sloc -> equation list
+  val assigned : sigma sequence -> c_object -> M.loc sloc -> equation list
 
-  val initialized : M.Sigma.t -> M.loc rloc -> pred
+  val initialized : sigma -> M.loc rloc -> pred
 
 end
 

@@ -28,23 +28,21 @@ open LogicUsage
 open Cil_types
 open Cil_datatype
 open Clabels
-open Lang
 open Lang.F
-open Sigs
+open Memory
+open Sigma
 open Definitions
 
 type polarity = [ `Positive | `Negative | `NoPolarity ]
 
-module Make( M : Sigs.Model ) :
+module Make( M : Memory.Model ) :
 sig
 
   (** {3 Definitions} *)
 
-  type value = M.loc Sigs.value
-  type logic = M.loc Sigs.logic
-  type result = M.loc Sigs.result
-  type sigma = M.Sigma.t
-  type chunk = M.Chunk.t
+  type value = M.loc Memory.value
+  type logic = M.loc Memory.logic
+  type result = M.loc Memory.result
 
   (** {3 Frames} *)
 
@@ -101,12 +99,12 @@ sig
   val term : env -> Cil_types.term -> term
   val pred : polarity -> env -> predicate -> pred
   val logic : env -> Cil_types.term -> logic
-  val region : env -> Cil_types.term -> M.loc Sigs.region
+  val region : env -> Cil_types.term -> M.loc Memory.region
 
   val bootstrap_term : (env -> Cil_types.term -> term) -> unit
   val bootstrap_pred : (polarity -> env -> predicate -> pred) -> unit
   val bootstrap_logic : (env -> Cil_types.term -> logic) -> unit
-  val bootstrap_region : (env -> Cil_types.term -> M.loc Sigs.region) -> unit
+  val bootstrap_region : (env -> Cil_types.term -> M.loc Memory.region) -> unit
 
   (** {3 Application} *)
 

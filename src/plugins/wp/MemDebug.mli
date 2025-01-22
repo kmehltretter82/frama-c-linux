@@ -25,14 +25,14 @@
 (* -------------------------------------------------------------------------- *)
 
 val pp_sequence : 'a Pretty_utils.formatter -> Format.formatter ->
-  'a Sigs.sequence -> unit
-val pp_equation : Format.formatter -> Sigs.equation -> unit
-val pp_acs : Format.formatter -> Sigs.acs -> unit
+  'a Memory.sequence -> unit
+val pp_equation : Format.formatter -> Memory.equation -> unit
+val pp_acs : Format.formatter -> Memory.acs -> unit
 val pp_value : 'a Pretty_utils.formatter -> Format.formatter ->
-  'a Sigs.value -> unit
+  'a Memory.value -> unit
 val pp_rloc : 'a Pretty_utils.formatter -> Format.formatter ->
-  'a Sigs.rloc -> unit
+  'a Memory.rloc -> unit
 val pp_sloc : 'a Pretty_utils.formatter -> Format.formatter ->
-  'a Sigs.sloc -> unit
+  'a Memory.sloc -> unit
 
-module Make(_ : Sigs.Model) : Sigs.Model
+module Make(_ : Memory.Model) : Memory.Model

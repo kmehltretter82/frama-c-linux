@@ -30,7 +30,8 @@ open Definitions
 open Ctypes
 open Lang
 open Lang.F
-open Sigs
+open Memory
+open Sigma
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compound Loader                                                    --- *)
@@ -41,9 +42,6 @@ let cluster () =
 
 module type Model =
 sig
-
-  module Chunk : Chunk
-  module Sigma : Sigma with type chunk = Chunk.t
 
   val name : string
 
@@ -56,12 +54,12 @@ sig
   val to_region_pointer : loc -> int * term
   val of_region_pointer : int -> c_object -> term -> loc
 
-  val value_footprint: c_object -> loc -> Sigma.domain
-  val init_footprint: c_object -> loc -> Sigma.domain
+  val value_footprint: c_object -> loc -> domain
+  val init_footprint: c_object -> loc -> domain
 
   val frames : c_object -> loc -> Chunk.t -> frame list
 
-  val last : Sigma.t -> c_object -> loc -> term
+  val last : sigma -> c_object -> loc -> term
 
   val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
     length:term -> Chunk.t -> term
@@ -69,17 +67,17 @@ sig
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
 
-  val load_int : Sigma.t -> c_int -> loc -> term
-  val load_float : Sigma.t -> c_float -> loc -> term
-  val load_pointer : Sigma.t -> typ -> loc -> loc
+  val load_int : sigma -> c_int -> loc -> term
+  val load_float : sigma -> c_float -> loc -> term
+  val load_pointer : sigma -> typ -> loc -> loc
 
-  val store_int : Sigma.t -> c_int -> loc -> term -> Chunk.t * term
-  val store_float : Sigma.t -> c_float -> loc -> term -> Chunk.t * term
-  val store_pointer : Sigma.t -> typ -> loc -> term -> Chunk.t * term
+  val store_int : sigma -> c_int -> loc -> term -> Chunk.t * term
+  val store_float : sigma -> c_float -> loc -> term -> Chunk.t * term
+  val store_pointer : sigma -> typ -> loc -> term -> Chunk.t * term
 
-  val is_init_atom : Sigma.t -> c_object -> loc -> term
-  val is_init_range : Sigma.t -> c_object -> loc -> term -> pred
-  val set_init_atom : Sigma.t -> c_object -> loc -> term -> Chunk.t * term
+  val is_init_atom : sigma -> c_object -> loc -> term
+  val is_init_range : sigma -> c_object -> loc -> term -> pred
+  val set_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
   val set_init : c_object -> loc -> length:term ->
     Chunk.t -> current:term -> term
 
@@ -87,12 +85,6 @@ end
 
 module Make (M : Model) =
 struct
-
-  type chunk = M.Chunk.t
-
-  module Chunk = M.Chunk
-  module Sigma = M.Sigma
-  module Domain = M.Sigma.Chunk.Set
 
   let signature ft =
     let s = Sigma.create () in
@@ -106,7 +98,7 @@ struct
     List.rev !xs , List.rev !cs , s
 
   let domain obj loc =
-    M.Sigma.Chunk.Set.union
+    Domain.union
       (M.value_footprint obj loc)
       (M.init_footprint obj loc)
 
@@ -209,12 +201,12 @@ struct
 
   module type LOAD_INFO = sig
     val kind : Lang.datakind
-    val footprint : c_object -> M.loc -> M.Sigma.domain
+    val footprint : c_object -> M.loc -> domain
     val t_comp : compinfo -> Lang.tau
     val t_array : AKEY.base -> Lang.tau
     val comp_id : compinfo -> string
     val array_id : AKEY.base -> string
-    val load : M.Sigma.t -> c_object -> M.loc -> term
+    val load : sigma -> c_object -> M.loc -> term
   end
 
   module VALUE_LOAD_INFO = struct
@@ -373,9 +365,9 @@ struct
 
   module LOADER_GEN
       (ATOM: sig
-         val load_int : M.Sigma.t -> c_int -> M.loc -> term
-         val load_float : M.Sigma.t -> c_float -> M.loc -> term
-         val load_pointer : M.Sigma.t -> typ -> M.loc -> term
+         val load_int : sigma -> c_int -> M.loc -> term
+         val load_float : sigma -> c_float -> M.loc -> term
+         val load_pointer : sigma -> typ -> M.loc -> term
        end)
       (COMP: sig val get : (int*compinfo) -> (lfun * chunk list) end)
       (ARRAY: sig val get : (int*AKEY.base*Matrix.t) -> (lfun * chunk list) end)
@@ -418,7 +410,7 @@ struct
   let () = VALUE_LOAD_INFO.load_rec := load_value
 
   let load sigma obj loc =
-    let open Sigs in
+    let open Memory in
     match obj with
     | C_int i -> Val (M.load_int sigma i loc)
     | C_float f -> Val (M.load_float sigma f loc)

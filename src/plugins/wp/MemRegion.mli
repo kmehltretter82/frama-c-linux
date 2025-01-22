@@ -23,10 +23,11 @@
 open Cil_types
 open Ctypes
 open Lang.F
-open Sigs
+open Memory
+open Sigma
 
-type primitive = | Int of c_int | Float of c_float | Ptr
-type kind = Single of primitive | Many of primitive | Garbled
+type prim = | Int of c_int | Float of c_float | Ptr
+type kind = Single of prim | Many of prim | Garbled
 val pp_kind : Format.formatter -> kind -> unit
 
 (* -------------------------------------------------------------------------- *)
@@ -36,9 +37,9 @@ val pp_kind : Format.formatter -> kind -> unit
 module type RegionProxy =
 sig
   type region
-  module Type : Sigs.Type with type t = region
   val id : region -> int
   val of_id : int -> region option
+  val pretty : Format.formatter -> region -> unit
   val kind : region -> kind
   val name : region -> string option
   val cvar : varinfo -> region option
@@ -53,7 +54,7 @@ end
 
 module type ModelWithLoader =
 sig
-  include Sigs.Model
+  include Memory.Model
   val sizeof : c_object -> term
 
   val last : sigma -> c_object -> loc -> term
@@ -81,4 +82,4 @@ sig
   val init_footprint : c_object -> loc -> domain
 end
 
-module Make : RegionProxy -> ModelWithLoader -> Sigs.Model
+module Make : RegionProxy -> ModelWithLoader -> Memory.Model

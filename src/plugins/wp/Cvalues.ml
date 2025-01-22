@@ -29,7 +29,7 @@ open Ctypes
 open Qed
 open Lang
 open Lang.F
-open Sigs
+open Memory
 open Definitions
 
 (* -------------------------------------------------------------------------- *)
@@ -583,12 +583,12 @@ let negate = function
   | `Negative -> `Positive
   | `NoPolarity -> `NoPolarity
 
-module Logic(M : Sigs.Model) =
+module Logic(M : Memory.Model) =
 struct
 
-  type logic = M.loc Sigs.logic
-  type segment = c_object * M.loc Sigs.sloc
-  type region = M.loc Sigs.region
+  type logic = M.loc Memory.logic
+  type segment = c_object * M.loc Memory.sloc
+  type region = M.loc Memory.region
 
   (* -------------------------------------------------------------------------- *)
   (* --- Projections                                                        --- *)

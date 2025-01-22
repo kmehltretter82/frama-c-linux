@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Lang.F
-open Sigs
+open Memory
 open Ctypes
 
 module Logic = Qed.Logic
@@ -126,7 +126,6 @@ end
 (* Model *)
 let datatype = "MemBytes"
 let lc_name = String.lowercase_ascii datatype
-let dkey_state = Wp_parameters.register_category (lc_name ^ ":state")
 let dkey_model = Wp_parameters.register_category (lc_name ^ ":model")
 
 let configure () =
@@ -181,23 +180,22 @@ struct
     | Init -> "init"
     | Alloc -> "alloc"
 
+  let is_init = function Init -> true | Mem | Alloc -> false
+  let is_primary _ = false
   let is_framed _ = false
 end
 
-module Heap = Qed.Collection.Make(Chunk)
-module Sigma = Sigma.Make(Chunk)(Heap)
+module State = Sigma.Make(Chunk)
+
+let m_alloc = State.chunk Alloc
+let m_init = State.chunk Init
+let m_mem = State.chunk Mem
 
 type loc = term
-
-let pretty fmt =
-  Format.fprintf fmt "l:(%a)" pp_term
 
 let vars = vars
 let occurs = occurs
 
-type chunk = Chunk.t
-type sigma = Sigma.t
-type domain = Sigma.domain
 type segment = loc rloc
 
 let shift_cluster () =
@@ -382,20 +380,15 @@ module Shift = WpContext.Generator(Cobj)
         dfun.d_lfun
     end)
 
-let field loc f =
-  Wp_parameters.debug ~level:3 ~dkey:dkey_model
-    "%s.field %a.%a" datatype pretty loc Cil_printer.pp_field f ;
-  e_fun (ShiftField.get f) [loc]
-let shift loc obj k =
-  Wp_parameters.debug ~level:3 ~dkey:dkey_model
-    "%s.shift %a + %a(%a)" datatype pretty loc pp_term k Ctypes.pp_object obj ;
-  e_fun (Shift.get obj) [loc;k]
+let field loc f = e_fun (ShiftField.get f) [loc]
+let shift loc obj k = e_fun (Shift.get obj) [loc;k]
 
 (* ********************************************************************** *)
 (* VALIDITY and SEPARATION                                                *)
 (* ********************************************************************** *)
 
-let allocated sigma l = e_get (Sigma.value sigma Alloc) (MemAddr.base l)
+let allocated sigma l =
+  e_get (Sigma.value sigma m_alloc) (MemAddr.base l)
 
 let s_valid sigma acs p n =
   let valid = match acs with
@@ -403,10 +396,10 @@ let s_valid sigma acs p n =
     | RD -> MemAddr.valid_rd
     | OBJ -> (fun m p _ -> MemAddr.valid_obj m p)
   in
-  valid (Sigma.value sigma Alloc) p n
+  valid (Sigma.value sigma m_alloc) p n
 
 let s_invalid sigma p n =
-  MemAddr.invalid (Sigma.value sigma Alloc) p n
+  MemAddr.invalid (Sigma.value sigma m_alloc) p n
 
 let segment phi = function
   | Rloc(obj,l) ->
@@ -559,7 +552,7 @@ let load_int_raw memory kind addr =
   read memory addr
 
 let load_int sigma kind addr =
-  load_int_raw (Sigma.value sigma Chunk.Mem) kind addr
+  load_int_raw (Sigma.value sigma m_mem) kind addr
 
 let load_float sigma kind addr =
   int_to_float kind @@ load_int sigma (Float.ikind kind) addr
@@ -579,7 +572,7 @@ let load_init memory size loc =
   | _ -> assert false
 
 let is_init_atom sigma obj loc =
-  let init_memory = Sigma.value sigma Init in
+  let init_memory = Sigma.value sigma m_init in
   let size = sizeof_object obj in
   load_init init_memory size loc
 
@@ -595,7 +588,7 @@ let store_int sigma kind addr v =
     | UInt64 -> WBytes.write_uint64
     | SInt64 -> WBytes.write_sint64
   in
-  Chunk.Mem, write (Sigma.value sigma Mem) addr v
+  m_mem, write (Sigma.value sigma m_mem) addr v
 
 let store_float sigma kind addr v =
   store_int sigma (Float.ikind kind) addr @@ float_to_int kind v
@@ -614,13 +607,11 @@ let store_init_raw m size loc v =
   write m loc v
 
 let set_init_atom sigma obj loc v =
-  let init_memory = Sigma.value sigma Init in
+  let init_memory = Sigma.value sigma m_init in
   let size = sizeof_object obj in
-  Chunk.Init, store_init_raw init_memory size loc v
+  m_init, store_init_raw init_memory size loc v
 
 module Model = struct
-  module Chunk = Chunk
-  module Sigma = Sigma
 
   let name = "MemBytes.Loader"
 
@@ -634,8 +625,8 @@ module Model = struct
   let to_region_pointer l = 0,l
   let of_region_pointer _r _obj l = l
 
-  let value_footprint _ _ = Sigma.Chunk.Set.singleton Chunk.Mem
-  let init_footprint _ _ = Sigma.Chunk.Set.singleton Chunk.Init
+  let value_footprint _ _ = Sigma.Domain.singleton m_mem
+  let init_footprint _ _ = Sigma.Domain.singleton m_init
 
   let frames  ~addr:p ~offset:n ?(basename="mem") tau =
     let t_block = Qed.Logic.Array (Qed.Logic.Int, tau) in
@@ -657,23 +648,27 @@ module Model = struct
       "havoc"  , []    , [sep]     , m , mh ;
     ]
 
-  let frames obj addr = function
-    | Chunk.Alloc -> []
-    | m ->
+  let frames obj addr chunk =
+    match Sigma.ckind chunk with
+    | State.Mu Alloc -> []
+    | State.Mu m ->
       let offset = sizeof obj in
       let tau = Chunk.val_of_chunk m in
       let basename = Chunk.basename_of_chunk m in
       frames ~addr ~offset ~basename tau
+    | _ -> []
 
   let last sigma obj l =
     let n = protected_sizeof_object obj in
     e_sub (e_div (allocated sigma l) n) e_one
 
   let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    if chunk <> Chunk.Alloc then
+    match Sigma.ckind chunk with
+    | State.Mu Alloc -> msrc
+    | State.Mu _ ->
       let n = e_mul (e_int @@ sizeof_object obj) length in
       WBytes.memcpy mtgt msrc ltgt lsrc n
-    else msrc
+    | _ -> assert false
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
@@ -697,7 +692,7 @@ module Model = struct
   let is_init_atom = is_init_atom
   let is_init_range sigma obj loc length =
     let n = e_mul (sizeof obj) length in
-    WBytes.is_init_range (Sigma.value sigma Init) loc n
+    WBytes.is_init_range (Sigma.value sigma m_init) loc n
 
   let set_init_atom = set_init_atom
   let set_init obj loc ~length _chunk ~current =
@@ -872,7 +867,7 @@ module STRING = WpContext.Generator(LITERAL)
         let i = Lang.freshvar ~basename:"i" Lang.t_int in
         let c = Cstring.char_at cst (e_var i) in
         let ikind = Ctypes.c_char () in
-        let m = Lang.freshvar ~basename:"mchar" (Chunk.tau_of_chunk Mem) in
+        let m = Lang.freshvar ~basename:"mchar" @@ Chunk.tau_of_chunk Mem in
         let addr = shift (MemAddr.global base) (C_int ikind) (e_var i) in
         let v = load_int_raw (e_var m) ikind addr in
         let read = Lang.F.(p_equal c v) in
@@ -936,8 +931,6 @@ let global _sigma p =
 (* STATE                                                                  *)
 (* ********************************************************************** *)
 
-type state = chunk Tmap.t
-
 let rec lookup_a e =
   match repr e with
   | Fun( f , [e] ) when MemAddr.is_f_global f -> lookup_a e
@@ -950,45 +943,24 @@ and lookup_f f es =
     | RS_Index _ , [e;k] -> Mstate.index (lookup_lv e) k
     | _ -> raise Not_found
   with Not_found when es = [] ->
-    Sigs.(Mvar (RegisterBASE.find f),[])
+    Memory.(Mvar (RegisterBASE.find f),[])
 
-and lookup_lv e = try lookup_a e with Not_found -> Sigs.(Mmem e,[])
-
-let mchunk c =
-  match c with
-  | Chunk.Init -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KInit)
-  | _ -> Sigs.Mchunk (Pretty_utils.to_string Chunk.pretty c, KValue)
+and lookup_lv e = try lookup_a e with Not_found -> Memory.(Mmem e,[])
 
 let lookup s e =
-  Wp_parameters.debug ~level:2 ~dkey:dkey_state "%s.lookup _ %a"
-    datatype pp_term e ;
-  try mchunk (Tmap.find e s)
-  with Not_found ->
-  try match repr e with
-    | Fun( f , es ) -> Sigs.Maddr (lookup_f f es)
-    | Aget( m , k ) when Tmap.find m s = Init ->
-      Sigs.Mlval (lookup_lv k, KInit)
-    | Aget( m , k ) when Tmap.find m s <> Alloc ->
-      Sigs.Mlval (lookup_lv k, KValue)
-    | _ -> Sigs.Mterm
-  with Not_found -> Sigs.Mterm
+  match repr e with
+  | Fun( f , es ) -> Memory.Maddr (lookup_f f es)
+  | Aget( m , k ) ->
+    begin
+      match Sigma.ckind @@ Tmap.find m s with
+      | State.Mu Alloc -> raise Not_found
+      | State.Mu Init -> Memory.Minit (lookup_lv k)
+      | State.Mu _ -> Memory.Mlval (lookup_lv k)
+      | _ -> raise Not_found
+    end
+  | _ -> raise Not_found
 
-let state sigma =
-  Wp_parameters.debug ~level:2 ~dkey:dkey_state "%s.state _" datatype ;
-  let s = ref Tmap.empty in
-  Sigma.iter (fun c x -> s := Tmap.add (e_var x) c !s) sigma ; !s
-
-let iter f s =
-  Wp_parameters.debug ~level:2 ~dkey:dkey_state "%s.iter _ _" datatype ;
-  Tmap.iter (fun m c -> f (mchunk c) m) s
-
-let updates _ _ =
-  Wp_parameters.debug ~level:2 ~dkey:dkey_state "%s.updates _ _" datatype ;
-  Bag.empty
-
-let apply f s =
-  Wp_parameters.debug ~level:2 ~dkey:dkey_state "%s.apply _ _" datatype ;
-  Tmap.fold (fun m c w -> Tmap.add (f m) c w) s Tmap.empty
+let updates _ _ = Bag.empty
 
 (* ********************************************************************** *)
 (* POINTERS OPS                                                           *)
@@ -1008,7 +980,7 @@ let base_offset loc =
 let block_length sigma _obj loc =
   Wp_parameters.debug ~level:3 ~dkey:dkey_model
     "%s.block_length _ _ _ " datatype ;
-  e_get (Sigma.value sigma Chunk.Alloc) (MemAddr.base loc)
+  e_get (Sigma.value sigma m_alloc) (MemAddr.base loc)
 
 let cast _ loc =
   Wp_parameters.debug ~level:3 ~dkey:dkey_model
@@ -1028,7 +1000,7 @@ let int_of_loc _ loc =
 
 (* -------------------------------------------------------------------------- *)
 
-let domain _ _ = Sigma.Chunk.Set.of_list [ Init ; Mem ]
+let domain _ _ = Sigma.Domain.of_list [ m_init ; m_mem ]
 
 let is_null = p_equal null
 let loc_eq = p_equal
@@ -1090,14 +1062,14 @@ let frame sigma =
     then [ phi (Sigma.value sigma chunk) ]
     else []
   in
-  wellformed_frame MemAddr.linked Alloc @
-  wellformed_frame WBytes.cinits Init @
-  wellformed_frame WBytes.sconst Mem @
-  [ framed (Sigma.value sigma Mem) ]
+  wellformed_frame MemAddr.linked m_alloc @
+  wellformed_frame WBytes.cinits m_init @
+  wellformed_frame WBytes.sconst m_mem @
+  [ framed (Sigma.value sigma m_mem) ]
 
 let is_well_formed s =
   Wp_parameters.debug ~level:2 ~dkey:dkey_model "%s.is_well_formed _" datatype ;
-  WBytes.bytes (Sigma.value s Mem)
+  WBytes.bytes (Sigma.value s m_mem)
 
 (* ********************************************************************** *)
 (* ALLOCATION                                                             *)
@@ -1107,25 +1079,25 @@ let alloc sigma xs =
   Wp_parameters.debug ~level:2 ~dkey:dkey_model
     "%s.alloc %a %a"
     datatype Sigma.pretty sigma (Pretty_utils.pp_list Cil_printer.pp_varinfo) xs ;
-  if xs = [] then sigma else Sigma.havoc_chunk sigma Alloc
+  if xs = [] then sigma else Sigma.havoc_chunk sigma m_alloc
 
 let scope seq scope xs =
   Wp_parameters.debug ~level:2 ~dkey:dkey_model
     "%s.scope { %a ; %a } %s %a"
     datatype Sigma.pretty seq.pre Sigma.pretty seq.post
-    (if scope = Sigs.Enter then "Enter" else "Leave")
+    (if scope = Memory.Enter then "Enter" else "Leave")
     (Pretty_utils.pp_list Cil_printer.pp_varinfo) xs ;
   if xs = [] then [] else
     let alloc =
       List.fold_left
         (fun m x ->
            let size = match scope with
-             | Sigs.Leave -> e_zero
-             | Sigs.Enter ->
+             | Memory.Leave -> e_zero
+             | Memory.Enter ->
                protected_sizeof_object @@ Ctypes.object_of x.Cil_types.vtype
            in e_set m (BASE.get x) size)
-        (Sigma.value seq.pre Alloc) xs in
-    [ p_equal (Sigma.value seq.post Alloc) alloc ]
+        (Sigma.value seq.pre m_alloc) xs in
+    [ p_equal (Sigma.value seq.post m_alloc) alloc ]
 
 (* ********************************************************************** *)
 (* API with Region                                                        *)

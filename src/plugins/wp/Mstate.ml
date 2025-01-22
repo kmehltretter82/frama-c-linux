@@ -20,25 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Lang.F
-open Sigs
-
-type (_,_) eq = Equal : 'a -> ('a,'a) eq | NotEqual : ('a,'b) eq
-
-module Ident :
-sig
-  type 'a t
-  val create : 'a -> 'a t
-  val get : 'a t -> 'a
-  val eq : 'a t -> 'b t -> ('a,'b) eq
-end =
-struct
-  let k = ref 0
-  type 'a t = int * 'a
-  let get = snd
-  let create s = incr k ; (!k,s)
-  let eq (k,s) (k',_) = if k = k' then Obj.magic (Equal s) else NotEqual
-end
+open Memory
 
 (* -------------------------------------------------------------------------- *)
 (* --- L-Val Utility                                                      --- *)
@@ -68,35 +50,41 @@ let equal a b = a == b || (host_eq (fst a) (fst b) && offset_eq (snd a) (snd b))
 (* --- Memory State Pretty Printing Information                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-type 'a operations = {
-  apply : (term -> term) -> 'a -> 'a ;
-  lookup : 'a -> term -> mval ;
-  updates : 'a sequence -> Vars.t -> update Bag.t ;
-  iter : (mval -> term -> unit) -> 'a -> unit ;
-}
+type state = STATE of {
+    model : (module Memory.Model) ;
+    state : Sigma.state ;
+  }
 
-type 'a model = MODEL : 'a operations Ident.t * ('b -> 'a) -> 'b model
+let create (module M: Memory.Model) sigma =
+  STATE { model = (module M) ; state = Sigma.state sigma }
 
-let create (type s) (module M : Sigs.Model with type Sigma.t = s) =
-  let op = {
-    apply = M.apply ;
-    lookup = M.lookup ;
-    updates = M.updates ;
-    iter = M.iter ;
-  } in
-  MODEL( Ident.create op , M.state )
+let apply f = function STATE { model ; state } ->
+  let module M = (val model) in
+  let state = Sigma.apply f state in
+  STATE { model ; state }
 
-type state = STATE : 'a operations Ident.t * 'a -> state
+let lookup s e =
+  match s with STATE { model ; state } ->
+    let module M = (val model) in
+    try M.lookup state e
+    with Not_found ->
+      Mchunk (Lang.F.Tmap.find e state)
 
-let state model sigma = match model with MODEL(op,state) -> STATE(op,state sigma)
-
-let iter f = function STATE(m,s) -> (Ident.get m).iter f s
-let apply f = function STATE(m,s) -> STATE(m,(Ident.get m).apply f s)
-let lookup s e = match s with STATE(m,s) -> (Ident.get m).lookup s e
 let updates seq vars =
-  match seq.pre , seq.post with STATE(p,u) , STATE(q,v) ->
-  match Ident.eq p q with
-  | Equal s -> s.updates { pre = u ; post = v } vars
-  | NotEqual -> Bag.empty (* assert false *)
+  match seq.pre, seq.post with
+    STATE { model ; state = pre },
+    STATE { state = post } ->
+    let module M = (val model) in
+    M.updates { pre ; post } vars
+
+let iter f s =
+  match s with STATE { model ; state } ->
+    let module M = (val model) in
+    Lang.F.Tmap.iter
+      (fun value chunk ->
+         match M.lookup state value with
+         | exception Not_found -> f (Mchunk chunk) value
+         | mval -> f mval value
+      ) state
 
 (* -------------------------------------------------------------------------- *)

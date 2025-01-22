@@ -50,7 +50,7 @@ type prop_kind =
   | PKSmoke       (** expected to fail *)
   | PKPre of kernel_function * stmt * Property.t
   (** precondition for function
-      at stmt, property of the require. Many information that should come
+      at stmt, property of the require. Mterm information that should come
       from the p_prop part of the prop_id, but in the PKPre case,
       it seems that it is hidden in a IPBlob property ! *)
 

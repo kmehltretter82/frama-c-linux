@@ -152,7 +152,7 @@ val included :
   shift:('loc -> Ctypes.c_object -> term -> 'loc) ->
   addrof:('loc -> term) ->
   sizeof:(Ctypes.c_object -> term) ->
-  'loc Sigs.rloc -> 'loc Sigs.rloc -> pred
+  'loc Memory.rloc -> 'loc Memory.rloc -> pred
 (** [included ~shift ~addrof ~sizeof r1 r2] builds a predicate that checks
     whether [r1] is included in [r2].
     - [shift loc obj k]: [loc] shifted of [k] [obj] in the memory model,
@@ -164,7 +164,7 @@ val separated :
   shift:('loc -> Ctypes.c_object -> term -> 'loc) ->
   addrof:('loc -> term) ->
   sizeof:(Ctypes.c_object -> term) ->
-  'loc Sigs.rloc -> 'loc Sigs.rloc -> pred
+  'loc Memory.rloc -> 'loc Memory.rloc -> pred
 (** [separated ~shift ~addrof ~sizeof r1 r2] builds a predicate that checks
     whether [r1] and [r2] are separated.
     - [shift loc obj k]: [loc] shifted of [k] [obj] in the memory model,

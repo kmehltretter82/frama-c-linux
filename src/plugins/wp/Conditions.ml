@@ -783,7 +783,7 @@ let ground (hs,g) =
 (* --- Letify                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module Sigma = Letify.Sigma
+module Subst = Letify.Subst
 module Defs = Letify.Defs
 
 let used_of_dseq ds =
@@ -801,12 +801,12 @@ let locals sigma ~target ~required ?(step=Vars.empty) k dseq =
        if i > k then t := Vars.union !t step.vars ;
        if i <> k then e := Vars.union !e step.vars ;
     ) dseq ;
-  Vars.diff !t (Sigma.domain sigma) , !e
+  Vars.diff !t (Subst.domain sigma) , !e
 
 let dseq_of_step sigma step =
   let defs =
     match step.condition with
-    | Init p | Have p | When p | Core p -> Defs.extract (Sigma.p_apply sigma p)
+    | Init p | Have p | When p | Core p -> Defs.extract (Subst.p_apply sigma p)
     | Type _ | Branch _ | Either _ | State _ | Probe _ -> Defs.empty
   in defs , step
 
@@ -817,13 +817,13 @@ let letify_assume sref (_,step) =
     | Type _ | Branch _ | Either _ | State _ | Probe _ -> ()
     | Init p | Have p | When p | Core p ->
       if Wp_parameters.Simpl.get () then
-        sref := Sigma.assume current p
+        sref := Subst.assume current p
   end ; current
 
 let rec letify_type sigma used p = match F.p_expr p with
   | And ps -> p_all (letify_type sigma used) ps
   | _ ->
-    let p = Sigma.p_apply sigma p in
+    let p = Subst.p_apply sigma p in
     let vs = F.varsp p in
     if Vars.intersect used vs || Vars.is_empty vs then p else F.p_true
 
@@ -835,11 +835,11 @@ let rec letify_seq sigma0 ~target ~export (seq : step list) =
   let sigma2 = !sref in (* with assumptions *)
   let outside = Vars.union export target in
   let inside = used_of_dseq dseq in
-  let used = Vars.diff (Vars.union outside inside) (Sigma.domain sigma2) in
-  let required = Vars.union outside (Sigma.codomain sigma2) in
+  let used = Vars.diff (Vars.union outside inside) (Subst.domain sigma2) in
+  let required = Vars.union outside (Subst.codomain sigma2) in
   let sequence =
     Array.mapi (letify_step dseq dsigma ~used ~required ~target) dseq in
-  let modified = ref (not (Sigma.equal sigma0 sigma1)) in
+  let modified = ref (not (Subst.equal sigma0 sigma1)) in
 (*
   let sequence =
     if Wp_parameters.Ground.get () then fst (ground_hrp sequence)
@@ -851,32 +851,32 @@ let rec letify_seq sigma0 ~target ~export (seq : step list) =
 and letify_step dseq dsigma ~required ~target ~used i (d,s) =
   let sigma = dsigma.(i) in
   let cond = match s.condition with
-    | Probe(p,t) -> Probe (p,Sigma.e_apply sigma t)
-    | State s -> State (Mstate.apply (Sigma.e_apply sigma) s)
+    | Probe(p,t) -> Probe (p,Subst.e_apply sigma t)
+    | State s -> State (Mstate.apply (Subst.e_apply sigma) s)
     | Init p ->
-      let p = Sigma.p_apply sigma p in
+      let p = Subst.p_apply sigma p in
       let ps = Letify.add_definitions sigma d required [p] in
       Init (p_conj ps)
     | Have p ->
-      let p = Sigma.p_apply sigma p in
+      let p = Subst.p_apply sigma p in
       let ps = Letify.add_definitions sigma d required [p] in
       Have (p_conj ps)
     | Core p ->
-      let p = Sigma.p_apply sigma p in
+      let p = Subst.p_apply sigma p in
       let ps = Letify.add_definitions sigma d required [p] in
       Core (p_conj ps)
     | When p ->
-      let p = Sigma.p_apply sigma p in
+      let p = Subst.p_apply sigma p in
       let ps = Letify.add_definitions sigma d required [p] in
       When (p_conj ps)
     | Type p ->
       Type (letify_type sigma used p)
     | Branch(p,a,b) ->
-      let p = Sigma.p_apply sigma p in
+      let p = Subst.p_apply sigma p in
       let step = F.varsp p in
       let (target,export) = locals sigma ~target ~required ~step i dseq in
-      let sa = Sigma.assume sigma p in
-      let sb = Sigma.assume sigma (p_not p) in
+      let sa = Subst.assume sigma p in
+      let sb = Subst.assume sigma (p_not p) in
       let a = letify_case sa ~target ~export a in
       let b = letify_case sb ~target ~export b in
       Branch(p,a,b)
@@ -1173,7 +1173,7 @@ and compute limit solvers sigma s0 =
   let export = Vars.empty in
   let modified , sigma1 , sigma2 , hs =
     letify_seq sigma ~target ~export hs in
-  let p = Sigma.p_apply sigma2 p in
+  let p = Subst.p_apply sigma2 p in
   let s2 = ground (hs , p) in
   if is_trivial_hsp s2 then [],p_true
   else
@@ -1185,10 +1185,10 @@ and compute limit solvers sigma s0 =
     | Trivial -> [],p_true
     | NoSimplification -> s2
 
-let letify_hsp ?(solvers=[]) hsp = fixpoint 10 solvers Sigma.empty hsp
+let letify_hsp ?(solvers=[]) hsp = fixpoint 10 solvers Subst.empty hsp
 
 let rec simplify ?(solvers=[]) ?(intros=10) (seq,p0) =
-  let hs,p = fixpoint 10 solvers Sigma.empty (seq.seq_list,p0) in
+  let hs,p = fixpoint 10 solvers Subst.empty (seq.seq_list,p0) in
   let sequent = sequence hs , p in
   match introduction sequent with
   | Some introduced ->
@@ -1685,8 +1685,9 @@ struct
         if Lang.F.is_primitive t then ()
         else
           match Mstate.lookup s t with
-          | Mlval(_, KInit) | Mchunk(_, KInit) -> raise Found
-          | _ -> ()
+          | Minit _ -> raise Found
+          | Mchunk chunk when Sigma.is_init chunk -> raise Found
+          | exception Not_found | _ -> ()
       in
       if Tset.mem t !visited then ()
       else begin

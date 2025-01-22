@@ -24,4 +24,4 @@
 (* --- Empty Memory Model                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-include Sigs.Model
+include Memory.Model

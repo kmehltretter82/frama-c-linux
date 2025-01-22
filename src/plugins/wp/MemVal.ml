@@ -28,8 +28,8 @@ open Cil_types
 open Cil_datatype
 open Ctypes
 open Lang
-open Lang.F
-open Sigs
+open Sigma
+open Memory
 open Definitions
 
 module Logic = Qed.Logic
@@ -63,13 +63,13 @@ sig
   val cvar : varinfo -> t
 
   val field : t -> Cil_types.fieldinfo -> t
-  val shift : t -> Ctypes.c_object -> term -> t
+  val shift : t -> Ctypes.c_object -> F.term -> t
   val base_addr : t -> t
 
   val load : state -> t -> Ctypes.c_object -> t
 
   val domain : t -> Base.t list
-  val offset : t -> (term -> pred)
+  val offset : t -> (F.term -> F.pred)
 
   val pretty : Format.formatter -> t -> unit
 end
@@ -100,17 +100,17 @@ let f_shift  = Lang.extern_f ~library ~result:t_addr "shift"
 let f_global = Lang.extern_f ~library ~result:t_addr "global"
 let f_null   = Lang.extern_f ~library ~result:t_addr "null"
 
-let a_null = F.constant (e_fun f_null []) (* { base = 0; offset = 0 } *)
-let a_base p = e_fun f_base [p]           (* p -> p.offset *)
-let a_offset p = e_fun f_offset [p]       (* p -> p.base *)
-let a_global b = e_fun f_global [b]       (* b -> { base = b; offset = 0 } *)
-let a_shift l k = e_fun f_shift [l;k]     (* p k -> { p w/ offset = p.offset + k } *)
+let a_null = F.constant (F.e_fun f_null []) (* { base = 0; offset = 0 } *)
+let a_base p = F.e_fun f_base [p]           (* p -> p.offset *)
+let a_offset p = F.e_fun f_offset [p]       (* p -> p.base *)
+let a_global b = F.e_fun f_global [b]       (* b -> { base = b; offset = 0 } *)
+let a_shift l k = F.e_fun f_shift [l;k]     (* p k -> { p w/ offset = p.offset + k } *)
 let a_addr b k = a_shift (a_global b) k   (* b k -> { base = b; offset = k } *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Cmath Wrapper                                                     --- *)
 (* -------------------------------------------------------------------------- *)
-let a_iabs i = e_fun ~result:Logic.Int Cmath.f_iabs [i]    (* x -> |x| *)
+let a_iabs i = F.e_fun ~result:Logic.Int Cmath.f_iabs [i]    (* x -> |x| *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  MemValue Types                                                     --- *)
@@ -127,7 +127,7 @@ let phi_base t = match F.repr t with
   | _ -> raise Not_found
 
 let phi_offset t = match F.repr t with
-  | Logic.Fun (f, [p; k]) when f == f_shift -> e_add (a_offset p) k
+  | Logic.Fun (f, [p; k]) when f == f_shift -> F.e_add (a_offset p) k
   | Logic.Fun (f, _) when f == f_global -> F.e_zero
   | _ -> raise Not_found
 
@@ -187,8 +187,7 @@ struct
     | Unknown (_, _, m) -> Integer.succ m
     | Variable { max_allocable } -> Integer.succ max_allocable
 
-  let size_from_validity b =
-    Integer.(e_div (bitsize_from_validity b) eight)
+  let size_from_validity b = Integer.(e_div (bitsize_from_validity b) eight)
 end
 
 
@@ -225,68 +224,57 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* ---  Chunk                                                             --- *)
   (* -------------------------------------------------------------------------- *)
-  type chunk =
-    | M_base of Base.t
 
   module Chunk =
   struct
-    type t = chunk
+    type t = Base.t
     let self = "MemVal.Chunk"
-    let hash = function
-      | M_base b -> 5 * Base.hash b
-    let equal c1 c2 = match c1, c2 with
-      | M_base b1, M_base b2 -> Base.equal b1 b2
-    let compare c1 c2 = match c1, c2 with
-      | M_base b1, M_base b2 -> Base.compare b1 b2
-    let pretty fmt = function
-      | M_base b -> Base.pretty fmt b
-    let tau_of_chunk = function
-      | M_base _ -> t_words
-    let basename_of_base = function
+    let hash = Base.hash
+    let equal = Base.equal
+    let compare = Base.compare
+    let pretty = Base.pretty
+    let tau_of_chunk _base = t_words
+    let basename_of_chunk = function
       | Base.Var (vi, _) -> Format.sprintf "MVar_%s" (LogicUsage.basename vi)
       | Base.CLogic_Var (_, _, _) -> assert false (* not supposed to append. *)
       | Base.Null -> "MNull"
       | Base.String (eid, _) -> Format.sprintf "MStr_%d" eid
       | Base.Allocated (vi, _dealloc, _) ->
         Format.sprintf "MAlloc_%s" (LogicUsage.basename vi)
-    let basename_of_chunk = function
-      | M_base b -> basename_of_base b
-    let is_framed = function
-      | M_base b ->
-        try
-          (match WpContext.get_scope () with
-           | WpContext.Global -> assert false
-           | WpContext.Kf kf -> Base.is_formal_or_local b (Kernel_function.get_definition kf))
-        with Invalid_argument _ | Kernel_function.No_Definition ->
-          assert false (* by context. *)
+
+    let is_init _ = false
+    let is_primary = function Base.Var _ -> true | _ -> false
+
+    let is_framed b =
+      try
+        (match WpContext.get_scope () with
+         | WpContext.Global -> assert false
+         | WpContext.Kf kf -> Base.is_formal_or_local b (Kernel_function.get_definition kf))
+      with Invalid_argument _ | Kernel_function.No_Definition ->
+        assert false (* by context. *)
+
   end
 
   let cluster () = Definitions.cluster ~id:"MemVal"  ()
 
-  module Heap = Qed.Collection.Make(Chunk)
-  module Sigma = Sigma.Make(Chunk)(Heap)
+  module State = Sigma.Make(Chunk)
 
   type loc = {
     loc_v : V.t;
-    loc_t : term (* of type addr *)
+    loc_t : F.term (* of type addr *)
   }
 
-  type sigma = Sigma.t
   type segment = loc rloc
 
-  type state = unit
-  let state _ = ()
-  let iter _ _ = ()
-  let lookup _ _ = Mterm
+  let lookup _ _ = raise Not_found
   let updates _ _ = Bag.empty
-  let apply _ _ = ()
 
   let pretty fmt l =
     Format.fprintf fmt "([@ t:%a,@ v:%a @])"
       F.pp_term l.loc_t
       V.pretty l.loc_v
 
-  let vars _l = Vars.empty
+  let vars _l = F.Vars.empty
   let occurs _x _l = false
 
   (* -------------------------------------------------------------------------- *)
@@ -365,14 +353,14 @@ struct
         let axiomatize ~obj:_ suffix t_mem t_data f_rd f_wr =
           let name = "axiom_" ^ suffix in
           let xw = Lang.freshvar ~basename:"w" t_mem in
-          let w = e_var xw in
+          let w = F.e_var xw in
           let xo = Lang.freshvar ~basename:"o" Logic.Int in
-          let o = e_var xo in
+          let o = F.e_var xo in
           let xv = Lang.freshvar ~basename:"v" t_data in
-          let v = e_var xv in
-          let p_write = e_fun f_wr [w; o; v] ~result:t_mem in
-          let p_read = e_fun f_rd [p_write; o] ~result:t_data in
-          let lemma = p_equal p_read v in
+          let v = F.e_var xv in
+          let p_write = F.e_fun f_wr [w; o; v] ~result:t_mem in
+          let p_read = F.e_fun f_rd [p_write; o] ~result:t_data in
+          let lemma = F.p_equal p_read v in
           let cluster = cluster () in
           (* if not (Wp_parameters.debug_atleast 1) then begin
            *   F.set_builtin_2 f_rd (phi_read ~obj ~read:f_rd ~write:f_wr)
@@ -389,21 +377,21 @@ struct
         let axiomatize2 ~obj suffix t_mem t_data f_rd f_wr =
           let name = "axiom_" ^ suffix ^ "_2" in
           let xw = Lang.freshvar ~basename:"w" t_mem in
-          let w = e_var xw in
+          let w = F.e_var xw in
           let xwo = Lang.freshvar ~basename:"xwo" Logic.Int in
-          let wo = e_var xwo in
+          let wo = F.e_var xwo in
           let xro = Lang.freshvar ~basename:"xro" Logic.Int in
-          let ro = e_var xro in
+          let ro = F.e_var xro in
           let xv = Lang.freshvar ~basename:"v" t_data in
-          let v = e_var xv in
-          let p_write = e_fun f_wr [w; wo; v] ~result:t_mem in
-          let p_read = e_fun f_rd [p_write; ro] ~result:t_data in
+          let v = F.e_var xv in
+          let p_write = F.e_fun f_wr [w; wo; v] ~result:t_mem in
+          let p_read = F.e_fun f_rd [p_write; ro] ~result:t_data in
           let sizeof = (F.e_int (Ctypes.sizeof_object obj)) in
           let offset = a_iabs (F.e_sub ro wo) in
           let lemma =
             F.p_imply
               (F.p_leq sizeof offset)
-              (F.p_equal p_read (e_fun f_rd [w; ro] ~result:t_data))
+              (F.p_equal p_read (F.e_fun f_rd [w; ro] ~result:t_data))
           in
           let cluster = cluster () in
           Definitions.define_lemma {
@@ -513,15 +501,15 @@ struct
     let d = V.domain l.loc_v in
     assert (d <> []);
     List.fold_left
-      (fun acc b -> Heap.Set.add (M_base b) acc)
-      Heap.Set.empty d
+      (fun acc b -> Domain.add (State.chunk b) acc)
+      Domain.empty d
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Load                                                       --- *)
   (* -------------------------------------------------------------------------- *)
   let load_value sigma obj l =
     let load_base base =
-      let mem = Sigma.value sigma (M_base base) in
+      let mem = State.value sigma base in
       let offset = a_offset l.loc_t in
       read obj ~mem ~offset
     in
@@ -534,7 +522,7 @@ struct
 
   let load_loc ~assume sigma obj l =
     let load_base v' base =
-      let mem = Sigma.value sigma (M_base base) in
+      let mem = State.value sigma base in
       let offset = a_offset l.loc_t in
       let rd = read obj ~mem ~offset in
       if assume then begin
@@ -550,7 +538,7 @@ struct
       loc_t = t;
     }
 
-  let load : sigma -> c_object -> loc -> loc value = fun sigma obj l ->
+  let load sigma obj l =
     StateRef.update ();
     begin match obj with
       | C_int _ | C_float _ -> load_value sigma obj l
@@ -559,15 +547,15 @@ struct
     end
 
   let load_init _sigma obj _loc =
-    e_var @@ Lang.freshvar ~basename:"i" @@ Lang.init_of_object obj
+    F.e_var @@ Lang.freshvar ~basename:"i" @@ Lang.init_of_object obj
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
-  let stored : sigma sequence -> c_object -> loc -> term -> equation list = fun seq obj l v ->
+  let stored seq obj l v =
     let mk_write cond base =
-      let wpre = Sigma.value seq.pre (M_base base) in
-      let wpost = Sigma.value seq.post (M_base base) in
+      let wpre = State.value seq.pre base in
+      let wpost = State.value seq.post base in
       let write = write obj ~mem:wpre ~offset:(a_offset l.loc_t) ~value:v in
       F.p_equal wpost (F.e_if cond write wpre)
     in
@@ -588,8 +576,8 @@ struct
 
   let copied seq obj ll lr =
     let v = match load seq.pre obj lr with
-      | Sigs.Val v -> v
-      | Sigs.Loc l -> l.loc_t
+      | Memory.Val v -> v
+      | Memory.Loc l -> l.loc_t
     in
     stored seq obj ll v
 
@@ -601,7 +589,7 @@ struct
   (* -------------------------------------------------------------------------- *)
   (* ---  Pointer Comparison                                                --- *)
   (* -------------------------------------------------------------------------- *)
-  let is_null l = p_equal l.loc_t a_null
+  let is_null l = F.p_equal l.loc_t a_null
 
   let loc_delta l1 l2 =
     match F.is_equal (a_base l1.loc_t) (a_base l2.loc_t) with
@@ -623,7 +611,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   type range =
-    | LOC of loc * term (*size*)
+    | LOC of loc * F.term (*size*)
     | RANGE of loc * Vset.set (* offset range access from *loc* *)
 
   let range_of_rloc = function
@@ -631,7 +619,7 @@ struct
       LOC (l, F.e_int (Ctypes.sizeof_object obj))
     | Rrange (l, obj, Some a, Some b) ->
       let la = shift l obj a in
-      let n = e_fact (Ctypes.sizeof_object obj) (F.e_range a b) in
+      let n = F.e_fact (Ctypes.sizeof_object obj) (F.e_range a b) in
       LOC (la, n)
     | Rrange (l, obj, a_opt, b_opt) ->
       let f = F.e_fact (Ctypes.sizeof_object obj) in
@@ -657,7 +645,7 @@ struct
       Vset.range (Some F.e_zero) (Some mn_valid)
     | Base.Unknown (_, None, _) -> Vset.empty
 
-  let valid_range : sigma -> acs -> range -> pred = fun _ acs r ->
+  let valid_range acs r =
     let for_writing = match acs with RW -> true | RD -> false
                                    | OBJ -> true (* TODO:  *) in
     let l, base_offset = match r with
@@ -679,17 +667,16 @@ struct
   (** [valid sigma acs seg] returns the formula that tests if a given memory
       segment [seg] (in bytes) is valid (according to [acs]) at memory state
       [sigma]. **)
-  let valid : sigma -> acs -> segment -> pred = fun s acs seg ->
-    valid_range s acs (range_of_rloc seg)
+  let valid _sigma acs seg = valid_range acs (range_of_rloc seg)
 
   let invalid = fun _ _ -> F.p_true (* TODO *)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Scope                                                             --- *)
   (* -------------------------------------------------------------------------- *)
-  let alloc_sigma : sigma -> varinfo list -> sigma = fun sigma xs ->
+  let alloc_vars sigma xs =
     let alloc sigma x =
-      let havoc s c = Sigma.havoc_chunk s (M_base c) in
+      let havoc s b = Sigma.havoc_chunk s (State.chunk b) in
       let v = V.cvar x in
       List.fold_left havoc sigma (V.domain v)
     in
@@ -698,9 +685,9 @@ struct
   let alloc_pred _ _ _ = []
 
   let alloc sigma xs =
-    if xs = [] then sigma else alloc_sigma sigma xs
+    if xs = [] then sigma else alloc_vars sigma xs
 
-  let scope : sigma sequence -> scope -> varinfo list -> pred list = fun seq scope xs ->
+  let scope seq scope xs =
     match scope with
     | Enter -> []
     | Leave ->
@@ -712,12 +699,11 @@ struct
       Sigma.pretty seq.pre
       Sigma.pretty seq.post
       (Pretty_utils.pp_iter ~sep:" " List.iter Varinfo.pretty) xs
-      (Pretty_utils.pp_iter ~sep:" " List.iter pp_pred) preds;
+      (Pretty_utils.pp_iter ~sep:" " List.iter F.pp_pred) preds;
     preds
 
-  let global : sigma -> term (*addr*) -> pred = fun _ _ ->
+  let global _ _ =
     F.p_true (* True is harmless and WP never call this function... *)
-
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Separation                                                        --- *)
@@ -729,35 +715,31 @@ struct
       l, Vset.range (Some a) (Some b)
     | RANGE (l, r) -> l, Vset.lift_add (Vset.singleton l.loc_t) r
 
-  let included : segment -> segment -> pred = fun s1 s2 ->
+  let included : segment -> segment -> F.pred = fun s1 s2 ->
     (* (b1 = b2) -> (r1 \in r2) *)
     let l1, vs1 = range_to_base_offset (range_of_rloc s1) in
     let l2, vs2 = range_to_base_offset (range_of_rloc s2) in
-    p_and
-      (p_equal (a_base l1.loc_t) (a_base l2.loc_t))
+    F.p_and
+      (F.p_equal (a_base l1.loc_t) (a_base l2.loc_t))
       (Vset.subset vs1 vs2)
 
-  let separated : segment -> segment -> pred = fun s1 s2 ->
+  let separated : segment -> segment -> F.pred = fun s1 s2 ->
     (* (b1 = b2) -> (r1 \cap r2) = \empty *)
     let l1, vs1 = range_to_base_offset (range_of_rloc s1) in
     let l2, vs2 = range_to_base_offset (range_of_rloc s2) in
-    p_and
-      (p_equal (a_base l1.loc_t) (a_base l2.loc_t))
+    F.p_and
+      (F.p_equal (a_base l1.loc_t) (a_base l2.loc_t))
       (Vset.disjoint vs1 vs2)
 
   let initialized _sigma _l = F.p_true (* todo *)
   let is_well_formed _ = F.p_true (* todo *)
   let base_offset _loc = assert false (* TODO *)
-  type domain = Sigma.domain
   let no_binder = { bind = fun _ f v -> f v }
   let configure_ia _ = no_binder (* todo *)
   let hypotheses x = x (* todo *)
   let frame _sigma = [] (* todo *)
 
 end
-
-
-
 
 (* -------------------------------------------------------------------------- *)
 (* ---  EVA Instance                                                      --- *)

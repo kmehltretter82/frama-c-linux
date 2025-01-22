@@ -32,14 +32,15 @@ open Clabels
 open Ctypes
 open Lang
 open Lang.F
-open Sigs
+open Memory
+open Sigma
 open Definitions
 
 let dkey_lemma = Wp_parameters.register_category "lemma"
 
 type polarity = [ `Positive | `Negative | `NoPolarity ]
 
-module Make( M : Sigs.Model ) =
+module Make( M : Memory.Model ) =
 struct
 
   (* -------------------------------------------------------------------------- *)
@@ -48,11 +49,9 @@ struct
 
   open M
 
-  type value = M.loc Sigs.value
-  type logic = M.loc Sigs.logic
-  type result = loc Sigs.result
-  type sigma = M.Sigma.t
-  type chunk = M.Chunk.t
+  type value = M.loc Memory.value
+  type logic = M.loc Memory.logic
+  type result = loc Memory.result
 
   type signature =
     | CST of Integer.t
@@ -129,7 +128,7 @@ struct
   type call = {
     kf : kernel_function ;
     formals : value Varinfo.Map.t ;
-    mutable result : M.loc Sigs.result option ;
+    mutable result : M.loc Memory.result option ;
     mutable status : var option ;
   }
 
@@ -267,7 +266,7 @@ struct
     assert (not (Clabels.is_here label));
     try LabelMap.find label frame.labels
     with Not_found ->
-      let s = M.Sigma.create () in
+      let s = Sigma.create () in
       frame.labels <- LabelMap.add label s frame.labels ; s
 
   let set_at_frame frame label sigma =
@@ -390,13 +389,13 @@ struct
       let heap = List.fold_left
           (fun m x ->
              let obj = object_of x.vtype in
-             M.Sigma.Chunk.Set.union m (M.domain obj (M.cvar x))
-          ) M.Sigma.Chunk.Set.empty vars
+             Domain.union m (M.domain obj (M.cvar x))
+          ) Domain.empty vars
       in List.fold_left
         (fun acc l ->
            let label = Clabels.of_logic l in
            let sigma = Sigma.create () in
-           M.Sigma.Chunk.Set.fold_sorted
+           Domain.fold_sorted
              (fun chunk (parm,sigm) ->
                 let x = Sigma.get sigma chunk in
                 let s = Sig_chunk (chunk,label) in
@@ -455,7 +454,7 @@ struct
         let (parm,sigm) =
           LabelMap.fold
             (fun label sigma acc ->
-               M.Sigma.Chunk.Set.fold_sorted
+               Domain.fold_sorted
                  (fun chunk acc ->
                     if filter result (Sigma.get sigma chunk) then
                       let (parm,sigm) = acc in
@@ -476,7 +475,7 @@ struct
   let cc_logic : (env -> Cil_types.term -> logic) ref
     = ref (fun _ _ -> assert false)
   let cc_region
-    : (env -> Cil_types.term -> loc Sigs.region) ref
+    : (env -> Cil_types.term -> loc Memory.region) ref
     = ref (fun _ -> assert false)
 
   let term env t = !cc_term env t
@@ -707,10 +706,10 @@ struct
       let frame = logic_frame l.l_var_info.lv_name l.l_tparams in
       in_frame frame
         (fun () ->
-           Heap.Map.fold_sorted
+           Sigma.Heap.Map.fold_sorted
              (fun chunk labels acc ->
-                let basename = Chunk.basename_of_chunk chunk in
-                let tau = Chunk.tau_of_chunk chunk in
+                let basename = Sigma.Chunk.basename_of_chunk chunk in
+                let tau = Sigma.Chunk.tau_of_chunk chunk in
                 LabelSet.fold
                   (fun label (parm,sigm) ->
                      let x = Lang.freshvar ~basename tau in
@@ -882,7 +881,7 @@ struct
   (* --- Binding Formal with Actual w.r.t Signature                         --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let rec bind_labels env phi_labels labels : M.Sigma.t LabelMap.t =
+  let rec bind_labels env phi_labels labels : sigma LabelMap.t =
     match phi_labels, labels with
     | [], [] -> LabelMap.empty
     | l1 :: phi_labels, l2 :: labels ->
@@ -909,7 +908,7 @@ struct
             with Not_found ->
               Wp_parameters.fatal "*** Label %a not-found@." Clabels.pretty l
           in
-          M.Sigma.value sigma c
+          Sigma.value sigma c
       ) sparam
 
   let call_fun env

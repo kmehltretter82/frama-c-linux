@@ -31,7 +31,7 @@ open Ctypes
 open MemoryContext
 open Lang
 open Lang.F
-open Sigs
+open Memory
 
 module type VarUsage =
 sig
@@ -64,7 +64,7 @@ struct
   let iter = Raw.iter
 end
 
-module Make(V : VarUsage)(M : Sigs.Model) =
+module Make(V : VarUsage)(M : Memory.Model) =
 struct
 
   (* -------------------------------------------------------------------------- *)
@@ -89,12 +89,6 @@ struct
   (* ---  Chunk                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  type chunk =
-    | Var of varinfo
-    | Alloc of varinfo
-    | Init of varinfo
-    | Mem of M.Chunk.t
-
   let is_framed_var x = not x.vglob && not x.vaddrof
   (* Can not use VarUsage info, since (&x) can still be passed
      to the function and be modified by the call (when it assigns everything). *)
@@ -113,6 +107,8 @@ struct
       | _ -> x.vtype
     let tau_of_chunk x = Lang.tau_of_ctype (typ_of_chunk x)
     let is_framed = is_framed_var
+    let is_init _ = false
+    let is_primary _ = true
     let basename_of_chunk = LogicUsage.basename
   end
 
@@ -131,6 +127,8 @@ struct
         "ra_" ^ LogicUsage.basename x
       | NotUsed | ByValue | ByShift | ByAddr | InContext _ | InArray _ ->
         "ta_" ^ LogicUsage.basename x
+    let is_init _ = false
+    let is_primary _ = false
     let is_framed = is_framed_var
   end
 
@@ -147,273 +145,25 @@ struct
       | ByRef -> Cil.typeOf_pointed x.vtype
       | _ -> x.vtype
     let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
+    let is_init _ = true
+    let is_primary _ = false
     let is_framed = is_framed_var
     let basename_of_chunk x = "Init_" ^ (LogicUsage.basename x)
-  end
-
-  module Chunk =
-  struct
-    type t = chunk
-    let self = "varmem"
-    let hash = function
-      | Var x -> 3 * Varinfo.hash x
-      | Alloc x -> 5 * Varinfo.hash x
-      | Mem m -> 7 * M.Chunk.hash m
-      | Init x -> 11 * Varinfo.hash x
-    let compare c1 c2 =
-      if c1 == c2 then 0 else
-        match c1 , c2 with
-        | Var x , Var y
-        | Alloc x , Alloc y
-        | Init x, Init y -> Varinfo.compare x y
-        | Mem p , Mem q -> M.Chunk.compare p q
-        | Var _ , _ -> (-1)
-        | _ , Var _ -> 1
-        | Init _, _ -> (-1)
-        | _, Init _ -> 1
-        | Alloc _  , _ -> (-1)
-        | _ , Alloc _ -> 1
-    let equal c1 c2 = (compare c1 c2 = 0)
-    let pretty fmt = function
-      | Var x -> Varinfo.pretty fmt x
-      | Alloc x -> Format.fprintf fmt "alloc(%a)" Varinfo.pretty x
-      | Init x -> Format.fprintf fmt "init(%a)" Varinfo.pretty x
-      | Mem m -> M.Chunk.pretty fmt m
-    let tau_of_chunk = function
-      | Var x -> VAR.tau_of_chunk x
-      | Alloc x -> VALLOC.tau_of_chunk x
-      | Init x -> VINIT.tau_of_chunk x
-      | Mem m -> M.Chunk.tau_of_chunk m
-    let basename_of_chunk = function
-      | Var x -> VAR.basename_of_chunk x
-      | Alloc x -> VALLOC.basename_of_chunk x
-      | Init x -> VINIT.basename_of_chunk x
-      | Mem m -> M.Chunk.basename_of_chunk m
-    let is_framed = function
-      | Var x -> VAR.is_framed x
-      | Alloc x -> VALLOC.is_framed x
-      | Init x -> VINIT.is_framed x
-      | Mem m -> M.Chunk.is_framed m
   end
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Sigma                                                             --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module HEAP = Qed.Collection.Make(VAR)
-  module TALLOC = Qed.Collection.Make(VALLOC)
-  module TINIT = Qed.Collection.Make(VINIT)
-  module SIGMA = Sigma.Make(VAR)(HEAP)
-  module ALLOC = Sigma.Make(VALLOC)(TALLOC)
-  module INIT = Sigma.Make(VINIT)(TINIT)
-  module Heap = Qed.Collection.Make(Chunk)
-
-  type sigma = {
-    mem : M.Sigma.t ;
-    vars : SIGMA.t ;
-    init : INIT.t ;
-    alloc : ALLOC.t ;
-  }
-
-  module Sigma =
-  struct
-    type t = sigma
-    type chunk = Chunk.t
-    module Chunk = Heap
-    type domain = Heap.set
-    let empty = Heap.Set.empty
-    let union = Heap.Set.union
-
-    let create () = {
-      vars = SIGMA.create () ;
-      init = INIT.create () ;
-      alloc = ALLOC.create () ;
-      mem = M.Sigma.create () ;
-    }
-
-    let copy s = {
-      vars = SIGMA.copy s.vars ;
-      init = INIT.copy s.init ;
-      alloc = ALLOC.copy s.alloc ;
-      mem = M.Sigma.copy s.mem ;
-    }
-
-    let choose s1 s2 =
-      let s = SIGMA.choose s1.vars s2.vars in
-      let i = INIT.choose s1.init s2.init in
-      let a = ALLOC.choose s1.alloc s2.alloc in
-      let m = M.Sigma.choose s1.mem s2.mem in
-      { vars = s ; alloc = a ; mem = m ; init = i }
-
-    let merge s1 s2 =
-      let s,pa1,pa2 = SIGMA.merge s1.vars s2.vars in
-      let i,ia1,ia2 = INIT.merge s1.init s2.init in
-      let a,ta1,ta2 = ALLOC.merge s1.alloc s2.alloc in
-      let m,qa1,qa2 = M.Sigma.merge s1.mem s2.mem in
-      { vars = s ; alloc = a ; mem = m ; init = i } ,
-      Passive.union (Passive.union (Passive.union pa1 ta1) qa1) ia1 ,
-      Passive.union (Passive.union (Passive.union pa2 ta2) qa2) ia2
-
-    let merge_list l =
-      let s,pa = SIGMA.merge_list (List.map (fun s -> s.vars) l) in
-      let i,ia = INIT.merge_list (List.map (fun s -> s.init) l) in
-      let a,ta = ALLOC.merge_list (List.map (fun s -> s.alloc) l) in
-      let m,qa = M.Sigma.merge_list (List.map (fun s -> s.mem) l) in
-      { vars = s ; alloc = a ; mem = m ; init = i } ,
-      let union = List.map2 Passive.union in
-      union (union (union pa ta) qa) ia
-
-    let join s1 s2 =
-      Passive.union
-        (Passive.union
-           (Passive.union
-              (SIGMA.join s1.vars s2.vars)
-              (ALLOC.join s1.alloc s2.alloc))
-           (M.Sigma.join s1.mem s2.mem))
-        (INIT.join s1.init s2.init)
-
-    let get s = function
-      | Var x -> SIGMA.get s.vars x
-      | Init x -> INIT.get s.init x
-      | Alloc x -> ALLOC.get s.alloc x
-      | Mem m -> M.Sigma.get s.mem m
-
-    let mem s = function
-      | Var x -> SIGMA.mem s.vars x
-      | Init x -> INIT.mem s.init x
-      | Alloc x -> ALLOC.mem s.alloc x
-      | Mem m -> M.Sigma.mem s.mem m
-
-    let value s c = e_var (get s c)
-
-    let iter f s =
-      begin
-        SIGMA.iter (fun x -> f (Var x)) s.vars ;
-        INIT.iter (fun x -> f (Init x)) s.init ;
-        ALLOC.iter (fun x -> f (Alloc x)) s.alloc ;
-        M.Sigma.iter (fun m -> f (Mem m)) s.mem ;
-      end
-
-    let iter2 f s t =
-      begin
-        SIGMA.iter2 (fun x a b -> f (Var x) a b) s.vars t.vars ;
-        INIT.iter2 (fun x a b -> f (Init x) a b) s.init t.init ;
-        ALLOC.iter2 (fun x a b -> f (Alloc x) a b) s.alloc t.alloc ;
-        M.Sigma.iter2 (fun m p q -> f (Mem m) p q) s.mem t.mem ;
-      end
-
-    let domain_partition r =
-      begin
-        let xs = ref HEAP.Set.empty in
-        let is = ref TINIT.Set.empty in
-        let ts = ref TALLOC.Set.empty in
-        let ms = ref M.Heap.Set.empty in
-        Heap.Set.iter
-          (function
-            | Var x -> xs := HEAP.Set.add x !xs
-            | Init x -> is := TINIT.Set.add x !is
-            | Alloc x -> ts := TALLOC.Set.add x !ts
-            | Mem c -> ms := M.Heap.Set.add c !ms
-          ) r ;
-        !xs , !is, !ts , !ms
-      end
-
-    let domain_var xs =
-      HEAP.Set.fold (fun x s -> Heap.Set.add (Var x) s) xs Heap.Set.empty
-
-    let domain_init xs =
-      TINIT.Set.fold (fun x s -> Heap.Set.add (Init x) s) xs Heap.Set.empty
-
-    let domain_alloc ts =
-      TALLOC.Set.fold (fun x s -> Heap.Set.add (Alloc x) s) ts Heap.Set.empty
-
-    let domain_mem ms =
-      M.Heap.Set.fold (fun m s -> Heap.Set.add (Mem m) s) ms Heap.Set.empty
-
-    let assigned ~pre ~post w =
-      let w_vars , w_init, w_alloc , w_mem = domain_partition w in
-      let h_vars = SIGMA.assigned ~pre:pre.vars ~post:post.vars w_vars in
-      let h_init = INIT.assigned ~pre:pre.init ~post:post.init w_init in
-      let h_alloc = ALLOC.assigned ~pre:pre.alloc ~post:post.alloc w_alloc in
-      let h_mem = M.Sigma.assigned ~pre:pre.mem ~post:post.mem w_mem in
-      Bag.ulist [h_vars;h_init;h_alloc;h_mem]
-
-    let havoc s r =
-      let rvar , rinit, ralloc , rmem = domain_partition r
-      in {
-        vars = SIGMA.havoc s.vars rvar ;
-        init = INIT.havoc s.init rinit ;
-        alloc = ALLOC.havoc s.alloc ralloc ;
-        mem = M.Sigma.havoc s.mem rmem ;
-      }
-
-    let havoc_chunk s = function
-      | Var x -> { s with vars = SIGMA.havoc_chunk s.vars x }
-      | Init x -> { s with init = INIT.havoc_chunk s.init x }
-      | Alloc x -> { s with alloc = ALLOC.havoc_chunk s.alloc x }
-      | Mem m -> { s with mem = M.Sigma.havoc_chunk s.mem m }
-
-    let havoc_any ~call s = {
-      alloc = s.alloc ;
-      vars = SIGMA.havoc_any ~call s.vars ;
-      init = INIT.havoc_any ~call s.init ;
-      mem = M.Sigma.havoc_any ~call s.mem ;
-    }
-
-    let remove_chunks s r =
-      let rvar , rinit, ralloc , rmem = domain_partition r
-      in {
-        vars = SIGMA.remove_chunks s.vars rvar ;
-        init = INIT.remove_chunks s.init rinit ;
-        alloc = ALLOC.remove_chunks s.alloc ralloc ;
-        mem = M.Sigma.remove_chunks s.mem rmem ;
-      }
-
-    let domain s =
-      Heap.Set.union
-        (Heap.Set.union
-           (Heap.Set.union
-              (domain_var (SIGMA.domain s.vars))
-              (domain_alloc (ALLOC.domain s.alloc)))
-           (domain_mem (M.Sigma.domain s.mem)))
-        (domain_init (INIT.domain s.init))
-
-    let writes s =
-      Heap.Set.union
-        (Heap.Set.union
-           (Heap.Set.union
-              (domain_var (SIGMA.writes {pre=s.pre.vars;post=s.post.vars}))
-              (domain_alloc (ALLOC.writes {pre=s.pre.alloc;post=s.post.alloc})))
-           (domain_mem (M.Sigma.writes {pre=s.pre.mem;post=s.post.mem})))
-        (domain_init (INIT.writes {pre=s.pre.init;post=s.post.init}))
-
-    let pretty fmt s =
-      Format.fprintf fmt "@[<hov 2>{X:@[%a@]@ I:@[%a@]@ T:@[%a@]@ M:@[%a@]}@]"
-        SIGMA.pretty s.vars
-        INIT.pretty s.init
-        ALLOC.pretty s.alloc
-        M.Sigma.pretty s.mem
-
-  end
-
-  type domain = Sigma.domain
-
-  let get_var s x = SIGMA.get s.vars x
-  let get_term s x = e_var (get_var s x)
-
-  let get_init s x = INIT.get s.init x
-  let get_init_term s x = e_var (get_init s x)
+  module SVAR = Sigma.Make(VAR)
+  module SALLOC = Sigma.Make(VALLOC)
+  module SINIT = Sigma.Make(VINIT)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  State Pretty Printer                                              --- *)
   (* -------------------------------------------------------------------------- *)
 
   type ichunk = Iref of varinfo | Ivar of varinfo | Iinit of varinfo
-
-  type state = {
-    svar : ichunk Tmap.t ;
-    smem : M.state ;
-  }
 
   module IChunk =
   struct
@@ -449,55 +199,41 @@ struct
 
   module Icmap = Qed.Mergemap.Make(IChunk)
 
-  let set_chunk v c m =
-    let c =
-      try
-        let c0 = Tmap.find v m in
-        if IChunk.compare c c0 < 0 then c else c0
-      with Not_found -> c in
-    Tmap.add v c m
-
-  let state s =
-    let m = ref Tmap.empty in
-    SIGMA.iter (fun x v ->
-        let c = match V.param x with ByRef -> Iref x | _ -> Ivar x in
-        m := set_chunk (e_var v) c !m
-      ) s.vars ;
-    INIT.iter (fun x v ->
-        match V.param x with
-        | ByRef -> ()
-        | _ -> m := set_chunk (e_var v) (Iinit x) !m
-      ) s.init ;
-    { svar = !m ; smem = M.state s.mem }
-
   let ilval = function
     | Iref x -> (Mvar x,[Mindex e_zero])
     | Ivar x | Iinit x -> (Mvar x,[])
 
   let imval c = match c with
-    | Iref _ | Ivar _ -> Sigs.Mlval (ilval c, KValue)
-    | Iinit _ -> Sigs.Mlval (ilval c, KInit)
+    | Iref _ | Ivar _ -> Memory.Mlval (ilval c)
+    | Iinit _ -> Memory.Minit (ilval c)
 
-  let lookup s e =
-    try imval (Tmap.find e s.svar)
-    with Not_found -> M.lookup s.smem e
+  let is_ref x =
+    match V.param x with
+    | InContext _ | InArray _ | ByRef -> true
+    | _ -> false
 
-  let apply f s =
-    let m = ref Tmap.empty in
-    Tmap.iter (fun e c ->
-        let e = f e in
-        m := set_chunk e c !m ;
-      ) s.svar ;
-    { svar = !m ; smem = M.apply f s.smem }
+  let iref x = if is_ref x then Iref x else Ivar x
 
-  let iter f s =
-    Tmap.iter (fun v c -> f (imval c) v) s.svar ;
-    M.iter f s.smem
+  let lookup (s : Sigma.state) e =
+    try
+      match Sigma.ckind @@ Tmap.find e s with
+      | SVAR.Mu x -> imval (iref x)
+      | SINIT.Mu x -> imval (Iinit x)
+      | SALLOC.Mu _ -> raise Not_found
+      | _ -> raise Not_found
+    with Not_found ->
+      M.lookup s e
 
   let icmap domain istate =
-    Tmap.fold (fun m c w ->
-        if Vars.intersect (F.vars m) domain
-        then Icmap.add c m w else w
+    Tmap.fold
+      (fun m c w ->
+         if Vars.intersect (F.vars m) domain
+         then
+           match Sigma.ckind c with
+           | SVAR.Mu x -> Icmap.add (iref x) m w
+           | SINIT.Mu x -> Icmap.add (Iinit x) m w
+           | _ -> w
+         else w
       ) istate Icmap.empty
 
   let rec diff lv v1 v2 =
@@ -521,9 +257,9 @@ struct
     | (Lang.Mfield _,_)::_ -> Bag.elt (Mstore(lv,v2))
     | [] -> Bag.empty
 
-  let updates seq domain =
-    let pre = icmap domain seq.pre.svar in
-    let post = icmap domain seq.post.svar in
+  let updates (seq : Sigma.state sequence) domain =
+    let pre = icmap domain seq.pre in
+    let post = icmap domain seq.post in
     let pool = ref Bag.empty in
     Icmap.iter2
       (fun c v1 v2 ->
@@ -532,8 +268,7 @@ struct
          | None , Some v -> pool := Bag.add (Mstore(ilval c,v)) !pool
          | Some v1 , Some v2 -> pool := Bag.concat (diff (ilval c) v1 v2) !pool
       ) pre post ;
-    let seq_mem =  { pre = seq.pre.smem ; post = seq.post.smem } in
-    Bag.concat !pool (M.updates seq_mem domain)
+    Bag.concat !pool (M.updates seq domain)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Location                                                          --- *)
@@ -699,8 +434,6 @@ struct
     | Field f -> M.field l f
     | Shift(e,k) -> M.shift l e k
 
-  let mseq_of_seq seq = { pre = seq.pre.mem ; post = seq.post.mem }
-
   let mloc_of_path m x ofs =
     let l = match m with
       | CTXT Nullable | CARR Nullable -> M.pointer_loc @@ nullable_address x
@@ -745,7 +478,7 @@ struct
     | Val(_,_,ofs) -> List.fold_left byte_offset e_zero ofs
 
   let block_length sigma obj = function
-    | Loc l -> M.block_length sigma.mem obj l
+    | Loc l -> M.block_length sigma obj l
     | Ref x -> noref ~op:"block-length of" x
     | Val(m,x,_) ->
       begin match Ctypes.object_of (vtype m x) with
@@ -795,21 +528,21 @@ struct
   let load sigma obj = function
     | Ref x ->
       begin match V.param x with
-        | ByRef       -> Sigs.Loc(Val(CREF,x,[]))
-        | InContext n -> Sigs.Loc(Val(CTXT n,x,[]))
-        | InArray n   -> Sigs.Loc(Val(CARR n,x,[]))
+        | ByRef       -> Memory.Loc(Val(CREF,x,[]))
+        | InContext n -> Memory.Loc(Val(CTXT n,x,[]))
+        | InArray n   -> Memory.Loc(Val(CARR n,x,[]))
         | NotUsed | ByAddr | ByValue | ByShift -> assert false
       end
     | Val((CREF|CVAL),x,ofs) ->
-      Sigs.Val(access (get_term sigma x) ofs)
+      Memory.Val(access (SVAR.value sigma x) ofs)
     | Loc l ->
       Cvalues.map_value
         (fun l -> Loc l)
-        (M.load sigma.mem obj l)
+        (M.load sigma obj l)
     | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
       Cvalues.map_value
         (fun l -> Loc l)
-        (M.load sigma.mem obj (mloc_of_path m x ofs))
+        (M.load sigma obj (mloc_of_path m x ofs))
 
   let load_init sigma obj = function
     | Ref _ ->
@@ -817,23 +550,23 @@ struct
     | Val((CREF|CVAL),x,_) when Cvalues.always_initialized x ->
       Cvalues.initialized_obj obj
     | Val((CREF|CVAL),x,ofs) ->
-      access_init (get_init_term sigma x) ofs
+      access_init (SINIT.value sigma x) ofs
     | Loc l ->
-      M.load_init sigma.mem obj l
+      M.load_init sigma obj l
     | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
-      M.load_init sigma.mem obj (mloc_of_path m x ofs)
+      M.load_init sigma obj (mloc_of_path m x ofs)
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Memory Store                                                      --- *)
   (* -------------------------------------------------------------------------- *)
 
   let memvar_stored kind seq x ofs v =
-    let get_term, update = match kind with
-      | KValue -> get_term, update
-      | KInit -> get_init_term, update_init
+    let read, update = match kind with
+      | KValue -> SVAR.value, update
+      | KInit -> SINIT.value, update_init
     in
-    let v1 = get_term seq.pre x in
-    let v2 = get_term seq.post x in
+    let v1 = read seq.pre x in
+    let v2 = read seq.post x in
     Set( v2 , update v1 ofs v )
 
   let gen_stored kind seq obj l v =
@@ -843,17 +576,17 @@ struct
     | Val((CREF|CVAL),x,ofs) ->
       [memvar_stored kind seq x ofs v]
     | Val((CTXT _|CARR _|HEAP) as m,x,ofs) ->
-      mstored (mseq_of_seq seq) obj (mloc_of_path m x ofs) v
+      mstored seq obj (mloc_of_path m x ofs) v
     | Loc l ->
-      mstored (mseq_of_seq seq) obj l v
+      mstored seq obj l v
 
   let stored = gen_stored KValue
   let stored_init = gen_stored KInit
 
   let copied seq obj l1 l2 =
     let v = match load seq.pre obj l2 with
-      | Sigs.Val r -> r
-      | Sigs.Loc l -> pointer_val l
+      | Memory.Val r -> r
+      | Memory.Loc l -> pointer_val l
     in stored seq obj l1 v
 
   let copied_init seq obj l1 l2 =
@@ -1012,7 +745,7 @@ struct
       | RD | OBJ -> p_true
     else
       match mem with
-      | CVAL | HEAP -> p_bool (ALLOC.value sigma.alloc x)
+      | CVAL | HEAP -> p_bool (SALLOC.value sigma x)
       | CREF | CTXT Valid | CARR Valid -> p_true
       | CTXT Nullable | CARR Nullable ->
         p_not @@ M.is_null (mloc_of_path mem x [])
@@ -1035,19 +768,19 @@ struct
     | Rloc(obj,l) ->
       begin match l with
         | Ref _ -> p_true
-        | Loc l -> M.valid sigma.mem acs (Rloc(obj,l))
+        | Loc l -> M.valid sigma acs (Rloc(obj,l))
         | Val(m,x,p) ->
           try valid_offset_path sigma acs m x p
           with ShiftMismatch ->
             if is_heap_allocated m then
-              M.valid sigma.mem acs (Rloc(obj,mloc_of_loc l))
+              M.valid sigma acs (Rloc(obj,mloc_of_loc l))
             else
               shift_mismatch l
       end
     | Rrange(l,elt,a,b) ->
       begin match l with
         | Ref x -> noref ~op:"valid sub-range of" x
-        | Loc l -> M.valid sigma.mem acs (Rrange(l,elt,a,b))
+        | Loc l -> M.valid sigma acs (Rrange(l,elt,a,b))
         | Val(m,x,p) ->
           match a,b with
           | Some ka,Some kb ->
@@ -1058,7 +791,7 @@ struct
               with ShiftMismatch ->
                 if is_heap_allocated m then
                   let l = mloc_of_loc l in
-                  M.valid sigma.mem acs (Rrange(l,elt,a,b))
+                  M.valid sigma acs (Rrange(l,elt,a,b))
                 else shift_mismatch l
             end
           | _ ->
@@ -1085,19 +818,19 @@ struct
     | Rloc(obj,l) ->
       begin match l with
         | Ref _ -> p_false
-        | Loc l -> M.invalid sigma.mem (Rloc(obj,l))
+        | Loc l -> M.invalid sigma (Rloc(obj,l))
         | Val(m,x,p) ->
           try invalid_offset_path sigma m x p
           with ShiftMismatch ->
             if is_heap_allocated m then
-              M.invalid sigma.mem (Rloc(obj,mloc_of_loc l))
+              M.invalid sigma (Rloc(obj,mloc_of_loc l))
             else
               shift_mismatch l
       end
     | Rrange(l,elt,a,b) ->
       begin match l with
         | Ref x -> noref ~op:"invalid sub-range of" x
-        | Loc l -> M.invalid sigma.mem (Rrange(l,elt,a,b))
+        | Loc l -> M.invalid sigma (Rrange(l,elt,a,b))
         | Val(m,x,p) ->
           match a,b with
           | Some ka,Some kb ->
@@ -1108,7 +841,7 @@ struct
               with ShiftMismatch ->
                 if is_heap_allocated m then
                   let l = mloc_of_loc l in
-                  M.invalid sigma.mem (Rrange(l,elt,a,b))
+                  M.invalid sigma (Rrange(l,elt,a,b))
                 else shift_mismatch l
             end
           | _ ->
@@ -1123,7 +856,7 @@ struct
   let rec initialized_loc sigma obj x ofs =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-      p_bool (access_init (get_init_term sigma x) ofs)
+      p_bool (access_init (SINIT.value sigma x) ofs)
     | C_array { arr_flat=flat ; arr_element = te } ->
       let size = match flat with
         | None -> unsized_array ()
@@ -1132,7 +865,7 @@ struct
       initialized_range sigma elt x ofs (e_int 0) (e_int (size-1))
     | C_comp { cfields = None } ->
       Lang.F.p_equal
-        (access_init (get_init_term sigma x) ofs)
+        (access_init (SINIT.value sigma x) ofs)
         (Cvalues.initialized_obj obj)
     | C_comp { cfields = Some fields } ->
       let init_field fd =
@@ -1155,10 +888,10 @@ struct
     | Rloc(obj,l) ->
       begin match l with
         | Ref _ -> p_true
-        | Loc l -> M.initialized sigma.mem (Rloc(obj,l))
+        | Loc l -> M.initialized sigma (Rloc(obj,l))
         | Val(m,x,p) ->
           if is_heap_allocated m then
-            M.initialized sigma.mem (Rloc(obj,mloc_of_loc l))
+            M.initialized sigma (Rloc(obj,mloc_of_loc l))
           else if Cvalues.always_initialized x then
             try valid_offset RD (vobject m x) p
             with ShiftMismatch -> shift_mismatch l
@@ -1168,12 +901,12 @@ struct
     | Rrange(l,elt, Some a, Some b) ->
       begin match l with
         | Ref _ -> p_true
-        | Loc l -> M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
+        | Loc l -> M.initialized sigma (Rrange(l,elt,Some a, Some b))
         | Val(m,x,p) ->
           try
             if is_heap_allocated m then
               let l = mloc_of_loc l in
-              M.initialized sigma.mem (Rrange(l,elt,Some a, Some b))
+              M.initialized sigma (Rrange(l,elt,Some a, Some b))
             else
               let rec normalize obj = function
                 | [] -> [], a, b
@@ -1220,18 +953,21 @@ struct
 
   let frame sigma =
     let hs = ref [] in
-    SIGMA.iter
-      begin fun x chunk ->
-        (if (x.vglob || x.vformal) then
-           let t = VAR.typ_of_chunk x in
-           let v = e_var chunk in
-           let h = forall_pointers (M.global sigma.mem) v t in
-           if not (F.eqp h F.p_true) then hs := h :: !hs ) ;
-        (if x.vglob then
-           let v = e_var chunk in
-           hs := Cvalues.has_ctype x.vtype v :: !hs ) ;
-      end sigma.vars ;
-    !hs @ M.frame sigma.mem
+    Sigma.iter
+      begin fun chunk value ->
+        match Sigma.ckind chunk with
+        | SVAR.Mu x when not @@ is_ref x ->
+          (if (x.vglob || x.vformal) then
+             let t = VAR.typ_of_chunk x in
+             let v = e_var value in
+             let h = forall_pointers (M.global sigma) v t in
+             if not (F.eqp h F.p_true) then hs := h :: !hs ) ;
+          (if x.vglob then
+             let v = e_var value in
+             hs := Cvalues.has_ctype x.vtype v :: !hs ) ;
+        | _ -> ()
+      end sigma ;
+    !hs @ M.frame sigma
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Scope                                                             --- *)
@@ -1248,25 +984,24 @@ struct
 
   let alloc sigma xs =
     let xm = List.filter is_mem xs in
-    let mem = M.alloc sigma.mem xm in
+    let sigma = M.alloc sigma xm in
     let xv = List.filter is_mvar_alloc xs in
-    let domain = TALLOC.Set.of_list xv in
-    let alloc = ALLOC.havoc sigma.alloc domain in
-    { sigma with alloc ; mem }
+    let domain = Sigma.Domain.of_list @@ List.map SALLOC.chunk xv in
+    Sigma.havoc sigma domain
 
   let scope_vars seq scope xs =
     let xs = List.filter is_mvar_alloc xs in
     if xs = [] then []
     else
-      let t_in = seq.pre.alloc in
-      let t_out = seq.post.alloc in
+      let t_in = seq.pre in
+      let t_out = seq.post in
       let v_in  = match scope with Enter -> e_false | Leave -> e_true in
       let v_out = match scope with Enter -> e_true | Leave -> e_false in
       List.map
         (fun x ->
            F.p_and
-             (F.p_equal (ALLOC.value t_in x) v_in)
-             (F.p_equal (ALLOC.value t_out x) v_out)
+             (F.p_equal (SALLOC.value t_in x) v_in)
+             (F.p_equal (SALLOC.value t_out x) v_out)
         ) xs
 
   let scope_init seq scope xs =
@@ -1278,7 +1013,7 @@ struct
         then None
         else
           let i = Cvalues.uninitialized_obj (Ctypes.object_of v.vtype) in
-          Some (Lang.F.p_equal (access_init (get_init_term seq.post v) []) i)
+          Some (Lang.F.p_equal (access_init (SINIT.value seq.post v) []) i)
       in
       List.filter_map init_status xs
 
@@ -1296,14 +1031,13 @@ struct
 
   let scope seq scope xs =
     let xm = List.filter is_mem xs in
-    let smem = { pre = seq.pre.mem ; post = seq.post.mem } in
-    let hmem = M.scope smem scope xm in
+    let hmem = M.scope seq scope xm in
     let hvars = scope_vars seq scope xs in
     let hinit = scope_init seq scope xs in
     let hcontext = List.filter_map nullable_scope xs in
     hvars @ hinit @ hmem @ hcontext
 
-  let global sigma p = M.global sigma.mem p
+  let global = M.global
 
   (* -------------------------------------------------------------------------- *)
   (* ---  Havoc along a ranged-path                                        --- *)
@@ -1358,9 +1092,9 @@ struct
           assigned_path kind (eqk :: hs) xs ys ae be ofs
 
   let assigned_genset s xs mem x ofs p =
-    let valid = valid_offset_path s.post Sigs.RW mem x ofs in
-    let a = get_term s.pre x in
-    let b = get_term s.post x in
+    let valid = valid_offset_path s.post Memory.RW mem x ofs in
+    let a = SVAR.value s.pre x in
+    let b = SVAR.value s.post x in
     let a_ofs = access a ofs in
     let b_ofs = access b ofs in
     let p_sloc = p_forall xs (p_hyps [valid;p_not p] (p_equal a_ofs b_ofs)) in
@@ -1371,9 +1105,9 @@ struct
   let monotonic_initialized_genset s xs mem x ofs p =
     if always_init x then [Assert p_true]
     else
-      let valid = valid_offset_path s.post Sigs.RW mem x ofs in
-      let a = get_init_term s.pre x in
-      let b = get_init_term s.post x in
+      let valid = valid_offset_path s.post Memory.RW mem x ofs in
+      let a = SINIT.value s.pre x in
+      let b = SINIT.value s.post x in
       let a_ofs = access_init a ofs in
       let b_ofs = access_init b ofs in
       let not_p = p_forall xs (p_hyps [valid;p_not p] (p_equal a_ofs b_ofs)) in
@@ -1399,8 +1133,8 @@ struct
 
       | C_int _ | C_float _ | C_pointer _ ->
         p_imply
-          (p_bool (access_init (get_init_term seq.pre x) ofs))
-          (p_bool (access_init (get_init_term seq.post x) ofs))
+          (p_bool (access_init (SINIT.value seq.pre x) ofs))
+          (p_bool (access_init (SINIT.value seq.post x) ofs))
 
       | C_array { arr_flat=flat ; arr_element=t } ->
         let size = match flat with
@@ -1430,9 +1164,9 @@ struct
         [ memvar_stored KInit seq x ofs (e_var init) ]
       end
     | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
-      M.assigned (mseq_of_seq seq) obj (Sloc (mloc_of_path m x ofs))
+      M.assigned seq obj (Sloc (mloc_of_path m x ofs))
     | Loc l ->
-      M.assigned (mseq_of_seq seq) obj (Sloc l)
+      M.assigned seq obj (Sloc l)
 
   let assigned_array seq obj l elt n =
     match l with
@@ -1452,17 +1186,17 @@ struct
 
     | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
       let l = mloc_of_path m x ofs in
-      M.assigned (mseq_of_seq seq) obj (Sarray(l,elt,n))
+      M.assigned seq obj (Sarray(l,elt,n))
     | Loc l ->
-      M.assigned (mseq_of_seq seq) obj (Sarray(l,elt,n))
+      M.assigned seq obj (Sarray(l,elt,n))
 
   let assigned_range seq obj l elt a b =
     match l with
     | Ref x -> noref ~op:"assigns to" x
     | Loc l ->
-      M.assigned (mseq_of_seq seq) obj (Srange(l,elt,a,b))
+      M.assigned seq obj (Srange(l,elt,a,b))
     | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
-      M.assigned (mseq_of_seq seq) obj (Srange(mloc_of_path m x ofs,elt,a,b))
+      M.assigned seq obj (Srange(mloc_of_path m x ofs,elt,a,b))
     | Val((CVAL|CREF) as m,x,ofs) ->
       let k = Lang.freshvar ~basename:"k" Qed.Logic.Int in
       let p = Vset.in_range (e_var k) a b in
@@ -1474,9 +1208,9 @@ struct
     match l with
     | Ref x -> noref ~op:"assigns to" x
     | Loc l ->
-      M.assigned (mseq_of_seq seq) obj (Sdescr(xs,l,p))
+      M.assigned seq obj (Sdescr(xs,l,p))
     | Val((HEAP|CTXT _|CARR _) as m,x,ofs) ->
-      M.assigned (mseq_of_seq seq) obj (Sdescr(xs,mloc_of_path m x ofs,p))
+      M.assigned seq obj (Sdescr(xs,mloc_of_path m x ofs,p))
     | Val((CVAL|CREF) as m,x,ofs) ->
       (* (monotonic_initialized_genset seq xs m x ofs p) @ *)
       (assigned_genset seq xs m x ofs p)
@@ -1624,20 +1358,22 @@ struct
     match l with
     | Ref x | Val((CVAL|CREF),x,_) ->
       let init =
-        if not @@ Cvalues.always_initialized x then [ Init x ] else []
+        if not @@ Cvalues.always_initialized x then [ SINIT.chunk x ] else []
       in
-      Heap.Set.of_list ((Var x) :: init)
+      Sigma.Domain.of_list (SVAR.chunk x :: init)
     | Loc _ | Val((CTXT _|CARR _|HEAP),_,_) ->
-      M.Heap.Set.fold
-        (fun m s -> Heap.Set.add (Mem m) s)
-        (M.domain obj (mloc_of_loc l)) Heap.Set.empty
+      M.domain obj (mloc_of_loc l)
 
   let is_well_formed sigma =
     let cstrs = ref [] in
-    SIGMA.iter
-      (fun v c -> cstrs := Cvalues.has_ctype v.vtype (e_var c) :: !cstrs)
-      sigma.vars ;
-    p_conj ((M.is_well_formed sigma.mem) :: !cstrs)
+    Sigma.iter
+      (fun chunk value ->
+         match Sigma.ckind chunk with
+         | SVAR.Mu x when not @@ is_ref x ->
+           cstrs := Cvalues.has_ctype x.vtype (e_var value) :: !cstrs
+         | _ -> ())
+      sigma ;
+    p_conj (M.is_well_formed sigma :: !cstrs)
 
   (* -------------------------------------------------------------------------- *)
 
