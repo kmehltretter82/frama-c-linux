@@ -121,6 +121,7 @@ let pp_chunk fmt (n: node) (m: chunk) =
         Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
         Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
       end ;
+    List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
     Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
   end
 [@@ warning "-32"]
@@ -189,6 +190,7 @@ module SNode = Set.Make(struct
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
+
 let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   failwith_locked m "Region.Memory.new_chunk" ;
   let clayout =
@@ -199,7 +201,8 @@ let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
-  Ufind.make m.store { empty with clayout ; cpointed ; cparents }
+  let chunk = { empty with clayout ; cpointed ; cparents } in
+  Ufind.make m.store chunk
 
 let add_root (m: map) v =
   try Vmap.find v m.roots with Not_found ->
@@ -346,6 +349,8 @@ let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
     let cb = Ufind.get m.store b in
     let rt = Ufind.union m.store a b in
     let ck = merge_chunk m q rt ca cb in
+    let ck = { ck with
+               cparents = List.filter (fun r -> not @@ equal m r rt) ck.cparents } in
     Ufind.set m.store rt ck ;
   end
 
@@ -362,10 +367,6 @@ let merge_all (m:map) = function
 let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
   merge_all m [a;b]
-
-let merge_copy (m: map) ~(l: node) ~(r: node) : unit =
-  let { clayout } = get m r in
-  merge_all m [ l; Ufind.make m.store { empty with clayout } ]
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)
@@ -562,6 +563,7 @@ let rec singleton m r =
   | [r0] ->
     Vset.is_empty node.croots &&
     single_path m r0 r (sizeof node.clayout) &&
+    (* r != r0 && (* This test may be useful to prevent infinity loops. *) *)
     singleton m r0
   | _ -> false
 

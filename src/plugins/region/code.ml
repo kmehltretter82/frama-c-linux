@@ -120,12 +120,18 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
   match instr with
   | Skip _ | Code_annot _ -> ()
 
+  | Set(lv, { enode = Lval  le }, _)
+    when
+      Cil.isStructType @@ Cil.typeOfLval lv
+      || Cil.isArrayType @@ Cil.typeOfLval lv ->
+    Memory.merge m (add_lval m s lv) (add_lval m s le)
+
   | Set(lv, { enode = Lval exp }, _) ->
     let l = add_lval m s lv in
     let r = add_lval m s exp in
     Memory.add_read m r (Lval(s,exp)) ;
     Memory.add_write m l (Lval(s,lv)) ;
-    Memory.merge_copy m ~l ~r
+    Memory.merge m l r
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in

@@ -217,7 +217,12 @@ struct
         let tau = Sigma.Chunk.tau_of_chunk c in
         let basename = Sigma.Chunk.basename_of_chunk c in
         MemMemory.frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
-      | _ -> []
+      | _ ->
+        let offset = M.sizeof ty in
+        let sizeof = Lang.F.e_one in
+        let tau = Chunk.tau_of_chunk c in
+        let basename = Chunk.basename_of_chunk c in
+        MemMemory.frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
 
     let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
       match Sigma.ckind chunk with
