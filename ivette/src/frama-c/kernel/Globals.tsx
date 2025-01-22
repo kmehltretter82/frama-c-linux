@@ -192,14 +192,12 @@ function List(props: ListProps): JSX.Element {
 // --- Function items
 // --------------------------------------------------------------------------
 
-interface FctItemProps {
-  fct: functionsData;
-  current: string | undefined;
-  icon?: string;
-}
-
-function FctItem(props: FctItemProps): JSX.Element {
-  const { name, signature, main, stdlib, builtin, defined, decl } = props.fct;
+function makeFctItem(
+  fct: functionsData,
+  scope: States.Scope,
+  icon?: string
+): JSX.Element {
+  const { name, signature, main, stdlib, builtin, defined, decl } = fct;
   const className = classes(
     main && 'globals-main',
     (stdlib || builtin) && 'globals-stdlib',
@@ -210,11 +208,12 @@ function FctItem(props: FctItemProps): JSX.Element {
   );
   return (
     <Item
-      icon={props.icon}
+      key={decl}
+      icon={icon}
       className={className}
       label={name}
       title={signature}
-      selected={name === props.current}
+      selected={decl === scope}
       onSelection={() => States.setCurrentScope(decl)}
     >
       {attributes && <span className="globals-attr">{attributes}</span>}
@@ -339,22 +338,18 @@ export function useFunctionFilter(): FunctionFilterRet {
 export function Functions(props: ScrollableParent): JSX.Element {
   // Hooks
   const scope = States.useCurrentScope();
-  const { kind, name } = States.useDeclaration(scope);
 
   const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
   const { showFunction, contextFctMenuItems } = useFunctionFilter();
 
-  // Currently selected function.
-  const current = (scope && kind === 'FUNCTION') ? name : undefined;
-
   // Filtered
   const items =
     fcts
       .filter(showFunction)
       .sort((f, g) => alpha(f.name, g.name))
-      .map((fct) => <FctItem key={fct.key} fct={fct} current={current} />);
+      .map((fct) => makeFctItem(fct, scope));
 
   return (
     <List
@@ -589,7 +584,6 @@ export function Files(props: ScrollableParent): JSX.Element {
   const { scrollableParent } = props;
   // Hooks
   const scope = States.useCurrentScope();
-  const { kind, name } = States.useDeclaration(scope);
 
   // functions
   const ker = States.useSyncArrayProxy(Ast.functions);
@@ -604,9 +598,6 @@ export function Files(props: ScrollableParent): JSX.Element {
   const { showVariable, contextVarMenuItems } = useVariableFilter();
   const [showVars, flipShowVars]
     = Dome.useFlipSettings('ivette.files.show.globals', true);
-
-  // Currently selected function.
-  const current = (scope && kind === 'FUNCTION') ? name : undefined;
 
   interface InfosFile {
     label: string,
@@ -640,17 +631,22 @@ export function Files(props: ScrollableParent): JSX.Element {
     return newFiles;
   }, [fcts, showFunction, variables, showVariable]);
 
+  const currentSection = React.useMemo(() => {
+    for( const path of Object.keys(files)) {
+      if(files[path].fcts.find(e => e.decl === scope) ||
+      files[path].vars.find(e => e.decl === scope)
+      ) return path;
+    }
+    return undefined;
+  }, [files, scope]);
+
   function getList([path, infos]: [string, InfosFile]): JSX.Element | null {
     const { label, fcts, vars } = infos;
     const fctsComp: JSX.Element[] = showFcts ?
-      fcts.map(elt => <FctItem
-        key={elt.key}
-        icon="FUNCTION"
-        fct={elt}
-        current={current} />)
+      fcts.map(fct => makeFctItem(fct, scope, 'FUNCTION'))
       : [];
     const varsComp: JSX.Element[] = showVars ?
-      vars.map((v) => makeVarItem(scope, v, "VARIABLE"))
+      vars.map((v) => makeVarItem(scope, v, 'VARIABLE'))
       : [];
     const items = fctsComp.concat(varsComp);
     if(items.length === 0) return null;
@@ -660,7 +656,7 @@ export function Files(props: ScrollableParent): JSX.Element {
         key={path}
         label={label}
         title={path}
-        settings={`frama-c.sidebar.files.${path}`}
+        infos={currentSection === path ? '(active)' : undefined}
         className='globals-section'
       >
         <InfiniteScrollList scrollableParent={scrollableParent} >
