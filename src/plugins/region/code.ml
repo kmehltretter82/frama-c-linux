@@ -131,7 +131,7 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
     let r = add_lval m s exp in
     Memory.add_read m r (Lval(s,exp)) ;
     Memory.add_write m l (Lval(s,lv)) ;
-    Memory.merge m l r
+    Memory.merge_copy m ~l ~r
 
   | Set(lv,e,_) ->
     let r = add_lval m s lv in
