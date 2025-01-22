@@ -28,7 +28,7 @@ import React from 'react';
 import * as Ivette from 'ivette';
 
 import History from 'frama-c/kernel/History';
-import Globals, { GlobalsFiles } from 'frama-c/kernel/Globals';
+import { GlobalDeclarations, GlobalByFiles } from 'frama-c/kernel/Globals';
 import ASTview from 'frama-c/kernel/ASTview';
 import ASTinfo from 'frama-c/kernel/ASTinfo';
 import SourceCode from 'frama-c/kernel/SourceCode';
@@ -52,7 +52,7 @@ Ivette.registerSidebar({
   label: 'AST',
   icon: 'DUPLICATE',
   title: 'Global Declarations (AST)',
-  children: <Globals />
+  children: <GlobalDeclarations />
 });
 
 Ivette.registerSidebar({
@@ -60,7 +60,7 @@ Ivette.registerSidebar({
   label: 'Files',
   icon: 'FOLDER',
   title: 'Files',
-  children: <GlobalsFiles />
+  children: <GlobalByFiles />
 });
 
 Ivette.registerToolbar({
