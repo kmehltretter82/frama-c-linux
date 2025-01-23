@@ -26,13 +26,13 @@ import remarkCustomHeaderId from 'remark-custom-header-id';
 
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Icon, jIconKind, IconKind } from 'dome/controls/icons';
+import { Icon, jIconKind, IconKind as _IconKind  } from 'dome/controls/icons';
 import {
   CodeBlock, atomOneDark, atomOneLight
 } from "react-code-blocks";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { jLEDstatus, LED, LEDstatus } from 'dome/controls/displays';
+import {
+  jLEDstatus, LED, LEDstatus as _LEDstatus
+} from 'dome/controls/displays';
 
 export interface Pattern {
   pattern: RegExp,
@@ -45,7 +45,7 @@ export interface Pattern {
  * `[icon-<id>(-<kind | color>)?]` :
  *
  * * Id : case-insensitive, consult [Icon Gallery](../../doc/guides/icons.md)
- * * kind : {@link IconKind}
+ * * kind : {@link _IconKind}
  * * color : Hexa or html
  *
  * @example
@@ -69,7 +69,7 @@ export const iconTag: Pattern = {
 /**
  * ledTag allows you to replace the tag with an {@link LED}.
  *
- * `[led-<status>]` : {@link LEDstatus}
+ * `[led-<status>]` : {@link _LEDstatus}
  * */
 export const ledTag: Pattern = {
   pattern: /\[led-([^\]]+)\]/g,

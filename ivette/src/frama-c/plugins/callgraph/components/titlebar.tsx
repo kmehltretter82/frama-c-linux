@@ -89,7 +89,7 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
 /* --- Callgraph documentation                                            --- */
 /* -------------------------------------------------------------------------- */
 
-/** Pattern used for callraph documentation */
+/** Pattern used for callgraph documentation */
 const TSButtonTag: Pattern = {
   pattern: /\[button-displaymode\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
@@ -97,7 +97,7 @@ const TSButtonTag: Pattern = {
   }
 };
 
-/** Pattern used for callraph documentation */
+/** Pattern used for callgraph documentation */
 const selectButtonTag: Pattern = {
   pattern: /\[button-select\]/g,
   replace: (key: number, match?: RegExpExecArray) => {
