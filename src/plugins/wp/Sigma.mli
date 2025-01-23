@@ -80,10 +80,14 @@ sig
   (** Whether the chunk tracks memory initialization (used for filtering). *)
 
   val is_primary : t -> bool
-  (** Used to sort memory chunk parameters in ACSL symbols.
+  (** Used to sort memory chunk parameters in compiled ACSL symbols.
 
-      Single chunks represents values of variables or individual l-values.
-      They are sorted last among memory chunk parameters. *)
+      Non-primary chunk parameters come first, followed by primary ones,
+      followed by logical parameters.
+
+      Typical primary chunks are memory chunks with a single location,
+      like hoare of ref variables in MemVar or singleton regions in
+      MemRegion. *)
 
   val is_framed : t -> bool
   (** Whether the chunk is local to a function call.
