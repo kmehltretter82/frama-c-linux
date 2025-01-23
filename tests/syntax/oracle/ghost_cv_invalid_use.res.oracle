@@ -57,5 +57,6 @@
   Call to non-ghost function from ghost code is not allowed
 [kernel:ghost:bad-use] ghost_cv_invalid_use.i:162: Warning: 
   Call to non-ghost function from ghost code is not allowed
-[kernel] Warning: warning ghost:bad-use treated as deferred error. See above messages for more information.
+[kernel] Warning: warning ghost:bad-use treated as deferred error:
+  ghost_cv_invalid_use.i:14: 'ng' is a non-ghost lvalue, it cannot be assigned in ghost code
 [kernel] Frama-C aborted: invalid user input.

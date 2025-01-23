@@ -29,5 +29,6 @@
   ----------------------------------------------------------------------------
   No logical properties have been reached by the analysis.
   ----------------------------------------------------------------------------
-[kernel] Warning: warning annot-error treated as deferred error. See above messages for more information.
+[kernel] Warning: warning annot-error treated as deferred error:
+  very_large_integers.c:132: Invalid slevel directive. Ignoring code annotation
 [kernel] Frama-C aborted: invalid user input.

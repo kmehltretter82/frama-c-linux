@@ -37,5 +37,7 @@
   /*@ ghost goto X; */
 [kernel:ghost:bad-use] ghost_cfg.c:109: Warning: 
   '__retres' is a non-ghost lvalue, it cannot be assigned in ghost code
-[kernel] Warning: warning ghost:bad-use treated as deferred error. See above messages for more information.
+[kernel] Warning: warning ghost:bad-use treated as deferred error:
+  ghost_cfg.c:10: Ghost code breaks CFG starting at:
+  /*@ ghost goto X; */
 [kernel] Frama-C aborted: invalid user input.

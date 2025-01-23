@@ -562,11 +562,6 @@ let deferred_exn = ref DNo_exn
 
 let unreported_error = "##unreported-error##"
 
-let unreported_event { evt_category } =
-  match evt_category with
-  | None -> false
-  | Some s -> s = unreported_error
-
 (* we keep track of at most one deferred exception, ordered by seriousness
    (internal error > user error > warning-as-error). the rationale is that
    an internal error might cause subsequent errors or warning, but the reverse
@@ -585,16 +580,20 @@ let update_deferred_exn exn =
 
 let warn_event_as_error event = update_deferred_exn (DWarn_as_error event)
 
-let deferred_raise ~fatal ~unreported event msg =
+let deferred_raise ~fatal event msg =
   (* reset deferred flag. *)
   let () = deferred_exn := DNo_exn in
   let channel = new_channel event.evt_plugin in
-  let append =
-    if unreported then None else
-      Some
-        (fun fmt ->
-           Format.fprintf fmt " See above messages for more information.@\n")
+  let pp_pos fmt pos =
+    if Filepath.is_empty_pos pos
+    then Format.fprintf fmt "<unknown location> "
+    else Format.fprintf fmt "%a: " Filepath.pp_pos pos
   in
+  let pp_pos_opt = Pretty_utils.pp_opt pp_pos in
+  let print_event fmt =
+    Format.fprintf fmt "@\n%a%s" pp_pos_opt event.evt_source event.evt_message
+  in
+  let append = Some print_event in
   let exn =
     if fatal then AbortFatal event.evt_plugin
     else AbortError event.evt_plugin
@@ -606,23 +605,20 @@ let treat_deferred_error () =
   match !deferred_exn with
   | DNo_exn -> ()
   | DWarn_as_error event ->
-    let unreported = unreported_event event in
     let wkey =
       match event.evt_category with
       | None -> ""
       | Some s when s = unreported_error -> ""
       | Some s -> s
     in
-    deferred_raise ~fatal:false ~unreported event
-      "warning %s treated as deferred error." wkey
+    deferred_raise ~fatal:false event
+      "warning %s treated as deferred error:" wkey
   | DError event ->
-    let unreported = unreported_event event in
-    deferred_raise ~fatal:false ~unreported event
-      "Deferred error message was emitted during execution."
+    deferred_raise ~fatal:false event
+      "Deferred error message was emitted during execution:"
   | DFatal event ->
-    let unreported = unreported_event event in
-    deferred_raise ~fatal:true ~unreported event
-      "Deferred internal error message was emitted during execution."
+    deferred_raise ~fatal:true event
+      "Deferred internal error message was emitted during execution:"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Messages Interface                                                 --- *)

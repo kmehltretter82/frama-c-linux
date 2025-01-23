@@ -28,6 +28,7 @@ import * as Server from 'frama-c/server';
 import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import { EvaStatus } from 'frama-c/plugins/eva/components/AnalysisStatus';
+import { SidebarTitle } from 'dome/frame/sidebars';
 
 
 export interface EvaToolsProps {
@@ -60,7 +61,7 @@ export default function EvaTools(
   const syncToFC = (): void => { remote.commit(); };
 
   return (
-    <Hbox className='dome-xSideBar-title  eva-tools'>
+    <SidebarTitle label='Parameters of Eva Analysis' className='eva-tools'>
       <Hbox className='eva-tools-actions'>
         <IconButton
           icon="MEDIA.PLAY"
@@ -100,6 +101,6 @@ export default function EvaTools(
       <Hbox className='eva-tools-status'>
         <EvaStatus iconSize={18} />
       </Hbox>
-    </Hbox>
+    </SidebarTitle>
   );
 }

@@ -3,7 +3,8 @@
 [test:a] Warning: Warning A
 [test] Failure: Testing failure function
 [test:a] Warning: Another Warning A
-[test] Failure: Deferred internal error message was emitted during execution. See above messages for more information.
+[test] Failure: Deferred internal error message was emitted during execution:
+  Testing failure function
 [kernel] Current source was: <unknown>
   The full backtrace is:
   
