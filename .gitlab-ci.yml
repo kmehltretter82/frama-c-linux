@@ -526,7 +526,7 @@ additional-arch-release:
 .build_template: &ocaml_always_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.2"]
+      - OCAML: ["5.3"]
 
 # Uncomment this block when there are intermediate versions to check manually
 # Beware that some targets may fail if the target job does not provide the
@@ -534,9 +534,7 @@ additional-arch-release:
 .build_template: &ocaml_manual_additional_versions_template
   parallel:
     matrix:
-      - OCAML: ["5.1"]
-      - OCAML: ["5.3-beta1"]
-        OPAM_OPTS: [ "--with-test" ] # odoc not ported to 5.3 for now
+      - OCAML: ["5.1", "5.2"]
   when: manual
 
 .build_template: &ocaml_versions_template
