@@ -1223,8 +1223,8 @@ function ViewBar(): JSX.Element {
   const groups = State.useElements(GROUP);
   const allGroups = groups.concat(Sandbox);
 
-  return (
-    <Sidebars.SideBar>
+  return (<>
+      <Sidebars.SidebarTitle label='Views & Components' />
       <ViewSection key='views' />
       {groups.map((group) =>
         <GroupSection
@@ -1236,7 +1236,7 @@ function ViewBar(): JSX.Element {
       <GroupSection
         key='sandbox'
         filter={inGroup(Sandbox)} {...Sandbox} />
-    </Sidebars.SideBar>
+    </>
   );
 }
 

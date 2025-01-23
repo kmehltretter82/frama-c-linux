@@ -358,12 +358,6 @@ tr:first-of-type > .eva-table-callsite-box {
 /* ------------------ */
 /* --- Tools Eva  --- */
 .eva-tools {
-
-  .eva-tools-actions {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
   .dome-xIconButton {
     padding: 2px 5px;
   }

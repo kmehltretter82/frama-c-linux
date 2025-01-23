@@ -29,9 +29,9 @@ import * as Dome from 'dome';
 import * as Json from 'dome/data/json';
 import { classes } from 'dome/misc/utils';
 import { alpha } from 'dome/data/compare';
-import { Section, Item } from 'dome/frame/sidebars';
+import { Section, Item, SidebarTitle } from 'dome/frame/sidebars';
 import { Button } from 'dome/controls/buttons';
-import { Label, Title } from 'dome/controls/labels';
+import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
 import InfiniteScroll from 'react-infinite-scroller';
@@ -686,37 +686,36 @@ function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
   const [showFcts, flipShowFcts] = showFctsState;
   const [showVars, flipShowVars] = showVarsState;
 
-  return <Hbox className='dome-xSideBar-title'  >
-    <Hbox style={{ flexWrap: 'wrap', alignContent: 'center' }}>
-      <Title label='Files' />
-    </Hbox>
-    <Hbox>
-      <Toolbar.ButtonGroup>
-        <Toolbar.Button
-          icon="FUNCTION"
-          title={'Show functions'}
-          selected={showFcts}
-          onClick={() => flipShowFcts()}
-          />
-        <Toolbar.Button
-          icon='TUNINGS'
-          onClick={() => Dome.popupMenu(contextFctMenuItems)}
-          />
-      </Toolbar.ButtonGroup>
-      <Toolbar.ButtonGroup>
-        <Toolbar.Button
-          icon="VARIABLE"
-          title={'Show variables'}
-          selected={showVars}
-          onClick={() => flipShowVars()}
-          />
-        <Toolbar.Button
-          icon='TUNINGS'
-          onClick={() => Dome.popupMenu(contextVarMenuItems)}
-          />
-      </Toolbar.ButtonGroup>
-    </Hbox>
-  </Hbox>;
+  return (
+    <SidebarTitle label='Files'>
+      <Hbox>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            icon="FUNCTION"
+            title={'Show functions'}
+            selected={showFcts}
+            onClick={() => flipShowFcts()}
+            />
+          <Toolbar.Button
+            icon='TUNINGS'
+            onClick={() => Dome.popupMenu(contextFctMenuItems)}
+            />
+        </Toolbar.ButtonGroup>
+        <Toolbar.ButtonGroup>
+          <Toolbar.Button
+            icon="VARIABLE"
+            title={'Show variables'}
+            selected={showVars}
+            onClick={() => flipShowVars()}
+            />
+          <Toolbar.Button
+            icon='TUNINGS'
+            onClick={() => Dome.popupMenu(contextVarMenuItems)}
+            />
+        </Toolbar.ButtonGroup>
+      </Hbox>
+    </SidebarTitle>
+  );
 }
 
 // --------------------------------------------------------------------------
@@ -757,12 +756,14 @@ export function GlobalByFiles(): JSX.Element {
 
 export function GlobalDeclarations(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
-  return (
-    <div ref={scrollableArea} className="globals-scrollable-area">
-      <Types />
-      <Variables scrollableParent={scrollableArea} />
-      <Functions scrollableParent={scrollableArea} />
-    </div>
+  return (<>
+      <SidebarTitle label='Global Declarations' />
+      <div ref={scrollableArea} className="globals-scrollable-area">
+        <Types />
+        <Variables scrollableParent={scrollableArea} />
+        <Functions scrollableParent={scrollableArea} />
+      </div>
+    </>
   );
 }
 
