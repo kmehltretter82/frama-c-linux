@@ -50,7 +50,7 @@
     Frama_C_entropy_source; x; y; tmp; tmp_0; tmp_1
 [inout] Inputs for function main_fail:
     Frama_C_entropy_source
-[eva] Warning: warning assigns:missing treated as deferred error:
+[eva] Deferred error: warning as error assigns:missing:
   recursion.c:426: Recursive call to sum_nospec without assigns clause.
   Generating probably incomplete assigns to interpret the call.
   Try to increase the -eva-unroll-recursive-calls parameter or write a correct specification for function sum_nospec.

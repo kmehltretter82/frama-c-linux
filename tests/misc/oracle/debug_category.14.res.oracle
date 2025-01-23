@@ -3,7 +3,7 @@
 [test:a] Warning: 
   Warning A
   (warn-error-once: no further messages from category 'a' will be emitted)
-[test] Warning: warning a treated as deferred error:
+[test] Deferred error: warning as error a:
   Warning A
   (warn-error-once: no further messages from category 'a' will be emitted)
 [kernel] Plug-in test aborted: invalid user input.

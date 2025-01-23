@@ -3,6 +3,6 @@
 [wp] User Error: Library Module not found
 [wp] Running WP plugin...
 [wp] No proof obligations
-[wp] User Error: Deferred error message was emitted during execution:
+[wp] Deferred error message was emitted during execution:
   Library Module not found
 [kernel] Plug-in wp aborted: invalid user input.

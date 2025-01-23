@@ -93,6 +93,6 @@
   Invalid cast of '& g_0' from 'int \ghost *' to 'int *'
 [kernel:ghost:bad-use] ghost_cv_incompat.i:194: Warning: 
   Invalid cast of '& g_0' from 'int \ghost *' to 'int *'
-[kernel] Warning: warning ghost:bad-use treated as deferred error:
+[kernel] Deferred error: warning as error ghost:bad-use:
   ghost_cv_incompat.i:27: Invalid cast of '& ng' from 'int *' to 'int \ghost *'
 [kernel] Frama-C aborted: invalid user input.

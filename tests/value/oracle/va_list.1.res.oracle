@@ -30,6 +30,6 @@
     vlParameters; tmp
 [inout] Inputs for function main:
     \nothing
-[eva] User Error: Deferred error message was emitted during execution:
+[eva] Deferred error message was emitted during execution:
   va_list.c:14: functions returning variadic arguments must be stubbed
 [kernel] Plug-in eva aborted: invalid user input.

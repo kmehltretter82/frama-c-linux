@@ -74,6 +74,6 @@
     x; y
   Sure outputs:
     w; z
-[eva] Warning: warning assigns:missing treated as deferred error:
+[eva] Deferred error: warning as error assigns:missing:
   No assigns specified for function 'f' for which option -eva-use-spec is set. Generating potentially incorrect assigns.
 [kernel] Plug-in eva aborted: invalid user input.

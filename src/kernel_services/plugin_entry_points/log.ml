@@ -599,7 +599,8 @@ let deferred_raise ~fatal event msg =
     else AbortError event.evt_plugin
   in
   let finally = finally_raise exn in
-  logwithfinal finally channel ?append ~kind:event.evt_kind msg
+  (* change the kind to avoid re-appending 'Error' to the message *)
+  logwithfinal finally channel ?append ~kind:Result msg
 
 let treat_deferred_error () =
   match !deferred_exn with
@@ -611,8 +612,8 @@ let treat_deferred_error () =
       | Some s when s = unreported_error -> ""
       | Some s -> s
     in
-    deferred_raise ~fatal:false event
-      "warning %s treated as deferred error:" wkey
+    deferred_raise ~fatal:false { event with evt_kind = Error }
+      "Deferred error: warning as error %s:" wkey
   | DError event ->
     deferred_raise ~fatal:false event
       "Deferred error message was emitted during execution:"

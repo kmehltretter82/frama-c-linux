@@ -4,7 +4,8 @@
   [server] User Error: [batch] "unknown request": request "kernel.unknown" not found
   [server] User Error: [batch] "wrong data": request "kernel.ast.printFunction" not found
   [server] Output "wrong.out.json"
-  [server] User Error: Deferred error message was emitted during execution. See above messages for more information.
+  [server] Deferred error message was emitted during execution:
+    [batch] "unknown request": request "kernel.unknown" not found
   [kernel] Plug-in server aborted: invalid user input.
   [1]
   $ cat wrong.out.json

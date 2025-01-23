@@ -186,7 +186,8 @@ Customized kernel var > xdg var
 Bad home value
   $ HOME= dune exec --cache=disabled -- frama-c
   [dirs] User Error: Failure when creating directories
-  [dirs] User Error: Deferred error message was emitted during execution. See above messages for more information.
+  [dirs] Deferred error message was emitted during execution:
+    Failure when creating directories
   [kernel] Plug-in dirs aborted: invalid user input.
   [1]
 

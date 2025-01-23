@@ -1,6 +1,6 @@
 [kernel] Parsing cert_msc_38.c (with preprocessing)
 [kernel:CERT:MSC:38] cert_msc_38.c:38: Warning: 
   Attempt to declare math_errhandling as external identifier outside of the stdlib. It is supposed to be a macro name and cannot be declared. See CERT C coding rule MSC38-C
-[kernel] Warning: warning CERT:MSC:38 treated as deferred error:
+[kernel] Deferred error: warning as error CERT:MSC:38:
   cert_msc_38.c:38: Attempt to declare math_errhandling as external identifier outside of the stdlib. It is supposed to be a macro name and cannot be declared. See CERT C coding rule MSC38-C
 [kernel] Frama-C aborted: invalid user input.

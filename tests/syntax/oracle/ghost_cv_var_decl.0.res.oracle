@@ -27,6 +27,6 @@
   Invalid type for 'param': indirection from non-ghost to ghost
 [kernel:ghost:bad-use] ghost_cv_var_decl.c:166: Warning: 
   Invalid type for 'pptrg': indirection from non-ghost to ghost
-[kernel] Warning: warning ghost:bad-use treated as deferred error:
+[kernel] Deferred error: warning as error ghost:bad-use:
   ghost_cv_var_decl.c:152: No definition, nor assigns specification for ghost function 'decl_bad_return_type'
 [kernel] Frama-C aborted: invalid user input.

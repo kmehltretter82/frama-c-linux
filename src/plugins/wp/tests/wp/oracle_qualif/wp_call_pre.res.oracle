@@ -31,5 +31,7 @@
   call_main                 4        -        4       100%
   call_g                    4        -        4       100%
 ------------------------------------------------------------
-[wp] User Error: Deferred error message was emitted during execution. See above messages for more information.
+[wp] Deferred error message was emitted during execution:
+  Main entry point function 'main' is (potentially) recursive.
+  This case is not supported yet (skipped verification).
 [kernel] Plug-in wp aborted: invalid user input.
