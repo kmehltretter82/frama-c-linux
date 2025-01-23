@@ -4,11 +4,12 @@
 , gmp
 , mpfr
 , buildDunePackage
+, dune-configurator
 }:
 
 buildDunePackage rec {
   pname = "mlmpfr";
-  version = "4.1.0-bugfix2";
+  version = "4.2.1";
 
   minimumOCamlVersion = "4.04";
 
@@ -16,9 +17,11 @@ buildDunePackage rec {
     owner = "thvnx";
     repo = pname;
     rev = pname+"."+version;
-    sha256 = "19g26jv6cjinpl5pcjif1ldyaagxlandp3qjajsy8srqg4a5rg0d";
+    sha256 = "1pr1kl50r4s03z3biwhwvbg6pplwsgbdh2mg60r316hij1fdvkvg";
   };
 
+  patches = [ ./mlmpfr.patch ];
+  buildInputs = [ dune-configurator ];
   propagatedBuildInputs = [ gmp mpfr ];
 
   meta = {

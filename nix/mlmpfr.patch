@@ -1,0 +1,26 @@
+From f810ca8cd5690d76367d6031796850828a7162b8 Mon Sep 17 00:00:00 2001
+From: Allan Blanchard <allan.blanchard@cea.fr>
+Date: Thu, 23 Jan 2025 13:37:11 +0100
+Subject: [PATCH] be sure that the warning on implicit declaration is never an
+ error
+
+---
+ src/dune | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/dune b/src/dune
+index 5158d05..ab698c1 100644
+--- a/src/dune
++++ b/src/dune
+@@ -7,7 +7,7 @@
+   (language c)
+   (names mlmpfr_stubs)
+   (flags
+-   (:include c_flags.sexp)))
++   (:include c_flags.sexp) -Wno-error=implicit-function-declaration))
+  (c_library_flags
+   (:include c_library_flags.sexp)))
+ 
+-- 
+2.34.1
+
