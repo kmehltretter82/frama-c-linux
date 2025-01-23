@@ -579,25 +579,32 @@ export function Types(): JSX.Element {
 // --------------------------------------------------------------------------
 // --- Files Section
 // --------------------------------------------------------------------------
+type FilesProps = {
+  showFunction: (fct: functionsData) => boolean;
+  showFctsState: [boolean, () => void];
+  showVariable: (vi: Ast.globalsData) => boolean
+  showVarsState: [boolean, () => void];
+} & ScrollableParent
 
-export function Files(props: ScrollableParent): JSX.Element {
-  const { scrollableParent } = props;
+export function Files(props: FilesProps): JSX.Element {
+  const { showFunction, showFctsState, showVariable, showVarsState,
+    scrollableParent } = props;
   // Hooks
   const scope = States.useCurrentScope();
+  const getDecl = States.useSyncArrayGetter(Ast.declAttributes);
+  const currentSection = React.useMemo(() => {
+    return getDecl(scope)?.source.file;
+  }, [scope, getDecl]);
 
   // functions
   const ker = States.useSyncArrayProxy(Ast.functions);
   const eva = States.useSyncArrayProxy(Eva.functions);
   const fcts = React.useMemo(() => computeFcts(ker, eva), [ker, eva]);
-  const { showFunction, contextFctMenuItems } = useFunctionFilter();
-  const [showFcts, flipShowFcts]
-    = Dome.useFlipSettings('ivette.files.show.functions', true);
+  const [showFcts, ] = showFctsState;
 
   // Variables
   const variables = States.useSyncArrayData(Ast.globals);
-  const { showVariable, contextVarMenuItems } = useVariableFilter();
-  const [showVars, flipShowVars]
-    = Dome.useFlipSettings('ivette.files.show.globals', true);
+  const [showVars, ] = showVarsState;
 
   interface InfosFile {
     label: string,
@@ -631,15 +638,6 @@ export function Files(props: ScrollableParent): JSX.Element {
     return newFiles;
   }, [fcts, showFunction, variables, showVariable]);
 
-  const currentSection = React.useMemo(() => {
-    for( const path of Object.keys(files)) {
-      if(files[path].fcts.find(e => e.decl === scope) ||
-      files[path].vars.find(e => e.decl === scope)
-      ) return path;
-    }
-    return undefined;
-  }, [files, scope]);
-
   function getList([path, infos]: [string, InfosFile]): JSX.Element | null {
     const { label, fcts, vars } = infos;
     const fctsComp: JSX.Element[] = showFcts ?
@@ -667,38 +665,6 @@ export function Files(props: ScrollableParent): JSX.Element {
   }
 
   return <>
-    <Hbox className='dome-xSideBar-title'  >
-      <Hbox style={{ flexWrap: 'wrap', alignContent: 'center' }}>
-        <Title label='Files' />
-      </Hbox>
-      <Hbox>
-        <Toolbar.ButtonGroup>
-          <Toolbar.Button
-            icon="FUNCTION"
-            title={'Show functions'}
-            selected={showFcts}
-            onClick={() => flipShowFcts()}
-            />
-          <Toolbar.Button
-            icon='TUNINGS'
-            onClick={() => Dome.popupMenu(contextFctMenuItems)}
-            />
-        </Toolbar.ButtonGroup>
-        <Toolbar.ButtonGroup>
-          <Toolbar.Button
-            icon="VARIABLE"
-            title={'Show variables'}
-            selected={showVars}
-            onClick={() => flipShowVars()}
-            />
-          <Toolbar.Button
-            icon='TUNINGS'
-            onClick={() => Dome.popupMenu(contextVarMenuItems)}
-            />
-        </Toolbar.ButtonGroup>
-      </Hbox>
-    </Hbox>
-
     {
       Object.entries(files)
         .sort((v1, v2) => alpha(v1[1].label, v2[1].label))
@@ -707,16 +673,85 @@ export function Files(props: ScrollableParent): JSX.Element {
   </>;
 }
 
+interface SidebarFilesTitleProps {
+  showFctsState: [boolean, () => void];
+  contextFctMenuItems: Dome.PopupMenuItem[];
+  showVarsState: [boolean, () => void];
+  contextVarMenuItems: Dome.PopupMenuItem[];
+}
+
+function SidebarFilesTitle(props: SidebarFilesTitleProps): JSX.Element {
+  const { showFctsState, contextFctMenuItems,
+    showVarsState, contextVarMenuItems } = props;
+  const [showFcts, flipShowFcts] = showFctsState;
+  const [showVars, flipShowVars] = showVarsState;
+
+  return <Hbox className='dome-xSideBar-title'  >
+    <Hbox style={{ flexWrap: 'wrap', alignContent: 'center' }}>
+      <Title label='Files' />
+    </Hbox>
+    <Hbox>
+      <Toolbar.ButtonGroup>
+        <Toolbar.Button
+          icon="FUNCTION"
+          title={'Show functions'}
+          selected={showFcts}
+          onClick={() => flipShowFcts()}
+          />
+        <Toolbar.Button
+          icon='TUNINGS'
+          onClick={() => Dome.popupMenu(contextFctMenuItems)}
+          />
+      </Toolbar.ButtonGroup>
+      <Toolbar.ButtonGroup>
+        <Toolbar.Button
+          icon="VARIABLE"
+          title={'Show variables'}
+          selected={showVars}
+          onClick={() => flipShowVars()}
+          />
+        <Toolbar.Button
+          icon='TUNINGS'
+          onClick={() => Dome.popupMenu(contextVarMenuItems)}
+          />
+      </Toolbar.ButtonGroup>
+    </Hbox>
+  </Hbox>;
+}
+
 // --------------------------------------------------------------------------
 // --- All globals
 // --------------------------------------------------------------------------
 
 export function GlobalByFiles(): JSX.Element {
   const scrollableArea = React.useRef<HTMLDivElement>(null);
-  return (
-    <div ref={scrollableArea} className="globals-scrollable-area">
-      <Files scrollableParent={scrollableArea} />
-    </div>
+
+  // functions
+  const { showFunction, contextFctMenuItems } = useFunctionFilter();
+  const showFctsState =
+    Dome.useFlipSettings('ivette.files.show.functions', true);
+
+  // Variables
+  const { showVariable, contextVarMenuItems } = useVariableFilter();
+  const showVarsState =
+    Dome.useFlipSettings('ivette.files.show.globals', true);
+
+  return (<>
+      <SidebarFilesTitle
+        showFctsState={showFctsState}
+        contextFctMenuItems={contextFctMenuItems}
+        showVarsState={showVarsState}
+        contextVarMenuItems={contextVarMenuItems}
+      />
+      <div ref={scrollableArea} className="globals-scrollable-area">
+        <Files scrollableParent={scrollableArea}
+          showFctsState={showFctsState}
+          showFunction={showFunction}
+          showVarsState={showVarsState}
+          showVariable={showVariable}
+        />
+      </div>
+    </>
   );
 }
 
