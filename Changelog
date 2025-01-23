@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Ivette    [2025-01-23] New sidebar listing functions and global variables
+              for each source file.
 -   Eva       [2025-01-23] Rename warning key `invalid-assigns` to
               `assigns:invalid-location`
 -   Eva       [2025-01-23] All warnings about missing assigns or \from clauses
