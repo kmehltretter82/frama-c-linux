@@ -124,7 +124,14 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
     when
       Cil.isStructType @@ Cil.typeOfLval lv
       || Cil.isArrayType @@ Cil.typeOfLval lv ->
-    Memory.merge m (add_lval m s lv) (add_lval m s le)
+    let n1 = add_lval m s lv in
+    let n2 = add_lval m s le in
+    Memory.merge m n1 n2 ;
+    (* Add all children fields *)
+    let n = Memory.node m n1 in
+    List.iter (fun f -> let _ = Memory.add_field m n f in ())
+    @@ Option.value ~default:[] (Cil.getCompType @@ Cil.typeOfLval lv).cfields
+
 
   | Set(lv, { enode = Lval exp }, _) ->
     let l = add_lval m s lv in

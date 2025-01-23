@@ -1,0 +1,34 @@
+# frama-c -wp -wp-model 'Region' [...]
+[kernel] Parsing copy_struct.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal copy_struct_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal copy_struct_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+------------------------------------------------------------
+  Function copy_struct
+------------------------------------------------------------
+
+Goal Post-condition (file copy_struct.i, line 22) in 'copy_struct':
+Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 12).
+Let a_2 = memcpy(Msint16_0, Msint16_undef_0, a, a, 1).
+Let a_3 = Load_R003_S1_S(a, a_1, a_2).
+Let x = Msint16_1[shiftfield_F1_S_fs(a)].
+Let a_4 = Load_R003_S1_S(b, a_1, a_2).
+Assume {
+  Type: is_sint16(x) /\ IsS1_S(a_3) /\ IsS1_S(a_4).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ framed(mem_0) /\
+      sconst(mem_0).
+  (* Pre-condition *)
+  Have: separated(a, 12, b, 12).
+  If x = 0
+  Then {
+    Have: Msint16_1 = Msint16_2.
+    Have: Msint16_2[shiftfield_F1_S_fs(a) <- 1] = Msint16_0.
+  }
+  Else { Have: Msint16_1 = Msint16_0. }
+  Have: a_3 = Load_R003_S1_S(b, mem_0, Msint16_0).
+}
+Prove: EqS1_S(a_3, a_4).
+
+------------------------------------------------------------
