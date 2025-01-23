@@ -241,16 +241,8 @@ let rec echo_lines ?(prefix=false) output text p q =
 let add_source buffer = function
   | None -> ()
   | Some src ->
-    (* Avoid printing ':0:' if the position is unknown. *)
-    if Filepath.is_empty_pos src
-    then Buffer.add_string buffer "<unknown location> "
-    else begin
-      Buffer.add_string buffer
-        (Filepath.Normalized.to_pretty_string src.Filepath.pos_path);
-      Buffer.add_string buffer ":" ;
-      Buffer.add_string buffer (string_of_int src.Filepath.pos_lnum);
-      Buffer.add_string buffer ": "
-    end
+    let fmt = Format.formatter_of_buffer buffer in
+    Format.fprintf fmt "%a: @?" Filepath.pp_pos src
 
 let add_category buffer = function
   | None -> ()
@@ -584,11 +576,7 @@ let deferred_raise ~fatal event msg =
   (* reset deferred flag. *)
   let () = deferred_exn := DNo_exn in
   let channel = new_channel event.evt_plugin in
-  let pp_pos fmt pos =
-    if Filepath.is_empty_pos pos
-    then Format.fprintf fmt "<unknown location> "
-    else Format.fprintf fmt "%a: " Filepath.pp_pos pos
-  in
+  let pp_pos fmt pos = Format.fprintf fmt "%a: " Filepath.pp_pos pos in
   let pp_pos_opt = Pretty_utils.pp_opt pp_pos in
   let print_event fmt =
     Format.fprintf fmt "@\n%a%s" pp_pos_opt event.evt_source event.evt_message

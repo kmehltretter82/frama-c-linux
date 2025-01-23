@@ -229,7 +229,9 @@ let rec skip_dot file_name =
   else file_name
 
 let pretty file_name =
-  if Filename.is_relative file_name then
+  if file_name = "" then
+    "<unknown location>"
+  else if Filename.is_relative file_name then
     skip_dot file_name
   else
     let path = insert cwd file_name in
@@ -297,6 +299,8 @@ module Normalized = struct
   let pretty fmt p =
     if is_special_stdout p then
       Format.fprintf fmt "<stdout>"
+    else if is_empty p then
+      Format.fprintf fmt "<unknown location>"
     else
       Format.fprintf fmt "%s" (pretty p)
   let pp_abs fmt p = Format.fprintf fmt "%s" p
@@ -337,7 +341,11 @@ let empty_pos = {
 }
 
 let pp_pos fmt pos =
-  Format.fprintf fmt "%a:%d" Normalized.pretty pos.pos_path pos.pos_lnum
+  let path = pos.pos_path in
+  if Normalized.(is_empty path || is_special_stdout path) then
+    Format.fprintf fmt "%a" Normalized.pretty path
+  else
+    Format.fprintf fmt "%a:%d" Normalized.pretty path pos.pos_lnum
 
 let is_empty_pos pos = pos == empty_pos
 
