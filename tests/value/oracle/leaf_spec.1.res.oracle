@@ -10,9 +10,9 @@
 [eva] computing for function f <- main1.
   Called from leaf_spec.i:27.
 [eva] using specification for function f
-[eva:invalid-assigns] leaf_spec.i:27: 
+[eva:assigns:invalid-location] leaf_spec.i:27: 
   Completely invalid destination for assigns clause *x. Ignoring.
-[eva:invalid-assigns] leaf_spec.i:27: 
+[eva:assigns:invalid-location] leaf_spec.i:27: 
   Completely invalid destination for assigns clause *y. Ignoring.
 [eva] Done for function f
 [eva] Recording results for main1

@@ -11,7 +11,7 @@
   function setitimer: precondition 'valid_new_value' got status valid.
 [eva] sys_time_h.c:6: 
   function setitimer: precondition 'old_value_null_or_valid' got status valid.
-[eva:invalid-assigns] sys_time_h.c:6: 
+[eva:assigns:invalid-location] sys_time_h.c:6: 
   Completely invalid destination for assigns clause *old_value. Ignoring.
 [eva] Done for function setitimer
 [eva] sys_time_h.c:7: assertion got status valid.

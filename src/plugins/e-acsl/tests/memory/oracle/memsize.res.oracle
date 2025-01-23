@@ -14,7 +14,7 @@
 [eva] memsize.c:25: Warning: ignoring unsupported allocates clause
 [eva:alarm] memsize.c:26: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva] FRAMAC_SHARE/libc/stdlib.h:485: Warning: 
+[eva:assigns:missing-result] FRAMAC_SHARE/libc/stdlib.h:485: Warning: 
   no 'assigns \result \from ...' clause specified for function realloc
 [eva] memsize.c:29: Warning: ignoring unsupported allocates clause
 [eva:alarm] memsize.c:29: Warning: 
@@ -42,7 +42,7 @@
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] memsize.c:52: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva] FRAMAC_SHARE/libc/stdlib.h:418: Warning: 
+[eva:assigns:missing-result] FRAMAC_SHARE/libc/stdlib.h:418: Warning: 
   no 'assigns \result \from ...' clause specified for function calloc
 [eva] memsize.c:55: Warning: ignoring unsupported allocates clause
 [eva:alarm] memsize.c:56: Warning: 

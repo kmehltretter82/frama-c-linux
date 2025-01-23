@@ -4,23 +4,20 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   ghost_loctable[0..99] ∈ {0}
-  pmutex ∈ {0}
-[eva:alarm] lock.i:48: Warning: 
+  mutex ∈ [--..--]
+[eva:alarm] lock.i:49: Warning: 
   function locks0_good: precondition got status unknown.
 [eva] computing for function acquire_lock <- locks0_good.
-  Called from lock.i:51.
+  Called from lock.i:52.
 [eva] using specification for function acquire_lock
-[eva:alarm] lock.i:51: Warning: 
+[eva:alarm] lock.i:52: Warning: 
   function acquire_lock: precondition got status unknown.
-[eva] lock.i:21: Warning: 
-  no \from part for clause 'assigns ghost_loctable[0 .. 99];'
 [eva] Done for function acquire_lock
 [eva] computing for function release_lock <- locks0_good.
-  Called from lock.i:52.
+  Called from lock.i:53.
 [eva] using specification for function release_lock
-[eva:alarm] lock.i:52: Warning: 
+[eva:alarm] lock.i:53: Warning: 
   function release_lock: precondition got status unknown.
-[eva] lock.i:29: Warning: no \from part for clause 'assigns ghost_loctable[..];'
 [eva] Done for function release_lock
 [eva] Recording results for locks0_good
 [eva] Done for function locks0_good
@@ -36,13 +33,13 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function acquire_lock:
-  ghost_loctable[0..99] FROM ANYTHING(origin:Unknown) (and SELF)
+  ghost_loctable[0..99] FROM mutex
 [from] Function release_lock:
-  ghost_loctable[0..99] FROM ANYTHING(origin:Unknown) (and SELF)
+  ghost_loctable[0..99] FROM mutex
 [from] Function locks0_good:
-  ghost_loctable[0..99] FROM ANYTHING(origin:Unknown) (and SELF)
+  ghost_loctable[0..99] FROM mutex
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function locks0_good:
     ghost_loctable[0..99]
 [inout] Inputs for function locks0_good:
-    ANYTHING(origin:Unknown)
+    mutex

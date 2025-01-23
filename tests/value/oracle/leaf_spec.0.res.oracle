@@ -31,7 +31,7 @@
 [eva] computing for function k <- main.
   Called from leaf_spec.i:22.
 [eva] using specification for function k
-[eva:invalid-assigns] leaf_spec.i:22: 
+[eva:assigns:invalid-location] leaf_spec.i:22: 
   Completely invalid destination for assigns clause *l. Ignoring.
 [eva] Done for function k
 [kernel:annot:missing-spec] leaf_spec.i:22: Warning: 

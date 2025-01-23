@@ -7,7 +7,7 @@ PLUGIN: eva,inout,scope
 int pfsqopfc(int x) {
 int five_times;
 /*@
-  assigns five_times;
+  assigns five_times \from x;
   ensures five_times == (int)(5 * x);
 */
 asm ("leal (%1,%1,4), %0"

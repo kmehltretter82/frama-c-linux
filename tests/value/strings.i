@@ -126,7 +126,7 @@ int strcmp(const char *s1, const char *s2)
   return (*(unsigned char *)s1 - *(unsigned char *)--s2);
 }
 
-//@ assigns p[0..s-1]; ensures \initialized(&p[0..s-1]);
+//@ assigns p[0..s-1] \from indirect:nondet; ensures \initialized(&p[0..s-1]);
 void assigns(char *p, unsigned int s);
 
 int long_chain() {

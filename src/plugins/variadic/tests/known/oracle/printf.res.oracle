@@ -105,7 +105,7 @@
 [kernel:annot:missing-spec] printf.c:71: Warning: 
   Neither code nor specification for function printf_fallback_1,
    generating default assigns. See -generated-spec-* options for more info
-[eva:invalid-assigns] printf.c:71: 
+[eva:assigns:invalid-location] printf.c:71: 
   Completely invalid destination for assigns clause *(param1 + (0 ..)).
   Ignoring.
 [eva] ====== VALUES COMPUTED ======

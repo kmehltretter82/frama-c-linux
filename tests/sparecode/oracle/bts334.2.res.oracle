@@ -17,7 +17,7 @@
 [eva] computing for function init <- main_init.
   Called from bts334.i:66.
 [eva] using specification for function init
-[eva] bts334.i:61: Warning: 
+[eva:assigns:missing-result] bts334.i:61: Warning: 
   no 'assigns \result \from ...' clause specified for function init
 [kernel] bts334.i:66: Warning: keeping only assigns from behaviors: default
 [eva] Done for function init

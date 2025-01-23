@@ -79,9 +79,10 @@
 [eva] computing for function assigns_post <- main1 <- main.
   Called from assigns.i:56.
 [eva] using specification for function assigns_post
-[eva] assigns.i:39: Warning: 
-  no \from part
-  for clause 'assigns Tpost[\at(\old(i),Post)], Tpost[\at(k,Post)];'
+[eva:assigns:missing] assigns.i:39: Warning: 
+  no \from part for clause
+  'assigns Tpost[\at(\old(i),Post)], Tpost[\at(k,Post)];'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva] assigns.i:56: Warning: 
   cannot interpret \from clause \at(x,Post)
   (no environment to evaluate \at(_,Post)); effects will be ignored
@@ -99,13 +100,15 @@
 [eva] computing for function ff1 <- main2 <- main.
   Called from assigns.i:76.
 [eva] using specification for function ff1
-[eva] assigns.i:60: Warning: 
+[eva:assigns:missing-result] assigns.i:60: Warning: 
   no 'assigns \result \from ...' clause specified for function ff1
 [eva] Done for function ff1
 [eva] computing for function ff3 <- main2 <- main.
   Called from assigns.i:78.
 [eva] using specification for function ff3
-[eva] assigns.i:68: Warning: no \from part for clause 'assigns y1, y3;'
+[eva:assigns:missing] assigns.i:68: Warning: 
+  no \from part for clause 'assigns y1, y3;'.
+  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
 [eva] Done for function ff3
 [kernel:annot:missing-spec] assigns.i:79: Warning: 
   Neither code nor specification for function ff4,
@@ -131,7 +134,7 @@
 [eva] computing for function ff2_bis <- main2 <- main.
   Called from assigns.i:83.
 [eva] using specification for function ff2_bis
-[eva] assigns.i:64: Warning: 
+[eva:assigns:missing-result] assigns.i:64: Warning: 
   no 'assigns \result \from ...' clause specified for function ff2_bis
 [eva] Done for function ff2_bis
 [eva:alarm] assigns.i:84: Warning: 

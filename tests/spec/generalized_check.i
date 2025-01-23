@@ -6,7 +6,7 @@ PLUGIN:
 */
 /*@ check lemma easy_proof: \false; */ // should not be put in any environment
 /*@ check requires f_valid_x: \valid(x);
-    assigns *x;
+    assigns *x \from indirect:x;
     check ensures f_init_x: *x == 0;
 */
 void f(int* x) {

@@ -5,6 +5,7 @@
 /*@ check requires f_valid_x: \valid(x);
     check ensures f_init_x: *\old(x) ≡ 0;
     assigns *x;
+    assigns *x \from (indirect: x);
  */
 void f(int *x)
 {

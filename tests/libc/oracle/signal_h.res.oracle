@@ -83,7 +83,7 @@
   function sigprocmask: precondition 'valid_oldset_or_null' got status valid.
 [eva] signal_h.c:35: 
   function sigprocmask: precondition 'separation' got status valid.
-[eva:invalid-assigns] signal_h.c:35: 
+[eva:assigns:invalid-location] signal_h.c:35: 
   Completely invalid destination for assigns clause *oldset. Ignoring.
 [eva] Done for function sigprocmask
 [eva] computing for function sigprocmask <- main.
@@ -145,7 +145,7 @@
   function sigaction: precondition 'valid_read_act_or_null' got status valid.
 [eva] signal_h.c:51: 
   function sigaction: precondition 'separation,separated_acts' got status valid.
-[eva:invalid-assigns] signal_h.c:51: 
+[eva:assigns:invalid-location] signal_h.c:51: 
   Completely invalid destination for assigns clause *oldact. Ignoring.
 [eva] Done for function sigaction
 [eva] signal_h.c:55: assertion 'valid_nsig' got status valid.

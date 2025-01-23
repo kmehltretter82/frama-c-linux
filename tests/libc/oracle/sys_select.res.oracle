@@ -68,9 +68,9 @@
 [eva] sys_select.c:31: 
   function select: precondition 'errorfds' got status valid.
 [eva] sys_select.c:31: function select: precondition 'timeout' got status valid.
-[eva:invalid-assigns] sys_select.c:31: 
+[eva:assigns:invalid-location] sys_select.c:31: 
   Completely invalid destination for assigns clause *writefds. Ignoring.
-[eva:invalid-assigns] sys_select.c:31: 
+[eva:assigns:invalid-location] sys_select.c:31: 
   Completely invalid destination for assigns clause *errorfds. Ignoring.
 [eva] Done for function select
 [eva] computing for function FD_ISSET <- main.

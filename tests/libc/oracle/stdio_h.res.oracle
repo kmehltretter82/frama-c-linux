@@ -204,7 +204,7 @@
 [eva:libc:unsupported-spec] stdio_h.c:99: Warning: 
   The specification of function 'vscanf' is currently not supported by Eva.
   Consider adding 'FRAMAC_SHARE/libc/stdio.c' to the analyzed source files.
-[eva] FRAMAC_SHARE/libc/stdio.h:276: Warning: 
+[eva:assigns:missing-result] FRAMAC_SHARE/libc/stdio.h:276: Warning: 
   no 'assigns \result \from ...' clause specified for function vscanf
 [eva] Done for function vscanf
 [eva] Recording results for caller_stub_for_vscanf

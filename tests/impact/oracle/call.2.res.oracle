@@ -13,7 +13,6 @@
 [eva] computing for function p3 <- test3 <- call_test3 <- main3.
   Called from call.i:45.
 [eva] using specification for function p3
-[eva] call.i:41: Warning: no \from part for clause 'assigns G;'
 [eva] Done for function p3
 [kernel:annot:missing-spec] call.i:45: Warning: 
   Neither code nor specification for function p2,
@@ -44,7 +43,10 @@
 [pdg] done for function test3
 [pdg] computing for function p3
 [pdg] done for function p3
+[pdg] computing for function p2
+[pdg] done for function p2
 [impact] impacted statements of stmt(s) 30 are:
-    call.i:45 (sid 22): p3(1);call.i:49 (sid 26): test3();
+    call.i:45 (sid 21): if(X) <..>call.i:45 (sid 22): p3(1);
+    call.i:45 (sid 23): p2(0);call.i:49 (sid 26): test3();
     call.i:55 (sid 31): call_test3();
 [impact] analysis done

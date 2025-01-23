@@ -40,19 +40,31 @@ let find_default_behavior spec =
   List.find (fun b' -> b'.b_name = Cil.default_behavior_name) spec.spec_behavior
 
 let warn_empty_assigns () =
-  Self.warning ~current:true ~once:true
-    "Cannot handle empty assigns clause. Assuming assigns \\nothing: \
-     be aware this is probably incorrect."
+  Self.warning ~current:true ~once:true ~wkey:Self.wkey_missing_assigns
+    "Cannot handle empty assigns clause. Assuming assigns \\nothing so that \
+     the analysis can continue, but be aware this is probably incorrect."
 
 (* Warn for assigns clauses without \from. *)
 let warn_empty_from list =
-  let no_from = List.filter (fun (_, from) -> from = FromAny) list in
+  let is_empty_set it =
+    match it with
+    | { it_content = { term_node = Tempty_set }} -> true
+    | _ -> false
+  in
+  let no_from =
+    List.filter
+      (fun (it, from) ->
+         (* Ignore assigns \empty with no \from. *)
+         not (is_empty_set it) && from = FromAny)
+      list
+  in
   match no_from with
   | [] -> ()
   | (out, _) :: _ ->
     let source = fst out.it_content.term_loc in
-    Self.warning ~source ~once:true
-      "@[no \\from part@ for clause '%a'@]"
+    Self.warning ~source ~once:true ~wkey:Self.wkey_missing_assigns
+      "@[no \\from part for clause@ '%a'.@ Assuming \\from \\nothing so that \
+       the analysis can continue, but be aware this is probably incorrect.@]"
       Printer.pp_assigns (Writes no_from)
 
 let get_assigns = function
@@ -124,8 +136,8 @@ let warn_on_missing_result_assigns kinstr kf spec =
   if return_used && not (List.for_all assigns_result spec.spec_behavior)
   then
     let source = fst (Kernel_function.get_location kf) in
-    Self.warning ~once:true ~source
-      "@[no 'assigns \\result@ \\from ...'@ clause@ specified for@ function %a@]"
+    Self.warning ~wkey:Self.wkey_missing_assigns_result  ~once:true ~source
+      "@[no 'assigns \\result \\from ...' clause specified for function %a@]"
       Kernel_function.pretty kf
 
 let reduce_to_valid_location kind term loc =

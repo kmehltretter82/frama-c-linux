@@ -174,7 +174,7 @@
   function strtok: precondition 'separation' got status valid.
 [eva] string_h.c:82: 
   function strtok, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva:invalid-assigns] string_h.c:82: 
+[eva:assigns:invalid-location] string_h.c:82: 
   Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
 [eva] Done for function strtok
 [eva:alarm] string_h.c:83: Warning: check got status unknown.
@@ -273,7 +273,7 @@
   function strtok_r: precondition 'valid_saveptr' got status valid.
 [eva] string_h.c:112: 
   function strtok_r, behavior new_str: precondition 'valid_string_s_or_delim_not_found' got status valid.
-[eva:invalid-assigns] string_h.c:112: 
+[eva:assigns:invalid-location] string_h.c:112: 
   Completely invalid destination for assigns clause *(s + (0 ..)). Ignoring.
 [eva] Done for function strtok_r
 [eva:alarm] string_h.c:113: Warning: check got status unknown.
@@ -500,7 +500,7 @@
   Called from string_h.c:204.
 [eva] string_h.c:204: 
   function strsep: precondition 'valid_stringp' got status valid.
-[eva:invalid-assigns] string_h.c:204: 
+[eva:assigns:invalid-location] string_h.c:204: 
   Completely invalid destination for assigns clause *(*(stringp + (0 ..))).
   Ignoring.
 [eva] Done for function strsep

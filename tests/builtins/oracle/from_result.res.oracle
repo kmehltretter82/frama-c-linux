@@ -31,7 +31,7 @@
 [eva] computing for function foo <- main.
   Called from from_result.c:37.
 [eva] using specification for function foo
-[eva] from_result.c:29: Warning: 
+[eva:assigns:missing-result] from_result.c:29: Warning: 
   no 'assigns \result \from ...' clause specified for function foo
 [eva] Done for function foo
 [eva] Recording results for main

@@ -52,7 +52,7 @@
   function sendfile: precondition 'valid_offset_or_null' got status valid.
 [eva] sys_sendfile_h.c:19: 
   function sendfile: precondition 'initialization,offset' got status valid.
-[eva:invalid-assigns] sys_sendfile_h.c:19: 
+[eva:assigns:invalid-location] sys_sendfile_h.c:19: 
   Completely invalid destination for assigns clause *offset. Ignoring.
 [eva] Done for function sendfile
 [eva] computing for function close <- main.

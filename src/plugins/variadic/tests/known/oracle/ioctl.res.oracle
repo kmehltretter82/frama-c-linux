@@ -11,7 +11,7 @@
 [eva] Analyzing a complete application starting at main
 [eva] using specification for function __va_ioctl_void
 [eva] using specification for function __va_ioctl_ptr
-[eva:invalid-assigns] ioctl.c:17: 
+[eva:assigns:invalid-location] ioctl.c:17: 
   Completely invalid destination for assigns clause *((char *)argp + (0 ..)).
   Ignoring.
 [eva] using specification for function __va_ioctl_int

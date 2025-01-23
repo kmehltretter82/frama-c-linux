@@ -8,10 +8,10 @@
 
 int i0, o0;
 
-/*@ assigns i0, o0 ; */
+/*@ assigns i0, o0 \from \nothing; */
 void loop_body (void) ;
 
-/*@ assigns *p_res; */
+/*@ assigns *p_res \from indirect:p_res; */
 void init (int * p_res) ;
 
 int is_ko = -1;

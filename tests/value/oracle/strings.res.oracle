@@ -165,8 +165,6 @@
 [eva] computing for function assigns <- long_chain <- main.
   Called from strings.i:135.
 [eva] using specification for function assigns
-[eva] strings.i:129: Warning: 
-  no \from part for clause 'assigns *(p + (0 .. s - 1));'
 [eva] Done for function assigns
 [eva] computing for function strcmp <- long_chain <- main.
   Called from strings.i:136.
@@ -323,11 +321,11 @@
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
 [from] Function assigns:
-  tc[0..29] FROM ANYTHING(origin:Unknown) (and SELF)
+  tc[0..29] FROM nondet
 [from] Function strcmp:
   \result FROM s1_0; s2_0; tc[0..29]; long_chain_0[0..30]
 [from] Function long_chain:
-  \result FROM ANYTHING(origin:Unknown)
+  \result FROM nondet
 [from] Function strcpy:
   NON TERMINATING - NO EFFECTS
 [from] Function string_writes:
@@ -385,7 +383,7 @@
 [inout] Out (internal) for function long_chain:
     tc[0..29]; long_chain_0[0..31]; x
 [inout] Inputs for function long_chain:
-    ANYTHING(origin:Unknown)
+    nondet
 [inout] Out (internal) for function strcpy:
     src; ldst; b[0..4]; tmp_unfold_46; tmp_1_unfold_46; tmp_0_unfold_46;
     tmp_unfold_49; tmp_1_unfold_49; tmp_0_unfold_49; tmp_unfold_52;
@@ -421,4 +419,5 @@
 [inout] Out (internal) for function main:
     s1{[3]; [6]}; s5; s6; cc; Q; R; S; T; U; V; W; X; Y; Z
 [inout] Inputs for function main:
-    ANYTHING(origin:Unknown)
+    nondet; s1[0..5]; s3; s4; s5; s6; s7; s8; cc; "tutu"[bits 0 to 7];
+    "toto"[bits 0 to 7]
