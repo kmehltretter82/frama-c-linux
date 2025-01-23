@@ -138,7 +138,7 @@ function Callgraph(): JSX.Element {
   const functionFilter = useFunctionFilter();
 
   const {
-    contextMenuItems, multipleSelection, showFunction
+    contextFctMenuItems, multipleSelection, showFunction
   } = functionFilter;
 
   const filteredFunctions =  React.useMemo(() => {
@@ -313,7 +313,7 @@ function Callgraph(): JSX.Element {
   return (
     <>
       <CallgraphTitleBar
-        contextMenuItems={contextMenuItems}
+        contextMenuItems={contextFctMenuItems}
         autoCenterState={[ autoCenter, flipAutoCenter ]}
         autoSelectState={[ autoSelect, flipAutoSelect ]}
       />

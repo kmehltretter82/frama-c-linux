@@ -83,6 +83,8 @@
 /* -------------------------------------------------------------------------- */
 
 .dome-xSideBar {
+    display: flex;
+    flex-direction: column;
     width: 100% ;
     height: 100% ;
     overflow-x: hidden ;
@@ -93,8 +95,17 @@
 .dome-xSideBar.dome-color-frame
 {
     background: var(--background-sidebar) ;
-}
 
+    .dome-xSideBar-title {
+      justify-content: space-between;
+      position:sticky;
+      top:0;
+      z-index: 10;
+      padding: 5px;
+      border-bottom: solid 1px var(--border-discrete);
+      background-color:var(--background-sidebar);
+    }
+}
 /* -------------------------------------------------------------------------- */
 /* --- SideBar Section                                                    --- */
 /* -------------------------------------------------------------------------- */

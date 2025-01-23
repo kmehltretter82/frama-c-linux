@@ -254,6 +254,6 @@ Ivette.registerSidebar({
   id: 'frama-c.plugins.eva_sidebar',
   label: 'EVA',
   icon: 'APPLE',
-  title: 'Eva Sidebar',
+  title: 'Eva',
   children: <EvaSideBar />,
 });

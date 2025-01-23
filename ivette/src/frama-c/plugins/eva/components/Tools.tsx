@@ -60,7 +60,7 @@ export default function EvaTools(
   const syncToFC = (): void => { remote.commit(); };
 
   return (
-    <Hbox className='eva-tools'>
+    <Hbox className='dome-xSideBar-title  eva-tools'>
       <Hbox className='eva-tools-actions'>
         <IconButton
           icon="MEDIA.PLAY"
