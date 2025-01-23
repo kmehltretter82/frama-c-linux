@@ -18,6 +18,11 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Eva       [2025-01-23] Rename warning key `invalid-assigns` to
+              `assigns:invalid-location`
+-   Eva       [2025-01-23] All warnings about missing assigns or \from clauses
+              are now emitted as errors by default, with the new warning key
+              `assigns:missing`.
 -   Kernel    [2025-01-17] New option -memory-footprint to configure the memory
               usage of analyses.
 o!  Kernel    [2024-12-20] Remove Cabs.SEQUENCE statement
