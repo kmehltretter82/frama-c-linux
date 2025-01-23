@@ -526,7 +526,7 @@ let extract_inout_from_froms assigns =
         (* Skip zones fully unassigned, they are not really port of the
            dependencies, but just present in the offsetmap to avoid "holes" *)
         match (in_ : Eva.Assigns.DepsOrUnassigned.t) with
-        | DepsBottom | Unassigned -> acc
+        | Unassigned -> acc
         | AssignedFrom in_ | MaybeAssignedFrom in_ ->
           Zone.join acc_in (Eva.Deps.to_zone in_),
           Zone.join acc_out out

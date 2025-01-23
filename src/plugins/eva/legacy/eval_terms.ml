@@ -28,36 +28,11 @@ open Cvalue
 
 type predicate_status = Abstract_interp.Comp.result = True | False | Unknown
 
-let string_of_predicate_status = function
-  | Unknown -> "unknown"
-  | True -> "valid"
-  | False -> "invalid"
-
-let pretty_predicate_status fmt v =
-  Format.fprintf fmt "%s" (string_of_predicate_status v)
-
 let join_predicate_status x y = match x, y with
   | True, True -> True
   | False, False -> False
   | True, False | False, True
   | Unknown, _ | _, Unknown -> Unknown
-
-let _join_list_predicate_status l =
-  let exception Stop in
-  try
-    let r =
-      List.fold_left
-        (fun acc e ->
-           match e, acc with
-           | Unknown, _ -> raise Stop
-           | e, None -> Some e
-           | e, Some eacc -> Some (join_predicate_status eacc e)
-        ) None l
-    in
-    match r with
-    | None -> True
-    | Some r -> r
-  with Stop -> Unknown
 
 (* Type of possible errors during evaluation. See pretty-printer for details *)
 type logic_evaluation_error =

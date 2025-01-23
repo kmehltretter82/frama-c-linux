@@ -141,7 +141,7 @@ module Make (V: Abstract.Value.External) = struct
     | GR_Empty -> ()
     | GR_Offsm (offsm, typ) -> pretty_gui_offsetmap_res ?typ fmt offsm
     | GR_Value (v, typ) -> Eval.Flagged_Value.pretty (V.pretty_typ typ) fmt v
-    | GR_Status s -> Eval_terms.pretty_predicate_status fmt s
+    | GR_Status s -> Alarmset.Status.pretty fmt s
     | GR_Zone z -> Locations.Zone.pretty fmt z
 
   let equal_gui_res r1 r2 = match r1, r2 with

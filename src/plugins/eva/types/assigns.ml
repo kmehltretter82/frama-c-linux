@@ -25,7 +25,6 @@ module DepsOrUnassigned = struct
     include Datatype.Serializable_undefined
 
     type t =
-      | DepsBottom
       | Unassigned
       | AssignedFrom of Deps.t
       | MaybeAssignedFrom of Deps.t
@@ -34,17 +33,15 @@ module DepsOrUnassigned = struct
     let name = "Eva.Froms.DepsOrUnassigned"
 
     let pretty fmt = function
-      | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
       | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
       | AssignedFrom fd -> Deps.pretty_precise fmt fd
       | MaybeAssignedFrom fd ->
         Format.fprintf fmt "%a (or UNASSIGNED)" Deps.pretty_precise fd
 
     let hash = function
-      | DepsBottom -> 1
-      | Unassigned -> 2
-      | AssignedFrom fd -> Hashtbl.hash (3, Deps.hash fd)
-      | MaybeAssignedFrom fd -> Hashtbl.hash (4, Deps.hash fd)
+      | Unassigned -> 1
+      | AssignedFrom fd -> Hashtbl.hash (2, Deps.hash fd)
+      | MaybeAssignedFrom fd -> Hashtbl.hash (3, Deps.hash fd)
 
     let reprs = Unassigned :: List.map (fun r -> AssignedFrom r) Deps.reprs
   end
@@ -53,7 +50,6 @@ module DepsOrUnassigned = struct
   include Datatype_Input
 
   let join d1 d2 = match d1, d2 with
-    | DepsBottom, d | d, DepsBottom -> d
     | Unassigned, Unassigned -> Unassigned
     | Unassigned, AssignedFrom fd | AssignedFrom fd, Unassigned ->
       MaybeAssignedFrom fd
@@ -68,14 +64,11 @@ module DepsOrUnassigned = struct
       MaybeAssignedFrom (Deps.join fd1 fd2)
 
   let is_included d1 d2 = match d1, d2 with
-    | DepsBottom, (DepsBottom | Unassigned | AssignedFrom _ |
-                   MaybeAssignedFrom _)
     | Unassigned, (Unassigned | AssignedFrom _ | MaybeAssignedFrom _) ->
       true
     | MaybeAssignedFrom fd1, (AssignedFrom fd2 | MaybeAssignedFrom fd2)
     | AssignedFrom fd1, AssignedFrom fd2 ->
       Deps.is_included fd1 fd2
-    | (Unassigned | AssignedFrom _ | MaybeAssignedFrom _), DepsBottom
     | (AssignedFrom _ | MaybeAssignedFrom _), Unassigned
     | AssignedFrom _, MaybeAssignedFrom _ ->
       false
@@ -85,11 +78,11 @@ module DepsOrUnassigned = struct
   let default_is_bottom = false
 
   let to_zone = function
-    | DepsBottom | Unassigned -> Locations.Zone.bottom
+    | Unassigned -> Locations.Zone.bottom
     | AssignedFrom fd | MaybeAssignedFrom fd -> Deps.to_zone fd
 
   let may_be_unassigned = function
-    | DepsBottom | AssignedFrom _ -> false
+    | AssignedFrom _ -> false
     | Unassigned | MaybeAssignedFrom _ -> true
 end
 
@@ -97,7 +90,7 @@ module Memory = struct
   (* A From table is internally represented as a Lmap of [DepsOrUnassigned].
      However, the API mostly hides this fact, and exports access functions
      that take or return [Deps.t] values. This way, the user needs not
-     understand the subtleties of DepsBottom/Unassigned/MaybeAssigned. *)
+     understand the subtleties of Unassigned/MaybeAssigned. *)
 
   include Lmap_bitwise.Make_bitwise(DepsOrUnassigned)
 
@@ -150,7 +143,6 @@ module Memory = struct
       (* If the interval can be unassigned, we collect its bound. We also
          return the dependencies stored at this interval. *)
       let default, v = match v with
-        | DepsOrUnassigned.DepsBottom -> false, Deps.bottom
         | DepsOrUnassigned.Unassigned -> true, Deps.bottom
         | DepsOrUnassigned.MaybeAssignedFrom v -> true, v
         | DepsOrUnassigned.AssignedFrom v -> false, v
@@ -234,6 +226,6 @@ let outputs assigns =
       (fun z v acc ->
          let open DepsOrUnassigned in
          match v with
-         | DepsBottom | Unassigned -> acc
+         | Unassigned -> acc
          | AssignedFrom _ | MaybeAssignedFrom _ -> Locations.Zone.join z acc)
       m Locations.Zone.bottom

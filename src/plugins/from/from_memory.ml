@@ -28,7 +28,6 @@ module DepsOrUnassigned = struct
 
   let subst f d =
     match d with
-    | DepsBottom -> DepsBottom
     | Unassigned -> Unassigned
     | AssignedFrom fd ->
       let fd' = f fd in
@@ -39,8 +38,6 @@ module DepsOrUnassigned = struct
 
   let compose d1 d2 =
     match d1, d2 with
-    | DepsBottom, _ | _, DepsBottom ->
-      DepsBottom (* could indicate dead code. Not used in practice anyway *)
     | Unassigned, _ -> d2
     | AssignedFrom _, _ -> d1
     | MaybeAssignedFrom _, Unassigned -> d1
@@ -52,14 +49,12 @@ module DepsOrUnassigned = struct
   (* for backwards compatibility *)
   let pretty fmt fd =
     match fd with
-    | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
     | Unassigned -> Format.pp_print_string fmt "(SELF)"
     | AssignedFrom d -> Zone.pretty fmt (Deps.to_zone d)
     | MaybeAssignedFrom d ->
       Format.fprintf fmt "%a (and SELF)" Zone.pretty (Deps.to_zone d)
 
   let pretty_precise fmt = function
-    | DepsBottom -> Format.pp_print_string fmt "DEPS_BOTTOM"
     | Unassigned -> Format.pp_print_string fmt "UNASSIGNED"
     | AssignedFrom fd -> Deps.pretty_precise fmt fd
     | MaybeAssignedFrom fd ->
@@ -197,7 +192,6 @@ let collapse_return x = x
 (* ----- Pretty-printing ---------------------------------------------------- *)
 
 let pretty_skip = function
-  | DepsOrUnassigned.DepsBottom -> true
   | DepsOrUnassigned.Unassigned -> true
   | DepsOrUnassigned.AssignedFrom _ -> false
   | DepsOrUnassigned.MaybeAssignedFrom _ -> false

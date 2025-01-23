@@ -632,9 +632,6 @@ module Assigns: sig
   module DepsOrUnassigned : sig
 
     type t =
-      | DepsBottom (** Bottom of the lattice, never bound inside a memory state
-                       at a valid location. (May appear for bases for which the
-                       validity does not start at 0, currently only NULL.) *)
       | Unassigned (** Location has never been assigned *)
       | AssignedFrom of Deps.t (** Location guaranteed to have been overwritten,
                                    its contents depend on the [Deps.t] value *)

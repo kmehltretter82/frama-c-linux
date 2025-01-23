@@ -71,46 +71,6 @@ let check_spec kinstr kf =
       Kernel_function.pretty kf;
     mark_unknown_requires kinstr kf funspec
 
-(* Find a spec for a function [kf] that begins a recursive call. If [kf]
-   has no existing specification, generate (an incorrect) one, and warn
-   loudly. *)
-let _spec_for_recursive_call kf =
-  let initial_spec = Annotations.funspec kf in
-  match Cil.find_default_behavior initial_spec with
-  | Some bhv when bhv.b_assigns <> WritesAny -> initial_spec
-  | _ ->
-    let assigns = Infer_assigns.from_prototype kf in
-    let bhv = Cil.mk_behavior ~assigns:(Writes assigns) () in
-    let spec = { (Cil.empty_funspec ()) with spec_behavior = [bhv] } in
-    Self.error ~once:true
-      "@[recursive@ call@ on@ an unspecified@ \
-       function.@ Using@ potentially@ invalid@ inferred assigns '%t'@]"
-      (fun fmt -> match assigns with
-         | [] -> Format.pp_print_string fmt "assigns \\nothing"
-         | _ :: _ ->
-           Pretty_utils.pp_list ~sep:"@ " Printer.pp_from fmt assigns);
-    (* Merge existing spec into our custom one with assigns *)
-    Logic_utils.merge_funspec
-      ~silent_about_merging_behav:true spec initial_spec;
-    spec
-
-let _empty_spec_for_recursive_call kf =
-  let typ_res = Kernel_function.get_return_type kf in
-  let empty = Cil.empty_funspec () in
-  let assigns =
-    if Cil.isVoidType typ_res then
-      Writes []
-    else
-      let res = TResult typ_res, TNoOffset in
-      let res = Logic_const.term (TLval res) (Ctype typ_res) in
-      let res = Logic_const.new_identified_term res in
-      Writes [res, From []]
-  in
-  let bhv = Cil.mk_behavior ~assigns ~name:Cil.default_behavior_name () in
-  empty.spec_behavior <- [bhv];
-  empty
-
-
 (* -------------------------------------------------------------------------- *)
 
 module CallDepth =
