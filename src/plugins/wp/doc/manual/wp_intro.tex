@@ -414,7 +414,7 @@ which is actually used internally to manage the scope of local variables.
 However, \textsf{ACSL} clauses for specifying allocation and deallocation
 are not implemented yet (\textit{medium}).
 \item[Assigns.]
-The WP strategy for proving assign clauses is a based on a sound but incomplete verification: we check that side effects
+The WP strategy for proving assign clauses is based on a sound but incomplete verification: we check that side effects
 (writes and called assigns) are \emph{included} in specified assigns, which
 is a sufficient but not necessary condition. The known workaround is to
 specify larger assigns and to add the missing equalities to contracts.
