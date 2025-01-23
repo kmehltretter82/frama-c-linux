@@ -130,7 +130,21 @@ extern void __fc_sig_err(int);
 #define SA_NOMASK	SA_NODEFER
 #define SA_ONESHOT	SA_RESETHAND
 
-/*@ assigns \nothing; */
+__FC_EXTERN __fc_sighandler_t __fc_signal_handlers[SIGRTMAX+1];
+
+/*@ // missing: errno may be set to EINVAL when trying to set some signals
+  requires valid_signal: 0 <= sig <= SIGRTMAX;
+  requires func_not_null: func != \null;
+  assigns __fc_signal_handlers[sig] \from func;
+  assigns \result \from \old(__fc_signal_handlers[sig]),
+                        SIG_ERR, SIG_DFL, SIG_IGN;
+  ensures result_not_null: \result != \null;
+  ensures result_ok_or_error:
+    \result == SIG_ERR ||
+    ((\result == SIG_DFL || \result == SIG_IGN ||
+      \result == \old(__fc_signal_handlers[sig])) &&
+     __fc_signal_handlers[sig] == func);
+*/
 extern void (*signal(int sig, void (*func)(int)))(int);
 
 /*@
