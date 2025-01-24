@@ -175,6 +175,8 @@ README* header_spec=.ignore
 *.svg header_spec=.ignore
 
 *.nix header_spec=.ignore
+/nix/*.patch header_spec=.ignore
+
 *.md header_spec=.ignore
 *.opam header_spec=.ignore
 
