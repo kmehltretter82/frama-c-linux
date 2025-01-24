@@ -16,10 +16,7 @@ mk_tests {
       @tests/syntax/ptests \
       @src/kernel_internals/parsing/tests/ptests
     dune runtest -j1 --display short \
-      src/plugins/server/tests/batch \
-      tests/fc_script \
-      tests/misc \
-      tests/syntax
+      tests
     make -C share/machdeps check-schema
   '';
 }

@@ -218,6 +218,7 @@ endif # PTEST_USE_WP_CACHE
 .PHONY: default-tests
 default-tests: run-ptests
 	dune build @ptests_config
+	dune runtest tests
 	$(MAKE) count-tests
 
 .PHONY: count-tests
