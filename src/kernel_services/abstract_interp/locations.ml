@@ -383,6 +383,7 @@ module Zone = struct
       (Base.Base) (Base.SetLattice) (Int_Intervals) (MapLattice)
 
   let is_bottom = equal bottom
+  let is_top = equal top
 
   let filter_base = filter_keys
   let fold_bases = fold_keys
