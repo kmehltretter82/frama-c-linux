@@ -213,7 +213,8 @@ module type Polymorphic2_input = sig
   val reprs: 'a -> 'b -> ('a, 'b) t list
 end
 
-(** Same as {!Polymorphic} for polymorphic types with two type variables. *)
+(** Same as {!module:Polymorphic} for polymorphic types with two type
+    variables. *)
 module type Polymorphic2 = sig
   type ('a, 'b) poly
   val instantiate: 'a t -> 'b t -> ('a, 'b) poly t * bool
@@ -225,8 +226,8 @@ end
 module Polymorphic2(T:Polymorphic2_input)
   : Polymorphic2 with type ('a, 'b) poly = ('a, 'b) T.t
 
-(** Instance of {!Polymorphic2} for functions: same signature than
-    {!Polymorphic2} with possibility to specify a label for the function
+(** Instance of {!module:Polymorphic2} for functions: same signature than
+    {!module:Polymorphic2} with possibility to specify a label for the function
     parameter. *)
 module Function : sig
   type ('a, 'b) poly = 'a -> 'b
@@ -255,7 +256,8 @@ module type Polymorphic3_input = sig
   val reprs: 'a -> 'b -> 'c -> ('a, 'b, 'c) t list
 end
 
-(** Same as {!Polymorphic} for polymorphic types with three type variables.
+(** Same as {!module:Polymorphic} for polymorphic types with three type
+    variables.
     @since Oxygen-20120901 *)
 module type Polymorphic3 = sig
   type ('a, 'b, 'c) poly
@@ -283,7 +285,8 @@ module type Polymorphic4_input = sig
   val reprs: 'a -> 'b -> 'c -> 'd -> ('a, 'b, 'c, 'd) t list
 end
 
-(** Same as {!Polymorphic} for polymorphic types with four type variables.
+(** Same as {!module:Polymorphic} for polymorphic types with four type
+    variables.
     @since Oxygen-20120901 *)
 module type Polymorphic4 = sig
   type ('a, 'b, 'c, 'd) poly

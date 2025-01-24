@@ -29,7 +29,7 @@
 (* ********************************************************************** *)
 
 (** Type used for handling (possibly mutually) recursive structural
-    descriptors. See module {!Recursive}. *)
+    descriptors. See module {!module:Recursive}. *)
 type recursive
 
 type single_pack = private Unmarshal.t
@@ -39,7 +39,7 @@ type pack = private
   | Nopack                 (** Was impossible to build a pack. *)
   | Pack of single_pack    (** A standard pack. *)
   | Recursive of recursive (** Pack for a recursive descriptor.
-                               See module {!Recursive}. *)
+                               See module {!module:Recursive}. *)
 
 (** Type of internal representations of OCaml type.
 

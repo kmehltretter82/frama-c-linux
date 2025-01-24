@@ -336,7 +336,7 @@ type behavior = {
 }
 
 (** Function or statement contract. This type shares the name of its
-    constructors with {!Cil_types.spec}. *)
+    constructors with {!type:Cil_types.spec}. *)
 type spec = {
   mutable spec_behavior : behavior list;
   (** behaviors *)

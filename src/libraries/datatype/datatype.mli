@@ -162,7 +162,7 @@ end
     end] *)
 module Undefined: Undefined
 
-(** Same as {!Undefined}, but the type is supposed to be marshallable by the
+(** Same as {!module:Undefined}, but the type is supposed to be marshallable by the
     standard OCaml way (in particular, no hash-consing or projects inside
     the type).
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -354,7 +354,7 @@ val filepath: Filepath.t Type.t
 (** {2 Generic functors for polymorphic types} *)
 (* ****************************************************************************)
 
-(** Output signature of {!Polymorphic}. *)
+(** Output signature of {!module:Polymorphic}. *)
 module type Polymorphic = sig
   include Type.Polymorphic
   module Make(T: S) : S with type t = T.t poly
@@ -382,7 +382,7 @@ module Polymorphic
      end) :
   Polymorphic with type 'a poly = 'a P.t
 
-(** Output signature of {!Polymorphic2}. *)
+(** Output signature of {!module:Polymorphic2}. *)
 module type Polymorphic2 = sig
   include Type.Polymorphic2
   module Make(T1: S)(T2: S) : S with type t = (T1.t, T2.t) poly
@@ -414,7 +414,7 @@ module Polymorphic2
      end) :
   Polymorphic2 with type ('a, 'b) poly = ('a, 'b) P.t
 
-(** Output signature of {!Polymorphic3}.
+(** Output signature of {!module:Polymorphic3}.
     @since Oxygen-20120901 *)
 module type Polymorphic3 = sig
   include Type.Polymorphic3
@@ -454,7 +454,7 @@ module Polymorphic3
      end) :
   Polymorphic3 with type ('a, 'b, 'c) poly = ('a, 'b, 'c) P.t
 
-(** Output signature of {!Polymorphic4}.
+(** Output signature of {!module:Polymorphic4}.
     @since Oxygen-20120901 *)
 module type Polymorphic4 = sig
   include Type.Polymorphic4

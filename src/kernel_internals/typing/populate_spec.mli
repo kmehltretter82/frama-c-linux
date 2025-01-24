@@ -58,7 +58,7 @@ type t_requires = identified_predicate list
 type t_terminates = identified_predicate option
 
 (** Type of a function that, given a {!Kernel_function.t} and a
-    {!Cil_types.spec}, returns a clause. Accepted clause types include
+    {!type:Cil_types.spec}, returns a clause. Accepted clause types include
     {!t_exits}, {!t_assigns}, {!t_requires}, {!t_allocates} and {!t_terminates}.
 *)
 type 'a gen = (kernel_function -> spec -> 'a)

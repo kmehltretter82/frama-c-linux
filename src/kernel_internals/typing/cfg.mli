@@ -46,7 +46,7 @@
     This will fill in the [preds] and [succs] fields of {!Cil_types.stmt}
 
     This is nearly always automatically done by the kernel. You only need
-    those functions if you build {!Cil_types.fundec} yourself. *)
+    those functions if you build {!type:Cil_types.fundec} yourself. *)
 
 open Cil_types
 

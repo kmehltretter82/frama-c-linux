@@ -646,18 +646,19 @@ type combineFunction =
     @raise Cannot_combine with an explanation when the type cannot be combined.
 
     @since 28.0-Nickel
-    @before 29.0-Copper [strictInteger (true)] and [strictReturnTypes (false)]
-            were optional
+    @before 29.0-Copper [strictInteger:true] and [strictReturnTypes:false] were
+    optional
 *)
 val combineTypesGen : ?emitwith:(Log.event -> unit) -> combineFunction ->
   strictInteger:bool -> strictReturnTypes:bool ->
   combineWhat -> typ -> typ -> typ
 
-(** Specialized version of {!combineTypesGen], we suppose here that if two
-    global symbols are equal, then they are the same object.
+(** Specialized version of {!combineTypesGen}, we suppose here that if two
+    global symbols are equal, then they are the same object. [strictInteger] is
+    [true] by default, [strictReturnTypes] is [false] by default.
 
     @since 28.0-Nickel
-    @before 29.0-Copper [strictInteger (true)] was not present and left with its
+    @before 29.0-Copper [strictInteger] was not present and left with its
     default value in combineTypesGen.
 *)
 val combineTypes : ?strictInteger:bool -> ?strictReturnTypes:bool ->

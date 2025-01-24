@@ -128,13 +128,16 @@ val exp : map -> exp -> node option
     For optimized access, all the fonctions in this section return
     unnormalized nodes and may raise [Not_found] for not localized routes. *)
 
-(** Unormalized. @raises Not_found *)
+(** Unormalized.
+    @raises Not_found *)
 val cvar : map -> varinfo -> node
 
-(** Unormalized. @raises Not_found *)
+(** Unormalized.
+    @raises Not_found *)
 val field : map -> node -> fieldinfo -> node
 
-(** Unormalized. @raises Not_found *)
+(** Unormalized.
+    @raises Not_found *)
 val index : map -> node -> typ -> node
 
 (** Normalized list of leaf nodes. *)
