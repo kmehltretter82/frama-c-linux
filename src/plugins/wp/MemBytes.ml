@@ -670,6 +670,14 @@ module Model = struct
       WBytes.memcpy mtgt msrc ltgt lsrc n
     | _ -> assert false
 
+  let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
+    match Sigma.ckind chunk with
+    | State.Mu Alloc -> msrc
+    | State.Mu _ ->
+      let n = length in
+      WBytes.memcpy mtgt msrc ltgt lsrc n
+    | _ -> assert false
+
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = e_var xp in
@@ -1112,3 +1120,4 @@ let is_init_range = Model.is_init_range
 let value_footprint = Model.value_footprint
 let init_footprint = Model.init_footprint
 let memcpy = Model.memcpy
+let memcpy_enforced_length = Model.memcpy_enforced_length

@@ -1054,6 +1054,15 @@ struct
       F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
     | _ -> assert false
 
+  let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
+    match Sigma.ckind chunk with
+    | State.Mu T_alloc -> msrc
+    | State.Mu _ ->
+      let n = length in
+      F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
+    | _ -> assert false
+
+
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
     let p = F.e_var xp in

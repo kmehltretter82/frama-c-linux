@@ -62,6 +62,8 @@ sig
 
   val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
     length:term -> Chunk.t -> term
+  val memcpy_enforced_length : mtgt:term -> msrc:term ->
+    ltgt:loc -> lsrc:loc -> length:term -> Chunk.t -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 

@@ -84,6 +84,8 @@ module type ModelWithLoader = sig
 
   val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
     length:term -> Chunk.t -> term
+  val memcpy_enforced_length : mtgt:term -> msrc:term ->
+    ltgt:loc -> lsrc:loc -> length:term -> Chunk.t -> term
 
   val eqmem_forall : c_object -> loc -> chunk -> term -> term -> var list * pred * pred
 
@@ -236,6 +238,19 @@ struct
       | _ ->
         M.memcpy ty ~mtgt ~msrc ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length chunk
 
+    let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
+      match Sigma.ckind chunk with
+      | State.Mu { data } ->
+        begin
+          match data with
+          | Value _ | ValInit -> msrc
+          | Array _ | ArrInit ->
+            e_fun f_memcpy [mtgt;msrc;to_addr ltgt;to_addr lsrc;length]
+        end
+      | _ ->
+        M.memcpy_enforced_length ~mtgt ~msrc
+          ~ltgt:(loc ltgt) ~lsrc:(loc lsrc) ~length chunk
+
     let eqmem_forall ty l chunk m1 m2 =
       match Sigma.ckind chunk with
       | State.Mu { data } ->
@@ -251,7 +266,8 @@ struct
             let equal = p_equal (e_get m1 p) (e_get m2 p) in
             [xp],separated,equal
         end
-      | _ -> M.eqmem_forall ty (loc l) chunk m1 m2
+      | _ ->
+        M.eqmem_forall ty (loc l) chunk m1 m2
 
     (* ---------------------------------------------------------------------- *)
     (* --- Load                                                           --- *)

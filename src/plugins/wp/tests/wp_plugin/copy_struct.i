@@ -25,7 +25,6 @@ struct S {
 void
 copy_struct (struct S * a, struct S * b)
 {
-    if (a->fs==0) { a->fs = 1;}
     *a = *b;
     //return a->fi + a->fs + a->fca[3];
 }
