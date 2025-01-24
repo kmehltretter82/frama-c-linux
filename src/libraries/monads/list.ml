@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2025                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,16 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Adding let binding operators to the Option module. See
-   https://v2.ocaml.org/manual/bindingops.html for more information. *)
+include Stdlib.List
 
-include module type of Stdlib.Option
-
-val zip : 'a option -> 'b option -> ('a * 'b) option
-
-module Operators : sig
-  val ( let* ) : 'a option -> ('a -> 'b option) -> 'b option
-  val ( let+ ) : 'a option -> ('a -> 'b) -> 'b option
-  val ( and* ) : 'a option -> 'b option -> ('a * 'b) option
-  val ( and+ ) : 'a option -> 'b option -> ('a * 'b) option
+module Minimal = struct
+  type 'a t = 'a list
+  let return   x = [ x ]
+  let map   f xs = map f xs
+  let flatten xs = flatten xs
+  let product ls rs = combine ls rs
 end
+
+include Monad.Make_based_on_map_with_product (Minimal)

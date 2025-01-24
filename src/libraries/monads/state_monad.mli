@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2025                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,13 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include Stdlib.Option
+(** The State monad represents computations relying on a global mutable
+    state but implemented in a functionnal way.
+    @since Frama-C+dev *)
 
-let zip l r = match l, r with Some l, Some r -> Some (l, r) | _ -> None
-
-module Operators = struct
-  let ( let* ) m f = bind m f
-  let ( let+ ) m f = map f m
-  let ( and* ) l r = zip l r
-  let ( and+ ) l r = zip l r
+module Make (Env : Datatype.S_with_collections) : sig
+  include Monad.S
+  type env = Env.t
+  val get_environment : env t
+  val set_environment : env -> unit t
+  val resolve : 'a t -> env -> 'a * env
 end

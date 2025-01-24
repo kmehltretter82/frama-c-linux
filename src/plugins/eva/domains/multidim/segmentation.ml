@@ -304,14 +304,14 @@ struct
 
   let lower_bound ~oracle b1 b2 =
     if b1 == b2 || eq b1 b2 then `Value b1 else
-      let+ i1,i2 = Top.zip
+      let+ i1,i2 = Top.product
           (lower_integer ~oracle:(oracle Left) b1)
           (lower_integer ~oracle:(oracle Right) b2) in
       Const (Integer.min i1 i2)
 
   let upper_bound ~oracle b1 b2 =
     if b1 == b2 || eq b1 b2 then `Value b1 else
-      let+ i1,i2 = Top.zip
+      let+ i1,i2 = Top.product
           (upper_integer ~oracle:(oracle Left) b1)
           (upper_integer ~oracle:(oracle Right) b2) in
       Const (Integer.max i1 i2)
@@ -510,7 +510,7 @@ struct
 
   let hull ~oracle (m : t) : (bound * bound) or_top =
     let l = m.start and u = last_bound m.segments in
-    Top.zip (B.lower_const ~oracle l) (B.upper_const ~oracle u)
+    Top.product (B.lower_const ~oracle l) (B.upper_const ~oracle u)
 
   let is_empty_segment ~oracle l u =
     let open (val (B.operators oracle)) in

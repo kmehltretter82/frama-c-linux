@@ -20,9 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Make (L : Abstract_context.S) (R : Abstract_context.S) = struct
-  type t = L.t * R.t
-  let top = (L.top, R.top)
-  let narrow (l, r) (l', r') =
-    Lattice_bounds.Bottom.product (L.narrow l l') (R.narrow r r')
+include Stdlib.Option
+
+module Minimal = struct
+  type 'a t = 'a option
+  let return v = Some v
+  let bind f m = bind m f
+  let product l r = match l, r with Some l, Some r -> Some (l, r) | _ -> None
 end
+
+include Monad.Make_based_on_bind_with_product (Minimal)
+let bind m f = bind f m

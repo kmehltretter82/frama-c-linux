@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*  This file is part of Frama-C.                                         *)
 (*                                                                        *)
-(*  Copyright (C) 2007-2025                                               *)
+(*  Copyright (C) 2007-2024                                               *)
 (*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
 (*         alternatives)                                                  *)
 (*                                                                        *)
@@ -20,19 +20,32 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Adding let binding operators to the Result module. See
-   https://v2.ocaml.org/manual/bindingops.html for more information. *)
+module Make (Env : Datatype.S_with_collections) = struct
 
-include module type of Stdlib.Result
+  module Cache = Env.Hashtbl
+  type 'a cache = 'a Cache.t
+  type env = Env.t
 
-(** [zip r1 r2] regroups values in a pair [Ok (v1, v2)] if both arguments are
-    [Ok v1] and [Ok v2] and propagate errors in other cases. If both [r1]
-    and [r2] are errors we keep the first one, in this case [r1]. *)
-val zip : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
+  module Minimal = struct
 
-module Operators : sig
-  val ( let* ) : ('a, 'e) result -> ('a -> ('b, 'e) result) -> ('b, 'e) result
-  val ( let+ ) : ('a, 'e) result -> ('a -> 'b) -> ('b, 'e) result
-  val ( and* ) : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
-  val ( and+ ) : ('a, 'e) result -> ('b, 'e) result -> ('a * 'b, 'e) result
+    type 'a t = ('a * env) cache option * (env -> 'a * env)
+    let return (x : 'a) : 'a t = (None, fun env -> x, env)
+
+    let compute ((cache, make) : 'a t) (env : env) : 'a * env =
+      match cache with
+      | None -> make env
+      | Some cache when Cache.mem cache env -> Cache.find cache env
+      | Some cache -> let r = make env in Cache.add cache env r ; r
+
+    let bind (f : 'a -> 'b t) (m : 'a t) : 'b t =
+      let make env = let a, env = compute m env in compute (f a) env in
+      (Some (Cache.create 13), make)
+
+  end
+
+  include Monad.Make_based_on_bind (Minimal)
+  let get_environment : env t = None, fun env -> env, env
+  let set_environment (env : env) : unit t = None, fun _ -> (), env
+  let resolve (m : 'a t) (env : env) : 'a * env = Minimal.compute m env
+
 end

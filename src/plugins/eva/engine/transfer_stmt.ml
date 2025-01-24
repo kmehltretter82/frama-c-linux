@@ -735,7 +735,7 @@ module Make (Engine: Engine_sig.S) = struct
               cacheable := NoCacheCallers;
             states
           in
-          Bottom.list_of_bot states
+          Bottom.value ~bottom:[] states
       in
       (* Process each possible function apart, and append the result list. *)
       let process acc (kf, valuation) =
@@ -743,7 +743,7 @@ module Make (Engine: Engine_sig.S) = struct
       in
       List.fold_left process [] functions
     in
-    Bottom.list_of_bot eval, !cacheable
+    Bottom.value ~bottom:[] eval, !cacheable
 
   (* ------------------------------------------------------------------------ *)
   (*                            Unspecified Sequence                          *)

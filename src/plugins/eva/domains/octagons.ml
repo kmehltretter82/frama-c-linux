@@ -1277,8 +1277,9 @@ module State = struct
   let mk_variable_builder (eval : evaluator) (_: t) =
     let (let*) x f = Option.bind (Top.to_option x) f in
     (* Is the interval computed for a variable a singleton? *)
-    let is_singleton =
-      Top.fold ~top:false Cvalue.V.cardinal_zero_or_one
+    let is_singleton v =
+      Top.map Cvalue.V.cardinal_zero_or_one v
+      |> Top.value ~top:false
     in
     fun exp ->
       match exp.node with

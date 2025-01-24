@@ -417,7 +417,7 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
     | Status truth -> Alarmset.Status.pretty fmt truth
 
   let get_pointed_bases = function
-    | Value v -> get_bases (Bottom.fold ~bottom:Cvalue.V.bottom get_cvalue v.v)
+    | Value v -> get_bases Bottom.(map get_cvalue v.v |> value ~bottom:Cvalue.V.bottom)
     | Offsetmap offsm -> get_pointed_bases offsm
     | Status _ -> Base.Hptset.empty
 
@@ -445,7 +445,7 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
     let pretty_eval = Bottom.pretty (pp_result typ) in
     let value = Pretty_utils.to_string pretty_eval result in
     let pointed_markers = get_pointed_markers eval_point in
-    let pointed_vars = Bottom.fold ~bottom:[] pointed_markers result in
+    let pointed_vars = Bottom.(map pointed_markers result |> value ~bottom:[]) in
     { value; alarms; pointed_vars }
 
   (* --- Evaluates an expression or lvalue into an evaluation [result]. ----- *)
