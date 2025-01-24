@@ -3,5 +3,6 @@
   Array length is too large.
 [kernel] too_large_array.i:12: Warning: 
   Cannot represent length of array as an attribute
-[kernel] Warning: warning too-large-array treated as deferred error. See above messages for more information.
+[kernel] Deferred error: warning as error too-large-array:
+  too_large_array.i:12: Array length is too large.
 [kernel] Frama-C aborted: invalid user input.

@@ -16,5 +16,7 @@ Goal Instance of 'Pre-condition 'qed_ok,Rmain' in 'main'' in 'call_main' at call
 Prove: true.
 
 ------------------------------------------------------------
-[wp] User Error: Deferred error message was emitted during execution. See above messages for more information.
+[wp] Deferred error message was emitted during execution:
+  Main entry point function 'main' is (potentially) recursive.
+  This case is not supported yet (skipped verification).
 [kernel] Plug-in wp aborted: invalid user input.

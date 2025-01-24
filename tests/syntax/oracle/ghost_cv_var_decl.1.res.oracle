@@ -173,21 +173,21 @@
    c: ghost
 [kernel] ghost_cv_var_decl.c:186
    bar_1: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
 [kernel] ghost_cv_var_decl.c:187
    bar_2: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
-[kernel] :0
+[kernel] <unknown location>
    b: ghost
 [kernel] ghost_cv_var_decl.c:188
    bar_3: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
-[kernel] :0
+[kernel] <unknown location>
    b: ghost
-[kernel] :0
+[kernel] <unknown location>
    c: ghost
 [kernel] ghost_cv_var_decl.c:190
    pfoo_1: normal
@@ -209,21 +209,21 @@
    c: ghost -> normal
 [kernel] ghost_cv_var_decl.c:202
    pbar_1: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal -> normal
 [kernel] ghost_cv_var_decl.c:203
    pbar_2: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
-[kernel] :0
+[kernel] <unknown location>
    b: ghost -> normal
 [kernel] ghost_cv_var_decl.c:204
    pbar_3: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
-[kernel] :0
+[kernel] <unknown location>
    b: ghost -> ghost
-[kernel] :0
+[kernel] <unknown location>
    c: ghost -> normal
 [kernel] ghost_cv_var_decl.c:206
    afoo_1: normal
@@ -243,19 +243,19 @@
    b: ghost -> ghost
 [kernel] ghost_cv_var_decl.c:218
    abar_1: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal -> normal
 [kernel] ghost_cv_var_decl.c:219
    abar_2: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
-[kernel] :0
+[kernel] <unknown location>
    b: ghost -> ghost
 [kernel] ghost_cv_var_decl.c:220
    abar_3: normal
-[kernel] :0
+[kernel] <unknown location>
    a: normal
-[kernel] :0
+[kernel] <unknown location>
    b: ghost -> ghost
 [kernel] ghost_cv_var_decl.c:223
    reference_functions: normal
