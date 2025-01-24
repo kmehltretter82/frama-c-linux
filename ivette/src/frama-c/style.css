@@ -1,0 +1,57 @@
+/* -------------------------------------------------------------------------- */
+/* --- About Frama-c - content                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.modal-framac-infos {
+
+  .dome-xModal-body {
+    flex-direction: column;
+    padding: 20px;
+    max-height: 100%;
+
+    .modal-framac-about {
+      max-height: 100%;
+      flex-direction: column;
+      overflow: auto;
+
+      button:hover { cursor: pointer; }
+    }
+
+    .modal-framac-credits {
+      text-align: center;
+      font-size: 1.1em;
+      max-width: 100%;
+      width: 550px;
+      column-width: 170px;
+      max-height: 550px;
+      column-count: auto;
+      column-gap: 20px;
+      overflow: auto;
+
+      >div {
+        padding: 2px 0;
+        white-space: nowrap;
+      }
+    }
+
+    .dome-xBoxes-hbox {
+      width: 100%;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 20px;
+
+      img {
+        width: 100%;
+        max-width: 400px;
+        background-color: var(--background-softer);
+      }
+
+      pre {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 10px;
+        white-space: pre-wrap;
+      }
+    }
+  }
+}

@@ -32,6 +32,7 @@ import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
+import * as HelpMenu from './help';
 
 const cFilter = {
   name: 'C source files',
@@ -153,6 +154,20 @@ export function init(): void {
     label: 'Save session…',
     id: 'file_save',
     onClick: saveSession,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Help',
+    label: 'About',
+    id: 'help_about',
+    onClick: () => Dialogs.showModal(HelpMenu.getAbout()),
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Help',
+    label: 'Credits',
+    id: 'help_credits',
+    onClick: () => Dialogs.showModal(HelpMenu.getCredits()),
     kind: 'normal',
   });
 }
