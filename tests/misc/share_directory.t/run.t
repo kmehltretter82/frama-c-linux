@@ -1,7 +1,7 @@
-  $ dune build --root . @install
+  $ dune build --cache=disabled  --root . @install
 
 Basic case
-  $ dune exec -- frama-c
+  $ dune exec --cache=disabled -- frama-c
   [kernel] IS_SET false
   [dirs] path (dir)
   [dirs] Found: FRAMAC_SHARE/dirs/path
@@ -22,7 +22,7 @@ Basic case
 
 With option
   $ cp -r share copied
-  $ dune exec -- frama-c -dirs-share copied
+  $ dune exec --cache=disabled -- frama-c -dirs-share copied
   [kernel] IS_SET true
   [dirs] path (dir)
   [dirs] Found: copied/path
