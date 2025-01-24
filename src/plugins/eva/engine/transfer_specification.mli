@@ -30,7 +30,8 @@ module Make
                            and type states = States.t)
   : sig
 
-    val treat_statement_assigns: assigns -> Engine.Dom.t -> Engine.Dom.t
+    val treat_statement_assigns:
+      stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
 
     val compute_using_specification:
       warn:bool ->
