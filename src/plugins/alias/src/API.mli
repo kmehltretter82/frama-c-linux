@@ -61,9 +61,6 @@ module Statement : sig
   (** see [Abstract_state.alias_vars] *)
   val alias_vars : stmt:stmt -> lval -> VarSet.t
 
-  val aliases : stmt:stmt -> lval -> LSet.t
-  [@@alert deprecated "Use Statement.alias_lvals instead!"]
-
   (** see [Abstract_state.alias_lvals] *)
   val alias_lvals : stmt:stmt -> lval -> LSet.t
 
@@ -94,9 +91,6 @@ module Function : sig
   (** see [Abstract_state.alias_vars] *)
   val alias_vars : kf:kernel_function -> lval -> VarSet.t
 
-  val aliases : kf:kernel_function -> lval -> LSet.t
-  [@@alert deprecated "Use Function.alias_lvals instead!"]
-
   (** see [Abstract_state.alias_lvals] *)
   val alias_lvals : kf:kernel_function -> lval -> LSet.t
 
@@ -107,52 +101,12 @@ module Function : sig
   val fundec_stmts : kf:kernel_function -> lval -> (stmt * LSet.t) list
 end
 
-val points_to_set_stmt : kernel_function -> stmt -> lval -> LSet.t
-[@@alert deprecated "Use Statement.points_to_vars or Statement.points_to_lvals instead!"]
-
-val points_to_set_kf : kernel_function -> lval -> LSet.t
-[@@alert deprecated "Use Function.points_to_vars or Function.points_to_lvals instead!"]
-
-val aliases_stmt : kernel_function -> stmt -> lval -> LSet.t
-[@@alert deprecated "Use Statement.aliases instead!"]
-
-val aliases_kf : kernel_function -> lval -> LSet.t
-[@@alert deprecated "Use Function.aliases instead!"]
-
-val fundec_stmts : kernel_function -> lval -> (stmt * LSet.t) list
-[@@alert deprecated "Use Function.fundec_stmts instead!"]
-
-
-val fold_points_to_set:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
-[@@alert deprecated "Use LSet.fold/Statement.points_to_lvals or VarSet.fold/Statement.points_to_vars instead!"]
-
-val fold_aliases_stmt:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
-[@@alert deprecated "Use LSet.fold and Statement.aliases instead!"]
-
-val fold_new_aliases_stmt:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> stmt -> lval -> 'a
-[@@alert deprecated "Use Statement.new_aliases with LSet.fold instead!"]
-
-val fold_points_to_set_kf :
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
-[@@alert deprecated "Use LSet.fold/Function.points_to_lvals VarSet.fold/Function.points_to_vars instead!"]
-
-(** [fold_aliases_kf f acc kf lv] folds [f acc] over all the aliases of lval
-    [lv] at the end of function [kf]. *)
-val fold_aliases_kf:
-  ('a -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
-[@@alert deprecated "Use LSet.fold/Function.aliases VarSet.fold/alias_vars instead!"]
 
 (** [fold_fundec_stmts f acc kf v] folds [f acc s e] on the list of
     pairs [s, e] where [e] is the set of lval aliased to [v] after statement [s]
     in function [kf]. *)
 val fold_fundec_stmts:
   ('a -> stmt -> lval -> 'a) -> 'a -> kernel_function -> lval -> 'a
-
-val are_aliased: kernel_function -> stmt -> lval -> lval -> bool
-[@@alert deprecated "Use Statement.are_aliased instead!"]
 
 (** [fold_vertex f acc kf s v] folds [f acc i lv] to all [lv] in [i], where [i] is
     the vertex that represents the equivalence class of [v] before statement [s] in function [kf]. *)
@@ -179,14 +133,14 @@ module Abstract_state : sig
   val get_vars : v -> t -> VarSet.t
 
   (** set of lvals which can be used to refered to the given vertex
-      Example graph: {a} → {b} -t→ {c}
-      The lvals corresponding to the rightmost vertex are {c, b.t, a->t}:
+      Example graph: <a> → <b> -t→ <c>
+      The lvals corresponding to the rightmost vertex are <c, b.t, a->t>:
       - c:    simply refers to a variable associated with the vertex.
       - b.t:  starting from the second vertex one can follow a field-edge
-              labelled "t" to come upon the rightmost vertex.
+              labelled [t] to come upon the rightmost vertex.
       - a->t: Following a pointer edge from the leftmost vertex one obtains
-              "*a". Following the "t" field-edge one arrives at the rightmost
-              vertex, corresponding to "( *a ).t" or "a->t". *)
+              [*a]. Following the [t] field-edge one arrives at the rightmost
+              vertex, corresponding to [( *a ).t] or [a->t]. *)
   val get_lval_set : v -> t -> LSet.t
 
   (** pretty printer; debug=true prints the graph, debug = false only
@@ -209,9 +163,9 @@ module Abstract_state : sig
   (** Note: You probably want to use [alias_lvals] instead of this function.
       Combining [find_vertex] with [get_lval_set], this function yields all the
       different ways the vertex containing the given lval can be referred to.
-      Example: {a} → {b,c}
-      If "a" points to "b", then the vertex containing "b" can be referred to not
-      only by "b" but also by "c" or "*a".
+      Example: <a> → <b,c>
+      If [a] points to [b], then the vertex containing [b] can be referred to not
+      only by [b] but also by [c] or [*a].
       Does not raise an exception but returns an empty set if the lval is not in
       the graph. *)
   val find_synonyms : lval -> t -> LSet.t
@@ -221,14 +175,11 @@ module Abstract_state : sig
       - variables from a neighbouring vertex, i.e. a vertex that shares a
         successor with the vertex of [lv].
 
-      Example: {a,b} → {c} ← {d} ← {e}
-      The aliases of "a" are {a,b,d}:
-      - "b" shares a vertex with "a"
-      - "d" is in a neighbouring vertex, pointing to "c" as does {a,b} *)
+      Example: <a,b> → <c> ← <d> ← <e>
+      The aliases of [a] are <a,b,d>:
+      - [b] shares a vertex with [a]
+      - [d] is in a neighbouring vertex, pointing to [c] as does <a,b> *)
   val alias_vars : lval -> t -> VarSet.t
-
-  val find_aliases : lval -> t -> LSet.t
-  [@@alert deprecated "Use find_synonyms, alias_vars, or alias_lvals instead!"]
 
   (** Yields all lvals that are an alias of a given lval [lv]. This includes:
       - variables sharing an equivalence class (or: vertex) with [lv]
@@ -236,15 +187,12 @@ module Abstract_state : sig
         successor with the vertex of [lv].
       - lvals reconstructed from the variables from the two previous sets.
 
-      Example: {a,b} → {c} ← {d} ← {e}
-      The aliases of "a" are {a,b,d,*e}:
-      - "b" shares a vertex with "a"
-      - "d" is in a neighbouring vertex, as it shares a successor with {a,b}
-      - *e is obtained by following backwards the pointer edge from {d} to {e}. *)
+      Example: <a,b> → <c> ← <d> ← <e>
+      The aliases of [a] are <a,b,d,*e>:
+      - [b] shares a vertex with [a]
+      - [d] is in a neighbouring vertex, as it shares a successor with <a,b>
+      - [*e] is obtained by following backwards the pointer edge from <d> to <e>. *)
   val alias_lvals : lval -> t -> LSet.t
-
-  val find_all_aliases : lval -> t -> LSet.t
-  [@@alert deprecated "Use alias_lvals instead!"]
 
   (** the set of all variables to which the given variable may point. *)
   val points_to_vars : lval -> t -> VarSet.t
@@ -254,18 +202,15 @@ module Abstract_state : sig
       For some pointer p it will always include *p. *)
   val points_to_lvals : lval -> t -> LSet.t
 
-  val points_to_set : lval -> t -> LSet.t
-  [@@alert deprecated "Use points_to_vars or points_to_lvals instead!"]
-
   (** all the alias sets of a given state
-      Example: {a,b} → {c} ← {d} ← {e,f}
-      The aliases sets are {{a,b,d}, {e,f}}
+      Example: <a,b> → <c> ← <d> ← <e,f>
+      The aliases sets are <<a,b,d>, <e,f>>
   *)
   val alias_sets_vars : t -> VarSet.t list
 
   (** all the alias sets of a given state, including reconstructed lvals
-      Example: {a,b} → {c} ← {d} ← {e,f}
-      The aliases sets are {{a,b,d,*e,*f}, {e,f}}
+      Example: <a,b> → <c> ← <d> ← <e,f>
+      The aliases sets are <<a,b,d,*e,*f>, <e,f>>
   *)
   val alias_sets_lvals : t -> LSet.t list
 
