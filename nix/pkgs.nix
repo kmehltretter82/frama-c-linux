@@ -51,7 +51,10 @@ let
     wp-tests = oself.callPackage ./wp-tests.nix {};
 
     # Internal tests
-    internal-tests = oself.callPackage ./internal-tests.nix {};
+    internal-tests = oself.callPackage ./internal-tests.nix {
+      clang = pkgs.clang_18;
+      llvmPackages = pkgs.llvmPackages_18;
+    };
 
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};
