@@ -1,5 +1,5 @@
 /* run.config*
-   FILTER: sed -e 's/\([0-9.]\+\(%\|s\)\)/?\2/g'
+   FILTER: sed -e 's/[0-9.]\{1,\}\([%s]\)/?\1/g'
    STDOPT: +"-eva-show-perf"
    EXECNOW: BIN flamegraph.txt BIN flamegraph.err { PTESTS_TESTING=1 %{bin:frama-c} @PTEST_FILE@ -eva -eva-flamegraph flamegraph.txt && NOGUI=1 %{bin:frama-c-script} flamegraph flamegraph.txt; } 1> /dev/null 2> flamegraph.err
 */
