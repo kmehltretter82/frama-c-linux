@@ -39,6 +39,7 @@ import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
+import { Text } from 'frama-c/richtext';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
 
 /* -------------------------------------------------------------------------- */
@@ -442,7 +443,9 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
     const { value = '', pointedVars = [] } = evaluation ?? {};
     const items: Dome.PopupMenuItem[] = [];
-    const copy = (): void => { navigator.clipboard.writeText(value); };
+    const copy = (): void => {
+      if (value) navigator.clipboard.writeText(value.toString());
+    };
     if (value !== '') items.push({ label: 'Copy to clipboard', onClick: copy });
     if (items.length > 0 && pointedVars.length > 0) items.push('separator');
     pointedVars.forEach((lval) => {
@@ -452,6 +455,10 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       items.push({ label, onClick: onItemClick });
     });
     if (items.length > 0) Dome.popupMenu(items);
+  };
+
+  const onSelected = (m: string): void => {
+    addLoc(Ast.jMarker(m));
   };
 
   return async (callstack: callstack): Promise<JSX.Element> => {
@@ -473,7 +480,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       return (
         <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
           <TableCell right={warning} align={align}>
-            <span className='eva-table-text'>{value}</span>
+            <Text onSelected={onSelected} text={value} />
           </TableCell>
         </td>
       );
