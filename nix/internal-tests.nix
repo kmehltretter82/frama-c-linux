@@ -54,7 +54,7 @@
 , perl
 , python3
 , python3Packages
-, swiProlog
+, swi-prolog
 , time
 , unixtools
 , which
@@ -128,7 +128,7 @@ stdenvNoCC.mkDerivation rec {
     python3
     python3Packages.jsonschema
     python3Packages.pyaml
-    swiProlog
+    swi-prolog
     time
     unixtools.getopt
     which

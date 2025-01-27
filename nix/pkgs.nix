@@ -5,7 +5,10 @@ let
     alt-ergo = oself.callPackage ./alt-ergo.nix {};
     camlp5 = oself.callPackage ./camlp5.nix {};
     combinetura = oself.callPackage ./combinetura.nix {};
+    dolmen = oself.callPackage ./dolmen.nix {};
     mlmpfr = oself.callPackage ./mlmpfr.nix {};
+    ppxlib = oself.callPackage ./ppxlib.nix {};
+    ppxlib_jane = oself.callPackage ./ppxlib_jane.nix {};
     why3 = oself.callPackage ./why3.nix {};
 
     # Helpers
@@ -48,7 +51,10 @@ let
     wp-tests = oself.callPackage ./wp-tests.nix {};
 
     # Internal tests
-    internal-tests = oself.callPackage ./internal-tests.nix {};
+    internal-tests = oself.callPackage ./internal-tests.nix {
+      clang = pkgs.clang_18;
+      llvmPackages = pkgs.llvmPackages_18;
+    };
 
     # Release
     api-doc = oself.callPackage ./api-doc.nix {};

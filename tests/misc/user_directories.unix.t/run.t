@@ -3,7 +3,7 @@ touch the actual user HOME.
 In addition, make sure that you use dune with option `--cache=disabled`,
 in order not to pollute `home/.cache` in dune >= 3.16
 
-  $ dune build --root . @install
+  $ dune build --cache=disabled --root . @install
 
 Basic case
   $ HOME=home dune exec --cache=disabled -- frama-c

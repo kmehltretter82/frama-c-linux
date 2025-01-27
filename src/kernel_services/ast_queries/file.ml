@@ -494,7 +494,13 @@ let build_cpp_cmd = function
       else []
     in
     let fc_define_args = ["__FRAMAC__"] in
-    let clang_no_warn = silence_cpp_machdep_warnings cmdl in
+    let machdep_no_warn = silence_cpp_machdep_warnings cmdl in
+    let clang_no_warn =
+      (* Clang complains when -nostdlibinc is not used ... *)
+      if cpp_name cmdl = "clang"
+      then [ "-Wno-unused-command-line-argument" ]
+      else []
+    in
     let nostdinc_arg =
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
@@ -516,7 +522,7 @@ let build_cpp_cmd = function
     in
     let supp_args =
       string_of_supp_args
-        (gnu_implicit_args @ clang_no_warn @ extra_args)
+        (gnu_implicit_args @ machdep_no_warn @ clang_no_warn @ extra_args)
         fc_include_args fc_define_args
     in
     let cpp_command =
