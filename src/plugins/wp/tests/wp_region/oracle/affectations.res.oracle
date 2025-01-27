@@ -37,14 +37,14 @@ Prove: true.
 ------------------------------------------------------------
 
 Goal Post-condition for 'SEP' 'Q' in 'f':
-Let x = Msint32_0[p].
+Let x = M0007_sint32_0[p].
 Let x_1 = 1 + x.
-Let m = Msint32_0[p <- x_1].
+Let m = M0007_sint32_0[p <- x_1].
 Let x_2 = m[q].
 Let x_3 = x_2 - 1.
 Let x_4 = m[q <- x_3][p].
 Assume {
-  Type: is_sint32(x) /\ is_sint32(Msint32_0[q]) /\ is_sint32(x_2) /\
+  Type: is_sint32(x) /\ is_sint32(M0007_sint32_0[q]) /\ is_sint32(x_2) /\
       is_sint32(x_3) /\ is_sint32(x_4).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ linked(alloc_0).
@@ -62,9 +62,9 @@ Prove: x_4 = x_1.
 ------------------------------------------------------------
 
 Goal Post-condition for 'SEP' 'Q' in 'f':
-Let x = Msint32_0[p].
-Let x_1 = Msint32_0[q].
-Let m = Msint32_0[p <- 1 + x].
+Let x = M0007_sint32_0[p].
+Let x_1 = M0007_sint32_0[q].
+Let m = M0007_sint32_0[p <- 1 + x].
 Let x_2 = m[q].
 Let x_3 = x_2 - 1.
 Assume {

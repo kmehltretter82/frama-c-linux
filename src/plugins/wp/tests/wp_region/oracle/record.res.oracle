@@ -12,9 +12,9 @@
 Goal Post-condition (file record.c, line 12) in 'f':
 Let a = shiftfield_F1_S_g(q).
 Let a_1 = shiftfield_F1_S_f(p).
-Let x = Msint32_0[a_1].
+Let x = M000b_sint32_0[a_1].
 Let x_1 = 1 + x.
-Let m = Msint32_0[a_1 <- x_1].
+Let m = M000b_sint32_0[a_1 <- x_1].
 Let a_2 = shiftfield_F1_S_f(q).
 Let x_2 = m[a_2].
 Let x_3 = m[a_2 <- x_2 - 1][a_1].

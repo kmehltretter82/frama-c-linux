@@ -10,8 +10,8 @@
 
 Goal Post-condition (file copy_struct.i, line 22) in 'copy_struct':
 Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 12).
-Let a_2 = Load_R003_S1_S(a, a_1).
-Let a_3 = Load_R003_S1_S(b, a_1).
+Let a_2 = Load_R0003_S1_S(a, a_1).
+Let a_3 = Load_R0003_S1_S(b, a_1).
 Assume {
   Type: IsS1_S(a_2) /\ IsS1_S(a_3).
   (* Heap *)
@@ -19,7 +19,7 @@ Assume {
       sconst(mem_0).
   (* Pre-condition *)
   Have: separated(a, 12, b, 12).
-  Have: a_2 = Load_R003_S1_S(b, mem_0).
+  Have: a_2 = Load_R0003_S1_S(b, mem_0).
 }
 Prove: EqS1_S(a_2, a_3).
 
