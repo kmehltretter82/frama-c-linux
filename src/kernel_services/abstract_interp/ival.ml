@@ -783,7 +783,7 @@ let cast_float_to_int_non_nan ~signed ~size (min, max) =
   let max_all = Option.get (max_int all) in
   let range l u = inject_range (Some l) (Some u) in
   let convert f =
-    match Floating_point.(double f |> truncate_to_integer) with
+    match Floating_point.truncate_to_integer f with
     | Integer i when Int.lt i min_all -> Floating_point.Underflow
     | Integer i when Int.gt i max_all -> Floating_point.Overflow
     | truncated -> truncated
@@ -966,9 +966,9 @@ let reinterpret_as_float kind i =
       let f = Bottom.join_list Fval.join (pos :: neg :: nan) in
       inject_float (Bottom.non_bottom f)
     in
-    let Format format = Floating_point.format_of_fkind kind in
-    let minf, maxf = Floating_point.finite_range_of ~format in
-    let minf, maxf = Floating_point.(bits_encoding minf, bits_encoding maxf) in
+    let Format format = Typed_float.format_of_fkind kind in
+    let minf, maxf = Typed_float.finite_range_of ~format in
+    let minf, maxf = Typed_float.(bits_encoding minf, bits_encoding maxf) in
     match kind with
     | Cil_types.FDouble ->
       let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64_exn v)) in

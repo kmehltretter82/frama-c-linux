@@ -74,11 +74,8 @@ module F = struct
         then compare f1 f2
         else compare m1 m2 *)
 
-  let pretty_normal ~use_hex fmt f =
-    Floating_point.(pretty_normal ~use_hex fmt (double f))
-
-  let pretty fmt f =
-    Floating_point.(pretty fmt (double f))
+  let pretty_normal = Floating_point.pretty_normal
+  let pretty = Floating_point.pretty
 
   let plus_zero = 0.0
 

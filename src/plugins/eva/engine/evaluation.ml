@@ -753,9 +753,9 @@ module Make
     | TSFloat of fkind
 
   let round fkind f =
-    let Format fmt = Floating_point.format_of_fkind fkind in
-    let f = Floating_point.represents ~float:f ~in_format:fmt in
-    Floating_point.to_float f
+    let Format fmt = Typed_float.format_of_fkind fkind in
+    let f = Typed_float.represents ~float:f ~in_format:fmt in
+    Typed_float.to_float f
 
   let truncate_float_bound fkind bound bound_kind expr value =
     let next_int, prev_float, is_beyond = match bound_kind with

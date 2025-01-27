@@ -339,8 +339,8 @@ struct
     Cil_types.CInt64(iv,kind,None)
 
   let mk_cfloat kind fv =
-    let Format fmt = Floating_point.format_of_fkind kind in
-    let fv = Floating_point.(represents ~float:fv ~in_format:fmt |> to_float) in
+    let Format fmt = Typed_float.format_of_fkind kind in
+    let fv = Typed_float.(represents ~float:fv ~in_format:fmt |> to_float) in
     Cil_types.CReal(fv, kind, None)
 
   let of_cint ?(kind=Cil_types.IInt) iv =

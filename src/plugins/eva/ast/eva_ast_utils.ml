@@ -342,7 +342,7 @@ and const_fold_cast (t : typ) (e : exp) : exp  =
     | `Float f, `Float fkind -> Build.float ~fkind f
     (* float -> integer *)
     | `Float f, `Int ikind ->
-      begin match Floating_point.(double f |> truncate_to_integer) with
+      begin match Floating_point.truncate_to_integer f with
         | Integer i when Cil.fitsInInt ikind i -> Build.integer ~ikind i
         | Overflow | Underflow | Integer _ -> default ()
       end

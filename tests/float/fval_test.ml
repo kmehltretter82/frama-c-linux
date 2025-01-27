@@ -223,10 +223,10 @@ let test_forward_unop () =
   test_unop Stdlib.ceil ceil "ceil";
   (* TODO: use interesting floating-point values for trigonometry. *)
   test_unop ~fkinds:[Double] Stdlib.cos cos "cos";
-  let cosf f = Floating_point.(single f |> cos |> to_float) in
+  let cosf f = Typed_float.(single f |> cos |> to_float) in
   test_unop ~fkinds:[Single] cosf cos "cos";
   test_unop ~fkinds:[Double] Stdlib.sin sin "sin";
-  let sinf f = Floating_point.(single f |> sin |> to_float) in
+  let sinf f = Typed_float.(single f |> sin |> to_float) in
   test_unop ~fkinds:[Single] sinf sin "sin";
   test_unop ~exact:false ~fkinds:[Single; Double]
     (fun f -> f) reinterpret "reinterpret";
@@ -249,10 +249,10 @@ let test_forward_binop () =
   test_binop ~pow:false fkinds ( /. ) div "/";
   test_binop ~pow:false [Single; Double] mod_float fmod "mod";
   test_binop ~pow:true [Double] ( ** ) pow "pow";
-  let powf b e = Floating_point.(pow (single b) (single e) |> to_float) in
+  let powf b e = Typed_float.(pow (single b) (single e) |> to_float) in
   test_binop ~pow:true [Single] powf pow "pow";
   test_binop ~pow:false [Double] Stdlib.atan2 atan2 "atan2";
-  let atan2f b e = Floating_point.(atan2 (single b) (single e) |> to_float) in
+  let atan2f b e = Typed_float.(atan2 (single b) (single e) |> to_float) in
   test_binop ~pow:false [Single] atan2f atan2 "atan2"
 
 let interesting_for_comp =

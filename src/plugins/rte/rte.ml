@@ -390,9 +390,7 @@ let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
     in
     begin match remove_trivial, number with
       | false, _ | true, None -> alarm Upper_bound ; alarm Lower_bound
-      | true, Some (f, fkind) ->
-        let Format fmt = Floating_point.format_of_fkind fkind in
-        let f = Floating_point.represents ~float:f ~in_format:fmt in
+      | true, Some (f, _) ->
         match Floating_point.truncate_to_integer f with
         | Underflow -> alarm Lower_bound
         | Overflow  -> alarm Upper_bound

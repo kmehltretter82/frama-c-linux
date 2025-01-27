@@ -138,9 +138,7 @@ and pp_constant fmt = function
     Format.fprintf fmt "'%s'" (Escape.escape_char c)
   | CReal (_, _, Some s) ->
     Format.fprintf fmt "%s" s
-  | CReal (f, fkind, None) ->
-    let Format format = Floating_point.format_of_fkind fkind in
-    let f = Floating_point.represents ~float:f ~in_format:format in
+  | CReal (f, _, None) ->
     Floating_point.pretty fmt f
   | CEnum ({ einame }, _) ->
     Format.fprintf fmt "%s" einame

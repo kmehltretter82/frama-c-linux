@@ -232,17 +232,17 @@ let force_float r =
   else r
 
 let format = function
-  | Float32 -> Floating_point.(Format Single)
-  | Float64 -> Floating_point.(Format Double)
+  | Float32 -> Typed_float.(Format Single)
+  | Float64 -> Typed_float.(Format Double)
 
 let float_lit fmt (q : Q.t) =
   let Format fmt = format fmt in
-  let v = Floating_point.represents ~float:(Q.to_float q) ~in_format:fmt in
-  let reparse s = Floating_point.represents ~float:(float_of_string s) ~in_format:fmt in
+  let v = Typed_float.represents ~float:(Q.to_float q) ~in_format:fmt in
+  let reparse s = Typed_float.represents ~float:(float_of_string s) ~in_format:fmt in
   let rec lookup = function
-    | [] -> Pretty_utils.to_string Floating_point.pretty v
+    | [] -> Pretty_utils.to_string Typed_float.pretty v
     | pp :: pps ->
-      let r = Floating_point.to_float v |> pp |> force_float in
+      let r = Typed_float.to_float v |> pp |> force_float in
       if reparse r = v then r else lookup pps
   in lookup printers
 

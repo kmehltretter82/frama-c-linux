@@ -270,9 +270,9 @@ let real_of_float s f =
   { r_literal = s ; r_nearest = f ; r_upper = f ; r_lower = f }
 
 let real_of_parsed s p =
-  let r_nearest = Floating_point.(to_float p.nearest) in
-  let r_upper = Floating_point.(to_float p.upper) in
-  let r_lower = Floating_point.(to_float p.lower) in
+  let r_nearest = Typed_float.(to_float p.nearest) in
+  let r_upper = Typed_float.(to_float p.upper) in
+  let r_lower = Typed_float.(to_float p.lower) in
   { r_literal = s ; r_nearest ; r_upper ; r_lower }
 
 let constant_to_lconstant c = match c with
@@ -314,9 +314,9 @@ let parse_float ?loc literal =
   let len = String.length literal in
   let last = Char.uppercase_ascii literal.[len-1] in
   let is_nearest_exact = last = 'F' || last = 'D' in
-  let Parsed p = Floating_point.parse literal in
-  let nearest = Floating_point.(to_float p.nearest) in
-  let fkind = Floating_point.fkind_of_format p.format in
+  let Parsed p = Typed_float.parse literal in
+  let nearest = Typed_float.(to_float p.nearest) in
+  let fkind = Typed_float.fkind_of_format p.format in
   let creal =
     if is_nearest_exact
     then real_of_float literal nearest

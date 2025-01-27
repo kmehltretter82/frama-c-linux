@@ -102,6 +102,11 @@ long double to_long(value num) { return Double_val(num); }
 // Convert a C double into an OCaml double.
 value to_ocaml(double d) { return caml_copy_double(d); }
 
+// Round an ocaml float into single precision.
+value round_to_single(value num) {
+  return caml_copy_double(to_float(num));
+}
+
 // Round a floating-point number into a given format. It is based on
 // C implicit casts to perform the roundings.
 value frama_c_change_format(value frama_c_prec, value num) {

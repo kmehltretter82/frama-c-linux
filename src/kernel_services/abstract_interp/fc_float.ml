@@ -25,11 +25,11 @@ open Float_sig
 
 
 type rounding = Floating_point.rounding
-type context = Floating_point.resulting_format * rounding
+type context = Typed_float.resulting_format * rounding
 
 let format_of_prec = function
-  | Single -> Floating_point.Format Single
-  | Double | Long_Double | Real -> Floating_point.Format Double
+  | Single -> Typed_float.Format Single
+  | Double | Long_Double | Real -> Typed_float.Format Double
 
 let convert_rounding = function
   | Float_sig.Up   -> Floating_point.Upward
@@ -51,7 +51,7 @@ let ( let<> ) ((format, new_rounding) : context) computation =
 type t = float
 let hash = Hashtbl.hash
 let packed_descr = Structural_descr.p_float
-let pretty fmt f = Floating_point.(pretty fmt (double f))
+let pretty = Floating_point.pretty
 
 let is_exact = function
   | Single | Double -> true
@@ -59,8 +59,8 @@ let is_exact = function
 
 let of_float rounding prec f =
   let<> Format fmt = using ~prec ~rounding in
-  let f = Floating_point.represents ~float:f ~in_format:fmt in
-  Floating_point.to_float f
+  let f = Typed_float.represents ~float:f ~in_format:fmt in
+  Typed_float.to_float f
 
 let to_float f = f
 
@@ -137,40 +137,40 @@ let abs = abs_float
 let floor = floor
 let ceil  = ceil
 
-let trunc  f = Floating_point.(double f |> trunc |> to_float)
-let fround f = Floating_point.(single f |> round |> to_float)
+let trunc  f = Typed_float.(double f |> trunc |> to_float)
+let fround f = Typed_float.(single f |> round |> to_float)
 
-type 'f number = 'f Floating_point.t
+type 'f number = 'f Typed_float.t
 type unary = { compute : 'f. 'f number -> 'f number }
 type binary = { compute : 'f. 'f number -> 'f number -> 'f number }
 
 let unary (op : unary) rounding prec x =
   let<> Format fmt = using ~prec ~rounding in
-  let x = Floating_point.represents ~float:x ~in_format:fmt in
-  Floating_point.(op.compute x |> to_float)
+  let x = Typed_float.represents ~float:x ~in_format:fmt in
+  Typed_float.(op.compute x |> to_float)
 
 let binary (op : binary) rounding prec x y =
   let<> Format fmt = using ~prec ~rounding in
-  let x = Floating_point.represents ~float:x ~in_format:fmt in
-  let y = Floating_point.represents ~float:y ~in_format:fmt in
-  Floating_point.(op.compute x y |> to_float)
+  let x = Typed_float.represents ~float:x ~in_format:fmt in
+  let y = Typed_float.represents ~float:y ~in_format:fmt in
+  Typed_float.(op.compute x y |> to_float)
 
-let add  = binary { compute = Floating_point.( + ) }
-let sub  = binary { compute = Floating_point.( - ) }
-let mul  = binary { compute = Floating_point.( * ) }
-let div  = binary { compute = Floating_point.( / ) }
-let fmod = binary { compute = Floating_point.fmod }
+let add  = binary { compute = Typed_float.( + ) }
+let sub  = binary { compute = Typed_float.( - ) }
+let mul  = binary { compute = Typed_float.( * ) }
+let div  = binary { compute = Typed_float.( / ) }
+let fmod = binary { compute = Typed_float.fmod }
 
-let exp   = unary { compute = Floating_point.exp }
-let log   = unary { compute = Floating_point.log }
-let log10 = unary { compute = Floating_point.log10 }
-let sqrt  = unary { compute = Floating_point.sqrt }
-let pow   = binary { compute = Floating_point.pow }
+let exp   = unary { compute = Typed_float.exp }
+let log   = unary { compute = Typed_float.log }
+let log10 = unary { compute = Typed_float.log10 }
+let sqrt  = unary { compute = Typed_float.sqrt }
+let pow   = binary { compute = Typed_float.pow }
 
-let cos   = unary { compute = Floating_point.cos }
-let sin   = unary { compute = Floating_point.sin }
-let tan   = unary { compute = Floating_point.tan }
-let acos  = unary { compute = Floating_point.acos }
-let asin  = unary { compute = Floating_point.asin }
-let atan  = unary { compute = Floating_point.atan }
-let atan2 = binary { compute = Floating_point.atan2 }
+let cos   = unary { compute = Typed_float.cos }
+let sin   = unary { compute = Typed_float.sin }
+let tan   = unary { compute = Typed_float.tan }
+let acos  = unary { compute = Typed_float.acos }
+let asin  = unary { compute = Typed_float.asin }
+let atan  = unary { compute = Typed_float.atan }
+let atan2 = binary { compute = Typed_float.atan2 }
