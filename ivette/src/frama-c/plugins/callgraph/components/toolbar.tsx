@@ -37,6 +37,7 @@ import { IThreeStateButton, ThreeStateButton } from "./threeStateButton";
 /* -------------------------------------------------------------------------- */
 /* --- Callgraph Toolsbar component                                       --- */
 /* -------------------------------------------------------------------------- */
+
 interface CallgraphToolsBarProps {
   /* eslint-disable max-len */
   displayModeState: [ModeDisplay, (newValue: ModeDisplay) => void],

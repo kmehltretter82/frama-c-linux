@@ -42,16 +42,14 @@ const isTaintedScope = (node: NodeObject3D<CGNode>): boolean => {
 
 const getNodeAlarms = (node: CGNode): JSX.Element => {
   return <>
-    <div>
-      {node.alarmStatuses && node.alarmStatuses.invalid > 0 && LED({
-        status: "negative",
-        title: node.alarmStatuses.invalid+" invalid",
-        })}
-      {node.alarmStatuses && node.alarmStatuses.unknown > 0 && LED({
-        status: "warning",
-        title: node.alarmStatuses.unknown+" unknown",
-        })}
-    </div>
+    {node.alarmStatuses && node.alarmStatuses.invalid > 0 && LED({
+      status: "negative",
+      title: node.alarmStatuses.invalid+" invalid",
+      })}
+    {node.alarmStatuses && node.alarmStatuses.unknown > 0 && LED({
+      status: "warning",
+      title: node.alarmStatuses.unknown+" unknown",
+      })}
   </>;
 };
 

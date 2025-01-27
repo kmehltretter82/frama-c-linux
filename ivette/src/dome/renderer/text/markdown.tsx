@@ -26,22 +26,57 @@ import remarkCustomHeaderId from 'remark-custom-header-id';
 
 import * as Themes from 'dome/themes';
 import { classes } from 'dome/misc/utils';
-import { Icon } from 'dome/controls/icons';
+import { Icon, jIconKind, IconKind as _IconKind  } from 'dome/controls/icons';
 import {
   CodeBlock, atomOneDark, atomOneLight
 } from "react-code-blocks";
+import {
+  jLEDstatus, LED, LEDstatus as _LEDstatus
+} from 'dome/controls/displays';
+
 export interface Pattern {
   pattern: RegExp,
   replace: (key: number, match?: RegExpExecArray) => JSX.Element | null
 }
 
+/**
+ * iconTag allows you to replace the tag with an {@link Icon}.
+ *
+ * `[icon-<id>(-<kind | color>)?]` :
+ *
+ * * Id : case-insensitive, consult [Icon Gallery](../../doc/guides/icons.md)
+ * * kind : {@link _IconKind}
+ * * color : Hexa or html
+ *
+ * @example
+ * [icon-tunings-#FF0000] : this tag will be replaced by a red TUNINGS icon
+ */
+
 export const iconTag: Pattern = {
-  pattern: /(\[ex:\])?\[icon-([^\]]+)\]/g,
+  pattern: /(\[icon-([^-\]]+)(-([^\]]+))?\])/g,
   replace: (key: number, match?: RegExpExecArray) => {
-    if(match && match[1] === "[ex:]") {
-      return <span key={key}>{`[icon-${match[2]}]`}</span>;
-    }
-    return match ? <Icon key={key} id={match[2]}/> : null;
+    if(!match) return null;
+    const kind = jIconKind(match[4]);
+    const color = !kind ? match[4] : undefined;
+    return <Icon key={key}
+     id={match[2].toUpperCase()}
+     kind={kind}
+     fill={color}
+    />;
+  }
+};
+
+/**
+ * ledTag allows you to replace the tag with an {@link LED}.
+ *
+ * `[led-<status>]` : {@link _LEDstatus}
+ * */
+export const ledTag: Pattern = {
+  pattern: /\[led-([^\]]+)\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
+    if(!match) return null;
+    const status = jLEDstatus(match[1]);
+    return <LED key={key} status={status} />;
   }
 };
 
@@ -52,6 +87,10 @@ export const iconTag: Pattern = {
 /**
  * Replace all tag in children.
  * This function doesn't replace any tags added by a previous replacement.
+ *
+ * Patterns added to the table will be processed to make replacements
+ * in the markdown file. Markdown component provides two patterns,
+ * iconTag and ledTag
  */
 function replaceTags(
   children: React.ReactNode,
@@ -120,6 +159,7 @@ export function Markdown(
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages", className
   );
+  let liKey: number = 0;
 
   const scroll = (id: string): void => {
     const elt = document.getElementById(id);
@@ -134,7 +174,9 @@ export function Markdown(
   };
   options.components = {
     p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
-    li: ({ children }) => <li>{replaceTags(children, patterns)}</li>,
+    li: ({ children }) => {
+      return <li key={liKey++}>{replaceTags(children, patterns)}</li>;
+    },
     /** Uses codeBlock if ``` is used in markdown with a language,
      *  otherwise the code-inline class is added */
     code: ({ className, children }) => {

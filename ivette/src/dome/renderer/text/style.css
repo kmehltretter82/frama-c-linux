@@ -72,7 +72,9 @@
 
 .dome-pages li
 {
-
+  &:has(.code-inline) {
+    margin: 5px 0;
+  }
 }
 
 .dome-pages a
