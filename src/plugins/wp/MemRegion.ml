@@ -154,11 +154,11 @@ struct
       match c.data with
       | ValInit -> "Vinit"
       | ArrInit -> "Minit"
-      | Array p -> Format.asprintf "M%a" pp_prim p
+      | Array p -> Format.asprintf "M%04x_%a" (R.id c.region) pp_prim p
       | Value p ->
         match R.name c.region with
         | Some a -> a
-        | None -> Format.asprintf "V%a" pp_prim p
+        | None -> Format.asprintf "V%4x_%a" (R.id c.region) pp_prim p
 
     let is_init c =
       match c.data with
@@ -207,6 +207,10 @@ struct
 
     let field l fd =
       make (M.field (loc l) fd) (rfold (fun r -> R.field r fd) l)
+
+    let ofield l fd =
+      Option.map (fun r -> Loc (M.field (loc l) fd, r))
+      @@ rfold (fun r -> R.field r fd) l
 
     let shift l obj ofs =
       make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
@@ -450,8 +454,9 @@ struct
           List.fold_left
             (fun dom fd ->
                let obj = Ctypes.object_of fd.ftype in
-               let loc = field loc fd in
-               Domain.union dom (footprint ~value obj loc)
+               match ofield loc fd with
+               | None -> dom
+               | Some loc -> Domain.union dom (footprint ~value obj loc)
             ) Domain.empty fds
         | C_array { arr_element = elt } ->
           let obj = object_of elt in

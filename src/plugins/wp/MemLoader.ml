@@ -105,7 +105,7 @@ struct
       (M.value_footprint obj loc)
       (M.init_footprint obj loc)
 
-  let pp_rid fmt r = if r <> 0 then Format.fprintf fmt "_R%03d" r
+  let pp_rid fmt r = if r <> 0 then Format.fprintf fmt "_R%04x" r
 
   (* -------------------------------------------------------------------------- *)
   (* --- Frame Lemmas for Compound Access                                   --- *)
@@ -576,26 +576,28 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let gen_memcpy_length get_domain s obj ?enforced_length ?lsrc loc length =
-    let lsrc = if Wp_parameters.Havoc.get () then None else lsrc in
-    let memcpy = match enforced_length with
-      | None -> M.memcpy obj ~length
-      | Some l -> M.memcpy_enforced_length ~length:l
+    let memcpy ~mtgt ~msrc ~ltgt ~lsrc c =
+      match enforced_length with
+      | None -> M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc
+                  ~length:(e_mul length @@ M.sizeof obj) c
+      | Some l ->
+        M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length:l c
     in
     let ps = ref [] in
     Domain.iter
       (fun chunk ->
          let pre = Sigma.value s.pre chunk in
-         let post = Sigma.value s.post chunk in
-         let tau = Chunk.tau_of_chunk chunk in
-         let updated =
-           match lsrc with
+         let updated = match lsrc with
            | None ->
+             let tau = Chunk.tau_of_chunk chunk in
              let basename = Chunk.basename_of_chunk chunk ^ "_undef" in
              let fresh = F.e_var (Lang.freshvar ~basename tau) in
              memcpy ~mtgt:pre ~msrc:fresh ~ltgt:loc ~lsrc:loc chunk
            | Some lsrc ->
              memcpy ~mtgt:pre ~msrc:pre ~ltgt:loc ~lsrc chunk
-         in ps := Set(post,updated) :: !ps
+         in
+         let post = Sigma.value s.post chunk in
+         ps := Set(post,updated) :: !ps
       ) (get_domain obj loc) ; !ps
 
   let memcpy_length = gen_memcpy_length M.value_footprint
@@ -645,10 +647,9 @@ struct
       gen_stored s obj p (gen_loaded s.pre obj q)
     else match obj with
       | C_int _ | C_float _ | C_pointer _ ->
-        gen_stored s obj p (gen_loaded s.pre obj q)
+        gen_memcpy s obj ~lsrc:q p
       | C_comp _ | C_array _ ->
-        gen_memcpy s obj ~enforced_length:(M.sizeof obj) ?lsrc:(Some q) p
-
+        gen_memcpy s obj ~enforced_length:(M.sizeof obj) ~lsrc:q p
 
   let copied = gen_copied ~is_init:false
 
@@ -656,7 +657,7 @@ struct
 
   let memcpy s ty ?lsrc loc = memcpy s ty ?lsrc loc
   let memcpy_init s ty ?lsrc loc = memcpy_init s ty ?lsrc loc
-  let memcpy_length s ty ?lsrc loc = memcpy_length s ty ? lsrc loc
+  let memcpy_length s ty ?lsrc loc = memcpy_length s ty ?lsrc loc
   let memcpy_init_length s ty ?lsrc loc = memcpy_init_length s ty ?lsrc loc
 
   (* -------------------------------------------------------------------------- *)
