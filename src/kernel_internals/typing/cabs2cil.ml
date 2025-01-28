@@ -7395,6 +7395,11 @@ and doExp local_env
             end
         end
       end
+
+    | Cabs.GNU_BODY _ when !currentFunctionFDEC == dummy_function ->
+      abort_context
+        "statement expression forbidden outside function definition"
+
     | Cabs.GNU_BODY b -> begin
         (* Find the last Cabs.COMPUTATION and remember it. This one is invoked
          * on the reversed list of statements. *)
@@ -7425,7 +7430,7 @@ and doExp local_env
           | _ ->
             try findLastComputation (List.rev b.Cabs.bstmts), false
             with Not_found ->
-              Kernel.fatal ~current:true "Cannot find COMPUTATION in GNU.body"
+              abort_context "void value not ignored as it ought to be"
               (*                Cabs.NOP cabslu, true *)
         in
         let loc = Cabshelper.get_statementloc lastComp in
@@ -7441,7 +7446,9 @@ and doExp local_env
         match !data with
         | None when isvoidbody ->
           finishExp [] se (zero ~loc:e.expr_loc) voidType
-        | None -> abort_context "Cannot find COMPUTATION in GNU.body"
+        | None ->
+          Kernel.fatal ~current:true
+            "statement expression without COMPUTATION, which should be caught by findLastComputation"
         | Some (e, t) ->
           let se, e =
             match se.stmts with
