@@ -72,6 +72,19 @@ int main(void)
   return __retres;
 }
 
+__inline static int r__fc_inline_0(VINT *v_0)
+{
+  int __retres;
+  __retres = *v_0;
+  return __retres;
+}
+
+__inline static int w__fc_inline_0(int volatile *v_0, int new)
+{
+  *v_0 = new;
+  return new;
+}
+
 int f(int x_0)
 {
   int __retres;

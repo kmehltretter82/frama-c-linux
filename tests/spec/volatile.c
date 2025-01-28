@@ -1,6 +1,6 @@
 /* run.config
  DEPS: volatile.h
-   OPT: %{dep:./volatile_aux.c} -print -copy
+   OPT: %{dep:./volatile_aux.c} -print -copy -keep-unused-functions all
 */
 #include "volatile.h"
 

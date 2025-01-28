@@ -1,3 +1,7 @@
+/* run.config
+   STDOPT: +"-keep-unused-functions all"
+*/
+
 /*@ behavior b:
   assumes z>=0;
   ensures \true;
@@ -12,7 +16,7 @@ int f(int z) {
   /*@ for b: assigns x,y; */
   asm ("mov %1, %0\n\t" : "=r" (x) : "r" (y));
 
-  /*@ 
+  /*@
     assigns x,y;
     behavior c:
       assumes x>=0;
