@@ -260,7 +260,10 @@ let is_relational_bop = function
   | EQ | NE | LT | GT | LE | GE -> true
   | _ -> false
 
-let rec stripParen = function { expr_node = Cabs.PAREN e } -> stripParen e | e -> e
+let rec stripParen e =
+  match e with
+  | { expr_node = Cabs.PAREN e } -> stripParen e
+  | e -> e
 
 let rec is_dangerous_offset = function
     NoOffset -> false
