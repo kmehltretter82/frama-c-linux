@@ -35,28 +35,6 @@
 (* ****************************************************************************)
 (* ****************************************************************************)
 
-(** Precedences used for generating the minimal number of parenthesis in
-    combination with function {!par} below. *)
-type precedence =
-  | Basic
-  | Call
-  | Tuple
-  | List
-  | NoPar
-
-(* p1 <= p2 *)
-let lower_prec p1 p2 = match p1, p2 with
-  | NoPar, _
-  | _, Basic -> true
-  | x, y when x = y -> true
-  | List, (Tuple | Call) | Tuple, Call -> true
-  | _, _ -> false
-
-let par p_caller p_callee fmt pp =
-  (* if p_callee <= p_caller then parenthesis else no parenthesis *)
-  if lower_prec p_callee p_caller then Format.fprintf fmt "(%t)" pp
-  else Format.fprintf fmt "%t" pp
-
 type concrete_repr =
   { mutable name: string;
     digest: Digest.t;

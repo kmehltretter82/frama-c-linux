@@ -602,8 +602,7 @@ module Pair_arg = struct
   let mk_hash f1 f2 (x1,x2) = f1 x1 + 1351 * f2 x2
   let map f1 f2 (x1,x2) = f1 x1, f2 x2
   let mk_pretty f1 f2 fmt (x1, x2) =
-    let pp fmt = Format.fprintf fmt "@[<hv 2>%a,@;%a@]" f1 x1 f2 x2 in
-    Type.par Type.Basic Type.Tuple fmt pp
+    Format.fprintf fmt "(@[<hv 2>%a,@;%a@])" f1 x1 f2 x2
   let mk_mem_project mem1 mem2 f (x1, x2) = mem1 f x1 && mem2 f x2
 end
 
@@ -809,8 +808,7 @@ module Poly_ref =
       let mk_hash f x = f !x
       let map f x = ref (f !x)
       let mk_pretty f fmt x =
-        let pp fmt = Format.fprintf fmt "@[<hv 2>ref@;%a@]" f !x in
-        Type.par Type.Basic Type.Call fmt pp
+        Format.fprintf fmt "(@[<hv 2>ref@;%a@])" f !x
       let mk_mem_project mem f x = mem f !x
     end)
 
@@ -864,10 +862,7 @@ module Poly_option =
       let mk_pretty f fmt = function
         | None -> Format.fprintf fmt "None"
         | Some x ->
-          let pp fmt =
-            Format.fprintf fmt "@[<hv 2>Some@;%a@]" f x
-          in
-          Type.par Type.Basic Type.Call fmt pp
+          Format.fprintf fmt "(@[<hv 2>Some@;%a@])" f x
       let mk_mem_project mem f = function None -> false | Some x -> mem f x
     end)
 
@@ -929,17 +924,14 @@ module Poly_list =
         with Too_long n -> n
       let map = List.map
       let mk_pretty f fmt l =
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>[ %t ]@]"
-            (fun fmt ->
-               let rec print fmt = function
-                 | [] -> ()
-                 | [ x ] -> Format.fprintf fmt "%a" f x
-                 | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
-               in
-               print fmt l)
-        in
-        Type.par Type.Basic Type.Basic fmt pp (* Never enclose lists in parentheses *)
+        Format.fprintf fmt "(@[<hv 2>[ %t ]@])"
+          (fun fmt ->
+             let rec print fmt = function
+               | [] -> ()
+               | [ x ] -> Format.fprintf fmt "%a" f x
+               | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
+             in
+             print fmt l)
       let mk_mem_project mem f = List.exists (mem f)
     end)
 
@@ -1011,18 +1003,15 @@ module Poly_array =
       ;;
       let map = Array.map
       let mk_pretty f fmt a =
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>[| %t |]@]"
-            (fun fmt ->
-               let length = Array.length a in
-               match length with
-               | 0 -> ()
-               | _ -> (Format.fprintf fmt "%a" f a.(0);
-                       for i = 1 to (length - 1) do
-                         Format.fprintf fmt ";@;%a" f a.(i)
-                       done))
-        in
-        Type.par Type.Basic Type.Basic fmt pp (* Never enclose arrays in parentheses *)
+        Format.fprintf fmt "(@[<hv 2>[| %t |]@])"
+          (fun fmt ->
+             let length = Array.length a in
+             match length with
+             | 0 -> ()
+             | _ -> (Format.fprintf fmt "%a" f a.(0);
+                     for i = 1 to (length - 1) do
+                       Format.fprintf fmt ";@;%a" f a.(i)
+                     done))
       let mk_mem_project mem f a =
         try
           for i = 0 to (Array.length a - 1) do
@@ -1683,10 +1672,7 @@ module Triple_arg = struct
   let mk_hash f1 f2 f3 (x1,x2,x3) = f1 x1 + 1351 * f2 x2 + 257 * f3 x3
   let map f1 f2 f3 (x1,x2,x3) = f1 x1, f2 x2, f3 x3
   let mk_pretty f1 f2 f3 fmt (x1, x2, x3) =
-    let pp fmt =
-      Format.fprintf fmt "@[<hv 2>%a,@;%a,@;%a@]" f1 x1 f2 x2 f3 x3
-    in
-    Type.par Type.Basic Type.Tuple fmt pp
+    Format.fprintf fmt "(@[<hv 2>%a,@;%a,@;%a@])" f1 x1 f2 x2 f3 x3
   let mk_mem_project mem1 mem2 mem3 f (x1, x2, x3) =
     mem1 f x1 && mem2 f x2 && mem3 f x3
 end
@@ -1779,10 +1765,7 @@ module Quadruple_arg = struct
     f1 x1 + 1351 * f2 x2 + 257 * f3 x3 + 997 * f4 x4
   let map f1 f2 f3 f4 (x1,x2,x3,x4) = f1 x1, f2 x2, f3 x3, f4 x4
   let mk_pretty f1 f2 f3 f4 fmt (x1, x2, x3, x4) =
-    let pp fmt =
-      Format.fprintf fmt "@[<hv 2>%a,@;%a,@;%a,@;%a@]" f1 x1 f2 x2 f3 x3 f4 x4
-    in
-    Type.par Type.Basic Type.Tuple fmt pp
+    Format.fprintf fmt "(@[<hv 2>%a,@;%a,@;%a,@;%a@])" f1 x1 f2 x2 f3 x3 f4 x4
   let mk_mem_project mem1 mem2 mem3 mem4 f (x1, x2, x3, x4) =
     mem1 f x1 && mem2 f x2 && mem3 f x3 && mem4 f x4
 end

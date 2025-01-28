@@ -75,13 +75,6 @@ type sl_fct_slice = SlicingInternals.fct_slice
 (** Marks : used to put 'colors' in the result *)
 type sl_mark = SlicingInternals.pdg_mark
 
-let pp_sl_project p_caller fmt _p =
-  let pp fmt =
-    Format.fprintf fmt
-      "@[<hv 2>Extlib.the@;~exn:Db.Slicing.No_Project@;@[<hv 2>(!Db.Slicing.Project.get_project@;())@]@]"
-  in
-  Type.par p_caller Type.Call fmt pp
-
 module Sl_project =
   Datatype.Make
     (struct
@@ -104,16 +97,6 @@ module Sl_select =
       let name = "SlicingTypes.Sl_select"
       let mem_project = Datatype.never_any_project
     end)
-
-let pp_sl_fct_slice p_caller fmt ff =
-  let pp fmt =
-    Format.fprintf fmt
-      "@[<hv 2>!Db.Slicing.Slice.from_num_id@;%a@;%d@]"
-      Kernel_function.pretty
-      ff.SlicingInternals.ff_fct.SlicingInternals.fi_kf
-      ff.SlicingInternals.ff_id
-  in
-  Type.par p_caller Type.Call fmt pp
 
 module Sl_fct_slice =
   Datatype.Make

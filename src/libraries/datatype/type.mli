@@ -42,35 +42,6 @@ type 'a ty = 'a t
 (** {2 Pretty printing materials} *)
 (* ****************************************************************************)
 
-(** Precedences used for generating the minimal number of parenthesis in
-    combination with function {!par} below. *)
-type precedence =
-  | Basic
-  (** Normal precedence
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-  | Call
-  (** Instantiation of polymorphic type
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-  | Tuple
-  | List
-  | NoPar
-
-(** [par context myself fmt pp] puts parenthesis around the verbatim
-    prints by [pp] according to the precedence [myself] of the verbatim and to
-    the precedence [context] of the caller of the pretty printer. [fmt] is the
-    output formatter.
-
-    The typical use is the following:
-    [let pretty_print p_caller fmt x =
-    let pp fmt = Format.fprintf "..." ... x ... in
-    let myself = Call in
-    par p_caller myself fmt pp]
-
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-val par:
-  precedence -> precedence -> Format.formatter -> (Format.formatter -> unit) ->
-  unit
-
 (** [par_ty_name f ty] puts parenthesis around the name of the [ty] iff [f ty]
     is [true].
     @since Carbon-20101201 *)
