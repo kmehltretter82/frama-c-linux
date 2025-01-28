@@ -106,8 +106,6 @@ let pretty ?vbox fmt message =
 (* -------------------------------------------------------------------------- *)
 
 let min_buffer = 128    (* initial size of buffer *)
-let max_buffer = 2097152 (* maximal size of buffer *)
-let tgr_buffer = 3145728 (* elasticity (internal overhead) *)
 
 type buffer = {
   mutable formatter : Format.formatter ; (* formatter on self (recursive) *)
@@ -136,7 +134,8 @@ let shrink buffer =
   if Buffer.length buffer.content > min_buffer then
     Buffer.reset buffer.content
 
-let truncate_text buffer size =
+let truncate buffer size =
+  let truncated = ref false in
   if Buffer.length buffer.content > size then
     begin
       let p = trim_begin buffer in
@@ -147,23 +146,21 @@ let truncate_text buffer size =
       else if n <= size then
         Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n
       else
-        begin
-          let n_left = size / 2 - 3 in
-          let n_right = size - n_left - 5 in
-          if p > 0 then
-            Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n_left;
-          let buf_right = Buffer.sub buffer.content (q-n_right+1) n_right in
-          Buffer.truncate buffer.content n_left;
-          Buffer.add_string buffer.content "[...]";
-          Buffer.add_string buffer.content buf_right;
-        end
-    end
+        let n_left = size / 2 - 3 in
+        let n_right = size - n_left - 5 in
+        if p > 0 then
+          Buffer.blit buffer.content p (Buffer.to_bytes buffer.content) 0 n_left;
+        let buf_right = Buffer.sub buffer.content (q-n_right+1) n_right in
+        Buffer.truncate buffer.content n_left;
+        Buffer.add_string buffer.content "[...]";
+        Buffer.add_string buffer.content buf_right;
+        truncated := true;
+    end;
+  !truncated
 
 (* All text added shall go through this function *)
 let append buffer s k n =
-  Buffer.add_substring buffer.content s k n ;
-  if Buffer.length buffer.content > tgr_buffer then
-    truncate_text buffer max_buffer
+  Buffer.add_substring buffer.content s k n
 
 let push_tag buffer _tag =
   let p = Buffer.length buffer.content in
@@ -219,13 +216,12 @@ let create ?indent ?margin () =
   buffer
 
 let trim buffer =
-  truncate_text buffer max_buffer ;
   let p = trim_begin buffer in
   let q = trim_end buffer in
   p , q
 
 let contents buffer =
-  truncate_text buffer max_buffer ; Buffer.contents buffer.content
+  Buffer.contents buffer.content
 
 let message buffer =
   ( Buffer.contents buffer.content , List.rev buffer.revtags )
@@ -247,7 +243,6 @@ let to_string ?(indent=20) ?(margin=40) ?(trim=true) pp data =
   let fmt = formatter buffer in
   pp fmt data ;
   Format.pp_print_flush fmt () ;
-  truncate_text buffer max_buffer ;
   if trim then
     let p = trim_begin buffer in
     let q = trim_end buffer in
