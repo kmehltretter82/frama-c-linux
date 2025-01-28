@@ -253,10 +253,10 @@ val mkdir : ?parents:bool -> Filepath.Normalized.t -> Unix.file_perm -> bool
     in a modified state before raising an exception.
     Returns [true] if the directory was created, [false] otherwise.
     @raise Unix.Unix_error if cannot create [name] or its parents.
+    @raise Failure if the path exists but is not a directory
     @since 19.0-Potassium
-    @since 28.0-Nickel added check for existence of path (error if exists
-    but not a directory, otherwise do nothing if directory already exists).
-    Changed type of [name] argument and return type.
+    @before 28.0-Nickel [name] argument was of type [string] and the returned
+    type was [unit]. Also, the function did not check for path's existence.
 *)
 
 val safe_at_exit : (unit -> unit) -> unit

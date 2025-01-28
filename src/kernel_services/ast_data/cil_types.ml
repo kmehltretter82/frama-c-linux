@@ -591,7 +591,7 @@ and typeinfo = {
     {!Cil_types.varinfo} structure. A global {!Cil_types.varinfo} can be
     introduced with the [GVarDecl] or [GVar], [GFunDecl] or [GFun] globals.
     A local varinfo can be introduced as part of a function definition
-    {!Cil_types.fundec}.
+    {!type:Cil_types.fundec}.
 
     All references to a given global or local variable must refer to the same
     copy of the [varinfo]. Each [varinfo] has a globally unique identifier that
@@ -925,8 +925,8 @@ and offset =
 (** A special kind of expressions are those that can appear as initializers for
     global variables (initialization of local variables is turned into
     assignments). The initializers are represented as type
-    {!Cil_types.init}. You can create initializers with {!Cil.makeZeroInit} and
-    you can conveniently scan compound initializers them with
+    {!type:Cil_types.init}. You can create initializers with {!Cil.makeZeroInit}
+    and you can conveniently scan compound initializers them with
     {!Cil.foldLeftCompound}. *)
 
 (** Initializers for global variables. *)
@@ -974,10 +974,10 @@ and local_init =
 
 (** A function definition is always introduced with a [GFun] constructor at the
     top level. All the information about the function is stored into a
-    {!Cil_types.fundec}. Some of the information (e.g. its name, type, storage,
-    attributes) is stored as a {!Cil_types.varinfo} that is a field of the
-    [fundec]. To refer to the function from the expression language you must use
-    the [varinfo].
+    {!type:Cil_types.fundec}. Some of the information (e.g. its name, type,
+    storage, attributes) is stored as a {!Cil_types.varinfo} that is a field of
+    the [fundec]. To refer to the function from the expression language you must
+    use the [varinfo].
 
     The function definition contains, in addition to the body, a list of all the
     local variables and separately a list of the formals. Both kind of variables

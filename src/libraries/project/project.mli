@@ -100,7 +100,7 @@ val get_name: t -> string
 (** Project name. Two projects may have the same name. *)
 
 val get_unique_name: t -> string
-(** @return a project name based on {!name} but different of each others
+(** @return a project name based on {!field:name} but different of each others
     [unique_name]. *)
 
 val set_name: t -> string -> unit

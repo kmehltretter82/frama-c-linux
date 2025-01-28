@@ -64,7 +64,7 @@ val bor: int -> t -> t -> t
 val bxor: int -> t -> t -> t        (* bitwise difference *)
 val beq: int -> t -> t -> t         (* bitwise equivalence/equality *)
 
-(** {2 Generic Bitwise Operations}. *)
+(** {2 Generic Bitwise Operations} *)
 
 (** Prefer using these rather than create intermediary bitvectors. *)
 

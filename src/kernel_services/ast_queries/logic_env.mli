@@ -41,7 +41,8 @@ val is_extension: plugin:string -> string -> bool
 val is_extension_block: plugin:string -> string -> bool
 
 (** Return [true] if a module importer is registered for the given name and
-    plugin. @since 30.0-Zinc
+    plugin.
+    @since 30.0-Zinc
 *)
 val is_importer: plugin:string -> string -> bool
 

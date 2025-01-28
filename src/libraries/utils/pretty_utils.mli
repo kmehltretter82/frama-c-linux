@@ -195,7 +195,7 @@ val pp_items :
        (default is [Format.pp_print_string])
     - [~pp_item] pretty-printer to print each element.
 
-    There is also a low-level API to this feature, provided by {!marger},
+    There is also a low-level API to this feature, provided by {!val:marger},
     {!pp_margin} and {!add_margin} below.
 *)
 
