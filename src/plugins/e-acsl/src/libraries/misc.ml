@@ -213,13 +213,11 @@ let name_of_binop = function
   | MinusPP | MinusPI | PlusPI -> assert false
 
 module Id_term =
-  Datatype.Make_with_collections
+  Datatype.Make_with_hashtbl
     (struct
       include Cil_datatype.Term
       let name = "E_ACSL.Id_term"
-      let compare _ _ =
-        (* There is no sound comparison based on physical identity. *)
-        Kernel.fatal "Id_term: comparison undefined (and undefinable)"
+      let compare = Datatype.undefined
       let equal (t1:term) t2 = t1 == t2
       let structural_descr = Structural_descr.t_abstract
       let rehash = Datatype.identity

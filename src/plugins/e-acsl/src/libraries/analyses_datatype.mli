@@ -68,7 +68,7 @@ end
 (** term with a profile: a term inside a logic function or predicate may
     contain free variables. The profile indicates the interval for those
     free variables. *)
-module Id_term_in_profile: Datatype.S_with_collections
+module Id_term_in_profile: Datatype.S_with_hashtbl
   with type t = term * Profile.t
 
 (** profile of logic function or predicate: a logic info representing a logic

@@ -138,7 +138,7 @@ end = struct
     = Id_term_in_profile.Hashtbl.create 97
 
   (* Small functor to access the result of a memoized inference *)
-  module Accesses (X : Datatype.S_with_collections)
+  module Accesses (X : Datatype.S_with_hashtbl)
       (Tbl: sig val tbl : ival Error.result X.Hashtbl.t end)
     : sig
       val get : X.Hashtbl.key -> ival Error.result
