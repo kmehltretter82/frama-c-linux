@@ -470,7 +470,12 @@ module UnfoldingForce: Parameter_sig.Bool
 (** Behavior of option "-machdep".
     If function [set] is called, then {!File.prepare_from_c_files} must be
     called for well preparing the AST. *)
-module Machdep: Parameter_sig.String
+module Machdep: sig
+  include Parameter_sig.String
+  val machdep_dir : unit -> LoadState.t
+  val default_machdep_file : string -> LoadState.t
+  val is_default_machdep : string -> bool
+end
 
 (** Behavior of invisible option -keep-logical-operators:
     Tries to avoid converting && and || into conditional statements.

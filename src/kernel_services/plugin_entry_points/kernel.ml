@@ -1012,24 +1012,43 @@ let () = Plugin.state_ref := State_dir.get
 
 let parsing = add_group "Parsing"
 
+
+
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
 let () = Parameter_customize.set_cmdline_stage Cmdline.Extended
-module Machdep =
-  String
-    (struct
-      let module_name = "Machdep"
-      let option_name = "-machdep"
-      let default =
-        try Sys.getenv "FRAMAC_MACHDEP"
-        with Not_found -> "x86_64"
-      let arg_name = "machine"
-      let help =
-        "use <machine> as the current machine dependent configuration. \
-         See \"-machdep help\" for a list. The environment variable \
-         FRAMAC_MACHDEP can be used to override the default value. The command \
-         line parameter still has priority over the default value"
-    end)
+module Machdep = struct
+  include String
+      (struct
+        let module_name = "Machdep"
+        let option_name = "-machdep"
+        let default =
+          try Sys.getenv "FRAMAC_MACHDEP"
+          with Not_found -> "x86_64"
+        let arg_name = "machine"
+        let help =
+          "use <machine> as the current machine dependent configuration. \
+           See \"-machdep help\" for a list. The environment variable \
+           FRAMAC_MACHDEP can be used to override the default value. The command \
+           line parameter still has priority over the default value"
+      end)
+
+  let machdep_dir () = Share.get_dir "machdeps"
+  let default_machdep_file machdep =
+    let filename = "machdep_" ^ machdep ^ ".yaml" in
+    Filepath.Normalized.concat (machdep_dir()) filename
+  let is_default_machdep machdep =
+    Filepath.Normalized.is_file (default_machdep_file machdep)
+
+  let normalize name =
+    if is_default_machdep name then name else
+      (Filepath.Normalized.of_string ~existence:Must_exist name :> string)
+end
+let () = Machdep.(add_set_hook
+                    (fun old_name new_name ->
+                       let new_name = normalize new_name in
+                       if equal old_name new_name then ()
+                       else unsafe_set new_name))
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()
