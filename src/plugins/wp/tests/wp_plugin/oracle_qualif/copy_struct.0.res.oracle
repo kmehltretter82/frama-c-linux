@@ -5,7 +5,7 @@
 [wp] [Valid] Goal copy_struct_terminates (Cfg) (Trivial)
 [wp] Warning: Missing RTE guards
 [wp] 1 goal scheduled
-[wp] [Failure] region_copy_struct_ensures (Qed 2ms) (Alt-Ergo) (Cache miss 1)
+[wp] [Failure] region_copy_struct_ensures (Alt-Ergo) (Cached)
 [wp] Proved goals:    2 / 3
   Terminating:     1
   Unreachable:     1

@@ -647,7 +647,7 @@ struct
       gen_stored s obj p (gen_loaded s.pre obj q)
     else match obj with
       | C_int _ | C_float _ | C_pointer _ ->
-        gen_memcpy s obj ~lsrc:q p
+        gen_stored s obj p (gen_loaded s.pre obj q)
       | C_comp _ | C_array _ ->
         gen_memcpy s obj ~enforced_length:(M.sizeof obj) ~lsrc:q p
 

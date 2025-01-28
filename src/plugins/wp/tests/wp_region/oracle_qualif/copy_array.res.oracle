@@ -8,26 +8,25 @@
 [region] copy_array.c:18: Warning: Annotations not analyzed
 [region] copy_array.c:19: Warning: Annotations not analyzed
 [wp] 13 goals scheduled
-[wp] [NoResult] region_copy_ensures (Qed)
-[wp] [NoResult] region_copy_loop_invariant_Copy_preserved (Qed)
+[wp] [Valid] region_copy_ensures (Alt-Ergo) (Cached)
+[wp] [Valid] region_copy_loop_invariant_Copy_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] region_copy_loop_invariant_Copy_established (Qed)
 [wp] [Valid] region_copy_loop_invariant_Range_preserved (Qed)
 [wp] [Valid] region_copy_loop_invariant_Range_established (Qed)
-[wp] [NoResult] region_copy_assert_A (Qed)
-[wp] [NoResult] region_copy_assert_B (Qed)
+[wp] [Valid] region_copy_assert_A (Alt-Ergo) (Cached)
+[wp] [Valid] region_copy_assert_B (Alt-Ergo) (Cached)
 [wp] [Valid] region_copy_loop_assigns_part1 (Qed)
 [wp] [Valid] region_copy_loop_assigns_part2 (Qed)
-[wp] [NoResult] region_copy_loop_assigns_part3 (Qed)
+[wp] [Valid] region_copy_loop_assigns_part3 (Alt-Ergo) (Cached)
 [wp] [Valid] region_copy_assigns (Qed)
 [wp] [Valid] region_copy_loop_variant_decrease (Qed)
 [wp] [Valid] region_copy_loop_variant_positive (Qed)
-[wp] Proved goals:   10 / 15
+[wp] Proved goals:   15 / 15
   Terminating:     1
   Unreachable:     1
   Qed:             8
-  Unsuccess:       5
-  Missing:         5
+  Alt-Ergo:        5
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
-  copy                      8        -       13      61.5%
+  copy                      8        5       13       100%
 ------------------------------------------------------------
