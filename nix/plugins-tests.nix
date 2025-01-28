@@ -27,6 +27,8 @@ mk_tests {
       @src/plugins/region/tests/ptests \
       @src/plugins/server/tests/ptests \
       @src/plugins/variadic/tests/ptests
+    dune runtest -j1 --display short \
+      src/plugins/server
   '';
   has-wp-proofs = true ;
 }
