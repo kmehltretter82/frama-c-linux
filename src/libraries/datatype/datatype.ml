@@ -265,6 +265,17 @@ module type Hashtbl = sig
   module Make(Data: S) : S with type t = Data.t t
 end
 
+module type S_with_set_and_map = sig
+  include S
+  module Set: Set with type elt = t
+  module Map: Map with type key = t
+end
+
+module type S_with_hashtbl = sig
+  include S
+  module Hashtbl: Hashtbl with type key = t
+end
+
 module type S_with_collections = sig
   include S
   module Set: Set with type elt = t
@@ -1459,7 +1470,7 @@ end
 (** {2 Simple type values} *)
 (* ****************************************************************************)
 
-module With_collections(X: S)(Info: Functor_info) = struct
+module With_set_and_map(X: S)(Info: Functor_info) = struct
 
   module D = X
   include D
@@ -1475,6 +1486,18 @@ module With_collections(X: S)(Info: Functor_info) = struct
       (Stdlib.Map.Make(D))
       (D)
       (struct let module_name = Info.module_name ^ ".Map" end)
+
+end
+
+module Make_with_set_and_map(X: Make_input) =
+  With_set_and_map
+    (Make(X))
+    (struct let module_name = String.capitalize_ascii X.name end)
+
+module With_hashtbl(X: S)(Info: Functor_info) = struct
+
+  module D = X
+  include D
 
   module Hashtbl =
     Hashtbl
@@ -1501,6 +1524,16 @@ module With_collections(X: S)(Info: Functor_info) = struct
       (D)
       (struct let module_name = Info.module_name ^ ".Hashtbl" end)
 
+end
+
+module Make_with_hashtbl(X: Make_input) =
+  With_hashtbl
+    (Make(X))
+    (struct let module_name = String.capitalize_ascii X.name end)
+
+module With_collections(X: S)(Info: Functor_info) = struct
+  include (With_set_and_map(X)(Info) : S_with_set_and_map with type t = X.t)
+  include (With_hashtbl(X)(Info) : S_with_hashtbl with type t := X.t)
 end
 
 module Make_with_collections(X: Make_input) =
