@@ -91,5 +91,3 @@ val remove_unused_labels:
   ?is_removable:(Cil_types.label -> bool) -> Cil_types.fundec -> unit
 
 val keepUnused: bool ref (* Set this to true to turn off this module *)
-val rmUnusedInlines: bool ref (* Delete unused inline funcs in gcc mode? *)
-val rmUnusedStatic: bool ref (* Delete unused static functions? *)

@@ -74,10 +74,6 @@ module InfoHashtbl = Hashtbl.Make(struct
 
 let keepUnused = ref false
 
-(* Possibly no longer used: *)
-let rmUnusedInlines = ref false
-let rmUnusedStatic = ref false
-
 let is_reachable t r = try InfoHashtbl.find t r with Not_found -> false
 
 let pp_info fmt = function
@@ -261,9 +257,8 @@ let isExportedRoot global =
         if hasExportingAttribute v then
           v.vname,true, "constructor or destructor function"
         else if v.vstorage = Static then
-          v.vname, not !rmUnusedStatic, "static function"
-        else if v.vinline && v.vstorage != Extern
-                && (Machine.msvcMode () || !rmUnusedInlines) then
+          v.vname, true, "static function"
+        else if v.vinline && v.vstorage != Extern && (Machine.msvcMode ()) then
           v.vname, false, "inline function"
         else
           v.vname, true, "other function"

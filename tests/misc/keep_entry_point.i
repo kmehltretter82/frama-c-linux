@@ -1,5 +1,4 @@
 /* run.config
- MODULE: @PTEST_NAME@
    OPT: -main f -no-autoload-plugins -print
 */
 
