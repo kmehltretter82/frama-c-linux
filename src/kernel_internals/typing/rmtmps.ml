@@ -236,13 +236,10 @@ let hasExportingAttribute funvar =
 (* Exported roots are those global varinfos which are visible to the
  * linker and dynamic loader.  For variables, this consists of
  * anything that is not "static".  For functions, this consists of:
- *
  * - functions bearing a "constructor" or "destructor" attribute
  * - functions declared extern but not inline
  * - functions declared neither inline nor static
  * - the function named "main"
- * gcc incorrectly (according to C99) makes inline functions visible to
- * the linker.  So we can only remove inline functions on MSVC.
 *)
 
 let isExportedRoot global =
@@ -256,10 +253,10 @@ let isExportedRoot global =
     | GFun ({svar = v}, _) -> begin
         if hasExportingAttribute v then
           v.vname,true, "constructor or destructor function"
-        else if v.vstorage = Static then
-          v.vname, true, "static function"
-        else if v.vinline && v.vstorage != Extern && (Machine.msvcMode ()) then
+        else if v.vinline && v.vstorage != Extern then
           v.vname, false, "inline function"
+        else if v.vstorage = Static then
+          v.vname, false, "static function"
         else
           v.vname, true, "other function"
       end

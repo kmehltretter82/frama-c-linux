@@ -3,16 +3,6 @@
 static int f(void);
 
 static int x;
-static int y;
-static int g(void)
-{
-  int tmp;
-  tmp = y;
-  y ++;
-  ;
-  return tmp;
-}
-
 static int f(void)
 {
   int tmp;

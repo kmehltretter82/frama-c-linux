@@ -36,7 +36,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:summary] ====== ANALYSIS SUMMARY ======
   ----------------------------------------------------------------------------
-  3 functions analyzed (out of 5): 60% coverage.
+  3 functions analyzed (out of 3): 100% coverage.
   In these functions, 36 statements reached (out of 36): 100% coverage.
   ----------------------------------------------------------------------------
   No errors or warnings raised during the analysis.

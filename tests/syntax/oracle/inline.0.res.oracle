@@ -15,13 +15,6 @@ __inline static int incr__fc_inline(int x)
   return __retres;
 }
 
-__inline static int decr__fc_inline(int x)
-{
-  int __retres;
-  __retres = x - 1;
-  return __retres;
-}
-
 void main(void)
 {
   int a = incr__fc_inline(41);
