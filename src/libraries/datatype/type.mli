@@ -87,7 +87,6 @@ exception AlreadyExists of string
 val register:
   ?closure:bool ->
   name:string ->
-  ml_name:string option ->
   Structural_descr.t ->
   'a list ->
   'a t
@@ -97,7 +96,6 @@ val register:
     [closure] is true iff the type is a function type.
     [name] is the name of the type. Must be a valid OCaml type name (eventually
     prefixed by a module path).
-    [ml_name] is the OCaml name of the registered type value.
     @raise AlreadyExists if the given name is already used by another type.
     @raise Invalid_argument if [reprs] is the empty list
 *)
@@ -129,9 +127,6 @@ val get_embedded_type_names: 'a t -> string list
     list"; "int" ].
     @since Oxygen-20120901 *)
 
-val ml_name: 'a t -> string
-val pp_ml_name: 'a t -> precedence -> Format.formatter -> unit
-val set_ml_name: 'a t -> string option -> unit
 val set_name: 'a t -> string -> unit
 (** @since Neon-20140301 *)
 

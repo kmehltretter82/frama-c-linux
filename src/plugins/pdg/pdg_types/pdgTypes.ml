@@ -481,7 +481,6 @@ module Pdg = struct
         let name = "body"
         let mem_project = Datatype.never_any_project
       end)
-  let () = Type.set_ml_name Body_datatype.ty None
 
   include Datatype.Pair(Kernel_function)(Body_datatype)
 

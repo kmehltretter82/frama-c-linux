@@ -93,7 +93,6 @@ struct
           let reprs = [ M.create () ]
           let mem_project = Datatype.never_any_project
         end)
-    let () = Type.set_ml_name Datatype.ty None
     let add_labeled_edge g src l dst =
       if mem_edge g src dst then begin
         remove_edge g src dst;

@@ -60,8 +60,7 @@ let par p_caller p_callee fmt pp =
 type concrete_repr =
   { mutable name: string;
     digest: Digest.t;
-    structural_descr: Structural_descr.t;
-    mutable pp_ml_name: precedence -> Format.formatter -> unit }
+    structural_descr: Structural_descr.t }
 
 (* phantom type *)
 type 'a t = concrete_repr
@@ -94,32 +93,8 @@ let embedded_types: concrete_repr Tbl.t = Tbl.create 7
 (** {2 Main functions} *)
 (* ****************************************************************************)
 
-let mk_dyn_pp name = function
-  | None ->
-    let pp fmt =
-      let plugin_name = match Str.split (Str.regexp_string ".") name with
-        | [] -> None
-        | p :: _ -> Some p
-      in
-      match plugin_name with
-      | None ->
-        Format.fprintf fmt "(failwith \"%s is not a printable type name\")" name
-      | Some p ->
-        Format.fprintf fmt "%s.ty" p
-    in
-    (fun p fmt -> par p Basic fmt pp)
-  | Some s ->
-    let prec =
-      try
-        ignore (Str.search_forward (Str.regexp " ") name 0);
-        Call
-      with Not_found ->
-        Basic
-    in
-    fun p fmt -> par p prec fmt (fun fmt -> Format.fprintf fmt "%s" s)
-
 exception AlreadyExists of string
-let register ?(closure=false) ~name ~ml_name structural_descr reprs =
+let register ?(closure=false) ~name structural_descr reprs =
   let error () =
     invalid_arg ("Type.register: invalid reprs for type " ^ name)
   in
@@ -132,7 +107,6 @@ let register ?(closure=false) ~name ~ml_name structural_descr reprs =
     error ()
   | _ ->
     if Hashtbl.mem types name then raise (AlreadyExists name);
-    let pp_ml_name = mk_dyn_pp name ml_name in
     let digest = match structural_descr with
       | Structural_descr.Unknown ->
         (* unserializable type: weakest digest *)
@@ -144,8 +118,7 @@ let register ?(closure=false) ~name ~ml_name structural_descr reprs =
     let ty =
       { name = name;
         digest = digest;
-        structural_descr = structural_descr;
-        pp_ml_name = pp_ml_name }
+        structural_descr = structural_descr }
     in
     let full_ty = { ty = ty; reprs = List.map Obj.repr reprs } in
     Hashtbl.add types name full_ty;
@@ -174,17 +147,11 @@ end
 let name ty = ty.name
 let structural_descr ty = ty.structural_descr
 let digest ty = ty.digest
-let pp_ml_name ty = ty.pp_ml_name
-let ml_name ty = Format.asprintf "%t" (ty.pp_ml_name Basic)
 
 let unsafe_reprs ty = (Hashtbl.find types ty.name).reprs
 let reprs ty =
   let l = try unsafe_reprs ty with Not_found -> assert false in
   List.map Obj.obj l
-
-let set_ml_name ty ml_name =
-  let pp = mk_dyn_pp ty.name ml_name in
-  ty.pp_ml_name <- pp
 
 let set_name ty name =
   let full_ty = try Hashtbl.find types ty.name with Not_found -> assert false in
@@ -236,11 +203,6 @@ module Polymorphic(T: Polymorphic_input) = struct
 
   type 'a poly = 'a T.t
 
-  let ml_name from_ty =
-    Format.asprintf "%s.instantiate %t"
-      T.module_name
-      (from_ty.pp_ml_name Call)
-
   let instantiate (ty:'a t) =
     try
       Tbl.find ty, false
@@ -248,7 +210,6 @@ module Polymorphic(T: Polymorphic_input) = struct
       let repr =
         register
           ~name:(T.name ty)
-          ~ml_name:(Some (ml_name ty))
           (T.structural_descr ty.structural_descr)
           (List.fold_left
              (fun acc ty -> T.reprs ty @ acc) [] (unsafe_reprs ty))
@@ -298,13 +259,6 @@ module Polymorphic2(T: Polymorphic2_input) = struct
   let memo_tbl : concrete_repr Concrete_pair.t = Concrete_pair.create 17
   let instances : (concrete_repr * concrete_repr) Tbl.t = Tbl.create 17
 
-  let ml_name from_ty1 from_ty2 =
-    Format.asprintf
-      "%s.instantiate %t %t"
-      T.module_name
-      (from_ty1.pp_ml_name Call)
-      (from_ty2.pp_ml_name Call)
-
   let instantiate a b =
     let key = a, b in
     try
@@ -323,7 +277,6 @@ module Polymorphic2(T: Polymorphic2_input) = struct
       let ty =
         register
           ~name:(T.name a b)
-          ~ml_name:(Some (ml_name a b))
           (T.structural_descr a.structural_descr b.structural_descr)
           reprs
       in
@@ -396,12 +349,6 @@ module Function = struct
     (match label with None -> "" | Some l -> "~" ^ l ^ ":")
     ^ par_ty_name is_instance_of ty1 ^ " -> " ^ name ty2
 
-  let ml_name label ty1 ty2 =
-    Format.asprintf
-      "Datatype.func%s %t %t"
-      (match label with None -> "" | Some l -> " ~label:(" ^ l ^ ", None)")
-      (ty1.pp_ml_name Call) (ty2.pp_ml_name Call)
-
   let instantiate ?label (a:'a) (b:'b t): ('a, 'b) poly t * bool =
     let l, o = match label with
       | None -> None, None
@@ -420,7 +367,6 @@ module Function = struct
         register
           ~closure:true
           ~name:(name l a b)
-          ~ml_name:(Some (ml_name l a b))
           Structural_descr.t_unknown
           (List.map (fun r _ -> r) (unsafe_reprs b))
       in
@@ -471,14 +417,6 @@ module Polymorphic3(T:Polymorphic3_input) = struct
     : (concrete_repr * concrete_repr * concrete_repr) Tbl.t
     = Tbl.create 17
 
-  let ml_name from_ty1 from_ty2 from_ty3 =
-    Format.asprintf
-      "%s.instantiate %t %t %t"
-      T.module_name
-      (from_ty1.pp_ml_name Call)
-      (from_ty2.pp_ml_name Call)
-      (from_ty3.pp_ml_name Call)
-
   let instantiate a b c =
     let key = a, b, c in
     try
@@ -501,7 +439,6 @@ module Polymorphic3(T:Polymorphic3_input) = struct
       let ty =
         register
           ~name:(T.name a b c)
-          ~ml_name:(Some (ml_name a b c))
           (T.structural_descr
              a.structural_descr
              b.structural_descr
@@ -569,15 +506,6 @@ module Polymorphic4(T:Polymorphic4_input) = struct
     : (concrete_repr * concrete_repr * concrete_repr * concrete_repr) Tbl.t
     = Tbl.create 17
 
-  let ml_name from_ty1 from_ty2 from_ty3 from_ty4 =
-    Format.asprintf
-      "%s.instantiate %t %t %t %t"
-      T.module_name
-      (from_ty1.pp_ml_name Call)
-      (from_ty2.pp_ml_name Call)
-      (from_ty3.pp_ml_name Call)
-      (from_ty4.pp_ml_name Call)
-
   let instantiate a b c d =
     let key = a, b, c, d in
     try
@@ -604,7 +532,6 @@ module Polymorphic4(T:Polymorphic4_input) = struct
       let ty =
         register
           ~name:(T.name a b c d)
-          ~ml_name:(Some (ml_name a b c d))
           (T.structural_descr
              a.structural_descr
              b.structural_descr

@@ -398,8 +398,6 @@ module S =
           po_formula = VC_Annot.repr ;
         }]
     end)
-(* to get a "reasonable" API doc: *)
-let () = Type.set_ml_name S.ty (Some "Wpo.po")
 
 module WpoType = S
 module ProverType =
@@ -410,8 +408,6 @@ module ProverType =
       let name = "Wpo.prover"
       let reprs = [ Qed ]
     end)
-(* to get a "reasonable" API doc: *)
-let () = Type.set_ml_name ProverType.ty (Some "Wpo.prover")
 
 module ResultType =
   Datatype.Make
@@ -423,8 +419,6 @@ module ResultType =
         List.map VCS.result
           [ Valid ; Unknown ; Timeout ; Failed ]
     end)
-(* to get a "reasonable" API doc *)
-let () = Type.set_ml_name ResultType.ty (Some "Wpo.result")
 
 (* -------------------------------------------------------------------------- *)
 (* --- Getters                                                            --- *)

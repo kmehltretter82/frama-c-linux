@@ -228,8 +228,7 @@ module Make(X: Make_input) = struct
   module T = struct
     include X
     let name = if is_module_name X.name then X.name ^ ".t" else X.name
-    let ml_name = if is_module_name X.name then Some (X.name ^ ".ty") else None
-    let ty = Type.register ~name ~ml_name X.structural_descr X.reprs
+    let ty = Type.register ~name X.structural_descr X.reprs
   end
 
   include T
@@ -326,27 +325,6 @@ module Polymorphic2(P: Polymorphic2_input) = struct
 
   include Type.Polymorphic2(P)
 
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty1 ty2 =
-    let res, first = instantiate ty1 ty2 in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty1
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty2
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
-
   module Make(T1: S)(T2: S) = struct
 
     module T = struct
@@ -437,29 +415,6 @@ module Polymorphic3
 struct
 
   include Type.Polymorphic3(P)
-
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty1 ty2 ty3 =
-    let res, first = instantiate ty1 ty2 ty3 in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a %a %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty1
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty2
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty3
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
 
   module Make(T1: S)(T2: S)(T3: S) = struct
 
@@ -565,31 +520,6 @@ module Polymorphic4
 struct
 
   include Type.Polymorphic4(P)
-
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty1 ty2 ty3 ty4 =
-    let res, first = instantiate ty1 ty2 ty3 ty4 in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a %a %a %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty1
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty2
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty3
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty4
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
 
   module Make(T1: S)(T2: S)(T3: S)(T4: S) = struct
 
@@ -795,25 +725,6 @@ end
 module Polymorphic_gen(P: Polymorphic_input) = struct
 
   include Type.Polymorphic(P)
-
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty =
-    let res, first = instantiate ty in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
 
   module Make_gen(X: S)(R: sig val rehash: X.t poly -> X.t poly end) = struct
 
@@ -1246,8 +1157,6 @@ struct
   let nearest_elt_le x = S.find_last (fun y -> y <= x)
   let nearest_elt_ge x = S.find_first (fun y -> y >= x)
 
-  let () = Type.set_ml_name P.ty (Some (Info.module_name ^ ".ty"))
-
   let ty = P.ty
   let name = P.name
   let descr = P.descr
@@ -1455,7 +1364,6 @@ module Weak(W: Sub_caml_weak_hashtbl)(D: S with type t = W.data) = struct
         let name = "Weak(" ^ D.name ^ ")"
         let reprs = let w = W.create 0 in Caml_list.iter (W.add w) D.reprs; [ w ]
       end)
-  let () = Type.set_ml_name ty None;
 end
 
 module Caml_weak_hashtbl(D: S) = struct
@@ -1574,8 +1482,6 @@ struct
          let mem_project = never_any_project
        end))
       (struct let module_name = module_name end)
-
-  let () = Type.set_ml_name ty (Some ("Datatype." ^ name))
 
 end
 

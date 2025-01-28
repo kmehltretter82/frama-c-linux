@@ -2456,7 +2456,6 @@ module Kf = struct
         let pretty fmt kf = Varinfo.pretty fmt (vi kf)
         let mem_project = Datatype.never_any_project
       end)
-  let () = Type.set_ml_name ty (Some "Kernel_function.ty")
 
 end
 
