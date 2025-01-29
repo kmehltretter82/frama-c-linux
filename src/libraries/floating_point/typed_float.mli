@@ -152,35 +152,14 @@ val parse : string -> parsed_result
 
 
 
-(** {2 Format based constants} *)
+(** {2 Format based constants}
 
-(** The significant size of a given format is denoted {m m}.
-    The exponent size of a given format is denoted {m e}. *)
+    See documentation in [Floating_point]. *)
 
-(** Returns the largest positive finite floating point number of a given format.
-    It is computed as :
-    {math \left({2 - 2 ^ {1 - m}}\right) ^ {2 ^ {e - 1} - 1}} *)
 val largest_finite_float_of : format:'f format -> 'f t
-
-(** Returns the bounds of the finite range of a given format, i.e the largest
-    negative finite floating point number and the largest positive finite
-    floating point number of a given format. *)
 val finite_range_of : format:'f format -> 'f t * 'f t
-
-(** Returns the smallest positive normalized floating point number of a given
-    format. It is computed as :
-    {math  {2} ^ {2 - {2} ^ {e - 1}} } *)
 val smallest_normal_float_of : format:'f format -> 'f t
-
-(** Returns the smallest positive denormalized floating point number of a
-    given format. It is simply computed by setting the least significant bit
-    to one, as this bit corresponds to the last bit of the significant. *)
 val smallest_denormal_float_of : format:'f format -> 'f t
-
-(** Returns the unit in the last place of a given format, i.e the value of
-    the least significant bit of a floating point number with an exponent
-    set at zero. It is primally used to overapproximate rounding errors.
-    It is computed as {m 2 ^ {-m}}. *)
 val unit_in_the_last_place_of : format:'f format -> 'f t
 
 

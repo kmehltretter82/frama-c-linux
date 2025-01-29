@@ -75,3 +75,40 @@ val pretty : Format.formatter -> float -> unit
     format, i.e 'F' for single precision, 'D' for double precision and
     'L' for extended precision. *)
 val has_suffix : Cil_types.fkind -> string -> bool
+
+
+(** {2 Format based constants} *)
+
+type format = Single | Double
+
+(** The significant size of a given format is denoted {m m}.
+    The exponent size of a given format is denoted {m e}. *)
+
+(** Returns the largest positive finite floating point number of a given format.
+    It is computed as :
+    {math \left({2 - 2 ^ {1 - m}}\right) ^ {2 ^ {e - 1} - 1}} *)
+val largest_finite_float_of : format-> float
+
+(** Returns the bounds of the finite range of a given format, i.e the largest
+    negative finite floating point number and the largest positive finite
+    floating point number of a given format. *)
+val finite_range_of : format -> float * float
+
+(** Returns the smallest positive normalized floating point number of a given
+    format. It is computed as :
+    {math  {2} ^ {2 - {2} ^ {e - 1}} } *)
+val smallest_normal_float_of : format -> float
+
+(** Returns the smallest positive denormalized floating point number of a
+    given format. It is simply computed by setting the least significant bit
+    to one, as this bit corresponds to the last bit of the significant. *)
+val smallest_denormal_float_of : format -> float
+
+(** Returns the unit in the last place of a given format, i.e the value of
+    the least significant bit of a floating point number with an exponent
+    set at zero. It is primally used to overapproximate rounding errors.
+    It is computed as {m 2 ^ {-m}}. *)
+val unit_in_the_last_place_of : format -> float
+
+val minimal_exponent_of : format -> int
+val maximal_exponent_of : format -> int

@@ -122,49 +122,36 @@ let is_infinite (Float (f, _)) = Floating_point.is_infinite f
 let is_nan (Float (f, _)) = Floating_point.is_nan f
 
 
-type compute_float = { run : 'f. 'f format -> float }
-let cache_floats : type f. compute_float -> f format -> f t = fun { run } ->
-  let s = run Single and d = run Double and l = run Long in
-  function Single -> single s | Double -> double d | Long -> long l
 
-type compute_integer = { run : 'f. 'f format -> Z.t }
-let cache_integers : type f. compute_integer -> f format -> Z.t = fun { run } ->
-  let single = run Single and double = run Double and long = run Long in
-  function Single -> single | Double -> double | Long -> long
+let sig_size : type f. f format -> int = function
+    Single -> 24 | Double -> 53 | Long -> 53 (* Beware: this is unsound! *)
 
-let sig_size : type f. f format -> int =
-  function Single -> 24 | Double -> 53 | Long -> 53
+type compute_float = Floating_point.format -> float
+let convert_float : type f. compute_float -> f format -> f t = fun f -> function
+  | Single -> single (f Floating_point.Single)
+  | Double -> double (f Floating_point.Double)
+  | Long -> long (f Floating_point.Double) (* Beware: this is unsound! *)
 
-let exp_size : type f. f format -> int =
-  function Single ->  8 | Double -> 11 | Long -> 11
+let largest_finite_float_of ~format =
+  convert_float Floating_point.largest_finite_float_of format
+let smallest_normal_float_of ~format =
+  convert_float Floating_point.smallest_normal_float_of format
+let smallest_denormal_float_of ~format =
+  convert_float Floating_point.smallest_denormal_float_of format
+let unit_in_the_last_place_of ~format =
+  convert_float Floating_point.unit_in_the_last_place_of format
 
-let largest_finite_float_of : type f. format:f format -> f t =
-  let exponent fmt = Int.shift_left 1 (exp_size fmt - 1) - 1 in
-  let base fmt = 2.0 -. ldexp 1.0 (1 - sig_size fmt) in
-  let run fmt = ldexp (base fmt) (exponent fmt) |> change_format fmt in
-  fun ~format -> cache_floats { run } format
+type compute_int = Floating_point.format -> int
+let convert_int : type f. compute_int -> f format -> int = fun f format ->
+  match format with
+  | Single -> f Floating_point.Single
+  | Double -> f Floating_point.Double
+  | Long -> f Floating_point.Double (* Beware: this is unsound! *)
 
-let smallest_normal_float_of : type f. format:f format -> f t =
-  let exponent fmt = 2 - Int.shift_left 1 (exp_size fmt - 1) in
-  let run fmt = ldexp 1.0 (exponent fmt) |> change_format fmt in
-  fun ~format -> cache_floats { run } format
-
-let smallest_denormal_float_of : type f. format:f format -> f t =
-  let s () = Int32.float_of_bits 1l and d () = Int64.float_of_bits 1L in
-  let run : type k. k format -> float = function Single -> s () | _ -> d () in
-  fun ~format -> cache_floats { run } format
-
-let unit_in_the_last_place_of : type f. format:f format -> f t =
-  let run fmt = ldexp 1.0 (- sig_size fmt) in
-  fun ~format -> cache_floats { run } format
-
-let minimal_exponent_of : type f. format:f format -> Z.t =
-  let run fmt = Z.(of_int 2 - pow (of_int 2) Stdlib.(exp_size fmt - 1)) in
-  fun ~format -> cache_integers { run } format
-
-let maximal_exponent_of : type f. format:f format -> Z.t =
-  let run fmt = Z.(pow (of_int 2) Stdlib.(exp_size fmt - 1) - one) in
-  fun ~format -> cache_integers { run } format
+let minimal_exponent_of ~format =
+  convert_int Floating_point.minimal_exponent_of format
+let maximal_exponent_of ~format =
+  convert_int Floating_point.maximal_exponent_of format
 
 
 
@@ -295,13 +282,12 @@ let normalize_zero_in_numerator ~format numerator =
   else Normalized numerator
 
 let normalize_exponent_on_format ~format exponent =
-  let exponent = Z.of_int exponent in
-  let significant_size = Stdlib.(sig_size format - 1) |> Z.of_int in
+  let significant_size = Stdlib.(sig_size format - 1) in
   let maximal_exponent = maximal_exponent_of ~format in
-  let shifted_maximal = Z.(maximal_exponent - significant_size) in
-  if Z.Compare.(exponent > shifted_maximal)
+  let shifted_maximal = Stdlib.(maximal_exponent - significant_size) in
+  if Stdlib.(exponent > shifted_maximal)
   then pos_inf_shortcut ~format
-  else Normalized Z.(to_int exponent)
+  else Normalized exponent
 
 let normalize integral fractional exponent format =
   (* Concats the integral and fractional parts to produce [ i x 10 ^ l + f ]
@@ -334,7 +320,7 @@ let normalize integral fractional exponent format =
      the significant. *)
   let sig_size = sig_size format in
   let minimal_exponent = minimal_exponent_of ~format in
-  let minimal_exponent = Stdlib.(Z.to_int minimal_exponent - sig_size + 1) in
+  let minimal_exponent = Stdlib.(minimal_exponent - sig_size + 1) in
   (* Morally, the next step would be to find δ ∈ ℤ such as we have :
      [ emin ≤ e - δ + m ≤ emax ] and [ 2 ^ (m - 1) ≤ (n / d) * 2 ^ δ ≤ 2 ^ m ],
      with the idea to shift the numerator or the denominator such as their
@@ -351,7 +337,7 @@ let normalize integral fractional exponent format =
      take a shortcut, the result will be infinity. This fix an old issue where
      the parser were stuck for a long time on numbers like 1e99999. *)
   let delta = Stdlib.(sig_size - Z.log2 !numerator + Z.log2 !denominator + 1) in
-  let max_exponent_in_format = maximal_exponent_of ~format |> Z.to_int in
+  let max_exponent_in_format = maximal_exponent_of ~format in
   let exponent_underapprox = Stdlib.(!exponent - delta) in
   let is_infinity = Stdlib.(max_exponent_in_format < exponent_underapprox) in
   let* () = if is_infinity then pos_inf_shortcut ~format else Normalized () in

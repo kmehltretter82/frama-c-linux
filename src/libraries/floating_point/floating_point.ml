@@ -138,3 +138,33 @@ let has_suffix fkind literal =
   let ln = String.length literal in
   let suffix = suffix_of_fkind fkind in
   ln > 0 && Char.uppercase_ascii literal.[ln - 1] = suffix
+
+
+type format = Single | Double
+
+let sig_size = function Single -> 24 | Double -> 53
+let exp_size = function Single ->  8 | Double -> 11
+
+let largest_finite_float_of format =
+  let exponent format = Int.shift_left 1 (exp_size format - 1) - 1 in
+  let base format = 2.0 -. ldexp 1.0 (1 - sig_size format) in
+  ldexp (base format) (exponent format)
+
+let finite_range_of format =
+  let upper = largest_finite_float_of format in Float.neg upper, upper
+
+let smallest_normal_float_of format=
+  let exponent format = 2 - Int.shift_left 1 (exp_size format - 1) in
+  ldexp 1.0 (exponent format)
+
+let smallest_denormal_float_of = function
+  | Single -> Int32.float_of_bits 1l
+  | Double -> Int64.float_of_bits 1L
+
+let unit_in_the_last_place_of format = ldexp 1.0 (- sig_size format)
+
+(* Only compute 2^7 or 2^10 below, so no overflow. *)
+let two_power n = Integer.(to_int_exn (two_power_of_int n))
+
+let minimal_exponent_of format = 2 - two_power (exp_size format - 1)
+let maximal_exponent_of format = two_power (exp_size format - 1) - 1

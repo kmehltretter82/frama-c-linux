@@ -96,10 +96,12 @@ let join i1 i2 = match i1, i2 with
            this float type; otherwise return Rational *)
         (try
            let to_float n = Int64.to_float (Integer.to_int64_exn n) in
-           let Format format = Typed_float.format_of_fkind k in
-           let minf, maxf = Typed_float.finite_range_of ~format in
-           let minf, maxf = Typed_float.(to_float minf, to_float maxf) in
            let mini, maxi = to_float min, to_float max in
+           let minf, maxf = match k with
+             | FFloat -> Floating_point.finite_range_of Single
+             | FDouble -> Floating_point.finite_range_of Double
+             | FLongDouble -> raise Exit
+           in
            if mini >= minf && maxi <= maxf then Float(k, None) else Rational
          with Z.Overflow | Exit ->
            Rational)
@@ -130,8 +132,8 @@ let meet i1 i2 = match i1, i2 with
   | Float(k',None), Float(k, Some f) ->
     let f_in_k' = match k' with
       | FFloat ->
-        let minf, maxf = Typed_float.finite_range_of ~format:Single in
-        Typed_float.to_float minf <= f && f <= Typed_float.to_float maxf
+        let minf, maxf = Floating_point.finite_range_of Single in
+        minf <= f && f <= maxf
       | FDouble
       | FLongDouble ->
         true
@@ -171,11 +173,13 @@ let meet i1 i2 = match i1, i2 with
         (try
            let to_float n = Int64.to_float (Integer.to_int64_exn n) in
            let mini, maxi = to_float min, to_float max in
-           let Format format = Typed_float.format_of_fkind k in
-           let minf, maxf = Typed_float.finite_range_of ~format in
-           let minf, maxf = Typed_float.(to_float minf, to_float maxf) in
+           let minf, maxf = match k with
+             | FFloat -> Floating_point.finite_range_of Single
+             | FDouble -> Floating_point.finite_range_of Double
+             | FLongDouble -> raise Exit
+           in
            if mini <= minf && maxi >= maxf then Float(k, None) else Rational
-         with Z.Overflow ->
+         with Z.Overflow | Exit ->
            Rational)
       | None, Some _ | Some _, None ->
         assert false
