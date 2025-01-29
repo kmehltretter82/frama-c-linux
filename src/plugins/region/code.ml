@@ -44,7 +44,8 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
   match e.enode with
 
   | AddrOf lv | StartOf lv -> Some (add_lval m s lv)
-
+  | AddrOfStr _ | AddrOfWStr _ ->
+    Options.not_yet_implemented "address of string literal"
   | Lval lv ->
     let rv = add_lval m s lv in
     Memory.add_read rv (Lval(s,lv)) ;
@@ -65,7 +66,7 @@ and add_exp (m: map) (s:stmt) (e:exp) : value =
     add_exp m s p
 
   | Const _
-  | SizeOf _ | SizeOfE _ | SizeOfStr _
+  | SizeOf _ | SizeOfE _
   | AlignOf _ | AlignOfE _
     -> None
 

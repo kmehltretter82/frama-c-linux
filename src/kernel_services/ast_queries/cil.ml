@@ -61,7 +61,7 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
+let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
 let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
@@ -1593,8 +1593,6 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   | SizeOfE e1 ->
     let e1' = vExp e1 in
     if e1' != e1 then new_exp (SizeOfE e1') else e
-  | SizeOfStr _s -> e
-
   | AlignOf t ->
     let t' = vTyp t in
     if t' != t then new_exp (AlignOf t') else e
@@ -1618,6 +1616,8 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   | AddrOf lv ->
     let lv' = vLval lv in
     if lv' != lv then new_exp (AddrOf lv') else e
+  | AddrOfStr _s -> e
+  | AddrOfWStr _s -> e
   | StartOf lv ->
     let lv' = vLval lv in
     if lv' != lv then new_exp (StartOf lv') else e
@@ -2065,7 +2065,7 @@ and visitCilAttributes (vis: cilVisitor) (al: attributes) : attributes =
     al
 and childrenAttribute (vis: cilVisitor) ((n, args) as a: attribute) : attribute =
   let fAttrP a = visitCilAttrParams vis a in
-  let args' = Extlib.map_no_copy fAttrP args in
+    let args' = Extlib.map_no_copy fAttrP args in
   if args' != args then (n, args') else a
 
 and visitCilAttrParams (vis: cilVisitor) (a: attrparam) : attrparam =
@@ -2485,7 +2485,7 @@ let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
 let kfloat ~loc k f =
   let f = Floating_point.round_if_single_precision k f in
-  new_exp ~loc (Const (CReal (f, k, None)))
+  new_exp ~loc (Const (CReal(f,k,None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -2805,6 +2805,16 @@ let no_op_coerce typ t =
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
+let type_of_string_literal ?(loc=Cil_datatype.Location.unknown) s =
+  let len = kinteger ~loc (sizeof_kind()) (String.length s + 1) in
+  let t = typeAddAttributes [Attr ("const",[])] Cil_const.charType in
+  TArray(t,Some len,[])
+
+let type_of_wstring_literal ?(loc=Cil_datatype.Location.unknown) s =
+  let typ = typeAddAttributes [Attr("const",[])] (wchar_type ()) in
+  let len = kinteger ~loc (sizeof_kind()) (8 * (List.length s + 1)) in
+  TArray(typ, Some len, [])
+
 (**** Compute the type of an expression ****)
 let rec typeOf (e: exp) : typ =
   match e.enode with
@@ -2815,14 +2825,9 @@ let rec typeOf (e: exp) : typ =
    * don't believe me. *)
   | Const(CChr _) -> Cil_const.intType
 
-  (* The type of a string is a pointer to characters ! The only case when
-   * you would want it to be an array is as an argument to sizeof, but we
-   * have SizeOfStr for that *)
-  | Const(CStr _s) -> Machine.string_literal_type ()
+  | Const(CStr s) -> type_of_string_literal ~loc:e.eloc s
 
-  | Const(CWStr _s) ->
-    let typ = Ast_types.add_attributes [("const",[])] (Machine.wchar_type ()) in
-    Cil_const.mk_tptr typ
+  | Const(CWStr s) -> type_of_wstring_literal ~loc:e.eloc s
 
   | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
 
@@ -2831,12 +2836,14 @@ let rec typeOf (e: exp) : typ =
   (* l-values used as r-values lose their qualifiers (C99 6.3.2.1:2) *)
   | Lval lv -> Ast_types.remove_qualifiers (typeOfLval lv)
 
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Machine.sizeof_type ()
-  | AlignOf _ | AlignOfE _ -> Machine.sizeof_type ()
+  | SizeOf _ | SizeOfE _ -> (sizeof_type ())
+  | AlignOf _ | AlignOfE _ -> (sizeof_type ())
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
   | AddrOf lv -> Cil_const.mk_tptr (typeOfLval lv)
+  | AddrOfStr s -> TPtr(type_of_string_literal ~loc:e.eloc s,[])
+  | AddrOfWStr s -> TPtr(type_of_wstring_literal ~loc:e.eloc s,[])
   | StartOf lv ->
     match Ast_types.unroll (typeOfLval lv) with
     | { tnode = TArray (t,_); tattr } -> Cil_const.mk_tptr ~tattr t
@@ -3066,7 +3073,7 @@ let selfTypSize = TypSize.self
 let rank : ikind -> int =
   function
   (* these are just unique numbers representing the integer
-      conversion rank. *)
+     conversion rank. *)
   | IBool | IChar | ISChar | IUChar -> 1
   | IShort | IUShort -> 2
   | IInt | IUInt -> 3
@@ -3691,8 +3698,6 @@ and constFold (machdep: bool) (e: exp) : exp =
     kinteger ~loc (Machine.sizeof_kind ()) ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
-  | SizeOfStr s when machdep ->
-    kinteger ~loc (Machine.sizeof_kind ()) (1 + String.length s)
   | AlignOf t when machdep ->
     begin
       try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf t)
@@ -3707,7 +3712,7 @@ and constFold (machdep: bool) (e: exp) : exp =
       (* For an array, it is the alignment of the array ! *)
       | _ -> constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
     end
-  | AlignOfE _ | AlignOf _ | SizeOfStr _ | SizeOfE _ | SizeOf _ ->
+  | AlignOfE _ | AlignOf _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
   | CastE (t, e) -> begin
@@ -3750,6 +3755,7 @@ and constFold (machdep: bool) (e: exp) : exp =
     end
   | Lval lv -> new_exp ~loc (Lval (constFoldLval machdep lv))
   | AddrOf lv -> new_exp ~loc (AddrOf (constFoldLval machdep lv))
+  | AddrOfStr _ | AddrOfWStr _ -> e
   | StartOf lv -> new_exp ~loc (StartOf (constFoldLval machdep lv))
 
 and constFoldLval machdep (host,offset) =
@@ -4925,7 +4931,7 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
   | Lval (Var vi, offset) ->
     is_varinfo_cst vi && isConstantOffsetGen is_varinfo_cst f offset
   | Lval _ -> false
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
+  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
   | CastE(t,{ enode = Const(CReal _)}) when Ast_types.is_integral t -> true
   | CastE(t, e) ->
@@ -4942,6 +4948,7 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
     end
   | AddrOf (Var vi, off) | StartOf (Var vi, off) ->
     vi.vglob && isConstantOffsetGen is_varinfo_cst f off
+  | AddrOfStr _ | AddrOfWStr _ -> true
   | AddrOf (Mem e, off) | StartOf(Mem e, off) ->
     isConstantGen is_varinfo_cst f e &&
     isConstantOffsetGen is_varinfo_cst f off
@@ -5095,8 +5102,8 @@ let rec is_boolean_result e =
        | Div | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr), _, _, _) -> false
   | UnOp (LNot, _, _) -> true
   | UnOp ((Neg | BNot), _, _) -> false
-  | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-  | AlignOfE _ | AddrOf _ | StartOf _ -> false
+  | Lval _ | SizeOf _ | SizeOfE _ | AlignOf _
+  | AlignOfE _ | AddrOf _ | AddrOfStr _ | AddrOfWStr _ | StartOf _ -> false
 
 
 (** A hook into the code that creates casts.  By default this

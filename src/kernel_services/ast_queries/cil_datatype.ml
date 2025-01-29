@@ -1067,9 +1067,6 @@ struct
     | SizeOfE e1, SizeOfE e2 -> compare_exp e1 e2
     | SizeOfE _, _ -> 1
     | _, SizeOfE _ -> -1
-    | SizeOfStr s1, SizeOfStr s2 -> String.compare s1 s2
-    | SizeOfStr _, _ -> 1
-    | _, SizeOfStr _ -> -1
     | AlignOf ty1, AlignOf ty2 -> Typ.compare ty1 ty2
     | AlignOf _, _ -> 1
     | _, AlignOf _ -> -1
@@ -1103,6 +1100,13 @@ struct
     | AddrOf lv1, AddrOf lv2 -> compare_lval lv1 lv2
     | AddrOf _, _ -> 1
     | _, AddrOf _ -> -1
+    | AddrOfStr s1, AddrOfStr s2 -> String.compare s1 s2
+    | AddrOfStr _, _ -> 1
+    | _, AddrOfStr _ -> -1
+    | AddrOfWStr l1, AddrOfWStr l2 ->
+      compare_list Int64.compare l1 l2
+    | AddrOfWStr _, _ -> 1
+    | _, AddrOfWStr _ -> -1
     | StartOf lv1, StartOf lv2 -> compare_lval lv1 lv2
 
   and compare_lval ~structural ~strict (h1,o1) (h2,o2) =
@@ -1137,7 +1141,6 @@ struct
     | Lval lv -> hash_lval ((prime*acc) lxor 42) lv
     | SizeOf t -> (prime*acc) lxor Typ.hash t
     | SizeOfE e -> hash_exp ((prime*acc) lxor 75) e
-    | SizeOfStr s -> (prime*acc) lxor Hashtbl.hash s
     | AlignOf t -> (prime*acc) lxor Typ.hash t
     | AlignOfE e -> hash_exp ((prime*acc) lxor 153) e
     | UnOp(op,e,ty) ->
@@ -1149,6 +1152,8 @@ struct
       (prime * res) lxor Typ.hash ty
     | CastE(ty,e) -> hash_exp ((prime*acc) lxor Typ.hash ty) e
     | AddrOf lv -> hash_lval (prime*acc lxor 329) lv
+    | AddrOfStr s -> (prime * acc) lxor Hashtbl.hash s
+    | AddrOfWStr l ->  (prime * acc) lxor Hashtbl.hash l
     | StartOf lv -> hash_lval (prime*acc lxor 431) lv
   and hash_lval acc (h,o) =
     hash_offset ((prime * acc) lxor hash_lhost 856 h) o

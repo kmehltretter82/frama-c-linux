@@ -177,9 +177,9 @@ let assign ?(ltype) lhs rhs loc =
   | TInt _ | TFloat _ | TEnum _ -> None
   | TComp _ ->
     let rhs = match rhs.enode with
-      | AddrOf _ -> rhs
+      | AddrOf _ | AddrOfStr _ | AddrOfWStr _ -> rhs
       | Lval lv -> Cil.mkAddrOf ~loc lv
-      | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _
+      | Const _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _
       | UnOp _ | BinOp _ | CastE _ | StartOf _ ->
         Options.abort "unsupported RHS %a" Printer.pp_exp rhs
     in Some (lhs, rhs, Copy)

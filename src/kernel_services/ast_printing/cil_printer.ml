@@ -300,13 +300,13 @@ module Precedence = struct
     | BinOp((Div|Mod|Mult),_,_,_) -> multiplicativeLevel
     (* Unary *)
     | CastE(_,_)
-    | AddrOf(_)
+    | AddrOf(_) | AddrOfStr _ | AddrOfWStr _
     | StartOf(_)
     | UnOp((Neg|BNot|LNot),_,_) -> unaryLevel
     (* Lvals *)
     | Lval(Mem _ , _) -> derefStarLevel
     | Lval(Var _, (Field _|Index _)) -> indexLevel
-    | SizeOf _ | SizeOfE _ | SizeOfStr _ -> sizeOfLevel
+    | SizeOf _ | SizeOfE _ -> sizeOfLevel
     | AlignOf _ | AlignOfE _ -> alignOfLevel
     | Lval(Var _, NoOffset) -> 0        (* Plain variables *)
     | Const _ -> 0                        (* Constants *)
@@ -490,6 +490,22 @@ type annot_ctxt =
   | In_simple_annot  (** in /*@ ... */ annotation *)
   | In_nested_annot  (** in /@ ... @/ annotation *)
 
+let pp_wstring fmt s =
+  (* text ("L\"" ^ escape_string s ^ "\"")  *)
+  fprintf fmt "L";
+  List.iter
+    (fun elt ->
+       if (elt >= Int64.zero &&
+           elt <= (Int64.of_int 255)) then
+         fprintf fmt "%S"
+           (Escape.escape_char (Char.chr (Int64.to_int elt)))
+       else
+         fprintf fmt "\"\\x%LX\"" elt;
+       fprintf fmt "@ ")
+    s;
+  (* we cannot print L"\xabcd" "feedme" as L"\xabcdfeedme" --
+   * the former has 7 wide characters and the later has 3. *)
+
 class cil_printer () = object (self)
 
   val mutable logic_printer_enabled = true
@@ -633,23 +649,7 @@ class cil_printer () = object (self)
       fprintf fmt "%s%a" prefix (pretty_C_constant suffix ik) i
 
     | CStr(s) -> fprintf fmt "\"%s\"" (Escape.escape_string s)
-    | CWStr [] -> fprintf fmt "L\"\""
-    | CWStr(s) -> (* non-empty list of characters... *)
-      (* text ("L\"" ^ escape_string s ^ "\"")  *)
-      fprintf fmt "L";
-      List.iter
-        (fun elt ->
-           if (elt >= Int64.zero &&
-               elt <= (Int64.of_int 255)) then
-             fprintf fmt "%S"
-               (Escape.escape_char (Char.chr (Int64.to_int elt)))
-           else
-             fprintf fmt "\"\\x%LX\"" elt;
-           fprintf fmt "@ ")
-        s;
-      (* we cannot print L"\xabcd" "feedme" as L"\xabcdfeedme" --
-       * the former has 7 wide characters and the later has 3. *)
-
+    | CWStr(s) -> pp_wstring fmt s
     | CChr(c) -> fprintf fmt "'%s'" (Escape.escape_char c)
     | CReal(_, _, Some s) -> fprintf fmt "%s" s
     | CReal(f, FFloat, None) ->
@@ -809,9 +809,6 @@ class cil_printer () = object (self)
     | SizeOfE e ->
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof" self#exp_non_decay e
-    | SizeOfStr s ->
-      fprintf fmt "%a(%a)"
-        self#pp_keyword "sizeof" self#constant (CStr s)
     (* __alignof__ is a gcc extension, which seems to have a subtle
        semantic difference with newer C11 _Alignof, as mentioned in
        https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023
@@ -822,6 +819,8 @@ class cil_printer () = object (self)
       when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
       self#varinfo fmt v
     | AddrOf lv -> fprintf fmt "& %a" (self#lval_prec Precedence.addrOfLevel) lv
+    | AddrOfStr s -> fprintf fmt "&%S" s
+    | AddrOfWStr l -> fprintf fmt "&%a" pp_wstring l
     | StartOf(lv) ->
       if state.print_cil_as_is || non_decay then
         fprintf fmt "&(%a[0])" self#lval lv
@@ -2155,82 +2154,82 @@ class cil_printer () = object (self)
   (* Print one attribute. Return also an indication whether this attribute
      should be printed inside the __attribute__ list *)
   method attribute fmt (an, args) =
-    (* Recognize and take care of some known cases *)
+      (* Recognize and take care of some known cases *)
     match an, args with
-    | "const", [] -> self#pp_keyword fmt "const"; false
-    (* Put the aconst inside the attribute list *)
-    | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
-    | "thread", [ ACons ("c11",[]) ]
-      when not state.print_cil_as_is ->
-      fprintf fmt "_Thread_local"; false
-    | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
-    | "volatile", [] -> self#pp_keyword fmt "volatile"; false
-    | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
-    | "restrict", [] ->
-      if Machine.msvcMode () then
-        fprintf fmt "__restrict"
-      else
-        self#pp_keyword fmt "restrict";
-      false
-    | "missingproto", [] ->
-      if self#display_comment () then fprintf fmt "/* missing proto */";
-      false
-    | "cdecl", [] when Machine.msvcMode () ->
-      fprintf fmt "__cdecl"; false
-    | "stdcall", [] when Machine.msvcMode () ->
-      fprintf fmt "__stdcall"; false
-    | "fastcall", [] when Machine.msvcMode () ->
-      fprintf fmt "__fastcall"; false
-    | "declspec", args when Machine.msvcMode () ->
-      fprintf fmt "__declspec(%a)"
-        (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
-      false
-    | "w64", [] when Machine.msvcMode () ->
-      fprintf fmt "__w64"; false
-    | "asm", args ->
-      fprintf fmt "__asm__(%a)"
-        (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
-      false
+       | "const", [] -> self#pp_keyword fmt "const"; false
+       (* Put the aconst inside the attribute list *)
+       | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
+       | "thread", [ ACons ("c11",[]) ]
+         when not state.print_cil_as_is ->
+         fprintf fmt "_Thread_local"; false
+       | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
+       | "volatile", [] -> self#pp_keyword fmt "volatile"; false
+       | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
+       | "restrict", [] ->
+         if Machine.msvcMode () then
+           fprintf fmt "__restrict"
+         else
+           self#pp_keyword fmt "restrict";
+         false
+       | "missingproto", [] ->
+         if self#display_comment () then fprintf fmt "/* missing proto */";
+         false
+       | "cdecl", [] when Machine.msvcMode () ->
+         fprintf fmt "__cdecl"; false
+       | "stdcall", [] when Machine.msvcMode () ->
+         fprintf fmt "__stdcall"; false
+       | "fastcall", [] when Machine.msvcMode () ->
+         fprintf fmt "__fastcall"; false
+       | "declspec", args when Machine.msvcMode () ->
+         fprintf fmt "__declspec(%a)"
+           (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
+         false
+       | "w64", [] when Machine.msvcMode () ->
+         fprintf fmt "__w64"; false
+       | "asm", args ->
+         fprintf fmt "__asm__(%a)"
+           (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
+         false
 
-    (* sm: also suppress "format" because we seem to print it in
-       a way gcc does not like *)
-    | "format", _ ->
-      if self#display_comment () then fprintf fmt "/* format attribute */";
-      false
+       (* sm: also suppress "format" because we seem to print it in
+          a way gcc does not like *)
+       | "format", _ ->
+         if self#display_comment () then fprintf fmt "/* format attribute */";
+         false
 
-    | "hidden", _ -> (* hidden attribute list *)
-      false
-    (* sm: here's another one I don't want to see gcc warnings about.. *)
-    | "mayPointToStack", _ when not state.print_cil_input ->
-      (* [matth: may be inside another comment.]
-         -> text "/*mayPointToStack*/", false *)
-      false
+       | "hidden", _ -> (* hidden attribute list *)
+         false
+       (* sm: here's another one I don't want to see gcc warnings about.. *)
+       | "mayPointToStack", _ when not state.print_cil_input ->
+         (* [matth: may be inside another comment.]
+            -> text "/*mayPointToStack*/", false *)
+         false
 
-    | "arraylen", [a] ->
-      if self#display_comment () then fprintf fmt "/*[%a]*/" self#attrparam a;
-      false
-    | "static",_ ->
-      if self#display_comment () then fprintf fmt "/* static */"; false
-    | "", _ ->
-      fprintf fmt "%a "
-        (Pretty_utils.pp_list ~sep:" " self#attrparam) args;
-      true
-    | s, _ when
+       | "arraylen", [a] ->
+         if self#display_comment () then fprintf fmt "/*[%a]*/" self#attrparam a;
+         false
+       | "static",_ ->
+         if self#display_comment () then fprintf fmt "/* static */"; false
+       | "", _ ->
+         fprintf fmt "%a "
+           (Pretty_utils.pp_list ~sep:" " self#attrparam) args;
+         true
+       | s, _ when
         s = Ast_attributes.bitfield_attribute_name &&
-        not state.print_cil_as_is &&
-        not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
-      false
-    | _ -> (* This is the default case *)
-      (* Add underscores to the name *)
-      let an' =
-        if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
-      in
-      (match args with
-       | [] -> fprintf fmt "%s" an'
-       | _ :: _ ->
-         fprintf fmt "%s(%a)"
-           an'
-           (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
+           not state.print_cil_as_is &&
+           not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
+         false
+       | _ -> (* This is the default case *)
+         (* Add underscores to the name *)
+         let an' =
+           if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
+         in
+         (match args with
+          | [] -> fprintf fmt "%s" an'
+          | _ :: _ ->
+            fprintf fmt "%s(%a)"
+              an'
+              (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
       true
 
   method private attribute_prec (contextprec: int) fmt (a: attrparam) =

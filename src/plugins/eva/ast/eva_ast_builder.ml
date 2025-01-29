@@ -64,8 +64,10 @@ let rec translate_exp (e : Cil_types.exp) =
       BinOp (translate_binop binop, translate_exp e1, translate_exp e2, typ)
     | CastE (typ, expr) -> CastE (typ, translate_exp expr)
     | AddrOf lval -> AddrOf (translate_lval lval)
+    | AddrOfStr _ | AddrOfWStr _ ->
+      Self.not_yet_implemented "address of string literal"
     | StartOf lval -> StartOf (translate_lval lval)
-    | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
+    | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ ->
       match (Cil.constFold true e).enode with
       | Const c -> Const (translate_constant c)
       | _ -> Const (CTopInt (Machine.sizeof_kind ()))

@@ -62,20 +62,20 @@ let func_locs () = FuncLocs.get ()
 let unsupported_attributes = ["vector_size"]
 
 let check_attribute_name s =
-  let res = Extlib.strip_underscore s in
-  if res = "" then
+    let res = Extlib.strip_underscore s in
+    if res = "" then
     Kernel.error ~once:true ~current:true "Invalid attribute name %s" s
   else begin
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "Unsupported attribute: %s" s
     else if not (Ast_attributes.is_known res) then begin
       Ast_attributes.register AttrUnknown res;
-      Kernel.warning
-        ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+          Kernel.warning
+            ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
         "Ignoring unknown attribute: %s" s;
     end
-  end;
-  res
+    end;
+    res
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
@@ -185,7 +185,8 @@ let rec is_dangerous e = match e.enode with
   | Lval lv | AddrOf lv | StartOf lv -> is_dangerous_lval lv
   | UnOp (_,e,_) | CastE(_,e) -> is_dangerous e
   | BinOp(_,e1,e2,_) -> is_dangerous e1 || is_dangerous e2
-  | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
+  | Const _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _
+  | AddrOfStr _ | AddrOfWStr _ ->
     false
 and is_dangerous_lval = function
   | Var v,_ when
@@ -1292,7 +1293,7 @@ let findCompType ghost kind name tattr =
             Kernel.error ~once:true
               ~source:(fst @@ Current_loc.get ())
               "forward declaration of enum %s" (Machdep.allowed_machdep "GCC");
-          cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
+        cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
         end;
       mk_tenum ~tattr enum
     else
@@ -1604,23 +1605,23 @@ struct
       b.bscoping <- b.bscoping || declares_var || not force_non_scoping;
       b
     | stmts ->
-      if c.unspecified_order then begin
+    if c.unspecified_order then begin
         if List.length stmts >= 2 then begin
-          let first_stmt =
+        let first_stmt =
             (fun (s,_,_,_,_) -> s) (Extlib.last stmts) in
-          Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-            ~source:(fst (Stmt.loc first_stmt))
-            "Potential unsequenced side-effects"
-        end;
-        let b =
-          Cil.mkBlock
+        Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
+          ~source:(fst (Stmt.loc first_stmt))
+          "Potential unsequenced side-effects"
+      end;
+      let b =
+        Cil.mkBlock
             [mkStmt ~ghost ~valid_sid (UnspecifiedSequence (List.rev stmts))]
-        in
-        b.blocals <- vars;
-        b.bstatics <- c.statics;
-        b.bscoping <- declares_var || not force_non_scoping;
-        b
-      end else
+      in
+      b.blocals <- vars;
+      b.bstatics <- c.statics;
+      b.bscoping <- declares_var || not force_non_scoping;
+      b
+    end else
         let stmts = List.rev_map (fun (s,_,_,_,_) -> s) stmts in
         let b = Cil.mkBlock stmts in
         b.blocals <- vars;
@@ -2480,7 +2481,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       let oldvi, oldloc = lookupGlobalVar true vi.vname in
       if oldvi.vghost <> vi.vghost then
         Errorloc.abort_context "Inconsistent ghost specification for %s.@ \
-                                Previous declaration was at: %a"
+                       Previous declaration was at: %a"
           vi.vname Cil_datatype.Location.pretty oldloc ;
 
       Kernel.debug ~dkey:Kernel.dkey_typing_global
@@ -3737,7 +3738,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let res =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
-          Option.bind
+            Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
               | _ -> None (* should not happen. *))
@@ -4053,7 +4054,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
   let getTypeAttrs () : Cabs.attribute list =
     (* Partitions the attributes in !attrs.
        Type attributes are removed from attrs and returned, so that they
-       can go into the type definition. Name attributes are left in attrs,
+       can go into the type definition.  Name attributes are left in attrs,
        so they will be returned by doSpecList and used in the variable
        declaration. *)
     let an, af, at =
@@ -4290,27 +4291,11 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
       res
 
     | [Cabs.TtypeofE e] ->
-      let (_, s, e', t) =
+      let (_, s, _, t) =
         doExp (ghost_local_env ghost) CNoConst e AExpLeaveArrayFun
       in
       clean_up_chunk_locals s;
-      let t' =
-        match e'.enode with
-        (* If this is a string literal, then we treat it as in sizeof*)
-        | Const (CStr s) -> begin
-            match (typeOf e').tnode with
-            | TPtr bt-> (* This is the type of array elements *)
-              mk_tarray bt (Some (new_exp ~loc:e'.eloc (SizeOfStr s)))
-            | _ ->
-              Errorloc.abort_context "The typeOf a string is not a pointer type"
-          end
-        | _ -> t
-      in
-      (*
-        ignore (E.log "typeof(%a) = %a\n" d_exp e' d_type t');
-       *)
-      t'
-
+      t
     | [Cabs.TtypeofT (specs, dt)] -> doOnlyType loc ghost specs dt
 
     | l ->
@@ -4551,9 +4536,9 @@ and cabsPartitionAttributes
 
 and doType (ghost:bool) (context: type_context)
     (nameortype: Ast_attributes.attribute_class) (* This is AttrName if we are doing
-                                                  * the type for a name, or AttrType
-                                                  * if we are doing this type in a
-                                                  * typedef *)
+                                  * the type for a name, or AttrType
+                                  * if we are doing this type in a
+                                  * typedef *)
     ?(allowZeroSizeArrays=false)
     ?(allowVarSizeArrays=false)
     (bt: typ)                    (* The base type *)
@@ -5308,7 +5293,10 @@ and doExp local_env
   in
   (* A subexpression of array type is automatically turned into StartOf(e).
    * Similarly an expression of function type is turned into AddrOf. So
-   * essentially doExp should never return things of type TFun or TArray *)
+   * essentially doExp should never return things of type TFun or TArray.
+   * We make an exception for (wide) string literals, which are themselves
+   * lvalues.
+  *)
   let processArrayFun e t =
     let loc = e.eloc in
     let t' = Ast_types.unroll t in
@@ -5317,6 +5305,7 @@ and doExp local_env
       mkStartOfAndMark loc lv, mk_tptr ~tattr:t'.tattr tbase
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TFun _  ->
       mkAddrOfAndMark loc lv, mk_tptr t
+    | (Const (CStr _ | CWStr _)), _ -> e,t
     | _, (TArray _ | TFun _) ->
       Errorloc.abort_context
         "Array or function expression is not lval: %a@\n"
@@ -5660,7 +5649,6 @@ and doExp local_env
               IH.find varSizeArrays vi.vid
             with Not_found -> new_exp ~loc (SizeOfE e')
           end
-        | Const (CStr s) -> new_exp ~loc (SizeOfStr s)
         | _ -> new_exp ~loc (SizeOfE e')
       in
       finishExp [] scope_chunk size (Machine.sizeof_type ())
@@ -5891,6 +5879,7 @@ and doExp local_env
             in
             (* ignore (E.log "ADDROF on %a : %a\n" Cil_printer.pp_exp e'
                Cil_datatype.Typ.pretty t); *)
+            let loc = e'.eloc in
             match e'.enode with
             | Lval x | CastE(_, {enode = Lval x}) | StartOf x ->
               (* Recover type qualifiers that were dropped by dropQualifiers
@@ -5909,7 +5898,6 @@ and doExp local_env
             | Const (CStr _ | CWStr _) ->
               (* string to array *)
               finishExp r se e' (mk_tptr t)
-
             (* Function names are converted into pointers to the function.
              * Taking the address-of again does not change things *)
             | AddrOf (Var v, NoOffset) when Ast_types.is_fun v.vtype ->
@@ -6374,7 +6362,7 @@ and doExp local_env
         | { tnode = TPtr t } -> begin
             match Ast_types.unroll t with
             | { tnode = TFun (rt, at, isvar) } -> (* Make the function pointer
-                                                   * explicit  *)
+                                      * explicit  *)
               let f'' =
                 match f'.enode with
                 | AddrOf (f,NoOffset) -> f
@@ -9021,7 +9009,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
   in
   let snode =
     if Ast_types.is_void rt then
-      Cabs.COMPUTATION ({expr_loc = loc; expr_node = call}, loc)
+                  Cabs.COMPUTATION({expr_loc = loc; expr_node = call}, loc)
     else
       Cabs.RETURN ({expr_loc = loc; expr_node = call}, loc)
   in
@@ -9648,7 +9636,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
             if declared_in_current_scope ~ghost n then
               begin
                 match newTyp'.tnode with (* do NOT unroll type here,
-                                            redefinitions of typedefs are ok *)
+                                      redefinitions of typedefs are ok *)
                 | TComp newci ->
                   (* Composite types with different tags may be compatible, but here
                      we use the tags to try and detect if the type is being redefined,
@@ -9671,7 +9659,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                   (match t.tnode with
                    | TEnum ei ->
                      if ei.ename <> newei.ename then
-                       error_conflicting_types ()
+                  error_conflicting_types ()
                      else
                        warn_c11_redefinition ()
                    | TInt _ -> error_conflicting_types ()

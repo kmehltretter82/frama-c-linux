@@ -338,7 +338,7 @@ and expr (e:Cil_types.exp) : model = match e.enode with
 
   (* Logics *)
   | Const _
-  | SizeOf _ | SizeOfE _ | SizeOfStr _  | AlignOf _ | AlignOfE _ -> nothing
+  | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ -> nothing
 
   (* Unary *)
   | UnOp((Neg|BNot|LNot),e,_) -> mexpr e
@@ -356,6 +356,8 @@ and expr (e:Cil_types.exp) : model = match e.enode with
 
   (* Address *)
   | AddrOf lval -> lvalue lval
+  | AddrOfStr _ | AddrOfWStr _ ->
+    Wp_parameters.not_yet_implemented "addrof string literal"
   | StartOf lval -> startof (lvalue lval) (Cil.typeOfLval lval)
 
   (* Load *)

@@ -95,7 +95,8 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
       (fun x y -> new_exp ~loc (BinOp (binop, x,y, logic_type_to_typ ltype)))
       (loc_to_exp ?result lexp1)
       (loc_to_exp ?result lexp2)
-  | TSizeOfStr string -> [new_exp ~loc (SizeOfStr string)]
+  | TSizeOfStr string ->
+    [new_exp ~loc (SizeOfE (new_exp ~loc (Const (CStr string))))]
   | TConst constant ->
     (* TODO: Very likely to fail on large integer and incorrect on reals not
        representable as floats *)

@@ -121,7 +121,9 @@ let mk_init_function () =
       (fun s vi stmts ->
          let loc = Location.unknown in
          let e = Cil.new_exp ~loc (Const (CStr s)) in
-         let str_size = Cil.new_exp ~loc (SizeOfStr s) in
+         let str_size =
+           Cil.kinteger ~loc (Machine.sizeof_kind ()) (String.length s)
+         in
          Smart_stmt.assigns ~loc ~result:(Cil.var vi) e
          :: Smart_stmt.store_stmt ~str_size vi
          :: Smart_stmt.full_init_stmt vi

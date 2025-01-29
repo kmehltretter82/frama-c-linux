@@ -371,7 +371,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let adata = Assert.register_term ~loc ~force:true t e adata in
     e, adata, env, Analyses_types.C_number, "sizeof"
   | TSizeOfStr s ->
-    let e = Cil.new_exp ~loc (SizeOfStr s) in
+    let e = Cil.kinteger ~loc (Machine.sizeof_kind()) (String.length s) in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, "sizeofstr"
   | TAlignOf ty ->

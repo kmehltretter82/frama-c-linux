@@ -387,7 +387,6 @@ and pp_exp_node fmt = function
   | Lval(lval) -> Format.fprintf fmt "Lval(%a)"        pp_lval lval
   | SizeOf(typ) -> Format.fprintf fmt "SizeOf(%a)"      pp_typ typ
   | SizeOfE(exp) -> Format.fprintf fmt "SizeOfE(%a)"     pp_exp exp
-  | SizeOfStr(string) -> Format.fprintf fmt "SizeOfStr(%a)"   pp_string string
   | AlignOf(typ) -> Format.fprintf fmt "AlignOf(%a)"     pp_typ typ
   | AlignOfE(exp) -> Format.fprintf fmt "AlignOfE(%a)"    pp_exp exp
   | UnOp(unop,exp,typ) -> Format.fprintf fmt "UnOp(%a,%a,%a)"        pp_unop unop  pp_exp exp  pp_typ typ
@@ -395,6 +394,8 @@ and pp_exp_node fmt = function
     Format.fprintf fmt "BinOp(%a,%a,%a,%a)"       pp_binop binop  pp_exp exp1  pp_exp exp2  pp_typ typ
   | CastE(typ,exp) -> Format.fprintf fmt "CastE(%a,%a)"       pp_typ typ  pp_exp exp
   | AddrOf(lval) -> Format.fprintf fmt "AddrOf(%a)"      pp_lval lval
+  | AddrOfStr s -> Format.fprintf fmt "AddrOfStr(%S)" s
+  | AddrOfWStr l -> Format.fprintf fmt "AddrOfWStr(%a)" (pp_list pp_int64) l
   | StartOf(lval) -> Format.fprintf fmt "StartOf(%a)"     pp_lval lval
 
 and pp_constant fmt = function

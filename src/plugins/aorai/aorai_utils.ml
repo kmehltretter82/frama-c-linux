@@ -396,7 +396,7 @@ let rec term_to_exp t res =
   | TLval tlval -> new_exp ~loc (Lval (tlval_to_lval tlval res))
   | TSizeOf ty -> new_exp ~loc (SizeOf ty)
   | TSizeOfE t -> new_exp ~loc (SizeOfE(term_to_exp t res))
-  | TSizeOfStr s -> new_exp ~loc (SizeOfStr s)
+  | TSizeOfStr s -> Cil.kinteger ~loc (Machine.sizeof_kind()) (String.length s)
   | TAlignOf ty -> new_exp ~loc (AlignOf ty)
   | TAlignOfE t -> new_exp ~loc (AlignOfE (term_to_exp t res))
   | TUnOp (unop, t) ->

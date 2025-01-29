@@ -930,7 +930,6 @@ and is_same_exp e e' env =
   | Lval lv, Lval lv' -> is_same_lval lv lv' env
   | SizeOf t, SizeOf t' -> is_same_type t t' env
   | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
-  | SizeOfStr s, SizeOfStr s' -> String.length s = String.length s'
   | AlignOf t, AlignOf t' -> is_same_type t t' env
   | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
   | UnOp(op,e,t), UnOp(op',e',t') ->
@@ -940,9 +939,16 @@ and is_same_exp e e' env =
     && is_same_type t t' env
   | CastE(t,e), CastE(t',e') -> is_same_type t t' env && is_same_exp e e' env
   | AddrOf lv, AddrOf lv' -> is_same_lval lv lv' env
+  | AddrOfStr s1, AddrOfStr s2 ->
+    (* two literal string with same content can have different addresses.
+       Use OCaml's physical equality (as a hint that the expressions stem
+       from the same string literal in source code)*)
+    s1 == s2
+  | AddrOfWStr s1, AddrOfWStr s2 -> s1 == s2 (* same as above. *)
   | StartOf lv, StartOf lv' -> is_same_lval lv lv' env
-  | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
-    | AlignOfE _ | UnOp _ | BinOp _  | CastE _ | AddrOf _ | StartOf _),_-> false
+  | (Const _ | Lval _ | SizeOf _ | SizeOfE _ | AlignOf _
+    | AlignOfE _ | UnOp _ | BinOp _  | CastE _
+    | AddrOf _ | AddrOfStr _ | AddrOfWStr _ | StartOf _),_-> false
 
 and is_same_lval lv lv' env =
   is_same_pair is_same_lhost is_same_offset lv lv' env

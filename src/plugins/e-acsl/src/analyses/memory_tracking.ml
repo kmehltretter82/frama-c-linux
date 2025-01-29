@@ -268,10 +268,11 @@ module rec Transfer
         base_addr e2
       end
     | CastE(_, e) -> base_addr e
+    | AddrOfStr _ | AddrOfWStr _ -> Options.not_yet_implemented "address of string literal"
     | BinOp((MinusPP | PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt
             | Lt | Gt | Le | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr),
             _, _, _)
-    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _
+    | UnOp _ | Const _ | SizeOf _ | SizeOfE _ | AlignOf _
     | AlignOfE _ ->
       None
 
@@ -834,7 +835,8 @@ and apply_on_vi_base_from_exp f ?kf ?stmt e = match e.enode with
   | BinOp((PlusA | MinusA | Mult | Div | Mod |Shiftlt | Shiftrt | Lt | Gt | Le
           | Ge | Eq | Ne | BAnd | BXor | BOr | LAnd | LOr), _, _, _)
   | Const _ -> (* possible in case of static address *) false
-  | UnOp _ | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ ->
+  | AddrOfStr _ | AddrOfWStr _ -> Options.not_yet_implemented "address of string literal"
+  | UnOp _ | SizeOf _ | SizeOfE _ | AlignOf _ | AlignOfE _ ->
     Options.fatal "[pre_analysis] unexpected expression %a" Exp.pretty e
 
 let must_monitor_lval = apply_on_vi_base_from_lval must_monitor_vi

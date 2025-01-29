@@ -305,7 +305,8 @@ struct
 
     | AddrOf lv ->
       Loc (lval env lv)
-
+    | AddrOfStr _ | AddrOfWStr _ ->
+      Wp_parameters.not_yet_implemented "address of string literal"
     | StartOf lv ->
       Loc (Cvalues.startof ~shift:M.shift (lval env lv) (Cil.typeOfLval lv))
 
@@ -313,7 +314,7 @@ struct
     | BinOp(op,e1,e2,tr) -> exp_binop env tr op e1 e2
 
     | AlignOfE _ | AlignOf _
-    | SizeOfE _ | SizeOf _ | SizeOfStr _ -> Val (Cvalues.constant_exp e)
+    | SizeOfE _ | SizeOf _  -> Val (Cvalues.constant_exp e)
 
     | CastE(tr,e) -> cast tr (Cil.typeOf e) (!s_exp env e)
 

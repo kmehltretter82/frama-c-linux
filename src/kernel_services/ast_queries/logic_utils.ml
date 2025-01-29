@@ -511,6 +511,8 @@ let rec expr_to_term ?(coerce=false) e =
     | Const c -> TConst (constant_to_lconstant c) , coerce_type typ
     | StartOf lv -> TStartOf (lval_to_term_lval lv) , ctyp
     | AddrOf lv -> TAddrOf (lval_to_term_lval lv) , ctyp
+    | AddrOfStr _ | AddrOfWStr _ ->
+      Kernel.not_yet_implemented "address of literal string in logic"
     | BinOp (op, _, _, _) when is_boolean_binop op ->
       let tc = expr_to_boolean e in
       Tif( tc , Cil.lone ~loc () , Cil.lzero ~loc () ),
@@ -541,7 +543,6 @@ let rec expr_to_term ?(coerce=false) e =
       end
     | SizeOf t -> TSizeOf t, ctyp
     | SizeOfE e -> TSizeOf (Cil.typeOf e), ctyp
-    | SizeOfStr s -> TSizeOfStr s, ctyp
     | AlignOf typ -> TAlignOf typ, ctyp
     | AlignOfE e -> TAlignOf (Cil.typeOf e), ctyp
     | Lval lv -> TLval (lval_to_term_lval lv), ctyp

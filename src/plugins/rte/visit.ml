@@ -198,9 +198,10 @@ class annot_visitor kf flags on_alarm = object (self)
     match exp.enode with
     | SizeOf _
     | SizeOfE _
-    | SizeOfStr _
     | AlignOf _
-    | AlignOfE _ -> Cil.SkipChildren
+    | AlignOfE _
+    | AddrOfStr _
+    | AddrOfWStr _ -> Cil.SkipChildren
     | _ ->
       let generate () =
         match exp.enode with
@@ -337,9 +338,10 @@ class annot_visitor kf flags on_alarm = object (self)
         | UnOp _
         | Const _
         | BinOp _ -> ()
+        | AddrOfStr _
+        | AddrOfWStr _
         | SizeOf _
         | SizeOfE _
-        | SizeOfStr _
         | AlignOf _
         | AlignOfE _ -> assert false
       in

@@ -1,7 +1,8 @@
 #include "stddef.h"
 
 int main(volatile int v) {
-
+  if ("bla"[3]) return 5;
+  if (L"bli"[3]) return 6;
   // String literals are lvalues
   char (*p)[4] = &("bar");
   wchar_t (*q)[4] = &(L"foO");

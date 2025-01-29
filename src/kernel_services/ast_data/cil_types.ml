@@ -743,11 +743,6 @@ and exp_node =
 
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
-  | SizeOfStr  of string
-  (** sizeof(string_literal). We separate this case out because this is the
-      only instance in which a string literal should not be treated as having
-      type pointer to character. *)
-
   | AlignOf    of typ
   (** This corresponds to the GCC __alignof_. Has [size_t] type which depends on
       machine configuration (cf. {!Machine}). *)
@@ -768,6 +763,15 @@ and exp_node =
   | AddrOf     of lval
   (** Always use {!Cil.mkAddrOf} to construct one of these. Apply to an lvalue
       of type [T] yields an expression of type [TPtr(T)] *)
+
+  | AddrOfStr of string
+  (** address of a string literal.
+      @since Frama-C+dev *)
+
+  | AddrOfWStr of int64 list
+  (** address of a wide string literal.
+      @since Frama-C+dev
+  *)
 
   | StartOf    of lval
   (** Conversion from an array to a pointer to the beginning of the array.
