@@ -114,7 +114,6 @@ module Internal = struct
       (Locations.Zone) (* memory zones that have been overwritten since
                           the beginning of the function. Not used when the
                           state of the caller is used as initial state. *)
-      (struct let module_name = "equality_domain_reloaded" end)
 
   type state = t
 

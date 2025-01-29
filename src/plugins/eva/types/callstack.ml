@@ -31,7 +31,6 @@ module Stmt = Cil_datatype.Stmt
 module Var = Cil_datatype.Varinfo
 
 module Call = Datatype.Pair_with_collections(Kf)(Stmt)
-    (struct let module_name = "Eva.Callstack.Call" end)
 
 module Calls = Datatype.List (Call)
 

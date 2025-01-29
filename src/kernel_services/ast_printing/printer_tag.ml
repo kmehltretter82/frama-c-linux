@@ -455,10 +455,8 @@ let dkey = Kernel.register_category "pretty-source"
 
 module LineToLocalizable =
   Datatype.Hashtbl(Datatype.Int.Hashtbl)(Datatype.Int)
-    (struct let module_name = "Pretty_source.LineToLocalizable" end)
 module FileToLines =
   Datatype.Hashtbl(Datatype.Filepath.Hashtbl)(Datatype.Filepath)
-    (struct let module_name = "Pretty_source.FilesToLine" end)
 
 module MappingLineLocalizable = struct
   module LineToLocalizableAux =

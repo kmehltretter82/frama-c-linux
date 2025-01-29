@@ -140,10 +140,8 @@ module Graph = struct
 
   (* A loop exit condition is an expression and a boolean expression whether the
      expression must be zero or not-zero to exit the loop. *)
-  module Condition = struct
-    module Info = struct let module_name = "Condition" end
-    include Datatype.Pair_with_collections (Eva_ast.Exp) (Datatype.Bool) (Info)
-  end
+  module Condition =
+    Datatype.Pair_with_collections (Eva_ast.Exp) (Datatype.Bool)
 
   (* Returns a list of loop exit conditions. *)
   let find_loop_exit_condition loop =

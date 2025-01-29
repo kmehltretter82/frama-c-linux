@@ -351,7 +351,6 @@ struct
       that precondition of the same call-site are grouped *)
   module CallSite = Datatype.Triple_with_collections
       (Kernel_function)(Kernel_function)(Stmt)
-      (struct let module_name = "Wp.WpPropId.CallSite" end)
   module Uniquify_Stmt = NameUniquify(CallSite)(struct
       let name = "Wp.WpPropId.Names3."
       let basename (caller_kf,callee_kf,_stmt) =

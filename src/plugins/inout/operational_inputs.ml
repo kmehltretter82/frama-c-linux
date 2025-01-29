@@ -205,7 +205,6 @@ module Internals =
 
 module Callsite =
   Datatype.Pair_with_collections (Kernel_function) (Cil_datatype.Kinstr)
-    (struct let module_name = "From.Callsite" end)
 module CallsiteHash = Callsite.Hashtbl
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).

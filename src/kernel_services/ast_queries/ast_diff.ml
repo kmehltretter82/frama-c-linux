@@ -38,7 +38,6 @@ module Correspondence_input =
 struct
   type 'a t = 'a correspondence
   let name a = Type.name a ^ " correspondence"
-  let module_name = "Correspondence"
   let structural_descr _ = Structural_descr.t_abstract
   let reprs x = [ `Not_present; `Same x]
   let mk_equal eq x y =
@@ -120,7 +119,6 @@ module Code_correspondence_input =
 struct
   type 'a t = 'a code_correspondence
   let name a = Type.name a ^ " code_correspondence"
-  let module_name = "Code_correspondence"
   let structural_descr _ = Structural_descr.t_abstract
   let reprs = Correspondence_input.reprs
   let mk_equal eq x y =

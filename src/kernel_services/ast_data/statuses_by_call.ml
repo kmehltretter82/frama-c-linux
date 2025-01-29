@@ -42,7 +42,6 @@ module PreCondProxyGenerated =
 
 module PropStmt =
   Datatype.Pair_with_collections(Property)(Cil_datatype.Stmt)
-    (struct let module_name = "Statuses_by_call.PropStmt" end)
 
 module FunctionPointers =
   Cil_state_builder.Stmt_hashtbl(Kernel_function.Hptset)

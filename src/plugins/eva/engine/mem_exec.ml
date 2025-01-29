@@ -72,9 +72,6 @@ module Make
   (* List of the arguments of a call. *)
   module ActualArgs =
     Datatype.List_with_collections (Datatype.Option (Value)) (* None is bottom *)
-      (struct let module_name = "Mem_exec.ActualArgs("
-                                ^ string_of_int !counter ^ ")"
-      end)
 
   (* Map from the arguments of a call to stored results. *)
   module ArgsToStoredCalls = ActualArgs.Map.Make (InputBasesToCallEffect)

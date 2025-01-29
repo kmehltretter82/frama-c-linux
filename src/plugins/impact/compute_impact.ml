@@ -64,7 +64,6 @@ type result = nodes KFM.t
    (the callee) at the given statement. *)
 module KfKfCall = Datatype.Triple_with_collections
     (Kernel_function)(Kernel_function)(Cil_datatype.Stmt)
-    (struct let module_name = "Impact.Compute.KfKfCall" end)
 
 (** Worklist maintained by the plugin to build its results *)
 type worklist = {

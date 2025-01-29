@@ -26,7 +26,6 @@ module Callsite = Datatype.Pair (Kernel_function) (Cil_datatype.Kinstr)
 type call_site = Callsite.t
 
 include Datatype.With_collections (Datatype.List (Callsite))
-    (struct let module_name = "Dive.Callstack" end)
 
 let init kf = [(kf,Kglobal)]
 

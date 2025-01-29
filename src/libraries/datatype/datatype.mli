@@ -215,13 +215,6 @@ end
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Make(X: Make_input): S with type t = X.t
 
-(** Additional info for building [Set], [Map] and [Hashtbl]. *)
-module type Functor_info = sig
-  val module_name: string
-  (** Must be a valid OCaml module name corresponding to the module name you are
-      defining by applying the functor. *)
-end
-
 (** A standard OCaml set signature extended with datatype operations. *)
 module type Set = sig
   include Set.S
@@ -313,7 +306,7 @@ module Make_with_set_and_map(X: Make_input):
 (** Add sets and maps to an existing datatype, provided the [equal] and
     [compare] are not {!undefined}.
     @since Frama-C+dev *)
-module With_set_and_map(X: S)(_: Functor_info):
+module With_set_and_map(X: S):
   S_with_set_and_map with type t = X.t
 
 (** Generic comparable datatype builder: functions [equal] and [hash] must not
@@ -325,7 +318,7 @@ module Make_with_hashtbl(X: Make_input):
 (** Add hashtables modules to an existing datatype, provided the [equal] and
     [hash] functions are not {!undefined}.
     @since Frama-C+dev *)
-module With_hashtbl(X: S)(_: Functor_info):
+module With_hashtbl(X: S):
   S_with_hashtbl with type t = X.t
 
 (** Generic comparable datatype builder: functions [equal], [compare] and
@@ -336,7 +329,7 @@ module Make_with_collections(X: Make_input):
 (** Add sets, maps and hashtables modules to an existing datatype, provided the
     [equal], [compare] and [hash] functions are not {!undefined}.
     @since Oxygen-20120901 *)
-module With_collections(X: S)(_: Functor_info):
+module With_collections(X: S):
   S_with_collections with type t = X.t
 
 (* ****************************************************************************)
@@ -555,7 +548,7 @@ module Poly_pair: Polymorphic2 with type ('a, 'b) poly = 'a * 'b
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module Pair(T1: S)(T2: S): S with type t = T1.t * T2.t
-module Pair_with_collections(T1: S)(T2: S)(_: Functor_info):
+module Pair_with_collections(T1: S)(T2: S):
   S_with_collections with type t = T1.t * T2.t
 val pair: 'a Type.t -> 'b Type.t -> ('a * 'b) Type.t
 
@@ -569,7 +562,7 @@ module Poly_option: Polymorphic with type 'a poly = 'a option
 module Option(T: S) : S with type t = T.t option
 
 (** @since Nitrogen-20111001 *)
-module Option_with_collections(T:S)(_: Functor_info):
+module Option_with_collections(T:S):
   S_with_collections with type t = T.t option
 
 val option: 'a Type.t -> 'a option Type.t
@@ -579,7 +572,7 @@ module Poly_list: Polymorphic with type 'a poly = 'a list
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 module List(T: S) : S with type t = T.t list
 
-module List_with_collections(T:S)(_:Functor_info):
+module List_with_collections(T:S):
   S_with_collections with type t = T.t list
 (** @since Fluorine-20130401 *)
 
@@ -592,7 +585,7 @@ module Poly_array: Polymorphic with type 'a poly = 'a array
 module Array(T: S) : S with type t = T.t array
 (** @since Neon-20140301 *)
 
-module Array_with_collections(T:S)(_:Functor_info):
+module Array_with_collections(T:S):
   S_with_collections with type t = T.t array
 (** @since Neon-20140301 *)
 
@@ -608,7 +601,7 @@ module Triple(T1: S)(T2: S)(T3: S): S with type t = T1.t * T2.t * T3.t
 val triple: 'a Type.t -> 'b Type.t -> 'c Type.t -> ('a * 'b * 'c) Type.t
 (** @since Fluorine-20130401 *)
 
-module Triple_with_collections(T1: S)(T2: S)(T3: S)(_: Functor_info):
+module Triple_with_collections(T1: S)(T2: S)(T3: S):
   S_with_collections with type t = T1.t * T2.t * T3.t
 
 (** @since Nitrogen-20111001 *)
@@ -620,7 +613,7 @@ val quadruple:
 
 (** @since Nitrogen-20111001 *)
 module Quadruple_with_collections
-    (T1: S)(T2: S)(T3: S)(T4:S)(_: Functor_info):
+    (T1: S)(T2: S)(T3: S)(T4:S):
   S_with_collections with type t = T1.t * T2.t * T3.t * T4.t
 
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -664,15 +657,15 @@ val func4:
   ('a -> 'b -> 'c -> 'd -> 'e) Type.t
 
 module Set
-    (S: Set.S)(E: S with type t = S.elt)(_ : Functor_info):
+    (S: Set.S)(E: S with type t = S.elt):
   Set with type t = S.t and type elt = E.t
 
 module Map
-    (M: Map.S)(Key: S with type t = M.key)(_: Functor_info) :
+    (M: Map.S)(Key: S with type t = M.key):
   Map with type 'a t = 'a M.t and type key = M.key and module Key = Key
 
 module Hashtbl
-    (H: Hashtbl_with_descr)(Key: S with type t = H.key)(_: Functor_info):
+    (H: Hashtbl_with_descr)(Key: S with type t = H.key):
   Hashtbl with type 'a t = 'a H.t and type key = H.key and module Key = Key
 
 module type Sub_caml_weak_hashtbl = sig

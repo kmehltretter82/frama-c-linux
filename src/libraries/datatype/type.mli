@@ -122,9 +122,6 @@ module type Polymorphic_input = sig
   (** How to build a name for each monomorphic instance of the type
       value from the underlying type. *)
 
-  val module_name: string
-  (** The name of the built module. *)
-
   val structural_descr: Structural_descr.t -> Structural_descr.t
   (** How to build the structural descriptor for each monomorphic instance.
       @since Carbon-20101201 *)
@@ -172,7 +169,6 @@ module Polymorphic(T:Polymorphic_input)
     argument corresponding to the second type variable. *)
 module type Polymorphic2_input = sig
   val name: 'a t -> 'b t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t
   type ('a, 'b) t
@@ -214,7 +210,6 @@ end
     @since Oxygen-20120901 *)
 module type Polymorphic3_input = sig
   val name: 'a t -> 'b t -> 'c t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t ->
     Structural_descr.t
@@ -243,7 +238,6 @@ module Polymorphic3(T:Polymorphic3_input)
     @since Oxygen-20120901 *)
 module type Polymorphic4_input = sig
   val name: 'a t -> 'b t -> 'c t -> 'd t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t ->
     Structural_descr.t -> Structural_descr.t

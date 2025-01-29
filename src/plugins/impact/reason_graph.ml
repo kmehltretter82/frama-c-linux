@@ -56,7 +56,6 @@ module ReasonType = Datatype.Make(
 (** Reasons for impact are expressed as sets [(n', n, reason)] *)
 module Reason =
   Datatype.Triple_with_collections(PdgTypes.Node)(PdgTypes.Node)(ReasonType)
-    (struct let module_name = "Impact.Reason_graph.Reason.t" end)
 
 type reason_graph = Reason.Set.t
 

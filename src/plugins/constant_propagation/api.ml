@@ -328,13 +328,11 @@ end
 
 module Result_pair =
   Datatype.Pair_with_collections(Cil_datatype.Fundec.Set)(Datatype.Bool)
-    (struct let module_name = "Constant_propagation.Register.Result_pair.t" end)
 module Result =
   State_builder.Hashtbl
     (Datatype.Hashtbl
        (Result_pair.Hashtbl)
-       (Result_pair)
-       (struct let module_name = "Semantical constant propagation" end))
+       (Result_pair))
     (Project.Datatype)
     (struct
       let size = 7

@@ -180,9 +180,7 @@ let compute_englobing_subexpr ~subexpr ~expr =
   in
   Option.value ~default:[] (compute expr)
 
-module Englobing =
-  Datatype.Pair_with_collections (Eva_ast.Exp) (Eva_ast.Exp)
-    (struct  let module_name = "Subexpressions" end)
+module Englobing = Datatype.Pair_with_collections (Eva_ast.Exp) (Eva_ast.Exp)
 module SubExprs = Datatype.List (Eva_ast.Exp)
 
 module EnglobingSubexpr =

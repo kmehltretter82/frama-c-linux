@@ -57,10 +57,7 @@ let mk_hdr level ppf hdr_strg =
   Format.fprintf ppf "@[<v 0>%s@ %s@]" hdr_strg underline ;
 ;;
 
-module OptionKf =
-  Datatype.Option_with_collections
-    (Cil_datatype.Kf)
-    (struct let module_name = "OptionKf" end)
+module OptionKf = Datatype.Option_with_collections (Cil_datatype.Kf)
 
 (** Defining base metrics and operations on those *)
 module BasicMetrics = struct

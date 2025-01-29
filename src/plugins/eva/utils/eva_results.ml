@@ -96,7 +96,6 @@ type stmt_by_callstack = Cvalue.Model.t Callstack.Hashtbl.t
 
 module AlarmsStmt =
   Datatype.Pair_with_collections (Alarms) (Stmt)
-    (struct let module_name = "Value.Eva_results.AlarmStmt" end)
 
 type results = {
   main: Kernel_function.t option (** None means multiple functions *);

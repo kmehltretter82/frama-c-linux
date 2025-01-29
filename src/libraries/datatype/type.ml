@@ -150,7 +150,6 @@ let rec get_embedded_type_names ty =
 
 module type Polymorphic_input = sig
   val name: 'a t -> string
-  val module_name: string
   val structural_descr: Structural_descr.t -> Structural_descr.t
   type 'a t
   val reprs: 'a -> 'a t list
@@ -208,7 +207,6 @@ end
 
 module type Polymorphic2_input = sig
   val name: 'a t -> 'b t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t
   type ('a, 'b) t
@@ -362,7 +360,6 @@ end
 
 module type Polymorphic3_input = sig
   val name: 'a t -> 'b t -> 'c t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t ->
     Structural_descr.t
@@ -447,7 +444,6 @@ end
 
 module type Polymorphic4_input = sig
   val name: 'a t -> 'b t -> 'c t -> 'd t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t ->
     Structural_descr.t -> Structural_descr.t

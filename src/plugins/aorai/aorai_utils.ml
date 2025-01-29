@@ -465,7 +465,6 @@ and tlval_to_lval (tlhost, toffset) res =
 
 module Kf_bhv_cache =
   Datatype.Pair_with_collections(Cil_datatype.Kf)(Datatype.String)
-    (struct let module_name = "Aorai_utils.Kf_bhv_cache" end)
 
 let bhv_aux_functions_table = Kf_bhv_cache.Hashtbl.create 7
 

@@ -102,11 +102,7 @@ end = struct
   include Datatype.Pair_with_collections
       (Logic_label)
       (Datatype.Option_with_collections
-         (Stmt)
-         (struct
-           let module_name = "E_ACSL.Labels.Ext_logic_label.StmtOption"
-         end))
-      (struct let module_name = "E_ACSL.Labels.Ext_logic_label" end)
+         (Stmt))
 
   (* Override [pretty] to print a more compact representation of
      [Ext_logic_label] for debugging purposes. *)
@@ -365,16 +361,12 @@ module Id_term_in_profile =
     (Datatype.Pair
        (Misc.Id_term)
        (Profile))
-    (struct let module_name = "E_ACSL.Analyse.Id_term_in_profile" end)
 
 (* Environment to handle recursive functions: this environment stores the logic
    functions that we have already started inferring along with their
    profiles. This is necessary for the fixpoint algorithm. *)
 module LFProf =
   Datatype.Pair_with_collections (Cil_datatype.Logic_info) (Profile)
-    (struct
-      let module_name = "E_ACSL.Interval.LFProf"
-    end)
 
 module Logic_env
 = struct

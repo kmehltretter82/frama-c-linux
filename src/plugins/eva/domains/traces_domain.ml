@@ -220,8 +220,7 @@ end = struct
 end
 
 module EdgeList = struct
-  include Datatype.List_with_collections(Edge)
-      (struct let module_name = "Value.Traces_domain.EdgeList" end)
+  include Datatype.List_with_collections (Edge)
   let pretty = Edge.pretty_list
 end
 

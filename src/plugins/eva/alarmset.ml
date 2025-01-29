@@ -248,11 +248,7 @@ let local_printer: Printer.extensible_printer =
 let pr_annot = local_printer#code_annotation
 
 (* Default behaviour: print one alarm per kinstr. *)
-module Alarm_key =
-  Datatype.Pair_with_collections (Cil_datatype.Kinstr) (Alarms)
-    (struct
-      let module_name = "Alarm_key"
-    end)
+module Alarm_key = Datatype.Pair_with_collections (Cil_datatype.Kinstr) (Alarms)
 
 module Alarm_cache =
   State_builder.Hashtbl (Alarm_key.Hashtbl) (Datatype.Unit)

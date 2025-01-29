@@ -1062,8 +1062,6 @@ module UnrollUnnatural  = struct
   end
 
   module Version = Datatype.Pair_with_collections(Vertex)(Vertex_Set)
-      (struct let module_name = "Interpreted_automata.OnlyHead.Version" end)
-
 
   module Edge =
   struct

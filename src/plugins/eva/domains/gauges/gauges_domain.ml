@@ -528,7 +528,6 @@ module G = struct
   include Datatype.Pair_with_collections
       (MV)
       (Datatype.List(Datatype.Pair(Cil_datatype.Stmt)(IterationInfo)))
-      (struct let module_name = "Values.Gauges_domain.G" end)
 
   let name = "gauges"
 

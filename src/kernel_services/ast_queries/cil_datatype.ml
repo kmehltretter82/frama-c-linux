@@ -587,7 +587,6 @@ let pretty_typ_ref = ref (fun _ _ -> assert false)
 
 module Attributes=
   Datatype.List_with_collections(Attribute)
-    (struct let module_name = "Attributes" end)
 
 module MakeTyp(M:sig val config: type_compare_config val name: string end) =
 struct
@@ -1098,7 +1097,6 @@ end
 
 module Wide_string =
   Datatype.List_with_collections(Datatype.Int64)
-    (struct let module_name = "Cil_datatype.Wide_string" end)
 
 module Constant_input =
 struct
@@ -2150,7 +2148,6 @@ module Term_lval = struct
   include Datatype.Pair_with_collections
       (Term_lhost)
       (Term_offset)
-      (struct let module_name = "Cil_datatype.Term_lval" end)
   let pretty fmt t = !pretty_ref fmt t
 end
 
