@@ -41,21 +41,8 @@ val type_binop: Logic_ptree.binop -> Cil_types.binop
 val unescape: string -> string
 val wcharlist_of_string: string -> int64 list
 
-val is_arithmetic_type: Cil_types.logic_type -> bool
-val is_integral_type: Cil_types.logic_type -> bool
-val is_set_type: Cil_types.logic_type -> bool
-val is_array_type: Cil_types.logic_type -> bool
-val is_pointer_type: Cil_types.logic_type -> bool
-
-(** @since Aluminium-20160501 *)
-val is_list_type: Cil_types.logic_type -> bool
-
-(** @since Aluminium-20160501 *)
-val type_of_list_elem : logic_type -> logic_type
-
 val type_of_pointed: logic_type -> logic_type
 val type_of_array_elem: logic_type -> logic_type
-val type_of_set_elem: logic_type -> logic_type
 
 val ctype_of_pointed: logic_type -> typ
 val ctype_of_array_elem: logic_type -> typ

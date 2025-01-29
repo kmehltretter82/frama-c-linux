@@ -127,7 +127,7 @@ let check_assigns kf assigns =
       else acc
     in
     let vfrom acc = function
-      | t, FromAny when Logic_typing.is_pointer_type t.it_content.term_type ->
+      | t, FromAny when Logic_utils.is_pointer_type t.it_content.term_type ->
         incomplete acc
           begin fun _kf ->
             Wp_parameters.warning ~wkey:wkey_pedantic

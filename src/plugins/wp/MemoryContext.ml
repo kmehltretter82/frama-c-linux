@@ -112,8 +112,8 @@ open Logic_const
 
 let rec ptr_of = function
   | Ctype t -> Ctype (Cil_const.mk_tptr t)
-  | t when Logic_typing.is_set_type t ->
-    let t = Logic_typing.type_of_set_elem t in
+  | t when is_set_type t ->
+    let t = Logic_utils.type_of_set_elem t in
     Logic_const.make_set_type (ptr_of t)
   | _ -> assert false
 
@@ -226,7 +226,7 @@ let normalize ps =
   List.filter (fun p -> not(Logic_utils.is_trivially_true p)) ps
 
 let ptrset { term_type = t } =
-  let open Logic_typing in
+  let open Logic_utils in
   is_pointer_type t || (is_set_type t && is_pointer_type (type_of_element t))
 
 (* -------------------------------------------------------------------------- *)

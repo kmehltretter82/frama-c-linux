@@ -454,7 +454,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_typing.is_integral_type t.term_type);
+      assert (Logic_utils.is_integral_type t.term_type);
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Analyses_types.C_number, ""
     end
@@ -520,7 +520,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Q.binop ~loc (Some t) bop env kf e1 e2 in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_typing.is_integral_type t.term_type);
+      assert (Logic_utils.is_integral_type t.term_type);
       (* no guard required since RTEs are generated separately *)
       let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
@@ -724,7 +724,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_typing.is_integral_type t.term_type);
+      assert (Logic_utils.is_integral_type t.term_type);
       let e1, adata, env = t1_to_exp adata env in
       let e2, adata, env = t2_to_exp adata env in
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
@@ -788,7 +788,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       let e, env = Gmp.Z.new_var ~loc ~name env kf t mk_stmts in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Logic_typing.is_integral_type t.term_type);
+      assert (Logic_utils.is_integral_type t.term_type);
       let e = Cil.new_exp ~loc (BinOp(bop, e1, e2, ty)) in
       e, adata, env, Analyses_types.C_number, ""
     end

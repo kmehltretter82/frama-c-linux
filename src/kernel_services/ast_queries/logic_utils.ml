@@ -72,6 +72,33 @@ let is_instance_of vars t1 t2 =
 (** {1 From C to logic}*)
 (* ************************************************************************* *)
 
+let plain_arithmetic_type t = Cil.isLogicArithmeticType t
+let plain_integral_type t = Cil.isLogicIntegralType t
+let plain_fun_ptr t = Cil.isLogicFunPtrType t
+
+let is_arithmetic_type = plain_or_set plain_arithmetic_type
+let is_integral_type = plain_or_set plain_integral_type
+let is_fun_ptr = plain_or_set plain_fun_ptr
+
+let is_list_type t = Logic_const.is_list_type (unroll_type t)
+let type_of_list_elem t = Logic_const.type_of_list_elem (unroll_type t)
+
+let is_set_type t = Logic_const.is_set_type (unroll_type t)
+let type_of_set_elem t = Logic_const.type_of_element (unroll_type t)
+
+let is_plain_array_type t =
+  match unroll_type t with
+  | Ctype ct -> Cil.isArrayType ct
+  | _ -> false
+
+let is_plain_pointer_type t =
+  match unroll_type t with
+  | Ctype ct -> Cil.isPointerType ct
+  | _ -> false
+
+let is_array_type = plain_or_set is_plain_array_type
+let is_pointer_type = plain_or_set is_plain_pointer_type
+
 let isLogicType f t = plain_or_set (Logic_const.isLogicCType f) t
 
 (** true if the type is a C array (or a set of)*)
@@ -1266,15 +1293,13 @@ let is_same_pl_constant c1 c2 =
   | (IntConstant _| FloatConstant _
     | StringConstant _ | WStringConstant _), _ -> false
 
-let is_same_pl_array_size c1 c2 =
-  let open Logic_ptree in
+let rec is_same_pl_array_size c1 c2 =
   match c1,c2 with
-  | ASnone, ASnone -> true
-  | ASinteger s1, ASinteger s2
-  | ASidentifier s1, ASidentifier s2 -> s1 = s2
-  | (ASnone | ASinteger _| ASidentifier _), _ -> false
+  | None, None -> true
+  | Some e1, Some e2 -> is_same_lexpr e1 e2
+  | _, _ -> false
 
-let rec is_same_pl_type t1 t2 =
+and is_same_pl_type t1 t2 =
   let open Logic_ptree in
   match t1, t2 with
   | LTvoid, LTvoid
@@ -1319,10 +1344,10 @@ let rec is_same_pl_type t1 t2 =
     | LTunion _ | LTnamed _ | LTstruct _ | LTattribute _),_ ->
     false
 
-let is_same_quantifiers =
-  is_same_list (fun (t1,x1) (t2,x2) -> x1 = x2 && is_same_pl_type t1 t2)
+and is_same_quantifiers qs1 qs2 =
+  is_same_list (fun (t1,x1) (t2,x2) -> x1 = x2 && is_same_pl_type t1 t2) qs1 qs2
 
-let is_same_unop op1 op2 =
+and is_same_unop op1 op2 =
   let open Logic_ptree in
   match op1,op2 with
   | Uminus, Uminus
@@ -1331,7 +1356,7 @@ let is_same_unop op1 op2 =
   | Uamp, Uamp -> true
   | (Uminus | Ustar | Uamp | Ubw_not), _ -> false
 
-let is_same_binop op1 op2 =
+and is_same_binop op1 op2 =
   let open Logic_ptree in
   match op1, op2 with
   | Badd, Badd | Bsub, Bsub | Bmul, Bmul | Bdiv, Bdiv | Bmod, Bmod
@@ -1340,13 +1365,13 @@ let is_same_binop op1 op2 =
   | (Badd | Bsub | Bmul | Bdiv | Bmod | Bbw_and | Bbw_or
     | Bbw_xor | Blshift | Brshift),_ -> false
 
-let is_same_relation r1 r2 =
+and is_same_relation r1 r2 =
   let open Logic_ptree in
   match r1, r2 with
   | Lt, Lt | Gt, Gt | Le, Le | Ge, Ge | Eq, Eq | Neq, Neq -> true
   | (Lt | Gt | Le | Ge | Eq | Neq), _ -> false
 
-let rec is_same_path_elt p1 p2 =
+and is_same_path_elt p1 p2 =
   let open Logic_ptree in
   match p1, p2 with
     PLpathField s1, PLpathField s2 -> s1 = s2

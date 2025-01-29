@@ -101,14 +101,6 @@ let wcharlist_of_string s =
   done;
   List.rev (!res)
 
-let type_of_list_elem t = Logic_const.type_of_list_elem (unroll_type t)
-
-let is_list_type t = Logic_const.is_list_type (unroll_type t)
-
-let type_of_set_elem t = Logic_const.type_of_element (unroll_type t)
-
-let is_set_type t = Logic_const.is_set_type (unroll_type t)
-
 let plain_mk_mem ?loc t ofs = match t.term_node with
   | TAddrOf lv -> Logic_const.addTermOffsetLval ofs lv
   | TStartOf lv ->
@@ -586,15 +578,6 @@ let rec arithmetic_conversion ty1 ty2 =
       "arithmetic conversion between non arithmetic types %a and %a"
       Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
-let plain_arithmetic_type t = Cil.isLogicArithmeticType t
-let plain_integral_type t = Cil.isLogicIntegralType t
-let plain_boolean_type t = Cil.isLogicBooleanType t
-let plain_fun_ptr t = Cil.isLogicFunPtrType t
-
-let is_arithmetic_type = plain_or_set plain_arithmetic_type
-let is_integral_type = plain_or_set plain_integral_type
-let is_fun_ptr = plain_or_set plain_fun_ptr
-
 let rec type_of_pointed t =
   match unroll_type t with
     Ctype ty when isPointerType ty -> Ctype (Cil.typeOf_pointed ty)
@@ -635,18 +618,10 @@ let mk_mem ?loc t ofs =
         (type_of_pointed t.term_type))
     t
 
-let is_plain_array_type t =
-  match unroll_type t with
-  | Ctype ct -> Cil.isArrayType ct
-  | _ -> false
-
 let is_plain_pointer_type t =
   match unroll_type t with
   | Ctype ct -> Cil.isPointerType ct
   | _ -> false
-
-let is_array_type = plain_or_set is_plain_array_type
-let is_pointer_type = plain_or_set is_plain_pointer_type
 
 module type S =
 sig
@@ -1047,6 +1022,20 @@ struct
     with Not_found ->
       C.error loc "logic label `%s' not found" l
 
+  let rec size_exp ctxt loc size =
+    match size.term_node with
+    | TLval (TVar ({ lv_kind = LVGlobal } as lvar), TNoOffset) ->
+      begin (* logic variable, so try to unfold its definition *)
+        match Logic_env.find_logic_cons lvar with
+        | { l_labels = [] ; l_body = (LBterm term) ; l_profile = [] } ->
+          size_exp ctxt loc term
+        | _ -> raise Not_found
+      end
+    | _ ->
+      try Logic_to_c.term_to_exp size
+      with Logic_to_c.No_conversion ->
+        ctxt.error loc "size of array must be a valid C expression"
+
   let logic_type ctxt loc env t =
     (* force calls to go through ctxt *)
     let module [@warning "-60"] C = struct end in
@@ -1057,38 +1046,15 @@ struct
     | LTint ikind -> Ctype (Cil_const.mk_tint ikind)
     | LTfloat fkind -> Ctype (Cil_const.mk_tfloat fkind)
     | LTarray (ty,length) ->
-
-      let size = match length with
-        | ASnone -> None
-        | ASinteger s ->
-          let t = parseInt loc s in
-          (match t.term_node with
-           | TConst lconst ->
-             Some (new_exp ~loc (Const (lconstant_to_constant lconst)))
-           | _ -> Kernel.fatal ~loc "integer literal not parsed as constant")
-        | ASidentifier s ->
-          let size = ctxt.type_term ctxt env
-              {lexpr_node=PLvar(s);lexpr_loc=loc} in
-          if size.term_type <> Linteger then
-            ctxt.error loc "size of array must be an integral value";
-          try
-            let rec size_exp size =
-              match size.term_node with
-              | TConst lconst -> (* the identifier was a macro to an integer *)
-                Some (new_exp ~loc (Const (lconstant_to_constant lconst)))
-              | TLval (TVar( {lv_kind=LVGlobal} as lvar), TNoOffset) ->
-                begin (* logic variable, so try to unfold its definition *)
-                  match Logic_env.find_logic_cons lvar with
-                  | {l_labels=[];l_body=(LBterm term);l_profile=[]} ->
-                    size_exp term
-                  | _ -> raise Not_found
-                end
-              | _ -> raise Not_found
-            in size_exp size
-          with Not_found ->
-            ctxt.error loc "size of array must be an integral value";
-      in Ctype (Cil_const.mk_tarray (ctype ty) size)
-
+      begin match Option.map (ctxt.type_term ctxt env) length with
+        | None -> Ctype (Cil_const.mk_tarray (ctype ty) None)
+        | Some size ->
+          match size.term_type with
+          | Linteger ->
+            let size = Some (size_exp ctxt loc size) in
+            Ctype (Cil_const.mk_tarray (ctype ty) size)
+          | _ -> ctxt.error loc "size of array must be an integral value"
+      end
     | LTpointer ty -> Ctype (Cil_const.mk_tptr (ctype ty))
     | LTenum e ->
       (try Ctype (ctxt.find_type Enum e)
@@ -1414,7 +1380,7 @@ struct
       with
       | Ctype oldt, Ctype newt ->
         c_mk_cast ~force e oldt newt
-      | t1, Lboolean when is_integral_type t1 ->
+      | t1, Lboolean when Logic_utils.is_integral_type t1 ->
         let e = mk_cast e Linteger in
         Logic_const.term ~loc (TBinOp(Ne,e,lzero ~loc())) Lboolean
       | Lboolean, Linteger when explicit ->
@@ -1770,7 +1736,7 @@ struct
     | Ltype({lt_name = "set"}, [t1]), t2 ->
       let (env, ot, nt) = partial_unif ~overloaded loc term t1 t2 env in
       env, make_set_type ot, make_set_type nt
-    | t1,t2 when plain_boolean_type t1 && plain_boolean_type t2 ->
+    | t1,t2 when Cil.isLogicBooleanType t1 && Cil.isLogicBooleanType t2 ->
       env,ot,nt
     | ((Ctype _ | Linteger | Lreal | Lboolean),
        (Ctype _ | Linteger | Lreal | Lboolean)) ->
@@ -2042,16 +2008,14 @@ struct
 
   let list_conversion loc t ot nt env =
     if is_same_type ot nt then ot
-    else if plain_integral_type ot && plain_integral_type nt then ot
-    else if plain_arithmetic_type ot && plain_arithmetic_type nt then ot
+    else if Cil.isLogicIntegralType ot && Cil.isLogicIntegralType nt then ot
+    else if Cil.isLogicArithmeticType ot && Cil.isLogicArithmeticType nt then ot
     else let _,_,t = partial_unif ~overloaded:false loc t ot nt env in
       t
 
   let list_promotion typ =
-    if plain_integral_type typ then
-      Linteger
-    else if plain_arithmetic_type typ then
-      Lreal
+    if Cil.isLogicIntegralType typ then Linteger
+    else if Cil.isLogicArithmeticType typ then Lreal
     else typ
 
   let list_coercion typ t =
@@ -2322,7 +2286,7 @@ struct
                  term_type = type2}
     in
     let (toff, t_off2, opt_idx_let), ofs_type =
-      let check_type typ = plain_integral_type typ
+      let check_type typ = Cil.isLogicIntegralType typ
                            || C.error loc "range is only allowed for last offset"
       and mk_field f = TField(f,TNoOffset),TField(f,TNoOffset),(fun x -> x)
       and mk_idx idx =
@@ -3238,7 +3202,7 @@ struct
       f loc op (mk_cast t1 t) (mk_cast t2 t)
     in
     begin match op with
-      | _ when plain_arithmetic_type ty1 && plain_arithmetic_type ty2 ->
+      | _ when Cil.isLogicArithmeticType ty1 && Cil.isLogicArithmeticType ty2 ->
         conditional_conversion t1 t2
       | Eq | Neq when isLogicPointer t1 && isLogicNull t2 ->
         let t1 = mk_logic_pointer_or_StartOf t1 in
@@ -3292,7 +3256,7 @@ struct
       | TStartOf lv
       | Tat ({term_node = TStartOf lv}, _) ->
         f lv t
-      | TAddrOf lv when is_fun_ptr t.term_type ->
+      | TAddrOf lv when Logic_utils.is_fun_ptr t.term_type ->
         f lv
           { t with
             term_type = type_of_pointed t.term_type;
@@ -3305,7 +3269,7 @@ struct
   and term_from f t =
     let check_from t =
       match t.term_node with
-      | TAddrOf lv when is_fun_ptr t.term_type ->
+      | TAddrOf lv when Logic_utils.is_fun_ptr t.term_type ->
         f lv
           { t with
             term_type = type_of_pointed t.term_type;
@@ -3387,14 +3351,14 @@ struct
   and type_int_term ctxt env t =
     let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
-    if not (plain_integral_type tt.term_type) then
+    if not (Cil.isLogicIntegralType tt.term_type) then
       ctxt.error t.lexpr_loc
         "integer expected but %a found" Cil_printer.pp_logic_type tt.term_type;
     tt
 
   and type_bool_term ctxt env t =
     let tt = ctxt.type_term ctxt env t in
-    if not (plain_boolean_type tt.term_type) then
+    if not (Cil.isLogicBooleanType tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
     mk_cast tt Lboolean

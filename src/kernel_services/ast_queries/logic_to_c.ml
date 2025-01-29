@@ -128,19 +128,19 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
   | Tinter _ | Tcomprehension _ -> error_lval()
   | Tat ({term_node = TAddrOf (TVar _, TNoOffset)} as taddroflval, _) ->
     loc_to_exp ?result taddroflval
-  | TCast (true, Linteger, t) when Logic_typing.is_integral_type t.term_type ->
+  | TCast (true, Linteger, t) when Logic_utils.is_integral_type t.term_type ->
     loc_to_exp ?result t
-  | TCast (true, Lreal, t) when Logic_typing.is_integral_type t.term_type ->
+  | TCast (true, Lreal, t) when Logic_utils.is_integral_type t.term_type ->
     List.map
       (fun x -> new_exp ~loc (CastE (logic_type_to_typ Lreal, x)))
       (loc_to_exp ?result t)
-  | TCast (true, Lreal, t) when Logic_typing.is_arithmetic_type t.term_type ->
+  | TCast (true, Lreal, t) when Logic_utils.is_arithmetic_type t.term_type ->
     loc_to_exp ?result t
   | TCast (true, set, t)
     when
       Logic_const.is_set_type set &&
       Logic_utils.is_same_type
-        (Logic_typing.type_of_set_elem set) t.term_type ->
+        (Logic_utils.type_of_set_elem set) t.term_type ->
     loc_to_exp ?result t
   | Tnull -> [ Cil.mkCast ~newt:(Cil_const.voidPtrType) (Cil.zero ~loc) ]
 
@@ -167,9 +167,9 @@ let rec loc_to_lval ?result t =
      a coercion to set here.
   *)
   | TCast (true, set, t) when
-      Logic_typing.is_set_type set &&
+      Logic_utils.is_set_type set &&
       Logic_utils.is_same_type
-        (Logic_typing.type_of_set_elem set) t.term_type ->
+        (Logic_utils.type_of_set_elem set) t.term_type ->
     loc_to_lval ?result t
   | Tinter _ -> error_lval() (* TODO *)
   | Tcomprehension _ -> error_lval()
