@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (* Messages longer than N characters are truncated when printed on terminal. *)
-let max_message_length = 2097152
+let max_message_length = 10000
 
 type kind = Result | Feedback | Debug | Warning | Error | Failure
 
