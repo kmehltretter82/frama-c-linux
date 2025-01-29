@@ -237,7 +237,7 @@ let gen_if ghost ghost_else stmt_then stmt_else env =
   let else_b = Cil.mkBlock else_s in
   if (not ghost) && ghoste then begin
     let attr = Attr (Cil.frama_c_ghost_else,[]) in
-    else_b.battrs <- Cil.addAttribute attr else_b.battrs;
+    else_b.battrs <- Ast_attributes.add_attribute attr else_b.battrs;
   end;
   stmt.skind <- If(e,Cil.mkBlock then_s, Cil.mkBlock else_s,loc);
   env, stmt

@@ -171,8 +171,8 @@ val remove_attribute : string -> unit
 *)
 val get_attribute_class : default:attribute_class -> string -> attribute_class
 
-(** {!is_known_attribute attrname} returns true if the attribute named
-    {!attrname} is known by Frama-C.
+(** [is_known_attribute attrname] returns true if the attribute named
+    [attrname] is known by Frama-C.
 *)
 val is_known_attribute : string -> bool
 

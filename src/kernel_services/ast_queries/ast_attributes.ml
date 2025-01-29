@@ -54,7 +54,7 @@ let has_attribute an al =
    attribute for both the [x] attribute and the attributes of the list. For
    example, if have a call:
 
-   dropAttribute "__const" [ Attr("const", []) ; Attr("__const", []) ; Attr("__const__", []) ]
+   drop_attribute "__const" [ Attr("const", []) ; Attr("__const", []) ; Attr("__const__", []) ]
 
    The result is [].
 *)

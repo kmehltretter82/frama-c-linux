@@ -4670,8 +4670,8 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
 and doAttributes (ghost:bool) (al: Cabs.attribute list) : attribute list =
   List.fold_left (fun acc a -> cabsAddAttributes (doAttr ghost a) acc) [] al
 
-(* A version of Cil.partitionAttributes that works on CABS attributes.
-   It would  be better to use Cil.partitionAttributes instead to avoid
+(* A version of Ast_attributes.partition_attributes that works on CABS attributes.
+   It would be better to use Ast_attributes.partition_attributes instead to avoid
    the extra doAttr conversions here, but that's hard to do in doSpecList.*)
 and cabsPartitionAttributes
     ghost
@@ -4685,7 +4685,8 @@ and cabsPartitionAttributes
         | [] -> "", default
         | (Attr(an, _) | AttrAnnot an)::_ ->
           (* doAttr already strip underscores of the attribute if necessary so
-             we do not need to strip then before calling attributeClass here. *)
+             we do not need to strip then before calling get_attribute_class
+             here. *)
           an, get_attribute_class ~default an
       in
       match kind with

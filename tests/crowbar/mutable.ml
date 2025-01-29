@@ -21,7 +21,7 @@ let struct_name =
 type attr_kind = NoAttr | Const | Mutable
 
 let attr_of_kind =
-  function NoAttr | Const -> [] | Mutable -> [ Attr( Cil.frama_c_mutable, []) ]
+  function NoAttr | Const -> [] | Mutable -> [ Attr( Ast_attributes.frama_c_mutable, []) ]
 
 let tattr_of_kind =
   function NoAttr | Mutable -> [] | Const -> [ Attr ("const",[]) ]

@@ -1359,7 +1359,8 @@ val typeAttrs: typ -> attribute list
 
 (** Add some attributes to a type. Qualifiers attributes are recursively pushed
     into array elements type until a non-array type is found.
-    [combine] explains how to combine attributes. Default is [addAttributes].
+    [combine] explains how to combine attributes.
+    Default is {!Ast_attributes.add_attributes}.
 
     @before 28.0-Nickel [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->

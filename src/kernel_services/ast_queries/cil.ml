@@ -7270,7 +7270,7 @@ type attributeClass =
   (** Attribute of a statement or a block *)
   | AttrIgnored
   (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions [attributeClass] and [partitionAttributes]. *)
+      ignored by functions {!get_attribute_class} and {!partition_attributes}. *)
 
 let registerAttribute = register_attribute
 
