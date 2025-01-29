@@ -166,9 +166,8 @@ struct
   let bool = function false -> zero | true -> one
 
   let float ~fkind f =
-    let Format fmt = Typed_float.format_of_fkind fkind in
-    let f = Typed_float.represents ~float:f ~in_format:fmt in
-    mk_exp (Const (CReal (Typed_float.to_float f, fkind, None)))
+    let f = Floating_point.round_if_single_precision fkind f in
+    mk_exp (Const (CReal (f, fkind, None)))
 
   let cast typ exp =
     if Cil.need_cast exp.typ typ

@@ -35,7 +35,10 @@ val set_rounding_mode : rounding -> unit
 val get_rounding_mode : unit -> rounding
 
 (** Rounds the given float to a single precision float. *)
-val round_to_single_precision_float : float -> float
+val round_to_single_precision : float -> float
+
+(** Rounds the given float to a single precision float if [fkind = FFloat]. *)
+val round_if_single_precision : Cil_types.fkind -> float -> float
 
 
 (** {2 Floating-point operations} *)

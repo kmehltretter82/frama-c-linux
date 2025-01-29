@@ -35,7 +35,7 @@ end
 
 let round fkind =
   if fkind = Single
-  then Floating_point.round_to_single_precision_float
+  then Floating_point.round_to_single_precision
   else fun f -> f
 
 (* Inject a float as a singleton interval. *)

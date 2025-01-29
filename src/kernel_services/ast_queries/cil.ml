@@ -2689,10 +2689,9 @@ let intKindForValue i (unsigned: bool) =
   else raise Not_representable
 
 (* True is an double constant is finite for a kind *)
-let isFiniteFloat fk v =
-  let Format fmt = Typed_float.format_of_fkind fk in
-  let v = Typed_float.represents ~float:v ~in_format:fmt in
-  Typed_float.is_finite v
+let isFiniteFloat fk f =
+  let f = Floating_point.round_if_single_precision fk f in
+  Floating_point.is_finite f
 
 let isExactFloat fk r =
   r.r_upper = r.r_lower && isFiniteFloat fk r.r_nearest
@@ -2726,9 +2725,8 @@ let integer_constant i = CInt64(Integer.of_int i, IInt, None)
 let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
 let kfloat ~loc k f =
-  let Format fmt = Typed_float.format_of_fkind k in
-  let f = Typed_float.represents ~float:f ~in_format:fmt in
-  new_exp ~loc (Const (CReal (Typed_float.to_float f, k, None)))
+  let f = Floating_point.round_if_single_precision k f in
+  new_exp ~loc (Const (CReal (f, k, None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -4219,7 +4217,7 @@ and constFold (machdep: bool) (e: exp) : exp =
           | Integer i -> kinteger64 ~loc ~kind:ik i
         end
       | Const (CReal(f,_,_)), TFloat FFloat when t.tattr = [] ->
-        let f = Floating_point.round_to_single_precision_float f in
+        let f = Floating_point.round_to_single_precision f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CReal(f,_,_)), TFloat FDouble when t.tattr = [] ->
         new_exp ~loc (Const (CReal (f,FDouble,None)))
@@ -4227,7 +4225,7 @@ and constFold (machdep: bool) (e: exp) : exp =
          how to handle this type anyway. *)
       | Const (CInt64(i,_,_)), TFloat FFloat when t.tattr = [] ->
         let f = Integer.to_float i in
-        let f = Floating_point.round_to_single_precision_float f in
+        let f = Floating_point.round_to_single_precision f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CInt64(i,_,_)), TFloat FDouble when t.tattr = [] ->
         let f = Integer.to_float i in

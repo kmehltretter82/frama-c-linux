@@ -29,7 +29,11 @@ type rounding =
 external set_rounding_mode : rounding -> unit = "frama_c_set_round_mode" [@@noalloc]
 external get_rounding_mode : unit -> rounding = "frama_c_get_round_mode" [@@noalloc]
 
-external round_to_single_precision_float: float -> float = "round_to_single"
+external round_to_single_precision : float -> float = "round_to_single"
+
+let round_if_single_precision = function
+  | Cil_types.FFloat -> round_to_single_precision
+  | FDouble | FLongDouble -> Fun.id
 
 
 type truncated_to_integer =
