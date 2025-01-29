@@ -290,7 +290,7 @@ module MYTREE = struct
     | _ -> false
 
   let is_builtin_global g =
-    Cil.hasAttribute "FC_BUILTIN" (Cil_datatype.Global.attr g)
+    Ast_attributes.has_attribute "FC_BUILTIN" (Cil_datatype.Global.attr g)
 
   let comes_from_share filename =
     let path = Filepath.Normalized.of_string filename in

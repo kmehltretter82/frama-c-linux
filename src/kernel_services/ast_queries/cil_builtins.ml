@@ -57,7 +57,7 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let has_fc_builtin_attr v = Cil.hasAttribute "FC_BUILTIN" v.vattr
+let has_fc_builtin_attr v = Ast_attributes.has_attribute "FC_BUILTIN" v.vattr
 
 let is_unused_builtin v = has_fc_builtin_attr v && not v.vreferenced
 
@@ -100,7 +100,7 @@ module Builtin_functions =
 let add_builtin ?(prefix="__builtin_") s t l b =
   Builtin_functions.add (prefix ^ s) (t, l, b)
 
-let () = Cil.registerAttribute "FC_BUILTIN" (AttrName true)
+let () = Ast_attributes.register_attribute "FC_BUILTIN" (AttrName true)
 
 let custom_builtins = Queue.create ()
 

@@ -172,7 +172,7 @@ let categorizePragmas ast =
       end
     | GFunDecl (_,v, _) -> begin
         (* Look for alias attributes, e.g. Linux modules *)
-        match filterAttributes "alias" v.vattr with
+        match Ast_attributes.filter_attributes "alias" v.vattr with
         | [] -> ()  (* ordinary prototype. *)
         | [ Attr("alias", [AStr othername]) ] ->
           Hashtbl.add keepers.defines othername ()
@@ -211,7 +211,7 @@ let isPragmaRoot keepers = function
   | GFunDecl (_,{vname = name; vattr = attrs}, _)
   | GFun ({svar = {vname = name; vattr = attrs}}, _) ->
     Hashtbl.mem keepers.defines name ||
-    hasAttribute "used" attrs
+    Ast_attributes.has_attribute "used" attrs
   | _ ->
     false
 
@@ -252,7 +252,7 @@ let hasExportingAttribute funvar =
 let isExportedRoot global =
   let name, result, reason = match global with
     | GVar ({vstorage = Static} as v, _, _) when
-        Cil.hasAttribute "FC_BUILTIN" v.vattr ->
+        Ast_attributes.has_attribute "FC_BUILTIN" v.vattr ->
       v.vname, true, "FC_BUILTIN attribute"
     | GVar ({vstorage = Static; vname}, _, _) -> vname, false, "static variable"
     | GVar (v,_,_) ->
@@ -268,19 +268,20 @@ let isExportedRoot global =
         else
           v.vname, true, "other function"
       end
-    | GFunDecl(_,v,_) when hasAttribute "alias" v.vattr ->
+    | GFunDecl(_,v,_) when Ast_attributes.has_attribute "alias" v.vattr ->
       v.vname, true, "has GCC alias attribute"
-    | GFunDecl(_,v,_) | GVarDecl(v,_) when hasAttribute "FC_BUILTIN" v.vattr ->
+    | GFunDecl(_,v,_) | GVarDecl(v,_) when
+        Ast_attributes.has_attribute "FC_BUILTIN" v.vattr ->
       v.vname, true, "has FC_BUILTIN attribute"
     | GAnnot _ -> "", true, "global annotation"
     | GType (t, _) when
-        Cil.hasAttribute "FC_BUILTIN" t.ttype.tattr ->
+        Ast_attributes.has_attribute "FC_BUILTIN" t.ttype.tattr ->
       t.tname, true, "has FC_BUILTIN attribute"
     | GCompTag (c,_) | GCompTagDecl (c,_) when
-        Cil.hasAttribute "FC_BUILTIN" c.cattr ->
+        Ast_attributes.has_attribute "FC_BUILTIN" c.cattr ->
       c.cname, true, "has FC_BUILTIN attribute"
     | GEnumTag (e, _) | GEnumTagDecl (e,_) when
-        Cil.hasAttribute "FC_BUILTIN" e.eattr ->
+        Ast_attributes.has_attribute "FC_BUILTIN" e.eattr ->
       e.ename, true, "has FC_BUILTIN attribute"
     | _ ->
       (Format.asprintf "%a" Cil_types_debug.pp_global global), false,
@@ -352,7 +353,7 @@ class markReachableVisitor
       | GVarDecl (varinfo, _)
       | GFunDecl (_,varinfo, _)
       | GFun ({svar = varinfo}, _) ->
-        if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then
+        if not (Ast_attributes.has_attribute "FC_BUILTIN" varinfo.vattr) then
           begin
             Kernel.debug ~dkey "marking reachable: function %s" varinfo.vname;
             InfoHashtbl.replace reachable_tbl (Var varinfo) true;
@@ -590,7 +591,7 @@ class markReferencedVisitor = object (self)
   val inside_typ : typ Stack.t = Stack.create ()
 
   method private reference varinfo loc =
-    if not (hasAttribute "FC_BUILTIN" varinfo.vattr) then begin
+    if not (Ast_attributes.has_attribute "FC_BUILTIN" varinfo.vattr) then begin
       Kernel.debug ~dkey "referenced: var/fun %s@." varinfo.vname;
       Kernel.debug ~source:(fst loc) ~dkey "referenced: fun %s" varinfo.vname;
       varinfo.vreferenced <- true;
@@ -824,21 +825,21 @@ let removeUnmarked isRoot ast reachable_tbl =
     (* unused global types, variables, and functions are simply removed *)
     | GType (t, _) ->
       is_reachable reachable_tbl (Type t) ||
-      Cil.hasAttribute "FC_BUILTIN" t.ttype.tattr
+      Ast_attributes.has_attribute "FC_BUILTIN" t.ttype.tattr
       || isRoot global
     | GCompTag (c,_) | GCompTagDecl (c,_) ->
       is_reachable reachable_tbl (Comp c) ||
-      Cil.hasAttribute "FC_BUILTIN" c.cattr || isRoot global
+      Ast_attributes.has_attribute "FC_BUILTIN" c.cattr || isRoot global
     | GEnumTag (e, _) | GEnumTagDecl (e,_) ->
       is_reachable reachable_tbl (Enum e) ||
-      Cil.hasAttribute "FC_BUILTIN" e.eattr || isRoot global
+      Ast_attributes.has_attribute "FC_BUILTIN" e.eattr || isRoot global
     | GVar (v, _, _) ->
       is_reachable reachable_tbl (Var v) ||
-      Cil.hasAttribute "FC_BUILTIN" v.vattr || isRoot global
+      Ast_attributes.has_attribute "FC_BUILTIN" v.vattr || isRoot global
     | GVarDecl (v, _)
     | GFunDecl (_,v, _)->
       is_reachable reachable_tbl (Var v) ||
-      Cil.hasAttribute "FC_BUILTIN" v.vattr ||
+      Ast_attributes.has_attribute "FC_BUILTIN" v.vattr ||
       (if isRoot global then true else (Cil.removeFormalsDecl v; false))
     (* keep FC_BUILTIN, as some plug-ins might want to use them later
        for semi-legitimate reasons. *)
@@ -864,7 +865,7 @@ let removeUnmarked isRoot ast reachable_tbl =
       end
       in
       ((is_reachable reachable_tbl (Var func.svar))
-       || Cil.hasAttribute "FC_BUILTIN" func.svar.vattr
+       || Ast_attributes.has_attribute "FC_BUILTIN" func.svar.vattr
        || isRoot global) &&
       (ignore (visitCilBlock remove_blocals func.sbody);
        remove_unused_labels func;

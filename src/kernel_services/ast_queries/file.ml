@@ -1380,7 +1380,7 @@ class reorder_ast: Visitor.frama_c_visitor =
             Global_annotation_graph.fold
               (fun g acc ->
                  let stdlib =
-                   Cil.findAttribute "fc_stdlib" (Cil_datatype.Global.attr g)
+                   Ast_attributes.find_attribute "fc_stdlib" (Cil_datatype.Global.attr g)
                  in
                  let key =
                    match  stdlib with

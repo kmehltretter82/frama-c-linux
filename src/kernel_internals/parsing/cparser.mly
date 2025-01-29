@@ -940,7 +940,7 @@ else_part:
   %prec if_no_else /* To attach the next else to the current if */
 | ELSE annotated_statement { in_block $loc($2) $2 }
 | LGHOST_ELSE annotated_statement RGHOST
-    { in_ghost_block ~battrs:[ (Cil.frama_c_ghost_else , []) ] $2 }
+    { in_ghost_block ~battrs:[ (Ast_attributes.frama_c_ghost_else , []) ] $2 }
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 | LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement {
     let loc = Cil_datatype.Location.of_lexing_loc $sloc in

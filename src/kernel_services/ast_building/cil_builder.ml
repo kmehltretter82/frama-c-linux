@@ -90,10 +90,9 @@ struct
   let attribute (s, t) name params =
     match t with
     | Ctype t ->
-      let tattr = Cil.addAttribute (Attr (name, params)) t.tattr in
+      let tattr = Ast_attributes.add_attribute (Attr (name, params)) t.tattr in
       s, Ctype { t with tattr }
     | _ -> raise NotACType
-
 
   let const typ = attribute typ "const" []
   let stdlib_generated typ = attribute typ "fc_stdlib_generated" []
@@ -836,7 +835,7 @@ struct
   let if_ ?(ghost_else=false) cond ~then_ ~else_ =
     let else_attributes =
       if ghost_else
-      then [Cil_types.Attr (Cil.frama_c_ghost_else,[])]
+      then [Cil_types.Attr (Ast_attributes.frama_c_ghost_else,[])]
       else []
     in
     `stmt (If (
@@ -1088,7 +1087,7 @@ struct
       Cil_types.If (ifthen_exp, block, Cil.mkBlock [], b.loc)
     | IfThenElse { ifthenelse_exp; then_block; ghost_else } ->
       if ghost_else then
-        block.battrs <- [Cil_types.Attr (Cil.frama_c_ghost_else,[])];
+        block.battrs <- [Cil_types.Attr (Ast_attributes.frama_c_ghost_else,[])];
       Cil_types.If (ifthenelse_exp, then_block, block, b.loc)
     | Switch { switch_exp } ->
       let open Cil_types in
@@ -1347,7 +1346,7 @@ struct
 
   let add_attribute attr =
     let fundec = get_owner () in
-    fundec.svar.vattr <- Cil.addAttribute attr fundec.svar.vattr
+    fundec.svar.vattr <- Ast_attributes.add_attribute attr fundec.svar.vattr
 
   let add_new_attribute attr params =
     add_attribute (Cil_types.Attr (attr, params))

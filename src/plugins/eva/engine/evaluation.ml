@@ -1111,7 +1111,7 @@ module Make
       remaining_volatile || volatile
     | Field (fi, remaining) ->
       let open Evaluated.Operators in
-      let attrs = Cil.filter_qualifier_attributes (Cil.typeAttrs typ) in
+      let attrs = Ast_attributes.filter_qualifier_attributes (Cil.typeAttrs typ) in
       let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
       let evaluated = eval_offset env ~reduce_valid_index typ_fi remaining in
       let+ r, volatile = evaluated in

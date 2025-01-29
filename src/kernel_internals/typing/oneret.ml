@@ -138,9 +138,9 @@ let encapsulate_local_vars f =
      coarse, our general solution is to enclose the function body (except the
      return statement and the declaration of the retvar) inside a block. *)
   if
-    List.exists
-      (fun v -> Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr)
-      f.sbody.blocals
+    List.exists (fun v ->
+        Ast_attributes.has_attribute Cabs2cil.frama_c_destructor v.vattr
+      ) f.sbody.blocals
   then begin
     let exception Found of (block Stack.t * stmt) in
     let vis = object

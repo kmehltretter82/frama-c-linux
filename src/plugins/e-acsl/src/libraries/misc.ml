@@ -39,7 +39,7 @@ let is_fc_or_compiler_builtin vi =
    && Functions.Libc.has_replacement vi.vname)
 
 let is_fc_stdlib_generated vi =
-  Cil.hasAttribute "fc_stdlib_generated" vi.vattr
+  Ast_attributes.has_attribute "fc_stdlib_generated" vi.vattr
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)
@@ -161,7 +161,7 @@ let is_bitfield_pointers lty =
       begin match Cil.unrollTypeNode typ with
         | TPtr typ ->
           let attrs = Cil.typeAttrs typ in
-          Cil.hasAttribute Cil.bitfield_attribute_name attrs
+          Ast_attributes.(has_attribute bitfield_attribute_name attrs)
         | _ ->
           false
       end

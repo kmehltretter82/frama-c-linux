@@ -831,10 +831,10 @@ struct
   let attribute_name = "wp_nullable"
 
   let is_nullable vi =
-    vi.vformal && Cil.hasAttribute attribute_name vi.vattr
+    vi.vformal && Ast_attributes.has_attribute attribute_name vi.vattr
 
   let make_nullable vi =
-    vi.vattr <- Cil.addAttribute (AttrAnnot attribute_name) vi.vattr
+    vi.vattr <- Ast_attributes.add_attribute (AttrAnnot attribute_name) vi.vattr
 
   module Nullable_extension =
   struct

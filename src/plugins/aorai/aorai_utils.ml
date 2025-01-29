@@ -935,7 +935,7 @@ class visit_decl_loops_init () =
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
             Cil.typeAddAttributes
-              [Attr (Cil.frama_c_ghost_formal,[])] Cil_const.intType
+              [Attr (Ast_attributes.frama_c_ghost_formal,[])] Cil_const.intType
           in
           let var = Cil.makeLocalVar ~ghost:true f ~scope name typ in
           Data_for_aorai.set_varinfo name var

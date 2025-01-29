@@ -13,7 +13,7 @@ class stdlib_visitor = object
   val idents : (string, string list) Hashtbl.t = Hashtbl.create 500
 
   method! vglob_aux g =
-    match Cil.findAttribute "fc_stdlib" (Cil.global_attributes g) with
+    match Ast_attributes.find_attribute "fc_stdlib" (Cil.global_attributes g) with
     | [] ->
       in_stdlib := false;
       Cil.SkipChildren

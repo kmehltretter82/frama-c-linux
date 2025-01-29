@@ -493,7 +493,7 @@ and inject_in_stmt env kf stmt =
   add_new_block_in_stmt env kf stmt
 
 and inject_in_block (env: Env.t) kf blk =
-  blk.battrs <- Cil.dropAttribute Cil.frama_c_ghost_else blk.battrs ;
+  blk.battrs <- Ast_attributes.(drop_attribute frama_c_ghost_else blk.battrs);
   let stmts, env =
     List.fold_left
       (fun (stmts, env) stmt ->
@@ -604,7 +604,7 @@ let inject_in_fundec main fundec =
   List.iter unghost_local fundec.slocals;
   let unghost_formal vi =
     unghost_local vi ;
-    vi.vattr <- Cil.dropAttribute Cil.frama_c_ghost_formal vi.vattr
+    vi.vattr <- Ast_attributes.(drop_attribute frama_c_ghost_formal vi.vattr)
   in
   List.iter unghost_formal fundec.sformals;
   (* update environments *)
@@ -640,7 +640,9 @@ let unghost_vi vi =
   match Cil.unrollType vi.vtype with
   | { tnode = TFun (res, Some l, va); tattr } ->
     (* unghostify function's parameters *)
-    let retype (n, t, a) = n, t, Cil.dropAttribute Cil.frama_c_ghost_formal a in
+    let retype (n, t, a) =
+      n, t, Ast_attributes.(drop_attribute frama_c_ghost_formal a)
+    in
     Cil.update_var_type vi
       (Cil_const.mk_tfun ~tattr res (Some (List.map retype l)) va)
   | _ ->
