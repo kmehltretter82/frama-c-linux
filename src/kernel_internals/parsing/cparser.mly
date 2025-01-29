@@ -313,6 +313,15 @@ let in_ghost_block ?(battrs=[]) l =
                      get_statementloc (List.hd l),
                      get_statementloc (Extlib.last l)))
 
+let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
+  (* Prefix the builtin name with __fc_ to avoid collisions with real
+     world code. *)
+  let builtin = "__fc_" ^ builtin in
+  (* Build an expression representing the given type with a marker to indicate
+     the builtin for which this translation was made. *)
+  let info = SINGLE_INIT { expr_loc = loc; expr_node = VARIABLE builtin } in
+  { expr_loc = loc; expr_node = CAST ((specifier, decl_type), info) }
+
 %}
 
 %token <Filepath.position * string> SPEC
@@ -551,28 +560,31 @@ postfix_expression:                     /*(* 6.5.2 *)*/
 | postfix_expression LPAREN arguments RPAREN ghost_arguments_opt
     { make_expr $sloc (CALL ($1, $3, $5))}
 | BUILTIN_VA_ARG LPAREN expression COMMA type_name RPAREN {
+    let builtin = "__builtin_va_arg" in
     let b, d = $5 in
     let loc = Cil_datatype.Location.of_lexing_loc $loc($5) in
     let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
+    let type_as_expr = type_to_expr_for_builtin ~loc ~builtin b d in
     make_expr $sloc
       (CALL
           ({ expr_loc = loc_f;
-            expr_node = VARIABLE "__builtin_va_arg"},
-          [$3; { expr_loc = loc;
-                  expr_node = TYPE_SIZEOF (b, d)}],[]))
+            expr_node = VARIABLE builtin},
+          [$3; type_as_expr],[]))
   }
 | BUILTIN_TYPES_COMPAT LPAREN type_name COMMA type_name RPAREN {
+    let builtin = "__builtin_types_compatible_p" in
     let b1,d1 = $3 in
     let b2,d2 = $5 in
     let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in
     let loc1 = Cil_datatype.Location.of_lexing_loc $loc($3) in
     let loc2 = Cil_datatype.Location.of_lexing_loc $loc($5) in
+    let type_as_expr1 = type_to_expr_for_builtin ~loc:loc1 ~builtin b1 d1 in
+    let type_as_expr2 = type_to_expr_for_builtin ~loc:loc2 ~builtin b2 d2 in
     make_expr $sloc
       (CALL
           ({expr_loc = loc_f;
-            expr_node = VARIABLE "__builtin_types_compatible_p"},
-          [ { expr_loc = loc1; expr_node = TYPE_SIZEOF(b1,d1)};
-            { expr_loc = loc2; expr_node = TYPE_SIZEOF(b2,d2)}],[]))
+            expr_node = VARIABLE builtin},
+          [ type_as_expr1; type_as_expr2],[]))
   }
 | BUILTIN_OFFSETOF LPAREN type_name COMMA offsetof_member_designator RPAREN {
     let loc_f = Cil_datatype.Location.of_lexing_loc $loc($1) in

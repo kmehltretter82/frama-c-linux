@@ -1097,7 +1097,7 @@ class cil_printer () = object (self)
       let last = self#getLastNamedArgument () in
       self#instr fmt (Call(res,Cil.dummy_exp(Lval(Var vi,NoOffset)),[last],l))
 
-    (* In cparser we have turned the call to
+    (* In cabs2cil we have turned the call to
        __builtin_types_compatible_p(t1, t2) into
        __builtin_types_compatible_p(sizeof t1, sizeof t2), so that we can
        represent the types as expressions.

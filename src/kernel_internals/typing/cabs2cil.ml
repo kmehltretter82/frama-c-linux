@@ -260,7 +260,16 @@ let is_relational_bop = function
   | EQ | NE | LT | GT | LE | GE -> true
   | _ -> false
 
-let rec stripParen = function { expr_node = Cabs.PAREN e } -> stripParen e | e -> e
+let rec stripParen e =
+  match e with
+  | { expr_node = Cabs.PAREN e } -> stripParen e
+  | e -> e
+
+let is_for_builtin builtin info =
+  match info with
+  | SINGLE_INIT { expr_node = VARIABLE name } ->
+    String.equal ("__fc_" ^ builtin) name
+  | _ -> false
 
 let rec is_dangerous_offset = function
     NoOffset -> false
@@ -5814,6 +5823,26 @@ and doExp local_env
       in
       finishExp [] scope_chunk (new_exp ~loc (AlignOfE(e'')))
         (Machine.sizeof_type ())
+
+    (* In cparser, the types used as arguments of certain builtins are converted
+       to casts so that they can be represented as expressions. The following
+       matches are special cases to type those expressions. They are then
+       converted to `sizeof typ` for CIL. *)
+    | Cabs.CAST ((specs, dt), info)
+      when is_for_builtin "__builtin_types_compatible_p" info ->
+      let typ = doOnlyType loc local_env.is_ghost specs dt in
+      let res = new_exp ~loc (SizeOf typ) in
+      finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
+
+    | Cabs.CAST ((specs, dt), info)
+      when is_for_builtin "__builtin_va_arg" info ->
+      let typ = doOnlyType loc local_env.is_ghost specs dt in
+      if not (Cil.isCompleteType typ) then
+        Kernel.error ~current:true "__builtin_va_arg on incomplete type '%a'"
+          Cil_datatype.Typ.pretty typ;
+      let res = new_exp ~loc (SizeOf typ) in
+      finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
+    (* End of special casts. *)
 
     | Cabs.CAST ((specs, dt), ie) ->
       let s', dt', ie' = preprocessCast loc local_env.is_ghost specs dt ie in
