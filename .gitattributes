@@ -82,6 +82,7 @@ src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 
 *.dot -check-eoleof
 
+/tests/misc/commands_file.t/comments_and_newlines.txt -check-eoleof
 /tests/spec/unfinished-oneline-acsl-comment.i -check-eoleof
 /doc/developer/check_api/run.oracle -check-eoleof
 
