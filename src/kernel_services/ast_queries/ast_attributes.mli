@@ -65,13 +65,13 @@ val frama_c_ghost_else: string
 (** A varinfo marked with this attribute is known to be a ghost formal. *)
 val frama_c_ghost_formal: string
 
-(** a formal marked with this attribute is known to be a pointer to an
+(** A formal marked with this attribute is known to be a pointer to an
     object being initialized by the current function, which can thus assign
     any sub-object regardless of const status.
 *)
 val frama_c_init_obj: string
 
-(** a field struct marked with this attribute is known to be mutable, i.e.
+(** A field struct marked with this attribute is known to be mutable, i.e.
     it can be modified even on a const object.
 *)
 val frama_c_mutable: string
@@ -85,7 +85,7 @@ val frama_c_inlined : string
 (** {2 Attributes manipulations} *)
 (* ***************************** *)
 
-(** Returns the name of an attribute. *)
+(** Return the name of an attribute. *)
 val attribute_name : attribute -> string
 
 (** True if the named attribute appears in the attribute list. The list of
@@ -113,25 +113,13 @@ val drop_attribute : string -> attributes -> attribute list
 *)
 val drop_attributes : string list -> attributes -> attributes
 
-(** Returns the list of parameters associated to an attribute. The list is empty
+(** Return the list of parameters associated to an attribute. The list is empty
     if there is no such attribute or it has no parameters at all.
 *)
 val find_attribute : string -> attribute list -> attrparam list
 
-(** Retains attributes with the given name *)
+(** Retain attributes with the given name. *)
 val filter_attributes : string -> attribute list -> attribute list
-
-(** retains attributes corresponding to type qualifiers (6.7.3) *)
-val filter_qualifier_attributes : attribute list -> attribute list
-
-(** given some attributes on an array type, split them into those that belong
-    to the type of the elements of the array (currently, qualifiers such as
-    const and volatile), and those that must remain on the array, in that
-    order. *)
-val split_array_attributes : attribute list -> attribute list * attribute list
-
-(** Separate out the storage-modifier name attributes *)
-val split_storage_modifier: attribute list -> attribute list * attribute list
 
 (* **************************************** *)
 (** {2 Attributes classes and registration} *)
@@ -163,6 +151,9 @@ val attribute_hash : (string, attribute_class) Hashtbl.t
 (** Add a new attribute with a specified class *)
 val register_attribute : string -> attribute_class -> unit
 
+(** Register a list of attributes with a given class. *)
+val register_attribute : string list -> attribute_class -> unit
+
 (** Remove an attribute previously registered. *)
 val remove_attribute : string -> unit
 
@@ -184,3 +175,20 @@ val partition_attributes : default:attribute_class -> attribute list ->
   attribute list * (* AttrName *)
   attribute list * (* AttrFunType *)
   attribute list   (* AttrType *)
+
+(* **************************************** *)
+(** {2 Utility functions} *)
+(* **************************************** *)
+
+(** Retain attributes corresponding to type qualifiers (6.7.3) *)
+val filter_qualifier_attributes : attribute list -> attribute list
+
+(** Given some attributes on an array type, split them into those that belong
+    to the type of the elements of the array (currently, qualifiers such as
+    const and volatile), and those that must remain on the array, in that
+    order.
+*)
+val split_array_attributes : attribute list -> attribute list * attribute list
+
+(** Separate out the storage-modifier name attributes *)
+val split_storage_modifier: attribute list -> attribute list * attribute list

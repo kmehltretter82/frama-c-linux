@@ -24,23 +24,7 @@
 
 open Cil_types
 
-let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
-
-let anonymous_attribute_name = "fc_anonymous"
-
-let anonymous_attribute = Attr(anonymous_attribute_name, [])
-
-let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
-
-let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
-
-let cast_irrelevant_attributes = ["visibility"]
-
-let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
-
-let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
-
-(** Construct sorted lists of attributes ***)
+(* Construct sorted lists of attributes *)
 let attribute_name (Attr(an, _) | AttrAnnot an) =
   Extlib.strip_underscore an
 
@@ -58,7 +42,6 @@ let has_attribute an al =
 
    The result is [].
 *)
-
 let add_attribute (Attr(an, _) | AttrAnnot an as a) al =
   let rec insert_sorted = function
     | [] -> [a]
@@ -70,7 +53,7 @@ let add_attribute (Attr(an, _) | AttrAnnot an as a) al =
   in
   insert_sorted al
 
-(** The second attribute list is sorted *)
+(* The second attribute list is sorted *)
 let add_attributes al0 al =
   if al0 == [] then
     al
@@ -103,12 +86,6 @@ let filter_attributes an al =
   let an = Extlib.strip_underscore an in
   List.filter (fun a -> attribute_name a = an) al
 
-let filter_qualifier_attributes al =
-  List.filter (fun a -> List.mem (attribute_name a) qualifier_attributes) al
-
-let split_array_attributes al =
-  List.partition (fun a -> List.mem (attribute_name a) qualifier_attributes) al
-
 (**************************************)
 (* Attribute registration and classes *)
 (**************************************)
@@ -137,29 +114,7 @@ type attribute_class =
  * Extend this table with more attributes as you need. This table is used to
  * determine how to associate attributes with names or type during cabs2cil
  * conversion *)
-let attribute_hash : (string, attribute_class) Hashtbl.t =
-  let table = Hashtbl.create 13 in
-  List.iter (fun a -> Hashtbl.add table a (AttrName false))
-    [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
-      "no_instrument_function"; "alias"; "no_check_memory_usage";
-      "exception"; "model"; (* "restrict"; *)
-      "aconst"; "asm" (* Gcc uses this to specify the name to be used in
-                       * assembly for a global  *)];
-  (* Now come the MSVC declspec attributes *)
-  List.iter (fun a -> Hashtbl.add table a (AttrName true))
-    [ "thread"; "naked"; "dllimport"; "dllexport";
-      "selectany"; "allocate"; "nothrow"; "novtable"; "property";
-      "uuid"; "align" ];
-  List.iter (fun a -> Hashtbl.add table a (AttrFunType false))
-    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline"; ];
-  List.iter (fun a -> Hashtbl.add table a (AttrFunType true))
-    [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
-  List.iter (fun a -> Hashtbl.add table a AttrType)
-    ("mode" :: qualifier_attributes);
-  (* GCC label and statement attributes. *)
-  List.iter (fun a -> Hashtbl.add table a AttrStmt)
-    [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ];
-  table
+let attribute_hash : (string, attribute_class) Hashtbl.t = Hashtbl.create 59
 
 let register_attribute an ac =
   if Hashtbl.mem attribute_hash an then begin
@@ -176,6 +131,9 @@ let register_attribute an ac =
       an pp (Hashtbl.find attribute_hash an) pp ac
   end;
   Hashtbl.replace attribute_hash an ac
+
+let register_attributes ac al =
+  List.iter (fun a -> register_attribute a ac) al
 
 let remove_attribute = Hashtbl.remove attribute_hash
 
@@ -206,6 +164,103 @@ let partition_attributes
   in
   loop ([], [], []) attrs
 
+(* Registering some attributes. *)
+
+let () =
+  register_attributes (AttrName false)
+    [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
+      "no_instrument_function"; "alias"; "no_check_memory_usage";
+      "exception"; "model"; "aconst";
+      (* Gcc uses this to specify the name to be used in assembly for a global  *)
+      "asm" ]
+
+let () =
+  (* Now come the MSVC declspec attributes *)
+  register_attributes (AttrName true)
+    [ "thread"; "naked"; "dllimport"; "dllexport"; "selectany"; "allocate";
+      "nothrow"; "novtable"; "property"; "uuid"; "align" ]
+
+let () =
+  register_attributes (AttrFunType false)
+    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline" ]
+
+let () =
+  register_attributes (AttrFunType true)
+    [ "stdcall";"cdecl"; "fastcall"; "noreturn" ]
+
+let () = register_attributes AttrType [ "mode" ]
+
+let () =
+  (* GCC label and statement attributes. *)
+  register_attributes AttrStmt
+    [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
+
+let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
+let () = register_attribute bitfield_attribute_name AttrType
+
+let anonymous_attribute_name = "fc_anonymous"
+let () = register_attribute anonymous_attribute_name AttrIgnored
+
+let anonymous_attribute = Attr(anonymous_attribute_name, [])
+
+let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
+let () = register_attributes AttrType qualifier_attributes
+
+let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
+let () = register_attributes AttrIgnored fc_internal_attributes
+
+let cast_irrelevant_attributes = ["visibility"]
+let () = register_attributes AttrType cast_irrelevant_attributes
+
+let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
+
+let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
+
+let frama_c_ghost_else = "fc_ghost_else"
+let () = register_attribute frama_c_ghost_else (AttrStmt)
+
+let frama_c_ghost_formal = "fc_ghost_formal"
+let () = register_attribute frama_c_ghost_formal (AttrName false)
+
+let frama_c_init_obj = "fc_initialized_object"
+let () = register_attribute frama_c_init_obj (AttrName false)
+
+let frama_c_mutable = "fc_mutable"
+let () = register_attribute frama_c_mutable (AttrName false)
+
+let frama_c_inlined = "fc_inlined"
+let () = register_attribute frama_c_inlined (AttrFunType false)
+
+(* Forward declaration from Cil_datatype. *)
+
+let () =
+  Cil_datatype.drop_non_logic_attributes :=
+    drop_attributes spare_attributes_for_logic_cast
+
+let () =
+  Cil_datatype.drop_fc_internal_attributes :=
+    drop_attributes fc_internal_attributes
+
+let () =
+  Cil_datatype.drop_unknown_attributes :=
+    let is_annot_or_known_attr = function
+      | Attr (name, _) -> is_known_attribute name
+      (* Attribute annotations are always known. *)
+      | AttrAnnot _ -> true
+    in
+    (fun attributes ->
+       List.filter is_annot_or_known_attr attributes)
+
+(**********************)
+(* Utility functions  *)
+(**********************)
+
+let filter_qualifier_attributes al =
+  List.filter (fun a -> List.mem (attribute_name a) qualifier_attributes) al
+
+let split_array_attributes al =
+  List.partition (fun a -> List.mem (attribute_name a) qualifier_attributes) al
+
 let split_storage_modifier al =
   let isstoragemod (Attr(an, _) | AttrAnnot an : attribute) : bool =
     try
@@ -227,46 +282,3 @@ let split_storage_modifier al =
         ) stom
     in
     stom', rest
-
-let frama_c_ghost_else = "fc_ghost_else"
-let () = register_attribute frama_c_ghost_else (AttrStmt)
-
-let frama_c_ghost_formal = "fc_ghost_formal"
-let () = register_attribute frama_c_ghost_formal (AttrName false)
-
-let frama_c_init_obj = "fc_initialized_object"
-let () = register_attribute frama_c_init_obj (AttrName false)
-
-let frama_c_mutable = "fc_mutable"
-let () = register_attribute frama_c_mutable (AttrName false)
-
-let frama_c_inlined = "fc_inlined"
-let () = register_attribute frama_c_inlined (AttrFunType false)
-
-let () =
-  register_attribute bitfield_attribute_name AttrType;
-  register_attribute anonymous_attribute_name AttrIgnored;
-  List.iter
-    (fun a -> register_attribute a AttrIgnored)
-    fc_internal_attributes;
-  List.iter
-    (fun a -> register_attribute a AttrType)
-    cast_irrelevant_attributes
-
-let () =
-  Cil_datatype.drop_non_logic_attributes :=
-    drop_attributes spare_attributes_for_logic_cast
-
-let () =
-  Cil_datatype.drop_fc_internal_attributes :=
-    drop_attributes fc_internal_attributes
-
-let () =
-  Cil_datatype.drop_unknown_attributes :=
-    let is_annot_or_known_attr = function
-      | Attr (name, _) -> is_known_attribute name
-      (* Attribute annotations are always known. *)
-      | AttrAnnot _ -> true
-    in
-    (fun attributes ->
-       List.filter is_annot_or_known_attr attributes)

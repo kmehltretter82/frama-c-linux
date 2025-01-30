@@ -7221,49 +7221,29 @@ let setTypeAttrs t tattr = { t with tattr }
 (* **************************** *)
 
 let bitfield_attribute_name = bitfield_attribute_name
-
 let anonymous_attribute_name = anonymous_attribute_name
-
 let anonymous_attribute = anonymous_attribute
-
 let frama_c_ghost_else = frama_c_ghost_else
-
 let frama_c_ghost_formal = frama_c_ghost_formal
-
 let frama_c_init_obj = frama_c_init_obj
-
 let frama_c_mutable = frama_c_mutable
-
 let frama_c_inlined = frama_c_inlined
 
 let attributeName = attribute_name
-
 let hasAttribute = has_attribute
-
 let addAttribute = add_attribute
-
 let addAttributes = add_attributes
-
 let dropAttribute = drop_attribute
-
 let dropAttributes = drop_attributes
-
 let findAttribute = find_attribute
-
 let filterAttributes = filter_attributes
 
-let filter_qualifier_attributes = filter_qualifier_attributes
-
-let splitArrayAttributes = split_array_attributes
-
 let registerAttribute = register_attribute
-
 let removeAttribute = remove_attribute
-
 let attributeClass = get_attribute_class
-
 let isKnownAttribute = is_known_attribute
-
 let partitionAttributes = partition_attributes
 
+let filter_qualifier_attributes = filter_qualifier_attributes
+let splitArrayAttributes = split_array_attributes
 let separateStorageModifiers = split_storage_modifier
