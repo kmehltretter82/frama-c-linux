@@ -84,7 +84,6 @@ let register ?(closure=false) ~name structural_descr reprs =
        thus that is correct to check only the first one *)
     error ()
   | _ ->
-    if Hashtbl.mem types name then raise (AlreadyExists name);
     let digest = match structural_descr with
       | Structural_descr.Unknown ->
         (* unserializable type: weakest digest *)
@@ -98,9 +97,18 @@ let register ?(closure=false) ~name structural_descr reprs =
         digest = digest;
         structural_descr = structural_descr }
     in
-    let full_ty = { ty = ty; reprs = List.map Obj.repr reprs } in
-    Hashtbl.add types name full_ty;
-    ty
+    match Hashtbl.find_opt types name with
+    (* Either the type is already registered *)
+    | Some full_ty ->
+      (* then check that the new type is the same as the old one *)
+      if equal ty full_ty.ty
+      then full_ty.ty
+      else raise (AlreadyExists name)
+    (* or this is a brand new type *)
+    | None ->
+      let full_ty = { ty = ty; reprs = List.map Obj.repr reprs } in
+      Hashtbl.add types name full_ty;
+      ty
 
 let add_abstract_types = ref (fun _ _ -> ())
 
