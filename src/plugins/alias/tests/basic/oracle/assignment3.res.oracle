@@ -1,21 +1,16 @@
 [kernel] Parsing assignment3.c (with preprocessing)
-[alias] analysing function: main
-[alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *a = (int *)0;  is    <empty>
-[alias] analysing instruction: int b = 0;
-[alias] May-aliases after instruction  int b = 0;  are  <none>
-[alias] May-alias graph after instruction  int b = 0;  is    <empty>
-[alias] analysing instruction: int *c = (int *)0;
-[alias] May-aliases after instruction  int *c = (int *)0;  are  <none>
-[alias] May-alias graph after instruction  int *c = (int *)0;  is    <empty>
-[alias] analysing instruction: a = & b;
-[alias] May-aliases after instruction  a = & b;  are  <none>
-[alias] May-alias graph after instruction  a = & b;  is    0:{ a } → 1:{ b }
-[alias] analysing instruction: c = & b;
-[alias] May-aliases after instruction  c = & b;  are  { a; c }
-[alias] May-alias graph after instruction  c = & b;  is
+[alias] analysing global variable definiton: b = 0;
+[alias] May-aliases after global variable definition  b  are  <none>
+[alias] May-alias graph after global variable definition  b  is    <empty>
+[alias] analysing global variable definiton: a = & b;
+[alias] May-aliases after global variable definition  a  are  <none>
+[alias] May-alias graph after global variable definition  a  is
+  0:{ a } → 1:{ b }
+[alias] analysing global variable definiton: c = & b;
+[alias] May-aliases after global variable definition  c  are  { a; c }
+[alias] May-alias graph after global variable definition  c  is
   0:{ a } → 5:{ b }   4:{ c } → 5:{ b }
+[alias] analysing function: main
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are  { a; c }
 [alias] May-alias graph after instruction  __retres = 0;  is
