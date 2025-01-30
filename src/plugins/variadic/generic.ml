@@ -30,7 +30,7 @@ module Build = Cil_builder.Pure
 (* Types of variadic parameter and argument *)
 
 let vpar_typ tattr =
-  Cil_const.(mk_tptr ~tattr (mk_tptr ~tattr:[Attr ("const", [])] voidType))
+  Cil_const.(mk_tptr ~tattr (mk_tptr ~tattr:[("const", [])] voidType))
 let vpar_name = "__va_params"
 let vpar =
   (vpar_name, vpar_typ [], [])

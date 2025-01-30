@@ -111,10 +111,10 @@ let declaration = function
     -> GVarDecl(vi,loc)
   | GAsm(_,loc) -> GAsm("…",loc)
   | GText s when String.length s > 20 -> GText(String.sub s 0 20 ^ "…")
-  | GPragma(Attr(a,_),loc) -> GPragma(Attr(a,[]),loc)
+  | GPragma((a,_),loc) -> GPragma((a,[]),loc)
   | GAnnot _ -> GText "Global annotation"
   | ( GType _ | GCompTagDecl _ | GEnumTagDecl _
-    | GVarDecl _ | GText _ | GPragma _) as g -> g
+    | GVarDecl _ | GText _ ) as g -> g
 
 let signature_of_declaration = function
   | SEnum ei -> GEnumTagDecl(ei,Location.unknown)

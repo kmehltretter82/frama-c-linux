@@ -77,12 +77,12 @@ let charPtrType  = mk_tptr charType
 let scharPtrType = mk_tptr scharType
 let ucharPtrType = mk_tptr ucharType
 let charConstPtrType =
-  let charConst = mk_tint ~tattr:[Attr ("const", [])] IChar in
+  let charConst = mk_tint ~tattr:[("const", [])] IChar in
   mk_tptr charConst
 
 let voidPtrType = mk_tptr voidType
 let voidConstPtrType =
-  let voidConst = mk_tvoid ~tattr:[Attr ("const", [])] () in
+  let voidConst = mk_tvoid ~tattr:[("const", [])] () in
   mk_tptr voidConst
 
 let intPtrType  = mk_tptr intType

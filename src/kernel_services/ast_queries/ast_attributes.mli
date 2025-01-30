@@ -145,19 +145,19 @@ type attribute_class =
       ignored by functions {!get_attribute_class} and {!partition_attributes}. *)
   | AttrIgnored
 
-(* Table containing all registered attributes. *)
+(** Table containing all registered attributes. *)
 val attribute_hash : (string, attribute_class) Hashtbl.t
 
 (** Add a new attribute with a specified class *)
 val register_attribute : string -> attribute_class -> unit
 
 (** Register a list of attributes with a given class. *)
-val register_attribute : string list -> attribute_class -> unit
+val register_attributes : attribute_class -> string list ->  unit
 
 (** Remove an attribute previously registered. *)
 val remove_attribute : string -> unit
 
-(** Return the class of an attributes. The class `default' is returned for
+(** Return the class of an attribute. The class `default' is returned for
     unknown and ignored attributes.
 *)
 val get_attribute_class : default:attribute_class -> string -> attribute_class

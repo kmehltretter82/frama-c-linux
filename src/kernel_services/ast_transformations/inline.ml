@@ -262,7 +262,7 @@ let inliner functions_to_inline = object (self)
               callee return_aux args
           in
           let fun_name = Kernel_function.get_name callee in
-          let new_attribute = Attr (Ast_attributes.frama_c_inlined,[AStr fun_name]) in
+          let new_attribute = (Ast_attributes.frama_c_inlined, [AStr fun_name]) in
           block.battrs <- Ast_attributes.add_attribute new_attribute block.battrs;
           let skind =
             if needs_assign then begin

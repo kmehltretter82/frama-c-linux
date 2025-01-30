@@ -69,15 +69,10 @@ class annotateFunFromDeclspec =
     in
     aux attrparam
   in
-  let recover_from_attribute params attr =
-    match attr with
-    | Attr(name,attrparams) ->
-      begin
-        try
-          Some(name, List.map (recover_from_attr_param params) attrparams)
-        with No_recovery -> None
-      end
-    | AttrAnnot _ -> None
+  let recover_from_attribute params (name,attrparams) =
+    try
+      Some(name, List.map (recover_from_attr_param params) attrparams)
+    with No_recovery -> None
   in
 
   (* Add precondition based on declspec on parameters *)

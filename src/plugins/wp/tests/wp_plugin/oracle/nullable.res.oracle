@@ -50,7 +50,7 @@ Prove: true.
        requires \separated(p, &x);
        requires p ≢ \null ⇒ \separated(g, p, &x);
      */
-  void nullable_coherence(int *p /*@ wp_nullable */);
+  void nullable_coherence(int *p __attribute__((__wp_nullable__)));
 [wp] nullable.i:24: Warning: 
   Memory model hypotheses for function 'nullable_in_context':
   /*@
@@ -67,6 +67,7 @@ Prove: true.
        requires r ≢ \null ⇒ p ≢ \null ⇒ \separated(r, p);
        requires r ≢ \null ⇒ q ≢ \null ⇒ \separated(r, q);
      */
-  void nullable_in_context(int *p /*@ wp_nullable */,
-                           int *q /*@ wp_nullable */,
-                           int *r /*@ wp_nullable */, int *s, int *t);
+  void nullable_in_context(int *p __attribute__((__wp_nullable__)),
+                           int *q __attribute__((__wp_nullable__)),
+                           int *r __attribute__((__wp_nullable__)), int *s,
+                           int *t);

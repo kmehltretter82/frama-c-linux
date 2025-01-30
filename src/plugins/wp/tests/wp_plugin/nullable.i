@@ -9,7 +9,7 @@ int x ;
 int *g ;
 
 /*@ assigns *g, *p, x ; */
-void nullable_coherence(int* p /*@ wp_nullable */){
+void nullable_coherence(int* p __attribute__((wp_nullable))){
   if(p == (void*)0){
     //@ check must_fail: \false ;
     return;
@@ -22,9 +22,9 @@ void nullable_coherence(int* p /*@ wp_nullable */){
 
 //@ assigns *p, *q, *r, *s, *t ;
 void nullable_in_context
-(int* p /*@ wp_nullable */,
- int* q /*@ wp_nullable */,
- int* r /*@ wp_nullable */,
+(int* p __attribute__((wp_nullable)),
+ int* q __attribute__((wp_nullable)),
+ int* r __attribute__((wp_nullable)),
  int* s, int* t)
 {
   *p = 42;

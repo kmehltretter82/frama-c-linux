@@ -45,7 +45,7 @@
 open Cil_datatype
 open Cil_types
 
-let typeAddVolatile typ = Cil.typeAddAttributes [Attr ("volatile", [])] typ
+let typeAddVolatile typ = Cil.typeAddAttributes [("volatile", [])] typ
 
 module Frama_c_builtins =
   State_builder.Hashtbl

@@ -373,15 +373,13 @@ and typ_node =
 (** {2 Attributes} *)
 (* ************************************************************************* *)
 
-and attribute =
-  | Attr of string * attrparam list
-  (** An attribute has a name and some optional parameters. The name should not
-      start or end with underscore. When CIL parses attribute names it will
-      strip leading and ending underscores (to ensure that the multitude of GCC
-      attributes such as const, __const and __const__ all mean the same
-      thing.) *)
-
-  | AttrAnnot of string
+(** An attribute has a name and some optional parameters. The name should not
+    start or end with underscore. When CIL parses attribute names it will
+    strip leading and ending underscores (to ensure that the multitude of GCC
+    attributes such as const, __const and __const__ all mean the same
+    thing.)
+*)
+and attribute = string * attrparam list
 
 (** Attributes are lists sorted by the attribute name. Use the functions
     {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to

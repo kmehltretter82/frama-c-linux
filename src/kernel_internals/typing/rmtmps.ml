@@ -132,7 +132,7 @@ let categorizePragmas ast =
     in
 
     function
-    | GPragma (Attr ("cilnoremove" as directive, args), (location,_)) ->
+    | GPragma (("cilnoremove" as directive, args), (location,_)) ->
       (* a very flexible pragma: can retain typedefs, enums,
        * structs, unions, or globals (functions or variables) *)
       begin
@@ -174,7 +174,7 @@ let categorizePragmas ast =
         (* Look for alias attributes, e.g. Linux modules *)
         match Ast_attributes.filter_attributes "alias" v.vattr with
         | [] -> ()  (* ordinary prototype. *)
-        | [ Attr("alias", [AStr othername]) ] ->
+        | [ ("alias", [AStr othername]) ] ->
           Hashtbl.add keepers.defines othername ()
         | _ ->
           Kernel.fatal ~current:true
@@ -224,8 +224,8 @@ let isPragmaRoot keepers = function
 *)
 let hasExportingAttribute funvar =
   let isExportingAttribute = function
-    | Attr ("constructor", []) -> true
-    | Attr ("destructor", []) -> true
+    | ("constructor", []) -> true
+    | ("destructor", []) -> true
     | _ -> false
   in
   List.exists isExportingAttribute funvar.vattr

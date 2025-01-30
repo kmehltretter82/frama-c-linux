@@ -91,8 +91,3 @@ val mk_behavior :
   Logic_ptree.behavior
 
 val mk_asm_templates : string list -> string list
-val mk_attr_annot : string -> Cabs.attribute
-(** builds a Cabs attribute annotation
-
-    @since 28.0-Nickel
-*)

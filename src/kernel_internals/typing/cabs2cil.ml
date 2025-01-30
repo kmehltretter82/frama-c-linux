@@ -98,15 +98,6 @@ let () =
     (fun a -> Ast_attributes.register_attribute a AttrIgnored)
     erased_attributes
 
-(* JS: return [Some s] if the attribute string is the attribute annotation [s]
-   and [None] if it is not an annotation. *)
-let attrAnnot s =
-  let r = Str.regexp "~attrannot:\\(.+\\)" in
-  if Str.string_match r s 0 then
-    try Some (Str.matched_group 1 s) with Not_found -> assert false
-  else
-    None
-
 let stripUnderscore s =
   if String.length s = 1 then begin
     if s = "_" then
@@ -119,11 +110,6 @@ let stripUnderscore s =
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
-      match attrAnnot res with
-      | Some _ ->
-        (* Attribute annotation are always considered known *)
-        ()
-      | None ->
         if not (Ast_attributes.is_known_attribute res) then
           Kernel.warning
             ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
@@ -391,7 +377,7 @@ let get_current_stdheader () =
 *)
 let (>>?) opt f =
   match opt with
-  | Some (Attr(name, args)) -> f name args
+  | Some (name, args) -> f name args
   | _ -> opt
 
 let process_stdlib_pragma name args =
@@ -403,8 +389,8 @@ let process_stdlib_pragma name args =
       let relative_name = Filepath.relativize ~base_name s in
       push_stdheader relative_name;
       None
-    | _ -> Some (Attr(name, args))
-  end else Some (Attr(name, args))
+    | _ -> Some (name, args)
+  end else Some (name, args)
 
 let fc_stdlib_attribute attrs =
   let open Ast_attributes in
@@ -417,7 +403,7 @@ let fc_stdlib_attribute attrs =
         drop_attribute fc_stdlib attrs
       end else [AStr s], attrs
     in
-    add_attribute (Attr (fc_stdlib, payload)) attrs
+    add_attribute (fc_stdlib, payload) attrs
   end
 (* ICC align/noalign pragmas (not supported by GCC/MSVC with this syntax).
    Implemented by translating them to 'aligned' attributes. Currently,
@@ -512,7 +498,7 @@ let process_pack_pragma name args =
               "packing pragma: setting alignment to %a" Integer.pretty n;
             current_packing_pragma := new_pragma; None
           end else
-            Some (Attr (name, args))
+            Some (name, args)
         | [ACons ("push",[])] (* #pragma pack(push) *) ->
           Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
             "packing pragma: pushing alignment %t" pretty_current_packing_pragma;
@@ -526,7 +512,7 @@ let process_pack_pragma name args =
             Stack.push !current_packing_pragma packing_pragma_stack;
             current_packing_pragma:= new_pragma; None
           end else
-            Some (Attr (name, args))
+            Some (name, args)
         | ACons ("push",[]) :: args (* unknown push directive *) ->
           Kernel.warning ~current:true
             "Unsupported argument for pragma pack push directive: `%a'."
@@ -554,20 +540,20 @@ let process_pack_pragma name args =
               None
           end
         | [ACons ("show",[])] (* #pragma pack(show) *) ->
-          Some (Attr (name, args))
+          Some (name, args)
         | _ ->
           Kernel.warning ~current:true
             "Unsupported packing pragma not honored by Frama-C: #pragma pack(%a)"
             (Pretty_utils.pp_list ~sep:", " ~empty:"<empty>"
                Cil_printer.pp_attrparam) args;
-          Some (Attr (name, args))
+          Some (name, args)
       end
-    | _ -> Some (Attr (name, args))
+    | _ -> Some (name, args)
   end
 
 let force_packed_attribute a =
   if Ast_attributes.has_attribute "packed" a then a
-  else Ast_attributes.add_attribute (Attr("packed",[])) a
+  else Ast_attributes.add_attribute ("packed",[]) a
 
 let is_power_of_two i = i > 0 && i land (i-1) = 0
 
@@ -591,7 +577,7 @@ let eval_aligned_attrparams aps =
 let warn_invalid_align_attribute aps =
   Kernel.warning ~current:true ~once:true
     "ignoring invalid aligned attribute: %a"
-    Cil_printer.pp_attribute (Attr("aligned", aps))
+    Cil_printer.pp_attribute ("aligned", aps)
 
 (* If there is more than one 'aligned' attribute, GCC's behavior is to
    consider the maximum among them. This function computes this value
@@ -602,7 +588,7 @@ let combine_aligned_attributes attrs =
   | aligned_attrs ->
     List.fold_left (fun acc attr ->
         match attr with
-        | Attr("aligned", aps) ->
+        | ("aligned", aps) ->
           begin
             let align = eval_aligned_attrparams aps in
             if align = None then begin
@@ -614,6 +600,7 @@ let combine_aligned_attributes attrs =
               | Some old_n, Some new_n -> Some (Integer.max old_n new_n)
           end
         | _ -> assert false (* attributes were previously filtered by name *)
+
       ) None aligned_attrs
 
 let warn_incompatible_pragmas_attributes apragma has_attrs =
@@ -630,7 +617,7 @@ let warn_incompatible_pragmas_attributes apragma has_attrs =
 let check_aligned attrs =
   List.fold_right (fun attr acc ->
       match attr with
-      | Attr("aligned", aps) ->
+      | ("aligned", aps) ->
         if eval_aligned_attrparams aps = None then
           (warn_invalid_align_attribute aps; acc)
         else attr :: acc
@@ -661,7 +648,7 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
           Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
             Integer.pretty n ci.cname;
-          add_attribute (Attr("aligned",[AInt n])) (drop_attribute "aligned" cattrs)
+          add_attribute ("aligned",[AInt n]) (drop_attribute "aligned" cattrs)
         end
       | Some local ->
         (* The largest aligned wins with GCC. Don't know
@@ -670,7 +657,7 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
         Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
           Integer.pretty align ci.cname;
-        add_attribute (Attr("aligned",[AInt align]))
+        add_attribute ("aligned",[AInt align])
           (drop_attribute "aligned" cattrs)
     in
     force_packed_attribute with_aligned_attributes
@@ -679,7 +666,7 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
   | None, Some false ->
     force_packed_attribute
       (add_attribute
-         (Attr("aligned",[AInt Integer.one]))
+         (("aligned",[AInt Integer.one]))
          (drop_attribute "aligned" cattrs))
 
 (* Takes into account the possible effect of '#pragma pack' directives on
@@ -721,13 +708,13 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
         "%s aligned(%a) attribute to field '%s.%s' due to packing pragma"
         (if Option.is_none field_align then "adding" else "setting")
         Integer.pretty new_align fi.fcomp.cname fi.fname;
-      let new_attr = Attr ("aligned", [AInt new_align]) in
+      let new_attr = ("aligned", [AInt new_align]) in
       add_attribute new_attr (drop_attribute "aligned" fattrs)
   | None, Some true ->
     drop_attribute "aligned" fattrs
   | None, Some false ->
     (add_attribute
-       (Attr("aligned",[AInt Integer.one]))
+       ("aligned",[AInt Integer.one])
        (drop_attribute "aligned" fattrs))
 
 
@@ -2576,7 +2563,7 @@ let rec clean_up_cond_locals =
 let cabsAddAttributes al0 (al: attributes) : attributes =
   if al0 == [] then al else
     List.fold_left
-      (fun acc (Attr(an, _) | AttrAnnot an as a) ->
+      (fun acc ((an, _) as a) ->
          (* See if the attribute is already in there *)
          match Ast_attributes.filter_attributes an acc with
          | [] -> Ast_attributes.add_attribute a acc (* Nothing with that name *)
@@ -2627,7 +2614,7 @@ let rec cabsTypeCombineAttributes what a0 t =
           List.fold_left
             (fun (ik', a0') a0one ->
                match a0one with
-               | Attr("mode", [ACons(mode,[])]) -> begin
+               | ("mode", [ACons(mode,[])]) -> begin
                    (* (trace "gccwidth" (dprintf "I see mode %s applied to an int type\n"
                                         mode )); *)
                    (* the cases below encode the 32-bit assumption.. *)
@@ -2880,7 +2867,7 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
   cabsPushGlobal (GFunDecl (funspec, v, Cil_builtins.builtinLoc));
   Cil.unsafeSetFormalsDecl v args;
   if force_keep then
-    v.vattr <- Ast_attributes.add_attribute (Attr ("FC_BUILTIN",[])) v.vattr;
+    v.vattr <- Ast_attributes.add_attribute ("FC_BUILTIN",[]) v.vattr;
   v
 
 (*  builtin is never ghost *)
@@ -3931,7 +3918,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let locals = b.blocals in
       b.blocals <- [];
       b.battrs <-
-      Ast_attributes.add_attributes [Attr(frama_c_keep_block,[])] b.battrs;
+        Ast_attributes.add_attributes [(frama_c_keep_block,[])] b.battrs;
       let block = mkStmt ~ghost ~valid_sid (Block b) in
       let chunk = s2c block in
       let chunk = { chunk with cases = current_chunk.cases } in
@@ -4498,7 +4485,6 @@ and convertCVtoAttr (src: Cabs.cvspec list) : Cabs.attribute list =
   | CV_CONST    :: tl -> ("const",[])    :: (convertCVtoAttr tl)
   | CV_VOLATILE :: tl -> ("volatile",[]) :: (convertCVtoAttr tl)
   | CV_RESTRICT :: tl -> ("restrict",[]) :: (convertCVtoAttr tl)
-  | CV_ATTRIBUTE_ANNOT a :: tl -> (Cabshelper.mk_attr_annot a) :: convertCVtoAttr tl
   | CV_GHOST    :: tl -> ("ghost",[]) :: (convertCVtoAttr tl)
 
 and makeVarInfoCabs
@@ -4579,9 +4565,6 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
   (* Strip the leading and trailing underscore *)
   match a with
   | ("__attribute__", []) -> []  (* An empty list of gcc attributes *)
-  | (s, []) ->
-    let s = stripUnderscore s in
-    [ match attrAnnot s with None -> Attr(s, []) | Some s -> AttrAnnot s ]
   | (s, el) ->
 
     let rec attrOfExp (strip: bool)
@@ -4655,7 +4638,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     (* Sometimes we need to convert attrarg into attr *)
     let arg2attrs = function
       | ACons (s, _) when List.mem s erased_attributes -> []
-      | ACons (s, args) -> [Attr (s, args)]
+      | ACons (s, args) -> [(s, args)]
       | a ->
         Kernel.fatal ~current:true
           "Invalid form of attribute: %a"
@@ -4669,7 +4652,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     else if s = "__declspec" then
       fold_attrs (attrOfExp false ~foldenum:false) el
     else
-      [Attr(stripUnderscore s, List.map (attrOfExp ~foldenum:false false) el)]
+      [(stripUnderscore s, List.map (attrOfExp ~foldenum:false false) el)]
 
 and doAttributes (ghost:bool) (al: Cabs.attribute list) : attribute list =
   List.fold_left (fun acc a -> cabsAddAttributes (doAttr ghost a) acc) [] al
@@ -4687,7 +4670,7 @@ and cabsPartitionAttributes
     | a :: rest ->
       let an, kind = match doAttr ghost a with
         | [] -> "", default
-        | (Attr(an, _) | AttrAnnot an)::_ ->
+        | (an, _)::_ ->
           (* doAttr already strip underscores of the attribute if necessary so
              we do not need to strip then before calling get_attribute_class
              here. *)
@@ -4708,9 +4691,9 @@ and cabsPartitionAttributes
 
 and doType (ghost:bool) (context: type_context)
     (nameortype: Ast_attributes.attribute_class) (* This is AttrName if we are doing
-                                  * the type for a name, or AttrType
-                                  * if we are doing this type in a
-                                  * typedef *)
+                                   * the type for a name, or AttrType
+                                   * if we are doing this type in a
+                                   * typedef *)
     ?(allowZeroSizeArrays=false)
     ?(allowVarSizeArrays=false)
     (bt: typ)                    (* The base type *)
@@ -5005,13 +4988,13 @@ and doType (ghost:bool) (context: type_context)
           | None -> []
           | Some l -> begin
               let static = if Ast_attributes.has_attribute "static" a then
-                  [Attr ("static",[])]
+                  [("static",[])]
                 else []
               in
               (* Transform the length into an attribute expression *)
               try
                 let la : attrparam = expToAttrParam l in
-                Attr("arraylen", [ la ]) :: static
+                ("arraylen", [ la ]) :: static
               with NotAnAttrParam _ -> begin
                   Kernel.warning ~once:true ~current:true
                     "Cannot represent the length '%a' of array as an attribute"
@@ -5055,7 +5038,7 @@ and doType (ghost:bool) (context: type_context)
           let arg_type_from_vi vi =
             let attrs =
               if vi.vghost then
-                cabsAddAttributes [Attr (Ast_attributes.frama_c_ghost_formal, [])] vi.vattr
+                cabsAddAttributes [(Ast_attributes.frama_c_ghost_formal, [])] vi.vattr
               else
                 vi.vattr
             in (vi.vname, vi.vtype, attrs)
@@ -5232,7 +5215,7 @@ and makeCompType loc ghost (isstruct: bool)
               end;
               let ftype =
                 typeAddAttributes
-                  [Attr (Ast_attributes.bitfield_attribute_name, [AInt (Integer.of_int s)])]
+                  [(Ast_attributes.bitfield_attribute_name, [AInt (Integer.of_int s)])]
                   ftype
               in
               w, ftype
@@ -6501,7 +6484,7 @@ and doExp local_env
                 Kernel.debug ~dkey:Kernel.dkey_typing_global
                   "Calling function %s without prototype." n ;
                 let ftype =
-                  mk_tfun ~tattr:[Attr("missingproto",[])] intType None false
+                  mk_tfun ~tattr:[("missingproto",[])] intType None false
                 in
                 (* Add a prototype to the environment *)
                 let proto, _ =
@@ -8913,7 +8896,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     in
     checkArray inite vi;
     vi.vname <- newname;
-    let attrs = Ast_attributes.add_attribute (Attr (fc_local_static,[])) vi.vattr in
+    let attrs = Ast_attributes.add_attribute (fc_local_static,[]) vi.vattr in
     vi.vattr <- fc_stdlib_attribute attrs;
 
     (* However, we have a problem if a real global appears later with the
@@ -8981,7 +8964,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     if isvarsize then begin
       let free = vla_free_fun () in
       let destructor = AStr free.vname in
-      let attr = Attr (frama_c_destructor, [destructor]) in
+      let attr = (frama_c_destructor, [destructor]) in
       vi.vdefined <- true;
       vi.vattr <- Ast_attributes.add_attribute attr vi.vattr;
     end;
@@ -9208,7 +9191,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
          | [] -> (* ordinary prototype. *)
            ignore (createGlobal l local_env.is_ghost logic_spec spec_res name)
          (*  E.log "%s is not aliased\n" name *)
-         | [Attr("alias", [AStr othername])] ->
+         | [("alias", [AStr othername])] ->
            if not (isFunctionType vtype) || local_env.is_ghost then begin
              Kernel.warning ~current:true
                "%a: CIL only supports attribute((alias)) for C functions."
@@ -9257,7 +9240,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
 
   | Cabs.PRAGMA (a, _) when isglobal -> begin
       match doAttr local_env.is_ghost ("dummy", [a]) with
-      | [Attr("dummy", [a'])] ->
+      | [("dummy", [a'])] ->
         let a'' =
           match a' with
           | ACons (s, args) ->
@@ -9266,7 +9249,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
             process_pack_pragma
           | _ -> (* Cil.fatal "Unexpected attribute in #pragma" *)
             Kernel.warning ~current:true "Unexpected attribute in #pragma";
-            Some (Attr ("", [a']))
+            Some ( ("", [a']))
         in
         Option.iter
           (fun a'' ->
@@ -10023,7 +10006,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
     let b = c2block ~ghost c in
-    b.battrs <- Ast_attributes.add_attributes [Attr(frama_c_keep_block,[])] b.battrs;
+    b.battrs <- Ast_attributes.add_attributes [(frama_c_keep_block,[])] b.battrs;
     let res = s2c (mkStmt ~ghost ~valid_sid (Block b)) in
     { res with cases = c.cases }
 
@@ -10044,7 +10027,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let loc' = convLoc loc in
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
-    loopChunk ~ghost ~sattr:[Attr("while",[])] a
+    loopChunk ~ghost ~sattr:[("while",[])] a
       ((doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond)
        @@@ (s', ghost))
 
@@ -10079,7 +10062,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
              CNoConst e skipChunk (breakChunk ~ghost loc'))
       in
       exitLoop ();
-      loopChunk ~ghost ~sattr:[Attr("dowhile",[])] a (s' @@@ (s'', ghost))
+      loopChunk ~ghost ~sattr:[("dowhile",[])] a (s' @@@ (s'', ghost))
 
   | Cabs.FOR(a,fc1,e2,e3,s,loc) -> begin
       let loc' = convLoc loc in
@@ -10107,7 +10090,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         | _ ->
           doCondition ~is_loop:true local_env CNoConst e2 skipChunk break_cond @@@ (c, ghost)
       in
-      let res = se1 @@@ (loopChunk ~sattr:[Attr("for",[])] ~ghost a c, ghost) in
+      let res = se1 @@@ (loopChunk ~sattr:[("for",[])] ~ghost a c, ghost) in
       exitScope ();
       if has_decl then begin
         let chunk = s2c (mkStmt ~ghost ~valid_sid (Block (c2block ~ghost res)))

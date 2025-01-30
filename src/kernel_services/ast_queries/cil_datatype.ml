@@ -407,12 +407,8 @@ type type_compare_config =
     unroll: bool;
     no_attrs:bool; }
 
-let rec compare_attribute config a1 a2 = match a1, a2 with
-  | Attr (s1, l1), Attr (s2, l2) ->
-    compare_chain (=?=) s1 s2 (compare_attrparam_list config) l1 l2
-  | AttrAnnot s1, AttrAnnot s2 -> s1 =?= s2
-  | Attr _, AttrAnnot _ -> -1
-  | AttrAnnot _, Attr _ -> 1
+let rec compare_attribute config (s1, l1) (s2, l2) =
+  compare_chain (=?=) s1 s2 (compare_attrparam_list config) l1 l2
 and compare_attributes config  l1 l2 =
   if config.no_attrs then 0
   else
@@ -525,11 +521,10 @@ and compare_arg_list  config l1 l2 =
           compare_type config t1 t2
        )) l1 l2
 
-let hash_attribute _config = function
-  | AttrAnnot s -> Hashtbl.hash s
-  | Attr (s, _) -> (* We do not hash attrparams. There is a recursivity problem
-                      with typ, and the equal function will be complicated enough in itself *)
-    3 * Hashtbl.hash s + 117
+let hash_attribute _config (s, _) =
+  (* We do not hash attrparams. There is a recursivity problem with typ, and the
+     equal function will be complicated enough in itself *)
+  3 * Hashtbl.hash s + 117
 let hash_attributes config l =
   let attrs = if config.logic_type then !drop_non_logic_attributes l else l in
   hash_list (hash_attribute config) attrs
@@ -573,7 +568,7 @@ module Attribute=struct
           { by_name = false; logic_type = false;
             unroll = true; no_attrs = false }
         let name = "Attribute"
-        let reprs = [ AttrAnnot "" ]
+        let reprs = [ ("", []) ]
         let compare = compare_attribute config
         let hash = hash_attribute config
         let equal = Datatype.from_compare

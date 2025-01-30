@@ -25,7 +25,7 @@
 open Cil_types
 
 (* Construct sorted lists of attributes *)
-let attribute_name (Attr(an, _) | AttrAnnot an) =
+let attribute_name (an, _) =
   Extlib.strip_underscore an
 
 let has_attribute an al =
@@ -42,10 +42,10 @@ let has_attribute an al =
 
    The result is [].
 *)
-let add_attribute (Attr(an, _) | AttrAnnot an as a) al =
+let add_attribute ((an, _) as a) al =
   let rec insert_sorted = function
     | [] -> [a]
-    | ((Attr(an0, _) | AttrAnnot an0 as a0) :: rest) as l ->
+    | (((an0, _) as a0) :: rest) as l ->
       if an < an0 then a :: l
       else if Cil_datatype.Attribute.equal a a0 then l (* Do not add if already in there *)
       else a0 :: insert_sorted rest (* Make sure we see all attributes with
@@ -76,10 +76,8 @@ let rec drop_attributes anl al =
 
 let find_attribute an al =
   let an = Extlib.strip_underscore an in
-  List.fold_left (fun acc a ->
-      match a with
-      | Attr (_, param) as a0 when attribute_name a0 = an -> param @ acc
-      | _ -> acc
+  List.fold_left (fun acc ((_, param) as a) ->
+      if attribute_name a = an then param @ acc else acc
     ) [] al
 
 let filter_attributes an al =
@@ -150,8 +148,8 @@ let partition_attributes
     (attrs:  attribute list) :
   attribute list * attribute list * attribute list =
   let rec loop (n,f,t) = function
-      [] -> n, f, t
-    | (Attr(an, _) | AttrAnnot an as a) :: rest ->
+    | [] -> n, f, t
+    | ((an, _) as a) :: rest ->
       match get_attribute_class ~default an with
         AttrName _ -> loop (add_attribute a n, f, t) rest
       | AttrFunType _ ->
@@ -201,7 +199,7 @@ let () = register_attribute bitfield_attribute_name AttrType
 let anonymous_attribute_name = "fc_anonymous"
 let () = register_attribute anonymous_attribute_name AttrIgnored
 
-let anonymous_attribute = Attr(anonymous_attribute_name, [])
+let anonymous_attribute = (anonymous_attribute_name, [])
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 let () = register_attributes AttrType qualifier_attributes
@@ -243,13 +241,10 @@ let () =
 
 let () =
   Cil_datatype.drop_unknown_attributes :=
-    let is_annot_or_known_attr = function
-      | Attr (name, _) -> is_known_attribute name
-      (* Attribute annotations are always known. *)
-      | AttrAnnot _ -> true
+    let is_annot_or_known_attr (name, _) =
+      is_known_attribute name
     in
-    (fun attributes ->
-       List.filter is_annot_or_known_attr attributes)
+    (fun attributes -> List.filter is_annot_or_known_attr attributes)
 
 (**********************)
 (* Utility functions  *)
@@ -262,7 +257,7 @@ let split_array_attributes al =
   List.partition (fun a -> List.mem (attribute_name a) qualifier_attributes) al
 
 let split_storage_modifier al =
-  let isstoragemod (Attr(an, _) | AttrAnnot an : attribute) : bool =
+  let isstoragemod ((an, _) : attribute) : bool =
     try
       match Hashtbl.find attribute_hash an with
       | AttrName issm -> issm
@@ -275,10 +270,6 @@ let split_storage_modifier al =
     (* Put back the declspec. Put it without the leading __ since these will
      * be added later *)
     let stom' =
-      List.map (fun a ->
-          match a with
-          | Attr(an, args) -> Attr("declspec", [ACons(an, args)])
-          | AttrAnnot _ -> assert false
-        ) stom
+      List.map (fun (an, args) -> ("declspec", [ACons(an, args)])) stom
     in
     stom', rest

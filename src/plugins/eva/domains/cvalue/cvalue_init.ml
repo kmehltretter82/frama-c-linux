@@ -57,7 +57,7 @@ type validity_hidden_base =
   | KnownThenUnknownValidity of Integer.t (* Base is valid on i bits, then
                                              maybe invalid on the remainder of its validity *)
 
-let stdlib_attribute = Attr ("fc_stdlib_generated", [])
+let stdlib_attribute = ("fc_stdlib_generated", [])
 
 let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
   let hidden_var = Eva_utils.create_new_var hidden_var_name pointed_typ in

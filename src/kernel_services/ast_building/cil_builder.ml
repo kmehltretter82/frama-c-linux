@@ -90,7 +90,7 @@ struct
   let attribute (s, t) name params =
     match t with
     | Ctype t ->
-      let tattr = Ast_attributes.add_attribute (Attr (name, params)) t.tattr in
+      let tattr = Ast_attributes.add_attribute (name, params) t.tattr in
       s, Ctype { t with tattr }
     | _ -> raise NotACType
 
@@ -835,7 +835,7 @@ struct
   let if_ ?(ghost_else=false) cond ~then_ ~else_ =
     let else_attributes =
       if ghost_else
-      then [Cil_types.Attr (Ast_attributes.frama_c_ghost_else,[])]
+      then [(Ast_attributes.frama_c_ghost_else,[])]
       else []
     in
     `stmt (If (
@@ -1087,7 +1087,7 @@ struct
       Cil_types.If (ifthen_exp, block, Cil.mkBlock [], b.loc)
     | IfThenElse { ifthenelse_exp; then_block; ghost_else } ->
       if ghost_else then
-        block.battrs <- [Cil_types.Attr (Ast_attributes.frama_c_ghost_else,[])];
+        block.battrs <- [(Ast_attributes.frama_c_ghost_else,[])];
       Cil_types.If (ifthenelse_exp, then_block, block, b.loc)
     | Switch { switch_exp } ->
       let open Cil_types in
@@ -1349,7 +1349,7 @@ struct
     fundec.svar.vattr <- Ast_attributes.add_attribute attr fundec.svar.vattr
 
   let add_new_attribute attr params =
-    add_attribute (Cil_types.Attr (attr, params))
+    add_attribute (attr, params)
 
   let add_stdlib_generated () =
     add_new_attribute "fc_stdlib_generated" []

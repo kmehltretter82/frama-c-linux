@@ -61,7 +61,7 @@ let noGhostFD prj fd =
             DoChildren
           | _ ->
             let o = self#original s in
-            s.sattr <- if has_annot o then [AttrAnnot annot_attr] else [] ;
+            s.sattr <- if has_annot o then [(annot_attr, [])] else [] ;
             DoChildren
         end
 

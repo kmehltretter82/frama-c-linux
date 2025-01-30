@@ -231,7 +231,7 @@ let typeHasAttributeMemoryBlock a (ty:typ): bool =
 
 let typeAddGhost typ =
   if not (typeHasAttribute "ghost" typ) then
-    typeAddAttributes [Attr ("ghost", [])] typ
+    typeAddAttributes [("ghost", [])] typ
   else
     typ
 
@@ -917,7 +917,7 @@ let transient_block b =
       "ignoring request to mark transient a block with local variables:@\n%a"
       Cil_datatype.Block.pretty b
   end else
-    b.battrs <- add_attribute (Attr (vis_tmp_attr,[])) b.battrs; b
+    b.battrs <- add_attribute (vis_tmp_attr,[]) b.battrs; b
 
 let block_of_transient b =
   if has_attribute vis_tmp_attr b.battrs then begin
@@ -2033,7 +2033,7 @@ and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
     let make i = mkStmt ~ghost:res.ghost (Instr i) in
     let last = mkStmt ~ghost:res.ghost res.skind in
     let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
-    block.battrs <- add_attribute (Attr (vis_tmp_attr, [])) block.battrs;
+    block.battrs <- add_attribute (vis_tmp_attr, []) block.battrs;
     (* Make our statement contain the instructions to prepend *)
     res.skind <- Block block;
     vis#pop_stmt s; res
@@ -2305,14 +2305,10 @@ and visitCilAttributes (vis: cilVisitor) (al: attribute list) : attribute list=
     add_attributes al' []
   else
     al
-and childrenAttribute (vis: cilVisitor) (a: attribute) : attribute =
+and childrenAttribute (vis: cilVisitor) ((n, args) as a: attribute) : attribute =
   let fAttrP a = visitCilAttrParams vis a in
-  match a with
-  | Attr (n, args) ->
-    let args' = Extlib.map_no_copy fAttrP args in
-    if args' != args then Attr(n, args') else a
-  | AttrAnnot _ ->
-    a
+  let args' = Extlib.map_no_copy fAttrP args in
+  if args' != args then (n, args') else a
 
 and visitCilAttrParams (vis: cilVisitor) (a: attrparam) : attrparam =
   doVisitCil vis id vis#vattrparam childrenAttrparam a
@@ -2993,11 +2989,11 @@ let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
                 body), guard.eloc, None, None)) ]
 
 let mkWhile ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
-  let sattr = [Attr("while", [])] @ Option.value ~default:[] sattr in
+  let sattr = [("while", [])] @ Option.value ~default:[] sattr in
   mkLoop ~sattr ~guard ~body ()
 
 let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
-  let sattr = [Attr("dowhile", [])] @ Option.value ~default:[] sattr in
+  let sattr = [("dowhile", [])] @ Option.value ~default:[] sattr in
   let exit_stmt =
     mkStmt ~valid_sid:true
       (If(guard, mkBlock [mkStmt ~valid_sid:true (Break guard.eloc)],
@@ -3008,7 +3004,7 @@ let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
 
 let mkFor ?sattr ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
     ~(body: stmt list) () : stmt list =
-  let sattr = [Attr("for", [])] @ Option.value ~default:[] sattr in
+  let sattr = [("for", [])] @ Option.value ~default:[] sattr in
   (start @
    (mkLoop ~sattr ~guard ~body:(body @ next)) ())
 
@@ -3293,7 +3289,7 @@ let rec typeOf (e: exp) : typ =
   | Const(CStr _s) -> string_literal_type ()
 
   | Const(CWStr _s) ->
-    let typ = typeAddAttributes [Attr("const",[])] (wchar_type ()) in
+    let typ = typeAddAttributes [("const",[])] (wchar_type ()) in
     Cil_const.mk_tptr typ
 
   | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
@@ -3778,7 +3774,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     Kernel.warning ~current:true "ignoring recursive align attributes on %t"
       pp;
     default_align ()
-  | (Attr(_, [a]) as at)::rest -> begin
+  | ((_, [a]) as at)::rest -> begin
       if rest <> [] then
         Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
           pp;
@@ -3789,7 +3785,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
           !pp_attribute_ref at pp;
         default_align ()
     end
-  | Attr(_, [])::rest ->
+  | (_, [])::rest ->
     (* aligned with no arg means a power of two at least as large as
        any alignment on the system.*)
     if rest <> [] then
@@ -4727,7 +4723,7 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
   let makeit name =
     let vi = makeLocal ~ghost ?loc ~formal:true fdec name typ in
     if ghost && not fdec.svar.vghost then
-      vi.vattr <- add_attribute (Attr(frama_c_ghost_formal, [])) vi.vattr ;
+      vi.vattr <- add_attribute (frama_c_ghost_formal, []) vi.vattr ;
     vi
   in
   let error () = Kernel.fatal ~current:true
@@ -6797,7 +6793,7 @@ let pushGlobal (g: global)
       let varsintype : (varinfo list * location) option =
         match g with
           GType (_, l) | GCompTag (_, l) -> Some (getVarsInGlobal g, l)
-        | GEnumTag (_, l) | GPragma (Attr("pack", _), l)
+        | GEnumTag (_, l) | GPragma (("pack", _), l)
         | GCompTagDecl (_, l) | GEnumTagDecl (_, l) -> Some ([], l)
         (* Move the warning pragmas early
             | GPragma(Attr(s, _), l) when hasPrefix "warning" s -> Some ([], l)
@@ -7191,8 +7187,8 @@ class dropAttributes ?select () = object(self)
     | None -> ChangeTo []
     | Some l ->
       (match a with
-       | (Attr (s,_) | AttrAnnot s) when List.mem s l -> ChangeTo []
-       | Attr _ | AttrAnnot _ -> DoChildren)
+       | (s,_) when List.mem s l -> ChangeTo []
+       | _  -> DoChildren)
   method! vtype ty = match ty.tnode with
     | TNamed internal_ty ->
       let tty = typeAddAttributes ty.tattr internal_ty.ttype in

@@ -966,7 +966,7 @@ let cleanup file =
         *)
         b.battrs <- List.filter
             (function
-              | Attr(l,[]) when l = Cabs2cil.frama_c_keep_block -> false
+              | (l,[]) when l = Cabs2cil.frama_c_keep_block -> false
               | _ -> true)
             b.battrs;
         b
@@ -1397,7 +1397,7 @@ class reorder_ast: Visitor.frama_c_visitor =
           in
           Datatype.String.Map.fold
             (fun k l res ->
-               let attr = if k = "" then [] else [ Attr("fc_stdlib", [AStr k])] in
+               let attr = if k = "" then [] else [ ("fc_stdlib", [AStr k])] in
                let entries =
                  List.fold_left
                    (fun acc g ->

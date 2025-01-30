@@ -116,7 +116,7 @@ let plain_array_to_ptr ty =
           in
           (* Normally, overflow is checked in bitsSizeOf itself *)
           let la = AInt (Integer.of_int len) in
-          [ Attr("arraylen",[la])]
+          [ ("arraylen",[la]) ]
         with Cil.SizeOfError _ ->
           Kernel.warning ~current:true
             "Cannot represent length of array as an attribute";
@@ -818,12 +818,8 @@ let rec is_same_attrparam p1 p2 =
     && is_same_attrparam e1 e2
   | _ -> false
 
-let is_same_attribute a1 a2 =
-  match a1,a2 with
-  | Attr (s1,prm1), Attr (s2,prm2) ->
-    is_same_string s1 s2 && is_same_list is_same_attrparam prm1 prm2
-  | AttrAnnot s1, AttrAnnot s2 -> is_same_string s1 s2
-  | _ -> false
+let is_same_attribute (s1,prm1) (s2,prm2) =
+  is_same_string s1 s2 && is_same_list is_same_attrparam prm1 prm2
 
 let is_same_attributes l1 l2 = is_same_list is_same_attribute l1 l2
 

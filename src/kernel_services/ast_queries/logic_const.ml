@@ -307,7 +307,7 @@ let treal_zero ?(loc=Cil_datatype.Location.unknown) ?(ltyp=Lreal) () =
 
 let tstring ?(loc=Cil_datatype.Location.unknown) s =
   (* Cannot refer to Cil_const.charConstPtrType in this module... *)
-  let typ = Cil_const.(mk_tptr (mk_tint ~tattr:[Attr("const", [])] IChar)) in
+  let typ = Cil_const.(mk_tptr (mk_tint ~tattr:[("const", [])] IChar)) in
   term ~loc (TConst (LStr s)) (Ctype typ)
 
 let tat ?(loc=Cil_datatype.Location.unknown) (t,label) =

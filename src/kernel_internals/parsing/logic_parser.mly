@@ -254,9 +254,9 @@
       let str = Str.global_replace regex1 "\\1\\\\3" str in
       Str.global_replace regex2 "\\1\\\\" str
 
-  let cv_const = Attr ("const", [])
-  let cv_volatile = Attr ("volatile", [])
-  let cv_ghost = Attr("ghost", [])
+  let cv_const = ("const", [])
+  let cv_volatile = ("volatile", [])
+  let cv_ghost = ("ghost", [])
 
   let toplevel_pred tp_kind tp_statement = { tp_kind; tp_statement }
 
@@ -312,7 +312,7 @@
 %token VOLATILE READS WRITES
 %token LOGIC PREDICATE INDUCTIVE AXIOM LEMMA LBRACE RBRACE
 %token AXIOMATIC MODULE IMPORT
-%token GHOST MODEL CASE
+%token MODEL CASE
 %token VOID CHAR SIGNED UNSIGNED SHORT LONG DOUBLE STRUCT ENUM UNION
 %token BSUNION INTER
 %token TYPE BEHAVIOR BEHAVIORS ASSUMES COMPLETE DISJOINT
@@ -320,7 +320,7 @@
 %token BIFF BIMPLIES STARHAT HAT HATHAT PIPE TILDE GTGT LTLT
 %token SIZEOF LAMBDA LET
 %token TYPEOF BSTYPE
-%token WITH CONST BSGHOST
+%token WITH CONST GHOST
 %token INITIALIZED DANGLING
 %token LSQUAREPIPE RSQUAREPIPE
 %token IN
@@ -787,7 +787,7 @@ logic_type: logic_type_gen(typesymbol) { $1 }
 cv:
   CONST { cv_const }
 | VOLATILE { cv_volatile }
-| BSGHOST { cv_ghost }
+| GHOST { cv_ghost }
 ;
 
 type_spec_cv:
@@ -1386,8 +1386,6 @@ annotation:
           (Not_well_formed (loc $sloc,
                             "Only one code annotation is allowed per comment"))
       }
-| identifier { Aattribute_annot (loc $sloc, $1) }
-| BSGHOST { Aattribute_annot(loc $sloc,"\\ghost") }
 | unknown_extension SEMICOLON { raise Unknown_ext }
 ;
 
@@ -2080,7 +2078,7 @@ bs_keyword:
 | AS { () }
 | BASE_ADDR { () }
 | BLOCK_LENGTH { () }
-| BSGHOST { () }
+| GHOST { () }
 | DYNAMIC { () }
 | EMPTY { () }
 | FALSE { () }
@@ -2139,7 +2137,6 @@ wildcard:
 | EQUAL { () }
 | EXISTS { () }
 | GE { () }
-| GHOST { () }
 | GT { () }
 | GTGT { () }
 | HAT { () }

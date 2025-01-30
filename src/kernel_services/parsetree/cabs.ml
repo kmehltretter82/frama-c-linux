@@ -79,8 +79,7 @@ and storage =
   | NO_STORAGE | AUTO | STATIC | EXTERN | REGISTER
 
 and cvspec =
-  | CV_CONST | CV_VOLATILE | CV_RESTRICT
-  | CV_ATTRIBUTE_ANNOT of string | CV_GHOST
+  | CV_CONST | CV_VOLATILE | CV_RESTRICT | CV_GHOST
 
 (* Type specifier elements. These appear at the start of a declaration *)
 (* Everywhere they appear in this file, they appear as a 'spec_elem list', *)

@@ -1657,7 +1657,7 @@ let oneFilePass1 (f:file) : unit =
           end else attrprm
         in
         let attrs = Ast_attributes.drop_attribute "fc_stdlib" newrep.ndata.vattr in
-        let attrs = Ast_attributes.add_attribute (Attr ("fc_stdlib", attrprm)) attrs in
+        let attrs = Ast_attributes.add_attribute ("fc_stdlib", attrprm) attrs in
         newrep.ndata.vattr <- attrs;
       end;
       newrep.ndata.vdefined <- vi.vdefined || oldvi.vdefined;
