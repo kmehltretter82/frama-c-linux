@@ -55,16 +55,24 @@ type long   = Format_Long
 type 'f format =
   | Single : single format (** 32-bits single precision IEEE-754 format. *)
   | Double : double format (** 64-bits double precision IEEE-754 format. *)
-  | Long   : long   format (** 80-bits extended precision x86 format. *)
+
+type ('format, 'encoded_as) support =
+  | Single_supported : (single, single) support
+  | Double_supported : (double, double) support
+  | Long_unsupported : (long  , double) support
 
 (** Type used to return existantially quantified formats. *)
-type resulting_format = Format : 'f format -> resulting_format
+type resulting_format =
+  | Format : ('f, 'k) support * 'k format -> resulting_format
 
 (** Returns the format corresponding to the given [fkind]. *)
 val format_of_fkind : Cil_types.fkind -> resulting_format
 
 (** Returns the [fkind] corresponding to the given format. *)
 val fkind_of_format : 'f format -> Cil_types.fkind
+
+(** Returns the [fkind] corresponding to the given support. *)
+val fkind_of_support : ('k, 'f) support -> Cil_types.fkind
 
 (** Type used to return a proof that two formats are in fact the same. *)
 type ('l, 'r) same_format =
@@ -90,9 +98,6 @@ val single : float -> single t
 
 (** Returns a typed double precision float. *)
 val double : float -> double t
-
-(** Returns a typed long precision float. *)
-val long : float -> long t
 
 (** Build a typed float of the given format given an OCaml 64-bits
     floating point number. *)
@@ -147,7 +152,9 @@ type 'f parsed_float =
   ; format  : 'f format
   }
 
-type parsed_result = Parsed : 'f parsed_float -> parsed_result
+type parsed_result =
+  | Parsed : ('f, 'k) support * 'k parsed_float -> parsed_result
+
 val parse : string -> parsed_result
 
 

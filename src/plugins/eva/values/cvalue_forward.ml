@@ -532,7 +532,7 @@ let eval_float_constant f fkind fstring =
     let fl, fu = match fstring with
       | Some "INFINITY" -> f, f (* Special case for the INFINITY macro. *)
       | Some string when fkind = Cil_types.FLongDouble || all_rounding () ->
-        let Parsed p = Typed_float.parse string in
+        let Parsed (_, p) = Typed_float.parse string in
         (* Computations are done in double. For long double constants, if we
            reach infinity, we must use the interval [max_double..infty] to be
            sound. Here we even use [-infty..infty]. *)

@@ -23,6 +23,7 @@
 open Floating_point
 
 
+
 type single = Format_Single
 type double = Format_Double
 type long   = Format_Long
@@ -30,7 +31,11 @@ type long   = Format_Long
 type 'f format =
   | Single : single format
   | Double : double format
-  | Long   : long   format
+
+type ('f, 'k) support =
+  | Single_supported : (single, single) support
+  | Double_supported : (double, double) support
+  | Long_unsupported : (long  , double) support
 
 type 'f t =
   | Float : float * 'f format -> 'f t
@@ -56,28 +61,35 @@ external fmod  : 'f format -> float -> float -> float = "frama_c_fmod"
 
 
 
-type resulting_format = Format : 'f format -> resulting_format
+type resulting_format =
+  | Format : ('f, 'k) support * 'k format -> resulting_format
 
 let format_of_fkind = function
-  | Cil_types.FFloat      -> Format Single
-  | Cil_types.FDouble     -> Format Double
-  | Cil_types.FLongDouble -> Format Long
+  | Cil_types.FFloat      -> Format (Single_supported, Single)
+  | Cil_types.FDouble     -> Format (Double_supported, Double)
+  | Cil_types.FLongDouble -> Format (Long_unsupported, Double)
 
 let fkind_of_format : type f. f format -> Cil_types.fkind = function
   | Single -> Cil_types.FFloat
   | Double -> Cil_types.FDouble
-  | Long   -> Cil_types.FLongDouble
+
+let fkind_of_support : type k f. (k, f) support -> Cil_types.fkind = function
+  | Single_supported -> Cil_types.FFloat
+  | Double_supported -> Cil_types.FDouble
+  | Long_unsupported -> Cil_types.FLongDouble
 
 let format_of_string = function
-  | "L" | "l" -> Format Long
-  | "F" | "f" -> Format Single
-  | _         -> Format Double
+  | "L" | "l" -> Format (Long_unsupported, Double)
+  | "F" | "f" -> Format (Single_supported, Single)
+  | _         -> Format (Double_supported, Double)
 
 let format_of_char = function
-  | 'L' | 'l' -> Format Long  , true
-  | 'D' | 'd' -> Format Double, true
-  | 'F' | 'f' -> Format Single, true
-  | _         -> Format Double, false
+  | 'L' | 'l' -> Format (Long_unsupported, Double), true
+  | 'D' | 'd' -> Format (Double_supported, Double), true
+  | 'F' | 'f' -> Format (Single_supported, Single), true
+  | _         -> Format (Double_supported, Double), false
+
+
 
 type ('l, 'r) same_format =
   | No  : ('l, 'r) same_format
@@ -87,7 +99,6 @@ let same_format (type l r) (l : l format) (r : r format) : (l, r) same_format =
   match l, r with
   | Single, Single -> Yes Single
   | Double, Double -> Yes Double
-  | Long  , Long   -> Yes Long
   | _, _ -> No
 
 let format_order (type l r) (l : l format) (r : r format) : int =
@@ -96,26 +107,20 @@ let format_order (type l r) (l : l format) (r : r format) : int =
   | Single, _      -> -1
   | _     , Single ->  1
   | Double, Double ->  0
-  | Double, _      -> -1
-  | _     , Double ->  1
-  | Long  , Long   -> 0
 
 
 
 let single f = Float (change_format Single f, Single)
 let double f = Float (f, Double)
-let long   f = Float (f, Long)
 
 let represents : type f. float:float -> in_format:f format -> f t =
   fun ~float ~in_format ->
   match in_format with
   | Single -> single float
   | Double -> double float
-  | Long   -> long   float
 
 let to_float (Float (n, _)) = n
 let format   (Float (_, f)) = f
-
 
 let is_finite (Float (f, _)) = Floating_point.is_finite f
 let is_infinite (Float (f, _)) = Floating_point.is_infinite f
@@ -123,33 +128,32 @@ let is_nan (Float (f, _)) = Floating_point.is_nan f
 
 
 
-let sig_size : type f. f format -> int = function
-    Single -> 24 | Double -> 53 | Long -> 53 (* Beware: this is unsound! *)
+let sig_size : type f. f format -> int =
+  function Single -> 24 | Double -> 53
 
-type compute_float = Floating_point.format -> float
-let convert_float : type f. compute_float -> f format -> f t = fun f -> function
+let convert_float (type f) f : f format -> f t = function
   | Single -> single (f Floating_point.Single)
   | Double -> double (f Floating_point.Double)
-  | Long -> long (f Floating_point.Double) (* Beware: this is unsound! *)
 
 let largest_finite_float_of ~format =
   convert_float Floating_point.largest_finite_float_of format
+
 let smallest_normal_float_of ~format =
   convert_float Floating_point.smallest_normal_float_of format
+
 let smallest_denormal_float_of ~format =
   convert_float Floating_point.smallest_denormal_float_of format
+
 let unit_in_the_last_place_of ~format =
   convert_float Floating_point.unit_in_the_last_place_of format
 
-type compute_int = Floating_point.format -> int
-let convert_int : type f. compute_int -> f format -> int = fun f format ->
-  match format with
+let convert_int (type f) f : f format -> int = function
   | Single -> f Floating_point.Single
   | Double -> f Floating_point.Double
-  | Long -> f Floating_point.Double (* Beware: this is unsound! *)
 
 let minimal_exponent_of ~format =
   convert_int Floating_point.minimal_exponent_of format
+
 let maximal_exponent_of ~format =
   convert_int Floating_point.maximal_exponent_of format
 
@@ -208,7 +212,6 @@ let change_format : type a f. a t -> f format -> f t = fun number format ->
   match number, format with
   | Float (n, _), Single -> single n
   | Float (n, _), Double -> double n
-  | Float (n, _),   Long -> long   n
 
 let finite_range_of : type f. format:f format -> f t * f t = fun ~format ->
   let upper = largest_finite_float_of ~format in neg upper, upper
@@ -218,14 +221,14 @@ let finite_range_of : type f. format:f format -> f t * f t = fun ~format ->
 let bits_encoding : type f. f t -> Z.t = function
   | Float (x, Single) -> Z.of_int32 (Int32.bits_of_float x)
   | Float (x, Double) -> Z.of_int64 (Int64.bits_of_float x)
-  | Float (x,   Long) -> Z.of_int64 (Int64.bits_of_float x)
 
 
 
 let pretty_normal ~use_hex fmt (Float (f, _)) =
   Floating_point.pretty_normal ~use_hex fmt f
 
-let pretty fmt (Float (f, _)) = Floating_point.pretty fmt f
+let pretty fmt (Float (f, _)) =
+  Floating_point.pretty fmt f
 
 
 
@@ -237,7 +240,7 @@ type 'f parsed_float =
   }
 
 type parsed_result =
-  | Parsed : 'f parsed_float -> parsed_result
+  | Parsed : ('f, 'k) support * 'k parsed_float -> parsed_result
 
 type ('a, 'f) normalizing =
   | Normalized : 'a -> ('a, 'f) normalizing
@@ -248,14 +251,14 @@ let ( let* ) normalizing f =
   | Shortcut parsed -> Shortcut parsed
   | Normalized v -> f v
 
-let parsed sign = function
-  | Shortcut r | Normalized r ->
-    if Stdlib.(sign = "-") then
-      let upper   = neg r.lower   in
-      let lower   = neg r.upper   in
-      let nearest = neg r.nearest in
-      Parsed { lower ; nearest ; upper ; format = r.format }
-    else Parsed r
+let apply_sign sign norm =
+  let (Shortcut r | Normalized r) = norm in
+  if Stdlib.(sign = "-") then
+    let upper   = neg r.lower   in
+    let lower   = neg r.upper   in
+    let nearest = neg r.nearest in
+    { lower ; nearest ; upper ; format = r.format }
+  else r
 
 let pos_inf_shortcut ~format =
   let inf = represents ~float:Float.infinity ~in_format:format in
@@ -398,11 +401,11 @@ let parse_hexadecimal (type f) ~(format : f format) s =
 
 
 
-let pretty_format (type f) fmt (format : f format) =
-  match format with
-  | Single -> Format.fprintf fmt "single precision"
-  | Double -> Format.fprintf fmt "double precision"
-  | Long   -> Format.fprintf fmt "long double precision"
+let pretty_format fmt (Format (supported, format)) =
+  match supported, format with
+  | Single_supported, Single -> Format.fprintf fmt "single precision"
+  | Double_supported, Double -> Format.fprintf fmt "double precision"
+  | Long_unsupported, Double -> Format.fprintf fmt "long double precision"
 
 let cannot_be_parsed string format =
   Kernel.abort ~current:true
@@ -432,32 +435,39 @@ let parse str =
   if Stdlib.(length < 0) then
     empty_string ()
   else if is_hexadecimal str then
-    let Format format, suffix = format_of_char str.[length] in
+    let resulting_format, suffix = format_of_char str.[length] in
+    let Format (supported, format) = resulting_format in
     let str = if suffix then String.sub str 0 length else str in
     match parse_hexadecimal ~format str with
-    | None -> cannot_be_parsed str format
-    | Some result -> Parsed result
+    | None -> cannot_be_parsed str resulting_format
+    | Some result -> Parsed (supported, result)
   else if Str.string_match num_dot_frac_exp str 0 then
-    let sign          = Str.matched_group 1 str in
-    let integral      = Str.matched_group 2 str in
-    let fractional    = Str.matched_group 3 str in
-    let exponent      = Str.matched_group 4 str in
-    let Format format = Str.matched_group 5 str |> format_of_string in
-    normalize integral fractional exponent format |> parsed sign
+    let sign       = Str.matched_group 1 str in
+    let integral   = Str.matched_group 2 str in
+    let fractional = Str.matched_group 3 str in
+    let exponent   = Str.matched_group 4 str in
+    let format     = Str.matched_group 5 str in
+    let Format (supported, format) = format_of_string format in
+    let normalizing = normalize integral fractional exponent format in
+    Parsed (supported, apply_sign sign normalizing)
   else if Str.string_match num_dot_frac str 0 then
-    let sign          = Str.matched_group 1 str in
-    let integral      = Str.matched_group 2 str in
-    let fractional    = Str.matched_group 3 str in
-    let exponent      = "0" in
-    let Format format = Str.matched_group 4 str |> format_of_string in
-    normalize integral fractional exponent format |> parsed sign
+    let sign       = Str.matched_group 1 str in
+    let integral   = Str.matched_group 2 str in
+    let fractional = Str.matched_group 3 str in
+    let exponent   = "0" in
+    let format     = Str.matched_group 4 str in
+    let Format (supported, format) = format_of_string format in
+    let normalizing = normalize integral fractional exponent format in
+    Parsed (supported, apply_sign sign normalizing)
   else if Str.string_match num_exp str 0 then
     let sign          = Str.matched_group 1 str in
     let integral      = Str.matched_group 2 str in
     let fractional    = "" in
     let exponent      = Str.matched_group 3 str in
-    let Format format = Str.matched_group 4 str |> format_of_string in
-    normalize integral fractional exponent format |> parsed sign
+    let format     = Str.matched_group 4 str in
+    let Format (supported, format) = format_of_string format in
+    let normalizing = normalize integral fractional exponent format in
+    Parsed (supported, apply_sign sign normalizing)
   else
-    let Format format = format_of_string (String.make 1 str.[length]) in
+    let format = format_of_string (String.make 1 str.[length]) in
     cannot_be_parsed str format

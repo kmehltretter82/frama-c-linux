@@ -399,8 +399,8 @@ let rec term_to_exp t res =
   | TConst (LWStr l) -> new_exp ~loc (Const (CWStr l))
   | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
-    let Parsed p = Typed_float.parse l_real.r_literal in
-    let fk = Typed_float.fkind_of_format p.format in
+    let Parsed (supported, _) = Typed_float.parse l_real.r_literal in
+    let fk = Typed_float.fkind_of_support supported in
     let cst =
       if Cil.isExactFloat fk l_real then
         (CReal (l_real.r_nearest, fk, Some l_real.r_literal))

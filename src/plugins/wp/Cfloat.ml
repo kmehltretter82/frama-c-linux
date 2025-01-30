@@ -232,11 +232,11 @@ let force_float r =
   else r
 
 let format = function
-  | Float32 -> Typed_float.(Format Single)
-  | Float64 -> Typed_float.(Format Double)
+  | Float32 -> Typed_float.(Format (Single_supported, Single))
+  | Float64 -> Typed_float.(Format (Double_supported, Double))
 
 let float_lit fmt (q : Q.t) =
-  let Format fmt = format fmt in
+  let Format (_, fmt) = format fmt in
   let v = Typed_float.represents ~float:(Q.to_float q) ~in_format:fmt in
   let reparse s = Typed_float.represents ~float:(float_of_string s) ~in_format:fmt in
   let rec lookup = function

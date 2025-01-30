@@ -966,7 +966,7 @@ let reinterpret_as_float kind i =
       let f = Bottom.join_list Fval.join (pos :: neg :: nan) in
       inject_float (Bottom.non_bottom f)
     in
-    let Format format = Typed_float.format_of_fkind kind in
+    let Format (_, format) = Typed_float.format_of_fkind kind in
     let minf, maxf = Typed_float.finite_range_of ~format in
     let minf, maxf = Typed_float.(bits_encoding minf, bits_encoding maxf) in
     match kind with
