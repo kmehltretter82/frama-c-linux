@@ -1033,22 +1033,24 @@ module Machdep = struct
            line parameter still has priority over the default value"
       end)
 
-  let machdep_dir () = Share.get_dir "machdeps"
-  let default_machdep_file machdep =
+  let get_dir () = Share.get_dir "machdeps"
+  let get_default_file machdep =
     let filename = "machdep_" ^ machdep ^ ".yaml" in
-    Filepath.Normalized.concat (machdep_dir()) filename
-  let is_default_machdep machdep =
-    Filepath.Normalized.is_file (default_machdep_file machdep)
+    Filepath.Normalized.concat (get_dir()) filename
+  let is_default machdep =
+    Filepath.Normalized.is_file (get_default_file machdep)
 
   let normalize name =
-    if is_default_machdep name then name else
-      (Filepath.Normalized.of_string ~existence:Must_exist name :> string)
+    if is_default name then name else
+      Filepath.normalize ~existence:Must_exist name
+
+  let () =
+    let set_if_necessary old_name new_name =
+      let new_name = normalize new_name in
+      if not (equal old_name new_name) then unsafe_set new_name
+    in
+    add_set_hook set_if_necessary
 end
-let () = Machdep.(add_set_hook
-                    (fun old_name new_name ->
-                       let new_name = normalize new_name in
-                       if equal old_name new_name then ()
-                       else unsafe_set new_name))
 
 let () = Parameter_customize.set_group parsing
 let () = Parameter_customize.do_not_reset_on_copy ()

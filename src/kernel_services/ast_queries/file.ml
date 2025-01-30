@@ -273,7 +273,7 @@ let print_machdep fmt (m : Machdep.mach) =
 
 let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 
-let mem_machdep s = Kernel.Machdep.is_default_machdep s || Sys.file_exists s
+let mem_machdep s = Kernel.Machdep.is_default s || Sys.file_exists s
 
 let default_machdeps () =
   Array.fold_right
@@ -281,7 +281,7 @@ let default_machdeps () =
        if Str.string_match regexp_machdep s 0 then
          Str.matched_group 1 s :: acc
        else acc)
-    (Sys.readdir (Kernel.Machdep.machdep_dir() :> string))
+    (Sys.readdir (Kernel.Machdep.get_dir() :> string))
     []
 
 let pretty_machdeps fmt =
@@ -310,8 +310,8 @@ let () = Cmdline.run_after_configuring_stage set_machdep
 let get_machdep () =
   let m = Kernel.Machdep.get () in
   let file =
-    if Kernel.Machdep.is_default_machdep m
-    then Kernel.Machdep.default_machdep_file m
+    if Kernel.Machdep.is_default m
+    then Kernel.Machdep.get_default_file m
     else Filepath.Normalized.of_string ~existence:Must_exist m
   in
   let res =

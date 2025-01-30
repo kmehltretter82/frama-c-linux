@@ -472,9 +472,9 @@ module UnfoldingForce: Parameter_sig.Bool
     called for well preparing the AST. *)
 module Machdep: sig
   include Parameter_sig.String
-  val machdep_dir : unit -> LoadState.t
-  val default_machdep_file : string -> LoadState.t
-  val is_default_machdep : string -> bool
+  val get_dir : unit -> LoadState.t
+  val get_default_file : string -> LoadState.t
+  val is_default : string -> bool
 end
 
 (** Behavior of invisible option -keep-logical-operators:
