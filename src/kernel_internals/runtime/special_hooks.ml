@@ -223,6 +223,11 @@ let run_list_all_plugin_options () =
                         let (min, max) = frange () in
                         if min = min_int && max = max_int then [(name, "int")]
                         else [(name, Format.asprintf "int (%d, %d)" min max)]
+                      | Float (_, frange) ->
+                        let (min, max) = frange () in
+                        if min = min_float && max = max_float
+                        then [(name, "float")]
+                        else [(name, Format.asprintf "float (%f, %f)" min max)]
                       | String (_, fvalues) ->
                         let values = fvalues () in
                         if values = [] then [(name, "string")]

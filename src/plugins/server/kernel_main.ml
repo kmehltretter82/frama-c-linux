@@ -54,6 +54,7 @@ let register_parameter parameter =
   match parameter.accessor with
   | Bool (accessor, _) -> register (module Data.Jbool) accessor
   | Int (accessor, _) -> register (module Data.Jint) accessor
+  | Float (accessor, _) -> register (module Data.Jfloat) accessor
   | String (accessor, _) -> register (module Data.Jstring) accessor
 
 (* Registers requests for all parameters of the given plugin. *)

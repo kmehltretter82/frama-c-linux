@@ -31,6 +31,7 @@ type 'a accessor = ('a, 'a) gen_accessor
 type typed_accessor =
   | Bool of bool accessor * string option (** the negative option, if any *)
   | Int of int accessor * (unit -> int * int) (** getting range *)
+  | Float of float accessor * (unit -> float * float) (** getting range *)
   | String of string accessor * (unit -> string list) (** possible values *)
 
 type parameter =
@@ -84,6 +85,7 @@ let get = Datatype.String.Hashtbl.find parameters
 let pretty_value fmt p = match p.accessor with
   | Bool(a, _) -> Format.fprintf fmt "%b" (a.get ())
   | Int(a, _) -> Format.fprintf fmt "%d" (a.get ())
+  | Float (a, _) -> Format.fprintf fmt "%f" (a.get ())
   | String(a, _) -> Format.fprintf fmt "%s" (a.get ())
 
 let get_value p = Format.asprintf "%a" pretty_value p

@@ -337,6 +337,68 @@ struct
     Int(struct include X let default = 0 end)
 
   (* ************************************************************************ *)
+  (** {3 Float} *)
+  (* ************************************************************************ *)
+
+  module Decimal
+      (X: sig include Parameter_sig.Input_with_arg val default: float end) =
+  struct
+
+    include Build
+        (struct
+          include Datatype.Float
+          include X
+          let default () = default
+          let functor_name = "Float"
+        end)
+
+    let add_option name =
+      Cmdline.add_option
+        name
+        ~argname:X.arg_name
+        ~help:X.help
+        ~visible:is_visible
+        ~ext_help:!Parameter_customize.optional_help_ref
+        ~plugin:P.shortname
+        ~group
+        stage
+        (Cmdline.Float set)
+
+    let range = ref (min_float, max_float)
+    let set_range ~min ~max = range := min, max
+    let get_range () = !range
+
+    let parameter =
+      add_set_hook
+        (fun _ f ->
+           let min, max = !range in
+           if f < min then
+             P.L.abort "argument of %s must be at least %f." name min;
+           if f > max then
+             P.L.abort "argument of %s must be no more than %f." name max);
+      let accessor =
+        Typed_parameter.Float
+          ({ Typed_parameter.get = get; set = set;
+             add_set_hook = add_set_hook; add_update_hook = add_update_hook },
+           get_range)
+      in
+      let reconfigurable = is_parameter_reconfigurable stage in
+      let p =
+        Typed_parameter.create ~name ~help:X.help ~accessor
+          ~visible:is_visible ~reconfigurable ~is_set:is_set
+      in
+      add_parameter !Parameter_customize.group_ref stage p;
+      add_option X.option_name;
+      Parameter_customize.reset ();
+      if is_dynamic then
+        let plugin = empty_string in
+        Dynamic.register
+          ~plugin X.option_name Typed_parameter.ty p
+      else p
+
+  end
+
+  (* ************************************************************************ *)
   (** {3 String} *)
   (* ************************************************************************ *)
 

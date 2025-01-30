@@ -259,11 +259,13 @@ let catch_toplevel_run ~f ~at_normal_exit ~on_error =
 type option_setting =
   | Unit of (unit -> unit)
   | Int of (int -> unit)
+  | Float of (float -> unit)
   | String of (string -> unit)
 
 let option_setting_and_warn warn = function
   | Unit f -> Unit (fun () -> warn (); f ())
   | Int f -> Int (fun i -> warn (); f i)
+  | Float f -> Float (fun x -> warn (); f x)
   | String f -> String (fun s -> warn (); f s)
 
 exception Cannot_parse of string * string
@@ -322,6 +324,14 @@ let parse known_options_list then_expected options_list =
               raise_error option "requires an integer as argument"
           in
           f n;
+          true
+        | Float f ->
+          let x =
+            try float_of_string arg
+            with Failure _ ->
+              raise_error option "requires a decimal number as argument"
+          in
+          f x;
           true
         | String f ->
           check_string_argname ();
@@ -942,6 +952,7 @@ let low_print_option_help fmt print_invisible o =
         match o.setting with
         | Unit _ -> ""
         | Int _ -> " <n>"
+        | Float _ -> " <x>"
         | String _ -> " <s>"
       else
         " <" ^ s ^ ">"

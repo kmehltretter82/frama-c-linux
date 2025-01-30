@@ -248,6 +248,22 @@ module type Int = sig
 
 end
 
+(** Signature for a floating-point parameter.
+    @since Frama-C+dev *)
+module type Float = sig
+
+  include S with type t = float
+
+  val set_range: min:float -> max:float -> unit
+  (** Set what is the possible range of values for this parameter.
+      @since Beryllium-20090901 *)
+
+  val get_range: unit -> float * float
+  (** What is the possible range of values for this parameter.
+      @since Beryllium-20090901 *)
+
+end
+
 (** Signature for a string parameter. *)
 module type String = sig
 
@@ -613,6 +629,10 @@ module type Builder = sig
 
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module Zero(_: Input_with_arg): Int
+
+  (** Parameter with an optional decimal point converted to an Ocaml float
+      @since Frama-C+dev *)
+  module Decimal(_: sig include Input_with_arg val default: float end): Float
 
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module String(_: sig include Input_with_arg val default: string end): String
