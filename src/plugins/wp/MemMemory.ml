@@ -118,18 +118,24 @@ let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
   let t_mem = L.Array(MemAddr.t_addr,tau) in
   let m  = F.e_var (Lang.freshvar ~basename t_mem) in
   let m' = F.e_var (Lang.freshvar ~basename t_mem) in
-  let p' = F.e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
+  let pt' = F.e_var (Lang.freshvar ~basename:"pt" MemAddr.t_addr) in
+  let ps' = F.e_var (Lang.freshvar ~basename:"ps" MemAddr.t_addr) in
   let n' = F.e_var (Lang.freshvar ~basename:"n" L.Int) in
-  let mh = F.e_fun f_memcpy [m;m';p';p';n'] in
+  let mh = F.e_fun f_memcpy [m;m';pt';ps';n'] in
   let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
-  let meq = F.p_call p_eqmem [m;m';p';n'] in
-  let diff = F.p_call MemAddr.p_separated [p;n;p';s] in
-  let sep = F.p_call MemAddr.p_separated [p;n;p';n'] in
-  let inc = F.p_call MemAddr.p_included [p;n;p';n'] in
+  let meq = F.p_call p_eqmem [m;m';pt';n'] in
+  let diff = F.p_call MemAddr.p_separated [p;n;pt';s] in
+  let sep = F.p_call MemAddr.p_separated [p;n;pt';n'] in
+  let inc = F.p_call MemAddr.p_included [p;n;pt';n'] in
   let teq = T.of_pred meq in
   [
-    "update" , [] , [diff] , m , e_set m p' v' ;
+    (* (nom du lemme, triggers, "forall vars" conditions, m1, m2) veut dire :
+       - conditions => m1 = m2, avec vars comme free vars
+    *)
+    "update" , [] , [diff] , m , e_set m pt' v' ;
     "eqmem" , [teq] , [inc;meq] , m , m' ;
+    (* "havoc"-> nom plus général: passe au dessus d'un memcpy *)
+    (* il faut réussir à sortir du memcpy quand on est séparé *)
     "havoc" , [] , [sep] , m , mh ;
   ]
 
