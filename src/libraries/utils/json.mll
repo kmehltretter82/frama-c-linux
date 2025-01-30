@@ -167,7 +167,7 @@ let rec pp fmt v = let open Format in
   | `Bool b -> pp_print_bool fmt b
   | `String s -> fprintf fmt "%S" s
   | `Int a -> pp_print_int fmt a
-  | `Float f -> Format.fprintf fmt "%g" f
+  | `Float f -> Format.fprintf fmt "%.3g" f
   | `List [] -> pp_print_string fmt "[]"
   | `List (e::es) ->
       Format.fprintf fmt "@[<hov 2>[ %a" pp e ;
