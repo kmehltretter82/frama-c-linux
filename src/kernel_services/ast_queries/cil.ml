@@ -7256,22 +7256,6 @@ let filter_qualifier_attributes = filter_qualifier_attributes
 
 let splitArrayAttributes = split_array_attributes
 
-type attributeClass =
-    AttrName of bool
-  (** Attribute of a name. If argument is true and we are on MSVC then
-      the attribute is printed using __declspec as part of the storage
-      specifier  *)
-  | AttrFunType of bool
-  (** Attribute of a function type. If argument is true and we are on
-      MSVC then the attribute is printed just before the function name *)
-  | AttrType
-  (** Attribute of a type *)
-  | AttrStmt
-  (** Attribute of a statement or a block *)
-  | AttrIgnored
-  (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions {!get_attribute_class} and {!partition_attributes}. *)
-
 let registerAttribute = register_attribute
 
 let removeAttribute = remove_attribute

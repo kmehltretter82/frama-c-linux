@@ -2414,26 +2414,6 @@ val filter_qualifier_attributes: attributes -> attributes
 val splitArrayAttributes: attributes -> attributes * attributes
 [@@deprecated "Use Ast_attributes.split_array_attributes instead."]
 
-(** Various classes of attributes
-    @before 30.0-Zinc [AttrStmt] and [AttrIgnored] didn't exist
-*)
-type attributeClass =
-    AttrName of bool
-  (** Attribute of a name. If argument is true and we are on MSVC then
-      the attribute is printed using __declspec as part of the storage
-      specifier  *)
-  | AttrFunType of bool
-  (** Attribute of a function type. If argument is true and we are on
-      MSVC then the attribute is printed just before the function name *)
-  | AttrType
-  (** Attribute of a type *)
-  | AttrStmt
-  (** Attribute of a statement or a block *)
-  | AttrIgnored
-  (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions [attributeClass] and [partitionAttributes]. *)
-[@@deprecated "Use Ast_attributes.attribute_class instead."]
-
 val registerAttribute: string -> Ast_attributes.attribute_class -> unit
 (** Add a new attribute with a specified class *)
 [@@deprecated "Use Ast_attributes.register_attribute instead."]
@@ -2442,7 +2422,8 @@ val removeAttribute: string -> unit
 (** Remove an attribute previously registered. *)
 [@@deprecated "Use Ast_attributes.remove_attribute instead."]
 
-val attributeClass: default:Ast_attributes.attribute_class -> string -> Ast_attributes.attribute_class
+val attributeClass: default:Ast_attributes.attribute_class -> string ->
+  Ast_attributes.attribute_class
 (** Return the class of an attributes. The class `default' is returned for
     unknown and ignored attributes.
     @before 30.0-Zinc no [default] argument
