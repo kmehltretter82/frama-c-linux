@@ -34,6 +34,7 @@
 , jq
 , perl
 , python3Packages
+, socat
 , stdenvNoCC
 , time
 , unixtools
@@ -65,6 +66,7 @@ stdenvNoCC.mkDerivation {
     perl
     python3Packages.jsonschema
     python3Packages.pyaml
+    socat
     time
     unixtools.getopt
     which

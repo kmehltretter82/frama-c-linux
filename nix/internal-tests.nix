@@ -54,6 +54,7 @@
 , perl
 , python3
 , python3Packages
+, socat
 , swi-prolog
 , time
 , unixtools
@@ -128,6 +129,7 @@ stdenvNoCC.mkDerivation rec {
     python3
     python3Packages.jsonschema
     python3Packages.pyaml
+    socat
     swi-prolog
     time
     unixtools.getopt
