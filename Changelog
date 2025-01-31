@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
+              fields `tnode` and `tattr` for its `typ_node` and `attributes`.
 -   Ivette    [2025-01-23] New sidebar listing functions and global variables
               for each source file.
 -   Eva       [2025-01-23] Rename warning key `invalid-assigns` to
