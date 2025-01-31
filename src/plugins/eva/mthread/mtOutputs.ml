@@ -528,10 +528,8 @@ module Html = struct
         let ret = Command.command ~timeout:60 "dot" (Array.of_list args) in
         match ret with
         | Unix.WEXITED 0 ->
-          if not (MtOptions.KeepDotFiles.get ()) then begin
-            MtOptions.debug "remove %s\n" tmp_file;
-            Sys.remove tmp_file
-          end
+          MtOptions.debug "remove %s\n" tmp_file;
+          Sys.remove tmp_file
         | Unix.WEXITED code ->
           fail (Printf.sprintf "Error (code %d)" code)
         | Unix.WSIGNALED id -> fail (Printf.sprintf "Signal %d" id)
