@@ -114,14 +114,14 @@ module Make (F: Function) =
 struct
   let generate_function_type t =
     let to_type = function
-      | CPtr -> ptr_of (const_of t)
-      | Ptr ->  ptr_of t
+      | CPtr -> Cil_const.mk_tptr (const_of t)
+      | Ptr ->  Cil_const.mk_tptr t
       | Data t -> t
     in
     let ret, ps = F.prototype () in
     let ret = to_type ret in
     let ps = List.map (fun (name, kind, _) -> name, (to_type kind), []) ps in
-    TFun(ret, Some ps, false, [])
+    Cil_const.mk_tfun ret (Some ps) false
 
   let generate_prototype t =
     let ftype = generate_function_type t in

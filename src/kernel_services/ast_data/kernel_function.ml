@@ -611,8 +611,8 @@ let is_main kf =
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
-  match Cil.unrollType result_type with
-  | TVoid _ -> true
+  match Cil.unrollTypeNode result_type with
+  | TVoid -> true
   | _ -> false
 
 (* ************************************************************************* *)

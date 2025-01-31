@@ -216,8 +216,8 @@ class annot_visitor kf flags on_alarm = object (self)
       let generate () =
         match exp.enode with
         | BinOp((Div | Mod), lexp, rexp, ty) ->
-          (match Cil.unrollType ty with
-           | TInt(kind,_) ->
+          (match Cil.unrollTypeNode ty with
+           | TInt kind ->
              (* add assertion "divisor not zero" *)
              if self#do_div_mod () then
                self#generate_assertion Rte.divmod_assertion rexp;
@@ -225,13 +225,13 @@ class annot_visitor kf flags on_alarm = object (self)
                (* treat the special case of signed division/modulo overflow *)
                let exp = { exp with enode = BinOp (Div, lexp, rexp, ty) } in
                self#generate_assertion Rte.signed_div_assertion (exp, lexp, rexp)
-           | TFloat(fkind,_) when self#do_finite_float () ->
+           | TFloat fkind when self#do_finite_float () ->
              self#generate_assertion Rte.finite_float_assertion (fkind,exp);
            | _ -> ())
 
         | BinOp((Shiftlt | Shiftrt) as op, lexp, rexp,ttype ) ->
-          (match Cil.unrollType ttype with
-           | TInt(kind,_) ->
+          (match Cil.unrollTypeNode ttype with
+           | TInt kind ->
              (* 0 <= rexp <= width *)
              if self#do_shift () then begin
                let typ = Cil.unrollType (Cil.typeOf exp) in
@@ -255,18 +255,18 @@ class annot_visitor kf flags on_alarm = object (self)
         | BinOp((PlusA |MinusA | Mult) as op, lexp, rexp, ttype) ->
           (* may be skipped if the enclosing expression is a downcast to a signed
              type *)
-          (match Cil.unrollType ttype with
-           | TInt(kind,_) when Cil.isSigned kind ->
+          (match Cil.unrollTypeNode ttype with
+           | TInt kind when Cil.isSigned kind ->
              if self#do_signed_overflow () && not (self#must_skip exp) then
                self#generate_assertion
                  (Rte.mult_sub_add_assertion ~signed:true)
                  (exp, op, lexp, rexp)
-           | TInt(kind,_) when not (Cil.isSigned kind) ->
+           | TInt kind when not (Cil.isSigned kind) ->
              if self#do_unsigned_overflow () then
                self#generate_assertion
                  (Rte.mult_sub_add_assertion ~signed:false)
                  (exp, op, lexp, rexp)
-           | TFloat(fkind,_) when self#do_finite_float () ->
+           | TFloat fkind when self#do_finite_float () ->
              self#generate_assertion Rte.finite_float_assertion (fkind,exp)
            | _ -> ())
 
@@ -278,19 +278,19 @@ class annot_visitor kf flags on_alarm = object (self)
              "subtracting the promoted value from the largest value
              of the promoted type and adding one",
              the result is always representable: so no overflow *)
-          (match Cil.unrollType ty with
-           | TInt(kind,_) when Cil.isSigned kind ->
+          (match Cil.unrollTypeNode ty with
+           | TInt kind when Cil.isSigned kind ->
              if self#do_signed_overflow () then
                self#generate_assertion Rte.uminus_assertion exp;
-           | TFloat(fkind,_) when self#do_finite_float () ->
+           | TFloat fkind when self#do_finite_float () ->
              self#generate_assertion Rte.finite_float_assertion (fkind,exp)
            | _ -> ())
 
         | Lval lval ->
-          (match Cil.(unrollType (typeOfLval lval)) with
+          (match Cil.(unrollTypeNode (typeOfLval lval)) with
            | TPtr _ when self#do_pointer_value () ->
              self#generate_assertion Rte.pointer_value exp
-           | TInt (IBool,_) when self#do_bool_value () ->
+           | TInt IBool when self#do_bool_value () ->
              self#generate_assertion Rte.bool_value lval
            | _ -> ());
           (* left values are checked for valid access *)
@@ -310,14 +310,14 @@ class annot_visitor kf flags on_alarm = object (self)
               Rte.lval_initialized_assertion lval
           end ;
         | CastE (ty, e) ->
-          (match Cil.unrollType ty, Cil.unrollType (Cil.typeOf e) with
+          (match Cil.unrollTypeNode ty, Cil.(unrollTypeNode (typeOf e)) with
            (* to , from *)
            | TInt _, TPtr _ when self#do_pointer_downcast () ->
              self#generate_assertion Rte.downcast_assertion (ty, e)
            | TPtr _, TInt _ when self#do_pointer_value () ->
              self#generate_assertion Rte.pointer_value exp
 
-           | TInt(kind,_), TInt (_, _) ->
+           | TInt kind, TInt _ ->
              let signed = Cil.isSigned kind in
              if signed && self#do_signed_downcast ()
              || not signed && self#do_unsigned_downcast ()
@@ -329,7 +329,7 @@ class annot_visitor kf flags on_alarm = object (self)
              if self#do_float_to_int () then
                self#generate_assertion Rte.float_to_int_assertion (ty, e)
 
-           | TFloat (to_fkind,_), TFloat (from_fkind,_) when
+           | TFloat to_fkind, TFloat from_fkind when
                self#do_finite_float () && Cil.frank to_fkind < Cil.frank from_fkind ->
              self#generate_assertion Rte.finite_float_assertion (to_fkind,exp)
            | _ -> ());

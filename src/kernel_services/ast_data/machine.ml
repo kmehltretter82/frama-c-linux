@@ -276,14 +276,14 @@ let init ~initLogicBuiltins machdep =
         Kernel.fatal ~current:true
           "Machine.init: cannot find the right ikind for type %s" name
     in
-    the_machine.upointKind <- findIkindSz true (sizeof_ptr ());
-    the_machine.upointType <- TInt(the_machine.upointKind, []);
+    the_machine.upointKind   <- findIkindSz true (sizeof_ptr ());
+    the_machine.upointType   <- Cil_const.mk_tint the_machine.upointKind;
     the_machine.kindOfSizeOf <- findIkindName (size_t ());
-    the_machine.typeOfSizeOf <- TInt(the_machine.kindOfSizeOf, []);
-    the_machine.wcharKind <- findIkindName (wchar_t ());
-    the_machine.wcharType <- TInt(the_machine.wcharKind, []);
-    the_machine.ptrdiffKind <- findIkindName (ptrdiff_t ());
-    the_machine.ptrdiffType <- TInt(the_machine.ptrdiffKind, []);
+    the_machine.typeOfSizeOf <- Cil_const.mk_tint the_machine.kindOfSizeOf;
+    the_machine.wcharKind    <- findIkindName (wchar_t ());
+    the_machine.wcharType    <- Cil_const.mk_tint the_machine.wcharKind;
+    the_machine.ptrdiffKind  <- findIkindName (ptrdiff_t ());
+    the_machine.ptrdiffType  <- Cil_const.mk_tint the_machine.ptrdiffKind;
     the_machine.useLogicalOperators <- Kernel.LogicalOperators.get ();
     (* Have to be marked before calling [init*Builtins] below. *)
     TheMachine.mark_as_computed ();

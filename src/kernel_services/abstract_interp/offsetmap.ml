@@ -2653,8 +2653,7 @@ module Int_Intervals = struct
     let typ =
       match typ with
       | Some t -> t
-      | None ->
-        Cil_types.(TArray (TInt(IUChar,[]), None, []))
+      | None -> Cil_const.(mk_tarray ucharType None)
     in
     match i with
     | Top -> Format.pp_print_string fmt "[..]"

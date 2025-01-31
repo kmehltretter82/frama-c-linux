@@ -36,7 +36,7 @@ let remove_model annot = Annotations.remove_global e annot
 
 let main () =
   let t = find () in
-  let typ = TNamed(t,[]) in
+  let typ = Cil_const.mk_tnamed t in
   print_models typ;
   let m = add_model typ in
   Format.printf "After adding field@.";

@@ -926,9 +926,9 @@ let untyped_to_exp typ t =
     if Gmp_types.Z.is_t ty then Typing.gmpz
     else if Gmp_types.Q.is_t ty then Typing.rational
     else
-      match ty with
-      | TInt(ik, _) | TEnum({ ekind = ik }, _) -> Typing.ikind ik
-      | TFloat(fk, _) -> Typing.fkind fk
+      match ty.tnode with
+      | TInt ik | TEnum { ekind = ik } -> Typing.ikind ik
+      | TFloat fk -> Typing.fkind fk
       | _ -> Typing.nan
   in
   let ctx = Option.map ctx_of_typ typ in

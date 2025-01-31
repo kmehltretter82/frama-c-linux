@@ -24,13 +24,13 @@ open Cil_types
 
 module Typ = struct
   let params typ =
-    match Cil.unrollType typ with
-    | TFun (_,args,_,_) -> Cil.argsToList args
+    match Cil.unrollTypeNode typ with
+    | TFun (_, args, _) -> Cil.argsToList args
     | _ -> invalid_arg "params"
 
   let ghost_partitioned_params typ =
-    match Cil.unrollType typ with
-    | TFun (_,args,_,_) -> Cil.argsToPairOfLists args
+    match Cil.unrollTypeNode typ with
+    | TFun (_, args, _) -> Cil.argsToPairOfLists args
     | _ -> invalid_arg "params"
 
   let params_types typ =

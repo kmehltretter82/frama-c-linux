@@ -413,7 +413,7 @@ let rec infer ~force ~logic_env t =
       ignore (infer ~force ~logic_env t1);
       ignore (infer ~force ~logic_env t2);
       (match Cil.unrollType (get_cty t1) with
-       | TArray(_, _, _) as ta ->
+       | { tnode = TArray(_, _) } as ta ->
          begin
            try
              let n = Cil.bitsSizeOf ta in
@@ -425,13 +425,13 @@ let rec infer ~force ~logic_env t =
            with Cil.SizeOfError _ ->
              Lazy.force interv_of_unknown_block
          end
-       | TPtr _ -> Lazy.force interv_of_unknown_block
+       | { tnode = TPtr _ } -> Lazy.force interv_of_unknown_block
        | _ -> assert false)
     | Tblock_length (_, t)
     | Toffset(_, t) ->
       ignore (infer ~force ~logic_env t);
       (match Cil.unrollType (get_cty t) with
-       | TArray(_, _, _) as ta ->
+       | { tnode = TArray (_, _) } as ta ->
          begin
            try
              let n = Cil.bitsSizeOf ta in
@@ -440,7 +440,7 @@ let rec infer ~force ~logic_env t =
            with Cil.SizeOfError _ ->
              Lazy.force interv_of_unknown_block
          end
-       | TPtr _ -> Lazy.force interv_of_unknown_block
+       | { tnode = TPtr _ } -> Lazy.force interv_of_unknown_block
        | _ -> assert false)
     | Tnull  -> singleton_of_int 0
     | Tapp (li,_,args) ->
@@ -628,7 +628,7 @@ and infer_term_host ~force ~logic_env thost =
      match v.lv_type with
      | Lboolean -> ival Z.zero Z.one
      | Linteger -> top_ival
-     | Ctype (TFloat(fk, _)) -> Float(fk, None)
+     | Ctype { tnode = TFloat fk } -> Float(fk, None)
      | Lreal -> Real
      | Ctype _ -> interv_of_typ (Logic_utils.logicCType v.lv_type)
      | Ltype _ | Lvar _ | Larrow _ ->
@@ -638,8 +638,8 @@ and infer_term_host ~force ~logic_env thost =
   | TMem t ->
     ignore (infer ~force ~logic_env t);
     let ty = Logic_utils.logicCType t.term_type in
-    match Cil.unrollType ty with
-    | TPtr(ty, _) | TArray(ty, _, _) ->
+    match Cil.unrollTypeNode ty with
+    | TPtr ty | TArray (ty, _) ->
       interv_of_typ ty
     | _ ->
       Options.fatal "unexpected type %a for term %a"

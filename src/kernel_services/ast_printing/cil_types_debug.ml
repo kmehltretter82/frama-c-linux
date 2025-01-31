@@ -121,23 +121,31 @@ and pp_global fmt = function
   | GText(string) -> Format.fprintf fmt "GText(%a)"  pp_string string
   | GAnnot(global_annotation,location) -> Format.fprintf fmt "GAnnot(%a,%a)"  pp_global_annotation global_annotation  pp_location location
 
-and pp_typ fmt = function
-  | TVoid(attributes) -> Format.fprintf fmt "TVoid(%a)"  pp_attributes attributes
-  | TInt(ikind,attributes) -> Format.fprintf fmt "TInt(%a,%a)"  pp_ikind ikind  pp_attributes attributes
-  | TFloat(fkind,attributes) -> Format.fprintf fmt "TFloat(%a,%a)"  pp_fkind fkind  pp_attributes attributes
-  | TPtr(typ,attributes) -> Format.fprintf fmt "TPtr(%a,%a)"  pp_typ typ  pp_attributes attributes
-  | TArray(typ,exp_option,attributes) ->
-    Format.fprintf fmt "TArray(%a,%a,%a)"  pp_typ typ  (pp_option pp_exp) exp_option
-      pp_attributes attributes
-  | TFun(typ,string_typ_attributes_tuple_list_option,bool,attributes) ->
-    Format.fprintf fmt "TFun(%a,%a,%a,%a)"  pp_typ typ
+and pp_typ_node fmt node =
+  match node with
+  | TVoid        -> Format.fprintf fmt "TVoid"
+  | TInt   ikind -> Format.fprintf fmt "TInt(%a)" pp_ikind ikind
+  | TFloat fkind -> Format.fprintf fmt "TFloat(%a)" pp_fkind fkind
+  | TPtr   typ   -> Format.fprintf fmt "TPtr(%a)"   pp_typ typ
+  | TArray (typ,exp_option) ->
+    Format.fprintf fmt "TArray(%a,%a)" pp_typ typ (pp_option pp_exp) exp_option
+  | TFun (typ,string_typ_attributes_tuple_list_option,bool) ->
+    Format.fprintf fmt "TFun(%a,%a,%a)" pp_typ typ
       (pp_option (pp_list (pp_tuple3 pp_string pp_typ pp_attributes))) string_typ_attributes_tuple_list_option
-      pp_bool bool  pp_attributes attributes
-  | TNamed(typeinfo,attributes) ->
-    Format.fprintf fmt "TNamed(%a,%a)"  pp_typeinfo typeinfo  pp_attributes attributes
-  | TComp(compinfo,attributes) -> Format.fprintf fmt "TComp(%a,%a)"  pp_compinfo compinfo  pp_attributes attributes
-  | TEnum(enuminfo,attributes) -> Format.fprintf fmt "TEnum(%a,%a)"  pp_enuminfo enuminfo  pp_attributes attributes
-  | TBuiltin_va_list(attributes) -> Format.fprintf fmt "TBuiltin_va_list(%a)"  pp_attributes attributes
+      pp_bool bool
+  | TNamed typeinfo -> Format.fprintf fmt "TNamed(%a)" pp_typeinfo typeinfo
+  | TComp compinfo  -> Format.fprintf fmt "TComp(%a)"  pp_compinfo compinfo
+  | TEnum enuminfo  -> Format.fprintf fmt "TEnum(%a)"  pp_enuminfo enuminfo
+  | TBuiltin_va_list -> Format.fprintf fmt "TBuiltin_va_list"
+
+and pp_typ fmt t =
+  Format.fprintf fmt
+    "{\
+     tnode=%a;\
+     tattr=%a;\
+     }"
+    pp_typ_node t.tnode
+    pp_attributes t.tattr
 
 and pp_ikind fmt = function
   | IBool -> Format.fprintf fmt "IBool"

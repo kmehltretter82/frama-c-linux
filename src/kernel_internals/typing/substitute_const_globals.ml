@@ -35,8 +35,9 @@ class constGlobSubstVisitorClass : cilVisitor = object
   (* Visit globals and register only the association between globals with attribute
      'const' and respective initializers. *)
   method! vglob g =
-    let rec is_arithmetic_type = function
-      | TArray (typ, _, _) -> is_arithmetic_type typ
+    let rec is_arithmetic_type t =
+      match t.tnode with
+      | TArray (typ, _) -> is_arithmetic_type typ
       | TInt _ | TFloat _ | TEnum _ -> true
       | _ -> false
     in

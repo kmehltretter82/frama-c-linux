@@ -233,7 +233,7 @@ let interv_of_unknown_block =
   lazy (ival Integer.zero (Bit_utils.max_byte_address ()))
 
 let ival_of_ikind ik =
-  let n = Cil.bitsSizeOf (TInt (ik, [])) in
+  let n = Cil.bitsSizeOf (Cil_const.mk_tint ik) in
   let l, u =
     if Cil.isSigned ik then Cil.min_signed_number n, Cil.max_signed_number n
     else Integer.zero, Cil.max_unsigned_number n
@@ -241,18 +241,18 @@ let ival_of_ikind ik =
   Ival.inject_range (Some l) (Some u)
 
 (* The boolean indicates whether we have real numbers *)
-let rec interv_of_typ ty = match Cil.unrollType ty with
-  | TInt (k,_) ->
+let rec interv_of_typ ty = match Cil.unrollTypeNode ty with
+  | TInt k ->
     Ival (ival_of_ikind k)
-  | TEnum(enuminfo, _) ->
-    interv_of_typ (TInt(enuminfo.ekind, []))
+  | TEnum enuminfo ->
+    interv_of_typ (Cil_const.mk_tint enuminfo.ekind)
   | _ when Gmp_types.Z.is_t ty ->
     top_ival
-  | TFloat (k, _) ->
-    Float(k, None)
+  | TFloat k ->
+    Float (k, None)
   | _ when Gmp_types.Q.is_t ty ->
     Rational (* only rationals are implemented *)
-  | TVoid _ | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list _ ->
+  | TVoid | TPtr _ | TArray _ | TFun _ | TComp _ | TBuiltin_va_list ->
     Nan
   | TNamed _ ->
     assert false

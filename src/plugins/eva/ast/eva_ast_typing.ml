@@ -23,13 +23,13 @@
 open Eva_ast_types
 
 let type_of_const : constant -> typ = function
-  | CTopInt ik -> Cil_types.TInt (ik, [])
-  | CInt64 (_, ik, _) -> Cil_types.TInt (ik, [])
+  | CTopInt ik -> Cil_const.mk_tint ik
+  | CInt64 (_, ik, _) -> Cil_const.mk_tint ik
   | CChr _ -> Cil_const.intType
   | CString (String (_, Base.CSString _)) -> Machine.string_literal_type ()
-  | CString (String (_, Base.CSWstring _)) -> TPtr (Machine.wchar_type (), [])
+  | CString (String (_, Base.CSWstring _)) -> Cil_const.mk_tptr (Machine.wchar_type ())
   | CString (_) -> assert false (* it must be a String base*)
-  | CReal (_, fk, _) -> TFloat (fk, [])
+  | CReal (_, fk, _) -> Cil_const.mk_tfloat fk
   | CEnum (_ei, e) -> e.typ
 
 let rec type_of_offset (basetyp : typ) : offset -> typ = function
@@ -37,7 +37,7 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | Index (_, o) ->
     type_of_offset (Cil.typeOf_array_elem basetyp) o
   | Field (fi, o) ->
-    let base_attrs = Cil.typeAttr (Cil.unrollType basetyp) in
+    let base_attrs = (Cil.unrollType basetyp).tattr in
     let base_attrs = Cil.filter_qualifier_attributes base_attrs in
     let base_attrs =
       if Cil.hasAttribute Cil.frama_c_mutable fi.fattr then
@@ -61,8 +61,8 @@ let type_of_exp_node : exp_node -> typ = function
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
-  | AddrOf lv -> TPtr (lv.typ, [])
+  | AddrOf lv -> Cil_const.mk_tptr lv.typ
   | StartOf lv ->
     match Cil.unrollType lv.typ with
-    | TArray (t, _, attrs) -> TPtr (t, attrs)
+    | { tnode = TArray (t, _); tattr } -> Cil_const.mk_tptr ~tattr t
     | _ ->  assert false

@@ -574,8 +574,9 @@ let sound_verdict_vi =
 
 let sound_verdict () = Lazy.force sound_verdict_vi
 
-let is_variadic_function vi = match Cil.unrollType vi.vtype with
-  | TFun(_, _, variadic, _) -> variadic
+let is_variadic_function vi =
+  match Cil.unrollTypeNode vi.vtype with
+  | TFun(_, _, variadic) -> variadic
   | _ -> false
 
 (* set of functions that must never be duplicated *)

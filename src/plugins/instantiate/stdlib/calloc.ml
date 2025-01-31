@@ -32,14 +32,14 @@ let unexpected = Options.fatal "Stdlib.Calloc: unexpected: %s"
 let pset_len_to_zero ?loc alloc_type num size =
   let eq_simpl_value ?loc t =
     let value = match Logic_utils.unroll_type t.term_type with
-      | Ctype(TPtr(_)) -> term Tnull t.term_type
-      | Ctype(TFloat(_)) -> treal ?loc 0.
-      | Ctype(TInt(_) | TEnum (_)) -> tinteger ?loc 0
+      | Ctype { tnode = TPtr _ } -> term Tnull t.term_type
+      | Ctype { tnode = TFloat _ } -> treal ?loc 0.
+      | Ctype { tnode = (TInt _ | TEnum _) } -> tinteger ?loc 0
       | _ -> unexpected "non atomic type during equality generation"
     in
     prel ?loc (Req, t, value)
   in
-  let ptr_type = ptr_of alloc_type in
+  let ptr_type = Cil_const.mk_tptr alloc_type in
   let result = tresult ?loc ptr_type in
   let p = if Cil.has_flexible_array_member alloc_type then
       let access = Cil.mkTermMem ~addr:result ~off:TNoOffset in
@@ -62,7 +62,7 @@ let generate_requires ?loc alloc_type num size =
   [ valid_size ?loc alloc_type size ] @ (Option.to_list only_one)
 
 let pinitialized_len ?loc alloc_type num size =
-  let result = tresult ?loc (ptr_of alloc_type) in
+  let result = tresult ?loc (Cil_const.mk_tptr alloc_type) in
   let initialized ?loc t =
     let t = match t.term_node, Logic_utils.unroll_type t.term_type with
       | TLval (lv), (Ctype _ as t) ->
@@ -82,12 +82,12 @@ let pinitialized_len ?loc alloc_type num size =
   new_predicate { p with pred_name = [ "initialization" ] }
 
 let generate_global_assigns loc alloc_type num size =
-  let assigns_result = assigns_result ~loc (ptr_of alloc_type) [ num ; size ] in
+  let assigns_result = assigns_result ~loc (Cil_const.mk_tptr alloc_type) [ num ; size ] in
   let assigns_heap = assigns_heap [ num ; size ] in
   Writes [ assigns_result ; assigns_heap ]
 
 let make_behavior_allocation loc alloc_type num size =
-  let ptr_type = ptr_of alloc_type in
+  let ptr_type = Cil_const.mk_tptr alloc_type in
   let len = term ~loc (TBinOp(Mult, num, size)) Linteger in
   let assumes = [ is_allocable ~loc len ] in
   let assigns = generate_global_assigns loc alloc_type num size in
@@ -101,7 +101,7 @@ let make_behavior_allocation loc alloc_type num size =
 
 let make_behavior_no_allocation loc alloc_type num size =
   let len = term ~loc (TBinOp(Mult, num, size)) Linteger in
-  let ptr_type = ptr_of alloc_type in
+  let ptr_type = Cil_const.mk_tptr alloc_type in
   let assumes = [ isnt_allocable ~loc len ] in
   let assigns = Writes [assigns_result ~loc ptr_type []] in
   let ensures = [ Normal, null_result ~loc ptr_type ] in
@@ -117,7 +117,7 @@ let generate_spec alloc_type loc { svar = vi } =
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
   let requires = generate_requires ~loc alloc_type num size in
   let assigns = generate_global_assigns loc alloc_type num size in
-  let alloc = allocates_result ~loc (ptr_of alloc_type) in
+  let alloc = allocates_result ~loc (Cil_const.mk_tptr alloc_type) in
   make_funspec [
     make_behavior ~requires ~assigns ~alloc () ;
     make_behavior_allocation loc alloc_type num size ;
@@ -130,7 +130,7 @@ let generate_prototype alloc_type =
     ("num", size_t (), []) ;
     ("size", size_t (), [])
   ] in
-  name, (TFun((ptr_of alloc_type), Some params, false, []))
+  name, Cil_const.(mk_tfun (mk_tptr alloc_type) (Some params) false)
 
 let well_typed_call ret _fct args =
   match ret, args with

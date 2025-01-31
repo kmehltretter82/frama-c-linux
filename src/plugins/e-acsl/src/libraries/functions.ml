@@ -160,18 +160,18 @@ module Libc = struct
       | FLongDouble -> "E" (* [long double] *)
     in
     (* get a character representing a pointer type *)
-    let get_pkind_str a ty = match ty with
-      | TInt(IChar,_) | TInt(ISChar,_) -> "s" (* [char*] *)
-      | TInt(IUChar,_) -> "S" (* [unsigned char*] *)
-      | TInt(IShort,_) -> "q" (* [short*] *)
-      | TInt(IUShort,_) -> "Q" (* [unsigned short*] *)
-      | TInt(IInt,_) -> "i" (* [int*] *)
-      | TInt(IUInt,_) -> "I" (* [unsigned int*] *)
-      | TInt(ILong,_) -> "z" (* [long int*] *)
-      | TInt(IULong,_) -> "Z" (* [unsigned long int*] *)
-      | TInt(ILongLong,_) -> "w" (* [long int*] *)
-      | TInt(IULongLong,_) -> "W" (* [unsigned long int*] *)
-      | TVoid _ -> "p" (* [void*] *)
+    let get_pkind_str a ty = match ty.tnode with
+      | TInt IChar | TInt ISChar -> "s" (* [char*] *)
+      | TInt IUChar -> "S" (* [unsigned char*] *)
+      | TInt IShort -> "q" (* [short*] *)
+      | TInt IUShort -> "Q" (* [unsigned short*] *)
+      | TInt IInt -> "i" (* [int*] *)
+      | TInt IUInt -> "I" (* [unsigned int*] *)
+      | TInt ILong -> "z" (* [long int*] *)
+      | TInt IULong -> "Z" (* [unsigned long int*] *)
+      | TInt ILongLong -> "w" (* [long int*] *)
+      | TInt IULongLong -> "W" (* [unsigned long int*] *)
+      | TVoid -> "p" (* [void*] *)
       | _ ->
         Options.fatal "unexpected argument type in printf: type %a of arg %a@."
           Printer.pp_typ ty
@@ -180,12 +180,12 @@ module Libc = struct
     let exps = drop (printf_fmt_position fn) args in
     let param_str =
       List.fold_right
-        (fun exp acc -> match Cil.unrollType (Cil.typeOf exp) with
-           | TInt(k, _) -> get_ikind_str k ^ acc
-           | TFloat(k, _) -> get_fkind_str k ^ acc
-           | TPtr(ty, _) -> get_pkind_str exp (Cil.unrollType ty) ^ acc
-           | TVoid _ | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
-           | TBuiltin_va_list _ -> assert false)
+        (fun exp acc -> match Cil.(unrollTypeNode (typeOf exp)) with
+           | TInt k -> get_ikind_str k ^ acc
+           | TFloat k -> get_fkind_str k ^ acc
+           | TPtr ty -> get_pkind_str exp (Cil.unrollType ty) ^ acc
+           | TVoid | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
+           | TBuiltin_va_list -> assert false)
         exps
         ""
     in

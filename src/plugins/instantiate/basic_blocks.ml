@@ -22,10 +22,8 @@
 
 open Cil
 open Cil_types
-open Cil_const
 open Logic_const
 
-let ptr_of t = TPtr(t, [])
 let const_of t = Cil.typeAddAttributes [Attr("const", [])] t
 
 let size_t () =
@@ -50,36 +48,37 @@ let call_function lval vi args =
   let args = List.map2 gen_arg args typs in
   Call(lval, (Cil.evar vi), args, loc)
 
-let rec string_of_typ_aux = function
-  | TVoid(_) -> "void"
-  | TInt(IBool, _) -> "bool"
-  | TInt(IChar, _) -> "char"
-  | TInt(ISChar, _) -> "schar"
-  | TInt(IUChar, _) -> "uchar"
-  | TInt(IInt, _) -> "int"
-  | TInt(IUInt, _) -> "uint"
-  | TInt(IShort, _) -> "short"
-  | TInt(IUShort, _) -> "ushort"
-  | TInt(ILong, _) -> "long"
-  | TInt(IULong, _) -> "ulong"
-  | TInt(ILongLong, _) -> "llong"
-  | TInt(IULongLong, _) -> "ullong"
-  | TFloat(FFloat, _) -> "float"
-  | TFloat(FDouble, _) -> "double"
-  | TFloat(FLongDouble, _) -> "ldouble"
-  | TPtr(t, _) -> "ptr_" ^ string_of_typ t
-  | TEnum (ei, _) -> "e_" ^ ei.ename
-  | TComp (ci, _) when ci.cstruct -> "st_" ^ ci.cname
-  | TComp (ci, _) -> "un_" ^ ci.cname
-  | TArray (t, Some e, _) ->
+let rec string_of_typ_aux t =
+  match t.tnode with
+  | TVoid -> "void"
+  | TInt IBool -> "bool"
+  | TInt IChar -> "char"
+  | TInt ISChar -> "schar"
+  | TInt IUChar -> "uchar"
+  | TInt IInt -> "int"
+  | TInt IUInt -> "uint"
+  | TInt IShort -> "short"
+  | TInt IUShort -> "ushort"
+  | TInt ILong -> "long"
+  | TInt IULong -> "ulong"
+  | TInt ILongLong -> "llong"
+  | TInt IULongLong -> "ullong"
+  | TFloat FFloat -> "float"
+  | TFloat FDouble -> "double"
+  | TFloat FLongDouble -> "ldouble"
+  | TPtr t -> "ptr_" ^ string_of_typ t
+  | TEnum ei -> "e_" ^ ei.ename
+  | TComp ci when ci.cstruct -> "st_" ^ ci.cname
+  | TComp ci -> "un_" ^ ci.cname
+  | TArray (t, Some e) ->
     "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
-  | t ->
+  | _ ->
     Options.fatal "unsupported type %a" Cil_printer.pp_typ t
 and string_of_typ t = string_of_typ_aux (Cil.unrollType t)
 and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
 let size_var ?(name_ext="") t value = {
-  l_var_info = make_logic_var_local ("__fc_" ^ name_ext ^ "len") t;
+  l_var_info = Cil_const.make_logic_var_local ("__fc_" ^ name_ext ^ "len") t;
   l_type = Some t;
   l_tparams = [];
   l_labels = [];
@@ -114,7 +113,7 @@ let tdivide ?loc t1 t2 =
 
 let ttype_of_pointed t =
   match Logic_utils.unroll_type t with
-  | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _)) -> Ctype t
+  | Ctype { tnode = TPtr t | TArray (t, _) } -> Ctype t
   | _ -> Options.fatal "ttype_of_pointed on a non pointer type"
 
 let tbuffer_range ?loc ptr len =
@@ -130,7 +129,7 @@ let rec tunref_range ?loc ptr len =
   term (TLval tlval) typ
 and tunref_range_unfold ?loc lval typ =
   match typ with
-  | Ctype(TArray(typ, Some e, _)) ->
+  | Ctype { tnode = TArray (typ, Some e) } ->
     let len = Logic_utils.expr_to_term ~coerce:true e in
     let last = tminus ?loc len (tinteger ?loc 1) in
     let range = trange ?loc (Some (tinteger ?loc 0), Some last) in
@@ -144,18 +143,18 @@ let taccess ?loc ptr offset =
     | _ -> Options.fatal "unexpected non-lvalue on call to taccess"
   in
   match Logic_utils.unroll_type ptr.term_type with
-  | Ctype(TPtr(_)) ->
+  | Ctype { tnode = TPtr _ } ->
     let address = tplus ?loc ptr offset in
     let lval = TLval(TMem(address), TNoOffset) in
     term ?loc lval (ttype_of_pointed ptr.term_type)
-  | Ctype(TArray(_)) ->
+  | Ctype { tnode = TArray _ } ->
     let lval = get_lval ptr.term_node in
     let lval = addTermOffsetLval (TIndex(offset, TNoOffset)) lval in
     term ?loc (TLval lval) (ttype_of_pointed ptr.term_type)
   | _ -> Options.fatal "taccess on a non pointer type"
 
 let sizeofpointed = function
-  | Ctype(TPtr(t, _)) | Ctype(TArray(t, _, _)) -> Cil.bytesSizeOf t
+  | Ctype { tnode = (TPtr t | TArray (t, _)) } -> Cil.bytesSizeOf t
   | _ -> Options.fatal "size_of_pointed on a non pointer type"
 
 let sizeof = function
@@ -208,7 +207,7 @@ let rec punfold_all_elems_eq ?loc t1 t2 len =
   assert(Cil_datatype.Logic_type.equal t1.term_type t2.term_type) ;
   pall_elems_eq ?loc 0 t1 t2 len
 and pall_elems_eq ?loc depth t1 t2 len =
-  let ind = make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
+  let ind = Cil_const.make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
   let tind = tvar ind in
   let bounds = pbounds_incl_excl ?loc (tinteger 0) tind len in
   let t1_acc = taccess ?loc t1 tind in
@@ -217,7 +216,7 @@ and pall_elems_eq ?loc depth t1 t2 len =
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and peq_unfold ?loc depth t1 t2 =
   match Logic_utils.unroll_type t1.term_type with
-  | Ctype(TArray(_, Some len, _)) ->
+  | Ctype { tnode = TArray (_, Some len) } ->
     let len = Logic_utils.expr_to_term ~coerce:true len in
     pall_elems_eq ?loc depth t1 t2 len
   | _ -> prel ?loc (Req, t1, t2)
@@ -225,7 +224,7 @@ and peq_unfold ?loc depth t1 t2 =
 let rec punfold_all_elems_pred ?loc t1 len pred =
   pall_elems_pred ?loc 0 t1 len pred
 and pall_elems_pred ?loc depth t1 len pred =
-  let ind = make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
+  let ind = Cil_const.make_logic_var_quant ("j" ^ (string_of_int depth)) Linteger in
   let tind = tvar ind in
   let bounds = pbounds_incl_excl ?loc (tinteger 0) tind len in
   let t1_acc = taccess ?loc t1 tind in
@@ -233,7 +232,7 @@ and pall_elems_pred ?loc depth t1 len pred =
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
   match Logic_utils.unroll_type t1.term_type with
-  | Ctype(TArray(_, opt_len, _)) ->
+  | Ctype { tnode = TArray (_, opt_len) } ->
     let len =
       match opt_len, dyn_len with
       | Some len, None -> Logic_utils.expr_to_term ~coerce:true len
@@ -242,7 +241,7 @@ and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
         Options.fatal "Unfolding array: cannot find a length"
     in
     pall_elems_pred ?loc (depth+1) t1 len pred
-  | Ctype(TComp(ci, _)) ->
+  | Ctype { tnode = TComp ci } ->
     pall_fields_pred ?loc depth t1 ci pred
   | _ -> pred ?loc t1
 and pall_fields_pred ?loc ?(flex_mem_len=None) depth t1 ci pred =
@@ -262,7 +261,7 @@ and pall_fields_pred ?loc ?(flex_mem_len=None) depth t1 ci pred =
 let punfold_flexible_struct_pred ?loc the_struct bytes_len pred =
   let struct_len = tinteger ?loc (sizeof the_struct.term_type) in
   let ci = match the_struct.term_type with
-    | Ctype(TComp(ci, _) as t) when Cil.has_flexible_array_member t -> ci
+    | Ctype ({ tnode = TComp ci } as t) when Cil.has_flexible_array_member t -> ci
     | _ -> Options.fatal "Unfolding flexible on a non flexible structure"
   in
   let flex_type = Ctype (Extlib.last (Option.get ci.cfields)).ftype in

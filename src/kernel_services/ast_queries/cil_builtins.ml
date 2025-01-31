@@ -256,41 +256,41 @@ let build_type_table () : (string, typ option) Hashtbl.t =
   let uint16_t = try Some (Cil.uint16_t ()) with Not_found -> None in
   let uint32_t = try Some (Cil.uint32_t ()) with Not_found -> None in
   let uint64_t = try Some (Cil.uint64_t ()) with Not_found -> None in
-  let ptr_of = Option.map (fun t -> TPtr(t,[])) in
-  let volatile_ptr_of = Option.map (fun t -> TPtr(typeAddVolatile t,[])) in
+  let ptr_of = Option.map (fun t -> Cil_const.mk_tptr t) in
+  let volatile_ptr_of = Option.map (fun t -> Cil_const.mk_tptr (typeAddVolatile t)) in
   let types =
     [
       ("__builtin_va_list",
        Some (if Machine.has_builtin_va_list ()
-             then TBuiltin_va_list []
+             then Cil_const.mk_tbuiltin ()
              else Cil_const.voidPtrType));
       ("char *", Some Cil_const.charPtrType);
       ("char const *", Some Cil_const.charConstPtrType);
       ("double", Some Cil_const.doubleType);
-      ("double *", Some (TPtr(Cil_const.doubleType,[])));
+      ("double *", Some Cil_const.(mk_tptr doubleType));
       ("float", Some Cil_const.floatType);
-      ("float *", Some (TPtr(Cil_const.floatType,[])));
+      ("float *", Some Cil_const.(mk_tptr floatType));
       ("int", Some Cil_const.intType);
       ("int *", Some Cil_const.intPtrType);
-      ("int volatile *", Some (TPtr(typeAddVolatile Cil_const.intType,[])));
+      ("int volatile *", Some Cil_const.(mk_tptr (typeAddVolatile intType)));
       ("long", Some Cil_const.longType);
       ("long double", Some Cil_const.longDoubleType);
-      ("long double *", Some (TPtr(Cil_const.longDoubleType,[])));
+      ("long double *", Some Cil_const.(mk_tptr longDoubleType));
       ("long long", Some Cil_const.longLongType);
-      ("long long volatile *", Some (TPtr(typeAddVolatile Cil_const.longLongType,[])));
+      ("long long volatile *", Some Cil_const.(mk_tptr (typeAddVolatile longLongType)));
       ("short", Some Cil_const.shortType);
-      ("short volatile *", Some (TPtr(typeAddVolatile Cil_const.shortType,[])));
+      ("short volatile *", Some Cil_const.(mk_tptr (typeAddVolatile shortType)));
       ("signed char", Some Cil_const.scharType);
-      ("signed char volatile *", Some (TPtr(typeAddVolatile Cil_const.scharType,[])));
+      ("signed char volatile *", Some Cil_const.(mk_tptr (typeAddVolatile scharType)));
       ("unsigned char", Some Cil_const.ucharType);
-      ("unsigned char volatile *", Some (TPtr(typeAddVolatile Cil_const.ucharType,[])));
+      ("unsigned char volatile *", Some Cil_const.(mk_tptr (typeAddVolatile ucharType)));
       ("unsigned int", Some Cil_const.uintType);
-      ("unsigned int volatile *", Some (TPtr(typeAddVolatile Cil_const.uintType,[])));
+      ("unsigned int volatile *", Some Cil_const.(mk_tptr (typeAddVolatile uintType)));
       ("unsigned long", Some Cil_const.ulongType);
       ("unsigned long long", Some Cil_const.ulongLongType);
-      ("unsigned long long volatile *", Some (TPtr(typeAddVolatile Cil_const.ulongLongType,[])));
+      ("unsigned long long volatile *", Some Cil_const.(mk_tptr (typeAddVolatile ulongLongType)));
       ("unsigned short", Some Cil_const.ushortType);
-      ("unsigned short volatile *", Some (TPtr(typeAddVolatile Cil_const.ushortType,[])));
+      ("unsigned short volatile *", Some Cil_const.(mk_tptr (typeAddVolatile ushortType)));
       ("void", Some Cil_const.voidType);
       ("void *", Some Cil_const.voidPtrType);
       ("void const *", Some Cil_const.voidConstPtrType);

@@ -68,7 +68,7 @@ let mk_function name =
   let vi =
     Cil.makeGlobalVar ~source:true
       name
-      (TFun(Cil_const.voidType, Some [], false, []))
+      Cil_const.(mk_tfun voidType (Some []) false)
   in
   vi.vdefined <- true;
   (* There is no contract associated with the function *)
@@ -157,7 +157,7 @@ let mk_init_function () =
     Cil.makeLocalVar
       fundec
       (Functions.RTL.mk_api_name "already_run")
-      (TInt(IChar, []))
+      Cil_const.charType
   in
   vi_already_run.vdefined <- true;
   vi_already_run.vreferenced <- true;

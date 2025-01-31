@@ -34,7 +34,8 @@ let float_type = Ctype Cil_const.floatType
 let double_type = Ctype Cil_const.doubleType
 let long_double_type = Ctype Cil_const.longDoubleType
 let object_ptr = Ctype Cil_const.voidPtrType
-let fun_ptr = Ctype (TPtr(TFun(Cil_const.voidType,None,false,[]),[]))
+let fun_ptr =
+  Ctype Cil_const.(mk_tptr (mk_tfun voidType None false))
 
 let polymorphic_type name = name, Lvar name
 

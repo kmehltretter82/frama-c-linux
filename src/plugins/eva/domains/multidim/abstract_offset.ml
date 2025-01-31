@@ -125,8 +125,8 @@ let rec of_eva_offset (oracle : Eva_ast.exp -> Int_val.t) base_typ = function
       let+ sub' = of_eva_offset oracle fi.ftype sub in
       Field (fi, sub')
   | Index (exp, sub) ->
-    match Cil.unrollType base_typ with
-    | TArray (elem_typ, array_size, _) ->
+    match Cil.unrollTypeNode base_typ with
+    | TArray (elem_typ, array_size) ->
       let idx = oracle exp in
       let+ () = assert_valid_index idx array_size
       and+ sub' = of_eva_offset oracle elem_typ sub in
@@ -137,8 +137,8 @@ let rec of_int_val ~base_typ ~typ ival =
   if Int_val.is_zero ival && Bit_utils.type_compatible base_typ typ then
     `Value (NoOffset typ)
   else
-    match Cil.unrollType base_typ with
-    | TArray (elem_typ, array_size, _) ->
+    match Cil.unrollTypeNode base_typ with
+    | TArray (elem_typ, array_size) ->
       let* range, rem =
         try
           let elem_size = Integer.of_int (Cil.bitsSizeOf elem_typ) in
@@ -164,7 +164,7 @@ let rec of_int_val ~base_typ ~typ ival =
       and+ sub' = of_int_val ~base_typ:elem_typ ~typ rem in
       Index (None, range, elem_typ, sub')
 
-    | TComp (ci, _) ->
+    | TComp ci ->
       if not ci.cstruct then
         (* Ignore unions for now *)
         `Top
@@ -225,8 +225,8 @@ let rec of_term_offset base_typ = function
       let+ sub' = of_term_offset fi.ftype sub in
       Field (fi, sub')
   | TIndex (index, sub) ->
-    begin match Cil.unrollType base_typ with
-      | TArray (elem_typ, array_size, _) ->
+    begin match Cil.unrollTypeNode base_typ with
+      | TArray (elem_typ, array_size) ->
         let* idx = index_of_term array_size index in
         let+ () = assert_valid_index idx array_size
         and+ sub' = of_term_offset elem_typ sub in

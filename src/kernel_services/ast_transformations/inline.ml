@@ -175,8 +175,8 @@ let inline_call loc caller callee return args =
   in
   callee_fd.sbody
 
-let is_variadic_function vi = match vi.vtype with
-  | TFun(_, _, is_v, _) -> is_v
+let is_variadic_function vi = match vi.vtype.tnode with
+  | TFun(_, _, is_v) -> is_v
   | _ -> false
 
 let inliner functions_to_inline = object (self)

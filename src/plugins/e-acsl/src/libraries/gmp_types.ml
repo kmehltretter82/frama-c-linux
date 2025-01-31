@@ -32,7 +32,7 @@ let mk_dummy_type_info_ref () =
   ref
     { torig_name = "";
       tname = "";
-      ttype = TVoid [];
+      ttype = Cil_const.voidType;
       treferenced = false }
 
 module type S = sig
@@ -52,7 +52,7 @@ module Make() = struct
 
   let is_now_referenced () = !t_torig_ref.treferenced <- true
 
-  let t () = TNamed(!t_torig_ref, [])
+  let t () = Cil_const.mk_tnamed !t_torig_ref
 
   (* create a unique shared representation in order to use [==] in [is_t] *)
   let t_as_ptr_info =
@@ -60,17 +60,16 @@ module Make() = struct
       {
         torig_name = "";
         tname = !t_struct_torig_ref.tname ^ " *";
-        ttype = TArray(
-            TNamed(!t_struct_torig_ref, []),
-            Some (Cil.one ~loc:Cil_datatype.Location.unknown),
-            []);
+        ttype =
+          Cil_const.(mk_tarray (mk_tnamed !t_struct_torig_ref)
+                       (Some (Cil.one ~loc:Cil_datatype.Location.unknown)));
         treferenced = true;
       }
 
-  let t_as_ptr () = TNamed (Lazy.force t_as_ptr_info, [])
+  let t_as_ptr () = Cil_const.mk_tnamed (Lazy.force t_as_ptr_info)
 
-  let is_t ty = match ty with
-    | TNamed(tinfo, []) ->
+  let is_t ty = match ty.tnode with
+    | TNamed tinfo ->
       tinfo == !t_torig_ref || tinfo == Lazy.force t_as_ptr_info
     | _ -> false
 
@@ -82,7 +81,7 @@ module Q = Make()
 let bitcnt_type_info_ref = mk_dummy_type_info_ref ()
 
 let set_bitcnt_t tinfo = bitcnt_type_info_ref := tinfo
-let bitcnt_t () = TNamed(!bitcnt_type_info_ref, [])
+let bitcnt_t () =  Cil_const.mk_tnamed !bitcnt_type_info_ref
 
 (**************************************************************************)
 (******************* Initialization of mpz and mpq types ******************)

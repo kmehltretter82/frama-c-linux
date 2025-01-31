@@ -196,8 +196,6 @@ val block_of_local: fundec -> varinfo -> block
 (** {2 Types} *)
 (* ************************************************************************** *)
 
-val array_type: ?length:exp -> ?attr:attributes -> typ -> typ
-
 val direct_array_size: typ -> Integer.t
 val array_size: typ -> Integer.t
 val direct_element_type: typ -> typ
@@ -280,6 +278,10 @@ val is_frama_c_builtin: varinfo -> bool
     {!Cil_builtins.has_fc_builtin_attr} are true.
     @before 29.0-Copper Behave like {!start_with_frama_c_builtin}.
 *)
+
+val array_type: ?length:exp -> ?attr:attributes -> typ -> typ
+(** @deprecated Frama-C+dev *)
+[@@alert deprecated "Use Cil_const.mk_tarray instead."]
 
 (*
 Local Variables:

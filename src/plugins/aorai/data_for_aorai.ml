@@ -558,7 +558,7 @@ let memo_aux_variable tr counter used_prms vi =
     let my_type =
       match counter with
       | None -> vi.vtype
-      | Some _ -> TArray(vi.vtype,None,[])
+      | Some _ -> Cil_const.mk_tarray vi.vtype None
     in
     let my_var =
       Cil.makeGlobalVar ~ghost:true (get_fresh ("aorai_" ^ vi.vname)) my_type
@@ -737,7 +737,7 @@ let type_expr metaenv env ?tr ?current e =
       let t =
         Logic_const.term
           (TConst (LWStr (Logic_typing.wcharlist_of_string s)))
-          (Ctype (TPtr(Machine.wchar_type (),[])))
+          (Ctype (Cil_const.mk_tptr (Machine.wchar_type ())))
       in env,t,cond
     | PBinop(bop,e1,e2) ->
       let op = Logic_typing.type_binop bop in
@@ -1139,7 +1139,7 @@ let rec type_seq default_state tr metaenv env needs_pebble curr_start curr_end s
       (* TODO: makes it an integer *)
       let counter =
         let ty = if needs_pebble then
-            Cil_types.TArray (Cil_const.intType,None,[])
+            Cil_const.(mk_tarray intType None)
           else Cil_const.intType
         in (* We won't always need a counter *)
         lazy (
@@ -2271,13 +2271,13 @@ let get_cenum_option name =
     None
 
 let func_enum_type () =
-  try TEnum(Hashtbl.find used_enuminfo listOp,[])
+  try Cil_const.mk_tenum (Hashtbl.find used_enuminfo listOp)
   with Not_found ->
     Aorai_option.fatal
       "Enum type indicating current function (%s) is unknown" listOp
 
 let status_enum_type () =
-  try TEnum(Hashtbl.find used_enuminfo listStatus,[])
+  try Cil_const.mk_tenum (Hashtbl.find used_enuminfo listStatus)
   with Not_found ->
     Aorai_option.fatal
       "Enum type indicating current event (%s) is unknown" listStatus

@@ -70,11 +70,11 @@ let float_range fkind l u =
 
 let evaluate cvalue typ =
   let cardinal = Cvalue.V.cardinal cvalue in
-  match typ, cardinal with
+  match typ.Cil_types.tnode, cardinal with
   | _, Some card when Integer.is_zero card -> Empty
   | _, Some card when Integer.is_one card -> Singleton
-  | Cil_types.TInt (ikind,_), Some cardinal -> integer_range cardinal ikind
-  | Cil_types.TFloat (fkind,_), _ ->
+  | TInt ikind, Some cardinal -> integer_range cardinal ikind
+  | TFloat fkind, _ ->
     begin match Ival.min_and_max_float (Cvalue.V.project_ival cvalue) with
       | Some (l, u), _can_be_nan -> float_range fkind l u
       | _, _ -> Wide

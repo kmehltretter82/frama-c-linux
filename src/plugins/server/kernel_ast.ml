@@ -475,11 +475,11 @@ struct
 
   let descr_localizable fmt = function
     | PGlobal (GType(ti,_)) ->
-      PrinterTag.pp_typ fmt (TNamed(ti,[]))
+      PrinterTag.pp_typ fmt (Cil_const.mk_tnamed ti)
     | PGlobal (GCompTag(ci,_) | GCompTagDecl(ci,_)) ->
-      PrinterTag.pp_typ fmt (TComp(ci,[]))
+      PrinterTag.pp_typ fmt (Cil_const.mk_tcomp ci)
     | PGlobal (GEnumTag(ei,_) | GEnumTagDecl(ei,_)) ->
-      PrinterTag.pp_typ fmt (TEnum(ei,[]))
+      PrinterTag.pp_typ fmt (Cil_const.mk_tenum ei)
     | g -> pp_localizable fmt g
 
   let model = States.model ()
@@ -917,7 +917,7 @@ let () = Information.register
     ~title:"Type Definition"
     begin fun fmt loc ->
       match loc with
-      | PType (TNamed _ as ty)
+      | PType ({ tnode = TNamed _ } as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
         begin
           let tdef = Cil.unrollType ty in
@@ -940,8 +940,8 @@ let () = Information.register
         | PType typ -> typ
         | PVDecl(_,_,vi) -> vi.vtype
         | PGlobal (GType(ti,_)) -> ti.ttype
-        | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> TComp(ci,[])
-        | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> TEnum(ei,[])
+        | PGlobal (GCompTagDecl(ci,_) | GCompTag(ci,_)) -> Cil_const.mk_tcomp ci
+        | PGlobal (GEnumTagDecl(ei,_) | GEnumTag(ei,_)) -> Cil_const.mk_tenum ei
         | _ -> raise Not_found
       in
       let bits =

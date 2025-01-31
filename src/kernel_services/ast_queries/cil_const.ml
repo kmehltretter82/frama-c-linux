@@ -46,34 +46,51 @@ open Cil_types
 
 (* Types *)
 
-let voidType = TVoid([])
-let boolType = TInt(IBool,[])
-let intType = TInt(IInt,[])
-let uintType = TInt(IUInt,[])
-let shortType = TInt(IShort, [])
-let ushortType = TInt(IUShort, [])
-let longType = TInt(ILong,[])
-let longLongType = TInt(ILongLong,[])
-let ulongType = TInt(IULong,[])
-let ulongLongType = TInt(IULongLong, [])
-let charType = TInt(IChar, [])
-let scharType = TInt(ISChar, [])
-let ucharType = TInt(IUChar, [])
+let mk_typ ?(tattr=[]) tnode = { tnode; tattr }
 
-let charPtrType = TPtr(charType,[])
-let scharPtrType = TPtr(scharType,[])
-let ucharPtrType = TPtr(ucharType,[])
-let charConstPtrType = TPtr(TInt(IChar, [Attr("const", [])]),[])
+let mk_tvoid  ?tattr ()    = mk_typ ?tattr TVoid
+let mk_tint   ?tattr ik    = mk_typ ?tattr (TInt   ik)
+let mk_tfloat ?tattr fk    = mk_typ ?tattr (TFloat fk)
+let mk_tptr   ?tattr t     = mk_typ ?tattr (TPtr   t )
+let mk_tarray ?tattr t len = mk_typ ?tattr (TArray (t, len))
+let mk_tfun   ?tattr f args va = mk_typ ?tattr (TFun (f, args, va))
+let mk_tnamed ?tattr ti    = mk_typ ?tattr (TNamed ti)
+let mk_tcomp  ?tattr ci    = mk_typ ?tattr (TComp  ci)
+let mk_tenum  ?tattr ei    = mk_typ ?tattr (TEnum  ei)
+let mk_tbuiltin ?tattr ()  = mk_typ ?tattr TBuiltin_va_list
 
-let voidPtrType = TPtr(voidType, [])
-let voidConstPtrType = TPtr(TVoid [Attr ("const", [])], [])
+let voidType      = mk_tvoid ()
+let boolType      = mk_tint IBool
+let intType       = mk_tint IInt
+let uintType      = mk_tint IUInt
+let shortType     = mk_tint IShort
+let ushortType    = mk_tint IUShort
+let longType      = mk_tint ILong
+let longLongType  = mk_tint ILongLong
+let ulongType     = mk_tint IULong
+let ulongLongType = mk_tint IULongLong
+let charType      = mk_tint IChar
+let scharType     = mk_tint ISChar
+let ucharType     = mk_tint IUChar
 
-let intPtrType = TPtr(intType, [])
-let uintPtrType = TPtr(uintType, [])
+let charPtrType  = mk_tptr charType
+let scharPtrType = mk_tptr scharType
+let ucharPtrType = mk_tptr ucharType
+let charConstPtrType =
+  let charConst = mk_tint ~tattr:[Attr ("const", [])] IChar in
+  mk_tptr charConst
 
-let doubleType = TFloat(FDouble, [])
-let floatType = TFloat(FFloat, [])
-let longDoubleType = TFloat (FLongDouble, [])
+let voidPtrType = mk_tptr voidType
+let voidConstPtrType =
+  let voidConst = mk_tvoid ~tattr:[Attr ("const", [])] () in
+  mk_tptr voidConst
+
+let intPtrType  = mk_tptr intType
+let uintPtrType = mk_tptr uintType
+
+let doubleType     = mk_tfloat FDouble
+let floatType      = mk_tfloat FFloat
+let longDoubleType = mk_tfloat FLongDouble
 
 module Vid = State_builder.SharedCounter(struct let name = "vid_counter" end)
 module Sid = State_builder.SharedCounter(struct let name = "sid" end)

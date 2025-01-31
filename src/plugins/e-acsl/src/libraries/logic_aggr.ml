@@ -34,9 +34,9 @@ let rec get_array_typ_opt ty =
     *)
     None
   else
-    match ty with
-    | TNamed (r, _) -> get_array_typ_opt r.ttype
-    | TArray (t, eo, a) -> Some (t, eo, a)
+    match ty.tnode with
+    | TNamed ti -> get_array_typ_opt ti.ttype
+    | TArray (t, eo) -> Some (t, eo, ty.tattr)
     | _ -> None
 
 (** @return true iff the type is an array *)

@@ -72,8 +72,8 @@ let get_set_suffix_and_arg res_ty e =
      [TODO] check the statement above *)
   | C_float FLongDouble, _ -> Error.not_yet "creating gmp from long double"
   | Gmpz, _ | Rational, _ | Real, _ | Nan, _ ->
-    match Cil.unrollType ty with
-    | TPtr(TInt(IChar, _), _) ->
+    match Cil.unrollTypeNode ty with
+    | TPtr { tnode = TInt IChar } ->
       "_str",
       (* decimal base for the number given as string *)
       [ e; Cil.integer ~loc:e.eloc 10 ]
@@ -114,7 +114,7 @@ let init_set ~loc lv ev e =
              [ ev;
                Cil.one ~loc;
                Cil.one ~loc;
-               Cil.sizeOf ~loc (TInt(IULongLong, []));
+               Cil.sizeOf ~loc Cil_const.ulongLongType;
                Cil.zero ~loc;
                Cil.zero ~loc;
                Cil.mkAddrOf ~loc elv ]
@@ -368,13 +368,13 @@ module Q = struct
       in
       e, env
     in
-    match Cil.unrollType ty with
-    | TFloat(FLongDouble, _) ->
+    match Cil.unrollTypeNode ty with
+    | TFloat FLongDouble ->
       (* The biggest floating-point type we can extract from GMPQ is double *)
       Error.not_yet "R to long double"
-    | TFloat(FDouble, _) ->
+    | TFloat FDouble ->
       get_double e env
-    | TFloat(FFloat, _) ->
+    | TFloat FFloat ->
       (* No "get_float" in GMPQ, but fortunately, [float] \subset [double].
          HOWEVER: going through double as intermediate step might be unsound
          since it could cause double rounding. See: [Boldo2013, Sec 2.2]
@@ -383,7 +383,7 @@ module Q = struct
       Options.warning
         ~once:true "R to float: double rounding might cause unsoundness";
       Cil.mkCastT ~force:false ~oldt:Cil_const.doubleType ~newt:ty e, env
-    | TInt(IULongLong, _) ->
+    | TInt IULongLong ->
       (* The biggest C integer type we can extract from GMP is ulong *)
       Error.not_yet "R to unsigned long long"
     | TInt _ ->

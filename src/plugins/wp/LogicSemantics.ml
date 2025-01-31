@@ -358,8 +358,8 @@ struct
   let float_of_logic_type lt =
     match Logic_utils.unroll_type lt with
     | Ctype ty ->
-      (match Cil.unrollType ty with
-       | TFloat(f,_) -> Some (Ctypes.c_float f)
+      (match Cil.unrollTypeNode ty with
+       | TFloat f -> Some (Ctypes.c_float f)
        | _ -> None)
     | _ -> None
 

@@ -69,7 +69,7 @@ end = struct
 
   let init ~loc ~result_name env kf count =
     (* Add a call to init in the environment *)
-    let ty = TPtr(Lazy.force ctyp_lazy, []) in
+    let ty = Cil_const.mk_tptr (Lazy.force ctyp_lazy) in
     Env.new_var
       ~loc
       ~name:result_name

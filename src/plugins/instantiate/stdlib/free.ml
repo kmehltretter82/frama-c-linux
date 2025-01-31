@@ -79,9 +79,9 @@ let generate_spec _typ loc { svar = vi } =
 let generate_prototype alloc_t =
   let name = function_name ^ "_" ^ (string_of_typ alloc_t) in
   let params = [
-    ("ptr", (ptr_of alloc_t), [])
+    ("ptr", (Cil_const.mk_tptr alloc_t), [])
   ] in
-  name, (TFun(Cil_const.voidType, Some params, false, []))
+  name, Cil_const.(mk_tfun voidType (Some params) false)
 
 let well_typed_call _ret _fct args =
   match args with

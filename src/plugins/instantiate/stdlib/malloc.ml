@@ -55,12 +55,12 @@ let generate_spec alloc_typ loc { svar = vi } =
   in
   let size = tlogic_coerce ~loc (cvar_to_tvar csize) Linteger in
   let requires = [ valid_size ~loc alloc_typ size ] in
-  let assigns = generate_global_assigns loc (ptr_of alloc_typ) size in
-  let alloc = allocates_result ~loc (ptr_of alloc_typ) in
+  let assigns = generate_global_assigns loc (Cil_const.mk_tptr alloc_typ) size in
+  let alloc = allocates_result ~loc (Cil_const.mk_tptr alloc_typ) in
   make_funspec [
     make_behavior ~requires ~assigns ~alloc () ;
-    make_behavior_allocation loc (ptr_of alloc_typ) size ;
-    make_behavior_no_allocation loc (ptr_of alloc_typ) size
+    make_behavior_allocation loc (Cil_const.mk_tptr alloc_typ) size ;
+    make_behavior_no_allocation loc (Cil_const.mk_tptr alloc_typ) size
   ] ()
 
 let generate_prototype alloc_t =
@@ -68,7 +68,7 @@ let generate_prototype alloc_t =
   let params = [
     ("size", size_t (), [])
   ] in
-  name, (TFun((ptr_of alloc_t), Some params, false, []))
+  name, Cil_const.(mk_tfun (mk_tptr alloc_t) (Some params) false)
 
 let well_typed_call ret _fct args =
   match ret, args with

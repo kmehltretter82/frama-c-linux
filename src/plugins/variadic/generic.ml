@@ -29,8 +29,8 @@ module Build = Cil_builder.Pure
 
 (* Types of variadic parameter and argument *)
 
-let vpar_typ attr =
-  TPtr (TPtr (TVoid [], [Attr ("const", [])]), attr)
+let vpar_typ tattr =
+  Cil_const.(mk_tptr ~tattr (mk_tptr ~tattr:[Attr ("const", [])] voidType))
 let vpar_name = "__va_params"
 let vpar =
   (vpar_name, vpar_typ [], [])
@@ -38,8 +38,9 @@ let vpar =
 
 (* Translation of variadic types (not deeply) *)
 
-let translate_type = function
-  | TFun (ret_typ, args, is_variadic, attributes) ->
+let translate_type t =
+  match t.tnode with
+  | TFun (ret_typ, args, is_variadic) ->
     let new_args =
       if is_variadic
       then
@@ -47,11 +48,9 @@ let translate_type = function
         Some (ng_args @ [vpar] @ g_args)
       else args
     in
-    TFun (ret_typ, new_args, false, attributes)
-
-  | TBuiltin_va_list attr -> vpar_typ attr
-
-  | typ -> typ
+    Cil_const.mk_tfun ~tattr:t.tattr ret_typ new_args false
+  | TBuiltin_va_list -> vpar_typ t.tattr
+  | _ -> t
 
 
 (* Adding the vpar parameter to variadic functions *)

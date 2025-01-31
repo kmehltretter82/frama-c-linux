@@ -153,7 +153,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
       error env ~loc "Pointer-type expected for operator '*'"
   | PLunop( Uamp , p ) ->
     let lv = parse_lpath env p in
-    let typ = TPtr( lv.typ , [] ) in
+    let typ = Cil_const.mk_tptr lv.typ in
     { loc ; step = AddrOf lv ; typ }
   | PLbinop( p , Badd , rg ) ->
     parse_lrange env rg ;
@@ -163,7 +163,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
     else
     if Cil.isArrayType typ then
       let te = Cil.typeOf_array_elem typ in
-      { loc ; step = Shift lv ; typ = TPtr(te,[]) }
+      { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
     else
       error env ~loc "Pointer-type expected for operator '+'"
   | PLdot( p , f ) ->

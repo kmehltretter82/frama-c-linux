@@ -99,7 +99,7 @@ let logicCType t =
 let plain_array_to_ptr ty =
   let open Current_loc.Operators in
   match unroll_type ty with
-  | Ctype(TArray(ty,lo,attr) as tarr) ->
+  | Ctype({ tnode = TArray(ty,lo); tattr } as tarr) ->
     let length_attr =
       match lo with
       | None -> []
@@ -122,7 +122,8 @@ let plain_array_to_ptr ty =
             "Cannot represent length of array as an attribute";
           []
     in
-    Ctype(TPtr(ty, Cil.addAttributes length_attr attr))
+    let tattr = Cil.addAttributes length_attr tattr in
+    Ctype (Cil_const.mk_tptr ~tattr ty)
   | ty -> ty
 
 let array_to_ptr = plain_or_set plain_array_to_ptr
@@ -214,7 +215,7 @@ let rec mk_logic_StartOf t =
 let mk_logic_AddrOf ?(loc=Cil_datatype.Location.unknown) lval typ =
   let lift_set typ =
     Logic_const.transform_element
-      (fun typ -> (Ctype (TPtr (logicCType typ,[])))) typ
+      (fun typ -> Ctype (Cil_const.mk_tptr (logicCType typ))) typ
   in
   match lval with
   | TMem e, TNoOffset -> Logic_const.term ~loc e.term_node e.term_type
@@ -324,7 +325,7 @@ let parse_float ?loc literal =
     else real_of_parsed literal v in
   let vreal = Logic_const.term ?loc (TConst(LReal creal)) Lreal in
   if is_flt then
-    let ty = TFloat(fk,[]) in
+    let ty = Cil_const.mk_tfloat fk in
     Logic_const.term ?loc (TCast(false, Ctype ty,vreal)) (Ctype ty)
   else vreal
 
@@ -342,12 +343,12 @@ let rec numeric_coerce ltyp t =
   | TConst(LReal _ ) when ltyp = Lreal ->
     { t with term_type = Lreal }
   | TCast (false, Ctype ty,e) ->
-    begin match ltyp, Cil.unrollType ty, e.term_node with
-      | Linteger, TInt(ik,_), TConst(Integer(v,_))
+    begin match ltyp, Cil.unrollTypeNode ty, e.term_node with
+      | Linteger, TInt ik, TConst(Integer(v,_))
         when Cil.fitsInInt ik v -> { e with term_type = Linteger }
-      | Lreal, TFloat(fk,_), TConst(LReal r)
+      | Lreal, TFloat fk, TConst(LReal r)
         when Cil.isExactFloat fk r -> { e with term_type = Lreal }
-      | Linteger, TInt(ik,_), TConst(LEnum { eival }) ->
+      | Linteger, TInt ik, TConst(LEnum { eival }) ->
         ( match Cil.constFoldToInt eival with
           | Some i when Cil.fitsInInt ik i -> { e with term_type = Linteger }
           | _ -> mk_coerce ltyp t )
@@ -380,8 +381,8 @@ and numeric_bound ltyp = function
 
 let is_zero_comparable t =
   match unroll_type t.term_type with
-  | Ctype (TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TEnum _) -> true
-  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _) -> false
+  | Ctype { tnode = (TInt _ | TFloat _ | TPtr _  | TArray _ | TFun _ | TEnum _) } -> true
+  | Ctype { tnode = (TVoid  | TNamed _ | TComp _ | TBuiltin_va_list) } -> false
   | Linteger | Lreal | Lboolean -> true
   | Ltype _ -> false
   | Lvar _ | Larrow _ -> false
@@ -397,18 +398,18 @@ let scalar_term_conversion conversion t =
   let bool_conversion t =
     conversion ~loc true t (Logic_const.tboolean ~loc true) in
   match unroll_type t.term_type with
-  | Ctype (TInt _ | TEnum _) -> int_conversion t
-  | Ctype (TFloat _) as ltyp -> real_conversion ~ltyp t
-  | Ctype (TPtr _) -> ptr_conversion t
-  | Ctype (TArray _) -> ptr_conversion t
+  | Ctype { tnode = (TInt _ | TEnum _) } -> int_conversion t
+  | Ctype { tnode = TFloat _ } as ltyp -> real_conversion ~ltyp t
+  | Ctype { tnode = TPtr _ } -> ptr_conversion t
+  | Ctype { tnode = TArray _ } -> ptr_conversion t
   (* Could be transformed to \true: an array is never \null *)
-  | Ctype (TFun _) -> ptr_conversion t
+  | Ctype { tnode = TFun _ } -> ptr_conversion t
   (* decay as pointer *)
   | Linteger -> int_conversion t
   | Lreal -> real_conversion t
   | Lboolean -> bool_conversion t
   | Ltype _ | Lvar _ | Larrow _
-  | Ctype (TVoid _ | TNamed _ | TComp _ | TBuiltin_va_list _)
+  | Ctype { tnode = (TVoid | TNamed _ | TComp _ | TBuiltin_va_list) }
     -> Kernel.fatal
          "Cannot convert a term of type %a"
          !Cil.pp_logic_type_ref t.term_type
@@ -447,16 +448,16 @@ let float_builtin prefix fkind =
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
 
 let get_float_binop op typ =
-  match Cil.unrollType typ, op with
-  | TFloat(fkind,_) , PlusA  -> float_builtin "add" fkind
-  | TFloat(fkind,_) , MinusA -> float_builtin "sub" fkind
-  | TFloat(fkind,_) , Mult   -> float_builtin "mul" fkind
-  | TFloat(fkind,_) , Div    -> float_builtin "div" fkind
+  match Cil.unrollTypeNode typ, op with
+  | TFloat fkind, PlusA  -> float_builtin "add" fkind
+  | TFloat fkind, MinusA -> float_builtin "sub" fkind
+  | TFloat fkind, Mult   -> float_builtin "mul" fkind
+  | TFloat fkind, Div    -> float_builtin "div" fkind
   | _ -> None
 
 let get_float_unop op typ =
-  match Cil.unrollType typ, op with
-  | TFloat(fkind,_) , Neg  -> float_builtin "neg" fkind
+  match Cil.unrollTypeNode typ, op with
+  | TFloat fkind, Neg  -> float_builtin "neg" fkind
   | _ -> None
 
 let is_boolean_exp e =
@@ -523,7 +524,7 @@ let rec expr_to_term ?(coerce=false) e =
   in
   let v = mk_cast ~loc typ @@ Logic_const.term ~loc node ltyp in
   if coerce then
-    match Cil.unrollType typ with
+    match Cil.unrollTypeNode typ with
     | TInt _ -> numeric_coerce Linteger v
     | TFloat _ -> numeric_coerce Lreal v
     | _ -> v
@@ -2223,8 +2224,8 @@ let lhost_c_type thost =
   | TVar v -> extract_ctype v.lv_type
   | TMem t ->
     let ty = extract_ctype t.term_type in
-    (match Cil.unrollType ty with
-     | TPtr(ty, _) -> ty
+    (match Cil.unrollTypeNode ty with
+     | TPtr ty -> ty
      | _ -> assert false)
   | TResult ty -> ty
 
@@ -2337,23 +2338,23 @@ let complete_types f = Cil.visitCilFile (new complete_types) f
 
 let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
   let preds = Logic_env.find_all_logic_functions "\\pointer_comparable" in
-  let cfct_ptr = TPtr (TFun(Cil_const.voidType,None,false,[]),[]) in
+  let cfct_ptr = Cil_const.(mk_tptr (mk_tfun Cil_const.voidType None false)) in
   let fct_ptr = Ctype cfct_ptr in
   let obj_ptr = Ctype Cil_const.voidPtrType in
   let discriminate t =
     let loc = t.term_loc in
     match Logic_const.unroll_ltdef t.term_type with
     | Ctype ty ->
-      (match Cil.unrollTypeDeep ty with
-       | TPtr(TFun _,_) ->
+      (match Cil.(unrollTypeDeep ty).tnode with
+       | TPtr { tnode = TFun _ } ->
          mk_cast ~loc cfct_ptr t, fct_ptr
-       | TPtr(TVoid _,_) -> t, obj_ptr
+       | TPtr { tnode = TVoid } -> t, obj_ptr
        | TPtr _ | TInt _ | TFloat _ | TEnum _ ->
          (* Value may emit pointer_comparable alarms on anything that
             may be compared. We cast scalar to void* to account for
             this *)
          mk_cast ~loc Cil_const.voidPtrType t, obj_ptr
-       | TVoid _ | TFun _ | TNamed _ | TComp _ | TBuiltin_va_list _
+       | TVoid | TFun _ | TNamed _ | TComp _ | TBuiltin_va_list
        | TArray _ (* in logic array do not decay implicitly
                      into pointers. *)
          ->
@@ -2436,10 +2437,10 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
 
 and constFoldCastToInt ~machdep typ e =
   try
-    let ik = match Cil.unrollType typ with
-      | TInt (ik, _) -> ik
+    let ik = match Cil.unrollTypeNode typ with
+      | TInt ik -> ik
       | TPtr _ -> Machine.uintptr_kind ()
-      | TEnum (ei,_) -> ei.ekind
+      | TEnum ei -> ei.ekind
       | _ -> raise Exit
     in
     match constFoldTermToInt ~machdep e with
@@ -2594,8 +2595,8 @@ let const_fold_trange_bounds typ b e =
   let e = match e with
     | Some te -> extract (constFoldTermToInt te)
     | None ->
-      match Cil.unrollType typ with
-      | TArray (_, Some size, _) ->
+      match Cil.unrollTypeNode typ with
+      | TArray (_, Some size) ->
         Integer.pred (extract (Cil.isInteger size))
       | _ -> raise CannotSimplify
   in

@@ -420,8 +420,8 @@ let rec term_to_exp t res =
     new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil_const.intType))
   | TCast (false, Ctype ty, {term_node = TConst(LReal lreal)}) when Cil.isFloatingType ty ->
-    (match Cil.unrollType ty with
-     | TFloat(fk,_) ->
+    (match Cil.unrollTypeNode ty with
+     | TFloat fk ->
        new_exp ~loc
          (Const (CReal (lreal.r_nearest,fk,Some lreal.r_literal)))
      | _ ->
@@ -482,7 +482,7 @@ let get_bhv_aux_fct kf bhv =
     vi.vdefined <- false;
     vi.vghost <- true;
     let (_,args,varargs,_) = Cil.splitFunctionTypeVI ovi in
-    let typ = TFun(Cil_const.intType, args, varargs,[]) in
+    let typ = Cil_const.(mk_tfun intType args varargs) in
     Cil.update_var_type vi typ;
     Cil.setFormalsDecl vi typ;
     vi.vattr <- [];
@@ -755,7 +755,7 @@ let mk_global_c_enum_type name elements =
   ignore (mk_global_c_enum_type_tagged name elements)
 
 let mk_gvar_enum ?init name name_enuminfo =
-  mk_gvar ?init ~ty:(TEnum(get_usedinfo name_enuminfo,[])) name
+  mk_gvar ?init ~ty:(Cil_const.mk_tenum (get_usedinfo name_enuminfo)) name
 
 
 (* ************************************************************************* *)
@@ -778,7 +778,7 @@ let mk_offseted_array host off =
 
 let int2enumstate nums =
   let enum = find_enum nums in
-  Logic_const.term (TConst (LEnum enum)) (Ctype (TEnum (enum.eihost,[])))
+  Logic_const.term (TConst (LEnum enum)) (Ctype (Cil_const.mk_tenum enum.eihost))
 
 let int2enumstate_exp loc nums = new_exp ~loc (Const (CEnum (find_enum nums)))
 
@@ -789,7 +789,7 @@ let mk_offseted_array_states_as_enum host off =
     (TLval
        (Logic_const.addTermOffsetLval
           (TIndex(Logic_const.term
-                    (TConst(LEnum enum)) (Ctype (TEnum (enum.eihost,[]))),
+                    (TConst(LEnum enum)) (Ctype (Cil_const.mk_tenum enum.eihost)),
                   TNoOffset))
           host))
     (Ctype Cil_const.intType)
@@ -1124,7 +1124,7 @@ let initGlobals root complete =
   mk_global_comment "//* Some constants";
   let states_typ =
     if Aorai_option.Deterministic.get ()
-    then Some (TEnum (make_enum_states (), []))
+    then Some (Cil_const.mk_tenum (make_enum_states ()))
     else None
   in
   (* non deterministic mode uses one variable for each possible state *)

@@ -283,35 +283,35 @@ let compute () = Globals.Functions.iter compute_kf
 
 let get_type_tag t =
   let rec aux t =
-    match t with
-    | TVoid _ -> "v"
-    | TInt (IBool,_) -> "B"
-    | TInt (IChar,_) -> "c"
-    | TInt (ISChar,_) -> "sc"
-    | TInt (IUChar,_) -> "uc"
-    | TInt (IInt,_) -> "i"
-    | TInt (IUInt,_) -> "ui"
-    | TInt (IShort,_) -> "s"
-    | TInt (IUShort,_) -> "us"
-    | TInt (ILong,_) -> "l"
-    | TInt (IULong,_) -> "ul"
-    | TInt (ILongLong,_) -> "ll"
-    | TInt (IULongLong,_) -> "ull"
-    | TFloat(FFloat,_) -> "f"
-    | TFloat(FDouble,_) -> "d"
-    | TFloat (FLongDouble,_) -> "ld"
-    | TPtr(t,_) -> "p" ^ aux t
-    | TArray(t,_,_) -> "a" ^ aux t
-    | TFun(rt,l,_,_) ->
+    match t.tnode with
+    | TVoid -> "v"
+    | TInt IBool -> "B"
+    | TInt IChar -> "c"
+    | TInt ISChar -> "sc"
+    | TInt IUChar -> "uc"
+    | TInt IInt -> "i"
+    | TInt IUInt -> "ui"
+    | TInt IShort -> "s"
+    | TInt IUShort -> "us"
+    | TInt ILong -> "l"
+    | TInt IULong -> "ul"
+    | TInt ILongLong -> "ll"
+    | TInt IULongLong -> "ull"
+    | TFloat FFloat -> "f"
+    | TFloat FDouble -> "d"
+    | TFloat FLongDouble -> "ld"
+    | TPtr t -> "p" ^ aux t
+    | TArray (t, _) -> "a" ^ aux t
+    | TFun (rt, l, _) ->
       let base = "fun" ^ aux rt in
       (match l with
        | None -> base
        | Some l ->
          List.fold_left (fun acc (_,t,_) -> acc ^ aux t) base l)
     | TNamed _ -> Kernel.fatal "named type not correctly unrolled"
-    | TComp (s,_) -> (if s.cstruct then "S" else "U") ^ s.cname
-    | TEnum (e,_) -> "E" ^ e.ename
-    | TBuiltin_va_list _ -> "va"
+    | TComp ci -> (if ci.cstruct then "S" else "U") ^ ci.cname
+    | TEnum ei -> "E" ^ ei.ename
+    | TBuiltin_va_list -> "va"
   in "__fc_" ^ aux t
 
 let get_type_enum t = "__fc_exn_kind_" ^ (get_type_tag t)
@@ -366,10 +366,10 @@ let generate_exn_union e exns =
   in
   let create_struct_fields _ =
     let uncaught = (exn_uncaught_name, Cil_const.intType, None, [], loc) in
-    let kind = (exn_kind_name, TEnum (e,[]), None, [], loc) in
+    let kind = (exn_kind_name, Cil_const.mk_tenum e, None, [], loc) in
     let obj =
       (exn_obj_name,
-       TComp(exn_kind_union, []), None, [], loc)
+       Cil_const.mk_tcomp exn_kind_union, None, [], loc)
     in
     Some [uncaught; kind; obj]
   in
@@ -563,7 +563,7 @@ class erase_exn =
         let e = generate_exn_enum exns in
         let u,s = generate_exn_union e exns in
         let exn =
-          Cil.makeGlobalVar "__fc_exn" (TComp (s,[]))
+          Cil.makeGlobalVar "__fc_exn" (Cil_const.mk_tcomp s)
         in
         self#update_enum_bindings e exns;
         self#update_union_bindings u exns;
@@ -574,7 +574,7 @@ class erase_exn =
           GCompTag (u,loc) ::
           GEnumTag (e,loc) :: new_types;
         exn_var <- Some exn;
-        let exn_init = Cil.makeZeroInit ~loc (TComp(s,[]))
+        let exn_init = Cil.makeZeroInit ~loc (Cil_const.mk_tcomp s)
         in
         let gexn_var = GVar(exn, { init = Some exn_init }, loc) in
         ChangeDoChildrenPost(

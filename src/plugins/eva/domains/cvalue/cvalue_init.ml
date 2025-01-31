@@ -67,8 +67,8 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
   let validity =
     (* Add a special case for void* pointers: we do not want to compute the
        size of void *)
-    let validity = match Cil.unrollType pointed_typ with
-      | TVoid _ -> Base.Unknown (Integer.zero, None, Bit_utils.max_bit_address ())
+    let validity = match Cil.unrollTypeNode pointed_typ with
+      | TVoid -> Base.Unknown (Integer.zero, None, Bit_utils.max_bit_address ())
       | _ -> Base.validity_from_type hidden_var
     in
     match validity with
@@ -96,8 +96,8 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
 
 
 let reject_empty_struct b offset typ =
-  match Cil.unrollType typ with
-  | TComp (ci, _) ->
+  match Cil.unrollTypeNode typ with
+  | TComp ci ->
     if ci.cfields = Some [] && not (Machine.acceptEmptyCompinfo ()) then
       Self.abort ~current:true
         "@[empty %ss@ are unsupported@ (type '%a',@ location %a%a)@ \
@@ -116,11 +116,11 @@ let initialize_var_using_type varinfo state =
     let bind_entire_loc ?(state=state) v = (* Shortcut *)
       add_initialized state (Lazy.force loc) v
     in
-    match typ with
-    | TInt _ | TEnum (_, _)->
+    match typ.tnode with
+    | TInt _ | TEnum _ ->
       bind_entire_loc Cvalue.V.top_int
 
-    | TFloat (fkind, _) -> begin
+    | TFloat fkind -> begin
         (* TODO: depend on the option for finitness *)
         bind_entire_loc
           (Cvalue.V.inject_float (Fval.top_finite (Fval.kind fkind)))
@@ -128,14 +128,14 @@ let initialize_var_using_type varinfo state =
 
     | TFun _ -> state
 
-    | TPtr (typ, _) as full_typ
+    | TPtr typ'
       when depth <= Parameters.AutomaticContextMaxDepth.get () ->
-      let attr = Cil.typeAttrs full_typ in
+      let attr = Cil.typeAttrs typ in
       let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
         Parameters.AutomaticContextMaxWidth.get ()
       in begin
-        match Cil.isVoidType typ, Cil.isFunctionType typ with
+        match Cil.isVoidType typ', Cil.isFunctionType typ' with
         | false, false -> (* non-void, non-function *)
           let i =
             match Cil.findAttribute "arraylen" attr with
@@ -143,9 +143,7 @@ let initialize_var_using_type varinfo state =
             | _ -> Integer.of_int context_max_width
           in
           let arr_pointed_typ =
-            TArray(typ,
-                   Some (Cil.kinteger64 ~loc:varinfo.vdecl i),
-                   [])
+            Cil_const.mk_tarray typ' (Some (Cil.kinteger64 ~loc:varinfo.vdecl i))
           in
           let hidden_var_name =
             Cabs2cil.fresh_global ("S_" ^ name)
@@ -154,7 +152,7 @@ let initialize_var_using_type varinfo state =
           (* Make first cell of the array valid. The NULL pointer takes
              care of a potential invalid pointer. *)
           let valid =
-            try KnownThenUnknownValidity (Integer.of_int (Cil.bitsSizeOf typ))
+            try KnownThenUnknownValidity (Integer.of_int (Cil.bitsSizeOf typ'))
             with Cil.SizeOfError _ -> UnknownValidity
           in
           let hidden_base =
@@ -184,7 +182,7 @@ let initialize_var_using_type varinfo state =
           let name_desc = "*"^name_desc in
           let valid = UnknownValidity in
           let hidden_base =
-            create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc typ
+            create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc typ'
           in
           make_well hidden_base state (Lazy.force loc)
         | false, true -> (* function *)
@@ -194,7 +192,7 @@ let initialize_var_using_type varinfo state =
         | true, true -> assert false (* inconsistent *)
       end
 
-    | TArray (typ, len, _) ->
+    | TArray (typ, len) ->
       begin try
           let size = Cil.lenOfArray len in
           let size_elt = Integer.of_int (Cil.bitsSizeOf typ) in
@@ -298,7 +296,7 @@ let initialize_var_using_type varinfo state =
           bind_entire_loc Cvalue.V.top_int;
       end
 
-    | TComp ({cstruct=true;} as compinfo, _) -> (* Struct *)
+    | TComp ({cstruct=true} as compinfo) -> (* Struct *)
       reject_empty_struct b offset_orig typ;
       let treat_field state field =
         match field.fbitfield with
@@ -319,7 +317,7 @@ let initialize_var_using_type varinfo state =
           bind_entire_loc Cvalue.V.top_int;
       end
 
-    | TComp ({cstruct=false}, _) when Cil.is_fully_arithmetic typ ->
+    | TComp {cstruct=false} when Cil.is_fully_arithmetic typ ->
       reject_empty_struct b offset_orig typ;
       (* Union of arithmetic types *)
       bind_entire_loc Cvalue.V.top_int
@@ -328,7 +326,7 @@ let initialize_var_using_type varinfo state =
       (* deep pointers map to NULL in this case *)
       bind_entire_loc Cvalue.V.singleton_zero
 
-    | TBuiltin_va_list _ | TComp _ | TVoid _  | TPtr  _ ->
+    | TBuiltin_va_list | TComp _ | TVoid | TPtr _ ->
       reject_empty_struct b offset_orig typ;
       (* variable arguments or union with non-arithmetic type
          or deep pointers *)
@@ -344,7 +342,7 @@ let initialize_var_using_type varinfo state =
       let validity = Base.Known (Integer.zero, Bit_utils.max_bit_address ()) in
       let hidden_base = Base.register_memory_var hidden_var validity in
       make_well hidden_base state (Lazy.force loc)
-    | TNamed (_, _)  -> assert false
+    | TNamed _ -> assert false
   in
   add_offsetmap
     0

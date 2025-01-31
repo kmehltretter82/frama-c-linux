@@ -92,9 +92,9 @@ class visitor = object(self)
   inherit Visitor.frama_c_inplace
 
   method private ghost_incompatible nt ot =
-    match (unrollType nt), (unrollType ot) with
-    | TPtr (nt', _), TPtr(ot', _)
-    | TPtr (nt', _), TArray(ot', _, _) ->
+    match unrollTypeNode nt, unrollTypeNode ot with
+    | TPtr nt', TPtr ot'
+    | TPtr nt', TArray (ot', _) ->
       Cil.isGhostType nt' <> Cil.isGhostType ot' ||
       self#ghost_incompatible nt' ot'
     | _ ->
@@ -152,8 +152,8 @@ class visitor = object(self)
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
     if isFunctionType (unrollType v.vtype) then begin
       let ftype = getReturnType (unrollType v.vtype) in
-      match ftype with
-      | TPtr (t, _) when not (isWFGhostType t) ->
+      match ftype.tnode with
+      | TPtr t when not (isWFGhostType t) ->
         Error.invalid_ghost_type_for_return ~once:true ~current ~source ()
       | _ -> ()
     end ;

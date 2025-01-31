@@ -56,7 +56,7 @@ end
 type kind = Integer | Float
 
 let typ_kind typ =
-  match Cil.unrollType typ with
+  match Cil.unrollTypeNode typ with
   | TInt _ | TEnum  _ | TPtr _ -> Integer
   | TFloat _ -> Float
   | _ -> assert false

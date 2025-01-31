@@ -213,42 +213,18 @@ let findAttribute (an: string) (al: attribute list) : attrparam list =
        | _ -> acc)
     [] al
 
-let rec typeAttrs = function
-    TVoid a -> a
-  | TInt (_, a) -> a
-  | TFloat (_, a) -> a
-  | TNamed (t, a) -> addAttributes a (typeAttrs t.ttype)
-  | TPtr (_, a) -> a
-  | TArray (_, _,a) -> a
-  | TComp (comp, a) -> addAttributes comp.cattr a
-  | TEnum (enum, a) -> addAttributes enum.eattr a
-  | TFun (_, _, _, a) -> a
-  | TBuiltin_va_list a -> a
-
-let typeAttr = function
-  | TVoid a
-  | TInt (_, a)
-  | TFloat (_, a)
-  | TNamed (_, a)
-  | TPtr (_, a)
-  | TArray (_, _, a)
-  | TComp (_, a)
-  | TEnum (_, a)
-  | TFun (_, _, _, a)
-  | TBuiltin_va_list a -> a
-
-let setTypeAttrs t a =
-  match t with
-    TVoid _ -> TVoid a
-  | TInt (i, _) -> TInt (i, a)
-  | TFloat (f, _) -> TFloat (f, a)
-  | TNamed (t, _) -> TNamed(t, a)
-  | TPtr (t', _) -> TPtr(t', a)
-  | TArray (t', l, _) -> TArray(t', l, a)
-  | TComp (comp, _) -> TComp (comp, a)
-  | TEnum (enum, _) -> TEnum (enum, a)
-  | TFun (r, args, v, _) -> TFun(r,args,v,a)
-  | TBuiltin_va_list _ -> TBuiltin_va_list a
+let rec typeAttrs { tnode; tattr } =
+  match tnode with
+  | TVoid    -> tattr
+  | TInt _   -> tattr
+  | TFloat _ -> tattr
+  | TNamed t -> addAttributes tattr (typeAttrs t.ttype)
+  | TPtr _   -> tattr
+  | TArray _ -> tattr
+  | TComp comp -> addAttributes comp.cattr tattr
+  | TEnum enum -> addAttributes enum.eattr tattr
+  | TFun _   -> tattr
+  | TBuiltin_va_list -> tattr
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
 
@@ -273,57 +249,61 @@ let rec typeAddAttributes ?(combine=addAttributes) a0 t =
     | _ ->
       (* anything else: add a0 to existing attributes *)
       let add (a: attributes) = combine a0 a in
-      match t with
-        TVoid a -> TVoid (add a)
-      | TInt (ik, a) -> TInt (ik, add a)
-      | TFloat (fk, a) -> TFloat (fk, add a)
-      | TEnum (enum, a) -> TEnum (enum, add a)
-      | TPtr (t, a) -> TPtr (t, add a)
-      | TArray (t, l, a) ->
+      match t.tnode with
+      | TVoid
+      | TInt   _
+      | TFloat _
+      | TEnum  _
+      | TPtr   _
+      | TFun   _
+      | TComp  _
+      | TNamed _
+      | TBuiltin_va_list -> {t with tattr = add t.tattr}
+      | TArray (bt, l) ->
         let att_elt, att_typ = splitArrayAttributes a0 in
-        TArray (arrayPushAttributes att_elt t, l,
-                addAttributes att_typ a)
-      | TFun (t, args, isva, a) -> TFun(t, args, isva, add a)
-      | TComp (comp, a) -> TComp (comp, add a)
-      | TNamed (t, a) -> TNamed (t, add a)
-      | TBuiltin_va_list a -> TBuiltin_va_list (add a)
+        let bt' = arrayPushAttributes att_elt bt in
+        let tattr = addAttributes att_typ t.tattr in
+        Cil_const.mk_tarray ~tattr bt' l
   end
 (* Push attributes that belong to the type of the elements of the array as
    far as possible *)
-and arrayPushAttributes al = function
-  | TArray (bt, l, a) ->
-    TArray (arrayPushAttributes al bt, l, a)
-  | t -> typeAddAttributes al t
+and arrayPushAttributes al t =
+  match t.tnode with
+  | TArray (bt, l) ->
+    let bt' = arrayPushAttributes al bt in
+    Cil_const.mk_tarray ~tattr:t.tattr bt' l
+  | _ -> typeAddAttributes al t
 
 (**** Look for the presence of an attribute in a type ****)
 
 let typeHasAttribute attr typ = hasAttribute attr (typeAttrs typ)
 
-let rec typeHasQualifier attr typ =
-  match typ with
-  | TNamed (t, a) ->
-    hasAttribute attr a || typeHasQualifier attr t.ttype
-  | TArray (t, _, a) ->
-    typeHasQualifier attr t || (* ill-formed type *) hasAttribute attr a
-  | _ -> hasAttribute attr (typeAttrs typ)
+let rec typeHasQualifier attr t =
+  match t.tnode with
+  | TNamed ti ->
+    hasAttribute attr t.tattr || typeHasQualifier attr ti.ttype
+  | TArray (bt, _) ->
+    typeHasQualifier attr bt || (* ill-formed type *) hasAttribute attr t.tattr
+  | _ -> hasAttribute attr (typeAttrs t)
 
 let typeHasAttributeMemoryBlock a (ty:typ): bool =
   let f attrs = if hasAttribute a attrs then raise Exit in
   let rec visit (t: typ) : unit =
-    match t with
-    | TNamed (r, a') -> f a' ; visit r.ttype
-    | TArray(t, _, a') -> f a'; visit t
-    | TComp (comp, a') -> f a';
+    f t.tattr;
+    match t.tnode with
+    | TNamed r -> visit r.ttype
+    | TArray (bt, _) -> visit bt
+    | TComp comp ->
       List.iter
         (fun fi -> f fi.fattr; visit fi.ftype)
         (Option.value ~default:[] comp.cfields)
-    | TVoid a'
-    | TInt (_, a')
-    | TFloat (_, a')
-    | TEnum (_, a')
-    | TFun (_, _, _, a')
-    | TBuiltin_va_list a'
-    | TPtr(_, a') -> f a'
+    | TVoid
+    | TInt _
+    | TFloat _
+    | TEnum _
+    | TFun _
+    | TBuiltin_va_list
+    | TPtr _ -> ()
   in
   try visit ty; false
   with Exit -> true
@@ -337,26 +317,31 @@ let typeAddGhost typ =
 let rec typeRemoveAttributes ?anl t =
   (* Try to preserve sharing. We use sharing to be more efficient, but also
      to detect that we have removed an attribute under typedefs *)
-  let new_attr al =
-    match anl with None -> [] | Some anl -> dropAttributes anl al
+  let tattr =
+    match anl with
+    | None     -> []
+    | Some anl -> dropAttributes anl t.tattr
   in
-  let reshare al f =
-    let al' = new_attr al in if al' == al then t else f al'
+  let reshare () =
+    if tattr == t.tattr
+    then t
+    else Cil_const.mk_typ ~tattr t.tnode
   in
-  match t with
-  | TVoid a -> reshare a (fun a -> TVoid a)
-  | TInt (ik, a) -> reshare a (fun a -> TInt (ik, a))
-  | TFloat (fk, a) -> reshare a (fun a -> TFloat (fk, a))
-  | TEnum (enum, a) -> reshare a (fun a -> TEnum (enum, a))
-  | TPtr (t, a) -> reshare a (fun a -> TPtr (t, a))
-  | TArray (t, l, a) -> reshare a (fun a -> TArray (t, l, a))
-  | TFun (t, args, isva, a) -> reshare a (fun a -> TFun(t, args, isva, a))
-  | TComp (comp, a) -> reshare a (fun a -> TComp (comp, a))
-  | TBuiltin_va_list a -> reshare a (fun a -> TBuiltin_va_list a)
-  | TNamed (tn, a) ->
-    let tn' = typeRemoveAttributes ?anl tn.ttype in
-    if tn' == tn.ttype then reshare a (fun a -> TNamed (tn, a))
-    else typeAddAttributes (new_attr a) tn'
+  match t.tnode with
+  | TVoid
+  | TInt   _
+  | TFloat _
+  | TEnum  _
+  | TPtr   _
+  | TArray _
+  | TFun   _
+  | TComp  _
+  | TBuiltin_va_list -> reshare ()
+  | TNamed ti ->
+    let tt = typeRemoveAttributes ?anl ti.ttype in
+    if tt == ti.ttype
+    then reshare ()
+    else typeAddAttributes tattr tt
 
 let typeRemoveAllAttributes t = typeRemoveAttributes t
 
@@ -365,32 +350,35 @@ let typeRemoveAttributes anl t = typeRemoveAttributes ~anl t
 let rec typeRemoveAttributesDeep (anl: string list) t =
   (* Try to preserve sharing. We use sharing to be more efficient, but also
      to detect that we have removed an attribute under typedefs *)
-  let reshare al f =
-    let al' = dropAttributes anl al in
-    if al' == al then t else f al'
+  let reshare () =
+    let tattr = dropAttributes anl t.tattr in
+    if tattr == t.tattr
+    then t
+    else Cil_const.mk_typ ~tattr t.tnode
   in
-  match t with
-  | TVoid a -> reshare a (fun a -> TVoid a)
-  | TInt (ik, a) -> reshare a (fun a -> TInt (ik, a))
-  | TFloat (fk, a) -> reshare a (fun a -> TFloat (fk, a))
-  | TEnum (enum, a) -> reshare a (fun a -> TEnum (enum, a))
-  | TPtr (t, a) ->
+  match t.tnode with
+  | TVoid    -> reshare ()
+  | TInt   _ -> reshare ()
+  | TFloat _ -> reshare ()
+  | TEnum  _ -> reshare ()
+  | TPtr   t ->
     let t' = typeRemoveAttributesDeep anl t in
-    if t != t' then TPtr(t', dropAttributes anl a)
-    else reshare a (fun a -> TPtr(t,a))
-  | TArray (t, l, a) ->
+    if t != t'
+    then Cil_const.mk_tptr ~tattr:(dropAttributes anl t.tattr) t'
+    else reshare ()
+  | TArray (t, l) ->
     let t' = typeRemoveAttributesDeep anl t in
-    if t!=t' then TArray(t', l, dropAttributes anl a)
-    else reshare a (fun a -> TArray (t, l, a))
-  | TFun (t, args, isva, a) -> reshare a (fun a -> TFun(t, args, isva, a))
-  | TComp (comp, a) -> reshare a (fun a -> TComp (comp, a))
-  | TBuiltin_va_list a -> reshare a (fun a -> TBuiltin_va_list a)
-  | TNamed (tn, a) ->
-    let tn' = typeRemoveAttributesDeep anl tn.ttype in
-    if tn' == tn.ttype then
-      reshare a (fun a -> TNamed (tn, a))
-    else
-      typeAddAttributes (dropAttributes anl a) tn'
+    if t != t'
+    then Cil_const.mk_tarray ~tattr:(dropAttributes anl t.tattr) t' l
+    else reshare ()
+  | TFun  _ -> reshare ()
+  | TComp _ -> reshare ()
+  | TBuiltin_va_list -> reshare ()
+  | TNamed ti ->
+    let tt = typeRemoveAttributesDeep anl ti.ttype in
+    if tt == ti.ttype
+    then reshare ()
+    else typeAddAttributes (dropAttributes anl t.tattr) tt
 
 let type_remove_qualifier_attributes =
   typeRemoveAttributes qualifier_attributes
@@ -516,19 +504,50 @@ let () =
 
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
-    match t with
-      TNamed (r, a') -> withAttrs (addAttributes al a') r.ttype
-    | x -> typeAddAttributes al x
+    match t.tnode with
+    | TNamed ti -> withAttrs (addAttributes al t.tattr) ti.ttype
+    | _ -> typeAddAttributes al t
   in
   withAttrs [] t
+
+let unrollTypeNode (t: typ) : typ_node =
+  (unrollType t).tnode
 
 let () = punrollType := unrollType
 
 (* Unroll typedefs, discarding all intermediate attribute. To be used only
-   when one is interested in the shape of the type *)
-let rec unrollTypeSkel = function
-  | TNamed (r, _) -> unrollTypeSkel r.ttype
-  | x -> x
+   when one is interested in the shape of the type node *)
+let rec unrollTypeSkel (t : typ) : typ_node =
+  match t.tnode with
+  | TNamed ti -> unrollTypeSkel ti.ttype
+  | _ -> t.tnode
+
+let rec unrollTypeDeep (t: typ) : typ =
+  let rec withAttrs (al: attributes) (t: typ) : typ =
+    match t.tnode with
+    | TNamed r -> withAttrs (addAttributes al t.tattr) r.ttype
+    | TPtr bt ->
+      let bt' = unrollTypeDeep bt in
+      let tattr = addAttributes al t.tattr in
+      Cil_const.mk_tptr ~tattr bt'
+    | TArray (bt, l) ->
+      let att_elt, att_typ = splitArrayAttributes al in
+      let bt' = arrayPushAttributes att_elt (unrollTypeDeep bt) in
+      let tattr = addAttributes att_typ t.tattr in
+      Cil_const.mk_tarray ~tattr bt' l
+    | TFun (rt, args, isva) ->
+      let rt' = unrollTypeDeep rt in
+      let args' =
+        match args with
+        | None -> None
+        | Some argl ->
+          Some (List.map (fun (an, at, aa) -> (an, unrollTypeDeep at, aa)) argl)
+      in
+      let tattr = addAttributes al t.tattr in
+      Cil_const.mk_tfun ~tattr rt' args' isva
+    | _ -> typeAddAttributes al t
+  in
+  withAttrs [] t
 
 let is_ghost_else block =
   hasAttribute frama_c_ghost_else block.battrs
@@ -617,8 +636,8 @@ let isGhostFormalVarDecl (_name, _type, attr) =
   hasAttribute frama_c_ghost_formal attr
 
 let setFormalsDecl vi typ =
-  match unrollType typ with
-  | TFun(_, Some args, _, _) ->
+  match unrollTypeSkel typ with
+  | TFun (_, Some args, _) ->
     let is_ghost d = vi.vghost || isGhostFormalVarDecl d in
     let makeFormalsVarDecl i (n,t,a as x) =
       let x = if n = "" then begin
@@ -630,7 +649,7 @@ let setFormalsDecl vi typ =
       makeFormalsVarDecl ~ghost:(is_ghost x) x
     in
     FormalsDecl.replace vi (List.mapi makeFormalsVarDecl args)
-  | TFun(_,None,_,_) -> ()
+  | TFun (_, None, _) -> ()
   | _ ->
     Kernel.error ~current:true
       "trying to assigns formal parameters to an object \
@@ -652,11 +671,10 @@ let setFormals (f: fundec) (forms: varinfo list) =
   List.iter (fun v -> v.vformal <- true) forms;
   f.sformals <- forms; (* Set the formals *)
   match unrollType f.svar.vtype with
-    TFun(rt, _, isva, fa) ->
-    update_var_type f.svar
-      (TFun(rt,
-            Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms),
-            isva, fa));
+  | { tnode = TFun (rt, _, isva); tattr } ->
+    let args = Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms) in
+    let t' = Cil_const.mk_tfun ~tattr rt args isva in
+    update_var_type f.svar t'
   | _ ->
     Kernel.fatal "Set formals. %s does not have function type" f.svar.vname
 
@@ -2393,29 +2411,34 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
   (* look for types referred to inside t's definition *)
   let fTyp t  = visitCilType vis t in
   let fAttr a = visitCilAttributes vis a in
-  match t with
-    TPtr(t1, a) ->
+  let tattr = visitCilAttributes vis t.tattr in
+  match t.tnode with
+  | TPtr t1 ->
     let t1' = fTyp t1 in
-    let a' = fAttr a in
-    if t1' != t1 || a' != a then TPtr(t1', a') else t
-  | TArray(t1, None, a) ->
+    if t1' != t1 || tattr != t.tattr
+    then Cil_const.mk_tptr ~tattr t1'
+    else t
+  | TArray (t1, None) ->
     let t1' = fTyp t1 in
-    let a' = fAttr a in
-    if t1' != t1 || a' != a  then TArray(t1', None, a') else t
-  | TArray(t1, Some e, a) ->
+    if t1' != t1 || tattr != t.tattr
+    then Cil_const.mk_tarray ~tattr t1' None
+    else t
+  | TArray(t1, Some e) ->
     let t1' = fTyp t1 in
     let e' = visitCilExpr vis e in
-    let a' = fAttr a in
-    if t1' != t1 || e' != e  || a' != a then TArray(t1', Some e',a') else t
+    if t1' != t1 || e' != e  || tattr != t.tattr
+    then Cil_const.mk_tarray ~tattr t1' (Some e')
+    else t
 
   (* DON'T recurse into the compinfo, this is done in visitCilGlobal.
      User can iterate over cinfo.cfields manually, if desired.*)
-  | TComp(cinfo, a) ->
+  | TComp cinfo ->
     let cinfo' = Visitor_behavior.Get.compinfo vis#behavior cinfo in
-    let a' = fAttr a in
-    if a != a' || cinfo' != cinfo then TComp(cinfo',a') else t
+    if tattr != t.tattr || cinfo' != cinfo
+    then Cil_const.mk_tcomp ~tattr cinfo'
+    else t
 
-  | TFun(rettype, args, isva, a) ->
+  | TFun (rettype, args, isva) ->
     let rettype' = fTyp rettype in
     (* iterate over formals, as variable declarations *)
     let argslist = argsToList args in
@@ -2425,24 +2448,24 @@ and childrenType (vis : cilVisitor) (t : typ) : typ =
       if at' != at || aa' != aa then (an,at',aa') else arg
     in
     let argslist' = Extlib.map_no_copy visitArg argslist in
-    let a' = fAttr a in
-    if rettype' != rettype || argslist' != argslist || a' != a  then
+    if rettype' != rettype || argslist' != argslist || tattr != t.tattr then
       let args' = if argslist' == argslist then args else Some argslist' in
-      TFun(rettype', args', isva, a') else t
+      Cil_const.mk_tfun ~tattr rettype' args' isva
+    else t
 
-  | TNamed(t1, a) ->
-    let a' = fAttr a in
+  | TNamed t1 ->
     let t1' = Visitor_behavior.Get.typeinfo vis#behavior t1 in
-    if a' != a  || t1' != t1 then TNamed (t1', a') else t
-  | TEnum(enum,a) ->
-    let a' = fAttr a in
+    if tattr != t.tattr || t1' != t1
+    then Cil_const.mk_tnamed ~tattr t1'
+    else t
+  | TEnum enum ->
     let enum' = Visitor_behavior.Get.enuminfo vis#behavior enum in
-    if a' != a || enum' != enum then TEnum(enum',a') else t
-  | TVoid _ | TInt _ | TFloat _ | TBuiltin_va_list _  ->
+    if tattr != t.tattr || enum' != enum
+    then Cil_const.mk_tenum ~tattr enum'
+    else t
+  | TVoid | TInt _ | TFloat _ | TBuiltin_va_list ->
     (* no nested type. visit only the attributes. *)
-    let a = typeAttrs t in
-    let a' = fAttr a in
-    if a' != a  then setTypeAttrs t a' else t
+    if tattr != t.tattr then {t with tattr} else t
 
 (* for declarations, we visit the types inside; but for uses, *)
 (* we just visit the varinfo node *)
@@ -2752,12 +2775,12 @@ let intKindForSize (s:int) (unsigned:bool) : ikind =
   else if s = sizeof_longlong () then ILongLong
   else raise Not_found
 
-let uint64_t () = TInt(intKindForSize 8 true,[])
-let uint32_t () = TInt(intKindForSize 4 true,[])
-let uint16_t () = TInt(intKindForSize 2 true,[])
-let int64_t () = TInt(intKindForSize 8 false,[])
-let int32_t () = TInt(intKindForSize 4 false,[])
-let int16_t () = TInt(intKindForSize 2 false,[])
+let uint64_t () = Cil_const.mk_tint (intKindForSize 8 true)
+let uint32_t () = Cil_const.mk_tint (intKindForSize 4 true)
+let uint16_t () = Cil_const.mk_tint (intKindForSize 2 true)
+let int64_t  () = Cil_const.mk_tint (intKindForSize 8 false)
+let int32_t  () = Cil_const.mk_tint (intKindForSize 4 false)
+let int16_t  () = Cil_const.mk_tint (intKindForSize 2 false)
 
 let floatKindForSize (s:int) =
   if s = sizeof_double () then FDouble
@@ -3136,36 +3159,14 @@ let mkStmtOneInstr ?ghost ?valid_sid ?sattr i =
 let dummyInstr = Asm([], ["dummy statement!!"], None, Location.unknown)
 let dummyStmt = mkStmt (Instr dummyInstr)
 
-let rec unrollTypeDeep (t: typ) : typ =
-  let rec withAttrs (al: attributes) (t: typ) : typ =
-    match t with
-      TNamed (r, a') -> withAttrs (addAttributes al a') r.ttype
-    | TPtr(t, a') -> TPtr(unrollTypeDeep t, addAttributes al a')
-    | TArray(t, l, a') ->
-      let att_elt, att_typ = splitArrayAttributes al in
-      TArray(arrayPushAttributes att_elt (unrollTypeDeep t), l,
-             addAttributes att_typ a')
-    | TFun(rt, args, isva, a') ->
-      TFun (unrollTypeDeep rt,
-            (match args with
-               None -> None
-             | Some argl ->
-               Some (List.map (fun (an,at,aa) ->
-                   (an, unrollTypeDeep at, aa)) argl)),
-            isva,
-            addAttributes al a')
-    | x -> typeAddAttributes al x
-  in
-  withAttrs [] t
-
 let isSignedInteger ty =
   match unrollTypeSkel ty with
-  | TInt(ik,_) | TEnum ({ekind=ik},_) -> isSigned ik
+  | TInt ik | TEnum {ekind=ik} -> isSigned ik
   | _ -> false
 
 let isUnsignedInteger ty =
   match unrollTypeSkel ty with
-  | TInt(ik,_) | TEnum ({ekind=ik},_) -> not (isSigned ik)
+  | TInt ik | TEnum {ekind=ik} -> not (isSigned ik)
   | _ -> false
 
 let var vi : lval = (Var vi, NoOffset)
@@ -3258,47 +3259,48 @@ let separateStorageModifiers (al: attribute list) =
 
 let isVoidType t =
   match unrollTypeSkel t with
-    TVoid _ -> true
+  | TVoid -> true
   | _ -> false
 
 let isVoidPtrType t =
   match unrollTypeSkel t with
-    TPtr(tau,_) when isVoidType tau -> true
+  | TPtr tau when isVoidType tau -> true
   | _ -> false
 
 let isAnyCharType t =
   match unrollTypeSkel t with
-  | TInt((IChar|ISChar|IUChar),_) -> true
+  | TInt (IChar | ISChar | IUChar) -> true
   | _ -> false
 
 let isCharType t =
   match unrollTypeSkel t with
-  | TInt(IChar,_) -> true
+  | TInt IChar -> true
   | _ -> false
 
 let isShortType t =
   match unrollTypeSkel t with
-  | TInt((IUShort|IShort),_) -> true
+  | TInt (IUShort | IShort) -> true
   | _ -> false
 
 let isAnyCharPtrType t =
   match unrollTypeSkel t with
-    TPtr(tau,_) when isAnyCharType tau -> true
+  | TPtr tau when isAnyCharType tau -> true
   | _ -> false
 
 let isCharPtrType t =
   match unrollTypeSkel t with
-    TPtr(tau,_) when isCharType tau -> true
+  | TPtr tau when isCharType tau -> true
   | _ -> false
 
 let isCharConstPtrType t =
-  match unrollTypeSkel t with
-    TPtr(tau,attrs) when isCharType tau -> hasAttribute "const" attrs
+  match unrollType t with
+  | { tnode = TPtr tau; tattr } when isCharType tau ->
+    hasAttribute "const" tattr
   | _ -> false
 
 let isIntegralType t =
   match unrollTypeSkel t with
-    (TInt _ | TEnum _) -> true
+  | (TInt _ | TEnum _) -> true
   | _ -> false
 
 let isIntegralOrPointerType t =
@@ -3308,14 +3310,16 @@ let isIntegralOrPointerType t =
 
 (* Don't completely unroll here, as we do not want to identify
    intptr_t with its supporting integer type. *)
-let rec is_intptr_t = function
-  | TNamed(t,_) ->
-    t.tname = "intptr_t" || is_intptr_t t.ttype
+let rec is_intptr_t t =
+  match t.tnode with
+  | TNamed ti ->
+    ti.tname = "intptr_t" || is_intptr_t ti.ttype
   | _ -> false
 
-let rec is_uintptr_t = function
-  | TNamed (t,_) ->
-    t.tname = "uintptr_t" || is_uintptr_t t.ttype
+let rec is_uintptr_t  t =
+  match t.tnode with
+  | TNamed ti ->
+    ti.tname = "uintptr_t" || is_uintptr_t ti.ttype
   | _ -> false
 
 let rec isLogicBooleanType t =
@@ -3326,8 +3330,9 @@ let rec isLogicBooleanType t =
     ( is_unrollable_ltdef tdef && isLogicBooleanType (unroll_ltdef t))
   | Lreal | Lvar _ | Larrow _ -> false
 
-let isBoolType typ = match unrollType typ with
-  | TInt (IBool, _) -> true
+let isBoolType typ =
+  match unrollTypeSkel typ with
+  | TInt IBool -> true
   | _ -> false
 
 let rec isLogicPureBooleanType t =
@@ -3350,7 +3355,7 @@ let rec isLogicIntegralType t =
 
 let isFloatingType t =
   match unrollTypeSkel t with
-    TFloat _ -> true
+  | TFloat _ -> true
   | _ -> false
 
 let isLogicFloatType t =
@@ -3384,12 +3389,12 @@ let rec isLogicRealType t =
 (* ISO 6.2.5.18 *)
 let isArithmeticType t =
   match unrollTypeSkel t with
-    (TInt _ | TEnum _ | TFloat _) -> true
+  | (TInt _ | TEnum _ | TFloat _) -> true
   | _ -> false
 
 let isLongDoubleType t =
   match unrollTypeSkel t with
-  | TFloat(FLongDouble,_) -> true
+  | TFloat FLongDouble -> true
   | _ -> false
 
 let rec isLogicArithmeticType t =
@@ -3413,7 +3418,7 @@ let isLogicFunctionType t = Logic_const.isLogicCType isFunctionType t
 
 let isFunPtrType t =
   match unrollTypeSkel t with
-  | TPtr (t,_) -> isFunctionType t
+  | TPtr t -> isFunctionType t
   | _ -> false
 
 let isLogicFunPtrType t = Logic_const.isLogicCType isFunPtrType t
@@ -3431,8 +3436,8 @@ let isScalarType t = isArithmeticType t || isPointerType t
 (* Check if a type is a transparent union, and return the first field if it
  * is *)
 let isTransparentUnion (t: typ) : fieldinfo option =
-  match unrollType t with
-  | TComp (comp, _) when not comp.cstruct ->
+  match unrollTypeSkel t with
+  | TComp comp when not comp.cstruct ->
     (* Turn transparent unions into the type of their first field *)
     if typeHasAttribute "transparent_union" t then begin
       match comp.cfields with
@@ -3451,32 +3456,33 @@ let rec isTypeTagType t =
   | _ -> false
 
 let getReturnType t =
-  match unrollType t with
-  | TFun(rt,_,_,_) -> rt
+  match unrollTypeSkel t with
+  | TFun(rt, _, _) -> rt
   | _ -> Kernel.fatal "getReturnType: not a function type"
 
 let setReturnTypeVI (v: varinfo) (t: typ) =
   match unrollType v.vtype with
-  | TFun (_, args, va, a) ->
-    update_var_type v (TFun (t, args, va, a));
+  | { tnode = TFun (_, args, va); tattr } ->
+    let t' = Cil_const.mk_tfun ~tattr t args va in
+    update_var_type v t'
   | _ -> Kernel.fatal "setReturnType: not a function type"
 
 let setReturnType (f:fundec) (t:typ) =
   setReturnTypeVI f.svar t
 
 let typeOf_pointed typ =
-  match unrollType typ with
-  | TPtr (typ,_) -> typ
+  match unrollTypeSkel typ with
+  | TPtr typ -> typ
   | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
 
 let typeOf_array_elem t =
-  match unrollType t with
-  | TArray (ty_elem, _, _) -> ty_elem
+  match unrollTypeNode t with
+  | TArray (ty_elem, _) -> ty_elem
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
 let typeOf_array_elem_size t =
-  match unrollType t with
-  | TArray (ty_elem, arr_size, _ ) ->
+  match unrollTypeNode t with
+  | TArray (ty_elem, arr_size) ->
     ty_elem, Option.bind arr_size !constfoldtoint
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
@@ -3492,7 +3498,7 @@ let no_op_coerce typ t =
 (**** Compute the type of an expression ****)
 let rec typeOf (e: exp) : typ =
   match e.enode with
-  | Const(CInt64 (_, ik, _)) -> TInt(ik, [])
+  | Const(CInt64 (_, ik, _)) -> Cil_const.mk_tint ik
 
   (* Character constants have type int.  ISO/IEC 9899:1999 (E),
    * section 6.4.4.4 [Character constants], paragraph 10, if you
@@ -3506,9 +3512,9 @@ let rec typeOf (e: exp) : typ =
 
   | Const(CWStr _s) ->
     let typ = typeAddAttributes [Attr("const",[])] (wchar_type ()) in
-    TPtr(typ,[])
+    Cil_const.mk_tptr typ
 
-  | Const(CReal (_, fk, _)) -> TFloat(fk, [])
+  | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
 
   | Const(CEnum {eival=v}) -> typeOf v
 
@@ -3520,22 +3526,22 @@ let rec typeOf (e: exp) : typ =
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
-  | AddrOf lv -> TPtr(typeOfLval lv, [])
+  | AddrOf lv -> Cil_const.mk_tptr (typeOfLval lv)
   | StartOf lv ->
     match unrollType (typeOfLval lv) with
-    | TArray (t,_,attrs) -> TPtr(t, attrs)
+    | { tnode = TArray (t,_); tattr } -> Cil_const.mk_tptr ~tattr t
     | _ ->  Kernel.fatal ~current:true "typeOf: StartOf on a non-array"
 
 and typeOfInit (i: init) : typ =
   match i with
-    SingleInit e -> typeOf e
+  | SingleInit e -> typeOf e
   | CompoundInit (t, _) -> t
 
 and typeOfLval = function
-    Var vi, off -> typeOffset vi.vtype off
+  | Var vi, off -> typeOffset vi.vtype off
   | Mem addr, off -> begin
-      match unrollType (typeOf addr) with
-      | TPtr (t, _) -> typeOffset t off
+      match (unrollType (typeOf addr)).tnode with
+      | TPtr t -> typeOffset t off
       | _ -> Kernel.fatal ~current:true
                "typeOfLval: Mem on a non-pointer (%a)" !pp_exp_ref addr
     end
@@ -3547,15 +3553,14 @@ and typeOfLhost = function
 and typeOffset basetyp = function
     NoOffset -> basetyp
   | Index (_, o) -> begin
-      match unrollType basetyp with
-        TArray (t, _, _baseAttrs) ->
-        typeOffset t o
+      match unrollTypeNode basetyp with
+      | TArray (t, _) -> typeOffset t o
       | _ -> Kernel.fatal ~current:true "typeOffset: Index on a non-array"
     end
   | Field (fi, o) ->
     match unrollType basetyp with
-    | TComp (_, baseAttrs) ->
-      let attrs = filter_qualifier_attributes baseAttrs in
+    | { tnode = TComp _; tattr } ->
+      let attrs = filter_qualifier_attributes tattr in
       (* if the field is mutable, it can written to even if it is
          part of a const object (but a const subpart of the field
          is still const (except potentially a mutable subsubpart, etc.)
@@ -3583,8 +3588,8 @@ let rec typeOfTermLval = function
   | TMem addr, off -> begin
       let rec type_of_pointed = function
         | Ctype typ ->
-          begin match unrollType typ with
-            | TPtr (t, _) -> typeTermOffset (Ctype t) off
+          begin match unrollTypeSkel typ with
+            | TPtr t -> typeTermOffset (Ctype t) off
             | _ ->
               Kernel.fatal ~current:true
                 "typeOfTermLval: Mem on a non-pointer"
@@ -3637,9 +3642,9 @@ and typeTermOffset basetyp =
         match basetyp with
         | Ctype typ ->
           begin match unrollType typ with
-              TArray (t, _, baseAttrs) ->
+            | { tnode = TArray (t, _); tattr } ->
               let elementType = typeTermOffset (Ctype t) o in
-              blendAttributes baseAttrs elementType
+              blendAttributes tattr elementType
             | _ ->
               Kernel.fatal ~current:true
                 "typeTermOffset: Index on a non-array"
@@ -3661,9 +3666,9 @@ and typeTermOffset basetyp =
     let rec elt_type = function
       | Ctype typ ->
         begin match unrollType typ with
-            TComp (_, baseAttrs) ->
+          | { tnode = TComp _; tattr } ->
             let fieldType = typeTermOffset (Ctype fi.ftype) o in
-            blendAttributes baseAttrs fieldType
+            blendAttributes tattr fieldType
           | _ ->  Kernel.fatal ~current:true "typeTermOffset: Field on a non-compound"
         end
       | Lboolean | Linteger | Lreal ->
@@ -3707,13 +3712,13 @@ let rec isWFGhostType t =
   isWFGhostType' (unrollTypeDeep t)
 and isWFGhostType' t =
   if not (isGhostType t) then isWFNonGhostType t
-  else match t with
-    | TPtr(t, _) | TArray(t, _, _) -> isWFGhostType' t
+  else match t.tnode with
+    | TPtr t | TArray (t, _) -> isWFGhostType' t
     | _ -> true
 and isWFNonGhostType t =
   if isGhostType t then false
-  else match t with
-    | TPtr(t, _) | TArray(t, _, _) -> isWFNonGhostType t
+  else match t.tnode with
+    | TPtr t | TArray (t, _) -> isWFNonGhostType t
     | _ -> true
 
 (**** MACHINE DEPENDENT PART ****)
@@ -3854,22 +3859,23 @@ let ignoreAlignmentAttrs = ref false
 
 (* Get the minimum alignment in bytes for a given type *)
 let rec bytesAlignOf t =
-  let alignOfType () = match t with
-    | TInt((IChar|ISChar|IUChar|IBool), _) -> 1
-    | TInt((IShort|IUShort), _) -> alignof_short ()
-    | TInt((IInt|IUInt), _) -> alignof_int ()
-    | TInt((ILong|IULong), _) -> alignof_long ()
-    | TInt((ILongLong|IULongLong), _) -> alignof_longlong ()
-    | TEnum (ei,_) ->  bytesAlignOf (TInt(ei.ekind, []))
-    | TFloat(FFloat, _) -> alignof_float ()
-    | TFloat(FDouble, _) -> alignof_double ()
-    | TFloat(FLongDouble, _) -> alignof_longdouble ()
-    | TNamed (t, _) -> bytesAlignOf t.ttype
-    | TArray (t, _, _) -> bytesAlignOf t
-    | TPtr _ | TBuiltin_va_list _ -> alignof_ptr ()
+  let alignOfType () =
+    match t.tnode with
+    | TInt (IChar|ISChar|IUChar|IBool) -> 1
+    | TInt (IShort|IUShort) -> alignof_short ()
+    | TInt (IInt|IUInt) -> alignof_int ()
+    | TInt (ILong|IULong) -> alignof_long ()
+    | TInt (ILongLong|IULongLong) -> alignof_longlong ()
+    | TEnum ei ->  bytesAlignOf (Cil_const.mk_tint ei.ekind)
+    | TFloat FFloat -> alignof_float ()
+    | TFloat FDouble -> alignof_double ()
+    | TFloat FLongDouble -> alignof_longdouble ()
+    | TNamed t -> bytesAlignOf t.ttype
+    | TArray (t, _) -> bytesAlignOf t
+    | TPtr _ | TBuiltin_va_list -> alignof_ptr ()
 
     (* For composite types get the maximum alignment of any field inside *)
-    | TComp (c, _) ->
+    | TComp c ->
       (* On GCC the zero-width fields do not contribute to the alignment. On
        * MSVC only those zero-width that _do_ appear after other
        * bitfields contribute to the alignment. So we drop those that
@@ -3890,8 +3896,8 @@ let rec bytesAlignOf t =
              max sofar (alignOfField f)) 1 fields
     (* These are some error cases *)
     | TFun _ when not (msvcMode ()) -> alignof_fun ()
-    | TFun _ as t -> raise (SizeOfError ("Undefined sizeof on a function.", t))
-    | TVoid _ as t ->
+    | TFun _ -> raise (SizeOfError ("Undefined sizeof on a function.", t))
+    | TVoid  ->
       if sizeof_void () > 0 then
         sizeof_void ()
       else
@@ -4074,9 +4080,9 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
   let ftype = unrollType fi.ftype in
   let ftypeAlign = 8 * alignOfField fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
-  match ftype, fi.fbitfield, sofar.oaPrevBitPack with
+  match ftype.tnode, fi.fbitfield, sofar.oaPrevBitPack with
   (* Ignore zero-width bitfields that come after non-bitfields *)
-  | TInt (_ikthis, _), Some 0, None ->
+  | TInt _ikthis, Some 0, None ->
     let firstFree      = sofar.oaFirstFree in
     { oaFirstFree      = firstFree;
       oaLastFieldStart = firstFree;
@@ -4097,7 +4103,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
         oaPrevBitPack    = None }
 
   (* A width of 0 means that we must end the current packing. *)
-  | TInt (ikthis, _), Some 0, Some (packstart, _, wdpack) ->
+  | TInt ikthis, Some 0, Some (packstart, _, wdpack) ->
     let firstFree =
       if sofar.oaFirstFree = packstart then packstart else
         packstart + wdpack
@@ -4110,7 +4116,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
 
   (* Check for a bitfield that fits in the current pack after some other
    * bitfields *)
-  | TInt(_ikthis, _), Some wdthis, Some (packstart, _ikprev, wdpack)
+  | TInt _ikthis, Some wdthis, Some (packstart, _ikprev, wdpack)
     when  packstart + wdpack >= sofar.oaFirstFree + wdthis ->
     { oaFirstFree = sofar.oaFirstFree + wdthis;
       oaLastFieldStart = sofar.oaFirstFree;
@@ -4132,7 +4138,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
         oaPrevBitPack    = None }
 
   (* No active bitfield pack. But we are seeing a bitfield. *)
-  | TInt(ikthis, _), Some wdthis, None ->
+  | TInt ikthis, Some wdthis, None ->
     let firstFree     = addTrailing sofar.oaFirstFree ftypeAlign in
     { oaFirstFree     = firstFree + wdthis;
       oaLastFieldStart = firstFree;
@@ -4154,9 +4160,9 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
 (** This is a special version of [bitsSizeOf] that accepts empty arrays.
     Currently, we only use it for flexible array members *)
 and bitsSizeOfEmptyArray typ =
-  match unrollType typ with
-  | TArray (_, None, _) -> 0
-  | TArray (_, Some e, _) -> begin
+  match unrollTypeNode typ with
+  | TArray (_, None) -> 0
+  | TArray (_, Some e) -> begin
       match constFoldToInt e with
       | Some i when Integer.is_zero i ->
         (* Used for GCC extension of non-C99 flexible array members.
@@ -4170,29 +4176,29 @@ and bitsSizeOfEmptyArray typ =
 (* The size of a type, in bits. If struct or array then trailing padding is
  * added *)
 and bitsSizeOf t =
-  match t with
-  | TInt (ik,_) -> 8 * (bytesSizeOfInt ik)
-  | TFloat(FDouble, _) -> 8 * sizeof_double ()
-  | TFloat(FLongDouble, _) -> 8 * sizeof_longdouble ()
-  | TFloat _ -> 8 * sizeof_float ()
-  | TEnum (ei,_) -> bitsSizeOf (TInt(ei.ekind, []))
-  | TPtr _ -> 8 * sizeof_ptr ()
-  | TBuiltin_va_list _ -> 8 * sizeof_ptr ()
-  | TNamed (t, _) -> bitsSizeOf t.ttype
-  | TComp ({cfields=None} as comp, _) ->
+  match t.tnode with
+  | TInt ik            -> 8 * (bytesSizeOfInt ik)
+  | TFloat FDouble     -> 8 * sizeof_double ()
+  | TFloat FLongDouble -> 8 * sizeof_longdouble ()
+  | TFloat _           -> 8 * sizeof_float ()
+  | TEnum ei           -> bitsSizeOf (Cil_const.mk_tint ei.ekind)
+  | TPtr _             -> 8 * sizeof_ptr ()
+  | TBuiltin_va_list   -> 8 * sizeof_ptr ()
+  | TNamed t           -> bitsSizeOf t.ttype
+  | TComp ({cfields=None} as comp) ->
     raise
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-  | TComp ({cfields=Some[]}, _) when acceptEmptyCompinfo() ->
+  | TComp {cfields=Some[]} when acceptEmptyCompinfo() ->
     find_sizeof t (fun () -> t,0)
-  | TComp ({cfields=Some[]} as comp,_) ->
+  | TComp ({cfields=Some[]} as comp) ->
     find_sizeof t
       (fun () ->
          (* sizeof() empty structs/arrays is only allowed on GCC/MSVC *)
          raise
            (SizeOfError
               (Format.sprintf "empty struct '%s'" (compFullName comp), t)))
-  | TComp (comp, _) when comp.cstruct -> (* Struct *)
+  | TComp comp when comp.cstruct -> (* Struct *)
     find_sizeof t
       (fun () ->
          (* Go and get the last offset *)
@@ -4215,7 +4221,7 @@ and bitsSizeOf t =
          else
            t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
 
-  | TComp (comp, _) -> (* Union *)
+  | TComp comp -> (* Union *)
     find_sizeof t
       (fun () ->
          (* Get the maximum of all fields *)
@@ -4236,12 +4242,12 @@ and bitsSizeOf t =
          (* Add trailing by simulating adding an extra field *)
          t, addTrailing max (8 * bytesAlignOf t))
 
-  | TArray(bt, Some len, attrs) ->
+  | TArray(bt, Some len) ->
     find_sizeof t
       (fun () ->
          begin
            let v = constFold true len in
-           let norm_typ = TArray(bt, Some v, attrs) in
+           let norm_typ = Cil_const.mk_tarray ~tattr:t.tattr bt (Some v) in
            match v with
              { enode = Const(CInt64(l,_,_)) } ->
              let sz = Integer.mul (Integer.of_int (bitsSizeOf bt)) l in
@@ -4259,7 +4265,7 @@ and bitsSizeOf t =
            | _ ->
              raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
-  | TVoid _ ->
+  | TVoid ->
     if sizeof_void () >= 0 then
       8 * sizeof_void ()
     else
@@ -4270,7 +4276,7 @@ and bitsSizeOf t =
     else
       raise (SizeOfError ("Undefined sizeof on a function.", t))
 
-  | TArray (_, None, _) ->
+  | TArray (_, None) ->
     find_sizeof t
       (fun () ->
          raise (SizeOfError ("Size of array without number of elements.", t)))
@@ -4318,7 +4324,7 @@ and fieldBitsOffset (f : fieldinfo) : int * int =
 
 and bitsOffset (baset: typ) (off: offset) : int * int =
   let rec loopOff (baset: typ) (width: int) (start: int) = function
-      NoOffset -> start, width
+    | NoOffset -> start, width
     | Index(e, off) -> begin
         let ei =
           match constFoldToInt e with
@@ -4331,8 +4337,8 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
       end
     | Field(f, off) ->
       if check_invariants then
-        (match unrollType baset with
-         | TComp (ci, _) -> assert (ci == f.fcomp)
+        (match unrollTypeSkel baset with
+         | TComp ci -> assert (ci == f.fcomp)
          | _ -> assert false);
       let offsbits, size = fieldBitsOffset f in
       loopOff f.ftype size (start + offsbits) off
@@ -4348,19 +4354,19 @@ and constFold (machdep: bool) (e: exp) : exp =
   Kernel.debug ~dkey "ConstFold %a@." !pp_exp_ref e;
   let loc = e.eloc in
   match e.enode with
-    BinOp(bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
-  | UnOp(unop, e1, tres) when isIntegralType tres -> begin
+  | BinOp (bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
+  | UnOp (unop, e1, tres) when isIntegralType tres -> begin
       let tk =
         match unrollTypeSkel tres with
-        | TInt(ik, _) -> ik
-        | TEnum (ei,_) -> ei.ekind
+        | TInt ik  -> ik
+        | TEnum ei -> ei.ekind
         | _ -> assert false (* tres is an integral type *)
       in
       let e1c = constFold machdep e1 in
       match e1c.enode with
         Const(CInt64(i,_ik,repr)) -> begin
           match unop with
-            Neg ->
+          | Neg ->
             let repr = Option.map (fun s -> "-" ^ s) repr in
             kinteger64 ~loc ?repr ~kind:tk (Integer.neg i)
           | BNot -> kinteger64 ~loc ~kind:tk (Integer.lognot i)
@@ -4370,10 +4376,10 @@ and constFold (machdep: bool) (e: exp) : exp =
         end
       | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
     end
-  | UnOp(unop, e1, tres) when isArithmeticType tres -> begin
+  | UnOp (unop, e1, tres) when isArithmeticType tres -> begin
       let tk =
         match unrollTypeSkel tres with
-        | TFloat(fk,_) -> fk
+        | TFloat fk -> fk
         | _ -> assert false (*tres is arithmetic but not integral, i.e. Float *)
       in
       let e1c = constFold machdep e1 in
@@ -4423,9 +4429,10 @@ and constFold (machdep: bool) (e: exp) : exp =
   | CastE (t, e) -> begin
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
-      match e.enode, unrollType t with
-      | Const(CInt64(i,_k,_)),(TInt(nk,a)|TEnum({ekind = nk},a))
-        when dropAttributes fc_internal_attributes a = [] ->
+      let t' = unrollType t in
+      match e.enode, t'.tnode with
+      | Const (CInt64(i,_k,_)), (TInt nk | TEnum {ekind = nk})
+        when dropAttributes fc_internal_attributes t'.tattr = [] ->
         begin
           (* If the cast has attributes, leave it alone. *)
           Kernel.debug ~dkey "ConstFold to %a : %a@."
@@ -4433,7 +4440,7 @@ and constFold (machdep: bool) (e: exp) : exp =
           (* Downcasts might truncate silently *)
           kinteger64 ~loc ~kind:nk i
         end
-      | Const (CReal(f,_,_)),(TInt(ik,a)|TEnum({ekind = ik},a)) when a = [] ->
+      | Const (CReal(f,_,_)), (TInt ik | TEnum {ekind = ik}) when t.tattr = [] ->
         (* See above *)
         begin
           try
@@ -4446,18 +4453,18 @@ and constFold (machdep: bool) (e: exp) : exp =
           with Floating_point.Float_Non_representable_as_Int64 _ -> (* too big*)
             new_exp ~loc (CastE (t, e))
         end
-      | Const (CReal(f,_,_)), TFloat (FFloat,a) when a = [] ->
+      | Const (CReal(f,_,_)), TFloat FFloat when t.tattr = [] ->
         let f = Floating_point.round_to_single_precision_float f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
-      | Const (CReal(f,_,_)), TFloat (FDouble,a) when a = [] ->
+      | Const (CReal(f,_,_)), TFloat FDouble when t.tattr = [] ->
         new_exp ~loc (Const (CReal (f,FDouble,None)))
       (* We don't treat cast to long double, as we don't really know
          how to handle this type anyway. *)
-      | Const (CInt64(i,_,_)), (TFloat(FFloat,a)) when a = [] ->
+      | Const (CInt64(i,_,_)), TFloat FFloat when t.tattr = [] ->
         let f = Integer.to_float i in
         let f = Floating_point.round_to_single_precision_float f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
-      | Const (CInt64(i,_,_)), (TFloat(FDouble,a)) when a = [] ->
+      | Const (CInt64(i,_,_)), TFloat FDouble when t.tattr = [] ->
         let f = Integer.to_float i in
         new_exp ~loc (Const (CReal (f,FDouble,None)))
       | _, _ -> new_exp ~loc (CastE (t, e))
@@ -4492,11 +4499,11 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         | Const(CEnum {eival = v}) -> mkInt v
         | CastE(typ, e') -> begin
             match unrollType typ with
-            | TInt (ik, ta) -> begin
+            | { tnode = TInt ik } as t -> begin
                 let e = mkInt e' in
                 match e.enode with
                 | Const(CInt64(i, _, _)) -> kinteger64 ~loc ~kind:ik i
-                | _ -> {e with enode = CastE(TInt(ik, ta), e)}
+                | _ -> {e with enode = CastE(t, e)}
               end
             | _ -> e
           end
@@ -4504,8 +4511,8 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       in
       let tk =
         match unrollTypeSkel tres with
-          TInt(ik, _) -> ik
-        | TEnum (ei,_) -> ei.ekind
+        | TInt ik  -> ik
+        | TEnum ei -> ei.ekind
         | _ -> Kernel.fatal ~current:true "constFoldBinOp"
       in
       (* See if the result is unsigned *)
@@ -4646,7 +4653,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
   end else if isArithmeticType tres && not (isLongDoubleType tres) then begin
     let tk =
       match unrollTypeSkel tres with
-      | TFloat(fk,_) -> fk
+      | TFloat fk -> fk
       | _ -> Kernel.fatal "constFoldBinOp: not a floating type"
     in
     match bop, e1'.enode, e2'.enode with
@@ -4676,8 +4683,8 @@ and constFoldToInt ?(machdep=true) e =
 
 let bitsSizeOfBitfield typlv =
   match unrollType typlv with
-  | TInt (_, attrs) | TEnum (_, attrs) as t ->
-    (match findAttribute bitfield_attribute_name attrs with
+  | { tnode = TInt _; tattr } | { tnode = TEnum _; tattr } as t ->
+    (match findAttribute bitfield_attribute_name tattr with
      | [AInt i] -> Integer.to_int_exn i
      | _ -> bitsSizeOf t)
   | t -> bitsSizeOf t
@@ -4732,9 +4739,9 @@ let interpret_character_constant char_list =
   else begin
     let orig_rep = None (* Some("'" ^ (String.escaped str) ^ "'") *) in
     if value <= (Int64.of_int32 Int32.max_int) then
-      (CInt64(Integer.of_int64 value,IULong,orig_rep)),(TInt(IULong,[]))
+      (CInt64(Integer.of_int64 value,IULong,orig_rep)), Cil_const.ulongType
     else
-      (CInt64(Integer.of_int64 value,IULongLong,orig_rep)),(TInt(IULongLong,[]))
+      (CInt64(Integer.of_int64 value,IULongLong,orig_rep)), Cil_const.ulongLongType
   end
 
 let invalidStmt = mkStmt (Instr (Skip Location.unknown))
@@ -4838,9 +4845,9 @@ let need_cast ?(force=false) oldt newt =
   not (Cil_datatype.Typ.equal oldt newt) &&
   (force ||
    match oldt, newt with
-   | TInt(ik,ai),TEnum(e,ae)
-   | TEnum(e,ae),TInt(ik,ai) when Attributes.equal ai ae ->
-     ik <> e.ekind
+   | { tnode = TInt ik; tattr = ai }, { tnode = TEnum e; tattr = ae }
+   | { tnode = TEnum e; tattr = ae }, { tnode = TInt ik; tattr = ai }
+     when Attributes.equal ai ae -> ik <> e.ekind
    | _ -> true)
 
 let cvar_to_lvar vi = match vi.vlogic_var_assoc with
@@ -4915,8 +4922,8 @@ let makeTempVar fdec ?insert ?ghost ?(name = "__cil_tmp") ?descr ?(descrpure = t
 (* Set the types of arguments and results as given by the function type
  * passed as the second argument *)
 let setFunctionType (f: fundec) (t: typ) =
-  match unrollType t with
-    TFun (_rt, Some args, _va, _a) ->
+  match unrollTypeSkel t with
+  | TFun (_rt, Some args, _va) ->
     if List.length f.sformals <> List.length args then
       Kernel.fatal ~current:true "setFunctionType: number of arguments differs from the number of formals" ;
     (* Change the function type. *)
@@ -4932,8 +4939,8 @@ let setFunctionType (f: fundec) (t: typ) =
 (* Set the types of arguments and results as given by the function type
    passed as the second argument *)
 let setFunctionTypeMakeFormals (f: fundec) (t: typ) =
-  match unrollType t with
-    TFun (_rt, Some args, _va, _a) ->
+  match unrollTypeNode t with
+  | TFun (_rt, Some args, _va) ->
     if f.sformals <> [] then
       Kernel.fatal ~current:true "setFunctionTypMakeFormals called on function %s with some formals already"
         f.svar.vname ;
@@ -5028,7 +5035,7 @@ let emptyFunctionFromVI vi =
 (* Make an empty function *)
 let emptyFunction name =
   let vi =
-    makeGlobalVar ~temp:false name (TFun(Cil_const.voidType, Some [], false,[]))
+    makeGlobalVar ~temp:false name Cil_const.(mk_tfun voidType (Some []) false)
   in emptyFunctionFromVI vi
 
 let dummyFile =
@@ -5486,7 +5493,7 @@ let mkAddrOfVi vi = mkAddrOf ~loc:vi.vdecl (var vi)
 
 let mkAddrOrStartOf ~loc (lv: lval) : exp =
   match unrollTypeSkel (typeOfLval lv) with
-    TArray _ -> new_exp ~loc (StartOf lv)
+  | TArray _ -> new_exp ~loc (StartOf lv)
   | _ -> mkAddrOf ~loc lv
 
 let mkMem ~(addr: exp) ~(off: offset) : lval =
@@ -5562,14 +5569,14 @@ let instr_falls_through = function
 let splitFunctionType (ftype: typ)
   : typ * (string * typ * attributes) list option * bool * attributes =
   match unrollType ftype with
-    TFun (rt, args, isva, a) -> rt, args, isva, a
+  | { tnode = TFun (rt, args, isva); tattr } -> rt, args, isva, tattr
   | _ -> Kernel.fatal ~current:true "splitFunctionType invoked on a non function type %a"
            !pp_typ_ref ftype
 
 let splitFunctionTypeVI (fvi: varinfo)
   : typ * (string * typ * attributes) list option * bool * attributes =
   match unrollType fvi.vtype with
-    TFun (rt, args, isva, a) -> rt, args, isva, a
+  | { tnode = TFun (rt, args, isva); tattr } -> rt, args, isva, tattr
   | _ -> Kernel.abort "Function %s invoked on a non function type" fvi.vname
 
 let argsToPairOfLists args =
@@ -5581,26 +5588,25 @@ let remove_attributes_for_integral_promotion a =
   dropAttributes (bitfield_attribute_name :: spare_attributes_for_c_cast) a
 
 let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
+  let open Cil_const in
   match unrollType t with
-  | TInt ((IShort|ISChar|IBool), a) ->
-    let a = remove_attributes_for_integral_promotion a in
-    TInt(IInt, a)
-  | TInt (IUChar|IUShort as k, a) ->
-    let a = remove_attributes_for_integral_promotion a in
-    if bitsSizeOfInt k < bitsSizeOf Cil_const.intType then
-      TInt(IInt, a)
-    else
-      TInt(IUInt,a)
-  | TInt (IChar,a) ->
+  | { tnode = TInt (IShort|ISChar|IBool); tattr } ->
+    let tattr = remove_attributes_for_integral_promotion tattr in
+    mk_tint ~tattr IInt
+  | { tnode = TInt (IUChar|IUShort as k); tattr } ->
+    let tattr = remove_attributes_for_integral_promotion tattr in
+    let ik = if bitsSizeOfInt k < bitsSizeOf intType then IInt else IUInt in
+    mk_tint ~tattr ik
+  | { tnode = TInt IChar; tattr } ->
     let k = if isSigned IChar then ISChar else IUChar in
-    integralPromotion (TInt (k, a))
-  | TInt (k,a) ->
-    begin match findAttribute bitfield_attribute_name a with
+    integralPromotion (mk_tint ~tattr k)
+  | { tnode = TInt k; tattr } ->
+    begin match findAttribute bitfield_attribute_name tattr with
       | [AInt size] ->
         (* This attribute always fits in int. *)
         let size = Integer.to_int_exn size in
-        let sizeofint = bitsSizeOf Cil_const.intType in
-        let attrs = remove_attributes_for_integral_promotion a in
+        let sizeofint = bitsSizeOf intType in
+        let tattr = remove_attributes_for_integral_promotion tattr in
         let kind =
           if size < sizeofint then IInt
           else if size = sizeofint then
@@ -5608,60 +5614,61 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
             else IUInt
           else k
         in
-        TInt(kind,attrs)
+        mk_tint ~tattr kind
       | [] -> t
       | _ -> assert false
     end
-  | TEnum (ei, a) -> (* gcc packed enums can be < int *)
-    integralPromotion (TInt(ei.ekind, a))
-  | t -> Kernel.fatal ~current:true "integralPromotion: not expecting %a" !pp_typ_ref t
+  | { tnode = TEnum ei; tattr } -> (* gcc packed enums can be < int *)
+    integralPromotion (mk_tint ~tattr ei.ekind)
+  | _ -> Kernel.fatal ~current:true "integralPromotion: not expecting %a" !pp_typ_ref t
 
 let arithmeticConversion t1 t2 = (* c.f. ISO 6.3.1.8 *)
   let checkToInt _ = () in  (* dummies for now *)
   let checkToFloat _ = () in
   match unrollTypeSkel t1, unrollTypeSkel t2 with
-    TFloat(FLongDouble, _), _ -> checkToFloat t2; t1
-  | _, TFloat(FLongDouble, _) -> checkToFloat t1; t2
-  | TFloat(FDouble, _), _ -> checkToFloat t2; t1
-  | _, TFloat (FDouble, _) -> checkToFloat t1; t2
-  | TFloat(FFloat, _), _ -> checkToFloat t2; t1
-  | _, TFloat (FFloat, _) -> checkToFloat t1; t2
+  | TFloat FLongDouble, _ -> checkToFloat t2; t1
+  | _, TFloat FLongDouble -> checkToFloat t1; t2
+  | TFloat FDouble, _ -> checkToFloat t2; t1
+  | _, TFloat FDouble -> checkToFloat t1; t2
+  | TFloat FFloat, _ -> checkToFloat t2; t1
+  | _, TFloat FFloat -> checkToFloat t1; t2
   | _, _ -> begin
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
       match unrollTypeSkel t1', unrollTypeSkel t2' with
-        TInt(IULongLong, _), _ -> checkToInt t2'; t1'
-      | _, TInt(IULongLong, _) -> checkToInt t1'; t2'
+      | TInt IULongLong, _ -> checkToInt t2'; t1'
+      | _, TInt IULongLong -> checkToInt t1'; t2'
 
-      | TInt(ILongLong,_), _
+      | TInt ILongLong, _
         when bitsSizeOf t1' <= bitsSizeOf t2' &&
-             (not (isSignedInteger t2')) -> TInt(IULongLong,[])
-      | _, TInt(ILongLong,_)
+             (not (isSignedInteger t2')) -> Cil_const.ulongLongType
+      | _, TInt ILongLong
         when bitsSizeOf t2' <= bitsSizeOf t1' &&
-             (not (isSignedInteger t1')) -> TInt(IULongLong,[])
+             (not (isSignedInteger t1')) -> Cil_const.ulongLongType
 
-      | TInt(ILongLong, _), _ -> checkToInt t2'; t1'
-      | _, TInt(ILongLong, _) -> checkToInt t1'; t2'
+      | TInt ILongLong, _ -> checkToInt t2'; t1'
+      | _, TInt ILongLong -> checkToInt t1'; t2'
 
-      | TInt(IULong, _), _ -> checkToInt t2'; t1'
-      | _, TInt(IULong, _) -> checkToInt t1'; t2'
+      | TInt IULong, _ -> checkToInt t2'; t1'
+      | _, TInt IULong -> checkToInt t1'; t2'
 
 
-      | TInt(ILong,_), TInt(IUInt,_)
-        when bitsSizeOf t1' <= bitsSizeOf t2' -> TInt(IULong,[])
-      | TInt(IUInt,_), TInt(ILong,_)
-        when bitsSizeOf t2' <= bitsSizeOf t1' -> TInt(IULong,[])
+      | TInt ILong, TInt IUInt
+        when bitsSizeOf t1' <= bitsSizeOf t2' -> Cil_const.ulongType
+      | TInt IUInt, TInt ILong
+        when bitsSizeOf t2' <= bitsSizeOf t1' -> Cil_const.ulongType
 
-      | TInt(ILong, _), _ -> checkToInt t2'; t1'
-      | _, TInt(ILong, _) -> checkToInt t1'; t2'
+      | TInt ILong, _ -> checkToInt t2'; t1'
+      | _, TInt ILong -> checkToInt t1'; t2'
 
-      | TInt(IUInt, _), _ -> checkToInt t2'; t1'
-      | _, TInt(IUInt, _) -> checkToInt t1'; t2'
+      | TInt IUInt, _ -> checkToInt t2'; t1'
+      | _, TInt IUInt -> checkToInt t1'; t2'
 
-      | TInt(IInt, _), TInt (IInt, _) -> t1'
+      | TInt IInt, TInt IInt -> t1'
 
-      | t1, t2 ->
-        Kernel.fatal ~current:true "arithmeticConversion %a -> %a@." !pp_typ_ref t1 !pp_typ_ref t2
+      | n1, n2 ->
+        Kernel.fatal ~current:true "arithmeticConversion %a -> %a@."
+          !pp_typ_ref (Cil_const.mk_typ n1) !pp_typ_ref (Cil_const.mk_typ n2)
     end
 
 let isArrayType t = match unrollTypeSkel t with
@@ -5669,33 +5676,33 @@ let isArrayType t = match unrollTypeSkel t with
   | _ -> false
 
 let isUnsizedArrayType t = match unrollTypeSkel t with
-  | TArray (_, None, _) -> true
+  | TArray (_, None) -> true
   | _ -> false
 
 let isSizedArrayType t = match unrollTypeSkel t with
-  | TArray (_, Some _, _) -> true
+  | TArray (_, Some _) -> true
   | _ -> false
 
 let isAnyCharArrayType t = match unrollTypeSkel t with
-  | TArray(tau,_,_) when isAnyCharType tau -> true
+  | TArray(tau, _) when isAnyCharType tau -> true
   | _ -> false
 
 let isCharArrayType t = match unrollTypeSkel t with
-  | TArray(tau,_,_) when isCharType tau -> true
+  | TArray(tau, _) when isCharType tau -> true
   | _ -> false
 
 let isStructType t = match unrollTypeSkel t with
-  | TComp (comp, _) -> comp.cstruct
+  | TComp comp -> comp.cstruct
   | _ -> false
 
 let isUnionType t = match unrollTypeSkel t with
-  | TComp (comp, _) -> not comp.cstruct
+  | TComp comp -> not comp.cstruct
   | _ -> false
 
 let isStructOrUnionType t = isStructType t || isUnionType t
 
 let isVariadicListType t = match unrollTypeSkel t with
-  | TBuiltin_va_list _ -> true
+  | TBuiltin_va_list -> true
   | _ -> false
 
 let rec isConstantGen is_varinfo_cst f e = match e.enode with
@@ -5716,8 +5723,8 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
   | CastE(t,{ enode = Const(CReal _)}) when isIntegralType t -> true
   | CastE(t, e) ->
     begin
-      match t, typeOf e with
-      | TInt (i, _), TPtr _ ->
+      match t.tnode, (typeOf e).tnode with
+      | TInt i, TPtr _ ->
         (* gcc/clang/ccomp only consider non-truncated constant ptr values
            to be constant. If it is truncated, we consider it non-const
            in any case.
@@ -5758,7 +5765,7 @@ let getCompField cinfo fieldName =
 
 let getCompType typ =
   match unrollTypeSkel typ with
-  | TComp(comp,_) -> comp
+  | TComp comp -> comp
   | _ -> raise Not_found
 
 let sameSizeInt ?(machdep=false) (ik1 : ikind) (ik2 : ikind) =
@@ -5838,8 +5845,9 @@ let included_qualifiers ?(context=Identical) a1 a2 =
 (* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
    you must have called [combineTypes t1 t2] before calling this function. *)
 let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
-  match unrollType t1, unrollType t2 with
-  | TFun (tres1, Some args1, _, _), TFun (tres2, Some args2, _, _) ->
+  let t1 = unrollType t1 and t2 = unrollType t2 in
+  match t1.tnode, t2.tnode with
+  | TFun (tres1, Some args1, _), TFun (tres2, Some args2, _) ->
     have_compatible_qualifiers_deep
       ~context:(qualifier_context_fun_ret context) tres1 tres2 &&
     let context = qualifier_context_fun_arg context in
@@ -5847,9 +5855,9 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
         have_compatible_qualifiers_deep ~context t1' t2' &&
         included_qualifiers ~context a1 a2)
       args1 args2
-  | TPtr (t1', a1), TPtr (t2', a2)
-  | TArray (t1', _, a1), TArray (t2', _, a2) ->
-    (included_qualifiers ~context a1 a2) &&
+  | TPtr t1', TPtr t2'
+  | TArray (t1', _), TArray (t2', _) ->
+    (included_qualifiers ~context t1.tattr t2.tattr) &&
     let context = qualifier_context_ptr context in
     have_compatible_qualifiers_deep ~context t1' t2'
   | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
@@ -5940,12 +5948,14 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     ~strictInteger ~strictReturnTypes
     (what : combineWhat) (oldt : typ) (t : typ) : typ =
   let warning = Kernel.warning ?emitwith in
-  match oldt, t with
-  | TVoid olda, TVoid a -> TVoid (combineAttributes what olda a)
+  let tattr = combineAttributes what oldt.tattr t.tattr in
+  match oldt.tnode, t.tnode with
+  | TVoid, TVoid ->
+    Cil_const.mk_tvoid ~tattr ()
 
-  | _, TVoid _ when what = CombineFunret && not strictReturnTypes -> t
+  | _, TVoid when what = CombineFunret && not strictReturnTypes -> t
 
-  | TInt (oldik, olda), TInt (ik, a) ->
+  | TInt oldik, TInt ik ->
     let result k oldk = if rank oldk<rank k then k else oldk in
     let check_gcc_mode oldk k =
       if gccMode () && oldk == IInt &&
@@ -5984,9 +5994,9 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       else
         check_gcc_mode oldk k
     in
-    TInt (combineIK oldik ik, combineAttributes what olda a)
+    Cil_const.mk_tint ~tattr (combineIK oldik ik)
 
-  | TFloat (oldfk, olda), TFloat (fk, a) ->
+  | TFloat oldfk, TFloat fk ->
     let combineFK oldk k =
       if oldk == k then oldk else
       if gccMode () && oldk == FDouble && k == FFloat
@@ -5995,28 +6005,28 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       else
         raise (Cannot_combine "different floating point types")
     in
-    TFloat (combineFK oldfk fk, combineAttributes what olda a)
+    Cil_const.mk_tfloat ~tattr (combineFK oldfk fk)
 
-  | TEnum (oldei, olda), TEnum (ei, a) ->
+  | TEnum oldei, TEnum ei ->
     (* Matching enumerations always succeeds. But sometimes it maps both
      * enumerations to integers *)
-    TEnum (combF.enum_combine combF oldei ei,
-           combineAttributes what olda a)
+    let ei' = combF.enum_combine combF oldei ei in
+    Cil_const.mk_tenum ~tattr ei'
 
   (* Strange one. But seems to be handled by GCC *)
-  | TEnum (oldei, olda) , TInt(IInt, a) ->
-    TEnum(oldei, combineAttributes what olda a)
+  | TEnum oldei , TInt IInt ->
+    Cil_const.mk_tenum ~tattr oldei
 
   (* Strange one. But seems to be handled by GCC. Warning. Here we are
    * leaking types from new to old  *)
-  | TInt(IInt, olda), TEnum (ei, a) ->
-    TEnum(ei, combineAttributes what olda a)
+  | TInt IInt, TEnum ei ->
+    Cil_const.mk_tenum ~tattr ei
 
-  | TComp (oldci, olda) , TComp (ci, a) ->
-    TComp(combF.comp_combine combF oldci ci,
-          combineAttributes what olda a)
+  | TComp oldci , TComp ci ->
+    let ci' = combF.comp_combine combF oldci ci in
+    Cil_const.mk_tcomp ~tattr ci'
 
-  | TArray (oldbt, oldsz, olda), TArray (bt, sz, a) ->
+  | TArray (oldbt, oldsz), TArray (bt, sz) ->
     let newbt =
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes CombineOther oldbt bt
@@ -6047,16 +6057,16 @@ let combineTypesGen ?emitwith (combF : combineFunction)
         end else
           raise (Cannot_combine "different array lengths")
     in
-    TArray (newbt, newsz, combineAttributes what olda a)
+    Cil_const.mk_tarray ~tattr newbt newsz
 
-  | TPtr (oldbt, olda), TPtr (bt, a) ->
+  | TPtr oldbt, TPtr bt ->
     let newbt =
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes CombineOther oldbt bt
     in
-    TPtr (newbt, combineAttributes what olda a)
+    Cil_const.mk_tptr ~tattr newbt
 
-  | TFun (oldrt, oldargs, oldva, olda), TFun (rt, args, va, a) ->
+  | TFun (oldrt, oldargs, oldva), TFun (rt, args, va) ->
     let newrt =
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes CombineFunret oldrt rt
@@ -6103,37 +6113,38 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
     let olda' =
-      if not (hasAttribute "missingproto" a) then
-        dropAttribute "missingproto" olda
-      else olda
+      if not (hasAttribute "missingproto" t.tattr) then
+        dropAttribute "missingproto" oldt.tattr
+      else oldt.tattr
     in
     let a' =
-      if not (hasAttribute "missingproto" olda) then
-        dropAttribute "missingproto" a
-      else a
+      if not (hasAttribute "missingproto" oldt.tattr) then
+        dropAttribute "missingproto" t.tattr
+      else t.tattr
     in
-    TFun (newrt, newargs, oldva, combineAttributes what olda' a')
+    let tattr = combineAttributes what olda' a' in
+    Cil_const.mk_tfun ~tattr newrt newargs oldva
 
-  | TBuiltin_va_list olda, TBuiltin_va_list a ->
-    TBuiltin_va_list (combineAttributes what olda a)
+  | TBuiltin_va_list, TBuiltin_va_list ->
+    Cil_const.mk_tbuiltin ~tattr ()
 
-  | TNamed (oldt, olda), TNamed (t, a) ->
-    TNamed (combF.name_combine combF what oldt t,
-            combineAttributes what olda a)
+  | TNamed oldti, TNamed ti ->
+    let ti' = combF.name_combine combF what oldti ti in
+    Cil_const.mk_tnamed ~tattr ti'
 
-  | _, TNamed (t, a) ->
+  | _, TNamed ti ->
     let res =
       combF.typ_combine combF
-        ~strictInteger ~strictReturnTypes what oldt t.ttype
+        ~strictInteger ~strictReturnTypes what oldt ti.ttype
     in
-    typeAddAttributes ~combine:(combineAttributes what) a res
+    typeAddAttributes ~combine:(combineAttributes what) t.tattr res
 
-  | TNamed (oldt, olda), _ ->
+  | TNamed oldti, _ ->
     let res =
       combF.typ_combine combF
-        ~strictInteger ~strictReturnTypes what oldt.ttype t
+        ~strictInteger ~strictReturnTypes what oldti.ttype t
     in
-    typeAddAttributes ~combine:(combineAttributes what) olda res
+    typeAddAttributes ~combine:(combineAttributes what) oldt.tattr res
 
   | _ ->
     raise
@@ -6193,10 +6204,12 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
   let error msg = abort_context ("%s " ^^ msg) origin in
   let rec default_rec oldt newt =
-    match unrollType oldt, unrollType newt with
+    let oldt' = unrollType oldt in
+    let newt' = unrollType newt in
+    match oldt'.tnode, newt'.tnode with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in checkCast"
-    | t, TInt (IBool, _) when isScalarType t -> ()
+    | _, TInt IBool when isScalarType oldt' -> ()
     | TInt _, TInt _ -> ()
     | TFloat _, TInt _ -> (* ISO 6.3.1.4.1 *) ()
     | TInt _, TFloat _ -> (* ISO 6.3.1.4.2 *) ()
@@ -6210,13 +6223,13 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
         "Casting a pointer into an enumeration type"
     | TInt _, TEnum _ -> ()
 
-    | _, TVoid _ ->
+    | _, TVoid ->
       (* ISO 6.3.2.2 *)
       Kernel.debug ~level:3
         "Casting a value into void: expr is evaluated for side effects"
-    | TPtr (t, _), TPtr (TVoid _, _) when isObjectType t ->
+    | TPtr t, TPtr { tnode = TVoid } when isObjectType t ->
       (* ISO 6.3.2.3.1 *) ()
-    | TPtr (TVoid _, _), TPtr (t, _) when isObjectType t ->
+    | TPtr { tnode = TVoid }, TPtr t when isObjectType t ->
       (* ISO 6.3.2.3.1 *) ()
     | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
     | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
@@ -6226,9 +6239,9 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
           ~wkey:Kernel.wkey_int_conversion
           ~current:true
           "Conversion from a pointer to an integer without an explicit cast"
-    | TPtr (t1, _), TPtr (t2, _) when isObjectType t1 && isObjectType t2 ->
+    | TPtr t1, TPtr t2 when isObjectType t1 && isObjectType t2 ->
       (* ISO 6.3.2.3.7 *) ()
-    | TPtr (t1, _), TPtr (t2, _) when isFunctionType t1 && isFunctionType t2 ->
+    | TPtr t1, TPtr t2 when isFunctionType t1 && isFunctionType t2 ->
       (* ISO 6.3.2.3.8 *)
       if not (areCompatibleTypes ?context oldt newt)
       then
@@ -6242,12 +6255,12 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
     (* accept converting a ptr to function to/from a ptr to void, even though
        not really accepted by the standard.
        Main compilers supports it. *)
-    | TPtr (TFun _, _), TPtr (TVoid _, _) -> ()
-    | TPtr (TVoid _, _), TPtr (TFun _, _) -> ()
+    | TPtr { tnode = TFun _ }, TPtr { tnode = TVoid } -> ()
+    | TPtr { tnode = TVoid } , TPtr { tnode = TFun _ } -> ()
 
-    | TFun _, TPtr (TFun _, _) -> (* ISO 6.3.2.1.4 *) ()
+    | TFun _, TPtr { tnode = TFun _ } -> (* ISO 6.3.2.1.4 *) ()
 
-    | TArray (t1, _, _), TPtr (t2, _) ->
+    | TArray (t1, _), TPtr t2 ->
       (* ISO 6.3.2.1.3 *)
       if not (areCompatibleTypes ?context t1 t2)
       then
@@ -6258,7 +6271,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
            %a@ and@ %a"
           Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
 
-    | TArray (t1, _, _), TArray (t2, _, _) ->
+    | TArray (t1, _), TArray (t2, _) ->
       if not (areCompatibleTypes ?context t1 t2)
       then
         Kernel.warning
@@ -6272,10 +6285,15 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
        use unrollTypeDeep above in order to avoid needless divergence with
        original type in the sources.
     *)
-    | TPtr (TFun _, _), TPtr (TNamed (ti, nattr), pattr) ->
-      default_rec oldt (TPtr (typeAddAttributes nattr ti.ttype, pattr))
-    | TPtr (TNamed (ti, nattr), pattr), TPtr (TFun _, _) ->
-      default_rec (TPtr (typeAddAttributes nattr ti.ttype, pattr)) newt
+    | TPtr { tnode = TFun _ }, TPtr { tnode = TNamed ti; tattr } ->
+      let t' = typeAddAttributes tattr ti.ttype in
+      let t'' = Cil_const.mk_tptr ~tattr:newt'.tattr t' in
+      default_rec t'' newt
+
+    | TPtr { tnode = TNamed ti; tattr }, TPtr { tnode = TFun _ } ->
+      let t' = typeAddAttributes tattr ti.ttype in
+      let t'' = Cil_const.mk_tptr ~tattr:oldt'.tattr t' in
+      default_rec t'' newt
 
     | TFloat _, TPtr _
     | TPtr _, TFloat _ ->
@@ -6284,24 +6302,24 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
     (* No other conversion implying a pointer to function
           and a pointer to object are supported. *)
-    | TPtr (t1, _), TPtr (t2, _) when isFunctionType t1 && isObjectType t2 ->
+    | TPtr t1, TPtr t2 when isFunctionType t1 && isObjectType t2 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
           "casting function to %a" Cil_datatype.Typ.pretty newt
-    | TPtr (t1, _), TPtr (t2, _) when isFunctionType t2 && isObjectType t1 ->
+    | TPtr t1, TPtr t2 when isFunctionType t2 && isObjectType t1 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
           "casting function from %a" Cil_datatype.Typ.pretty oldt
 
-    | _, TPtr (t1, _) when isFunctionType t1 ->
+    | _, TPtr t1 when isFunctionType t1 ->
       error "cannot cast %a to function type"
         Cil_datatype.Typ.pretty oldt
 
-    | t1, t2 when isArithmeticType t1 && isArithmeticType t2 ->
+    | _, _ when isArithmeticType oldt' && isArithmeticType newt' ->
       (* ISO 6.5.16.1.1#1 *) ()
 
 
@@ -6313,7 +6331,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
        have been changed to the type of the first argument, and we'll
        see a cast from a union to the type of the first argument. Turn
        that into a field access *)
-    | TComp (_, _), _ ->
+    | TComp _, _ ->
       begin
         match isTransparentUnion oldt with
         | None ->
@@ -6322,13 +6340,13 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
         | Some _ -> ()
       end
 
-    | TBuiltin_va_list _, (TInt _ | TPtr _) -> ()
+    | TBuiltin_va_list, (TInt _ | TPtr _) -> ()
 
-    | (TInt _ | TPtr _), TBuiltin_va_list _ ->
+    | (TInt _ | TPtr _), TBuiltin_va_list ->
       Kernel.debug ~dkey ~current:true
         "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt
 
-    | _, t1 when fromsource && not (isScalarType t1) ->
+    | _, _ when fromsource && not (isScalarType newt') ->
       (* ISO 6.5.4.2 *)
       error "cast over a non-scalar type %a" Cil_datatype.Typ.pretty newt
 
@@ -6345,16 +6363,17 @@ let rec castReduce fromsource force =
     let loc = e.eloc in
     let normalized_newt = type_remove_attributes_for_c_cast (unrollType newt) in
     let res e = new_exp ~loc (CastE (type_remove_qualifier_attributes newt, e)) in
-    match unrollType oldt, normalized_newt, e.enode with
+    let oldt' = unrollType oldt in
+    match oldt'.tnode, (normalized_newt).tnode, e.enode with
     (* In the case were we have a representation for the literal,
          explicitly add the cast. *)
-    | _, TInt (newik, []), Const (CInt64 (i, _, None)) ->
+    | _, TInt newik, Const (CInt64 (i, _, None)) ->
       (* ISO 6.3.1.3.2 *) kinteger64 ~loc ~kind:newik i
 
     | _, TPtr _, CastE (_, e') ->
       begin
         match unrollType (typeOf e'), e'.enode with
-        | (TPtr _ as typ''), _ ->
+        | { tnode = TPtr _ } as typ'', _ ->
           (* Old cast can be removed...*)
           if need_cast ~force newt typ'' then res e'
           else (* In fact, both casts can be removed. *) e'
@@ -6362,13 +6381,13 @@ let rec castReduce fromsource force =
         | _ -> res e
       end
 
-    | TInt (ik, _), TEnum (ei, _), Const (CEnum { eihost = ei'}) when
+    | TInt ik, TEnum ei, Const (CEnum { eihost = ei'}) when
         ei.ename = ei'.ename && not fromsource &&
         bytesSizeOfInt ik = bytesSizeOfInt ei'.ekind -> e
 
-    | TFun _, TPtr (TFun _, _), Lval lv -> mkAddrOf ~loc lv
+    | TFun _, TPtr { tnode = TFun _ }, Lval lv -> mkAddrOf ~loc lv
 
-    | t, TInt (IBool, _), _ when isScalarType t ->
+    | _, TInt IBool, _ when isScalarType oldt' ->
       if is_boolean_result e then begin
         Kernel.debug ~dkey "Explicit cast to Boolean: %a" !pp_exp_ref e;
         res e
@@ -6416,7 +6435,7 @@ and mkCastTGen ?(check=true) ?context ?(fromsource=false) ?(force=false)
     begin
       Kernel.debug ~dkey "no cast to perform";
       let returned_type =
-        match newt with
+        match newt.tnode with
         | TNamed _ -> newt
         | _ -> oldt
       in
@@ -6560,12 +6579,12 @@ let existsType (f: typ -> existsAction) (t: typ) : bool =
       ExistsTrue -> true
     | ExistsFalse -> false
     | ExistsMaybe ->
-      (match t with
-         TNamed (t', _) -> loop t'.ttype
-       | TComp (c,_) -> loopComp c
-       | TArray (t', _, _) -> loop t'
-       | TPtr (t', _) -> loop t'
-       | TFun (rt, args, _, _) ->
+      (match t.tnode with
+       | TNamed t' -> loop t'.ttype
+       | TComp c   -> loopComp c
+       | TArray (t', _) -> loop t'
+       | TPtr t' -> loop t'
+       | TFun (rt, args, _) ->
          (loop rt || List.exists (fun (_, at, _) -> loop at)
             (argsToList args))
        | _ -> false)
@@ -6586,8 +6605,8 @@ let increm (e: exp) (i: int) =
   let e' = constFold false e in
   let et = typeOf e' in
   let bop = if isPointerType et then PlusPI else PlusA in
-  let i = match et with
-    | TInt (k, _) | TEnum ({ekind = k },_) -> kinteger k ~loc:e.eloc i
+  let i = match et.tnode with
+    | TInt k | TEnum {ekind = k } -> kinteger k ~loc:e.eloc i
     | _ -> integer ~loc:e.eloc i
   in
   constFoldBinOp ~loc:e.eloc false bop e' i et
@@ -6628,12 +6647,13 @@ let lenOfArray eo =
 
 (*** Make an initializer for zeroing a data type ***)
 let rec makeZeroInit ~loc (t: typ) : init =
-  match unrollType t with
-    TInt (ik, _) ->
+  let t' = unrollType t in
+  match t'.tnode with
+  | TInt ik ->
     SingleInit (new_exp ~loc (Const(CInt64(Integer.zero, ik, None))))
-  | TFloat(fk, _) -> SingleInit(new_exp ~loc (Const(CReal(0.0, fk, None))))
+  | TFloat fk -> SingleInit(new_exp ~loc (Const(CReal(0.0, fk, None))))
   | TEnum _ -> SingleInit (zero ~loc)
-  | TComp (comp, _) as t' when comp.cstruct ->
+  | TComp comp when comp.cstruct ->
     let inits =
       List.fold_right
         (fun f acc ->
@@ -6644,7 +6664,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
         (Option.value ~default:[] comp.cfields) []
     in
     CompoundInit (t', inits)
-  | TComp (comp, _) when not comp.cstruct ->
+  | TComp comp when not comp.cstruct ->
     (match comp.cfields with
      | Some [] -> CompoundInit(t, []) (* tolerate empty initialization. *)
      | Some (f :: _rest) ->
@@ -6653,7 +6673,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
        CompoundInit(t, [(Field(f, NoOffset), makeZeroInit ~loc f.ftype)])
      | None ->
        Kernel.fatal "Initialization of incomplete struct")
-  | TArray(bt, Some len, _) as t' ->
+  | TArray (bt, Some len) ->
     let n =
       match constFoldToInt len with
       | Some n -> Integer.to_int_exn n
@@ -6666,16 +6686,16 @@ let rec makeZeroInit ~loc (t: typ) : init =
     in
     CompoundInit(t', loopElems [] (n - 1))
 
-  | TArray (_bt, None, _) as t' ->
+  | TArray (_bt, None) ->
     (* Unsized array, allow it and fill it in later
      * (see cabs2cil.ml, collectInitializer) *)
     CompoundInit (t', [])
 
-  | TPtr _ as t ->
+  | TPtr _ ->
     SingleInit(
-      if (insert_implicit_casts ()) then mkCast ~newt:t (zero ~loc)
+      if (insert_implicit_casts ()) then mkCast ~newt:t' (zero ~loc)
       else zero ~loc)
-  | x -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref x
+  | _ -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref t'
 
 (** Fold over the list of initializers in a Compound (not also the nested
  * ones). [doinit] is called on every present initializer, even if it is of
@@ -6691,8 +6711,8 @@ let foldLeftCompound
     ~(ct: typ)
     ~(initl: (offset * init) list)
     ~(acc: 'a) : 'a =
-  match unrollType ct with
-  | TArray(bt, leno, _) -> begin
+  match unrollTypeNode ct with
+  | TArray (bt, leno) -> begin
       let default () =
         (* iter over the supplied initializers *)
         List.fold_left (fun acc (o, i) -> doinit o i bt acc) acc initl
@@ -6740,7 +6760,7 @@ let foldLeftCompound
       else default ()
     end
 
-  | TComp (_comp, _) ->
+  | TComp _comp ->
     let getTypeOffset = function
         Field(f, NoOffset) -> f.ftype
       | _ -> Kernel.fatal ~current:true "foldLeftCompound: malformed initializer"
@@ -6752,13 +6772,13 @@ let foldLeftCompound
 
 let rec has_flexible_array_member t =
   let is_flexible_array t =
-    match unrollType t with
-    | TArray (_, None, _) -> true
-    | TArray (_, Some z, _) -> (msvcMode() || gccMode()) && isZero z
+    match unrollTypeSkel t with
+    | TArray (_, None) -> true
+    | TArray (_, Some z) -> (msvcMode() || gccMode()) && isZero z
     | _ -> false
   in
-  match unrollType t with
-  | TComp ({ cfields = Some ((_::_) as l) },_) ->
+  match unrollTypeSkel t with
+  | TComp { cfields = Some ((_::_) as l) } ->
     let last = (Extlib.last l).ftype in
     is_flexible_array last ||
     ((gccMode() || msvcMode()) && has_flexible_array_member last)
@@ -6769,21 +6789,21 @@ let rec has_flexible_array_member t =
    the array type isn't. *)
 let rec isCompleteType ?(allowZeroSizeArrays=gccMode ())
     ?(last_field=false) t =
-  match unrollType t with
-  | TVoid _ -> false (* void is an incomplete type by definition (6.2.5§19) *)
-  | TArray(t, None, _) ->
+  match unrollTypeNode t with
+  | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
+  | TArray(t, None) ->
     last_field && is_complete_agg_member ~allowZeroSizeArrays ~last_field  t
-  | TArray(t, Some z, _) when isZero z ->
+  | TArray(t, Some z) when isZero z ->
     allowZeroSizeArrays &&
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TArray(t, Some _, _) ->
+  | TArray(t, Some _) ->
     is_complete_agg_member ~allowZeroSizeArrays ~last_field t
-  | TComp ( { cfields = None }, _) -> false
-  | TComp ( { cstruct ; cfields = Some flds }, _) -> (* Struct or union *)
+  | TComp { cfields = None } -> false
+  | TComp { cstruct ; cfields = Some flds } -> (* Struct or union *)
     complete_type_fields ~allowZeroSizeArrays cstruct flds
-  | TEnum({eitems = []},_) -> false
+  | TEnum {eitems = []} -> false
   | TEnum _ -> true
-  | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list _ -> true
+  | TInt _ | TFloat _ | TPtr _ | TBuiltin_va_list -> true
   | TFun _ -> true (* only object types can be incomplete (6.2.5§1) *)
   | TNamed _ -> assert false (* unroll should have removed it. *)
 
@@ -6809,10 +6829,11 @@ let isCompleteType ?allowZeroSizeArrays t =
   isCompleteType ?allowZeroSizeArrays t
 
 let pointer_decay t =
-  match unrollType t with
-  | TArray (typ, _, _) -> TPtr(typ, [])
-  | TFun _ as typ -> TPtr(typ, [])
-  | t -> t
+  let t' = unrollType t in
+  match t'.tnode with
+  | TArray (typ, _) -> Cil_const.mk_tptr typ
+  | TFun _ ->  Cil_const.mk_tptr t'
+  | _ -> t'
 
 (* C11 6.3.2.1:  If the lvalue has qualified type, the value has the
    unqualified version of the type of the lvalue; additionally, if the lvalue
@@ -6832,8 +6853,8 @@ let lvalue_conversion (t : typ) : (typ, string) result =
     Ok (type_remove_qualifier_attributes_deep t')
 
 let rec is_variably_modified_type (t : typ) : bool =
-  match unrollType t with
-  | TArray(t', osize, _) -> begin
+  match unrollTypeNode t with
+  | TArray(t', osize) -> begin
       match osize with
       | None -> is_variably_modified_type t'
       | Some s ->
@@ -6844,20 +6865,21 @@ let rec is_variably_modified_type (t : typ) : bool =
     (* GCC supports VLA fields as an extension; if we ever support it,
        add extra code here to take them into account *)
     false
-  | TVoid _ | TInt _ | TEnum _ | TFloat _
-  | TPtr _ | TFun _ | TNamed _ | TBuiltin_va_list _ -> false
+  | TVoid | TInt _ | TEnum _ | TFloat _
+  | TPtr _ | TFun _ | TNamed _ | TBuiltin_va_list -> false
 
 let is_mutable (lhost, offset) =
   let rec aux can_mutate typ off =
     let can_mutate = can_mutate && not (isConstType typ) in
-    match unrollType typ, off with
+    let typ' = unrollType typ in
+    match typ'.tnode, off with
     | _, NoOffset -> can_mutate
     | _, Field (fi, off) ->
       let can_mutate = can_mutate || hasAttribute frama_c_mutable fi.fattr in
       aux can_mutate fi.ftype off
-    | TArray(typ, _, _), Index(_, off) -> aux can_mutate typ off
-    | typ, Index _ ->
-      Kernel.fatal "Index on a non-array type '%a'" Cil_datatype.Typ.pretty typ
+    | TArray (typ, _), Index(_, off) -> aux can_mutate typ off
+    | _, Index _ ->
+      Kernel.fatal "Index on a non-array type '%a'" Cil_datatype.Typ.pretty typ'
   in
   aux false (typeOfLhost lhost) offset
 
@@ -6882,7 +6904,7 @@ let is_mutable_or_initialized lval =
 
 let is_modifiable_lval lv =
   let t = typeOfLval lv in
-  match unrollType t with
+  match unrollTypeSkel t with
   | TArray _ -> false
   | TFun _ -> false
   | _ -> (not (isConstType t)
@@ -7328,11 +7350,11 @@ let create_alpha_renaming old_args new_args =
 (** Returns [true] whenever the type contains only arithmetic types *)
 let is_fully_arithmetic ty =
   not (existsType
-         (fun typ -> match typ with
+         (fun typ -> match typ.tnode with
             | TNamed _
             | TComp _
             | TArray _ -> ExistsMaybe
-            | TPtr _ | TBuiltin_va_list _ | TFun _ | TVoid _ -> ExistsTrue
+            | TPtr _ | TBuiltin_va_list | TFun _ | TVoid -> ExistsTrue
             | TEnum _ |TFloat _ | TInt _ ->  ExistsFalse)
          ty)
 
@@ -7411,23 +7433,25 @@ class dropAttributes ?select () = object(self)
       (match a with
        | (Attr (s,_) | AttrAnnot s) when List.mem s l -> ChangeTo []
        | Attr _ | AttrAnnot _ -> DoChildren)
-  method! vtype ty = match ty with
-    | TNamed (internal_ty, attrs) ->
-      let tty = typeAddAttributes attrs internal_ty.ttype in
+  method! vtype ty = match ty.tnode with
+    | TNamed internal_ty ->
+      let tty = typeAddAttributes ty.tattr internal_ty.ttype in
       (* keep the original type whenever possible *)
       ChangeToPost
         (visitCilType (self:>cilVisitor) tty,
          fun x -> if x == internal_ty.ttype then ty else x)
-    | TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _
-    | TComp _ | TEnum _ | TBuiltin_va_list _ -> DoChildren
+    | TVoid | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _
+    | TComp _ | TEnum _ | TBuiltin_va_list -> DoChildren
 end
 
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+(******************************************************************************)
+(** Deprecated typ manipulation                                               *)
+(******************************************************************************)
+
+let typeAttr { tattr } = tattr
+
+let setTypeAttrs t tattr = { t with tattr }

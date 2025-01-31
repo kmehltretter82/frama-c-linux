@@ -180,7 +180,7 @@ let reduce eval expr range =
    If overflows are not allowed for the type [typ], then [texpr = e]. *)
 let coerce ?(cast=false) eval typ texpr =
   match Cil.unrollType typ with
-  | TInt (ikind, attrs) | TEnum ({ ekind = ikind}, attrs) ->
+  | { tnode = (TInt ikind | TEnum { ekind = ikind }); tattr } ->
     let signed = Cil.isSigned ikind in
     if
       not cast
@@ -189,13 +189,13 @@ let coerce ?(cast=false) eval typ texpr =
     then
       texpr
     else
-      let range = Eval_typ.ik_attrs_range ikind attrs in
+      let range = Eval_typ.ik_attrs_range ikind tattr in
       reduce eval texpr range
   | _ -> raise (Out_of_Scope "coerce not integer")
 
 
 let translate_typ typ =
-  match Cil.unrollType typ with
+  match Cil.unrollTypeNode typ with
   | TInt _ | TEnum _ -> Texpr1.Int
   | _ -> raise (Out_of_Scope "translate_typ not int")
 
@@ -225,8 +225,8 @@ let translate_varinfo varinfo =
   if not (is_relevant_varinfo varinfo)
   then raise (Out_of_Scope "translate_varinfo irrelevant")
   else
-    match Cil.unrollType varinfo.vtype with
-    | TInt (ik, _) | TEnum ({ekind=ik}, _) ->
+    match Cil.unrollTypeNode varinfo.vtype with
+    | TInt ik | TEnum {ekind=ik} ->
       let id = "_" ^ string_of_int varinfo.vid in
       let name = varinfo.vname ^ id in
       let var = Var.of_string name in
@@ -300,13 +300,13 @@ let constraint_reduction env expr interval =
 
 let truncate_interval typ interval =
   match Cil.unrollType typ with
-  | TInt (ikind, attrs) | TEnum ({ ekind = ikind }, attrs) ->
+  | { tnode = (TInt ikind | TEnum { ekind = ikind }); tattr } ->
     let signed = Cil.isSigned ikind in
     if
       (signed && not (Kernel.SignedOverflow.get ()))
       || ((not signed) && not (Kernel.UnsignedOverflow.get ()))
     then
-      let range = Eval_typ.ik_attrs_range ikind attrs in
+      let range = Eval_typ.ik_attrs_range ikind tattr in
       let inf, sup, _size = bounds_of_typ range in
       let inf = Scalar.of_mpqf (Mpqf.of_mpz inf)
       and sup = Scalar.of_mpqf (Mpqf.of_mpz sup) in

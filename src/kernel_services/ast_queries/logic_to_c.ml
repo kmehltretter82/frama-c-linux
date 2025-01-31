@@ -29,10 +29,10 @@ let error_lval () = raise No_conversion
 
 let rec logic_type_to_typ = function
   | Ctype typ -> typ
-  | Linteger -> TInt(ILongLong,[]) (*TODO: to have an unlimited integer type
-                                     in the logic interpretation*)
-  | Lreal -> TFloat(FDouble,[]) (* TODO: handle reals, not floats... *)
-  | Lboolean  -> TInt(ILongLong,[])
+  | Linteger -> Cil_const.longLongType (*TODO: to have an unlimited integer type
+                                         in the logic interpretation*)
+  | Lreal -> Cil_const.doubleType (* TODO: handle reals, not floats... *)
+  | Lboolean  -> Cil_const.longLongType
   | Ltype({lt_name = "set"},[t]) -> logic_type_to_typ t
   | Ltype _ | Lvar _ | Larrow _ -> error_lval ()
 
@@ -142,7 +142,7 @@ and loc_to_exp ?result {term_node = lnode ; term_type = ltype; term_loc = loc} =
       Logic_utils.is_same_type
         (Logic_typing.type_of_set_elem set) t.term_type ->
     loc_to_exp ?result t
-  | Tnull -> [ Cil.mkCast ~newt:(TPtr(TVoid [], [])) (Cil.zero ~loc) ]
+  | Tnull -> [ Cil.mkCast ~newt:(Cil_const.voidPtrType) (Cil.zero ~loc) ]
 
   (* additional constructs *)
   | Tapp _ | Tlambda _ | Trange _   | Tlet _

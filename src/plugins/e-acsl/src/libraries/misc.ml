@@ -158,8 +158,8 @@ let is_range_free t =
 let is_bitfield_pointers lty =
   let is_bitfield_pointer = function
     | Ctype typ ->
-      begin match Cil.unrollType typ with
-        | TPtr(typ, _) ->
+      begin match Cil.unrollTypeNode typ with
+        | TPtr typ ->
           let attrs = Cil.typeAttrs typ in
           Cil.hasAttribute Cil.bitfield_attribute_name attrs
         | _ ->

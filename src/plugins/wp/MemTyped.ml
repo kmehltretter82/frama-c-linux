@@ -674,7 +674,7 @@ struct
   type atom = P of typ | I of c_int | F of c_float
 
   let pp_atom fmt = function
-    | P ty -> Printer.pp_typ fmt (TPtr(ty,[]))
+    | P ty -> Printer.pp_typ fmt (Cil_const.mk_tptr ty)
     | I i -> Ctypes.pp_int fmt i
     | F f -> Ctypes.pp_float fmt f
 

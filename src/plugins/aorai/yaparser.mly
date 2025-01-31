@@ -27,7 +27,6 @@
 
 /* Originated from http://www.ltl2dstar.de/down/ltl2dstar-0.4.2.zip  */
 %{
-open Cil_types
 open Logic_ptree
 open Automaton_ast
 open Bool3
@@ -91,9 +90,9 @@ let set_accept_state id =
 
 let add_metavariable map (name,typename) =
   let ty = match typename with
-    | "int" -> TInt(IInt, [])
-    | "char" -> TInt(IChar, [])
-    | "long" -> TInt(ILong, [])
+    | "int" -> Cil_const.intType
+    | "char" -> Cil_const.charType
+    | "long" -> Cil_const.longType
     | _ ->
       Aorai_option.abort "Unrecognized type %s for metavariable %s"
         typename name

@@ -200,8 +200,8 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
       assert false
   in
   (* s *)
-  let ty = match Cil.unrollType (Misc.cty ptr.term_type) with
-    | TPtr(ty, _) | TArray(ty, _, _) -> ty
+  let ty = match Cil.unrollTypeNode (Misc.cty ptr.term_type) with
+    | TPtr ty | TArray (ty, _) -> ty
     | _ -> assert false
   in
   let s = Logic_const.term ~loc (TSizeOf ty) Linteger in
@@ -351,7 +351,7 @@ let extract_quantifiers ~loc args =
          | TAddrOf(TVar _, TIndex({ term_node = Trange _ }, TNoOffset)) ->
            (* Case A: explicit range *)
            arg, quantifiers
-         | TAddrOf(TVar ({ lv_type = Ctype (TArray _) } as lv), toffset) ->
+         | TAddrOf(TVar ({ lv_type = Ctype { tnode = TArray _ } } as lv), toffset) ->
            if has_set_as_index toffset then
              (* Case B: non-explicit range, try to extract quantifiers with
                 range elimination. *)

@@ -380,8 +380,9 @@ let index_attrparam = function
   | AIndex _ -> 14
   | AQuestion _ -> 15
 
-let index_typ = function
-  | TVoid _ -> 0
+let index_typ t =
+  match t.tnode with
+  | TVoid -> 0
   | TInt _ -> 1
   | TFloat _ -> 2
   | TPtr _ -> 3
@@ -390,7 +391,7 @@ let index_typ = function
   | TNamed _ -> 6
   | TComp _ -> 7
   | TEnum _ -> 8
-  | TBuiltin_va_list _ -> 9
+  | TBuiltin_va_list -> 9
 
 let constfoldtoint = Extlib.mk_fun "constfoldtoint"
 let punrollType = Extlib.mk_fun "punrollType"
@@ -476,51 +477,46 @@ and compare_array_sizes e1o e2o =
 and compare_type config t1 t2 =
   if t1 == t2 then 0
   else
-    let typs =
+    let t1, t2 =
       if config.unroll then !punrollType t1, !punrollType t2
       else t1,t2
     in
-    match typs with
-    | TVoid l1, TVoid l2 -> compare_attributes config l1 l2
-    | TInt (i1, l1), TInt (i2, l2) ->
-      compare_chain (=?=) i1 i2 (compare_attributes config) l1 l2
-    | TFloat (f1, l1), TFloat (f2, l2) ->
-      compare_chain (=?=) f1 f2 (compare_attributes config) l1 l2
-    | TPtr (t1, l1), TPtr (t2, l2) ->
-      compare_chain
-        (compare_type config) t1 t2
-        (compare_attributes config) l1 l2
-    | TArray (t1', e1, l1), TArray (t2', e2, l2) ->
+    let comp_tattr () = compare_attributes config t1.tattr t2.tattr in
+    let compare_chain_tattr cmp x1 x2 =
+      let res = cmp x1 x2 in if res = 0 then comp_tattr () else res
+    in
+    match t1.tnode, t2.tnode with
+    | TVoid, TVoid -> comp_tattr ()
+    | TInt i1, TInt i2 ->
+      compare_chain_tattr (=?=) i1 i2
+    | TFloat f1, TFloat f2 ->
+      compare_chain_tattr (=?=) f1 f2
+    | TPtr t1, TPtr t2 ->
+      compare_chain_tattr (compare_type config) t1 t2
+    | TArray (t1', e1), TArray (t2', e2) ->
       compare_chain compare_array_sizes e1 e2
-        (compare_chain
-           (compare_type config) t1' t2'
-           (compare_attributes config)) l1 l2
-    | TFun (r1, a1, v1, l1), TFun (r2, a2, v2, l2) ->
+        (compare_chain_tattr (compare_type config)) t1' t2'
+    | TFun (r1, a1, v1), TFun (r2, a2, v2) ->
       compare_chain (compare_type config) r1 r2
         (compare_chain (=?=) v1 v2
-           (compare_chain (compare_arg_list config) a1 a2
-              (compare_attributes config))) l1 l2
-    | TNamed (t1,a1), TNamed (t2,a2) ->
+           (compare_chain_tattr (compare_arg_list config))) a1 a2
+    | TNamed t1, TNamed t2 ->
       assert (not config.unroll);
-      compare_chain (=?=) t1.tname t2.tname
-        (compare_attributes config) a1 a2
-    | TComp (c1, l1), TComp (c2, l2) ->
+      compare_chain_tattr (=?=) t1.tname t2.tname
+    | TComp c1, TComp c2 ->
       let res =
         if config.by_name
         then (=?=) c1.cname c2.cname
         else (=?=) c1.ckey c2.ckey
       in
       if res <> 0 then res
-      else compare_attributes config l1 l2
-    | TEnum (e1, l1), TEnum (e2, l2) ->
-      compare_chain
-        (=?=) e1.ename e2.ename
-        (compare_attributes config) l1 l2
-    | TBuiltin_va_list l1, TBuiltin_va_list l2 ->
-      compare_attributes config l1 l2
-    | (TVoid _ | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TNamed _ |
-       TComp _ | TEnum _ | TBuiltin_va_list _ as a1), a2 ->
-      index_typ a1 - index_typ a2
+      else comp_tattr ()
+    | TEnum e1, TEnum e2 ->
+      compare_chain_tattr (=?=) e1.ename e2.ename
+    | TBuiltin_va_list, TBuiltin_va_list -> comp_tattr ()
+    | (TVoid | TInt _ | TFloat _ | TPtr _ | TArray _ | TFun _ | TNamed _ |
+       TComp _ | TEnum _ | TBuiltin_va_list), _ ->
+      index_typ t1 - index_typ t2
 
 and compare_arg_list  config l1 l2 =
   Option.compare
@@ -540,26 +536,27 @@ let hash_attributes config l =
 
 let rec hash_type config t =
   let t = if config.unroll then !punrollType t else t in
-  match t with
-  | TVoid l -> Hashtbl.hash (hash_attributes config l, 1)
-  | TInt (i, l) -> Hashtbl.hash (i, 2, hash_attributes config l)
-  | TFloat (f, l) -> Hashtbl.hash (f, 3, hash_attributes config l)
-  | TPtr (t, l) ->
-    Hashtbl.hash (hash_type config t, 4, hash_attributes config l)
-  | TArray (t, _, l) ->
-    Hashtbl.hash (hash_type config t, 5, hash_attributes config l)
-  | TFun (r, a, v, l) ->
+  let tattr_hash = hash_attributes config t.tattr in
+  match t.tnode with
+  | TVoid -> Hashtbl.hash (tattr_hash, 1)
+  | TInt i -> Hashtbl.hash (i, 2, tattr_hash)
+  | TFloat f -> Hashtbl.hash (f, 3, tattr_hash)
+  | TPtr t ->
+    Hashtbl.hash (hash_type config t, 4, tattr_hash)
+  | TArray (t, _) ->
+    Hashtbl.hash (hash_type config t, 5, tattr_hash)
+  | TFun (r, a, v) ->
     Hashtbl.hash
-      (hash_type config r, 6, hash_args config a, v, hash_attributes config l)
-  | TNamed (ti, l) ->
-    Hashtbl.hash (ti.tname, 7, hash_attributes config l)
-  | TComp (c, l) ->
+      (hash_type config r, 6, hash_args config a, v, tattr_hash)
+  | TNamed ti ->
+    Hashtbl.hash (ti.tname, 7, tattr_hash)
+  | TComp c ->
     Hashtbl.hash
       ((if config.by_name then Hashtbl.hash c.cname else c.ckey), 8,
-       hash_attributes config l)
-  | TEnum (e, l) ->
-    Hashtbl.hash (e.ename, 9, hash_attributes config l)
-  | TBuiltin_va_list l -> Hashtbl.hash (hash_attributes config l, 10)
+       tattr_hash)
+  | TEnum e ->
+    Hashtbl.hash (e.ename, 9, tattr_hash)
+  | TBuiltin_va_list -> Hashtbl.hash (tattr_hash, 10)
 and hash_args config = function
   | None -> 11713
   | Some l ->
@@ -599,7 +596,7 @@ struct
       (struct
         type t = typ
         let name = M.name
-        let reprs = [ TVoid [] ]
+        let reprs = [ { tnode = TVoid; tattr = [] } ]
         let compare = compare_type M.config
         let hash = hash_type M.config
         let equal = Datatype.from_compare
@@ -617,17 +614,6 @@ module Typ= struct
             unroll = true; no_attrs = false}
         let name = "Typ"
       end)
-  let toplevel_attr = function
-    | TVoid a -> a
-    | TInt (_, a) -> a
-    | TFloat (_, a) -> a
-    | TNamed (_, a) -> a
-    | TPtr (_, a) -> a
-    | TArray (_, _,a) -> a
-    | TComp (_, a) -> a
-    | TEnum (_, a) -> a
-    | TFun (_, _, _, a) -> a
-    | TBuiltin_va_list a -> a
 end
 
 module TypByName =
@@ -664,7 +650,7 @@ module Typeinfo =
       let reprs =
         [ { torig_name = "";
             tname = "";
-            ttype = TVoid [];
+            ttype = { tnode = TVoid; tattr = [] };
             treferenced = false } ]
       let compare v1 v2 = String.compare v1.tname v2.tname
       let hash v = Hashtbl.hash v.tname
@@ -729,7 +715,7 @@ module Varinfo_Id = struct
   let dummy =
     { vname = "";
       vorig_name = "";
-      vtype = TVoid [];
+      vtype = { tnode = TVoid; tattr = [] };
       vattr = [];
       vstorage = NoStorage;
       vglob = false;
@@ -953,26 +939,26 @@ struct
 
   (* Return true if the types have the same size, machine-indepently *)
   let rec compare_structural_typ_size (t1 : typ) (t2 : typ) : int =
-    match !punrollType t1, !punrollType t2 with
-    | TPtr (t1, _), TPtr (t2, _) when
-        (match t1, t2 with
-         | (TVoid _ | TInt ((IChar | ISChar | IUChar) , _)),
-           (TVoid _ | TInt ((IChar | ISChar | IUChar) , _)) -> true
+    match (!punrollType t1).tnode, (!punrollType t2).tnode with
+    | TPtr t1, TPtr t2 when
+        (match t1.tnode, t2.tnode with
+         | (TVoid | TInt (IChar | ISChar | IUChar)),
+           (TVoid | TInt (IChar | ISChar | IUChar)) -> true
          | _ -> false) ->
       (* Void and characters pointers have the same size.
          ISO.6.2.5.28 *)
       0
-    | TPtr (TComp (comp1, _), _), TPtr (TComp (comp2, _), _)
+    | TPtr { tnode = TComp comp1 }, TPtr { tnode = TComp comp2 }
       when comp1.cstruct = comp2.cstruct ->
       (* Struct pointers have the same size.
          Union pointers have the same size.
          ISO.6.2.5.28 *)
       0
-    | TPtr (t1, _), TPtr (t2, _) ->
+    | TPtr t1, TPtr t2 ->
       (* Pointers aren't force to have the same size. Depends on the type.
          ISO.6.2.5.28 *)
       Typ.compare t1 t2
-    | TComp (c1, _), TComp (c2, _) ->
+    | TComp c1, TComp c2 ->
       (* Struct/union's id are not necessarily unified.
          We structurally compare them. *)
       begin
@@ -2394,7 +2380,7 @@ module Global = struct
   let attr = function
     | GVar (vi,_,_) | GFun ({svar = vi},_) | GVarDecl (vi,_) | GFunDecl (_,vi,_)->
       vi.vattr
-    | GType (t,_) -> Typ.toplevel_attr t.ttype
+    | GType (t,_) -> t.ttype.tattr
     | GCompTag(ci,_) | GCompTagDecl(ci,_) -> ci.cattr
     | GEnumTag(ei,_) | GEnumTagDecl(ei,_) -> ei.eattr
     | GAnnot (g,_) -> Global_annotation.attr g

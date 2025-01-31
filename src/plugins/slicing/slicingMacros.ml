@@ -184,8 +184,8 @@ let get_called_kf call_stmt = match call_stmt.skind with
 
 let is_variadic kf =
   let varf = Kernel_function.get_vi kf in
-  match varf.vtype with
-  | TFun (_, _, is_variadic, _) -> is_variadic
+  match varf.vtype.tnode with
+  | TFun (_, _, is_variadic) -> is_variadic
   | _ -> assert false
 
 (** get the [fct_info] of the called function, if we know it *)

@@ -227,8 +227,8 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
       | NoOffset -> ()
       | Field (fi, off) -> aux_offset fi.ftype off
       | Index (idx, off) -> begin
-          match Cil.unrollType typ with
-          | TArray (typ_e, size, _) -> begin
+          match Cil.unrollTypeNode typ with
+          | TArray (typ_e, size) -> begin
               aux_offset typ_e off;
               try
                 let size = Cil.lenOfArray64 size in

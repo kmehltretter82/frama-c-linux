@@ -45,6 +45,62 @@
 (** Smart constructors for some CIL data types *)
 open Cil_types
 
+(** Create a typ record, [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_typ : ?tattr:attributes -> typ_node -> typ
+
+(** Create a typ record [TVoid], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tvoid : ?tattr:attributes -> unit  -> typ
+
+(** Create a typ record [TInt ik], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tint : ?tattr:attributes -> ikind -> typ
+
+(** Create a typ record [TFloat fk], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tfloat : ?tattr:attributes -> fkind -> typ
+
+(** Create a typ record [TPtr t], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tptr : ?tattr:attributes -> typ   -> typ
+
+(** Create a typ record [TArray (t, len)], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tarray : ?tattr:attributes -> typ   -> exp option -> typ
+
+(** Create a typ record [TFun (rt, args, is_va)], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tfun : ?tattr:attributes -> typ   ->
+  (string * typ * attributes) list option -> bool -> typ
+
+(** Create a typ record [TNamed ti], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tnamed : ?tattr:attributes -> typeinfo  -> typ
+
+(** Create a typ record [TComp ci], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tcomp : ?tattr:attributes -> compinfo  -> typ
+
+(** Create a typ record [TEnum ei], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tenum : ?tattr:attributes -> enuminfo  -> typ
+
+(** Create a typ record [TBuiltin_va_list], [tattr] defaults to empty list.
+    @since Frama-C+dev
+*)
+val mk_tbuiltin : ?tattr:attributes -> unit      -> typ
+
 (** void *)
 val voidType: typ
 

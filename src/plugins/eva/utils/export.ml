@@ -136,8 +136,8 @@ let frange ~kind (exp : Exp.exp) = function
 
 let fval typ (exp : Exp.exp) (fval : Fval.t) : pred =
   let kind =
-    match typ with
-    | TFloat(kind,_) -> kind
+    match typ.tnode with
+    | TFloat kind -> kind
     | _ -> assert false in
   let range,isNaN = Fval.min_and_max fval in
   por (fNaN exp isNaN) (frange ~kind exp range)

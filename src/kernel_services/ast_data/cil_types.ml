@@ -280,14 +280,14 @@ and global =
 (** {2 Types} *)
 (* ************************************************************************* *)
 
-(** A C type is represented in CIL using the type {!Cil_types.typ}.  Among types
+(** A C type is represented in CIL using the type {!Cil_types.typ}. Among types
     we differentiate the integral types (with different kinds denoting the sign
     and precision), floating point types, enumeration types, array and pointer
     types, and function types. Every type is associated with a list of
     attributes, which are always kept in sorted order. Use {!Cil.addAttribute}
     and {!Cil.addAttributes} to construct list of attributes. If you want to
-    inspect a type, you should use {!Cil.unrollType} or {!Cil.unrollTypeDeep} to
-    see through the uses of named types.
+    inspect a type, you should use {!Cil.unrollType}, {!Cil.unrollTypeNode} or
+    {!Cil.unrollTypeDeep} to see through the uses of named types.
 
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute
@@ -296,27 +296,39 @@ and global =
     (both in bits) using the function {!Cil.bitsOffset}. At the moment these
     functions do not take into account the [packed] attributes and pragmas. *)
 
-and typ =
-  | TVoid of attributes (** Void type. Also predefined as {!Cil_const.voidType} *)
+(** The representation of a Cil type.
+    @before Frama-C+dev This type was not a record but a variant like
+    {!typ_node} with attributes being part of the tuples. *)
+and typ = {
+  tnode : typ_node;
+  (** The type itself. *)
 
-  | TInt of ikind * attributes
+  tattr : attributes;
+  (** A list of attributes associated with the type, including its qualifiers. *)
+}
+
+(** @since Frama-C+dev *)
+and typ_node =
+  | TVoid (** Void type. Also predefined as {!Cil_const.voidType} *)
+
+  | TInt of ikind
   (** An integer type. The kind specifies the sign and width. Several useful
       variants are predefined as {!Cil_const.intType}, {!Cil_const.uintType},
       {!Cil_const.longType}, {!Cil_const.charType}. *)
 
-  | TFloat of fkind * attributes
+  | TFloat of fkind
   (** A floating-point type. The kind specifies the precision. You can also use
       the predefined constant {!Cil_const.doubleType}. *)
 
-  | TPtr of typ * attributes
+  | TPtr of typ
   (** Pointer type. Several useful variants are predefined as
       {!Cil_const.charPtrType}, {!Cil_const.charConstPtrType} (pointer to a constant
       character), {!Cil_const.voidPtrType}, {!Cil_const.intPtrType} *)
 
-  | TArray of typ * exp option * attributes
+  | TArray of typ * exp option
   (** Array type. It indicates the base type and the array length. *)
 
-  | TFun of typ * (string * typ * attributes) list option * bool * attributes
+  | TFun of typ * (string * typ * attributes) list option * bool
   (** Function type. Indicates the type of the result, the name, type
       and name attributes of the formal arguments ([None] if no arguments
       were specified, as in a function whose definition or prototype we
@@ -328,7 +340,7 @@ and typ =
       {!Cil.setFormals}, or {!Cil.setFunctionType}, or
       {!Cil.makeFormalVar} for this purpose. *)
 
-  | TNamed of typeinfo * attributes
+  | TNamed of typeinfo
   (** The use of a named type. All uses of the same type name must share the
       typeinfo. Each such type name must be preceded in the file by a [GType]
       global. This is printed as just the type name. The actual referred type
@@ -337,7 +349,7 @@ and typ =
       attributes are in addition to those given when the type name was
       defined. *)
 
-  | TComp of compinfo * attributes
+  | TComp of compinfo
   (** A reference to a struct or a union type. All references to the
       same struct or union must share the same compinfo among them and
       with a [GCompTag] global that precedes all uses (except maybe
@@ -346,14 +358,14 @@ and typ =
       addition to the attributes that were given at the definition of
       the type and which are stored in the compinfo.  *)
 
-  | TEnum of enuminfo * attributes
+  | TEnum of enuminfo
   (** A reference to an enumeration type. All such references must
       share the enuminfo among them and with a [GEnumTag] global that
       precedes all uses. The attributes refer to this use of the
       enumeration and are in addition to the attributes of the
       enumeration itself, which are stored inside the enuminfo *)
 
-  | TBuiltin_va_list of attributes
+  | TBuiltin_va_list
   (** This is the same as the gcc's type with the same name *)
 
 (* ************************************************************************* *)

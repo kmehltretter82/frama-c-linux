@@ -37,8 +37,8 @@ let assigns ~loc ~result e = instr (Set(result, e, loc))
 let assigns_field ~loc vi name value =
   let ty = vi.vtype in
   let compinfo =
-    match Cil.unrollType ty with
-    | TComp (compinfo, _) -> compinfo
+    match Cil.unrollTypeNode ty with
+    | TComp compinfo -> compinfo
     | _ ->
       Options.fatal
         "type of %a (%a) is not a structure"
@@ -66,8 +66,8 @@ let struct_local_init ~loc vi fields =
   vi.vdefined <- true;
   let ty = vi.vtype in
   let compinfo =
-    match Cil.unrollType ty with
-    | TComp (compinfo, _) -> compinfo
+    match Cil.unrollTypeNode ty with
+    | TComp compinfo -> compinfo
     | _ ->
       Options.fatal
         "type of %a (%a) is not a structure"
@@ -109,7 +109,7 @@ let do_call ~loc ?result vi args =
       match args, param_ty with
       | arg :: args_tl, (_, ty, _) :: param_ty_tl ->
         let e =
-          match ty, Cil.unrollType (Cil.typeOf arg), arg.enode with
+          match ty.tnode, Cil.(unrollTypeNode (typeOf arg)), arg.enode with
           | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
           | TPtr _, TArray _, _ -> assert false
           | _, _, _ -> arg
@@ -126,9 +126,9 @@ let do_call ~loc ?result vi args =
     in
     List.rev (make_rev_args [] args param_ty)
   in
-  let args = match Cil.unrollType vi.vtype with
-    | TFun(_, Some params, variadic, _) -> make_args ~variadic args params
-    | TFun(_, None, _, _) -> []
+  let args = match Cil.unrollTypeNode vi.vtype with
+    | TFun (_, Some params, variadic) -> make_args ~variadic args params
+    | TFun (_, None, _) -> []
     | _ -> assert false
   in
   call_instr ~loc ?result f args
@@ -174,10 +174,10 @@ let named_store_stmt name ?str_size vi =
   let ty = Cil.unrollType vi.vtype in
   let loc = vi.vdecl in
   let store = rtl_call ~loc name in
-  match ty, str_size with
-  | TArray(_, Some _,_), None ->
+  match ty.tnode, str_size with
+  | TArray (_, Some _), None ->
     store [ Cil.evar ~loc vi; Cil.sizeOf ~loc ty ]
-  | TPtr(TInt(IChar, _), _), Some size ->
+  | TPtr { tnode = TInt IChar }, Some size ->
     store [ Cil.evar ~loc vi ; size ]
   | TPtr _, Some size ->
     (* a VLA that has been converted into a pointer by the kernel *)
@@ -202,8 +202,8 @@ let duplicate_store_stmt ?str_size vi =
 let delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
   let mk = rtl_call ~loc "delete_block" in
-  match is_addr, Cil.unrollType vi.vtype with
-  | _, TArray(_, Some _, _) | true, _ -> mk [ Cil.evar ~loc vi ]
+  match is_addr, Cil.unrollTypeNode vi.vtype with
+  | _, TArray (_, Some _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 
 let mark_readonly vi =

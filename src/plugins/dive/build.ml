@@ -164,10 +164,10 @@ let get_loc_filename loc =
   Filepath.(Normalized.to_pretty_string (fst loc).pos_path)
 
 let is_foldable_type typ =
-  match Cil.unrollType typ with
+  match Cil.unrollTypeNode typ with
   | TArray _ | TComp _ -> true
-  | TVoid _ | TInt _ | TEnum _ | TFloat _ | TPtr _ | TFun _
-  | TBuiltin_va_list _ -> false
+  | TVoid | TInt _ | TEnum _ | TFloat _ | TPtr _ | TFun _
+  | TBuiltin_va_list -> false
   | TNamed _ -> assert false (* the type have been unrolled *)
 
 

@@ -33,15 +33,16 @@ open Sigma
 open Lang
 
 module WpLog = Wp_parameters
-let constfold_ctyp = function
-  | TArray (_,Some {enode = (Const CInt64 _) },_) as ct -> ct
-  | TArray (ty,Some len,attr) as ct -> begin
+let constfold_ctyp t =
+  match t.tnode with
+  | TArray (_,Some {enode = (Const CInt64 _) }) -> t
+  | TArray (ty,Some len) -> begin
       match Cil.constFold true len with
       | {enode = (Const CInt64 _) } as len ->
-        TArray(ty,Some len,attr)
-      | _ -> ct
+        Cil_const.mk_tarray ~tattr:t.tattr ty (Some len)
+      | _ -> t
     end
-  | ct -> ct
+  | _ -> t
 
 let constfold_coffset = function
   | Index({enode=Const (CInt64 _)}, _) as off -> off
@@ -194,8 +195,8 @@ struct
     let t2 = Cil.typeOf e2 in
     if Cil.isPointerType t1 && Cil.isPointerType t2 then
       Cvalues.is_true (lop (loc_of_exp env e1) (loc_of_exp env e2))
-    else match Cil.unrollType t1 with
-      | TFloat(f,_) ->
+    else match Cil.unrollTypeNode t1 with
+      | TFloat f ->
         let p = fop (Ctypes.c_float f)
             (val_of_exp env e1) (val_of_exp env e2) in
         F.e_if (F.e_prop p) F.e_one F.e_zero
@@ -492,11 +493,11 @@ struct
     | CompoundInit ( ct , initl ) ->
       let ct = constfold_ctyp ct in
       let acc = (* updated acc with default init of structure *)
-        match ct with
-        | TComp ( { cfields = None },_) ->
+        match ct.tnode with
+        | TComp { cfields = None } ->
           Wp_parameters.fatal
             "Initializer for incomplete type %a" Cil_printer.pp_typ ct
-        | TComp ( { cstruct ; cfields = Some fields },_)
+        | TComp { cstruct ; cfields = Some fields }
           when cstruct && (* not for union... *)
                (List.length initl) < (List.length fields) ->
           (* default init for unintialized field of a struct *)
@@ -518,8 +519,8 @@ struct
 
         | _ -> acc
       in
-      match ct with
-      | TArray (ty,len,_) ->
+      match ct.tnode with
+      | TArray (ty, len) ->
         let delayed =
           match len with (* number of required elements *)
           | Some {enode = (Const CInt64 (size,_,_))} ->

@@ -137,8 +137,8 @@ let assume_comparable _ v1 v2 = `Unknown (v1, v2)
 let neg_unop v = { v with neg = v.pos; pos = v.neg }
 
 let bitwise_not typ v =
-  match Cil.unrollType typ with
-  | TInt (ikind, _) | TEnum ({ekind=ikind}, _) ->
+  match Cil.unrollTypeNode typ with
+  | TInt ikind | TEnum {ekind=ikind} ->
     if Cil.isSigned ikind
     then { pos = v.neg; neg = v.pos || v.zero; zero = v.neg }
     else { pos = v.pos || v.zero; neg = false; zero = v.pos }

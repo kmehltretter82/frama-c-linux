@@ -462,7 +462,7 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
       find_offsetmap cvalue_state precise_loc
 
   let eval_lval (lval : Eva_ast.lval) state =
-    match Cil.unrollType lval.typ with
+    match Cil.unrollTypeNode lval.typ with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
       A.copy_lvalue state lval >>=: fun value -> Value value
     | _ ->

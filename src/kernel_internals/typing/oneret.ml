@@ -203,13 +203,13 @@ let oneret ?(callback: callback option) (f: fundec) : unit =
   let fname = f.svar.vname in
   (* Get the return type *)
   let retTyp =
-    match f.svar.vtype with
-      TFun(rt, _, _, _) -> rt
+    match f.svar.vtype.tnode with
+      TFun(rt, _, _) -> rt
     | _ ->
       Kernel.fatal "Function %s does not have a function type" f.svar.vname
   in
   (* Does it return anything ? *)
-  let hasRet = match unrollType retTyp with TVoid _ -> false | _ -> true in
+  let hasRet = match unrollTypeNode retTyp with TVoid -> false | _ -> true in
 
   (* Memoize the return result variable. Use only if hasRet *)
   let lastloc = ref Cil_datatype.Location.unknown in

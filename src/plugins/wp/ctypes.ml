@@ -264,11 +264,12 @@ let get_int64 e =
   | _ -> None
 
 let dimension t =
-  let rec flat k d = function
-    | TNamed (r,_) -> flat k d r.ttype
-    | TArray(ty,Some e,_) ->
+  let rec flat k d t =
+    match t.tnode with
+    | TNamed r -> flat k d r.ttype
+    | TArray (ty, Some e) ->
       flat (succ k) (Int64.mul d (constant e)) ty
-    | te -> k , d , te
+    | _ -> k , d , t
   in flat 1 Int64.one t
 
 (* -------------------------------------------------------------------------- *)
@@ -280,14 +281,14 @@ let is_pointer = function
   | C_int _ | C_float _ | C_array _ | C_comp _ -> false
 
 let rec object_of typ =
-  match typ with
-  | TInt(i,_) -> C_int (c_int i)
-  | TFloat(f,_) -> C_float (c_float f)
-  | TPtr(typ,_) -> C_pointer (if Cil.isVoidType typ then Cil_const.charType else typ)
+  match typ.tnode with
+  | TInt i -> C_int (c_int i)
+  | TFloat f -> C_float (c_float f)
+  | TPtr typ -> C_pointer (if Cil.isVoidType typ then Cil_const.charType else typ)
   | TFun _ -> C_pointer Cil_const.voidType
-  | TEnum ({ekind=i},_) -> C_int (c_int i)
-  | TComp (comp,_) -> C_comp comp
-  | TArray (typ_elt,e_opt,_) ->
+  | TEnum {ekind=i} -> C_int (c_int i)
+  | TComp comp -> C_comp comp
+  | TArray (typ_elt,e_opt) ->
     begin
       match array_size e_opt with
       | None ->
@@ -307,13 +308,13 @@ let rec object_of typ =
             }
         }
     end
-  | TBuiltin_va_list _ ->
+  | TBuiltin_va_list ->
     WpLog.warning ~current:true ~once:true "variadyc type (considered as void*)" ;
-    C_pointer (TVoid [])
-  | TVoid _ ->
+    C_pointer (Cil_const.voidType)
+  | TVoid ->
     WpLog.warning ~current:true "void object" ;
     C_int (c_int IInt)
-  | TNamed (r,_)  -> object_of r.ttype
+  | TNamed r -> object_of r.ttype
 
 (* ------------------------------------------------------------------------ *)
 (* --- Comparable                                                       --- *)
@@ -405,13 +406,14 @@ let to_fkind flt =
   List.find (fun fk -> c_float fk = flt) fkinds
 
 let object_to = function
-  | C_int i -> TInt(to_ikind i,[])
-  | C_float f -> TFloat(to_fkind f,[])
-  | C_pointer typ -> TPtr(typ,[])
-  | C_comp comp -> TComp(comp,[])
-  | C_array { arr_element = elt ; arr_flat = None } -> TArray(elt,None,[])
+  | C_int i -> Cil_const.mk_tint (to_ikind i)
+  | C_float f -> Cil_const.mk_tfloat (to_fkind f)
+  | C_pointer typ -> Cil_const.mk_tptr typ
+  | C_comp comp -> Cil_const.mk_tcomp comp
+  | C_array { arr_element = elt ; arr_flat = None } -> Cil_const.mk_tarray elt None
   | C_array { arr_element = elt ; arr_flat = Some { arr_size = size } } ->
-    TArray(elt,Some (Cil.integer ~loc:Location.unknown size),[])
+    let size = Some (Cil.integer ~loc:Location.unknown size) in
+    Cil_const.mk_tarray elt size
 
 (* -------------------------------------------------------------------------- *)
 (* --- Accessor Utilities                                                 --- *)
@@ -499,16 +501,14 @@ let sizeof_defined = function
   | C_array { arr_flat = None } -> false
   | _ -> true
 
-let typ_comp cinfo = TComp(cinfo,[])
-
-let bits_sizeof_comp cinfo = Cil.bitsSizeOf (typ_comp cinfo)
+let bits_sizeof_comp cinfo = Cil.bitsSizeOf (Cil_const.mk_tcomp cinfo)
 
 let bits_sizeof_array ainfo =
   match ainfo.arr_flat with
   | Some a ->
     let csize = Cil.kinteger64
         ~loc:Cil_builtins.builtinLoc (Z.of_int64 a.arr_cell_nbr) in
-    let ctype = TArray(a.arr_cell,Some csize,[]) in
+    let ctype = Cil_const.mk_tarray a.arr_cell (Some csize) in
     Cil.bitsSizeOf ctype
   | None ->
     if WpLog.ExternArrays.get () then
@@ -576,8 +576,9 @@ let rec basename = function
     | None -> te ^ "_array"
     | Some f -> te ^ "_" ^ string_of_int f.arr_size
 
-let is_atomic = function
-  | TVoid _ | TInt _ | TFloat _ | TNamed _ -> true
+let is_atomic t =
+  match t.tnode with
+  | TVoid | TInt _ | TFloat _ | TNamed _ -> true
   | _ -> false
 
 let rec pretty fmt = function
