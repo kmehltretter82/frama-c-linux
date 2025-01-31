@@ -361,7 +361,7 @@ let unsupported_float_types =
 let known_bad_macros =
   Datatype.String.Set.add_seq
     (List.to_seq
-       (["__GCC_IEC_559_COMPLEX"; "__SIZEOF_INT128__"; "__SSE__" ]
+       (["__GCC_IEC_559_COMPLEX"; "__SIZEOF_INT128__"; "__SSE__"; "__SSE2__" ]
         @ unsupported_libc_macros))
     unsupported_float_types
 
