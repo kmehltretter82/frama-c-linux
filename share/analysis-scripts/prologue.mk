@@ -26,11 +26,6 @@
 # Note: this variable must be defined before including any files
 makefile_dir := $(dir $(lastword $(MAKEFILE_LIST)))
 
-## Useful definitions (to be overridden later if needed)
-
-# Improves analysis time, at the cost of extra memory usage
-export FRAMA_C_MEMORY_FOOTPRINT = 8
-
 # analysis.mk contains the main rules and targets
 include $(makefile_dir)/analysis.mk
 

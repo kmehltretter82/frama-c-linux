@@ -1847,14 +1847,27 @@ module MemoryFootprint =
     end)
 let () = MemoryFootprint.set_range ~min:1 ~max:10
 
-(* ************************************************************************* *)
-(** {2 Other options} *)
-(* ************************************************************************* *)
+let () = Parameter_customize.set_group performance
+let () = Parameter_customize.do_not_reset_on_copy ()
+module CacheSize =
+  Int
+    (struct
+      let module_name = "CacheSize"
+      let default = 2
+      let option_name = "-cache-size"
+      let arg_name = "n"
+      let help =
+        "Control the amount of memory allocated to some internal caches. \
+         Must be between 1 and 10; default value is 2. \
+         Each increase of 1 doubles the size of these caches. \
+         Small values are most suitable for the analysis of small programs \
+         (less than 1000 lines). Higher values (around 7-8) can speed up the \
+         analysis of large code bases."
+    end)
+let () = CacheSize.set_range ~min:1 ~max:10
+let () = CacheSize.add_update_hook (fun _ i -> Binary_cache.set_cache_size i)
 
-[@@@warning "-60"]
-(* Warning: these options are parsed and used directly from Cmdline *)
-
-let () = Parameter_customize.set_group project
+let () = Parameter_customize.set_group performance
 let () = Parameter_customize.set_negative_option_name ""
 let () = Parameter_customize.set_cmdline_stage Cmdline.Early
 module Deterministic =
@@ -1865,6 +1878,10 @@ module Deterministic =
       let option_name = "-deterministic"
       let help = ""
     end)
+
+(* ************************************************************************* *)
+(** {2 Other options} *)
+(* ************************************************************************* *)
 
 let () = Parameter_customize.set_group checks
 let () = Parameter_customize.do_not_projectify ()
@@ -1878,8 +1895,6 @@ module Permissive =
       let help =
         "perform less verifications on validity of command-line options"
     end)
-
-[@@@warning "+60"]
 
 (*
 Local Variables:

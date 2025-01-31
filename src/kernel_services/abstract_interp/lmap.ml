@@ -745,9 +745,7 @@ struct
 
   let iter = M.iter
 
-  let cached_fold ~f ~cache_name ~temporary ~joiner ~empty =
-    let cached_f = M.cached_fold ~f ~cache_name ~temporary ~joiner ~empty in
-    fun m -> cached_f m
+  let cached_fold = M.cached_fold
 
   let cached_map ~f ~cache ~temporary =
     let cached_f = M.cached_map ~f ~cache ~temporary in

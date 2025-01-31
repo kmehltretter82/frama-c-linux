@@ -118,8 +118,7 @@ module type Shape = sig
       the map's ordering. *)
 
   val cached_fold :
-    cache_name:string ->
-    temporary:bool ->
+    cache:cache_type ->
     f:(key -> 'v -> 'b) ->
     joiner:('b -> 'b -> 'b) ->
     empty:'b ->
