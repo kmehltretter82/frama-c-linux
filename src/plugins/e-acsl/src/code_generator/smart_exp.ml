@@ -40,7 +40,7 @@ let subscript ~loc array idx =
       array
 
 let ptr_sizeof ~loc typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_type_node typ with
   | TPtr t' -> Cil.new_exp ~loc (SizeOf t')
   | _ -> assert false
 

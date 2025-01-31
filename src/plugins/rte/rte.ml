@@ -83,7 +83,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
       (* Mark that we went through a struct field, then recurse *)
       check_array_access default off fi.ftype true
     | Index (e, off) ->
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_type_node typ with
       | TArray (bt, Some size) ->
         if Kernel.SafeArrays.get () || not in_struct then begin
           (* Generate an assertion for this access, then go deeper in
@@ -126,7 +126,7 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
 (* assertion for unary minus signed overflow *)
 let uminus_assertion ~remove_trivial ~on_alarm exp =
   (* - expr overflows if exp is TYPE_MIN *)
-  let t = Cil.unrollType (Cil.typeOf exp) in
+  let t = Ast_types.unroll_type (Cil.typeOf exp) in
   let size = Cil.bitsSizeOf t in
   let min_ty = Cil.min_signed_number size in
   (* alarm is bound <= exp, hence bound must be MIN_INT+1 *)
@@ -150,7 +150,7 @@ let mult_sub_add_assertion ~signed ~remove_trivial ~on_alarm (exp,op,lexp,rexp) 
   (* signed multiplication/addition/subtraction:
      the expression overflows iff its integer value
      is strictly more than [max_ty] or strictly less than [min_ty] *)
-  let t = Cil.unrollType (Cil.typeOf exp) in
+  let t = Ast_types.unroll_type (Cil.typeOf exp) in
   let size = Cil.bitsSizeOf t in
   let min_ty, max_ty =
     if signed then Cil.min_signed_number size, Cil.max_signed_number size
@@ -235,7 +235,7 @@ let signed_div_assertion ~remove_trivial ~on_alarm (exp, lexp, rexp) =
      and divisor is equal to -1. Under the hypothesis (cf Value) that
      integers are represented in two's complement.
   *)
-  let t = Cil.unrollType (Cil.typeOf rexp) in
+  let t = Ast_types.unroll_type (Cil.typeOf rexp) in
   let size = Cil.bitsSizeOf t in
   (* check dividend_expr / divisor_expr : if constants ... *)
   (* compute smallest representable "size bits" (signed) integer *)
@@ -298,7 +298,7 @@ let shift_negative_assertion ~remove_trivial ~on_alarm exp =
 (* Assertion for left and right shift overflow: the result should be
    representable in the result type.  *)
 let shift_overflow_assertion ~signed ~remove_trivial ~on_alarm (exp, op, lexp, rexp) =
-  let t = Cil.unrollType (Cil.typeOf exp) in
+  let t = Ast_types.unroll_type (Cil.typeOf exp) in
   let size = Cil.bitsSizeOf t in
   if size <> Cil.bitsSizeOf (Cil.typeOf lexp) then
     (* size of result type should be size of left (promoted) operand *)
@@ -371,7 +371,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
 
 (* assertion for casting a floating-point value to an integer *)
 let float_to_int_assertion ~remove_trivial ~on_alarm (ty, exp) =
-  let e_typ = Cil.unrollType (Cil.typeOf exp) in
+  let e_typ = Ast_types.unroll_type (Cil.typeOf exp) in
   match e_typ.tnode, ty.tnode with
   | TFloat _, TInt ikind ->
     let signed = Cil.isSigned ikind in

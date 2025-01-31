@@ -422,13 +422,13 @@ let block_of_local (fdec:fundec) vi =
 (* ************************************************************************** *)
 
 let direct_array_size ty =
-  match unrollTypeNode ty with
+  match Ast_types.unroll_type_node ty with
   | TArray(_ty,Some size) -> value_of_integral_expr size
   | TArray(_ty,None) -> Integer.zero
   | _ -> assert false
 
 let rec array_size ty =
-  match unrollTypeNode ty with
+  match Ast_types.unroll_type_node ty with
   | TArray(elemty,Some _) ->
     if isArrayType elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)
@@ -436,26 +436,26 @@ let rec array_size ty =
   | TArray(_,None) -> Integer.zero
   | _ -> assert false
 
-let direct_element_type ty = match unrollTypeNode ty with
+let direct_element_type ty = match Ast_types.unroll_type_node ty with
   | TArray(eltyp,_) -> eltyp
   | _ -> assert false
 
 let element_type ty =
-  let rec elem_type ty = match unrollTypeNode ty with
+  let rec elem_type ty = match Ast_types.unroll_type_node ty with
     | TArray(eltyp,_) -> elem_type eltyp
     | _ -> ty
   in
-  match unrollTypeNode ty with
+  match Ast_types.unroll_type_node ty with
   | TArray (eltyp,_) -> elem_type eltyp
   | _ -> assert false
 
 let direct_pointed_type ty =
-  match unrollTypeNode ty with
+  match Ast_types.unroll_type_node ty with
   | TPtr elemty -> elemty
   | _ -> assert false
 
 let pointed_type ty =
-  let ty' = unrollType (direct_pointed_type ty) in
+  let ty' = Ast_types.unroll_type (direct_pointed_type ty) in
   match ty'.tnode with
   | TArray _ -> element_type ty'
   | _ -> ty'

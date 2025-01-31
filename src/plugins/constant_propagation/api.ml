@@ -85,9 +85,9 @@ class propagate project fnames ~cast_intro = object(self)
        pointed values. *)
     let oldt, newt =
       if ignore_const_cast then
-        match Cil.unrollType oldt, Cil.unrollType newt with
+        match Ast_types.unroll_type oldt, Ast_types.unroll_type newt with
         | { tnode = TPtr typ; tattr = attrs }, { tnode = TPtr typ'; tattr =  attrs' } ->
-          let drop_const ty = Cil.typeRemoveAttributes ["const"] ty in
+          let drop_const ty = Ast_types.type_remove_attributes ["const"] ty in
           Cil_const.mk_tptr ~tattr:attrs  (drop_const typ),
           Cil_const.mk_tptr ~tattr:attrs' (drop_const typ')
         | _ -> oldt, newt
@@ -124,7 +124,7 @@ class propagate project fnames ~cast_intro = object(self)
     try
       let loc = expr.eloc in
       let typ = Cil.typeOf expr in
-      let typ_e = Cil.unrollType typ in
+      let typ_e = Ast_types.unroll_type typ in
       begin match typ_e.tnode with
         | TInt _ | TFloat _ | TPtr _ | TEnum _ -> ()
         | _ -> raise Cannot_expand
@@ -159,7 +159,7 @@ class propagate project fnames ~cast_intro = object(self)
             try
               if not (Cil.isPointerType typ_e) then
                 raise Bit_utils.NoMatchingOffset;
-              let typ_pointed = Cil.unrollType (Cil.typeOf_pointed typ_e) in
+              let typ_pointed = Ast_types.unroll_type (Cil.typeOf_pointed typ_e) in
               if Cil.isVoidType typ_pointed then
                 raise Bit_utils.NoMatchingOffset;
               let offset = Integer.mul offset Integer.eight in

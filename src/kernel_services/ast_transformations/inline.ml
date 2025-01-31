@@ -250,7 +250,7 @@ let inliner functions_to_inline = object (self)
                  or const: *)
               r.vdefined <- false;
               Cil.update_var_type
-                r (Cil.typeRemoveAttributes ["const"] r.vtype);
+                r (Ast_types.type_remove_attributes ["const"] r.vtype);
               false, None, (Cil.mkAddrOf ~loc (Cil.var r)) :: args
             | Some _, _ ->
               Kernel.fatal "Attempt to initialize an inexistent varinfo"

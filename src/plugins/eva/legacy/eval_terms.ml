@@ -503,7 +503,7 @@ let rec infer_type = function
    differences in integer and floating-point sizes, that are meaningless
    in the logic *)
 let same_etype t1 t2 =
-  match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
+  match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TFloat _, TFloat _ -> true
   | TPtr p1, TPtr p2 -> Cil_datatype.Typ.equal p1 p2
@@ -512,7 +512,7 @@ let same_etype t1 t2 =
 (* Returns the kind of floating-point represented by a logic type, or None. *)
 let logic_type_fkind = function
   | Ctype typ -> begin
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_type_node typ with
       | TFloat fkind -> Some fkind
       | _ -> None
     end
@@ -1340,7 +1340,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
   else
     let r1 = eval_term ~alarm_mode env t1 in
     let r2 = eval_term ~alarm_mode env t2 in
-    let te1 = Cil.unrollType r1.etype in
+    let te1 = Ast_types.unroll_type r1.etype in
     check_logic_alarms ~alarm_mode te1 r1 op r2;
     let typ_res = infer_binop_res_type op te1 in
     let op = Eva_ast.translate_binop op in
@@ -1666,7 +1666,7 @@ and eval_tlhost ~alarm_mode env lv =
      | None -> no_result ())
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
-    let tres = match Cil.unrollTypeNode r.etype with
+    let tres = match Ast_types.unroll_type_node r.etype with
       | TPtr t -> t
       | _ -> ast_error "*p where p is not a pointer"
     in
@@ -1685,7 +1685,7 @@ and eval_toffset ~alarm_mode env typ toffset =
       eover = Ival.zero;
       empty = false; }
   | TIndex (idx, remaining) ->
-    let typ_e, size = match Cil.unrollTypeNode typ with
+    let typ_e, size = match Ast_types.unroll_type_node typ with
       | TArray (t, size) -> t, size
       | _ -> ast_error "index on a non-array"
     in
@@ -1725,8 +1725,9 @@ and eval_toffset ~alarm_mode env typ toffset =
       try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
-    let attrs = Ast_attributes.filter_qualifiers (Cil.typeAttrs typ) in
-    let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
+    let attrs = Ast_types.type_attrs typ in
+    let attrs = Ast_attributes.filter_qualifiers attrs in
+    let typ_fi = Ast_types.type_add_attributes attrs fi.ftype in
     let offsrem = eval_toffset ~alarm_mode env typ_fi remaining in
     { etype = offsrem.etype;
       ldeps = offsrem.ldeps;
@@ -1802,7 +1803,7 @@ and eval_term_as_exact_locs ~alarm_mode env t =
     let typ = loc.etype in
     (* eval_term_as_exact_loc is only used for reducing values, and we must
        NOT reduce volatile locations. *)
-    if Cil.typeHasQualifier "volatile" typ then raise Not_an_exact_loc;
+    if Ast_types.type_has_qualifier "volatile" typ then raise Not_an_exact_loc;
     let loc = Locations.make_loc loc.eunder (Eval_typ.sizeof_lval_typ typ)in
     if Locations.is_bottom_loc loc then raise Not_an_exact_loc;
     Location (typ, loc)

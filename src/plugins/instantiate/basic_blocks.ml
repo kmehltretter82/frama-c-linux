@@ -24,7 +24,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let const_of t = Cil.typeAddAttributes [("const", [])] t
+let const_of t = Ast_types.type_add_attributes [("const", [])] t
 
 let size_t () =
   Globals.Types.find_type Logic_typing.Typedef "size_t"
@@ -74,7 +74,7 @@ let rec string_of_typ_aux t =
     "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
   | _ ->
     Options.fatal "unsupported type %a" Cil_printer.pp_typ t
-and string_of_typ t = string_of_typ_aux (Cil.unrollType t)
+and string_of_typ t = string_of_typ_aux (Ast_types.unroll_type t)
 and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
 let size_var ?(name_ext="") t value = {

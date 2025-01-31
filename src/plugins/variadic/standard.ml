@@ -79,7 +79,7 @@ let integral_rep ikind =
   Cil.bitsSizeOfInt ikind, Cil.isSigned ikind
 
 let expose t =
-  Cil.type_remove_attributes_for_c_cast (Cil.unrollType t)
+  Ast_types.type_remove_attributes_for_c_cast (Ast_types.unroll_type t)
 
 (* From most permissive to least permissive *)
 type castability = Strict      (* strictly allowed by the C standard *)
@@ -108,14 +108,14 @@ let can_cast given expected =
   | _, _ -> Never
 
 let does_fit exp typ =
-  match Cil.constFoldToInt exp, Cil.unrollTypeNode typ with
+  match Cil.constFoldToInt exp, Ast_types.unroll_type_node typ with
   | Some i, (TInt ekind | TEnum {ekind}) ->
     Cil.fitsInInt ekind i
   | _ -> false
 
 (* Variant of [pp_typ] which details the underlying type for enums *)
 let pretty_typ fmt t =
-  match Cil.unrollTypeNode t with
+  match Ast_types.unroll_type_node t with
   | TEnum ei ->
     Format.fprintf fmt "%a (%a)" Printer.pp_typ t
       Printer.pp_typ (Cil_const.mk_tint ei.ekind)
@@ -311,7 +311,7 @@ let aggregator_call ~builder aggregator vf args =
 (* ************************************************************************ *)
 
 let rec check_arg_matching expected given =
-  match Cil.unrollTypeNode given, Cil.unrollTypeNode expected with
+  match Ast_types.unroll_type_node given, Ast_types.unroll_type_node expected with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TPtr _, _ when Cil.isVoidPtrType expected -> true
   | TPtr t1, TPtr t2 -> check_arg_matching t1 t2
@@ -421,18 +421,18 @@ let find_field env structname fieldname =
     raise Not_found
 
 let find_predicate_by_width typ narrow_name wide_name =
-  match Cil.(unrollTypeDeep typ).tnode with
+  match (Ast_types.unroll_type_deep typ).tnode with
   | TPtr { tnode = TInt IChar } -> find_predicate narrow_name
   | TPtr t when
       (* drop attributes to remove 'const' qualifiers and fc_stdlib attributes *)
       Cil_datatype.Typ.equal
-        (Cil.typeDeepDropAllAttributes (Cil.unrollTypeDeep t))
+        (Cil.typeDeepDropAllAttributes (Ast_types.unroll_type_deep t))
         (Machine.wchar_type ()) ->
     find_predicate wide_name
   | _ ->
     Self.warning ~current:true ~wkey:wkey_typing
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
-      Printer.pp_typ typ Cil_types_debug.pp_typ typ Cil_types_debug.pp_typ (Cil.unrollTypeDeep typ);
+      Printer.pp_typ typ Cil_types_debug.pp_typ typ Cil_types_debug.pp_typ (Ast_types.unroll_type_deep typ);
     raise Not_found
 
 let valid_read_string typ =

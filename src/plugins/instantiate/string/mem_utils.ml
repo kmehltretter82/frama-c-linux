@@ -44,8 +44,8 @@ let exp_type_of_pointed x =
     | _ ->
       No_pointed
   else
-    let xt = Cil.unrollTypeDeep (Cil.typeOf no_cast) in
-    let xt = Cil.type_remove_qualifier_attributes_deep xt in
+    let xt = Ast_types.unroll_type_deep (Cil.typeOf no_cast) in
+    let xt = Ast_types.type_remove_qualifier_attributes_deep xt in
     Value_of (Cil.typeOf_pointed xt)
 
 let unexpected = Options.fatal "Mem_utils: %s"

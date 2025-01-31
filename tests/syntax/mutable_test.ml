@@ -12,7 +12,7 @@ let main () =
     Format.printf "Type of variable: %a@\nOffset: %a@."
       Printer.pp_typ x.vtype Printer.pp_offset offset;
     assert
-      (not (Cil.typeHasAttribute "const" (Cil.typeOffset x.vtype offset)))
+      (not (Ast_types.type_has_attribute "const" (Cil.typeOffset x.vtype offset)))
   | _ -> assert false
 
 let () = Boot.Main.extend main

@@ -122,7 +122,7 @@ class annotateFunFromDeclspec =
                in
                app :: acc
              with Not_found -> acc
-      ) acc (typeAttrs v.vtype)
+      ) acc (Ast_types.type_attrs v.vtype)
   in
 
   let annotate_fun v =
@@ -179,7 +179,7 @@ class annotateFunFromDeclspec =
                      (Normal,app) :: acc
                    with Not_found -> acc)
             behavior.b_post_cond
-            (typeAttrs return_ty)
+            (Ast_types.type_attrs return_ty)
         in
         let ppt_ensures b =
           Property.ip_ensures_of_behavior kf Kglobal b

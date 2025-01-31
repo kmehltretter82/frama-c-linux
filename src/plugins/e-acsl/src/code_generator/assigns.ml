@@ -30,7 +30,7 @@ exception NoAssigns
 
 (* If an argument contains a pointer type, then it is undecidable which assigns
    clause should be generated, so skip the assigns generation in this case *)
-let rec is_ptr_free typ = match Cil.unrollTypeNode typ with
+let rec is_ptr_free typ = match Ast_types.unroll_type_node typ with
   | TVoid
   | TInt _
   | TFloat _ -> true

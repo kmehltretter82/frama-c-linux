@@ -180,10 +180,10 @@ module Libc = struct
     let exps = drop (printf_fmt_position fn) args in
     let param_str =
       List.fold_right
-        (fun exp acc -> match Cil.(unrollTypeNode (typeOf exp)) with
+        (fun exp acc -> match Cil.(Ast_types.unroll_type_node (typeOf exp)) with
            | TInt k -> get_ikind_str k ^ acc
            | TFloat k -> get_fkind_str k ^ acc
-           | TPtr ty -> get_pkind_str exp (Cil.unrollType ty) ^ acc
+           | TPtr ty -> get_pkind_str exp (Ast_types.unroll_type ty) ^ acc
            | TVoid | TArray _ | TFun _ | TNamed _ | TComp _ | TEnum _
            | TBuiltin_va_list -> assert false)
         exps

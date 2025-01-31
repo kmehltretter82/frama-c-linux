@@ -53,7 +53,7 @@ class visitor = object
 
   method! vglob_aux = function
     | GType (ty,_) ->
-      if not (Cil.is_in_libc (Cil.typeAttrs ty.ttype)) then
+      if not (Cil.is_in_libc (Ast_types.type_attrs ty.ttype)) then
         ty.tname <- Dictionary.fresh Obfuscator_kind.Type ty.tname;
       Cil.DoChildren
     | GVarDecl (v, _) | GVar (v, _, _)

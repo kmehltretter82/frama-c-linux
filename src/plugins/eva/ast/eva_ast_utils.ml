@@ -116,7 +116,7 @@ let is_mutable (lval : lval) : bool =
   let (lhost, offset) = lval.node in
   let rec aux base_mutable typ off =
     let base_mutable = base_mutable && not (Cil.isConstType typ) in
-    let typ = Cil.unrollType typ in
+    let typ = Ast_types.unroll_type typ in
     match typ.tnode, off with
     | _, NoOffset -> base_mutable
     | _, Field (fi, off) ->
@@ -311,7 +311,7 @@ let to_value exp =
   | _ -> `None
 
 let type_kind typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_type_node typ with
   | TInt ikind | TEnum {ekind = ikind} -> `Int ikind
   | TFloat fkind -> `Float fkind
   | _ -> `None

@@ -380,7 +380,7 @@ struct
   let covers_base (tracked : Tracking.t option) (b : base) : bool =
     match b with
     | Base.Var (vi, _) ->
-      not (Cil.typeHasQualifier "volatile" vi.vtype) &&
+      not (Ast_types.type_has_qualifier "volatile" vi.vtype) &&
       Option.fold ~none:true ~some:(Tracking.mem b) tracked
     | Null -> true
     | CLogic_Var _ | String _ | Allocated (_, _, _) -> false
@@ -823,7 +823,7 @@ struct
       begin match Location.of_term env arg with
         | `Top -> `Value state (* can't resolve location, ignore *)
         | `Value (loc,typ) ->
-          begin match Cil.unrollTypeNode (Logic_utils.logicCType typ) with
+          begin match Ast_types.unroll_type_node (Logic_utils.logicCType typ) with
             | TFloat fkind ->
               let update = Value.backward_is_finite positive fkind
               and oracle = mk_oracle state in

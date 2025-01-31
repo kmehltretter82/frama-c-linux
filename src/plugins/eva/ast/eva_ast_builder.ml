@@ -171,7 +171,7 @@ struct
 
   let cast typ exp =
     if Cil.need_cast exp.typ typ
-    then mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, exp))
+    then mk_exp (CastE (Ast_types.type_remove_qualifier_attributes typ, exp))
     else exp
 
   let binop op e1 e2 =
@@ -255,7 +255,7 @@ let rec normalize_condition exp positive =
     else mk_exp (BinOp (invert_relation binop, e1, e2, typ))
   | _ ->
     let op = if positive then Ne else Eq in
-    let typ = Cil.unrollType exp.typ in
+    let typ = Ast_types.unroll_type exp.typ in
     mk_exp (BinOp (op, zero_typed typ, exp, Cil_const.intType))
 
 

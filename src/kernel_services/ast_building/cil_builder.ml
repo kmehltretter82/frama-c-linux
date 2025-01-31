@@ -500,7 +500,7 @@ struct
     | Index (lv, e) ->
       let (host, offset) as lv' = build_lval ~scope ~loc lv
       and e' = build_exp ~scope ~loc e in
-      begin match Cil.(unrollTypeNode (typeOfLval lv')) with
+      begin match Ast_types.unroll_type_node (Cil.typeOfLval lv') with
         | TArray _ ->
           let offset' = Cil_types.Index (e', NoOffset) in
           host, Cil.addOffset offset' offset
@@ -513,7 +513,8 @@ struct
       end
     | (Field (lv,_) | FieldNamed (lv,_)) as e ->
       let (host, offset) as lv' = build_lval ~scope ~loc lv in
-      let host', offset', ci = match Cil.(unrollTypeDeep (typeOfLval lv')).tnode with
+      let host', offset', ci =
+        match (Ast_types.unroll_type_deep (Cil.typeOfLval lv')).tnode with
         | TComp ci -> host, offset, ci
         | TPtr { tnode = TComp ci } ->
           Mem (Cil.new_exp ~loc (Lval lv')), Cil_types.NoOffset, ci
@@ -589,7 +590,7 @@ struct
     | (Field (tlv,_) | FieldNamed (tlv,_)) as t ->
       let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv in
       let lty = match Logic_utils.unroll_type (Cil.typeOfTermLval tlv') with
-        | Ctype cty -> Cil_types.Ctype (Cil.unrollTypeDeep cty)
+        | Ctype cty -> Cil_types.Ctype (Ast_types.unroll_type_deep cty)
         | lty -> lty
       in
       let host', offset', ci = match lty with

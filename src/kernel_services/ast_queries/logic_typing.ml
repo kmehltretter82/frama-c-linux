@@ -836,7 +836,7 @@ struct
 
   let check_fun_ptr loc ty =
     let is_fun_ptr t =
-      match Cil.unrollTypeNode t with
+      match Ast_types.unroll_type_node t with
       | TPtr t when Cil.isFunctionType t -> true
       | _ -> false
     in
@@ -846,7 +846,7 @@ struct
 
   let check_object_ptr loc ty =
     let is_object_ptr t =
-      match Cil.unrollTypeNode t with
+      match Ast_types.unroll_type_node t with
       | TPtr t when not (Cil.isFunctionType t) -> true
       | _ -> false
     in
@@ -870,7 +870,7 @@ struct
     try
       ignore (Logic_env.find_model_field f ty); true
     with Not_found ->
-      (match Cil.unrollTypeNode ty with
+      (match Ast_types.unroll_type_node ty with
        | TComp ci ->
          List.exists
            (fun x -> x.fname = f)
@@ -878,14 +878,14 @@ struct
        | _ -> false)
 
   let plain_type_of_c_field loc f ty =
-    match Cil.unrollType ty with
+    match Ast_types.unroll_type ty with
     | { tnode = TComp ci; tattr } ->
       (try
          let attrs = Ast_attributes.filter_qualifiers tattr in
          let field = C.find_comp_field ci f in
          let typ = Cil.typeOffset ty field in
          Logic_utils.offset_to_term_offset field,
-         Ctype (Cil.typeAddAttributes attrs typ)
+         Ctype (Ast_types.type_add_attributes attrs typ)
        with Not_found -> C.error loc "cannot find field %s" f)
     | _ ->
       C.error loc "expected a struct with field %s" f
@@ -1089,7 +1089,7 @@ struct
     | LTreal -> Lreal
     | LTattribute (ty,attr) ->
       (* attributes can only qualify C types *)
-      Ctype (Cil.typeAddAttributes [attr] (ctype ty))
+      Ctype (Ast_types.type_add_attributes [attr] (ctype ty))
 
   let mk_logic_access env t =
     match t.term_node with
@@ -1227,7 +1227,7 @@ struct
            to get an explicit access to the memory *)
         mk_mem (c_mk_cast ~force e oldt (Cil_const.mk_tptr newt)) TNoOffset
       else begin
-        match Cil.unrollTypeNode newt, e.term_node with
+        match Ast_types.unroll_type_node newt, e.term_node with
         | TEnum ei, TConst (LEnum { eihost = ei'})
           when ei.ename = ei'.ename && not force -> e
         | _ ->
@@ -1448,7 +1448,7 @@ struct
     else
       begin
         Cil.checkCast ot nt;
-        match Cil.unrollTypeNode ot, Cil.unrollTypeNode nt with
+        match Ast_types.unroll_type_node ot, Ast_types.unroll_type_node nt with
         | TPtr _, TPtr _ when isVoidPtrType nt ->
           nt, e
         | (TInt _ | TEnum _ | TPtr _ ), TVoid ->
@@ -1486,7 +1486,7 @@ struct
           C.error loc "invalid implicit conversion from '%a' to '%a'"
             Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
       end else if is_implicit_pointer_conversion oterm ty1 ty2
-               || (match unrollTypeNode ty1, unrollTypeNode ty2 with
+               || (match Ast_types.unroll_type_node ty1, Ast_types.unroll_type_node ty2 with
                    | TFloat f1, TFloat f2 ->
                      f1 <= f2
                    (*[BM]
@@ -1801,7 +1801,7 @@ struct
     | Linteger -> Linteger
     | Lreal -> Lreal
     | Ctype ty ->
-      (match Cil.unrollTypeNode ty with
+      (match Ast_types.unroll_type_node ty with
        | TFloat _ -> Lreal
        | _ ->
          Kernel.fatal ~current:true
@@ -1889,7 +1889,7 @@ struct
                 | None -> lty1
                 | Some rel ->
                   let kind =
-                    match Cil.unrollTypeNode ty1 with
+                    match Ast_types.unroll_type_node ty1 with
                     | TFloat FFloat -> "float"
                     | TFloat FDouble -> "double"
                     | TFloat FLongDouble -> "long double"
@@ -3871,7 +3871,7 @@ struct
     let env = append_pre_label (Lenv.funspec()) in
     let typ = Cil.getReturnType typ in
     (* Qualifiers are dropped on return type, recover ghost *)
-    let typ = if vi.vghost then Cil.typeAddGhost typ else typ in
+    let typ = if vi.vghost then Ast_types.type_add_ghost typ else typ in
     let log_return_typ = Ctype typ in
     let env =
       match formals with
@@ -4374,7 +4374,7 @@ struct
               | Ctype ctyp' ->
                 ( reads || not (Cil.isConstType ctyp') )
                 && Cil_datatype.Typ.equal ctyp
-                  (Cil.type_remove_qualifier_attributes ctyp')
+                  (Ast_types.type_remove_qualifier_attributes ctyp')
               | _ -> false
             in
             if not (Logic_const.plain_or_set check t.term_type) then
@@ -4394,7 +4394,7 @@ struct
            return type with respect to qualifiers *)
         if not (isPointerType arg1) then error ();
         let vol_typ = typeOf_pointed arg1 in
-        let base_typ = Cil.type_remove_qualifier_attributes vol_typ in
+        let base_typ = Ast_types.type_remove_qualifier_attributes vol_typ in
         if not (Cil.isVolatileType vol_typ &&
                 ( reads || not (Cil.isConstType vol_typ) ) &&
                 Cil_datatype.Typ.equal ret_typ base_typ)
@@ -4425,7 +4425,7 @@ struct
         in match args with
         | Some ((_,arg1,_)::[_,arg2,_]) when
             (not (isVoidType ret || is_varg_arg))
-            && Cil_datatype.Typ.equal ret (Cil.type_remove_qualifier_attributes arg2)
+            && Cil_datatype.Typ.equal ret (Ast_types.type_remove_qualifier_attributes arg2)
           -> (* matching prototype: T fct (volatile T *arg1, T arg2) *)
           let vol_typ = volatile_type ~reads:false ret arg1 error in
           checks_tsets_type ~reads:false fct vol_typ (* tsets should have type: volatile T *)

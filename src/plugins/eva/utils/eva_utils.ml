@@ -150,7 +150,7 @@ let create_new_var name typ =
   register_new_var vi typ;
   vi
 
-let is_const_write_invalid typ = Cil.typeHasQualifier "const" typ
+let is_const_write_invalid typ = Ast_types.type_has_qualifier "const" typ
 
 let find_return_var kf =
   match (Kernel_function.find_return kf).skind with

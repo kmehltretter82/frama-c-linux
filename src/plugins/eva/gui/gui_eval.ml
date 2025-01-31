@@ -232,7 +232,7 @@ module Make (X: Analysis.Engine) = struct
       r, ok, false
 
   let lv_offsetmap_res_to_gui_res lv offsm =
-    let typ = Some (Cil.unrollType (Cil.typeOfLval lv)) in
+    let typ = Some (Ast_types.unroll_type (Cil.typeOfLval lv)) in
     GR_Offsm (offsm, typ)
 
   let id_env state _ = state

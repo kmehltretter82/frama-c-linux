@@ -150,7 +150,7 @@ let typeof v =
   | String (_,_) -> Some Cil_const.charConstPtrType
   | CLogic_Var (_, ty, _) -> Some ty
   | Null -> None
-  | Var (v,_) | Allocated(v,_,_) -> Some (unrollType v.vtype)
+  | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.unroll_type v.vtype)
 
 let cstring_bitlength s =
   let u, l =
@@ -241,7 +241,7 @@ let validity b =
 let is_read_only base =
   match base with
   | String _ -> true
-  | Var (v,_) -> typeHasQualifier "const" v.vtype
+  | Var (v,_) -> Ast_types.type_has_qualifier "const" v.vtype
   | _ -> false
 
 (* Minor optimization compared to [is_weak (validity b)] *)

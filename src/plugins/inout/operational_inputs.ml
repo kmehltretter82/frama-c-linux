@@ -414,7 +414,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
   let transfer_guard stmt e t =
     let request = X.stmt_request stmt in
     let v_e = Eva.Results.(eval_exp e request |> as_cvalue) in
-    let t1 = Cil.unrollType (Cil.typeOf e) in
+    let t1 = Ast_types.unroll_type (Cil.typeOf e) in
     let do_then, do_else =
       if Cil.isIntegralType t1 || Cil.isPointerType t1
       then Cvalue.V.contains_non_zero v_e,

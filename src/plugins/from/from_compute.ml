@@ -463,7 +463,7 @@ struct
     let transfer_guard s e d =
       let request = To_Use.stmt_request s in
       let interpreted_e = Eva.Results.(eval_exp e request |> as_cvalue) in
-      let t1 = unrollType (typeOf e) in
+      let t1 = Ast_types.unroll_type (typeOf e) in
       let do_then, do_else =
         if isIntegralType t1 || isPointerType t1
         then Cvalue.V.contains_non_zero interpreted_e,

@@ -208,7 +208,7 @@ let guess_intended_malloc_type stack sizev constant_size =
     else None
   in
   let mk_typed_size t =
-    match Cil.unrollTypeNode t with
+    match Ast_types.unroll_type_node t with
     | TPtr t when not (Cil.isVoidType t) ->
       let s = Int.of_int (Cil.bytesSizeOf t) in
       if Int.(equal s zero) ||
@@ -251,7 +251,7 @@ let type_from_nb_elems tsize =
 (* Generalize a type into an array type without size. Useful for variables
    whose size is mutated. *)
 let weaken_type typ =
-  match Cil.unrollType typ with
+  match Ast_types.unroll_type typ with
   | { tnode = TArray (_, None) } -> typ
   | { tnode = TArray (typ, Some _) }
   | typ ->

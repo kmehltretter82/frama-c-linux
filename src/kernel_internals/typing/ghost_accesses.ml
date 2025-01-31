@@ -83,7 +83,7 @@ let get_lvalue = function
 
 let rec ghost_term_type t =
   match (Logic_utils.unroll_type t) with
-  | Ctype t -> isGhostType t
+  | Ctype t -> Ast_types.is_ghost_type t
   | t when Logic_const.is_set_type t ->
     ghost_term_type (Logic_const.type_of_element t)
   | _ -> false
@@ -92,10 +92,10 @@ class visitor = object(self)
   inherit Visitor.frama_c_inplace
 
   method private ghost_incompatible nt ot =
-    match unrollTypeNode nt, unrollTypeNode ot with
+    match Ast_types.unroll_type_node nt, Ast_types.unroll_type_node ot with
     | TPtr nt', TPtr ot'
     | TPtr nt', TArray (ot', _) ->
-      Cil.isGhostType nt' <> Cil.isGhostType ot' ||
+      Ast_types.is_ghost_type nt' <> Ast_types.is_ghost_type ot' ||
       self#ghost_incompatible nt' ot'
     | _ ->
       false
@@ -148,12 +148,13 @@ class visitor = object(self)
       | Some l -> false, l
       | None -> true, (Log.get_current_source ())
     in
-    if not(is_generated_ret_var v) && not (isWFGhostType v.vtype) then
+    if not(is_generated_ret_var v)
+    && not (Ast_types.is_wellformed_ghost_type v.vtype) then
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
-    if isFunctionType (unrollType v.vtype) then begin
-      let ftype = getReturnType (unrollType v.vtype) in
+    if isFunctionType (Ast_types.unroll_type v.vtype) then begin
+      let ftype = getReturnType (Ast_types.unroll_type v.vtype) in
       match ftype.tnode with
-      | TPtr t when not (isWFGhostType t) ->
+      | TPtr t when not (Ast_types.is_wellformed_ghost_type t) ->
         Error.invalid_ghost_type_for_return ~once:true ~current ~source ()
       | _ -> ()
     end ;
@@ -169,7 +170,7 @@ class visitor = object(self)
           Error.bad_cast_on_return ~current:true fexp ret_type lv
       in
       let error_if_not_writable lv =
-        if not (isGhostType (typeOfLval lv)) then
+        if not (Ast_types.is_ghost_type (typeOfLval lv)) then
           Error.assigns_non_ghost_lvalue ~current:true lv
       in
       let failed = match i with

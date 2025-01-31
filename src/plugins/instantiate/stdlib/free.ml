@@ -94,8 +94,8 @@ let key_from_call _ret _fct args =
   match args with
   | [ ptr ] ->
     let ptr = Cil.stripCasts ptr in
-    let ptr_t = Cil.unrollTypeDeep (Cil.typeOf ptr) in
-    let ptr_t = Cil.type_remove_qualifier_attributes_deep ptr_t in
+    let ptr_t = Ast_types.unroll_type_deep (Cil.typeOf ptr) in
+    let ptr_t = Ast_types.type_remove_qualifier_attributes_deep ptr_t in
     Cil.typeOf_pointed ptr_t
   | _ -> unexpected "trying to generate a key on an ill-typed call"
 

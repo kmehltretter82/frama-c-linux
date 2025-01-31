@@ -824,7 +824,7 @@ module Make (Engine: Engine_sig.S) = struct
     let kind = Abstract_domain.Local kf in
     let state = Domain.enter_scope kind variables state in
     let is_volatile varinfo =
-      Cil.typeHasQualifier "volatile" varinfo.vtype
+      Ast_types.type_has_qualifier "volatile" varinfo.vtype
     in
     let vars = List.filter is_volatile variables in
     let initialized = false in

@@ -128,7 +128,7 @@ let test (types, kind) =
   in
   match kind with
   | NoAttr | Mutable ->
-    if Cil.typeHasAttribute "const" inner_type then begin
+    if Ast_types.type_has_attribute "const" inner_type then begin
       let filename = generate_failure_file false types in
       Crowbar.fail
         ("typeOffset declared const a field that should have been mutable. \
@@ -136,7 +136,7 @@ let test (types, kind) =
     end;
     true
   | Const ->
-    if not (Cil.typeHasAttribute "const" inner_type) then begin
+    if not (Ast_types.type_has_attribute "const" inner_type) then begin
       let filename = generate_failure_file true types in
       Crowbar.fail
         ("typeOffset should have marked a field as const. \

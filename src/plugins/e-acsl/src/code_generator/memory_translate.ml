@@ -200,7 +200,7 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
       assert false
   in
   (* s *)
-  let ty = match Cil.unrollTypeNode (Misc.cty ptr.term_type) with
+  let ty = match Ast_types.unroll_type_node (Misc.cty ptr.term_type) with
     | TPtr ty | TArray (ty, _) -> ty
     | _ -> assert false
   in

@@ -72,7 +72,7 @@ let get_set_suffix_and_arg res_ty e =
      [TODO] check the statement above *)
   | C_float FLongDouble, _ -> Error.not_yet "creating gmp from long double"
   | Gmpz, _ | Rational, _ | Real, _ | Nan, _ ->
-    match Cil.unrollTypeNode ty with
+    match Ast_types.unroll_type_node ty with
     | TPtr { tnode = TInt IChar } ->
       "_str",
       (* decimal base for the number given as string *)
@@ -371,7 +371,7 @@ module Q = struct
       in
       e, env
     in
-    match Cil.unrollTypeNode ty with
+    match Ast_types.unroll_type_node ty with
     | TFloat FLongDouble ->
       (* The biggest floating-point type we can extract from GMPQ is double *)
       Error.not_yet "R to long double"

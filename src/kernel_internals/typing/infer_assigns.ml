@@ -50,7 +50,7 @@ let from_prototype kf =
          let t = tvar (cvar_to_lvar vi) in
          let typ = vi.vtype in
          if isVoidPtrType typ then
-           let const = typeHasAttribute "const" (Cil.typeOf_pointed typ) in
+           let const = Ast_types.type_has_attribute "const" (Cil.typeOf_pointed typ) in
            let typ' = if const then Cil_const.charConstPtrType else Cil_const.charPtrType in
            (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
          else (vi.vghost, t, typ)
@@ -72,7 +72,7 @@ let from_prototype kf =
     (* Generate the required numbers of [[..]] until with find a non-array
        type *)
     let rec mk_offset set typ =
-      match unrollTypeNode typ with
+      match Ast_types.unroll_type_node typ with
       | TArray (typ_elem, size) ->
         let range = match size with
           | None -> make_range None
@@ -115,7 +115,7 @@ let from_prototype kf =
       (List.filter
          (fun (_g, _t, typ) ->
             let pointed_type = typeOf_pointed typ in
-            not (typeHasAttribute "const" pointed_type)
+            not (Ast_types.type_has_attribute "const" pointed_type)
          )
          pointer_args)
   in

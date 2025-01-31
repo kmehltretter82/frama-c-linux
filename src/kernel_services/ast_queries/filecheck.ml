@@ -25,7 +25,7 @@ open Cil_datatype
 
 
 let same_integral_types t1 t2 =
-  match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
+  match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
   | TInt ik1, TInt ik2 ->
     Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2 &&
     Cil.isSigned ik1 = Cil.isSigned ik2
@@ -36,7 +36,7 @@ let is_admissible_conversion e ot nt =
   let nt' = Cil.typeDeepDropAllAttributes nt in
   not (Cil.need_cast ot' nt') ||
   same_integral_types ot' nt' ||
-  (match e.enode, Cil.unrollTypeNode nt with
+  (match e.enode, Ast_types.unroll_type_node nt with
    | Const(CEnum { eihost = ei }), TEnum ei' -> ei.ename = ei'.ename
    | _ -> false)
 
@@ -725,7 +725,7 @@ module Base_checker = struct
              let t1 = Kernel_function.get_return_type kf in
              let t1 =
                if Kernel_function.is_ghost kf
-               then Cil.typeAddGhost t1 else t1
+               then Ast_types.type_add_ghost t1 else t1
              in
              if Cil.isVoidType t1 then
                check_abort
@@ -1212,7 +1212,7 @@ module Base_checker = struct
         | _ -> false
 
       method! vexpr e =
-        if Cil.typeHasAttribute "volatile" (Cil.typeOf e) then begin
+        if Ast_types.type_has_attribute "volatile" (Cil.typeOf e) then begin
           Kernel.warning ~wkey:Kernel.wkey_check_volatile ~current:true
             "Expression with volatile qualification %a" Printer.pp_exp e
         end;
@@ -1265,7 +1265,7 @@ module Base_checker = struct
              | None -> ()
              | Some lv ->
                let tlv = Cil.typeOfLval lv in
-               let tlv = Cil.type_remove_qualifier_attributes tlv in
+               let tlv = Ast_types.type_remove_qualifier_attributes tlv in
                if not (Cabs2cil.allow_return_collapse ~tlv ~tf:treturn) then
                  check_abort "in call %a, cannot implicitly cast from \
                               function return type %a to type of %a (%a)"

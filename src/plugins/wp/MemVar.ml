@@ -741,7 +741,7 @@ struct
   let valid_base sigma acs mem x =
     if x.vglob then
       match acs with
-      | RW -> if Cil.typeHasQualifier "const" x.vtype then p_false else p_true
+      | RW -> if Ast_types.type_has_qualifier "const" x.vtype then p_false else p_true
       | RD | OBJ -> p_true
     else
       match mem with
@@ -936,7 +936,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec forall_pointers phi v t =
-    match Cil.unrollTypeNode t with
+    match Ast_types.unroll_type_node t with
     | TInt _ | TFloat _ | TVoid | TEnum _ | TNamed _ | TBuiltin_va_list
       -> F.p_true
     | TPtr _ | TFun _ -> phi v

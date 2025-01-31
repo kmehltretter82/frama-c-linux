@@ -180,7 +180,7 @@ let memset_value e =
   | _ -> None
 
 let rec contains_union_type t =
-  match Cil.unrollTypeNode t with
+  match Ast_types.unroll_type_node t with
   | TComp { cstruct = false } ->
     true
   | TComp { cfields = Some fields } ->

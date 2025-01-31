@@ -141,7 +141,7 @@ module Make
      to top without applying the initializer. Otherwise, lets the standard
      transfer function on assignments handle volatile locations. *)
   let rec apply_eva_initializer ~top_volatile kinstr lval init state =
-    if top_volatile && Cil.typeHasQualifier "volatile" lval.typ
+    if top_volatile && Ast_types.type_has_qualifier "volatile" lval.typ
     then initialize_top_volatile lval state
     else
       match init with
@@ -170,7 +170,7 @@ module Make
     ignore (warn_unknown_size vi);
     let typ = vi.vtype in
     let lval = Eva_ast.Build.var vi in
-    let volatile_everywhere = Cil.typeHasQualifier "volatile" typ in
+    let volatile_everywhere = Ast_types.type_has_qualifier "volatile" typ in
     let state =
       if volatile_everywhere && padding_initialization ~local = `Initialized
       then initialize_top_volatile lval state
@@ -201,8 +201,8 @@ module Make
   let rec apply_cil_const_initializer kinstr state lval = function
     | Cil_types.SingleInit exp ->
       let typ_lval = Cil.typeOfLval lval in
-      if Cil.typeHasQualifier "const" typ_lval &&
-         not (Cil.typeHasQualifier "volatile" typ_lval)
+      if Ast_types.type_has_qualifier "const" typ_lval &&
+         not (Ast_types.type_has_qualifier "volatile" typ_lval)
          && not (Cil.is_mutable_or_initialized lval)
       then
         let lval = Eva_ast.translate_lval lval
@@ -211,7 +211,7 @@ module Make
         apply_eva_single_initializer ~source kinstr state lval exp
       else state
     | CompoundInit (typ, l) ->
-      if Cil.typeHasQualifier "volatile" typ || not (Cil.isConstType typ)
+      if Ast_types.type_has_qualifier "volatile" typ || not (Cil.isConstType typ)
       then state (* initializer is not useful *)
       else
         let doinit off init _typ state =
@@ -224,8 +224,8 @@ module Make
      set, or when [vi] is extern. [const] initializers, explicit or implicit,
      are taken into account *)
   let initialize_var_lib_entry kinstr vi init state =
-    if Cil.typeHasQualifier "const" vi.vtype && not (vi.vstorage = Extern)
-       && not (Cil.typeHasAttributeMemoryBlock Ast_attributes.frama_c_mutable vi.vtype)
+    if Ast_types.type_has_qualifier "const" vi.vtype && not (vi.vstorage = Extern)
+       && not (Ast_types.type_has_attribute_memory_block Ast_attributes.frama_c_mutable vi.vtype)
     then (* Fully const base. Ignore -lib-entry altogether. *)
       let init = Option.map Eva_ast.translate_init init in
       initialize_var_not_lib_entry kinstr ~local:false vi init state

@@ -846,7 +846,7 @@ module Make
   let rec get_influential_vars valuation (exp : Eva_ast.exp) acc =
     match exp.node with
     | Lval ({ node = host, off } as lval)  ->
-      if Cil.typeHasQualifier "volatile" lval.typ then `Value acc
+      if Ast_types.type_has_qualifier "volatile" lval.typ then `Value acc
       else
         Loc.to_value (find_loc valuation lval) >>- fun value ->
         if Cvalue.V.cardinal_zero_or_one (get_cval value)

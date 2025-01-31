@@ -141,8 +141,8 @@ module V = struct
      [typ]. Whenever possible, we print real addresses instead of bytes
      offsets. *)
   let pretty_base_offsets_typ typ fmt b i =
-    let typ_match = match Option.map Cil.unrollType typ with
-      | Some { tnode = TPtr typ_pointed } ->
+    let typ_match = match Option.map Ast_types.unroll_type_node typ with
+      | Some (TPtr typ_pointed) ->
         if Cil.isVoidType typ_pointed then None else Some typ_pointed
       | _ -> None
     in
@@ -191,7 +191,7 @@ module V = struct
         let conv_offset' o =
           let o, ok = conv_offset o in
           if o = NoOffset then
-            let o' = match Cil.unrollTypeNode typ_base with
+            let o' = match Ast_types.unroll_type_node typ_base with
               | TArray _ -> Index (Cil.(zero ~loc:Cil_builtins.builtinLoc), NoOffset)
               | TComp ci -> Field (List.hd (Option.get ci.cfields), NoOffset)
               | _ -> raise Bit_utils.NoMatchingOffset
@@ -254,8 +254,8 @@ module V = struct
     | Map m ->
       try
         let ival = project_ival v in
-        match Ival.project_small_set ival, Option.map Cil.unrollType typ with
-        | Some list, Some { tnode = TEnum ei } -> pretty_enumitem_set ei fmt list
+        match Ival.project_small_set ival, Option.map Ast_types.unroll_type_node typ with
+        | Some list, Some (TEnum ei) -> pretty_enumitem_set ei fmt list
         | _ -> Ival.pretty fmt ival
       with
       | Not_based_on_null ->

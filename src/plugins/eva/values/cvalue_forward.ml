@@ -404,7 +404,7 @@ let forward_binop_int ~typ ev1 op ev2 =
       ~contains_non_zero:(V.contains_non_zero ev1 && V.contains_non_zero ev2)
   | Eq | Ne | Ge | Le | Gt | Lt ->
     let op = Eva_ast.conv_relation op in
-    let signed = Bit_utils.is_signed_int_enum_pointer (Cil.unrollType typ) in
+    let signed = Bit_utils.is_signed_int_enum_pointer (Ast_types.unroll_type typ) in
     V.inject_comp_result (V.forward_comp_int ~signed op ev1 ev2)
 
 let forward_binop_float fkind ev1 op ev2 =
@@ -434,7 +434,7 @@ let forward_binop_float fkind ev1 op ev2 =
    This is left to the caller *)
 let forward_uneg v t =
   try
-    match Cil.unrollTypeNode t with
+    match Ast_types.unroll_type_node t with
     | TFloat _ ->
       let v = V.project_float v in
       V.inject_ival (Ival.inject_float (Fval.neg v))
@@ -450,7 +450,7 @@ let forward_unop typ op value =
   match op with
   | Eva_ast.Neg -> forward_uneg value typ
   | BNot -> begin
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_type_node typ with
       | TInt ik | TEnum {ekind=ik} ->
         let size = Cil.bitsSizeOfInt ik in
         let signed = Cil.isSigned ik in
@@ -513,7 +513,7 @@ let forward_cast ~src_type ~dst_type v =
 let make_volatile ?typ v =
   let is_volatile = match typ with
     | None -> true
-    | Some typ -> Cil.typeHasQualifier "volatile" typ
+    | Some typ -> Ast_types.type_has_qualifier "volatile" typ
   in
   if is_volatile && not (V.is_bottom v)
   then

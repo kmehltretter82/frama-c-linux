@@ -144,7 +144,7 @@ let add_pending_register_data ~loc { data_ptr } name e =
     else if Gmp_types.Q.is_t ty then
       "mpq", [ e ]
     else
-      let ty = Cil.unrollType ty in
+      let ty = Ast_types.unroll_type ty in
       match ty.tnode with
       | TInt ikind -> ikind_to_string ikind, [ Cil.zero ~loc; e ]
       | TFloat FFloat -> "float", [ e ]

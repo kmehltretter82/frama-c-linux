@@ -56,7 +56,7 @@ end
 type kind = Integer | Float
 
 let typ_kind typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_type_node typ with
   | TInt _ | TEnum  _ | TPtr _ -> Integer
   | TFloat _ -> Float
   | _ -> assert false
@@ -1292,7 +1292,7 @@ module State = struct
       | CastE (typ, { node = Lval { node = Var vi, NoOffset } })
         when Cil.isIntegralType typ
           && Cil.isFloatingType vi.vtype
-          && not (Cil.typeHasQualifier "volatile" vi.vtype)
+          && not (Ast_types.type_has_qualifier "volatile" vi.vtype)
           && not (is_singleton (eval exp)) ->
         Some (Variable.make_int vi, Ival.zero)
 

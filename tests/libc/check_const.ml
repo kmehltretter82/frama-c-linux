@@ -7,7 +7,7 @@ let non_const_exceptions = [
 
 let warn_if_const string typ vi loc =
   let bs = if string = "" then "\\" else "" in
-  if Cil.typeHasQualifier "const" typ then
+  if Ast_types.type_has_qualifier "const" typ then
     Kernel.result ~source:(fst loc)
       "'requires %svalid%s' of a const variable %a. \
        You probably meant '%svalid_read%s' instead"
@@ -15,7 +15,7 @@ let warn_if_const string typ vi loc =
 
 let warn_if_not_const kf string typ vi loc =
   if not (List.mem (Kernel_function.get_name kf) non_const_exceptions) then
-    if not (Cil.typeHasQualifier "const" typ) then
+    if not (Ast_types.type_has_qualifier "const" typ) then
       Kernel.result ~source:(fst loc)
         "'requires \\valid_read%s' of a non-const variable %a. \
          You may have meant '\\valid%s'"

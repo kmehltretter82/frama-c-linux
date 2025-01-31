@@ -57,7 +57,7 @@ let term_to_exp_ref
    first extra argument at each call *)
 let result_as_extra_argument typ =
   let is_composite typ =
-    match Cil.unrollTypeNode typ with
+    match Ast_types.unroll_type_node typ with
     | TComp _ | TPtr _ | TArray _ -> true
     | TInt _ | TVoid  | TFloat _ | TFun _ | TNamed _ | TEnum _
     | TBuiltin_va_list -> false
