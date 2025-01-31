@@ -506,46 +506,26 @@ module Html = struct
   ;;
 
   let append_file ~input ~output ~name =
+    let create = not (Sys.file_exists output) in
+    let print_header cout =
+      Out_channel.output_string cout
+        "// Concatenated dot files. \
+         Generate all graphs with `dot -Tpng -O file.dot`\n\
+         // They will be named file.dot.png, file.dot.2.png, etc.\n\n";
+    in
     let copy cin cout =
-      let rec aux cin cout =
-        let line = input_line cin in
-        Printf.fprintf cout "%s\n" line;
-        aux cin cout
-      in
-      try
-        Printf.fprintf cout "// Graph for %s\n" name;
-        aux cin cout
-      with End_of_file ->
-        output_string cout "\n"
+      if create then print_header cout;
+      Printf.fprintf cout "// Graph for %s\n" name;
+      In_channel.input_all cin |> Out_channel.output_string cout;
+      Out_channel.output_string cout "\n\n"
     in
     let with_open_in = In_channel.with_open_text input in
-    let with_open_out f =
-      if Sys.file_exists output then
-        Out_channel.with_open_gen
-          [Open_text; Open_wronly; Open_append]
-          0o666
-          output
-          f
-      else
-        let print_header cout =
-          Printf.fprintf cout
-            "// Concatenated dot files. Generate all graphs with \
-             `dot -Tpng -O file.dot`\n\
-             // They will be named file.dot.png, file.dot.2.png, ...\n\n"
-        in
-        Out_channel.with_open_text
-          output
-          (fun cout ->
-             print_header cout;
-             f cout)
-    in
-    try
-      with_open_out (fun cout ->
-          with_open_in (fun cin ->
-              copy cin cout))
+    let flags = [ Open_creat; Open_text; Open_wronly; Open_append ] in
+    let with_open_out = Out_channel.with_open_gen flags 0o666 output in
+    try with_open_out (fun cout -> with_open_in (fun cin -> copy cin cout))
     with e ->
       MtOptions.error
-        "Error while appending %s to %s: %s"
+        "Error while appending dot file %s to %s: %s"
         input output (Printexc.to_string e)
 
   let mk_graph_img th =
