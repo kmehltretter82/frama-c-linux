@@ -37,24 +37,19 @@ import framacImage from './frama-c.png';
 /* --- Frama-C infos                                                      --- */
 /* -------------------------------------------------------------------------- */
 
-const synopsis = 'Frama-C is a suite of tools dedicated to the analysis of the\
-source code of software written in C.';
-const description = '\
-Frama-C gathers several analysis techniques in a single collaborative\
-framework, based on analyzers (called "plug-ins") that can build upon the\
-results computed by other analyzers in the framework.\
-Thanks to this approach, Frama-C provides sophisticated tools, including:\
-- an analyzer based on abstract interpretation (Eva plug-in);\
-- a program proof framework based on weakest precondition calculus\
- (WP plug-in);\
-- a program slicer (Slicing plug-in);\
-- a tool for verification of automata-based properties (Aoraï plug-in);\
-- a runtime verification tool (E-ACSL plug-in);\
-- several tools for code base exploration and dependency analysis\
-  (plug-ins From, Impact, Metrics, Occurrence, Scope, etc.).\
-These plug-ins communicate between each other via the Frama-C API\
-and via ACSL (ANSI/ISO C Specification Language) properties.\
-';
+const synopsis =
+'Frama-C is a platform dedicated to the analysis of source code written in C.';
+const description =
+'Frama-C gathers several analysis techniques in a single collaborative \
+framework, based on analyzers, called "plug-ins", that can build upon the \
+results computed by other analyzers of the platform.\n\
+Thanks to this approach, Frama-C provides sophisticated tools, including:\n\
+- Eva, an analyzer based on abstract interpretation;\n\
+- Wp, a program proof framework based on weakest precondition calculus;\n\
+- E-ACSL, a runtime verification tool;\n\
+- Aoraï, a tool for the verification of automata-based properties;\n\
+- several tools for code base exploration and dependency analysis: \
+  the plug-ins From, Impact, Metrics, Occurrence, Scope, etc.';
 const authors = [
     'Michele Alberti',
     'Thibaud Antignac',
@@ -112,17 +107,17 @@ const authors = [
     'Boris Yakobowski'
   ];
 const homepage = 'https://frama-c.com/';
-const devRepo = 'git+https://git.frama-c.com/pub/frama-c.git';
-const doc = 'https://frama-c.com/download/user-manual-30.0-Zinc.pdf';
+const doc = 'https://frama-c.com/html/documentation.html';
 const bugReports = 'https://git.frama-c.com/pub/frama-c/issues';
+const devRepo = 'https://git.frama-c.com/pub/frama-c/';
 
-const license = 'Licenses of the Frama-C kernel and plug-ins are either under \
-LGPL v2.1, or BSD.\n\
+const license =
+'Most sources are LGPLv2.1,\n with some isolated exceptions for \
+external libraries modified for Frama-C (BSD, QPL).\n\
 See the particular header of each source file for details.';
-const copyright = "© CEA and INRIA for the Frama-C kernel\n\
-© CEA for the GUI and plug-ins constant propagation, from, inout, impact, \
-metrics, occurrence pdg, scope, security_slicing, \
-semantic callgraph, slicing, sparecode, syntactic callgraph, users and value.";
+const copyright =
+'© CEA and INRIA for the Frama-C kernel\n\
+© CEA for the GUI and plug-ins';
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C About                                                      --- */
@@ -151,7 +146,7 @@ function AboutModal(props: AboutProps): JSX.Element {
           <Hbox>
             <Button
               onClick={() => shell.openExternal(homepage)}
-              label='Questions and support' />
+              label='Website' />
             <Button
               onClick={() => shell.openExternal(doc)}
               label='Documentation' />
