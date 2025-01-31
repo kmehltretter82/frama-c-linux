@@ -35,11 +35,13 @@
 import React from 'react';
 import { classes } from 'dome/misc/utils';
 import { Hbox } from 'dome/layout/boxes';
+import { Label } from 'dome/controls/labels';
 
 
 /* --------------------------------------------------------------------------*/
 /* --- Panel Container                                                       */
 /* --------------------------------------------------------------------------*/
+
 export type PanelPosition = 'top' | 'bottom' | 'left' | 'right';
 
 interface PanelProps {
@@ -112,5 +114,35 @@ export function ListElement(props: ListElementProps): JSX.Element {
     <div className='dome-xPanel-list'>
       {props.children}
     </div>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Panel Title
+// --------------------------------------------------------------------------
+
+export interface PanelTitleProps {
+  /** Label. */
+  label: string;
+  /** Additionnal CSS class. */
+  className?: string;
+  /** Other elements. */
+  children?: React.ReactNode;
+}
+
+/** Sidebar Title. */
+export function PanelTitle(props: PanelTitleProps): JSX.Element {
+  const { label, children } = props;
+  const className = classes(
+    'dome-xPanelTitle',
+    props.className,
+  );
+  return (
+    <>
+      <Hbox className={className}>
+        <Hbox><Label label={label} title={label}/></Hbox>
+        { children}
+      </Hbox>
+    </>
   );
 }

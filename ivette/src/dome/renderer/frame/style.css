@@ -630,10 +630,34 @@ input:checked + .dome-xSwitch-slider:before {
   &.dome-xPanel-left,
   &.dome-xPanel-right {
     top: 5px;
-    padding-top: -5px;
     max-height: calc(100% - 10px);
     max-width: 350px;
     overflow-y: auto;
+
+    .dome-xBoxes-hbox:has(.dome-xPanelTitle) {
+      width: 100%;
+      z-index: 60;
+      position:sticky;
+      top: -10px;
+      margin-top: -10px;
+      background-color: var(--background-intense);
+
+      .dome-xPanelTitle {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        padding: 5px;
+        border-bottom: solid 1px var(--border-discrete);
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
+
+      .dome-xBoxes-hbox {
+        max-width: 100%;
+        flex-wrap: wrap;
+        align-content: center;
+      }
+    }
   }
 
   &.dome-xPanel-left {
@@ -665,6 +689,8 @@ input:checked + .dome-xSwitch-slider:before {
     left:5px;
     max-height: 200px;
     overflow-x: scroll;
+
+    .dome-xBoxes-hbox:has(.dome-xPanelTitle) { display: none; }
 
     label,
     .dome-xPanel-list {
@@ -712,62 +738,65 @@ input:checked + .dome-xSwitch-slider:before {
 /* -------------------------------------------------------------------------- */
 /* --- Tree                                                               --- */
 /* -------------------------------------------------------------------------- */
+
 @keyframes dome-xTree-arrow {
-  to { rotate: -90deg; fill:var(--activated-button-color); }
+  to {
+    rotate: -90deg;
+    fill: var(--activated-button-color);
+  }
 }
 @keyframes dome-xTree-arrow-down { from { rotate: -90deg; } }
 
 .dome-xTree {
-  width: 100%;
   background-color: var(--background-intense);
-  overflow-y: auto;
-  max-height: 100%;
   padding-bottom: 5px;
 
-  li.dome-xTree-node {
+  .dome-xTree-nodes {
+    overflow-y: auto;
+  }
+
+  div.dome-xTree-subtree {
+    overflow: hidden;
+
+    &:not(:has(.dome-xTree-show-children)) {
+      border-left: solid 2px var(--background-profound);
+    }
+    &.dome-xTree-subtree-hidden {
+      height: 0;
+      visibility: hidden;
+    }
+  }
+
+  .dome-xTree-node {
     display: flex;
-    flex-direction: column;
-    opacity: 1;
+    flex-direction: row;
     background-color: var(--background-intense);
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 2px;
 
-    &>div {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      padding: 2px;
+    &.dome-xTree-has-subtree.dome-xTree-show-children {
+      margin-top: 5px;
+      border-radius: 7px 7px 7px 0;
+      background-color: var(--background-profound);
     }
 
-    &.dome-xTree-has-subtree {
-
-      &>div {
-        margin-top: 5px;
-        border-radius: 7px;
-        background-color: var(--background-softer);
-      }
-
-    }
-
-    &>div:hover,
-    &>div div:hover {
+    &:hover,
+    &.dome-xTree-show-children:hover,
+    div:hover {
       cursor: pointer;
       background-color: var(--background-softer);
+    }
+
+    &.dome-xTree-selected,
+    &.dome-xTree-selected.dome-xTree-show-children {
+      background-color: var(--background-interaction);
     }
 
     .dome-xTree-node-actions {
       display: flex;
       justify-content: center;
       padding-left: 10px;
-    }
-
-    ul {
-      transition: max-height .3s linear;
-      margin-left: 7px;
-      overflow: hidden;
-
-      &:not(:has(ul)) {
-        border-left: solid 1px var(--background-softer);
-      }
     }
 
     &.dome-xTree-show-children {

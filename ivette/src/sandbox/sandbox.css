@@ -32,12 +32,12 @@
     margin-bottom: 5px;
 }
 
-.sandbox-xTree-title {
+.sandbox-tree-control {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding-bottom: 5px;
-    font-size: medium;
+    font-size: 1.1em;
     width: 100%;
 
     &>.sandbox-xTree-actions{margin-left: 4em;}
