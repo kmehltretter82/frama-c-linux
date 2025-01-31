@@ -1162,10 +1162,13 @@ let rec eval_term ~alarm_mode env t =
          ldeps = r.ldeps;
          eover; eunder = under_from_over eover;
          empty = r.empty }
-     | _ ->
+     | ltyp ->
        if Logic_const.is_boolean_type ltyp
        && Logic_typing.is_integral_type t.term_type
        then cast_to_bool r
+       else if Logic_utils.is_same_type ltyp t.term_type then
+         (* coercion from singleton to set *)
+         r
        else
          unsupported
            (Format.asprintf "logic coercion %a -> %a@."
