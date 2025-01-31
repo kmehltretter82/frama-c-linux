@@ -283,6 +283,32 @@ option, no error is detected.
   \texttt{-no-warn-invalid-bool}.
 \end{description}
 
+
+\section{Performance Parameters}
+
+The following options allow the user to adjust the amount of memory
+used by Frama-C:
+
+\begin{description}
+
+\item \texttt{\optiondef{-}{memory-footprint} <1-10>}
+governs the memory usage of Frama-C.
+With smaller values, analyses consume much less memory,
+but are also slightly slower.
+The argument must be between 1 and 10; default is 6.
+
+\item \optiondef{-}{cache-size <1-10>}
+controls the amount of memory allocated to some internal caches,
+mainly used by the \Eva analysis.
+Each increase of 1 doubles the size of the caches, the default value being 2.
+Small values are most suitable for the analysis of small programs
+(less than 1000 lines), which would not benefit from larger caches.
+Higher values (around 7-8) can speed up the analysis of large code bases,
+but increase their memory usage.
+
+\end{description}
+
+
 % Local Variables:
 % TeX-master: "userman.tex"
 % ispell-local-dictionary: "english"
