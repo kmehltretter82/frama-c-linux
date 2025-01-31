@@ -26,11 +26,12 @@ import { Hbox } from 'dome/layout/boxes';
 
 import { shell } from 'electron';
 import { Button } from 'dome/controls/buttons';
+import * as Server from 'frama-c/server';
+import * as Dialogs from 'dome/dialogs';
+import { getConfig } from 'frama-c/kernel/api/services';
 
 import './style.css';
 import framacImage from './frama-c.png';
-import vNumber from '../../../VERSION?raw';
-import vCodename from '../../../VERSION_CODENAME?raw';
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C infos                                                      --- */
@@ -38,7 +39,6 @@ import vCodename from '../../../VERSION_CODENAME?raw';
 
 const synopsis = 'Frama-C is a suite of tools dedicated to the analysis of the\
 source code of software written in C.';
-const version = `${vNumber} (${vCodename})`.replace(/[\r\n]/g, '');
 const description = '\
 Frama-C gathers several analysis techniques in a single collaborative\
 framework, based on analyzers (called "plug-ins") that can build upon the\
@@ -136,13 +136,17 @@ function FramaCLogo(): JSX.Element {
   );
 }
 
-export function getAbout(): JSX.Element {
+interface AboutProps {
+  version: string;
+}
+
+function AboutModal(props: AboutProps): JSX.Element {
   return (
     <Modal className='modal-framac-infos' label='About Frama-C'>
       <>
         <FramaCLogo />
         <Hbox className='modal-framac-about'>
-          <pre>version: {version}</pre>
+          <pre>version: {props.version}</pre>
           <pre>{synopsis}</pre>
           <Hbox>
             <Button
@@ -167,7 +171,14 @@ export function getAbout(): JSX.Element {
   );
 }
 
-export function getCredits(): JSX.Element {
+export async function showAboutModal(): Promise<void> {
+  const config = await Server.send(getConfig, {});
+  const version = config.version_codename;
+  const modal = <AboutModal version = {version}/>;
+  Dialogs.showModal(modal);
+}
+
+function CreditsModal(): JSX.Element {
   return (
     <Modal className='modal-framac-infos' label='Credits'>
       <>
@@ -176,9 +187,14 @@ export function getCredits(): JSX.Element {
           <pre style={{ fontSize: '1.2em' }}>Created by:</pre>
         </Hbox>
         <div className='modal-framac-credits'>
-          {authors.map((author, i) => <div key={i} >{ author }</div>)}
+          {authors.map((author, i) => <div key={i} >{author}</div>)}
         </div>
       </>
     </Modal>
   );
+}
+
+export function showCreditsModal(): void {
+  const modal = <CreditsModal/>;
+  Dialogs.showModal(modal);
 }

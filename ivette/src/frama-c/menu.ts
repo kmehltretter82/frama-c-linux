@@ -160,14 +160,14 @@ export function init(): void {
     menu: 'Help',
     label: 'About',
     id: 'help_about',
-    onClick: () => Dialogs.showModal(HelpMenu.getAbout()),
+    onClick: HelpMenu.showAboutModal,
     kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'Help',
     label: 'Credits',
     id: 'help_credits',
-    onClick: () => Dialogs.showModal(HelpMenu.getCredits()),
+    onClick: HelpMenu.showCreditsModal,
     kind: 'normal',
   });
 }
