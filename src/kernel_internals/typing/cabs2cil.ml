@@ -161,7 +161,17 @@ let () =
   Cil.registerAttribute "FC_OLDSTYLEPROTO" (AttrName false);
   Cil.registerAttribute "static" (AttrName false);
   Cil.registerAttribute "missingproto" (AttrName false);
-  Cil.registerAttribute "dummy" AttrIgnored
+  Cil.registerAttribute "dummy" AttrIgnored;
+  Cil.registerAttribute "signal" AttrIgnored; (* AVR-specific attribute *)
+  Cil.registerAttribute "leaf" AttrIgnored;
+  Cil.registerAttribute "nonnull" AttrIgnored;
+  Cil.registerAttribute "deprecated" AttrIgnored;
+  Cil.registerAttribute "access" AttrIgnored;
+  Cil.registerAttribute "returns_twice" AttrIgnored;
+  Cil.registerAttribute "pure" AttrIgnored;
+  Cil.registerAttribute "cleanup" AttrIgnored;
+  Cil.registerAttribute "warning" AttrIgnored;
+  ()
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
