@@ -71,6 +71,7 @@ val pp_from :
 val pp_assigns : Format.formatter -> Cil_types.assigns -> unit
 val pp_file : Format.formatter -> Cil_types.file -> unit
 val pp_global : Format.formatter -> Cil_types.global -> unit
+val pp_typ_node : Cil_types.typ_node Pretty_utils.formatter
 val pp_typ : Cil_types.typ Pretty_utils.formatter
 val pp_ikind : Format.formatter -> Cil_types.ikind -> unit
 val pp_fkind : Format.formatter -> Cil_types.fkind -> unit

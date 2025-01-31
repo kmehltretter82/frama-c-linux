@@ -5999,7 +5999,7 @@ and doExp local_env
             let last = getLast !currentFunctionFDEC.sformals in
             let res = mkAddrOfAndMark e.expr_loc (var last) in
             let tres = typeOf res in
-            let tres', res' = castTo tres longType res in
+            let tres', res' = castTo tres ulongType res in
             (* Now we must add to this address to point to the next
              * argument. Round up to a multiple of 4  *)
             let sizeOfLast =
