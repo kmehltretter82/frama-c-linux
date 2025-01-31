@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Cil_types
 open Mt_types
 open Mt_shared_vars_types
 open Mt_mutexes_types
@@ -96,9 +95,11 @@ let record_end_of_thread_analysis analysis =
   (* We compute the globals variables accessed by the thread *)
   Mt_options.feedback ~level:2 "* Computing shared variables";
   let state_accesser = Mt_memory.Types.Global in
-  let read_written = Mt_shared_vars.read_written_by_function
+  let read_written =
+    Mt_shared_vars.read_written_by_thread
       (Mt_shared_vars.stmt_is_multithreaded analysis state_accesser)
-      th.th_eva_thread state_accesser th.th_fun Kglobal in
+      th.th_eva_thread
+  in
   th.th_read_written <- read_written;
   Mt_options.result ~level:3 "@[<v 0>Globals accessed by thread:@ %a@]"
     AccessesByZone.pretty_map read_written;
@@ -200,11 +201,14 @@ let recompute_shared_vars_values_changed analysis th before now =
                (fun z accesses () ->
                   if Locations.Zone.intersects z_changed z &&
                      (* YYY: recompute also threads that only write the variable?*)
-                     (SetStmtIdAccess.exists (fun (op, _,_) -> op = Read) accesses)
-                  then (
+                     (SetStmtIdAccess.exists
+                        (fun (op, _, _) -> RW.is_read op)
+                        accesses)
+                  then begin
                     ThreadState.recompute_because th' SharedVarsValuesChanged;
-                    raise Exit (* Speed up things, th' will be recomputed *) )
-               ) th'.th_read_written ()
+                    raise Exit (* Speed up things, th' will be recomputed *)
+                  end)
+               th'.th_read_written ()
            with Exit -> ()
       )
 ;;

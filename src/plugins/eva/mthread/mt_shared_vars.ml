@@ -21,6 +21,7 @@
 (**************************************************************************)
 
 open Cil_types
+open Cil_datatype
 open Visitor
 open Locations
 open Mt_cil
@@ -64,6 +65,66 @@ let remove_uninteresting_variables_zone z =
   Zone.filter_base keep_base z
 let remove_uninteresting_variables_loc loc =
   Locations.filter_base keep_base loc
+
+let error_io_whole_memory op =
+  let source = fst (RW.loc op) in
+  Mt_options.error ~source ~once:true
+    "@[%a of the whole memory.@ Ignoring to allow Mthread to continue, \
+     but the analysis will not be correct.@]"
+    RW.pretty op
+
+let filter_inout_memory =
+  let is_mthread_shared base =
+    try
+      (* Skip variable "__fc_mthread_shared", as it is only used to prevent
+         Memexec from caching some functions *)
+      let vi = Base.to_varinfo base in
+      String.equal vi.vorig_name "__fc_mthread_shared"
+    with Base.Not_a_C_variable ->
+      false
+  in
+  let filter_base base =
+    Base.is_global base && not (is_mthread_shared base)
+  in
+  Inout_memory.mk_filter ~filter_base
+
+let read_written_by_thread ?(watch_only=Locations.Zone.top) sm th =
+  let open Current_loc.Operators in
+
+  let add stmt op zone acc =
+    if Locations.Zone.is_bottom zone then
+      (* Do nothing *) acc
+    else if Locations.Zone.is_top zone then
+      let () = error_io_whole_memory op in
+      acc
+    else
+      let zone = remove_uninteresting_variables_zone zone in
+      let zone = Locations.Zone.narrow zone watch_only in
+      let state = AccessesByZone.Map acc in
+      let v = SetStmtIdAccess.inject_singleton (op, stmt, th) in
+      match AccessesByZone.add_binding state ~exact:false zone v with
+      | AccessesByZone.Bottom -> assert false (* state is not Bottom *)
+      | AccessesByZone.Top -> assert false (* Top is checked above *)
+      | AccessesByZone.Map m -> m
+  in
+
+  Inout_memory.fold
+    ~filter:filter_inout_memory
+    (fun aloc memory acc ->
+       match aloc with
+       | Global _ ->
+         (* A Global analysis location represents the initialization state and
+            is never multithreaded. *)
+         acc
+       | Local (stmt, _) ->
+         let<> UpdatedCurrentLoc = Stmt.loc stmt in
+         if sm stmt then
+           acc
+           |> add stmt (ReadAloc aloc) memory.read
+           |> add stmt (WriteAloc aloc) memory.written
+         else
+           acc)
+    AccessesByZone.empty_map
 
 (** In global mode, we do a rough analysis using the synthetic results of
     Value. In local mode, we supply precise states for each statement of the
@@ -297,12 +358,6 @@ let aux_visitor sm th sa watch_only =
   } in
   new do_it cp
 
-let _read_written_by_statement sm thid sa ?(watch_only=Locations.Zone.top) stmt =
-  let comp = aux_visitor sm thid sa watch_only in
-  comp#rw_stmt stmt;
-  comp#accesses;
-;;
-
 let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
   let comp = aux_visitor sm th sa watch_only in
   (* We position the current statement for calls to leaf functions *)
@@ -313,7 +368,6 @@ let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
   comp#rw_fun kf;
   comp#accesses;
 ;;
-
 
 let var_thread_created =
   Mt_cil.mthread_global_var "__fc_mthread_threads_running"
@@ -781,8 +835,8 @@ let register_concurrent_var_accesses analysis states =
       match ki with
       | Kglobal -> assert false
       | Kstmt s ->
-        let h = Cil_datatype.Stmt.Hashtbl.create 1 in
-        Cil_datatype.Stmt.Hashtbl.add h s state;
+        let h = Stmt.Hashtbl.create 1 in
+        Stmt.Hashtbl.add h s state;
         h
   in
   let accesses = read_written_by_function
