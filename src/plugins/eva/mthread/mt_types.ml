@@ -25,6 +25,7 @@ open Cil_datatype
 open Mt_cil
 open Mt_memory.Types
 open Mt_lib
+module ALoc = Analysis_location
 
 
 (* -------------------------------------------------------------------------- *)
@@ -33,32 +34,69 @@ open Mt_lib
 
 
 type rw = Read | Write of Locations.location
+        | ReadAloc of ALoc.t | WriteAloc of ALoc.t
 
-module RW = Datatype.Make(
-  struct
-    include Datatype.Serializable_undefined
-    type t = rw = Read | Write of Locations.location
-    let name = "rw"
-    let reprs = [Read]
-    let equal rw1 rw2 = match rw1, rw2 with
-      | Read, Read -> true
-      | Write l1, Write l2 -> Locations.Location.equal l1 l2
-      | Read, Write _ | Write _, Read -> false
-    let compare rw1 rw2 = match rw1, rw2 with
-      | Read, Read -> 0
-      | Write l1, Write l2 -> Locations.Location.compare l1 l2
-      | Read, Write _ -> -1
-      | Write _, Read -> 1
-    let hash = function
-      | Read -> 17
-      | Write l -> 39 + Locations.Location.hash l
-    let pretty fmt rw = Format.fprintf fmt "%s"
-        (match rw with
-         | Read -> "read"
-         | Write _ -> "write"
-        )
-  end)
+module RW = struct
+  include Datatype.Make(
+    struct
+      include Datatype.Serializable_undefined
+      type t = rw
+      let name = "rw"
+      let reprs = [Read]
+      let equal rw1 rw2 = match rw1, rw2 with
+        | Read, Read -> true
+        | Write l1, Write l2 -> Locations.Location.equal l1 l2
+        | Read, Write _ | Write _, Read -> false
+        | ReadAloc aloc1, ReadAloc aloc2
+        | WriteAloc aloc1, WriteAloc aloc2 -> ALoc.equal aloc1 aloc2
+        | ReadAloc _, WriteAloc _ | WriteAloc _, ReadAloc _ -> false
+        | (Read | Write _), (ReadAloc _ | WriteAloc _)
+        | (ReadAloc _ | WriteAloc _), (Read | Write _) -> false
+      let compare rw1 rw2 = match rw1, rw2 with
+        | Read, Read -> 0
+        | Write l1, Write l2 -> Locations.Location.compare l1 l2
+        | Read, Write _ -> -1
+        | Write _, Read -> 1
+        | ReadAloc aloc1, ReadAloc aloc2
+        | WriteAloc aloc1, WriteAloc aloc2 -> ALoc.compare aloc1 aloc2
+        | ReadAloc _, WriteAloc _ -> -1
+        | WriteAloc _, ReadAloc _ -> +1
+        | (Read | Write _), (ReadAloc _ | WriteAloc _) -> -2
+        | (ReadAloc _ | WriteAloc _), (Read | Write _) -> +2
+      let hash = function
+        | ReadAloc aloc -> 1 + Hashtbl.hash (1, ALoc.hash aloc)
+        | WriteAloc aloc -> 1 + Hashtbl.hash (2, ALoc.hash aloc)
+        | Write l -> 1 + Hashtbl.hash (3, Locations.Location.hash l)
+        | Read -> 0
+      let pretty fmt rw = Format.fprintf fmt "%s"
+          (match rw with
+           | Read -> "read"
+           | Write _ -> "write"
+           | ReadAloc _ -> "read"
+           | WriteAloc _ -> "write"
+          )
+    end)
 
+  let loc op =
+    match op with
+    | Read | Write _ -> Location.unknown
+    | ReadAloc aloc | WriteAloc aloc -> ALoc.loc aloc
+
+  let is_read op =
+    match op with
+    | Read -> true
+    | Write _ -> false
+    | ReadAloc _ -> true
+    | WriteAloc _ -> false
+
+  let pretty_op fmt rw = pretty fmt rw
+
+  let pretty_loc fmt rw =
+    match rw with
+    | Read -> Format.fprintf fmt "<noloc>"
+    | Write l -> Locations.Location.pretty fmt l
+    | ReadAloc aloc | WriteAloc aloc -> ALoc.pretty_loc fmt aloc
+end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Multi-threading events                                             --- *)

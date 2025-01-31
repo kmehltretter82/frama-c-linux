@@ -544,6 +544,8 @@ struct
                 match op with
                 | Read -> (true, write)
                 | Write _ -> (read, true)
+                | ReadAloc _ -> (true, write)
+                | WriteAloc _ -> (read, true)
              ) s (false, false)
          in match read_access, write_access with
          | false, false -> acc (* no access at all, [s] is empty *)
@@ -665,6 +667,9 @@ module Precise = struct
          SetNodeIdAccess.fold
            (fun (op, node, _thid as access) () ->
               match op with
+              | ReadAloc _ | WriteAloc _ ->
+                Mt_options.not_yet_implemented ~current:true ~once:true
+                  "MtSharedVars.Precise.display_shared_vars_value for ALoc"
               | Write _ -> ()
               | Read ->
                 let state = node.cfgn_value_state.state_before in
@@ -682,6 +687,9 @@ module Precise = struct
     let aux _b _itvs s acc =
       let aux_nodes (op, node, th as access) (seen, _wr as acc) =
         match op with
+        | ReadAloc _ | WriteAloc _ ->
+          Mt_options.not_yet_implemented ~current:true ~once:true
+            "MtSharedVars.Precise.enumerate_written_vars_value for ALoc"
         | Read -> acc
         | Write loc ->
           if not (WriteSeen.Set.mem (node, th, loc) seen) then
