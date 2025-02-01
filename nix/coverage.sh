@@ -38,7 +38,7 @@ RATE=$(echo "$LINE" | sed -e 's/.*line-rate=\"\(.*\)\".*/\1/')
 PERCENT="0.0"
 if [ "$RATE" != "-nan" ]; then
   # Keep the "/1", bc DOES NOT use scale for anything else than division ...
-  PERCENT=$(echo "scale=2; (100 * $RATE)/1" | bc -l)
+  PERCENT=$(echo "scale=4; (100 * $RATE)/1" | bc -l)
 fi
 
 echo "Coverage: $PERCENT%"
