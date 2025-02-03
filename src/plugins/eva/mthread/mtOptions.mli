@@ -74,8 +74,8 @@ module OnlyThreads: Parameter_sig.String_set
 (** behavior of option -mt-stop-after. *)
 module StopAfter: Parameter_sig.Int
 
-(** behavior of option -mt-keep-dot. *)
-module KeepDotFiles: Parameter_sig.Bool
+(** behavior of option -mt-concat-dot-files-to. *)
+module ConcatDotFilesTo: Parameter_sig.Filepath
 
 (** behavior of option -mt-extract. *)
 module ExtractModels: Parameter_sig.String_set

@@ -505,6 +505,29 @@ module Html = struct
     unicode
   ;;
 
+  let append_file ~input ~output ~name =
+    let create = not (Sys.file_exists output) in
+    let print_header cout =
+      Out_channel.output_string cout
+        "// Concatenated dot files. \
+         Generate all graphs with `dot -Tpng -O file.dot`\n\
+         // They will be named file.dot.png, file.dot.2.png, etc.\n\n";
+    in
+    let copy cin cout =
+      if create then print_header cout;
+      Printf.fprintf cout "// Graph for %s\n" name;
+      In_channel.input_all cin |> Out_channel.output_string cout;
+      Out_channel.output_string cout "\n\n"
+    in
+    let with_open_in = In_channel.with_open_text input in
+    let flags = [ Open_creat; Open_text; Open_wronly; Open_append ] in
+    let with_open_out = Out_channel.with_open_gen flags 0o666 output in
+    try with_open_out (fun cout -> with_open_in (fun cin -> copy cin cout))
+    with e ->
+      MtOptions.error
+        "Error while appending dot file %s to %s: %s"
+        input output (Printexc.to_string e)
+
   let mk_graph_img th =
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
@@ -513,6 +536,11 @@ module Html = struct
     let fmt = Format.formatter_of_out_channel otmp in
     MtCfg.dot_fprint_graph fmt th.th_cfg f_stmt;
     close_out otmp;
+    if not (MtOptions.ConcatDotFilesTo.is_empty ()) then begin
+      let name = Thread.label th.th_eva_thread in
+      let output = (MtOptions.ConcatDotFilesTo.get () :> string) in
+      append_file ~input:tmp_file ~output ~name
+    end;
     let dot_output_format = "svg" in
     let link_fname =
       (Format.asprintf "%s.%s" thread_name dot_output_format) in
@@ -528,10 +556,8 @@ module Html = struct
         let ret = Command.command ~timeout:60 "dot" (Array.of_list args) in
         match ret with
         | Unix.WEXITED 0 ->
-          if not (MtOptions.KeepDotFiles.get ()) then begin
-            MtOptions.debug "remove %s\n" tmp_file;
-            Sys.remove tmp_file
-          end
+          MtOptions.debug "remove %s\n" tmp_file;
+          Sys.remove tmp_file
         | Unix.WEXITED code ->
           fail (Printf.sprintf "Error (code %d)" code)
         | Unix.WSIGNALED id -> fail (Printf.sprintf "Signal %d" id)
