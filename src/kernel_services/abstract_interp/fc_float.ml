@@ -140,9 +140,11 @@ let ceil  = ceil
 let trunc  f = Typed_float.(double f |> trunc |> to_float)
 let fround f = Typed_float.(single f |> round |> to_float)
 
+type format = Format : 'f Typed_float.format -> format
+
 let format_of_prec = function
-  | Single -> Typed_float.Format (Single_supported, Single)
-  | _      -> Typed_float.Format (Double_supported, Double)
+  | Single -> Format Single
+  | _      -> Format Double
 
 type 'f number = 'f Typed_float.t
 type unary = { compute : 'f. 'f number -> 'f number }
@@ -150,13 +152,13 @@ type binary = { compute : 'f. 'f number -> 'f number -> 'f number }
 
 let unary (op : unary) rounding prec x =
   let<> RoundingMode = rounding in
-  let Format (_, fmt) = format_of_prec prec in
+  let Format fmt = format_of_prec prec in
   let x = Typed_float.represents ~float:x ~in_format:fmt in
   Typed_float.(op.compute x |> to_float)
 
 let binary (op : binary) rounding prec x y =
   let<> RoundingMode = rounding in
-  let Format (_, fmt) = format_of_prec prec in
+  let Format fmt = format_of_prec prec in
   let x = Typed_float.represents ~float:x ~in_format:fmt in
   let y = Typed_float.represents ~float:y ~in_format:fmt in
   Typed_float.(op.compute x y |> to_float)

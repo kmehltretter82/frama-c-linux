@@ -56,23 +56,8 @@ type 'f format =
   | Single : single format (** 32-bits single precision IEEE-754 format. *)
   | Double : double format (** 64-bits double precision IEEE-754 format. *)
 
-type ('format, 'encoded_as) support =
-  | Single_supported : (single, single) support
-  | Double_supported : (double, double) support
-  | Long_unsupported : (long  , double) support
-
-(** Type used to return existantially quantified formats. *)
-type resulting_format =
-  | Format : ('f, 'k) support * 'k format -> resulting_format
-
-(** Returns the format corresponding to the given [fkind]. *)
-val format_of_fkind : Cil_types.fkind -> resulting_format
-
 (** Returns the [fkind] corresponding to the given format. *)
 val fkind_of_format : 'f format -> Cil_types.fkind
-
-(** Returns the [fkind] corresponding to the given support. *)
-val fkind_of_support : ('k, 'f) support -> Cil_types.fkind
 
 (** Type used to return a proof that two formats are in fact the same. *)
 type ('l, 'r) same_format =
@@ -152,10 +137,21 @@ type 'f parsed_float =
   ; format  : 'f format
   }
 
-type parsed_result =
-  | Parsed : ('f, 'k) support * 'k parsed_float -> parsed_result
+type ('format, 'encoded_as) parsed_format =
+  | Single_supported : (single, single) parsed_format
+  | Double_supported : (double, double) parsed_format
+  | Long_unsupported : (long  , double) parsed_format
 
+type parsed_result =
+  | Parsed : ('f, 'k) parsed_format * 'k parsed_float -> parsed_result
+
+(** Parses the given string and returns the parsed float and its kind (single,
+    double or long) according to its suffix, if any. Strings with no suffix
+    are parsed as double. *)
 val parse : string -> parsed_result
+
+(** Returns the floating-point kind parsed by [parse]. *)
+val parsed_fkind : ('k, 'f) parsed_format -> Cil_types.fkind
 
 
 

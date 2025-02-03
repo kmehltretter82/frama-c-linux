@@ -929,7 +929,9 @@ let reinterpret_as_float kind i =
        The float are of the same sign as the integer they convert into.
        Furthermore, the conversion function is increasing on the positive
        interval, and decreasing on the negative one. *)
-    let reinterpret size kind conv min_f max_f =
+    let reinterpret size kind format conv =
+      let minf, maxf = Typed_float.finite_range_of ~format in
+      let min_f, max_f = Typed_float.(bits_encoding minf, bits_encoding maxf) in
       let size = Integer.of_int size in
       let i = cast_int_to_int ~size ~signed:true i in
       (* Intersect [i'] with [i], and return the (finite) bounds directly. *)
@@ -966,16 +968,13 @@ let reinterpret_as_float kind i =
       let f = Bottom.join_list Fval.join (pos :: neg :: nan) in
       inject_float (Bottom.non_bottom f)
     in
-    let Format (_, format) = Typed_float.format_of_fkind kind in
-    let minf, maxf = Typed_float.finite_range_of ~format in
-    let minf, maxf = Typed_float.(bits_encoding minf, bits_encoding maxf) in
     match kind with
     | Cil_types.FDouble ->
       let conv v = Fval.F.of_float (Int64.float_of_bits (Int.to_int64_exn v)) in
-      reinterpret 64 Fval.Double conv minf maxf
+      reinterpret 64 Fval.Double Typed_float.Double conv
     | Cil_types.FFloat ->
       let conv v = Fval.F.of_float(Int32.float_of_bits (Int.to_int32_exn v)) in
-      reinterpret 32 Fval.Single conv minf maxf
+      reinterpret 32 Fval.Single Typed_float.Single conv
     | Cil_types.FLongDouble ->
       (* currently always imprecise *)
       top_float

@@ -32,10 +32,10 @@ type 'f format =
   | Single : single format
   | Double : double format
 
-type ('f, 'k) support =
-  | Single_supported : (single, single) support
-  | Double_supported : (double, double) support
-  | Long_unsupported : (long  , double) support
+type ('f, 'k) parsed_format =
+  | Single_supported : (single, single) parsed_format
+  | Double_supported : (double, double) parsed_format
+  | Long_unsupported : (long  , double) parsed_format
 
 type 'f t =
   | Float : float * 'f format -> 'f t
@@ -62,18 +62,13 @@ external fmod  : 'f format -> float -> float -> float = "frama_c_fmod"
 
 
 type resulting_format =
-  | Format : ('f, 'k) support * 'k format -> resulting_format
-
-let format_of_fkind = function
-  | Cil_types.FFloat      -> Format (Single_supported, Single)
-  | Cil_types.FDouble     -> Format (Double_supported, Double)
-  | Cil_types.FLongDouble -> Format (Long_unsupported, Double)
+  | Format : ('f, 'k) parsed_format * 'k format -> resulting_format
 
 let fkind_of_format : type f. f format -> Cil_types.fkind = function
   | Single -> Cil_types.FFloat
   | Double -> Cil_types.FDouble
 
-let fkind_of_support : type k f. (k, f) support -> Cil_types.fkind = function
+let parsed_fkind : type k f. (k, f) parsed_format -> Cil_types.fkind = function
   | Single_supported -> Cil_types.FFloat
   | Double_supported -> Cil_types.FDouble
   | Long_unsupported -> Cil_types.FLongDouble
@@ -240,7 +235,7 @@ type 'f parsed_float =
   }
 
 type parsed_result =
-  | Parsed : ('f, 'k) support * 'k parsed_float -> parsed_result
+  | Parsed : ('f, 'k) parsed_format * 'k parsed_float -> parsed_result
 
 type ('a, 'f) normalizing =
   | Normalized : 'a -> ('a, 'f) normalizing
