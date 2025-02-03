@@ -324,21 +324,6 @@ val has_flexible_array_member: typ -> bool
     @before 24.0-Chromium this function didn't take in account the GCC/MSVC mode
 *)
 
-(** Unroll a type until it exposes a non [TNamed]. Will collect all attributes
-    appearing in [TNamed] and add them to the final type using
-    {!Cil.typeAddAttributes}. *)
-val unrollType: typ -> typ
-
-(** Same than {!Cil.unrollType} but discard the final type attributes and only
-    return its node.
-    @since Frama-c+Dev *)
-val unrollTypeNode: typ -> typ_node
-
-(** Unroll all the TNamed in a type (even under type constructors such as
-    [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
-    types. Will collect all attributes *)
-val unrollTypeDeep: typ -> typ
-
 (** returns the type of the result of an arithmetic operator applied to
     values of the corresponding input types.
     @since Nitrogen-20111001 (moved from Cabs2cil)
@@ -1353,86 +1338,6 @@ val isGlobalInitConst: varinfo -> bool
 *)
 val typeDeepDropAllAttributes: typ -> typ
 
-(** Returns all the attributes contained in a type. This requires a traversal
-    of the type structure, in case of composite, enumeration and named types *)
-val typeAttrs: typ -> attribute list
-
-(** Add some attributes to a type. Qualifiers attributes are recursively pushed
-    into array elements type until a non-array type is found.
-    [combine] explains how to combine attributes.
-    Default is {!Ast_attributes.add_list}.
-
-    @before 28.0-Nickel [combine] does not exist *)
-val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
-  attribute list -> typ -> typ
-
-(** Remove all attributes with the given names from a type. Note that this
-    does not remove attributes from typedef and tag definitions, just from
-    their uses (unfolding the type definition when needed).
-    It only removes attributes of topmost type, i.e. does not
-    recurse under pointers, arrays, ...
-*)
-val typeRemoveAttributes: string list -> typ -> typ
-
-(** same as above, but remove any existing attribute from the type.
-
-    @since Magnesium-20151001
-*)
-val typeRemoveAllAttributes: typ -> typ
-
-(** Same as [typeRemoveAttributes], but recursively removes the given
-    attributes from inner types as well. Mainly useful to check whether
-    two types are equal modulo some attributes. See also
-    [typeDeepDropAllAttributes], which will strip every single attribute
-    from a type.
-*)
-val typeRemoveAttributesDeep: string list -> typ -> typ
-
-val typeHasAttribute: string -> typ -> bool
-(** Does the type have the given attribute. Does
-    not recurse through pointer types, nor inside function prototypes.
-    @since Sodium-20150201 *)
-
-val typeHasQualifier: string -> typ -> bool
-(** Does the type have the given qualifier. Handles the case of arrays, for
-    which the qualifiers are actually carried by the type of the elements.
-    It is always correct to call this function instead of {!typeHasAttribute}.
-    For l-values, both functions return the same results, as l-values cannot
-    have array type.
-    @since Sodium-20150201 *)
-
-val typeHasAttributeMemoryBlock: string -> typ -> bool
-(** [typeHasAttributeMemoryBlock attr t] is
-    [true] iff at least one component of an object of type [t] has attribute
-    [attr]. In other words, it searches for [attr] under aggregates, but not
-    under pointers.
-
-    @since Chlorine-20180501 replaces typeHasAttributeDeep (name too ambiguous)
-*)
-
-(** Remove all attributes relative to const, volatile and restrict attributes
-    @since Nitrogen-20111001
-*)
-val type_remove_qualifier_attributes: typ -> typ
-
-(**
-   remove also qualifiers under Ptr and Arrays
-   @since Sodium-20150201
-*)
-val type_remove_qualifier_attributes_deep: typ -> typ
-
-(** Remove all attributes relative to const, volatile and restrict attributes
-    when building a C cast
-    @since Oxygen-20120901
-*)
-val type_remove_attributes_for_c_cast: typ -> typ
-
-(** Remove all attributes relative to const, volatile and restrict attributes
-    when building a logic cast
-    @since Oxygen-20120901
-*)
-val type_remove_attributes_for_logic_type: typ -> typ
-
 (** Convert an expression into an attrparam, if possible. Otherwise raise
     NotAnAttrParam with the offending subexpression *)
 val expToAttrParam: exp -> attrparam
@@ -1491,26 +1396,6 @@ val isVolatileLval : lval -> bool
 val isVolatileTermLval : term_lval -> bool
 (** Check if the l-value has a volatile part
     @since Sulfur-20171101 *)
-
-(* ************************************************************************* *)
-(** {2 Ghost Attribute} *)
-(* ************************************************************************* *)
-
-val isGhostType : typ -> bool
-(** Check for ["ghost"] qualifier from the type of an l-value (do not follow pointer)
-    @return true iff a part of the related l-value has ["ghost"] qualifier
-    @since 21.0-Scandium *)
-
-val isWFGhostType : typ -> bool
-(** Check if the received type is well-formed according to \ghost semantics, that is
-    once the type is not ghost anymore, \ghost cannot appear again.
-    @return true iff the type is well formed
-    @since 21.0-Scandium *)
-
-val typeAddGhost : typ -> typ
-(** Add the ghost attribute to a type (does nothing if the type is alreay ghost)
-    @return the ghost qualified original type
-    @since 26.0-Iron *)
 
 (* ************************************************************************* *)
 (** {2 The visitor} *)
@@ -2327,21 +2212,6 @@ val set_extension_handler:
 *)
 
 (* ************************************************************************* *)
-(** {2 Deprecated types functions}                                           *)
-(* ************************************************************************* *)
-
-(** Returns the attributes of a type.
-    @deprecated Frama-C+dev *)
-val typeAttr: typ -> attribute list
-[@@alert deprecated "Use [t.tattr] instead."]
-
-(** Sets the attributes of the type to the given list. Previous attributes
-    are discarded.
-    @deprecated Frama-C+dev *)
-val setTypeAttrs: typ -> attributes -> typ
-[@@alert deprecated "Use [{t with tattr = ...}] instead."]
-
-(* ************************************************************************* *)
 (** {2 Deprecated values moved to Ast_attributes}                            *)
 (* ************************************************************************* *)
 
@@ -2512,3 +2382,145 @@ val frama_c_mutable: string
 val frama_c_inlined: string
 [@@deprecated "Use Ast_attributes.frama_c_inlined instead."]
 [@@migrate { repl = Ast_attributes.frama_c_inlined } ]
+
+(* ************************************************************************* *)
+(** {2 Deprecated values moved to Ast_types}                                 *)
+(* ************************************************************************* *)
+
+(** Returns the attributes of a type.
+    @deprecated Frama-C+dev *)
+val typeAttr: typ -> attribute list
+[@@deprecated "Use [t.tattr] instead."]
+
+(** Sets the attributes of the type to the given list. Previous attributes
+    are discarded.
+    @deprecated Frama-C+dev *)
+val setTypeAttrs: typ -> attributes -> typ
+[@@deprecated "Use [{t with tattr = ...}] instead."]
+
+(** Returns all the attributes contained in a type. This requires a traversal
+    of the type structure, in case of composite, enumeration and named types *)
+val typeAttrs: typ -> attribute list
+[@@deprecated "Use Ast_types.type_attrs instead."]
+
+(** Add some attributes to a type.
+    [combine] explains how to combine attributes. Default is [addAttributes].
+
+    @before 28.0-Nickel [combine] does not exist *)
+val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
+  attribute list -> typ -> typ
+[@@deprecated "Use Ast_types.type_add_attributes instead."]
+
+(** Remove all attributes with the given names from a type. Note that this
+    does not remove attributes from typedef and tag definitions, just from
+    their uses (unfolding the type definition when needed).
+    It only removes attributes of topmost type, i.e. does not
+    recurse under pointers, arrays, ...
+*)
+val typeRemoveAttributes: string list -> typ -> typ
+[@@deprecated "Use Ast_types.type_remove_attributes instead."]
+
+(** same as above, but remove any existing attribute from the type.
+
+    @since Magnesium-20151001
+*)
+val typeRemoveAllAttributes: typ -> typ
+[@@deprecated "Use Ast_types.type_remove_all_attributes instead."]
+
+(** Same as [typeRemoveAttributes], but recursively removes the given
+    attributes from inner types as well. Mainly useful to check whether
+    two types are equal modulo some attributes. See also
+    [typeDeepDropAllAttributes], which will strip every single attribute
+    from a type.
+*)
+val typeRemoveAttributesDeep: string list -> typ -> typ
+[@@deprecated "Use Ast_types.type_remove_attributes_deep instead."]
+
+val typeHasAttribute: string -> typ -> bool
+(** Does the type have the given attribute. Does
+    not recurse through pointer types, nor inside function prototypes.
+    @since Sodium-20150201 *)
+[@@deprecated "Use Ast_types.type_has_attribute instead."]
+
+val typeHasQualifier: string -> typ -> bool
+(** Does the type have the given qualifier. Handles the case of arrays, for
+    which the qualifiers are actually carried by the type of the elements.
+    It is always correct to call this function instead of {!typeHasAttribute}.
+    For l-values, both functions return the same results, as l-values cannot
+    have array type.
+    @since Sodium-20150201 *)
+[@@deprecated "Use Ast_types.type_has_qualifier instead."]
+
+val typeHasAttributeMemoryBlock: string -> typ -> bool
+(** [typeHasAttributeMemoryBlock attr t] is
+    [true] iff at least one component of an object of type [t] has attribute
+    [attr]. In other words, it searches for [attr] under aggregates, but not
+    under pointers.
+
+    @since Chlorine-20180501 replaces typeHasAttributeDeep (name too ambiguous)
+*)
+[@@deprecated "Use Ast_types.type_has_attribute_memory_block instead."]
+
+(** Remove all attributes relative to const, volatile and restrict attributes
+    @since Nitrogen-20111001
+*)
+val type_remove_qualifier_attributes: typ -> typ
+[@@deprecated "Use Ast_types.type_remove_qualifier_attributes instead."]
+
+(**
+   remove also qualifiers under Ptr and Arrays
+   @since Sodium-20150201
+*)
+val type_remove_qualifier_attributes_deep: typ -> typ
+[@@deprecated "Use Ast_types.type_remove_qualifier_attributes_deep instead."]
+
+(** Remove all attributes relative to const, volatile and restrict attributes
+    when building a C cast
+    @since Oxygen-20120901
+*)
+val type_remove_attributes_for_c_cast: typ -> typ
+[@@deprecated "Use Ast_types.type_remove_attributes_for_c_cast instead."]
+
+(** Remove all attributes relative to const, volatile and restrict attributes
+    when building a logic cast
+    @since Oxygen-20120901
+*)
+val type_remove_attributes_for_logic_type: typ -> typ
+[@@deprecated "Use Ast_types.type_remove_attributes_for_logic_type instead."]
+
+val typeAddGhost : typ -> typ
+(** Add the ghost attribute to a type (does nothing if the type is alreay ghost)
+    @return the ghost qualified original type
+    @since 26.0-Iron *)
+[@@deprecated "Use Ast_types.type_add_ghost instead."]
+
+val isGhostType : typ -> bool
+(** Check for ["ghost"] qualifier from the type of an l-value (do not follow pointer)
+    @return true iff a part of the related l-value has ["ghost"] qualifier
+    @since 21.0-Scandium *)
+[@@deprecated "Use Ast_types.is_ghost_type instead."]
+
+val isWFGhostType : typ -> bool
+(** Check if the received type is well-formed according to \ghost semantics, that is
+    once the type is not ghost anymore, \ghost cannot appear again.
+    @return true iff the type is well formed
+    @since 21.0-Scandium *)
+[@@deprecated "Use Ast_types.is_wellformed_ghost_type instead."]
+
+(** Unroll a type until it exposes a non [TNamed]. Will collect all attributes
+    appearing in [TNamed] and add them to the final type using
+    {!Ast_attributes.add}. *)
+val unrollType: typ -> typ
+[@@deprecated "Use Ast_types.unroll_type instead."]
+
+(** Same than {!Cil.unrollType} but discard the final type attributes and only
+    return its node.
+    @since Frama-c+Dev *)
+val unrollTypeNode: typ -> typ_node
+[@@deprecated "Use Ast_types.unroll_type_node instead."]
+
+(** Unroll all the TNamed in a type (even under type constructors such as
+    [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
+    types. Will collect all attributes *)
+val unrollTypeDeep: typ -> typ
+[@@deprecated "Use Ast_types.unroll_type_deep instead."]
