@@ -106,6 +106,10 @@ val trim : buffer -> int * int
 (** Resize the buffer to roughly fit its actual content. *)
 val shrink : buffer -> unit
 
+(** [truncate buffer size] truncates the content of [buffer] if longer than
+    [size] characters. Returns true if the bufffer has been truncated. *)
+val truncate : buffer -> int -> bool
+
 (* -------------------------------------------------------------------------- *)
 (** Printer *)
 (* -------------------------------------------------------------------------- *)

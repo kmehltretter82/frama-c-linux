@@ -8,3 +8,8 @@
   (enabled_if %{bin-available:gcc})
   (deps pragma-pack.c pragma-pack-utils.h)
 )
+
+(cram
+  (applies_to log-truncation)
+  (enabled_if %{bin-available:socat})
+)

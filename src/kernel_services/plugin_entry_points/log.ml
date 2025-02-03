@@ -20,6 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Messages longer than N characters are truncated when printed on terminal. *)
+let max_message_length = 10000
+
 type kind = Result | Feedback | Debug | Warning | Error | Failure
 
 [@@@ warning "-32"]
@@ -467,6 +470,7 @@ let logtransient channel text =
        try
          Format.pp_print_newline fmt () ;
          Format.pp_print_flush fmt () ;
+         ignore (Rich_text.truncate buffer max_message_length) ;
          let p,q = Rich_text.trim buffer in
          do_transient channel.terminal (Rich_text.contents buffer) p q ;
          close_buffer channel
@@ -497,11 +501,19 @@ let logwithfinal finally channel
          Format.pp_close_box fmt () ;
          Format.pp_print_newline fmt () ;
          Format.pp_print_flush fmt () ;
+         let truncated =
+           if channel.terminal.isatty
+           then Rich_text.truncate buffer max_message_length
+           else false
+         in
          let p,q = Rich_text.trim buffer in
          let output =
            if p <= q then
              let source = get_source current source in
              let message = Rich_text.range buffer p q in
+             let message =
+               if truncated then "(truncated message) " ^ message else message
+             in
              let event = {
                evt_kind = kind ;
                evt_plugin = channel.plugin ;
