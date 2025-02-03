@@ -169,7 +169,7 @@ class visit_adding_code_for_synchronisation =
       (* in particular get rid of __no_return if set in vi*)
 
       let arg =
-        if Cil.isVoidType rettype
+        if Ast_types.is_void_type rettype
         then []
         else ["res",rettype,[]]
       in
@@ -940,7 +940,7 @@ class visit_adding_pre_post_from_buch treatloops =
            let bhvs =
              (* if return type is not void, convert \result in the formal
                 arg of current kf. Otherwise, there's no conversion to do. *)
-             if Cil.isVoidType rt then bhvs
+             if Ast_types.is_void_type rt then bhvs
              else (Visitor.visitFramacBehaviors
                      (new change_result my_kf) (* LBLsformals : change_result must not be called
                                                   if f_post has no arguments, ie no formals for a

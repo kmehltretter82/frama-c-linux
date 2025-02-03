@@ -169,7 +169,7 @@ let assign ?(ltype) lhs rhs loc =
           If this is the case then the analysis takes the value of a variable.
        *)
        | Lval lv ->
-         if Cil.isPointerType (Ast_types.unroll_type (Cil.typeOfLval lv)) then
+         if Ast_types.is_pointer_type (Ast_types.unroll_type (Cil.typeOfLval lv)) then
            Cil.mkAddrOf ~loc lv, Indirect
          else
            rhs, Direct
@@ -337,7 +337,7 @@ end = struct
         definition otherwise there is no point. *)
     let has_def = Functions.has_fundef fexp in
     let env =
-      if Cil.isFunctionType (Cil.typeOf fexp) || has_def then
+      if Ast_types.is_function_type (Cil.typeOf fexp) || has_def then
         save_params loc args env kf
       else
         env
@@ -419,7 +419,7 @@ let track_argument ?(typ) param index env =
 let handle_return_stmt loc ret env =
   match ret.enode with
   | Lval lv ->
-    if Cil.isPointerType (Cil.typeOfLval lv) then
+    if Ast_types.is_pointer_type (Cil.typeOfLval lv) then
       let exp = Cil.mkAddrOf ~loc lv in
       let stmt = Mk.handle_return_referent ~loc ~save:true exp in
       Env.add_stmt ~post:false env stmt

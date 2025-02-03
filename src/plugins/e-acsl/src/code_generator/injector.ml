@@ -813,7 +813,7 @@ let inject_mtracking_handler main =
         | [] ->
           (* no arguments to main given *)
           nulls
-        | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
+        | _argc :: argv :: _ when Ast_types.is_pointer_type argv.vtype ->
           (* grab addresses of arguments for a call to the main initialization
              function, i.e., [__e_acsl_memory_init] *)
           List.map Cil.mkAddrOfVi fundec.sformals;

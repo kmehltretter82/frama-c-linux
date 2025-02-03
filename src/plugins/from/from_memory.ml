@@ -221,7 +221,7 @@ let pretty_with_type ~indirect typ fmt assigns =
       then pretty_ind_data
       else pretty
     in
-    if Cil.isVoidType rt_typ
+    if Ast_types.is_void_type rt_typ
     then begin
       if is_empty memory
       then Format.fprintf fmt "@[NO EFFECTS@]"

@@ -1,7 +1,7 @@
 let well_typed_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
-    not (Cil.isVoidPtrType t) && Cil.isPointerType t
+    not (Ast_types.is_void_ptr_type t) && Ast_types.is_pointer_type t
   | _ -> false
 
 let key_from_call _ _ = function

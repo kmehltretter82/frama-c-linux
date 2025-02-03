@@ -544,7 +544,7 @@ struct
       Cil.(new_exp ~loc (Cil_types.UnOp (op, mkCastT ~oldt ~newt e', oldt)))
     | Binop (op,e1,e2) ->
       let is_pointer_type e =
-        Cil.(isPointerType (typeOf e))
+        Ast_types.is_pointer_type (Cil.typeOf e)
       in
       let e1' = build_exp ~scope ~loc e1
       and e2' = build_exp ~scope ~loc e2 in
@@ -576,7 +576,7 @@ struct
       let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv
       and t' = build_term ~scope ~loc ~restyp t in
       let lty = Cil.typeOfTermLval tlv' in
-      begin match Logic_utils.unroll_type lty with
+      begin match Logic_utils.unroll_logic_type lty with
         | Ctype { tnode = TArray _ } ->
           let offset' = Cil_types.(TIndex (t', TNoOffset)) in
           host, Logic_const.addTermOffset offset' offset
@@ -589,7 +589,7 @@ struct
       end
     | (Field (tlv,_) | FieldNamed (tlv,_)) as t ->
       let (host, offset) as tlv' = build_term_lval ~scope ~loc ~restyp tlv in
-      let lty = match Logic_utils.unroll_type (Cil.typeOfTermLval tlv') with
+      let lty = match Logic_utils.unroll_logic_type (Cil.typeOfTermLval tlv') with
         | Ctype cty -> Cil_types.Ctype (Ast_types.unroll_type_deep cty)
         | lty -> lty
       in

@@ -105,7 +105,7 @@ let translate_va_builtin caller inst =
       | _ -> Self.abort "Unexpected arguments to va_arg"
     in
     (* Check validity of type *)
-    if Cil.isIntegralType ty then begin
+    if Ast_types.is_integral_type ty then begin
       let promoted_type = Cil.integralPromotion ty in
       if promoted_type <> ty then
         Self.warning ~current:true ~wkey:wkey_typing

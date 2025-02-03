@@ -191,7 +191,7 @@ let apply_on_all_locs f loc state =
 (* Display [o] as a single value, when this is more readable and more precise
    than the standard display. *)
 let pretty_stitched_offsetmap fmt typ o =
-  if Cil.isScalarType typ &&
+  if Ast_types.is_scalar_type typ &&
      not (Cvalue.V_Offsetmap.is_single_interval o)
   then
     match v_uninit_of_offsetmap ~typ o with

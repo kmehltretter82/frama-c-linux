@@ -59,7 +59,7 @@ struct
   let datatype = "Static"
   let param x =
     let open Cil_types in
-    if x.vaddrof || Cil.isArrayType x.vtype || Cil.isPointerType x.vtype
+    if x.vaddrof || Ast_types.is_array_type x.vtype || Ast_types.is_pointer_type x.vtype
     then MemoryContext.ByAddr else MemoryContext.ByValue
   let iter = Raw.iter
 end
@@ -1129,7 +1129,8 @@ struct
       (* Structure initialization is not monotonic *)
       | C_comp _ -> p_true
       (* Neither is initialization of arrays of structures *)
-      | C_array { arr_element=t } when Cil.isStructOrUnionType t -> p_true
+      | C_array { arr_element=t }
+        when Ast_types.is_struct_or_union_type t -> p_true
 
       | C_int _ | C_float _ | C_pointer _ ->
         p_imply
@@ -1157,7 +1158,7 @@ struct
     | Val((CVAL|CREF),x,ofs) ->
       let value = Lang.freshvar ~basename:"v" (tau_of_object obj) in
       memvar_stored KValue seq x ofs (e_var value) ::
-      if Cil.isStructOrUnionType x.vtype then []
+      if Ast_types.is_struct_or_union_type x.vtype then []
       else begin
         let init = Lang.freshvar ~basename:"v" (init_of_object obj) in
         Assert(monotonic_initialized seq obj x ofs) ::

@@ -209,7 +209,7 @@ let guess_intended_malloc_type stack sizev constant_size =
   in
   let mk_typed_size t =
     match Ast_types.unroll_type_node t with
-    | TPtr t when not (Cil.isVoidType t) ->
+    | TPtr t when not (Ast_types.is_void_type t) ->
       let s = Int.of_int (Cil.bytesSizeOf t) in
       if Int.(equal s zero) ||
          (Int.equal (Int.e_rem size_min s) Int.zero &&

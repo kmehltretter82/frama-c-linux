@@ -87,7 +87,7 @@ let well_typed_call _ret _fct args =
   match args with
   | [ ptr ] ->
     let t = Cil.typeOf (Cil.stripCasts ptr) in
-    Cil.isPointerType t && not (Cil.isVoidPtrType t)
+    Ast_types.is_pointer_type t && not (Ast_types.is_void_ptr_type t)
   | _ -> false
 
 let key_from_call _ret _fct args =

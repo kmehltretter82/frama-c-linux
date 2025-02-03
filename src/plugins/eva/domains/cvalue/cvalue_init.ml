@@ -135,7 +135,7 @@ let initialize_var_using_type varinfo state =
       let context_max_width =
         Parameters.AutomaticContextMaxWidth.get ()
       in begin
-        match Cil.isVoidType typ', Cil.isFunctionType typ' with
+        match Ast_types.is_void_type typ', Ast_types.is_function_type typ' with
         | false, false -> (* non-void, non-function *)
           let i =
             match Ast_attributes.find_params "arraylen" attr with

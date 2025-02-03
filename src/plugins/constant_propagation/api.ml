@@ -72,7 +72,7 @@ class propagate project fnames ~cast_intro = object(self)
     in
     must_add_decl <- Varinfo.Set.add vi' must_add_decl;
     known_globals <- Varinfo.Set.add vi known_globals;
-    if Cil.isFunctionType vi.vtype then begin
+    if Ast_types.is_function_type vi.vtype then begin
       let kf = Globals.Functions.get vi in
       let new_kf = Visitor_behavior.Memo.kernel_function self#behavior kf in
       Queue.add (fun () -> Globals.Functions.register new_kf)
@@ -157,10 +157,10 @@ class propagate project fnames ~cast_intro = object(self)
           let offset = Ival.project_int m in (* these are bytes *)
           let expr' =
             try
-              if not (Cil.isPointerType typ_e) then
+              if not (Ast_types.is_pointer_type typ_e) then
                 raise Bit_utils.NoMatchingOffset;
               let typ_pointed = Ast_types.unroll_type (Cil.typeOf_pointed typ_e) in
-              if Cil.isVoidType typ_pointed then
+              if Ast_types.is_void_type typ_pointed then
                 raise Bit_utils.NoMatchingOffset;
               let offset = Integer.mul offset Integer.eight in
               let m = Bit_utils.MatchType typ_pointed in
@@ -172,7 +172,7 @@ class propagate project fnames ~cast_intro = object(self)
                  when [idx] or [rem] is zero. *)
               let array, idx, rem =
                 let array, sizeof_pointed =
-                  let array = Cil.isArrayType vi.vtype in
+                  let array = Ast_types.is_array_type vi.vtype in
                   let size = if array
                     then Bit_utils.osizeof_pointed vi.vtype
                     else Bit_utils.osizeof vi.vtype
@@ -307,7 +307,7 @@ class propagate project fnames ~cast_intro = object(self)
            PropagationParameters.feedback ~level:2
              "Adding declaration of global %a" Printer.pp_varinfo vi;
            let g' =
-             if Cil.isFunctionType vi.vtype
+             if Ast_types.is_function_type vi.vtype
              then GFunDecl(Cil.empty_funspec(), vi, vi.vdecl)
              else GVarDecl(vi, vi.vdecl)
            in

@@ -100,7 +100,7 @@ class visitor = object
     if Varinfo.Hashtbl.mem varinfos_visited vi then
       Cil.SkipChildren
     else begin
-      if Cil.isFunctionType vi.vtype then begin
+      if Ast_types.is_function_type vi.vtype then begin
         if vi.vname <> "main"
         && not (Cil_builtins.is_builtin vi)
         && not (Cil.is_in_libc vi.vattr) then

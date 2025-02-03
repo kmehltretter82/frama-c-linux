@@ -226,7 +226,7 @@ let inliner functions_to_inline = object (self)
             | None, Some _ -> false, return, args
             | None, None ->
               let rt, _, _,_ = Cil.splitFunctionTypeVI f in
-              if Cil.isVoidType rt then false,return, args
+              if Ast_types.is_void_type rt then false,return, args
               else begin
                 let scope = Stack.top block_stack in
                 let v =

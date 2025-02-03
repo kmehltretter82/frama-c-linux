@@ -139,11 +139,11 @@ let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
   | "none" -> false
   | "all" -> true
-  | "pointer" -> Cil.isPointerType (Ast_types.unroll_type typ)
+  | "pointer" -> Ast_types.(is_pointer_type (unroll_type typ))
   | _ -> assert false
 
 let propagate_all_pointer_comparison typ =
-  not (Cil.isPointerType typ)
+  not (Ast_types.is_pointer_type typ)
   || Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let comparison_kind = function
@@ -599,7 +599,7 @@ module Make
     | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
-    if Cil.isIntegralType typ then
+    if Ast_types.is_integral_type typ then
       match op with
       | Div | Mod ->
         (* The behavior of a%b is undefined if the behavior of a/b is undefined,
@@ -651,7 +651,7 @@ module Make
       then result
       else
         let zero_or_one = Value.(join zero one) in
-        if Cil.isPointerType typ then
+        if Ast_types.is_pointer_type typ then
           Self.result
             ~current:true ~once:true
             ~dkey:Self.dkey_pointer_comparison
@@ -791,7 +791,7 @@ module Make
         match src_type, dst_type with
         | TSPtr src, TSInt dst ->
           let alarm =
-            if Cil.is_intptr_t dst_typ || Cil.is_uintptr_t dst_typ
+            if Ast_types.is_intptr_t dst_typ || Ast_types.is_uintptr_t dst_typ
             then NoAlarm
             else PtrDowncast
           in

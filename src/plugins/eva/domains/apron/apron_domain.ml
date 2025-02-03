@@ -554,7 +554,7 @@ module Make (Man : Input) = struct
      into Apron intervals. *)
   let make_oracle valuation =
     fun exp exn ->
-    if Cil.isIntegralType exp.typ then
+    if Ast_types.is_integral_type exp.typ then
       match valuation.Abstract_domain.find exp with
       | `Value { value = { v = `Value itv } } ->
         let interval = ival_to_interval itv in

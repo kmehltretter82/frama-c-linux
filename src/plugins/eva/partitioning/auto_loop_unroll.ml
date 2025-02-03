@@ -210,7 +210,7 @@ type var_status =
                  in the loop. *)
   | Unsuitable (* Cannot be used for the heuristic. *)
 
-let is_integer lval = Cil.isIntegralType lval.Eva_ast.typ
+let is_integer lval = Ast_types.is_integral_type lval.Eva_ast.typ
 
 (* Computes the status of a lvalue for the heuristic, according to the
    loop effects. Uses [eval_ptr] to compute the bases pointed by pointer
@@ -353,7 +353,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     (* Is the expression [e] equal to the lvalue [lval] (modulo cast)? *)
     let rec is_lval (e : Eva_ast.exp) = match e.node with
       | Lval lv -> Eva_ast.Lval.equal lval lv
-      | CastE (typ, e) -> Cil.isIntegralType typ && is_lval e
+      | CastE (typ, e) -> Ast_types.is_integral_type typ && is_lval e
       | _ -> false
     in
     match Eva_ast.fold_to_integer expr with
@@ -368,7 +368,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
         else if is_lval e2 && binop = PlusA
         then add_to_delta context binop acc e1
         else raise NoIncrement
-      | CastE (typ, e) when Cil.isIntegralType typ ->
+      | CastE (typ, e) when Ast_types.is_integral_type typ ->
         delta_assign context lval e acc
       | _ -> raise NoIncrement
 

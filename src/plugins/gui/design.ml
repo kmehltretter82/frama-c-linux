@@ -300,7 +300,7 @@ let go_to_definition selected main_ui =
       | Var vi, _ when vi.vsource && vi.vglob ->
         let typ = Cil.typeOfLval lv in
         let glob =
-          if Cil.isFunctionType typ
+          if Ast_types.is_function_type typ
           then Kernel_function.get_global (Globals.Functions.get vi)
           else GVarDecl (vi, Location.unknown)
         in
@@ -532,7 +532,7 @@ let to_do_on_select
 
     | PLval (kf, ki,lv) ->
       let ty = typeOfLval lv in
-      if isFunctionType ty then begin
+      if Ast_types.is_function_type ty then begin
         begin
           match ki with
           | Kstmt s -> ignore (view_original s)
@@ -599,7 +599,7 @@ let to_do_on_select
         main_ui#pretty_information
           "This is the last declaration or definition of %s %a.@\n\
            It is %sreferenced and its address is %staken.@."
-          (if Cil.isFunctionType vi.vtype
+          (if Ast_types.is_function_type vi.vtype
            then "function" else "global variable")
           Varinfo.pretty vi
           (if vi.vreferenced then "" else "not ")

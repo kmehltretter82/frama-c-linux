@@ -167,7 +167,8 @@ let reduce_to_valid_location kind term loc =
 let term_as_address term =
   match term.it_content.term_node with
   | TAddrOf (TVar lv, _) | TStartOf (TVar lv, _) -> lv.lv_origin
-  | TLval (TVar lv, _) when Cil.isLogicFunctionType lv.lv_type -> lv.lv_origin
+  | TLval (TVar lv, _) when Ast_types.is_logic_function_type lv.lv_type ->
+    lv.lv_origin
   | _ -> None
 
 let precise_loc_of_assign env kind term =

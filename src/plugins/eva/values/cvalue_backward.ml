@@ -24,7 +24,7 @@ open Cil_types
 open Cvalue
 
 let propagate_all_comparison typ =
-  not (Cil.isPointerType typ) ||
+  not (Ast_types.is_pointer_type typ) ||
   Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let backward_int_relation typ op v1 v2 =
@@ -344,11 +344,11 @@ let backward_unop ~typ_arg op ~arg:_ ~res =
   | Neg ->
     try
       let v = V.project_ival res in
-      if Cil.isIntegralType typ_arg then
+      if Ast_types.is_integral_type typ_arg then
         let v = V.inject_ival (Ival.neg_int v) in
         Some (Cvalue_forward.reinterpret typ_arg v)
       else begin
-        assert (Cil.isFloatingType typ_arg);
+        assert (Ast_types.is_floating_type typ_arg);
         let f = Ival.project_float v in
         Some (V.inject_ival (Ival.inject_float (Fval.neg f)))
       end

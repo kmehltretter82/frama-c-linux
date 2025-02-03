@@ -99,7 +99,7 @@ and lookup env e = function
       | Memory.Mchunk m -> Chunk(m,flag lbl)
     with Not_found -> lookup env e others
 
-let is_ref x k = (k == F.e_zero) && Cil.isPointerType x.vtype
+let is_ref x k = (k == F.e_zero) && Ast_types.is_pointer_type x.vtype
 let is_atomic = function
   | Mvar x , [Mindex k] -> is_ref x k
   | Mvar _ , [] -> true

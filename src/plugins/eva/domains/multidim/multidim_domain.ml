@@ -667,7 +667,7 @@ struct
     `Value (Value.top, None), Alarmset.all
 
   let extract_lval ~oracle _context state lv _loc =
-    if Cil.isScalarType lv.Eva_ast.typ then
+    if Ast_types.is_scalar_type lv.Eva_ast.typ then
       let oracle = fun exp ->
         match oracle exp with
         | `Value v, alarms when Alarmset.is_empty alarms -> v (* only use values safely evaluated *)
@@ -703,7 +703,7 @@ struct
     let* state = state' in
     let oracle = valuation_to_oracle state valuation in
     match (expr : Eva_ast.exp).node with
-    | Lval lv when Cil.isScalarType lv.typ ->
+    | Lval lv when Ast_types.is_scalar_type lv.typ ->
       let value = Value_or_Uninitialized.from_flagged record.value in
       if not (Value.is_topint (Value_or_Uninitialized.get_v value)) then
         match Location.of_lval oracle lv with

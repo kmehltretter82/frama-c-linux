@@ -260,7 +260,7 @@ let lift_set f loc =
 
 let is_same_type t1 t2 =
   Cil_datatype.Logic_type.equal
-    (Logic_utils.unroll_type t1) (Logic_utils.unroll_type t2)
+    (Logic_utils.unroll_logic_type t1) (Logic_utils.unroll_logic_type t2)
 
 let type_rel = function
   | Eq -> Cil_types.Req
@@ -557,15 +557,17 @@ let get_typer_block = Extensions.typer_block
 let get_importer = Extensions.importer
 
 let rec arithmetic_conversion ty1 ty2 =
-  match unroll_type ty1, unroll_type ty2 with
+  match unroll_logic_type ty1, unroll_logic_type ty2 with
   | Ctype ty1, Ctype ty2 ->
-    if isIntegralType ty1 && isIntegralType ty2
+    if Ast_types.is_integral_type ty1 && Ast_types.is_integral_type ty2
     then Linteger
     else Lreal
-  | (Linteger, Ctype t | Ctype t, Linteger) when isIntegralType t ->
+  | (Linteger, Ctype t | Ctype t, Linteger) when Ast_types.is_integral_type t ->
     Linteger
-  | (Linteger, Ctype t | Ctype t , Linteger) when isArithmeticType t-> Lreal
-  | (Lreal, Ctype ty | Ctype ty, Lreal) when isArithmeticType ty -> Lreal
+  | (Linteger, Ctype t | Ctype t , Linteger)
+    when Ast_types.is_arithmetic_type t-> Lreal
+  | (Lreal, Ctype ty | Ctype ty, Lreal)
+    when Ast_types.is_arithmetic_type ty -> Lreal
   | Linteger, Linteger -> Linteger
   | (Lreal | Linteger) , (Lreal | Linteger) -> Lreal
   | Ltype ({lt_name="set"} as lt,[t1]),
@@ -578,16 +580,16 @@ let rec arithmetic_conversion ty1 ty2 =
       Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
 let rec ctype_of_pointed t =
-  match unroll_type t with
-    Ctype ty when isPointerType ty -> Cil.typeOf_pointed ty
+  match unroll_logic_type t with
+    Ctype ty when Ast_types.is_pointer_type ty -> Cil.typeOf_pointed ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
       Cil_printer.pp_logic_type t
 
 let rec ctype_of_array_elem t =
-  match unroll_type t with
-  | Ctype ty when isArrayType ty -> Cil.typeOf_array_elem ty
+  match unroll_logic_type t with
+  | Ctype ty when Ast_types.is_array_type ty -> Cil.typeOf_array_elem ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
@@ -835,19 +837,14 @@ struct
       C.error loc "Cannot use a pointer to void here"
 
   let check_fun_ptr loc ty =
-    let is_fun_ptr t =
-      match Ast_types.unroll_type_node t with
-      | TPtr t when Cil.isFunctionType t -> true
-      | _ -> false
-    in
-    if not (Logic_utils.isLogicType is_fun_ptr ty) then
+    if not (Logic_utils.isLogicType Ast_types.is_fun_ptr_type ty) then
       C.error loc "expecting a function pointer, found %a"
         Cil_datatype.Logic_type.pretty ty
 
   let check_object_ptr loc ty =
     let is_object_ptr t =
       match Ast_types.unroll_type_node t with
-      | TPtr t when not (Cil.isFunctionType t) -> true
+      | TPtr t when not (Ast_types.is_function_type t) -> true
       | _ -> false
     in
     if not (Logic_utils.isLogicType is_object_ptr ty) then
@@ -1055,7 +1052,7 @@ struct
       begin
         match prms with
         | [] -> Ctype (Cil_const.mk_tfun rt None false)
-        | [(_,arg_typ,_)] when isVoidType arg_typ ->
+        | [(_,arg_typ,_)] when Ast_types.is_void_type arg_typ ->
           (* Same invariant as in C *)
           Ctype (Cil_const.mk_tfun rt (Some []) false)
         | _ -> Ctype (Cil_const.mk_tfun rt (Some prms) false)
@@ -1208,13 +1205,13 @@ struct
       if force then Logic_utils.mk_cast ~loc ~force newt e else e
     end else begin
       (* Watch out for constants *)
-      if isPointerType newt && isLogicNull e && not (isLogicZero e) then
+      if Ast_types.is_pointer_type newt && isLogicNull e && not (isLogicZero e) then
         (* \null can have any pointer type, see ACSL manual. *)
         (if force then
            Logic_const.term ~loc (TCast (false, Ctype newt, e)) (Ctype newt)
          else
            { e with term_type = Ctype newt })
-      else if isPointerType newt && isArrayType oldt then begin
+      else if Ast_types.(is_pointer_type newt && is_array_type oldt) then begin
         if not (is_C_array e) then
           C.error loc "cannot cast logic array to pointer type";
         let e = mk_logic_StartOf e in
@@ -1222,7 +1219,7 @@ struct
         (* we have converted from array to ptr, but the pointed type might
            differ. Just do another round of conversion. *)
         c_mk_cast e oldt newt
-      end else if isPointerType oldt && isArrayType newt then
+      end else if Ast_types.(is_pointer_type oldt && is_array_type newt) then
         (* transforms '(T[size])ptr' into an equivalent '*(T( * )[size])ptr'
            to get an explicit access to the memory *)
         mk_mem (c_mk_cast ~force e oldt (Cil_const.mk_tptr newt)) TNoOffset
@@ -1238,12 +1235,12 @@ struct
     end
 
   let is_same_ptr_type ctyp1 ctyp2 =
-    (isPointerType ctyp1) &&
-    (isPointerType ctyp2) &&
+    (Ast_types.is_pointer_type ctyp1) &&
+    (Ast_types.is_pointer_type ctyp2) &&
     (is_same_c_type (typeOf_pointed ctyp1) (typeOf_pointed ctyp2))
 
   let is_same_array_type ctyp1 ctyp2 =
-    (isArrayType ctyp1) && (isArrayType ctyp2) &&
+    Ast_types.is_array_type ctyp1 && Ast_types.is_array_type ctyp2 &&
     (is_same_c_type (typeOf_array_elem ctyp1) (typeOf_array_elem ctyp2))
 
   let is_same_logic_ptr_type ty1 ty2 =
@@ -1258,7 +1255,7 @@ struct
 
   let is_function_pointer cty =
     try
-      Cil.isFunctionType (Cil.typeOf_pointed  cty)
+      Ast_types.is_function_type (Cil.typeOf_pointed  cty)
     with Assert_failure _ -> false
 
   let is_compatible_funtype ty1 ty2 =
@@ -1286,14 +1283,14 @@ struct
     in
     let compatible_pointed () =
       same_pointed () ||
-      (isVoidPtrType ctyp2 && not (is_function_pointer ctyp1))
+      (Ast_types.is_void_ptr_type ctyp2 && not (is_function_pointer ctyp1))
       ||
       (is_function_pointer ctyp2 && is_function_pointer ctyp1 &&
        is_compatible_funtype (typeOf_pointed ctyp1) (typeOf_pointed ctyp2))
     in
-    (isArrayType ctyp1 && isArrayType ctyp2 && same_array_elt ()) ||
-    (isPointerType ctyp1 && isPointerType ctyp2 &&
-     (compatible_pointed() || isLogicNull term))
+    Ast_types.(is_array_type ctyp1 && is_array_type ctyp2 && same_array_elt ())
+    || Ast_types.(is_pointer_type ctyp1 && is_pointer_type ctyp2 &&
+                  (compatible_pointed() || isLogicNull term))
 
   let is_enum_cst e t =
     match e.term_node with
@@ -1315,7 +1312,7 @@ struct
       | TCast (true,t2,e) when Cil.no_op_coerce t2 e ->
         let e = aux e in
         { e with term_type = real_type; term_node = TCast (true, real_type,e) }
-      | _ when Cil.isLogicArithmeticType real_type ->
+      | _ when Ast_types.is_logic_arithmetic_type real_type ->
         Logic_utils.numeric_coerce real_type e
       | _ ->
         { e with term_type = real_type; term_node = TCast (true, real_type,e) }
@@ -1356,7 +1353,7 @@ struct
     end else if is_enum_cst e newt then { e with term_type = newt }
     else begin
       match
-        (unroll_type e.term_type),
+        (unroll_logic_type e.term_type),
         (* If any, use the typedef itself in the inserted cast *)
         (Logic_const.unroll_ltdef newt)
       with
@@ -1393,17 +1390,18 @@ struct
         c_mk_cast ~force e Cil_const.intType t
       | Linteger, (Ctype newt) | Lreal, (Ctype newt) when explicit ->
         Logic_utils.mk_cast ~loc newt e
-      | Linteger, Ctype t when isIntegralType t ->
+      | Linteger, Ctype t when Ast_types.is_integral_type t ->
         (try C.integral_cast t e with Failure s -> C.error loc "%s" s)
       | Linteger, Ctype _ | Lreal, Ctype _ | Lboolean, Ctype _ ->
         C.error loc "invalid implicit cast from %a to C type %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt
-      | Ctype t, Linteger when Cil.isIntegralType t -> logic_coerce Linteger e
-      | Ctype t, Linteger when Cil.isArithmeticType t && explicit ->
+      | Ctype t, Linteger when Ast_types.is_integral_type t ->
+        logic_coerce Linteger e
+      | Ctype t, Linteger when Ast_types.is_arithmetic_type t && explicit ->
         Logic_const.term
           ~loc (Tapp(truncate_info,[], [logic_coerce Lreal e])) Linteger
-      | Ctype t, Lreal when isArithmeticType t -> logic_coerce Lreal e
+      | Ctype t, Lreal when Ast_types.is_arithmetic_type t -> logic_coerce Lreal e
       | Ctype _, (Lreal | Linteger | Lboolean) ->
         C.error loc "invalid implicit cast from %a to logic type %a"
           Cil_printer.pp_logic_type e.term_type
@@ -1449,7 +1447,7 @@ struct
       begin
         Cil.checkCast ot nt;
         match Ast_types.unroll_type_node ot, Ast_types.unroll_type_node nt with
-        | TPtr _, TPtr _ when isVoidPtrType nt ->
+        | TPtr _, TPtr _ when Ast_types.is_void_ptr_type nt ->
           nt, e
         | (TInt _ | TEnum _ | TPtr _ ), TVoid ->
           ot, e
@@ -1470,11 +1468,11 @@ struct
     otherwise print an error message with location [loc]
    *)
   let rec implicit_conversion ~overloaded loc oterm ot nt =
-    match (unroll_type ot), (unroll_type nt) with
+    match (unroll_logic_type ot), (unroll_logic_type nt) with
     | Ctype ty1, Ctype ty2 ->
       if is_same_c_type ty1 ty2
       then ot, oterm
-      else if (isIntegralType ty1 && isIntegralType ty2) then begin
+      else if Ast_types.(is_integral_type ty1 && is_integral_type ty2) then begin
         let sz1 = bitsSizeOf ty1 in
         let sz2 = bitsSizeOf ty2 in
         if (sz1 < sz2
@@ -1486,7 +1484,7 @@ struct
           C.error loc "invalid implicit conversion from '%a' to '%a'"
             Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
       end else if is_implicit_pointer_conversion oterm ty1 ty2
-               || (match Ast_types.unroll_type_node ty1, Ast_types.unroll_type_node ty2 with
+               || (match Ast_types.(unroll_type_node ty1, unroll_type_node ty2) with
                    | TFloat f1, TFloat f2 ->
                      f1 <= f2
                    (*[BM]
@@ -1497,7 +1495,7 @@ struct
         let t,e = c_cast_to ty1 ty2 oterm in Ctype t, e
       end else if overloaded then raise Not_applicable
       else if (* not overloaded: raise an error. *)
-        isArrayType ty1 && isPointerType ty2
+        Ast_types.is_array_type ty1 && Ast_types.is_pointer_type ty2
         && is_same_c_type (typeOf_array_elem ty1) (typeOf_pointed ty2)
       then
         if Logic_utils.is_C_array oterm then
@@ -1515,16 +1513,16 @@ struct
       else
         C.error loc "invalid implicit conversion from '%a' to '%a'"
           Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
-    | Ctype ty, Lboolean when Cil.isBoolType ty -> Lboolean, oterm
-    | Ctype ty, Linteger when Cil.isIntegralType ty -> Linteger, oterm
-    | Ctype ty, Lreal when Cil.isArithmeticType ty -> Lreal, oterm
+    | Ctype ty, Lboolean when Ast_types.is_bool_type ty -> Lboolean, oterm
+    | Ctype ty, Linteger when Ast_types.is_integral_type ty -> Linteger, oterm
+    | Ctype ty, Lreal when Ast_types.is_arithmetic_type ty -> Lreal, oterm
     | Linteger, Lreal -> Lreal, oterm
     (* Integer 0 is also a valid pointer. *)
-    | Linteger, Ctype ty when Cil.isPointerType ty && isLogicNull oterm ->
+    | Linteger, Ctype ty when Ast_types.is_pointer_type ty && isLogicNull oterm ->
       nt, { oterm with
             term_node = TCast(false, Ctype ty,oterm);
             term_type = nt }
-    | Linteger, Ctype ty when Cil.isIntegralType ty ->
+    | Linteger, Ctype ty when Ast_types.is_integral_type ty ->
       (try
          nt, C.integral_cast ty oterm
        with Failure s ->
@@ -1576,19 +1574,19 @@ struct
           Cil_printer.pp_logic_type ot Cil_printer.pp_logic_type nt
 
   let rec find_supertype ~overloaded loc t ot nt =
-    match unroll_type ot, unroll_type nt with
+    match unroll_logic_type ot, unroll_logic_type nt with
     | Ctype ot, Ctype nt ->
       if is_same_c_type ot nt then Ctype ot
-      else if Cil.isIntegralType ot && Cil.isIntegralType nt then Linteger
-      else if Cil.isArithmeticType ot && Cil.isArithmeticType nt then Lreal
+      else if Ast_types.(is_integral_type ot && is_integral_type nt) then Linteger
+      else if Ast_types.(is_arithmetic_type ot && is_arithmetic_type nt) then Lreal
       else if is_implicit_pointer_conversion t ot nt then
         let res,_ = c_cast_to ot nt t in Ctype res
       else if overloaded then raise Not_applicable
       else
         C.error loc "incompatible types %a and %a@."
           Cil_printer.pp_typ ot Cil_printer.pp_typ nt
-    | Ctype ot, (Lboolean as nt) when Cil.isIntegralType ot -> nt
-    | Lboolean as ot, Ctype nt when Cil.isIntegralType nt -> ot
+    | Ctype ot, (Lboolean as nt) when Ast_types.is_integral_type ot -> nt
+    | Lboolean as ot, Ctype nt when Ast_types.is_integral_type nt -> ot
     | (Linteger, (Lboolean as t) | (Lboolean as t), Linteger) -> t
     | Ltype(ot,oprms), Ltype(nt,nprms) when ot == nt ->
       let res =
@@ -1604,21 +1602,21 @@ struct
       let st = find_supertype ~overloaded loc t t1 t2 in
       Ltype(set, [st])
     | Lvar s1, Lvar s2 when s1 = s2 -> ot
-    | Linteger, Ctype nt when Cil.isIntegralType nt -> Linteger
-    | Linteger, Ctype nt when Cil.isPointerType nt && isLogicNull t ->
+    | Linteger, Ctype nt when Ast_types.is_integral_type nt -> Linteger
+    | Linteger, Ctype nt when Ast_types.is_pointer_type nt && isLogicNull t ->
       Ctype nt
-    | Ctype ot, Linteger when Cil.isIntegralType ot -> Linteger
-    | Ctype ot, Linteger when Cil.isPointerType ot && isLogicNull t ->
+    | Ctype ot, Linteger when Ast_types.is_integral_type ot -> Linteger
+    | Ctype ot, Linteger when Ast_types.is_pointer_type ot && isLogicNull t ->
       Ctype ot
     | Lboolean, Lboolean -> Lboolean
     | Linteger, Linteger -> Linteger
     | Linteger, Lreal -> Lreal
-    | Linteger, Ctype nt when Cil.isArithmeticType nt -> Lreal
-    | Ctype ot, Linteger when Cil.isArithmeticType ot -> Lreal
+    | Linteger, Ctype nt when Ast_types.is_arithmetic_type nt -> Lreal
+    | Ctype ot, Linteger when Ast_types.is_arithmetic_type ot -> Lreal
     | Lreal, Linteger -> Lreal
     | Lreal, Lreal -> Lreal
-    | Lreal, Ctype nt when Cil.isArithmeticType nt -> Lreal
-    | Ctype nt, Lreal when Cil.isArithmeticType nt -> Lreal
+    | Lreal, Ctype nt when Ast_types.is_arithmetic_type nt -> Lreal
+    | Ctype nt, Lreal when Ast_types.is_arithmetic_type nt -> Lreal
     | Larrow(oargs,oret), Larrow(nargs,nret)
       when List.length oargs = List.length nargs ->
       let ret = find_supertype ~overloaded loc t oret nret in
@@ -1631,7 +1629,7 @@ struct
           Cil_printer.pp_logic_type ot Cil_printer.pp_logic_type nt
 
   let rec partial_unif ~overloaded loc term ot nt env =
-    match (unroll_type ot),(unroll_type nt) with
+    match unroll_logic_type ot, unroll_logic_type nt with
     | Lvar s1, Lvar s2 ->
       if generated_var s1 then
         try
@@ -1718,7 +1716,8 @@ struct
     | Ltype({lt_name = "set"}, [t1]), t2 ->
       let (env, ot, nt) = partial_unif ~overloaded loc term t1 t2 env in
       env, make_set_type ot, make_set_type nt
-    | t1,t2 when Cil.isLogicBooleanType t1 && Cil.isLogicBooleanType t2 ->
+    | t1,t2 when Ast_types.is_logic_boolean_type t1
+              && Ast_types.is_logic_boolean_type t2 ->
       env,ot,nt
     | ((Ctype _ | Linteger | Lreal | Lboolean),
        (Ctype _ | Linteger | Lreal | Lboolean)) ->
@@ -1752,10 +1751,10 @@ struct
     res
 
   let convertible_non_null (ty1,t as t1) (ty2,_ as t2) =
-    match (unroll_type ty1, unroll_type ty2) with
+    match (unroll_logic_type ty1, unroll_logic_type ty2) with
     | Ctype ty1, Ctype ty2 when
-        isPointerType ty1 && isPointerType ty2 && isLogicNull t ->
-      isVoidPtrType ty2
+        Ast_types.is_pointer_type ty1 && Ast_types.is_pointer_type ty2 && isLogicNull t ->
+      Ast_types.is_void_ptr_type ty2
     | _ -> convertible t1 t2
 
   (* TODO: filter on signatures, not on type-checked actual arguments !!!!!! *)
@@ -1796,8 +1795,8 @@ struct
     assert (l <> []); l
 
   let rec logic_arithmetic_promotion t =
-    match unroll_type t with
-    | Ctype ty when Cil.isIntegralType ty -> Linteger
+    match unroll_logic_type t with
+    | Ctype ty when Ast_types.is_integral_type ty -> Linteger
     | Linteger -> Linteger
     | Lreal -> Lreal
     | Ctype ty ->
@@ -1815,8 +1814,8 @@ struct
         Cil_printer.pp_logic_type t
 
   let rec integral_promotion t =
-    match unroll_type t with
-    | Ctype ty when isIntegralType ty -> Linteger
+    match unroll_logic_type t with
+    | Ctype ty when Ast_types.is_integral_type ty -> Linteger
     | Linteger -> Linteger
     | Ltype ({lt_name="set"} as lt,[t]) -> Ltype(lt,[integral_promotion t])
     | Lboolean | Ltype _ | Lreal | Lvar _ | Larrow _ | Ctype _ ->
@@ -1865,9 +1864,9 @@ struct
 
   let conditional_conversion loc rel t1 t2 =
     let rec aux lty1 lty2 =
-      match (unroll_type lty1), (unroll_type lty2) with
+      match (unroll_logic_type lty1), (unroll_logic_type lty2) with
       | Ctype ty1, Ctype ty2 ->
-        if isIntegralType ty1 && isIntegralType ty2 then
+        if Ast_types.is_integral_type ty1 && Ast_types.is_integral_type ty2 then
           if is_same_type lty1 lty2 then lty1
           else if (isSignedInteger ty1) <> (isSignedInteger ty2) then
             (* in ACSL, the comparison between 0xFFFFFFFF seen as int and
@@ -1881,7 +1880,7 @@ struct
           else if is_enum_cst t1 lty2 then lty2
           else if is_enum_cst t2 lty1 then lty1
           else Ctype (C.conditionalConversion ty1 ty2)
-        else if isArithmeticType ty1 && isArithmeticType ty2 then
+        else if Ast_types.(is_arithmetic_type ty1 && is_arithmetic_type ty2) then
           begin
             if is_same_type lty1 lty2 then
               begin
@@ -1907,21 +1906,22 @@ struct
         if is_same_ptr_type ty1 ty2 || is_same_array_type ty1 ty2 then
           Ctype (C.conditionalConversion ty1 ty2)
         else if
-          (isPointerType ty1 || isArrayType ty1) &&
-          (isPointerType ty2 || isArrayType ty2)
+          (Ast_types.is_pointer_type ty1 || Ast_types.is_array_type ty1) &&
+          (Ast_types.is_pointer_type ty2 || Ast_types.is_array_type ty2)
         then C.error loc "types %a and %a are not convertible"
             Cil_printer.pp_typ ty1 Cil_printer.pp_typ ty2
         else (* pointer to integer conversion *)
           Ctype (C.conditionalConversion ty1 ty2)
       | (Linteger, Ctype t | Ctype t, Linteger)
-        when Cil.isIntegralType t -> Linteger
+        when Ast_types.is_integral_type t -> Linteger
       | (Linteger, Ctype t | Ctype t, Linteger)
-        when Cil.isArithmeticType t -> Lreal
+        when Ast_types.is_arithmetic_type t -> Lreal
       (* In ACSL, you can convert implicitely from integral to boolean =>
          prefer boolean as common type when doing comparison. *)
       | Lboolean, t when is_integral_type t -> Lboolean
       | t, Lboolean when is_integral_type t -> Lboolean
-      | Lreal, Ctype ty | Ctype ty, Lreal when isArithmeticType ty -> Lreal
+      | Lreal, Ctype ty | Ctype ty, Lreal
+        when Ast_types.is_arithmetic_type ty -> Lreal
       | Ltype (s1,l1), Ltype (s2,l2)
         when s1.lt_name = s2.lt_name && List.for_all2 is_same_type l1 l2 ->
         lty1
@@ -1990,14 +1990,16 @@ struct
 
   let list_conversion loc t ot nt env =
     if is_same_type ot nt then ot
-    else if Cil.isLogicIntegralType ot && Cil.isLogicIntegralType nt then ot
-    else if Cil.isLogicArithmeticType ot && Cil.isLogicArithmeticType nt then ot
+    else if Ast_types.(is_logic_integral_type ot && is_logic_integral_type nt)
+    then ot
+    else if Ast_types.(is_logic_arithmetic_type ot && is_logic_arithmetic_type nt)
+    then ot
     else let _,_,t = partial_unif ~overloaded:false loc t ot nt env in
       t
 
   let list_promotion typ =
-    if Cil.isLogicIntegralType typ then Linteger
-    else if Cil.isLogicArithmeticType typ then Lreal
+    if Ast_types.is_logic_integral_type typ then Linteger
+    else if Ast_types.is_logic_arithmetic_type typ then Lreal
     else typ
 
   let list_coercion typ t =
@@ -2048,7 +2050,7 @@ struct
     let (tq,env) =
       List.fold_left
         (fun (tq,env) (ty, id) ->
-           let ty = unroll_type (logic_type ctxt loc env ty) in
+           let ty = unroll_logic_type (logic_type ctxt loc env ty) in
            let v = Cil_const.make_logic_var_kind id kind ty in
            (v::tq, Lenv.add_var id v env))
         ([],env) q
@@ -2076,7 +2078,7 @@ struct
       List.find (fun x -> x.l_var_info.lv_id = v.lv_id) l
 
   let eta_expand loc names env v =
-    match (unroll_type v.lv_type) with
+    match (unroll_logic_type v.lv_type) with
       Larrow(args,rt) ->
       let (_,vars) = List.fold_right
           (fun x (i,l) ->
@@ -2122,7 +2124,7 @@ struct
 
   let normalize_lambda_term env term =
     let add_binders quants term =
-      match term.term_node, (unroll_type term.term_type) with
+      match term.term_node, (unroll_logic_type term.term_type) with
       | Tlambda(quants',term), Larrow (args,rt_typ) ->
         let args = List.fold_right (fun x l -> x.lv_type :: l) quants args in
         { term with
@@ -2232,14 +2234,14 @@ struct
     | PLpathIndex idx ->
       let idx = idx_typing idx in
       let ofs_type =
-        if Cil.isArrayType t_type && check_type idx.term_type
+        if Ast_types.is_array_type t_type && check_type idx.term_type
         then Ctype (Cil.typeOf_array_elem t_type)
         else C.error loc "subscripted value is not an array"
       in mk_idx idx, ofs_type
 
   let normalize_updated_offset_term idx_typing env loc t normalizing_cont toff =
     let t_type =
-      try Logic_utils.logicCType (Logic_utils.unroll_type t.term_type)
+      try Logic_utils.logicCType (Logic_utils.unroll_logic_type t.term_type)
       with Failure _ ->
         C.error loc "Trying to update field on a non struct type %a"
           Cil_printer.pp_logic_type t.term_type
@@ -2268,8 +2270,9 @@ struct
                  term_type = type2}
     in
     let (toff, t_off2, opt_idx_let), ofs_type =
-      let check_type typ = Cil.isLogicIntegralType typ
-                           || C.error loc "range is only allowed for last offset"
+      let check_type typ =
+        Ast_types.is_logic_integral_type  typ
+        || C.error loc "range is only allowed for last offset"
       and mk_field f = TField(f,TNoOffset),TField(f,TNoOffset),(fun x -> x)
       and mk_idx idx =
         let mk_idx_let, idx, idx2 =
@@ -2401,7 +2404,7 @@ struct
       accept_models = true; accept_func_ptr = true; accept_addrs = true;
       accept_const = true; }
 
-  let is_fct_ptr lv = Cil.isLogicFunctionType (Cil.typeOfTermLval lv)
+  let is_fct_ptr lv = Ast_types.is_logic_function_type (Cil.typeOfTermLval lv)
 
   let check_lval_kind m t =
     let rec aux t = match t.term_node with
@@ -2477,7 +2480,7 @@ struct
     | (toff::tail) as offs ->
       begin
         let t_type =
-          try Logic_utils.logicCType (Logic_utils.unroll_type t.term_type)
+          try Logic_utils.logicCType (Logic_utils.unroll_logic_type t.term_type)
           with Failure _ ->
             if ctxt.silent then raise Backtrack;
             ctxt.error loc "Update field on a non-struct type %a"
@@ -3184,7 +3187,8 @@ struct
       f loc op (mk_cast t1 t) (mk_cast t2 t)
     in
     begin match op with
-      | _ when Cil.isLogicArithmeticType ty1 && Cil.isLogicArithmeticType ty2 ->
+      | _ when Ast_types.is_logic_arithmetic_type ty1
+            && Ast_types.is_logic_arithmetic_type ty2 ->
         conditional_conversion t1 t2
       | Eq | Neq when isLogicPointer t1 && isLogicNull t2 ->
         let t1 = mk_logic_pointer_or_StartOf t1 in
@@ -3333,14 +3337,14 @@ struct
   and type_int_term ctxt env t =
     let module [@warning "-60"] C = struct end in
     let tt = ctxt.type_term ctxt env t in
-    if not (Cil.isLogicIntegralType tt.term_type) then
+    if not (Ast_types.is_logic_integral_type tt.term_type) then
       ctxt.error t.lexpr_loc
         "integer expected but %a found" Cil_printer.pp_logic_type tt.term_type;
     tt
 
   and type_bool_term ctxt env t =
     let tt = ctxt.type_term ctxt env t in
-    if not (Cil.isLogicBooleanType tt.term_type) then
+    if not (Ast_types.is_logic_boolean_type tt.term_type) then
       ctxt.error t.lexpr_loc "boolean expected but %a found"
         Cil_printer.pp_logic_type tt.term_type;
     mk_cast tt Lboolean
@@ -4370,7 +4374,7 @@ struct
       let checks_tsets_type ~reads fct ctyp =
         List.iter
           begin fun t ->
-            let check t = match Logic_utils.unroll_type t with
+            let check t = match Logic_utils.unroll_logic_type t with
               | Ctype ctyp' ->
                 ( reads || not (Cil.isConstType ctyp') )
                 && Cil_datatype.Typ.equal ctyp
@@ -4392,7 +4396,7 @@ struct
       let volatile_type ~reads ret_typ arg1 error =
         (* note: type pointed to by arg1 may differ from the
            return type with respect to qualifiers *)
-        if not (isPointerType arg1) then error ();
+        if not (Ast_types.is_pointer_type arg1) then error ();
         let vol_typ = typeOf_pointed arg1 in
         let base_typ = Ast_types.type_remove_qualifier_attributes vol_typ in
         if not (Cil.isVolatileType vol_typ &&
@@ -4404,12 +4408,12 @@ struct
       let checks_reads_fct fct ty =
         let error () = prototype_error "reads" fct
         in let ret,args,is_varg_arg,_attrib =
-             if not (Cil.isFunctionType ty) then
+             if not (Ast_types.is_function_type ty) then
                error ();
              Cil.splitFunctionType ty
         in match args with
         | Some [_,arg1,_] when
-            (not (isVoidType ret || is_varg_arg))
+            (not (Ast_types.is_void_type ret || is_varg_arg))
           -> (* matching prototype: T fct (volatile T *arg1) *)
           let vol_typ = volatile_type ~reads:true ret arg1 error in
           checks_tsets_type ~reads:true fct vol_typ (* tsets should have type: volatile T *)
@@ -4419,12 +4423,12 @@ struct
       let checks_writes_fct fct ty =
         let error () = prototype_error "writes" fct
         in let ret,args,is_varg_arg,_attrib =
-             if not (Cil.isFunctionType ty) then
+             if not (Ast_types.is_function_type ty) then
                error ();
              Cil.splitFunctionType ty
         in match args with
         | Some ((_,arg1,_)::[_,arg2,_]) when
-            (not (isVoidType ret || is_varg_arg))
+            (not (Ast_types.is_void_type ret || is_varg_arg))
             && Cil_datatype.Typ.equal ret (Ast_types.type_remove_qualifier_attributes arg2)
           -> (* matching prototype: T fct (volatile T *arg1, T arg2) *)
           let vol_typ = volatile_type ~reads:false ret arg1 error in

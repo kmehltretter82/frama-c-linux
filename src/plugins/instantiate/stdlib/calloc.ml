@@ -31,7 +31,7 @@ let unexpected = Options.fatal "Stdlib.Calloc: unexpected: %s"
 
 let pset_len_to_zero ?loc alloc_type num size =
   let eq_simpl_value ?loc t =
-    let value = match Logic_utils.unroll_type t.term_type with
+    let value = match Logic_utils.unroll_logic_type t.term_type with
       | Ctype { tnode = TPtr _ } -> term Tnull t.term_type
       | Ctype { tnode = TFloat _ } -> treal ?loc 0.
       | Ctype { tnode = (TInt _ | TEnum _) } -> tinteger ?loc 0
@@ -64,7 +64,7 @@ let generate_requires ?loc alloc_type num size =
 let pinitialized_len ?loc alloc_type num size =
   let result = tresult ?loc (Cil_const.mk_tptr alloc_type) in
   let initialized ?loc t =
-    let t = match t.term_node, Logic_utils.unroll_type t.term_type with
+    let t = match t.term_node, Logic_utils.unroll_logic_type t.term_type with
       | TLval (lv), (Ctype _ as t) ->
         Logic_utils.mk_logic_AddrOf ?loc lv t
       | _ -> unexpected "non lvalue or non c-type during initialized generation"
@@ -136,7 +136,7 @@ let well_typed_call ret _fct args =
   match ret, args with
   | Some ret, [ _ ; _ ] ->
     let t = Cil.typeOfLval ret in
-    Cil.isPointerType t && not (Cil.isVoidPtrType t) &&
+    Ast_types.is_pointer_type t && not (Ast_types.is_void_ptr_type t) &&
     Cil.isCompleteType (Cil.typeOf_pointed t)
   | _ -> false
 

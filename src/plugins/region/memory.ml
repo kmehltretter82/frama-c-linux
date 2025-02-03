@@ -397,7 +397,7 @@ let add_points_to (m: map) (a: node) (b : node) =
   end
 
 let add_value (m:map) (rv:node) (ty:typ) : node option =
-  if Cil.isPointerType ty then
+  if Ast_types.is_pointer_type ty then
     begin
       failwith_locked m "Region.Memory.add_value" ;
       let rp = new_chunk m ~pointed:rv () in

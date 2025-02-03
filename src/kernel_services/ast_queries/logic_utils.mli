@@ -73,7 +73,7 @@ val is_instance_of: string list -> logic_type -> logic_type -> bool
 
 (** expands logic type definitions. If the [unroll_typedef] flag is set to
     [true] (this is the default), C typedef will be expanded as well. *)
-val unroll_type : ?unroll_typedef:bool -> logic_type -> logic_type
+val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
 (** {3 tests and extraction of element type}
     @before Frama-C+dev these function were in {!Logic_typing}

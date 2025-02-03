@@ -143,7 +143,7 @@ module V = struct
   let pretty_base_offsets_typ typ fmt b i =
     let typ_match = match Option.map Ast_types.unroll_type_node typ with
       | Some (TPtr typ_pointed) ->
-        if Cil.isVoidType typ_pointed then None else Some typ_pointed
+        if Ast_types.is_void_type typ_pointed then None else Some typ_pointed
       | _ -> None
     in
     try

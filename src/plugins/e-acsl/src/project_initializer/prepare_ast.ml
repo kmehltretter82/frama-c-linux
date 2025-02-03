@@ -134,7 +134,7 @@ let dup_fundec loc spec sound_verdict_vi kf vi new_vi =
   let new_formals = List.map mk_formal formals in
   let res =
     let ty = Kernel_function.get_return_type kf in
-    if Cil.isVoidType ty
+    if Ast_types.is_void_type ty
     then None
     else Some (Cil.makeVarinfo false false ~referenced:true "__retres" ty)
   in

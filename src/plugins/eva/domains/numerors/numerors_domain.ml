@@ -28,7 +28,7 @@ module Numerors_Value = struct
   include Numerors_value
 
   (* In this domain, we only track floating-point variables. *)
-  let track_variable vi = Cil.isFloatingType vi.vtype
+  let track_variable vi = Ast_types.is_floating_type vi.vtype
 
   (* No widen in the domain for now *)
   let widen _ _ = top

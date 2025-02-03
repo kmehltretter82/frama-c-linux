@@ -296,7 +296,7 @@ module Select (Eval: Eval) = struct
     Eval.display_data_by_callstack loc selection data
 
   let select_lv main_ui loc lv =
-    if Cil.isScalarType (Cil.typeOfLval lv)
+    if Ast_types.is_scalar_type (Cil.typeOfLval lv)
     then select_loc main_ui Eval.lval_ev loc lv
     else select_loc main_ui Eval.lval_as_offsm_ev loc lv
   let select_null main_ui loc =
@@ -429,10 +429,10 @@ module Select (Eval: Eval) = struct
         if Gui_eval.results_kf_computed kf then
           pretty_stmt_info main_ui kf stmt
       | PLval (Some kf, Kstmt stmt,lv) ->
-        if not (Cil.isFunctionType (Cil.typeOfLval lv)) then
+        if not (Ast_types.is_function_type (Cil.typeOfLval lv)) then
           select_lv main_ui (GL_Stmt (kf, stmt)) lv
       | PLval (Some kf, Kglobal, lv) -> (* see can_eval_acsl_expr_selector *)
-        if not (Cil.isFunctionType (Cil.typeOfLval lv)) then
+        if not (Ast_types.is_function_type (Cil.typeOfLval lv)) then
           select_lv main_ui (GL_Pre kf) lv
       | PExp (Some kf, Kstmt stmt,e) ->
         select_exp main_ui (GL_Stmt (kf, stmt)) e
@@ -508,9 +508,9 @@ module Select (Eval: Eval) = struct
       (* Do special actions for functions *)
       begin
         (match lv with
-         | Var _,NoOffset when Cil.isFunctionType ty ->
+         | Var _,NoOffset when Ast_types.is_function_type ty ->
            () (* direct calls are handled by [Design]. *)
-         | Mem _, NoOffset when Cil.isFunctionType ty -> begin
+         | Mem _, NoOffset when Ast_types.is_function_type ty -> begin
              (* Function pointers *)
              (* get the list of functions in the values *)
              let e = Eva_ast.(Build.lval (translate_lval lv)) in

@@ -83,7 +83,7 @@ and add_exp (m: map) (s:stmt) (e:exp) : scalar =
 
   | CastE(ty,p) ->
     let v = add_exp m s p in
-    if Cil.isPointerType ty then
+    if Ast_types.is_pointer_type ty then
       fst @@ pointer m @@ v
     else
       integral

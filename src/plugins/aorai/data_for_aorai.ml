@@ -588,7 +588,7 @@ let check_one top info counter s =
   | EReturn kf when top && ( Datatype.String.equal s "return"
                              || Datatype.String.equal s "\\result") ->
     let rt = Kernel_function.get_return_type kf in
-    if Cil.isVoidType rt then
+    if Ast_types.is_void_type rt then
       Aorai_option.abort
         "%a returns void. \\result is meaningless in this context"
         Kernel_function.pretty kf;
@@ -634,7 +634,7 @@ let find_prm_in_env env ?tr counter f x =
      Datatype.String.equal x "\\result" then begin
     (* Return event *)
     let rt = Kernel_function.get_return_type kf in
-    if Cil.isVoidType rt then
+    if Ast_types.is_void_type rt then
       Aorai_option.abort
         "%a returns void. %s().%s is meaningless in this context"
         Kernel_function.pretty kf f x;

@@ -215,7 +215,7 @@ let field = function
 let load = function
   | Loc_var x -> Val_var x (* E.access x ByValue E.bot *)
   | Loc_shift(x,e) ->
-    if Cil.isScalarType x.vtype then
+    if Ast_types.is_scalar_type x.vtype then
       E (E.access x ByAddr e)
     else
       E (E.access x ByValue e)
@@ -261,7 +261,7 @@ let cast_obj tgt src =
 let cast_ctyp tgt src =
   cast_obj (Ctypes.object_of tgt) (Ctypes.object_of src)
 let cast_ltyp tgt src =
-  match Logic_utils.unroll_type ~unroll_typedef:false src with
+  match Logic_utils.unroll_logic_type ~unroll_typedef:false src with
   | Ctype src -> cast_ctyp tgt src
   | _ -> Cast
 
@@ -386,7 +386,7 @@ and offset (m:model) = function
   | Index(e,ofs) -> offset (shift m (vexpr e)) ofs
 
 and startof (m:model) typ =
-  if Cil.isArrayType typ then shift m E.bot else m
+  if Ast_types.is_array_type typ then shift m E.bot else m
 
 (* ---------------------------------------------------------------------- *)
 (* --- Compilation of ACSL-Terms                                      --- *)
@@ -844,7 +844,7 @@ struct
     let type_term ctxt loc e =
       match ctxt.Logic_typing.type_term ctxt ctxt.pre_state e with
       | { term_node = TLval (TVar { lv_origin = Some vi }, TNoOffset) } as term
-        when Cil.isPointerType vi.vtype && vi.vformal ->
+        when Ast_types.is_pointer_type vi.vtype && vi.vformal ->
         make_nullable vi ; term
       | t -> ctxt.error loc "Not a formal pointer: %a" Cil_printer.pp_term t
 

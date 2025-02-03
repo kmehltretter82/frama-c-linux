@@ -193,7 +193,7 @@ struct
   let bool_of_comp env iop lop fop e1 e2 =
     let t1 = Cil.typeOf e1 in
     let t2 = Cil.typeOf e2 in
-    if Cil.isPointerType t1 && Cil.isPointerType t2 then
+    if Ast_types.is_pointer_type t1 && Ast_types.is_pointer_type t2 then
       Cvalues.is_true (lop (loc_of_exp env e1) (loc_of_exp env e2))
     else match Ast_types.unroll_type_node t1 with
       | TFloat f ->
@@ -370,9 +370,9 @@ struct
       then M.loc_neq (cloc v1) (cloc v2)
       else F.p_neq (cval v1) (cval v2)
 
-  let equal_typ t v1 v2 = eq_t Cil.isPointerType t v1 v2
+  let equal_typ t v1 v2 = eq_t Ast_types.is_pointer_type t v1 v2
   let equal_obj obj v1 v2 = eq_t Ctypes.is_pointer obj v1 v2
-  let not_equal_typ t v1 v2 = neq_t Cil.isPointerType t v1 v2
+  let not_equal_typ t v1 v2 = neq_t Ast_types.is_pointer_type t v1 v2
   let not_equal_obj obj v1 v2 = neq_t Ctypes.is_pointer obj v1 v2
 
   let compare env vop lop fop e1 e2 =
@@ -451,7 +451,7 @@ struct
            in
            let init_hyp = match init with
              | Some { enode = Lval lv_init }
-               when Cil.(isStructOrUnionType @@ typeOfLval lv_init) ->
+               when Ast_types.is_struct_or_union_type (Cil.typeOfLval lv_init) ->
                let l_initializer = lval sigma lv_init in
                F.p_equal
                  (M.load_init sigma obj l)

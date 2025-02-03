@@ -460,7 +460,7 @@ let forward_unop typ op value =
   | LNot ->
     let eq = Abstract_interp.Comp.Eq in
     (* [!c] holds iff [c] is equal to [O] *)
-    if Cil.isFloatingType typ then
+    if Ast_types.is_floating_type typ then
       try
         let i = V.project_ival value in
         let f = Ival.project_float i in

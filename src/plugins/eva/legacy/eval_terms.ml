@@ -289,10 +289,10 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match Logic_utils.unroll_type lv.lv_type with
+    match Logic_utils.unroll_logic_type lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
-    | Ctype ctyp when Cil.isIntegralType ctyp ->
+    | Ctype ctyp when Ast_types.is_integral_type ctyp ->
       let base = Base.of_c_logic_var lv in
       let size = Integer.of_int (Cil.bitsSizeOf ctyp) in
       let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
@@ -306,7 +306,7 @@ let bind_logic_vars env lvs =
 
 let copy_logic_vars ~src ~dst lvars =
   let copy_one env lvar =
-    match Logic_utils.unroll_type lvar.lv_type with
+    match Logic_utils.unroll_logic_type lvar.lv_type with
     | Linteger | Lreal ->
       let value = LogicVarEnv.find lvar src.logic_vars in
       let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
@@ -326,7 +326,7 @@ let copy_logic_vars ~src ~dst lvars =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match Logic_utils.unroll_type lv.lv_type with
+    match Logic_utils.unroll_logic_type lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | Ctype _ ->
       let base = Base.of_c_logic_var lv in
@@ -482,7 +482,7 @@ let rec isLogicNonCompositeType t =
     (try isLogicNonCompositeType (Logic_const.type_of_element t)
      with Failure _ -> false)
   | Lboolean | Linteger | Lreal -> true
-  | Ctype t -> Cil.isScalarType t
+  | Ctype t -> Ast_types.is_scalar_type t
 
 let rec infer_type = function
   | Ctype t ->
@@ -522,11 +522,11 @@ let infer_binop_res_type op targ =
   match op with
   | PlusA | MinusA | Mult | Div -> targ
   | PlusPI | MinusPI ->
-    assert (Cil.isPointerType targ); targ
+    assert (Ast_types.is_pointer_type targ); targ
   | MinusPP -> Cil_const.intType
   | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr ->
     (* can only be applied on integral arguments *)
-    assert (Cil.isIntegralType targ); Cil_const.intType
+    assert (Ast_types.is_integral_type targ); Cil_const.intType
   | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
     Cil_const.intType (* those operators always return a boolean *)
 
@@ -545,10 +545,10 @@ let comes_from_fc_stdlib lvar =
 let is_noop_cast ~src_typ ~dst_typ =
   let src_typ = Logic_const.plain_or_set
       (fun lt ->
-         match Logic_utils.unroll_type lt with
+         match Logic_utils.unroll_logic_type lt with
          | Ctype typ -> Eval_typ.classify_as_scalar typ
          | _ -> None
-      ) (Logic_utils.unroll_type src_typ)
+      ) (Logic_utils.unroll_logic_type src_typ)
   in
   let open Eval_typ in
   match src_typ, Eval_typ.classify_as_scalar dst_typ with
@@ -562,7 +562,7 @@ let is_noop_cast ~src_typ ~dst_typ =
 (* If casting [trm] to [typ] has no effect in terms of the values contained
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
-  match Logic_utils.unroll_type typ, Logic_utils.unroll_type trm.term_type with
+  match Logic_utils.(unroll_logic_type typ, unroll_logic_type trm.term_type) with
   | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
   | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
     Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
@@ -717,7 +717,7 @@ let is_true = function
    defined unambiguously in ACSL. *)
 let check_logic_alarms ~alarm_mode typ (_v1: V.t eval_result) op v2 =
   match op with
-  | Div | Mod when Cil.isIntegralOrPointerType typ ->
+  | Div | Mod when Ast_types.is_integral_or_pointer_type typ ->
     let truth = Cvalue_forward.assume_non_zero v2.eover in
     let division_by_zero = not (is_true truth) in
     track_alarms division_by_zero alarm_mode
@@ -973,7 +973,7 @@ let forward_binop typ v1 op v2 =
   match op with
   | Eva_ast.Eq | Ne | Le | Lt | Ge | Gt ->
     let comp = Eva_ast.conv_relation op in
-    if Cil.isPointerType typ || Cvalue_forward.are_comparable comp v1 v2
+    if Ast_types.is_pointer_type typ || Cvalue_forward.are_comparable comp v1 v2
     then forward_binop_by_type typ v1 op v2
     else Cvalue.V.zero_or_one
   | _ -> forward_binop_by_type typ v1 op v2
@@ -1135,7 +1135,7 @@ let rec eval_term ~alarm_mode env t =
     (* See if the cast does something. If not, we can keep eunder as is.*)
     if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
     then { r with etype = typ }
-    else if Cil.isBoolType typ
+    else if Ast_types.is_bool_type typ
     then cast_to_bool r
     else
       let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
@@ -1151,7 +1151,7 @@ let rec eval_term ~alarm_mode env t =
     (match Logic_const.plain_or_set Fun.id ltyp with
      | Linteger when Logic_utils.is_integral_type t.term_type
                   || Logic_const.is_boolean_type t.term_type -> r
-     | Ctype typ when Cil.isIntegralOrPointerType typ -> r
+     | Ctype typ when Ast_types.is_integral_or_pointer_type typ -> r
      | Lreal ->
        let eover =
          if Logic_utils.is_integral_type t.term_type
@@ -1644,7 +1644,7 @@ and eval_tlhost ~alarm_mode env lv =
   match lv with
   | TVar lvar ->
     let base, typ =
-      match lvar.lv_origin, Logic_utils.unroll_type lvar.lv_type with
+      match lvar.lv_origin, Logic_utils.unroll_logic_type lvar.lv_type with
       | Some v, _ -> Base.of_varinfo v, v.vtype
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar

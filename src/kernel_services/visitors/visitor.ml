@@ -729,8 +729,7 @@ class internal_generic_frama_c_visitor fundec queue current_kf behavior: frama_c
            | None -> ()
            (* User is responsible for registering the new function *)
           )
-        | GVarDecl (({vstorage=Extern} as v),_) (* when not (isFunctionType
-                                                     v.vtype) *) ->
+        | GVarDecl (({vstorage=Extern} as v),_) ->
           if cond then
             Queue.add
               (fun () ->

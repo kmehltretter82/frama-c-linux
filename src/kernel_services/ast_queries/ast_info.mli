@@ -209,6 +209,7 @@ val pointed_type: typ -> typ
 
 val is_function_type : varinfo -> bool
 (** Return [true] iff the type of the given varinfo is a function type. *)
+[@@deprecated "Use Ast_types.is_function_type on the varinfo type instead."]
 
 (** Operations on cil function. *)
 module Function: sig

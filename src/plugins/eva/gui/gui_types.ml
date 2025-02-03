@@ -174,7 +174,7 @@ module Make (V: Abstract.Value.External) = struct
     try
       let vi = Base.to_varinfo base in
       (* if it is a function, do not add it *)
-      if Cil.isFunctionType vi.vtype then acc else vi :: acc
+      if Ast_types.is_function_type vi.vtype then acc else vi :: acc
     with Base.Not_a_C_variable -> acc
 
   (* [vars_in_gui_res r] returns a list of non-function C variables

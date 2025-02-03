@@ -313,7 +313,7 @@ let aggregator_call ~builder aggregator vf args =
 let rec check_arg_matching expected given =
   match Ast_types.unroll_type_node given, Ast_types.unroll_type_node expected with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
-  | TPtr _, _ when Cil.isVoidPtrType expected -> true
+  | TPtr _, _ when Ast_types.is_void_ptr_type expected -> true
   | TPtr t1, TPtr t2 -> check_arg_matching t1 t2
   | _, _ -> not (Cil.need_cast given expected)
 
@@ -477,7 +477,7 @@ let build_specialized_fun ~builder env vf format_fun tvparams =
     let name = if name = "" then fresh_param_name () else name in
     Build.parameter ~attributes typ name
   and add_variadic_param (typ,_dir) =
-    let typ = if Cil.isIntegralType typ then
+    let typ = if Ast_types.is_integral_type typ then
         Cil.integralPromotion typ
       else
         typ
@@ -607,7 +607,7 @@ let build_specialized_fun ~builder env vf format_fun tvparams =
   end;
 
   (* assign \result \from indirect:sources *)
-  if not (Cil.isVoidType ret_typ) then
+  if not (Ast_types.is_void_type ret_typ) then
     Build.(assigns [result] (List.map indirect !sources));
   (* assigns dests \from sources *)
   Build.assigns !dests !sources;
@@ -648,7 +648,7 @@ let rec format_of_type vf k t =
   | TPtr _ ->
     (* technically, we might still want to write/read the actual pointer,
        but this is not the most likely possibility. *)
-    if Cil.isCharPtrType t then
+    if Ast_types.is_char_ptr_type t then
       None, `s
     else
       None, `p
@@ -704,7 +704,7 @@ let infer_format_from_args vf format_fun args =
       match format_fun.f_kind with
       | PrintfLike -> t
       | ScanfLike ->
-        if not (Cil.isPointerType t) then begin
+        if not (Ast_types.is_pointer_type t) then begin
           let source = fst arg.eloc in
           Self.warning ~source ~wkey:wkey_typing
             "Expecting pointer as parameter of scanf function. \

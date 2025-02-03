@@ -496,7 +496,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let null = Logic_const.term ~loc Tnull t.term_type in
       Logic_const.por ~loc
         (Logic_const.prel (Req, null, t),
-         if Cil.isFunPtrType (Cil.typeOf e)
+         if Ast_types.is_fun_ptr_type (Cil.typeOf e)
          then Logic_const.pvalid_function ~loc t
          else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t))
 

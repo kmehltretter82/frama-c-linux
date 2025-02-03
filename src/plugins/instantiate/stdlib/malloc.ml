@@ -74,7 +74,7 @@ let well_typed_call ret _fct args =
   match ret, args with
   | Some ret, [ _ ] ->
     let t = Cil.typeOfLval ret in
-    Cil.isPointerType t && not (Cil.isVoidPtrType t) &&
+    Ast_types.is_pointer_type t && not (Ast_types.is_void_ptr_type t) &&
     Cil.isCompleteType (Cil.typeOf_pointed t)
   | _ -> false
 

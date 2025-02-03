@@ -2849,10 +2849,10 @@ let typeOf_array_elem_size t =
 
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> isLogicArithmeticType t.term_type
-  | Linteger -> isLogicIntegralType t.term_type
+  | Lreal -> is_logic_arithmetic_type t.term_type
+  | Linteger -> is_logic_integral_type t.term_type
   | Ltype _ when Logic_const.is_boolean_type typ ->
-    isLogicPureBooleanType t.term_type
+    is_logic_pure_boolean_type t.term_type
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
@@ -3699,7 +3699,7 @@ and constFold (machdep: bool) (e: exp) : exp =
   let loc = e.eloc in
   match e.enode with
   | BinOp (bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
-  | UnOp (unop, e1, tres) when isIntegralType tres -> begin
+  | UnOp (unop, e1, tres) when is_integral_type tres -> begin
       let tk =
         match unroll_type_skel tres with
         | TInt ik  -> ik
@@ -3720,7 +3720,7 @@ and constFold (machdep: bool) (e: exp) : exp =
         end
       | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
     end
-  | UnOp (unop, e1, tres) when isArithmeticType tres -> begin
+  | UnOp (unop, e1, tres) when is_arithmetic_type tres -> begin
       let tk =
         match unroll_type_skel tres with
         | TFloat fk -> fk
@@ -3829,7 +3829,7 @@ and constFoldOffset machdep = function
 and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
   let e1' = constFold machdep e1 in
   let e2' = constFold machdep e2 in
-  if isIntegralType tres then begin
+  if is_integral_type tres then begin
     let newe =
       let rec mkInt e =
         let loc = e.eloc in
@@ -3989,7 +3989,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
       !pp_exp_ref newe;
     newe
-  end else if isArithmeticType tres && not (isLongDoubleType tres) then begin
+  end else if is_arithmetic_type tres && not (is_long_double_type tres) then begin
     let tk =
       match unroll_type_skel tres with
       | TFloat fk -> fk
@@ -4012,7 +4012,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
 and constFoldToInt ?(machdep=true) e =
   match (constFold machdep e).enode with
   | Const(CInt64(c,_,_)) -> Some c
-  | CastE (typ, e) when machdep && isPointerType typ -> begin
+  | CastE (typ, e) when machdep && is_pointer_type typ -> begin
       (* Those casts are left left by constFold *)
       match constFoldToInt ~machdep e with
       | None -> None
@@ -4985,14 +4985,14 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
     isConstantGen is_varinfo_cst f e2
   | Lval (Var vi, NoOffset) ->
     is_varinfo_cst vi ||
-    (vi.vglob && isArrayType vi.vtype) ||
-    isFunctionType vi.vtype
+    (vi.vglob && is_array_type vi.vtype) ||
+    is_function_type vi.vtype
   | Lval (Var vi, offset) ->
     is_varinfo_cst vi && isConstantOffsetGen is_varinfo_cst f offset
   | Lval _ -> false
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
-  | CastE(t,{ enode = Const(CReal _)}) when isIntegralType t -> true
+  | CastE(t,{ enode = Const(CReal _)}) when is_integral_type t -> true
   | CastE(t, e) ->
     begin
       match t.tnode, (typeOf e).tnode with
@@ -5139,12 +5139,12 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
 let rec is_nullptr e =
   match e.enode with
   | Const (CInt64 (i,_,_)) -> Integer.is_zero i
-  | CastE (t,e) when isPointerType t -> is_nullptr e
+  | CastE (t,e) when is_pointer_type t -> is_nullptr e
   | _ -> false
 
 (* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
 let rec is_boolean_result e =
-  (isBoolType (typeOf e)) ||
+  (is_bool_type (typeOf e)) ||
   match e.enode with
   | Const _ ->
     (match isInteger e with
@@ -5482,7 +5482,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
     match oldt'.tnode, newt'.tnode with
     | TNamed _, _
     | _, TNamed _ -> Kernel.fatal ~current:true "Ast_types.unroll_type failed in checkCast"
-    | _, TInt IBool when isScalarType oldt' -> ()
+    | _, TInt IBool when is_scalar_type oldt' -> ()
     | TInt _, TInt _ -> ()
     | TFloat _, TInt _ -> (* ISO 6.3.1.4.1 *) ()
     | TInt _, TFloat _ -> (* ISO 6.3.1.4.2 *) ()
@@ -5500,9 +5500,9 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       (* ISO 6.3.2.2 *)
       Kernel.debug ~level:3
         "Casting a value into void: expr is evaluated for side effects"
-    | TPtr t, TPtr { tnode = TVoid } when isObjectType t ->
+    | TPtr t, TPtr { tnode = TVoid } when is_object_type t ->
       (* ISO 6.3.2.3.1 *) ()
-    | TPtr { tnode = TVoid }, TPtr t when isObjectType t ->
+    | TPtr { tnode = TVoid }, TPtr t when is_object_type t ->
       (* ISO 6.3.2.3.1 *) ()
     | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
     | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
@@ -5512,9 +5512,9 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
           ~wkey:Kernel.wkey_int_conversion
           ~current:true
           "Conversion from a pointer to an integer without an explicit cast"
-    | TPtr t1, TPtr t2 when isObjectType t1 && isObjectType t2 ->
+    | TPtr t1, TPtr t2 when is_object_type t1 && is_object_type t2 ->
       (* ISO 6.3.2.3.7 *) ()
-    | TPtr t1, TPtr t2 when isFunctionType t1 && isFunctionType t2 ->
+    | TPtr t1, TPtr t2 when is_function_type t1 && is_function_type t2 ->
       (* ISO 6.3.2.3.8 *)
       if not (areCompatibleTypes ?context oldt newt)
       then
@@ -5575,24 +5575,24 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
     (* No other conversion implying a pointer to function
           and a pointer to object are supported. *)
-    | TPtr t1, TPtr t2 when isFunctionType t1 && isObjectType t2 ->
+    | TPtr t1, TPtr t2 when is_function_type t1 && is_object_type t2 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
           "casting function to %a" Cil_datatype.Typ.pretty newt
-    | TPtr t1, TPtr t2 when isFunctionType t2 && isObjectType t1 ->
+    | TPtr t1, TPtr t2 when is_function_type t2 && is_object_type t1 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
           "casting function from %a" Cil_datatype.Typ.pretty oldt
 
-    | _, TPtr t1 when isFunctionType t1 ->
+    | _, TPtr t1 when is_function_type t1 ->
       error "cannot cast %a to function type"
         Cil_datatype.Typ.pretty oldt
 
-    | _, _ when isArithmeticType oldt' && isArithmeticType newt' ->
+    | _, _ when is_arithmetic_type oldt' && is_arithmetic_type newt' ->
       (* ISO 6.5.16.1.1#1 *) ()
 
 
@@ -5606,7 +5606,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
        that into a field access *)
     | TComp _, _ ->
       begin
-        match isTransparentUnion oldt with
+        match is_transparent_union_type oldt with
         | None ->
           error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
@@ -5619,7 +5619,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       Kernel.debug ~dkey ~current:true
         "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt
 
-    | _, _ when fromsource && not (isScalarType newt') ->
+    | _, _ when fromsource && not (is_scalar_type newt') ->
       (* ISO 6.5.4.2 *)
       error "cast over a non-scalar type %a" Cil_datatype.Typ.pretty newt
 
@@ -5660,7 +5660,7 @@ let rec castReduce fromsource force =
 
     | TFun _, TPtr { tnode = TFun _ }, Lval lv -> mkAddrOf ~loc lv
 
-    | _, TInt IBool, _ when isScalarType oldt' ->
+    | _, TInt IBool, _ when is_scalar_type oldt' ->
       if is_boolean_result e then begin
         Kernel.debug ~dkey "Explicit cast to Boolean: %a" !pp_exp_ref e;
         res e
@@ -5674,7 +5674,7 @@ let rec castReduce fromsource force =
 
     | TComp _, _, _ ->
       begin
-        match isTransparentUnion oldt with
+        match is_transparent_union_type oldt with
         | None ->
           error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
@@ -5747,7 +5747,7 @@ and mkBinOp ~loc op e1 e2 =
   in
   let doIntegralArithmetic () =
     let tres = arithmeticConversion t1 t2 in
-    if isIntegralType tres then
+    if is_integral_type tres then
       make_expr tres tres
     else
       Kernel.fatal
@@ -5770,7 +5770,7 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
   in
   let check_scalar op e t =
-    if not (isScalarType t) then
+    if not (is_scalar_type t) then
       Kernel.fatal ~current:true "operand of %s is not scalar: %a"
         op !pp_exp_ref e
   in
@@ -5792,26 +5792,26 @@ and mkBinOp ~loc op e1 e2 =
       constFoldBinOp ~loc machdep op
         (mkCastT ~oldt:t1 ~newt:t1' e1) (mkCastT ~oldt:t2 ~newt:t2' e2) t1'
   | (PlusA|MinusA)
-    when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
-  | (PlusPI|MinusPI) when isPointerType t1 && isIntegralType t2 ->
+    when is_arithmetic_type t1 && is_arithmetic_type t2 -> doArithmetic ()
+  | (PlusPI|MinusPI) when is_pointer_type t1 && is_integral_type t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
-  | MinusPP when isPointerType t1 && isPointerType t2 ->
+  | MinusPP when is_pointer_type t1 && is_pointer_type t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
     constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) Cil_const.intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
-    when isArithmeticType t1 && isArithmeticType t2 ->
+    when is_arithmetic_type t1 && is_arithmetic_type t2 ->
     doArithmeticComp ()
-  | (Eq|Ne) when isPointerType t1 && isZero e2 ->
+  | (Eq|Ne) when is_pointer_type t1 && isZero e2 ->
     compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when isPointerType t2 && isZero e1 ->
+  | (Eq|Ne) when is_pointer_type t2 && isZero e1 ->
     compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Eq|Ne) when isVariadicListType t1 && isZero e2 ->
+  | (Eq|Ne) when is_variadic_list_type t1 && isZero e2 ->
     Kernel.debug ~level:3 "Comparison of va_list and zero";
     compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when isVariadicListType t2 && isZero e1 ->
+  | (Eq|Ne) when is_variadic_list_type t2 && isZero e1 ->
     Kernel.debug ~level:3 "Comparison of zero and va_list";
     compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isPointerType t2 ->
+  | (Le|Lt|Ge|Gt|Eq|Ne) when is_pointer_type t1 && is_pointer_type t2 ->
     compare_pointer ~cast1:(uintptr_type ()) ~cast2:(uintptr_type ())
       op e1 e2
   | _ ->
@@ -5829,7 +5829,7 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
     | (Eq | Ne | Lt | Le | Ge | Gt) ->
       let t1 = typeOf e1 in
       let t2 = typeOf e2 in
-      if isPointerType t1 && isPointerType t2
+      if is_pointer_type t1 && is_pointer_type t2
          && not (isZero e1) && not (isZero e2)
       then begin
         mkCast ~force:true ~newt:(uintptr_type ()) e1,
@@ -5877,7 +5877,7 @@ let existsType (f: typ -> existsAction) (t: typ) : bool =
 let increm (e: exp) (i: int) =
   let e' = constFold false e in
   let et = typeOf e' in
-  let bop = if isPointerType et then PlusPI else PlusA in
+  let bop = if is_pointer_type et then PlusPI else PlusA in
   let i = match et.tnode with
     | TInt k | TEnum {ekind = k } -> kinteger k ~loc:e.eloc i
     | _ -> integer ~loc:e.eloc i
@@ -5887,7 +5887,7 @@ let increm (e: exp) (i: int) =
 (* Try to do an increment, with constant folding *)
 let increm64 (e: exp) i =
   let et = typeOf e in
-  let bop = if isPointerType et then PlusPI else PlusA in
+  let bop = if is_pointer_type et then PlusPI else PlusA in
   constFold
     false
     (new_exp ~loc:e.eloc (BinOp(bop, e, kinteger64 ~loc:e.eloc i, et)))
@@ -6115,7 +6115,7 @@ let pointer_decay t =
    an incomplete type and does not have array type, the behavior is undefined.
 *)
 let lvalue_conversion (t : typ) : (typ, string) result =
-  if not (isCompleteType t) && not (isArrayType t) then
+  if not (isCompleteType t) && not (is_array_type t) then
     Error (Format.asprintf
              "Invalid lvalue conversion of incomplete non-array type %a"
              !pp_typ_ref t)
@@ -6326,7 +6326,7 @@ let pushGlobal (g: global)
           (* insert declarations for referred variables ('vl'), before
            * the type definition 'g' itself *)
           let aux acc v =
-            if isFunctionType v.vtype
+            if is_function_type v.vtype
             then GFunDecl (empty_funspec (),v, loc) :: acc
             else begin
               let is_same_decl = function
@@ -6798,15 +6798,14 @@ let isCharConstPtrType = is_char_const_ptr_type
 let isShortType = is_short_type
 let isIntegralType = is_integral_type
 let is_intptr_t = is_intptr_t
-let is_uintptr_t = isis_uintptr_t
+let is_uintptr_t = is_uintptr_t
 
 let isFloatingType = is_floating_type
-let isLongDoubleType = is_long_double_type (* notexp ? *)
 
 let isArithmeticType = is_arithmetic_type
 
 let isPointerType = is_pointer_type
-let isIntegralOrPointerType = is_integral_or_ptr_type
+let isIntegralOrPointerType = is_integral_or_pointer_type
 
 let isArrayType = is_array_type
 let isUnsizedArrayType = is_unsized_array_type
@@ -6818,7 +6817,6 @@ let isFunctionType = is_function_type
 let isFunPtrType = is_fun_ptr_type
 
 let isScalarType = is_scalar_type
-let isObjectType = is_object_type
 
 let isStructType = is_struct_type
 let isUnionType = is_union_type

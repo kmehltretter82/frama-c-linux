@@ -78,28 +78,28 @@ let set x p w =
   | NotUsed -> w
   | ByAddr -> { w with by_addr = Var x :: w.by_addr }
   | ByRef ->
-    if Cil.isFunctionType x.vtype then w else
+    if Ast_types.is_function_type x.vtype then w else
       { w with context = Ptr x :: w.context }
   | InContext v ->
-    if Cil.isFunctionType x.vtype then w else
+    if Ast_types.is_function_type x.vtype then w else
       begin match v with
         | Nullable -> { w with nullable = Ptr x :: w.nullable }
         | Valid -> { w with context = Ptr x :: w.context }
       end
   | InArray v ->
-    if Cil.isFunctionType x.vtype then w else
+    if Ast_types.is_function_type x.vtype then w else
       begin match v with
         | Nullable -> { w with nullable = Arr x :: w.nullable }
         | Valid -> { w with context = Arr x :: w.context }
       end
   | ByValue | ByShift ->
     if x.vghost then w else
-    if Cil.isFunctionType x.vtype then w else
+    if Ast_types.is_function_type x.vtype then w else
     if x.vglob && (x.vstorage <> Static || x.vaddrof) then
-      let z = if Cil.isArrayType x.vtype then Arr x else Var x in
+      let z = if Ast_types.is_array_type x.vtype then Arr x else Var x in
       { w with globals = z :: w.globals }
     else
-    if x.vformal && Cil.isPointerType x.vtype then
+    if x.vformal && Ast_types.is_pointer_type x.vtype then
       let z = if p = ByShift then Arr x else Ptr x in
       { w with to_heap = z :: w.to_heap }
     else w
@@ -144,7 +144,7 @@ let rec addr_of_lval ?loc term =
 let type_of_zone = function
   | Ptr vi -> vi.vtype
   | Var vi -> Cil_const.mk_tptr vi.vtype
-  | Arr vi when Cil.isPointerType vi.vtype -> vi.vtype
+  | Arr vi when Ast_types.is_pointer_type vi.vtype -> vi.vtype
   | Arr vi -> Cil_const.mk_tptr (Cil.typeOf_array_elem vi.vtype)
 
 let zone_to_term ?(to_char=false) loc zone =
@@ -169,7 +169,7 @@ let zone_to_term ?(to_char=false) loc zone =
   | Ptr vi -> loc_range (term ~loc (TLval(lval vi)) typ)
   | Arr vi ->
     let ptr =
-      if Cil.isArrayType vi.vtype
+      if Ast_types.is_array_type vi.vtype
       then term ~loc (TStartOf (lval vi)) typ
       else term ~loc (TLval(lval vi)) typ
     in
@@ -383,7 +383,7 @@ let out_pointers_separation kf loc p =
   in
   let asgnd_ptrs = List.filter_map assigned_ptr (assigned_via_pointers kf) in
   let asgnd_ptrs =
-    if Cil.isPointerType ret_t then tresult ~loc ret_t :: asgnd_ptrs
+    if Ast_types.is_pointer_type ret_t then tresult ~loc ret_t :: asgnd_ptrs
     else asgnd_ptrs
   in
   let formals_separation =

@@ -39,7 +39,7 @@ let get_retres_vi = Retres.memo
     (fun kf ->
        let vi = Kernel_function.get_vi kf in
        let typ = Cil.getReturnType vi.vtype in
-       if Cil.isVoidType typ then
+       if Ast_types.is_void_type typ then
          None
        else
          try

@@ -36,11 +36,12 @@ let from_prototype kf =
   in
   let rtyp, _, _, _ = splitFunctionTypeVI vi in
   let pointer_args,basic_args =
-    List.partition (fun vi -> isPointerType vi.vtype) formals in
+    List.partition (fun vi -> Ast_types.is_pointer_type vi.vtype) formals in
   (* Remove args of type pointer to pointer *)
   let pointer_args =
-    List.filter
-      (fun vi -> not (isPointerType (typeOf_pointed vi.vtype))) pointer_args
+    List.filter (fun vi ->
+        not (Ast_types.is_pointer_type (typeOf_pointed vi.vtype))
+      ) pointer_args
   in
   (* Convert void* pointers to char* *)
   let pointer_args =
@@ -49,7 +50,7 @@ let from_prototype kf =
          let loc = vi.vdecl in
          let t = tvar (cvar_to_lvar vi) in
          let typ = vi.vtype in
-         if isVoidPtrType typ then
+         if Ast_types.is_void_ptr_type typ then
            let const = Ast_types.type_has_attribute "const" (Cil.typeOf_pointed typ) in
            let typ' = if const then Cil_const.charConstPtrType else Cil_const.charPtrType in
            (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
@@ -96,7 +97,7 @@ let from_prototype kf =
       match Ast_attributes.find_params "arraylen" typ.tattr with
       | [AInt length] -> TBinOp (PlusPI, t, make_range (Some length)), true
       | _ ->
-        if isAnyCharPtrType typ
+        if Ast_types.is_any_char_ptr_type typ
         then TBinOp (PlusPI, t, make_range None), true
         else t.term_node, false
     in

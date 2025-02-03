@@ -1482,7 +1482,7 @@ class reorder_ast: Visitor.frama_c_visitor =
 
     method! vvrbl vi =
       if vi.vglob && not (Cil_datatype.Varinfo.Set.mem vi known_var) then begin
-        if Cil.isFunctionType vi.vtype then
+        if Ast_types.is_function_type vi.vtype then
           self#add_needed_decl (GFunDecl (Cil.empty_funspec(),vi,vi.vdecl))
         else
           self#add_needed_decl (GVarDecl (vi,vi.vdecl));

@@ -82,7 +82,7 @@ let get_lvalue = function
   | _ -> None
 
 let rec ghost_term_type t =
-  match (Logic_utils.unroll_type t) with
+  match (Logic_utils.unroll_logic_type t) with
   | Ctype t -> Ast_types.is_ghost_type t
   | t when Logic_const.is_set_type t ->
     ghost_term_type (Logic_const.type_of_element t)
@@ -151,7 +151,7 @@ class visitor = object(self)
     if not(is_generated_ret_var v)
     && not (Ast_types.is_wellformed_ghost_type v.vtype) then
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
-    if isFunctionType (Ast_types.unroll_type v.vtype) then begin
+    if Ast_types.(is_function_type (unroll_type v.vtype)) then begin
       let ftype = getReturnType (Ast_types.unroll_type v.vtype) in
       match ftype.tnode with
       | TPtr t when not (Ast_types.is_wellformed_ghost_type t) ->

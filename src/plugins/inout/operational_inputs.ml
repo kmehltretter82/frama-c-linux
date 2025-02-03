@@ -416,7 +416,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
     let v_e = Eva.Results.(eval_exp e request |> as_cvalue) in
     let t1 = Ast_types.unroll_type (Cil.typeOf e) in
     let do_then, do_else =
-      if Cil.isIntegralType t1 || Cil.isPointerType t1
+      if Ast_types.is_integral_type t1 || Ast_types.is_pointer_type t1
       then Cvalue.V.contains_non_zero v_e,
            Cvalue.V.contains_zero v_e
       else true, true (* TODO: a float condition is true iff != 0.0 *)

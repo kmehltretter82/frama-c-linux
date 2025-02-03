@@ -46,7 +46,7 @@ let ptr_sizeof ~loc typ =
 
 let lnot ~loc e =
   let ty = Cil.typeOf e in
-  if not (Cil.isScalarType ty) then
+  if not (Ast_types.is_scalar_type ty) then
     Options.fatal
       ~current:true
       "Trying to create a logical not on an expression that is not scalar: %a"

@@ -221,7 +221,7 @@ end = struct
         (fun s v ->
            let v =
              match v.lv_type with
-             | Ctype ty when Cil.isIntegralType ty -> v
+             | Ctype ty when Ast_types.is_integral_type ty -> v
              | Linteger | Lboolean -> v
              | Ctype _ | Ltype _ | Lvar _ | Lreal | Larrow _ ->
                Error.not_yet
