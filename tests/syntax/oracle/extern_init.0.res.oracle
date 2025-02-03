@@ -1,12 +1,6 @@
 [kernel] Parsing extern_init.i (no preprocessing)
 [kernel] Parsing extern_init_1.i (no preprocessing)
 [kernel] Parsing extern_init_2.i (no preprocessing)
-[kernel:typing:no-proto] extern_init_2.i:10: Warning: 
-  Calling function f that is declared without prototype.
-  Its formals will be inferred from actual arguments
-[kernel:typing:no-proto] extern_init_2.i:11: Warning: 
-  Calling function g that is declared without prototype.
-  Its formals will be inferred from actual arguments
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

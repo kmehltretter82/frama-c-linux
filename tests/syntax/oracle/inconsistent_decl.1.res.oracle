@@ -1,7 +1,8 @@
 [kernel] Parsing inconsistent_decl.c (with preprocessing)
 [kernel:typing:no-proto] inconsistent_decl.c:12: Warning: 
   Calling function f that is declared without prototype.
-  Its formals will be inferred from actual arguments
+  Its formals will be inferred from actual arguments.
+  Declare it as f(void) if the function does not take any parameters.
 [kernel] Parsing inconsistent_decl_2.i (no preprocessing)
 [kernel] User Error: Incompatible declaration for f:
   different type constructors:

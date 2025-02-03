@@ -1,7 +1,8 @@
 [kernel] Parsing no_prototype.i (no preprocessing)
 [kernel:typing:no-proto] no_prototype.i:9: Warning: 
   Calling function foo that is declared without prototype.
-  Its formals will be inferred from actual arguments
+  Its formals will be inferred from actual arguments.
+  Declare it as foo(void) if the function does not take any parameters.
 [kernel] no_prototype.i:11: User Error: 
   Declaration of foo does not match previous declaration from no_prototype.i:6 (different number of arguments).
   9         foo();
