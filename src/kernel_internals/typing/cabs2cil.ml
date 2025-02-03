@@ -6535,7 +6535,10 @@ and doExp local_env
         if not (Cil.typeHasAttribute "missingproto" f.vtype) then
           Kernel.warning ~source:(fst loc) ~wkey:Kernel.wkey_no_proto
             "Calling function %a that is declared without prototype.@ \
-             Its formals will be inferred from actual arguments"
+             Its formals will be inferred from actual arguments.@ \
+             Declare it as %a(void) if the function does not take any \
+             parameters."
+            Cil_printer.pp_varinfo f
             Cil_printer.pp_varinfo f
       in
       (* Drop certain qualifiers from the result type *)
