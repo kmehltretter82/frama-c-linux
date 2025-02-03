@@ -17,9 +17,9 @@
   function __e_acsl_assert_register_long: precondition data->values == \null ||
                                                        \valid(data->values) got status unknown.
 [eva:alarm] arith.i:34: Warning: 
-  signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__7;
+  signed overflow. assert -2147483648 <= 1 + __gen_e_acsl__6;
 [eva:alarm] arith.i:34: Warning: 
-  signed overflow. assert 1 + __gen_e_acsl__7 <= 2147483647;
+  signed overflow. assert 1 + __gen_e_acsl__6 <= 2147483647;
 [eva:alarm] arith.i:36: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

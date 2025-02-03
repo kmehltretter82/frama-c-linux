@@ -63,15 +63,15 @@ int __gen_e_acsl_main(int argc, char **argv)
   {
     unsigned long __gen_e_acsl_block_length;
     __e_acsl_mpz_t __gen_e_acsl_block_length_2;
-    __e_acsl_mpz_t __gen_e_acsl_;
+    __e_acsl_mpz_t __gen_e_acsl_mul;
     int __gen_e_acsl_eq;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_2 =
       {.values = (void *)0};
     __gen_e_acsl_block_length = __e_acsl_block_length((void *)argv);
     __gmpz_init_set_ui(__gen_e_acsl_block_length_2,__gen_e_acsl_block_length);
-    __gmpz_init_set_si(__gen_e_acsl_,(argc + 1L) * 8);
+    __gmpz_init_set_si(__gen_e_acsl_mul,(argc + 1L) * 8);
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_block_length_2),
-                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_));
+                                 (__e_acsl_mpz_struct const *)(__gen_e_acsl_mul));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data_2,"argv",
                                  (void *)argv);
     __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data_2,
@@ -89,7 +89,7 @@ int __gen_e_acsl_main(int argc, char **argv)
     __e_acsl_assert(__gen_e_acsl_eq == 0,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
     __gmpz_clear(__gen_e_acsl_block_length_2);
-    __gmpz_clear(__gen_e_acsl_);
+    __gmpz_clear(__gen_e_acsl_mul);
   }
   /*@ assert \block_length(argv) == (argc + 1) * sizeof(char *); */ ;
   {

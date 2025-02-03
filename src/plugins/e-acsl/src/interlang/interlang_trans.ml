@@ -161,7 +161,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
     let* e = M.modifying_env @@ fun env ->
       Translate_utils.comparison_to_exp ~loc kf env ity binop e1 e2 ~name origin
     in
-    M.return (e, Some (Analyses_types.C_number, ""))
+    M.return (e, Some (Analyses_types.C_number, name))
   | BinOp {ity; binop = Plus | Minus | Mult as binop; op1; op2} ->
     let binop = compile_binop binop in
     let* e1 = compile op1 in
@@ -180,7 +180,7 @@ and compile_context_insensitive {Interlang.enode; origin} =
         let ty = Typing.typ_of_number_ty ity in
         M.return @@ Cil.new_exp ~loc @@ BinOp (binop, e1, e2, ty)
     in
-    M.return (e, Some (Analyses_types.C_number, ""))
+    M.return (e, Some (Analyses_types.C_number, Misc.name_of_binop binop))
   | BinOp ({binop = Div | Mod} as binop_node) ->
     compile_div_mod ~origin binop_node
   | Lval lval ->
