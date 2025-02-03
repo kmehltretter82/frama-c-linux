@@ -1,14 +1,16 @@
 2d1
 < [eva:experimental] Warning: The taint domain is experimental.
-25c24
-< [eva:alarm] multi_taint.c:21: Warning: check got status unknown.
+27,28c26,27
+< [eva:alarm] multi_taint.c:25: Warning: check got status unknown.
+< [eva:alarm] multi_taint.c:26: Warning: check got status unknown.
 ---
-> [eva:alarm] multi_taint.c:21: Warning: check got status invalid.
-33c32
+> [eva:alarm] multi_taint.c:25: Warning: check got status invalid.
+> [eva:alarm] multi_taint.c:26: Warning: check got status invalid.
+37c36
 <   t ∈ [--..--]
 ---
 >   t ∈ {4}
-39c38
+43c42
 <   taint_var ∈ [--..--]
 ---
 >   taint_var ∈ {4}

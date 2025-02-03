@@ -1,12 +1,14 @@
-25c25
-< [eva:alarm] multi_taint.c:21: Warning: check got status unknown.
+27,28c27,28
+< [eva:alarm] multi_taint.c:25: Warning: check got status unknown.
+< [eva:alarm] multi_taint.c:26: Warning: check got status unknown.
 ---
-> [eva:alarm] multi_taint.c:21: Warning: check got status invalid.
-33c33
+> [eva:alarm] multi_taint.c:25: Warning: check got status invalid.
+> [eva:alarm] multi_taint.c:26: Warning: check got status invalid.
+37c37
 <   t ∈ [--..--]
 ---
 >   t ∈ {4}
-39c39
+43c43
 <   taint_var ∈ [--..--]
 ---
 >   taint_var ∈ {4}
