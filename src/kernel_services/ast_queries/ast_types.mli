@@ -138,3 +138,156 @@ val is_ghost_type : typ -> bool
     once the type is not ghost anymore, \ghost cannot appear again.
 *)
 val is_wellformed_ghost_type : typ -> bool
+
+(* ************************************************************************* *)
+(** {2 Type checkers} *)
+(* ************************************************************************* *)
+
+(** is the given type "void"? *)
+val is_void_type: typ -> bool
+
+(** is the given type "void *"? *)
+val is_void_ptr_type: typ -> bool
+
+(** True if the argument is [_Bool]. *)
+val is_bool_type: typ -> bool
+
+(** True if the argument is a plain character type (but neither [signed char]
+    nor [unsigned char]).
+*)
+val is_char_type: typ -> bool
+
+(** True if the argument is a character type (i.e. plain, signed or unsigned). *)
+val is_any_char_type: typ -> bool
+
+(** True if the argument is a pointer to a plain character type (but neither
+    [signed char] nor [unsigned char]).
+*)
+val is_char_ptr_type: typ -> bool
+
+(** True if the argument is a pointer to a character type (i.e. plain, signed or
+    unsigned).
+*)
+val is_any_char_ptr_type: typ -> bool
+
+(** True if the argument is a pointer to a constant character type, e.g. a
+    string literal.
+*)
+val is_char_const_ptr_type: typ -> bool
+
+(** True if the argument is a short type (i.e. signed or unsigned). *)
+val is_short_type: typ -> bool
+
+(** True if the argument is an integral type (i.e. integer or enum). *)
+val is_integral_type: typ -> bool
+
+(** True if the argument is [intptr_t] (but _not_ its underlying integer type). *)
+val is_intptr_t: typ -> bool
+
+(** True if the argument is [uintptr_t] (but _not_ its underlying integer type). *)
+val is_uintptr_t: typ -> bool
+
+(** True if the argument is a floating point type. *)
+val is_floating_type: typ -> bool
+
+(** True if the argument is a long double type. *)
+val is_long_double_type: typ -> bool
+
+(** True if the argument is an arithmetic type (i.e. integer, enum or floating
+    point.
+*)
+val is_arithmetic_type: typ -> bool
+
+(** True if the argument is a pointer type. *)
+val is_pointer_type: typ -> bool
+
+(** True if the argument is an integral or pointer type. *)
+val is_integral_or_pointer_type: typ -> bool
+
+(** True if the argument is an array type. *)
+val is_array_type: typ -> bool
+
+(** True if the argument is an array type without size. *)
+val is_unsized_array_type: typ -> bool
+
+(** True if the argument is a sized array type. *)
+val is_sized_array_type: typ -> bool
+
+(** True if the argument is an array of a character type (i.e. plain, signed or
+    unsigned).
+*)
+val is_char_array_type: typ -> bool
+
+(** True if the argument is an array of a character type (i.e. plain, signed or
+    unsigned).
+*)
+val is_any_char_array_type: typ -> bool
+
+(** True if the argument is a function type. *)
+val is_function_type: typ -> bool
+
+(** True if the argument is a function pointer type. *)
+val is_fun_ptr_type: typ -> bool
+
+(** True if the argument is a scalar type (i.e. integral, enum, floating point
+    or pointer.
+*)
+val is_scalar_type: typ -> bool
+
+(** True if the argument is an object type (i.e. not a function type). *)
+val is_object_type: typ -> bool
+
+(** True if the argument is a struct. *)
+val is_struct_type: typ -> bool
+
+(** True if the argument is a union type. *)
+val is_union_type: typ -> bool
+
+(** True if the argument is a struct or union type. *)
+val is_struct_or_union_type: typ -> bool
+
+(** Check if a type is a transparent union, and return the first field. *)
+val is_transparent_union_type : typ -> fieldinfo option
+
+(** True if the argument denotes the type of [...] in a variadic function. *)
+val is_variadic_list_type: typ -> bool
+
+(** True if the argument is the type for reified C types. *)
+val is_logic_typetag_type: logic_type -> bool
+
+(** True if the argument is a boolean type, either integral C type or
+    mathematical boolean one.
+*)
+val is_logic_boolean_type: logic_type -> bool
+
+(** True if the argument is [_Bool] or [boolean]. *)
+val is_logic_pure_boolean_type: logic_type -> bool
+
+(** True if the argument is an integral type (i.e. integer or enum), either C or
+    mathematical one.
+*)
+val is_logic_integral_type: logic_type -> bool
+
+(** True if the argument is a floating point type. *)
+val is_logic_float_type: logic_type -> bool
+
+(** True if the argument is the logic 'real' type. *)
+val is_logic_real_type: logic_type -> bool
+
+(** True if the argument is a C floating point type or logic 'real' type. *)
+val is_logic_real_or_float_type: logic_type -> bool
+
+(** True if the argument is a logic arithmetic type (i.e. integer, enum or
+    floating point, either C or mathematical one.
+*)
+val is_logic_arithmetic_type: logic_type -> bool
+
+(** True if the argument is the logic function type. Expands the logic type
+    definition if necessary.
+*)
+val is_logic_function_type: logic_type -> bool
+
+(** True if the argument is the logic function pointer type. Expands the logic
+    type definition if necessary.
+*)
+val is_logic_fun_ptr_type: logic_type -> bool

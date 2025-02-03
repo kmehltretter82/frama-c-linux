@@ -221,12 +221,6 @@ val foldLeftCompound:
 (** {2 Values for manipulating types} *)
 (* ************************************************************************* *)
 
-(** is the given type "void"? *)
-val isVoidType: typ -> bool
-
-(** is the given type "void *"? *)
-val isVoidPtrType: typ -> bool
-
 (** Any signed integer type of size 16 bits.
     It is equivalent to the ISO C int16_t type but without using the
     corresponding header.
@@ -335,133 +329,6 @@ val arithmeticConversion : typ -> typ -> typ
 *)
 val integralPromotion : typ -> typ
 
-(** True if the argument is a character type (i.e. plain, signed or unsigned)
-    @since Chlorine-20180501 *)
-val isAnyCharType: typ -> bool
-
-(** True if the argument is a plain character type
-    (but neither [signed char] nor [unsigned char]). *)
-val isCharType: typ -> bool
-
-(** True if the argument is a short type (i.e. signed or unsigned) *)
-val isShortType: typ -> bool
-
-(** True if the argument is a pointer to a character type
-    (i.e. plain, signed or unsigned).
-    @since Chlorine-20180501 *)
-val isAnyCharPtrType: typ -> bool
-
-(** True if the argument is a pointer to a plain character type
-    (but neither [signed char] nor [unsigned char]). *)
-val isCharPtrType: typ -> bool
-
-(** True if the argument is a pointer to a constant character type,
-    e.g. a string literal.
-    @since Chlorine-20180501 *)
-val isCharConstPtrType: typ -> bool
-
-(** True if the argument is an array of a character type
-    (i.e. plain, signed or unsigned)
-    @since Chlorine-20180501 *)
-val isAnyCharArrayType: typ -> bool
-
-(** True if the argument is an array of a character type
-    (i.e. plain, signed or unsigned)
-*)
-val isCharArrayType: typ -> bool
-
-(** True if the argument is an integral type (i.e. integer or enum) *)
-val isIntegralType: typ -> bool
-
-(** True if the argument is [_Bool]
-    @since 19.0-Potassium
-*)
-val isBoolType: typ -> bool
-
-(** True if the argument is [intptr_t] (but _not_ its underlying integer type)
-    @since 30.0-Zinc
-*)
-val is_intptr_t: typ -> bool
-
-(** True if the argument is [uintptr_t] (but _not_ its underlying integer type)
-    @since 30.0-Zinc
-*)
-val is_uintptr_t: typ -> bool
-
-(** True if the argument is [_Bool] or [boolean].
-    @since 19.0-Potassium
-*)
-val isLogicPureBooleanType: logic_type -> bool
-
-(** True if the argument is an integral or pointer type. *)
-val isIntegralOrPointerType: typ -> bool
-
-(** True if the argument is an integral type (i.e. integer or enum), either
-    C or mathematical one. *)
-val isLogicIntegralType: logic_type -> bool
-
-(** True if the argument is a boolean type, either integral C type or
-    mathematical boolean one. *)
-val isLogicBooleanType: logic_type -> bool
-
-(** True if the argument is a floating point type. *)
-val isFloatingType: typ -> bool
-
-(** True if the argument is a floating point type. *)
-val isLogicFloatType: logic_type -> bool
-
-(** True if the argument is a C floating point type or logic 'real' type. *)
-val isLogicRealOrFloatType: logic_type -> bool
-
-(** True if the argument is the logic 'real' type. *)
-val isLogicRealType: logic_type -> bool
-
-(** True if the argument is an arithmetic type (i.e. integer, enum or
-    floating point *)
-val isArithmeticType: typ -> bool
-
-(** True if the argument is a scalar type (i.e. integral, enum,
-    floating point or pointer
-    @since 22.0-Titanium
-*)
-val isScalarType: typ -> bool
-
-(** True if the argument is a logic arithmetic type (i.e. integer, enum or
-    floating point, either C or mathematical one. *)
-val isLogicArithmeticType: logic_type -> bool
-
-(** True if the argument is a function type *)
-val isFunctionType: typ -> bool
-
-(** True if the argument is the logic function type.
-    Expands the logic type definition if necessary.
-    @since 18.0-Argon *)
-val isLogicFunctionType: logic_type -> bool
-
-(** True if the argument is a pointer type. *)
-val isPointerType: typ -> bool
-
-(** True if the argument is a function pointer type.
-    @since 18.0-Argon *)
-val isFunPtrType: typ -> bool
-
-(** True if the argument is the logic function pointer type.
-    Expands the logic type definition if necessary.
-    @since 18.0-Argon *)
-val isLogicFunPtrType: logic_type -> bool
-
-(** Check if a type is a transparent union, and return the first field
-
-    @since 28.0-Nickel *)
-val isTransparentUnion : typ -> fieldinfo option
-
-(** True if the argument is the type for reified C types. *)
-val isTypeTagType: logic_type -> bool
-
-(** True if the argument denotes the type of ... in a variadic function.
-    @since Nitrogen-20111001 moved from cabs2cil *)
-val isVariadicListType: typ -> bool
-
 (** Obtain the argument list ([] if None).
     @since 20.0-Calcium Beware that it contains the ghost arguments. *)
 val argsToList:
@@ -472,32 +339,6 @@ val argsToList:
 val argsToPairOfLists:
   (string * typ * attributes) list option ->
   (string * typ * attributes) list * (string * typ * attributes) list
-
-(** True if the argument is an array type *)
-val isArrayType: typ -> bool
-
-(** True if the argument is an array type without size
-    @since 28.0-Nickel
-*)
-val isUnsizedArrayType: typ -> bool
-
-(** True if the argument is a sized array type
-    @since 28.0-Nickel
-*)
-val isSizedArrayType: typ -> bool
-
-(** True if the argument is a struct
-    @since 28.0-Nickel
-*)
-val isStructType: typ -> bool
-
-(** True if the argument is a union type
-    @since 28.0-Nickel
-*)
-val isUnionType: typ -> bool
-
-(** True if the argument is a struct or union type *)
-val isStructOrUnionType: typ -> bool
 
 (** possible causes for raising {!Cil.LenOfArray} *)
 type incorrect_array_length = Not_constant | Not_integer | Negative | Too_big
@@ -2524,3 +2365,201 @@ val unrollTypeNode: typ -> typ_node
     types. Will collect all attributes *)
 val unrollTypeDeep: typ -> typ
 [@@deprecated "Use Ast_types.unroll_type_deep instead."]
+
+(** is the given type "void"? *)
+val isVoidType: typ -> bool
+[@@deprecated "Use Ast_types.is_void_type instead."]
+
+(** is the given type "void *"? *)
+val isVoidPtrType: typ -> bool
+[@@deprecated "Use Ast_types.is_void_ptr_type instead."]
+
+(** True if the argument is [_Bool]
+    @since 19.0-Potassium
+*)
+val isBoolType: typ -> bool
+[@@deprecated "Use Ast_types.is_bool_type instead."]
+
+(** True if the argument is a plain character type
+    (but neither [signed char] nor [unsigned char]). *)
+val isCharType: typ -> bool
+[@@deprecated "Use Ast_types.is_char_type instead."]
+
+(** True if the argument is a character type (i.e. plain, signed or unsigned)
+    @since Chlorine-20180501 *)
+val isAnyCharType: typ -> bool
+[@@deprecated "Use Ast_types.is_any_char_type instead."]
+
+(** True if the argument is a pointer to a plain character type
+    (but neither [signed char] nor [unsigned char]). *)
+val isCharPtrType: typ -> bool
+[@@deprecated "Use Ast_types.is_char_ptr_type instead."]
+
+(** True if the argument is a pointer to a character type
+    (i.e. plain, signed or unsigned).
+    @since Chlorine-20180501 *)
+val isAnyCharPtrType: typ -> bool
+[@@deprecated "Use Ast_types.is_any_char_ptr_type instead."]
+
+(** True if the argument is a pointer to a constant character type,
+    e.g. a string literal.
+    @since Chlorine-20180501 *)
+val isCharConstPtrType: typ -> bool
+[@@deprecated "Use Ast_types.is_char_const_ptr_type instead."]
+
+(** True if the argument is a short type (i.e. signed or unsigned) *)
+val isShortType: typ -> bool
+[@@deprecated "Use Ast_types.is_short_type instead."]
+
+(** True if the argument is an integral type (i.e. integer or enum) *)
+val isIntegralType: typ -> bool
+[@@deprecated "Use Ast_types.is_integral_type instead."]
+
+(** True if the argument is [intptr_t] (but _not_ its underlying integer type)
+    @since 30.0-Zinc
+*)
+val is_intptr_t: typ -> bool
+[@@deprecated "Use Ast_types.is_intptr_t instead."]
+
+(** True if the argument is [uintptr_t] (but _not_ its underlying integer type)
+    @since 30.0-Zinc
+*)
+val is_uintptr_t: typ -> bool
+[@@deprecated "Use Ast_types.is_uintptr_t instead."]
+
+(** True if the argument is a floating point type. *)
+val isFloatingType: typ -> bool
+[@@deprecated "Use Ast_types.is_floating_type instead."]
+
+(** True if the argument is an arithmetic type (i.e. integer, enum or
+    floating point *)
+val isArithmeticType: typ -> bool
+[@@deprecated "Use Ast_types.is_arithmetic_type instead."]
+
+(** True if the argument is a pointer type. *)
+val isPointerType: typ -> bool
+[@@deprecated "Use Ast_types.is_pointer_type instead."]
+
+(** True if the argument is an integral or pointer type. *)
+val isIntegralOrPointerType: typ -> bool
+[@@deprecated "Use Ast_types.is_integral_or_pointer_type instead."]
+
+(** True if the argument is an array type *)
+val isArrayType: typ -> bool
+[@@deprecated "Use Ast_types.is_array_type instead."]
+
+(** True if the argument is an array type without size
+    @since 28.0-Nickel
+*)
+val isUnsizedArrayType: typ -> bool
+[@@deprecated "Use Ast_types.is_unsized_array_type instead."]
+
+(** True if the argument is a sized array type
+    @since 28.0-Nickel
+*)
+val isSizedArrayType: typ -> bool
+[@@deprecated "Use Ast_types.is_sized_array_type instead."]
+
+(** True if the argument is an array of a character type
+    (i.e. plain, signed or unsigned)
+*)
+val isCharArrayType: typ -> bool
+[@@deprecated "Use Ast_types.is_char_array_type instead."]
+
+(** True if the argument is an array of a character type
+    (i.e. plain, signed or unsigned)
+    @since Chlorine-20180501 *)
+val isAnyCharArrayType: typ -> bool
+[@@deprecated "Use Ast_types.is_any_char_array_type instead."]
+
+(** True if the argument is a function type *)
+val isFunctionType: typ -> bool
+[@@deprecated "Use Ast_types.is_function_type instead."]
+
+(** True if the argument is a function pointer type.
+    @since 18.0-Argon *)
+val isFunPtrType: typ -> bool
+[@@deprecated "Use Ast_types.is_fun_ptr_type instead."]
+
+(** True if the argument is a scalar type (i.e. integral, enum,
+    floating point or pointer
+    @since 22.0-Titanium
+*)
+val isScalarType: typ -> bool
+[@@deprecated "Use Ast_types.is_scalar_type instead."]
+
+(** True if the argument is a struct
+    @since 28.0-Nickel
+*)
+val isStructType: typ -> bool
+[@@deprecated "Use Ast_types.is_struct_type instead."]
+
+(** True if the argument is a union type
+    @since 28.0-Nickel
+*)
+val isUnionType: typ -> bool
+[@@deprecated "Use Ast_types.is_union_type instead."]
+
+(** True if the argument is a struct or union type *)
+val isStructOrUnionType: typ -> bool
+[@@deprecated "Use Ast_types.is_struct_or_union_type instead."]
+
+(** Check if a type is a transparent union, and return the first field
+
+    @since 28.0-Nickel *)
+val isTransparentUnion : typ -> fieldinfo option
+[@@deprecated "Use Ast_types.is_transparent_union_type instead."]
+
+(** True if the argument denotes the type of ... in a variadic function.
+    @since Nitrogen-20111001 moved from cabs2cil *)
+val isVariadicListType: typ -> bool
+[@@deprecated "Use Ast_types.is_variadic_list_type instead."]
+
+(** True if the argument is the type for reified C types. *)
+val isTypeTagType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_typetag_type instead."]
+
+(** True if the argument is a boolean type, either integral C type or
+    mathematical boolean one. *)
+val isLogicBooleanType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_boolan_type instead."]
+
+(** True if the argument is [_Bool] or [boolean].
+    @since 19.0-Potassium
+*)
+val isLogicPureBooleanType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_pure_boolean_type instead."]
+
+(** True if the argument is an integral type (i.e. integer or enum), either
+    C or mathematical one. *)
+val isLogicIntegralType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_integral_type instead."]
+
+(** True if the argument is a floating point type. *)
+val isLogicFloatType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_float_type instead."]
+
+(** True if the argument is the logic 'real' type. *)
+val isLogicRealType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_real_type instead."]
+
+(** True if the argument is a C floating point type or logic 'real' type. *)
+val isLogicRealOrFloatType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_real_or_float_type instead."]
+
+(** True if the argument is a logic arithmetic type (i.e. integer, enum or
+    floating point, either C or mathematical one. *)
+val isLogicArithmeticType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_arithmetic_type instead."]
+
+(** True if the argument is the logic function type.
+    Expands the logic type definition if necessary.
+    @since 18.0-Argon *)
+val isLogicFunctionType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_function_type instead."]
+
+(** True if the argument is the logic function pointer type.
+    Expands the logic type definition if necessary.
+    @since 18.0-Argon *)
+val isLogicFunPtrType: logic_type -> bool
+[@@deprecated "Use Ast_types.is_logic_fun_ptr_type instead."]

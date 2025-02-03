@@ -24,6 +24,20 @@
 
 open Cil_types
 
+(* tmp, to remove later *)
+
+let abort_context msg =
+  let loc = Current_loc.get () in
+  let append fmt =
+    Format.pp_print_newline fmt ();
+    Errorloc.pp_context_from_file fmt loc
+  in
+  Kernel.abort ~current:true ~append msg
+
+(** Get the full name of a comp *)
+let compFullName comp =
+  (if comp.cstruct then "struct " else "union ") ^ comp.cname
+
 (* ********** *)
 (* Attributes *)
 (* ********** *)
@@ -200,6 +214,8 @@ let type_remove_attributes_for_logic_type t =
 (* Utils      *)
 (* ********** *)
 
+(* Unrolling *)
+
 let unroll_type (t: typ) : typ =
   let rec with_attrs (al: attributes) (t: typ) : typ =
     match t.tnode with
@@ -270,3 +286,243 @@ and is_wellformed_non_ghost_type t =
   else match t.tnode with
     | TPtr t | TArray (t, _) -> is_wellformed_non_ghost_type t
     | _ -> true
+
+(* ************** *)
+(* Type checkers. *)
+(* ************** *)
+
+let is_void_type t =
+  match unroll_type_skel t with
+  | TVoid -> true
+  | _ -> false
+
+let is_void_ptr_type t =
+  match unroll_type_skel t with
+  | TPtr t when is_void_type t -> true
+  | _ -> false
+
+let is_bool_type t =
+  match unroll_type_skel t with
+  | TInt IBool -> true
+  | _ -> false
+
+let is_char_type t =
+  match unroll_type_skel t with
+  | TInt IChar -> true
+  | _ -> false
+
+let is_any_char_type t =
+  match unroll_type_skel t with
+  | TInt (IChar | ISChar | IUChar) -> true
+  | _ -> false
+
+let is_char_ptr_type t =
+  match unroll_type_skel t with
+  | TPtr t when is_char_type t -> true
+  | _ -> false
+
+let is_any_char_ptr_type t =
+  match unroll_type_skel t with
+  | TPtr t when is_any_char_type t -> true
+  | _ -> false
+
+let is_char_const_ptr_type t =
+  match unroll_type t with
+  | { tnode = TPtr t; tattr } when is_char_type t ->
+    Ast_attributes.contains "const" tattr
+  | _ -> false
+
+let is_short_type t =
+  match unroll_type_skel t with
+  | TInt (IUShort | IShort) -> true
+  | _ -> false
+
+let is_integral_type t =
+  match unroll_type_skel t with
+  | (TInt _ | TEnum _) -> true
+  | _ -> false
+
+(* Don't completely unroll here, as we do not want to identify
+   intptr_t with its supporting integer type. *)
+let rec is_intptr_t t =
+  match t.tnode with
+  | TNamed ti -> ti.tname = "intptr_t" || is_intptr_t ti.ttype
+  | _ -> false
+
+let rec is_uintptr_t  t =
+  match t.tnode with
+  | TNamed ti -> ti.tname = "uintptr_t" || is_uintptr_t ti.ttype
+  | _ -> false
+
+let is_floating_type t =
+  match unroll_type_skel t with
+  | TFloat _ -> true
+  | _ -> false
+
+let is_long_double_type t =
+  match unroll_type_skel t with
+  | TFloat FLongDouble -> true
+  | _ -> false
+
+(* ISO 6.2.5.18 *)
+let is_arithmetic_type t =
+  match unroll_type_skel t with
+  | (TInt _ | TEnum _ | TFloat _) -> true
+  | _ -> false
+
+let is_pointer_type t =
+  match unroll_type_skel t with
+  | TPtr _ -> true
+  | _ -> false
+
+let is_integral_or_pointer_type t =
+  is_integral_type t || is_pointer_type t
+
+let is_array_type t =
+  match unroll_type_skel t with
+  | TArray _ -> true
+  | _ -> false
+
+let is_unsized_array_type t =
+  match unroll_type_skel t with
+  | TArray (_, None) -> true
+  | _ -> false
+
+let is_sized_array_type t =
+  match unroll_type_skel t with
+  | TArray (_, Some _) -> true
+  | _ -> false
+
+let is_char_array_type t = match unroll_type_skel t with
+  | TArray(tau, _) when is_char_type tau -> true
+  | _ -> false
+
+let is_any_char_array_type t = match unroll_type_skel t with
+  | TArray(tau, _) when is_any_char_type tau -> true
+  | _ -> false
+
+let is_function_type t =
+  match unroll_type_skel t with
+  | TFun _ -> true
+  | _ -> false
+
+let is_fun_ptr_type t =
+  match unroll_type_skel t with
+  | TPtr t -> is_function_type t
+  | _ -> false
+
+(* ISO 6.2.5.21 *)
+let is_scalar_type t =
+  is_arithmetic_type t || is_pointer_type t
+
+(* ISO 6.2.5.1 *)
+let is_object_type t =
+  not (is_function_type t)
+
+let is_struct_type t =
+  match unroll_type_skel t with
+  | TComp ci -> ci.cstruct
+  | _ -> false
+
+let is_union_type t =
+  match unroll_type_skel t with
+  | TComp ci -> not ci.cstruct
+  | _ -> false
+
+let is_struct_or_union_type t = is_struct_type t || is_union_type t
+
+(* Check if a type is a transparent union, and return the first field if it is. *)
+let is_transparent_union_type t =
+  match unroll_type_skel t with
+  | TComp ci when not ci.cstruct ->
+    (* Turn transparent unions into the type of their first field. *)
+    if type_has_attribute "transparent_union" t then begin
+      match ci.cfields with
+      | Some [] | None ->
+        abort_context "Empty transparent union: %s" (compFullName ci)
+      | Some (f :: _) -> Some f
+    end else
+      None
+  | _ -> None
+
+let is_variadic_list_type t =
+  match unroll_type_skel t with
+  | TBuiltin_va_list -> true
+  | _ -> false
+
+(* Utils function for is_logic_* functions. *)
+let unroll_logic_aux is_logic lti t =
+  Logic_const.is_unrollable_ltdef lti && is_logic (Logic_const.unroll_ltdef t)
+
+let rec is_logic_typetag_type t =
+  match t with
+  | Ltype ({lt_name = "typetag"}, []) -> true
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_typetag_type lti t
+  | _ -> false
+
+let rec is_logic_boolean_type t =
+  match t with
+  | Ctype t -> is_integral_type t
+  | Lboolean | Linteger -> true
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_boolean_type lti t
+  | Lreal | Lvar _ | Larrow _ -> false
+
+let rec is_logic_pure_boolean_type t =
+  match t with
+  | Ctype t -> is_bool_type t
+  | Lboolean -> true
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_pure_boolean_type lti t
+  | _ -> false
+
+let rec is_logic_integral_type t =
+  match t with
+  | Ctype t -> is_integral_type t
+  | Lboolean -> false
+  | Linteger -> true
+  | Lreal -> false
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_integral_type lti t
+  | Lvar _ | Larrow _ -> false
+
+let is_logic_float_type t =
+  match t with
+  | Ctype t -> is_floating_type t
+  | Lboolean -> false
+  | Linteger -> false
+  | Lreal -> false
+  | Lvar _ | Ltype _ | Larrow _ -> false
+
+let rec is_logic_real_type t =
+  match t with
+  | Ctype _ -> false
+  | Lboolean -> false
+  | Linteger -> false
+  | Lreal -> true
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_real_type lti t
+  | Lvar _ | Larrow _ -> false
+
+let rec is_logic_real_or_float_type t =
+  match t with
+  | Ctype t -> is_floating_type t
+  | Lboolean -> false
+  | Linteger -> false
+  | Lreal -> true
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_real_or_float_type lti t
+  | Lvar _ | Larrow _ -> false
+
+let rec is_logic_arithmetic_type t =
+  match t with
+  | Ctype t -> is_arithmetic_type t
+  | Linteger | Lreal -> true
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic_type lti t
+  | Lboolean | Lvar _ | Larrow _ -> false
+
+let is_logic_function_type t =
+  Logic_const.isLogicCType is_function_type t
+
+
+let is_logic_fun_ptr_type t =
+  Logic_const.isLogicCType is_fun_ptr_type t
+
+
+
+
