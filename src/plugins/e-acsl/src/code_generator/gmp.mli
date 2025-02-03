@@ -50,7 +50,7 @@ module Z : sig
     loc:location -> ?scope:Varname.scope -> ?name:string ->
     Env.t -> kernel_function -> term option ->
     (varinfo -> exp (* the var as exp *) -> stmt list) ->
-    varinfo * exp * Env.t
+    exp * Env.t
   (** Same as [Env.new_var], but dedicated to mpz_t variables initialized by
       {!Mpz.init}. *)
 

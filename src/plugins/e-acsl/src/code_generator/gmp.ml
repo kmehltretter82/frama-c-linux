@@ -154,15 +154,18 @@ module Z = struct
         Printer.pp_binop bop
 
   let new_var ~loc ?scope ?name env kf t mk_stmts =
-    Env.new_var
-      ~loc
-      ?scope
-      ?name
-      env
-      kf
-      t
-      (Gmp_types.Z.t ())
-      (fun v e -> init ~loc e :: mk_stmts v e)
+    let _, e, env =
+      Env.new_var
+        ~loc
+        ?scope
+        ?name
+        env
+        kf
+        t
+        (Gmp_types.Z.t ())
+        (fun v e -> init ~loc e :: mk_stmts v e)
+    in
+    e, env
 
   let create ~loc ?name t_opt env kf e =
     let _, e, env =
@@ -206,7 +209,7 @@ module Z = struct
                            name
                            [ e; e1; e2 ] ] in
     let name = Misc.name_of_binop bop in
-    let _, e, env = new_var ~loc ~name env kf t_opt mk_stmts in
+    let e, env = new_var ~loc ~name env kf t_opt mk_stmts in
     e,env
 
   let cmp ~loc name t_opt bop env kf e1 e2 =
@@ -395,15 +398,17 @@ module Q = struct
       Error.not_yet "R to <typ>"
 
   let new_var ~loc ?scope ?name env kf t_opt mk_stmts =
-    Env.new_var
-      ~loc
-      ?scope
-      ?name
-      env
-      kf
-      t_opt
-      (Gmp_types.Q.t ())
-      (fun v e -> init ~loc e :: mk_stmts v e)
+    let _, e, env = Env.new_var
+        ~loc
+        ?scope
+        ?name
+        env
+        kf
+        t_opt
+        (Gmp_types.Q.t ())
+        (fun v e -> init ~loc e :: mk_stmts v e)
+    in
+    e, env
 
   let binop ~loc t_opt bop env kf e1 e2 =
     let name = name_arith_bop bop in
@@ -414,7 +419,7 @@ module Q = struct
                            name
                            [ e; e1; e2 ] ] in
     let name = Misc.name_of_binop bop in
-    let _, e, env = new_var ~loc ~name env kf t_opt mk_stmts in
+    let e, env = new_var ~loc ~name env kf t_opt mk_stmts in
     e, env
 
   let cmp ~loc name t_opt bop env kf e1 e2 =
