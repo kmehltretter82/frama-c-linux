@@ -24,27 +24,24 @@ open Float_sig
 
 
 
-type rounding = Floating_point.rounding
-type context = Typed_float.resulting_format * rounding
-
-let format_of_prec = function
-  | Single -> Typed_float.Format (Single_supported, Single)
-  | _      -> Typed_float.Format (Double_supported, Double)
-
 let convert_rounding = function
   | Float_sig.Up   -> Floating_point.Upward
   | Float_sig.Down -> Floating_point.Downward
   | Float_sig.Near -> Floating_point.Nearest_even
   | Float_sig.Zero -> Floating_point.Toward_zero
 
-let using ~prec ~rounding = (format_of_prec prec, convert_rounding rounding)
-
-let ( let<> ) ((format, new_rounding) : context) computation =
+(* Apply [computation arg] with rounding mode [rounding]. *)
+let with_rounding_mode rounding computation arg =
+  let new_rounding = convert_rounding rounding in
   let old_rounding = Floating_point.get_rounding_mode () in
-  Floating_point.set_rounding_mode new_rounding ;
-  let result = computation format in
-  Floating_point.set_rounding_mode old_rounding ;
+  let change_rounding = old_rounding <> new_rounding in
+  if change_rounding then Floating_point.set_rounding_mode new_rounding ;
+  let result = computation arg in
+  if change_rounding then Floating_point.set_rounding_mode old_rounding ;
   result
+
+type operation = RoundingMode
+let ( let<> ) rounding_mode f = with_rounding_mode rounding_mode f RoundingMode
 
 
 
@@ -57,15 +54,16 @@ let is_exact = function
   | Single | Double -> true
   | Long_Double | Real -> false
 
-let of_float rounding prec f =
-  let<> Format (_, fmt) = using ~prec ~rounding in
-  let f = Typed_float.represents ~float:f ~in_format:fmt in
-  Typed_float.to_float f
+let round_to_precision round prec t =
+  if prec = Single
+  then
+    let<> RoundingMode = round in
+    Floating_point.round_to_single_precision t
+  else t
+
+let of_float = round_to_precision
 
 let to_float f = f
-
-let round_to_precision round prec t =
-  of_float round prec t
 
 
 
@@ -142,17 +140,23 @@ let ceil  = ceil
 let trunc  f = Typed_float.(double f |> trunc |> to_float)
 let fround f = Typed_float.(single f |> round |> to_float)
 
+let format_of_prec = function
+  | Single -> Typed_float.Format (Single_supported, Single)
+  | _      -> Typed_float.Format (Double_supported, Double)
+
 type 'f number = 'f Typed_float.t
 type unary = { compute : 'f. 'f number -> 'f number }
 type binary = { compute : 'f. 'f number -> 'f number -> 'f number }
 
 let unary (op : unary) rounding prec x =
-  let<> Format (_, fmt) = using ~prec ~rounding in
+  let<> RoundingMode = rounding in
+  let Format (_, fmt) = format_of_prec prec in
   let x = Typed_float.represents ~float:x ~in_format:fmt in
   Typed_float.(op.compute x |> to_float)
 
 let binary (op : binary) rounding prec x y =
-  let<> Format (_, fmt) = using ~prec ~rounding in
+  let<> RoundingMode = rounding in
+  let Format (_, fmt) = format_of_prec prec in
   let x = Typed_float.represents ~float:x ~in_format:fmt in
   let y = Typed_float.represents ~float:y ~in_format:fmt in
   Typed_float.(op.compute x y |> to_float)
