@@ -448,7 +448,7 @@ module TransferSingleTaint = struct
     match args with
     | [] -> raise Not_found
     | arg :: rest ->
-      match arg.Eval.formal.vtype with
+      match arg.Eval.formal.vtype.tnode with
       | TPtr _ | TArray _ -> arg
       | _ -> find_tainted_argument rest
 
