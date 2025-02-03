@@ -330,8 +330,8 @@ module TransferSingleTaint = struct
     Precise_locs.make_precise_loc Precise_locs.bottom_location_bits
       ~size:Int_Base.zero
 
-  let zone_simplified valuation to_loc =
-    let improved_to_loc lval =
+  let dont_taint_singleton valuation to_loc =
+    let to_loc_improved lval =
       let curr_exp = Eva_ast.Build.lval lval in
       match valuation.Abstract_domain.find curr_exp with
       | `Top -> to_loc lval
@@ -341,24 +341,23 @@ module TransferSingleTaint = struct
         | `Value v ->
           if Cvalue.V.cardinal_zero_or_one v then bottom_loc else to_loc lval
     in
-    improved_to_loc
+    to_loc_improved
 
   (* Propagates data- and control-taints for an assignement [lval = exp]. *)
   let assign_aux lval exp v to_loc state =
     let lv_zone, lv_indirect_zone, singleton = compute_zones lval to_loc in
     let to_loc_choosen =
       if ignore_singletons () then
-        zone_simplified v to_loc
-        (* in case we treat solely single state,
-           we can operate some simplifications on taint *)
+        (* Do not data-taint [lval] in case it contains a singleton value. *)
+        dont_taint_singleton v to_loc
       else
-        to_loc
-        (* [lv] becomes data-tainted if a memory location on which the value of
+        (* [lval] becomes data-tainted if a memory location on which the value of
            [exp] depends on is data-tainted. *)
+        to_loc
     in
     let exp_zone = Eva_ast.zone_of_exp to_loc_choosen exp in
     let data_tainted = Zone.intersects state.locs_data exp_zone in
-    (* [lv] becomes control-tainted if:
+    (* [lval] becomes control-tainted if:
        - the current call depends on a tainted assume statements of a caller;
        - the execution of the assignment depends on a tainted assume statement;
        - the value of [exp] is control-tainted;
