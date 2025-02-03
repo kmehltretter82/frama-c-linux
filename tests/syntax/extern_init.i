@@ -7,4 +7,4 @@ OPT: %{dep:./@PTEST_NAME@_2.i} %{dep:./@PTEST_NAME@_1.i} -eva @EVA_CONFIG@
 extern int a[] ;
 
 /*@ assigns a[3] \from \nothing; */
-void g();
+void g(void);
