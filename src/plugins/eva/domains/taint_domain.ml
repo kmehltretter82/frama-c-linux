@@ -758,8 +758,8 @@ let () =
   Acsl_extension.register_code_annot_next_stmt ~plugin:"eva" "taint"
     (typer `Pre) false
 
-(* The taint name of a term is stored as the term name.
-   If no term name is present, use "default". *)
+(* The taint namespace of a term is stored as its term name.
+   If no term name is present, the term namespace defaults to "default". *)
 let term_taint_names term =
   if term.term_name = [] then [ default_taint_name ] else term.term_name
 
