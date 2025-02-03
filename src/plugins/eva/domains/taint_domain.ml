@@ -49,8 +49,8 @@ let auto_taint_res_functions = [
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
 
-(* Default name for taints, when no custum name is provided by the user. *)
-let default_taint_name = "default"
+(* Default namespace for taints, when no custum one is provided by the user. *)
+let default_taint_namespace = "default"
 
 type taint_state = {
   (* Over-approximation of the memory locations that are tainted due to a data
@@ -229,7 +229,8 @@ module LatticeMultiTaint = struct
         else pp_locs_only fmt t
 
       let hash t =
-        TaintNamespace.fold (fun _ state acc -> LatticeSingleTaint.hash state + acc)
+        TaintNamespace.fold (fun _ state acc ->
+            LatticeSingleTaint.hash state + acc)
           t 0
 
       let copy c = c
@@ -241,7 +242,8 @@ module LatticeMultiTaint = struct
   (* TODO: this is an unsound top value, as custom taint names are not bound
      to top. It cannot be represented as a map and should be replaced by a
      special TOP value. *)
-  let top = TaintNamespace.singleton default_taint_name LatticeSingleTaint.top
+  let top =
+    TaintNamespace.singleton default_taint_namespace LatticeSingleTaint.top
 
   let join t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
@@ -761,8 +763,8 @@ let () =
 
 (* The taint namespace of a term is stored as its term name.
    If no term name is present, the term namespace defaults to "default". *)
-let term_taint_names term =
-  if term.term_name = [] then [ default_taint_name ] else term.term_name
+let term_taint_namespaces term =
+  if term.term_name = [] then [ default_taint_namespace ] else term.term_name
 
 (* Interpretation of logic by the taint domain, using the cvalue domain. *)
 module TaintLogic = struct
@@ -810,7 +812,7 @@ module TaintLogic = struct
       join state1 state2
     | _, Pnot p -> reduce_by_predicate cvalue_env state_map p (not positive)
     | _, Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-      let taint_names = term_taint_names arg in
+      let taint_names = term_taint_namespaces arg in
       TaintNamespace.mapi (fun key state ->
           if List.mem key taint_names then
             reduce_by_taint_predicate cvalue_env state arg positive
@@ -830,7 +832,7 @@ module TaintLogic = struct
     let rec evaluate predicate =
       match predicate.pred_content with
       | Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
-        let taint_names = term_taint_names arg in
+        let taint_names = term_taint_namespaces arg in
         let states_list =
           List.map
             (fun key -> TaintNamespace.find_or_empty key state_map)
@@ -883,7 +885,7 @@ module TaintLogic = struct
             "Cannot precisely evaluate term %a in taint annotation; \
              over-approximating."
             Printer.pp_term term;
-        let taint_names = term_taint_names term in
+        let taint_names = term_taint_namespaces term in
         let add_taint state name =
           let taint = TaintNamespace.find_or_empty name state in
           let locs_data = Zone.join taint.locs_data over in
