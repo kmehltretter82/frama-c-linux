@@ -120,15 +120,17 @@ let prev_float prec f =
 
 let widen_up ?(hint = Datatype.Float.Set.empty) prec f =
   let is_upper e = total_compare e f >= 0 in
-  match Datatype.Float.Set.find_first_opt is_upper hint with
-  | None -> if f <= max_float then max_float else infinity
-  | Some result -> round_to_precision Up prec result
+  let threshold_opt = Datatype.Float.Set.find_first_opt is_upper hint in
+  let default = if f <= max_float then max_float else infinity in
+  let result = Option.value ~default threshold_opt in
+  round_to_precision Up prec result
 
 let widen_down ?(hint = Datatype.Float.Set.empty) prec f =
   let is_lower e = total_compare e f <= 0 in
-  match Datatype.Float.Set.find_last_opt is_lower hint with
-  | None -> if f >= -.max_float then -.max_float else neg_infinity
-  | Some result -> round_to_precision Down prec result
+  let threshold_opt = Datatype.Float.Set.find_last_opt is_lower hint in
+  let default = if f >= (-.max_float) then -.max_float else neg_infinity in
+  let result = Option.value ~default threshold_opt in
+  round_to_precision Down prec result
 
 
 
