@@ -35,10 +35,10 @@ int a, b, c, d, e, f;
 pthread_mutex_t lock;
 
 /*@ assigns a \from b; */
-void g3();
+void g3(void);
 
 /*@ assigns b \from a; */
-void g4();
+void g4(void);
 
 /*@ assigns *to \from *from; */
 void g5(int * to, int * from);

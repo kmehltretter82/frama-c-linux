@@ -1,13 +1,5 @@
 [kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
 [kernel] Parsing ccfg.c (with preprocessing)
-[kernel:typing:no-proto] ccfg.c:52: Warning: 
-  Calling function g3 that is declared without prototype.
-  Its formals will be inferred from actual arguments.
-  Declare it as g3(void) if the function does not take any parameters.
-[kernel:typing:no-proto] ccfg.c:61: Warning: 
-  Calling function g4 that is declared without prototype.
-  Its formals will be inferred from actual arguments.
-  Declare it as g4(void) if the function does not take any parameters.
 [kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
 [mt] Warning: Mthread is an experimental plugin and is still in development.
