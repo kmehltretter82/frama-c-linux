@@ -179,7 +179,8 @@ function CreditsModal(): JSX.Element {
       <>
         <FramaCLogo />
         <Hbox>
-          <pre style={{ fontSize: '1.2em' }}>Created by:</pre>
+          <pre style={{ fontSize: '1.2em', textAlign: "center" }}
+          >Created by:</pre>
         </Hbox>
         <div className='modal-framac-credits'>
           {authors.map((author, i) => <div key={i} >{author}</div>)}

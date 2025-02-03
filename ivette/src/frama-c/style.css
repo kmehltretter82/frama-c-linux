@@ -13,8 +13,10 @@
       max-height: 100%;
       flex-direction: column;
       overflow: auto;
+      text-align: left;
 
       button:hover { cursor: pointer; }
+      pre { user-select: text; }
     }
 
     .modal-framac-credits {
@@ -48,7 +50,6 @@
 
       pre {
         width: 100%;
-        text-align: center;
         margin-bottom: 10px;
         white-space: pre-wrap;
       }

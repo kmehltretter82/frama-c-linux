@@ -277,15 +277,19 @@ const helpMenuItemsCustom: MenuSpec = [];
 
 let learnMoreLink = '';
 ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
-  if (typeof link === 'string') learnMoreLink = link;
+  if (typeof link === 'string') {
+    learnMoreLink = link;
+    helpMenuItems.push(
+      {
+        label: 'Learn More',
+        click() { shell.openExternal(learnMoreLink); },
+      },
+    );
+  }
 });
 
-const helpMenuItems: MenuSpec = [
-  {
-    label: 'Learn More',
-    click() { shell.openExternal(learnMoreLink); },
-  },
-];
+const helpMenuItems: MenuSpec = [];
+
 
 // --------------------------------------------------------------------------
 // --- Update MenuBar (async)
