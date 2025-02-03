@@ -182,7 +182,8 @@ module LatticeSingleTaint = struct
 
 end
 
-module StringMap = struct
+(* Maps a taint namespace to corresponding taint state. *)
+module TaintNamespace = struct
   include Datatype.String.Map
 
   let find_or_empty key map =
@@ -190,11 +191,11 @@ module StringMap = struct
     with Not_found -> LatticeSingleTaint.empty
 end
 
-type multi_taint_state = taint_state StringMap.t
+type multi_taint_state = taint_state TaintNamespace.t
 
 module LatticeMultiTaint = struct
   let pp_locs_only fmt t =
-    Pretty_utils.pp_iter2 ~sep:"@ " ~between:": " StringMap.iter
+    Pretty_utils.pp_iter2 ~sep:"@ " ~between:": " TaintNamespace.iter
       Format.pp_print_string LatticeSingleTaint.pp_locs_only fmt t
 
   let pp_state fmt t =
@@ -205,7 +206,7 @@ module LatticeMultiTaint = struct
         LatticeSingleTaint.pp_state fmt taint
       end
     in
-    StringMap.iter pp_per_taint t
+    TaintNamespace.iter pp_per_taint t
 
   (* Frama-C "datatype" for type [taint]. *)
   include Datatype.Make_with_collections(struct
@@ -215,10 +216,10 @@ module LatticeMultiTaint = struct
 
       let name = "taint"
 
-      let reprs = [ StringMap.empty ]
+      let reprs = [ TaintNamespace.empty ]
 
       let compare t1 t2 =
-        StringMap.compare LatticeSingleTaint.compare t1 t2
+        TaintNamespace.compare LatticeSingleTaint.compare t1 t2
 
       let equal = Datatype.from_compare
 
@@ -228,19 +229,19 @@ module LatticeMultiTaint = struct
         else pp_locs_only fmt t
 
       let hash t =
-        StringMap.fold (fun _ state acc -> LatticeSingleTaint.hash state + acc)
+        TaintNamespace.fold (fun _ state acc -> LatticeSingleTaint.hash state + acc)
           t 0
 
       let copy c = c
 
     end)
 
-  let empty = StringMap.empty
+  let empty = TaintNamespace.empty
 
   (* TODO: this is an unsound top value, as custom taint names are not bound
      to top. It cannot be represented as a map and should be replaced by a
      special TOP value. *)
-  let top = StringMap.singleton default_taint_name LatticeSingleTaint.top
+  let top = TaintNamespace.singleton default_taint_name LatticeSingleTaint.top
 
   let join t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
@@ -248,7 +249,7 @@ module LatticeMultiTaint = struct
       | state, None | None, state -> state
       | Some state1, Some state2 -> Some (LatticeSingleTaint.join state1 state2)
     in
-    StringMap.merge merge_per_key t1 t2
+    TaintNamespace.merge merge_per_key t1 t2
 
   let widen kf stmt t1 t2 =
     let widen_per_key _key maybe_state1 maybe_state2 =
@@ -257,7 +258,7 @@ module LatticeMultiTaint = struct
       | Some state1, Some state2 ->
         Some (LatticeSingleTaint.widen kf stmt state1 state2)
     in
-    StringMap.merge widen_per_key t1 t2
+    TaintNamespace.merge widen_per_key t1 t2
 
   let narrow t1 t2 =
     let merge_per_key _key maybe_state1 maybe_state2 =
@@ -267,15 +268,15 @@ module LatticeMultiTaint = struct
         let `Value v = LatticeSingleTaint.narrow state1 state2 in
         Some v
     in
-    `Value (StringMap.merge merge_per_key t1 t2)
+    `Value (TaintNamespace.merge merge_per_key t1 t2)
 
   let is_included t1 t2 =
     let fold2 f t1 t2 base =
       let f key state1 acc =
-        let state2 = StringMap.find_or_empty key t2 in
+        let state2 = TaintNamespace.find_or_empty key t2 in
         f state1 state2 acc
       in
-      StringMap.fold f t1 base
+      TaintNamespace.fold f t1 base
     in
     fold2 (fun state1 state2 acc ->
         LatticeSingleTaint.is_included state1 state2 && acc) t1 t2 true
@@ -520,20 +521,20 @@ module TransferMultiTaint = struct
     let assign_per_taint state =
       get_value @@ TransferSingleTaint.assign ki lv exp v valuation state
     in
-    `Value (StringMap.map assign_per_taint state_map)
+    `Value (TaintNamespace.map assign_per_taint state_map)
 
   let assume stmt exp b valuation state_map =
     let assume_per_taint state =
       get_value @@ TransferSingleTaint.assume stmt exp b valuation state
     in
-    `Value (StringMap.map assume_per_taint state_map)
+    `Value (TaintNamespace.map assume_per_taint state_map)
 
   let start_call stmt call recursion valuation state_map =
     let start_call_per_taint state =
       get_value @@ TransferSingleTaint.start_call stmt call
         recursion valuation state
     in
-    `Value (StringMap.map start_call_per_taint state_map)
+    `Value (TaintNamespace.map start_call_per_taint state_map)
 
 
   let finalize_call stmt call recursion ~pre ~post =
@@ -550,15 +551,15 @@ module TransferMultiTaint = struct
       in
       if LatticeSingleTaint.(equal empty state) then None else Some state
     in
-    let map_state = StringMap.merge merge_per_key pre post in
+    let map_state = TaintNamespace.merge merge_per_key pre post in
     (* Adds auto taints if -eva-auto-taint is set. *)
     let map_state =
       if auto_taint () then
-        let auto_state = StringMap.find_or_empty "auto" map_state in
+        let auto_state = TaintNamespace.find_or_empty "auto" map_state in
         let auto_state =
           TransferSingleTaint.add_call_auto_taint call auto_state
         in
-        StringMap.add "auto" auto_state map_state
+        TaintNamespace.add "auto" auto_state map_state
       else map_state
     in
     `Value map_state
@@ -570,7 +571,7 @@ module TransferMultiTaint = struct
         TransferSingleTaint.show_expr valuation state fmt exp
       end
     in
-    StringMap.iter show_expr_per_taint state_map
+    TaintNamespace.iter show_expr_per_taint state_map
 end
 
 
@@ -639,8 +640,8 @@ module Domain = struct
     match assign with
     | None -> state_map
     | Some (loc_assign, taint_map) ->
-      StringMap.mapi (fun key state ->
-          let current_taint = StringMap.find_or_empty key taint_map in
+      TaintNamespace.mapi (fun key state ->
+          let current_taint = TaintNamespace.find_or_empty key taint_map in
           logic_assign_per_taint (loc_assign, current_taint) location state)
         state_map
 
@@ -654,7 +655,7 @@ module Domain = struct
                  locs_control = remove state.locs_control; }
 
   let remove_bases bases state_map =
-    StringMap.map (remove_bases_per_taint bases) state_map
+    TaintNamespace.map (remove_bases_per_taint bases) state_map
 
   let leave_scope _kf vars state =
     let bases = Base.Hptset.of_list (List.map Base.of_varinfo vars) in
@@ -677,9 +678,9 @@ module Domain = struct
                    locs_control = filter_base state.locs_control;
                    assume_stmts = Stmt.Set.empty; }
     in
-    StringMap.map (filter_state bases) state_map
+    TaintNamespace.map (filter_state bases) state_map
 
-    let project = filter
+  let project = filter
 
   let overwrite bases ~on:state ~by =
     let state = remove_bases bases state in
@@ -810,7 +811,7 @@ module TaintLogic = struct
     | _, Pnot p -> reduce_by_predicate cvalue_env state_map p (not positive)
     | _, Papp ({l_var_info = {lv_name = "\\tainted"}}, _labels, [arg]) ->
       let taint_names = term_taint_names arg in
-      StringMap.mapi (fun key state ->
+      TaintNamespace.mapi (fun key state ->
           if List.mem key taint_names then
             reduce_by_taint_predicate cvalue_env state arg positive
           else
@@ -832,7 +833,7 @@ module TaintLogic = struct
         let taint_names = term_taint_names arg in
         let states_list =
           List.map
-            (fun key -> StringMap.find_or_empty key state_map)
+            (fun key -> TaintNamespace.find_or_empty key state_map)
             taint_names
         in
         let state =
@@ -884,9 +885,9 @@ module TaintLogic = struct
             Printer.pp_term term;
         let taint_names = term_taint_names term in
         let add_taint state name =
-          let taint = StringMap.find_or_empty name state in
+          let taint = TaintNamespace.find_or_empty name state in
           let locs_data = Zone.join taint.locs_data over in
-          StringMap.add name { taint with locs_data } state
+          TaintNamespace.add name { taint with locs_data } state
         in
         List.fold_left add_taint state taint_names
     in
@@ -959,7 +960,7 @@ type taint = Direct | Indirect | Untainted
 
 let is_tainted state_map ?indirect zone =
   let { locs_data ; locs_control } =
-    StringMap.fold (fun _ state acc -> LatticeSingleTaint.join state acc)
+    TaintNamespace.fold (fun _ state acc -> LatticeSingleTaint.join state acc)
       state_map LatticeSingleTaint.empty
   in
   let intersects_any z = Zone.(intersects (join locs_data locs_control) z) in
