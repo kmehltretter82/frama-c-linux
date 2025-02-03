@@ -283,16 +283,14 @@ struct
   let re_float = Str.regexp
       "-?0x\\([0-9a-f]+\\).\\([0-9a-f]+\\)?0*p?\\([+-]?[0-9a-f]+\\)?$"
 
-  let format = function
-    | Ctypes.Float32 -> Typed_float.(Format (Single_supported, Single))
-    | Ctypes.Float64 -> Typed_float.(Format (Double_supported, Double))
-
   let float_literal_from_q ~cnv tau q =
     let use_hex = true in
     let qf = Q.to_float q in
-    let Format (_, fmt) = format (cfloat_of_tau tau) in
-    let f = Typed_float.represents ~float:qf ~in_format:fmt in
-    let s = Pretty_utils.to_string (Typed_float.pretty_normal ~use_hex) f in
+    let f = match cfloat_of_tau tau with
+      | Float32 -> Floating_point.round_to_single_precision qf
+      | Float64 -> qf
+    in
+    let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) f in
     let s = String.lowercase_ascii s in
     if Str.string_match re_float s 0 then
       let group n r = try Str.matched_group n r with Not_found -> "" in
