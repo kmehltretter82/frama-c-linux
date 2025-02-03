@@ -24,7 +24,9 @@ open Cil_types
 open Cil_datatype
 open Locations
 
-let auto_taint_functions = [
+(* Functions flagged as commonly related to user-provided input, therefore
+   targeted in the option for automatic tainting. *)
+let auto_taint_arg_functions = (* auto taint the arguments *) [
   "fgets";
   "gets";
   "fread";
@@ -39,12 +41,10 @@ let auto_taint_variadic_functions = [
   "scanf"
 ]
 
-let auto_taint_res_functions = [
+let auto_taint_res_functions = (* auto taint the result *) [
   "getchar";
   "getc"
 ]
-(* functions flagged as commonly related to user-provided input,
-   therefore targeted in the option for automatic tainting *)
 
 let auto_taint () = Parameters.AutoTaint.get ()
 let ignore_singletons () = not (Parameters.TaintSingletons.get ())
@@ -424,14 +424,14 @@ module TransferSingleTaint = struct
     let splitted = String.split_on_char '%' s in
     List.length splitted - 1
 
-  let is_variadic_tainting kf =
+  let is_auto_taint_variadic kf =
     let vi = Kernel_function.get_vi kf in
     Cil.hasAttribute "fc_stdlib_generated" vi.vattr
     && List.mem vi.vorig_name auto_taint_variadic_functions
 
-  let is_tainting kf =
+  let is_auto_taint_arg kf =
     let vi = Kernel_function.get_vi kf in
-    List.mem vi.vorig_name auto_taint_functions
+    List.mem vi.vorig_name auto_taint_arg_functions
 
   let arg_to_zone arg =
     match Eval.(value_assigned arg.avalue) with
@@ -455,7 +455,7 @@ module TransferSingleTaint = struct
       | TPtr _ | TArray _ -> arg
       | _ -> find_tainted_argument rest
 
-  let is_tainting_res kf =
+  let is_auto_taint_res kf =
     let vi = Kernel_function.get_vi kf in
     List.mem vi.vorig_name auto_taint_res_functions
 
@@ -475,7 +475,7 @@ module TransferSingleTaint = struct
   (* Adds automatic taint from [call] to [state] for some libc functions.
      Should be called after [finalize_call] only if -eva-auto-taint is set. *)
   let add_call_auto_taint call state =
-    if is_variadic_tainting call.Eval.kf then
+    if is_auto_taint_variadic call.Eval.kf then
       begin
         match call.arguments with
         | { concrete = { node = Const (CString (String (_, CSString s))) } } :: rest
@@ -489,7 +489,7 @@ module TransferSingleTaint = struct
           end
         | _ -> state
       end
-    else if is_tainting call.kf then
+    else if is_auto_taint_arg call.kf then
       begin
         try
           let to_taint = find_tainted_argument call.arguments in
@@ -498,7 +498,7 @@ module TransferSingleTaint = struct
         with
         | Not_found -> state
       end
-    else if is_tainting_res call.kf then
+    else if is_auto_taint_res call.kf then
       begin
         let zone = zone_of_return call.return in
         { state with locs_data = Zone.join state.locs_data zone }
