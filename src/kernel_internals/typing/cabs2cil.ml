@@ -110,10 +110,10 @@ let stripUnderscore s =
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
-        if not (Ast_attributes.is_known_attribute res) then
-          Kernel.warning
-            ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
-            "Unknown attribute: %s" s
+      if not (Ast_attributes.is_known_attribute res) then
+        Kernel.warning
+          ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+          "Unknown attribute: %s" s
     end;
     res
   end
@@ -4691,9 +4691,9 @@ and cabsPartitionAttributes
 
 and doType (ghost:bool) (context: type_context)
     (nameortype: Ast_attributes.attribute_class) (* This is AttrName if we are doing
-                                   * the type for a name, or AttrType
-                                   * if we are doing this type in a
-                                   * typedef *)
+                                                  * the type for a name, or AttrType
+                                                  * if we are doing this type in a
+                                                  * typedef *)
     ?(allowZeroSizeArrays=false)
     ?(allowVarSizeArrays=false)
     (bt: typ)                    (* The base type *)
