@@ -291,9 +291,6 @@ module type Polymorphic = sig
   module Make(T: S) : S with type t = T.t poly
 end
 
-(* local argument of below functors: not visible from outside *)
-let poly_name_ref = ref ""
-
 (* ****************************************************************************)
 (** {2 Polymorphic2 } *)
 (* ****************************************************************************)
@@ -587,8 +584,6 @@ end
 (** {3 Pair} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "pair"
-
 module Pair_arg = struct
   type ('a, 'b) t = 'a * 'b
   let reprs a b = [ a, b ]
@@ -793,7 +788,6 @@ end
 (** {3 Reference} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "t_ref"
 module Poly_ref =
   Polymorphic
     (struct
@@ -835,7 +829,6 @@ let t_ref (type typ) (ty: typ Type.t) =
 (** {3 Option} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "option"
 module Poly_option =
   Polymorphic
     (struct
@@ -889,7 +882,6 @@ let option (type typ) (ty: typ Type.t) =
 (** {3 List} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "list"
 module Poly_list =
   Polymorphic
     (struct
@@ -957,7 +949,6 @@ let list (type typ) (ty: typ Type.t) =
 (** {3 Arrays} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "array"
 module Poly_array =
   Polymorphic
     (struct
@@ -1042,7 +1033,6 @@ let array (type typ) (ty: typ Type.t) =
 (** {3 Queue} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "queue"
 module Poly_queue =
   Polymorphic
     (struct
@@ -1615,8 +1605,6 @@ let filepath = Filepath.ty
 (** {3 Triple} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "triple"
-
 module Triple_arg = struct
   type ('a, 'b, 'c) t = 'a * 'b * 'c
   let reprs a b c = [ a, b, c ]
@@ -1700,8 +1688,6 @@ let triple
 (* ****************************************************************************)
 (** {3 Quadruple} *)
 (* ****************************************************************************)
-
-let () = poly_name_ref := "quadruple"
 
 module Quadruple_arg = struct
   type ('a, 'b, 'c, 'd) t = 'a * 'b * 'c * 'd
