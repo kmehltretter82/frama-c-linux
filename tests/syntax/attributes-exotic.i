@@ -44,3 +44,21 @@ void body(void) {
   // from 8cc
   int save_hook __attribute__((unused, cleanup(pop_function)));
 }
+
+// from libintl
+char *ngettext (const char *__msgid1, const char *__msgid2,
+                unsigned long int __n)
+  __attribute__((__format_arg__(2), __format_arg__(1))) { return 0; }
+
+// from zstd
+__attribute__((no_sanitize("signed-integer-overflow")))
+int my_ZSTD_wrappedPtrDiff(unsigned char const* lhs, unsigned char const* rhs) {
+    return lhs - rhs;
+}
+
+// from zstd
+__attribute__((__target__("bmi2"))) unsigned
+my_ZSTD_decompress_bmi2(char* dctx,
+                        void* dst, unsigned maxDstSize,
+                        const void* seqStart, const _Bool isLongOffset)
+{ return 0; }

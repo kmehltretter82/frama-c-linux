@@ -154,7 +154,9 @@ let () =
   Ast_attributes.register AttrIgnored "pure";
   Ast_attributes.register AttrIgnored "cleanup";
   Ast_attributes.register AttrIgnored "warning";
-  ()
+  Ast_attributes.register AttrIgnored "format_arg";
+  Ast_attributes.register AttrIgnored "no_sanitize";
+  Ast_attributes.register AttrIgnored "target"
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
