@@ -4874,7 +4874,7 @@ and doType (ghost:bool) (context: type_context)
                  Kernel.error ~once:true ~current:true
                    "A type definition cannot be a variable-length array"
                | `LocalDecl ->
-                 Kernel.not_yet_implemented
+                 Kernel.not_yet_implemented ~current:true
                    "For multi-dimensional arrays, variable length is only \
                     supported on the first dimension"
                | `OnlyType | `FormalDecl ->
