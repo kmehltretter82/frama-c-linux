@@ -576,7 +576,9 @@ class erase_exn =
         exn_var <- Some exn;
         let exn_init = Cil.makeZeroInit ~loc (Cil_const.mk_tcomp s)
         in
-        let gexn_var = GVar(exn, { init = Some exn_init }, loc) in
+        let exn_initinfo = { init = Some exn_init } in
+        let gexn_var = GVar(exn, exn_initinfo, loc) in
+        Globals.Vars.add exn exn_initinfo;
         ChangeDoChildrenPost(
           f,add_types_and_globals (List.rev new_types) [gexn_var])
       end else (* nothing can be thrown in the first place, but we still have
