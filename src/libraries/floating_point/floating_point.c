@@ -88,7 +88,10 @@ value frama_c_get_round_mode(value _) {
 }
 
 // Floating-point formats supported by Frama-C. Must be synchronized with
-// the ['f format] type of the [Floating_point] module.
+// the ['f format] type of the [Floating_point] module, in the sens that it
+// must contain at least one value for each constructor of ['f format], and
+// those values have to be in the same order. For now, there is also a [Long]
+// value, which is not yet used, but will probably be in the future.
 typedef enum { Single, Double, Long } precision;
 
 // Convert the Frama-C format into a precision.
