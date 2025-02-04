@@ -20,33 +20,43 @@
 (*                                                                        *)
 (**************************************************************************)
 
+type 't bounds = { lower : 't ; upper : 't }
+
 module type S = sig
 
-  type scalar
-  include Datatype.S_with_collections with type t = scalar
+  include Datatype.S_with_collections
+  type scalar = t
 
-  val zero     : scalar
-  val one      : scalar
-  val infinity : scalar
+  val zero    : scalar
+  val one     : scalar
+  val two     : scalar
+  val pos_inf : scalar
+  val neg_inf : scalar
 
-  val of_int : int -> scalar
-  val of_float : float -> scalar
-  val to_float : scalar -> float
+  val of_int    : int -> scalar
+  val of_float  : float -> scalar
+  val to_float  : scalar -> float
+  val of_string : string -> scalar
 
   val neg : scalar -> scalar
   val abs : scalar -> scalar
   val max : scalar -> scalar -> scalar
   val min : scalar -> scalar -> scalar
 
-  val ( =  ) : scalar -> scalar -> bool
-  val ( <= ) : scalar -> scalar -> bool
-  val ( <  ) : scalar -> scalar -> bool
-  val ( >= ) : scalar -> scalar -> bool
-  val ( >  ) : scalar -> scalar -> bool
+  val pow2 : int -> scalar
+  val log2 : scalar -> int bounds
+  val sqrt : scalar -> scalar bounds
 
   val ( + ) : scalar -> scalar -> scalar
   val ( - ) : scalar -> scalar -> scalar
   val ( * ) : scalar -> scalar -> scalar
   val ( / ) : scalar -> scalar -> scalar
+
+  val ( =  ) : scalar -> scalar -> bool
+  val ( != ) : scalar -> scalar -> bool
+  val ( <= ) : scalar -> scalar -> bool
+  val ( <  ) : scalar -> scalar -> bool
+  val ( >= ) : scalar -> scalar -> bool
+  val ( >  ) : scalar -> scalar -> bool
 
 end
