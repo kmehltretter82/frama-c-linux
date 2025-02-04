@@ -1372,6 +1372,11 @@ annot:
 | decl_list EOF   { Adecl ($1) }
 ;
 
+// Not supported anymore
+attribute_annot:
+| identifier { $1 }
+| GHOST { "\\ghost" }
+
 annotation:
 | loop_annotations
       { let (b,v,p) = $1 in
@@ -1386,6 +1391,11 @@ annotation:
           (Not_well_formed (loc $sloc,
                             "Only one code annotation is allowed per comment"))
       }
+| attribute_annot {
+    raise (Not_well_formed (loc $sloc,
+      "Attribute annotation '"^ $1 ^"' are not supported anymore, use regular \
+       C attributes instead."))
+  }
 | unknown_extension SEMICOLON { raise Unknown_ext }
 ;
 
@@ -2078,7 +2088,6 @@ bs_keyword:
 | AS { () }
 | BASE_ADDR { () }
 | BLOCK_LENGTH { () }
-| GHOST { () }
 | DYNAMIC { () }
 | EMPTY { () }
 | FALSE { () }
@@ -2086,6 +2095,7 @@ bs_keyword:
 | FREEABLE { () }
 | FRESH { () }
 | FROM { () }
+| GHOST { () }
 | INTER { () }
 | LAMBDA { () }
 | LET { () }
