@@ -267,6 +267,28 @@ module type Hashtbl = sig
 
 end
 
+(** A datatype for a type [t] extended with predefined hashtbl over [t].
+    @since Frama-C+dev
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+*)
+module type S_with_hashtbl = sig
+  include S
+  module Hashtbl: Hashtbl with type key = t
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+end
+
+(** A datatype for a type [t] extended with predefined set and map over [t].
+    @since Frama-C+dev
+    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf>
+*)
+module type S_with_set_and_map = sig
+  include S
+  module Set: Set with type elt = t
+  (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
+
+  module Map: Map with type key = t
+end
+
 (** A datatype for a type [t] extended with predefined set, map and hashtbl
     over [t].
 
@@ -281,6 +303,30 @@ module type S_with_collections = sig
   module Hashtbl: Hashtbl with type key = t
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 end
+
+(** Generic comparable datatype builder: functions [equal] and [compare] must
+    not be {!undefined}.
+    @since Frama-C+dev *)
+module Make_with_set_and_map(X: Make_input):
+  S_with_set_and_map with type t = X.t
+
+(** Add sets and maps to an existing datatype, provided the [equal] and
+    [compare] are not {!undefined}.
+    @since Frama-C+dev *)
+module With_set_and_map(X: S)(_: Functor_info):
+  S_with_set_and_map with type t = X.t
+
+(** Generic comparable datatype builder: functions [equal] and [hash] must not
+    be {!undefined}.
+    @since Frama-C+dev *)
+module Make_with_hashtbl(X: Make_input):
+  S_with_hashtbl with type t = X.t
+
+(** Add hashtables modules to an existing datatype, provided the [equal] and
+    [hash] functions are not {!undefined}.
+    @since Frama-C+dev *)
+module With_hashtbl(X: S)(_: Functor_info):
+  S_with_hashtbl with type t = X.t
 
 (** Generic comparable datatype builder: functions [equal], [compare] and
     [hash] must not be {!undefined}. *)

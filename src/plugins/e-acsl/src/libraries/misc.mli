@@ -81,7 +81,7 @@ val name_of_binop: binop -> string
 val finite_min_and_max: Ival.t -> Integer.t * Integer.t
 (** [finite_min_and_max i] takes the finite ival [i] and returns its bounds. *)
 
-module Id_term: Datatype.S_with_collections with type t = term
+module Id_term: Datatype.S_with_hashtbl with type t = term
 (** Datatype for terms that relies on physical equality.
     Note that of its collections only [Hashtbl] can be used.
     Using [Map] and [Set] raises a fatal error as they require a comparison

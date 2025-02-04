@@ -361,9 +361,10 @@ struct
 end
 
 module Id_term_in_profile =
-  Datatype.Pair_with_collections
-    (Misc.Id_term)
-    (Profile)
+  Datatype.With_hashtbl
+    (Datatype.Pair
+       (Misc.Id_term)
+       (Profile))
     (struct let module_name = "E_ACSL.Analyse.Id_term_in_profile" end)
 
 (* Environment to handle recursive functions: this environment stores the logic
