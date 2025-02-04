@@ -1028,12 +1028,14 @@ themselves (typically, files in \texttt{share}), you can use an
 (install
   (package frama-c-myplugin)
   (section (site (frama-c share)))
-  (files (share/myfile as frama-c-myplugin/myfile)))
+  (files (share/myfile as myplugin-shortname/myfile)))
 \end{dunecode}
+
+{\em Note: Make sure to use the plug-in's shortname in the file path.}
 
 With the stanza above, the installation of package \texttt{frama-c-myplugin}
 will copy \texttt{myfile} from the \texttt{share} directory
-of the plug-in sources into the \texttt{frama-c-myplugin} directory inside
+of the plug-in sources into the \texttt{myplugin-shortname} directory inside
 the \texttt{share} directory of \framac's installation. Other target sections
 are available (e.g. \texttt{bin} for installing an additional executable), see
 the \texttt{dune}
