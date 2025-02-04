@@ -23,21 +23,21 @@
 (* A filter corresponds to the following recursive equation :
       X[t + 1] = AX[t] + ∑B(ω)ε(ω)[k + 1] + C
    where :
-    - n is the filter's order ;
-    - ω is a measure's source (for instance, a specific sensor in a
-      cyberphysical system) ;
-    - m(ω) is the delay for the source (ω) ;
-    - X[t] ∈ 𝕂^n is the filter's state at iteration [t] ;
-    - ε(ω)[t] ∈ 𝕂^m(ω) is the measure at iteration [t] for the source (ω) ;
-    - A ∈ 𝕂^(nxn) is the filter's state matrix ;
-    - B(ω) ∈ 𝕂^(nxm(ω)) is the source matrix for the source (ω) ;
-    - C ∈ 𝕂^n is the filter's center.
+   - n is the filter's order ;
+   - ω is a measure's source (for instance, a specific sensor in a
+     cyberphysical system) ;
+   - m(ω) is the delay for the source (ω) ;
+   - X[t] ∈ 𝕂^n is the filter's state at iteration [t] ;
+   - ε(ω)[t] ∈ 𝕂^m(ω) is the measure at iteration [t] for the source (ω) ;
+   - A ∈ 𝕂^(nxn) is the filter's state matrix ;
+   - B(ω) ∈ 𝕂^(nxm(ω)) is the source matrix for the source (ω) ;
+   - C ∈ 𝕂^n is the filter's center.
 
    The goal of this module is to compute filters invariants, i.e bounds for
    each of the filter's state dimensions when the iterations goes to infinity.
    To do so, each measure of a given source is supposed bounded by the same
-   interval, represented as a center and a deviation. Each source can thus be
-   bounded by a different interval.
+   interval, represented as a center and a deviation. Each source can however
+   be bounded by a different interval.
 
    {!Linear_filter_test} is an example using this module. *)
 module Make (Field : Field.S) : sig
@@ -55,31 +55,31 @@ module Make (Field : Field.S) : sig
   type 'n source
 
   (* Sources constructor. The inputs are as following :
-      - matrix is the source matrix, describing how the current and past
-        measures are taken into account ;
-      - center is the measures center ;
-      - deviation is the measures deviation. *)
+     - matrix is the source matrix, describing how the current and past
+       measures are taken into account ;
+     - center is the measures center ;
+     - deviation is the measures deviation. *)
   val source :
     matrix    : ('n succ, 'm succ) Linear.matrix ->
     center    : Field.scalar ->
     deviation : Field.scalar ->
     'n succ source
 
-  
+
   (* A value of type [n filter] describes a filter of order (i.e with n state
      variables). The sources delays are contained by each one of them. *)
   type 'n filter
 
   (* Filters constructors. The inputs are as following :
-      - center is the filter's center ;
-      - state is the filter's state matrix ;
-      - sources is the list of the filter's sources. *)
+     - center is the filter's center ;
+     - state is the filter's state matrix ;
+     - sources is the list of the filter's sources. *)
   val create :
     state   : ('n succ, 'n succ) Linear.matrix ->
     center  : 'n succ Linear.vector ->
     sources : 'n succ source list ->
     'n succ filter
-  
+
   (* Filters pretty printer. *)
   val pretty : Format.formatter -> 'n filter -> unit
 

@@ -39,8 +39,8 @@ module Make (Field : Field.S) = struct
      given source matrix describes how the current and past measures are taken
      into account by the filter. *)
   type 'n source =
-    Source : ('n, 'm succ) source_data -> 'n source
-  
+    | Source : ('n, 'm succ) source_data -> 'n source
+
   and ('n, 'm) source_data =
     { matrix : ('n, 'm) matrix
     ; measure_center : scalar
@@ -66,7 +66,7 @@ module Make (Field : Field.S) = struct
      each iteration, a state matrix, describing how the current and past states
      are taken into account, and a list of sources. *)
   type 'n filter =
-    Filter : 'n succ filter_data -> 'n succ filter
+    | Filter : 'n succ filter_data -> 'n succ filter
 
   and 'n filter_data =
     { center  : 'n vector
@@ -136,7 +136,7 @@ module Make (Field : Field.S) = struct
 
   (* Bounds for a given dimension. *)
   let bounds i invariant = (lower i invariant, upper i invariant)
-  
+
 
 
   (* Invariant computation. The computation of the sum of all past
