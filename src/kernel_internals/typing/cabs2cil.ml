@@ -107,10 +107,12 @@ let stripUnderscore s =
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
-      if not (Ast_attributes.is_known res) then
+      if not (Ast_attributes.is_known res) then begin
+        Ast_attributes.register AttrIgnored res;
         Kernel.warning
           ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
-          "Unknown attribute: %s" s
+          "Ignoring unknown attribute: %s" s;
+      end
     end;
     res
   end
