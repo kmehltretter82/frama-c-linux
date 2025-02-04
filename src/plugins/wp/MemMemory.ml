@@ -136,7 +136,7 @@ let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
     "eqmem" , [teq] , [inc;meq] , m , m' ;
     (* "havoc"-> nom plus général: passe au dessus d'un memcpy *)
     (* il faut réussir à sortir du memcpy quand on est séparé *)
-    "havoc" , [] , [sep] , m , mh ;
+    "memcpy_neq" , [] , [sep] , m , mh ;
   ]
 
 (* -------------------------------------------------------------------------- *)

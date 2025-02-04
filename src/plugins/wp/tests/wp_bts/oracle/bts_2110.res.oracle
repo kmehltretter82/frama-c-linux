@@ -80,7 +80,7 @@ theory Compound
      included p 1 pt n ->
      eqmem mint mint1 pt n -> Load_S2_A p mint1 = Load_S2_A p mint
   
-  axiom Q_Load_S2_A_havoc_Mint0 :
+  axiom Q_Load_S2_A_memcpy_neq_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, n:int, p:addr, ps:addr, pt:
      addr [Load_S2_A p (memcpy mint mint1 pt ps n)].
      separated p 1 pt n ->

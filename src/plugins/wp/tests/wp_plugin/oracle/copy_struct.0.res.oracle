@@ -9,18 +9,24 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file copy_struct.i, line 22) in 'copy_struct':
-Let a_1 = memcpy(mem_0, mem_undef_0, a, a, 12).
-Let a_2 = Load_R0003_S1_S(a, a_1).
-Let a_3 = Load_R0003_S1_S(b, a_1).
+Let a_1 = memcpy(M000c_sint32_0, M000c_sint32_undef_0, a, a, 12).
+Let a_2 = memcpy(M0016_sint8_0, M0016_sint8_undef_0, a, a, 12).
+Let a_3 = memcpy(M0011_sint16_0, M0011_sint16_undef_0, a, a, 12).
+Let a_4 = Load_R0003_S1_S(a, a_1, a_2, a_3).
+Let x = M0011_sint16_undef_0[shiftfield_F1_S_fs(a)].
+Let x_1 = M000c_sint32_undef_0[shiftfield_F1_S_fi(a)].
+Let x_2 = M0016_sint8_undef_0[shift_sint8(shiftfield_F1_S_fca(a), 3)].
+Let a_5 = Load_R0003_S1_S(b, a_1, a_2, a_3).
 Assume {
-  Type: IsS1_S(a_2) /\ IsS1_S(a_3).
+  Type: is_sint16(x) /\ is_sint32(x_1) /\ is_sint8(x_2) /\
+      is_sint32(x_1 + x + x_2) /\ IsS1_S(a_4) /\ IsS1_S(a_5).
   (* Heap *)
-  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ framed(mem_0) /\
-      sconst(mem_0).
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Pre-condition *)
-  Have: separated(a, 12, b, 12).
-  Have: a_2 = Load_R0003_S1_S(b, mem_0).
+  Have: P_pointed(a, b).
+  Have: a_4 =
+      Load_R0003_S1_S(b, M000c_sint32_0, M0016_sint8_0, M0011_sint16_0).
 }
-Prove: EqS1_S(a_2, a_3).
+Prove: EqS1_S(a_4, a_5).
 
 ------------------------------------------------------------

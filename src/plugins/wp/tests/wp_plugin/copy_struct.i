@@ -18,13 +18,15 @@ struct S {
 */
 
 /*@
-    requires \separated (a, b);
+    requires pointed(a,b);
     ensures *a == *b;
 */
-//int
-void
+//
+int
+//void
 copy_struct (struct S * a, struct S * b)
 {
     *a = *b;
-    //return a->fi + a->fs + a->fca[3];
+    //
+    return a->fi + a->fs + a->fca[3];
 }

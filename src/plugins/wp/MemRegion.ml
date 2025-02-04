@@ -150,6 +150,11 @@ struct
       | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
       | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
 
+    let prim_tau_of_chunk { data } =
+      match data with
+      | Value p | Array p -> tau_of_prim p
+      | ValInit | ArrInit -> Qed.Logic.Bool
+
     let basename_of_chunk c =
       match c.data with
       | ValInit -> "Vinit"
@@ -215,20 +220,45 @@ struct
     let shift l obj ofs =
       make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
 
-    let frames ty l c =
+    let frames  ~addr:p ~offset:n ~sizeof:s ?(basename = "Rmem") tau =
+      let t_mem = Qed.Logic.Array(MemAddr.t_addr, tau) in
+      let m  = e_var (Lang.freshvar ~basename t_mem) in
+      let m' = e_var (Lang.freshvar ~basename t_mem) in
+      let pt' = F.e_var (Lang.freshvar ~basename:"pt" MemAddr.t_addr) in
+      let ps' = F.e_var (Lang.freshvar ~basename:"ps" MemAddr.t_addr) in
+      let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
+      let mh = Lang.F.e_fun f_memcpy [m;m';pt';ps';n'] in
+      let v' = e_var (Lang.freshvar ~basename:"v" tau ) in
+      let meq = p_call p_eqmem [m;m';pt';n'] in
+      let diff = p_call MemAddr.p_separated [p;n;pt';s] in
+      let sep = p_call MemAddr.p_separated [p;n;pt';n'] in
+      let inc = p_call MemAddr.p_included [p;n;pt';n'] in
+      let teq = Definitions.Trigger.of_pred meq in
+      [
+        "update"     , []    , [diff]    , m , e_set m pt' v' ;
+        "eqmem"      , [teq] , [inc;meq] , m , m' ;
+        "memcpy_neq" , []    , [sep]     , m , mh ;
+      ]
+
+
+    let get_tau l c = match kind l, Sigma.ckind c with
+      | _, State.Mu c -> Chunk.prim_tau_of_chunk c
+      | _ -> Sigma.Chunk.tau_of_chunk c
+
+    let frames ty l (c : Sigma.Chunk.t) =
       match kind l with
       | Single Ptr | Many Ptr | Garbled ->
         let offset = M.sizeof ty in
         let sizeof = Lang.F.e_one in
-        let tau = Sigma.Chunk.tau_of_chunk c in
+        let tau = get_tau l c in
         let basename = Sigma.Chunk.basename_of_chunk c in
-        MemMemory.frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
+        frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
       | _ ->
         let offset = M.sizeof ty in
         let sizeof = Lang.F.e_one in
-        let tau = Sigma.Chunk.tau_of_chunk c in
+        let tau = get_tau l c in
         let basename = Sigma.Chunk.basename_of_chunk c in
-        MemMemory.frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
+        frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
 
     let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
       match Sigma.ckind chunk with

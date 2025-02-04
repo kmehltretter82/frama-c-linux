@@ -146,7 +146,7 @@ theory Compound
      eqmem mchar mchar1 pt n ->
      Load_S1_X p mchar1 mint mint1 = Load_S1_X p mchar mint mint1
   
-  axiom Q_Load_S1_X_havoc_Mchar0 :
+  axiom Q_Load_S1_X_memcpy_neq_Mchar0 :
     forall mchar:addr -> int, mchar1:addr -> int, mint:addr -> int, mint1:
      addr -> int, n:int, p:addr, ps:addr, pt:addr
      [Load_S1_X p (memcpy mchar mchar1 pt ps n) mint mint1].
@@ -169,7 +169,7 @@ theory Compound
      eqmem mint1 mint2 pt n ->
      Load_S1_X p mchar mint2 mint = Load_S1_X p mchar mint1 mint
   
-  axiom Q_Load_S1_X_havoc_Mint1 :
+  axiom Q_Load_S1_X_memcpy_neq_Mint1 :
     forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, mint2:addr
      -> int, n:int, p:addr, ps:addr, pt:addr
      [Load_S1_X p mchar (memcpy mint1 mint2 pt ps n) mint].
@@ -192,7 +192,7 @@ theory Compound
      eqmem mint1 mint2 pt n ->
      Load_S1_X p mchar mint mint2 = Load_S1_X p mchar mint mint1
   
-  axiom Q_Load_S1_X_havoc_Mint2 :
+  axiom Q_Load_S1_X_memcpy_neq_Mint2 :
     forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, mint2:addr
      -> int, n:int, p:addr, ps:addr, pt:addr
      [Load_S1_X p mchar mint (memcpy mint1 mint2 pt ps n)].
@@ -213,7 +213,7 @@ theory Compound
      included p 3 pt n ->
      eqmem init init1 pt n -> Load_Init_S1_X p init1 = Load_Init_S1_X p init
   
-  axiom Q_Load_Init_S1_X_havoc_Init0 :
+  axiom Q_Load_Init_S1_X_memcpy_neq_Init0 :
     forall init:addr -> bool, init1:addr -> bool, n:int, p:addr, ps:addr, pt:
      addr [Load_Init_S1_X p (memcpy init init1 pt ps n)].
      separated p 3 pt n ->
