@@ -301,9 +301,12 @@ let gen_define_macro fmt macro def =
   else gen_define_string fmt macro def
 
 let gen_define_custom_macros fmt censored key_values =
+  let is_same_macro m1 m2 =
+    Extlib.strip_underscore m1 = Extlib.strip_underscore m2
+  in
   List.iter
     (fun (k,v) ->
-       if not (Datatype.String.Set.mem (Extlib.strip_underscore k) censored)
+       if not (Datatype.String.Set.exists (is_same_macro k) censored)
        then begin
          gen_undef fmt k;
          gen_define_macro fmt k v
@@ -613,7 +616,7 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
 let generate_machdep_header ?censored_macros mach =
-  let debug = Kernel.(is_debug_key_enabled dkey_pp) in
+  let debug = Kernel.(is_debug_key_enabled dkey_pp_keep_temp_files) in
   let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
   let file = Filepath.Normalized.concat temp "__fc_machdep.h" in
   let chan = open_out (file:>string) in

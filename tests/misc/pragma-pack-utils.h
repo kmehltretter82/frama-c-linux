@@ -9,13 +9,11 @@
 
 // Some versions of MSVC do not accept the '%z' modifier, but GCC emits warnings
 // without it, so use this macro to print it in both compilers.
-// Note that __GNUC__ is defined in our machdep MSVC, but not in the actual
-// MSVC compiler itself.
-#ifdef __GNUC__
+#if defined(__GNUC__) || defined(__FRAMAC__)
 // GCC uses %zu for size_t, and allows unicode
 # define ZU "%zu"
 # define IN "∈"
-#else
+#else // actual MSVC compilation
 // MSVC uses %u for size_t, and does not allow unicode
 # define ZU "%u"
 # define IN "IN"
