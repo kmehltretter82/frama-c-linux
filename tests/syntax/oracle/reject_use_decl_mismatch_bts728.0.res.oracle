@@ -1,7 +1,8 @@
 [kernel] Parsing reject_use_decl_mismatch_bts728.c (with preprocessing)
 [kernel:typing:no-proto] reject_use_decl_mismatch_bts728.c:15: Warning: 
   Calling function f that is declared without prototype.
-  Its formals will be inferred from actual arguments
+  Its formals will be inferred from actual arguments.
+  Declare it as f(void) if the function does not take any parameters.
 [kernel] reject_use_decl_mismatch_bts728.c:19: User Error: 
   Declaration of f does not match previous declaration from reject_use_decl_mismatch_bts728.c:7 (different number of arguments).
   17    }

@@ -3,7 +3,8 @@
   Calling undeclared function bar. Old style K&R code?
 [kernel:typing:no-proto] issue-641-implicit-calls.c:25: Warning: 
   Calling function bar that is declared without prototype.
-  Its formals will be inferred from actual arguments
+  Its formals will be inferred from actual arguments.
+  Declare it as bar(void) if the function does not take any parameters.
 [kernel] issue-641-implicit-calls.c:25: User Error: 
   nested calls of bar without a prototype and incompatible arguments : different integer types:
   'int' and 'unsigned int'
