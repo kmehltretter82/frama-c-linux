@@ -191,6 +191,9 @@ let wkey_int_conversion =
 let wkey_merge_conversion =
   register_warn_category "typing:merge-conversion"
 
+let wkey_alignof_bitfield =
+  register_warn_category "typing:alignof-bitfield"
+
 let wkey_initializer_overrides =
   register_warn_category "typing:initializer-overrides"
 

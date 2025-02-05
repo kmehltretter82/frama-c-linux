@@ -79,6 +79,19 @@ let unsupported key =
   let msg f k = Format.fprintf f "%s is currently unsupported by Frama-C." k in
   add key (fun loc -> Kernel.abort ~source:(fst loc) "%a" msg key)
 
+let compiler (name, is_machdep) key builder =
+  let wkey = Kernel.wkey_conditional_feature in
+  let warning () =
+    Kernel.warning ~wkey
+      "%s is a %s extension, use a %s-based machdep to enable it."
+        key name name ;
+    IDENT key
+  in
+  add key (fun loc -> if is_machdep then builder loc else warning ())
+
+(* let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder *)
+let msvc key builder = compiler ("MSVC", Machine.msvcMode ()) key builder
+
 let thread_keyword () =
   let wkey = Kernel.wkey_conditional_feature in
   let s = "__thread is a GCC extension, use a GCC-based machdep to enable it" in
@@ -134,6 +147,8 @@ let init_lexicon () =
   valid "for" (fun loc -> FOR loc) ;
   valid "if" (fun loc -> IF loc) ;
   valid "else" (fun _ -> ELSE) ;
+  valid "alignof" (fun loc -> ALIGNOF loc) ;
+  valid "_Alignof" (fun loc -> ALIGNOF loc) ;
   (*** Implementation specific keywords ***)
   valid "__signed__" (fun loc -> SIGNED loc) ;
   valid "__inline__" (fun loc -> INLINE loc) ;
@@ -151,8 +166,6 @@ let init_lexicon () =
   valid "__typeof__" (fun loc -> TYPEOF loc) ;
   valid "__typeof" (fun loc -> TYPEOF loc) ;
   valid "typeof" (fun loc -> TYPEOF loc) ;
-  valid "__alignof" (fun loc -> ALIGNOF loc) ;
-  valid "__alignof__" (fun loc -> ALIGNOF loc) ;
   valid "__volatile__" (fun loc -> VOLATILE loc) ;
   valid "__volatile" (fun loc -> VOLATILE loc) ;
   valid "__FUNCTION__" (fun loc -> FUNCTION__ loc) ;
@@ -160,6 +173,7 @@ let init_lexicon () =
   valid "__PRETTY_FUNCTION__" (fun loc -> PRETTY_FUNCTION__ loc) ;
   valid "__label__" (fun _ -> LABEL__) ;
   (*** weimer: GCC arcana ***)
+  (* gcc   "__alignof__" (fun loc -> ALIGNOF loc) ; *)
   valid "__restrict" (fun loc -> RESTRICT loc) ;
   valid "restrict" (fun loc -> RESTRICT loc) ;
   (**** MS VC ***)
@@ -173,6 +187,7 @@ let init_lexicon () =
   valid "__fastcall" (fun _ -> MSATTR ("__fastcall", currentLoc ())) ;
   valid "__w64" (fun _ -> MSATTR("__w64", currentLoc ())) ;
   valid "__declspec" (fun loc -> DECLSPEC loc) ;
+  msvc  "__alignof" (fun loc -> ALIGNOF loc) ;
   (* !! we turn forceinline into inline *)
   valid "__forceinline" (fun loc -> INLINE loc) ;
   (* Some files produced by 'GCC -E' expect this type to be defined *)
@@ -188,7 +203,6 @@ let init_lexicon () =
    provide some helpful error messages. Usage of 'fatal' instead of 'error'
    below prevents duplicate error messages due to parsing errors. *)
   unsupported "_Alignas" ;
-  unsupported "_Alignof" ;
   unsupported "_Complex" ;
   unsupported "_Decimal32" ;
   unsupported "_Decimal64" ;

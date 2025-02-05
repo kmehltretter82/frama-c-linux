@@ -1,7 +1,6 @@
 /* run.config
    EXIT: 1
    STDOPT: #"-cpp-extra-args=-DALIGNAS"
-   STDOPT: #"-cpp-extra-args=-DALIGNOF"
    STDOPT: #"-cpp-extra-args=-DCOMPLEX"
    STDOPT: #"-cpp-extra-args=-DIMAGINARY"
    STDOPT: #"-cpp-extra-args=-DDECIMAL"
@@ -16,11 +15,7 @@ struct st_alignas {
 #endif
 
 int main(void) {
-#ifdef ALIGNOF
-  int alignd = _Alignof(double);
-#endif
-
-#ifdef COMPLEX
+#ifdef COMPLEX // see also tests/syntax/alignof_typing_constrains.c "#ifdef TEST_COMPLEX"
   double _Complex c = 1;
 #endif
 

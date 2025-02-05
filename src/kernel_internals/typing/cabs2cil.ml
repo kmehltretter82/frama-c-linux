@@ -5657,10 +5657,18 @@ and doExp local_env
     | Cabs.TYPE_ALIGNOF (bt, dt) ->
       let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
+      if Ast_types.has_bitfield typ then
+        Kernel.warning ~current:true ~wkey:Kernel.wkey_alignof_bitfield
+          "_Alignof(bitfield) has unspecified value" ;
       let res = new_exp ~loc (AlignOf typ) in
       finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
 
     | Cabs.EXPR_ALIGNOF e ->
+      if not @@ Machine.gccMode () then
+        Kernel.error
+          "_Alignof(expression) is a GCC extension, use a \
+           GCC-based machdep to enable it" ;
+
       let (_, se, e', lvt) =
         doExp (no_paren_local_env local_env) CNoConst e AExpLeaveArrayFun
       in

@@ -795,12 +795,10 @@ class cil_printer () = object (self)
     | SizeOfE e ->
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof" self#exp_non_decay e
-    (* __alignof__ is a gcc extension, which seems to have a subtle
-       semantic difference with newer C11 _Alignof, as mentioned in
-       https://gcc.gnu.org/bugzilla/show_bug.cgi?id=52023
-       Neither cookie nor keyword for you. *)
-    | AlignOf t -> fprintf fmt "__alignof__(%a)" (self#typ None) t
-    | AlignOfE e -> fprintf fmt "__alignof__(%a)" self#exp_non_decay e
+    | AlignOf t ->
+      fprintf fmt "%a(%a)" (self#pp_keyword) "_Alignof" (self#typ None) t
+    | AlignOfE e ->
+      fprintf fmt "%a(%a)" (self#pp_keyword) "_Alignof" self#exp_non_decay e
     | AddrOf ((Var v, NoOffset))
       when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
       self#varinfo fmt v

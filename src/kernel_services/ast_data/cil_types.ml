@@ -744,10 +744,11 @@ and exp_node =
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
   | AlignOf    of typ
-  (** This corresponds to the GCC __alignof_. Has [size_t] type which depends on
-      machine configuration (cf. {!Machine}). *)
+  (** _Alignof. Has [size_t] type which depends on machine configuration 
+       (cf. {!Machine}). *)
 
   | AlignOfE   of exp
+  (** GCC accepts expressions in _Alignof. *)
 
   | UnOp       of unop * exp * typ
   (** Unary operation. Includes the type of the result. *)
