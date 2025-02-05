@@ -6,8 +6,6 @@ __inline static int f__fc_inline(int x)
   return x;
 }
 
-__inline int f(int x);
-
 __inline static int f1__fc_inline(void)
 {
   int __retres;
@@ -35,7 +33,7 @@ int g(int x)
   return __retres;
 }
 
-__inline int f(int x)
+int f(int x)
 {
   int __retres;
   __retres = x + 1;

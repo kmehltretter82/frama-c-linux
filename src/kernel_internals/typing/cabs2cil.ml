@@ -10393,53 +10393,19 @@ and doStatement local_env (s : Cabs.statement) : chunk =
         BlockChunk.empty
     end
 
-let copy_spec (old_f,new_f) formals_map spec =
-  let obj = object
-    inherit Cil.genericCilVisitor (Visitor_behavior.refresh (Project.current()))
-    method! vlogic_var_use lv =
-      match lv.lv_origin with
-      | None -> DoChildren
-      | Some v ->
-        if Cil_datatype.Varinfo.equal v old_f then
-          ChangeTo (Cil.cvar_to_lvar new_f)
-        else begin
-          try
-            let _,new_v =
-              List.find
-                (fun (x,_) -> Cil_datatype.Varinfo.equal v x) formals_map
-            in
-            ChangeTo (Cil.cvar_to_lvar new_v)
-          with Not_found -> DoChildren
-        end
-  end
-  in
-  Cil.visitCilFunspec obj spec
-
-let split_extern_inline_def acc g =
-  match g with
-  | GFun ( { svar; sformals; sspec }, loc)
-    when svar.vinline && svar.vstorage = NoStorage ->
+let process_inline_def = function
+  | GFun ( { svar }, _loc) when svar.vinline && svar.vstorage = NoStorage ->
     (* we have an inline definition, which is also an implicit external
        _declaration_ (see C11 6.7.4§7). Just rename its uses in the current
-       translation unit, and leave a new, unrelated, external declaration for
-       the link phase. If a spec exists, the external declaration will inherit
-       it.
-    *)
-    let new_v = copy_with_new_vid svar in
+       translation unit. *)
     svar.vname <- svar.vname ^ "__fc_inline";
     (* inline definition is restricted to this translation unit. *)
     svar.vstorage <- Static;
-    let new_formals = List.map copy_with_new_vid sformals in
-    Cil.unsafeSetFormalsDecl new_v new_formals;
-    let formals_map = List.combine sformals new_formals in
-    let new_spec = copy_spec (svar, new_v) formals_map sspec in
-    GFunDecl (new_spec, new_v, loc) :: g :: acc
   | GFun ({ svar },_) when svar.vinline && svar.vstorage = Extern ->
     (* The definition is a real external definition. We may as well remove
        the inline specification. *)
     svar.vinline <- false;
-    g :: acc
-  | _ -> g::acc
+  | _ -> ()
 
 (* Translate a file *)
 let convFile (path, f) =
@@ -10473,8 +10439,7 @@ let convFile (path, f) =
   in
   List.iter doOneGlobal f;
   let globals = fileGlobals () in
-  let globals = List.fold_left split_extern_inline_def [] globals in
-  let globals = List.rev globals in
+  List.iter process_inline_def globals;
   List.iter rename_spec globals;
   Logic_env.prepare_tables ();
   IH.clear mustTurnIntoDef;
