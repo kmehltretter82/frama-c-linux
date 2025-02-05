@@ -340,7 +340,7 @@ struct
   (** {3 Float} *)
   (* ************************************************************************ *)
 
-  module Decimal
+  module Float
       (X: sig include Parameter_sig.Input_with_arg val default: float end) =
   struct
 

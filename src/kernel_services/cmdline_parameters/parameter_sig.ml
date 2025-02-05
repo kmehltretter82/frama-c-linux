@@ -630,7 +630,7 @@ module type Builder = sig
 
   (** Parameter with an optional decimal point converted to an Ocaml float
       @since Frama-C+dev *)
-  module Decimal(_: sig include Input_with_arg val default: float end): Float
+  module Float(_: sig include Input_with_arg val default: float end): Float
 
   (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
   module String(_: sig include Input_with_arg val default: string end): String

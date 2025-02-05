@@ -6,7 +6,7 @@ include Plugin.Register (struct
     let help = "A fake plugin for test purpose"
   end)
 
-module TestDecimal = Decimal (struct
+module TestDecimal = Float (struct
     let option_name = "-test-decimal-option"
     let help = "test option"
     let arg_name = "x"
@@ -18,7 +18,7 @@ let () =
   TestDecimal.add_aliases ~deprecated:true
     ["-test-deprecated-option"]
 
-module TestDecimalDefaultRange = Decimal (struct
+module TestDecimalDefaultRange = Float (struct
     let option_name = "-test-default-range"
     let help = "test option"
     let arg_name = "x"
