@@ -42,35 +42,6 @@ type 'a ty = 'a t
 (** {2 Pretty printing materials} *)
 (* ****************************************************************************)
 
-(** Precedences used for generating the minimal number of parenthesis in
-    combination with function {!par} below. *)
-type precedence =
-  | Basic
-  (** Normal precedence
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-  | Call
-  (** Instantiation of polymorphic type
-      @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-  | Tuple
-  | List
-  | NoPar
-
-(** [par context myself fmt pp] puts parenthesis around the verbatim
-    prints by [pp] according to the precedence [myself] of the verbatim and to
-    the precedence [context] of the caller of the pretty printer. [fmt] is the
-    output formatter.
-
-    The typical use is the following:
-    [let pretty_print p_caller fmt x =
-    let pp fmt = Format.fprintf "..." ... x ... in
-    let myself = Call in
-    par p_caller myself fmt pp]
-
-    @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
-val par:
-  precedence -> precedence -> Format.formatter -> (Format.formatter -> unit) ->
-  unit
-
 (** [par_ty_name f ty] puts parenthesis around the name of the [ty] iff [f ty]
     is [true].
     @since Carbon-20101201 *)
@@ -87,7 +58,6 @@ exception AlreadyExists of string
 val register:
   ?closure:bool ->
   name:string ->
-  ml_name:string option ->
   Structural_descr.t ->
   'a list ->
   'a t
@@ -97,7 +67,6 @@ val register:
     [closure] is true iff the type is a function type.
     [name] is the name of the type. Must be a valid OCaml type name (eventually
     prefixed by a module path).
-    [ml_name] is the OCaml name of the registered type value.
     @raise AlreadyExists if the given name is already used by another type.
     @raise Invalid_argument if [reprs] is the empty list
 *)
@@ -129,9 +98,6 @@ val get_embedded_type_names: 'a t -> string list
     list"; "int" ].
     @since Oxygen-20120901 *)
 
-val ml_name: 'a t -> string
-val pp_ml_name: 'a t -> precedence -> Format.formatter -> unit
-val set_ml_name: 'a t -> string option -> unit
 val set_name: 'a t -> string -> unit
 (** @since Neon-20140301 *)
 
@@ -155,9 +121,6 @@ module type Polymorphic_input = sig
   val name: 'a t -> string
   (** How to build a name for each monomorphic instance of the type
       value from the underlying type. *)
-
-  val module_name: string
-  (** The name of the built module. *)
 
   val structural_descr: Structural_descr.t -> Structural_descr.t
   (** How to build the structural descriptor for each monomorphic instance.
@@ -206,7 +169,6 @@ module Polymorphic(T:Polymorphic_input)
     argument corresponding to the second type variable. *)
 module type Polymorphic2_input = sig
   val name: 'a t -> 'b t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t
   type ('a, 'b) t
@@ -248,7 +210,6 @@ end
     @since Oxygen-20120901 *)
 module type Polymorphic3_input = sig
   val name: 'a t -> 'b t -> 'c t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t ->
     Structural_descr.t
@@ -277,7 +238,6 @@ module Polymorphic3(T:Polymorphic3_input)
     @since Oxygen-20120901 *)
 module type Polymorphic4_input = sig
   val name: 'a t -> 'b t -> 'c t -> 'd t -> string
-  val module_name: string
   val structural_descr:
     Structural_descr.t -> Structural_descr.t -> Structural_descr.t ->
     Structural_descr.t -> Structural_descr.t

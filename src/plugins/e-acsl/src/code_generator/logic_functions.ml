@@ -314,7 +314,6 @@ end = struct
     Datatype.Pair_with_collections
       (Profile)
       (Typ) (* return type *)
-      (struct let module_name = "E_ACSL.Logic_functions.Signatures" end)
 
   module Signatures = Profile_and_return_type.Hashtbl
 

@@ -82,8 +82,7 @@ let pp_calls fmt calls =
 (* --- Dynamic Calls                                                      --- *)
 (* -------------------------------------------------------------------------- *)
 
-module PInfo = struct let module_name = "Dyncall.Point" end
-module Point = Datatype.Pair_with_collections(Datatype.String)(Stmt)(PInfo)
+module Point = Datatype.Pair_with_collections(Datatype.String)(Stmt)
 module Calls = Datatype.Pair(Property)(Datatype.List(Kernel_function))
 module CInfo =
 struct

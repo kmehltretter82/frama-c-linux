@@ -1692,7 +1692,6 @@ let () = Ast.add_linked_state Aux_varinfos.self
 module StringPair =
   Datatype.Pair_with_collections
     (Datatype.String)(Datatype.String)
-    (struct let module_name = "Data_for_aorai.StringPair" end)
 
 module Paraminfos =
   State_builder.Hashtbl(StringPair.Hashtbl)(Cil_datatype.Varinfo)

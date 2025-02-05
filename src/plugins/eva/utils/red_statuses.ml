@@ -51,8 +51,7 @@ module AlarmOrProp = Datatype.Make_with_collections(struct
       | Prop p -> 175 + Property.hash p
   end)
 
-module Info = struct let module_name = "CallstackOption" end
-module CallstackOption = Datatype.Option_with_collections (Callstack) (Info)
+module CallstackOption = Datatype.Option_with_collections (Callstack)
 module Callstacks = CallstackOption.Set
 
 (* For each alarm or predicate, stores the set of callstacks for which it was

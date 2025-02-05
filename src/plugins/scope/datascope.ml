@@ -360,9 +360,8 @@ let compute_escaping_zones s1 s2 =
 
 (* type pair_stmts = stmt * stmt *)
 module PairStmts =
-  Datatype.Pair_with_collections
-    (Cil_datatype.Stmt)(Cil_datatype.Stmt)
-    (struct let module_name = "Scope.Datascope.PairStmts" end)
+  Datatype.Pair_with_collections(Cil_datatype.Stmt)(Cil_datatype.Stmt)
+
 
 (* Hashtbl from pairs of stmts to zone. Used as maps from Cfg edges to the
    memory zones that are 'modified' by thescope change. *)

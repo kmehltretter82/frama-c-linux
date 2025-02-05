@@ -1350,9 +1350,7 @@ module Consolidation_graph = struct
 
   module Edge = struct
 
-    include Datatype.Option_with_collections
-        (Emitted_status)
-        (struct let module_name = "Property_status.Consolidation_graph.Edge" end)
+    include Datatype.Option_with_collections(Emitted_status)
 
     let default = None
 

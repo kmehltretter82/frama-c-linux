@@ -30,15 +30,8 @@ type key = (typ * int option)
 let unexpected = Options.fatal "String.Memset: unexpected: %s"
 
 module With_collection = struct
-  module OptIntInfo = struct
-    let module_name = String.capitalize_ascii "Instantiate.Memset.OptInt.Datatype"
-  end
-  module OptInt = Datatype.Option_with_collections (Datatype.Int)(OptIntInfo)
-  module MemsetKeyInfo = struct
-    let module_name = String.capitalize_ascii "Instantiate.Memset.Key.Datatype"
-  end
-  include Datatype.Pair_with_collections
-      (Cil_datatype.Typ) (OptInt) (MemsetKeyInfo)
+  module OptInt = Datatype.Option_with_collections (Datatype.Int)
+  include Datatype.Pair_with_collections (Cil_datatype.Typ) (OptInt)
 end
 
 let rec any_char_composed_type t =

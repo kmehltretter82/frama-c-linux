@@ -24,13 +24,11 @@
 
 module Result_pair =
   Datatype.Pair_with_collections(Datatype.Bool)(Datatype.Bool)
-    (struct let module_name = "Sparecode.Register.Result_pair.t" end)
 module Result =
   State_builder.Hashtbl
     (Datatype.Hashtbl
        (Result_pair.Hashtbl)
-       (Result_pair)
-       (struct let module_name = "Sparecode" end))
+       (Result_pair))
     (Project.Datatype)
     (struct
       let name = "Sparecode"

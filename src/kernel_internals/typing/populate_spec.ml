@@ -920,7 +920,6 @@ module Clauses =
 
 module Key =
   Datatype.Pair_with_collections (Kernel_function) (Clauses)
-    (struct let module_name = "Populate_spec.Key.t" end)
 
 (* Hashtbl used to memoize which kernel function has been populated. *)
 module Is_populated =

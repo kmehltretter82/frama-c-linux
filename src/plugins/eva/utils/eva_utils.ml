@@ -188,7 +188,6 @@ let conv_relation rel =
 
 module PairExpBool =
   Datatype.Pair_with_collections(Cil_datatype.Exp)(Datatype.Bool)
-    (struct let module_name = "Value.Eva_utils.PairExpBool" end)
 
 module MemoLvalToExp =
   Cil_state_builder.Lval_hashtbl

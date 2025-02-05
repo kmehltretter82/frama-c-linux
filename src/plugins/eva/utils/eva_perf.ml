@@ -83,9 +83,7 @@ module Stat = Datatype.Make (struct
     let reprs = [ empty_stat ]
   end)
 
-module KfList =
-  Datatype.List_with_collections (Kernel_function)
-    (struct let module_name = "Eva_perf.KfList" end)
+module KfList = Datatype.List_with_collections (Kernel_function)
 
 module StatByCallstack = struct
   module Info = struct

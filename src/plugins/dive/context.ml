@@ -27,7 +27,6 @@ module Graph = Dive_graph
 
 module NodeRef = Datatype.Pair_with_collections
     (Node_kind) (Callstack)
-    (struct let module_name = "Build.NodeRef" end)
 
 module Index = Datatype.Int.Hashtbl
 module NodeTable = FCHashtbl.Make (NodeRef)

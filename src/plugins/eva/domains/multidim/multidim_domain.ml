@@ -355,10 +355,7 @@ struct
 
   end
 
-  include Datatype.Pair_with_collections
-      (BaseMap)
-      (Datatype.Option (Tracking))
-      (struct let module_name = "DomainLattice" end)
+  include Datatype.Pair_with_collections (BaseMap) (Datatype.Option (Tracking))
 
   let name = "multidim"
 

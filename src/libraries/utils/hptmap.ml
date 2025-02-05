@@ -693,7 +693,6 @@ struct
         let pretty = pretty
         let mem_project = Datatype.never_any_project
       end)
-  let () = Type.set_ml_name D.ty None
   include (D: Datatype.S_with_collections with type t := t)
 
   module PatriciaHashconsTbl =

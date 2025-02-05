@@ -224,8 +224,7 @@ module Complete_Minimal_with_datatype
     include Make_Minimal (Value) (Location) (Domain)
 
     include
-      (Datatype.With_collections
-         (Domain) (struct let module_name = Domain.name end)
+      (Datatype.With_collections (Domain)
        : Datatype.S_with_collections with type t := t)
   end
 
@@ -243,8 +242,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
     include Domain
 
     include
-      (Datatype.With_collections
-         (Domain) (struct let module_name = Domain.name end)
+      (Datatype.With_collections (Domain)
        : Datatype.S_with_collections with type t := t)
 
     type value = Cvalue.V.t
@@ -314,12 +312,6 @@ end
 
 (* -------------------------------------------------------------------------- *)
 
-let unique_name =
-  let counter = ref 0 in
-  fun name ->
-    incr counter;
-    name ^ string_of_int !counter
-
 module Restrict
     (Context: Abstract_context.S)
     (Value: Abstract_value.S with type context = Context.t)
@@ -360,13 +352,8 @@ module Restrict
        transfer functions are applied accordingly. The current mode is replaced
        at function calls by [mode.calls]. *)
 
-  let info suffix =
-    let name = unique_name (Domain.name ^ " " ^ suffix) in
-    let module Info = struct let module_name = name end in
-    (module Info: Datatype.Functor_info)
-
-  module D = Datatype.Pair_with_collections (Domain) (Mode) (val info "restricted")
-  include Datatype.Option_with_collections (D) (val info "option")
+  module D = Datatype.Pair_with_collections (Domain) (Mode)
+  include Datatype.Option_with_collections (D)
   let name = Domain.name
 
   let default = Domain.top, Mode.all

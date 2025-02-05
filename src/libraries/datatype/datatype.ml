@@ -127,12 +127,12 @@ end
 (** {2 Generic builders} *)
 (* ********************************************************************** *)
 
-let check f fname tname fstr =
+let check f fname tname =
   assert
     (if f == undefined then begin
         Format.printf "@[Preliminary datatype check failed.@\n\
-                       Value `%s' of type %s is required for building %s.@]@."
-          fname tname fstr;
+                       Value `%s' of type %s is required.@]@."
+          fname tname;
         false
       end else
        true)
@@ -181,7 +181,7 @@ struct
       if Descr.is_unmarshable d then Descr.unmarshable
       else
       if rehash == undefined then begin
-        check rehash "rehash" name "descriptor";
+        check rehash "rehash" name;
         assert false
       end
       else
@@ -189,7 +189,7 @@ struct
       else
         begin
           if Descr.is_unmarshable d then begin
-            check undefined "structural_descr" name "descriptor";
+            check undefined "structural_descr" name;
             assert false
           end;
           Descr.transform d rehash
@@ -228,8 +228,7 @@ module Make(X: Make_input) = struct
   module T = struct
     include X
     let name = if is_module_name X.name then X.name ^ ".t" else X.name
-    let ml_name = if is_module_name X.name then Some (X.name ^ ".ty") else None
-    let ty = Type.register ~name ~ml_name X.structural_descr X.reprs
+    let ty = Type.register ~name X.structural_descr X.reprs
   end
 
   include T
@@ -292,9 +291,6 @@ module type Polymorphic = sig
   module Make(T: S) : S with type t = T.t poly
 end
 
-(* local argument of below functors: not visible from outside *)
-let poly_name_ref = ref ""
-
 (* ****************************************************************************)
 (** {2 Polymorphic2 } *)
 (* ****************************************************************************)
@@ -325,27 +321,6 @@ end
 module Polymorphic2(P: Polymorphic2_input) = struct
 
   include Type.Polymorphic2(P)
-
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty1 ty2 =
-    let res, first = instantiate ty1 ty2 in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty1
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty2
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
 
   module Make(T1: S)(T2: S) = struct
 
@@ -437,29 +412,6 @@ module Polymorphic3
 struct
 
   include Type.Polymorphic3(P)
-
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty1 ty2 ty3 =
-    let res, first = instantiate ty1 ty2 ty3 in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a %a %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty1
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty2
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty3
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
 
   module Make(T1: S)(T2: S)(T3: S) = struct
 
@@ -566,31 +518,6 @@ struct
 
   include Type.Polymorphic4(P)
 
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty1 ty2 ty3 ty4 =
-    let res, first = instantiate ty1 ty2 ty3 ty4 in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a %a %a %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty1
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty2
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty3
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty4
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
-
   module Make(T1: S)(T2: S)(T3: S)(T4: S) = struct
 
     module T = struct
@@ -657,11 +584,8 @@ end
 (** {3 Pair} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "pair"
-
 module Pair_arg = struct
   type ('a, 'b) t = 'a * 'b
-  let module_name = "Datatype.Pair"
   let reprs a b = [ a, b ]
   let structural_descr d1 d2 =
     Structural_descr.t_tuple
@@ -672,8 +596,7 @@ module Pair_arg = struct
   let mk_hash f1 f2 (x1,x2) = f1 x1 + 1351 * f2 x2
   let map f1 f2 (x1,x2) = f1 x1, f2 x2
   let mk_pretty f1 f2 fmt (x1, x2) =
-    let pp fmt = Format.fprintf fmt "@[<hv 2>%a,@;%a@]" f1 x1 f2 x2 in
-    Type.par Type.Basic Type.Tuple fmt pp
+    Format.fprintf fmt "(@[<hv 2>%a,@;%a@])" f1 x1 f2 x2
   let mk_mem_project mem1 mem2 f (x1, x2) = mem1 f x1 && mem2 f x2
 end
 
@@ -796,25 +719,6 @@ module Polymorphic_gen(P: Polymorphic_input) = struct
 
   include Type.Polymorphic(P)
 
-  (* cannot declare [name] locally in instantiate since it prevents OCaml
-     generalization *)
-  let name = !poly_name_ref
-  let instantiate ty =
-    let res, first = instantiate ty in
-    if first && name <> "" then begin
-      let ml_name =
-        Format.asprintf
-          "Datatype.%s %a"
-          name
-          (fun fmt ty -> Type.pp_ml_name ty Type.Call fmt)
-          ty
-      in
-      Type.set_ml_name res (Some ml_name)
-    end;
-    res, first
-
-  let () = poly_name_ref := ""
-
   module Make_gen(X: S)(R: sig val rehash: X.t poly -> X.t poly end) = struct
 
     module T = struct
@@ -884,13 +788,11 @@ end
 (** {3 Reference} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "t_ref"
 module Poly_ref =
   Polymorphic
     (struct
       type 'a t = 'a ref
       let name ty = Type.par_ty_name is_function_or_pair ty ^ " ref"
-      let module_name = "Datatype.Ref"
       let reprs ty = [ ref ty ]
       let structural_descr = Structural_descr.t_ref
       let mk_equal f x y = f !x !y
@@ -898,8 +800,7 @@ module Poly_ref =
       let mk_hash f x = f !x
       let map f x = ref (f !x)
       let mk_pretty f fmt x =
-        let pp fmt = Format.fprintf fmt "@[<hv 2>ref@;%a@]" f !x in
-        Type.par Type.Basic Type.Call fmt pp
+        Format.fprintf fmt "(@[<hv 2>ref@;%a@])" f !x
       let mk_mem_project mem f x = mem f !x
     end)
 
@@ -928,13 +829,11 @@ let t_ref (type typ) (ty: typ Type.t) =
 (** {3 Option} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "option"
 module Poly_option =
   Polymorphic
     (struct
       type 'a t = 'a option
       let name ty = Type.par_ty_name is_function_or_pair ty ^ " option"
-      let module_name = "Type.Option"
       let reprs ty = [ Some ty ]
       let structural_descr = Structural_descr.t_option
       let mk_equal f x y = match x, y with
@@ -953,10 +852,7 @@ module Poly_option =
       let mk_pretty f fmt = function
         | None -> Format.fprintf fmt "None"
         | Some x ->
-          let pp fmt =
-            Format.fprintf fmt "@[<hv 2>Some@;%a@]" f x
-          in
-          Type.par Type.Basic Type.Call fmt pp
+          Format.fprintf fmt "(@[<hv 2>Some@;%a@])" f x
       let mk_mem_project mem f = function None -> false | Some x -> mem f x
     end)
 
@@ -986,13 +882,11 @@ let option (type typ) (ty: typ Type.t) =
 (** {3 List} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "list"
 module Poly_list =
   Polymorphic
     (struct
       type 'a t = 'a list
       let name ty = Type.par_ty_name is_function_or_pair ty ^ " list"
-      let module_name = "Datatype.List"
       let reprs ty = [ [ ty ] ]
       let structural_descr = Structural_descr.t_list
       let mk_equal f l1 l2 =
@@ -1018,17 +912,14 @@ module Poly_list =
         with Too_long n -> n
       let map = List.map
       let mk_pretty f fmt l =
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>[ %t ]@]"
-            (fun fmt ->
-               let rec print fmt = function
-                 | [] -> ()
-                 | [ x ] -> Format.fprintf fmt "%a" f x
-                 | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
-               in
-               print fmt l)
-        in
-        Type.par Type.Basic Type.Basic fmt pp (* Never enclose lists in parentheses *)
+        Format.fprintf fmt "(@[<hv 2>[ %t ]@])"
+          (fun fmt ->
+             let rec print fmt = function
+               | [] -> ()
+               | [ x ] -> Format.fprintf fmt "%a" f x
+               | x :: l -> Format.fprintf fmt "%a;@;%a" f x print l
+             in
+             print fmt l)
       let mk_mem_project mem f = List.exists (mem f)
     end)
 
@@ -1058,13 +949,11 @@ let list (type typ) (ty: typ Type.t) =
 (** {3 Arrays} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "array"
 module Poly_array =
   Polymorphic
     (struct
       type 'a t = 'a array
       let name ty = Type.par_ty_name is_function_or_pair ty ^ " array"
-      let module_name = "Datatype.Array"
       let reprs ty = [ [| ty |] ]
       let structural_descr = Structural_descr.t_array
       exception Early_exit of int
@@ -1100,18 +989,15 @@ module Poly_array =
       ;;
       let map = Array.map
       let mk_pretty f fmt a =
-        let pp fmt =
-          Format.fprintf fmt "@[<hv 2>[| %t |]@]"
-            (fun fmt ->
-               let length = Array.length a in
-               match length with
-               | 0 -> ()
-               | _ -> (Format.fprintf fmt "%a" f a.(0);
-                       for i = 1 to (length - 1) do
-                         Format.fprintf fmt ";@;%a" f a.(i)
-                       done))
-        in
-        Type.par Type.Basic Type.Basic fmt pp (* Never enclose arrays in parentheses *)
+        Format.fprintf fmt "(@[<hv 2>[| %t |]@])"
+          (fun fmt ->
+             let length = Array.length a in
+             match length with
+             | 0 -> ()
+             | _ -> (Format.fprintf fmt "%a" f a.(0);
+                     for i = 1 to (length - 1) do
+                       Format.fprintf fmt ";@;%a" f a.(i)
+                     done))
       let mk_mem_project mem f a =
         try
           for i = 0 to (Array.length a - 1) do
@@ -1147,13 +1033,11 @@ let array (type typ) (ty: typ Type.t) =
 (** {3 Queue} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "queue"
 module Poly_queue =
   Polymorphic
     (struct
       type 'a t = 'a Queue.t
       let name ty = Type.par_ty_name is_function_or_pair ty ^ " Queue.t"
-      let module_name = "Datatype.Queue"
       let reprs x =
         let q = Queue.create () in
         Queue.add x q;
@@ -1194,20 +1078,17 @@ let queue (type typ) (ty: typ Type.t) =
 (** {3 Set} *)
 (* ****************************************************************************)
 
-module type Functor_info = sig val module_name: string end
-
 (* OCaml functors are generative *)
-module Set
-    (S: Set.S)(E: S with type t = S.elt)(Info: Functor_info) =
+module Set(S: Set.S)(E: S with type t = S.elt) =
 struct
 
-  let () = check E.equal "equal" E.name Info.module_name
-  let () = check E.compare "compare" E.name Info.module_name
+  let () = check E.equal "equal" E.name
+  let () = check E.compare "compare" E.name
 
   module P = Make
       (struct
         type t = S.t
-        let name = Info.module_name ^ "(" ^ E.name ^ ")"
+        let name = "Set(" ^ E.name ^ ")"
         let structural_descr =
           Structural_descr.t_set_unchanged_compares (Descr.str E.descr)
         open S
@@ -1246,8 +1127,6 @@ struct
   let nearest_elt_le x = S.find_last (fun y -> y <= x)
   let nearest_elt_ge x = S.find_first (fun y -> y >= x)
 
-  let () = Type.set_ml_name P.ty (Some (Info.module_name ^ ".ty"))
-
   let ty = P.ty
   let name = P.name
   let descr = P.descr
@@ -1266,21 +1145,18 @@ end
 (** {3 Map} *)
 (* ****************************************************************************)
 
-module Map
-    (M: Map.S)(Key: S with type t = M.key)(Info: Functor_info) =
+module Map(M: Map.S)(Key: S with type t = M.key) =
 struct
 
-  let () = check Key.equal "equal" Key.name Info.module_name
-  let () = check Key.compare "compare" Key.name Info.module_name
+  let () = check Key.equal "equal" Key.name
+  let () = check Key.compare "compare" Key.name
 
   module P_gen = Polymorphic_gen
       (struct
         type 'a t = 'a M.t
-        let name ty =
-          Info.module_name ^ "(" ^ Key.name ^ ", " ^ Type.name ty ^ ")"
+        let name ty = "Map(" ^ Key.name ^ ", " ^ Type.name ty ^ ")"
         let structural_descr d =
           Structural_descr.t_map_unchanged_compares (Descr.str Key.descr) d
-        let module_name = Info.module_name
         open M
         let reprs r =
           [ Caml_list.fold_left (fun m k -> add k r m) empty Key.reprs ]
@@ -1345,19 +1221,16 @@ end
 (* ****************************************************************************)
 
 (* OCaml functors are generative *)
-module Hashtbl
-    (H: Hashtbl_with_descr)(Key: S with type t = H.key)(Info : Functor_info) =
+module Hashtbl(H: Hashtbl_with_descr)(Key: S with type t = H.key) =
 struct
 
-  let () = check Key.equal "equal" Key.name Info.module_name
-  let () = check Key.hash "hash" Key.name Info.module_name
+  let () = check Key.equal "equal" Key.name
+  let () = check Key.hash "hash" Key.name
 
   module P_gen = Polymorphic_gen
       (struct
         type 'a t = 'a H.t
-        let name ty =
-          Info.module_name ^ "(" ^ Key.name ^ ", " ^ Type.name ty ^ ")"
-        let module_name = Info.module_name
+        let name ty = "Hashtbl(" ^ Key.name ^ ", " ^ Type.name ty ^ ")"
         let structural_descr = H.structural_descr
         let reprs x =
           [ let h = H.create 7 in
@@ -1455,12 +1328,11 @@ module Weak(W: Sub_caml_weak_hashtbl)(D: S with type t = W.data) = struct
         let name = "Weak(" ^ D.name ^ ")"
         let reprs = let w = W.create 0 in Caml_list.iter (W.add w) D.reprs; [ w ]
       end)
-  let () = Type.set_ml_name ty None;
 end
 
 module Caml_weak_hashtbl(D: S) = struct
-  let () = check D.equal "equal" D.name "Caml_weak_hashtbl"
-  let () = check D.compare "hash" D.name "Caml_weak_hashtbl"
+  let () = check D.equal "equal" D.name
+  let () = check D.compare "hash" D.name
   module W = Initial_caml_weak.Make(D)
   include W
   module Datatype = Weak(W)(D)
@@ -1470,31 +1342,20 @@ end
 (** {2 Simple type values} *)
 (* ****************************************************************************)
 
-module With_set_and_map(X: S)(Info: Functor_info) = struct
+module With_set_and_map(X: S) = struct
 
   module D = X
   include D
 
-  module Set =
-    Set
-      (Stdlib.Set.Make(D))
-      (D)
-      (struct let module_name = Info.module_name ^ ".Set" end)
-
-  module Map =
-    Map
-      (Stdlib.Map.Make(D))
-      (D)
-      (struct let module_name = Info.module_name ^ ".Map" end)
+  module Set = Set (Stdlib.Set.Make(D))(D)
+  module Map = Map (Stdlib.Map.Make(D))(D)
 
 end
 
 module Make_with_set_and_map(X: Make_input) =
-  With_set_and_map
-    (Make(X))
-    (struct let module_name = String.capitalize_ascii X.name end)
+  With_set_and_map (Make(X))
 
-module With_hashtbl(X: S)(Info: Functor_info) = struct
+module With_hashtbl(X: S) = struct
 
   module D = X
   include D
@@ -1522,24 +1383,17 @@ module With_hashtbl(X: S)(Info: Functor_info) = struct
           Structural_descr.t_hashtbl_unchanged_hashs (Descr.str D.descr)
       end)
       (D)
-      (struct let module_name = Info.module_name ^ ".Hashtbl" end)
 
 end
 
-module Make_with_hashtbl(X: Make_input) =
-  With_hashtbl
-    (Make(X))
-    (struct let module_name = String.capitalize_ascii X.name end)
+module Make_with_hashtbl(X: Make_input) = With_hashtbl(Make(X))
 
-module With_collections(X: S)(Info: Functor_info) = struct
-  include (With_set_and_map(X)(Info) : S_with_set_and_map with type t = X.t)
-  include (With_hashtbl(X)(Info) : S_with_hashtbl with type t := X.t)
+module With_collections(X: S) = struct
+  include (With_set_and_map(X) : S_with_set_and_map with type t = X.t)
+  include (With_hashtbl(X) : S_with_hashtbl with type t := X.t)
 end
 
-module Make_with_collections(X: Make_input) =
-  With_collections
-    (Make(X))
-    (struct let module_name = String.capitalize_ascii X.name end)
+module Make_with_collections(X: Make_input) = With_collections (Make(X))
 
 (* ****************************************************************************)
 (** {2 Predefined datatype} *)
@@ -1557,8 +1411,6 @@ module Simple_type
      end) =
 struct
 
-  let module_name = "Datatype." ^ String.capitalize_ascii X.name
-
   include With_collections
       (Make(struct
          type t = X.t
@@ -1573,9 +1425,6 @@ struct
          let pretty = X.pretty
          let mem_project = never_any_project
        end))
-      (struct let module_name = module_name end)
-
-  let () = Type.set_ml_name ty (Some ("Datatype." ^ name))
 
 end
 
@@ -1756,11 +1605,8 @@ let filepath = Filepath.ty
 (** {3 Triple} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "triple"
-
 module Triple_arg = struct
   type ('a, 'b, 'c) t = 'a * 'b * 'c
-  let module_name = "Datatype.Triple"
   let reprs a b c = [ a, b, c ]
   let structural_descr d1 d2 d3 =
     Structural_descr.t_tuple
@@ -1777,10 +1623,7 @@ module Triple_arg = struct
   let mk_hash f1 f2 f3 (x1,x2,x3) = f1 x1 + 1351 * f2 x2 + 257 * f3 x3
   let map f1 f2 f3 (x1,x2,x3) = f1 x1, f2 x2, f3 x3
   let mk_pretty f1 f2 f3 fmt (x1, x2, x3) =
-    let pp fmt =
-      Format.fprintf fmt "@[<hv 2>%a,@;%a,@;%a@]" f1 x1 f2 x2 f3 x3
-    in
-    Type.par Type.Basic Type.Tuple fmt pp
+    Format.fprintf fmt "(@[<hv 2>%a,@;%a,@;%a@])" f1 x1 f2 x2 f3 x3
   let mk_mem_project mem1 mem2 mem3 f (x1, x2, x3) =
     mem1 f x1 && mem2 f x2 && mem3 f x3
 end
@@ -1846,11 +1689,8 @@ let triple
 (** {3 Quadruple} *)
 (* ****************************************************************************)
 
-let () = poly_name_ref := "quadruple"
-
 module Quadruple_arg = struct
   type ('a, 'b, 'c, 'd) t = 'a * 'b * 'c * 'd
-  let module_name = "Datatype.Quadruple"
   let reprs a b c d = [ a, b, c, d ]
   let structural_descr d1 d2 d3 d4 =
     Structural_descr.t_tuple
@@ -1873,10 +1713,7 @@ module Quadruple_arg = struct
     f1 x1 + 1351 * f2 x2 + 257 * f3 x3 + 997 * f4 x4
   let map f1 f2 f3 f4 (x1,x2,x3,x4) = f1 x1, f2 x2, f3 x3, f4 x4
   let mk_pretty f1 f2 f3 f4 fmt (x1, x2, x3, x4) =
-    let pp fmt =
-      Format.fprintf fmt "@[<hv 2>%a,@;%a,@;%a,@;%a@]" f1 x1 f2 x2 f3 x3 f4 x4
-    in
-    Type.par Type.Basic Type.Tuple fmt pp
+    Format.fprintf fmt "(@[<hv 2>%a,@;%a,@;%a,@;%a@])" f1 x1 f2 x2 f3 x3 f4 x4
   let mk_mem_project mem1 mem2 mem3 mem4 f (x1, x2, x3, x4) =
     mem1 f x1 && mem2 f x2 && mem3 f x3 && mem4 f x4
 end
@@ -1944,23 +1781,23 @@ let quadruple
   in
   L.ty
 
-module Pair_with_collections(T1: S)(T2: S)(Info:Functor_info) =
-  With_collections(Pair(T1)(T2))(Info)
+module Pair_with_collections(T1: S)(T2: S) =
+  With_collections(Pair(T1)(T2))
 
-module Triple_with_collections(T1: S)(T2: S)(T3: S)(Info:Functor_info) =
-  With_collections(Triple(T1)(T2)(T3))(Info)
+module Triple_with_collections(T1: S)(T2: S)(T3: S) =
+  With_collections(Triple(T1)(T2)(T3))
 
-module Quadruple_with_collections(T1:S)(T2:S)(T3:S)(T4:S)(Info:Functor_info) =
-  With_collections(Quadruple(T1)(T2)(T3)(T4))(Info)
+module Quadruple_with_collections(T1:S)(T2:S)(T3:S)(T4:S) =
+  With_collections(Quadruple(T1)(T2)(T3)(T4))
 
-module Option_with_collections(T:S)(Info:Functor_info) =
-  With_collections (Option(T))(Info)
+module Option_with_collections(T:S) =
+  With_collections (Option(T))
 
-module List_with_collections(T:S)(Info:Functor_info) =
-  With_collections (List(T))(Info)
+module List_with_collections(T:S) =
+  With_collections (List(T))
 
-module Array_with_collections(T:S)(Info:Functor_info) =
-  With_collections (Array(T))(Info)
+module Array_with_collections(T:S) =
+  With_collections (Array(T))
 
 
 (*

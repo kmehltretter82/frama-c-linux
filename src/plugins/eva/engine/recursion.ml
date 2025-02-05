@@ -75,7 +75,6 @@ let check_spec kinstr kf =
 
 module CallDepth =
   Datatype.Pair_with_collections (Kernel_function) (Datatype.Int)
-    (struct let module_name = "CallDepth" end)
 
 module VarCopies =
   Datatype.List (Datatype.Pair (Varinfo) (Varinfo))

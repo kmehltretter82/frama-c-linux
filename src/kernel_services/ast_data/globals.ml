@@ -653,7 +653,6 @@ module Syntactic_search = struct
   module Key =
     Datatype.Triple_with_collections
       (Datatype.String)(Cil_datatype.Syntactic_scope)(Datatype.Bool)
-      (struct let module_name = "Globals.Datatype.Key" end)
 
   module Scope_info =
     State_builder.Hashtbl
@@ -747,7 +746,6 @@ module Types = struct
   module Type_Name_Namespace =
     Datatype.Pair_with_collections
       (Datatype.String)(Logic_typing.Type_namespace)
-      (struct let module_name = "Globals.Types.Typ_Name_Namespace" end)
 
   (* Maps from a type name and its namespace, to the Cil type. *)
   module Types =

@@ -595,7 +595,6 @@ struct
         let copy = Datatype.undefined
         let mem_project = Datatype.never_any_project
       end)
-  let () = Type.set_ml_name ty None
 
   let top = Top
   let bottom = Bottom

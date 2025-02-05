@@ -218,10 +218,7 @@ struct
   end
 
   module Map = (* 'a Map.t : (fi -> int) -> 'a *)
-  struct
-    module Info = struct let module_name = "Abstract_memory.Disjunction.Map" end
-    include Datatype.Map (Map.Make (Valuation)) (Valuation) (Info)
-  end
+    Datatype.Map (Map.Make (Valuation)) (Valuation)
 
   module S = (* Structures in the disjunction *)
   struct

@@ -541,7 +541,6 @@ module Make(Ord: Datatype.S)(Value: Value) = struct
           else
             (fun s -> exists (fun k v -> Ord.mem_project s k || Value.mem_project s v))
       end)
-  let () = Type.set_ml_name ty None
 
 end
 

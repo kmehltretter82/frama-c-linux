@@ -1873,7 +1873,6 @@ module Poly_ab =
     (struct
        type 'a t = 'a ab
        let name ty = Type.name ty ^ " ab"
-       let module_name = "Ab"
        let reprs ty = [ A ty ]
        let structural_descr d =
          Structural_descr.Structure

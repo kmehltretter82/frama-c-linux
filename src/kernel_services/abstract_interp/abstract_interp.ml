@@ -246,7 +246,6 @@ module Make_Hashconsed_Lattice_Set
   module O = Set
 
   include Make_Generic_Lattice_Set (V) (Set)
-  let () = Type.set_ml_name ty None
 
   let intersects e1 e2 = match e1, e2 with
     | _, Top | Top, _ -> true
