@@ -1,3 +1,0 @@
-[kernel] User Error: option `-test-decimal-option' requires a decimal number as argument.
-  use `frama-c -help' for more information.
-[kernel] Frama-C aborted: invalid user input.

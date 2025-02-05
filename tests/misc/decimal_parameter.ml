@@ -25,8 +25,6 @@ module TestDecimalDefaultRange = Decimal (struct
     let default = 0.0
   end)
 
-
-
 let run_test () =
   let _range = TestDecimal.get_range () in
   let _range = TestDecimalDefaultRange.get_range () in

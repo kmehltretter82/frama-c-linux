@@ -255,12 +255,10 @@ module type Float = sig
   include S with type t = float
 
   val set_range: min:float -> max:float -> unit
-  (** Set what is the possible range of values for this parameter.
-      @since Beryllium-20090901 *)
+  (** Set what is the possible range of values for this parameter. *)
 
   val get_range: unit -> float * float
-  (** What is the possible range of values for this parameter.
-      @since Beryllium-20090901 *)
+  (** What is the possible range of values for this parameter. *)
 
 end
 

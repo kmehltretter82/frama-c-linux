@@ -1,5 +1,4 @@
 /* run.config*
- PLUGIN: @EVA_PLUGINS@
  MODULE: @PTEST_NAME@
  OPT: -test-decimal-option 0.12 -test-deprecated-option 0.12
  OPT: -autocomplete test
