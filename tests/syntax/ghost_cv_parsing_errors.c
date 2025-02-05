@@ -23,6 +23,8 @@ int \ghost global ;
 
 #ifdef IN_GHOST_ATTR
 
+// Attribute annotation are not supported anymore, any keyword or identifier
+// Here will produce the same error.
 int /*@ \ghost */ global ;
 
 #endif

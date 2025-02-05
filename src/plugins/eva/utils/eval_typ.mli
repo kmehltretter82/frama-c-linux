@@ -63,7 +63,8 @@ module DatatypeIntegerRange: Datatype.S with type t = integer_range
 val ik_range: ikind -> integer_range
 val ik_attrs_range: ikind -> attributes -> integer_range
 (** Range for an integer type with some attributes. The attribute
-    {!Cil.bitfield_attribute_name} influences the width of the type. *)
+    {!Ast_attributes.bitfield_attribute_name} influences the width of the
+    type. *)
 
 val pointer_range: unit -> integer_range
 (** Range for a pointer type. *)

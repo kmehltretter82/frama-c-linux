@@ -24,7 +24,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let const_of t = Cil.typeAddAttributes [Attr("const", [])] t
+let const_of t = Cil.typeAddAttributes [("const", [])] t
 
 let size_t () =
   Globals.Types.find_type Logic_typing.Typedef "size_t"

@@ -56,6 +56,7 @@ open Logic_const
 open Cil_datatype
 open Cil_types
 open Machine
+open Ast_attributes
 
 (* ************************************************************************* *)
 (* Reporting messages *)
@@ -145,102 +146,22 @@ let stmt_of_instr_list ?(loc=Location.unknown) = function
 
 (**** Utility functions ******)
 
-(**** ATTRIBUTES ****)
-
-(* Attributes are added as they are (e.g. if we add ["__attr"] and then ["attr"] both are added).
-   When checking for the presence of an attribute [x] or trying to remove it, underscores are
-   removed at the beginning and the end of the attribute for both the [x] attribute and the
-   attributes of the list. For example, if have a call:
-
-   dropAttribute "__const" [ Attr("const", []) ; Attr("__const", []) ; Attr("__const__", []) ]
-
-   The result is [].
-*)
-
-let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
-
-let anonymous_attribute_name = "fc_anonymous"
-let anonymous_attribute = Attr(anonymous_attribute_name, [])
-
-(** Construct sorted lists of attributes ***)
-let attributeName =
-  function Attr(a, _) | AttrAnnot a -> Extlib.strip_underscore a
-
-let addAttribute
-    (Attr(an, _) | AttrAnnot an as a: attribute) (al: attributes) =
-  let rec insertSorted = function
-      [] -> [a]
-    | ((Attr(an0, _) | AttrAnnot an0 as a0) :: rest) as l ->
-      if an < an0 then a :: l
-      else if Cil_datatype.Attribute.equal a a0 then l (* Do not add if already in there *)
-      else a0 :: insertSorted rest (* Make sure we see all attributes with
-                                    * this name *)
-  in
-  insertSorted al
-
-(** The second attribute list is sorted *)
-let addAttributes al0 (al: attributes) : attributes =
-  if al0 == [] then al else
-    List.fold_left (fun acc a -> addAttribute a acc) al al0
-
-let dropAttribute (an: string) (al: attributes) =
-  let an = Extlib.strip_underscore an in
-  List.filter (fun a -> attributeName a <> an) al
-
-let hasAttribute (an: string) (al: attribute list) : bool =
-  let an = Extlib.strip_underscore an in
-  List.exists (fun a -> attributeName a = an) al
-
-let rec dropAttributes (anl: string list) (al: attributes) =
-  match al with
-  | [] -> []
-  | a :: q ->
-    let q' = dropAttributes anl q in
-    if List.mem (attributeName a) anl then
-      q' (* drop this attribute *)
-    else
-    if q' == q then al (* preserve sharing *) else a :: q'
-
-let filterAttributes (an: string) (al: attribute list) : attribute list =
-  let an = Extlib.strip_underscore an in
-  List.filter (fun a -> attributeName a = an) al
-
-let findAttribute (an: string) (al: attribute list) : attrparam list =
-  let an = Extlib.strip_underscore an in
-  List.fold_left
-    (fun acc -> function
-       | Attr (_, param) as a0 when attributeName a0 = an -> param @ acc
-       | _ -> acc)
-    [] al
+(* Attributes *)
 
 let rec typeAttrs { tnode; tattr } =
   match tnode with
   | TVoid    -> tattr
   | TInt _   -> tattr
   | TFloat _ -> tattr
-  | TNamed t -> addAttributes tattr (typeAttrs t.ttype)
+  | TNamed t -> add_attributes tattr (typeAttrs t.ttype)
   | TPtr _   -> tattr
   | TArray _ -> tattr
-  | TComp comp -> addAttributes comp.cattr tattr
-  | TEnum enum -> addAttributes enum.eattr tattr
+  | TComp comp -> add_attributes comp.cattr tattr
+  | TEnum enum -> add_attributes enum.eattr tattr
   | TFun _   -> tattr
   | TBuiltin_va_list -> tattr
 
-let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
-
-let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
-
-let cast_irrelevant_attributes = ["visibility"]
-
-let filter_qualifier_attributes al =
-  List.filter
-    (fun a -> List.mem (attributeName a) qualifier_attributes) al
-
-let splitArrayAttributes =
-  List.partition
-    (fun a -> List.mem (attributeName a) qualifier_attributes)
-
-let rec typeAddAttributes ?(combine=addAttributes) a0 t =
+let rec typeAddAttributes ?(combine=add_attributes) a0 t =
   begin
     match a0 with
     | [] ->
@@ -260,9 +181,9 @@ let rec typeAddAttributes ?(combine=addAttributes) a0 t =
       | TNamed _
       | TBuiltin_va_list -> {t with tattr = add t.tattr}
       | TArray (bt, l) ->
-        let att_elt, att_typ = splitArrayAttributes a0 in
+        let att_elt, att_typ = split_array_attributes a0 in
         let bt' = arrayPushAttributes att_elt bt in
-        let tattr = addAttributes att_typ t.tattr in
+        let tattr = add_attributes att_typ t.tattr in
         Cil_const.mk_tarray ~tattr bt' l
   end
 (* Push attributes that belong to the type of the elements of the array as
@@ -276,18 +197,18 @@ and arrayPushAttributes al t =
 
 (**** Look for the presence of an attribute in a type ****)
 
-let typeHasAttribute attr typ = hasAttribute attr (typeAttrs typ)
+let typeHasAttribute attr typ = has_attribute attr (typeAttrs typ)
 
 let rec typeHasQualifier attr t =
   match t.tnode with
   | TNamed ti ->
-    hasAttribute attr t.tattr || typeHasQualifier attr ti.ttype
+    has_attribute attr t.tattr || typeHasQualifier attr ti.ttype
   | TArray (bt, _) ->
-    typeHasQualifier attr bt || (* ill-formed type *) hasAttribute attr t.tattr
-  | _ -> hasAttribute attr (typeAttrs t)
+    typeHasQualifier attr bt || (* ill-formed type *) has_attribute attr t.tattr
+  | _ -> has_attribute attr (typeAttrs t)
 
 let typeHasAttributeMemoryBlock a (ty:typ): bool =
-  let f attrs = if hasAttribute a attrs then raise Exit in
+  let f attrs = if has_attribute a attrs then raise Exit in
   let rec visit (t: typ) : unit =
     f t.tattr;
     match t.tnode with
@@ -310,7 +231,7 @@ let typeHasAttributeMemoryBlock a (ty:typ): bool =
 
 let typeAddGhost typ =
   if not (typeHasAttribute "ghost" typ) then
-    typeAddAttributes [Attr ("ghost", [])] typ
+    typeAddAttributes [("ghost", [])] typ
   else
     typ
 
@@ -320,7 +241,7 @@ let rec typeRemoveAttributes ?anl t =
   let tattr =
     match anl with
     | None     -> []
-    | Some anl -> dropAttributes anl t.tattr
+    | Some anl -> drop_attributes anl t.tattr
   in
   let reshare () =
     if tattr == t.tattr
@@ -351,7 +272,7 @@ let rec typeRemoveAttributesDeep (anl: string list) t =
   (* Try to preserve sharing. We use sharing to be more efficient, but also
      to detect that we have removed an attribute under typedefs *)
   let reshare () =
-    let tattr = dropAttributes anl t.tattr in
+    let tattr = drop_attributes anl t.tattr in
     if tattr == t.tattr
     then t
     else Cil_const.mk_typ ~tattr t.tnode
@@ -364,12 +285,12 @@ let rec typeRemoveAttributesDeep (anl: string list) t =
   | TPtr   t ->
     let t' = typeRemoveAttributesDeep anl t in
     if t != t'
-    then Cil_const.mk_tptr ~tattr:(dropAttributes anl t.tattr) t'
+    then Cil_const.mk_tptr ~tattr:(drop_attributes anl t.tattr) t'
     else reshare ()
   | TArray (t, l) ->
     let t' = typeRemoveAttributesDeep anl t in
     if t != t'
-    then Cil_const.mk_tarray ~tattr:(dropAttributes anl t.tattr) t' l
+    then Cil_const.mk_tarray ~tattr:(drop_attributes anl t.tattr) t' l
     else reshare ()
   | TFun  _ -> reshare ()
   | TComp _ -> reshare ()
@@ -378,7 +299,7 @@ let rec typeRemoveAttributesDeep (anl: string list) t =
     let tt = typeRemoveAttributesDeep anl ti.ttype in
     if tt == ti.ttype
     then reshare ()
-    else typeAddAttributes (dropAttributes anl t.tattr) tt
+    else typeAddAttributes (drop_attributes anl t.tattr) tt
 
 let type_remove_qualifier_attributes =
   typeRemoveAttributes qualifier_attributes
@@ -386,126 +307,10 @@ let type_remove_qualifier_attributes =
 let type_remove_qualifier_attributes_deep =
   typeRemoveAttributesDeep qualifier_attributes
 
-type attributeClass =
-  | AttrName of bool
-  (* Attribute of a name. If argument is true and we are on MSVC then
-   * the attribute is printed using __declspec as part of the storage
-   * specifier  *)
-  | AttrFunType of bool
-  (* Attribute of a function type. If argument is true and we are on
-   * MSVC then the attribute is printed just before the function name *)
-
-  | AttrType
-  (* Attribute of a type *)
-
-  | AttrStmt
-  (* Attribute of a statement or block *)
-
-  | AttrIgnored
-  (** Attribute that does not correspond to either of the above classes. *)
-
-(* This table contains the mapping of predefined attributes to classes.
- * Extend this table with more attributes as you need. This table is used to
- * determine how to associate attributes with names or type during cabs2cil
- * conversion *)
-let attributeHash: (string, attributeClass) Hashtbl.t =
-  let table = Hashtbl.create 13 in
-  List.iter (fun a -> Hashtbl.add table a (AttrName false))
-    [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
-      "no_instrument_function"; "alias"; "no_check_memory_usage";
-      "exception"; "model"; (* "restrict"; *)
-      "aconst"; "asm" (* Gcc uses this to specify the name to be used in
-                       * assembly for a global  *)];
-  (* Now come the MSVC declspec attributes *)
-  List.iter (fun a -> Hashtbl.add table a (AttrName true))
-    [ "thread"; "naked"; "dllimport"; "dllexport";
-      "selectany"; "allocate"; "nothrow"; "novtable"; "property";
-      "uuid"; "align" ];
-  List.iter (fun a -> Hashtbl.add table a (AttrFunType false))
-    [ "format"; "regparm"; "longcall"; "noinline"; "always_inline"; ];
-  List.iter (fun a -> Hashtbl.add table a (AttrFunType true))
-    [ "stdcall";"cdecl"; "fastcall"; "noreturn"];
-  List.iter (fun a -> Hashtbl.add table a AttrType)
-    ("mode" :: qualifier_attributes);
-  (* GCC label and statement attributes. *)
-  List.iter (fun a -> Hashtbl.add table a AttrStmt)
-    [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ];
-  table
-
-let isKnownAttribute = Hashtbl.mem attributeHash
-
-let attributeClass ~default name =
-  match Hashtbl.find attributeHash name with
-  | exception Not_found -> default
-  | AttrIgnored -> default
-  | ac -> ac
-
-let registerAttribute an ac =
-  if Hashtbl.mem attributeHash an then begin
-    let pp fmt c =
-      match c with
-      | AttrName b -> Format.fprintf fmt "(AttrName %B)" b
-      | AttrFunType b -> Format.fprintf fmt "(AttrFunType %B)" b
-      | AttrType -> Format.fprintf fmt "AttrType"
-      | AttrIgnored -> Format.fprintf fmt "AttrIgnored"
-      | AttrStmt -> Format.fprintf fmt "AttrStmt"
-    in
-    Kernel.warning
-      "Replacing existing class for attribute %s: was %a, now %a"
-      an pp (Hashtbl.find attributeHash an) pp ac
-  end;
-  Hashtbl.replace attributeHash an ac
-let removeAttribute = Hashtbl.remove attributeHash
-
-(** Partition the attributes into classes *)
-let partitionAttributes
-    ~(default:attributeClass)
-    (attrs:  attribute list) :
-  attribute list * attribute list * attribute list =
-  let rec loop (n,f,t) = function
-      [] -> n, f, t
-    | (Attr(an, _) | AttrAnnot an as a) :: rest ->
-      match attributeClass ~default an with
-        AttrName _ -> loop (addAttribute a n, f, t) rest
-      | AttrFunType _ ->
-        loop (n, addAttribute a f, t) rest
-      | AttrType -> loop (n, f, addAttribute a t) rest
-      | AttrStmt ->
-        Kernel.warning "unexpected statement attribute %s" an;
-        loop (n,f,t) rest
-      | AttrIgnored -> loop (n, f, t) rest
-  in
-  loop ([], [], []) attrs
-
-let frama_c_ghost_else = "fc_ghost_else"
-let () = registerAttribute frama_c_ghost_else (AttrStmt)
-
-let frama_c_ghost_formal = "fc_ghost_formal"
-let () = registerAttribute frama_c_ghost_formal (AttrName false)
-
-let frama_c_init_obj = "fc_initialized_object"
-let () = registerAttribute frama_c_init_obj (AttrName false)
-
-let frama_c_mutable = "fc_mutable"
-let () = registerAttribute frama_c_mutable (AttrName false)
-
-let frama_c_inlined = "fc_inlined"
-let () = registerAttribute frama_c_inlined (AttrFunType false)
-
-let () =
-  registerAttribute bitfield_attribute_name AttrType;
-  registerAttribute anonymous_attribute_name AttrIgnored;
-  List.iter
-    (fun a -> registerAttribute a AttrIgnored)
-    fc_internal_attributes;
-  List.iter
-    (fun a -> registerAttribute a AttrType)
-    cast_irrelevant_attributes
-
 let unrollType (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
     match t.tnode with
-    | TNamed ti -> withAttrs (addAttributes al t.tattr) ti.ttype
+    | TNamed ti -> withAttrs (add_attributes al t.tattr) ti.ttype
     | _ -> typeAddAttributes al t
   in
   withAttrs [] t
@@ -525,15 +330,15 @@ let rec unrollTypeSkel (t : typ) : typ_node =
 let rec unrollTypeDeep (t: typ) : typ =
   let rec withAttrs (al: attributes) (t: typ) : typ =
     match t.tnode with
-    | TNamed r -> withAttrs (addAttributes al t.tattr) r.ttype
+    | TNamed r -> withAttrs (add_attributes al t.tattr) r.ttype
     | TPtr bt ->
       let bt' = unrollTypeDeep bt in
-      let tattr = addAttributes al t.tattr in
+      let tattr = add_attributes al t.tattr in
       Cil_const.mk_tptr ~tattr bt'
     | TArray (bt, l) ->
-      let att_elt, att_typ = splitArrayAttributes al in
+      let att_elt, att_typ = split_array_attributes al in
       let bt' = arrayPushAttributes att_elt (unrollTypeDeep bt) in
-      let tattr = addAttributes att_typ t.tattr in
+      let tattr = add_attributes att_typ t.tattr in
       Cil_const.mk_tarray ~tattr bt' l
     | TFun (rt, args, isva) ->
       let rt' = unrollTypeDeep rt in
@@ -543,14 +348,14 @@ let rec unrollTypeDeep (t: typ) : typ =
         | Some argl ->
           Some (List.map (fun (an, at, aa) -> (an, unrollTypeDeep at, aa)) argl)
       in
-      let tattr = addAttributes al t.tattr in
+      let tattr = add_attributes al t.tattr in
       Cil_const.mk_tfun ~tattr rt' args' isva
     | _ -> typeAddAttributes al t
   in
   withAttrs [] t
 
 let is_ghost_else block =
-  hasAttribute frama_c_ghost_else block.battrs
+  has_attribute frama_c_ghost_else block.battrs
 
 let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
   let force_ghost = force_ghost || stmt.ghost in
@@ -630,10 +435,10 @@ let makeFormalsVarDecl ?ghost (n,t,a) =
   vi
 
 let isGhostFormalVarinfo vi =
-  hasAttribute frama_c_ghost_formal vi.vattr
+  has_attribute frama_c_ghost_formal vi.vattr
 
 let isGhostFormalVarDecl (_name, _type, attr) =
-  hasAttribute frama_c_ghost_formal attr
+  has_attribute frama_c_ghost_formal attr
 
 let setFormalsDecl vi typ =
   match unrollTypeSkel typ with
@@ -641,7 +446,7 @@ let setFormalsDecl vi typ =
     let is_ghost d = vi.vghost || isGhostFormalVarDecl d in
     let makeFormalsVarDecl i (n,t,a as x) =
       let x = if n = "" then begin
-          let a  = addAttribute anonymous_attribute a in
+          let a  = add_attribute anonymous_attribute a in
           "__x" ^ string_of_int i,t,a
         end
         else x
@@ -1112,19 +917,19 @@ let transient_block b =
       "ignoring request to mark transient a block with local variables:@\n%a"
       Cil_datatype.Block.pretty b
   end else
-    b.battrs <- addAttribute (Attr (vis_tmp_attr,[])) b.battrs; b
+    b.battrs <- add_attribute (vis_tmp_attr,[]) b.battrs; b
 
 let block_of_transient b =
-  if hasAttribute vis_tmp_attr b.battrs then begin
+  if has_attribute vis_tmp_attr b.battrs then begin
     if b.blocals <> [] then
       Kernel.fatal
         "Block that is supposed to be transient declares local variabels";
-    b.battrs <- dropAttribute vis_tmp_attr b.battrs;
+    b.battrs <- drop_attribute vis_tmp_attr b.battrs;
     b.bscoping <- false
   end;
   b
 
-let is_transient_block b = hasAttribute vis_tmp_attr b.battrs
+let is_transient_block b = has_attribute vis_tmp_attr b.battrs
 
 let flatten_transient_sub_blocks b =
   let prev = ref None in
@@ -2228,7 +2033,7 @@ and visitCilStmt (vis:cilVisitor) (s: stmt) : stmt =
     let make i = mkStmt ~ghost:res.ghost (Instr i) in
     let last = mkStmt ~ghost:res.ghost res.skind in
     let block = mkBlockNonScoping (List.map make instr_list @ [ last ]) in
-    block.battrs <- addAttribute (Attr (vis_tmp_attr, [])) block.battrs;
+    block.battrs <- add_attribute (vis_tmp_attr, []) block.battrs;
     (* Make our statement contain the instructions to prepend *)
     res.skind <- Block block;
     vis#pop_stmt s; res
@@ -2248,7 +2053,7 @@ and childrenStmt (toPrepend: instr list ref) (vis:cilVisitor) (s:stmt): stmt =
           (function (stmt,modified,writes,reads,calls) as orig->
              let stmt' = visitCilStmt vis stmt in
              (match stmt'.skind with
-              | Block b -> b.battrs <- dropAttribute vis_tmp_attr b.battrs;
+              | Block b -> b.battrs <- drop_attribute vis_tmp_attr b.battrs;
               | _ -> ());
              (* might make sense for the default to be
                 to just copy the varinfo when using the copy visitor,
@@ -2497,17 +2302,13 @@ and visitCilAttributes (vis: cilVisitor) (al: attribute list) : attribute list=
          id vis#vattr childrenAttribute) al in
   if al' != al then
     (* Must re-sort *)
-    addAttributes al' []
+    add_attributes al' []
   else
     al
-and childrenAttribute (vis: cilVisitor) (a: attribute) : attribute =
+and childrenAttribute (vis: cilVisitor) ((n, args) as a: attribute) : attribute =
   let fAttrP a = visitCilAttrParams vis a in
-  match a with
-  | Attr (n, args) ->
-    let args' = Extlib.map_no_copy fAttrP args in
-    if args' != args then Attr(n, args') else a
-  | AttrAnnot _ ->
-    a
+  let args' = Extlib.map_no_copy fAttrP args in
+  if args' != args then (n, args') else a
 
 and visitCilAttrParams (vis: cilVisitor) (a: attrparam) : attrparam =
   doVisitCil vis id vis#vattrparam childrenAttrparam a
@@ -3188,11 +2989,11 @@ let mkLoop ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
                 body), guard.eloc, None, None)) ]
 
 let mkWhile ?sattr ~(guard:exp) ~(body: stmt list) () : stmt list =
-  let sattr = [Attr("while", [])] @ Option.value ~default:[] sattr in
+  let sattr = [("while", [])] @ Option.value ~default:[] sattr in
   mkLoop ~sattr ~guard ~body ()
 
 let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
-  let sattr = [Attr("dowhile", [])] @ Option.value ~default:[] sattr in
+  let sattr = [("dowhile", [])] @ Option.value ~default:[] sattr in
   let exit_stmt =
     mkStmt ~valid_sid:true
       (If(guard, mkBlock [mkStmt ~valid_sid:true (Break guard.eloc)],
@@ -3203,7 +3004,7 @@ let mkDoWhile ?sattr ~(body: stmt list) ~(guard:exp) () : stmt list =
 
 let mkFor ?sattr ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
     ~(body: stmt list) () : stmt list =
-  let sattr = [Attr("for", [])] @ Option.value ~default:[] sattr in
+  let sattr = [("for", [])] @ Option.value ~default:[] sattr in
   (start @
    (mkLoop ~sattr ~guard ~body:(body @ next)) ())
 
@@ -3233,29 +3034,6 @@ let rec stripCasts (e: exp) =
 
 let rec stripTermCasts (t: term) =
   match t.term_node with TCast(_,_, t') -> stripTermCasts t' | _ -> t
-
-(* Separate out the storage-modifier name attributes *)
-let separateStorageModifiers (al: attribute list) =
-  let isstoragemod (Attr(an, _) | AttrAnnot an : attribute) : bool =
-    try
-      match Hashtbl.find attributeHash an with
-      | AttrName issm -> issm
-      | _ -> false
-    with Not_found -> false
-  in
-  let stom, rest = List.partition isstoragemod al in
-  if not (msvcMode ()) then stom, rest
-  else
-    (* Put back the declspec. Put it without the leading __ since these will
-     * be added later *)
-    let stom' =
-      List.map
-        (function
-          | Attr(an, args) -> Attr("declspec", [ACons(an, args)])
-          | AttrAnnot _ -> assert false)
-        stom
-    in
-    stom', rest
 
 let isVoidType t =
   match unrollTypeSkel t with
@@ -3295,7 +3073,7 @@ let isCharPtrType t =
 let isCharConstPtrType t =
   match unrollType t with
   | { tnode = TPtr tau; tattr } when isCharType tau ->
-    hasAttribute "const" tattr
+    has_attribute "const" tattr
   | _ -> false
 
 let isIntegralType t =
@@ -3511,7 +3289,7 @@ let rec typeOf (e: exp) : typ =
   | Const(CStr _s) -> string_literal_type ()
 
   | Const(CWStr _s) ->
-    let typ = typeAddAttributes [Attr("const",[])] (wchar_type ()) in
+    let typ = typeAddAttributes [("const",[])] (wchar_type ()) in
     Cil_const.mk_tptr typ
 
   | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
@@ -3566,8 +3344,8 @@ and typeOffset basetyp = function
          is still const (except potentially a mutable subsubpart, etc.)
       *)
       let attrs =
-        if hasAttribute frama_c_mutable fi.fattr then
-          dropAttribute "const" attrs
+        if has_attribute frama_c_mutable fi.fattr then
+          drop_attribute "const" attrs
         else attrs
       in
       typeOffset (typeAddAttributes attrs fi.ftype) o
@@ -3614,7 +3392,7 @@ let rec typeOfTermLval = function
 and typeTermOffset basetyp =
   let blendAttributes baseAttrs t =
     let (_, _, contagious) =
-      partitionAttributes ~default:(AttrName false) baseAttrs in
+      partition_attributes ~default:(AttrName false) baseAttrs in
     let rec putAttributes = function
       | Ctype typ ->
         Ctype (typeAddAttributes contagious typ)
@@ -3915,11 +3693,11 @@ let rec bytesAlignOf t =
    differently when put into a struct, or in each of its fields.
 *)
 and alignOfField (fi: fieldinfo) =
-  let fieldIsPacked = hasAttribute "packed" fi.fattr
-                      || hasAttribute "packed" fi.fcomp.cattr
+  let fieldIsPacked = has_attribute "packed" fi.fattr
+                      || has_attribute "packed" fi.fcomp.cattr
   in
   if fieldIsPacked then begin
-    if hasAttribute "aligned" fi.fattr then
+    if has_attribute "aligned" fi.fattr then
       (* field is packed and aligned => process alignment *)
       let field_alignment = process_aligned_attribute ~may_reduce:true
           (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
@@ -3988,7 +3766,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
      be specified as well. When used as part of a typedef, the aligned attribute
      can both increase and decrease alignment, and specifying the packed
      attribute generates a warning." *)
-  match filterAttributes "aligned" attrs with
+  match filter_attributes "aligned" attrs with
   | [] ->
     (* no __aligned__ attribute, so get the default alignment *)
     default_align ()
@@ -3996,7 +3774,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     Kernel.warning ~current:true "ignoring recursive align attributes on %t"
       pp;
     default_align ()
-  | (Attr(_, [a]) as at)::rest -> begin
+  | ((_, [a]) as at)::rest -> begin
       if rest <> [] then
         Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
           pp;
@@ -4007,7 +3785,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
           !pp_attribute_ref at pp;
         default_align ()
     end
-  | Attr(_, [])::rest ->
+  | (_, [])::rest ->
     (* aligned with no arg means a power of two at least as large as
        any alignment on the system.*)
     if rest <> [] then
@@ -4432,7 +4210,7 @@ and constFold (machdep: bool) (e: exp) : exp =
       let t' = unrollType t in
       match e.enode, t'.tnode with
       | Const (CInt64(i,_k,_)), (TInt nk | TEnum {ekind = nk})
-        when dropAttributes fc_internal_attributes t'.tattr = [] ->
+        when drop_attributes fc_internal_attributes t'.tattr = [] ->
         begin
           (* If the cast has attributes, leave it alone. *)
           Kernel.debug ~dkey "ConstFold to %a : %a@."
@@ -4684,7 +4462,7 @@ and constFoldToInt ?(machdep=true) e =
 let bitsSizeOfBitfield typlv =
   match unrollType typlv with
   | { tnode = TInt _; tattr } | { tnode = TEnum _; tattr } as t ->
-    (match findAttribute bitfield_attribute_name tattr with
+    (match find_attribute bitfield_attribute_name tattr with
      | [AInt i] -> Integer.to_int_exn i
      | _ -> bitsSizeOf t)
   | t -> bitsSizeOf t
@@ -4803,9 +4581,6 @@ let mk_behavior ?(name=default_behavior_name) ?(assumes=[]) ?(requires=[])
     b_extended = extended;
   }
 
-let spare_attributes_for_c_cast =
-  fc_internal_attributes @ qualifier_attributes
-
 let type_remove_attributes_for_c_cast t =
   let attributes_to_remove =
     fc_internal_attributes @ cast_irrelevant_attributes
@@ -4813,31 +4588,12 @@ let type_remove_attributes_for_c_cast t =
   let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_c_cast t
 
-let spare_attributes_for_logic_cast =
-  spare_attributes_for_c_cast
-
 let type_remove_attributes_for_logic_type t =
   let attributes_to_remove =
     fc_internal_attributes @ cast_irrelevant_attributes
   in
   let t = typeRemoveAttributesDeep attributes_to_remove t in
   typeRemoveAttributes spare_attributes_for_logic_cast t
-
-let () = Cil_datatype.drop_non_logic_attributes :=
-    dropAttributes spare_attributes_for_logic_cast
-
-let () = Cil_datatype.drop_fc_internal_attributes :=
-    dropAttributes fc_internal_attributes
-
-let () =
-  Cil_datatype.drop_unknown_attributes :=
-    let is_annot_or_known_attr = function
-      | Attr (name, _) -> isKnownAttribute name
-      (* Attribute annotations are always known. *)
-      | AttrAnnot _ -> true
-    in
-    (fun attributes ->
-       List.filter is_annot_or_known_attr attributes)
 
 let need_cast ?(force=false) oldt newt =
   let oldt = type_remove_attributes_for_c_cast (unrollType oldt) in
@@ -4967,7 +4723,7 @@ let makeFormalVar fdec ?(ghost=fdec.svar.vghost) ?(where = "$") ?loc name typ : 
   let makeit name =
     let vi = makeLocal ~ghost ?loc ~formal:true fdec name typ in
     if ghost && not fdec.svar.vghost then
-      vi.vattr <- addAttribute (Attr(frama_c_ghost_formal, [])) vi.vattr ;
+      vi.vattr <- add_attribute (frama_c_ghost_formal, []) vi.vattr ;
     vi
   in
   let error () = Kernel.fatal ~current:true
@@ -5342,8 +5098,8 @@ let global_attributes = function
   | GAsm _ | GText _ -> []
 
 let is_in_libc attrs =
-  hasAttribute "fc_stdlib" attrs ||
-  hasAttribute "fc_stdlib_generated" attrs
+  has_attribute "fc_stdlib" attrs ||
+  has_attribute "fc_stdlib_generated" attrs
 
 let global_is_in_libc g =
   is_in_libc (global_attributes g)
@@ -5585,7 +5341,7 @@ let argsToPairOfLists args =
     (argsToList args)
 
 let remove_attributes_for_integral_promotion a =
-  dropAttributes (bitfield_attribute_name :: spare_attributes_for_c_cast) a
+  drop_attributes (bitfield_attribute_name :: spare_attributes_for_c_cast) a
 
 let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
   let open Cil_const in
@@ -5601,7 +5357,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
     let k = if isSigned IChar then ISChar else IUChar in
     integralPromotion (mk_tint ~tattr k)
   | { tnode = TInt k; tattr } ->
-    begin match findAttribute bitfield_attribute_name tattr with
+    begin match find_attribute bitfield_attribute_name tattr with
       | [AInt size] ->
         (* This attribute always fits in int. *)
         let size = Integer.to_int_exn size in
@@ -5828,10 +5584,10 @@ let qualifier_context_ptr = function
 let included_qualifiers ?(context=Identical) a1 a2 =
   let a1 = filter_qualifier_attributes a1 in
   let a2 = filter_qualifier_attributes a2 in
-  let a1 = dropAttribute "restrict" a1 in
-  let a2 = dropAttribute "restrict" a2 in
-  let a1_no_cv = dropAttributes ["const"; "volatile"] a1 in
-  let a2_no_cv = dropAttributes ["const"; "volatile"] a2 in
+  let a1 = drop_attribute "restrict" a1 in
+  let a2 = drop_attribute "restrict" a2 in
+  let a1_no_cv = drop_attributes ["const"; "volatile"] a1 in
+  let a2_no_cv = drop_attributes ["const"; "volatile"] a2 in
   let is_equal = Cil_datatype.Attributes.equal a1 a2 in
   if is_equal then true
   else begin
@@ -5920,7 +5676,7 @@ type combineWhat =
 let combineAttributes what olda a =
   match what with
   | CombineFunarg _ -> a (* override old attributes with new ones *)
-  | _ -> addAttributes olda a (* union of attributes *)
+  | _ -> add_attributes olda a (* union of attributes *)
 
 type combineFunction =
   {
@@ -6107,19 +5863,19 @@ let combineTypesGen ?emitwith (combF : combineFunction)
                     combF.typ_combine combF
                       ~strictInteger ~strictReturnTypes what ot at
                   in
-                  let a = addAttributes oa aa in
+                  let a = add_attributes oa aa in
                   (n, t, a))
                oldargslist argslist)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
     let olda' =
-      if not (hasAttribute "missingproto" t.tattr) then
-        dropAttribute "missingproto" oldt.tattr
+      if not (has_attribute "missingproto" t.tattr) then
+        drop_attribute "missingproto" oldt.tattr
       else oldt.tattr
     in
     let a' =
-      if not (hasAttribute "missingproto" oldt.tattr) then
-        dropAttribute "missingproto" t.tattr
+      if not (has_attribute "missingproto" oldt.tattr) then
+        drop_attribute "missingproto" t.tattr
       else t.tattr
     in
     let tattr = combineAttributes what olda' a' in
@@ -6875,7 +6631,7 @@ let is_mutable (lhost, offset) =
     match typ'.tnode, off with
     | _, NoOffset -> can_mutate
     | _, Field (fi, off) ->
-      let can_mutate = can_mutate || hasAttribute frama_c_mutable fi.fattr in
+      let can_mutate = can_mutate || has_attribute frama_c_mutable fi.fattr in
       aux can_mutate fi.ftype off
     | TArray (typ, _), Index(_, off) -> aux can_mutate typ off
     | _, Index _ ->
@@ -6893,7 +6649,7 @@ let rec is_initialized_aux on_same_obj e =
 
 and is_initialized_lhost on_same_obj lhost =
   match lhost with
-  | Var vi -> hasAttribute frama_c_init_obj vi.vattr
+  | Var vi -> has_attribute frama_c_init_obj vi.vattr
   | Mem e -> on_same_obj && is_initialized_aux false e
 
 let is_initialized e =
@@ -7037,7 +6793,7 @@ let pushGlobal (g: global)
       let varsintype : (varinfo list * location) option =
         match g with
           GType (_, l) | GCompTag (_, l) -> Some (getVarsInGlobal g, l)
-        | GEnumTag (_, l) | GPragma (Attr("pack", _), l)
+        | GEnumTag (_, l) | GPragma (("pack", _), l)
         | GCompTagDecl (_, l) | GEnumTagDecl (_, l) -> Some ([], l)
         (* Move the warning pragmas early
             | GPragma(Attr(s, _), l) when hasPrefix "warning" s -> Some ([], l)
@@ -7332,11 +7088,11 @@ let create_alpha_renaming old_args new_args =
   List.iter2
     (fun old_vi new_vi ->
        Hashtbl.add conversion old_vi.vid new_vi;
-       if hasAttribute anonymous_attribute_name new_vi.vattr &&
-          not (hasAttribute anonymous_attribute_name old_vi.vattr)
+       if has_attribute anonymous_attribute_name new_vi.vattr &&
+          not (has_attribute anonymous_attribute_name old_vi.vattr)
        then begin
          new_vi.vname <- old_vi.vname;
-         new_vi.vattr <- dropAttribute anonymous_attribute_name new_vi.vattr;
+         new_vi.vattr <- drop_attribute anonymous_attribute_name new_vi.vattr;
        end;
        match old_vi.vlogic_var_assoc, new_vi.vlogic_var_assoc with
        | None, _ -> () (* nothing to convert in logic spec. *)
@@ -7431,8 +7187,8 @@ class dropAttributes ?select () = object(self)
     | None -> ChangeTo []
     | Some l ->
       (match a with
-       | (Attr (s,_) | AttrAnnot s) when List.mem s l -> ChangeTo []
-       | Attr _ | AttrAnnot _ -> DoChildren)
+       | (s,_) when List.mem s l -> ChangeTo []
+       | _  -> DoChildren)
   method! vtype ty = match ty.tnode with
     | TNamed internal_ty ->
       let tty = typeAddAttributes ty.tattr internal_ty.ttype in
@@ -7455,3 +7211,35 @@ let typeDeepDropAllAttributes t =
 let typeAttr { tattr } = tattr
 
 let setTypeAttrs t tattr = { t with tattr }
+
+(* **************************** *)
+(* Forward attributes functions *)
+(* **************************** *)
+
+let bitfield_attribute_name = bitfield_attribute_name
+let anonymous_attribute_name = anonymous_attribute_name
+let anonymous_attribute = anonymous_attribute
+let frama_c_ghost_else = frama_c_ghost_else
+let frama_c_ghost_formal = frama_c_ghost_formal
+let frama_c_init_obj = frama_c_init_obj
+let frama_c_mutable = frama_c_mutable
+let frama_c_inlined = frama_c_inlined
+
+let attributeName = attribute_name
+let hasAttribute = has_attribute
+let addAttribute = add_attribute
+let addAttributes = add_attributes
+let dropAttribute = drop_attribute
+let dropAttributes = drop_attributes
+let findAttribute = find_attribute
+let filterAttributes = filter_attributes
+
+let registerAttribute = register_attribute
+let removeAttribute = remove_attribute
+let attributeClass = get_attribute_class
+let isKnownAttribute = is_known_attribute
+let partitionAttributes = partition_attributes
+
+let filter_qualifier_attributes = filter_qualifier_attributes
+let splitArrayAttributes = split_array_attributes
+let separateStorageModifiers = split_storage_modifier

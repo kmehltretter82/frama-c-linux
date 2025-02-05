@@ -250,7 +250,7 @@
         "\\freeable", FREEABLE;
         "\\fresh", FRESH;
         "\\from", FROM;
-        "\\ghost", BSGHOST;
+        "\\ghost", GHOST;
         "\\initialized", INITIALIZED;
         "\\dangling", DANGLING;
         "\\in", IN;

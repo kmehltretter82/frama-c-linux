@@ -116,13 +116,13 @@ let plain_array_to_ptr ty =
           in
           (* Normally, overflow is checked in bitsSizeOf itself *)
           let la = AInt (Integer.of_int len) in
-          [ Attr("arraylen",[la])]
+          [ ("arraylen",[la]) ]
         with Cil.SizeOfError _ ->
           Kernel.warning ~current:true
             "Cannot represent length of array as an attribute";
           []
     in
-    let tattr = Cil.addAttributes length_attr tattr in
+    let tattr = Ast_attributes.add_attributes length_attr tattr in
     Ctype (Cil_const.mk_tptr ~tattr ty)
   | ty -> ty
 
@@ -734,19 +734,21 @@ let rec add_attribute_glob_annot a g =
   match g with
   | Dfun_or_pred ({ l_var_info },_) | Dinvariant({ l_var_info }, _)
   | Dtype_annot ( { l_var_info }, _) ->
-    l_var_info.lv_attr <- Cil.addAttribute a l_var_info.lv_attr; g
-  | Dvolatile(v,r,w,al,l) -> Dvolatile(v,r,w,Cil.addAttribute a al,l)
+    l_var_info.lv_attr <- Ast_attributes.add_attribute a l_var_info.lv_attr; g
+  | Dvolatile(v,r,w,al,l) ->
+    Dvolatile(v,r,w,Ast_attributes.add_attribute a al,l)
   | Daxiomatic(n,l,al,loc) ->
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
-               Cil.addAttribute a al,loc)
+               Ast_attributes.add_attribute a al,loc)
   | Dmodule(n,l,al,loader,loc) ->
     Dmodule(n,List.map (add_attribute_glob_annot a) l,
-            Cil.addAttribute a al,loader,loc)
-  | Dtype(ti,_) -> ti.lt_attr <- Cil.addAttribute a ti.lt_attr; g
+            Ast_attributes.add_attribute a al,loader,loc)
+  | Dtype(ti,_) -> ti.lt_attr <- Ast_attributes.add_attribute a ti.lt_attr; g
   | Dlemma(n,labs,t,p,al,l) ->
-    Dlemma(n,labs,t,p,Cil.addAttribute a al,l)
-  | Dmodel_annot (mi,_) -> mi.mi_attr <- Cil.addAttribute a mi.mi_attr; g
-  | Dextended (e,al,l) -> Dextended(e,Cil.addAttribute a al,l)
+    Dlemma(n,labs,t,p,Ast_attributes.add_attribute a al,l)
+  | Dmodel_annot (mi,_) ->
+    mi.mi_attr <- Ast_attributes.add_attribute a mi.mi_attr; g
+  | Dextended (e,al,l) -> Dextended(e,Ast_attributes.add_attribute a al,l)
 
 let behavior_has_only_assigns bhvs =
   bhvs.b_requires = [] && bhvs.b_assumes = [] &&
@@ -816,12 +818,8 @@ let rec is_same_attrparam p1 p2 =
     && is_same_attrparam e1 e2
   | _ -> false
 
-let is_same_attribute a1 a2 =
-  match a1,a2 with
-  | Attr (s1,prm1), Attr (s2,prm2) ->
-    is_same_string s1 s2 && is_same_list is_same_attrparam prm1 prm2
-  | AttrAnnot s1, AttrAnnot s2 -> is_same_string s1 s2
-  | _ -> false
+let is_same_attribute (s1,prm1) (s2,prm2) =
+  is_same_string s1 s2 && is_same_list is_same_attrparam prm1 prm2
 
 let is_same_attributes l1 l2 = is_same_list is_same_attribute l1 l2
 

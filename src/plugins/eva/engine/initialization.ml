@@ -225,7 +225,7 @@ module Make
      are taken into account *)
   let initialize_var_lib_entry kinstr vi init state =
     if Cil.typeHasQualifier "const" vi.vtype && not (vi.vstorage = Extern)
-       && not (Cil.typeHasAttributeMemoryBlock Cil.frama_c_mutable vi.vtype)
+       && not (Cil.typeHasAttributeMemoryBlock Ast_attributes.frama_c_mutable vi.vtype)
     then (* Fully const base. Ignore -lib-entry altogether. *)
       let init = Option.map Eva_ast.translate_init init in
       initialize_var_not_lib_entry kinstr ~local:false vi init state

@@ -1,11 +1,5 @@
 [kernel] Parsing ghost_cv_parsing_errors.c (with preprocessing)
-[kernel] ghost_cv_parsing_errors.c:26: 
-  Use of \ghost out of ghost code:
-  Location: line 26, between columns 8 and 14, before or at token: global
-  24    #ifdef IN_GHOST_ATTR
-  25    
-  26    int /*@ \ghost */ global ;
-                ^^^^^^
-  27    
-  28    #endif
+[kernel:annot-error] ghost_cv_parsing_errors.c:28: Warning: 
+  Attribute annotation '\ghost' are not supported anymore, use regular C attributes instead.
+[kernel] User Error: warning annot-error treated as fatal error.
 [kernel] Frama-C aborted: invalid user input.

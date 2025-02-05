@@ -328,7 +328,6 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token <Logic_ptree.decl list> DECL
 %token <Logic_ptree.code_annot * Cabs.cabsloc> CODE_ANNOT
 %token <Logic_ptree.code_annot list * Cabs.cabsloc> LOOP_ANNOT
-%token <string * Cabs.cabsloc> ATTRIBUTE_ANNOT
 
 %token <string> IDENT
 %token <int64 list * Cabs.cabsloc> CST_CHAR
@@ -940,7 +939,7 @@ else_part:
   %prec if_no_else /* To attach the next else to the current if */
 | ELSE annotated_statement { in_block $loc($2) $2 }
 | LGHOST_ELSE annotated_statement RGHOST
-    { in_ghost_block ~battrs:[ (Cil.frama_c_ghost_else , []) ] $2 }
+    { in_ghost_block ~battrs:[ (Ast_attributes.frama_c_ghost_else , []) ] $2 }
     %prec ghost_else_no_else /* To force the non ghost else to be attached to the current if */
 | LGHOST_ELSE annotated_statement RGHOST ELSE annotated_statement {
     let loc = Cil_datatype.Location.of_lexing_loc $sloc in
@@ -1574,13 +1573,6 @@ cvspec:
 | VOLATILE        { SpecCV(CV_VOLATILE), $1 }
 | RESTRICT        { SpecCV(CV_RESTRICT), $1 }
 | GHOST           { SpecCV(CV_GHOST), $1 }
-| ATTRIBUTE_ANNOT {
-    let annot, loc = $1 in
-    if String.compare annot "\\ghost" = 0 then begin
-      Errorloc.parse_error ~loc "Use of \\ghost out of ghost code"
-    end else
-      SpecCV(CV_ATTRIBUTE_ANNOT annot), loc
-  }
 ;
 
 /*** GCC attributes ***/
@@ -1625,7 +1617,6 @@ attribute:
 | RESTRICT        { ("restrict",[]), $1 }
 | VOLATILE        { ("volatile",[]), $1 }
 | GHOST           { ("ghost",[]), $1 }
-| ATTRIBUTE_ANNOT { let annot, loc = $1 in (mk_attr_annot annot), loc }
 ;
 
 /* (* sm: I need something that just includes __attribute__ and nothing more,

@@ -704,7 +704,7 @@ let mk_gvar ?init ~ty name =
   (* See if the variable is already declared *)
   let vi =
     try
-      let ty' = typeAddAttributes [Attr ("ghost", [])] ty in
+      let ty' = typeAddAttributes [("ghost", [])] ty in
       let vi = Globals.Vars.find_from_astinfo name Global in
       if not (Cil_datatype.Typ.equal vi.vtype ty') then
         Aorai_option.abort "Global %s is declared with type %a instead of %a"
@@ -935,7 +935,7 @@ class visit_decl_loops_init () =
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
             Cil.typeAddAttributes
-              [Attr (Cil.frama_c_ghost_formal,[])] Cil_const.intType
+              [(Ast_attributes.frama_c_ghost_formal,[])] Cil_const.intType
           in
           let var = Cil.makeLocalVar ~ghost:true f ~scope name typ in
           Data_for_aorai.set_varinfo name var

@@ -1,4 +1,5 @@
-void foo(int* p /*@ wp_nullable */, int* q /*@ wp_nullable */){
+void foo(int* p __attribute__((wp_nullable)),
+         int* q __attribute__((wp_nullable))){
 
 }
 

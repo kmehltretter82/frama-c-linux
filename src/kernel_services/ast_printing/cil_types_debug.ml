@@ -166,10 +166,8 @@ and pp_fkind fmt = function
   | FDouble -> Format.fprintf fmt "FDouble"
   | FLongDouble -> Format.fprintf fmt "FLongDouble"
 
-and pp_attribute fmt = function
-  | Attr(string,attrparam_list) ->
-    Format.fprintf fmt "Attr(%a,%a)" pp_string string (pp_list pp_attrparam) attrparam_list
-  | AttrAnnot(string) -> Format.fprintf fmt "AttrAnnot(%a)"  pp_string string
+and pp_attribute fmt (string,attrparam_list) =
+  Format.fprintf fmt "(%a,%a)" pp_string string (pp_list pp_attrparam) attrparam_list
 
 and pp_attributes fmt attributes = (pp_list pp_attribute) fmt attributes
 

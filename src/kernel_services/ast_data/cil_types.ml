@@ -281,13 +281,14 @@ and global =
 (* ************************************************************************* *)
 
 (** A C type is represented in CIL using the type {!Cil_types.typ}. Among types
-    we differentiate the integral types (with different kinds denoting the sign
-    and precision), floating point types, enumeration types, array and pointer
-    types, and function types. Every type is associated with a list of
-    attributes, which are always kept in sorted order. Use {!Cil.addAttribute}
-    and {!Cil.addAttributes} to construct list of attributes. If you want to
-    inspect a type, you should use {!Cil.unrollType}, {!Cil.unrollTypeNode} or
-    {!Cil.unrollTypeDeep} to see through the uses of named types.
+    we differentiate the integral types (with different kinds denoting the
+    sign and precision), floating point types, enumeration types, array and
+    pointer types, and function types. Every type is associated with a list of
+    attributes, which are always kept in sorted order. Use
+    {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to
+    construct list of attributes. If you want to inspect a type, you should
+    use {!Cil.unrollType}, {!Cil.unrollTypeNode} or {!Cil.unrollTypeDeep} to
+    see through the uses of named types.
 
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute
@@ -372,19 +373,17 @@ and typ_node =
 (** {2 Attributes} *)
 (* ************************************************************************* *)
 
-and attribute =
-  | Attr of string * attrparam list
-  (** An attribute has a name and some optional parameters. The name should not
-      start or end with underscore. When CIL parses attribute names it will
-      strip leading and ending underscores (to ensure that the multitude of GCC
-      attributes such as const, __const and __const__ all mean the same
-      thing.) *)
-
-  | AttrAnnot of string
+(** An attribute has a name and some optional parameters. The name should not
+    start or end with underscore. When CIL parses attribute names it will
+    strip leading and ending underscores (to ensure that the multitude of GCC
+    attributes such as const, __const and __const__ all mean the same
+    thing.)
+*)
+and attribute = string * attrparam list
 
 (** Attributes are lists sorted by the attribute name. Use the functions
-    {!Cil.addAttribute} and {!Cil.addAttributes} to insert attributes in an
-    attribute list and maintain the sortedness. *)
+    {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to
+    insert attributes in an attribute list and maintain the sortedness. *)
 and attributes = attribute list
 
 (** The type of parameters of attributes *)

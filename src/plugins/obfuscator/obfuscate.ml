@@ -192,10 +192,9 @@ class visitor = object
         Dictionary.fresh Obfuscator_kind.Logic_constructor lci.ctor_name ;
     Cil.DoChildren
 
-  method! vattr = function
-    | Attr(str, _) | AttrAnnot str ->
-      warn "attribute" str;
-      Cil.DoChildren
+  method! vattr (str, _) =
+    warn "attribute" str;
+    Cil.DoChildren
 
   method! vattrparam p =
     (match p with

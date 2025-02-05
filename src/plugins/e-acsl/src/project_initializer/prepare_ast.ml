@@ -289,7 +289,7 @@ let sufficiently_aligned vi algn =
     List.fold_left
       (fun acc attr ->
          match attr with
-         | Attr("align", [AInt i]) ->
+         | ("align", [AInt i]) ->
            let alignment = Integer.to_int_exn i in
            if acc <> 0 && acc <> alignment then begin
              (* multiple align attributes with different values *)
@@ -309,7 +309,7 @@ let sufficiently_aligned vi algn =
              algn
            end else
              alignment
-         | Attr("align", _) ->
+         | ("align", _) ->
            (* align attribute with an argument other than a single number,
               should not happen really *)
            assert false
@@ -470,7 +470,7 @@ let prepare_fundec kf =
                      storage of 32-bit timestamps in a 1:1 shadow. *)
                   if require_alignment vi 4 then
                     vi.vattr <-
-                      Attr("aligned", [ AInt Integer.four ]) :: vi.vattr)
+                      ("aligned", [ AInt Integer.four ]) :: vi.vattr)
                blk.blocals;
              blk)
       else
@@ -569,7 +569,7 @@ let sound_verdict_vi =
      let vi = Cil.makeGlobalVar name Cil_const.intType in
      vi.vstorage <- Extern;
      vi.vreferenced <- true;
-     vi.vattr <- Cil.addAttribute (Attr ("FC_BUILTIN", [])) vi.vattr;
+     vi.vattr <- Ast_attributes.add_attribute (("FC_BUILTIN", [])) vi.vattr;
      vi)
 
 let sound_verdict () = Lazy.force sound_verdict_vi

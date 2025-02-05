@@ -20,6 +20,11 @@ Open Source Release <next-release>
 
 -!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
               parsing errors due to unsupported compiler extensions.
+o!  Kernel    [2025-02-05] New module Ast_attributes for attribute related
+              functions. Moved most of Cil functions into this module, Cil
+              functions are now deprecated.
+o!  Kernel    [2025-02-05] Remove attributes annotations (Cil.AttrAnnot). Use
+              normal attributes instead.
 o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
               fields `tnode` and `tattr` for its `typ_node` and `attributes`.
 -   Ivette    [2025-01-23] New sidebar listing functions and global variables

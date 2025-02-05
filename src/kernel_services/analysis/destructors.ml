@@ -24,7 +24,7 @@ open Cil_types
 
 let add_destructor (_, l as acc) var =
   let loc = var.vdecl in
-  match Cil.findAttribute Cabs2cil.frama_c_destructor var.vattr with
+  match Ast_attributes.find_attribute Cabs2cil.frama_c_destructor var.vattr with
   | [] -> acc
   | [ attr ] ->
     let mk_call f e args =
@@ -211,7 +211,7 @@ class vis flag = object(self)
       current_vars @ vars
     in
     let abort_if_non_trivial_type kind v =
-      if Cil.hasAttribute Cabs2cil.frama_c_destructor v.vattr then
+      if Ast_attributes.has_attribute Cabs2cil.frama_c_destructor v.vattr then
         Kernel.abort
           "%a, cannot jump from %s statement \
            bypassing initialization of variable %a, declared at %a"

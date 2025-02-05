@@ -423,7 +423,6 @@ let make_annot ~one_line default lexbuf s =
        parsing of the annotation will only occur in the cparser.mly rule. *)
     | Logic_ptree.Acode_annot (loc,a) -> CODE_ANNOT (a, loc)
     | Logic_ptree.Aloop_annot (loc,a) -> LOOP_ANNOT (a,loc)
-    | Logic_ptree.Aattribute_annot (loc,a) -> ATTRIBUTE_ANNOT (a, loc)
 
 (* Initialize the pointer in Errormsg *)
 let () =

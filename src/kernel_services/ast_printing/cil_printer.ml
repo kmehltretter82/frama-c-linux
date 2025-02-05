@@ -115,16 +115,15 @@ let register_shallow_attribute s =
   reserved_attributes:=
     (Extlib.strip_underscore s)::!reserved_attributes
 
-let () = register_shallow_attribute Cil.frama_c_ghost_else
-let () = register_shallow_attribute Cil.frama_c_ghost_formal
-let () = register_shallow_attribute Cil.frama_c_mutable
-let () = register_shallow_attribute Cil.frama_c_init_obj
-let () = register_shallow_attribute Cil.frama_c_inlined
-let () = register_shallow_attribute Cil.anonymous_attribute_name
+let () = register_shallow_attribute Ast_attributes.frama_c_ghost_else
+let () = register_shallow_attribute Ast_attributes.frama_c_ghost_formal
+let () = register_shallow_attribute Ast_attributes.frama_c_mutable
+let () = register_shallow_attribute Ast_attributes.frama_c_init_obj
+let () = register_shallow_attribute Ast_attributes.frama_c_inlined
+let () = register_shallow_attribute Ast_attributes.anonymous_attribute_name
 
-let keep_attr = function
-  | Attr _ as a -> not (List.mem (Cil.attributeName a) !reserved_attributes)
-  | AttrAnnot _ -> true
+let keep_attr a =
+  not (List.mem (Ast_attributes.attribute_name a) !reserved_attributes)
 
 let filter_printing_attributes l =
   if Kernel.(is_debug_key_enabled dkey_print_attrs) then l
@@ -144,7 +143,8 @@ let print_global g =
   (* This function decides whether to hide functions in Frama-C's libc. *)
   let attrs = Cil_datatype.Global.attr g in
   let printable =
-    not (Cil.hasAttribute "fc_stdlib" attrs) || Kernel.PrintLibc.get()
+    not (Ast_attributes.has_attribute "fc_stdlib" attrs)
+    || Kernel.PrintLibc.get()
   in
   let print_var v =
     not (Cil_builtins.is_unused_builtin v) ||
@@ -166,7 +166,8 @@ let print_std_includes fmt globs =
     in
     let add_file acc g =
       let attrs = Cil_datatype.Global.attr g in
-      List.fold_left extract_file acc (Cil.findAttribute "fc_stdlib" attrs)
+      Ast_attributes.find_attribute "fc_stdlib" attrs
+      |> List.fold_left extract_file acc
     in
     let includes = List.fold_left add_file Datatype.String.Set.empty globs in
     let print_one_include s = Format.fprintf fmt "#include \"%s\"@." s in
@@ -716,15 +717,17 @@ class cil_printer () = object (self)
     match t.tnode with
     | TArray (bt, e) ->
       let bt' = Cil.typeRemoveAttributes [ "ghost" ] bt in
-      let tattr = Cil.dropAttribute "ghost" t.tattr in
+      let tattr = Ast_attributes.drop_attribute "ghost" t.tattr in
       Cil_const.mk_tarray ~tattr bt' e
     | _ -> Cil.typeRemoveAttributes [ "ghost" ] t
 
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
-    let stom, rest = Cil.separateStorageModifiers v.vattr in
+    let stom, rest = Ast_attributes.split_storage_modifier v.vattr in
     (* Small hack to keep printing noreturn attribute before function type. *)
-    let noreturn_attrs = Cil.(filterAttributes "noreturn" v.vtype.tattr) in
+    let noreturn_attrs =
+      Ast_attributes.filter_attributes "noreturn" v.vtype.tattr
+    in
     let stom_noreturn = stom @ noreturn_attrs in
     let vtype_no_noreturn = Cil.typeRemoveAttributes ["noreturn"] v.vtype in
     let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
@@ -732,14 +735,14 @@ class cil_printer () = object (self)
     let v =
       if v.vformal && not state.print_cil_as_is then begin
         match v.vtype.tnode with
-        | TPtr t when Cil.hasAttribute "arraylen" v.vtype.tattr ->
+        | TPtr t when Ast_attributes.has_attribute "arraylen" v.vtype.tattr ->
           { v with vtype = Cil_const.mk_tarray ~tattr:v.vtype.tattr t None}
         | _ -> v
       end
       else v
     in
     let name =
-      if Cil.hasAttribute Cil.anonymous_attribute_name v.vattr
+      if Ast_attributes.(has_attribute anonymous_attribute_name v.vattr)
       && not v.vreferenced && not state.print_cil_as_is
       then
         None
@@ -1794,7 +1797,7 @@ class cil_printer () = object (self)
           (self#typeref (Cil_const.mk_tenum enum) self#enumname) enum
 
       | GCompTag (comp, l) -> (* This is a definition of a tag *)
-        let sto_mod, rest_attr = Cil.separateStorageModifiers comp.cattr in
+        let sto_mod, rest_attr = Ast_attributes.split_storage_modifier comp.cattr in
         self#line_directive ~forcefile:true fmt l;
         fprintf fmt "@[<3>%a%a %a {@\n%a@]@\n}%a;@\n"
           self#compkind comp
@@ -1851,7 +1854,7 @@ class cil_printer () = object (self)
         self#line_directive fmt l;
         fprintf fmt "__asm__(\"%s\");@\n" (Escape.escape_string s)
 
-      | GPragma (Attr(an, args), l) ->
+      | GPragma ((an, args), l) ->
         (* sm: suppress printing pragmas that gcc does not understand *)
         (* assume anything starting with "ccured" is ours *)
         (* also don't print the 'combiner' pragma *)
@@ -1882,11 +1885,6 @@ class cil_printer () = object (self)
               (Pretty_utils.pp_list ~sep:"," self#attrparam) args
         end;
         if suppress then  fprintf fmt " */@\n" else fprintf fmt "@\n"
-
-      | GPragma (AttrAnnot _, _) ->
-        assert false
-      (* self#line_directive fmt l;
-         fprintf fmt "/* #pragma %s */@\n" a*)
 
       | GAnnot (decl,l) ->
         (* attributes are purely internal. *)
@@ -2037,14 +2035,16 @@ class cil_printer () = object (self)
       let (paren: (formatter -> unit) option), (bt': typ) =
         match bt.tnode with
         | TFun(rt, args, isva) when Machine.msvcMode () ->
-          let an, af', at = Cil.partitionAttributes ~default:Cil.AttrType bt.tattr in
+          let an, af', at =
+            Ast_attributes.(partition_attributes ~default:AttrType bt.tattr)
+          in
           (* We take the af' and we put them into the parentheses *)
           Some
             (fun fmt ->
                fprintf fmt
                  "(%a"
                  printAttributes af'),
-          Cil_const.mk_tfun ~tattr:(Cil.addAttributes an at) rt args isva
+          Cil_const.mk_tfun ~tattr:(Ast_attributes.add_attributes an at) rt args isva
         | TFun _ | TArray _ -> (Some (fun fmt -> fprintf fmt "(")), bt
         | _ -> None, bt
       in
@@ -2061,10 +2061,11 @@ class cil_printer () = object (self)
       self#typ (Some name'') fmt bt'
 
     | TArray (elemt, lo) ->
-      let atts_elem, a = Cil.splitArrayAttributes t.tattr in
+      let atts_elem, a = Ast_attributes.split_array_attributes t.tattr in
       let size_info,a =
-        List.partition
-          (fun a -> List.mem (Cil.attributeName a) ["arraylen"; "static"]) a
+        List.partition (fun a ->
+            List.mem (Ast_attributes.attribute_name a) ["arraylen"; "static"]
+          ) a
       in
       (* qualifiers attributes are not supposed to be on the TArray,
          but on the base type, except in the case of a formal declaration. *)
@@ -2076,11 +2077,11 @@ class cil_printer () = object (self)
       let print_size_info fmt =
         match size_info with
         | [] -> printAttributes fmt a
-        | [Attr("arraylen",[s])]->
+        | [("arraylen",[s])]->
           Format.fprintf fmt "%a%t%a"
             printAttributes atts_elem sep self#attrparam s
-        | [Attr("static",[]); Attr("arraylen",[s])]
-        | [Attr("arraylen", [s]); Attr("static", [])] ->
+        | [("static",[]); ("arraylen",[s])]
+        | [("arraylen", [s]); ("static", [])] ->
           Format.fprintf fmt "static%a@ %a"
             printAttributes atts_elem self#attrparam s
         | _ -> ()
@@ -2138,7 +2139,7 @@ class cil_printer () = object (self)
           let pp_args fmt (aname,atype,aattr) =
             (* The storage modifiers come first *)
             let atype = self#no_ghost_at_first_level atype in
-            let stom, rest = Cil.separateStorageModifiers aattr in
+            let stom, rest = Ast_attributes.split_storage_modifier aattr in
             fprintf fmt "%a%a%a"
               self#attributes stom
               (self#typ (Some (fun fmt -> fprintf fmt "%s" aname))) atype
@@ -2171,100 +2172,91 @@ class cil_printer () = object (self)
 
   (* Print one attribute. Return also an indication whether this attribute
      should be printed inside the __attribute__ list *)
-  method attribute fmt = function
-    | Attr(an, args) ->
-      (* Recognize and take care of some known cases *)
-      (match an, args with
-       | "const", [] -> self#pp_keyword fmt "const"; false
-       (* Put the aconst inside the attribute list *)
-       | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
-       | "thread", [ ACons ("c11",[]) ]
-         when not state.print_cil_as_is ->
-         fprintf fmt "_Thread_local"; false
-       | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
-       | "volatile", [] -> self#pp_keyword fmt "volatile"; false
-       | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
-       | "restrict", [] ->
-         if Machine.msvcMode () then
-           fprintf fmt "__restrict"
-         else
-           self#pp_keyword fmt "restrict";
-         false
-       | "missingproto", [] ->
-         if self#display_comment () then fprintf fmt "/* missing proto */";
-         false
-       | "cdecl", [] when Machine.msvcMode () ->
-         fprintf fmt "__cdecl"; false
-       | "stdcall", [] when Machine.msvcMode () ->
-         fprintf fmt "__stdcall"; false
-       | "fastcall", [] when Machine.msvcMode () ->
-         fprintf fmt "__fastcall"; false
-       | "declspec", args when Machine.msvcMode () ->
-         fprintf fmt "__declspec(%a)"
-           (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
-         false
-       | "w64", [] when Machine.msvcMode () ->
-         fprintf fmt "__w64"; false
-       | "asm", args ->
-         fprintf fmt "__asm__(%a)"
-           (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
-         false
-       (* we suppress printing mode(__si__) because it triggers an
-          internal compiler error in all current gcc versions
-          sm: I've now encountered a problem with mode(__hi__)...
-          I don't know what's going on, but let's try disabling all "mode". *)
-       | "mode", [ACons(tag,[])] ->
-         if self#display_comment () then fprintf fmt "/* mode(%s) */" tag;
-         false
-
-       (* sm: also suppress "format" because we seem to print it in
-          a way gcc does not like *)
-       | "format", _ ->
-         if self#display_comment () then fprintf fmt "/* format attribute */";
-         false
-
-       | "hidden", _ -> (* hidden attribute list *)
-         false
-       (* sm: here's another one I don't want to see gcc warnings about.. *)
-       | "mayPointToStack", _ when not state.print_cil_input ->
-         (* [matth: may be inside another comment.]
-            -> text "/*mayPointToStack*/", false *)
-         false
-
-       | "arraylen", [a] ->
-         if self#display_comment () then fprintf fmt "/*[%a]*/" self#attrparam a;
-         false
-       | "static",_ ->
-         if self#display_comment () then fprintf fmt "/* static */"; false
-       | "", _ ->
-         fprintf fmt "%a "
-           (Pretty_utils.pp_list ~sep:" " self#attrparam) args;
-         true
-       | s, _ when
-           s = Cil.bitfield_attribute_name &&
-           not state.print_cil_as_is &&
-           not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
-         false
-       | _ -> (* This is the default case *)
-         (* Add underscores to the name *)
-         let an' =
-           if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
-         in
-         (match args with
-          | [] -> fprintf fmt "%s" an'
-          | _ :: _ ->
-            fprintf fmt "%s(%a)"
-              an'
-              (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
-         true)
-    | AttrAnnot s ->
-      let block = false in
-      fprintf fmt "%t %s %t"
-        (fun fmt -> self#pp_open_annotation ~block fmt)
-        s
-        (fun fmt -> self#pp_close_annotation ~block fmt);
-
+  method attribute fmt (an, args) =
+    (* Recognize and take care of some known cases *)
+    match an, args with
+    | "const", [] -> self#pp_keyword fmt "const"; false
+    (* Put the aconst inside the attribute list *)
+    | "aconst", [] when not (Machine.msvcMode ()) -> fprintf fmt "__const__"; true
+    | "thread", [ ACons ("c11",[]) ]
+      when not state.print_cil_as_is ->
+      fprintf fmt "_Thread_local"; false
+    | "thread", [] when not (Machine.msvcMode ()) -> fprintf fmt "__thread"; false
+    | "volatile", [] -> self#pp_keyword fmt "volatile"; false
+    | "ghost", [] -> self#pp_keyword fmt "\\ghost"; false
+    | "restrict", [] ->
+      if Machine.msvcMode () then
+        fprintf fmt "__restrict"
+      else
+        self#pp_keyword fmt "restrict";
       false
+    | "missingproto", [] ->
+      if self#display_comment () then fprintf fmt "/* missing proto */";
+      false
+    | "cdecl", [] when Machine.msvcMode () ->
+      fprintf fmt "__cdecl"; false
+    | "stdcall", [] when Machine.msvcMode () ->
+      fprintf fmt "__stdcall"; false
+    | "fastcall", [] when Machine.msvcMode () ->
+      fprintf fmt "__fastcall"; false
+    | "declspec", args when Machine.msvcMode () ->
+      fprintf fmt "__declspec(%a)"
+        (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
+      false
+    | "w64", [] when Machine.msvcMode () ->
+      fprintf fmt "__w64"; false
+    | "asm", args ->
+      fprintf fmt "__asm__(%a)"
+        (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
+      false
+    (* we suppress printing mode(__si__) because it triggers an
+       internal compiler error in all current gcc versions
+       sm: I've now encountered a problem with mode(__hi__)...
+       I don't know what's going on, but let's try disabling all "mode". *)
+    | "mode", [ACons(tag,[])] ->
+      if self#display_comment () then fprintf fmt "/* mode(%s) */" tag;
+      false
+
+    (* sm: also suppress "format" because we seem to print it in
+       a way gcc does not like *)
+    | "format", _ ->
+      if self#display_comment () then fprintf fmt "/* format attribute */";
+      false
+
+    | "hidden", _ -> (* hidden attribute list *)
+      false
+    (* sm: here's another one I don't want to see gcc warnings about.. *)
+    | "mayPointToStack", _ when not state.print_cil_input ->
+      (* [matth: may be inside another comment.]
+         -> text "/*mayPointToStack*/", false *)
+      false
+
+    | "arraylen", [a] ->
+      if self#display_comment () then fprintf fmt "/*[%a]*/" self#attrparam a;
+      false
+    | "static",_ ->
+      if self#display_comment () then fprintf fmt "/* static */"; false
+    | "", _ ->
+      fprintf fmt "%a "
+        (Pretty_utils.pp_list ~sep:" " self#attrparam) args;
+      true
+    | s, _ when
+        s = Ast_attributes.bitfield_attribute_name &&
+        not state.print_cil_as_is &&
+        not (Kernel.is_debug_key_enabled Kernel.dkey_print_bitfields) ->
+      false
+    | _ -> (* This is the default case *)
+      (* Add underscores to the name *)
+      let an' =
+        if Machine.msvcMode () then "__" ^ an else "__" ^ an ^ "__"
+      in
+      (match args with
+       | [] -> fprintf fmt "%s" an'
+       | _ :: _ ->
+         fprintf fmt "%s(%a)"
+           an'
+           (Pretty_utils.pp_list ~sep:"," self#attrparam) args);
+      true
 
   method private attribute_prec (contextprec: int) fmt (a: attrparam) =
     let thisLevel = Precedence.getParenthLevelAttrParam a in

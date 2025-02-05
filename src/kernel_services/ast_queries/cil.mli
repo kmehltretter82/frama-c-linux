@@ -339,9 +339,6 @@ val unrollTypeNode: typ -> typ_node
     types. Will collect all attributes *)
 val unrollTypeDeep: typ -> typ
 
-(** Separate out the storage-modifier name attributes *)
-val separateStorageModifiers: attribute list -> attribute list * attribute list
-
 (** returns the type of the result of an arithmetic operator applied to
     values of the corresponding input types.
     @since Nitrogen-20111001 (moved from Cabs2cil)
@@ -1322,101 +1319,6 @@ val instr_falls_through : instr -> bool
 (** {2 Values for manipulating attributes} *)
 (* ************************************************************************* *)
 
-(** Various classes of attributes
-    @before 30.0-Zinc [AttrStmt] and [AttrIgnored] didn't exist
-*)
-type attributeClass =
-    AttrName of bool
-  (** Attribute of a name. If argument is true and we are on MSVC then
-      the attribute is printed using __declspec as part of the storage
-      specifier  *)
-  | AttrFunType of bool
-  (** Attribute of a function type. If argument is true and we are on
-      MSVC then the attribute is printed just before the function name *)
-  | AttrType
-  (** Attribute of a type *)
-  | AttrStmt
-  (** Attribute of a statement or a block *)
-  | AttrIgnored
-  (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions [attributeClass] and [partitionAttributes]. *)
-
-val registerAttribute: string -> attributeClass -> unit
-(** Add a new attribute with a specified class *)
-
-val removeAttribute: string -> unit
-(** Remove an attribute previously registered. *)
-
-val isKnownAttribute: string -> bool
-(** [isKnownAttribute attrname] returns true if the attribute named [attrname]
-    is known by Frama-C.
-    @since 30.0-Zinc
-*)
-
-val attributeClass: default:attributeClass -> string -> attributeClass
-(** Return the class of an attributes. The class `default' is returned for
-    unknown and ignored attributes.
-    @before 30.0-Zinc no [default] argument
-*)
-
-(** Partition the attributes into classes: name attributes, function type and
-    type attributes. Unknown and ignored attributes are returned in the
-    `default` attribute class.
-    @before 30.0-Zinc no [default] argument
-*)
-val partitionAttributes:  default:attributeClass ->
-  attributes -> attribute list * (* AttrName *)
-                attribute list * (* AttrFunType *)
-                attribute list   (* AttrType *)
-
-(** Add an attribute. Maintains the attributes in sorted order of the second
-    argument. The attribute is not added if it is already there. *)
-val addAttribute: attribute -> attributes -> attributes
-
-(** Add a list of attributes. Maintains the attributes in sorted order. The
-    second argument must be sorted, but not necessarily the first *)
-val addAttributes: attribute list -> attributes -> attributes
-
-(** Remove all attributes with the given name. Maintains the attributes in
-    sorted order.  *)
-val dropAttribute: string -> attributes -> attributes
-
-(** Remove all attributes with names appearing in the string list.
-    Maintains the attributes in sorted order *)
-val dropAttributes: string list -> attributes -> attributes
-
-(** A block marked with this attribute is known to be a ghost else.
-
-    @since 21.0-Scandium
-*)
-val frama_c_ghost_else: string
-
-(** A varinfo marked with this attribute is known to be a ghost formal.
-
-    @since 20.0-Calcium
-*)
-val frama_c_ghost_formal: string
-
-(** a formal marked with this attribute is known to be a pointer to an
-    object being initialized by the current function, which can thus assign
-    any sub-object regardless of const status.
-
-    @since 18.0-Argon
-*)
-val frama_c_init_obj: string
-
-(** a field struct marked with this attribute is known to be mutable, i.e.
-    it can be modified even on a const object.
-
-    @since 18.0-Argon
-*)
-val frama_c_mutable: string
-
-(** A block marked with this attribute is known to be inlined, i.e.
-    it replaces a call to an inline function.
-*)
-val frama_c_inlined: string
-
 (** [true] if the underlying left-value of the given expression is allowed to be
     assigned to thanks to a [frama_c_init_obj] attribute. *)
 val is_initialized: exp -> bool
@@ -1438,7 +1340,6 @@ val isGhostFormalVarinfo: varinfo -> bool
 *)
 val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
-
 (** [true] iff the given variable is a const global variable with non extern
     storage.
 
@@ -1452,27 +1353,14 @@ val isGlobalInitConst: varinfo -> bool
 *)
 val typeDeepDropAllAttributes: typ -> typ
 
-(** Retains attributes with the given name *)
-val filterAttributes: string -> attributes -> attributes
-
-(** True if the named attribute appears in the attribute list. The list of
-    attributes must be sorted.  *)
-val hasAttribute: string -> attributes -> bool
-
-(** Returns the name of an attribute. *)
-val attributeName: attribute -> string
-
-(** Returns the list of parameters associated to an attribute. The list is empty if there
-    is no such attribute or it has no parameters at all. *)
-val findAttribute: string -> attribute list -> attrparam list
-
 (** Returns all the attributes contained in a type. This requires a traversal
     of the type structure, in case of composite, enumeration and named types *)
 val typeAttrs: typ -> attribute list
 
 (** Add some attributes to a type. Qualifiers attributes are recursively pushed
     into array elements type until a non-array type is found.
-    [combine] explains how to combine attributes. Default is [addAttributes].
+    [combine] explains how to combine attributes.
+    Default is {!Ast_attributes.add_attributes}.
 
     @before 28.0-Nickel [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
@@ -1544,31 +1432,6 @@ val type_remove_attributes_for_c_cast: typ -> typ
     @since Oxygen-20120901
 *)
 val type_remove_attributes_for_logic_type: typ -> typ
-
-(** retains attributes corresponding to type qualifiers (6.7.3) *)
-val filter_qualifier_attributes: attributes -> attributes
-
-(** given some attributes on an array type, split them into those that belong
-    to the type of the elements of the array (currently, qualifiers such as
-    const and volatile), and those that must remain on the array, in that
-    order
-    @since Oxygen-20120901 *)
-val splitArrayAttributes: attributes -> attributes * attributes
-
-val bitfield_attribute_name: string
-(** Name of the attribute that is automatically inserted (with an [AINT size]
-    argument when querying the type of a field that is a bitfield *)
-
-val anonymous_attribute_name: string
-(** Name of the attribute that is inserted when generating a name for a varinfo
-    representing an anonymous function parameter.
-    @since 24.0-Chromium
-*)
-
-val anonymous_attribute: attribute
-(** attribute identifying anonymous function parameters
-    @since 24.0-Chromium
-*)
 
 (** Convert an expression into an attrparam, if possible. Otherwise raise
     NotAnAttrParam with the offending subexpression *)
@@ -2463,6 +2326,10 @@ val set_extension_handler:
     @before 30.0-Zinc This function did not take a [plugin:string] parameter
 *)
 
+(* ************************************************************************* *)
+(** {2 Deprecated types functions}                                           *)
+(* ************************************************************************* *)
+
 (** Returns the attributes of a type.
     @deprecated Frama-C+dev *)
 val typeAttr: typ -> attribute list
@@ -2474,8 +2341,150 @@ val typeAttr: typ -> attribute list
 val setTypeAttrs: typ -> attributes -> typ
 [@@alert deprecated "Use [{t with tattr = ...}] instead."]
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
+(* ************************************************************************* *)
+(** {2 Deprecated values moved to Ast_attributes}                            *)
+(* ************************************************************************* *)
+
+val bitfield_attribute_name: string
+(** Name of the attribute that is automatically inserted (with an [AINT size]
+    argument when querying the type of a field that is a bitfield.
 *)
+[@@deprecated "Use Ast_attributes.bitfield_attribute_name instead."]
+
+val anonymous_attribute_name: string
+(** Name of the attribute that is inserted when generating a name for a varinfo
+    representing an anonymous function parameter.
+    @since 24.0-Chromium
+*)
+[@@deprecated "Use Ast_attributes.anonymous_attribute_name instead."]
+
+val anonymous_attribute: attribute
+(** attribute identifying anonymous function parameters
+    @since 24.0-Chromium
+*)
+[@@deprecated "Use Ast_attributes.anonymous_attribute instead."]
+
+(** Returns the name of an attribute. *)
+val attributeName: attribute -> string
+[@@deprecated "Use Ast_attributes.attribute_name instead."]
+
+(** True if the named attribute appears in the attribute list. The list of
+    attributes must be sorted.  *)
+val hasAttribute: string -> attributes -> bool
+[@@deprecated "Use Ast_attributes.has_attribute instead."]
+
+(** Add an attribute. Maintains the attributes in sorted order of the second
+    argument. The attribute is not added if it is already there. *)
+val addAttribute: attribute -> attributes -> attributes
+[@@deprecated "Use Ast_attributes.add_attribute instead."]
+
+(** Add a list of attributes. Maintains the attributes in sorted order. The
+    second argument must be sorted, but not necessarily the first *)
+val addAttributes: attribute list -> attributes -> attributes
+[@@deprecated "Use Ast_attributes.add_attributes instead."]
+
+(** Remove all attributes with the given name. Maintains the attributes in
+    sorted order.  *)
+val dropAttribute: string -> attributes -> attributes
+[@@deprecated "Use Ast_attributes.drop_attribute instead."]
+
+(** Remove all attributes with names appearing in the string list.
+    Maintains the attributes in sorted order *)
+val dropAttributes: string list -> attributes -> attributes
+[@@deprecated "Use Ast_attributes.drop_attributes instead."]
+
+(** Returns the list of parameters associated to an attribute. The list is empty if there
+    is no such attribute or it has no parameters at all. *)
+val findAttribute: string -> attribute list -> attrparam list
+[@@deprecated "Use Ast_attributes.find_attribute instead."]
+
+(** Retains attributes with the given name *)
+val filterAttributes: string -> attributes -> attributes
+[@@deprecated "Use Ast_attributes.filter_attributes instead."]
+
+(** retains attributes corresponding to type qualifiers (6.7.3) *)
+val filter_qualifier_attributes: attributes -> attributes
+[@@deprecated "Use Ast_attributes.filter_qualifier_attributes instead."]
+
+(** given some attributes on an array type, split them into those that belong
+    to the type of the elements of the array (currently, qualifiers such as
+    const and volatile), and those that must remain on the array, in that
+    order
+    @since Oxygen-20120901 *)
+val splitArrayAttributes: attributes -> attributes * attributes
+[@@deprecated "Use Ast_attributes.split_array_attributes instead."]
+
+val registerAttribute: string -> Ast_attributes.attribute_class -> unit
+(** Add a new attribute with a specified class *)
+[@@deprecated "Use Ast_attributes.register_attribute instead."]
+
+val removeAttribute: string -> unit
+(** Remove an attribute previously registered. *)
+[@@deprecated "Use Ast_attributes.remove_attribute instead."]
+
+val attributeClass: default:Ast_attributes.attribute_class -> string ->
+  Ast_attributes.attribute_class
+(** Return the class of an attributes. The class `default' is returned for
+    unknown and ignored attributes.
+    @before 30.0-Zinc no [default] argument
+*)
+[@@deprecated "Use Ast_attributes.get_attribute_class instead."]
+
+val isKnownAttribute: string -> bool
+(** [isKnownAttribute attrname] returns true if the attribute named [attrname]
+    is known by Frama-C.
+    @since 30.0-Zinc
+*)
+[@@deprecated "Use Ast_attributes.is_known_attribute instead."]
+
+(** Partition the attributes into classes: name attributes, function type and
+    type attributes. Unknown and ignored attributes are returned in the
+    `default` attribute class.
+    @before 30.0-Zinc no [default] argument
+*)
+val partitionAttributes:  default:Ast_attributes.attribute_class ->
+  attributes -> attribute list * (* AttrName *)
+                attribute list * (* AttrFunType *)
+                attribute list   (* AttrType *)
+[@@deprecated "Use Ast_attributes.partition_attributes instead."]
+
+(** Separate out the storage-modifier name attributes *)
+val separateStorageModifiers: attribute list -> attribute list * attribute list
+[@@deprecated "Use Ast_attributes.split_storage_modifier instead."]
+
+(** A block marked with this attribute is known to be a ghost else.
+
+    @since 21.0-Scandium
+*)
+val frama_c_ghost_else: string
+[@@deprecated "Use Ast_attributes.frama_c_ghost_else instead."]
+
+(** A varinfo marked with this attribute is known to be a ghost formal.
+
+    @since 20.0-Calcium
+*)
+val frama_c_ghost_formal: string
+[@@deprecated "Use Ast_attributes.frama_c_ghost_formal instead."]
+
+(** a formal marked with this attribute is known to be a pointer to an
+    object being initialized by the current function, which can thus assign
+    any sub-object regardless of const status.
+
+    @since 18.0-Argon
+*)
+val frama_c_init_obj: string
+[@@deprecated "Use Ast_attributes.frama_c_init_obj instead."]
+
+(** a field struct marked with this attribute is known to be mutable, i.e.
+    it can be modified even on a const object.
+
+    @since 18.0-Argon
+*)
+val frama_c_mutable: string
+[@@deprecated "Use Ast_attributes.frama_c_mutable instead."]
+
+(** A block marked with this attribute is known to be inlined, i.e.
+    it replaces a call to an inline function.
+*)
+val frama_c_inlined: string
+[@@deprecated "Use Ast_attributes.frama_c_inlined instead."]
