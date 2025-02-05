@@ -40,6 +40,7 @@ import {
 
 import { CGData, SelectedNodes } from "../definitions";
 import { IconButton } from 'dome/controls/buttons';
+import { Hbox } from 'dome/layout/boxes';
 
 
 /* -------------------------------------------------------------------------- */
@@ -278,12 +279,9 @@ export function Panel(
     <DPanel
       position={ positionDefault ? 'right' : 'left'}
       visible={panelVisible}
-    >
-      <>
-        <Label label={ countNodes.toString()+" / "+countLink.toString() } >
-          {'( Nodes / links )'}
-        </Label>
-        <div className='cg-panel-sidebuttons'>
+      label={`${countNodes} / ${countLink} ( Nodes / links )`}
+      actions={
+        <Hbox>
           <IconButton
             icon={positionDefault ? 'ANGLE.LEFT' : 'ANGLE.RIGHT'}
             title={"Change the side of the panel"}
@@ -295,47 +293,50 @@ export function Panel(
             title={"Hide panel"}
             onClick={flipPanelVisible}
             />
-        </div>
-      </>
-      <Label
-        label={
-          countSelected.toString()+" node"+
-          (countSelected > 1 ? "s" : "")+" selected"
+        </Hbox>
         }
-      />
-      { tainted > 0 ?
+    >
+      <>
         <Label
-        label='Taint legend:'
-        >
-          {
-            <>
-            {renderTaint({ name: "direct_taint", descr: "direct_taint" })}
-            {renderTaint({ name: "indirect_taint", descr: "indirect_taint" })}
-            </>
+          label={
+            countSelected.toString()+" node"+
+            (countSelected > 1 ? "s" : "")+" selected"
           }
-        </Label> : <></>
-        }
-      <Label className='cg-filter-panel'>
-        {getPanelFilters({
-          contextMenuStatus,
-          contextMenuKind,
-          contextMenuEva
-        })}
-      </Label>
-      <ListElement>
-        { getElementList({
-          graph: graphData,
-          selectedNodes,
-          properties,
-          evaProperties,
-          nodes: graphData.nodes.length,
-          links: graphData.links.length,
-          tainted: tainted > 0,
-          style,
-          showKind, showStatus, showEva
-        }).map((elt) => elt )
-        }
-      </ListElement>
+        />
+        { tainted > 0 ?
+          <Label
+          label='Taint legend:'
+          >
+            {
+              <>
+              {renderTaint({ name: "direct_taint", descr: "direct_taint" })}
+              {renderTaint({ name: "indirect_taint", descr: "indirect_taint" })}
+              </>
+            }
+          </Label> : <></>
+          }
+        <Label className='cg-filter-panel'>
+          {getPanelFilters({
+            contextMenuStatus,
+            contextMenuKind,
+            contextMenuEva
+          })}
+        </Label>
+        <ListElement>
+          { getElementList({
+            graph: graphData,
+            selectedNodes,
+            properties,
+            evaProperties,
+            nodes: graphData.nodes.length,
+            links: graphData.links.length,
+            tainted: tainted > 0,
+            style,
+            showKind, showStatus, showEva
+          }).map((elt) => elt )
+          }
+        </ListElement>
+      </>
     </DPanel>
   );
 }

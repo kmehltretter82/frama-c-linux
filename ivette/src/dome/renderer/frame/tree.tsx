@@ -39,16 +39,9 @@ import { Actions } from 'dome/layout/forms';
 
 export type FoldIconPosition = 'left' | 'right';
 
-interface TreeContext {
-  unfoldAll: true | false | undefined;
-  foldButtonPosition: FoldIconPosition;
-  selected?: string;
-  onClick?: (id: string) => void;
-  depth: number;
-}
+type TreeContext = { depth: number; } & Omit<TreeProps, "children">;
 
 const CONTEXT_DEFAULT: TreeContext = {
-  unfoldAll: false,
   foldButtonPosition: 'left',
   depth: 0,
 };
@@ -57,7 +50,8 @@ const CONTEXT = React.createContext<TreeContext>(CONTEXT_DEFAULT);
 function useContext(props: Partial<TreeContext>): TreeContext {
   const Parent = React.useContext(CONTEXT);
   return {
-    unfoldAll: props.unfoldAll || Parent.unfoldAll,
+    unfoldAll: props.unfoldAll,
+    setUnfoldAll: props.setUnfoldAll,
     foldButtonPosition: props.foldButtonPosition || Parent.foldButtonPosition,
     selected: props.selected || Parent.selected,
     depth: props.depth || Parent.depth,
@@ -67,6 +61,7 @@ function useContext(props: Partial<TreeContext>): TreeContext {
 
 interface TreeProps {
   unfoldAll?: boolean ; /* default false */
+  setUnfoldAll?: (v: boolean|undefined) => void;
   foldButtonPosition?: FoldIconPosition;
   selected?: string;
   onClick?: (id: string) => void;
@@ -75,12 +70,13 @@ interface TreeProps {
 
 export function Tree(props: TreeProps): JSX.Element {
   const {
-      unfoldAll, foldButtonPosition,
+      unfoldAll, setUnfoldAll, foldButtonPosition,
       selected, onClick
     } = props;
 
   const context = useContext({
     unfoldAll: unfoldAll,
+    setUnfoldAll: setUnfoldAll,
     onClick: onClick,
     foldButtonPosition: foldButtonPosition,
     selected,
@@ -89,7 +85,6 @@ export function Tree(props: TreeProps): JSX.Element {
   return (
     <CONTEXT.Provider value={context}>
       <div className={'dome-xTree'}>
-
         <div className='dome-xTree-nodes'>
           { props.children }
         </div>
@@ -113,8 +108,12 @@ export function Node(props: NodeProps): JSX.Element {
   const context = React.useContext(CONTEXT);
   const countChildren = React.Children.count(children);
 
-  const [ unfold, setUnfold ] = React.useState(false);
-  const flipUnfold = (): void => setUnfold(v => !v);
+  const [ unfold, setUnfold ] = React.useState(
+    context.unfoldAll !== undefined ? context.unfoldAll : false);
+  const flipUnfold = (): void => {
+    setUnfold(v => !v);
+    if (context.setUnfoldAll !== undefined) context.setUnfoldAll(undefined);
+  };
 
   React.useEffect(() => {
     if(context.unfoldAll !== undefined) setUnfold(context.unfoldAll);

@@ -137,35 +137,40 @@ function SandboxTree(): JSX.Element {
           position='left'
           display={true}
         >
-          <div className='sandbox-tree-control'>
-            <Label
-              label={`${selected ? `node ${selected}` : 'no node' } selected`}
-            />
-            { setUnfoldAll &&
-              <div className='dome-xTree-actions'>
-                { !unfoldAll && <IconButton
+          <>
+            <div className='sandbox-tree-control'>
+              <Label
+                label={`${selected ? `node ${selected}` : 'no node' } selected`}
+              />
+              { setUnfoldAll &&
+                <div className='dome-xTree-actions'>
+                  <IconButton
                     icon={ "CHEVRON.EXPAND" }
+                    title="Unfold all"
+                    disabled={unfoldAll}
                     size={14}
                     onClick={() => setUnfoldAll(true)}
-                    />
-                  }
-                { (unfoldAll || unfoldAll === undefined) && <IconButton
+                  />
+                  <IconButton
                     icon={ "CHEVRON.CONTRACT" }
+                    title="Fold all"
+                    disabled={unfoldAll === false}
                     size={14}
                     onClick={() => setUnfoldAll(false)}
-                    />
-                  }
-              </div>
-            }
-          </div>
-          <Tree
-            unfoldAll={unfoldAll}
-            selected={selected}
-            onClick={setSelected}
-            foldButtonPosition={foldIconPosition}
-            >
-              { allNodes }
-          </Tree>
+                  />
+                </div>
+              }
+            </div>
+            <Tree
+              unfoldAll={unfoldAll}
+              setUnfoldAll={setUnfoldAll}
+              selected={selected}
+              onClick={setSelected}
+              foldButtonPosition={foldIconPosition}
+              >
+                { allNodes }
+            </Tree>
+          </>
         </Panel>
       </div>
     </>

@@ -679,7 +679,7 @@ input:checked + .dome-xSwitch-slider:before {
     max-height: 200px;
     overflow-x: scroll;
 
-    .dome-xBoxes-hbox:has(.dome-xPanelTitle) { display: none; }
+    .dome-xPanelTitle { display: none; }
 
     label,
     .dome-xPanel-list {
@@ -737,7 +737,7 @@ input:checked + .dome-xSwitch-slider:before {
 @keyframes dome-xTree-arrow-down { from { rotate: -90deg; } }
 
 .dome-xTree {
-  background-color: var(--background-intense);
+  background-color: inherit;
   padding-bottom: 5px;
 
   .dome-xTree-nodes {
@@ -759,7 +759,7 @@ input:checked + .dome-xSwitch-slider:before {
   .dome-xTree-node {
     display: flex;
     flex-direction: row;
-    background-color: var(--background-intense);
+    background-color: inherit;
     justify-content: space-between;
     flex-wrap: wrap;
     padding: 2px;

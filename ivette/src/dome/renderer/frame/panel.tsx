@@ -62,7 +62,7 @@ interface PanelProps {
   /** Defaults to `true`. */
   display?: boolean;
   /** Panel children. */
-  children: JSX.Element[];
+  children: JSX.Element;
 }
 
 export const Panel = (props: PanelProps): JSX.Element => {
@@ -85,7 +85,7 @@ export const Panel = (props: PanelProps): JSX.Element => {
         { actions}
       </Hbox>
       }
-      {props.children.map((elt, k) => <Hbox key={k}>{elt}</Hbox>)}
+      { props.children }
     </div>
   );
 };
