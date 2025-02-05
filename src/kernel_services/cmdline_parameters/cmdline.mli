@@ -257,6 +257,7 @@ val add_plugin: ?short:string -> string -> help:string -> unit
 type option_setting =
   | Unit of (unit -> unit)
   | Int of (int -> unit)
+  | Float of (float -> unit)
   | String of (string -> unit)
 
 val add_option:

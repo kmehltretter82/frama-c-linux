@@ -260,6 +260,14 @@ val on_int:
 (** Pack a spin button.
     By default, sensitivity is set to true when this function is called. *)
 
+val on_float:
+  ?tooltip:string -> ?use_markup:bool -> ?lower:float -> ?upper:float ->
+  ?sensitive:(unit -> bool) -> ?width:int ->
+  float chooser
+(** Pack a spin button.
+    By default, sensitivity is set to true when this function is called. *)
+
+
 val on_string:
   ?tooltip:string -> ?use_markup:bool -> ?validator:(string -> bool) ->
   ?width:int

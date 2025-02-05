@@ -80,6 +80,15 @@ let add_parameter (box:GPack.box) p =
      Kernel_hook.extend
        (on_int ~tooltip ~use_markup ~lower ~upper ~width:120 box name get set);
 
+   | Typed_parameter.Float ({ Typed_parameter.get = get; set = set }, range) ->
+     let use_markup = is_set () in
+     let name = if use_markup then hname else name in
+     let lower, upper = range () in
+     let old = get () in
+     let set r = if r <> old then set r in
+     Kernel_hook.extend
+       (on_float ~tooltip ~use_markup ~lower ~upper ~width:120 box name get set);
+
    | Typed_parameter.String
        ({ Typed_parameter.get = get; set = set }, possible_values) ->
      let use_markup = is_set () in

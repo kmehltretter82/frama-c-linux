@@ -392,6 +392,8 @@ let () =
               a.Typed_parameter.add_set_hook (fun _ _ -> update ())
             | Typed_parameter.Int(a, _) ->
               a.Typed_parameter.add_set_hook (fun _ _ -> update ())
+            | Typed_parameter.Float(a, _) ->
+              a.Typed_parameter.add_set_hook (fun _ _ -> update ())
             | Typed_parameter.String(a, _) ->
               a.Typed_parameter.add_set_hook (fun _ _ -> update ()))
          (* [JS 2012/02/07] should be limited to

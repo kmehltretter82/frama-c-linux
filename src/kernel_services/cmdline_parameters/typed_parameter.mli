@@ -39,6 +39,7 @@ type 'a accessor = ('a, 'a) gen_accessor
 type typed_accessor =
   | Bool of bool accessor * string option (** the negative option, if any *)
   | Int of int accessor * (unit -> int * int) (** getting range *)
+  | Float of float accessor * (unit -> float * float) (** getting range *)
   | String of string accessor * (unit -> string list) (** possible values *)
 
 type parameter = private

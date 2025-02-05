@@ -421,6 +421,29 @@ let on_int
      spin#misc#set_sensitive (sensitive ());
      spin#adjustment#set_value (float (get())))
 
+let on_float
+    ?tooltip ?use_markup ?(lower=min_float) ?(upper=max_float)
+    ?(sensitive=(fun () -> true)) ?width
+    (container:GPack.box) label get set =
+  let container = GPack.hbox ~packing:container#pack () in
+  do_tooltip ?tooltip container;
+  let non_fixed = width=None in
+  let spin = GEdit.spin_button ~digits:0
+      ?width ~packing:(container#pack ~expand:non_fixed ~fill:non_fixed) ()
+  in
+  spin#adjustment#set_bounds
+    ~lower ~upper ~step_incr:1. ();
+  spin#adjustment#set_value (get());
+  ignore
+    (spin#connect#value_changed
+       ~callback:
+         (fun () -> set spin#value));
+  let label = mk_label ?use_markup ~xalign:0. container label in
+  (fun () ->
+     label#misc#set_sensitive (sensitive ());
+     spin#misc#set_sensitive (sensitive ());
+     spin#adjustment#set_value (get()))
+
 let on_string ?tooltip ?use_markup ?(validator=(fun _ -> true)) ?width
     (container:GPack.box) label get set =
   let container = GPack.hbox ~packing:container#pack () in

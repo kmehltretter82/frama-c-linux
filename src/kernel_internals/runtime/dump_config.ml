@@ -28,6 +28,7 @@ let dump_parameter tp =
   let json_value = match tp.accessor with
     | Bool (accessor,_) -> `Bool (accessor.get ())
     | Int (accessor,_) -> `Int (accessor.get ())
+    | Float (accessor,_) -> `Float (accessor.get ())
     | String (accessor,_) -> `String (accessor.get ())
   in
   tp.name, json_value

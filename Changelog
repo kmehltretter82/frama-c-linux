@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o   Kernel    [2025-02-05] New parameter builder `Float` for decimal
+              command-line parameters.
 -!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
               parsing errors due to unsupported compiler extensions.
 o!  Kernel    [2025-02-05] New module Ast_attributes for attribute related
