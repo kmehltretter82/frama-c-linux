@@ -425,7 +425,7 @@ module TransferSingleTaint = struct
 
   let is_auto_taint_variadic kf =
     let vi = Kernel_function.get_vi kf in
-    Cil.hasAttribute "fc_stdlib_generated" vi.vattr
+    Ast_attributes.has_attribute "fc_stdlib_generated" vi.vattr
     && List.mem vi.vorig_name auto_taint_variadic_functions
 
   let is_auto_taint_arg kf =
