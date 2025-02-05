@@ -1614,7 +1614,7 @@ module Rational =
       let rehash = identity
       let mem_project = never_any_project
       let pretty fmt q = Format.pp_print_float fmt (Q.to_float q)
-      let hash q = Z.hash (Q.num q) + 3 * Z.hash (Q.den q)
+      let hash q = Stdlib.Hashtbl.hash (Z.hash (Q.num q), Z.hash (Q.den q))
     end)
 let rational = Rational.ty
 
