@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every
+              `Datatype` functor building collection(s).
 -!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
               parsing errors due to unsupported compiler extensions.
 o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
