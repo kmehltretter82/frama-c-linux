@@ -29,7 +29,7 @@ import React from 'react';
 import { registerSandbox } from 'ivette';
 
 import { Tree, Node, FoldIconPosition } from 'dome/frame/tree';
-import { Panel, PanelTitle } from 'dome/frame/panel';
+import { Panel } from 'dome/frame/panel';
 import { IconButton } from 'dome/controls/buttons';
 
 import './style.css';
@@ -120,19 +120,23 @@ function SandboxTree(): JSX.Element {
       >{ getSubTree(subTree, multiSelectedState) }</Node>
     ); }, [multiSelectedState]);
 
+    const panelActions = <IconButton
+        icon={foldIconPosition === 'left' ? 'ANGLE.RIGHT' : 'ANGLE.LEFT'}
+        title='Change side of the fold button'
+        onClick={() =>
+          setFoldIconPosition(val => val === 'left' ? 'right' : 'left')}
+        style={{ marginLeft: '15px' }}
+      />;
+
   return (
     <>
       <div style={{ position: 'relative', height: '100%' }}>
-        <Panel position='left' display={true}>
-          <PanelTitle label={`Sandbox Tree: ${multiSelected.length} selected`}>
-            <IconButton
-              icon={foldIconPosition === 'left' ? 'ANGLE.RIGHT' : 'ANGLE.LEFT'}
-              title='Change side of the fold button'
-              onClick={() =>
-                setFoldIconPosition(val => val === 'left' ? 'right' : 'left')}
-              style={{ marginLeft: '15px' }}
-              />
-          </PanelTitle>
+        <Panel
+          label={`Sandbox Tree: ${multiSelected.length} selected`}
+          actions={panelActions}
+          position='left'
+          display={true}
+        >
           <div className='sandbox-tree-control'>
             <Label
               label={`${selected ? `node ${selected}` : 'no node' } selected`}
