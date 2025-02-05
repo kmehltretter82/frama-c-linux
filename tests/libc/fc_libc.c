@@ -89,6 +89,7 @@
 #include "__fc_define_useconds_t.h"
 #include "__fc_define_wchar_t.h"
 #include "__fc_define_wint_t.h"
+#include "__fc_gcc_builtin_macros.h"
 #include "__fc_gcc_builtins.h"
 #include "__fc_inet.h"
 #include "__fc_integer.h"
@@ -192,7 +193,6 @@
 #include "wchar.h"
 #include "wctype.h"
 #include "wordexp.h"
-
 
 
 

@@ -42,6 +42,7 @@
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_useconds_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_wchar_t.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_define_wint_t.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/__fc_gcc_builtin_macros.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_gcc_builtins.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_inet.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/__fc_integer.h (with preprocessing)
