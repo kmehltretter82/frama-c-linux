@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 ##########################################################################
 #                                                                        #
 #  This file is part of Frama-C.                                         #
@@ -41,6 +41,10 @@
 #   kcachegrind callgrind.out
 
 dune exec -- valgrind \
-  --tool=callgrind --callgrind-out-file=callgrind.out --dump-instr=yes \
-  --separate-callers=2 --collect-jumps=yes --fn-skip='caml_*' \
+  --tool=callgrind \
+  --callgrind-out-file=callgrind.out \
+  --dump-instr=yes \
+  --separate-callers=1 \
+  --collect-jumps=yes \
+  --fn-skip='caml_*' --fn-skip='caml_Stdlib' \
   frama-c "$@"
