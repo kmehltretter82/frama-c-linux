@@ -35,9 +35,6 @@
 [eva] using specification for function readdir
 [eva:alarm] dirent_h.c:23: Warning: 
   function readdir: precondition 'dirp_valid_dir_stream' got status unknown.
-[eva:garbled-mix:assigns] dirent_h.c:23: 
-  The specification of function readdir
-  has generated a garbled mix of addresses for assigns clause __fc_errno.
 [eva] Done for function readdir
 [eva] computing for function closedir <- main.
   Called from dirent_h.c:39.
@@ -57,9 +54,7 @@
       garbled mix of &{__fc_opendir}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_errno ∈
-            {{ garbled mix of &{__fc_opendir}
-             (origin: Library function {dirent_h.c:23}) }}
+  __fc_errno ∈ [--..--]
   __fc_opendir[0..15] ∈
               {{ garbled mix of &{__fc_opendir}
                (origin: Library function {dirent_h.c:39}) }}
