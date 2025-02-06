@@ -20,4 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(** Implementation of the [Field] signature based on rational numbers.
+    @since Frama-C+dev *)
 include Field.S with type t = Q.t
