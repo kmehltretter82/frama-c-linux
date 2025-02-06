@@ -37,29 +37,46 @@ module type S = sig
   include Datatype.S_with_collections
   type scalar = t
 
-  (** Useful constants in the field. Two is provided for users that model
-      floating point computations using abstractions over the field. *)
+  (** {2 Useful constants in the field.}
+
+      Two is provided for users that model floating point computations using
+      abstractions over the field. *)
+
   val zero    : scalar
   val one     : scalar
   val two     : scalar
   val pos_inf : scalar
   val neg_inf : scalar
 
-  (** Constructors interacting with standard OCaml types. *)
+  (** {2 Constructors interacting with standard OCaml types.} *)
+
   val of_int    : int -> scalar
   val of_float  : float -> scalar
   val to_float  : scalar -> float
   val of_string : string -> scalar
 
-  (** Standard arithmetic unary operations. *)
+  (** {2 Standard arithmetic unary operations.} *)
+
   val neg : scalar -> scalar
   val abs : scalar -> scalar
 
-  (** Standard arithmetic binary operations. *)
+  (** {2 Standard arithmetic binary operations.} *)
+
   val ( + ) : scalar -> scalar -> scalar
   val ( - ) : scalar -> scalar -> scalar
   val ( * ) : scalar -> scalar -> scalar
   val ( / ) : scalar -> scalar -> scalar
+
+  (** {2 Standard arithmetic relational operations.} *)
+
+  val ( =  ) : scalar -> scalar -> bool
+  val ( != ) : scalar -> scalar -> bool
+  val ( <= ) : scalar -> scalar -> bool
+  val ( <  ) : scalar -> scalar -> bool
+  val ( >= ) : scalar -> scalar -> bool
+  val ( >  ) : scalar -> scalar -> bool
+
+  (** {2 Other arithmetic operations. }*)
 
   (** [pow2 e] computes the scalar [2 ^ e]. *)
   val pow2 : int -> scalar
@@ -73,12 +90,5 @@ module type S = sig
 
   val max : scalar -> scalar -> scalar
   val min : scalar -> scalar -> scalar
-
-  val ( =  ) : scalar -> scalar -> bool
-  val ( != ) : scalar -> scalar -> bool
-  val ( <= ) : scalar -> scalar -> bool
-  val ( <  ) : scalar -> scalar -> bool
-  val ( >= ) : scalar -> scalar -> bool
-  val ( >  ) : scalar -> scalar -> bool
 
 end

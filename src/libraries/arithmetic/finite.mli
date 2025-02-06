@@ -22,11 +22,12 @@
 
 open Nat
 
+(** Encoding of finite set in OCaml type system. *)
 
-
-(* The type [n finite] encodes all finite sets of cardinal [n]. It is used by
-   the module Linear to represent accesses to vectors and matrices coefficients,
-   statically ensuring that no out of bounds access can be performed. *)
+(** The type [n finite] encodes all finite sets of cardinal [n]. It is used by
+    the module {!Linear} to represent accesses to vectors and matrices
+    coefficients, statically ensuring that no out of bounds access can be
+    performed. *)
 type 'n finite
 
 val first : 'n succ finite
@@ -34,15 +35,16 @@ val last  : 'n succ nat -> 'n succ finite
 val next  : 'n finite -> 'n succ finite
 val ( = ) : 'n finite -> 'n finite -> bool
 
-(* The call [of_int limit n] returns a finite value representing the n-nd
-   element of a finite set of cardinal limit. If n is not in the bounds, none is
-   returned. This function complexity is O(1). *)
+(** The call [of_int limit n] returns a finite value representing the n-nd
+    element of a finite set of cardinal limit. If n is not in the bounds, [None]
+    is returned. This function complexity is O(1). *)
 val of_int : 'n succ nat -> int -> 'n succ finite option
 
-(* The call [to_int n] returns an integer equal to n. This function complexity
-   is O(1). *)
+(** The call [to_int n] returns an integer equal to n. This function complexity
+    is O(1). *)
 val to_int : 'n finite -> int
 
-(* The call [for_each acc limit f] folds over each finite elements of a set of
-   cardinal limit, computing f at each step. The function complexity is O(n). *)
+(** The call [for_each acc limit f] folds over each finite elements of a set of
+    cardinal limit, computing f at each step.
+    The function complexity is O(n). *)
 val for_each : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a
