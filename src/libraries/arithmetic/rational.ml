@@ -26,13 +26,14 @@ type scalar = t
 let zero = Q.zero
 let one = Q.one
 let two = Q.of_int 2
+let ten = Z.of_int 10
 let pos_inf = Q.inf
 let neg_inf = Q.minus_inf
 let of_float = Q.of_float
 let to_float = Q.to_float
 let of_int = Q.of_int
 
-let pow10 e = Z.(pow (of_int 10) e) |> Q.of_bigint
+let pow10 e = Z.(pow ten e) |> Q.of_bigint
 
 let split_significant_exponent s =
   match String.split_on_char 'e' s with
@@ -59,18 +60,18 @@ let of_string str =
   Q.(significant * shift)
 
 let pow2 e =
-  let p = Z.(shift_left one (Stdlib.abs e)) in
-  if e >= 0 then Q.(make p Z.one) else Q.(make Z.one p)
+  Q.(mul_2exp one e)
 
+(* r = ⌊log₂ (n / d)⌋ = ⌊log₂ n - log₂ d⌋ which cannot be calculated directly.
+   However, we have the three following properties:
+   - ⌊x⌋ + ⌊y⌋ ≤ ⌊x + y⌋ ≤ ⌊x⌋ + ⌊y⌋ + 1 ;
+   - ⌊-x⌋ = -⌈x⌉ ;
+   - ⌈x⌉ = ⌊x⌋ + 1 ;
+   Thus, we deduce that ⌊log₂ n⌋ - ⌊log₂ d⌋ - 1 ≤ r ≤ ⌊log₂ n⌋ - ⌊log₂ d⌋. *)
 let log2 q =
   if Q.(q <= zero) then raise (Invalid_argument (Q.to_string q)) ;
   let num = Q.num q |> Z.log2 and den = Q.den q |> Z.log2 in
-  let start = num - den - 1 in
-  let rec aux acc e =
-    let acc' = Q.(acc * two) in
-    if Q.(acc' > q) then Field.{ lower = e ; upper = e + 1 }
-    else aux acc' (e + 1)
-  in aux (pow2 start) start
+  Field.{ lower = num - den - 1 ; upper = num - den }
 
 let neg = Q.neg
 let abs = Q.abs
@@ -79,7 +80,6 @@ let max = Q.max
 
 let sqrt q =
   if Q.sign q = 1 then
-    let ten = Z.of_int 10 in
     let num = Q.num q and den = Q.den q in
     let acceptable_delta = Q.inv (Q.of_bigint @@ Z.pow ten 32) in
     let rec approx_starting_at_scaling scaling =
