@@ -168,7 +168,7 @@ void eacsl_assert_register_ulonglong(eacsl_assert_data_t *data,
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
+  @ assigns data->values \from indirect:__fc_heap_status, *value;
   @ // admit ensures \valid(data->values); */
 void eacsl_assert_register_mpz(eacsl_assert_data_t *data, const char *name,
                                int is_enum, const eacsl_mpz_t value)
@@ -204,7 +204,7 @@ void eacsl_assert_register_longdouble(eacsl_assert_data_t *data,
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
+  @ assigns data->values \from indirect:__fc_heap_status, *value;
   @ // admit ensures \valid(data->values); */
 void eacsl_assert_register_mpq(eacsl_assert_data_t *data, const char *name,
                                const eacsl_mpq_t value)
