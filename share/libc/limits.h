@@ -223,4 +223,58 @@
 #  define IOV_MAX 255
 #endif
 
+// Maximum number of user trace event type identifiers that may simultaneously
+// exist in a traced process, including the predefined user trace event
+// POSIX_TRACE_UNNAMED_USER_EVENT.
+// Minimum Acceptable Value: _POSIX_TRACE_USER_EVENT_MAX
+#ifdef __FC_TRACE_USER_EVENT_MAX
+#  if __FC_TRACE_USER_EVENT_MAX >= 0
+     _Static_assert(__FC_TRACE_USER_EVENT_MAX >= _POSIX_TRACE_USER_EVENT_MAX, "__FC_TRACE_USER_EVENT_MAX is too small (" __fc_expand(__FC_TRACE_USER_EVENT_MAX) "): minimal value is " __fc_expand(_POSIX_TRACE_USER_EVENT_MAX));
+#    define TRACE_USER_EVENT_MAX __FC_TRACE_USER_EVENT_MAX
+#  else
+#    undef TRACE_USER_EVENT_MAX
+#  endif
+#else
+#  define TRACE_USER_EVENT_MAX 64
+#endif
+
+// Maximum length of the trace event name (not including the terminating null).
+// Minimum Acceptable Value: _POSIX_TRACE_EVENT_NAME_MAX
+#ifdef __FC_TRACE_EVENT_NAME_MAX
+#  if __FC_TRACE_EVENT_NAME_MAX >= 0
+     _Static_assert(__FC_TRACE_EVENT_NAME_MAX >= _POSIX_TRACE_EVENT_NAME_MAX, "__FC_TRACE_EVENT_NAME_MAX is too small (" __fc_expand(__FC_TRACE_EVENT_NAME_MAX) "): minimal value is " __fc_expand(_POSIX_TRACE_EVENT_NAME_MAX));
+#    define TRACE_EVENT_NAME_MAX __FC_TRACE_EVENT_NAME_MAX
+#  else
+#    undef TRACE_EVENT_NAME_MAX
+#  endif
+#else
+#  define TRACE_EVENT_NAME_MAX 30
+#endif
+
+// Maximum length of the trace generation version string or of the trace stream name (not including the terminating null).
+// Minimum Acceptable Value: _POSIX_TRACE_NAME_MAX
+#ifdef __FC_TRACE_NAME_MAX
+#  if __FC_TRACE_NAME_MAX >= 0
+     _Static_assert(__FC_TRACE_NAME_MAX >= _POSIX_TRACE_NAME_MAX, "__FC_TRACE_NAME_MAX is too small (" __fc_expand(__FC_TRACE_NAME_MAX) "): minimal value is " __fc_expand(_POSIX_TRACE_NAME_MAX));
+#    define TRACE_NAME_MAX __FC_TRACE_NAME_MAX
+#  else
+#    undef TRACE_NAME_MAX
+#  endif
+#else
+#  define TRACE_NAME_MAX 8
+#endif
+
+// The size of the storage required for a login name, in bytes, including the terminating null.
+// Minimum Acceptable Value: _POSIX_LOGIN_NAME_MAX
+#ifdef __FC_LOGIN_NAME_MAX
+#  if __FC_LOGIN_NAME_MAX >= 0
+     _Static_assert(__FC_LOGIN_NAME_MAX >= _POSIX_LOGIN_NAME_MAX, "__FC_LOGIN_NAME_MAX is too small (" __fc_expand(__FC_LOGIN_NAME_MAX) "): minimal value is " __fc_expand(_POSIX_LOGIN_NAME_MAX));
+#    define LOGIN_NAME_MAX __FC_LOGIN_NAME_MAX
+#  else
+#    undef LOGIN_NAME_MAX
+#  endif
+#else
+#  define LOGIN_NAME_MAX 8
+#endif
+
 #endif
