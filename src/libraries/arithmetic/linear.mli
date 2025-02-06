@@ -92,8 +92,8 @@ module Space (Field : Field.S) : sig
         and the last column is all zero, and the remaining is the identity. *)
     val shift : 'n succ nat -> ('n succ, 'n succ) matrix
 
-    (* The call [get i j m] returns the coefficient of the i-th row and
-       the j-th column. *)
+    (** The call [get i j m] returns the coefficient of the i-th row and
+        the j-th column. *)
     val get : 'n finite -> 'm finite -> ('n, 'm) matrix -> scalar
 
     (** The call [set i j x m] returns a new matrix of the same linear space as
@@ -101,8 +101,8 @@ module Space (Field : Field.S) : sig
         and the j-th column, which is set to the scalar [x]. *)
     val set : 'n finite -> 'm finite -> scalar -> ('n, 'm) matrix -> ('n, 'm) matrix
 
-    (* The call [norm_inf m] computes the ∞-norm of [m], i.e the maximum of the
-       absolute sums of the rows of [m]. *)
+    (** The call [norm_inf m] computes the ∞-norm of [m], i.e the maximum of the
+        absolute sums of the rows of [m]. *)
     val norm_inf : ('n, 'm) matrix -> scalar
 
     (** The call [norm_one m] computes the 1-norm of [m], i.e the maximum of the
@@ -123,17 +123,17 @@ module Space (Field : Field.S) : sig
         is statically ensured. *)
     val ( - ) : ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
 
-    (* Matrices multiplication. The dimensions compatibility is statically
-       ensured. *)
+    (** Matrices multiplication. The dimensions compatibility is statically
+        ensured. *)
     val ( * ) : ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
 
     (** Scalar multiplication. *)
     val ( ** ) : scalar -> ('n, 'm) matrix  -> ('n, 'm) matrix
 
-    (* Matrix exponentiation. The call [power m] returns a memoized function.
-       When one needs to compute several exponentiations of the same matrix, one
-       should perform the call [power m] once and used the returned function
-       each times one needs it. *)
+    (** Matrix exponentiation. The call [power m] returns a memoized function.
+        When one needs to compute several exponentiations of the same matrix,
+        one should perform the call [power m] once and used the returned
+        function each times one needs it. *)
     val power : ('n, 'n) matrix -> (int -> ('n, 'n) matrix)
 
     (** Matrix inverse. Returns None if the input matrix is singular. *)
