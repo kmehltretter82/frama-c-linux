@@ -97,16 +97,19 @@ let rec predicate_content_to_exp ~adata ?(inplace=false) ?name kf env p =
         (Typing.get_effective_ty ~logic_env t1)
         (Typing.get_effective_ty ~logic_env t2)
     in
-    Translate_utils.comparison_to_exp
-      ~adata
-      ~loc
-      kf
-      env
-      ity
-      (relation_to_binop rel)
-      t1
-      t2
-      None
+    let e1, adata, env = Translate_terms.to_exp ~adata kf env t1 in
+    let e2, adata, env = Translate_terms.to_exp ~adata kf env t2 in
+    let e, env = Translate_utils.comparison_to_exp
+        ~loc
+        kf
+        env
+        ity
+        (relation_to_binop rel)
+        e1
+        e2
+        None
+    in
+    e, adata, env
   | Pand(p1, p2) ->
     (* p1 && p2 <==> if p1 then p2 else false *)
     Extlib.flatten

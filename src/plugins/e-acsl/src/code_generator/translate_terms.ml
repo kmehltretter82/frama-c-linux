@@ -328,17 +328,18 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       let zero = Logic_const.tinteger 0 in
       let ctx = Typing.get_number_ty ~logic_env t in
       Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
-      let e, adata, env =
+      let t_exp, adata, env = to_exp ~adata kf env t in
+      let zero_exp, adata, env = to_exp ~adata kf env zero in
+      let e, env =
         Translate_utils.comparison_to_exp
-          ~adata
           kf
           ~loc
           ~name:"not"
           env
           Typing.gmpz
           Eq
-          t
-          zero
+          t_exp
+          zero_exp
           (Some t)
       in
       e, adata, env, Analyses_types.C_number, ""
@@ -386,19 +387,18 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
       let zero = Logic_const.tinteger 0 in
       Typing.preprocess_term ~use_gmp_opt:true ~ctx ~logic_env zero;
       (* do not generate [e2] from [t2] twice *)
-      let guard, _, env =
+      let guard, env =
         let name = Misc.name_of_binop bop ^ "_guard" in
+        let zero_exp, _, env = to_exp ~adata:Assert.no_data kf env zero in
         Translate_utils.comparison_to_exp
-          ~adata:Assert.no_data
           ~loc
           kf
           env
           Typing.gmpz
-          ~e1:e2
           ~name
           Ne
-          t2
-          zero
+          e2
+          zero_exp
           t
       in
       let p = Logic_const.prel ~loc (Rneq, t2, zero) in
@@ -434,23 +434,24 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
     end
   | TBinOp(Lt | Gt | Le | Ge | Eq | Ne as bop, t1, t2) ->
     (* comparison operators *)
+    let t1 = Logic_normalizer.get_term t1 in
+    let t2 = Logic_normalizer.get_term t2 in
     let ity =
-      let t1 = Logic_normalizer.get_term t1 in
-      let t2 = Logic_normalizer.get_term t2 in
       Typing.join
         (Typing.get_effective_ty ~logic_env t1)
         (Typing.get_effective_ty ~logic_env t2)
     in
-    let e, adata, env =
+    let e1, adata, env = to_exp ~adata kf env t1 in
+    let e2, adata, env = to_exp ~adata kf env t2 in
+    let e, env =
       Translate_utils.comparison_to_exp
-        ~adata
         ~loc
         kf
         env
         ity
         bop
-        t1
-        t2
+        e1
+        e2
         (Some t)
     in
     e, adata, env, Analyses_types.C_number, ""
@@ -582,19 +583,18 @@ and context_insensitive_term_to_exp ~adata ?(inplace=false) kf env t =
              if (warn left shift negative and left shift)
                 or (warn right shift negative and right shift)
              then check e1 >= 0 *)
-          let e1_guard, _, env =
+          let zero_exp, _, env = to_exp ~adata:Assert.no_data kf env zero in
+          let e1_guard, env =
             let name = e1_name ^ bop_name ^ "_guard" in
             Translate_utils.comparison_to_exp
-              ~adata:Assert.no_data
               ~loc
               kf
               env
               Typing.gmpz
-              ~e1
               ~name
               Ge
-              t1
-              zero
+              e1
+              zero_exp
               t
           in
           let e1_guard_cond, env =
