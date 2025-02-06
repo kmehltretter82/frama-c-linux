@@ -10038,7 +10038,8 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
     loopChunk ~ghost ~sattr:[("while",[])] a
-      ((doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond)
+      ((empty @@@
+        (doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond, ghost))
        @@@ (s', ghost))
 
   | Cabs.DOWHILE(a, e,s,loc) ->
