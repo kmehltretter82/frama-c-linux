@@ -147,51 +147,49 @@ int decode_int(char *s)
       loop invariant Aorai: 0 ≡ main_0;
   */
   while (1) {
+    char *tmp;
+    /*@ ghost aorai_Loop_Init_5 = 0; */
+    tmp = s;
+    s ++;
+    c = *tmp;
+    if (! c) break;
     {
-      char *tmp;
-      /*@ ghost aorai_Loop_Init_5 = 0; */
-      tmp = s;
-      s ++;
-      c = *tmp;
-      if (! c) break;
-      {
-        int v = 0;
-        switch ((int)c) {
-          case '0': v = 0;
-          break;
-          case '1': v = 1;
-          break;
-          case '2': v = 2;
-          break;
-          case '3': v = 3;
-          break;
-          case '4': v = 4;
-          break;
-          case '5': v = 5;
-          break;
-          case '6': v = 6;
-          break;
-          case '7': v = 7;
-          break;
-          case '8': v = 8;
-          break;
-          case '9': v = 9;
-          break;
-          default: __retres = -1;
-          goto return_label;
-        }
-        if (value > cutoff) {
-          __retres = -1;
-          goto return_label;
-        }
-        else 
-          if (value == cutoff) 
-            if (v > cutlim) {
-              __retres = -1;
-              goto return_label;
-            }
-        value = value * 10 + v;
+      int v = 0;
+      switch ((int)c) {
+        case '0': v = 0;
+        break;
+        case '1': v = 1;
+        break;
+        case '2': v = 2;
+        break;
+        case '3': v = 3;
+        break;
+        case '4': v = 4;
+        break;
+        case '5': v = 5;
+        break;
+        case '6': v = 6;
+        break;
+        case '7': v = 7;
+        break;
+        case '8': v = 8;
+        break;
+        case '9': v = 9;
+        break;
+        default: __retres = -1;
+        goto return_label;
       }
+      if (value > cutoff) {
+        __retres = -1;
+        goto return_label;
+      }
+      else 
+        if (value == cutoff) 
+          if (v > cutlim) {
+            __retres = -1;
+            goto return_label;
+          }
+      value = value * 10 + v;
     }
   }
   __retres = value;
