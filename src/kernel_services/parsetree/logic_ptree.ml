@@ -45,10 +45,6 @@ type constant =
 
 (** size of logic array. *)
 type array_size = lexpr option
-    (* ASinteger of string (** integer constant *) *)
-  (* | ASidentifier of string (** a variable or macro*) *)
-  (* | ASlexpr of lexpr *)
-  (* | ASnone (**  none *) *)
 
 (** logic types. *)
 and logic_type =
