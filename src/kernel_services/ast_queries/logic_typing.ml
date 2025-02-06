@@ -2452,7 +2452,7 @@ struct
       accept_const = false; }
   let lval_assigns_dependency_mode =
     { accept_empty = true; accept_formal = true; accept_array = false;
-      accept_models = true; accept_func_ptr = false; accept_addrs = true;
+      accept_models = true; accept_func_ptr = true; accept_addrs = true;
       accept_const = true; }
 
   let is_fct_ptr lv = Cil.isLogicFunctionType (Cil.typeOfTermLval lv)
