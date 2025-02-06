@@ -20,43 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module Rational = struct
-
-  type scalar = Q.t
-
-  module Type = struct
-    include Datatype.Serializable_undefined
-    type t = scalar
-    let name = "Linear.Filter.Test.Rational"
-    let reprs = [ Q.zero ]
-    let compare = Q.compare
-    let equal = Q.equal
-    let hash q = Z.hash (Q.num q) + 11 * Z.hash (Q.den q)
-  end
-
-  include Datatype.Make_with_collections (Type)
-
-  let pretty fmt n =
-    let ten = Z.of_int 10 in
-    let sign = if Q.sign n >= 0 then "" else "-" in
-    let num = Q.num n |> Z.abs and den = Q.den n |> Z.abs in
-    let finish n = Z.Compare.(n >= den || n = Z.zero) in
-    let rec f e n = if finish n then (n, e) else f (e + 1) Z.(n * ten) in
-    let num, exponent = f 0 num in
-    let default fmt n = Format.fprintf fmt "%1.7f" (Q.to_float n) in
-    if exponent > 0 then
-      let number = Q.make num den in
-      Format.fprintf fmt "%s%aE-%d" sign default number exponent
-    else default fmt n
-
-  include Q
-  let infinity = Q.inf
-  let ( = ) = Q.equal
-
-end
-
-
-
 module Filter = Linear_filter.Make (Rational)
 module Linear = Filter.Linear
 

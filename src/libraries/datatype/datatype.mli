@@ -377,6 +377,9 @@ val formatter: Format.formatter Type.t
 module Integer: S_with_collections with type t = Integer.t
 val integer: Integer.t Type.t
 
+module Rational: S_with_collections with type t = Q.t
+val rational : Rational.t Type.t
+
 (** Type-safe strings representing normalized filepaths.
     See module {!Filepath.Normalized}.
     @since 18.0-Argon *)

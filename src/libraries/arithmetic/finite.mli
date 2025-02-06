@@ -20,33 +20,31 @@
 (*                                                                        *)
 (**************************************************************************)
 
-module type S = sig
+open Nat
 
-  type scalar
-  include Datatype.S_with_collections with type t = scalar
+(** Encoding of finite set in OCaml type system. *)
 
-  val zero     : scalar
-  val one      : scalar
-  val infinity : scalar
+(** The type [n finite] encodes all finite sets of cardinal [n]. It is used by
+    the module {!Linear} to represent accesses to vectors and matrices
+    coefficients, statically ensuring that no out of bounds access can be
+    performed. *)
+type 'n finite
 
-  val of_int : int -> scalar
-  val of_float : float -> scalar
-  val to_float : scalar -> float
+val first : 'n succ finite
+val last  : 'n succ nat -> 'n succ finite
+val next  : 'n finite -> 'n succ finite
+val ( = ) : 'n finite -> 'n finite -> bool
 
-  val neg : scalar -> scalar
-  val abs : scalar -> scalar
-  val max : scalar -> scalar -> scalar
-  val min : scalar -> scalar -> scalar
+(** The call [of_int limit n] returns a finite value representing the n-nd
+    element of a finite set of cardinal limit. If n is not in the bounds, [None]
+    is returned. This function complexity is O(1). *)
+val of_int : 'n succ nat -> int -> 'n succ finite option
 
-  val ( =  ) : scalar -> scalar -> bool
-  val ( <= ) : scalar -> scalar -> bool
-  val ( <  ) : scalar -> scalar -> bool
-  val ( >= ) : scalar -> scalar -> bool
-  val ( >  ) : scalar -> scalar -> bool
+(** The call [to_int n] returns an integer equal to n. This function complexity
+    is O(1). *)
+val to_int : 'n finite -> int
 
-  val ( + ) : scalar -> scalar -> scalar
-  val ( - ) : scalar -> scalar -> scalar
-  val ( * ) : scalar -> scalar -> scalar
-  val ( / ) : scalar -> scalar -> scalar
-
-end
+(** The call [for_each f limit acc] folds over each finite elements of a set of
+    cardinal limit, computing f at each step.
+    The function complexity is O(n). *)
+val for_each : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a
