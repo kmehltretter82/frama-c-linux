@@ -44,7 +44,7 @@ val of_int : 'n succ nat -> int -> 'n succ finite option
     is O(1). *)
 val to_int : 'n finite -> int
 
-(** The call [for_each acc limit f] folds over each finite elements of a set of
+(** The call [for_each f limit acc] folds over each finite elements of a set of
     cardinal limit, computing f at each step.
     The function complexity is O(n). *)
 val for_each : ('n finite -> 'a -> 'a) -> 'n nat -> 'a -> 'a
