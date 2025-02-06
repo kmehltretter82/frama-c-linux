@@ -337,50 +337,48 @@ void f(int N)
       loop invariant aorai_Loop_Init_38 ≡ 0 ⇒ aorai_CurTrans[0] ≡ 0;
   */
   while (1) {
-    {
-      int tmp;
-      if (i < N) {
-        if (! (! t)) goto while_0_break;
-      }
-      else goto while_0_break;
-      aorai_Loop_Init_38 = 0;
-      aorai_CurOperation = op_g;
-      aorai_CurOpStatus = aorai_Called;
-      aorai_CurStates_old[S5] = 0;
-      aorai_CurStates_old[S4] = 0;
-      aorai_CurStates_old[S3] = 0;
-      aorai_CurStates_old[S2] = 0;
-      aorai_CurStates_old[S1] = aorai_CurStates[0];
-      aorai_CurStates_old[OK] = 0;
-      aorai_CurStates_old[S0] = 0;
-      aorai_CurTrans[0] = 0;
-      aorai_CurTrans[1] = 0;
-      if (NB > 0) 
-        if (g_calls < NB) 
-          if (0 <= g_calls) 
-            if (aorai_CurStates_old[0]) tmp = 1; else tmp = 0;
-          else tmp = 0;
+    int tmp;
+    if (i < N) {
+      if (! (! t)) goto while_0_break;
+    }
+    else goto while_0_break;
+    aorai_Loop_Init_38 = 0;
+    aorai_CurOperation = op_g;
+    aorai_CurOpStatus = aorai_Called;
+    aorai_CurStates_old[S5] = 0;
+    aorai_CurStates_old[S4] = 0;
+    aorai_CurStates_old[S3] = 0;
+    aorai_CurStates_old[S2] = 0;
+    aorai_CurStates_old[S1] = aorai_CurStates[0];
+    aorai_CurStates_old[OK] = 0;
+    aorai_CurStates_old[S0] = 0;
+    aorai_CurTrans[0] = 0;
+    aorai_CurTrans[1] = 0;
+    if (NB > 0) 
+      if (g_calls < NB) 
+        if (0 <= g_calls) 
+          if (aorai_CurStates_old[0]) tmp = 1; else tmp = 0;
         else tmp = 0;
       else tmp = 0;
-      aorai_CurTrans[2] = tmp;
-      aorai_CurTrans[3] = 0;
-      aorai_CurTrans[4] = 0;
-      aorai_CurTrans[5] = 0;
-      aorai_CurTrans[6] = 0;
-      aorai_CurTrans[7] = 0;
-      aorai_CurTrans[8] = 0;
-      aorai_CurStates[S5] = 0;
-      aorai_CurStates[S4] = 0;
-      aorai_CurStates[S3] = 0;
-      aorai_CurStates[S2] = aorai_CurTrans[2];
-      aorai_CurStates[S1] = 0;
-      aorai_CurStates[OK] = 0;
-      aorai_CurStates[S0] = 0;
-      t = g(i);
-      G_i = t;
-      i ++;
-      g_calls = i;
-    }
+    else tmp = 0;
+    aorai_CurTrans[2] = tmp;
+    aorai_CurTrans[3] = 0;
+    aorai_CurTrans[4] = 0;
+    aorai_CurTrans[5] = 0;
+    aorai_CurTrans[6] = 0;
+    aorai_CurTrans[7] = 0;
+    aorai_CurTrans[8] = 0;
+    aorai_CurStates[S5] = 0;
+    aorai_CurStates[S4] = 0;
+    aorai_CurStates[S3] = 0;
+    aorai_CurStates[S2] = aorai_CurTrans[2];
+    aorai_CurStates[S1] = 0;
+    aorai_CurStates[OK] = 0;
+    aorai_CurStates[S0] = 0;
+    t = g(i);
+    G_i = t;
+    i ++;
+    g_calls = i;
   }
   while_0_break: ;
   if (t) {

@@ -98,7 +98,7 @@
 [sparecode] add selection in function 'main'
 [sparecode] look for annotations in function main_bis
 [pdg] computing for function main_bis
-[pdg] Warning: unreachable entry point (sid:31, function main_bis)
+[pdg] Warning: unreachable entry point (sid:30, function main_bis)
 [pdg] Bottom for function main_bis
 [sparecode] pdg bottom: skip annotations
 [sparecode] finalize call input propagation

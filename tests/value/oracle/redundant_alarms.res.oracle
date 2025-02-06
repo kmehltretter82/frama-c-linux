@@ -149,13 +149,11 @@ void main3(unsigned int i, unsigned int j)
 void main4(int i)
 {
   while (1) {
-    {
-      int j = 0;
-      /*@ assert i ≤ 0; */ ;
-      int k = 0;
-      int z = 0;
-      int w = 0;
-    }
+    int j = 0;
+    /*@ assert i ≤ 0; */ ;
+    int k = 0;
+    int z = 0;
+    int w = 0;
   }
   return;
 }

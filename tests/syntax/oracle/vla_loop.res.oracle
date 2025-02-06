@@ -13,20 +13,18 @@ void awhile(int x)
 {
   int *p;
   while (1) {
-    {
-      unsigned int __lengthof_a1;
-      /*@ assert alloca_bounds: 0 < sizeof(int) * x ≤ 4294967295; */ ;
-      __lengthof_a1 = (unsigned int)x;
-      int *a1 = __fc_vla_alloc(sizeof(int) * __lengthof_a1);
-      p = (int *)(& a1);
-      if (x) {
-        __fc_vla_free((void *)a1);
-        break;
-      }
-      else {
-        __fc_vla_free((void *)a1);
-        continue;
-      }
+    unsigned int __lengthof_a1;
+    /*@ assert alloca_bounds: 0 < sizeof(int) * x ≤ 4294967295; */ ;
+    __lengthof_a1 = (unsigned int)x;
+    int *a1 = __fc_vla_alloc(sizeof(int) * __lengthof_a1);
+    p = (int *)(& a1);
+    if (x) {
+      __fc_vla_free((void *)a1);
+      break;
+    }
+    else {
+      __fc_vla_free((void *)a1);
+      continue;
     }
   }
   return;

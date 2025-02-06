@@ -36,18 +36,16 @@ void main(void)
     /*@ loop invariant 1 ≤ b ≤ c ∧ g ≡ b * 2;
         loop variant b; */
     while (1) {
-      {
-        int tmp;
-        d += f[b] * a;
-        g --;
-        f[b] = d % g;
-        tmp = g;
-        g --;
-        d /= tmp;
-        b --;
-        if (! b) break;
-        d *= b;
-      }
+      int tmp;
+      d += f[b] * a;
+      g --;
+      f[b] = d % g;
+      tmp = g;
+      g --;
+      d /= tmp;
+      b --;
+      if (! b) break;
+      d *= b;
     }
     c -= 14;
     print4(e + d / a);
