@@ -67,7 +67,7 @@ let pow2 e =
    - ⌊x⌋ + ⌊y⌋ ≤ ⌊x + y⌋ ≤ ⌊x⌋ + ⌊y⌋ + 1 ;
    - ⌊-x⌋ = -⌈x⌉ ;
    - ⌈x⌉ = ⌊x⌋ + 1 ;
-   Thus, we deduce that ⌊log₂ n⌋ - ⌊log₂ d⌋ - 1 ≤ r ≤ ⌊log₂ n⌋ - ⌊log₂ d⌋. *)
+     Thus, we deduce that ⌊log₂ n⌋ - ⌊log₂ d⌋ - 1 ≤ r ≤ ⌊log₂ n⌋ - ⌊log₂ d⌋. *)
 let log2 q =
   if Q.(q <= zero) then raise (Invalid_argument (Q.to_string q)) ;
   let num = Q.num q |> Z.log2 and den = Q.den q |> Z.log2 in
