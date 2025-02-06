@@ -349,6 +349,7 @@ type automaton = {
   graph : graph;
   entry_point : vertex;
   return_point : vertex;
+  exit_points : vertex list;
   stmt_table : (vertex * vertex) StmtTable.t;
 }
 
@@ -362,6 +363,7 @@ module Automaton = Datatype.Make
           graph=G.create ();
           entry_point=dummy_vertex;
           return_point=dummy_vertex;
+          exit_points=[];
           stmt_table=StmtTable.create 0;
         }]
       let name = "Interpreted_automata.Automaton"
@@ -568,7 +570,7 @@ let build_automaton ~annotations kf =
   (* Entry and return point in the automaton *)
   let entry_point = add_vertex ()
   and return_point = add_vertex () in
-  let exit_point = add_vertex () in
+  let exit_points : vertex list ref = ref [] in
 
   (* AST traversal *)
   let rec do_block control kinstr labels block =
@@ -627,7 +629,10 @@ let build_automaton ~annotations kf =
         let dest =
           if Cil.instr_falls_through instr
           then control.dest
-          else exit_point
+          else
+            let v = add_vertex () in
+            exit_points := v :: !exit_points;
+            v
         in
         add_edge control.src dest kinstr (Instr (instr, stmt)) loc;
         dest
@@ -872,7 +877,14 @@ let build_automaton ~annotations kf =
   List.iter remove_unreachable unreachables;
 
   (* Build the record *)
-  let automaton = {graph = g; entry_point; return_point; stmt_table = table} in
+  let automaton =
+    { graph = g;
+      entry_point;
+      return_point;
+      exit_points = !exit_points;
+      stmt_table = table;
+    }
+  in
 
   (* Debug output *)
   if debug_output_to_dot then begin

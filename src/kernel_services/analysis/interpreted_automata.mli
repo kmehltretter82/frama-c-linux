@@ -125,14 +125,19 @@ module Edge : Datatype.S_with_collections with type t = vertex edge
 
 
 (** An interpreted automaton for a given function is a graph whose edges are
-    guards and commands and always containing two special nodes which are the
-    entry point and the return point of the function. It also comes with
-    a table linking Cil statements to their starting and ending vertex *)
-
+    guards and commands.
+    - [graph] is the control flow graph
+    - [entry_point]: each execution of the function starts at this vertex
+    - [return_point]: return statements links to this vertex
+    - [exit_points]: each call to a non-returning function (declared with the C
+      attribute "noreturn") leads to a vertex with no successor of this list
+    - [stmt_table]: this table links statements to their starting and ending
+      vertex *)
 type automaton = {
   graph : graph;
   entry_point : vertex;
   return_point : vertex;
+  exit_points : vertex list;
   stmt_table : (vertex * vertex) Cil_datatype.Stmt.Hashtbl.t;
 }
 
