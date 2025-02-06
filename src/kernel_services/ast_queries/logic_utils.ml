@@ -270,12 +270,10 @@ let real_of_float s f =
   { r_literal = s ; r_nearest = f ; r_upper = f ; r_lower = f }
 
 let real_of_parsed s p =
-  let open Floating_point in
-  {
-    r_literal = s ; r_nearest = p.f_nearest ;
-    r_upper = p.f_upper ;
-    r_lower = p.f_lower ;
-  }
+  let r_nearest = Typed_float.(to_float p.nearest) in
+  let r_upper = Typed_float.(to_float p.upper) in
+  let r_lower = Typed_float.(to_float p.lower) in
+  { r_literal = s ; r_nearest ; r_upper ; r_lower }
 
 let constant_to_lconstant c = match c with
   | CInt64(i,_,s) -> Integer (i,s)
@@ -310,22 +308,23 @@ let lconstant_to_constant c = match c with
   | LEnum e -> CEnum e
 
 let parse_float ?loc literal =
-  let fk,v = Floating_point.parse literal in
   (* If the string has suffix 'F' or 'D', then it represents a single or double
      constant and the nearest parsed float is exact. Otherwise, use the upper
      and lower float computed by [parse]. *)
-  let is_flt =
-    let len = String.length literal in
-    let last = Char.uppercase_ascii literal.[len-1] in
-    last = 'F' || last = 'D'
-  in
+  let len = String.length literal in
+  let last = Char.uppercase_ascii literal.[len-1] in
+  let is_nearest_exact = last = 'F' || last = 'D' in
+  let Parsed (format, p) = Typed_float.parse literal in
+  let nearest = Typed_float.(to_float p.nearest) in
+  let fkind = Typed_float.parsed_fkind format in
   let creal =
-    if is_flt
-    then real_of_float literal v.Floating_point.f_nearest
-    else real_of_parsed literal v in
+    if is_nearest_exact
+    then real_of_float literal nearest
+    else real_of_parsed literal p
+  in
   let vreal = Logic_const.term ?loc (TConst(LReal creal)) Lreal in
-  if is_flt then
-    let ty = Cil_const.mk_tfloat fk in
+  if is_nearest_exact then
+    let ty = Cil_const.mk_tfloat fkind in
     Logic_const.term ?loc (TCast(false, Ctype ty,vreal)) (Ctype ty)
   else vreal
 

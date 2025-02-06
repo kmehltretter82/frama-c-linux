@@ -287,7 +287,7 @@ struct
     let use_hex = true in
     let qf = Q.to_float q in
     let f = match cfloat_of_tau tau with
-      | Float32 -> Floating_point.round_to_single_precision_float qf
+      | Float32 -> Floating_point.round_to_single_precision qf
       | Float64 -> qf
     in
     let s = Pretty_utils.to_string (Floating_point.pretty_normal ~use_hex) f in

@@ -532,20 +532,18 @@ let eval_float_constant f fkind fstring =
     let fl, fu = match fstring with
       | Some "INFINITY" -> f, f (* Special case for the INFINITY macro. *)
       | Some string when fkind = Cil_types.FLongDouble || all_rounding () ->
-        let open Floating_point in
-        let {f_lower; f_upper} = snd (parse string) in
+        let Parsed (_, p) = Typed_float.parse string in
         (* Computations are done in double. For long double constants, if we
            reach infinity, we must use the interval [max_double..infty] to be
            sound. Here we even use [-infty..infty]. *)
-        if Fc_float.is_infinite f_lower && Fc_float.is_infinite f_upper
-        then
+        if Typed_float.(is_infinite p.lower && is_infinite p.upper) then
           begin
             Self.warning ~current:true ~once:true
               "cannot parse floating-point constant, \
                returning imprecise result";
             neg_infinity, infinity
           end
-        else f_lower, f_upper
+        else Typed_float.(to_float p.lower, to_float p.upper)
       | None | Some _ -> f, f
     in
     let fl = Fval.F.of_float fl

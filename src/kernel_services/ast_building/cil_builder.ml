@@ -339,12 +339,8 @@ struct
     Cil_types.CInt64(iv,kind,None)
 
   let mk_cfloat kind fv =
-    let open Cil_types in
-    let fv =
-      match kind with
-      | FFloat -> Floating_point.round_to_single_precision_float fv
-      | FDouble | FLongDouble -> fv
-    in CReal(fv,kind,None)
+    let fv = Floating_point.round_if_single_precision kind fv in
+    Cil_types.CReal(fv, kind, None)
 
   let of_cint ?(kind=Cil_types.IInt) iv =
     `const (CilConstant (mk_cint kind iv))

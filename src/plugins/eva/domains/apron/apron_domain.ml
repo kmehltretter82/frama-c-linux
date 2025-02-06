@@ -713,7 +713,7 @@ module Apron_Polka_Equalities = struct
 end
 
 (** Apron manager allocation changes the rounding mode. *)
-let () = Floating_point.set_round_nearest_even ()
+let () = Floating_point.set_rounding_mode Nearest_even
 
 let make (module Man: Input) =
   let module Domain = Make (Man) in

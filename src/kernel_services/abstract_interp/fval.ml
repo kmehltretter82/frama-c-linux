@@ -129,9 +129,9 @@ module F = struct
     | Real | Long_Double -> f'
     | Double -> f
     | Single ->
-      Floating_point.set_round_upward ();
-      let f = Floating_point.round_to_single_precision_float f in
-      Floating_point.set_round_nearest_even ();
+      Floating_point.set_rounding_mode Upward ;
+      let f = Floating_point.round_to_single_precision f in
+      Floating_point.set_rounding_mode Nearest_even ;
       f
 
   let prev_float fkind f' =
@@ -140,9 +140,9 @@ module F = struct
     | Real | Long_Double -> f'
     | Double -> f
     | Single ->
-      Floating_point.set_round_downward ();
-      let f = Floating_point.round_to_single_precision_float f in
-      Floating_point.set_round_nearest_even ();
+      Floating_point.set_rounding_mode Downward ;
+      let f = Floating_point.round_to_single_precision f in
+      Floating_point.set_rounding_mode Nearest_even ;
       f
 end
 
@@ -160,19 +160,12 @@ let zeros = inject ~nan:false (-0.) 0.
    32-bit representations: lower bits are 0, and the value fits inside
    a 32-bit float. *)
 let check_representability prec b e =
-  if prec = Single &&
-     (Floating_point.round_to_single_precision_float b <> b ||
-      Floating_point.round_to_single_precision_float e <> e)
-  then
-    let this_one fmt x =
-      if Floating_point.round_to_single_precision_float x <> x
-      then Format.pp_print_string fmt "->"
-    in
+  let single f = Floating_point.round_to_single_precision f in
+  let this_one fmt x = if single x <> x then Format.pp_print_string fmt "->" in
+  if prec = Single && (single b <> b || single e <> e) then
     Kernel.fatal "Ival: invalid float32, %ab=%g (%a) %ae=%g (%a)"
-      this_one b
-      b (Floating_point.pretty_normal ~use_hex:true) b
-      this_one e
-      e (Floating_point.pretty_normal ~use_hex:true) e
+      this_one b b (F.pretty_normal ~use_hex:true) b
+      this_one e e (F.pretty_normal ~use_hex:true) e
 
 let inject ?(nan = false) prec b e =
   check_representability prec b e;

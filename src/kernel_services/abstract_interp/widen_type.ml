@@ -240,10 +240,10 @@ let float_hints stmto baseo hints =
 (* default set of hints. Depends on the machdep *)
 let default () =
   let int_default = IntSet.of_list (List.map Integer.of_int [-1;0;1]) in
-  let float_default =
-    let l = [0.0;1.0;10.0;1e10;Floating_point.max_single_precision_float;1e80] in
-    FloatSet.(union (of_list l) (of_list (List.map (fun x -> -. x) l)))
-  in
+  let max_32 = Floating_point.largest_finite_float_of Single in
+  let positives = [ 0.0 ; 1.0 ; 10.0 ; 1e10 ; max_32 ; 1e80 ] in
+  let negatives = List.map (fun x -> -.x) positives in
+  let float_default = FloatSet.(union (of_list positives) (of_list negatives)) in
   join (num_hints None None int_default) (float_hints None None float_default)
 
 (*

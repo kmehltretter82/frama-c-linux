@@ -752,17 +752,14 @@ module Make
     | TSPtr of integer_range
     | TSFloat of fkind
 
-  let round fkind f = match fkind with
-    | FFloat -> Floating_point.round_to_single_precision_float f
-    | FDouble | FLongDouble -> f
-
   let truncate_float_bound fkind bound bound_kind expr value =
     let next_int, prev_float, is_beyond = match bound_kind with
       | Alarms.Upper_bound -> Integer.succ, Fval.F.prev_float, Integer.ge
       | Alarms.Lower_bound -> Integer.pred, Fval.F.next_float, Integer.le
     in
     let ibound = next_int bound in
-    let fbound = round fkind (Integer.to_float ibound) in
+    let fbound = Integer.to_float ibound in
+    let fbound = Floating_point.round_if_single_precision fkind fbound in
     let float_bound =
       if is_beyond (Integer.of_float fbound) ibound
       then prev_float (Fval.kind fkind) fbound

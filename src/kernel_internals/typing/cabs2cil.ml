@@ -5763,15 +5763,15 @@ and doExp local_env
           finishExp [] (unspecified_chunk empty) result (typeOf result)
 
         | Cabs.CONST_FLOAT str -> begin
-            Floating_point.set_round_nearest_even ();
-            let kind, parsed_float = Floating_point.parse str in
-            let nearest_float = parsed_float.Floating_point.f_nearest in
-            if Floating_point.(parsed_float.f_lower <> parsed_float.f_upper)
-            then
+            Floating_point.(set_rounding_mode Nearest_even) ;
+            let Parsed (format, parsed) = Typed_float.parse str in
+            let nearest_float = Typed_float.to_float parsed.nearest in
+            if Typed_float.(parsed.lower <> parsed.upper) then
               Kernel.warning ~wkey:Kernel.wkey_decimal_float ~current:true
                 "Floating-point constant %s is not represented exactly. \
                  Will use %a."
                 str (Floating_point.pretty_normal ~use_hex:true) nearest_float;
+            let kind = Typed_float.parsed_fkind format in
             let node = Const (CReal (nearest_float, kind, Some str)) in
             let typ = mk_tfloat kind in
             finishExp [] (unspecified_chunk empty) (new_exp ~loc node) typ

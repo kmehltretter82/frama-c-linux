@@ -2689,12 +2689,9 @@ let intKindForValue i (unsigned: bool) =
   else raise Not_representable
 
 (* True is an double constant is finite for a kind *)
-let isFiniteFloat fk v =
-  Floating_point.isfinite @@
-  match fk with
-  | FFloat -> Floating_point.round_to_single_precision_float v
-  | _ -> v
-
+let isFiniteFloat fk f =
+  let f = Floating_point.round_if_single_precision fk f in
+  Floating_point.is_finite f
 
 let isExactFloat fk r =
   r.r_upper = r.r_lower && isFiniteFloat fk r.r_nearest
@@ -2728,15 +2725,8 @@ let integer_constant i = CInt64(Integer.of_int i, IInt, None)
 let integer ~loc (i: int) = new_exp ~loc (Const (integer_constant i))
 
 let kfloat ~loc k f =
-  let is_single_precision =
-    match k with FFloat -> true | FDouble | FLongDouble -> false
-  in
-  let f =
-    if is_single_precision then
-      Floating_point.round_to_single_precision_float f
-    else f
-  in
-  new_exp ~loc (Const (CReal(f,k,None)))
+  let f = Floating_point.round_if_single_precision k f in
+  new_exp ~loc (Const (CReal (f, k, None)))
 
 let zero      ~loc = integer ~loc 0
 let one       ~loc = integer ~loc 1
@@ -4220,19 +4210,14 @@ and constFold (machdep: bool) (e: exp) : exp =
         end
       | Const (CReal(f,_,_)), (TInt ik | TEnum {ekind = ik}) when t.tattr = [] ->
         (* See above *)
-        begin
-          try
-            let i = Floating_point.truncate_to_integer f in
-            let _i', truncated = truncateInteger64 ik i in
-            if truncated then (* Float is too big. Do not const-fold *)
-              new_exp ~loc (CastE (t, e))
-            else
-              kinteger64 ~loc ~kind:ik i
-          with Floating_point.Float_Non_representable_as_Int64 _ -> (* too big*)
-            new_exp ~loc (CastE (t, e))
+        let truncated i = truncateInteger64 ik i |> snd in
+        begin match Floating_point.truncate_to_integer f with
+          | Underflow | Overflow -> new_exp ~loc (CastE (t, e))
+          | Integer i when truncated i -> new_exp ~loc (CastE (t, e))
+          | Integer i -> kinteger64 ~loc ~kind:ik i
         end
       | Const (CReal(f,_,_)), TFloat FFloat when t.tattr = [] ->
-        let f = Floating_point.round_to_single_precision_float f in
+        let f = Floating_point.round_to_single_precision f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CReal(f,_,_)), TFloat FDouble when t.tattr = [] ->
         new_exp ~loc (Const (CReal (f,FDouble,None)))
@@ -4240,7 +4225,7 @@ and constFold (machdep: bool) (e: exp) : exp =
          how to handle this type anyway. *)
       | Const (CInt64(i,_,_)), TFloat FFloat when t.tattr = [] ->
         let f = Integer.to_float i in
-        let f = Floating_point.round_to_single_precision_float f in
+        let f = Floating_point.round_to_single_precision f in
         new_exp ~loc (Const (CReal (f,FFloat,None)))
       | Const (CInt64(i,_,_)), TFloat FDouble when t.tattr = [] ->
         let f = Integer.to_float i in
