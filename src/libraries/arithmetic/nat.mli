@@ -41,9 +41,9 @@ val prev : 'n succ nat -> 'n nat
 val to_int : 'n nat -> int
 
 (** Returns a positive or null natural. If the given parameter is stricly
-    negative then [None] is returned. This function complexity is O(n). *)
+    negative then [None] is returned. This function complexity is O(1). *)
 val of_int : int -> positive_or_null option
 
 (** Returns a strictly positive natural. If the given parameter is less or equal
-    than zero, then [None] is returned. This function complexity is O(n). *)
+    than zero, then [None] is returned. This function complexity is O(1). *)
 val of_strictly_positive_int : int -> strictly_positive option
