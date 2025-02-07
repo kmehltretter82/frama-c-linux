@@ -32,25 +32,4 @@ void __fc_sig_dfl(int sig) {}
 void __fc_sig_ign(int sig) {}
 void __fc_sig_err(int sig) {}
 
-__fc_sighandler_t signal(int sig, __fc_sighandler_t func) {
-  static volatile int nondet;
-  if (nondet && sig >= 0 && sig <= SIGRTMAX && func != NULL) {
-    __fc_sighandler_t old = __fc_signal_handlers[sig];
-    __fc_signal_handlers[sig] = func;
-
-    // If __fc_signal_handlers[sig] was not already set, choose between
-    // SIG_DFL and SIG_IGN now
-    if (old) {
-      return old;
-    } else if (nondet) {
-      return SIG_DFL;
-    } else {
-      return SIG_IGN;
-    }
-  } else {
-    errno = EINVAL;
-    return SIG_ERR;
-  }
-}
-
 __POP_FC_STDLIB

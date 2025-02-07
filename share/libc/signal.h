@@ -135,15 +135,31 @@ __FC_EXTERN __fc_sighandler_t __fc_signal_handlers[SIGRTMAX+1];
 /*@ // missing: errno may be set to EINVAL when trying to set some signals
   requires valid_signal: 0 <= sig <= SIGRTMAX;
   requires func_not_null: func != \null;
+
   assigns __fc_signal_handlers[sig] \from func;
   assigns \result \from \old(__fc_signal_handlers[sig]),
                         SIG_ERR, SIG_DFL, SIG_IGN;
+
   ensures result_not_null: \result != \null;
-  ensures result_ok_or_error:
-    \result == SIG_ERR ||
-    ((\result == SIG_DFL || \result == SIG_IGN ||
-      \result == \old(__fc_signal_handlers[sig])) &&
-     __fc_signal_handlers[sig] == func);
+  ensures handler_saved_or_unchanged:
+    __fc_signal_handlers[sig] == func
+    || __fc_signal_handlers[sig] == \old(__fc_signal_handlers[sig]);
+  ensures handler_saved_if_ok:
+    \result == SIG_ERR || __fc_signal_handlers[sig] == func;
+
+  behavior old_handler_is_set:
+    assumes old_handler_not_null: __fc_signal_handlers[sig] != \null;
+    ensures result_old_handler_or_error:
+      \result == \old(__fc_signal_handlers[sig]) ||
+      \result == SIG_ERR;
+
+  behavior old_handler_not_set:
+    assumes old_handler_null: __fc_signal_handlers[sig] == \null;
+    ensures result_ok_or_error:
+      \result == SIG_DFL || \result == SIG_IGN || \result == SIG_ERR;
+
+  complete behaviors;
+  disjoint behaviors;
 */
 extern void (*signal(int sig, void (*func)(int)))(int);
 
