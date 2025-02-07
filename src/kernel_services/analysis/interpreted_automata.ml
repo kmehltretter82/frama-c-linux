@@ -765,35 +765,35 @@ let build_automaton ~annotations kf =
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
-            let loop_head_point = add_vertex control.blocks in
-            add_edge control.src loop_head_point kinstr Skip loc;
-            loop_head_point.vertex_info <-
+            let loop_head = add_vertex control.blocks in
+            add_edge control.src loop_head kinstr Skip loc;
+            loop_head.vertex_info <-
               LoopHead { stmt; level = control.loop_level };
             let labels =
               LabelMap.(
                 control.labels
                 |> add_builtin LoopEntry control.src
-                |> add_builtin LoopCurrent loop_head_point)
+                |> add_builtin LoopCurrent loop_head)
             in
             (* for variant to have one point at the end of the loop *)
-            let loop_end_point = add_vertex control.blocks in
             let start_annot, end_annot =
               List.partition
                 (function { annot_content = AVariant _ } -> false | _ -> true)
                 (code_annot stmt)
             in
-            let loop_start_body =
-              do_annot_list {control with src = loop_head_point; labels} start_annot
+            let body_start =
+              do_annot_list {control with src = loop_head; labels} start_annot
             in
+            let body_end = add_vertex control.blocks in
             let loop_back =
-              do_annot_list {control with src = loop_end_point; labels} end_annot
+              do_annot_list {control with src = body_end; labels} end_annot
             in
-            add_edge loop_back loop_head_point kinstr Skip loc;
+            add_edge loop_back loop_head kinstr Skip loc;
             { control with
-              src = loop_start_body;
-              dest = loop_end_point;
+              src = body_start;
+              dest = body_end;
               break = control.dest;
-              continue = loop_head_point;
+              continue = body_end;
               loop_level = control.loop_level + 1;
               labels;
             }
