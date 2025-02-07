@@ -12,6 +12,10 @@ struct S {
     int fi;
     short fs;
     char fca [6];
+    struct T {
+        int sti;
+        short sts;
+    } st;
 };
 
 /*@ predicate pointed(struct S *p, struct S * q) = p==q || \separated(p,q);
@@ -28,7 +32,7 @@ copy_struct (struct S * a, struct S * b)
 {
     *a = *b;
     //
-    return a->fi + a->fs + a->fca[3] ;
+    return a->fi + a->fs + a->fca[3] + a->st.sti + a->st.sts;
 }
 
 /**/
@@ -42,5 +46,5 @@ int
 zeroify_S_fs (struct S * a, struct S * b) {
     *a = *b;
     a->fs = b->fs ^ b->fs ;
-    return a->fi + a->fs + a->fca[4] ;
+    return a->fi + a->fs + a->fca[4] + a->st.sti ;
 }
