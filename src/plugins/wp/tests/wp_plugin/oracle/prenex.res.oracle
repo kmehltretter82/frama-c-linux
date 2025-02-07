@@ -27,6 +27,7 @@ Assume {
   If i < n
   Then {
     Let x = Mint_0[shift_sint32(p, i)].
+    (* Block In *)
     Have: (ta_j_0=false).
     (* Invariant 'J' *)
     Have: (0 <= j) /\ (j <= m).
