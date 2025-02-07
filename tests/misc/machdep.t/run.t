@@ -22,6 +22,8 @@
     __retres = 8388607 - 1;
     return __retres;
   }
+  
+  
 
 
 
@@ -51,6 +53,8 @@ Note: we can't use only -D below, as the __fc_machdep.h define takes precedence.
     __retres = 8388607 - 42;
     return __retres;
   }
+  
+  
 
 
 
@@ -81,6 +85,8 @@ corresponding `-save` was performed
     __retres = 8388607 - 1;
     return __retres;
   }
+  
+  
 
 
 
@@ -107,3 +113,5 @@ corresponding `-save` was performed
     __retres = 8388607 - 1;
     return __retres;
   }
+  
+  
