@@ -33,6 +33,9 @@ o!  Kernel    [2025-02-17] New module Ast_attributes for attribute related
               provided it can be evaluated to an integer constant.
               Fixes ##2695 and #@1413
 o!  Kernel    [2025-02-13] Move some functions from Logic_typing to Logic_utils
+-   Alias     [2025-02-07] New message key printer:show-libc-vars for
+              including variables stemming from the C library in the console
+              output (now disabled by default).
 o   Kernel    [2025-02-05] New parameter builder `Float` for decimal
               command-line parameters.
 o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every

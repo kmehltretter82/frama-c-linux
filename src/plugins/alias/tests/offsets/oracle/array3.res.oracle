@@ -7,50 +7,38 @@
 [alias] analysing global variable definiton: __fc_p_random48_counter =
   __fc_random48_counter;
 [alias] May-aliases after global variable definition  __fc_p_random48_counter  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+  <none>
 [alias] May-alias graph after global variable definition  __fc_p_random48_counter
-  is    0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  is    0:{  } → 1:{  }
 [alias] analysing function: main
 [alias] analysing instruction: int *x = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases after instruction
-  int *x = malloc((unsigned long)4 * sizeof(int));  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+  int *x = malloc((unsigned long)4 * sizeof(int));  are  <none>
 [alias] May-alias graph after instruction
   int *x = malloc((unsigned long)4 * sizeof(int));  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  4:{ x } → 5:{  }
+  0:{  } → 1:{  }   4:{ x } → 5:{  }
 [alias] analysing instruction: int *y = malloc((unsigned long)4 * sizeof(int));
 [alias] May-aliases after instruction
-  int *y = malloc((unsigned long)4 * sizeof(int));  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+  int *y = malloc((unsigned long)4 * sizeof(int));  are  <none>
 [alias] May-alias graph after instruction
   int *y = malloc((unsigned long)4 * sizeof(int));  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  4:{ x } → 5:{  }   6:{ y } → 7:{  }
+  0:{  } → 1:{  }   4:{ x } → 5:{  }   6:{ y } → 7:{  }
 [alias] analysing instruction: x = mat[0];
-[alias] May-aliases after instruction  x = mat[0];  are
-  { __fc_random48_counter; __fc_p_random48_counter }  { mat[0..]; x }
+[alias] May-aliases after instruction  x = mat[0];  are  { mat[0..]; x }
 [alias] May-alias graph after instruction  x = mat[0];  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  4:{ x } → 5:{  }   6:{ y } → 7:{  }   8:{ mat } → 4:{ x }
+  0:{  } → 1:{  }   4:{ x } → 5:{  }   6:{ y } → 7:{  }
+  8:{ mat } → 4:{ x }
 [alias] analysing instruction: y = mat[1];
-[alias] May-aliases after instruction  y = mat[1];  are
-  { __fc_random48_counter; __fc_p_random48_counter }  { mat[0..]; x; y }
+[alias] May-aliases after instruction  y = mat[1];  are  { mat[0..]; x; y }
 [alias] May-alias graph after instruction  y = mat[1];  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  6:{ x; y } → 7:{  }   8:{ mat } → 6:{ x; y }
+  0:{  } → 1:{  }   6:{ x; y } → 7:{  }   8:{ mat } → 6:{ x; y }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are
-  { __fc_random48_counter; __fc_p_random48_counter }  { mat[0..]; x; y }
+[alias] May-aliases after instruction  __retres = 0;  are  { mat[0..]; x; y }
 [alias] May-alias graph after instruction  __retres = 0;  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  6:{ x; y } → 7:{  }   8:{ mat } → 6:{ x; y }
-[alias] May-aliases at the end of function main:
-  { __fc_random48_counter; __fc_p_random48_counter }  { mat[0..]; x; y }
+  0:{  } → 1:{  }   6:{ x; y } → 7:{  }   8:{ mat } → 6:{ x; y }
+[alias] May-aliases at the end of function main: { mat[0..]; x; y }
 [alias] May-alias graph at the end of function main:
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  6:{ x; y } → 7:{  }   8:{ mat } → 6:{ x; y }
+  0:{  } → 1:{  }   6:{ x; y } → 7:{  }   8:{ mat } → 6:{ x; y }
 [alias] Summary of function main:
-  formals:     returns: __retres
-  state: { __fc_random48_counter; __fc_p_random48_counter }  { mat[0..]; x; y }
+  formals:     returns: __retres    state: { mat[0..]; x; y }
 [alias] Analysis complete

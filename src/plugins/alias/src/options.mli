@@ -52,5 +52,5 @@ module Warn : sig
 end
 
 module DebugKeys : sig
-  val lvals : category
+  val show_libc_vars : category
 end

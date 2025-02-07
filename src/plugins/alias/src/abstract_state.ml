@@ -273,9 +273,31 @@ module Pretty = struct
     Format.fprintf fmt "@]";
     Format.fprintf fmt "@]"
 
+  let libc_regexp = Str.regexp "^__fc_"
+
+  let vars_filter_libc vars =
+    if Options.is_debug_key_enabled Options.DebugKeys.show_libc_vars
+    then vars
+    else
+      let is_from_libc vi = Str.string_match libc_regexp vi.vname 0 in
+      VarSet.filter (fun v -> not @@ is_from_libc v) vars
+
+  let lvals_filter_libc lvals =
+    if Options.is_debug_key_enabled Options.DebugKeys.show_libc_vars
+    then lvals
+    else
+      let rec is_from_libc = function
+        | Var vi, _ -> Str.string_match libc_regexp vi.vname 0
+        | Mem {enode = Lval l; _}, _ -> is_from_libc l
+        | Mem _, _ -> false
+      in
+      LSet.filter (fun lval -> not @@ is_from_libc lval) lvals
+
   let pp_graph fmt s =
     let is_first = ref true in
-    let pp_node v fmt lset = Format.fprintf fmt "%d:%a" v VarSet.pretty lset in
+    let pp_node v fmt vars =
+      Format.fprintf fmt "%d:%a" v
+        VarSet.pretty (vars_filter_libc vars) in
     let pp_edge e =
       let v1 = E.src e and v2 = E.dst e in
       if !is_first then is_first := false else Format.fprintf fmt "@;<3>";
@@ -297,6 +319,11 @@ module Pretty = struct
 
   let pp_aliases fmt s =
     let alias_sets = Readout.alias_sets_lvals s in
+    let alias_sets =
+      List.filter
+        (fun lvals -> LSet.cardinal lvals >= 2)
+        (List.map lvals_filter_libc alias_sets)
+    in
     Pretty_utils.pp_list ~empty:"<none>" ~sep:"@;<2>" LSet.pretty fmt alias_sets
 end
 

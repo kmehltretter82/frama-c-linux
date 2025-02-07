@@ -1,124 +1,77 @@
 [kernel] Parsing arrays.c (with preprocessing)
 [alias] analysing global variable definiton: __fc_p_fopen = __fc_fopen;
-[alias] May-aliases after global variable definition  __fc_p_fopen  are
-  { __fc_fopen; __fc_p_fopen }
+[alias] May-aliases after global variable definition  __fc_p_fopen  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_fopen  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
+  0:{  } → 1:{  }
 [alias] analysing global variable definiton: __fc_p_tmpnam = __fc_tmpnam;
-[alias] May-aliases after global variable definition  __fc_p_tmpnam  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
+[alias] May-aliases after global variable definition  __fc_p_tmpnam  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_tmpnam  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }
 [alias] analysing global variable definiton: __fc_p_ctermid = __fc_ctermid;
-[alias] May-aliases after global variable definition  __fc_p_ctermid  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }
+[alias] May-aliases after global variable definition  __fc_p_ctermid  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_ctermid  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
 [alias] analysing global variable definiton: __fc_p_cuserid = __fc_cuserid;
-[alias] May-aliases after global variable definition  __fc_p_cuserid  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }
+[alias] May-aliases after global variable definition  __fc_p_cuserid  are  <none>
 [alias] May-alias graph after global variable definition  __fc_p_cuserid  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }
 [alias] analysing function: main
 [alias] analysing instruction: t[0] = a;
-[alias] May-aliases after instruction  t[0] = a;  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }
-  { a; t[0..] }
+[alias] May-aliases after instruction  t[0] = a;  are  { a; t[0..] }
 [alias] May-alias graph after instruction  t[0] = a;  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   16:{ t } → 17:{ a }
-  17:{ a } → 18:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   16:{ t } → 17:{ a }   17:{ a } → 18:{  }
 [alias] analysing instruction: z = & t;
 [alias] May-aliases after instruction  z = & t;  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }
   { *z; t }  { (*z)[0..]; a; t[0..] }
 [alias] May-alias graph after instruction  z = & t;  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   21:{ z } → 22:{ t }
-  22:{ t } → 23:{ a }   23:{ a } → 24:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   21:{ z } → 22:{ t }   22:{ t } → 23:{ a }
+  23:{ a } → 24:{  }
 [alias] analysing instruction: q = z;
 [alias] May-aliases after instruction  q = z;  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }  { z; q }
-  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; t[0..] }
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; t[0..] }
 [alias] May-alias graph after instruction  q = z;  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   26:{ z; q } → 27:{ t }
-  27:{ t } → 28:{ a }   28:{ a } → 29:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   26:{ z; q } → 27:{ t }   27:{ t } → 28:{ a }
+  28:{ a } → 29:{  }
 [alias] analysing instruction: b = (*(z + 0))[0];
 [alias] May-aliases after instruction  b = (*(z + 0))[0];  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }  { z; q }
-  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; t[0..] }
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; t[0..] }
 [alias] May-alias graph after instruction  b = (*(z + 0))[0];  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   26:{ z; q } → 27:{ t }
-  27:{ t } → 30:{ a; b }   30:{ a; b } → 31:{  }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   26:{ z; q } → 27:{ t }   27:{ t } → 30:{ a; b }
+  30:{ a; b } → 31:{  }
 [alias] analysing instruction: n = (*(q + 0))[0];
 [alias] May-aliases after instruction  n = (*(q + 0))[0];  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }  { z; q }
-  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
 [alias] May-alias graph after instruction  n = (*(q + 0))[0];  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   26:{ z; q } → 27:{ t }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   26:{ z; q } → 27:{ t }
   27:{ t } → 32:{ a; b; n }   32:{ a; b; n } → 33:{  }
 [alias] analysing instruction: printf("%d\n%d\n",a == b,a == n);
 [alias:undefined:fn] arrays.c:17: Warning: function printf has no definition
 [alias] May-aliases after instruction  printf("%d\n%d\n",a == b,a == n);  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }  { z; q }
-  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
 [alias] May-alias graph after instruction  printf("%d\n%d\n",a == b,a == n);  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   26:{ z; q } → 27:{ t }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   26:{ z; q } → 27:{ t }
   27:{ t } → 32:{ a; b; n }   32:{ a; b; n } → 33:{  }
 [alias] analysing instruction: __retres = 0;
 [alias] May-aliases after instruction  __retres = 0;  are
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }  { z; q }
-  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
 [alias] May-alias graph after instruction  __retres = 0;  is
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   26:{ z; q } → 27:{ t }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   26:{ z; q } → 27:{ t }
   27:{ t } → 32:{ a; b; n }   32:{ a; b; n } → 33:{  }
 [alias] May-aliases at the end of function main:
-  { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-  { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }  { z; q }
-  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
 [alias] May-alias graph at the end of function main:
-  0:{ __fc_fopen; __fc_p_fopen } → 1:{  }
-  4:{ __fc_tmpnam; __fc_p_tmpnam } → 5:{  }
-  8:{ __fc_ctermid; __fc_p_ctermid } → 9:{  }
-  12:{ __fc_cuserid; __fc_p_cuserid } → 13:{  }   26:{ z; q } → 27:{ t }
+  0:{  } → 1:{  }   4:{  } → 5:{  }   8:{  } → 9:{  }
+  12:{  } → 13:{  }   26:{ z; q } → 27:{ t }
   27:{ t } → 32:{ a; b; n }   32:{ a; b; n } → 33:{  }
 [alias] Summary of function main:
   formals:     returns: __retres
-  state: { __fc_fopen; __fc_p_fopen }  { __fc_tmpnam; __fc_p_tmpnam }
-         { __fc_ctermid; __fc_p_ctermid }  { __fc_cuserid; __fc_p_cuserid }
-         { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
+  state: { z; q }  { *z; *q; t }  { (*z)[0..]; (*q)[0..]; a; b; n; t[0..] }
 [alias] Analysis complete
