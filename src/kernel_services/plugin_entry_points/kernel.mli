@@ -472,8 +472,19 @@ module UnfoldingForce: Parameter_sig.Bool
     called for well preparing the AST. *)
 module Machdep: sig
   include Parameter_sig.String
+
+  (** [get_dir] returns the directory containing default machdeps.
+      @since Frama-C+dev *)
   val get_dir : unit -> LoadState.t
+
+  (** [get_default_file] return the file with the name format of machdep from
+      the default machdep directory.
+      @since Frama-C+dev *)
   val get_default_file : string -> LoadState.t
+
+  (** [is_default] decides if the parameter refers to a default machdep or a
+      user file.
+      @since Frama-C+dev *)
   val is_default : string -> bool
 end
 
