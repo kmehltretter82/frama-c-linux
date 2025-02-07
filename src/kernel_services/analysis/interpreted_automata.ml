@@ -397,9 +397,16 @@ let exit_strategy automaton wto =
     jump. *)
 type goto_list = (vertex * stmt * stmt) list ref
 
-(** The following record contains the control points from and to which the
-    current processed node of the AST may connect. *)
-type control_points = {
+(** The following record contains all the context information needed to build
+    edge and vertices of the graph:
+    - [src]: the vertex from which the current transitions must be built
+    - [dest]: the vertex to which the current transitions must be built
+    - [continue]: the vertex to which continue statements must jump
+    - [break]: the vertex to which break statements must jump
+    - [return]: the vertex to which return statements must jump
+    - [blocks]: the englobing blocks of the current transitions
+    - [loop_level]: the number of loop englobing the current transitions *)
+type control_context = {
   src: vertex;
   dest: vertex;
   continue: vertex;
