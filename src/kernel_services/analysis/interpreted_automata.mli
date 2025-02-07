@@ -52,13 +52,12 @@ type 'a control =
       the given cases and default vertices. *)
 
 (** Vertices are control points. When a vertice is the *start* of a statement,
-    this statement is kept in [vertex_start_of]. Currently, this statement is
-    kept for two reasons: to know when callbacks should be called and when
-    annotations should be read. *)
+    this statement is kept in [vertex_start_of]. *)
 
 type vertex = private {
   vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
+  vertex_blocks : Cil_types.block list;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;

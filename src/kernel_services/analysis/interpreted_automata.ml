@@ -46,6 +46,7 @@ type 'a control =
 type vertex = {
   vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
+  vertex_blocks : Cil_types.block list;
   mutable vertex_start_of : Cil_types.stmt option;
   mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;
@@ -92,6 +93,7 @@ let dummy_kf = List.hd (Cil_datatype.Kf.reprs)
 let dummy_vertex = {
   vertex_kf = dummy_kf;
   vertex_key = -1;
+  vertex_blocks = [];
   vertex_start_of = None;
   vertex_info = NoneInfo;
   vertex_control = Edges;
@@ -402,7 +404,21 @@ type control_points = {
   dest: vertex;
   continue: vertex;
   break: vertex;
+  return: vertex;
+  blocks: Cil_types.block list;
 }
+
+let blocks_closed v1 v2 =
+  let rec aux acc = function
+    | [] -> acc
+    | b :: l ->
+      if List.memq b v2.vertex_blocks then acc
+      else aux (b :: acc) l
+  in
+  aux [] v1.vertex_blocks
+
+let blocks_opened c1 c2 =
+  blocks_closed c2 c1 |> List.rev
 
 
 (** Helpers *)
@@ -493,15 +509,17 @@ let build_automaton ~annotations kf =
   let g = G.create () in
   let table : (vertex * vertex) StmtTable.t = StmtTable.create 17 in
   let gotos : goto_list = ref [] in
+  let exit_points : vertex list ref = ref [] in
   let loop_level = ref 0 in
 
   (* Edges and vertices are numbered consecutively *)
   let next_vertex = ref 0
   and next_edge = ref 0 in
-  let add_vertex () =
+  let add_vertex vertex_blocks =
     let v = {
       vertex_kf = kf;
       vertex_key = !next_vertex;
+      vertex_blocks;
       vertex_start_of = None;
       vertex_info = NoneInfo;
       vertex_control = Edges;
@@ -521,70 +539,61 @@ let build_automaton ~annotations kf =
   in
 
   (* Helpers to add edges *)
-  let build_transitions src dest kinstr loc l =
-    (* Add transitions to the graph *)
-    let rec fold_transition v1 = function
-      | [] ->
-        assert false
-      | [t] ->
-        add_edge v1 dest kinstr t loc
-      | Skip :: l ->
-        fold_transition v1 l
-      | t :: l ->
-        let v2 = add_vertex () in
-        add_edge v1 v2 kinstr t loc;
-        fold_transition v2 l
+  let build_jump src dest stmt guard =
+    (* Build a transition followed with a jump to the [dest] vertex consisting
+       in several enter/leave.
+       Returns the vertex just following the transition, before the enter/leave
+       transitions. *)
+    let kinstr = Kstmt stmt and loc = stmt_loc stmt in
+    (* Add a list of transitions *)
+    let build_enter dest b =
+      assert (b == List.hd dest.vertex_blocks);
+      let blocks = List.tl dest.vertex_blocks in
+      let v = add_vertex blocks in
+      add_edge v dest kinstr (Enter b) loc;
+      v
+    and build_leave dest b =
+      let blocks = b :: dest.vertex_blocks in
+      let v = add_vertex blocks in
+      add_edge v dest kinstr (Leave b) loc;
+      v
     in
-    fold_transition src l
+    let v = dest in
+    let v = List.fold_left build_enter v (blocks_opened src dest) in
+    let v = List.fold_left build_leave v (blocks_closed src dest) in
+    add_edge src v kinstr guard loc;
+    v
   in
-  let build_stmt_next src dest stmt succ transition =
-    (* Also returns the successor of the required transition. *)
-    (* Inserts between next and dest the list of exited and enterd group. *)
-    let exited_blocks = Kernel_function.blocks_closed_by_edge stmt succ
-    and entered_blocks = Kernel_function.blocks_opened_by_edge stmt succ
-    in
-    let l =
-      List.map (fun b -> Leave b) exited_blocks @
-      List.map (fun b -> Enter b) entered_blocks
-    and kinstr = Kstmt stmt and loc = stmt_loc stmt
-    in
-    if l = [] then
-      ( add_edge src dest kinstr transition loc ; dest )
-    else
-      let v = add_vertex () in
-      add_edge src v kinstr transition loc ;
-      build_transitions v dest kinstr loc l ; v
-  in
-  let build_stmt_transition src dest stmt succ transition =
-    ignore (build_stmt_next src dest stmt succ transition) in
 
   let rec do_list do_one control labels = function
     | [] -> assert false
     | stmt :: [] -> do_one control labels stmt
     | stmt :: l ->
-      let point = add_vertex () in
+      let point = add_vertex control.blocks in
       do_one {control with dest = point} labels stmt;
       do_list do_one {control with src = point} labels l
   in
-
-  (* Entry and return point in the automaton *)
-  let entry_point = add_vertex ()
-  and return_point = add_vertex () in
-  let exit_points : vertex list ref = ref [] in
 
   (* AST traversal *)
   let rec do_block control kinstr labels block =
     if block.bstmts = [] then
       add_edge control.src control.dest kinstr Skip unknown_loc
     else begin
-      let block_start = add_vertex ()
-      and block_end = add_vertex ()
+      let englobing_blocks = block :: control.blocks in
+      let block_start = add_vertex englobing_blocks
+      and block_end = add_vertex englobing_blocks
       and loc_start = first_loc block
       and loc_end = last_loc block
       in
       add_edge control.src block_start kinstr (Enter block) loc_start;
       add_edge block_end control.dest kinstr (Leave block) loc_end;
-      let block_control = {control with src = block_start; dest = block_end} in
+      let block_control =
+        { control with
+          src = block_start;
+          dest = block_end;
+          blocks = englobing_blocks
+        }
+      in
       do_list do_stmt block_control labels block.bstmts
     end
 
@@ -599,7 +608,7 @@ let build_automaton ~annotations kf =
     in
     let do_annot_list control labels l =
       if l = [] then control.src else
-        let point = add_vertex () in
+        let point = add_vertex control.blocks in
         do_list do_annot {control with dest = point} labels l;
         point
     in
@@ -617,7 +626,7 @@ let build_automaton ~annotations kf =
        and the joined states from the gotoes. *)
     let control =
       if is_goto_destination stmt then
-        let src = add_vertex () in
+        let src = add_vertex control.blocks in
         add_edge control.src src kinstr Skip loc;
         { control with src }
       else control
@@ -630,7 +639,7 @@ let build_automaton ~annotations kf =
           if Cil.instr_falls_through instr
           then control.dest
           else
-            let v = add_vertex () in
+            let v = add_vertex [] in
             exit_points := v :: !exit_points;
             v
         in
@@ -638,40 +647,32 @@ let build_automaton ~annotations kf =
         dest
 
       | Cil_types.Return (opt_exp, _) ->
-        let exited_blocks = Kernel_function.find_all_enclosing_blocks stmt in
-        let transitions =
-          Return (opt_exp,stmt) ::
-          List.map (fun b -> Leave b) exited_blocks
-        in
-        build_transitions control.src return_point kinstr loc transitions;
-        return_point
+        let transition = Return (opt_exp,stmt) in
+        build_jump control.src control.return stmt transition
 
       | Goto (dest_stmt, _) ->
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
         control.src
 
       | Break _ | Continue _ as skind ->
-        assert (List.length stmt.succs = 1);
-        let dest_stmt = List.hd stmt.succs in
         let dest =
           match skind with
           | Break _ -> control.break
           | Continue _ -> control.continue
           | _ -> assert false
         in
-        build_stmt_transition control.src dest stmt dest_stmt Skip;
-        control.src
+        build_jump control.src dest stmt Skip
 
       | If (exp, then_block, else_block, _) ->
-        let then_point = add_vertex ()
-        and else_point = add_vertex () in
+        let then_point = add_vertex control.blocks
+        and else_point = add_vertex control.blocks in
         let then_transition = Guard (exp, Then, stmt)
         and else_transition = Guard (exp, Else, stmt)
         in
         add_edge control.src then_point kinstr then_transition loc;
         add_edge control.src else_point kinstr else_transition loc;
-        do_block {control with src=then_point} kinstr labels then_block;
-        do_block {control with src=else_point} kinstr labels else_block;
+        do_block { control with src = then_point } kinstr labels then_block;
+        do_block { control with src = else_point } kinstr labels else_block;
         control.src.vertex_control <- If {
             cond = exp ; vthen = then_point; velse = else_point
           };
@@ -684,14 +685,15 @@ let build_automaton ~annotations kf =
           Guard (Cil.new_exp ~loc:exp2.eloc enode, kind, stmt)
         in
         (* First build the automaton for the block *)
-        let block_control = {
-          control with
-          src = add_vertex ();
-          break = control.dest;
-        } in
+        let block_control =
+          { control with
+            src = add_vertex control.blocks; (* This vertex is unreachable *)
+            break = control.dest;
+          }
+        in
         do_block block_control kinstr labels block;
         (* Then link the cases *)
-        let default_case : (vertex * Cil_types.stmt) option ref = ref None in
+        let default_case : vertex option ref = ref None in
         let value_cases : (Cil_types.exp * vertex) list ref = ref [] in
         (* For all statements *)
         let values = List.fold_left
@@ -702,12 +704,11 @@ let build_automaton ~annotations kf =
                 begin fun values -> function
                   | Case (exp2,_) ->
                     let guard = build_guard exp2 Then in
-                    let v2 =
-                      build_stmt_next control.src dest stmt case_stmt guard in
+                    let v2 = build_jump control.src dest stmt guard in
                     value_cases := (exp2,v2) :: !value_cases ;
                     exp2 :: values
                   | Default (_) ->
-                    default_case := Some (dest,case_stmt);
+                    default_case := Some dest;
                     values
                   | Label _ -> values
                 end values case_stmt.Cil_types.labels
@@ -721,7 +722,7 @@ let build_automaton ~annotations kf =
             let guard = build_guard exp2 Else in
             add_last_edge src guard
           | exp2 :: l ->
-            let point = add_vertex ()
+            let point = add_vertex control.blocks
             and guard = build_guard exp2 Else in
             add_edge src point kinstr guard loc;
             add_default_edge point l
@@ -730,8 +731,8 @@ let build_automaton ~annotations kf =
           | None ->
             add_edge src control.dest kinstr transition loc ;
             control.dest
-          | Some (case_vertex, case_stmt) ->
-            build_stmt_transition src case_vertex stmt case_stmt transition ;
+          | Some case_vertex ->
+            build_jump src case_vertex stmt transition |> ignore;
             case_vertex
         in
         let default_vertex = add_default_edge control.src values in
@@ -747,14 +748,15 @@ let build_automaton ~annotations kf =
         let loop_control =
           if not annotations
           then
-            { src = control.src;
+            { control with
+              src = control.src;
               dest = control.src;
               break = control.dest;
               continue = control.src; }
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
-            let loop_head_point = add_vertex () in
+            let loop_head_point = add_vertex control.blocks in
             add_edge control.src loop_head_point kinstr Skip loc;
             loop_head_point.vertex_info <- LoopHead {stmt; level = !loop_level};
             let labels =
@@ -762,7 +764,7 @@ let build_automaton ~annotations kf =
                           (add_builtin LoopCurrent loop_head_point labels))
             in
             (* for variant to have one point at the end of the loop *)
-            let loop_end_point = add_vertex () in
+            let loop_end_point = add_vertex control.blocks in
             let start_annot, end_annot =
               List.partition
                 (function { annot_content = AVariant _ } -> false | _ -> true)
@@ -775,7 +777,8 @@ let build_automaton ~annotations kf =
               do_annot_list {control with src = loop_end_point} labels end_annot
             in
             add_edge loop_back loop_head_point kinstr Skip loc;
-            { src = loop_start_body;
+            { control with
+              src = loop_start_body;
               dest = loop_end_point;
               break = control.dest;
               continue = loop_head_point  }
@@ -805,12 +808,16 @@ let build_automaton ~annotations kf =
   in
 
   (* Iterate through the AST *)
-  let control = {
-    src = entry_point;
-    dest = return_point;
-    break = dummy_vertex;
-    continue = dummy_vertex;
-  }
+  let entry_point = add_vertex []
+  and return_point = add_vertex [] in
+  let control =
+    { src = entry_point;
+      dest = return_point;
+      break = dummy_vertex;
+      continue = dummy_vertex;
+      return = return_point;
+      blocks = []
+    }
   in
 
   let labels_body =
@@ -822,7 +829,7 @@ let build_automaton ~annotations kf =
   List.iter
     begin fun (src,src_stmt,dest_stmt) ->
       let dest = fst (StmtTable.find table dest_stmt) in
-      build_stmt_transition src dest src_stmt dest_stmt Skip
+      build_jump src dest src_stmt Skip |> ignore
     end !gotos;
 
   (* For annotation transitions, bind statement labels to their corresponding
@@ -882,7 +889,7 @@ let build_automaton ~annotations kf =
       entry_point;
       return_point;
       exit_points = !exit_points;
-      stmt_table = table;
+      stmt_table = table
     }
   in
 
