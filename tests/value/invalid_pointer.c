@@ -6,7 +6,6 @@
 #include "__fc_builtin.h"
 #include <stdint.h>
 #include <signal.h>
-#include <signal.c>
 
 /* Tests the emission of \object_pointer alarms when -warn-invalid-pointer
    is enabled. The second run should emit no alarm. */
