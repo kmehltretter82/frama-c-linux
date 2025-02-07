@@ -414,6 +414,7 @@ type control_context = {
   return: vertex;
   blocks: Cil_types.block list;
   loop_level: int;
+  labels: vertex labels
 }
 
 let blocks_closed v1 v2 =
@@ -572,17 +573,17 @@ let build_automaton ~annotations kf =
     v
   in
 
-  let rec do_list do_one control labels = function
+  let rec do_list do_one control = function
     | [] -> assert false
-    | stmt :: [] -> do_one control labels stmt
+    | stmt :: [] -> do_one control stmt
     | stmt :: l ->
       let point = add_vertex control.blocks in
-      do_one {control with dest = point} labels stmt;
-      do_list do_one {control with src = point} labels l
+      do_one {control with dest = point} stmt;
+      do_list do_one {control with src = point} l
   in
 
   (* AST traversal *)
-  let rec do_block control kinstr labels block =
+  let rec do_block control kinstr block =
     if block.bstmts = [] then
       add_edge control.src control.dest kinstr Skip unknown_loc
     else begin
@@ -601,22 +602,22 @@ let build_automaton ~annotations kf =
           blocks = englobing_blocks
         }
       in
-      do_list do_stmt block_control labels block.bstmts
+      do_list do_stmt block_control block.bstmts
     end
 
-  and do_stmt control (labels:vertex labels) stmt =
+  and do_stmt control stmt =
     let kinstr = Kstmt stmt
     and loc = stmt_loc stmt in
-    let do_annot control labels (annot: code_annotation) : unit =
-      let labels = LabelMap.add_builtin Here control.src labels in
+    let do_annot control (annot: code_annotation) : unit =
+      let labels = LabelMap.add_builtin Here control.src control.labels in
       let annotation = make_annotation kf stmt annot labels in
       let transition = Prop (annotation, stmt) in
       add_edge control.src control.dest kinstr transition loc
     in
-    let do_annot_list control labels l =
+    let do_annot_list control l =
       if l = [] then control.src else
         let point = add_vertex control.blocks in
-        do_list do_annot {control with dest = point} labels l;
+        do_list do_annot {control with dest = point} l;
         point
     in
 
@@ -624,7 +625,7 @@ let build_automaton ~annotations kf =
        where variants and invariants need some special processing. *)
     let control =
       if not annotations || is_loop stmt then control else
-        let src = do_annot_list control labels (code_annot stmt) in
+        let src = do_annot_list control (code_annot stmt) in
         { control with src }
     in
 
@@ -678,8 +679,8 @@ let build_automaton ~annotations kf =
         in
         add_edge control.src then_point kinstr then_transition loc;
         add_edge control.src else_point kinstr else_transition loc;
-        do_block { control with src = then_point } kinstr labels then_block;
-        do_block { control with src = else_point } kinstr labels else_block;
+        do_block { control with src = then_point } kinstr then_block;
+        do_block { control with src = else_point } kinstr else_block;
         control.src.vertex_control <- If {
             cond = exp ; vthen = then_point; velse = else_point
           };
@@ -698,7 +699,7 @@ let build_automaton ~annotations kf =
             break = control.dest;
           }
         in
-        do_block block_control kinstr labels block;
+        do_block block_control kinstr block;
         (* Then link the cases *)
         let default_case : vertex option ref = ref None in
         let value_cases : (Cil_types.exp * vertex) list ref = ref [] in
@@ -769,8 +770,10 @@ let build_automaton ~annotations kf =
             loop_head_point.vertex_info <-
               LoopHead { stmt; level = control.loop_level };
             let labels =
-              LabelMap.(add_builtin LoopEntry control.src
-                          (add_builtin LoopCurrent loop_head_point labels))
+              LabelMap.(
+                control.labels
+                |> add_builtin LoopEntry control.src
+                |> add_builtin LoopCurrent loop_head_point)
             in
             (* for variant to have one point at the end of the loop *)
             let loop_end_point = add_vertex control.blocks in
@@ -780,10 +783,10 @@ let build_automaton ~annotations kf =
                 (code_annot stmt)
             in
             let loop_start_body =
-              do_annot_list {control with src = loop_head_point} labels start_annot
+              do_annot_list {control with src = loop_head_point; labels} start_annot
             in
             let loop_back =
-              do_annot_list {control with src = loop_end_point} labels end_annot
+              do_annot_list {control with src = loop_end_point; labels} end_annot
             in
             add_edge loop_back loop_head_point kinstr Skip loc;
             { control with
@@ -792,19 +795,20 @@ let build_automaton ~annotations kf =
               break = control.dest;
               continue = loop_head_point;
               loop_level = control.loop_level + 1;
+              labels;
             }
         in
-        do_block loop_control kinstr labels block;
+        do_block loop_control kinstr block;
         control.src.vertex_control <- Loop control.dest ;
         control.dest
 
       | Block block ->
-        do_block control kinstr labels block;
+        do_block control kinstr block;
         control.dest
 
       | UnspecifiedSequence us ->
         let block = Cil.block_from_unspecified_sequence us in
-        do_block control kinstr labels block;
+        do_block control kinstr block;
         control.dest
 
       | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
@@ -828,13 +832,14 @@ let build_automaton ~annotations kf =
       return = return_point;
       blocks = [];
       loop_level = 0;
+      labels =
+        LabelMap.(
+          empty
+          |> add_builtin Pre entry_point
+          |> add_builtin Post return_point)
     }
   in
-
-  let labels_body =
-    LabelMap.(add_builtin Pre entry_point (add_builtin Post return_point empty))
-  in
-  do_block control Kglobal labels_body fundec.sbody;
+  do_block control Kglobal fundec.sbody;
 
   (* Handle gotos *)
   List.iter
