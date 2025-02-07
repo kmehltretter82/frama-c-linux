@@ -59,6 +59,7 @@ type vertex = private {
   vertex_key : int;
   vertex_blocks : Cil_types.block list;
   mutable vertex_start_of : Cil_types.stmt option;
+  mutable vertex_end_of : Cil_types.stmt list;
   mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;
 }

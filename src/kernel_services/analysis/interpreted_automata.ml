@@ -48,6 +48,7 @@ type vertex = {
   vertex_key : int;
   vertex_blocks : Cil_types.block list;
   mutable vertex_start_of : Cil_types.stmt option;
+  mutable vertex_end_of : Cil_types.stmt list;
   mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;
 }
@@ -95,6 +96,7 @@ let dummy_vertex = {
   vertex_key = -1;
   vertex_blocks = [];
   vertex_start_of = None;
+  vertex_end_of = [];
   vertex_info = NoneInfo;
   vertex_control = Edges;
 }
@@ -536,6 +538,7 @@ let build_automaton ~annotations kf =
       vertex_key = !next_vertex;
       vertex_blocks;
       vertex_start_of = None;
+      vertex_end_of = [];
       vertex_info = NoneInfo;
       vertex_control = Edges;
     } in
@@ -825,6 +828,7 @@ let build_automaton ~annotations kf =
     (* Update statement table *)
     assert (control.src.vertex_start_of = None);
     control.src.vertex_start_of <- Some stmt;
+    dest.vertex_end_of <- stmt :: dest.vertex_end_of;
     StmtTable.add table stmt (control.src,dest)
   in
 
@@ -885,16 +889,13 @@ let build_automaton ~annotations kf =
   in
   G.iter_edges_e bind_labels g;
 
-  (* Recursively removes unreachable vertices, except those bound to a statement
-     in [table]. *)
-  let stmt_vertices =
-    let add _stmt (v1, v2) acc = Vertex.Set.(add v1 (add v2 acc)) in
-    StmtTable.fold add table Vertex.Set.empty
-  in
+  (* Recursively removes unreachable vertices, except those bound to a
+     statement *)
   let is_unreachable vertex =
     G.in_degree g vertex = 0
     && not (Vertex.equal vertex entry_point)
-    && not (Vertex.Set.mem vertex stmt_vertices)
+    && vertex.vertex_start_of = None
+    && vertex.vertex_end_of = []
   in
   let rec remove_unreachable vertex =
     let succs = G.succ g vertex in
