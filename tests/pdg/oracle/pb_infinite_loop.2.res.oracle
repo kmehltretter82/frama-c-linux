@@ -31,10 +31,10 @@
  {n6}: block
    -[-c-]-> 1
    -[-c-]-> 5
- {n7}: Call30-InCtrl : exit(1);
+ {n7}: Call28-InCtrl : exit(1);
    -[-c-]-> 1
    -[-c-]-> 5
- {n8}: Call30-In1 : exit(1);
+ {n8}: Call28-In1 : exit(1);
    -[-c-]-> 1
    -[-c-]-> 5
    -[-c-]-> 7

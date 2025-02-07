@@ -18,9 +18,9 @@
 <   /*@ assert Eva: initialization: \initialized(p); */
 125d114
 <   /*@ assert Eva: initialization: \initialized(&t[i]); */
-194a184
+192a182
 >   int z;
-197,199d186
+195,197d184
 <   *p = 1;
 <   int z = *p + 1;
 <   int w = *p + 2;

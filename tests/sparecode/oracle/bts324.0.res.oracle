@@ -45,7 +45,7 @@
 [sparecode] pdg bottom: skip annotations
 [sparecode] look for annotations in function main_ter
 [pdg] computing for function main_ter
-[pdg] Warning: unreachable entry point (sid:19, function main_ter)
+[pdg] Warning: unreachable entry point (sid:18, function main_ter)
 [pdg] Bottom for function main_ter
 [sparecode] pdg bottom: skip annotations
 [sparecode] finalize call input propagation

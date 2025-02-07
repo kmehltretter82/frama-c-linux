@@ -1643,13 +1643,13 @@ struct
     Logic_labels.add_label l labstmt;
     H.add labelStmt l labstmt
 
-  (* transforms a chunk into a block. Note that if the chunk has its
-     unspecified_order flag set, the resulting block contains a single
-     UnspecifiedSequence statement.
-     If the chunk consists in a single block, this block will get returned
-     directly, unless collapse_block is set to false.
+  (* transforms a chunk into a block.
+     Note that if the chunk has its unspecified_order flag set, the resulting
+     block contains a single UnspecifiedSequence statement. However, whatever
+     the unspecified_order value, if the chunk consists in a single block, this
+     block will get returned directly, unless collapse_block is set to false.
      By default, the block is scoping. If force_non_scoping is true
-     (and the block does not not declare anything by itself), it is made
+     (and the block does not declare anything by itself), it is made
      non-scoping.
   *)
   let c2block ~ghost ?(collapse_block=true) ?(force_non_scoping=false) c =
@@ -1688,32 +1688,32 @@ struct
     List.iter cleanup_var c.locals;
     !currentFunctionFDEC.slocals <- !currentFunctionFDEC.slocals @ !vars;
     let vars = !vars @ c.locals in
-    if c.unspecified_order then begin
-      if List.length c.stmts >= 2 then begin
-        let first_stmt =
-          (fun (s,_,_,_,_) -> s) (Extlib.last c.stmts) in
-        Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-          ~source:(fst (Stmt.loc first_stmt))
-          "Potential unsequenced side-effects"
-      end;
-      let b =
-        Cil.mkBlock
-          [mkStmt ~ghost ~valid_sid (UnspecifiedSequence (List.rev c.stmts))]
-      in
-      b.blocals <- vars;
-      b.bstatics <- c.statics;
-      b.bscoping <- declares_var || not force_non_scoping;
+    match c.stmts with
+    | [{ skind = Block b } as s,_,_,_,_] when
+        collapse_block && s.labels = []
+        && (ghost = s.ghost || Cil.is_ghost_else b) ->
+      b.blocals <- vars @ b.blocals;
+      b.bstatics <- c.statics @ b.bstatics;
+      b.bscoping <- b.bscoping || declares_var || not force_non_scoping;
       b
-    end else
-      match c.stmts with
-      | [{ skind = Block b } as s,_,_,_,_] when
-          collapse_block && s.labels = []
-          && (ghost = s.ghost || Cil.is_ghost_else b) ->
-        b.blocals <- vars @ b.blocals;
-        b.bstatics <- c.statics @ b.bstatics;
-        b.bscoping <- b.bscoping || declares_var || not force_non_scoping;
+    | stmts ->
+      if c.unspecified_order then begin
+        if List.length stmts >= 2 then begin
+          let first_stmt =
+            (fun (s,_,_,_,_) -> s) (Extlib.last stmts) in
+          Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
+            ~source:(fst (Stmt.loc first_stmt))
+            "Potential unsequenced side-effects"
+        end;
+        let b =
+          Cil.mkBlock
+            [mkStmt ~ghost ~valid_sid (UnspecifiedSequence (List.rev stmts))]
+        in
+        b.blocals <- vars;
+        b.bstatics <- c.statics;
+        b.bscoping <- declares_var || not force_non_scoping;
         b
-      | stmts ->
+      end else
         let stmts = List.rev_map (fun (s,_,_,_,_) -> s) stmts in
         let b = Cil.mkBlock stmts in
         b.blocals <- vars;
@@ -10038,7 +10038,8 @@ and doStatement local_env (s : Cabs.statement) : chunk =
     let break_cond = breakChunk ~ghost loc' in
     exitLoop ();
     loopChunk ~ghost ~sattr:[("while",[])] a
-      ((doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond)
+      ((empty @@@
+        (doCondition ~is_loop:true local_env CNoConst e skipChunk break_cond, ghost))
        @@@ (s', ghost))
 
   | Cabs.DOWHILE(a, e,s,loc) ->
