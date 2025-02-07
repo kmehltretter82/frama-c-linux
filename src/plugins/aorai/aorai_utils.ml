@@ -399,7 +399,7 @@ let rec term_to_exp t res =
   | TConst (LWStr l) -> new_exp ~loc (Const (CWStr l))
   | TConst (LChr c) -> new_exp ~loc (Const (CChr c))
   | TConst (LReal l_real) ->
-    let Parsed (format, _) = Typed_float.parse l_real.r_literal in
+    let Parsed (format, _) = Typed_float.parse_exn l_real.r_literal in
     let fk = Typed_float.parsed_fkind format in
     let cst =
       if Cil.isExactFloat fk l_real then

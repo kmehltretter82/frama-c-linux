@@ -5764,7 +5764,7 @@ and doExp local_env
 
         | Cabs.CONST_FLOAT str -> begin
             Floating_point.(set_rounding_mode Nearest_even) ;
-            let Parsed (format, parsed) = Typed_float.parse str in
+            let Parsed (format, parsed) = Typed_float.parse_exn str in
             let nearest_float = Typed_float.to_float parsed.nearest in
             if Typed_float.(parsed.lower <> parsed.upper) then
               Kernel.warning ~wkey:Kernel.wkey_decimal_float ~current:true
