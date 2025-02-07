@@ -621,14 +621,6 @@ let build_automaton ~annotations kf =
         point
     in
 
-    (* Adds statement annotations to the graph if required, except on loops
-       where variants and invariants need some special processing. *)
-    let control =
-      if not annotations || is_loop stmt then control else
-        let src = do_annot_list control (code_annot stmt) in
-        { control with src }
-    in
-
     (* Adds an empty vertex before goto destinations, allowing Eva
        to distinguish between the state juste before the label
        and the joined states from the gotoes. *)
@@ -638,6 +630,14 @@ let build_automaton ~annotations kf =
         add_edge control.src src kinstr Skip loc;
         { control with src }
       else control
+    in
+
+    (* Adds statement annotations to the graph if required, except on loops
+       where variants and invariants need some special processing. *)
+    let control =
+      if not annotations || is_loop stmt then control else
+        let src = do_annot_list control (code_annot stmt) in
+        { control with src }
     in
 
     (* Handle statement *)
