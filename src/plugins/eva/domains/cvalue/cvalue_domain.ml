@@ -257,12 +257,14 @@ module State = struct
     let one_from_contents acc dep =
       if dep.direct
       then
-        match dep.location with
-        | None -> Cvalue.V.top
-        | Some location ->
-          let location = Precise_locs.imprecise_location location in
-          let v = Cvalue.Model.find ~conflate_bottom:false state location in
-          Cvalue.V.topify Origin.Leaf (Cvalue.V.join acc v)
+        let v =
+          match dep.location with
+          | Address vi -> Cvalue.V.inject (Base.of_varinfo vi) Ival.zero
+          | Location location ->
+            let location = Precise_locs.imprecise_location location in
+            Cvalue.Model.find ~conflate_bottom:false state location
+        in
+        Cvalue.V.topify Origin.Leaf (Cvalue.V.join acc v)
       else acc
     in
     List.fold_left one_from_contents Cvalue.V.top_int deps

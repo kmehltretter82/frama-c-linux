@@ -129,7 +129,11 @@ module Make
   let show_expr valuation = Domain.show_expr (lift_valuation valuation)
 
   let lift_logic_dep dep =
-    let location = Option.map Loc.restrict dep.location in
+    let location =
+      match dep.location with
+      | Location loc -> Location (Loc.restrict loc)
+      | Address _ as x -> x
+    in
     { dep with location }
 
   let lift_logic_assigns = function

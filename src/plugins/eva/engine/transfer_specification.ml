@@ -162,6 +162,14 @@ let reduce_to_valid_location kind term loc =
       end
     else Some loc
 
+(* If [term] refers to the address of a C variable (or a function), returns its
+   varinfo. For a function, f is equivalent to &f. Returns [None] otherwise. *)
+let term_as_address term =
+  match term.it_content.term_node with
+  | TAddrOf (TVar lv, _) | TStartOf (TVar lv, _) -> lv.lv_origin
+  | TLval (TVar lv, _) when Cil.isLogicFunctionType lv.lv_type -> lv.lv_origin
+  | _ -> None
+
 let precise_loc_of_assign env kind term =
   try
     (* TODO: warn about errors during evaluation. *)
@@ -171,7 +179,7 @@ let precise_loc_of_assign env kind term =
         Eval_terms.eval_tlval_as_location ~alarm_mode env term.it_content
       | Free | Allocate ->
         let result = Eval_terms.eval_term ~alarm_mode env term.it_content in
-        let loc_bits = Locations.loc_bytes_to_loc_bits result.Eval_terms.eover in
+        let loc_bits = Locations.loc_bytes_to_loc_bits result.eover in
         Locations.make_loc loc_bits Int_Base.top
     in
     if kind <> From then reduce_to_valid_location kind term loc else Some loc
@@ -180,7 +188,6 @@ let precise_loc_of_assign env kind term =
       "@[<hov 0>@[<hov 2>cannot interpret %a@]%a;@ effects will be ignored@]"
       pp_assign_clause (kind, term) pp_eval_error e;
     None
-
 
 module Make
     (Abstract: Abstractions.S)
@@ -271,16 +278,26 @@ module Make
   let evaluate_assigns state retres_loc assigns =
     let env = make_env state in
     let evaluate (term, deps) =
-      match evaluate_location env retres_loc Assign term with
-      | None -> None (* Warnings have been emitted by [evaluate_location]. *)
-      | Some loc ->
-        let evaluate_from term =
-          let direct = not (List.mem "indirect" term.it_content.term_name) in
-          let location = evaluate_location env retres_loc From term in
-          { term; direct; location }
+      let open Option.Operators in
+      (* Assigns whose location cannot be interpreted are filtered out.
+         A warning is emitted by [evaluate_location]. *)
+      let+ assigned_loc = evaluate_location env retres_loc Assign term in
+      let evaluate_from term =
+        let direct = not (List.mem "indirect" term.it_content.term_name) in
+        let+ location =
+          (* Special case for clauses "\from &g". *)
+          match term_as_address term with
+          | Some vi -> Some (Address vi)
+          | None ->
+            (* \from dependencies whose location cannot be interpreted are
+               filtered out. A warning is emitted by [evaluate_location]. *)
+            let+ location = evaluate_location env retres_loc From term in
+            Location location
         in
-        let deps = List.map evaluate_from deps in
-        Some (Eval.Assigns (term, deps), loc)
+        { term; direct; location }
+      in
+      let deps = List.filter_map evaluate_from deps in
+      Eval.Assigns (term, deps), assigned_loc
     in
     List.filter_map evaluate assigns
 

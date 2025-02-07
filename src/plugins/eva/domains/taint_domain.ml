@@ -322,9 +322,8 @@ module Domain = struct
     let exists_tainted_from state deps =
       let single_from_contents dep =
         match dep.Eval.location with
-        | None ->
-          false
-        | Some location ->
+        | Address _ -> false
+        | Location location ->
           let loc_zone = Precise_locs.enumerate_valid_bits Read location in
           LatticeTaint.intersects state loc_zone
       in
