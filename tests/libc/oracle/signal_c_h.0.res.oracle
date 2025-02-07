@@ -1,9 +1,13 @@
 [kernel] Parsing signal_c_h.c (with preprocessing)
+[eva] Splitting return states on:
+  \full_split(signal)
+  \return(raise) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
+  signal_status ∈ {0}
 [eva] computing for function test_sigaction <- main.
   Called from signal_c_h.c:104.
 [eva] computing for function sigemptyset <- test_sigaction <- main.
@@ -159,6 +163,35 @@
 [eva] signal_c_h.c:73: assertion 'sigsuspend_return' got status valid.
 [eva] Recording results for test_sigaction
 [eva] Done for function test_sigaction
+[eva] computing for function test_sighandler <- main.
+  Called from signal_c_h.c:105.
+[eva] signal_c_h.c:87: assertion got status valid.
+[eva] computing for function signal <- test_sighandler <- main.
+  Called from signal_c_h.c:89.
+[eva] using specification for function signal
+[eva] signal_c_h.c:89: 
+  function signal: precondition 'valid_signal' got status valid.
+[eva] signal_c_h.c:89: 
+  function signal: precondition 'func_not_null' got status valid.
+[eva] Done for function signal
+[eva] computing for function raise <- test_sighandler <- main.
+  Called from signal_c_h.c:92.
+[eva] using specification for function raise
+[eva:libc:unsupported-spec] signal_c_h.c:92: Warning: 
+  The specification of function 'raise' is currently not supported by Eva.
+  Consider adding 'FRAMAC_SHARE/libc/signal.c' to the analyzed source files.
+[eva] signal_c_h.c:92: 
+  function raise: precondition 'valid_signal' got status valid.
+[eva] Done for function raise
+[eva] computing for function raise <- test_sighandler <- main.
+  Called from signal_c_h.c:92.
+[eva] Done for function raise
+[eva] signal_c_h.c:99: assertion 'handler_called' got status valid.
+[eva:alarm] signal_c_h.c:99: Warning: 
+  assertion 'handler_called' got status invalid (stopping propagation).
+[eva] signal_c_h.c:100: assertion 'handler_not_called' got status valid.
+[eva] Recording results for test_sighandler
+[eva] Done for function test_sighandler
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -305,8 +338,18 @@
      {{ garbled mix of &{__fc_sigaction}
       (origin: Library function {signal_c_h.c:60}) }} or UNINITIALIZED
   __retres ∈ {-1; 0; 1; 2; 3}
+[eva:final-states] Values at end of function test_sighandler:
+  __fc_signal_handlers[0..1] ∈ {0}
+                      [2] ∈ {{ NULL ; &signal_handler }}
+                      [3..64] ∈ {0}
+  res_sig ∈ {{ &SIG_DFL ; &SIG_IGN ; &SIG_ERR }}
+  res_raise ∈ [--..--]
+  handler_called ∈ {0}
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
+  __fc_signal_handlers[0..1] ∈ {0}
+                      [2] ∈ {{ NULL ; &signal_handler }}
+                      [3..64] ∈ {0}
   __fc_sigaction[0]{.sa_handler; .sa_sigaction} ∈ {0}
                 [0]{.sa_mask; .sa_flags} ∈ [--..--]
                 [1]{.sa_handler; .sa_sigaction} ∈ {0}

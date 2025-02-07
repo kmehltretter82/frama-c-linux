@@ -1,13 +1,13 @@
 /* run.config
-
-
-   STDOPT: #"-eva-slevel 2"
-
+   MACRO: SIGNAL_CONF -eva-split-return-function signal:full -eva-slevel-function signal:2
+   MACRO: RAISE_CONF -eva-split-return-function raise:auto -eva-slevel-function raise:2
+   STDOPT: #"-eva-slevel 2 @SIGNAL_CONF@ @RAISE_CONF@"
+   STDOPT: #"-eva-slevel 2 -cpp-extra-args=-DWITH_SIGNAL_C @SIGNAL_CONF@ @RAISE_CONF@"
 */
-/*
-
-
-*/
+/* The interaction between signal() and raise() can only be exploited by Eva if
+   signal.c is included and the splits inside those functions are propagated to
+   the callers. The macros SIGNAL_CONF and RAISE_CONF add -eva-split-return and
+   -eva-slevel for those two functions to do just that. */
 #include <errno.h>
 #include <signal.h>
 #ifdef WITH_SIGNAL_C
@@ -76,32 +76,32 @@ int test_sigaction() {
   return 0;
 }
 
+int signal_status;
 
+void signal_handler(int signal)
+{
+  signal_status = signal;
+}
 
+void test_sighandler() {
+  //@ assert signal_status == 0;
 
+  sighandler_t res_sig = signal(SIGINT, signal_handler);
+  //@ split res_sig != SIG_ERR;
 
+  int res_raise = raise(SIGINT);
+  //@ split res_raise < 0;
+  //@ split res_raise > 0;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  // First check will fail on one of the partition if `signal.c` is not included
+  // as Eva cannot know that `signal_handler` has been called.
+  //@ ghost int handler_called = res_sig != SIG_ERR && res_raise == 0;
+  //@ assert handler_called: handler_called ==> signal_status == SIGINT;
+  //@ assert handler_not_called: !handler_called ==> signal_status == 0;
+}
 
 int main() {
   test_sigaction();
-
+  test_sighandler();
   return 0;
 }
