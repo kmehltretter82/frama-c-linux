@@ -203,7 +203,7 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     __gen_e_acsl_assert_data.pred_txt = "retval == \\null || \\valid(retval)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_join";
-    __gen_e_acsl_assert_data.line = 405;
+    __gen_e_acsl_assert_data.line = 411;
     __gen_e_acsl_assert_data.name = "valid_or_null_retval";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -246,7 +246,7 @@ int __gen_e_acsl_pthread_join(pthread_t thread, void **retval)
     __gen_e_acsl_assert_data_2.pred_txt = "\\result == 0 || \\result == 35 || \\result == 22 || \\result == 3";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_join";
-    __gen_e_acsl_assert_data_2.line = 409;
+    __gen_e_acsl_assert_data_2.line = 415;
     __gen_e_acsl_assert_data_2.name = "success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_4,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -301,7 +301,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data.pred_txt = "\\valid(thread)";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data.fct = "pthread_create";
-    __gen_e_acsl_assert_data.line = 355;
+    __gen_e_acsl_assert_data.line = 361;
     __gen_e_acsl_assert_data.name = "valid_thread";
     __e_acsl_assert(__gen_e_acsl_valid,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -331,7 +331,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data_2.pred_txt = "attr == \\null || \\valid_read(attr)";
     __gen_e_acsl_assert_data_2.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_2.fct = "pthread_create";
-    __gen_e_acsl_assert_data_2.line = 356;
+    __gen_e_acsl_assert_data_2.line = 362;
     __gen_e_acsl_assert_data_2.name = "valid_null_attr";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data_2);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_2);
@@ -356,7 +356,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data_4.pred_txt = "arg == \\null || \\valid((char *)arg)";
     __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_4.fct = "pthread_create";
-    __gen_e_acsl_assert_data_4.line = 358;
+    __gen_e_acsl_assert_data_4.line = 364;
     __gen_e_acsl_assert_data_4.name = "valid_null_arg";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data_4);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);
@@ -408,7 +408,7 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __gen_e_acsl_assert_data_5.pred_txt = "(\\result == 0 && \\initialized(\\old(thread))) || \\result == 11 ||\n\\result == 22 || \\result == 1";
     __gen_e_acsl_assert_data_5.file = "FRAMAC_SHARE/libc/pthread.h";
     __gen_e_acsl_assert_data_5.fct = "pthread_create";
-    __gen_e_acsl_assert_data_5.line = 362;
+    __gen_e_acsl_assert_data_5.line = 368;
     __gen_e_acsl_assert_data_5.name = "initialization/success_or_error";
     __e_acsl_assert(__gen_e_acsl_or_5,& __gen_e_acsl_assert_data_5);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_5);
@@ -426,6 +426,14 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
+    __e_acsl_store_block((void *)(& __fc_p_cuserid),8UL);
+    __e_acsl_full_init((void *)(& __fc_p_cuserid));
+    __e_acsl_store_block((void *)(__fc_cuserid),9UL);
+    __e_acsl_full_init((void *)(& __fc_cuserid));
+    __e_acsl_store_block((void *)(& __fc_p_ctermid),8UL);
+    __e_acsl_full_init((void *)(& __fc_p_ctermid));
+    __e_acsl_store_block((void *)(__fc_ctermid),9UL);
+    __e_acsl_full_init((void *)(& __fc_ctermid));
     __e_acsl_store_block((void *)(& __fc_p_tmpnam),8UL);
     __e_acsl_full_init((void *)(& __fc_p_tmpnam));
     __e_acsl_store_block((void *)(__fc_tmpnam),20UL);
@@ -434,6 +442,10 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_p_fopen));
     __e_acsl_store_block((void *)(__fc_fopen),128UL);
     __e_acsl_full_init((void *)(& __fc_fopen));
+    __e_acsl_store_block((void *)(& __fc_p_getdate),8UL);
+    __e_acsl_full_init((void *)(& __fc_p_getdate));
+    __e_acsl_store_block((void *)(& __fc_getdate),56UL);
+    __e_acsl_full_init((void *)(& __fc_getdate));
     __e_acsl_store_block((void *)(& __fc_interrupted),4UL);
     __e_acsl_full_init((void *)(& __fc_interrupted));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
@@ -456,10 +468,16 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
+  __e_acsl_delete_block((void *)(& __fc_p_cuserid));
+  __e_acsl_delete_block((void *)(__fc_cuserid));
+  __e_acsl_delete_block((void *)(& __fc_p_ctermid));
+  __e_acsl_delete_block((void *)(__fc_ctermid));
   __e_acsl_delete_block((void *)(& __fc_p_tmpnam));
   __e_acsl_delete_block((void *)(__fc_tmpnam));
   __e_acsl_delete_block((void *)(& __fc_p_fopen));
   __e_acsl_delete_block((void *)(__fc_fopen));
+  __e_acsl_delete_block((void *)(& __fc_p_getdate));
+  __e_acsl_delete_block((void *)(& __fc_getdate));
   __e_acsl_delete_block((void *)(& __fc_interrupted));
   __e_acsl_delete_block((void *)(& __fc_p_time_tm));
   __e_acsl_delete_block((void *)(& __fc_time_tm));

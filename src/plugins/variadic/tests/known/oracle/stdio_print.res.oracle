@@ -1,20 +1,20 @@
-[variadic] FRAMAC_SHARE/libc/stdio.h:244: 
-  Declaration of variadic function fprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:246: 
-  Declaration of variadic function fscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:248: 
-  Declaration of variadic function printf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:249: 
-  Declaration of variadic function scanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:250: 
-  Declaration of variadic function snprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:252: 
-  Declaration of variadic function sprintf.
+  Declaration of variadic function fprintf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:251: 
+  Declaration of variadic function fscanf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:253: 
+  Declaration of variadic function printf.
 [variadic] FRAMAC_SHARE/libc/stdio.h:254: 
+  Declaration of variadic function scanf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:255: 
+  Declaration of variadic function snprintf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:257: 
+  Declaration of variadic function sprintf.
+[variadic] FRAMAC_SHARE/libc/stdio.h:259: 
   Declaration of variadic function sscanf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:587: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:620: 
   Declaration of variadic function dprintf.
-[variadic] FRAMAC_SHARE/libc/stdio.h:649: 
+[variadic] FRAMAC_SHARE/libc/stdio.h:682: 
   Declaration of variadic function asprintf.
 [variadic] stdio_print.c:9: Warning: 
   Call to function fprintf with non-static format argument: assuming that parameters are coherent with the format, and that no %n specifiers are present in the actual string.
