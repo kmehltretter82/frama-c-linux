@@ -1,11 +1,23 @@
 /* run.config
+
+
    STDOPT: #"-eva-slevel 2"
+
+*/
+/*
+
+
 */
 #include <errno.h>
 #include <signal.h>
+#ifdef WITH_SIGNAL_C
+  #include <signal.c>
+#endif
+
 volatile int nondet;
 
-int main() {
+
+int test_sigaction() {
   sigset_t s;
   if (sigemptyset(&s)) return 1;
   if (sigaddset(&s, SIGALRM)) {
@@ -60,6 +72,36 @@ int main() {
     //@ assert sigsuspend_errno_eintr: errno == EINTR;
     //@ assert sigsuspend_return: r == -1;
   }
+
+  return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int main() {
+  test_sigaction();
 
   return 0;
 }
