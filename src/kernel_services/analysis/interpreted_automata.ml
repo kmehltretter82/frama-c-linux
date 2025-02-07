@@ -140,8 +140,15 @@ module Transition = Datatype.Make (struct
     let reprs = [Skip]
     let pretty fmt =
       let open Format in
-      let print_var_list fmt l =
-        Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo fmt l
+      let pretty_block_id fmt b =
+        match b.bstmts with
+        | [] -> ()
+        | s1 :: _ -> Format.fprintf fmt "b%d" s1.Cil_types.sid
+      in
+      let pretty_block fmt b =
+        Format.fprintf fmt "(%a) %a"
+          pretty_block_id b
+          (Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo) b.blocals
       and pretty_kind fmt = function
         | Invariant -> Format.pp_print_string fmt "Invariant"
         | Assert -> Format.pp_print_string fmt "Assert"
@@ -157,8 +164,8 @@ module Transition = Datatype.Make (struct
           fprintf fmt "%a: %a"
             pretty_kind a.kind Printer.pp_identified_predicate a.predicate
         | Instr (instr,_) -> Printer.pp_instr fmt instr
-        | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
-        | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
+        | Enter (b) -> fprintf fmt "Enter %a" pretty_block b
+        | Leave (b)  -> fprintf fmt "Exit %a" pretty_block b
   end)
 
 module Edge = Datatype.Make_with_collections (struct
