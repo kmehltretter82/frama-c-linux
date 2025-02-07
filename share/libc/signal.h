@@ -163,9 +163,9 @@ __FC_EXTERN __fc_sighandler_t __fc_signal_handlers[SIGRTMAX+1];
 */
 extern void (*signal(int sig, void (*func)(int)))(int);
 
-/*@
-  assigns \nothing;
-  ensures never_terminates: \false; */
+/*@ // Side effects of the spec unsupported by Eva.
+  requires valid_signal: 0 <= sig <= SIGRTMAX;
+  assigns \result \from indirect:sig, indirect:__fc_signal_handlers[sig]; */
 extern int raise(int sig);
 #include "__fc_define_sigset_t.h"
 
