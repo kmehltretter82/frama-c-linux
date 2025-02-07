@@ -406,6 +406,7 @@ type control_points = {
   break: vertex;
   return: vertex;
   blocks: Cil_types.block list;
+  loop_level: int;
 }
 
 let blocks_closed v1 v2 =
@@ -510,7 +511,6 @@ let build_automaton ~annotations kf =
   let table : (vertex * vertex) StmtTable.t = StmtTable.create 17 in
   let gotos : goto_list = ref [] in
   let exit_points : vertex list ref = ref [] in
-  let loop_level = ref 0 in
 
   (* Edges and vertices are numbered consecutively *)
   let next_vertex = ref 0
@@ -744,7 +744,6 @@ let build_automaton ~annotations kf =
         control.dest
 
       | Loop (_annotations, block, _, _, _) ->
-        incr loop_level;
         let loop_control =
           if not annotations
           then
@@ -752,13 +751,16 @@ let build_automaton ~annotations kf =
               src = control.src;
               dest = control.src;
               break = control.dest;
-              continue = control.src; }
+              continue = control.src;
+              loop_level = control.loop_level + 1;
+            }
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
             let loop_head_point = add_vertex control.blocks in
             add_edge control.src loop_head_point kinstr Skip loc;
-            loop_head_point.vertex_info <- LoopHead {stmt; level = !loop_level};
+            loop_head_point.vertex_info <-
+              LoopHead { stmt; level = control.loop_level };
             let labels =
               LabelMap.(add_builtin LoopEntry control.src
                           (add_builtin LoopCurrent loop_head_point labels))
@@ -781,10 +783,11 @@ let build_automaton ~annotations kf =
               src = loop_start_body;
               dest = loop_end_point;
               break = control.dest;
-              continue = loop_head_point  }
+              continue = loop_head_point;
+              loop_level = control.loop_level + 1;
+            }
         in
         do_block loop_control kinstr labels block;
-        decr loop_level;
         control.src.vertex_control <- Loop control.dest ;
         control.dest
 
@@ -816,7 +819,8 @@ let build_automaton ~annotations kf =
       break = dummy_vertex;
       continue = dummy_vertex;
       return = return_point;
-      blocks = []
+      blocks = [];
+      loop_level = 0;
     }
   in
 
