@@ -105,7 +105,7 @@ let pp_eval_error fmt e =
 
 type clause_kind = Assign | Free | Allocate | From
 
-let pp_assign_clause fmt (kind, term) =
+let pp_clause fmt (kind, term) =
   let clause =
     match kind with
     | Assign -> "assigns"
@@ -113,7 +113,7 @@ let pp_assign_clause fmt (kind, term) =
     | Allocate -> "allocates"
     | From -> "\\from"
   in
-  Format.fprintf fmt "%s clause %a" clause Printer.pp_term term.it_content
+  Format.fprintf fmt "%s clause %a" clause Printer.pp_term term
 
 (* Warns in case the 'assigns \result' clause is missing in a behavior
    (only if the return is used at the call site). *)
@@ -146,7 +146,7 @@ let reduce_to_valid_location kind term loc =
       Self.error ~once:true ~current:true
         "@[Cannot handle@ %a,@ location is too imprecise@ (%a).@ \
          Assuming it is not assigned,@ but be aware@ this is incorrect.@]"
-        pp_assign_clause (kind, term) Locations.pretty loc;
+        pp_clause (kind, term) Locations.pretty loc;
       None
     end
   else
@@ -157,7 +157,7 @@ let reduce_to_valid_location kind term loc =
           Self.warning ~current:true ~once:true
             ~wkey:Self.wkey_invalid_assigns
             "@[Completely invalid destination@ for %a.@ \
-             Ignoring.@]" pp_assign_clause (kind, term);
+             Ignoring.@]" pp_clause (kind, term);
         None
       end
     else Some loc
@@ -176,9 +176,9 @@ let precise_loc_of_assign env kind term =
     let alarm_mode = Eval_terms.Ignore in
     let loc = match kind with
       | Assign | From ->
-        Eval_terms.eval_tlval_as_location ~alarm_mode env term.it_content
+        Eval_terms.eval_tlval_as_location ~alarm_mode env term
       | Free | Allocate ->
-        let result = Eval_terms.eval_term ~alarm_mode env term.it_content in
+        let result = Eval_terms.eval_term ~alarm_mode env term in
         let loc_bits = Locations.loc_bytes_to_loc_bits result.eover in
         Locations.make_loc loc_bits Int_Base.top
     in
@@ -186,7 +186,7 @@ let precise_loc_of_assign env kind term =
   with Eval_terms.LogicEvalError e ->
     Self.warning ~current:true ~once:true
       "@[<hov 0>@[<hov 2>cannot interpret %a@]%a;@ effects will be ignored@]"
-      pp_assign_clause (kind, term) pp_eval_error e;
+      pp_clause (kind, term) pp_eval_error e;
     None
 
 module Make
@@ -263,9 +263,9 @@ module Make
 
   (* Evaluates the location affected by an assigns, allocates, frees or \from
      clause. Returns None if the clause cannot be interpreted. *)
-  let evaluate_location env retres_loc kind term =
-    if (kind = Assign || kind = Allocate)
-    && Logic_utils.is_result term.it_content
+  let evaluate_location env retres_loc kind identified_term =
+    let term = identified_term.it_content in
+    if (kind = Assign || kind = Allocate) && Logic_utils.is_result term
     then retres_loc
     else
       let ploc = precise_loc_of_assign env kind term in
@@ -350,7 +350,7 @@ module Make
                 ~wkey:Self.wkey_garbled_mix_assigns
                 "@[The specification of function %a@ has generated \
                  a garbled mix of addresses@ for %a.@]"
-                Kernel_function.pretty kf pp_assign_clause (Assign, assign)
+                Kernel_function.pretty kf pp_clause (Assign, assign.it_content)
           | _ -> ()
         in
         Bottom.iter (Cvalue.V_Offsetmap.iter_on_values warn) offsm
