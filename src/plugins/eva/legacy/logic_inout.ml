@@ -65,22 +65,35 @@ let eval_error_reason fmt e =
   if e <> Eval_terms.CAlarm
   then Eval_terms.pretty_logic_evaluation_error fmt e
 
+(* Does [term] refers to the address of a C variable (or function)? *)
+let is_address term =
+  match term.term_node with
+  | TAddrOf (TVar _, _) | TStartOf (TVar _, _) -> true
+  | TLval (TVar lv, _) when Cil.isLogicFunctionType lv.lv_type -> true
+  | _ -> false
+
 let eval_tlval_as_zone assigns kind env acc t =
-  try
-    let alarm_mode = Eval_terms.Ignore in
-    let zone = Eval_terms.eval_tlval_as_zone ~alarm_mode kind env t.it_content in
-    Locations.Zone.join acc zone
-  with Eval_terms.LogicEvalError e ->
-    let pp_clause fmt =
-      if kind = Read
-      then Printer.pp_from fmt assigns
-      else Printer.pp_term fmt (fst assigns).it_content
-    in
-    Self.warning ~current:true ~once:true
-      "Failed to interpret %sassigns clause '%t'%a"
-      (if kind = Read then "inputs in " else "")
-      pp_clause eval_error_reason e;
-    Locations.Zone.top
+  let term = t.it_content in
+  (* If the term is an address, it has no memory dependency.
+     This is possible in "\from &g" clauses. *)
+  if is_address term then
+    acc
+  else
+    try
+      let alarm_mode = Eval_terms.Ignore in
+      let zone = Eval_terms.eval_tlval_as_zone ~alarm_mode kind env term in
+      Locations.Zone.join acc zone
+    with Eval_terms.LogicEvalError e ->
+      let pp_clause fmt =
+        if kind = Read
+        then Printer.pp_from fmt assigns
+        else Printer.pp_term fmt (fst assigns).it_content
+      in
+      Self.warning ~current:true ~once:true
+        "Failed to interpret %sassigns clause '%t'%a"
+        (if kind = Read then "inputs in " else "")
+        pp_clause eval_error_reason e;
+      Locations.Zone.top
 
 let assigns_inputs_to_zone state assigns =
   let env = Eval_terms.env_assigns ~pre:state in
@@ -110,16 +123,25 @@ type tlval_zones = {
   deps: Locations.Zone.t;
 }
 
+let bottom_zones =
+  let bottom = Locations.Zone.bottom in
+  { under = bottom; over = bottom; deps = bottom; }
+
 let assigns_tlval_to_zones state access tlval =
   let env = Eval_terms.env_post_f ~pre:state ~post:state ~result:None () in
   let alarm_mode = Eval_terms.Ignore in
-  try
-    let under, over =
-      Eval_terms.eval_tlval_as_zone_under_over ~alarm_mode access env tlval
-    in
-    let deps = join_logic_deps (Eval_terms.tlval_deps env tlval) in
-    Some { under; over; deps; }
-  with Eval_terms.LogicEvalError _ -> None
+  (* If the term is an address, it has no memory dependency.
+     This is possible in "\from &g" clauses. *)
+  if is_address tlval then
+    Some bottom_zones
+  else
+    try
+      let under, over =
+        Eval_terms.eval_tlval_as_zone_under_over ~alarm_mode access env tlval
+      in
+      let deps = join_logic_deps (Eval_terms.tlval_deps env tlval) in
+      Some { under; over; deps; }
+    with Eval_terms.LogicEvalError _ -> None
 
 
 (* -------------------------------------------------------------------------- *)
