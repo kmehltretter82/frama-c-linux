@@ -23,7 +23,7 @@ void f(void) {
     assigns k \from \nothing;
     assigns u \from u;
 
-    
+
 */
 void main1(void)
 {
@@ -45,8 +45,8 @@ void main15(void){
 /*@ assigns a[3..5] \from \nothing;
     behavior true:
     assumes \true;
-    assigns a[2..5] \from a[..]; 
-    
+    assigns a[2..5] \from a[..];
+
     behavior wrongassigns:
     assumes \true;
     assigns a[3..4] \from \nothing;
@@ -72,24 +72,24 @@ void main3(int i){
 
 int constante = 2;
 
-/*@ 
+/*@
 
   behavior true:
   assigns a[constante] \from \nothing;
 
   behavior wrong:
   assumes \true;
-  assigns a[..] \from a[i]; 
+  assigns a[..] \from a[i];
 */
 /* This is correct: actually, only a[2] is assigned from \nothing.  */
 void main4(int i){
   a[2] = 3;
 }
 
-/*@ 
+/*@
   behavior wrong:
   assumes \true;
-  assigns a[..] \from a[i]; 
+  assigns a[..] \from a[i];
 
   behavior true:
   assigns a[2] \from a[sizeof(int)];
@@ -217,6 +217,53 @@ void main18() {
                   clauses */
 }
 
+/* Test of the interpretation of "\from &x" clauses, where x can be a global
+   variable or a function: the assigned value depends on the address of x,
+   but not on the value of x. */
+
+volatile int nondet;
+
+typedef unsigned int uint;
+
+uint g = 1;
+uint h[100];
+
+/*@ assigns \result \from &g, &h; */
+uint* get_imprecise_pointer(void);
+
+/*@ assigns \result \from &g, &h;
+    ensures \result == &g || \result == h; */
+uint* get_exact_pointer(void);
+
+/*@ assigns \result \from &g, &h;
+    ensures \valid(\result); */
+uint* get_valid_pointer(void);
+
+void fun (void);
+void fun2 (void);
+
+/*@ assigns \result \from &fun, &fun2;
+    ensures \result == &fun || \result == &fun2; */
+void* get_function_pointer(void);
+
+/* Tests the interpretation of the "\from &x" clauses above. */
+void main19(void) {
+  int a;
+  // &a should not be assigned through clauses "assigns _ \from &g",
+  if (nondet) g = (uint)&a;
+  uint *p;
+  p = get_imprecise_pointer();
+  Frama_C_show_each_gm(p);
+  p = get_exact_pointer();
+  Frama_C_show_each_exact(p);
+  p = get_valid_pointer();
+  Frama_C_show_each_valid(p);
+  void *pf;
+  pf = get_function_pointer();
+  Frama_C_show_each_fct(pf);
+  g = 0;
+}
+
 
 void main(void)
 {
@@ -251,6 +298,5 @@ void main(void)
   main16();
   main17(t17, 10);
   main18();
+  main19();
 }
-
-
