@@ -210,17 +210,16 @@ module Space (Field : Field.S) = struct
     let rec back_propagation (M _ as m) inverse start =
       let size, _ = dimensions m in
       if Finite.(first < start) then
-        let rows, cols = dimensions m in
         let propagate r (m, inverse) =
           if Finite.(r < start) then
             let f = Field.(get r start m / get start start m) in
             let compute c m = set r c Field.(get r c m - f * get start c m) m in
-            let inverse = Finite.for_each compute cols inverse in
-            let m = Finite.for_each compute cols m in
+            let inverse = Finite.for_each compute size inverse in
+            let m = Finite.for_each compute size m in
             (m, inverse)
           else (m, inverse)
         in
-        let m, inverse = Finite.for_each propagate rows (m, inverse) in
+        let m, inverse = Finite.for_each propagate size (m, inverse) in
         back_propagation m inverse Finite.(prev start |> weaken)
       else if equal m (id size) then Some inverse else None
 
