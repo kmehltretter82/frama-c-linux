@@ -269,18 +269,11 @@ let print_machdep fmt (m : Machdep.mach) =
       (if m.has__builtin_va_list then "has" else "has not") ;
   end
 
-let machdep_dir () = Kernel.Share.get_dir "machdeps"
+
 
 let regexp_machdep = Str.regexp "^machdep_\\([^.]*\\).yaml$"
 
-let default_machdep_file machdep =
-  let filename = "machdep_" ^ machdep ^ ".yaml" in
-  Filepath.Normalized.concat (machdep_dir()) filename
-
-let is_default_machdep machdep =
-  Filepath.Normalized.is_file (default_machdep_file machdep)
-
-let mem_machdep s = is_default_machdep s || Sys.file_exists s
+let mem_machdep s = Kernel.Machdep.is_default s || Sys.file_exists s
 
 let default_machdeps () =
   Array.fold_right
@@ -288,7 +281,7 @@ let default_machdeps () =
        if Str.string_match regexp_machdep s 0 then
          Str.matched_group 1 s :: acc
        else acc)
-    (Sys.readdir (machdep_dir() :> string))
+    (Sys.readdir (Kernel.Machdep.get_dir() :> string))
     []
 
 let pretty_machdeps fmt =
@@ -317,7 +310,8 @@ let () = Cmdline.run_after_configuring_stage set_machdep
 let get_machdep () =
   let m = Kernel.Machdep.get () in
   let file =
-    if is_default_machdep m then default_machdep_file m
+    if Kernel.Machdep.is_default m
+    then Kernel.Machdep.get_default_file m
     else Filepath.Normalized.of_string ~existence:Must_exist m
   in
   let res =
