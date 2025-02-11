@@ -227,6 +227,7 @@ module Space (Field : Field.S) = struct
     let rec inverse_aux (M _ as m) inverse h k =
       let open Option.Operators in
       let size, _ = dimensions m in
+      (* Monadic operator to return [Option.value ~default] on the result of f *)
       let ( let- ) default f = Option.(f `Callback |> value ~default) in
       (* Find the k-th pivot *)
       let i_max = argmax m h k in

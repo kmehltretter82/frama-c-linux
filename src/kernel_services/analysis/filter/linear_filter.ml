@@ -141,7 +141,7 @@ module Make (Field : Field.S) = struct
 
   (* Invariant computation. The computation of the sum of all past
      contributions, and in particuler the oldest ones, implies to check
-     is an infinite series converge and to compute its limit. This is done
+     if an infinite series converge and to compute its limit. This is done
      by grouping iterations by pack of size [e] and factorizing the common
      state matrix power. This leads to an infinite geometric series in the
      matrix space. If the spectral radius of this matrix is stricly lower
@@ -240,9 +240,9 @@ module Make (Field : Field.S) = struct
         let add_recent_contrib = add_contribution compute_recent_contrib in
         let recent = Finite.for_each add_recent_contrib maximal_delay zero in
         (* For the old contributions, we use the same factorization as described
-           previously. However, this time the common terms is not independant
-           from the exponent (i.e the indice of the infinite sum). However, for
-           each indice [k], that common term actually behave the same, it is
+           previously. However, this time the common term is not independant
+           from the exponent (i.e the index of the infinite sum). However, for
+           each index [k], that common term actually behave the same, it is
            just a matter of rewritting. Thus, by computing the maximal deviation
            of this finite common up to rewritting term, we can actually consider
            it as a constant and thus use the same technique as previously

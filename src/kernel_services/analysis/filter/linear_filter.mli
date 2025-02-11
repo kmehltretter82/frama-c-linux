@@ -66,7 +66,7 @@ module Make (Field : Field.S) : sig
     'n succ source
 
 
-  (* A value of type [n filter] describes a filter of order (i.e with n state
+  (** A value of type [n filter] describes a filter of order [n] (i.e with [n] state
      variables). The sources delays are contained by each one of them. *)
   type 'n filter
 
