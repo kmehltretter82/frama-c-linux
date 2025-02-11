@@ -147,7 +147,7 @@ type parsed_result =
     [Error msg] if the parsing fails, where [msg] is the error message. *)
 val parse : string -> (parsed_result, string) result
 
-(** Calls {!parse} and evaluates the reuslt type.
+(** Calls {!parse} and evaluates the result type.
     @raise Log.AbortError if the parsing fails. *)
 val parse_exn : string -> parsed_result
 
