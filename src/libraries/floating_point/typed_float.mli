@@ -141,10 +141,15 @@ type ('format, 'encoded_as) parsed_format =
 type parsed_result =
   | Parsed : ('f, 'k) parsed_format * 'k parsed_float -> parsed_result
 
-(** Parses the given string and returns the parsed float and its kind (single,
-    double or long) according to its suffix, if any. Strings with no suffix
-    are parsed as double. *)
-val parse : string -> parsed_result
+(** Parses the given string and returns [Ok Parsed (kind, float)] with the
+    parsed [float] and its [kind] (single, double or long) according to its
+    suffix, if any. Strings with no suffix are parsed as double. Returns
+    [Error msg] if the parsing fails, where [msg] is the error message. *)
+val parse : string -> (parsed_result, string) result
+
+(** Calls {!parse} and evaluates the result type.
+    @raise Log.AbortError if the parsing fails. *)
+val parse_exn : string -> parsed_result
 
 (** Returns the floating-point kind parsed by [parse]. *)
 val parsed_fkind : ('k, 'f) parsed_format -> Cil_types.fkind

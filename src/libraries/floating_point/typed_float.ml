@@ -403,15 +403,15 @@ let pretty_format fmt (Format (supported, format)) =
   | Long_unsupported, Double -> Format.fprintf fmt "long double precision"
 
 let cannot_be_parsed string format =
-  Kernel.abort ~current:true
-    "The string %s cannot be parsed as a %a floating-point constant"
-    string pretty_format format
+  let msg =
+    Format.asprintf
+      "The string %s cannot be parsed as a %a floating-point constant"
+      string pretty_format format
+  in
+  Error msg
 
 let empty_string () =
-  Kernel.abort ~current:true
-    "Parsing an empty string as a floating-point constant."
-
-
+  Error "Parsing an empty string as a floating-point constant."
 
 module Regexp = struct
   let sign = "\\([+-]?\\)"
@@ -435,7 +435,7 @@ let parse str =
     let str = if suffix then String.sub str 0 length else str in
     match parse_hexadecimal ~format str with
     | None -> cannot_be_parsed str resulting_format
-    | Some result -> Parsed (supported, result)
+    | Some result -> Ok (Parsed (supported, result))
   else if Str.string_match num_dot_frac_exp str 0 then
     let sign       = Str.matched_group 1 str in
     let integral   = Str.matched_group 2 str in
@@ -444,7 +444,7 @@ let parse str =
     let format     = Str.matched_group 5 str in
     let Format (supported, format) = format_of_string format in
     let normalizing = normalize integral fractional exponent format in
-    Parsed (supported, apply_sign sign normalizing)
+    Ok (Parsed (supported, apply_sign sign normalizing))
   else if Str.string_match num_dot_frac str 0 then
     let sign       = Str.matched_group 1 str in
     let integral   = Str.matched_group 2 str in
@@ -453,7 +453,7 @@ let parse str =
     let format     = Str.matched_group 4 str in
     let Format (supported, format) = format_of_string format in
     let normalizing = normalize integral fractional exponent format in
-    Parsed (supported, apply_sign sign normalizing)
+    Ok (Parsed (supported, apply_sign sign normalizing))
   else if Str.string_match num_exp str 0 then
     let sign          = Str.matched_group 1 str in
     let integral      = Str.matched_group 2 str in
@@ -462,7 +462,12 @@ let parse str =
     let format     = Str.matched_group 4 str in
     let Format (supported, format) = format_of_string format in
     let normalizing = normalize integral fractional exponent format in
-    Parsed (supported, apply_sign sign normalizing)
+    Ok (Parsed (supported, apply_sign sign normalizing))
   else
     let format = format_of_string (String.make 1 str.[length]) in
     cannot_be_parsed str format
+
+let parse_exn str =
+  match parse str with
+  | Ok parsed -> parsed
+  | Error msg -> Kernel.abort ~current:true "%s" msg

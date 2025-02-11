@@ -314,7 +314,7 @@ let parse_float ?loc literal =
   let len = String.length literal in
   let last = Char.uppercase_ascii literal.[len-1] in
   let is_nearest_exact = last = 'F' || last = 'D' in
-  let Parsed (format, p) = Typed_float.parse literal in
+  let Parsed (format, p) = Typed_float.parse_exn literal in
   let nearest = Typed_float.(to_float p.nearest) in
   let fkind = Typed_float.parsed_fkind format in
   let creal =
