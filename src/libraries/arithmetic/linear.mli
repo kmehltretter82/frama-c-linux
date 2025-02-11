@@ -58,6 +58,9 @@ module Space (Field : Field.S) : sig
         for the i-th coordinate, which contains one. *)
     val base   : 'n succ finite -> 'n succ nat -> 'n succ vector
 
+    (** The call [get i m] returns the i-th coefficient. *)
+    val get : 'n finite -> 'n vector -> scalar
+
     (** The call [set i x v] returns a new vector of the same linear space as
         [v], and with the same coordinates, except for the i-th one, which is
         set to the scalar [x]. *)
