@@ -822,10 +822,9 @@ extern int          close(int fd);
 extern size_t confstr(int name, char *buf, size_t len);
 
 __FC_EXTERN char __fc_crypt[256];
-char* const __fc_p_crypt = __fc_crypt;
 
 /*@
-  assigns \result \from __fc_p_crypt;
+  assigns \result \from &__fc_crypt;
   assigns __fc_crypt[0..] \from key[0..], salt[0..];
 */
 extern char *crypt(const char *key, const char *salt);
@@ -996,10 +995,9 @@ extern int gethostname(char *name, size_t len);
 extern int sethostname(const char *name, size_t len);
 
 __FC_EXTERN char __fc_getlogin[LOGIN_NAME_MAX];
-char* const __fc_p_getlogin = __fc_getlogin;
 
 /*@
-  assigns \result \from __fc_p_getlogin;
+  assigns \result \from &__fc_getlogin;
 */
 extern char *getlogin(void);
 
@@ -1016,10 +1014,9 @@ extern int getpagesize(void);
 // getpass is deprecated, so we provide only minimal support
 // (PASS_MAX is removed from POSIX Issue 6)
 __FC_EXTERN char __fc_getpass[16];
-char* const __fc_p_getpass = __fc_getpass;
 
 /*@
-  assigns \result \from __fc_p_getpass, indirect:prompt[0..];
+  assigns \result \from &__fc_getpass, indirect:prompt[0..];
 */
 extern char *getpass(const char *prompt);
 
@@ -1281,13 +1278,12 @@ extern int tcsetpgrp(int fildes, pid_t pgid_id);
 extern int truncate(const char *path, off_t length);
 
 __FC_EXTERN volatile char __fc_ttyname[TTY_NAME_MAX];
-volatile char * const __fc_p_ttyname = __fc_ttyname;
 
 /*@
   // missing: may assign to errno: EBADF, ENOTTY
   requires valid_fildes: 0 <= fildes < __FC_MAX_OPEN_FILES;
-  assigns \result \from __fc_p_ttyname, indirect:fildes;
-  ensures result_name_or_null: \result == __fc_p_ttyname || \result == \null;
+  assigns \result \from &__fc_ttyname, indirect:fildes;
+  ensures result_name_or_null: \result == &__fc_ttyname[0] || \result == \null;
  */
 extern char        *ttyname(int fildes);
 

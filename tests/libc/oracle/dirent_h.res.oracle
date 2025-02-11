@@ -41,9 +41,6 @@
 [eva] using specification for function closedir
 [eva] dirent_h.c:39: 
   function closedir: precondition 'dirp_valid_dir_stream' got status valid.
-[eva:garbled-mix:assigns] dirent_h.c:39: 
-  The specification of function closedir
-  has generated a garbled mix of addresses for assigns clause *dirp.
 [eva] Done for function closedir
 [eva] Recording results for main
 [eva] Done for function main
@@ -55,9 +52,7 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
-  __fc_opendir[0..15] ∈
-              {{ garbled mix of &{__fc_opendir}
-               (origin: Library function {dirent_h.c:39}) }}
+  __fc_opendir[0..15] ∈ [--..--]
   d ∈ {{ &__fc_opendir + [0..240],0%16 }}
   dp ∈ {0}
   dfd ∈ [-1..1023]

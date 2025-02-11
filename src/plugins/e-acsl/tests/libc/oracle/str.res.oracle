@@ -1,5 +1,5 @@
 [e-acsl] beginning translation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:507: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:506: Warning: 
   no assigns clause generated for function valid_read_nstring because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:281: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
@@ -7,59 +7,63 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:508: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:507: Warning: 
   no assigns clause generated for function valid_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:274: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:510: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:509: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:511: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:510: Warning: 
   no assigns clause generated for function strnlen because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:300: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:517: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:516: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:524: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:523: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:506: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:505: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:506: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:505: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:521: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:520: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:528: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:527: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:488: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:487: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:490: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:489: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:490: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:489: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:485: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:484: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:493: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:492: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:495: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
@@ -67,10 +71,19 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:497: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:449: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:452: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:439: Warning: 
+  Some assumes clauses could not be translated.
+  Ignoring complete and disjoint behaviors annotations.
+[e-acsl] FRAMAC_SHARE/libc/string.h:439: Warning: 
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:450: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
@@ -79,54 +92,41 @@
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:440: Warning: 
-  Some assumes clauses could not be translated.
-  Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/string.h:440: Warning: 
-  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:451: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:454: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:430: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:432: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:432: Warning: 
-  E-ACSL construct `logic functions or predicates performing read accesses'
-  is not yet supported.
-  Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:429: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:431: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:431: Warning: 
+  E-ACSL construct `logic functions or predicates performing read accesses'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:428: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:435: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:434: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/string.h:429: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:428: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:435: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:434: Warning: 
   function __gen_e_acsl_strcpy: postcondition 'equal_contents' got status unknown.
 [eva:alarm] str.c:16: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] str.c:16: Warning: assertion got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:442: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:441: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:444: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:443: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:448: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:447: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:454: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:453: Warning: 
   function __gen_e_acsl_strncpy, behavior partial: postcondition 'equal_prefix' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:451: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:450: Warning: 
   function __gen_e_acsl_strncpy, behavior complete: postcondition 'equal_after_copy' got status unknown.
 [eva:alarm] str.c:43: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -135,17 +135,17 @@
   function __gen_e_acsl_strcat: precondition 'valid_string_dest' got status unknown.
 [eva:alarm] str.c:47: Warning: 
   function __gen_e_acsl_strcat: precondition 'room_string' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:485: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:484: Warning: 
   function strcat: precondition 'valid_string_dest' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:485: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:484: Warning: 
   function strcat: precondition 'room_string' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:485: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:484: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:493: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:492: Warning: 
   function __gen_e_acsl_strcat: postcondition 'sum_of_lengths' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:496: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:495: Warning: 
   function __gen_e_acsl_strcat: postcondition 'initialization,dest' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:497: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:496: Warning: 
   function __gen_e_acsl_strcat: postcondition 'dest_null_terminated' got status unknown.
 [eva:alarm] str.c:48: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -160,13 +160,13 @@
   function __gen_e_acsl_strncat: precondition 'valid_string_dest' got status unknown.
 [eva:alarm] str.c:59: Warning: 
   function __gen_e_acsl_strncat, behavior partial: precondition 'room_string' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:505: Warning: 
   function strncat: precondition 'valid_string_dest' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:505: Warning: 
   function strncat, behavior partial: precondition 'room_string' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:505: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:528: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:527: Warning: 
   function __gen_e_acsl_strncat, behavior partial: postcondition 'sum_of_bounded_lengths' got status unknown.
 [eva:alarm] str.c:60: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -181,9 +181,9 @@
   function __gen_e_acsl_strncat: precondition 'valid_string_dest' got status unknown.
 [eva:alarm] str.c:71: Warning: 
   function __gen_e_acsl_strncat, behavior complete: precondition 'room_string' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:506: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:505: Warning: 
   function strncat, behavior complete: precondition 'room_string' got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:521: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:520: Warning: 
   function __gen_e_acsl_strncat, behavior complete: postcondition 'sum_of_lengths' got status unknown.
 [eva:alarm] str.c:72: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.

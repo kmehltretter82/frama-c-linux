@@ -462,7 +462,6 @@ extern void srandom(unsigned int seed);
 int __fc_random48_init;
 
 __FC_EXTERN unsigned short __fc_random48_counter[3];
-unsigned short * const __fc_p_random48_counter = __fc_random48_counter;
 
 /*@
   assigns __fc_random48_counter[0..2] \from seed;
@@ -476,9 +475,9 @@ extern void srand48 (long int seed);
   requires initialization:initialized_seed16v: \initialized(seed16v+(0..2));
   assigns __fc_random48_counter[0..2] \from seed16v[0..2];
   assigns __fc_random48_init \from \nothing;
-  assigns \result \from __fc_p_random48_counter;
+  assigns \result \from &__fc_random48_counter;
   ensures random48_initialized: __fc_random48_init == 1;
-  ensures result_counter: \result == __fc_p_random48_counter;
+  ensures result_counter: \result == &__fc_random48_counter[0];
 */
 extern unsigned short *seed48(unsigned short seed16v[3]);
 

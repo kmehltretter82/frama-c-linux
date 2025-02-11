@@ -31,8 +31,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main1_l9[0] }}
   r ∈ {{ &__malloc_main1_l12[0] }}
@@ -60,8 +58,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main1_l9[0] }}
   r ∈ {{ &__malloc_main1_l12[0] }}
@@ -79,8 +75,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main1_l9[0] }} or ESCAPINGADDR
   r ∈ {{ &__malloc_main1_l12[0] }} or ESCAPINGADDR
@@ -130,8 +124,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main2_l30[0] }}
   r ∈ {{ &__malloc_main2_l33[0] }}
@@ -162,8 +154,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main2_l30[0] }}
   r ∈ {{ &__malloc_main2_l33[0] }}
@@ -181,8 +171,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   q ∈ {{ &__malloc_main2_l30[0] }} or ESCAPINGADDR
   r ∈ {{ &__malloc_main2_l33[0] }} or ESCAPINGADDR
@@ -239,8 +227,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main3_l52 }}
   q ∈ {{ &__malloc_main3_l53_0 }}
@@ -279,8 +265,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main3_l52 }} or ESCAPINGADDR
   q ∈ {{ &__malloc_main3_l53_0 }} or ESCAPINGADDR
@@ -314,8 +298,6 @@
   __fc_errno ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   Frama_C_entropy_source ∈ [--..--]
   p ∈ {{ &__malloc_main3_l52 }} or ESCAPINGADDR
   q ∈ {{ &__malloc_main3_l53_0 }} or ESCAPINGADDR

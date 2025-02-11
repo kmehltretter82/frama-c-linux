@@ -36,12 +36,11 @@ typedef struct entry {
 typedef enum { FIND, ENTER } ACTION;
 typedef enum { preorder, postorder, endorder, leaf } VISIT;
 
-extern volatile char __fc_search_key[64];
-extern volatile char __fc_search_data[64];
+__FC_EXTERN volatile char __fc_search_key[64];
+__FC_EXTERN volatile char __fc_search_data[64];
 
 struct entry *__fc_search_tbl; // allocated/freed by hcreate/hdestroy
 ENTRY __fc_search_entry = { __fc_search_key, __fc_search_data }; // used by hsearch
-ENTRY * const __fc_p_search_entry = &__fc_search_entry;
 
 /*@
   allocates __fc_search_tbl;
@@ -57,7 +56,7 @@ extern int hcreate(size_t nel);
 extern void hdestroy(void);
 
 /*@
-  assigns \result \from __fc_p_search_entry, indirect:item,
+  assigns \result \from &__fc_search_entry, indirect:item,
     indirect:action;
   assigns __fc_search_key[0..] \from __fc_search_key[0..], item.key[0..],
     indirect:action;

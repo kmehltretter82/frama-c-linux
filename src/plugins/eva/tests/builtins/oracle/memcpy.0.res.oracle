@@ -327,10 +327,6 @@
   # cvalue:
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   i ∈ [--..--]
   src[0..19] ∈ {0}
   dst1[0..19] ∈ {0}

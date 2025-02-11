@@ -2,42 +2,42 @@
 [e-acsl] Warning: annotating undefined function `realpath':
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1050: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1049: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1052: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1051: Warning: 
   no assigns clause generated for function valid_read_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:277: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1050: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1049: Warning: 
   Some assumes clauses could not be translated.
   Ignoring complete and disjoint behaviors annotations.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1050: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1049: Warning: 
   E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1072: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1071: Warning: 
   E-ACSL construct `\fresh' is not yet supported. Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1088: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1087: Warning: 
   no assigns clause generated for function valid_string because pointers as arguments is not yet supported
 [e-acsl] FRAMAC_SHARE/libc/__fc_string_axiomatic.h:274: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1100: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/stdlib.h:1099: Warning: 
   E-ACSL construct
   `logic functions or predicates with no definition nor reads clause'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:assigns:missing-result] FRAMAC_SHARE/libc/stdlib.h:1102: Warning: 
+[eva:assigns:missing-result] FRAMAC_SHARE/libc/stdlib.h:1101: Warning: 
   no 'assigns \result \from ...' clause specified for function realpath
-[eva] FRAMAC_SHARE/libc/stdlib.h:1050: Warning: 
+[eva] FRAMAC_SHARE/libc/stdlib.h:1049: Warning: 
   ignoring unsupported allocates clause
-[inout] FRAMAC_SHARE/libc/stdlib.h:1050: Warning: 
+[inout] FRAMAC_SHARE/libc/stdlib.h:1049: Warning: 
   failed to interpret assigns clause '*(\result + (0 .. 4096 - 1))'
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1065: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1064: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1080: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1079: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status invalid.
-[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1072: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/stdlib.h:1071: Warning: 
   function __gen_e_acsl_realpath, behavior allocate_resolved_name: postcondition 'allocation' got status unknown.

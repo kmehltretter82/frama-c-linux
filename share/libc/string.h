@@ -412,13 +412,12 @@ extern char *strtok_r(char *restrict s, const char *restrict delim, char **restr
 extern char *strsep (char **stringp, const char *delim);
 
 __FC_EXTERN char __fc_strerror[64];
-char * const __fc_p_strerror = __fc_strerror;
 
 // Note: postcondition "result_nul_terminated" is only a temporary patch,
 //       to help plug-ins which are currently unable to reduce the post-state
 //       using only 'result_valid_string'.
-/*@ assigns \result \from __fc_p_strerror, indirect:errnum;
-  @ ensures result_internal_str: \result == __fc_p_strerror;
+/*@ assigns \result \from &__fc_strerror, indirect:errnum;
+  @ ensures result_internal_str: \result == &__fc_strerror[0];
   @ ensures result_nul_terminated: \result[63] == 0;
   @ ensures result_valid_string: valid_read_string(\result);
   @*/
@@ -646,11 +645,10 @@ extern char *stpncpy(char *restrict dest, const char *restrict src, size_t n);
 extern int strerror_r(int errnum, char *strerrbuf, size_t buflen);
 
 __FC_EXTERN char __fc_strsignal[64];
-char * const __fc_p_strsignal = __fc_strsignal;
 
 /*@ //missing: requires valid_signal(signum); assigns \from 'locale';
-  @ assigns \result \from __fc_p_strsignal, indirect:signum;
-  @ ensures result_internal_str: \result == __fc_p_strsignal;
+  @ assigns \result \from &__fc_strsignal, indirect:signum;
+  @ ensures result_internal_str: \result == &__fc_strsignal[0];
   @ ensures result_nul_terminated: \result[63] == 0;
   @ ensures result_valid_string: valid_read_string(\result);
   @*/

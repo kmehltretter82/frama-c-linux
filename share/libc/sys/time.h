@@ -38,8 +38,8 @@ struct timezone {
 };
 
 /* Abstract representation of the current time. */
-//@ ghost volatile unsigned int __fc_time;
-//@ ghost extern int __fc_tz;
+__FC_EXTERN unsigned int __fc_time;
+__FC_EXTERN int __fc_tz;
 
 /*@
   requires valid_path: valid_read_string(path);

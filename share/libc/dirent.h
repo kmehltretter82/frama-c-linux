@@ -49,7 +49,6 @@ typedef struct DIR {
 } DIR;
 
 DIR __fc_opendir[__FC_FOPEN_MAX];
-DIR* const __fc_p_opendir = __fc_opendir;
 
 /*@
   assigns \result \from indirect:*a[0..], indirect:*b[0..];
@@ -58,10 +57,10 @@ extern int alphasort(const struct dirent **a, const struct dirent **b);
 
 /*@
   requires dirp_valid_dir_stream: \subset(dirp,&__fc_opendir[0 .. __FC_FOPEN_MAX-1]);
-  assigns \result \from dirp, *dirp, __fc_p_opendir;
-  assigns errno \from indirect:dirp, indirect:*dirp, indirect:__fc_p_opendir;
-  assigns *dirp \from dirp, *dirp, __fc_p_opendir;
-  ensures err_or_closed_on_success: 
+  assigns \result, errno \from indirect:dirp, indirect:*dirp,
+                               indirect:__fc_opendir[0 .. __FC_FOPEN_MAX-1];
+  assigns *dirp \from indirect:dirp, *dirp, __fc_opendir[0 .. __FC_FOPEN_MAX-1];
+  ensures err_or_closed_on_success:
     (\result == 0 && dirp->__fc_dir_inode == \null) || \result == -1;
 */
 extern int closedir(DIR *dirp);
@@ -72,15 +71,15 @@ extern int closedir(DIR *dirp);
 extern int dirfd(DIR *fd);
 
 /*@
-  assigns \result \from __fc_p_opendir;
+  assigns \result \from &__fc_opendir;
   assigns errno \from indirect:__fc_opendir[0 .. __FC_FOPEN_MAX-1];
   assigns __fc_opendir[0 .. __FC_FOPEN_MAX-1] \from __fc_opendir[0 .. __FC_FOPEN_MAX-1];
 */
 extern DIR *fdopendir(int fd);
 
 /*@
-  assigns \result \from path[0..], __fc_p_opendir;
-  assigns errno \from indirect:path[0..], indirect:__fc_p_opendir;
+  assigns \result \from path[0..], &__fc_opendir;
+  assigns errno \from indirect:path[0..], indirect:&__fc_opendir;
   ensures result_null_or_valid: \result == \null || \valid(\result);
   ensures valid_dir_stream_on_success: 
     \result != \null ==> \result == &__fc_opendir[\result->__fc_dir_id];
@@ -91,18 +90,18 @@ extern DIR *opendir(const char *path);
 
 /*@
   requires dirp_valid_dir_stream: \subset(dirp, &__fc_opendir[0 .. __FC_FOPEN_MAX-1]);
-  assigns \result \from *dirp, __fc_p_opendir;
+  assigns \result \from *dirp, __fc_opendir[0 .. __FC_FOPEN_MAX-1];
   assigns dirp->__fc_dir_position \from dirp->__fc_dir_position;
-  assigns errno \from indirect:dirp, indirect:*dirp, indirect:__fc_p_opendir;
+  assigns errno \from indirect:dirp, indirect:*dirp,
+                      indirect:__fc_opendir[0 .. __FC_FOPEN_MAX-1];
   ensures result_null_or_valid: \result == \null || \valid(\result);
 */
 extern struct dirent *readdir(DIR *dirp);
 
 /*@
-  assigns \result \from *dirp, __fc_p_opendir;
+  assigns \result, errno \from indirect:*dirp, indirect:__fc_opendir[0 .. __FC_FOPEN_MAX-1];
   assigns *dirp, *entry \from *dirp;
   assigns *result \from entry;
-  assigns errno \from indirect:*dirp, indirect:*entry;
 */
 extern int readdir_r(DIR * dirp, struct dirent * entry,
                      struct dirent ** result);

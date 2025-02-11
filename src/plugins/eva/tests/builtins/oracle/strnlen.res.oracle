@@ -38,13 +38,7 @@
   __fc_heap_status ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
   __fc_random48_init ∈ {0}
-  __fc_random48_counter[0..2] ∈ [--..--]
-  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
   __fc_strtok_ptr ∈ {0}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   t1[0] ∈ {97}
     [1] ∈ {98}
     [2] ∈ {99}

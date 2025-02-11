@@ -59,10 +59,6 @@
   NULL[rbits 800 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   i ∈ {1}
   j ∈ {1; 2}
   k[0..4] ∈ [--..--]
@@ -140,10 +136,6 @@
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   v ∈ [--..--]
   addr ∈ [--..--]
   v1.[bits 0 to 7] ∈ {1}
@@ -179,10 +171,6 @@
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {0}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   v ∈ [--..--]
   addr ∈ [--..--]
   v1.[bits 0 to 7] ∈ {1}
@@ -614,10 +602,6 @@
   NULL[rbits 800 to 1607] ∈ [--..--]
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   i ∈ {1}
   j ∈ {1; 2}
   k[0..4] ∈ [--..--]
@@ -692,10 +676,6 @@
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   v ∈ [--..--]
   addr ∈ [--..--]
   v1.[bits 0 to 7] ∈ {1}
@@ -733,10 +713,6 @@
   NULL[rbits 800 to 1607] ∈ [--..--] or ESCAPINGADDR
   __fc_heap_status ∈ [--..--]
   __fc_strtok_ptr ∈ {{ NULL ; &S___fc_strtok_ptr[0] }}
-  __fc_strerror[0..63] ∈ [--..--]
-  __fc_p_strerror ∈ {{ &__fc_strerror[0] }}
-  __fc_strsignal[0..63] ∈ [--..--]
-  __fc_p_strsignal ∈ {{ &__fc_strsignal[0] }}
   v ∈ [--..--]
   addr ∈ [--..--]
   v1.[bits 0 to 7] ∈ {1}

@@ -2,7 +2,6 @@
 #include "errno.h"
 #include "pthread.h"
 #include "sched.h"
-#include "signal.h"
 #include "stddef.h"
 #include "stdint.h"
 #include "stdio.h"
@@ -758,7 +757,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "usleep";
-    __gen_e_acsl_assert_data.line = 1316;
+    __gen_e_acsl_assert_data.line = 1312;
     __gen_e_acsl_assert_data.name = "result_ok_or_error";
     __e_acsl_assert(__gen_e_acsl_or,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -785,7 +784,7 @@ int __gen_e_acsl_usleep(useconds_t usec)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 704;
+    __gen_e_acsl_assert_data.line = 703;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     __e_acsl_delete_block((void *)(& status));
@@ -1703,68 +1702,18 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& write_count));
     __e_acsl_store_block((void *)(values),80UL);
     __e_acsl_full_init((void *)(& values));
-    __e_acsl_store_block((void *)(& __fc_p_ttyname),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_ttyname));
-    __e_acsl_store_block((void *)(ttyname),32UL);
-    __e_acsl_full_init((void *)(& ttyname));
-    __e_acsl_store_block((void *)(& __fc_p_getpass),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_getpass));
-    __e_acsl_store_block((void *)(getpass),16UL);
-    __e_acsl_full_init((void *)(& getpass));
-    __e_acsl_store_block((void *)(& __fc_p_getlogin),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_getlogin));
-    __e_acsl_store_block((void *)(getlogin),8UL);
-    __e_acsl_full_init((void *)(& getlogin));
-    __e_acsl_store_block((void *)(& __fc_p_crypt),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_crypt));
-    __e_acsl_store_block((void *)(crypt),256UL);
-    __e_acsl_full_init((void *)(& crypt));
     __e_acsl_store_block((void *)(& Frama_C_entropy_source),4UL);
     __e_acsl_full_init((void *)(& Frama_C_entropy_source));
-    __e_acsl_store_block((void *)(& __fc_p_random48_counter),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_random48_counter));
-    __e_acsl_store_block((void *)(random48_counter),6UL);
-    __e_acsl_full_init((void *)(& random48_counter));
     __e_acsl_store_block((void *)(& __fc_random48_init),4UL);
     __e_acsl_full_init((void *)(& __fc_random48_init));
     __e_acsl_store_block((void *)(& __fc_rand_max),8UL);
     __e_acsl_full_init((void *)(& __fc_rand_max));
-    __e_acsl_store_block((void *)(& __fc_p_cuserid),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_cuserid));
-    __e_acsl_store_block((void *)(cuserid),9UL);
-    __e_acsl_full_init((void *)(& cuserid));
-    __e_acsl_store_block((void *)(& __fc_p_ctermid),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_ctermid));
-    __e_acsl_store_block((void *)(ctermid),9UL);
-    __e_acsl_full_init((void *)(& ctermid));
-    __e_acsl_store_block((void *)(& __fc_p_tmpnam),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_tmpnam));
-    __e_acsl_store_block((void *)(tmpnam),20UL);
-    __e_acsl_full_init((void *)(& tmpnam));
-    __e_acsl_store_block((void *)(& __fc_p_fopen),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_fopen));
     __e_acsl_store_block((void *)(__fc_fopen),128UL);
     __e_acsl_full_init((void *)(& __fc_fopen));
-    __e_acsl_store_block((void *)(& __fc_p_getdate),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_getdate));
-    __e_acsl_store_block((void *)(& getdate),56UL);
-    __e_acsl_full_init((void *)(& getdate));
     __e_acsl_store_block((void *)(& __fc_interrupted),4UL);
     __e_acsl_full_init((void *)(& __fc_interrupted));
-    __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_time_tm));
-    __e_acsl_store_block((void *)(& time_tm),56UL);
-    __e_acsl_full_init((void *)(& time_tm));
-    __e_acsl_store_block((void *)(& __fc_p_ctime),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_ctime));
-    __e_acsl_store_block((void *)(ctime),26UL);
-    __e_acsl_full_init((void *)(& ctime));
-    __e_acsl_store_block((void *)(& __fc_time),4UL);
-    __e_acsl_full_init((void *)(& __fc_time));
-    __e_acsl_store_block((void *)(& __fc_p_sigaction),8UL);
-    __e_acsl_full_init((void *)(& __fc_p_sigaction));
-    __e_acsl_store_block((void *)(sigaction),2080UL);
-    __e_acsl_full_init((void *)(& sigaction));
+    __e_acsl_store_block((void *)(& time),4UL);
+    __e_acsl_full_init((void *)(& time));
   }
   return;
 }
@@ -1778,37 +1727,12 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& read_count));
   __e_acsl_delete_block((void *)(& write_count));
   __e_acsl_delete_block((void *)(values));
-  __e_acsl_delete_block((void *)(& __fc_p_ttyname));
-  __e_acsl_delete_block((void *)(ttyname));
-  __e_acsl_delete_block((void *)(& __fc_p_getpass));
-  __e_acsl_delete_block((void *)(getpass));
-  __e_acsl_delete_block((void *)(& __fc_p_getlogin));
-  __e_acsl_delete_block((void *)(getlogin));
-  __e_acsl_delete_block((void *)(& __fc_p_crypt));
-  __e_acsl_delete_block((void *)(crypt));
   __e_acsl_delete_block((void *)(& Frama_C_entropy_source));
-  __e_acsl_delete_block((void *)(& __fc_p_random48_counter));
-  __e_acsl_delete_block((void *)(random48_counter));
   __e_acsl_delete_block((void *)(& __fc_random48_init));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
-  __e_acsl_delete_block((void *)(& __fc_p_cuserid));
-  __e_acsl_delete_block((void *)(cuserid));
-  __e_acsl_delete_block((void *)(& __fc_p_ctermid));
-  __e_acsl_delete_block((void *)(ctermid));
-  __e_acsl_delete_block((void *)(& __fc_p_tmpnam));
-  __e_acsl_delete_block((void *)(tmpnam));
-  __e_acsl_delete_block((void *)(& __fc_p_fopen));
   __e_acsl_delete_block((void *)(__fc_fopen));
-  __e_acsl_delete_block((void *)(& __fc_p_getdate));
-  __e_acsl_delete_block((void *)(& getdate));
   __e_acsl_delete_block((void *)(& __fc_interrupted));
-  __e_acsl_delete_block((void *)(& __fc_p_time_tm));
-  __e_acsl_delete_block((void *)(& time_tm));
-  __e_acsl_delete_block((void *)(& __fc_p_ctime));
-  __e_acsl_delete_block((void *)(ctime));
-  __e_acsl_delete_block((void *)(& __fc_time));
-  __e_acsl_delete_block((void *)(& __fc_p_sigaction));
-  __e_acsl_delete_block((void *)(sigaction));
+  __e_acsl_delete_block((void *)(& time));
   return;
 }
 

@@ -2,7 +2,6 @@
 #include "errno.h"
 #include "pthread.h"
 #include "sched.h"
-#include "signal.h"
 #include "stddef.h"
 #include "stdint.h"
 #include "stdio.h"
@@ -650,7 +649,7 @@ pid_t __gen_e_acsl_fork(void)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
-    __gen_e_acsl_assert_data.line = 917;
+    __gen_e_acsl_assert_data.line = 916;
     __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
@@ -798,7 +797,7 @@ pid_t __gen_e_acsl_waitpid(pid_t pid, int *stat_loc, int options)
     __gen_e_acsl_assert_data.pred_txt = "\\false";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/stdlib.h";
     __gen_e_acsl_assert_data.fct = "exit";
-    __gen_e_acsl_assert_data.line = 704;
+    __gen_e_acsl_assert_data.line = 703;
     __gen_e_acsl_assert_data.name = "never_terminates";
     __e_acsl_assert(0,& __gen_e_acsl_assert_data);
     return;

@@ -356,13 +356,12 @@ extern uint16_t ntohs(uint16_t arg);
   assigns \result \from indirect:arg[0..]; */
 extern in_addr_t inet_addr(const char *arg);
 
-volatile char __fc_inet_ntoa_array[16];
-char *__fc_inet_ntoa = (char*)__fc_inet_ntoa_array;
+volatile char __fc_inet_ntoa[16];
 
 /*@
-  assigns \result \from indirect:arg, __fc_inet_ntoa;
+  assigns \result \from indirect:arg, &__fc_inet_ntoa;
   assigns __fc_inet_ntoa[0..] \from indirect:arg;
-  ensures result_static_string: \result == __fc_inet_ntoa;
+  ensures result_static_string: \result == &__fc_inet_ntoa[0];
   ensures result_null_terminated: \result[15] == 0; // always null-terminated
   ensures result_valid_string: valid_read_string(\result);
 */

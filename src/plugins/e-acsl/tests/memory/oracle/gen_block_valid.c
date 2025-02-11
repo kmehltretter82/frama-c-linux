@@ -2,7 +2,6 @@
 #include "errno.h"
 #include "pthread.h"
 #include "sched.h"
-#include "signal.h"
 #include "stddef.h"
 #include "stdint.h"
 #include "stdio.h"
