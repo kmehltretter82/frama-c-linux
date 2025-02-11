@@ -252,8 +252,13 @@ module Make (Field : Field.S) = struct
         let old = Finite.for_each add_old_contrib exponent zero in
         (* The old contribution is raised to infinity by dividing it with the
            scalar (1 - ||A^q||), which is the limit of the norm of the infinite
-           series. I don't know why, but we cannot use the same method because
-           it produces an under approximation. *)
+           series. We do not use the same method as before because we observe
+           experimentaly that it produces an under approximation. Even if we do
+           not have a proof of why it is the case, our intuition is that by
+           grouping the infinite sum with our rewritting, we do introduce
+           correlations that lead to an underapproximation. Those correlations
+           are however ignored through a norm based approach and thus the
+           compution is correct. *)
         let scale_to_infinity = Field.(one / (one - spectral_norm)) in
         let old_at_infinity = Matrix.(scale_to_infinity ** old) in
         Matrix.(acc + recent + old_at_infinity)
