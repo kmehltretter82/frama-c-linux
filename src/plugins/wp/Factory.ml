@@ -140,8 +140,8 @@ end
 (* -------------------------------------------------------------------------- *)
 
 let is_ptr x = Cil.isPointerType x.Cil_types.vtype
-let is_fun_ptr x = Cil.isFunctionType x.Cil_types.vtype
 let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
+
 let is_init kf x =
   CfgInfos.is_entry_point kf ||
   Wp_parameters.AliasInit.get () ||
@@ -156,7 +156,8 @@ let refusage_param ~byref ~context x =
   | RefUsage.ByAddr -> MemoryContext.ByAddr
   | RefUsage.ByValue ->
     if context && is_formal_ptr x then MemoryContext.InContext (validity x)
-    else if is_ptr x && not (is_fun_ptr x) then MemoryContext.ByShift
+    else if is_ptr x && not @@ Cil.isFunPtrType x.Cil_types.vtype
+    then MemoryContext.ByShift
     else MemoryContext.ByValue
   | RefUsage.ByRef ->
     if byref
