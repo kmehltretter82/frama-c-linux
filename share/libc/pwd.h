@@ -114,7 +114,7 @@ extern int getpwuid_r(uid_t uid, struct passwd *pwd,
                       char *buf, size_t buflen, struct passwd **result);
 
 // Represents the user database and its current entry
-struct passwd __fc_pwent;
+__FC_EXTERN struct passwd __fc_pwent;
 
 /*@
   assigns __fc_pwent \from __fc_pwent;

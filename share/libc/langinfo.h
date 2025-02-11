@@ -154,7 +154,7 @@ enum
 #define CRNCYSTR CRNCYSTR
 };
 
-char __fc_langinfo[64];
+__FC_EXTERN char __fc_langinfo[64];
 char* const __fc_p_langinfo = __fc_langinfo;
 
 /*@

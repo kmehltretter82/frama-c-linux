@@ -40,5 +40,6 @@
 #include "stdio.c"
 #include "stdlib.c"
 #include "string.c"
+#include "time.c"
 #include "unistd.c"
 #include "wchar.c"

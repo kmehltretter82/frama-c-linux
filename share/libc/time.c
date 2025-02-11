@@ -24,7 +24,9 @@
 #include "__fc_builtin.h"
 __PUSH_FC_STDLIB
 
-extern char __fc_ctime[26];
+char __fc_ctime[26];
+struct tm __fc_time_tm;
+struct tm __fc_getdate;
 
 extern char *ctime(const time_t *timer) {
   //@ assert \valid_read(timer);

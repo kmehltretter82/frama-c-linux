@@ -3456,12 +3456,12 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& valid_specifiers));
     __e_acsl_store_block((void *)(& __fc_p_getdate),8UL);
     __e_acsl_full_init((void *)(& __fc_p_getdate));
-    __e_acsl_store_block((void *)(& __fc_getdate),56UL);
-    __e_acsl_full_init((void *)(& __fc_getdate));
+    __e_acsl_store_block((void *)(& getdate),56UL);
+    __e_acsl_full_init((void *)(& getdate));
     __e_acsl_store_block((void *)(& __fc_p_time_tm),8UL);
     __e_acsl_full_init((void *)(& __fc_p_time_tm));
-    __e_acsl_store_block((void *)(& __fc_time_tm),56UL);
-    __e_acsl_full_init((void *)(& __fc_time_tm));
+    __e_acsl_store_block((void *)(& time_tm),56UL);
+    __e_acsl_full_init((void *)(& time_tm));
   }
   return;
 }
@@ -3470,9 +3470,9 @@ void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(& valid_specifiers));
   __e_acsl_delete_block((void *)(& __fc_p_getdate));
-  __e_acsl_delete_block((void *)(& __fc_getdate));
+  __e_acsl_delete_block((void *)(& getdate));
   __e_acsl_delete_block((void *)(& __fc_p_time_tm));
-  __e_acsl_delete_block((void *)(& __fc_time_tm));
+  __e_acsl_delete_block((void *)(& time_tm));
   return;
 }
 

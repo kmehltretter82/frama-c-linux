@@ -128,7 +128,7 @@ extern time_t mktime(struct tm *timeptr);
 */
 extern time_t time(time_t *timer);
 
-char __fc_ctime[26];
+__FC_EXTERN char __fc_ctime[26];
 char * const  __fc_p_ctime = __fc_ctime;
 
 /*@
@@ -151,7 +151,7 @@ extern char *asctime(const struct tm *timeptr);
 */
 extern char *ctime(const time_t *timer);
 
-struct tm __fc_time_tm;
+__FC_EXTERN struct tm __fc_time_tm;
 struct tm * const  __fc_p_time_tm = &__fc_time_tm;
 
 /*@
@@ -315,7 +315,7 @@ extern char *ctime_r(const time_t *timep, char *buf);
 
 extern int getdate_err;
 
-struct tm __fc_getdate;
+__FC_EXTERN struct tm __fc_getdate;
 struct tm * const __fc_p_getdate = &__fc_getdate;
 
 /*@
@@ -395,17 +395,17 @@ extern int timer_create(clockid_t clockid, struct sigevent *restrict evp,
 extern int timer_delete(timer_t timerid);
 
 /*@
-  assigns \result \from timerid;
+  assigns \result \from indirect:timerid;
 */
 extern int timer_getoverrun(timer_t timerid);
 
 /*@
-  assigns \result, *value \from timerid;
+  assigns \result, *value \from indirect:timerid;
 */
 extern int timer_gettime(timer_t timerid, struct itimerspec *value);
 
 /*@
-  assigns \result, *ovalue \from timerid, flags, *value;
+  assigns \result, *ovalue \from indirect:timerid, flags, *value;
 */
 extern int timer_settime(timer_t timerid, int flags,
                          const struct itimerspec *restrict value,

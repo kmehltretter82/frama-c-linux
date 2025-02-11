@@ -140,7 +140,7 @@ FILE* const __fc_p_fopen = __fc_fopen;
 */
 extern FILE *tmpfile(void);
 
-char __fc_tmpnam[L_tmpnam];
+__FC_EXTERN char __fc_tmpnam[L_tmpnam];
 char * const __fc_p_tmpnam = __fc_tmpnam;
 
 /*@
@@ -706,7 +706,7 @@ extern int asprintf(char **strp, const char *fmt, ...);
 extern int vasprintf(char **restrict strp, const char *restrict fmt,
                      va_list ap);
 
-char __fc_ctermid[L_ctermid];
+__FC_EXTERN char __fc_ctermid[L_ctermid];
 char* const __fc_p_ctermid = __fc_ctermid;
 
 /*@
@@ -717,7 +717,7 @@ extern char *ctermid(char *s);
 
 // Note: since L_cuserid has been removed from POSIX since Issue 6,
 // we will not add it to our machdep.
-char __fc_cuserid[9];
+__FC_EXTERN char __fc_cuserid[9];
 char* const __fc_p_cuserid = __fc_cuserid;
 
 /*@

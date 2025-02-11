@@ -120,6 +120,7 @@
 #include "sys/wait.h"
 #include "syslog.h"
 #include "termios.h"
+#include "time.c"
 #include "time.h"
 #include "trace.h"
 #include "uchar.h"

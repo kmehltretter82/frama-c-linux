@@ -68,7 +68,7 @@ struct utmp
 extern int login_tty (int fd);
 
 // static storage used by some getter functions
-extern struct utmp __fc_get;
+__FC_EXTERN struct utmp __fc_get;
 
 /*@
   assigns __fc_utmp \from __fc_utmp, *ut;

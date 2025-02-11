@@ -551,7 +551,7 @@ extern void exit(int status) __attribute__ ((__noreturn__));
 */
 extern void _Exit(int status) __attribute__ ((__noreturn__));
 
-extern char *__fc_env[ARG_MAX];
+__FC_EXTERN char *__fc_env[ARG_MAX];
 
 /*@
   requires valid_name: valid_read_string(name);

@@ -62,12 +62,16 @@
   tv.tv_sec ∈ [--..--]
     .tv_usec ∈ [0..999999]
 [eva:final-states] Values at end of function test_strftime:
-  __fc_time_tm ∈ [--..--]
+  __fc_time_tm{.tm_sec; .tm_min; .tm_hour; .tm_mday; .tm_mon; .tm_year; .tm_wday; .tm_yday; .tm_isdst; .tm_gmtoff} ∈
+              [--..--]
+              .tm_zone ∈ {{ NULL + [--..--] ; &S_tm_zone___fc_time_tm[0] }}
   outstr[0..199] ∈ [--..--] or UNINITIALIZED
   t ∈ [--..--]
   tmp ∈ {{ NULL ; &__fc_time_tm }}
   res ∈ [0..199] or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_ctime[0..25] ∈ [--..--]
-  __fc_time_tm ∈ [--..--]
+  __fc_time_tm{.tm_sec; .tm_min; .tm_hour; .tm_mday; .tm_mon; .tm_year; .tm_wday; .tm_yday; .tm_isdst; .tm_gmtoff} ∈
+              [--..--]
+              .tm_zone ∈ {{ NULL + [--..--] ; &S_tm_zone___fc_time_tm[0] }}
   __retres ∈ {0}

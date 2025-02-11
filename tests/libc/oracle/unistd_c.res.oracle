@@ -7,36 +7,36 @@
 [eva] computing for function getopt <- main.
   Called from unistd_c.c:6.
 [eva] computing for function Frama_C_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:38.
-[eva] using specification for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:38: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] FRAMAC_SHARE/libc/unistd.c:39: Call to builtin strlen
-[eva] FRAMAC_SHARE/libc/unistd.c:39: 
-  function strlen: precondition 'valid_string_s' got status valid.
-[eva] computing for function Frama_C_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:39.
-[eva] FRAMAC_SHARE/libc/unistd.c:39: 
-  function Frama_C_interval: precondition 'order' got status valid.
-[eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_nondet_ptr <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:40.
-[eva] using specification for function Frama_C_nondet_ptr
-[eva] Done for function Frama_C_nondet_ptr
-[eva] computing for function Frama_C_interval <- getopt <- main.
   Called from FRAMAC_SHARE/libc/unistd.c:41.
+[eva] using specification for function Frama_C_interval
 [eva] FRAMAC_SHARE/libc/unistd.c:41: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] computing for function Frama_C_unsigned_char_interval <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:42.
-[eva] using specification for function Frama_C_unsigned_char_interval
+[eva] FRAMAC_SHARE/libc/unistd.c:42: Call to builtin strlen
 [eva] FRAMAC_SHARE/libc/unistd.c:42: 
+  function strlen: precondition 'valid_string_s' got status valid.
+[eva] computing for function Frama_C_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:42.
+[eva] FRAMAC_SHARE/libc/unistd.c:42: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_nondet_ptr <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:43.
+[eva] using specification for function Frama_C_nondet_ptr
+[eva] Done for function Frama_C_nondet_ptr
+[eva] computing for function Frama_C_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:44.
+[eva] FRAMAC_SHARE/libc/unistd.c:44: 
+  function Frama_C_interval: precondition 'order' got status valid.
+[eva] Done for function Frama_C_interval
+[eva] computing for function Frama_C_unsigned_char_interval <- getopt <- main.
+  Called from FRAMAC_SHARE/libc/unistd.c:45.
+[eva] using specification for function Frama_C_unsigned_char_interval
+[eva] FRAMAC_SHARE/libc/unistd.c:45: 
   function Frama_C_unsigned_char_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_unsigned_char_interval
 [eva] computing for function Frama_C_nondet <- getopt <- main.
-  Called from FRAMAC_SHARE/libc/unistd.c:42.
+  Called from FRAMAC_SHARE/libc/unistd.c:45.
 [eva] using specification for function Frama_C_nondet
 [eva] Done for function Frama_C_nondet
 [eva] Recording results for getopt
