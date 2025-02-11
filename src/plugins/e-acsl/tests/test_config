@@ -3,7 +3,7 @@ MACRO: MACHDEP -machdep gcc_x86_64
 MACRO: GLOBAL @MACHDEP@ -keep-unused-functions none -verbose 0 -no-unicode
 
 COMMENT: no more share to set with Dune
-MACRO: EACSL -e-acsl -e-acsl-verbose 1
+MACRO: EACSL -e-acsl -e-acsl-verbose 1 -e-acsl-interlang
 MACRO: EVA -eva -eva-no-alloc-returns-null -eva-no-results -eva-no-print -eva-warn-key libc:unsupported-spec=inactive -eva-warn-key loop-unroll:auto=inactive
 
 MACRO: EVENTUALLY -print -ocode @DEST@.c

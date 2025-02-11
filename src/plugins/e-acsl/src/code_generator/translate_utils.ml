@@ -169,7 +169,7 @@ let gmp_to_sizet ~adata ~loc ~name ?(check_lower_bound=true) ?pp kf env t =
 let () =
   Memory_translate.gmp_to_sizet_ref := gmp_to_sizet
 
-let exp_comparison_to_exp
+let comparison_to_exp
     ~loc kf env ity bop e1 e2 ?(name = Misc.name_of_binop bop) t_opt =
   let ty1 = Cil.typeOf e1 in
   let ty2 = Cil.typeOf e2 in
@@ -202,20 +202,6 @@ let exp_comparison_to_exp
         Printer.pp_typ ty2
   in
   e, env
-
-let comparison_to_exp ~adata ~loc kf env ity ?e1 bop t1 t2 ?name t_opt
-  =
-  let e1, adata, env =
-    match e1 with
-    | None ->
-      let e1, adata, env = term_to_exp ~adata kf env t1 in
-      e1, adata, env
-    | Some e1 ->
-      e1, adata, env
-  in
-  let e2, adata, env = term_to_exp ~adata kf env t2 in
-  let e, env = exp_comparison_to_exp ~loc kf env ity bop e1 e2 ?name t_opt in
-  e, adata, env
 
 let conditional_to_exp ?(name="if") ~loc kf t_opt e1 (e2, env2) (e3, env3) =
   let env = Env.pop (Env.pop env3) in

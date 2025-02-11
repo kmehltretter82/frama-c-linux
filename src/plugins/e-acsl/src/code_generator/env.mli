@@ -40,6 +40,10 @@ val has_no_new_stmt: t -> bool
 (** Assume that a local context has been previously pushed.
     @return true iff the given env does not contain any new statement. *)
 
+val assigned_var_of_term : env:t -> term -> varinfo option
+(** Check if the given term has already been translated and if the result has
+    been assigned to a variable *)
+
 type localized_scope =
   | LGlobal
   | LFunction of kernel_function

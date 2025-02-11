@@ -48,6 +48,7 @@ Plugin E-ACSL 30.0 (Zinc)
                 taken into account, leading to functions calls with an
                 incorrect number of arguments.
 -* E-ACSL       [2024-06-20] fix typing of logic functions over rationals
+-o E-ACSL       [2024-07-01] compile E-ACSL via a new intermediate language
 
 ###############################################################################
 Plugin E-ACSL 29.0 (Copper)

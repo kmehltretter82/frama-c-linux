@@ -51,25 +51,15 @@ val gmp_to_sizet:
     be positive.
     If [pp] is provided, this term is used in the messages of the RTE checks. *)
 
-val comparison_to_exp:
-  adata:Assert.t ->
+val comparison_to_exp :
   loc:location ->
   kernel_function ->
   Env.t ->
   number_ty ->
-  ?e1:exp ->
-  binop ->
-  term ->
-  term ->
-  ?name:string ->
-  term option ->
-  exp * Assert.t * Env.t
-(** [comparison_to_exp ~data ~loc kf env ity ?e1 ?name bop t1 t2 topt] generates
-    the C code equivalent to [t1 bop t2] in the given environment with the
-    given assertion context.
+  binop -> exp -> exp -> ?name:string -> term option -> exp * Env.t
+(** [comparison_to_exp ~loc kf env ity ?name bop e1 e2 topt] generates
+    the C code equivalent to [e1 bop e2] in the given environment.
     [ity] is the number type of the comparison when comparing scalar numbers.
-    [e1] is the expression representing [t1] if the term has already been
-    translated.
     [name] is used to generate temporary variable names.
     [topt] is the term holding the result of the comparison. *)
 

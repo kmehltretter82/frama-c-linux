@@ -20,21 +20,19 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** E-ACSL. *)
+open Cil_types
+open Interlang
 
-module Options = Options
-module Error = Error
 
-module Translate_terms = Translate_terms
-module Translate_predicates = Translate_predicates
+module Exp = struct
+  let of_exp_node ?origin enode = {enode; origin}
+  let of_lval ?origin lval = of_exp_node ?origin @@ Lval lval
+  let of_integer ~origin n = of_exp_node ~origin @@ Integer n
+  let of_sizeof ~origin ty = of_exp_node ~origin @@ SizeOf ty
+end
 
-module Functions = Functions
-module Interlang = Interlang
-module Interlang_trans = Interlang_trans
-module Interlang_build = Interlang_build
-
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+module Lhost = struct
+  let of_varinfo ?name vi =
+    let name = Option.value ~default:vi.vname name in
+    Interlang.(Var (Varinfo.logic {vi with vorig_name = name}))
+end

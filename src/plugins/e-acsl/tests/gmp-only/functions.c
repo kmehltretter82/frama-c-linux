@@ -33,7 +33,8 @@ int glob = 5;
 // To test that functions that are never called are not generated:
 /*@ predicate never_called(int x) = x == x; */
 
-/*@ logic double f2(double x) = (double)(1/x); */ /* handle in MR !226 */
+// To test rationals and casting to double:
+/*@ logic double f2(double x) = (double)(1/x); */
 
 // To test not_yet:
 /*@ predicate p_notyet{L}(integer x) = x > 0; */
@@ -68,7 +69,7 @@ int main(void) {
   k(9);
 
   double d = 2.0;
-  /*@ assert f2(d) > 0; */;
+  /*@ assert 0.499999 < f2(d) < 0.500001; */;
 
   // not yet supported
   /* /\*@ assert p_notyet(27); *\/ ; */

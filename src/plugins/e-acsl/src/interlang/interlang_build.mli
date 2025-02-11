@@ -20,21 +20,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** E-ACSL. *)
+(** Smart constructors for building expressions of the intermediate language. *)
 
-module Options = Options
-module Error = Error
+open Cil_types
 
-module Translate_terms = Translate_terms
-module Translate_predicates = Translate_predicates
+module Exp : sig
+  val of_exp_node :
+    ?origin:term -> Interlang.exp_node -> Interlang.exp
 
-module Functions = Functions
-module Interlang = Interlang
-module Interlang_trans = Interlang_trans
-module Interlang_build = Interlang_build
+  val of_lval :
+    ?origin:term -> Interlang.lval -> Interlang.exp
 
-(*
-Local Variables:
-compile-command: "make"
-End:
-*)
+  val of_integer : origin:term -> Z.t -> Interlang.exp
+  val of_sizeof : origin:term -> typ -> Interlang.exp
+end
+
+module Lhost : sig
+  val of_varinfo : ?name:string -> varinfo -> Interlang.lhost
+end
