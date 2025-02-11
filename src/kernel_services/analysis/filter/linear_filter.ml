@@ -20,6 +20,15 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Important notations and conventions.
+
+   In all this file, the following notations are used :
+   - I is the identity matrix ;
+   - S is the shift matrix, i.e an identity matrix augmented with a zero-row
+     on top and a zero column on the right ;
+   - A is the filter's state matrix ;
+   - B is a source matrix. *)
+
 
 
 module Make (Field : Field.S) = struct
