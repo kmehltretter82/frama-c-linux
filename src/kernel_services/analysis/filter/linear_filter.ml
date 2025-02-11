@@ -34,7 +34,6 @@
 module Make (Field : Field.S) = struct
 
   module Linear = Linear.Space (Field)
-  open Option.Operators
   open Pretty_utils
   open Linear
   open Nat
@@ -157,6 +156,7 @@ module Make (Field : Field.S) = struct
      than one, then the series converge and its limit at infinity can be
      computed as (I - A^e)^(-1). *)
   let invariant : type n. n filter -> int -> n invariant option = fun f e ->
+    let open Option.Operators in
 
     (* Computation of the spectral radius at the given exponent. As the power
        computation is memoized, it will be cheap to retrieve the spectral
