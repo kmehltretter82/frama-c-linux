@@ -12,7 +12,7 @@ type 'value builtin = 'value list -> 'value or_bottom
 
 module type Value = sig
   include Abstract_value.Leaf
-  val widen : t -> t -> t
+  val widen : Locations.Location_Bytes.widen_hint -> t -> t -> t
   val track_variable: Cil_types.varinfo -> bool
   val builtins: (string * t builtin) list
 end
@@ -66,10 +66,12 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
     in
     inter ~cache ~symmetric:true ~idempotent:true ~decide
 
-  let widen =
+  let widen kf stmt =
+    let _, get_hints = Widen.getWidenHints kf stmt in
     let cache = cache_name "widen"  in
-    let decide _ b1 b2 =
-      let r = Value.widen b1 b2 in
+    let decide base b1 b2 =
+      let widen_hints = get_hints base in
+      let r = Value.widen widen_hints b1 b2 in
       if Value.(equal top r) then None else Some r
     in
     inter ~cache ~symmetric:false ~idempotent:true ~decide
@@ -181,8 +183,6 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let value_dependencies = Abstract_value.Leaf (module Value)
   let location_dependencies = Main_locations.ploc
-
-  let widen _kf _stmt = widen
 
   (* This function returns the information known about the location
      corresponding to [_lv], so that it may be used by the engine during
