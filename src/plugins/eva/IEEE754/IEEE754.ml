@@ -1,0 +1,608 @@
+(**************************************************************************)
+(*                                                                        *)
+(*  This file is part of Frama-C.                                         *)
+(*                                                                        *)
+(*  Copyright (C) 2007-2025                                               *)
+(*    CEA (Commissariat à l'énergie atomique et aux énergies              *)
+(*         alternatives)                                                  *)
+(*                                                                        *)
+(*  you can redistribute it and/or modify it under the terms of the GNU   *)
+(*  Lesser General Public License as published by the Free Software       *)
+(*  Foundation, version 2.1.                                              *)
+(*                                                                        *)
+(*  It is distributed in the hope that it will be useful,                 *)
+(*  but WITHOUT ANY WARRANTY; without even the implied warranty of        *)
+(*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *)
+(*  GNU Lesser General Public License for more details.                   *)
+(*                                                                        *)
+(*  See the GNU Lesser General Public License version 2.1                 *)
+(*  for more details (enclosed in the file licenses/LGPLv2.1).            *)
+(*                                                                        *)
+(**************************************************************************)
+
+open Eva_ast
+open Field
+
+
+
+include IEEE754_sig
+type 'f format = 'f Typed_float.format
+
+let warning_on_long_double () =
+  Kernel.warning ~wkey:Kernel.wkey_long_double
+    "Abstract semantics for IEEE-754 do not support the long double format.\
+     It will instead uses the double format."
+
+let format_of_fkind = function
+  | Cil_types.FFloat      -> Format Single
+  | Cil_types.FDouble     -> Format Double
+  | Cil_types.FLongDouble -> warning_on_long_double () ; Format Double
+
+
+
+module Make (Model : Modeling) = struct
+
+  include Model
+
+  type context = Context.t
+
+  type 'f representation =
+    { exact    : exact
+    ; absolute : absolute
+    ; relative : relative
+    ; format   : 'f format
+    }
+
+  type value =
+    | Top   : value
+    | False : value
+    | Repr  : 'f representation -> value
+
+  let pretty fmt = function
+    | False -> Format.fprintf fmt "{ 0 }"
+    | Top -> Format.pp_print_string fmt Utf8_logic.top
+    | Repr r ->
+      let open Format in
+      let fkind f = Typed_float.fkind_of_format f in
+      fprintf fmt "@[<v0>" ;
+      fprintf fmt "Real     : @[<h>%a@]@ " Exact.pretty    r.exact    ;
+      fprintf fmt "Absolute : @[<h>%a@]@ " Absolute.pretty r.absolute ;
+      fprintf fmt "Relative : @[<h>%a@]@ " Relative.pretty r.relative ;
+      fprintf fmt "Format : %a" Cil_printer.pp_fkind (fkind r.format) ;
+      fprintf fmt "@]"
+
+  let hash = function
+    | False -> 0
+    | Top -> 1
+    | Repr r ->
+      let format   = Hashtbl.hash  r.format   in
+      let exact    = Exact.hash    r.exact    in
+      let absolute = Absolute.hash r.absolute in
+      let relative = Relative.hash r.relative in
+      2 + Hashtbl.hash (format, exact, absolute, relative)
+
+  let compare l r =
+    match l, r with
+    | False, False | Top, Top -> 0
+    | False, _ | Top, _ -> -1
+    | _, False | _, Top ->  1
+    | Repr l, Repr r ->
+      let conclude_they_are_equal = 0 in
+      let ( let= ) c f = if c = 0 then f `Eq else c in
+      let= `Eq = Typed_float.format_order l.format r.format in
+      let= `Eq = Exact.compare    l.exact    r.exact    in
+      let= `Eq = Absolute.compare l.absolute r.absolute in
+      let= `Eq = Relative.compare l.relative r.relative in
+      conclude_they_are_equal
+
+  module Type = struct
+    type t = value
+    let name = name
+    let reprs = [ False ; Top ]
+    let copy = Datatype.identity
+    let rehash = Datatype.identity
+    let mem_project = Datatype.never_any_project
+    let structural_descr = Structural_descr.t_unknown
+    let pretty = pretty
+    let hash = hash
+    let compare = compare
+    let equal = Datatype.from_compare
+  end
+
+  include Datatype.Make (Type)
+  let key : t Abstract_value.key = Structure.Key_Value.create_key "Filter.Value"
+  let context = Abstract_context.Leaf (module Context)
+
+  let resolve context computation =
+    let context = Abstract_value.(context.from_domains) in
+    Effect.resolve context computation
+
+  let map f x = Effect.Operators.(let+ x in f x)
+  let lift = Effect.return
+
+  let exact    repr = map (fun r -> r.exact   ) repr
+  let absolute repr = map (fun r -> r.absolute) repr
+  let relative repr = map (fun r -> r.relative) repr
+  let format   repr = map (fun r -> r.format  ) repr
+  let approx   repr = Exact.(exact repr + absolute repr)
+
+
+
+  let reduce_absolute exact absolute relative =
+    let open Effect.Operators in
+    if do_reduce_absolute_with_relative () then
+      if not Relative.(equal relative zero) then
+        let+ computed = recompute_absolute ~exact ~relative in
+        let reduced = Absolute.narrow absolute computed in
+        Eval.Bottom.non_bottom reduced
+      else Effect.return Absolute.zero
+    else Effect.return absolute
+
+  let reduce_relative exact absolute relative =
+    let open Effect.Operators in
+    if do_reduce_relative_with_absolute () then
+      if not Absolute.(equal absolute zero) then
+        let+ computed = recompute_relative ~exact ~absolute in
+        let reduced = Relative.narrow relative computed in
+        Eval.Bottom.non_bottom reduced
+      else Effect.return Relative.zero
+    else Effect.return relative
+
+  let make exact absolute' relative' format =
+    let open Effect.Operators in
+    if not Exact.(equal exact top) then
+      let* absolute = reduce_absolute exact absolute' relative' in
+      let+ relative = reduce_relative exact absolute' relative' in
+      Repr { exact ; absolute ; relative ; format }
+    else Effect.return Top
+
+
+
+  let machine_epsilon format lower upper =
+    let epsilon = Typed_float.unit_in_the_last_place_of ~format in
+    let epsilon = Scalar.of_float (Typed_float.to_float epsilon) in
+    let in_pos_range = Scalar.(epsilon <= upper && upper <= pos_inf) in
+    let in_neg_range = Scalar.(neg_inf <= lower && lower <= neg epsilon) in
+    if in_pos_range || in_neg_range then epsilon else Scalar.zero
+
+  let machine_delta format lower upper =
+    let epsilon = Typed_float.unit_in_the_last_place_of ~format in
+    let epsilon = Scalar.of_float (Typed_float.to_float epsilon) in
+    let delta = Typed_float.smallest_denormal_float_of ~format in
+    let delta = Scalar.of_float (Typed_float.to_float delta) in
+    let in_neg_range = Scalar.(lower <= neg epsilon && neg epsilon <= upper) in
+    let in_pos_range = Scalar.(lower <= epsilon && epsilon <= upper) in
+    if in_pos_range || in_neg_range then delta else Scalar.zero
+
+  let abs_exact_bounds approx =
+    let { lower ; upper } = Exact.bounds approx in
+    let lower = Scalar.abs lower in
+    let upper = Scalar.abs upper in 
+    if Scalar.(lower <= zero && zero <= upper)
+    then Scalar.{ lower = zero ; upper = max lower upper }
+    else Scalar.{ lower = min lower upper ; upper = max lower upper }
+  
+  let elementary expr format approx =
+    let open Effect.Operators in
+    let max_float = Typed_float.largest_finite_float_of ~format in
+    let max_float = Typed_float.to_float max_float |> Scalar.of_float in
+    let { lower ; upper } = abs_exact_bounds approx in
+    if Scalar.(upper <= max_float) then
+      let machine_epsilon = machine_epsilon format lower upper in
+      let machine_delta = machine_delta format lower upper in
+      let epsilon = Scalar.(pow2 (log2 upper).lower * machine_epsilon) in
+      let absolute = Scalar.max epsilon machine_delta in
+      let* absolute = new_absolute_elementary_error expr absolute in
+      if Scalar.(zero < lower) then
+        let same_exponent = Scalar.log2 lower = Scalar.log2 upper in
+        let significant n = Scalar.(pow2 (log2 n).lower / n) in
+        let ufp = if same_exponent then significant lower else Scalar.one in
+        let epsilon = Scalar.(ufp * machine_epsilon) in
+        let delta = Scalar.(machine_delta / lower) in
+        let relative = Scalar.max epsilon delta in
+        let+ relative = new_relative_elementary_error expr relative in
+        absolute, relative
+      else Effect.return (absolute, Relative.top)
+    else Effect.return (Absolute.top, Relative.top)
+
+  let elementary expr format approx =
+    let open Effect.Operators in
+    let elementary = elementary expr format approx in
+    let absolute = let+ elementary in fst elementary in
+    let relative = let+ elementary in snd elementary in
+    absolute, relative
+
+  let add_elementary expr exact approx absolute relative format =
+    let open Effect.Operators in
+    let e_absolute, e_relative = elementary expr format approx in
+    let* absolute = Absolute.(absolute + e_absolute) in
+    let* relative = Relative.(relative * (lift one + e_relative) - lift one) in
+    make exact absolute relative format
+
+  let no_elementary exact absolute relative format =
+    let open Effect.Operators in
+    let* absolute and* relative = Relative.(relative - lift one) in
+    make exact absolute relative format
+
+
+
+  let contains_pos_inf r =
+    let upper = Exact.upper r in
+    Scalar.(upper = pos_inf)
+
+  let contains_neg_inf r =
+    let lower = Exact.lower r in
+    Scalar.(lower = neg_inf)
+
+  let contains_an_inf r =
+    contains_pos_inf r || contains_neg_inf r
+
+  let contains_zero r =
+    let { lower ; upper } = Exact.bounds r in
+    Scalar.(lower <= zero && zero <= upper)
+
+  let is_zero r =
+    let { lower ; upper } = Exact.bounds r in
+    Scalar.(lower = zero && upper = zero)
+
+  let is_power_of_two r =
+    let { lower ; upper } = Exact.bounds r in
+    let is_power_of_two f = Scalar.(pow2 (log2 (abs f)).lower = abs f) in
+    Scalar.(lower = upper && (lower = zero || is_power_of_two lower))
+
+  module NaN = struct
+
+    let ( + ) l r =
+      let open Effect.Operators in
+      let+ l = exact l and+ r = exact r in
+      (contains_pos_inf l && contains_neg_inf r) ||
+      (contains_neg_inf l && contains_pos_inf r)
+
+    let ( - ) l r =
+      let open Effect.Operators in
+      let+ l = exact l and+ r = exact r in
+      (contains_pos_inf l && contains_pos_inf r) ||
+      (contains_neg_inf l && contains_neg_inf r)
+
+    let ( * ) l r =
+      let open Effect.Operators in
+      let+ l = exact l and+ r = exact r in
+      (contains_an_inf l && contains_zero r) ||
+      (contains_zero l && contains_an_inf r)
+
+    let ( / ) l r =
+      let open Effect.Operators in
+      let+ l = exact l and+ r = exact r in
+      (contains_an_inf l && contains_an_inf r) ||
+      (contains_zero l && contains_zero r)
+
+  end
+
+
+
+  type unary = | and binary = |
+
+  type ('a, 'kind) handler =
+    | Handler_Unary  : value * 'a         -> ('a, unary ) handler
+    | Handler_Binary : value * value * 'a -> ('a, binary) handler
+
+  type 'kind handle =
+    | Unary  : 'f handle_unary  -> unary handle
+    | Binary : 'f handle_binary -> binary handle
+
+  and 'f handle_unary =
+    'f representation effect
+
+  and 'f handle_binary =
+    'f format * 'f representation effect * 'f representation effect
+
+  let unary value =
+    let open Effect.Operators in
+    let+ value in Handler_Unary (value, Top)
+
+  let binary ~fallback left right =
+    let open Effect.Operators in
+    let+ left and+ right in Handler_Binary (left, right, fallback)
+
+  type ('a, 'k) handler_step =
+    ('a, 'k) handler effect -> ('k handle -> 'a effect) -> 'a effect
+
+  let ( let@ ) : type k. ('a, k) handler_step = fun handler step ->
+    let open Effect.Operators in
+    let* handler = handler in
+    match handler with
+    | Handler_Unary  (Top     , fallback) -> lift fallback
+    | Handler_Unary  (False   , fallback) -> lift fallback
+    | Handler_Binary (Top  , _, fallback) -> lift fallback
+    | Handler_Binary (False, _, fallback) -> lift fallback
+    | Handler_Binary (_, Top  , fallback) -> lift fallback
+    | Handler_Binary (_, False, fallback) -> lift fallback
+    | Handler_Unary  (Repr r, _) -> step (Unary (lift r))
+    | Handler_Binary (Repr left, Repr right, fallback) ->
+      match Typed_float.same_format left.format right.format with
+      | Yes format -> step (Binary (format, lift left, lift right))
+      | No -> lift fallback
+
+
+
+  let neg computation =
+    let open Effect.Operators in
+    let@ Unary  x = unary computation in
+    let* exact    = Exact.neg    (exact    x) in
+    let* absolute = Absolute.neg (absolute x) in
+    let* relative = relative x and* format = format x in
+    make exact absolute relative format
+
+  let sqrt computation =
+    let open Effect.Operators in
+    let@ Unary x = unary computation in
+    let* lower = Exact.(exact x |> map lower) in
+    if Scalar.(lower >= zero) then
+      let* format  = format x in
+      let* result  = Exact.sqrt (exact x) in
+      let* expr    = let+ x = exact x in Sqrt x in
+      let* approx  = Exact.sqrt (approx x) in
+      let relative = Relative.(sqrt (lift one + relative x)) in
+      if do_reduce_absolute_with_relative () then
+        let* relative' = Relative.(relative - lift one) in
+        let absolute = recompute_absolute ~exact:result ~relative:relative' in
+        add_elementary expr result approx absolute relative format
+      else
+        let imprecise = Absolute.(absolute x / exact x) in
+        let imprecise = Absolute.(sqrt (lift one + imprecise) - lift one) in
+        let absolute  = Absolute.(exact x * imprecise) in
+        add_elementary expr result approx absolute relative format
+    else Effect.return Top
+
+
+
+  let a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y result =
+    if contains_zero result then Relative.(lift top)
+    else a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y
+
+  let is_linear_exact l r =
+    let open Effect.Operators in
+    let* l = Exact.(map bounds l) in
+    let+ r = Exact.(map bounds r) in
+    Scalar.(r.upper / two <= l.lower && l.upper <= r.lower * two) ||
+    Scalar.(l.upper / two <= r.lower && r.upper <= l.lower * two) ||
+    Scalar.(l.lower = zero && l.upper = zero) ||
+    Scalar.(r.lower = zero && r.upper = zero)
+
+  let is_addition_exact l r =
+    is_linear_exact (exact l) (Exact.neg (exact r))
+
+  let is_substraction_exact l r =
+    is_linear_exact (exact l) (exact r)
+    
+  let ( + ) l r =
+    let open Effect.Operators in
+    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let* result_is_nan = NaN.(l + r) in
+    if not result_is_nan then
+      let* result = Exact.(exact l + exact r) in
+      let* a = Relative.(lift one + relative l) and* x = exact l in
+      let* b = Relative.(lift one + relative r) and* y = exact r in
+      let relative = a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y result in
+      let absolute = Absolute.(absolute l + absolute r) in
+      let* exactly_computed = is_addition_exact l r in
+      if not exactly_computed then
+        let* expr = let+ l = exact l and+ r = exact r in Add (l, r) in
+        let* approx = Exact.(approx l + approx r) in
+        add_elementary expr result approx absolute relative format
+      else no_elementary result absolute relative format
+    else Effect.return Top
+
+  let ( - ) l r =
+    let open Effect.Operators in
+    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let* result_is_nan = NaN.(l - r) in
+    if not result_is_nan then
+      let* result = Exact.(exact l - exact r) in
+      let* a = Relative.(lift one + relative l) in
+      let* b = Relative.(lift one + relative r) in
+      let* x = exact l and* y = Exact.neg (exact r) in
+      let relative = a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y result in
+      let absolute = Absolute.(absolute l - absolute r) in
+      let* exactly_computed = is_substraction_exact l r in
+      if not exactly_computed then
+        let* expr = let+ l = exact l and+ r = exact r in Sub (l, r) in
+        let* approx = Exact.(approx l - approx r) in
+        add_elementary expr result approx absolute relative format
+      else no_elementary result absolute relative format
+    else Effect.return Top
+
+  let ( * ) l r =
+    let open Effect.Operators in
+    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let* result_is_nan = NaN.(l * r) in
+    if not result_is_nan then
+      let* result = Exact.(exact l * exact r) in
+      let from_l = Absolute.(exact l * absolute r) in
+      let from_r = Absolute.(exact r * absolute l) in
+      let from_errors = Absolute.(absolute l * absolute r) in
+      let absolute = Absolute.(from_l + from_r + from_errors) in
+      let relative = Relative.((lift one + relative l) * (lift one + relative r)) in
+      let* l_is_a_power_of_two = map is_power_of_two (exact l) in
+      let* r_is_a_power_of_two = map is_power_of_two (exact r) in
+      if not (l_is_a_power_of_two || r_is_a_power_of_two) then
+        let* expr = let+ l = exact l and+ r = exact r in Mul (l, r) in
+        let* approx = Exact.(approx l * approx r) in
+        add_elementary expr result approx absolute relative format
+      else no_elementary result absolute relative format
+    else Effect.return Top
+
+  let ( / ) l r =
+    let open Effect.Operators in
+    let@ Binary (format, l, r) = binary ~fallback:Top l r in
+    let* result_is_nan = NaN.(l / r) in
+    if not result_is_nan then
+      let* result = Exact.(exact l / exact r) in
+      let denominator = Absolute.(exact r + absolute r) in
+      let compute exact relative = recompute_absolute ~exact ~relative in
+      let compute e r = let* e and* r in compute e r in
+      let reduced () = compute (exact l) (relative r) in
+      let direct  () = Absolute.(exact l * absolute r / exact r) in
+      let do_reduce () = do_reduce_absolute_with_relative () in
+      let from_divisor = if do_reduce () then reduced () else direct () in
+      let numerator = Absolute.(absolute l - from_divisor) in
+      let absolute = Absolute.(numerator / denominator) in
+      let shifted_relative x = Relative.(lift one + relative x) in
+      let relative = Relative.(shifted_relative l / shifted_relative r) in
+      let* r_is_power_of_two = map is_power_of_two (exact r) in
+      let* l_is_zero = map is_zero (exact l) in
+      if not (r_is_power_of_two || l_is_zero) then
+        let* expr = let+ l = exact l and+ r = exact r in Div (l, r) in
+        let* approx = Exact.(approx l / approx r) in
+        add_elementary expr result approx absolute relative format
+      else no_elementary result absolute relative format
+    else Effect.return Top
+
+
+
+  let top  = Top
+  let zero = False
+  let one  = top
+  let top_int = top
+  let inject_int _ _ = top
+
+  let assume_non_zero v = `Unknown v
+  let assume_bounded _ _ v = `Unknown v
+  let assume_not_nan ~assume_finite:_ _ v = `Unknown v
+  let assume_pointer v = `Unknown v
+  let assume_comparable _ l r = `Unknown (l, r)
+  let rewrap_integer _ _ _ = top
+  let resolve_functions _ = `Top, true
+  let replace_base _ v = v
+  let pretty_typ _ = pretty
+
+  let backward_binop _ ~input_type:_ ~resulting_type:_ _ ~left:_ ~right:_ ~result:_ =
+    `Value (None, None)
+
+  let backward_cast _ ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+    `Value None
+
+  let backward_unop _ ~typ_arg:_ _ ~arg:_ ~res:_ =
+    `Value None
+
+
+
+  let is_included l r =
+    match l, r with
+    | (Top | False | Repr _), Top | False, False -> true
+    | Top, (False | Repr _) | Repr _, False | False, Repr _ -> false
+    | Repr l, Repr r ->
+      match Typed_float.same_format l.format r.format with
+      | No -> false
+      | Yes _ ->
+        Exact.is_included    l.exact    r.exact    &&
+        Absolute.is_included l.absolute r.absolute &&
+        Relative.is_included l.relative r.relative
+
+  let join l r =
+    match l, r with
+    | (False | Repr _ | Top), Top | Top, (False | Repr _) -> Top
+    | False, False | False, Repr _ | Repr _, False -> Top
+    | Repr l, Repr r ->
+      match Typed_float.same_format l.format r.format with
+      | No -> Top
+      | Yes format ->
+        let exact = Exact.join    l.exact    r.exact    in
+        let abs   = Absolute.join l.absolute r.absolute in
+        let rel   = Relative.join l.relative r.relative in
+        Repr { exact ; absolute = abs ; relative = rel ; format }
+
+  let narrow l r =
+    let open Eval.Bottom.Operators in
+    match l, r with
+    | Top, result | result, Top -> `Value result
+    | False, False -> `Value False
+    | False, Repr _ | Repr _, False -> `Bottom
+    | Repr l, Repr r ->
+      match Typed_float.same_format l.format r.format with
+      | No -> `Bottom
+      | Yes format ->
+        let* exact = Exact.narrow    l.exact    r.exact    in
+        let* abs   = Absolute.narrow l.absolute r.absolute in
+        let+ rel   = Relative.narrow l.relative r.relative in
+        Repr { exact ; absolute = abs ; relative = rel ; format }
+
+
+
+  let constant _ _ = function
+    | CInt64 _ | CTopInt _ | CString _ | CChr _ | CEnum _ -> Top
+    | CReal (f, fkind, str) ->
+      let open Scalar in
+      let approx = of_float f in
+      let Format format = format_of_fkind fkind in
+      let exact  = Option.(map of_string str |> value ~default:approx) in
+      let relative = if exact = zero then zero else approx / exact - one in
+      let absolute = approx - exact in
+      let exact    = Exact.singleton    exact    in
+      let absolute = Absolute.singleton absolute in
+      let relative = Relative.singleton relative in
+      Repr { exact ; absolute ; relative ; format }
+
+  let forward_unop context _ unop value =
+    match unop with
+    | Neg -> `Value (lift value |> neg |> resolve context)
+    | BNot | LNot -> `Value top
+
+  let forward_binop context _ binop l r =
+    match binop with
+    | PlusA  -> `Value (lift l + lift r |> resolve context)
+    | MinusA -> `Value (lift l - lift r |> resolve context)
+    | Mult   -> `Value (lift l * lift r |> resolve context)
+    | Div    -> `Value (lift l / lift r |> resolve context)
+    | PlusPI | MinusPI | MinusPP -> `Value top
+    | Mod | Shiftlt | Shiftrt -> `Value top
+    | Lt | Gt | Le | Ge | Eq | Ne -> `Value top
+    | BAnd | BXor | BOr | LAnd | LOr -> `Value top
+
+  let forward_cast context ~src_type ~dst_type value =
+    let open Eval_typ in
+    match value, src_type, dst_type with
+    | False, TSFloat _, TSFloat _ -> `Value False
+    | Top, TSFloat _, TSFloat _ -> `Value Top
+    | _, (TSInt _ | TSPtr _), (TSInt _ | TSFloat _ | TSPtr _) -> `Value Top
+    | _, TSFloat _, (TSInt _ | TSPtr _) -> `Value Top
+    | Repr r, TSFloat _, TSFloat destination ->
+      let Format dest = format_of_fkind destination in
+      let default = Repr { r with format = dest } in
+      match r.format, dest with
+      | Single, (Single | Double) -> `Value default
+      | Double, Double -> `Value default
+      | Double, Single ->
+        let result =
+          let open Effect.Operators in
+          let expr = Cast r.exact and r = lift r in
+          let* exact = exact r and* approx = approx r in
+          let absolute = absolute r and relative = relative r in
+          add_elementary expr exact approx absolute relative dest
+        in `Value (resolve context result)
+
+
+
+  let make exact absolute relative format =
+    Repr { exact ; absolute ; relative ; format }
+
+  let exact = function
+    | Top    -> Exact.top
+    | False  -> Exact.zero
+    | Repr r -> r.exact
+
+  let absolute = function
+    | Top    -> Absolute.top
+    | False  -> Absolute.zero
+    | Repr r -> r.absolute
+
+  let relative = function
+    | Top    -> Relative.top
+    | False  -> Relative.zero
+    | Repr r -> r.relative
+
+  let format = function
+    | Top | False -> `Top
+    | Repr r -> `Value (Format r.format)
+
+end
