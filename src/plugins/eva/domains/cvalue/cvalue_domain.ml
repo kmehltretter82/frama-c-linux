@@ -251,21 +251,26 @@ module State = struct
 
   let interpret_acsl_extension _extension _env state = state
 
+  (* Computes an over-approximation of the value written by an assigns clause
+     according to the list of dependencies stated by its \from part. *)
   let evaluate_from_clause state deps =
-    (* Evaluates the contents of one element of the from clause, topify them,
-       and add them to the current state of the evaluation in acc. *)
-    let one_from_contents acc dep =
-      if dep.direct
-      then
-        match dep.location with
-        | None -> Cvalue.V.top
-        | Some location ->
-          let location = Precise_locs.imprecise_location location in
-          let v = Cvalue.Model.find ~conflate_bottom:false state location in
-          Cvalue.V.topify Origin.Leaf (Cvalue.V.join acc v)
-      else acc
+    (* Only direct dependencies  to the written value. *)
+    let direct_deps = List.filter (fun dep -> dep.direct) deps in
+    (* Evaluates the content of one dependency. *)
+    let content dep =
+      match dep.location with
+      | Address vi ->
+        (* Case "\from &x": the value depends of "&x" (not the value of x). *)
+        Cvalue.V.inject (Base.of_varinfo vi) Ival.zero
+      | Location location ->
+        (* Use [conflate_bottom] to join all bits of the location content. *)
+        let location = Precise_locs.imprecise_location location in
+        Cvalue.Model.find ~conflate_bottom:false state location
     in
-    List.fold_left one_from_contents Cvalue.V.top_int deps
+    let values = List.map content direct_deps in
+    (* Join all values and topify them. *)
+    let joined_value = List.fold_left Cvalue.V.join Cvalue.V.top_int values in
+    Cvalue.V.topify Origin.Leaf joined_value
 
   let logic_assign logic_assign location (state, sclob) =
     match logic_assign with

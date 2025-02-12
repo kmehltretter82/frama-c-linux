@@ -227,10 +227,14 @@ let value_assigned = function
   | Assign v -> `Value v
   | Copy (_, copied) -> copied.v
 
+type 'location location_or_address =
+  | Location of 'location
+  | Address of varinfo
+
 type 'location logic_dependency =
   { term: identified_term;
     direct: bool;
-    location: 'location option; }
+    location: 'location location_or_address; }
 
 type 'location logic_assign =
   | Assigns of identified_term * 'location logic_dependency list

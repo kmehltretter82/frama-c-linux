@@ -202,6 +202,13 @@ type ('loc, 'value) assigned =
 (* Extract the assigned value from a [value assigned]. *)
 val value_assigned : ('loc, 'value) assigned -> 'value or_bottom
 
+(** The location of a logic dependency:
+    - the memory location of <lval> for a clause "\from lval" (default case).
+    - the address of x in case of a clause "\from &x". *)
+type 'location location_or_address =
+  | Location of 'location
+  | Address of varinfo
+
 (** The logic dependency of an ACSL assigns clause. *)
 type 'location logic_dependency =
   { term: identified_term;
@@ -210,9 +217,8 @@ type 'location logic_dependency =
     (** Whether the dependency is direct (default case), or has been declared
         as "indirect", meaning that its value is only used in a conditional or
         to compute an address. *)
-    location: 'location option;
-    (** The location of the dependency. [None] if the location could not be
-        evaluated, in which case a warning has been emitted. *)
+    location: 'location location_or_address;
+    (** The memory location of the dependency. *)
   }
 
 type 'location logic_assign =

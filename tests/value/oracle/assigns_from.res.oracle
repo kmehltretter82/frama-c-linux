@@ -11,8 +11,11 @@
   t[0..99] ∈ {0}
   p_t ∈ {{ &t[0] }}
   t17[0..9] ∈ {0}
+  nondet ∈ [--..--]
+  g ∈ {1}
+  h[0..99] ∈ {0}
 [eva] computing for function main1 <- main.
-  Called from assigns_from.i:224.
+  Called from assigns_from.i:271.
 [eva] computing for function f <- main1 <- main.
   Called from assigns_from.i:30.
 [eva] Recording results for f
@@ -43,7 +46,7 @@
   function main1, behavior wrong: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main1
 [eva] computing for function main15 <- main.
-  Called from assigns_from.i:225.
+  Called from assigns_from.i:272.
 [eva] Recording results for main15
 [from] Computing for function main15
 [from] Done for function main15
@@ -56,7 +59,7 @@
   function main15: \from ... part in assign clause got status valid.
 [eva] Done for function main15
 [eva] computing for function main2 <- main.
-  Called from assigns_from.i:226.
+  Called from assigns_from.i:273.
 [eva] Recording results for main2
 [from] Computing for function main2
 [from] Done for function main2
@@ -81,11 +84,11 @@
   function main2, behavior wrongfrom: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main2
 [eva] computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:227.
+  Called from assigns_from.i:274.
 [eva] using specification for function Frama_C_interval
 [eva] Done for function Frama_C_interval
 [eva] computing for function main3 <- main.
-  Called from assigns_from.i:228.
+  Called from assigns_from.i:275.
 [eva] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
@@ -94,7 +97,7 @@
   function main3: \from ... part in assign clause got status valid.
 [eva] Done for function main3
 [eva] computing for function main3 <- main.
-  Called from assigns_from.i:229.
+  Called from assigns_from.i:276.
 [eva] Recording results for main3
 [from] Computing for function main3
 [from] Done for function main3
@@ -102,7 +105,7 @@
   function main3: assigns got status unknown.
 [eva] Done for function main3
 [eva] computing for function main4 <- main.
-  Called from assigns_from.i:230.
+  Called from assigns_from.i:277.
 [eva] Recording results for main4
 [from] Computing for function main4
 [from] Done for function main4
@@ -116,7 +119,7 @@
   function main4, behavior wrong: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
-  Called from assigns_from.i:231.
+  Called from assigns_from.i:278.
 [eva] Recording results for main5
 [from] Computing for function main5
 [from] Done for function main5
@@ -130,20 +133,20 @@
   function main5, behavior true: \from ... part in assign clause got status valid.
 [eva] Done for function main5
 [eva] computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:232.
+  Called from assigns_from.i:279.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:233.
+  Called from assigns_from.i:280.
 [eva] Done for function Frama_C_interval
 [eva] computing for function main6_right <- main.
-  Called from assigns_from.i:234.
+  Called from assigns_from.i:281.
 [eva] Recording results for main6_right
 [from] Computing for function main6_right
 [from] Done for function main6_right
 [eva] assigns_from.i:111: function main6_right: assigns got status valid.
 [eva] Done for function main6_right
 [eva] computing for function main6_wrong <- main.
-  Called from assigns_from.i:235.
+  Called from assigns_from.i:282.
 [eva] Recording results for main6_wrong
 [from] Computing for function main6_wrong
 [from] Done for function main6_wrong
@@ -151,7 +154,7 @@
   function main6_wrong: assigns got status unknown.
 [eva] Done for function main6_wrong
 [eva] computing for function main7 <- main.
-  Called from assigns_from.i:236.
+  Called from assigns_from.i:283.
 [eva] Recording results for main7
 [from] Computing for function main7
 [from] Done for function main7
@@ -161,7 +164,7 @@
   function main7, behavior wrong: assigns got status unknown.
 [eva] Done for function main7
 [eva] computing for function main8 <- main.
-  Called from assigns_from.i:239.
+  Called from assigns_from.i:286.
 [eva] Recording results for main8
 [from] Computing for function main8
 [from] Done for function main8
@@ -170,7 +173,7 @@
   function main8: \from ... part in assign clause got status valid.
 [eva] Done for function main8
 [eva] computing for function main8 <- main.
-  Called from assigns_from.i:241.
+  Called from assigns_from.i:288.
 [eva] Recording results for main8
 [from] Computing for function main8
 [from] Done for function main8
@@ -178,14 +181,14 @@
   function main8: assigns got status unknown.
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
-  Called from assigns_from.i:243.
+  Called from assigns_from.i:290.
 [eva] Recording results for main9
 [from] Computing for function main9
 [from] Done for function main9
 [eva] assigns_from.i:135: function main9: assigns got status valid.
 [eva] Done for function main9
 [eva] computing for function main10 <- main.
-  Called from assigns_from.i:244.
+  Called from assigns_from.i:291.
 [kernel:annot:missing-spec] assigns_from.i:152: Warning: 
   Neither code nor specification for function c,
    generating default assigns. See -generated-spec-* options for more info
@@ -212,7 +215,7 @@
 [from] Done for function main10
 [eva] Done for function main10
 [eva] computing for function main11 <- main.
-  Called from assigns_from.i:245.
+  Called from assigns_from.i:292.
 [eva] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
@@ -221,7 +224,7 @@
   function main11: \from ... part in assign clause got status valid.
 [eva] Done for function main11
 [eva] computing for function main11 <- main.
-  Called from assigns_from.i:246.
+  Called from assigns_from.i:293.
 [eva] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
@@ -231,16 +234,16 @@
   function main11: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main11
 [eva] computing for function Frama_C_interval <- main.
-  Called from assigns_from.i:247.
+  Called from assigns_from.i:294.
 [eva] Done for function Frama_C_interval
 [eva] computing for function main11 <- main.
-  Called from assigns_from.i:247.
+  Called from assigns_from.i:294.
 [eva] Recording results for main11
 [from] Computing for function main11
 [from] Done for function main11
 [eva] Done for function main11
 [eva] computing for function main12 <- main.
-  Called from assigns_from.i:248.
+  Called from assigns_from.i:295.
 [eva] Recording results for main12
 [from] Computing for function main12
 [from] Done for function main12
@@ -250,7 +253,7 @@
   function main12, behavior ok: \from ... part in assign clause got status valid.
 [eva] Done for function main12
 [eva] computing for function main13 <- main.
-  Called from assigns_from.i:249.
+  Called from assigns_from.i:296.
 [eva] Recording results for main13
 [from] Computing for function main13
 [from] Done for function main13
@@ -264,7 +267,7 @@
   function main13, behavior bad: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main13
 [eva] computing for function main14 <- main.
-  Called from assigns_from.i:250.
+  Called from assigns_from.i:297.
 [eva:partition] assigns_from.i:183: starting to merge loop iterations
 [eva] Recording results for main14
 [from] Computing for function main14
@@ -274,7 +277,7 @@
   function main14: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main14
 [eva] computing for function main16 <- main.
-  Called from assigns_from.i:251.
+  Called from assigns_from.i:298.
 [eva:partition] assigns_from.i:188: starting to merge loop iterations
 [eva] Recording results for main16
 [from] Computing for function main16
@@ -284,7 +287,7 @@
   function main16: \from ... part in assign clause got status unknown (cannot validate direct dependencies).
 [eva] Done for function main16
 [eva] computing for function main17 <- main.
-  Called from assigns_from.i:252.
+  Called from assigns_from.i:299.
 [eva:partition] assigns_from.i:195: starting to merge loop iterations
 [eva] Recording results for main17
 [from] Computing for function main17
@@ -294,7 +297,7 @@
   function main17: \from ... part in assign clause got status unknown (cannot validate direct and indirect dependencies).
 [eva] Done for function main17
 [eva] computing for function main18 <- main.
-  Called from assigns_from.i:253.
+  Called from assigns_from.i:300.
 [eva] computing for function f18 <- main18 <- main.
   Called from assigns_from.i:215.
 [eva] using specification for function f18
@@ -306,10 +309,46 @@
 [from] Computing for function main18
 [from] Done for function main18
 [eva] Done for function main18
+[eva] computing for function main19 <- main.
+  Called from assigns_from.i:301.
+[eva] computing for function get_imprecise_pointer <- main19 <- main.
+  Called from assigns_from.i:255.
+[eva] using specification for function get_imprecise_pointer
+[eva:garbled-mix:assigns] assigns_from.i:255: 
+  The specification of function get_imprecise_pointer
+  has generated a garbled mix of addresses for assigns clause \result.
+[eva] Done for function get_imprecise_pointer
+[eva] assigns_from.i:256: 
+  Frama_C_show_each_gm:
+  {{ garbled mix of &{g; h} (origin: Library function {assigns_from.i:255}) }}
+[eva] computing for function get_exact_pointer <- main19 <- main.
+  Called from assigns_from.i:257.
+[eva] using specification for function get_exact_pointer
+[eva] Done for function get_exact_pointer
+[eva] assigns_from.i:258: Frama_C_show_each_exact: {{ &g ; &h }}
+[eva] computing for function get_valid_pointer <- main19 <- main.
+  Called from assigns_from.i:259.
+[eva] using specification for function get_valid_pointer
+[eva] Done for function get_valid_pointer
+[eva] assigns_from.i:260: Frama_C_show_each_valid: {{ &g ; &h + [0..396] }}
+[eva] computing for function get_function_pointer <- main19 <- main.
+  Called from assigns_from.i:262.
+[eva] using specification for function get_function_pointer
+[eva] Done for function get_function_pointer
+[eva] assigns_from.i:263: Frama_C_show_each_fct: {{ &fun ; &fun2 }}
+[eva] Recording results for main19
+[from] Computing for function main19
+[from] Done for function main19
+[eva] Done for function main19
 [eva] Recording results for main
 [from] Computing for function main
 [from] Done for function main
 [eva] Done for function main
+[eva:garbled-mix:summary] 
+  Origins of garbled mix generated during analysis:
+    assigns_from.i:255: assigns clause on addresses
+      (read in 1 statement, propagated through 1 statement)
+      garbled mix of &{g; h}
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function f:
   k ∈ {0}
@@ -384,6 +423,10 @@
    .i ∈
    {{ garbled mix of &{base_a; base_b}
     (origin: Misaligned read {assigns_from.i:215}) }} or UNINITIALIZED
+[eva:final-states] Values at end of function main19:
+  g ∈ {0}
+  p ∈ {{ &g ; &h + [0..396] }}
+  pf ∈ {{ (void *)&fun ; (void *)&fun2 }}
 [eva:final-states] Values at end of function main2:
   a[0..2] ∈ {0}
    [3] ∈ {2}
@@ -464,6 +507,7 @@
      [8][bits 8 to 31] ∈ {0}
      [9][bits 0 to 7] ∈ [0..9]
      [9][bits 8 to 31] ∈ {0}
+  g ∈ {0}
   j ∈ [0..9]
   a_0 ∈ {0; 1; 2; 3}
   b ∈ {6; 7; 8; 9}
@@ -496,6 +540,16 @@
 [from] Computing for function f18 <-main18
 [from] Done for function f18
 [from] Done for function main18
+[from] Computing for function main19
+[from] Computing for function get_imprecise_pointer <-main19
+[from] Done for function get_imprecise_pointer
+[from] Computing for function get_exact_pointer <-main19
+[from] Done for function get_exact_pointer
+[from] Computing for function get_valid_pointer <-main19
+[from] Done for function get_valid_pointer
+[from] Computing for function get_function_pointer <-main19
+[from] Done for function get_function_pointer
+[from] Done for function main19
 [from] Computing for function main2
 [from] Done for function main2
 [from] Computing for function main3
@@ -529,6 +583,14 @@
 [from] Function f18:
   a_0 FROM a_0; b (and SELF)
   b FROM a_0; b (and SELF)
+[from] Function get_exact_pointer:
+  \result FROM \nothing
+[from] Function get_function_pointer:
+  \result FROM \nothing
+[from] Function get_imprecise_pointer:
+  \result FROM \nothing
+[from] Function get_valid_pointer:
+  \result FROM \nothing
 [from] Function main1:
   u FROM v
   k FROM \nothing
@@ -553,6 +615,8 @@
      FROM p; i (and SELF)
 [from] Function main18:
   NO EFFECTS
+[from] Function main19:
+  g FROM \nothing
 [from] Function main2:
   a[3..5] FROM \nothing
 [from] Function main3:
@@ -583,6 +647,7 @@
       [4][bits 0 to 7]; [5][bits 0 to 7]; [6][bits 0 to 7]; [7][bits 0 to 7];
       [8][bits 0 to 7]; [9][bits 0 to 7]}
      FROM \nothing (and SELF)
+  g FROM \nothing
 [from] ====== END OF DEPENDENCIES ======
 [from] ====== DISPLAYING CALLWISE DEPENDENCIES ======
 [from] call to f at assigns_from.i:30 (by main1):
@@ -592,65 +657,83 @@
 [from] call to f18 at assigns_from.i:215 (by main18):
   a_0 FROM a_0; b (and SELF)
   b FROM a_0; b (and SELF)
-[from] call to main1 at assigns_from.i:224 (by main):
+[from] call to get_imprecise_pointer at assigns_from.i:255 (by main19):
+  \result FROM \nothing
+[from] call to Frama_C_show_each_gm at assigns_from.i:256 (by main19):
+  \result FROM \nothing
+[from] call to get_exact_pointer at assigns_from.i:257 (by main19):
+  \result FROM \nothing
+[from] call to Frama_C_show_each_exact at assigns_from.i:258 (by main19):
+  \result FROM \nothing
+[from] call to get_valid_pointer at assigns_from.i:259 (by main19):
+  \result FROM \nothing
+[from] call to Frama_C_show_each_valid at assigns_from.i:260 (by main19):
+  \result FROM \nothing
+[from] call to get_function_pointer at assigns_from.i:262 (by main19):
+  \result FROM \nothing
+[from] call to Frama_C_show_each_fct at assigns_from.i:263 (by main19):
+  \result FROM \nothing
+[from] call to main1 at assigns_from.i:271 (by main):
   u FROM v
   k FROM \nothing
-[from] call to main15 at assigns_from.i:225 (by main):
+[from] call to main15 at assigns_from.i:272 (by main):
   a[3..5] FROM \nothing
-[from] call to main2 at assigns_from.i:226 (by main):
+[from] call to main2 at assigns_from.i:273 (by main):
   a[3..5] FROM \nothing
-[from] call to Frama_C_interval at assigns_from.i:227 (by main):
+[from] call to Frama_C_interval at assigns_from.i:274 (by main):
   \result FROM a; b
-[from] call to main3 at assigns_from.i:228 (by main):
+[from] call to main3 at assigns_from.i:275 (by main):
   a[6] FROM i
-[from] call to main3 at assigns_from.i:229 (by main):
+[from] call to main3 at assigns_from.i:276 (by main):
   a[0..9] FROM i (and SELF)
-[from] call to main4 at assigns_from.i:230 (by main):
+[from] call to main4 at assigns_from.i:277 (by main):
   a[2] FROM \nothing
-[from] call to main5 at assigns_from.i:231 (by main):
+[from] call to main5 at assigns_from.i:278 (by main):
   a[2] FROM a[4]
-[from] call to Frama_C_interval at assigns_from.i:232 (by main):
+[from] call to Frama_C_interval at assigns_from.i:279 (by main):
   \result FROM a; b
-[from] call to Frama_C_interval at assigns_from.i:233 (by main):
+[from] call to Frama_C_interval at assigns_from.i:280 (by main):
   \result FROM a; b
-[from] call to main6_right at assigns_from.i:234 (by main):
+[from] call to main6_right at assigns_from.i:281 (by main):
   a[3..5] FROM \nothing
-[from] call to main6_wrong at assigns_from.i:235 (by main):
+[from] call to main6_wrong at assigns_from.i:282 (by main):
   a[2..6] FROM \nothing
-[from] call to main7 at assigns_from.i:236 (by main):
+[from] call to main7 at assigns_from.i:283 (by main):
   a{[2]; [7..8]} FROM \nothing
-[from] call to main8 at assigns_from.i:239 (by main):
+[from] call to main8 at assigns_from.i:286 (by main):
   c_0 FROM p
-[from] call to main8 at assigns_from.i:241 (by main):
+[from] call to main8 at assigns_from.i:288 (by main):
   c_0 FROM p (and SELF)
   d FROM p (and SELF)
-[from] call to main9 at assigns_from.i:243 (by main):
+[from] call to main9 at assigns_from.i:290 (by main):
   NO EFFECTS
-[from] call to main10 at assigns_from.i:244 (by main):
+[from] call to main10 at assigns_from.i:291 (by main):
   NO EFFECTS
-[from] call to main11 at assigns_from.i:245 (by main):
+[from] call to main11 at assigns_from.i:292 (by main):
   a[2] FROM \nothing
-[from] call to main11 at assigns_from.i:246 (by main):
+[from] call to main11 at assigns_from.i:293 (by main):
   a[2] FROM \nothing
-[from] call to main11 at assigns_from.i:247 (by main):
+[from] call to main11 at assigns_from.i:294 (by main):
   a[2] FROM \nothing
-[from] call to Frama_C_interval at assigns_from.i:247 (by main):
+[from] call to Frama_C_interval at assigns_from.i:294 (by main):
   \result FROM a; b
-[from] call to main12 at assigns_from.i:248 (by main):
+[from] call to main12 at assigns_from.i:295 (by main):
   \result FROM \nothing
-[from] call to main13 at assigns_from.i:249 (by main):
+[from] call to main13 at assigns_from.i:296 (by main):
   \result FROM p_t
-[from] call to main14 at assigns_from.i:250 (by main):
+[from] call to main14 at assigns_from.i:297 (by main):
   t[2..38] FROM \nothing (and SELF)
-[from] call to main16 at assigns_from.i:251 (by main):
+[from] call to main16 at assigns_from.i:298 (by main):
   t[1..19] FROM \nothing (and SELF)
-[from] call to main17 at assigns_from.i:252 (by main):
+[from] call to main17 at assigns_from.i:299 (by main):
   t17{[0][bits 0 to 7]; [1][bits 0 to 7]; [2][bits 0 to 7]; [3][bits 0 to 7];
       [4][bits 0 to 7]; [5][bits 0 to 7]; [6][bits 0 to 7]; [7][bits 0 to 7];
       [8][bits 0 to 7]; [9][bits 0 to 7]}
      FROM p; i (and SELF)
-[from] call to main18 at assigns_from.i:253 (by main):
+[from] call to main18 at assigns_from.i:300 (by main):
   NO EFFECTS
+[from] call to main19 at assigns_from.i:301 (by main):
+  g FROM \nothing
 [from] entry point:
   u FROM v
   k FROM \nothing
@@ -662,6 +745,7 @@
       [4][bits 0 to 7]; [5][bits 0 to 7]; [6][bits 0 to 7]; [7][bits 0 to 7];
       [8][bits 0 to 7]; [9][bits 0 to 7]}
      FROM \nothing (and SELF)
+  g FROM \nothing
 [from] ====== END OF CALLWISE DEPENDENCIES ======
 [inout] Out (internal) for function f:
     k
@@ -709,6 +793,10 @@
     base_a; a_0; base_b; b
 [inout] Inputs for function main18:
     \nothing
+[inout] Out (internal) for function main19:
+    g; p; pf
+[inout] Inputs for function main19:
+    nondet
 [inout] Out (internal) for function main2:
     a[3..5]
 [inout] Inputs for function main2:
@@ -749,7 +837,7 @@
     u; k; a[0..9]; constante; t[1..38];
     t17{[0][bits 0 to 7]; [1][bits 0 to 7]; [2][bits 0 to 7]; [3][bits 0 to 7];
         [4][bits 0 to 7]; [5][bits 0 to 7]; [6][bits 0 to 7]; [7][bits 0 to 7];
-        [8][bits 0 to 7]; [9][bits 0 to 7]}; j; a_0; b; c_0; d; p; tmp_2; 
+        [8][bits 0 to 7]; [9][bits 0 to 7]}; g; j; a_0; b; c_0; d; p; tmp_2;
     tmp_3
 [inout] Inputs for function main:
-    u; v; a[4]; p_t
+    u; v; a[4]; p_t; nondet
