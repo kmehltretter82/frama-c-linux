@@ -111,9 +111,9 @@ let stripUnderscore s =
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
       if not (Ast_attributes.is_known_attribute res) then
-          Kernel.warning
-            ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
-            "Unknown attribute: %s" s
+        Kernel.warning
+          ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+          "Unknown attribute: %s" s
     end;
     res
   end
@@ -1390,7 +1390,7 @@ let findCompType ghost kind name tattr =
           Kernel.warning ~wkey:Kernel.wkey_forward_enum
             ~source:(fst @@ Current_loc.get ())
             "forward declaration of enum might be rejected by compilers";
-        cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
+          cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
         end;
       mk_tenum ~tattr enum
     else
@@ -1702,23 +1702,23 @@ struct
       b.bscoping <- b.bscoping || declares_var || not force_non_scoping;
       b
     | stmts ->
-    if c.unspecified_order then begin
+      if c.unspecified_order then begin
         if List.length stmts >= 2 then begin
-        let first_stmt =
+          let first_stmt =
             (fun (s,_,_,_,_) -> s) (Extlib.last stmts) in
-        Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
-          ~source:(fst (Stmt.loc first_stmt))
-          "Potential unsequenced side-effects"
-      end;
-      let b =
-        Cil.mkBlock
+          Kernel.warning ~wkey:Kernel.wkey_cert_exp_10
+            ~source:(fst (Stmt.loc first_stmt))
+            "Potential unsequenced side-effects"
+        end;
+        let b =
+          Cil.mkBlock
             [mkStmt ~ghost ~valid_sid (UnspecifiedSequence (List.rev stmts))]
-      in
-      b.blocals <- vars;
-      b.bstatics <- c.statics;
-      b.bscoping <- declares_var || not force_non_scoping;
-      b
-    end else
+        in
+        b.blocals <- vars;
+        b.bstatics <- c.statics;
+        b.bscoping <- declares_var || not force_non_scoping;
+        b
+      end else
         let stmts = List.rev_map (fun (s,_,_,_,_) -> s) stmts in
         let b = Cil.mkBlock stmts in
         b.blocals <- vars;
@@ -4696,9 +4696,9 @@ and cabsPartitionAttributes
 
 and doType (ghost:bool) (context: type_context)
     (nameortype: Ast_attributes.attribute_class) (* This is AttrName if we are doing
-                                  * the type for a name, or AttrType
-                                  * if we are doing this type in a
-                                  * typedef *)
+                                                  * the type for a name, or AttrType
+                                                  * if we are doing this type in a
+                                                  * typedef *)
     ?(allowZeroSizeArrays=false)
     ?(allowVarSizeArrays=false)
     (bt: typ)                    (* The base type *)
@@ -6515,7 +6515,7 @@ and doExp local_env
         | { tnode = TPtr t } -> begin
             match unrollType t with
             | { tnode = TFun (rt, at, isvar) } -> (* Make the function pointer
-                                      * explicit  *)
+                                                   * explicit  *)
               let f'' =
                 match f'.enode with
                 | AddrOf lv -> new_exp ~loc:f'.eloc (Lval(lv))
@@ -9786,7 +9786,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
             if declared_in_current_scope ~ghost n then
               begin
                 match newTyp'.tnode with (* do NOT unroll type here,
-                                      redefinitions of typedefs are ok *)
+                                            redefinitions of typedefs are ok *)
                 | TComp newci ->
                   (* Composite types with different tags may be compatible, but here
                      we use the tags to try and detect if the type is being redefined,
