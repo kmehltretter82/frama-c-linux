@@ -1293,6 +1293,30 @@ let is_same_pl_constant c1 c2 =
   | (IntConstant _| FloatConstant _
     | StringConstant _ | WStringConstant _), _ -> false
 
+let is_same_unop op1 op2 =
+  let open Logic_ptree in
+  match op1,op2 with
+  | Uminus, Uminus
+  | Ubw_not, Ubw_not
+  | Ustar, Ustar
+  | Uamp, Uamp -> true
+  | (Uminus | Ustar | Uamp | Ubw_not), _ -> false
+
+let is_same_binop op1 op2 =
+  let open Logic_ptree in
+  match op1, op2 with
+  | Badd, Badd | Bsub, Bsub | Bmul, Bmul | Bdiv, Bdiv | Bmod, Bmod
+  | Bbw_and, Bbw_and | Bbw_or, Bbw_or | Bbw_xor, Bbw_xor
+  | Blshift, Blshift | Brshift, Brshift -> true
+  | (Badd | Bsub | Bmul | Bdiv | Bmod | Bbw_and | Bbw_or
+    | Bbw_xor | Blshift | Brshift),_ -> false
+
+let is_same_relation r1 r2 =
+  let open Logic_ptree in
+  match r1, r2 with
+  | Lt, Lt | Gt, Gt | Le, Le | Ge, Ge | Eq, Eq | Neq, Neq -> true
+  | (Lt | Gt | Le | Ge | Eq | Neq), _ -> false
+
 let rec is_same_pl_array_size c1 c2 =
   match c1,c2 with
   | None, None -> true
@@ -1346,30 +1370,6 @@ and is_same_pl_type t1 t2 =
 
 and is_same_quantifiers qs1 qs2 =
   is_same_list (fun (t1,x1) (t2,x2) -> x1 = x2 && is_same_pl_type t1 t2) qs1 qs2
-
-and is_same_unop op1 op2 =
-  let open Logic_ptree in
-  match op1,op2 with
-  | Uminus, Uminus
-  | Ubw_not, Ubw_not
-  | Ustar, Ustar
-  | Uamp, Uamp -> true
-  | (Uminus | Ustar | Uamp | Ubw_not), _ -> false
-
-and is_same_binop op1 op2 =
-  let open Logic_ptree in
-  match op1, op2 with
-  | Badd, Badd | Bsub, Bsub | Bmul, Bmul | Bdiv, Bdiv | Bmod, Bmod
-  | Bbw_and, Bbw_and | Bbw_or, Bbw_or | Bbw_xor, Bbw_xor
-  | Blshift, Blshift | Brshift, Brshift -> true
-  | (Badd | Bsub | Bmul | Bdiv | Bmod | Bbw_and | Bbw_or
-    | Bbw_xor | Blshift | Brshift),_ -> false
-
-and is_same_relation r1 r2 =
-  let open Logic_ptree in
-  match r1, r2 with
-  | Lt, Lt | Gt, Gt | Le, Le | Ge, Ge | Eq, Eq | Neq, Neq -> true
-  | (Lt | Gt | Le | Ge | Eq | Neq), _ -> false
 
 and is_same_path_elt p1 p2 =
   let open Logic_ptree in
