@@ -86,6 +86,11 @@ val plain_fun_ptr: Cil_types.logic_type -> bool
 val plain_array_type: Cil_types.logic_type -> bool
 val plain_pointer_type: Cil_types.logic_type -> bool
 
+(** {3 tests and extraction of element type}
+    @before Frama-C+dev these function were in Logic_typing
+*)
+
+(** see {!plain_arithmetic_type} *)
 val is_arithmetic_type: Cil_types.logic_type -> bool
 val is_integral_type: Cil_types.logic_type -> bool
 val is_fun_ptr: Cil_types.logic_type -> bool
@@ -95,19 +100,17 @@ val is_pointer_type: Cil_types.logic_type -> bool
 val is_set_type: Cil_types.logic_type -> bool
 val type_of_set_elem: logic_type -> logic_type
 
-(** @since Aluminium-20160501 *)
 val is_list_type: Cil_types.logic_type -> bool
 
-(** @since Aluminium-20160501 *)
 val type_of_list_elem : logic_type -> logic_type
 
+(** {3 Predefined tests over types} *)
 (** [isLogicType test typ] is [false] for pure logic types and the result
     of test for C types.
     In case of a set type, the function tests the element type.
 *)
 val isLogicType : (typ -> bool) -> logic_type -> bool
 
-(** {3 Predefined tests over types} *)
 val isLogicArrayType : logic_type -> bool
 
 val isLogicCharType : logic_type -> bool

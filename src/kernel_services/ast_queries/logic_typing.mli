@@ -348,3 +348,42 @@ val get_importer:
   builder:module_builder ->
   loc:Logic_ptree.location ->
   string list -> unit
+
+(** / **)
+
+(* deprecated functions only used for migration *)
+val is_arithmetic_type: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_arithmetic_type } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val is_integral_type: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_integral_type } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val is_fun_ptr: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_fun_ptr } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val is_array_type: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_array_type } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val is_pointer_type: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_pointer_type } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val is_set_type: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_set_type } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val is_list_type: Cil_types.logic_type -> bool
+[@@migrate { repl = Logic_utils.is_list_type } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val type_of_set_elem: logic_type -> logic_type
+[@@migrate { repl = Logic_utils.type_of_set_elem } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val type_of_list_elem: logic_type -> logic_type
+[@@migrate { repl = Logic_utils.type_of_list_elem } ]
+[@@deprecated "use ocamlmig for migration"]
