@@ -9804,23 +9804,25 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                       Kernel.fatal ~current:true "typeinfo.ttype (%a) should be TComp"
                         Cil_datatype.Typ.pretty typeinfo.ttype
                   end
-                | TEnum (newei,_) -> (* GCC/Clang: "conflicting types" *)
-                  (match unrollType typeinfo.ttype with
-                   | TEnum(ei,_) ->
+                | TEnum newei -> (* GCC/Clang: "conflicting types" *)
+                  let t = unrollType typeinfo.ttype in
+                  (match t.tnode with
+                   | TEnum ei ->
                      if ei.ename <> newei.ename then
                        error_conflicting_types ()
                      else
                        warn_c11_redefinition ()
                    | TInt _ -> error_conflicting_types ()
-                   | t ->
+                   | _ ->
                      Kernel.fatal
                        ~current:true "typeinfo.ttype (%a) should be an Enum"
                        Cil_datatype.Typ.pretty t)
                 | TInt _ ->
-                  (match typeinfo.ttype with
+                  let t = unrollType typeinfo.ttype in
+                  (match t.tnode with
                    | TInt _ -> warn_c11_redefinition ()
                    | TEnum _ -> error_conflicting_types ()
-                   | t ->
+                   | _ ->
                      Kernel.fatal
                        ~current:true "typeinfo.ttype (%a) should be an int"
                        Cil_datatype.Typ.pretty t
