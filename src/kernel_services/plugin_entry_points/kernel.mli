@@ -238,6 +238,9 @@ val wkey_line_directive: warn_category
 val wkey_unknown_attribute: warn_category
 (** Warning emitted when an unknown attribute is encountered during parsing. *)
 
+val wkey_long_double : warn_category
+(** Warning emitted by plugins that do not support the long double format. *)
+
 val wkey_format: warn_category
 val wkey_libc: warn_category
 val wkey_libc_framac: warn_category
