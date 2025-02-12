@@ -86,18 +86,18 @@ let type_of_list_elem t = Logic_const.type_of_list_elem (unroll_type t)
 let is_set_type t = Logic_const.is_set_type (unroll_type t)
 let type_of_set_elem t = Logic_const.type_of_element (unroll_type t)
 
-let is_plain_array_type t =
+let plain_array_type t =
   match unroll_type t with
   | Ctype ct -> Cil.isArrayType ct
   | _ -> false
 
-let is_plain_pointer_type t =
+let plain_pointer_type t =
   match unroll_type t with
   | Ctype ct -> Cil.isPointerType ct
   | _ -> false
 
-let is_array_type = plain_or_set is_plain_array_type
-let is_pointer_type = plain_or_set is_plain_pointer_type
+let is_array_type = plain_or_set plain_array_type
+let is_pointer_type = plain_or_set plain_pointer_type
 
 let isLogicType f t = plain_or_set (Logic_const.isLogicCType f) t
 

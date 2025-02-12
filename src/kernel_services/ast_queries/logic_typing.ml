@@ -618,11 +618,6 @@ let mk_mem ?loc t ofs =
         (type_of_pointed t.term_type))
     t
 
-let is_plain_pointer_type t =
-  match unroll_type t with
-  | Ctype ct -> Cil.isPointerType ct
-  | _ -> false
-
 module type S =
 sig
   val type_of_field:
@@ -1389,11 +1384,11 @@ struct
         C.error loc "invalid implicit cast from %a to %a"
           Cil_printer.pp_logic_type e.term_type
           Cil_printer.pp_logic_type newt
-      | Lboolean, Ctype t2 when is_integral_type newt && explicit ->
+      | Lboolean, Ctype t2 when Logic_utils.is_integral_type newt && explicit ->
         Logic_const.term ~loc (TCast (false, Ctype t2,e)) newt
       | ty1, Ltype({lt_name="set"},[ty2])
-        when is_pointer_type ty1 &&
-             is_plain_pointer_type ty2 &&
+        when Logic_utils.is_pointer_type ty1 &&
+             Logic_utils.plain_pointer_type ty2 &&
              isLogicCharType (type_of_pointed ty2) ->
         location_to_char_ptr e
       | Ltype({lt_name = "set"},[_]), Ltype({lt_name="set"},[ty2]) ->
@@ -1549,8 +1544,8 @@ struct
          if overloaded then raise Not_applicable
          else C.error loc "%s" s)
     | t1, Ltype ({lt_name = "set"},[t2]) when
-        is_pointer_type t1 &&
-        is_plain_pointer_type t2 &&
+        Logic_utils.is_pointer_type t1 &&
+        Logic_utils.plain_pointer_type t2 &&
         isLogicCharType (type_of_pointed t2) ->
       nt, location_to_char_ptr oterm
     (* can convert implicitly a singleton into a set,

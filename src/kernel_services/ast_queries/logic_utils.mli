@@ -75,15 +75,25 @@ val is_instance_of: string list -> logic_type -> logic_type -> bool
     [true] (this is the default), C typedef will be expanded as well. *)
 val unroll_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
+(** [true] if the type is an arithmetic type. Contrarily to
+    {!is_arithmetic_type} below, returns [false] for a set of
+    arithmetic elements.
+    @before Frama-C+dev was not exported
+*)
+val plain_arithmetic_type: Cil_types.logic_type -> bool
+val plain_integral_type: Cil_types.logic_type -> bool
+val plain_fun_ptr: Cil_types.logic_type -> bool
+val plain_array_type: Cil_types.logic_type -> bool
+val plain_pointer_type: Cil_types.logic_type -> bool
+
 val is_arithmetic_type: Cil_types.logic_type -> bool
 val is_integral_type: Cil_types.logic_type -> bool
 val is_fun_ptr: Cil_types.logic_type -> bool
+val is_array_type: Cil_types.logic_type -> bool
+val is_pointer_type: Cil_types.logic_type -> bool
 
 val is_set_type: Cil_types.logic_type -> bool
 val type_of_set_elem: logic_type -> logic_type
-
-val is_array_type: Cil_types.logic_type -> bool
-val is_pointer_type: Cil_types.logic_type -> bool
 
 (** @since Aluminium-20160501 *)
 val is_list_type: Cil_types.logic_type -> bool

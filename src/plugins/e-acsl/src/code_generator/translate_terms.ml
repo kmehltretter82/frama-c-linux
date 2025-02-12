@@ -325,7 +325,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
     let bop = Interlang_gen.binop bop in
     let ty = Typing.get_typ ~logic_env t in
     if not (Gmp_types.Z.is_t ty) && not (Gmp_types.Q.is_t ty) then
-      assert (Logic_typing.is_integral_type t.term_type);
+      assert (Logic_utils.is_integral_type t.term_type);
     M.return @@ IL.(Exp.of_exp_node ~origin:t @@
                     BinOp {ity; binop = bop; op1 = e1; op2 = e2})
   | TBinOp((Lt | Gt | Le | Ge | Eq | Ne) as bop, t1, t2) ->
@@ -350,7 +350,7 @@ and context_insensitive_term_to_exp_il ?inplace t =
     let ity = Typing.get_number_ty ~logic_env t in
     let bop = Interlang_gen.binop binop in
     if not (Gmp_types.Z.is_t ty || Gmp_types.Q.is_t ty) then
-      assert (Logic_typing.is_integral_type t.term_type);
+      assert (Logic_utils.is_integral_type t.term_type);
     M.return @@ IL.(Exp.of_exp_node ~origin:t @@
                     BinOp {ity; binop = bop; op1 = e1; op2 = e2})
   | _ -> M.not_covered Printer.pp_term t
