@@ -14,8 +14,6 @@
    (echo "EVA:" %{lib-available:frama-c-eva.core} "\n")
    (echo " - ppx_deriving.eq:" %{lib-available:ppx_deriving.eq} "\n")
    (echo " - ppx_deriving.ord:" %{lib-available:ppx_deriving.ord} "\n")
-   (echo "Numerors:" %{lib-available:frama-c-eva.numerors.core} "\n")
-   (echo " - MLMPFR:" %{lib-available:mlmpfr} "\n")
    (echo "Apron domains:" %{lib-available:frama-c-eva.apron.core} "\n")
    (echo " - apron.octMPQ:" %{lib-available:apron.octMPQ} "\n")
    (echo " - apron.boxMPQ:" %{lib-available:apron.boxMPQ} "\n")
@@ -90,23 +88,6 @@
  (libraries frama-c-eva.mthread.gui)
  (site (frama-c plugins_gui)))
 
-(subdir domains/numerors (include_subdirs no))
-(subdir domains/numerors
- (library
-  (name numerors)
-  (optional)
-  (public_name frama-c-eva.numerors.core)
-  (flags -open Frama_c_kernel -open Eva__Private :standard)
-  (libraries frama-c.kernel frama-c-eva.core mlmpfr)
-  (instrumentation (backend landmarks))
-  (instrumentation (backend bisect_ppx))))
-
-(plugin
- (name eva.numerors)
- (optional)
- (libraries frama-c-eva.numerors.core)
- (site (frama-c plugins)))
-
 (subdir domains/apron (include_subdirs no))
 (subdir domains/apron
  (library
@@ -121,10 +102,10 @@
   (instrumentation (backend bisect_ppx))))
 
 (plugin
-  (name eva.apron)
-  (optional)
-  (libraries frama-c-eva.apron.core)
-  (site (frama-c plugins)))
+ (name eva.apron)
+ (optional)
+ (libraries frama-c-eva.apron.core)
+ (site (frama-c plugins)))
 
 (subdir gen_api
  (include_subdirs no)
