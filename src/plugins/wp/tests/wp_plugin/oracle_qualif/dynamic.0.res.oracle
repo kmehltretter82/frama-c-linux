@@ -97,12 +97,12 @@
 [wp] dynamic.i:65: Warning: 
   Memory model hypotheses for function 'behavior':
   /*@ behavior wp_typed:
-        requires \separated(p + (..), &X1); */
+        requires \separated(p, &X1); */
   int behavior(int (*p)(void));
 [wp] dynamic.i:78: Warning: 
   Memory model hypotheses for function 'some_behaviors':
   /*@ behavior wp_typed:
-        requires \separated(p + (..), &X1); */
+        requires \separated(p, &X1); */
   int some_behaviors(int (*p)(void));
 [wp] dynamic.i:87: Warning: 
   Memory model hypotheses for function 'missing_context':
