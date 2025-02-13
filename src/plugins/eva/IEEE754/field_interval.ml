@@ -24,13 +24,13 @@ module type Name = sig val name : string end
 
 type 'k bounds = 'k Field.bounds = { lower : 'k ; upper : 'k }
 
-module Make (K : Field.S) (Effect : IEEE754.Effect) (Name : Name) = struct
+module Make (K : Field.S) (Computation : IEEE754.Computation) (Name : Name) = struct
 
   module Scalar = K
   type scalar = K.t
 
-  module Effect = Effect
-  type 'a effect = 'a Effect.t
+  module Computation = Computation
+  type 'a computation = 'a Computation.t
 
   type subset = scalar bounds
 
@@ -76,31 +76,31 @@ module Make (K : Field.S) (Effect : IEEE754.Effect) (Name : Name) = struct
   let bounds b = b
 
   let neg b =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let+ b in between (K.neg b.upper) (K.neg b.lower)
 
   let sqrt b =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let+ { lower ; upper } = b in
     join (K.sqrt lower) (K.sqrt upper)
 
   let ( + ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let+ l and+ r in between K.(l.lower + r.lower) K.(l.upper + r.upper)
 
   let ( - ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let+ l and+ r in between K.(l.lower - r.upper) K.(l.upper - r.lower)
 
   let ( * ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let* { lower = l  ; upper = u  } = l in
     let+ { lower = l' ; upper = u' } = r in
     let a, b, c, d = K.(l * l', l * u', u * l', u * u') in
     between K.(min (min a b) (min c d)) K.(max (max a b) (max c d))
 
   let ( / ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let* { lower = l  ; upper = u  } = l in
     let+ { lower = l' ; upper = u' } = r in
     if K.(zero < l' || u' < zero) then

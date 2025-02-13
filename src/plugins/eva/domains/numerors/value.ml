@@ -48,7 +48,7 @@ module Make (Model : IEEE754.Modeling) = struct
       make exact absolute relative format
 
   let sqrt context = function
-    | [ v ] -> `Value Effect.(return v |> sqrt |> resolve context)
+    | [ v ] -> `Value Computation.(return v |> sqrt |> resolve context)
     | _ -> `Value top
 
   let between _context = function
@@ -94,7 +94,7 @@ module Make (Model : IEEE754.Modeling) = struct
 
   module type Abstraction = IEEE754.Abstraction
     with module Scalar = Scalar
-     and module Effect = Effect
+     and module Computation = Computation
 
   type 't abstraction = (module Abstraction with type t = 't)
 

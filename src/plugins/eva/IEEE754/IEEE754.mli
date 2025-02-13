@@ -97,27 +97,27 @@ module Make (Model : Modeling) : sig
     with type t = Model.Context.t
 
   (** The monad used to encode context dependent computations. *)
-  module Effect : Effect
+  module Computation : Computation
     with type context = Context.t
-     and type 'a t = 'a Model.Effect.t
+     and type 'a t = 'a Model.Computation.t
 
   (** Abstraction used for the exact semantic. *)
   module Exact : Abstraction
     with type t = Model.Exact.t
      and module Scalar = Scalar
-     and module Effect = Effect
+     and module Computation = Computation
 
   (** Abstraction used for the absolute error semantic. *)
   module Absolute : Abstraction
     with type t = Model.Absolute.t
      and module Scalar = Scalar
-     and module Effect = Effect
+     and module Computation = Computation
 
   (** Abstraction used for the exact semantic. *)
   module Relative : Abstraction
     with type t = Model.Relative.t
      and module Scalar = Scalar
-     and module Effect = Effect
+     and module Computation = Computation
 
   (** The resulting abstraction is an Eva abstract value. *)
   include Abstract_value.Leaf
@@ -130,7 +130,7 @@ module Make (Model : Modeling) : sig
   type exact     = Exact.subset
   type absolute  = Absolute.subset
   type relative  = Relative.subset
-  type 'a effect = 'a Effect.t
+  type 'a computation = 'a Computation.t
 
 
   (** {3 Useful functions on abstract values. }*)
@@ -154,11 +154,11 @@ module Make (Model : Modeling) : sig
 
   (** {3 Effectful arithmetic operators.} *)
 
-  val neg   : t effect -> t effect
-  val sqrt  : t effect -> t effect
-  val ( + ) : t effect -> t effect -> t effect
-  val ( - ) : t effect -> t effect -> t effect
-  val ( * ) : t effect -> t effect -> t effect
-  val ( / ) : t effect -> t effect -> t effect
+  val neg   : t computation -> t computation
+  val sqrt  : t computation -> t computation
+  val ( + ) : t computation -> t computation -> t computation
+  val ( - ) : t computation -> t computation -> t computation
+  val ( * ) : t computation -> t computation -> t computation
+  val ( / ) : t computation -> t computation -> t computation
 
 end

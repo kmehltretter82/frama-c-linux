@@ -39,7 +39,7 @@ let get_interaction_mode () =
   | _ -> assert false
 
 (* Identity effect with unit context. *)
-module Effect = struct
+module Identity = struct
   include Identity
   type context = unit
   let resolve () x = x
@@ -47,7 +47,7 @@ end
 
 (* Interval abstraction over rationals. *)
 module Abstraction_Name = struct let name = "Numerors.Rational.Interval" end
-module Abstraction = Field_interval.Make (Rational) (Effect) (Abstraction_Name)
+module Abstraction = Field_interval.Make (Rational) (Identity) (Abstraction_Name)
 
 
 
@@ -58,8 +58,8 @@ module Model = struct
   type scalar = Rational.t
 
   module Context = Unit_context
-  module Effect = Effect
-  type 'a effect = 'a Effect.t
+  module Computation = Identity
+  type 'a computation = 'a Computation.t
 
   module Additive       = Abstraction
   module Multiplicative = Abstraction

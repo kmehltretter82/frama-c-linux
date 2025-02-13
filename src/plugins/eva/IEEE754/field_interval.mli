@@ -22,8 +22,8 @@
 
 module type Name = sig val name : string end
 
-module Make (K : Field.S) (Effect : IEEE754.Effect) (_ : Name) :
+module Make (K : Field.S) (Computation : IEEE754.Computation) (_ : Name) :
   IEEE754.Abstraction
   with module Scalar = K
-   and module Effect = Effect
+   and module Computation = Computation
    and type t = K.t Field.bounds

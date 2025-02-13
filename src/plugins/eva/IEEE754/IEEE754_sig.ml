@@ -53,7 +53,7 @@ type resulting_format =
     using a monad. This signature extends monads signature with a [resolve]
     function, that must be able to concretize a monadic computation on a
     given context. *)
-module type Effect = sig
+module type Computation = sig
   type context
   include Monad.S_with_product
   val resolve : context -> 'a t -> 'a
@@ -73,8 +73,8 @@ module type Abstraction = sig
 
   (** {3 The monad used to encode context dependent computations.} *)
 
-  module Effect : Effect
-  type 'a effect = 'a Effect.t
+  module Computation : Computation
+  type 'a computation = 'a Computation.t
 
 
   (** {3 Datatype and type alias.} *)
@@ -115,12 +115,12 @@ module type Abstraction = sig
 
   (** {3 Arithmetic operations.} *)
 
-  val neg   : subset effect -> subset effect
-  val sqrt  : subset effect -> subset effect
-  val ( + ) : subset effect -> subset effect -> subset effect
-  val ( - ) : subset effect -> subset effect -> subset effect
-  val ( * ) : subset effect -> subset effect -> subset effect
-  val ( / ) : subset effect -> subset effect -> subset effect
+  val neg   : subset computation -> subset computation
+  val sqrt  : subset computation -> subset computation
+  val ( + ) : subset computation -> subset computation -> subset computation
+  val ( - ) : subset computation -> subset computation -> subset computation
+  val ( * ) : subset computation -> subset computation -> subset computation
+  val ( / ) : subset computation -> subset computation -> subset computation
 
 
   (** {3 Backward reductions.} *)
@@ -157,15 +157,15 @@ module type Modeling = sig
       It must rely on a context that respects {!Abstract_context.Leaf}. *)
 
   module Context : Abstract_context.Leaf
-  module Effect : Effect with type context = Context.t
-  type 'a effect = 'a Effect.t
+  module Computation : Computation with type context = Context.t
+  type 'a computation = 'a Computation.t
 
 
   (** {3 Abstraction used for the exact and absolute errors semantics.} *)
 
   module Additive : Abstraction
     with module Scalar = Scalar
-     and module Effect = Effect
+     and module Computation = Computation
 
   module Exact = Additive
   type exact = Exact.subset
@@ -178,7 +178,7 @@ module type Modeling = sig
 
   module Multiplicative : Abstraction
     with module Scalar = Scalar
-     and module Effect = Effect
+     and module Computation = Computation
 
   module Relative = Multiplicative
   type relative = Relative.subset
@@ -193,13 +193,13 @@ module type Modeling = sig
       of the absolute abstraction of the elementary rounding error that would
       be produced by the computation of [expr] and is bounded by [bound]. *)
   val new_absolute_elementary_error :
-    exact correctly_rounded_expression -> scalar -> absolute effect
+    exact correctly_rounded_expression -> scalar -> absolute computation
 
   (** The call [new_relative_elementary_error expr bound] returns a computation
       of the relative abstraction of the elementary rounding error that would
       be produced by the computation of [expr] and is bounded by [bound]. *)
   val new_relative_elementary_error :
-    exact correctly_rounded_expression -> scalar -> relative effect
+    exact correctly_rounded_expression -> scalar -> relative computation
 
   (** The call [do_reduce_absolute_with_relative ()] returns [true] if and only
       if the analysis is configured to reduce the absolute errors using the
@@ -219,7 +219,7 @@ module type Modeling = sig
   val recompute_absolute :
     exact    : exact    ->
     relative : relative ->
-    absolute effect
+    absolute computation
 
   (** The call [recompute_relative exact absolute] returns a computation of
       relative error bounds as deduced from [exact] and [absolute], respectively
@@ -229,7 +229,7 @@ module type Modeling = sig
   val recompute_relative :
     exact    : exact    ->
     absolute : absolute ->
-    relative effect
+    relative computation
 
   (** This function is used to compute an abstraction of [(ax + by) / (x + y)],
       as this expression can be more precisely abstracted using a dedicated
@@ -240,6 +240,6 @@ module type Modeling = sig
   val a_x_plus_b_y_over_x_plus_y :
     a : relative -> x : exact ->
     b : relative -> y : exact ->
-    relative effect
+    relative computation
 
 end

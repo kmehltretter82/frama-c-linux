@@ -115,10 +115,10 @@ module Make (Model : Modeling) = struct
 
   let resolve context computation =
     let context = Abstract_value.(context.from_domains) in
-    Effect.resolve context computation
+    Computation.resolve context computation
 
-  let map f x = Effect.Operators.(let+ x in f x)
-  let lift = Effect.return
+  let map f x = Computation.Operators.(let+ x in f x)
+  let lift = Computation.return
 
   let exact    repr = map (fun r -> r.exact   ) repr
   let absolute repr = map (fun r -> r.absolute) repr
@@ -129,32 +129,32 @@ module Make (Model : Modeling) = struct
 
 
   let reduce_absolute exact absolute relative =
-    let open Effect.Operators in
+    let open Computation.Operators in
     if do_reduce_absolute_with_relative () then
       if not Relative.(equal relative zero) then
         let+ computed = recompute_absolute ~exact ~relative in
         let reduced = Absolute.narrow absolute computed in
         Eval.Bottom.non_bottom reduced
-      else Effect.return Absolute.zero
-    else Effect.return absolute
+      else Computation.return Absolute.zero
+    else Computation.return absolute
 
   let reduce_relative exact absolute relative =
-    let open Effect.Operators in
+    let open Computation.Operators in
     if do_reduce_relative_with_absolute () then
       if not Absolute.(equal absolute zero) then
         let+ computed = recompute_relative ~exact ~absolute in
         let reduced = Relative.narrow relative computed in
         Eval.Bottom.non_bottom reduced
-      else Effect.return Relative.zero
-    else Effect.return relative
+      else Computation.return Relative.zero
+    else Computation.return relative
 
   let make exact absolute' relative' format =
-    let open Effect.Operators in
+    let open Computation.Operators in
     if not Exact.(equal exact top) then
       let* absolute = reduce_absolute exact absolute' relative' in
       let+ relative = reduce_relative exact absolute' relative' in
       Repr { exact ; absolute ; relative ; format }
-    else Effect.return Top
+    else Computation.return Top
 
 
 
@@ -183,7 +183,7 @@ module Make (Model : Modeling) = struct
     else Scalar.{ lower = min lower upper ; upper = max lower upper }
 
   let elementary expr format approx =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let max_float = Typed_float.largest_finite_float_of ~format in
     let max_float = Typed_float.to_float max_float |> Scalar.of_float in
     let { lower ; upper } = abs_exact_bounds approx in
@@ -202,25 +202,25 @@ module Make (Model : Modeling) = struct
         let relative = Scalar.max epsilon delta in
         let+ relative = new_relative_elementary_error expr relative in
         absolute, relative
-      else Effect.return (absolute, Relative.top)
-    else Effect.return (Absolute.top, Relative.top)
+      else Computation.return (absolute, Relative.top)
+    else Computation.return (Absolute.top, Relative.top)
 
   let elementary expr format approx =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let elementary = elementary expr format approx in
     let absolute = let+ elementary in fst elementary in
     let relative = let+ elementary in snd elementary in
     absolute, relative
 
   let add_elementary expr exact approx absolute relative format =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let e_absolute, e_relative = elementary expr format approx in
     let* absolute = Absolute.(absolute + e_absolute) in
     let* relative = Relative.(relative * (lift one + e_relative) - lift one) in
     make exact absolute relative format
 
   let no_elementary exact absolute relative format =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let* absolute and* relative = Relative.(relative - lift one) in
     make exact absolute relative format
 
@@ -253,25 +253,25 @@ module Make (Model : Modeling) = struct
   module NaN = struct
 
     let ( + ) l r =
-      let open Effect.Operators in
+      let open Computation.Operators in
       let+ l = exact l and+ r = exact r in
       (contains_pos_inf l && contains_neg_inf r) ||
       (contains_neg_inf l && contains_pos_inf r)
 
     let ( - ) l r =
-      let open Effect.Operators in
+      let open Computation.Operators in
       let+ l = exact l and+ r = exact r in
       (contains_pos_inf l && contains_pos_inf r) ||
       (contains_neg_inf l && contains_neg_inf r)
 
     let ( * ) l r =
-      let open Effect.Operators in
+      let open Computation.Operators in
       let+ l = exact l and+ r = exact r in
       (contains_an_inf l && contains_zero r) ||
       (contains_zero l && contains_an_inf r)
 
     let ( / ) l r =
-      let open Effect.Operators in
+      let open Computation.Operators in
       let+ l = exact l and+ r = exact r in
       (contains_an_inf l && contains_an_inf r) ||
       (contains_zero l && contains_zero r)
@@ -291,24 +291,24 @@ module Make (Model : Modeling) = struct
     | Binary : 'f handle_binary -> binary handle
 
   and 'f handle_unary =
-    'f representation effect
+    'f representation computation
 
   and 'f handle_binary =
-    'f format * 'f representation effect * 'f representation effect
+    'f format * 'f representation computation * 'f representation computation
 
   let unary value =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let+ value in Handler_Unary (value, Top)
 
   let binary ~fallback left right =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let+ left and+ right in Handler_Binary (left, right, fallback)
 
   type ('a, 'k) handler_step =
-    ('a, 'k) handler effect -> ('k handle -> 'a effect) -> 'a effect
+    ('a, 'k) handler computation -> ('k handle -> 'a computation) -> 'a computation
 
   let ( let@ ) : type k. ('a, k) handler_step = fun handler step ->
-    let open Effect.Operators in
+    let open Computation.Operators in
     let* handler = handler in
     match handler with
     | Handler_Unary  (Top     , fallback) -> lift fallback
@@ -326,7 +326,7 @@ module Make (Model : Modeling) = struct
 
 
   let neg computation =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let@ Unary  x = unary computation in
     let* exact    = Exact.neg    (exact    x) in
     let* absolute = Absolute.neg (absolute x) in
@@ -334,7 +334,7 @@ module Make (Model : Modeling) = struct
     make exact absolute relative format
 
   let sqrt computation =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let@ Unary x = unary computation in
     let* lower = Exact.(exact x |> map lower) in
     if Scalar.(lower >= zero) then
@@ -352,7 +352,7 @@ module Make (Model : Modeling) = struct
         let imprecise = Absolute.(sqrt (lift one + imprecise) - lift one) in
         let absolute  = Absolute.(exact x * imprecise) in
         add_elementary expr result approx absolute relative format
-    else Effect.return Top
+    else Computation.return Top
 
 
 
@@ -361,7 +361,7 @@ module Make (Model : Modeling) = struct
     else a_x_plus_b_y_over_x_plus_y ~a ~x ~b ~y
 
   let is_linear_exact l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let* l = Exact.(map bounds l) in
     let+ r = Exact.(map bounds r) in
     Scalar.(r.upper / two <= l.lower && l.upper <= r.lower * two) ||
@@ -376,7 +376,7 @@ module Make (Model : Modeling) = struct
     is_linear_exact (exact l) (exact r)
 
   let ( + ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let@ Binary (format, l, r) = binary ~fallback:Top l r in
     let* result_is_nan = NaN.(l + r) in
     if not result_is_nan then
@@ -391,10 +391,10 @@ module Make (Model : Modeling) = struct
         let* approx = Exact.(approx l + approx r) in
         add_elementary expr result approx absolute relative format
       else no_elementary result absolute relative format
-    else Effect.return Top
+    else Computation.return Top
 
   let ( - ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let@ Binary (format, l, r) = binary ~fallback:Top l r in
     let* result_is_nan = NaN.(l - r) in
     if not result_is_nan then
@@ -410,10 +410,10 @@ module Make (Model : Modeling) = struct
         let* approx = Exact.(approx l - approx r) in
         add_elementary expr result approx absolute relative format
       else no_elementary result absolute relative format
-    else Effect.return Top
+    else Computation.return Top
 
   let ( * ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let@ Binary (format, l, r) = binary ~fallback:Top l r in
     let* result_is_nan = NaN.(l * r) in
     if not result_is_nan then
@@ -430,10 +430,10 @@ module Make (Model : Modeling) = struct
         let* approx = Exact.(approx l * approx r) in
         add_elementary expr result approx absolute relative format
       else no_elementary result absolute relative format
-    else Effect.return Top
+    else Computation.return Top
 
   let ( / ) l r =
-    let open Effect.Operators in
+    let open Computation.Operators in
     let@ Binary (format, l, r) = binary ~fallback:Top l r in
     let* result_is_nan = NaN.(l / r) in
     if not result_is_nan then
@@ -456,7 +456,7 @@ module Make (Model : Modeling) = struct
         let* approx = Exact.(approx l / approx r) in
         add_elementary expr result approx absolute relative format
       else no_elementary result absolute relative format
-    else Effect.return Top
+    else Computation.return Top
 
 
 
@@ -565,7 +565,7 @@ module Make (Model : Modeling) = struct
       | Double, Double -> `Value default
       | Double, Single ->
         let result =
-          let open Effect.Operators in
+          let open Computation.Operators in
           let expr = Cast r.exact and r = lift r in
           let* exact = exact r and* approx = approx r in
           let absolute = absolute r and relative = relative r in
