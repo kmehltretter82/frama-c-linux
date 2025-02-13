@@ -149,7 +149,7 @@ module Make (Field : Field.S) = struct
 
   (* Invariant computation. The computation of the sum of all past
      contributions, and in particuler the oldest ones, implies to check
-     is an infinite series converge and to compute its limit. This is done
+     if an infinite series converge and to compute its limit. This is done
      by grouping iterations by pack of size [e] and factorizing the common
      state matrix power. This leads to an infinite geometric series in the
      matrix space. If the spectral radius of this matrix is stricly lower
@@ -267,7 +267,7 @@ module Make (Field : Field.S) = struct
            grouping the infinite sum with our rewritting, we do introduce
            correlations that lead to an underapproximation. Those correlations
            are however ignored through a norm based approach and thus the
-           compution is correct. *)
+           computation is correct. *)
         let scale_to_infinity = Field.(one / (one - spectral_norm)) in
         let old_at_infinity = Matrix.(scale_to_infinity ** old) in
         Matrix.(acc + recent + old_at_infinity)

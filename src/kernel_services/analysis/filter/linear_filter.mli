@@ -55,10 +55,10 @@ module Make (Field : Field.S) : sig
   type 'n source
 
   (** Sources constructor. The inputs are as following :
-      - @param matrix is the source matrix, describing how the current and past
+      - [matrix] is the source matrix, describing how the current and past
         measures are taken into account ;
-      - @param center is the measures center ;
-      - @param deviation is the measures deviation. *)
+      - [center] is the measures center ;
+      - [deviation] is the measures deviation. *)
   val source :
     matrix    : ('n succ, 'm succ) Linear.matrix ->
     center    : Field.scalar ->
@@ -70,9 +70,9 @@ module Make (Field : Field.S) : sig
   type 'n filter
 
   (** Filters constructors. The inputs are as following :
-      - @param center is the filter's center ;
-      - @param state is the filter's state matrix ;
-      - @param sources is the list of the filter's sources. *)
+      - [center] is the filter's center ;
+      - [state] is the filter's state matrix ;
+      - [sources] is the list of the filter's sources. *)
   val create :
     state   : ('n succ, 'n succ) Linear.matrix ->
     center  : 'n succ Linear.vector ->

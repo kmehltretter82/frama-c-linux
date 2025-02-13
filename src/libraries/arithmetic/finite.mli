@@ -22,7 +22,7 @@
 
 open Nat
 
-(** {1 Encoding of finite set in OCaml type system.} *)
+(** Encoding of finite set in OCaml type system. *)
 
 (** The type [n finite] encodes all finite sets of cardinal [n]. It is used by
     the module {!Linear} to represent accesses to vectors and matrices
@@ -34,7 +34,7 @@ type 'n finite
     subset to have an element, its cardinal must be at least one. *)
 val first  : 'n succ finite
 
-(** The call [last n] returns a value encoding the last element of any
+(** [last n] returns a value encoding the last element of any
     finite subset of cardinal [n]. *)
 val last   : 'n succ nat -> 'n succ finite
 
