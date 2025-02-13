@@ -100,7 +100,7 @@ let is_array_type = plain_or_set plain_array_type
 let is_pointer_type = plain_or_set plain_pointer_type
 
 let type_of_array_elem =
-  plain_or_set
+  Logic_const.transform_element
     (fun t ->
        match unroll_type t with
          Ctype ty when isArrayType ty -> Ctype (Cil.typeOf_array_elem ty)
@@ -109,7 +109,7 @@ let type_of_array_elem =
            Cil_datatype.Logic_type.pretty t)
 
 let type_of_pointed =
-  plain_or_set
+  Logic_const.transform_element
     (fun t ->
        match unroll_type t with
          Ctype ty when isPointerType ty -> Ctype (Cil.typeOf_pointed ty)
