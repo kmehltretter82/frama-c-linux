@@ -104,6 +104,10 @@ val is_list_type: Cil_types.logic_type -> bool
 
 val type_of_list_elem : logic_type -> logic_type
 
+val type_of_pointed: logic_type -> logic_type
+
+val type_of_array_elem: logic_type -> logic_type
+
 (** {3 Predefined tests over types} *)
 (** [isLogicType test typ] is [false] for pure logic types and the result
     of test for C types.

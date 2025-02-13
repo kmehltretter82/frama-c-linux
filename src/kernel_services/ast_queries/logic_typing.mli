@@ -41,9 +41,6 @@ val type_binop: Logic_ptree.binop -> Cil_types.binop
 val unescape: string -> string
 val wcharlist_of_string: string -> int64 list
 
-val type_of_pointed: logic_type -> logic_type
-val type_of_array_elem: logic_type -> logic_type
-
 val ctype_of_pointed: logic_type -> typ
 val ctype_of_array_elem: logic_type -> typ
 
@@ -386,4 +383,12 @@ val type_of_set_elem: logic_type -> logic_type
 
 val type_of_list_elem: logic_type -> logic_type
 [@@migrate { repl = Logic_utils.type_of_list_elem } ]
+[@@deprecated "use ocamlmig for migration"]
+
+val type_of_pointed: logic_type -> logic_type
+[@@migrate { repl = Logic_utils.type_of_pointed }]
+[@@deprecated "use ocamlmig for migration"]
+
+val type_of_array_elem: logic_type -> logic_type
+[@@migrate { repl = Logic_utils.type_of_array_elem }]
 [@@deprecated "use ocamlmig for migration"]

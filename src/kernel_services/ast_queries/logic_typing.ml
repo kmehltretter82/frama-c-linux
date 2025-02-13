@@ -578,15 +578,6 @@ let rec arithmetic_conversion ty1 ty2 =
       "arithmetic conversion between non arithmetic types %a and %a"
       Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
-let rec type_of_pointed t =
-  match unroll_type t with
-    Ctype ty when isPointerType ty -> Ctype (Cil.typeOf_pointed ty)
-  | Ltype ({lt_name = "set"} as lt,[t]) ->
-    Ltype(lt,[type_of_pointed t])
-  | _ ->
-    Kernel.fatal ~current:true "type %a is not a pointer type"
-      Cil_printer.pp_logic_type t
-
 let rec ctype_of_pointed t =
   match unroll_type t with
     Ctype ty when isPointerType ty -> Cil.typeOf_pointed ty
@@ -594,15 +585,6 @@ let rec ctype_of_pointed t =
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
       Cil_printer.pp_logic_type t
-
-let type_of_array_elem =
-  plain_or_set
-    (fun t ->
-       match unroll_type t with
-         Ctype ty when isArrayType ty -> Ctype (Cil.typeOf_array_elem ty)
-       | _ ->
-         Kernel.fatal ~current:true "type %a is not an array type"
-           Cil_printer.pp_logic_type t)
 
 let rec ctype_of_array_elem t =
   match unroll_type t with
@@ -4499,3 +4481,5 @@ let is_set_type = Logic_utils.is_set_type
 let is_list_type = Logic_utils.is_list_type
 let type_of_set_elem = Logic_utils.type_of_set_elem
 let type_of_list_elem = Logic_utils.type_of_list_elem
+let type_of_pointed = Logic_utils.type_of_pointed
+let type_of_array_elem = Logic_utils.type_of_array_elem

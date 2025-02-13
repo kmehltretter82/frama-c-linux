@@ -823,7 +823,7 @@ let type_expr metaenv env ?tr ?current e =
         env,
         Logic_const.term
           (TLval (TMem t, TNoOffset))
-          (Logic_typing.type_of_pointed t.term_type),
+          (Logic_utils.type_of_pointed t.term_type),
         cond
       else
         Aorai_option.abort "Cannot dereference term %a" Printer.pp_term t
@@ -836,13 +836,13 @@ let type_expr metaenv env ?tr ?current e =
         then
           Logic_const.term
             (TBinOp (PlusPI,t1,t2))
-            (Logic_typing.type_of_pointed t1.term_type)
+            (Logic_utils.type_of_pointed t1.term_type)
         else if Logic_utils.isLogicPointerType t2.term_type
              && Logic_utils.is_integral_type t1.term_type
         then
           Logic_const.term
             (TBinOp (PlusPI,t2,t1))
-            (Logic_typing.type_of_pointed t2.term_type)
+            (Logic_utils.type_of_pointed t2.term_type)
         else if Logic_utils.isLogicArrayType t1.term_type
              && Logic_utils.is_integral_type t2.term_type
         then
@@ -852,7 +852,7 @@ let type_expr metaenv env ?tr ?current e =
                (TLval
                   (Logic_const.addTermOffsetLval
                      (TIndex (t2, TNoOffset)) lv))
-               (Logic_typing.type_of_array_elem t1.term_type)
+               (Logic_utils.type_of_array_elem t1.term_type)
            | _ ->
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
@@ -865,7 +865,7 @@ let type_expr metaenv env ?tr ?current e =
              Logic_const.term
                (TLval
                   (Logic_const.addTermOffsetLval (TIndex (t1, TNoOffset)) lv))
-               (Logic_typing.type_of_array_elem t2.term_type)
+               (Logic_utils.type_of_array_elem t2.term_type)
            | _ ->
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
@@ -891,7 +891,7 @@ let type_expr metaenv env ?tr ?current e =
       if Logic_utils.isLogicPointerType t.term_type then begin
         let off, ty =
           LTyping.type_of_field loc s
-            (Logic_typing.type_of_pointed t.term_type)
+            (Logic_utils.type_of_pointed t.term_type)
         in
         let lv = Logic_const.addTermOffsetLval off (TMem t,TNoOffset) in
         env, Logic_const.term (TLval lv) ty, cond

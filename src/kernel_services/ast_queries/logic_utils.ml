@@ -99,6 +99,24 @@ let plain_pointer_type t =
 let is_array_type = plain_or_set plain_array_type
 let is_pointer_type = plain_or_set plain_pointer_type
 
+let type_of_array_elem =
+  plain_or_set
+    (fun t ->
+       match unroll_type t with
+         Ctype ty when isArrayType ty -> Ctype (Cil.typeOf_array_elem ty)
+       | _ ->
+         Kernel.fatal ~current:true "type %a is not an array type"
+           Cil_datatype.Logic_type.pretty t)
+
+let type_of_pointed =
+  plain_or_set
+    (fun t ->
+       match unroll_type t with
+         Ctype ty when isPointerType ty -> Ctype (Cil.typeOf_pointed ty)
+       | _ ->
+         Kernel.fatal ~current:true "type %a is not a pointer type"
+           Cil_datatype.Logic_type.pretty t)
+
 let isLogicType f t = plain_or_set (Logic_const.isLogicCType f) t
 
 (** true if the type is a C array (or a set of)*)
