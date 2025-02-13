@@ -476,15 +476,6 @@ module Make (Model : Modeling) = struct
   let replace_base _ v = v
   let pretty_typ _ = pretty
 
-  let backward_binop _ ~input_type:_ ~resulting_type:_ _ ~left:_ ~right:_ ~result:_ =
-    `Value (None, None)
-
-  let backward_cast _ ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
-    `Value None
-
-  let backward_unop _ ~typ_arg:_ _ ~arg:_ ~res:_ =
-    `Value None
-
 
 
   let is_included l r =
@@ -580,6 +571,43 @@ module Make (Model : Modeling) = struct
           let absolute = absolute r and relative = relative r in
           add_elementary expr exact approx absolute relative dest
         in `Value (resolve context result)
+
+
+
+  type backward = Backward : 'a representation * 'b representation -> backward
+
+  let ( let$ ) (Backward (left, right)) f =
+    match Typed_float.same_format left.format right.format with
+    | Yes format -> f (Format format)
+    | No -> `Bottom
+
+  let backward_binop context ~input_type:_ ~resulting_type:_ op ~left ~right ~result =
+    let open Eval.Bottom.Operators in
+    match op, left, right, result with
+    | Ne, _, _, False ->
+      let+ reduced = narrow left right in
+      Some reduced, Some reduced
+    | (Ge | Gt), Repr l, Repr r, False ->
+      let$ Format format = Backward (l, r) in
+      let* reduced_l = Exact.backward_lower   ~left:l.exact ~right:r.exact in
+      let+ reduced_r = Exact.backward_greater ~left:r.exact ~right:l.exact in
+      let l = make reduced_l l.absolute l.relative format |> resolve context in
+      let r = make reduced_r r.absolute r.relative format |> resolve context in
+      Some l, Some r
+    | (Le | Lt), Repr l, Repr r, False ->
+      let$ Format format = Backward (l, r) in
+      let* reduced_l = Exact.backward_greater ~left:l.exact ~right:r.exact in
+      let+ reduced_r = Exact.backward_lower   ~left:r.exact ~right:l.exact in
+      let l = make reduced_l l.absolute l.relative format |> resolve context in
+      let r = make reduced_r r.absolute r.relative format |> resolve context in
+      Some l, Some r
+    | _, _, _, _ -> `Value (None, None)
+
+  let backward_cast _ ~src_typ:_ ~dst_typ:_ ~src_val:_ ~dst_val:_ =
+    `Value None
+
+  let backward_unop _ ~typ_arg:_ _ ~arg:_ ~res:_ =
+    `Value None
 
 
 

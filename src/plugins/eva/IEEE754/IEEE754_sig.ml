@@ -122,6 +122,23 @@ module type Abstraction = sig
   val ( * ) : subset effect -> subset effect -> subset effect
   val ( / ) : subset effect -> subset effect -> subset effect
 
+
+  (** {3 Backward reductions.} *)
+
+  (** The call [backward_lower ~left ~right] returns a reduced abstraction
+      of [left] based on the assumption that [left <= right]. If the assumption
+      is wrong because no concrete element of [left] can possibly be lower
+      than or equal to any concrete element of [right], the function must
+      return [`Bottom]. *)
+  val backward_lower : left : subset -> right : subset -> subset or_bottom
+
+  (** The call [backward_greater ~left ~right] returns a reduced abstraction
+      of [left] based on the assumption that [left >= right]. If the assumption
+      is wrong because no concrete element of [left] can possibly be greater
+      than or equal to any concrete element of [right], the function must
+      return [`Bottom]. *)
+  val backward_greater : left : subset -> right : subset -> subset or_bottom
+
 end
 
 
