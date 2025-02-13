@@ -33,6 +33,9 @@ the default namespace. This is the main reason why this file is not included
 by default by Frama-C.
 
 This list is based on https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html.
+
+_Complex-related builtins are commented out since Frama-C does not currently
+support them.
 */
 
 #include "ctype.h"
