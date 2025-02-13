@@ -35,14 +35,24 @@
 import React from 'react';
 import { classes } from 'dome/misc/utils';
 import { Hbox } from 'dome/layout/boxes';
+import { Label } from 'dome/controls/labels';
 
 
 /* --------------------------------------------------------------------------*/
 /* --- Panel Container                                                       */
 /* --------------------------------------------------------------------------*/
+
 export type PanelPosition = 'top' | 'bottom' | 'left' | 'right';
 
 interface PanelProps {
+  /** Label. */
+  label?: string;
+  /** Icon. */
+  icon?: string;
+  /** Title. */
+  title?: string;
+  /** Actions : Add in the panel title */
+  actions?: React.JSX.Element;
   /** Additional class. */
   className?: string;
   /** Position to displayed the panel. Default 'tr' */
@@ -52,11 +62,11 @@ interface PanelProps {
   /** Defaults to `true`. */
   display?: boolean;
   /** Panel children. */
-  children: JSX.Element[];
+  children: JSX.Element;
 }
 
 export const Panel = (props: PanelProps): JSX.Element => {
-  const { visible = true, display = true,
+  const { label, icon, title, actions, visible = true, display = true,
     className, position = 'right' } = props;
 
   const classNames = classes(
@@ -69,7 +79,13 @@ export const Panel = (props: PanelProps): JSX.Element => {
 
   return (
     <div className={classNames}>
-      {props.children.map((elt, k) => <Hbox key={k}>{elt}</Hbox>)}
+      { (label || icon || actions) &&
+      <Hbox className={'dome-xPanelTitle'}>
+        <Label icon={icon} label={label} title={title}/>
+        { actions}
+      </Hbox>
+      }
+      { props.children }
     </div>
   );
 };

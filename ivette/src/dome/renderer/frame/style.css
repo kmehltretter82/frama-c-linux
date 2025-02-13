@@ -610,9 +610,8 @@ input:checked + .dome-xSwitch-slider:before {
 /* -------------------------------------------------------------------------- */
 .dome-xPanel {
   position: absolute;
-  z-index: 50;
+  z-index: 1000;
   background-color: var(--background-intense);
-  padding: 10px 5px;
   transition: transform .5s ease-in-out, opacity .5s;
 
   button:hover,
@@ -630,10 +629,24 @@ input:checked + .dome-xSwitch-slider:before {
   &.dome-xPanel-left,
   &.dome-xPanel-right {
     top: 5px;
-    padding-top: -5px;
     max-height: calc(100% - 10px);
     max-width: 350px;
     overflow-y: auto;
+
+    .dome-xPanelTitle {
+      width: 100%;
+      z-index: 1;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0px;
+      background-color: var(--background-intense);
+      border-bottom: solid 1px var(--border-discrete);
+      padding: 5px;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
   }
 
   &.dome-xPanel-left {
@@ -665,6 +678,8 @@ input:checked + .dome-xSwitch-slider:before {
     left:5px;
     max-height: 200px;
     overflow-x: scroll;
+
+    .dome-xPanelTitle { display: none; }
 
     label,
     .dome-xPanel-list {
@@ -706,5 +721,83 @@ input:checked + .dome-xSwitch-slider:before {
         background-color: var(--background-profound);
       }
     }
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* --- Tree                                                               --- */
+/* -------------------------------------------------------------------------- */
+
+@keyframes dome-xTree-arrow {
+  to {
+    rotate: -90deg;
+    fill: var(--activated-button-color);
+  }
+}
+@keyframes dome-xTree-arrow-down { from { rotate: -90deg; } }
+
+.dome-xTree {
+  background-color: inherit;
+  padding-bottom: 5px;
+
+  .dome-xTree-nodes {
+    overflow-y: auto;
+  }
+
+  div.dome-xTree-subtree {
+    overflow: hidden;
+
+    &:not(:has(.dome-xTree-show-children)) {
+      border-left: solid 2px var(--background-profound);
+    }
+    &.dome-xTree-subtree-hidden {
+      height: 0;
+      visibility: hidden;
+    }
+  }
+
+  .dome-xTree-node {
+    display: flex;
+    flex-direction: row;
+    background-color: inherit;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding: 2px;
+
+    &.dome-xTree-has-subtree.dome-xTree-show-children {
+      margin-top: 5px;
+      border-radius: 7px 7px 7px 0;
+      background-color: var(--background-profound);
+    }
+
+    &:hover,
+    &.dome-xTree-show-children:hover,
+    div:hover {
+      cursor: pointer;
+      background-color: var(--background-softer);
+    }
+
+    &.dome-xTree-selected,
+    &.dome-xTree-selected.dome-xTree-show-children {
+      background-color: var(--background-interaction);
+    }
+
+    .dome-xTree-node-actions {
+      display: flex;
+      justify-content: center;
+      padding-left: 10px;
+    }
+
+    &.dome-xTree-show-children {
+      &>div .dome-xTree-folding-button svg {
+        animation: dome-xTree-arrow-down .3s linear;
+      }
+    }
+    &.dome-xTree-hide-children {
+      &>div .dome-xTree-folding-button svg {
+        animation: forwards dome-xTree-arrow .3s linear;
+      }
+    }
+
   }
 }

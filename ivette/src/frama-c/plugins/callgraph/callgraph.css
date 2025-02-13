@@ -14,10 +14,6 @@
     width: 100%;
   }
 
-  .dome-xBoxes-hbox.dome-xBoxes-box:has(.cg-panel-sidebuttons) {
-    justify-content: space-between;
-  }
-
   .cg-panel-element {
     margin:5px;
     background-color: var(--background-alterning-even);
