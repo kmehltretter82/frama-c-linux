@@ -553,8 +553,21 @@ such as \verb+int c[10] = {};+ will result in the following error message:
  -machdep or run 'frama-c -machdep help' for the list of available machdeps
 \end{verbatim}
 
-This means that using a GCC or MSVC machdep (e.g., \verb+-machdep gcc_x86_32+)
+This means that using a GCC or MSVC machdep (e.g., \verb+-machdep gcc_x86_64+)
 will allow the language extension to be accepted by \FramaC.
+
+\FramaC's standard library (detailed in the next section) also includes a
+GCC-specific header to improve analyses:
+\texttt{\_\_fc\_gcc\_builtin\_macros.h} defines several GCC libc-related
+builtins as their libc equivalents (e.g. \texttt{\_\_builtin\_pow} as
+\texttt{pow}) so that \FramaC can reuse its standard library specifications.
+You need to include it manually, however, using an option such as:
+
+\begin{frama-c-commands}
+$ FRAMAC_SHARE=$(frama-c-config -print-share-path)
+$ frama-c <options and sources> \
+  -cpp-extra-args="-include $FRAMAC_SHARE/libc/__fc_gcc_builtin_macros.h"
+\end{frama-c-commands}
 
 \section{Standard library (libc)}\label{sec:libc}
 
