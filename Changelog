@@ -18,6 +18,10 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-*  Kernel    [2025-02-13] ACSL arrays can have an arbitrary term as length,
+              provided it can be evaluated to an integer constant.
+              Fixes ##2695 and #@1413
+o!  Kernel    [2025-02-13] Move some functions from Logic_typing to Logic_utils
 o   Kernel    [2025-02-05] New parameter builder `Float` for decimal
               command-line parameters.
 o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every
