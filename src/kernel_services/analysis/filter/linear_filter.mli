@@ -20,26 +20,28 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** A filter corresponds to the following recursive equation :
-       X[t + 1] = AX[t] + ∑B(ω)ε(ω)[k + 1] + C
-    where :
-    - n is the filter's order ;
-    - ω is a measure's source (for instance, a specific sensor in a
-      cyberphysical system) ;
-    - m(ω) is the delay for the source (ω) ;
-    - X[t] ∈ 𝕂^n is the filter's state at iteration [t] ;
-    - ε(ω)[t] ∈ 𝕂^m(ω) is the measure at iteration [t] for the source (ω) ;
-    - A ∈ 𝕂^(nxn) is the filter's state matrix ;
-    - B(ω) ∈ 𝕂^(nxm(ω)) is the source matrix for the source (ω) ;
-    - C ∈ 𝕂^n is the filter's center.
+(** Compute filters invariants, i.e bounds for each of the filter's state
+    dimensions when the iterations goes to infinity.
 
-    The goal of this module is to compute filters invariants, i.e bounds for
-    each of the filter's state dimensions when the iterations goes to infinity.
-    To do so, each measure of a given source is supposed bounded by the same
-    interval, represented as a center and a deviation. Each source can thus be
-    bounded by a different interval.
+    A filter corresponds to the following recursive equation :
+       {math X[t + 1] = AX[t] + ∑B(ω)ε(ω)[k + 1] + C }
+    where :
+    - {m n} is the filter's order ;
+    - {m ω} is a measure's source (for instance, a specific sensor in a
+      cyberphysical system) ;
+    - {m m(ω)} is the delay for the source {m ω} ;
+    - {m X[t] ∈ 𝕂^n} is the filter's state at iteration [t] ;
+    - {m ε(ω)[t] ∈ 𝕂^{m(ω)}} is the measure at iteration [t] for the source {m ω} ;
+    - {m A ∈ 𝕂^{nxn}} is the filter's state matrix ;
+    - {m B(ω) ∈ 𝕂^{nxm(ω)}} is the source matrix for the source {m ω} ;
+    - {m C ∈ 𝕂^n} is the filter's center.
+
+    To compute filter invariants, each measure of a given source is supposed
+    bounded by the same interval, represented as a center and a deviation. Each
+    source can thus be bounded by a different interval.
 
     {!Linear_filter_test} is an example using this module. *)
+
 module Make (Field : Field.S) : sig
 
   (** The linear space in which the filters are defined. *)
