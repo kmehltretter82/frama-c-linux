@@ -233,7 +233,7 @@ module type Graph = sig
 end
 
 (** This functor can be used to build generic control flow graphs *)
-module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) : Graph
+module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) : Graph
   with type V.t = Vertex.t
    and type E.t = Vertex.t * Edge.t * Vertex.t
    and type V.label = Vertex.t

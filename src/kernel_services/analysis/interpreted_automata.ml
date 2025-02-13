@@ -211,7 +211,7 @@ end
 
 module StmtTable = Cil_datatype.Stmt.Hashtbl
 
-module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
+module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
   module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled
       (Vertex)
       (struct include Edge let default = List.hd reprs end)
@@ -229,6 +229,8 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
 
   module WTO = Wto.Make (Vertex)
   type wto = Vertex.t Wto.partition
+
+  module VTable = Vertex.Hashtbl
 
   let build_wto ~pref graph entry_point =
     WTO.partition ~pref ~init:entry_point ~succs:(G.succ graph)
@@ -255,12 +257,11 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
     in
     (* Build vertex attributes and subgraphs from wto if present *)
     let open Graph.Graphviz.DotAttributes in
-    let module Table = FCHashtbl.Make (G.V) in
-    let subgraphs = Table.create (G.nb_vertex graph) in
+    let subgraphs = VTable.create (G.nb_vertex graph) in
     let tag =
       let c = ref 0 in
-      let h = (Table.create (G.nb_vertex graph)) in
-      fun v -> Table.memo h v (fun _ -> incr c; !c)
+      let h = (VTable.create (G.nb_vertex graph)) in
+      fun v -> VTable.memo h v (fun _ -> incr c; !c)
     in
     let component_count = ref 0 in
     let donode subgraph head v =
@@ -270,7 +271,7 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
         then [`Shape `Invtriangle ; label]
         else [label]
       in
-      Table.add subgraphs v (vertex_attributes,subgraph,!component_count,head)
+      VTable.add subgraphs v (vertex_attributes,subgraph,!component_count,head)
     in
     let rec traverse_element subgraph = function
       | Wto.Node v -> donode subgraph false v
@@ -297,19 +298,19 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
         let default_vertex_attributes _g = (* [`Shape `Point] *) [`Shape `Circle]
         let vertex_name v = "cp" ^ (string_of_int (tag v))
         let vertex_attributes v =
-          try let (x,_,_,_) = Table.find subgraphs v in x
+          try let (x,_,_,_) = VTable.find subgraphs v in x
           with Not_found ->
             htmllabel "%a" pp_vertex v ::
             if wto = None then [] else [`Style `Dashed]
         let get_subgraph v =
-          try let (_,x,_,_) = Table.find subgraphs v in x
+          try let (_,x,_,_) = VTable.find subgraphs v in x
           with Not_found -> None
         let default_edge_attributes _g = []
         let edge_attributes (v1,e,v2) =
           htmllabel "%a" pp_edge e ::
-          if Table.mem subgraphs v1 && Table.mem subgraphs v2 then
-            let (_,_,c1,_) = Table.find subgraphs v1 in
-            let (_,_,c2,head2) = Table.find subgraphs v2 in
+          if VTable.mem subgraphs v1 && VTable.mem subgraphs v2 then
+            let (_,_,c1,_) = VTable.find subgraphs v1 in
+            let (_,_,c2,head2) = VTable.find subgraphs v2 in
             if head2 && c2 <= c1 then [`Constraint false] else []
           else if wto = None then [] else [`Style `Dashed]
         include G
@@ -324,24 +325,24 @@ module MakeGraph (Vertex : Datatype.S) (Edge : Datatype.S) = struct
     in
     (* Build a table of vertices that should not be passed through to get
        a path to an exit. At the begining it only contains the component head. *)
-    let table = Hashtbl.create (G.nb_vertex graph) in
-    Hashtbl.add table head ();
+    let table = VTable.create (G.nb_vertex graph) in
+    VTable.add table head ();
     (* Filter elements at the top level of the wto, in reverse order *)
     let rec f acc = function
       | [] -> acc
       | Wto.Node v :: l ->
-        if List.for_all (Hashtbl.mem table) (G.succ graph v) then
-          (Hashtbl.add table v (); f acc l)
+        if List.for_all (VTable.mem table) (G.succ graph v) then
+          (VTable.add table v (); f acc l)
         else
           f (Wto.Node v :: acc) l
       | Wto.Component (v, w) :: l ->
         let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
-        List.iter (fun v -> Hashtbl.add table v ()) vertices; (* Temporarilly add them *)
+        List.iter (fun v -> VTable.add table v ()) vertices; (* Temporarilly add them *)
         let succs = List.flatten (List.map (G.succ graph) vertices) in
-        if List.for_all (Hashtbl.mem table) succs then
+        if List.for_all (VTable.mem table) succs then
           f acc l
         else (
-          List.iter (Hashtbl.remove table) vertices; (* Undo *)
+          List.iter (VTable.remove table) vertices; (* Undo *)
           f (Wto.Component (v, w) :: acc) l)
     in
     f [] (List.rev l)
