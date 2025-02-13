@@ -2,8 +2,8 @@
    COMMENT: we need Eva for the loop unroll ACSL extension
    PLUGIN: eva
    MODULE: @PTEST_NAME@
-     OPT: -then -ast-diff %{dep:ast_diff_2.c}
-     OPT: -then -ast-diff %{dep:ast_diff_2.c} -cpp-extra-args="-DADD_ENUM_TAG"
+     OPT: -machdep gcc_x86_64 -then -ast-diff %{dep:ast_diff_2.c}
+     OPT: -machdep gcc_x86_64 -then -ast-diff %{dep:ast_diff_2.c} -cpp-extra-args="-DADD_ENUM_TAG"
 */
 int X;
 int Y=3;

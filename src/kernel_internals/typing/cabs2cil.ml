@@ -1387,9 +1387,10 @@ let findCompType ghost kind name tattr =
       let enum, isnew = createEnumInfo name ~norig:name in
       if isnew then
         begin
-          Kernel.warning ~wkey:Kernel.wkey_forward_enum
-            ~source:(fst @@ Current_loc.get ())
-            "forward declaration of enum might be rejected by compilers";
+          if not (Machine.gccMode ()) then
+            Kernel.error ~once:true
+              ~source:(fst @@ Current_loc.get ())
+              "forward declaration of enum %s" (Machdep.allowed_machdep "GCC");
           cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
         end;
       mk_tenum ~tattr enum

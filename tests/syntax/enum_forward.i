@@ -1,5 +1,8 @@
 /* run.config
-   STDOPT: #"-kernel-warn-key typing:forward-enum"
+   OPT: -machdep gcc_x86_64 -print
+   EXIT: 1
+   STDOPT:
+*/
 /* forward declaration of enum is supported by GCC but nonstandard */
 
 enum e X;

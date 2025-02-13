@@ -73,8 +73,7 @@
       ],
       "disabled": [
         "CERT:EXP:10", "acsl-float-compare", "c11", "file:not-found",
-        "ghost:already-ghost", "parser:decimal-float", "transient-block",
-        "typing:forward-enum"
+        "ghost:already-ghost", "parser:decimal-float", "transient-block"
       ]
     }
   },
