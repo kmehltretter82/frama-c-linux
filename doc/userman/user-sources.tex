@@ -564,9 +564,8 @@ builtins as their libc equivalents (e.g. \texttt{\_\_builtin\_pow} as
 You need to include it manually, however, using an option such as:
 
 \begin{frama-c-commands}
-$ FRAMAC_SHARE=$(frama-c-config -print-share-path)
 $ frama-c <options and sources> \
-  -cpp-extra-args="-include $FRAMAC_SHARE/libc/__fc_gcc_builtin_macros.h"
+  -cpp-extra-args="-include __fc_gcc_builtin_macros.h"
 \end{frama-c-commands}
 
 \section{Standard library (libc)}\label{sec:libc}

@@ -26,7 +26,7 @@
 
 Usage: add the following to the command line:
 
-    -cpp-extra-args="-include $(frama-c-config -print-share-path)/libc/__fc_gcc_builtin_macros.h"
+    -cpp-extra-args="-include __fc_gcc_builtin_macros.h"
 
 NOTE: this file adds '#include' directives for several libc files, "polluting"
 the default namespace. This is the main reason why this file is not included

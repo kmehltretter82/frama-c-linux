@@ -1,5 +1,5 @@
 /* run.config
-   STDOPT: #"-machdep gcc_x86_64 -cpp-extra-args='-include@FRAMAC_SHARE@/libc/__fc_gcc_builtin_macros.h'"
+   STDOPT: #"-machdep gcc_x86_64 -cpp-extra-args='-include __fc_gcc_builtin_macros.h'"
 */
 
 volatile int nondet;
