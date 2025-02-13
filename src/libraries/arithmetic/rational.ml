@@ -46,18 +46,25 @@ let of_string str =
   Q.(significant * shift)
 
 let pow2 e =
-  Q.(mul_2exp one e)
+  let scaling = Q.(mul_2exp one (Stdlib.abs e)) in
+  if e >= 0 then scaling else Q.inv scaling
 
-(* r = ⌊log₂ (n / d)⌋ = ⌊log₂ n - log₂ d⌋ which cannot be calculated directly.
-   However, we have the three following properties:
-   - ⌊x⌋ + ⌊y⌋ ≤ ⌊x + y⌋ ≤ ⌊x⌋ + ⌊y⌋ + 1 ;
-   - ⌊-x⌋ = -⌈x⌉ ;
-   - ⌈x⌉ = ⌊x⌋ + 1 ;
-     Thus, we deduce that ⌊log₂ n⌋ - ⌊log₂ d⌋ - 1 ≤ r ≤ ⌊log₂ n⌋ - ⌊log₂ d⌋. *)
+(* We cannot compute directly ⌊log₂ (a / b)⌋ and ⌈log₂ (a / b)⌉. However, we
+   can compute n = ⌊log₂ a⌋ and m = ⌊log₂ b⌋ using Zarith. Those equalities
+   mean that n ≤ log₂ a < n + 1 and m ≤ log₂ b < m + 1. Taking the negation
+   of the inequalities on m and b and adding them with the one on n and a,
+   we obtain n - m - 1 < log₂ a - log₂ b < n - m + 1, which is equivalent
+   to 2 ^ (n - m - 1) < a / b < 2 ^ (n - m + 1). However, those borns are
+   not optimal. Indeed, we necessary have one of the following :
+   - n - m - 1 < n - m ≤ log₂ a - log₂ b < n - m + 1
+   - n - m - 1 < log₂ a - log₂ b ≤ n - m < n - m + 1
+   Testing which one is true comes down to check if 2 ^ (n - m) ≤ (a / b). *)
 let log2 q =
   if Q.(q <= zero) then raise (Invalid_argument (Q.to_string q)) ;
-  let num = Q.num q |> Z.log2 and den = Q.den q |> Z.log2 in
-  Field.{ lower = num - den - 1 ; upper = num - den }
+  let middle = (Q.num q |> Z.log2) - (Q.den q |> Z.log2) in
+  if Q.(pow2 middle <= q)
+  then Field.{ lower = middle ; upper = middle + 1 }
+  else Field.{ lower = middle - 1 ; upper = middle }
 
 let neg = Q.neg
 let abs = Q.abs
