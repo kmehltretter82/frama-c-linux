@@ -177,11 +177,11 @@ module Make (Model : Modeling) = struct
   let abs_exact_bounds approx =
     let { lower ; upper } = Exact.bounds approx in
     let lower = Scalar.abs lower in
-    let upper = Scalar.abs upper in 
+    let upper = Scalar.abs upper in
     if Scalar.(lower <= zero && zero <= upper)
     then Scalar.{ lower = zero ; upper = max lower upper }
     else Scalar.{ lower = min lower upper ; upper = max lower upper }
-  
+
   let elementary expr format approx =
     let open Effect.Operators in
     let max_float = Typed_float.largest_finite_float_of ~format in
@@ -374,7 +374,7 @@ module Make (Model : Modeling) = struct
 
   let is_substraction_exact l r =
     is_linear_exact (exact l) (exact r)
-    
+
   let ( + ) l r =
     let open Effect.Operators in
     let@ Binary (format, l, r) = binary ~fallback:Top l r in

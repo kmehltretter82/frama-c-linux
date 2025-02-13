@@ -52,18 +52,18 @@ module Make (K : Field.S) (Effect : IEEE754.Effect) (Name : Name) = struct
     Structural_descr.t_record [| scalar ; scalar |]
 
   include Datatype.Make (struct
-    type t = subset
-    let name = Name.name
-    let reprs = [ zero ; one ; top ]
-    let structural_descr = structural_descr
-    let mem_project = Datatype.never_any_project
-    let rehash = Datatype.identity
-    let copy b = { lower = K.copy b.lower ; upper = K.copy b.upper }
-    let hash b = Hashtbl.hash(K.hash b.lower, K.hash b.upper)
-    let pretty = pretty
-    let compare = compare
-    let equal = Datatype.from_compare
-  end)
+      type t = subset
+      let name = Name.name
+      let reprs = [ zero ; one ; top ]
+      let structural_descr = structural_descr
+      let mem_project = Datatype.never_any_project
+      let rehash = Datatype.identity
+      let copy b = { lower = K.copy b.lower ; upper = K.copy b.upper }
+      let hash b = Hashtbl.hash(K.hash b.lower, K.hash b.upper)
+      let pretty = pretty
+      let compare = compare
+      let equal = Datatype.from_compare
+    end)
 
   let is_included l r = K.(r.lower <= l.lower && l.upper <= r.upper)
   let join l r = between (K.min l.lower r.lower) (K.max l.upper r.upper)
@@ -78,7 +78,7 @@ module Make (K : Field.S) (Effect : IEEE754.Effect) (Name : Name) = struct
   let neg b =
     let open Effect.Operators in
     let+ b in between (K.neg b.upper) (K.neg b.lower)
-  
+
   let sqrt b =
     let open Effect.Operators in
     let+ { lower ; upper } = b in

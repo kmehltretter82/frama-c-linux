@@ -98,7 +98,7 @@ module type Abstraction = sig
 
 
   (** {3 Lattice structure.} *)
-  
+
   val top         : subset
   val is_included : subset -> subset -> bool
   val join        : subset -> subset -> subset
@@ -204,7 +204,7 @@ module type Modeling = sig
   (** The call [do_reduce_absolute_with_relative ()] returns [true] if and only
       if the analysis is configured to reduce the absolute errors using the
       relative error bounds. *)
-  val do_reduce_absolute_with_relative : unit -> bool  
+  val do_reduce_absolute_with_relative : unit -> bool
 
   (** The call [do_reduce_relative_with_absolute ()] returns [true] if and only
       if the analysis is configured to reduce the relative errors using the

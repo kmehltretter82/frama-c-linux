@@ -88,7 +88,7 @@ module Model = struct
     let upper = Scalar.abs bound in
     let lower = Scalar.neg upper in
     between lower upper
-  
+
   let do_reduce_absolute_with_relative () =
     match get_interaction_mode () with
     | Only_Reduce_Absolute_Using_Relative | Complet_Reduced_Product -> true
@@ -98,7 +98,7 @@ module Model = struct
     match get_interaction_mode () with
     | Only_Reduce_Relative_Using_Absolute | Complet_Reduced_Product -> true
     | Only_Reduce_Absolute_Using_Relative | No_Reduced_Product -> false
-  
+
   let recompute_absolute ~(exact : exact) ~(relative : relative) =
     Abstraction.(exact * relative)
 

@@ -32,7 +32,7 @@
       computing {m x} using floating-point numbers in the format {m f};
     - an abstraction {m \varepsilon_r^f(x)} of the relative errors commited when
       computing {m x} using floating-point numbers in fhe format {m f}.
-      
+
     Two sound abstract overapproximations of sets of real numbers are required
     to build a sound overapproximation of IEEE-754 semantics. The first one,
     called {m \mathbb{A}} is used to abstract the real numbers and the absolute
@@ -49,12 +49,13 @@
     in {{:https://theses.hal.science/tel-01094485v1} here}, and is optimal if
     there is no relation between {m a}, {m b}, {m x} and {m y}. Thus, an
     implementation of this computation is also required.
-    
+
     Another key part of the precision of the semantics builded is the relations
     between absolute and relative errors. Indeed, each one can be derived from
     the other as follows:
     - {m \varepsilon_a^f(x) = \mathbb{R}(x)\left(1 + \varepsilon_r^f(x)\right)}
     - {m \varepsilon_r^f(x) = \varepsilon_a^f(x) / \mathbb{R}(x)}
+
     Thus, a sound abstraction of those computations are required to define a
     correct reduced product between the two errors abstractions. As one may need
     to partially or totally deactivate this reduced product, for experimentation
@@ -66,7 +67,7 @@
     floating-point error (i.e each elementary error), one is also asked to provide
     a constructor for absolute and relative abstractions, that returns a symmetric
     and tracked if needed abstraction based on a given positive bound.
-    
+
     All the required components form together an abstract {b Model}, as described
     by the [Modeling] signature described in {!IEEE754_sig}. *)
 
@@ -131,7 +132,7 @@ module Make (Model : Modeling) : sig
   type relative  = Relative.subset
   type 'a effect = 'a Effect.t
 
-  
+
   (** {3 Useful functions on abstract values. }*)
 
   (** Returns the exact abstraction of a value. *)
