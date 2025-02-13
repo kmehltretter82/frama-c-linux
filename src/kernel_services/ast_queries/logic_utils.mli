@@ -75,40 +75,50 @@ val is_instance_of: string list -> logic_type -> logic_type -> bool
     [true] (this is the default), C typedef will be expanded as well. *)
 val unroll_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
-(** [true] if the type is an arithmetic type. Contrarily to
-    {!is_arithmetic_type} below, returns [false] for a set of
-    arithmetic elements.
-    @before Frama-C+dev was not exported
+(** {3 tests and extraction of element type}
+    @before Frama-C+dev these function were in {!Logic_typing}
 *)
+(** {4 tests for an individual (non set) type}
+    [plain_xxx t] returns [true] iff [t] is a [xxx]
+    @before Frama-C+dev these functions were not exported
+*)
+
 val plain_arithmetic_type: Cil_types.logic_type -> bool
 val plain_integral_type: Cil_types.logic_type -> bool
 val plain_fun_ptr: Cil_types.logic_type -> bool
 val plain_array_type: Cil_types.logic_type -> bool
 val plain_pointer_type: Cil_types.logic_type -> bool
 
-(** {3 tests and extraction of element type}
-    @before Frama-C+dev these function were in Logic_typing
+(** {4 tests for potential sets}
+    [is_xxx t] returns true iff [t] is a [xxx] _or_ a set of [xxx]
 *)
 
-(** see {!plain_arithmetic_type} *)
 val is_arithmetic_type: Cil_types.logic_type -> bool
 val is_integral_type: Cil_types.logic_type -> bool
 val is_fun_ptr: Cil_types.logic_type -> bool
 val is_array_type: Cil_types.logic_type -> bool
 val is_pointer_type: Cil_types.logic_type -> bool
 
-val is_set_type: Cil_types.logic_type -> bool
-val type_of_set_elem: logic_type -> logic_type
+(** {4 sets and lists} *)
 
 val is_list_type: Cil_types.logic_type -> bool
+val is_set_type: Cil_types.logic_type -> bool
 
+(** {4 extract elements} *)
+
+val type_of_set_elem: logic_type -> logic_type
 val type_of_list_elem : logic_type -> logic_type
 
+(** returns the type of the element pointed to by the type. If the
+    source type is a set of pointers, returns a set of elements.
+*)
 val type_of_pointed: logic_type -> logic_type
 
+(** same as {!type_of_pointed} but for arrays (or set of arrays). *)
 val type_of_array_elem: logic_type -> logic_type
 
 (** {3 Predefined tests over types} *)
+
 (** [isLogicType test typ] is [false] for pure logic types and the result
     of test for C types.
     In case of a set type, the function tests the element type.
