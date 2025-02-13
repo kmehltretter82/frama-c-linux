@@ -112,7 +112,7 @@ open Logic_const
 
 let rec ptr_of = function
   | Ctype t -> Ctype (Cil_const.mk_tptr t)
-  | t when is_set_type t ->
+  | t when Logic_utils.is_set_type t ->
     let t = Logic_utils.type_of_set_elem t in
     Logic_const.make_set_type (ptr_of t)
   | _ -> assert false
