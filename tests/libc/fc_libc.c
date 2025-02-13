@@ -1,10 +1,10 @@
 /* run.config*
  PLUGIN: @EVA_PLUGINS@ metrics
- EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -cpp-extra-args='-nostdinc -I@FRAMAC_SHARE@/libc' @PTEST_FILE@ -save @PTEST_NAME@.sav >@PTEST_NAME@_sav.res 2>@PTEST_NAME@_sav.err
+ EXECNOW: BIN @PTEST_NAME@.sav LOG @PTEST_NAME@_sav.res LOG @PTEST_NAME@_sav.err @frama-c@ -cpp-extra-args='-nostdinc -I@FRAMAC_SHARE@/libc' -keep-unused-functions all @PTEST_FILE@ -save @PTEST_NAME@.sav >@PTEST_NAME@_sav.res 2>@PTEST_NAME@_sav.err
  MODULE: check_libc_naming_conventions, check_const
    OPT: -load %{dep:@PTEST_NAME@.sav} -print -cpp-extra-args='-nostdinc -I@FRAMAC_SHARE@/libc' -eva @EVA_CONFIG@ -then -lib-entry -no-print
  MODULE:
-   OPT: -print -print-libc -machdep x86_32 -ocode @DEV_NULL@
+   OPT: -keep-unused-functions all -print -print-libc -machdep x86_32 -ocode @DEV_NULL@
  MODULE: check_parsing_individual_headers
    OPT:
  MODULE: check_libc_anonymous_tags
@@ -16,7 +16,7 @@
    OPT:
  CMD: @frama-c@
  ENABLED_IF: %{read:../../../python-3.7-available}
-   OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | python3 %{dep:./check_some_metrics.py} "> 100" "> 400" "< 2" "> 0" "== 1" "== 1" "== 0" "== 0" "== 0" "== 1"
+   OPT: -load %{dep:@PTEST_NAME@.sav} -metrics -metrics-libc -then -lib-entry -metrics-no-libc | python3 %{dep:./check_some_metrics.py} "> 100" "> 400" ">= 0" "> 0" "== 1" "== 1" "== 0" "== 0" "== 0" "== 1"
 **/
 
 

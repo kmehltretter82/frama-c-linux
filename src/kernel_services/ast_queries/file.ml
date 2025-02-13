@@ -717,7 +717,8 @@ let isRoot g =
        the command-line option *)
     || keepFuncs = "all_debug"
     || (keepFuncs = "all" && not (Cil_builtins.Builtin_functions.mem v.vname))
-    || (keepFuncs = "specified" && not (is_empty_funspec spec))
+    || (keepFuncs = "user-specified" &&
+        (not (is_empty_funspec spec) && not (Cil.global_is_in_libc g)))
   | GType _ | GCompTag _ | GCompTagDecl _ | GEnumTag _ | GEnumTagDecl _ ->
     keepTypes
   | _ -> false
