@@ -1009,9 +1009,15 @@ struct
         | _ -> raise Not_found
       end
     | _ ->
-      try Logic_to_c.term_to_exp size
-      with Logic_to_c.No_conversion ->
-        ctxt.error loc "size of array must be a valid C expression"
+      (match (Cil.constFoldTerm size).term_node with
+       | TConst (Integer _ | LChr _ | LEnum _) ->
+         (try
+            Logic_to_c.term_to_exp size
+          with
+          | Logic_to_c.No_conversion ->
+            ctxt.error loc "size of ACSL array cannot be represented in C")
+       | _ ->
+         ctxt.error loc "size of array must be a constant")
 
   let logic_type ctxt loc env t =
     (* force calls to go through ctxt *)
