@@ -4721,9 +4721,7 @@ not tainted anymore.
 \subsection{Numerors}
 \label{sec:numerors}
 
-\emph{This domain is experimental and should only be used on toy examples.\\
-  It requires the \texttt{mlmpfr} library with support of MPFR,
-  provided by opam.}
+\emph{This domain is experimental and should only be used on toy examples.}
 
 \Eva{} provides a domain inferring ranges for the absolute and relative errors
 stemming from floating-point computations. This domain can be enabled by the
@@ -4737,7 +4735,6 @@ shows over-approximations of:
 \begin{itemize}
 \item its real value, computed by over-approximation of the mathematical
   semantics;
-\item its floating-point value, computed accordingly to the IEEE 754 standard;
 \item its absolute error, i.e. the possible difference between the real value
   and the floating-point value;
 \item its relative error, i.e. the absolute error divided by the real value.
@@ -4745,11 +4742,7 @@ shows over-approximations of:
 
 \paragraph{Current limitations}
 
-The numerors domain does not handle loops, unless they are completely unrolled
-by the analysis. Floating-point computations occurring within loops are
-interpreted as leading to any possible value.
-
-Moreover, the domain only infers error values for scalar variables. Structure
+The numerors domain only infers error values for scalar variables. Structure
 and union fields, as well as arrays, are ignored.
 
 \section{Non-termination}\label{nonterm}
