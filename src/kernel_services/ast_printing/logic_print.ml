@@ -26,10 +26,49 @@ open Format
 open Pretty_utils
 open Logic_ptree
 
-let print_array_size fmt = function
-  | ASidentifier s
-  | ASinteger s -> pp_print_string fmt s
-  | ASnone -> ()
+let get_relation_string = function
+    Lt -> "<" | Gt -> ">" | Le -> "<=" | Ge -> ">=" | Eq -> "==" | Neq -> "!="
+
+let get_binop_string = function
+    Badd -> "+"
+  | Bsub -> "-"
+  | Bmul -> "*"
+  | Bdiv -> "/"
+  | Bmod -> "%"
+  | Bbw_and -> "&"
+  | Bbw_or -> "|"
+  | Bbw_xor -> "^"
+  | Blshift -> "<<"
+  | Brshift -> ">>"
+
+let get_unop_string = function
+    Uminus -> "-" | Ustar -> "*" | Uamp -> "&" | Ubw_not -> "~"
+
+let getParenthLevel e =
+  match e.lexpr_node with
+  | PLnamed _ -> 95
+  | PLlambda _ | PLlet _ | PLrange _ -> 90
+  | PLforall _ | PLexists _ -> 87
+  | PLimplies _ | PLiff _ -> 85
+  | PLand _ | PLor _ | PLxor _ -> 80
+  | PLif _ -> 77
+  | PLbinop (_,(Bbw_and | Bbw_or | Bbw_xor),_) -> 75
+  | PLrepeat _ -> 72
+  | PLrel _ -> 70
+  | PLbinop (_,(Badd|Bsub|Blshift|Brshift),_) -> 60
+  | PLbinop (_,(Bmul|Bdiv|Bmod),_) -> 40
+  | PLunop ((Uamp|Uminus|Ubw_not),_) | PLcast _ | PLnot _ -> 30
+  | PLunop (Ustar,_) | PLdot _ | PLarrow _ | PLarrget _
+  | PLsizeof _ | PLsizeofE _ -> 20
+  | PLapp _ | PLold _ | PLat _
+  | PLoffset _ | PLbase_addr _ | PLblock_length _
+  | PLupdate _  | PLinitField _ | PLinitIndex _
+  | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
+  | PLinitialized _ | PLdangling _
+  | PLallocable _ | PLfreeable _ | PLfresh _
+  | PLseparated _ | PLunion _ | PLinter _ -> 10
+  | PLvar _ | PLconstant _ | PLresult | PLnull | PLtypeof _ | PLtype _
+  | PLfalse | PLtrue | PLcomprehension _ | PLempty | PLset _ | PLlist _ -> 0
 
 let print_constant fmt = function
   | IntConstant s -> pp_print_string fmt s
@@ -37,7 +76,11 @@ let print_constant fmt = function
   | StringConstant s -> fprintf fmt "\"%s\"" s
   | WStringConstant s -> fprintf fmt "\"%s\"" s
 
-let rec print_logic_type name fmt typ =
+let rec print_array_size fmt = function
+  | Some lexpr -> print_lexpr fmt lexpr
+  | None -> ()
+
+and print_logic_type name fmt typ =
   let pname = match name with
     | Some d -> (fun fmt -> fprintf fmt "@ %t" d)
     | None -> (fun _ -> ())
@@ -90,56 +133,12 @@ let rec print_logic_type name fmt typ =
     in
     print_logic_type (Some pname) fmt ret
 
-let print_typed_ident fmt (t,s) =
+and print_typed_ident fmt (t,s) =
   print_logic_type (Some (fun fmt -> pp_print_string fmt s)) fmt t
 
-let print_quantifiers fmt l = pp_list ~sep:",@ " print_typed_ident fmt l
+and print_quantifiers fmt l = pp_list ~sep:",@ " print_typed_ident fmt l
 
-let get_relation_string = function
-    Lt -> "<" | Gt -> ">" | Le -> "<=" | Ge -> ">=" | Eq -> "==" | Neq -> "!="
-
-let get_binop_string = function
-    Badd -> "+"
-  | Bsub -> "-"
-  | Bmul -> "*"
-  | Bdiv -> "/"
-  | Bmod -> "%"
-  | Bbw_and -> "&"
-  | Bbw_or -> "|"
-  | Bbw_xor -> "^"
-  | Blshift -> "<<"
-  | Brshift -> ">>"
-
-let get_unop_string = function
-    Uminus -> "-" | Ustar -> "*" | Uamp -> "&" | Ubw_not -> "~"
-
-let getParenthLevel e =
-  match e.lexpr_node with
-  | PLnamed _ -> 95
-  | PLlambda _ | PLlet _ | PLrange _ -> 90
-  | PLforall _ | PLexists _ -> 87
-  | PLimplies _ | PLiff _ -> 85
-  | PLand _ | PLor _ | PLxor _ -> 80
-  | PLif _ -> 77
-  | PLbinop (_,(Bbw_and | Bbw_or | Bbw_xor),_) -> 75
-  | PLrepeat _ -> 72
-  | PLrel _ -> 70
-  | PLbinop (_,(Badd|Bsub|Blshift|Brshift),_) -> 60
-  | PLbinop (_,(Bmul|Bdiv|Bmod),_) -> 40
-  | PLunop ((Uamp|Uminus|Ubw_not),_) | PLcast _ | PLnot _ -> 30
-  | PLunop (Ustar,_) | PLdot _ | PLarrow _ | PLarrget _
-  | PLsizeof _ | PLsizeofE _ -> 20
-  | PLapp _ | PLold _ | PLat _
-  | PLoffset _ | PLbase_addr _ | PLblock_length _
-  | PLupdate _  | PLinitField _ | PLinitIndex _
-  | PLvalid _ | PLvalid_read _ | PLobject_pointer _ | PLvalid_function _
-  | PLinitialized _ | PLdangling _
-  | PLallocable _ | PLfreeable _ | PLfresh _
-  | PLseparated _ | PLunion _ | PLinter _ -> 10
-  | PLvar _ | PLconstant _ | PLresult | PLnull | PLtypeof _ | PLtype _
-  | PLfalse | PLtrue | PLcomprehension _ | PLempty | PLset _ | PLlist _ -> 0
-
-let rec print_path_elt fmt = function
+and print_path_elt fmt = function
   | PLpathField s -> fprintf fmt ".%s" s
   | PLpathIndex i -> fprintf fmt "[@[%a@]]" print_lexpr i
 

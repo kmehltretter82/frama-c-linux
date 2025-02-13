@@ -501,8 +501,8 @@ let map_logic f = function
   | Lset ls -> Lset (List.map (map_sloc f) ls)
 
 let plain lt e =
-  if Logic_typing.is_set_type lt then
-    let te = Logic_typing.type_of_set_elem lt in
+  if Logic_utils.is_set_type lt then
+    let te = Logic_utils.type_of_set_elem lt in
     Vset [Vset.Set(tau_of_ltype te,e)]
   else
     Vexp e
@@ -831,12 +831,12 @@ struct
         | Vset s -> a.vset <- List.rev_append s a.vset
         | Lset s -> a.sloc <- List.rev_append s a.sloc
       ) vs ;
-    flush (Logic_typing.is_pointer_type t) a
+    flush (Logic_utils.is_pointer_type t) a
 
   let inter t vs =
     match List.map (fun v -> Vset.concretize (vset v)) vs with
     | [] ->
-      if Logic_typing.is_pointer_type t
+      if Logic_utils.is_pointer_type t
       then Lset [] else Vset []
     | v::vs ->
       let s = List.fold_left Vset.inter v vs in

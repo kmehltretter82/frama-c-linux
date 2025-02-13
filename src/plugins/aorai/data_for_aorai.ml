@@ -746,8 +746,8 @@ let type_expr metaenv env ?tr ?current e =
       let t1 = e1.term_type in
       let t2 = e2.term_type in
       let t =
-        if Logic_typing.is_arithmetic_type t1
-        && Logic_typing.is_arithmetic_type t2
+        if Logic_utils.is_arithmetic_type t1
+        && Logic_utils.is_arithmetic_type t2
         then
           let t = Logic_typing.arithmetic_conversion t1 t2 in
           Logic_const.term
@@ -757,22 +757,22 @@ let type_expr metaenv env ?tr ?current e =
           (match bop with
            | Logic_ptree.Badd
              when
-               Logic_typing.is_integral_type t2
+               Logic_utils.is_integral_type t2
                && Logic_utils.isLogicPointerType t1 ->
              Logic_const.term (TBinOp (PlusPI,e1,e2)) t1
            | Logic_ptree.Bsub
              when
-               Logic_typing.is_integral_type t2
+               Logic_utils.is_integral_type t2
                && Logic_utils.isLogicPointerType t1 ->
              Logic_const.term (TBinOp (MinusPI,e1,e2)) t1
            | Logic_ptree.Badd
              when
-               Logic_typing.is_integral_type t1
+               Logic_utils.is_integral_type t1
                && Logic_utils.isLogicPointerType t2 ->
              Logic_const.term (TBinOp (PlusPI,e2,e1)) t2
            | Logic_ptree.Bsub
              when
-               Logic_typing.is_integral_type t1
+               Logic_utils.is_integral_type t1
                && Logic_utils.isLogicPointerType t2 ->
              Logic_const.term (TBinOp (MinusPI,e2,e1)) t2
            | Logic_ptree.Bsub
@@ -793,13 +793,13 @@ let type_expr metaenv env ?tr ?current e =
       env, t, cond
     | PUnop(Logic_ptree.Uminus,e) ->
       let env,t,cond = aux env cond e in
-      if Logic_typing.is_arithmetic_type t.term_type then
+      if Logic_utils.is_arithmetic_type t.term_type then
         env,Logic_const.term (TUnOp (Neg,t)) Linteger,cond
       else Aorai_option.abort
           "Invalid operand for unary -: unexpected %a" Printer.pp_term t
     | PUnop(Logic_ptree.Ubw_not,e) ->
       let env,t,cond = aux env cond e in
-      if Logic_typing.is_arithmetic_type t.term_type then
+      if Logic_utils.is_arithmetic_type t.term_type then
         env,Logic_const.term (TUnOp (BNot,t)) Linteger,cond
       else Aorai_option.abort
           "Invalid operand for bitwise not: unexpected %a" Printer.pp_term t
@@ -823,7 +823,7 @@ let type_expr metaenv env ?tr ?current e =
         env,
         Logic_const.term
           (TLval (TMem t, TNoOffset))
-          (Logic_typing.type_of_pointed t.term_type),
+          (Logic_utils.type_of_pointed t.term_type),
         cond
       else
         Aorai_option.abort "Cannot dereference term %a" Printer.pp_term t
@@ -832,19 +832,19 @@ let type_expr metaenv env ?tr ?current e =
       let env, t2, cond = aux env cond e2 in
       let t =
         if Logic_utils.isLogicPointerType t1.term_type
-        && Logic_typing.is_integral_type t2.term_type
+        && Logic_utils.is_integral_type t2.term_type
         then
           Logic_const.term
             (TBinOp (PlusPI,t1,t2))
-            (Logic_typing.type_of_pointed t1.term_type)
+            (Logic_utils.type_of_pointed t1.term_type)
         else if Logic_utils.isLogicPointerType t2.term_type
-             && Logic_typing.is_integral_type t1.term_type
+             && Logic_utils.is_integral_type t1.term_type
         then
           Logic_const.term
             (TBinOp (PlusPI,t2,t1))
-            (Logic_typing.type_of_pointed t2.term_type)
+            (Logic_utils.type_of_pointed t2.term_type)
         else if Logic_utils.isLogicArrayType t1.term_type
-             && Logic_typing.is_integral_type t2.term_type
+             && Logic_utils.is_integral_type t2.term_type
         then
           (match t1.term_node with
            | TStartOf lv | TLval lv ->
@@ -852,20 +852,20 @@ let type_expr metaenv env ?tr ?current e =
                (TLval
                   (Logic_const.addTermOffsetLval
                      (TIndex (t2, TNoOffset)) lv))
-               (Logic_typing.type_of_array_elem t1.term_type)
+               (Logic_utils.type_of_array_elem t1.term_type)
            | _ ->
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
                Printer.pp_term t1 Printer.pp_term t2)
         else if Logic_utils.isLogicArrayType t2.term_type
-             && Logic_typing.is_integral_type t1.term_type
+             && Logic_utils.is_integral_type t1.term_type
         then
           (match t2.term_node with
            | TStartOf lv | TLval lv ->
              Logic_const.term
                (TLval
                   (Logic_const.addTermOffsetLval (TIndex (t1, TNoOffset)) lv))
-               (Logic_typing.type_of_array_elem t2.term_type)
+               (Logic_utils.type_of_array_elem t2.term_type)
            | _ ->
              Aorai_option.fatal
                "Unsupported operation: %a[%a]"
@@ -891,7 +891,7 @@ let type_expr metaenv env ?tr ?current e =
       if Logic_utils.isLogicPointerType t.term_type then begin
         let off, ty =
           LTyping.type_of_field loc s
-            (Logic_typing.type_of_pointed t.term_type)
+            (Logic_utils.type_of_pointed t.term_type)
         in
         let lv = Logic_const.addTermOffsetLval off (TMem t,TNoOffset) in
         env, Logic_const.term (TLval lv) ty, cond

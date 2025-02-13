@@ -1149,12 +1149,12 @@ let rec eval_term ~alarm_mode env t =
        nothing to do, AND coercion from an integer type to a floating-point
        type, that require a conversion. *)
     (match Logic_const.plain_or_set Fun.id ltyp with
-     | Linteger when Logic_typing.is_integral_type t.term_type
+     | Linteger when Logic_utils.is_integral_type t.term_type
                   || Logic_const.is_boolean_type t.term_type -> r
      | Ctype typ when Cil.isIntegralOrPointerType typ -> r
      | Lreal ->
        let eover =
-         if Logic_typing.is_integral_type t.term_type
+         if Logic_utils.is_integral_type t.term_type
          then V.cast_int_to_float Fval.Real r.eover
          else V.cast_float_to_float Fval.Real r.eover
        in
@@ -1164,7 +1164,7 @@ let rec eval_term ~alarm_mode env t =
          empty = r.empty }
      | ltyp ->
        if Logic_const.is_boolean_type ltyp
-       && Logic_typing.is_integral_type t.term_type
+       && Logic_utils.is_integral_type t.term_type
        then cast_to_bool r
        else if Logic_utils.is_same_type ltyp t.term_type then
          (* coercion from singleton to set *)

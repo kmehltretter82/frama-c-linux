@@ -108,8 +108,8 @@ struct
   let collection_of_term env t =
     let v = C.logic env t in
     match v with
-    | Vexp s when Logic_typing.is_set_type t.term_type ->
-      let te = Logic_typing.type_of_set_elem t.term_type in
+    | Vexp s when Logic_utils.is_set_type t.term_type ->
+      let te = Logic_utils.type_of_set_elem t.term_type in
       Vset [Vset.Set(tau_of_ltype te,s)]
     | w -> w
 
@@ -364,7 +364,7 @@ struct
     | _ -> None
 
   let compare_term env vrel lrel frel a b =
-    if Logic_typing.is_pointer_type a.term_type then
+    if Logic_utils.is_pointer_type a.term_type then
       lrel (loc_of_term env a) (loc_of_term env b)
     else match float_of_logic_type a.term_type with
       | Some f -> frel f (val_of_term env a) (val_of_term env b)
@@ -393,8 +393,8 @@ struct
   let arith env fint freal a b =
     let va = C.logic env a in
     let vb = C.logic env b in
-    let ta = Logic_typing.is_integral_type a.term_type in
-    let tb = Logic_typing.is_integral_type b.term_type in
+    let ta = Logic_utils.is_integral_type a.term_type in
+    let tb = Logic_utils.is_integral_type b.term_type in
     if ta && tb
     then fint va vb
     else freal (toreal ta va) (toreal tb vb)
@@ -665,7 +665,7 @@ struct
         | _ -> base
       end
 
-    | TUnOp(Neg,t) when not (Logic_typing.is_integral_type t.term_type) ->
+    | TUnOp(Neg,t) when not (Logic_utils.is_integral_type t.term_type) ->
       L.map F.e_opp (C.logic env t)
     | TUnOp(unop,t) -> term_unop unop (C.logic env t)
     | TBinOp(binop,a,b) -> term_binop env binop a b

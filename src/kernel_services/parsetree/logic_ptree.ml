@@ -24,6 +24,18 @@
 
 (* Logic parse trees *)
 
+type location = Cil_types.location
+
+(** comparison operators. *)
+type relation = Lt | Gt | Le | Ge | Eq | Neq
+
+(** arithmetic and logic binary operators. *)
+type binop = Badd | Bsub | Bmul | Bdiv | Bmod | Bbw_and | Bbw_or | Bbw_xor |
+             Blshift | Brshift
+
+(** unary operators. *)
+type unop = Uminus | Ustar | Uamp | Ubw_not
+
 (** logic constants. *)
 type constant =
     IntConstant of string (** integer constant *)
@@ -31,14 +43,13 @@ type constant =
   | StringConstant of string (** string constant *)
   | WStringConstant of string (** wide string constant *)
 
-(** size of logic array. *)
-type array_size =
-    ASinteger of string (** integer constant *)
-  | ASidentifier of string (** a variable or macro*)
-  | ASnone (**  none *)
+(** size of logic array.
+    @before Frama-C+dev was a sum type with only integer constants and variables
+*)
+type array_size = lexpr option
 
 (** logic types. *)
-type logic_type =
+and logic_type =
   | LTvoid (** C void *)
   | LTboolean (** booleans *)
   | LTinteger (** mathematical integers. *)
@@ -54,25 +65,13 @@ type logic_type =
   | LTarrow of logic_type list * logic_type
   | LTattribute of logic_type * Cil_types.attribute (* Only const and volatile can appear here *)
 
-type location = Cil_types.location
-
 (** quantifier-bound variables *)
-type quantifiers = (logic_type * string) list
-
-(** comparison operators. *)
-type relation = Lt | Gt | Le | Ge | Eq | Neq
-
-(** arithmetic and logic binary operators. *)
-type binop = Badd | Bsub | Bmul | Bdiv | Bmod | Bbw_and | Bbw_or | Bbw_xor |
-             Blshift | Brshift
-
-(** unary operators. *)
-type unop = Uminus | Ustar | Uamp | Ubw_not
+and quantifiers = (logic_type * string) list
 
 (** logical expression. The distinction between locations, terms and
     predicate is done during typing.
 *)
-type lexpr = {
+and lexpr = {
   lexpr_node : lexpr_node; (** kind of expression. *)
   lexpr_loc : location (** position in the source code. *)
 }

@@ -715,9 +715,8 @@ constant:
 ;
 
 array_size:
-| INT_CONSTANT { ASinteger $1 }
-| full_identifier { ASidentifier $1 }
-| /* empty */ { ASnone }
+| lexpr {Some $1}
+| /* empty */ { None }
 ;
 
 var_spec_bis:

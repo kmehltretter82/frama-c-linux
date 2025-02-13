@@ -360,7 +360,7 @@ let extract_quantifiers ~loc args =
                  eliminate_ranges_from_index_of_toffset ~loc toffset quantifiers
                in
                let lty_noset =
-                 Logic_typing.type_of_pointed @@
+                 Logic_utils.type_of_pointed @@
                  if Logic_const.is_set_type arg.term_type then
                    Logic_const.type_of_element arg.term_type
                  else
