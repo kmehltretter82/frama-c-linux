@@ -38,6 +38,9 @@ _Complex-related builtins are commented out since Frama-C does not currently
 support them.
 */
 
+#ifndef __FC_GCC_BUILTIN_MACROS
+#define __FC_GCC_BUILTIN_MACROS
+
 #include "ctype.h"
 #include "inttypes.h"
 #include "math.h"
@@ -309,3 +312,5 @@ support them.
 #define __builtin_vsnprintf vsnprintf
 #define __builtin_vsprintf vsprintf
 #define __builtin_vsscanf vsscanf
+
+#endif
