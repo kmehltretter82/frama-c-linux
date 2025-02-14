@@ -1,4 +1,4 @@
-# Sandbox {#help-sandbox}
+# Sandbox {#sandbox}
 
 The sandbox part of Ivette is only available in development mode.
 It allows you to test new modules and discover a simplified form of the basic modules before using them.

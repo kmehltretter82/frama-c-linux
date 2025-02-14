@@ -36,6 +36,14 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
 import * as State from './state';
 import * as Search from './search';
+import doc from './doc.md?raw';
+import { Pattern } from 'dome/text/markdown';
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+export const docIvette = { id: "ivette", content: doc };
 
 /* -------------------------------------------------------------------------- */
 /* --- Items                                                              --- */
@@ -211,6 +219,12 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
+export interface DocProps {
+  id: string;
+  content: string;
+  patterns?: Pattern[];
+}
+
 /** @ignore */
 export const SIDEBAR = new State.ElementRack<SidebarProps>();
 
@@ -219,6 +233,9 @@ export const TOOLBAR = new State.ElementRack<ToolProps>();
 
 /** @ignore */
 export const STATUSBAR = new State.ElementRack<ToolProps>();
+
+/** @ignore */
+export const DOCITEM = new State.ElementRack<DocProps>();
 
 export function registerSidebar(sidebar: SidebarProps): void {
   SIDEBAR.register(sidebar);
@@ -231,6 +248,12 @@ export function registerToolbar(tools: ToolProps): void {
 export function registerStatusbar(status: ToolProps): void {
   STATUSBAR.register(status);
 }
+
+export function registerDocItem(doc: DocProps): void {
+  DOCITEM.register(doc);
+}
+
+registerDocItem(docIvette);
 
 /* -------------------------------------------------------------------------- */
 /* --- Search Modes                                                       --- */

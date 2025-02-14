@@ -29,8 +29,8 @@ import { IconButton } from 'dome/controls/buttons';
 import { Button, ButtonGroup, Inset } from 'dome/frame/toolbars';
 import { HelpIcon } from 'dome/help';
 import * as Themes from 'dome/themes';
-import { ledTag, iconTag, Pattern } from 'dome/text/markdown';
-import docCallgraph from '../callgraph.md?raw';
+import { Pattern } from 'dome/text/markdown';
+import doc from '../callgraph.md?raw';
 import { ModeDisplay } from '../definitions';
 import {
   IThreeStateButton, ThreeStateButton, TThreesButtonState
@@ -75,11 +75,7 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
         title={"Automatically select node of the function selected in AST"}
       />
       <Inset />
-      <HelpIcon
-        label='Callgraph'
-        scrollTo={'callgraph'}
-        patterns={[iconTag, ledTag, selectButtonTag, TSButtonTag]}
-      >{ docCallgraph }</HelpIcon>
+      <HelpIcon id="callgraph" />
       <Inset />
     </Ivette.TitleBar>
   );
@@ -104,6 +100,12 @@ const selectButtonTag: Pattern = {
     return match ? <Button key={key} label="Select" title={`Nodes selection`}/>
       : null;
   }
+};
+
+export const docCallgraph = {
+  id: 'callgraph',
+  content: doc,
+  patterns: [selectButtonTag, TSButtonTag]
 };
 
 interface ShowNodesButtonProps {

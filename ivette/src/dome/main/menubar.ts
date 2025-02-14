@@ -270,11 +270,33 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 ]);
 
 // --------------------------------------------------------------------------
+// --- Renderer-Process Communication
+// --------------------------------------------------------------------------
+
+export function broadcast(event: string, ...args: unknown[]): void {
+  BrowserWindow.getAllWindows().forEach((w) => {
+    w.webContents.send(event, ...args);
+  });
+}
+
+// --------------------------------------------------------------------------
 // --- Help Menu Items
 // --------------------------------------------------------------------------
 
 const helpMenuItemsCustom: MenuSpec = [];
 const helpMenuItems: MenuSpec = [];
+
+ipcMain.handle('dome.ipc.addDocHelpMenu', () => {
+  helpMenuItems.push(
+      {
+        role: 'help',
+        label: 'Documentation',
+        id: 'help_documentation',
+        click: () => broadcast('dome.menu.help.open.doc'),
+        type: 'normal',
+      }
+    );
+});
 
 let learnMoreLink = '';
 ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {

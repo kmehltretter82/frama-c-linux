@@ -20,18 +20,17 @@
 /*                                                                          */
 /* ************************************************************************ */
 
-/* -------------------------------------------------------------------------- */
-/* --- Sandbox Testing for Force Graph component                          --- */
-/* -------------------------------------------------------------------------- */
 
 import React from 'react';
 import { registerSandbox, TitleBar } from 'ivette';
 import { HelpIcon } from 'dome/help';
-import helpSandbox from './sandbox.md?raw';
+import doc from './sandbox.md?raw';
 
-// --------------------------------------------------------------------------
-// --- Main force graph component
-// --------------------------------------------------------------------------
+/* -------------------------------------------------------------------------- */
+/* --- Sandbox help                                                       --- */
+/* -------------------------------------------------------------------------- */
+
+export const docSandbox = { id: 'sandbox', content: doc };
 
 function SandboxHelp(): JSX.Element {
   const style = {
@@ -46,19 +45,12 @@ function SandboxHelp(): JSX.Element {
   return (
     <>
       <TitleBar>
-        <HelpIcon
-          label='Sandbox - Help'
-          scrollTo={'sandbox-help'}
-        >{ helpSandbox }</HelpIcon>
+        <HelpIcon id='sandbox' />
       </TitleBar>
       <div style={style}>
         <>
           Click the help button to display help : here
-          <HelpIcon
-            label='Sandbox - Help'
-            size={18}
-            scrollTo={'sandbox-help'}
-            >{ helpSandbox }</HelpIcon>
+          <HelpIcon id='sandbox' size={18} />
           or on the toolbar
         </>
       </div>

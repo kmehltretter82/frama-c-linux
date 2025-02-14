@@ -24,6 +24,7 @@
 /* --- Frama-C MENU                                                       ---*/
 /* --------------------------------------------------------------------------*/
 
+import { ipcRenderer } from 'electron';
 import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Display from 'ivette/display';
@@ -114,6 +115,7 @@ async function saveSession(): Promise<void> {
 }
 
 export function init(): void {
+  ipcRenderer.invoke('dome.ipc.addDocHelpMenu');
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files…',

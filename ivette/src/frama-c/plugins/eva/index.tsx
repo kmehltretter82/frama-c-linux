@@ -25,6 +25,7 @@
 // --------------------------------------------------------------------------
 
 import * as Ivette from 'ivette';
+import doc from './doc.md?raw';
 import './valuetable';
 import './Summary';
 import './Coverage';
@@ -32,6 +33,12 @@ import './DomainStates';
 import './EvaSidebar';
 import './Flamegraph';
 import './style.css';
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+export const docEva = { id: "eva", content: doc };
 
 // --------------------------------------------------------------------------
 // --- Export Component

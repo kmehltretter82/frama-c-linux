@@ -44,6 +44,13 @@ import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
+import doc from './doc.md?raw';
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+export const docKernel = { id: "kernel", content: doc };
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints

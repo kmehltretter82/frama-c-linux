@@ -21,17 +21,29 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { Modal } from 'dome/dialogs';
-import { Hbox } from 'dome/layout/boxes';
-
 import { shell } from 'electron';
+
+import { DEVEL } from 'dome';
+import { Modal, showModal } from 'dome/dialogs';
+import { Hbox } from 'dome/layout/boxes';
 import { Button } from 'dome/controls/buttons';
-import * as Server from 'frama-c/server';
-import * as Dialogs from 'dome/dialogs';
+
+import { registerDocItem, DocProps } from 'ivette';
 import { getConfig } from 'frama-c/kernel/api/services';
+import * as Server from 'frama-c/server';
 
 import './style.css';
 import framacImage from './frama-c.png';
+
+/** Import doc */
+
+import docFramaCMd from './doc.md?raw';
+import { docEva } from './plugins/eva';
+import { docCallgraph } from './plugins/callgraph/components/titlebar';
+import { docDive } from './plugins/dive';
+import { docWP } from './plugins/wp';
+import { docSandbox } from '../sandbox/help';
+import { docKernel } from './kernel/Globals';
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C infos                                                      --- */
@@ -171,7 +183,7 @@ export async function showAboutModal(): Promise<void> {
   const config = await Server.send(getConfig, {});
   const version = config.version_codename;
   const modal = <AboutModal version = {version}/>;
-  Dialogs.showModal(modal);
+  showModal(modal);
 }
 
 function CreditsModal(): JSX.Element {
@@ -193,5 +205,26 @@ function CreditsModal(): JSX.Element {
 
 export function showCreditsModal(): void {
   const modal = <CreditsModal/>;
-  Dialogs.showModal(modal);
+  showModal(modal);
 }
+/* -------------------------------------------------------------------------- */
+/* --- Frama-C Documentation                                              --- */
+/* -------------------------------------------------------------------------- */
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+const docFramaC = { id: "framac", content: docFramaCMd };
+
+const docList: DocProps[] = [
+  docFramaC,
+  docKernel,
+  docEva,
+  docWP,
+  docCallgraph,
+  docDive,
+];
+if(DEVEL) docList.push(docSandbox);
+
+docList.forEach(e => registerDocItem(e));

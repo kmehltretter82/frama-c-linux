@@ -748,7 +748,7 @@ input:checked + .dome-xSwitch-slider:before {
   div.dome-xTree-subtree {
     overflow: hidden;
 
-    &:not(:has(.dome-xTree-show-children)) {
+    &:not(:has(.dome-xTree-show-children.dome-xTree-has-subtree)) {
       border-left: solid 2px var(--background-profound);
     }
     &.dome-xTree-subtree-hidden {
