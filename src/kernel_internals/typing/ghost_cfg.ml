@@ -37,7 +37,7 @@ let annot_attr = "has_annot"
 *)
 let has_annot stmt =
   Annotations.code_annot stmt <> [] ||
-  Ast_attributes.has_attribute annot_attr stmt.sattr
+  Ast_attributes.exists annot_attr stmt.sattr
 
 let noGhostFD prj fd =
   let visitor = object (self)
@@ -68,7 +68,7 @@ let noGhostFD prj fd =
     method! vblock b =
       if Cil.is_ghost_else b then begin
         b.bstmts <- [] ;
-        b.battrs <- Ast_attributes.(drop_attribute frama_c_ghost_else b.battrs);
+        b.battrs <- Ast_attributes.(drop frama_c_ghost_else b.battrs);
         SkipChildren
       end else
         DoChildren

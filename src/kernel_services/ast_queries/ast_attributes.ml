@@ -25,12 +25,8 @@
 open Cil_types
 
 (* Construct sorted lists of attributes *)
-let attribute_name (an, _) =
+let get_name (an, _) =
   Extlib.strip_underscore an
-
-let has_attribute an al =
-  let an = Extlib.strip_underscore an in
-  List.exists (fun a -> attribute_name a = an) al
 
 (* Attributes are added as they are (e.g. if we add ["__attr"] and then ["attr"]
    both are added). When checking for the presence of an attribute [x] or trying
@@ -42,7 +38,7 @@ let has_attribute an al =
 
    The result is [].
 *)
-let add_attribute ((an, _) as a) al =
+let add ((an, _) as a) al =
   let rec insert_sorted = function
     | [] -> [a]
     | (((an0, _) as a0) :: rest) as l ->
@@ -54,35 +50,39 @@ let add_attribute ((an, _) as a) al =
   insert_sorted al
 
 (* The second attribute list is sorted *)
-let add_attributes al0 al =
+let add_list al0 al =
   if al0 == [] then
     al
   else
-    List.fold_left (fun acc a -> add_attribute a acc) al al0
+    List.fold_left (fun acc a -> add a acc) al al0
 
-let drop_attribute an al =
+let drop an al =
   let an = Extlib.strip_underscore an in
-  List.filter (fun a -> attribute_name a <> an) al
+  List.filter (fun a -> get_name a <> an) al
 
-let rec drop_attributes anl al =
+let rec drop_list anl al =
   match al with
   | [] -> []
   | a :: q ->
-    let q' = drop_attributes anl q in
-    if List.mem (attribute_name a) anl then
+    let q' = drop_list anl q in
+    if List.mem (get_name a) anl then
       q' (* drop this attribute *)
     else
     if q' == q then al (* preserve sharing *) else a :: q'
 
-let find_attribute an al =
+let exists an al =
+  let an = Extlib.strip_underscore an in
+  List.exists (fun a -> get_name a = an) al
+
+let find_params an al =
   let an = Extlib.strip_underscore an in
   List.fold_left (fun acc ((_, param) as a) ->
-      if attribute_name a = an then param @ acc else acc
+      if get_name a = an then param @ acc else acc
     ) [] al
 
-let filter_attributes an al =
+let filter an al =
   let an = Extlib.strip_underscore an in
-  List.filter (fun a -> attribute_name a = an) al
+  List.filter (fun a -> get_name a = an) al
 
 (**************************************)
 (* Attribute registration and classes *)
@@ -105,17 +105,17 @@ type attribute_class =
   | AttrStmt
 
   (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions {!get_attribute_class} and {!partition_attributes}. *)
+      ignored by functions {!get_class} and {!partition}. *)
   | AttrIgnored
 
 (* This table contains the mapping of predefined attributes to classes.
  * Extend this table with more attributes as you need. This table is used to
  * determine how to associate attributes with names or type during cabs2cil
  * conversion *)
-let attribute_hash : (string, attribute_class) Hashtbl.t = Hashtbl.create 59
+let known_table : (string, attribute_class) Hashtbl.t = Hashtbl.create 59
 
-let register_attribute ac an =
-  if Hashtbl.mem attribute_hash an then begin
+let register ac an =
+  if Hashtbl.mem known_table an then begin
     let pp fmt c =
       match c with
       | AttrName b -> Format.fprintf fmt "(AttrName %B)" b
@@ -126,35 +126,35 @@ let register_attribute ac an =
     in
     Kernel.warning
       "Replacing existing class for attribute %s: was %a, now %a"
-      an pp (Hashtbl.find attribute_hash an) pp ac
+      an pp (Hashtbl.find known_table an) pp ac
   end;
-  Hashtbl.replace attribute_hash an ac
+  Hashtbl.replace known_table an ac
 
-let register_attributes ac al =
-  List.iter (register_attribute ac) al
+let register_list ac al =
+  List.iter (register ac) al
 
-let remove_attribute = Hashtbl.remove attribute_hash
+let remove = Hashtbl.remove known_table
 
-let get_attribute_class ~default name =
-  match Hashtbl.find attribute_hash name with
+let get_class ~default name =
+  match Hashtbl.find known_table name with
   | exception Not_found -> default
   | AttrIgnored -> default
   | ac -> ac
 
-let is_known_attribute = Hashtbl.mem attribute_hash
+let is_known = Hashtbl.mem known_table
 
-let partition_attributes
+let partition
     ~(default:attribute_class)
     (attrs:  attribute list) :
   attribute list * attribute list * attribute list =
   let rec loop (n,f,t) = function
     | [] -> n, f, t
     | ((an, _) as a) :: rest ->
-      match get_attribute_class ~default an with
-        AttrName _ -> loop (add_attribute a n, f, t) rest
+      match get_class ~default an with
+        AttrName _ -> loop (add a n, f, t) rest
       | AttrFunType _ ->
-        loop (n, add_attribute a f, t) rest
-      | AttrType -> loop (n, f, add_attribute a t) rest
+        loop (n, add a f, t) rest
+      | AttrType -> loop (n, f, add a t) rest
       | AttrStmt ->
         Kernel.warning "unexpected statement attribute %s" an;
         loop (n,f,t) rest
@@ -165,7 +165,7 @@ let partition_attributes
 (* Registering some attributes. *)
 
 let () =
-  register_attributes (AttrName false)
+  register_list (AttrName false)
     [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
       "no_instrument_function"; "alias"; "no_check_memory_usage";
       "exception"; "model"; "aconst";
@@ -174,75 +174,75 @@ let () =
 
 let () =
   (* Now come the MSVC declspec attributes *)
-  register_attributes (AttrName true)
+  register_list (AttrName true)
     [ "thread"; "naked"; "dllimport"; "dllexport"; "selectany"; "allocate";
       "nothrow"; "novtable"; "property"; "uuid"; "align" ]
 
 let () =
-  register_attributes (AttrFunType false)
+  register_list (AttrFunType false)
     [ "format"; "regparm"; "longcall"; "noinline"; "always_inline" ]
 
 let () =
-  register_attributes (AttrFunType true)
+  register_list (AttrFunType true)
     [ "stdcall";"cdecl"; "fastcall"; "noreturn" ]
 
-let () = register_attributes AttrType [ "mode" ]
+let () = register_list AttrType [ "mode" ]
 
 let () =
   (* GCC label and statement attributes. *)
-  register_attributes AttrStmt
+  register_list AttrStmt
     [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
 
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
-let () = register_attribute AttrType bitfield_attribute_name
+let () = register AttrType bitfield_attribute_name
 
 let anonymous_attribute_name = "fc_anonymous"
-let () = register_attribute AttrIgnored anonymous_attribute_name
+let () = register AttrIgnored anonymous_attribute_name
 
 let anonymous_attribute = (anonymous_attribute_name, [])
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
-let () = register_attributes AttrType qualifier_attributes
+let () = register_list AttrType qualifier_attributes
 
 let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
-let () = register_attributes AttrIgnored fc_internal_attributes
+let () = register_list AttrIgnored fc_internal_attributes
 
 let cast_irrelevant_attributes = ["visibility"]
-let () = register_attributes AttrType cast_irrelevant_attributes
+let () = register_list AttrType cast_irrelevant_attributes
 
 let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
 
 let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
 
 let frama_c_ghost_else = "fc_ghost_else"
-let () = register_attribute AttrStmt frama_c_ghost_else
+let () = register AttrStmt frama_c_ghost_else
 
 let frama_c_ghost_formal = "fc_ghost_formal"
-let () = register_attribute (AttrName false) frama_c_ghost_formal
+let () = register (AttrName false) frama_c_ghost_formal
 
 let frama_c_init_obj = "fc_initialized_object"
-let () = register_attribute (AttrName false) frama_c_init_obj
+let () = register (AttrName false) frama_c_init_obj
 
 let frama_c_mutable = "fc_mutable"
-let () = register_attribute (AttrName false) frama_c_mutable
+let () = register (AttrName false) frama_c_mutable
 
 let frama_c_inlined = "fc_inlined"
-let () = register_attribute (AttrFunType false) frama_c_inlined
+let () = register (AttrFunType false) frama_c_inlined
 
 (* Forward declaration from Cil_datatype. *)
 
 let () =
   Cil_datatype.drop_non_logic_attributes :=
-    drop_attributes spare_attributes_for_logic_cast
+    drop_list spare_attributes_for_logic_cast
 
 let () =
   Cil_datatype.drop_fc_internal_attributes :=
-    drop_attributes fc_internal_attributes
+    drop_list fc_internal_attributes
 
 let () =
   Cil_datatype.drop_unknown_attributes :=
     let is_annot_or_known_attr (name, _) =
-      is_known_attribute name
+      is_known name
     in
     (fun attributes -> List.filter is_annot_or_known_attr attributes)
 
@@ -250,16 +250,16 @@ let () =
 (* Utility functions  *)
 (**********************)
 
-let filter_qualifier_attributes al =
-  List.filter (fun a -> List.mem (attribute_name a) qualifier_attributes) al
+let filter_qualifiers al =
+  List.filter (fun a -> List.mem (get_name a) qualifier_attributes) al
 
 let split_array_attributes al =
-  List.partition (fun a -> List.mem (attribute_name a) qualifier_attributes) al
+  List.partition (fun a -> List.mem (get_name a) qualifier_attributes) al
 
-let split_storage_modifier al =
+let split_storage_modifiers al =
   let isstoragemod ((an, _) : attribute) : bool =
     try
-      match Hashtbl.find attribute_hash an with
+      match Hashtbl.find known_table an with
       | AttrName issm -> issm
       | _ -> false
     with Not_found -> false

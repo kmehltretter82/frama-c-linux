@@ -539,7 +539,7 @@ module Base_checker = struct
           check_abort
             "%t is supposed to be static, but varinfo has automatic storage."
             prefix;
-        if not (Ast_attributes.has_attribute Cabs2cil.fc_local_static v.vattr) then
+        if not (Ast_attributes.exists Cabs2cil.fc_local_static v.vattr) then
           check_abort "%t is declared as a global static." prefix;
         ignore (self#vvrbl v);
         (* Ensure that the variable was not already claimed by another block. *)
@@ -985,7 +985,7 @@ module Base_checker = struct
           if Cil.isFunctionType v.vtype then
             check_abort "Variable %a has function type" Printer.pp_varinfo v;
           self#remove_globals_var v;
-          if (Ast_attributes.has_attribute Cabs2cil.fc_local_static v.vattr) then
+          if (Ast_attributes.exists Cabs2cil.fc_local_static v.vattr) then
             self#add_local_static v;
           Cil.DoChildren
         | GFun (f,_) ->

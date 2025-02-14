@@ -60,7 +60,7 @@ struct
   let default_loop_unroll = DefaultLoopUnroll.get ()
 
   let warn_no_loop_unroll stmt =
-    let is_attribute a = Ast_attributes.has_attribute a stmt.sattr in
+    let is_attribute a = Ast_attributes.exists a stmt.sattr in
     match List.filter is_attribute ["for" ; "while" ; "dowhile"] with
     | [] -> ()
     | loop_kind :: _ ->

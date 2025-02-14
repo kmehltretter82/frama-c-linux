@@ -93,7 +93,7 @@ let from_prototype kf =
        recognize formals with type [typ[]] instead of [typ *], but this
        information is lost during normalization *)
     let t_range_node, set =
-      match Ast_attributes.find_attribute "arraylen" typ.tattr with
+      match Ast_attributes.find_params "arraylen" typ.tattr with
       | [AInt length] -> TBinOp (PlusPI, t, make_range (Some length)), true
       | _ ->
         if isAnyCharPtrType typ

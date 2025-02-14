@@ -1725,7 +1725,7 @@ and eval_toffset ~alarm_mode env typ toffset =
       try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
-    let attrs = Ast_attributes.filter_qualifier_attributes (Cil.typeAttrs typ) in
+    let attrs = Ast_attributes.filter_qualifiers (Cil.typeAttrs typ) in
     let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
     let offsrem = eval_toffset ~alarm_mode env typ_fi remaining in
     { etype = offsrem.etype;

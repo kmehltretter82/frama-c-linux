@@ -123,7 +123,7 @@ let () = register_shallow_attribute Ast_attributes.frama_c_inlined
 let () = register_shallow_attribute Ast_attributes.anonymous_attribute_name
 
 let keep_attr a =
-  not (List.mem (Ast_attributes.attribute_name a) !reserved_attributes)
+  not (List.mem (Ast_attributes.get_name a) !reserved_attributes)
 
 let filter_printing_attributes l =
   if Kernel.(is_debug_key_enabled dkey_print_attrs) then l
@@ -143,7 +143,7 @@ let print_global g =
   (* This function decides whether to hide functions in Frama-C's libc. *)
   let attrs = Cil_datatype.Global.attr g in
   let printable =
-    not (Ast_attributes.has_attribute "fc_stdlib" attrs)
+    not (Ast_attributes.exists "fc_stdlib" attrs)
     || Kernel.PrintLibc.get()
   in
   let print_var v =
@@ -166,7 +166,7 @@ let print_std_includes fmt globs =
     in
     let add_file acc g =
       let attrs = Cil_datatype.Global.attr g in
-      Ast_attributes.find_attribute "fc_stdlib" attrs
+      Ast_attributes.find_params "fc_stdlib" attrs
       |> List.fold_left extract_file acc
     in
     let includes = List.fold_left add_file Datatype.String.Set.empty globs in
@@ -716,16 +716,16 @@ class cil_printer () = object (self)
     match t.tnode with
     | TArray (bt, e) ->
       let bt' = Cil.typeRemoveAttributes [ "ghost" ] bt in
-      let tattr = Ast_attributes.drop_attribute "ghost" t.tattr in
+      let tattr = Ast_attributes.drop "ghost" t.tattr in
       Cil_const.mk_tarray ~tattr bt' e
     | _ -> Cil.typeRemoveAttributes [ "ghost" ] t
 
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
-    let stom, rest = Ast_attributes.split_storage_modifier v.vattr in
+    let stom, rest = Ast_attributes.split_storage_modifiers v.vattr in
     (* Small hack to keep printing noreturn attribute before function type. *)
     let noreturn_attrs =
-      Ast_attributes.filter_attributes "noreturn" v.vtype.tattr
+      Ast_attributes.filter "noreturn" v.vtype.tattr
     in
     let stom_noreturn = stom @ noreturn_attrs in
     let vtype_no_noreturn = Cil.typeRemoveAttributes ["noreturn"] v.vtype in
@@ -734,14 +734,14 @@ class cil_printer () = object (self)
     let v =
       if v.vformal && not state.print_cil_as_is then begin
         match v.vtype.tnode with
-        | TPtr t when Ast_attributes.has_attribute "arraylen" v.vtype.tattr ->
+        | TPtr t when Ast_attributes.exists "arraylen" v.vtype.tattr ->
           { v with vtype = Cil_const.mk_tarray ~tattr:v.vtype.tattr t None}
         | _ -> v
       end
       else v
     in
     let name =
-      if Ast_attributes.(has_attribute anonymous_attribute_name v.vattr)
+      if Ast_attributes.(exists anonymous_attribute_name v.vattr)
       && not v.vreferenced && not state.print_cil_as_is
       then
         None
@@ -1796,7 +1796,7 @@ class cil_printer () = object (self)
           (self#typeref (Cil_const.mk_tenum enum) self#enumname) enum
 
       | GCompTag (comp, l) -> (* This is a definition of a tag *)
-        let sto_mod, rest_attr = Ast_attributes.split_storage_modifier comp.cattr in
+        let sto_mod, rest_attr = Ast_attributes.split_storage_modifiers comp.cattr in
         self#line_directive ~forcefile:true fmt l;
         fprintf fmt "@[<3>%a%a %a {@\n%a@]@\n}%a;@\n"
           self#compkind comp
@@ -2035,7 +2035,7 @@ class cil_printer () = object (self)
         match bt.tnode with
         | TFun(rt, args, isva) when Machine.msvcMode () ->
           let an, af', at =
-            Ast_attributes.(partition_attributes ~default:AttrType bt.tattr)
+            Ast_attributes.(partition ~default:AttrType bt.tattr)
           in
           (* We take the af' and we put them into the parentheses *)
           Some
@@ -2043,7 +2043,7 @@ class cil_printer () = object (self)
                fprintf fmt
                  "(%a"
                  printAttributes af'),
-          Cil_const.mk_tfun ~tattr:(Ast_attributes.add_attributes an at) rt args isva
+          Cil_const.mk_tfun ~tattr:(Ast_attributes.add_list an at) rt args isva
         | TFun _ | TArray _ -> (Some (fun fmt -> fprintf fmt "(")), bt
         | _ -> None, bt
       in
@@ -2063,7 +2063,7 @@ class cil_printer () = object (self)
       let atts_elem, a = Ast_attributes.split_array_attributes t.tattr in
       let size_info,a =
         List.partition (fun a ->
-            List.mem (Ast_attributes.attribute_name a) ["arraylen"; "static"]
+            List.mem (Ast_attributes.get_name a) ["arraylen"; "static"]
           ) a
       in
       (* qualifiers attributes are not supposed to be on the TArray,
@@ -2138,7 +2138,7 @@ class cil_printer () = object (self)
           let pp_args fmt (aname,atype,aattr) =
             (* The storage modifiers come first *)
             let atype = self#no_ghost_at_first_level atype in
-            let stom, rest = Ast_attributes.split_storage_modifier aattr in
+            let stom, rest = Ast_attributes.split_storage_modifiers aattr in
             fprintf fmt "%a%a%a"
               self#attributes stom
               (self#typ (Some (fun fmt -> fprintf fmt "%s" aname))) atype

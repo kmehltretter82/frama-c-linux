@@ -90,7 +90,7 @@ struct
   let attribute (s, t) name params =
     match t with
     | Ctype t ->
-      let tattr = Ast_attributes.add_attribute (name, params) t.tattr in
+      let tattr = Ast_attributes.add (name, params) t.tattr in
       s, Ctype { t with tattr }
     | _ -> raise NotACType
 
@@ -1342,7 +1342,7 @@ struct
 
   let add_attribute attr =
     let fundec = get_owner () in
-    fundec.svar.vattr <- Ast_attributes.add_attribute attr fundec.svar.vattr
+    fundec.svar.vattr <- Ast_attributes.add attr fundec.svar.vattr
 
   let add_new_attribute attr params =
     add_attribute (attr, params)

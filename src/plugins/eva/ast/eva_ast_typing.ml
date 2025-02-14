@@ -38,10 +38,10 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
     type_of_offset (Cil.typeOf_array_elem basetyp) o
   | Field (fi, o) ->
     let base_attrs = (Cil.unrollType basetyp).tattr in
-    let base_attrs = Ast_attributes.filter_qualifier_attributes base_attrs in
+    let base_attrs = Ast_attributes.filter_qualifiers base_attrs in
     let base_attrs =
-      if Ast_attributes.(has_attribute frama_c_mutable fi.fattr) then
-        Ast_attributes.drop_attribute "const" base_attrs
+      if Ast_attributes.(exists frama_c_mutable fi.fattr) then
+        Ast_attributes.drop "const" base_attrs
       else
         base_attrs
     in

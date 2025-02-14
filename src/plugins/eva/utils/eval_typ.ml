@@ -24,14 +24,14 @@ open Cil_types
 open Cvalue
 
 let bitfield_size_attributes attrs =
-  match Ast_attributes.(find_attribute bitfield_attribute_name attrs) with
+  match Ast_attributes.(find_params bitfield_attribute_name attrs) with
   | [AInt size] -> Some size
   | _ -> None
 
 let sizeof_lval_typ typlv =
   match Cil.unrollType typlv with
   | { tnode = (TInt _ | TEnum _); tattr } as t ->
-    (match Ast_attributes.(find_attribute bitfield_attribute_name tattr) with
+    (match Ast_attributes.(find_params bitfield_attribute_name tattr) with
      | [AInt i] -> Int_Base.Value i
      | _ -> Bit_utils.sizeof t)
   | t -> Bit_utils.sizeof t

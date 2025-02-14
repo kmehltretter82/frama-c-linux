@@ -62,7 +62,7 @@ let stdlib_attribute = ("fc_stdlib_generated", [])
 let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
   let hidden_var = Eva_utils.create_new_var hidden_var_name pointed_typ in
   if libc
-  then hidden_var.vattr <- Ast_attributes.add_attribute stdlib_attribute hidden_var.vattr;
+  then hidden_var.vattr <- Ast_attributes.add stdlib_attribute hidden_var.vattr;
   hidden_var.vdescr <- Some name_desc;
   let validity =
     (* Add a special case for void* pointers: we do not want to compute the
@@ -138,7 +138,7 @@ let initialize_var_using_type varinfo state =
         match Cil.isVoidType typ', Cil.isFunctionType typ' with
         | false, false -> (* non-void, non-function *)
           let i =
-            match Ast_attributes.find_attribute "arraylen" attr with
+            match Ast_attributes.find_params "arraylen" attr with
             | [AInt i] -> i
             | _ -> Integer.of_int context_max_width
           in

@@ -167,7 +167,7 @@ let plain_array_to_ptr ty =
             "Cannot represent length of array as an attribute";
           []
     in
-    let tattr = Ast_attributes.add_attributes length_attr tattr in
+    let tattr = Ast_attributes.add_list length_attr tattr in
     Ctype (Cil_const.mk_tptr ~tattr ty)
   | ty -> ty
 
@@ -778,21 +778,21 @@ let rec add_attribute_glob_annot a g =
   match g with
   | Dfun_or_pred ({ l_var_info },_) | Dinvariant({ l_var_info }, _)
   | Dtype_annot ( { l_var_info }, _) ->
-    l_var_info.lv_attr <- Ast_attributes.add_attribute a l_var_info.lv_attr; g
+    l_var_info.lv_attr <- Ast_attributes.add a l_var_info.lv_attr; g
   | Dvolatile(v,r,w,al,l) ->
-    Dvolatile(v,r,w,Ast_attributes.add_attribute a al,l)
+    Dvolatile(v,r,w,Ast_attributes.add a al,l)
   | Daxiomatic(n,l,al,loc) ->
     Daxiomatic(n,List.map (add_attribute_glob_annot a) l,
-               Ast_attributes.add_attribute a al,loc)
+               Ast_attributes.add a al,loc)
   | Dmodule(n,l,al,loader,loc) ->
     Dmodule(n,List.map (add_attribute_glob_annot a) l,
-            Ast_attributes.add_attribute a al,loader,loc)
-  | Dtype(ti,_) -> ti.lt_attr <- Ast_attributes.add_attribute a ti.lt_attr; g
+            Ast_attributes.add a al,loader,loc)
+  | Dtype(ti,_) -> ti.lt_attr <- Ast_attributes.add a ti.lt_attr; g
   | Dlemma(n,labs,t,p,al,l) ->
-    Dlemma(n,labs,t,p,Ast_attributes.add_attribute a al,l)
+    Dlemma(n,labs,t,p,Ast_attributes.add a al,l)
   | Dmodel_annot (mi,_) ->
-    mi.mi_attr <- Ast_attributes.add_attribute a mi.mi_attr; g
-  | Dextended (e,al,l) -> Dextended(e,Ast_attributes.add_attribute a al,l)
+    mi.mi_attr <- Ast_attributes.add a mi.mi_attr; g
+  | Dextended (e,al,l) -> Dextended(e,Ast_attributes.add a al,l)
 
 let behavior_has_only_assigns bhvs =
   bhvs.b_requires = [] && bhvs.b_assumes = [] &&

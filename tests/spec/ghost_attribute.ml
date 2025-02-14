@@ -1,1 +1,1 @@
-let () = Ast_attributes.register_attribute AttrType "registered_attr"
+let () = Ast_attributes.register AttrType "registered_attr"

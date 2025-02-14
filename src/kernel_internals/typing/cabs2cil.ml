@@ -93,7 +93,7 @@ let unsupported_attributes = ["vector_size"]
 (* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
    attributes can refer to erased functions and make the code un-reparsable *)
 let erased_attributes = ["malloc"]
-let () = Ast_attributes.register_attributes AttrIgnored erased_attributes
+let () = Ast_attributes.register_list AttrIgnored erased_attributes
 
 let stripUnderscore s =
   if String.length s = 1 then begin
@@ -107,7 +107,7 @@ let stripUnderscore s =
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
-      if not (Ast_attributes.is_known_attribute res) then
+      if not (Ast_attributes.is_known res) then
         Kernel.warning
           ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
           "Unknown attribute: %s" s
@@ -117,43 +117,43 @@ let stripUnderscore s =
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block
-let () = Ast_attributes.register_attribute AttrStmt frama_c_keep_block
+let () = Ast_attributes.register AttrStmt frama_c_keep_block
 
 let fc_stdlib = "fc_stdlib"
 let fc_stdlib_generated = "fc_stdlib_generated"
 let () = Cil_printer.register_shallow_attribute fc_stdlib
 let () = Cil_printer.register_shallow_attribute fc_stdlib_generated
 (* fc_stdlib attribute already registered in cil.ml *)
-let () = Ast_attributes.register_attribute (AttrName false) fc_stdlib_generated
+let () = Ast_attributes.register (AttrName false) fc_stdlib_generated
 
 let fc_local_static = "fc_local_static"
 let () = Cil_printer.register_shallow_attribute fc_local_static
-let () = Ast_attributes.register_attribute (AttrName false) fc_local_static
+let () = Ast_attributes.register (AttrName false) fc_local_static
 
 let frama_c_destructor = "fc_destructor"
 let () = Cil_printer.register_shallow_attribute frama_c_destructor
-let () = Ast_attributes.register_attribute (AttrName false) frama_c_destructor
+let () = Ast_attributes.register (AttrName false) frama_c_destructor
 
 let () =
   (* packed and aligned are treated separately, we ignore them
      during standard processing.
   *)
-  Ast_attributes.register_attribute AttrIgnored "packed";
-  Ast_attributes.register_attribute AttrIgnored "aligned";
-  Ast_attributes.register_attribute (AttrFunType false) "warn_unused_result";
-  Ast_attributes.register_attribute (AttrName false) "FC_OLDSTYLEPROTO";
-  Ast_attributes.register_attribute (AttrName false) "static";
-  Ast_attributes.register_attribute (AttrName false) "missingproto";
-  Ast_attributes.register_attribute AttrIgnored "dummy";
-  Ast_attributes.register_attribute AttrIgnored "signal"; (* AVR-specific attribute *)
-  Ast_attributes.register_attribute AttrIgnored "leaf";
-  Ast_attributes.register_attribute AttrIgnored "nonnull";
-  Ast_attributes.register_attribute AttrIgnored "deprecated";
-  Ast_attributes.register_attribute AttrIgnored "access";
-  Ast_attributes.register_attribute AttrIgnored "returns_twice";
-  Ast_attributes.register_attribute AttrIgnored "pure";
-  Ast_attributes.register_attribute AttrIgnored "cleanup";
-  Ast_attributes.register_attribute AttrIgnored "warning";
+  Ast_attributes.register AttrIgnored "packed";
+  Ast_attributes.register AttrIgnored "aligned";
+  Ast_attributes.register (AttrFunType false) "warn_unused_result";
+  Ast_attributes.register (AttrName false) "FC_OLDSTYLEPROTO";
+  Ast_attributes.register (AttrName false) "static";
+  Ast_attributes.register (AttrName false) "missingproto";
+  Ast_attributes.register AttrIgnored "dummy";
+  Ast_attributes.register AttrIgnored "signal"; (* AVR-specific attribute *)
+  Ast_attributes.register AttrIgnored "leaf";
+  Ast_attributes.register AttrIgnored "nonnull";
+  Ast_attributes.register AttrIgnored "deprecated";
+  Ast_attributes.register AttrIgnored "access";
+  Ast_attributes.register AttrIgnored "returns_twice";
+  Ast_attributes.register AttrIgnored "pure";
+  Ast_attributes.register AttrIgnored "cleanup";
+  Ast_attributes.register AttrIgnored "warning";
   ()
 
 (** A hook into the code that creates temporary local vars.  By default this
@@ -280,7 +280,7 @@ let rec is_dangerous e = match e.enode with
 and is_dangerous_lval = function
   | Var v,_ when
       (not v.vglob && not v.vformal && not v.vtemp)
-      || Ast_attributes.has_attribute "volatile" v.vattr
+      || Ast_attributes.exists "volatile" v.vattr
       || Cil.typeHasAttribute "volatile" (Cil.unrollType v.vtype)
     -> true
   (* Local might be uninitialized, which will trigger UB,
@@ -390,17 +390,16 @@ let process_stdlib_pragma name args =
   end else Some (name, args)
 
 let fc_stdlib_attribute attrs =
-  let open Ast_attributes in
   let s = get_current_stdheader () in
   if s = "" then attrs
   else begin
     let payload, attrs =
-      if has_attribute fc_stdlib attrs then begin
-        AStr s :: find_attribute fc_stdlib attrs,
-        drop_attribute fc_stdlib attrs
+      if Ast_attributes.exists fc_stdlib attrs then begin
+        AStr s :: Ast_attributes.find_params fc_stdlib attrs,
+        Ast_attributes.drop fc_stdlib attrs
       end else [AStr s], attrs
     in
-    add_attribute (fc_stdlib, payload) attrs
+    Ast_attributes.add (fc_stdlib, payload) attrs
   end
 (* ICC align/noalign pragmas (not supported by GCC/MSVC with this syntax).
    Implemented by translating them to 'aligned' attributes. Currently,
@@ -549,8 +548,8 @@ let process_pack_pragma name args =
   end
 
 let force_packed_attribute a =
-  if Ast_attributes.has_attribute "packed" a then a
-  else Ast_attributes.add_attribute ("packed",[]) a
+  if Ast_attributes.exists "packed" a then a
+  else Ast_attributes.add ("packed",[]) a
 
 let is_power_of_two i = i > 0 && i land (i-1) = 0
 
@@ -580,7 +579,7 @@ let warn_invalid_align_attribute aps =
    consider the maximum among them. This function computes this value
    and also emits warnings for invalid attributes. *)
 let combine_aligned_attributes attrs =
-  match Ast_attributes.filter_attributes "aligned" attrs with
+  match Ast_attributes.filter "aligned" attrs with
   | [] -> None
   | aligned_attrs ->
     List.fold_left (fun acc attr ->
@@ -626,7 +625,6 @@ let check_aligned attrs =
    This function is complemented by
    [process_pragmas_pack_align_field_attributes]. *)
 let process_pragmas_pack_align_comp_attributes loc ci cattrs =
-  let open Ast_attributes in
   let source = snd loc in
   match !current_packing_pragma, align_pragma_for_struct ci.corig_name with
   | None, None -> check_aligned cattrs
@@ -640,12 +638,13 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
              alignment given by the pack pragma;
            – otherwise, no alignment attribute is necessary.
            Drop existing "aligned" attributes, if there are invalid ones. *)
-        if has_attribute "packed" cattrs then (drop_attribute "aligned" cattrs)
+        if Ast_attributes.exists "packed" cattrs
+        then Ast_attributes.drop "aligned" cattrs
         else begin
           Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
             Integer.pretty n ci.cname;
-          add_attribute ("aligned",[AInt n]) (drop_attribute "aligned" cattrs)
+          Ast_attributes.(add ("aligned",[AInt n]) (drop "aligned" cattrs))
         end
       | Some local ->
         (* The largest aligned wins with GCC. Don't know
@@ -654,17 +653,14 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
         Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
           Integer.pretty align ci.cname;
-        add_attribute ("aligned",[AInt align])
-          (drop_attribute "aligned" cattrs)
+        Ast_attributes.(add ("aligned",[AInt align]) (drop "aligned" cattrs))
     in
     force_packed_attribute with_aligned_attributes
   | None, Some true ->
-    drop_attribute "aligned" cattrs
+    Ast_attributes.drop "aligned" cattrs
   | None, Some false ->
     force_packed_attribute
-      (add_attribute
-         (("aligned",[AInt Integer.one]))
-         (drop_attribute "aligned" cattrs))
+      Ast_attributes.(add ("aligned",[AInt Integer.one]) (drop "aligned" cattrs))
 
 (* Takes into account the possible effect of '#pragma pack' directives on
    field [fi], and checks the alignment of aligned() attributes.
@@ -678,7 +674,6 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
      has 2 alignment directives, it is the maximum of those that is taken). *)
 let process_pragmas_pack_align_field_attributes fi fattrs cattr =
   let open Current_loc.Operators in
-  let open Ast_attributes in
   let<> UpdatedCurrentLoc = fi.floc in
   match !current_packing_pragma, align_pragma_for_struct fi.forig_name with
   | None, None -> check_aligned fattrs
@@ -688,8 +683,8 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
     (* If this field has no valid aligned attributes and the composite type
         has a packed attribute, nothing needs to be done: the composite will
         have the "packed" attribute anyway. *)
-    if field_align = None && has_attribute "packed" cattr then
-      drop_attribute "aligned" fattrs
+    if field_align = None && Ast_attributes.exists "packed" cattr then
+      Ast_attributes.drop "aligned" fattrs
     else
       (* Otherwise, align on min(n, max(field alignment, type alignment)):
          the field alignment attribute (if there is one) may be smaller than
@@ -706,13 +701,11 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
         (if Option.is_none field_align then "adding" else "setting")
         Integer.pretty new_align fi.fcomp.cname fi.fname;
       let new_attr = ("aligned", [AInt new_align]) in
-      add_attribute new_attr (drop_attribute "aligned" fattrs)
+      Ast_attributes.(add new_attr (drop "aligned" fattrs))
   | None, Some true ->
-    drop_attribute "aligned" fattrs
+    Ast_attributes.drop "aligned" fattrs
   | None, Some false ->
-    (add_attribute
-       ("aligned",[AInt Integer.one])
-       (drop_attribute "aligned" fattrs))
+    Ast_attributes.(add ("aligned",[AInt Integer.one]) (drop "aligned" fattrs))
 
 
 (***** COMPUTED GOTO ************)
@@ -2568,8 +2561,8 @@ let cabsAddAttributes al0 (al: attributes) : attributes =
     List.fold_left
       (fun acc ((an, _) as a) ->
          (* See if the attribute is already in there *)
-         match Ast_attributes.filter_attributes an acc with
-         | [] -> Ast_attributes.add_attribute a acc (* Nothing with that name *)
+         match Ast_attributes.filter an acc with
+         | [] -> Ast_attributes.add a acc (* Nothing with that name *)
          | a' :: _ ->
            if Cil_datatype.Attribute.equal a a' then
              acc (* Already in *)
@@ -2579,7 +2572,7 @@ let cabsAddAttributes al0 (al: attributes) : attributes =
                Cil_printer.pp_attribute a Cil_printer.pp_attribute a' ;
              (* let acc' = drop_attribute an acc in *)
              (* Keep both attributes *)
-             Ast_attributes.add_attribute a acc
+             Ast_attributes.add a acc
            end)
       al
       al0
@@ -2678,7 +2671,7 @@ let cabsTypeAddAttributes =
 
 (* Do types *)
 
-let get_qualifiers t = Ast_attributes.filter_qualifier_attributes (Cil.typeAttrs t)
+let get_qualifiers t = Ast_attributes.filter_qualifiers (Cil.typeAttrs t)
 
 let castTo ?context ?(fromsource=false)
     (oldt : typ) (newt : typ) (e : exp) : (typ * exp) =
@@ -2736,8 +2729,8 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       (* If the new declaration has a section attribute, remove any
        * preexisting section attribute. This mimics behavior of gcc that is
        * required to compile the Linux kernel properly. *)
-      if Ast_attributes.has_attribute "section" vi.vattr then
-        oldvi.vattr <- Ast_attributes.drop_attribute "section" oldvi.vattr;
+      if Ast_attributes.exists "section" vi.vattr then
+        oldvi.vattr <- Ast_attributes.drop "section" oldvi.vattr;
       (* Before combining attributes, we need to check compatibility between
          qualifiers *)
       begin
@@ -2754,7 +2747,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           oldvi.vattr <- cabsAddAttributes oldvi.vattr vi.vattr;
           let what =
             if isadef then
-              CombineFundef (Ast_attributes.has_attribute "FC_OLDSTYLEPROTO" vi.vattr)
+              CombineFundef (Ast_attributes.exists "FC_OLDSTYLEPROTO" vi.vattr)
             else CombineOther
           in
           let mytype = combineTypes what oldvi.vtype vi.vtype in
@@ -2766,7 +2759,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                raise Cannot_combine if necessary. However, due to old-style
                prototypes in GCC machdeps, we must support eccentric cases,
                for which we perform no such additional verification. *)
-            if not (Ast_attributes.has_attribute "FC_OLDSTYLEPROTO" vi.vattr) then
+            if not (Ast_attributes.exists "FC_OLDSTYLEPROTO" vi.vattr) then
               ignore (compatibleTypes oldvi.vtype vi.vtype)
           end;
           Cil.update_var_type oldvi mytype;
@@ -2836,7 +2829,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         let vi = alphaConvertVarAndAddToEnv true vi in
         (* update the field [vdefined] *)
         if isadef then vi.vdefined <- true;
-        vi.vattr <- Ast_attributes.drop_attribute "FC_OLDSTYLEPROTO" vi.vattr;
+        vi.vattr <- Ast_attributes.drop "FC_OLDSTYLEPROTO" vi.vattr;
         vi.vattr <- fc_stdlib_attribute vi.vattr;
         vi, false
       end
@@ -2870,7 +2863,7 @@ let setupBuiltin ?(force_keep=false) name ?spec (resTyp, args_or_argtypes, isva)
   cabsPushGlobal (GFunDecl (funspec, v, Cil_builtins.builtinLoc));
   Cil.unsafeSetFormalsDecl v args;
   if force_keep then
-    v.vattr <- Ast_attributes.add_attribute ("FC_BUILTIN",[]) v.vattr;
+    v.vattr <- Ast_attributes.add ("FC_BUILTIN",[]) v.vattr;
   v
 
 (*  builtin is never ghost *)
@@ -3921,7 +3914,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let locals = b.blocals in
       b.blocals <- [];
       b.battrs <-
-        Ast_attributes.add_attributes [(frama_c_keep_block,[])] b.battrs;
+        Ast_attributes.add_list [(frama_c_keep_block,[])] b.battrs;
       let block = mkStmt ~ghost ~valid_sid (Block b) in
       let chunk = s2c block in
       let chunk = { chunk with cases = current_chunk.cases } in
@@ -4434,7 +4427,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
         let ekind =
           match Kernel.Enums.get () with
           | "" | "help" | "gcc-enums" ->
-            if Ast_attributes.has_attribute "packed" enum.eattr ||
+            if Ast_attributes.exists "packed" enum.eattr ||
                bytesSizeOfInt real_kind >= bytesSizeOfInt IInt
             then real_kind
             else if unsigned then IUInt else IInt
@@ -4508,7 +4501,7 @@ and makeVarInfoCabs
          Hence, at this point only formals can have a VLA type *)
       bt (Cabs.PARENTYPE(attrs, ndt, a))
   in
-  if Ast_attributes.has_attribute "thread" nattr then begin
+  if Ast_attributes.exists "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
     let source = fst ldecl in
     if isFunctionType vtype then
@@ -4517,12 +4510,12 @@ and makeVarInfoCabs
       Kernel.warning ~wkey ~source "a local object cannot be thread-local";
   end;
   if not isgenerated && ghost then begin
-    if Ast_attributes.has_attribute "ghost" (Cil.typeAttrs vtype) then
+    if Ast_attributes.exists "ghost" (Cil.typeAttrs vtype) then
       Kernel.warning
         ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
         "'%s' is already ghost" n;
     if isArrayType vtype then
-      if Ast_attributes.has_attribute "ghost" (Cil.typeAttrs (typeOf_array_elem vtype)) then
+      if Ast_attributes.exists "ghost" (Cil.typeAttrs (typeOf_array_elem vtype)) then
         Kernel.warning
           ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
           "'%s' elements are already ghost" n;
@@ -4677,7 +4670,7 @@ and cabsPartitionAttributes
           (* doAttr already strip underscores of the attribute if necessary so
              we do not need to strip then before calling get_attribute_class
              here. *)
-          an, Ast_attributes.get_attribute_class ~default an
+          an, Ast_attributes.get_class ~default an
       in
       match kind with
       | AttrName _ -> loop (a::n, f, t) rest
@@ -4714,9 +4707,9 @@ and doType (ghost:bool) (context: type_context)
     | Cabs.JUSTBASE -> bt, acc
     | Cabs.PARENTYPE (a1, d, a2) ->
       let a1' = doAttributes ghost a1 in
-      let a1n, a1f, a1t = Ast_attributes.partition_attributes ~default:AttrType a1' in
+      let a1n, a1f, a1t = Ast_attributes.partition ~default:AttrType a1' in
       let a2' = doAttributes ghost a2 in
-      let a2n, a2f, a2t = Ast_attributes.partition_attributes ~default:nameortype a2' in
+      let a2n, a2f, a2t = Ast_attributes.partition ~default:nameortype a2' in
       let bt' = cabsTypeAddAttributes a1t bt in
       let bt'', a1fadded =
         match unrollTypeNode bt with
@@ -4761,7 +4754,7 @@ and doType (ghost:bool) (context: type_context)
 
     | Cabs.PTR (al, d) ->
       let al' = doAttributes ghost al in
-      let an, af, at = Ast_attributes.partition_attributes ~default:AttrType al' in
+      let an, af, at = Ast_attributes.partition ~default:AttrType al' in
       (* Now recurse *)
       let t = mk_tptr ~tattr:at bt in
       let restyp, nattr = doDeclType t acc d in
@@ -4898,7 +4891,7 @@ and doType (ghost:bool) (context: type_context)
           Some len'
       in
       let al' = doAttributes ghost al in
-      if context <> `FormalDecl && Ast_attributes.has_attribute "static" al' then
+      if context <> `FormalDecl && Ast_attributes.exists "static" al' then
         Kernel.error ~once:true ~current:true
           "static specifier inside array argument is allowed only in \
            function argument";
@@ -4985,12 +4978,12 @@ and doType (ghost:bool) (context: type_context)
        * our life a lot, and is what the standard requires. *)
       let turnArrayIntoPointer (bt: typ)
           (lo: exp option) (a: attributes) : typ =
-        let main_attrs = Ast_attributes.drop_attribute "static" a in
+        let main_attrs = Ast_attributes.drop "static" a in
         let a' : attributes =
           match lo with
           | None -> []
           | Some l -> begin
-              let static = if Ast_attributes.has_attribute "static" a then
+              let static = if Ast_attributes.exists "static" a then
                   [("static",[])]
                 else []
               in
@@ -5007,7 +5000,7 @@ and doType (ghost:bool) (context: type_context)
                 end
             end
         in
-        let tattr = Ast_attributes.add_attributes a' main_attrs in
+        let tattr = Ast_attributes.add_list a' main_attrs in
         mk_tptr ~tattr bt
       in
       let rec fixupArgumentTypes (argidx: int) (args: varinfo list) : unit =
@@ -5355,7 +5348,7 @@ and makeCompType loc ghost (isstruct: bool)
     end;
 
   (*  ignore (E.log "makeComp: %s: %a\n" comp.cname d_attrlist a); *)
-  let a = Ast_attributes.add_attributes comp.cattr a in
+  let a = Ast_attributes.add_list comp.cattr a in
   comp.cattr <- process_pragmas_pack_align_comp_attributes loc comp a;
   let res = mk_tcomp comp in
   (* Create a typedef for this one *)
@@ -8909,7 +8902,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     in
     checkArray inite vi;
     vi.vname <- newname;
-    let attrs = Ast_attributes.add_attribute (fc_local_static,[]) vi.vattr in
+    let attrs = Ast_attributes.add (fc_local_static,[]) vi.vattr in
     vi.vattr <- fc_stdlib_attribute attrs;
 
     (* However, we have a problem if a real global appears later with the
@@ -8979,7 +8972,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
       let destructor = AStr free.vname in
       let attr = (frama_c_destructor, [destructor]) in
       vi.vdefined <- true;
-      vi.vattr <- Ast_attributes.add_attribute attr vi.vattr;
+      vi.vattr <- Ast_attributes.add attr vi.vattr;
     end;
     let se1 =
       if isvarsize then begin (* Variable-sized array *)
@@ -9174,7 +9167,7 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
     try lookupGlobalVar ghost thisname
     with Not_found -> Kernel.fatal ~current:true "error in doDecl"
   in
-  v.vattr <- Ast_attributes.drop_attribute "alias" v.vattr
+  v.vattr <- Ast_attributes.drop "alias" v.vattr
 
 
 (* Do one declaration *)
@@ -9200,7 +9193,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         let vtype, nattr =
           doType local_env.is_ghost `GlobalDecl
             (AttrName false) bt (Cabs.PARENTYPE(attrs, ndt, a)) in
-        (match Ast_attributes.filter_attributes "alias" nattr with
+        (match Ast_attributes.filter "alias" nattr with
          | [] -> (* ordinary prototype. *)
            ignore (createGlobal l local_env.is_ghost logic_spec spec_res name)
          (*  E.log "%s is not aliased\n" name *)
@@ -9339,7 +9332,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         doType local_env.is_ghost `GlobalDecl
           (AttrName false) bt (Cabs.PARENTYPE(attrs, dt, a))
       in
-      if Ast_attributes.has_attribute "thread" funattr then begin
+      if Ast_attributes.exists "thread" funattr then begin
         let wkey = Kernel.wkey_inconsistent_specifier in
         let source = fst funloc in
         Kernel.warning ~wkey ~source "only objects can be thread-local"
@@ -9403,7 +9396,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
           if f.vname = "" then begin
             f.vname <- "__x" ^ (string_of_int !cnt);
             incr cnt;
-            f.vattr <- Ast_attributes.(add_attribute anonymous_attribute f.vattr);
+            f.vattr <- Ast_attributes.(add anonymous_attribute f.vattr);
           end;
           alphaConvertVarAndAddToEnv true f
         in
@@ -10041,7 +10034,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
     let b = c2block ~ghost c in
-    b.battrs <- Ast_attributes.add_attributes [(frama_c_keep_block,[])] b.battrs;
+    b.battrs <- Ast_attributes.add_list [(frama_c_keep_block,[])] b.battrs;
     let res = s2c (mkStmt ~ghost ~valid_sid (Block b)) in
     { res with cases = c.cases }
 

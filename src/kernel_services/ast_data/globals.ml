@@ -671,7 +671,7 @@ module Syntactic_search = struct
     let has_name v = v.vorig_name = x in
     let global_has_name v =
       has_name v && v.vglob
-      && not (Ast_attributes.has_attribute Cabs2cil.fc_local_static v.vattr)
+      && not (Ast_attributes.exists Cabs2cil.fc_local_static v.vattr)
     in
     let lookup next_scope candidate =
       match candidate with

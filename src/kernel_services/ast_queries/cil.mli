@@ -1360,7 +1360,7 @@ val typeAttrs: typ -> attribute list
 (** Add some attributes to a type. Qualifiers attributes are recursively pushed
     into array elements type until a non-array type is found.
     [combine] explains how to combine attributes.
-    Default is {!Ast_attributes.add_attributes}.
+    Default is {!Ast_attributes.add_list}.
 
     @before 28.0-Nickel [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
@@ -2350,6 +2350,7 @@ val bitfield_attribute_name: string
     argument when querying the type of a field that is a bitfield.
 *)
 [@@deprecated "Use Ast_attributes.bitfield_attribute_name instead."]
+[@@migrate { repl = Ast_attributes.bitfield_attribute_name } ]
 
 val anonymous_attribute_name: string
 (** Name of the attribute that is inserted when generating a name for a varinfo
@@ -2357,70 +2358,75 @@ val anonymous_attribute_name: string
     @since 24.0-Chromium
 *)
 [@@deprecated "Use Ast_attributes.anonymous_attribute_name instead."]
+[@@migrate { repl = Ast_attributes.anonymous_attribute_name } ]
 
 val anonymous_attribute: attribute
 (** attribute identifying anonymous function parameters
     @since 24.0-Chromium
 *)
 [@@deprecated "Use Ast_attributes.anonymous_attribute instead."]
+[@@migrate { repl = Ast_attributes.anonymous_attribute } ]
 
 (** Returns the name of an attribute. *)
 val attributeName: attribute -> string
-[@@deprecated "Use Ast_attributes.attribute_name instead."]
-
-(** True if the named attribute appears in the attribute list. The list of
-    attributes must be sorted.  *)
-val hasAttribute: string -> attributes -> bool
-[@@deprecated "Use Ast_attributes.has_attribute instead."]
+[@@deprecated "Use Ast_attributes.get_name instead."]
+[@@migrate { repl = Ast_attributes.get_name } ]
 
 (** Add an attribute. Maintains the attributes in sorted order of the second
     argument. The attribute is not added if it is already there. *)
 val addAttribute: attribute -> attributes -> attributes
-[@@deprecated "Use Ast_attributes.add_attribute instead."]
+[@@deprecated "Use Ast_attributes.add instead."]
+[@@migrate { repl = Ast_attributes.add } ]
 
 (** Add a list of attributes. Maintains the attributes in sorted order. The
     second argument must be sorted, but not necessarily the first *)
 val addAttributes: attribute list -> attributes -> attributes
-[@@deprecated "Use Ast_attributes.add_attributes instead."]
+[@@deprecated "Use Ast_attributes.add_list instead."]
+[@@migrate { repl = Ast_attributes.add_list } ]
 
 (** Remove all attributes with the given name. Maintains the attributes in
     sorted order.  *)
 val dropAttribute: string -> attributes -> attributes
-[@@deprecated "Use Ast_attributes.drop_attribute instead."]
+[@@deprecated "Use Ast_attributes.drop instead."]
+[@@migrate { repl = Ast_attributes.drop } ]
 
 (** Remove all attributes with names appearing in the string list.
     Maintains the attributes in sorted order *)
 val dropAttributes: string list -> attributes -> attributes
-[@@deprecated "Use Ast_attributes.drop_attributes instead."]
+[@@deprecated "Use Ast_attributes.drop_list instead."]
+[@@migrate { repl = Ast_attributes.drop_list } ]
+
+(** True if the named attribute appears in the attribute list. The list of
+    attributes must be sorted.  *)
+val hasAttribute: string -> attributes -> bool
+[@@deprecated "Use Ast_attributes.exists instead."]
+[@@migrate { repl = Ast_attributes.exists } ]
 
 (** Returns the list of parameters associated to an attribute. The list is empty if there
     is no such attribute or it has no parameters at all. *)
 val findAttribute: string -> attribute list -> attrparam list
-[@@deprecated "Use Ast_attributes.find_attribute instead."]
+[@@deprecated "Use Ast_attributes.find_params instead."]
+[@@migrate { repl = Ast_attributes.find_params } ]
 
 (** Retains attributes with the given name *)
 val filterAttributes: string -> attributes -> attributes
-[@@deprecated "Use Ast_attributes.filter_attributes instead."]
+[@@deprecated "Use Ast_attributes.filter instead."]
+[@@migrate { repl = Ast_attributes.filter } ]
 
 (** retains attributes corresponding to type qualifiers (6.7.3) *)
 val filter_qualifier_attributes: attributes -> attributes
-[@@deprecated "Use Ast_attributes.filter_qualifier_attributes instead."]
-
-(** given some attributes on an array type, split them into those that belong
-    to the type of the elements of the array (currently, qualifiers such as
-    const and volatile), and those that must remain on the array, in that
-    order
-    @since Oxygen-20120901 *)
-val splitArrayAttributes: attributes -> attributes * attributes
-[@@deprecated "Use Ast_attributes.split_array_attributes instead."]
+[@@deprecated "Use Ast_attributes.filter_qualifiers instead."]
+[@@migrate { repl = Ast_attributes.filter_qualifiers } ]
 
 val registerAttribute: string -> Ast_attributes.attribute_class -> unit
 (** Add a new attribute with a specified class *)
-[@@deprecated "Use Ast_attributes.register_attribute instead."]
+[@@deprecated "Use Ast_attributes.register instead."]
+[@@migrate { repl = Ast_attributes.register } ]
 
 val removeAttribute: string -> unit
 (** Remove an attribute previously registered. *)
-[@@deprecated "Use Ast_attributes.remove_attribute instead."]
+[@@deprecated "Use Ast_attributes.remove instead."]
+[@@migrate { repl = Ast_attributes.remove } ]
 
 val attributeClass: default:Ast_attributes.attribute_class -> string ->
   Ast_attributes.attribute_class
@@ -2428,14 +2434,16 @@ val attributeClass: default:Ast_attributes.attribute_class -> string ->
     unknown and ignored attributes.
     @before 30.0-Zinc no [default] argument
 *)
-[@@deprecated "Use Ast_attributes.get_attribute_class instead."]
+[@@deprecated "Use Ast_attributes.get_class instead."]
+[@@migrate { repl = Ast_attributes.get_class } ]
 
 val isKnownAttribute: string -> bool
 (** [isKnownAttribute attrname] returns true if the attribute named [attrname]
     is known by Frama-C.
     @since 30.0-Zinc
 *)
-[@@deprecated "Use Ast_attributes.is_known_attribute instead."]
+[@@deprecated "Use Ast_attributes.is_known instead."]
+[@@migrate { repl = Ast_attributes.is_known } ]
 
 (** Partition the attributes into classes: name attributes, function type and
     type attributes. Unknown and ignored attributes are returned in the
@@ -2446,11 +2454,22 @@ val partitionAttributes:  default:Ast_attributes.attribute_class ->
   attributes -> attribute list * (* AttrName *)
                 attribute list * (* AttrFunType *)
                 attribute list   (* AttrType *)
-[@@deprecated "Use Ast_attributes.partition_attributes instead."]
+[@@deprecated "Use Ast_attributes.partition instead."]
+[@@migrate { repl = Ast_attributes.partition } ]
+
+(** given some attributes on an array type, split them into those that belong
+    to the type of the elements of the array (currently, qualifiers such as
+    const and volatile), and those that must remain on the array, in that
+    order
+    @since Oxygen-20120901 *)
+val splitArrayAttributes: attributes -> attributes * attributes
+[@@deprecated "Use Ast_attributes.split_array_attributes instead."]
+[@@migrate { repl = Ast_attributes.split_array_attributes } ]
 
 (** Separate out the storage-modifier name attributes *)
 val separateStorageModifiers: attribute list -> attribute list * attribute list
-[@@deprecated "Use Ast_attributes.split_storage_modifier instead."]
+[@@deprecated "Use Ast_attributes.split_storage_modifiers instead."]
+[@@migrate { repl = Ast_attributes.split_storage_modifiers } ]
 
 (** A block marked with this attribute is known to be a ghost else.
 
@@ -2458,6 +2477,7 @@ val separateStorageModifiers: attribute list -> attribute list * attribute list
 *)
 val frama_c_ghost_else: string
 [@@deprecated "Use Ast_attributes.frama_c_ghost_else instead."]
+[@@migrate { repl = Ast_attributes.frama_c_ghost_else } ]
 
 (** A varinfo marked with this attribute is known to be a ghost formal.
 
@@ -2465,6 +2485,7 @@ val frama_c_ghost_else: string
 *)
 val frama_c_ghost_formal: string
 [@@deprecated "Use Ast_attributes.frama_c_ghost_formal instead."]
+[@@migrate { repl = Ast_attributes.frama_c_ghost_formal } ]
 
 (** a formal marked with this attribute is known to be a pointer to an
     object being initialized by the current function, which can thus assign
@@ -2474,6 +2495,7 @@ val frama_c_ghost_formal: string
 *)
 val frama_c_init_obj: string
 [@@deprecated "Use Ast_attributes.frama_c_init_obj instead."]
+[@@migrate { repl = Ast_attributes.frama_c_init_obj } ]
 
 (** a field struct marked with this attribute is known to be mutable, i.e.
     it can be modified even on a const object.
@@ -2482,9 +2504,11 @@ val frama_c_init_obj: string
 *)
 val frama_c_mutable: string
 [@@deprecated "Use Ast_attributes.frama_c_mutable instead."]
+[@@migrate { repl = Ast_attributes.frama_c_mutable } ]
 
 (** A block marked with this attribute is known to be inlined, i.e.
     it replaces a call to an inline function.
 *)
 val frama_c_inlined: string
 [@@deprecated "Use Ast_attributes.frama_c_inlined instead."]
+[@@migrate { repl = Ast_attributes.frama_c_inlined } ]
