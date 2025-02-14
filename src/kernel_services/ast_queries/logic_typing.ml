@@ -581,7 +581,7 @@ let rec arithmetic_conversion ty1 ty2 =
 
 let rec ctype_of_pointed t =
   match unroll_logic_type t with
-    Ctype ty when Ast_types.is_pointer_type ty -> Cil.typeOf_pointed ty
+    Ctype ty when Ast_types.is_pointer_type ty -> Ast_types.type_of_pointed ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
@@ -589,7 +589,7 @@ let rec ctype_of_pointed t =
 
 let rec ctype_of_array_elem t =
   match unroll_logic_type t with
-  | Ctype ty when Ast_types.is_array_type ty -> Cil.typeOf_array_elem ty
+  | Ctype ty when Ast_types.is_array_type ty -> Ast_types.type_of_array_elem ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
@@ -1235,13 +1235,18 @@ struct
     end
 
   let is_same_ptr_type ctyp1 ctyp2 =
-    (Ast_types.is_pointer_type ctyp1) &&
-    (Ast_types.is_pointer_type ctyp2) &&
-    (is_same_c_type (typeOf_pointed ctyp1) (typeOf_pointed ctyp2))
+    Ast_types.is_pointer_type ctyp1 &&
+    Ast_types.is_pointer_type ctyp2 &&
+    is_same_c_type
+      (Ast_types.type_of_pointed ctyp1)
+      (Ast_types.type_of_pointed ctyp2)
 
   let is_same_array_type ctyp1 ctyp2 =
-    Ast_types.is_array_type ctyp1 && Ast_types.is_array_type ctyp2 &&
-    (is_same_c_type (typeOf_array_elem ctyp1) (typeOf_array_elem ctyp2))
+    Ast_types.is_array_type ctyp1 &&
+    Ast_types.is_array_type ctyp2 &&
+    is_same_c_type
+      (Ast_types.type_of_array_elem ctyp1)
+      (Ast_types.type_of_array_elem ctyp2)
 
   let is_same_logic_ptr_type ty1 ty2 =
     match (Logic_const.unroll_ltdef ty1, Logic_const.unroll_ltdef ty2) with
@@ -1255,7 +1260,7 @@ struct
 
   let is_function_pointer cty =
     try
-      Ast_types.is_function_type (Cil.typeOf_pointed  cty)
+      Ast_types.(is_function_type (type_of_pointed  cty))
     with Assert_failure _ -> false
 
   let is_compatible_funtype ty1 ty2 =
@@ -1276,17 +1281,23 @@ struct
 
   let is_implicit_pointer_conversion term ctyp1 ctyp2 =
     let same_pointed () =
-      is_same_c_type (typeOf_pointed ctyp1) (typeOf_pointed ctyp2)
+      is_same_c_type
+        (Ast_types.type_of_pointed ctyp1)
+        (Ast_types.type_of_pointed ctyp2)
     in
     let same_array_elt () =
-      is_same_c_type (typeOf_array_elem ctyp1) (typeOf_array_elem ctyp2)
+      is_same_c_type
+        (Ast_types.type_of_array_elem ctyp1)
+        (Ast_types.type_of_array_elem ctyp2)
     in
     let compatible_pointed () =
       same_pointed () ||
       (Ast_types.is_void_ptr_type ctyp2 && not (is_function_pointer ctyp1))
       ||
       (is_function_pointer ctyp2 && is_function_pointer ctyp1 &&
-       is_compatible_funtype (typeOf_pointed ctyp1) (typeOf_pointed ctyp2))
+       is_compatible_funtype
+         (Ast_types.type_of_pointed ctyp1)
+         (Ast_types.type_of_pointed ctyp2))
     in
     Ast_types.(is_array_type ctyp1 && is_array_type ctyp2 && same_array_elt ())
     || Ast_types.(is_pointer_type ctyp1 && is_pointer_type ctyp2 &&
@@ -1495,8 +1506,11 @@ struct
         let t,e = c_cast_to ty1 ty2 oterm in Ctype t, e
       end else if overloaded then raise Not_applicable
       else if (* not overloaded: raise an error. *)
-        Ast_types.is_array_type ty1 && Ast_types.is_pointer_type ty2
-        && is_same_c_type (typeOf_array_elem ty1) (typeOf_pointed ty2)
+        Ast_types.is_array_type ty1 &&
+        Ast_types.is_pointer_type ty2 &&
+        is_same_c_type
+          (Ast_types.type_of_array_elem ty1)
+          (Ast_types.type_of_pointed ty2)
       then
         if Logic_utils.is_C_array oterm then
           C.error loc
@@ -2235,7 +2249,7 @@ struct
       let idx = idx_typing idx in
       let ofs_type =
         if Ast_types.is_array_type t_type && check_type idx.term_type
-        then Ctype (Cil.typeOf_array_elem t_type)
+        then Ctype (Ast_types.type_of_array_elem t_type)
         else C.error loc "subscripted value is not an array"
       in mk_idx idx, ofs_type
 
@@ -4397,7 +4411,7 @@ struct
         (* note: type pointed to by arg1 may differ from the
            return type with respect to qualifiers *)
         if not (Ast_types.is_pointer_type arg1) then error ();
-        let vol_typ = typeOf_pointed arg1 in
+        let vol_typ = Ast_types.type_of_pointed arg1 in
         let base_typ = Ast_types.type_remove_qualifier_attributes vol_typ in
         if not (Cil.isVolatileType vol_typ &&
                 ( reads || not (Cil.isConstType vol_typ) ) &&

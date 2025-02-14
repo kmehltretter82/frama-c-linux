@@ -159,7 +159,7 @@ class propagate project fnames ~cast_intro = object(self)
             try
               if not (Ast_types.is_pointer_type typ_e) then
                 raise Bit_utils.NoMatchingOffset;
-              let typ_pointed = Ast_types.unroll_type (Cil.typeOf_pointed typ_e) in
+              let typ_pointed = Ast_types.(unroll_type (type_of_pointed typ_e)) in
               if Ast_types.is_void_type typ_pointed then
                 raise Bit_utils.NoMatchingOffset;
               let offset = Integer.mul offset Integer.eight in

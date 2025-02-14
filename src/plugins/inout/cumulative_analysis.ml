@@ -32,7 +32,7 @@ open Visitor
 let fold_implicit_initializer typ =
   not
     (Ast_types.is_array_type typ &&
-     (Ast_types.is_scalar_type (Cil.typeOf_array_elem typ)
+     (Ast_types.(is_scalar_type (type_of_array_elem typ))
       || Ast_info.array_size typ > (Integer.of_int 100)))
 
 let specialize_state_on_call ?stmt kf =

@@ -501,7 +501,7 @@ and offset (m: map) (r: node) (ty: typ) (ofs: offset) : node =
   | Field (fd, ofs) ->
     offset m (field m r fd) fd.ftype ofs
   | Index (_, ofs) ->
-    let te = Cil.typeOf_array_elem ty in
+    let te = Ast_types.type_of_array_elem ty in
     offset m (index m r te) te ofs
 
 and exp (m: map) (e: exp) : node option =

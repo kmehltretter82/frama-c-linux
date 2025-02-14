@@ -712,7 +712,7 @@ let infer_format_from_args vf format_fun args =
             Printer.pp_exp arg Printer.pp_typ t;
           raise (Translate_call_exn vf.vf_decl);
         end;
-        Cil.typeOf_pointed t
+        Ast_types.type_of_pointed t
     in
     format_of_type vf format_fun.f_kind t
   in

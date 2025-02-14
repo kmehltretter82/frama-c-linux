@@ -40,13 +40,13 @@ let exp_type_of_pointed x =
   if not (Ast_types.is_pointer_type (Cil.typeOf no_cast)) then
     match Cil.constFoldToInt x with
     | Some t when Integer.(equal t (of_int 0)) ->
-      Of_null (Cil.typeOf_pointed (Cil.typeOf x))
+      Of_null (Ast_types.type_of_pointed (Cil.typeOf x))
     | _ ->
       No_pointed
   else
     let xt = Ast_types.unroll_type_deep (Cil.typeOf no_cast) in
     let xt = Ast_types.type_remove_qualifier_attributes_deep xt in
-    Value_of (Cil.typeOf_pointed xt)
+    Value_of (Ast_types.type_of_pointed xt)
 
 let unexpected = Options.fatal "Mem_utils: %s"
 

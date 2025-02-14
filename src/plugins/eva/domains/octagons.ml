@@ -376,7 +376,7 @@ module Rewriting = struct
               let v2 =
                 if Ast_types.is_pointer_type typ
                 then
-                  let scale = Cil.(bytesSizeOf (typeOf_pointed typ)) in
+                  let scale = Cil.(bytesSizeOf (Ast_types.type_of_pointed typ)) in
                   Arith.mul_integer (Integer.of_int scale) v2
                 else v2
               in
@@ -1260,7 +1260,7 @@ module State = struct
         with Cil.SizeOfError _ -> `Top
       end
     | Index (exp, sub) ->
-      let elem_type = Cil.typeOf_array_elem base_type in
+      let elem_type = Ast_types.type_of_array_elem base_type in
       let* cvalue = eval exp in
       let* index =
         try

@@ -2940,7 +2940,7 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
   tresult
 
 let logicConditionalConversion t1 t2 =
-  match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
+  match unroll_type_node t1, unroll_type_node t2 with
   | TPtr _ , TInt _ | TInt _, TPtr _ ->
     abort_context "invalid implicit conversion from %a to %a"
       Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t1
@@ -3387,7 +3387,7 @@ let fieldsToInit
       (* if this field is an anonymous comp, search for the designator inside *)
     else if prefix anonCompFieldName f.fname && not found
             && f.forig_name <> f.fname then
-      match Ast_types.unroll_type_node f.ftype with
+      match unroll_type_node f.ftype with
       | TComp comp ->
         add_comp offset comp acc (* go deeper inside *)
       | _ ->
@@ -4520,7 +4520,7 @@ and makeVarInfoCabs
         ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
         "'%s' is already ghost" n;
     if is_array_type vtype then
-      if Ast_attributes.contains "ghost" (type_attrs (typeOf_array_elem vtype)) then
+      if Ast_attributes.contains "ghost" (type_attrs (type_of_array_elem vtype)) then
         Kernel.warning
           ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
           "'%s' elements are already ghost" n;
@@ -6415,7 +6415,7 @@ and doExp local_env
                         doExp (no_paren_local_env local_env) CNoConst a1 AType
                       in
                       clean_up_chunk_locals c;
-                      let t = typeOf_pointed t in
+                      let t = type_of_pointed t in
                       Format.sprintf "%s_%sint%d_t"
                         n
                         (if isSignedInteger t then "" else "u")
@@ -6455,7 +6455,7 @@ and doExp local_env
                         doExp (no_paren_local_env local_env) CNoConst a1 AType
                       in
                       clean_up_chunk_locals c;
-                      let t = typeOf_pointed t in
+                      let t = type_of_pointed t in
                       Format.sprintf "%s_%d" n (bytesSizeOf t)
                     | [] ->
                       Kernel.error ~once:true ~current:true
@@ -7694,8 +7694,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     if false then Kernel.debug "%a %a %a %a"
         Cil_printer.pp_exp e1 Cil_datatype.Typ.pretty t1
         Cil_printer.pp_exp e2 Cil_datatype.Typ.pretty t2;
-    let t1p = unroll_type (Cil.typeOf_pointed t1) in
-    let t2p = unroll_type (Cil.typeOf_pointed t2) in
+    let t1p = unroll_type (type_of_pointed t1) in
+    let t2p = unroll_type (type_of_pointed t2) in
     (* We are more lenient than the norm here (C99 6.5.8, 6.5.9), and cast
        arguments with incompatible types to a common type *)
     let e1', e2' =
@@ -8994,7 +8994,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
         let savelen = alphaConvertVarAndAddToEnv true savelen in
         let se0 = local_var_chunk se0 savelen in
         (* Compute the allocation size *)
-        let elt_size = new_exp ~loc (SizeOf (Cil.typeOf_pointed vi.vtype)) in
+        let elt_size = new_exp ~loc (SizeOf (type_of_pointed vi.vtype)) in
         let alloca_size =
           new_exp ~loc
             (BinOp(Mult,

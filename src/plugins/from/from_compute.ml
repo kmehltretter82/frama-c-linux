@@ -441,7 +441,7 @@ struct
                padding bits. The 100 limit is arbitrary. *)
             let implicit =
               not (Ast_types.is_array_type ct &&
-                   (Ast_types.is_scalar_type (Cil.typeOf_array_elem ct)
+                   (Ast_types.(is_scalar_type (type_of_array_elem ct))
                     || Ast_info.array_size ct > (Integer.of_int 100)))
             in
             let r = Cil.foldLeftCompound ~implicit ~doinit ~ct ~initl ~acc in

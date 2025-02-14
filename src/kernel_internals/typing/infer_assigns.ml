@@ -40,7 +40,7 @@ let from_prototype kf =
   (* Remove args of type pointer to pointer *)
   let pointer_args =
     List.filter (fun vi ->
-        not (Ast_types.is_pointer_type (typeOf_pointed vi.vtype))
+        not (Ast_types.(is_pointer_type (type_of_pointed vi.vtype)))
       ) pointer_args
   in
   (* Convert void* pointers to char* *)
@@ -51,7 +51,7 @@ let from_prototype kf =
          let t = tvar (cvar_to_lvar vi) in
          let typ = vi.vtype in
          if Ast_types.is_void_ptr_type typ then
-           let const = Ast_types.type_has_attribute "const" (Cil.typeOf_pointed typ) in
+           let const = Ast_types.(type_has_attribute "const" (type_of_pointed typ)) in
            let typ' = if const then Cil_const.charConstPtrType else Cil_const.charPtrType in
            (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
          else (vi.vghost, t, typ)
@@ -88,7 +88,7 @@ let from_prototype kf =
     in
     (* make_set_type (Ctype typ_pointed) *)
 
-    let typ_pointed = typeOf_pointed typ in
+    let typ_pointed = Ast_types.type_of_pointed typ in
     (* Generate the initial term: [*(t+(0..))] for array types or char*
        pointers, *t for other pointer types. It would have been better to
        recognize formals with type [typ[]] instead of [typ *], but this
@@ -115,7 +115,7 @@ let from_prototype kf =
       mk_star
       (List.filter
          (fun (_g, _t, typ) ->
-            let pointed_type = typeOf_pointed typ in
+            let pointed_type = Ast_types.type_of_pointed typ in
             not (Ast_types.type_has_attribute "const" pointed_type)
          )
          pointer_args)

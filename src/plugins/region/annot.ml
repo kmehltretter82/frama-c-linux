@@ -147,7 +147,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLunop( Ustar , p ) ->
     let lv = parse_lpath env p in
     if Ast_types.is_pointer_type lv.typ then
-      let te = Cil.typeOf_pointed lv.typ in
+      let te = Ast_types.type_of_pointed lv.typ in
       { loc ; step = Star lv ; typ = te }
     else
       error env ~loc "Pointer-type expected for operator '*'"
@@ -162,7 +162,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
       { loc ; step = Shift lv ; typ = typ }
     else
     if Ast_types.is_array_type typ then
-      let te = Cil.typeOf_array_elem typ in
+      let te = Ast_types.type_of_array_elem typ in
       { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
     else
       error env ~loc "Pointer-type expected for operator '+'"
@@ -179,12 +179,13 @@ let rec parse_lpath (env:env) (e: lexpr) =
     parse_lrange env rg ;
     let { typ } as lv = parse_lpath env p in
     if Ast_types.is_pointer_type typ then
-      let pointed = Cil.typeOf_pointed typ in
+      let pointed = Ast_types.type_of_pointed typ in
       let ls = { loc ; step = Shift lv ; typ } in
       { loc ; step = Star ls ; typ = pointed }
     else
     if Ast_types.is_array_type typ then
-      let elt,size = Cil.typeOf_array_elem_size typ in
+      let elt,size = Ast_types.type_of_array_elem_size typ in
+      let size = Option.bind size Cil.constFoldToInt in
       { loc ; step = Index(lv,Z.to_int @@ Option.get size) ; typ = elt }
     else
       error env ~loc:lv.loc "Pointer or array type expected"

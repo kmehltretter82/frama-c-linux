@@ -162,7 +162,7 @@ struct
     | TField(f,offset) ->
       logic_offset env f.ftype (L.field v f) offset
     | TIndex(k,offset) ->
-      let te = Cil.typeOf_array_elem typ in
+      let te = Ast_types.type_of_array_elem typ in
       let size = Ctypes.get_array_size (Ctypes.object_of typ) in
       let obj = Ctypes.object_of te in
       let vloc = L.shift v obj ?size (C.logic env k) in

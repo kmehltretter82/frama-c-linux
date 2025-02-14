@@ -103,7 +103,7 @@ struct
     let pretty = Varinfo.pretty
     let typ_of_chunk x =
       match V.param x with
-      | ByRef -> Cil.typeOf_pointed x.vtype
+      | ByRef -> Ast_types.type_of_pointed x.vtype
       | _ -> x.vtype
     let tau_of_chunk x = Lang.tau_of_ctype (typ_of_chunk x)
     let is_framed = is_framed_var
@@ -142,7 +142,7 @@ struct
     let pretty = Varinfo.pretty
     let typ_of_chunk x =
       match V.param x with
-      | ByRef -> Cil.typeOf_pointed x.vtype
+      | ByRef -> Ast_types.type_of_pointed x.vtype
       | _ -> x.vtype
     let tau_of_chunk x = Lang.init_of_ctype (typ_of_chunk x)
     let is_init _ = true
@@ -326,8 +326,8 @@ struct
   let vtype m x =
     match m with
     | CVAL | HEAP -> x.vtype
-    | CTXT _ | CREF -> Cil.typeOf_pointed x.vtype
-    | CARR _ -> Cil_const.mk_tarray (Cil.typeOf_pointed x.vtype) None
+    | CTXT _ | CREF -> Ast_types.type_of_pointed x.vtype
+    | CARR _ -> Cil_const.mk_tarray (Ast_types.type_of_pointed x.vtype) None
 
   let vobject m x = Ctypes.object_of (vtype m x)
 

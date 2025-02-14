@@ -35,7 +35,7 @@ let type_of_const : constant -> typ = function
 let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | NoOffset -> basetyp
   | Index (_, o) ->
-    type_of_offset (Cil.typeOf_array_elem basetyp) o
+    type_of_offset (Ast_types.type_of_array_elem basetyp) o
   | Field (fi, o) ->
     let base_attrs = (Ast_types.unroll_type basetyp).tattr in
     let base_attrs = Ast_attributes.filter_qualifiers base_attrs in
@@ -49,7 +49,7 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
 
 let type_of_lhost : lhost -> typ = function
   | Var vi -> vi.vtype
-  | Mem addr -> Cil.typeOf_pointed addr.typ
+  | Mem addr -> Ast_types.type_of_pointed addr.typ
 
 let type_of_lval_node (host, offset : lval_node) : typ =
   let basetyp = type_of_lhost host in
