@@ -49,7 +49,7 @@ Thanks to this approach, Frama-C provides sophisticated tools, including:\n\
 - E-ACSL, a runtime verification tool;\n\
 - Aoraï, a tool for the verification of automata-based properties;\n\
 - several tools for code base exploration and dependency analysis: \
-  the plug-ins From, Impact, Metrics, Occurrence, Scope, etc.';
+plug-ins From, Impact, Metrics, Occurrence, Scope, etc.';
 
 const authors = [
     'Michele Alberti',
@@ -114,7 +114,7 @@ const devRepo = 'https://git.frama-c.com/pub/frama-c/';
 
 const license =
 'Most sources are LGPLv2.1,\n with some isolated exceptions for \
-external libraries modified for Frama-C (BSD, QPL).\n\
+external libraries modified for Frama-C.\n\
 See the particular header of each source file for details.';
 const copyright =
 '© CEA and INRIA for the Frama-C kernel\n\
