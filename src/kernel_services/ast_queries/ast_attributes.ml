@@ -114,7 +114,7 @@ type attribute_class =
  * conversion *)
 let attribute_hash : (string, attribute_class) Hashtbl.t = Hashtbl.create 59
 
-let register_attribute an ac =
+let register_attribute ac an =
   if Hashtbl.mem attribute_hash an then begin
     let pp fmt c =
       match c with
@@ -131,7 +131,7 @@ let register_attribute an ac =
   Hashtbl.replace attribute_hash an ac
 
 let register_attributes ac al =
-  List.iter (fun a -> register_attribute a ac) al
+  List.iter (register_attribute ac) al
 
 let remove_attribute = Hashtbl.remove attribute_hash
 
@@ -194,10 +194,10 @@ let () =
     [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
 
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
-let () = register_attribute bitfield_attribute_name AttrType
+let () = register_attribute AttrType bitfield_attribute_name
 
 let anonymous_attribute_name = "fc_anonymous"
-let () = register_attribute anonymous_attribute_name AttrIgnored
+let () = register_attribute AttrIgnored anonymous_attribute_name
 
 let anonymous_attribute = (anonymous_attribute_name, [])
 
@@ -215,19 +215,19 @@ let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
 let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
 
 let frama_c_ghost_else = "fc_ghost_else"
-let () = register_attribute frama_c_ghost_else (AttrStmt)
+let () = register_attribute AttrStmt frama_c_ghost_else
 
 let frama_c_ghost_formal = "fc_ghost_formal"
-let () = register_attribute frama_c_ghost_formal (AttrName false)
+let () = register_attribute (AttrName false) frama_c_ghost_formal
 
 let frama_c_init_obj = "fc_initialized_object"
-let () = register_attribute frama_c_init_obj (AttrName false)
+let () = register_attribute (AttrName false) frama_c_init_obj
 
 let frama_c_mutable = "fc_mutable"
-let () = register_attribute frama_c_mutable (AttrName false)
+let () = register_attribute (AttrName false) frama_c_mutable
 
 let frama_c_inlined = "fc_inlined"
-let () = register_attribute frama_c_inlined (AttrFunType false)
+let () = register_attribute (AttrFunType false) frama_c_inlined
 
 (* Forward declaration from Cil_datatype. *)
 

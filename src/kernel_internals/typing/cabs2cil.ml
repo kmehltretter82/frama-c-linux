@@ -93,10 +93,7 @@ let unsupported_attributes = ["vector_size"]
 (* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
    attributes can refer to erased functions and make the code un-reparsable *)
 let erased_attributes = ["malloc"]
-let () =
-  List.iter
-    (fun a -> Ast_attributes.register_attribute a AttrIgnored)
-    erased_attributes
+let () = Ast_attributes.register_attributes AttrIgnored erased_attributes
 
 let stripUnderscore s =
   if String.length s = 1 then begin
@@ -120,43 +117,43 @@ let stripUnderscore s =
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Cil_printer.register_shallow_attribute frama_c_keep_block
-let () = Ast_attributes.register_attribute frama_c_keep_block AttrStmt
+let () = Ast_attributes.register_attribute AttrStmt frama_c_keep_block
 
 let fc_stdlib = "fc_stdlib"
 let fc_stdlib_generated = "fc_stdlib_generated"
 let () = Cil_printer.register_shallow_attribute fc_stdlib
 let () = Cil_printer.register_shallow_attribute fc_stdlib_generated
 (* fc_stdlib attribute already registered in cil.ml *)
-let () = Ast_attributes.register_attribute fc_stdlib_generated (AttrName false)
+let () = Ast_attributes.register_attribute (AttrName false) fc_stdlib_generated
 
 let fc_local_static = "fc_local_static"
 let () = Cil_printer.register_shallow_attribute fc_local_static
-let () = Ast_attributes.register_attribute fc_local_static (AttrName false)
+let () = Ast_attributes.register_attribute (AttrName false) fc_local_static
 
 let frama_c_destructor = "fc_destructor"
 let () = Cil_printer.register_shallow_attribute frama_c_destructor
-let () = Ast_attributes.register_attribute frama_c_destructor (AttrName false)
+let () = Ast_attributes.register_attribute (AttrName false) frama_c_destructor
 
 let () =
   (* packed and aligned are treated separately, we ignore them
      during standard processing.
   *)
-  Ast_attributes.register_attribute "packed" AttrIgnored;
-  Ast_attributes.register_attribute "aligned" AttrIgnored;
-  Ast_attributes.register_attribute "warn_unused_result" (AttrFunType false);
-  Ast_attributes.register_attribute "FC_OLDSTYLEPROTO" (AttrName false);
-  Ast_attributes.register_attribute "static" (AttrName false);
-  Ast_attributes.register_attribute "missingproto" (AttrName false);
-  Ast_attributes.register_attribute "dummy" AttrIgnored;
-  Ast_attributes.register_attribute "signal" AttrIgnored; (* AVR-specific attribute *)
-  Ast_attributes.register_attribute "leaf" AttrIgnored;
-  Ast_attributes.register_attribute "nonnull" AttrIgnored;
-  Ast_attributes.register_attribute "deprecated" AttrIgnored;
-  Ast_attributes.register_attribute "access" AttrIgnored;
-  Ast_attributes.register_attribute "returns_twice" AttrIgnored;
-  Ast_attributes.register_attribute "pure" AttrIgnored;
-  Ast_attributes.register_attribute "cleanup" AttrIgnored;
-  Ast_attributes.register_attribute "warning" AttrIgnored;
+  Ast_attributes.register_attribute AttrIgnored "packed";
+  Ast_attributes.register_attribute AttrIgnored "aligned";
+  Ast_attributes.register_attribute (AttrFunType false) "warn_unused_result";
+  Ast_attributes.register_attribute (AttrName false) "FC_OLDSTYLEPROTO";
+  Ast_attributes.register_attribute (AttrName false) "static";
+  Ast_attributes.register_attribute (AttrName false) "missingproto";
+  Ast_attributes.register_attribute AttrIgnored "dummy";
+  Ast_attributes.register_attribute AttrIgnored "signal"; (* AVR-specific attribute *)
+  Ast_attributes.register_attribute AttrIgnored "leaf";
+  Ast_attributes.register_attribute AttrIgnored "nonnull";
+  Ast_attributes.register_attribute AttrIgnored "deprecated";
+  Ast_attributes.register_attribute AttrIgnored "access";
+  Ast_attributes.register_attribute AttrIgnored "returns_twice";
+  Ast_attributes.register_attribute AttrIgnored "pure";
+  Ast_attributes.register_attribute AttrIgnored "cleanup";
+  Ast_attributes.register_attribute AttrIgnored "warning";
   ()
 
 (** A hook into the code that creates temporary local vars.  By default this

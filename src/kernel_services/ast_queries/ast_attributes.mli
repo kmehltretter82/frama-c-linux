@@ -149,7 +149,7 @@ type attribute_class =
 val attribute_hash : (string, attribute_class) Hashtbl.t
 
 (** Add a new attribute with a specified class *)
-val register_attribute : string -> attribute_class -> unit
+val register_attribute : attribute_class -> string -> unit
 
 (** Register a list of attributes with a given class. *)
 val register_attributes : attribute_class -> string list ->  unit

@@ -7219,7 +7219,7 @@ let dropAttributes = drop_attributes
 let findAttribute = find_attribute
 let filterAttributes = filter_attributes
 
-let registerAttribute = register_attribute
+let registerAttribute s ac = register_attribute ac s
 let removeAttribute = remove_attribute
 let attributeClass = get_attribute_class
 let isKnownAttribute = is_known_attribute

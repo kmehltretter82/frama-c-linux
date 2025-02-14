@@ -831,7 +831,7 @@ struct
   let attribute_name = "wp_nullable"
 
   let () =
-    Ast_attributes.register_attribute attribute_name (AttrName false)
+    Ast_attributes.register_attribute (AttrName false) attribute_name
 
   let is_nullable vi =
     vi.vformal && Ast_attributes.has_attribute attribute_name vi.vattr
