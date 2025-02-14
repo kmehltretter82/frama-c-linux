@@ -22,6 +22,8 @@ Open Source Release <next-release>
               provided it can be evaluated to an integer constant.
               Fixes ##2695 and #@1413
 o!  Kernel    [2025-02-13] Move some functions from Logic_typing to Logic_utils
+-   Libc      [2025-02-14] Add __fc_gcc_builtin_macros.h to improve analyses
+              for code using GCC libc builtins (e.g. __builtin_strlen).
 o   Kernel    [2025-02-05] New parameter builder `Float` for decimal
               command-line parameters.
 o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every
