@@ -1626,10 +1626,10 @@ let oneFilePass1 (f:file) : unit =
                 Cil_printer.pp_location oldloc
                 Cil_printer.pp_location loc
             in
-            (* If the new variable is unused, ignore it, unless it is defined
-               while the old variable was also unused but not defined. *)
-            if not vi.vreferenced
-            && (oldvi.vreferenced || oldvi.vdefined || not vi.vdefined)
+            (* If the new variable is unused and undefined, ignore it,
+               unless the old variable is also unused and undefined. *)
+            if not vi.vreferenced && not vi.vdefined
+               && (oldvi.vreferenced || oldvi.vdefined)
             then begin
               Kernel.warning ~wkey:Kernel.wkey_drop_unused
                 "%s@\nCurrent declaration is unused, silently removing it"
