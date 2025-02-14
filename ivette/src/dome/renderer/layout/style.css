@@ -56,6 +56,10 @@
     overflow: auto ;
 }
 
+.dome-container {
+    z-index: 0;
+}
+
 .dome-container > .dome-xBoxes-fill
 {
     width:  100% ;

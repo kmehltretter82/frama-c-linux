@@ -101,6 +101,10 @@ let () =
   let result_list name descr =
     Request.result signature ~name ~descr:(Md.plain descr) (module Jlist (Jstring)) in
   let set_version = result "version" "Frama-C version" in
+  let set_codename = result "codename" "Frama-C codename" in
+  let set_version_codename =
+    result "version_codename" "Frama-C version and codename"
+  in
   let set_datadir = result_list "datadir" "Shared directory (FRAMAC_SHARE)" in
   let set_pluginpath = result_list "pluginpath" "Plugin directories (FRAMAC_PLUGIN)" in
   Request.register_sig
@@ -109,6 +113,8 @@ let () =
     signature
     begin fun rq () ->
       set_version rq System_config.Version.id ;
+      set_codename rq System_config.Version.codename ;
+      set_version_codename rq System_config.Version.id_and_codename ;
       set_datadir rq (Filepath.Normalized.to_string_list System_config.Share.dirs);
       set_pluginpath rq
         (Filepath.Normalized.to_string_list System_config.Plugins.dirs) ;

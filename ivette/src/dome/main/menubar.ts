@@ -273,17 +273,21 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 // --- Help Menu Items
 // --------------------------------------------------------------------------
 
+const helpMenuItemsCustom: MenuSpec = [];
+const helpMenuItems: MenuSpec = [];
+
 let learnMoreLink = '';
 ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
-  if (typeof link === 'string') learnMoreLink = link;
+  if (typeof link === 'string') {
+    learnMoreLink = link;
+    helpMenuItems.push(
+      {
+        label: 'Learn More',
+        click() { shell.openExternal(learnMoreLink); },
+      },
+    );
+  }
 });
-
-const helpMenuItems: MenuSpec = [
-  {
-    label: 'Learn More',
-    click() { shell.openExternal(learnMoreLink); },
-  },
-];
 
 // --------------------------------------------------------------------------
 // --- Update MenuBar (async)
@@ -319,6 +323,7 @@ function findMenu(label: string): MenuSpec | undefined {
     case 'File': return fileMenuItemsCustom;
     case 'Edit': return editMenuItemsCustom;
     case 'View': return viewMenuItemsCustom;
+    case 'Help': return helpMenuItemsCustom;
     default: {
       const cm = customMenus.find((m) => m.label === label);
       return cm && cm.submenu;
@@ -445,7 +450,7 @@ function template(): CustomMenu[] {
           {
             label: 'Help',
             role: 'help',
-            submenu: helpMenuItems,
+            submenu: concatSep(helpMenuItems, helpMenuItemsCustom),
           },
         ],
       );
@@ -470,7 +475,9 @@ function template(): CustomMenu[] {
         customMenus,
         [
           { label: 'Window', submenu: windowMenuItemsLinux },
-          { label: 'Help', submenu: helpMenuItems },
+          {
+            label: 'Help',
+            submenu: concatSep(helpMenuItems, helpMenuItemsCustom) },
         ],
       );
   }
@@ -504,6 +511,7 @@ function reset(): void {
   fileMenuItemsCustom.length = 0;
   editMenuItemsCustom.length = 0;
   viewMenuItemsCustom.length = 0;
+  helpMenuItemsCustom.length = 0;
   customMenus.length = 0;
   customItems.clear();
   install();

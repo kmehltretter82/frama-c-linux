@@ -26,6 +26,11 @@ declare module '*.md?raw' {
   export default content;
 }
 
+declare module '*.png' {
+  const value: string;
+  export default value;
+}
+
 declare module 'react-flame-graph';
 declare module 'react-pivottable/PivotTableUI';
 declare module 'three/examples/jsm/renderers/CSS2DRenderer';
