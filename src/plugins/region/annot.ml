@@ -185,8 +185,14 @@ let rec parse_lpath (env:env) (e: lexpr) =
     else
     if Ast_types.is_array_type typ then
       let elt,size = Ast_types.type_of_array_elem_size typ in
-      let size = Option.bind size Cil.constFoldToInt in
-      { loc ; step = Index(lv,Z.to_int @@ Option.get size) ; typ = elt }
+      let size =
+        match Option.bind Cil.constFoldToInt size with
+        | Some size -> size
+        | None ->
+          Kernel.fatal "parse_lpath: array type %a without a size"
+            Cil_printer.pp_typ typ
+      in
+      { loc ; step = Index(lv,Z.to_int size) ; typ = elt }
     else
       error env ~loc:lv.loc "Pointer or array type expected"
   | PLcast( t , a ) ->
