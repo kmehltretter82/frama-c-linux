@@ -1386,10 +1386,16 @@ let findCompType ghost kind name tattr =
     if kind = "enum" then
       let enum, isnew = createEnumInfo name ~norig:name in
       if isnew then
-        cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
+        begin
+          if not (Machine.gccMode ()) then
+            Kernel.error ~once:true
+              ~source:(fst @@ Current_loc.get ())
+              "forward declaration of enum %s" (Machdep.allowed_machdep "GCC");
+          cabsPushGlobal (GEnumTagDecl (enum, Current_loc.get ()));
+        end;
       mk_tenum ~tattr enum
     else
-      let iss = if kind = "struct" then true else false in
+      let iss = kind = "struct" in
       let self, isnew = createCompInfo iss name ~norig:name in
       if isnew then
         cabsPushGlobal (GCompTagDecl (self, Current_loc.get ()));
@@ -1418,8 +1424,8 @@ class canDropStmtClass pRes = object
 
   method! vinst _ = Cil.SkipChildren
   method! vexpr _ = Cil.SkipChildren
-
 end
+
 let canDropStatement (s: stmt) : bool =
   let pRes = ref true in
   let vis = new canDropStmtClass pRes in
@@ -6510,7 +6516,7 @@ and doExp local_env
         | { tnode = TPtr t } -> begin
             match unrollType t with
             | { tnode = TFun (rt, at, isvar) } -> (* Make the function pointer
-                                                    * explicit  *)
+                                                   * explicit  *)
               let f'' =
                 match f'.enode with
                 | AddrOf lv -> new_exp ~loc:f'.eloc (Lval(lv))
@@ -9770,7 +9776,8 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                 Cil_datatype.Location.pretty oldloc
             in
             (* Tested with GCC+Clang: redefinition of compatible types in same scope:
-               - enums are NOT allowed;
+               - enums are NOT allowed, except if they refer to the exact same
+                 enumerated type
                - composite types are allowed only if the composite type itself is
                  not redefined (complex rules; with some extra tag checking performed
                  in compatibleTypesp, we use tags here to detect redefinitions,
@@ -9798,8 +9805,29 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                       Kernel.fatal ~current:true "typeinfo.ttype (%a) should be TComp"
                         Cil_datatype.Typ.pretty typeinfo.ttype
                   end
-                | TEnum _ -> (* GCC/Clang: "conflicting types" *)
-                  error_conflicting_types ()
+                | TEnum newei -> (* GCC/Clang: "conflicting types" *)
+                  let t = unrollType typeinfo.ttype in
+                  (match t.tnode with
+                   | TEnum ei ->
+                     if ei.ename <> newei.ename then
+                       error_conflicting_types ()
+                     else
+                       warn_c11_redefinition ()
+                   | TInt _ -> error_conflicting_types ()
+                   | _ ->
+                     Kernel.fatal
+                       ~current:true "typeinfo.ttype (%a) should be an Enum"
+                       Cil_datatype.Typ.pretty t)
+                | TInt _ ->
+                  let t = unrollType typeinfo.ttype in
+                  (match t.tnode with
+                   | TInt _ -> warn_c11_redefinition ()
+                   | TEnum _ -> error_conflicting_types ()
+                   | _ ->
+                     Kernel.fatal
+                       ~current:true "typeinfo.ttype (%a) should be an int"
+                       Cil_datatype.Typ.pretty t
+                  )
                 | _ -> (* redeclaration in same scope valid only in C11 *)
                   warn_c11_redefinition ()
               end
