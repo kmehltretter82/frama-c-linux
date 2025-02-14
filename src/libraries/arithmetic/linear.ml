@@ -87,6 +87,9 @@ module Space (Field : Field.S) = struct
       let inner i acc = Field.(acc + get i l * get i r) in
       Finite.for_each inner (size l) Field.zero
 
+    let max (type n) (M l : n vector) (M r : n vector) : n vector =
+      init l.rows @@ fun i -> Field.max (get i (M l)) (get i (M r))
+
     let base (type n) (i : n succ finite) (dimension : n succ nat) =
       zero dimension |> set i Field.one
 
@@ -128,6 +131,9 @@ module Space (Field : Field.S) = struct
     let zero n m = init n m (fun _ _ -> Field.zero)
     let id n = Finite.for_each (fun i m -> set i i Field.one m) n (zero n n)
 
+    let shift n = init n n @@ fun row col ->
+      if Finite.(col = (prev row |> weaken)) then Field.one else Field.zero
+
     let transpose : type n m. (n, m) matrix -> (m, n) matrix =
       fun (M m) -> init m.cols m.rows (fun j i -> get i j (M m))
 
@@ -136,16 +142,30 @@ module Space (Field : Field.S) = struct
       let ( + ) i j = Field.(get i j (M l) + get i j (M r)) in
       init l.rows l.cols ( + )
 
+    type ('n, 'm) sub = ('n, 'm) matrix -> ('n, 'm) matrix -> ('n, 'm) matrix
+    let ( - ) : type n m. (n, m) sub = fun (M l) (M r) ->
+      let ( - ) i j = Field.(get i j (M l) - get i j (M r)) in
+      init l.rows l.cols ( - )
+
     type ('n, 'm, 'p) mul = ('n, 'm) matrix -> ('m, 'p) matrix -> ('n, 'p) matrix
     let ( * ) : type n m p. (n, m, p) mul = fun (M l) (M r) ->
       let ( * ) i j = Vector.(row i (M l) * col j (M r)) in
       init l.rows r.cols ( * )
 
-    let norm : type n m. (n, m) matrix -> scalar = fun (M m) ->
+    let ( ** ) : type n m. scalar -> (n, m) matrix -> (n, m) matrix = fun l (M m) ->
+      M { m with data = Parray.map (fun c -> Field.(l * c)) m.data }
+
+    let norm_inf : type n m. (n, m) matrix -> scalar = fun (M m) ->
       let add v j r = Field.(abs (Vector.get j v) + r) in
       let sum v = Finite.for_each (add v) (Vector.size v) Field.zero in
       let max i res = Field.max res (row i (M m) |> sum) in
       Finite.for_each max m.rows Field.zero
+
+    let norm_one : type n m. (n, m) matrix -> scalar = fun (M m) ->
+      let add v j r = Field.(abs (Vector.get j v) + r) in
+      let sum v = Finite.for_each (add v) (Vector.size v) Field.zero in
+      let max i res = Field.max res (col i (M m) |> sum) in
+      Finite.for_each max m.cols Field.zero
 
     let power (type n) (M m : (n, n) matrix) : int -> (n, n) matrix =
       let n = dimensions (M m) |> fst in
@@ -153,13 +173,103 @@ module Space (Field : Field.S) = struct
       let find i = Datatype.Int.Hashtbl.find_opt cache i in
       let save i v = Datatype.Int.Hashtbl.add cache i v ; v in
       let rec pow e =
-        if e < 0 then raise (Invalid_argument "negative exponent") ;
+        if Stdlib.(e < 0) then raise (Invalid_argument "negative exponent") ;
         match find e with
         | Some r -> r
         | None when Stdlib.(e = 0) -> id n
         | None when Stdlib.(e = 1) -> M m
         | None -> let h = pow (e / 2) in save e (pow (e mod 2) * h * h)
       in pow
+
+    let abs (type n m) (M m : (n, m) matrix) : (n, m) matrix =
+      M { m with data = Parray.map Field.abs m.data }
+
+
+
+    let swap_rows (M m) r r' =
+      let swap c m =
+        let elt = get r c m and elt' = get r' c m in
+        m |> set r c elt' |> set r' c elt
+      in Finite.for_each swap m.cols (M m)
+
+    let argmax (M m) starting_row col =
+      let max row argmax_row =
+        if not Finite.(row < starting_row) then
+          let argmax_value = Field.abs (get argmax_row col (M m)) in
+          let row_value = Field.abs (get row col (M m)) in
+          if Field.(argmax_value < row_value) then row else argmax_row
+        else argmax_row
+      in Finite.for_each max m.rows starting_row
+
+    let equal : type n m. (n, m) matrix -> (n, m) matrix -> bool = fun l r ->
+      let rows, cols = dimensions l in
+      let equal_elt row col eq = eq && Field.(get row col l = get row col r) in
+      let equal_row row eq = eq && Finite.for_each (equal_elt row) cols eq in
+      Finite.for_each equal_row rows true
+
+    let rec back_propagation (M _ as m) inverse start =
+      let size, _ = dimensions m in
+      if Finite.(first < start) then
+        let propagate r (m, inverse) =
+          if Finite.(r < start) then
+            let f = Field.(get r start m / get start start m) in
+            let compute c m = set r c Field.(get r c m - f * get start c m) m in
+            let inverse = Finite.for_each compute size inverse in
+            let m = Finite.for_each compute size m in
+            (m, inverse)
+          else (m, inverse)
+        in
+        let m, inverse = Finite.for_each propagate size (m, inverse) in
+        back_propagation m inverse Finite.(prev start |> weaken)
+      else if equal m (id size) then Some inverse else None
+
+    let rec inverse_aux (M _ as m) inverse h k =
+      let open Option.Operators in
+      let size, _ = dimensions m in
+      (* Monadic operator to return [Option.value ~default] on the result of f *)
+      let ( let- ) default f = Option.(f `Callback |> value ~default) in
+      (* Find the k-th pivot *)
+      let i_max = argmax m h k in
+      if Field.(get i_max k m = zero) then
+        (* No pivot here, goes to the next. Stop if we've done them all. *)
+        let- `Callback = m, inverse in
+        let+ k = Finite.(next k |> strenghten size) in
+        inverse_aux m inverse h k
+      else
+        let value = get i_max k m in
+        let divide col m = Field.(get i_max col m / value) in
+        let normalize col m = set i_max col (divide col m) m in
+        let m = Finite.for_each normalize size m in
+        let m = swap_rows m h i_max in
+        let inverse = Finite.for_each normalize size inverse in
+        let inverse = swap_rows inverse h i_max in
+        (* For all rows below pivot, fill with zeros and update remaining
+           elements in the row. *)
+        let rec below_pivot i (m, inverse) =
+          if Finite.(h < i) then
+            let f = Field.(get i k m / get h k m) in
+            let m = set i k Field.zero m in
+            let on_row bypass = remaining_current_row bypass f i in
+            let m = Finite.for_each (on_row false) size m in
+            let inverse = Finite.for_each (on_row true) size inverse in
+            (m, inverse)
+          else (m, inverse)
+        (* Update remaining elements in the current row. *)
+        and remaining_current_row bypass f i j m =
+          if Finite.(k < j) || bypass
+          then set i j Field.(get i j m - f * get h j m) m
+          else m
+        in
+        let m, inverse = Finite.for_each below_pivot size (m, inverse) in
+        let- `Callback = m, inverse in
+        let* h = Finite.(next h |> strenghten size) in
+        let+ k = Finite.(next k |> strenghten size) in
+        inverse_aux m inverse h k
+
+    let inverse : type n. (n, n) matrix -> (n, n) matrix option = fun (M m) ->
+      let size, _ = dimensions (M m) in
+      let m, inverse = inverse_aux (M m) (id size) Finite.first Finite.first in
+      back_propagation m inverse (Finite.last size)
 
   end
 
