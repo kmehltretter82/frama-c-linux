@@ -50,6 +50,7 @@ Thanks to this approach, Frama-C provides sophisticated tools, including:\n\
 - Aoraï, a tool for the verification of automata-based properties;\n\
 - several tools for code base exploration and dependency analysis: \
   the plug-ins From, Impact, Metrics, Occurrence, Scope, etc.';
+
 const authors = [
     'Michele Alberti',
     'Thibaud Antignac',
@@ -157,7 +158,7 @@ function AboutModal(props: AboutProps): JSX.Element {
               onClick={() => shell.openExternal(devRepo)}
               label='Git repository' />
           </Hbox>
-          <pre>{description}</pre>
+          <pre className='framac-about-description'>{description}</pre>
           <pre>{copyright}</pre>
           <pre>{license}</pre>
         </Hbox>

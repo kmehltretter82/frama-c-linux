@@ -274,6 +274,7 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 // --------------------------------------------------------------------------
 
 const helpMenuItemsCustom: MenuSpec = [];
+const helpMenuItems: MenuSpec = [];
 
 let learnMoreLink = '';
 ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
@@ -287,9 +288,6 @@ ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
     );
   }
 });
-
-const helpMenuItems: MenuSpec = [];
-
 
 // --------------------------------------------------------------------------
 // --- Update MenuBar (async)
