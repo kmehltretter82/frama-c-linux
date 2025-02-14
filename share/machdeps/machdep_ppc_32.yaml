@@ -6,6 +6,7 @@ alignof_int: 4
 alignof_long: 4
 alignof_longdouble: 16
 alignof_longlong: 8
+alignof_max_align_t: 16
 alignof_ptr: 4
 alignof_short: 2
 alignof_str: 1

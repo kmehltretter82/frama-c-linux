@@ -60,6 +60,7 @@ type mach = {
   alignof_str: int;
   alignof_fun: int;
   alignof_aligned: int;
+  alignof_max_align_t: int;
   char_is_unsigned: bool;
   little_endian: bool;
   has__builtin_va_list: bool;
@@ -127,6 +128,7 @@ let dummy = {
   alignof_str = 1;
   alignof_fun = -1;
   alignof_aligned = 16;
+  alignof_max_align_t = 16;
   char_is_unsigned = true;
   little_endian = true;
   has__builtin_va_list = true;
@@ -184,7 +186,7 @@ module Machdep = struct
        wint_t=%s;sig_atomic_t=%s;time_t=%s;max_align_t=%s;\
        alignof_short=%d;alignof_int=%d;alignof_long=%d;alignof_longlong=%d;\
        alignof_ptr=%d;alignof_float=%d;alignof_double=%d;alignof_longdouble=%d;\
-       alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;\
+       alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;alignof_max_align_t=%d;\
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
        compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
        posix_c_source=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
@@ -231,6 +233,7 @@ module Machdep = struct
       mach.alignof_str
       mach.alignof_fun
       mach.alignof_aligned
+      mach.alignof_max_align_t
       mach.char_is_unsigned
       mach.little_endian
       mach.has__builtin_va_list

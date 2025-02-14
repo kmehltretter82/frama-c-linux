@@ -138,6 +138,7 @@ let alignof_longdouble () = the_machine.machdep.alignof_longdouble
 let alignof_str () = the_machine.machdep.alignof_str
 let alignof_aligned () = the_machine.machdep.alignof_aligned
 let alignof_fun () = the_machine.machdep.alignof_fun
+let alignof_max () = the_machine.machdep.alignof_max_align_t
 
 (* Misc *)
 let char_is_unsigned () = the_machine.machdep.char_is_unsigned

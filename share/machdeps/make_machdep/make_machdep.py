@@ -205,6 +205,7 @@ source_files = [
     ("alignof_fun.c", "number"),
     ("alignof_str.c", "number"),
     ("alignof_aligned.c", "number"),
+    ("alignof_max_align_t.c", "number"),
     ("size_t.c", "type"),
     ("ssize_t.c", "type"),
     ("wchar_t.c", "type"),

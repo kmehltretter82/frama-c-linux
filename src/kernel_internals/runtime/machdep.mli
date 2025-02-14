@@ -54,6 +54,7 @@ type mach = {
   alignof_str: int;       (** [_AlignOf(<string>)] *)
   alignof_fun: int;       (** [_AlignOf(<function type>)]. Negative if unsupported. *)
   alignof_aligned: int;   (** Alignment of a type with aligned attribute *)
+  alignof_max_align_t: int; (** [_AlignOf(max_align_t)]. Negative if unsupported. *)
   char_is_unsigned: bool; (** Whether "char" is unsigned *)
   little_endian: bool;    (** whether the machine is little endian *)
   has__builtin_va_list: bool; (** Whether [__builtin_va_list] is a known type *)

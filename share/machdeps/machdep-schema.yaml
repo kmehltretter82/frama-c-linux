@@ -48,6 +48,12 @@ alignof_longlong:
 
   type: integer
 
+alignof_max_align_t:
+
+  description:  alignment of 'max_align_t' type
+
+  type: integer
+
 alignof_ptr:
 
   description:  alignment of 'void*' type
