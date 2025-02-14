@@ -2831,22 +2831,6 @@ let setReturnTypeVI (v: varinfo) (t: typ) =
 let setReturnType (f:fundec) (t:typ) =
   setReturnTypeVI f.svar t
 
-let typeOf_pointed typ =
-  match unroll_type_skel typ with
-  | TPtr typ -> typ
-  | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
-
-let typeOf_array_elem t =
-  match unroll_type_node t with
-  | TArray (ty_elem, _) -> ty_elem
-  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
-
-let typeOf_array_elem_size t =
-  match unroll_type_node t with
-  | TArray (ty_elem, arr_size) ->
-    ty_elem, Option.bind !constfoldtoint arr_size
-  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
-
 let no_op_coerce typ t =
   match typ with
   | Lreal -> is_logic_arithmetic_type t.term_type
@@ -2909,7 +2893,7 @@ and typeOfLval = function
 
 and typeOfLhost = function
   | Var x -> x.vtype
-  | Mem e -> typeOf_pointed (typeOf e)
+  | Mem e -> Ast_types.type_of_pointed (typeOf e)
 
 and typeOffset basetyp = function
     NoOffset -> basetyp
@@ -3675,7 +3659,7 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
           | Some i -> Integer.to_int_exn i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
-        let bt = typeOf_array_elem baset in
+        let bt = Ast_types.type_of_array_elem baset in
         let bitsbt = bitsSizeOf bt in
         loopOff bt bitsbt (start + ei * bitsbt) off
       end
@@ -6835,3 +6819,7 @@ let isLogicRealOrFloatType = is_logic_real_or_float_type
 let isLogicArithmeticType = is_logic_arithmetic_type
 let isLogicFunctionType = is_logic_function_type
 let isLogicFunPtrType = is_logic_fun_ptr_type
+
+let typeOf_pointed = type_of_pointed
+let typeOf_array_elem = type_of_array_elem
+let typeOf_array_elem_size = type_of_array_elem_size

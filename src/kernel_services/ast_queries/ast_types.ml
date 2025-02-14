@@ -38,6 +38,8 @@ let abort_context msg =
 let compFullName comp =
   (if comp.cstruct then "struct " else "union ") ^ comp.cname
 
+let pp_typ_ref = Extlib.mk_fun "Ast_types.pp_typ_ref"
+
 (* ********** *)
 (* Attributes *)
 (* ********** *)
@@ -449,6 +451,39 @@ let is_variadic_list_type t =
   match unroll_type_skel t with
   | TBuiltin_va_list -> true
   | _ -> false
+
+(* ************ *)
+(* Type access. *)
+(* ************ *)
+
+let type_of_pointed typ =
+  match unroll_type_skel typ with
+  | TPtr typ -> typ
+  | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
+
+let type_of_array_elem t =
+  match unroll_type_node t with
+  | TArray (ty_elem, _) -> ty_elem
+  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+
+let type_of_array_elem_size t =
+  match unroll_type_node t with
+  | TArray (ty_elem, arr_size) ->
+    ty_elem, arr_size
+  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+
+(* ************** *)
+(* Type checkers. *)
+(* ************** *)
+
+let rec unroll_logic_type ?(unroll_typedef=true) = function
+  | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
+    unroll_logic_type ~unroll_typedef (Logic_const.unroll_ltdef ty)
+  | Ctype ty when unroll_typedef -> Ctype (unroll_type ty)
+  | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
+    ty
+
+let () = Cil_datatype.punrollLogicType := unroll_logic_type
 
 (* Utils function for is_logic_* functions. *)
 let unroll_logic_aux is_logic lti t =

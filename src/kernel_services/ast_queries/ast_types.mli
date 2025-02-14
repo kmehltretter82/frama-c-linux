@@ -27,6 +27,14 @@
 
 open Cil_types
 
+(* TO REMOVE *)
+
+val pp_typ_ref: (Format.formatter -> typ -> unit) ref
+
+(* ************************************************************************* *)
+(** {2 Type Attributes} *)
+(* ************************************************************************* *)
+
 (** Returns all the attributes contained in a type. This requires a traversal
     of the type structure, in case of composite, enumeration and named types *)
 val type_attrs : typ -> attributes
@@ -251,6 +259,36 @@ val is_transparent_union_type : typ -> fieldinfo option
 
 (** True if the argument denotes the type of [...] in a variadic function. *)
 val is_variadic_list_type: typ -> bool
+
+(* ************************************************************************* *)
+(** {2 Type access} *)
+(* ************************************************************************* *)
+
+val type_of_pointed : typ -> typ
+(** Returns the type pointed by the given type.
+    @raise AbortFatal it is not a pointer type.
+*)
+
+val type_of_array_elem : typ -> typ
+(** Returns the type of the array elements of the given type.
+    @raise AbortFatal it is not an array type.
+*)
+
+val type_of_array_elem_size : typ -> typ * exp option
+(** Returns the type of the array elements of the given type, and the size
+    of the array, if any.
+    @raise AbortFatal it is not an array type.
+    @before Frama-C+dev In Cil this function applied {!Cil.constFoldToInt} of
+    array's size and returned a [Z.t option].
+*)
+
+(* ************************************************************************* *)
+(** {2 Logic Type checkers} *)
+(* ************************************************************************* *)
+
+(** expands logic type definitions. If the [unroll_typedef] flag is set to
+    [true] (this is the default), C typedef will be expanded as well. *)
+val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
 (** True if the argument is the type for reified C types. *)
 val is_logic_typetag_type: logic_type -> bool
