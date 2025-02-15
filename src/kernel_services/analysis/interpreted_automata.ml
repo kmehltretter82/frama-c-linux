@@ -673,14 +673,11 @@ let build_automaton ~annotations kf =
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
         control.src
 
-      | Break _ | Continue _ as skind ->
-        let dest =
-          match skind with
-          | Break _ -> control.break
-          | Continue _ -> control.continue
-          | _ -> assert false
-        in
-        build_jump control.src dest stmt Skip
+      | Break _ ->
+        build_jump control.src control.break stmt Skip
+
+      | Continue _ ->
+        build_jump control.src control.continue stmt Skip
 
       | If (exp, then_block, else_block, _) ->
         let then_point = add_vertex control.blocks
