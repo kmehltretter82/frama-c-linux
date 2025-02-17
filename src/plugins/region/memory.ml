@@ -201,8 +201,7 @@ let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   in
   let cparents = match parent with None -> [] | Some root -> [root] in
   let cpointed = match pointed with None -> [] | Some ptr -> [ptr] in
-  let chunk = { empty with clayout ; cpointed ; cparents } in
-  Ufind.make m.store chunk
+  Ufind.make m.store  { empty with clayout ; cpointed ; cparents }
 
 let add_root (m: map) v =
   try Vmap.find v m.roots with Not_found ->
@@ -367,11 +366,6 @@ let merge_all (m:map) = function
 let merge (m: map) (a: node) (b: node) : unit =
   failwith_locked m "Region.Memory.merge" ;
   merge_all m [a;b]
-
-let merge_copy (m: map) ~(l: node) ~(r: node) : unit =
-  let { clayout } = get m r in
-  merge_all m [ l; Ufind.make m.store { empty with clayout } ]
-
 
 (* -------------------------------------------------------------------------- *)
 (* --- Offset                                                             --- *)

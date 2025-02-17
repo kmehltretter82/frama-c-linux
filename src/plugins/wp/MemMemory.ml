@@ -129,13 +129,8 @@ let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
   let inc = F.p_call MemAddr.p_included [p;n;pt';n'] in
   let teq = T.of_pred meq in
   [
-    (* (nom du lemme, triggers, "forall vars" conditions, m1, m2) veut dire :
-       - conditions => m1 = m2, avec vars comme free vars
-    *)
     "update" , [] , [diff] , m , e_set m pt' v' ;
     "eqmem" , [teq] , [inc;meq] , m , m' ;
-    (* "havoc"-> nom plus général: passe au dessus d'un memcpy *)
-    (* il faut réussir à sortir du memcpy quand on est séparé *)
     "memcpy_neq" , [] , [sep] , m , mh ;
   ]
 

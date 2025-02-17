@@ -583,9 +583,14 @@ struct
   let stored = gen_stored KValue
   let stored_init = gen_stored KInit
 
-  let copied seq obj l1 l2 = match l1, l2 with
-    | Loc l1, Loc l2 -> M.copied seq obj l1 l2
-    (* + 3 cas avec Val((CTXT _|CARR _|HEAP) as m,x,ofs) *)
+  let oget_Mloc = function
+    | Loc l -> Some l
+    | Val ((CTXT _| CARR _|HEAP) as m,x,ofs) ->
+      Some ((mloc_of_path m x ofs))
+    | Ref _ | Val ((CREF | CVAL), _, _) -> None
+
+  let copied seq obj l1 l2 = match oget_Mloc l1, oget_Mloc l2 with
+    | Some l1, Some l2 -> M.copied seq obj l1 l2
     | _, _ ->
       let v = match load seq.pre obj l2 with
         | Memory.Val r -> r
