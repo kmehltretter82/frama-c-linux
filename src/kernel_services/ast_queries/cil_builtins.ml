@@ -57,7 +57,7 @@ module Frama_c_builtins =
       let size = 3
     end)
 
-let has_fc_builtin_attr v = Ast_attributes.exists "FC_BUILTIN" v.vattr
+let has_fc_builtin_attr v = Ast_attributes.contains "FC_BUILTIN" v.vattr
 
 let is_unused_builtin v = has_fc_builtin_attr v && not v.vreferenced
 

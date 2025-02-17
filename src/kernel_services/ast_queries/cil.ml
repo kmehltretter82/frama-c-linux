@@ -194,19 +194,19 @@ and arrayPushAttributes al t =
 
 (**** Look for the presence of an attribute in a type ****)
 
-let typeHasAttribute attr typ = Ast_attributes.exists attr (typeAttrs typ)
+let typeHasAttribute attr typ = Ast_attributes.contains attr (typeAttrs typ)
 
 let rec typeHasQualifier attr t =
   match t.tnode with
   | TNamed ti ->
-    Ast_attributes.exists attr t.tattr || typeHasQualifier attr ti.ttype
+    Ast_attributes.contains attr t.tattr || typeHasQualifier attr ti.ttype
   | TArray (bt, _) ->
     typeHasQualifier attr bt
-    || (* ill-formed type *) Ast_attributes.exists attr t.tattr
-  | _ -> Ast_attributes.exists attr (typeAttrs t)
+    || (* ill-formed type *) Ast_attributes.contains attr t.tattr
+  | _ -> Ast_attributes.contains attr (typeAttrs t)
 
 let typeHasAttributeMemoryBlock a (ty:typ): bool =
-  let f attrs = if Ast_attributes.exists a attrs then raise Exit in
+  let f attrs = if Ast_attributes.contains a attrs then raise Exit in
   let rec visit (t: typ) : unit =
     f t.tattr;
     match t.tnode with
@@ -353,7 +353,7 @@ let rec unrollTypeDeep (t: typ) : typ =
   withAttrs [] t
 
 let is_ghost_else block =
-  Ast_attributes.exists Ast_attributes.frama_c_ghost_else block.battrs
+  Ast_attributes.contains Ast_attributes.frama_c_ghost_else block.battrs
 
 let rec enforceGhostStmtCoherence ?(force_ghost=false) stmt =
   let force_ghost = force_ghost || stmt.ghost in
@@ -433,10 +433,10 @@ let makeFormalsVarDecl ?ghost (n,t,a) =
   vi
 
 let isGhostFormalVarinfo vi =
-  Ast_attributes.(exists frama_c_ghost_formal vi.vattr)
+  Ast_attributes.(contains frama_c_ghost_formal vi.vattr)
 
 let isGhostFormalVarDecl (_name, _type, attr) =
-  Ast_attributes.(exists frama_c_ghost_formal attr)
+  Ast_attributes.(contains frama_c_ghost_formal attr)
 
 let setFormalsDecl vi typ =
   match unrollTypeSkel typ with
@@ -918,7 +918,7 @@ let transient_block b =
     b.battrs <- Ast_attributes.add (vis_tmp_attr,[]) b.battrs; b
 
 let block_of_transient b =
-  if Ast_attributes.exists vis_tmp_attr b.battrs then begin
+  if Ast_attributes.contains vis_tmp_attr b.battrs then begin
     if b.blocals <> [] then
       Kernel.fatal
         "Block that is supposed to be transient declares local variabels";
@@ -927,7 +927,7 @@ let block_of_transient b =
   end;
   b
 
-let is_transient_block b = Ast_attributes.exists vis_tmp_attr b.battrs
+let is_transient_block b = Ast_attributes.contains vis_tmp_attr b.battrs
 
 let flatten_transient_sub_blocks b =
   let prev = ref None in
@@ -3061,7 +3061,7 @@ let isCharPtrType t =
 let isCharConstPtrType t =
   match unrollType t with
   | { tnode = TPtr tau; tattr } when isCharType tau ->
-    Ast_attributes.exists "const" tattr
+    Ast_attributes.contains "const" tattr
   | _ -> false
 
 let isIntegralType t =
@@ -3332,7 +3332,7 @@ and typeOffset basetyp = function
          is still const (except potentially a mutable subsubpart, etc.)
       *)
       let attrs =
-        if Ast_attributes.(exists frama_c_mutable fi.fattr) then
+        if Ast_attributes.(contains frama_c_mutable fi.fattr) then
           Ast_attributes.drop "const" attrs
         else attrs
       in
@@ -3682,10 +3682,10 @@ let rec bytesAlignOf t =
 *)
 and alignOfField (fi: fieldinfo) =
   let fieldIsPacked =
-    Ast_attributes.(exists "packed" fi.fattr || exists "packed" fi.fcomp.cattr)
+    Ast_attributes.(contains "packed" fi.fattr || contains "packed" fi.fcomp.cattr)
   in
   if fieldIsPacked then begin
-    if Ast_attributes.exists "aligned" fi.fattr then
+    if Ast_attributes.contains "aligned" fi.fattr then
       (* field is packed and aligned => process alignment *)
       let field_alignment = process_aligned_attribute ~may_reduce:true
           (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
@@ -5081,8 +5081,8 @@ let global_attributes = function
   | GAsm _ | GText _ -> []
 
 let is_in_libc attrs =
-  Ast_attributes.exists "fc_stdlib" attrs ||
-  Ast_attributes.exists "fc_stdlib_generated" attrs
+  Ast_attributes.contains "fc_stdlib" attrs ||
+  Ast_attributes.contains "fc_stdlib_generated" attrs
 
 let global_is_in_libc g =
   is_in_libc (global_attributes g)
@@ -5856,12 +5856,12 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
     let olda' =
-      if not (Ast_attributes.exists "missingproto" t.tattr) then
+      if not (Ast_attributes.contains "missingproto" t.tattr) then
         Ast_attributes.drop "missingproto" oldt.tattr
       else oldt.tattr
     in
     let a' =
-      if not (Ast_attributes.exists "missingproto" oldt.tattr) then
+      if not (Ast_attributes.contains "missingproto" oldt.tattr) then
         Ast_attributes.drop "missingproto" t.tattr
       else t.tattr
     in
@@ -6619,7 +6619,7 @@ let is_mutable (lhost, offset) =
     | _, NoOffset -> can_mutate
     | _, Field (fi, off) ->
       let can_mutate =
-        can_mutate || Ast_attributes.(exists frama_c_mutable fi.fattr)
+        can_mutate || Ast_attributes.(contains frama_c_mutable fi.fattr)
       in
       aux can_mutate fi.ftype off
     | TArray (typ, _), Index(_, off) -> aux can_mutate typ off
@@ -6638,7 +6638,7 @@ let rec is_initialized_aux on_same_obj e =
 
 and is_initialized_lhost on_same_obj lhost =
   match lhost with
-  | Var vi -> Ast_attributes.(exists frama_c_init_obj vi.vattr)
+  | Var vi -> Ast_attributes.(contains frama_c_init_obj vi.vattr)
   | Mem e -> on_same_obj && is_initialized_aux false e
 
 let is_initialized e =
@@ -7077,8 +7077,8 @@ let create_alpha_renaming old_args new_args =
   List.iter2
     (fun old_vi new_vi ->
        Hashtbl.add conversion old_vi.vid new_vi;
-       if Ast_attributes.(exists anonymous_attribute_name new_vi.vattr) &&
-          not (Ast_attributes.(exists anonymous_attribute_name old_vi.vattr))
+       if Ast_attributes.(contains anonymous_attribute_name new_vi.vattr) &&
+          not (Ast_attributes.(contains anonymous_attribute_name old_vi.vattr))
        then begin
          new_vi.vname <- old_vi.vname;
          new_vi.vattr <- Ast_attributes.(drop anonymous_attribute_name new_vi.vattr);
@@ -7219,7 +7219,7 @@ let addAttribute = Ast_attributes.add
 let addAttributes = Ast_attributes.add_list
 let dropAttribute = Ast_attributes.drop
 let dropAttributes = Ast_attributes.drop_list
-let hasAttribute = Ast_attributes.exists
+let hasAttribute = Ast_attributes.contains
 let findAttribute = Ast_attributes.find_params
 let filterAttributes = Ast_attributes.filter
 

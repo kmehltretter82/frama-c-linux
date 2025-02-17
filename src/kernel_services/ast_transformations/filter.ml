@@ -834,7 +834,7 @@ end = struct
                (fun x y ->
                   if y.vname = "" then begin
                     y.vname <- x.vname;
-                    if Ast_attributes.(exists anonymous_attribute_name x.vattr) then
+                    if Ast_attributes.(contains anonymous_attribute_name x.vattr) then
                       y.vattr <- Ast_attributes.(add anonymous_attribute y.vattr);
                   end;
                   Visitor_behavior.Set.varinfo self#behavior x y;

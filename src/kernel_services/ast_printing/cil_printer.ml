@@ -143,7 +143,7 @@ let print_global g =
   (* This function decides whether to hide functions in Frama-C's libc. *)
   let attrs = Cil_datatype.Global.attr g in
   let printable =
-    not (Ast_attributes.exists "fc_stdlib" attrs)
+    not (Ast_attributes.contains "fc_stdlib" attrs)
     || Kernel.PrintLibc.get()
   in
   let print_var v =
@@ -734,14 +734,14 @@ class cil_printer () = object (self)
     let v =
       if v.vformal && not state.print_cil_as_is then begin
         match v.vtype.tnode with
-        | TPtr t when Ast_attributes.exists "arraylen" v.vtype.tattr ->
+        | TPtr t when Ast_attributes.contains "arraylen" v.vtype.tattr ->
           { v with vtype = Cil_const.mk_tarray ~tattr:v.vtype.tattr t None}
         | _ -> v
       end
       else v
     in
     let name =
-      if Ast_attributes.(exists anonymous_attribute_name v.vattr)
+      if Ast_attributes.(contains anonymous_attribute_name v.vattr)
       && not v.vreferenced && not state.print_cil_as_is
       then
         None

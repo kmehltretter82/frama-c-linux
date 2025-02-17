@@ -280,7 +280,7 @@ let rec is_dangerous e = match e.enode with
 and is_dangerous_lval = function
   | Var v,_ when
       (not v.vglob && not v.vformal && not v.vtemp)
-      || Ast_attributes.exists "volatile" v.vattr
+      || Ast_attributes.contains "volatile" v.vattr
       || Cil.typeHasAttribute "volatile" (Cil.unrollType v.vtype)
     -> true
   (* Local might be uninitialized, which will trigger UB,
@@ -394,7 +394,7 @@ let fc_stdlib_attribute attrs =
   if s = "" then attrs
   else begin
     let payload, attrs =
-      if Ast_attributes.exists fc_stdlib attrs then begin
+      if Ast_attributes.contains fc_stdlib attrs then begin
         AStr s :: Ast_attributes.find_params fc_stdlib attrs,
         Ast_attributes.drop fc_stdlib attrs
       end else [AStr s], attrs
@@ -548,7 +548,7 @@ let process_pack_pragma name args =
   end
 
 let force_packed_attribute a =
-  if Ast_attributes.exists "packed" a then a
+  if Ast_attributes.contains "packed" a then a
   else Ast_attributes.add ("packed",[]) a
 
 let is_power_of_two i = i > 0 && i land (i-1) = 0
@@ -638,7 +638,7 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
              alignment given by the pack pragma;
            – otherwise, no alignment attribute is necessary.
            Drop existing "aligned" attributes, if there are invalid ones. *)
-        if Ast_attributes.exists "packed" cattrs
+        if Ast_attributes.contains "packed" cattrs
         then Ast_attributes.drop "aligned" cattrs
         else begin
           Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
@@ -683,7 +683,7 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
     (* If this field has no valid aligned attributes and the composite type
         has a packed attribute, nothing needs to be done: the composite will
         have the "packed" attribute anyway. *)
-    if field_align = None && Ast_attributes.exists "packed" cattr then
+    if field_align = None && Ast_attributes.contains "packed" cattr then
       Ast_attributes.drop "aligned" fattrs
     else
       (* Otherwise, align on min(n, max(field alignment, type alignment)):
@@ -2729,7 +2729,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       (* If the new declaration has a section attribute, remove any
        * preexisting section attribute. This mimics behavior of gcc that is
        * required to compile the Linux kernel properly. *)
-      if Ast_attributes.exists "section" vi.vattr then
+      if Ast_attributes.contains "section" vi.vattr then
         oldvi.vattr <- Ast_attributes.drop "section" oldvi.vattr;
       (* Before combining attributes, we need to check compatibility between
          qualifiers *)
@@ -2747,7 +2747,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           oldvi.vattr <- cabsAddAttributes oldvi.vattr vi.vattr;
           let what =
             if isadef then
-              CombineFundef (Ast_attributes.exists "FC_OLDSTYLEPROTO" vi.vattr)
+              CombineFundef (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr)
             else CombineOther
           in
           let mytype = combineTypes what oldvi.vtype vi.vtype in
@@ -2759,7 +2759,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                raise Cannot_combine if necessary. However, due to old-style
                prototypes in GCC machdeps, we must support eccentric cases,
                for which we perform no such additional verification. *)
-            if not (Ast_attributes.exists "FC_OLDSTYLEPROTO" vi.vattr) then
+            if not (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr) then
               ignore (compatibleTypes oldvi.vtype vi.vtype)
           end;
           Cil.update_var_type oldvi mytype;
@@ -4427,7 +4427,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
         let ekind =
           match Kernel.Enums.get () with
           | "" | "help" | "gcc-enums" ->
-            if Ast_attributes.exists "packed" enum.eattr ||
+            if Ast_attributes.contains "packed" enum.eattr ||
                bytesSizeOfInt real_kind >= bytesSizeOfInt IInt
             then real_kind
             else if unsigned then IUInt else IInt
@@ -4501,7 +4501,7 @@ and makeVarInfoCabs
          Hence, at this point only formals can have a VLA type *)
       bt (Cabs.PARENTYPE(attrs, ndt, a))
   in
-  if Ast_attributes.exists "thread" nattr then begin
+  if Ast_attributes.contains "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
     let source = fst ldecl in
     if isFunctionType vtype then
@@ -4510,12 +4510,12 @@ and makeVarInfoCabs
       Kernel.warning ~wkey ~source "a local object cannot be thread-local";
   end;
   if not isgenerated && ghost then begin
-    if Ast_attributes.exists "ghost" (Cil.typeAttrs vtype) then
+    if Ast_attributes.contains "ghost" (Cil.typeAttrs vtype) then
       Kernel.warning
         ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
         "'%s' is already ghost" n;
     if isArrayType vtype then
-      if Ast_attributes.exists "ghost" (Cil.typeAttrs (typeOf_array_elem vtype)) then
+      if Ast_attributes.contains "ghost" (Cil.typeAttrs (typeOf_array_elem vtype)) then
         Kernel.warning
           ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
           "'%s' elements are already ghost" n;
@@ -4891,7 +4891,7 @@ and doType (ghost:bool) (context: type_context)
           Some len'
       in
       let al' = doAttributes ghost al in
-      if context <> `FormalDecl && Ast_attributes.exists "static" al' then
+      if context <> `FormalDecl && Ast_attributes.contains "static" al' then
         Kernel.error ~once:true ~current:true
           "static specifier inside array argument is allowed only in \
            function argument";
@@ -4983,7 +4983,7 @@ and doType (ghost:bool) (context: type_context)
           match lo with
           | None -> []
           | Some l -> begin
-              let static = if Ast_attributes.exists "static" a then
+              let static = if Ast_attributes.contains "static" a then
                   [("static",[])]
                 else []
               in
@@ -9332,7 +9332,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         doType local_env.is_ghost `GlobalDecl
           (AttrName false) bt (Cabs.PARENTYPE(attrs, dt, a))
       in
-      if Ast_attributes.exists "thread" funattr then begin
+      if Ast_attributes.contains "thread" funattr then begin
         let wkey = Kernel.wkey_inconsistent_specifier in
         let source = fst funloc in
         Kernel.warning ~wkey ~source "only objects can be thread-local"

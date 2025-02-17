@@ -211,7 +211,7 @@ class vis flag = object(self)
       current_vars @ vars
     in
     let abort_if_non_trivial_type kind v =
-      if Ast_attributes.exists Cabs2cil.frama_c_destructor v.vattr then
+      if Ast_attributes.contains Cabs2cil.frama_c_destructor v.vattr then
         Kernel.abort
           "%a, cannot jump from %s statement \
            bypassing initialization of variable %a, declared at %a"

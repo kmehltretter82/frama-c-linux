@@ -1649,10 +1649,10 @@ let oneFilePass1 (f:file) : unit =
             end else Kernel.abort "%s" msg (* Fail if both variables are used. *)
           end
       in
-      if Ast_attributes.exists "fc_stdlib" oldvi.vattr then begin
+      if Ast_attributes.contains "fc_stdlib" oldvi.vattr then begin
         let attrprm = Ast_attributes.find_params "fc_stdlib" oldvi.vattr in
         let attrprm =
-          if Ast_attributes.exists "fc_stdlib" vi.vattr then begin
+          if Ast_attributes.contains "fc_stdlib" vi.vattr then begin
             Ast_attributes.find_params "fc_stdlib" vi.vattr @ attrprm
           end else attrprm
         in
@@ -1696,8 +1696,8 @@ let oneFilePass1 (f:file) : unit =
          the only way to obtain the "correct" function is to tell the user to
          invert the order of source files given in the command line.
       *)
-      if fromGFun && Ast_attributes.exists "weak" oldvi.vattr &&
-         not (Ast_attributes.exists "weak" vi.vattr) then
+      if fromGFun && Ast_attributes.contains "weak" oldvi.vattr &&
+         not (Ast_attributes.contains "weak" vi.vattr) then
         begin
           let open Filepath in
           let oldpath = (fst oldvi.vdecl).pos_path in
@@ -2868,7 +2868,7 @@ let oneFilePass2 (f: file) =
               Cil.setFormals fdec (Option.get defn_formals);
               (* Remove static variables (avoids dangling globals in the AST *)
               remove_function_statics fdec';
-              if Ast_attributes.exists "weak" fdec'.svar.vattr then begin
+              if Ast_attributes.contains "weak" fdec'.svar.vattr then begin
                 Kernel.warning ~current:true ~wkey:Kernel.wkey_linker_weak
                   "dropping weak def'n of func %s at %a in favor of \
                    that at %a"

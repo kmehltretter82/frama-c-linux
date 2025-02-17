@@ -40,7 +40,7 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
     let base_attrs = (Cil.unrollType basetyp).tattr in
     let base_attrs = Ast_attributes.filter_qualifiers base_attrs in
     let base_attrs =
-      if Ast_attributes.(exists frama_c_mutable fi.fattr) then
+      if Ast_attributes.(contains frama_c_mutable fi.fattr) then
         Ast_attributes.drop "const" base_attrs
       else
         base_attrs

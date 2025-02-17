@@ -70,7 +70,7 @@ let rec drop_list anl al =
     else
     if q' == q then al (* preserve sharing *) else a :: q'
 
-let exists an al =
+let contains an al =
   let an = Extlib.strip_underscore an in
   List.exists (fun a -> get_name a = an) al
 

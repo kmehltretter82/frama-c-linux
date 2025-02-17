@@ -111,7 +111,7 @@ val drop_list : string list -> attributes -> attributes
 (** True if the named attribute appears in the attribute list. The list of
     attributes must be sorted.
 *)
-val exists : string -> attributes -> bool
+val contains : string -> attributes -> bool
 
 (** Return the list of parameters associated to an attribute. The list is empty
     if there is no such attribute or it has no parameters at all.

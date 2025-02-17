@@ -37,7 +37,7 @@ let annot_attr = "has_annot"
 *)
 let has_annot stmt =
   Annotations.code_annot stmt <> [] ||
-  Ast_attributes.exists annot_attr stmt.sattr
+  Ast_attributes.contains annot_attr stmt.sattr
 
 let noGhostFD prj fd =
   let visitor = object (self)

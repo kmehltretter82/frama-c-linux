@@ -121,7 +121,7 @@ let is_mutable (lval : lval) : bool =
     | _, NoOffset -> base_mutable
     | _, Field (fi, off) ->
       let base_mutable =
-        base_mutable || Ast_attributes.(exists frama_c_mutable fi.fattr)
+        base_mutable || Ast_attributes.(contains frama_c_mutable fi.fattr)
       in
       aux base_mutable fi.ftype off
     | TArray(typ, _), Index(_, off) -> aux base_mutable typ off
@@ -141,7 +141,7 @@ let rec is_initialized_exp (on_same_obj : bool) (exp : exp) =
 
 and is_initialized_lhost (on_same_obj : bool) (lhost : lhost) =
   match lhost with
-  | Var vi -> Ast_attributes.(exists frama_c_init_obj vi.vattr)
+  | Var vi -> Ast_attributes.(contains frama_c_init_obj vi.vattr)
   | Mem e -> on_same_obj && is_initialized_exp false e
 
 let is_initialized lval =
