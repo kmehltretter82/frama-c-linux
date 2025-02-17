@@ -249,13 +249,13 @@ struct
       match kind l with
       | Single Ptr | Many Ptr | Garbled ->
         let offset = M.sizeof ty in
-        let sizeof = Lang.F.e_one in
+        let sizeof = M.sizeof ty in
         let tau = get_tau l c in
         let basename = Sigma.Chunk.basename_of_chunk c in
         frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
       | _ ->
         let offset = M.sizeof ty in
-        let sizeof = Lang.F.e_one in
+        let sizeof = M.sizeof ty in
         let tau = get_tau l c in
         let basename = Sigma.Chunk.basename_of_chunk c in
         frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau

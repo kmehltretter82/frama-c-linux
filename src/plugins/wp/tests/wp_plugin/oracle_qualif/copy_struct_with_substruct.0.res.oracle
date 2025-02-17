@@ -1,0 +1,21 @@
+# frama-c -wp -wp-model 'Region' [...]
+[kernel] Parsing copy_struct_with_substruct.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal zeroify_S_fs_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal zeroify_S_fs_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+[wp] 6 goals scheduled
+[wp] [Valid] region_zeroify_S_fs_ensures_post_eq_struct_fields (Alt-Ergo) (Cached)
+[wp] [Valid] region_zeroify_S_fs_ensures_post_eq_struct_with_update (Alt-Ergo) (Cached)
+[wp] [Valid] region_zeroify_S_fs_ensures_post_eq_struct_S_st_T_sti (Alt-Ergo) (Cached)
+[wp] [Valid] region_zeroify_S_fs_ensures_post_eq_struct_S_st_T_sti_2 (Alt-Ergo) (Cached)
+[wp] [Valid] region_zeroify_S_fs_ensures_post_eq_struct_S_st (Alt-Ergo) (Cached)
+[wp] [Valid] region_zeroify_S_fs_ensures_post_eq_struct_S_fca (Alt-Ergo) (Cached)
+[wp] Proved goals:    8 / 8
+  Terminating:     1
+  Unreachable:     1
+  Alt-Ergo:        6
+------------------------------------------------------------
+ Functions                 WP     Alt-Ergo  Total   Success
+  zeroify_S_fs              -        6        6       100%
+------------------------------------------------------------

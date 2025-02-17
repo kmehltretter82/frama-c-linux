@@ -190,7 +190,6 @@ module SNode = Set.Make(struct
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
-
 let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   failwith_locked m "Region.Memory.new_chunk" ;
   let clayout =
@@ -322,6 +321,9 @@ let merge_layout (m:map) (q:queue) (root:node) (a:layout) (b:layout) : layout =
 
   | Compound(sa,fa,wa), Compound(sb,fb,wb) ->
     merge_ranges m q root sa fa wa sb fb wb
+
+  | ((Compound(sr,_,_) as c), Cell(sx,None)
+    | Cell(sx,None), (Compound(sr,_,_) as c)) when sr = sx -> c
 
   | Compound(sr,_,wr), Cell(sx,ptr)
   | Cell(sx,ptr), Compound(sr,_,wr) ->
