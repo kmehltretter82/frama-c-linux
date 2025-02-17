@@ -199,8 +199,9 @@ let export_as_csv_to_channel out_channel =
   List.iter (pp_stat fmt) l
 
 let export_as_csv_to_file filename =
-  let out_channel = open_out (filename : Filepath.Normalized.t :> string) in
-  export_as_csv_to_channel out_channel
+  Filepath.with_out filename export_as_csv_to_channel
+  |> Result.iter_error @@
+  Self.warning "failed to output statistics: %s"
 
 let export_as_csv ?filename () =
   match filename with
