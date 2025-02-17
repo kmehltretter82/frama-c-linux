@@ -94,20 +94,21 @@ process_file ()
    -e 's/Cil\.frama_c_mutable/Ast_attributes.frama_c_mutable/g' \
    -e 's/Cil\.frama_c_inlined/Ast_attributes.frama_c_inlined/g' \
    -e 's/Cil\.attributeName/Ast_attributes.attribute_name/g' \
-   -e 's/Cil\.hasAttribute/Ast_attributes.has_attribute/g' \
-   -e 's/Cil\.addAttributes/Ast_attributes.add_attributes/g' \
-   -e 's/Cil\.dropAttribute/Ast_attributes.drop_attribute/g' \
-   -e 's/Cil\.dropAttributes/Ast_attributes.drop_attributes/g' \
-   -e 's/Cil\.findAttribute/Ast_attributes.find_attribute/g' \
-   -e 's/Cil\.filterAttributes/Ast_attributes.filter_attributes/g' \
-   -e 's/Cil\.registerAttribute/Ast_attributes.register_attribute/g' \
-   -e 's/Cil\.removeAttribute/Ast_attributes.remove_attribute/g' \
-   -e 's/Cil\.attributeClass/Ast_attributes.get_attribute_class/g' \
-   -e 's/Cil\.isKnownAttribute/Ast_attributes.is_known_attribute/g' \
-   -e 's/Cil\.partitionAttributes/Ast_attributes.partition_attributes/g' \
-   -e 's/Cil\.filter_qualifier_attributes/Ast_attributes.filter_qualifier_attributes/g' \
+   -e 's/Cil\.addAttribute/Ast_attributes.add/g' \
+   -e 's/Cil\.addAttributes/Ast_attributes.add_list/g' \
+   -e 's/Cil\.dropAttribute/Ast_attributes.drop/g' \
+   -e 's/Cil\.dropAttributes/Ast_attributes.drop_list/g' \
+   -e 's/Cil\.hasAttribute/Ast_attributes.contains/g' \
+   -e 's/Cil\.findAttribute/Ast_attributes.find_params/g' \
+   -e 's/Cil\.filterAttributes/Ast_attributes.filter/g' \
+   -e 's/Cil\.registerAttribute/Ast_attributes.register/g' \
+   -e 's/Cil\.removeAttribute/Ast_attributes.remove/g' \
+   -e 's/Cil\.attributeClass/Ast_attributes.get_class/g' \
+   -e 's/Cil\.isKnownAttribute/Ast_attributes.is_known/g' \
+   -e 's/Cil\.partitionAttributes/Ast_attributes.partition/g' \
+   -e 's/Cil\.filter_qualifier_attributes/Ast_attributes.filter_qualifiers/g' \
    -e 's/Cil\.splitArrayAttributes/Ast_attributes.split_array_attributes/g' \
-   -e 's/Cil\.separateStorageModifiers/Ast_attributes.split_storage_modifier/g'
+   -e 's/Cil\.separateStorageModifiers/Ast_attributes.split_storage_modifiers/g'
    # this line left empty on purpose
 }
 
