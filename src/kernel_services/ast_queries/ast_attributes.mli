@@ -108,6 +108,11 @@ val drop : string -> attributes -> attributes
 *)
 val drop_list : string list -> attributes -> attributes
 
+(** [replace_params name params al] will {!drop} all the attributes named [name]
+    in [al] and {!add} a new attribute [(name, params)] in the list.
+*)
+val replace_params : string -> attrparam list -> attributes -> attributes
+
 (** True if the named attribute appears in the attribute list. The list of
     attributes must be sorted.
 *)

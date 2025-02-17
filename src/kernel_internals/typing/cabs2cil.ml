@@ -644,7 +644,7 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
           Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
             "adding aligned(%a) attribute to comp '%s' due to packing pragma"
             Integer.pretty n ci.cname;
-          Ast_attributes.(add ("aligned",[AInt n]) (drop "aligned" cattrs))
+          Ast_attributes.replace_params "aligned" [AInt n] cattrs
         end
       | Some local ->
         (* The largest aligned wins with GCC. Don't know
@@ -653,14 +653,14 @@ let process_pragmas_pack_align_comp_attributes loc ci cattrs =
         Kernel.feedback ~source ~dkey:Kernel.dkey_typing_pragma
           "setting aligned(%a) attribute to comp '%s' due to packing pragma"
           Integer.pretty align ci.cname;
-        Ast_attributes.(add ("aligned",[AInt align]) (drop "aligned" cattrs))
+        Ast_attributes.replace_params "aligned" [AInt align] cattrs
     in
     force_packed_attribute with_aligned_attributes
   | None, Some true ->
     Ast_attributes.drop "aligned" cattrs
   | None, Some false ->
     force_packed_attribute
-      Ast_attributes.(add ("aligned",[AInt Integer.one]) (drop "aligned" cattrs))
+      (Ast_attributes.replace_params "aligned" [AInt Integer.one] cattrs)
 
 (* Takes into account the possible effect of '#pragma pack' directives on
    field [fi], and checks the alignment of aligned() attributes.
@@ -700,12 +700,11 @@ let process_pragmas_pack_align_field_attributes fi fattrs cattr =
         "%s aligned(%a) attribute to field '%s.%s' due to packing pragma"
         (if Option.is_none field_align then "adding" else "setting")
         Integer.pretty new_align fi.fcomp.cname fi.fname;
-      let new_attr = ("aligned", [AInt new_align]) in
-      Ast_attributes.(add new_attr (drop "aligned" fattrs))
+      Ast_attributes.replace_params "aligned" [AInt new_align] fattrs
   | None, Some true ->
     Ast_attributes.drop "aligned" fattrs
   | None, Some false ->
-    Ast_attributes.(add ("aligned",[AInt Integer.one]) (drop "aligned" fattrs))
+    Ast_attributes.replace_params "aligned" [AInt Integer.one] fattrs
 
 
 (***** COMPUTED GOTO ************)
