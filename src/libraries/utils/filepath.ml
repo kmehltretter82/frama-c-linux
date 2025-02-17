@@ -363,6 +363,37 @@ let basename p = Filename.basename p
 
 let dirname p = Filename.dirname p
 
+(* We dont't directly use Fun.protect as it catches exceptions in [finally]
+   and reraise them as [Finally_raised exn]. However, a Sys_error can be
+   raised by [open_out] (and [open_in] but it should not happen).
+*)
+let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
+  try
+    let r =
+      try f channel
+      with exn -> close channel; raise exn
+    in
+    close channel;
+    Ok r
+  with Sys_error s -> Error s
+
+let with_in (p: string) (f: in_channel -> 'a): ('a,string) result =
+  open_in (p :> string) |> protect_file_op ~close:close_in f
+
+let with_out (p: string) (f: out_channel -> 'a): ('a,string) result =
+  open_out (p :> string) |> protect_file_op ~close:close_out f
+
+module Operators =
+struct
+  type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
+
+  let open_in = with_in
+  let open_out = with_out
+
+  let (let+$) with_file f = with_file f
+  let (let*$) with_file f = with_file f |> Result.join
+end
+
 (*
 Local Variables:
 compile-command: "make -C ../../.."

@@ -265,6 +265,59 @@ val basename: Normalized.t -> string
 *)
 val dirname: Normalized.t -> Normalized.t
 
+(** [with_in path f] calls [f] with a new input channel on the file [path]
+    opened for reading. The file is closed when f returns or whenever an
+    exception is thrown by [f].
+    @since Frama-C+dev
+*)
+val with_in: Normalized.t -> (in_channel -> 'a) -> ('a,string) result
+
+(** [with_out path f] calls [f] with a new output channel on the file [path]
+    opened for writing. The file is closed when f returns or whenever an
+    exception is thrown by [f].
+    @since Frama-C+dev
+*)
+val with_out: Normalized.t -> (out_channel -> 'a) -> ('a,string) result
+
+(** Opening this module allows to use shorter syntax to deal with file:
+
+    {[
+      let result =
+        let open Filepath.Operators in
+        let+$ channel = open_out filepath in
+        output_string channel "42"
+      in
+      Result.iter_error display_error result
+    ]}
+
+    When the file processing returns a result by itself, the operator [let+*]
+    can be used instead:
+
+    {[
+      let open Filepath.Operators in
+      let*$ channel = open_in filepath in
+      try
+        let header = input_line channel in
+        if header = "42"
+        then Ok ()
+        else Error "wrong file header"
+      with End_of_file ->
+        Error "file is empty"
+    ]}
+*)
+module Operators : sig
+  type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
+
+  val open_in: Normalized.t -> (in_channel,'a) safe_processor
+  val open_out: Normalized.t -> (out_channel,'a) safe_processor
+
+  val (let+$): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
+  val (let*$): ('ch,('a,string) result) safe_processor ->
+    ('ch -> ('a,string) result) ->
+    ('a,string) result
+end
+
+(** *)
 (*
   Local Variables:
   compile-command: "make -C ../../.."
