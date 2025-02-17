@@ -26,7 +26,8 @@ open Memory
 let rec add_lval (m:map) (p:path): node =
   match p.step with
   | Var x -> add_root m x
-  | Field(lv,fd) -> Memory.add_field m (add_lval m lv) fd
+  | Field(lv,fd) ->
+    Memory.add_field m (add_lval m lv) fd
   | Index(lv,_) -> Memory.add_index m (add_lval m lv) lv.typ
   | Star e | Cast(_,e) -> add_pointer m e
   | Shift _ | AddrOf _ ->
