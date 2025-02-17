@@ -882,7 +882,7 @@ struct
     match Cil.unrollType ty with
     | { tnode = TComp ci; tattr } ->
       (try
-         let attrs = Ast_attributes.filter_qualifier_attributes tattr in
+         let attrs = Ast_attributes.filter_qualifiers tattr in
          let field = C.find_comp_field ci f in
          let typ = Cil.typeOffset ty field in
          Logic_utils.offset_to_term_offset field,

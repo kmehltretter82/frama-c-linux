@@ -569,7 +569,7 @@ let sound_verdict_vi =
      let vi = Cil.makeGlobalVar name Cil_const.intType in
      vi.vstorage <- Extern;
      vi.vreferenced <- true;
-     vi.vattr <- Ast_attributes.add_attribute (("FC_BUILTIN", [])) vi.vattr;
+     vi.vattr <- Ast_attributes.add (("FC_BUILTIN", [])) vi.vattr;
      vi)
 
 let sound_verdict () = Lazy.force sound_verdict_vi

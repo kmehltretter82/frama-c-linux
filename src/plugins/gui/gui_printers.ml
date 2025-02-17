@@ -102,13 +102,13 @@ let rec get_type_specifier (t:typ) =
 
 let pp_tcomp_unfolded fmt comp attrs =
   (* uses GCompTag pretty-printer to expand the composite type *)
-  let cattrs = Ast_attributes.add_attributes attrs comp.cattr in
+  let cattrs = Ast_attributes.add_list attrs comp.cattr in
   let comp = {comp with cattr = cattrs} in
   Printer.pp_global fmt (GCompTag (comp, Cil_datatype.Location.unknown))
 
 let pp_enum_unfolded fmt enum attrs =
   (* use GEnumTag pretty-printer to expand the enum *)
-  let eattrs = Ast_attributes.add_attributes attrs enum.eattr in
+  let eattrs = Ast_attributes.add_list attrs enum.eattr in
   let enum = {enum with eattr = eattrs} in
   Printer.pp_global fmt (GEnumTag (enum, Cil_datatype.Location.unknown))
 
@@ -124,9 +124,9 @@ let pp_typ_unfolded fmt (t : typ) =
       (* unfolds the typedef, and one step further if it is a TComp/TEnum *)
       match ti.ttype.tnode with
       | TComp ci ->
-        pp_tcomp_unfolded fmt ci (Ast_attributes.add_attributes t.tattr ti.ttype.tattr)
+        pp_tcomp_unfolded fmt ci (Ast_attributes.add_list t.tattr ti.ttype.tattr)
       | TEnum ei ->
-        pp_enum_unfolded  fmt ei (Ast_attributes.add_attributes t.tattr ti.ttype.tattr)
+        pp_enum_unfolded  fmt ei (Ast_attributes.add_list t.tattr ti.ttype.tattr)
       | _ ->
         Printer.pp_typ fmt (Cil.typeAddAttributes t.tattr ti.ttype)
     end

@@ -263,7 +263,7 @@ let inliner functions_to_inline = object (self)
           in
           let fun_name = Kernel_function.get_name callee in
           let new_attribute = (Ast_attributes.frama_c_inlined, [AStr fun_name]) in
-          block.battrs <- Ast_attributes.add_attribute new_attribute block.battrs;
+          block.battrs <- Ast_attributes.add new_attribute block.battrs;
           let skind =
             if needs_assign then begin
               match return_aux, return with
@@ -353,11 +353,11 @@ let remove_local_statics = object
   inherit Visitor.frama_c_inplace
   method! vblock b =
     b.bstatics <- List.filter (fun v ->
-        not (Ast_attributes.has_attribute Cabs2cil.fc_local_static v.vattr)
+        not (Ast_attributes.contains Cabs2cil.fc_local_static v.vattr)
       ) b.bstatics;
     Cil.DoChildren
   method! vvrbl v =
-    v.vattr <- Ast_attributes.drop_attribute Cabs2cil.fc_local_static v.vattr;
+    v.vattr <- Ast_attributes.drop Cabs2cil.fc_local_static v.vattr;
     Cil.DoChildren
 end
 

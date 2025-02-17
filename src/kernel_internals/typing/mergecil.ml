@@ -832,7 +832,7 @@ let init ?(all=true) () =
 
 (* Ignores some attributes that are irrelevant for mergecil, e.g. fc_stdlib *)
 let drop_attributes_for_merge attrs =
-  Ast_attributes.drop_attributes ["fc_stdlib"; "fc_stdlib_generated"] attrs
+  Ast_attributes.drop_list ["fc_stdlib"; "fc_stdlib_generated"] attrs
 
 let equal_attributes_for_merge attrs1 attrs2 =
   Cil_datatype.Attributes.equal (drop_attributes_for_merge attrs1)
@@ -957,8 +957,8 @@ let intEnumInfoNode =
    attributes, we allow them to merge (arbitrarily choosing whether
    to keep or to drop such attributes). *)
 let equalModuloPackedAlign attrs1 attrs2 =
-  let drop = Ast_attributes.drop_attributes ["packed"; "aligned"] in
-  equal_attributes_for_merge (drop attrs1) (drop attrs2)
+  let drop_list = Ast_attributes.drop_list ["packed"; "aligned"] in
+  equal_attributes_for_merge (drop_list attrs1) (drop_list attrs2)
 
 
 
@@ -1043,7 +1043,7 @@ let matchEnumInfoGen (oldei: enuminfo) (ei: enuminfo) : unit =
       (* Set the representative *)
       let newrep, _ = EnumMerging.union oldeinode einode in
       (* We get here if the enumerations match *)
-      newrep.ndata.eattr <- Ast_attributes.add_attributes oldei.eattr ei.eattr
+      newrep.ndata.eattr <- Ast_attributes.add_list oldei.eattr ei.eattr
     with (Cannot_combine msg | Failure msg) ->
       let pp_items = Pretty_utils.pp_list ~pre:"{" ~suf:"}" ~sep:",@ "
           (fun fmt item ->
@@ -1186,7 +1186,7 @@ let matchCompInfoGen (combineF : combineFunction)
            end);
         (* We get here when we succeeded checking that they are equal, or one of
          * them was empty *)
-        newrep.ndata.cattr <- Ast_attributes.add_attributes oldci.cattr ci.cattr)
+        newrep.ndata.cattr <- Ast_attributes.add_list oldci.cattr ci.cattr)
 
 
 (* Match two typeinfos and throw a Failure if they do not match *)
@@ -1649,15 +1649,15 @@ let oneFilePass1 (f:file) : unit =
             end else Kernel.abort "%s" msg (* Fail if both variables are used. *)
           end
       in
-      if Ast_attributes.has_attribute "fc_stdlib" oldvi.vattr then begin
-        let attrprm = Ast_attributes.find_attribute "fc_stdlib" oldvi.vattr in
+      if Ast_attributes.contains "fc_stdlib" oldvi.vattr then begin
+        let attrprm = Ast_attributes.find_params "fc_stdlib" oldvi.vattr in
         let attrprm =
-          if Ast_attributes.has_attribute "fc_stdlib" vi.vattr then begin
-            Ast_attributes.find_attribute "fc_stdlib" vi.vattr @ attrprm
+          if Ast_attributes.contains "fc_stdlib" vi.vattr then begin
+            Ast_attributes.find_params "fc_stdlib" vi.vattr @ attrprm
           end else attrprm
         in
-        let attrs = Ast_attributes.drop_attribute "fc_stdlib" newrep.ndata.vattr in
-        let attrs = Ast_attributes.add_attribute ("fc_stdlib", attrprm) attrs in
+        let attrs = Ast_attributes.drop "fc_stdlib" newrep.ndata.vattr in
+        let attrs = Ast_attributes.add ("fc_stdlib", attrprm) attrs in
         newrep.ndata.vattr <- attrs;
       end;
       newrep.ndata.vdefined <- vi.vdefined || oldvi.vdefined;
@@ -1696,8 +1696,8 @@ let oneFilePass1 (f:file) : unit =
          the only way to obtain the "correct" function is to tell the user to
          invert the order of source files given in the command line.
       *)
-      if fromGFun && Ast_attributes.has_attribute "weak" oldvi.vattr &&
-         not (Ast_attributes.has_attribute "weak" vi.vattr) then
+      if fromGFun && Ast_attributes.contains "weak" oldvi.vattr &&
+         not (Ast_attributes.contains "weak" vi.vattr) then
         begin
           let open Filepath in
           let oldpath = (fst oldvi.vdecl).pos_path in
@@ -1710,7 +1710,7 @@ let oneFilePass1 (f:file) : unit =
             Printer.pp_location oldvi.vdecl
             Normalized.pretty newpath Normalized.pretty oldpath
         end;
-      newrep.ndata.vattr <- Ast_attributes.add_attributes oldvi.vattr vi.vattr;
+      newrep.ndata.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
       newrep.ndata.vdecl <- newdecl
   in
   let iter g =
@@ -1809,7 +1809,7 @@ let matchInlines (oldfidx: int) (oldi: varinfo)
       oldi (combineTypes CombineOther oldfidx oldi.vtype fidx i.vtype);
     (* We get here if we have success *)
     (* Combine the attributes as well *)
-    oldi.vattr <- Ast_attributes.add_attributes oldi.vattr i.vattr
+    oldi.vattr <- Ast_attributes.add_list oldi.vattr i.vattr
     (* Do not union them yet because we do not know that they are the same.
      * We have checked only the types so far *)
   end
@@ -2868,7 +2868,7 @@ let oneFilePass2 (f: file) =
               Cil.setFormals fdec (Option.get defn_formals);
               (* Remove static variables (avoids dangling globals in the AST *)
               remove_function_statics fdec';
-              if Ast_attributes.has_attribute "weak" fdec'.svar.vattr then begin
+              if Ast_attributes.contains "weak" fdec'.svar.vattr then begin
                 Kernel.warning ~current:true ~wkey:Kernel.wkey_linker_weak
                   "dropping weak def'n of func %s at %a in favor of \
                    that at %a"
@@ -2876,7 +2876,7 @@ let oneFilePass2 (f: file) =
                   Cil_printer.pp_location l Cil_printer.pp_location prevLoc;
                 (* We remove the 'weak' attribute, assuming the 'strong'
                    version overrode it. *)
-                fdec'.svar.vattr <- Ast_attributes.drop_attribute "weak" fdec'.svar.vattr;
+                fdec'.svar.vattr <- Ast_attributes.drop "weak" fdec'.svar.vattr;
               end else
               if (curSum = prevSum) then
                 Kernel.warning ~current:true

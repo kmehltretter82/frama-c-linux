@@ -105,7 +105,7 @@ let innermost_nonlast env =
 
 let update_env env block =
   if List.exists
-      (fun v -> Ast_attributes.has_attribute Cabs2cil.frama_c_destructor v.vattr)
+      (fun v -> Ast_attributes.contains Cabs2cil.frama_c_destructor v.vattr)
       block.blocals
   then init_env block
   else { env with is_last = false :: env.is_last }
@@ -113,7 +113,7 @@ let update_env env block =
 let requires_new_stmt env =
   is_last env &&
   List.exists
-    (fun v -> Ast_attributes.has_attribute Cabs2cil.frama_c_destructor v.vattr)
+    (fun v -> Ast_attributes.contains Cabs2cil.frama_c_destructor v.vattr)
     env.parent_block.blocals
 
 let make_break_stmt loc env next =

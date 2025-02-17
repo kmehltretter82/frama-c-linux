@@ -139,7 +139,7 @@ let encapsulate_local_vars f =
      return statement and the declaration of the retvar) inside a block. *)
   if
     List.exists (fun v ->
-        Ast_attributes.has_attribute Cabs2cil.frama_c_destructor v.vattr
+        Ast_attributes.contains Cabs2cil.frama_c_destructor v.vattr
       ) f.sbody.blocals
   then begin
     let exception Found of (block Stack.t * stmt) in
