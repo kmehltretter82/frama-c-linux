@@ -254,6 +254,11 @@ let () = register_noprint ~ignore:true (AttrFunType false) frama_c_inlined
 
 let () = register (AttrFunType false) "warn_unused_result"
 
+(* Globals (extern or not) internal to Frama-C's libc *)
+let fc_stdlib_internal = "fc_stdlib_internal"
+let () =
+  register (AttrName false) fc_stdlib_internal
+
 (* List of attributes for internal uses. *)
 
 let fc_internal_attributes =
@@ -270,6 +275,7 @@ let fc_internal_attributes =
   ; frama_c_inlined
   ; fc_oldstyleproto
   ; fc_missingproto
+  ; fc_stdlib_internal
   ; "declspec"
   ; "arraylen"
   ]

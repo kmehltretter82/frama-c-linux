@@ -120,8 +120,17 @@
 // When linking code including Frama-C's libc, we avoid adding 'extern'
 // to some variable declarations. In this case, __FC_EXTERN is defined to
 // the empty string. Otherwise, define it to 'extern'.
+// Moreover, the attribute `__fc_stdlib_internal` is added to the declarations
+// so that Frama-C and its plugins can detect that some variables are not part
+// of the standard library but instead are part of Frama-C
 #ifndef __FC_EXTERN
-#define __FC_EXTERN extern
+#  define __FC_EXTERN extern __attribute__((__fc_stdlib_internal))
+#endif
+
+// Add the attribute `__fc_stdlib_internal` to a global declaration that is not
+// `extern`.
+#ifndef __FC_INTERN
+#  define __FC_INTERN __attribute__((__fc_stdlib_internal))
 #endif
 
 // C11 §6.10.8.3 Conditional feature macros: Frama-C does not support complex.h
