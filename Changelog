@@ -18,6 +18,9 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o!  Kernel    [2025-02-17] New module Ast_attributes for attribute related
+              functions. Moved most of Cil functions into this module, Cil
+              functions are now deprecated.
 -   Libc      [2025-02-14] Add __fc_gcc_builtin_macros.h to improve analyses
               for code using GCC libc builtins (e.g. __builtin_strlen).
 -*  Kernel    [2025-02-14] Proper support for forwarded enum as gcc extension
@@ -32,9 +35,6 @@ o!  Kernel    [2025-02-05] Remove the parameter `Functor_info` for every
               `Datatype` functor building collection(s).
 -!  Kernel    [2025-02-04] Undefine some predefined GCC macros, to minimize
               parsing errors due to unsupported compiler extensions.
-o!  Kernel    [2025-02-05] New module Ast_attributes for attribute related
-              functions. Moved most of Cil functions into this module, Cil
-              functions are now deprecated.
 o!  Kernel    [2025-02-05] Remove attributes annotations (Cil.AttrAnnot). Use
               normal attributes instead.
 o!  Kernel    [2025-01-31] Use a record to represent `Cil_types.typ` with two
