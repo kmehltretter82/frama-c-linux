@@ -1,5 +1,5 @@
 [kernel] Parsing invalid_pointer.c (with preprocessing)
-[kernel:typing:int-conversion] invalid_pointer.c:113: Warning: 
+[kernel:typing:int-conversion] invalid_pointer.c:112: Warning: 
   Conversion from a pointer to an integer without an explicit cast
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
@@ -8,115 +8,125 @@
   NULL[rbits 80 to 247] ∈ [--..--]
   undet ∈ [--..--]
 [eva] computing for function pointer_computation <- main.
-  Called from invalid_pointer.c:191.
+  Called from invalid_pointer.c:190.
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
-  Called from invalid_pointer.c:32.
+  Called from invalid_pointer.c:31.
 [eva] using specification for function Frama_C_interval
-[eva] invalid_pointer.c:32: 
+[eva] invalid_pointer.c:31: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
-  Called from invalid_pointer.c:34.
-[eva] invalid_pointer.c:34: 
+  Called from invalid_pointer.c:33.
+[eva] invalid_pointer.c:33: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for pointer_computation
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
-  Called from invalid_pointer.c:192.
-[eva:partition] invalid_pointer.c:44: 
+  Called from invalid_pointer.c:191.
+[eva:partition] invalid_pointer.c:43: 
   Trace partitioning superposing up to 100 states
-[eva] invalid_pointer.c:55: Frama_C_show_each_bottom: {{ &t + {-4} }}
+[eva] invalid_pointer.c:54: Frama_C_show_each_bottom: {{ &t + {-4} }}
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
-  Called from invalid_pointer.c:193.
+  Called from invalid_pointer.c:192.
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from invalid_pointer.c:67.
-[eva] invalid_pointer.c:67: 
+  Called from invalid_pointer.c:66.
+[eva] invalid_pointer.c:66: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from invalid_pointer.c:69.
-[eva] invalid_pointer.c:69: 
+  Called from invalid_pointer.c:68.
+[eva] invalid_pointer.c:68: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
-  Called from invalid_pointer.c:73.
-[eva] invalid_pointer.c:73: 
+  Called from invalid_pointer.c:72.
+[eva] invalid_pointer.c:72: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva] Recording results for int_conversion
 [eva] Done for function int_conversion
 [eva] computing for function addrof <- main.
-  Called from invalid_pointer.c:194.
+  Called from invalid_pointer.c:193.
 [eva] Recording results for addrof
 [eva] Done for function addrof
 [eva] computing for function union_pointer <- main.
-  Called from invalid_pointer.c:195.
+  Called from invalid_pointer.c:194.
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
-  Called from invalid_pointer.c:196.
+  Called from invalid_pointer.c:195.
 [eva] Recording results for write_pointer
 [eva] Done for function write_pointer
 [eva] computing for function object_pointer_predicate <- main.
-  Called from invalid_pointer.c:197.
-[eva] invalid_pointer.c:128: assertion got status valid.
-[eva:alarm] invalid_pointer.c:131: Warning: 
+  Called from invalid_pointer.c:196.
+[eva] invalid_pointer.c:127: assertion got status valid.
+[eva:alarm] invalid_pointer.c:130: Warning: 
   assertion got status invalid (stopping propagation).
-[eva] invalid_pointer.c:134: assertion got status valid.
-[eva:alarm] invalid_pointer.c:137: Warning: 
+[eva] invalid_pointer.c:133: assertion got status valid.
+[eva:alarm] invalid_pointer.c:136: Warning: 
   assertion got status invalid (stopping propagation).
-[eva:alarm] invalid_pointer.c:140: Warning: assertion got status unknown.
-[eva] invalid_pointer.c:141: assertion got status valid.
-[eva] invalid_pointer.c:142: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
-[eva:alarm] invalid_pointer.c:144: Warning: assertion got status unknown.
-[eva] invalid_pointer.c:145: assertion got status valid.
-[eva] invalid_pointer.c:146: 
+[eva:alarm] invalid_pointer.c:139: Warning: assertion got status unknown.
+[eva] invalid_pointer.c:140: assertion got status valid.
+[eva] invalid_pointer.c:141: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
+[eva:alarm] invalid_pointer.c:143: Warning: assertion got status unknown.
+[eva] invalid_pointer.c:144: assertion got status valid.
+[eva] invalid_pointer.c:145: 
   Frama_C_show_each_object_pointer_char: {{ &x + {0; 1; 2; 3; 4} }}
 [eva] computing for function Frama_C_interval <- object_pointer_predicate <- main.
-  Called from invalid_pointer.c:147.
-[eva] invalid_pointer.c:147: 
+  Called from invalid_pointer.c:146.
+[eva] invalid_pointer.c:146: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] invalid_pointer.c:149: assertion got status valid.
-[eva:alarm] invalid_pointer.c:151: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:153: Warning: assertion got status unknown.
-[eva] invalid_pointer.c:154: 
+[eva] invalid_pointer.c:148: assertion got status valid.
+[eva:alarm] invalid_pointer.c:150: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:152: Warning: assertion got status unknown.
+[eva] invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
-[eva] invalid_pointer.c:156: assertion got status valid.
-[eva:alarm] invalid_pointer.c:159: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:162: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:164: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:167: Warning: 
+[eva] invalid_pointer.c:155: assertion got status valid.
+[eva:alarm] invalid_pointer.c:158: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:161: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:163: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:166: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for object_pointer_predicate
 [eva] Done for function object_pointer_predicate
 [eva] computing for function flexible_array_member <- main.
-  Called from invalid_pointer.c:198.
-[eva:alarm] invalid_pointer.c:186: Warning: 
+  Called from invalid_pointer.c:197.
+[eva:alarm] invalid_pointer.c:185: Warning: 
   out of bounds write. assert \valid(p_0 + 1);
-[kernel] invalid_pointer.c:186: Warning: 
+[kernel] invalid_pointer.c:185: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for flexible_array_member
 [eva] Done for function flexible_array_member
 [eva] computing for function signal <- main.
+  Called from invalid_pointer.c:199.
+[eva] using specification for function signal
+[eva] invalid_pointer.c:199: 
+  function signal: precondition 'valid_signal' got status valid.
+[eva] invalid_pointer.c:199: 
+  function signal: precondition 'func_not_null' got status valid.
+[eva] Done for function signal
+[eva] computing for function signal <- main.
   Called from invalid_pointer.c:200.
-[eva] Recording results for signal
+[eva] invalid_pointer.c:200: 
+  function signal: precondition 'valid_signal' got status valid.
+[eva] invalid_pointer.c:200: 
+  function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
   Called from invalid_pointer.c:201.
-[eva] Recording results for signal
-[eva] Done for function signal
-[eva] computing for function signal <- main.
-  Called from invalid_pointer.c:202.
-[eva] Recording results for signal
+[eva] invalid_pointer.c:201: 
+  function signal: precondition 'valid_signal' got status valid.
+[eva] invalid_pointer.c:201: 
+  function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] Recording results for main
 [eva] Done for function main
-[eva] invalid_pointer.c:186: 
+[eva] invalid_pointer.c:185: 
   assertion 'Eva,mem_access' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
@@ -270,16 +280,6 @@
    [126] ∈ {1; 126}
    [127] ∈ {0; 127}
   p ∈ {{ &t[128] }}
-[eva:final-states] Values at end of function signal:
-  __fc_errno ∈ [--..--]
-  __fc_signal_handlers[0..9] ∈ {0}
-                      [10] ∈ {{ NULL ; &SIG_IGN }}
-                      [11] ∈ {0}
-                      [12] ∈ {{ NULL ; &SIG_ERR }}
-                      [13..30] ∈ {0}
-                      [31] ∈ {{ NULL ; &SIG_DFL }}
-                      [32..64] ∈ {0}
-  __retres ∈ {{ &SIG_DFL ; &SIG_IGN ; &SIG_ERR }}
 [eva:final-states] Values at end of function union_pointer:
   p ∈ [--..--]
   u ∈ [--..--]
@@ -288,7 +288,6 @@
   q ∈ {{ NULL + {42} ; &x + [0..4294967295] }}
 [eva:final-states] Values at end of function main:
   Frama_C_entropy_source ∈ [--..--]
-  __fc_errno ∈ [--..--]
   __fc_signal_handlers[0..9] ∈ {0}
                       [10] ∈ {{ NULL ; &SIG_IGN }}
                       [11] ∈ {0}
@@ -310,13 +309,13 @@
 [from] Done for function pointer_computation
 [from] Computing for function pointer_in_loops
 [from] Done for function pointer_in_loops
-[from] Computing for function signal
-[from] Done for function signal
 [from] Computing for function union_pointer
 [from] Done for function union_pointer
 [from] Computing for function write_pointer
 [from] Done for function write_pointer
 [from] Computing for function main
+[from] Computing for function signal <-main
+[from] Done for function signal
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
   These dependencies hold at termination for the executions that terminate:
@@ -336,19 +335,15 @@
 [from] Function pointer_in_loops:
   NO EFFECTS
 [from] Function signal:
-  __fc_errno FROM signal_nondet (and SELF)
-  __fc_signal_handlers{[10]; [12]; [31]}
-                      FROM sig; func; signal_nondet (and SELF)
-  \result FROM __fc_signal_handlers{[10]; [12]; [31]}; sig; func;
-               signal_nondet
+  __fc_signal_handlers{[10]; [12]; [31]} FROM func (and SELF)
+  \result FROM __fc_signal_handlers{[10]; [12]; [31]}
 [from] Function union_pointer:
   NO EFFECTS
 [from] Function write_pointer:
   NO EFFECTS
 [from] Function main:
   Frama_C_entropy_source FROM Frama_C_entropy_source (and SELF)
-  __fc_errno FROM signal_nondet (and SELF)
-  __fc_signal_handlers{[10]; [12]; [31]} FROM signal_nondet (and SELF)
+  __fc_signal_handlers{[10]; [12]; [31]} FROM \nothing (and SELF)
 [from] ====== END OF DEPENDENCIES ======
 [inout] Out (internal) for function addrof:
     p; offset
@@ -374,10 +369,6 @@
     t[0..127]; p; i; q; i_0
 [inout] Inputs for function pointer_in_loops:
     undet
-[inout] Out (internal) for function signal:
-    __fc_errno; __fc_signal_handlers{[10]; [12]; [31]}; old; __retres
-[inout] Inputs for function signal:
-    __fc_signal_handlers{[10]; [12]; [31]}; signal_nondet
 [inout] Out (internal) for function union_pointer:
     p; u
 [inout] Inputs for function union_pointer:
@@ -387,7 +378,6 @@
 [inout] Inputs for function write_pointer:
     undet
 [inout] Out (internal) for function main:
-    Frama_C_entropy_source; __fc_errno; __fc_signal_handlers{[10]; [12]; [31]}
+    Frama_C_entropy_source; __fc_signal_handlers{[10]; [12]; [31]}
 [inout] Inputs for function main:
-    Frama_C_entropy_source; __fc_signal_handlers{[10]; [12]; [31]}; undet;
-    signal_nondet
+    Frama_C_entropy_source; __fc_signal_handlers{[10]; [12]; [31]}; undet
