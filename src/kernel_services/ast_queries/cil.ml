@@ -81,7 +81,7 @@ let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
 
 let argsToList :
   (string * typ * attributes) list option -> (string * typ * attributes) list =
-  function None -> [] | Some al -> al
+  Option.value ~default:[]
 
 (* A hack to allow forward reference of d_exp *)
 let pp_typ_ref = Extlib.mk_fun "Cil.pp_typ_ref"
