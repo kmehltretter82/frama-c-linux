@@ -1362,8 +1362,10 @@ struct
       output_to_dot out ~labeling:(`Custom pp_vertex) ~wto automaton
 
     let to_dot_file pp_value result filepath =
-      let out = open_out (filepath : Filepath.Normalized.t :> string) in
-      to_dot_output pp_value result out
+      let open Filepath.Operators in
+      let& error = Filepath.with_out filepath (to_dot_output pp_value result) in
+      Kernel.warning "cannot output automaton to dot file %a: %s"
+        Filepath.Normalized.pretty filepath error
 
     let as_table (_automaton,_wto,states) =
       states
