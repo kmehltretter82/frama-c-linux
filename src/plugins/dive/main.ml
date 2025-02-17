@@ -23,14 +23,15 @@
 type format = Dot | Json
 
 let output format context filename =
-  let output_function = match format with
-    | Dot -> Dive_graph.output_to_dot
-    | Json -> Server_interface.output_to_json
+  let graph = Context.get_graph context in
+  let output_function channel = match format with
+    | Dot -> Dive_graph.output_to_dot channel graph
+    | Json -> Server_interface.output_to_json channel graph
   in
   Self.result "output to %a" Filepath.Normalized.pretty filename;
-  let out_channel = open_out (filename:>string) in
-  output_function out_channel (Context.get_graph context);
-  close_out out_channel
+  Filepath.with_out filename output_function
+  |> Result.iter_error @@
+  Self.warning "failed to output graph: %s"
 
 let main () =
   if not (Self.FromBases.is_empty () &&
