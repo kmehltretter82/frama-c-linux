@@ -8,7 +8,7 @@
   NULL[rbits 80 to 247] ∈ [--..--]
   undet ∈ [--..--]
 [eva] computing for function pointer_computation <- main.
-  Called from invalid_pointer.c:190.
+  Called from invalid_pointer.c:195.
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
   Called from invalid_pointer.c:31.
 [eva] using specification for function Frama_C_interval
@@ -23,14 +23,14 @@
 [eva] Recording results for pointer_computation
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
-  Called from invalid_pointer.c:191.
+  Called from invalid_pointer.c:196.
 [eva:partition] invalid_pointer.c:43: 
   Trace partitioning superposing up to 100 states
 [eva] invalid_pointer.c:54: Frama_C_show_each_bottom: {{ &t + {-4} }}
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
-  Called from invalid_pointer.c:192.
+  Called from invalid_pointer.c:197.
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
   Called from invalid_pointer.c:66.
 [eva] invalid_pointer.c:66: 
@@ -49,19 +49,19 @@
 [eva] Recording results for int_conversion
 [eva] Done for function int_conversion
 [eva] computing for function addrof <- main.
-  Called from invalid_pointer.c:193.
+  Called from invalid_pointer.c:198.
 [eva] Recording results for addrof
 [eva] Done for function addrof
 [eva] computing for function union_pointer <- main.
-  Called from invalid_pointer.c:194.
+  Called from invalid_pointer.c:199.
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
-  Called from invalid_pointer.c:195.
+  Called from invalid_pointer.c:200.
 [eva] Recording results for write_pointer
 [eva] Done for function write_pointer
 [eva] computing for function object_pointer_predicate <- main.
-  Called from invalid_pointer.c:196.
+  Called from invalid_pointer.c:201.
 [eva] invalid_pointer.c:127: assertion got status valid.
 [eva:alarm] invalid_pointer.c:130: Warning: 
   assertion got status invalid (stopping propagation).
@@ -86,47 +86,49 @@
 [eva] invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
-[eva] invalid_pointer.c:155: assertion got status valid.
-[eva:alarm] invalid_pointer.c:158: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:161: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:163: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:166: Warning: 
+[eva:alarm] invalid_pointer.c:156: Warning: 
+  assertion 'false' got status invalid (stopping propagation).
+[eva] invalid_pointer.c:161: assertion got status valid.
+[eva:alarm] invalid_pointer.c:165: Warning: assertion got status unknown.
+[eva] invalid_pointer.c:166: Frama_C_show_each_absolute_20: {20}
+[eva:alarm] invalid_pointer.c:168: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:171: Warning: 
   assertion got status invalid (stopping propagation).
 [eva] Recording results for object_pointer_predicate
 [eva] Done for function object_pointer_predicate
 [eva] computing for function flexible_array_member <- main.
-  Called from invalid_pointer.c:197.
-[eva:alarm] invalid_pointer.c:185: Warning: 
+  Called from invalid_pointer.c:202.
+[eva:alarm] invalid_pointer.c:190: Warning: 
   out of bounds write. assert \valid(p_0 + 1);
-[kernel] invalid_pointer.c:185: Warning: 
+[kernel] invalid_pointer.c:190: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for flexible_array_member
 [eva] Done for function flexible_array_member
 [eva] computing for function signal <- main.
-  Called from invalid_pointer.c:199.
+  Called from invalid_pointer.c:204.
 [eva] using specification for function signal
-[eva] invalid_pointer.c:199: 
+[eva] invalid_pointer.c:204: 
   function signal: precondition 'valid_signal' got status valid.
-[eva] invalid_pointer.c:199: 
+[eva] invalid_pointer.c:204: 
   function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from invalid_pointer.c:200.
-[eva] invalid_pointer.c:200: 
+  Called from invalid_pointer.c:205.
+[eva] invalid_pointer.c:205: 
   function signal: precondition 'valid_signal' got status valid.
-[eva] invalid_pointer.c:200: 
+[eva] invalid_pointer.c:205: 
   function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from invalid_pointer.c:201.
-[eva] invalid_pointer.c:201: 
+  Called from invalid_pointer.c:206.
+[eva] invalid_pointer.c:206: 
   function signal: precondition 'valid_signal' got status valid.
-[eva] invalid_pointer.c:201: 
+[eva] invalid_pointer.c:206: 
   function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] Recording results for main
 [eva] Done for function main
-[eva] invalid_pointer.c:185: 
+[eva] invalid_pointer.c:190: 
   assertion 'Eva,mem_access' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
@@ -141,7 +143,7 @@
   p ∈ [--..--]
 [eva:final-states] Values at end of function object_pointer_predicate:
   Frama_C_entropy_source ∈ [--..--]
-  p ∈ [0..31]
+  p ∈ [10..31]
   i ∈ [0..20]
 [eva:final-states] Values at end of function pointer_computation:
   Frama_C_entropy_source ∈ [--..--]

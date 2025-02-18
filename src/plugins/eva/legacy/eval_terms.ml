@@ -2255,7 +2255,7 @@ and reduce_by_predicate ~alarm_mode env positive p =
     | _,Pvalid_read (_label,tsets) ->
       reduce_by_valid env positive Read tsets
     | _,Pobject_pointer (_label, tsets) ->
-      reduce_by_valid env positive No_access tsets
+      reduce_by_valid env positive Object_pointer tsets
 
     | _,Pvalid_function _tsets -> env (* TODO *)
 
@@ -2425,7 +2425,7 @@ and eval_predicate env pred =
         match p.pred_content with
         | Pvalid_read _ -> Read
         | Pvalid _ -> Write
-        | Pobject_pointer _ -> No_access
+        | Pobject_pointer _ -> Object_pointer
         | _ -> assert false
       in
       let typ_pointed = Logic_typing.ctype_of_pointed tsets.term_type in

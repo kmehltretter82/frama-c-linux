@@ -181,11 +181,12 @@ val max_valid_absolute_address: unit -> Int.t
 
 val bits_sizeof : t -> Int_Base.t
 
-(** Access kind: read/write of k bits, or no access.
-    Without any access, an offset must point into or just beyond the base ("one
-    past the last element of the array object", non-array object being viewed as
-    array of one element). *)
-type access = Read of Int.t | Write of Int.t | No_access
+(** Access kind: read/write of k bits, or no access:
+    - Object_pointer: the pointer must point into or just beyond the base ("one
+      past the last element of the array object", non-array object being viewed
+      as array of one element).
+    - Any_pointer: object pointer, function pointer or NULL. *)
+type access = Read of Int.t | Write of Int.t | Object_pointer | Any_pointer
 
 val is_valid_offset : access -> t -> Ival.t -> bool
 (** [is_valid_offset access b offset] holds iff the ival [offset] (expressed in

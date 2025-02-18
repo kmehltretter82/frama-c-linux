@@ -330,7 +330,7 @@ val loc_equal : location -> location -> bool
 val loc_size : location -> Int_Base.t
 
 (** Kind of memory access. *)
-type access = Read | Write | No_access
+type access = Read | Write | Object_pointer | Any_pointer
 
 (** Conversion into a base access, with the size information.
     Accesses of unknown sizes are converted into empty accesses.  *)
