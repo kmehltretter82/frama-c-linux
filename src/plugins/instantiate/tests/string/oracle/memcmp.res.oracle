@@ -18,10 +18,12 @@ struct incomplete;
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 4; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 4; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 4; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 4; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = len / 4;
@@ -56,10 +58,12 @@ int with_named(named s1[10], named s2[10])
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = len / 8;
@@ -87,10 +91,12 @@ int structure(struct X s1[10], struct X s2[10])
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = len / 8;
@@ -118,10 +124,12 @@ int pointers(int *s1[10], int *s2[10])
 /*@ requires aligned_end: len % 40 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 40; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 40; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 40; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 40; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = len / 40;
@@ -189,10 +197,12 @@ struct incomplete;
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 4; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 4; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 4; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 4; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = \old(len) / 4;
@@ -230,10 +240,12 @@ int with_named(named s1[10], named s2[10])
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = \old(len) / 8;
@@ -263,10 +275,12 @@ int structure(struct X s1[10], struct X s2[10])
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 8; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 8; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = \old(len) / 8;
@@ -296,10 +310,12 @@ int pointers(int *s1[10], int *s2[10])
 /*@ requires aligned_end: len % 40 ≡ 0;
     requires
       valid_read_s1:
-        \let __fc_len = len / 40; \valid_read(s1 + (0 .. __fc_len - 1));
+        \object_pointer(s1) ∧
+        (\let __fc_len = len / 40; \valid_read(s1 + (0 .. __fc_len - 1)));
     requires
       valid_read_s2:
-        \let __fc_len = len / 40; \valid_read(s2 + (0 .. __fc_len - 1));
+        \object_pointer(s2) ∧
+        (\let __fc_len = len / 40; \valid_read(s2 + (0 .. __fc_len - 1)));
     ensures
       equals:
         \let __fc_len = \old(len) / 40;

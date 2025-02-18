@@ -9,7 +9,9 @@ struct X {
 };
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 4;
@@ -45,7 +47,9 @@ struct X {
 };
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 4;

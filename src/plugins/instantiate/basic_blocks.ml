@@ -190,6 +190,9 @@ let pgeneric_valid_len_bytes ?loc validity lbl ptr bytes_len =
   plet_len_div_size ?loc ptr.term_type bytes_len
     (pgeneric_valid_buffer ?loc validity lbl ptr)
 
+let pobject_pointer ?loc label ptr =
+  Logic_const.pobject_pointer ?loc (label, ptr)
+
 let pvalid_len_bytes ?loc = pgeneric_valid_len_bytes ?loc pvalid
 let pvalid_read_len_bytes ?loc = pgeneric_valid_len_bytes ?loc pvalid_read
 

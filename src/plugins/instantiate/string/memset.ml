@@ -127,7 +127,9 @@ let generate_requires loc ptr value len =
           with pred_name = [ "in_bounds_value" ] } ]
   in
   List.map new_predicate (bounds @ [
-      { (pvalid_len_bytes ~loc here_label ptr len)
+      { (Logic_const.pand ~loc (
+            pobject_pointer ~loc here_label ptr,
+            pvalid_len_bytes ~loc here_label ptr len))
         with pred_name = ["valid_dest"] }
     ])
 
