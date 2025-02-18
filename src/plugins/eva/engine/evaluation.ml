@@ -1462,7 +1462,7 @@ module Make
       backward_offset fuel context state field.ftype remaining rem
     | Index (exp, remaining) ->
       let* v = find_val exp in
-      let typ_pointed = Ast_types.array_elem_type typ in
+      let typ_pointed = Ast_types.direct_element_type typ in
       let* env = fast_eval_environment state in
       let* rem, _ =
         eval_offset env ~reduce_valid_index:true typ_pointed remaining |> fst

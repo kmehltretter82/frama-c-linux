@@ -51,7 +51,7 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field m r fd) fd.ftype ofs
   | Index(e,ofs) ->
-    let elt = Ast_types.array_elem_type ty in
+    let elt = Ast_types.direct_element_type ty in
     ignore @@ add_exp m s e ;
     add_loffset m s (add_index m r elt) elt ofs
 

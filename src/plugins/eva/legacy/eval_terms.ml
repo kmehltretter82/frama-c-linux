@@ -1015,7 +1015,7 @@ let rec eval_term ~alarm_mode env t =
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
-    { etype = Cil_const.mk_tptr (Ast_types.array_elem_type r.etype);
+    { etype = Cil_const.mk_tptr (Ast_types.direct_element_type r.etype);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover;

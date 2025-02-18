@@ -436,30 +436,6 @@ let rec array_size ty =
   | TArray(_,None) -> Integer.zero
   | _ -> assert false
 
-let direct_element_type ty = match Ast_types.unroll_type_node ty with
-  | TArray(eltyp,_) -> eltyp
-  | _ -> assert false
-
-let element_type ty =
-  let rec elem_type ty = match Ast_types.unroll_type_node ty with
-    | TArray(eltyp,_) -> elem_type eltyp
-    | _ -> ty
-  in
-  match Ast_types.unroll_type_node ty with
-  | TArray (eltyp,_) -> elem_type eltyp
-  | _ -> assert false
-
-let direct_pointed_type ty =
-  match Ast_types.unroll_type_node ty with
-  | TPtr elemty -> elemty
-  | _ -> assert false
-
-let pointed_type ty =
-  let ty' = Ast_types.unroll_type (direct_pointed_type ty) in
-  match ty'.tnode with
-  | TArray _ -> element_type ty'
-  | _ -> ty'
-
 (* ************************************************************************** *)
 (** {2 Predefined} *)
 (* ************************************************************************** *)
@@ -495,12 +471,15 @@ let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
 let is_frama_c_builtin v =
   Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
 
+(* Deprecated *)
+
 let array_type ?length ?(attr=[]) ty =
   Cil_const.mk_tarray ~tattr:attr ty length
 
+let direct_element_type = Ast_types.direct_element_type
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+let element_type = Ast_types.element_type
+
+let direct_pointed_type = Ast_types.direct_pointed_type
+
+let pointed_type = Ast_types.pointed_type

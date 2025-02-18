@@ -151,7 +151,7 @@ struct
     | Field(f,offset) -> loc_of_offset env (M.field l f) f.ftype offset
     | Index(e,offset) ->
       let k = val_of_exp env e in
-      let te = Ast_types.array_elem_type typ in
+      let te = Ast_types.direct_element_type typ in
       let obj = Ctypes.object_of te in
       loc_of_offset env (M.shift l obj k) te offset
 

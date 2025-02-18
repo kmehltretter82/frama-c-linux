@@ -589,7 +589,7 @@ let rec ctype_of_pointed t =
 
 let rec ctype_of_array_elem t =
   match unroll_logic_type t with
-  | Ctype ty when Ast_types.is_array ty -> Ast_types.array_elem_type ty
+  | Ctype ty when Ast_types.is_array ty -> Ast_types.direct_element_type ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
   | _ ->
     Kernel.fatal ~current:true "type %a is not a pointer type"
@@ -1245,8 +1245,8 @@ struct
     Ast_types.is_array ctyp1 &&
     Ast_types.is_array ctyp2 &&
     is_same_c_type
-      (Ast_types.array_elem_type ctyp1)
-      (Ast_types.array_elem_type ctyp2)
+      (Ast_types.direct_element_type ctyp1)
+      (Ast_types.direct_element_type ctyp2)
 
   let is_same_logic_ptr_type ty1 ty2 =
     match (Logic_const.unroll_ltdef ty1, Logic_const.unroll_ltdef ty2) with
@@ -1287,8 +1287,8 @@ struct
     in
     let same_array_elt () =
       is_same_c_type
-        (Ast_types.array_elem_type ctyp1)
-        (Ast_types.array_elem_type ctyp2)
+        (Ast_types.direct_element_type ctyp1)
+        (Ast_types.direct_element_type ctyp2)
     in
     let compatible_pointed () =
       same_pointed () ||
@@ -1509,7 +1509,7 @@ struct
         Ast_types.is_array ty1 &&
         Ast_types.is_ptr ty2 &&
         is_same_c_type
-          (Ast_types.array_elem_type ty1)
+          (Ast_types.direct_element_type ty1)
           (Ast_types.direct_pointed_type ty2)
       then
         if Logic_utils.is_C_array oterm then
@@ -2249,7 +2249,7 @@ struct
       let idx = idx_typing idx in
       let ofs_type =
         if Ast_types.is_array t_type && check_type idx.term_type
-        then Ctype (Ast_types.array_elem_type t_type)
+        then Ctype (Ast_types.direct_element_type t_type)
         else C.error loc "subscripted value is not an array"
       in mk_idx idx, ofs_type
 

@@ -35,7 +35,7 @@ let type_of_const : constant -> typ = function
 let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | NoOffset -> basetyp
   | Index (_, o) ->
-    type_of_offset (Ast_types.array_elem_type basetyp) o
+    type_of_offset (Ast_types.direct_element_type basetyp) o
   | Field (fi, o) ->
     let base_attrs = (Ast_types.unroll_type basetyp).tattr in
     let base_attrs = Ast_attributes.filter_qualifiers base_attrs in

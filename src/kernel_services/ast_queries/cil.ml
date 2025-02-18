@@ -3660,7 +3660,7 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
           | Some i -> Integer.to_int_exn i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
-        let bt = Ast_types.array_elem_type baset in
+        let bt = Ast_types.direct_element_type baset in
         let bitsbt = bitsSizeOf bt in
         loopOff bt bitsbt (start + ei * bitsbt) off
       end
@@ -6822,5 +6822,5 @@ let isLogicFunctionType = is_logic_fun
 let isLogicFunPtrType = is_logic_fun_ptr
 
 let typeOf_pointed = direct_pointed_type
-let typeOf_array_elem = array_elem_type
+let typeOf_array_elem = direct_element_type
 let typeOf_array_elem_size = array_elem_type_and_size

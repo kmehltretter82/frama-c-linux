@@ -263,23 +263,34 @@ val is_variadic_list: typ -> bool
 (** {2 Type access} *)
 (* ************************************************************************* *)
 
-val direct_pointed_type : typ -> typ
-(** Returns the type pointed by the given type.
-    @raise AbortFatal it is not a pointer type.
-*)
-
-val array_elem_type : typ -> typ
 (** Returns the type of the array elements of the given type.
     @raise AbortFatal it is not an array type.
 *)
+val direct_element_type : typ -> typ
 
-val array_elem_type_and_size : typ -> typ * exp option
+(** Returns the elements type using {!direct_element_type}, but if the resulting
+    type is an array, recursively call {!element_type}.
+*)
+val element_type : typ -> typ
+
+(** Returns the type directly pointed by the given type.
+    @raise AbortFatal it is not a pointer type.
+*)
+val direct_pointed_type : typ -> typ
+
+(** Returns the pointed type using {!direct_pointed_type}, but if the resulting
+    type is an array, returns the element type instead using {!element_type}
+*)
+val pointed_type : typ -> typ
+
 (** Returns the type of the array elements of the given type, and the size
     of the array, if any.
     @raise AbortFatal it is not an array type.
     @before Frama-C+dev In Cil this function applied {!Cil.constFoldToInt} on
     array's size and returned a [Z.t option].
 *)
+val array_elem_type_and_size : typ -> typ * exp option
+
 
 (* ************************************************************************* *)
 (** {2 Logic Type checkers} *)

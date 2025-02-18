@@ -457,21 +457,32 @@ let is_variadic_list t =
 (* Type access. *)
 (* ************ *)
 
-let direct_pointed_type typ =
-  match unroll_type_skel typ with
-  | TPtr typ -> typ
-  | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
-
-let array_elem_type t =
+let direct_element_type t =
   match unroll_type_node t with
-  | TArray (ty_elem, _) -> ty_elem
+  | TArray (elem_t, _) -> elem_t
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+
+let rec element_type t =
+  let t' = direct_element_type t in
+  match unroll_type_node t' with
+  | TArray _ -> element_type t'
+  | _ -> t'
 
 let array_elem_type_and_size t =
   match unroll_type_node t with
-  | TArray (ty_elem, arr_size) ->
-    ty_elem, arr_size
+  | TArray (ty_elem, arr_size) -> ty_elem, arr_size
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+
+let direct_pointed_type t =
+  match unroll_type_skel t with
+  | TPtr t -> t
+  | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref t
+
+let pointed_type t =
+  let t' = direct_pointed_type t in
+  match unroll_type_node t' with
+  | TArray _ -> element_type t'
+  | _ -> t'
 
 (* ************** *)
 (* Type checkers. *)

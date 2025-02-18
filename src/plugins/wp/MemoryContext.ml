@@ -145,7 +145,7 @@ let type_of_zone = function
   | Ptr vi -> vi.vtype
   | Var vi -> Cil_const.mk_tptr vi.vtype
   | Arr vi when Ast_types.is_ptr vi.vtype -> vi.vtype
-  | Arr vi -> Cil_const.mk_tptr (Ast_types.array_elem_type vi.vtype)
+  | Arr vi -> Cil_const.mk_tptr (Ast_types.direct_element_type vi.vtype)
 
 let zone_to_term ?(to_char=false) loc zone =
   let typ = Ctype (type_of_zone zone) in

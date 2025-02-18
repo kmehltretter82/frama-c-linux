@@ -501,7 +501,7 @@ and offset (m: map) (r: node) (ty: typ) (ofs: offset) : node =
   | Field (fd, ofs) ->
     offset m (field m r fd) fd.ftype ofs
   | Index (_, ofs) ->
-    let te = Ast_types.array_elem_type ty in
+    let te = Ast_types.direct_element_type ty in
     offset m (index m r te) te ofs
 
 and exp (m: map) (e: exp) : node option =

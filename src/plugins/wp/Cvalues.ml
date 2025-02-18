@@ -569,7 +569,7 @@ let is_false p = e_if (e_prop p) e_zero e_one
 
 let startof ~shift loc typ =
   if Ast_types.is_array typ then
-    let t_elt = Ast_types.array_elem_type typ in
+    let t_elt = Ast_types.direct_element_type typ in
     shift loc (Ctypes.object_of t_elt) e_zero
   else loc
 

@@ -1260,7 +1260,7 @@ module State = struct
         with Cil.SizeOfError _ -> `Top
       end
     | Index (exp, sub) ->
-      let elem_type = Ast_types.array_elem_type base_type in
+      let elem_type = Ast_types.direct_element_type base_type in
       let* cvalue = eval exp in
       let* index =
         try

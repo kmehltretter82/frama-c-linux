@@ -162,7 +162,7 @@ let rec parse_lpath (env:env) (e: lexpr) =
       { loc ; step = Shift lv ; typ = typ }
     else
     if Ast_types.is_array typ then
-      let te = Ast_types.array_elem_type typ in
+      let te = Ast_types.direct_element_type typ in
       { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
     else
       error env ~loc "Pointer-type expected for operator '+'"

@@ -104,7 +104,7 @@ let type_of_array_elem =
     (fun t ->
        match unroll_logic_type t with
          Ctype ty when Ast_types.is_array ty ->
-         Ctype (Ast_types.array_elem_type ty)
+         Ctype (Ast_types.direct_element_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not an array type"
            Cil_datatype.Logic_type.pretty t)
@@ -2570,7 +2570,7 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
           | Some i -> i
           | None -> raise (SizeOfError ("Index is not constant", typ))
         in
-        let typ_e = Ast_types.array_elem_type typ in
+        let typ_e = Ast_types.direct_element_type typ in
         let size_e = Integer.of_int (Cil.bitsSizeOf typ_e) in
         loopOff typ size_e (Integer.(add start (mul ei size_e))) off
       end
