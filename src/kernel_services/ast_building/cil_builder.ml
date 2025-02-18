@@ -544,7 +544,7 @@ struct
       Cil.(new_exp ~loc (Cil_types.UnOp (op, mkCastT ~oldt ~newt e', oldt)))
     | Binop (op,e1,e2) ->
       let is_pointer_type e =
-        Ast_types.is_pointer_type (Cil.typeOf e)
+        Ast_types.is_ptr (Cil.typeOf e)
       in
       let e1' = build_exp ~scope ~loc e1
       and e2' = build_exp ~scope ~loc e2 in

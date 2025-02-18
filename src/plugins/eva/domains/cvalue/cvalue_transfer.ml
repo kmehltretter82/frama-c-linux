@@ -70,7 +70,7 @@ let warn_imprecise_offsm_write ?prefix lval offsm =
 (* ---------------------------------------------------------------------- *)
 
 let reduce valuation lval value t =
-  if Ast_types.type_has_qualifier "volatile" lval.typ
+  if Ast_types.has_qualifier "volatile" lval.typ
   then t
   else
     match valuation.Abstract_domain.find_loc lval with
@@ -92,7 +92,7 @@ let update valuation t =
   let process exp record t =
     match exp.node with
     | Lval lv ->
-      if record.reductness = Reduced && Ast_types.is_scalar_type lv.typ
+      if record.reductness = Reduced && Ast_types.is_scalar lv.typ
       then
         let {v; initialized; escaping} = record.value in
         let v = unbottomize v in
@@ -122,7 +122,7 @@ let write_abstract_value state (lval, loc) assigned_value =
   let {v; initialized; escaping} = assigned_value in
   let value = unbottomize v in
   let value =
-    if Ast_types.type_has_qualifier "volatile" lval.typ
+    if Ast_types.has_qualifier "volatile" lval.typ
     then Cvalue_forward.make_volatile value
     else value
   in
@@ -142,8 +142,8 @@ let copy_one_loc state left_lv right_lv =
   let right_loc = right_loc.Locations.loc in
   let offsetmap = Cvalue.Model.copy_offsetmap right_loc size state in
   let make_volatile =
-    Ast_types.type_has_qualifier "volatile" left_lval.typ ||
-    Ast_types.type_has_qualifier "volatile" right_lval.typ
+    Ast_types.has_qualifier "volatile" left_lval.typ ||
+    Ast_types.has_qualifier "volatile" right_lval.typ
   in
   match offsetmap with
   | `Bottom -> `Bottom

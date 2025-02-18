@@ -204,7 +204,7 @@ class slocVisitor ~libc : sloc_visitor = object(self)
 
   method! vvdec vi =
     if not (Varinfo.Set.mem vi seen_vars) then (
-      if Ast_types.is_function_type vi.vtype then (
+      if Ast_types.is_fun vi.vtype then (
         if consider_function ~libc vi then begin
           global_metrics := incr_funcs !global_metrics;
           (* Mark the function as seen, adding 0 to the number of calls *)

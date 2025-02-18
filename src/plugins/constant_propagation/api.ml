@@ -72,7 +72,7 @@ class propagate project fnames ~cast_intro = object(self)
     in
     must_add_decl <- Varinfo.Set.add vi' must_add_decl;
     known_globals <- Varinfo.Set.add vi known_globals;
-    if Ast_types.is_function_type vi.vtype then begin
+    if Ast_types.is_fun vi.vtype then begin
       let kf = Globals.Functions.get vi in
       let new_kf = Visitor_behavior.Memo.kernel_function self#behavior kf in
       Queue.add (fun () -> Globals.Functions.register new_kf)
@@ -87,7 +87,7 @@ class propagate project fnames ~cast_intro = object(self)
       if ignore_const_cast then
         match Ast_types.unroll_type oldt, Ast_types.unroll_type newt with
         | { tnode = TPtr typ; tattr = attrs }, { tnode = TPtr typ'; tattr =  attrs' } ->
-          let drop_const ty = Ast_types.type_remove_attributes ["const"] ty in
+          let drop_const ty = Ast_types.remove_attributes ["const"] ty in
           Cil_const.mk_tptr ~tattr:attrs  (drop_const typ),
           Cil_const.mk_tptr ~tattr:attrs' (drop_const typ')
         | _ -> oldt, newt
@@ -157,10 +157,10 @@ class propagate project fnames ~cast_intro = object(self)
           let offset = Ival.project_int m in (* these are bytes *)
           let expr' =
             try
-              if not (Ast_types.is_pointer_type typ_e) then
+              if not (Ast_types.is_ptr typ_e) then
                 raise Bit_utils.NoMatchingOffset;
-              let typ_pointed = Ast_types.(unroll_type (type_of_pointed typ_e)) in
-              if Ast_types.is_void_type typ_pointed then
+              let typ_pointed = Ast_types.(unroll_type (direct_pointed_type typ_e)) in
+              if Ast_types.is_void typ_pointed then
                 raise Bit_utils.NoMatchingOffset;
               let offset = Integer.mul offset Integer.eight in
               let m = Bit_utils.MatchType typ_pointed in
@@ -172,7 +172,7 @@ class propagate project fnames ~cast_intro = object(self)
                  when [idx] or [rem] is zero. *)
               let array, idx, rem =
                 let array, sizeof_pointed =
-                  let array = Ast_types.is_array_type vi.vtype in
+                  let array = Ast_types.is_array vi.vtype in
                   let size = if array
                     then Bit_utils.osizeof_pointed vi.vtype
                     else Bit_utils.osizeof vi.vtype
@@ -307,7 +307,7 @@ class propagate project fnames ~cast_intro = object(self)
            PropagationParameters.feedback ~level:2
              "Adding declaration of global %a" Printer.pp_varinfo vi;
            let g' =
-             if Ast_types.is_function_type vi.vtype
+             if Ast_types.is_fun vi.vtype
              then GFunDecl(Cil.empty_funspec(), vi, vi.vdecl)
              else GVarDecl(vi, vi.vdecl)
            in

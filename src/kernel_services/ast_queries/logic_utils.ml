@@ -72,9 +72,9 @@ let is_instance_of vars t1 t2 =
 (** {1 From C to logic}*)
 (* ************************************************************************* *)
 
-let plain_arithmetic_type t = Ast_types.is_logic_arithmetic_type t
-let plain_integral_type t = Ast_types.is_logic_integral_type t
-let plain_fun_ptr t = Ast_types.is_logic_fun_ptr_type t
+let plain_arithmetic_type t = Ast_types.is_logic_arithmetic t
+let plain_integral_type t = Ast_types.is_logic_integral t
+let plain_fun_ptr t = Ast_types.is_logic_fun_ptr t
 
 let is_arithmetic_type = plain_or_set plain_arithmetic_type
 let is_integral_type = plain_or_set plain_integral_type
@@ -88,12 +88,12 @@ let type_of_set_elem t = Logic_const.type_of_element (unroll_logic_type t)
 
 let plain_array_type t =
   match unroll_logic_type t with
-  | Ctype ct -> Ast_types.is_array_type ct
+  | Ctype ct -> Ast_types.is_array ct
   | _ -> false
 
 let plain_pointer_type t =
   match unroll_logic_type t with
-  | Ctype ct -> Ast_types.is_pointer_type ct
+  | Ctype ct -> Ast_types.is_ptr ct
   | _ -> false
 
 let is_array_type = plain_or_set plain_array_type
@@ -103,8 +103,8 @@ let type_of_array_elem =
   Logic_const.transform_element
     (fun t ->
        match unroll_logic_type t with
-         Ctype ty when Ast_types.is_array_type ty ->
-         Ctype (Ast_types.type_of_array_elem ty)
+         Ctype ty when Ast_types.is_array ty ->
+         Ctype (Ast_types.array_elem_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not an array type"
            Cil_datatype.Logic_type.pretty t)
@@ -113,8 +113,8 @@ let type_of_pointed =
   Logic_const.transform_element
     (fun t ->
        match unroll_logic_type t with
-         Ctype ty when Ast_types.is_pointer_type ty ->
-         Ctype (Ast_types.type_of_pointed ty)
+         Ctype ty when Ast_types.is_ptr ty ->
+         Ctype (Ast_types.direct_pointed_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not a pointer type"
            Cil_datatype.Logic_type.pretty t)
@@ -122,17 +122,17 @@ let type_of_pointed =
 let isLogicType f t = plain_or_set (Logic_const.isLogicCType f) t
 
 (** true if the type is a C array (or a set of)*)
-let isLogicArrayType = isLogicType Ast_types.is_array_type
+let isLogicArrayType = isLogicType Ast_types.is_array
 
-let isLogicCharType = isLogicType Ast_types.is_char_type
+let isLogicCharType = isLogicType Ast_types.is_char
 
-let isLogicAnyCharType = isLogicType Ast_types.is_any_char_type
+let isLogicAnyCharType = isLogicType Ast_types.is_any_char
 
-let isLogicVoidType = isLogicType Ast_types.is_void_type
+let isLogicVoidType = isLogicType Ast_types.is_void
 
-let isLogicPointerType = isLogicType Ast_types.is_pointer_type
+let isLogicPointerType = isLogicType Ast_types.is_ptr
 
-let isLogicVoidPointerType = isLogicType Ast_types.is_void_ptr_type
+let isLogicVoidPointerType = isLogicType Ast_types.is_void_ptr
 
 let logicCType t =
   let rec logicCType = function
@@ -179,7 +179,7 @@ let logic_type_remove_qualifiers =
   let plain typ =
     match unroll_logic_type typ with
     | Ctype t ->
-      let t' = Ast_types.type_remove_qualifier_attributes t in
+      let t' = Ast_types.remove_qualifiers t in
       if Cil_datatype.Typ.equal t t' then typ else Ctype t'
     | _ -> typ
   in
@@ -187,8 +187,8 @@ let logic_type_remove_qualifiers =
 
 let coerce_type typ =
   let ty = Ast_types.unroll_type typ in
-  if Ast_types.is_integral_type ty then Linteger
-  else if Ast_types.is_floating_type ty then Lreal
+  if Ast_types.is_integral ty then Linteger
+  else if Ast_types.is_float ty then Lreal
   else Ctype typ
 
 let translate_old_label s p =
@@ -285,20 +285,20 @@ let equal_ltype = Cil_datatype.Logic_type.equal
 
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
 let mk_cast ?loc ?(force=false) newt t =
-  let newt' = Ast_types.type_remove_attributes_for_logic_type newt in
+  let newt' = Ast_types.remove_attributes_for_logic_type newt in
   if equal_ltype (Ctype newt') t.term_type then t else
     let rec unroll_cast e = match e.term_node with
       | TCast(false, Ctype oldt,e)
-        when Ast_types.(is_pointer_type newt' && is_pointer_type oldt)
+        when Ast_types.(is_ptr newt' && is_ptr oldt)
           || equal_ltype
-               (Ctype (Ast_types.type_remove_attributes_for_logic_type oldt))
+               (Ctype (Ast_types.remove_attributes_for_logic_type oldt))
                (Ctype newt')
         -> unroll_cast e
       | TCast(true,Linteger,e)
-        when Ast_types.is_scalar_type newt'
+        when Ast_types.is_scalar newt'
         -> unroll_cast e
       | TCast(true,Lreal,e)
-        when Ast_types.is_floating_type newt'
+        when Ast_types.is_float newt'
         -> unroll_cast e
       | _ -> e
     in
@@ -564,7 +564,7 @@ let rec expr_to_term ?(coerce=false) e =
     | AlignOfE e -> TAlignOf (Cil.typeOf e), ctyp
     | Lval lv -> TLval (lval_to_term_lval lv), ctyp
     | CastE (ty,e) ->
-      let coerce = Ast_types.is_integral_type (Cil.typeOf e) in
+      let coerce = Ast_types.is_integral (Cil.typeOf e) in
       let t = mk_cast ~loc ty (expr_to_term ~coerce e) in
       t.term_node , t.term_type
   in
@@ -692,7 +692,7 @@ let array_with_range arr size =
   let arr = Cil.stripCasts arr in
   let typ_arr = typeOf arr in
   let no_cast =
-    Ast_types.(is_any_char_ptr_type typ_arr || is_any_char_array_type typ_arr)
+    Ast_types.(is_any_char_ptr typ_arr || is_any_char_array typ_arr)
   in
   let char_ptr = Ctype Cil_const.charPtrType in
   let arr = expr_to_term arr in
@@ -2570,7 +2570,7 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
           | Some i -> i
           | None -> raise (SizeOfError ("Index is not constant", typ))
         in
-        let typ_e = Ast_types.type_of_array_elem typ in
+        let typ_e = Ast_types.array_elem_type typ in
         let size_e = Integer.of_int (Cil.bitsSizeOf typ_e) in
         loopOff typ size_e (Integer.(add start (mul ei size_e))) off
       end
@@ -2698,9 +2698,9 @@ let eval_term_lval global_find_init (lhost, loff) =
   | TVar lvi -> begin
       (* See if we can evaluate the l-value using the initializer of lvi*)
       let off_type = Cil.typeTermOffset lvi.lv_type loff in
-      if Logic_const.plain_or_set Ast_types.is_logic_integral_type off_type then
+      if Logic_const.plain_or_set Ast_types.is_logic_integral off_type then
         match lvi.lv_origin with
-        | Some vi when vi.vglob && Ast_types.type_has_qualifier "const" vi.vtype ->
+        | Some vi when vi.vglob && Ast_types.has_qualifier "const" vi.vtype ->
           find_initial_value (global_find_init vi) loff
         | _ -> None
       else None

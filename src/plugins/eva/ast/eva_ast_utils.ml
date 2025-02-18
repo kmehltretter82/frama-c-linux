@@ -254,7 +254,7 @@ let rec to_integer e =
   | Const (CInt64 (n,_,_)) -> Some n
   | Const (CChr c) -> Some (Cil.charConstToInt c)
   | Const (CEnum ({eival = v}, _)) -> Cil.isInteger v
-  | CastE (typ, e) when Ast_types.is_pointer_type typ ->
+  | CastE (typ, e) when Ast_types.is_ptr typ ->
     begin
       match to_integer e with
       | Some i as r when Cil.fitsInInt (Machine.uintptr_kind ()) i -> r
@@ -268,7 +268,7 @@ let is_zero exp =
   | Some i -> Integer.is_zero i
 
 let is_zero_ptr exp =
-  is_zero exp && Ast_types.is_pointer_type exp.typ
+  is_zero exp && Ast_types.is_ptr exp.typ
 
 (* Constant folding *)
 

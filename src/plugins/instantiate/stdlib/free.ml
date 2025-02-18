@@ -87,7 +87,7 @@ let well_typed_call _ret _fct args =
   match args with
   | [ ptr ] ->
     let t = Cil.typeOf (Cil.stripCasts ptr) in
-    Ast_types.is_pointer_type t && not (Ast_types.is_void_ptr_type t)
+    Ast_types.is_ptr t && not (Ast_types.is_void_ptr t)
   | _ -> false
 
 let key_from_call _ret _fct args =
@@ -95,8 +95,8 @@ let key_from_call _ret _fct args =
   | [ ptr ] ->
     let ptr = Cil.stripCasts ptr in
     let ptr_t = Ast_types.unroll_type_deep (Cil.typeOf ptr) in
-    let ptr_t = Ast_types.type_remove_qualifier_attributes_deep ptr_t in
-    Ast_types.type_of_pointed ptr_t
+    let ptr_t = Ast_types.remove_qualifiers_deep ptr_t in
+    Ast_types.direct_pointed_type ptr_t
   | _ -> unexpected "trying to generate a key on an ill-typed call"
 
 let retype_args _typ args = List.map Cil.stripCasts args

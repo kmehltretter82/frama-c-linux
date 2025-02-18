@@ -100,7 +100,7 @@ let apply_on_vi f localizable = match localizable with
   | PVDecl(_,_,vi)
   | PLval(_, _, (Var vi, NoOffset))
   | PTermLval(_, _, _, (TVar { lv_origin = Some vi }, TNoOffset)) ->
-    if not (Ast_types.is_function_type vi.vtype) then
+    if not (Ast_types.is_fun vi.vtype) then
       f vi
   | _ -> ()
 

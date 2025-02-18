@@ -397,7 +397,7 @@ let add_points_to (m: map) (a: node) (b : node) =
   end
 
 let add_value (m:map) (rv:node) (ty:typ) : node option =
-  if Ast_types.is_pointer_type ty then
+  if Ast_types.is_ptr ty then
     begin
       failwith_locked m "Region.Memory.add_value" ;
       let rp = new_chunk m ~pointed:rv () in
@@ -501,7 +501,7 @@ and offset (m: map) (r: node) (ty: typ) (ofs: offset) : node =
   | Field (fd, ofs) ->
     offset m (field m r fd) fd.ftype ofs
   | Index (_, ofs) ->
-    let te = Ast_types.type_of_array_elem ty in
+    let te = Ast_types.array_elem_type ty in
     offset m (index m r te) te ofs
 
 and exp (m: map) (e: exp) : node option =

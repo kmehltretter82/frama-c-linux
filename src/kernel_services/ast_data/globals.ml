@@ -310,7 +310,7 @@ module Functions = struct
   let get vi =
     (*Kernel.feedback "get %a in %a" Cil_datatype.Varinfo.pretty vi
       Project.pretty (Project.current()); *)
-    if not (Ast_types.is_function_type vi.vtype) then raise Not_found;
+    if not (Ast_types.is_fun vi.vtype) then raise Not_found;
     let add v =
       (* Builtins don't automatically get a kernel function (unless they
          are used explicitly), but might still be accessed after AST

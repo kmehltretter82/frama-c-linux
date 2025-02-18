@@ -149,10 +149,10 @@ let fval typ (exp : Exp.exp) (fval : Fval.t) : pred =
 let domain lv value =
   let exp = Exp.of_lval lv in
   let typ = Cil.typeOfLval lv in
-  if Ast_types.is_integral_type typ then
+  if Ast_types.is_integral typ then
     Results.as_ival value |> Result.fold ~error ~ok:(ival exp)
   else
-  if Ast_types.is_floating_type typ then
+  if Ast_types.is_float typ then
     Results.as_fval value |> Result.fold ~error ~ok:(fval typ exp)
   else
     True

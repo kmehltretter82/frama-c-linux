@@ -136,7 +136,7 @@ let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
 
 let always_initialized x =
-  (x.vformal || x.vglob) && not @@ Ast_types.is_struct_or_union_type x.vtype
+  (x.vformal || x.vglob) && not @@ Ast_types.is_struct_or_union x.vtype
 
 (* -------------------------------------------------------------------------- *)
 (* --- Length of empty compinfos                                          --- *)
@@ -568,8 +568,8 @@ let is_false p = e_if (e_prop p) e_zero e_one
 (* -------------------------------------------------------------------------- *)
 
 let startof ~shift loc typ =
-  if Ast_types.is_array_type typ then
-    let t_elt = Ast_types.type_of_array_elem typ in
+  if Ast_types.is_array typ then
+    let t_elt = Ast_types.array_elem_type typ in
     shift loc (Ctypes.object_of t_elt) e_zero
   else loc
 

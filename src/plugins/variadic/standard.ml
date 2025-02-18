@@ -79,7 +79,7 @@ let integral_rep ikind =
   Cil.bitsSizeOfInt ikind, Cil.isSigned ikind
 
 let expose t =
-  Ast_types.type_remove_attributes_for_c_cast (Ast_types.unroll_type t)
+  Ast_types.remove_attributes_for_c_cast (Ast_types.unroll_type t)
 
 (* From most permissive to least permissive *)
 type castability = Strict      (* strictly allowed by the C standard *)
@@ -313,7 +313,7 @@ let aggregator_call ~builder aggregator vf args =
 let rec check_arg_matching expected given =
   match Ast_types.unroll_type_node given, Ast_types.unroll_type_node expected with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
-  | TPtr _, _ when Ast_types.is_void_ptr_type expected -> true
+  | TPtr _, _ when Ast_types.is_void_ptr expected -> true
   | TPtr t1, TPtr t2 -> check_arg_matching t1 t2
   | _, _ -> not (Cil.need_cast given expected)
 
@@ -477,7 +477,7 @@ let build_specialized_fun ~builder env vf format_fun tvparams =
     let name = if name = "" then fresh_param_name () else name in
     Build.parameter ~attributes typ name
   and add_variadic_param (typ,_dir) =
-    let typ = if Ast_types.is_integral_type typ then
+    let typ = if Ast_types.is_integral typ then
         Cil.integralPromotion typ
       else
         typ
@@ -607,7 +607,7 @@ let build_specialized_fun ~builder env vf format_fun tvparams =
   end;
 
   (* assign \result \from indirect:sources *)
-  if not (Ast_types.is_void_type ret_typ) then
+  if not (Ast_types.is_void ret_typ) then
     Build.(assigns [result] (List.map indirect !sources));
   (* assigns dests \from sources *)
   Build.assigns !dests !sources;
@@ -648,7 +648,7 @@ let rec format_of_type vf k t =
   | TPtr _ ->
     (* technically, we might still want to write/read the actual pointer,
        but this is not the most likely possibility. *)
-    if Ast_types.is_char_ptr_type t then
+    if Ast_types.is_char_ptr t then
       None, `s
     else
       None, `p
@@ -704,7 +704,7 @@ let infer_format_from_args vf format_fun args =
       match format_fun.f_kind with
       | PrintfLike -> t
       | ScanfLike ->
-        if not (Ast_types.is_pointer_type t) then begin
+        if not (Ast_types.is_ptr t) then begin
           let source = fst arg.eloc in
           Self.warning ~source ~wkey:wkey_typing
             "Expecting pointer as parameter of scanf function. \
@@ -712,7 +712,7 @@ let infer_format_from_args vf format_fun args =
             Printer.pp_exp arg Printer.pp_typ t;
           raise (Translate_call_exn vf.vf_decl);
         end;
-        Ast_types.type_of_pointed t
+        Ast_types.direct_pointed_type t
     in
     format_of_type vf format_fun.f_kind t
   in

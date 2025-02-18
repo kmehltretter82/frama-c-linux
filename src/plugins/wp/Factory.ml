@@ -139,7 +139,7 @@ end
 (* --- RefUsage-based Proxies                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_ptr x = Ast_types.is_pointer_type x.Cil_types.vtype
+let is_ptr x = Ast_types.is_ptr x.Cil_types.vtype
 let is_formal_ptr x = x.Cil_types.vformal && is_ptr x
 
 let is_init kf x =
@@ -156,7 +156,7 @@ let refusage_param ~byref ~context x =
   | RefUsage.ByAddr -> MemoryContext.ByAddr
   | RefUsage.ByValue ->
     if context && is_formal_ptr x then MemoryContext.InContext (validity x)
-    else if is_ptr x && not @@ Ast_types.is_fun_ptr_type x.Cil_types.vtype
+    else if is_ptr x && not @@ Ast_types.is_fun_ptr x.Cil_types.vtype
     then MemoryContext.ByShift
     else MemoryContext.ByValue
   | RefUsage.ByRef ->

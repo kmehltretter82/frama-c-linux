@@ -171,10 +171,10 @@ module Readout = struct
                       error for certain reconstructed lvals involving a union
                       type. See tests/known_bugs/union_readback.c *)
                    let ty = Cil.typeOfLval lv in
-                   if Ast_types.is_array_type ty then
+                   if Ast_types.is_array ty then
                      Cil.addOffsetLval (Index (Simplified.nul_exp, NoOffset)) lv
                    else
-                     let () = if not @@ Ast_types.is_pointer_type ty then
+                     let () = if not @@ Ast_types.is_ptr ty then
                          Options.debug "unexpected type: %a" Printer.pp_typ ty
                      in
                      Mem (Cil.dummy_exp @@ Lval lv), NoOffset
@@ -581,7 +581,7 @@ let set_type s v1 v2 : state =
 
 let assignment s lv (e:exp) : state =
   assert_invariants s;
-  match Ast_types.is_pointer_type (Cil.typeOf e), LvalOrRef.from_exp e with
+  match Ast_types.is_ptr (Cil.typeOf e), LvalOrRef.from_exp e with
   | false, _ | _, None -> s
   | true, Some y ->
     let v1, s = find_or_create_lval_vertex (Lval.simplify lv) s in

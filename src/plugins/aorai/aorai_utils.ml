@@ -420,7 +420,7 @@ let rec term_to_exp t res =
     new_exp ~loc
       (BinOp(binop, term_to_exp t1 res, term_to_exp t2 res, Cil_const.intType))
   | TCast (false, Ctype ty, {term_node = TConst(LReal lreal)})
-    when Ast_types.is_floating_type ty ->
+    when Ast_types.is_float ty ->
     (match Ast_types.unroll_type_node ty with
      | TFloat fk ->
        new_exp ~loc
@@ -505,7 +505,7 @@ let get_bhv_aux_fct kf bhv =
     let assumes = Visitor.visitFramacPredicates vis bhv.b_assumes in
     let assumes = List.map Logic_const.refresh_predicate assumes in
     let assigns = Writes [] in
-    let ret_typ = Ast_types.type_add_ghost Cil_const.intType in
+    let ret_typ = Ast_types.add_ghost Cil_const.intType in
     let post_cond =
       [Normal,
        Logic_const.(
@@ -704,7 +704,7 @@ let mk_gvar ?init ~ty name =
   (* See if the variable is already declared *)
   let vi =
     try
-      let ty' = Ast_types.type_add_attributes [("ghost", [])] ty in
+      let ty' = Ast_types.add_attributes [("ghost", [])] ty in
       let vi = Globals.Vars.find_from_astinfo name Global in
       if not (Cil_datatype.Typ.equal vi.vtype ty') then
         Aorai_option.abort "Global %s is declared with type %a instead of %a"
@@ -934,7 +934,7 @@ class visit_decl_loops_init () =
           let f = Option.get self#current_func in
           let name = Data_for_aorai.loopInit ^ "_" ^ (string_of_int stmt.sid) in
           let typ =
-            Ast_types.type_add_attributes
+            Ast_types.add_attributes
               [(Ast_attributes.frama_c_ghost_formal,[])] Cil_const.intType
           in
           let var = Cil.makeLocalVar ~ghost:true f ~scope name typ in

@@ -794,7 +794,7 @@ module BASE = WpContext.Generator(Cil_datatype.Varinfo)
 
       let compile vi =
         let result = Logic.Int in
-        let acs_rd = Ast_types.type_has_qualifier "const" vi.vtype in
+        let acs_rd = Ast_types.has_qualifier "const" vi.vtype in
         let prefix =
           if vi.vglob
           then if acs_rd then "K" else "G"

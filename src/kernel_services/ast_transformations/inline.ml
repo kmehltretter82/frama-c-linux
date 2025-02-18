@@ -226,7 +226,7 @@ let inliner functions_to_inline = object (self)
             | None, Some _ -> false, return, args
             | None, None ->
               let rt, _, _,_ = Cil.splitFunctionTypeVI f in
-              if Ast_types.is_void_type rt then false,return, args
+              if Ast_types.is_void rt then false,return, args
               else begin
                 let scope = Stack.top block_stack in
                 let v =
@@ -250,7 +250,7 @@ let inliner functions_to_inline = object (self)
                  or const: *)
               r.vdefined <- false;
               Cil.update_var_type
-                r (Ast_types.type_remove_attributes ["const"] r.vtype);
+                r (Ast_types.remove_attributes ["const"] r.vtype);
               false, None, (Cil.mkAddrOf ~loc (Cil.var r)) :: args
             | Some _, _ ->
               Kernel.fatal "Attempt to initialize an inexistent varinfo"

@@ -24,7 +24,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let const_of t = Ast_types.type_add_attributes [("const", [])] t
+let const_of t = Ast_types.add_attributes [("const", [])] t
 
 let size_t () =
   Globals.Types.find_type Logic_typing.Typedef "size_t"
@@ -93,9 +93,9 @@ let cvar_to_tvar vi = tvar (cvar_to_lvar vi)
 let tminus ?loc t1 t2 =
   let minus, typ = match t1.term_type, t2.term_type with
     | Ctype(t1), Ctype(t2)
-      when Ast_types.is_pointer_type t1 && Ast_types.is_pointer_type t2 ->
+      when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
       MinusPP, Linteger
-    | Ctype(t), _ when Ast_types.is_pointer_type t ->
+    | Ctype(t), _ when Ast_types.is_ptr t ->
       MinusPI, Ctype(t)
     | t, _ ->
       MinusA, t
@@ -104,7 +104,7 @@ let tminus ?loc t1 t2 =
 
 let tplus ?loc t1 t2 =
   let plus = match t1.term_type with
-    | Ctype(t) when Ast_types.is_pointer_type t -> PlusPI
+    | Ctype(t) when Ast_types.is_ptr t -> PlusPI
     | _ -> PlusA
   in
   term ?loc (TBinOp(plus, t1, t2)) t1.term_type

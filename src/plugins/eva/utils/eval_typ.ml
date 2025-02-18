@@ -117,7 +117,7 @@ let compatible_functions typ_pointer ?args kfs =
   let typ_pointer = refine_fun_ptr typ_pointer args in
   let check_pointer (list, alarm) kf =
     let typ = Kernel_function.get_type kf in
-    if Ast_types.is_function_type typ then
+    if Ast_types.is_fun typ then
       match is_compatible_function ~typ_pointed:typ_pointer ~typ_fun:typ with
       | Compatible -> kf :: list, alarm
       | Incompatible_but_accepted -> kf :: list, true

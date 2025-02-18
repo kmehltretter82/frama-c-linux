@@ -167,7 +167,7 @@ let reduce_to_valid_location kind term loc =
 let term_as_address term =
   match term.it_content.term_node with
   | TAddrOf (TVar lv, _) | TStartOf (TVar lv, _) -> lv.lv_origin
-  | TLval (TVar lv, _) when Ast_types.is_logic_function_type lv.lv_type ->
+  | TLval (TVar lv, _) when Ast_types.is_logic_fun lv.lv_type ->
     lv.lv_origin
   | _ -> None
 
@@ -602,7 +602,7 @@ module Make
      some warnings are disabled, such as warnings about new garbled mixes. *)
   let compute_using_specification ~warn kinstr call spec state =
     let vi = Kernel_function.get_vi call.kf in
-    if Ast_types.type_has_attribute "noreturn" vi.vtype
+    if Ast_types.has_attribute "noreturn" vi.vtype
     then []
     else
       (* Initializes the variable returned by the function. *)

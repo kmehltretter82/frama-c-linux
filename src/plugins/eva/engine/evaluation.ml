@@ -139,11 +139,11 @@ let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
   | "none" -> false
   | "all" -> true
-  | "pointer" -> Ast_types.(is_pointer_type (unroll_type typ))
+  | "pointer" -> Ast_types.(is_ptr (unroll_type typ))
   | _ -> assert false
 
 let propagate_all_pointer_comparison typ =
-  not (Ast_types.is_pointer_type typ)
+  not (Ast_types.is_ptr typ)
   || Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let comparison_kind = function
@@ -599,7 +599,7 @@ module Make
     | _ -> return (v1, v2)
 
   let assume_valid_binop context typ (e1, v1 as arg1) op (e2, v2 as arg2) =
-    if Ast_types.is_integral_type typ then
+    if Ast_types.is_integral typ then
       match op with
       | Div | Mod ->
         (* The behavior of a%b is undefined if the behavior of a/b is undefined,
@@ -651,7 +651,7 @@ module Make
       then result
       else
         let zero_or_one = Value.(join zero one) in
-        if Ast_types.is_pointer_type typ then
+        if Ast_types.is_ptr typ then
           Self.result
             ~current:true ~once:true
             ~dkey:Self.dkey_pointer_comparison
@@ -1108,9 +1108,9 @@ module Make
       remaining_volatile || volatile
     | Field (fi, remaining) ->
       let open Evaluated.Operators in
-      let attrs = Ast_types.type_attrs typ in
+      let attrs = Ast_types.get_attributes typ in
       let attrs = Ast_attributes.filter_qualifiers attrs in
-      let typ_fi = Ast_types.type_add_attributes attrs fi.ftype in
+      let typ_fi = Ast_types.add_attributes attrs fi.ftype in
       let evaluated = eval_offset env ~reduce_valid_index typ_fi remaining in
       let+ r, volatile = evaluated in
       let off = Loc.forward_field typ fi r in
@@ -1128,7 +1128,7 @@ module Make
          in the proper way through offsets)
        - if it contains a sub-expression which is volatile (volatile_expr)
     *)
-    let volatile = volatile_expr || Ast_types.type_has_qualifier "volatile" lval.typ in
+    let volatile = volatile_expr || Ast_types.has_qualifier "volatile" lval.typ in
     let cil_lval = Eva_ast.to_cil_lval lval in
     (* Find the value of the location, if not bottom. *)
     let v, alarms = domain_query lval loc in
@@ -1444,7 +1444,7 @@ module Make
         backward_eval fuel context state expr (Some loc_value)
       | _ ->
         let reduce_valid_index = true in
-        let typ_lval = Ast_types.type_of_pointed expr.typ in
+        let typ_lval = Ast_types.direct_pointed_type expr.typ in
         let* env = fast_eval_environment state in
         let eval = eval_offset env ~reduce_valid_index typ_lval offset in
         let* loc_offset, _ = fst eval in
@@ -1462,7 +1462,7 @@ module Make
       backward_offset fuel context state field.ftype remaining rem
     | Index (exp, remaining) ->
       let* v = find_val exp in
-      let typ_pointed = Ast_types.type_of_array_elem typ in
+      let typ_pointed = Ast_types.array_elem_type typ in
       let* env = fast_eval_environment state in
       let* rem, _ =
         eval_offset env ~reduce_valid_index:true typ_pointed remaining |> fst

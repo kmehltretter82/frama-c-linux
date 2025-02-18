@@ -732,7 +732,7 @@ module GlobalVars = struct
       ~name:"ghost"
       ~descr:(Md.plain "Is the variable ghost?")
       ~data:(module Data.Jbool)
-      ~get:(fun vi -> Ast_types.is_ghost_type vi.vtype);
+      ~get:(fun vi -> Ast_types.is_ghost vi.vtype);
     States.column model
       ~name:"init"
       ~descr:(Md.plain "Is the variable explicitly initialized?")

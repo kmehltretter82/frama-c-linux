@@ -583,7 +583,7 @@ let has_noreturn_attr kf =
   match kf.fundec with
   | Definition ({ svar = vi },_)
   | Declaration (_, vi, _, _) ->
-    Ast_types.type_has_attribute "noreturn" vi.vtype
+    Ast_types.has_attribute "noreturn" vi.vtype
 
 let is_first_stmt kf stmt =
   try

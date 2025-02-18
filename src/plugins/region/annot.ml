@@ -146,8 +146,8 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLvar x -> parse_variable env ~loc x
   | PLunop( Ustar , p ) ->
     let lv = parse_lpath env p in
-    if Ast_types.is_pointer_type lv.typ then
-      let te = Ast_types.type_of_pointed lv.typ in
+    if Ast_types.is_ptr lv.typ then
+      let te = Ast_types.direct_pointed_type lv.typ in
       { loc ; step = Star lv ; typ = te }
     else
       error env ~loc "Pointer-type expected for operator '*'"
@@ -158,11 +158,11 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLbinop( p , Badd , rg ) ->
     parse_lrange env rg ;
     let { typ } as lv = parse_lpath env p in
-    if Ast_types.is_pointer_type typ then
+    if Ast_types.is_ptr typ then
       { loc ; step = Shift lv ; typ = typ }
     else
-    if Ast_types.is_array_type typ then
-      let te = Ast_types.type_of_array_elem typ in
+    if Ast_types.is_array typ then
+      let te = Ast_types.array_elem_type typ in
       { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
     else
       error env ~loc "Pointer-type expected for operator '+'"
@@ -178,13 +178,13 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLarrget( p , rg ) ->
     parse_lrange env rg ;
     let { typ } as lv = parse_lpath env p in
-    if Ast_types.is_pointer_type typ then
-      let pointed = Ast_types.type_of_pointed typ in
+    if Ast_types.is_ptr typ then
+      let pointed = Ast_types.direct_pointed_type typ in
       let ls = { loc ; step = Shift lv ; typ } in
       { loc ; step = Star ls ; typ = pointed }
     else
-    if Ast_types.is_array_type typ then
-      let elt,size = Ast_types.type_of_array_elem_size typ in
+    if Ast_types.is_array typ then
+      let elt,size = Ast_types.array_elem_type_and_size typ in
       let size =
         match Option.bind Cil.constFoldToInt size with
         | Some size -> size

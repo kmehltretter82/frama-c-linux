@@ -35,7 +35,7 @@ let type_of_const : constant -> typ = function
 let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | NoOffset -> basetyp
   | Index (_, o) ->
-    type_of_offset (Ast_types.type_of_array_elem basetyp) o
+    type_of_offset (Ast_types.array_elem_type basetyp) o
   | Field (fi, o) ->
     let base_attrs = (Ast_types.unroll_type basetyp).tattr in
     let base_attrs = Ast_attributes.filter_qualifiers base_attrs in
@@ -45,11 +45,11 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
       else
         base_attrs
     in
-    type_of_offset (Ast_types.type_add_attributes base_attrs fi.ftype) o
+    type_of_offset (Ast_types.add_attributes base_attrs fi.ftype) o
 
 let type_of_lhost : lhost -> typ = function
   | Var vi -> vi.vtype
-  | Mem addr -> Ast_types.type_of_pointed addr.typ
+  | Mem addr -> Ast_types.direct_pointed_type addr.typ
 
 let type_of_lval_node (host, offset : lval_node) : typ =
   let basetyp = type_of_lhost host in
@@ -57,7 +57,7 @@ let type_of_lval_node (host, offset : lval_node) : typ =
 
 let type_of_exp_node : exp_node -> typ = function
   | Const c -> type_of_const c
-  | Lval lv -> Ast_types.type_remove_qualifier_attributes lv.typ
+  | Lval lv -> Ast_types.remove_qualifiers lv.typ
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t

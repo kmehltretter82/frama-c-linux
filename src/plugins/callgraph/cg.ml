@@ -83,7 +83,7 @@ let get_pointed_kfs =
         let o = object
           inherit Visitor.frama_c_inplace
           method !vexpr e = match e.enode with
-            | AddrOf (Var vi, NoOffset) when Ast_types.is_function_type vi.vtype ->
+            | AddrOf (Var vi, NoOffset) when Ast_types.is_fun vi.vtype ->
               (* function pointer *)
               let kf =
                 try Globals.Functions.get vi

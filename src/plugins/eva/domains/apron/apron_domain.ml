@@ -33,7 +33,7 @@ let abort exclog =
     print_exc exclog.exn print_funid exclog.funid exclog.msg
 
 let is_relevant_varinfo varinfo =
-  not (Ast_types.type_has_qualifier "volatile" varinfo.Cil_types.vtype)
+  not (Ast_types.has_qualifier "volatile" varinfo.Cil_types.vtype)
   && (true || not varinfo.vglob)
 
 let is_relevant_lval lval = match lval.node with
@@ -554,7 +554,7 @@ module Make (Man : Input) = struct
      into Apron intervals. *)
   let make_oracle valuation =
     fun exp exn ->
-    if Ast_types.is_integral_type exp.typ then
+    if Ast_types.is_integral exp.typ then
       match valuation.Abstract_domain.find exp with
       | `Value { value = { v = `Value itv } } ->
         let interval = ival_to_interval itv in

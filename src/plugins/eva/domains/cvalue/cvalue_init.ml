@@ -130,12 +130,12 @@ let initialize_var_using_type varinfo state =
 
     | TPtr typ'
       when depth <= Parameters.AutomaticContextMaxDepth.get () ->
-      let attr = Ast_types.type_attrs typ in
+      let attr = Ast_types.get_attributes typ in
       let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
         Parameters.AutomaticContextMaxWidth.get ()
       in begin
-        match Ast_types.is_void_type typ', Ast_types.is_function_type typ' with
+        match Ast_types.is_void typ', Ast_types.is_fun typ' with
         | false, false -> (* non-void, non-function *)
           let i =
             match Ast_attributes.find_params "arraylen" attr with

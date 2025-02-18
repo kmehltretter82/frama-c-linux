@@ -330,7 +330,7 @@ let is_block_local v b = List.exists (fun vv -> v.vid = vv.vid) b.blocals
 (** {2 Functions} *)
 (* ************************************************************************** *)
 
-let is_function_type vi = Ast_types.is_function_type vi.vtype
+let is_function_type vi = Ast_types.is_fun vi.vtype
 
 module Function = struct
 
@@ -430,7 +430,7 @@ let direct_array_size ty =
 let rec array_size ty =
   match Ast_types.unroll_type_node ty with
   | TArray(elemty,Some _) ->
-    if Ast_types.is_array_type elemty then
+    if Ast_types.is_array elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)
     else direct_array_size ty
   | TArray(_,None) -> Integer.zero

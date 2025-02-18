@@ -151,7 +151,7 @@ struct
     | Field(f,offset) -> loc_of_offset env (M.field l f) f.ftype offset
     | Index(e,offset) ->
       let k = val_of_exp env e in
-      let te = Ast_types.type_of_array_elem typ in
+      let te = Ast_types.array_elem_type typ in
       let obj = Ctypes.object_of te in
       loc_of_offset env (M.shift l obj k) te offset
 
@@ -193,7 +193,7 @@ struct
   let bool_of_comp env iop lop fop e1 e2 =
     let t1 = Cil.typeOf e1 in
     let t2 = Cil.typeOf e2 in
-    if Ast_types.is_pointer_type t1 && Ast_types.is_pointer_type t2 then
+    if Ast_types.is_ptr t1 && Ast_types.is_ptr t2 then
       Cvalues.is_true (lop (loc_of_exp env e1) (loc_of_exp env e2))
     else match Ast_types.unroll_type_node t1 with
       | TFloat f ->
@@ -230,15 +230,15 @@ struct
     | LAnd    -> Val (Cvalues.bool_and (bool_of_exp env e1) (bool_of_exp env e2))
     | LOr     -> Val (Cvalues.bool_or  (bool_of_exp env e1) (bool_of_exp env e2))
     | PlusPI ->
-      let te = Ast_types.type_of_pointed (Cil.typeOf e1) in
+      let te = Ast_types.direct_pointed_type (Cil.typeOf e1) in
       let obj = Ctypes.object_of te in
       Loc(M.shift (loc_of_exp env e1) obj (val_of_exp env e2))
     | MinusPI ->
-      let te = Ast_types.type_of_pointed (Cil.typeOf e1) in
+      let te = Ast_types.direct_pointed_type (Cil.typeOf e1) in
       let obj = Ctypes.object_of te in
       Loc(M.shift (loc_of_exp env e1) obj (F.e_opp (val_of_exp env e2)))
     | MinusPP ->
-      let te = Ast_types.type_of_pointed (Cil.typeOf e1) in
+      let te = Ast_types.direct_pointed_type (Cil.typeOf e1) in
       let obj = Ctypes.object_of te in
       Val(M.loc_diff obj (loc_of_exp env e1) (loc_of_exp env e2))
 
@@ -370,9 +370,9 @@ struct
       then M.loc_neq (cloc v1) (cloc v2)
       else F.p_neq (cval v1) (cval v2)
 
-  let equal_typ t v1 v2 = eq_t Ast_types.is_pointer_type t v1 v2
+  let equal_typ t v1 v2 = eq_t Ast_types.is_ptr t v1 v2
   let equal_obj obj v1 v2 = eq_t Ctypes.is_pointer obj v1 v2
-  let not_equal_typ t v1 v2 = neq_t Ast_types.is_pointer_type t v1 v2
+  let not_equal_typ t v1 v2 = neq_t Ast_types.is_ptr t v1 v2
   let not_equal_obj obj v1 v2 = neq_t Ctypes.is_pointer obj v1 v2
 
   let compare env vop lop fop e1 e2 =
@@ -451,7 +451,7 @@ struct
            in
            let init_hyp = match init with
              | Some { enode = Lval lv_init }
-               when Ast_types.is_struct_or_union_type (Cil.typeOfLval lv_init) ->
+               when Ast_types.is_struct_or_union (Cil.typeOfLval lv_init) ->
                let l_initializer = lval sigma lv_init in
                F.p_equal
                  (M.load_init sigma obj l)

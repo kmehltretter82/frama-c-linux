@@ -303,7 +303,7 @@ module ValueCoverageGUI = struct
           in
           match loc with
           | Printer_tag.PVDecl(_, _, vi) ->
-            if Ast_types.is_function_type vi.vtype then begin
+            if Ast_types.is_fun vi.vtype then begin
               if Varinfo.Set.mem vi pure_syntactic then syn_hilit ()
               else if Varinfo.Set.mem vi metrics.semantic then sem_hilit ()
               else unseen_hilit ()

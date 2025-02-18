@@ -409,7 +409,7 @@ let model_varinfo :
         | RefUsage.NoAccess -> "any"
         | RefUsage.ByValue -> "'var'"
         | RefUsage.ByRef -> "'ref'"
-        | RefUsage.ByArray when x.vformal && Ast_types.is_pointer_type x.vtype
+        | RefUsage.ByArray when x.vformal && Ast_types.is_ptr x.vtype
           -> "'caveat'"
         | _ -> "'typed'"
       in

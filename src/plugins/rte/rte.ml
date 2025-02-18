@@ -101,7 +101,7 @@ let lval_assertion ~read_only ~remove_trivial ~on_alarm lv =
   match lv with
   | Var vi , off -> check_array_access false off vi.vtype false
   | (Mem _ as lh), off ->
-    if not (Ast_types.is_function_type (Cil.typeOfLval lv)) then
+    if not (Ast_types.is_fun (Cil.typeOfLval lv)) then
       check_array_access true off (Cil.typeOfLhost lh) false
 
 (* assertion for lvalue initialization *)
@@ -116,11 +116,11 @@ let lval_initialized_assertion ~remove_trivial:_ ~on_alarm lv =
        - temporary variables (initialized during AST normalization)
     *)
     if not (vi.vglob || vi.vformal || vi.vtemp)
-    && not (Ast_types.is_struct_or_union_type typ)
+    && not (Ast_types.is_struct_or_union typ)
     then
       on_alarm ~invalid:false (Alarms.Uninitialized lv)
   | _ ->
-    if not Ast_types.(is_function_type typ || is_struct_or_union_type typ) then
+    if not Ast_types.(is_fun typ || is_struct_or_union typ) then
       on_alarm ~invalid:false (Alarms.Uninitialized lv)
 
 (* assertion for unary minus signed overflow *)
@@ -338,7 +338,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
   let src_size = Cil.bitsSizeOf src_type in
   let dst_size = Cil.bitsSizeOfBitfield dst_type in
   if (dst_size < src_size || dst_size == src_size && dst_signed <> src_signed)
-  && not Ast_types.(is_pointer_type src_type && (is_intptr_t dst_type || is_uintptr_t dst_type))
+  && not Ast_types.(is_ptr src_type && (is_intptr_t dst_type || is_uintptr_t dst_type))
   then
     let dst_min, dst_max =
       if dst_signed
@@ -346,7 +346,7 @@ let downcast_assertion ~remove_trivial ~on_alarm (dst_type, exp) =
       else Integer.zero, Cil.max_unsigned_number dst_size
     in
     let overflow_kind =
-      if Ast_types.is_pointer_type src_type
+      if Ast_types.is_ptr src_type
       then Alarms.Pointer_downcast
       else if dst_signed
       then Alarms.Signed_downcast

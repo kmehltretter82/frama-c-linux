@@ -52,7 +52,7 @@ end
 let build_body caller callee args_generator =
   let loc  = Cil_datatype.Location.unknown in
   let ret_var = match Cil.getReturnType caller.svar.vtype with
-    | t when Ast_types.is_void_type t -> None
+    | t when Ast_types.is_void t -> None
     | t -> Some (Cil.makeLocalVar caller "__retres" t)
   in
   let call =

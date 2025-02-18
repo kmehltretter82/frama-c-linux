@@ -101,7 +101,7 @@ let sizeof_vid v = sizeof v.vtype
 let sizeof_lval lv =
   let typ = Cil.typeOfLval lv in
   let typ = Ast_types.unroll_type typ in
-  if Ast_types.is_integral_type typ then (* We might be a bitfield *)
+  if Ast_types.is_integral typ then (* We might be a bitfield *)
     let rec get_size off =
       match off with
       | NoOffset | Index (_,NoOffset) -> sizeof typ

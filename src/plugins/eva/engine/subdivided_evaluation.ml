@@ -95,7 +95,7 @@ let gather_non_linear expr =
       let map1 = compute_from_offset d expr offset in
       let map2 = compute_from_host d host in
       let map = union expr depth map1 map2 in
-      if LvalMap.is_empty map && Ast_types.is_arithmetic_type lv.typ
+      if LvalMap.is_empty map && Ast_types.is_arithmetic lv.typ
       then LvalMap.singleton lv (expr, d, LvalSet.empty)
       else map
     | UnOp (_, e, _) | CastE (_, e) -> compute depth e
@@ -846,7 +846,7 @@ module Make
   let rec get_influential_vars valuation (exp : Eva_ast.exp) acc =
     match exp.node with
     | Lval ({ node = host, off } as lval)  ->
-      if Ast_types.type_has_qualifier "volatile" lval.typ then `Value acc
+      if Ast_types.has_qualifier "volatile" lval.typ then `Value acc
       else
         Loc.to_value (find_loc valuation lval) >>- fun value ->
         if Cvalue.V.cardinal_zero_or_one (get_cval value)

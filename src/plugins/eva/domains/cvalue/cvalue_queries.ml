@@ -92,7 +92,7 @@ module Queries = struct
        with the new value stemming from the evaluation, even if it has been
        reduced, in order to not propagate incompatible type. *)
     let incompatible_type =
-      is_float value <> Ast_types.is_floating_type lval.typ
+      is_float value <> Ast_types.is_float lval.typ
     in
     let origin = if incompatible_type then Some value else None in
     let value = Cvalue_forward.reinterpret lval.typ value in
@@ -123,7 +123,7 @@ module Queries = struct
         v, alarms
 
   let extract_lval ~oracle:_ _context state lval loc =
-    if Ast_types.is_scalar_type lval.Eva_ast.typ
+    if Ast_types.is_scalar lval.Eva_ast.typ
     then extract_scalar_lval state lval loc
     else extract_aggregate_lval state lval loc
 

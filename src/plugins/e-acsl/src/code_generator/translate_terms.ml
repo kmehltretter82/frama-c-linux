@@ -438,7 +438,7 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
       in
       e, adata, env, Analyses_types.C_number, ""
     else begin
-      assert (Ast_types.is_integral_type ty);
+      assert (Ast_types.is_integral ty);
       let e, adata, env = to_exp ~adata kf env t in
       let e = Smart_exp.lnot ~loc e in
       e, adata, env, Analyses_types.C_number, ""

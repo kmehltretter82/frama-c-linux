@@ -36,7 +36,7 @@ let dkey = Self.register_category "imprecision"
 let rec pretty_lval_of_address exp =
   match exp.node with
   | AddrOf lval -> lval
-  | CastE (_typ, exp) when Ast_types.is_pointer_type exp.typ ->
+  | CastE (_typ, exp) when Ast_types.is_ptr exp.typ ->
     (* Removes conversion to void* for more readable messages. *)
     pretty_lval_of_address exp
   | _ -> Eva_ast.Build.mem exp

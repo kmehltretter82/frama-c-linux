@@ -44,12 +44,12 @@ let pp_typ_ref = Extlib.mk_fun "Ast_types.pp_typ_ref"
 (* Attributes *)
 (* ********** *)
 
-let rec type_attrs { tnode; tattr } =
+let rec get_attributes { tnode; tattr } =
   match tnode with
   | TVoid    -> tattr
   | TInt _   -> tattr
   | TFloat _ -> tattr
-  | TNamed t -> Ast_attributes.add_list tattr (type_attrs t.ttype)
+  | TNamed t -> Ast_attributes.add_list tattr (get_attributes t.ttype)
   | TPtr _   -> tattr
   | TArray _ -> tattr
   | TComp comp -> Ast_attributes.add_list comp.cattr tattr
@@ -57,7 +57,7 @@ let rec type_attrs { tnode; tattr } =
   | TFun _   -> tattr
   | TBuiltin_va_list -> tattr
 
-let rec type_add_attributes ?(combine=Ast_attributes.add_list) a0 t =
+let rec add_attributes ?(combine=Ast_attributes.add_list) a0 t =
   begin
     match a0 with
     | [] ->
@@ -89,22 +89,23 @@ and array_push_attributes al t =
   | TArray (bt, l) ->
     let bt' = array_push_attributes al bt in
     Cil_const.mk_tarray ~tattr:t.tattr bt' l
-  | _ -> type_add_attributes al t
+  | _ -> add_attributes al t
 
 (**** Look for the presence of an attribute in a type ****)
 
-let type_has_attribute attr typ = Ast_attributes.contains attr (type_attrs typ)
+let has_attribute attr typ =
+  Ast_attributes.contains attr (get_attributes typ)
 
-let rec type_has_qualifier attr t =
+let rec has_qualifier attr t =
   match t.tnode with
   | TNamed ti ->
-    Ast_attributes.contains attr t.tattr || type_has_qualifier attr ti.ttype
+    Ast_attributes.contains attr t.tattr || has_qualifier attr ti.ttype
   | TArray (bt, _) ->
-    type_has_qualifier attr bt
+    has_qualifier attr bt
     || (* ill-formed type *) Ast_attributes.contains attr t.tattr
-  | _ -> Ast_attributes.contains attr (type_attrs t)
+  | _ -> Ast_attributes.contains attr (get_attributes t)
 
-let type_has_attribute_memory_block a (ty:typ): bool =
+let has_attribute_memory_block a (ty:typ): bool =
   let f attrs = if Ast_attributes.contains a attrs then raise Exit in
   let rec visit (t: typ) : unit =
     f t.tattr;
@@ -126,7 +127,7 @@ let type_has_attribute_memory_block a (ty:typ): bool =
   try visit ty; false
   with Exit -> true
 
-let rec type_remove_aux ?anl t =
+let rec remove_aux ?anl t =
   (* Try to preserve sharing. We use sharing to be more efficient, but also
      to detect that we have removed an attribute under typedefs *)
   let tattr =
@@ -150,16 +151,16 @@ let rec type_remove_aux ?anl t =
   | TComp  _
   | TBuiltin_va_list -> reshare ()
   | TNamed ti ->
-    let tt = type_remove_aux ?anl ti.ttype in
+    let tt = remove_aux ?anl ti.ttype in
     if tt == ti.ttype
     then reshare ()
-    else type_add_attributes tattr tt
+    else add_attributes tattr tt
 
-let type_remove_attributes anl t = type_remove_aux ~anl t
+let remove_attributes anl t = remove_aux ~anl t
 
-let type_remove_all_attributes t = type_remove_aux t
+let remove_all_attributes t = remove_aux t
 
-let rec type_remove_attributes_deep (anl: string list) t =
+let rec remove_attributes_deep (anl: string list) t =
   (* Try to preserve sharing. We use sharing to be more efficient, but also
      to detect that we have removed an attribute under typedefs *)
   let reshare () =
@@ -174,12 +175,12 @@ let rec type_remove_attributes_deep (anl: string list) t =
   | TFloat _ -> reshare ()
   | TEnum  _ -> reshare ()
   | TPtr   t ->
-    let t' = type_remove_attributes_deep anl t in
+    let t' = remove_attributes_deep anl t in
     if t != t'
     then Cil_const.mk_tptr ~tattr:(Ast_attributes.drop_list anl t.tattr) t'
     else reshare ()
   | TArray (t, l) ->
-    let t' = type_remove_attributes_deep anl t in
+    let t' = remove_attributes_deep anl t in
     if t != t'
     then Cil_const.mk_tarray ~tattr:(Ast_attributes.drop_list anl t.tattr) t' l
     else reshare ()
@@ -187,30 +188,30 @@ let rec type_remove_attributes_deep (anl: string list) t =
   | TComp _ -> reshare ()
   | TBuiltin_va_list -> reshare ()
   | TNamed ti ->
-    let tt = type_remove_attributes_deep anl ti.ttype in
+    let tt = remove_attributes_deep anl ti.ttype in
     if tt == ti.ttype
     then reshare ()
-    else type_add_attributes (Ast_attributes.drop_list anl t.tattr) tt
+    else add_attributes (Ast_attributes.drop_list anl t.tattr) tt
 
-let type_remove_qualifier_attributes =
-  type_remove_attributes Ast_attributes.qualifier_attributes
+let remove_qualifiers =
+  remove_attributes Ast_attributes.qualifier_attributes
 
-let type_remove_qualifier_attributes_deep =
-  type_remove_attributes_deep Ast_attributes.qualifier_attributes
+let remove_qualifiers_deep =
+  remove_attributes_deep Ast_attributes.qualifier_attributes
 
-let type_remove_attributes_for_c_cast t =
+let remove_attributes_for_c_cast t =
   let attributes_to_remove =
     Ast_attributes.(fc_internal_attributes @ cast_irrelevant_attributes)
   in
-  let t = type_remove_attributes_deep attributes_to_remove t in
-  type_remove_attributes Ast_attributes.spare_attributes_for_c_cast t
+  let t = remove_attributes_deep attributes_to_remove t in
+  remove_attributes Ast_attributes.spare_attributes_for_c_cast t
 
-let type_remove_attributes_for_logic_type t =
+let remove_attributes_for_logic_type t =
   let attributes_to_remove =
     Ast_attributes.(fc_internal_attributes @ cast_irrelevant_attributes)
   in
-  let t = type_remove_attributes_deep attributes_to_remove t in
-  type_remove_attributes Ast_attributes.spare_attributes_for_logic_cast t
+  let t = remove_attributes attributes_to_remove t in
+  remove_attributes Ast_attributes.spare_attributes_for_logic_cast t
 
 (* ********** *)
 (* Utils      *)
@@ -222,7 +223,7 @@ let unroll_type (t: typ) : typ =
   let rec with_attrs (al: attributes) (t: typ) : typ =
     match t.tnode with
     | TNamed ti -> with_attrs (Ast_attributes.add_list al t.tattr) ti.ttype
-    | _ -> type_add_attributes al t
+    | _ -> add_attributes al t
   in
   with_attrs [] t
 
@@ -259,7 +260,7 @@ let rec unroll_type_deep (t: typ) : typ =
       in
       let tattr = Ast_attributes.add_list al t.tattr in
       Cil_const.mk_tfun ~tattr rt' args' isva
-    | _ -> type_add_attributes al t
+    | _ -> add_attributes al t
   in
   with_attrs [] t
 
@@ -267,79 +268,79 @@ let rec unroll_type_deep (t: typ) : typ =
 (* Handling ghost attribute. *)
 (* ************************* *)
 
-let type_add_ghost typ =
-  if not (type_has_attribute "ghost" typ) then
-    type_add_attributes [("ghost", [])] typ
+let add_ghost typ =
+  if not (has_attribute "ghost" typ) then
+    add_attributes [("ghost", [])] typ
   else
     typ
 
-let is_ghost_type typ_lval =
-  type_has_attribute_memory_block "ghost" typ_lval
+let is_ghost typ_lval =
+  has_attribute_memory_block "ghost" typ_lval
 
-let rec is_wellformed_ghost_type t =
-  is_wellformed_ghost_type' (unroll_type_deep t)
-and is_wellformed_ghost_type' t =
-  if not (is_ghost_type t) then is_wellformed_non_ghost_type t
+let rec is_wellformed_ghost t =
+  is_wellformed_ghost' (unroll_type_deep t)
+and is_wellformed_ghost' t =
+  if not (is_ghost t) then is_wellformed_non_ghost t
   else match t.tnode with
-    | TPtr t | TArray (t, _) -> is_wellformed_ghost_type' t
+    | TPtr t | TArray (t, _) -> is_wellformed_ghost' t
     | _ -> true
-and is_wellformed_non_ghost_type t =
-  if is_ghost_type t then false
+and is_wellformed_non_ghost t =
+  if is_ghost t then false
   else match t.tnode with
-    | TPtr t | TArray (t, _) -> is_wellformed_non_ghost_type t
+    | TPtr t | TArray (t, _) -> is_wellformed_non_ghost t
     | _ -> true
 
 (* ************** *)
 (* Type checkers. *)
 (* ************** *)
 
-let is_void_type t =
+let is_void t =
   match unroll_type_skel t with
   | TVoid -> true
   | _ -> false
 
-let is_void_ptr_type t =
+let is_void_ptr t =
   match unroll_type_skel t with
-  | TPtr t when is_void_type t -> true
+  | TPtr t when is_void t -> true
   | _ -> false
 
-let is_bool_type t =
+let is_bool t =
   match unroll_type_skel t with
   | TInt IBool -> true
   | _ -> false
 
-let is_char_type t =
+let is_char t =
   match unroll_type_skel t with
   | TInt IChar -> true
   | _ -> false
 
-let is_any_char_type t =
+let is_any_char t =
   match unroll_type_skel t with
   | TInt (IChar | ISChar | IUChar) -> true
   | _ -> false
 
-let is_char_ptr_type t =
+let is_char_ptr t =
   match unroll_type_skel t with
-  | TPtr t when is_char_type t -> true
+  | TPtr t when is_char t -> true
   | _ -> false
 
-let is_any_char_ptr_type t =
+let is_any_char_ptr t =
   match unroll_type_skel t with
-  | TPtr t when is_any_char_type t -> true
+  | TPtr t when is_any_char t -> true
   | _ -> false
 
-let is_char_const_ptr_type t =
+let is_char_const_ptr t =
   match unroll_type t with
-  | { tnode = TPtr t; tattr } when is_char_type t ->
+  | { tnode = TPtr t; tattr } when is_char t ->
     Ast_attributes.contains "const" tattr
   | _ -> false
 
-let is_short_type t =
+let is_short t =
   match unroll_type_skel t with
   | TInt (IUShort | IShort) -> true
   | _ -> false
 
-let is_integral_type t =
+let is_integral t =
   match unroll_type_skel t with
   | (TInt _ | TEnum _) -> true
   | _ -> false
@@ -356,89 +357,89 @@ let rec is_uintptr_t  t =
   | TNamed ti -> ti.tname = "uintptr_t" || is_uintptr_t ti.ttype
   | _ -> false
 
-let is_floating_type t =
+let is_float t =
   match unroll_type_skel t with
   | TFloat _ -> true
   | _ -> false
 
-let is_long_double_type t =
+let is_long_double t =
   match unroll_type_skel t with
   | TFloat FLongDouble -> true
   | _ -> false
 
 (* ISO 6.2.5.18 *)
-let is_arithmetic_type t =
+let is_arithmetic t =
   match unroll_type_skel t with
   | (TInt _ | TEnum _ | TFloat _) -> true
   | _ -> false
 
-let is_pointer_type t =
+let is_ptr t =
   match unroll_type_skel t with
   | TPtr _ -> true
   | _ -> false
 
-let is_integral_or_pointer_type t =
-  is_integral_type t || is_pointer_type t
+let is_integral_or_pointer t =
+  is_integral t || is_ptr t
 
-let is_array_type t =
+let is_array t =
   match unroll_type_skel t with
   | TArray _ -> true
   | _ -> false
 
-let is_unsized_array_type t =
+let is_unsized_array t =
   match unroll_type_skel t with
   | TArray (_, None) -> true
   | _ -> false
 
-let is_sized_array_type t =
+let is_sized_array t =
   match unroll_type_skel t with
   | TArray (_, Some _) -> true
   | _ -> false
 
-let is_char_array_type t = match unroll_type_skel t with
-  | TArray(tau, _) when is_char_type tau -> true
+let is_char_array t = match unroll_type_skel t with
+  | TArray(tau, _) when is_char tau -> true
   | _ -> false
 
-let is_any_char_array_type t = match unroll_type_skel t with
-  | TArray(tau, _) when is_any_char_type tau -> true
+let is_any_char_array t = match unroll_type_skel t with
+  | TArray(tau, _) when is_any_char tau -> true
   | _ -> false
 
-let is_function_type t =
+let is_fun t =
   match unroll_type_skel t with
   | TFun _ -> true
   | _ -> false
 
-let is_fun_ptr_type t =
+let is_fun_ptr t =
   match unroll_type_skel t with
-  | TPtr t -> is_function_type t
+  | TPtr t -> is_fun t
   | _ -> false
 
 (* ISO 6.2.5.21 *)
-let is_scalar_type t =
-  is_arithmetic_type t || is_pointer_type t
+let is_scalar t =
+  is_arithmetic t || is_ptr t
 
 (* ISO 6.2.5.1 *)
-let is_object_type t =
-  not (is_function_type t)
+let is_object t =
+  not (is_fun t)
 
-let is_struct_type t =
+let is_struct t =
   match unroll_type_skel t with
   | TComp ci -> ci.cstruct
   | _ -> false
 
-let is_union_type t =
+let is_union t =
   match unroll_type_skel t with
   | TComp ci -> not ci.cstruct
   | _ -> false
 
-let is_struct_or_union_type t = is_struct_type t || is_union_type t
+let is_struct_or_union t = is_struct t || is_union t
 
 (* Check if a type is a transparent union, and return the first field if it is. *)
-let is_transparent_union_type t =
+let is_transparent_union t =
   match unroll_type_skel t with
   | TComp ci when not ci.cstruct ->
     (* Turn transparent unions into the type of their first field. *)
-    if type_has_attribute "transparent_union" t then begin
+    if has_attribute "transparent_union" t then begin
       match ci.cfields with
       | Some [] | None ->
         abort_context "Empty transparent union: %s" (compFullName ci)
@@ -447,7 +448,7 @@ let is_transparent_union_type t =
       None
   | _ -> None
 
-let is_variadic_list_type t =
+let is_variadic_list t =
   match unroll_type_skel t with
   | TBuiltin_va_list -> true
   | _ -> false
@@ -456,17 +457,17 @@ let is_variadic_list_type t =
 (* Type access. *)
 (* ************ *)
 
-let type_of_pointed typ =
+let direct_pointed_type typ =
   match unroll_type_skel typ with
   | TPtr typ -> typ
   | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
 
-let type_of_array_elem t =
+let array_elem_type t =
   match unroll_type_node t with
   | TArray (ty_elem, _) -> ty_elem
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
-let type_of_array_elem_size t =
+let array_elem_type_and_size t =
   match unroll_type_node t with
   | TArray (ty_elem, arr_size) ->
     ty_elem, arr_size
@@ -489,75 +490,70 @@ let () = Cil_datatype.punrollLogicType := unroll_logic_type
 let unroll_logic_aux is_logic lti t =
   Logic_const.is_unrollable_ltdef lti && is_logic (Logic_const.unroll_ltdef t)
 
-let rec is_logic_typetag_type t =
+let rec is_logic_typetag t =
   match t with
   | Ltype ({lt_name = "typetag"}, []) -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_typetag_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_typetag lti t
   | _ -> false
 
-let rec is_logic_boolean_type t =
+let rec is_logic_boolean t =
   match t with
-  | Ctype t -> is_integral_type t
+  | Ctype t -> is_integral t
   | Lboolean | Linteger -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_boolean_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_boolean lti t
   | Lreal | Lvar _ | Larrow _ -> false
 
-let rec is_logic_pure_boolean_type t =
+let rec is_logic_pure_boolean t =
   match t with
-  | Ctype t -> is_bool_type t
+  | Ctype t -> is_bool t
   | Lboolean -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_pure_boolean_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_pure_boolean lti t
   | _ -> false
 
-let rec is_logic_integral_type t =
+let rec is_logic_integral t =
   match t with
-  | Ctype t -> is_integral_type t
+  | Ctype t -> is_integral t
   | Lboolean -> false
   | Linteger -> true
   | Lreal -> false
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_integral_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_integral lti t
   | Lvar _ | Larrow _ -> false
 
-let is_logic_float_type t =
+let is_logic_float t =
   match t with
-  | Ctype t -> is_floating_type t
+  | Ctype t -> is_float t
   | Lboolean -> false
   | Linteger -> false
   | Lreal -> false
   | Lvar _ | Ltype _ | Larrow _ -> false
 
-let rec is_logic_real_type t =
+let rec is_logic_real t =
   match t with
   | Ctype _ -> false
   | Lboolean -> false
   | Linteger -> false
   | Lreal -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_real_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_real lti t
   | Lvar _ | Larrow _ -> false
 
-let rec is_logic_real_or_float_type t =
+let rec is_logic_real_or_float t =
   match t with
-  | Ctype t -> is_floating_type t
+  | Ctype t -> is_float t
   | Lboolean -> false
   | Linteger -> false
   | Lreal -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_real_or_float_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_real_or_float lti t
   | Lvar _ | Larrow _ -> false
 
-let rec is_logic_arithmetic_type t =
+let rec is_logic_arithmetic t =
   match t with
-  | Ctype t -> is_arithmetic_type t
+  | Ctype t -> is_arithmetic t
   | Linteger | Lreal -> true
-  | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic_type lti t
+  | Ltype (lti, _) -> unroll_logic_aux is_logic_arithmetic lti t
   | Lboolean | Lvar _ | Larrow _ -> false
 
-let is_logic_function_type t =
-  Logic_const.isLogicCType is_function_type t
+let is_logic_fun t =
+  Logic_const.isLogicCType is_fun t
 
-
-let is_logic_fun_ptr_type t =
-  Logic_const.isLogicCType is_fun_ptr_type t
-
-
-
-
+let is_logic_fun_ptr t =
+  Logic_const.isLogicCType is_fun_ptr t

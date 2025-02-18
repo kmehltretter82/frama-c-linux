@@ -1342,7 +1342,7 @@ and enumitem_correspondence ?loc ei env =
 and gvar_correspondence ?loc vi env =
   let add vi =
     match find_candidate_varinfo ?loc vi Cil_types.Global with
-    | None when Ast_types.is_function_type vi.vtype ->
+    | None when Ast_types.is_fun vi.vtype ->
       begin
         match gfun_correspondence ?loc vi env with
         | `Same kf' -> `Same (Kf.get_vi kf')

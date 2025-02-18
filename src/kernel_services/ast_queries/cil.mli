@@ -2231,17 +2231,17 @@ val setTypeAttrs: typ -> attributes -> typ
 (** Returns all the attributes contained in a type. This requires a traversal
     of the type structure, in case of composite, enumeration and named types *)
 val typeAttrs: typ -> attribute list
-[@@deprecated "Use Ast_types.type_attrs instead."]
-[@@migrate { repl = Ast_types.type_attrs } ]
+[@@deprecated "Use Ast_types.get_attributes instead."]
+[@@migrate { repl = Ast_types.get_attributes } ]
 
-(** Add some attributes to a type.
-    [combine] explains how to combine attributes. Default is [addAttributes].
+(** Add some attributes to a type. [combine] explains how to combine attributes.
+    Default is {!Ast_attributes.add_list}.
 
     @before 28.0-Nickel [combine] does not exist *)
 val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
   attribute list -> typ -> typ
-[@@deprecated "Use Ast_types.type_add_attributes instead."]
-[@@migrate { repl = Ast_types.type_add_attributes } ]
+[@@deprecated "Use Ast_types.add_attributes instead."]
+[@@migrate { repl = Ast_types.add_attributes } ]
 
 (** Remove all attributes with the given names from a type. Note that this
     does not remove attributes from typedef and tag definitions, just from
@@ -2250,33 +2250,33 @@ val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
     recurse under pointers, arrays, ...
 *)
 val typeRemoveAttributes: string list -> typ -> typ
-[@@deprecated "Use Ast_types.type_remove_attributes instead."]
-[@@migrate { repl = Ast_types.type_remove_attributes } ]
+[@@deprecated "Use Ast_types.remove_attributes instead."]
+[@@migrate { repl = Ast_types.remove_attributes } ]
 
 (** same as above, but remove any existing attribute from the type.
 
     @since Magnesium-20151001
 *)
 val typeRemoveAllAttributes: typ -> typ
-[@@deprecated "Use Ast_types.type_remove_all_attributes instead."]
-[@@migrate { repl = Ast_types.type_remove_all_attributes } ]
+[@@deprecated "Use Ast_types.remove_all_attributes instead."]
+[@@migrate { repl = Ast_types.remove_all_attributes } ]
 
-(** Same as [typeRemoveAttributes], but recursively removes the given
+(** Same as {!typeRemoveAttributes}, but recursively removes the given
     attributes from inner types as well. Mainly useful to check whether
     two types are equal modulo some attributes. See also
-    [typeDeepDropAllAttributes], which will strip every single attribute
+    {!typeDeepDropAllAttributes}, which will strip every single attribute
     from a type.
 *)
 val typeRemoveAttributesDeep: string list -> typ -> typ
-[@@deprecated "Use Ast_types.type_remove_attributes_deep instead."]
-[@@migrate { repl = Ast_types.type_remove_attributes_deep } ]
+[@@deprecated "Use Ast_types.remove_attributes_deep instead."]
+[@@migrate { repl = Ast_types.remove_attributes_deep } ]
 
 val typeHasAttribute: string -> typ -> bool
 (** Does the type have the given attribute. Does
     not recurse through pointer types, nor inside function prototypes.
     @since Sodium-20150201 *)
-[@@deprecated "Use Ast_types.type_has_attribute instead."]
-[@@migrate { repl = Ast_types.type_has_attribute } ]
+[@@deprecated "Use Ast_types.has_attribute instead."]
+[@@migrate { repl = Ast_types.has_attribute } ]
 
 val typeHasQualifier: string -> typ -> bool
 (** Does the type have the given qualifier. Handles the case of arrays, for
@@ -2285,8 +2285,8 @@ val typeHasQualifier: string -> typ -> bool
     For l-values, both functions return the same results, as l-values cannot
     have array type.
     @since Sodium-20150201 *)
-[@@deprecated "Use Ast_types.type_has_qualifier instead."]
-[@@migrate { repl = Ast_types.type_has_qualifier } ]
+[@@deprecated "Use Ast_types.has_qualifier instead."]
+[@@migrate { repl = Ast_types.has_qualifier } ]
 
 val typeHasAttributeMemoryBlock: string -> typ -> bool
 (** [typeHasAttributeMemoryBlock attr t] is
@@ -2296,61 +2296,61 @@ val typeHasAttributeMemoryBlock: string -> typ -> bool
 
     @since Chlorine-20180501 replaces typeHasAttributeDeep (name too ambiguous)
 *)
-[@@deprecated "Use Ast_types.type_has_attribute_memory_block instead."]
-[@@migrate { repl = Ast_types.type_has_attribute_memory_block } ]
+[@@deprecated "Use Ast_types.has_attribute_memory_block instead."]
+[@@migrate { repl = Ast_types.has_attribute_memory_block } ]
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     @since Nitrogen-20111001
 *)
 val type_remove_qualifier_attributes: typ -> typ
-[@@deprecated "Use Ast_types.type_remove_qualifier_attributes instead."]
-[@@migrate { repl = Ast_types.type_remove_qualifier_attributes } ]
+[@@deprecated "Use Ast_types.remove_qualifiers instead."]
+[@@migrate { repl = Ast_types.remove_qualifiers } ]
 
 (**
    remove also qualifiers under Ptr and Arrays
    @since Sodium-20150201
 *)
 val type_remove_qualifier_attributes_deep: typ -> typ
-[@@deprecated "Use Ast_types.type_remove_qualifier_attributes_deep instead."]
-[@@migrate { repl = Ast_types.type_remove_qualifier_attributes_deep } ]
+[@@deprecated "Use Ast_types.remove_qualifiers_deep instead."]
+[@@migrate { repl = Ast_types.remove_qualifiers_deep } ]
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     when building a C cast
     @since Oxygen-20120901
 *)
 val type_remove_attributes_for_c_cast: typ -> typ
-[@@deprecated "Use Ast_types.type_remove_attributes_for_c_cast instead."]
-[@@migrate { repl = Ast_types.type_remove_attributes_for_c_cast } ]
+[@@deprecated "Use Ast_types.remove_attributes_for_c_cast instead."]
+[@@migrate { repl = Ast_types.remove_attributes_for_c_cast } ]
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     when building a logic cast
     @since Oxygen-20120901
 *)
 val type_remove_attributes_for_logic_type: typ -> typ
-[@@deprecated "Use Ast_types.type_remove_attributes_for_logic_type instead."]
-[@@migrate { repl = Ast_types.type_remove_attributes_for_logic_type } ]
+[@@deprecated "Use Ast_types.remove_attributes_for_logic_type instead."]
+[@@migrate { repl = Ast_types.remove_attributes_for_logic_type } ]
 
 val typeAddGhost : typ -> typ
 (** Add the ghost attribute to a type (does nothing if the type is alreay ghost)
     @return the ghost qualified original type
     @since 26.0-Iron *)
-[@@deprecated "Use Ast_types.type_add_ghost instead."]
-[@@migrate { repl = Ast_types.type_add_ghost } ]
+[@@deprecated "Use Ast_types.add_ghost instead."]
+[@@migrate { repl = Ast_types.add_ghost } ]
 
 val isGhostType : typ -> bool
 (** Check for ["ghost"] qualifier from the type of an l-value (do not follow pointer)
     @return true iff a part of the related l-value has ["ghost"] qualifier
     @since 21.0-Scandium *)
-[@@deprecated "Use Ast_types.is_ghost_type instead."]
-[@@migrate { repl = Ast_types.is_ghost_type } ]
+[@@deprecated "Use Ast_types.is_ghost instead."]
+[@@migrate { repl = Ast_types.is_ghost } ]
 
 val isWFGhostType : typ -> bool
 (** Check if the received type is well-formed according to \ghost semantics, that is
     once the type is not ghost anymore, \ghost cannot appear again.
     @return true iff the type is well formed
     @since 21.0-Scandium *)
-[@@deprecated "Use Ast_types.is_wellformed_ghost_type instead."]
-[@@migrate { repl = Ast_types.is_wellformed_ghost_type } ]
+[@@deprecated "Use Ast_types.is_wellformed_ghost instead."]
+[@@migrate { repl = Ast_types.is_wellformed_ghost } ]
 
 (** Unroll a type until it exposes a non [TNamed]. Will collect all attributes
     appearing in [TNamed] and add them to the final type using
@@ -2375,62 +2375,62 @@ val unrollTypeDeep: typ -> typ
 
 (** is the given type "void"? *)
 val isVoidType: typ -> bool
-[@@deprecated "Use Ast_types.is_void_type instead."]
-[@@migrate { repl = Ast_types.is_void_type } ]
+[@@deprecated "Use Ast_types.is_void instead."]
+[@@migrate { repl = Ast_types.is_void } ]
 
 (** is the given type "void *"? *)
 val isVoidPtrType: typ -> bool
-[@@deprecated "Use Ast_types.is_void_ptr_type instead."]
-[@@migrate { repl = Ast_types.is_void_ptr_type } ]
+[@@deprecated "Use Ast_types.is_void_ptr instead."]
+[@@migrate { repl = Ast_types.is_void_ptr } ]
 
 (** True if the argument is [_Bool]
     @since 19.0-Potassium
 *)
 val isBoolType: typ -> bool
-[@@deprecated "Use Ast_types.is_bool_type instead."]
-[@@migrate { repl = Ast_types.is_bool_type } ]
+[@@deprecated "Use Ast_types.is_bool instead."]
+[@@migrate { repl = Ast_types.is_bool } ]
 
 (** True if the argument is a plain character type
     (but neither [signed char] nor [unsigned char]). *)
 val isCharType: typ -> bool
-[@@deprecated "Use Ast_types.is_char_type instead."]
-[@@migrate { repl = Ast_types.is_char_type } ]
+[@@deprecated "Use Ast_types.is_char instead."]
+[@@migrate { repl = Ast_types.is_char } ]
 
 (** True if the argument is a character type (i.e. plain, signed or unsigned)
     @since Chlorine-20180501 *)
 val isAnyCharType: typ -> bool
-[@@deprecated "Use Ast_types.is_any_char_type instead."]
-[@@migrate { repl = Ast_types.is_any_char_type } ]
+[@@deprecated "Use Ast_types.is_any_char instead."]
+[@@migrate { repl = Ast_types.is_any_char } ]
 
 (** True if the argument is a pointer to a plain character type
     (but neither [signed char] nor [unsigned char]). *)
 val isCharPtrType: typ -> bool
-[@@deprecated "Use Ast_types.is_char_ptr_type instead."]
-[@@migrate { repl = Ast_types.is_char_ptr_type } ]
+[@@deprecated "Use Ast_types.is_char_ptr instead."]
+[@@migrate { repl = Ast_types.is_char_ptr } ]
 
 (** True if the argument is a pointer to a character type
     (i.e. plain, signed or unsigned).
     @since Chlorine-20180501 *)
 val isAnyCharPtrType: typ -> bool
-[@@deprecated "Use Ast_types.is_any_char_ptr_type instead."]
-[@@migrate { repl = Ast_types.is_any_char_ptr_type } ]
+[@@deprecated "Use Ast_types.is_any_char_ptr instead."]
+[@@migrate { repl = Ast_types.is_any_char_ptr } ]
 
 (** True if the argument is a pointer to a constant character type,
     e.g. a string literal.
     @since Chlorine-20180501 *)
 val isCharConstPtrType: typ -> bool
-[@@deprecated "Use Ast_types.is_char_const_ptr_type instead."]
-[@@migrate { repl = Ast_types.is_char_const_ptr_type } ]
+[@@deprecated "Use Ast_types.is_char_const_ptr instead."]
+[@@migrate { repl = Ast_types.is_char_const_ptr } ]
 
 (** True if the argument is a short type (i.e. signed or unsigned) *)
 val isShortType: typ -> bool
-[@@deprecated "Use Ast_types.is_short_type instead."]
-[@@migrate { repl = Ast_types.is_short_type } ]
+[@@deprecated "Use Ast_types.is_short instead."]
+[@@migrate { repl = Ast_types.is_short } ]
 
 (** True if the argument is an integral type (i.e. integer or enum) *)
 val isIntegralType: typ -> bool
-[@@deprecated "Use Ast_types.is_integral_type instead."]
-[@@migrate { repl = Ast_types.is_integral_type } ]
+[@@deprecated "Use Ast_types.is_integral instead."]
+[@@migrate { repl = Ast_types.is_integral } ]
 
 (** True if the argument is [intptr_t] (but _not_ its underlying integer type)
     @since 30.0-Zinc
@@ -2448,119 +2448,119 @@ val is_uintptr_t: typ -> bool
 
 (** True if the argument is a floating point type. *)
 val isFloatingType: typ -> bool
-[@@deprecated "Use Ast_types.is_floating_type instead."]
-[@@migrate { repl = Ast_types.is_floating_type } ]
+[@@deprecated "Use Ast_types.is_float instead."]
+[@@migrate { repl = Ast_types.is_float } ]
 
 (** True if the argument is an arithmetic type (i.e. integer, enum or
     floating point *)
 val isArithmeticType: typ -> bool
-[@@deprecated "Use Ast_types.is_arithmetic_type instead."]
-[@@migrate { repl = Ast_types.is_arithmetic_type } ]
+[@@deprecated "Use Ast_types.is_arithmetic instead."]
+[@@migrate { repl = Ast_types.is_arithmetic } ]
 
 (** True if the argument is a pointer type. *)
 val isPointerType: typ -> bool
-[@@deprecated "Use Ast_types.is_pointer_type instead."]
-[@@migrate { repl = Ast_types.is_pointer_type } ]
+[@@deprecated "Use Ast_types.is_ptr instead."]
+[@@migrate { repl = Ast_types.is_ptr } ]
 
 (** True if the argument is an integral or pointer type. *)
 val isIntegralOrPointerType: typ -> bool
-[@@deprecated "Use Ast_types.is_integral_or_pointer_type instead."]
-[@@migrate { repl = Ast_types.is_integral_or_pointer_type } ]
+[@@deprecated "Use Ast_types.is_integral_or_pointer instead."]
+[@@migrate { repl = Ast_types.is_integral_or_pointer } ]
 
 (** True if the argument is an array type *)
 val isArrayType: typ -> bool
-[@@deprecated "Use Ast_types.is_array_type instead."]
-[@@migrate { repl = Ast_types.is_array_type } ]
+[@@deprecated "Use Ast_types.is_array instead."]
+[@@migrate { repl = Ast_types.is_array } ]
 
 (** True if the argument is an array type without size
     @since 28.0-Nickel
 *)
 val isUnsizedArrayType: typ -> bool
-[@@deprecated "Use Ast_types.is_unsized_array_type instead."]
-[@@migrate { repl = Ast_types.is_unsized_array_type } ]
+[@@deprecated "Use Ast_types.is_unsized_array instead."]
+[@@migrate { repl = Ast_types.is_unsized_array } ]
 
 (** True if the argument is a sized array type
     @since 28.0-Nickel
 *)
 val isSizedArrayType: typ -> bool
-[@@deprecated "Use Ast_types.is_sized_array_type instead."]
-[@@migrate { repl = Ast_types.is_sized_array_type } ]
+[@@deprecated "Use Ast_types.is_sized_array instead."]
+[@@migrate { repl = Ast_types.is_sized_array } ]
 
 (** True if the argument is an array of a character type
     (i.e. plain, signed or unsigned)
 *)
 val isCharArrayType: typ -> bool
-[@@deprecated "Use Ast_types.is_char_array_type instead."]
-[@@migrate { repl = Ast_types.is_char_array_type } ]
+[@@deprecated "Use Ast_types.is_char_array instead."]
+[@@migrate { repl = Ast_types.is_char_array } ]
 
 (** True if the argument is an array of a character type
     (i.e. plain, signed or unsigned)
     @since Chlorine-20180501 *)
 val isAnyCharArrayType: typ -> bool
-[@@deprecated "Use Ast_types.is_any_char_array_type instead."]
-[@@migrate { repl = Ast_types.is_any_char_array_type } ]
+[@@deprecated "Use Ast_types.is_any_char_array instead."]
+[@@migrate { repl = Ast_types.is_any_char_array } ]
 
 (** True if the argument is a function type *)
 val isFunctionType: typ -> bool
-[@@deprecated "Use Ast_types.is_function_type instead."]
-[@@migrate { repl = Ast_types.is_function_type } ]
+[@@deprecated "Use Ast_types.is_fun instead."]
+[@@migrate { repl = Ast_types.is_fun } ]
 
 (** True if the argument is a function pointer type.
     @since 18.0-Argon *)
 val isFunPtrType: typ -> bool
-[@@deprecated "Use Ast_types.is_fun_ptr_type instead."]
-[@@migrate { repl = Ast_types.is_fun_ptr_type } ]
+[@@deprecated "Use Ast_types.is_fun_ptr instead."]
+[@@migrate { repl = Ast_types.is_fun_ptr } ]
 
 (** True if the argument is a scalar type (i.e. integral, enum,
     floating point or pointer
     @since 22.0-Titanium
 *)
 val isScalarType: typ -> bool
-[@@deprecated "Use Ast_types.is_scalar_type instead."]
-[@@migrate { repl = Ast_types.is_scalar_type } ]
+[@@deprecated "Use Ast_types.is_scalar instead."]
+[@@migrate { repl = Ast_types.is_scalar } ]
 
 (** True if the argument is a struct
     @since 28.0-Nickel
 *)
 val isStructType: typ -> bool
-[@@deprecated "Use Ast_types.is_struct_type instead."]
-[@@migrate { repl = Ast_types.is_struct_type } ]
+[@@deprecated "Use Ast_types.is_struct instead."]
+[@@migrate { repl = Ast_types.is_struct } ]
 
 (** True if the argument is a union type
     @since 28.0-Nickel
 *)
 val isUnionType: typ -> bool
-[@@deprecated "Use Ast_types.is_union_type instead."]
-[@@migrate { repl = Ast_types.is_union_type } ]
+[@@deprecated "Use Ast_types.is_union instead."]
+[@@migrate { repl = Ast_types.is_union } ]
 
 (** True if the argument is a struct or union type *)
 val isStructOrUnionType: typ -> bool
-[@@deprecated "Use Ast_types.is_struct_or_union_type instead."]
-[@@migrate { repl = Ast_types.is_struct_or_union_type } ]
+[@@deprecated "Use Ast_types.is_struct_or_union instead."]
+[@@migrate { repl = Ast_types.is_struct_or_union } ]
 
 (** Check if a type is a transparent union, and return the first field
 
     @since 28.0-Nickel *)
 val isTransparentUnion : typ -> fieldinfo option
-[@@deprecated "Use Ast_types.is_transparent_union_type instead."]
-[@@migrate { repl = Ast_types.is_transparent_union_type } ]
+[@@deprecated "Use Ast_types.is_transparent_union instead."]
+[@@migrate { repl = Ast_types.is_transparent_union } ]
 
 (** True if the argument denotes the type of ... in a variadic function.
     @since Nitrogen-20111001 moved from cabs2cil *)
 val isVariadicListType: typ -> bool
-[@@deprecated "Use Ast_types.is_variadic_list_type instead."]
-[@@migrate { repl = Ast_types.is_variadic_list_type } ]
+[@@deprecated "Use Ast_types.is_variadic_list instead."]
+[@@migrate { repl = Ast_types.is_variadic_list } ]
 
 val typeOf_pointed : typ -> typ
 (** Returns the type pointed by the given type. Asserts it is a pointer type. *)
-[@@deprecated "Use Ast_types.type_of_pointed instead."]
-[@@migrate { repl = Ast_types.type_of_pointed } ]
+[@@deprecated "Use Ast_types.direct_pointed_type instead."]
+[@@migrate { repl = Ast_types.direct_pointed_type } ]
 
 val typeOf_array_elem : typ -> typ
 (** Returns the type of the array elements of the given type.
     Asserts it is an array type. *)
-[@@deprecated "Use Ast_types.type_of_array_elem instead."]
-[@@migrate { repl = Ast_types.type_of_array_elem } ]
+[@@deprecated "Use Ast_types.direct_element_type instead."]
+[@@migrate { repl = Ast_types.direct_element_type } ]
 
 val typeOf_array_elem_size : typ -> typ * exp option
 (** Returns the type of the array elements of the given type, and the size
@@ -2569,64 +2569,64 @@ val typeOf_array_elem_size : typ -> typ * exp option
     @before Frama-C+dev This function applied {!Cil.constFoldToInt} on array's
     size and returned a [Z.t option].
     @since 30.0-Zinc *)
-[@@deprecated "Use Ast_types.type_of_array_elem_size instead."]
-[@@migrate { repl = Ast_types.type_of_array_elem_size } ]
+[@@deprecated "Use Ast_types.array_elem_type_and_size instead."]
+[@@migrate { repl = Ast_types.array_elem_type_and_size } ]
 
 (** True if the argument is the type for reified C types. *)
 val isTypeTagType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_typetag_type instead."]
-[@@migrate { repl = Ast_types.is_logic_typetag_type } ]
+[@@deprecated "Use Ast_types.is_logic_typetag instead."]
+[@@migrate { repl = Ast_types.is_logic_typetag } ]
 
 (** True if the argument is a boolean type, either integral C type or
     mathematical boolean one. *)
 val isLogicBooleanType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_boolan_type instead."]
-[@@migrate { repl = Ast_types.is_logic_boolan_type } ]
+[@@deprecated "Use Ast_types.is_logic_boolan instead."]
+[@@migrate { repl = Ast_types.is_logic_boolan } ]
 
 (** True if the argument is [_Bool] or [boolean].
     @since 19.0-Potassium
 *)
 val isLogicPureBooleanType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_pure_boolean_type instead."]
-[@@migrate { repl = Ast_types.is_logic_pure_boolean_type } ]
+[@@deprecated "Use Ast_types.is_logic_pure_boolean instead."]
+[@@migrate { repl = Ast_types.is_logic_pure_boolean } ]
 
 (** True if the argument is an integral type (i.e. integer or enum), either
     C or mathematical one. *)
 val isLogicIntegralType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_integral_type instead."]
-[@@migrate { repl = Ast_types.is_logic_integral_type } ]
+[@@deprecated "Use Ast_types.is_logic_integral instead."]
+[@@migrate { repl = Ast_types.is_logic_integral } ]
 
 (** True if the argument is a floating point type. *)
 val isLogicFloatType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_float_type instead."]
-[@@migrate { repl = Ast_types.is_logic_float_type } ]
+[@@deprecated "Use Ast_types.is_logic_float instead."]
+[@@migrate { repl = Ast_types.is_logic_float } ]
 
 (** True if the argument is the logic 'real' type. *)
 val isLogicRealType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_real_type instead."]
-[@@migrate { repl = Ast_types.is_logic_real_type } ]
+[@@deprecated "Use Ast_types.is_logic_real instead."]
+[@@migrate { repl = Ast_types.is_logic_real } ]
 
 (** True if the argument is a C floating point type or logic 'real' type. *)
 val isLogicRealOrFloatType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_real_or_float_type instead."]
-[@@migrate { repl = Ast_types.is_logic_real_or_float_type } ]
+[@@deprecated "Use Ast_types.is_logic_real_or_float instead."]
+[@@migrate { repl = Ast_types.is_logic_real_or_float } ]
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
     floating point, either C or mathematical one. *)
 val isLogicArithmeticType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_arithmetic_type instead."]
-[@@migrate { repl = Ast_types.is_logic_arithmetic_type } ]
+[@@deprecated "Use Ast_types.is_logic_arithmetic instead."]
+[@@migrate { repl = Ast_types.is_logic_arithmetic } ]
 
 (** True if the argument is the logic function type.
     Expands the logic type definition if necessary.
     @since 18.0-Argon *)
 val isLogicFunctionType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_function_type instead."]
-[@@migrate { repl = Ast_types.is_logic_function_type } ]
+[@@deprecated "Use Ast_types.is_logic_function instead."]
+[@@migrate { repl = Ast_types.is_logic_function } ]
 
 (** True if the argument is the logic function pointer type.
     Expands the logic type definition if necessary.
     @since 18.0-Argon *)
 val isLogicFunPtrType: logic_type -> bool
-[@@deprecated "Use Ast_types.is_logic_fun_ptr_type instead."]
-[@@migrate { repl = Ast_types.is_logic_fun_ptr_type } ]
+[@@deprecated "Use Ast_types.is_logic_fun_ptr instead."]
+[@@migrate { repl = Ast_types.is_logic_fun_ptr } ]
