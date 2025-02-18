@@ -377,11 +377,11 @@ let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
     Ok r
   with Sys_error s -> Error s
 
-let with_in (p: string) (f: in_channel -> 'a): ('a,string) result =
-  open_in (p :> string) |> protect_file_op ~close:close_in f
+let with_in (p: Normalized.t) (f: in_channel -> 'a): ('a,string) result =
+  open_in p |> protect_file_op ~close:close_in f
 
-let with_out (p: string) (f: out_channel -> 'a): ('a,string) result =
-  open_out (p :> string) |> protect_file_op ~close:close_out f
+let with_out (p: Normalized.t) (f: out_channel -> 'a): ('a,string) result =
+  open_out p |> protect_file_op ~close:close_out f
 
 module Operators =
 struct
