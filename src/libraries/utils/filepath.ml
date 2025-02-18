@@ -377,11 +377,30 @@ let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
     Ok r
   with Sys_error s -> Error s
 
-let with_in (p: Normalized.t) (f: in_channel -> 'a): ('a,string) result =
-  open_in p |> protect_file_op ~close:close_in f
+let with_in
+    ?(binary=false)
+    (p: Normalized.t) (f: in_channel -> 'a): ('a,string) result =
+  let flags =
+    [Open_rdonly] @
+    (if binary then [Open_binary] else [Open_text])
+  in
+  let perm = 0 in (* perm is ignored when Open_creat is not set *)
+  open_in_gen flags perm p |> protect_file_op ~close:close_in f
 
-let with_out (p: Normalized.t) (f: out_channel -> 'a): ('a,string) result =
-  open_out p |> protect_file_op ~close:close_out f
+type action_if_file_exists = Error | Append | Truncate
+
+let with_out
+    ?(binary=false) ?(if_exists=Truncate) ?(perm=0o666)
+    (p: Normalized.t) (f: out_channel -> 'a): ('a,string) result =
+  let flags =
+    [Open_wronly; Open_creat] @
+    (if binary then [Open_binary] else [Open_text]) @
+    match if_exists with
+    | Error -> [Open_excl]
+    | Append ->  [Open_append]
+    | Truncate -> [Open_trunc]
+  in
+  open_out_gen flags perm p |> protect_file_op ~close:close_out f
 
 module Operators =
 struct

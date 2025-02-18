@@ -268,22 +268,43 @@ val dirname: Normalized.t -> Normalized.t
 (** [with_in path f] calls [f] with a new input channel on the file [path]
     opened for reading. The file is closed when [f] returns or whenever an
     exception is thrown by [f].
+    @param binary must be set if the file need to be opened in binary mode
+    (disables conversion, e.g. new lines), defaults to false
     @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing of the file.
     @since Frama-C+dev
 *)
-val with_in: Normalized.t -> (in_channel -> 'a) -> ('a,string) result
+val with_in:
+  ?binary:bool ->
+  Normalized.t ->
+  (in_channel -> 'a) ->
+  ('a,string) result
+
+(** This types define what action [with_out] must perform when the file to
+    open already exists. *)
+type action_if_file_exists =
+  | Error (* file opening functions will fail with an error *)
+  | Append (* the writing contents will be appened *)
+  | Truncate (* the file will be truncated before any writes *)
 
 (** [with_out path f] calls [f] with a new output channel on the file [path]
     opened for writing. The file is closed when [f] returns or whenever an
     exception is thrown by [f].
+    @param binary must be set if the file need to be opened in binary mode
+    (disables conversion, e.g. new lines), defaults to [false].
+    @param if_exists defines what action must be performed when the file already
+    exists, defaults to [Truncate].
+    @param perm is the permissions to be applied when the file is created,
+    defaults to [0o666].
     @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing the file.
     @since Frama-C+dev
 *)
-val with_out: Normalized.t -> (out_channel -> 'a) -> ('a,string) result
+val with_out:
+  ?binary:bool -> ?if_exists:[< action_if_file_exists] -> ?mode:int ->
+  Normalized.t -> (out_channel -> 'a) -> ('a,string) result
 
 (** Opening this module allows to use shorter syntax to deal with file:
 
@@ -314,8 +335,12 @@ val with_out: Normalized.t -> (out_channel -> 'a) -> ('a,string) result
 module Operators : sig
   type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
 
-  val open_in: Normalized.t -> (in_channel,'a) safe_processor
-  val open_out: Normalized.t -> (out_channel,'a) safe_processor
+  val open_in:
+    ?binary:bool ->
+    Normalized.t -> (in_channel,'a) safe_processor
+  val open_out:
+    ?binary:bool -> ?if_exists:[< action_if_file_exists] -> ?perm:int ->
+    Normalized.t -> (out_channel,'a) safe_processor
 
   val (let+$): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
   val (let*$): ('ch,('a,string) result) safe_processor ->
