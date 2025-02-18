@@ -177,7 +177,7 @@ char *__gen_e_acsl_strdup(char const *s)
       __gen_e_acsl_assert_data_4.pred_txt = "\\result == \\null";
       __gen_e_acsl_assert_data_4.file = "FRAMAC_SHARE/libc/string.h";
       __gen_e_acsl_assert_data_4.fct = "strdup";
-      __gen_e_acsl_assert_data_4.line = 596;
+      __gen_e_acsl_assert_data_4.line = 590;
       __gen_e_acsl_assert_data_4.name = "no_allocation/result_null";
       __e_acsl_assert(__retres == (char *)0,& __gen_e_acsl_assert_data_4);
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data_4);

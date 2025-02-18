@@ -9,7 +9,7 @@
 [eva] fam.c:16: function memcpy: precondition 'valid_dest' got status valid.
 [eva] fam.c:16: function memcpy: precondition 'valid_src' got status valid.
 [eva] fam.c:16: function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:128: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for main
 [eva] Done for function main
