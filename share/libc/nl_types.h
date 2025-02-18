@@ -36,7 +36,7 @@ typedef unsigned long nl_item;
 */
 extern int catclose(nl_catd catd);
 
-char __fc_catgets[256]; // arbitrary size
+__FC_EXTERN char __fc_catgets[256]; // arbitrary size
 
 /*@
   assigns \result \from &__fc_catgets, s, indirect:catd, indirect:set_id,

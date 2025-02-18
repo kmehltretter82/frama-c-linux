@@ -435,8 +435,8 @@ extern unsigned long long int strtoull(
      char ** restrict endptr,
      int base);
 
-//@ ghost extern int __fc_random_counter __attribute__((unused));
-const unsigned long __fc_rand_max = __FC_RAND_MAX;
+//@ ghost __FC_EXTERN int __fc_random_counter __attribute__((unused));
+//@ ghost __FC_INTERN const unsigned long __fc_rand_max = __FC_RAND_MAX;
 
 /* ISO C: 7.20.2 */
 /*@
@@ -459,7 +459,7 @@ extern long int random(void);
 extern void srandom(unsigned int seed);
 
 // used to check if some *48() functions have called the seed initializer
-int __fc_random48_init;
+//@ ghost __FC_INTERN int __fc_random48_init;
 
 __FC_EXTERN unsigned short __fc_random48_counter[3];
 
@@ -904,13 +904,13 @@ extern lldiv_t lldiv(long long int numer, long long int denom);
 
 /* ISO C: 7.20.7 */
 
-//@ ghost extern int __fc_mblen_state;
+//@ ghost __FC_EXTERN int __fc_mblen_state;
 
 /*@ assigns \result, __fc_mblen_state \from
     indirect:s, indirect:s[0 ..], indirect:n, __fc_mblen_state; */
 extern int mblen(const char *s, size_t n);
 
-//@ ghost extern int __fc_mbtowc_state;
+//@ ghost __FC_EXTERN int __fc_mbtowc_state;
 
 /*@
   requires separation: \separated(pwc, s);
@@ -924,7 +924,7 @@ extern int mbtowc(wchar_t * restrict pwc,
      const char * restrict s,
      size_t n);
 
-//@ ghost extern int __fc_wctomb_state;
+//@ ghost __FC_EXTERN int __fc_wctomb_state;
 
 /*@
   //requires room_string: \valid(s + (0 .. __fc_mb_cur_max - 1));

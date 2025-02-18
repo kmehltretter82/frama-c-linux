@@ -120,10 +120,10 @@ struct addrinfo
 # define EAI_OVERFLOW	  -12	/* Argument buffer overflow.  */
 
 // dummy data, used for assigns clauses
-extern struct hostent __fc_dummy_hostent;
-extern struct netent __fc_dummy_netent;
-extern struct protoent __fc_dummy_protoent;
-extern struct servent __fc_dummy_servent;
+__FC_EXTERN struct hostent __fc_dummy_hostent;
+__FC_EXTERN struct netent __fc_dummy_netent;
+__FC_EXTERN struct protoent __fc_dummy_protoent;
+__FC_EXTERN struct servent __fc_dummy_servent;
 
 /*@
   assigns __fc_dummy_hostent \from \nothing;
@@ -152,7 +152,7 @@ extern void endservent(void);
 */
 extern void freeaddrinfo(struct addrinfo * addrinfo);
 
-const char *__fc_gai_strerror = "<error message reported by gai_strerror>";
+__FC_EXTERN const char *__fc_gai_strerror;
 
 /*@
   assigns \result \from indirect:errcode, __fc_gai_strerror;

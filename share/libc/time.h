@@ -243,7 +243,7 @@ extern int clock_gettime(clockid_t clk_id, struct timespec *tp);
   @ }                                           // calling thread
 */
 
-/*@ ghost volatile int __fc_interrupted; */
+/*@ ghost __FC_EXTERN volatile int __fc_interrupted; */
 
 /*@ // missing: may assign to errno: EINTR, EINVAL, ENOTSUP
     // missing: assigns \result, rmtp \from 'clock having id clock_id'

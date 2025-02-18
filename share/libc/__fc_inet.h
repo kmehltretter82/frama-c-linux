@@ -356,7 +356,7 @@ extern uint16_t ntohs(uint16_t arg);
   assigns \result \from indirect:arg[0..]; */
 extern in_addr_t inet_addr(const char *arg);
 
-volatile char __fc_inet_ntoa[16];
+__FC_EXTERN volatile char __fc_inet_ntoa[16];
 
 /*@
   assigns \result \from indirect:arg, &__fc_inet_ntoa;

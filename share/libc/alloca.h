@@ -28,7 +28,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-/*@ ghost extern int __fc_stack_status; */
+/*@ ghost __FC_EXTERN int __fc_stack_status; */
 
 // Note: alloca is considered to never fail, unlike malloc
 // Currently, ACSL does not allow specifying that the memory allocated by

@@ -291,7 +291,7 @@ extern char *strstr(const char *haystack, const char *needle);
 extern char *strcasestr(const char *haystack, const char *needle);
 
 // internal state of strtok
-char *__fc_strtok_ptr;
+//@ ghost __FC_INTERN char *__fc_strtok_ptr;
 
 /*@
   requires valid_string_delim: valid_read_string(delim);

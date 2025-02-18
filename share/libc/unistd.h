@@ -974,7 +974,7 @@ extern int getgroups(int gidsetsize, gid_t grouplist[]);
 */
 extern long gethostid(void);
 
-extern volatile char __fc_hostname[HOST_NAME_MAX];
+__FC_EXTERN volatile char __fc_hostname[HOST_NAME_MAX];
 
 /*@
   requires name_has_room: \valid(name + (0 .. len-1));

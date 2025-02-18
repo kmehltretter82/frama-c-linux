@@ -50,12 +50,7 @@ __FC_EXTERN char __fc_getpw_pw_gecos[64];
 __FC_EXTERN char __fc_getpw_pw_dir[64];
 __FC_EXTERN char __fc_getpw_pw_shell[64];
 
-struct passwd __fc_pwd =
-  {.pw_name = __fc_getpw_pw_name,
-   .pw_passwd = __fc_getpw_pw_passwd,
-   .pw_gecos = __fc_getpw_pw_gecos,
-   .pw_dir = __fc_getpw_pw_dir,
-   .pw_shell = __fc_getpw_pw_shell};
+__FC_EXTERN struct passwd __fc_pwd;
 
 /*@
   // missing: may assign to errno: EIO, EINTR, EMFILE, ENFILE

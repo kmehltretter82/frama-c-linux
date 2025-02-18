@@ -29,7 +29,7 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-/*@ ghost extern int __fc_heap_status; */
+/*@ ghost __FC_EXTERN int __fc_heap_status; */
 
 /*@ axiomatic dynamic_allocation {
   @   predicate is_allocable{L}(integer n) // Can a block of n bytes be allocated?

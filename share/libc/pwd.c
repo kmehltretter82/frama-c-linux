@@ -33,6 +33,13 @@ char __fc_getpw_pw_gecos[64];
 char __fc_getpw_pw_dir[64];
 char __fc_getpw_pw_shell[64];
 
+struct passwd __fc_pwd =
+  {.pw_name = __fc_getpw_pw_name,
+   .pw_passwd = __fc_getpw_pw_passwd,
+   .pw_gecos = __fc_getpw_pw_gecos,
+   .pw_dir = __fc_getpw_pw_dir,
+   .pw_shell = __fc_getpw_pw_shell};
+
 static int __fc_getpw_init; // used to initialize the __fc_getpw* strings
 
 #define COPY_FIELD(fieldname)                   \

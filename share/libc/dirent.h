@@ -48,7 +48,7 @@ typedef struct DIR {
   struct dirent ** __fc_dir_entries;
 } DIR;
 
-DIR __fc_opendir[__FC_FOPEN_MAX];
+__FC_EXTERN DIR __fc_opendir[__FC_FOPEN_MAX];
 
 /*@
   assigns \result \from indirect:*a[0..], indirect:*b[0..];
@@ -81,10 +81,10 @@ extern DIR *fdopendir(int fd);
   assigns \result \from path[0..], &__fc_opendir;
   assigns errno \from indirect:path[0..], indirect:&__fc_opendir;
   ensures result_null_or_valid: \result == \null || \valid(\result);
-  ensures valid_dir_stream_on_success: 
+  ensures valid_dir_stream_on_success:
     \result != \null ==> \result == &__fc_opendir[\result->__fc_dir_id];
   ensures stream_positioned_on_success:
-	\result != \null ==> \result->__fc_dir_inode != \null;
+    \result != \null ==> \result->__fc_dir_inode != \null;
 */
 extern DIR *opendir(const char *path);
 

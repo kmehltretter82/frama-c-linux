@@ -130,7 +130,7 @@ extern int renameat2(int olddirfd, const char *old_name,
                      int newdirfd, const char *new_name,
                      int flags);
 
-FILE __fc_fopen[__FC_FOPEN_MAX];
+__FC_EXTERN FILE __fc_fopen[__FC_FOPEN_MAX];
 
 /*@
   assigns \result \from &__fc_fopen;

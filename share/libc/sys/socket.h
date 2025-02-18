@@ -297,10 +297,10 @@ struct __fc_sockfds_type { int x; };
 //@ ghost struct __fc_sockfds_type __fc_sockfds[__FC_MAX_OPEN_SOCKETS];
 
 /* Represents the creation of new file descriptors for sockets. */
-//@ ghost extern int __fc_socket_counter;
+//@ ghost __FC_EXTERN int __fc_socket_counter;
 
 // __fc_sockfds represents the state of open socket descriptors.
-//@ ghost volatile int __fc_open_sock_fds;
+//@ ghost __FC_INTERN volatile int __fc_open_sock_fds;
 
 struct linger {
   int l_onoff;
@@ -450,7 +450,7 @@ extern int listen(int sockfd, int backlog);
 #define MSG_CMSG_CLOEXEC 0x40000000
 
 
-/*@ 
+/*@
   requires valid_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
   requires valid_buffer_length: \valid((char *)buf+(0 .. len-1));
   assigns  *((char *)buf+(0 .. len-1)), __fc_sockfds[sockfd], \result
@@ -558,7 +558,7 @@ extern ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
   requires valid_sockfd: 0 <= sockfd < __FC_MAX_OPEN_SOCKETS;
   requires optval_null_or_has_room:
            optval == \null || \valid_read(((char *)optval)+(0..optlen-1));
-  assigns  \result, __fc_sockfds[sockfd] 
+  assigns  \result, __fc_sockfds[sockfd]
            \from  __fc_sockfds[sockfd], level, optname,
              ((char *)optval)[0..optlen-1], optlen;
   ensures  result_error_or_ok: \result == 0 || \result == -1;
