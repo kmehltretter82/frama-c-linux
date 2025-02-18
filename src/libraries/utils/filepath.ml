@@ -368,18 +368,22 @@ let dirname p = Filename.dirname p
    raised by [open_out] (and [open_in] but it should not happen).
 *)
 let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
-  try
-    let r =
-      try f channel
-      with exn -> close channel; raise exn
-    in
-    close channel;
-    Ok r
-  with Sys_error s -> Error s
+  let r =
+    try f channel with
+    | exn ->
+      try
+        close channel;
+        raise exn
+      with
+      | Sys_error _ ->
+        raise exn (* re-raise the first exception, do not erase it *)
+  in
+  close channel;
+  r
 
-let with_in
+let with_in_exn
     ?(binary=false)
-    (p: Normalized.t) (f: in_channel -> 'a): ('a,string) result =
+    (p: Normalized.t) (f: in_channel -> 'a): 'a =
   let flags =
     [Open_rdonly] @
     (if binary then [Open_binary] else [Open_text])
@@ -387,11 +391,15 @@ let with_in
   let perm = 0 in (* perm is ignored when Open_creat is not set *)
   open_in_gen flags perm p |> protect_file_op ~close:close_in f
 
+let with_in ?binary p f =
+  try Ok (with_in_exn ?binary p f) with Sys_error s -> Error s
+
+
 type action_if_file_exists = Error | Append | Truncate
 
-let with_out
+let with_out_exn
     ?(binary=false) ?(if_exists=Truncate) ?(perm=0o666)
-    (p: Normalized.t) (f: out_channel -> 'a): ('a,string) result =
+    (p: Normalized.t) (f: out_channel -> 'a): 'a =
   let flags =
     [Open_wronly; Open_creat] @
     (if binary then [Open_binary] else [Open_text]) @
@@ -402,15 +410,22 @@ let with_out
   in
   open_out_gen flags perm p |> protect_file_op ~close:close_out f
 
+let with_out ?binary ?if_exists ?perm p f =
+  try Ok (with_out_exn ?binary ?if_exists ?perm p f) with Sys_error s -> Error s
+
 module Operators =
 struct
   type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
+  type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
 
+  let open_in_exn = with_in_exn
+  let open_out_exn = with_out_exn
   let open_in = with_in
   let open_out = with_out
 
   let (let+$) with_file f = with_file f
   let (let*$) with_file f = with_file f |> Result.join
+  let (let$) with_file f = with_file f
 
   let (let&) r f = Result.iter_error f r
 
@@ -420,7 +435,7 @@ struct
 
   let (let*&) r f = match r with
     | Ok _ -> r
-    | Error e -> f e  
+    | Error e -> f e
 end
 
 (*

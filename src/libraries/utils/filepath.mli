@@ -277,9 +277,12 @@ val dirname: Normalized.t -> Normalized.t
 *)
 val with_in:
   ?binary:bool ->
-  Normalized.t ->
-  (in_channel -> 'a) ->
-  ('a,string) result
+  Normalized.t -> (in_channel -> 'a) -> ('a,string) result
+
+(** Same as [with_in] but raises [Sys_error] instead of returning [Error] *)
+val with_in_exn :
+  ?binary:bool ->
+  Normalized.t -> (in_channel -> 'a) -> 'a
 
 (** This types define what action [with_out] must perform when the file to
     open already exists. *)
@@ -305,6 +308,11 @@ type action_if_file_exists =
 val with_out:
   ?binary:bool -> ?if_exists:action_if_file_exists -> ?perm:int ->
   Normalized.t -> (out_channel -> 'a) -> ('a,string) result
+
+(** Same as [with_out] but raises [Sys_error] instead of returning [Error] *)
+val with_out_exn:
+  ?binary:bool -> ?if_exists:action_if_file_exists -> ?perm:int ->
+  Normalized.t -> (out_channel -> 'a) -> 'a
 
 (** Opening this module allows to use shorter syntax to deal with file:
 
@@ -333,19 +341,32 @@ val with_out:
     ]}
 *)
 module Operators : sig
-  type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
+  type ('ch,'a) safe_processor
+  type ('ch,'a) exn_processor
 
   val open_in:
     ?binary:bool ->
     Normalized.t -> (in_channel,'a) safe_processor
+  val open_in_exn:
+    ?binary:bool ->
+    Normalized.t -> (in_channel,'a) exn_processor
   val open_out:
     ?binary:bool -> ?if_exists:action_if_file_exists -> ?perm:int ->
     Normalized.t -> (out_channel,'a) safe_processor
+  val open_out_exn:
+    ?binary:bool -> ?if_exists:action_if_file_exists -> ?perm:int ->
+    Normalized.t -> (out_channel,'a) exn_processor
 
+  (* The operators are intented to be used with [open_in] or [open_out]. *)
   val (let+$): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
-  val (let*$): ('ch,('a,string) result) safe_processor ->
+  val (let*$):
+    ('ch,('a,string) result) safe_processor ->
     ('ch -> ('a,string) result) ->
     ('a,string) result
+
+  (* This operator is intented to be used with [open_in_exn] or
+     [open_out_exn]. *)
+  val (let$): ('ch,'a) exn_processor -> ('ch -> 'a) -> 'a
 
   (* These operators can be used to handle errors *)
   val (let&): (unit,'e) result -> ('e -> unit) -> unit
