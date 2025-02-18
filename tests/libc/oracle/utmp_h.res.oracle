@@ -120,12 +120,12 @@
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
-  __fc_pwd.pw_name ∈ {{ &__fc_getpw_pw_name[0] }}
-          .pw_passwd ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_passwd[0] }}
+  __fc_pwd.pw_name ∈ {{ &S_pw_name___fc_pwd[0] }}
+          .pw_passwd ∈ {{ NULL + [--..--] ; &S_pw_passwd___fc_pwd[0] }}
           {.pw_uid; .pw_gid} ∈ [--..--]
-          .pw_gecos ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_gecos[0] }}
-          .pw_dir ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_dir[0] }}
-          .pw_shell ∈ {{ NULL + [--..--] ; &__fc_getpw_pw_shell[0] }}
+          .pw_gecos ∈ {{ NULL + [--..--] ; &S_pw_gecos___fc_pwd[0] }}
+          .pw_dir ∈ {{ NULL + [--..--] ; &S_pw_dir___fc_pwd[0] }}
+          .pw_shell ∈ {{ NULL + [--..--] ; &S_pw_shell___fc_pwd[0] }}
   __fc_utmp ∈ [--..--]
   entry.ut_type ∈ {8}
        .[bits 16 to 31] ∈ UNINITIALIZED

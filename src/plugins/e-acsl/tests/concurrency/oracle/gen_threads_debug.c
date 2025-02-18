@@ -1390,10 +1390,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_full_init((void *)(& __fc_random48_init));
     __e_acsl_store_block((void *)(& __fc_rand_max),8UL);
     __e_acsl_full_init((void *)(& __fc_rand_max));
-    __e_acsl_store_block((void *)(__fc_fopen),128UL);
-    __e_acsl_full_init((void *)(& __fc_fopen));
-    __e_acsl_store_block((void *)(& __fc_interrupted),4UL);
-    __e_acsl_full_init((void *)(& __fc_interrupted));
     __e_acsl_store_block((void *)(& time),4UL);
     __e_acsl_full_init((void *)(& time));
   }
@@ -1412,8 +1408,6 @@ void __e_acsl_globals_clean(void)
   __e_acsl_delete_block((void *)(& Frama_C_entropy_source));
   __e_acsl_delete_block((void *)(& __fc_random48_init));
   __e_acsl_delete_block((void *)(& __fc_rand_max));
-  __e_acsl_delete_block((void *)(__fc_fopen));
-  __e_acsl_delete_block((void *)(& __fc_interrupted));
   __e_acsl_delete_block((void *)(& time));
   return;
 }

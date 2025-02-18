@@ -425,10 +425,6 @@ void __e_acsl_globals_init(void)
   static char __e_acsl_already_run = 0;
   if (! __e_acsl_already_run) {
     __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(__fc_fopen),128UL);
-    __e_acsl_full_init((void *)(& __fc_fopen));
-    __e_acsl_store_block((void *)(& __fc_interrupted),4UL);
-    __e_acsl_full_init((void *)(& __fc_interrupted));
     __e_acsl_store_block((void *)(& time),4UL);
     __e_acsl_full_init((void *)(& time));
   }
@@ -437,8 +433,6 @@ void __e_acsl_globals_init(void)
 
 void __e_acsl_globals_clean(void)
 {
-  __e_acsl_delete_block((void *)(__fc_fopen));
-  __e_acsl_delete_block((void *)(& __fc_interrupted));
   __e_acsl_delete_block((void *)(& time));
   return;
 }

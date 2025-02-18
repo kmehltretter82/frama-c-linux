@@ -18,6 +18,10 @@
 [eva:garbled-mix:assigns] dirent_h.c:19: 
   The specification of function fdopendir
   has generated a garbled mix of addresses for assigns clause \result.
+[eva:garbled-mix:assigns] dirent_h.c:19: 
+  The specification of function fdopendir
+  has generated a garbled mix of addresses
+  for assigns clause __fc_opendir[0 .. 16 - 1].
 [eva] Done for function fdopendir
 [eva:alarm] dirent_h.c:19: Warning: 
   pointer comparison. assert \pointer_comparable((void *)d, (void *)0);
@@ -52,7 +56,12 @@
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
-  __fc_opendir[0..15] ∈ [--..--]
+  __fc_opendir[0..15] ∈
+              {{ garbled mix of &{S___fc_dir_inode_0___fc_opendir;
+                                  S___fc_dir_entries_0___fc_opendir;
+                                  S___fc_dir_inode_1___fc_opendir;
+                                  S___fc_dir_entries_1___fc_opendir}
+               (origin: Misaligned read {dirent_h.c:19}) }}
   d ∈ {{ &__fc_opendir + [0..240],0%16 }}
   dp ∈ {0}
   dfd ∈ [-1..1023]

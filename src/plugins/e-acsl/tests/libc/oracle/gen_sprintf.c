@@ -66,7 +66,7 @@ int main(void)
       __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
     }
     /*@ assert !\initialized(&buf[0 .. 3]); */ ;
-    __gen_e_acsl_sprintf_res = sprintf(buf,__gen_e_acsl_literal_string,10); /* sprintf_va_1 */
+    __gen_e_acsl_sprintf_res = sprintf(buf,"%d",10); /* sprintf_va_1 */
     if (__gen_e_acsl_sprintf_res >= 0) __e_acsl_initialize((void *)(buf),
                                                            (size_t)(__gen_e_acsl_sprintf_res + 1L));
     {
