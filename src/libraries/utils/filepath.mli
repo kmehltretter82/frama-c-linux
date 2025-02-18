@@ -303,7 +303,7 @@ type action_if_file_exists =
     @since Frama-C+dev
 *)
 val with_out:
-  ?binary:bool -> ?if_exists:[< action_if_file_exists] -> ?mode:int ->
+  ?binary:bool -> ?if_exists:action_if_file_exists -> ?perm:int ->
   Normalized.t -> (out_channel -> 'a) -> ('a,string) result
 
 (** Opening this module allows to use shorter syntax to deal with file:
@@ -339,13 +339,18 @@ module Operators : sig
     ?binary:bool ->
     Normalized.t -> (in_channel,'a) safe_processor
   val open_out:
-    ?binary:bool -> ?if_exists:[< action_if_file_exists] -> ?perm:int ->
+    ?binary:bool -> ?if_exists:action_if_file_exists -> ?perm:int ->
     Normalized.t -> (out_channel,'a) safe_processor
 
   val (let+$): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
   val (let*$): ('ch,('a,string) result) safe_processor ->
     ('ch -> ('a,string) result) ->
     ('a,string) result
+
+  (* These operators can be used to handle errors *)
+  val (let&): (unit,'e) result -> ('e -> unit) -> unit
+  val (let+&): ('a,'e) result -> ('e -> 'a) ->  ('a,'e) result
+  val (let*&): ('a,'e) result -> ('e -> ('a,'e) result) -> ('a,'e) result
 end
 
 (** *)

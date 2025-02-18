@@ -411,6 +411,16 @@ struct
 
   let (let+$) with_file f = with_file f
   let (let*$) with_file f = with_file f |> Result.join
+
+  let (let&) r f = Result.iter_error f r
+
+  let (let+&) r f = match r with
+    | Ok _ -> r
+    | Error e -> Ok (f e)
+
+  let (let*&) r f = match r with
+    | Ok _ -> r
+    | Error e -> f e  
 end
 
 (*
