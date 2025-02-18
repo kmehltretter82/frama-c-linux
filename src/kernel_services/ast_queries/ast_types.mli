@@ -29,7 +29,7 @@ open Cil_types
 
 (* TO REMOVE *)
 
-val pp_typ_ref: (Format.formatter -> typ -> unit) ref
+val pp_typ_ref : (Format.formatter -> typ -> unit) ref
 
 (* ************************************************************************* *)
 (** {2 Type Attributes} *)
@@ -97,12 +97,12 @@ val remove_qualifiers_deep : typ -> typ
 (** Remove all attributes relative to const, volatile and restrict attributes
     when building a C cast
 *)
-val remove_attributes_for_c_cast: typ -> typ
+val remove_attributes_for_c_cast : typ -> typ
 
 (** Remove all attributes relative to const, volatile and restrict attributes
     when building a logic cast
 *)
-val remove_attributes_for_logic_type: typ -> typ
+val remove_attributes_for_logic_type : typ -> typ
 
 (* ************************************************************************* *)
 (** {2 Utils functions} *)
@@ -112,20 +112,20 @@ val remove_attributes_for_logic_type: typ -> typ
     appearing in [TNamed] and add them to the final type using
     {!add_attributes}.
 *)
-val unroll_type: typ -> typ
+val unroll_type : typ -> typ
 
 (** Same than {!unroll_type} but discard the final type attributes and only
     return its node. *)
-val unroll_type_node: typ -> typ_node
+val unroll_type_node : typ -> typ_node
 
 (** Unroll typedefs, discarding all intermediate attribute. To be used only
     when one is interested in the shape of the type *)
-val unroll_type_skel: typ -> typ_node
+val unroll_type_skel : typ -> typ_node
 
 (** Unroll all the TNamed in a type (even under type constructors such as
     [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
     types. Will collect all attributes *)
-val unroll_type_deep: typ -> typ
+val unroll_type_deep : typ -> typ
 
 (* ************************************************************************* *)
 (** {2 Ghost Attribute} *)
@@ -151,113 +151,113 @@ val is_wellformed_ghost : typ -> bool
 (* ************************************************************************* *)
 
 (** is the given type "void"? *)
-val is_void: typ -> bool
+val is_void : typ -> bool
 
 (** is the given type "void *"? *)
-val is_void_ptr: typ -> bool
+val is_void_ptr : typ -> bool
 
 (** True if the argument is [_Bool]. *)
-val is_bool: typ -> bool
+val is_bool : typ -> bool
 
 (** True if the argument is a plain character type (but neither [signed char]
     nor [unsigned char]).
 *)
-val is_char: typ -> bool
+val is_char : typ -> bool
 
 (** True if the argument is a character type (i.e. plain, signed or unsigned). *)
-val is_any_char: typ -> bool
+val is_any_char : typ -> bool
 
 (** True if the argument is a pointer to a plain character type (but neither
     [signed char] nor [unsigned char]).
 *)
-val is_char_ptr: typ -> bool
+val is_char_ptr : typ -> bool
 
 (** True if the argument is a pointer to a character type (i.e. plain, signed or
     unsigned).
 *)
-val is_any_char_ptr: typ -> bool
+val is_any_char_ptr : typ -> bool
 
 (** True if the argument is a pointer to a constant character type, e.g. a
     string literal.
 *)
-val is_char_const_ptr: typ -> bool
+val is_char_const_ptr : typ -> bool
 
 (** True if the argument is a short type (i.e. signed or unsigned). *)
-val is_short: typ -> bool
+val is_short : typ -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum). *)
-val is_integral: typ -> bool
+val is_integral : typ -> bool
 
 (** True if the argument is [intptr_t] (but _not_ its underlying integer type). *)
-val is_intptr_t: typ -> bool
+val is_intptr_t : typ -> bool
 
 (** True if the argument is [uintptr_t] (but _not_ its underlying integer type). *)
-val is_uintptr_t: typ -> bool
+val is_uintptr_t : typ -> bool
 
 (** True if the argument is a floating point type. *)
-val is_float: typ -> bool
+val is_float : typ -> bool
 
 (** True if the argument is a long double type. *)
-val is_long_double: typ -> bool
+val is_long_double : typ -> bool
 
 (** True if the argument is an arithmetic type (i.e. integer, enum or floating
     point.
 *)
-val is_arithmetic: typ -> bool
+val is_arithmetic : typ -> bool
 
 (** True if the argument is a pointer type. *)
-val is_ptr: typ -> bool
+val is_ptr : typ -> bool
 
 (** True if the argument is an integral or pointer type. *)
-val is_integral_or_pointer: typ -> bool
+val is_integral_or_pointer : typ -> bool
 
 (** True if the argument is an array type. *)
-val is_array: typ -> bool
+val is_array : typ -> bool
 
 (** True if the argument is an array type without size. *)
-val is_unsized_array: typ -> bool
+val is_unsized_array : typ -> bool
 
 (** True if the argument is a sized array type. *)
-val is_sized_array: typ -> bool
+val is_sized_array : typ -> bool
 
 (** True if the argument is an array of a character type (i.e. plain, signed or
     unsigned).
 *)
-val is_char_array: typ -> bool
+val is_char_array : typ -> bool
 
 (** True if the argument is an array of a character type (i.e. plain, signed or
     unsigned).
 *)
-val is_any_char_array: typ -> bool
+val is_any_char_array : typ -> bool
 
 (** True if the argument is a function type. *)
-val is_fun: typ -> bool
+val is_fun : typ -> bool
 
 (** True if the argument is a function pointer type. *)
-val is_fun_ptr: typ -> bool
+val is_fun_ptr : typ -> bool
 
 (** True if the argument is a scalar type (i.e. integral, enum, floating point
     or pointer.
 *)
-val is_scalar: typ -> bool
+val is_scalar : typ -> bool
 
 (** True if the argument is an object type (i.e. not a function type). *)
-val is_object: typ -> bool
+val is_object : typ -> bool
 
 (** True if the argument is a struct. *)
-val is_struct: typ -> bool
+val is_struct : typ -> bool
 
 (** True if the argument is a union type. *)
-val is_union: typ -> bool
+val is_union : typ -> bool
 
 (** True if the argument is a struct or union type. *)
-val is_struct_or_union: typ -> bool
+val is_struct_or_union : typ -> bool
 
 (** Check if a type is a transparent union, and return the first field. *)
 val is_transparent_union : typ -> fieldinfo option
 
 (** True if the argument denotes the type of [...] in a variadic function. *)
-val is_variadic_list: typ -> bool
+val is_variadic_list : typ -> bool
 
 (* ************************************************************************* *)
 (** {2 Type access} *)
@@ -303,41 +303,41 @@ val array_elem_type_and_size : typ -> typ * exp option
 val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
 (** True if the argument is the type for reified C types. *)
-val is_logic_typetag: logic_type -> bool
+val is_logic_typetag : logic_type -> bool
 
 (** True if the argument is a boolean type, either integral C type or
     mathematical boolean one.
 *)
-val is_logic_boolean: logic_type -> bool
+val is_logic_boolean : logic_type -> bool
 
 (** True if the argument is [_Bool] or [boolean]. *)
-val is_logic_pure_boolean: logic_type -> bool
+val is_logic_pure_boolean : logic_type -> bool
 
 (** True if the argument is an integral type (i.e. integer or enum), either C or
     mathematical one.
 *)
-val is_logic_integral: logic_type -> bool
+val is_logic_integral : logic_type -> bool
 
 (** True if the argument is a floating point type. *)
-val is_logic_float: logic_type -> bool
+val is_logic_float : logic_type -> bool
 
 (** True if the argument is the logic 'real' type. *)
-val is_logic_real: logic_type -> bool
+val is_logic_real : logic_type -> bool
 
 (** True if the argument is a C floating point type or logic 'real' type. *)
-val is_logic_real_or_float: logic_type -> bool
+val is_logic_real_or_float : logic_type -> bool
 
 (** True if the argument is a logic arithmetic type (i.e. integer, enum or
     floating point, either C or mathematical one.
 *)
-val is_logic_arithmetic: logic_type -> bool
+val is_logic_arithmetic : logic_type -> bool
 
 (** True if the argument is the logic function type. Expands the logic type
     definition if necessary.
 *)
-val is_logic_fun: logic_type -> bool
+val is_logic_fun : logic_type -> bool
 
 (** True if the argument is the logic function pointer type. Expands the logic
     type definition if necessary.
 *)
-val is_logic_fun_ptr: logic_type -> bool
+val is_logic_fun_ptr : logic_type -> bool
