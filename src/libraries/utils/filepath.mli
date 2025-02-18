@@ -266,23 +266,21 @@ val basename: Normalized.t -> string
 val dirname: Normalized.t -> Normalized.t
 
 (** [with_in path f] calls [f] with a new input channel on the file [path]
-    opened for reading. The file is closed when f returns or whenever an
+    opened for reading. The file is closed when [f] returns or whenever an
     exception is thrown by [f].
-    If an [Sys_error] is thrown during the execution of f or during the closing
-    of the file, its string eror is returned.
     @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
-    if a [Sys_error s] is thrown.
+    if a [Sys_error s] is thrown during the execution of [f] or during the
+    closing of the file.
     @since Frama-C+dev
 *)
 val with_in: Normalized.t -> (in_channel -> 'a) -> ('a,string) result
 
 (** [with_out path f] calls [f] with a new output channel on the file [path]
-    opened for writing. The file is closed when f returns or whenever an
+    opened for writing. The file is closed when [f] returns or whenever an
     exception is thrown by [f].
-    If an [Sys_error] is thrown during the execution of f or during the closing
-    of the file, its string eror is returned.
     @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
-    if a [Sys_error s] is thrown.
+    if a [Sys_error s] is thrown during the execution of [f] or during the
+    closing the file.
     @since Frama-C+dev
 *)
 val with_out: Normalized.t -> (out_channel -> 'a) -> ('a,string) result

@@ -363,7 +363,7 @@ let basename p = Filename.basename p
 
 let dirname p = Filename.dirname p
 
-(* We dont't directly use Fun.protect as it catches exceptions in [finally]
+(* We don't directly use Fun.protect as it catches exceptions in [finally]
    and reraise them as [Finally_raised exn]. However, a Sys_error can be
    raised by [open_out] (and [open_in] but it should not happen).
 *)
