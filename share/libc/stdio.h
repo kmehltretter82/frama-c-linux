@@ -62,13 +62,13 @@ __PUSH_FC_STDLIB
 
 __BEGIN_DECLS
 
-extern FILE * __fc_stderr;
+__FC_EXTERN_FOR_MACRO(stderr) FILE * __fc_stderr;
 #define stderr (__fc_stderr)
 
-extern FILE * __fc_stdin;
+__FC_EXTERN_FOR_MACRO(stdin) FILE * __fc_stdin;
 #define stdin (__fc_stdin)
 
-extern FILE * __fc_stdout;
+__FC_EXTERN_FOR_MACRO(stdout) FILE * __fc_stdout;
 #define stdout (__fc_stdout)
 
 /*

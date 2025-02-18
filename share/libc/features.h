@@ -127,6 +127,16 @@
 #  define __FC_EXTERN extern __attribute__((__fc_stdlib_internal))
 #endif
 
+// The `__FC_EXTERN_FOR_MACRO` can be used to mark that a variable internal to
+// Frama-C replaces an existing libc macro. For instance `errno` is a macro
+// that points to `__fc_errno` in Frama-C's libc, in this case `__fc_errno` is
+// marked with `__FC_EXTERN_FOR_MACRO(errno)`. The macro adds the attributes
+// `__fc_stdlib_internal` and `__fc_stdlib_for_macro(macro)`.
+#ifndef __FC_EXTERN_FOR_MACRO
+#  define __FC_EXTERN_FOR_MACRO(orig)                                          \
+    extern __attribute__((__fc_stdlib_internal, __fc_stdlib_for_macro(#orig)))
+#endif
+
 // Add the attribute `__fc_stdlib_internal` to a global declaration that is not
 // `extern`.
 #ifndef __FC_INTERN

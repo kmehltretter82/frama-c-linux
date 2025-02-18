@@ -269,3 +269,8 @@ val split_array_attributes : attributes -> attributes * attributes
 
 (** Separate out the storage-modifier name attributes *)
 val split_storage_modifiers : attributes -> attributes * attributes
+
+(** Find the name of the replaced macro for extern globals in Frama-C's libc
+    that are replacing an existing macro. For instance [stdout] for
+    [__fc_stdout]. *)
+val find_fc_stdlib_extern_replacement : attributes -> string option

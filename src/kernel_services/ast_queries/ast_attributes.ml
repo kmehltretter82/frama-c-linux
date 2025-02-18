@@ -259,6 +259,29 @@ let fc_stdlib_internal = "fc_stdlib_internal"
 let () =
   register (AttrName false) fc_stdlib_internal
 
+(* Extern globals that replace a real libc global *)
+let fc_stdlib_for_macro = "fc_stdlib_for_macro"
+let () =
+  register (AttrName false) fc_stdlib_for_macro
+
+let find_fc_stdlib_extern_replacement attributes =
+  let open Option.Operators in
+  let is_extern_replace_attr attribute =
+    let name = get_name attribute in
+    String.equal name fc_stdlib_for_macro
+  in
+  let* extern_replace_attribute =
+    List.find_opt is_extern_replace_attr attributes
+  in
+  let attrparams = snd extern_replace_attribute in
+  match attrparams with
+  | [ AStr replacement ] -> Some replacement
+  | _ ->
+    Kernel.error
+      "attribute %s expects one string parameter."
+      fc_stdlib_for_macro;
+    None
+
 (* List of attributes for internal uses. *)
 
 let fc_internal_attributes =
@@ -276,6 +299,7 @@ let fc_internal_attributes =
   ; fc_oldstyleproto
   ; fc_missingproto
   ; fc_stdlib_internal
+  ; fc_stdlib_for_macro
   ; "declspec"
   ; "arraylen"
   ]
