@@ -363,6 +363,28 @@ let basename p = Filename.basename p
 
 let dirname p = Filename.dirname p
 
+(* -------------------------------------------------------------------------- *)
+(* --- Input/Output                                                       --- *)
+(* -------------------------------------------------------------------------- *)
+
+type action_if_file_misses = Create of int | DoNotCreate
+type action_if_file_exists = Error | Append | Truncate
+
+let flags_and_perm ?if_exists ~if_misses ~binary ~blocking default =
+  let l =
+    default ::
+    (if binary then [Open_binary] else [Open_text]) @
+    (if blocking then [] else [Open_nonblock]) @
+    match if_exists with
+    | Some Error -> [Open_excl]
+    | Some Append ->  [Open_append]
+    | Some Truncate -> [Open_trunc]
+    | None -> []
+  in
+  match if_misses with
+  | DoNotCreate -> l, 0 (* perm is ignored when Open_creat is not set *)
+  | Create mode -> Open_creat :: l, mode
+
 (* We don't directly use Fun.protect as it catches exceptions in [finally]
    and reraise them as [Finally_raised exn]. However, a Sys_error can be
    raised by [open_out] (and [open_in] but it should not happen).
@@ -382,36 +404,29 @@ let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
   r
 
 let with_in_exn
-    ?(binary=false)
+    ?(if_misses=DoNotCreate) ?(binary=false) ?(blocking=true)
     (p: Normalized.t) (f: in_channel -> 'a): 'a =
-  let flags =
-    [Open_rdonly] @
-    (if binary then [Open_binary] else [Open_text])
+  let flags, perm =
+    flags_and_perm ~if_misses ~binary ~blocking Open_rdonly
   in
-  let perm = 0 in (* perm is ignored when Open_creat is not set *)
   open_in_gen flags perm p |> protect_file_op ~close:close_in f
 
-let with_in ?binary p f =
-  try Ok (with_in_exn ?binary p f) with Sys_error s -> Error s
-
-
-type action_if_file_exists = Error | Append | Truncate
+let with_in ?if_misses ?binary ?blocking p f =
+  try Ok (with_in_exn ?if_misses ?binary ?blocking p f)
+  with Sys_error s -> Error s
 
 let with_out_exn
-    ?(binary=false) ?(if_exists=Truncate) ?(perm=0o666)
+    ?(if_misses=Create 0o666) ?(if_exists=Truncate)
+    ?(binary=false) ?(blocking=true)
     (p: Normalized.t) (f: out_channel -> 'a): 'a =
-  let flags =
-    [Open_wronly; Open_creat] @
-    (if binary then [Open_binary] else [Open_text]) @
-    match if_exists with
-    | Error -> [Open_excl]
-    | Append ->  [Open_append]
-    | Truncate -> [Open_trunc]
+  let flags, perm =
+    flags_and_perm ~if_exists ~if_misses ~binary ~blocking Open_wronly
   in
   open_out_gen flags perm p |> protect_file_op ~close:close_out f
 
-let with_out ?binary ?if_exists ?perm p f =
-  try Ok (with_out_exn ?binary ?if_exists ?perm p f) with Sys_error s -> Error s
+let with_out ?if_misses ?if_exists ?binary ?blocking p f =
+  try Ok (with_out_exn ?if_misses ?if_exists ?binary ?blocking p f)
+  with Sys_error s -> Error s
 
 module Operators =
 struct
