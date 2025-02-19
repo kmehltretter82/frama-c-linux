@@ -1521,7 +1521,7 @@ function_def: /* (* ISO 6.9.1 *) */
             Option.map
               (fun (loc', spec) -> spec, (loc, loc'))
               (Logic_lexer.spec s))
-		s
+        s
     in
     currentFunctionName := "<__FUNCTION__ used outside any functions>";
     doFunctionDef spec_loc loc (trd3 b) specs decl (fst3 b)
