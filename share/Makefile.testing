@@ -152,7 +152,9 @@ wtests-help:
 purge-tests:
 	find $(PTEST_ALL_DIRS) -name dune \
         | $(GREP) -e "/oracle.*/dune\|/result.*/dune" \
-        | $(XARGS) -n 10 $(RM)
+        | $(XARGS) $(RM)
+	find $(PTEST_ALL_DIRS) -name "*.wtests" \
+        | $(XARGS) $(RM)
 
 # Force the full cleaning of the testing environment
 .PHONY: clean-tests
