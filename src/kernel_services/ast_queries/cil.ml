@@ -55,7 +55,6 @@
 open Logic_const
 open Cil_datatype
 open Cil_types
-open Machine
 
 (* ************************************************************************* *)
 (* Reporting messages *)
@@ -99,7 +98,7 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
+let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
 let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
@@ -2340,14 +2339,15 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
   | IChar | ISChar | IUChar | IBool -> 1
-  | IInt | IUInt -> sizeof_int ()
-  | IShort | IUShort -> sizeof_short ()
-  | ILong | IULong -> sizeof_long ()
-  | ILongLong | IULongLong -> sizeof_longlong ()
+  | IInt | IUInt -> Machine.sizeof_int ()
+  | IShort | IUShort -> Machine.sizeof_short ()
+  | ILong | IULong -> Machine.sizeof_long ()
+  | ILongLong | IULongLong -> Machine.sizeof_longlong ()
 
 let bitsSizeOfInt ik = 8 * bytesSizeOfInt ik
 
 let intKindForSize (s:int) (unsigned:bool) : ikind =
+  let open Machine in
   if unsigned then
     (* Test the most common sizes first *)
     if s = 1 then IUChar
@@ -2373,9 +2373,9 @@ let int32_t  () = Cil_const.mk_tint (intKindForSize 4 false)
 let int16_t  () = Cil_const.mk_tint (intKindForSize 2 false)
 
 let floatKindForSize (s:int) =
-  if s = sizeof_double () then FDouble
-  else if s = sizeof_float () then FFloat
-  else if s = sizeof_longdouble () then FLongDouble
+  if s = Machine.sizeof_double () then FDouble
+  else if s = Machine.sizeof_float () then FFloat
+  else if s = Machine.sizeof_longdouble () then FLongDouble
   else raise Not_found
 
 (** Returns true if and only if the given integer type is signed. *)
@@ -2393,7 +2393,7 @@ let isSigned = function
   | ILongLong ->
     true
   | IChar ->
-    not (char_is_unsigned ())
+    not (Machine.char_is_unsigned ())
 
 let max_signed_number nrBits =
   let n = nrBits-1 in
@@ -2851,10 +2851,10 @@ let rec typeOf (e: exp) : typ =
   (* The type of a string is a pointer to characters ! The only case when
    * you would want it to be an array is as an argument to sizeof, but we
    * have SizeOfStr for that *)
-  | Const(CStr _s) -> string_literal_type ()
+  | Const(CStr _s) -> Machine.string_literal_type ()
 
   | Const(CWStr _s) ->
-    let typ = Ast_types.add_attributes [("const",[])] (wchar_type ()) in
+    let typ = Ast_types.add_attributes [("const",[])] (Machine.wchar_type ()) in
     Cil_const.mk_tptr typ
 
   | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
@@ -2864,8 +2864,8 @@ let rec typeOf (e: exp) : typ =
   (* l-values used as r-values lose their qualifiers (C99 6.3.2.1:2) *)
   | Lval lv -> Ast_types.remove_qualifiers (typeOfLval lv)
 
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> (sizeof_type ())
-  | AlignOf _ | AlignOfE _ -> (sizeof_type ())
+  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Machine.sizeof_type ()
+  | AlignOf _ | AlignOfE _ -> Machine.sizeof_type ()
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
@@ -3109,14 +3109,14 @@ let selfTypSize = TypSize.self
 
 (* Some basic type utilities *)
 let rank : ikind -> int =
- function
- (* these are just unique numbers representing the integer
-     conversion rank. *)
- | IBool | IChar | ISChar | IUChar -> 1
- | IShort | IUShort -> 2
- | IInt | IUInt -> 3
- | ILong | IULong -> 4
- | ILongLong | IULongLong -> 5
+  function
+  (* these are just unique numbers representing the integer
+      conversion rank. *)
+  | IBool | IChar | ISChar | IUChar -> 1
+  | IShort | IUShort -> 2
+  | IInt | IUInt -> 3
+  | ILong | IULong -> 4
+  | ILongLong | IULongLong -> 5
 
 let unsignedVersionOf (ik:ikind): ikind =
   match ik with
@@ -3187,6 +3187,7 @@ let ignoreAlignmentAttrs = ref false
 
 (* Get the minimum alignment in bytes for a given type *)
 let rec bytesAlignOf t =
+  let open Machine in
   let alignOfType () =
     match t.tnode with
     | TInt (IChar|ISChar|IUChar|IBool) -> 1
@@ -3341,7 +3342,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     if rest <> [] then
       Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
         pp;
-    alignof_aligned ()
+    Machine.alignof_aligned ()
   | at::_ ->
     Kernel.warning ~current:true "alignment attribute \"%a\" not understood on %t"
       !pp_attribute_ref at pp;
@@ -3351,7 +3352,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
    computed for the previous fields. [last] indicates that we are considering
    the last field of the struct. Set to [false] by default for unions. *)
 and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
-  if msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
+  if Machine.msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
   else offsetOfFieldAcc_GCC last fi sofar
 
 (* GCC version *)
@@ -3506,18 +3507,18 @@ and bitsSizeOfEmptyArray typ =
 and bitsSizeOf t =
   match t.tnode with
   | TInt ik            -> 8 * (bytesSizeOfInt ik)
-  | TFloat FDouble     -> 8 * sizeof_double ()
-  | TFloat FLongDouble -> 8 * sizeof_longdouble ()
-  | TFloat _           -> 8 * sizeof_float ()
+  | TFloat FDouble     -> 8 * Machine.sizeof_double ()
+  | TFloat FLongDouble -> 8 * Machine.sizeof_longdouble ()
+  | TFloat _           -> 8 * Machine.sizeof_float ()
   | TEnum ei           -> bitsSizeOf (Cil_const.mk_tint ei.ekind)
-  | TPtr _             -> 8 * sizeof_ptr ()
-  | TBuiltin_va_list   -> 8 * sizeof_ptr ()
+  | TPtr _             -> 8 * Machine.sizeof_ptr ()
+  | TBuiltin_va_list   -> 8 * Machine.sizeof_ptr ()
   | TNamed t           -> bitsSizeOf t.ttype
   | TComp ({cfields=None} as comp) ->
     raise
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-  | TComp {cfields=Some[]} when acceptEmptyCompinfo() ->
+  | TComp {cfields=Some[]} when Machine.acceptEmptyCompinfo() ->
     find_sizeof t (fun () -> t,0)
   | TComp ({cfields=Some[]} as comp) ->
     find_sizeof t
@@ -3541,7 +3542,7 @@ and bitsSizeOf t =
              (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
              startAcc (Option.get comp.cfields) (* Note: we treat None above *)
          in
-         if msvcMode () && lastoff.oaFirstFree = 0
+         if Machine.msvcMode () && lastoff.oaFirstFree = 0
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
@@ -3594,13 +3595,13 @@ and bitsSizeOf t =
              raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
   | TVoid ->
-    if sizeof_void () >= 0 then
-      8 * sizeof_void ()
+    if Machine.sizeof_void () >= 0 then
+      8 * Machine.sizeof_void ()
     else
       raise (SizeOfError ("Undefined sizeof(void).", t))
   | TFun _ ->
-    if sizeof_fun () >= 0 then
-      8 * sizeof_fun ()
+    if Machine.sizeof_fun () >= 0 then
+      8 * Machine.sizeof_fun ()
     else
       raise (SizeOfError ("Undefined sizeof on a function.", t))
 
@@ -3726,28 +3727,28 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
   | SizeOf t when machdep ->
     begin
-      try kinteger ~loc (sizeof_kind ()) (bytesSizeOf t)
+      try kinteger ~loc (Machine.sizeof_kind ()) (bytesSizeOf t)
       with SizeOfError _ -> e
     end
   | SizeOfE { enode = Const (CWStr l) } when machdep ->
     let len = List.length l in
-    let wchar_size = bitsSizeOfInt (wchar_kind ()) / 8 in
-    kinteger ~loc (sizeof_kind ()) ((len + 1) * wchar_size)
+    let wchar_size = bitsSizeOfInt (Machine.wchar_kind ()) / 8 in
+    kinteger ~loc (Machine.sizeof_kind ()) ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
-    kinteger ~loc (sizeof_kind ()) (1 + String.length s)
+    kinteger ~loc (Machine.sizeof_kind ()) (1 + String.length s)
   | AlignOf t when machdep ->
     begin
-      try kinteger ~loc (sizeof_kind ()) (bytesAlignOf t)
+      try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf t)
       with SizeOfError _ -> e
     end
   | AlignOfE e when machdep -> begin
       (* The alignment of an expression is not always the alignment of its
        * type. I know that for strings this is not true *)
       match e.enode with
-      | Const (CStr _) when not (msvcMode ()) ->
-        kinteger ~loc (sizeof_kind ()) (alignof_str ())
+      | Const (CStr _) when not (Machine.msvcMode ()) ->
+        kinteger ~loc (Machine.sizeof_kind ()) (Machine.alignof_str ())
       (* For an array, it is the alignment of the array ! *)
       | _ -> constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
     end
@@ -4001,7 +4002,7 @@ and constFoldToInt ?(machdep=true) e =
       (* Those casts are left left by constFold *)
       match constFoldToInt ~machdep e with
       | None -> None
-      | Some i as r -> if fitsInInt (uintptr_kind ()) i then r else None
+      | Some i as r -> if fitsInInt (Machine.uintptr_kind ()) i then r else None
     end
   | _ -> None
 
@@ -4986,7 +4987,7 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
            to be constant. If it is truncated, we consider it non-const
            in any case.
         *)
-        bytesSizeOfInt (uintptr_kind ()) <= bytesSizeOfInt i &&
+        bytesSizeOfInt (Machine.uintptr_kind ()) <= bytesSizeOfInt i &&
         isConstantGen is_varinfo_cst f e
       | _ -> isConstantGen is_varinfo_cst f e
     end
@@ -5219,7 +5220,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
   | TInt oldik, TInt ik ->
     let result k oldk = if rank oldk<rank k then k else oldk in
     let check_gcc_mode oldk k =
-      if gccMode () && oldk == IInt &&
+      if Machine.gccMode () && oldk == IInt &&
          bytesSizeOf t <= bytesSizeOfInt IInt &&
          (what = CombineFunarg true || what = CombineFunret)
       then k
@@ -5260,7 +5261,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
   | TFloat oldfk, TFloat fk ->
     let combineFK oldk k =
       if oldk == k then oldk else
-      if gccMode () && oldk == FDouble && k == FFloat
+      if Machine.gccMode () && oldk == FDouble && k == FFloat
          && (what = CombineFunarg true || what = CombineFunret)
       then k
       else
@@ -5495,7 +5496,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       (* ISO 6.3.2.3.1 *) ()
     | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
     | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
-      if not fromsource && newt != uintptr_type ()
+      if not fromsource && newt != Machine.uintptr_type ()
       then
         Kernel.warning
           ~wkey:Kernel.wkey_int_conversion
@@ -5775,7 +5776,7 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
   | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
-    if msvcMode () then
+    if Machine.msvcMode () then
       (* MSVC has a bug. We duplicate it here *)
       doIntegralArithmetic ()
     else
@@ -5826,8 +5827,8 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
       if Ast_types.is_ptr t1 && Ast_types.is_ptr t2
          && not (isZero e1) && not (isZero e2)
       then begin
-        mkCast ~force:true ~newt:(uintptr_type ()) e1,
-        mkCast ~force:true ~newt:(uintptr_type ()) e2
+        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e1,
+        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e2
       end else e1, e2
     | _ -> e1, e2
   in
@@ -5960,7 +5961,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ ->
     SingleInit(
-      if (insert_implicit_casts ()) then mkCast ~newt:t' (zero ~loc)
+      if (Machine.insert_implicit_casts ()) then mkCast ~newt:t' (zero ~loc)
       else zero ~loc)
   | _ -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref t'
 
@@ -6041,20 +6042,20 @@ let rec has_flexible_array_member t =
   let is_flexible_array t =
     match Ast_types.unroll_type_skel t with
     | TArray (_, None) -> true
-    | TArray (_, Some z) -> (msvcMode() || gccMode()) && isZero z
+    | TArray (_, Some z) -> Machine.(msvcMode() || gccMode()) && isZero z
     | _ -> false
   in
   match Ast_types.unroll_type_skel t with
   | TComp { cfields = Some ((_::_) as l) } ->
     let last = (Extlib.last l).ftype in
     is_flexible_array last ||
-    ((gccMode() || msvcMode()) && has_flexible_array_member last)
+    (Machine.(gccMode() || msvcMode()) && has_flexible_array_member last)
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
    a struct (which could be a FAM, making the whole struct complete even if
    the array type isn't. *)
-let rec isCompleteType ?(allowZeroSizeArrays=gccMode ())
+let rec isCompleteType ?(allowZeroSizeArrays=Machine.gccMode ())
     ?(last_field=false) t =
   match Ast_types.unroll_type_node t with
   | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
