@@ -1260,7 +1260,7 @@ struct
     let process_edge v e acc =
       (* Retrieve origin value *)
       let value = States.find_opt results v in
-      let result = Option.bind value (D.transfer v e) in
+      let result = Option.bind (D.transfer v e) value in
       Option.to_list result @ acc
     in
 
@@ -1314,10 +1314,8 @@ struct
 
   module Result =
   struct
+    open Option.Operators
     module Stmts = Cil_datatype.Stmt.Hashtbl
-
-    let (>>) o f = Option.map f o
-    let (>>:) = Option.bind
 
     let at_entry (automaton,_wto,states) =
       States.find_opt states automaton.entry_point
@@ -1326,10 +1324,12 @@ struct
       States.find_opt states automaton.return_point
 
     let before (automaton,_wto,states) stmt =
-      Stmts.find_opt automaton.stmt_table stmt >> fst >>: States.find_opt states
+      let* before, _ = Stmts.find_opt automaton.stmt_table stmt in
+      States.find_opt states before
 
     let after (automaton,_wto,states) stmt =
-      Stmts.find_opt automaton.stmt_table stmt >> snd >>: States.find_opt states
+      let* _, after = Stmts.find_opt automaton.stmt_table stmt in
+      States.find_opt states after
 
     let iter_vertex f (_automaton,_wto,states) =
       States.iter f states

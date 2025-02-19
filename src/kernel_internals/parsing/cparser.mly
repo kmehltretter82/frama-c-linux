@@ -1515,12 +1515,13 @@ function_def: /* (* ISO 6.9.1 *) */
 | s=ioption(SPEC) fn=function_def_start b=main_block {
     let (loc, specs, decl) = fn in
     let spec_loc =
-      Option.bind s
+      Option.bind
         (fun s ->
             let loc = fst s in
             Option.map
               (fun (loc', spec) -> spec, (loc, loc'))
               (Logic_lexer.spec s))
+		s
     in
     currentFunctionName := "<__FUNCTION__ used outside any functions>";
     doFunctionDef spec_loc loc (trd3 b) specs decl (fst3 b)

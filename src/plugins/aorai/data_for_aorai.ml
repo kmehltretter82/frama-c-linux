@@ -581,7 +581,7 @@ let check_one top info counter s =
   match info with
   | ECall (kf,used_prms,tr) ->
     Globals.Syntactic_search.find_in_scope ~strict:true s (Formal kf) |>
-    (Fun.flip Option.bind
+    (Option.bind
        (fun vi ->
           if top then Some (Logic_const.tvar (Cil.cvar_to_lvar vi))
           else Some (memo_aux_variable tr counter used_prms vi)))

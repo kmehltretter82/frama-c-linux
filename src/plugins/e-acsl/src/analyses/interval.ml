@@ -661,11 +661,11 @@ and compute_logic_env_if_branches logic_env t =
   let get_res = Error.map (fun x -> x) in
   let ival v = infer ~force:false ~logic_env v in
   let add_ub logic_env x v =
-    let max = Option.bind (Error.map extract_ival @@ ival v) Ival.max_int in
+    let max = Option.bind Ival.max_int (Error.map extract_ival @@ ival v) in
     Logic_env.refine logic_env x (Ival (Ival.inject_range None max))
   in
   let add_lb logic_env x v =
-    let min = Option.bind (Error.map extract_ival @@ ival v) Ival.min_int in
+    let min = Option.bind Ival.min_int (Error.map extract_ival @@ ival v) in
     Logic_env.refine logic_env x (Ival (Ival.inject_range min None))
   in
   let add_eq logic_env x v = Logic_env.refine logic_env x (get_res (ival v)) in

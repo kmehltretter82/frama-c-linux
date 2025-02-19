@@ -1275,7 +1275,7 @@ module State = struct
       Ival.(add_int (scale (Integer.of_int elem_size) index) sub_coeff)
 
   let mk_variable_builder (eval : evaluator) (_: t) =
-    let (let*) x f = Option.bind (Top.to_option x) f in
+    let (let*) x f = Option.bind f (Top.to_option x) in
     (* Is the interval computed for a variable a singleton? *)
     let is_singleton v =
       Top.map Cvalue.V.cardinal_zero_or_one v

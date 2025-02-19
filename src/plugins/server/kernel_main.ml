@@ -212,10 +212,10 @@ let () = States.option model ~name:"source"
     ~get:(fun (evt, _) -> evt.Log.evt_source)
 
 let getMarker (evt, _id) =
-  Option.bind evt.Log.evt_source Printer_tag.loc_to_localizable
+  Option.bind Printer_tag.loc_to_localizable evt.Log.evt_source
 
 let getDecl t =
-  Option.bind (getMarker t) Printer_tag.declaration_of_localizable
+  Option.bind Printer_tag.declaration_of_localizable (getMarker t)
 
 let () = States.option model ~name:"marker"
     ~descr:(Md.plain "Marker at the message position (if any)")

@@ -70,7 +70,7 @@ struct
     match Cil.unrollTypeNode ty with
     | TArray (te, n) ->
       begin
-        match Option.bind n Ctypes.get_int with
+        match Option.bind Ctypes.get_int n with
         | None -> failwith "Wp.Layout: unkown array size"
         | Some n -> Index(te,n)
       end

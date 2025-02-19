@@ -25,6 +25,3 @@
 
 include module type of Stdlib.Option
 include Monad.S_with_product with type 'a t = 'a option
-
-(** The bind is reversed for retrocompatibility reasons. *)
-val bind : 'a t -> ('a -> 'b t) -> 'b t

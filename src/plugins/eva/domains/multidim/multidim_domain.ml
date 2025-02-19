@@ -406,19 +406,21 @@ struct
 
   let update_var_references ~oracle (dst : Cil_types.varinfo)
       (src : Eva_ast.exp option) (base_map,tracked : t) =
-    let incr = Option.bind src (fun expr ->
-        let is_dst (exp : Eva_ast.exp) = match exp.node with
-          | Lval { node = Var v, NoOffset } -> Cil_datatype.Varinfo.equal dst v
-          | _ -> false
-        in
-        match expr.node with
-        | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e1 ->
-          Eva_ast.fold_to_integer e2
-        | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e2 ->
-          Eva_ast.fold_to_integer e1
-        | BinOp ((MinusA|MinusPI), e1, e2, _typ) when is_dst e1 ->
-          Option.map Integer.neg (Eva_ast.fold_to_integer e2)
-        | _ -> None)
+    let incr =
+      let open Option.Operators in
+      let* expr = src in
+      let is_dst (exp : Eva_ast.exp) = match exp.node with
+        | Lval { node = Var v, NoOffset } -> Cil_datatype.Varinfo.equal dst v
+        | _ -> false
+      in
+      match expr.node with
+      | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e1 ->
+        Eva_ast.fold_to_integer e2
+      | BinOp ((PlusA|PlusPI), e1, e2, _typ) when is_dst e2 ->
+        Eva_ast.fold_to_integer e1
+      | BinOp ((MinusA|MinusPI), e1, e2, _typ) when is_dst e1 ->
+        Option.map Integer.neg (Eva_ast.fold_to_integer e2)
+      | _ -> None
     in
     (* [oracle] must be the oracle before the (non-invertible)
        assignement of the referee to allow removing of eventual empty slice

@@ -3888,8 +3888,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let res =
         match current_chunk.stmts with
         | [(s1, m1, w1, r1, c1); (s2, m2, w2, r2, c2)] ->
-          Fun.flip
-            Option.bind
+          Option.bind
             (function
               | [ s1' ] -> Some (s1', m1 @ m2, w1 @ w2, r1 @ r2, c1 @ c2)
               | _ -> None (* should not happen. *))

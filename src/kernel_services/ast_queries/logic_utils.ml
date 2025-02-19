@@ -2454,10 +2454,10 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
   | TCast (false, Ctype typ, e) -> constFoldCastToInt ~machdep typ e
   | TCast (true, Linteger, e) -> constFoldTermToInt ~machdep e
   | Toffset (_, t) -> if machdep then constFoldToffset t else None
-  | Tif (c, e1, e2) -> begin
-      Option.bind (constFoldTermToInt ~machdep c)
-        (fun i -> constFoldTermToInt ~machdep (if Integer.is_zero i then e2 else e1))
-    end
+  | Tif (c, e1, e2) ->
+    let open Option.Operators in
+    let* i = constFoldTermToInt ~machdep c in
+    constFoldTermToInt ~machdep (if Integer.is_zero i then e2 else e1)
   | Tnull -> Some Integer.zero
   | Tapp (li, _, [{term_node = (Tunion args |
                                 TCast (true, _, {term_node = Tunion args}))}])

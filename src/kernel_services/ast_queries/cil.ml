@@ -3249,7 +3249,7 @@ let typeOf_array_elem t =
 let typeOf_array_elem_size t =
   match unrollTypeNode t with
   | TArray (ty_elem, arr_size) ->
-    ty_elem, Option.bind arr_size !constfoldtoint
+    ty_elem, Option.bind !constfoldtoint arr_size
   | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
 
 let no_op_coerce typ t =
