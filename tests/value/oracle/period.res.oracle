@@ -1,12 +1,6 @@
 [kernel] Parsing period.c (with preprocessing)
 [kernel:unknown-attribute] period.c:4: Warning: 
-  Unknown attribute: Frama_C_periodic
-[kernel:unknown-attribute] period.c:13: Warning: 
-  Unknown attribute: Frama_C_periodic
-[kernel:unknown-attribute] period.c:14: Warning: 
-  Unknown attribute: Frama_C_periodic
-[kernel:unknown-attribute] period.c:15: Warning: 
-  Unknown attribute: Frama_C_periodic
+  Ignoring unknown attribute: Frama_C_periodic
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

@@ -68,8 +68,7 @@ int __attribute__((__no_sanitize__("signed-integer-overflow"))) my_ZSTD_wrappedP
 (unsigned char const *lhs, unsigned char const *rhs)
 {
   int __attribute__((__no_sanitize__("signed-integer-overflow"))) __retres;
-  __retres = (int __attribute__((__no_sanitize__("signed-integer-overflow"))))(
-  lhs - rhs);
+  __retres = lhs - rhs;
   return __retres;
 }
 
