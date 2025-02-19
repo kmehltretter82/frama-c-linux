@@ -289,7 +289,7 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match Logic_utils.unroll_logic_type lv.lv_type with
+    match Ast_types.unroll_logic_type lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
     | Ctype ctyp when Ast_types.is_integral ctyp ->
@@ -306,7 +306,7 @@ let bind_logic_vars env lvs =
 
 let copy_logic_vars ~src ~dst lvars =
   let copy_one env lvar =
-    match Logic_utils.unroll_logic_type lvar.lv_type with
+    match Ast_types.unroll_logic_type lvar.lv_type with
     | Linteger | Lreal ->
       let value = LogicVarEnv.find lvar src.logic_vars in
       let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
@@ -326,7 +326,7 @@ let copy_logic_vars ~src ~dst lvars =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match Logic_utils.unroll_logic_type lv.lv_type with
+    match Ast_types.unroll_logic_type lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | Ctype _ ->
       let base = Base.of_c_logic_var lv in
@@ -545,10 +545,10 @@ let comes_from_fc_stdlib lvar =
 let is_noop_cast ~src_typ ~dst_typ =
   let src_typ = Logic_const.plain_or_set
       (fun lt ->
-         match Logic_utils.unroll_logic_type lt with
+         match Ast_types.unroll_logic_type lt with
          | Ctype typ -> Eval_typ.classify_as_scalar typ
          | _ -> None
-      ) (Logic_utils.unroll_logic_type src_typ)
+      ) (Ast_types.unroll_logic_type src_typ)
   in
   let open Eval_typ in
   match src_typ, Eval_typ.classify_as_scalar dst_typ with
@@ -562,7 +562,7 @@ let is_noop_cast ~src_typ ~dst_typ =
 (* If casting [trm] to [typ] has no effect in terms of the values contained
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
-  match Logic_utils.(unroll_logic_type typ, unroll_logic_type trm.term_type) with
+  match Ast_types.(unroll_logic_type typ, unroll_logic_type trm.term_type) with
   | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
   | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
     Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
@@ -1644,7 +1644,7 @@ and eval_tlhost ~alarm_mode env lv =
   match lv with
   | TVar lvar ->
     let base, typ =
-      match lvar.lv_origin, Logic_utils.unroll_logic_type lvar.lv_type with
+      match lvar.lv_origin, Ast_types.unroll_logic_type lvar.lv_type with
       | Some v, _ -> Base.of_varinfo v, v.vtype
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar

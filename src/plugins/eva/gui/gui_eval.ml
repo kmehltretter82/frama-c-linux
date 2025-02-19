@@ -29,10 +29,10 @@ let kf_called kf = Analysis.is_computed () && Results.is_called kf
 
 let term_c_type t =
   Logic_const.plain_or_set
-    (fun ltyp -> match Logic_utils.unroll_logic_type ltyp with
+    (fun ltyp -> match Ast_types.unroll_logic_type ltyp with
        | Ctype typ -> Some typ
        | _ -> None
-    ) (Logic_utils.unroll_logic_type t.term_type)
+    ) (Ast_types.unroll_logic_type t.term_type)
 
 let classify_pre_post kf ip =
   let open Property in

@@ -437,7 +437,7 @@ let object_of_array_elem = function
            "object_of_array_elem called on non-array %a." pp_object o
 
 let rec object_of_logic_type t =
-  match Logic_utils.unroll_logic_type ~unroll_typedef:false t with
+  match Ast_types.unroll_logic_type ~unroll_typedef:false t with
   | Ctype ty -> object_of ty
   | Ltype({lt_name="set"},[t]) -> object_of_logic_type t
   | t -> Wp_parameters.fatal ~current:true
@@ -445,7 +445,7 @@ let rec object_of_logic_type t =
            Printer.pp_logic_type t
 
 let rec object_of_logic_pointed t =
-  match Logic_utils.unroll_logic_type ~unroll_typedef:false t with
+  match Ast_types.unroll_logic_type ~unroll_typedef:false t with
   | Ctype ty -> object_of_pointed (object_of ty)
   | Ltype({lt_name="set"},[t]) -> object_of_logic_pointed t
   | t -> Wp_parameters.fatal ~current:true

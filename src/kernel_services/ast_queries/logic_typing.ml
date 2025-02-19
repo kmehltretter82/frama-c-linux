@@ -260,7 +260,7 @@ let lift_set f loc =
 
 let is_same_type t1 t2 =
   Cil_datatype.Logic_type.equal
-    (Logic_utils.unroll_logic_type t1) (Logic_utils.unroll_logic_type t2)
+    (Ast_types.unroll_logic_type t1) (Ast_types.unroll_logic_type t2)
 
 let type_rel = function
   | Eq -> Cil_types.Req
@@ -557,7 +557,7 @@ let get_typer_block = Extensions.typer_block
 let get_importer = Extensions.importer
 
 let rec arithmetic_conversion ty1 ty2 =
-  match unroll_logic_type ty1, unroll_logic_type ty2 with
+  match Ast_types.unroll_logic_type ty1, Ast_types.unroll_logic_type ty2 with
   | Ctype ty1, Ctype ty2 ->
     if Ast_types.is_integral ty1 && Ast_types.is_integral ty2
     then Linteger
@@ -580,7 +580,7 @@ let rec arithmetic_conversion ty1 ty2 =
       Cil_printer.pp_logic_type ty1 Cil_printer.pp_logic_type ty2
 
 let rec ctype_of_pointed t =
-  match unroll_logic_type t with
+  match Ast_types.unroll_logic_type t with
     Ctype ty when Ast_types.is_ptr ty -> Ast_types.direct_pointed_type ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_pointed t
   | _ ->
@@ -588,7 +588,7 @@ let rec ctype_of_pointed t =
       Cil_printer.pp_logic_type t
 
 let rec ctype_of_array_elem t =
-  match unroll_logic_type t with
+  match Ast_types.unroll_logic_type t with
   | Ctype ty when Ast_types.is_array ty -> Ast_types.direct_element_type ty
   | Ltype ({lt_name = "set"},[t]) -> ctype_of_array_elem t
   | _ ->
@@ -1364,7 +1364,7 @@ struct
     end else if is_enum_cst e newt then { e with term_type = newt }
     else begin
       match
-        (unroll_logic_type e.term_type),
+        (Ast_types.unroll_logic_type e.term_type),
         (* If any, use the typedef itself in the inserted cast *)
         (Logic_const.unroll_ltdef newt)
       with
@@ -1479,7 +1479,7 @@ struct
     otherwise print an error message with location [loc]
    *)
   let rec implicit_conversion ~overloaded loc oterm ot nt =
-    match (unroll_logic_type ot), (unroll_logic_type nt) with
+    match (Ast_types.unroll_logic_type ot), (Ast_types.unroll_logic_type nt) with
     | Ctype ty1, Ctype ty2 ->
       if is_same_c_type ty1 ty2
       then ot, oterm
@@ -1588,7 +1588,7 @@ struct
           Cil_printer.pp_logic_type ot Cil_printer.pp_logic_type nt
 
   let rec find_supertype ~overloaded loc t ot nt =
-    match unroll_logic_type ot, unroll_logic_type nt with
+    match Ast_types.unroll_logic_type ot, Ast_types.unroll_logic_type nt with
     | Ctype ot, Ctype nt ->
       if is_same_c_type ot nt then Ctype ot
       else if Ast_types.(is_integral ot && is_integral nt) then Linteger
@@ -1643,7 +1643,7 @@ struct
           Cil_printer.pp_logic_type ot Cil_printer.pp_logic_type nt
 
   let rec partial_unif ~overloaded loc term ot nt env =
-    match unroll_logic_type ot, unroll_logic_type nt with
+    match Ast_types.unroll_logic_type ot, Ast_types.unroll_logic_type nt with
     | Lvar s1, Lvar s2 ->
       if generated_var s1 then
         try
@@ -1765,7 +1765,7 @@ struct
     res
 
   let convertible_non_null (ty1,t as t1) (ty2,_ as t2) =
-    match (unroll_logic_type ty1, unroll_logic_type ty2) with
+    match (Ast_types.unroll_logic_type ty1, Ast_types.unroll_logic_type ty2) with
     | Ctype ty1, Ctype ty2 when
         Ast_types.is_ptr ty1 && Ast_types.is_ptr ty2 && isLogicNull t ->
       Ast_types.is_void_ptr ty2
@@ -1809,7 +1809,7 @@ struct
     assert (l <> []); l
 
   let rec logic_arithmetic_promotion t =
-    match unroll_logic_type t with
+    match Ast_types.unroll_logic_type t with
     | Ctype ty when Ast_types.is_integral ty -> Linteger
     | Linteger -> Linteger
     | Lreal -> Lreal
@@ -1828,7 +1828,7 @@ struct
         Cil_printer.pp_logic_type t
 
   let rec integral_promotion t =
-    match unroll_logic_type t with
+    match Ast_types.unroll_logic_type t with
     | Ctype ty when Ast_types.is_integral ty -> Linteger
     | Linteger -> Linteger
     | Ltype ({lt_name="set"} as lt,[t]) -> Ltype(lt,[integral_promotion t])
@@ -1878,7 +1878,7 @@ struct
 
   let conditional_conversion loc rel t1 t2 =
     let rec aux lty1 lty2 =
-      match (unroll_logic_type lty1), (unroll_logic_type lty2) with
+      match (Ast_types.unroll_logic_type lty1), (Ast_types.unroll_logic_type lty2) with
       | Ctype ty1, Ctype ty2 ->
         if Ast_types.is_integral ty1 && Ast_types.is_integral ty2 then
           if is_same_type lty1 lty2 then lty1
@@ -2064,7 +2064,7 @@ struct
     let (tq,env) =
       List.fold_left
         (fun (tq,env) (ty, id) ->
-           let ty = unroll_logic_type (logic_type ctxt loc env ty) in
+           let ty = Ast_types.unroll_logic_type (logic_type ctxt loc env ty) in
            let v = Cil_const.make_logic_var_kind id kind ty in
            (v::tq, Lenv.add_var id v env))
         ([],env) q
@@ -2092,7 +2092,7 @@ struct
       List.find (fun x -> x.l_var_info.lv_id = v.lv_id) l
 
   let eta_expand loc names env v =
-    match (unroll_logic_type v.lv_type) with
+    match (Ast_types.unroll_logic_type v.lv_type) with
       Larrow(args,rt) ->
       let (_,vars) = List.fold_right
           (fun x (i,l) ->
@@ -2138,7 +2138,7 @@ struct
 
   let normalize_lambda_term env term =
     let add_binders quants term =
-      match term.term_node, (unroll_logic_type term.term_type) with
+      match term.term_node, (Ast_types.unroll_logic_type term.term_type) with
       | Tlambda(quants',term), Larrow (args,rt_typ) ->
         let args = List.fold_right (fun x l -> x.lv_type :: l) quants args in
         { term with
@@ -2255,7 +2255,7 @@ struct
 
   let normalize_updated_offset_term idx_typing env loc t normalizing_cont toff =
     let t_type =
-      try Logic_utils.logicCType (Logic_utils.unroll_logic_type t.term_type)
+      try Logic_utils.logicCType (Ast_types.unroll_logic_type t.term_type)
       with Failure _ ->
         C.error loc "Trying to update field on a non struct type %a"
           Cil_printer.pp_logic_type t.term_type
@@ -2494,7 +2494,7 @@ struct
     | (toff::tail) as offs ->
       begin
         let t_type =
-          try Logic_utils.logicCType (Logic_utils.unroll_logic_type t.term_type)
+          try Logic_utils.logicCType (Ast_types.unroll_logic_type t.term_type)
           with Failure _ ->
             if ctxt.silent then raise Backtrack;
             ctxt.error loc "Update field on a non-struct type %a"
@@ -4388,7 +4388,7 @@ struct
       let checks_tsets_type ~reads fct ctyp =
         List.iter
           begin fun t ->
-            let check t = match Logic_utils.unroll_logic_type t with
+            let check t = match Ast_types.unroll_logic_type t with
               | Ctype ctyp' ->
                 ( reads || not (Cil.isConstType ctyp') )
                 && Cil_datatype.Typ.equal ctyp

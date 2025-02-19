@@ -60,7 +60,7 @@ let skind = function
   | A -> Logic.Sdata
 
 let rec lkind t =
-  match Logic_utils.unroll_logic_type ~unroll_typedef:false t with
+  match Ast_types.unroll_logic_type ~unroll_typedef:false t with
   | Ctype ty -> ckind ty
   | Ltype({lt_name="set"},[t]) -> lkind t
   | Lreal -> R

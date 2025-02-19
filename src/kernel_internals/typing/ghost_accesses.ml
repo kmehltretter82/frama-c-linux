@@ -82,7 +82,7 @@ let get_lvalue = function
   | _ -> None
 
 let rec ghost_term_type t =
-  match (Logic_utils.unroll_logic_type t) with
+  match (Ast_types.unroll_logic_type t) with
   | Ctype t -> Ast_types.is_ghost t
   | t when Logic_const.is_set_type t ->
     ghost_term_type (Logic_const.type_of_element t)

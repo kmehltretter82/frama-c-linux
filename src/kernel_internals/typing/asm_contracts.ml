@@ -101,7 +101,7 @@ let access_elts ~loc ?size tlv =
   Logic_const.addTermOffsetLval (TIndex(range,TNoOffset)) tlv
 
 let extract_mem_term ~loc acc tlv =
-  match Logic_utils.unroll_logic_type (Cil.typeOfTermLval tlv) with
+  match Ast_types.unroll_logic_type (Cil.typeOfTermLval tlv) with
   | Ctype { tnode = TPtr _ } -> access_ptr_elts ~loc tlv :: acc
   | Ctype { tnode = TArray (_,e) } ->
     let size = Option.bind (Cil.constFoldToInt ~machdep:true) e in
