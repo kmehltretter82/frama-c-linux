@@ -1047,12 +1047,25 @@ struct
       else
         let b = Buffer.create 17 in
         let first = ref true in
+        let to_escape =
+          if use_category then
+            [ '+'; '-'; '@'; ' '; '\t'; '\n'; '\r' ]
+          else
+            []
+        in
         C.iter
           (fun e ->
-             let s = E.to_string e in
-             if !first then begin if s <> "" then first := false end
-             else Buffer.add_string b ",";
-             Buffer.add_string b (E.to_string e))
+             let raw = E.to_string e in
+             if !first then begin if raw <> "" then first := false end
+             else Buffer.add_char b ',';
+             if raw <> "" && List.mem (Stdlib.String.get raw 0) to_escape then
+               Buffer.add_char b '\\';
+             Stdlib.String.iter
+               (fun c ->
+                  if c = ',' || c = '\\' then
+                    Buffer.add_char b '\\';
+                  Buffer.add_char b c)
+               raw)
           c;
         Buffer.contents b
 
