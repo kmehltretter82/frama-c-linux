@@ -133,21 +133,26 @@ val filter : string -> attributes -> attributes
 type attribute_class =
   (** Attribute of a name. If argument is true and we are on MSVC then
       the attribute is printed using __declspec as part of the storage
-      specifier  *)
+      specifier.
+  *)
   | AttrName of bool
 
   (** Attribute of a function type. If argument is true and we are on
-      MSVC then the attribute is printed just before the function name *)
+      MSVC then the attribute is printed just before the function name.
+  *)
   | AttrFunType of bool
 
-  (** Attribute of a type *)
+  (** Attribute of a type. *)
   | AttrType
 
-  (** Attribute of a statement or a block *)
+  (** Attribute of a statement or a block. *)
   | AttrStmt
 
-  (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions {!get_attribute_class} and {!partition_attributes}. *)
+  (** Attribute that does not correspond to either of the above classes. It is
+      assigned a default class by {!get_class} and can lead to attributes
+      being ignored by {!partition}. It will also be ignored when comparing
+      types, see {!Cil_datatype.drop_ignored_attributes}.
+  *)
   | AttrIgnored
 
 (** Table containing all registered attributes. *)
@@ -172,9 +177,10 @@ val get_class : default:attribute_class -> string -> attribute_class
 *)
 val is_known : string -> bool
 
-(** Partition the attributes into classes: name attributes, function type and
-    type attributes. Unknown and ignored attributes are returned in the
-    `default` attribute class.
+(** Partition the attributes into classes: name, function type and
+    type. Statement attributes are removed with a warning, Unknown and Ignored
+    attributes are returned in the `default` attribute class. If this class
+    is [AttrIgnored], they are removed like [AttrStmt] without warning.
 *)
 val partition : default:attribute_class -> attributes ->
   attributes * (* AttrName *)
