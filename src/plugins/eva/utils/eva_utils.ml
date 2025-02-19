@@ -120,10 +120,14 @@ module DegenerationPoints =
       let dependencies = [ Self.state ]
     end)
 
+let is_interactive () = System_config.is_gui || Server.Main.is_active ()
+let is_saved () = not (Kernel.SaveState.is_empty ())
+
 let protect_only_once = ref true
 
 let protect f ~cleanup =
-  let catch () = !protect_only_once && not (Kernel.SaveState.is_empty ()) in
+  protect_only_once := true;
+  let catch () = is_interactive () || is_saved () in
   let cleanup () =
     Self.feedback ~once:true "Clean up and save partial results.";
     try cleanup ()
@@ -133,8 +137,9 @@ let protect f ~cleanup =
   in
   try f ();
   with
-  | Log.AbortError _ | Log.AbortFatal _ | Log.FeatureRequest _
-  | Sys.Break as e when catch () ->
+  | Log.(AbortError _ | AbortFatal _ | FeatureRequest _) as e when catch () ->
+    cleanup (); raise e
+  | Sys.Break as e when catch () && !protect_only_once ->
     cleanup (); raise e
   | Self.Abort as e ->
     cleanup (); raise e
