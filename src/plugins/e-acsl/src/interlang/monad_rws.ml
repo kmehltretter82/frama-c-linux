@@ -49,14 +49,6 @@ module type S = sig
   val get : state t
   val set : state -> unit t
   val modify : (state -> state) -> unit t
-
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-  end
 end
 
 module Make (C : Conf)
@@ -91,14 +83,4 @@ module Make (C : Conf)
   let get = fun _env state -> state, C.empty_out (), state
   let set state = fun _env _state -> (), C.empty_out (), state
   let modify f = fun _env state -> (), C.empty_out (), f state
-
-  module Bool = struct
-    let only_if b m = if b then m else return ()
-  end
-
-  module Option = struct
-    let iter f = function
-      | None -> return ()
-      | Some x -> f x
-  end
 end

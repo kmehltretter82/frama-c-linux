@@ -119,7 +119,12 @@ end
 
 module TopBottom: sig
 
-  include Monad.S_with_product with type 'a t = 'a or_top_bottom
+  type 'a t = 'a or_top_bottom
+  val return : 'a -> 'a t
+  val product : [< 'a t] -> [< 'b t] -> [> ('a * 'b) t]
+  val bind : ('a -> ([> 'b t] as 'c)) -> [< 'a t] -> 'c
+  val map : ('a -> 'b) -> [< 'a t] -> [> 'b t]
+  val flatten : [< 'a t t] -> [> 'a t]
 
   (** Datatype constructor *)
   module Make_Datatype (Domain: Datatype.S) :

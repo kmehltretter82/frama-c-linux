@@ -57,17 +57,38 @@
     currently used in a code.
     @since Frama-C+dev *)
 module type S = sig
+
   type 'a t
   val return : 'a -> 'a t
   val flatten : 'a t t -> 'a t
   val map  : ('a -> 'b  ) -> 'a t -> 'b t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
+
+  (** monadic convenience functions around booleans *)
+  module Bool : sig
+    val only_if : bool -> unit t -> unit t
+  end
+
+  (** applying monadic functions to the option type *)
+  module Option : sig
+    val iter : ('a -> unit t) -> 'a option -> unit t
+    val map : ('a -> 'b t) -> 'a option -> 'b option t
+  end
+
+  (** applying monadic functions to lists *)
+  module List : sig
+    val iter : ('a -> unit t) -> 'a list -> unit t
+    val map : ('a -> 'b t) -> 'a list -> 'b list t
+    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
+  end
+
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( >>-: ) : 'a t -> ('a -> 'b) -> 'b t
     val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
   end
+
 end
 
 
@@ -83,12 +104,29 @@ end
     and the two let-bindings [and*] and [and+].
     @since Frama-C+dev *)
 module type S_with_product = sig
+
   type 'a t
   val return : 'a -> 'a t
   val flatten : 'a t t -> 'a t
   val map  : ('a -> 'b  ) -> 'a t -> 'b t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
   val product : 'a t -> 'b t -> ('a * 'b) t
+
+  module Bool : sig
+    val only_if : bool -> unit t -> unit t
+  end
+
+  module Option : sig
+    val iter : ('a -> unit t) -> 'a option -> unit t
+    val map : ('a -> 'b t) -> 'a option -> 'b option t
+  end
+
+  module List : sig
+    val iter : ('a -> unit t) -> 'a list -> unit t
+    val map : ('a -> 'b t) -> 'a list -> 'b list t
+    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
+  end
+
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -97,6 +135,7 @@ module type S_with_product = sig
     val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
     val ( and+ ) : 'a t -> 'b t -> ('a * 'b) t
   end
+
 end
 
 
