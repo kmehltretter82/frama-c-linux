@@ -20,7 +20,9 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [option] type to a full fleshed monad.
+(** Extend the [option] type to a full fleshed monad. Be wary that the
+    parameters order of the [bind] function are reversed compared to
+    the standard library.
     @since Frama-C+dev *)
 
 include module type of Stdlib.Option
