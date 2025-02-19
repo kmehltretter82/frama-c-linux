@@ -317,24 +317,23 @@ module Lenv = struct
   }
 
   let string_of_current_label env =
-    Option.bind env.current_logic_label (
-      function
-      | FormalLabel _ -> None
-      | BuiltinLabel Init -> Some "Init"
-      | BuiltinLabel Pre -> Some "Pre"
-      | BuiltinLabel Old -> Some "Old"
-      | BuiltinLabel Post -> Some "Post"
-      | BuiltinLabel Here -> Some "Here"
-      | BuiltinLabel LoopCurrent -> Some "LoopCurrent"
-      | BuiltinLabel LoopEntry -> Some "LoopEntry"
-      | StmtLabel s ->
-        (match
-           List.find_opt
-             (function Label (_,_,b) -> b | _ -> false) !s.labels
-         with
-         | None -> None
-         | Some (Label (lab,_,_)) -> Some lab
-         | Some _ -> None))
+    let open Option.Operators in
+    let* label = env.current_logic_label in
+    match label with
+    | FormalLabel _ -> None
+    | BuiltinLabel Init -> Some "Init"
+    | BuiltinLabel Pre -> Some "Pre"
+    | BuiltinLabel Old -> Some "Old"
+    | BuiltinLabel Post -> Some "Post"
+    | BuiltinLabel Here -> Some "Here"
+    | BuiltinLabel LoopCurrent -> Some "LoopCurrent"
+    | BuiltinLabel LoopEntry -> Some "LoopEntry"
+    | StmtLabel s ->
+      let from_input = function Label (_, _, b) -> b | _ -> false in
+      let* input_label = List.find_opt from_input !s.labels in
+      match input_label with
+      | Label (lab, _, _) -> Some lab
+      | _ -> None
 
   let fresh_var env name kind typ =
     let name =

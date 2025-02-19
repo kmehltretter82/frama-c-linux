@@ -305,7 +305,7 @@ let widen ?size ?hint t1 t2 =
     | Float f2 ->
       let f1 = project_float t1 in
       let prec =
-        match Option.bind size Integer.to_int_opt with
+        match Option.bind Integer.to_int_opt size with
         | Some 32 -> Float_sig.Single
         | Some 64 -> Float_sig.Double
         | Some 128 -> Float_sig.Long_Double

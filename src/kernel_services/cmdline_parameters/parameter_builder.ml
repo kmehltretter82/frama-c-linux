@@ -658,7 +658,7 @@ struct
     let get () =
       if Dir_name.is_set () then Dir_name.get ()
       else
-        match Option.bind Info.env Sys.getenv_opt with
+        match Option.bind Sys.getenv_opt Info.env with
         | Some s when s <> "" -> of_string s
         | _ -> Parent.get_dir Info.dirname
 

@@ -137,8 +137,8 @@ let code_annot kf stmt s =
   let loc = Stmt.loc stmt in
   let pa =
     Option.bind
-      (Logic_lexer.annot (fst loc,s))
       (function (_, Logic_ptree.Acode_annot (_,a)) -> Some a | _ -> None)
+      (Logic_lexer.annot (fst loc,s))
   in
   let parse pa =
     Populate_spec.populate_funspec kf [`Assigns];

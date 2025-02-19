@@ -263,8 +263,8 @@ module FunctionAtPos = struct
 
   let find pos =
     let fp = pos.Filepath.pos_path in
-    Option.bind (Hashtbl.find_opt tbl fp)
-      (fun a -> binary_search a pos)
+    Option.bind (fun a -> binary_search a pos)
+      (Hashtbl.find_opt tbl fp)
 
 end
 

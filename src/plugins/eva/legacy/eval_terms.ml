@@ -602,7 +602,7 @@ let constraint_trange idx size_arr =
     match idx.term_node with
     | Trange ((None as low), up) | Trange (low, (None as up)) -> begin
         let loc = idx.term_loc in
-        match Option.bind size_arr Cil.constFoldToInt with
+        match Option.bind Cil.constFoldToInt size_arr with
         | None -> idx
         | Some size ->
           let low = match low with (* constrained l.h.s *)
@@ -1305,7 +1305,7 @@ let rec eval_term ~alarm_mode env t =
   | Tcomprehension (term, quantifiers, predicate) ->
     let env = bind_comprehension_quantifiers env quantifiers predicate in
     let r = eval_term ~alarm_mode env term in
-    let pred_deps = Option.bind predicate (predicate_deps env) in
+    let pred_deps = Option.bind (predicate_deps env) predicate in
     let ldeps =
       Option.fold ~none:r.ldeps ~some:(join_logic_deps r.ldeps) pred_deps
     in
@@ -1782,7 +1782,7 @@ and eval_term_as_lval ~alarm_mode env t =
   | Tcomprehension (term, quantifiers, predicate) ->
     let env = bind_comprehension_quantifiers env quantifiers predicate in
     let r = eval_term_as_lval ~alarm_mode env term in
-    let pred_deps = Option.bind predicate (predicate_deps env) in
+    let pred_deps = Option.bind (predicate_deps env) predicate in
     let ldeps =
       Option.fold ~none:r.ldeps ~some:(join_logic_deps r.ldeps) pred_deps
     in

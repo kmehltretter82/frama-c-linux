@@ -217,15 +217,14 @@ let isCrossableAtInit tr func =
         match base with
         | TVar v ->
           (try
-             Option.bind
-               v.lv_origin
-               (fun v ->
-                  let init = Globals.Vars.find v in
-                  let init = match init.Cil_types.init with
-                      None -> Cil.makeZeroInit ~loc:v.vdecl v.vtype
-                    | Some i -> i
-                  in
-                  aux_init off init)
+             let open Option.Operators in
+             let* v = v.lv_origin in
+             let init = Globals.Vars.find v in
+             let init = match init.Cil_types.init with
+               | None -> Cil.makeZeroInit ~loc:v.vdecl v.vtype
+               | Some i -> i
+             in
+             aux_init off init
            with Not_found -> None)
         | TMem t ->
           (match (aux t).term_node with

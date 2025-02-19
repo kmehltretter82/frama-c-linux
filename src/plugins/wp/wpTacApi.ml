@@ -239,8 +239,8 @@ class parameter
       begin
         p_label <- fd.title ;
         p_title <- fd.descr ;
-        p_vmin <- Option.bind range (fun rg -> rg.vmin) ;
-        p_vmax <- Option.bind range (fun rg -> rg.vmax) ;
+        p_vmin <- Option.bind (fun rg -> rg.Tactical.vmin) range ;
+        p_vmax <- Option.bind (fun rg -> rg.Tactical.vmax) range ;
         p_vstep <- Option.map (fun rg -> rg.Tactical.vstep) range ;
         p_enabled <- true ;
       end

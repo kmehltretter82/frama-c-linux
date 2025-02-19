@@ -427,7 +427,7 @@ let hints ?node goal =
   let pool = ref [] in
   let add s = if not @@ List.memq s !pool then pool := s :: !pool in
   let addname name = Option.iter add @@ Hashtbl.find_opt strategies name in
-  Option.iter addname (Option.bind node ProofEngine.get_hint) ;
+  Option.iter addname (Option.bind ProofEngine.get_hint node) ;
   let pid = goal.Wpo.po_pid in
   List.iter
     (fun (name,ps) ->

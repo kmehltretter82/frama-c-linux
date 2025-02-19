@@ -20,11 +20,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(** Extend the [option] type to a full fleshed monad.
+(** Extend the [option] type to a full fleshed monad. Be wary that the
+    parameters order of the [bind] function are reversed compared to
+    the standard library.
     @since Frama-C+dev *)
 
 include module type of Stdlib.Option
 include Monad.S_with_product with type 'a t = 'a option
-
-(** The bind is reversed for retrocompatibility reasons. *)
-val bind : 'a t -> ('a -> 'b t) -> 'b t

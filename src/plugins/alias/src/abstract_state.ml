@@ -222,7 +222,7 @@ module Readout = struct
 
   let alias_lvals lv s : LSet.t =
     let v_opt = try Some (find_lval_vertex lv s) with Not_found -> None in
-    match Option.bind v_opt @@ G.psucc_opt s.graph with
+    match Option.bind (G.psucc_opt s.graph) v_opt with
     | None -> LSet.empty
     | Some succ -> lvals_pointing_to_vertex succ s
 

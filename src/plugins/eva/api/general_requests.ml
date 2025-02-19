@@ -291,7 +291,7 @@ let marker_evaluation_point = function
 
 let term_lval_to_lval kf tlval =
   try
-    let result = Option.bind kf Eva_utils.find_return_var in
+    let result = Option.bind Eva_utils.find_return_var kf in
     Logic_to_c.term_lval_to_lval ?result tlval
   with Logic_to_c.No_conversion -> raise Not_found
 
@@ -343,10 +343,10 @@ module EvaTaints = struct
   open Results
 
   let evaluate expr request =
-    let (let+) = Option.bind in
+    let open Option.Operators in
     let Deps.{ data ; indirect } = expr_dependencies expr request in
-    let+ data = is_tainted data request |> Result.to_option in
-    let+ indirect = is_tainted indirect request |> Result.to_option in
+    let* data = is_tainted data request |> Result.to_option in
+    let* indirect = is_tainted indirect request |> Result.to_option in
     Some (data, indirect)
 
   let expr_of_marker = let open Printer_tag in function
@@ -358,10 +358,10 @@ module EvaTaints = struct
       | _ -> None
 
   let of_marker marker =
-    let (let+) = Option.bind in
-    let+ expr, stmt = expr_of_marker marker in
-    let+ before = evaluate expr (before stmt) in
-    let+ after  = evaluate expr (after  stmt) in
+    let open Option.Operators in
+    let* expr, stmt = expr_of_marker marker in
+    let* before = evaluate expr (before stmt) in
+    let* after  = evaluate expr (after  stmt) in
     Some (before, after)
 
   let to_string = function

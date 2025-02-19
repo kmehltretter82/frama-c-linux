@@ -30,4 +30,3 @@ module Minimal = struct
 end
 
 include Monad.Make_based_on_bind_with_product (Minimal)
-let bind m f = bind f m
