@@ -456,12 +456,6 @@ void __e_acsl_globals_init(void)
     __e_acsl_already_run = 1;
     __e_acsl_store_block((void *)(values),80UL);
     __e_acsl_full_init((void *)(& values));
-    __e_acsl_store_block((void *)(& __fc_random48_init),4UL);
-    __e_acsl_full_init((void *)(& __fc_random48_init));
-    __e_acsl_store_block((void *)(& __fc_rand_max),8UL);
-    __e_acsl_full_init((void *)(& __fc_rand_max));
-    __e_acsl_store_block((void *)(& time),4UL);
-    __e_acsl_full_init((void *)(& time));
   }
   return;
 }
@@ -469,9 +463,6 @@ void __e_acsl_globals_init(void)
 void __e_acsl_globals_clean(void)
 {
   __e_acsl_delete_block((void *)(values));
-  __e_acsl_delete_block((void *)(& __fc_random48_init));
-  __e_acsl_delete_block((void *)(& __fc_rand_max));
-  __e_acsl_delete_block((void *)(& time));
   return;
 }
 

@@ -29,6 +29,8 @@ open Cil_types
 let is_fc_or_compiler_builtin vi =
   Cil_builtins.has_fc_builtin_attr vi
   ||
+  Ast_attributes.(contains fc_stdlib_internal vi.vattr)
+  ||
   (let prefix_length = 10 (* number of characters in "__builtin_" *) in
    String.length vi.vname > prefix_length
    &&

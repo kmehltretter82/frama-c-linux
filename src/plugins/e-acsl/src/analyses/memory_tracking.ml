@@ -74,10 +74,15 @@ let must_never_monitor vi =
   (* E-ACSL, please do not monitor yourself! *)
   Rtl.Symbols.mem_vi vi.vname
   ||
-  (* extern ghost variables are usually used (by the Frama-C libc) to
-       represent some internal invisible states in ACSL specifications. They do
-       not correspond to something concrete *)
+  (* extern ghost variables are usually used to represent some internal
+     invisible states in ACSL specifications. They do not correspond to
+     something concrete *)
   (vi.vghost && vi.vstorage = Extern)
+  ||
+  (* The fc_stdlib_internal attribute is used by the Frama-C libc to declare
+     internal states in the specification that are implemented with stubs. They
+     should not be monitored by E-ACSL *)
+  Ast_attributes.(contains fc_stdlib_internal vi.vattr)
   ||
   (* incomplete types cannot be properly monitored. See BTS #2406. *)
   not (Cil.isCompleteType vi.vtype)

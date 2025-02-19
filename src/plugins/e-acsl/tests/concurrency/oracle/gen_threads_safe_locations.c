@@ -151,6 +151,25 @@ void *thread_start(void *arg)
   return __retres;
 }
 
+int main(void)
+{
+  int __retres;
+  pthread_t t;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& t),8UL);
+  __e_acsl_store_block((void *)(& __retres),4UL);
+  __gen_e_acsl_pthread_create(& t,(pthread_attr_t const *)0,& thread_start,
+                              (void *)0);
+  /*@ assert Eva: initialization: \initialized(&t); */
+  __gen_e_acsl_pthread_join(t,(void **)0);
+  __e_acsl_full_init((void *)(& __retres));
+  __retres = 0;
+  __e_acsl_delete_block((void *)(& t));
+  __e_acsl_delete_block((void *)(& __retres));
+  __e_acsl_memory_clean();
+  return __retres;
+}
+
 /*@ requires valid_or_null_retval: retval == \null || \valid(retval);
     ensures
       success_or_error:
@@ -418,44 +437,6 @@ int __gen_e_acsl_pthread_create(pthread_t * restrict thread,
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
-}
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& time),4UL);
-    __e_acsl_full_init((void *)(& time));
-  }
-  return;
-}
-
-void __e_acsl_globals_clean(void)
-{
-  __e_acsl_delete_block((void *)(& time));
-  return;
-}
-
-int main(void)
-{
-  int __retres;
-  pthread_t t;
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& t),8UL);
-  __e_acsl_store_block((void *)(& __retres),4UL);
-  __gen_e_acsl_pthread_create(& t,(pthread_attr_t const *)0,& thread_start,
-                              (void *)0);
-  /*@ assert Eva: initialization: \initialized(&t); */
-  __gen_e_acsl_pthread_join(t,(void **)0);
-  __e_acsl_full_init((void *)(& __retres));
-  __retres = 0;
-  __e_acsl_delete_block((void *)(& t));
-  __e_acsl_delete_block((void *)(& __retres));
-  __e_acsl_globals_clean();
-  __e_acsl_memory_clean();
-  return __retres;
 }
 
 

@@ -29,6 +29,35 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
  */
 time_t __gen_e_acsl_time(time_t *timer);
 
+int main(void)
+{
+  int __retres;
+  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
+  __e_acsl_store_block((void *)(& __retres),4UL);
+  time_t tmp = __gen_e_acsl_time((time_t *)0);
+  __e_acsl_store_block((void *)(& tmp),8UL);
+  __e_acsl_full_init((void *)(& tmp));
+  {
+    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
+    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"tmp",0,tmp);
+    __gen_e_acsl_assert_data.blocking = 1;
+    __gen_e_acsl_assert_data.kind = "Assertion";
+    __gen_e_acsl_assert_data.pred_txt = "tmp != -1";
+    __gen_e_acsl_assert_data.file = "vdso.c";
+    __gen_e_acsl_assert_data.fct = "main";
+    __gen_e_acsl_assert_data.line = 13;
+    __e_acsl_assert(tmp != -1L,& __gen_e_acsl_assert_data);
+    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
+  }
+  /*@ assert tmp != -1; */ ;
+  __e_acsl_full_init((void *)(& __retres));
+  __retres = 0;
+  __e_acsl_delete_block((void *)(& tmp));
+  __e_acsl_delete_block((void *)(& __retres));
+  __e_acsl_memory_clean();
+  return __retres;
+}
+
 /*@ assigns *timer, \result;
     assigns *timer \from __fc_time;
     assigns \result \from __fc_time;
@@ -149,54 +178,6 @@ time_t __gen_e_acsl_time(time_t *timer)
     __e_acsl_delete_block((void *)(& __retres));
     return __retres;
   }
-}
-
-void __e_acsl_globals_init(void)
-{
-  static char __e_acsl_already_run = 0;
-  if (! __e_acsl_already_run) {
-    __e_acsl_already_run = 1;
-    __e_acsl_store_block((void *)(& time),4UL);
-    __e_acsl_full_init((void *)(& time));
-  }
-  return;
-}
-
-void __e_acsl_globals_clean(void)
-{
-  __e_acsl_delete_block((void *)(& time));
-  return;
-}
-
-int main(void)
-{
-  int __retres;
-  __e_acsl_memory_init((int *)0,(char ***)0,8UL);
-  __e_acsl_globals_init();
-  __e_acsl_store_block((void *)(& __retres),4UL);
-  time_t tmp = __gen_e_acsl_time((time_t *)0);
-  __e_acsl_store_block((void *)(& tmp),8UL);
-  __e_acsl_full_init((void *)(& tmp));
-  {
-    __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __e_acsl_assert_register_long(& __gen_e_acsl_assert_data,"tmp",0,tmp);
-    __gen_e_acsl_assert_data.blocking = 1;
-    __gen_e_acsl_assert_data.kind = "Assertion";
-    __gen_e_acsl_assert_data.pred_txt = "tmp != -1";
-    __gen_e_acsl_assert_data.file = "vdso.c";
-    __gen_e_acsl_assert_data.fct = "main";
-    __gen_e_acsl_assert_data.line = 13;
-    __e_acsl_assert(tmp != -1L,& __gen_e_acsl_assert_data);
-    __e_acsl_assert_clean(& __gen_e_acsl_assert_data);
-  }
-  /*@ assert tmp != -1; */ ;
-  __e_acsl_full_init((void *)(& __retres));
-  __retres = 0;
-  __e_acsl_delete_block((void *)(& tmp));
-  __e_acsl_delete_block((void *)(& __retres));
-  __e_acsl_globals_clean();
-  __e_acsl_memory_clean();
-  return __retres;
 }
 
 
