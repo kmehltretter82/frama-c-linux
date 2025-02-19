@@ -127,6 +127,12 @@ val unroll_type_skel : typ -> typ_node
     types. Will collect all attributes *)
 val unroll_type_deep : typ -> typ
 
+(** Expands logic type definitions. If the [unroll_typedef] flag is set to
+    [true] (this is the default), C typedef will be expanded as well using
+    {!Logic_const.unroll_ltdef}.
+*)
+val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
+
 (* ************************************************************************* *)
 (** {2 Ghost Attribute} *)
 (* ************************************************************************* *)
@@ -295,12 +301,6 @@ val array_elem_type_and_size : typ -> typ * exp option
 (* ************************************************************************* *)
 (** {2 Logic Type checkers} *)
 (* ************************************************************************* *)
-
-(** Expands logic type definitions. If the [unroll_typedef] flag is set to
-    [true] (this is the default), C typedef will be expanded as well using
-    {!Logic_const.unroll_ltdef}.
-*)
-val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
 (** True if the argument is the type for reified C types. *)
 val is_logic_typetag : logic_type -> bool

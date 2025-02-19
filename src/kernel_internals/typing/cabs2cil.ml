@@ -60,7 +60,6 @@ let valid_sid = false
 open Cil_types
 open Cil_datatype
 open Cil_const
-open Ast_types
 
 (* Maps the start and end positions of a function declaration or definition
    (including its possible contract) to its name. *)
@@ -272,7 +271,7 @@ let is_for_builtin builtin info =
 let rec is_dangerous_offset = function
     NoOffset -> false
   | Field (fi, o) ->
-    has_attribute "volatile" (unroll_type fi.ftype) ||
+    Ast_types.(has_attribute "volatile" (unroll_type fi.ftype)) ||
     is_dangerous_offset o
   | Index _ -> true
 
@@ -286,7 +285,7 @@ and is_dangerous_lval = function
   | Var v,_ when
       (not v.vglob && not v.vformal && not v.vtemp)
       || Ast_attributes.contains "volatile" v.vattr
-      || has_attribute "volatile" (unroll_type v.vtype)
+      || Ast_types.(has_attribute "volatile" (unroll_type v.vtype))
     -> true
   (* Local might be uninitialized, which will trigger UB,
      but we assume that the variables we generate are correctly initialized.
@@ -755,7 +754,7 @@ let isOldStyleVarArgTypeName n =
 *)
 let check_logical_operand e t =
   let (source,_) = e.expr_loc in
-  match unroll_type_node t with
+  match Ast_types.unroll_type_node t with
   | TInt IBool ->
     Kernel.warning ~wkey:Kernel.wkey_cert_exp_46 ~source
       "operand of bitwise operator has boolean type"
@@ -1292,7 +1291,7 @@ let get_temp_name ghost () =
 (* Create a new temporary variable *)
 let newTempVar ~ghost loc descr (descrpure:bool) typ =
   let t' = (!typeForInsertedVar) typ in
-  let t' = remove_attributes ["const"] t' in
+  let t' = Ast_types.remove_attributes ["const"] t' in
   let name = get_temp_name ghost () in
   let vi = makeVarinfo ~ghost ~temp:true ~loc false false name t' in
   vi.vdescr <- Some descr;
@@ -1397,7 +1396,7 @@ let findCompType ghost kind name tattr =
   in
   try
     let old, _ = lookupTypeNoError ghost kind name in (* already defined  *)
-    let olda = get_attributes old in
+    let olda = Ast_types.get_attributes old in
     let equal =
       try List.for_all2 Cil_datatype.Attribute.equal olda tattr
       with Invalid_argument _ -> false
@@ -1427,10 +1426,10 @@ let canDropStatement (s: stmt) : bool =
   !pRes
 
 let fail_if_incompatible_sizeof ~ensure_complete op typ =
-  if is_fun typ && Machine.sizeof_fun () < 0 then
+  if Ast_types.is_fun typ && Machine.sizeof_fun () < 0 then
     Kernel.error ~current:true "%s called on function %s" op
       (Machdep.allowed_machdep "GCC");
-  let is_void = is_void typ in
+  let is_void = Ast_types.is_void typ in
   if is_void && Machine.sizeof_void () < 0 then
     Kernel.error ~current:true "%s on void type %s" op
       (Machdep.allowed_machdep "GCC/MSVC");
@@ -1447,12 +1446,12 @@ let integralPromotion = Cil.integralPromotion
 (* C99 6.3.2.1:2: l-values used as r-values lose their qualifier. By default,
    we drop qualifiers, and recover them for the few operators that are
    exceptions, also listed in 6.3.2.1:2 *)
-let dropQualifiers = remove_qualifiers
+let dropQualifiers = Ast_types.remove_qualifiers
 
 (* A cast that is used for conditional expressions. Pointers are Ok.
    Abort if invalid *)
 let checkBool (ot : typ) (_ : exp) =
-  if not (is_scalar ot) then
+  if not (Ast_types.is_scalar ot) then
     abort_context "cannot cast expr of type %a into a boolean value"
       Cil_datatype.Typ.pretty ot
 
@@ -2677,7 +2676,7 @@ let cabsTypeAddAttributes =
 (* Do types *)
 
 let get_qualifiers t =
-  Ast_attributes.filter_qualifiers (get_attributes t)
+  Ast_attributes.filter_qualifiers (Ast_types.get_attributes t)
 
 let castTo ?context ?(fromsource=false)
     (oldt : typ) (newt : typ) (e : exp) : (typ * exp) =
@@ -2719,7 +2718,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         | NoStorage, Extern -> if oldvi.vdefined then NoStorage else Extern
         | NoStorage, NoStorage -> NoStorage
         | Static, Extern -> Static (* 6.2.2§4 *)
-        | Static, NoStorage when is_fun vi.vtype -> Static
+        | Static, NoStorage when Ast_types.is_fun vi.vtype -> Static
         | _ ->
           if vi.vstorage != oldvi.vstorage then
             Kernel.error ~current:true
@@ -2908,8 +2907,8 @@ let vla_free_fun () =
 
 let conditionalConversion (t2: typ) (t3: typ) : typ =
   let tresult =  (* ISO 6.5.15 *)
-    let t2' = unroll_type t2 in
-    let t3' = unroll_type t3 in
+    let t2' = Ast_types.unroll_type t2 in
+    let t3' = Ast_types.unroll_type t3 in
     match t2'.tnode, t3'.tnode with
     | (TInt _ | TEnum _ | TFloat _), (TInt _ | TEnum _ | TFloat _) ->
       arithmeticConversion t2 t3
@@ -2940,7 +2939,7 @@ let conditionalConversion (t2: typ) (t3: typ) : typ =
   tresult
 
 let logicConditionalConversion t1 t2 =
-  match unroll_type_node t1, unroll_type_node t2 with
+  match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
   | TPtr _ , TInt _ | TInt _, TPtr _ ->
     abort_context "invalid implicit conversion from %a to %a"
       Cil_datatype.Typ.pretty t2 Cil_datatype.Typ.pretty t1
@@ -3063,7 +3062,7 @@ let rec collectInitializer
       Cil_datatype.Typ.pretty thistype;
     (makeZeroInit ~loc thistype), thistype, reads
   end else
-    match unroll_type thistype, this with
+    match Ast_types.unroll_type thistype, this with
     | _ , SinglePre (e, r) ->
       Kernel.debug ~dkey "Initializing object of type %a to %a"
         Cil_datatype.Typ.pretty thistype Cil_printer.pp_exp e;
@@ -3135,8 +3134,8 @@ let rec collectInitializer
       in
       let newtype =
         (* detect flexible array member initialization *)
-        if is_unsized_array thistype &&
-           is_struct parenttype &&
+        if Ast_types.is_unsized_array thistype &&
+           Ast_types.is_struct parenttype &&
            len > 0
         then
           begin
@@ -3387,7 +3386,7 @@ let fieldsToInit
       (* if this field is an anonymous comp, search for the designator inside *)
     else if prefix anonCompFieldName f.fname && not found
             && f.forig_name <> f.fname then
-      match unroll_type_node f.ftype with
+      match Ast_types.unroll_type_node f.ftype with
       | TComp comp ->
         add_comp offset comp acc (* go deeper inside *)
       | _ ->
@@ -3424,7 +3423,7 @@ let find_field_offset cond (fidlist: fieldinfo list) : offset =
     | fid :: _ when cond fid ->
       Field(fid, NoOffset)
     | fid :: rest when prefix anonCompFieldName fid.fname -> begin
-        match unroll_type_node fid.ftype with
+        match Ast_types.unroll_type_node fid.ftype with
         | TComp ci ->
           (try
              let off = search (Option.value ~default:[] ci.cfields) in
@@ -3479,7 +3478,7 @@ let convBinOp (bop: Cabs.binary_operator) : binop =
 let allow_return_collapse ~tlv ~tf =
   Cil_datatype.Typ.equal tlv tf ||
   Kernel.DoCollapseCallCast.get () &&
-  (match unroll_type_node tlv, unroll_type_node tf with
+  (match Ast_types.unroll_type_node tlv, Ast_types.unroll_type_node tf with
    | TPtr _, TPtr _ -> true (* useful for malloc and others. Could be
                                 restricted to void* -> any if needed *)
    | TInt iklv, TInt ikf ->
@@ -3491,7 +3490,7 @@ let allow_return_collapse ~tlv ~tf =
   )
 
 let tcallres f =
-  match unroll_type_node (typeOf f) with
+  match Ast_types.unroll_type_node (typeOf f) with
   | TFun (rt, _, _) -> rt
   | _ -> abort_context "Function call to a non-function"
 
@@ -3931,7 +3930,7 @@ let default_argument_promotion idx exp =
   let name = "x_" ^ string_of_int idx in
   let arg_type = typeOf exp in
   let typ =
-    let t = unroll_type arg_type in
+    let t = Ast_types.unroll_type arg_type in
     match t.tnode with
     | TVoid -> voidType
     | TInt k when Cil.rank k < Cil.rank IInt ->
@@ -4061,7 +4060,7 @@ let initStdIntegerSizes () =
 let checkTypedefSize name typ =
   if Hashtbl.length stdIntegerSizes = 0 then
     initStdIntegerSizes ();
-  if is_integral typ then begin
+  if Ast_types.is_integral typ then begin
     let size = Cil.bitsSizeOf typ in
     try
       let intended_size, exact = Hashtbl.find stdIntegerSizes name in
@@ -4080,10 +4079,10 @@ let checkTypedefSize name typ =
 (* Checks for invalid 'restrict' qualifiers,
    and reports [Kernel.error] if they are found. *)
 let rec checkRestrictQualifierDeep t =
-  if has_qualifier "restrict" t then
-    match unroll_type_node t with
+  if Ast_types.has_qualifier "restrict" t then
+    match Ast_types.unroll_type_node t with
     | TArray (bt, _) | TPtr bt ->
-      if is_fun bt then
+      if Ast_types.is_fun bt then
         Kernel.error ~once:true ~current:true
           "function pointer type does not allow 'restrict' qualifier"
       else
@@ -4091,7 +4090,7 @@ let rec checkRestrictQualifierDeep t =
     | _ -> Kernel.error ~once:true ~current:true
              "invalid usage of 'restrict' qualifier"
   else
-    match unroll_type_node t with
+    match Ast_types.unroll_type_node t with
     | TArray (bt, _) | TPtr bt ->
       checkRestrictQualifierDeep bt
     | TFun (rt, args, _) ->
@@ -4509,26 +4508,26 @@ and makeVarInfoCabs
   if Ast_attributes.contains "thread" nattr then begin
     let wkey = Kernel.wkey_inconsistent_specifier in
     let source = fst ldecl in
-    if is_fun vtype then
+    if Ast_types.is_fun vtype then
       Kernel.warning ~wkey ~source "only objects can be thread-local"
     else if not isglobal && (sto = NoStorage || sto = Register) then
       Kernel.warning ~wkey ~source "a local object cannot be thread-local";
   end;
   if not isgenerated && ghost then begin
 
-    if Ast_attributes.contains "ghost" (get_attributes vtype) then
+    if Ast_attributes.contains "ghost" (Ast_types.get_attributes vtype) then
       Kernel.warning
         ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
         "'%s' is already ghost" n;
-    if is_array vtype then
-      let elem_t = direct_element_type vtype in
-      if Ast_attributes.contains "ghost" (get_attributes elem_t) then
+    if Ast_types.is_array vtype then
+      let elem_t = Ast_types.direct_element_type vtype in
+      if Ast_attributes.contains "ghost" (Ast_types.get_attributes elem_t) then
         Kernel.warning
           ~wkey:Kernel.wkey_ghost_already_ghost ~once:true ~current:true
           "'%s' elements are already ghost" n;
   end ;
 
-  if inline && not (is_fun vtype) then
+  if inline && not (Ast_types.is_fun vtype) then
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
   let vi =
@@ -4537,7 +4536,8 @@ and makeVarInfoCabs
   vi.vstorage <- sto;
   vi.vattr <- nattr;
   vi.vdefined <-
-    not (is_fun vtype) && isglobal && (sto = NoStorage || sto = Static);
+    not (Ast_types.is_fun vtype) && isglobal
+    && (sto = NoStorage || sto = Static);
   vi
 
 (* Process a local variable declaration and allow variable-sized arrays *)
@@ -4719,7 +4719,7 @@ and doType (ghost:bool) (context: type_context)
       let a2n, a2f, a2t = Ast_attributes.partition ~default:nameortype a2' in
       let bt' = cabsTypeAddAttributes a1t bt in
       let bt'', a1fadded =
-        match unroll_type_node bt with
+        match Ast_types.unroll_type_node bt with
         | TFun _ -> cabsTypeAddAttributes a1f bt', true
         | _ -> bt', false
       in
@@ -4729,7 +4729,7 @@ and doType (ghost:bool) (context: type_context)
       let restyp = cabsTypeAddAttributes a2t restyp in
       (* See if we can add some more type attributes *)
       let restyp' =
-        let t = unroll_type restyp in
+        let t = Ast_types.unroll_type restyp in
         match t.tnode with
         | TFun _ ->
           if a1fadded then
@@ -4767,7 +4767,7 @@ and doType (ghost:bool) (context: type_context)
       let restyp, nattr = doDeclType t acc d in
       (* See if we can do anything with function type attributes *)
       let restyp' =
-        let t = unroll_type restyp in
+        let t = Ast_types.unroll_type restyp in
         match t.tnode with
         | TFun _ -> cabsTypeAddAttributes af restyp
         | TPtr ({ tnode = TFun _ } as tf) ->
@@ -4783,7 +4783,7 @@ and doType (ghost:bool) (context: type_context)
       restyp', cabsAddAttributes an nattr
 
     | Cabs.ARRAY (d, al, len) ->
-      if is_fun bt then
+      if Ast_types.is_fun bt then
         Kernel.error ~once:true ~current:true
           "declaration of array of function type '%a`"
           Cil_datatype.Typ.pretty bt
@@ -4814,7 +4814,7 @@ and doType (ghost:bool) (context: type_context)
              We used to also cast the length to int here, but that's
              theoretically too restrictive on 64-bit machines. *)
           let len' = doPureExp (ghost_local_env ghost) len in
-          if not (is_integral (typeOf len')) then
+          if not (Ast_types.is_integral (typeOf len')) then
             Kernel.error ~once:true ~current:true
               "Array length %a does not have an integral type."
               Cil_printer.pp_exp len';
@@ -4939,7 +4939,7 @@ and doType (ghost:bool) (context: type_context)
         let vi =
           makeVarInfoCabs ~ghost ~kind:`FormalDecl (convLoc cloc) s' (n,ndt,a)
         in
-        if is_void vi.vtype then begin
+        if Ast_types.is_void vi.vtype then begin
           if argl_length > 1 then
             Kernel.error ~once:true ~current:true
               "'void' must be the only parameter if specified";
@@ -4962,12 +4962,12 @@ and doType (ghost:bool) (context: type_context)
       let targs : varinfo list option =
         match noopt_targs with
         | [] -> None (* No argument list *)
-        | [t] when is_void t.vtype -> Some []
+        | [t] when Ast_types.is_void t.vtype -> Some []
         | l -> Some l
       in
       let ghost_targs : varinfo list =
         match noopt_ghost_targs with
-        | [t] when is_void t.vtype ->
+        | [t] when Ast_types.is_void t.vtype ->
           Kernel.error ~once:true ~current:true
             "ghost parameters list cannot be void" ;
           []
@@ -5014,7 +5014,7 @@ and doType (ghost:bool) (context: type_context)
         match args with
         | [] -> ()
         | a :: args' ->
-          let t = unroll_type a.vtype in
+          let t = Ast_types.unroll_type a.vtype in
           (match t.tnode with
            | TArray (bt, lo) ->
              (* Note that for multi-dimensional arrays we strip off only
@@ -5023,7 +5023,7 @@ and doType (ghost:bool) (context: type_context)
              Cil.update_var_type a real_type
            | TFun _ -> Cil.update_var_type a (mk_tptr a.vtype)
            | TComp _ -> begin
-               match is_transparent_union a.vtype with
+               match Ast_types.is_transparent_union a.vtype with
                | None ->  ()
                | Some fstfield ->
                  transparentUnionArgs :=
@@ -5049,7 +5049,7 @@ and doType (ghost:bool) (context: type_context)
           Some (List.map arg_type_from_vi argl)
       in
       let tres =
-        match unroll_type bt with
+        match Ast_types.unroll_type bt with
         | { tnode = TArray(t,lo); tattr } -> turnArrayIntoPointer t lo tattr
         | _ -> bt
       in
@@ -5057,7 +5057,7 @@ and doType (ghost:bool) (context: type_context)
          make sense only on l-values), and they make life more complicated:
          the return type of the function is used e.g. for the type of retres,
          and probably in many other places. *)
-      let tres = remove_qualifiers tres in
+      let tres = Ast_types.remove_qualifiers tres in
       let t = mk_tfun tres args isva' in
       doDeclType t acc d
   in
@@ -5155,7 +5155,7 @@ and makeCompType loc ghost (isstruct: bool)
          struct C1 { struct C2 c2; };          //This line is now an error.
          struct C2 { struct C1 c1; int dummy; };
       *)
-      if is_fun ftype then
+      if Ast_types.is_fun ftype then
         Kernel.error ~source
           "field `%s' declared as a function" n
       else if Cil.has_flexible_array_member ftype && isstruct then begin
@@ -5172,7 +5172,7 @@ and makeCompType loc ghost (isstruct: bool)
       end
       else if not (Cil.isCompleteType ~allowZeroSizeArrays ftype)
       then begin
-        if is_unsized_array ftype && last_group && last_field
+        if Ast_types.is_unsized_array ftype && last_group && last_field
         then
           (* possible flexible array member; check if struct contains at least
                one other field *)
@@ -5192,7 +5192,7 @@ and makeCompType loc ghost (isstruct: bool)
         | None -> None, ftype
         | Some w -> begin
             let source = fst w.expr_loc in
-            (match unroll_type_node ftype with
+            (match Ast_types.unroll_type_node ftype with
              | TInt _ -> ()
              | TEnum _ -> ()
              | _ ->
@@ -5217,7 +5217,7 @@ and makeCompType loc ghost (isstruct: bool)
                     "Unable to compute size of %a" Cil_datatype.Typ.pretty ftype
               end;
               let ftype =
-                add_attributes
+                Ast_types.add_attributes
                   [(Ast_attributes.bitfield_attribute_name, [AInt (Integer.of_int s)])]
                   ftype
               in
@@ -5233,7 +5233,7 @@ and makeCompType loc ghost (isstruct: bool)
        * then give it a distinguished name  *)
       let fname =
         if n = missingFieldName then
-          if is_struct_or_union ftype then
+          if Ast_types.is_struct_or_union ftype then
             begin
               Kernel.warning ~wkey:Kernel.wkey_c11 ~once:true ~current:true
                 "unnamed fields are a C11 extension";
@@ -5251,7 +5251,7 @@ and makeCompType loc ghost (isstruct: bool)
           end
       in
       let rec is_circular t =
-        match unroll_type_node t with
+        match Ast_types.unroll_type_node t with
         | TArray (bt, _) -> is_circular bt
         | TComp comp' ->
           if Cil_datatype.Compinfo.equal comp comp' then begin
@@ -5377,7 +5377,7 @@ and preprocessCast loc ghost (specs: Cabs.specifier)
   (* However, it may just be casting of a whole union to its own type.  We
    * will resolve this later, when we'll convert casts to unions. *)
   let ie' =
-    match unroll_type_node typ, ie with
+    match Ast_types.unroll_type_node typ, ie with
     | TComp c, Cabs.SINGLE_INIT _ when not c.cstruct ->
       Cabs.COMPOUND_INIT [(Cabs.INFIELD_INIT ("___matching_field",
                                               Cabs.NEXT_INIT),
@@ -5446,7 +5446,7 @@ and doExp local_env
   (* will be reset at the end of the compilation of current expression. *)
   let<> UpdatedCurrentLoc = loc in
   let checkVoidLval e t =
-    if (match e.enode with Lval _ -> true | _ -> false) && is_void t then
+    if (match e.enode with Lval _ -> true | _ -> false) && Ast_types.is_void t then
       abort_context "lvalue of type void: %a@\n" Cil_printer.pp_exp e
   in
   (* A subexpression of array type is automatically turned into StartOf(e).
@@ -5454,7 +5454,7 @@ and doExp local_env
    * essentially doExp should never return things of type TFun or TArray *)
   let processArrayFun e t =
     let loc = e.eloc in
-    let t' = unroll_type t in
+    let t' = Ast_types.unroll_type t in
     match e.enode, t'.tnode with
     | (Lval(lv) | CastE(_, {enode = Lval lv})), TArray(tbase, _) ->
       mkStartOfAndMark loc lv, mk_tptr ~tattr:t'.tattr tbase
@@ -5539,8 +5539,8 @@ and doExp local_env
                 (* Always allow to read the address of an
                    array or a function, as it will never be written to:
                    no read/write interference is possible. *)
-                is_array vi.vtype ||
-                is_fun vi.vtype ||
+                Ast_types.is_array vi.vtype ||
+                Ast_types.is_fun vi.vtype ||
                 Lval.Set.mem lval local_env.authorized_reads
               then []
               else [ lval ]
@@ -5590,7 +5590,7 @@ and doExp local_env
         let se = se1 @@@ (se2, ghost) in
         let (e1'', t1, e2'', tresult) =
           (* Either e1 or e2 can be the pointer *)
-          match unroll_type_node t1, unroll_type_node t2 with
+          match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
           | TPtr t1e, (TInt _|TEnum _) -> e1', t1, e2', t1e
           | (TInt _|TEnum _), TPtr t2e -> e2', t2, e1', t2e
           | _ ->
@@ -5626,7 +5626,7 @@ and doExp local_env
         doExp (no_paren_local_env local_env) CNoConst e (AExp None)
       in
       let tresult =
-        match unroll_type_node t with
+        match Ast_types.unroll_type_node t with
         | TPtr te -> te
         | _ ->
           abort_context
@@ -5662,7 +5662,7 @@ and doExp local_env
         List.filter (fun x -> not (Lval.equal x lv)) r
       in
       let field_offset =
-        match unroll_type_node t' with
+        match Ast_types.unroll_type_node t' with
         | TComp comp -> findField str comp
         | _ ->
           abort_context "expecting a struct with field %s" str
@@ -5674,7 +5674,7 @@ and doExp local_env
         then r
         else lv':: r
       in
-      contains_temp_subarray := (is_array field_type && nested_call e);
+      contains_temp_subarray := (Ast_types.is_array field_type && nested_call e);
       finishExp reads se (new_exp ~loc (Lval lv')) (dropQualifiers field_type)
 
     (* e->str = * (e + off(str)) *)
@@ -5684,12 +5684,12 @@ and doExp local_env
       let (r,se, e', t') =
         doExp (no_paren_local_env local_env) CNoConst e (AExp None)
       in
-      let pointedt = match unroll_type_node t' with
+      let pointedt = match Ast_types.unroll_type_node t' with
         | TPtr t1 -> t1
         | TArray (t1,_) -> t1
         | _ -> abort_context "expecting a pointer to a struct"
       in
-      let field_offset = match unroll_type pointedt with
+      let field_offset = match Ast_types.unroll_type pointedt with
         | { tnode = TComp comp } -> findField str comp
         | t ->
           abort_context
@@ -5905,7 +5905,7 @@ and doExp local_env
              * StartOf. We must undo that now so that it is done once by
              * the finishExp at the end of this case *)
             let e2, t2 =
-              match unroll_type_node typ, e'.enode with
+              match Ast_types.unroll_type_node typ, e'.enode with
               | TArray _, StartOf lv -> new_exp ~loc (Lval lv), typ
               | _, _ -> e', t'
             in
@@ -5936,14 +5936,14 @@ and doExp local_env
       let (r, se, e', t) =
         doExp (no_paren_local_env local_env) asconst e (AExp None)
       in
-      if is_integral t then
+      if Ast_types.is_integral t then
         let tres = integralPromotion t in
         let e'' =
           new_exp ~loc (UnOp(Neg, mkCastT ~oldt:t ~newt:tres e', tres))
         in
         finishExp r se e'' tres
       else
-      if is_arithmetic t then
+      if Ast_types.is_arithmetic t then
         finishExp r se (new_exp ~loc:e'.eloc (UnOp(Neg,e',t))) t
       else
         abort_context "Unary - on a non-arithmetic type"
@@ -5952,7 +5952,7 @@ and doExp local_env
       let (r, se, e', t) =
         doExp (no_paren_local_env local_env) asconst e (AExp None)
       in
-      if is_integral t then
+      if Ast_types.is_integral t then
         let tres = integralPromotion t in
         let e'' =
           new_exp ~loc (UnOp(BNot, mkCastT ~oldt:t ~newt:tres e', tres))
@@ -5963,12 +5963,12 @@ and doExp local_env
 
     | Cabs.UNARY(Cabs.PLUS, e) ->
       let (r, se, e, t as v) = doExp (no_paren_local_env local_env) asconst e what in
-      if is_integral t then
+      if Ast_types.is_integral t then
         let newt = integralPromotion t in
         let e' = mkCastT ~oldt:t ~newt e in
         finishExp r se e' newt
       else
-      if is_arithmetic t then
+      if Ast_types.is_arithmetic t then
         v
       else
         abort_context "Unary + on a non-arithmetic type"
@@ -6055,7 +6055,7 @@ and doExp local_env
 
             (* Function names are converted into pointers to the function.
              * Taking the address-of again does not change things *)
-            | AddrOf (Var v, NoOffset) when is_fun v.vtype ->
+            | AddrOf (Var v, NoOffset) when Ast_types.is_fun v.vtype ->
               finishExp r se e' t
 
             | _ ->
@@ -6417,7 +6417,7 @@ and doExp local_env
                         doExp (no_paren_local_env local_env) CNoConst a1 AType
                       in
                       clean_up_chunk_locals c;
-                      let t = direct_pointed_type t in
+                      let t = Ast_types.direct_pointed_type t in
                       Format.sprintf "%s_%sint%d_t"
                         n
                         (if isSignedInteger t then "" else "u")
@@ -6457,7 +6457,7 @@ and doExp local_env
                         doExp (no_paren_local_env local_env) CNoConst a1 AType
                       in
                       clean_up_chunk_locals c;
-                      let t = direct_pointed_type t in
+                      let t = Ast_types.direct_pointed_type t in
                       Format.sprintf "%s_%d" n (bytesSizeOf t)
                     | [] ->
                       Kernel.error ~once:true ~current:true
@@ -6471,7 +6471,7 @@ and doExp local_env
                 if Lval.Set.mem
                     (var vi) local_env.authorized_reads
                    ||
-                   (vi.vglob && is_fun vi.vtype)
+                   (vi.vglob && Ast_types.is_fun vi.vtype)
                 then []
                 else [ var vi ]
               in
@@ -6508,10 +6508,10 @@ and doExp local_env
       in
       (* Get the result type and the argument types *)
       let (resType, argTypes, isvar, f'', tattr) =
-        match unroll_type ft' with
+        match Ast_types.unroll_type ft' with
         | { tnode = TFun(rt,at,isvar); tattr } -> (rt,at,isvar,f',tattr)
         | { tnode = TPtr t } -> begin
-            match unroll_type t with
+            match Ast_types.unroll_type t with
             | { tnode = TFun (rt, at, isvar) } -> (* Make the function pointer
                                                    * explicit  *)
               let f'' =
@@ -6535,7 +6535,7 @@ and doExp local_env
       let argTypesList = argsToList argTypes in
       let warn_no_proto f =
         (* Do not punish twice users of completely undeclared functions. *)
-        if not (has_attribute "missingproto" f.vtype) then
+        if not (Ast_types.has_attribute "missingproto" f.vtype) then
           Kernel.warning ~source:(fst loc) ~wkey:Kernel.wkey_no_proto
             "Calling function %a that is declared without prototype.@ \
              Its formals will be inferred from actual arguments.@ \
@@ -6545,7 +6545,7 @@ and doExp local_env
             Cil_printer.pp_varinfo f
       in
       (* Drop certain qualifiers from the result type *)
-      let resType' = remove_attributes ["warn_unused_result"] resType in
+      let resType' = Ast_types.remove_attributes ["warn_unused_result"] resType in
       (* Before we do the arguments we try to intercept a few builtins. For
        * these we have defined then with a different type, so we do not
        * want to give warnings. We'll just leave the arguments of these
@@ -6603,30 +6603,30 @@ and doExp local_env
              Note: this check is conservative (it may not emit warnings when
              it should), and compilers can often detect more errors. *)
           if not (Exp.equal a' a'') &&
-             match is_arithmetic texpected, is_arithmetic att with
+             match Ast_types.is_arithmetic texpected, Ast_types.is_arithmetic att with
              | true, true -> (* never a problem *) false
              | true, false -> true
              | false, true ->
                (* pointer with no pointer: problematic, except NULL;
                   if expected pointer and got null pointer constant => ok *)
-               not (is_ptr texpected && Ast_info.is_null_expr a')
+               not (Ast_types.is_ptr texpected && Ast_info.is_null_expr a')
              | false, false ->
                (* Ghost compatibility is considered 'after_cleanup' *)
-               let texpected = remove_attributes_deep [ "ghost" ] texpected in
-               let att = remove_attributes_deep [ "ghost" ] att in
+               let texpected = Ast_types.remove_attributes_deep [ "ghost" ] texpected in
+               let att = Ast_types.remove_attributes_deep [ "ghost" ] att in
                (* pointers: check compatible modulo void ptr and modulo
                   literal strings (too many warnings otherwise) *)
                let ok1 =
                  (* accept literal strings even when expecting non-const char*;
                     equivalent to GCC's default behavior (-Wno-write-strings) *)
-                 (Typ.equal (unroll_type texpected) charPtrType &&
-                  Typ.equal (unroll_type att) charConstPtrType) ||
+                 (Typ.equal (Ast_types.unroll_type texpected) charPtrType &&
+                  Typ.equal (Ast_types.unroll_type att) charConstPtrType) ||
                  (* all pointers are convertible to void* *)
-                 (is_void_ptr texpected && is_ptr att) ||
+                 (Ast_types.is_void_ptr texpected && Ast_types.is_ptr att) ||
                  (* allow implicit void* -> char* conversion *)
-                 (is_any_char_ptr texpected && is_void_ptr att) ||
+                 (Ast_types.is_any_char_ptr texpected && Ast_types.is_void_ptr att) ||
                  (* always allow null pointers *)
-                 (is_ptr texpected && Ast_info.is_null_expr a') ||
+                 (Ast_types.is_ptr texpected && Ast_info.is_null_expr a') ||
                  areCompatibleTypes ~context:ContravariantToplevel att texpected
                in
                let ok2 =
@@ -6635,14 +6635,14 @@ and doExp local_env
                     attribute. *)
                  let arg_is_initialized = Cil.is_initialized a' in
                  arg_is_initialized
-                 && is_ptr texpected
+                 && Ast_types.is_ptr texpected
                  && areCompatibleTypes ~context:CovariantToplevel att texpected
                in
                let ok =
                  if ok1 || ok2 then true
                  (* special warning for void* -> any* conversions;
                     this is equivalent to option '-Wc++-compat' in GCC *)
-                 else if is_void_ptr att && is_ptr texpected
+                 else if Ast_types.is_void_ptr att && Ast_types.is_ptr texpected
                  then begin
                    Kernel.warning ~wkey:Kernel.wkey_implicit_conv_void_ptr
                      ~current:true ~once:true
@@ -7505,7 +7505,7 @@ and doExp local_env
                   abort_context
                     "generic association with incomplete type '%a'"
                     Cil_datatype.Typ.pretty t
-                else if (is_fun t) then
+                else if (Ast_types.is_fun t) then
                   abort_context
                     "generic association with function type '%a'"
                     Cil_datatype.Typ.pretty t
@@ -7651,7 +7651,7 @@ and normalize_binop binop action local_env asconst le re what =
  * version if necessary *)
 and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
   let doArithmetic () =
-    if is_arithmetic t1 && is_arithmetic t2 then begin
+    if Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 then begin
       let tres = arithmeticConversion t1 t2 in
       (* Keep the operator since it is arithmetic *)
       tres,
@@ -7674,8 +7674,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
       intType
   in
   let doIntegralArithmetic () =
-    if is_integral t1 && is_integral t2 then begin
-      let tres = unroll_type (arithmeticConversion t1 t2) in
+    if Ast_types.is_integral t1 && Ast_types.is_integral t2 then begin
+      let tres = Ast_types.unroll_type (arithmeticConversion t1 t2) in
       match tres.tnode with
       | TInt _ ->
         tres,
@@ -7696,8 +7696,8 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
     if false then Kernel.debug "%a %a %a %a"
         Cil_printer.pp_exp e1 Cil_datatype.Typ.pretty t1
         Cil_printer.pp_exp e2 Cil_datatype.Typ.pretty t2;
-    let t1p = unroll_type (direct_pointed_type t1) in
-    let t2p = unroll_type (direct_pointed_type t2) in
+    let t1p = Ast_types.(unroll_type (direct_pointed_type t1)) in
+    let t2p = Ast_types.(unroll_type (direct_pointed_type t2)) in
     (* We are more lenient than the norm here (C99 6.5.8, 6.5.9), and cast
        arguments with incompatible types to a common type *)
     let e1', e2' =
@@ -7734,22 +7734,23 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
         (mkCastT ~oldt:t2 ~newt:t2' e2)
         t1'
   | (PlusA|MinusA)
-    when is_arithmetic t1 && is_arithmetic t2 -> doArithmetic ()
+    when Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 ->
+    doArithmetic ()
   | (Eq|Ne|Lt|Le|Ge|Gt)
-    when is_arithmetic t1 && is_arithmetic t2 ->
+    when Ast_types.is_arithmetic t1 && Ast_types.is_arithmetic t2 ->
     doArithmeticComp ()
-  | PlusA when is_ptr t1 && is_integral t2 ->
+  | PlusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
     t1, do_shift e1 t1 e2 t2
-  | PlusA when is_integral t1 && is_ptr t2 ->
+  | PlusA when Ast_types.is_integral t1 && Ast_types.is_ptr t2 ->
     t2, do_shift e2 t2 e1 t1
-  | MinusA when is_ptr t1 && is_integral t2 ->
+  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_integral t2 ->
     t1,
     optConstFoldBinOp loc false MinusPI e1
       (mkCastT ~oldt:t2 ~newt:(integralPromotion t2) e2) t1
-  | MinusA when is_ptr t1 && is_ptr t2 ->
+  | MinusA when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
     if areCompatibleTypes (* C99 6.5.6:3 *)
-        (remove_qualifiers_deep t1)
-        (remove_qualifiers_deep t2)
+        (Ast_types.remove_qualifiers_deep t1)
+        (Ast_types.remove_qualifiers_deep t2)
     then
       Machine.ptrdiff_type (),
       optConstFoldBinOp loc false MinusPP e1 e2 (Machine.ptrdiff_type ())
@@ -7757,16 +7758,17 @@ and doBinOp loc (bop: binop) (e1: exp) (t1: typ) (e2: exp) (t2: typ) =
 
   (* Two special cases for comparisons with the NULL pointer. We are a bit
      more permissive. *)
-  | (Le|Lt|Ge|Gt|Eq|Ne) when is_ptr t1 && isZero e2 ->
+  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && isZero e2 ->
     pointerComparison e1 t1 (mkCast ~newt:t1 e2) t1
-  | (Le|Lt|Ge|Gt|Eq|Ne) when is_ptr t2 && isZero e1 ->
+  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t2 && isZero e1 ->
     pointerComparison (mkCast ~newt:t2 e1) t2 e2 t2
 
-  | (Le|Lt|Ge|Gt|Eq|Ne) when is_ptr t1 && is_ptr t2 ->
+  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
     pointerComparison e1 t1 e2 t2
 
-  | (Eq|Ne|Le|Lt|Ge|Gt) when (is_ptr t1 && is_arithmetic t2 ||
-                              is_arithmetic t1 && is_ptr t2 ) ->
+  | (Eq|Ne|Le|Lt|Ge|Gt) when
+      Ast_types.is_ptr t1 && Ast_types.is_arithmetic t2 ||
+      Ast_types.is_arithmetic t1 && Ast_types.is_ptr t2 ->
     abort_context
       "comparison between pointer and non-pointer: %a"
       Cil_printer.pp_exp (dummy_exp(BinOp(bop,e1,e2,intType)))
@@ -7851,7 +7853,7 @@ and doCondExp local_env asconst
         match doCondExp (no_paren_local_env local_env) asconst ?ctxt e1 with
         | CEExp (se1, e) when isEmpty se1 ->
           let t = typeOf e in
-          if not ((is_ptr t) || (is_arithmetic t))then
+          if not (Ast_types.is_ptr t || Ast_types.is_arithmetic t) then
             Kernel.error ~once:true ~current:true "Bad operand to !";
           CEExp (empty, new_exp ~loc (UnOp(LNot, e, intType)))
         | ce1 -> CENot ce1
@@ -8046,7 +8048,7 @@ and doInitializer loc local_env (vi: varinfo) (inite: Cabs.init_expression)
 
   let checkArrayInit ty init =
     let init_ok =
-      if is_array ty then
+      if Ast_types.is_array ty then
         match init with
         | COMPOUND_INIT _ -> true
         | SINGLE_INIT e ->
@@ -8161,7 +8163,7 @@ and doInit local_env asconst preinit so acc initl =
        | (what, ie) :: _ ->
          Cprint.print_init_expression fmt (Cabs.COMPOUND_INIT [(what, ie)])
     );
-  let soTyp' = unroll_type so.soTyp in
+  let soTyp' = Ast_types.unroll_type so.soTyp in
   match soTyp'.tnode, allinitl with
   (* No more initializers return *)
   | _, [] -> acc, preinit, []
@@ -8180,7 +8182,7 @@ and doInit local_env asconst preinit so acc initl =
                 Cabs.CONSTANT
                   (Cabs.CONST_STRING s)} as e))]))
     :: restil
-    when (match unroll_type_node bt with
+    when (match Ast_types.unroll_type_node bt with
         | TInt (IChar|IUChar|ISChar) -> true
         | TInt _ ->
           (*Base type is a scalar other than char. Maybe a wchar_t?*)
@@ -8243,7 +8245,7 @@ and doInit local_env asconst preinit so acc initl =
                  (Cabs.CONST_WSTRING s)} as e))]))
     :: restil
     when
-      (let bt' = unroll_type bt in
+      (let bt' = Ast_types.unroll_type bt in
        match bt'.tnode with
        (* compare bt to wchar_t, ignoring signed vs. unsigned *)
        | TInt _ when (bitsSizeOf bt') =
@@ -8325,7 +8327,7 @@ and doInit local_env asconst preinit so acc initl =
       doExp (no_paren_local_env local_env) asconst oneinit (AExp None)
     in
     let r = Cil_datatype.Lval.Set.of_list r in
-    if (match unroll_type_node t' with
+    if (match Ast_types.unroll_type_node t' with
         | TComp comp' when comp'.ckey = comp.ckey -> true
         | _ -> false)
     then begin
@@ -8486,7 +8488,7 @@ and doInit local_env asconst preinit so acc initl =
         match what with
         | Cabs.NEXT_INIT -> acc
         | Cabs.INFIELD_INIT (fn, whatnext) -> begin
-            match unroll_type_node so.soTyp with
+            match Ast_types.unroll_type_node so.soTyp with
             | TComp comp ->
               let toinit = fieldsToInit comp (Some fn) in
               so.stack <- InComp(so.soOff, comp, toinit) :: so.stack;
@@ -8499,7 +8501,7 @@ and doInit local_env asconst preinit so acc initl =
         | Cabs.ATINDEX_INIT(idx, whatnext) -> begin
             let open Current_loc.Operators in
             let<> UpdatedCurrentLoc = idx.expr_loc in
-            match unroll_type_node so.soTyp with
+            match Ast_types.unroll_type_node so.soTyp with
             | TArray (bt, leno) ->
               let ilen = integerArrayLength leno in
               let nextidx', doidx =
@@ -8623,7 +8625,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
   in
   (* Add the variable to the environment before doing the initializer
    * because it might refer to the variable itself *)
-  if is_fun vi.vtype then begin
+  if Ast_types.is_fun vi.vtype then begin
     FuncLocs.add_loc ?spec:logic_spec (Current_loc.get ()) vi_loc n;
     if inite != Cabs.NO_INIT  then
       Kernel.error ~once:true ~current:true
@@ -8634,7 +8636,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
       vi.vname
   end;
   let isadef =
-    not (is_fun vi.vtype) &&
+    not (Ast_types.is_fun vi.vtype) &&
     (inite != Cabs.NO_INIT
      ||
      (* tentative definition, but definition nevertheless. *)
@@ -8652,7 +8654,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
       (* Maybe we now have a better type?  Use the type of the
        * initializer only if it really differs from the type of
        * the variable. *)
-      if unroll_type vi.vtype != unroll_type et then
+      if Ast_types.(unroll_type vi.vtype != unroll_type et) then
         Cil.update_var_type vi et;
       if isNotEmpty se then begin
         Kernel.error ~once:true ~current:true
@@ -8671,7 +8673,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
     Kernel.debug ~dkey:Kernel.dkey_typing_global
       " global %s was already defined" vi.vname;
     (* Do not declare it again, but update the spec if any *)
-    if is_fun vi.vtype then
+    if Ast_types.is_fun vi.vtype then
       begin
         match logic_spec with
         | None -> ()
@@ -8725,7 +8727,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
         H.add alreadyDefined vi.vname (Current_loc.get ());
         vi
       end else begin
-        if not (is_fun vi.vtype) &&
+        if not (Ast_types.is_fun vi.vtype) &&
            (vi.vstorage = NoStorage || vi.vstorage = Static)
            && not (IH.mem mustTurnIntoDef vi.vid) then
           begin
@@ -8734,7 +8736,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
         if not alreadyInEnv then begin (* Only one declaration *)
           (* If it has function type it is a prototype *)
           (* NB: We add the formal prms in the env*)
-          if is_fun vi.vtype then begin
+          if Ast_types.is_fun vi.vtype then begin
             if not vi.vdefined then
               setFormalsDecl vi vi.vtype;
             let spec, loc =
@@ -8865,7 +8867,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
   let checkArray init vi =
     if init == Cabs.NO_INIT
     then
-      if is_unsized_array vi.vtype
+      if Ast_types.is_unsized_array vi.vtype
       then
         Kernel.error ~once:true ~current:true
           "variable %s with array type needs an explicit size or an initializer"
@@ -8935,7 +8937,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
         (* Maybe we now have a better type?  Use the type of the
          * initializer only if it really differs from the type of
          * the variable. *)
-        if unroll_type vi.vtype != unroll_type et then
+        if Ast_types.(unroll_type vi.vtype != unroll_type et) then
           Cil.update_var_type vi et;
         if isNotEmpty se then
           Kernel.error ~once:true ~current:true "global static initializer";
@@ -8996,7 +8998,8 @@ and createLocal ghost ((_, sto, _, _) as specs)
         let savelen = alphaConvertVarAndAddToEnv true savelen in
         let se0 = local_var_chunk se0 savelen in
         (* Compute the allocation size *)
-        let elt_size = new_exp ~loc (SizeOf (direct_pointed_type vi.vtype)) in
+        let elt_type = Ast_types.direct_pointed_type vi.vtype in
+        let elt_size = new_exp ~loc (SizeOf elt_type) in
         let alloca_size =
           new_exp ~loc
             (BinOp(Mult,
@@ -9094,7 +9097,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
       in
       let se4 = cleanup_autoreference vi se4 in
       (* Fix the length *)
-      if is_unsized_array vi.vtype && is_sized_array et
+      if Ast_types.is_unsized_array vi.vtype && Ast_types.is_sized_array et
       then
         (* We have a length now *)
         Cil.update_var_type vi et
@@ -9161,10 +9164,16 @@ and doAliasFun ghost vtype (thisname:string) (othername:string)
       (argsToList formals) in
   let call = Cabs.CALL ({expr_loc = loc; expr_node = Cabs.VARIABLE othername}, args,[])
   in
-  let stmt = {stmt_ghost = false;
-              stmt_node = if is_void rt then
-                  Cabs.COMPUTATION({expr_loc = loc; expr_node = call}, loc)
-                else Cabs.RETURN({expr_loc = loc; expr_node = call}, loc)}
+  let snode =
+    if Ast_types.is_void rt then
+      Cabs.COMPUTATION ({expr_loc = loc; expr_node = call}, loc)
+    else
+      Cabs.RETURN ({expr_loc = loc; expr_node = call}, loc)
+  in
+  let stmt = {
+    stmt_ghost = false;
+    stmt_node = snode;
+  }
   in
   let body = { Cabs.blabels = []; Cabs.battrs = []; Cabs.bstmts = [stmt] } in
   let fdef = Cabs.FUNDEF (None, sname, body, loc, loc) in
@@ -9205,7 +9214,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
            ignore (createGlobal l local_env.is_ghost logic_spec spec_res name)
          (*  E.log "%s is not aliased\n" name *)
          | [("alias", [AStr othername])] ->
-           if not (is_fun vtype) || local_env.is_ghost then begin
+           if not (Ast_types.is_fun vtype) || local_env.is_ghost then begin
              Kernel.warning ~current:true
                "%a: CIL only supports attribute((alias)) for C functions."
                Cil_printer.pp_location (Current_loc.get ());
@@ -9595,7 +9604,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
         let newformals, newbody =
           List.fold_right (* So that the formals come out in order *)
             (fun f (accform, accbody) ->
-               match is_transparent_union f.vtype with
+               match Ast_types.is_transparent_union f.vtype with
                | None -> (f :: accform, accbody)
                | Some fstfield ->
                  (* A new shadow to be placed in the formals. Use
@@ -9637,7 +9646,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
             in
             Cil.mkStmt ~ghost ~valid_sid (Instr(Code_annot(annot,loc)))
           in
-          let rt = unroll_type !currentReturnType in
+          let rt = Ast_types.unroll_type !currentReturnType in
           match rt.tnode with
           | TVoid -> [], None
           | TInt _ | TEnum _ | TFloat _ | TPtr _ ->
@@ -9667,7 +9676,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
               !currentFunctionFDEC.svar.vname;
             [assert_false ()], res
         in
-        if not (has_attribute "noreturn" !currentFunctionFDEC.svar.vtype)
+        if not (Ast_types.has_attribute "noreturn" !currentFunctionFDEC.svar.vtype)
         then
           !currentFunctionFDEC.sbody.bstmts <-
             !currentFunctionFDEC.sbody.bstmts
@@ -9790,7 +9799,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                      we use the tags to try and detect if the type is being redefined,
                      which is NOT allowed. *)
                   begin
-                    match unroll_type_node typeinfo.ttype with
+                    match Ast_types.unroll_type_node typeinfo.ttype with
                     | TComp ci ->
                       if ci.cname <> newci.cname then
                         (* different tags => we consider that the type is being redefined *)
@@ -9803,7 +9812,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                         Cil_datatype.Typ.pretty typeinfo.ttype
                   end
                 | TEnum newei -> (* GCC/Clang: "conflicting types" *)
-                  let t = unroll_type typeinfo.ttype in
+                  let t = Ast_types.unroll_type typeinfo.ttype in
                   (match t.tnode with
                    | TEnum ei ->
                      if ei.ename <> newei.ename then
@@ -9816,7 +9825,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
                        ~current:true "typeinfo.ttype (%a) should be an Enum"
                        Cil_datatype.Typ.pretty t)
                 | TInt _ ->
-                  let t = unroll_type typeinfo.ttype in
+                  let t = Ast_types.unroll_type typeinfo.ttype in
                   (match t.tnode with
                    | TInt _ -> warn_c11_redefinition ()
                    | TEnum _ -> error_conflicting_types ()
@@ -10145,7 +10154,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
 
   | Cabs.RETURN ({ expr_node = Cabs.NOTHING}, loc) ->
     let loc' = convLoc loc in
-    if not (is_void !currentReturnType) then
+    if not (Ast_types.is_void !currentReturnType) then
       Kernel.error ~current:true
         "Return statement without a value in function returning %a\n"
         Cil_datatype.Typ.pretty !currentReturnType;
@@ -10154,14 +10163,14 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.RETURN (e, loc) ->
     let loc' = convLoc loc in
     (* Sometimes we return the result of a void function call *)
-    if is_void !currentReturnType then begin
+    if Ast_types.is_void !currentReturnType then begin
       Kernel.error ~current:true
         "Return statement with a value in function returning void";
       let (se, _, _) = doFullExp local_env CNoConst e ADrop in
       se @@@ (returnChunk ~ghost None loc', ghost)
     end else begin
       let rt =
-        remove_attributes ["warn_unused_result"] !currentReturnType
+        Ast_types.remove_attributes ["warn_unused_result"] !currentReturnType
       in
       let (se, e', et) =
         doFullExp local_env CNoConst e (AExp (Some rt)) in
@@ -10172,7 +10181,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.SWITCH (e, s, loc) ->
     let loc' = convLoc loc in
     let (se, e', et) = doFullExp local_env CNoConst e (AExp None) in
-    if not (is_integral et) then
+    if not (Ast_types.is_integral et) then
       Kernel.abort ~once:true ~current:true "Switch on a non-integer expression.";
     let et' = Cil.integralPromotion et in
     let e' = mkCastT ~oldt:et ~newt:et' e' in
