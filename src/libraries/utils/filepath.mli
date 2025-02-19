@@ -265,53 +265,55 @@ val basename: Normalized.t -> string
 *)
 val dirname: Normalized.t -> Normalized.t
 
-(** This type defines what action [with_in] and [with_out] must perform when
-     the file to open does not exist. *)
-type action_if_file_misses =
+(** This type defines what action {!with_in} and {!with_out} must perform when
+    the file to open does not exist. *)
+type action_if_missing =
   | Create of int (** create the file with the given permissions *)
   | DoNotCreate (** do not create the file and fail *)
 
 (** This type define what action [with_out] must perform when the file to
     open already exists. *)
-type action_if_file_exists =
+type action_if_exists =
   | Error (** file opening functions will fail with an error *)
-  | Append (** the writing contents will be appened *)
+  | Append (** the writing contents will be appended *)
   | Truncate (** the file will be truncated before any writes *)
 
-(** [with_in path f] calls [f] with a new input channel on the file [path]
-    opened for reading. The file is closed when [f] returns or whenever an
-    exception is thrown by [f].
-    @param if_misses defines what must be done if the file does not exist,
+(** [with_in path f] opens file [path] for reading and calls [f] with the
+    newly-created input channel. The file is closed when [f] returns or whenever
+    an exception is thrown by [f].
+    @param if_missing defines what must be done if the file does not exist,
     defaults to [DoNotCreate].
-    @param binary must be set if the file need to be opened in binary mode
+    @param binary must be set if the file needs to be opened in binary mode
     (disables conversion, e.g. new lines), defaults to [false]
     @param blocking must be unset if the file needs to be opened in nonblocking
-    mode, defaults to [true]
+    mode, defaults to [true].
     @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
     closing of the file.
     @since Frama-C+dev
 *)
 val with_in:
-  ?if_misses:action_if_file_misses -> ?binary:bool -> ?blocking:bool ->
+  ?if_missing:action_if_missing -> ?binary:bool -> ?blocking:bool ->
   Normalized.t -> (in_channel -> 'a) -> ('a,string) result
 
-(** Same as [with_in] but raises [Sys_error] instead of returning [Error] *)
+(** Same as {!with_in} but raises [Sys_error] instead of returning [Error].
+    @since Frama-C+dev
+*)
 val with_in_exn :
-  ?if_misses:action_if_file_misses -> ?binary:bool -> ?blocking:bool ->
+  ?if_missing:action_if_missing -> ?binary:bool -> ?blocking:bool ->
   Normalized.t -> (in_channel -> 'a) -> 'a
 
 (** [with_out path f] calls [f] with a new output channel on the file [path]
     opened for writing. The file is closed when [f] returns or whenever an
     exception is thrown by [f].
-    @param if_misses defines what must be done if the file does not exist,
+    @param if_missing defines what must be done if the file does not exist,
     defaults to [Create 0o666].
     @param if_exists defines what action must be performed when the file already
     exists, defaults to [Truncate].
-    @param binary must be set if the file need to be opened in binary mode
+    @param binary must be set if the file needs to be opened in binary mode
     (disables conversion, e.g. new lines), defaults to [false].
     @param blocking must be unset if the file needs to be opened in nonblocking
-    mode, defaults to [true]
+    mode, defaults to [true].
 
     @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
     if a [Sys_error s] is thrown during the execution of [f] or during the
@@ -319,17 +321,19 @@ val with_in_exn :
     @since Frama-C+dev
 *)
 val with_out:
-  ?if_misses:action_if_file_misses -> ?if_exists:action_if_file_exists ->
+  ?if_missing:action_if_missing -> ?if_exists:action_if_exists ->
   ?binary:bool -> ?blocking:bool ->
   Normalized.t -> (out_channel -> 'a) -> ('a,string) result
 
-(** Same as [with_out] but raises [Sys_error] instead of returning [Error] *)
+(** Same as {!with_out} but raises [Sys_error] instead of returning [Error].
+    @since Frama-C+dev
+*)
 val with_out_exn:
-  ?if_misses:action_if_file_misses -> ?if_exists:action_if_file_exists ->
+  ?if_missing:action_if_missing -> ?if_exists:action_if_exists ->
   ?binary:bool -> ?blocking:bool ->
   Normalized.t -> (out_channel -> 'a) -> 'a
 
-(** Opening this module allows to use shorter syntax to deal with file:
+(** Opening this module allows to use shorter syntax to deal with files.
 
     {[
       let open Filepath.Operators in
@@ -337,12 +341,12 @@ val with_out_exn:
         let+$ channel = open_out filepath in
         output_string channel "42";
       in
-      Format.printf "error wrinting to file %a: %s"
+      Format.printf "error writing to file %a: %s"
         Filepath.Normalized.pretty filepath
         error
     ]}
 
-    When the file processing returns a result by itself, the operator [let+*]
+    When the file processing returns a result by itself, the operator [let*$]
     can be used instead:
 
     {[
@@ -362,38 +366,46 @@ module Operators : sig
   type ('ch,'a) exn_processor
 
   val open_in:
-    ?if_misses:action_if_file_misses -> ?binary:bool -> ?blocking:bool ->
+    ?if_missing:action_if_missing -> ?binary:bool -> ?blocking:bool ->
     Normalized.t -> (in_channel,'a) safe_processor
   val open_in_exn:
-    ?if_misses:action_if_file_misses -> ?binary:bool -> ?blocking:bool ->
+    ?if_missing:action_if_missing -> ?binary:bool -> ?blocking:bool ->
     Normalized.t -> (in_channel,'a) exn_processor
   val open_out:
-    ?if_misses:action_if_file_misses -> ?if_exists:action_if_file_exists ->
+    ?if_missing:action_if_missing -> ?if_exists:action_if_exists ->
     ?binary:bool -> ?blocking:bool ->
     Normalized.t -> (out_channel,'a) safe_processor
   val open_out_exn:
-    ?if_misses:action_if_file_misses -> ?if_exists:action_if_file_exists ->
+    ?if_missing:action_if_missing -> ?if_exists:action_if_exists ->
     ?binary:bool -> ?blocking:bool ->
     Normalized.t -> (out_channel,'a) exn_processor
 
-  (* The operators are intented to be used with [open_in] or [open_out]. *)
+  (** {3 Result operators}
+      These operators are intended to be used with {!open_in} or {!open_out}.
+  *)
+
   val (let+$): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
   val (let*$):
     ('ch,('a,string) result) safe_processor ->
     ('ch -> ('a,string) result) ->
     ('a,string) result
 
-  (* This operator is intented to be used with [open_in_exn] or
-     [open_out_exn]. *)
+  (** {3 Exception operators}
+      These operators are intended to be used with {!open_in_exn} or
+      {!open_out_exn}, error [Sys_error] must be caught.
+  *)
+
   val (let$): ('ch,'a) exn_processor -> ('ch -> 'a) -> 'a
 
-  (* These operators can be used to handle errors *)
+  (** {3 Error handling}
+      These operators can be used to handle result errors.
+  *)
+
   val (let&): (unit,'e) result -> ('e -> unit) -> unit
   val (let+&): ('a,'e) result -> ('e -> 'a) ->  ('a,'e) result
   val (let*&): ('a,'e) result -> ('e -> ('a,'e) result) -> ('a,'e) result
 end
 
-(** *)
 (*
   Local Variables:
   compile-command: "make -C ../../.."
