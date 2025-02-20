@@ -351,8 +351,8 @@ module TransferSingleTaint = struct
         (* Do not data-taint [lval] in case it contains a singleton value. *)
         dont_taint_singleton v to_loc
       else
-        (* [lval] becomes data-tainted if a memory location on which the value of
-           [exp] depends on is data-tainted. *)
+        (* [lval] becomes data-tainted if a memory location on which the value
+           of [exp] depends on is data-tainted. *)
         to_loc
     in
     let exp_zone = Eva_ast.zone_of_exp to_loc_choosen exp in
@@ -477,13 +477,18 @@ module TransferSingleTaint = struct
     if is_auto_taint_variadic call.Eval.kf then
       begin
         match call.arguments with
-        | { concrete = { node = Const (CString (String (_, CSString s))) } } :: rest
-        | _ :: { concrete = { node = Const (CString (String (_, CSString s))) } } :: rest ->
+        | { concrete = { node = Const (CString (String (_, CSString s))) } }
+          :: rest
+        | _ ::
+          { concrete = { node = Const (CString (String (_, CSString s))) } }
+          :: rest ->
           begin
             let zones = List.map arg_to_zone rest in
             let n = get_formats_number s in
             let vars_to_taint = get_n_first zones n in
-            let locs_data = List.fold_left Zone.join state.locs_data vars_to_taint in
+            let locs_data =
+              List.fold_left Zone.join state.locs_data vars_to_taint
+            in
             { state with locs_data }
           end
         | _ -> state
