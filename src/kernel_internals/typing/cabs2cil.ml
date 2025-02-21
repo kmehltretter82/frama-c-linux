@@ -107,10 +107,12 @@ let stripUnderscore s =
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
-      if not (Ast_attributes.is_known res) then
+      if not (Ast_attributes.is_known res) then begin
+        Ast_attributes.register AttrIgnored res;
         Kernel.warning
           ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
-          "Unknown attribute: %s" s
+          "Ignoring unknown attribute: %s" s;
+      end
     end;
     res
   end
@@ -154,7 +156,9 @@ let () =
   Ast_attributes.register AttrIgnored "pure";
   Ast_attributes.register AttrIgnored "cleanup";
   Ast_attributes.register AttrIgnored "warning";
-  ()
+  Ast_attributes.register AttrIgnored "format_arg";
+  Ast_attributes.register AttrIgnored "no_sanitize";
+  Ast_attributes.register AttrIgnored "target"
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
@@ -4874,7 +4878,7 @@ and doType (ghost:bool) (context: type_context)
                  Kernel.error ~once:true ~current:true
                    "A type definition cannot be a variable-length array"
                | `LocalDecl ->
-                 Kernel.not_yet_implemented
+                 Kernel.not_yet_implemented ~current:true
                    "For multi-dimensional arrays, variable length is only \
                     supported on the first dimension"
                | `OnlyType | `FormalDecl ->

@@ -51,6 +51,8 @@
   int __builtin___vsprintf_chk(char *__x0, int __x1, unsigned int __x2,
                                char const *__x3, __builtin_va_list __x4);
   
+  void __builtin_abort(void);
+  
   int __builtin_abs(int __x0);
   
   double __builtin_acos(double __x0);
@@ -367,6 +369,8 @@
   int __builtin_memcmp(void const *__x0, void const *__x1, unsigned int __x2);
   
   void *__builtin_memcpy(void *__x0, void const *__x1, unsigned int __x2);
+  
+  void *__builtin_memmove(void *__x0, void const *__x1, unsigned int __x2);
   
   void *__builtin_mempcpy(void *__x0, void const *__x1, unsigned int __x2);
   

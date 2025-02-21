@@ -168,6 +168,10 @@
             "rettype":"int",
             "args": ["char *","int","size_t","char const *","__builtin_va_list"]
         },
+        "__builtin_abort": {
+            "rettype":"void",
+            "args": []
+        },
         "__builtin_abs": {
             "rettype":"int",
             "args": ["int"]
@@ -799,6 +803,10 @@
             "args": ["void const *","void const *","size_t"]
         },
         "__builtin_memcpy": {
+            "rettype":"void *",
+            "args": ["void *","void const *","size_t"]
+        },
+        "__builtin_memmove": {
             "rettype":"void *",
             "args": ["void *","void const *","size_t"]
         },

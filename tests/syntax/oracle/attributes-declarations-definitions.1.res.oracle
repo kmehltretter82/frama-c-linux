@@ -1,46 +1,46 @@
 [kernel] Parsing attributes-declarations-definitions.c (with preprocessing)
 [kernel:unknown-attribute] attributes-declarations-definitions.c:7: Warning: 
-  Unknown attribute: tret1
+  Ignoring unknown attribute: tret1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:7: Warning: 
-  Unknown attribute: f1
+  Ignoring unknown attribute: f1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:7: Warning: 
-  Unknown attribute: arg1
+  Ignoring unknown attribute: arg1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:10: Warning: 
-  Unknown attribute: tret2
+  Ignoring unknown attribute: tret2
 [kernel:unknown-attribute] attributes-declarations-definitions.c:10: Warning: 
-  Unknown attribute: f2
+  Ignoring unknown attribute: f2
 [kernel:unknown-attribute] attributes-declarations-definitions.c:10: Warning: 
-  Unknown attribute: arg2
+  Ignoring unknown attribute: arg2
 [kernel:unknown-attribute] attributes-declarations-definitions.c:13: Warning: 
-  Unknown attribute: tret3
+  Ignoring unknown attribute: tret3
 [kernel:unknown-attribute] attributes-declarations-definitions.c:13: Warning: 
-  Unknown attribute: arg3
+  Ignoring unknown attribute: arg3
 [kernel] attributes-declarations-definitions.c:12: Warning: 
   found two contracts (old location: attributes-declarations-definitions.c:6). Merging them
 [kernel:unknown-attribute] attributes-declarations-definitions.c:21: Warning: 
-  Unknown attribute: tret4
+  Ignoring unknown attribute: tret4
 [kernel:unknown-attribute] attributes-declarations-definitions.c:21: Warning: 
-  Unknown attribute: f4
+  Ignoring unknown attribute: f4
 [kernel:unknown-attribute] attributes-declarations-definitions.c:21: Warning: 
-  Unknown attribute: arg4
+  Ignoring unknown attribute: arg4
 [kernel] attributes-declarations-definitions.c:21: Warning: 
   found two contracts (old location: attributes-declarations-definitions.c:13). Merging them
 [kernel:unknown-attribute] attributes-declarations-definitions.c:23: Warning: 
-  Unknown attribute: tret5
+  Ignoring unknown attribute: tret5
 [kernel:unknown-attribute] attributes-declarations-definitions.c:23: Warning: 
-  Unknown attribute: f5
+  Ignoring unknown attribute: f5
 [kernel:unknown-attribute] attributes-declarations-definitions.c:25: Warning: 
-  Unknown attribute: a1
+  Ignoring unknown attribute: a1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:33: Warning: 
-  Unknown attribute: a2
+  Ignoring unknown attribute: a2
 [kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
-  Unknown attribute: p1
+  Ignoring unknown attribute: p1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
-  Unknown attribute: p2
+  Ignoring unknown attribute: p2
 [kernel:unknown-attribute] attributes-declarations-definitions.c:56: Warning: 
-  Unknown attribute: _n
+  Ignoring unknown attribute: _n
 [kernel:unknown-attribute] attributes-declarations-definitions.c:58: Warning: 
-  Unknown attribute: e_
+  Ignoring unknown attribute: e_
 [kernel] attributes-declarations-definitions.c:62: User Error: 
   unsupported attribute: vector_size
 [kernel] User Error: stopping on file "attributes-declarations-definitions.c" that has errors. Add

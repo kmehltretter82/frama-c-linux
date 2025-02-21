@@ -92,23 +92,10 @@ let filter an al =
 (**************************************)
 
 type attribute_class =
-  (** Attribute of a name. If argument is true and we are on MSVC then
-      the attribute is printed using __declspec as part of the storage
-      specifier  *)
   | AttrName of bool
-
-  (** Attribute of a function type. If argument is true and we are on
-      MSVC then the attribute is printed just before the function name *)
   | AttrFunType of bool
-
-  (** Attribute of a type *)
   | AttrType
-
-  (** Attribute of a statement or a block *)
   | AttrStmt
-
-  (** Attribute that does not correspond to either of the above classes and is
-      ignored by functions {!get_class} and {!partition}. *)
   | AttrIgnored
 
 (* This table contains the mapping of predefined attributes to classes.
@@ -243,11 +230,14 @@ let () =
     drop_list fc_internal_attributes
 
 let () =
-  Cil_datatype.drop_unknown_attributes :=
-    let is_annot_or_known_attr (name, _) =
-      is_known name
+  Cil_datatype.drop_ignored_attributes :=
+    let keep_attr (name, _) =
+      match Hashtbl.find_opt known_table name with
+      | None -> false
+      | Some AttrIgnored -> false
+      | Some _ -> true
     in
-    (fun attributes -> List.filter is_annot_or_known_attr attributes)
+    (fun attributes -> List.filter keep_attr attributes)
 
 (**********************)
 (* Utility functions  *)

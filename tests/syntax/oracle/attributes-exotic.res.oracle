@@ -55,4 +55,30 @@ void body(void)
   return;
 }
 
+char *ngettext(char const *__msgid1, char const *__msgid2, unsigned long __n) __attribute__((
+__format_arg__(1), __format_arg__(2)));
+char *ngettext(char const *__msgid1, char const *__msgid2, unsigned long __n)
+{
+  char *__retres;
+  __retres = (char *)0;
+  return __retres;
+}
+
+int __attribute__((__no_sanitize__("signed-integer-overflow"))) my_ZSTD_wrappedPtrDiff
+(unsigned char const *lhs, unsigned char const *rhs)
+{
+  int __attribute__((__no_sanitize__("signed-integer-overflow"))) __retres;
+  __retres = lhs - rhs;
+  return __retres;
+}
+
+unsigned int __attribute__((__target__("bmi2"))) my_ZSTD_decompress_bmi2
+(char *dctx, void *dst, unsigned int maxDstSize, void const *seqStart,
+ _Bool const isLongOffset)
+{
+  unsigned int __attribute__((__target__("bmi2"))) __retres;
+  __retres = (unsigned int __attribute__((__target__("bmi2"))))0;
+  return __retres;
+}
+
 
