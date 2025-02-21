@@ -921,12 +921,6 @@ else
   OPT_LDFLAGS=""
 fi
 
-# Concurrency support
-if [ -n "$OPTION_CONCURRENCY" ]; then
-  OPT_CPPFLAGS="$OPT_CPPFLAGS -DE_ACSL_CONCURRENCY_PTHREAD"
-  OPT_LDFLAGS="$OPT_LDFLAGS -pthread"
-fi
-
 # Gcc and related flags
 CC="$OPTION_CC"
 CFLAGS="$OPTION_CFLAGS
@@ -955,11 +949,6 @@ if [ "`basename $CC`" = 'clang' ]; then
     -Wno-gnu-empty-struct \
     -Wno-incompatible-pointer-types-discards-qualifiers"
 fi
-
-CPPFLAGS="$OPTION_CPPFLAGS
-  $OPT_CPPFLAGS"
-LDFLAGS="$OPTION_LDFLAGS
-  $OPT_LDFLAGS"
 
 # Dlmalloc
 if [ -n "$OPTION_WITH_DLMALLOC" ]; then
@@ -1084,7 +1073,7 @@ fi
 
 # Instrument
 if [ -n "$OPTION_INSTRUMENT" ]; then
-  ($OPTION_ECHO; \
+  INSTRUMENT_OUTPUT=$($OPTION_ECHO; \
     $FRAMAC \
     $FRAMAC_FLAGS \
     $MACHDEP \
@@ -1094,8 +1083,29 @@ if [ -n "$OPTION_INSTRUMENT" ]; then
     $RTE_FLAGS \
     $EACSL_FLAGS \
     -print -ocode "$OPTION_OUTPUT_CODE");
-    error "aborted by Frama-C" $?;
+  EXIT_CODE=$?
+  echo "$INSTRUMENT_OUTPUT"
+  error "aborted by Frama-C" $EXIT_CODE;
 fi
+
+# determine whether Frama-C detected the use of pthreads
+CONTAINS_PTHREAD=0
+PTHREAD_FOUND_MSG="Turning on option --e-acsl-concurrency."
+if echo "$INSTRUMENT_OUTPUT" | grep -F -q "$PTHREAD_FOUND_MSG"; then
+	CONTAINS_PTHREAD=1
+fi
+
+# Concurrency support
+if [ "$CONTAINS_PTHREAD" == "1" ] || [ -n "$OPTION_CONCURRENCY" ]; then
+  OPT_CPPFLAGS="$OPT_CPPFLAGS -DE_ACSL_CONCURRENCY_PTHREAD"
+  OPT_LDFLAGS="$OPT_LDFLAGS -pthread"
+fi
+
+CPPFLAGS="$OPTION_CPPFLAGS
+  $OPT_CPPFLAGS"
+
+LDFLAGS="$OPTION_LDFLAGS
+  $OPT_LDFLAGS"
 
 # Compile
 if [ -n "$OPTION_COMPILE" ]; then
