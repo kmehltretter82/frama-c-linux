@@ -362,8 +362,10 @@ let known_bad_macros =
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
     let censored_macros = known_bad_macros in
-    Machdep.gen_all_defines
-      Format.std_formatter ~censored_macros (get_machdep());
+    let machdep = get_machdep() in
+    Format.printf "/* __fc_machdep.h */@\n%a@\n/* builtin macros */@\n%a@."
+      Machdep.gen_all_defines machdep
+      (Fun.flip Machdep.gen_define_custom_macros censored_macros) machdep;
     raise Cmdline.Exit
   end else Cmdline.nop
 
@@ -504,7 +506,7 @@ let build_cpp_cmd = function
     let fc_define_args = ["__FRAMAC__"] in
     let machdep_no_warn = silence_cpp_machdep_warnings cmdl in
     let clang_no_warn =
-      (* Clang complains when -nostdlibinc is not used ... *)
+      (* Clang complains when -nostdinc is not used ... *)
       if cpp_name cmdl = "clang"
       then [ "-Wno-unused-command-line-argument" ]
       else []
@@ -513,8 +515,9 @@ let build_cpp_cmd = function
       if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
       else []
     in
-    let no_builtin_macros =
-      if Kernel.FramaCStdLib.get () then add_if_gnu "-undef"
+    let restrict_builtin_macros =
+      if Kernel.FramaCStdLib.get () then
+        add_if_gnu "-undef" @ add_if_gnu "-imacros __fc_builtin_macros.h"
       else []
     in
     let output_defines_arg =
@@ -526,7 +529,7 @@ let build_cpp_cmd = function
       | _, _, _ -> []
     in
     let gnu_implicit_args =
-      output_defines_arg @ nostdinc_arg @ no_builtin_macros
+      output_defines_arg @ nostdinc_arg @ restrict_builtin_macros
     in
     let string_of_supp_args extra includes undef defines =
       Format.asprintf "%s%s%s%s"
