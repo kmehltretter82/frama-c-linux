@@ -391,8 +391,6 @@ module Transfer = struct
 
 end
 
-
-
 module Domain = struct
   type value = Value.t
   type location = Precise_locs.precise_location
@@ -406,16 +404,30 @@ module Domain = struct
   let value_dependencies = Main_values.cval
   let location_dependencies = Main_locations.ploc
 
-  let create_main_thread state =
+  let register_and_start_thread thread state =
     let open Result.Operators in
     let threads = state.threads in
-    let* (threads, r) = MtThread.Register.register [Thread.main] threads in
+    let* (threads, r) = MtThread.Register.register [thread] threads in
     let+ (threads, _) = MtThread.Register.start r threads in
     { state with threads }
 
+  let create_main_thread state =
+    register_and_start_thread Thread.main state
+
+  let create_interrupt_handler_threads state =
+    let open Result.Operators in
+    List.fold_left
+      (fun state interrupt ->
+         let* state in
+         register_and_start_thread interrupt state)
+      state
+      (Thread.interrupt_handlers ())
+
   let empty () =
-    let state = default in
-    create_main_thread state |> Result.log ~error:state
+    default
+    |> create_main_thread
+    |> create_interrupt_handler_threads
+    |> Result.log ~error:default
   let logic_assign _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state

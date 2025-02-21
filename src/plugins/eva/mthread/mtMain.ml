@@ -165,6 +165,10 @@ let mthread_run project =
     MtLib.clear_value_results ();
     Thread.reset_state ();
     Mutex.reset_state ();
+
+    (* Let Eva know about interrupt handlers. *)
+    Thread.register_interrupt_handlers (MtOptions.InterruptHandlers.get ());
+
     MtOptions.feedback "*** Computing value analysis for main thread";
     Analysis.compute ();
     MtOptions.feedback "*** First value analysis for main thread done." ;
