@@ -26,6 +26,8 @@ if [ $? != 0 ]; then exit 1; fi
 
 commit=$(echo "$commit" | cut -f1)
 
+echo -e "\e[1;31mSelected cache commit: $commit\e[0m"
+
 cat >./nix/wp-cache.nix << EOL
 { lib, stdenv } :
 stdenv.mkDerivation rec {
