@@ -616,7 +616,11 @@ let gen_all_defines fmt mach =
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;
   if gccMode mach then
-    gen_include fmt "__fc_gcc_builtins.h";
+    gen_include fmt "__fc_gcc_builtins.h"
+  else
+    (* when not gccMode, we don't use -imacros on the command line,
+       hence resort to define builtins here. *)
+    gen_include fmt "__fc_builtin_macros.h";
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
 let create_file gen (fp : Filepath.Normalized.t) =
