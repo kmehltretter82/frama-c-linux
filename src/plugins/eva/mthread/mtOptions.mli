@@ -50,6 +50,9 @@ module DumpSharedVarsValues: Parameter_sig.Int
 (** behavior of option -mt-shared-accesses-synchronization. *)
 module CheckProtections: Parameter_sig.Bool
 
+(** behavior of option -mt-interrupts*)
+module InterruptHandlers: Parameter_sig.Kernel_function_set
+
 (** behavior of option -mt-moderate-warning. *)
 module ModerateWarnings: Parameter_sig.Bool
 
