@@ -575,8 +575,6 @@
     (shared vars values changed, interferences changed)
 [mt] * Computing value analysis for thread <main>
 [mt] Thread <main>, fun main
-[eva] ccfg.c:69: Warning: imprecise memory footprint computed at this point
-[eva:interferences] ccfg.c:69: inject threads interferences at this point
 [mt] ccfg.c:22: Thread jobs[0], fun fjob, parent <main>, args {0}
 [mt] ccfg.c:22: Start thread jobs[0]
 [mt] ccfg.c:22: New context for jobs[0], fun fjob, parent <main>, args {0}
