@@ -44,7 +44,22 @@ val spawn :
   Cvalue.V.t list ->
   t list
 
+(** [is_interrupt_handler kf] returns [true] if [kf] has been registered as an
+    interrupt handler. *)
+val is_interrupt_handler : Cil_types.kernel_function -> bool
+
+(** [interrupt_handler kf] returns the thread representing the interrupt
+    handler [kf]. *)
+val interrupt_handler : Cil_types.kernel_function -> t
+
+(** [interrupt_handlers ()] returns the threads representing the registered
+    interrupt handlers. *)
+val interrupt_handlers : unit -> t list
+
 (* Internal state of the current analysis *)
+
+(** Register a set of functions serving as interrupt handlers. *)
+val register_interrupt_handlers : Kernel_function.Set.t -> unit
 
 val reset_state : unit -> unit
 val current : unit -> t
