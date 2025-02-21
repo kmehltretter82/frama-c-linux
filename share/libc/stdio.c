@@ -513,4 +513,8 @@ int vscanf(const char * restrict format, va_list arg) {
   return vfscanf(__fc_stdin, format, arg);
 }
 
+char __fc_tmpnam[L_tmpnam];
+char __fc_ctermid[L_ctermid];
+char __fc_cuserid[9];
+
 __POP_FC_STDLIB

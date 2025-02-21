@@ -133,6 +133,12 @@ enum __fc_pthread_mutex_pshared
 #include "sched.h"
 
 /*@
+  assigns \result \from indirect:prepare, indirect:parent, indirect:child;
+*/
+extern int pthread_atfork(void (*prepare)(void), void (*parent)(void),
+                          void(*child)(void));
+
+/*@
   assigns \result, *attr \from *attr;
 */
 extern int pthread_attr_destroy(pthread_attr_t *attr);

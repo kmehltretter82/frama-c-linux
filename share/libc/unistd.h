@@ -766,8 +766,15 @@ extern int          euidaccess(const char *path, int amode);
 */
 extern int          faccessat(int fd, const char *path, int amode, int flag);
 
-extern unsigned int alarm(unsigned int);
-extern int          brk(void *);
+/*@
+  assigns \result \from seconds;
+*/
+extern unsigned int alarm(unsigned seconds);
+
+/*@
+  assigns \result \from indirect:addr;
+*/
+extern int brk(void *addr);
 
 /*@ // missing: may assign to errno: EACCES, ELOOP, ENAMETOOLONG, ENOENT,
     //                               ENOTDIR
@@ -808,10 +815,20 @@ extern int          chown(const char *path, uid_t owner, gid_t group);
   ensures result_ok_or_error: \result == 0 || \result == -1;
 */
 extern int          close(int fd);
-extern size_t       confstr(int, char *, size_t);
-extern char        *crypt(const char *, const char *);
-extern char        *ctermid(char *);
-extern char        *cuserid(char *s);
+
+/*@
+  assigns \result, buf[0 .. len-1] \from name, buf, len;
+*/
+extern size_t confstr(int name, char *buf, size_t len);
+
+__FC_EXTERN char __fc_crypt[256];
+char* const __fc_p_crypt = __fc_crypt;
+
+/*@
+  assigns \result \from __fc_p_crypt;
+  assigns __fc_crypt[0..] \from key[0..], salt[0..];
+*/
+extern char *crypt(const char *key, const char *salt);
 
 /*@ // missing: may assign errno EBADF, EMFILE
   requires valid_fildes: 0 <= fildes < __FC_MAX_OPEN_FILES;
@@ -831,7 +848,10 @@ extern int          dup(int fildes);
 */
 extern int          dup2(int fildes, int fildes2);
 
-extern void         encrypt(char[64], int);
+/*@
+  assigns block[0..63] \from block[0..63], edflag;
+*/
+extern void encrypt(char block[64], int edflag);
 
 /*@ requires valid_string_path: valid_read_string(path);
     requires valid_string_arg: valid_read_string(arg);
@@ -871,11 +891,25 @@ extern int          execvp(const char *path, char *const argv[]);
 */
 extern void         _exit(int) __attribute__ ((__noreturn__));
 
-extern int          fchown(int, uid_t, gid_t);
-extern int          fchownat(int fd, const char *path, uid_t owner,
-                             gid_t group, int flag);
-extern int          fchdir(int);
-extern int          fdatasync(int);
+/*@
+  assigns \result \from fildes, owner, group;
+*/
+extern int fchown(int fildes, uid_t owner, gid_t group);
+
+/*@
+  assigns \result \from fd, path[0..], owner, group, flag;
+*/
+extern int fchownat(int fd, const char *path, uid_t owner,
+                    gid_t group, int flag);
+/*@
+  assigns \result \from fildes; //missing: assigns 'cwd'
+*/
+extern int fchdir(int fildes);
+
+/*@
+  assigns \result \from fildes; //missing: assigns 'filesystem'
+*/
+extern int fdatasync(int fildes);
 
 /*@ // missing: assigns \result \from 'other processes, internal state'
     // missing: may assign errno EAGAIN, ENOMEM
@@ -885,9 +919,20 @@ extern int          fdatasync(int);
 */
 extern pid_t        fork(void);
 
-extern long int     fpathconf(int, int);
-extern int          fsync(int);
-extern int          ftruncate(int, off_t);
+/*@
+  assigns \result \from fildes, name;
+*/
+extern long fpathconf(int fildes, int name);
+
+/*@
+  assigns \result \from fildes;
+*/
+extern int fsync(int fildes);
+
+/*@
+  assigns \result \from fildes, length;
+*/
+extern int ftruncate(int fildes, off_t length);
 
 /*@ // missing: assigns buf[0..size-1] \from 'cwd'
     // missing: may assign to errno: EACCES, EINVAL, ENAMETOOLONG, ENOENT,
@@ -900,7 +945,10 @@ extern int          ftruncate(int, off_t);
 */
 extern char        *getcwd(char *buf, size_t size);
 
-extern int          getdtablesize(void);
+/*@
+  assigns \result \from \nothing; //missing: assigns \from 'getrlimit'
+*/
+extern int getdtablesize(void);
 
 /*@ //missing: assigns \result \from 'process effective gid'
   assigns \result \from \nothing;
@@ -917,8 +965,15 @@ extern uid_t        geteuid(void);
 */
 extern gid_t        getgid(void);
 
-extern int          getgroups(int, gid_t []);
-extern long         gethostid(void);
+/*@
+  assigns \result \from gidsetsize, grouplist[0..];
+*/
+extern int getgroups(int gidsetsize, gid_t grouplist[]);
+
+/*@
+  assigns \result \from \nothing;
+*/
+extern long gethostid(void);
 
 extern volatile char __fc_hostname[HOST_NAME_MAX];
 
@@ -940,10 +995,33 @@ extern int gethostname(char *name, size_t len);
 */
 extern int sethostname(const char *name, size_t len);
 
-extern char        *getlogin(void);
-extern int          getlogin_r(char *, size_t);
-extern int          getpagesize(void);
-extern char        *getpass(const char *);
+__FC_EXTERN char __fc_getlogin[LOGIN_NAME_MAX];
+char* const __fc_p_getlogin = __fc_getlogin;
+
+/*@
+  assigns \result \from __fc_p_getlogin;
+*/
+extern char *getlogin(void);
+
+/*@
+  assigns \result, name[0 .. namesize-1] \from \nothing;
+*/
+extern int getlogin_r(char *name, size_t namesize);
+
+/*@
+  assigns \result \from \nothing;
+*/
+extern int getpagesize(void);
+
+// getpass is deprecated, so we provide only minimal support
+// (PASS_MAX is removed from POSIX Issue 6)
+__FC_EXTERN char __fc_getpass[16];
+char* const __fc_p_getpass = __fc_getpass;
+
+/*@
+  assigns \result \from __fc_p_getpass, indirect:prompt[0..];
+*/
+extern char *getpass(const char *prompt);
 
 /*@ //missing: assigns \result \from 'process PGID'
   assigns \result \from indirect:pid;
@@ -975,7 +1053,11 @@ extern pid_t        getsid(pid_t);
 */
 extern uid_t        getuid(void);
 
-extern char        *getwd(char *);
+/*@
+  assigns \result \from buf; //missing: \from 'cwd'
+  assigns buf[0..] \from \nothing; //missing: \from 'cwd'
+*/
+extern char *getwd(char *buf);
 
 /*@ //missing: may assign to errno: EBADF, ENOTTY (POSIX) / EINVAL (Linux)
   assigns \result \from indirect:fd, indirect:__fc_fds[fd];
@@ -983,7 +1065,10 @@ extern char        *getwd(char *);
  */
 extern int          isatty(int fd);
 
-extern int          lchown(const char *, uid_t, gid_t);
+/*@
+  assigns \result \from path[0..], owner, group;
+*/
+extern int lchown(const char *path, uid_t owner, gid_t group);
 
 /*@ //missing: may assign to errno: EACCES, EEXIST, ELOOP, EMLINK, ENAMETOOLONG,
     //                              ENOENT, ENOSPC, ENOTDIR, EPERM, EROFS,
@@ -999,7 +1084,10 @@ extern int          lchown(const char *, uid_t, gid_t);
  */
 extern int          link(const char *path1, const char *path2);
 
-extern int          lockf(int, int, off_t);
+/*@
+  assigns \result \from fildes, function, size;
+*/
+extern int lockf(int fildes, int function, off_t size);
 
 /*@ //missing: may assign to errno: EBADF, EINVAL, EOVERFLOW, ESPIPE, ENXIO (Linux);
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
@@ -1013,7 +1101,10 @@ extern int          lockf(int, int, off_t);
  */
 extern off_t        lseek(int fd, off_t offset, int whence);
 
-extern int          nice(int);
+/*@
+  assigns \result \from incr;
+*/
+extern int nice(int incr);
 
 /*@ // missing: may assign to errno: EACCES, EINVAL, ELOOP, ENOENT, ENOTDIR
     // missing: assigns \result \from 'file path in filesystem'
@@ -1022,7 +1113,10 @@ extern int          nice(int);
 */
 extern long pathconf(char const *path, int name);
 
-extern int          pause(void);
+/*@
+  assigns \result \from \nothing;
+*/
+extern int pause(void);
 
 /*@
   requires valid_pipefd: \valid(pipefd+(0..1));
@@ -1035,10 +1129,15 @@ extern int          pause(void);
  */
 extern int          pipe(int pipefd[2]);
 
-extern ssize_t      pread(int, void *, size_t, off_t);
-extern int          pthread_atfork(void (*)(void), void (*)(void),
-                 void(*)(void));
-extern ssize_t      pwrite(int, const void *, size_t, off_t);
+/*@
+  assigns \result, ((char*)buf)[0 .. nbyte-1] \from fildes, offset;
+*/
+extern ssize_t pread(int fildes, void *buf, size_t nbyte, off_t offset);
+
+/*@
+  assigns \result \from fildes, ((char*)buf)[0 .. nbyte-1], offset;
+*/
+extern ssize_t pwrite(int fildes, const void *buf, size_t nbyte, off_t offset);
 
 /*@
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
@@ -1063,9 +1162,16 @@ extern ssize_t      pwrite(int, const void *, size_t, off_t);
 */
 extern ssize_t      read(int fd, void *buf, size_t count);
 
-extern int          readlink(const char *, char *, size_t);
-extern int          rmdir(const char *);
-extern void        *sbrk(intptr_t);
+/*@
+  assigns \result, ((char*)buf)[0 .. bufsize-1] \from path[0..];
+*/
+extern int readlink(const char *path, char *buf, size_t bufsize);
+
+/*@
+  allocates \result;
+  assigns \result \from indirect:increment;
+*/
+extern void *sbrk(intptr_t increment);
 
 /*@ // missing: may assign errno to EINVAL or EPERM
     // missing: assigns 'process egid' \from gid
@@ -1096,7 +1202,10 @@ extern int          setgid(gid_t gid);
 */
 extern int          setpgid(pid_t pid, pid_t pgid);
 
-extern pid_t        setpgrp(void);
+/*@
+  assigns \result \from \nothing;
+*/
+extern pid_t setpgrp(void);
 
 /*@ // missing: may assign errno to EINVAL, EPERM or EAGAIN
     // missing: assigns 'process real/effective gid' \from gid
@@ -1135,8 +1244,15 @@ extern int          setuid(uid_t uid);
  */
 extern unsigned int sleep(unsigned int seconds);
 
-extern void         swab(const void *, void *, ssize_t);
-extern int          symlink(const char *, const char *);
+/*@
+  assigns ((char*)dest)[0 .. nbytes-1] \from ((char*)src)[nbytes - 1];
+*/
+extern void swab(const void *src, void *dest, ssize_t nbytes);
+
+/*@
+  assigns \result \from path1[0..], path2[0..];
+*/
+extern int symlink(const char *path1, const char *path2);
 
 /*@ //missing: assigns 'filesystem' \from 'filesystem'
   assigns \nothing;
@@ -1149,12 +1265,23 @@ extern void         sync(void);
 */
 extern long int     sysconf(int name);
 
-extern pid_t        tcgetpgrp(int);
-extern int          tcsetpgrp(int, pid_t);
-extern int          truncate(const char *, off_t);
+/*@
+  assigns \result \from fildes;
+*/
+extern pid_t tcgetpgrp(int fildes);
+
+/*@
+  assigns \result \from fildes, pgid_id;
+*/
+extern int tcsetpgrp(int fildes, pid_t pgid_id);
+
+/*@
+  assigns \result \from path[0..], length;
+*/
+extern int truncate(const char *path, off_t length);
 
 __FC_EXTERN volatile char __fc_ttyname[TTY_NAME_MAX];
-volatile char *__fc_p_ttyname = __fc_ttyname;
+volatile char * const __fc_p_ttyname = __fc_ttyname;
 
 /*@
   // missing: may assign to errno: EBADF, ENOTTY
@@ -1164,8 +1291,15 @@ volatile char *__fc_p_ttyname = __fc_ttyname;
  */
 extern char        *ttyname(int fildes);
 
-extern int          ttyname_r(int, char *, size_t);
-extern useconds_t   ualarm(useconds_t, useconds_t);
+/*@
+  assigns \result, name[0 .. namesize-1] \from fildes;
+*/
+extern int ttyname_r(int fildes, char *name, size_t namesize);
+
+/*@
+  assigns \result \from usecs, interval;
+*/
+extern useconds_t ualarm(useconds_t usecs, useconds_t interval);
 
 /*@ // missing: may assign errno
   // missing: assigns 'filesystem' \from path[0..];
@@ -1183,7 +1317,10 @@ extern int          unlink(const char *path);
  */
 extern int          usleep(useconds_t usec);
 
-extern pid_t        vfork(void);
+/*@
+  assigns \result \from \nothing;
+*/
+extern pid_t vfork(void);
 
 /*@
   requires valid_fd: 0 <= fd < __FC_MAX_OPEN_FILES;
@@ -1195,6 +1332,9 @@ extern pid_t        vfork(void);
 extern ssize_t      write(int fd, const void *buf, size_t count);
 
 // setgroups() is not POSIX
+/*@
+  assigns \result \from size, list[0..];
+*/
 extern int setgroups(size_t size, const gid_t *list);
 
 // The following functions are GNU extensions

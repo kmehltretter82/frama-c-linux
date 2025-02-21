@@ -18,6 +18,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -61,6 +65,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -100,6 +108,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -142,6 +154,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -183,6 +199,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -228,6 +248,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -271,6 +295,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -318,6 +346,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -363,6 +395,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -412,6 +448,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -459,6 +499,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -510,6 +554,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -803,6 +851,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -1098,6 +1150,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -1389,6 +1445,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -1684,6 +1744,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -1976,6 +2040,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}
@@ -2272,6 +2340,10 @@
   __fc_tmpnam[0..19] ∈ {0}
   __fc_p_tmpnam ∈ {{ &__fc_tmpnam[0] }}
   __fc_heap_status ∈ [--..--]
+  __fc_ctermid[0..8] ∈ {0}
+  __fc_p_ctermid ∈ {{ &__fc_ctermid[0] }}
+  __fc_cuserid[0..8] ∈ {0}
+  __fc_p_cuserid ∈ {{ &__fc_cuserid[0] }}
   Frama_C_entropy_source ∈ [--..--]
   __fc_random_counter ∈ [--..--]
   __fc_rand_max ∈ {2147483647}

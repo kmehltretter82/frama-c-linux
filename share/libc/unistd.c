@@ -26,6 +26,9 @@
 __PUSH_FC_STDLIB
 
 volatile char __fc_ttyname[TTY_NAME_MAX];
+char __fc_crypt[256];
+char __fc_getlogin[LOGIN_NAME_MAX];
+char __fc_getpass[16];
 
 int optind = 1;
 char *optarg;

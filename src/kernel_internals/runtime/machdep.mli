@@ -85,6 +85,7 @@ type mach = {
   filename_max: string;   (** expansion of FILENAME_MAX macro *)
   host_name_max: string;  (** expansion of HOST_NAME_MAX macro *)
   tty_name_max: string;   (** expansion of TTY_NAME_MAX macro *)
+  l_ctermid: string;      (** expansion of L_ctermid macro *)
   l_tmpnam: string;       (** expansion of L_tmpnam macro *)
   path_max: string;       (** expansion of PATH_MAX macro *)
   tmp_max: string;        (** expansion of TMP_MAX macro *)

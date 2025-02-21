@@ -51,7 +51,10 @@ struct ipc_perm {
 #define IPC_SET 1
 #define IPC_STAT 2
 
-extern key_t ftok(const char *, int);
+/*@
+ assigns \result \from path[0..], id;
+*/
+extern key_t ftok(const char *path, int id);
 
 __END_DECLS
 __POP_FC_STDLIB

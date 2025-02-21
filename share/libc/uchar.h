@@ -53,19 +53,19 @@ typedef __UINT_LEAST16_T char32_t;
 /* C23 7.30.1 "...If ps is a null pointer, each function uses its own
    internal mbstate_t object..."
 */
-mbstate_t __fc_mbrtoc8_internal_mbstate;
-mbstate_t __fc_c8rtomb_internal_mbstate;
-mbstate_t __fc_mbrtoc16_internal_mbstate;
-mbstate_t __fc_c16rtomb_internal_mbstate;
-mbstate_t __fc_mbrtoc32_internal_mbstate;
-mbstate_t __fc_c32rtomb_internal_mbstate;
+__FC_EXTERN mbstate_t __fc_mbrtoc8_internal_mbstate;
+__FC_EXTERN mbstate_t __fc_c8rtomb_internal_mbstate;
+__FC_EXTERN mbstate_t __fc_mbrtoc16_internal_mbstate;
+__FC_EXTERN mbstate_t __fc_c16rtomb_internal_mbstate;
+__FC_EXTERN mbstate_t __fc_mbrtoc32_internal_mbstate;
+__FC_EXTERN mbstate_t __fc_c32rtomb_internal_mbstate;
 
 /* C23 7.30.1.2 / 7.30.1.4 / 7.30.1.6 : If s is a null pointer, the c8rtomb,
    c16rtomb and c32rtomb function are using an internal buffer instead.
 */
-char __fc_c8rtomb_internal_buf[__FC_MB_CUR_MAX];
-char __fc_c16rtomb_internal_buf[__FC_MB_CUR_MAX];
-char __fc_c32rtomb_internal_buf[__FC_MB_CUR_MAX];
+__FC_EXTERN char __fc_c8rtomb_internal_buf[__FC_MB_CUR_MAX];
+__FC_EXTERN char __fc_c16rtomb_internal_buf[__FC_MB_CUR_MAX];
+__FC_EXTERN char __fc_c32rtomb_internal_buf[__FC_MB_CUR_MAX];
 
 /*@
   assigns pc8[0], *ps, __fc_mbrtoc8_internal_mbstate

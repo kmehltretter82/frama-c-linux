@@ -255,7 +255,9 @@
 [eva:final-states] Values at end of function main:
   __fc_errno ∈ [--..--]
   __fc_ctime[0..25] ∈ [--..--]
-  __fc_time_tm ∈ [--..--]
+  __fc_time_tm{.tm_sec; .tm_min; .tm_hour; .tm_mday; .tm_mon; .tm_year; .tm_wday; .tm_yday; .tm_isdst; .tm_gmtoff} ∈
+              [--..--]
+              .tm_zone ∈ {{ NULL + [--..--] ; &S_tm_zone___fc_time_tm[0] }}
   Frama_C_entropy_source ∈ [--..--]
   req.tv_sec ∈ [--..--]
      .tv_nsec ∈ [0..999999999]

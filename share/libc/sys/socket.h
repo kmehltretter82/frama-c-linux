@@ -84,11 +84,18 @@ struct msghdr {
 // POSIX.1-2008 requires these to be defined as macros, but we have no body
 // for them, so we declare them as prototypes as well.
 #ifndef CMSG_FIRSTHDR
-extern struct cmsghdr *CMSG_FIRSTHDR(struct msghdr *msgh);
+/*@
+  assigns \result \from msgh;
+*/
+extern struct cmsghdr *CMSG_FIRSTHDR(const struct msghdr *msgh);
 # define CMSG_FIRSTHDR(h) CMSG_FIRSTHDR(h)
 #endif
 #ifndef CMSG_NXTHDR
-extern struct cmsghdr *CMSG_NXTHDR(struct msghdr *msgh, struct cmsghdr *cmsg);
+/*@
+  assigns \result \from msgh, cmsg;
+*/
+extern struct cmsghdr *CMSG_NXTHDR(const struct msghdr *msgh,
+                                   const struct cmsghdr *cmsg);
 # define CMSG_NXTHDR(h, c) CMSG_NXTHDR(h, c)
 #endif
 
@@ -348,7 +355,13 @@ extern int     bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
  */
 extern int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
-extern int     getpeername(int, struct sockaddr *, socklen_t *);
+/*@
+  assigns \result \from indirect:socket, indirect:*address_len;
+  assigns *address \from indirect:socket, indirect:*address_len;
+  assigns *address_len \from indirect:socket, *address_len;
+*/
+extern int getpeername(int socket, struct sockaddr *address,
+                       socklen_t *address_len);
 
 /*@
   // missing: may assign to errno: EBADF, ENOTSOCK, EOPNOTSUPP, EINVAL, ENOBUFS
@@ -559,7 +572,10 @@ extern int setsockopt(int sockfd, int level, int optname, const void *optval, so
  */
 extern int shutdown(int sockfd, int how);
 
-extern int sockatmark(int);
+/*@
+  assigns \result \from indirect:s;
+*/
+extern int sockatmark(int s);
 
 /*@
   assigns  \result \from indirect:domain, indirect:type, indirect:protocol,
@@ -570,8 +586,6 @@ extern int sockatmark(int);
            0 <= \result < __FC_MAX_OPEN_SOCKETS || \result == -1;
 */
 extern int socket(int domain, int type, int protocol);
-
-extern int sockatmark(int);
 
 /*@ requires valid_socket_sector: \valid(&sv[0..1]);
   @ assigns \result, __fc_socket_counter, sv[0..1] \from

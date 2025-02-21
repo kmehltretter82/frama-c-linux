@@ -29,7 +29,7 @@ __PUSH_FC_STDLIB
 __BEGIN_DECLS
 
 __FC_EXTERN char __fc_basename[__FC_PATH_MAX];
-char *__fc_p_basename = __fc_basename;
+char * const __fc_p_basename = __fc_basename;
 
 /*@ // missing: assigns path[0 ..], __fc_p_basename[0 ..] \from 'filesystem';
   requires null_or_valid_string_path: path == \null || valid_read_string(path);
@@ -41,7 +41,7 @@ char *__fc_p_basename = __fc_basename;
 extern char *basename(char *path);
 
 __FC_EXTERN char __fc_dirname[__FC_PATH_MAX];
-char *__fc_p_dirname = __fc_dirname;
+char * const __fc_p_dirname = __fc_dirname;
 
 /*@ // missing: assigns path[0 ..], __fc_p_dirname[0 ..] \from 'filesystem';
   requires null_or_valid_string_path: path == \null || valid_read_string(path);

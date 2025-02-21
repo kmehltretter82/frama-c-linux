@@ -101,7 +101,16 @@ struct timex {
   int32_t _padding[11];
 };
 
+/*@
+  assigns \result \from indirect:*buf;
+  assigns *buf \from *buf;
+*/
 extern int adjtimex(struct timex *buf);
+
+/*@
+  assigns \result \from indirect:*buf;
+  assigns *buf \from *buf;
+*/
 extern int ntp_adjtime(struct timex *buf);
 
 __END_DECLS

@@ -207,8 +207,25 @@
 void main() {
   /* The variables below must be const; otherwise the preconditions
      and the assigns/from of some functions will not match */
+  //@ assert __fc_p_basename == __fc_basename;
+  //@ assert __fc_p_ctime == __fc_ctime;
+  //@ assert __fc_p_dirname == __fc_dirname;
   //@ assert __fc_p_fopen == (FILE *)&__fc_fopen;
+  //@ assert __fc_p_getdate == &__fc_getdate;
+  //@ assert __fc_p_langinfo == __fc_langinfo;
   //@ assert __fc_p_opendir == (DIR*)&__fc_opendir;
-  //@ assert __fc_p_time_tm == &__fc_time_tm;
+  //@ assert __fc_p_random48_counter == __fc_random48_counter;
   //@ assert __fc_p_strerror == __fc_strerror;
+  //@ assert __fc_p_strsignal == __fc_strsignal;
+  //@ assert __fc_p_time_tm == &__fc_time_tm;
+  //@ assert __fc_p_tmpnam == __fc_tmpnam;
+  //@ assert __fc_p_ttyname == __fc_ttyname;
+  //@ assert __fc_p_catgets == __fc_catgets;
+  //@ assert __fc_p_crypt == __fc_crypt;
+  //@ assert __fc_p_ctermid == __fc_ctermid;
+  //@ assert __fc_p_cuserid == __fc_cuserid;
+  //@ assert __fc_p_getlogin == __fc_getlogin;
+  //@ assert __fc_p_getpass == __fc_getpass;
+  //@ assert __fc_p_pwd == &__fc_pwd;
+  //@ assert __fc_p_sigaction == __fc_sigaction;
 }

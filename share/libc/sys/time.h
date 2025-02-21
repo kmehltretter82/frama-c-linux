@@ -210,17 +210,32 @@ extern int setitimer (int which,
       struct itimerval *restrict old_value);
 
 // Non-POSIX, non-C99 functions (present in Linux and most BSDs)
+/*@
+  assigns *res \from *a, *b;
+*/
 extern void timeradd(struct timeval *a, struct timeval *b,
-              struct timeval *res);
+                     struct timeval *res);
 
+/*@
+  assigns *res \from *a, *b;
+*/
 extern void timersub(struct timeval *a, struct timeval *b,
-              struct timeval *res);
+                     struct timeval *res);
 
+/*@
+  assigns *tvp \from \nothing;
+*/
 extern void timerclear(struct timeval *tvp);
 
+/*@
+  assigns \result \from *tvp;
+*/
 extern int timerisset(struct timeval *tvp);
 
 #define timercmp(a, b, _CMP) _timercmp(a, b)
+/*@
+  assigns \result \from indirect:*a, indirect:*b;
+*/
 extern int _timercmp(struct timeval *a, struct timeval *b);
 
 // From POSIX, and for better compatibility with existing code bases:

@@ -1,8 +1,8 @@
 [e-acsl] beginning translation.
-[e-acsl] FRAMAC_SHARE/libc/unistd.h:880: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/unistd.h:914: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:82: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/sys/wait.h:85: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/stdlib.h:539: Warning: 
@@ -16,9 +16,9 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:883: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:917: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:884: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/unistd.h:918: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.

@@ -48,13 +48,26 @@ struct msqid_ds {
  time_t msg_ctime;
 };
 
+/*@
+  assigns \result, *buf \from msqid, cmd;
+*/
 extern int msgctl(int msqid, int cmd, struct msqid_ds *buf);
 
+/*@
+  assigns \result \from key, msgflg;
+*/
 extern int msgget(key_t key, int msgflg);
 
-extern ssize_t msgrcv(int msgid, void *msgp, size_t msgsz, long msgtyp,
+/*@
+  assigns \result, ((char*)msgp)[0 .. msgsz-1] \from msqid, msgsz, msgtyp,
+    msgflg;
+*/
+extern ssize_t msgrcv(int msqid, void *msgp, size_t msgsz, long msgtyp,
                       int msgflg);
 
+/*@
+  assigns \result \from msqid, ((char*)msgp)[0 .. msgsz-1], msgsz, msgflg;
+*/
 extern int msgsnd(int msqid, const void *msgp, size_t msgsz, int msgflg);
 
 __END_DECLS

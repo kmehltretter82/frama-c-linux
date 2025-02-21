@@ -53,7 +53,7 @@ typedef struct __fc_trace_event_set_t {
    int _fc_trevset;
 } trace_event_set_t;
 
-extern trace_event_set_t __fc_cur_trace;
+__FC_EXTERN trace_event_set_t __fc_cur_trace;
 
 struct posix_trace_status_info {
   int posix_stream_full_status;

@@ -314,7 +314,7 @@ extern void srandom(unsigned int seed);
 int __fc_random48_init;
 
 __FC_EXTERN unsigned short __fc_random48_counter[3];
-unsigned short *__fc_p_random48_counter = __fc_random48_counter;
+unsigned short * const __fc_p_random48_counter = __fc_random48_counter;
 
 /*@
   assigns __fc_random48_counter[0..2] \from seed;
@@ -551,7 +551,7 @@ extern void exit(int status) __attribute__ ((__noreturn__));
 */
 extern void _Exit(int status) __attribute__ ((__noreturn__));
 
-extern char *__fc_env[ARG_MAX];
+__FC_EXTERN char *__fc_env[ARG_MAX];
 
 /*@
   requires valid_name: valid_read_string(name);

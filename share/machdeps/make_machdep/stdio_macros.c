@@ -34,6 +34,9 @@ int fopen_max_is = FOPEN_MAX;
 #if defined(FILENAME_MAX)
 int filename_max_is = FILENAME_MAX;
 #endif
+#if defined(L_ctermid)
+int l_ctermid_is = L_ctermid;
+#endif
 #if defined(L_tmpnam)
 int l_tmpnam_is = L_tmpnam;
 #endif

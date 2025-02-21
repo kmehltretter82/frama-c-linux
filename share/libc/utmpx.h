@@ -48,7 +48,7 @@ struct utmpx {
 };
 
 // static storage used by some getter functions
-extern struct utmpx __fc_getx;
+__FC_EXTERN struct utmpx __fc_getx;
 
 /*@
   assigns \result \from &__fc_getx, indirect:__fc_utmp;

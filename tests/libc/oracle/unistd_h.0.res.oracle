@@ -4,15 +4,19 @@
   \return(chdir) == 0 (auto)
   \return(chroot) == 0 (auto)
   \return(chown) == 0 (auto)
+  \return(crypt) == 0 (auto)
   \return(dup) == -1 (auto)
   \return(getcwd) == 0 (auto)
   \return(gethostname) == 0 (auto)
+  \return(getlogin) == 0 (auto)
+  \return(getpass) == 0 (auto)
   \return(getpgrp) == 0 (auto)
+  \return(getwd) == 0 (auto)
   \return(isatty) == 0 (auto)
   \return(lseek) == -1 (auto)
   \return(pipe) == 0 (auto)
   \return(read) == -1, 32 (auto)
-  \return(rmdir) == 0 (auto)
+  \return(sbrk) == 0 (auto)
   \return(setegid) == 0 (auto)
   \return(seteuid) == 0 (auto)
   \return(setgid) == 0 (auto)
@@ -28,6 +32,7 @@
   \return(setresuid) == 0 (auto)
   \return(getresgid) == 0 (auto)
   \return(setresgid) == 0 (auto)
+  \return(rmdir) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

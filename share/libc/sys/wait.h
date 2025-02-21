@@ -76,7 +76,10 @@ typedef enum __FC_IDTYPE_T { P_ALL, P_PID, P_PGID } idtype_t;
 */
 extern pid_t wait(int *stat_loc);
 
-extern int waitid(idtype_t idt, id_t id, siginfo_t * sig, int options);
+/*@
+  assigns \result, *infop \from idtype, id, options;
+*/
+extern int waitid(idtype_t idtype, id_t id, siginfo_t *infop, int options);
 
 
 /*@ //missing: assigns \result \from 'child processes'
@@ -99,7 +102,10 @@ extern pid_t waitpid(pid_t pid, int *stat_loc, int options);
 
 #include "resource.h"
 // non-POSIX
-extern pid_t wait3(int *, int, struct rusage *);
+/*@
+  assigns \result, *wstatus, *rusage \from options;
+*/
+extern pid_t wait3(int *wstatus, int options, struct rusage *rusage);
 
 
 __END_DECLS

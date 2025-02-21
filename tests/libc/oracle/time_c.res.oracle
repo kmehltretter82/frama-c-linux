@@ -6,12 +6,12 @@
   v ∈ [--..--]
 [eva] computing for function ctime <- main.
   Called from time_c.c:8.
-[eva] FRAMAC_SHARE/libc/time.c:30: assertion got status valid.
-[eva:alarm] FRAMAC_SHARE/libc/time.c:31: Warning: assertion got status unknown.
+[eva] FRAMAC_SHARE/libc/time.c:32: assertion got status valid.
+[eva:alarm] FRAMAC_SHARE/libc/time.c:33: Warning: assertion got status unknown.
 [eva] computing for function Frama_C_make_unknown <- ctime <- main.
-  Called from FRAMAC_SHARE/libc/time.c:32.
+  Called from FRAMAC_SHARE/libc/time.c:34.
 [eva] using specification for function Frama_C_make_unknown
-[eva] FRAMAC_SHARE/libc/time.c:32: 
+[eva] FRAMAC_SHARE/libc/time.c:34: 
   function Frama_C_make_unknown: precondition 'valid_p' got status valid.
 [eva] Done for function Frama_C_make_unknown
 [eva] Recording results for ctime

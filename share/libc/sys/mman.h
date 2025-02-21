@@ -71,18 +71,53 @@ __BEGIN_DECLS
 //  size_t posix_tmi_length;
 //}
 
-extern int mlock (const void *addr, size_t len);
-extern int mlockall (int __flags);
+/*@
+  assigns \result \from addr, len;
+*/
+extern int mlock(const void *addr, size_t len);
 
+/*@
+  assigns \result \from flags;
+*/
+extern int mlockall(int flags);
+
+/*@
+  allocates \result;
+  assigns \result \from addr, indirect:len, indirect:prot, indirect:flags,
+    indirect:fildes, indirect:off;
+ */
 extern void *mmap(void *addr, size_t len, int prot, int flags,
                   int fildes, off_t off);
 
-extern int mprotect (void *__addr, size_t __len, int __prot);
-extern int msync (void *__addr, size_t __len, int __flags);
-extern int munlock (const void *__addr, size_t __len);
-extern int munlockall (void);
-extern int munmap (void *__addr, size_t __len);
-extern int posix_madvise (void *__addr, size_t __len, int __advice);
+/*@
+  assigns \result \from addr, len, prot;
+*/
+extern int mprotect(void *addr, size_t len, int prot);
+
+/*@
+  assigns \result \from addr, len, flags;
+*/
+extern int msync(void *addr, size_t len, int flags);
+
+/*@
+  assigns \result \from addr, len;
+*/
+extern int munlock(const void *addr, size_t len);
+
+/*@
+  assigns \result \from \nothing;
+*/
+extern int munlockall(void);
+
+/*@
+  assigns \result \from addr, len;
+*/
+extern int munmap(void *addr, size_t len);
+
+/*@
+  assigns \result \from addr, len, advice;
+*/
+extern int posix_madvise(void *addr, size_t len, int advice);
 
 // Not currently defined in any Linux header
 //int    posix_mem_offset(const void *restrict, size_t, off_t *restrict,
@@ -90,8 +125,15 @@ extern int posix_madvise (void *__addr, size_t __len, int __advice);
 //int    posix_typed_mem_get_info(int, struct posix_typed_mem_info *);
 //int    posix_typed_mem_open(const char *, int, int);
 
-extern int shm_open (const char *__name, int __oflag, mode_t __mode);
-extern int shm_unlink (const char *__name);
+/*@
+  assigns \result \from name[0..], oflag, mode;
+*/
+extern int shm_open (const char *name, int oflag, mode_t mode);
+
+/*@
+  assigns \result \from name[0..];
+*/
+extern int shm_unlink (const char *name);
 
 __END_DECLS
 __POP_FC_STDLIB

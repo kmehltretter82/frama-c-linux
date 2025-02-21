@@ -4,9 +4,6 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
-[kernel:annot:missing-spec] sys_sem_h.c:20: Warning: 
-  Neither code nor specification for function ftok,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function ftok <- main.
   Called from sys_sem_h.c:20.
 [eva] using specification for function ftok
@@ -17,9 +14,6 @@
 [eva] sys_sem_h.c:21: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
-[kernel:annot:missing-spec] sys_sem_h.c:25: Warning: 
-  Neither code nor specification for function semget,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function semget <- main.
   Called from sys_sem_h.c:25.
 [eva] using specification for function semget
@@ -27,16 +21,10 @@
 [eva] computing for function semget <- main.
   Called from sys_sem_h.c:28.
 [eva] Done for function semget
-[kernel:annot:missing-spec] sys_sem_h.c:36: Warning: 
-  Neither code nor specification for function semctl,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function semctl <- main.
   Called from sys_sem_h.c:36.
 [eva] using specification for function semctl
 [eva] Done for function semctl
-[kernel:annot:missing-spec] sys_sem_h.c:37: Warning: 
-  Neither code nor specification for function semop,
-   generating default assigns. See -generated-spec-* options for more info
 [eva] computing for function semop <- main.
   Called from sys_sem_h.c:37.
 [eva] using specification for function semop
@@ -104,6 +92,8 @@
   __fc_stdout ∈ {{ NULL ; &S___fc_stdout[0] }}
   semkey ∈ [0..4294967294]
   semid ∈ [--..--]
-  sbuf ∈ [--..--]
+  sbuf.sem_num ∈ {0}
+      .sem_op ∈ {-1}
+      .sem_flg ∈ {4096}
   arg ∈ {0}
   __retres ∈ {0}
