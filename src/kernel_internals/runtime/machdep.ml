@@ -310,7 +310,9 @@ let gen_define_custom_macros fmt censored mach =
   let is_same_macro m1 m2 =
     Extlib.strip_underscore m1 = Extlib.strip_underscore m2
   in
-  Format.pp_open_vbox fmt 0;
+  Format.fprintf fmt "@[<v 0>/* Builtin macros for current machdep */@\n";
+  Format.fprintf fmt "#ifndef __FC_BUILTIN_MACROS_H@\n";
+  Format.fprintf fmt "#define __FC_BUILTIN_MACROS_H@\n";
   List.iter
     (fun (k,v) ->
        if not (Datatype.String.Set.exists (is_same_macro k) censored)
@@ -319,7 +321,7 @@ let gen_define_custom_macros fmt censored mach =
          gen_define_macro fmt k v
        end)
     key_values;
-  Format.fprintf fmt "@]@."
+  Format.fprintf fmt "#endif /* ifdef __FC_BUILTIN_MACROS_H */@]@."
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 
@@ -617,12 +619,9 @@ let gen_all_defines fmt mach =
   List.iter (gen_define_errno_macro fmt) mach.errno;
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;
+  gen_include fmt "__fc_builtin_macros.h";
   if gccMode mach then
-    gen_include fmt "__fc_gcc_builtins.h"
-  else
-    (* when not gccMode, we don't use -imacros on the command line,
-       hence resort to define builtins here. *)
-    gen_include fmt "__fc_builtin_macros.h";
+    gen_include fmt "__fc_gcc_builtins.h";
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
 let create_file gen (fp : Filepath.Normalized.t) =
