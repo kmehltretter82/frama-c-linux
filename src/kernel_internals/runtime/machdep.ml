@@ -310,6 +310,7 @@ let gen_define_custom_macros fmt censored mach =
   let is_same_macro m1 m2 =
     Extlib.strip_underscore m1 = Extlib.strip_underscore m2
   in
+  Format.pp_open_vbox fmt 0;
   List.iter
     (fun (k,v) ->
        if not (Datatype.String.Set.exists (is_same_macro k) censored)
@@ -317,7 +318,8 @@ let gen_define_custom_macros fmt censored mach =
          gen_undef fmt k;
          gen_define_macro fmt k v
        end)
-    key_values
+    key_values;
+  Format.fprintf fmt "@]@."
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 
