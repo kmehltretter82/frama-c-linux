@@ -482,6 +482,18 @@ module PrintMachdepHeader =
     end)
 
 let () = Parameter_customize.set_group help
+let () = Parameter_customize.set_cmdline_stage Cmdline.Exiting
+let () = Parameter_customize.set_negative_option_name ""
+module PrintMachdepBuiltinMacros =
+  False
+    (struct
+      let module_name = "PrintMachdepBuiltinMacros"
+      let option_name = "-print-machdep-builtin-macros"
+      let help =
+        "print on standard output the content of the generated __fc_builtin_macros.h"
+    end)
+
+let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_negative_option_name ""
 module DumpDependencies =
   P.Empty_string

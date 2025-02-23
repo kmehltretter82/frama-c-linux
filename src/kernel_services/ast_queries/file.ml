@@ -361,15 +361,22 @@ let known_bad_macros =
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
-    let censored_macros = known_bad_macros in
     let machdep = get_machdep() in
-    Format.printf "/* __fc_machdep.h */@\n%a@\n/* builtin macros */@\n%a@."
-      Machdep.gen_all_defines machdep
-      (Fun.flip Machdep.gen_define_custom_macros censored_macros) machdep;
+    Machdep.gen_all_defines Format.std_formatter machdep;
     raise Cmdline.Exit
   end else Cmdline.nop
 
 let () = Cmdline.run_after_exiting_stage print_machdep_header
+
+let print_machdep_builtin_macros () =
+  if Kernel.PrintMachdepBuiltinMacros.get () then begin
+    let censored_macros = known_bad_macros in
+    let machdep = get_machdep() in
+    Machdep.gen_define_custom_macros Format.std_formatter censored_macros machdep;
+    raise Cmdline.Exit
+  end else Cmdline.nop
+
+let () = Cmdline.run_after_exiting_stage print_machdep_builtin_macros
 
 let list_available_machdeps = default_machdeps
 
