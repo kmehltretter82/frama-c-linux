@@ -151,7 +151,7 @@ let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
     else pos
   in
   try
-    let$ in_ch = open_in_exn pos.pos_path in
+    let$ in_ch = with_open_in_exn pos.pos_path in
     let first_error_line, start_char, last_error_line =
       min start_pos.pos_lnum pos.pos_lnum,
       (start_pos.pos_cnum - start_pos.pos_bol + 1),

@@ -26,7 +26,7 @@
 
 let pp_to_file f pp =
   let open Filepath.Operators in
-  let$ cout = open_out_exn f in
+  let$ cout = Filepath.with_open_out_exn f in
   let fout = Format.formatter_of_out_channel cout in
   try
     pp fout ;
@@ -37,7 +37,7 @@ let pp_to_file f pp =
 
 let pp_from_file fmt file =
   let open Filepath.Operators in
-  let$ cin = open_in_exn file in
+  let$ cin = Filepath.with_open_in_exn file in
   try
     while true do
       Async.yield () ;
@@ -58,16 +58,16 @@ let rec bincopy buffer cin cout =
 
 let copy src tgt =
   let open Filepath.Operators in
-  let$ inc = open_in_exn src in
-  let$ out = open_out_exn tgt in
+  let$ inc = Filepath.with_open_in_exn src in
+  let$ out = Filepath.with_open_out_exn tgt in
   bincopy (Bytes.create 2048) inc out
 
 let read_file file job =
-  Filepath.with_in_exn file job
+  Filepath.with_open_in_exn file job
 
 let read_lines file job =
   let open Filepath.Operators in
-  let$ inc = open_in_exn file in
+  let$ inc = Filepath.with_open_in_exn file in
   try
     while true do
       job (input_line inc) ;
@@ -76,7 +76,7 @@ let read_lines file job =
 
 let write_file file job =
   assert (not (Filepath.Normalized.is_empty file));
-  Filepath.with_out_exn file job
+  Filepath.with_open_out_exn file job
 
 let print_file file job =
   write_file file

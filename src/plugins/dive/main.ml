@@ -29,9 +29,10 @@ let output format context filename =
     | Json -> Server_interface.output_to_json channel graph
   in
   Self.result "output to %a" Filepath.Normalized.pretty filename;
-  Filepath.with_out filename output_function
-  |> Result.iter_error @@
-  Self.warning "failed to output graph: %s"
+  match Filepath.with_open_out filename output_function with
+  | Ok () -> ()
+  | Error error ->
+    Self.warning "failed to output graph: %s" error
 
 let main () =
   if not (Self.FromBases.is_empty () &&
