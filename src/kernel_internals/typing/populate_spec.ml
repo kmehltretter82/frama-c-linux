@@ -955,13 +955,3 @@ let populate_funspec ?loc ?(do_body=false) kf clauses =
       do_populate ?loc kf todo;
       List.iter (fun c -> Is_populated.add (kf, c) ()) todo
     end
-
-let () =
-  (* This function is deprecated. Until removed, populate assigns and
-     returns true if spec generation was performed. *)
-  let f kf _funspec =
-    let before = Is_populated.mem (kf, `Assigns) in
-    populate_funspec kf [`Assigns];
-    not before && Is_populated.mem (kf, `Assigns)
-  in
-  Annotations.populate_spec_ref := f [@@ warning "-3"]

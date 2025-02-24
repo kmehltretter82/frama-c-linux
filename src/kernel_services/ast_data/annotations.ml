@@ -162,8 +162,6 @@ let () =
 (** {2 Getting annotations} *)
 (**************************************************************************)
 
-let populate_spec_ref = Extlib.mk_fun "Annotations.populate_spec"
-
 let merge_from from1 from2 =
   match from1, from2 with
   | FromAny, FromAny -> FromAny
