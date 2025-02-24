@@ -204,3 +204,5 @@ val init: initLogicBuiltins:(unit -> unit) -> Machdep.mach -> unit
 
 (** Unless your name is {!Cil_builtins}, you should not call this. *)
 val init_builtins_ref: (unit -> unit) ref
+[@@alert machine_init_builtins_ref
+    "This function can only be called by Cil_builtins"]
