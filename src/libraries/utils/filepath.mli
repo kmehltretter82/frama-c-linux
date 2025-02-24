@@ -396,14 +396,6 @@ module Operators : sig
   *)
 
   val (let$): ('ch,'a) exn_processor -> ('ch -> 'a) -> 'a
-
-  (** {3 Error handling}
-      These operators can be used to handle result errors.
-  *)
-
-  val (let&): (unit,'e) result -> ('e -> unit) -> unit
-  val (let+&): ('a,'e) result -> ('e -> 'a) ->  ('a,'e) result
-  val (let*&): ('a,'e) result -> ('e -> ('a,'e) result) -> ('a,'e) result
 end
 
 (*
