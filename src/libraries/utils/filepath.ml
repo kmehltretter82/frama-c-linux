@@ -439,8 +439,8 @@ let with_open_out ?if_missing ?if_exists ?binary ?blocking p f =
 
 module Operators =
 struct
-  let (let+$) with_open f = with_open f
-  let (let*$) with_open f = with_open f |> Result.join
+  let (let+) with_open f = with_open f
+  let (let*) with_open f = with_open f |> Result.join
   let (let$) with_open f = with_open f
 end
 

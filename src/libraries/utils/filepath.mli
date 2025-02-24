@@ -392,8 +392,8 @@ module Operators : sig
       These operators are intended to be used with {!with_open_in} or {!with_open_out}.
   *)
 
-  val (let+$): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
-  val (let*$):
+  val (let+): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
+  val (let*):
     ('ch,('a,string) result) safe_processor ->
     ('ch -> ('a,string) result) ->
     ('a,string) result
