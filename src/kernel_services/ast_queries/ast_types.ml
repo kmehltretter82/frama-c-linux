@@ -24,7 +24,9 @@
 
 open Cil_types
 
-(* tmp, to remove later *)
+(* *************************************** *)
+(* Utils from Cil that do not belong here. *)
+(* *************************************** *)
 
 let abort_context msg =
   let loc = Current_loc.get () in
@@ -34,11 +36,9 @@ let abort_context msg =
   in
   Kernel.abort ~current:true ~append msg
 
-(** Get the full name of a comp *)
+(* Get the full name of a comp *)
 let compFullName comp =
   (if comp.cstruct then "struct " else "union ") ^ comp.cname
-
-let pp_typ_ref = Extlib.mk_fun "Ast_types.pp_typ_ref"
 
 (* ********** *)
 (* Attributes *)
@@ -460,7 +460,7 @@ let is_variadic_list t =
 let direct_element_type t =
   match unroll_type_node t with
   | TArray (elem_t, _) -> elem_t
-  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+  | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
 
 let rec element_type t =
   let t' = direct_element_type t in
@@ -471,12 +471,12 @@ let rec element_type t =
 let array_elem_type_and_size t =
   match unroll_type_node t with
   | TArray (ty_elem, arr_size) -> ty_elem, arr_size
-  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
+  | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
 
 let direct_pointed_type t =
   match unroll_type_skel t with
   | TPtr t -> t
-  | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref t
+  | _ -> Kernel.fatal "Not a pointer type %a" Cil_datatype.Typ.pretty t
 
 let pointed_type t =
   let t' = direct_pointed_type t in
