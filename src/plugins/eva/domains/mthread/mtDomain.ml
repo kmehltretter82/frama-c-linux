@@ -407,7 +407,7 @@ module Domain = struct
   let location_dependencies = Main_locations.ploc
 
   let create_main_thread state =
-    let open Result in
+    let open Result.Operators in
     let threads = state.threads in
     let* (threads, r) = MtThread.Register.register [Thread.main] threads in
     let+ (threads, _) = MtThread.Register.start r threads in
@@ -443,7 +443,7 @@ module Domain = struct
 
   let thread_create state stmt = function
     | (name, _) :: (func, _) :: args ->
-      let open Result in
+      let open Result.Operators in
       let name = Name.of_cvalue name in
       let* func = Value.extract_fun func in
       let args = List.map fst args in
@@ -455,7 +455,7 @@ module Domain = struct
 
   let thread_update f state _ = function
     | (id, _) :: [] ->
-      let open Result in
+      let open Result.Operators in
       let+ (threads, return) = f id state.threads in
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."
@@ -470,7 +470,7 @@ module Domain = struct
 
   let mutex_init state stmt = function
     | (name, _) :: [] ->
-      let open Result in
+      let open Result.Operators in
       let name = Name.of_cvalue name in
       let aloc = (stmt, Eva_utils.current_call_stack ()) in
       let mutex = Mutex.create aloc name in
@@ -480,14 +480,14 @@ module Domain = struct
 
   let mutex_lock state _ = function
     | (id, _) :: [] ->
-      let open Result in
+      let open Result.Operators in
       let+ (mutexes, return) = MtMutex.Register.lock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
   let mutex_unlock state _ = function
     | (id, _) :: [] ->
-      let open Result in
+      let open Result.Operators in
       let+ (mutexes, return) = MtMutex.Register.unlock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."

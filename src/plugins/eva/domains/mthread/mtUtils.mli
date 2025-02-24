@@ -40,8 +40,10 @@ module Result : sig
   val log : error : 'a -> 'a t -> 'a
   val value : 'a t -> 'a
 
-  val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
-  val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
+  module Operators : sig
+    val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
+    val ( let+ ) : 'a t -> ('a -> 'b) -> 'b t
+  end
 end
 
 
