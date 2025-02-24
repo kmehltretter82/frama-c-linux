@@ -1075,6 +1075,45 @@ For more advanced usage of \texttt{ptests} please refer to Section~\ref{adv:ptes
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Plug-in Migration from the previous version of \framac }\label{adv:framac-migration}
+
+\begin{target}developers who have an existing plug-in for Frama-C 31 or more and
+  want to migrate their plug-in to the next version.
+\end{target}
+
+\begin{prereq}
+  Being familiar with the plug-in to migrate. Using \ocaml 5.2.1 or higher.
+  Installing \texttt{OCamlmig}\codeidxdef{OCamlmig}.
+\end{prereq}
+
+Please note that this section is a best effort procedure for making the
+migration as smooth as possible. If the plug-in is particularly complex,
+please contact us if you need some help for migrating it.
+
+\subsubsection{\texttt{OCamlmig}\codeidxdef{OCamlmig}}
+
+Previous version of \framac used migration shell scripts and \texttt{sed} to
+migrate things that changed in the API (like moving or renaming functions). This
+scripts were not reliable and we decided to use a \texttt{OCamlmig} (see
+\url{https://github.com/v-gb/ocamlmig}), to automate migrations. \framac
+developers can now indicates in the code how it should be migrated. Plug-in
+developers then can run \lstinline{ocamlmig migrate -w} inside their plug-in
+directory after installing \framac and it will apply all the mirgation rules in
+their code.
+
+\subsubsection{Format}
+
+At the moment, \texttt{Ocamlmig} uses \texttt{OCamlFormat} to print the code. If
+you do not use \texttt{OCamlFormat} in your plug-in, you can minimize the diff
+by setting an environnement variable \texttt{OCAMLMIG\_PRESERVE\_FORMAT} before
+running the migration command, either by exporting it via
+\lstinline{export OCAMLMIG_PRESERVE_FORMAT=1} or in front of the command
+\lstinline{OCAMLMIG_PRESERVE_FORMAT=1 ocamlmig migrate -w}. With this setting,
+\texttt{OCamlmig} will try to format only chunks of codes that are impacted by
+the tool without any guarantee.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Plug-in General Services}\label{adv:plugin-services}
 
 Module \texttt{Plugin}\codeidxdef{Plugin} provides an access to some general
