@@ -80,11 +80,14 @@ let parse_line env line =
       let f = Str.matched_group 1 line in
       Mdr_params.debug ~dkey
         "Remark for section %s in file %s" env.current_section f;
-      try
-        let chan = open_in f in
-        add_channel env chan;
-        close_in chan
-      with Sys_error err ->
+      let open Filepath.Operators in
+      let result =
+        let+ chan = Filepath.(with_open_in (Normalized.of_string f)) in
+        add_channel env chan
+      in
+      match result with
+      | Ok () -> ()
+      | Error err ->
         Mdr_params.error
           "Unable to open included remarks file %s (%s), Ignoring." f err
     end else begin
