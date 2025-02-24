@@ -390,7 +390,7 @@ let flags_and_perm ?if_exists ~if_missing ~binary ~blocking default =
 
 (* We don't directly use Fun.protect as it catches exceptions in [finally]
    and reraise them as [Finally_raised exn]. However, a [Sys_error] can be
-   raised by [with_open_out] (and [with_open_in] but it should not happen).
+   raised by [close_out] (and [close_in] but it should not happen).
 *)
 let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
   let r =

@@ -361,7 +361,7 @@ val with_open_out_exn:
     {[
       let open Filepath.Operators in
       let result =
-        let+$ channel = Filepath.with_open_out filepath in
+        let+ channel = Filepath.with_open_out filepath in
         output_string channel "42";
       in
       match result with
@@ -377,7 +377,7 @@ val with_open_out_exn:
 
     {[
       let open Filepath.Operators in
-      let*$ channel = Filepath.with_open_in filepath in
+      let* channel = Filepath.with_open_in filepath in
       try
         let header = input_line channel in
         if header = "42"
