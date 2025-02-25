@@ -40,11 +40,11 @@ __PUSH_FC_STDLIB
 #include "fcntl.h"
 #include "limits.h"
 
-#ifndef __FC_POSIX_VERSION
+#ifndef __FC_POSIX_C_SOURCE
 #error "unistd.h should only be included with a POSIX machdep"
 #endif
 
-#define _POSIX_VERSION __FC_POSIX_VERSION
+#define _POSIX_C_SOURCE __FC_POSIX_C_SOURCE
 
 __BEGIN_DECLS
 

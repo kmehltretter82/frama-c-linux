@@ -115,7 +115,7 @@ val string_literal_type: unit -> typ
 
 val weof: unit -> string
 val wordsize: unit -> string
-val posix_version: unit -> string
+val posix_c_source: unit -> string
 val bufsiz: unit -> string
 val eof: unit -> string
 val fopen_max: unit -> string

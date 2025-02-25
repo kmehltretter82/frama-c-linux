@@ -235,9 +235,9 @@ path_max:
 
   type: string
 
-posix_version:
+posix_c_source:
   description: |
-    value of the macro '_POSIX_VERSION'
+    value of the macro '_POSIX_C_SOURCE'
     leave empty for non-POSIX systems
 
   type: string

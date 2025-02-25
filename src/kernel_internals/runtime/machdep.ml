@@ -82,7 +82,7 @@ type mach = {
   version: string;
   weof: string;
   wordsize: string;
-  posix_version: string;
+  posix_c_source: string;
   bufsiz: string;
   eof: string;
   fopen_max: string;
@@ -149,7 +149,7 @@ let dummy = {
   version = "N/A";
   weof = "(-1)";
   wordsize = "64";
-  posix_version = "";
+  posix_c_source = "";
   bufsiz = "255";
   eof = "(-1)";
   fopen_max = "255";
@@ -201,7 +201,7 @@ module Machdep = struct
        alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;\
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
        compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
-       posix_version=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
+       posix_c_source=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
        path_max=%s;tty_name_max=%s;host_name_max=%s;l_ctermid=%s;\
        l_tmpnam=%s;tmp_max=%s;\
        rand_max=%s;mb_cur_max=%s;nsig=%s;errno=%a;machdep_name=%s;\
@@ -253,7 +253,7 @@ module Machdep = struct
       mach.version
       mach.weof
       mach.wordsize
-      mach.posix_version
+      mach.posix_c_source
       mach.bufsiz
       mach.eof
       mach.fopen_max
@@ -600,7 +600,7 @@ let gen_all_defines fmt mach =
   gen_define_literal_string fmt "__PRIPTR_PREFIX"
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
   gen_define_macro fmt "__WORDSIZE" mach.wordsize;
-  gen_define_macro fmt "__FC_POSIX_VERSION" mach.posix_version;
+  gen_define_macro fmt "__FC_POSIX_C_SOURCE" mach.posix_c_source;
   gen_define_string fmt "__FC_SIG_ATOMIC_T" mach.sig_atomic_t;
   gen_intlike_min fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
   gen_intlike_max fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;

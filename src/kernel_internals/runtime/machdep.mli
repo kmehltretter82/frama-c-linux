@@ -78,7 +78,7 @@ type mach = {
   version: string;        (** Information on this machdep *)
   weof: string;           (** expansion of WEOF macro, empty if undefined *)
   wordsize: string;       (** expansion of __WORDSIZE macro, empty if undefined *)
-  posix_version: string;  (** expansion of _POSIX_VERSION macro, empty if undefined *)
+  posix_c_source: string;  (** expansion of _POSIX_C_SOURCE macro, empty if undefined *)
   bufsiz: string;         (** expansion of BUFSIZ macro *)
   eof: string;            (** expansion of EOF macro *)
   fopen_max: string;      (** expansion of FOPEN_MAX macro *)
