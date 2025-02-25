@@ -305,10 +305,14 @@ let gen_define_macro fmt macro def =
   if def = "" then gen_undef fmt macro
   else gen_define_string fmt macro def
 
-let gen_define_custom_macros fmt censored key_values =
+let gen_define_custom_macros fmt censored mach =
+  let key_values = mach.custom_defs in
   let is_same_macro m1 m2 =
     Extlib.strip_underscore m1 = Extlib.strip_underscore m2
   in
+  Format.fprintf fmt "@[<v 0>/* Builtin macros for current machdep */@\n";
+  Format.fprintf fmt "#ifndef __FC_BUILTIN_MACROS_H@\n";
+  Format.fprintf fmt "#define __FC_BUILTIN_MACROS_H@\n";
   List.iter
     (fun (k,v) ->
        if not (Datatype.String.Set.exists (is_same_macro k) censored)
@@ -316,7 +320,8 @@ let gen_define_custom_macros fmt censored key_values =
          gen_undef fmt k;
          gen_define_macro fmt k v
        end)
-    key_values
+    key_values;
+  Format.fprintf fmt "#endif /* ifdef __FC_BUILTIN_MACROS_H */@]@."
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
 
@@ -545,7 +550,7 @@ let machdep_macro_name s =
   in
   String.map tr s
 
-let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
+let gen_all_defines fmt mach =
   Format.fprintf fmt "/* Machdep-specific info for Frama-C's libc */@\n";
   Format.fprintf fmt "#ifndef __FC_MACHDEP@\n#define __FC_MACHDEP@\n";
   gen_define_int fmt ("__FC_" ^ (machdep_macro_name mach.machdep_name)) 1;
@@ -614,20 +619,27 @@ let gen_all_defines fmt ?(censored_macros=Datatype.String.Set.empty) mach =
   List.iter (gen_define_errno_macro fmt) mach.errno;
   gen_define_macro fmt "__FC_TIME_T" mach.time_t;
   gen_define_macro fmt "__FC_NSIG" mach.nsig;
+  gen_include fmt "__fc_builtin_macros.h";
   if gccMode mach then
     gen_include fmt "__fc_gcc_builtins.h";
-
-  gen_define_custom_macros fmt censored_macros mach.custom_defs;
-
   Format.fprintf fmt "#endif // __FC_MACHDEP@\n"
 
-let generate_machdep_header ?censored_macros mach =
+let create_file gen (fp : Filepath.Normalized.t) =
+  let chan = open_out (fp:>string) in
+  let fmt = Format.formatter_of_out_channel chan in
+  gen fmt;
+  flush chan;
+  close_out chan
+
+let generate_machdep_header ?(censored_macros=Datatype.String.Set.empty) mach =
   let debug = Kernel.(is_debug_key_enabled dkey_pp_keep_temp_files) in
   let temp = Extlib.temp_dir_cleanup_at_exit ~debug "__fc_machdep" in
-  let file = Filepath.Normalized.concat temp "__fc_machdep.h" in
-  let chan = open_out (file:>string) in
-  let fmt = Format.formatter_of_out_channel chan in
-  gen_all_defines fmt ?censored_macros mach;
-  flush chan;
-  close_out chan;
+  let fc_machdep = Filepath.Normalized.concat temp "__fc_machdep.h" in
+  let gen_machdep = Fun.flip gen_all_defines mach in
+  create_file gen_machdep fc_machdep;
+  let fc_builtins = Filepath.Normalized.concat temp "__fc_builtin_macros.h" in
+  let gen_builtins =
+    Fun.(flip (flip gen_define_custom_macros censored_macros) mach)
+  in
+  create_file gen_builtins fc_builtins;
   temp

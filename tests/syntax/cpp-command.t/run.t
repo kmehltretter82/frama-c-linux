@@ -3,11 +3,11 @@
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -machdep x86_32 -cpp-frama-c-compliant -cpp-command "echo [\$(basename '%1') \$(basename '%1') \$(basename '%i') \$(basename '%input')] ['%2' '%2' '%o' '%output'] ['%args']" | python3 filter.py
   [kernel] Parsing cpp-command.c (with preprocessing)
-  [cpp-command.c cpp-command.c cpp-command.c cpp-command.c] [<TMPDIR/PP>.i <TMPDIR/PP>.i <TMPDIR/PP>.i <TMPDIR/PP>.i] [-I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef]
+  [cpp-command.c cpp-command.c cpp-command.c cpp-command.c] [<TMPDIR/PP>.i <TMPDIR/PP>.i <TMPDIR/PP>.i <TMPDIR/PP>.i] [-I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef -imacros __fc_builtin_macros.h]
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -machdep x86_32 -cpp-frama-c-compliant -cpp-command "echo %%1 = \$(basename '%1') %%2 = '%2' %%args = '%args'" | python3 filter.py
   [kernel] Parsing cpp-command.c (with preprocessing)
-  %1 = cpp-command.c %2 = <TMPDIR/PP>.i %args = -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef
+  %1 = cpp-command.c %2 = <TMPDIR/PP>.i %args = -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef -imacros __fc_builtin_macros.h
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -machdep x86_32 -cpp-frama-c-compliant -cpp-command "printf \"%s\n\" \"using \\% has no effect : \$(basename \"\%input\")\""
   [kernel] Parsing cpp-command.c (with preprocessing)
@@ -19,7 +19,7 @@
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -machdep x86_32 -print-cpp-commands | python3 filter.py
   [kernel] Preprocessing command:
-  gcc -E -C -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef -Wno-builtin-macro-redefined -Wno-unknown-warning-option '$TESTCASE_ROOT/cpp-command.c' -o '<TMPDIR/PP>.i'
+  gcc -E -C -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef -imacros __fc_builtin_macros.h -Wno-builtin-macro-redefined -Wno-unknown-warning-option '$TESTCASE_ROOT/cpp-command.c' -o '<TMPDIR/PP>.i'
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -cpp-extra-args-per-file=cpp-command.c:"-DPF=\\\"cp%02d_%.3f\\\"" -cpp-extra-args="-DPF2=\\\"cp%02d_%.3f\\\"" -print | python3 filter.py
   [kernel] Parsing cpp-command.c (with preprocessing)
@@ -45,11 +45,20 @@
   
 
   $ frama-c -check -no-autoload-plugins cpp-command.c -cpp-extra-args-per-file=cpp-command.c:"file_extra" -cpp-extra-args="global_extra" -cpp-command "echo 'extra_args: %args'" -print | python3 filter.py
-  [kernel] Warning: your preprocessor is not known to handle option `-nostdinc'. If preprocessing fails because of it, please add -no-cpp-frama-c-compliant option to Frama-C's command-line. If you do not want to see this warning again, explicitly use option -cpp-frama-c-compliant.
-  [kernel] Warning: your preprocessor is not known to handle option `-undef'. If preprocessing fails because of it, please add -no-cpp-frama-c-compliant option to Frama-C's command-line. If you do not want to see this warning again, explicitly use option -cpp-frama-c-compliant.
-  [kernel] Warning: your preprocessor is not known to handle option `-dD'. If preprocessing fails because of it, please add -no-cpp-frama-c-compliant option to Frama-C's command-line. If you do not want to see this warning again, explicitly use option -cpp-frama-c-compliant.
+  [kernel] Warning: your preprocessor is not known to handle the following options:
+  -nostdinc -undef -imacros __fc_builtin_macros.h -dD
+  If preprocessing fails because of them, please add -no-cpp-frama-c-compliant option to Frama-C's command-line. If you do not want to see this warning again, explicitly use option -cpp-frama-c-compliant.
   [kernel] Parsing cpp-command.c (with preprocessing)
-  extra_args: -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef file_extra global_extra
+  extra_args: -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ -dD -nostdinc -undef -imacros __fc_builtin_macros.h file_extra global_extra
   [kernel] Warning: trying to preprocess annotation with an unknown preprocessor.
+  /* Generated by Frama-C */
+  
+  $ frama-c -check -no-autoload-plugins cpp-command.c -cpp-command "echo" -no-cpp-frama-c-compliant -kernel-msg-key pp,-pp:keep-temp-files -print | python3 filter.py
+  [kernel:pp]
+  preprocessing with "echo -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ '$TESTCASE_ROOT/cpp-command.c' -o '<TMPDIR/PP>.i'"
+  [kernel] Parsing cpp-command.c (with preprocessing)
+  -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ $TESTCASE_ROOT/cpp-command.c -o <TMPDIR/PP>.i
+  [kernel:pp]
+  Full preprocessing command: echo -I<TMP_MACHDEP> -I$FRAMAC_SHARE/libc -U__STDC_IEC_559_COMPLEX__ -U__STDC_IEC_60559_COMPLEX__ -U__STDC_ISO_10646__ -U__STDC_UTF16__ -U__STDC_UTF32__ -D__FRAMAC__ '$TESTCASE_ROOT/cpp-command.c' -o '<TMPDIR/PP>.i'
   /* Generated by Frama-C */
   

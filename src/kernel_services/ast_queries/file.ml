@@ -361,13 +361,22 @@ let known_bad_macros =
 
 let print_machdep_header () =
   if Kernel.PrintMachdepHeader.get () then begin
-    let censored_macros = known_bad_macros in
-    Machdep.gen_all_defines
-      Format.std_formatter ~censored_macros (get_machdep());
+    let machdep = get_machdep() in
+    Machdep.gen_all_defines Format.std_formatter machdep;
     raise Cmdline.Exit
   end else Cmdline.nop
 
 let () = Cmdline.run_after_exiting_stage print_machdep_header
+
+let print_machdep_builtin_macros () =
+  if Kernel.PrintMachdepBuiltinMacros.get () then begin
+    let censored_macros = known_bad_macros in
+    let machdep = get_machdep() in
+    Machdep.gen_define_custom_macros Format.std_formatter censored_macros machdep;
+    raise Cmdline.Exit
+  end else Cmdline.nop
+
+let () = Cmdline.run_after_exiting_stage print_machdep_builtin_macros
 
 let list_available_machdeps = default_machdeps
 
@@ -472,20 +481,11 @@ let build_cpp_cmd = function
     if not (Filepath.exists f) then
       Kernel.abort "source file %a does not exist"
         Filepath.Normalized.pretty f;
-    let add_if_gnu opt =
+    let add_if_gnu ~to_warn opt =
       match is_gnu_like with
-      | Gnu -> [opt]
-      | Not_gnu -> []
-      | Unknown ->
-        Kernel.warning
-          ~once:true
-          "your preprocessor is not known to handle option `%s'. \
-           If preprocessing fails because of it, please add \
-           -no-cpp-frama-c-compliant option to Frama-C's command-line. \
-           If you do not want to see this warning again, explicitly use \
-           option -cpp-frama-c-compliant."
-          opt;
-        [opt]
+      | Gnu -> [], [opt]
+      | Not_gnu -> [], []
+      | Unknown -> opt :: to_warn, [opt]
     in
     let ppf = create_temp_file (Filename.basename (f :> string)) ".i" in
     (* Hypothesis: the preprocessor is POSIX compliant,
@@ -504,29 +504,33 @@ let build_cpp_cmd = function
     let fc_define_args = ["__FRAMAC__"] in
     let machdep_no_warn = silence_cpp_machdep_warnings cmdl in
     let clang_no_warn =
-      (* Clang complains when -nostdlibinc is not used ... *)
+      (* Clang complains when -nostdinc is not used ... *)
       if cpp_name cmdl = "clang"
       then [ "-Wno-unused-command-line-argument" ]
       else []
     in
-    let nostdinc_arg =
-      if Kernel.FramaCStdLib.get() then add_if_gnu "-nostdinc"
-      else []
+    let to_warn = [] in (* options to warn about w.r.t. GNU CPP compliance *)
+    let to_warn, nostdinc_arg =
+      if Kernel.FramaCStdLib.get() then add_if_gnu ~to_warn "-nostdinc"
+      else to_warn, []
     in
-    let no_builtin_macros =
-      if Kernel.FramaCStdLib.get () then add_if_gnu "-undef"
-      else []
+    let to_warn, restrict_builtin_macros =
+      if Kernel.FramaCStdLib.get () then
+        let to_warn, opts1 = add_if_gnu ~to_warn "-undef" in
+        let to_warn, opts2 = add_if_gnu ~to_warn "-imacros __fc_builtin_macros.h" in
+        to_warn, opts1 @ opts2
+      else to_warn, []
     in
-    let output_defines_arg =
+    let to_warn, output_defines_arg =
       let open Kernel in
       match ReadAnnot.get (), PreprocessAnnot.is_set (), PreprocessAnnot.get () with
-      | true, true, true -> ["-dD"] (* keep '#defines' in preprocessed output *)
-      | true, true, false -> []
-      | true, false, _ -> add_if_gnu "-dD"
-      | _, _, _ -> []
+      | true, true, true -> to_warn, ["-dD"] (* keep '#defines' in preprocessed output *)
+      | true, true, false -> to_warn, []
+      | true, false, _ -> add_if_gnu ~to_warn "-dD"
+      | _, _, _ -> to_warn, []
     in
     let gnu_implicit_args =
-      output_defines_arg @ nostdinc_arg @ no_builtin_macros
+      output_defines_arg @ nostdinc_arg @ restrict_builtin_macros
     in
     let string_of_supp_args extra includes undef defines =
       Format.asprintf "%s%s%s%s"
@@ -551,6 +555,17 @@ let build_cpp_cmd = function
     Kernel.feedback ~dkey:Kernel.dkey_pp
       "preprocessing with \"%s\""
       cpp_command_with_chdir;
+    if to_warn <> [] then
+      Kernel.warning
+        ~once:true
+        "your preprocessor is not known to handle the following options:@\n\
+         %a@\n\
+         If preprocessing fails because of them, please add \
+         -no-cpp-frama-c-compliant option to Frama-C's command-line. \
+         If you do not want to see this warning again, explicitly use \
+         option -cpp-frama-c-compliant."
+        (Pretty_utils.pp_list ~sep:" " Format.pp_print_string)
+        (List.rev to_warn);
     Some (cpp_command_with_chdir, ppf)
 
 let abort_with_detailed_pp_message f cpp_command =

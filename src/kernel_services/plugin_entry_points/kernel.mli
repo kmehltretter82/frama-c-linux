@@ -358,6 +358,10 @@ module PrintMachdepHeader : Parameter_sig.Bool
 (** Behavior of option "-print-machdep-header"
     @since 27.0-Cobalt *)
 
+module PrintMachdepBuiltinMacros: Parameter_sig.Bool
+(** Behavior of option "-print-machdep-builtin-macros"
+    @since Frama-C+dev *)
+
 module PrintLibc: Parameter_sig.Bool
 (** Behavior of option "-print-libc"
     @since Phosphorus-20170501-beta1 *)
