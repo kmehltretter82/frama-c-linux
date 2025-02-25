@@ -26,33 +26,26 @@ let (<?>) c other = if c = 0 then Lazy.force other else c
 
 module Result = struct
   type log = string list
-  type 'a t = Ok of 'a | Warning of 'a * log | Error of log
+  type 'a result = Ok of 'a | Warning of 'a * log | Error of log
 
-  let ok v = Ok v
+  module Minimal = struct
+    type 'a t = 'a result
+    let return v = Ok v
+    let bind f result =
+      match result with
+      | Ok v -> f v
+      | Error log -> Error log
+      | Warning (v, log) ->
+        match f v with
+        | Ok r -> Warning (r, log)
+        | Warning (r, log') -> Warning (r, log @ log')
+        | Error log' -> Error (log @ log')
+  end
+  include Monad.Make_based_on_bind (Minimal)
+
+  let ok v = return v
   let warning v fmt = Format.kasprintf (fun msg -> Warning (v, [msg])) fmt
   let error fmt = Format.kasprintf (fun msg -> Error [msg]) fmt
-
-  let map f = function
-    | Ok v -> Ok (f v)
-    | Warning (v, log) -> Warning (f v, log)
-    | Error log -> Error log
-
-  let bind result f =
-    match result with
-    | Ok v -> f v
-    | Error log -> Error log
-    | Warning (v, log) ->
-      match f v with
-      | Ok r -> Warning (r, log)
-      | Warning (r, log') -> Warning (r, log @ log')
-      | Error log' -> Error (log @ log')
-
-  let join = function
-    | Ok r -> r
-    | Warning (Ok r, log) -> Warning (r, log)
-    | Warning (Warning (r, log), log') -> Warning (r, log @ log')
-    | Warning (Error log, log') -> Error (log @ log')
-    | Error log -> Error log
 
   let compare f x y =
     let compare_log = Stdlib.List.compare String.compare in
@@ -88,11 +81,6 @@ module Result = struct
       Self.warning ~current:true ~once:true "%a" pp_log log ; v
     | Error log ->
       Self.fatal ~current:true "%a" pp_log log
-
-  module Operators = struct
-    let ( let* ) = bind
-    let ( let+ ) v f = map f v
-  end
 end
 
 
