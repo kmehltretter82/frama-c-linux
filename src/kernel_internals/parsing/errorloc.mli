@@ -104,3 +104,10 @@ val had_errors : unit -> bool
     if needed.
 *)
 val clear_errors : unit -> unit
+
+(** Calls {!Kernel.abort} but appends the result of {!pp_context_from_file}.
+    [loc] defaults to [Current_loc.get ()].
+    @since Frama-C+dev
+*)
+val abort_context : ?loc:Cil_types.location ->
+  ('a, Format.formatter, unit, 'b) format4 -> 'a

@@ -66,14 +66,6 @@ let check_invariants = false
 
 let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
 
-let abort_context msg =
-  let loc = Current_loc.get () in
-  let append fmt =
-    Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt loc
-  in
-  Kernel.abort ~current:true ~append msg
-
 let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
 
 let dummy_exp e = { eid = -1; enode = e; eloc = Cil_datatype.Location.unknown }
@@ -5464,7 +5456,7 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
   let dkey = Kernel.dkey_typing_cast in
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
-  let error msg = abort_context ("%s " ^^ msg) origin in
+  let error msg = Errorloc.abort_context ("%s " ^^ msg) origin in
   let rec default_rec oldt newt =
     let oldt' = Ast_types.unroll_type oldt in
     let newt' = Ast_types.unroll_type newt in
@@ -5621,7 +5613,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 let rec castReduce fromsource force =
   let dkey = Kernel.dkey_typing_cast in
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
-  let error msg = abort_context ("%s " ^^ msg) origin in
+  let error msg = Errorloc.abort_context ("%s " ^^ msg) origin in
   let rec rec_default oldt newt e =
     let loc = e.eloc in
     let normalized_newt =

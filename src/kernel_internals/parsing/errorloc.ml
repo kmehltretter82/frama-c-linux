@@ -314,6 +314,13 @@ let currentLoc () =
 
 (** Handling of errors during parsing *)
 
+let abort_context ?(loc=Current_loc.get ()) msg =
+  let append fmt =
+    Format.pp_print_newline fmt ();
+    pp_context_from_file fmt loc
+  in
+  Kernel.abort ~source:(fst loc) ~append msg
+
 let hadErrors = ref false
 let had_errors () = !hadErrors
 let clear_errors () = hadErrors := false

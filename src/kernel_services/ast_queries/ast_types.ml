@@ -24,22 +24,6 @@
 
 open Cil_types
 
-(* *************************************** *)
-(* Utils from Cil that do not belong here. *)
-(* *************************************** *)
-
-let abort_context msg =
-  let loc = Current_loc.get () in
-  let append fmt =
-    Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt loc
-  in
-  Kernel.abort ~current:true ~append msg
-
-(* Get the full name of a comp *)
-let compFullName comp =
-  (if comp.cstruct then "struct " else "union ") ^ comp.cname
-
 (* ********** *)
 (* Attributes *)
 (* ********** *)
@@ -442,7 +426,10 @@ let is_transparent_union t =
     if has_attribute "transparent_union" t then begin
       match ci.cfields with
       | Some [] | None ->
-        abort_context "Empty transparent union: %s" (compFullName ci)
+        let name =
+          (if ci.cstruct then "struct " else "union ") ^ ci.cname
+        in
+        Errorloc.abort_context "Empty transparent union: %s" name
       | Some (f :: _) -> Some f
     end else
       None
