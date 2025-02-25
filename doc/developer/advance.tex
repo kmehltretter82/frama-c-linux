@@ -1075,6 +1075,58 @@ For more advanced usage of \texttt{ptests} please refer to Section~\ref{adv:ptes
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\section{Plug-in Migration from the previous version of \framac }\label{adv:framac-migration}
+
+\begin{target}developers who have an existing plug-in for Frama-C 30 or newer and
+  want to migrate their plug-in to the next version.
+\end{target}
+
+\begin{prereq}
+  Being familiar with the plug-in to migrate. Using \ocaml 5.2.1 or higher.
+  Having installed \texttt{OCamlmig} (see below).
+\end{prereq}
+
+Please note that this section is a best effort procedure for making the
+migration as smooth as possible. If the plug-in is particularly complex,
+please contact us if you need some help for migrating it. Note also that
+\texttt{ocamlmig} is very young, and even though it has been successfully
+tested on the whole Frama-C codebase, some issues might still be present.
+
+\subsubsection{\texttt{OCamlmig}\codeidxdef{OCamlmig}}
+
+Previous version of \framac used migration shell scripts and \texttt{sed} to
+migrate things that changed in the API (like moving or renaming functions). This
+scripts were very incomplete and when \texttt{OCamlmig} (see
+\url{https://github.com/v-gb/ocamlmig}) was first released early 2025, we
+decided to have look at it to help automating migrations. \framac
+developers can now indicate in the code how it should be migrated. Plug-in
+developers then can run \lstinline{ocamlmig migrate -w} inside their plug-in
+directory after installing \framac and it will apply all the migration rules in
+their code.
+
+\subsubsection{Format}
+
+At the moment, \texttt{Ocamlmig} uses \texttt{OCamlFormat} to print the code. If
+you do not use \texttt{OCamlFormat} in your plug-in, you can minimize the diff
+by setting an environnement variable \texttt{OCAMLMIG\_PRESERVE\_FORMAT} before
+running the migration command, either by exporting it via
+\lstinline{export OCAMLMIG_PRESERVE_FORMAT=1} or in front of the command
+\lstinline{OCAMLMIG_PRESERVE_FORMAT=1 ocamlmig migrate -w}. With this setting,
+\texttt{OCamlmig} will try to format only chunks of codes that are impacted by
+the tool (without any guarantee that the diff will be minimal, but, in practice,
+the results usually look right).
+
+\subsubsection{Incremental Migration}
+
+It must be noted that the \texttt{migrate} attributes for \texttt{ocamlmig} are
+meant to perform a migration from \framac version N to \framac version N+1 (or
+from the last stable release to the development branch). In case you're trying
+to migrate a plug-in that has not been maintained for several releases
+of Frama-C, you will need to make the migration step by step for each
+intermediate release.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Plug-in General Services}\label{adv:plugin-services}
 
 Module \texttt{Plugin}\codeidxdef{Plugin} provides an access to some general
