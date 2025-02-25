@@ -28,43 +28,43 @@
     triplet composed of:
     - an abstraction {m \mathbb{R}(x)} of the theoretical computation of {m x}
       using real numbers;
-    - an abstraction {m \varepsilon_a^f(x)} of the absolute errors commited when
+    - an abstraction {m \varepsilon_a^f(x)} of the absolute errors committed when
       computing {m x} using floating-point numbers in the format {m f};
-    - an abstraction {m \varepsilon_r^f(x)} of the relative errors commited when
+    - an abstraction {m \varepsilon_r^f(x)} of the relative errors committed when
       computing {m x} using floating-point numbers in fhe format {m f}.
 
     Two sound abstract overapproximations of sets of real numbers are required
     to build a sound overapproximation of IEEE-754 semantics. The first one,
-    called {m \mathbb{A}} is used to abstract the real numbers and the absolute
-    floating-point errors. As absolute error semantics are mostly linear, it is
+    called {m \mathbb{A}}, is used to abstract the real numbers and the absolute
+    floating-point errors. As absolute error semantics is mostly linear, it is
     preferable to provide an abstraction as precise as possible on linear
     operations, like affine forms for example. The second required abstraction,
-    called {m \mathbb{M}} is used to abstract the relative errors. As there
+    called {m \mathbb{M}}, is used to abstract the relative errors. As their
     semantics heavily relies on multiplications and divisions, it is preferable
     to provide an abstraction as precise as possible on those operations, like
     the relative forms described {{:https://theses.hal.science/tel-03566701}
     here}. Moreover, the relative error semantics for additions and substractions
-    are defined based on an expression of the form {m (ax \pm by) / (x \pm y)}.
+    is defined based on an expression of the form {m (ax \pm by) / (x \pm y)}.
     This expression can be precisely computed even in intervals, as described
     in {{:https://theses.hal.science/tel-01094485v1} here}, and is optimal if
     there is no relation between {m a}, {m b}, {m x} and {m y}. Thus, an
     implementation of this computation is also required.
 
-    Another key part of the precision of the semantics builded is the relations
+    Another key part of the precision of the built semantics is the relations
     between absolute and relative errors. Indeed, each one can be derived from
     the other as follows:
     - {m \varepsilon_a^f(x) = \mathbb{R}(x)\left(1 + \varepsilon_r^f(x)\right)}
     - {m \varepsilon_r^f(x) = \varepsilon_a^f(x) / \mathbb{R}(x)}
 
     Thus, a sound abstraction of those computations are required to define a
-    correct reduced product between the two errors abstractions. As one may need
-    to partially or totally deactivate this reduced product, for experimentation
+    correct reduced product between the two error abstractions. As one may need
+    to partially or totally disable this reduced product, for experimentation
     purposes for instance, two functions are required to build the semantics,
-    returning true if the absolute (reps. relative) error should be reduced using
+    returning true if the absolute (resp. relative) error should be reduced using
     the other.
 
-    Finally, as relationnal abstractions may need to keep track of each source of
-    floating-point error (i.e each elementary error), one is also asked to provide
+    Finally, as relational abstractions may need to keep track of each source of
+    floating-point errors (i.e. each elementary error), one is also asked to provide
     a constructor for absolute and relative abstractions, that returns a symmetric
     and tracked if needed abstraction based on a given positive bound.
 

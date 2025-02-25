@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (** This module provides the type definitions and module signatures used by
-    the {!IEEE754} module to build an abstract semantic of floating-point
+    the {!IEEE754} module to build an abstract semantics of floating-point
     computations as defined by the IEEE-754 standard. See this module for
     more information. *)
 
@@ -143,7 +143,7 @@ end
 
 
 
-(** {2 Modeling used to abstract the IEEE-754 semantic.} *)
+(** {2 Modeling used to abstract the IEEE-754 semantics.} *)
 
 module type Modeling = sig
 
@@ -213,7 +213,7 @@ module type Modeling = sig
 
   (** The call [recompute_absolute exact relative] returns a computation of
       absolute error bounds as deduced from [exact] and [relative], respectively
-      representing the exact semantic and the relative error semantic. It will
+      representing the exact semantics and the relative error semantics. It will
       be used if the reduced product is configured to reduce the absolute errors
       using the relative error bounds. *)
   val recompute_absolute :
@@ -223,7 +223,7 @@ module type Modeling = sig
 
   (** The call [recompute_relative exact absolute] returns a computation of
       relative error bounds as deduced from [exact] and [absolute], respectively
-      representing the exact semantic and the absolute error semantic. It will
+      representing the exact semantics and the absolute error semantics. It will
       be used if the reduced product is configured to reduce the relative errors
       using the absolute error bounds. *)
   val recompute_relative :
@@ -234,8 +234,8 @@ module type Modeling = sig
   (** This function is used to compute an abstraction of [(ax + by) / (x + y)],
       as this expression can be more precisely abstracted using a dedicated
       approach than the straightforward composition of arithmetic operators.
-      In the context of the IEEE-754 semantic, those expressions appear in
-      the relative error semantic of the addition, which is why the function
+      In the context of the IEEE-754 semantics, those expressions appear in
+      the relative error semantics of the addition, which is why the function
       is specialized on relative abstractions. *)
   val a_x_plus_b_y_over_x_plus_y :
     a : relative -> x : exact ->
