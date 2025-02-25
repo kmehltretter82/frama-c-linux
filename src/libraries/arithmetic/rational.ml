@@ -51,10 +51,9 @@ let pow2 e =
 
 (* We cannot compute directly ⌊log₂ (a / b)⌋ and ⌈log₂ (a / b)⌉. However, we
    can compute n = ⌊log₂ a⌋ and m = ⌊log₂ b⌋ using Zarith. Those equalities
-   mean that n ≤ log₂ a < n + 1 and m ≤ log₂ b < m + 1. Taking the negation
-   of the inequalities on m and b and adding them with the one on n and a,
+   mean that n ≤ log₂ a < n + 1 and m ≤ log₂ b < m + 1, and thus
    we obtain n - m - 1 < log₂ a - log₂ b < n - m + 1, which is equivalent
-   to 2 ^ (n - m - 1) < a / b < 2 ^ (n - m + 1). However, those borns are
+   to 2 ^ (n - m - 1) < a / b < 2 ^ (n - m + 1). However, those bounds are
    not optimal. Indeed, we necessary have one of the following :
    - n - m - 1 < n - m ≤ log₂ a - log₂ b < n - m + 1
    - n - m - 1 < log₂ a - log₂ b ≤ n - m < n - m + 1
