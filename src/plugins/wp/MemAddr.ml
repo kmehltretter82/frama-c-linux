@@ -333,11 +333,6 @@ let r_valid_unref = function
     e_leq n e_zero
   | _ -> raise Not_found
 
-(* - lemma valid_obj_null: forall m n. valid_obj m null n *)
-let r_valid_obj = function
-  | [_; p] when decide (e_eq p null) -> e_true
-  | _ -> raise Not_found
-
 (* - lemma invalid_null: forall m n p. p.base = 0 -> invalid m p n *)
 let r_invalid = function
   | [_; p; _] when decide (null_base p) -> e_true
@@ -361,7 +356,6 @@ let () = Context.register
       set_builtin p_invalid r_invalid ;
       set_builtin p_valid_rd r_valid_unref ;
       set_builtin p_valid_rw r_valid_unref ;
-      set_builtin p_valid_obj r_valid_obj ;
     end
 
 (* -------------------------------------------------------------------------- *)

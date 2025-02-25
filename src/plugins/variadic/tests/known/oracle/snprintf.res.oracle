@@ -21,7 +21,7 @@
 [variadic] snprintf.c:15: 
   Translating call to snprintf to a call to the specialized version snprintf_va_2.
 [eva] Analyzing a complete application starting at main
-[eva] FRAMAC_SHARE/libc/string.h:167: 
+[eva] FRAMAC_SHARE/libc/string.h:161: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] using specification for function snprintf
 [eva] FRAMAC_SHARE/libc/stdio.h:255: 

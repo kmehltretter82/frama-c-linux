@@ -1,44 +1,38 @@
 [e-acsl] beginning translation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:164: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:158: Warning: 
   no assigns clause generated for function valid_or_empty because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:49: Warning: 
-  no assigns clause generated for function empty_block because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:164: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:43: Warning: 
+  E-ACSL construct `\object_pointer' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:158: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:167: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:161: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:154: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:148: Warning: 
   no assigns clause generated for function valid_read_or_empty because pointers as arguments is not yet supported
-[e-acsl] FRAMAC_SHARE/libc/string.h:153: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:46: Warning: 
+  E-ACSL construct `\object_pointer' is not yet supported. Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:147: Warning: 
   E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:157: Warning: 
+[e-acsl] FRAMAC_SHARE/libc/string.h:151: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
+  Ignoring annotation.
+[e-acsl] FRAMAC_SHARE/libc/string.h:122: Warning: 
+  E-ACSL construct `assigns clause in behavior' is not yet supported.
   Ignoring annotation.
 [e-acsl] FRAMAC_SHARE/libc/string.h:128: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
-[e-acsl] FRAMAC_SHARE/libc/string.h:134: Warning: 
   E-ACSL construct `logic functions or predicates performing read accesses'
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/string.h:164: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:162: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:164: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:164: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:168: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:167: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:161: Warning: 
   function __gen_e_acsl_memset: postcondition 'acsl_c_equiv' got status unknown.
 [eva:alarm] mem.c:10: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
@@ -79,45 +73,27 @@
 [eva:alarm] mem.c:19: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:128: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:128: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:125: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:128: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:125: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:125: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:125: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:52: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:125: Warning: 
+  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
+                                                        \valid(data->values) got status unknown.
+[eva:alarm] FRAMAC_SHARE/libc/string.h:125: Warning: 
+  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
+                                                      \valid(data->values) got status unknown.
 [eva:alarm] FRAMAC_SHARE/libc/string.h:129: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:129: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:129: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:131: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:131: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:131: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:131: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:131: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:131: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:135: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:134: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:128: Warning: 
   function __gen_e_acsl_memcpy: postcondition 'copied_contents' got status unknown.
 [eva:alarm] mem.c:23: Warning: 
   function __e_acsl_assert_register_ulong: precondition data->values == \null ||
@@ -134,26 +110,10 @@
 [eva:alarm] mem.c:25: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:153: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:152: Warning: 
   function __e_acsl_assert_register_ptr: precondition data->values == \null ||
                                                       \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:153: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:153: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:154: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:154: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:154: Warning: 
-  function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:158: Warning: 
-  function __e_acsl_assert_register_ptr: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/string.h:157: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:151: Warning: 
   function __gen_e_acsl_memmove: postcondition 'copied_contents' got status unknown.
 [eva:alarm] mem.c:28: Warning: 
   function __e_acsl_assert_register_int: precondition data->values == \null ||

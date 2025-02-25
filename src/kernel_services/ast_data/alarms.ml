@@ -493,9 +493,12 @@ let create_predicate ?(loc=Location.unknown) alarm =
     | Invalid_pointer e ->
       let loc = best_loc ~loc e.eloc in
       let t = Logic_utils.expr_to_term e in
-      if Cil.isFunPtrType (Cil.typeOf e)
-      then Logic_const.pvalid_function ~loc t
-      else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t)
+      let null = Logic_const.term ~loc Tnull t.term_type in
+      Logic_const.por ~loc
+        (Logic_const.prel (Req, null, t),
+         if Cil.isFunPtrType (Cil.typeOf e)
+         then Logic_const.pvalid_function ~loc t
+         else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t))
 
     | Invalid_shift(e, n) ->
       (* 0 <= e < n *)

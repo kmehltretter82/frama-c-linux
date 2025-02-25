@@ -80,7 +80,7 @@
   function memcmp: precondition 'danglingness,s1' got status valid.
 [eva] FRAMAC_SHARE/libc/stdatomic.c:96: 
   function memcmp: precondition 'danglingness,s2' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:63: 
+[eva] FRAMAC_SHARE/libc/string.h:57: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Done for function memcmp
 [eva] FRAMAC_SHARE/libc/stdatomic.c:97: Call to builtin memcpy
@@ -90,7 +90,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] FRAMAC_SHARE/libc/stdatomic.c:97: 
   function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:128: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] FRAMAC_SHARE/libc/stdatomic.c:98: Call to builtin memcpy
 [eva] FRAMAC_SHARE/libc/stdatomic.c:98: 

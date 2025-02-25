@@ -39,17 +39,11 @@ __BEGIN_DECLS
 */
 
 /*@
-  predicate empty_block{L}(void *s) =
-    \block_length((char*)s) == 0 && \offset((char*)s) == 0;
-
-  // Note: the [\valid_read] below is intentional: if [malloc(0)] may return a
-  // const base, then [memset(p, 0, 0)] requires p to have a readable
-  // (but not writable) byte.
   predicate valid_or_empty{L}(void *s, size_t n) =
-    (empty_block(s) || \valid_read((char*)s)) && \valid(((char*)s)+(0..n-1));
+    \object_pointer((char*)s) && \valid(((char*)s)+(0..n-1));
 
   predicate valid_read_or_empty{L}(void *s, size_t n) =
-    (empty_block(s) || \valid_read((char*)s)) && \valid_read(((char*)s)+(1..n-1));
+    \object_pointer((char*)s) && \valid_read(((char*)s)+(0..n-1));
 */
 
 /*@ requires valid_s1: valid_read_or_empty(s1, n);

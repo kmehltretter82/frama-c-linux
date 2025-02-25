@@ -22,7 +22,7 @@
 [eva] precise_memset.c:72: Call to builtin memset
 [eva] precise_memset.c:72: 
   function memset: precondition 'valid_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:167: 
+[eva] FRAMAC_SHARE/libc/string.h:161: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memset
 [eva] precise_memset.c:73: Call to builtin memset
 [eva] precise_memset.c:73: 

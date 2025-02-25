@@ -271,12 +271,19 @@ let final_empty_struct = function
   | Var (vi, _) | Allocated (vi, _, _) -> final_empty_struct vi.vtype
   | _ -> false
 
-type access = Read of Integer.t | Write of Integer.t | No_access
-let for_writing = function Write _ -> true | Read _ | No_access -> false
+type access =
+  | Read of Integer.t
+  | Write of Integer.t
+  | Object_pointer
+  | Any_pointer
 
-let is_empty = function
+let for_writing = function
+  | Write _ -> true
+  | Read _ | Object_pointer | Any_pointer -> false
+
+let is_empty_access = function
   | Read size | Write size -> Int.(equal zero size)
-  | No_access -> true
+  | Object_pointer | Any_pointer -> true
 
 (* Computes the last valid offset for an access of the base [base] with [max]
    valid bits: [max - size + 1] for an access of size [size]. *)
@@ -287,12 +294,13 @@ let last_valid_offset base max = function
        ends by an empty struct, in which case [max+1] is also a valid offset. *)
     then if final_empty_struct base then Int.succ max else max
     else Int.sub max (Int.pred size)
-  | No_access -> Int.succ max (* A pointer can point just beyond its object. *)
+  | Object_pointer | Any_pointer ->
+    Int.succ max (* A pointer can point just beyond its object. *)
 
 let offset_for_validity ~bitfield access base =
   match validity base with
-  | Empty -> if is_empty access then Ival.zero else Ival.bottom
-  | Invalid -> if access = No_access then Ival.zero else Ival.bottom
+  | Empty -> if is_empty_access access then Ival.zero else Ival.bottom
+  | Invalid -> if access = Any_pointer then Ival.zero else Ival.bottom
   | Known (min, max) | Unknown (min, _, max) ->
     let max = last_valid_offset base max access in
     if bitfield
@@ -312,7 +320,7 @@ let valid_offset ?(bitfield=true) access base =
     (* When -absolute-valid-range is enabled, the Null base has a Known validity
        that does not include 0. In this case, adds 0 as possible offset for a
        pointer without memory access. *)
-    if access = No_access && is_null base
+    if access = Any_pointer && is_null base
     then Ival.(join zero offset)
     else offset
 
@@ -325,8 +333,8 @@ let offset_is_in_validity access base ival =
     | _, _ -> false
   in
   match validity base with
-  | Empty -> is_empty access && Ival.(equal zero ival)
-  | Invalid -> access = No_access && Ival.(equal zero ival)
+  | Empty -> is_empty_access access && Ival.(equal zero ival)
+  | Invalid -> access = Any_pointer && Ival.(equal zero ival)
   | Known (min, max)
   | Unknown (min, Some max, _) -> is_valid_for_bounds min max
   | Unknown (_, None, _) -> false (* All accesses are possibly invalid. *)
@@ -336,7 +344,7 @@ let is_valid_offset access base offset =
   Ival.is_bottom offset
   || not (for_writing access && (is_read_only base))
      && (offset_is_in_validity access base offset
-         || access = No_access && is_null base && Ival.(equal zero offset))
+         || access = Any_pointer && is_null base && Ival.(equal zero offset))
 
 let is_function base =
   match base with

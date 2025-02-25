@@ -18,7 +18,8 @@ enum E {
     C = 2
 };
 /*@ requires in_bounds_value: -128 ≤ value < 128;
-    requires valid_dest: \valid(ptr + (0 .. len - 1));
+    requires
+      valid_dest: \object_pointer(ptr) ∧ \valid(ptr + (0 .. len - 1));
     ensures
       set_content: ∀ ℤ j0; 0 ≤ j0 < len ⇒ *(ptr + j0) ≡ value;
     ensures result: \result ≡ ptr;
@@ -41,7 +42,8 @@ void chars(char dest[10])
 }
 
 /*@ requires in_bounds_value: 0 ≤ value < 256;
-    requires valid_dest: \valid(ptr + (0 .. len - 1));
+    requires
+      valid_dest: \object_pointer(ptr) ∧ \valid(ptr + (0 .. len - 1));
     ensures
       set_content: ∀ ℤ j0; 0 ≤ j0 < len ⇒ *(ptr + j0) ≡ value;
     ensures result: \result ≡ ptr;
@@ -66,7 +68,9 @@ void uchars(unsigned char dest[10])
 
 /*@ requires in_bounds_value: -128 ≤ value < 128;
     requires
-      valid_dest: \let __fc_len = len / 10; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 10; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 10;
@@ -94,7 +98,9 @@ void nested_chars(char dest[10][10])
 
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 4;
@@ -120,7 +126,9 @@ void integer(int dest[10])
 
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 4;
@@ -146,7 +154,9 @@ void with_enum(enum E dest[10])
 
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 4;
@@ -179,7 +189,9 @@ void with_named(named dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 8;
@@ -206,7 +218,9 @@ void structure(struct X dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 8;
@@ -232,7 +246,9 @@ void pointers(int *dest[10])
 
 /*@ requires aligned_end: len % 40 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 40; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 40; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = len / 40;
@@ -290,7 +306,8 @@ enum E {
     C = 2
 };
 /*@ requires in_bounds_value: -128 ≤ value < 128;
-    requires valid_dest: \valid(ptr + (0 .. len - 1));
+    requires
+      valid_dest: \object_pointer(ptr) ∧ \valid(ptr + (0 .. len - 1));
     ensures
       set_content:
         ∀ ℤ j0;
@@ -315,7 +332,8 @@ void chars(char dest[10])
 }
 
 /*@ requires in_bounds_value: 0 ≤ value < 256;
-    requires valid_dest: \valid(ptr + (0 .. len - 1));
+    requires
+      valid_dest: \object_pointer(ptr) ∧ \valid(ptr + (0 .. len - 1));
     ensures
       set_content:
         ∀ ℤ j0;
@@ -342,7 +360,9 @@ void uchars(unsigned char dest[10])
 
 /*@ requires in_bounds_value: -128 ≤ value < 128;
     requires
-      valid_dest: \let __fc_len = len / 10; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 10; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 10;
@@ -371,7 +391,9 @@ void nested_chars(char dest[10][10])
 
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 4;
@@ -397,7 +419,9 @@ void integer(int dest[10])
 
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 4;
@@ -423,7 +447,9 @@ void with_enum(enum E dest[10])
 
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 4; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 4;
@@ -456,7 +482,9 @@ void with_named(named dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 8;
@@ -484,7 +512,9 @@ void structure(struct X dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 8; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 8;
@@ -510,7 +540,9 @@ void pointers(int *dest[10])
 
 /*@ requires aligned_end: len % 40 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 40; \valid(ptr + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(ptr) ∧
+        (\let __fc_len = len / 40; \valid(ptr + (0 .. __fc_len - 1)));
     ensures
       set_content:
         \let __fc_len = \old(len) / 40;

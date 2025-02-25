@@ -25,10 +25,13 @@ void (*p)(void);
 void f(void)
 {
   if (p) goto return_label;
-  /*@ assert rte: pointer_value: \valid_function(p + 2); */
+  /*@ assert rte: pointer_value: \null ≡ p + 2 ∨ \valid_function(p + 2);
+  */
   if (p + 2) goto return_label;
   if (s.f) goto return_label;
-  /*@ assert rte: pointer_value: \valid_function(s.f + 2); */
+  /*@ assert
+      rte: pointer_value: \null ≡ s.f + 2 ∨ \valid_function(s.f + 2);
+  */
   if (s.f + 2) goto return_label;
   return_label: return;
 }
@@ -39,20 +42,30 @@ void write_something(void *x);
 
 void h(void)
 {
-  /*@ assert rte: pointer_value: \object_pointer(&s1.f); */
+  /*@ assert rte: pointer_value: \null ≡ &s1.f ∨ \object_pointer(&s1.f);
+  */
   write_something((void *)(& s1.f));
-  /*@ assert rte: pointer_value: \object_pointer(&s3.tab[4]); */
+  /*@ assert
+      rte: pointer_value:
+        \null ≡ &s3.tab[4] ∨ \object_pointer(&s3.tab[4]);
+  */
   write_something((void *)(& s3.tab[4]));
   return;
 }
 
 void g(void)
 {
-  /*@ assert rte: pointer_value: \valid_function(s2.__anonCompField1.g); */
+  /*@ assert
+      rte: pointer_value:
+        \null ≡ s2.__anonCompField1.g ∨
+        \valid_function(s2.__anonCompField1.g);
+  */
   if (s2.__anonCompField1.g) goto return_label;
-  /*@ assert rte: pointer_value: \valid_function(s1.f); */
+  /*@ assert rte: pointer_value: \null ≡ s1.f ∨ \valid_function(s1.f); */
   if (s1.f) goto return_label;
-  /*@ assert rte: pointer_value: \valid_function(s3.tab[4]); */
+  /*@ assert
+      rte: pointer_value: \null ≡ s3.tab[4] ∨ \valid_function(s3.tab[4]);
+  */
   if (s3.tab[4]) goto return_label;
   return_label: return;
 }

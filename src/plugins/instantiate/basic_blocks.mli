@@ -155,11 +155,21 @@ val punfold_flexible_struct_pred:
   ?loc:location -> term -> term ->
   (?loc: location -> term -> predicate) -> predicate
 
+(** [pobject_pointer ~loc label ptr] generates a predicate
+    - [\object_pointer{label}(ptr)].
+
+    Parameters:
+    - [ptr] must be a term of pointer type.
+*)
+val pobject_pointer: ?loc:location -> logic_label -> term -> predicate
+
 (** [pvalid_len_bytes ~loc label ptr bytes_len] generates a predicate
     - [\valid{label}(ptr + (0 .. (len_bytes/sizeof(\*ptr))))].
 
     Parameters:
     - [ptr] must be a term of pointer type.
+
+    @since Frama-C+dev
 *)
 val pvalid_len_bytes: ?loc:location -> logic_label -> term -> term -> predicate
 

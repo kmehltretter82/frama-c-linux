@@ -151,18 +151,23 @@ void object_pointer_predicate () {
   p += undet;
   /*@ assert \object_pointer(p); */
   Frama_C_show_each_object_pointer_array(p);
-  p = (int *) 0;
-  /*@ assert \object_pointer(p); */
+  p = (int *)0;
+  if (undet) {
+    /*@ assert false: \object_pointer(p); */
+    Frama_C_show_each_bottom(p); // should be unreachable
+  }
+  if (undet) {
+    p = (int *)20; // valid absolute address
+    /*@ assert \object_pointer(p); */
+  }
   if (undet)
-    p = (int *) 20;
+    p = (int *)50; // invalid absolute address
   /*@ assert \object_pointer(p); */
-  if (undet)
-    p = (int *) 50;
-  /*@ assert \object_pointer(p); */
-  p = (int *) undet;
+  Frama_C_show_each_absolute_20(p);
+  p = (int *)undet;
   /*@ assert \object_pointer(p); */
   if (undet) {
-    p = (int *) 100;
+    p = (int *)100;
     /*@ assert \object_pointer(p); */
   }
 }

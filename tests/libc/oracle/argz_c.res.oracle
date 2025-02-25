@@ -143,7 +143,7 @@
   function memcpy: precondition 'valid_src' got status valid.
 [eva] FRAMAC_SHARE/libc/argz.c:279: 
   function memcpy: precondition 'separation' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:134: 
+[eva] FRAMAC_SHARE/libc/string.h:128: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for argz_append
 [eva] Done for function argz_append
@@ -238,7 +238,7 @@
 [eva] FRAMAC_SHARE/libc/argz.c:135: Call to builtin strchr
 [eva] FRAMAC_SHARE/libc/argz.c:135: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:218: 
+[eva] FRAMAC_SHARE/libc/string.h:212: 
   cannot evaluate ACSL term, unsupported logic var p
 [eva] Recording results for argz_next
 [eva] Done for function argz_next
@@ -520,7 +520,7 @@
   function memmove: precondition 'valid_dest' got status valid.
 [eva] FRAMAC_SHARE/libc/argz.c:192: 
   function memmove: precondition 'valid_src' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:157: 
+[eva] FRAMAC_SHARE/libc/string.h:151: 
   cannot evaluate ACSL term, unsupported ACSL construct: logic function memcmp
 [eva] Recording results for argz_delete
 [eva] Done for function argz_delete

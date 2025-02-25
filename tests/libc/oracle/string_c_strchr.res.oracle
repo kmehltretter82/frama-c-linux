@@ -12,7 +12,7 @@
   Called from string_c_strchr.c:62.
 [eva] string_c_strchr.c:62: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:221: 
+[eva] FRAMAC_SHARE/libc/string.h:215: 
   function strchr, behavior not_found: postcondition 'result_null' got status valid.
 [eva] Recording results for strchr
 [eva] Done for function strchr
@@ -58,17 +58,17 @@
   Called from string_c_strchr.c:70.
 [eva] string_c_strchr.c:70: 
   function strchr: precondition 'valid_string_s' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:213: 
+[eva] FRAMAC_SHARE/libc/string.h:207: 
   function strchr, behavior found: postcondition 'result_valid_string' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:214: 
+[eva] FRAMAC_SHARE/libc/string.h:208: 
   function strchr, behavior found: postcondition 'result_char' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:215: 
+[eva] FRAMAC_SHARE/libc/string.h:209: 
   function strchr, behavior found: postcondition 'result_same_base' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:216: 
+[eva] FRAMAC_SHARE/libc/string.h:210: 
   function strchr, behavior found: postcondition 'result_in_length' got status valid.
-[eva] FRAMAC_SHARE/libc/string.h:218: 
+[eva] FRAMAC_SHARE/libc/string.h:212: 
   cannot evaluate ACSL term, unsupported logic var p
-[eva:alarm] FRAMAC_SHARE/libc/string.h:218: Warning: 
+[eva:alarm] FRAMAC_SHARE/libc/string.h:212: Warning: 
   function strchr, behavior found: postcondition 'result_first_occurrence' got status unknown.
 [eva] Recording results for strchr
 [eva] Done for function strchr

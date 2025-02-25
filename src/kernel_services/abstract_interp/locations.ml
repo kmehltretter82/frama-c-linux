@@ -455,7 +455,7 @@ type location =
   { loc : Location_Bits.t;
     size : Int_Base.t }
 
-type access = Read | Write | No_access
+type access = Read | Write | Object_pointer | Any_pointer
 
 let project_size = function
   | Int_Base.Value size -> size
@@ -465,7 +465,8 @@ let project_size = function
    must be at least valid for an empty access, so accesses of unknown sizes are
    converted into empty accesses. *)
 let base_access ~size = function
-  | No_access -> Base.No_access
+  | Object_pointer -> Base.Object_pointer
+  | Any_pointer -> Base.Any_pointer
   | Read -> Base.Read (project_size size)
   | Write -> Base.Write (project_size size)
 

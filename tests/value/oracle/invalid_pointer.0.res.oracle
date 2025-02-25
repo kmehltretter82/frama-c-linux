@@ -8,17 +8,17 @@
   NULL[rbits 80 to 247] ∈ [--..--]
   undet ∈ [--..--]
 [eva] computing for function pointer_computation <- main.
-  Called from invalid_pointer.c:190.
+  Called from invalid_pointer.c:195.
 [eva:alarm] invalid_pointer.c:20: Warning: 
-  invalid pointer creation. assert \object_pointer(p - 1);
+  invalid pointer creation. assert \null ≡ p - 1 ∨ \object_pointer(p - 1);
 [eva:alarm] invalid_pointer.c:23: Warning: 
-  invalid pointer creation. assert \object_pointer(p + 1);
+  invalid pointer creation. assert \null ≡ p + 1 ∨ \object_pointer(p + 1);
 [eva:alarm] invalid_pointer.c:25: Warning: 
-  invalid pointer creation. assert \object_pointer(p + i);
+  invalid pointer creation. assert \null ≡ p + i ∨ \object_pointer(p + i);
 [eva:alarm] invalid_pointer.c:27: Warning: 
-  invalid pointer creation. assert \object_pointer(p - j);
+  invalid pointer creation. assert \null ≡ p - j ∨ \object_pointer(p - j);
 [eva:alarm] invalid_pointer.c:28: Warning: 
-  invalid pointer creation. assert \object_pointer(p - 1);
+  invalid pointer creation. assert \null ≡ p - 1 ∨ \object_pointer(p - 1);
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
   Called from invalid_pointer.c:31.
 [eva] using specification for function Frama_C_interval
@@ -26,28 +26,31 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:32: Warning: 
-  invalid pointer creation. assert \object_pointer(q + offset1);
+  invalid pointer creation.
+  assert \null ≡ q + offset1 ∨ \object_pointer(q + offset1);
 [eva] computing for function Frama_C_interval <- pointer_computation <- main.
   Called from invalid_pointer.c:33.
 [eva] invalid_pointer.c:33: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:34: Warning: 
-  invalid pointer creation. assert \object_pointer(q + offset2);
+  invalid pointer creation.
+  assert \null ≡ q + offset2 ∨ \object_pointer(q + offset2);
 [eva] Recording results for pointer_computation
 [eva] Done for function pointer_computation
 [eva] computing for function pointer_in_loops <- main.
-  Called from invalid_pointer.c:191.
+  Called from invalid_pointer.c:196.
 [eva:partition] invalid_pointer.c:43: 
   Trace partitioning superposing up to 100 states
 [eva:alarm] invalid_pointer.c:52: Warning: 
-  invalid pointer creation. assert \object_pointer(q - 1);
+  invalid pointer creation. assert \null ≡ q - 1 ∨ \object_pointer(q - 1);
 [eva] Recording results for pointer_in_loops
 [eva] Done for function pointer_in_loops
 [eva] computing for function int_conversion <- main.
-  Called from invalid_pointer.c:192.
+  Called from invalid_pointer.c:197.
 [eva:alarm] invalid_pointer.c:64: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)42);
+  invalid pointer creation.
+  assert \null ≡ (int *)42 ∨ \object_pointer((int *)42);
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
   Called from invalid_pointer.c:66.
 [eva] invalid_pointer.c:66: 
@@ -59,60 +62,70 @@
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:70: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)x);
+  invalid pointer creation.
+  assert \null ≡ (int *)x ∨ \object_pointer((int *)x);
 [eva] computing for function Frama_C_interval <- int_conversion <- main.
   Called from invalid_pointer.c:72.
 [eva] invalid_pointer.c:72: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
 [eva:alarm] invalid_pointer.c:73: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)x);
+  invalid pointer creation.
+  assert \null ≡ (int *)x ∨ \object_pointer((int *)x);
 [eva:alarm] invalid_pointer.c:74: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)undet);
+  invalid pointer creation.
+  assert \null ≡ (int *)undet ∨ \object_pointer((int *)undet);
 [eva] Recording results for int_conversion
 [eva] Done for function int_conversion
 [eva] computing for function addrof <- main.
-  Called from invalid_pointer.c:193.
+  Called from invalid_pointer.c:198.
 [eva:alarm] invalid_pointer.c:82: Warning: 
-  invalid pointer creation. assert \object_pointer(&a[11]);
+  invalid pointer creation.
+  assert \null ≡ &a[11] ∨ \object_pointer(&a[11]);
 [eva:alarm] invalid_pointer.c:84: Warning: 
-  invalid pointer creation. assert \object_pointer(&a[(int)(-1)]);
+  invalid pointer creation.
+  assert \null ≡ &a[(int)(-1)] ∨ \object_pointer(&a[(int)(-1)]);
 [eva:alarm] invalid_pointer.c:86: Warning: 
-  invalid pointer creation. assert \object_pointer(&a[offset]);
+  invalid pointer creation.
+  assert \null ≡ &a[offset] ∨ \object_pointer(&a[offset]);
 [eva] Recording results for addrof
 [eva] Done for function addrof
 [eva] computing for function union_pointer <- main.
-  Called from invalid_pointer.c:194.
+  Called from invalid_pointer.c:199.
 [eva:alarm] invalid_pointer.c:102: Warning: 
-  invalid pointer creation. assert \object_pointer(u.pointer);
+  invalid pointer creation.
+  assert \null ≡ u.pointer ∨ \object_pointer(u.pointer);
 [eva:alarm] invalid_pointer.c:105: Warning: 
-  invalid pointer creation. assert \object_pointer(u.pointer);
+  invalid pointer creation.
+  assert \null ≡ u.pointer ∨ \object_pointer(u.pointer);
 [eva] Recording results for union_pointer
 [eva] Done for function union_pointer
 [eva] computing for function write_pointer <- main.
-  Called from invalid_pointer.c:195.
+  Called from invalid_pointer.c:200.
 [eva:alarm] invalid_pointer.c:115: Warning: 
-  invalid pointer creation. assert \object_pointer(p);
+  invalid pointer creation. assert \null ≡ p ∨ \object_pointer(p);
 [eva:alarm] invalid_pointer.c:118: Warning: 
-  invalid pointer creation. assert \object_pointer(p);
+  invalid pointer creation. assert \null ≡ p ∨ \object_pointer(p);
 [eva] Recording results for write_pointer
 [eva] Done for function write_pointer
 [eva] computing for function object_pointer_predicate <- main.
-  Called from invalid_pointer.c:196.
+  Called from invalid_pointer.c:201.
 [eva] invalid_pointer.c:127: assertion got status valid.
 [eva:alarm] invalid_pointer.c:129: Warning: 
-  invalid pointer creation. assert \object_pointer(p - 1);
+  invalid pointer creation. assert \null ≡ p - 1 ∨ \object_pointer(p - 1);
 [eva] invalid_pointer.c:133: assertion got status valid.
 [eva:alarm] invalid_pointer.c:135: Warning: 
-  invalid pointer creation. assert \object_pointer(p + 1);
+  invalid pointer creation. assert \null ≡ p + 1 ∨ \object_pointer(p + 1);
 [eva:alarm] invalid_pointer.c:138: Warning: 
-  invalid pointer creation. assert \object_pointer(p + undet);
+  invalid pointer creation.
+  assert \null ≡ p + undet ∨ \object_pointer(p + undet);
 [eva] invalid_pointer.c:139: assertion got status valid.
 [eva] invalid_pointer.c:140: assertion got status valid.
 [eva] invalid_pointer.c:141: Frama_C_show_each_object_pointer: {{ &x + {0; 4} }}
 [eva:alarm] invalid_pointer.c:142: Warning: 
   invalid pointer creation.
   assert
+  \null ≡ (int *)((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet)) ∨
   \object_pointer((int *)((uintptr_t)((uintptr_t)(&x) + (uintptr_t)undet)));
 [eva] invalid_pointer.c:143: assertion got status valid.
 [eva] invalid_pointer.c:144: assertion got status valid.
@@ -125,56 +138,64 @@
 [eva] Done for function Frama_C_interval
 [eva] invalid_pointer.c:148: assertion got status valid.
 [eva:alarm] invalid_pointer.c:149: Warning: 
-  invalid pointer creation. assert \object_pointer(p + i);
+  invalid pointer creation. assert \null ≡ p + i ∨ \object_pointer(p + i);
 [eva] invalid_pointer.c:150: assertion got status valid.
 [eva:alarm] invalid_pointer.c:151: Warning: 
-  invalid pointer creation. assert \object_pointer(p + undet);
+  invalid pointer creation.
+  assert \null ≡ p + undet ∨ \object_pointer(p + undet);
 [eva] invalid_pointer.c:152: assertion got status valid.
 [eva] invalid_pointer.c:153: 
   Frama_C_show_each_object_pointer_array:
   {{ &x + {0; 4} ; &array + [0..256],0%4 }}
-[eva] invalid_pointer.c:155: assertion got status valid.
-[eva:alarm] invalid_pointer.c:158: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:160: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)50);
-[eva:alarm] invalid_pointer.c:161: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:162: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)undet);
-[eva:alarm] invalid_pointer.c:163: Warning: assertion got status unknown.
-[eva:alarm] invalid_pointer.c:165: Warning: 
-  invalid pointer creation. assert \object_pointer((int *)100);
+[eva:alarm] invalid_pointer.c:156: Warning: 
+  assertion 'false' got status invalid (stopping propagation).
+[eva] invalid_pointer.c:161: assertion got status valid.
+[eva:alarm] invalid_pointer.c:164: Warning: 
+  invalid pointer creation.
+  assert \null ≡ (int *)50 ∨ \object_pointer((int *)50);
+[eva:alarm] invalid_pointer.c:165: Warning: assertion got status unknown.
+[eva] invalid_pointer.c:166: Frama_C_show_each_absolute_20: {20}
+[eva:alarm] invalid_pointer.c:167: Warning: 
+  invalid pointer creation.
+  assert \null ≡ (int *)undet ∨ \object_pointer((int *)undet);
+[eva:alarm] invalid_pointer.c:168: Warning: assertion got status unknown.
+[eva:alarm] invalid_pointer.c:170: Warning: 
+  invalid pointer creation.
+  assert \null ≡ (int *)100 ∨ \object_pointer((int *)100);
 [eva] Recording results for object_pointer_predicate
 [eva] Done for function object_pointer_predicate
 [eva] computing for function flexible_array_member <- main.
-  Called from invalid_pointer.c:197.
-[eva:alarm] invalid_pointer.c:181: Warning: 
-  invalid pointer creation. assert \object_pointer(&s1.fam[1]);
-[eva:alarm] invalid_pointer.c:185: Warning: 
-  invalid pointer creation. assert \object_pointer(p_0 + 1);
-[kernel] invalid_pointer.c:185: Warning: 
+  Called from invalid_pointer.c:202.
+[eva:alarm] invalid_pointer.c:186: Warning: 
+  invalid pointer creation.
+  assert \null ≡ &s1.fam[1] ∨ \object_pointer(&s1.fam[1]);
+[eva:alarm] invalid_pointer.c:190: Warning: 
+  invalid pointer creation.
+  assert \null ≡ p_0 + 1 ∨ \object_pointer(p_0 + 1);
+[kernel] invalid_pointer.c:190: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] Recording results for flexible_array_member
 [eva] Done for function flexible_array_member
 [eva] computing for function signal <- main.
-  Called from invalid_pointer.c:199.
+  Called from invalid_pointer.c:204.
 [eva] using specification for function signal
-[eva] invalid_pointer.c:199: 
+[eva] invalid_pointer.c:204: 
   function signal: precondition 'valid_signal' got status valid.
-[eva] invalid_pointer.c:199: 
+[eva] invalid_pointer.c:204: 
   function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from invalid_pointer.c:200.
-[eva] invalid_pointer.c:200: 
+  Called from invalid_pointer.c:205.
+[eva] invalid_pointer.c:205: 
   function signal: precondition 'valid_signal' got status valid.
-[eva] invalid_pointer.c:200: 
+[eva] invalid_pointer.c:205: 
   function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] computing for function signal <- main.
-  Called from invalid_pointer.c:201.
-[eva] invalid_pointer.c:201: 
+  Called from invalid_pointer.c:206.
+[eva] invalid_pointer.c:206: 
   function signal: precondition 'valid_signal' got status valid.
-[eva] invalid_pointer.c:201: 
+[eva] invalid_pointer.c:206: 
   function signal: precondition 'func_not_null' got status valid.
 [eva] Done for function signal
 [eva] Recording results for main
@@ -199,13 +220,13 @@
   assertion 'Eva,pointer_value' got final status invalid.
 [eva] invalid_pointer.c:135: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] invalid_pointer.c:160: 
+[eva] invalid_pointer.c:164: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] invalid_pointer.c:165: 
+[eva] invalid_pointer.c:170: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] invalid_pointer.c:181: 
+[eva] invalid_pointer.c:186: 
   assertion 'Eva,pointer_value' got final status invalid.
-[eva] invalid_pointer.c:185: 
+[eva] invalid_pointer.c:190: 
   assertion 'Eva,pointer_value' got final status invalid.
 [scope:rm_asserts] removing 2 assertion(s)
 [eva] ====== VALUES COMPUTED ======
@@ -220,7 +241,7 @@
   p ∈ [0..31]
 [eva:final-states] Values at end of function object_pointer_predicate:
   Frama_C_entropy_source ∈ [--..--]
-  p ∈ [0..31]
+  p ∈ [10..31]
   i ∈ [0..20]
 [eva:final-states] Values at end of function pointer_computation:
   Frama_C_entropy_source ∈ [--..--]

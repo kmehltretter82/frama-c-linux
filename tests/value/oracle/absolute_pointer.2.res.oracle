@@ -7,12 +7,14 @@
   R ∈ {0}
   nondet ∈ [--..--]
 [eva:alarm] absolute_pointer.c:43: Warning: 
-  invalid pointer creation. assert \object_pointer(p - 100);
+  invalid pointer creation.
+  assert \null ≡ p - 100 ∨ \object_pointer(p - 100);
 [kernel] absolute_pointer.c:43: Warning: 
   all target addresses were invalid. This path is assumed to be dead.
 [eva] absolute_pointer.c:47: Frama_C_show_each: {4294967196}
 [eva:alarm] absolute_pointer.c:50: Warning: 
-  invalid pointer creation. assert \object_pointer(p - 99);
+  invalid pointer creation.
+  assert \null ≡ p - 99 ∨ \object_pointer(p - 99);
 [eva] absolute_pointer.c:56: Frama_C_show_each: {4294967197}
 [eva] Recording results for negative_absolute_address
 [eva] Done for function negative_absolute_address

@@ -143,12 +143,13 @@ Prove: !valid_obj(Malloc_0[L_x_28 <- 1], shift_sint32(global(L_x_28), 2)).
 
 ------------------------------------------------------------
 
-Goal Check 'qed_NULL' (file object_pointer.i, line 23):
-Prove: true.
+Goal Check 'qed_NULL_ko' (file object_pointer.i, line 23):
+Assume { (* Heap *) Type: linked(Malloc_0). }
+Prove: valid_obj(Malloc_0[L_x_28 <- 1], null).
 
 ------------------------------------------------------------
 
-Goal Check 'prover_NULL' (file object_pointer.i, line 24):
+Goal Check 'prover_NULL_ko' (file object_pointer.i, line 24):
 Assume { (* Heap *) Type: linked(Malloc_0). }
 Prove: valid_obj(Malloc_0[L_x_28 <- 1], L_GET).
 

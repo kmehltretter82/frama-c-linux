@@ -19,10 +19,13 @@ typedef int named;
 struct incomplete;
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = len / 4;
@@ -55,10 +58,13 @@ void with_named(named src[10], named dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = len / 8;
@@ -85,10 +91,13 @@ void structure(struct X src[10], struct X dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = len / 8;
@@ -115,10 +124,12 @@ void pointers(int *src[10], int *dest[10])
 /*@ requires aligned_end: len % 40 ≡ 0;
     requires
       valid_dest:
-        \let __fc_len = len / 40; \valid(dest + (0 .. __fc_len - 1));
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 40; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 40; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 40; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = len / 40;
@@ -186,10 +197,13 @@ typedef int named;
 struct incomplete;
 /*@ requires aligned_end: len % 4 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 4; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 4; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = \old(len) / 4;
@@ -225,10 +239,13 @@ void with_named(named src[10], named dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = \old(len) / 8;
@@ -258,10 +275,13 @@ void structure(struct X src[10], struct X dest[10])
 
 /*@ requires aligned_end: len % 8 ≡ 0;
     requires
-      valid_dest: \let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1));
+      valid_dest:
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 8; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 8; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = \old(len) / 8;
@@ -291,10 +311,12 @@ void pointers(int *src[10], int *dest[10])
 /*@ requires aligned_end: len % 40 ≡ 0;
     requires
       valid_dest:
-        \let __fc_len = len / 40; \valid(dest + (0 .. __fc_len - 1));
+        \object_pointer(dest) ∧
+        (\let __fc_len = len / 40; \valid(dest + (0 .. __fc_len - 1)));
     requires
       valid_read_src:
-        \let __fc_len = len / 40; \valid_read(src + (0 .. __fc_len - 1));
+        \object_pointer(src) ∧
+        (\let __fc_len = len / 40; \valid_read(src + (0 .. __fc_len - 1)));
     ensures
       moved:
         \let __fc_len = \old(len) / 40;

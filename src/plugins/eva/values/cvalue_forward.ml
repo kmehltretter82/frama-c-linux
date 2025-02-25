@@ -132,8 +132,8 @@ let are_comparable_reason kind ev1 ev2 =
     else
       (* Both pointers have to be almost valid (they can be pointers to one past
          an array object. *)
-    if (not (possible_pointer Base.No_access rest_1)) ||
-       (not (possible_pointer Base.No_access rest_2))
+    if (not (possible_pointer Base.Any_pointer rest_1)) ||
+       (not (possible_pointer Base.Any_pointer rest_2))
     then false, `Invalid_pointer
     else
       (* Equality operators allow the comparison between an almost valid pointer
