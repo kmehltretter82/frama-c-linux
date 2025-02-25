@@ -278,7 +278,7 @@ type action_if_exists =
   | Append (** the writing contents will be appended *)
   | Truncate (** the file will be truncated before any writes *)
 
-(** A [safe_processor] helps to to handle files operation while ensuring the
+(** A [safe_processor] helps to handle file operations while ensuring the
     file will be closed no matter what happens. It is a function that takes
     a file operation [f] as a parameter, opens a file and calls the [f] with
     the newly-created channel. *)
@@ -372,7 +372,7 @@ val with_open_out_exn:
           error
     ]}
 
-    When the file processing returns a result by itself, the operator [let*$]
+    When the file processing returns a result by itself, the operator [let*]
     can be used instead:
 
     {[
