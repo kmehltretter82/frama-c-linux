@@ -20,6 +20,7 @@ custom_defs:
     __UINT_LEAST16_MAX__: '0xffff'
     __FLT16_HAS_QUIET_NAN__: '1'
     __ATOMIC_ACQUIRE: '2'
+    __WCHAR_MAX__: '0x7fffffff'
     __FLT128_MAX_10_EXP__: '4932'
     __FLT_MIN__: 1.17549435082228750796873653722224568e-38F
     __UINT_LEAST8_TYPE__: unsigned char
@@ -34,7 +35,6 @@ custom_defs:
     __BFLT16_NORM_MAX__: 3.38953138925153547590470800371487867e+38BF16
     __BFLT16_MIN_10_EXP__: (-37)
     __ORDER_LITTLE_ENDIAN__: '1234'
-    __WCHAR_MAX__: '0x7fffffff'
     __FLT32X_DECIMAL_DIG__: '17'
     __FLT_EVAL_METHOD__: '0'
     __FLT64_DECIMAL_DIG__: '17'
@@ -95,7 +95,6 @@ custom_defs:
     __INT_WIDTH__: '32'
     __DECIMAL_DIG__: '21'
     __FLT64_EPSILON__: 2.22044604925031308084726333618164062e-16F64
-    __FLT128_IS_IEC_60559__: '1'
     __FLT64X_MIN_10_EXP__: (-4931)
     __LDBL_HAS_QUIET_NAN__: '1'
     __FLT16_MIN_EXP__: (-13)
@@ -176,7 +175,7 @@ custom_defs:
     __DEC_EVAL_METHOD__: '2'
     __FLT_MANT_DIG__: '24'
     __LDBL_DECIMAL_DIG__: '21'
-    __VERSION__: '"13.2.1 20230801"'
+    __VERSION__: '"14.2.1 20250207"'
     __UINT64_C(c): 'c ## UL'
     _STDC_PREDEF_H: '1'
     __INT_LEAST32_MAX__: '0x7fffffff'
@@ -242,6 +241,7 @@ custom_defs:
     __PRAGMA_REDEFINE_EXTNAME: '1'
     __SIZE_WIDTH__: '64'
     __SEG_FS: '1'
+    __BITINT_MAXWIDTH__: '65535'
     __INT_LEAST16_MAX__: '0x7fff'
     __FLT16_NORM_MAX__: 6.55040000000000000000000000000000000e+4F16
     __DEC64_MANT_DIG__: '16'
@@ -337,6 +337,7 @@ custom_defs:
     __FLT32_DIG__: '6'
     __UINT32_C(c): 'c ## U'
     __FLT_DENORM_MIN__: 1.40129846432481707092372958328991613e-45F
+    __FLT128_IS_IEC_60559__: '1'
     __INT8_MAX__: '0x7f'
     __LONG_WIDTH__: '64'
     __DBL_MIN__: ((double)2.22507385850720138309023271733240406e-308L)
@@ -361,6 +362,7 @@ custom_defs:
     __DBL_MAX_10_EXP__: '308'
     __LDBL_DENORM_MIN__: 3.64519953188247460252840593361941982e-4951L
     __INT16_C(c): c
+    __ATOMIC_RELEASE: '3'
     __PTRDIFF_TYPE__: long int
     __FLT32X_MIN_10_EXP__: (-307)
     __UINTPTR_TYPE__: long unsigned int
@@ -376,7 +378,6 @@ custom_defs:
     __SIZE_MAX__: 0xffffffffffffffffUL
     __UINT_FAST8_TYPE__: unsigned char
     __ATOMIC_ACQ_REL: '4'
-    __ATOMIC_RELEASE: '3'
 eof: (-1)
 errno:
     edom: '33'
@@ -517,7 +518,7 @@ machdep_name: machdep_x86_64
 mb_cur_max: ((size_t) 16 )
 nsig: (64 + 1)
 path_max: '4096'
-posix_version: 200809L
+posix_c_source: 200809L
 ptrdiff_t: long
 rand_max: '2147483647'
 sig_atomic_t: int
@@ -541,7 +542,7 @@ uint_fast16_t: unsigned long
 uint_fast32_t: unsigned long
 uint_fast64_t: unsigned long
 uintptr_t: unsigned long
-version: gcc (GCC) 13.2.1 20230801
+version: gcc (GCC) 14.2.1 20250207
 wchar_t: int
 weof: (0xffffffffu)
 wint_t: unsigned int

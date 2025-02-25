@@ -9,7 +9,7 @@ alignof_longlong: 1
 alignof_ptr: 1
 alignof_short: 2
 alignof_str: 1
-max_align_t: struct __machdep_max_align_t { int __max_align; } __attribute__ ((aligned (8)))
+max_align_t: struct {int __max_align; } __attribute__ ((aligned (8)))
 bufsiz: '1024'
 char_is_unsigned: false
 compiler: clang
@@ -67,6 +67,7 @@ custom_defs:
     __DBL_MIN_10_EXP__: (-37)
     __DBL_MIN_EXP__: (-125)
     __DBL_MIN__: '1.17549435e-38'
+    __DBL_NORM_MAX__: '3.40282347e+38'
     __DECIMAL_DIG__: __LDBL_DECIMAL_DIG__
     __ELF__: '1'
     __FINITE_MATH_ONLY__: '0'
@@ -84,6 +85,7 @@ custom_defs:
     __FLT_MIN_10_EXP__: (-37)
     __FLT_MIN_EXP__: (-125)
     __FLT_MIN__: 1.17549435e-38F
+    __FLT_NORM_MAX__: 3.40282347e+38F
     __FLT_RADIX__: '2'
     __FPCLASS_NEGINF: '0x0004'
     __FPCLASS_NEGNORMAL: '0x0008'
@@ -106,6 +108,8 @@ custom_defs:
     __GCC_ATOMIC_SHORT_LOCK_FREE: '1'
     __GCC_ATOMIC_TEST_AND_SET_TRUEVAL: '1'
     __GCC_ATOMIC_WCHAR_T_LOCK_FREE: '1'
+    __GCC_CONSTRUCTIVE_SIZE: '32'
+    __GCC_DESTRUCTIVE_SIZE: '32'
     __GNUC_MINOR__: '2'
     __GNUC_PATCHLEVEL__: '1'
     __GNUC_STDC_INLINE__: '1'
@@ -198,11 +202,17 @@ custom_defs:
     __LDBL_MIN_10_EXP__: (-37)
     __LDBL_MIN_EXP__: (-125)
     __LDBL_MIN__: 1.17549435e-38L
+    __LDBL_NORM_MAX__: 3.40282347e+38L
     __LITTLE_ENDIAN__: '1'
     __LLONG_WIDTH__: '64'
     __LONG_LONG_MAX__: 9223372036854775807LL
     __LONG_MAX__: 2147483647L
     __LONG_WIDTH__: '32'
+    __MEMORY_SCOPE_DEVICE: '1'
+    __MEMORY_SCOPE_SINGLE: '4'
+    __MEMORY_SCOPE_SYSTEM: '0'
+    __MEMORY_SCOPE_WRKGRP: '2'
+    __MEMORY_SCOPE_WVFRNT: '3'
     __NO_INLINE__: '1'
     __OBJC_BOOL_IS_BOOL: '0'
     __OPENCL_MEMORY_SCOPE_ALL_SVM_DEVICES: '3'
@@ -336,7 +346,7 @@ custom_defs:
     __UINT_LEAST8_MAX__: '255'
     __UINT_LEAST8_TYPE__: unsigned char
     __USER_LABEL_PREFIX__: ''
-    __VERSION__: '"Clang 17.0.6"'
+    __VERSION__: '"Clang 19.1.7"'
     __WCHAR_MAX__: '32767'
     __WCHAR_TYPE__: int
     __WCHAR_WIDTH__: '16'
@@ -345,10 +355,10 @@ custom_defs:
     __WINT_WIDTH__: '16'
     __clang__: '1'
     __clang_literal_encoding__: '"UTF-8"'
-    __clang_major__: '17'
-    __clang_minor__: '0'
-    __clang_patchlevel__: '6'
-    __clang_version__: '"17.0.6 "'
+    __clang_major__: '19'
+    __clang_minor__: '1'
+    __clang_patchlevel__: '7'
+    __clang_version__: '"19.1.7 "'
     __clang_wide_literal_encoding__: '"UTF-16"'
     __flash: __attribute__((__address_space__(1)))
     __llvm__: '1'
@@ -434,7 +444,7 @@ machdep_name: machdep_avr_16
 mb_cur_max: ((size_t)16)
 nsig: ''
 path_max: '4096'
-posix_version: ''
+posix_c_source: ''
 ptrdiff_t: int
 rand_max: '0x7FFF'
 sig_atomic_t: ''
@@ -458,7 +468,7 @@ uint_fast16_t: unsigned int
 uint_fast32_t: unsigned long
 uint_fast64_t: unsigned long long
 uintptr_t: unsigned int
-version: clang version 17.0.6
+version: clang version 19.1.7
 wchar_t: int
 weof: (0xffffffffu)
 wint_t: int
