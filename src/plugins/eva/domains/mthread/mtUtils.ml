@@ -74,9 +74,6 @@ module Result = struct
     | Warning _, Error _ | Error _, Warning _ -> false
     | Error lx, Error ly -> equal_log lx ly
 
-  let ( let* ) = bind
-  let ( let+ ) v f = map f v
-
   let pp_log = Format.(pp_print_list ~pp_sep:pp_print_newline pp_print_string)
   let log ~error = function
     | Ok v -> v
@@ -91,6 +88,11 @@ module Result = struct
       Self.warning ~current:true ~once:true "%a" pp_log log ; v
     | Error log ->
       Self.fatal ~current:true "%a" pp_log log
+
+  module Operators = struct
+    let ( let* ) = bind
+    let ( let+ ) v f = map f v
+  end
 end
 
 
@@ -188,16 +190,16 @@ module Value = struct
     with Not_found -> error_not_a_pointer_to_function value
 
   let extract_fun cvalue =
-    let open Result in
+    let open Result.Operators in
     let add b _ival acc =
       let* acc = acc in
       match b with
       | Base.Var (v, _) ->
         let* f = get_function cvalue v in
         begin match f.fundec with
-          | Definition (_, _) -> ok (f :: acc)
+          | Definition (_, _) -> Result.ok (f :: acc)
           | Declaration (_, f, _, _) ->
-            error "Missing@ definition@ for function@ '%s'." f.vname
+            Result.error "Missing@ definition@ for function@ '%s'." f.vname
         end
       | _ -> error_not_a_pointer_to_function cvalue
     in

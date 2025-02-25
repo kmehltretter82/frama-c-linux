@@ -45,8 +45,6 @@ end
 
 
 module Make (Key : Key_sig) (Status : Status_sig) = struct
-  open Result
-
   module Info = struct
     let initial_values = [ ]
     let dependencies = [ Ast.self ]
@@ -81,7 +79,7 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
 
   let fold_keys f keys register =
     let f' acc key =
-      let open Result in
+      let open Result.Operators in
       let* (register, result) = acc in
       let+ register, result' = f key register in
       register, Value.join result' result
@@ -97,6 +95,7 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
     fold_keys register_one keys register
 
   let update new_status check keys_value register =
+    let open Result.Operators in
     let update_one key register =
       match find key register with
       | None ->
@@ -109,7 +108,6 @@ module Make (Key : Key_sig) (Status : Status_sig) = struct
         | Ok -> Result.ok (register, Value.zero)
         | Invalid reason -> warning key register (MayBeInState reason)
     in
-    let open Result in
     let* keys = Key.of_value keys_value in
     fold_keys update_one keys register
 

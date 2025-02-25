@@ -36,7 +36,7 @@ struct
   let name = "MtThread.Thread"
   let key_name = "thread"
   let of_value x =
-    let open Result in
+    let open Result.Operators in
     let* l = Value.to_int_list x in
     let convert_one acc id =
       let* acc = acc in
