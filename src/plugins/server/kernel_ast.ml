@@ -727,7 +727,7 @@ module GlobalVars = struct
       ~name:"volatile"
       ~descr:(Md.plain "Is the variable volatile?")
       ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.isVolatileType vi.vtype);
+      ~get:(fun vi -> Ast_types.is_volatile vi.vtype);
     States.column model
       ~name:"ghost"
       ~descr:(Md.plain "Is the variable ghost?")

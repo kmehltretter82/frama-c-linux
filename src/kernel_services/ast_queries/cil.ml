@@ -3018,27 +3018,15 @@ and typeTermOffset basetyp =
 
 (**** Check for const attribute ****)
 
-let isConstType typ_lval = Ast_types.has_attribute_memory_block "const" typ_lval
-
 let isGlobalInitConst vi =
   (* Note: the type must be fully const, not a part of it *)
   vi.vglob && vi.vstorage <> Extern && Ast_types.has_qualifier "const" vi.vtype
 
 (**** Check for volatile attribute ****)
 
-let isVolatileType typ_lval =
-  Ast_types.has_attribute_memory_block "volatile" typ_lval
-
-let rec isVolatileLogicType = function
-  | Ctype typ -> isVolatileType typ
-  | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isVolatileLogicType (unroll_ltdef ty)
-  | Ltype _ -> false
-
-let isVolatileLval lv = isVolatileType (typeOfLval lv)
+let isVolatileLval lv = Ast_types.is_volatile (typeOfLval lv)
 let isVolatileTermLval lv =
-  Logic_const.plain_or_set isVolatileLogicType (typeOfTermLval lv)
+  Logic_const.plain_or_set Ast_types.is_logic_volatile (typeOfTermLval lv)
 
 (**** MACHINE DEPENDENT PART ****)
 
@@ -6130,7 +6118,7 @@ let rec is_variably_modified_type (t : typ) : bool =
 
 let is_mutable (lhost, offset) =
   let rec aux can_mutate typ off =
-    let can_mutate = can_mutate && not (isConstType typ) in
+    let can_mutate = can_mutate && not (Ast_types.is_const typ) in
     let typ' = Ast_types.unroll_type typ in
     match typ'.tnode, off with
     | _, NoOffset -> can_mutate
@@ -6170,7 +6158,8 @@ let is_modifiable_lval lv =
   | TArray _ -> false
   | TFun _ -> false
   | _ ->
-    (not (isConstType t) || is_mutable_or_initialized lv) && isCompleteType t
+    (not (Ast_types.is_const t) || is_mutable_or_initialized lv)
+    && isCompleteType t
 
 (** Uniquefy the variable names *)
 let uniqueVarNames (f: file) : unit =
@@ -6770,6 +6759,11 @@ let unrollTypeDeep = Ast_types.unroll_type_deep
 let typeAddGhost = Ast_types.add_ghost
 let isGhostType = Ast_types.is_ghost
 let isWFGhostType = Ast_types.is_wellformed_ghost
+
+let isConstType = Ast_types.is_const
+
+let isVolatileType = Ast_types.is_volatile
+let isVolatileLogicType = Ast_types.is_logic_volatile
 
 let isVoidType = Ast_types.is_void
 let isVoidPtrType = Ast_types.is_void_ptr

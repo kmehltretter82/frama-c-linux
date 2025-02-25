@@ -130,6 +130,24 @@ val unroll_type_deep : typ -> typ
 val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
 
 (* ************************************************************************* *)
+(** {2 Const Attribute} *)
+(* ************************************************************************* *)
+
+(** Check for ["const"] qualifier from the type of an l-value using
+    {!has_attribute_memory_block}.
+*)
+val is_const : typ -> bool
+
+(* ************************************************************************* *)
+(** {2 Volatile Attribute} *)
+(* ************************************************************************* *)
+
+(** Check for ["volatile"] qualifier from the type of an l-value using
+    {!has_attribute_memory_block}.
+*)
+val is_volatile : typ -> bool
+
+(* ************************************************************************* *)
 (** {2 Ghost Attribute} *)
 (* ************************************************************************* *)
 
@@ -297,6 +315,9 @@ val array_elem_type_and_size : typ -> typ * exp option
 (* ************************************************************************* *)
 (** {2 Logic Type checkers} *)
 (* ************************************************************************* *)
+
+(** Check for ["volatile"] qualifier from a logic type using {!is_volatile}. *)
+val is_logic_volatile : logic_type -> bool
 
 (** True if the argument is the type for reified C types. *)
 val is_logic_typetag : logic_type -> bool

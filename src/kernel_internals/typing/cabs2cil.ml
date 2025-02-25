@@ -874,7 +874,7 @@ class checkGlobal = object
       | _ ->
         let problematic_var : string option ref = ref None in
         let is_varinfo_cst vi =
-          let res = Cil.isConstType vi.vtype && isDefined vi in
+          let res = Ast_types.is_const vi.vtype && isDefined vi in
           if not res then problematic_var := Some vi.vorig_name;
           res
         in

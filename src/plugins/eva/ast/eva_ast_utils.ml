@@ -115,7 +115,7 @@ and to_cil_const : Eva_ast_types.constant -> Cil_types.constant = function
 let is_mutable (lval : lval) : bool =
   let (lhost, offset) = lval.node in
   let rec aux base_mutable typ off =
-    let base_mutable = base_mutable && not (Cil.isConstType typ) in
+    let base_mutable = base_mutable && not (Ast_types.is_const typ) in
     let typ = Ast_types.unroll_type typ in
     match typ.tnode, off with
     | _, NoOffset -> base_mutable
@@ -178,7 +178,7 @@ let exp_contains_volatile, lval_contains_volatile =
   let open Eva_ast_visitor.Fold in
   let neutral = false and combine b1 b2 = b1 || b2 in
   let fold_lval ~visitor lval =
-    Cil.isVolatileType lval.typ || default.fold_lval ~visitor lval
+    Ast_types.is_volatile lval.typ || default.fold_lval ~visitor lval
   in
   let folder = { default with fold_lval } in
   visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder

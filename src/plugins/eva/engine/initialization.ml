@@ -183,7 +183,7 @@ module Make
            must be different from zero somewhere. This is a not-so minor
            optimization. *)
         if padding_initialization ~local = `Initialized &&
-           not (Cil.isVolatileType typ)
+           not (Ast_types.is_volatile typ)
         then state
         else initialize_var_zero_or_volatile kinstr vi state
     in
@@ -211,7 +211,7 @@ module Make
         apply_eva_single_initializer ~source kinstr state lval exp
       else state
     | CompoundInit (typ, l) ->
-      if Ast_types.has_qualifier "volatile" typ || not (Cil.isConstType typ)
+      if Ast_types.has_qualifier "volatile" typ || not (Ast_types.is_const typ)
       then state (* initializer is not useful *)
       else
         let doinit off init _typ state =
@@ -250,7 +250,7 @@ module Make
       (* If needed, initializes const fields according to the initializer
          (or generate one if there are none). In the first phase, they have been
          set to generic values. *)
-      if Cil.isConstType vi.vtype && not (vi.vstorage = Extern)
+      if Ast_types.is_const vi.vtype && not (vi.vstorage = Extern)
       then
         let init = match init with
           | None -> Cil.makeZeroInit ~loc:vi.vdecl vi.vtype

@@ -1153,13 +1153,6 @@ val isGhostFormalVarinfo: varinfo -> bool
 *)
 val isGhostFormalVarDecl: (string * typ * attributes) -> bool
 
-(** [true] iff the given variable is a const global variable with non extern
-    storage.
-
-    @since 25.0-Manganese
-*)
-val isGlobalInitConst: varinfo -> bool
-
 (** Remove any attribute appearing somewhere in the fully expanded
     version of the type.
     @since Oxygen-20120901
@@ -1199,23 +1192,16 @@ exception NotAnAttrParam of exp
 (** {2 Const Attribute} *)
 (* ************************************************************************* *)
 
-val isConstType : typ -> bool
-(** Check for ["const"] qualifier from the type of an l-value (do not follow pointer)
-    @return true iff a part of the related l-value has ["const"] qualifier
-    @since Chlorine-20180501 *)
+(** [true] iff the given variable is a const global variable with non extern
+    storage.
+
+    @since 25.0-Manganese
+*)
+val isGlobalInitConst: varinfo -> bool
 
 (* ************************************************************************* *)
 (** {2 Volatile Attribute} *)
 (* ************************************************************************* *)
-
-val isVolatileType : typ -> bool
-(** Check for ["volatile"] qualifier from the type of an l-value (do not follow pointer)
-    @return true iff a part of the related l-value has ["volatile"] qualifier
-    @since Sulfur-20171101 *)
-
-val isVolatileLogicType : logic_type -> bool
-(** Check for ["volatile"] qualifier from a logic type
-    @since Sulfur-20171101 *)
 
 val isVolatileLval : lval -> bool
 (** Check if the l-value has a volatile part
@@ -2329,6 +2315,26 @@ val type_remove_attributes_for_c_cast: typ -> typ
 val type_remove_attributes_for_logic_type: typ -> typ
 [@@deprecated "Use Ast_types.remove_attributes_for_logic_type instead."]
 [@@migrate { repl = Ast_types.remove_attributes_for_logic_type } ]
+
+val isConstType : typ -> bool
+(** Check for ["const"] qualifier from the type of an l-value (do not follow pointer)
+    @return true iff a part of the related l-value has ["const"] qualifier
+    @since Chlorine-20180501 *)
+[@@deprecated "Use Ast_types.is_const instead."]
+[@@migrate { repl = Ast_types.is_const } ]
+
+val isVolatileType : typ -> bool
+(** Check for ["volatile"] qualifier from the type of an l-value (do not follow pointer)
+    @return true iff a part of the related l-value has ["volatile"] qualifier
+    @since Sulfur-20171101 *)
+[@@deprecated "Use Ast_types.is_volatile instead."]
+[@@migrate { repl = Ast_types.is_volatile } ]
+
+val isVolatileLogicType : logic_type -> bool
+(** Check for ["volatile"] qualifier from a logic type
+    @since Sulfur-20171101 *)
+[@@deprecated "Use Ast_types.is_logic_volatile instead."]
+[@@migrate { repl = Ast_types.is_logic_volatile } ]
 
 val typeAddGhost : typ -> typ
 (** Add the ghost attribute to a type (does nothing if the type is alreay ghost)

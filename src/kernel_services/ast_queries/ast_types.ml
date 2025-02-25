@@ -249,6 +249,18 @@ let rec unroll_type_deep (t: typ) : typ =
   with_attrs [] t
 
 (* ************************* *)
+(* Handling const attribute. *)
+(* ************************* *)
+
+let is_const typ_lval = has_attribute_memory_block "const" typ_lval
+
+(* **************************** *)
+(* Handling volatile attribute. *)
+(* **************************** *)
+
+let is_volatile typ_lval = has_attribute_memory_block "volatile" typ_lval
+
+(* ************************* *)
 (* Handling ghost attribute. *)
 (* ************************* *)
 
@@ -471,9 +483,9 @@ let pointed_type t =
   | TArray _ -> element_type t'
   | _ -> t'
 
-(* ************** *)
-(* Type checkers. *)
-(* ************** *)
+(* ******************** *)
+(* Logic Type checkers. *)
+(* ******************** *)
 
 let rec unroll_logic_type ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
@@ -487,6 +499,12 @@ let () = Cil_datatype.punrollLogicType := unroll_logic_type
 (* Utils function for is_logic_* functions. *)
 let unroll_logic_aux is_logic lti t =
   Logic_const.is_unrollable_ltdef lti && is_logic (Logic_const.unroll_ltdef t)
+
+let rec is_logic_volatile t =
+  match t with
+  | Ctype typ -> is_volatile typ
+  | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
+  | Ltype (lti,_) -> unroll_logic_aux is_logic_volatile lti t
 
 let rec is_logic_typetag t =
   match t with

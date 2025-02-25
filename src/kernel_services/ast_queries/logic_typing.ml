@@ -2433,7 +2433,7 @@ struct
           | TIndex (_, n) -> offsets n
           | TModel (_, n) -> m.accept_models && offsets n
           | TField (f, n) ->
-            (not (Cil.isConstType f.ftype) || m.accept_const) && offsets n
+            (not (Ast_types.is_const f.ftype) || m.accept_const) && offsets n
         in
         (not (isLogicArrayType t.term_type) || m.accept_array) &&
         (match lhost with
@@ -2448,7 +2448,7 @@ struct
                           model variables are not supported. *)
              | Some v ->
                (not v.vformal || m.accept_formal) &&
-               (not (isConstType @@ logicCType t.term_type) || m.accept_const)
+               (not (Ast_types.is_const @@ logicCType t.term_type) || m.accept_const)
            end
          | TResult _ -> m.accept_models
          | _ -> true) &&
@@ -4390,7 +4390,7 @@ struct
           begin fun t ->
             let check t = match Ast_types.unroll_logic_type t with
               | Ctype ctyp' ->
-                ( reads || not (Cil.isConstType ctyp') )
+                ( reads || not (Ast_types.is_const ctyp') )
                 && Cil_datatype.Typ.equal ctyp
                   (Ast_types.remove_qualifiers ctyp')
               | _ -> false
@@ -4413,8 +4413,8 @@ struct
         if not (Ast_types.is_ptr arg1) then error ();
         let vol_typ = Ast_types.direct_pointed_type arg1 in
         let base_typ = Ast_types.remove_qualifiers vol_typ in
-        if not (Cil.isVolatileType vol_typ &&
-                ( reads || not (Cil.isConstType vol_typ) ) &&
+        if not (Ast_types.is_volatile vol_typ &&
+                ( reads || not (Ast_types.is_const vol_typ) ) &&
                 Cil_datatype.Typ.equal ret_typ base_typ)
         then error ();
         base_typ
