@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+o   Kernel    [2025-02-25] Frama-C now uses OCamlmig (see developer manual) to
+              perform migrations between versions.
 o!  Kernel    [2025-02-17] New module Ast_attributes for attribute related
               functions. Moved most of Cil functions into this module, Cil
               functions are now deprecated.
