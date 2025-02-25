@@ -441,6 +441,7 @@ little_endian: true
 machdep_name: machdep_avr_8
 max_align_t: struct __machdep_max_align_t {int __max_align; } __attribute__ ((aligned
     (8)))
+max_extended_alignment: 4294967296
 mb_cur_max: ((size_t)16)
 nsig: ''
 path_max: '4096'

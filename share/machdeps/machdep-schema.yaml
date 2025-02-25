@@ -78,6 +78,13 @@ max_align_t:
 
   type: string
 
+max_extended_alignment:
+
+  description: maximal value that can be given to _Alignas.
+               0 if only standard alignments are supported.
+
+  type: integer
+
 bufsiz:
 
   description: value of 'BUFSIZ' macro

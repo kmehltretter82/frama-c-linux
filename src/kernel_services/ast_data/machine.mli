@@ -77,6 +77,7 @@ val alignof_str: unit -> int
 val alignof_aligned: unit -> int
 val alignof_fun: unit -> int
 val alignof_max: unit -> int
+val alignof_extended: unit -> int
 
 (* ***********************************************************************)
 (** {2 Typ/kind getters}                                                 *)

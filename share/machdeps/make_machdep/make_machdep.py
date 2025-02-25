@@ -375,6 +375,30 @@ if not version_lines:
 else:
     version = version_output.stdout.splitlines()[0]
 
+
+# Special case for determining whether extended alignments are supported, and,
+# if yes what is the maximal value allowed. We assume that it does not depend
+# on the exact compilation context.
+def test_possible_alignas(align_test):
+    f = my_path / "max_extended_alignment.c"
+    cmd = compilation_command + [f"-DALIGN_TEST={align_test}", str(f)]
+    if args.verbose:
+        print(f"[INFO] running command: {' '.join(cmd)}")
+    proc = subprocess.run(cmd, capture_output=True)
+    Path(f).with_suffix(".o").unlink(missing_ok=True)
+    return proc.returncode == 0
+
+
+align_test = 1
+if machdep["alignof_max_align_t"] is not None:
+    align_test = 2 * machdep["alignof_max_align_t"]
+
+machdep["max_extended_alignment"] = 0
+
+while test_possible_alignas(align_test):
+    machdep["max_extended_alignment"] = align_test
+    align_test = 2 * align_test
+
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
 machdep["version"] = version
