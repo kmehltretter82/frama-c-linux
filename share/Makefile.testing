@@ -66,10 +66,10 @@ RM      ?= rm -f
 RMDIR   ?= rm -rf
 
 ifeq ($(PLATFORM),Darwin)
-XARGS   ?= xargs
+XARGS   ?= xargs -0
 else
 # Unix, Cygwin
-XARGS   ?= xargs --no-run-if-empty
+XARGS   ?= xargs -0 --no-run-if-empty
 endif
 
 ##########################################################################
@@ -150,10 +150,10 @@ wtests-help:
 
 .PHONY: purge-tests
 purge-tests:
-	find $(PTEST_ALL_DIRS) -name dune \
+	find $(PTEST_ALL_DIRS) -name dune -print0 \
         | $(GREP) -e "/oracle.*/dune\|/result.*/dune" \
         | $(XARGS) $(RM)
-	find $(PTEST_ALL_DIRS) -name "*.wtests" \
+	find $(PTEST_ALL_DIRS) -name "*.wtests" -print0 \
         | $(XARGS) $(RM)
 
 # Force the full cleaning of the testing environment
