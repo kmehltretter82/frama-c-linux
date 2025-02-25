@@ -248,6 +248,9 @@ let rec unroll_type_deep (t: typ) : typ =
   in
   with_attrs [] t
 
+let unroll_type_deep_node (t: typ) : typ_node =
+  (unroll_type_deep t).tnode
+
 (* ************************* *)
 (* Handling const attribute. *)
 (* ************************* *)

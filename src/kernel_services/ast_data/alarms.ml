@@ -518,7 +518,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let t1 = match e1 with
         | None -> begin
             let typ =
-              match (Ast_types.unroll_type_deep (Cil.typeOf e2)).tnode with
+              match Ast_types.unroll_type_deep_node (Cil.typeOf e2) with
               | TPtr { tnode = TFun _ } ->
                 Cil_const.(mk_tptr (mk_tfun voidType None false))
               | _ -> Cil_const.voidPtrType

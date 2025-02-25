@@ -421,7 +421,7 @@ let find_field env structname fieldname =
     raise Not_found
 
 let find_predicate_by_width typ narrow_name wide_name =
-  match (Ast_types.unroll_type_deep typ).tnode with
+  match Ast_types.unroll_type_deep_node typ with
   | TPtr { tnode = TInt IChar } -> find_predicate narrow_name
   | TPtr t when
       (* drop attributes to remove 'const' qualifiers and fc_stdlib attributes *)
@@ -432,7 +432,9 @@ let find_predicate_by_width typ narrow_name wide_name =
   | _ ->
     Self.warning ~current:true ~wkey:wkey_typing
       "expected single/wide character pointer type, got %a (%a, unrolled %a)"
-      Printer.pp_typ typ Cil_types_debug.pp_typ typ Cil_types_debug.pp_typ (Ast_types.unroll_type_deep typ);
+      Printer.pp_typ typ
+      Cil_types_debug.pp_typ typ
+      Cil_types_debug.pp_typ (Ast_types.unroll_type_deep typ);
     raise Not_found
 
 let valid_read_string typ =

@@ -514,7 +514,7 @@ struct
     | (Field (lv,_) | FieldNamed (lv,_)) as e ->
       let (host, offset) as lv' = build_lval ~scope ~loc lv in
       let host', offset', ci =
-        match (Ast_types.unroll_type_deep (Cil.typeOfLval lv')).tnode with
+        match Ast_types.unroll_type_deep_node (Cil.typeOfLval lv') with
         | TComp ci -> host, offset, ci
         | TPtr { tnode = TComp ci } ->
           Mem (Cil.new_exp ~loc (Lval lv')), Cil_types.NoOffset, ci

@@ -288,8 +288,8 @@ and global =
     {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to
     construct list of attributes. If you want to inspect a type, you should
     use {!Ast_types.unroll_type}, {!Ast_types.unroll_type_node},
-    {!Ast_types.unroll_type_skel} {!Ast_types.unroll_type_deep} to see through
-    the uses of named types.
+    {!Ast_types.unroll_type_skel}, {!Ast_types.unroll_type_deep} or
+    {!Ast_types.unroll_type_deep_node} to see through the uses of named types.
 
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute

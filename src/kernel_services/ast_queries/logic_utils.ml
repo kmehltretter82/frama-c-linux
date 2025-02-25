@@ -2386,7 +2386,7 @@ let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
     let loc = t.term_loc in
     match Logic_const.unroll_ltdef t.term_type with
     | Ctype ty ->
-      (match (Ast_types.unroll_type_deep ty).tnode with
+      (match Ast_types.unroll_type_deep_node ty with
        | TPtr { tnode = TFun _ } ->
          mk_cast ~loc cfct_ptr t, fct_ptr
        | TPtr { tnode = TVoid } -> t, obj_ptr

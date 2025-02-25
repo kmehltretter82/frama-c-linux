@@ -123,6 +123,10 @@ val unroll_type_skel : typ -> typ_node
     types. Will collect all attributes *)
 val unroll_type_deep : typ -> typ
 
+(** Same than {!unroll_type_deep} but discard the final type attributes and only
+    return its node. *)
+val unroll_type_deep_node : typ -> typ_node
+
 (** Expands logic type definitions. If the [unroll_typedef] flag is set to
     [true] (this is the default), C typedef will be expanded as well using
     {!Logic_const.unroll_ltdef}.
