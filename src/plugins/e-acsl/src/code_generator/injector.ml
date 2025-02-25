@@ -598,7 +598,7 @@ let inject_in_fundec main fundec =
   (* convert ghost variables *)
   vi.vghost <- false;
   let unghost_local vi =
-    Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
+    Cil.update_var_type vi (Ast_types.remove_attributes_deep ["ghost"] vi.vtype);
     vi.vghost <- false
   in
   List.iter unghost_local fundec.slocals;
@@ -636,8 +636,8 @@ let unghost_vi vi =
   (* do not convert extern ghost variables, because they can't be linked,
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
-  Cil.update_var_type vi (Cil.typeRemoveAttributesDeep ["ghost"] vi.vtype);
-  match Cil.unrollType vi.vtype with
+  Cil.update_var_type vi (Ast_types.remove_attributes_deep ["ghost"] vi.vtype);
+  match Ast_types.unroll vi.vtype with
   | { tnode = TFun (res, Some l, va); tattr } ->
     (* unghostify function's parameters *)
     let retype (n, t, a) =
@@ -813,7 +813,7 @@ let inject_mtracking_handler main =
         | [] ->
           (* no arguments to main given *)
           nulls
-        | _argc :: argv :: _ when Cil.isPointerType argv.vtype ->
+        | _argc :: argv :: _ when Ast_types.is_ptr argv.vtype ->
           (* grab addresses of arguments for a call to the main initialization
              function, i.e., [__e_acsl_memory_init] *)
           List.map Cil.mkAddrOfVi fundec.sformals;

@@ -83,7 +83,7 @@ let must_never_monitor vi =
   not (Cil.isCompleteType vi.vtype)
   ||
   (* function pointers are not yet supported. *)
-  Cil.isFunctionType vi.vtype
+  Ast_types.is_fun vi.vtype
   ||
   SpecialPointers.mem vi
 
@@ -251,7 +251,8 @@ module rec Transfer
     Some
       (Varinfo.Hptset.union (Env.default_varinfos s1) (Env.default_varinfos s2))
 
-  let is_ptr_or_array ty = Cil.isPointerType ty || Cil.isArrayType ty
+  let is_ptr_or_array ty =
+    Ast_types.is_ptr ty || Ast_types.is_array ty
 
   let is_ptr_or_array_exp e =
     let ty = Cil.typeOf e in

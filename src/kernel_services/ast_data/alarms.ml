@@ -496,7 +496,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let null = Logic_const.term ~loc Tnull t.term_type in
       Logic_const.por ~loc
         (Logic_const.prel (Req, null, t),
-         if Cil.isFunPtrType (Cil.typeOf e)
+         if Ast_types.is_fun_ptr (Cil.typeOf e)
          then Logic_const.pvalid_function ~loc t
          else Logic_const.pobject_pointer ~loc (Logic_const.here_label, t))
 
@@ -517,7 +517,8 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = best_loc ~loc e2.eloc in
       let t1 = match e1 with
         | None -> begin
-            let typ = match Cil.(unrollTypeDeep (typeOf e2)).tnode with
+            let typ =
+              match Ast_types.unroll_deep_node (Cil.typeOf e2) with
               | TPtr { tnode = TFun _ } ->
                 Cil_const.(mk_tptr (mk_tfun voidType None false))
               | _ -> Cil_const.voidPtrType
@@ -622,7 +623,7 @@ let create_predicate ?(loc=Location.unknown) alarm =
       let loc = e.eloc in
       let t = Cil.typeOf e in
       let e =
-        let t' = Cil.unrollTypeDeep t in
+        let t' = Ast_types.unroll_deep t in
         match t'.tnode, args with
         | TPtr { tnode = TFun (_, Some _, _) }, _
         | TPtr { tnode = TFun _ }, None -> e

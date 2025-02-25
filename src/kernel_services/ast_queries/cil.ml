@@ -55,7 +55,6 @@
 open Logic_const
 open Cil_datatype
 open Cil_types
-open Machine
 
 (* ************************************************************************* *)
 (* Reporting messages *)
@@ -66,14 +65,6 @@ open Machine
 let check_invariants = false
 
 let pp_thisloc fmt = Location.pretty fmt (Current_loc.get ())
-
-let abort_context msg =
-  let loc = Current_loc.get () in
-  let append fmt =
-    Format.pp_print_newline fmt ();
-    Errorloc.pp_context_from_file fmt loc
-  in
-  Kernel.abort ~current:true ~append msg
 
 let new_exp ~loc e = { eloc = loc; eid = Cil_const.Eid.next (); enode = e }
 
@@ -99,7 +90,7 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
+let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
 let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
@@ -143,215 +134,6 @@ let stmt_of_instr_list ?(loc=Location.unknown) = function
 
 (**** Utility functions ******)
 
-(* Attributes *)
-
-let rec typeAttrs { tnode; tattr } =
-  match tnode with
-  | TVoid    -> tattr
-  | TInt _   -> tattr
-  | TFloat _ -> tattr
-  | TNamed t -> Ast_attributes.add_list tattr (typeAttrs t.ttype)
-  | TPtr _   -> tattr
-  | TArray _ -> tattr
-  | TComp comp -> Ast_attributes.add_list comp.cattr tattr
-  | TEnum enum -> Ast_attributes.add_list enum.eattr tattr
-  | TFun _   -> tattr
-  | TBuiltin_va_list -> tattr
-
-let rec typeAddAttributes ?(combine=Ast_attributes.add_list) a0 t =
-  begin
-    match a0 with
-    | [] ->
-      (* no attributes, keep same type *)
-      t
-    | _ ->
-      (* anything else: add a0 to existing attributes *)
-      let add (a: attributes) = combine a0 a in
-      match t.tnode with
-      | TVoid
-      | TInt   _
-      | TFloat _
-      | TEnum  _
-      | TPtr   _
-      | TFun   _
-      | TComp  _
-      | TNamed _
-      | TBuiltin_va_list -> {t with tattr = add t.tattr}
-      | TArray (bt, l) ->
-        let att_elt, att_typ = Ast_attributes.split_array_attributes a0 in
-        let bt' = arrayPushAttributes att_elt bt in
-        let tattr = Ast_attributes.add_list att_typ t.tattr in
-        Cil_const.mk_tarray ~tattr bt' l
-  end
-(* Push attributes that belong to the type of the elements of the array as
-   far as possible *)
-and arrayPushAttributes al t =
-  match t.tnode with
-  | TArray (bt, l) ->
-    let bt' = arrayPushAttributes al bt in
-    Cil_const.mk_tarray ~tattr:t.tattr bt' l
-  | _ -> typeAddAttributes al t
-
-(**** Look for the presence of an attribute in a type ****)
-
-let typeHasAttribute attr typ = Ast_attributes.contains attr (typeAttrs typ)
-
-let rec typeHasQualifier attr t =
-  match t.tnode with
-  | TNamed ti ->
-    Ast_attributes.contains attr t.tattr || typeHasQualifier attr ti.ttype
-  | TArray (bt, _) ->
-    typeHasQualifier attr bt
-    || (* ill-formed type *) Ast_attributes.contains attr t.tattr
-  | _ -> Ast_attributes.contains attr (typeAttrs t)
-
-let typeHasAttributeMemoryBlock a (ty:typ): bool =
-  let f attrs = if Ast_attributes.contains a attrs then raise Exit in
-  let rec visit (t: typ) : unit =
-    f t.tattr;
-    match t.tnode with
-    | TNamed r -> visit r.ttype
-    | TArray (bt, _) -> visit bt
-    | TComp comp ->
-      List.iter
-        (fun fi -> f fi.fattr; visit fi.ftype)
-        (Option.value ~default:[] comp.cfields)
-    | TVoid
-    | TInt _
-    | TFloat _
-    | TEnum _
-    | TFun _
-    | TBuiltin_va_list
-    | TPtr _ -> ()
-  in
-  try visit ty; false
-  with Exit -> true
-
-let typeAddGhost typ =
-  if not (typeHasAttribute "ghost" typ) then
-    typeAddAttributes [("ghost", [])] typ
-  else
-    typ
-
-let rec typeRemoveAttributes ?anl t =
-  (* Try to preserve sharing. We use sharing to be more efficient, but also
-     to detect that we have removed an attribute under typedefs *)
-  let tattr =
-    match anl with
-    | None     -> []
-    | Some anl -> Ast_attributes.drop_list anl t.tattr
-  in
-  let reshare () =
-    if tattr == t.tattr
-    then t
-    else Cil_const.mk_typ ~tattr t.tnode
-  in
-  match t.tnode with
-  | TVoid
-  | TInt   _
-  | TFloat _
-  | TEnum  _
-  | TPtr   _
-  | TArray _
-  | TFun   _
-  | TComp  _
-  | TBuiltin_va_list -> reshare ()
-  | TNamed ti ->
-    let tt = typeRemoveAttributes ?anl ti.ttype in
-    if tt == ti.ttype
-    then reshare ()
-    else typeAddAttributes tattr tt
-
-let typeRemoveAllAttributes t = typeRemoveAttributes t
-
-let typeRemoveAttributes anl t = typeRemoveAttributes ~anl t
-
-let rec typeRemoveAttributesDeep (anl: string list) t =
-  (* Try to preserve sharing. We use sharing to be more efficient, but also
-     to detect that we have removed an attribute under typedefs *)
-  let reshare () =
-    let tattr = Ast_attributes.drop_list anl t.tattr in
-    if tattr == t.tattr
-    then t
-    else Cil_const.mk_typ ~tattr t.tnode
-  in
-  match t.tnode with
-  | TVoid    -> reshare ()
-  | TInt   _ -> reshare ()
-  | TFloat _ -> reshare ()
-  | TEnum  _ -> reshare ()
-  | TPtr   t ->
-    let t' = typeRemoveAttributesDeep anl t in
-    if t != t'
-    then Cil_const.mk_tptr ~tattr:(Ast_attributes.drop_list anl t.tattr) t'
-    else reshare ()
-  | TArray (t, l) ->
-    let t' = typeRemoveAttributesDeep anl t in
-    if t != t'
-    then Cil_const.mk_tarray ~tattr:(Ast_attributes.drop_list anl t.tattr) t' l
-    else reshare ()
-  | TFun  _ -> reshare ()
-  | TComp _ -> reshare ()
-  | TBuiltin_va_list -> reshare ()
-  | TNamed ti ->
-    let tt = typeRemoveAttributesDeep anl ti.ttype in
-    if tt == ti.ttype
-    then reshare ()
-    else typeAddAttributes (Ast_attributes.drop_list anl t.tattr) tt
-
-let type_remove_qualifier_attributes =
-  typeRemoveAttributes Ast_attributes.qualifier_attributes
-
-let type_remove_qualifier_attributes_deep =
-  typeRemoveAttributesDeep Ast_attributes.qualifier_attributes
-
-let unrollType (t: typ) : typ =
-  let rec withAttrs (al: attributes) (t: typ) : typ =
-    match t.tnode with
-    | TNamed ti -> withAttrs (Ast_attributes.add_list al t.tattr) ti.ttype
-    | _ -> typeAddAttributes al t
-  in
-  withAttrs [] t
-
-let unrollTypeNode (t: typ) : typ_node =
-  (unrollType t).tnode
-
-let () = punrollType := unrollType
-
-(* Unroll typedefs, discarding all intermediate attribute. To be used only
-   when one is interested in the shape of the type node *)
-let rec unrollTypeSkel (t : typ) : typ_node =
-  match t.tnode with
-  | TNamed ti -> unrollTypeSkel ti.ttype
-  | _ -> t.tnode
-
-let rec unrollTypeDeep (t: typ) : typ =
-  let rec withAttrs (al: attributes) (t: typ) : typ =
-    match t.tnode with
-    | TNamed r -> withAttrs (Ast_attributes.add_list al t.tattr) r.ttype
-    | TPtr bt ->
-      let bt' = unrollTypeDeep bt in
-      let tattr = Ast_attributes.add_list al t.tattr in
-      Cil_const.mk_tptr ~tattr bt'
-    | TArray (bt, l) ->
-      let att_elt, att_typ = Ast_attributes.split_array_attributes al in
-      let bt' = arrayPushAttributes att_elt (unrollTypeDeep bt) in
-      let tattr = Ast_attributes.add_list att_typ t.tattr in
-      Cil_const.mk_tarray ~tattr bt' l
-    | TFun (rt, args, isva) ->
-      let rt' = unrollTypeDeep rt in
-      let args' =
-        match args with
-        | None -> None
-        | Some argl ->
-          Some (List.map (fun (an, at, aa) -> (an, unrollTypeDeep at, aa)) argl)
-      in
-      let tattr = Ast_attributes.add_list al t.tattr in
-      Cil_const.mk_tfun ~tattr rt' args' isva
-    | _ -> typeAddAttributes al t
-  in
-  withAttrs [] t
-
 let is_ghost_else block =
   Ast_attributes.contains Ast_attributes.frama_c_ghost_else block.battrs
 
@@ -378,7 +160,7 @@ and enforceGhostBlockCoherence ?(force_ghost=false) block =
 (* makes sure that the type of a C variable and the type of its associated
    logic variable -if any- stay synchronized. See bts 1538 *)
 let update_var_type v t =
-  v.vtype <- if v.vghost then typeAddGhost t else t;
+  v.vtype <- if v.vghost then Ast_types.add_ghost t else t;
   match v.vlogic_var_assoc with
   | None -> ()
   | Some lv ->
@@ -398,7 +180,7 @@ let makeVarinfo
       vdefined = false;
       vformal = formal;
       vtemp = temp;
-      vtype = if ghost then typeAddGhost typ else typ;
+      vtype = if ghost then Ast_types.add_ghost typ else typ;
       vdecl = loc;
       vinline = false;
       vattr = [];
@@ -439,7 +221,7 @@ let isGhostFormalVarDecl (_name, _type, attr) =
   Ast_attributes.(contains frama_c_ghost_formal attr)
 
 let setFormalsDecl vi typ =
-  match unrollTypeSkel typ with
+  match Ast_types.unroll_skel typ with
   | TFun (_, Some args, _) ->
     let is_ghost d = vi.vghost || isGhostFormalVarDecl d in
     let makeFormalsVarDecl i (n,t,a as x) =
@@ -473,7 +255,7 @@ let setFormals (f: fundec) (forms: varinfo list) =
   unsafeSetFormalsDecl f.svar forms;
   List.iter (fun v -> v.vformal <- true) forms;
   f.sformals <- forms; (* Set the formals *)
-  match unrollType f.svar.vtype with
+  match Ast_types.unroll f.svar.vtype with
   | { tnode = TFun (rt, _, isva); tattr } ->
     let args = Some (List.map (fun a -> (a.vname, a.vtype, a.vattr)) forms) in
     let t' = Cil_const.mk_tfun ~tattr rt args isva in
@@ -2549,14 +2331,15 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
   | IChar | ISChar | IUChar | IBool -> 1
-  | IInt | IUInt -> sizeof_int ()
-  | IShort | IUShort -> sizeof_short ()
-  | ILong | IULong -> sizeof_long ()
-  | ILongLong | IULongLong -> sizeof_longlong ()
+  | IInt | IUInt -> Machine.sizeof_int ()
+  | IShort | IUShort -> Machine.sizeof_short ()
+  | ILong | IULong -> Machine.sizeof_long ()
+  | ILongLong | IULongLong -> Machine.sizeof_longlong ()
 
 let bitsSizeOfInt ik = 8 * bytesSizeOfInt ik
 
 let intKindForSize (s:int) (unsigned:bool) : ikind =
+  let open Machine in
   if unsigned then
     (* Test the most common sizes first *)
     if s = 1 then IUChar
@@ -2582,9 +2365,9 @@ let int32_t  () = Cil_const.mk_tint (intKindForSize 4 false)
 let int16_t  () = Cil_const.mk_tint (intKindForSize 2 false)
 
 let floatKindForSize (s:int) =
-  if s = sizeof_double () then FDouble
-  else if s = sizeof_float () then FFloat
-  else if s = sizeof_longdouble () then FLongDouble
+  if s = Machine.sizeof_double () then FDouble
+  else if s = Machine.sizeof_float () then FFloat
+  else if s = Machine.sizeof_longdouble () then FLongDouble
   else raise Not_found
 
 (** Returns true if and only if the given integer type is signed. *)
@@ -2602,7 +2385,7 @@ let isSigned = function
   | ILongLong ->
     true
   | IChar ->
-    not (char_is_unsigned ())
+    not (Machine.char_is_unsigned ())
 
 let max_signed_number nrBits =
   let n = nrBits-1 in
@@ -2949,12 +2732,12 @@ let dummyInstr = Asm([], ["dummy statement!!"], None, Location.unknown)
 let dummyStmt = mkStmt (Instr dummyInstr)
 
 let isSignedInteger ty =
-  match unrollTypeSkel ty with
+  match Ast_types.unroll_skel ty with
   | TInt ik | TEnum {ekind=ik} -> isSigned ik
   | _ -> false
 
 let isUnsignedInteger ty =
-  match unrollTypeSkel ty with
+  match Ast_types.unroll_skel ty with
   | TInt ik | TEnum {ekind=ik} -> not (isSigned ik)
   | _ -> false
 
@@ -2999,7 +2782,7 @@ let mkFor ?sattr ~(start: stmt list) ~(guard: exp) ~(next: stmt list)
 let mkForIncr ?sattr ~(iter : varinfo) ~(first: exp) ~(stopat: exp) ~(incr: exp)
     ~(body: stmt list) () : stmt list =
   (* See what kind of operator we need *)
-  let nextop = match unrollTypeSkel iter.vtype with
+  let nextop = match Ast_types.unroll_skel iter.vtype with
     | TPtr _ -> PlusPI
     | _ -> PlusA
   in
@@ -3023,211 +2806,13 @@ let rec stripCasts (e: exp) =
 let rec stripTermCasts (t: term) =
   match t.term_node with TCast(_,_, t') -> stripTermCasts t' | _ -> t
 
-let isVoidType t =
-  match unrollTypeSkel t with
-  | TVoid -> true
-  | _ -> false
-
-let isVoidPtrType t =
-  match unrollTypeSkel t with
-  | TPtr tau when isVoidType tau -> true
-  | _ -> false
-
-let isAnyCharType t =
-  match unrollTypeSkel t with
-  | TInt (IChar | ISChar | IUChar) -> true
-  | _ -> false
-
-let isCharType t =
-  match unrollTypeSkel t with
-  | TInt IChar -> true
-  | _ -> false
-
-let isShortType t =
-  match unrollTypeSkel t with
-  | TInt (IUShort | IShort) -> true
-  | _ -> false
-
-let isAnyCharPtrType t =
-  match unrollTypeSkel t with
-  | TPtr tau when isAnyCharType tau -> true
-  | _ -> false
-
-let isCharPtrType t =
-  match unrollTypeSkel t with
-  | TPtr tau when isCharType tau -> true
-  | _ -> false
-
-let isCharConstPtrType t =
-  match unrollType t with
-  | { tnode = TPtr tau; tattr } when isCharType tau ->
-    Ast_attributes.contains "const" tattr
-  | _ -> false
-
-let isIntegralType t =
-  match unrollTypeSkel t with
-  | (TInt _ | TEnum _) -> true
-  | _ -> false
-
-let isIntegralOrPointerType t =
-  match unrollTypeSkel t with
-  | TInt _ | TEnum _ | TPtr _ -> true
-  | _ -> false
-
-(* Don't completely unroll here, as we do not want to identify
-   intptr_t with its supporting integer type. *)
-let rec is_intptr_t t =
-  match t.tnode with
-  | TNamed ti ->
-    ti.tname = "intptr_t" || is_intptr_t ti.ttype
-  | _ -> false
-
-let rec is_uintptr_t  t =
-  match t.tnode with
-  | TNamed ti ->
-    ti.tname = "uintptr_t" || is_uintptr_t ti.ttype
-  | _ -> false
-
-let rec isLogicBooleanType t =
-  match t with
-  | Ctype ty -> isIntegralType ty
-  | Lboolean | Linteger -> true
-  | Ltype (tdef,_) ->
-    ( is_unrollable_ltdef tdef && isLogicBooleanType (unroll_ltdef t))
-  | Lreal | Lvar _ | Larrow _ -> false
-
-let isBoolType typ =
-  match unrollTypeSkel typ with
-  | TInt IBool -> true
-  | _ -> false
-
-let rec isLogicPureBooleanType t =
-  match t with
-  | Ctype t -> isBoolType t
-  | Lboolean -> true
-  | Ltype (def,_) ->
-    (is_unrollable_ltdef def && isLogicPureBooleanType (unroll_ltdef t))
-  | _ -> false
-
-let rec isLogicIntegralType t =
-  match t with
-  | Ctype t -> isIntegralType t
-  | Lboolean -> false
-  | Linteger -> true
-  | Lreal -> false
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isLogicIntegralType (unroll_ltdef ty)
-  | Lvar _ | Ltype _ | Larrow _ -> false
-
-let isFloatingType t =
-  match unrollTypeSkel t with
-  | TFloat _ -> true
-  | _ -> false
-
-let isLogicFloatType t =
-  match t with
-  | Ctype t -> isFloatingType t
-  | Lboolean -> false
-  | Linteger -> false
-  | Lreal -> false
-  | Lvar _ | Ltype _ | Larrow _ -> false
-
-let rec isLogicRealOrFloatType t =
-  match t with
-  | Ctype t -> isFloatingType t
-  | Lboolean -> false
-  | Linteger -> false
-  | Lreal -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isLogicRealOrFloatType (unroll_ltdef ty)
-  | Lvar _ | Ltype _ | Larrow _ -> false
-
-let rec isLogicRealType t =
-  match t with
-  | Ctype _ -> false
-  | Lboolean -> false
-  | Linteger -> false
-  | Lreal -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isLogicRealType (unroll_ltdef ty)
-  | Lvar _ | Ltype _ | Larrow _ -> false
-
-(* ISO 6.2.5.18 *)
-let isArithmeticType t =
-  match unrollTypeSkel t with
-  | (TInt _ | TEnum _ | TFloat _) -> true
-  | _ -> false
-
-let isLongDoubleType t =
-  match unrollTypeSkel t with
-  | TFloat FLongDouble -> true
-  | _ -> false
-
-let rec isLogicArithmeticType t =
-  match t with
-  | Ctype t -> isArithmeticType t
-  | Linteger | Lreal -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isLogicArithmeticType (unroll_ltdef ty)
-  | Lboolean | Lvar _ | Ltype _ | Larrow _ -> false
-
-let isFunctionType t =
-  match unrollTypeSkel t with
-  | TFun _ -> true
-  | _ -> false
-
-(* ISO 6.2.5.1 *)
-let isObjectType t =
-  not (isFunctionType t)
-
-let isLogicFunctionType t = Logic_const.isLogicCType isFunctionType t
-
-let isFunPtrType t =
-  match unrollTypeSkel t with
-  | TPtr t -> isFunctionType t
-  | _ -> false
-
-let isLogicFunPtrType t = Logic_const.isLogicCType isFunPtrType t
-
-let isPointerType t =
-  match unrollTypeSkel t with
-  | TPtr _ -> true
-  | _ -> false
-
-(* ISO 6.2.5.21 *)
-let isScalarType t = isArithmeticType t || isPointerType t
-
-
-(********** TRANSPARENT UNION ******)
-(* Check if a type is a transparent union, and return the first field if it
- * is *)
-let isTransparentUnion (t: typ) : fieldinfo option =
-  match unrollTypeSkel t with
-  | TComp comp when not comp.cstruct ->
-    (* Turn transparent unions into the type of their first field *)
-    if typeHasAttribute "transparent_union" t then begin
-      match comp.cfields with
-      | Some [] | None ->
-        abort_context "Empty transparent union: %s" (compFullName comp)
-      | Some (f :: _) -> Some f
-    end else
-      None
-  | _ -> None
-
-let rec isTypeTagType t =
-  match t with
-  | Ltype ({lt_name = "typetag"},[]) -> true
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isTypeTagType (unroll_ltdef ty)
-  | _ -> false
-
 let getReturnType t =
-  match unrollTypeSkel t with
+  match Ast_types.unroll_skel t with
   | TFun(rt, _, _) -> rt
   | _ -> Kernel.fatal "getReturnType: not a function type"
 
 let setReturnTypeVI (v: varinfo) (t: typ) =
-  match unrollType v.vtype with
+  match Ast_types.unroll v.vtype with
   | { tnode = TFun (_, args, va); tattr } ->
     let t' = Cil_const.mk_tfun ~tattr t args va in
     update_var_type v t'
@@ -3236,28 +2821,12 @@ let setReturnTypeVI (v: varinfo) (t: typ) =
 let setReturnType (f:fundec) (t:typ) =
   setReturnTypeVI f.svar t
 
-let typeOf_pointed typ =
-  match unrollTypeSkel typ with
-  | TPtr typ -> typ
-  | _ -> Kernel.fatal "Not a pointer type %a" !pp_typ_ref typ
-
-let typeOf_array_elem t =
-  match unrollTypeNode t with
-  | TArray (ty_elem, _) -> ty_elem
-  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
-
-let typeOf_array_elem_size t =
-  match unrollTypeNode t with
-  | TArray (ty_elem, arr_size) ->
-    ty_elem, Option.bind !constfoldtoint arr_size
-  | _ -> Kernel.fatal "Not an array type %a" !pp_typ_ref t
-
 let no_op_coerce typ t =
   match typ with
-  | Lreal -> isLogicArithmeticType t.term_type
-  | Linteger -> isLogicIntegralType t.term_type
+  | Lreal -> Ast_types.is_logic_arithmetic t.term_type
+  | Linteger -> Ast_types.is_logic_integral t.term_type
   | Ltype _ when Logic_const.is_boolean_type typ ->
-    isLogicPureBooleanType t.term_type
+    Ast_types.is_logic_pure_boolean t.term_type
   | Ltype ({lt_name="set"},_) -> true
   | _ -> false
 
@@ -3274,10 +2843,10 @@ let rec typeOf (e: exp) : typ =
   (* The type of a string is a pointer to characters ! The only case when
    * you would want it to be an array is as an argument to sizeof, but we
    * have SizeOfStr for that *)
-  | Const(CStr _s) -> string_literal_type ()
+  | Const(CStr _s) -> Machine.string_literal_type ()
 
   | Const(CWStr _s) ->
-    let typ = typeAddAttributes [("const",[])] (wchar_type ()) in
+    let typ = Ast_types.add_attributes [("const",[])] (Machine.wchar_type ()) in
     Cil_const.mk_tptr typ
 
   | Const(CReal (_, fk, _)) -> Cil_const.mk_tfloat fk
@@ -3285,16 +2854,16 @@ let rec typeOf (e: exp) : typ =
   | Const(CEnum {eival=v}) -> typeOf v
 
   (* l-values used as r-values lose their qualifiers (C99 6.3.2.1:2) *)
-  | Lval lv -> type_remove_qualifier_attributes (typeOfLval lv)
+  | Lval lv -> Ast_types.remove_qualifiers (typeOfLval lv)
 
-  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> (sizeof_type ())
-  | AlignOf _ | AlignOfE _ -> (sizeof_type ())
+  | SizeOf _ | SizeOfE _ | SizeOfStr _ -> Machine.sizeof_type ()
+  | AlignOf _ | AlignOfE _ -> Machine.sizeof_type ()
   | UnOp (_, _, t) -> t
   | BinOp (_, _, _, t) -> t
   | CastE (t, _) -> t
   | AddrOf lv -> Cil_const.mk_tptr (typeOfLval lv)
   | StartOf lv ->
-    match unrollType (typeOfLval lv) with
+    match Ast_types.unroll (typeOfLval lv) with
     | { tnode = TArray (t,_); tattr } -> Cil_const.mk_tptr ~tattr t
     | _ ->  Kernel.fatal ~current:true "typeOf: StartOf on a non-array"
 
@@ -3306,7 +2875,7 @@ and typeOfInit (i: init) : typ =
 and typeOfLval = function
   | Var vi, off -> typeOffset vi.vtype off
   | Mem addr, off -> begin
-      match (unrollType (typeOf addr)).tnode with
+      match (Ast_types.unroll (typeOf addr)).tnode with
       | TPtr t -> typeOffset t off
       | _ -> Kernel.fatal ~current:true
                "typeOfLval: Mem on a non-pointer (%a)" !pp_exp_ref addr
@@ -3314,17 +2883,17 @@ and typeOfLval = function
 
 and typeOfLhost = function
   | Var x -> x.vtype
-  | Mem e -> typeOf_pointed (typeOf e)
+  | Mem e -> Ast_types.direct_pointed_type (typeOf e)
 
 and typeOffset basetyp = function
     NoOffset -> basetyp
   | Index (_, o) -> begin
-      match unrollTypeNode basetyp with
+      match Ast_types.unroll_node basetyp with
       | TArray (t, _) -> typeOffset t o
       | _ -> Kernel.fatal ~current:true "typeOffset: Index on a non-array"
     end
   | Field (fi, o) ->
-    match unrollType basetyp with
+    match Ast_types.unroll basetyp with
     | { tnode = TComp _; tattr } ->
       let attrs = Ast_attributes.filter_qualifiers tattr in
       (* if the field is mutable, it can written to even if it is
@@ -3336,7 +2905,7 @@ and typeOffset basetyp = function
           Ast_attributes.drop "const" attrs
         else attrs
       in
-      typeOffset (typeAddAttributes attrs fi.ftype) o
+      typeOffset (Ast_types.add_attributes attrs fi.ftype) o
     | basetyp ->
       Kernel.fatal ~current:true
         "typeOffset: Field %s on a non-compound type '%a'"
@@ -3354,7 +2923,7 @@ let rec typeOfTermLval = function
   | TMem addr, off -> begin
       let rec type_of_pointed = function
         | Ctype typ ->
-          begin match unrollTypeSkel typ with
+          begin match Ast_types.unroll_skel typ with
             | TPtr t -> typeTermOffset (Ctype t) off
             | _ ->
               Kernel.fatal ~current:true
@@ -3383,7 +2952,7 @@ and typeTermOffset basetyp =
       Ast_attributes.partition ~default:(AttrName false) baseAttrs in
     let rec putAttributes = function
       | Ctype typ ->
-        Ctype (typeAddAttributes contagious typ)
+        Ctype (Ast_types.add_attributes contagious typ)
       | Lboolean | Linteger | Lreal ->
         Kernel.fatal ~current:true
           "typeTermOffset: Attribute on a logic type"
@@ -3407,7 +2976,7 @@ and typeTermOffset basetyp =
       let rec elt_type basetyp =
         match basetyp with
         | Ctype typ ->
-          begin match unrollType typ with
+          begin match Ast_types.unroll typ with
             | { tnode = TArray (t, _); tattr } ->
               let elementType = typeTermOffset (Ctype t) o in
               blendAttributes tattr elementType
@@ -3431,7 +3000,7 @@ and typeTermOffset basetyp =
   | TField (fi, o) ->
     let rec elt_type = function
       | Ctype typ ->
-        begin match unrollType typ with
+        begin match Ast_types.unroll typ with
           | { tnode = TComp _; tattr } ->
             let fieldType = typeTermOffset (Ctype fi.ftype) o in
             blendAttributes tattr fieldType
@@ -3449,43 +3018,15 @@ and typeTermOffset basetyp =
 
 (**** Check for const attribute ****)
 
-let isConstType typ_lval = typeHasAttributeMemoryBlock "const" typ_lval
-
 let isGlobalInitConst vi =
   (* Note: the type must be fully const, not a part of it *)
-  vi.vglob && vi.vstorage <> Extern && typeHasQualifier "const" vi.vtype
+  vi.vglob && vi.vstorage <> Extern && Ast_types.has_qualifier "const" vi.vtype
 
 (**** Check for volatile attribute ****)
 
-let isVolatileType typ_lval = typeHasAttributeMemoryBlock "volatile" typ_lval
-
-let rec isVolatileLogicType = function
-  | Ctype typ -> isVolatileType typ
-  | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> false
-  | Ltype (tdef,_) as ty when is_unrollable_ltdef tdef ->
-    isVolatileLogicType (unroll_ltdef ty)
-  | Ltype _ -> false
-
-let isVolatileLval lv = isVolatileType (typeOfLval lv)
+let isVolatileLval lv = Ast_types.is_volatile (typeOfLval lv)
 let isVolatileTermLval lv =
-  Logic_const.plain_or_set isVolatileLogicType (typeOfTermLval lv)
-
-(**** Check for ghost attribute ****)
-
-let isGhostType typ_lval = typeHasAttributeMemoryBlock "ghost" typ_lval
-
-let rec isWFGhostType t =
-  isWFGhostType' (unrollTypeDeep t)
-and isWFGhostType' t =
-  if not (isGhostType t) then isWFNonGhostType t
-  else match t.tnode with
-    | TPtr t | TArray (t, _) -> isWFGhostType' t
-    | _ -> true
-and isWFNonGhostType t =
-  if isGhostType t then false
-  else match t.tnode with
-    | TPtr t | TArray (t, _) -> isWFNonGhostType t
-    | _ -> true
+  Logic_const.plain_or_set Ast_types.is_logic_volatile (typeOfTermLval lv)
 
 (**** MACHINE DEPENDENT PART ****)
 
@@ -3547,9 +3088,10 @@ let find_sizeof t f =
 let selfTypSize = TypSize.self
 
 (* Some basic type utilities *)
-let rank : ikind -> int = function
+let rank : ikind -> int =
+  function
   (* these are just unique numbers representing the integer
-     conversion rank. *)
+      conversion rank. *)
   | IBool | IChar | ISChar | IUChar -> 1
   | IShort | IUShort -> 2
   | IInt | IUInt -> 3
@@ -3625,6 +3167,7 @@ let ignoreAlignmentAttrs = ref false
 
 (* Get the minimum alignment in bytes for a given type *)
 let rec bytesAlignOf t =
+  let open Machine in
   let alignOfType () =
     match t.tnode with
     | TInt (IChar|ISChar|IUChar|IBool) -> 1
@@ -3671,7 +3214,7 @@ let rec bytesAlignOf t =
   in
   process_aligned_attribute ~may_reduce:true
     (fun fmt -> !pp_typ_ref fmt t)
-    (typeAttrs t) alignOfType
+    (Ast_types.get_attributes t) alignOfType
 
 (* Alignment of a possibly-packed or aligned struct field.
    From the GCC manual (https://gcc.gnu.org/onlinedocs/gcc/Common-Type-Attributes.html):
@@ -3779,7 +3322,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     if rest <> [] then
       Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
         pp;
-    alignof_aligned ()
+    Machine.alignof_aligned ()
   | at::_ ->
     Kernel.warning ~current:true "alignment attribute \"%a\" not understood on %t"
       !pp_attribute_ref at pp;
@@ -3789,14 +3332,14 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
    computed for the previous fields. [last] indicates that we are considering
    the last field of the struct. Set to [false] by default for unions. *)
 and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
-  if msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
+  if Machine.msvcMode () then offsetOfFieldAcc_MSVC last fi sofar
   else offsetOfFieldAcc_GCC last fi sofar
 
 (* GCC version *)
 (* Does not use the sofar.oaPrevBitPack *)
 and offsetOfFieldAcc_GCC last (fi: fieldinfo) (sofar: offsetAcc) : offsetAcc =
   (* field type *)
-  let ftype = unrollType fi.ftype in
+  let ftype = Ast_types.unroll fi.ftype in
   let ftypeAlign = 8 * alignOfField fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype, fi.fbitfield with
@@ -3843,7 +3386,7 @@ and offsetOfFieldAcc_GCC last (fi: fieldinfo) (sofar: offsetAcc) : offsetAcc =
 and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
     (sofar: offsetAcc) : offsetAcc =
   (* field type *)
-  let ftype = unrollType fi.ftype in
+  let ftype = Ast_types.unroll fi.ftype in
   let ftypeAlign = 8 * alignOfField fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype.tnode, fi.fbitfield, sofar.oaPrevBitPack with
@@ -3926,7 +3469,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
 (** This is a special version of [bitsSizeOf] that accepts empty arrays.
     Currently, we only use it for flexible array members *)
 and bitsSizeOfEmptyArray typ =
-  match unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TArray (_, None) -> 0
   | TArray (_, Some e) -> begin
       match constFoldToInt e with
@@ -3944,18 +3487,18 @@ and bitsSizeOfEmptyArray typ =
 and bitsSizeOf t =
   match t.tnode with
   | TInt ik            -> 8 * (bytesSizeOfInt ik)
-  | TFloat FDouble     -> 8 * sizeof_double ()
-  | TFloat FLongDouble -> 8 * sizeof_longdouble ()
-  | TFloat _           -> 8 * sizeof_float ()
+  | TFloat FDouble     -> 8 * Machine.sizeof_double ()
+  | TFloat FLongDouble -> 8 * Machine.sizeof_longdouble ()
+  | TFloat _           -> 8 * Machine.sizeof_float ()
   | TEnum ei           -> bitsSizeOf (Cil_const.mk_tint ei.ekind)
-  | TPtr _             -> 8 * sizeof_ptr ()
-  | TBuiltin_va_list   -> 8 * sizeof_ptr ()
+  | TPtr _             -> 8 * Machine.sizeof_ptr ()
+  | TBuiltin_va_list   -> 8 * Machine.sizeof_ptr ()
   | TNamed t           -> bitsSizeOf t.ttype
   | TComp ({cfields=None} as comp) ->
     raise
       (SizeOfError
          (Format.sprintf "abstract type '%s'" (compFullName comp), t))
-  | TComp {cfields=Some[]} when acceptEmptyCompinfo() ->
+  | TComp {cfields=Some[]} when Machine.acceptEmptyCompinfo() ->
     find_sizeof t (fun () -> t,0)
   | TComp ({cfields=Some[]} as comp) ->
     find_sizeof t
@@ -3979,7 +3522,7 @@ and bitsSizeOf t =
              (fun ~last acc fi -> offsetOfFieldAcc ~last ~fi ~sofar:acc)
              startAcc (Option.get comp.cfields) (* Note: we treat None above *)
          in
-         if msvcMode () && lastoff.oaFirstFree = 0
+         if Machine.msvcMode () && lastoff.oaFirstFree = 0
          then
            (* On MSVC if we have just a zero-width bitfields then the length
             * is 32 and is not padded  *)
@@ -4032,13 +3575,13 @@ and bitsSizeOf t =
              raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
   | TVoid ->
-    if sizeof_void () >= 0 then
-      8 * sizeof_void ()
+    if Machine.sizeof_void () >= 0 then
+      8 * Machine.sizeof_void ()
     else
       raise (SizeOfError ("Undefined sizeof(void).", t))
   | TFun _ ->
-    if sizeof_fun () >= 0 then
-      8 * sizeof_fun ()
+    if Machine.sizeof_fun () >= 0 then
+      8 * Machine.sizeof_fun ()
     else
       raise (SizeOfError ("Undefined sizeof on a function.", t))
 
@@ -4097,13 +3640,13 @@ and bitsOffset (baset: typ) (off: offset) : int * int =
           | Some i -> Integer.to_int_exn i
           | None -> raise (SizeOfError ("Index is not constant", baset))
         in
-        let bt = typeOf_array_elem baset in
+        let bt = Ast_types.direct_element_type baset in
         let bitsbt = bitsSizeOf bt in
         loopOff bt bitsbt (start + ei * bitsbt) off
       end
     | Field(f, off) ->
       if check_invariants then
-        (match unrollTypeSkel baset with
+        (match Ast_types.unroll_skel baset with
          | TComp ci -> assert (ci == f.fcomp)
          | _ -> assert false);
       let offsbits, size = fieldBitsOffset f in
@@ -4121,9 +3664,9 @@ and constFold (machdep: bool) (e: exp) : exp =
   let loc = e.eloc in
   match e.enode with
   | BinOp (bop, e1, e2, tres) -> constFoldBinOp ~loc machdep bop e1 e2 tres
-  | UnOp (unop, e1, tres) when isIntegralType tres -> begin
+  | UnOp (unop, e1, tres) when Ast_types.is_integral tres -> begin
       let tk =
-        match unrollTypeSkel tres with
+        match Ast_types.unroll_skel tres with
         | TInt ik  -> ik
         | TEnum ei -> ei.ekind
         | _ -> assert false (* tres is an integral type *)
@@ -4142,9 +3685,9 @@ and constFold (machdep: bool) (e: exp) : exp =
         end
       | _ -> if e1 == e1c then e else new_exp ~loc (UnOp(unop, e1c, tres))
     end
-  | UnOp (unop, e1, tres) when isArithmeticType tres -> begin
+  | UnOp (unop, e1, tres) when Ast_types.is_arithmetic tres -> begin
       let tk =
-        match unrollTypeSkel tres with
+        match Ast_types.unroll_skel tres with
         | TFloat fk -> fk
         | _ -> assert false (*tres is arithmetic but not integral, i.e. Float *)
       in
@@ -4164,28 +3707,28 @@ and constFold (machdep: bool) (e: exp) : exp =
   | Const (CReal _ | CWStr _ | CStr _ | CInt64 _) -> e (* a constant *)
   | SizeOf t when machdep ->
     begin
-      try kinteger ~loc (sizeof_kind ()) (bytesSizeOf t)
+      try kinteger ~loc (Machine.sizeof_kind ()) (bytesSizeOf t)
       with SizeOfError _ -> e
     end
   | SizeOfE { enode = Const (CWStr l) } when machdep ->
     let len = List.length l in
-    let wchar_size = bitsSizeOfInt (wchar_kind ()) / 8 in
-    kinteger ~loc (sizeof_kind ()) ((len + 1) * wchar_size)
+    let wchar_size = bitsSizeOfInt (Machine.wchar_kind ()) / 8 in
+    kinteger ~loc (Machine.sizeof_kind ()) ((len + 1) * wchar_size)
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
   | SizeOfStr s when machdep ->
-    kinteger ~loc (sizeof_kind ()) (1 + String.length s)
+    kinteger ~loc (Machine.sizeof_kind ()) (1 + String.length s)
   | AlignOf t when machdep ->
     begin
-      try kinteger ~loc (sizeof_kind ()) (bytesAlignOf t)
+      try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf t)
       with SizeOfError _ -> e
     end
   | AlignOfE e when machdep -> begin
       (* The alignment of an expression is not always the alignment of its
        * type. I know that for strings this is not true *)
       match e.enode with
-      | Const (CStr _) when not (msvcMode ()) ->
-        kinteger ~loc (sizeof_kind ()) (alignof_str ())
+      | Const (CStr _) when not (Machine.msvcMode ()) ->
+        kinteger ~loc (Machine.sizeof_kind ()) (Machine.alignof_str ())
       (* For an array, it is the alignment of the array ! *)
       | _ -> constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
     end
@@ -4195,7 +3738,7 @@ and constFold (machdep: bool) (e: exp) : exp =
   | CastE (t, e) -> begin
       Kernel.debug ~dkey "ConstFold CAST to %a@." !pp_typ_ref t ;
       let e = constFold machdep e in
-      let t' = unrollType t in
+      let t' = Ast_types.unroll t in
       match e.enode, t'.tnode with
       | Const (CInt64(i,_k,_)), (TInt nk | TEnum {ekind = nk})
         when Ast_attributes.(drop_list fc_internal_attributes t'.tattr) = [] ->
@@ -4251,7 +3794,7 @@ and constFoldOffset machdep = function
 and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
   let e1' = constFold machdep e1 in
   let e2' = constFold machdep e2 in
-  if isIntegralType tres then begin
+  if Ast_types.is_integral tres then begin
     let newe =
       let rec mkInt e =
         let loc = e.eloc in
@@ -4259,7 +3802,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         | Const(CChr c) -> new_exp ~loc (Const(charConstToIntConstant c))
         | Const(CEnum {eival = v}) -> mkInt v
         | CastE(typ, e') -> begin
-            match unrollType typ with
+            match Ast_types.unroll typ with
             | { tnode = TInt ik } as t -> begin
                 let e = mkInt e' in
                 match e.enode with
@@ -4271,7 +3814,7 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
         | _ -> e
       in
       let tk =
-        match unrollTypeSkel tres with
+        match Ast_types.unroll_skel tres with
         | TInt ik  -> ik
         | TEnum ei -> ei.ekind
         | _ -> Kernel.fatal ~current:true "constFoldBinOp"
@@ -4411,9 +3954,10 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
       !pp_exp_ref (new_exp ~loc (BinOp(bop, e1', e2', tres)))
       !pp_exp_ref newe;
     newe
-  end else if isArithmeticType tres && not (isLongDoubleType tres) then begin
+  end
+  else if Ast_types.(is_arithmetic tres && not (is_long_double tres)) then begin
     let tk =
-      match unrollTypeSkel tres with
+      match Ast_types.unroll_skel tres with
       | TFloat fk -> fk
       | _ -> Kernel.fatal "constFoldBinOp: not a floating type"
     in
@@ -4434,16 +3978,16 @@ and constFoldBinOp ~loc (machdep: bool) bop e1 e2 tres =
 and constFoldToInt ?(machdep=true) e =
   match (constFold machdep e).enode with
   | Const(CInt64(c,_,_)) -> Some c
-  | CastE (typ, e) when machdep && isPointerType typ -> begin
+  | CastE (typ, e) when machdep && Ast_types.is_ptr typ -> begin
       (* Those casts are left left by constFold *)
       match constFoldToInt ~machdep e with
       | None -> None
-      | Some i as r -> if fitsInInt (uintptr_kind ()) i then r else None
+      | Some i as r -> if fitsInInt (Machine.uintptr_kind ()) i then r else None
     end
   | _ -> None
 
 let bitsSizeOfBitfield typlv =
-  match unrollType typlv with
+  match Ast_types.unroll typlv with
   | { tnode = TInt _; tattr } | { tnode = TEnum _; tattr } as t ->
     (match Ast_attributes.(find_params bitfield_attribute_name tattr) with
      | [AInt i] -> Integer.to_int_exn i
@@ -4564,23 +4108,9 @@ let mk_behavior ?(name=default_behavior_name) ?(assumes=[]) ?(requires=[])
     b_extended = extended;
   }
 
-let type_remove_attributes_for_c_cast t =
-  let attributes_to_remove =
-    Ast_attributes.(fc_internal_attributes @ cast_irrelevant_attributes)
-  in
-  let t = typeRemoveAttributesDeep attributes_to_remove t in
-  typeRemoveAttributes Ast_attributes.spare_attributes_for_c_cast t
-
-let type_remove_attributes_for_logic_type t =
-  let attributes_to_remove =
-    Ast_attributes.(fc_internal_attributes @ cast_irrelevant_attributes)
-  in
-  let t = typeRemoveAttributesDeep attributes_to_remove t in
-  typeRemoveAttributes Ast_attributes.spare_attributes_for_logic_cast t
-
 let need_cast ?(force=false) oldt newt =
-  let oldt = type_remove_attributes_for_c_cast (unrollType oldt) in
-  let newt = type_remove_attributes_for_c_cast (unrollType newt) in
+  let oldt = Ast_types.(remove_attributes_for_c_cast (unroll oldt)) in
+  let newt = Ast_types.(remove_attributes_for_c_cast (unroll newt)) in
   not (Cil_datatype.Typ.equal oldt newt) &&
   (force ||
    match oldt, newt with
@@ -4661,7 +4191,7 @@ let makeTempVar fdec ?insert ?ghost ?(name = "__cil_tmp") ?descr ?(descrpure = t
 (* Set the types of arguments and results as given by the function type
  * passed as the second argument *)
 let setFunctionType (f: fundec) (t: typ) =
-  match unrollTypeSkel t with
+  match Ast_types.unroll_skel t with
   | TFun (_rt, Some args, _va) ->
     if List.length f.sformals <> List.length args then
       Kernel.fatal ~current:true "setFunctionType: number of arguments differs from the number of formals" ;
@@ -4678,7 +4208,7 @@ let setFunctionType (f: fundec) (t: typ) =
 (* Set the types of arguments and results as given by the function type
    passed as the second argument *)
 let setFunctionTypeMakeFormals (f: fundec) (t: typ) =
-  match unrollTypeNode t with
+  match Ast_types.unroll_node t with
   | TFun (_rt, Some args, _va) ->
     if f.sformals <> [] then
       Kernel.fatal ~current:true "setFunctionTypMakeFormals called on function %s with some formals already"
@@ -4954,7 +4484,7 @@ let findOrCreateFunc (f:file) (name:string) (t:typ) : varinfo =
          with that name." name ;
     | _ :: rest -> search rest (* tail recursive *)
     | [] -> (*not found, so create one *)
-      let t' = unrollTypeDeep t in
+      let t' = Ast_types.unroll_deep t in
       let new_decl = makeGlobalVar ~temp:false name t' in
       setFormalsDecl new_decl t';
       f.globals <- GFunDecl(empty_funspec (), new_decl, Location.unknown) :: f.globals;
@@ -5070,7 +4600,7 @@ let global_annotation_attributes = function
   | Dextended (_,attrs,_) -> attrs
 
 let global_attributes = function
-  | GType ({ttype},_) -> typeAttrs ttype
+  | GType ({ttype},_) -> Ast_types.get_attributes ttype
   | GCompTag({cattr = attrs},_) | GCompTagDecl({cattr = attrs},_)
   | GEnumTag({eattr = attrs},_) | GEnumTagDecl({eattr = attrs},_)
   | GVarDecl({vattr = attrs},_) | GVar({vattr = attrs},_,_) -> attrs
@@ -5231,7 +4761,7 @@ let mkAddrOf ~loc ((_b, _off) as lval) : exp =
 let mkAddrOfVi vi = mkAddrOf ~loc:vi.vdecl (var vi)
 
 let mkAddrOrStartOf ~loc (lv: lval) : exp =
-  match unrollTypeSkel (typeOfLval lv) with
+  match Ast_types.unroll_skel (typeOfLval lv) with
   | TArray _ -> new_exp ~loc (StartOf lv)
   | _ -> mkAddrOf ~loc lv
 
@@ -5302,19 +4832,19 @@ let has_extern_local_init b =
   end
 
 let instr_falls_through = function
-  | Call (_, f, _, _) -> not (typeHasAttribute "noreturn" (typeOf f))
+  | Call (_, f, _, _) -> not (Ast_types.has_attribute "noreturn" (typeOf f))
   | _ -> true
 
 let splitFunctionType (ftype: typ)
   : typ * (string * typ * attributes) list option * bool * attributes =
-  match unrollType ftype with
+  match Ast_types.unroll ftype with
   | { tnode = TFun (rt, args, isva); tattr } -> rt, args, isva, tattr
   | _ -> Kernel.fatal ~current:true "splitFunctionType invoked on a non function type %a"
            !pp_typ_ref ftype
 
 let splitFunctionTypeVI (fvi: varinfo)
   : typ * (string * typ * attributes) list option * bool * attributes =
-  match unrollType fvi.vtype with
+  match Ast_types.unroll fvi.vtype with
   | { tnode = TFun (rt, args, isva); tattr } -> rt, args, isva, tattr
   | _ -> Kernel.abort "Function %s invoked on a non function type" fvi.vname
 
@@ -5331,7 +4861,7 @@ let remove_attributes_for_integral_promotion a =
 
 let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
   let open Cil_const in
-  match unrollType t with
+  match Ast_types.unroll t with
   | { tnode = TInt (IShort|ISChar|IBool); tattr } ->
     let tattr = remove_attributes_for_integral_promotion tattr in
     mk_tint ~tattr IInt
@@ -5367,7 +4897,7 @@ let rec integralPromotion t = (* c.f. ISO 6.3.1.1 *)
 let arithmeticConversion t1 t2 = (* c.f. ISO 6.3.1.8 *)
   let checkToInt _ = () in  (* dummies for now *)
   let checkToFloat _ = () in
-  match unrollTypeSkel t1, unrollTypeSkel t2 with
+  match Ast_types.unroll_skel t1, Ast_types.unroll_skel t2 with
   | TFloat FLongDouble, _ -> checkToFloat t2; t1
   | _, TFloat FLongDouble -> checkToFloat t1; t2
   | TFloat FDouble, _ -> checkToFloat t2; t1
@@ -5377,7 +4907,7 @@ let arithmeticConversion t1 t2 = (* c.f. ISO 6.3.1.8 *)
   | _, _ -> begin
       let t1' = integralPromotion t1 in
       let t2' = integralPromotion t2 in
-      match unrollTypeSkel t1', unrollTypeSkel t2' with
+      match Ast_types.unroll_skel t1', Ast_types.unroll_skel t2' with
       | TInt IULongLong, _ -> checkToInt t2'; t1'
       | _, TInt IULongLong -> checkToInt t1'; t2'
 
@@ -5413,40 +4943,6 @@ let arithmeticConversion t1 t2 = (* c.f. ISO 6.3.1.8 *)
           !pp_typ_ref (Cil_const.mk_typ n1) !pp_typ_ref (Cil_const.mk_typ n2)
     end
 
-let isArrayType t = match unrollTypeSkel t with
-  | TArray _ -> true
-  | _ -> false
-
-let isUnsizedArrayType t = match unrollTypeSkel t with
-  | TArray (_, None) -> true
-  | _ -> false
-
-let isSizedArrayType t = match unrollTypeSkel t with
-  | TArray (_, Some _) -> true
-  | _ -> false
-
-let isAnyCharArrayType t = match unrollTypeSkel t with
-  | TArray(tau, _) when isAnyCharType tau -> true
-  | _ -> false
-
-let isCharArrayType t = match unrollTypeSkel t with
-  | TArray(tau, _) when isCharType tau -> true
-  | _ -> false
-
-let isStructType t = match unrollTypeSkel t with
-  | TComp comp -> comp.cstruct
-  | _ -> false
-
-let isUnionType t = match unrollTypeSkel t with
-  | TComp comp -> not comp.cstruct
-  | _ -> false
-
-let isStructOrUnionType t = isStructType t || isUnionType t
-
-let isVariadicListType t = match unrollTypeSkel t with
-  | TBuiltin_va_list -> true
-  | _ -> false
-
 let rec isConstantGen is_varinfo_cst f e = match e.enode with
   | Const c -> f c
   | UnOp (_, e, _) -> isConstantGen is_varinfo_cst f e
@@ -5455,14 +4951,14 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
     isConstantGen is_varinfo_cst f e2
   | Lval (Var vi, NoOffset) ->
     is_varinfo_cst vi ||
-    (vi.vglob && isArrayType vi.vtype) ||
-    isFunctionType vi.vtype
+    (vi.vglob && Ast_types.is_array vi.vtype) ||
+    Ast_types.is_fun vi.vtype
   | Lval (Var vi, offset) ->
     is_varinfo_cst vi && isConstantOffsetGen is_varinfo_cst f offset
   | Lval _ -> false
   | SizeOf _ | SizeOfE _ | SizeOfStr _ | AlignOf _ | AlignOfE _ -> true
   (* see ISO 6.6.6 *)
-  | CastE(t,{ enode = Const(CReal _)}) when isIntegralType t -> true
+  | CastE(t,{ enode = Const(CReal _)}) when Ast_types.is_integral t -> true
   | CastE(t, e) ->
     begin
       match t.tnode, (typeOf e).tnode with
@@ -5471,7 +4967,7 @@ let rec isConstantGen is_varinfo_cst f e = match e.enode with
            to be constant. If it is truncated, we consider it non-const
            in any case.
         *)
-        bytesSizeOfInt (uintptr_kind ()) <= bytesSizeOfInt i &&
+        bytesSizeOfInt (Machine.uintptr_kind ()) <= bytesSizeOfInt i &&
         isConstantGen is_varinfo_cst f e
       | _ -> isConstantGen is_varinfo_cst f e
     end
@@ -5506,7 +5002,7 @@ let getCompField cinfo fieldName =
     (Option.value ~default:[] cinfo.cfields)
 
 let getCompType typ =
-  match unrollTypeSkel typ with
+  match Ast_types.unroll_skel typ with
   | TComp comp -> comp
   | _ -> raise Not_found
 
@@ -5588,7 +5084,7 @@ let included_qualifiers ?(context=Identical) a1 a2 =
 (* precondition: t1 and t2 must be "compatible" as per combineTypes, i.e.
    you must have called [combineTypes t1 t2] before calling this function. *)
 let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
-  let t1 = unrollType t1 and t2 = unrollType t2 in
+  let t1 = Ast_types.unroll t1 and t2 = Ast_types.unroll t2 in
   match t1.tnode, t2.tnode with
   | TFun (tres1, Some args1, _), TFun (tres2, Some args2, _) ->
     have_compatible_qualifiers_deep
@@ -5603,18 +5099,21 @@ let rec have_compatible_qualifiers_deep ?(context=Identical) t1 t2 =
     (included_qualifiers ~context t1.tattr t2.tattr) &&
     let context = qualifier_context_ptr context in
     have_compatible_qualifiers_deep ~context t1' t2'
-  | _, _ -> included_qualifiers ~context (typeAttrs t1) (typeAttrs t2)
+  | _, _ ->
+    included_qualifiers ~context
+      (Ast_types.get_attributes t1)
+      (Ast_types.get_attributes t2)
 
 
 let rec is_nullptr e =
   match e.enode with
   | Const (CInt64 (i,_,_)) -> Integer.is_zero i
-  | CastE (t,e) when isPointerType t -> is_nullptr e
+  | CastE (t,e) when Ast_types.is_ptr t -> is_nullptr e
   | _ -> false
 
 (* true if the expression is known to be a boolean result, i.e. 0 or 1. *)
 let rec is_boolean_result e =
-  (isBoolType (typeOf e)) ||
+  (Ast_types.is_bool (typeOf e)) ||
   match e.enode with
   | Const _ ->
     (match isInteger e with
@@ -5701,7 +5200,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
   | TInt oldik, TInt ik ->
     let result k oldk = if rank oldk<rank k then k else oldk in
     let check_gcc_mode oldk k =
-      if gccMode () && oldk == IInt &&
+      if Machine.gccMode () && oldk == IInt &&
          bytesSizeOf t <= bytesSizeOfInt IInt &&
          (what = CombineFunarg true || what = CombineFunret)
       then k
@@ -5742,7 +5241,7 @@ let combineTypesGen ?emitwith (combF : combineFunction)
   | TFloat oldfk, TFloat fk ->
     let combineFK oldk k =
       if oldk == k then oldk else
-      if gccMode () && oldk == FDouble && k == FFloat
+      if Machine.gccMode () && oldk == FDouble && k == FFloat
          && (what = CombineFunarg true || what = CombineFunret)
       then k
       else
@@ -5880,14 +5379,14 @@ let combineTypesGen ?emitwith (combF : combineFunction)
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes what oldt ti.ttype
     in
-    typeAddAttributes ~combine:(combineAttributes what) t.tattr res
+    Ast_types.add_attributes ~combine:(combineAttributes what) t.tattr res
 
   | TNamed oldti, _ ->
     let res =
       combF.typ_combine combF
         ~strictInteger ~strictReturnTypes what oldti.ttype t
     in
-    typeAddAttributes ~combine:(combineAttributes what) oldt.tattr res
+    Ast_types.add_attributes ~combine:(combineAttributes what) oldt.tattr res
 
   | _ ->
     raise
@@ -5945,14 +5444,15 @@ let areCompatibleTypes ?strictReturnTypes ?context t1 t2 =
 let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
   let dkey = Kernel.dkey_typing_cast in
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
-  let error msg = abort_context ("%s " ^^ msg) origin in
+  let error msg = Errorloc.abort_context ("%s " ^^ msg) origin in
   let rec default_rec oldt newt =
-    let oldt' = unrollType oldt in
-    let newt' = unrollType newt in
+    let oldt' = Ast_types.unroll oldt in
+    let newt' = Ast_types.unroll newt in
     match oldt'.tnode, newt'.tnode with
     | TNamed _, _
-    | _, TNamed _ -> Kernel.fatal ~current:true "unrollType failed in checkCast"
-    | _, TInt IBool when isScalarType oldt' -> ()
+    | _, TNamed _ ->
+      Kernel.fatal ~current:true "Ast_types.unroll failed in checkCast"
+    | _, TInt IBool when Ast_types.is_scalar oldt' -> ()
     | TInt _, TInt _ -> ()
     | TFloat _, TInt _ -> (* ISO 6.3.1.4.1 *) ()
     | TInt _, TFloat _ -> (* ISO 6.3.1.4.2 *) ()
@@ -5970,21 +5470,21 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       (* ISO 6.3.2.2 *)
       Kernel.debug ~level:3
         "Casting a value into void: expr is evaluated for side effects"
-    | TPtr t, TPtr { tnode = TVoid } when isObjectType t ->
+    | TPtr t, TPtr { tnode = TVoid } when Ast_types.is_object t ->
       (* ISO 6.3.2.3.1 *) ()
-    | TPtr { tnode = TVoid }, TPtr t when isObjectType t ->
+    | TPtr { tnode = TVoid }, TPtr t when Ast_types.is_object t ->
       (* ISO 6.3.2.3.1 *) ()
     | TInt _, TPtr _ -> (* ISO 6.3.2.3.5 *) ()
     | TPtr _, TInt _ -> (* ISO 6.3.2.3.6 *)
-      if not fromsource && newt != uintptr_type ()
+      if not fromsource && newt != Machine.uintptr_type ()
       then
         Kernel.warning
           ~wkey:Kernel.wkey_int_conversion
           ~current:true
           "Conversion from a pointer to an integer without an explicit cast"
-    | TPtr t1, TPtr t2 when isObjectType t1 && isObjectType t2 ->
+    | TPtr t1, TPtr t2 when Ast_types.is_object t1 && Ast_types.is_object t2 ->
       (* ISO 6.3.2.3.7 *) ()
-    | TPtr t1, TPtr t2 when isFunctionType t1 && isFunctionType t2 ->
+    | TPtr t1, TPtr t2 when Ast_types.is_fun t1 && Ast_types.is_fun t2 ->
       (* ISO 6.3.2.3.8 *)
       if not (areCompatibleTypes ?context oldt newt)
       then
@@ -6025,16 +5525,16 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
           Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
 
     (* pointer to potential function type. Note that we do not
-       use unrollTypeDeep above in order to avoid needless divergence with
+       use unroll_typeDeep above in order to avoid needless divergence with
        original type in the sources.
     *)
     | TPtr { tnode = TFun _ }, TPtr { tnode = TNamed ti; tattr } ->
-      let t' = typeAddAttributes tattr ti.ttype in
+      let t' = Ast_types.add_attributes tattr ti.ttype in
       let t'' = Cil_const.mk_tptr ~tattr:newt'.tattr t' in
       default_rec t'' newt
 
     | TPtr { tnode = TNamed ti; tattr }, TPtr { tnode = TFun _ } ->
-      let t' = typeAddAttributes tattr ti.ttype in
+      let t' = Ast_types.add_attributes tattr ti.ttype in
       let t'' = Cil_const.mk_tptr ~tattr:oldt'.tattr t' in
       default_rec t'' newt
 
@@ -6045,24 +5545,24 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 
     (* No other conversion implying a pointer to function
           and a pointer to object are supported. *)
-    | TPtr t1, TPtr t2 when isFunctionType t1 && isObjectType t2 ->
+    | TPtr t1, TPtr t2 when Ast_types.is_fun t1 && Ast_types.is_object t2 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
           "casting function to %a" Cil_datatype.Typ.pretty newt
-    | TPtr t1, TPtr t2 when isFunctionType t2 && isObjectType t1 ->
+    | TPtr t1, TPtr t2 when Ast_types.is_fun t2 && Ast_types.is_object t1 ->
       if not nullptr_cast then
         Kernel.warning
           ~wkey:Kernel.wkey_incompatible_pointer_types
           ~current:true
           "casting function from %a" Cil_datatype.Typ.pretty oldt
 
-    | _, TPtr t1 when isFunctionType t1 ->
+    | _, TPtr t1 when Ast_types.is_fun t1 ->
       error "cannot cast %a to function type"
         Cil_datatype.Typ.pretty oldt
 
-    | _, _ when isArithmeticType oldt' && isArithmeticType newt' ->
+    | _, _ when Ast_types.is_arithmetic oldt' && Ast_types.is_arithmetic newt' ->
       (* ISO 6.5.16.1.1#1 *) ()
 
 
@@ -6076,7 +5576,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
        that into a field access *)
     | TComp _, _ ->
       begin
-        match isTransparentUnion oldt with
+        match Ast_types.is_transparent_union oldt with
         | None ->
           error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
@@ -6089,7 +5589,7 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
       Kernel.debug ~dkey ~current:true
         "Casting %a to __builtin_va_list" Cil_datatype.Typ.pretty oldt
 
-    | _, _ when fromsource && not (isScalarType newt') ->
+    | _, _ when fromsource && not (Ast_types.is_scalar newt') ->
       (* ISO 6.5.4.2 *)
       error "cast over a non-scalar type %a" Cil_datatype.Typ.pretty newt
 
@@ -6101,12 +5601,14 @@ let checkCast ?context ?(nullptr_cast=false) ?(fromsource=false) =
 let rec castReduce fromsource force =
   let dkey = Kernel.dkey_typing_cast in
   let origin = if fromsource then "explicit cast:" else " implicit cast:" in
-  let error msg = abort_context ("%s " ^^ msg) origin in
+  let error msg = Errorloc.abort_context ("%s " ^^ msg) origin in
   let rec rec_default oldt newt e =
     let loc = e.eloc in
-    let normalized_newt = type_remove_attributes_for_c_cast (unrollType newt) in
-    let res e = new_exp ~loc (CastE (type_remove_qualifier_attributes newt, e)) in
-    let oldt' = unrollType oldt in
+    let normalized_newt =
+      Ast_types.(remove_attributes_for_c_cast (unroll newt))
+    in
+    let res e = new_exp ~loc (CastE (Ast_types.remove_qualifiers newt, e)) in
+    let oldt' = Ast_types.unroll oldt in
     match oldt'.tnode, (normalized_newt).tnode, e.enode with
     (* In the case were we have a representation for the literal,
          explicitly add the cast. *)
@@ -6115,7 +5617,7 @@ let rec castReduce fromsource force =
 
     | _, TPtr _, CastE (_, e') ->
       begin
-        match unrollType (typeOf e'), e'.enode with
+        match Ast_types.unroll (typeOf e'), e'.enode with
         | { tnode = TPtr _ } as typ'', _ ->
           (* Old cast can be removed...*)
           if need_cast ~force newt typ'' then res e'
@@ -6130,7 +5632,7 @@ let rec castReduce fromsource force =
 
     | TFun _, TPtr { tnode = TFun _ }, Lval lv -> mkAddrOf ~loc lv
 
-    | _, TInt IBool, _ when isScalarType oldt' ->
+    | _, TInt IBool, _ when Ast_types.is_scalar oldt' ->
       if is_boolean_result e then begin
         Kernel.debug ~dkey "Explicit cast to Boolean: %a" !pp_exp_ref e;
         res e
@@ -6144,7 +5646,7 @@ let rec castReduce fromsource force =
 
     | TComp _, _, _ ->
       begin
-        match isTransparentUnion oldt with
+        match Ast_types.is_transparent_union oldt with
         | None ->
           error "cast from %a to %a"
             Cil_datatype.Typ.pretty oldt Cil_datatype.Typ.pretty newt
@@ -6198,6 +5700,7 @@ and mkCast ?(check=true) ?force ~(newt: typ) e =
 
 (* TODO: unify this with doBinOp in Cabs2cil. *)
 and mkBinOp ~loc op e1 e2 =
+  let open Ast_types in
   let t1 = typeOf e1 in
   let t2 = typeOf e2 in
   let machdep = false in
@@ -6217,7 +5720,7 @@ and mkBinOp ~loc op e1 e2 =
   in
   let doIntegralArithmetic () =
     let tres = arithmeticConversion t1 t2 in
-    if isIntegralType tres then
+    if is_integral tres then
       make_expr tres tres
     else
       Kernel.fatal
@@ -6240,7 +5743,7 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
   in
   let check_scalar op e t =
-    if not (isScalarType t) then
+    if not (is_scalar t) then
       Kernel.fatal ~current:true "operand of %s is not scalar: %a"
         op !pp_exp_ref e
   in
@@ -6253,7 +5756,7 @@ and mkBinOp ~loc op e1 e2 =
     constFoldBinOp ~loc machdep op e1 e2 Cil_const.intType
   | (Shiftlt|Shiftrt) -> (* ISO 6.5.7. Only integral promotions. The result
                           * has the same type as the left hand side *)
-    if msvcMode () then
+    if Machine.msvcMode () then
       (* MSVC has a bug. We duplicate it here *)
       doIntegralArithmetic ()
     else
@@ -6262,27 +5765,29 @@ and mkBinOp ~loc op e1 e2 =
       constFoldBinOp ~loc machdep op
         (mkCastT ~oldt:t1 ~newt:t1' e1) (mkCastT ~oldt:t2 ~newt:t2' e2) t1'
   | (PlusA|MinusA)
-    when isArithmeticType t1 && isArithmeticType t2 -> doArithmetic ()
-  | (PlusPI|MinusPI) when isPointerType t1 && isIntegralType t2 ->
+    when is_arithmetic t1 && is_arithmetic t2 -> doArithmetic ()
+  | (PlusPI|MinusPI) when is_ptr t1 && is_integral t2 ->
     constFoldBinOp ~loc machdep op e1 e2 t1
-  | MinusPP when isPointerType t1 && isPointerType t2 ->
+  | MinusPP when is_ptr t1 && is_ptr t2 ->
     (* NB: Same as cabs2cil. Check if this is really what the standard says*)
     constFoldBinOp ~loc machdep op e1 (mkCastT ~oldt:t2 ~newt:t1 e2) Cil_const.intType
   | (Eq|Ne|Lt|Le|Ge|Gt)
-    when isArithmeticType t1 && isArithmeticType t2 ->
+    when is_arithmetic t1 && is_arithmetic t2 ->
     doArithmeticComp ()
-  | (Eq|Ne) when isPointerType t1 && isZero e2 ->
+  | (Eq|Ne) when is_ptr t1 && isZero e2 ->
     compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when isPointerType t2 && isZero e1 ->
+  | (Eq|Ne) when is_ptr t2 && isZero e1 ->
     compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Eq|Ne) when isVariadicListType t1 && isZero e2 ->
+  | (Eq|Ne) when is_variadic_list t1 && isZero e2 ->
     Kernel.debug ~level:3 "Comparison of va_list and zero";
     compare_pointer ~cast2:t1 op e1 (zero ~loc)
-  | (Eq|Ne) when isVariadicListType t2 && isZero e1 ->
+  | (Eq|Ne) when is_variadic_list t2 && isZero e1 ->
     Kernel.debug ~level:3 "Comparison of zero and va_list";
     compare_pointer ~cast1:t2 op (zero ~loc) e2
-  | (Le|Lt|Ge|Gt|Eq|Ne) when isPointerType t1 && isPointerType t2 ->
-    compare_pointer ~cast1:(uintptr_type ()) ~cast2:(uintptr_type ())
+  | (Le|Lt|Ge|Gt|Eq|Ne) when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
+    compare_pointer
+      ~cast1:(Machine.uintptr_type ())
+      ~cast2:(Machine.uintptr_type ())
       op e1 e2
   | _ ->
     Kernel.fatal
@@ -6299,11 +5804,11 @@ let mkBinOp_safe_ptr_cmp ~loc op e1 e2 =
     | (Eq | Ne | Lt | Le | Ge | Gt) ->
       let t1 = typeOf e1 in
       let t2 = typeOf e2 in
-      if isPointerType t1 && isPointerType t2
+      if Ast_types.is_ptr t1 && Ast_types.is_ptr t2
          && not (isZero e1) && not (isZero e2)
       then begin
-        mkCast ~force:true ~newt:(uintptr_type ()) e1,
-        mkCast ~force:true ~newt:(uintptr_type ()) e2
+        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e1,
+        mkCast ~force:true ~newt:(Machine.uintptr_type ()) e2
       end else e1, e2
     | _ -> e1, e2
   in
@@ -6347,7 +5852,7 @@ let existsType (f: typ -> existsAction) (t: typ) : bool =
 let increm (e: exp) (i: int) =
   let e' = constFold false e in
   let et = typeOf e' in
-  let bop = if isPointerType et then PlusPI else PlusA in
+  let bop = if Ast_types.is_ptr et then PlusPI else PlusA in
   let i = match et.tnode with
     | TInt k | TEnum {ekind = k } -> kinteger k ~loc:e.eloc i
     | _ -> integer ~loc:e.eloc i
@@ -6357,7 +5862,7 @@ let increm (e: exp) (i: int) =
 (* Try to do an increment, with constant folding *)
 let increm64 (e: exp) i =
   let et = typeOf e in
-  let bop = if isPointerType et then PlusPI else PlusA in
+  let bop = if Ast_types.is_ptr et then PlusPI else PlusA in
   constFold
     false
     (new_exp ~loc:e.eloc (BinOp(bop, e, kinteger64 ~loc:e.eloc i, et)))
@@ -6390,7 +5895,7 @@ let lenOfArray eo =
 
 (*** Make an initializer for zeroing a data type ***)
 let rec makeZeroInit ~loc (t: typ) : init =
-  let t' = unrollType t in
+  let t' = Ast_types.unroll t in
   match t'.tnode with
   | TInt ik ->
     SingleInit (new_exp ~loc (Const(CInt64(Integer.zero, ik, None))))
@@ -6436,7 +5941,7 @@ let rec makeZeroInit ~loc (t: typ) : init =
 
   | TPtr _ ->
     SingleInit(
-      if (insert_implicit_casts ()) then mkCast ~newt:t' (zero ~loc)
+      if (Machine.insert_implicit_casts ()) then mkCast ~newt:t' (zero ~loc)
       else zero ~loc)
   | _ -> Kernel.fatal ~current:true "Cannot initialize type: %a" !pp_typ_ref t'
 
@@ -6454,7 +5959,7 @@ let foldLeftCompound
     ~(ct: typ)
     ~(initl: (offset * init) list)
     ~(acc: 'a) : 'a =
-  match unrollTypeNode ct with
+  match Ast_types.unroll_node ct with
   | TArray (bt, leno) -> begin
       let default () =
         (* iter over the supplied initializers *)
@@ -6515,24 +6020,24 @@ let foldLeftCompound
 
 let rec has_flexible_array_member t =
   let is_flexible_array t =
-    match unrollTypeSkel t with
+    match Ast_types.unroll_skel t with
     | TArray (_, None) -> true
-    | TArray (_, Some z) -> (msvcMode() || gccMode()) && isZero z
+    | TArray (_, Some z) -> Machine.(msvcMode() || gccMode()) && isZero z
     | _ -> false
   in
-  match unrollTypeSkel t with
+  match Ast_types.unroll_skel t with
   | TComp { cfields = Some ((_::_) as l) } ->
     let last = (Extlib.last l).ftype in
     is_flexible_array last ||
-    ((gccMode() || msvcMode()) && has_flexible_array_member last)
+    (Machine.(gccMode() || msvcMode()) && has_flexible_array_member last)
   | _ -> false
 
 (* last_field is [true] if the given type is the type of the last field of
    a struct (which could be a FAM, making the whole struct complete even if
    the array type isn't. *)
-let rec isCompleteType ?(allowZeroSizeArrays=gccMode ())
+let rec isCompleteType ?(allowZeroSizeArrays=Machine.gccMode ())
     ?(last_field=false) t =
-  match unrollTypeNode t with
+  match Ast_types.unroll_node t with
   | TVoid -> false (* void is an incomplete type by definition (6.2.5§19) *)
   | TArray(t, None) ->
     last_field && is_complete_agg_member ~allowZeroSizeArrays ~last_field  t
@@ -6572,7 +6077,7 @@ let isCompleteType ?allowZeroSizeArrays t =
   isCompleteType ?allowZeroSizeArrays t
 
 let pointer_decay t =
-  let t' = unrollType t in
+  let t' = Ast_types.unroll t in
   match t'.tnode with
   | TArray (typ, _) -> Cil_const.mk_tptr typ
   | TFun _ ->  Cil_const.mk_tptr t'
@@ -6585,7 +6090,7 @@ let pointer_decay t =
    an incomplete type and does not have array type, the behavior is undefined.
 *)
 let lvalue_conversion (t : typ) : (typ, string) result =
-  if not (isCompleteType t) && not (isArrayType t) then
+  if not (isCompleteType t) && not (Ast_types.is_array t) then
     Error (Format.asprintf
              "Invalid lvalue conversion of incomplete non-array type %a"
              !pp_typ_ref t)
@@ -6593,10 +6098,10 @@ let lvalue_conversion (t : typ) : (typ, string) result =
     let t' = pointer_decay t in
     (* NOTE: remove atomicity when it will be supported by Frama-C.
              also, note that currently 'ghost' is removed. *)
-    Ok (type_remove_qualifier_attributes_deep t')
+    Ok (Ast_types.remove_qualifiers_deep t')
 
 let rec is_variably_modified_type (t : typ) : bool =
-  match unrollTypeNode t with
+  match Ast_types.unroll_node t with
   | TArray(t', osize) -> begin
       match osize with
       | None -> is_variably_modified_type t'
@@ -6613,8 +6118,8 @@ let rec is_variably_modified_type (t : typ) : bool =
 
 let is_mutable (lhost, offset) =
   let rec aux can_mutate typ off =
-    let can_mutate = can_mutate && not (isConstType typ) in
-    let typ' = unrollType typ in
+    let can_mutate = can_mutate && not (Ast_types.is_const typ) in
+    let typ' = Ast_types.unroll typ in
     match typ'.tnode, off with
     | _, NoOffset -> can_mutate
     | _, Field (fi, off) ->
@@ -6649,11 +6154,12 @@ let is_mutable_or_initialized lval =
 
 let is_modifiable_lval lv =
   let t = typeOfLval lv in
-  match unrollTypeSkel t with
+  match Ast_types.unroll_skel t with
   | TArray _ -> false
   | TFun _ -> false
-  | _ -> (not (isConstType t)
-          || is_mutable_or_initialized lv) && isCompleteType t
+  | _ ->
+    (not (Ast_types.is_const t) || is_mutable_or_initialized lv)
+    && isCompleteType t
 
 (** Uniquefy the variable names *)
 let uniqueVarNames (f: file) : unit =
@@ -6796,7 +6302,7 @@ let pushGlobal (g: global)
           (* insert declarations for referred variables ('vl'), before
            * the type definition 'g' itself *)
           let aux acc v =
-            if isFunctionType v.vtype
+            if Ast_types.is_fun v.vtype
             then GFunDecl (empty_funspec (),v, loc) :: acc
             else begin
               let is_same_decl = function
@@ -7180,7 +6686,7 @@ class dropAttributes ?select () = object(self)
        | _  -> DoChildren)
   method! vtype ty = match ty.tnode with
     | TNamed internal_ty ->
-      let tty = typeAddAttributes ty.tattr internal_ty.ttype in
+      let tty = Ast_types.add_attributes ty.tattr internal_ty.ttype in
       (* keep the original type whenever possible *)
       ChangeToPost
         (visitCilType (self:>cilVisitor) tty,
@@ -7192,14 +6698,6 @@ end
 let typeDeepDropAllAttributes t =
   let vis = new dropAttributes () in
   visitCilType vis t
-
-(******************************************************************************)
-(** Deprecated typ manipulation                                               *)
-(******************************************************************************)
-
-let typeAttr { tattr } = tattr
-
-let setTypeAttrs t tattr = { t with tattr }
 
 (* **************************** *)
 (* Forward attributes functions *)
@@ -7232,3 +6730,93 @@ let partitionAttributes = Ast_attributes.partition
 let filter_qualifier_attributes = Ast_attributes.filter_qualifiers
 let splitArrayAttributes = Ast_attributes.split_array_attributes
 let separateStorageModifiers = Ast_attributes.split_storage_modifiers
+
+(* **************************** *)
+(* Forward types functions      *)
+(* **************************** *)
+
+let typeAttr { tattr } = tattr
+let typeAttrs = Ast_types.get_attributes
+let setTypeAttrs t a = { t with tattr =  a }
+let typeAddAttributes = Ast_types.add_attributes
+
+let typeHasAttribute = Ast_types.has_attribute
+let typeHasQualifier = Ast_types.has_qualifier
+let typeHasAttributeMemoryBlock = Ast_types.has_attribute_memory_block
+
+let typeRemoveAttributes = Ast_types.remove_attributes
+let typeRemoveAllAttributes = Ast_types.remove_all_attributes
+let typeRemoveAttributesDeep  = Ast_types.remove_attributes_deep
+let type_remove_qualifier_attributes = Ast_types.remove_qualifiers
+let type_remove_qualifier_attributes_deep = Ast_types.remove_qualifiers_deep
+let type_remove_attributes_for_c_cast = Ast_types.remove_attributes_for_c_cast
+let type_remove_attributes_for_logic_type = Ast_types.remove_attributes_for_logic_type
+
+let unrollType = Ast_types.unroll
+let unrollTypeNode = Ast_types.unroll_node
+let unrollTypeDeep = Ast_types.unroll_deep
+
+let typeAddGhost = Ast_types.add_ghost
+let isGhostType = Ast_types.is_ghost
+let isWFGhostType = Ast_types.is_wellformed_ghost
+
+let isConstType = Ast_types.is_const
+
+let isVolatileType = Ast_types.is_volatile
+let isVolatileLogicType = Ast_types.is_logic_volatile
+
+let isVoidType = Ast_types.is_void
+let isVoidPtrType = Ast_types.is_void_ptr
+
+let isBoolType = Ast_types.is_bool
+
+let isCharType = Ast_types.is_char
+let isAnyCharType = Ast_types.is_any_char
+let isCharPtrType = Ast_types.is_char_ptr
+let isAnyCharPtrType = Ast_types.is_any_char_ptr
+let isCharConstPtrType = Ast_types.is_char_const_ptr
+
+let isShortType = Ast_types.is_short
+let isIntegralType = Ast_types.is_integral
+let is_intptr_t = Ast_types.is_intptr_t
+let is_uintptr_t = Ast_types.is_uintptr_t
+
+let isFloatingType = Ast_types.is_float
+
+let isArithmeticType = Ast_types.is_arithmetic
+
+let isPointerType = Ast_types.is_ptr
+let isIntegralOrPointerType = Ast_types.is_integral_or_pointer
+
+let isArrayType = Ast_types.is_array
+let isUnsizedArrayType = Ast_types.is_unsized_array
+let isSizedArrayType = Ast_types.is_sized_array
+let isCharArrayType = Ast_types.is_char_array
+let isAnyCharArrayType = Ast_types.is_any_char_array
+
+let isFunctionType = Ast_types.is_fun
+let isFunPtrType = Ast_types.is_fun_ptr
+
+let isScalarType = Ast_types.is_scalar
+
+let isStructType = Ast_types.is_struct
+let isUnionType = Ast_types.is_union
+let isStructOrUnionType = Ast_types.is_struct_or_union
+let isTransparentUnion = Ast_types.is_transparent_union
+
+let isVariadicListType = Ast_types.is_variadic_list
+
+let isTypeTagType = Ast_types.is_logic_typetag
+let isLogicBooleanType = Ast_types.is_logic_boolean
+let isLogicPureBooleanType = Ast_types.is_logic_pure_boolean
+let isLogicIntegralType = Ast_types.is_logic_integral
+let isLogicFloatType = Ast_types.is_logic_float
+let isLogicRealType = Ast_types.is_logic_real
+let isLogicRealOrFloatType = Ast_types.is_logic_real_or_float
+let isLogicArithmeticType = Ast_types.is_logic_arithmetic
+let isLogicFunctionType = Ast_types.is_logic_fun
+let isLogicFunPtrType = Ast_types.is_logic_fun_ptr
+
+let typeOf_pointed = Ast_types.direct_pointed_type
+let typeOf_array_elem = Ast_types.direct_element_type
+let typeOf_array_elem_size = Ast_types.array_elem_type_and_size

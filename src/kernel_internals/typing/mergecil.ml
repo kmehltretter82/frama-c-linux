@@ -1665,10 +1665,10 @@ let oneFilePass1 (f:file) : unit =
       (* We do not want to turn non-"const" globals into "const" one. That
        * can happen if one file declares the variable a non-const while
        * others declare it as "const". *)
-      if typeHasAttribute "const" vi.vtype !=
-         typeHasAttribute "const" oldvi.vtype then begin
+      if Ast_types.has_attribute "const" vi.vtype !=
+         Ast_types.has_attribute "const" oldvi.vtype then begin
         Cil.update_var_type
-          newrep.ndata (typeRemoveAttributes ["const"] newtype);
+          newrep.ndata (Ast_types.remove_attributes ["const"] newtype);
       end else Cil.update_var_type newrep.ndata newtype;
       (* clean up the storage. also update the location of the variable
          declaration, but only if the new one should be preferred. *)

@@ -66,7 +66,7 @@ let backward_comp_float_left fkind positive comp l r =
 
 let backward_comp_left_from_type = function
   | Ctype typ -> begin
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_node typ with
       | TInt _ | TEnum _ | TPtr _ -> backward_comp_int_left
       | TFloat fk -> backward_comp_float_left (Fval.kind fk)
       | _ -> (fun _ _ v _ -> v) (* should never occur anyway *)
@@ -191,7 +191,7 @@ let apply_on_all_locs f loc state =
 (* Display [o] as a single value, when this is more readable and more precise
    than the standard display. *)
 let pretty_stitched_offsetmap fmt typ o =
-  if Cil.isScalarType typ &&
+  if Ast_types.is_scalar typ &&
      not (Cvalue.V_Offsetmap.is_single_interval o)
   then
     match v_uninit_of_offsetmap ~typ o with

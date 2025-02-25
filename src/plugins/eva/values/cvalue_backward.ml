@@ -24,7 +24,7 @@ open Cil_types
 open Cvalue
 
 let propagate_all_comparison typ =
-  not (Cil.isPointerType typ) ||
+  not (Ast_types.is_ptr typ) ||
   Parameters.UndefinedPointerComparisonPropagateAll.get ()
 
 let backward_int_relation typ op v1 v2 =
@@ -60,7 +60,7 @@ let backward_float_relation fkind ~positive op v1 v2 =
   Some (v1', v2')
 
 let backward_relation typ ~positive op =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TInt _ | TEnum _ | TPtr _ ->
     let op = if positive then op else Abstract_interp.Comp.inv op in
     backward_int_relation typ op
@@ -258,7 +258,7 @@ let backward_lor ~v1 ~v2 ~res =
     | false, true -> Some (V.diff v1 V.singleton_zero, v2)
 
 let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
-  let typ = Cil.unrollType typ_res in
+  let typ = Ast_types.unroll typ_res in
   match binop, typ.tnode with
   | Eva_ast.PlusA, TInt _ ->  backward_add_int typ ~res_value ~v1 ~v2 true
   | MinusA, TInt _ -> backward_add_int typ ~res_value ~v1 ~v2 false
@@ -285,10 +285,10 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
         None
       | false, true ->
         (* comparison relation holds *)
-        backward_relation (Cil.unrollType typ_e1) ~positive:true binop v1 v2
+        backward_relation (Ast_types.unroll typ_e1) ~positive:true binop v1 v2
       | true, false ->
         (* comparison relation does not hold *)
-        backward_relation (Cil.unrollType typ_e1) ~positive:false binop v1 v2
+        backward_relation (Ast_types.unroll typ_e1) ~positive:false binop v1 v2
       | _ ->
         assert false (* bottom *)
     end
@@ -344,11 +344,11 @@ let backward_unop ~typ_arg op ~arg:_ ~res =
   | Neg ->
     try
       let v = V.project_ival res in
-      if Cil.isIntegralType typ_arg then
+      if Ast_types.is_integral typ_arg then
         let v = V.inject_ival (Ival.neg_int v) in
         Some (Cvalue_forward.reinterpret typ_arg v)
       else begin
-        assert (Cil.isFloatingType typ_arg);
+        assert (Ast_types.is_float typ_arg);
         let f = Ival.project_float v in
         Some (V.inject_ival (Ival.inject_float (Fval.neg f)))
       end

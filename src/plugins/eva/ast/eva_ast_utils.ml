@@ -115,8 +115,8 @@ and to_cil_const : Eva_ast_types.constant -> Cil_types.constant = function
 let is_mutable (lval : lval) : bool =
   let (lhost, offset) = lval.node in
   let rec aux base_mutable typ off =
-    let base_mutable = base_mutable && not (Cil.isConstType typ) in
-    let typ = Cil.unrollType typ in
+    let base_mutable = base_mutable && not (Ast_types.is_const typ) in
+    let typ = Ast_types.unroll typ in
     match typ.tnode, off with
     | _, NoOffset -> base_mutable
     | _, Field (fi, off) ->
@@ -178,7 +178,7 @@ let exp_contains_volatile, lval_contains_volatile =
   let open Eva_ast_visitor.Fold in
   let neutral = false and combine b1 b2 = b1 || b2 in
   let fold_lval ~visitor lval =
-    Cil.isVolatileType lval.typ || default.fold_lval ~visitor lval
+    Ast_types.is_volatile lval.typ || default.fold_lval ~visitor lval
   in
   let folder = { default with fold_lval } in
   visit_exp ~neutral ~combine folder, visit_lval ~neutral ~combine folder
@@ -254,7 +254,7 @@ let rec to_integer e =
   | Const (CInt64 (n,_,_)) -> Some n
   | Const (CChr c) -> Some (Cil.charConstToInt c)
   | Const (CEnum ({eival = v}, _)) -> Cil.isInteger v
-  | CastE (typ, e) when Cil.isPointerType typ ->
+  | CastE (typ, e) when Ast_types.is_ptr typ ->
     begin
       match to_integer e with
       | Some i as r when Cil.fitsInInt (Machine.uintptr_kind ()) i -> r
@@ -268,7 +268,7 @@ let is_zero exp =
   | Some i -> Integer.is_zero i
 
 let is_zero_ptr exp =
-  is_zero exp && Cil.isPointerType exp.typ
+  is_zero exp && Ast_types.is_ptr exp.typ
 
 (* Constant folding *)
 
@@ -311,7 +311,7 @@ let to_value exp =
   | _ -> `None
 
 let type_kind typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TInt ikind | TEnum {ekind = ikind} -> `Int ikind
   | TFloat fkind -> `Float fkind
   | _ -> `None

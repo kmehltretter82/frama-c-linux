@@ -41,7 +41,7 @@ exception Explicit_pointer_address of location
 let check_cast_compatibility e to_type =
   let rec cast_preserves_indirection_level from_type to_type =
     let recurse = cast_preserves_indirection_level in
-    match Cil.unrollTypeNode from_type, Cil.unrollTypeNode to_type with
+    match Ast_types.unroll_node from_type, Ast_types.unroll_node to_type with
     | TPtr from_type, TPtr to_type -> recurse from_type to_type
     | TPtr _, _ -> false
     | _, TPtr _ -> false

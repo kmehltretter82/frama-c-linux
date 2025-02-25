@@ -121,7 +121,7 @@ module CVal = struct
       | Base.String (_,_) | Base.Null | Base.CLogic_Var _ | Base.Allocated _ ->
         acc, true
       | Base.Var (v,_) ->
-        if Cil.isFunctionType v.vtype then
+        if Ast_types.is_fun v.vtype then
           let alarm = alarm || Ival.contains_non_zero offs in
           let kf = Globals.Functions.get v in
           let list = if Ival.contains_zero offs then kf :: acc else acc in

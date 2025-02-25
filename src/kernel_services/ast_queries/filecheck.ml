@@ -25,7 +25,7 @@ open Cil_datatype
 
 
 let same_integral_types t1 t2 =
-  match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
+  match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
   | TInt ik1, TInt ik2 ->
     Cil.bitsSizeOfInt ik1 = Cil.bitsSizeOfInt ik2 &&
     Cil.isSigned ik1 = Cil.isSigned ik2
@@ -36,7 +36,7 @@ let is_admissible_conversion e ot nt =
   let nt' = Cil.typeDeepDropAllAttributes nt in
   not (Cil.need_cast ot' nt') ||
   same_integral_types ot' nt' ||
-  (match e.enode, Cil.unrollTypeNode nt with
+  (match e.enode, Ast_types.unroll_node nt with
    | Const(CEnum { eihost = ei }), TEnum ei' -> ei.ename = ei'.ename
    | _ -> false)
 
@@ -725,9 +725,9 @@ module Base_checker = struct
              let t1 = Kernel_function.get_return_type kf in
              let t1 =
                if Kernel_function.is_ghost kf
-               then Cil.typeAddGhost t1 else t1
+               then Ast_types.add_ghost t1 else t1
              in
-             if Cil.isVoidType t1 then
+             if Ast_types.is_void t1 then
                check_abort
                  "\\result found in a contract for function %a that returns void"
                  Kernel_function.pretty kf;
@@ -834,7 +834,7 @@ module Base_checker = struct
            | _ -> ());
           begin match t.term_type with
             | Ctype ty ->
-              if (Cil.isVoidType ty) then
+              if Ast_types.is_void ty then
                 check_abort "logic term with void type: %a" Printer.pp_term t;
               Cil.DoChildren
             | _ -> Cil.DoChildren
@@ -928,7 +928,7 @@ module Base_checker = struct
         match g with
         | GFunDecl(_,v,_) ->
           self#remove_globals_function v;
-          if not (Cil.isFunctionType v.vtype) then
+          if not (Ast_types.is_fun v.vtype) then
             check_abort "Function %a has non-function type" Printer.pp_varinfo v;
           if is_normalized then begin
             if v.vdefined &&
@@ -982,14 +982,14 @@ module Base_checker = struct
              end);
           Cil.DoChildren
         | GVarDecl(v,_) | GVar(v,_,_) ->
-          if Cil.isFunctionType v.vtype then
+          if Ast_types.is_fun v.vtype then
             check_abort "Variable %a has function type" Printer.pp_varinfo v;
           self#remove_globals_var v;
           if (Ast_attributes.contains Cabs2cil.fc_local_static v.vattr) then
             self#add_local_static v;
           Cil.DoChildren
         | GFun (f,_) ->
-          if not (Cil.isFunctionType f.svar.vtype) then
+          if not (Ast_types.is_fun f.svar.vtype) then
             check_abort "Function %a has non-function type"
               Printer.pp_varinfo f.svar;
           if not f.svar.vdefined then
@@ -1212,18 +1212,18 @@ module Base_checker = struct
         | _ -> false
 
       method! vexpr e =
-        if Cil.typeHasAttribute "volatile" (Cil.typeOf e) then begin
+        if Ast_types.has_attribute "volatile" (Cil.typeOf e) then begin
           Kernel.warning ~wkey:Kernel.wkey_check_volatile ~current:true
             "Expression with volatile qualification %a" Printer.pp_exp e
         end;
         match e.enode with
         | Const (CEnum ei) -> self#check_ei ei
         | Lval lv when
-            Cil.isArrayType (Cil.typeOfLval lv)
+            Ast_types.is_array (Cil.typeOfLval lv)
             && (Stack.is_empty accept_array || not (Stack.top accept_array)) ->
           check_abort "%a is an array, but used as an lval"
             Printer.pp_lval lv
-        | StartOf lv when not (Cil.isArrayType (Cil.typeOfLval lv)) ->
+        | StartOf lv when not (Ast_types.is_array (Cil.typeOfLval lv)) ->
           check_abort "%a is supposed to be an array, but has type %a"
             Printer.pp_lval lv Printer.pp_typ (Cil.typeOfLval lv)
         | _ ->
@@ -1257,7 +1257,7 @@ module Base_checker = struct
           match f.enode with
           | Lval (Var f, NoOffset) ->
             let (treturn,targs,is_variadic,_) = Cil.splitFunctionTypeVI f in
-            if Cil.isVoidType treturn && lvopt != None then
+            if Ast_types.is_void treturn && lvopt != None then
               check_abort
                 "in call %a, assigning result of a function returning void"
                 Printer.pp_instr i;
@@ -1265,7 +1265,7 @@ module Base_checker = struct
              | None -> ()
              | Some lv ->
                let tlv = Cil.typeOfLval lv in
-               let tlv = Cil.type_remove_qualifier_attributes tlv in
+               let tlv = Ast_types.remove_qualifiers tlv in
                if not (Cabs2cil.allow_return_collapse ~tlv ~tf:treturn) then
                  check_abort "in call %a, cannot implicitly cast from \
                               function return type %a to type of %a (%a)"

@@ -284,7 +284,11 @@ let rec object_of typ =
   match typ.tnode with
   | TInt i -> C_int (c_int i)
   | TFloat f -> C_float (c_float f)
-  | TPtr typ -> C_pointer (if Cil.isVoidType typ then Cil_const.charType else typ)
+  | TPtr typ ->
+    let typ' =
+      if Ast_types.is_void typ then Cil_const.charType else typ
+    in
+    C_pointer typ'
   | TFun _ -> C_pointer Cil_const.voidType
   | TEnum {ekind=i} -> C_int (c_int i)
   | TComp comp -> C_comp comp
@@ -433,7 +437,7 @@ let object_of_array_elem = function
            "object_of_array_elem called on non-array %a." pp_object o
 
 let rec object_of_logic_type t =
-  match Logic_utils.unroll_type ~unroll_typedef:false t with
+  match Ast_types.unroll_logic ~unroll_typedef:false t with
   | Ctype ty -> object_of ty
   | Ltype({lt_name="set"},[t]) -> object_of_logic_type t
   | t -> Wp_parameters.fatal ~current:true
@@ -441,7 +445,7 @@ let rec object_of_logic_type t =
            Printer.pp_logic_type t
 
 let rec object_of_logic_pointed t =
-  match Logic_utils.unroll_type ~unroll_typedef:false t with
+  match Ast_types.unroll_logic ~unroll_typedef:false t with
   | Ctype ty -> object_of_pointed (object_of ty)
   | Ltype({lt_name="set"},[t]) -> object_of_logic_pointed t
   | t -> Wp_parameters.fatal ~current:true

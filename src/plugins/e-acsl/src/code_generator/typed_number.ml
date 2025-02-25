@@ -45,7 +45,7 @@ let add_cast ~loc ?name env kf ctx strnum t_opt e =
       else
         (* C integer --> Z *)
         let e =
-          if not (Cil.isIntegralType ty) && strnum = C_number then
+          if not (Ast_types.is_integral ty) && strnum = C_number then
             (* special case for \null that must be casted to long: it is the
                only non integral value that can be seen as an integer, while the
                type system infers that it is C-representable (see

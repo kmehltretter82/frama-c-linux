@@ -111,7 +111,7 @@ module Make_Memory (Info: sig val name: string end) (Value: Value) = struct
   let covers_base b o size typ =
     match b with
     | Base.Var (vi, Base.Known (_, max)) -> (* "standard" varinfos only *)
-      if not (Cil.typeHasQualifier "volatile" vi.vtype) &&
+      if not (Ast_types.has_qualifier "volatile" vi.vtype) &&
          Value.track_variable vi &&
          Cil_datatype.Typ.equal typ vi.vtype &&
          Ival.is_zero o &&

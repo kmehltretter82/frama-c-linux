@@ -376,7 +376,7 @@ struct
   let assign_eq left_lval right_expr value valuation state =
     if Eva_ast.lval_contains_volatile left_lval ||
        Eva_ast.exp_contains_volatile right_expr ||
-       not (Cil.isScalarType left_lval.typ) ||
+       not (Ast_types.is_scalar left_lval.typ) ||
        indeterminate_copy value
     then state
     else
@@ -452,7 +452,7 @@ struct
           and e2 = Eva_ast.const_fold e2 in
           if Eva_ast.exp_contains_volatile e1
           || Eva_ast.exp_contains_volatile e2
-          || not (Cil.isScalarType e1.typ)
+          || not (Ast_types.is_scalar e1.typ)
           || (expr_is_cardinal_zero_or_one_loc valuation e1 &&
               expr_cardinal_zero_or_one valuation e2)
           || (expr_is_cardinal_zero_or_one_loc valuation e2 &&

@@ -583,7 +583,7 @@ let has_noreturn_attr kf =
   match kf.fundec with
   | Definition ({ svar = vi },_)
   | Declaration (_, vi, _, _) ->
-    Cil.typeHasAttribute "noreturn" vi.vtype
+    Ast_types.has_attribute "noreturn" vi.vtype
 
 let is_first_stmt kf stmt =
   try
@@ -611,7 +611,7 @@ let is_main kf =
 
 let returns_void kf =
   let result_type,_,_,_ = Cil.splitFunctionType (get_type kf) in
-  match Cil.unrollTypeNode result_type with
+  match Ast_types.unroll_node result_type with
   | TVoid -> true
   | _ -> false
 

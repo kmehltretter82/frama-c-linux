@@ -33,7 +33,7 @@ let abort exclog =
     print_exc exclog.exn print_funid exclog.funid exclog.msg
 
 let is_relevant_varinfo varinfo =
-  not (Cil.typeHasQualifier "volatile" varinfo.Cil_types.vtype)
+  not (Ast_types.has_qualifier "volatile" varinfo.Cil_types.vtype)
   && (true || not varinfo.vglob)
 
 let is_relevant_lval lval = match lval.node with
@@ -179,7 +179,7 @@ let reduce eval expr range =
    number are equivalent. [eval] is the mathematical evaluation function.
    If overflows are not allowed for the type [typ], then [texpr = e]. *)
 let coerce ?(cast=false) eval typ texpr =
-  match Cil.unrollType typ with
+  match Ast_types.unroll typ with
   | { tnode = (TInt ikind | TEnum { ekind = ikind }); tattr } ->
     let signed = Cil.isSigned ikind in
     if
@@ -195,7 +195,7 @@ let coerce ?(cast=false) eval typ texpr =
 
 
 let translate_typ typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TInt _ | TEnum _ -> Texpr1.Int
   | _ -> raise (Out_of_Scope "translate_typ not int")
 
@@ -225,7 +225,7 @@ let translate_varinfo varinfo =
   if not (is_relevant_varinfo varinfo)
   then raise (Out_of_Scope "translate_varinfo irrelevant")
   else
-    match Cil.unrollTypeNode varinfo.vtype with
+    match Ast_types.unroll_node varinfo.vtype with
     | TInt ik | TEnum {ekind=ik} ->
       let id = "_" ^ string_of_int varinfo.vid in
       let name = varinfo.vname ^ id in
@@ -282,7 +282,7 @@ let rec constraint_expr eval oracle env expr positive =
     let e2' = translate_expr_linearize eval oracle e2 in
     let e1'' = coerce eval e1.typ e1' in
     let e2'' = coerce eval e2.typ e2' in
-    let typ = translate_typ (Cil.unrollType typ) in
+    let typ = translate_typ (Ast_types.unroll typ) in
     let e = Texpr1.Binop (Texpr1.Sub, e1'', e2'', typ, round) in
     let expr = Texpr1.of_expr env e in
     let binop = Eva_ast.conv_relation binop in
@@ -299,7 +299,7 @@ let constraint_reduction env expr interval =
 
 
 let truncate_interval typ interval =
-  match Cil.unrollType typ with
+  match Ast_types.unroll typ with
   | { tnode = (TInt ikind | TEnum { ekind = ikind }); tattr } ->
     let signed = Cil.isSigned ikind in
     if
@@ -554,7 +554,7 @@ module Make (Man : Input) = struct
      into Apron intervals. *)
   let make_oracle valuation =
     fun exp exn ->
-    if Cil.isIntegralType exp.typ then
+    if Ast_types.is_integral exp.typ then
       match valuation.Abstract_domain.find exp with
       | `Value { value = { v = `Value itv } } ->
         let interval = ival_to_interval itv in

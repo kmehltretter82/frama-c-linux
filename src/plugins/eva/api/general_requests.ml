@@ -108,11 +108,11 @@ let eval_callee stmt lval =
 
 let callees = function
   | Printer_tag.PLval (_kf, Kstmt stmt, (Mem _, NoOffset as lval))
-    when Cil.(isFunctionType (typeOfLval lval)) ->
+    when Cil.(Ast_types.is_fun (typeOfLval lval)) ->
     List.map (fun kf -> Printer_tag.SFunction kf) @@
     eval_callee stmt lval
   | Printer_tag.PLval (_kf, Kstmt stmt, lval)
-    when Cil.(isFunPtrType (Cil.typeOfLval lval)) ->
+    when Ast_types.is_fun_ptr (Cil.typeOfLval lval) ->
     List.map (fun kf -> Printer_tag.SFunction kf) @@
     eval_callee stmt (Mem (Eva_utils.lval_to_exp lval), NoOffset)
   | _ -> []
@@ -296,7 +296,7 @@ let term_lval_to_lval kf tlval =
   with Logic_to_c.No_conversion -> raise Not_found
 
 let print_value fmt loc =
-  let is_scalar = Cil.isScalarType in
+  let is_scalar = Ast_types.is_scalar in
   let evaluation_point = marker_evaluation_point loc in
   let request = request_at evaluation_point in
   let eval =

@@ -201,7 +201,7 @@ module Make (Engine: Engine_sig.S) = struct
   (* Emits an alarm if the left and right locations of a struct or union copy
      overlap. *)
   let check_overlap typ (lval, loc) (right_lval, right_loc) =
-    if Cil.isStructOrUnionType typ
+    if Ast_types.is_struct_or_union typ
     then
       let truth = Location.assume_no_overlap ~partial:true loc right_loc in
       let alarm () =
@@ -235,7 +235,7 @@ module Make (Engine: Engine_sig.S) = struct
          of a function call, on struct and union types, and when
          -eva-warn-copy-indeterminate is disabled. *)
       let lval_copy =
-        if is_ret || Cil.isStructOrUnionType lval.typ || do_copy_at kinstr
+        if is_ret || Ast_types.is_struct_or_union lval.typ || do_copy_at kinstr
         then find_lval expr
         else None
       in
@@ -342,7 +342,7 @@ module Make (Engine: Engine_sig.S) = struct
     let written_formals = Backward_formals.written_formals call.kf in
     let is_safe argument =
       not (Varinfo.Set.mem argument.formal written_formals)
-      && Cil.isScalarType argument.formal.vtype
+      && Ast_types.is_scalar argument.formal.vtype
       && is_safe_argument valuation argument.concrete
     in
     List.filter is_safe call.arguments
@@ -473,7 +473,7 @@ module Make (Engine: Engine_sig.S) = struct
         Self.abort ~current:true
           "Function argument %a has unknown size. Aborting"
           Eva_ast.pp_exp expr;
-      if determinate && Cil.isScalarType lv.typ
+      if determinate && Ast_types.is_scalar lv.typ
       then assign_by_eval ~subdivnb state valuation expr
       else assign_by_copy ~subdivnb state valuation lv loc
     | _ -> assign_by_eval ~subdivnb state valuation expr
@@ -622,7 +622,7 @@ module Make (Engine: Engine_sig.S) = struct
         (Bottom.pretty Cvalue.V.pretty) fmt value
 
   let pretty_arguments ~subdivnb state arguments =
-    let is_scalar lval = Cil.isScalarType lval.Eva_ast.typ in
+    let is_scalar lval = Ast_types.is_scalar lval.Eva_ast.typ in
     let pretty fmt (expr : Eva_ast.exp) =
       match expr.node with
       | Lval lval | StartOf lval when not (is_scalar lval) ->
@@ -824,7 +824,7 @@ module Make (Engine: Engine_sig.S) = struct
     let kind = Abstract_domain.Local kf in
     let state = Domain.enter_scope kind variables state in
     let is_volatile varinfo =
-      Cil.typeHasQualifier "volatile" varinfo.vtype
+      Ast_types.has_qualifier "volatile" varinfo.vtype
     in
     let vars = List.filter is_volatile variables in
     let initialized = false in

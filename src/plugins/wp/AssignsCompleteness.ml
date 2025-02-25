@@ -115,7 +115,7 @@ let check_assigns kf assigns =
     let assigns_result ({ it_content=t }, _) = Logic_utils.is_result t in
     let froms = match a with WritesAny -> [] | Writes l -> l in
     let acc =
-      if Cil.isPointerType res_t && not (List.exists assigns_result froms) then
+      if Ast_types.is_ptr res_t && not (List.exists assigns_result froms) then
         incomplete acc
           begin fun kf ->
             Wp_parameters.warning ~wkey:wkey_pedantic

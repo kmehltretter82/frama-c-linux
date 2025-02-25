@@ -171,7 +171,7 @@ struct
 
   let cast typ exp =
     if Cil.need_cast exp.typ typ
-    then mk_exp (CastE (Cil.type_remove_qualifier_attributes typ, exp))
+    then mk_exp (CastE (Ast_types.remove_qualifiers typ, exp))
     else exp
 
   let binop op e1 e2 =
@@ -183,9 +183,9 @@ struct
 
     | Eq | Ne | Lt | Le | Ge |Gt ->
       let t =
-        if Cil.isArithmeticType e1.typ && Cil.isArithmeticType e2.typ then
+        if Ast_types.(is_arithmetic e1.typ && is_arithmetic e2.typ) then
           Cil.arithmeticConversion e1.typ e2.typ
-        else if Cil.isPointerType e1.typ && Cil.isPointerType e2.typ then
+        else if Ast_types.(is_ptr e1.typ && is_ptr e2.typ) then
           if Cil.need_cast ~force:true e1.typ e2.typ then
             Machine.uintptr_type ()
           else
@@ -203,7 +203,7 @@ struct
   let ne = binop Ne
 
   let index (base : lval) (index : exp) : lval =
-    assert (Cil.isArrayType base.typ);
+    assert (Ast_types.is_array base.typ);
     add_offset base (Index (index, NoOffset))
 
   let field (base : lval) (field : Cil_types.fieldinfo) : lval =
@@ -255,7 +255,7 @@ let rec normalize_condition exp positive =
     else mk_exp (BinOp (invert_relation binop, e1, e2, typ))
   | _ ->
     let op = if positive then Ne else Eq in
-    let typ = Cil.unrollType exp.typ in
+    let typ = Ast_types.unroll exp.typ in
     mk_exp (BinOp (op, zero_typed typ, exp, Cil_const.intType))
 
 

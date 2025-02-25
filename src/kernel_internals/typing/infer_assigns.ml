@@ -36,11 +36,12 @@ let from_prototype kf =
   in
   let rtyp, _, _, _ = splitFunctionTypeVI vi in
   let pointer_args,basic_args =
-    List.partition (fun vi -> isPointerType vi.vtype) formals in
+    List.partition (fun vi -> Ast_types.is_ptr vi.vtype) formals in
   (* Remove args of type pointer to pointer *)
   let pointer_args =
-    List.filter
-      (fun vi -> not (isPointerType (typeOf_pointed vi.vtype))) pointer_args
+    List.filter (fun vi ->
+        not (Ast_types.(is_ptr (direct_pointed_type vi.vtype)))
+      ) pointer_args
   in
   (* Convert void* pointers to char* *)
   let pointer_args =
@@ -49,8 +50,8 @@ let from_prototype kf =
          let loc = vi.vdecl in
          let t = tvar (cvar_to_lvar vi) in
          let typ = vi.vtype in
-         if isVoidPtrType typ then
-           let const = typeHasAttribute "const" (Cil.typeOf_pointed typ) in
+         if Ast_types.is_void_ptr typ then
+           let const = Ast_types.(has_attribute "const" (direct_pointed_type typ)) in
            let typ' = if const then Cil_const.charConstPtrType else Cil_const.charPtrType in
            (vi.vghost, Logic_utils.mk_cast ~loc typ' t, typ')
          else (vi.vghost, t, typ)
@@ -72,7 +73,7 @@ let from_prototype kf =
     (* Generate the required numbers of [[..]] until with find a non-array
        type *)
     let rec mk_offset set typ =
-      match unrollTypeNode typ with
+      match Ast_types.unroll_node typ with
       | TArray (typ_elem, size) ->
         let range = match size with
           | None -> make_range None
@@ -87,7 +88,7 @@ let from_prototype kf =
     in
     (* make_set_type (Ctype typ_pointed) *)
 
-    let typ_pointed = typeOf_pointed typ in
+    let typ_pointed = Ast_types.direct_pointed_type typ in
     (* Generate the initial term: [*(t+(0..))] for array types or char*
        pointers, *t for other pointer types. It would have been better to
        recognize formals with type [typ[]] instead of [typ *], but this
@@ -96,7 +97,7 @@ let from_prototype kf =
       match Ast_attributes.find_params "arraylen" typ.tattr with
       | [AInt length] -> TBinOp (PlusPI, t, make_range (Some length)), true
       | _ ->
-        if isAnyCharPtrType typ
+        if Ast_types.is_any_char_ptr typ
         then TBinOp (PlusPI, t, make_range None), true
         else t.term_node, false
     in
@@ -114,8 +115,8 @@ let from_prototype kf =
       mk_star
       (List.filter
          (fun (_g, _t, typ) ->
-            let pointed_type = typeOf_pointed typ in
-            not (typeHasAttribute "const" pointed_type)
+            let pointed_type = Ast_types.direct_pointed_type typ in
+            not (Ast_types.has_attribute "const" pointed_type)
          )
          pointer_args)
   in

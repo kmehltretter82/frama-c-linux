@@ -29,16 +29,9 @@ open Cil_types
 exception Not_well_formed of Cil_types.location * string
 exception Unknown_ext
 
-let rec unroll_type ?(unroll_typedef=true) = function
-  | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
-    unroll_type ~unroll_typedef (Logic_const.unroll_ltdef ty)
-  | Ctype ty when unroll_typedef -> Ctype (Cil.unrollType ty)
-  | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
-    ty
-
 let is_instance_of vars t1 t2 =
   let rec aux map t1 t2 =
-    match (unroll_type t1, unroll_type t2) with
+    match (Ast_types.unroll_logic t1, Ast_types.unroll_logic t2) with
     | _, Lvar s when List.mem s vars ->
       if Datatype.String.Map.mem s map then
         Cil_datatype.Logic_type.equal t1 (Datatype.String.Map.find s map),
@@ -72,28 +65,32 @@ let is_instance_of vars t1 t2 =
 (** {1 From C to logic}*)
 (* ************************************************************************* *)
 
-let plain_arithmetic_type t = Cil.isLogicArithmeticType t
-let plain_integral_type t = Cil.isLogicIntegralType t
-let plain_fun_ptr t = Cil.isLogicFunPtrType t
+let plain_arithmetic_type t = Ast_types.is_logic_arithmetic t
+let plain_integral_type t = Ast_types.is_logic_integral t
+let plain_fun_ptr t = Ast_types.is_logic_fun_ptr t
 
 let is_arithmetic_type = plain_or_set plain_arithmetic_type
 let is_integral_type = plain_or_set plain_integral_type
 let is_fun_ptr = plain_or_set plain_fun_ptr
 
-let is_list_type t = Logic_const.is_list_type (unroll_type t)
-let type_of_list_elem t = Logic_const.type_of_list_elem (unroll_type t)
+let is_list_type t =
+  Logic_const.is_list_type (Ast_types.unroll_logic t)
+let type_of_list_elem t =
+  Logic_const.type_of_list_elem (Ast_types.unroll_logic t)
 
-let is_set_type t = Logic_const.is_set_type (unroll_type t)
-let type_of_set_elem t = Logic_const.type_of_element (unroll_type t)
+let is_set_type t =
+  Logic_const.is_set_type (Ast_types.unroll_logic t)
+let type_of_set_elem t =
+  Logic_const.type_of_element (Ast_types.unroll_logic t)
 
 let plain_array_type t =
-  match unroll_type t with
-  | Ctype ct -> Cil.isArrayType ct
+  match Ast_types.unroll_logic t with
+  | Ctype ct -> Ast_types.is_array ct
   | _ -> false
 
 let plain_pointer_type t =
-  match unroll_type t with
-  | Ctype ct -> Cil.isPointerType ct
+  match Ast_types.unroll_logic t with
+  | Ctype ct -> Ast_types.is_ptr ct
   | _ -> false
 
 let is_array_type = plain_or_set plain_array_type
@@ -102,8 +99,9 @@ let is_pointer_type = plain_or_set plain_pointer_type
 let type_of_array_elem =
   Logic_const.transform_element
     (fun t ->
-       match unroll_type t with
-         Ctype ty when isArrayType ty -> Ctype (Cil.typeOf_array_elem ty)
+       match Ast_types.unroll_logic t with
+         Ctype ty when Ast_types.is_array ty ->
+         Ctype (Ast_types.direct_element_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not an array type"
            Cil_datatype.Logic_type.pretty t)
@@ -111,8 +109,9 @@ let type_of_array_elem =
 let type_of_pointed =
   Logic_const.transform_element
     (fun t ->
-       match unroll_type t with
-         Ctype ty when isPointerType ty -> Ctype (Cil.typeOf_pointed ty)
+       match Ast_types.unroll_logic t with
+         Ctype ty when Ast_types.is_ptr ty ->
+         Ctype (Ast_types.direct_pointed_type ty)
        | _ ->
          Kernel.fatal ~current:true "type %a is not a pointer type"
            Cil_datatype.Logic_type.pretty t)
@@ -120,17 +119,17 @@ let type_of_pointed =
 let isLogicType f t = plain_or_set (Logic_const.isLogicCType f) t
 
 (** true if the type is a C array (or a set of)*)
-let isLogicArrayType = isLogicType Cil.isArrayType
+let isLogicArrayType = isLogicType Ast_types.is_array
 
-let isLogicCharType = isLogicType Cil.isCharType
+let isLogicCharType = isLogicType Ast_types.is_char
 
-let isLogicAnyCharType = isLogicType Cil.isAnyCharType
+let isLogicAnyCharType = isLogicType Ast_types.is_any_char
 
-let isLogicVoidType = isLogicType Cil.isVoidType
+let isLogicVoidType = isLogicType Ast_types.is_void
 
-let isLogicPointerType = isLogicType Cil.isPointerType
+let isLogicPointerType = isLogicType Ast_types.is_ptr
 
-let isLogicVoidPointerType = isLogicType Cil.isVoidPtrType
+let isLogicVoidPointerType = isLogicType Ast_types.is_void_ptr
 
 let logicCType t =
   let rec logicCType = function
@@ -143,7 +142,7 @@ let logicCType t =
 
 let plain_array_to_ptr ty =
   let open Current_loc.Operators in
-  match unroll_type ty with
+  match Ast_types.unroll_logic ty with
   | Ctype({ tnode = TArray(ty,lo); tattr } as tarr) ->
     let length_attr =
       match lo with
@@ -175,18 +174,18 @@ let array_to_ptr = plain_or_set plain_array_to_ptr
 
 let logic_type_remove_qualifiers =
   let plain typ =
-    match unroll_type typ with
+    match Ast_types.unroll_logic typ with
     | Ctype t ->
-      let t' = Cil.type_remove_qualifier_attributes t in
+      let t' = Ast_types.remove_qualifiers t in
       if Cil_datatype.Typ.equal t t' then typ else Ctype t'
     | _ -> typ
   in
   Logic_const.transform_element plain
 
 let coerce_type typ =
-  let ty = Cil.unrollType typ in
-  if Cil.isIntegralType ty then Linteger
-  else if Cil.isFloatingType ty then Lreal
+  let ty = Ast_types.unroll typ in
+  if Ast_types.is_integral ty then Linteger
+  else if Ast_types.is_float ty then Lreal
   else Ctype typ
 
 let translate_old_label s p =
@@ -283,20 +282,20 @@ let equal_ltype = Cil_datatype.Logic_type.equal
 
 (* Does the same kind of optimization than [Cil.mkCastT] for [Ctype]. *)
 let mk_cast ?loc ?(force=false) newt t =
-  let newt' = Cil.type_remove_attributes_for_logic_type newt in
+  let newt' = Ast_types.remove_attributes_for_logic_type newt in
   if equal_ltype (Ctype newt') t.term_type then t else
     let rec unroll_cast e = match e.term_node with
       | TCast(false, Ctype oldt,e)
-        when (Cil.isPointerType newt' && Cil.isPointerType oldt)
+        when Ast_types.(is_ptr newt' && is_ptr oldt)
           || equal_ltype
-               (Ctype (Cil.type_remove_attributes_for_logic_type oldt))
+               (Ctype (Ast_types.remove_attributes_for_logic_type oldt))
                (Ctype newt')
         -> unroll_cast e
       | TCast(true,Linteger,e)
-        when Cil.isScalarType newt'
+        when Ast_types.is_scalar newt'
         -> unroll_cast e
       | TCast(true,Lreal,e)
-        when Cil.isFloatingType newt'
+        when Ast_types.is_float newt'
         -> unroll_cast e
       | _ -> e
     in
@@ -377,7 +376,7 @@ let mk_coerce ltyp t =
   Logic_const.term ~loc:t.term_loc (TCast (true, ltyp, t)) ltyp
 
 let rec numeric_coerce ltyp t =
-  let oldt = unroll_type t.term_type in
+  let oldt = Ast_types.unroll_logic t.term_type in
   match t.term_node with
   | TCast (true, lt,e) when Cil.no_op_coerce lt e ->
     (* coercion hidden by the printer, but still present *)
@@ -387,7 +386,7 @@ let rec numeric_coerce ltyp t =
   | TConst(LReal _ ) when ltyp = Lreal ->
     { t with term_type = Lreal }
   | TCast (false, Ctype ty,e) ->
-    begin match ltyp, Cil.unrollTypeNode ty, e.term_node with
+    begin match ltyp, Ast_types.unroll_node ty, e.term_node with
       | Linteger, TInt ik, TConst(Integer(v,_))
         when Cil.fitsInInt ik v -> { e with term_type = Linteger }
       | Lreal, TFloat fk, TConst(LReal r)
@@ -424,7 +423,7 @@ and numeric_bound ltyp = function
    and scalar_term_to_predicate in sync. *)
 
 let is_zero_comparable t =
-  match unroll_type t.term_type with
+  match Ast_types.unroll_logic t.term_type with
   | Ctype { tnode = (TInt _ | TFloat _ | TPtr _  | TArray _ | TFun _ | TEnum _) } -> true
   | Ctype { tnode = (TVoid  | TNamed _ | TComp _ | TBuiltin_va_list) } -> false
   | Linteger | Lreal | Lboolean -> true
@@ -441,7 +440,7 @@ let scalar_term_conversion conversion t =
     conversion ~loc false t (Logic_const.term ~loc Tnull t.term_type) in
   let bool_conversion t =
     conversion ~loc true t (Logic_const.tboolean ~loc true) in
-  match unroll_type t.term_type with
+  match Ast_types.unroll_logic t.term_type with
   | Ctype { tnode = (TInt _ | TEnum _) } -> int_conversion t
   | Ctype { tnode = TFloat _ } as ltyp -> real_conversion ~ltyp t
   | Ctype { tnode = TPtr _ } -> ptr_conversion t
@@ -492,7 +491,7 @@ let float_builtin prefix fkind =
   | _ -> Kernel.fatal "Missing or ambiguous builtin %S" name
 
 let get_float_binop op typ =
-  match Cil.unrollTypeNode typ, op with
+  match Ast_types.unroll_node typ, op with
   | TFloat fkind, PlusA  -> float_builtin "add" fkind
   | TFloat fkind, MinusA -> float_builtin "sub" fkind
   | TFloat fkind, Mult   -> float_builtin "mul" fkind
@@ -500,7 +499,7 @@ let get_float_binop op typ =
   | _ -> None
 
 let get_float_unop op typ =
-  match Cil.unrollTypeNode typ, op with
+  match Ast_types.unroll_node typ, op with
   | TFloat fkind, Neg  -> float_builtin "neg" fkind
   | _ -> None
 
@@ -562,13 +561,13 @@ let rec expr_to_term ?(coerce=false) e =
     | AlignOfE e -> TAlignOf (Cil.typeOf e), ctyp
     | Lval lv -> TLval (lval_to_term_lval lv), ctyp
     | CastE (ty,e) ->
-      let coerce = Cil.isIntegralType (Cil.typeOf e) in
+      let coerce = Ast_types.is_integral (Cil.typeOf e) in
       let t = mk_cast ~loc ty (expr_to_term ~coerce e) in
       t.term_node , t.term_type
   in
   let v = mk_cast ~loc typ @@ Logic_const.term ~loc node ltyp in
   if coerce then
-    match Cil.unrollTypeNode typ with
+    match Ast_types.unroll_node typ with
     | TInt _ -> numeric_coerce Linteger v
     | TFloat _ -> numeric_coerce Lreal v
     | _ -> v
@@ -689,7 +688,9 @@ let array_with_range arr size =
   let loc = arr.eloc in
   let arr = Cil.stripCasts arr in
   let typ_arr = typeOf arr in
-  let no_cast = isAnyCharPtrType typ_arr || isAnyCharArrayType typ_arr in
+  let no_cast =
+    Ast_types.(is_any_char_ptr typ_arr || is_any_char_array typ_arr)
+  in
   let char_ptr = Ctype Cil_const.charPtrType in
   let arr = expr_to_term arr in
   let arr =
@@ -2264,7 +2265,7 @@ let lhost_c_type thost =
   | TVar v -> extract_ctype v.lv_type
   | TMem t ->
     let ty = extract_ctype t.term_type in
-    (match Cil.unrollTypeNode ty with
+    (match Ast_types.unroll_node ty with
      | TPtr ty -> ty
      | _ -> assert false)
   | TResult ty -> ty
@@ -2332,7 +2333,7 @@ class complete_types =
         | _, [] -> if changed then List.rev args' else args
         | { lv_type = typ } :: typs, t :: terms ->
           let t' =
-            match unroll_type typ with
+            match Ast_types.unroll_logic typ with
             | Ctype typ -> mk_cast typ t
             | _ -> t
           in
@@ -2385,7 +2386,7 @@ let pointer_comparable ?loc ?(label=Logic_const.here_label) t1 t2 =
     let loc = t.term_loc in
     match Logic_const.unroll_ltdef t.term_type with
     | Ctype ty ->
-      (match Cil.(unrollTypeDeep ty).tnode with
+      (match Ast_types.unroll_deep_node ty with
        | TPtr { tnode = TFun _ } ->
          mk_cast ~loc cfct_ptr t, fct_ptr
        | TPtr { tnode = TVoid } -> t, obj_ptr
@@ -2441,7 +2442,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
   | TConst (LReal _ | LWStr _ | LStr _) -> None
   | TSizeOf typ -> constFoldSizeOfToInt ~machdep typ
   | TSizeOfE t -> begin
-      match unroll_type t.term_type with
+      match Ast_types.unroll_logic t.term_type with
       | Ctype typ -> constFoldSizeOfToInt ~machdep typ
       | _ -> None
     end
@@ -2477,7 +2478,7 @@ let rec constFoldTermToInt ?(machdep=true) (e: term) : Integer.t option =
 
 and constFoldCastToInt ~machdep typ e =
   try
-    let ik = match Cil.unrollTypeNode typ with
+    let ik = match Ast_types.unroll_node typ with
       | TInt ik -> ik
       | TPtr _ -> Machine.uintptr_kind ()
       | TEnum ei -> ei.ekind
@@ -2566,7 +2567,7 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
           | Some i -> i
           | None -> raise (SizeOfError ("Index is not constant", typ))
         in
-        let typ_e = Cil.typeOf_array_elem typ in
+        let typ_e = Ast_types.direct_element_type typ in
         let size_e = Integer.of_int (Cil.bitsSizeOf typ_e) in
         loopOff typ size_e (Integer.(add start (mul ei size_e))) off
       end
@@ -2584,7 +2585,7 @@ and bitsLogicOffset ltyp off : Integer.t * Integer.t =
         loopOff f.ftype (Integer.of_int (Cil.bitsSizeOf f.ftype)) start off
     | TModel _ -> raise (SizeOfError ("bitsLogicOffset on model field", typ))
   in
-  match unroll_type ltyp with
+  match Ast_types.unroll_logic ltyp with
   | Ctype typ -> loopOff typ Integer.zero Integer.zero off
   | _ -> raise (SizeOfError ("bitsLogicOffset on logic type", Cil_const.voidPtrType))
 
@@ -2635,7 +2636,7 @@ let const_fold_trange_bounds typ b e =
   let e = match e with
     | Some te -> extract (constFoldTermToInt te)
     | None ->
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_node typ with
       | TArray (_, Some size) ->
         Integer.pred (extract (Cil.isInteger size))
       | _ -> raise CannotSimplify
@@ -2694,9 +2695,9 @@ let eval_term_lval global_find_init (lhost, loff) =
   | TVar lvi -> begin
       (* See if we can evaluate the l-value using the initializer of lvi*)
       let off_type = Cil.typeTermOffset lvi.lv_type loff in
-      if Logic_const.plain_or_set Cil.isLogicIntegralType off_type then
+      if Logic_const.plain_or_set Ast_types.is_logic_integral off_type then
         match lvi.lv_origin with
-        | Some vi when vi.vglob && Cil.typeHasQualifier "const" vi.vtype ->
+        | Some vi when vi.vglob && Ast_types.has_qualifier "const" vi.vtype ->
           find_initial_value (global_find_init vi) loff
         | _ -> None
       else None
@@ -2727,4 +2728,4 @@ class simplify_const_lval global_find_init = object (self)
     | _ -> Cil.DoChildren
 end
 
-let () = Cil_datatype.punrollLogicType := unroll_type
+let unroll_logic_type = Ast_types.unroll_logic

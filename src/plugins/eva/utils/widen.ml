@@ -197,7 +197,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
     let rec aux_idx idx shift =
       match idx.enode with
       | Lval (Var vidx, _) -> add_hint vidx size shift
-      | CastE (typ, e') when Cil.isIntegralType typ ->
+      | CastE (typ, e') when Ast_types.is_integral typ ->
         (* It is safe to ignore casts: hints do not need to be sound. *)
         aux_idx e' shift
       | BinOp ((PlusA | MinusA as op), e1, e2, _) -> begin
@@ -227,7 +227,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
       | NoOffset -> ()
       | Field (fi, off) -> aux_offset fi.ftype off
       | Index (idx, off) -> begin
-          match Cil.unrollTypeNode typ with
+          match Ast_types.unroll_node typ with
           | TArray (typ_e, size) -> begin
               aux_offset typ_e off;
               try

@@ -91,7 +91,9 @@ module Queries = struct
        the same type as the read lvalue. In this case, we don't update the state
        with the new value stemming from the evaluation, even if it has been
        reduced, in order to not propagate incompatible type. *)
-    let incompatible_type = is_float value <> Cil.isFloatingType lval.typ in
+    let incompatible_type =
+      is_float value <> Ast_types.is_float lval.typ
+    in
     let origin = if incompatible_type then Some value else None in
     let value = Cvalue_forward.reinterpret lval.typ value in
     read_garbled_mix value;
@@ -121,7 +123,7 @@ module Queries = struct
         v, alarms
 
   let extract_lval ~oracle:_ _context state lval loc =
-    if Cil.isScalarType lval.Eva_ast.typ
+    if Ast_types.is_scalar lval.Eva_ast.typ
     then extract_scalar_lval state lval loc
     else extract_aggregate_lval state lval loc
 

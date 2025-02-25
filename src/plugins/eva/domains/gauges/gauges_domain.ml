@@ -767,13 +767,13 @@ module G = struct
   (* This function returns [true] if [vi] _may_ be tracked. Variables for
      which we return [false] will never be part of a state. *)
   let tracked_variable vi =
-    Cil.isIntegralOrPointerType vi.Cil_types.vtype &&
+    Ast_types.is_integral_or_pointer vi.Cil_types.vtype &&
     (match function_calls_handling with
      | FullInterprocedural -> true
      | IntraproceduralAll -> not vi.vglob
      | IntraproceduralNonReferenced -> not vi.vglob && not vi.vaddrof
     ) &&
-    not (Cil.typeHasQualifier "volatile" vi.vtype)
+    not (Ast_types.has_qualifier "volatile" vi.vtype)
 
   let kill_base b (ct, l as state: t): t =
     let aux = function
@@ -992,7 +992,7 @@ module G = struct
 
   let translate_exp state to_loc to_v e =
     let ptr_size e =
-      let typ_pointed = Cil.typeOf_pointed e.typ in
+      let typ_pointed = Ast_types.direct_pointed_type e.typ in
       try Integer.of_int (Cil.bytesSizeOf typ_pointed)
       with Cil.SizeOfError _ -> raise Untranslatable
     in

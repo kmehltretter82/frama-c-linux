@@ -145,7 +145,7 @@ let assign ?(ltype) lhs rhs loc =
     | Some l -> l
     | None -> Cil.typeOfLval lhs
   in
-  match Cil.unrollTypeNode ltype with
+  match Ast_types.unroll_node ltype with
   | TPtr _ ->
     let base = Misc.ptr_base ~loc:rhs.eloc rhs in
     let rhs, flow =
@@ -169,7 +169,7 @@ let assign ?(ltype) lhs rhs loc =
           If this is the case then the analysis takes the value of a variable.
        *)
        | Lval lv ->
-         if Cil.isPointerType (Cil.unrollType (Cil.typeOfLval lv)) then
+         if Ast_types.is_ptr (Ast_types.unroll (Cil.typeOfLval lv)) then
            Cil.mkAddrOf ~loc lv, Indirect
          else
            rhs, Direct
@@ -337,7 +337,7 @@ end = struct
         definition otherwise there is no point. *)
     let has_def = Functions.has_fundef fexp in
     let env =
-      if Cil.isFunctionType (Cil.typeOf fexp) || has_def then
+      if Ast_types.is_fun (Cil.typeOf fexp) || has_def then
         save_params loc args env kf
       else
         env
@@ -399,7 +399,7 @@ end
    associated with adding a function argument to a stack frame *)
 let track_argument ?(typ) param index env =
   let typ = Option.value ~default:param.vtype typ in
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TPtr _
   | TComp _ ->
     let stmt = Mk.pull_param ~loc:Location.unknown param index in
@@ -419,7 +419,7 @@ let track_argument ?(typ) param index env =
 let handle_return_stmt loc ret env =
   match ret.enode with
   | Lval lv ->
-    if Cil.isPointerType (Cil.typeOfLval lv) then
+    if Ast_types.is_ptr (Cil.typeOfLval lv) then
       let exp = Cil.mkAddrOf ~loc lv in
       let stmt = Mk.handle_return_referent ~loc ~save:true exp in
       Env.add_stmt ~post:false env stmt

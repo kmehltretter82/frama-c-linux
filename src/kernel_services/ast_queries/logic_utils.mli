@@ -71,10 +71,6 @@ val remove_logic_function : logic_info -> unit
 *)
 val is_instance_of: string list -> logic_type -> logic_type -> bool
 
-(** expands logic type definitions. If the [unroll_typedef] flag is set to
-    [true] (this is the default), C typedef will be expanded as well. *)
-val unroll_type : ?unroll_typedef:bool -> logic_type -> logic_type
-
 (** {3 tests and extraction of element type}
     @before Frama-C+dev these function were in {!Logic_typing}
 *)
@@ -545,6 +541,16 @@ class simplify_const_lval: (varinfo -> init option) -> Cil.cilVisitor
     has been completed after its use in an annotation. Internal use only.
     @since Neon-20140301 *)
 val complete_types: file -> unit
+
+
+(** {2 Deprecated} *)
+
+(** expands logic type definitions. If the [unroll_typedef] flag is set to
+    [true] (this is the default), C typedef will be expanded as well. *)
+val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
+[@@deprecated "Use Ast_types.unroll_logic instead."]
+[@@migrate { repl = Ast_types.unroll_logic } ]
+
 
 (*
 Local Variables:

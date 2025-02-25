@@ -67,7 +67,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
   let validity =
     (* Add a special case for void* pointers: we do not want to compute the
        size of void *)
-    let validity = match Cil.unrollTypeNode pointed_typ with
+    let validity = match Ast_types.unroll_node pointed_typ with
       | TVoid -> Base.Unknown (Integer.zero, None, Bit_utils.max_bit_address ())
       | _ -> Base.validity_from_type hidden_var
     in
@@ -96,7 +96,7 @@ let create_hidden_base ~libc ~valid ~hidden_var_name ~name_desc pointed_typ =
 
 
 let reject_empty_struct b offset typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TComp ci ->
     if ci.cfields = Some [] && not (Machine.acceptEmptyCompinfo ()) then
       Self.abort ~current:true
@@ -111,7 +111,7 @@ let reject_empty_struct b offset typ =
     to create an initial value in [state]. *)
 let initialize_var_using_type varinfo state =
   let rec add_offsetmap depth b name_desc name typ offset_orig typ_orig state =
-    let typ = Cil.unrollType typ in
+    let typ = Ast_types.unroll typ in
     let loc = lazy (loc_of_typoffset b typ_orig offset_orig) in
     let bind_entire_loc ?(state=state) v = (* Shortcut *)
       add_initialized state (Lazy.force loc) v
@@ -130,12 +130,12 @@ let initialize_var_using_type varinfo state =
 
     | TPtr typ'
       when depth <= Parameters.AutomaticContextMaxDepth.get () ->
-      let attr = Cil.typeAttrs typ in
+      let attr = Ast_types.get_attributes typ in
       let libc = Cil.is_in_libc varinfo.vattr in
       let context_max_width =
         Parameters.AutomaticContextMaxWidth.get ()
       in begin
-        match Cil.isVoidType typ', Cil.isFunctionType typ' with
+        match Ast_types.is_void typ', Ast_types.is_fun typ' with
         | false, false -> (* non-void, non-function *)
           let i =
             match Ast_attributes.find_params "arraylen" attr with
@@ -198,7 +198,7 @@ let initialize_var_using_type varinfo state =
           let size_elt = Integer.of_int (Cil.bitsSizeOf typ) in
           let psize = pred size in
           let state = ref state in
-          let typ = Cil.unrollType typ in
+          let typ = Ast_types.unroll typ in
           let max_precise_size =
             Parameters.AutomaticContextMaxWidth.get ()
           in

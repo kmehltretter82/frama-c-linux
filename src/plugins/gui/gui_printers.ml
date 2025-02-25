@@ -128,7 +128,7 @@ let pp_typ_unfolded fmt (t : typ) =
       | TEnum ei ->
         pp_enum_unfolded  fmt ei (Ast_attributes.add_list t.tattr ti.ttype.tattr)
       | _ ->
-        Printer.pp_typ fmt (Cil.typeAddAttributes t.tattr ti.ttype)
+        Printer.pp_typ fmt (Ast_types.add_attributes t.tattr ti.ttype)
     end
   | TComp ci -> pp_tcomp_unfolded fmt ci t.tattr
   | TEnum ei -> pp_enum_unfolded  fmt ei t.tattr

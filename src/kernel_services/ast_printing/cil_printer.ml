@@ -715,10 +715,10 @@ class cil_printer () = object (self)
   method private no_ghost_at_first_level t =
     match t.tnode with
     | TArray (bt, e) ->
-      let bt' = Cil.typeRemoveAttributes [ "ghost" ] bt in
+      let bt' = Ast_types.remove_attributes [ "ghost" ] bt in
       let tattr = Ast_attributes.drop "ghost" t.tattr in
       Cil_const.mk_tarray ~tattr bt' e
-    | _ -> Cil.typeRemoveAttributes [ "ghost" ] t
+    | _ -> Ast_types.remove_attributes [ "ghost" ] t
 
   (* variable declaration *)
   method vdecl fmt (v:varinfo) =
@@ -728,8 +728,8 @@ class cil_printer () = object (self)
       Ast_attributes.filter "noreturn" v.vtype.tattr
     in
     let stom_noreturn = stom @ noreturn_attrs in
-    let vtype_no_noreturn = Cil.typeRemoveAttributes ["noreturn"] v.vtype in
-    let fundecl = if Cil.isFunctionType v.vtype then Some v else None in
+    let vtype_no_noreturn = Ast_types.remove_attributes ["noreturn"] v.vtype in
+    let fundecl = if Ast_types.is_fun v.vtype then Some v else None in
     let v = { v with vtype = self#no_ghost_at_first_level vtype_no_noreturn } in
     let v =
       if v.vformal && not state.print_cil_as_is then begin
@@ -913,7 +913,7 @@ class cil_printer () = object (self)
           self#init fmt i
         | _ -> Kernel.fatal "Trying to print malformed initializer"
       in
-      if not (Cil.isArrayType t) then
+      if not (Ast_types.is_array t) then
         Pretty_utils.pp_list ~pre:"{@[<hv>" ~sep:",@ " ~suf:"@]}" ~empty:"{}"
           designated_init fmt initl
       else begin
@@ -964,7 +964,7 @@ class cil_printer () = object (self)
          fprintf fmt "%a = " self#lval lv;
          (* Maybe we need to print a cast *)
          (let destt = Cil.typeOfLval lv in
-          match Cil.(unrollTypeNode (typeOf e)) with
+          match Ast_types.unroll_node (Cil.typeOf e) with
           | TFun(rt, _, _) when (Cil.need_cast rt destt) ->
             fprintf fmt "(%a)" (self#typ None) destt
           | _ -> ()));

@@ -298,7 +298,7 @@ let impact_selector
     end
 
   | PVDecl (_, _, vi) | PGlobal (GFun ({ svar = vi }, _))
-    when Cil.isFunctionType vi.vtype ->
+    when Ast_types.is_fun vi.vtype ->
     if button = 1 then begin
       let kf = Globals.Functions.get vi in
       pp_impact_on_inputs main_ui kf;

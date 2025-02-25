@@ -794,7 +794,7 @@ struct
       let init = match expr.enode with
         | Lval lv when intercept_volatile "read" lv ->
           M.stored_init seq obj loc (Cvalues.initialized_obj obj)
-        | Lval lv when Cil.(isStructOrUnionType @@ typeOfLval lv) ->
+        | Lval lv when Ast_types.is_struct_or_union (Cil.typeOfLval lv) ->
           M.copied_init seq obj loc (C.lval seq.pre lv)
         | _ ->
           M.stored_init seq obj loc (Cvalues.initialized_obj obj)

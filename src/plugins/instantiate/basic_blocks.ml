@@ -24,7 +24,7 @@ open Cil
 open Cil_types
 open Logic_const
 
-let const_of t = Cil.typeAddAttributes [("const", [])] t
+let const_of t = Ast_types.add_attributes [("const", [])] t
 
 let size_t () =
   Globals.Types.find_type Logic_typing.Typedef "size_t"
@@ -74,7 +74,7 @@ let rec string_of_typ_aux t =
     "arr" ^ (string_of_exp e) ^ "_" ^ string_of_typ t
   | _ ->
     Options.fatal "unsupported type %a" Cil_printer.pp_typ t
-and string_of_typ t = string_of_typ_aux (Cil.unrollType t)
+and string_of_typ t = string_of_typ_aux (Ast_types.unroll t)
 and string_of_exp e = Format.asprintf "%a" Cil_printer.pp_exp e
 
 let size_var ?(name_ext="") t value = {
@@ -92,9 +92,10 @@ let cvar_to_tvar vi = tvar (cvar_to_lvar vi)
 
 let tminus ?loc t1 t2 =
   let minus, typ = match t1.term_type, t2.term_type with
-    | Ctype(t1), Ctype(t2) when Cil.isPointerType t1 && Cil.isPointerType t2 ->
+    | Ctype(t1), Ctype(t2)
+      when Ast_types.is_ptr t1 && Ast_types.is_ptr t2 ->
       MinusPP, Linteger
-    | Ctype(t), _ when Cil.isPointerType t ->
+    | Ctype(t), _ when Ast_types.is_ptr t ->
       MinusPI, Ctype(t)
     | t, _ ->
       MinusA, t
@@ -103,7 +104,7 @@ let tminus ?loc t1 t2 =
 
 let tplus ?loc t1 t2 =
   let plus = match t1.term_type with
-    | Ctype(t) when Cil.isPointerType t -> PlusPI
+    | Ctype(t) when Ast_types.is_ptr t -> PlusPI
     | _ -> PlusA
   in
   term ?loc (TBinOp(plus, t1, t2)) t1.term_type
@@ -112,7 +113,7 @@ let tdivide ?loc t1 t2 =
   term ?loc (TBinOp(Div, t1, t2)) t1.term_type
 
 let ttype_of_pointed t =
-  match Logic_utils.unroll_type t with
+  match Ast_types.unroll_logic t with
   | Ctype { tnode = TPtr t | TArray (t, _) } -> Ctype t
   | _ -> Options.fatal "ttype_of_pointed on a non pointer type"
 
@@ -142,7 +143,7 @@ let taccess ?loc ptr offset =
     | TLval(lval) -> lval
     | _ -> Options.fatal "unexpected non-lvalue on call to taccess"
   in
-  match Logic_utils.unroll_type ptr.term_type with
+  match Ast_types.unroll_logic ptr.term_type with
   | Ctype { tnode = TPtr _ } ->
     let address = tplus ?loc ptr offset in
     let lval = TLval(TMem(address), TNoOffset) in
@@ -218,7 +219,7 @@ and pall_elems_eq ?loc depth t1 t2 len =
   let eq = peq_unfold ?loc (depth+1) t1_acc t2_acc in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and peq_unfold ?loc depth t1 t2 =
-  match Logic_utils.unroll_type t1.term_type with
+  match Ast_types.unroll_logic t1.term_type with
   | Ctype { tnode = TArray (_, Some len) } ->
     let len = Logic_utils.expr_to_term ~coerce:true len in
     pall_elems_eq ?loc depth t1 t2 len
@@ -234,7 +235,7 @@ and pall_elems_pred ?loc depth t1 len pred =
   let eq = punfold_pred ?loc depth t1_acc pred in
   pforall ?loc ([ind], (pimplies ?loc (bounds, eq)))
 and punfold_pred ?loc ?(dyn_len = None) depth t1 pred =
-  match Logic_utils.unroll_type t1.term_type with
+  match Ast_types.unroll_logic t1.term_type with
   | Ctype { tnode = TArray (_, opt_len) } ->
     let len =
       match opt_len, dyn_len with

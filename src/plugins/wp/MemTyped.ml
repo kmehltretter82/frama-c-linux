@@ -605,7 +605,7 @@ module BASE = WpContext.Generator(Varinfo)
         | _ -> ()
 
       let generate x =
-        let acs_rd = Cil.typeHasQualifier "const" x.vtype in
+        let acs_rd = Ast_types.has_qualifier "const" x.vtype in
         let prefix =
           if x.vglob
           then if acs_rd then "K" else "G"

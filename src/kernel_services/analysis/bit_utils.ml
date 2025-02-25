@@ -81,7 +81,7 @@ exception Neither_Int_Nor_Enum_Nor_Pointer
 (** May raise [Neither_Int_Nor_Enum_Nor_Pointer] if the sign of the type is not
     meaningful. [true] means that the type is signed. *)
 let is_signed_int_enum_pointer ty =
-  match unrollTypeNode ty with
+  match Ast_types.unroll_node ty with
   | TInt k | TEnum {ekind=k} -> Cil.isSigned k
   | TPtr _ -> false
   | TFloat _ | TFun _ | TBuiltin_va_list
@@ -100,8 +100,8 @@ let sizeof_vid v = sizeof v.vtype
 (** Returns the size of a the type of the variable in bits. *)
 let sizeof_lval lv =
   let typ = Cil.typeOfLval lv in
-  let typ =  unrollType typ in
-  if isIntegralType typ then (* We might be a bitfield *)
+  let typ = Ast_types.unroll typ in
+  if Ast_types.is_integral typ then (* We might be a bitfield *)
     let rec get_size off =
       match off with
       | NoOffset | Index (_,NoOffset) -> sizeof typ
@@ -117,18 +117,18 @@ let sizeof_lval lv =
 (** Returns the size of the type pointed by a pointer type in bits.
     Never call it on a non pointer type. *)
 let sizeof_pointed typ =
-  match unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TPtr typ -> sizeof typ
   | TArray (typ,_) -> sizeof typ
   | _ ->
     Kernel.fatal "TYPE IS: %a (unrolled as %a)"
       Printer.pp_typ typ
-      Printer.pp_typ (unrollType typ)
+      Printer.pp_typ (Ast_types.unroll typ)
 
 (** Returns the size of the type pointed by a pointer type in bytes.
     Never call it on a non pointer type. *)
 let osizeof_pointed typ =
-  match unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TPtr typ -> osizeof typ
   | TArray (typ,_) -> osizeof typ
   | _ ->
@@ -214,7 +214,7 @@ let rec pretty_bits_internal env bfinfo typ ~align ~start ~stop =
                Abstract_interp.Int.pretty start
                Abstract_interp.Int.pretty stop;
              false) else true);
-  let typ = unrollType typ in
+  let typ = Ast_types.unroll typ in
   match typ.tnode with
   | TInt _ | TPtr _ | TEnum _  | TFloat _
   | TVoid | TBuiltin_va_list | TNamed _ | TFun (_, _, _) ->
@@ -464,7 +464,7 @@ type offset_match =
 
 (* Comparison of the shape of two types.  Attributes are completely ignored. *)
 let rec type_compatible t1 t2 =
-  match unrollTypeNode t1, Cil.unrollTypeNode t2 with
+  match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
   | TVoid, TVoid -> true
   | TInt i1, TInt i2 -> i1 = i2
   | TFloat f1, TFloat f2 -> f1 = f2
@@ -517,7 +517,7 @@ let rec find_offset typ ~offset om =
   if Integer.is_zero offset && offset_matches om typ then
     NoOffset, typ
   else
-    match Cil.unrollTypeNode typ with
+    match Ast_types.unroll_node typ with
     | TArray (typ_elt, _) ->
       let size_elt = Integer.of_int (Cil.bitsSizeOf typ_elt) in
       if Integer.(equal size_elt zero) then

@@ -136,7 +136,7 @@ let parse_typ env ~loc t =
   let open Logic_typing in
   let g = env.context in
   let t = g.logic_type g loc g.pre_state t in
-  match Logic_utils.unroll_type t with
+  match Ast_types.unroll_logic t with
   | Ctype typ -> typ
   | _ -> error env ~loc "C-type expected for casting l-values"
 
@@ -146,8 +146,8 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLvar x -> parse_variable env ~loc x
   | PLunop( Ustar , p ) ->
     let lv = parse_lpath env p in
-    if Cil.isPointerType lv.typ then
-      let te = Cil.typeOf_pointed lv.typ in
+    if Ast_types.is_ptr lv.typ then
+      let te = Ast_types.direct_pointed_type lv.typ in
       { loc ; step = Star lv ; typ = te }
     else
       error env ~loc "Pointer-type expected for operator '*'"
@@ -158,11 +158,11 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLbinop( p , Badd , rg ) ->
     parse_lrange env rg ;
     let { typ } as lv = parse_lpath env p in
-    if Cil.isPointerType typ then
+    if Ast_types.is_ptr typ then
       { loc ; step = Shift lv ; typ = typ }
     else
-    if Cil.isArrayType typ then
-      let te = Cil.typeOf_array_elem typ in
+    if Ast_types.is_array typ then
+      let te = Ast_types.direct_element_type typ in
       { loc ; step = Shift lv ; typ =  Cil_const.mk_tptr te }
     else
       error env ~loc "Pointer-type expected for operator '+'"
@@ -178,14 +178,21 @@ let rec parse_lpath (env:env) (e: lexpr) =
   | PLarrget( p , rg ) ->
     parse_lrange env rg ;
     let { typ } as lv = parse_lpath env p in
-    if Cil.isPointerType typ then
-      let pointed = Cil.typeOf_pointed typ in
+    if Ast_types.is_ptr typ then
+      let pointed = Ast_types.direct_pointed_type typ in
       let ls = { loc ; step = Shift lv ; typ } in
       { loc ; step = Star ls ; typ = pointed }
     else
-    if Cil.isArrayType typ then
-      let elt,size = Cil.typeOf_array_elem_size typ in
-      { loc ; step = Index(lv,Z.to_int @@ Option.get size) ; typ = elt }
+    if Ast_types.is_array typ then
+      let elt,size = Ast_types.array_elem_type_and_size typ in
+      let size =
+        match Option.bind Cil.constFoldToInt size with
+        | Some size -> size
+        | None ->
+          Kernel.fatal "parse_lpath: array type %a without a size"
+            Cil_printer.pp_typ typ
+      in
+      { loc ; step = Index(lv,Z.to_int size) ; typ = elt }
     else
       error env ~loc:lv.loc "Pointer or array type expected"
   | PLcast( t , a ) ->

@@ -150,7 +150,7 @@ let typeof v =
   | String (_,_) -> Some Cil_const.charConstPtrType
   | CLogic_Var (_, ty, _) -> Some ty
   | Null -> None
-  | Var (v,_) | Allocated(v,_,_) -> Some (unrollType v.vtype)
+  | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.unroll v.vtype)
 
 let cstring_bitlength s =
   let u, l =
@@ -241,7 +241,7 @@ let validity b =
 let is_read_only base =
   match base with
   | String _ -> true
-  | Var (v,_) -> typeHasQualifier "const" v.vtype
+  | Var (v,_) -> Ast_types.has_qualifier "const" v.vtype
   | _ -> false
 
 (* Minor optimization compared to [is_weak (validity b)] *)
@@ -350,7 +350,7 @@ let is_function base =
   match base with
   | String _ | Null | CLogic_Var _ | Allocated _ -> false
   | Var(v,_) ->
-    isFunctionType v.vtype
+    Ast_types.is_fun v.vtype
 
 let equal v w = (id v) = (id w)
 
@@ -412,7 +412,7 @@ let is_block_local v block =
   | Allocated _ | CLogic_Var _ | Null | String _ -> false
 
 let validity_from_type v =
-  if isFunctionType v.vtype then Invalid
+  if Ast_types.is_fun v.vtype then Invalid
   else
     let max_valid = Bit_utils.sizeof_vid v in
     match max_valid with
@@ -520,7 +520,7 @@ let register_allocated_var varinfo deallocation validity =
   base
 
 let of_c_logic_var lv =
-  match Logic_utils.unroll_type lv.lv_type with
+  match Ast_types.unroll_logic lv.lv_type with
   | Ctype ty ->
     CLogic_Var (lv, ty, validity_from_known_size (Bit_utils.sizeof ty))
   | _ -> Kernel.fatal "Logic variable with a non-C type %s" lv.lv_name

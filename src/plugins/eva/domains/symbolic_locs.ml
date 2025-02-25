@@ -543,7 +543,7 @@ module D : Abstract_domain.Leaf
     `Value (Memory.kill loc state)
 
   let store_copy valuation lv loc state fv =
-    if Cil.isScalarType lv.lval.typ then
+    if Ast_types.is_scalar lv.lval.typ then
       match fv.v, fv.initialized, fv.escaping with
       | `Value v, true, false -> store_value valuation lv.lval loc state v
       | _ -> store_indeterminate state loc

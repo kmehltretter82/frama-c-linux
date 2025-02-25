@@ -40,13 +40,13 @@ let subscript ~loc array idx =
       array
 
 let ptr_sizeof ~loc typ =
-  match Cil.unrollTypeNode typ with
+  match Ast_types.unroll_node typ with
   | TPtr t' -> Cil.new_exp ~loc (SizeOf t')
   | _ -> assert false
 
 let lnot ~loc e =
   let ty = Cil.typeOf e in
-  if not (Cil.isScalarType ty) then
+  if not (Ast_types.is_scalar ty) then
     Options.fatal
       ~current:true
       "Trying to create a logical not on an expression that is not scalar: %a"

@@ -67,7 +67,7 @@ struct
   let field fd = Field fd
 
   let index ty =
-    match Cil.unrollTypeNode ty with
+    match Ast_types.unroll_node ty with
     | TArray (te, n) ->
       begin
         match Option.bind Ctypes.get_int n with
@@ -471,7 +471,7 @@ struct
         pp fmt layout
 
   let deref ~pointed (_,typ) =
-    match Cil.unrollTypeNode typ with
+    match Ast_types.unroll_node typ with
     | TInt ti | TEnum { ekind = ti } -> Chunk (Int (Ctypes.c_int ti))
     | TFloat tf -> Chunk (Float (Ctypes.c_float tf))
     | TPtr _ | TFun _ -> Chunk(Pointer(Lazy.force pointed))
@@ -479,7 +479,7 @@ struct
 
   let rec get_dim s rds typ =
     if s = Cil.bitsSizeOf typ then Some (List.rev rds) else
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_node typ with
       | TArray( te , Some e ) ->
         begin match Ctypes.get_int e with
           | None -> None

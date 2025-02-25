@@ -1,11 +1,11 @@
 let well_typed_call _ _ = function
   | [ e ] ->
     let t = Cil.typeOf(Cil.stripCasts e) in
-    not (Cil.isVoidPtrType t) && Cil.isPointerType t
+    not (Ast_types.is_void_ptr t) && Ast_types.is_ptr t
   | _ -> false
 
 let key_from_call _ _ = function
-  | [ e ] -> Cil.typeOf_pointed (Cil.typeOf(Cil.stripCasts e))
+  | [ e ] -> Ast_types.direct_pointed_type (Cil.typeOf(Cil.stripCasts e))
   | _ -> assert false
 
 let retype_args _ = function

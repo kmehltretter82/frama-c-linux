@@ -198,10 +198,6 @@ val block_of_local: fundec -> varinfo -> block
 
 val direct_array_size: typ -> Integer.t
 val array_size: typ -> Integer.t
-val direct_element_type: typ -> typ
-val element_type: typ -> typ
-val direct_pointed_type: typ -> typ
-val pointed_type: typ -> typ
 
 (* ************************************************************************** *)
 (** {2 Functions} *)
@@ -209,6 +205,7 @@ val pointed_type: typ -> typ
 
 val is_function_type : varinfo -> bool
 (** Return [true] iff the type of the given varinfo is a function type. *)
+[@@deprecated "Use Ast_types.is_function_type on the varinfo type instead."]
 
 (** Operations on cil function. *)
 module Function: sig
@@ -281,10 +278,21 @@ val is_frama_c_builtin: varinfo -> bool
 
 val array_type: ?length:exp -> ?attr:attributes -> typ -> typ
 (** @deprecated Frama-C+dev *)
-[@@alert deprecated "Use Cil_const.mk_tarray instead."]
+[@@deprecated "Use Cil_const.mk_tarray instead."]
+[@@migrate { repl = (fun ?length ~attr:tattr t -> Cil_const.mk_tarray ~tattr t length) } ]
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+val direct_element_type: typ -> typ
+[@@deprecated "Use Ast_types.direct_element_type instead."]
+[@@migrate { repl = Ast_types.direct_element_type } ]
+
+val element_type: typ -> typ
+[@@deprecated "Use Ast_types.element_type instead."]
+[@@migrate { repl = Ast_types.element_type } ]
+
+val direct_pointed_type: typ -> typ
+[@@deprecated "Use Ast_types.direct_pointed_type instead."]
+[@@migrate { repl = Ast_types.direct_pointed_type } ]
+
+val pointed_type: typ -> typ
+[@@deprecated "Use Ast_types.pointed_type instead."]
+[@@migrate { repl = Ast_types.pointed_type } ]

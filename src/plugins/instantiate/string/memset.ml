@@ -36,14 +36,14 @@ end
 
 let rec any_char_composed_type t =
   match t.tnode with
-  | _ when Cil.isAnyCharType t -> true
+  | _ when Ast_types.is_any_char t -> true
   | TArray (t, _) -> any_char_composed_type t
   | _ -> false
 
 let rec base_char_type t =
   assert (any_char_composed_type t) ;
   match t.tnode with
-  | _ when Cil.isAnyCharType t -> t
+  | _ when Ast_types.is_any_char t -> t
   | TArray (t, _) -> base_char_type t
   | _ -> assert false
 
@@ -58,7 +58,7 @@ let pset_len_bytes_to_value ?loc ptr value bytes_len =
 
 let pset_len_bytes_to_zero ?loc ptr bytes_len =
   let eq_value ?loc t =
-    let value = match Logic_utils.unroll_type t.term_type with
+    let value = match Ast_types.unroll_logic t.term_type with
       | Ctype { tnode = TPtr _ } -> term Tnull t.term_type
       | Ctype { tnode = TFloat _ } -> treal ?loc 0.
       | Ctype { tnode = (TInt _ | TEnum _) } -> tinteger ?loc 0
@@ -77,7 +77,7 @@ let pset_len_bytes_all_bits_to_one ?loc ptr bytes_len =
   in
   let find_nan_for_type t = List.find (of_type t) nans in
   let all_bits_to_one ?loc t =
-    match Logic_utils.unroll_type t.term_type with
+    match Ast_types.unroll_logic t.term_type with
     | Ctype { tnode = TFloat _ } ->
       papp ?loc ((find_nan_for_type t.term_type), [], [t])
     | Ctype { tnode = TPtr _ } ->
@@ -109,7 +109,7 @@ let generate_requires loc ptr value len =
       [ { (pcorrect_len_bytes ~loc ptr.term_type len)
           with pred_name = ["aligned_end"] } ]
     | Some value ->
-      let low, up = match Logic_utils.unroll_type value.term_type with
+      let low, up = match Ast_types.unroll_logic value.term_type with
         | Ctype { tnode = TInt ((IChar|ISChar|IUChar) as kind) } ->
           let bits = bitsSizeOfInt kind in
           let plus_one = Integer.add (Integer.of_int 1) in
@@ -180,7 +180,7 @@ let memset_value e =
   | _ -> None
 
 let rec contains_union_type t =
-  match Cil.unrollTypeNode t with
+  match Ast_types.unroll_node t with
   | TComp { cstruct = false } ->
     true
   | TComp { cfields = Some fields } ->
@@ -195,7 +195,7 @@ let well_typed_call _ret _fct = function
       | (No_pointed | Of_null _) , _ -> false
       | Value_of t , _ when any_char_composed_type t -> true
       | Value_of t , _ when contains_union_type t -> false
-      | Value_of t , _ when Cil.isVoidType t -> false
+      | Value_of t , _ when Ast_types.is_void t -> false
       | Value_of t , _ when not (Cil.isCompleteType t) -> false
       | _, None -> false
       | _, Some _ -> true

@@ -72,7 +72,7 @@ let warning warn s =
    singleton location with an arithmetic type, and that it contains no more than
    [max_card] elements. *)
 let split_v ~warn lv state max_card =
-  if Cil.isScalarType lv.typ then
+  if Ast_types.is_scalar lv.typ then
     let loc = Cvalue_queries.lval_to_loc state lv in
     if Locations.Location_Bits.cardinal_zero_or_one loc.Locations.loc then
       let v_indet = Cvalue.Model.find_indeterminate state loc in
@@ -132,7 +132,7 @@ let rec gather_lv_in_exp acc e =
 and gather_lv_in_lv acc lv =
   let (host, offset) = lv.node in
   let acc =
-    if Cil.isScalarType lv.typ
+    if Ast_types.is_scalar lv.typ
     then lv :: acc
     else acc
   in

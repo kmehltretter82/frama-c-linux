@@ -102,7 +102,7 @@ struct
     | [] -> LabelMap.empty
 
   let has_ltype ltype t =
-    match Logic_utils.unroll_type ~unroll_typedef:false ltype with
+    match Ast_types.unroll_logic ~unroll_typedef:false ltype with
     | Ltype (lt, _) ->
       if not (Typedefs.mem lt) then !compile_logic_type ltype ;
       begin match Typedefs.find lt with
@@ -851,7 +851,7 @@ struct
             ax.ax_name Printer.pp_logic_var phi.l_var_info
 
   let rec logic_type t =
-    match Logic_utils.unroll_type ~unroll_typedef:false t with
+    match Ast_types.unroll_logic ~unroll_typedef:false t with
     | Ctype _ -> ()
     | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ -> ()
     | Ltype(lt,ps) ->

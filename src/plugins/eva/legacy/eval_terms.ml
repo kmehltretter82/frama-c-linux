@@ -289,10 +289,10 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match Logic_utils.unroll_type lv.lv_type with
+    match Ast_types.unroll_logic lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
-    | Ctype ctyp when Cil.isIntegralType ctyp ->
+    | Ctype ctyp when Ast_types.is_integral ctyp ->
       let base = Base.of_c_logic_var lv in
       let size = Integer.of_int (Cil.bitsSizeOf ctyp) in
       let v = Cvalue.V_Or_Uninitialized.initialized V.top_int in
@@ -306,7 +306,7 @@ let bind_logic_vars env lvs =
 
 let copy_logic_vars ~src ~dst lvars =
   let copy_one env lvar =
-    match Logic_utils.unroll_type lvar.lv_type with
+    match Ast_types.unroll_logic lvar.lv_type with
     | Linteger | Lreal ->
       let value = LogicVarEnv.find lvar src.logic_vars in
       let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
@@ -326,7 +326,7 @@ let copy_logic_vars ~src ~dst lvars =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match Logic_utils.unroll_type lv.lv_type with
+    match Ast_types.unroll_logic lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | Ctype _ ->
       let base = Base.of_c_logic_var lv in
@@ -482,7 +482,7 @@ let rec isLogicNonCompositeType t =
     (try isLogicNonCompositeType (Logic_const.type_of_element t)
      with Failure _ -> false)
   | Lboolean | Linteger | Lreal -> true
-  | Ctype t -> Cil.isScalarType t
+  | Ctype t -> Ast_types.is_scalar t
 
 let rec infer_type = function
   | Ctype t ->
@@ -503,7 +503,7 @@ let rec infer_type = function
    differences in integer and floating-point sizes, that are meaningless
    in the logic *)
 let same_etype t1 t2 =
-  match Cil.unrollTypeNode t1, Cil.unrollTypeNode t2 with
+  match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TFloat _, TFloat _ -> true
   | TPtr p1, TPtr p2 -> Cil_datatype.Typ.equal p1 p2
@@ -512,7 +512,7 @@ let same_etype t1 t2 =
 (* Returns the kind of floating-point represented by a logic type, or None. *)
 let logic_type_fkind = function
   | Ctype typ -> begin
-      match Cil.unrollTypeNode typ with
+      match Ast_types.unroll_node typ with
       | TFloat fkind -> Some fkind
       | _ -> None
     end
@@ -522,11 +522,11 @@ let infer_binop_res_type op targ =
   match op with
   | PlusA | MinusA | Mult | Div -> targ
   | PlusPI | MinusPI ->
-    assert (Cil.isPointerType targ); targ
+    assert (Ast_types.is_ptr targ); targ
   | MinusPP -> Cil_const.intType
   | Mod | Shiftlt | Shiftrt | BAnd | BXor | BOr ->
     (* can only be applied on integral arguments *)
-    assert (Cil.isIntegralType targ); Cil_const.intType
+    assert (Ast_types.is_integral targ); Cil_const.intType
   | Lt | Gt | Le | Ge | Eq | Ne | LAnd | LOr ->
     Cil_const.intType (* those operators always return a boolean *)
 
@@ -545,10 +545,10 @@ let comes_from_fc_stdlib lvar =
 let is_noop_cast ~src_typ ~dst_typ =
   let src_typ = Logic_const.plain_or_set
       (fun lt ->
-         match Logic_utils.unroll_type lt with
+         match Ast_types.unroll_logic lt with
          | Ctype typ -> Eval_typ.classify_as_scalar typ
          | _ -> None
-      ) (Logic_utils.unroll_type src_typ)
+      ) (Ast_types.unroll_logic src_typ)
   in
   let open Eval_typ in
   match src_typ, Eval_typ.classify_as_scalar dst_typ with
@@ -562,7 +562,7 @@ let is_noop_cast ~src_typ ~dst_typ =
 (* If casting [trm] to [typ] has no effect in terms of the values contained
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
-  match Logic_utils.unroll_type typ, Logic_utils.unroll_type trm.term_type with
+  match Ast_types.(unroll_logic typ, unroll_logic trm.term_type) with
   | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
   | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
     Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
@@ -717,7 +717,7 @@ let is_true = function
    defined unambiguously in ACSL. *)
 let check_logic_alarms ~alarm_mode typ (_v1: V.t eval_result) op v2 =
   match op with
-  | Div | Mod when Cil.isIntegralOrPointerType typ ->
+  | Div | Mod when Ast_types.is_integral_or_pointer typ ->
     let truth = Cvalue_forward.assume_non_zero v2.eover in
     let division_by_zero = not (is_true truth) in
     track_alarms division_by_zero alarm_mode
@@ -973,7 +973,7 @@ let forward_binop typ v1 op v2 =
   match op with
   | Eva_ast.Eq | Ne | Le | Lt | Ge | Gt ->
     let comp = Eva_ast.conv_relation op in
-    if Cil.isPointerType typ || Cvalue_forward.are_comparable comp v1 v2
+    if Ast_types.is_ptr typ || Cvalue_forward.are_comparable comp v1 v2
     then forward_binop_by_type typ v1 op v2
     else Cvalue.V.zero_or_one
   | _ -> forward_binop_by_type typ v1 op v2
@@ -1015,7 +1015,7 @@ let rec eval_term ~alarm_mode env t =
 
   | TStartOf tlval ->
     let r = eval_tlval ~alarm_mode env tlval in
-    { etype = Cil_const.mk_tptr (Cil.typeOf_array_elem r.etype);
+    { etype = Cil_const.mk_tptr (Ast_types.direct_element_type r.etype);
       ldeps = r.ldeps;
       eunder = loc_bits_to_loc_bytes_under r.eunder;
       eover = loc_bits_to_loc_bytes r.eover;
@@ -1135,7 +1135,7 @@ let rec eval_term ~alarm_mode env t =
     (* See if the cast does something. If not, we can keep eunder as is.*)
     if is_noop_cast ~src_typ:t.term_type ~dst_typ:typ
     then { r with etype = typ }
-    else if Cil.isBoolType typ
+    else if Ast_types.is_bool typ
     then cast_to_bool r
     else
       let eover = cast ~src_typ:r.etype ~dst_typ:typ r.eover in
@@ -1151,7 +1151,7 @@ let rec eval_term ~alarm_mode env t =
     (match Logic_const.plain_or_set Fun.id ltyp with
      | Linteger when Logic_utils.is_integral_type t.term_type
                   || Logic_const.is_boolean_type t.term_type -> r
-     | Ctype typ when Cil.isIntegralOrPointerType typ -> r
+     | Ctype typ when Ast_types.is_integral_or_pointer typ -> r
      | Lreal ->
        let eover =
          if Logic_utils.is_integral_type t.term_type
@@ -1340,7 +1340,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
   else
     let r1 = eval_term ~alarm_mode env t1 in
     let r2 = eval_term ~alarm_mode env t2 in
-    let te1 = Cil.unrollType r1.etype in
+    let te1 = Ast_types.unroll r1.etype in
     check_logic_alarms ~alarm_mode te1 r1 op r2;
     let typ_res = infer_binop_res_type op te1 in
     let op = Eva_ast.translate_binop op in
@@ -1644,7 +1644,7 @@ and eval_tlhost ~alarm_mode env lv =
   match lv with
   | TVar lvar ->
     let base, typ =
-      match lvar.lv_origin, Logic_utils.unroll_type lvar.lv_type with
+      match lvar.lv_origin, Ast_types.unroll_logic lvar.lv_type with
       | Some v, _ -> Base.of_varinfo v, v.vtype
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar
@@ -1666,7 +1666,7 @@ and eval_tlhost ~alarm_mode env lv =
      | None -> no_result ())
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
-    let tres = match Cil.unrollTypeNode r.etype with
+    let tres = match Ast_types.unroll_node r.etype with
       | TPtr t -> t
       | _ -> ast_error "*p where p is not a pointer"
     in
@@ -1685,7 +1685,7 @@ and eval_toffset ~alarm_mode env typ toffset =
       eover = Ival.zero;
       empty = false; }
   | TIndex (idx, remaining) ->
-    let typ_e, size = match Cil.unrollTypeNode typ with
+    let typ_e, size = match Ast_types.unroll_node typ with
       | TArray (t, size) -> t, size
       | _ -> ast_error "index on a non-array"
     in
@@ -1725,8 +1725,9 @@ and eval_toffset ~alarm_mode env typ toffset =
       try Ival.of_int (fst (Cil.fieldBitsOffset fi))
       with Cil.SizeOfError _ -> default
     in
-    let attrs = Ast_attributes.filter_qualifiers (Cil.typeAttrs typ) in
-    let typ_fi = Cil.typeAddAttributes attrs fi.ftype in
+    let attrs = Ast_types.get_attributes typ in
+    let attrs = Ast_attributes.filter_qualifiers attrs in
+    let typ_fi = Ast_types.add_attributes attrs fi.ftype in
     let offsrem = eval_toffset ~alarm_mode env typ_fi remaining in
     { etype = offsrem.etype;
       ldeps = offsrem.ldeps;
@@ -1802,7 +1803,7 @@ and eval_term_as_exact_locs ~alarm_mode env t =
     let typ = loc.etype in
     (* eval_term_as_exact_loc is only used for reducing values, and we must
        NOT reduce volatile locations. *)
-    if Cil.typeHasQualifier "volatile" typ then raise Not_an_exact_loc;
+    if Ast_types.has_qualifier "volatile" typ then raise Not_an_exact_loc;
     let loc = Locations.make_loc loc.eunder (Eval_typ.sizeof_lval_typ typ)in
     if Locations.is_bottom_loc loc then raise Not_an_exact_loc;
     Location (typ, loc)
@@ -1971,7 +1972,7 @@ and reduce_by_valid env positive access (tset: term) =
          (* Compute the offsets, that depend on the type of the lval.
             The computed list is exactly what [aux] requires *)
          let roffs =
-           eval_toffset ~alarm_mode env (Cil.typeOf_pointed typ) offs
+           eval_toffset ~alarm_mode env (Ast_types.direct_pointed_type typ) offs
          in
          let aux env offs = aux lt env (roffs.etype, offs) in
          aux_min_max_offset aux env roffs.eunder
@@ -1988,7 +1989,7 @@ and reduce_by_valid env positive access (tset: term) =
            with V.Not_based_on_null -> raise Exit
          in
          let li = if op = PlusPI then li else Ival.neg_int li in
-         let typ_p = Cil.typeOf_pointed rtlv.etype in
+         let typ_p = Ast_types.direct_pointed_type rtlv.etype in
          let sbits = Integer.of_int (Cil.bitsSizeOf typ_p) in
          (* Compute the offsets expected by [aux], which are [i *
             8 * sizeof( *tlv)] *)
@@ -2481,7 +2482,7 @@ and eval_predicate env pred =
         match funs with
         | `Top -> Unknown
         | `Value funs ->
-          let typ = Cil.typeOf_pointed v.etype in
+          let typ = Ast_types.direct_pointed_type v.etype in
           let funs, warn' = Eval_typ.compatible_functions typ funs in
           if warn || warn' then
             (* No function possible -> signal hard error. Otherwise, follow

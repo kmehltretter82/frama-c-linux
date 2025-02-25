@@ -56,7 +56,7 @@ module ReturnUsage = struct
   let add_call (uf: return_usage_per_fun) lv_opt e_fun =
     match e_fun.enode, lv_opt with
     | Lval (Var vi, NoOffset), Some lv
-      when Cil.isIntegralOrPointerType (Cil.typeOfLval lv) ->
+      when Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
       let kf = Globals.Functions.get vi in
       let u = find_or_default uf lv in
       let funs = Kernel_function.Hptset.add kf u.ret_callees in
@@ -71,8 +71,8 @@ module ReturnUsage = struct
   let add_alias (uf: return_usage_per_fun) lv_dest e =
     match e.enode with
     | CastE (typ, { enode = Lval lve })
-      when Cil.isIntegralOrPointerType typ &&
-           Cil.isIntegralOrPointerType (Cil.typeOfLval lve)
+      when Ast_types.is_integral_or_pointer typ &&
+           Ast_types.is_integral_or_pointer (Cil.typeOfLval lve)
       ->
       let u = find_or_default uf lve in
       MapLval.add lv_dest u uf
@@ -80,7 +80,7 @@ module ReturnUsage = struct
 
   (* add a comparison with the integer [i] to the lvalue [lv] *)
   let add_compare_ct uf i lv =
-    if Cil.isIntegralOrPointerType (Cil.typeOfLval lv) then
+    if Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) then
       let u = find_or_default uf lv in
       let v = Datatype.Integer.Set.add i u.ret_compared in
       let u = { u with ret_compared = v } in
@@ -105,16 +105,16 @@ module ReturnUsage = struct
      | BinOp ((Eq | Ne), ct, {enode = Lval lv}, _) -> add ct lv
      | BinOp ((Eq | Ne), {enode = CastE (typ, {enode = Lval lv})}, ct, _)
      | BinOp ((Eq | Ne), ct, {enode = CastE (typ, {enode = Lval lv})}, _) ->
-       if Cil.isIntegralOrPointerType typ &&
-          Cil.isIntegralOrPointerType (Cil.typeOfLval lv)
+       if Ast_types.is_integral_or_pointer typ &&
+          Ast_types.is_integral_or_pointer (Cil.typeOfLval lv)
        then add ct lv
        else uf
      | UnOp (LNot, {enode = Lval lv}, _) ->
        add_compare_ct uf Int.zero lv
 
      | UnOp (LNot, {enode = CastE (typ, {enode = Lval lv})}, _)
-       when Cil.isIntegralOrPointerType typ &&
-            Cil.isIntegralOrPointerType (Cil.typeOfLval lv) ->
+       when Ast_types.is_integral_or_pointer typ &&
+            Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
        add_compare_ct uf Int.zero lv
 
      | _ -> uf)
@@ -130,8 +130,8 @@ module ReturnUsage = struct
       add_compare_ct uf Int.zero lv
 
     | CastE (typ, {enode = Lval lv})
-      when Cil.isIntegralOrPointerType typ &&
-           Cil.isIntegralOrPointerType (Cil.typeOfLval lv) ->
+      when Ast_types.is_integral_or_pointer typ &&
+           Ast_types.is_integral_or_pointer (Cil.typeOfLval lv) ->
       add_compare_ct uf Int.zero lv
 
     | BinOp ((LAnd | LOr), e1, e2, _) ->
@@ -218,7 +218,7 @@ module ReturnUsage = struct
   let add_null_pointers_split (ru: return_split): return_split =
     let null_set = Datatype.Integer.Set.singleton Integer.zero in
     let aux kf acc =
-      if Cil.isPointerType (Kernel_function.get_return_type kf) then
+      if Ast_types.is_ptr (Kernel_function.get_return_type kf) then
         add_split kf null_set acc
       else acc
     in

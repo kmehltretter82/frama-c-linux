@@ -330,7 +330,7 @@ let is_block_local v b = List.exists (fun vv -> v.vid = vv.vid) b.blocals
 (** {2 Functions} *)
 (* ************************************************************************** *)
 
-let is_function_type vi = isFunctionType vi.vtype
+let is_function_type vi = Ast_types.is_fun vi.vtype
 
 module Function = struct
 
@@ -422,43 +422,19 @@ let block_of_local (fdec:fundec) vi =
 (* ************************************************************************** *)
 
 let direct_array_size ty =
-  match unrollTypeNode ty with
+  match Ast_types.unroll_node ty with
   | TArray(_ty,Some size) -> value_of_integral_expr size
   | TArray(_ty,None) -> Integer.zero
   | _ -> assert false
 
 let rec array_size ty =
-  match unrollTypeNode ty with
+  match Ast_types.unroll_node ty with
   | TArray(elemty,Some _) ->
-    if isArrayType elemty then
+    if Ast_types.is_array elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)
     else direct_array_size ty
   | TArray(_,None) -> Integer.zero
   | _ -> assert false
-
-let direct_element_type ty = match unrollTypeNode ty with
-  | TArray(eltyp,_) -> eltyp
-  | _ -> assert false
-
-let element_type ty =
-  let rec elem_type ty = match unrollTypeNode ty with
-    | TArray(eltyp,_) -> elem_type eltyp
-    | _ -> ty
-  in
-  match unrollTypeNode ty with
-  | TArray (eltyp,_) -> elem_type eltyp
-  | _ -> assert false
-
-let direct_pointed_type ty =
-  match unrollTypeNode ty with
-  | TPtr elemty -> elemty
-  | _ -> assert false
-
-let pointed_type ty =
-  let ty' = unrollType (direct_pointed_type ty) in
-  match ty'.tnode with
-  | TArray _ -> element_type ty'
-  | _ -> ty'
 
 (* ************************************************************************** *)
 (** {2 Predefined} *)
@@ -495,12 +471,15 @@ let () = Cil_builtins.add_special_builtin_family start_with_frama_c_builtin
 let is_frama_c_builtin v =
   Cil_builtins.has_fc_builtin_attr v || start_with_frama_c_builtin v.vname
 
+(* Deprecated *)
+
 let array_type ?length ?(attr=[]) ty =
   Cil_const.mk_tarray ~tattr:attr ty length
 
+let direct_element_type = Ast_types.direct_element_type
 
-(*
-Local Variables:
-compile-command: "make -C ../../.."
-End:
-*)
+let element_type = Ast_types.element_type
+
+let direct_pointed_type = Ast_types.direct_pointed_type
+
+let pointed_type = Ast_types.pointed_type

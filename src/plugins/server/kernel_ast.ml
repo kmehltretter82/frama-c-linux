@@ -727,12 +727,12 @@ module GlobalVars = struct
       ~name:"volatile"
       ~descr:(Md.plain "Is the variable volatile?")
       ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.isVolatileType vi.vtype);
+      ~get:(fun vi -> Ast_types.is_volatile vi.vtype);
     States.column model
       ~name:"ghost"
       ~descr:(Md.plain "Is the variable ghost?")
       ~data:(module Data.Jbool)
-      ~get:(fun vi -> Cil.isGhostType vi.vtype);
+      ~get:(fun vi -> Ast_types.is_ghost vi.vtype);
     States.column model
       ~name:"init"
       ~descr:(Md.plain "Is the variable explicitly initialized?")
@@ -920,7 +920,7 @@ let () = Information.register
       | PType ({ tnode = TNamed _ } as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
         begin
-          let tdef = Cil.unrollType ty in
+          let tdef = Ast_types.unroll ty in
           match Printer_tag.definition_of_type tdef with
           | Some marker ->
             let tag = Marker.index marker in

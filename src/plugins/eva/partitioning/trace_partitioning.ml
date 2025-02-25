@@ -191,7 +191,7 @@ struct
         match return_exp with
         | None -> apply (Ration empty_rationing)
         | Some return_exp ->
-          if Cil.isIntegralOrPointerType return_exp.typ
+          if Ast_types.is_integral_or_pointer return_exp.typ
           then apply (Restrict (return_exp, i))
           else apply (Ration empty_rationing)
 

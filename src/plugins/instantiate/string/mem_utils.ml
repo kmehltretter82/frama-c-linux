@@ -37,24 +37,24 @@ type pointed_expr_type =
 
 let exp_type_of_pointed x =
   let no_cast = Cil.stripCasts x in
-  if not (Cil.isPointerType (Cil.typeOf no_cast)) then
+  if not (Ast_types.is_ptr (Cil.typeOf no_cast)) then
     match Cil.constFoldToInt x with
     | Some t when Integer.(equal t (of_int 0)) ->
-      Of_null (Cil.typeOf_pointed (Cil.typeOf x))
+      Of_null (Ast_types.direct_pointed_type (Cil.typeOf x))
     | _ ->
       No_pointed
   else
-    let xt = Cil.unrollTypeDeep (Cil.typeOf no_cast) in
-    let xt = Cil.type_remove_qualifier_attributes_deep xt in
-    Value_of (Cil.typeOf_pointed xt)
+    let xt = Ast_types.unroll_deep (Cil.typeOf no_cast) in
+    let xt = Ast_types.remove_qualifiers_deep xt in
+    Value_of (Ast_types.direct_pointed_type xt)
 
 let unexpected = Options.fatal "Mem_utils: %s"
 
 let mem2s_typing _ = function
   | [ dest ; src ; len ] ->
-    (Cil.isIntegralType len) &&
+    (Ast_types.is_integral len) &&
     (Cil_datatype.Typ.equal dest src) &&
-    (not (Cil.isVoidType dest)) &&
+    (not (Ast_types.is_void dest)) &&
     (Cil.isCompleteType dest)
   | _ -> false
 

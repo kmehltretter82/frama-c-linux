@@ -37,7 +37,7 @@ let assigns ~loc ~result e = instr (Set(result, e, loc))
 let assigns_field ~loc vi name value =
   let ty = vi.vtype in
   let compinfo =
-    match Cil.unrollTypeNode ty with
+    match Ast_types.unroll_node ty with
     | TComp compinfo -> compinfo
     | _ ->
       Options.fatal
@@ -66,7 +66,7 @@ let struct_local_init ~loc vi fields =
   vi.vdefined <- true;
   let ty = vi.vtype in
   let compinfo =
-    match Cil.unrollTypeNode ty with
+    match Ast_types.unroll_node ty with
     | TComp compinfo -> compinfo
     | _ ->
       Options.fatal
@@ -109,7 +109,7 @@ let do_call ~loc ?result vi args =
       match args, param_ty with
       | arg :: args_tl, (_, ty, _) :: param_ty_tl ->
         let e =
-          match ty.tnode, Cil.(unrollTypeNode (typeOf arg)), arg.enode with
+          match ty.tnode, Ast_types.unroll_node (Cil.typeOf arg), arg.enode with
           | TPtr _, TArray _, Lval lv -> Cil.new_exp ~loc (StartOf lv)
           | TPtr _, TArray _, _ -> assert false
           | _, _, _ -> arg
@@ -126,7 +126,7 @@ let do_call ~loc ?result vi args =
     in
     List.rev (make_rev_args [] args param_ty)
   in
-  let args = match Cil.unrollTypeNode vi.vtype with
+  let args = match Ast_types.unroll_node vi.vtype with
     | TFun (_, Some params, variadic) -> make_args ~variadic args params
     | TFun (_, None, _) -> []
     | _ -> assert false
@@ -171,7 +171,7 @@ let initialize ~loc (host, offset as lv) = match host, offset with
       [ Cil.mkAddrOf ~loc lv; Cil.new_exp ~loc (SizeOf typ) ]
 
 let named_store_stmt name ?str_size vi =
-  let ty = Cil.unrollType vi.vtype in
+  let ty = Ast_types.unroll vi.vtype in
   let loc = vi.vdecl in
   let store = rtl_call ~loc name in
   match ty.tnode, str_size with
@@ -202,7 +202,7 @@ let duplicate_store_stmt ?str_size vi =
 let delete_stmt ?(is_addr=false) vi =
   let loc = vi.vdecl in
   let mk = rtl_call ~loc "delete_block" in
-  match is_addr, Cil.unrollTypeNode vi.vtype with
+  match is_addr, Ast_types.unroll_node vi.vtype with
   | _, TArray (_, Some _) | true, _ -> mk [ Cil.evar ~loc vi ]
   | _ -> mk [ Cil.mkAddrOfVi vi ]
 

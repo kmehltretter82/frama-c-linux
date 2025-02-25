@@ -57,7 +57,7 @@ let term_to_exp_ref
    first extra argument at each call *)
 let result_as_extra_argument typ =
   let is_composite typ =
-    match Cil.unrollTypeNode typ with
+    match Ast_types.unroll_node typ with
     | TComp _ | TPtr _ | TArray _ -> true
     | TInt _ | TVoid  | TFloat _ | TFun _ | TNamed _ | TEnum _
     | TBuiltin_va_list -> false
@@ -107,7 +107,7 @@ let pred_to_block ~loc kf env ret_vi p =
 (* Generate the function's body for terms. *)
 let term_to_block ~loc kf env ret_ty ret_vi t =
   let e, _, env = !term_to_exp_ref ~adata:Assert.no_data kf env t in
-  if Cil.isVoidType ret_ty then
+  if Ast_types.is_void ret_ty then
     (* if the function's result is a GMP, it is the first parameter of the
        function (by reference). *)
     let set =

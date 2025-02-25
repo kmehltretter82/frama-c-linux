@@ -136,7 +136,7 @@ let initialized_obj = init_value e_true
 let uninitialized_obj = init_value e_false
 
 let always_initialized x =
-  (x.vformal || x.vglob) && not @@ Cil.isStructOrUnionType x.vtype
+  (x.vformal || x.vglob) && not @@ Ast_types.is_struct_or_union x.vtype
 
 (* -------------------------------------------------------------------------- *)
 (* --- Length of empty compinfos                                          --- *)
@@ -320,7 +320,7 @@ let cdomain obj =
   if is_constrained_obj obj then Some(TYPE.is_obj obj) else None
 
 let ldomain ltype =
-  match Logic_utils.unroll_type ~unroll_typedef:false ltype with
+  match Ast_types.unroll_logic ~unroll_typedef:false ltype with
   | Ctype typ -> cdomain (Ctypes.object_of typ)
   | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
 
@@ -568,8 +568,8 @@ let is_false p = e_if (e_prop p) e_zero e_one
 (* -------------------------------------------------------------------------- *)
 
 let startof ~shift loc typ =
-  if Cil.isArrayType typ then
-    let t_elt = Cil.typeOf_array_elem typ in
+  if Ast_types.is_array typ then
+    let t_elt = Ast_types.direct_element_type typ in
     shift loc (Ctypes.object_of t_elt) e_zero
   else loc
 

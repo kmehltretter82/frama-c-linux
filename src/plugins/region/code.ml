@@ -51,7 +51,7 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | Field(fd,ofs) ->
     add_loffset m s (add_field m r fd) fd.ftype ofs
   | Index(e,ofs) ->
-    let elt = Cil.typeOf_array_elem ty in
+    let elt = Ast_types.direct_element_type ty in
     ignore @@ add_exp m s e ;
     add_loffset m s (add_index m r elt) elt ofs
 
@@ -83,7 +83,7 @@ and add_exp (m: map) (s:stmt) (e:exp) : scalar =
 
   | CastE(ty,p) ->
     let v = add_exp m s p in
-    if Cil.isPointerType ty then
+    if Ast_types.is_ptr ty then
       fst @@ pointer m @@ v
     else
       integral

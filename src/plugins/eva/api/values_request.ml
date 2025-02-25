@@ -115,8 +115,8 @@ let probe_property = function
 
 let probe_marker = function
   | Printer_tag.PLval (_, _, lval)
-    when Cil.(isFunctionType (typeOfLval lval)) -> raise Not_found
-  | PVDecl (_, _, vi) when Cil.isFunctionType vi.vtype -> raise Not_found
+    when Ast_types.is_fun (Cil.typeOfLval lval) -> raise Not_found
+  | PVDecl (_, _, vi) when Ast_types.is_fun vi.vtype -> raise Not_found
   | PLval (_, _, l) -> Plval l
   | PExp (_, _, e) -> Pexpr e
   | PStmt (_, s) | PStmtStart (_, s) -> probe_stmt s
@@ -347,7 +347,7 @@ let filter_variables bases =
     with Base.Not_a_C_variable -> acc
   in
   let vars = List.rev (Base.Hptset.fold add_var bases []) in
-  List.filter (fun vi -> not (Cil.isFunctionType vi.vtype)) vars
+  List.filter (fun vi -> not (Ast_types.is_fun vi.vtype)) vars
 
 (* -------------------------------------------------------------------------- *)
 (* --- EVA Proxy                                                          --- *)
@@ -462,7 +462,7 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
       find_offsetmap cvalue_state precise_loc
 
   let eval_lval (lval : Eva_ast.lval) state =
-    match Cil.unrollTypeNode lval.typ with
+    match Ast_types.unroll_node lval.typ with
     | TInt _ | TEnum _ | TPtr _ | TFloat _ ->
       A.copy_lvalue state lval >>=: fun value -> Value value
     | _ ->
