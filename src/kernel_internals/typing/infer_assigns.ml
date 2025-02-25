@@ -73,7 +73,7 @@ let from_prototype kf =
     (* Generate the required numbers of [[..]] until with find a non-array
        type *)
     let rec mk_offset set typ =
-      match Ast_types.unroll_type_node typ with
+      match Ast_types.unroll_node typ with
       | TArray (typ_elem, size) ->
         let range = match size with
           | None -> make_range None

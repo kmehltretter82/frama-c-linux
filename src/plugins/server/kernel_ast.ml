@@ -920,7 +920,7 @@ let () = Information.register
       | PType ({ tnode = TNamed _ } as ty)
       | PGlobal (GType({ ttype = ty },_)) ->
         begin
-          let tdef = Ast_types.unroll_type ty in
+          let tdef = Ast_types.unroll ty in
           match Printer_tag.definition_of_type tdef with
           | Some marker ->
             let tag = Marker.index marker in

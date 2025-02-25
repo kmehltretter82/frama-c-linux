@@ -60,7 +60,7 @@ let backward_float_relation fkind ~positive op v1 v2 =
   Some (v1', v2')
 
 let backward_relation typ ~positive op =
-  match Ast_types.unroll_type_node typ with
+  match Ast_types.unroll_node typ with
   | TInt _ | TEnum _ | TPtr _ ->
     let op = if positive then op else Abstract_interp.Comp.inv op in
     backward_int_relation typ op
@@ -258,7 +258,7 @@ let backward_lor ~v1 ~v2 ~res =
     | false, true -> Some (V.diff v1 V.singleton_zero, v2)
 
 let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
-  let typ = Ast_types.unroll_type typ_res in
+  let typ = Ast_types.unroll typ_res in
   match binop, typ.tnode with
   | Eva_ast.PlusA, TInt _ ->  backward_add_int typ ~res_value ~v1 ~v2 true
   | MinusA, TInt _ -> backward_add_int typ ~res_value ~v1 ~v2 false
@@ -285,10 +285,10 @@ let backward_binop ~typ_res ~res_value ~typ_e1 v1 binop v2 =
         None
       | false, true ->
         (* comparison relation holds *)
-        backward_relation (Ast_types.unroll_type typ_e1) ~positive:true binop v1 v2
+        backward_relation (Ast_types.unroll typ_e1) ~positive:true binop v1 v2
       | true, false ->
         (* comparison relation does not hold *)
-        backward_relation (Ast_types.unroll_type typ_e1) ~positive:false binop v1 v2
+        backward_relation (Ast_types.unroll typ_e1) ~positive:false binop v1 v2
       | _ ->
         assert false (* bottom *)
     end

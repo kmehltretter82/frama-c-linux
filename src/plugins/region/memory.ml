@@ -74,7 +74,7 @@ let cpointed = function Blob | Compound _ -> None | Cell(_,p) -> p
 let ctypes (m : chunk) : typ list =
   let pool = ref Typ.Set.empty in
   let add acs =
-    pool := Typ.Set.add (Ast_types.unroll_type @@ Access.typeof acs) !pool in
+    pool := Typ.Set.add (Ast_types.unroll @@ Access.typeof acs) !pool in
   Access.Set.iter add m.creads ;
   Access.Set.iter add m.cwrites ;
   Typ.Set.elements !pool

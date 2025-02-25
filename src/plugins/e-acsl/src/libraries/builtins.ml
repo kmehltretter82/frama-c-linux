@@ -45,9 +45,9 @@ let add_builtin vi already =
   if not already then
     let bl_name = vi.vname in
     if Options.Builtins.mem bl_name then
-      match Ast_types.unroll_type_node vi.vtype with
+      match Ast_types.unroll_node vi.vtype with
       | TFun(ret_typ, param_typs, _) ->
-        let bl_type = match Ast_types.unroll_type_node ret_typ with
+        let bl_type = match Ast_types.unroll_node ret_typ with
           | TVoid ->
             Options.fatal
               "Expecting a non-void return type for the E-ACSL built-in %s"

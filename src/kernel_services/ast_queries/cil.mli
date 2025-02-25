@@ -2362,22 +2362,22 @@ val isWFGhostType : typ -> bool
     appearing in [TNamed] and add them to the final type using
     {!Ast_attributes.add}. *)
 val unrollType: typ -> typ
-[@@deprecated "Use Ast_types.unroll_type instead."]
-[@@migrate { repl = Ast_types.unroll_type } ]
+[@@deprecated "Use Ast_types.unroll instead."]
+[@@migrate { repl = Ast_types.unroll } ]
 
 (** Same than {!Cil.unrollType} but discard the final type attributes and only
     return its node.
     @since Frama-c+Dev *)
 val unrollTypeNode: typ -> typ_node
-[@@deprecated "Use Ast_types.unroll_type_node instead."]
-[@@migrate { repl = Ast_types.unroll_type_node } ]
+[@@deprecated "Use Ast_types.unroll_node instead."]
+[@@migrate { repl = Ast_types.unroll_node } ]
 
 (** Unroll all the TNamed in a type (even under type constructors such as
     [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
     types. Will collect all attributes *)
 val unrollTypeDeep: typ -> typ
-[@@deprecated "Use Ast_types.unroll_type_deep instead."]
-[@@migrate { repl = Ast_types.unroll_type_deep } ]
+[@@deprecated "Use Ast_types.unroll_deep instead."]
+[@@migrate { repl = Ast_types.unroll_deep } ]
 
 (** is the given type "void"? *)
 val isVoidType: typ -> bool

@@ -29,7 +29,7 @@ let bitfield_size_attributes attrs =
   | _ -> None
 
 let sizeof_lval_typ typlv =
-  match Ast_types.unroll_type typlv with
+  match Ast_types.unroll typlv with
   | { tnode = (TInt _ | TEnum _); tattr } as t ->
     (match Ast_attributes.(find_params bitfield_attribute_name tattr) with
      | [AInt i] -> Int_Base.Value i
@@ -44,7 +44,7 @@ let offsetmap_matches_type typ_lv o =
       try typ_matches (V.project_ival_bottom v)
       with V.Not_based_on_null -> true (* Do not mess with pointers *)
   in
-  match Ast_types.unroll_type_node typ_lv with
+  match Ast_types.unroll_node typ_lv with
   | TFloat _ -> aux Ival.is_float
   | TInt _ | TEnum _ | TPtr _ -> aux Ival.is_int
   | _ -> true
@@ -62,7 +62,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
      - enums and integer types with the same signedness and size are equal *)
   let weak_compatible t1 t2 =
     Cabs2cil.areCompatibleTypes t1 t2 ||
-    match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
+    match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
     | TVoid, TVoid -> true
     | TPtr _, TPtr _ -> true
     | (TInt ik1 | TEnum {ekind = ik1}),
@@ -77,7 +77,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
   if Cabs2cil.areCompatibleTypes typ_fun typ_pointed then Compatible
   else
     let continue =
-      match Ast_types.unroll_type_node typ_pointed, Ast_types.unroll_type_node typ_fun with
+      match Ast_types.unroll_node typ_pointed, Ast_types.unroll_node typ_fun with
       | TFun (ret1, args1, var1), TFun (ret2, args2, var2) ->
         (* Either both functions are variadic, or none. Otherwise, it
            will be too complicated to make the argument match *)
@@ -104,7 +104,7 @@ let is_compatible_function ~typ_pointed ~typ_fun =
     if continue then Incompatible_but_accepted else Incompatible
 
 let refine_fun_ptr typ args =
-  match Ast_types.unroll_type typ, args with
+  match Ast_types.unroll typ, args with
   | { tnode = TFun (_, Some _, _) }, _ | _, None -> typ
   | { tnode = TFun (ret, None, var); tattr }, Some l ->
     let ltyps = List.map (fun arg -> "", arg, []) l in
@@ -177,7 +177,7 @@ let pointer_range () =
     i_signed = false; }
 
 let classify_as_scalar typ =
-  match Ast_types.unroll_type typ with
+  match Ast_types.unroll typ with
   | { tnode = (TInt ik | TEnum { ekind = ik }); tattr } ->
     Some (TSInt (ik_attrs_range ik tattr))
   | { tnode = TPtr _ } -> Some (TSPtr (pointer_range ()))
@@ -185,7 +185,7 @@ let classify_as_scalar typ =
   | _ -> None
 
 let integer_range ~ptr typ =
-  match Ast_types.unroll_type typ with
+  match Ast_types.unroll typ with
   | { tnode = (TInt ik | TEnum { ekind = ik }); tattr } ->
     Some (ik_attrs_range ik tattr)
   | { tnode = TPtr _ } when ptr -> Some (pointer_range ())

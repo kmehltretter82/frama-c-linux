@@ -37,7 +37,7 @@ let rec type_of_offset (basetyp : typ) : offset -> typ = function
   | Index (_, o) ->
     type_of_offset (Ast_types.direct_element_type basetyp) o
   | Field (fi, o) ->
-    let base_attrs = (Ast_types.unroll_type basetyp).tattr in
+    let base_attrs = (Ast_types.unroll basetyp).tattr in
     let base_attrs = Ast_attributes.filter_qualifiers base_attrs in
     let base_attrs =
       if Ast_attributes.(contains frama_c_mutable fi.fattr) then
@@ -63,6 +63,6 @@ let type_of_exp_node : exp_node -> typ = function
   | CastE (t, _) -> t
   | AddrOf lv -> Cil_const.mk_tptr lv.typ
   | StartOf lv ->
-    match Ast_types.unroll_type lv.typ with
+    match Ast_types.unroll lv.typ with
     | { tnode = TArray (t, _); tattr } -> Cil_const.mk_tptr ~tattr t
     | _ ->  assert false

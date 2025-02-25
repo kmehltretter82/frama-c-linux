@@ -81,7 +81,7 @@ let well_typed_call ret _fct args =
 let key_from_call ret _fct _ =
   match ret with
   | Some ret ->
-    let ret_t = Ast_types.unroll_type_deep (Cil.typeOfLval ret) in
+    let ret_t = Ast_types.unroll_deep (Cil.typeOfLval ret) in
     let ret_t = Ast_types.remove_qualifiers_deep ret_t in
     Ast_types.direct_pointed_type ret_t
   | _ -> unexpected "trying to generate a key on an ill-typed call"

@@ -108,30 +108,30 @@ val remove_attributes_for_logic_type : typ -> typ
     appearing in [TNamed] and add them to the final type using
     {!add_attributes}.
 *)
-val unroll_type : typ -> typ
+val unroll : typ -> typ
 
-(** Same than {!unroll_type} but discard the final type attributes and only
+(** Same than {!unroll} but discard the final type attributes and only
     return its node. *)
-val unroll_type_node : typ -> typ_node
+val unroll_node : typ -> typ_node
 
 (** Unroll typedefs, discarding all intermediate attribute. To be used only
     when one is interested in the shape of the type *)
-val unroll_type_skel : typ -> typ_node
+val unroll_skel : typ -> typ_node
 
 (** Unroll all the TNamed in a type (even under type constructors such as
     [TPtr], [TFun] or [TArray]. Does not unroll the types of fields in [TComp]
     types. Will collect all attributes *)
-val unroll_type_deep : typ -> typ
+val unroll_deep : typ -> typ
 
-(** Same than {!unroll_type_deep} but discard the final type attributes and only
+(** Same than {!unroll_deep} but discard the final type attributes and only
     return its node. *)
-val unroll_type_deep_node : typ -> typ_node
+val unroll_deep_node : typ -> typ_node
 
 (** Expands logic type definitions. If the [unroll_typedef] flag is set to
     [true] (this is the default), C typedef will be expanded as well using
     {!Logic_const.unroll_ltdef}.
 *)
-val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
+val unroll_logic : ?unroll_typedef:bool -> logic_type -> logic_type
 
 (* ************************************************************************* *)
 (** {2 Const Attribute} *)

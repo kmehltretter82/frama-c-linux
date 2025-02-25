@@ -227,7 +227,7 @@ val instantiate :
 val is_unrollable_ltdef : logic_type_info -> bool
 
 (** expands logic type definitions only.
-    To expands both logic part and C part, uses {!Ast_types.unroll_logic_type}.
+    To expands both logic part and C part, uses {!Ast_types.unroll_logic}.
     @since 18.0-Argon *)
 val unroll_ltdef : logic_type -> logic_type
 

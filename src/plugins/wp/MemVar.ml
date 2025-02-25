@@ -936,7 +936,7 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let rec forall_pointers phi v t =
-    match Ast_types.unroll_type_node t with
+    match Ast_types.unroll_node t with
     | TInt _ | TFloat _ | TVoid | TEnum _ | TNamed _ | TBuiltin_va_list
       -> F.p_true
     | TPtr _ | TFun _ -> phi v

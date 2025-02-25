@@ -82,7 +82,7 @@ let get_lvalue = function
   | _ -> None
 
 let rec ghost_term_type t =
-  match (Ast_types.unroll_logic_type t) with
+  match (Ast_types.unroll_logic t) with
   | Ctype t -> Ast_types.is_ghost t
   | t when Logic_const.is_set_type t ->
     ghost_term_type (Logic_const.type_of_element t)
@@ -92,7 +92,7 @@ class visitor = object(self)
   inherit Visitor.frama_c_inplace
 
   method private ghost_incompatible nt ot =
-    match Ast_types.unroll_type_node nt, Ast_types.unroll_type_node ot with
+    match Ast_types.unroll_node nt, Ast_types.unroll_node ot with
     | TPtr nt', TPtr ot'
     | TPtr nt', TArray (ot', _) ->
       Ast_types.is_ghost nt' <> Ast_types.is_ghost ot' ||
@@ -151,8 +151,8 @@ class visitor = object(self)
     if not(is_generated_ret_var v)
     && not (Ast_types.is_wellformed_ghost v.vtype) then
       Error.invalid_ghost_type_for_varinfo ~once:true ~current ~source v ;
-    if Ast_types.(is_fun (unroll_type v.vtype)) then begin
-      let ftype = getReturnType (Ast_types.unroll_type v.vtype) in
+    if Ast_types.(is_fun (unroll v.vtype)) then begin
+      let ftype = getReturnType (Ast_types.unroll v.vtype) in
       match ftype.tnode with
       | TPtr t when not (Ast_types.is_wellformed_ghost t) ->
         Error.invalid_ghost_type_for_return ~once:true ~current ~source ()

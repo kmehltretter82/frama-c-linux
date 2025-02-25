@@ -289,7 +289,7 @@ let bind_logic_vars env lvs =
     let bind_logic_var ival =
       state, LogicVarEnv.add lv (Cvalue.V.inject_ival ival) logic_vars
     in
-    match Ast_types.unroll_logic_type lv.lv_type with
+    match Ast_types.unroll_logic lv.lv_type with
     | Linteger -> bind_logic_var Ival.top
     | Lreal -> bind_logic_var top_float
     | Ctype ctyp when Ast_types.is_integral ctyp ->
@@ -306,7 +306,7 @@ let bind_logic_vars env lvs =
 
 let copy_logic_vars ~src ~dst lvars =
   let copy_one env lvar =
-    match Ast_types.unroll_logic_type lvar.lv_type with
+    match Ast_types.unroll_logic lvar.lv_type with
     | Linteger | Lreal ->
       let value = LogicVarEnv.find lvar src.logic_vars in
       let logic_vars = LogicVarEnv.add lvar value env.logic_vars in
@@ -326,7 +326,7 @@ let copy_logic_vars ~src ~dst lvars =
 
 let unbind_logic_vars env lvs =
   let unbind_one (state, logic_vars) lv =
-    match Ast_types.unroll_logic_type lv.lv_type with
+    match Ast_types.unroll_logic lv.lv_type with
     | Linteger | Lreal -> state, LogicVarEnv.remove lv logic_vars
     | Ctype _ ->
       let base = Base.of_c_logic_var lv in
@@ -503,7 +503,7 @@ let rec infer_type = function
    differences in integer and floating-point sizes, that are meaningless
    in the logic *)
 let same_etype t1 t2 =
-  match Ast_types.unroll_type_node t1, Ast_types.unroll_type_node t2 with
+  match Ast_types.unroll_node t1, Ast_types.unroll_node t2 with
   | (TInt _ | TEnum _), (TInt _ | TEnum _) -> true
   | TFloat _, TFloat _ -> true
   | TPtr p1, TPtr p2 -> Cil_datatype.Typ.equal p1 p2
@@ -512,7 +512,7 @@ let same_etype t1 t2 =
 (* Returns the kind of floating-point represented by a logic type, or None. *)
 let logic_type_fkind = function
   | Ctype typ -> begin
-      match Ast_types.unroll_type_node typ with
+      match Ast_types.unroll_node typ with
       | TFloat fkind -> Some fkind
       | _ -> None
     end
@@ -545,10 +545,10 @@ let comes_from_fc_stdlib lvar =
 let is_noop_cast ~src_typ ~dst_typ =
   let src_typ = Logic_const.plain_or_set
       (fun lt ->
-         match Ast_types.unroll_logic_type lt with
+         match Ast_types.unroll_logic lt with
          | Ctype typ -> Eval_typ.classify_as_scalar typ
          | _ -> None
-      ) (Ast_types.unroll_logic_type src_typ)
+      ) (Ast_types.unroll_logic src_typ)
   in
   let open Eval_typ in
   match src_typ, Eval_typ.classify_as_scalar dst_typ with
@@ -562,7 +562,7 @@ let is_noop_cast ~src_typ ~dst_typ =
 (* If casting [trm] to [typ] has no effect in terms of the values contained
    in [trm], do nothing. Otherwise, raise [exn]. Adapted from [pass_cast] *)
 let pass_logic_cast exn typ trm =
-  match Ast_types.(unroll_logic_type typ, unroll_logic_type trm.term_type) with
+  match Ast_types.(unroll_logic typ, unroll_logic trm.term_type) with
   | Linteger, Ctype { tnode = (TInt _ | TEnum _) } -> () (* Always inclusion *)
   | Ctype ({ tnode = (TInt _ | TEnum _) } as typ),
     Ctype ({ tnode = (TInt _ | TEnum _) } as typeoftrm) ->
@@ -1340,7 +1340,7 @@ and eval_binop ~alarm_mode env op t1 t2 =
   else
     let r1 = eval_term ~alarm_mode env t1 in
     let r2 = eval_term ~alarm_mode env t2 in
-    let te1 = Ast_types.unroll_type r1.etype in
+    let te1 = Ast_types.unroll r1.etype in
     check_logic_alarms ~alarm_mode te1 r1 op r2;
     let typ_res = infer_binop_res_type op te1 in
     let op = Eva_ast.translate_binop op in
@@ -1644,7 +1644,7 @@ and eval_tlhost ~alarm_mode env lv =
   match lv with
   | TVar lvar ->
     let base, typ =
-      match lvar.lv_origin, Ast_types.unroll_logic_type lvar.lv_type with
+      match lvar.lv_origin, Ast_types.unroll_logic lvar.lv_type with
       | Some v, _ -> Base.of_varinfo v, v.vtype
       | None, Ctype typ -> Base.of_c_logic_var lvar, typ
       | _ -> unsupported_lvar lvar
@@ -1666,7 +1666,7 @@ and eval_tlhost ~alarm_mode env lv =
      | None -> no_result ())
   | TMem t ->
     let r = eval_term ~alarm_mode env t in
-    let tres = match Ast_types.unroll_type_node r.etype with
+    let tres = match Ast_types.unroll_node r.etype with
       | TPtr t -> t
       | _ -> ast_error "*p where p is not a pointer"
     in
@@ -1685,7 +1685,7 @@ and eval_toffset ~alarm_mode env typ toffset =
       eover = Ival.zero;
       empty = false; }
   | TIndex (idx, remaining) ->
-    let typ_e, size = match Ast_types.unroll_type_node typ with
+    let typ_e, size = match Ast_types.unroll_node typ with
       | TArray (t, size) -> t, size
       | _ -> ast_error "index on a non-array"
     in

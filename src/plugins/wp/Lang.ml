@@ -156,7 +156,7 @@ let init_sort_of_object = function
 
 let sort_of_ctype t = sort_of_object (Ctypes.object_of t)
 
-let sort_of_ltype t = match Ast_types.unroll_logic_type ~unroll_typedef:false t with
+let sort_of_ltype t = match Ast_types.unroll_logic ~unroll_typedef:false t with
   | Ctype typ -> sort_of_ctype typ
   | Ltype _ | Lvar _ | Larrow _ -> Logic.Sdata
   | Lboolean -> Logic.Sbool
@@ -221,7 +221,7 @@ let atype lt ts =
   with Not_found -> Logic.Data(Atype lt,ts)
 
 let rec tau_of_ltype t =
-  match Ast_types.unroll_logic_type ~unroll_typedef:false t with
+  match Ast_types.unroll_logic ~unroll_typedef:false t with
   | Lboolean -> Logic.Bool
   | Linteger -> Logic.Int
   | Lreal -> Logic.Real

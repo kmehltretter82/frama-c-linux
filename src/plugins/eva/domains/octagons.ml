@@ -56,7 +56,7 @@ end
 type kind = Integer | Float
 
 let typ_kind typ =
-  match Ast_types.unroll_type_node typ with
+  match Ast_types.unroll_node typ with
   | TInt _ | TEnum  _ | TPtr _ -> Integer
   | TFloat _ -> Float
   | _ -> assert false

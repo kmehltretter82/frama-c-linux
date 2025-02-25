@@ -145,7 +145,7 @@ let assign ?(ltype) lhs rhs loc =
     | Some l -> l
     | None -> Cil.typeOfLval lhs
   in
-  match Ast_types.unroll_type_node ltype with
+  match Ast_types.unroll_node ltype with
   | TPtr _ ->
     let base = Misc.ptr_base ~loc:rhs.eloc rhs in
     let rhs, flow =
@@ -169,7 +169,7 @@ let assign ?(ltype) lhs rhs loc =
           If this is the case then the analysis takes the value of a variable.
        *)
        | Lval lv ->
-         if Ast_types.is_ptr (Ast_types.unroll_type (Cil.typeOfLval lv)) then
+         if Ast_types.is_ptr (Ast_types.unroll (Cil.typeOfLval lv)) then
            Cil.mkAddrOf ~loc lv, Indirect
          else
            rhs, Direct
@@ -399,7 +399,7 @@ end
    associated with adding a function argument to a stack frame *)
 let track_argument ?(typ) param index env =
   let typ = Option.value ~default:param.vtype typ in
-  match Ast_types.unroll_type_node typ with
+  match Ast_types.unroll_node typ with
   | TPtr _
   | TComp _ ->
     let stmt = Mk.pull_param ~loc:Location.unknown param index in

@@ -51,7 +51,7 @@ let self_fun = Exns.self
 let self_stmt = ExnsStmt.self
 
 let purify t =
-  let t = Ast_types.unroll_type_deep t in
+  let t = Ast_types.unroll_deep t in
   Ast_types.remove_qualifiers_deep t
 
 class all_exn =
@@ -81,7 +81,7 @@ let compute_all_exn () =
 let all_exn () = All_exn.memo compute_all_exn
 
 let add_exn_var exns v =
-  let t = Ast_types.unroll_type_deep v.vtype in
+  let t = Ast_types.unroll_deep v.vtype in
   let t = Ast_types.remove_qualifiers t in
   Cil_datatype.Typ.Set.add t exns
 
@@ -124,7 +124,7 @@ class exn_visit =
         let my_exn = Stack.top current_exn in
         self#union_exn my_exn; ExnsStmt.replace s my_exn; SkipChildren
       | Throw(Some (_,t),_) ->
-        let t = Ast_types.unroll_type_deep t in
+        let t = Ast_types.unroll_deep t in
         let t = Ast_types.remove_qualifiers t in
         self#add_exn t;
         ExnsStmt.replace s (Cil_datatype.Typ.Set.singleton t);

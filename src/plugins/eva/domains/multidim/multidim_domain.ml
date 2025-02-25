@@ -823,7 +823,7 @@ struct
       begin match Location.of_term env arg with
         | `Top -> `Value state (* can't resolve location, ignore *)
         | `Value (loc,typ) ->
-          begin match Ast_types.unroll_type_node (Logic_utils.logicCType typ) with
+          begin match Ast_types.unroll_node (Logic_utils.logicCType typ) with
             | TFloat fkind ->
               let update = Value.backward_is_finite positive fkind
               and oracle = mk_oracle state in

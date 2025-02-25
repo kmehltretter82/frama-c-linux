@@ -279,7 +279,7 @@ struct
   and matrixinfo = c_object * int option list
 
   let eqsort_of_type t =
-    match Ast_types.unroll_logic_type ~unroll_typedef:false t with
+    match Ast_types.unroll_logic ~unroll_typedef:false t with
     | Ltype({lt_name="set"},[_]) -> EQ_set
     | Lboolean | Linteger | Lreal | Lvar _ | Larrow _ | Ltype _ -> EQ_plain
     | Ctype t ->
@@ -356,9 +356,9 @@ struct
 
 
   let float_of_logic_type lt =
-    match Ast_types.unroll_logic_type lt with
+    match Ast_types.unroll_logic lt with
     | Ctype ty ->
-      (match Ast_types.unroll_type_node ty with
+      (match Ast_types.unroll_node ty with
        | TFloat f -> Some (Ctypes.c_float f)
        | _ -> None)
     | _ -> None
@@ -458,7 +458,7 @@ struct
     | L_array of arrayinfo
 
   let rec cvsort_of_ltype src_ltype =
-    match Ast_types.unroll_logic_type ~unroll_typedef:false src_ltype with
+    match Ast_types.unroll_logic ~unroll_typedef:false src_ltype with
     | Lboolean -> L_bool
     | Linteger -> L_integer
     | Lreal -> L_real
@@ -557,7 +557,7 @@ struct
         Printer.pp_typ dst_ctype Printer.pp_logic_type t.term_type
 
   let term_cast_to_real env t =
-    let src_ltype = Ast_types.unroll_logic_type ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_cint _ ->
       L.map (fun x -> Cmath.real_of_int (Cint.to_integer x)) (C.logic env t)
@@ -571,7 +571,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Lreal
 
   let term_cast_to_integer env t =
-    let src_ltype = Ast_types.unroll_logic_type ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_real ->
       L.map Cmath.int_of_real (C.logic env t)
@@ -589,7 +589,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Linteger
 
   let term_cast_to_boolean env t =
-    let src_ltype = Ast_types.unroll_logic_type ~unroll_typedef:false t.term_type in
+    let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
     match cvsort_of_ltype src_ltype with
     | L_bool -> C.logic env t
     | L_integer | L_cint _ ->
@@ -599,7 +599,7 @@ struct
         Printer.pp_logic_type src_ltype Printer.pp_logic_type Lboolean
 
   let rec term_cast_to_ltype env dst_ltype t =
-    match Ast_types.unroll_logic_type ~unroll_typedef:false dst_ltype with
+    match Ast_types.unroll_logic ~unroll_typedef:false dst_ltype with
     | Ctype typ-> term_cast_to_ctype env typ t
     | Lboolean -> term_cast_to_boolean env t
     | Linteger -> term_cast_to_integer env t
@@ -607,7 +607,7 @@ struct
     | Ltype({lt_name="set"},[elt_ltype]) -> (* lifting, set of elements ? *)
       term_cast_to_ltype env elt_ltype t
     | (Ltype _ | Lvar _ | Larrow _) as dst_ltype ->
-      let src_ltype = Ast_types.unroll_logic_type ~unroll_typedef:false t.term_type in
+      let src_ltype = Ast_types.unroll_logic ~unroll_typedef:false t.term_type in
       Warning.error "@[Logic cast to (%a) from (%a) not implemented yet@]"
         Printer.pp_logic_type dst_ltype Printer.pp_logic_type src_ltype
 
@@ -659,7 +659,7 @@ struct
       begin
         let lt = Cil.typeOfTermLval lval in
         let base = addr_lval env lval in
-        match Ast_types.unroll_logic_type lt with
+        match Ast_types.unroll_logic lt with
         | Ctype ct ->
           L.map_loc (fun l -> Cvalues.startof ~shift:M.shift l ct) base
         | _ -> base

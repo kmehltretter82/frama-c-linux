@@ -203,7 +203,7 @@ let remove_attributes_for_logic_type t =
 
 (* Unrolling *)
 
-let unroll_type (t: typ) : typ =
+let unroll (t: typ) : typ =
   let rec with_attrs (al: attributes) (t: typ) : typ =
     match t.tnode with
     | TNamed ti -> with_attrs (Ast_attributes.add_list al t.tattr) ti.ttype
@@ -211,36 +211,36 @@ let unroll_type (t: typ) : typ =
   in
   with_attrs [] t
 
-let () = Cil_datatype.punrollType := unroll_type
+let () = Cil_datatype.punrollType := unroll
 
-let unroll_type_node (t: typ) : typ_node =
-  (unroll_type t).tnode
+let unroll_node (t: typ) : typ_node =
+  (unroll t).tnode
 
-let rec unroll_type_skel (t : typ) : typ_node =
+let rec unroll_skel (t : typ) : typ_node =
   match t.tnode with
-  | TNamed ti -> unroll_type_skel ti.ttype
+  | TNamed ti -> unroll_skel ti.ttype
   | _ -> t.tnode
 
-let rec unroll_type_deep (t: typ) : typ =
+let rec unroll_deep (t: typ) : typ =
   let rec with_attrs (al: attributes) (t: typ) : typ =
     match t.tnode with
     | TNamed r -> with_attrs (Ast_attributes.add_list al t.tattr) r.ttype
     | TPtr bt ->
-      let bt' = unroll_type_deep bt in
+      let bt' = unroll_deep bt in
       let tattr = Ast_attributes.add_list al t.tattr in
       Cil_const.mk_tptr ~tattr bt'
     | TArray (bt, l) ->
       let att_elt, att_typ = Ast_attributes.split_array_attributes al in
-      let bt' = array_push_attributes att_elt (unroll_type_deep bt) in
+      let bt' = array_push_attributes att_elt (unroll_deep bt) in
       let tattr = Ast_attributes.add_list att_typ t.tattr in
       Cil_const.mk_tarray ~tattr bt' l
     | TFun (rt, args, isva) ->
-      let rt' = unroll_type_deep rt in
+      let rt' = unroll_deep rt in
       let args' =
         match args with
         | None -> None
         | Some argl ->
-          Some (List.map (fun (an, at, aa) -> (an, unroll_type_deep at, aa)) argl)
+          Some (List.map (fun (an, at, aa) -> (an, unroll_deep at, aa)) argl)
       in
       let tattr = Ast_attributes.add_list al t.tattr in
       Cil_const.mk_tfun ~tattr rt' args' isva
@@ -248,8 +248,8 @@ let rec unroll_type_deep (t: typ) : typ =
   in
   with_attrs [] t
 
-let unroll_type_deep_node (t: typ) : typ_node =
-  (unroll_type_deep t).tnode
+let unroll_deep_node (t: typ) : typ_node =
+  (unroll_deep t).tnode
 
 (* ************************* *)
 (* Handling const attribute. *)
@@ -277,7 +277,7 @@ let is_ghost typ_lval =
   has_attribute_memory_block "ghost" typ_lval
 
 let rec is_wellformed_ghost t =
-  is_wellformed_ghost' (unroll_type_deep t)
+  is_wellformed_ghost' (unroll_deep t)
 and is_wellformed_ghost' t =
   if not (is_ghost t) then is_wellformed_non_ghost t
   else match t.tnode with
@@ -294,53 +294,53 @@ and is_wellformed_non_ghost t =
 (* ************** *)
 
 let is_void t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TVoid -> true
   | _ -> false
 
 let is_void_ptr t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TPtr t when is_void t -> true
   | _ -> false
 
 let is_bool t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TInt IBool -> true
   | _ -> false
 
 let is_char t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TInt IChar -> true
   | _ -> false
 
 let is_any_char t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TInt (IChar | ISChar | IUChar) -> true
   | _ -> false
 
 let is_char_ptr t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TPtr t when is_char t -> true
   | _ -> false
 
 let is_any_char_ptr t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TPtr t when is_any_char t -> true
   | _ -> false
 
 let is_char_const_ptr t =
-  match unroll_type t with
+  match unroll t with
   | { tnode = TPtr t; tattr } when is_char t ->
     Ast_attributes.contains "const" tattr
   | _ -> false
 
 let is_short t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TInt (IUShort | IShort) -> true
   | _ -> false
 
 let is_integral t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | (TInt _ | TEnum _) -> true
   | _ -> false
 
@@ -357,23 +357,23 @@ let rec is_uintptr_t  t =
   | _ -> false
 
 let is_float t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TFloat _ -> true
   | _ -> false
 
 let is_long_double t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TFloat FLongDouble -> true
   | _ -> false
 
 (* ISO 6.2.5.18 *)
 let is_arithmetic t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | (TInt _ | TEnum _ | TFloat _) -> true
   | _ -> false
 
 let is_ptr t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TPtr _ -> true
   | _ -> false
 
@@ -381,35 +381,35 @@ let is_integral_or_pointer t =
   is_integral t || is_ptr t
 
 let is_array t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TArray _ -> true
   | _ -> false
 
 let is_unsized_array t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TArray (_, None) -> true
   | _ -> false
 
 let is_sized_array t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TArray (_, Some _) -> true
   | _ -> false
 
-let is_char_array t = match unroll_type_skel t with
+let is_char_array t = match unroll_skel t with
   | TArray(tau, _) when is_char tau -> true
   | _ -> false
 
-let is_any_char_array t = match unroll_type_skel t with
+let is_any_char_array t = match unroll_skel t with
   | TArray(tau, _) when is_any_char tau -> true
   | _ -> false
 
 let is_fun t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TFun _ -> true
   | _ -> false
 
 let is_fun_ptr t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TPtr t -> is_fun t
   | _ -> false
 
@@ -422,12 +422,12 @@ let is_object t =
   not (is_fun t)
 
 let is_struct t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TComp ci -> ci.cstruct
   | _ -> false
 
 let is_union t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TComp ci -> not ci.cstruct
   | _ -> false
 
@@ -435,7 +435,7 @@ let is_struct_or_union t = is_struct t || is_union t
 
 (* Check if a type is a transparent union, and return the first field if it is. *)
 let is_transparent_union t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TComp ci when not ci.cstruct ->
     (* Turn transparent unions into the type of their first field. *)
     if has_attribute "transparent_union" t then begin
@@ -451,7 +451,7 @@ let is_transparent_union t =
   | _ -> None
 
 let is_variadic_list t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TBuiltin_va_list -> true
   | _ -> false
 
@@ -460,29 +460,29 @@ let is_variadic_list t =
 (* ************ *)
 
 let direct_element_type t =
-  match unroll_type_node t with
+  match unroll_node t with
   | TArray (elem_t, _) -> elem_t
   | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
 
 let rec element_type t =
   let t' = direct_element_type t in
-  match unroll_type_node t' with
+  match unroll_node t' with
   | TArray _ -> element_type t'
   | _ -> t'
 
 let array_elem_type_and_size t =
-  match unroll_type_node t with
+  match unroll_node t with
   | TArray (ty_elem, arr_size) -> ty_elem, arr_size
   | _ -> Kernel.fatal "Not an array type %a" Cil_datatype.Typ.pretty t
 
 let direct_pointed_type t =
-  match unroll_type_skel t with
+  match unroll_skel t with
   | TPtr t -> t
   | _ -> Kernel.fatal "Not a pointer type %a" Cil_datatype.Typ.pretty t
 
 let pointed_type t =
   let t' = direct_pointed_type t in
-  match unroll_type_node t' with
+  match unroll_node t' with
   | TArray _ -> element_type t'
   | _ -> t'
 
@@ -490,14 +490,14 @@ let pointed_type t =
 (* Logic Type checkers. *)
 (* ******************** *)
 
-let rec unroll_logic_type ?(unroll_typedef=true) = function
+let rec unroll_logic ?(unroll_typedef=true) = function
   | Ltype (tdef,_) as ty when Logic_const.is_unrollable_ltdef tdef ->
-    unroll_logic_type ~unroll_typedef (Logic_const.unroll_ltdef ty)
-  | Ctype ty when unroll_typedef -> Ctype (unroll_type ty)
+    unroll_logic ~unroll_typedef (Logic_const.unroll_ltdef ty)
+  | Ctype ty when unroll_typedef -> Ctype (unroll ty)
   | Linteger | Lboolean | Lreal | Lvar _ | Larrow _ | Ctype _ | Ltype _ as ty ->
     ty
 
-let () = Cil_datatype.punrollLogicType := unroll_logic_type
+let () = Cil_datatype.punrollLogicType := unroll_logic
 
 (* Utils function for is_logic_* functions. *)
 let unroll_logic_aux is_logic lti t =

@@ -388,7 +388,7 @@ let memset_typ_offsm_int full_typ i =
           let vinit = V_Or_Uninitialized.initialized v in
           V_Offsetmap.add bounds (vinit, size, Rel.zero) offsm
         in
-        match Ast_types.unroll_type_node styp with
+        match Ast_types.unroll_node styp with
         | TInt _ | TEnum _ | TPtr _ ->
           let size = Eval_typ.sizeof_lval_typ styp (* handles bitfields *) in
           let size = Int_Base.project size in

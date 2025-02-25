@@ -964,7 +964,7 @@ class cil_printer () = object (self)
          fprintf fmt "%a = " self#lval lv;
          (* Maybe we need to print a cast *)
          (let destt = Cil.typeOfLval lv in
-          match Ast_types.unroll_type_node (Cil.typeOf e) with
+          match Ast_types.unroll_node (Cil.typeOf e) with
           | TFun(rt, _, _) when (Cil.need_cast rt destt) ->
             fprintf fmt "(%a)" (self#typ None) destt
           | _ -> ()));

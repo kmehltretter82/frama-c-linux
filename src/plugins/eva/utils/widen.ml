@@ -227,7 +227,7 @@ class widen_visitor init_widen_hints init_enclosing_loops = object(self)
       | NoOffset -> ()
       | Field (fi, off) -> aux_offset fi.ftype off
       | Index (idx, off) -> begin
-          match Ast_types.unroll_type_node typ with
+          match Ast_types.unroll_node typ with
           | TArray (typ_e, size) -> begin
               aux_offset typ_e off;
               try

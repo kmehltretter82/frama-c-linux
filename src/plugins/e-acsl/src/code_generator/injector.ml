@@ -637,7 +637,7 @@ let unghost_vi vi =
      see bts #1392 *)
   if vi.vstorage <> Extern then vi.vghost <- false;
   Cil.update_var_type vi (Ast_types.remove_attributes_deep ["ghost"] vi.vtype);
-  match Ast_types.unroll_type vi.vtype with
+  match Ast_types.unroll vi.vtype with
   | { tnode = TFun (res, Some l, va); tattr } ->
     (* unghostify function's parameters *)
     let retype (n, t, a) =

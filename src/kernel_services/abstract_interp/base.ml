@@ -150,7 +150,7 @@ let typeof v =
   | String (_,_) -> Some Cil_const.charConstPtrType
   | CLogic_Var (_, ty, _) -> Some ty
   | Null -> None
-  | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.unroll_type v.vtype)
+  | Var (v,_) | Allocated(v,_,_) -> Some (Ast_types.unroll v.vtype)
 
 let cstring_bitlength s =
   let u, l =
@@ -520,7 +520,7 @@ let register_allocated_var varinfo deallocation validity =
   base
 
 let of_c_logic_var lv =
-  match Ast_types.unroll_logic_type lv.lv_type with
+  match Ast_types.unroll_logic lv.lv_type with
   | Ctype ty ->
     CLogic_Var (lv, ty, validity_from_known_size (Bit_utils.sizeof ty))
   | _ -> Kernel.fatal "Logic variable with a non-C type %s" lv.lv_name

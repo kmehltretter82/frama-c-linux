@@ -548,8 +548,8 @@ val complete_types: file -> unit
 (** expands logic type definitions. If the [unroll_typedef] flag is set to
     [true] (this is the default), C typedef will be expanded as well. *)
 val unroll_logic_type : ?unroll_typedef:bool -> logic_type -> logic_type
-[@@deprecated "Use Ast_types.unroll_logic_type instead."]
-[@@migrate { repl = Ast_types.unroll_logic_type } ]
+[@@deprecated "Use Ast_types.unroll_logic instead."]
+[@@migrate { repl = Ast_types.unroll_logic } ]
 
 
 (*

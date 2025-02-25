@@ -44,7 +44,7 @@ let exp_type_of_pointed x =
     | _ ->
       No_pointed
   else
-    let xt = Ast_types.unroll_type_deep (Cil.typeOf no_cast) in
+    let xt = Ast_types.unroll_deep (Cil.typeOf no_cast) in
     let xt = Ast_types.remove_qualifiers_deep xt in
     Value_of (Ast_types.direct_pointed_type xt)
 

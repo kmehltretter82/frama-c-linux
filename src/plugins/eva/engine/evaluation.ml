@@ -139,7 +139,7 @@ let warn_pointer_comparison typ =
   match Parameters.WarnPointerComparison.get () with
   | "none" -> false
   | "all" -> true
-  | "pointer" -> Ast_types.(is_ptr (unroll_type typ))
+  | "pointer" -> Ast_types.(is_ptr (unroll typ))
   | _ -> assert false
 
 let propagate_all_pointer_comparison typ =
@@ -161,7 +161,7 @@ let signed_ikind = function
   | ILongLong | IULongLong  -> ILongLong
 
 let rec signed_counterpart typ =
-  let typ = Ast_types.unroll_type typ in
+  let typ = Ast_types.unroll typ in
   match typ.tnode with
   | TInt ik -> Cil_const.mk_tint ~tattr:typ.tattr (signed_ikind ik)
   | TEnum ei ->
@@ -511,7 +511,7 @@ module Make
   let assume_valid_value context lval res =
     let open Evaluated.Operators in
     let* value, origin = res in
-    match Ast_types.unroll_type_node lval.typ with
+    match Ast_types.unroll_node lval.typ with
     | TFloat fkind ->
       let expr = Eva_ast.Build.lval lval in
       let+ new_value = remove_special_float expr fkind value in
@@ -663,7 +663,7 @@ module Make
 
   let forward_binop context typ (e1, v1 as arg1) op arg2 =
     let open Evaluated.Operators in
-    let typ_e1 = Ast_types.unroll_type e1.typ in
+    let typ_e1 = Ast_types.unroll e1.typ in
     match comparison_kind op with
     | Some kind ->
       let compute v1 v2 = Value.forward_binop context typ_e1 op v1 v2 in
@@ -675,7 +675,7 @@ module Make
       Value.forward_binop context typ_e1 op v1 v2
 
   let forward_unop context unop (e, v as arg) =
-    let typ = Ast_types.unroll_type e.typ in
+    let typ = Ast_types.unroll e.typ in
     if unop = LNot then
       let kind = Abstract_value.Equality in
       let compute _ v = Value.forward_unop context typ unop v in
@@ -968,7 +968,7 @@ module Make
     | CastE (dst_typ, e) ->
       let* value, volatile = root_forward_eval env e in
       let v = forward_cast env.context ~dst_typ e value in
-      let v = match Ast_types.unroll_type_node dst_typ with
+      let v = match Ast_types.unroll_node dst_typ with
         | TFloat fkind -> let* v in remove_special_float expr fkind v
         | TPtr _ -> let* v in assume_pointer env.context expr v
         | _ -> v
@@ -1080,7 +1080,7 @@ module Make
     | Index (index_expr, remaining) ->
       let open Evaluated.Operators in
       let typ_pointed, array_size =
-        match Ast_types.unroll_type typ with
+        match Ast_types.unroll typ with
         | { tnode = TArray (t, size) } -> t, size
         | t -> Self.fatal ~current:true "Got type '%a'" Printer.pp_typ t
       in
@@ -1349,12 +1349,12 @@ module Make
          Value.backward_unop? *)
       backward_eval fuel context state cond (Some value)
     | UnOp (op, e, _typ) ->
-      let typ_arg = Ast_types.unroll_type e.typ in
+      let typ_arg = Ast_types.unroll e.typ in
       let* arg = find_val e in
       let* v = Value.backward_unop context ~typ_arg op ~arg ~res:value in
       backward_eval fuel context state e v
     | BinOp (binop, e1, e2, typ) ->
-      let resulting_type = Ast_types.unroll_type typ in
+      let resulting_type = Ast_types.unroll typ in
       let input_type = e1.typ in
       let* left = find_val e1
       and* right = find_val e2 in
@@ -1364,8 +1364,8 @@ module Make
       backward_eval fuel context state e2 v2
     | CastE (typ, e) ->
       begin
-        let dst_typ = Ast_types.unroll_type typ in
-        let src_typ = Ast_types.unroll_type e.typ in
+        let dst_typ = Ast_types.unroll typ in
+        let src_typ = Ast_types.unroll e.typ in
         let* src_val = find_val e in
         let backward = Value.backward_cast context ~src_typ ~dst_typ in
         let* v = backward ~src_val ~dst_val:value in

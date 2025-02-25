@@ -136,7 +136,7 @@ let parse_typ env ~loc t =
   let open Logic_typing in
   let g = env.context in
   let t = g.logic_type g loc g.pre_state t in
-  match Ast_types.unroll_logic_type t with
+  match Ast_types.unroll_logic t with
   | Ctype typ -> typ
   | _ -> error env ~loc "C-type expected for casting l-values"
 

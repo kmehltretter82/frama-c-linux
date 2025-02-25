@@ -195,7 +195,7 @@ struct
     let t2 = Cil.typeOf e2 in
     if Ast_types.is_ptr t1 && Ast_types.is_ptr t2 then
       Cvalues.is_true (lop (loc_of_exp env e1) (loc_of_exp env e2))
-    else match Ast_types.unroll_type_node t1 with
+    else match Ast_types.unroll_node t1 with
       | TFloat f ->
         let p = fop (Ctypes.c_float f)
             (val_of_exp env e1) (val_of_exp env e2) in

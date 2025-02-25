@@ -53,7 +53,7 @@ let get_retres_vi = Retres.memo
     )
 
 let returned_value kf =
-  let return_type = Ast_types.unroll_type (Kernel_function.get_return_type kf) in
+  let return_type = Ast_types.unroll (Kernel_function.get_return_type kf) in
   match return_type.tnode with
   | TComp _ when Cil.is_fully_arithmetic return_type -> Cvalue.V.top_int
   | TPtr _ | TComp _ -> Cvalue.V.inject Base.null Ival.zero

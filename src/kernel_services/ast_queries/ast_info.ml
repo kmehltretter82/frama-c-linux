@@ -422,13 +422,13 @@ let block_of_local (fdec:fundec) vi =
 (* ************************************************************************** *)
 
 let direct_array_size ty =
-  match Ast_types.unroll_type_node ty with
+  match Ast_types.unroll_node ty with
   | TArray(_ty,Some size) -> value_of_integral_expr size
   | TArray(_ty,None) -> Integer.zero
   | _ -> assert false
 
 let rec array_size ty =
-  match Ast_types.unroll_type_node ty with
+  match Ast_types.unroll_node ty with
   | TArray(elemty,Some _) ->
     if Ast_types.is_array elemty then
       Integer.mul (direct_array_size ty) (array_size elemty)

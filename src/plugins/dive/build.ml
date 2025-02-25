@@ -164,7 +164,7 @@ let get_loc_filename loc =
   Filepath.(Normalized.to_pretty_string (fst loc).pos_path)
 
 let is_foldable_type typ =
-  match Ast_types.unroll_type_node typ with
+  match Ast_types.unroll_node typ with
   | TArray _ | TComp _ -> true
   | TVoid | TInt _ | TEnum _ | TFloat _ | TPtr _ | TFun _
   | TBuiltin_va_list -> false

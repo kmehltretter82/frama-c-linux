@@ -287,9 +287,9 @@ and global =
     attributes, which are always kept in sorted order. Use
     {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to
     construct list of attributes. If you want to inspect a type, you should
-    use {!Ast_types.unroll_type}, {!Ast_types.unroll_type_node},
-    {!Ast_types.unroll_type_skel}, {!Ast_types.unroll_type_deep} or
-    {!Ast_types.unroll_type_deep_node} to see through the uses of named types.
+    use {!Ast_types.unroll}, {!Ast_types.unroll_node}, {!Ast_types.unroll_skel},
+    {!Ast_types.unroll_deep} or {!Ast_types.unroll_deep_node} to see through the
+    uses of named types.
 
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute
@@ -348,7 +348,7 @@ and typ_node =
       global. This is printed as just the type name. The actual referred type
       is not printed here and is carried only to simplify processing. To see
       through a sequence of named type references, use
-      {!Ast_types.unroll_type}. The attributes are in addition to those given
+      {!Ast_types.unroll}. The attributes are in addition to those given
       when the type name was defined. *)
 
   | TComp of compinfo

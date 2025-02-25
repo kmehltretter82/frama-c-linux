@@ -255,7 +255,7 @@ let rec normalize_condition exp positive =
     else mk_exp (BinOp (invert_relation binop, e1, e2, typ))
   | _ ->
     let op = if positive then Ne else Eq in
-    let typ = Ast_types.unroll_type exp.typ in
+    let typ = Ast_types.unroll exp.typ in
     mk_exp (BinOp (op, zero_typed typ, exp, Cil_const.intType))
 
 

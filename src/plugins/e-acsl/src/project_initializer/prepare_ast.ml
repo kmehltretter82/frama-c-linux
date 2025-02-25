@@ -575,7 +575,7 @@ let sound_verdict_vi =
 let sound_verdict () = Lazy.force sound_verdict_vi
 
 let is_variadic_function vi =
-  match Ast_types.unroll_type_node vi.vtype with
+  match Ast_types.unroll_node vi.vtype with
   | TFun(_, _, variadic) -> variadic
   | _ -> false
 

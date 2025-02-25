@@ -56,7 +56,7 @@ class constGlobSubstVisitorClass : cilVisitor = object
              pattern matching. *)
           assert false
       in
-      let typ = Ast_types.unroll_type_deep vi.vtype in
+      let typ = Ast_types.unroll_deep vi.vtype in
       if is_arithmetic_type typ && Ast_types.is_const typ
       then ChangeDoChildrenPost ([g], List.map register)
       else DoChildren

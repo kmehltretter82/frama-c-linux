@@ -320,7 +320,7 @@ let cdomain obj =
   if is_constrained_obj obj then Some(TYPE.is_obj obj) else None
 
 let ldomain ltype =
-  match Ast_types.unroll_logic_type ~unroll_typedef:false ltype with
+  match Ast_types.unroll_logic ~unroll_typedef:false ltype with
   | Ctype typ -> cdomain (Ctypes.object_of typ)
   | Ltype _ | Lvar _ | Lboolean | Linteger | Lreal | Larrow _ -> None
 

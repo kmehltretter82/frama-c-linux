@@ -320,8 +320,8 @@ let find_model_field s typ =
     try
       List.find (fun x -> Cil_datatype.Typ.equal x.mi_base_type typ) l
     with Not_found as e ->
-      (* Don't use Ast_types.unroll_type here:
-         Ast_types.unroll_type will unroll until it finds something other
+      (* Don't use Ast_types.unroll here:
+         Ast_types.unroll will unroll until it finds something other
          than TNamed. We want to go step by step.
       *)
       (match typ.tnode with

@@ -229,7 +229,7 @@ let ival_of_ikind ik =
   Ival.inject_range (Some l) (Some u)
 
 (* The boolean indicates whether we have real numbers *)
-let rec interv_of_typ ty = match Ast_types.unroll_type_node ty with
+let rec interv_of_typ ty = match Ast_types.unroll_node ty with
   | TInt k ->
     Ival (ival_of_ikind k)
   | TEnum enuminfo ->
