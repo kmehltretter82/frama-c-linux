@@ -490,7 +490,7 @@ let solaris_pragmas =
 let embedded_pragmas = "global_register" | "location"
 
 (* Pragmas that are not parsed by CIL. We lex them as PRAGMA_LINE tokens *)
-let no_parse_pragma = "warning" | "GCC" | solaris_pragmas | embedded_pragmas
+let no_parse_pragma = "warning" | "GCC" | "omp" | solaris_pragmas | embedded_pragmas
 
 let ghost_comments = "//\n" | ("//" [^'\n''@'] ([^'\n']*("\\\n")?)* '\n')
 
