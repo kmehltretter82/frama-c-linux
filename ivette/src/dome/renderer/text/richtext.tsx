@@ -658,7 +658,7 @@ export interface GutterDecoration extends LineDecoration {
 }
 
 export type Decoration = MarkDecoration | LineDecoration | GutterDecoration;
-export type Decorations = null | Decoration | readonly Decorations[];
+export type Decorations = undefined | null | Decoration | readonly Decorations[];
 
 /* -------------------------------------------------------------------------- */
 /* --- Decoration Builder                                                 --- */
@@ -666,7 +666,7 @@ export type Decorations = null | Decoration | readonly Decorations[];
 
 function isDecoration(d : Decorations) : d is Decoration
 {
-  return d !== null && !Array.isArray(d);
+  return d !== undefined && d !== null && !Array.isArray(d);
 }
 
 function isMarkDecoration(d : Decoration) : d is MarkDecoration
@@ -779,7 +779,7 @@ class DecorationsBuilder {
 
   addMark(spec: MarkDecoration): void {
     const { offset, length } = spec;
-    if (offset < 0) return;
+    if (offset < 0 || length < 1) return;
     const endOffset = offset + length;
     if (endOffset > this.doc.length) return;
     this.ranges.push(markDecoration(spec).range(offset, endOffset));
@@ -802,13 +802,13 @@ class DecorationsBuilder {
   }
 
   addSpec(spec : Decorations): void {
-    if (spec !== null) {
-      if (isDecoration(spec)) {
-        if (isMarkDecoration(spec)) this.addMark(spec);
-        if (isLineDecoration(spec)) this.addLine(spec);
-        if (isGutterDecoration(spec)) this.addGutter(spec);
-      } else spec.forEach(this.addSpec);
-    }
+    if (isDecoration(spec)) {
+      if (isMarkDecoration(spec)) this.addMark(spec);
+      if (isLineDecoration(spec)) this.addLine(spec);
+      if (isGutterDecoration(spec)) this.addGutter(spec);
+    } else
+    if (Array.isArray(spec))
+      spec.forEach(this.addSpec);
   }
 
   getRanges(): CS.RangeSet<CM.Decoration> {
