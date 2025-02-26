@@ -9,6 +9,7 @@
 open Eval
 
 type 'value builtin = 'value list -> 'value or_bottom
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
 
 module type Value = sig
   include Abstract_value.Leaf

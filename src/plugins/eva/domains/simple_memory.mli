@@ -14,12 +14,15 @@
     bottom). *)
 type 'value builtin = 'value list -> 'value Eval.or_bottom
 
+(** Set of relevant thresholds for the widening. *)
+type widen_hint = Datatype.Integer.Set.t * Datatype.Float.Set.t
+
 (** Abstraction of the values variables are mapped to. *)
 module type Value = sig
   include Abstract_value.Leaf
 
   (** Widening operation to ensure convergence. *)
-  val widen : Locations.Location_Bytes.widen_hint -> t -> t -> t
+  val widen : widen_hint -> t -> t -> t
 
   (** This function must return [true] if the given variable should be
       tracked by the domain. All untracked variables are implicitely
