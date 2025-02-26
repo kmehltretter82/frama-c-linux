@@ -305,6 +305,15 @@ let gen_define_macro fmt macro def =
   if def = "" then gen_undef fmt macro
   else gen_define_string fmt macro def
 
+let gen_redefinable_fc_macro fmt macro def =
+  let fc_name = "__FC_"  ^ macro in
+  let redef_name = "__FC_FORCE_" ^ macro in
+  Format.fprintf fmt "#if defined(%s)@\n" redef_name;
+  gen_define_string fmt fc_name redef_name;
+  Format.fprintf fmt "#else@\n";
+  gen_define_macro fmt fc_name def;
+  Format.fprintf fmt "#endif@\n"
+
 let gen_define_custom_macros fmt censored mach =
   let key_values = mach.custom_defs in
   let is_same_macro m1 m2 =
@@ -600,7 +609,7 @@ let gen_all_defines fmt mach =
   gen_define_literal_string fmt "__PRIPTR_PREFIX"
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
   gen_define_macro fmt "__WORDSIZE" mach.wordsize;
-  gen_define_macro fmt "__FC_POSIX_C_SOURCE" mach.posix_c_source;
+  gen_redefinable_fc_macro fmt "POSIX_C_SOURCE" mach.posix_c_source;
   gen_define_string fmt "__FC_SIG_ATOMIC_T" mach.sig_atomic_t;
   gen_intlike_min fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
   gen_intlike_max fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
