@@ -2155,22 +2155,45 @@ module Make
   (** This function does a weak update of the entire [offsm], by adding the
       topification of [v]. The parameter [validity] is respected, and so is the
       current size of [offsm]: each interval already present in [offsm] and valid
-      is overwritten. Interval already present but not valid are bound to
-      [V.bottom].
-      This function used to write bottom on non-valid locations, but this was
-      unnecessary as values on non-valid locations should never be accessed
-      anyway. *)
-  let update_imprecise_everywhere ~validity o v offsm =
+      is overwritten. Intervals already present but not valid are unchanged. *)
+  let update_imprecise_everywhere ~validity origin value offsm =
     match Base.valid_range validity with
     | Invalid_range -> `Bottom
     | Valid_range None -> `Value offsm
-    | Valid_range (Some itv) ->
-      let v = V.topify_with_origin o v in
-      let topify (min, max) (bound_v, _, _) acc =
-        let new_v = V.topify_with_origin o (V.join bound_v v) in
-        append_basic_itv ~min ~max ~v:new_v acc
+    | Valid_range (Some (min_range, max_range)) ->
+      let offset = Integer.zero in
+      let topify (min, max) (v, modu, rem) acc =
+        (* No intersection between current node [min..max] and the validity:
+           keep the node unchanged. *)
+        if max <~ min_range || min >~ max_range then
+          snd (add_node ~min ~max rem modu v offset acc)
+        else
+          (* If the current node starts before validity, add a node for
+             [min..min_range-1] with unchanged value.  *)
+          let acc =
+            if min <~ min_range
+            then snd (add_node ~min ~max:(pred min_range) rem modu v offset acc)
+            else acc
+          in
+          (* On the intersection between [min..max] and the validity, updates
+             and topify the value. *)
+          let acc =
+            let min = Integer.max min min_range in
+            let max = Integer.min max max_range in
+            let new_v = V.topify_with_origin origin (V.join v value) in
+            append_basic_itv ~min ~max ~v:new_v acc
+          in
+          (* If the current node ends after validity, adds a node for
+             [max_range+1..max] with unchanged value. As the start of the node
+             changes, the relative value alignment must be recomputed.  *)
+          if max >~ max_range
+          then
+            let new_min = succ max_range in
+            let new_rem = realign ~offset:min ~new_offset:new_min rem modu in
+            snd (add_node ~min:new_min ~max new_rem modu v offset acc)
+          else acc
       in
-      `Value (fold_between ~entire:false itv topify offsm m_empty)
+      `Value (fold topify offsm m_empty)
 
 
   let clear_caches () = List.iter (fun f -> f ()) !clear_caches_ref
