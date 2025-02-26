@@ -168,7 +168,7 @@ end
 (* Public description of the Numerors abstract domain. *)
 let descr =
   "Infers ranges for the absolute and relative errors \
-   in floating-point computations. No support of loops."
+   in floating-point computations."
 
 (* Registration of the Numerors abstract domain and its reduced product. *)
 let registered =
