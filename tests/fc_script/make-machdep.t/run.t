@@ -156,7 +156,7 @@
   mb_cur_max: ((size_t)16)
   nsig: (64 + 1)
   path_max: '4096'
-  posix_version: 200809L
+  posix_c_source: 200809L
   ptrdiff_t: long
   rand_max: '2147483647'
   sig_atomic_t: int
