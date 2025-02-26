@@ -1,5 +1,5 @@
 /* run.config
-   PLUGIN: @PTEST_PLUGIN@ eva.numerors
+   PLUGIN: @PTEST_PLUGIN@
    OPT: -eva -eva-domains numerors -eva-msg-key=d-numerors
 */
 /* Tests for the numerors domain, that computes absolute and relative errors

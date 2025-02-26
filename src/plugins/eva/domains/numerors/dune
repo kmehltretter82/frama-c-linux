@@ -30,9 +30,3 @@
  (flags -open Frama_c_kernel -open Eva__Private :standard -w -9)
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx)))
-
-(plugin
- (optional)
- (name eva.numerors)
- (libraries frama-c-eva.numerors.core)
- (site (frama-c plugins)))
