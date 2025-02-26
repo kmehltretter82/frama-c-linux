@@ -125,13 +125,19 @@ def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
 
-        validate(machdep, schema)
+        strict_schema = {
+            # extract the keys
+            "required": [x for x in schema],
+            "properties": schema,
+            "additionalProperties": False,
+        }
+        validate(machdep, strict_schema)
         return True
     except ImportError:
         logging.warning("jsonschema is not available: no validation will be performed")
         return True
-    except ValidationError:
-        logging.warning("machdep object is not conforming to machdep schema")
+    except ValidationError as exn:
+        logging.warning(f"machdep object is not conforming to machdep schema:\n{exn.message}")
         return False
 
 

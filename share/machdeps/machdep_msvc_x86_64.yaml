@@ -48,7 +48,7 @@ wchar_t: unsigned short
 weof: (0xffffU)
 wint_t: unsigned short
 wordsize: '64'
-posix_version: ''
+posix_c_source: ''
 
 # NB: except for l_tmpnam, the following macros are not defined in the old
 # __fc_machdep.h in the MSVC_X86_64 section. The values below have thus been

@@ -96,24 +96,20 @@ cpp_arch_flags:
     arguments to be given to the compiler to select the corresponding
     architecture (e.g. '-m32')
 
-  type: list
+  type: array
 
   items:
-
-    - type: string
+    type: string
 
 custom_defs:
   description: |
     builtin macros (and their definition) for the given architecture and
     compiler
-  type: list
+  type: object
   items:
     type: object
-    name:
-      description: macro name
-      type: string
-    value:
-      description: actual value
+    properties: { } # an empty set of macros is admissible
+    additionalProperties:
       type: string
 
 eof:
@@ -126,17 +122,10 @@ errno:
 
   description: all error macros defined in errno.h
 
-  type: list
-
-  items:
-
-    type: object
-    name:
-      description: macro name (lowercase)
-      type: string
-    value:
-      description: actual value
-      type: string
+  type: object
+  properties: { } #no error is OK
+  additionalProperties:
+    type: string
 
 filename_max:
 
