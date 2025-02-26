@@ -52,7 +52,7 @@ extern void bzero(void *s, size_t n);
 */
 extern int ffs(int i);
 
-#if _POSIX_C_SOURCE < 200809L
+#if __FC_POSIX_C_SOURCE < 200809L
 // index and rindex were removed in POSIX-1.2008
 
 /*@

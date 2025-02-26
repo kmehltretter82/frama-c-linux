@@ -1,7 +1,7 @@
 /* run.config
-  STDOPT: #"-cpp-extra-args=\"-D_POSIX_C_SOURCE=200809L\""
- EXIT: 1
   STDOPT:
+ EXIT: 1
+  STDOPT:  #"-cpp-extra-args=\"-D__FC_FORCE_POSIX_C_SOURCE=200112L\""
 */
 
 #include <strings.h>

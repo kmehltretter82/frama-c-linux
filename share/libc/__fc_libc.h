@@ -23,8 +23,10 @@
 // This file includes all compatible libc/POSIX/BSD headers known by the
 // Frama-C standard library. It is used by some Frama-C scripts.
 
+// #defines _POSIX_C_SOURCE
+#include "unistd.h"
+
 #define _XOPEN_SOURCE 600
-#define _POSIX_C_SOURCE 200112L
 #define _GNU_SOURCE 1
 
 #include "aio.h"
@@ -130,7 +132,6 @@
 #include "trace.h"
 #include "uchar.h"
 #include "ulimit.h"
-#include "unistd.h"
 #include "utime.h"
 #include "utmp.h"
 #include "utmpx.h"

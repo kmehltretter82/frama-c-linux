@@ -5,6 +5,7 @@
 [eva] Initial state computed
 [eva:initial-state] Values of globals at initialization
   
+[eva] fc_libc.c:209: assertion got status valid.
 [eva] fc_libc.c:210: assertion got status valid.
 [eva] fc_libc.c:211: assertion got status valid.
 [eva] fc_libc.c:212: assertion got status valid.
@@ -25,7 +26,6 @@
 [eva] fc_libc.c:227: assertion got status valid.
 [eva] fc_libc.c:228: assertion got status valid.
 [eva] fc_libc.c:229: assertion got status valid.
-[eva] fc_libc.c:230: assertion got status valid.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======

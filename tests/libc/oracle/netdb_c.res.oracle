@@ -56,8 +56,6 @@
   \return(strndup) == 0 (auto)
   \return(stpncpy) == 0 (auto)
   \return(strsignal) == 0 (auto)
-  \return(index) == 0 (auto)
-  \return(rindex) == 0 (auto)
   \return(CMSG_FIRSTHDR) == 0 (auto)
   \return(CMSG_NXTHDR) == 0 (auto)
   \return(bind) == 0 (auto)
