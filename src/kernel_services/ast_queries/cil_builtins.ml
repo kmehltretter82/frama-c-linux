@@ -425,3 +425,4 @@ let builtinLoc: location = Location.unknown
 
 let () =
   Machine.init_builtins_ref := init_builtins
+[@@alert "-machine_init_builtins_ref"]

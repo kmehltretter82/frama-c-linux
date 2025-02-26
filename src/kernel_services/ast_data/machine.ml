@@ -295,6 +295,3 @@ let init ~initLogicBuiltins machdep =
     Logic_env.Builtins.extend initLogicBuiltins;
 
   end
-
-(* To be removed ideally *)
-let theMachine = the_machine
