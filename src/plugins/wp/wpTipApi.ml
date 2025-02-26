@@ -456,15 +456,19 @@ let () =
       match get_node rq with
       | None -> D.jtext ""
       | Some node ->
-        let pp = lookup node in
-        let indent = get_indent rq in
-        let margin = get_margin rq in
-        Option.iter pp#set_iformat (get_iformat rq) ;
-        Option.iter pp#set_rformat (get_rformat rq) ;
-        Option.iter pp#set_ce_mode (get_showce rq) ;
-        Option.iter pp#set_focus_mode (get_autofocus rq) ;
-        Option.iter pp#set_unmangled (get_unmangled rq) ;
-        D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
+        let ctxt = ProofEngine.node_context node in
+        WpContext.on_context ctxt
+          begin fun () ->
+            let pp = lookup node in
+            let indent = get_indent rq in
+            let margin = get_margin rq in
+            Option.iter pp#set_iformat (get_iformat rq) ;
+            Option.iter pp#set_rformat (get_rformat rq) ;
+            Option.iter pp#set_ce_mode (get_showce rq) ;
+            Option.iter pp#set_focus_mode (get_autofocus rq) ;
+            Option.iter pp#set_unmangled (get_unmangled rq) ;
+            D.jpretty ?indent ?margin pp#pp_goal (ProofEngine.goal node)
+          end ()
     end
 
 (* -------------------------------------------------------------------------- *)
