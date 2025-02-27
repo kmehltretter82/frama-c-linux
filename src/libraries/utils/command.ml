@@ -30,11 +30,11 @@ let read_file p = Filepath.with_open_in_exn p
 let read_lines = Filepath.read_lines
 let write_file p = Filepath.with_open_out_exn p
 let pp_to_file = Filepath.pp_to_file
-let print_file = Filepath.print_file
+let print_file = Filepath.pp_to_file
 
-let pp_from_file fmt file =
+let pp_from_file fmt path =
   let open Filepath.Operators in
-  let$ cin = Filepath.with_open_in_exn file in
+  let$ cin = Filepath.with_open_in_exn path in
   try
     while true do
       Async.yield () ;
