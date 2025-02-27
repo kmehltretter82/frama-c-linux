@@ -152,11 +152,19 @@ module type S = sig
 
   (** {2 Join and inclusion testing} *)
 
-  include Lattice_type.Join_Semi_Lattice with type t := t
+  val join: t -> t -> t
+  (** Over-approximation of the union of abstract values.
+      Requires both offsetmaps to cover the same range; fails otherwise.  *)
+
+  val is_included: t -> t -> bool
+  (** Is first argument included in the second?
+      Requires both offsetmaps to cover the same range; otherwise, ranges
+      covered by only one of the offsetmaps are ignored. *)
 
   val widen : ?hint:widen_hint -> t -> t -> t
   (** [widen m1 m2] performs a widening step on [m2], assuming that
-      [m1] was the previous state. The relation [is_included m1 m2] must hold *)
+      [m1] was the previous state. The relation [is_included m1 m2] must hold.
+      Requires both offsetmaps to cover the same range; fails otherwise.*)
 
   (** {2 Narrowing} *)
 
@@ -170,13 +178,15 @@ module type S = sig
         equivalent representations (e.g. [-1] and [0xFF] on 8 bits) may be
         considered different, leading to empty intersections.
         This may result in unsound results; the function {!narrow_reinterpret}
-        below should be preferred in general. *)
+        below should be preferred in general.
+        Requires both offsetmaps to cover the same range; fails otherwise. *)
 
     val narrow_reinterpret: t -> t -> t
     (** Variant of the function above that bitwise-reinterprets values before
         performing the intersection (in order to get normal forms). This may
         lead to situations where the result is not included in the arguments,
-        but this function should be preferred to {!narrow}. *)
+        but this function should be preferred to {!narrow}.
+        Requires both offsetmaps to cover the same range; fails otherwise. *)
   end
 
 
