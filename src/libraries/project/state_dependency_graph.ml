@@ -89,8 +89,6 @@ end
 module Dot(A:Attributes) = struct
   module D = Graph.Graphviz.Dot(struct include A include Dependency_graph end)
   let dump filename =
-    let cout = open_out filename in
-    D.output_graph cout graph;
-    close_out cout
+    Filepath.with_open_out_exn filename (fun cout -> D.output_graph cout graph)
 end
 include Dot(Attributes)

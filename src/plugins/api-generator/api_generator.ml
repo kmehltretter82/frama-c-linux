@@ -578,7 +578,7 @@ let generate () =
           let dir = Filepath.Normalized.concat out path in
           let file = Filepath.Normalized.concat dir "index.ts" in
           ignore (Extlib.mkdir ~parents:true dir 0o755) ;
-          Command.print_file file (makePackage pkg path) ;
+          Filepath.with_formatter_exn file (makePackage pkg path) ;
         end
     end
 

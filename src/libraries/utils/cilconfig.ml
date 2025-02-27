@@ -165,13 +165,13 @@ let saveConfiguration (fname : Datatype.Filepath.t) =
     Buffer.contents buff
   in
   try
-    let oc = open_out (fname :> string) in
+    let open Filepath.Operators in
+    let$ oc = Filepath.with_open_out_exn fname in
     Kernel.debug "Saving configuration to %s@." (fname :> string);
     H.iter (fun k c ->
         output_string oc (k ^ "\n");
         output_string oc ((configToString c) ^ "\n"))
-      configurationData;
-    close_out oc
+      configurationData
   with _ ->
     Kernel.warning "Cannot open configuration file %s\n" (fname :> string)
 
@@ -234,20 +234,16 @@ let loadConfiguration (fname : Datatype.Filepath.t) : unit =
     in
     getOne ()
   in
-  (try
-     let ic = open_in (fname :> string) in
-     Kernel.debug "Loading configuration from %s@." (fname :> string);
-     (try
-        while true do
-          let k = input_line ic in
-          let s = input_line ic in
-          try
-            let c = stringToConfig s in
-            setConfiguration k c
-          with Not_found -> ()
-        done
-      with End_of_file -> ());
-     close_in ic;
-   with _ -> () (* no file, ignore *));
-
-  ()
+  let open Filepath.Operators in
+  try
+    let$ ic = Filepath.with_open_in_exn fname in
+    Kernel.debug "Loading configuration from %s@." (fname :> string);
+    while true do
+      let k = input_line ic in
+      let s = input_line ic in
+      try
+        let c = stringToConfig s in
+        setConfiguration k c
+      with Not_found -> ()
+    done
+  with End_of_file | Sys_error _ -> ()

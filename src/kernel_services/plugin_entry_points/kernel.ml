@@ -496,11 +496,13 @@ module PrintMachdepBuiltinMacros =
 let () = Parameter_customize.set_group help
 let () = Parameter_customize.set_negative_option_name ""
 module DumpDependencies =
-  P.Empty_string
+  P.Filepath
     (struct
       let option_name = "-dump-dependencies"
       let help = ""
       let arg_name = ""
+      let existence = Filepath.Indifferent
+      let file_kind = "Text"
     end)
 let () =
   Extlib.safe_at_exit

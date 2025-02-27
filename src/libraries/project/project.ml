@@ -447,7 +447,8 @@ let register_after_global_load_hook = After_global_load.extend
 let magic = 9 (* magic number *)
 
 let save_projects selection projects filename =
-  let cout = open_out_bin (filename : Filepath.Normalized.t :> string) in
+  let open Filepath.Operators in
+  let$ cout = Filepath.with_open_out_exn ~binary:true filename in
   output_value cout System_config.Version.id;
   output_value cout magic;
   output_value cout !Graph.Blocks.cpt_vertex;
@@ -462,8 +463,7 @@ let save_projects selection projects filename =
   (* projects are stored on disk from the current one to the last project.
      !last_created_by_copy_ref must be saved at the same time to share the
      project on disk *)
-  output_value cout (List.rev states, !last_created_by_copy_ref);
-  close_out cout
+  output_value cout (List.rev states, !last_created_by_copy_ref)
 
 let save ?(selection=State_selection.full) ?(project=current()) filename =
   guarded_feedback selection 2 "saving project %S into file %a"

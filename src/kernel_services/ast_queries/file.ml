@@ -1686,17 +1686,10 @@ let add_source_if_new tbl (fp : Filepath.Normalized.t) =
    the included sources listed in [file],
    which contains the output of 'gcc -H -MM'. *)
 let add_included_sources tbl file =
-  let ic = open_in file in
-  try
-    while true; do
-      let line = input_line ic in
-      if Str.string_match re_included_file line 0 then
-        let f = Str.matched_group 1 line in
-        add_source_if_new tbl (Filepath.Normalized.of_string f)
-    done;
-    assert false
-  with End_of_file ->
-    close_in ic
+  Filepath.iter_lines file @@ fun line ->
+  if Str.string_match re_included_file line 0 then
+    let f = Str.matched_group 1 line in
+    add_source_if_new tbl (Filepath.Normalized.of_string f)
 
 let print_all_sources out all_sources_tbl =
   let elems =
@@ -1735,8 +1728,8 @@ let compute_sources_table cpp_commands =
     | None -> ()
     | Some (cpp_cmd, _ppf) ->
       let tmp_file = create_temp_file "audit_produce_sources" ".txt" in
-      let tmp_file = (tmp_file :> string) in
-      let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file in
+      let tmp_file' = (tmp_file :> string) in
+      let cmd_for_sources = cpp_cmd ^ " -H -MM >/dev/null 2>" ^ tmp_file' in
       let exit_code = Sys.command cmd_for_sources in
       if exit_code = 0
       then add_included_sources all_sources_tbl tmp_file
@@ -1952,9 +1945,7 @@ let create_rebuilt_project_from_visitor
       let ext = if preprocess then ".c" else ".i" in
       create_temp_file name ext
     in
-    let cout = open_out (f :> string) in
-    let fmt = Format.formatter_of_out_channel cout in
-    pretty_ast ~prj ~fmt ();
+    Filepath.with_formatter_exn f (fun fmt -> pretty_ast ~prj ~fmt ());
     let redo () =
       (*      Kernel.feedback "redoing initialization on file %s" f;*)
       Files.reset ();
