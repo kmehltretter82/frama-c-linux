@@ -406,12 +406,17 @@ let protect_file_op ~(close: 'ch -> unit) (job: 'ch -> 'a) (channel: 'ch) =
   close channel;
   r
 
+let check_nonempty p =
+  if Normalized.is_empty p then
+    invalid_arg "path should not be empty"
+
 let with_open_in_exn
     ?(if_missing=DoNotCreate)
     ?(binary=false)
     ?(blocking=true)
     (p: Normalized.t)
     (job: in_channel -> 'a): 'a =
+  check_nonempty p;
   let flags, perm =
     flags_and_perm ~if_missing ~binary ~blocking Open_rdonly
   in
@@ -428,6 +433,7 @@ let with_open_out_exn
     ?(blocking=true)
     (p: Normalized.t)
     (job: out_channel -> 'a): 'a =
+  check_nonempty p;
   let flags, perm =
     flags_and_perm ~if_exists ~if_missing ~binary ~blocking Open_wronly
   in
