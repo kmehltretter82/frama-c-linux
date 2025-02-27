@@ -782,68 +782,63 @@ let export gstat specfile =
   let sect_prop = Buffer.create 64 in (* default sub-section *)
   let file = ref None in
   let section = ref HEAD in
-  begin
-    let cin = open_in specfile in
-    try
-      while true do
-        let line = input_line cin in
-        match Rformat.command line with
-        | Rformat.ARG("AXIOMATIC_PREFIX",f) -> config.axiomatic_prefix <- f
-        | Rformat.ARG("FUNCTION_PREFIX",f) -> config.function_prefix <- f
-        | Rformat.ARG("PROPERTY_PREFIX",f) -> config.property_prefix <- f
-        | Rformat.ARG("LEMMA_PREFIX",f) -> config.lemma_prefix <- f
+  Filepath.iter_lines specfile
+    begin fun line ->
+      match Rformat.command line with
+      | Rformat.ARG("AXIOMATIC_PREFIX",f) -> config.axiomatic_prefix <- f
+      | Rformat.ARG("FUNCTION_PREFIX",f) -> config.function_prefix <- f
+      | Rformat.ARG("PROPERTY_PREFIX",f) -> config.property_prefix <- f
+      | Rformat.ARG("LEMMA_PREFIX",f) -> config.lemma_prefix <- f
 
-        | Rformat.ARG("GLOBAL_SECTION",f) -> config.global_section <- f
-        | Rformat.ARG("AXIOMATIC_SECTION",f) -> config.axiomatic_section <- f
-        | Rformat.ARG("FUNCTION_SECTION",f) -> config.function_section <- f
+      | Rformat.ARG("GLOBAL_SECTION",f) -> config.global_section <- f
+      | Rformat.ARG("AXIOMATIC_SECTION",f) -> config.axiomatic_section <- f
+      | Rformat.ARG("FUNCTION_SECTION",f) -> config.function_section <- f
 
-        | Rformat.ARG("PASSED",s) -> config.status_passed <- s
-        | Rformat.ARG("FAILED",s) -> config.status_failed <- s
-        | Rformat.ARG("INCONCLUSIVE",s) -> config.status_inconclusive <- s
-        | Rformat.ARG("UNTRIED",s) -> config.status_untried <- s
+      | Rformat.ARG("PASSED",s) -> config.status_passed <- s
+      | Rformat.ARG("FAILED",s) -> config.status_failed <- s
+      | Rformat.ARG("INCONCLUSIVE",s) -> config.status_inconclusive <- s
+      | Rformat.ARG("UNTRIED",s) -> config.status_untried <- s
 
-        | Rformat.ARG("ZERO",z) -> config.zero <- z
-        | Rformat.ARG("FILE",f) -> file := Some f
-        | Rformat.ARG("SUFFIX",e) ->
-          let basename = Wp_parameters.ReportName.get () in
-          let filename = basename ^ e in
-          file := Some filename
-        | Rformat.CMD "CONSOLE" -> config.console <- true
+      | Rformat.ARG("ZERO",z) -> config.zero <- z
+      | Rformat.ARG("FILE",f) -> file := Some f
+      | Rformat.ARG("SUFFIX",e) ->
+        let basename = Wp_parameters.ReportName.get () in
+        let filename = basename ^ e in
+        file := Some filename
+      | Rformat.CMD "CONSOLE" -> config.console <- true
 
-        | Rformat.CMD "END" -> section := END
-        | Rformat.CMD "HEAD" -> section := HEAD
-        | Rformat.CMD "TAIL" -> section := TAIL
+      | Rformat.CMD "END" -> section := END
+      | Rformat.CMD "HEAD" -> section := HEAD
+      | Rformat.CMD "TAIL" -> section := TAIL
 
-        | Rformat.CMD "CHAPTER" -> section := CHAPTER
+      | Rformat.CMD "CHAPTER" -> section := CHAPTER
 
-        | Rformat.CMD "SECTION" -> section := SECTION
-        | Rformat.CMD "GLOBAL" -> section := GLOB_SECTION
-        | Rformat.CMD "AXIOMATIC" -> section := AXIO_SECTION
-        | Rformat.CMD "FUNCTION" -> section := FUNC_SECTION
+      | Rformat.CMD "SECTION" -> section := SECTION
+      | Rformat.CMD "GLOBAL" -> section := GLOB_SECTION
+      | Rformat.CMD "AXIOMATIC" -> section := AXIO_SECTION
+      | Rformat.CMD "FUNCTION" -> section := FUNC_SECTION
 
-        | Rformat.CMD "PROPERTY" -> section := PROPERTY
+      | Rformat.CMD "PROPERTY" -> section := PROPERTY
 
-        | Rformat.CMD a | Rformat.ARG(a,_) ->
-          Wp_parameters.error "Report '%s': unknown command '%s'" specfile a
-        | Rformat.TEXT ->
-          if !section <> END then
-            let text = match !section with
-              | HEAD      -> head
-              | CHAPTER   -> chap
-              | SECTION   -> sect
-              | GLOB_SECTION -> glob
-              | AXIO_SECTION -> axio
-              | FUNC_SECTION -> func
-              | PROPERTY -> sect_prop
-              | TAIL|END  -> tail
-            in
-            Buffer.add_string text line ;
-            Buffer.add_char text '\n' ;
-      done
-    with
-    | End_of_file -> close_in cin
-    | err -> close_in cin ; raise err
-  end ;
+      | Rformat.CMD a | Rformat.ARG(a,_) ->
+        Wp_parameters.error "Report '%s': unknown command '%s'"
+          (specfile :> string)
+          a
+      | Rformat.TEXT ->
+        if !section <> END then
+          let text = match !section with
+            | HEAD      -> head
+            | CHAPTER   -> chap
+            | SECTION   -> sect
+            | GLOB_SECTION -> glob
+            | AXIO_SECTION -> axio
+            | FUNC_SECTION -> func
+            | PROPERTY -> sect_prop
+            | TAIL|END  -> tail
+          in
+          Buffer.add_string text line ;
+          Buffer.add_char text '\n';
+    end;
   match !file with
   | None ->
     Log.print_on_output
@@ -857,24 +852,17 @@ let export gstat specfile =
          ~prop:(Buffer.contents sect_prop))
   | Some report ->
     Wp_parameters.feedback "Report '%s'" report ;
-    let cout = open_out report in
-    let fout = Format.formatter_of_out_channel cout in
-    try
-      print gstat ~config
-        ~head:(Buffer.contents head) ~tail:(Buffer.contents tail)
-        ~chap:(Buffer.contents chap)
-        ~sect:(Buffer.contents sect)
-        ~glob:(Buffer.contents glob)
-        ~axio:(Buffer.contents axio)
-        ~func:(Buffer.contents func)
-        ~prop:(Buffer.contents sect_prop)
-        fout ;
-      Format.pp_print_flush fout () ;
-      close_out cout ;
-    with err ->
-      Format.pp_print_flush fout () ;
-      close_out cout ;
-      raise err
+    let open Filepath.Operators in
+    let$ fout = Filepath.(with_formatter_exn (Normalized.of_string report)) in
+    print gstat ~config
+      ~head:(Buffer.contents head) ~tail:(Buffer.contents tail)
+      ~chap:(Buffer.contents chap)
+      ~sect:(Buffer.contents sect)
+      ~glob:(Buffer.contents glob)
+      ~axio:(Buffer.contents axio)
+      ~func:(Buffer.contents func)
+      ~prop:(Buffer.contents sect_prop)
+      fout
 
 (* -------------------------------------------------------------------------- *)
 
