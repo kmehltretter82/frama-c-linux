@@ -5,7 +5,7 @@
 [eva:initial-state] Values of globals at initialization
   nondet ∈ [--..--]
 [eva] computing for function test_exact_null <- main.
-  Called from realloc2.c:194.
+  Called from realloc2.c:217.
 [eva] realloc2.c:27: Call to builtin realloc
 [eva] realloc2.c:27: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
@@ -19,7 +19,7 @@
 [eva] Recording results for test_exact_null
 [eva] Done for function test_exact_null
 [eva] computing for function test_exact_null_free <- main.
-  Called from realloc2.c:195.
+  Called from realloc2.c:218.
 [eva] realloc2.c:32: Call to builtin realloc
 [eva] realloc2.c:32: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
@@ -29,7 +29,7 @@
 [eva] Recording results for test_exact_null_free
 [eva] Done for function test_exact_null_free
 [eva] computing for function test_exact_nonnull_expand <- main.
-  Called from realloc2.c:196.
+  Called from realloc2.c:219.
 [eva] realloc2.c:36: Call to builtin malloc
 [eva:malloc:new] realloc2.c:36: 
   allocating variable __malloc_test_exact_nonnull_expand_l36
@@ -51,7 +51,7 @@
 [eva] Recording results for test_exact_nonnull_expand
 [eva] Done for function test_exact_nonnull_expand
 [eva] computing for function test_exact_nonnull_shrink <- main.
-  Called from realloc2.c:197.
+  Called from realloc2.c:220.
 [eva] realloc2.c:44: Call to builtin malloc
 [eva:malloc:new] realloc2.c:44: 
   allocating variable __malloc_test_exact_nonnull_shrink_l44
@@ -73,7 +73,7 @@
 [eva] Recording results for test_exact_nonnull_shrink
 [eva] Done for function test_exact_nonnull_shrink
 [eva] computing for function test_exact_nonnull_free <- main.
-  Called from realloc2.c:198.
+  Called from realloc2.c:221.
 [eva] realloc2.c:51: Call to builtin malloc
 [eva:malloc:new] realloc2.c:51: 
   allocating variable __malloc_test_exact_nonnull_free_l51
@@ -91,7 +91,7 @@
 [eva] Recording results for test_exact_nonnull_free
 [eva] Done for function test_exact_nonnull_free
 [eva] computing for function test_maybe_nonnull <- main.
-  Called from realloc2.c:199.
+  Called from realloc2.c:222.
 [eva] realloc2.c:57: Call to builtin malloc
 [eva:malloc:new] realloc2.c:57: 
   allocating variable __malloc_test_maybe_nonnull_l57
@@ -109,7 +109,7 @@
 [eva] Recording results for test_maybe_nonnull
 [eva] Done for function test_maybe_nonnull
 [eva] computing for function test_same_size <- main.
-  Called from realloc2.c:200.
+  Called from realloc2.c:223.
 [eva] realloc2.c:63: Call to builtin malloc
 [eva:malloc:new] realloc2.c:63: allocating variable __malloc_test_same_size_l63
 [eva] computing for function fill <- test_same_size <- main.
@@ -124,7 +124,7 @@
 [eva] Recording results for test_same_size
 [eva] Done for function test_same_size
 [eva] computing for function test_imprecise_size <- main.
-  Called from realloc2.c:201.
+  Called from realloc2.c:224.
 [eva] realloc2.c:70: Call to builtin realloc
 [eva] realloc2.c:70: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
@@ -139,7 +139,7 @@
 [eva] Recording results for test_imprecise_size
 [eva] Done for function test_imprecise_size
 [eva] computing for function test_imprecise_size_but_precise_fill <- main.
-  Called from realloc2.c:202.
+  Called from realloc2.c:225.
 [eva] realloc2.c:76: Call to builtin realloc
 [eva] realloc2.c:76: function realloc: precondition 'freeable' got status valid.
 [eva:malloc] bases_to_realloc: {}
@@ -153,7 +153,7 @@
 [eva] Recording results for test_imprecise_size_but_precise_fill
 [eva] Done for function test_imprecise_size_but_precise_fill
 [eva] computing for function test_imprecise_size_free <- main.
-  Called from realloc2.c:203.
+  Called from realloc2.c:226.
 [eva] realloc2.c:81: Call to builtin malloc
 [eva:malloc:new] realloc2.c:81: 
   allocating variable __malloc_test_imprecise_size_free_l81
@@ -175,7 +175,7 @@
 [eva] Recording results for test_imprecise_size_free
 [eva] Done for function test_imprecise_size_free
 [eva] computing for function test_imprecise_both <- main.
-  Called from realloc2.c:204.
+  Called from realloc2.c:227.
 [eva] realloc2.c:89: Call to builtin malloc
 [eva:malloc:new] realloc2.c:89: 
   allocating variable __malloc_test_imprecise_both_l89
@@ -193,7 +193,7 @@
 [eva] Recording results for test_imprecise_both
 [eva] Done for function test_imprecise_both
 [eva] computing for function test_possibly_invalid_realloc <- main.
-  Called from realloc2.c:205.
+  Called from realloc2.c:228.
 [eva] realloc2.c:96: Call to builtin malloc
 [eva:malloc:new] realloc2.c:96: 
   allocating variable __malloc_test_possibly_invalid_realloc_l96
@@ -212,7 +212,7 @@
 [eva] Recording results for test_possibly_invalid_realloc
 [eva] Done for function test_possibly_invalid_realloc
 [eva] computing for function test_invalid_realloc <- main.
-  Called from realloc2.c:206.
+  Called from realloc2.c:229.
 [eva] realloc2.c:104: Call to builtin malloc
 [eva:malloc:new] realloc2.c:104: 
   allocating variable __malloc_test_invalid_realloc_l104
@@ -222,14 +222,14 @@
 [eva] Recording results for test_invalid_realloc
 [eva] Done for function test_invalid_realloc
 [eva] computing for function test_invalid_realloc2 <- main.
-  Called from realloc2.c:207.
+  Called from realloc2.c:230.
 [eva] realloc2.c:111: Call to builtin realloc
 [eva:alarm] realloc2.c:111: Warning: 
   function realloc: precondition 'freeable' got status invalid.
 [eva] Recording results for test_invalid_realloc2
 [eva] Done for function test_invalid_realloc2
 [eva] computing for function test_invalid_realloc3 <- main.
-  Called from realloc2.c:208.
+  Called from realloc2.c:231.
 [eva] realloc2.c:116: Call to builtin malloc
 [eva:malloc:new] realloc2.c:116: 
   allocating variable __malloc_test_invalid_realloc3_l116
@@ -239,7 +239,7 @@
 [eva] Recording results for test_invalid_realloc3
 [eva] Done for function test_invalid_realloc3
 [eva] computing for function test_realloc_sequence <- main.
-  Called from realloc2.c:209.
+  Called from realloc2.c:232.
 [eva] realloc2.c:124: Call to builtin malloc
 [eva:malloc:new] realloc2.c:124: 
   allocating variable __malloc_test_realloc_sequence_l124
@@ -266,7 +266,7 @@
 [eva] Recording results for test_realloc_sequence
 [eva] Done for function test_realloc_sequence
 [eva] computing for function test_realloc_loop <- main.
-  Called from realloc2.c:210.
+  Called from realloc2.c:233.
 [eva] realloc2.c:131: Call to builtin malloc
 [eva:malloc:new] realloc2.c:131: 
   allocating variable __malloc_test_realloc_loop_l131
@@ -334,7 +334,7 @@
 [eva] Recording results for test_realloc_loop
 [eva] Done for function test_realloc_loop
 [eva] computing for function test_realloc_multiple_bases <- main.
-  Called from realloc2.c:211.
+  Called from realloc2.c:234.
 [eva] realloc2.c:151: Call to builtin malloc
 [eva:malloc:new] realloc2.c:151: 
   allocating variable __malloc_test_realloc_multiple_bases_l151
@@ -367,7 +367,7 @@
 [eva] Recording results for test_realloc_multiple_bases
 [eva] Done for function test_realloc_multiple_bases
 [eva] computing for function test_realloc_multiple_bases2 <- main.
-  Called from realloc2.c:212.
+  Called from realloc2.c:235.
 [eva] realloc2.c:163: Call to builtin malloc
 [eva:malloc:new] realloc2.c:163: 
   allocating variable __malloc_test_realloc_multiple_bases2_l163
@@ -438,7 +438,7 @@
 [eva] Recording results for test_realloc_multiple_bases2
 [eva] Done for function test_realloc_multiple_bases2
 [eva] computing for function test_realloc_multiple_bases_loop <- main.
-  Called from realloc2.c:213.
+  Called from realloc2.c:236.
 [eva] realloc2.c:184: Call to builtin malloc
 [eva:malloc:new] realloc2.c:184: 
   allocating variable __malloc_test_realloc_multiple_bases_loop_l184
@@ -512,6 +512,130 @@
 [eva] Done for function fill
 [eva] Recording results for test_realloc_multiple_bases_loop
 [eva] Done for function test_realloc_multiple_bases_loop
+[eva] computing for function test_imprecise_update <- main.
+  Called from realloc2.c:237.
+[eva] realloc2.c:201: Call to builtin malloc
+[eva:malloc:new] realloc2.c:201: 
+  allocating variable __malloc_test_imprecise_update_l201
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] using specification for function write
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva] realloc2.c:209: 
+  function realloc: precondition 'freeable' got status valid.
+[eva:malloc] bases_to_realloc: {__malloc_test_imprecise_update_l201}
+[eva:malloc:new] realloc2.c:209: 
+  allocating variable __realloc_test_imprecise_update_l209
+[eva:malloc] realloc2.c:209: 
+  strong free on bases: {__malloc_test_imprecise_update_l201}
+[eva] realloc2.c:212: Frama_C_show_each: {1001}
+[eva:partition] realloc2.c:203: starting to merge loop iterations
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_test_imprecise_update_l209}
+[eva:malloc:weak] realloc2.c:209: 
+  marking variable `__realloc_test_imprecise_update_l209' as weak
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7) to fit 0..7/8007
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: {1001; 2001}
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_w_test_imprecise_update_l209}
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7/8007) to fit 0..7/16007
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: {1001; 2001; 3001}
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_w_test_imprecise_update_l209}
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7/16007) to fit 0..7/17179864007
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: [1001..2147484001],1%1000
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_w_test_imprecise_update_l209}
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7/17179864007) to fit 0..7/17179872007
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: [1001..2147485001],1%1000
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_w_test_imprecise_update_l209}
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7/17179872007) to fit 0..7/34359736007
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: [1..4294967289],1%8
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_w_test_imprecise_update_l209}
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7/34359736007) to fit 0..7/34359738311
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: [1..4294967289],1%8
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] realloc2.c:209: Call to builtin realloc
+[eva:malloc] 
+  bases_to_realloc: {__malloc_test_imprecise_update_l201,
+                     __realloc_w_test_imprecise_update_l209}
+[eva:malloc] realloc2.c:209: 
+  resizing variable `__realloc_w_test_imprecise_update_l209'
+  (0..7/34359738367) to fit 0..7/34359738311
+[eva:malloc] realloc2.c:209: 
+  weak free on bases: {__malloc_test_imprecise_update_l201,
+                       __realloc_w_test_imprecise_update_l209}
+[eva] realloc2.c:212: Frama_C_show_each: [1..4294967289],1%8
+[eva] computing for function write <- test_imprecise_update <- main.
+  Called from realloc2.c:206.
+[eva] Done for function write
+[eva] Recording results for test_imprecise_update
+[eva] Done for function test_imprecise_update
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -970,6 +1094,16 @@
                               [2] ∈ {2}
                               [3] ∈ {3}
                               [4] ∈ {4}
+[eva:final-states] Values at end of function test_imprecise_update:
+  __fc_heap_status ∈ [--..--]
+  p ∈
+   {{ &__malloc_test_imprecise_update_l201[0] ;
+      &__realloc_w_test_imprecise_update_l209[0] }}
+  size ∈ [1..4294967289],1%8
+  __malloc_test_imprecise_update_l201[0..9] ∈ [--..--] or UNINITIALIZED
+  __realloc_w_test_imprecise_update_l209[0..4294967288] ∈
+                                        [--..--] or UNINITIALIZED
+                                        [4294967289..4294967295] ∈ [--..--]
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   __retres ∈ {0}
@@ -1142,6 +1276,10 @@
                                                    {26} or UNINITIALIZED
                                                    [27] ∈
                                                    {27} or UNINITIALIZED
+  __malloc_test_imprecise_update_l201[0..9] ∈ [--..--] or UNINITIALIZED
+  __realloc_w_test_imprecise_update_l209[0..4294967288] ∈
+                                        [--..--] or UNINITIALIZED
+                                        [4294967289..4294967295] ∈ [--..--]
 [from] Computing for function fill
 [from] Done for function fill
 [from] Computing for function fill2
@@ -1193,6 +1331,10 @@
 [from] Done for function test_realloc_sequence
 [from] Computing for function test_same_size
 [from] Done for function test_same_size
+[from] Computing for function test_imprecise_update
+[from] Computing for function write <-test_imprecise_update
+[from] Done for function write
+[from] Done for function test_imprecise_update
 [from] Computing for function main
 [from] Done for function main
 [from] ====== DEPENDENCIES COMPUTED ======
@@ -1896,6 +2038,15 @@
   __malloc_test_realloc_multiple_bases_loop_l184[0..9] FROM __fc_heap_status (and SELF)
   __realloc_w_test_realloc_multiple_bases_loop_l187[0..27]
                                                    FROM __fc_heap_status (and SELF)
+[from] Function write:
+  __malloc_test_imprecise_update_l201[0..9] FROM \nothing (and SELF)
+  __realloc_w_test_imprecise_update_l209[0..4294967295]
+                                        FROM \nothing (and SELF)
+[from] Function test_imprecise_update:
+  __fc_heap_status FROM __fc_heap_status; nondet (and SELF)
+  __malloc_test_imprecise_update_l201[0..9] FROM nondet (and SELF)
+  __realloc_w_test_imprecise_update_l209[0..4294967295]
+                                        FROM nondet (and SELF)
 [from] Function main:
   __fc_heap_status FROM __fc_heap_status; nondet (and SELF)
   __realloc_test_exact_null_l27[0..9] FROM __fc_heap_status;
@@ -1955,5 +2106,8 @@
   __realloc_w_test_realloc_multiple_bases_loop_l187[0..27]
                                                    FROM __fc_heap_status;
                                                         nondet (and SELF)
+  __malloc_test_imprecise_update_l201[0..9] FROM nondet (and SELF)
+  __realloc_w_test_imprecise_update_l209[0..4294967295]
+                                        FROM nondet (and SELF)
   \result FROM \nothing
 [from] ====== END OF DEPENDENCIES ======

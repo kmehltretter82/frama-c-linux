@@ -183,10 +183,33 @@ void test_realloc_multiple_bases_loop() {
   size_t size = 10;
   char *p = malloc(size);
   for (int i = 0; i < 10; i++) {
-    size_t new_size = nondet ? size : 10+2*i; 
+    size_t new_size = nondet ? size : 10+2*i;
     p = nondet ? realloc(p, new_size) : p;
     if (!p) return;
     fill(p, new_size);
+  }
+}
+
+/*@ assigns *p \from \nothing; */
+void write(struct name *p);
+
+/* Test a crash that could happen if a completely imprecise write to a
+   dynamically allocated memory could change the size of its offsetmap
+   according to its current validity (that can change during the analysis
+   through reallocations). */
+void test_imprecise_update(void) {
+  char *p = malloc(10);
+  size_t size = 1;
+  while (nondet) {
+    if (nondet) {
+      struct name *tmp = p; // Unknown size for *tmp.
+      write(tmp); // Imprecise write to *p as the size of *tmp is unknown.
+    }
+    if (nondet) {
+      p = realloc(p, size);
+    }
+    size += 1000;
+    Frama_C_show_each(size);
   }
 }
 
@@ -211,5 +234,6 @@ int main(){
   test_realloc_multiple_bases();
   test_realloc_multiple_bases2();
   test_realloc_multiple_bases_loop();
+  test_imprecise_update();
   return 0;
 }
