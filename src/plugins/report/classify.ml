@@ -520,7 +520,7 @@ let report_dump fmt =
 
 let report_output file =
   R.feedback "Output %a@." Filepath.Normalized.pretty file;
-  Command.print_file file report_dump
+  Filepath.with_formatter_exn file report_dump
 
 let report_number name nb opt =
   if nb > 0 then R.feedback "%s%4d" name nb ;
