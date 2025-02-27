@@ -457,11 +457,15 @@ end
 
 open Operators
 
-let pp_to_file p job =
+let with_formatter_exn p job =
   let$ out_channel = with_open_out_exn p in
   let fmt = Format.formatter_of_out_channel out_channel in
   let finally = Format.pp_print_flush fmt in
   Fun.protect ~finally (fun () -> job fmt)
+
+let with_formatter p job =
+  try Ok (with_formatter_exn p job)
+  with Sys_error s -> Error s
 
 let rec bincopy buffer in_channel out_channel =
   let s = Bytes.length buffer in

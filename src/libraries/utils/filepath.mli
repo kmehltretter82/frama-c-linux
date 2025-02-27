@@ -265,11 +265,6 @@ val basename: Normalized.t -> string
 *)
 val dirname: Normalized.t -> Normalized.t
 
-val pp_to_file : Normalized.t -> (Format.formatter -> 'a) -> 'a
-(** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
-    The formatter is always properly flushed and closed on return.
-    Exceptions in [pp] are re-raised after closing. *)
-
 val bincopy : bytes -> in_channel -> out_channel -> unit
 (** [copy buffer cin cout] reads [cin] until end-of-file
     and copy it in [cout].
@@ -373,6 +368,24 @@ val with_open_out_exn:
   ?blocking:bool ->
   Normalized.t ->
   (out_channel, 'a) exn_processor
+
+
+(** [with_formatter_exn path f] calls [f] with a formatter writing to the file
+    [path]. The file is closed and the formatter is flushed when [f] returns or
+    whenever an exception is thrown by [f].
+
+    @return [Ok (f fmt)] if no exceptions are thrown, or [Error s]
+    if a [Sys_error s] is thrown during the execution of [f] or during the
+    closing the file.
+    @since Frama-C+dev
+*)
+val with_formatter: Normalized.t -> (Format.formatter, 'a) safe_processor
+
+(** Same as {!with_formatter} but raises [Sys_error] instead of returning
+    [Error].
+    @since Frama-C+dev
+*)
+val with_formatter_exn: Normalized.t -> (Format.formatter, 'a) exn_processor
 
 (** Opening this module allows to use shorter syntax to deal with files.
 

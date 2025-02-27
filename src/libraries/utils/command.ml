@@ -29,8 +29,8 @@ let copy = Filepath.copy
 let read_file p = Filepath.with_open_in_exn p
 let read_lines = Filepath.iter_lines
 let write_file p = Filepath.with_open_out_exn p
-let pp_to_file = Filepath.pp_to_file
-let print_file = Filepath.pp_to_file
+let pp_to_file = Filepath.with_formatter_exn
+let print_file = Filepath.with_formatter_exn
 
 let pp_from_file fmt path =
   let open Filepath.Operators in
