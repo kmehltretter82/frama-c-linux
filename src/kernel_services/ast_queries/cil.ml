@@ -156,6 +156,7 @@ let makeVarinfo
       vinline = false;
       vattr = [];
       vstorage = NoStorage;
+      valignas = None;
       vaddrof = false;
       vreferenced = referenced;
       vdescr = None;
@@ -3157,6 +3158,15 @@ type offsetAcc =
 (* Hack to prevent infinite recursion in alignments *)
 let ignoreAlignmentAttrs = ref false
 
+let foldAlignasToInt = function
+  | None -> None
+  | Some v ->
+    match !constfoldtoint v with
+    | None -> Kernel.fatal "%a should be a constant expresion" !pp_exp_ref v
+    | Some v when not @@ Z.fits_int v -> Kernel.fatal "_Alignas is too big"
+    | Some v when Z.equal Z.zero v -> None
+    | Some v -> Some (Z.to_int v)
+
 (* Get the minimum alignment in bytes for a given type *)
 let rec bytesAlignOf t =
   let open Machine in
@@ -3194,7 +3204,7 @@ let rec bytesAlignOf t =
            (* Bitfields with zero width do not contribute to the alignment in
             * GCC *)
            if not (msvcMode ()) && f.fbitfield = Some 0 then sofar else
-             max sofar (alignOfField f)) 1 fields
+             max sofar (bytesAlignOfField f)) 1 fields
     (* These are some error cases *)
     | TFun _ when not (msvcMode ()) -> alignof_fun ()
     | TFun _ -> raise (SizeOfError ("Undefined sizeof on a function.", t))
@@ -3215,27 +3225,22 @@ let rec bytesAlignOf t =
    Note that is not the case for the aligned attribute, which behaves
    differently when put into a struct, or in each of its fields.
 *)
-and alignOfField (fi: fieldinfo) =
+and bytesAlignOfField (fi: fieldinfo) =
   let fieldIsPacked =
     Ast_attributes.(contains "packed" fi.fattr || contains "packed" fi.fcomp.cattr)
   in
-  if fieldIsPacked then begin
-    if Ast_attributes.contains "aligned" fi.fattr then
-      (* field is packed and aligned => process alignment *)
-      let field_alignment = process_aligned_attribute ~may_reduce:true
-          (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
-          fi.fattr
-          (fun () -> bytesAlignOf fi.ftype)
-      in
-      field_alignment
-    else
-      (* packed and without minimum alignment => align on 1 *)
-      1
-  end else
-    process_aligned_attribute ~may_reduce:false
-      (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
-      fi.fattr
-      (fun () -> bytesAlignOf fi.ftype)
+  if fieldIsPacked && not @@ Ast_attributes.contains "aligned" fi.fattr then 1
+  else
+    let aligned = process_aligned_attribute ~may_reduce:fieldIsPacked
+        (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
+        fi.fattr
+        (fun () -> bytesAlignOf fi.ftype)
+    in
+    let alignas = match foldAlignasToInt fi.falignas with
+      | None -> 0
+      | Some v -> v
+    in
+    max alignas aligned
 
 and intOfAttrparam (a:attrparam) : int option =
   let rec doit a : int =
@@ -3332,7 +3337,7 @@ and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
 and offsetOfFieldAcc_GCC last (fi: fieldinfo) (sofar: offsetAcc) : offsetAcc =
   (* field type *)
   let ftype = Ast_types.unroll fi.ftype in
-  let ftypeAlign = 8 * alignOfField fi in
+  let ftypeAlign = 8 * bytesAlignOfField fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype, fi.fbitfield with
   (* A width of 0 means that we must end the current packing. It seems that
@@ -3379,7 +3384,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
     (sofar: offsetAcc) : offsetAcc =
   (* field type *)
   let ftype = Ast_types.unroll fi.ftype in
-  let ftypeAlign = 8 * alignOfField fi in
+  let ftypeAlign = 8 * bytesAlignOfField fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype.tnode, fi.fbitfield, sofar.oaPrevBitPack with
   (* Ignore zero-width bitfields that come after non-bitfields *)
@@ -3976,6 +3981,11 @@ let bitsSizeOfBitfield typlv =
   | t -> bitsSizeOf t
 
 let () = constfoldtoint := constFoldToInt ~machdep:true
+
+let bytesAlignOfVarinfo vi =
+  match foldAlignasToInt vi.valignas with
+  | None -> bytesAlignOf vi.vtype
+  | Some align -> align
 
 let intTypeIncluded kind1 kind2 =
   let bitsize1 = bitsSizeOfInt kind1 in

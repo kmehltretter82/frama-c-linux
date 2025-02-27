@@ -1338,14 +1338,14 @@ let canDropStatement (s: stmt) : bool =
 
 let fail_if_incompatible_sizeof ~ensure_complete op typ =
   if Ast_types.is_fun typ && Machine.sizeof_fun () < 0 then
-    Kernel.error ~current:true "%s called on function %s" op
+    Kernel.abort ~current:true "%s called on function %s" op
       (Machdep.allowed_machdep "GCC");
   let is_void = Ast_types.is_void typ in
   if is_void && Machine.sizeof_void () < 0 then
-    Kernel.error ~current:true "%s on void type %s" op
+    Kernel.abort ~current:true "%s on void type %s" op
       (Machdep.allowed_machdep "GCC/MSVC");
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
-    Kernel.error ~current:true
+    Kernel.abort ~current:true
       "%s on incomplete type '%a'" op Cil_datatype.Typ.pretty typ
 
 (******** CASTS *********)
@@ -2488,7 +2488,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
       Kernel.debug ~dkey:Kernel.dkey_typing_global
         "  %s(%d) already in the env at loc %a"
         vi.vname oldvi.vid Cil_printer.pp_location oldloc;
-      (* It was already defined. We must reuse the varinfo. But clean up the
+      (* It was already declared. We must reuse the varinfo. But clean up the
        * storage.  *)
       let newstorage = (* See 6.2.2 *)
         match oldvi.vstorage, vi.vstorage with
@@ -2513,6 +2513,48 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
          is extern we'll end up with an inline definition which must have
          a special treatment (see C11 6.7.4§7) *)
       oldvi.vinline <- oldvi.vinline && vi.vinline;
+
+      begin
+        (* C11 6.7.5 § 7 - Check _Alignas coherence, and update accordingly. *)
+
+        let same_alignas_value al1 al2 =
+          Option.equal Z.equal
+            (Cil.constFoldToInt al1)
+            (Cil.constFoldToInt al2)
+        in
+        match H.find_opt alreadyDefined oldvi.vname with
+        | None ->
+          begin match oldvi.valignas, vi.valignas with
+            | None, a | a, None ->
+              oldvi.valignas <- a
+            | Some al1, Some al2 when not @@ same_alignas_value al1 al2 ->
+              Kernel.error ~current:true
+                "%s was previously declared with incompatible _Alignas(%a) at %a"
+                oldvi.vname
+                Cil_printer.pp_exp (Option.get oldvi.valignas)
+                Cil_printer.pp_location oldloc
+            | _ -> ((* Compatile alignas *))
+          end
+        | Some oldloc ->
+          match oldvi.valignas with
+          | None ->
+            if Option.is_some vi.valignas then
+              Kernel.error ~current:true
+                "%s was previously defined without _Alignas specification at %a"
+                oldvi.vname Cil_printer.pp_location oldloc
+
+          | Some oldalignas ->
+            match vi.valignas with
+            | Some alignas when not @@ same_alignas_value oldalignas alignas ->
+              Kernel.error ~current:true
+                "%s was previous defined with incompatible _Alignas(%a) at %a"
+                oldvi.vname
+                Cil_printer.pp_exp oldalignas
+                Cil_printer.pp_location oldloc
+
+            | _ -> ((* Compatible alignas *))
+      end ;
+
       (* If the new declaration has a section attribute, remove any
        * preexisting section attribute. This mimics behavior of gcc that is
        * required to compile the Linux kernel properly. *)
@@ -3948,6 +3990,64 @@ let rec checkRestrictQualifierDeep t =
       end
     | _ -> ()
 
+let solveAlignas ~original_type alignas_specifiers =
+  let max_align = Machine.alignof_max () in
+  let extended_align = Machine.alignof_extended () in
+
+  let doAlignas alignas =
+    begin match Option.map Z.to_int @@ constFoldToInt ~machdep:true alignas with
+      | exception Z.Overflow ->
+        Kernel.abort
+          "Can't handle a value that big for _Alignas (%a)" Cil_printer.pp_exp alignas
+      | None ->
+        Kernel.abort (* C11 6.7.5 § 3 *)
+          "Invalid _Alignas(%a): shall evaluate to a constant" Cil_printer.pp_exp alignas ;
+      | Some value when not @@ (value = 0 || is_power_of_two value) ->
+        Kernel.abort (* C11 6.2.8 § 4 *)
+          "Invalid _Alignas(%a): shall be 0 or a positive power of 2" Cil_printer.pp_exp alignas ;
+      | Some value -> alignas, value
+    end
+  in
+  let alignas = match alignas_specifiers with
+    | [] -> None
+    | hd :: tl ->
+      (* C11 6.7.5 § 6 *)
+      let foldMaxAlignas acc alignas =
+        let align, value = doAlignas alignas in
+        if value > snd acc then align, value else acc
+      in
+      Some (List.fold_left foldMaxAlignas (doAlignas hd) tl)
+  in
+  match alignas with
+  | None -> None
+  | Some (_alignas, 0) -> None (* C11 6.7.5 § 6 *)
+  | Some (alignas, v) ->
+    let original_align = Cil.bytesAlignOf original_type in
+
+    (* C11 6.7.5 § 1 *)
+    if v < original_align then
+      Kernel.abort
+        "Invalid _Alignas(%a): shall not reduce original alignof(%a): %d"
+        Cil_printer.pp_exp alignas
+        Cil_printer.pp_typ original_type
+        original_align ;
+
+    (* C11 6.7.5 § 1 *)
+    if extended_align = 0 && v > max_align then
+      Kernel.abort
+        "Invalid _Alignas(%a): exceeds alignof(max_align_t): %d, \
+         and machdep does not allow extended alignment"
+        Cil_printer.pp_exp alignas
+        max_align ;
+
+    (* C11 6.7.5 § 1 *)
+    if v > extended_align && extended_align > 0 then
+      Kernel.abort
+        "Invalid _Alignas(%a): exceeds max extended alignment: %d"
+        Cil_printer.pp_exp alignas
+        extended_align ;
+    Some alignas
+
 (* Return true if the given expression is a call or a struct-returning call. *)
 let rec nested_call e =
   match e.expr_node with
@@ -3959,16 +4059,16 @@ let rec nested_call e =
    a struct-returning call. *)
 let contains_temp_subarray = ref false
 
-let rec doSpecList loc ghost (suggestedAnonName: string)
-    (* This string will be part of
-     * the names for anonymous
-     * structures and enums  *)
+let rec doSpecList loc ghost
+    (* This string will be part of the names for anonymous structs and enums *)
+    (suggestedAnonName: string)
     (specs: Cabs.spec_elem list)
   (* Returns the base type, the storage, whether it is inline and the
    * (unprocessed) attributes *)
-  : typ * storage * bool * Cabs.attribute list =
+  : typ * storage * exp list * bool * Cabs.attribute list =
   (* Do one element and collect the type specifiers *)
   let isinline = ref false in (* If inline appears *)
+  let alignas = ref [] in
   (* The storage is placed here *)
   let storage : storage ref = ref NoStorage in
 
@@ -4008,6 +4108,9 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
     | Cabs.SpecCV cv -> cvattrs := cv :: !cvattrs; acc
     | Cabs.SpecAttr a -> attrs := a :: !attrs; acc
     | Cabs.SpecType ts -> ts :: acc
+    | Cabs.SpecAlignas e ->
+      alignas := (doPureExp (ghost_local_env ghost) e) :: !alignas ;
+      acc
   in
   (* Now scan the list and collect the type specifiers. Preserve the order *)
   let tspecs = List.fold_right doSpecElem specs [] in
@@ -4304,7 +4407,7 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
         "Invalid combination of type specifiers:@ %a"
         (pp_list ~sep:"@ " Cprint.print_type_spec) l;
   in
-  bt,!storage,!isinline,List.rev (!attrs @ (convertCVtoAttr !cvattrs))
+  bt,!storage,!alignas,!isinline,List.rev (!attrs @ (convertCVtoAttr !cvattrs))
 
 (* given some cv attributes, convert them into named attributes for
  * uniform processing *)
@@ -4322,7 +4425,7 @@ and makeVarInfoCabs
     ?(isgenerated=false)
     ?(referenced=false)
     (ldecl : location)
-    (bt, sto, inline, attrs)
+    (bt, sto, alignas, inline, attrs)
     (n,ndt,a)
   : varinfo =
   let isglobal = kind = `GlobalDecl || kind = `LocalStaticDecl in
@@ -4366,6 +4469,22 @@ and makeVarInfoCabs
           "'%s' elements are already ghost" n;
   end ;
 
+  begin (* C11 6.7.5 § 2 *)
+    if Ast_types.is_fun vtype && alignas <> [] then
+      Kernel.error ~once:true ~current:true
+        "_Alignas not allowed on functions" ;
+
+    if isformal && alignas <> [] then
+      Kernel.error ~once:true ~current:true
+        "_Alignas not allowed on function parameters" ;
+
+    if sto = Register && alignas <> [] then
+      Kernel.error ~once:true ~current:true
+        "_Alignas not allowed on register variables" ;
+  end ;
+
+  let alignas = solveAlignas ~original_type:vtype alignas in
+
   if inline && not (Ast_types.is_fun vtype) then
     Kernel.error ~once:true ~current:true "inline for a non-function: %s" n;
   checkRestrictQualifierDeep vtype;
@@ -4373,6 +4492,7 @@ and makeVarInfoCabs
     makeVarinfo ~ghost ~referenced ~temp:isgenerated ~loc:ldecl isglobal isformal n vtype
   in
   vi.vstorage <- sto;
+  vi.valignas <- alignas;
   vi.vattr <- nattr;
   vi.vdefined <-
     not (Ast_types.is_fun vtype) && isglobal
@@ -4394,8 +4514,8 @@ and makeVarSizeVarInfo ghost (ldecl : location)
       (* In this case, we have changed the type from VLA to pointer: add the
          qualifier to the elements. *)
       let spec_res = match spec_res with
-        | (t, sto , inline , attrs) when ghost ->
-          (t, sto , inline , ("ghost", []) :: attrs)
+        | (t, sto , alignas, inline , attrs) when ghost ->
+          (t, sto , alignas, inline , ("ghost", []) :: attrs)
         | normal -> normal
       in
       makeVarInfoCabs ~ghost ~kind ldecl spec_res (n,ndt',a), se, len, true
@@ -4940,9 +5060,10 @@ and isVariableSizedArray ghost (dt: Cabs.decl_type)
   | Some (se, e) -> Some (dt', se, e)
 
 and doOnlyType loc ghost specs dt =
-  let bt',sto,inl,attrs = doSpecList loc ghost "" specs in
-  if sto <> NoStorage || inl then
-    Kernel.error ~once:true ~current:true "Storage or inline specifier in type only";
+  let bt',sto,align,inl,attrs = doSpecList loc ghost "" specs in
+  if sto <> NoStorage || inl || align <> [] then
+    Kernel.error ~once:true ~current:true
+      "Storage, inline or alignas specifier in type only";
   let tres, nattr =
     doType ghost `OnlyType AttrType bt' (Cabs.PARENTYPE(attrs, dt, []))
       ~allowVarSizeArrays:true
@@ -4978,7 +5099,8 @@ and makeCompType loc ghost (isstruct: bool)
       | [] -> "", Current_loc.get()
       | ((n, _, _, loc), _) :: _ -> n,loc
     in
-    let bt, sto, inl, attrs = doSpecList loc ghost sugg s in
+    let bt, sto, falignas, inl, attrs = doSpecList loc ghost sugg s in
+    let falignas = solveAlignas ~original_type:bt falignas in
     (* Do the fields *)
     let addFieldInfo ~last:last_field (flds : fieldinfo list)
         (((n,ndt,a,cloc) : Cabs.name), (widtho : Cabs.expression option))
@@ -5067,6 +5189,10 @@ and makeCompType loc ghost (isstruct: bool)
               w, ftype
           end
       in
+      if None <> fbitfield && Option.is_some falignas then
+        (* C11 6.7.5 § 2 *)
+        Kernel.error ~once:true ~current:true
+          "_Alignas not allowed on bitfields" ;
       (* Compute the order of the field in the structure *)
       let forder = match flds with
         | [] -> 0
@@ -5118,6 +5244,7 @@ and makeCompType loc ghost (isstruct: bool)
         fname;
         ftype;
         fbitfield;
+        falignas;
         fattr;
         floc =  convLoc cloc;
         faddrof = false;
@@ -5739,8 +5866,8 @@ and doExp local_env
               if !scopes == [] then begin
                 (* This is a global.  Mark the new vars as static *)
                 let spec_res' =
-                  let t, _, inl, attrs = spec_res in
-                  t, Static, inl, attrs
+                  let t, _, alignas, inl, attrs = spec_res in
+                  t, Static, alignas, inl, attrs
                 in
                 ignore (createGlobal loc local_env.is_ghost None spec_res'
                           ((newvar, dt', [], loc), ie'));
@@ -8412,7 +8539,8 @@ and doInit local_env asconst preinit so acc initl =
 
 (* Create and add to the file (if not already added) a global. Return the
  * varinfo *)
-and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool * Cabs.attribute list))
+and createGlobal loc ghost logic_spec
+    ((t,s,al,b,attr_list) : (typ * storage * exp list * bool * Cabs.attribute list))
     (((n,ndt,a,cloc), inite) : Cabs.init_name) : varinfo =
   let open Current_loc.Operators in
   Kernel.debug ~dkey:Kernel.dkey_typing_global "createGlobal: %s" n;
@@ -8442,7 +8570,7 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
   let vi =
     makeVarInfoCabs
       ~ghost ~kind:`GlobalDecl ~referenced:islibc ~isgenerated
-      vi_loc (t,s,b,attr_list) (n,ndt,a)
+      vi_loc (t,s,al,b,attr_list) (n,ndt,a)
   in
   (* Add the variable to the environment before doing the initializer
    * because it might refer to the variable itself *)
@@ -8737,7 +8865,7 @@ and handle_autoreference vi chunk ie =
   | Some v -> local_var_chunk { chunk with stmts } v
 
 (* Must catch the Static local variables. Make them global *)
-and createLocal ghost ((_, sto, _, _) as specs)
+and createLocal ghost ((_, sto, _, _, _) as specs)
     ((((n, ndt, a, cloc) : Cabs.name),
       (inite: Cabs.init_expression)) as init_name)
   : chunk =
@@ -8869,7 +8997,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
             ~ghost
             ~kind:`LocalDecl
             loc
-            (Machine.sizeof_type (), NoStorage, false, [])
+            (Machine.sizeof_type (), NoStorage, [], false, [])
             ("__lengthof_" ^ vi.vname,JUSTBASE, [])
         in
         (* Register it *)
@@ -9084,7 +9212,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
       let (n,ndt,a,l),_ = name in
       let<> UpdatedCurrentLoc = l in
       if isglobal then begin
-        let bt,_,_,attrs = spec_res in
+        let bt,_,_,_,attrs = spec_res in
         let vtype, nattr =
           doType local_env.is_ghost `GlobalDecl
             (AttrName false) bt (Cabs.PARENTYPE(attrs, ndt, a)) in
@@ -9221,7 +9349,13 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
        * We'll do it later *)
       transparentUnionArgs := [];
 
-      let bt,sto,inl,attrs = doSpecList idloc local_env.is_ghost n specs in
+      let bt,sto,alignas,inl,attrs = doSpecList idloc local_env.is_ghost n specs in
+
+      if alignas <> [] then
+        (* C11 6.7.5 § 2 *)
+        Kernel.error ~once:true ~current:true
+          "_Alignas not allowed on functions" ;
+
       !currentFunctionFDEC.svar.vinline <- inl;
       let ftyp, funattr =
         doType local_env.is_ghost `GlobalDecl
@@ -9620,12 +9754,12 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
       "block-level typedefs currently unsupported;@ \
        trying to convert it to a global-level typedef.@ \
        Note that this may lead to incoherent error messages.";
-  let bt, sto, inl, attrs =
+  let bt, sto, alignas, inl, attrs =
     doSpecList (Current_loc.get()) ghost (suggestAnonName nl) specs
   in
-  if sto <> NoStorage || inl then
+  if sto <> NoStorage || inl || alignas <> [] then
     Kernel.error ~once:true ~current:true
-      "Storage or inline specifier not allowed in typedef";
+      "Storage, inline or _Alignas specifier not allowed in typedef";
   let createTypedef ((n,ndt,a,_) : Cabs.name) =
     (*    E.s (error "doTypeDef") *)
     let newTyp, tattr =
@@ -9743,12 +9877,12 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
   List.iter createTypedef nl
 
 and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
-  let bt, sto, inl, attrs =
+  let bt, sto, align, inl, attrs =
     doSpecList (Current_loc.get()) ghost "" specs
   in
-  if sto <> NoStorage || inl then
+  if sto <> NoStorage || inl || align <> [] then
     Kernel.error ~once:true ~current:true
-      "Storage or inline specifier not allowed in typedef";
+      "Storage, inline or _Alignas specifier not allowed in typedef";
   let restyp, nattr =
     doType ghost `Typedef AttrType bt (Cabs.PARENTYPE(attrs, Cabs.JUSTBASE, []))
   in
@@ -10148,7 +10282,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
           (* Make a temporary variable *)
           let vchunk = createLocal
               local_env.is_ghost
-              (intType, NoStorage, false, [])
+              (intType, NoStorage, [], false, [])
               (("__compgoto", Cabs.JUSTBASE, [], loc), Cabs.NO_INIT)
           in
           if not (isEmpty vchunk) then

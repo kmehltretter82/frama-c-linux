@@ -1,18 +1,11 @@
 /* run.config
    EXIT: 1
-   STDOPT: #"-cpp-extra-args=-DALIGNAS"
    STDOPT: #"-cpp-extra-args=-DCOMPLEX"
    STDOPT: #"-cpp-extra-args=-DIMAGINARY"
    STDOPT: #"-cpp-extra-args=-DDECIMAL"
    STDOPT: #"-cpp-extra-args=-DINT128"
    STDOPT: #"-cpp-extra-args=-DUINT128"
 */
-
-#ifdef ALIGNAS
-struct st_alignas {
-  _Alignas(32) char buf[4];
-};
-#endif
 
 int main(void) {
 #ifdef COMPLEX // see also tests/syntax/alignof_typing_constrains.c "#ifdef TEST_COMPLEX"

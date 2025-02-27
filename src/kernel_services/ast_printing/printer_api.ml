@@ -167,9 +167,11 @@ class type extensible_printer_type = object
 
   method typ:
     ?fundecl:varinfo ->
+    ?alignas:exp ->
     (Format.formatter -> unit) option -> Format.formatter -> typ -> unit
   (** Use of some type in some declaration.  [fundecl] is the name of the
-      function which is declared with the corresponding type.  The second
+      function which is declared with the corresponding type.
+      [alignas] is the specified alignment. The second
       argument is used to print the declared element, or is None if we are just
       printing a type with no name being declared.  If [fundecl] is not None,
       second argument must also have a value. *)

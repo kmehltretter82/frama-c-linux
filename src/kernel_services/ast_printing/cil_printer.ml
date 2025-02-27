@@ -713,7 +713,7 @@ class cil_printer () = object (self)
       self#storage v.vstorage
       self#attributes stom_noreturn
       (if stom_noreturn = [] then "" else " ")
-      (self#typ ?fundecl name) v.vtype
+      (self#typ ?fundecl ?alignas:v.valignas name) v.vtype
       self#attributes rest
 
   method lhost fmt = function
@@ -1871,12 +1871,13 @@ class cil_printer () = object (self)
           fprintf fmt "%s@\n" s
 
   method fieldinfo fmt fi =
-    fprintf fmt "%a %s%a;"
+    fprintf fmt "%a%a %s%a;"
       (self#typ
          (Some (fun fmt ->
               if fi.fname <> Cil.missingFieldName then
                 self#varname fmt fi.fname)))
       fi.ftype
+      (self#alignas ~space:true) fi.falignas
       (match fi.fbitfield with
        | None -> ""
        | Some i -> ": " ^ string_of_int i ^ " ")
@@ -1917,6 +1918,10 @@ class cil_printer () = object (self)
     | Extern -> fprintf fmt "%a " self#pp_keyword "extern"
     | Register -> fprintf fmt "%a " self#pp_keyword "register"
 
+  method private alignas ~space fmt = function
+    | None -> fprintf fmt ""
+    | Some e -> fprintf fmt "%s_Alignas(%a)" (if space then " " else "") self#exp e
+
   method fkind fmt = function
     | FFloat -> fprintf fmt "float"
     | FDouble -> fprintf fmt "double"
@@ -1956,11 +1961,14 @@ class cil_printer () = object (self)
   method typename fmt tinfo =
     self#varname fmt tinfo.tname
 
-  method typ ?fundecl nameOpt
+  method typ ?fundecl ?alignas nameOpt
       fmt (t:typ) =
     let pname fmt space = match nameOpt with
       | None -> ()
       | Some pp -> if space then pp_print_char fmt ' '; pp fmt in
+    let palignas fmt space = match alignas with
+      | None -> ()
+      | alignas -> self#alignas fmt ~space alignas in
     let printAttributes fmt (a: attributes) =
       match nameOpt with
       | None when not state.print_cil_input && not (Machine.msvcMode ()) -> ()
@@ -1971,32 +1979,37 @@ class cil_printer () = object (self)
       | _ ->  self#attributes fmt a
     in
     match t.tnode with
-    | TVoid -> fprintf fmt "void%a%a" self#attributes t.tattr pname true
+    | TVoid ->
+      fprintf fmt "void%a%a%a" self#attributes t.tattr palignas true pname true
 
     | TInt ikind ->
-      fprintf fmt "%a%a%a"
+      fprintf fmt "%a%a%a%a"
         (self#typeref t self#ikind) ikind
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TFloat fkind ->
-      fprintf fmt "%a%a%a"
+      fprintf fmt "%a%a%a%a"
         (self#typeref t self#fkind) fkind
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TComp comp -> (* A reference to a struct *)
-      fprintf fmt "%a %a%a%a"
+      fprintf fmt "%a %a%a%a%a"
         self#compkind comp
         (self#typeref t self#compname) comp
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TEnum enum ->
-      fprintf fmt "%a %a%a%a"
+      fprintf fmt "%a %a%a%a%a"
         self#pp_keyword "enum"
         (self#typeref t self#enumname) enum
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TPtr bt ->
@@ -2021,7 +2034,12 @@ class cil_printer () = object (self)
         | _ -> None, bt
       in
       let name' =
-        fun fmt -> fprintf fmt "*%a%a" printAttributes t.tattr pname (t.tattr <> [])
+        fun fmt ->
+          let attr = t.tattr <> [] in
+          fprintf fmt "*%a%a%a"
+            printAttributes t.tattr
+            palignas attr
+            pname (attr || alignas <> None)
       in
       let name'' =
         fun fmt ->
@@ -2059,9 +2077,12 @@ class cil_printer () = object (self)
         | _ -> ()
       in
       let name' fmt =
-        if filter_printing_attributes a = [] then pname fmt false
-        else if nameOpt = None then printAttributes fmt a
-        else fprintf fmt "(%a%a)" printAttributes a pname true
+        if filter_printing_attributes a = [] then
+          fprintf fmt "%a%a" palignas true pname false
+        else if nameOpt = None then
+          fprintf fmt "%a%a" printAttributes a palignas true
+        else
+          fprintf fmt "(%a%a%a)" printAttributes a palignas true pname true
       in
       self#typ
         (Some (fun fmt ->
@@ -2076,6 +2097,7 @@ class cil_printer () = object (self)
         elemt
 
     | TFun (restyp, args, isvararg) ->
+      (* Note: no printing of _Alignas here, since it does not make sense. *)
       let name' fmt =
         if filter_printing_attributes t.tattr = [] then pname fmt false
         else if nameOpt = None then printAttributes fmt t.tattr
@@ -2129,12 +2151,14 @@ class cil_printer () = object (self)
       self#typ (Some pp_params) fmt restyp
 
     | TNamed ti ->
-      fprintf fmt "%a%a%a"
+      fprintf fmt "%a%a%a%a"
         (self#typeref t self#typename) ti
         self#attributes t.tattr
+        palignas true
         pname true
 
     | TBuiltin_va_list ->
+      (* Note: no printing of _Alignas here, since it does not make sense. *)
       fprintf fmt "__builtin_va_list%a%a"
         self#attributes t.tattr
         pname true

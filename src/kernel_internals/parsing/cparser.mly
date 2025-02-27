@@ -320,7 +320,7 @@ let type_to_expr_for_builtin ~loc ~builtin specifier decl_type =
 %token<Cabs.cabsloc> THREAD THREAD_LOCAL
 %token<Cabs.cabsloc> GHOST
 
-%token<Cabs.cabsloc> SIZEOF ALIGNOF GENERIC
+%token<Cabs.cabsloc> SIZEOF ALIGNOF ALIGNAS GENERIC
 
 %token EQ PLUS_EQ MINUS_EQ STAR_EQ SLASH_EQ PERCENT_EQ
 %token AND_EQ PIPE_EQ CIRC_EQ INF_INF_EQ SUP_SUP_EQ
@@ -1128,6 +1128,14 @@ decl_spec_wo_type_nor_attr: /* ISO 6.7 */
 // ISO 6.7.4
 | INLINE   { SpecInline, $1 }
 | NORETURN { SpecAttr (("noreturn",[])), $1 }
+| ALIGNAS LPAREN conditional_expression RPAREN {
+    SpecAlignas($3), $1
+  }
+| ALIGNAS LPAREN type_name RPAREN {
+    let b, d = $3 in
+    SpecAlignas(make_expr $sloc (TYPE_ALIGNOF(b, d))), $1
+  }
+
 // ISO 6.7.3
 | cvspec   { $1 }
 ;

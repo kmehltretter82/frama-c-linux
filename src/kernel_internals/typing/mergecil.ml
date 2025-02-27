@@ -942,6 +942,18 @@ let equalModuloPackedAlign attrs1 attrs2 =
 let checkFieldsEqualModuloPackedAlign ~mustCheckOffsets f1 f2 =
   if f1.fbitfield <> f2.fbitfield then
     raise (Failure "different bitfield info");
+
+  let same_alignas_value al1 al2 =
+    Option.equal Z.equal
+      (Cil.constFoldToInt al1)
+      (Cil.constFoldToInt al2)
+  in
+  begin match f1.falignas, f2.falignas with
+    | None, None -> ()
+    | Some a1, Some a2 when same_alignas_value a1 a2 -> ()
+    | _ -> raise (Failure "incompatible _Alignas specification");
+  end;
+
   if mustCheckOffsets || not (equal_attributes_for_merge f1.fattr f2.fattr) then
     (* different attributes: check if the difference is only due
        to aligned/packed attributes, and if the offsets are the same,

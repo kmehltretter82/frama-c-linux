@@ -132,12 +132,12 @@ module LinkPrinter(X: Printer.PrinterClass) = struct
   class printer = object
     inherit X.printer as super
 
-    method! typ ?fundecl nameOpt fmt t =
+    method! typ ?fundecl ?alignas nameOpt fmt t =
       match tid_of_typ t with
       | None -> Format.fprintf fmt "@{%a@}" (super#typ ?fundecl nameOpt) t
       | Some tid ->
         Format.fprintf fmt "@{<link:typ%d>%a@}"
-          tid (super#typ ?fundecl nameOpt) t
+          tid (super#typ ?fundecl ?alignas nameOpt) t
 
     method! varinfo fmt vi =
       ResolveVid.replace vi.vid vi;

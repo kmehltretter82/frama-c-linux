@@ -632,7 +632,7 @@ struct
       end)
 end
 
-module Typ= struct
+module Typ = struct
   include
     MakeTyp
       (struct
@@ -754,6 +754,7 @@ module Varinfo_Id = struct
     vtype    = Typ.dummy;
     vattr = [];
     vstorage = NoStorage;
+    valignas = None;
     vglob = false;
     vdefined = false;
     vformal = false;
@@ -825,6 +826,7 @@ module Fieldinfo = struct
     fname      = "@dummy_fieldinfo@";
     ftype      = Typ.dummy;
     fbitfield  = None;
+    falignas   = None;
     fattr      = [];
     floc       = Location.dummy;
     faddrof    = false;
@@ -832,7 +834,7 @@ module Fieldinfo = struct
     foffset_in_bits = None;
   }
 
-  include  Make_with_collections
+  include Make_with_collections
       (struct
         type t = fieldinfo
         let name = "fieldinfo"
@@ -849,6 +851,7 @@ module Fieldinfo = struct
                            fname = "";
                            ftype = typ;
                            fbitfield = None;
+                           falignas = None;
                            fattr = [];
                            floc = loc;
                            faddrof = false;
@@ -2180,7 +2183,7 @@ module Logic_constant = struct
   let pretty_ref = ref (fun _ _ -> assert false)
   let dummy = LStr "@dummy_logic_constant@"
 
-  include  Make_with_collections
+  include Make_with_collections
       (struct
         type t = logic_constant
         let name = "Logic_constant"

@@ -165,6 +165,7 @@ let rec print_specifiers fmt (specs: spec_elem list) =
     | SpecCV CV_GHOST -> fprintf fmt "\\ghost"
     | SpecAttr al -> print_attribute fmt al
     | SpecType bt -> print_type_spec fmt bt
+    | SpecAlignas e -> fprintf fmt "_Alignas(%a)" print_expression e
   in
   Pretty_utils.pp_list ~sep:"@ " print_spec_elem fmt specs
 

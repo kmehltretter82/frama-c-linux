@@ -1903,6 +1903,22 @@ val sizeOf: loc:location -> typ -> exp
     @raise {!SizeOfError} when it cannot compute the alignment. *)
 val bytesAlignOf: typ -> int
 
+(** The alignment of the variable according to:
+    - its _Alignas specifier, or if unspecified,
+    - its type.
+      @raise {!SizeOfError} when it cannot compute the alignment.
+      @since Frama-C+dev
+*)
+val bytesAlignOfVarinfo: varinfo -> int
+
+(** The alignment of the variable according to:
+    - its _Alignas specifier, or if unspecified,
+    - its type.
+      @raise {!SizeOfError} when it cannot compute the alignment.
+      @since Frama-C+dev
+*)
+val bytesAlignOfField: fieldinfo -> int
+
 (** [intOfAttrparam a] tries to const-fold [a] into a numeric value.
     Returns [Some n] if it succeeds, [None] otherwise.
     @since Silicium-20161101 *)

@@ -489,6 +489,12 @@ and fieldinfo = {
       the integer type. A field of width 0 is used in C to control the alignment
       of fields. *)
 
+  mutable falignas: exp option;
+  (** _Alignas specification, if specified.
+      Use {!Cil.bytesAlignOfField} to get the actual alignment.
+      @since Frama-C+dev
+  *)
+
   mutable fattr: attributes;
   (** The attributes for this field (not for its type) *)
 
@@ -618,6 +624,12 @@ and varinfo = {
   mutable vstorage: storage;
   (** The storage-class *)
 
+  mutable valignas: exp option;
+  (** The alignement specification, if some is specified.
+      Use {!Cil.bytesAlignOfVarinfo} to get the actual alignment.
+      @since Frama-C+dev
+  *)
+
   mutable vglob: bool;
   (** True if this is a global variable*)
 
@@ -744,7 +756,7 @@ and exp_node =
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
   | AlignOf    of typ
-  (** _Alignof. Has [size_t] type which depends on machine configuration 
+  (** _Alignof. Has [size_t] type which depends on machine configuration
        (cf. {!Machine}). *)
 
   | AlignOfE   of exp

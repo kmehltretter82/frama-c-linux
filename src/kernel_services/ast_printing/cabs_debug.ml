@@ -75,7 +75,6 @@ let rec pp_typeSpecifier fmt = function
   |     TtypeofE exp -> fprintf fmt "typeOfE %a" pp_exp exp
   |     TtypeofT (spec, d_type) -> fprintf fmt "typeOfT(%a,%a)" pp_spec spec pp_decl_type d_type
 
-
 and pp_spec_elem  fmt = function
   |     SpecTypedef -> fprintf fmt "SpecTypedef"
   |     SpecCV cvspec -> fprintf fmt "SpecCV %a" pp_cvspec cvspec
@@ -83,6 +82,7 @@ and pp_spec_elem  fmt = function
   |     SpecStorage storage -> fprintf fmt "SpecStorage %a" pp_storage storage
   |     SpecInline -> fprintf fmt "SpecInline"
   |     SpecType typeSpec -> fprintf fmt "SpecType %a" pp_typeSpecifier typeSpec
+  |     SpecAlignas exp -> fprintf fmt "SpecAlignas %a" pp_exp exp
 
 and pp_spec fmt spec_elems =
   fprintf fmt "@[<hv 2>{" ;

@@ -64,6 +64,7 @@ and spec_elem =
   | SpecStorage of storage
   | SpecInline
   | SpecType of typeSpecifier
+  | SpecAlignas of expression
 
 (* decided to go ahead and replace 'spec_elem list' with specifier *)
 and specifier = spec_elem list

@@ -147,6 +147,8 @@ let init_lexicon () =
   valid "for" (fun loc -> FOR loc) ;
   valid "if" (fun loc -> IF loc) ;
   valid "else" (fun _ -> ELSE) ;
+  valid "alignas" (fun loc -> ALIGNAS loc) ;
+  valid "_Alignas" (fun loc -> ALIGNAS loc) ;
   valid "alignof" (fun loc -> ALIGNOF loc) ;
   valid "_Alignof" (fun loc -> ALIGNOF loc) ;
   (*** Implementation specific keywords ***)
@@ -202,7 +204,6 @@ let init_lexicon () =
   (* The following C11/GNU extension tokens are not yet supported, so we
    provide some helpful error messages. Usage of 'fatal' instead of 'error'
    below prevents duplicate error messages due to parsing errors. *)
-  unsupported "_Alignas" ;
   unsupported "_Complex" ;
   unsupported "_Decimal32" ;
   unsupported "_Decimal64" ;

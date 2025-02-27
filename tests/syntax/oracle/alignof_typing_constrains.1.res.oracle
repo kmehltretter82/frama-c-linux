@@ -1,8 +1,4 @@
 [kernel] Parsing alignof_typing_constrains.c (with preprocessing)
 [kernel] alignof_typing_constrains.c:119: User Error: 
   alignof called on function only allowed for GCC machdeps; see option -machdep or run 'frama-c -machdep help' for the list of available machdeps
-[kernel:typing:alignof-bitfield] alignof_typing_constrains.c:146: Warning: 
-  _Alignof(bitfield) has unspecified value
-[kernel] User Error: stopping on file "alignof_typing_constrains.c" that has errors. Add
-  '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

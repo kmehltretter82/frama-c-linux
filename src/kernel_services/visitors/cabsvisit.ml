@@ -135,6 +135,9 @@ and childrenSpecElem (vis: cabsVisitor) (se: spec_elem) : spec_elem =
   | SpecType ts ->
     let ts' = visitCabsTypeSpecifier vis ts in
     if ts' != ts then SpecType ts' else se
+  | SpecAlignas e ->
+    let e' = visitCabsExpression vis e in
+    if e' != e then SpecAlignas e' else se
 
 and visitCabsSpecifier (vis: cabsVisitor) (s: specifier) : specifier =
   doVisit vis vis#vspec childrenSpec s
