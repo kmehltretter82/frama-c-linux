@@ -117,11 +117,9 @@ let parse_remarks env chan =
 let get_remarks f =
   Mdr_params.debug ~dkey "Using remarks file %a"
     Filepath.Normalized.pretty f;
-  try
-    let chan = open_in (f:>string) in
-    let { remarks } = parse_remarks (empty_env ()) chan in
-    remarks
-  with Sys_error err ->
+  match Filepath.with_open_in f (parse_remarks (empty_env ())) with
+  | Ok { remarks } -> remarks
+  | Error err ->
     Mdr_params.error
       "Unable to open remarks file %a (%s). \
        No additional remarks will be included in the report."
