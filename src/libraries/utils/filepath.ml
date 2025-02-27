@@ -392,9 +392,9 @@ let flags_and_perm ?if_exists ~if_missing ~binary ~blocking default =
    and reraise them as [Finally_raised exn]. However, a [Sys_error] can be
    raised by {!close_out} (and {!close_in} but it should not happen).
 *)
-let protect_file_op ~(close: 'ch -> unit) (f: 'ch -> 'a) (channel: 'ch) =
+let protect_file_op ~(close: 'ch -> unit) (job: 'ch -> 'a) (channel: 'ch) =
   let r =
-    try f channel with
+    try job channel with
     | exn ->
       try
         close channel;
@@ -411,14 +411,14 @@ let with_open_in_exn
     ?(binary=false)
     ?(blocking=true)
     (p: Normalized.t)
-    (f: in_channel -> 'a): 'a =
+    (job: in_channel -> 'a): 'a =
   let flags, perm =
     flags_and_perm ~if_missing ~binary ~blocking Open_rdonly
   in
-  open_in_gen flags perm p |> protect_file_op ~close:close_in f
+  open_in_gen flags perm p |> protect_file_op ~close:close_in job
 
-let with_open_in ?if_missing ?binary ?blocking p f =
-  try Ok (with_open_in_exn ?if_missing ?binary ?blocking p f)
+let with_open_in ?if_missing ?binary ?blocking p job =
+  try Ok (with_open_in_exn ?if_missing ?binary ?blocking p job)
   with Sys_error s -> Error s
 
 let with_open_out_exn
@@ -427,21 +427,21 @@ let with_open_out_exn
     ?(binary=false)
     ?(blocking=true)
     (p: Normalized.t)
-    (f: out_channel -> 'a): 'a =
+    (job: out_channel -> 'a): 'a =
   let flags, perm =
     flags_and_perm ~if_exists ~if_missing ~binary ~blocking Open_wronly
   in
-  open_out_gen flags perm p |> protect_file_op ~close:close_out f
+  open_out_gen flags perm p |> protect_file_op ~close:close_out job
 
-let with_open_out ?if_missing ?if_exists ?binary ?blocking p f =
-  try Ok (with_open_out_exn ?if_missing ?if_exists ?binary ?blocking p f)
+let with_open_out ?if_missing ?if_exists ?binary ?blocking p job =
+  try Ok (with_open_out_exn ?if_missing ?if_exists ?binary ?blocking p job)
   with Sys_error s -> Error s
 
 module Operators =
 struct
-  let (let+) with_open f = with_open f
-  let (let*) with_open f = with_open f |> Result.join
-  let (let$) with_open f = with_open f
+  let (let+) with_open job = with_open job
+  let (let*) with_open job = with_open job |> Result.join
+  let (let$) with_open job = with_open job
 end
 
 
@@ -451,39 +451,39 @@ end
 
 open Operators
 
-let pp_to_file f pp =
-  let$ cout = with_open_out_exn f in
-  let fout = Format.formatter_of_out_channel cout in
+let pp_to_file p job =
+  let$ out_channel = with_open_out_exn p in
+  let fout = Format.formatter_of_out_channel out_channel in
   try
-    pp fout ;
+    job fout ;
     Format.pp_print_flush fout ()
   with err ->
     Format.pp_print_flush fout () ;
     raise err
 
-let rec bincopy buffer cin cout =
+let rec bincopy buffer in_channel out_channel =
   let s = Bytes.length buffer in
-  let n = input cin buffer 0 s in
+  let n = input in_channel buffer 0 s in
   if n > 0 then
-    ( output cout buffer 0 n ; bincopy buffer cin cout )
+    ( output out_channel buffer 0 n ; bincopy buffer in_channel out_channel )
   else
-    ( flush cout )
+    ( flush out_channel )
 
 let copy src tgt =
-  let$ inc = with_open_in_exn src in
-  let$ out = with_open_out_exn tgt in
-  bincopy (Bytes.create 2048) inc out
+  let$ in_channel = with_open_in_exn src in
+  let$ out_channel = with_open_out_exn tgt in
+  bincopy (Bytes.create 2048) in_channel out_channel
 
-let read_lines file job =
-  let$ inc = with_open_in_exn file in
+let read_lines p job =
+  let$ in_channel = with_open_in_exn p in
   try
     while true do
-      job (input_line inc) ;
+      job (input_line in_channel) ;
     done
   with End_of_file -> ()
 
-let print_file file job =
-  with_open_out_exn file
+let print_file p job =
+  with_open_out_exn p
     (fun out ->
        let fmt = Format.formatter_of_out_channel out in
        let finally () = Format.pp_print_flush fmt () in
