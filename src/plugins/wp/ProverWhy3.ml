@@ -824,7 +824,7 @@ class visitor (ctx:context) c =
           let tgtdir = WpContext.directory () in
           let why3src = Filepath.basename source in
           let target = Filepath.Normalized.concat tgtdir (why3src :> string) in
-          Command.copy source target
+          Filepath.copy source target
       in
       let iter_file opt =
         match Str.split_delim regexp_col opt with

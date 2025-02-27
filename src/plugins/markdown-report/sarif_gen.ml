@@ -278,10 +278,10 @@ let generate () =
   if not (Mdr_params.Output.is_empty ()) then
     let file = Mdr_params.Output.get () in
     try
-      Command.write_file file
-        (fun out ->
-           Yojson.Safe.pretty_to_channel ~std:true out json;
-           output_char out '\n') ;
+      let open Filepath.Operators in
+      let$ out = Filepath.with_open_out_exn file in
+      Yojson.Safe.pretty_to_channel ~std:true out json;
+      output_char out '\n';
       Mdr_params.result "Report %a generated" Filepath.Normalized.pretty file
     with Sys_error s ->
       Mdr_params.abort "Unable to generate %a (%s)"

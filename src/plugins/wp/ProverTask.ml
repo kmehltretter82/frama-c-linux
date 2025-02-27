@@ -112,7 +112,8 @@ let dump_buffer buffer = function
   | Some log ->
     let n = Buffer.length buffer in
     if n > 0 then
-      Command.write_file log (fun out -> Buffer.output_buffer out buffer)
+      Filepath.with_open_out_exn log
+        (fun out -> Buffer.output_buffer out buffer)
     else if Wp_parameters.has_out () then
       Extlib.safe_remove (log :> string)
 

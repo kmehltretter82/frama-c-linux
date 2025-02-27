@@ -25,15 +25,13 @@
 (* ************************************************************************* *)
 (** {2 File Utilities} *)
 (* ************************************************************************* *)
-
+ 
 val pp_to_file : Filepath.Normalized.t -> (Format.formatter -> unit) -> unit
 (** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
     The formatter is always properly flushed and closed on return.
     Exceptions in [pp] are re-raised after closing. *)
-
-val pp_from_file : Format.formatter -> Filepath.Normalized.t -> unit
-(** [pp_from_file fmt file] dumps the content of [file] into the [fmt].
-    Exceptions in [pp] are re-raised after closing. *)
+[@@deprecated "Use Filepath.with_formatter_exn instead."]
+[@@migrate { repl = Filepath.with_formatter_exn } ]
 
 val bincopy : bytes -> in_channel -> out_channel -> unit
 (** [copy buffer cin cout] reads [cin] until end-of-file
@@ -41,21 +39,40 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
     [buffer] is a temporary string used during the copy.
     Recommended size is [2048].
 *)
+[@@deprecated]
 
 val copy : Filepath.Normalized.t -> Filepath.Normalized.t -> unit
 (** [copy source target] copies source file to target file using [bincopy]. *)
+[@@deprecated "Use Filepath.copy instead."]
+[@@migrate { repl = Filepath.copy } ]
 
 val read_file : Filepath.Normalized.t -> (in_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
+[@@deprecated "Use Filepath.with_open_in_exn instead."]
+[@@migrate { repl = Filepath.with_open_in_exn } ]
 
 val read_lines : Filepath.Normalized.t -> (string -> unit) -> unit
 (** Iter over all text lines in the file *)
+[@@deprecated "Use Filepath.iter_lines instead."]
+[@@migrate { repl = Filepath.iter_lines } ]
 
 val write_file : Filepath.Normalized.t -> (out_channel -> 'a) -> 'a
 (** Properly close the channel and re-raise exceptions *)
+[@@deprecated "Use Filepath.with_open_out_exn instead."]
+[@@migrate { repl = Filepath.with_open_out_exn } ]
 
 val print_file : Filepath.Normalized.t -> (Format.formatter -> 'a) -> 'a
 (** Properly flush and close the channel and re-raise exceptions *)
+[@@deprecated "Use Filepath.with_formatter_exn instead."]
+[@@migrate { repl = Filepath.with_formatter_exn } ]
+
+(* ************************************************************************* *)
+(** {2 Pretty from files} *)
+(* ************************************************************************* *)
+
+val pp_from_file : Format.formatter -> Filepath.Normalized.t -> unit
+(** [pp_from_file fmt file] dumps the content of [file] into the [fmt].
+    Exceptions in [pp] are re-raised after closing. *)
 
 (* ************************************************************************* *)
 (** {2 Timing Utility} *)
@@ -81,6 +98,7 @@ val full_command :
 (** Same arguments as {!Unix.create_process} but returns only when
     execution is complete.
     @raise Sys_error when a system error occurs *)
+[@@deprecated]
 
 type process_result =
   | Not_ready of (unit -> unit)
@@ -100,6 +118,7 @@ val full_command_async :
     You must call this function until it returns a Result
     to prevent Zombie processes.
     @raise Sys_error when a system error occurs *)
+[@@deprecated]
 
 val command_async :
   ?stdout:Buffer.t ->

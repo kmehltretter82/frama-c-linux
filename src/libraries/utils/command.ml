@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 (* -------------------------------------------------------------------------- *)
-(* --- File Utilities                                                     --- *)
+(* --- Deprecated file Utilities                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
 let bincopy = Filepath.bincopy
@@ -31,6 +31,10 @@ let read_lines = Filepath.iter_lines
 let write_file p = Filepath.with_open_out_exn p
 let pp_to_file = Filepath.with_formatter_exn
 let print_file = Filepath.with_formatter_exn
+
+(* -------------------------------------------------------------------------- *)
+(* --- Pretty from files                                                  --- *)
+(* -------------------------------------------------------------------------- *)
 
 let pp_from_file fmt path =
   let open Filepath.Operators in
@@ -106,7 +110,7 @@ let flush b f =
   match b with
   | None -> ()
   | Some b ->
-    try read_lines f
+    try Filepath.iter_lines f
           (fun line -> Buffer.add_string b line ; Buffer.add_char b '\n') ;
     with Sys_error _ -> ()
 
