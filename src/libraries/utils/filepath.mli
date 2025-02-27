@@ -265,6 +265,27 @@ val basename: Normalized.t -> string
 *)
 val dirname: Normalized.t -> Normalized.t
 
+val pp_to_file : Normalized.t -> (Format.formatter -> unit) -> unit
+(** [pp_to_file file pp] runs [pp] on a formatter that writes into [file].
+    The formatter is always properly flushed and closed on return.
+    Exceptions in [pp] are re-raised after closing. *)
+
+val bincopy : bytes -> in_channel -> out_channel -> unit
+(** [copy buffer cin cout] reads [cin] until end-of-file
+    and copy it in [cout].
+    [buffer] is a temporary string used during the copy.
+    Recommended size is [2048].
+*)
+
+val copy : Normalized.t -> Normalized.t -> unit
+(** [copy source target] copies source file to target file using [bincopy]. *)
+
+val read_lines : Normalized.t -> (string -> unit) -> unit
+(** Iter over all text lines in the file *)
+
+val print_file : Normalized.t -> (Format.formatter -> 'a) -> 'a
+(** Properly flush and close the channel and re-raise exceptions *)
+
 (** This type defines what action {!with_open_in} and {!with_open_out} must
     perform when the file to open does not exist. *)
 type action_if_missing =

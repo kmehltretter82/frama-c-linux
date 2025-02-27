@@ -364,7 +364,7 @@ let basename p = Filename.basename p
 let dirname p = Filename.dirname p
 
 (* -------------------------------------------------------------------------- *)
-(* --- Input/Output                                                       --- *)
+(* --- Low leevel Input/Output                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
 type action_if_missing = Create of int | DoNotCreate
@@ -443,3 +443,48 @@ struct
   let (let*) with_open f = with_open f |> Result.join
   let (let$) with_open f = with_open f
 end
+
+
+(* -------------------------------------------------------------------------- *)
+(* --- High level Input/Output                                            --- *)
+(* -------------------------------------------------------------------------- *)
+
+open Operators
+
+let pp_to_file f pp =
+  let$ cout = with_open_out_exn f in
+  let fout = Format.formatter_of_out_channel cout in
+  try
+    pp fout ;
+    Format.pp_print_flush fout ()
+  with err ->
+    Format.pp_print_flush fout () ;
+    raise err
+
+let rec bincopy buffer cin cout =
+  let s = Bytes.length buffer in
+  let n = input cin buffer 0 s in
+  if n > 0 then
+    ( output cout buffer 0 n ; bincopy buffer cin cout )
+  else
+    ( flush cout )
+
+let copy src tgt =
+  let$ inc = with_open_in_exn src in
+  let$ out = with_open_out_exn tgt in
+  bincopy (Bytes.create 2048) inc out
+
+let read_lines file job =
+  let$ inc = with_open_in_exn file in
+  try
+    while true do
+      job (input_line inc) ;
+    done
+  with End_of_file -> ()
+
+let print_file file job =
+  with_open_out_exn file
+    (fun out ->
+       let fmt = Format.formatter_of_out_channel out in
+       let finally () = Format.pp_print_flush fmt () in
+       Fun.protect ~finally (fun () -> job fmt))

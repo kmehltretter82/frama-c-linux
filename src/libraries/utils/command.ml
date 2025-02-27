@@ -24,16 +24,13 @@
 (* --- File Utilities                                                     --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pp_to_file f pp =
-  let open Filepath.Operators in
-  let$ cout = Filepath.with_open_out_exn f in
-  let fout = Format.formatter_of_out_channel cout in
-  try
-    pp fout ;
-    Format.pp_print_flush fout ()
-  with err ->
-    Format.pp_print_flush fout () ;
-    raise err
+let bincopy = Filepath.bincopy
+let copy = Filepath.copy
+let read_file p = Filepath.with_open_in_exn p
+let read_lines = Filepath.read_lines
+let write_file p = Filepath.with_open_out_exn p
+let pp_to_file = Filepath.pp_to_file
+let print_file = Filepath.print_file
 
 let pp_from_file fmt file =
   let open Filepath.Operators in
@@ -47,43 +44,6 @@ let pp_from_file fmt file =
     done
   with
   | End_of_file -> ()
-
-let rec bincopy buffer cin cout =
-  let s = Bytes.length buffer in
-  let n = input cin buffer 0 s in
-  if n > 0 then
-    ( output cout buffer 0 n ; bincopy buffer cin cout )
-  else
-    ( flush cout )
-
-let copy src tgt =
-  let open Filepath.Operators in
-  let$ inc = Filepath.with_open_in_exn src in
-  let$ out = Filepath.with_open_out_exn tgt in
-  bincopy (Bytes.create 2048) inc out
-
-let read_file file job =
-  Filepath.with_open_in_exn file job
-
-let read_lines file job =
-  let open Filepath.Operators in
-  let$ inc = Filepath.with_open_in_exn file in
-  try
-    while true do
-      job (input_line inc) ;
-    done
-  with End_of_file -> ()
-
-let write_file file job =
-  assert (not (Filepath.Normalized.is_empty file));
-  Filepath.with_open_out_exn file job
-
-let print_file file job =
-  write_file file
-    (fun out ->
-       let fmt = Format.formatter_of_out_channel out in
-       let finally () = Format.pp_print_flush fmt () in
-       Fun.protect ~finally (fun () -> job fmt))
 
 (* -------------------------------------------------------------------------- *)
 (* --- Timing                                                             --- *)
