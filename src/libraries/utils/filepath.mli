@@ -280,7 +280,7 @@ val bincopy : bytes -> in_channel -> out_channel -> unit
 val copy : Normalized.t -> Normalized.t -> unit
 (** [copy source target] copies source file to target file using [bincopy]. *)
 
-val read_lines : Normalized.t -> (string -> unit) -> unit
+val iter_lines : Normalized.t -> (string -> unit) -> unit
 (** Iter over all text lines in the file *)
 
 (** This type defines what action {!with_open_in} and {!with_open_out} must

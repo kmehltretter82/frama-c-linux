@@ -476,7 +476,7 @@ let copy src tgt =
   let$ out_channel = with_open_out_exn tgt in
   bincopy (Bytes.create 2048) in_channel out_channel
 
-let read_lines p job =
+let iter_lines p job =
   let$ in_channel = with_open_in_exn p in
   try
     while true do
