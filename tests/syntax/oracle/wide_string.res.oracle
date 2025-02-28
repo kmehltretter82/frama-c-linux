@@ -6,6 +6,13 @@
 #include "strings.h"
 #include "time.h"
 #include "wchar.h"
+int f(wchar_t const *s)
+{
+  int tmp;
+  tmp = wcscmp(s,L"");
+  return tmp;
+}
+
 int main(void)
 {
   int __retres;
