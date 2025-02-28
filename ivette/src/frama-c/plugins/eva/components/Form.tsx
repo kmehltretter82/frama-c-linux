@@ -236,6 +236,10 @@ export function EvaFormOptions(
     state={fields["-main"].state as Forms.FieldState<string | undefined>}
     actions={getActions(fields["-main"].state, "-main")}
   >
+    <option
+      key={"empty-main"} id={"empty-main"} value={""}
+      className={getClasses(fields["-main"].state, "-main")}
+    >-</option>
     {
       fctsList.map((f) => <option
           key={f.key} id={f.key} value={f.name}
