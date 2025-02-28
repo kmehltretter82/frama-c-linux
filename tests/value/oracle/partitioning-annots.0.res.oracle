@@ -6,13 +6,13 @@
   nondet ∈ [--..--]
   k ∈ {0}
 [eva] computing for function test_slevel <- main.
-  Called from partitioning-annots.c:289.
+  Called from partitioning-annots.c:352.
 [eva:partition] partitioning-annots.c:243: starting to merge loop iterations
 [eva:partition] partitioning-annots.c:248: starting to merge loop iterations
 [eva] Recording results for test_slevel
 [eva] Done for function test_slevel
 [eva] computing for function test_unroll <- main.
-  Called from partitioning-annots.c:290.
+  Called from partitioning-annots.c:353.
 [eva:loop-unroll:partial] partitioning-annots.c:26: loop not completely unrolled
 [eva:partition] partitioning-annots.c:26: starting to merge loop iterations
 [eva:loop-unroll:partial] partitioning-annots.c:34: loop not completely unrolled
@@ -25,7 +25,7 @@
 [eva] Recording results for test_unroll
 [eva] Done for function test_unroll
 [eva] computing for function test_split <- main.
-  Called from partitioning-annots.c:291.
+  Called from partitioning-annots.c:354.
 [eva] computing for function Frama_C_interval <- test_split <- main.
   Called from partitioning-annots.c:73.
 [eva] using specification for function Frama_C_interval
@@ -65,7 +65,7 @@
 [eva] Recording results for test_split
 [eva] Done for function test_split
 [eva] computing for function test_dynamic_split <- main.
-  Called from partitioning-annots.c:292.
+  Called from partitioning-annots.c:355.
 [eva] partitioning-annots.c:95: Warning: 
   this partitioning parameter cannot be evaluated safely on all states
 [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
@@ -90,12 +90,12 @@
 [eva] Recording results for test_dynamic_split
 [eva] Done for function test_dynamic_split
 [eva] computing for function test_dynamic_split_predicate <- main.
-  Called from partitioning-annots.c:293.
+  Called from partitioning-annots.c:356.
 [eva:partition] partitioning-annots.c:124: starting to merge loop iterations
 [eva] Recording results for test_dynamic_split_predicate
 [eva] Done for function test_dynamic_split_predicate
 [eva] computing for function test_splits_post_call <- main.
-  Called from partitioning-annots.c:294.
+  Called from partitioning-annots.c:357.
 [eva] computing for function Frama_C_interval <- test_splits_post_call <- main.
   Called from partitioning-annots.c:205.
 [eva] partitioning-annots.c:205: 
@@ -120,11 +120,61 @@
 [eva] Recording results for test_splits_post_call
 [eva] Done for function test_splits_post_call
 [eva] computing for function test_auto_limit <- main.
-  Called from partitioning-annots.c:295.
+  Called from partitioning-annots.c:358.
 [eva:loop-unroll:auto] partitioning-annots.c:280: Automatic loop unrolling.
 [eva:partition] partitioning-annots.c:284: starting to merge loop iterations
 [eva] Recording results for test_auto_limit
 [eva] Done for function test_auto_limit
+[eva] computing for function test_logic_disjunction <- main.
+  Called from partitioning-annots.c:359.
+[eva] computing for function non_zero_disjunction <- test_logic_disjunction <- main.
+  Called from partitioning-annots.c:315.
+[eva] using specification for function non_zero_disjunction
+[eva] Done for function non_zero_disjunction
+[eva:alarm] partitioning-annots.c:316: Warning: 
+  division by zero. assert x ≢ 0;
+[eva] computing for function non_zero_disjunction <- test_logic_disjunction <- main.
+  Called from partitioning-annots.c:317.
+[eva] Done for function non_zero_disjunction
+[eva] computing for function non_zero_disjunction <- test_logic_disjunction <- main.
+  Called from partitioning-annots.c:321.
+[eva] Done for function non_zero_disjunction
+[eva] computing for function non_zero_behavior <- test_logic_disjunction <- main.
+  Called from partitioning-annots.c:326.
+[eva] using specification for function non_zero_behavior
+[eva] Done for function non_zero_behavior
+[eva:alarm] partitioning-annots.c:327: Warning: 
+  division by zero. assert x ≢ 0;
+[eva] computing for function non_zero_behavior <- test_logic_disjunction <- main.
+  Called from partitioning-annots.c:328.
+[eva] Done for function non_zero_behavior
+[eva] computing for function non_zero_behavior <- test_logic_disjunction <- main.
+  Called from partitioning-annots.c:332.
+[eva] Done for function non_zero_behavior
+[eva] computing for function more_complex_disjunction <- test_logic_disjunction <- 
+                          main.
+  Called from partitioning-annots.c:337.
+[eva] using specification for function more_complex_disjunction
+[eva] Done for function more_complex_disjunction
+[eva] partitioning-annots.c:338: Frama_C_show_each: [-99..99], {-2; -1; 0; 1}
+[eva] computing for function more_complex_disjunction <- test_logic_disjunction <- 
+                          main.
+  Called from partitioning-annots.c:341.
+[eva] Done for function more_complex_disjunction
+[eva] partitioning-annots.c:342: Frama_C_show_each: [1..10], {0}
+[eva] partitioning-annots.c:342: Frama_C_show_each: [11..99], {1}
+[eva] partitioning-annots.c:342: Frama_C_show_each: [-99..-1], {-1}
+[eva] partitioning-annots.c:342: Frama_C_show_each: {0}, {-2}
+[eva] computing for function more_complex_disjunction <- test_logic_disjunction <- 
+                          main.
+  Called from partitioning-annots.c:345.
+[eva] Done for function more_complex_disjunction
+[eva] partitioning-annots.c:347: Frama_C_show_each: [11..99], {1}
+[eva] partitioning-annots.c:347: Frama_C_show_each: [1..10], {0}
+[eva] partitioning-annots.c:347: Frama_C_show_each: [-99..-1], {-1}
+[eva] partitioning-annots.c:347: Frama_C_show_each: {0}, {-2}
+[eva] Recording results for test_logic_disjunction
+[eva] Done for function test_logic_disjunction
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -144,6 +194,9 @@
   x ∈ [0..44]
   y ∈ [0..44]
   c ∈ [--..--]
+[eva:final-states] Values at end of function test_logic_disjunction:
+  x ∈ [-99..99]
+  y ∈ {-2; -1; 0; 1}
 [eva:final-states] Values at end of function test_slevel:
   a[0..9] ∈ {42}
   b[0..9] ∈ {42} or UNINITIALIZED
@@ -201,6 +254,14 @@
 [from] Done for function test_dynamic_split
 [from] Computing for function test_dynamic_split_predicate
 [from] Done for function test_dynamic_split_predicate
+[from] Computing for function test_logic_disjunction
+[from] Computing for function non_zero_disjunction <-test_logic_disjunction
+[from] Done for function non_zero_disjunction
+[from] Computing for function non_zero_behavior <-test_logic_disjunction
+[from] Done for function non_zero_behavior
+[from] Computing for function more_complex_disjunction <-test_logic_disjunction
+[from] Done for function more_complex_disjunction
+[from] Done for function test_logic_disjunction
 [from] Computing for function test_slevel
 [from] Done for function test_slevel
 [from] Computing for function test_split
@@ -221,6 +282,13 @@
 [from] Function body:
   y FROM nondet; i; p (and SELF)
   \result FROM nondet; i
+[from] Function more_complex_disjunction:
+  x FROM x (and SELF)
+  \result FROM x
+[from] Function non_zero_behavior:
+  \result FROM x
+[from] Function non_zero_disjunction:
+  \result FROM \nothing
 [from] Function spec:
   x FROM i
   \result FROM i
@@ -229,6 +297,8 @@
 [from] Function test_dynamic_split:
   Frama_C_entropy_source FROM Frama_C_entropy_source; nondet (and SELF)
 [from] Function test_dynamic_split_predicate:
+  NO EFFECTS
+[from] Function test_logic_disjunction:
   NO EFFECTS
 [from] Function test_slevel:
   NO EFFECTS
@@ -258,6 +328,10 @@
 [inout] Out (internal) for function test_dynamic_split_predicate:
     x; y; c; i
 [inout] Inputs for function test_dynamic_split_predicate:
+    nondet
+[inout] Out (internal) for function test_logic_disjunction:
+    x; y
+[inout] Inputs for function test_logic_disjunction:
     nondet
 [inout] Out (internal) for function test_slevel:
     a[0..9]; b[0..9]; c[0..9]; d[0..9]; e[0..3]; i; i_0; i_1; i_2; i_3

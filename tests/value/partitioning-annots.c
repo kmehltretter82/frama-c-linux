@@ -284,6 +284,69 @@ void test_auto_limit()
   for (int i = 0; i < 20; i++) {}
 }
 
+/*@ assigns \result \from \nothing;
+    ensures \result > 0 || \result < 0; */
+int non_zero_disjunction(void);
+
+/*@ assigns \result \from x;
+    behavior positive:
+      assumes x >= 0;
+      ensures \result > 0;
+    behavior negative:
+      assumes x < 0;
+      ensures \result < 0;
+    complete behaviors;
+    disjoint behaviors; */
+int non_zero_behavior(int x);
+
+/*@ assigns \result \from *p;
+    assigns *p \from *p;
+    ensures
+      (\result == 0 && 0 < *p <= 10)
+      || (\result == 1 && 10 < *p < 100)
+      || (\result == -1 && -100 < *p < 0)
+      || (\result == -2 && *p == 0) ; */
+int more_complex_disjunction(int *p);
+
+/* Use the three function specifications above to test the state partitioning
+   on ACSL disjunctions and contract behaviors. */
+void test_logic_disjunction(void) {
+  int x, y;
+  x = non_zero_disjunction();
+  y = 100 / x; // Alarm without state partitioning.
+  x = non_zero_disjunction();
+  //@ split x < 0;
+  y = 100 / x; // No alarm.
+  //@ merge x < 0;
+  x = non_zero_disjunction();
+  //@ slevel 2;
+  y = 100 / x; // No alarm.
+  //@ slevel default;
+
+  x = non_zero_behavior(nondet);
+  y = 100 / x; // Alarm without state partitioning.
+  x = non_zero_behavior(nondet);
+  //@ split x < 0;
+  y = 100 / x; // No alarm.
+  //@ merge x < 0;
+  x = non_zero_behavior(nondet);
+  //@ slevel 2;
+  y = 100 / x; // No alarm.
+  //@ slevel default;
+
+  y = more_complex_disjunction(&x);
+  Frama_C_show_each(x, y); // Only 1 state.
+
+  //@ slevel 4;
+  y = more_complex_disjunction(&x);
+  Frama_C_show_each(x, y); // There should be 4 precise states.
+  //@ slevel default;
+
+  y = more_complex_disjunction(&x);
+  //@ split y;
+  Frama_C_show_each(x, y); // There should be 4 precise states.
+}
+
 void main(void)
 {
   test_slevel();
@@ -293,4 +356,5 @@ void main(void)
   test_dynamic_split_predicate();
   test_splits_post_call();
   test_auto_limit();
+  test_logic_disjunction();
 }
