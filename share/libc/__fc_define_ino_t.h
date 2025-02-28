@@ -20,14 +20,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_INO_T
-#define __FC_DEFINE_INO_T
+#ifndef __FC_DEFINE_INO_T_H
+#define __FC_DEFINE_INO_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 #ifndef __ino_t_defined
 typedef unsigned int ino_t;
-#define __ino_t_defined
+#define __ino_t_defined 1
 #endif
 __END_DECLS
 __POP_FC_STDLIB

@@ -51,8 +51,8 @@
  *	@(#)tcp.h	8.1 (Berkeley) 6/10/93
  */
 
-#ifndef _NETINET_TCP_H
-#define _NETINET_TCP_H	1
+#ifndef __FC_NETINET_TCP_H
+#define __FC_NETINET_TCP_H
 
 #include <features.h>
 __PUSH_FC_STDLIB

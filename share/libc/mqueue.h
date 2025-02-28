@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_MQUEUE
-#define __FC_MQUEUE
+#ifndef __FC_MQUEUE_H
+#define __FC_MQUEUE_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"

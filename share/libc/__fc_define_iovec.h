@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_IOVEC
-#define __FC_DEFINE_IOVEC
+#ifndef __FC_DEFINE_IOVEC_H
+#define __FC_DEFINE_IOVEC_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"

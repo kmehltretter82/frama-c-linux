@@ -22,8 +22,8 @@
 
 // Note: this file is non-POSIX, but used by some coreutils.
 
-#ifndef __FC_UTMP
-#define __FC_UTMP
+#ifndef __FC_UTMP_H
+#define __FC_UTMP_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SELECT__
-#define __FC_SELECT__
+#ifndef __FC_SELECT_H
+#define __FC_SELECT_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_fd_set_t.h"

@@ -22,8 +22,8 @@
 
 // glibc-specific, Non-POSIX
 
-#ifndef __FC_SYS_SYSMACROS_H__
-#define __FC_SYS_SYSMACROS_H__
+#ifndef __FC_SYS_SYSMACROS_H
+#define __FC_SYS_SYSMACROS_H
 
 // The macros below are useful for coreutils.
 #define major(dev)  (((dev) >> 8) & 0xff)

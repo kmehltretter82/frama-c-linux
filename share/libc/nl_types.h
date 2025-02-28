@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_NL_TYPES
-#define __FC_NL_TYPES
+#ifndef __FC_NL_TYPES_H
+#define __FC_NL_TYPES_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_MAX_OPEN_FILES_T
-#define __FC_DEFINE_MAX_OPEN_FILES_T
+#ifndef __FC_DEFINE_MAX_OPEN_FILES_H
+#define __FC_DEFINE_MAX_OPEN_FILES_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

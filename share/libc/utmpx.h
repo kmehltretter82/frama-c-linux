@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_UTMPX
-#define __FC_UTMPX
+#ifndef __FC_UTMPX_H
+#define __FC_UTMPX_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

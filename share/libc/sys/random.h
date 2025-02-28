@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef _SYS_RANDOM_H
-#define _SYS_RANDOM_H 1
+#ifndef __FC_SYS_RANDOM_H
+#define __FC_SYS_RANDOM_H
 #include "features.h"
 #include "../__fc_define_size_t.h"
 #include "../__fc_define_ssize_t.h"

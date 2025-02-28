@@ -23,8 +23,8 @@
 // Non-ISO, Non-POSIX; header provided only for improved compatibility with
 // non-portable code.
 
-#ifndef __FC_STDALIGN
-#define __FC_STDALIGN
+#ifndef __FC_STDALIGN_H
+#define __FC_STDALIGN_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

@@ -22,8 +22,8 @@
 
 // POSIX-compatible minimalist interface for sched.h
 
-#ifndef __FC_SEMAPHORE
-#define __FC_SEMAPHORE
+#ifndef __FC_SEMAPHORE_H
+#define __FC_SEMAPHORE_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "time.h"

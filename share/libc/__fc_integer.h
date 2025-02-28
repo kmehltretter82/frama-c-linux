@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 
-#ifndef Frama_C_INTEGER
-#define Frama_C_INTEGER
+#ifndef __FC_INTEGER_H
+#define __FC_INTEGER_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

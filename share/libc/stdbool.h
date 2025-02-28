@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_STDBOOL
-#define __FC_STDBOOL
+#ifndef __FC_STDBOOL_H
+#define __FC_STDBOOL_H
 // In C++, bool, true and false are native values
 #ifndef __cplusplus
 #define bool _Bool

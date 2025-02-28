@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_INTPTR_T
-#define __FC_DEFINE_INTPTR_T
+#ifndef __FC_DEFINE_INTPTR_T_H
+#define __FC_DEFINE_INTPTR_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"
@@ -33,7 +33,7 @@ __BEGIN_DECLS
 typedef __INTPTR_T intptr_t;
 #define INTPTR_MIN __FC_INTPTR_MIN
 #define INTPTR_MAX __FC_INTPTR_MAX
-#define __intptr_t_defined
+#define __intptr_t_defined 1
 #endif
 #endif
 

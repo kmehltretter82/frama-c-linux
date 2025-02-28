@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.15 */
-#ifndef __FC_STDARG
-#define __FC_STDARG
+#ifndef __FC_STDARG_H
+#define __FC_STDARG_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h" // for __FC_VA_LIST_T

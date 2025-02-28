@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_TIMEVAL
-#define __FC_DEFINE_TIMEVAL
+#ifndef __FC_DEFINE_TIMEVAL_H
+#define __FC_DEFINE_TIMEVAL_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

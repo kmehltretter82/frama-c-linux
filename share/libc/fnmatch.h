@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_FNMATCH
-#define __FC_FNMATCH
+#ifndef __FC_FNMATCH_H
+#define __FC_FNMATCH_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

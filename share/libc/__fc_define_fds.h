@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_FDS
-#define __FC_DEFINE_FDS
+#ifndef __FC_DEFINE_FDS_H
+#define __FC_DEFINE_FDS_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

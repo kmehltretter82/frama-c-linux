@@ -38,8 +38,8 @@ _Complex-related builtins are commented out since Frama-C does not currently
 support them.
 */
 
-#ifndef __FC_GCC_BUILTIN_MACROS
-#define __FC_GCC_BUILTIN_MACROS
+#ifndef __FC_GCC_BUILTIN_MACROS_H
+#define __FC_GCC_BUILTIN_MACROS_H
 
 #include "ctype.h"
 #include "inttypes.h"

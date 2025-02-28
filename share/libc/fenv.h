@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.6 */
-#ifndef __FC_FENV
-#define __FC_FENV
+#ifndef __FC_FENV_H
+#define __FC_FENV_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

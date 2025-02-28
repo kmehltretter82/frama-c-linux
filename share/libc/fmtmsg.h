@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_FMTMSG
-#define __FC_FMTMSG
+#ifndef __FC_FMTMSG_H
+#define __FC_FMTMSG_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

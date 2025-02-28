@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_ALLOC_AXIOMATIC
-#define __FC_ALLOC_AXIOMATIC
+#ifndef __FC_ALLOC_AXIOMATIC_H
+#define __FC_ALLOC_AXIOMATIC_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"

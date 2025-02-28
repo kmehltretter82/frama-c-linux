@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_RESOURCE_H__
-#define __FC_SYS_RESOURCE_H__
+#ifndef __FC_SYS_RESOURCE_H
+#define __FC_SYS_RESOURCE_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 #include "time.h"

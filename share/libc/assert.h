@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_ASSERT
-#define __FC_ASSERT
+#ifndef __FC_ASSERT_H
+#define __FC_ASSERT_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

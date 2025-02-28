@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef FC_IFADDRS
-#define FC_IFADDRS
+#ifndef __FC_IFADDRS_H
+#define __FC_IFADDRS_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

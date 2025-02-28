@@ -22,8 +22,8 @@
 
 /* ISO C: 7.7 */
 
-#ifndef __FC_FLOAT
-#define __FC_FLOAT
+#ifndef __FC_FLOAT_H
+#define __FC_FLOAT_H
 
 /* Note: Values for long double are only valid for x86 extended format.
    Some black magic will be needed if some other format (or none) is

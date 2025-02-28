@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.20 */
-#ifndef __FC_STDLIB
-#define __FC_STDLIB
+#ifndef __FC_STDLIB_H
+#define __FC_STDLIB_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"
@@ -39,7 +39,7 @@ typedef struct __fc_div_t {
   int quot;              /* Quotient.  */
   int rem;               /* Remainder.  */
 } div_t;
-#define __div_t_defined
+#define __div_t_defined 1
 #endif
 
 #ifndef __ldiv_t_defined
@@ -47,7 +47,7 @@ typedef struct __fc_ldiv_t {
   long int quot;              /* Quotient.  */
   long int rem;               /* Remainder.  */
 } ldiv_t;
-#define __ldiv_t_defined
+#define __ldiv_t_defined 1
 #endif
 
 #ifndef __lldiv_t_defined
@@ -55,7 +55,7 @@ typedef struct __fc_lldiv_t {
   long long int quot;              /* Quotient.  */
   long long int rem;               /* Remainder.  */
 } lldiv_t;
-#define __lldiv_t_defined
+#define __lldiv_t_defined 1
 #endif
 
 #include "__fc_define_null.h"

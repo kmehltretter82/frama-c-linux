@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_MMAN_H__
-#define __FC_SYS_MMAN_H__
+#ifndef __FC_SYS_MMAN_H
+#define __FC_SYS_MMAN_H
 
 #include "../features.h"
 #include "../__fc_define_mode_t.h"

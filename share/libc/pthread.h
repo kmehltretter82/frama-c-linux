@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_PTHREAD_H__
-#define __FC_PTHREAD_H__
+#ifndef __FC_PTHREAD_H
+#define __FC_PTHREAD_H
 
 #include "features.h"
 __PUSH_FC_STDLIB

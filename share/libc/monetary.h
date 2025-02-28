@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_MONETARY
-#define __FC_MONETARY
+#ifndef __FC_MONETARY_H
+#define __FC_MONETARY_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_locale_t.h"

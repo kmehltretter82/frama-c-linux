@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_POLL
-#define __FC_POLL
+#ifndef __FC_POLL_H
+#define __FC_POLL_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

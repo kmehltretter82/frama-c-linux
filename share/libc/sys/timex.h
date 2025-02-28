@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef _SYS_TIMEX_H
-#define _SYS_TIMEX_H 1
+#ifndef __FC_SYS_TIMEX_H
+#define __FC_SYS_TIMEX_H
 #include "features.h"
 #include "stdint.h"
 #include "time.h"

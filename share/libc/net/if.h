@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef FC_NET_IF
-#define FC_NET_IF
+#ifndef __FC_NET_IF_H
+#define __FC_NET_IF_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

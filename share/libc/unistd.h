@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_UNISTD
-#define __FC_UNISTD
+#ifndef __FC_UNISTD_H
+#define __FC_UNISTD_H
 
 #include "features.h"
 __PUSH_FC_STDLIB

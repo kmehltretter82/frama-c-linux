@@ -23,8 +23,8 @@
 /* POSIX header */
 
 /* c_iflag bits */
-#ifndef _TERMIOS_H
-#define _TERMIOS_H
+#ifndef __FC_TERMIOS_H
+#define __FC_TERMIOS_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_pid_t.h"

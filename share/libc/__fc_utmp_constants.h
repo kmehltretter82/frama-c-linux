@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_FC_UTMP_CONSTANTS
-#define __FC_DEFINE_FC_UTMP_CONSTANTS
+#ifndef __FC_UTMP_CONSTANTS_H
+#define __FC_UTMP_CONSTANTS_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

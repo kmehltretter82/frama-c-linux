@@ -126,7 +126,7 @@
 
 // C11 §6.10.8.3 Conditional feature macros: Frama-C does not support complex.h
 #ifndef __STDC_NO_COMPLEX__
-#define __STDC_NO_COMPLEX__
+#define __STDC_NO_COMPLEX__ 1
 #endif
 
 /* end __FC_FEATURES_H */

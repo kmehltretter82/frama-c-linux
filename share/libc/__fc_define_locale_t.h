@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_LOCALE_T
-#define __FC_DEFINE_LOCALE_T
+#ifndef __FC_DEFINE_LOCALE_T_H
+#define __FC_DEFINE_LOCALE_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

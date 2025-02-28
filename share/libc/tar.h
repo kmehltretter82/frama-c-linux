@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_TAR
-#define __FC_TAR
+#ifndef __FC_TAR_H
+#define __FC_TAR_H
 
 #define TMAGIC   "ustar"
 #define TMAGLEN  6

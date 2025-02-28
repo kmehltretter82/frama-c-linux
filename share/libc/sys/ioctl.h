@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef FC_IOCTL
-#define FC_IOCTL
+#ifndef __FC_SYS_IOCTL_H
+#define __FC_SYS_IOCTL_H
 
 // This file is neither in the C standard nor POSIX; it is here for
 // compatibility reasons.

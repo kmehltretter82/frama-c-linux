@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SPAWN
-#define __FC_SPAWN
+#ifndef __FC_SPAWN_H
+#define __FC_SPAWN_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_mode_t.h"

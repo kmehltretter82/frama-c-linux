@@ -22,8 +22,8 @@
 
 // Non-POSIX; Linux-specific
 
-#ifndef __FC_SYS_SENDFILE_H__
-#define __FC_SYS_SENDFILE_H__
+#ifndef __FC_SYS_SENDFILE_H
+#define __FC_SYS_SENDFILE_H
 
 #include "../features.h"
 __PUSH_FC_STDLIB

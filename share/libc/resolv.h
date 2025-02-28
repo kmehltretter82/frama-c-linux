@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef _RESOLV_H
-#define _RESOLV_H 1
+#ifndef __FC_RESOLV_H
+#define __FC_RESOLV_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

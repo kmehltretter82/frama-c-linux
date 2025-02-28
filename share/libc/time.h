@@ -47,7 +47,7 @@ __BEGIN_DECLS
 
 #ifndef __clock_t_defined
 typedef unsigned int clock_t;
-#define __clock_t_defined
+#define __clock_t_defined 1
 #endif
 // From POSIX.1-2008: "The value of CLOCKS_PER_SEC shall be 1 million on
 // XSI-conformant systems. [...]"
