@@ -170,6 +170,10 @@ let run proc : _ response =
   | Killed -> `Killed proc.id
   | Data.InputError msg -> `Error(proc.id,msg)
   | Sys.Break as exn -> raise exn (* Silently pass the exception *)
+  | Globals.No_such_entry_point msg ->
+    (* Same as in Boot.play_analysis. *)
+    Kernel.error "%s" msg;
+    `Error(proc.id, msg)
   | exn when Cmdline.catch_at_toplevel exn ->
     Senv.warning "[%s] Uncaught exception:@\n%s"
       proc.request (Cmdline.protect exn) ;
