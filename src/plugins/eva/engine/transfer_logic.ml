@@ -316,7 +316,7 @@ module type S = sig
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 
   val interp_annot:
-    limit:int -> record:bool ->
+    record:bool ->
     kernel_function -> Active_behaviors.t -> stmt -> code_annotation ->
     initial_state:state -> states -> states
 end
@@ -384,12 +384,12 @@ module Make
 
   let count_disjunction p = fold_on_disjunction (fun _pred -> succ) p 0
 
-  let split_disjunction_and_reduce ~reduce ~limit env state pred =
+  let split_disjunction_and_reduce ~reduce env state pred =
     let nb = count_disjunction pred in
     if nb <= 1 && not reduce then
       States.singleton state (* reduction not required, nothing to split *)
-    else if nb <= limit
-    then begin (* Can split and maybe reduce *)
+    else
+      (* Can split and maybe reduce *)
       let treat_subpred pred acc =
         match Domain.reduce_by_predicate env state pred true with
         | `Bottom -> acc
@@ -404,16 +404,8 @@ module Make
       in
       try fold_on_disjunction treat_subpred pred States.empty
       with Does_not_improve -> States.singleton state
-    end
-    else if reduce then
-      (* Not enough slevel to split, but we should reduce in a global way *)
-      match Domain.reduce_by_predicate env state pred true with
-      | `Bottom -> States.empty
-      | `Value s -> States.singleton s
-    else (* Not enough slevel to split, and reduction not required *)
-      States.singleton state
 
-  let eval_split_and_reduce limit ~reduce pred build_env state =
+  let eval_split_and_reduce ~reduce pred build_env state =
     let env = build_env state in
     let status = Domain.evaluate_predicate env state pred in
     let reduced_states =
@@ -422,10 +414,10 @@ module Make
         | Alarmset.False   -> States.empty
         | Alarmset.True    ->
           (* Reduce in case [pre] is a disjunction *)
-          split_disjunction_and_reduce ~reduce:false ~limit env state pred
+          split_disjunction_and_reduce ~reduce:false env state pred
         | Alarmset.Unknown ->
           (* Reduce in all cases *)
-          split_disjunction_and_reduce ~reduce:true ~limit env state pred
+          split_disjunction_and_reduce ~reduce:true env state pred
       else
         States.singleton state
     in
@@ -478,7 +470,6 @@ module Make
      - [build_env] is used to build the environment evaluation, in particular
        the pre- and post-states. *)
   let eval_and_reduce kf behavior active kind ips states build_prop build_env =
-    let limit = Eva_utils.get_slevel kf in
     let emit = emit_contract_status kind kf behavior ~active in
     let aux_pred states pred =
       let pr = Logic_const.pred_of_id_pred pred in
@@ -496,7 +487,7 @@ module Make
           States.fold
             (fun state (acc_status, acc_states) ->
                let status, reduced_states =
-                 eval_split_and_reduce limit ~reduce pr build_env state
+                 eval_split_and_reduce ~reduce pr build_env state
                in
                (status :: acc_status,
                 fst (States.merge ~into:acc_states reduced_states)))
@@ -625,7 +616,7 @@ module Make
   (* Reduce the given states according to the given code annotations.
      If [record] is true, update the proof state of the code annotation.
      DO NOT PASS record=false unless you know what your are doing *)
-  let interp_annot ~limit ~record kf ab stmt code_annot ~initial_state states =
+  let interp_annot ~record kf ab stmt code_annot ~initial_state states =
     let aux_interp ~record ~reduce code_annot behav p =
       let in_behavior =
         match behav with
@@ -654,7 +645,7 @@ module Make
                evaluate to True *)
             let reduce = res = Alarmset.Unknown in
             let reduced_states =
-              split_disjunction_and_reduce ~reduce ~limit env here p
+              split_disjunction_and_reduce ~reduce env here p
             in
             fst (States.merge reduced_states ~into:accstateset)
         in

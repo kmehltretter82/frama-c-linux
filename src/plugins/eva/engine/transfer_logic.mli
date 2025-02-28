@@ -59,7 +59,7 @@ module type S = sig
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 
   val interp_annot:
-    limit:int -> record:bool ->
+    record:bool ->
     kernel_function -> Active_behaviors.t -> stmt -> code_annotation ->
     initial_state:state -> states -> states
 end

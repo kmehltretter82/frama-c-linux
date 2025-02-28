@@ -1227,12 +1227,8 @@
   u[0][bits 0 to 15]# ∈ {270729319}%32, bits 0 to 15 
    [bits 16 to 6399]# ∈
    {270729319} or UNINITIALIZED repeated %32, bits 16 to 6399 
-  r[0][bits 0 to 15]# ∈ {270729319} or UNINITIALIZED%32, bits 0 to 15 
-   [bits 16 to 6431]# ∈
-   {270729319} or UNINITIALIZED repeated %32, bits 16 to 6431 
-  t[0][bits 0 to 15]# ∈ {270729319} or UNINITIALIZED%32, bits 0 to 15 
-   [bits 16 to 31999999]# ∈
-   {270729319} or UNINITIALIZED repeated %32, bits 16 to 31999999 
+  r[0..200] ∈ {270729319} or UNINITIALIZED
+  t[0..999999] ∈ {270729319} or UNINITIALIZED
   p ∈ {{ &t + [0..3999996],0%4 }}
   len_u ∈ {1}
   len_r ∈ {1}

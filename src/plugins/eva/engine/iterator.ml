@@ -109,13 +109,6 @@ module Make_Dataflow
   let interpreter_mode =
     Parameters.InterpreterMode.get ()
 
-  (* Ideally, the slevel parameter should not be used anymore in this file
-     but it is still required for logic interpretation *)
-  let slevel =
-    let module P = Partitioning_parameters.Make (AnalysisParam) in
-    P.slevel
-
-
   (* --- Abstract values storage --- *)
 
   module Partitioning = Trace_partitioning.Make (Abstract) (AnalysisParam)
@@ -374,9 +367,7 @@ module Make_Dataflow
     fun state ->
       let interp_annot states ca =
         Logic.interp_annot
-          ~limit:(slevel stmt) ~record
-          kf active_behaviors stmt ca
-          ~initial_state states
+          ~record kf active_behaviors stmt ca ~initial_state states
       in
       States.to_list
         (List.fold_left interp_annot (States.singleton state) annots)
