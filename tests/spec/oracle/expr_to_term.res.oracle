@@ -42,8 +42,8 @@ int main(void)
   return __retres;
 }
 
-/*@ ensures int_eq((int)(t ≢ 0? 0: 1), (int)(t ≢ 0? 0: 1));
-    ensures int_eq((int)(t ≢ 0? 0: 1), (int)5);
+/*@ ensures int_eq((int)(t ≢ 0 ? 0 : 1), (int)(t ≢ 0 ? 0 : 1));
+    ensures int_eq((int)(t ≢ 0 ? 0 : 1), (int)5);
  */
 int g(void)
 {
@@ -59,8 +59,8 @@ int g(void)
   return_label: return __retres;
 }
 
-/*@ ensures int_eq((int)(t < 5? 1: 0), (int)(t < 5? 1: 0));
-    ensures int_eq((int)(t < 5? 1: 0), (int)6);
+/*@ ensures int_eq((int)(t < 5 ? 1 : 0), (int)(t < 5 ? 1 : 0));
+    ensures int_eq((int)(t < 5 ? 1 : 0), (int)6);
  */
 int h(void)
 {

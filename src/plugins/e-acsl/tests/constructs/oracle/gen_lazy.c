@@ -178,14 +178,14 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_10,"x",0,x);
     __gen_e_acsl_assert_data_10.blocking = 1;
     __gen_e_acsl_assert_data_10.kind = "Assertion";
-    __gen_e_acsl_assert_data_10.pred_txt = "x != 0? x != 0: y != 0";
+    __gen_e_acsl_assert_data_10.pred_txt = "x != 0 ? x != 0 : y != 0";
     __gen_e_acsl_assert_data_10.file = "lazy.i";
     __gen_e_acsl_assert_data_10.fct = "main";
     __gen_e_acsl_assert_data_10.line = 15;
     __e_acsl_assert(__gen_e_acsl_if,& __gen_e_acsl_assert_data_10);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_10);
   }
-  /*@ assert x != 0? x != 0: y != 0; */ ;
+  /*@ assert x != 0 ? x != 0 : y != 0; */ ;
   {
     int __gen_e_acsl_if_2;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_11 =
@@ -201,14 +201,14 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_11,"y",0,y);
     __gen_e_acsl_assert_data_11.blocking = 1;
     __gen_e_acsl_assert_data_11.kind = "Assertion";
-    __gen_e_acsl_assert_data_11.pred_txt = "y != 0? y != 0: x != 0";
+    __gen_e_acsl_assert_data_11.pred_txt = "y != 0 ? y != 0 : x != 0";
     __gen_e_acsl_assert_data_11.file = "lazy.i";
     __gen_e_acsl_assert_data_11.fct = "main";
     __gen_e_acsl_assert_data_11.line = 16;
     __e_acsl_assert(__gen_e_acsl_if_2,& __gen_e_acsl_assert_data_11);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_11);
   }
-  /*@ assert y != 0? y != 0: x != 0; */ ;
+  /*@ assert y != 0 ? y != 0 : x != 0; */ ;
   {
     int __gen_e_acsl_if_3;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_12 =
@@ -224,14 +224,14 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_12,"x",0,x);
     __gen_e_acsl_assert_data_12.blocking = 1;
     __gen_e_acsl_assert_data_12.kind = "Assertion";
-    __gen_e_acsl_assert_data_12.pred_txt = "x == 1? x == 18: x == 0";
+    __gen_e_acsl_assert_data_12.pred_txt = "x == 1 ? x == 18 : x == 0";
     __gen_e_acsl_assert_data_12.file = "lazy.i";
     __gen_e_acsl_assert_data_12.fct = "main";
     __gen_e_acsl_assert_data_12.line = 17;
     __e_acsl_assert(__gen_e_acsl_if_3,& __gen_e_acsl_assert_data_12);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_12);
   }
-  /*@ assert x == 1? x == 18: x == 0; */ ;
+  /*@ assert x == 1 ? x == 18 : x == 0; */ ;
   {
     int __gen_e_acsl_implies_3;
     int __gen_e_acsl_equiv;
@@ -307,7 +307,7 @@ int main(void)
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_15,"x",0,x);
     __gen_e_acsl_assert_data_15.blocking = 1;
     __gen_e_acsl_assert_data_15.kind = "Assertion";
-    __gen_e_acsl_assert_data_15.pred_txt = "((x != 0? x: y) != 0) == (x == 0)";
+    __gen_e_acsl_assert_data_15.pred_txt = "((x != 0 ? x : y) != 0) == (x == 0)";
     __gen_e_acsl_assert_data_15.file = "lazy.i";
     __gen_e_acsl_assert_data_15.fct = "main";
     __gen_e_acsl_assert_data_15.line = 24;
@@ -315,7 +315,7 @@ int main(void)
                     & __gen_e_acsl_assert_data_15);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data_15);
   }
-  /*@ assert ((x != 0? x: y) != 0) == (x == 0); */ ;
+  /*@ assert ((x != 0 ? x : y) != 0) == (x == 0); */ ;
   {
     int __gen_e_acsl_and_3;
     int __gen_e_acsl_or_3;

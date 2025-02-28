@@ -867,7 +867,7 @@ void __gen_e_acsl_g(long *ptr, size_t size)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(long) * (((size - 1) - 0) + 1); size <= 0? 0: size) <=\n18446744073709551615";
+    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(long) * (((size - 1) - 0) + 1); size <= 0 ? 0 : size) <=\n18446744073709551615";
     __gen_e_acsl_assert_data_2.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_2.fct = "g";
     __gen_e_acsl_assert_data_2.line = 8;
@@ -975,7 +975,7 @@ void __gen_e_acsl_g(long *ptr, size_t size)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if_2));
     __gen_e_acsl_assert_data_4.blocking = 1;
     __gen_e_acsl_assert_data_4.kind = "RTE";
-    __gen_e_acsl_assert_data_4.pred_txt = "(\\let size = sizeof(long) * (((\\old(size) + 1) - 0) + 1); size <= 0? 0: size)\n<= 18446744073709551615";
+    __gen_e_acsl_assert_data_4.pred_txt = "(\\let size = sizeof(long) * (((\\old(size) + 1) - 0) + 1);\n size <= 0 ? 0 : size)\n<= 18446744073709551615";
     __gen_e_acsl_assert_data_4.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_4.fct = "g";
     __gen_e_acsl_assert_data_4.line = 9;
@@ -1099,7 +1099,7 @@ void __gen_e_acsl_f(char *s, long n)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_if));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "RTE";
-    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(char) * (((n + 1000) - 3) + 1); size <= 0? 0: size) <=\n18446744073709551615";
+    __gen_e_acsl_assert_data_2.pred_txt = "(\\let size = sizeof(char) * (((n + 1000) - 3) + 1); size <= 0 ? 0 : size) <=\n18446744073709551615";
     __gen_e_acsl_assert_data_2.file = "ranges_in_builtins.c";
     __gen_e_acsl_assert_data_2.fct = "f";
     __gen_e_acsl_assert_data_2.line = 6;

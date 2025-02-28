@@ -10,7 +10,7 @@ extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@
 logic integer f(integer n) =
-  n <= 2147483647 + 1 || n >= 9223372036854775807L + 1? 0: f(n + 1) + n;
+  n <= 2147483647 + 1 || n >= 9223372036854775807L + 1 ? 0 : f(n + 1) + n;
 
 */
 void __gen_e_acsl_f(__e_acsl_mpz_t *__retres_arg, __e_acsl_mpz_struct * n);
@@ -63,7 +63,7 @@ int main(void)
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl_f_6));
     __gen_e_acsl_assert_data_2.blocking = 1;
     __gen_e_acsl_assert_data_2.kind = "Assertion";
-    __gen_e_acsl_assert_data_2.pred_txt = "\\let n = 0 == 0? 9223372036854775807L: -1; f(n) != 0";
+    __gen_e_acsl_assert_data_2.pred_txt = "\\let n = 0 == 0 ? 9223372036854775807L : -1; f(n) != 0";
     __gen_e_acsl_assert_data_2.file = "issue-eacsl-177.c";
     __gen_e_acsl_assert_data_2.fct = "main";
     __gen_e_acsl_assert_data_2.line = 14;
@@ -73,7 +73,7 @@ int main(void)
     __gmpz_clear(__gen_e_acsl_f_6);
     __gmpz_clear(__gen_e_acsl__4);
   }
-  /*@ assert \let n = 0 == 0? 9223372036854775807L: -1; f(n) != 0; */ ;
+  /*@ assert \let n = 0 == 0 ? 9223372036854775807L : -1; f(n) != 0; */ ;
   __retres = 0;
   __e_acsl_memory_clean();
   return __retres;

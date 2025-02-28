@@ -41,8 +41,10 @@ void foo(float *Mtmax_in, float *Mwmax, float *Mtmax_out)
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out) == *\old(Mtmin_in) < 0.85 * *\old(Mwmin)?
-          *\old(Mtmin_in) != 0.:
+        *\old(Mtmin_out) == *\old(Mtmin_in) < 0.85 * *\old(Mwmin)
+          ?
+          *\old(Mtmin_in) != 0.
+          :
           0.85 * *\old(Mwmin) != 0.;
  */
 void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out);
@@ -89,8 +91,10 @@ int main(void)
     behavior UnderEstimate_Motoring:
       assumes \true;
       ensures
-        *\old(Mtmin_out) == *\old(Mtmin_in) < 0.85 * *\old(Mwmin)?
-          *\old(Mtmin_in) != 0.:
+        *\old(Mtmin_out) == *\old(Mtmin_in) < 0.85 * *\old(Mwmin)
+          ?
+          *\old(Mtmin_in) != 0.
+          :
           0.85 * *\old(Mwmin) != 0.;
  */
 void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
@@ -313,7 +317,7 @@ void __gen_e_acsl_bar(float *Mtmin_in, float *Mwmin, float *Mtmin_out)
                                      "*\\old(Mwmin)",*__gen_e_acsl_at_3);
       __gen_e_acsl_assert_data_4.blocking = 1;
       __gen_e_acsl_assert_data_4.kind = "Postcondition";
-      __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)?\n  *\\old(Mtmin_in) != 0.:\n  0.85 * *\\old(Mwmin) != 0.";
+      __gen_e_acsl_assert_data_4.pred_txt = "*\\old(Mtmin_out) == *\\old(Mtmin_in) < 0.85 * *\\old(Mwmin)\n  ?\n  *\\old(Mtmin_in) != 0.\n  :\n  0.85 * *\\old(Mwmin) != 0.";
       __gen_e_acsl_assert_data_4.file = "bts1307.i";
       __gen_e_acsl_assert_data_4.fct = "bar";
       __gen_e_acsl_assert_data_4.line = 26;

@@ -9,7 +9,8 @@
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
 /*@
-logic integer f(integer x) = x == 0? 0: (\let v = f(0); 0 == v? x - 1: 0);
+logic integer f(integer x) =
+  x == 0 ? 0 : (\let v = f(0); 0 == v ? x - 1 : 0);
 
 */
 long __gen_e_acsl_f_2(int x);

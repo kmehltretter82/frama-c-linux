@@ -8,7 +8,7 @@
 #include "time.h"
 extern  __attribute__((__FC_BUILTIN__)) int __e_acsl_sound_verdict;
 
-/*@ logic integer identity(integer n) = n <= 0? n: identity(n - 1) + 1;
+/*@ logic integer identity(integer n) = n <= 0 ? n : identity(n - 1) + 1;
 
 */
 void __gen_e_acsl_identity(__e_acsl_mpz_t *__retres_arg,
