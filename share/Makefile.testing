@@ -151,7 +151,7 @@ wtests-help:
 .PHONY: purge-tests
 purge-tests:
 	find $(PTEST_ALL_DIRS) -name dune -print0 \
-        | $(GREP) -e "/oracle.*/dune\|/result.*/dune" \
+        | $(GREP) -z -e "/oracle.*/dune\|/result.*/dune" \
         | $(XARGS) $(RM)
 	find $(PTEST_ALL_DIRS) -name "*.wtests" -print0 \
         | $(XARGS) $(RM)
