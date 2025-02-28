@@ -120,7 +120,6 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     e, adata, env
   | Papp (_, _::_,_) -> Env.not_yet env "predicates with labels"
   | Pdangling _ -> Env.not_yet env "\\dangling"
-  | Pobject_pointer _ -> Env.not_yet env "\\object_pointer"
   | Pvalid_function _ -> Env.not_yet env "\\valid_function"
   | Prel(rel, t1, t2) ->
     let t1 = Logic_normalizer.get_term t1 in
@@ -253,7 +252,8 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     else
       Translate_ats.to_exp ~loc ~adata kf env (PoT_pred p) label
   | Pvalid_read(BuiltinLabel Here, t) as pc
-  | (Pvalid(BuiltinLabel Here, t) as pc) ->
+  | (Pvalid(BuiltinLabel Here, t) as pc)
+  | (Pobject_pointer(BuiltinLabel Here, t) as pc) ->
     begin
       match pc, Memory_tracking.SpecialPointers.pointer_of_term t with
       (* static resolution: \valid(stdout) ≡ 1; \valid(stdin) ≡ 0; etc. *)
@@ -265,6 +265,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
           let name = match pc with
             | Pvalid _ -> "valid"
             | Pvalid_read _ -> "valid_read"
+            | Pobject_pointer _ -> "object_pointer"
             | _ -> assert false
           in
           let e, adata, env =
@@ -279,6 +280,7 @@ let rec predicate_content_to_exp_old ?(inplace=false) ?name ~loc ~adata ~env ~kf
     end
   | Pvalid _ -> Env.not_yet env "labeled \\valid"
   | Pvalid_read _ -> Env.not_yet env "labeled \\valid_read"
+  | Pobject_pointer _ -> Env.not_yet env "labeled \\object_pointer"
   | Pseparated tlist ->
     let env =
       List.fold_left

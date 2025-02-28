@@ -75,6 +75,7 @@
 #define eacsl_block_length export_alias(block_length)
 #define eacsl_valid_read   export_alias(valid_read)
 #define eacsl_valid        export_alias(valid)
+#define eacsl_object_pointer export_alias(object_pointer)
 #define eacsl_initialized  export_alias(initialized)
 #define eacsl_freeable     export_alias(freeable)
 #define eacsl_separated    export_alias(separated)
@@ -271,6 +272,7 @@ void eacsl_mark_readonly(void *ptr) __attribute__((FC_BUILTIN));
 /*@ assigns \result \from ptr; */
 int eacsl_freeable(void *ptr) __attribute__((FC_BUILTIN));
 
+
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
  *
  * \\valid evaluates an expression of the form `p+i`, where `p` is a pointer
@@ -314,6 +316,37 @@ int eacsl_freeable(void *ptr) __attribute__((FC_BUILTIN));
   @ disjoint behaviors;
   @ */
 int eacsl_valid(void *ptr, size_t size, void *base, void *addrof_base)
+    __attribute__((FC_BUILTIN));
+
+/*@ assigns \result \from *(((char*)ptr)+(-size..size-1)), ptr, size;
+  @ behavior valid:
+  @   assumes \valid(((char *)ptr)+(0..size-1));
+  @   assumes
+  @     size <= 0 ||
+  @     ! \separated(((char *)ptr)+(0..size-1),
+  @                  ((char *)\base_addr(base))+(0..\block_length(base)-1));
+  @   ensures \result == 1;
+  @ behavior minus_one:
+  @   assumes \valid(((char *)ptr)+(-size..-1));
+  @   assumes ! \valid(((char *)ptr)+(0..size-1));
+  @   assumes
+  @     size <= 0 ||
+  @     ! \separated(((char *)ptr)+(-size..-1),
+  @                  ((char *)\base_addr(base))+(0..\block_length(base)-1));
+  @   ensures \result == 1;
+  @ behavior invalid_pointer_ptr:
+  @   assumes ! \valid(((char *)ptr)+(-size..-1));
+  @   assumes ! \valid(((char *)ptr)+(0..size-1));
+  @   ensures \result == 0;
+  @ behavior separated_ptr:
+  @   assumes size > 0;
+  @   assumes \separated(((char *)ptr)+(-size..size-1),
+  @                      ((char *)\base_addr(base))+(0..\block_length(base)-1));
+  @   ensures \result == 0;
+  @ complete behaviors;
+  @ disjoint behaviors;
+  @ */
+int eacsl_object_pointer(void *ptr, size_t size, void *base, void *addrof_base)
     __attribute__((FC_BUILTIN));
 
 /*! \brief Implementation of the \b \\valid_read predicate of E-ACSL.

@@ -114,4 +114,10 @@ int eacsl_separated(size_t count, ...) {
 #  error "No E-ACSL memory model defined. Aborting compilation"
 #endif
 
+int eacsl_object_pointer(void *ptr, size_t size, void *ptr_base,
+                         void *addrof_base) {
+  return eacsl_valid(ptr, size, ptr_base, addrof_base)
+         || eacsl_valid(ptr - size, size, ptr_base, addrof_base);
+}
+
 /* }}} */
