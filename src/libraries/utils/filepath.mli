@@ -265,6 +265,147 @@ val basename: Normalized.t -> string
 *)
 val dirname: Normalized.t -> Normalized.t
 
+(** This type defines what action {!with_open_in} and {!with_open_out} must
+    perform when the file to open does not exist. *)
+type action_if_missing =
+  | Create of int (** create the file with the given permissions *)
+  | DoNotCreate (** do not create the file and fail *)
+
+(** This type define what action [with_open_out] must perform when the file to
+    open already exists. *)
+type action_if_exists =
+  | Error (** file opening functions will fail with an error *)
+  | Append (** the writing contents will be appended *)
+  | Truncate (** the file will be truncated before any writes *)
+
+(** A [safe_processor] helps to handle file operations while ensuring the
+    file will be closed no matter what happens. It is a function that takes
+    a file operation [f] as a parameter, opens a file and calls the [f] with
+    the newly-created channel. *)
+type ('ch,'a) safe_processor = ('ch -> 'a) -> ('a,string) result
+
+(** Same as [safe_processor] but when a [Sys_error] is raised, re-raise it
+    after closing the file *)
+type ('ch,'a) exn_processor = ('ch -> 'a) -> 'a
+
+
+(** [with_open_in path f] opens file [path] for reading and calls [f] with the
+    newly-created input channel. The file is closed when [f] returns or whenever
+    an exception is thrown by [f].
+    @param if_missing defines what must be done if the file does not exist,
+    defaults to [DoNotCreate].
+    @param binary must be set if the file needs to be opened in binary mode
+    (disables conversion, e.g. new lines), defaults to [false]
+    @param blocking must be unset if the file needs to be opened in nonblocking
+    mode, defaults to [true].
+    @return [Ok (f input_channel)] if no exceptions are thrown, or [Error s]
+    if a [Sys_error s] is thrown during the execution of [f] or during the
+    closing of the file.
+    @since Frama-C+dev
+*)
+val with_open_in:
+  ?if_missing:action_if_missing ->
+  ?binary:bool ->
+  ?blocking:bool ->
+  Normalized.t ->
+  (in_channel, 'a) safe_processor
+
+(** Same as {!with_open_in} but raises [Sys_error] instead of returning [Error].
+    @since Frama-C+dev
+*)
+val with_open_in_exn :
+  ?if_missing:action_if_missing ->
+  ?binary:bool ->
+  ?blocking:bool ->
+  Normalized.t ->
+  (in_channel, 'a) exn_processor
+
+(** [with_open_out path f] calls [f] with a new output channel on the file [path]
+    opened for writing. The file is closed when [f] returns or whenever an
+    exception is thrown by [f].
+    @param if_missing defines what must be done if the file does not exist,
+    defaults to [Create 0o666].
+    @param if_exists defines what action must be performed when the file already
+    exists, defaults to [Truncate].
+    @param binary must be set if the file needs to be opened in binary mode
+    (disables conversion, e.g. new lines), defaults to [false].
+    @param blocking must be unset if the file needs to be opened in nonblocking
+    mode, defaults to [true].
+
+    @return [Ok (f output_channel)] if no exceptions are thrown, or [Error s]
+    if a [Sys_error s] is thrown during the execution of [f] or during the
+    closing the file.
+    @since Frama-C+dev
+*)
+val with_open_out:
+  ?if_missing:action_if_missing ->
+  ?if_exists:action_if_exists ->
+  ?binary:bool ->
+  ?blocking:bool ->
+  Normalized.t ->
+  (out_channel, 'a) safe_processor
+
+(** Same as {!with_open_out} but raises [Sys_error] instead of returning [Error].
+    @since Frama-C+dev
+*)
+val with_open_out_exn:
+  ?if_missing:action_if_missing ->
+  ?if_exists:action_if_exists ->
+  ?binary:bool ->
+  ?blocking:bool ->
+  Normalized.t ->
+  (out_channel, 'a) exn_processor
+
+(** Opening this module allows to use shorter syntax to deal with files.
+
+    {[
+      let open Filepath.Operators in
+      let result =
+        let+ channel = Filepath.with_open_out filepath in
+        output_string channel "42";
+      in
+      match result with
+      | Ok () -> ()
+      | Error error ->
+        Format.printf "error writing to file %a: %s"
+          Filepath.Normalized.pretty filepath
+          error
+    ]}
+
+    When the file processing returns a result by itself, the operator [let*]
+    can be used instead:
+
+    {[
+      let open Filepath.Operators in
+      let* channel = Filepath.with_open_in filepath in
+      try
+        let header = input_line channel in
+        if header = "42"
+        then Ok ()
+        else Error "wrong file header"
+      with End_of_file ->
+        Error "file is empty"
+    ]}
+*)
+module Operators : sig
+  (** {3 Result operators}
+      These operators are intended to be used with {!with_open_in} or {!with_open_out}.
+  *)
+
+  val (let+): ('ch,'a) safe_processor -> ('ch -> 'a) -> ('a,string) result
+  val (let*):
+    ('ch,('a,string) result) safe_processor ->
+    ('ch -> ('a,string) result) ->
+    ('a,string) result
+
+  (** {3 Exception operators}
+      These operators are intended to be used with {!with_open_in_exn} or
+      {!with_open_out_exn}, error [Sys_error] must be caught.
+  *)
+
+  val (let$): ('ch,'a) exn_processor -> ('ch -> 'a) -> 'a
+end
+
 (*
   Local Variables:
   compile-command: "make -C ../../.."

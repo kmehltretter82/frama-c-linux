@@ -144,86 +144,83 @@ let setCurrentFile n =
    similar to 'grep -C<ctx>'.
    Most exceptions are silently caught and printing is stopped if they occur. *)
 let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
+  let open Filepath.Operators in
   let open Filepath in
+  let start_pos =
+    if Normalized.equal start_pos.pos_path pos.pos_path then start_pos
+    else pos
+  in
   try
-    let start_pos =
-      if Normalized.equal start_pos.pos_path pos.pos_path then start_pos
-      else pos
+    let$ in_ch = with_open_in_exn pos.pos_path in
+    let first_error_line, start_char, last_error_line =
+      min start_pos.pos_lnum pos.pos_lnum,
+      (start_pos.pos_cnum - start_pos.pos_bol + 1),
+      max start_pos.pos_lnum pos.pos_lnum
     in
-    let in_ch = open_in (pos.pos_path :> string) in
+    (* The difference between the first and last error lines can be very
+        large; in this case, we print only the first and last [error_ctx]
+        lines, with "..." between them. *)
+    let first_to_print = max (first_error_line-ctx) 1 in
+    let last_to_print = last_error_line+ctx in
+    let error_ctx = 3 in
+    let error_height = last_error_line - first_error_line + 1 in
+    let compress_error = error_height > 2 * error_ctx + 1 + 2 in
+    let i = ref 1 in
     try
-      begin
-        let first_error_line, start_char, last_error_line =
-          min start_pos.pos_lnum pos.pos_lnum,
-          (start_pos.pos_cnum - start_pos.pos_bol + 1),
-          max start_pos.pos_lnum pos.pos_lnum
+      (* advance to line *)
+      while !i < first_to_print do
+        ignore (input_line in_ch);
+        incr i
+      done;
+      (* print context before first error line *)
+      while !i < first_error_line do
+        let line = input_line in_ch in
+        Format.fprintf fmt "%-6d%s\n" !i line;
+        incr i
+      done;
+      (* if more than one line of context, print blank line *)
+      if last_error_line <> first_error_line then
+        Format.fprintf fmt "\n";
+      (* print error lines *)
+      while !i <= last_error_line do
+        let line = input_line in_ch in
+        if compress_error && !i = first_error_line + error_ctx then
+          Format.fprintf fmt "%d-%d [... omitted ...]\n"
+            (first_error_line + error_ctx) (last_error_line - error_ctx)
+        else if compress_error && !i > first_error_line + error_ctx &&
+                !i <= last_error_line - error_ctx then
+          () (* ignore line *)
+        else begin
+          Format.fprintf fmt "%-6d%s\n" !i line;
+        end;
+        incr i
+      done;
+      (* if more than one line of context, print blank line,
+          otherwise print arrows *)
+      if last_error_line <> first_error_line then
+        Format.fprintf fmt "\n"
+      else begin
+        let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
+        (* output at least one '^' *)
+        let len = if len = 0 then 1 else len in
+        let cursor =
+          String.make 6 ' ' ^
+          String.make (start_char - 1) ' ' ^
+          String.make len '^'
         in
-        (* The difference between the first and last error lines can be very
-           large; in this case, we print only the first and last [error_ctx]
-           lines, with "..." between them. *)
-        let first_to_print = max (first_error_line-ctx) 1 in
-        let last_to_print = last_error_line+ctx in
-        let error_ctx = 3 in
-        let error_height = last_error_line - first_error_line + 1 in
-        let compress_error = error_height > 2 * error_ctx + 1 + 2 in
-        let i = ref 1 in
-        try
-          (* advance to line *)
-          while !i < first_to_print do
-            ignore (input_line in_ch);
-            incr i
-          done;
-          (* print context before first error line *)
-          while !i < first_error_line do
-            let line = input_line in_ch in
-            Format.fprintf fmt "%-6d%s\n" !i line;
-            incr i
-          done;
-          (* if more than one line of context, print blank line *)
-          if last_error_line <> first_error_line then
-            Format.fprintf fmt "\n";
-          (* print error lines *)
-          while !i <= last_error_line do
-            let line = input_line in_ch in
-            if compress_error && !i = first_error_line + error_ctx then
-              Format.fprintf fmt "%d-%d [... omitted ...]\n"
-                (first_error_line + error_ctx) (last_error_line - error_ctx)
-            else if compress_error && !i > first_error_line + error_ctx &&
-                    !i <= last_error_line - error_ctx then
-              () (* ignore line *)
-            else begin
-              Format.fprintf fmt "%-6d%s\n" !i line;
-            end;
-            incr i
-          done;
-          (* if more than one line of context, print blank line,
-             otherwise print arrows *)
-          if last_error_line <> first_error_line then
-            Format.fprintf fmt "\n"
-          else begin
-            let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
-            (* output at least one '^' *)
-            let len = if len = 0 then 1 else len in
-            let cursor =
-              String.make 6 ' ' ^
-              String.make (start_char - 1) ' ' ^
-              String.make len '^'
-            in
-            Format.fprintf fmt "%s\n" cursor
-          end;
-          while !i <= last_to_print do
-            let line = input_line in_ch in
-            Format.fprintf fmt "%-6d%s\n" !i line;
-            incr i
-          done;
-        with End_of_file ->
-          if !i <= last_error_line then (* could not reach line, print warning *)
-            Kernel.warning "end of file reached before line %d" last_error_line
-          else (* context after line n, no warning *) ()
+        Format.fprintf fmt "%s\n" cursor
       end;
-      close_in in_ch
-    with _ -> close_in_noerr in_ch
-  with _ -> ()
+      while !i <= last_to_print do
+        let line = input_line in_ch in
+        Format.fprintf fmt "%-6d%s\n" !i line;
+        incr i
+      done;
+    with End_of_file ->
+      if !i <= last_error_line then (* could not reach line, print warning *)
+        Kernel.warning "end of file reached before line %d" last_error_line
+      else (* context after line n, no warning *) ()
+  with Sys_error _ -> ()
+
 
 let pp_pos fmt pos =
   if pos = Cil_datatype.Position.unknown then Format.fprintf fmt "<unknown>"
