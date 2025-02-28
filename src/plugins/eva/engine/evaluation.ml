@@ -299,12 +299,6 @@ module Make
   (* Was the fuel entirely consumed? *)
   let fuel_consumed = ref false
 
-  let bottom_entry val_alarms =
-    let value = { v = `Bottom; initialized = true; escaping = false } in
-    let record = { value; origin = None; reductness = Dull; val_alarms } in
-    let report = { fuel = Infty; reduction = Neither; volatile = false} in
-    record, report
-
   let top_entry =
     let v = `Value Value.top in
     let value = { v; initialized = false; escaping = true } in
@@ -1181,12 +1175,21 @@ module Make
            evaluation (as the multiple evaluations modify the cache). *)
         match eval with
         | `Bottom ->
-          (* The evaluation of the expression requested by a domain returns
-             Bottom, but the evaluation of the primary expression may continue.
-             Thus bind Bottom to [expr] in the valuation. *)
-          cache := Cache.add' valuation expr (bottom_entry alarms);
+          (* The evaluation of [expr] requested by a domain led to Bottom,
+             but the evaluation of the primary expression may continue. *)
+          cache := valuation;
           `Bottom, alarms
-        | `Value (valuation, value) ->
+        | `Value (new_valuation, value) ->
+          (* If the evaluation of [expr] produced any alarms, the resulting
+             values may have been reduced accordingly, but these alarms will not
+             be emitted (as [expr] might be unrelated to the current statement).
+             In this case, do not record the evaluation results in the cache:
+             it would be correct as a cache for further evaluations, but not as
+             a result for the domains, as they could use the reduced values
+             while the related alarms have not been emitted. *)
+          let valuation =
+            if Alarmset.is_empty alarms then new_valuation else valuation
+          in
           cache := valuation;
           `Value value, alarms
     else fun _ -> fuel_consumed := true; `Value Value.top, Alarmset.all
