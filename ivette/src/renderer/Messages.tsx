@@ -547,10 +547,10 @@ States.onSyncArray(Kernel.message, () => {
     }
   }
   CURSOR = data.length;
-  const from = Array.of(plugins).join(',');
-  const many = errors > 0 ? 's' : '';
-  if (errors) {
-    Display.showError(`Frama-C/${from} Error${many}`);
+  const from = Array.from(plugins).join(',');
+  const many = errors > 1 ? 's' : '';
+  if (errors > 0) {
+    Display.showError(`${errors} error${many} from ${from}`);
     Display.alertComponent('fc.kernel.messages');
   }
 });
