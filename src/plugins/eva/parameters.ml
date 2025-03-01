@@ -1254,13 +1254,13 @@ module AllocBuiltin =
                   use one <imprecise> base for all allocations, \
                   create a <fresh> strong base at each call, \
                   or create a <fresh_weak> base at each call."
-      let default = "by_stack"
-      let arg_name = "imprecise|by_stack|fresh|fresh_weak"
+      let default = "by_function"
+      let arg_name = "imprecise|by_stack|fresh|fresh_weak|by_function"
     end)
 let () = add_precision_dep AllocBuiltin.parameter
 let () =
   AllocBuiltin.set_possible_values
-    ["imprecise"; "by_stack"; "fresh"; "fresh_weak"]
+    ["imprecise"; "by_stack"; "fresh"; "fresh_weak"; "by_function"]
 
 let () = Parameter_customize.set_group malloc
 module AllocFunctions =

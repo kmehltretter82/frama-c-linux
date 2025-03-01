@@ -242,7 +242,6 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
           "calling Record_Value_New callbacks on saved previous result";
       end;
       apply_call_results_hooks call init_state (`Reuse i);
-      Base.Hptset.iter (fun base -> Builtins_malloc.register_reused_base call.callstack base) call_result.allocated_bases;
       (* call can be cached since it was cached once *) 
       Transfer_stmt.{ 
         states = call_result.return_flow; 

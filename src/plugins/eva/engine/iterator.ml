@@ -696,13 +696,11 @@ module Make_Dataflow
         ) widenings stmts in
       Kf_Widening_Stmts.replace kf stmts
     in
-    let allocated_bases = Builtins_malloc.get_kf_allocated_bases kf in
-    let _  = Builtins_malloc.clear_kf_allocated_bases kf in
     Transfer_stmt.{
       states = states;
       widenings = widenings;
       cacheable = !cacheable;
-      allocated_bases = allocated_bases;
+      allocated_bases = Base.Hptset.empty;
     }
 
 

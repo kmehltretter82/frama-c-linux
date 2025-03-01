@@ -593,7 +593,7 @@ module Eva_annotations: sig
     | FlowMerge of split_term
     (** Merge states separated by a previous split. *)
 
-  type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
+  type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise | By_function
 
   type array_segmentation =
     Cil_types.varinfo * Cil_types.offset * Cil_types.exp list

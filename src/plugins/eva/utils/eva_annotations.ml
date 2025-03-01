@@ -42,7 +42,7 @@ type flow_annotation =
   | FlowSplit of split_term * split_kind
   | FlowMerge of split_term
 
-type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise
+type allocation_kind = By_stack | Fresh | Fresh_weak | Imprecise | By_function
 
 (* We use two representations for annotations :
    - the high level representation (HL) which is exported from this module
@@ -313,6 +313,7 @@ module Allocation = struct
     | "fresh"      -> Some Fresh
     | "fresh_weak" -> Some Fresh_weak
     | "imprecise"  -> Some Imprecise
+    | "by_function" -> Some By_function
     | _            -> None
 
   let to_string = function
@@ -320,6 +321,7 @@ module Allocation = struct
     | Fresh      -> "fresh"
     | Fresh_weak -> "fresh_weak"
     | Imprecise  -> "imprecise"
+    | By_function -> "by_function"
 
   include Register (struct
       type t = allocation_kind

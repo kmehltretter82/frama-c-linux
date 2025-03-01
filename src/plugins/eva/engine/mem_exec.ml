@@ -381,46 +381,18 @@ module Make
 
   exception Result_found of call_result * int
 
-  (* We try to reuse only previously allocated bases when the current callstack is similar to the callstack 
-     where the bases where allocated in order to preserve maximal precision
-     Similarity is defined as having the same prefix of callstacks, 
-     i.e the current callstack is prefix of the callstack where the bases were allocated
-  *)
-  let is_similar_callstack bases (callstack: Callstack.t) = 
-    let call_list_from_memexec = Callstack.to_call_list callstack in
-    let aux_similar base =
-      let cs = Builtins_malloc.get_base_allocation_site base in
-      let call_list_from_builtins = Callstack.to_call_list cs in
-      let rec left_compare s s' =
-        match s ,s' with
-        | [], _ -> true
-        | _ , [] -> false 
-        | hd::tl, hd'::tl' -> 
-          let (kf, _) = hd in
-          let (kf', _) = hd' in
-          if Kernel_function.equal kf kf' 
-          then left_compare tl tl'
-          else false
-      in left_compare call_list_from_memexec call_list_from_builtins
-    in Base.Hptset.for_all aux_similar bases
-
-
   (* We can reuse a set of allocated bases for the current call iff:
      - the set of bases is not in the current cvalue_model
-     - the current callstack is similar to the callstack where the bases were allocated 
   *)
-  let _can_reuse bases cvalue_model callstack = 
+  let _can_reuse bases cvalue_model = 
     not (Base.Hptset.exists (fun base -> 
         try
           ignore (Cvalue.Model.find_base base cvalue_model);
-          true
+          not (Base.is_weak base)
         with Not_found -> false) bases)
-    && 
-    is_similar_callstack bases callstack
 
-
-  let fail_if_not_reusable _bases _cvalue_model _callstack =
-    if not (Base.Hptset.is_empty _bases) && not (_can_reuse _bases _cvalue_model _callstack) then
+  let fail_if_not_reusable _bases _cvalue_model =
+    if not (Base.Hptset.is_empty _bases) && not (_can_reuse _bases _cvalue_model) then
       raise Not_found
 
   (** Find a previous execution in [map_inputs] that matches [st].
@@ -450,9 +422,8 @@ module Make
                 | true -> Eval.Cacheable
                 | false -> Eval.MallocedCall
               in
-              let callstack = Eva_utils.current_call_stack () in
               let _ = try 
-                  fail_if_not_reusable allocated cvalue_model callstack
+                  fail_if_not_reusable allocated cvalue_model 
                 with Not_found -> 
                   Statistics.incr stat_misses_allocated_bases kf; 
                   raise Not_found
