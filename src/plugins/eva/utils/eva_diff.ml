@@ -149,3 +149,7 @@ let import_callsite_stmt stmt = match Ast_diff.Stmt.find stmt with
 let import_widening_stmt stmt = match Ast_diff.Stmt.find stmt with
   | `Same stmt | `Partial (stmt, _) -> stmt
   | `Not_present -> raise Not_found
+
+let import_inout_kf kf = match Ast_diff.Kernel_function.find kf with
+  | `Same kf -> kf
+  | `Partial (_, _) | `Not_present -> raise Not_found

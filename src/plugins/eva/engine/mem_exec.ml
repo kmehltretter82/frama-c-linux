@@ -718,7 +718,7 @@ module Make
       import_cached_calls_from name saved;
       (* Inout wrapped *)
       let import_inout () =
-        Eva_dynamic.Inout.import_memexec Eva_diff.import_inout saved in
+        Eva_dynamic.Inout.import_memexec Eva_diff.import_inout Eva_diff.import_inout_kf saved in
       load_time_wrapper stat_inout_load_time import_inout;
       print_cache_size "In current session";
       Project.remove ~project:saved ();

@@ -612,26 +612,36 @@ module Callwise = struct
         "callwise: internal stack is inconsistent with Eva callstack"
 
 
+  module Kf_Inout = Datatype.Pair (Cil_datatype.Kf)(Inout_type)
+
   module MemExec =
     State_builder.Hashtbl
       (Datatype.Int.Hashtbl)
-      (Inout_type)
+      (Kf_Inout)
       (struct
         let size = 17
         let dependencies = [Ast.self]
         let name = "Operational_inputs.MemExec"
       end)
 
-  let import_memexec import_inout project =
-    let gather () = MemExec.fold (fun i inout acc -> (i, inout) :: acc) [] in
+  let import_memexec import_inout import_kf project =
+    let gather () = MemExec.fold (fun i (kf, inout) acc -> (i, (kf, inout)) :: acc) [] in
     let list = Project.on project gather () in
-    List.iter (fun (i, inout) -> MemExec.replace i (import_inout inout)) list
+    List.iter (fun (i, (kf, inout)) -> 
+      try
+        let kf' = import_kf kf in
+        let inout' = import_inout inout in 
+      MemExec.replace i (kf', inout')
+      with Not_found -> 
+        ()
+      ) list
 
   let _import =
     let inout = Inout_type.ty in
+    let kf = Kernel_function.ty in
     Dynamic.register
       ~plugin:"inout" "import_memexec"
-      (Datatype.func2 (Datatype.func inout inout) Project.ty Datatype.unit)
+      (Datatype.func3 (Datatype.func inout inout) (Datatype.func kf kf) Project.ty Datatype.unit)
       import_memexec
 
   let compute_call_from_value_states kf call_stack states =
@@ -683,13 +693,15 @@ module Callwise = struct
             compute_call_from_value_states kf callstack cvalue_states
           else top
         in
-        MemExec.replace memexec_counter inout;
+        MemExec.replace memexec_counter (kf,inout);
         pop_local_table kf;
         inout
       | `Reuse counter ->
         begin
-          try MemExec.find counter
-          with Not_found -> top (* big TODO *)
+          try snd (MemExec.find counter)
+          with Not_found -> 
+            Kernel.warning "Reuse Inout returns Top @.";
+            top (* big TODO *)
         end
       | `Spec _states
       | `Builtin (_states, None, None) -> compute_using_spec pre_state kf
