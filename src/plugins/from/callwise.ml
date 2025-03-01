@@ -147,8 +147,8 @@ let record_for_individual_froms callstack kf pre_state value_res =
           try MemExec.find counter
           with Not_found -> Eva.Assigns.top (* TODO *)
         end
-      | `Builtin (_states, Some (result,_)) -> result
-      | `Builtin (_states, None)
+      | `Builtin (_states, Some (result,_), _) -> result
+      | `Builtin (_states, None, _)
       | `Spec _states ->
         let bhv = Eva.Logic_inout.valid_behaviors kf pre_state in
         let assigns = Ast_info.merge_assigns bhv in

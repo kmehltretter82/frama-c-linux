@@ -27,6 +27,7 @@ type t = {
   under_outputs_if_termination: Locations.Zone.t;
   over_outputs: Locations.Zone.t;
   over_outputs_if_termination: Locations.Zone.t;
+  over_allocs: Locations.Zone.t;
 }
 
 let pretty_operational_inputs_aux fmt x =
@@ -69,7 +70,7 @@ include
 
        let structural_descr =
          let z = Locations.Zone.packed_descr in
-         Structural_descr.t_record [| z; z; z; z; z; z |]
+         Structural_descr.t_record [| z; z; z; z; z; z; z |]
        let reprs =
          List.map
            (fun z ->
@@ -79,6 +80,7 @@ include
                 over_logic_inputs = z;
                 over_outputs = z;
                 over_outputs_if_termination = z;
+                over_allocs = z;
               }) Locations.Zone.reprs
        let name = "Full.tt"
        let hash
@@ -88,13 +90,15 @@ include
              over_outputs = d;
              over_outputs_if_termination = e;
              over_logic_inputs = f;
+             over_allocs = g;
            } =
          Zone.hash a +
          17 * Zone.hash b +
          587 * Zone.hash c +
          1077 * Zone.hash d +
          13119 * Zone.hash e +
-         15823 * Zone.hash f
+         15823 * Zone.hash f + 
+         18234 * Zone.hash g
        let equal
            { over_inputs_if_termination = a;
              under_outputs_if_termination = b;
@@ -102,6 +106,7 @@ include
              over_outputs = d;
              over_outputs_if_termination = e;
              over_logic_inputs = f;
+             over_allocs = g;
            }
            { over_inputs_if_termination = a';
              under_outputs_if_termination = b';
@@ -109,6 +114,7 @@ include
              over_outputs = d';
              over_outputs_if_termination = e';
              over_logic_inputs = f';
+             over_allocs = g';
            } =
          Zone.equal a a'
          && Zone.equal b b'
@@ -116,6 +122,7 @@ include
          && Zone.equal d d'
          && Zone.equal e e'
          && Zone.equal f f'
+         && Zone.equal g g'
        let mem_project = Datatype.never_any_project
      end)
    : Datatype.S with type t := t)
@@ -127,6 +134,7 @@ let map f v = {
   over_logic_inputs = f v.over_logic_inputs;
   over_outputs = f v.over_outputs;
   over_outputs_if_termination = f v.over_outputs_if_termination;
+  over_allocs = f v.over_allocs;
 }
 
 let bottom = {
@@ -136,6 +144,7 @@ let bottom = {
   under_outputs_if_termination = Zone.top;
   over_outputs = Zone.bottom;
   over_outputs_if_termination = Zone.bottom;
+  over_allocs = Zone.bottom;
 }
 
 let join c1 c2 = {
@@ -148,6 +157,7 @@ let join c1 c2 = {
     Zone.join c1.over_outputs_if_termination c2.over_outputs_if_termination;
   under_outputs_if_termination =
     Zone.meet c1.under_outputs_if_termination c2.under_outputs_if_termination;
+  over_allocs = Zone.join c1.over_allocs c2.over_allocs
 }
 
 

@@ -256,6 +256,7 @@ module Make
       let logic_input_bases = bases inout.Inout_type.over_logic_inputs in
       Base.Hptset.union input_bases logic_input_bases
     in
+    let alloc_bases = bases inout.Inout_type.over_allocs in
     (* FIXME: Always remove outputs whose base is completely overwritten *)
     let input_bases =
       let uncertain_output_bases =
@@ -271,21 +272,31 @@ module Make
       | Base.SetLattice.Top -> raise TooImprecise
       | Base.SetLattice.Set bases -> bases
     in
+    (* Ensures that weak allocated bases are always in input bases *)
+    let input_bases =
+      let weak_bases = Base.Hptset.filter (Base.is_weak) alloc_bases in
+      Base.Hptset.union weak_bases input_bases
+    in
     (* Outputs bases, that is bases that are copy-pasted, also include
        input bases. Indeed, those may get reduced during the call. *)
     let all_output_bases =
       Base.Hptset.union input_bases output_bases
     in 
-    (input_bases, all_output_bases)
+    let all_output_bases = 
+      Base.Hptset.union all_output_bases alloc_bases
+    in
+    (input_bases, all_output_bases, alloc_bases)
 
 
   let store_results_kf inout kf input_state args (call_result: call_result) = 
-    let allocated_bases = call_result.allocated_bases in 
-    let input_bases, all_output_bases = extract_bases kf inout input_state in
-    let reduced_input_state = Domain.filter (`Pre kf) input_bases input_state in
-    let all_output_bases = 
-      Base.Hptset.union all_output_bases allocated_bases
+    let input_bases, all_output_bases, allocated_bases = extract_bases kf inout input_state in
+    let input_bases = 
+      let weak_allocated_bases = Base.Hptset.filter (Base.is_weak) allocated_bases in
+      Base.Hptset.union weak_allocated_bases input_bases
     in
+    (* let _ = 
+      Self.debug ~dkey:Self.dkey_memexec "Allocated bases: %a @." Base.Hptset.pretty allocated_bases in *)
+    let reduced_input_state = Domain.filter (`Pre kf) input_bases input_state in
     let outputs, call_number = process_outputs kf all_output_bases call_result in
     let map_args_to_input_bases =
       try PreviousCalls.find kf
@@ -306,8 +317,8 @@ module Make
         Base.Hptset.Hashtbl.add htbl_input_bases_to_input_state input_bases h;
         h
     in
-    (* We only keep the last set of allocated bases (More efficient, More precise) *)
     let htbl_allocated_bases_to_results =
+      (* Store only last input with last allocated bases *)
       (* try Domain.Hashtbl.find htbl_input_state_to_allocated_bases reduced_input_state
          with Not_found -> *)
       let h = Base.Hptset.Hashtbl.create 11 in
@@ -535,16 +546,10 @@ module Make
     in
     ActualArgs.Map.fold add map ActualArgs.Map.empty
 
-  let import_cache_summaries not_imported_kf (old_kf, old_data) =
+  let import_cache_summaries (old_kf, old_data) =
     match Ast_diff.Kernel_function.find old_kf with
     | `Same kf ->
       begin
-        if Kernel_function.Hashtbl.mem not_imported_kf old_kf then
-          begin
-            Self.debug ~dkey "Function %a has no syntax diff but cannot imported due to dynalloc data import failure @." Kernel_function.pretty old_kf;
-            Statistics.incr stat_misses_import_kf kf
-          end
-        else
           try
             let _ = Self.debug ~dkey "Importing summaries for function %a@." Kernel_function.pretty old_kf in
             let data = import_calls old_data in
@@ -646,17 +651,24 @@ module Make
     let list, list', counter =
       load_time_wrapper stat_gather_load_time gather in
     (* Builtin malloc wrapped *)
+    let import_base () = 
+      Base.import Eva_diff.import_base project
+    in
+    import_base ();
     let import_builtin_malloc () =
-      Base.import Eva_diff.import_base project;
+      if Parameters.CacheAllocation.get ()
+      then 
       Builtins_malloc.import project
     in
-    let not_imported_kf = load_time_wrapper stat_builtin_malloc_load_time import_builtin_malloc in
+    load_time_wrapper stat_builtin_malloc_load_time import_builtin_malloc;
     (* Summaries wrapped *)
     let import_function_summaries () =
-      List.iter (import_cache_summaries not_imported_kf) list in
+      List.iter (import_cache_summaries) list in
     load_time_wrapper stat_function_summaries_load_time import_function_summaries;
     let import_loop_widenings () = 
-      List.iter import_cache_widenings list' in
+      if Parameters.SaveWidenings.get () then
+        List.iter import_cache_widenings list'
+    in
     load_time_wrapper stat_loop_widenings_load_time import_loop_widenings;
     SaveCounter.set counter
 

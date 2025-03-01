@@ -32,6 +32,7 @@ type full_result = {
   c_values: (Cvalue.V.t option * Cvalue.Model.t) list;
   c_clobbered: Base.SetLattice.t;
   c_assigns: (Assigns.t * Locations.Zone.t) option;
+  c_allocs: Base.Hptset.t option;
 }
 
 type call_result =
@@ -280,7 +281,12 @@ let apply_builtin (builtin:builtin) call ~pre ~post =
       | Full result -> result.c_assigns
       | States _ | Result _ -> None
     in
-    let result = `Builtin (List.map fst states, froms) in
+    let allocs =
+      match call_result with
+      | Full result -> result.c_allocs
+      | States _ | Result _ -> None
+    in
+    let result = `Builtin (List.map fst states, froms, allocs) in
     Cvalue_callbacks.apply_call_results_hooks call.callstack call.kf pre result;
     states
   with

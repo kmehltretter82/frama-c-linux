@@ -288,12 +288,12 @@ let frama_c_memcpy name state actuals =
         Builtins.Full
           { Builtins.c_values = [Some dst_bytes, new_state];
             c_clobbered = Builtins.clobbered_set_from_ret new_state dst_bytes;
-            c_assigns = Some (c_assigns,  sure_zone); }
+            c_assigns = Some (c_assigns,  sure_zone); c_allocs = None }
       else
         Builtins.Full
           { Builtins.c_values = [ None, Cvalue.Model.bottom];
             c_clobbered = Base.SetLattice.bottom;
-            c_assigns = Some (c_assigns,  sure_zone); }
+            c_assigns = Some (c_assigns,  sure_zone); c_allocs = None }
   in
   match actuals with
   | [dst; src; size] -> compute dst src size
@@ -377,7 +377,8 @@ let frama_c_memset_imprecise state dst_lval dst v size =
   Builtins.Full
     { Builtins.c_values = [Some dst, new_state'];
       c_clobbered = Base.SetLattice.bottom;
-      c_assigns = Some (c_assigns,sure_zone); }
+      c_assigns = Some (c_assigns,sure_zone);
+      c_allocs = None }
 (* let () = register_builtin "Frama_C_memset" frama_c_memset_imprecise *)
 
 (* Type that describes why the 'precise memset' builtin may fail. *)
@@ -596,7 +597,8 @@ let frama_c_memset_precise state dst_lval dst v (exp_size, size) =
     Builtins.Full
       { Builtins.c_values = [Some dst, state'];
         c_clobbered = Base.SetLattice.bottom;
-        c_assigns = Some (c_from,dst_zone); }
+        c_assigns = Some (c_from,dst_zone);
+        c_allocs = None }
   with
   | Bit_utils.NoMatchingOffset -> raise (ImpreciseMemset SizeMismatch)
   | Base.Not_a_C_variable -> raise (ImpreciseMemset NoTypeForDest)

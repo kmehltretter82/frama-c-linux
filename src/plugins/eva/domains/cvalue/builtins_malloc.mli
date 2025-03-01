@@ -45,7 +45,7 @@ val freeable: Cvalue.V.t -> Abstract_interp.truth
     the C function free. Note that \freeable(\null) does not hold, despite NULL
     being a valid argument to the C function free. *)
 
-val import: Project.t -> unit Kernel_function.Hashtbl.t 
+val import: Project.t -> unit
 
 val print_summary : unit -> unit
 (** Print the summary of the dynamic allocation analysis. *)

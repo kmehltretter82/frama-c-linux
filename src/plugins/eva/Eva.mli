@@ -721,6 +721,8 @@ module Builtins: sig
         - the assigns of the function, i.e. the dependencies of the result
           and of each zone written to.
         - and its sure outputs, i.e. an under-approximation of written zones. *)
+    c_allocs: Base.Hptset.t option;
+    (** If not None, the set of bases allocated by the call *)
   }
 
   (** The result of a builtin can be given in different forms. *)
@@ -772,6 +774,8 @@ module Cvalue_callbacks: sig
       - and its sure outputs, i.e. an under-approximation of written zones. *)
   type call_assigns = (Assigns.t * Locations.Zone.t) option
 
+  type call_allocs = Base.Hptset.t option
+
   type analysis_kind =
     [ `Builtin (** A cvalue builtin is used to interpret the function. *)
     | `Spec  (** The specification is used to interpret the function. *)
@@ -795,7 +799,7 @@ module Cvalue_callbacks: sig
 
   (** Results of a function call. *)
   type call_results =
-    [ `Builtin of state list * call_assigns
+    [ `Builtin of state list * call_assigns * call_allocs
     (** List of cvalue states at the end of the builtin. *)
     | `Spec of state list
     (** List of cvalue states at the end of the call. *)

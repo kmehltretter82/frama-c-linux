@@ -27,6 +27,7 @@ type t = {
   under_outputs_if_termination: Locations.Zone.t;
   over_outputs: Locations.Zone.t;
   over_outputs_if_termination: Locations.Zone.t;
+  over_allocs: Locations.Zone.t;
 }
 
 include Datatype.S with type t := t

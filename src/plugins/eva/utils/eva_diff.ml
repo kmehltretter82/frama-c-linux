@@ -96,6 +96,7 @@ let import_inout t =
     under_outputs_if_termination = import_zone t.under_outputs_if_termination;
     over_outputs = import_zone t.over_outputs;
     over_outputs_if_termination = import_zone t.over_outputs_if_termination;
+    over_allocs = import_zone t.over_allocs;
   }
 
 

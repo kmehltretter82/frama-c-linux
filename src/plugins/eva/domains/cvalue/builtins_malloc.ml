@@ -421,11 +421,6 @@ module MallocedByStack = (* varinfo list Callstack.hashtbl *)
     end)
 let () = Ast.add_monotonic_state MallocedByStack.self
 
-
-module MallocedByFunction = 
-    State_builder.Hashtbl (Cil_datatype.Stmt.Hashtbl)
-
-
 (* Performs an abstract allocation on an existing allocated variable,
    its validity. If [make_weak], the variable is marked as being weak. *)
 let update_variable_validity ?(make_weak=false) base sizev =
@@ -523,7 +518,7 @@ let register_malloc ?replace name ?returns_null prefix region cacheable =
     let ret = V.inject new_base Ival.zero in
     let c_values = wrap_fallible_alloc ?returns_null ret state new_state in
     let c_clobbered = Base.SetLattice.bottom in
-    Builtins.Full { c_values; c_clobbered; c_assigns = None; }
+    Builtins.Full { c_values; c_clobbered; c_assigns = None; c_allocs = Some (Base.Hptset.singleton new_base) }
   in
   let name = "Frama_C_" ^ name in
   let typ () = Cil.voidPtrType, [Cil.theMachine.Cil.typeOfSizeOf] in
@@ -561,9 +556,9 @@ let calloc_builtin state args =
   if size_ok <> Alarmset.True then
     Eva_utils.warning_once_current
       "calloc out of bounds: assert(nmemb * size <= SIZE_MAX)";
-  let c_values =
+  let c_values, base =
     if size_ok = Alarmset.False (* size always overflows *)
-    then [Some Cvalue.V.singleton_zero, state]
+    then [Some Cvalue.V.singleton_zero, state], None
     else
       let allocate_base = choose_base_allocation () in
       let base, max_valid = allocate_base Base.Malloc "calloc" size state in
@@ -572,10 +567,10 @@ let calloc_builtin state args =
         if size_ok = Alarmset.Unknown then Some true else None
       in
       let ret = V.inject base Ival.zero in
-      wrap_fallible_alloc ?returns_null ret state new_state
+      wrap_fallible_alloc ?returns_null ret state new_state, Some (Base.Hptset.singleton base)
   in
   let c_clobbered = Base.SetLattice.bottom in
-  Builtins.Full { c_values; c_clobbered; c_assigns = None; }
+  Builtins.Full { c_values; c_clobbered; c_assigns = None; c_allocs = base}
 
 let () =
   let name = "Frama_C_calloc" in
@@ -679,12 +674,12 @@ let frama_c_free state actuals =
     let bases_to_remove, card_to_remove, _null = resolve_bases_to_free arg in
     let c_clobbered = Base.SetLattice.bottom in
     if card_to_remove = 0 then
-      Builtins.Full { c_values = []; c_clobbered; c_assigns = None; }
+      Builtins.Full { c_values = []; c_clobbered; c_assigns = None; c_allocs = None }
     else
       let strong = card_to_remove <= 1 in
       let state, changed = free_aux state ~strong bases_to_remove in
       let c_values = [None, state] in
-      Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; }
+      Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; c_allocs = None }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () =
@@ -700,7 +695,7 @@ let frama_c_vla_free state actuals =
     let state, changed = free_aux state ~strong:true bases_to_remove in
     let c_values = [None, state] in
     let c_clobbered = Base.SetLattice.bottom in
-    Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; }
+    Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; c_allocs = None }
   | _ -> raise (Builtins.Invalid_nb_of_args 1)
 
 let () =
@@ -858,10 +853,10 @@ let realloc_builtin_aux state ptr size =
     let new_state, changed = free_aux new_state ~strong bases in
     let c_values = wrap_fallible_alloc ret state new_state in
     let c_clobbered = Builtins.clobbered_set_from_ret new_state ret in
-    Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; }
+    Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; c_allocs = Some bases }
   else (* Invalid call. *)
     let c_clobbered = Base.SetLattice.bottom in
-    Builtins.Full { c_values = []; c_clobbered; c_assigns = None; }
+    Builtins.Full { c_values = []; c_clobbered; c_assigns = None; c_allocs = None}
 
 let realloc_builtin state args =
   let ptr, size =
@@ -949,7 +944,7 @@ let check_leaked_malloced_bases state _ =
           Base.pretty base)
     alloced_bases;
   let c_clobbered = Base.SetLattice.bottom in
-  Builtins.Full { c_values = [None,state]; c_clobbered; c_assigns = None; }
+  Builtins.Full { c_values = [None,state]; c_clobbered; c_assigns = None; c_allocs = None }
 
 let () =
   Builtins.register_builtin "Frama_C_check_leak" NoCacheCallers
@@ -993,11 +988,9 @@ let clear () =
 
 
 let import project =
-  let _ = clear () in
-  let not_imported_kf = Kernel_function.Hashtbl.create 1 in
-  let _ = import_dynamic_bases project in
-  let _ = import_malloced_by_stack project in
-  not_imported_kf
+  clear ();
+  import_dynamic_bases project;
+  import_malloced_by_stack project
 
 let print_summary fmt  = 
   let print_dynamic_alloc_bases () = 

@@ -342,7 +342,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     let final_state = join_states states in
     match final_state with
     | `Bottom ->
-      apply_call_results_hooks call state (`Builtin ([], None));
+      apply_call_results_hooks call state (`Builtin ([], None, None));
       Transfer_stmt.{ states; cacheable = Eval.Cacheable; allocated_bases = Base.Hptset.empty; widenings = Cil_datatype.Stmt.Map.empty}
     | `Value final_state ->
       let cvalue_call = get_cvalue_call call in

@@ -37,6 +37,7 @@ type t = Inout_type.t = {
   under_outputs_if_termination: Locations.Zone.t;
   over_outputs: Locations.Zone.t;
   over_outputs_if_termination: Locations.Zone.t;
+  over_allocs: Locations.Zone.t;
 }
 
 let top = {
@@ -46,6 +47,7 @@ let top = {
   under_outputs_if_termination = Zone.bottom;
   over_outputs = Zone.top;
   over_outputs_if_termination = Zone.top;
+  over_allocs = Zone.top;
 }
 
 (* [_if_termination] fields of the type above, which are the one propagated by
@@ -56,6 +58,7 @@ type compute_t = {
   over_inputs_d : Zone.t ;
   under_outputs_d : Zone.t;
   over_outputs_d: Zone.t;
+  over_allocs_d: Zone.t;
 }
 
 (* Initial value for the computation *)
@@ -63,29 +66,34 @@ let empty = {
   over_inputs_d = Zone.bottom;
   under_outputs_d = Zone.bottom;
   over_outputs_d = Zone.bottom;
+  over_allocs_d = Zone.bottom;
 }
 
 let bottom = {
   over_inputs_d = Zone.bottom;
   under_outputs_d = Zone.top;
   over_outputs_d = Zone.bottom;
+  over_allocs_d = Zone.bottom;
 }
 
 let equal ct1 ct2 =
   Zone.equal ct1.over_inputs_d ct2.over_inputs_d &&
   Zone.equal ct1.under_outputs_d ct2.under_outputs_d &&
-  Zone.equal ct1.over_outputs_d ct2.over_outputs_d
+  Zone.equal ct1.over_outputs_d ct2.over_outputs_d &&
+  Zone.equal ct1.over_allocs_d ct2.over_allocs_d
 
 let join c1 c2 = {
   over_inputs_d = Zone.join c1.over_inputs_d c2.over_inputs_d;
   under_outputs_d = Zone.meet c1.under_outputs_d c2.under_outputs_d;
   over_outputs_d = Zone.join c1.over_outputs_d c2.over_outputs_d;
+  over_allocs_d = Zone.join c1.over_allocs_d c2.over_allocs_d;
 }
 
 let is_included c1 c2 =
   Zone.is_included c1.over_inputs_d c2.over_inputs_d &&
   Zone.is_included c2.under_outputs_d c1.under_outputs_d &&
-  Zone.is_included c1.over_outputs_d c2.over_outputs_d
+  Zone.is_included c1.over_outputs_d c2.over_outputs_d &&
+  Zone.is_included c1.over_allocs_d c2.over_allocs_d
 
 let join_and_is_included smaller larger =
   let join = join smaller larger in
@@ -165,6 +173,7 @@ let eval_assigns kf state assigns =
       under_outputs_d = Zone.link acc.under_outputs_d sure_out;
       over_inputs_d = Zone.join acc.over_inputs_d inputs;
       over_outputs_d = Zone.join acc.over_outputs_d outputs_over;
+      over_allocs_d = acc.over_allocs_d;
     }
   in
   match assigns with
@@ -182,6 +191,7 @@ let eval_assigns kf state assigns =
       under_outputs_if_termination = r.under_outputs_d;
       over_outputs = r.over_outputs_d;
       over_outputs_if_termination = r.over_outputs_d;
+      over_allocs = r.over_allocs_d;
     }
 
 let compute_using_spec state kf =
@@ -265,6 +275,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
     { over_inputs_d = Zone.join c1.over_inputs_d inputs;
       under_outputs_d = Zone.link c1.under_outputs_d c2.under_outputs_d;
       over_outputs_d = Zone.join  c1.over_outputs_d c2.over_outputs_d;
+      over_allocs_d = Zone.join c1.over_allocs_d c2.over_allocs_d;
     }
 
   type t = compute_t
@@ -310,7 +321,8 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
     in
     { under_outputs_d = new_sure_outs;
       over_inputs_d = Zone.join data.over_inputs_d new_inputs;
-      over_outputs_d = Zone.join data.over_outputs_d new_outs }
+      over_outputs_d = Zone.join data.over_outputs_d new_outs;
+      over_allocs_d = data.over_allocs_d; }
 
   let transfer_call ~for_writing s dest f args _loc data =
     let request = X.stmt_request s in
@@ -322,7 +334,8 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
         data
         { over_inputs_d = f_args_inputs ;
           under_outputs_d = Zone.bottom;
-          over_outputs_d = Zone.bottom; }
+          over_outputs_d = Zone.bottom; 
+          over_allocs_d = Zone.bottom}
     in
     let called = Eva.Results.(eval_callee f request |> default []) in
     let for_functions =
@@ -334,6 +347,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
              over_inputs_d = res.over_inputs_if_termination;
              under_outputs_d = res.under_outputs_if_termination;
              over_outputs_d = res.over_outputs_if_termination;
+             over_allocs_d = res.over_allocs;
            } in
            join for_function acc)
         bottom
@@ -473,6 +487,7 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
       over_logic_inputs = !non_terminating_logic_inputs;
       over_outputs =
         Zone.join !non_terminating_outputs res_if_termination.over_outputs_d;
+      over_allocs = res_if_termination.over_allocs_d;
     }
 
 end
@@ -677,8 +692,14 @@ module Callwise = struct
           with Not_found -> top (* big TODO *)
         end
       | `Spec _states
-      | `Builtin (_states, None) -> compute_using_spec pre_state kf
-      | `Builtin (_states, Some (froms,sure_out)) ->
+      | `Builtin (_states, None, None) -> compute_using_spec pre_state kf
+      | `Builtin (_states, None, Some _allocs) -> 
+        let data = compute_using_spec pre_state kf in
+        {
+          data with over_allocs = Base.Hptset.fold (fun base acc->
+          Zone.join (Zone.inject base Int_Intervals.top) acc) _allocs Zone.bottom
+        }
+      | `Builtin (_states, Some (froms,sure_out), _) ->
         let in_, out_ = extract_inout_from_froms froms in
         {
           over_inputs_if_termination = in_;
@@ -687,6 +708,7 @@ module Callwise = struct
           over_outputs_if_termination = out_ ;
           over_outputs = out_;
           under_outputs_if_termination = sure_out;
+          over_allocs = Zone.bottom
         }
     in
     end_record callstack kf inout

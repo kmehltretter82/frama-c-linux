@@ -36,6 +36,8 @@ type state = Cvalue.Model.t
     - and its sure outputs, i.e. an under-approximation of written zones. *)
 type call_assigns = (Assigns.t * Locations.Zone.t) option
 
+type call_allocs = Base.Hptset.t option
+
 type analysis_kind =
   [ `Builtin (** A cvalue builtin is used to interpret the function. *)
   | `Spec  (** The specification is used to interpret the function. *)
@@ -59,7 +61,7 @@ type results = { before_stmts: state_by_stmt; after_stmts: state_by_stmt }
 
 (** Results of a function call. *)
 type call_results =
-  [ `Builtin of state list * call_assigns
+  [ `Builtin of state list * call_assigns * call_allocs
   (** List of cvalue states at the end of the builtin. *)
   | `Spec of state list
   (** List of cvalue states at the end of the call. *)
