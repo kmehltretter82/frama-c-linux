@@ -26,6 +26,8 @@ let stat_misses_allocated_bases = Statistics.register_function_stat "memexec-mis
 let stat_misses_entry_state = Statistics.register_function_stat "memexec-misses-entry-state"
 let stat_misses_input_relation = Statistics.register_function_stat "memexec-misses-input-relation"
 let stat_misses_import_kf = Statistics.register_function_stat "memexec-miss-import-kf"
+let stat_widenings_misses_kf = Statistics.register_function_stat "widenings-misses-kf"
+let stat_widenings_misses_args = Statistics.register_function_stat "widenings-misses-args"
 let stat_project_load_time = Statistics.register_global_stat 
     "time-project-load"
 let stat_memexec_load_time = Statistics.register_global_stat 
@@ -354,13 +356,41 @@ module Make
     in
     Cil_datatype.Stmt.Map.union join_same old_stmt new_stmt
 
-  let reduce_widenings inout kf (partitions: Partitions.t) =
-    let input_bases = bases inout.Inout_type.over_inputs in
-    let output_bases = bases inout.Inout_type.over_outputs in
-    let all_bases = Base.Hptset.union input_bases output_bases in
-    let filter widened_state =
-      Domain.filter (`Post kf) all_bases widened_state
-    in Partition.Key.Map.map filter partitions
+  let reduce_widenings _inout _kf _stmt (partitions: Partitions.t) =
+    let get_or_empty zone =
+      try 
+        bases zone
+      with TooImprecise -> Base.Hptset.empty
+    in
+    try
+      let inout = Cil_datatype.Stmt.Map.find _stmt _inout in
+      let output_bases = get_or_empty inout.Inout_type.over_outputs in
+      let input_bases = get_or_empty inout.Inout_type.over_inputs in
+      let allocated_bases = get_or_empty inout.Inout_type.over_allocs in
+      let _all_bases = Base.Hptset.union input_bases output_bases in
+      let _all_bases = Base.Hptset.union _all_bases allocated_bases in
+      (* let _ = Self.debug ~dkey:Self.dkey_widening 
+      "Stmt: %a @. All bases: %a @." Cil_datatype.Stmt.pretty _stmt Base.Hptset.pretty _all_bases in *)
+      let filter widened_state =
+          Domain.filter (`Post _kf) _all_bases widened_state
+      in Partition.Key.Map.map filter partitions
+    with Not_found -> partitions
+
+
+
+  let _pretty_saved_widenings fmt widenings = 
+      Cil_datatype.Stmt.Map.iter (fun stmt partitions ->
+        Format.fprintf fmt "Statement: %a -> %a @." Cil_datatype.Stmt.pretty stmt Partitions.pretty partitions
+        ) widenings
+
+
+  let clean_widenings widenings =
+    Cil_datatype.Stmt.Map.filter_map (fun stmt partition ->
+      match stmt.skind with
+      |  Loop _ -> Some partition
+      | _ -> None 
+      ) widenings
+
 
   let store_widenings_kf inout kf args _callstack widenings =
     let map_args =
@@ -373,21 +403,26 @@ module Make
       with Not_found ->
         Cil_datatype.Stmt.Map.empty
     in
+    let cleaned_widenings =
+      clean_widenings widenings in
     let reduced_widenings = 
       let f = reduce_widenings inout kf in
-      Cil_datatype.Stmt.Map.map f widenings in
+      Cil_datatype.Stmt.Map.mapi f cleaned_widenings in
     let merged = merge_statements old_widenings reduced_widenings in 
     let new_map_args = ActualArgs.Map.add args merged map_args in 
     PreviousWidenings.replace kf new_map_args;
     Statistics.incr_by stat_saved_widenings () (Cil_datatype.Stmt.Map.cardinal merged)
+    (* Self.debug ~dkey:Self.dkey_widening "Saved widenings: %a" pretty_saved_widenings merged *)
 
 
   let store_widenings kf args callstack widenings = 
-    match Transfer_stmt.current_kf_inout () with
+    match Transfer_stmt.current_stmt_inout () with
     | None -> ()
     | Some inout ->
+      try 
       let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
       store_widenings_kf inout kf args callstack widenings
+      with TooImprecise -> ()
 
 
   exception Result_found of call_result * int
@@ -485,9 +520,21 @@ module Make
 
   let reuse_previous_widenings kf args _callstack =
     try
-      let map_args = PreviousWidenings.find kf in
+      let map_args = 
+        try
+          PreviousWidenings.find kf
+        with Not_found ->
+          Statistics.incr stat_widenings_misses_kf kf;
+          raise Not_found
+        in
       let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
-      let widenings = ActualArgs.Map.find args map_args in
+      let widenings = 
+        try
+        ActualArgs.Map.find args map_args 
+        with Not_found ->
+          Statistics.incr stat_widenings_misses_args kf;
+          raise Not_found
+      in
       Some widenings
     with Not_found ->
       None
