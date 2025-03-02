@@ -136,6 +136,7 @@ module NumerorsLogFile: Parameter_sig.Filepath
 module StatisticsFile: Parameter_sig.Filepath
 
 module MemExecAll: Parameter_sig.Bool
+module CacheFunction: Parameter_sig.Bool
 
 
 module InterpreterMode: Parameter_sig.Bool

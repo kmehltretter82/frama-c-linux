@@ -202,13 +202,13 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       in
       let result = compute ~widenings kinstr call init_state in
       let cacheable = result.Transfer_stmt.cacheable in
-      let _widenings = match Parameters.SaveWidenings.get () && cacheable = Eval.Cacheable with
+      let _widenings = match Parameters.SaveWidenings.get () with
         | false -> ()
         | true -> 
           MemExec.store_widenings call.kf args call.callstack result.Transfer_stmt.widenings 
       in
       let () =
-        if (cacheable = Eval.Cacheable) || (Parameters.CacheAllocation.get () && cacheable = Eval.MallocedCall)
+        if Parameters.CacheFunction.get () && ((cacheable = Eval.Cacheable) || (Parameters.CacheAllocation.get () && cacheable = Eval.MallocedCall))
         then
           let call_result = MemExec.{
               return_flow = result.Transfer_stmt.states;

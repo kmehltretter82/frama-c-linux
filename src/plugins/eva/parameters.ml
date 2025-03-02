@@ -398,6 +398,18 @@ module JoinResults =
       let default = true
     end)
 
+
+let () = Parameter_customize.set_group performance
+module CacheFunction =
+Bool 
+  (struct
+    let option_name = "-eva-cache-function"
+    let help = "Cache the results of functions"
+    let default = true 
+  end)
+let () = add_precision_dep CacheFunction.parameter
+
+
 let () = Parameter_customize.set_group performance
 
 module ReuseWidenings = 
