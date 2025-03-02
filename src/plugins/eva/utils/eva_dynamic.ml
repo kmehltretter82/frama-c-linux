@@ -24,6 +24,9 @@ let get ~plugin name typ ~fallback =
   try Dynamic.get ~plugin name typ
   with Failure _ | Dynamic.(Unbound_value _ | Incompatible_type _) -> fallback
 
+
+module InOutStmt = Cil_datatype.Stmt.Map.Make(Inout_type)
+
 module Inout = struct
   let plugin = "inout"
 
@@ -31,6 +34,11 @@ module Inout = struct
     let fallback _ = () in
     let typ = Datatype.(func (func Inout_type.ty unit) unit) in
     get ~plugin "register_call_hook" typ ~fallback f
+
+  let register_stmt_hook f =
+      let fallback _ = () in
+      let typ = Datatype.(func (func InOutStmt.ty unit) unit) in
+      get ~plugin "register_stmt_hook" typ ~fallback f
 
   let fallback _ = Locations.Zone.top
   let typ arg = Datatype.func arg Locations.Zone.ty

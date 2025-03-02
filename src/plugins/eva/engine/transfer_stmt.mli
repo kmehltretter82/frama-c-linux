@@ -23,7 +23,13 @@
 open Cil_types
 open Eval
 
+module InOutStmt: sig 
+  type t = Inout_type.t Cil_datatype.Stmt.Map.t
+end
+
 val current_kf_inout: unit -> Inout_type.t option
+
+val current_stmt_inout: unit -> InOutStmt.t option
 
 type 'state call_result = {
   states: (Partition.key * 'state) list;

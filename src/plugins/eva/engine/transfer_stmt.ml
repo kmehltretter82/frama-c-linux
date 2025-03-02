@@ -58,12 +58,26 @@ module InOutCallback =
       let name = "Transfer_stmt.InOutCallback"
     end)
 
+
+module InOutStmt = Cil_datatype.Stmt.Map.Make(Inout_type)
+
+module InOutStmtCallback = 
+    State_builder.Option_ref (InOutStmt)
+    (struct
+      let dependencies = [Self.state]
+      let name = "Transfer_stmt.InOutStmtCallback"
+    end)
+
+
 let register_callback () =
-  Eva_dynamic.Inout.register_call_hook InOutCallback.set
+  ignore (Eva_dynamic.Inout.register_call_hook InOutCallback.set);
+  ignore (Eva_dynamic.Inout.register_stmt_hook InOutStmtCallback.set)
 
 let () = Cmdline.run_after_configuring_stage register_callback
 
 let current_kf_inout = InOutCallback.get_option
+
+let current_stmt_inout = InOutStmtCallback.get_option
 
 (* Should we warn about indeterminate copies in the function [kf] ? *)
 let warn_indeterminate kf =

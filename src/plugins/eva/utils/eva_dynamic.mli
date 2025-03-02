@@ -22,10 +22,16 @@
 
 (** Access to other plugins API via {!Dynamic.get}. *)
 
+module InOutStmt: sig 
+  type t = Inout_type.t Cil_datatype.Stmt.Map.t
+end
+
 module Inout: sig
   (** Registers a hook to be called on the inputs/outputs computed by the Inout
       plugin for each function call. *)
   val register_call_hook: (Inout_type.t -> unit) -> unit
+
+  val register_stmt_hook: (InOutStmt.t -> unit) -> unit
 
   (** Returns the memory zone read by the given function (including local
       and formal variables). Returns Top if the inout plugin is missing. *)

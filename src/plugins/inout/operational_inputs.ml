@@ -216,7 +216,13 @@ module Internals =
 module Callsite =
   Datatype.Pair_with_collections (Kernel_function) (Cil_datatype.Kinstr)
     (struct let module_name = "From.Callsite" end)
+
 module CallsiteHash = Callsite.Hashtbl
+
+module InOutStmt =
+  Cil_datatype.Stmt.Map.Make (Inout_type)
+
+let inout_stmt_ref = ref Cil_datatype.Stmt.Map.empty
 
 (* Results of an an entire call, represented by a pair (stmt, kernel_function).
 *)
@@ -460,7 +466,20 @@ module Computer(Fenv:Dataflows.FUNCTION_ENV)(X:sig
       assert (s.succs == []); []
     | Throw _ | TryCatch _ ->
       Inout_parameters.fatal "Exception node in the AST"
-    | UnspecifiedSequence _ | Loop _ | Block _
+    | Loop _ ->
+      let inout = {
+        over_inputs = data.over_inputs_d;
+        over_inputs_if_termination =  data.over_inputs_d;
+        over_logic_inputs = data.over_inputs_d;
+        under_outputs_if_termination = data.over_outputs_d;
+        over_outputs = data.over_outputs_d;
+        over_outputs_if_termination = data.over_outputs_d;
+        over_allocs = data.over_allocs_d;
+      } in
+      let new_map = Cil_datatype.Stmt.Map.add s inout !inout_stmt_ref in
+      let _ = inout_stmt_ref := new_map in
+      map_on_all_succs data
+    | UnspecifiedSequence _ | Block _
     | Goto _ | Break _ | Continue _
     | TryExcept _ | TryFinally _
       -> map_on_all_succs data
@@ -556,6 +575,8 @@ module Callwise = struct
 
   module Record_Inout_Callbacks = Hook.Build (struct type t = Inout_type.t end)
 
+  module Record_InOutStmt_Callbacks = Hook.Build (struct type t = InOutStmt.t end)
+
   let merge_call_in_local_table call local_table v =
     let prev =
       try CallsiteHash.find local_table call
@@ -600,6 +621,7 @@ module Callwise = struct
 
   let end_record callstack kf inout =
     Record_Inout_Callbacks.apply inout;
+    Record_InOutStmt_Callbacks.apply !inout_stmt_ref;
     let callsite = Eva.Callstack.top_callsite callstack in
     match callsite, !call_inout_stack with
     | Kstmt _, (_caller, table) :: _ ->
@@ -740,6 +762,15 @@ module Callwise = struct
       "register_call_hook"
       Datatype.(func (func Inout_type.ty unit) unit)
       Record_Inout_Callbacks.extend_once
+
+  let _register_stmt_hook = 
+    Dynamic.register
+      ~comment:"Registers a function to be applied on the inputs/outputs \
+                computed for each function call for each statement."
+      ~plugin:Inout_parameters.name
+      "register_stmt_hook"
+      Datatype.(func (func InOutStmt.ty unit) unit)
+      Record_InOutStmt_Callbacks.extend_once
 
 end
 
