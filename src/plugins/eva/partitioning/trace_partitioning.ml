@@ -383,6 +383,11 @@ struct
               | Some v -> Domain.join previous_state v
               | None -> previous_state
             in
+            (* let open Cvalue_domain.Getters(Domain) in
+            let prev_model = get_cvalue_or_top prev in
+            let curr_model = get_cvalue_or_top curr in 
+            let _ = 
+              Self.debug ~dkey:Self.dkey_widening "DIFF: %a @." (fun fmt -> Cvalue.Model.pretty_diff fmt curr_model) prev_model in *)
             let next = Domain.widen kf stmt prev (Domain.join prev curr) in
             w.previous_state <- Some next;
             w.widened_state <- Some next;
