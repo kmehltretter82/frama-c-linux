@@ -1327,6 +1327,16 @@ module CacheAllocation=
 let () = add_precision_dep CacheAllocation.parameter
 
 let () = Parameter_customize.set_group malloc
+module ImportAllocatedBase = 
+    Bool
+    (struct
+      let option_name =  "-eva-import-allocated-base"
+      let help = "Import dynamic allocation data in builtins_malloc from saved project"
+      let default = true
+    end)
+  let () = add_precision_dep ImportAllocatedBase.parameter
+
+let () = Parameter_customize.set_group malloc
 module CallstackNoStmt =
   Bool 
     (struct

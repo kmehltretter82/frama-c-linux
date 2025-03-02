@@ -697,13 +697,14 @@ module Make
     (* Gather time wrapped *)
     let list, list', counter =
       load_time_wrapper stat_gather_load_time gather in
-    (* Builtin malloc wrapped *)
+    (* Base for literal strings *)
     let import_base () = 
       Base.import Eva_diff.import_base project
     in
     import_base ();
+    (* Builtin malloc wrapped *)
     let import_builtin_malloc () =
-      if Parameters.CacheAllocation.get ()
+      if Parameters.ImportAllocatedBase.get ()
       then 
       Builtins_malloc.import project
     in

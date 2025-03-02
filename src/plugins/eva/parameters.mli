@@ -151,6 +151,7 @@ module AllocReturnsNull: Parameter_sig.Bool
 module MallocLevel: Parameter_sig.Int
 module CacheAllocation: Parameter_sig.Bool
 module CallstackNoStmt: Parameter_sig.Bool
+module ImportAllocatedBase: Parameter_sig.Bool
 
 (** Meta-option *)
 module Precision: Parameter_sig.Int
