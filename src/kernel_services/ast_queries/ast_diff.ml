@@ -1300,52 +1300,29 @@ and alloc_site_correspondence f f' _env =
         end
       ) call_sites
 
-
-and find_candidate_widening_stmt stmt f floc floc' =
-  let is_candidate stmt stmt' = 
-    let relative_to_kf sloc floc =
-      let sline = (fst sloc).Filepath.pos_lnum in
-      let fline = (fst floc).Filepath.pos_lnum in
-      Int.abs (sline - fline)
-    in
-    let is_close ?(closeness=10) stmt stmt' = 
-      let sloc = Cil_datatype.Stmt.loc stmt in (* Move higher to optmize *)
-      let sloc' = Cil_datatype.Stmt.loc stmt' in
-      Int.abs((relative_to_kf sloc floc) - (relative_to_kf sloc' floc')) <= closeness 
-    in
-    let is_same_type stmt stmt' =
-      match stmt.skind, stmt'.skind with
-      | Loop _, Loop _ -> true
-      | _,_ -> false
-    in
-    is_same_type stmt stmt' && is_close stmt stmt'
-  in
-  let fdec = Kf.get_definition f in
-  let candidates = List.find_all (fun stmt' -> is_candidate stmt stmt') fdec.sallstmts in
-  if List.length candidates = 1 then
-    Some (List.hd candidates)
-  else if List.length candidates > 1 then
-    begin
-      (* Multiple candidates found, failing for safety *)
-      Kernel.warning "Multiple candidates found for loop head %a" Printer.pp_stmt stmt;
-      None
-    end
-  else None
-
-and widening_stmt_correspondence f f' _env =
-  match Project.on (Orig_project.get ()) (!widening_stmts_ref f) ()  with
-  | None -> ()
-  | Some (stmts: stmt list) ->
-    let floc = Kf.get_location f in
-    let floc'= Kf.get_location f' in
-    List.iter (fun stmt -> 
-        match find_candidate_widening_stmt stmt f' floc floc' with
-        | None -> () 
-        | Some stmt' ->
-          begin
-            Stmt.add stmt (`Partial (stmt', `Body_changed))
-          end
-      ) stmts
+and widening_stmt_correspondence kf kf' _env =
+  let f = Kf.get_definition kf in
+  let f' = Kf.get_definition kf' in
+  let filter_loop stmts = List.filter (fun s -> match s.skind with Loop _ -> true | _ -> false) stmts in
+  let sort_loop stmts = List.sort (fun s s' -> 
+    let sloc = fst (Cil_datatype.Stmt.loc s) in
+    let sloc' = fst (Cil_datatype.Stmt.loc s') in
+    sloc.Filepath.pos_lnum - sloc'.Filepath.pos_lnum
+  ) stmts in
+  let stmts' = filter_loop f'.sallstmts in
+  let stmts = filter_loop f.sallstmts in
+  (* Sort loop statements in order of sloc *)
+  let sorted_stmts' = sort_loop stmts' in
+  let sorted_stmt = sort_loop stmts in
+  let rec combine_first list list' =
+  match list, list' with
+  | [], _ -> ()
+  | _, [] -> ()
+  | h::t, h'::t' -> 
+    (* Kernel.warning "Matching old stmt: %a with %a" Printer.pp_stmt h Printer.pp_stmt h'; *)
+    Stmt.add h (`Partial (h', `Body_changed)); 
+    combine_first t t'
+  in combine_first sorted_stmt sorted_stmts'
 
 (* correspondence of formals is supposed to have already been checked,
    and formals mapping to have been put in the local env
