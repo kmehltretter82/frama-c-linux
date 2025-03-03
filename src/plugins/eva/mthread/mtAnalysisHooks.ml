@@ -494,7 +494,7 @@ let hook_thread_creation analysis state : hook_sig = function
     wrap_res (Thread.id eva_thread)
 
   | _ -> MtOptions.fatal "Incorrect mthread binding for thread creation"
-(* By typing, __FRAMAC_THREAD_CREATE must receive at least those
+(* By typing, Frama_C_thread_create must receive at least those
    arguments *)
 
 
@@ -844,25 +844,25 @@ let hook_dummy_message analysis state : hook_sig = function
 let mthread_builtins =
   [
     (* Threads *)
-    "__FRAMAC_THREAD_CREATE", hook_thread_creation, `Pop;
-    "__FRAMAC_THREAD_START", hook_thread_start, `Pop;
-    "__FRAMAC_THREAD_SUSPEND", hook_thread_suspend, `Pop;
-    "__FRAMAC_THREAD_CANCEL", hook_thread_cancellation, `Pop;
-    "__FRAMAC_THREAD_EXIT", hook_thread_exit, `Pop;
-    "__FRAMAC_THREAD_ID", hook_thread_id, `Pop;
-    "__FRAMAC_THREAD_PRIORITY", hook_thread_priority, `Pop;
+    "Frama_C_thread_create", hook_thread_creation, `Pop;
+    "Frama_C_thread_start", hook_thread_start, `Pop;
+    "Frama_C_thread_suspend", hook_thread_suspend, `Pop;
+    "Frama_C_thread_cancel", hook_thread_cancellation, `Pop;
+    "Frama_C_thread_exit", hook_thread_exit, `Pop;
+    "Frama_C_thread_id", hook_thread_id, `Pop;
+    "Frama_C_thread_priority", hook_thread_priority, `Pop;
     (* Mutexes *)
-    "__FRAMAC_MUTEX_INIT", hook_init_mutex, `Pop;
-    "__FRAMAC_MUTEX_LOCK", hook_lock_mutex, `Pop;
-    "__FRAMAC_MUTEX_UNLOCK", hook_release_mutex, `Pop;
+    "Frama_C_mutex_init", hook_init_mutex, `Pop;
+    "Frama_C_mutex_lock", hook_lock_mutex, `Pop;
+    "Frama_C_mutex_unlock", hook_release_mutex, `Pop;
     (* Message queues *)
-    "__FRAMAC_QUEUE_INIT", hook_queue_init, `Pop;
-    "__FRAMAC_MESSAGE_SEND", hook_send_msg, `Pop;
-    "__FRAMAC_MESSAGE_RECEIVE", hook_receive_msg, `Pop;
+    "Frama_C_queue_init", hook_queue_init, `Pop;
+    "Frama_C_queue_send", hook_send_msg, `Pop;
+    "Frama_C_queue_receive", hook_receive_msg, `Pop;
     (* Misc *)
-    "__FRAMAC_MTHREAD_SHOW", hook_dummy_message, `NoPop;
+    "Frama_C_mthread_show", hook_dummy_message, `NoPop;
     (* Shared values *)
-    "__FRAMAC_MTHREAD_SYNC", hook_sync, `Pop;
+    "Frama_C_mthread_sync", hook_sync, `Pop;
   ]
 ;;
 

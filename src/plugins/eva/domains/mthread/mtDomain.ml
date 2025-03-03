@@ -504,14 +504,14 @@ module Domain = struct
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
-  let () = add_builtin "__FRAMAC_THREAD_CREATE" thread_create
-  let () = add_builtin "__FRAMAC_THREAD_START" thread_start
-  let () = add_builtin "__FRAMAC_THREAD_SUSPEND" thread_suspend
-  let () = add_builtin "__FRAMAC_THREAD_CANCEL" thread_cancel
-  let () = add_builtin "__FRAMAC_THREAD_ID" thread_id
-  let () = add_builtin "__FRAMAC_MUTEX_INIT" mutex_init
-  let () = add_builtin "__FRAMAC_MUTEX_LOCK" mutex_lock
-  let () = add_builtin "__FRAMAC_MUTEX_UNLOCK" mutex_unlock
+  let () = add_builtin "Frama_C_thread_create" thread_create
+  let () = add_builtin "Frama_C_thread_start" thread_start
+  let () = add_builtin "Frama_C_thread_suspend" thread_suspend
+  let () = add_builtin "Frama_C_thread_cancel" thread_cancel
+  let () = add_builtin "Frama_C_thread_id" thread_id
+  let () = add_builtin "Frama_C_mutex_init" mutex_init
+  let () = add_builtin "Frama_C_mutex_lock" mutex_lock
+  let () = add_builtin "Frama_C_mutex_unlock" mutex_unlock
 end
 
 let domain =

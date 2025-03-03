@@ -26,7 +26,7 @@ open Cil_types
     framac_mthread.h, with suitable error messages *)
 val mthread_global_var: string -> unit -> varinfo
 
-(** Is this statement a call to the primitive __FRAMAC_MTHREAD_SYNC *)
+(** Is this statement a call to the primitive Frama_C_mthread_sync *)
 val is_call_to_sync: stmt -> bool
 
 

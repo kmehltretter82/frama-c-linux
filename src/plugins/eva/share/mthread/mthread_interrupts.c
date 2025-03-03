@@ -22,26 +22,26 @@
 
 #include "mthread_interrupts.h"
 
-framac_mthread_id __mutex_interrupts;
+__fc_mthread_id __mutex_interrupts;
 
 void __mthread_init_mutex_interrupt() {
-  __mutex_interrupts = __FRAMAC_MUTEX_INIT("INTERRUPT");
+  __mutex_interrupts = Frama_C_mutex_init("INTERRUPT");
 }
 
 int __FRAMAC_MTHREAD_LOCK_LEVEL = 0;
 
 void __mthread_lock_interrupts() {
   if (__FRAMAC_MTHREAD_LOCK_LEVEL++)
-    __FRAMAC_MTHREAD_SHOW("Overlock INTERRUPT");
+    Frama_C_mthread_show("Overlock INTERRUPT");
   else
-    __FRAMAC_MUTEX_LOCK(__mutex_interrupts);
+    Frama_C_mutex_lock(__mutex_interrupts);
 }
 
 void __mthread_unlock_interrupts() {
   if (--__FRAMAC_MTHREAD_LOCK_LEVEL)
-    __FRAMAC_MTHREAD_SHOW("Decreasing INTERRUPT level");
+    Frama_C_mthread_show("Decreasing INTERRUPT level");
   else
-    __FRAMAC_MUTEX_UNLOCK(__mutex_interrupts);
+    Frama_C_mutex_unlock(__mutex_interrupts);
 }
 
 void __mthread_interrupt(void (*f)(void *), void *arg) {

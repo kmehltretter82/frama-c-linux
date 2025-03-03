@@ -23,7 +23,7 @@ void * job0 (void *v) {
 }
 
 void * job1( void * k ) {
-  __FRAMAC_MTHREAD_SYNC(); int x = a+c;
+  Frama_C_mthread_sync(); int x = a+c;
   return NULL;
 }
 

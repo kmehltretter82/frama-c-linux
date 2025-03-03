@@ -220,14 +220,14 @@ class do_it cp =
     method rw_stmt stmt =
       ignore (visitFramacStmt (self :> frama_c_visitor) stmt)
 
-    (* Skip assigns to "__MTHREAD_SHARED" variable, as this variable is
+    (* Skip assigns to "__fc_mthread_shared" variable, as this variable is
        only used to prevent Memexec from caching some functions *)
     method private assigns_not_mthread = function
       | WritesAny -> WritesAny
       | Writes l ->
         let aux (t, _) = match t.it_content.term_node with
           | TLval (TVar { lv_name = name}, _) ->
-            name <> "__FRAMAC_MTHREAD_SHARED"
+            name <> "__fc_mthread_shared"
           | _ -> true
         in
         Writes (List.filter aux l)
@@ -316,7 +316,7 @@ let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
 
 
 let var_thread_created =
-  MtCil.mthread_global_var "__FRAMAC_MTHREAD_THREADS_RUNNING"
+  MtCil.mthread_global_var "__fc_mthread_threads_running"
 
 (* Ad-hoc function that disregards accesses to variables that
    occurs before any thread is created. This simplifies the cfg of threads,

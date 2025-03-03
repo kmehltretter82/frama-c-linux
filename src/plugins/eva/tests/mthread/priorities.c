@@ -17,7 +17,7 @@ pthread_mutex_t  m2;
 int random();
 
 void *f1(void *_) {
-  __FRAMAC_THREAD_PRIORITY(0);
+  Frama_C_thread_priority(0);
   pthread_mutex_lock(&m1);
   int i = s1;
   pthread_mutex_unlock(&m1);
@@ -25,21 +25,21 @@ void *f1(void *_) {
 }
 
 void *f2(void *_) {
-  __FRAMAC_THREAD_PRIORITY(0);
+  Frama_C_thread_priority(0);
   pthread_mutex_lock(&m2);
   pthread_mutex_unlock(&m2);
   return NULL;
 }
 
 void *f3(void *_) {
-  __FRAMAC_THREAD_PRIORITY(0);;
+  Frama_C_thread_priority(0);;
   s2 = 3;
   return NULL;
 }
 
 
 void *f4(void *_) {
-  __FRAMAC_THREAD_PRIORITY(0);
+  Frama_C_thread_priority(0);
   pthread_mutex_lock(&m2);
   s2 = 3;
   pthread_mutex_unlock(&m2);
@@ -56,7 +56,7 @@ int main()
   pthread_create( &jobs3 , NULL, f3, NULL);
   pthread_create( &jobs4 , NULL, f4, NULL);
 
-  __FRAMAC_THREAD_PRIORITY(1);
+  Frama_C_thread_priority(1);
 
   pthread_mutex_lock(&m1);
   pthread_mutex_lock(&m2);

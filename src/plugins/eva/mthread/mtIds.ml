@@ -36,9 +36,9 @@ let pretty_raw_id fmt (idt, offset) =
 
 
 (* YYY cache this per project *)
-let array_threads = MtCil.mthread_global_var "__FRAMAC_MTHREAD_THREADS"
-let array_mutexes = MtCil.mthread_global_var "__FRAMAC_MTHREAD_MUTEXES"
-let array_queues = MtCil.mthread_global_var "__FRAMAC_MTHREAD_QUEUES"
+let array_threads = MtCil.mthread_global_var "__fc_mthread_threads"
+let array_mutexes = MtCil.mthread_global_var "__fc_mthread_mutexes"
+let array_queues = MtCil.mthread_global_var "__fc_mthread_queues"
 
 let array_of_idt = function
   | IdThread -> array_threads ()

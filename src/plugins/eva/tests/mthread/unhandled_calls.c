@@ -37,7 +37,7 @@ void main () {
   if (random ())
     p = &f2;
   else
-    p = &__FRAMAC_QUEUE_INIT;
+    p = &Frama_C_queue_init;
 
   (*p)(&q,1);
 

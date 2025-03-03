@@ -20,77 +20,92 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FRAMAC_MTHREAD
-#define __FRAMAC_MTHREAD
+#ifndef __FC_MTHREAD
+#define __FC_MTHREAD
+#include "features.h"
+__PUSH_FC_STDLIB
+
+__BEGIN_DECLS
 
 #ifndef MTHREAD_NUMBER_IDS
 #define MTHREAD_NUMBER_IDS 32
 #endif
 
-extern int __FRAMAC_MTHREAD_SHARED;
+__FC_EXTERN int __fc_mthread_shared;
 
-int __FRAMAC_MTHREAD_THREADS_RUNNING = 0;
+int __fc_mthread_threads_running = 0;
 
-int __FRAMAC_MTHREAD_THREADS[MTHREAD_NUMBER_IDS];
-int __FRAMAC_MTHREAD_MUTEXES[MTHREAD_NUMBER_IDS];
-int __FRAMAC_MTHREAD_QUEUES[MTHREAD_NUMBER_IDS];
+int __fc_mthread_threads[MTHREAD_NUMBER_IDS];
+int __fc_mthread_mutexes[MTHREAD_NUMBER_IDS];
+int __fc_mthread_queues[MTHREAD_NUMBER_IDS];
 
-typedef void *framac_mthread_name;
+typedef void *__fc_mthread_name;
 
-typedef int framac_mthread_id;
+typedef int __fc_mthread_id;
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-framac_mthread_id __FRAMAC_THREAD_CREATE(framac_mthread_name, void *(*)(), ...);
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-int __FRAMAC_THREAD_START(framac_mthread_id);
+//@ assigns __fc_mthread_shared \from \nothing;
+__fc_mthread_id Frama_C_thread_create(__fc_mthread_name, void *(*)(), ...)
+    __attribute__((FC_BUILTIN));
+//@ assigns __fc_mthread_shared \from \nothing;
+int Frama_C_thread_start(__fc_mthread_id) __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-int __FRAMAC_THREAD_SUSPEND(framac_mthread_id);
+//@ assigns __fc_mthread_shared \from \nothing;
+int Frama_C_thread_suspend(__fc_mthread_id) __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-int __FRAMAC_THREAD_CANCEL(framac_mthread_id);
+//@ assigns __fc_mthread_shared \from \nothing;
+int Frama_C_thread_cancel(__fc_mthread_id) __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-framac_mthread_id __FRAMAC_THREAD_ID(void);
+//@ assigns __fc_mthread_shared \from \nothing;
+__fc_mthread_id Frama_C_thread_id(void) __attribute__((FC_BUILTIN));
 
 /*@ terminates \false;
-  @ assigns __FRAMAC_MTHREAD_SHARED \from \nothing; */
-void __FRAMAC_THREAD_EXIT(void *);
+  @ assigns __fc_mthread_shared \from \nothing; */
+void Frama_C_thread_exit(void *) __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_THREAD_PRIORITY(int p);
+//@ assigns __fc_mthread_shared \from \nothing;
+void Frama_C_thread_priority(int p) __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-framac_mthread_id __FRAMAC_MUTEX_INIT(framac_mthread_name);
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-int __FRAMAC_MUTEX_LOCK(framac_mthread_id);
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-int __FRAMAC_MUTEX_UNLOCK(framac_mthread_id);
+//@ assigns __fc_mthread_shared \from \nothing;
+__fc_mthread_id Frama_C_mutex_init(__fc_mthread_name)
+    __attribute__((FC_BUILTIN));
+//@ assigns __fc_mthread_shared \from \nothing;
+int Frama_C_mutex_lock(__fc_mthread_id) __attribute__((FC_BUILTIN));
+//@ assigns __fc_mthread_shared \from \nothing;
+int Frama_C_mutex_unlock(__fc_mthread_id) __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-framac_mthread_id __FRAMAC_QUEUE_INIT(framac_mthread_name, int);
+//@ assigns __fc_mthread_shared \from \nothing;
+__fc_mthread_id Frama_C_queue_init(__fc_mthread_name, int)
+    __attribute__((FC_BUILTIN));
 
 /*@ requires \valid_read(buf+(0..(size-1)));
-  @ assigns __FRAMAC_MTHREAD_SHARED \from \nothing; */
-int __FRAMAC_MESSAGE_SEND(framac_mthread_id id, const char *buf, int size);
+  @ assigns __fc_mthread_shared \from \nothing; */
+int Frama_C_queue_send(__fc_mthread_id id, const char *buf, int size)
+    __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(buf+(0..(size-1)));
   @ assigns *buf \from \empty;
-  @ assigns __FRAMAC_MTHREAD_SHARED \from \nothing; */
-int __FRAMAC_MESSAGE_RECEIVE(framac_mthread_id, int size, char *buf);
+  @ assigns __fc_mthread_shared \from \nothing; */
+int Frama_C_queue_receive(__fc_mthread_id, int size, char *buf)
+    __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_MTHREAD_SHOW(char const *, ...);
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_MTHREAD_NAME_THREAD(framac_mthread_id, framac_mthread_name);
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_MTHREAD_NAME_MUTEX(framac_mthread_id, framac_mthread_name);
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_MTHREAD_NAME_QUEUE(framac_mthread_id, framac_mthread_name);
+//@ assigns __fc_mthread_shared \from \nothing;
+void Frama_C_mthread_show(char const *, ...) __attribute__((FC_BUILTIN));
+//@ assigns __fc_mthread_shared \from \nothing;
+void Frama_C_mthread_name_thread(__fc_mthread_id, __fc_mthread_name)
+    __attribute__((FC_BUILTIN));
+//@ assigns __fc_mthread_shared \from \nothing;
+void Frama_C_mthread_name_mutex(__fc_mthread_id, __fc_mthread_name)
+    __attribute__((FC_BUILTIN));
+//@ assigns __fc_mthread_shared \from \nothing;
+void Frama_C_mthread_name_queue(__fc_mthread_id, __fc_mthread_name)
+    __attribute__((FC_BUILTIN));
 
-//@ assigns __FRAMAC_MTHREAD_SHARED \from \nothing;
-void __FRAMAC_MTHREAD_SYNC(void);
+//@ assigns __fc_mthread_shared \from \nothing;
+void Frama_C_mthread_sync(void) __attribute__((FC_BUILTIN));
 
-#define __MTHREAD_SYNC(v) (__FRAMAC_MTHREAD_SYNC(), (v))
+#define __MTHREAD_SYNC(v) (Frama_C_mthread_sync(), (v))
 
-#endif
+__END_DECLS
+
+__POP_FC_STDLIB
+#endif // __FC_MTHREAD

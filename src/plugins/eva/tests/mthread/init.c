@@ -14,7 +14,7 @@ char (*names[2*N]) = { "mu1", "mu2", "mu3", "mu4", "mu5", "mu6" };
 
 
 int mutex_init(void* mname) {
-  return __FRAMAC_MUTEX_INIT(mname);
+  return Frama_C_mutex_init(mname);
 }
 
 void main() {
@@ -29,7 +29,7 @@ void main() {
   /*@ loop unfold N; */
   for(i=0;i<N;i++) {
     int m = mutex_init(NULL);
-    __FRAMAC_MTHREAD_NAME_MUTEX(m, names[i+3]);
+    Frama_C_mthread_name_mutex(m, names[i+3]);
   }
 
   // We really need to unroll the loop
