@@ -526,9 +526,9 @@ let register_malloc ?replace name ?returns_null prefix region cacheable =
 
 let () =
   register_malloc ~replace:"malloc" "malloc" "malloc" Base.Malloc Eval.MallocedCall;
-  register_malloc ~replace:"__fc_vla_alloc" "vla_alloc" "malloc" Base.VLA Eval.NoCacheCallers
+  register_malloc ~replace:"__fc_vla_alloc" "vla_alloc" "malloc" Base.VLA Eval.MallocedCall
     ~returns_null:false;
-  register_malloc ~replace:"alloca" "alloca" "alloca" Base.Alloca Eval.NoCacheCallers
+  register_malloc ~replace:"alloca" "alloca" "alloca" Base.Alloca Eval.MallocedCall
     ~returns_null:false
 
 (* --------------------------------- Calloc --------------------------------- *)
@@ -579,7 +579,7 @@ let () =
     let sizeof_typ = Cil.theMachine.Cil.typeOfSizeOf in
     Cil.voidPtrType, [ sizeof_typ; sizeof_typ ]
   in
-  Builtins.register_builtin ~replace name NoCacheCallers calloc_builtin ~typ
+  Builtins.register_builtin ~replace name MallocedCall calloc_builtin ~typ
 
 (* ---------------------------------- Free ---------------------------------- *)
 
@@ -870,7 +870,7 @@ let () =
   let name = "Frama_C_realloc" in
   let replace = "realloc" in
   let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
-  Builtins.register_builtin ~replace name NoCacheCallers realloc_builtin ~typ
+  Builtins.register_builtin ~replace name MallocedCall realloc_builtin ~typ
 
 let reallocarray_builtin state args =
   let ptr, nmemb, sizev =
@@ -907,7 +907,7 @@ let () =
          [voidPtrType; theMachine.typeOfSizeOf; theMachine.typeOfSizeOf])
   in
   Builtins.register_builtin
-    ~replace name NoCacheCallers reallocarray_builtin ~typ
+    ~replace name MallocedCall reallocarray_builtin ~typ
 
 (* ----------------------------- Leak detection ----------------------------- *)
 
