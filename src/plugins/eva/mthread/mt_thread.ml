@@ -21,9 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
-open MtTypes
-open MtSharedVarsTypes
-open MtCfgTypes
+open Mt_types
+open Mt_shared_vars_types
+open Mt_cfg_types
 
 (* -------------------------------------------------------------------------- *)
 (* --- Threads                                                            --- *)
@@ -58,7 +58,7 @@ module RecomputeReason = struct
       | PotentialSharedVarsChanged | InitialArgsChanged | InitialEnvChanged
       | InterferencesChanged),
       _ ->
-      MtLib.compare_tag r1 r2
+      Mt_lib.compare_tag r1 r2
 
   let pretty fmt = function
     | FirstIteration -> Format.fprintf fmt "first@ iteration"
@@ -85,7 +85,7 @@ type priority = PDefault | PUnknown | PPriority of int
 
 module Priority = Datatype.Make_with_collections(struct
     type t = priority
-    let name = "MtThread.priority"
+    let name = "Mt_thread.priority"
     let reprs = [PPriority 0; PDefault; PUnknown]
 
     include Datatype.Undefined
@@ -108,7 +108,7 @@ type thread_state = {
   mutable th_read_written: AccessesByZone.map;
   mutable th_cfg: CfgNode.t;
   mutable th_read_written_cfg: AccessesByZoneNode.map;
-  mutable th_values_written: MtMemory.Types.state;
+  mutable th_values_written: Mt_memory.Types.state;
   mutable th_projects: Project.t list;
   mutable th_value_results: Eva_results.results option;
   mutable th_priority: priority;
@@ -258,7 +258,7 @@ let threads analysis =
 
 let thread_state analysis th =
   try Thread.Hashtbl.find analysis.all_threads th
-  with Not_found -> MtOptions.fatal "Unknown thread %a" Thread.pretty th
+  with Not_found -> Mt_options.fatal "Unknown thread %a" Thread.pretty th
 
 let fold_threads analysis v f =
   List.fold_left (fun acc th -> f th acc) v (threads analysis)
@@ -271,12 +271,12 @@ let current_fun analysis = Callstack.top_kf analysis.curr_stack
 
 let curr_events analysis =
   match analysis.curr_events_stack with
-  | [] -> MtOptions.fatal "Invalid analysis stack"
+  | [] -> Mt_options.fatal "Invalid analysis stack"
   | h :: _ -> h
 
 let on_current_trace analysis f =
   match analysis.curr_events_stack with
-  | [] -> MtOptions.fatal "Invalid analysis stack"
+  | [] -> Mt_options.fatal "Invalid analysis stack"
   | h :: q ->
     analysis.curr_events_stack <- f h q :: q
 
@@ -293,7 +293,7 @@ let register_multiple_events analysis evts =
 
 (* Store the memory state for the function which we finished analyzing *)
 let register_memory_states analysis ~before ~after =
-  MtOptions.debug ~level:2 "Recording states for %a"
+  Mt_options.debug ~level:2 "Recording states for %a"
     Kernel_function.pretty (current_fun analysis);
   on_current_trace analysis (fun cur _ ->  Trace.add_states cur ~before ~after);
 ;;
@@ -309,7 +309,7 @@ let pop_function_call analysis =
     on_current_trace analysis (fun cur _ -> Trace.add_prefix top cur);
   | _ :: _ ->
     match analysis.curr_events_stack with
-    | [] | [_] -> MtOptions.fatal "Invalid analysis stack when popping calling"
+    | [] | [_] -> Mt_options.fatal "Invalid analysis stack when popping calling"
     | trace_callee :: trace_caller :: q ->
       let trace_callee' = Trace.add_prefix top trace_callee in
       let new_trace = Trace.union trace_caller trace_callee' in
@@ -394,7 +394,7 @@ end
 let should_compute_thread th =
   (Thread.is_main th.th_eva_thread) ||
   (let name = ThreadState.label th in
-   (not (Datatype.String.Set.mem name (MtOptions.SkipThreads.get ()))) &&
-   let only = MtOptions.OnlyThreads.get () in
+   (not (Datatype.String.Set.mem name (Mt_options.SkipThreads.get ()))) &&
+   let only = Mt_options.OnlyThreads.get () in
    Datatype.String.Set.is_empty only || Datatype.String.Set.mem name only
   )

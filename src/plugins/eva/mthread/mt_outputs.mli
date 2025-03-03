@@ -24,10 +24,10 @@
 
 (** {2 Summary of the analysis in HTML format} *)
 module Html : sig
-  val output_threads : MtThread.analysis_state -> unit ;;
+  val output_threads : Mt_thread.analysis_state -> unit ;;
 end
 
 (** {2 Superposes the results of Value in the analysis project} *)
 module Eva_results : sig
-  val display: MtThread.analysis_state -> unit ;;
+  val display: Mt_thread.analysis_state -> unit ;;
 end

@@ -35,19 +35,19 @@ sig
   val all_zones_accessed : list_accesses -> Locations.Zone.t
 
   val concurrent_accesses_all_threads :
-    MtThread.ThreadState.t list ->
+    Mt_thread.ThreadState.t list ->
     (list_accesses * list_accesses) * ZoneMap.map
 end
 
 module Global : Computer
-  with module Access = MtSharedVarsTypes.StmtIdAccess
-   and module Set = MtSharedVarsTypes.SetStmtIdAccess
+  with module Access = Mt_shared_vars_types.StmtIdAccess
+   and module Set = Mt_shared_vars_types.SetStmtIdAccess
 
 module Precise :
 sig
   include Computer
-    with module Access = MtCfgTypes.NodeIdAccess
-     and module Set = MtCfgTypes.SetNodeIdAccess
+    with module Access = Mt_cfg_types.NodeIdAccess
+     and module Set = Mt_cfg_types.SetNodeIdAccess
 
   val display_shared_vars_value : ZoneMap.map -> unit
   val enumerate_written_vars_value :
@@ -56,7 +56,7 @@ sig
   val join_shared_values :
     ('a * Base.t * Cvalue.Model.offsetmap) list -> Cvalue.Model.t
   val remove_non_concur_zones_from_cfg :
-    Locations.Zone.t -> MtCfgTypes.CfgNode.t -> unit
+    Locations.Zone.t -> Mt_cfg_types.CfgNode.t -> unit
   val mark_concur_access_in_cfg :
     ('a * Set.t) list -> unit
 end
@@ -65,19 +65,19 @@ end
 val read_written_by_function :
   (Cil_types.stmt -> bool) ->
   Thread.t ->
-  MtMemory.Types.state_accesser ->
+  Mt_memory.Types.state_accesser ->
   ?watch_only:Locations.Zone.t ->
   Kernel_function.Hptset.elt ->
-  Cil_types.kinstr -> MtSharedVarsTypes.AccessesByZone.map
+  Cil_types.kinstr -> Mt_shared_vars_types.AccessesByZone.map
 
 val register_concurrent_var_accesses :
-  MtThread.analysis_state ->
-  [< `Final of MtMemory.Types.functions_states
-  | `Leaf of MtMemory.Types.state ] ->
+  Mt_thread.analysis_state ->
+  [< `Final of Mt_memory.Types.functions_states
+  | `Leaf of Mt_memory.Types.state ] ->
   unit
 
 val stmt_is_multithreaded :
-  MtThread.analysis_state ->
-  MtMemory.Types.state_accesser -> Cil_types.stmt -> bool
+  Mt_thread.analysis_state ->
+  Mt_memory.Types.state_accesser -> Cil_types.stmt -> bool
 
 val var_thread_created : unit -> Cil_types.varinfo

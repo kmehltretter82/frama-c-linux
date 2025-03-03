@@ -23,12 +23,12 @@
 open Cil_types
 open Visitor
 open Locations
-open MtCil
-open MtMemory.Types
-open MtTypes
-open MtSharedVarsTypes
-open MtCfgTypes
-open MtThread
+open Mt_cil
+open Mt_memory.Types
+open Mt_types
+open Mt_shared_vars_types
+open Mt_cfg_types
+open Mt_thread
 
 (* -------------------------------------------------------------------------- *)
 (* --- Collecting accesses to variables                                   --- *)
@@ -52,9 +52,9 @@ let is_model_base b =
 
 let keep_base b =
   not (Base.is_any_formal_or_local b ||
-       MtMemory.is_frama_c_base b ||
+       Mt_memory.is_frama_c_base b ||
        is_model_base b ||
-       (MtOptions.IgnoreNull.get () && Base.(equal b null))
+       (Mt_options.IgnoreNull.get () && Base.(equal b null))
       )
 
 
@@ -118,14 +118,14 @@ class do_it cp =
           | AccessesByZone.Top -> assert false (* Top is checked above *)
           | AccessesByZone.Map m -> result <- m
       ) else
-        MtOptions.error ~current:true ~once:true
+        Mt_options.error ~current:true ~once:true
           "@[%a@ of@ the@ whole@ memory.@ Ignoring@ to@ allow@ Mthread@ to@ \
            continue,@ but@ the@ analysis@ will@ not@ be@ correct.@]"
           RW.pretty op
 
     method private cur_stmt =
       match super#current_stmt with
-      | None -> MtOptions.abort "visiting without current statement"
+      | None -> Mt_options.abort "visiting without current statement"
       | Some s -> s
 
     method! vstmt_aux s =
@@ -153,7 +153,7 @@ class do_it cp =
            self#add_access Read deps;
            let loc = Results.(eval_address lv request |> as_location) in
            if Location_Bits.(equal loc.loc top) then
-             MtOptions.warning ~current:true ~once:true
+             Mt_options.warning ~current:true ~once:true
                "Problem with %a: its writing location is completely unknown."
                Printer.pp_lval lv;
            let loc = remove_uninteresting_variables_loc loc in
@@ -253,7 +253,7 @@ class do_it cp =
                let z = Locations.(enumerate_valid_bits Write loc) in
                self#add_access (Write loc) z
              with Logic_to_c.No_conversion ->
-               MtOptions.warning ~once:true
+               Mt_options.warning ~once:true
                  "unsupported@ assigns@ clause@ for@ function %a;@ Ignoring it."
                  Kernel_function.pretty kf;
            in
@@ -316,7 +316,7 @@ let read_written_by_function sm th sa ?(watch_only=Locations.Zone.top) kf ki =
 
 
 let var_thread_created =
-  MtCil.mthread_global_var "__fc_mthread_threads_running"
+  Mt_cil.mthread_global_var "__fc_mthread_threads_running"
 
 (* Ad-hoc function that disregards accesses to variables that
    occurs before any thread is created. This simplifies the cfg of threads,
@@ -331,7 +331,7 @@ let stmt_is_multithreaded analysis sa =
        try
          iter_requests stmt (fun request ->
              let value = Results.(eval_var v request |> as_cvalue) in
-             match MtMemory.extract_int value with
+             match Mt_memory.extract_int value with
              | `Success 0 -> ()
              | _ -> raise Stmt_is_multithreaded
            );
@@ -360,7 +360,7 @@ sig
   val all_zones_accessed : list_accesses -> Locations.Zone.t
 
   val concurrent_accesses_all_threads :
-    MtThread.ThreadState.t list ->
+    Mt_thread.ThreadState.t list ->
     (list_accesses * list_accesses) * ZoneMap.map
 end
 
@@ -457,17 +457,17 @@ struct
     X.Set.fold
       (fun o1 acc -> X.Set.fold
           (fun o2 s ->
-             MtOptions.debug ~level:2
+             Mt_options.debug ~level:2
                "@[<hov>Possible concurrent accesss@ %a@ and %a@]"
                X.Access.pretty o1 X.Access.pretty o2;
              let is_concurrent = consider o1 o2 in
              if is_concurrent then (
-               MtOptions.debug ~level:2 "@[Above access is concurrent@]";
+               Mt_options.debug ~level:2 "@[Above access is concurrent@]";
                X.Set.join s
                  (X.Set.join (X.Set.inject_singleton o1)
                     (X.Set.inject_singleton o2))
              ) else (
-               MtOptions.debug ~level:2 "@[Above access is not concurrent@]";
+               Mt_options.debug ~level:2 "@[Above access is not concurrent@]";
                s)
           ) s2 acc
       ) s1 X.Set.bottom
@@ -478,13 +478,13 @@ struct
      removing those that are not really concurrent (using
      [concurrent_accesses_sets] above) *)
   let concurrent_accesses_two_threads th1 th2 =
-    MtOptions.debug ~level:2 "Concurrent accessses in threads %a and %a"
+    Mt_options.debug ~level:2 "Concurrent accessses in threads %a and %a"
       ThreadState.pretty th1 ThreadState.pretty th2;
     let consider = consider_vars_accesses th1 th2 in
     (* not a global cache: we have a dependency on [Thread.one_creates_other],
        which is not a pure function. *)
     let cache =
-      Hptmap_sig.TemporaryCache "MtSharedVars.concurrent_accesses_two_threads"
+      Hptmap_sig.TemporaryCache "Mt_shared_vars.concurrent_accesses_two_threads"
     in
     (* NOT [empty_neutral]: this operation is akin to an intersection. *)
     let empty_neutral = false in
@@ -503,7 +503,7 @@ struct
   (* Basic union of two sets accesses to the same variable. We simply
      merge the sets *)
   let basic_merge_events =
-    let cache = Hptmap_sig.PersistentCache "MtSharedVars.basic_merge_events" in
+    let cache = Hptmap_sig.PersistentCache "Mt_shared_vars.basic_merge_events" in
     let empty_neutral = true in
     let idempotent = true in
     let symmetric = true in
@@ -550,7 +550,7 @@ struct
          | true, false -> (* not a race condition *) acc
          | false, true ->
            (* write/write race *)
-           if MtOptions.WriteWriteRaces.get ()
+           if Mt_options.WriteWriteRaces.get ()
            then (z, s) :: write_write_races, read_write_races
            else acc
          | true, true -> (* read/write race *)
@@ -620,9 +620,9 @@ module Precise = struct
   let extract_shared_value node op loc state =
     match loc.size with
     | Int_Base.Top ->
-      MtOptions.warning ?source:(CfgNode.node_first_loc node)
+      Mt_options.warning ?source:(CfgNode.node_first_loc node)
         "Ignoring imprecise %a at %a"
-        MtTypes.RW.pretty op Locations.pretty loc;
+        Mt_types.RW.pretty op Locations.pretty loc;
       []
     | Int_Base.Value size ->
       Location_Bits.fold_topset_ok
@@ -648,13 +648,13 @@ module Precise = struct
 
   let pp_stack fmt node =
     Format.fprintf fmt "@ // %a" CfgNode.pretty_stmts node;
-    if MtOptions.DumpSharedVarsValues.get () > 1 then
+    if Mt_options.DumpSharedVarsValues.get () > 1 then
       Format.fprintf fmt "@ %a" Callstack.pretty node.cfgn_stack
 
   let pp_access (op, node, th) base offsm =
-    if MtOptions.DumpSharedVarsValues.get () > 0 then
-      MtOptions.result ~once:true "@[%a %as @ @[%a%a@]@ %a@]"
-        Thread.pretty th MtTypes.RW.pretty op Base.pretty base
+    if Mt_options.DumpSharedVarsValues.get () > 0 then
+      Mt_options.result ~once:true "@[%a %as @ @[%a%a@]@ %a@]"
+        Thread.pretty th Mt_types.RW.pretty op Base.pretty base
         (Cvalue.V_Offsetmap.pretty_generic ?typ:(Base.typeof base) ()) offsm
         pp_stack node
 
@@ -709,7 +709,7 @@ module Precise = struct
       try
         let offsm' = Cvalue.Model.find_base base m in
         match offsm' with
-        | `Top -> MtOptions.fatal "Top state"
+        | `Top -> Mt_options.fatal "Top state"
         | `Bottom -> m (* base invalid. Probably impossible case *)
         | `Value offsm' ->
           let join = Cvalue.V_Offsetmap.join offsm offsm' in
@@ -787,6 +787,6 @@ let register_concurrent_var_accesses analysis states =
        SetStmtIdAccess.iter
          (fun (rw, stmt, _id) ->
             let top = Stack.access_to_var stmt in
-            MtThread.register_event analysis ~top (VarAccess (rw, z))
+            Mt_thread.register_event analysis ~top (VarAccess (rw, z))
          ) set
     ) accesses ()

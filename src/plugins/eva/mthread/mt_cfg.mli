@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtCfgTypes
-open MtThread
+open Mt_cfg_types
+open Mt_thread
 
 
 val make_cfg: thread_state -> cfg

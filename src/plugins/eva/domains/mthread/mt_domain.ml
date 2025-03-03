@@ -21,7 +21,7 @@
 (**************************************************************************)
 
 open Eval
-open MtUtils
+open Mt_utils
 open Eva_ast
 open Locations
 open Concurency
@@ -89,24 +89,24 @@ type return = { standard : Value.t }
 
 module State = struct
   type state =
-    { threads : MtThread.Register.t
-    ; mutexes : MtMutex.Register.t
+    { threads : Mt_thread.Register.t
+    ; mutexes : Mt_mutex.Register.t
     ; memory  : memory
     ; return  : return
     ; results : BuiltinsResults.t
     }
 
   let default =
-    { threads = MtThread.Register.empty
-    ; mutexes = MtMutex.Register.empty
+    { threads = Mt_thread.Register.empty
+    ; mutexes = Mt_mutex.Register.empty
     ; memory  = Zone.{ read = bottom ; written = bottom }
     ; return  = Value.{ standard = bottom }
     ; results = BuiltinsResults.empty
     }
 
   let top =
-    { threads = MtThread.Register.top
-    ; mutexes = MtMutex.Register.top
+    { threads = Mt_thread.Register.top
+    ; mutexes = Mt_mutex.Register.top
     ; memory  = Zone.{ read = top ; written = top }
     ; return  = Value.{ standard = top }
     ; results = BuiltinsResults.top
@@ -118,8 +118,8 @@ module State = struct
       let reprs = [ default ; top ]
 
       let copy state =
-        let threads  = MtThread.Register.copy state.threads in
-        let mutexes  = MtMutex.Register.copy state.mutexes in
+        let threads  = Mt_thread.Register.copy state.threads in
+        let mutexes  = Mt_mutex.Register.copy state.mutexes in
         let written  = Zone.copy state.memory.written in
         let read     = Zone.copy state.memory.read in
         let memory   = { read ; written } in
@@ -130,8 +130,8 @@ module State = struct
 
       let structural_descr =
         let open Structural_descr in
-        let ths = MtThread.Register.packed_descr in
-        let mxs = MtMutex.Register.packed_descr in
+        let ths = Mt_thread.Register.packed_descr in
+        let mxs = Mt_mutex.Register.packed_descr in
         let mem = pack (t_record Zone.[| packed_descr ; packed_descr |]) in
         let ret = pack (t_record Value.[| packed_descr |]) in
         let results = BuiltinsResults.packed_descr in
@@ -139,9 +139,9 @@ module State = struct
 
       let pretty fmt state =
         Format.fprintf fmt "Threads :@.  @[<v>%a@]@."
-          MtThread.Register.pretty state.threads ;
+          Mt_thread.Register.pretty state.threads ;
         Format.fprintf fmt "Mutexes :@.  @[<v>%a@]@."
-          MtMutex.Register.pretty state.mutexes ;
+          Mt_mutex.Register.pretty state.mutexes ;
         Format.fprintf fmt "Memory  :@.  Read    : %a@.  Written : %a@."
           Zone.pretty state.memory.read Zone.pretty state.memory.written ;
         Format.fprintf fmt "Return  :@.  Standard : %a@."
@@ -156,8 +156,8 @@ module State = struct
         compare l.standard r.standard
 
       let compare l r =
-        MtThread.Register.compare l.threads r.threads
-        <?> lazy (MtMutex.Register.compare l.mutexes r.mutexes)
+        Mt_thread.Register.compare l.threads r.threads
+        <?> lazy (Mt_mutex.Register.compare l.mutexes r.mutexes)
         <?> lazy (compare_memory l.memory r.memory)
         <?> lazy (compare_return l.return r.return)
         <?> lazy (BuiltinsResults.compare l.results r.results)
@@ -172,8 +172,8 @@ module State = struct
 
       let hash t =
         Hashtbl.hash (
-          MtThread.Register.hash t.threads,
-          MtMutex.Register.hash t.mutexes,
+          Mt_thread.Register.hash t.threads,
+          Mt_mutex.Register.hash t.mutexes,
           hash_memory t.memory,
           hash_return t.return,
           BuiltinsResults.hash t.results)
@@ -201,16 +201,16 @@ module Datatype_with_Lattice = struct
   include State
 
   let is_included l r =
-    MtThread.Register.is_included l.threads r.threads
-    && MtMutex.Register.is_included l.mutexes r.mutexes
+    Mt_thread.Register.is_included l.threads r.threads
+    && Mt_mutex.Register.is_included l.mutexes r.mutexes
     && Zone.is_included l.memory.read r.memory.read
     && Zone.is_included l.memory.written r.memory.written
     && Value.is_included l.return.standard r.return.standard
     && BuiltinsResults.is_included l.results r.results
 
   let join l r =
-    let threads = MtThread.Register.join l.threads r.threads in
-    let mutexes = MtMutex.Register.join l.mutexes r.mutexes in
+    let threads = Mt_thread.Register.join l.threads r.threads in
+    let mutexes = Mt_mutex.Register.join l.mutexes r.mutexes in
     let read = Zone.join l.memory.read r.memory.read in
     let written = Zone.join l.memory.written r.memory.written in
     let memory = { read ; written } in
@@ -220,8 +220,8 @@ module Datatype_with_Lattice = struct
     { threads ; mutexes ; memory ; return ; results }
 
   let widen _ _ pre post =
-    let threads = MtThread.Register.join pre.threads post.threads in
-    let mutexes = MtMutex.Register.join pre.mutexes post.mutexes in
+    let threads = Mt_thread.Register.join pre.threads post.threads in
+    let mutexes = Mt_mutex.Register.join pre.mutexes post.mutexes in
     let read = Locations.Zone.join pre.memory.read post.memory.read in
     let written = Locations.Zone.join pre.memory.written post.memory.written in
     let memory = { read ; written } in
@@ -232,8 +232,8 @@ module Datatype_with_Lattice = struct
 
   let narrow l r =
     let open Lattice_bounds.Bottom.Operators in
-    let threads = MtThread.Register.narrow l.threads r.threads in
-    let mutexes = MtMutex.Register.narrow l.mutexes r.mutexes in
+    let threads = Mt_thread.Register.narrow l.threads r.threads in
+    let mutexes = Mt_mutex.Register.narrow l.mutexes r.mutexes in
     let read = Zone.narrow l.memory.read r.memory.read in
     let written = Zone.narrow l.memory.written r.memory.written in
     let memory = { read ; written } in
@@ -252,8 +252,8 @@ module Cache = struct
   let copy () = copy cache
   let reset () = reset cache
   let merge l r =
-    let threads = MtThread.Register.narrow l.threads r.threads in
-    let mutexes = MtMutex.Register.narrow l.mutexes r.mutexes in
+    let threads = Mt_thread.Register.narrow l.threads r.threads in
+    let mutexes = Mt_mutex.Register.narrow l.mutexes r.mutexes in
     let read = Zone.join l.memory.read r.memory.read in
     let written = Zone.join l.memory.written r.memory.written in
     let memory = { read ; written } in
@@ -335,7 +335,7 @@ module Transfer = struct
     { read ; written }
 
   let assign_return lval result return =
-    let main_return = MtThread.return_lval (Thread.current ()) in
+    let main_return = Mt_thread.return_lval (Thread.current ()) in
     if Option.equal Eva_ast.Lval.equal main_return (Some lval) then
       let bottom = Value.{ standard = bottom } in
       let f value = { standard = value } in
@@ -407,8 +407,8 @@ module Domain = struct
   let register_and_start_thread thread state =
     let open Result.Operators in
     let threads = state.threads in
-    let* (threads, r) = MtThread.Register.register [thread] threads in
-    let+ (threads, _) = MtThread.Register.start r threads in
+    let* (threads, r) = Mt_thread.Register.register [thread] threads in
+    let+ (threads, _) = Mt_thread.Register.start r threads in
     { state with threads }
 
   let create_main_thread state =
@@ -461,7 +461,7 @@ module Domain = struct
       let args = List.map fst args in
       let aloc = (stmt, Eva_utils.current_call_stack ()) in
       let th_list = Thread.spawn aloc name func args in
-      let+ threads, return = MtThread.Register.register th_list state.threads in
+      let+ threads, return = Mt_thread.Register.register th_list state.threads in
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."
 
@@ -472,9 +472,9 @@ module Domain = struct
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."
 
-  let thread_start   = thread_update MtThread.Register.start
-  let thread_suspend = thread_update MtThread.Register.suspend
-  let thread_cancel  = thread_update MtThread.Register.cancel
+  let thread_start   = thread_update Mt_thread.Register.start
+  let thread_suspend = thread_update Mt_thread.Register.suspend
+  let thread_cancel  = thread_update Mt_thread.Register.cancel
 
   let thread_id state _ = function
     | [] -> Result.ok (state, Thread.current () |> Thread.id |> Value.of_int)
@@ -486,21 +486,21 @@ module Domain = struct
       let name = Name.of_cvalue name in
       let aloc = (stmt, Eva_utils.current_call_stack ()) in
       let mutex = Mutex.create aloc name in
-      let+ (mutexes, return) = MtMutex.Register.register [mutex] state.mutexes in
+      let+ (mutexes, return) = Mt_mutex.Register.register [mutex] state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
   let mutex_lock state _ = function
     | (id, _) :: [] ->
       let open Result.Operators in
-      let+ (mutexes, return) = MtMutex.Register.lock id state.mutexes in
+      let+ (mutexes, return) = Mt_mutex.Register.lock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 
   let mutex_unlock state _ = function
     | (id, _) :: [] ->
       let open Result.Operators in
-      let+ (mutexes, return) = MtMutex.Register.unlock id state.mutexes in
+      let+ (mutexes, return) = Mt_mutex.Register.unlock id state.mutexes in
       { state with mutexes }, return
     | _ -> Result.error "Invalid parameters@."
 

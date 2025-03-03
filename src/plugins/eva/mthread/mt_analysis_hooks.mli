@@ -20,8 +20,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtMemory.Types
-open MtThread
+open Mt_memory.Types
+open Mt_thread
 
 (** A correct value for the main thread *)
 val main_thread: Cil_types.kernel_function -> state -> thread_state

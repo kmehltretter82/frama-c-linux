@@ -21,10 +21,10 @@
 (**************************************************************************)
 
 open Cil_types
-open MtTypes
-open MtThread
-open MtCfgTypes
-open MtMutexesTypes
+open Mt_types
+open Mt_thread
+open Mt_cfg_types
+open Mt_mutexes_types
 
 (* -------------------------------------------------------------------------- *)
 (* --- Checking that concurrent variables accesses are properly protected --- *)
@@ -51,10 +51,10 @@ let mutexes_protecting_zones' accesses =
   in z
 
 
-(* Pretty a value of type [MtSharedVars.Precise.list_accesses]
+(* Pretty a value of type [Mt_shared_vars.Precise.list_accesses]
    with the mutex information at each node concatenated to the output *)
 let pretty_with_mutexes =
-  MtSharedVars.Precise.pretty_concurrent_accesses
+  Mt_shared_vars.Precise.pretty_concurrent_accesses
     ~f:(fun fmt (_, node, _) ->
         let mutexes = node.cfgn_context.locked_mutexes in
         if MutexPresence.is_empty mutexes then
@@ -62,7 +62,7 @@ let pretty_with_mutexes =
         else
           Format.fprintf fmt ",@ @[<hov>protected by %a@]"
             MutexPresence.pretty mutexes ;
-        if MtOptions.PrintCallstacks.get ()
+        if Mt_options.PrintCallstacks.get ()
         then Format.fprintf fmt ",@ // %a" Callstack.pretty node.cfgn_stack
       ) ();
 ;;
@@ -89,7 +89,7 @@ let pretty_zone_protection fmt (z, l) =
     Locations.Zone.pretty z
     (Pretty_utils.pp_list ~pre:"" ~suf:"" pretty_protection_per_thread) l
 
-let check_protection analysis (l: MtSharedVars.Precise.list_accesses) : zone_protection =
+let check_protection analysis (l: Mt_shared_vars.Precise.list_accesses) : zone_protection =
   let aux (z, s) =
     let m_read = ref Thread.Map.empty in
     let m_write = ref Thread.Map.empty in
@@ -111,8 +111,8 @@ let check_protection analysis (l: MtSharedVars.Precise.list_accesses) : zone_pro
     SetNodeIdAccess.iter aux_nodes s;
     let classify_access th_read read th_write write classified =
       if not (Thread.equal th_read th_write) then begin
-        let th_read_state = MtThread.thread_state analysis th_read in
-        let th_write_state = MtThread.thread_state analysis th_write in
+        let th_read_state = Mt_thread.thread_state analysis th_read in
+        let th_write_state = Mt_thread.thread_state analysis th_write in
         let protection =
           match th_read_state.th_priority, th_write_state.th_priority with
           | PPriority p1, PPriority p2 when p1 > p2 ->
@@ -143,7 +143,7 @@ let pretty_protections fmt l =
   Pretty_utils.pp_list
     ~pre:"@[<v>" ~suf:"@]" ~sep:"@ " pretty_zone_protection fmt l
 
-let ill_protected (accesses: MtSharedVars.Precise.list_accesses) (protections: zone_protection) =
+let ill_protected (accesses: Mt_shared_vars.Precise.list_accesses) (protections: zone_protection) =
   let res = Cil_datatype.Stmt.Hashtbl.create 16 in
   let aux (z, nodes) (z', protections) =
     assert (z == z');
@@ -174,7 +174,7 @@ let need_sync stmtsh =
   let aux stmt z acc =
     (* YYY: detection should be improved to handle unspecified sequences. *)
     match stmt.preds with
-    | [stmt] when MtCil.is_call_to_sync stmt -> acc
+    | [stmt] when Mt_cil.is_call_to_sync stmt -> acc
     | _ -> (stmt, z) :: acc
   in
   Cil_datatype.Stmt.Hashtbl.fold aux stmtsh []

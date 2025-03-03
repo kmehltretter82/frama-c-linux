@@ -21,11 +21,11 @@
 (**************************************************************************)
 
 open Cil_types
-open MtMemory.Types
-open MtCil
-open MtTypes
-open MtSharedVarsTypes
-open MtCfgTypes
+open Mt_memory.Types
+open Mt_cil
+open Mt_types
+open Mt_shared_vars_types
+open Mt_cfg_types
 
 
 type recompute_reason =
@@ -86,7 +86,7 @@ type thread_state = {
 (** Globals read and written by the thread, and at which node
     in the cfg*);
 
-  mutable th_values_written: MtMemory.Types.state
+  mutable th_values_written: Mt_memory.Types.state
 (** Join of all the values written by this thread in shared locations.
     Currently not contextual *);
 

@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+open Mt_utils
 
 type value = Cvalue.V.t
 type thread = Thread.t
@@ -33,7 +33,7 @@ let return_lval thread =
 module Thread =
 struct
   include Thread
-  let name = "MtThread.Thread"
+  let name = "Mt_thread.Thread"
   let key_name = "thread"
   let of_value x =
     let open Result.Operators in
@@ -94,7 +94,7 @@ end
 
 
 module Register = struct
-  include MtRegister.Make (Thread) (Status)
+  include Mt_register.Make (Thread) (Status)
 
   let change_running running msg =
     let new_status status = { status with running } in

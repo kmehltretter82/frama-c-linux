@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtThread
+open Mt_thread
 
 (* Mthread registers once and for all a few callbacks inside the value
    analysis. Depending on whether the plugin is active and the mthread analysis
@@ -45,7 +45,7 @@ let hook_builtins =
     let nop st _args = st, None in
 
     (* We create a reference for each of our builtin functions *)
-    let lref = List.map (fun e -> (ref nop, e)) MtAnalysisHooks.mthread_builtins in
+    let lref = List.map (fun e -> (ref nop, e)) Mt_analysis_hooks.mthread_builtins in
 
     (* We register one hook by function, that simply dereferences the
        corresponding reference (up to some interface conversion) *)
@@ -56,8 +56,8 @@ let hook_builtins =
           (fun st args ->
              let st, res =
                try !r st args
-               with MtAnalysisHooks.Hook_failure res ->
-                 st, Some (MtMemory.int_to_value res)
+               with Mt_analysis_hooks.Hook_failure res ->
+                 st, Some (Mt_memory.int_to_value res)
              in
              Builtins.Full
                { c_values = [res, st];
@@ -77,9 +77,9 @@ let hook_builtins =
       | Some analysis ->
         List.iter (fun (r, (_s, f)) -> r:= f analysis) lref;
         ref_hook_call_function :=
-          MtAnalysisHooks.catch_functions_calls analysis;
+          Mt_analysis_hooks.catch_functions_calls analysis;
         ref_hook_end_function :=
-          MtAnalysisHooks.catch_functions_record analysis;
+          Mt_analysis_hooks.catch_functions_record analysis;
     )
   )
 
@@ -96,20 +96,20 @@ let apply_analysis_hooks () =
 (* Perform an entire mthread execution, based on the ast and options of the
    given project *)
 let mthread_run project =
-  MtOptions.warning
+  Mt_options.warning
     "Mthread is an experimental plugin and is still in development.";
 
-  if not (MtOptions.ConcatDotFilesTo.is_empty ()) &&
-     not (MtOptions.ExtractModels.mem "html") then
-    MtOptions.error "Option %S needs option \"%s html\" to work."
-      MtOptions.ConcatDotFilesTo.option_name
-      MtOptions.ExtractModels.option_name;
+  if not (Mt_options.ConcatDotFilesTo.is_empty ()) &&
+     not (Mt_options.ExtractModels.mem "html") then
+    Mt_options.error "Option %S needs option \"%s html\" to work."
+      Mt_options.ConcatDotFilesTo.option_name
+      Mt_options.ExtractModels.option_name;
 
   let old_project = Project.current () in
   Project.set_current project;
   let hook_builtins = Lazy.force hook_builtins in
 
-  MtOptions.feedback "******* Starting mthread";
+  Mt_options.feedback "******* Starting mthread";
 
   (* We force the computation of the AST before this stage, so that it does not
      get recomputed in some other projects later *)
@@ -117,7 +117,7 @@ let mthread_run project =
 
   (* Make sure that Mthread won't restart in one of the other projects
      or once the fixpoint is reached. *)
-  MtOptions.Enabled.set false;
+  Mt_options.Enabled.set false;
 
   (* We create the record containing the state of the analysis (which must
      remain unique, as it is used to define the callback for the value
@@ -128,10 +128,10 @@ let mthread_run project =
   let f_main =
     try fst (Globals.entry_point ())
     with Globals.No_such_entry_point s ->
-      MtOptions.abort "%s Mthread cannot run" s
+      Mt_options.abort "%s Mthread cannot run" s
   in
   let dummy_main_thread =
-    MtAnalysisHooks.main_thread f_main Cvalue.Model.empty_map in
+    Mt_analysis_hooks.main_thread f_main Cvalue.Model.empty_map in
   let analysis = {
     all_threads = Thread.Hashtbl.create 17;
     all_mutexes = Mutex.Set.empty;
@@ -162,45 +162,45 @@ let mthread_run project =
 
   try
     (* We analyse the main thread *)
-    MtLib.clear_value_results ();
+    Mt_lib.clear_value_results ();
     Thread.reset_state ();
     Mutex.reset_state ();
     Mqueue.reset_state ();
 
     (* Let Eva know about interrupt handlers. *)
-    Thread.register_interrupt_handlers (MtOptions.InterruptHandlers.get ());
+    Thread.register_interrupt_handlers (Mt_options.InterruptHandlers.get ());
 
-    MtOptions.feedback "*** Computing value analysis for main thread";
+    Mt_options.feedback "*** Computing value analysis for main thread";
     Analysis.compute ();
-    MtOptions.feedback "*** First value analysis for main thread done." ;
+    Mt_options.feedback "*** First value analysis for main thread done." ;
 
     (* The hooks of the value analysis have now found the real main thread *)
     let main_th = analysis.curr_thread in
     let results = Eva_results.get_results () in
     main_th.th_value_results <- Some results;
 
-    let interferences = MtInterferences.initial () in
-    MtAnalysisFixpoint.record_end_of_thread_analysis analysis interferences;
+    let interferences = Mt_interferences.initial () in
+    Mt_analysis_fixpoint.record_end_of_thread_analysis analysis interferences;
 
     (* We perform the analysis iterations *)
-    MtAnalysisFixpoint.reach_fixpoint analysis interferences;
+    Mt_analysis_fixpoint.reach_fixpoint analysis interferences;
 
     (* In the cfgs, mark whether the accesses are concurrent or not,
        and remove superfluous node *)
-    MtAnalysisFixpoint.mark_shared_nodes_kind analysis;
+    Mt_analysis_fixpoint.mark_shared_nodes_kind analysis;
 
     (* We display the combination of all analyses *)
-    MtOutputs.Eva_results.display analysis;
+    Mt_outputs.Eva_results.display analysis;
 
     (* Printing results to files *)
-    MtOptions.ExtractModels.iter
+    Mt_options.ExtractModels.iter
       (fun s ->
-         MtOptions.feedback "******* Outputting model for %s" s;
+         Mt_options.feedback "******* Outputting model for %s" s;
          (match s with
-          | "html" -> MtOutputs.Html.output_threads analysis;
-          | _ -> MtOptions.error "Unknown model %s specified" s;
+          | "html" -> Mt_outputs.Html.output_threads analysis;
+          | _ -> Mt_options.error "Unknown model %s specified" s;
          );
-         MtOptions.feedback "******* %s output done."
+         Mt_options.feedback "******* %s output done."
            (String.capitalize_ascii s);
       );
 
@@ -220,13 +220,13 @@ let compute_mthread_once, _self =
    the AST before we have started running *)
 let () = Cmdline.run_after_setting_files
     (fun _l ->
-       if MtOptions.Enabled.get () then
-         let f = File.from_filename (MtLib.mthread_h ()) in
+       if Mt_options.Enabled.get () then
+         let f = File.from_filename (Mt_lib.mthread_h ()) in
          File.pre_register f;
     )
 
 let main () =
-  if MtOptions.Enabled.get () then (
+  if Mt_options.Enabled.get () then (
     compute_mthread_once ()
   )
 let () = Boot.Main.extend main

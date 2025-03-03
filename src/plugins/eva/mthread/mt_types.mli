@@ -22,8 +22,8 @@
 
 open Cil_types
 open Cil_datatype
-open MtCil
-open MtMemory.Types
+open Mt_cil
+open Mt_memory.Types
 
 
 (** Kind of access to zones *)

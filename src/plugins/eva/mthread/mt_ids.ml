@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtMemory.Types
+open Mt_memory.Types
 
 type id_type = IdThread | IdMutex | IdQueue
 
@@ -36,9 +36,9 @@ let pretty_raw_id fmt (idt, offset) =
 
 
 (* YYY cache this per project *)
-let array_threads = MtCil.mthread_global_var "__fc_mthread_threads"
-let array_mutexes = MtCil.mthread_global_var "__fc_mthread_mutexes"
-let array_queues = MtCil.mthread_global_var "__fc_mthread_queues"
+let array_threads = Mt_cil.mthread_global_var "__fc_mthread_threads"
+let array_mutexes = Mt_cil.mthread_global_var "__fc_mthread_mutexes"
+let array_queues = Mt_cil.mthread_global_var "__fc_mthread_queues"
 
 let array_of_idt = function
   | IdThread -> array_threads ()
@@ -56,9 +56,9 @@ let pointer_of_id ((idt, offset): raw_id) : pointer =
 
 let read_id_state state raw_id =
   let p = pointer_of_id raw_id in
-  MtMemory.read_int_pointer p state
+  Mt_memory.read_int_pointer p state
 
-let read_id_state_enumerate card state raw_id : _ MtLib.conversion =
+let read_id_state_enumerate card state raw_id : _ Mt_lib.conversion =
   let value = read_id_state state raw_id in
   let failure fmt = Format.fprintf fmt "Id %a contains garbled state %a"
       pretty_raw_id raw_id Cvalue.V.pretty value
@@ -79,11 +79,11 @@ let read_id_state_enumerate card state raw_id : _ MtLib.conversion =
 
 let write_id_state state raw_id v =
   let p = pointer_of_id raw_id in
-  MtMemory.write_int_pointer p v state
+  Mt_memory.write_int_pointer p v state
 
 let replace_id_value state raw_id ~before ~after =
   let p = pointer_of_id raw_id in
-  MtMemory.replace_value_at_int_pointer p ~before ~after state
+  Mt_memory.replace_value_at_int_pointer p ~before ~after state
 
 let of_thread th = IdThread, Thread.id th
 let of_mutex m = IdMutex, Mutex.id m

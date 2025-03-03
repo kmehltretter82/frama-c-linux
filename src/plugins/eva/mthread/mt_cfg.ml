@@ -22,11 +22,11 @@
 
 open Cil_types
 open Cil_datatype
-open MtCil
-open MtTypes
-open MtSharedVarsTypes
-open MtCfgTypes
-open MtThread
+open Mt_cil
+open Mt_types
+open Mt_shared_vars_types
+open Mt_cfg_types
+open Mt_thread
 
 
 type mt_status =
@@ -142,20 +142,20 @@ let stmt_mt_status subtrace get_state stmt =
             one. If we inline callbacks, it also catches
             calls to Mthread functions that access global variables,
             which is often the case (eg. the index of a mutex, etc). *)
-         if MtOptions.PopTopFunctionForCallbacks.get () then
-           MtOptions.abort ?source:(MtCil.kinstr_to_source (Kstmt stmt))
+         if Mt_options.PopTopFunctionForCallbacks.get () then
+           Mt_options.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
              "Unhandled@ case@ during@ cfg@ building.@ Try@ to@ \
               deactivate@ option %s"
-             MtOptions.PopTopFunctionForCallbacks.option_name
+             Mt_options.PopTopFunctionForCallbacks.option_name
          else (
-           MtOptions.debug "%a"
+           Mt_options.debug "%a"
              (Pretty_utils.pp_list
                 (fun fmt (selt, subtrace) ->
                    Format.fprintf fmt "@[<v>-- %a@.%a@]"
-                     MtCil.StackElt.pretty selt
+                     Mt_cil.StackElt.pretty selt
                      Trace.pretty subtrace
                 )) callsites;
-           MtOptions.abort ?source:(MtCil.kinstr_to_source (Kstmt stmt))
+           Mt_options.abort ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
              "@[simultaneous@ call@ to@ a@ mthread@ function@ and@ \
               to@ another@ function:@ very@ strangely@ written@ \
               mthread@ binding?@]";
@@ -176,7 +176,7 @@ let stmt_mt_status subtrace get_state stmt =
       Complex
 
     | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-      MtOptions.not_yet_implemented "try finally/except/throw/catch"
+      Mt_options.not_yet_implemented "try finally/except/throw/catch"
 ;;
 
 let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
@@ -191,12 +191,12 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
     | None -> (* Can happen in the root thread function, if
                  nothing multithreaded happens, but we handle this case
                  explicitly *)
-      MtOptions.fatal "No events at subtrace %a" Callstack.pretty callstack
+      Mt_options.fatal "No events at subtrace %a" Callstack.pretty callstack
     | Some { Trace.trace_states = states;
              Trace.trace_states_after = states_after } ->
       assert (Stmt.Map.cardinal states > 0);
-      MtMemory.Types.map_functions_states_to_get_state states,
-      MtMemory.Types.map_functions_states_to_get_state states_after
+      Mt_memory.Types.map_functions_states_to_get_state states,
+      Mt_memory.Types.map_functions_states_to_get_state states_after
   in
 
   let rec aux stmt =
@@ -229,13 +229,13 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
          call it *)
       let next () =
         match stmt.succs with
-        | [] -> MtOptions.fatal
-                  ?source:(MtCil.kinstr_to_source (Kstmt stmt))
+        | [] -> Mt_options.fatal
+                  ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
                   "Statement with no successor encountered at \
                    an unexpected place (sid %d)" stmt.sid
         | [stmt'] -> aux stmt'
-        | _ :: _ :: _ -> MtOptions.fatal
-                           ?source:(MtCil.kinstr_to_source (Kstmt stmt))
+        | _ :: _ :: _ -> Mt_options.fatal
+                           ?source:(Mt_cil.kinstr_to_source (Kstmt stmt))
                            "Statement with more than one successor encountered at an \
                             unexpected place: (sid %d), succs %a"
                            stmt.sid pretty_succs stmt
@@ -256,7 +256,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
         (* Basic instr always one successor by construction of the
            previous phase, and only one predecessor. It may be safe
            to skip the construction of this node altogether *)
-        if MtOptions.FullCfg.get () ||
+        if Mt_options.FullCfg.get () ||
            CfgConcur.has_concur_accesses (Lazy.force mt_access)
         then
           let _, set = tg () in
@@ -329,7 +329,7 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
               st, se
             | [], [], [s; s'] when s.sid = s'.sid ->
               s, s
-            | _ -> MtOptions.fatal
+            | _ -> Mt_options.fatal
                      "Strange looking if: %a, (%a) as succs"
                      Printer.pp_stmt stmt pretty_succs stmt
           in
@@ -387,10 +387,10 @@ let rec make_cfg_aux ~eop ~subtrace ~caller_succ callstack =
           set (NSwitch (stmt, e, l))
 
         | TryFinally _ | TryExcept _ | Throw _ | TryCatch _ ->
-          MtOptions.not_yet_implemented "try finally/try except"
+          Mt_options.not_yet_implemented "try finally/try except"
   in
   match (Kernel_function.get_definition f).sbody.bstmts with
-  | [] -> MtOptions.abort "Function with empty body: %s"
+  | [] -> Mt_options.abort "Function with empty body: %s"
             (Kernel_function.get_name f)
   | s :: _ -> aux s
 ;;
@@ -504,7 +504,7 @@ let remove_node ~keep a =
           (* WholeCall that contains only accesses to variables we
              are not interested in *)
           assert (List.length n.cfgn_preds = 1);
-          let only_var_access = MtTypes.EventsSet.for_all
+          let only_var_access = Mt_types.EventsSet.for_all
               (function VarAccess _ -> true | _ -> false) s in
           if only_var_access then
             (remove_n succ; acc)
@@ -517,7 +517,7 @@ let remove_node ~keep a =
       if l' = [] then
         (* All subcalls are been recursively removed: remove [a] too *)
         match !succ with
-        | None -> MtOptions.fatal "Impossible case in cfg NCall removal"
+        | None -> Mt_options.fatal "Impossible case in cfg NCall removal"
         | Some succ -> replace_by_succ succ
       else
         (a.cfgn_kind <- NCall (stmt, List.split l');
@@ -565,7 +565,7 @@ let make_cfg th =
     state_after = th.th_init_state;
   };
   tg.cfgn_preds <- [start];
-  if not (MtOptions.FullCfg.get ())
+  if not (Mt_options.FullCfg.get ())
   then remove_superfluous_nodes ~keep:NotReallySharedVar start
   else start
 
@@ -689,7 +689,7 @@ let dot_fprint_graph fmt start_tg link_stmt =
         | NEOP -> `Invis
         | _ -> `Filled
       in [
-        `Label (MtLib.escape_non_utf8 label);
+        `Label (Mt_lib.escape_non_utf8 label);
         `ColorWithTransparency color;
         `Shape shape;
         `Style style;
@@ -741,12 +741,12 @@ let dot_fprint_graph fmt start_tg link_stmt =
 
         | NJump (JReturn _, a) ->
           do_edge a;
-          (if MtOptions.ShowReturnEdges.get () then
+          (if Mt_options.ShowReturnEdges.get () then
              try
                let caller = caller_in_stack 0 prevs in
                do_edge ~etype:Return caller
              with NoCaller ->
-               MtOptions.error "Strange stack in cfg, please report@.%a"
+               Mt_options.error "Strange stack in cfg, please report@.%a"
                  CfgNode.pretty_kinds_node_list prevs
           )
 
@@ -830,7 +830,7 @@ let compute_node_context th mutexes iter state node =
   let extract v = match v with
     | `Success v -> v
     | `WithWarning (mess, v) ->
-      MtOptions.warning "%a: %t" CfgNode.pretty_with_stmts node mess; v
+      Mt_options.warning "%a: %t" CfgNode.pretty_with_stmts node mess; v
   in
   let mutexes =
     Mutex.Set.fold

@@ -115,7 +115,7 @@ let clear_value_results () =
 ;;
 
 let mthread_h () =
-  MtOptions.MThread.Share.get_file "mthread.h";;
+  Mt_options.MThread.Share.get_file "mthread.h";;
 
 
 let sanitize_filename ?(char='_') s =

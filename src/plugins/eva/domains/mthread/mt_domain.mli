@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+open Mt_utils
 open Locations
 
 type memory = { read : Zone.t ; written : Zone.t }
@@ -28,8 +28,8 @@ type return = { standard : Value.t }
 
 module Domain : sig
   include Datatype.S_with_collections
-  val threads : t -> MtThread.Register.t
-  val mutexes : t -> MtMutex.Register.t
+  val threads : t -> Mt_thread.Register.t
+  val mutexes : t -> Mt_mutex.Register.t
   val memory  : t -> memory
   val return  : t -> return
   val key : t Structure.Key_Domain.key

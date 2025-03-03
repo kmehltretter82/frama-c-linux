@@ -21,30 +21,30 @@
 (**************************************************************************)
 
 val mutexes_protecting_zones' :
-  (Locations.Zone.t * MtCfgTypes.SetNodeIdAccess.t) list ->
-  MtMutexesTypes.MutexesByZone.t
+  (Locations.Zone.t * Mt_cfg_types.SetNodeIdAccess.t) list ->
+  Mt_mutexes_types.MutexesByZone.t
 val pretty_with_mutexes :
-  Format.formatter -> MtSharedVars.Precise.list_accesses -> unit
+  Format.formatter -> Mt_shared_vars.Precise.list_accesses -> unit
 type protection = Unprotected | Priority | Protected of Mutex.Set.t
 val pretty_protection : Format.formatter -> protection -> unit
 val pretty_protection_per_thread :
-  Format.formatter -> MtThread.thread * MtThread.thread * protection -> unit
+  Format.formatter -> Mt_thread.thread * Mt_thread.thread * protection -> unit
 type zone_protection =
-  (Locations.Zone.t * (MtThread.thread * MtThread.thread * protection) list)
+  (Locations.Zone.t * (Mt_thread.thread * Mt_thread.thread * protection) list)
     list
 val pretty_zone_protection :
   Format.formatter ->
-  Locations.Zone.t * (MtThread.thread * MtThread.thread * protection) list ->
+  Locations.Zone.t * (Mt_thread.thread * Mt_thread.thread * protection) list ->
   unit
 val check_protection :
-  MtThread.analysis_state ->
-  MtSharedVars.Precise.list_accesses -> zone_protection
+  Mt_thread.analysis_state ->
+  Mt_shared_vars.Precise.list_accesses -> zone_protection
 val pretty_protections :
   Format.formatter ->
-  (Locations.Zone.t * (MtThread.thread * MtThread.thread * protection) list)
+  (Locations.Zone.t * (Mt_thread.thread * Mt_thread.thread * protection) list)
     list -> unit
 val ill_protected :
-  MtSharedVars.Precise.list_accesses ->
+  Mt_shared_vars.Precise.list_accesses ->
   zone_protection -> Locations.Zone.t Cil_datatype.Stmt.Hashtbl.t
 val need_sync :
   'a Cil_datatype.Stmt.Hashtbl.t -> (Cil_datatype.Stmt.Hashtbl.key * 'a) list

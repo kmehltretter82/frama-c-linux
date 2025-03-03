@@ -20,15 +20,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Mthread__MtThread
-
 type ui = Design.main_window_extension_points
 
 let thread_hook = ref []
 let register_thread_hook hook = thread_hook := hook :: !thread_hook
 
 (* Restore the value analysis results for the thread [th]. *)
-let select_thread (ui:ui) th =
+let select_thread (ui: ui) (th: Mt_thread.thread_state) =
   ui#protect ~cancelable:false
     (fun () ->
        match th.th_projects with
@@ -39,7 +37,7 @@ let select_thread (ui:ui) th =
   ui#reset ()
 
 (* Gtk menu-item which displays a thread *)
-let make_thread_menu_entry ui (menu: GMenu.menu) th =
+let make_thread_menu_entry (ui: ui) (menu: GMenu.menu) (th: Mt_thread.thread_state) =
   let th_item = GMenu.menu_item ~packing:menu#append () in
   let callback () =
     select_thread ui th;
@@ -55,8 +53,8 @@ let make_thread_menu_entry ui (menu: GMenu.menu) th =
 let populate_menu =
   let menu_items = ref [] in
   fun (ui: ui) (menu: GMenu.menu) analysis ->
-    let threads = Mthread__MtThread.threads analysis in
-    let threads = List.filter Mthread__MtThread.should_compute_thread threads in
+    let threads = Mt_thread.threads analysis in
+    let threads = List.filter Mt_thread.should_compute_thread threads in
     List.iter (fun r -> menu#remove (r :> GMenu.menu_item)) !menu_items;
     menu_items := List.map (make_thread_menu_entry ui menu) threads
 
@@ -71,5 +69,5 @@ let () =
          item#misc#show ();
          populate_menu ui menu analysis
        in
-       Mthread__MtMain.register_analysis_hook hook;
-       Mthread__MtMain.apply_analysis_hooks ())
+       Mt_main.register_analysis_hook hook;
+       Mt_main.apply_analysis_hooks ())

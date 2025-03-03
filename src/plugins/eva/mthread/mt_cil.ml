@@ -26,9 +26,9 @@ open Cil_types
 let mthread_global_var var_name () =
   try Globals.Vars.find_from_astinfo var_name Global
   with Not_found ->
-    MtOptions.fatal
+    Mt_options.fatal
       "Variable@ %s@ not@ found.@ It@ should@ be@ in@ %a."
-      var_name Filepath.Normalized.pretty (MtLib.mthread_h ())
+      var_name Filepath.Normalized.pretty (Mt_lib.mthread_h ())
 
 let is_call_to_sync stmt =
   match stmt.skind with
@@ -43,7 +43,7 @@ let is_call_to_sync stmt =
 
 let pretty_stmt fmt stmt =
   Printer.pp_location fmt (Cil_datatype.Stmt.loc stmt);
-  if MtOptions.ShowSid.get () then
+  if Mt_options.ShowSid.get () then
     Format.fprintf fmt "@ (sid %d)" stmt.sid
 
 

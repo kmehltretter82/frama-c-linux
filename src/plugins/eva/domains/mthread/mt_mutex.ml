@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+open Mt_utils
 
 type value = Value.t
 
@@ -28,7 +28,7 @@ type value = Value.t
 module Mutex =
 struct
   include Mutex
-  let name = "MtThread.Mutex"
+  let name = "Mt_thread.Mutex"
   let key_name = "mutex"
   let of_value x =
     let open Result.Operators in
@@ -74,9 +74,9 @@ module MSet = Set
    It is indeed necessary to ensure soundness, as it will trigger more
    interferences as necessary. *)
 module Register = struct
-  include MtRegister.Make (Mutex) (Status)
+  include Mt_register.Make (Mutex) (Status)
   let check bad msg st =
-    if Status.equal bad st then MtRegister.Invalid (msg, true) else Ok
+    if Status.equal bad st then Mt_register.Invalid (msg, true) else Ok
   let lock = update (fun _ -> Locked) (check Locked "locked")
   let unlock = update (fun _ -> Unlocked) (check Unlocked "unlocked")
 

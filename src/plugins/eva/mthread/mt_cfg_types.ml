@@ -21,9 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
-open MtTypes
-open MtMemory.Types
-open MtSharedVarsTypes
+open Mt_types
+open Mt_memory.Types
+open Mt_shared_vars_types
 
 type thread = Thread.t
 
@@ -123,8 +123,8 @@ module NodeValueState = struct
     state_after  = Cvalue.Model.bottom;
   }
 
-  let aux_presence default raw_id f state : _ MtLib.conversion_with_warning =
-    match MtIds.read_id_state_enumerate 4 state raw_id with
+  let aux_presence default raw_id f state : _ Mt_lib.conversion_with_warning =
+    match Mt_ids.read_id_state_enumerate 4 state raw_id with
     | `Failure mess | `WithWarning (mess, _) ->
       `WithWarning(mess, default)
     | `Success l ->
@@ -133,7 +133,7 @@ module NodeValueState = struct
         `WithWarning (
           (fun fmt -> Format.fprintf fmt
               "@[Id %a@ contains@ strange@ state@ {%a}@]"
-              MtIds.pretty_raw_id raw_id
+              Mt_ids.pretty_raw_id raw_id
               (Pretty_utils.pp_list ~sep:"@ " ~pre:"" ~suf:""
                  Format.pp_print_int) l;
           ),
@@ -141,7 +141,7 @@ module NodeValueState = struct
       | `Ok v -> `Success v
 
   let mutex_presence m =
-    aux_presence NotPresent (MtIds.of_mutex m)
+    aux_presence NotPresent (Mt_ids.of_mutex m)
       (function
         | [0] |[1] | [0;1] -> `Ok NotPresent
         | [2] -> `Ok Present
@@ -149,7 +149,7 @@ module NodeValueState = struct
         | _ -> `Warn)
 
   let threads_presence started th =
-    aux_presence MaybePresent (MtIds.of_thread th)
+    aux_presence MaybePresent (Mt_ids.of_thread th)
       (fun l -> match l, started with
          | [0], (`Prior | `Started) -> `Ok Present
          | [0], `MaybeStarted -> `Ok MaybePresent
@@ -177,11 +177,11 @@ type node = {
   mutable cfgn_context: context;
 }
 and node_kind =
-  | NMT of stmt * MtTypes.events_set * node
+  | NMT of stmt * Mt_types.events_set * node
   | NInstr of stmt * node
   | NCall of stmt * (Kernel_function.t list * node list)
   | NWholeCall of
-      Kernel_function.t * stmt list * MtTypes.events_set * node
+      Kernel_function.t * stmt list * Mt_types.events_set * node
   | NWhile of stmt * node
   | NIf of stmt * node * node
   | NSwitch of stmt * exp * node list
@@ -225,7 +225,7 @@ module CfgNode = struct
       let structural_descr = Structural_descr.t_abstract
 
       let reprs = [dead]
-      let name = "MtCfgTypes.node"
+      let name = "Mt_cfg_types.node"
 
       let rehash x = x
 
@@ -261,7 +261,7 @@ module CfgNode = struct
   let pretty_stmts fmt node =
     match node_stmt node with
     | [] -> Format.pp_print_string fmt "<no stmt>"
-    | stmts -> Pretty_utils.pp_list ~sep:",@ " MtCil.pretty_stmt fmt stmts
+    | stmts -> Pretty_utils.pp_list ~sep:",@ " Mt_cil.pretty_stmt fmt stmts
 
   let pretty_with_stmts fmt node =
     Format.fprintf fmt "%a@ (%a)" pretty node pretty_stmts node

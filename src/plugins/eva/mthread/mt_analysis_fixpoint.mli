@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val mark_shared_nodes_kind : MtThread.analysis_state -> unit
+val mark_shared_nodes_kind : Mt_thread.analysis_state -> unit
 val record_end_of_thread_analysis :
-  MtThread.analysis_state -> Interferences.t -> unit
-val reach_fixpoint : MtThread.analysis_state -> Interferences.t -> unit
+  Mt_thread.analysis_state -> Interferences.t -> unit
+val reach_fixpoint : Mt_thread.analysis_state -> Interferences.t -> unit

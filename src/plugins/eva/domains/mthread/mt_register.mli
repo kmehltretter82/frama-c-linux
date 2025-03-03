@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open MtUtils
+open Mt_utils
 
 
 type update_check = Ok | Invalid of (string * bool)

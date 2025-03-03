@@ -21,9 +21,9 @@
 (**************************************************************************)
 
 open Cil_types
-open MtMemory.Types
-open MtTypes
-open MtSharedVarsTypes
+open Mt_memory.Types
+open Mt_types
+open Mt_shared_vars_types
 
 type thread = Thread.t
 
@@ -94,9 +94,9 @@ module NodeValueState: sig
 
   val threads_presence:
     [> `NotStarted | `Prior | `Started | `MaybeStarted]
-    -> Thread.t -> state -> presence_flag MtLib.conversion_with_warning
+    -> Thread.t -> state -> presence_flag Mt_lib.conversion_with_warning
 
-  val mutex_presence: Mutex.t -> state -> presence_flag MtLib.conversion_with_warning
+  val mutex_presence: Mutex.t -> state -> presence_flag Mt_lib.conversion_with_warning
 
 end
 
@@ -111,11 +111,11 @@ type node = {
   mutable cfgn_context: context;
 }
 and node_kind =
-  | NMT of stmt * MtTypes.events_set * node
+  | NMT of stmt * Mt_types.events_set * node
   | NInstr of stmt * node
   | NCall of stmt * (Kernel_function.t list * node list)
   | NWholeCall of
-      Kernel_function.t * stmt list * MtTypes.events_set * node
+      Kernel_function.t * stmt list * Mt_types.events_set * node
   | NWhile of stmt * node
   | NIf of stmt * node * node
   | NSwitch of stmt * exp * node list

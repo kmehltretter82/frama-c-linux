@@ -33,14 +33,14 @@ let initial () =
 let concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   let module ALoc = Analysis_location in
-  match Analyzer.Dom.get MtDomain.Domain.key with
+  match Analyzer.Dom.get Mt_domain.Domain.key with
   (* Domain disabled, no information about writes *)
   | None -> ALoc.Local.Set.empty
   (* Domain enabled *)
   | Some extract ->
     let add_aloc stmt cs state acc =
       let mt_state = extract state in
-      let { MtDomain.written } = MtDomain.Domain.memory mt_state in
+      let { Mt_domain.written } = Mt_domain.Domain.memory mt_state in
       let written_bases = Locations.Zone.get_bases written in
       if Base.SetLattice.(intersects (inject shared_bases) written_bases)
       then ALoc.Local.Set.add (stmt, cs) acc
@@ -67,7 +67,7 @@ let concurrent_writes shared_bases =
     Globals.Functions.fold add_kf ALoc.Local.Set.empty
 
 let shared_bases analysis_state =
-  let shared_zones = analysis_state.MtThread.concurrent_accesses in
+  let shared_zones = analysis_state.Mt_thread.concurrent_accesses in
   match Locations.Zone.get_bases shared_zones with
   | Top -> assert false
   | Set zones ->  zones
@@ -86,7 +86,7 @@ let add_last_analysis analysis_state interferences =
     try
       `Value (Callstack.Hashtbl.find state_table cs)
     with Not_found ->
-      MtOptions.result "cannot find %a at %a"
+      Mt_options.result "cannot find %a at %a"
         Callstack.pretty cs
         Printer.pp_location (Cil_datatype.Stmt.loc stmt);
       Analyzer.get_stmt_state ~after:true stmt
@@ -100,7 +100,7 @@ let add_last_analysis analysis_state interferences =
   in
   match res with
   | Updated ->
-    MtThread.iter_threads analysis_state
-      (fun th -> MtThread.ThreadState.recompute_because th InterferencesChanged)
+    Mt_thread.iter_threads analysis_state
+      (fun th -> Mt_thread.ThreadState.recompute_because th InterferencesChanged)
   | NoChanges ->
     ()

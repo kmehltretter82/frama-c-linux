@@ -139,7 +139,7 @@ let read_slice ~p ~sbytes state =
   match Cvalue.Model.copy_offsetmap loc_bits size state with
   | `Bottom ->
     assert (Cvalue.Model.equal state Cvalue.Model.bottom);
-    MtOptions.fatal "Reading inside bottom state"
+    Mt_options.fatal "Reading inside bottom state"
   | `Value offs -> offs
 
 let write_int_pointer p i state =
@@ -147,7 +147,7 @@ let write_int_pointer p i state =
   and value = Location_Bytes.inject Base.null (Ival.of_int i) in
   let pointer = location_of_pointer p in
   let p = location_with_size pointer sbytes in
-  MtOptions.debug ~level:3 "# Write %a at %a, size %d bytes"
+  Mt_options.debug ~level:3 "# Write %a at %a, size %d bytes"
     Cvalue.V.pretty value Locations.pretty p sbytes;
   Cvalue.Model.add_binding ~exact:true state p value
 
@@ -304,7 +304,7 @@ let join_value v1 v2 =
 let rec join_params l1 l2 = match l1, l2 with
   | [], [] -> ([], false)
   | [], l | l, [] ->
-    MtOptions.warning "Joining parameters lists of different lengths";
+    Mt_options.warning "Joining parameters lists of different lengths";
     (l, true)
   | x::xs , y::ys ->
     let v, recv = join_value x y and lv, recl = join_params xs ys in

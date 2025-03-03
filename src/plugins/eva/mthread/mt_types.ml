@@ -22,9 +22,9 @@
 
 open Cil_types
 open Cil_datatype
-open MtCil
-open MtMemory.Types
-open MtLib
+open Mt_cil
+open Mt_memory.Types
+open Mt_lib
 
 
 (* -------------------------------------------------------------------------- *)
@@ -96,7 +96,7 @@ module Event = struct
                            | Some s -> Format.fprintf fmt " (size %d)" s) s
     | SendMsg (q, (v, _s)) -> Format.fprintf fmt
                                 "Sending@ message@ on %a,@ content@ %a"
-                                Mqueue.pretty q MtMemory.pretty_slice v
+                                Mqueue.pretty q Mt_memory.pretty_slice v
     | ReceiveMsg (q, loc, size) -> Format.fprintf fmt
                                      "Receiving@ message@ on %a,@ max size %d,@ stored in %a."
                                      Mqueue.pretty q size Pointer.pretty loc
@@ -156,7 +156,7 @@ module Event = struct
       | ThreadExit _
       | MutexLock _ | MutexRelease _ | CreateQueue _
       | SendMsg _ | ReceiveMsg _ | VarAccess _ | Dummy _), _ ->
-      MtLib.compare_tag a1 a2
+      Mt_lib.compare_tag a1 a2
 
   let hash = function
     | CreateThread th -> Hashtbl.hash (Thread.hash th, 0)
@@ -319,7 +319,7 @@ module PresenceFlag = struct
     struct
       include Datatype.Serializable_undefined
       type t = presence_flag
-      let name = "MtTypes.presence_flag"
+      let name = "Mt_types.presence_flag"
       let reprs = [NotPresent; Present; MaybePresent]
       let equal : t -> t -> _ = (=)
       let compare : t -> t -> int = Stdlib.compare

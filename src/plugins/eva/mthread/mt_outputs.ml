@@ -21,8 +21,8 @@
 (**************************************************************************)
 
 open Cil_types
-open MtTypes
-open MtThread
+open Mt_types
+open Mt_thread
 
 module Utilities = struct
 
@@ -234,7 +234,7 @@ module Html = struct
             Hashtbl.find table.rows.from_id i
           with
           | Not_found ->
-            MtOptions.fatal "@[Row %d not found@]@." i
+            Mt_options.fatal "@[Row %d not found@]@." i
         in
 
         let pp_cells fmt cell_array =
@@ -357,7 +357,7 @@ module Html = struct
         List.map snd
       in
       assert ((Thread.Hashtbl.length mq_table) > 0);
-      MtOptions.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
+      Mt_options.debug "%d queues found@." (Thread.Hashtbl.length mq_table);
       Some (mq_table, QueueTable.mk queue_olist (List.map (fun th -> th.th_eva_thread) th_list));
     end
   ;;
@@ -503,21 +503,21 @@ module Html = struct
     let with_open_out = Out_channel.with_open_gen flags 0o666 output in
     try with_open_out (fun cout -> with_open_in (fun cin -> copy cin cout))
     with e ->
-      MtOptions.error
+      Mt_options.error
         "Error while appending dot file %s to %s: %s"
         input output (Printexc.to_string e)
 
   let mk_graph_img th =
     let unicode = suspend_unicode () in
     let f_stmt s = Format.sprintf "code.html#%s" (stmt_link s) in
-    let thread_name = Thread.label th.th_eva_thread |> MtLib.sanitize_filename in
+    let thread_name = Thread.label th.th_eva_thread |> Mt_lib.sanitize_filename in
     let tmp_file, otmp =  Filename.open_temp_file (thread_name ^ "-") ".dot" in
     let fmt = Format.formatter_of_out_channel otmp in
-    MtCfg.dot_fprint_graph fmt th.th_cfg f_stmt;
+    Mt_cfg.dot_fprint_graph fmt th.th_cfg f_stmt;
     close_out otmp;
-    if not (MtOptions.ConcatDotFilesTo.is_empty ()) then begin
+    if not (Mt_options.ConcatDotFilesTo.is_empty ()) then begin
       let name = Thread.label th.th_eva_thread in
-      let output = (MtOptions.ConcatDotFilesTo.get () :> string) in
+      let output = (Mt_options.ConcatDotFilesTo.get () :> string) in
       append_file ~input:tmp_file ~output ~name
     end;
     let dot_output_format = "svg" in
@@ -526,8 +526,8 @@ module Html = struct
     let output_file = Filename.concat default_dir link_fname in
     let args = [ "-Tsvg"; tmp_file; "-o"; output_file ] in
     let fail s =
-      MtOptions.error "%s when generating graph for thread %a. \
-                       Run 'dot %s' to restart generation"
+      Mt_options.error "%s when generating graph for thread %a. \
+                        Run 'dot %s' to restart generation"
         s ThreadState.pretty th (String.concat " " args)
     in
     begin
@@ -535,7 +535,7 @@ module Html = struct
         let ret = Command.command ~timeout:60 "dot" (Array.of_list args) in
         match ret with
         | Unix.WEXITED 0 ->
-          MtOptions.debug "remove %s\n" tmp_file;
+          Mt_options.debug "remove %s\n" tmp_file;
           Sys.remove tmp_file
         | Unix.WEXITED code ->
           fail (Printf.sprintf "Error (code %d)" code)
@@ -560,7 +560,7 @@ module Html = struct
         Buffer.contents (dot_escape s)
       let vertex_attributes v =
         let s = Format.asprintf "%a" Thread.pretty v in
-        [ `Label (MtLib.escape_non_utf8 s)]
+        [ `Label (Mt_lib.escape_non_utf8 s)]
       let get_subgraph _ = None
       let default_edge_attributes _ = [`Style(`Solid);]
       let edge_attributes _ = []
@@ -577,7 +577,7 @@ module Html = struct
     let unicode = suspend_unicode () in
     let name = "thread_inheritance_graph" in
     let tmp_file, otmp = Filename.open_temp_file name ".dot" in
-    MtOptions.debug "Open %s for writing@." tmp_file;
+    Mt_options.debug "Open %s for writing@." tmp_file;
     let fmt = Format.formatter_of_out_channel otmp in
     TGDot.fprint_graph fmt graph;
     close_out otmp;
@@ -588,8 +588,8 @@ module Html = struct
         dot_output_format tmp_file output_file in
     let ret = Sys.command cmd in
     if ret <> 0 then
-      MtOptions.error "Something bad happened when running %s" cmd;
-    MtOptions.debug "remove %s\n" tmp_file;
+      Mt_options.error "Something bad happened when running %s" cmd;
+    Mt_options.debug "remove %s\n" tmp_file;
     Sys.remove tmp_file;
     Kernel.Unicode.set unicode;
     link_fname
@@ -646,7 +646,7 @@ module Html = struct
   let css_content =
     lazy (
       let css_file =
-        (MtOptions.MThread.Share.get_file "mthread.css" :> string)
+        (Mt_options.MThread.Share.get_file "mthread.css" :> string)
       in
       try
         let ic = open_in css_file in
@@ -656,7 +656,7 @@ module Html = struct
         close_in ic;
         Buffer.contents b
       with Sys_error _ ->
-        MtOptions.warning "Cannot open mthread css '%s'" css_file;
+        Mt_options.warning "Cannot open mthread css '%s'" css_file;
         ""
     )
   ;;
@@ -664,7 +664,7 @@ module Html = struct
 
   let pp_page page =
     let file = Filename.concat default_dir page.page_name ^ ".html" in
-    MtOptions.debug "Open %s@." file;
+    Mt_options.debug "Open %s@." file;
     let ofile = open_out file in
     let fmt = Format.formatter_of_out_channel ofile in
     Format.pp_set_formatter_stag_functions fmt html_stag_functions;
@@ -830,7 +830,7 @@ module Eva_results = struct
     in
     let all_results = Thread.Hashtbl.fold aux_th ths [] in
     match all_results with
-    | [] -> MtOptions.error "No results recorded. Nothing to display"
+    | [] -> Mt_options.error "No results recorded. Nothing to display"
     | r :: qr ->
       let all = List.fold_left Eva_results.merge r qr in
       Eva_results.set_results all
