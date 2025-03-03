@@ -301,6 +301,7 @@ let add_locals f f' env =
 (* local static variables are in fact global. As soon as we have determined
    that they have a correspondence, we add them to the global bindings *)
 (* Add also init if they exists  *)
+(* FIXME: Ignore if init list raises Invalid Argument *)
 let add_statics l l' =
   let selection = State_selection.singleton Globals.Vars.self in
   let add_exp e e' = Exp.add e (`Same e') in
@@ -312,15 +313,15 @@ let add_statics l l' =
     | _, _ -> ()
   in
   let add_one v v' = 
+    Varinfo.add v (`Same v');
     try
       let i = Project.on ~selection (Orig_project.get()) Globals.Vars.find v in
       let i' = Globals.Vars.find v' in
       match i.init, i'.init with
       | Some init, Some init' -> 
         add_init init init'
-      | _, _ -> ();
-        Varinfo.add v (`Same v')
-    with Not_found -> ()
+      | _, _ -> ()
+    with Not_found | Invalid_argument _ -> ()
   in
   List.iter2 add_one l l'
 
