@@ -876,8 +876,12 @@ let mthread_builtins = List.map (fun (n, f, _) -> (n, f)) mthread_builtins
 
 (* Function to register as a callback of the Eva analysis if Mthread
    is enabled *)
-let catch_functions_calls analysis stack kf state kind =
+let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
   analysis.curr_stack <- stack;
+  if Callstack.is_empty stack then
+    (* This is the entry point of the analysis, the events stack needs to be
+       empty. *)
+    analysis.curr_events_stack <- [];
   let f = Kernel_function.get_name kf in
   let built = is_mthread_builtin f in
   (if built <> `NotBuiltin then
