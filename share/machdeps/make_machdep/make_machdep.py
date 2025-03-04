@@ -370,7 +370,7 @@ for f, typ in source_files:
     if proc.returncode == 0:
         # all tests should fail on an appropriate _Static_assert
         # if compilation succeeds, we have a problem
-        logging.warning(f"WARNING: could not identify value of '{p.stem}', skipping")
+        logging.warning(f"could not identify value of '{p.stem}', skipping")
         continue
     find_value(p.stem, typ, proc.stderr.decode())
 
