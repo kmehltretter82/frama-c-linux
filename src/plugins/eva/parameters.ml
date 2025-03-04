@@ -1311,7 +1311,7 @@ module MallocLevel =
       let help = "Set to [m] the number of precise dynamic allocations \
                   when set to 1, the first allocation is imprecise (defaults to 1)"
     end)
-let () = MallocLevel.set_range ~min:0 ~max:max_int
+let () = MallocLevel.set_range ~min:1 ~max:max_int
 let () = add_precision_dep MallocLevel.parameter
 
 
