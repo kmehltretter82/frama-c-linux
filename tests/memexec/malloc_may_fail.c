@@ -25,15 +25,18 @@ void foo(int arg)
 {
     int size = Frama_C_interval(0, 1);
     int *p = (int *)alloc(sizeof(int) * size);
+    Frama_C_dump_each();
 
     //@ loop unroll 3;
     for (int i = 0; i < 3; i++)
     {
-        int *q = (int *)alloc(sizeof(int) * size); // Here we can reuse allocated base from line 27 at the second call. FIXME: Shall we add the reused base to Malloced by stack ?
+        int *q = (int *)alloc(sizeof(int) * size); // Reuse allocated base
+        Frama_C_dump_each();
         *q = i;
         free(q);
     }
     free(p);
+    Frama_C_dump_each();
 }
 
 int main(int argc, char const *argv[])

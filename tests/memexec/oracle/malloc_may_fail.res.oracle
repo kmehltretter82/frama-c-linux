@@ -7,7 +7,7 @@
 [eva:memexec] No previous call found for main
 [eva:memexec] No previous call found for foo
 [eva] computing for function foo <- main.
-  Called from malloc_may_fail.c:41.
+  Called from malloc_may_fail.c:44.
 [eva] computing for function Frama_C_interval <- foo <- main.
   Called from malloc_may_fail.c:26.
 [eva] using specification for function Frama_C_interval
@@ -21,146 +21,819 @@
 [eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16
 [eva] Recording results for alloc
 [eva] Done for function alloc
+[eva] malloc_may_fail.c:28: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {1}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
 [eva:memexec] No previous saved state found for alloc
 [eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
+  Called from malloc_may_fail.c:33.
 [eva] malloc_may_fail.c:16: Call to builtin malloc
 [eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_0
 [eva] Recording results for alloc
 [eva] Done for function alloc
-[eva:alarm] malloc_may_fail.c:33: Warning: 
-  out of bounds write. assert \valid(q);
-[eva] malloc_may_fail.c:34: Call to builtin free
 [eva] malloc_may_fail.c:34: 
-  function free: precondition 'freeable' got status valid.
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_0}
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:41 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_0}
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:41 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_0}
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {1}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16 }}
+  i ∈ {0}
+  q ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva:alarm] malloc_may_fail.c:35: Warning: 
+  out of bounds write. assert \valid(q);
 [eva] malloc_may_fail.c:36: Call to builtin free
 [eva] malloc_may_fail.c:36: 
   function free: precondition 'freeable' got status valid.
-[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16}
+[eva:malloc] malloc_may_fail.c:36: strong free on bases: {__malloc_alloc_l16_0}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:44 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {1}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16 }}
+  i ∈ {1}
+  q ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: strong free on bases: {__malloc_alloc_l16_0}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:44 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {1}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16 }}
+  i ∈ {2}
+  q ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: strong free on bases: {__malloc_alloc_l16_0}
+[eva] malloc_may_fail.c:38: Call to builtin free
+[eva] malloc_may_fail.c:38: 
+  function free: precondition 'freeable' got status valid.
+[eva:malloc] malloc_may_fail.c:38: weak free on bases: {__malloc_alloc_l16}
+[eva] malloc_may_fail.c:39: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {1}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16 }} or ESCAPINGADDR
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:memexec] No previous call found for foo
 [eva] computing for function foo <- main.
-  Called from malloc_may_fail.c:42.
+  Called from malloc_may_fail.c:45.
 [eva] computing for function Frama_C_interval <- foo <- main.
   Called from malloc_may_fail.c:26.
 [eva] Done for function Frama_C_interval
 [eva:memexec-malloc] 
   --- Reused allocated bases {__malloc_alloc_l16_0} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:42 <- main
+  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:45 <- main
 [eva] malloc_may_fail.c:27: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:28: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
 [eva:memexec] No previous saved state found for alloc
 [eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
+  Called from malloc_may_fail.c:33.
 [eva] malloc_may_fail.c:16: Call to builtin malloc
-[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_1
+[eva] malloc_may_fail.c:16: allocating weak variable __malloc_w_alloc_l16
 [eva] Recording results for alloc
 [eva] Done for function alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
-[eva:memexec] No previous saved state found for alloc
-[eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
-[eva] malloc_may_fail.c:16: Call to builtin malloc
-[eva] Recording results for alloc
-[eva] Done for function alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_1} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:42 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_1}
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  i ∈ {0}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[0..3] ∈ UNINITIALIZED
+  ==END OF DUMP==
 [eva] malloc_may_fail.c:36: Call to builtin free
-[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16_0}
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:33.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  i ∈ {1}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[0..3] ∈ {0} or UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:memexec] No previous saved state found for alloc
+[eva] computing for function alloc <- foo <- main.
+  Called from malloc_may_fail.c:33.
+[eva] malloc_may_fail.c:16: Call to builtin malloc
+[eva] Recording results for alloc
+[eva] Done for function alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }}
+  i ∈ {2}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1} or UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva] malloc_may_fail.c:38: Call to builtin free
+[eva:malloc] malloc_may_fail.c:38: weak free on bases: {__malloc_alloc_l16_0}
+[eva] malloc_may_fail.c:39: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_alloc_l16_0 }} or ESCAPINGADDR
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:memexec] No previous call found for foo
 [eva] computing for function foo <- main.
-  Called from malloc_may_fail.c:43.
+  Called from malloc_may_fail.c:46.
 [eva] computing for function Frama_C_interval <- foo <- main.
   Called from malloc_may_fail.c:26.
 [eva] Done for function Frama_C_interval
-[eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_1} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:43 <- main
-[eva] malloc_may_fail.c:27: Reusing old results for call to alloc
 [eva:memexec] No previous saved state found for alloc
 [eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
-[eva] malloc_may_fail.c:16: Call to builtin malloc
-[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_2
-[eva] Recording results for alloc
-[eva] Done for function alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
-[eva:memexec] No previous saved state found for alloc
-[eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
+  Called from malloc_may_fail.c:27.
 [eva] malloc_may_fail.c:16: Call to builtin malloc
 [eva] Recording results for alloc
 [eva] Done for function alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
+[eva] malloc_may_fail.c:28: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {3}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_2} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:43 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_2}
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:46 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {3}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  i ∈ {0}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva] malloc_may_fail.c:36: Call to builtin free
-[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16_1}
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:46 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {3}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
+  i ∈ {1}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:46 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {3}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
+  i ∈ {2}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:alarm] malloc_may_fail.c:38: Warning: 
+  accessing left-value that contains escaping addresses.
+  assert ¬\dangling(&p);
+[eva] malloc_may_fail.c:38: Call to builtin free
+[eva:malloc] malloc_may_fail.c:38: weak free on bases: {__malloc_w_alloc_l16}
+[eva] malloc_may_fail.c:39: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {3}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva:memexec] No previous saved state found for foo
 [eva] computing for function foo <- main.
-  Called from malloc_may_fail.c:44.
+  Called from malloc_may_fail.c:47.
 [eva] computing for function Frama_C_interval <- foo <- main.
   Called from malloc_may_fail.c:26.
 [eva] Done for function Frama_C_interval
 [eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_2} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:44 <- main
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:27 <- foo :: malloc_may_fail.c:47 <- main
 [eva] malloc_may_fail.c:27: Reusing old results for call to alloc
-[eva:memexec] No previous saved state found for alloc
-[eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
-[eva] malloc_may_fail.c:16: Call to builtin malloc
-[eva] malloc_may_fail.c:16: allocating variable __malloc_alloc_l16_3
-[eva] Recording results for alloc
-[eva] Done for function alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
-[eva:memexec] No previous saved state found for alloc
-[eva] computing for function alloc <- foo <- main.
-  Called from malloc_may_fail.c:32.
-[eva] malloc_may_fail.c:16: Call to builtin malloc
-[eva] Recording results for alloc
-[eva] Done for function alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
+[eva] malloc_may_fail.c:28: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l16_3} for KF alloc at callstack 
-  alloc :: malloc_may_fail.c:32 <- foo :: malloc_may_fail.c:44 <- main
-[eva] malloc_may_fail.c:32: Reusing old results for call to alloc
-[eva] malloc_may_fail.c:34: Call to builtin free
-[eva:malloc] malloc_may_fail.c:34: strong free on bases: {__malloc_alloc_l16_3}
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:47 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  i ∈ {0}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva] malloc_may_fail.c:36: Call to builtin free
-[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_alloc_l16_2}
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:47 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
+  i ∈ {1}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_w_alloc_l16} for KF alloc at callstack 
+  alloc :: malloc_may_fail.c:33 <- foo :: malloc_may_fail.c:47 <- main
+[eva] malloc_may_fail.c:33: Reusing old results for call to alloc
+[eva] malloc_may_fail.c:34: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
+  i ∈ {2}
+  q ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }}
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
+[eva] malloc_may_fail.c:36: Call to builtin free
+[eva:malloc] malloc_may_fail.c:36: weak free on bases: {__malloc_w_alloc_l16}
+[eva] malloc_may_fail.c:38: Call to builtin free
+[eva:malloc] malloc_may_fail.c:38: weak free on bases: {__malloc_w_alloc_l16}
+[eva] malloc_may_fail.c:39: 
+  Frama_C_dump_each:
+  # cvalue:
+  __fc_heap_status ∈ [--..--]
+  __fc_errno ∈ [--..--]
+  __fc_random_counter ∈ [--..--]
+  __fc_rand_max ∈ {2147483647}
+  __fc_random48_init ∈ {0}
+  __fc_random48_counter[0..2] ∈ [--..--]
+  __fc_p_random48_counter ∈ {{ &__fc_random48_counter[0] }}
+  __fc_env[0] ∈ {{ NULL ; &S_0___fc_env[0] }}
+          [1] ∈ {{ NULL ; &S_1___fc_env[0] }}
+          [2..4095] ∈ {{ NULL ; &S_0___fc_env[0] ; &S_1___fc_env[0] }}
+  __fc_mblen_state ∈ [--..--]
+  __fc_mbtowc_state ∈ [--..--]
+  __fc_wctomb_state ∈ [--..--]
+  Frama_C_entropy_source ∈ [--..--]
+  arg ∈ {2}
+  size ∈ {0; 1}
+  p ∈ {{ NULL ; (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
+  argc ∈ [--..--]
+  argv ∈ {{ NULL ; &S_argv[0] }}
+  __retres ∈ UNINITIALIZED
+  S_0___fc_env[0..1] ∈ [--..--]
+  S_1___fc_env[0..1] ∈ [--..--]
+  S_argv[0] ∈ {{ NULL ; &S_0_S_argv[0] }}
+        [1] ∈ {{ NULL ; &S_1_S_argv[0] }}
+  S_0_S_argv[0..1] ∈ [--..--]
+  S_1_S_argv[0..1] ∈ [--..--]
+  __malloc_alloc_l16[0..3] ∈ UNINITIALIZED
+  __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
+  ==END OF DUMP==
 [eva] Recording results for foo
 [eva] Done for function foo
 [eva] Recording results for main
@@ -170,247 +843,44 @@
   __fc_heap_status ∈ [--..--]
   buf ∈
      {{ (void *)&__malloc_alloc_l16 ; (void *)&__malloc_alloc_l16_0 ;
-        (void *)&__malloc_alloc_l16_1 ; (void *)&__malloc_alloc_l16_2 ;
-        (void *)&__malloc_alloc_l16_3 }} or UNINITIALIZED
+        (void *)&__malloc_w_alloc_l16 }} or UNINITIALIZED
   __retres ∈
           {{ NULL ; (void *)&__malloc_alloc_l16 ;
-             (void *)&__malloc_alloc_l16_0 ; (void *)&__malloc_alloc_l16_1 ;
-             (void *)&__malloc_alloc_l16_2 ; (void *)&__malloc_alloc_l16_3 }}
+             (void *)&__malloc_alloc_l16_0 ; (void *)&__malloc_w_alloc_l16 }}
 [eva:final-states] Values at end of function foo:
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   size ∈ {0; 1}
   p ∈
    {{ NULL ; (int *)&__malloc_alloc_l16 ; (int *)&__malloc_alloc_l16_0 ;
-      (int *)&__malloc_alloc_l16_1 ; (int *)&__malloc_alloc_l16_2 }} or ESCAPINGADDR
+      (int *)&__malloc_w_alloc_l16 }} or ESCAPINGADDR
   __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
-  __malloc_alloc_l16_1[0..3] ∈ UNINITIALIZED
-  __malloc_alloc_l16_2[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
   Frama_C_entropy_source ∈ [--..--]
   __retres ∈ {0}
   __malloc_alloc_l16_0[0..3] ∈ UNINITIALIZED
-  __malloc_alloc_l16_1[0..3] ∈ UNINITIALIZED
-  __malloc_alloc_l16_2[0..3] ∈ UNINITIALIZED
+  __malloc_w_alloc_l16[bits 0 to 31] ∈ {0; 1; 2} or UNINITIALIZED
 [eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
-  Kernel function: main
-All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
-                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
-                      __malloc_alloc_l16_3}
-Allocation sites: {
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main;
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main }
-Call sites: { foo(1);; foo(2);; foo(3);; foo(2); }
-
-Kernel function: foo
-All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
-                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
-                      __malloc_alloc_l16_3}
-Allocation sites: {
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main;
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main }
-Call sites: { int *p = alloc(sizeof(int) * (unsigned int)size);;
-              int *q = alloc(sizeof(int) * (unsigned int)size); }
-
-Kernel function: alloc
-All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
-                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
-                      __malloc_alloc_l16_3}
-Allocation sites: {
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main;
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main }
-Call sites: { void *buf = malloc(size); }
-
-Kernel function: malloc
-All allocated bases: {__malloc_alloc_l16, __malloc_alloc_l16_0,
-                      __malloc_alloc_l16_1, __malloc_alloc_l16_2,
-                      __malloc_alloc_l16_3}
-Allocation sites: {
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    malloc :: malloc_may_fail.c:16 <-
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main;
-                    alloc :: malloc_may_fail.c:27 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:41 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:42 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:43 <-
-                    main;
-                    alloc :: malloc_may_fail.c:32 <-
-                    foo :: malloc_may_fail.c:44 <-
-                    main }
-Call sites: {  }
-
-Dynamic allocated bases: {[ __malloc_alloc_l16 -> alloc :: malloc_may_fail.c:27 <-
-                                                  foo :: malloc_may_fail.c:41 <-
-                                                  main
-                            __malloc_alloc_l16_0 -> alloc :: malloc_may_fail.c:32 <-
-                                                    foo :: malloc_may_fail.c:41 <-
+  Dynamic allocated bases: {[ __malloc_alloc_l16 -> malloc :: malloc_may_fail.c:16 <-
                                                     main
-                            __malloc_alloc_l16_1 -> alloc :: malloc_may_fail.c:32 <-
-                                                    foo :: malloc_may_fail.c:42 <-
-                                                    main
-                            __malloc_alloc_l16_2 -> alloc :: malloc_may_fail.c:32 <-
-                                                    foo :: malloc_may_fail.c:43 <-
-                                                    main
-                            __malloc_alloc_l16_3 -> alloc :: malloc_may_fail.c:32 <-
-                                                    foo :: malloc_may_fail.c:44 <-
-                                                    main ]}
-Malloced by stack: malloc :: malloc_may_fail.c:16 <-
-                   alloc :: malloc_may_fail.c:27 <-
-                   foo :: malloc_may_fail.c:41 <-
-                   main -> __malloc_alloc_l16
-Malloced by stack: malloc :: malloc_may_fail.c:16 <-
-                   alloc :: malloc_may_fail.c:32 <-
-                   foo :: malloc_may_fail.c:44 <-
-                   main -> __malloc_alloc_l16_3
-Malloced by stack: malloc :: malloc_may_fail.c:16 <-
-                   alloc :: malloc_may_fail.c:32 <-
-                   foo :: malloc_may_fail.c:41 <-
-                   main -> __malloc_alloc_l16_0
-Malloced by stack: malloc :: malloc_may_fail.c:16 <-
-                   alloc :: malloc_may_fail.c:32 <-
-                   foo :: malloc_may_fail.c:42 <-
-                   main -> __malloc_alloc_l16_1
-Malloced by stack: malloc :: malloc_may_fail.c:16 <-
-                   alloc :: malloc_may_fail.c:32 <-
-                   foo :: malloc_may_fail.c:43 <-
-                   main -> __malloc_alloc_l16_2
+                              __malloc_alloc_l16_0 -> malloc :: malloc_may_fail.c:16 <-
+                                                      main
+                              __malloc_w_alloc_l16 -> malloc :: malloc_may_fail.c:16 <-
+                                                      main ]}
+Malloced by stack: malloc :: malloc_may_fail.c:16 <- main -> __malloc_alloc_l16, __malloc_alloc_l16_0, __malloc_w_alloc_l16
 [inout] Out (external) for function alloc:
     __fc_heap_status
 [inout] Inputs for function alloc:
     __fc_heap_status
 [inout] Out (external) for function foo:
     __fc_heap_status; Frama_C_entropy_source; __malloc_alloc_l16_0[0..3];
-    __malloc_alloc_l16_1[0..3]; __malloc_alloc_l16_2[0..3];
-    __malloc_alloc_l16_3[0..3]
+    __malloc_w_alloc_l16[0..3]
 [inout] Inputs for function foo:
     __fc_heap_status; Frama_C_entropy_source
 [inout] Out (external) for function main:
     __fc_heap_status; Frama_C_entropy_source; __malloc_alloc_l16_0[0..3];
-    __malloc_alloc_l16_1[0..3]; __malloc_alloc_l16_2[0..3];
-    __malloc_alloc_l16_3[0..3]
+    __malloc_w_alloc_l16[0..3]
 [inout] Inputs for function main:
     __fc_heap_status; Frama_C_entropy_source

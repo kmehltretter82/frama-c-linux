@@ -28,19 +28,14 @@
 [eva:memexec] No previous call found for bar
 [eva] computing for function bar <- main.
   Called from malloc_diff_stack.c:27.
-[eva:memexec] No previous saved state found for alloc
-[eva] computing for function alloc <- bar <- main.
-  Called from malloc_diff_stack.c:20.
-[eva] malloc_diff_stack.c:9: Call to builtin malloc
-[eva] malloc_diff_stack.c:9: allocating variable __malloc_alloc_l9_0
-[eva] malloc_diff_stack.c:10: Call to builtin free
-[eva:malloc] malloc_diff_stack.c:10: strong free on bases: {__malloc_alloc_l9_0}
-[eva] Recording results for alloc
-[eva] Done for function alloc
+[eva:memexec-malloc] 
+  --- Reused allocated bases {__malloc_alloc_l9} for KF alloc at callstack 
+  alloc :: malloc_diff_stack.c:20 <- bar :: malloc_diff_stack.c:27 <- main
+[eva] malloc_diff_stack.c:20: Reusing old results for call to alloc
 [eva] Recording results for bar
 [eva] Done for function bar
 [eva:memexec-malloc] 
-  --- Reused allocated bases {__malloc_alloc_l9_0} for KF bar at callstack 
+  --- Reused allocated bases {__malloc_alloc_l9} for KF bar at callstack 
   bar :: malloc_diff_stack.c:28 <- main
 [eva] malloc_diff_stack.c:28: Reusing old results for call to bar
 [eva] Recording results for main
@@ -57,98 +52,6 @@
   __fc_heap_status ∈ [--..--]
   __retres ∈ {0}
 [eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
-  Kernel function: foo
-All allocated bases: {__malloc_alloc_l9}
-Allocation sites: {
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main }
-Call sites: { alloc(); }
-
-Kernel function: alloc
-All allocated bases: {__malloc_alloc_l9, __malloc_alloc_l9_0}
-Allocation sites: {
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main }
-Call sites: { int *p = malloc(sizeof(int)); }
-
-Kernel function: malloc
-All allocated bases: {__malloc_alloc_l9, __malloc_alloc_l9_0}
-Allocation sites: {
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main }
-Call sites: {  }
-
-Kernel function: main
-All allocated bases: {__malloc_alloc_l9, __malloc_alloc_l9_0}
-Allocation sites: {
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:15 <-
-                    foo :: malloc_diff_stack.c:25 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main }
-Call sites: { foo();; bar(); }
-
-Kernel function: bar
-All allocated bases: {__malloc_alloc_l9_0}
-Allocation sites: {
-                    malloc :: malloc_diff_stack.c:9 <-
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main;
-                    alloc :: malloc_diff_stack.c:20 <-
-                    bar :: malloc_diff_stack.c:27 <-
-                    main }
-Call sites: { alloc(); }
-
-Dynamic allocated bases: {[ __malloc_alloc_l9 -> alloc :: malloc_diff_stack.c:15 <-
-                                                 foo :: malloc_diff_stack.c:25 <-
-                                                 main
-                            __malloc_alloc_l9_0 -> alloc :: malloc_diff_stack.c:20 <-
-                                                   bar :: malloc_diff_stack.c:27 <-
+  Dynamic allocated bases: {[ __malloc_alloc_l9 -> malloc :: malloc_diff_stack.c:9 <-
                                                    main ]}
-Malloced by stack: malloc :: malloc_diff_stack.c:9 <-
-                   alloc :: malloc_diff_stack.c:15 <-
-                   foo :: malloc_diff_stack.c:25 <-
-                   main -> __malloc_alloc_l9
-Malloced by stack: malloc :: malloc_diff_stack.c:9 <-
-                   alloc :: malloc_diff_stack.c:20 <-
-                   bar :: malloc_diff_stack.c:27 <-
-                   main -> __malloc_alloc_l9_0
+Malloced by stack: malloc :: malloc_diff_stack.c:9 <- main -> __malloc_alloc_l9

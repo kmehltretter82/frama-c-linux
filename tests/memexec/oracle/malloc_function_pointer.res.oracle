@@ -47,85 +47,9 @@
   g ∈ {{ &foo }}
   __retres ∈ {0}
 [eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
-  Kernel function: foo
-All allocated bases: {__malloc_alloc_l9}
-Allocation sites: {
-                    malloc :: malloc_function_pointer.c:9 <-
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main;
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main }
-Call sites: { alloc(); }
-
-Kernel function: alloc
-All allocated bases: {__malloc_alloc_l9}
-Allocation sites: {
-                    malloc :: malloc_function_pointer.c:9 <-
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main;
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main }
-Call sites: { int *p = malloc(sizeof(int)); }
-
-Kernel function: malloc
-All allocated bases: {__malloc_alloc_l9}
-Allocation sites: {
-                    malloc :: malloc_function_pointer.c:9 <-
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main;
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main }
-Call sites: {  }
-
-Kernel function: main
-All allocated bases: {__malloc_alloc_l9}
-Allocation sites: {
-                    malloc :: malloc_function_pointer.c:9 <-
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main;
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main }
-Call sites: { test(f); }
-
-Kernel function: test
-All allocated bases: {__malloc_alloc_l9}
-Allocation sites: {
-                    malloc :: malloc_function_pointer.c:9 <-
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main;
-                    alloc :: malloc_function_pointer.c:15 <-
-                    foo :: malloc_function_pointer.c:20 <-
-                    test :: malloc_function_pointer.c:28 <-
-                    main }
-Call sites: { (*f)(); }
-
-Dynamic allocated bases: {[ __malloc_alloc_l9 -> alloc :: malloc_function_pointer.c:15 <-
-                                                 foo :: malloc_function_pointer.c:20 <-
-                                                 test :: malloc_function_pointer.c:28 <-
-                                                 main ]}
-Malloced by stack: malloc :: malloc_function_pointer.c:9 <-
-                   alloc :: malloc_function_pointer.c:15 <-
-                   foo :: malloc_function_pointer.c:20 <-
-                   test :: malloc_function_pointer.c:28 <-
-                   main -> __malloc_alloc_l9
+  Dynamic allocated bases: {[ __malloc_alloc_l9 -> malloc :: malloc_function_pointer.c:9 <-
+                                                   main ]}
+Malloced by stack: malloc :: malloc_function_pointer.c:9 <- main -> __malloc_alloc_l9
 [inout] Out (external) for function alloc:
     __fc_heap_status
 [inout] Inputs for function alloc:

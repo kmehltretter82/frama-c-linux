@@ -57,58 +57,6 @@
 [eva:final-states] Values at end of function main:
   __fc_heap_status ∈ [--..--]
 [eva:alloc-summary] ====== DYNAMIC ALLOCATION SUMMARY ======
-  Kernel function: f1
-All allocated bases: {__malloc_alloc_l8}
-Allocation sites: {
-                    malloc :: malloc_memexec.c:8 <-
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main;
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main }
-Call sites: { void *p = alloc(); }
-
-Kernel function: alloc
-All allocated bases: {__malloc_alloc_l8}
-Allocation sites: {
-                    malloc :: malloc_memexec.c:8 <-
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main;
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main }
-Call sites: { int *p = malloc(sizeof(int)); }
-
-Kernel function: malloc
-All allocated bases: {__malloc_alloc_l8}
-Allocation sites: {
-                    malloc :: malloc_memexec.c:8 <-
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main;
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main }
-Call sites: {  }
-
-Kernel function: main
-All allocated bases: {__malloc_alloc_l8}
-Allocation sites: {
-                    malloc :: malloc_memexec.c:8 <-
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main;
-                    alloc :: malloc_memexec.c:14 <-
-                    f1 :: malloc_memexec.c:20 <-
-                    main }
-Call sites: { f1(); }
-
-Dynamic allocated bases: {[ __malloc_alloc_l8 -> alloc :: malloc_memexec.c:14 <-
-                                                 f1 :: malloc_memexec.c:20 <-
-                                                 main ]}
-Malloced by stack: malloc :: malloc_memexec.c:8 <-
-                   alloc :: malloc_memexec.c:14 <-
-                   f1 :: malloc_memexec.c:20 <-
-                   main -> __malloc_alloc_l8
+  Dynamic allocated bases: {[ __malloc_alloc_l8 -> malloc :: malloc_memexec.c:8 <-
+                                                   main ]}
+Malloced by stack: malloc :: malloc_memexec.c:8 <- main -> __malloc_alloc_l8

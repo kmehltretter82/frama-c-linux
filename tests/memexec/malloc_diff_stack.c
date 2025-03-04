@@ -24,7 +24,7 @@ int main()
 {
     foo(); // Allocate new base here
     foo(); // Reuse the base
-    bar(); // Allocate new base here, We don't reuse base allocated by foo because they are in different call stack
+    bar(); // Reuse the base
     bar(); // Reuse the base
     return 0;
 }
