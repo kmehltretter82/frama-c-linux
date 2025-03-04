@@ -1302,28 +1302,31 @@ and alloc_site_correspondence f f' _env =
       ) call_sites
 
 and widening_stmt_correspondence kf kf' _env =
-  let f = Kf.get_definition kf in
-  let f' = Kf.get_definition kf' in
-  let filter_loop stmts = List.filter (fun s -> match s.skind with Loop _ -> true | _ -> false) stmts in
-  let sort_loop stmts = List.sort (fun s s' -> 
-    let sloc = fst (Cil_datatype.Stmt.loc s) in
-    let sloc' = fst (Cil_datatype.Stmt.loc s') in
-    sloc.Filepath.pos_lnum - sloc'.Filepath.pos_lnum
-  ) stmts in
-  let stmts' = filter_loop f'.sallstmts in
-  let stmts = filter_loop f.sallstmts in
-  (* Sort loop statements in order of sloc *)
-  let sorted_stmts' = sort_loop stmts' in
-  let sorted_stmt = sort_loop stmts in
-  let rec combine_first list list' =
-  match list, list' with
-  | [], _ -> ()
-  | _, [] -> ()
-  | h::t, h'::t' -> 
-    (* Kernel.warning "Matching old stmt: %a with %a" Printer.pp_stmt h Printer.pp_stmt h'; *)
-    Stmt.add h (`Partial (h', `Body_changed)); 
-    combine_first t t'
-  in combine_first sorted_stmt sorted_stmts'
+  if Kf.has_definition kf && Kf.has_definition kf' then
+    begin
+      let f = Kf.get_definition kf in
+      let f' = Kf.get_definition kf' in
+      let filter_loop stmts = List.filter (fun s -> match s.skind with Loop _ -> true | _ -> false) stmts in
+      let sort_loop stmts = List.sort (fun s s' -> 
+        let sloc = fst (Cil_datatype.Stmt.loc s) in
+        let sloc' = fst (Cil_datatype.Stmt.loc s') in
+        sloc.Filepath.pos_lnum - sloc'.Filepath.pos_lnum
+      ) stmts in
+      let stmts' = filter_loop f'.sallstmts in
+      let stmts = filter_loop f.sallstmts in
+      (* Sort loop statements in order of sloc *)
+      let sorted_stmts' = sort_loop stmts' in
+      let sorted_stmt = sort_loop stmts in
+      let rec combine_first list list' =
+      match list, list' with
+      | [], _ -> ()
+      | _, [] -> ()
+      | h::t, h'::t' -> 
+        (* Kernel.warning "Matching old stmt: %a with %a" Printer.pp_stmt h Printer.pp_stmt h'; *)
+        Stmt.add h (`Partial (h', `Body_changed)); 
+        combine_first t t'
+      in combine_first sorted_stmt sorted_stmts'
+    end
 
 (* correspondence of formals is supposed to have already been checked,
    and formals mapping to have been put in the local env
