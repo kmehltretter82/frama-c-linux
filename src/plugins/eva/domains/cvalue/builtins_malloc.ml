@@ -449,15 +449,15 @@ let update_variable_validity ?(make_weak=false) base sizev =
     base, max_valid_bits
   | _ -> Self.fatal "base is not Allocated: %a" Base.pretty base
 
-(* Checks if we should allocate a new base.
-  We should allocate new base when the number of allocated bases on the allocation site
-  is less than or equal to the threshold [mlevel] *)
+(* Checks if we should allocate a new base. *)
+  (* No allocation has been made n = 0 *)
+  (* No reusable base but can still allocate n <= max_level *)
 let must_allocate_new_variable nb max_level =
-  nb <= max_level
+  nb = 0 || nb <= max_level
 
 (* Returns the type of the new variable to be allocated *)
 let new_variable_type nb max_level =
-  if nb = max_level || (max_level <= 1) then Weak else Strong
+  if nb = max_level then Weak else Strong
 
 let can_reuse_variable b state =
   Base.is_weak b ||
@@ -467,7 +467,8 @@ let can_reuse_variable b state =
   with Not_found -> true
 
 (* Allocates a new variable for the given region, prefix and size. *)
-let alloc_by_aux stack region prefix sizev state =
+let alloc_by_stack region prefix sizev state = 
+  let stack = current_alloc_site () in
   let max_level = Parameters.MallocLevel.get () in
   let all_vars =
     try MallocedByStack.find stack
@@ -488,13 +489,10 @@ let alloc_by_aux stack region prefix sizev state =
       | true ->
         (* Either b is weak and should be the last allocated variable.
            Or b is strong and reusable *)
+        assert (nb <= max_level);
         update_variable_validity ~make_weak:false b sizev
   in
   aux 0 all_vars
-
-let alloc_by_stack region prefix sizev state = 
-  let stack = current_alloc_site () in
-  alloc_by_aux stack region prefix sizev state
 
 let choose_base_allocation () =
   let open Eva_annotations in
