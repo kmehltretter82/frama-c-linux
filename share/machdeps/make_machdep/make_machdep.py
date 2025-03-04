@@ -377,7 +377,16 @@ for f, typ in source_files:
 version_output = subprocess.run(
     [args.compiler, args.compiler_version], capture_output=True, text=True
 )
-version = version_output.stdout.splitlines()[0]
+version_lines = version_output.stdout.splitlines()
+if not version_lines:
+    logging.warning(
+        "could not obtain compiler version with "
+        + f"'{args.compiler_version}'"
+        + ", check option --compiler-version"
+    )
+    version = "<unknown>"
+else:
+    version = version_output.stdout.splitlines()[0]
 
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags
