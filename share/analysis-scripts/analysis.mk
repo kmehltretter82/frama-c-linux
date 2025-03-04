@@ -188,9 +188,7 @@ SHELL        := $(shell which bash)
 	      -metrics -metrics-log a:$@/metrics.log \
 	      -save $@/framac.sav \
 	      -print -ocode $@/framac.ast -then -no-print \
-	    || (mv -f $@/{running,command} &&
-	        $(RM) $@/stats.txt &&
-	        false) # Prevents having error code reporting in stats.txt
+	    || ($(RM) -r $@; false) # Ensures target failure
 	} 2>&1 |
 	  $(SED_UNBUFFERED) '/\[metrics\]/,999999d' |
 	  tee $@/parse.log
