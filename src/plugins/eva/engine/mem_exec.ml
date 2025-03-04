@@ -53,6 +53,22 @@ let stat_gather_load_time = Statistics.register_global_stat
 (* Total number of loops whose widenings are saved  *)
 let stat_saved_widenings = Statistics.register_global_stat
     "memexec-saved-widenings"
+    
+let stat_import_calls_load_time = Statistics.register_function_stat
+  "time-import-calls"
+
+let stat_import_bases_call_effect_load_time = Statistics.register_global_stat
+  "time-import-bases-call-effect"
+
+let stat_import_call_effect_load_time = Statistics.register_global_stat
+  "time-import-call-effect"
+
+let stat_import_stored_results_load_time = Statistics.register_global_stat
+  "time-import-stored-results"
+
+let stat_import_output_states_load_time = Statistics.register_global_stat
+  "time-import-output-states"
+
 
 
 let proxy = State_builder.Proxy.(create "Mem_exec.proxy" Forward [])
@@ -66,6 +82,26 @@ let load_time_wrapper stat_key f =
   let total_time_ms = int_of_float (total_time *. 1000.) in
   begin
     Statistics.set stat_key () total_time_ms;
+    res
+  end
+
+let arg_load_time_wrapper stat_key arg f =
+  let start_time = Unix.time () in
+  let res = f () in
+  let total_time = (Unix.time ()) -. start_time in
+  let total_time_ms = int_of_float (total_time *. 1000.) in
+  begin
+    Statistics.set stat_key arg total_time_ms;
+    res
+  end
+
+let cumulative_load_time_wrapper stat_key f =
+  let start_time = Unix.time () in
+  let res = f () in
+  let total_time = (Unix.time ()) -. start_time in
+  let total_time_ms = int_of_float (total_time *. 1000.) in
+  begin
+    Statistics.incr_by stat_key () total_time_ms;
     res
   end
 
@@ -548,8 +584,9 @@ module Make
     let add allocated (bases, outputs, i) =
       let all_bases = Eva_diff.import_bases bases in
       let allocated = Eva_diff.import_bases allocated in
+      let _import () = List.map (fun (key, state) -> key, Domain.import state) outputs in
       let outputs =
-        List.map (fun (key, state) -> key, Domain.import state) outputs
+      cumulative_load_time_wrapper stat_import_output_states_load_time _import
       in
       Base.Hptset.Hashtbl.add new_tbl allocated (all_bases, outputs, i)
     in 
@@ -561,7 +598,8 @@ module Make
     let add entry_state allocated_tbl =
       try
         let entry_state = Domain.import entry_state in
-        let allocated_tbl = import_stored_results allocated_tbl in
+        let _import () = import_stored_results allocated_tbl in
+        let allocated_tbl = cumulative_load_time_wrapper stat_import_stored_results_load_time _import in
         Domain.Hashtbl.add new_tbl entry_state allocated_tbl
       with Not_found ->
         ()
@@ -574,7 +612,8 @@ module Make
     let add bases call_effect =
       try
         let bases = Eva_diff.import_bases bases in
-        let call_effect = import_call_effect call_effect in
+        let _import () = import_call_effect call_effect in
+        let call_effect = cumulative_load_time_wrapper stat_import_call_effect_load_time _import in
         Base.Hptset.Hashtbl.add new_tbl bases call_effect;
       with Not_found ->
         ()
@@ -586,7 +625,8 @@ module Make
     let add key data acc =
       try
         let key = List.map (Option.map Value.import) key in
-        let data = import_bases_to_call_effect data in
+        let _import () = import_bases_to_call_effect data in
+        let data = cumulative_load_time_wrapper stat_import_bases_call_effect_load_time _import in
         ActualArgs.Map.add key data acc
       with Not_found -> 
         acc
@@ -599,7 +639,9 @@ module Make
       begin
           try
             let _ = Self.debug ~dkey "Importing summaries for function %a@." Kernel_function.pretty old_kf in
-            let data = import_calls old_data in
+            let _import_calls () = 
+              import_calls old_data in
+            let data = arg_load_time_wrapper stat_import_calls_load_time kf _import_calls in
             PreviousCalls.replace kf data
           with Not_found ->
             Self.debug ~dkey "Cannot import summaries for function %a@."
