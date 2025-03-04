@@ -124,6 +124,7 @@ skipping FRAMAC_SHARE/libc/complex.h
 [kernel] Parsing FRAMAC_SHARE/libc/sys/mman.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/msg.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/param.h (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/libc/sys/poll.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/random.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/resource.h (with preprocessing)
 [kernel] Parsing FRAMAC_SHARE/libc/sys/select.h (with preprocessing)
