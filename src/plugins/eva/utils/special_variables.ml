@@ -192,10 +192,7 @@ let import_created project =
   let list = Project.on project gather () in
   let import (name, vi, validity, alloc, loc) =
     let new_vi, _base = register name vi.vtype validity alloc in
-    let _ = 
-      match _base with
-      | Base.Allocated _ ->  Cabs2cil.register_var_name name loc
-      | _ -> ()  in
+    Cabs2cil.register_var_name name loc;
     Ast_diff.Varinfo.add vi (`Same new_vi)
   in
   List.iter import list
