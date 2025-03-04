@@ -76,9 +76,9 @@ let add_cache_dependency state = State_builder.Proxy.extend [state] proxy
 let cache_dependencies = [ Ast.self; State_builder.Proxy.get proxy ]
 
 let load_time_wrapper stat_key f =
-  let start_time = Unix.time () in
+  let start_time = Sys.time () in
   let res = f () in
-  let total_time = (Unix.time ()) -. start_time in
+  let total_time = (Sys.time ()) -. start_time in
   let total_time_ms = int_of_float (total_time *. 1000.) in
   begin
     Statistics.set stat_key () total_time_ms;
@@ -86,9 +86,9 @@ let load_time_wrapper stat_key f =
   end
 
 let arg_load_time_wrapper stat_key arg f =
-  let start_time = Unix.time () in
+  let start_time = Sys.time () in
   let res = f () in
-  let total_time = (Unix.time ()) -. start_time in
+  let total_time = (Sys.time ()) -. start_time in
   let total_time_ms = int_of_float (total_time *. 1000.) in
   begin
     Statistics.set stat_key arg total_time_ms;
@@ -96,9 +96,9 @@ let arg_load_time_wrapper stat_key arg f =
   end
 
 let cumulative_load_time_wrapper stat_key f =
-  let start_time = Unix.time () in
+  let start_time = Sys.time () in
   let res = f () in
-  let total_time = (Unix.time ()) -. start_time in
+  let total_time = (Sys.time ()) -. start_time in
   let total_time_ms = int_of_float (total_time *. 1000.) in
   begin
     Statistics.incr_by stat_key () total_time_ms;
