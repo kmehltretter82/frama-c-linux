@@ -62,14 +62,12 @@ module Make (Model : Modeling) = struct
     | False -> Format.fprintf fmt "{ 0 }"
     | Top -> Format.pp_print_string fmt Utf8_logic.top
     | Repr r ->
-      let open Format in
-      let fkind f = Typed_float.fkind_of_format f in
-      fprintf fmt "@[<v0>" ;
-      fprintf fmt "Real     : @[<h>%a@]@ " Exact.pretty    r.exact    ;
-      fprintf fmt "Absolute : @[<h>%a@]@ " Absolute.pretty r.absolute ;
-      fprintf fmt "Relative : @[<h>%a@]@ " Relative.pretty r.relative ;
-      fprintf fmt "Format : %a" Cil_printer.pp_fkind (fkind r.format) ;
-      fprintf fmt "@]"
+      Format.fprintf fmt "@[<v0>" ;
+      Format.fprintf fmt "Real     : @[<h>%a@]@ " Exact.pretty    r.exact    ;
+      Format.fprintf fmt "Absolute : @[<h>%a@]@ " Absolute.pretty r.absolute ;
+      Format.fprintf fmt "Relative : @[<h>%a@]@ " Relative.pretty r.relative ;
+      Format.fprintf fmt "Format : %a" Typed_float.pretty_format r.format ;
+      Format.fprintf fmt "@]"
 
   let hash = function
     | False -> 0
@@ -81,11 +79,21 @@ module Make (Model : Modeling) = struct
       let relative = Relative.hash r.relative in
       2 + Hashtbl.hash (format, exact, absolute, relative)
 
+  let copy = function
+    | False -> False
+    | Top -> Top
+    | Repr r ->
+      let exact    = Exact.copy    r.exact    in
+      let absolute = Absolute.copy r.absolute in
+      let relative = Relative.copy r.relative in
+      let format   = r.format in
+      Repr { exact ; absolute ; relative ; format }
+
   let compare l r =
     match l, r with
     | False, False | Top, Top -> 0
-    | False, _ | Top, _ -> -1
-    | _, False | _, Top ->  1
+    | False, _ | _, Top -> -1
+    | _, False | Top, _ ->  1
     | Repr l, Repr r ->
       let conclude_they_are_equal = 0 in
       let ( let= ) c f = if c = 0 then f `Eq else c in
@@ -95,16 +103,25 @@ module Make (Model : Modeling) = struct
       let= `Eq = Relative.compare l.relative r.relative in
       conclude_they_are_equal
 
+  let structural_descr =
+    let open Structural_descr in
+    let exact    = Exact.packed_descr    in
+    let absolute = Absolute.packed_descr in
+    let relative = Relative.packed_descr in
+    let format = t_sum [| [||] ; [||] |] |> pack in
+    let repr = t_record [| exact ; absolute ; relative ; format |] in
+    t_sum [| [||] ; [||] ; [| pack repr |] |]
+
   module Type = struct
     type t = value
     let name = name
     let reprs = [ False ; Top ]
-    let copy = Datatype.identity
     let rehash = Datatype.identity
     let mem_project = Datatype.never_any_project
-    let structural_descr = Structural_descr.t_unknown
+    let structural_descr = structural_descr
     let pretty = pretty
     let hash = hash
+    let copy = copy
     let compare = compare
     let equal = Datatype.from_compare
   end
