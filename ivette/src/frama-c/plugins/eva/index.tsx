@@ -38,7 +38,7 @@ import './style.css';
 // --- help
 // --------------------------------------------------------------------------
 
-export const docEva = { id: "eva", content: doc };
+Ivette.registerDocChapter({ id: "eva", content: doc });
 
 // --------------------------------------------------------------------------
 // --- Export Component

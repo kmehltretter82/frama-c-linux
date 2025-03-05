@@ -1,17 +1,27 @@
+**TODO**
+
 # Frama-C {#framac}
 
 documentation under construction...
 
 ## Server logs {#framac-server-logs}
 
-## WP Goal {#framac-wp-goals}
+## Kernel {#framac-kernel}
 
-show WP plugins doc.
+documentation under construction...
 
-## Region {#framac-Region}
+### AST info {#framac-kernel-ast-info}
 
-show Region plugin doc.
+### AST view {#framac-kernel-ast-view}
 
-## Locations {#framac-locations}
+### Source code {#framac-kernel-source-code}
 
-show Callgraph plugin doc.
+### Locations {#framac-kernel-locations}
+
+### Properties {#framac-kernel-properties}
+
+### Pivot table {#framac-kernel-pivot-table}
+
+### Console {#framac-kernel-console}
+
+### Messages {#framac-kernel-messages}

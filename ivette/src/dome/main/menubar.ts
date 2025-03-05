@@ -32,7 +32,6 @@ import {
   BrowserWindow,
   Menu,
   MenuItem,
-  shell,
   KeyboardEvent,
   IpcMainInvokeEvent,
 } from 'electron';
@@ -270,46 +269,10 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 ]);
 
 // --------------------------------------------------------------------------
-// --- Renderer-Process Communication
-// --------------------------------------------------------------------------
-
-export function broadcast(event: string, ...args: unknown[]): void {
-  BrowserWindow.getAllWindows().forEach((w) => {
-    w.webContents.send(event, ...args);
-  });
-}
-
-// --------------------------------------------------------------------------
 // --- Help Menu Items
 // --------------------------------------------------------------------------
 
 const helpMenuItemsCustom: MenuSpec = [];
-const helpMenuItems: MenuSpec = [];
-
-ipcMain.handle('dome.ipc.addDocHelpMenu', () => {
-  helpMenuItems.push(
-      {
-        role: 'help',
-        label: 'Documentation',
-        id: 'help_documentation',
-        click: () => broadcast('dome.menu.help.open.doc'),
-        type: 'normal',
-      }
-    );
-});
-
-let learnMoreLink = '';
-ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
-  if (typeof link === 'string') {
-    learnMoreLink = link;
-    helpMenuItems.push(
-      {
-        label: 'Learn More',
-        click() { shell.openExternal(learnMoreLink); },
-      },
-    );
-  }
-});
 
 // --------------------------------------------------------------------------
 // --- Update MenuBar (async)
@@ -444,6 +407,22 @@ export function setMenuItem({ id, ...options }: CustomMenuItem): void {
 // --------------------------------------------------------------------------
 
 function template(): CustomMenu[] {
+  const lastMenuMacOs: CustomMenu[] = [
+    { label: 'Window', role: 'window', submenu: windowMenuItemsMacos }
+  ];
+  const lastMenu: CustomMenu[] = [
+    { label: 'Window', submenu: windowMenuItemsLinux, }
+  ];
+
+  if(helpMenuItemsCustom.length > 0) {
+    lastMenuMacOs.push({
+      label: 'Help', role: 'help', submenu: helpMenuItemsCustom
+    });
+    lastMenu.push({
+      label: 'Help', submenu: helpMenuItemsCustom
+    });
+  }
+
   switch (System.platform) {
     case 'macos':
       return ([] as CustomMenu[]).concat(
@@ -463,18 +442,7 @@ function template(): CustomMenu[] {
           },
         ],
         customMenus,
-        [
-          {
-            label: 'Window',
-            role: 'window',
-            submenu: windowMenuItemsMacos,
-          },
-          {
-            label: 'Help',
-            role: 'help',
-            submenu: concatSep(helpMenuItems, helpMenuItemsCustom),
-          },
-        ],
+        lastMenuMacOs,
       );
     case 'windows':
     case 'linux':
@@ -495,12 +463,7 @@ function template(): CustomMenu[] {
           },
         ],
         customMenus,
-        [
-          { label: 'Window', submenu: windowMenuItemsLinux },
-          {
-            label: 'Help',
-            submenu: concatSep(helpMenuItems, helpMenuItemsCustom) },
-        ],
+        lastMenu
       );
   }
 }

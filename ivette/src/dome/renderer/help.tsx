@@ -26,6 +26,7 @@
  */
 
 import React from 'react';
+import * as Dome from 'dome';
 import { IconButton } from './controls/buttons';
 import { Modal, showModal } from './dialogs';
 import { Markdown } from './text/markdown';
@@ -34,8 +35,10 @@ import { Tree, Node } from './frame/tree';
 import { LSplit } from './layout/splitters';
 
 import * as Ivette from 'ivette';
-import { DocProps } from 'ivette';
-import { ipcRenderer } from 'electron';
+import { ChapterProps } from 'ivette';
+import { showAboutModal, showCreditsModal } from 'frama-c/help';
+import { Icon } from './controls/icons';
+import { LED } from './controls/displays';
 
 /* --------------------------------------------------------------------------*/
 /* --- Help                                                                  */
@@ -64,8 +67,7 @@ export function HelpIcon(props: HelpIconProps): JSX.Element {
 }
 
 /** General doc */
-
-interface IndexTree {
+interface Index {
   level: number;
   label: string;
   id: string;
@@ -74,34 +76,77 @@ interface IndexTree {
 interface HNode {
   id: string;
   label: string;
+  errors?: string[];
   subTree: HNode[];
 }
 
 type HTree = HNode[];
 
-function getTableOfContents(doc: DocProps): HTree {
+function getTableOfContents(chapter: ChapterProps): HTree {
   const regex = /^(#{1,4})\s(.+)\s\{#(.+)\}/gm;
-  // Retrieving the title list with an id
+  // Retrieving H1, H2, H3, H4 titles with an id
   let matches;
-  const titleWithId: IndexTree[] = [];
-  while ((matches = regex.exec(doc.content)) !== null) {
+  const titles: Index[] = [];
+  while ((matches = regex.exec(chapter.content)) !== null) {
       const level = matches[1].length;
       const label = matches[2];
       const id = matches[3];
-      titleWithId.push({ level, label, id });
+      titles.push({ level, label, id });
   }
-  // Calculate the tree from the title list
+
+  // Check title list
+  function checkTitles(): string[] {
+    const errors: string[] = [];
+    const ids: string[] = [];
+    const indexToDelete: number[] = [];
+    let h1Error = false;
+    const duplicateIds: string[] = [];
+    const badStartingIds: string[] = [];
+
+    titles.forEach((title, index) => {
+      const { level, id } = title;
+      // Check H1
+      if(!h1Error && (
+        (level === 1 && index > 0) || (level !== 1 && index === 0))
+      ) { h1Error = true; }
+      // Check duplicate ID
+      if(ids.find(e => e === id) !== undefined) {
+        indexToDelete.push(index);
+        duplicateIds.push(id);
+      } else ids.push(id);
+      // Check if ID stating with chapter.id
+      if(id.split('-')[0] !== chapter.id) badStartingIds.push(id);
+    });
+    // Add errors
+    if(h1Error) errors.push(
+      'The chapter must have one H1 and it must be placed at the beginning\n');
+    if(duplicateIds.length > 0) {
+      errors.push('Duplicate Ids are removed from table of content:');
+      duplicateIds.forEach(id => errors.push(`- ${id}`));
+    }
+    if(badStartingIds.length > 0) {
+      errors.push(`Id must start with "${chapter.id}":`);
+      badStartingIds.forEach(id => errors.push(`- ${id}`));
+    }
+
+    indexToDelete.forEach(i => titles.splice(i, 1));
+    return errors;
+  }
+  const errors = checkTitles();
+
+  // Calculate the tree from the titles list
   let i: number = 0;
   function toTree(): HTree {
     const t: HTree = [];
-    while(i < titleWithId.length) {
-      const elt = titleWithId[i];
+    while(i < titles.length) {
+      const elt = titles[i];
       const newNode: HNode = {
         id: elt.id, label: elt.label, subTree: []
       };
+      if(elt.level === 1) newNode.errors = errors;
       t.push(newNode);
-      if(i+1 < titleWithId.length) {
-        const nextLevel = titleWithId[i+1].level;
+      if(i+1 < titles.length) {
+        const nextLevel = titles[i+1].level;
         if(nextLevel > elt.level) {
           i++;
           newNode.subTree = toTree();
@@ -119,43 +164,111 @@ function getSubTree(tree: HTree): React.ReactNode {
 }
 
 function Nodes(props: { tree: HTree }): React.ReactNode {
-  return props.tree.map(({ id, label, subTree }) =>
-    <Node key={id} id={id} label={label}>{ getSubTree(subTree) }</Node>
+  return props.tree.map(({ id, label, errors, subTree }) => {
+    const actions = errors && errors.length > 0 ? (
+      <>
+        <LED status="negative" blink={true} />
+        <Icon id='WARNING' kind="negative" title={errors.join('\n')}></Icon>
+        <LED status="negative" blink={true} />
+      </>) :
+      undefined;
+    return <Node key={id} id={id} label={label} actions={actions}>
+        { getSubTree(subTree) }</Node>;
+  }
   );
 }
 
+/**
+  * Each chapter must have a unique identifier.
+  * If a chapter is saved with an existing identifier, the identifier will be
+  * changed and errors will appear on the last chapter saved.
+  * Each *.md file must declare a unique H1 key with
+  * # <title> {#<id>} with <id> without -.
+  * Each *.md file can then declare H2, H3 or H4 keys with
+  * #+ <title> {#<id>-<subid>} with <subid>
+  * which can optionally be compounded with - (unrelated to depth level).
+*/
 function GeneralDocModal(props: { id?: string }): JSX.Element {
   const { id } = props;
-
+  const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
   const selectedIdState = React.useState<string>(id || 'ivette');
-  const [selectedId, setSelectedid] = selectedIdState;
-  // const docList = Ivette.DOCITEM.getElements();
+  const [ selectedId, setSelectedid ] = selectedIdState;
+
+  const DuplicateIdsErrors = React.useMemo(() => {
+    const errors: string[] = [];
+    const duplicateIds = Ivette.DOCCHAPTER.getElements()
+      .map(elt => elt.id)
+      .filter(elt => elt.endsWith("-error"));
+    if(duplicateIds.length > 0) {
+      errors.push("Chapter Id must be unique.\
+        \nDuplication can be due to hot reloading.\
+        \nCheck the following ids:");
+      duplicateIds.forEach(id => errors.push(`- ${id}`));
+    }
+    return errors;
+  }, []);
 
   const index = React.useMemo(() => {
-    return Ivette.DOCITEM.getElements().map(item => {
-      return getTableOfContents(item);
-    });
+    return Ivette.DOCCHAPTER.getElements()
+      .sort((a, b) => {
+        const A = a.rank ?? 50;
+        const B = b.rank ?? 50;
+        return A - B;
+      })
+      .map(item => {
+        return getTableOfContents(item);
+      });
   }, []);
 
   const currentDoc = React.useMemo(() => {
     const docId = selectedId.split('-')[0];
-    return Ivette.DOCITEM.getElements().find(elt => elt.id === docId);
+    return Ivette.DOCCHAPTER.getElements().find(elt => elt.id === docId);
+  }, [selectedId]);
+
+  const title = React.useMemo(() => {
+    const ids = selectedId.split('-');
+    const chapter = ids[0].charAt(0).toUpperCase() + ids[0].slice(1);
+    const section = ids.slice(1).join(' ');
+    return `Documentation ${chapter} ${section ? "- "+section: ""}`;
   }, [selectedId]);
 
   return (
-    <Modal className='modal-framac-doc' label='Documentation'>
+    <Modal className='modal-framac-doc' label={title}>
       <LSplit settings="frama-c.modal-doc.split">
         <SideBar>
-          <SidebarTitle label='Table of contents' />
+          <SidebarTitle label='Table of contents' >
+            <div className='dome-xTree-actions'>
+              { DuplicateIdsErrors.length > 0 &&
+                <Icon id='WARNING' kind="negative"
+                  title={DuplicateIdsErrors.join('\n')}
+                  />
+              }
+              <IconButton
+                icon={ "CHEVRON.CONTRACT" }
+                title="Fold all"
+                disabled={unfoldAll === false}
+                size={14}
+                onClick={() => setUnfoldAll(false)}
+              />
+              <IconButton
+                icon={ "CHEVRON.EXPAND" }
+                title="Unfold all"
+                disabled={unfoldAll}
+                size={14}
+                onClick={() => setUnfoldAll(true)}
+              />
+            </div>
+          </SidebarTitle>
           <Tree
-            unfoldAll={true}
+            unfoldAll={unfoldAll}
+            setUnfoldAll={setUnfoldAll}
             foldButtonPosition='right'
             selected={selectedId}
             onClick={(id) => setSelectedid(id) }
           >
-            { index.map((e, i) => <Nodes
+            { index.map((tree, i) => <Nodes
                 key={i}
-                tree={e}
+                tree={tree}
               ></Nodes> ) }
           </Tree>
         </SideBar>
@@ -172,4 +285,29 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
 
 export function showFramaCDocModal(): void { showModal(<GeneralDocModal/>); }
 
-ipcRenderer.on('dome.menu.help.open.doc', showFramaCDocModal);
+Dome.addMenuItem({
+  menu: 'Help',
+  label: 'Documentation',
+  id: 'help_documentation',
+  onClick: showFramaCDocModal,
+  kind: 'normal',
+});
+Dome.addMenuItem({
+  menu: 'Help',
+  id: 'help_separator',
+  kind: 'separator',
+});
+Dome.addMenuItem({
+  menu: 'Help',
+  label: 'About',
+  id: 'help_about',
+  onClick: showAboutModal,
+  kind: 'normal',
+});
+Dome.addMenuItem({
+  menu: 'Help',
+  label: 'Credits',
+  id: 'help_credits',
+  onClick: showCreditsModal,
+  kind: 'normal',
+});

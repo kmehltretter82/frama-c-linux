@@ -423,7 +423,7 @@ export function addMenu(label: string): void {
   ipcRenderer.send('dome.ipc.menu.addmenu', label);
 }
 
-export type MenuName = 'File' | 'Edit' | 'View' | string;
+export type MenuName = 'File' | 'Edit' | 'View' | 'Help' | string;
 export type MenuItemType = 'normal' | 'separator' | 'checkbox' | 'radio';
 
 export interface MenuItemProps {

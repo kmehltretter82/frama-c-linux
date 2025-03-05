@@ -54,7 +54,7 @@ import * as Node from "./components/node";
 import { Panel } from './components/panel';
 import { CallgraphToolsBar } from "./components/toolbar";
 import { IThreeStateButton } from "./components/threeStateButton";
-import { CallgraphTitleBar } from "./components/titlebar";
+import { CallgraphTitleBar, docCallgraph } from "./components/titlebar";
 
 import * as CgAPI from './api';
 
@@ -385,5 +385,7 @@ Ivette.registerView({
     ABCD: 'fc.callgraph',
   }
 });
+
+Ivette.registerDocChapter(docCallgraph);
 
 // --------------------------------------------------------------------------

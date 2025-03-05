@@ -23,12 +23,11 @@
 import React from 'react';
 import { shell } from 'electron';
 
-import { DEVEL } from 'dome';
 import { Modal, showModal } from 'dome/dialogs';
 import { Hbox } from 'dome/layout/boxes';
 import { Button } from 'dome/controls/buttons';
 
-import { registerDocItem, DocProps } from 'ivette';
+import { registerDocChapter } from 'ivette';
 import { getConfig } from 'frama-c/kernel/api/services';
 import * as Server from 'frama-c/server';
 
@@ -36,14 +35,13 @@ import './style.css';
 import framacImage from './frama-c.png';
 
 /** Import doc */
+import docFramaC from './doc.md?raw';
 
-import docFramaCMd from './doc.md?raw';
-import { docEva } from './plugins/eva';
-import { docCallgraph } from './plugins/callgraph/components/titlebar';
-import { docDive } from './plugins/dive';
-import { docWP } from './plugins/wp';
-import { docSandbox } from '../sandbox/help';
-import { docKernel } from './kernel/Globals';
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+registerDocChapter({ id: "framac", content: docFramaC, rank: 1 });
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C infos                                                      --- */
@@ -207,24 +205,3 @@ export function showCreditsModal(): void {
   const modal = <CreditsModal/>;
   showModal(modal);
 }
-/* -------------------------------------------------------------------------- */
-/* --- Frama-C Documentation                                              --- */
-/* -------------------------------------------------------------------------- */
-
-// --------------------------------------------------------------------------
-// --- help
-// --------------------------------------------------------------------------
-
-const docFramaC = { id: "framac", content: docFramaCMd };
-
-const docList: DocProps[] = [
-  docFramaC,
-  docKernel,
-  docEva,
-  docWP,
-  docCallgraph,
-  docDive,
-];
-if(DEVEL) docList.push(docSandbox);
-
-docList.forEach(e => registerDocItem(e));

@@ -24,7 +24,6 @@
 /* --- Frama-C MENU                                                       ---*/
 /* --------------------------------------------------------------------------*/
 
-import { ipcRenderer } from 'electron';
 import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
 import * as Display from 'ivette/display';
@@ -32,7 +31,6 @@ import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
-import * as HelpMenu from './help';
 
 const cFilter = {
   name: 'C source files',
@@ -115,7 +113,6 @@ async function saveSession(): Promise<void> {
 }
 
 export function init(): void {
-  ipcRenderer.invoke('dome.ipc.addDocHelpMenu');
   Dome.addMenuItem({
     menu: 'File',
     label: 'Set source files…',
@@ -154,20 +151,6 @@ export function init(): void {
     label: 'Save session…',
     id: 'file_save',
     onClick: saveSession,
-    kind: 'normal',
-  });
-  Dome.addMenuItem({
-    menu: 'Help',
-    label: 'About',
-    id: 'help_about',
-    onClick: HelpMenu.showAboutModal,
-    kind: 'normal',
-  });
-  Dome.addMenuItem({
-    menu: 'Help',
-    label: 'Credits',
-    id: 'help_credits',
-    onClick: HelpMenu.showCreditsModal,
     kind: 'normal',
   });
 }

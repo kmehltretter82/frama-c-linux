@@ -61,4 +61,4 @@ Ivette.registerView({
 // --- help
 // --------------------------------------------------------------------------
 
-export const docDive = { id: "dive", content: doc };
+Ivette.registerDocChapter({ id: "dive", content: doc });

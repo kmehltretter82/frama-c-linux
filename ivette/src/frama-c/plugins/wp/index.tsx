@@ -46,7 +46,7 @@ import './style.css';
 // --- help
 // --------------------------------------------------------------------------
 
-export const docWP = { id: "wp", content: doc };
+Ivette.registerDocChapter({ id: "wp", content: doc });
 
 /* -------------------------------------------------------------------------- */
 /* --- Context Menus                                                      --- */

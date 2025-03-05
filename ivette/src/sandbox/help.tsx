@@ -22,7 +22,7 @@
 
 
 import React from 'react';
-import { registerSandbox, TitleBar } from 'ivette';
+import { registerSandbox, TitleBar, registerDocChapter } from 'ivette';
 import { HelpIcon } from 'dome/help';
 import doc from './sandbox.md?raw';
 
@@ -30,7 +30,7 @@ import doc from './sandbox.md?raw';
 /* --- Sandbox help                                                       --- */
 /* -------------------------------------------------------------------------- */
 
-export const docSandbox = { id: 'sandbox', content: doc };
+registerDocChapter({ id: 'sandbox', content: doc, rank: 1000 });
 
 function SandboxHelp(): JSX.Element {
   const style = {
