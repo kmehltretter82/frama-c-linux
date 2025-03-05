@@ -510,7 +510,8 @@ module Make (Model : Modeling) = struct
   let join l r =
     match l, r with
     | (False | Repr _ | Top), Top | Top, (False | Repr _) -> Top
-    | False, False | False, Repr _ | Repr _, False -> Top
+    | False, Repr _ | Repr _, False -> Top
+    | False, False -> False
     | Repr l, Repr r ->
       match Typed_float.same_format l.format r.format with
       | No -> Top
