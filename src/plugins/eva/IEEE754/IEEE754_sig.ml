@@ -130,14 +130,14 @@ module type Abstraction = sig
       is wrong because no concrete element of [left] can possibly be lower
       than or equal to any concrete element of [right], the function must
       return [`Bottom]. *)
-  val backward_lower : left : subset -> right : subset -> subset or_bottom
+  val backward_left_lower : left : subset -> right : subset -> subset or_bottom
 
   (** The call [backward_greater ~left ~right] returns a reduced abstraction
       of [left] based on the assumption that [left >= right]. If the assumption
       is wrong because no concrete element of [left] can possibly be greater
       than or equal to any concrete element of [right], the function must
       return [`Bottom]. *)
-  val backward_greater : left : subset -> right : subset -> subset or_bottom
+  val backward_left_greater : left : subset -> right : subset -> subset or_bottom
 
 end
 

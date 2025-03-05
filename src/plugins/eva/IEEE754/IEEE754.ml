@@ -589,15 +589,15 @@ module Make (Model : Modeling) = struct
       Some reduced, Some reduced
     | (Ge | Gt), Repr l, Repr r, False ->
       let$ Format format = Backward (l, r) in
-      let* reduced_l = Exact.backward_lower   ~left:l.exact ~right:r.exact in
-      let+ reduced_r = Exact.backward_greater ~left:r.exact ~right:l.exact in
+      let* reduced_l = Exact.backward_left_lower   ~left:l.exact ~right:r.exact in
+      let+ reduced_r = Exact.backward_left_greater ~left:r.exact ~right:l.exact in
       let l = make reduced_l l.absolute l.relative format |> resolve context in
       let r = make reduced_r r.absolute r.relative format |> resolve context in
       Some l, Some r
     | (Le | Lt), Repr l, Repr r, False ->
       let$ Format format = Backward (l, r) in
-      let* reduced_l = Exact.backward_greater ~left:l.exact ~right:r.exact in
-      let+ reduced_r = Exact.backward_lower   ~left:r.exact ~right:l.exact in
+      let* reduced_l = Exact.backward_left_greater ~left:l.exact ~right:r.exact in
+      let+ reduced_r = Exact.backward_left_lower   ~left:r.exact ~right:l.exact in
       let l = make reduced_l l.absolute l.relative format |> resolve context in
       let r = make reduced_r r.absolute r.relative format |> resolve context in
       Some l, Some r

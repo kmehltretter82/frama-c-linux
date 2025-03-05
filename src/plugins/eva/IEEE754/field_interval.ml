@@ -108,11 +108,11 @@ module Make (K : Field.S) (Computation : IEEE754.Computation) (Name : Name) = st
       between K.(min (min a b) (min c d)) K.(max (max a b) (max c d))
     else top
 
-  let backward_lower ~left ~right =
+  let backward_left_lower ~left ~right =
     let lower = left.lower and upper = K.min left.upper right.upper in
     if not K.(lower <= upper) then `Bottom else `Value { lower ; upper }
 
-  let backward_greater ~left ~right =
+  let backward_left_greater ~left ~right =
     let upper = left.upper and lower = K.max left.lower right.lower in
     if not K.(lower <= upper) then `Bottom else `Value { lower ; upper }
 
