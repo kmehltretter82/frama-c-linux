@@ -328,10 +328,6 @@ module Make
 
   let store_results_kf inout kf input_state args (call_result: call_result) = 
     let input_bases, all_output_bases, allocated_bases = extract_bases kf inout input_state in
-    let input_bases = 
-      let weak_allocated_bases = Base.Hptset.filter (Base.is_weak) allocated_bases in
-      Base.Hptset.union weak_allocated_bases input_bases
-    in
     (* let _ = 
       Self.debug ~dkey:Self.dkey_memexec "Allocated bases: %a @." Base.Hptset.pretty allocated_bases in *)
     let reduced_input_state = Domain.filter (`Pre kf) input_bases input_state in
