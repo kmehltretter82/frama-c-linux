@@ -65,6 +65,9 @@ end
 
 module type Abstraction = sig
 
+  include Datatype.S
+
+
   (** {3 The field over which the abstraction is defined.} *)
 
   module Scalar : Field.S
@@ -77,50 +80,44 @@ module type Abstraction = sig
   type 'a computation = 'a Computation.t
 
 
-  (** {3 Datatype and type alias.} *)
-
-  include Datatype.S
-  type subset = t
-
-
   (** {3 Constants and constructors.} *)
 
-  val zero : subset
-  val one  : subset
+  val zero : t
+  val one  : t
 
   (** The call [singleton r] returns the abstract representation of the
       singleton subset containing [r]. *)
-  val singleton : scalar -> subset
+  val singleton : scalar -> t
 
   (** The call [between l r] returns the abstract representation of the
       subset containing all scalars between [l] and [u] included. *)
-  val between   : scalar -> scalar -> subset
+  val between   : scalar -> scalar -> t
 
 
   (** {3 Lattice structure.} *)
 
-  val top         : subset
-  val is_included : subset -> subset -> bool
-  val join        : subset -> subset -> subset
-  val narrow      : subset -> subset -> subset or_bottom
+  val top         : t
+  val is_included : t -> t -> bool
+  val join        : t -> t -> t
+  val narrow      : t -> t -> t or_bottom
 
 
   (** {3 Projection into an interval.}
       The [lower] and [upper] functions are provided as convenience. *)
 
-  val bounds : subset -> scalar bounds
-  val lower  : subset -> scalar
-  val upper  : subset -> scalar
+  val bounds : t -> scalar bounds
+  val lower  : t -> scalar
+  val upper  : t -> scalar
 
 
   (** {3 Arithmetic operations.} *)
 
-  val neg   : subset computation -> subset computation
-  val sqrt  : subset computation -> subset computation
-  val ( + ) : subset computation -> subset computation -> subset computation
-  val ( - ) : subset computation -> subset computation -> subset computation
-  val ( * ) : subset computation -> subset computation -> subset computation
-  val ( / ) : subset computation -> subset computation -> subset computation
+  val neg   : t computation -> t computation
+  val sqrt  : t computation -> t computation
+  val ( + ) : t computation -> t computation -> t computation
+  val ( - ) : t computation -> t computation -> t computation
+  val ( * ) : t computation -> t computation -> t computation
+  val ( / ) : t computation -> t computation -> t computation
 
 
   (** {3 Backward reductions.} *)
@@ -130,14 +127,14 @@ module type Abstraction = sig
       is wrong because no concrete element of [left] can possibly be lower
       than or equal to any concrete element of [right], the function must
       return [`Bottom]. *)
-  val backward_left_lower : left : subset -> right : subset -> subset or_bottom
+  val backward_left_lower : left : t -> right : t -> t or_bottom
 
   (** The call [backward_greater ~left ~right] returns a reduced abstraction
       of [left] based on the assumption that [left >= right]. If the assumption
       is wrong because no concrete element of [left] can possibly be greater
       than or equal to any concrete element of [right], the function must
       return [`Bottom]. *)
-  val backward_left_greater : left : subset -> right : subset -> subset or_bottom
+  val backward_left_greater : left : t -> right : t -> t or_bottom
 
 end
 
@@ -168,10 +165,10 @@ module type Modeling = sig
      and module Computation = Computation
 
   module Exact = Additive
-  type exact = Exact.subset
+  type exact = Exact.t
 
   module Absolute = Additive
-  type absolute = Absolute.subset
+  type absolute = Absolute.t
 
 
   (** {3 Abstraction used for the relative errors semantics.} *)
@@ -181,7 +178,7 @@ module type Modeling = sig
      and module Computation = Computation
 
   module Relative = Multiplicative
-  type relative = Relative.subset
+  type relative = Relative.t
 
 
   (** {3 Reduced product and other miscellaneous values.} *)

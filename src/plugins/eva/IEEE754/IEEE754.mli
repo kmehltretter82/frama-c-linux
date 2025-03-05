@@ -127,9 +127,9 @@ module Make (Model : Modeling) : sig
   (** {3 Type aliases.} *)
 
   type scalar    = Scalar.t
-  type exact     = Exact.subset
-  type absolute  = Absolute.subset
-  type relative  = Relative.subset
+  type exact     = Exact.t
+  type absolute  = Absolute.t
+  type relative  = Relative.t
   type 'a computation = 'a Computation.t
 
 
