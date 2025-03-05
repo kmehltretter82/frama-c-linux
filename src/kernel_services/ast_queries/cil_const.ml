@@ -47,7 +47,7 @@ open Cil_types
 (* Types *)
 
 let add_attributes_ref =
-  ref (fun ?push_qualifiers:_ ?combine:_ tattr t -> { t with tattr } )
+  ref (fun ?push_qualifiers:_ tattr t -> { t with tattr } )
 
 let mk_typ ?(push_qualifiers=true) ?(tattr=[]) tnode =
   if push_qualifiers then

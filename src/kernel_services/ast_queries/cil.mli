@@ -2220,13 +2220,14 @@ val typeAttrs: typ -> attribute list
 [@@deprecated "Use Ast_types.get_attributes instead."]
 [@@migrate { repl = Ast_types.get_attributes } ]
 
-(** Add some attributes to a type. [combine] explains how to combine attributes.
-    Default is {!Ast_attributes.add_list}.
+(** Add some attributes to a type. [combine] is now ignored and we always use
+    {!Ast_attributes.add_list} instead.
 
-    @before 28.0-Nickel [combine] does not exist *)
-val typeAddAttributes: ?combine: (attribute list -> attributes -> attributes) ->
-  attribute list -> typ -> typ
-[@@deprecated "Use Ast_types.add_attributes instead."]
+    @before 28.0-Nickel [combine] does not exist. *)
+
+val typeAddAttributes: ?combine:(attribute list -> attributes -> attributes) ->
+  attributes -> typ -> typ
+[@@deprecated "Use Ast_types.add_attributes instead, [combine] is not supported anymore."]
 [@@migrate { repl = Ast_types.add_attributes } ]
 
 (** Remove all attributes with the given names from a type. Note that this

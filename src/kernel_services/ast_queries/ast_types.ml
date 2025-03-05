@@ -41,10 +41,10 @@ let rec get_attributes { tnode; tattr } =
   | TFun _   -> tattr
   | TBuiltin_va_list -> tattr
 
-let rec add_attributes ?(push_qualifiers=true) ?(combine=Ast_attributes.add_list) a0 t =
+let rec add_attributes ?(push_qualifiers=true) a0 t =
   if a0 = [] then t
   else
-    let add = combine a0 in
+    let add = Ast_attributes.add_list a0 in
     match t.tnode with
     | TVoid
     | TInt   _
