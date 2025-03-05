@@ -38,6 +38,9 @@ type 'f format =
 (** Returns the [fkind] corresponding to the given format. *)
 val fkind_of_format : 'f format -> Cil_types.fkind
 
+(** Pretty printer for floating point formats. *)
+val pretty_format : 'f format Pretty_utils.formatter
+
 (** Type used to return a proof that two formats are in fact the same. *)
 type ('l, 'r) same_format =
   | No  : ('l, 'r) same_format
