@@ -87,14 +87,26 @@ let call_stack_no_wrappers () =
 
 let current_alloc_site () = 
   let open Eva_annotations in
+  let cs = call_stack_no_wrappers () in
   match get_allocation (current_call_site ()) with
-  | By_function -> let stack = call_stack_no_wrappers () in
-      let top_call = Option.get (Callstack.top stack) in
-      {stack with stack = [top_call]}
-  | _ -> call_stack_no_wrappers ()
+  | By_function -> 
+    (* Get call site and its englobing function *)
+    (* Always remove the callsite information of the englobing 
+       function for easier import in case of modification
+    *)
+    let calls = match cs.stack with
+      | [] -> assert false
+      | (kf, stmt) :: [] -> [(kf, stmt)]
+      | (kf, stmt) :: (kf', _stmt') :: _ -> [(kf, stmt);(kf', Cil.dummyStmt)]
+    in
+    {cs with stack = calls}
+  | _ -> cs
 
 let register_malloced_base b =
-  let stack_without_top = current_alloc_site () in
+  let cs = current_alloc_site () in
+  let stack_without_top =
+    Option.value ~default:cs (Callstack.pop cs)
+  in
   Dynamic_Alloc_Bases.set
     (Base_hptmap.add b stack_without_top (Dynamic_Alloc_Bases.get ()))
 
@@ -450,10 +462,10 @@ let update_variable_validity ?(make_weak=false) base sizev =
   | _ -> Self.fatal "base is not Allocated: %a" Base.pretty base
 
 (* Checks if we should allocate a new base. *)
-  (* No allocation has been made n = 0 *)
-  (* No reusable base but can still allocate n <= max_level *)
+(* No allocation has been made n = 0 *)
+(* No reusable base but can still allocate n <= max_level *)
 let must_allocate_new_variable nb max_level =
-  nb = 0 || nb <= max_level
+  nb = 1 || nb <= max_level
 
 (* Returns the type of the new variable to be allocated *)
 let new_variable_type nb max_level =
@@ -492,7 +504,7 @@ let alloc_by_stack region prefix sizev state =
         assert (nb <= max_level);
         update_variable_validity ~make_weak:false b sizev
   in
-  aux 0 all_vars
+  aux 1 all_vars
 
 let choose_base_allocation () =
   let open Eva_annotations in
