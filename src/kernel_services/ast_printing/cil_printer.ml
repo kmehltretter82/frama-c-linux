@@ -718,9 +718,12 @@ class cil_printer () = object (self)
     let v = { v with vtype = self#no_ghost_at_first_level vtype_no_noreturn } in
     let v =
       if v.vformal && not state.print_cil_as_is then begin
+        let tattr = v.vtype.tattr in
         match v.vtype.tnode with
-        | TPtr t when Ast_attributes.contains "arraylen" v.vtype.tattr ->
-          { v with vtype = Cil_const.mk_tarray ~tattr:v.vtype.tattr t None}
+        | TPtr t when Ast_attributes.contains "arraylen" tattr ->
+          (* We make sure qualifiers are not pushed to its elements here. *)
+          let t' = Cil_const.mk_tarray ~push_qualifiers:false ~tattr t None in
+          { v with vtype = t'}
         | _ -> v
       end
       else v

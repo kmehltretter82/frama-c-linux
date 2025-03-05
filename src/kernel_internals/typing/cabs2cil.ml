@@ -4743,8 +4743,7 @@ and doType (ghost:bool) (context: type_context)
           "static specifier inside array argument is allowed only in \
            function argument";
       let push_qualifiers = context <> `FormalDecl || d <> Cabs.JUSTBASE in
-      let t = mk_tarray bt lo in
-      let t = Ast_types.add_attributes ~push_qualifiers al' t in
+      let t = mk_tarray ~push_qualifiers ~tattr:al' bt lo in
       doDeclType t acc d
 
     | Cabs.PROTO (d, args, ghost_args, isva) ->

@@ -45,10 +45,23 @@
 (** Smart constructors for some CIL data types *)
 open Cil_types
 
-(** Create a typ record, [tattr] defaults to empty list.
+(**/**)
+(* Reference to [Ast_types.add_attributes] to avoid circular dependancies
+   Ideally we want to move everything related to types in [Ast_types], but it
+   also requires moving a few things from [Logic_const] to [Ast_types]. We do
+   not use [Extlib.mk_fun] here because [mk_typ] is called later at toplevel
+   to build types, none of which are arrays, so we do not need to push
+   attributes anyway.
+*)
+val add_attributes_ref : (?push_qualifiers:bool -> attributes -> typ -> typ) ref
+[@@alert add_attributes_ref "Only use this if your name is Ast_types."]
+(**/**)
+
+(** Create a typ record, [tattr] defaults to empty list. [push_qualifiers] is
+    passed to {!Ast_types.add_attributes} and defaults to [true].
     @since Frama-C+dev
 *)
-val mk_typ : ?tattr:attributes -> typ_node -> typ
+val mk_typ : ?push_qualifiers:bool -> ?tattr:attributes -> typ_node -> typ
 
 (** Create a typ record [TVoid], [tattr] defaults to empty list.
     @since Frama-C+dev
@@ -71,9 +84,12 @@ val mk_tfloat : ?tattr:attributes -> fkind -> typ
 val mk_tptr : ?tattr:attributes -> typ -> typ
 
 (** Create a typ record [TArray (t, len)], [tattr] defaults to empty list.
+    [push_qualifiers] is passed to {!Ast_types.add_attributes} and defaults to
+    [true], arrays are not supposed to be qualified.
     @since Frama-C+dev
 *)
-val mk_tarray : ?tattr:attributes -> typ -> exp option -> typ
+val mk_tarray : ?push_qualifiers:bool -> ?tattr:attributes -> typ ->
+  exp option -> typ
 
 (** Create a typ record [TFun (rt, args, is_va)], [tattr] defaults to empty list.
     @since Frama-C+dev
