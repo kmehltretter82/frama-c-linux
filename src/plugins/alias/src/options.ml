@@ -56,7 +56,6 @@ module DebugTable = False
       let help = "switch to debug mode when printing statement or function tables (with options -alias-show-stmt-table and -alias-show-function-table)"
     end)
 
-
 module Dot_output =
   Empty_string
     (struct
@@ -76,5 +75,7 @@ module Warn = struct
 end
 
 module DebugKeys = struct
-  let lvals = register_category "lvals"
+  let show_libc_vars =
+    let help = "include variables stemming from the C library in output" in
+    register_category ~help "printer:show-libc-vars"
 end

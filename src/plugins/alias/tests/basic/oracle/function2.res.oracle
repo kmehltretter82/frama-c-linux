@@ -7,78 +7,58 @@
 [alias] analysing global variable definiton: __fc_p_random48_counter =
   __fc_random48_counter;
 [alias] May-aliases after global variable definition  __fc_p_random48_counter  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+  <none>
 [alias] May-alias graph after global variable definition  __fc_p_random48_counter
-  is    0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  is    0:{  } → 1:{  }
 [alias] analysing function: main
 [alias] analysing instruction: int *a = (int *)0;
-[alias] May-aliases after instruction  int *a = (int *)0;  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-aliases after instruction  int *a = (int *)0;  are  <none>
 [alias] May-alias graph after instruction  int *a = (int *)0;  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  0:{  } → 1:{  }
 [alias] analysing instruction: int *b = (int *)0;
-[alias] May-aliases after instruction  int *b = (int *)0;  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-aliases after instruction  int *b = (int *)0;  are  <none>
 [alias] May-alias graph after instruction  int *b = (int *)0;  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  0:{  } → 1:{  }
 [alias] analysing instruction: a = my_malloc(2);
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
-[alias] May-aliases after instruction  int *res = (int *)0;  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-aliases after instruction  int *res = (int *)0;  are  <none>
 [alias] May-alias graph after instruction  int *res = (int *)0;  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
+  0:{  } → 1:{  }
 [alias] analysing instruction: res = (int *)malloc((size_t)size);
 [alias] May-aliases after instruction  res = (int *)malloc((size_t)size);  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+  <none>
 [alias] May-alias graph after instruction  res = (int *)malloc((size_t)size);  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  4:{ res } → 5:{  }
-[alias] May-aliases at the end of function my_malloc:
-  { __fc_random48_counter; __fc_p_random48_counter }
+  0:{  } → 1:{  }   4:{ res } → 5:{  }
+[alias] May-aliases at the end of function my_malloc: <none>
 [alias] May-alias graph at the end of function my_malloc:
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  4:{ res } → 5:{  }
+  0:{  } → 1:{  }   4:{ res } → 5:{  }
 [alias] Summary of function my_malloc:
-  formals: size    returns: res
-  state: { __fc_random48_counter; __fc_p_random48_counter }
-[alias] May-aliases after instruction  a = my_malloc(2);  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+  formals: size    returns: res    state: <none>
+[alias] May-aliases after instruction  a = my_malloc(2);  are  <none>
 [alias] May-alias graph after instruction  a = my_malloc(2);  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  12:{ a } → 11:{  }
+  0:{  } → 1:{  }   12:{ a } → 11:{  }
 [alias] analysing instruction: b = my_malloc(3);
-[alias] May-aliases after instruction  b = my_malloc(3);  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-aliases after instruction  b = my_malloc(3);  are  <none>
 [alias] May-alias graph after instruction  b = my_malloc(3);  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  12:{ a } → 11:{  }   20:{ b } → 19:{  }
+  0:{  } → 1:{  }   12:{ a } → 11:{  }   20:{ b } → 19:{  }
 [alias] analysing instruction: __retres = 0;
-[alias] May-aliases after instruction  __retres = 0;  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-aliases after instruction  __retres = 0;  are  <none>
 [alias] May-alias graph after instruction  __retres = 0;  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  12:{ a } → 11:{  }   20:{ b } → 19:{  }
-[alias] May-aliases at the end of function main:
-  { __fc_random48_counter; __fc_p_random48_counter }
+  0:{  } → 1:{  }   12:{ a } → 11:{  }   20:{ b } → 19:{  }
+[alias] May-aliases at the end of function main: <none>
 [alias] May-alias graph at the end of function main:
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  12:{ a } → 11:{  }   20:{ b } → 19:{  }
+  0:{  } → 1:{  }   12:{ a } → 11:{  }   20:{ b } → 19:{  }
 [alias] Summary of function main:
-  formals:     returns: __retres
-  state: { __fc_random48_counter; __fc_p_random48_counter }
+  formals:     returns: __retres    state: <none>
 [alias] analysing function: my_malloc
 [alias] analysing instruction: int *res = (int *)0;
-[alias] May-aliases after instruction  int *res = (int *)0;  are
-  { __fc_random48_counter; __fc_p_random48_counter }
+[alias] May-aliases after instruction  int *res = (int *)0;  are  <none>
 [alias] May-alias graph after instruction  int *res = (int *)0;  is
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-[alias] May-aliases at the end of function my_malloc:
-  { __fc_random48_counter; __fc_p_random48_counter }
+  0:{  } → 1:{  }
+[alias] May-aliases at the end of function my_malloc: <none>
 [alias] May-alias graph at the end of function my_malloc:
-  0:{ __fc_random48_counter; __fc_p_random48_counter } → 1:{  }
-  4:{ res } → 5:{  }
+  0:{  } → 1:{  }   4:{ res } → 5:{  }
 [alias] Summary of function my_malloc:
-  formals: size    returns: res
-  state: { __fc_random48_counter; __fc_p_random48_counter }
+  formals: size    returns: res    state: <none>
 [alias] Analysis complete

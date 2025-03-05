@@ -114,9 +114,7 @@ module LvalOrRef = struct
       | Lval lv -> f fmt lv
       | Ref lv -> Format.fprintf fmt "&%a" f lv
     in
-    if Options.is_debug_key_enabled Options.DebugKeys.lvals
-    then print Cil_types_debug.pp_lval l
-    else print Printer.pp_lval l
+    print Printer.pp_lval l
 
   let from_exp e =
     let e = simplify_exp e in
