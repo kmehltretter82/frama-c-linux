@@ -20,15 +20,40 @@
 (*                                                                        *)
 (**************************************************************************)
 
+(* Helpers signature *)
+module type Helpers = sig
+  type 'a t
 
+  module Bool : sig
+    val only_if : bool -> unit t -> unit t
+  end
 
-(* Complete signature *)
-module type S = sig
+  module Option : sig
+    val iter : ('a -> unit t) -> 'a option -> unit t
+    val map : ('a -> 'b t) -> 'a option -> 'b option t
+  end
+
+  module List : sig
+    val iter : ('a -> unit t) -> 'a list -> unit t
+    val map : ('a -> 'b t) -> 'a list -> 'b list t
+    val fold_left : ('a -> 'b -> 'a t) -> 'a -> 'b list -> 'a t
+  end
+
+end
+
+(* Basic signature with all monadic functions *)
+module type Basic = sig
   type 'a t
   val return : 'a -> 'a t
   val flatten : 'a t t -> 'a t
   val map  : ('a -> 'b  ) -> 'a t -> 'b t
   val bind : ('a -> 'b t) -> 'a t -> 'b t
+end
+
+(* Complete signature *)
+module type S = sig
+  include Basic
+  include Helpers with type 'a t := 'a t
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -39,12 +64,9 @@ end
 
 (* Complete signature with a product *)
 module type S_with_product = sig
-  type 'a t
-  val return : 'a -> 'a t
-  val flatten : 'a t t -> 'a t
-  val map  : ('a -> 'b  ) -> 'a t -> 'b t
-  val bind : ('a -> 'b t) -> 'a t -> 'b t
+  include Basic
   val product : 'a t -> 'b t -> ('a * 'b) t
+  include Helpers with type 'a t := 'a t
   module Operators : sig
     val ( >>-  ) : 'a t -> ('a -> 'b t) -> 'b t
     val ( let* ) : 'a t -> ('a -> 'b t) -> 'b t
@@ -54,7 +76,6 @@ module type S_with_product = sig
     val ( and+ ) : 'a t -> 'b t -> ('a * 'b) t
   end
 end
-
 
 
 (* Minimal signature based on bind *)
@@ -90,68 +111,101 @@ module type Based_on_map_with_product = sig
 end
 
 
-
-(* Extend a based on bind minimal monad *)
-module Make_based_on_bind (M : Based_on_bind) = struct
+(* Basic based on bind signature *)
+module Basic_based_on_bind (M : Based_on_bind) = struct
   type 'a t = 'a M.t
   let return x = M.return x
   let bind f m = M.bind f m
   let flatten m = bind (fun x -> x) m
   let map f m = bind (fun x -> return (f x)) m
-  module Operators = struct
-    let ( >>-  ) m f = bind f m
-    let ( let* ) m f = bind f m
-    let ( >>-: ) m f = map  f m
-    let ( let+ ) m f = map  f m
-  end
 end
 
-(* Extend a based on map minimal monad *)
-module Make_based_on_map (M : Based_on_map) = struct
+(* Basic based on map signature *)
+module Basic_based_on_map (M : Based_on_map) = struct
   type 'a t = 'a M.t
   let return x = M.return x
   let map f m = M.map f m
   let flatten m = M.flatten m
   let bind f m = flatten (map f m)
-  module Operators = struct
-    let ( >>-  ) m f = bind f m
-    let ( let* ) m f = bind f m
-    let ( >>-: ) m f = map  f m
-    let ( let+ ) m f = map  f m
-  end
 end
 
-(* Extend a based on bind monad with a product *)
+(* Make operators from extended signatures *)
+module Make_operators (M : Basic) = struct
+  let ( >>-  ) m f = M.bind f m
+  let ( let* ) m f = M.bind f m
+  let ( >>-: ) m f = M.map  f m
+  let ( let+ ) m f = M.map  f m
+end
+
+module Make_bool (M : Basic) = struct
+  let only_if b m = if b then m else M.return ()
+end
+
+module Make_option (M : Basic) = struct
+
+  let iter f = function
+    | None -> M.return ()
+    | Some x -> f x
+
+  let map f = function
+    | None -> M.return None
+    | Some x -> M.map (fun x -> Some x) (f x)
+
+end
+
+module Make_list (M : Basic) = struct
+
+  let fold_left f acc xs =
+    let f acc x = M.bind (fun acc -> f acc x) acc in
+    Stdlib.List.fold_left f (M.return acc) xs
+
+  let iter f xs =
+    fold_left (fun () -> f) () xs
+
+  let map f xs =
+    let f rs x = M.map (fun r -> r :: rs) (f x) in
+    M.map Stdlib.List.rev (fold_left f [] xs)
+
+end
+
+
+(* Extend a basic monad based on bind minimal monad *)
+module Make_based_on_bind (M : Based_on_bind) = struct
+  module Basic = Basic_based_on_bind (M)
+  module Operators = Make_operators (Basic)
+  module Bool = Make_bool (Basic)
+  module Option = Make_option (Basic)
+  module List = Make_list (Basic)
+  include Basic
+end
+
+(* Extend a basic monad based on map minimal monad *)
+module Make_based_on_map (M : Based_on_map) = struct
+  module Basic = Basic_based_on_map (M)
+  module Operators = Make_operators (Basic)
+  module Bool = Make_bool (Basic)
+  module Option = Make_option (Basic)
+  module List = Make_list (Basic)
+  include Basic
+end
+
+(* Extend a basic monad based on bind monad with a product *)
 module Make_based_on_bind_with_product (M : Based_on_bind_with_product) = struct
-  type 'a t = 'a M.t
-  let return x = M.return x
-  let bind f m = M.bind f m
-  let flatten m = bind (fun x -> x) m
-  let map f m = bind (fun x -> return (f x)) m
-  let product l r = M.product l r
+  include Make_based_on_bind (M)
+  let product = M.product
   module Operators = struct
-    let ( >>-  ) m f = bind f m
-    let ( let* ) m f = bind f m
-    let ( let+ ) m f = map  f m
-    let ( >>-: ) m f = map  f m
+    include Operators
     let ( and* ) l r = product l r
     let ( and+ ) l r = product l r
   end
 end
 
-(** Extend a based on map monad with a product *)
+(* Extend a basic monad based on map monad with a product *)
 module Make_based_on_map_with_product (M : Based_on_map_with_product) = struct
-  type 'a t = 'a M.t
-  let return x = M.return x
-  let map f m = M.map f m
-  let flatten m = M.flatten m
-  let bind f m = flatten (map f m)
-  let product l r = M.product l r
+  include Make_based_on_map (M)
+  let product = M.product
   module Operators = struct
-    let ( >>-  ) m f = bind f m
-    let ( let* ) m f = bind f m
-    let ( let+ ) m f = map  f m
-    let ( >>-: ) m f = map  f m
+    include Operators
     let ( and* ) l r = product l r
     let ( and+ ) l r = product l r
   end

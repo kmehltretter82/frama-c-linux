@@ -111,16 +111,6 @@ module type S = sig
 
   val modify : (state -> state) -> unit t
   (** modify the current value of the State variable by applying a function *)
-
-  (** {1 Standard monadic helper functions} *)
-
-  module Bool : sig
-    val only_if : bool -> unit t -> unit t
-  end
-
-  module Option : sig
-    val iter : ('a -> unit t) -> 'a option -> unit t
-  end
 end
 
 (** create an RWS monad from specification [C] *)

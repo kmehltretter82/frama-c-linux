@@ -132,7 +132,7 @@ module Bottom = struct
     | `Value _, `Bottom
     | `Bottom, `Bottom -> `Bottom
 
-  let join_list f = List.fold_left (join f) `Bottom
+  let join_list f = Stdlib.List.fold_left (join f) `Bottom
 
   (* Combination *)
 
@@ -166,7 +166,7 @@ module Bottom = struct
     | `Value elt -> elt :: list
 
   let list_values l =
-    List.fold_left (fun l elt -> add_to_list elt l) [] l
+    Stdlib.List.fold_left (fun l elt -> add_to_list elt l) [] l
 
   (** Datatype construction *)
 
@@ -177,7 +177,7 @@ module Bottom = struct
       type t = Domain.t or_bottom
       let () = incr counter
       let name = Domain.name ^ "+bottom(" ^ string_of_int !counter ^ ")"
-      let reprs = `Bottom :: (List.map (fun v -> `Value v) Domain.reprs)
+      let reprs = `Bottom :: Stdlib.List.map (fun v -> `Value v) Domain.reprs
       let structural_descr = Structural_descr.t_unknown
       let hash = Common.hash Domain.hash
       let equal = (Common.equal Domain.equal :> t -> t -> bool)
@@ -242,7 +242,7 @@ module Top = struct
 
   (** Monadic operators *)
 
-  include Monad.Make_based_on_bind_with_product(struct
+  include Monad.Make_based_on_bind_with_product (struct
       type 'a t = 'a or_top
       let return x = `Value x
       let bind f = function `Top -> `Top | `Value x -> f x
@@ -258,7 +258,7 @@ module Top = struct
       type t = Domain.t or_top
       let () = incr counter
       let name = Domain.name ^ "+top(" ^ string_of_int !counter ^ ")"
-      let reprs = `Top :: (List.map (fun v -> `Value v) Domain.reprs)
+      let reprs = `Top :: Stdlib.List.map (fun v -> `Value v) Domain.reprs
       let structural_descr = Structural_descr.t_unknown
       let hash = Common.hash Domain.hash
       let equal = (Common.equal Domain.equal :> t -> t -> bool)
@@ -337,7 +337,7 @@ module TopBottom = struct
       type t = Domain.t or_top_bottom
       let () = incr counter
       let name = Domain.name ^ "+top_bottom(" ^ string_of_int !counter ^ ")"
-      let reprs = `Bottom :: `Top :: (List.map (fun v -> `Value v) Domain.reprs)
+      let reprs = `Bottom :: `Top :: (Stdlib.List.map (fun v -> `Value v) Domain.reprs)
       let structural_descr = Structural_descr.t_unknown
       let hash = Common.hash Domain.hash
       let equal = (Common.equal Domain.equal :> t -> t -> bool)
