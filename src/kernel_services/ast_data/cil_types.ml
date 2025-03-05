@@ -383,7 +383,7 @@ and typ_node =
 and attribute = string * attrparam list
 
 (** Attributes are lists sorted by the attribute name. Use the functions
-    {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to
+    {!Ast_attributes.add} and {!Ast_attributes.add_list} to
     insert attributes in an attribute list and maintain the sortedness. *)
 and attributes = attribute list
 
