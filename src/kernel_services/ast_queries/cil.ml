@@ -428,7 +428,7 @@ class type cilVisitor = object
 
   method venumitem: enumitem -> enumitem visitAction
 
-  method vattr: attribute -> attribute list visitAction
+  method vattr: attribute -> attributes visitAction
   (** Attribute. Each attribute can be replaced by a list *)
 
   method vattrparam: attrparam -> attrparam visitAction
@@ -2075,7 +2075,7 @@ and childrenVarDecl (vis : cilVisitor) (v : varinfo) : varinfo =
 and visitCilVarUse vis v =
   doVisitCil vis (Visitor_behavior.Get.varinfo vis#behavior) vis#vvrbl alphabetabeta v
 
-and visitCilAttributes (vis: cilVisitor) (al: attribute list) : attribute list=
+and visitCilAttributes (vis: cilVisitor) (al: attributes) : attributes =
   let al' =
     Extlib.map_no_copy_list
       (doVisitListCil vis

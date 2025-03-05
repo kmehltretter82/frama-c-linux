@@ -143,9 +143,9 @@ let mkCompInfo
        * representation of the structure type constructs the type of
        * the fields. The function can ignore this argument if not
        * constructing a recursive type.  *)
-    (mkfspec: compinfo -> (string * typ * int option * attribute list *
+    (mkfspec: compinfo -> (string * typ * int option * attributes *
                            location) list option)
-    (a: attribute list) : compinfo =
+    (a: attributes) : compinfo =
 
   (* make a new name for anonymous structs *)
   if n = "" then Kernel.fatal "mkCompInfo: missing structure name\n" ;

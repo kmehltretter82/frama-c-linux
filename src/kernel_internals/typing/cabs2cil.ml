@@ -4496,7 +4496,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     else
       [(check_attribute_name s, List.map (attrOfExp ~check:false ~foldenum:false) el)]
 
-and doAttributes (ghost:bool) (al: Cabs.attribute list) : attribute list =
+and doAttributes (ghost:bool) (al: Cabs.attribute list) : attributes =
   List.fold_left (fun acc a ->
       Ast_attributes.add_list (doAttr ghost a) acc
     ) [] al
@@ -4544,12 +4544,12 @@ and doType (ghost:bool) (context: type_context)
     (dt: Cabs.decl_type)
   (* Returns the new type and the accumulated name (or type attribute
      if nameoftype =  AttrType) attributes *)
-  : typ * attribute list =
+  : typ * attributes =
 
   (* Now do the declarator type. But remember that the structure of the
    * declarator type is as printed, meaning that it is the reverse of the
    * right one *)
-  let rec doDeclType (bt: typ) (acc: attribute list) decl_type =
+  let rec doDeclType (bt: typ) (acc: attributes) decl_type =
     checkRestrictQualifierDeep bt;
     match decl_type with
     | Cabs.JUSTBASE -> bt, acc
@@ -4955,7 +4955,7 @@ and makeCompType loc ghost (isstruct: bool)
     (n: string)
     ~(norig: string)
     (nglist: Cabs.field_group list)
-    (a: attribute list) =
+    (a: attributes) =
   (* Make a new name for the structure *)
   let kind = if isstruct then "struct" else "union" in
   let n', _  = newAlphaName ghost true kind n in
