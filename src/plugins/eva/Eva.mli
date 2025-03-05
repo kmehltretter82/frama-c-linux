@@ -142,6 +142,10 @@ module Callstack: sig
       to the function at bottom of the callstack - the first functions called. *)
   val compare_lex : t -> t -> int
 
+  (** [is_empty cs] returns true if the callstack is empty, i.e., [top_callsite]
+      would return [Kglobal]. *)
+  val is_empty : t -> bool
+
   (*** {2 Stack manipulation} *)
 
   (*** Constructor *)

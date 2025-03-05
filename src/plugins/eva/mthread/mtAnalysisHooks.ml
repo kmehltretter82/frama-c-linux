@@ -424,20 +424,27 @@ let spawn_thread analysis eva_thread stack func state params parent =
     th
 
 
-
-let main_thread k_main initial_state =
-  match k_main.Cil_types.fundec with
-  | Declaration (_,f,_,_) ->  MtOptions.fatal
-                                "Entry point '%s' has no definition : cannot run main." f.vname
-  | Definition (f_main,_) ->
-    let formals = f_main.sformals in
+let standalone_thread th kf initial_state =
+  match kf.Cil_types.fundec with
+  | Declaration (_, f, _, _) ->
+    MtOptions.fatal "Entry point '%s' has no definition : cannot run %a."
+      f.vname
+      Thread.pretty th
+  | Definition (fundec, _) ->
+    let formals = fundec.sformals in
     let eval_arg vi =
       Results.(in_cvalue_state initial_state |> eval_var vi |> as_cvalue)
     in
     let args = List.map eval_arg formals in
-    let stack = Callstack.init k_main in
-    basic_thread Thread.main stack k_main initial_state args None
+    let stack = Callstack.init kf in
+    basic_thread th stack kf initial_state args None
 
+let main_thread k_main initial_state =
+  standalone_thread Thread.main k_main initial_state
+
+let interrupt_thread kf initial_state =
+  let th = Thread.interrupt_handler kf in
+  standalone_thread th kf initial_state
 
 (** Set the global variable that indicates that at least one thread is running
     to one *)
@@ -869,8 +876,12 @@ let mthread_builtins = List.map (fun (n, f, _) -> (n, f)) mthread_builtins
 
 (* Function to register as a callback of the Eva analysis if Mthread
    is enabled *)
-let catch_functions_calls analysis stack kf state kind =
+let catch_functions_calls analysis (stack : Callstack.callstack) kf state kind =
   analysis.curr_stack <- stack;
+  if Callstack.is_empty stack then
+    (* This is the entry point of the analysis, the events stack needs to be
+       empty. *)
+    analysis.curr_events_stack <- [];
   let f = Kernel_function.get_name kf in
   let built = is_mthread_builtin f in
   (if built <> `NotBuiltin then
@@ -892,24 +903,51 @@ let catch_functions_calls analysis stack kf state kind =
        if MtOptions.PopTopFunctionForCallbacks.get () && built = `Pop then
          analysis.curr_stack <- stack;
   );
-  if analysis.curr_stack.stack = [] then begin
-    (* Beginning of a thread (kf being the entry point). For the main
+  if Callstack.is_empty analysis.curr_stack &&
+     Thread.is_main analysis.curr_thread.th_eva_thread then begin
+    (* Beginning of the main thread (kf being the entry point). For the main
        thread, it might have not been registered yet if we are at the
        first iteration. *)
-    if analysis.curr_thread.th_parent = None then begin
-      let th = main_thread kf state in
-      (* This call registers the main thread on the first run, and essentially
-         does nothing afterwards *)
-      let th = spawn_thread analysis th.th_eva_thread
-          th.th_stack th.th_fun th.th_init_state th.th_params None in
-      if analysis.main_thread != th then begin
-        (* On the first run, the record [th] is created. It is not contained
-           anywhere else, so we update the fields below. *)
-        analysis.main_thread <- th;
-        analysis.curr_thread <- th;
-        (* We are currently computing this thread (the main one) and we have
-           just started, no need to recompute it at the next iteration *)
-        th.th_to_recompute <- SetRecomputeReason.empty;
+    let th = main_thread kf state in
+    (* This call registers the main thread on the first run, and essentially
+       does nothing afterwards *)
+    let th = spawn_thread analysis th.th_eva_thread
+        th.th_stack th.th_fun th.th_init_state th.th_params None in
+    if analysis.main_thread != th then begin
+      (* On the first run, the record [th] is created. It is not contained
+         anywhere else, so we update the fields below. *)
+      analysis.main_thread <- th;
+      analysis.curr_thread <- th;
+      (* We are currently computing this thread (the main one) and we have
+         just started, no need to recompute it at the next iteration *)
+      th.th_to_recompute <- SetRecomputeReason.empty;
+      (* On the first iteration, also register the interrupt handlers *)
+      let interrupt_handlers = MtOptions.InterruptHandlers.get () in
+      let interrupts, state =
+        Kernel_function.Set.fold
+          (fun kf_interrupt (interrupts, state) ->
+             (* Create and spawn the interrupt thread *)
+             let th = interrupt_thread kf_interrupt state in
+             let th =
+               spawn_thread analysis th.th_eva_thread th.th_stack th.th_fun
+                 th.th_init_state th.th_params None
+             in
+             (* Start the interrupt thread *)
+             let state =
+               MtIds.write_id_state state (MtIds.of_thread th.th_eva_thread) 1
+             in
+             (th :: interrupts, state))
+          interrupt_handlers
+          ([], state)
+      in
+      if interrupts != [] then begin
+        (* If any interrupt handler has been registered, then their initial
+           state and the initial state of the main thread need to be updated
+           so that they all are considered running. *)
+        List.iter
+          (fun th ->
+             let _ = update_initial_state analysis th.th_eva_thread state in ())
+          (th :: interrupts)
       end
     end
   end;

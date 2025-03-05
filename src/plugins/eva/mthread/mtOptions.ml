@@ -120,6 +120,15 @@ module CheckProtections =
     let option_name = "-mt-shared-accesses-synchronization"
   end)
 
+let () = Parameter_customize.set_group grp_analysis
+module InterruptHandlers =
+  Kernel_function_set (struct
+    let option_name = "-mt-interrupt-handlers"
+    let arg_name = "functions"
+    let help = "Specify functions that will be treated as handlers for \
+                interrupts."
+  end)
+
 let () = Parameter_customize.set_group messages
 module ModerateWarnings =
   True (struct

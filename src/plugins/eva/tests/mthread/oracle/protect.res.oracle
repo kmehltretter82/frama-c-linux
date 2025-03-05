@@ -92,7 +92,8 @@
   t[3]: write by <main> at protect.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: t[3] = 4; <- main, t[1] = 1; <- main
+  concurrent writes: t[1] = 1; <- main,
+                     t[3] = 4; <- main
   shared bases: {t}
   interferences: { lock1 } -> # cvalue: t[0] ∈ {0}
                                          [1] ∈ {1}
@@ -188,7 +189,8 @@
   t[3]: write by <main> at protect.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: t[3] = 4; <- main, t[1] = 1; <- main
+  concurrent writes: t[1] = 1; <- main,
+                     t[3] = 4; <- main
   shared bases: {t}
   interferences: {  } -> # cvalue:
                  t[0] ∈ {0}

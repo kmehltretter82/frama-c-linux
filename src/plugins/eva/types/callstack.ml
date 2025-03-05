@@ -86,6 +86,11 @@ let compare_lex cs1 cs2 =
       if c <> 0 then c else
         Calls.compare (List.rev cs1.stack) (List.rev cs2.stack)
 
+let is_empty cs =
+  match cs.stack with
+  | [] -> true
+  | _ :: _ -> false
+
 (* Stack manipulation *)
 
 let init ?(thread=0) kf = { thread; entry_point=kf; stack = [] }

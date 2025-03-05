@@ -22,6 +22,11 @@
 
 (* --- Threads definition --- *)
 
+type kind =
+  | Main
+  | InterruptHandler of Kernel_function.t
+  | Thread of Concurency.Name.t option
+
 module Prototype =
 struct
   include Datatype.Serializable_undefined
@@ -30,24 +35,27 @@ struct
      to print a human-readable description of the thread. *)
   type t = {
     id: int;
-    name: Concurency.Name.t option
+    kind: kind
   }
 
   let name = "Thread"
-  let main = { id = 1; name = None } (* The main thread always is the thread 0 *)
+  let main = { id = 1; kind = Main } (* The main thread always is the thread 0 *)
   let reprs = [main]
   let equal th1 th2 = Int.equal th1.id th2.id
   let compare th1 th2 = Int.compare th1.id th2.id
   let hash th = th.id
 
   let pretty fmt th =
-    match th.name with
-    | Some name ->
+    match th.kind with
+    | Thread Some name ->
       Concurency.Name.pretty fmt name
-    | None when th == main ->
-      Format.fprintf fmt "<main>"
-    | None ->
+    | Thread None ->
       Format.fprintf fmt "#%i" th.id
+    | Main ->
+      Format.fprintf fmt "<main>"
+    | InterruptHandler kf ->
+      Format.fprintf fmt "<interrupt_handler %a>"
+        Kernel_function.pretty kf
 end
 
 module Thread = Datatype.Make_with_collections (Prototype)
@@ -70,9 +78,9 @@ module ThreadsById = State_builder.Hashtbl (Datatype.Int.Hashtbl) (Thread)
 
 let last_thread_id = ref 1
 
-let create name =
+let create kind =
   incr last_thread_id;
-  let th = { id = !last_thread_id; name } in
+  let th = { id = !last_thread_id; kind } in
   ThreadsById.add th.id th;
   th
 
@@ -100,17 +108,21 @@ struct
     type t =
       | ByName of Concurency.Name.t
       | BySpawnPoint of Analysis_location.Local.t
+      | ByInterruptHandler of Kernel_function.t
     [@@deriving eq, ord]
 
     let reprs =
       List.map (fun n -> ByName n) Concurency.Name.reprs @
-      List.map (fun al -> BySpawnPoint al) Analysis_location.Local.reprs
+      List.map (fun al -> BySpawnPoint al) Analysis_location.Local.reprs @
+      List.map (fun kf -> ByInterruptHandler kf) Kernel_function.reprs
 
     let hash = function
       | ByName name ->
         Stdlib.Hashtbl.hash(1, Concurency.Name.hash name)
       | BySpawnPoint al ->
         Stdlib.Hashtbl.hash(2, Analysis_location.Local.hash al)
+      | ByInterruptHandler kf ->
+        Stdlib.Hashtbl.hash(3, Kernel_function.hash kf)
   end
 
   module Prototype =
@@ -219,6 +231,13 @@ struct
       arguments = [];
     }
 
+  let interrupt_properties kf =
+    {
+      entry_point = kf;
+      spawn_points = ALSet.empty;
+      arguments = [];
+    }
+
   let add properties spawn_point entry_point arguments =
     assert (Kernel_function.equal entry_point properties.entry_point);
     {
@@ -252,7 +271,8 @@ let spawn_single_entry_point spawn_point name entry_point arguments =
     | None -> BySpawnPoint spawn_point
   in
   let identity = Identity.Prototype.{ key; entry_point } in
-  let th = Identities.memo (fun _ -> create name) identity in
+  let kind = Thread name in
+  let th = Identities.memo (fun _ -> create kind) identity in
   let properties = match State.find_opt th with
     (* Thre thread identity is new; register this thread *)
     | None ->
@@ -269,6 +289,31 @@ let spawn spawn_point name entry_points arguments =
     (fun kf -> spawn_single_entry_point spawn_point name kf arguments)
     entry_points
 
+let is_interrupt_handler entry_point =
+  let key = Identity.Key.ByInterruptHandler entry_point in
+  let identity = Identity.Prototype.{ key; entry_point } in
+  Identities.find_opt identity
+  |> Option.is_some
+
+let interrupt_handler entry_point =
+  let key = Identity.Key.ByInterruptHandler entry_point in
+  let identity = Identity.Prototype.{ key; entry_point } in
+  let kind = InterruptHandler entry_point in
+  Identities.memo (fun _ -> create kind) identity
+
+let interrupt_handlers () =
+  Identities.fold
+    (fun _ th handlers ->
+       match th.kind with
+       | InterruptHandler _ -> th :: handlers
+       | Thread _ | Main -> handlers)
+    []
+
+let register_interrupt_handlers kfs =
+  Kernel_function.Set.iter
+    (fun kf -> interrupt_handler kf |> ignore)
+    kfs
+
 let reset_state () =
   last_thread_id := 1;
   ThreadsById.clear ();
@@ -277,9 +322,10 @@ let reset_state () =
   set_current main
 
 let get_properties thread =
-  if is_main thread
-  then Properties.main_properties ()
-  else State.find thread
+  match thread.kind with
+  | Main -> Properties.main_properties ()
+  | InterruptHandler kf -> Properties.interrupt_properties kf
+  | Thread _ -> State.find thread
 
 let entry_point th =
   (get_properties th).entry_point
