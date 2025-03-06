@@ -137,9 +137,25 @@ let alignof_double () = the_machine.machdep.alignof_double
 let alignof_longdouble () = the_machine.machdep.alignof_longdouble
 let alignof_str () = the_machine.machdep.alignof_str
 let alignof_aligned () = the_machine.machdep.alignof_aligned
+let alignof_void () = the_machine.machdep.alignof_void
 let alignof_fun () = the_machine.machdep.alignof_fun
 let alignof_max () = the_machine.machdep.alignof_max_align_t
 let alignof_extended () = the_machine.machdep.max_extended_alignment
+
+(* GCC Alignof *)
+let gcc_alignof_short () = the_machine.machdep.gcc_alignof_short
+let gcc_alignof_int () = the_machine.machdep.gcc_alignof_int
+let gcc_alignof_long () = the_machine.machdep.gcc_alignof_long
+let gcc_alignof_longlong () = the_machine.machdep.gcc_alignof_longlong
+let gcc_alignof_ptr () = the_machine.machdep.gcc_alignof_ptr
+let gcc_alignof_float () = the_machine.machdep.gcc_alignof_float
+let gcc_alignof_double () = the_machine.machdep.gcc_alignof_double
+let gcc_alignof_longdouble () = the_machine.machdep.gcc_alignof_longdouble
+let gcc_alignof_str () = the_machine.machdep.gcc_alignof_str
+let gcc_alignof_aligned () = the_machine.machdep.gcc_alignof_aligned
+let gcc_alignof_void () = the_machine.machdep.gcc_alignof_void
+let gcc_alignof_fun () = the_machine.machdep.gcc_alignof_fun
+let gcc_alignof_max () = the_machine.machdep.gcc_alignof_max_align_t
 
 (* Misc *)
 let char_is_unsigned () = the_machine.machdep.char_is_unsigned

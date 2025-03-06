@@ -21,11 +21,12 @@ alignof_ptr: 2
 alignof_float: 2
 alignof_double: 2
 alignof_longdouble: 2
+alignof_max_align_t: 2
 alignof_str: 0
 alignof_fun: 0
-alignof_max_align_t: 2
-max_extended_alignment: 0
+alignof_void: 0
 max_align_t: long long
+max_extended_alignment: 0
 char_is_unsigned: true
 little_endian: true
 size_t: 'unsigned int'

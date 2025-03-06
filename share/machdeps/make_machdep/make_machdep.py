@@ -180,7 +180,7 @@ compilation_command = [args.compiler]
 for flag in args.cpp_arch_flags + args.compiler_flags:
     compilation_command = compilation_command + flag.split(" ")
 
-source_files = [
+standard_source_files = [
     # sanity_check is juste here to ensure that the given compiler
     # and flags are coherent. It must be kept at the top of the list.
     ("sanity_check.c", "none"),
@@ -202,6 +202,7 @@ source_files = [
     ("alignof_float.c", "number"),
     ("alignof_double.c", "number"),
     ("alignof_longdouble.c", "number"),
+    ("alignof_void.c", "number"),
     ("alignof_fun.c", "number"),
     ("alignof_str.c", "number"),
     ("alignof_aligned.c", "number"),
@@ -237,6 +238,27 @@ source_files = [
     ("errno.c", "macrolist"),
 ]
 
+gcc_alignof_source_files = [
+    ("gcc_alignof_short.c", "number"),
+    ("gcc_alignof_int.c", "number"),
+    ("gcc_alignof_long.c", "number"),
+    ("gcc_alignof_longlong.c", "number"),
+    ("gcc_alignof_ptr.c", "number"),
+    ("gcc_alignof_float.c", "number"),
+    ("gcc_alignof_double.c", "number"),
+    ("gcc_alignof_longdouble.c", "number"),
+    ("gcc_alignof_void.c", "number"),
+    ("gcc_alignof_fun.c", "number"),
+    ("gcc_alignof_str.c", "number"),
+    ("gcc_alignof_aligned.c", "number"),
+    ("gcc_alignof_max_align_t.c", "number"),
+]
+
+if args.compiler == "gcc":
+    source_files = standard_source_files + gcc_alignof_source_files
+else:
+    source_files = standard_source_files
+
 
 def find_value(name, typ, output):
     if typ == "bool":
@@ -266,6 +288,7 @@ def find_value(name, typ, output):
     else:
         logging.warning(f"unexpected type '{typ}' for field '{name}', skipping")
         return
+
     if name in machdep:
         msg = re.compile(name + " is " + expected)
         res = re.search(msg, output)
@@ -438,6 +461,13 @@ elif args.dest_file:
     machdep["machdep_name"] = Path(args.dest_file.name).stem
 else:
     machdep["machdep_name"] = "anonymous_machdep"
+
+
+def is_optional(field):
+    return "optional" in schema[field] and schema[field]["optional"]
+
+
+machdep = {f: v for [f, v] in machdep.items() if not (is_optional(f) and v is None)}
 
 missing_fields = [f for [f, v] in machdep.items() if v is None]
 

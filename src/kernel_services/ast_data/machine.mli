@@ -75,9 +75,28 @@ val alignof_double: unit -> int
 val alignof_longdouble: unit -> int
 val alignof_str: unit -> int
 val alignof_aligned: unit -> int
+val alignof_void: unit -> int
 val alignof_fun: unit -> int
 val alignof_max: unit -> int
 val alignof_extended: unit -> int
+
+(* ***********************************************************************)
+(** {2 GCC Alignof getters}                                              *)
+(* ***********************************************************************)
+
+val gcc_alignof_short: unit -> int
+val gcc_alignof_int: unit -> int
+val gcc_alignof_long: unit -> int
+val gcc_alignof_longlong: unit -> int
+val gcc_alignof_ptr: unit -> int
+val gcc_alignof_float: unit -> int
+val gcc_alignof_double: unit -> int
+val gcc_alignof_longdouble: unit -> int
+val gcc_alignof_str: unit -> int
+val gcc_alignof_aligned: unit -> int
+val gcc_alignof_void: unit -> int
+val gcc_alignof_fun: unit -> int
+val gcc_alignof_max: unit -> int
 
 (* ***********************************************************************)
 (** {2 Typ/kind getters}                                                 *)

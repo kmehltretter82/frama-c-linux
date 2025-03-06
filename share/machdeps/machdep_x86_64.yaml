@@ -10,6 +10,7 @@ alignof_max_align_t: 16
 alignof_ptr: 8
 alignof_short: 2
 alignof_str: 1
+alignof_void: -1
 bufsiz: '8192'
 char_is_unsigned: false
 compiler: generic

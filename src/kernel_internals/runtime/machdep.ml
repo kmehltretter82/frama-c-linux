@@ -58,10 +58,24 @@ type mach = {
   alignof_double: int;
   alignof_longdouble: int;
   alignof_str: int;
+  alignof_void: int;
   alignof_fun: int;
   alignof_aligned: int;
   alignof_max_align_t: int;
   max_extended_alignment: int;
+  gcc_alignof_short: int [@ default -1];
+  gcc_alignof_int: int [@ default -1];
+  gcc_alignof_long: int [@ default -1];
+  gcc_alignof_longlong: int [@ default -1];
+  gcc_alignof_ptr: int [@ default -1];
+  gcc_alignof_float: int [@ default -1];
+  gcc_alignof_double: int [@ default -1];
+  gcc_alignof_longdouble: int [@ default -1];
+  gcc_alignof_str: int [@ default -1];
+  gcc_alignof_void: int [@ default -1];
+  gcc_alignof_fun: int [@ default -1];
+  gcc_alignof_aligned: int [@ default -1];
+  gcc_alignof_max_align_t: int [@ default -1];
   char_is_unsigned: bool;
   little_endian: bool;
   has__builtin_va_list: bool;
@@ -127,10 +141,24 @@ let dummy = {
   alignof_double = 8;
   alignof_longdouble = 16;
   alignof_str = 1;
+  alignof_void = -1;
   alignof_fun = -1;
   alignof_aligned = 16;
   alignof_max_align_t = 16;
   max_extended_alignment = 0;
+  gcc_alignof_short = -1;
+  gcc_alignof_int = -1;
+  gcc_alignof_long = -1;
+  gcc_alignof_longlong = -1;
+  gcc_alignof_ptr = -1;
+  gcc_alignof_float = -1;
+  gcc_alignof_double = -1;
+  gcc_alignof_longdouble = -1;
+  gcc_alignof_str = -1;
+  gcc_alignof_void = -1;
+  gcc_alignof_fun = -1;
+  gcc_alignof_aligned = -1;
+  gcc_alignof_max_align_t = -1;
   char_is_unsigned = true;
   little_endian = true;
   has__builtin_va_list = true;
@@ -188,8 +216,13 @@ module Machdep = struct
        wint_t=%s;sig_atomic_t=%s;time_t=%s;max_align_t=%s;\
        alignof_short=%d;alignof_int=%d;alignof_long=%d;alignof_longlong=%d;\
        alignof_ptr=%d;alignof_float=%d;alignof_double=%d;alignof_longdouble=%d;\
-       alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;alignof_max_align_t=%d;\
-       max_extended_alignment=%d;\
+       alignof_str=%d;alignof_void=%d;alignof_fun=%d;alignof_aligned=%d;\
+       alignof_max_align_t=%d;max_extended_alignment=%d;\
+       gcc_alignof_short=%d;gcc_alignof_int=%d;gcc_alignof_long=%d;\
+       gcc_alignof_longlong=%d;gcc_alignof_ptr=%d;gcc_alignof_float=%d;\
+       gcc_alignof_double=%d;gcc_alignof_longdouble=%d;gcc_alignof_str=%d;\
+       gcc_alignof_void=%d;gcc_alignof_fun=%d;gcc_alignof_aligned=%d;\
+       gcc_alignof_max_align_t=%d;\
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
        compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
        posix_c_source=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
@@ -234,10 +267,24 @@ module Machdep = struct
       mach.alignof_double
       mach.alignof_longdouble
       mach.alignof_str
+      mach.alignof_void
       mach.alignof_fun
       mach.alignof_aligned
       mach.alignof_max_align_t
       mach.max_extended_alignment
+      mach.gcc_alignof_short
+      mach.gcc_alignof_int
+      mach.gcc_alignof_long
+      mach.gcc_alignof_longlong
+      mach.gcc_alignof_ptr
+      mach.gcc_alignof_float
+      mach.gcc_alignof_double
+      mach.gcc_alignof_longdouble
+      mach.gcc_alignof_str
+      mach.gcc_alignof_void
+      mach.gcc_alignof_fun
+      mach.gcc_alignof_aligned
+      mach.gcc_alignof_max_align_t
       mach.char_is_unsigned
       mach.little_endian
       mach.has__builtin_va_list

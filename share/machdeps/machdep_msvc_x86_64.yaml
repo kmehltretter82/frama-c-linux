@@ -10,6 +10,7 @@ alignof_max_align_t: -1
 alignof_ptr: 8
 alignof_short: 2
 alignof_str: 1
+alignof_void: -1
 max_align_t: ''
 max_extended_alignment: 0
 char_is_unsigned: false

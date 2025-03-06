@@ -10,6 +10,7 @@ alignof_max_align_t: 16
 alignof_ptr: 4
 alignof_short: 2
 alignof_str: 1
+alignof_void: -1
 max_align_t: struct __machdep_max_align_t { int __max_align; } __attribute__ ((aligned (16)))
 max_extended_alignment: 0
 char_is_unsigned: false
