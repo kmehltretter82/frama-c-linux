@@ -127,4 +127,5 @@ let create creation_point name =
 
 let reset_state () =
   last_queue_id := 0;
-  MqueuesById.clear ()
+  MqueuesById.clear ();
+  Identities.clear ()
