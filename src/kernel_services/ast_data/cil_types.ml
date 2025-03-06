@@ -285,11 +285,12 @@ and global =
     sign and precision), floating point types, enumeration types, array and
     pointer types, and function types. Every type is associated with a list of
     attributes, which are always kept in sorted order. Use
-    {!Ast_attributes.add_attribute} and {!Ast_attributes.add_attributes} to
-    construct list of attributes. If you want to inspect a type, you should
-    use {!Ast_types.unroll}, {!Ast_types.unroll_node}, {!Ast_types.unroll_skel},
-    {!Ast_types.unroll_deep} or {!Ast_types.unroll_deep_node} to see through the
-    uses of named types.
+    {!Ast_attributes.add} and {!Ast_attributes.add_list} to construct list of
+    attributes, {!Ast_types.add_attributes} to add them to a type. If you
+    want to inspect a type, you should use {!Ast_types.unroll},
+    {!Ast_types.unroll_node}, {!Ast_types.unroll_skel},
+    {!Ast_types.unroll_deep} or {!Ast_types.unroll_deep_node} to see through
+    the uses of named types.
 
     CIL is configured at build-time with the sizes and alignments of the
     underlying compiler (GCC or MSVC). CIL contains functions that can compute
