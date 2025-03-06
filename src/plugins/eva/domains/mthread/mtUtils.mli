@@ -31,8 +31,6 @@ module Result : sig
   val warning : 'a -> ('r, Format.formatter, unit, 'a t) format4 -> 'r
   val error : ('r, Format.formatter, unit, 'a t) format4 -> 'r
 
-  val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
-  val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
   val log : error : 'a -> 'a t -> 'a
   val value : 'a t -> 'a
 end

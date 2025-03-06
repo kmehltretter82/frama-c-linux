@@ -33,7 +33,6 @@ val is_call_to_sync: stmt -> bool
 (** Pretty-printing *)
 
 val pretty_stmt: Format.formatter -> stmt -> unit
-val pretty_kinstr: Format.formatter -> kinstr -> unit
 val pretty_succs: Format.formatter -> stmt -> unit
 (** Print the sid of the successors of a statement *)
 
@@ -49,8 +48,6 @@ module Stack : sig
   include Datatype.S with type t = stack
 
   val pretty: Format.formatter -> t -> unit
-
-  val cur_ki: stack -> kinstr
 
   (** Stack call simulating an access to a shared variable at the given
       statement *)

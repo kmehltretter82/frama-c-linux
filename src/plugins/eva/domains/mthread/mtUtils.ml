@@ -47,26 +47,6 @@ module Result = struct
   let warning v fmt = Format.kasprintf (fun msg -> Warning (v, [msg])) fmt
   let error fmt = Format.kasprintf (fun msg -> Error [msg]) fmt
 
-  let compare f x y =
-    let compare_log = Stdlib.List.compare String.compare in
-    match x, y with
-    | Ok x, Ok y -> f x y
-    | Ok _, (Warning _ | Error _) -> -1
-    | (Warning _ | Error _), Ok _ ->  1
-    | Warning (x, lx), Warning (y, ly) -> f x y <?> lazy (compare_log lx ly)
-    | Warning _, Error _ -> -1
-    | Error _, Warning _ ->  1
-    | Error lx, Error ly -> compare_log lx ly
-
-  let equal f x y =
-    let equal_log = Stdlib.List.equal String.equal in
-    match x, y with
-    | Ok x, Ok y -> f x y
-    | Ok _, (Warning _ | Error _) | (Warning _ | Error _), Ok _ -> false
-    | Warning (x, lx), Warning (y, ly) -> f x y && equal_log lx ly
-    | Warning _, Error _ | Error _, Warning _ -> false
-    | Error lx, Error ly -> equal_log lx ly
-
   let pp_log = Format.(pp_print_list ~pp_sep:pp_print_newline pp_print_string)
   let log ~error = function
     | Ok v -> v

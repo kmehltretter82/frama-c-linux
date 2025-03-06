@@ -49,14 +49,6 @@ let comp f1 v11 v12 f2 v21 v22 =
 (* --- Misc                                                               --- *)
 (* -------------------------------------------------------------------------- *)
 
-
-let mem () =
-  Gc.full_major ();
-  let s = Gc.stat () in
-  let size =  s.Gc.live_words  in
-  size * 8 / 1048576
-
-
 type 'a conversion_with_warning = [
   | `Success of 'a
   | `WithWarning of (Format.formatter -> unit) * 'a
@@ -66,13 +58,6 @@ type 'a conversion = [
   | 'a conversion_with_warning
   | `Failure of (Format.formatter -> unit)
 ]
-
-let conv_map f = function
-  | `Success v -> `Success (f v)
-  | `WithWarning (m, v) -> `WithWarning (m, f v)
-  | `Failure m -> `Failure m
-
-exception FailMsg of (Format.formatter -> unit)
 
 
 exception Found of int

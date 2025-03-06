@@ -51,11 +51,6 @@ let kinstr_to_source = function
   | Kglobal -> None
   | Kstmt stmt -> Some (fst (Cil_datatype.Stmt.loc stmt))
 
-let pretty_kinstr fmt ki =
-  match ki with
-  | Kglobal -> Format.fprintf fmt "<start>"
-  | Kstmt stmt -> pretty_stmt fmt stmt
-
 
 let pretty_succs fmt stmt =
   (Pretty_utils.pp_list ~sep:" "
@@ -105,10 +100,5 @@ module Stack = struct
   let access_to_var stmt : stack_elt = fun_access_vars (), Kstmt stmt
   let is_access_to_var (kf, _) =
     Kernel_function.equal kf (fun_access_vars ())
-
-
-  let cur_ki = function
-    | [] -> MtOptions.fatal ~current:true "Empty stack"
-    | (_kf, ki) :: _ -> ki
 
 end

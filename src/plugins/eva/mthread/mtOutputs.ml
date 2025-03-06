@@ -63,27 +63,6 @@ module Utilities = struct
       ) s;
     buf
   ;;
-
-  exception FramaCModelCheckingExec of string ;;
-
-  let _run_cmd cmd =
-    MtOptions.feedback "Running %s@."cmd;
-    if Sys.command cmd <> 0 then
-      let msg = Format.sprintf "Something happened when executing %s@." cmd in
-      raise (FramaCModelCheckingExec(msg))
-  ;;
-
-  let rec _list_unique cmp l =
-    match l with
-    | [] -> []
-    | x :: xs ->
-      x :: _list_unique cmp (List.filter (fun e -> cmp x e <> 0) xs)
-  ;;
-
-  let _list_equal feq l1 l2 =
-    try  List.for_all2 feq l1 l2
-    with Invalid_argument _ -> false
-  ;;
 end
 
 

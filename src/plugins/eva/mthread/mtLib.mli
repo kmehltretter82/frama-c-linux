@@ -43,11 +43,6 @@ val comp: ('a -> 'b -> int) -> 'a -> 'b -> ('c -> 'd -> int) -> 'c -> 'd -> int
 
 
 
-(** Memory used by mthread so far *)
-val mem: unit -> int
-
-
-
 (** Conversion from something into something else. Returns a formatter that
     prints the error in case of failure *)
 type 'a conversion_with_warning = [
@@ -59,10 +54,6 @@ type 'a conversion = [
   | 'a conversion_with_warning
   | `Failure of (Format.formatter -> unit)
 ]
-
-exception FailMsg of (Format.formatter -> unit)
-
-val conv_map: ('a -> 'b) -> 'a conversion -> 'b conversion
 
 val escape_non_utf8: string -> string
 
