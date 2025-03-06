@@ -602,8 +602,8 @@ let gen_all_defines fmt mach =
   gen_define_macro fmt "__WORDSIZE" mach.wordsize;
   gen_define_macro fmt "__FC_POSIX_VERSION" mach.posix_version;
   gen_define_string fmt "__FC_SIG_ATOMIC_T" mach.sig_atomic_t;
-  gen_intlike_min fmt "__FC_SIG_ATOMIC_MIN" mach.sig_atomic_t mach;
-  gen_intlike_max fmt "__FC_SIG_ATOMIC_MAX" mach.sig_atomic_t mach;
+  gen_intlike_min fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
+  gen_intlike_max fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
   gen_define_macro fmt "__FC_BUFSIZ" mach.bufsiz;
   gen_define_macro fmt "__FC_EOF" mach.eof;
   gen_define_macro fmt "__FC_FOPEN_MAX" mach.fopen_max;
