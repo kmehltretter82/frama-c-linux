@@ -133,7 +133,7 @@ module NodeValueState = struct
         `WithWarning (
           (fun fmt -> Format.fprintf fmt
               "@[Id %a@ contains@ strange@ state@ {%a}@]"
-              MtIds.RawId.pretty raw_id
+              MtIds.pretty_raw_id raw_id
               (Pretty_utils.pp_list ~sep:"@ " ~pre:"" ~suf:""
                  Format.pp_print_int) l;
           ),
