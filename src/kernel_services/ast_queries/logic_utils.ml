@@ -553,8 +553,18 @@ let rec expr_to_term ?(coerce=false) e =
       end
     | SizeOf t -> TSizeOf t, ctyp
     | SizeOfE e -> TSizeOf (Cil.typeOf e), ctyp
-    | AlignOf typ -> TAlignOf typ, ctyp
-    | AlignOfE e -> TAlignOf (Cil.typeOf e), ctyp
+    | AlignOf (typ, `Standard) -> TAlignOf typ, ctyp
+    | AlignOfE (e, `Standard) -> TAlignOf (Cil.typeOf e), ctyp
+    | AlignOf (_, `GCC) ->
+      begin match Cil.constFoldToInt e with
+        | Some value -> TConst (Integer (value, None)), Linteger
+        | None -> Kernel.fatal ""
+      end
+    | AlignOfE (_, `GCC) ->
+      begin match Cil.constFoldToInt e with
+        | Some value -> TConst (Integer (value, None)), Linteger
+        | None -> Kernel.fatal ""
+      end
     | Lval lv -> TLval (lval_to_term_lval lv), ctyp
     | CastE (ty,e) ->
       let coerce = Ast_types.is_integral (Cil.typeOf e) in
@@ -842,8 +852,10 @@ let rec is_same_attrparam p1 p2 =
     is_same_string s1 s2 && is_same_list is_same_attrparam p1 p2
   | ASizeOf t1, ASizeOf t2 -> is_same_c_type t1 t2
   | ASizeOfE p1, ASizeOfE p2 -> is_same_attrparam p1 p2
-  | AAlignOf t1, AAlignOf t2 -> is_same_c_type t1 t2
-  | AAlignOfE p1, AAlignOfE p2 -> is_same_attrparam p1 p2
+  | AAlignOf (t1, i1), AAlignOf (t2, i2) ->
+    is_same_c_type t1 t2 && Cil_types.equal_standard_or_gcc i1 i2
+  | AAlignOfE (p1, i1), AAlignOfE (p2, i2) ->
+    is_same_attrparam p1 p2 && Cil_types.equal_standard_or_gcc i1 i2
   | AUnOp(u1,p1), AUnOp(u2,p2) ->
     is_same_c_unop u1 u2 && is_same_attrparam p1 p2
   | ABinOp(b1,l1,r1), ABinOp(b2,l2,r2) ->

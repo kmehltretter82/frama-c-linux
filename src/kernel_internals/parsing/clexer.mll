@@ -81,22 +81,16 @@ let unsupported key =
 
 let compiler (name, is_machdep) key builder =
   let wkey = Kernel.wkey_conditional_feature in
-  let warning () =
-    Kernel.warning ~wkey
+  let warning loc =
+    Kernel.warning ~wkey ~source:(fst loc)
       "%s is a %s extension, use a %s-based machdep to enable it."
         key name name ;
     IDENT key
   in
-  add key (fun loc -> if is_machdep then builder loc else warning ())
+  add key (fun loc -> if is_machdep then builder loc else warning loc)
 
-(* let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder *)
+let gcc key builder = compiler ("GCC", Machine.gccMode ()) key builder
 let msvc key builder = compiler ("MSVC", Machine.msvcMode ()) key builder
-
-let thread_keyword () =
-  let wkey = Kernel.wkey_conditional_feature in
-  let s = "__thread is a GCC extension, use a GCC-based machdep to enable it" in
-  let warning () = Kernel.warning ~wkey "%s" s ; IDENT "__thread" in
-  add "__thread" (fun loc -> if Machine.gccMode () then THREAD loc else warning ())
 
 let filename_keyword () =
   let convert acc c = int64_of_char c :: acc in
@@ -174,11 +168,13 @@ let init_lexicon () =
   valid "__func__" (fun loc -> FUNCTION__ loc) ; (* ISO 6.4.2.2 *)
   valid "__PRETTY_FUNCTION__" (fun loc -> PRETTY_FUNCTION__ loc) ;
   valid "__label__" (fun _ -> LABEL__) ;
-  (*** weimer: GCC arcana ***)
-  (* gcc   "__alignof__" (fun loc -> ALIGNOF loc) ; *)
   valid "__restrict" (fun loc -> RESTRICT loc) ;
   valid "restrict" (fun loc -> RESTRICT loc) ;
-  (**** MS VC ***)
+  valid "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
+  (*** GCC ***)
+  gcc   "__alignof__" (fun loc -> GCC_ALIGNOF loc) ;
+  gcc   "__thread" (fun loc -> THREAD loc) ;
+  (**** MSVC ***)
   valid "__int64" (fun _ -> INT64 (currentLoc ())) ;
   valid "__int32" (fun loc -> INT loc) ;
   valid "_cdecl" ( fun _ -> MSATTR ("_cdecl", currentLoc ())) ;
@@ -197,9 +193,6 @@ let init_lexicon () =
   valid "__builtin_va_arg" (fun loc -> BUILTIN_VA_ARG loc) ;
   valid "__builtin_types_compatible_p" (fun loc -> BUILTIN_TYPES_COMPAT loc) ;
   valid "__builtin_offsetof" (fun loc -> BUILTIN_OFFSETOF loc) ;
-  valid "_Thread_local" (fun loc -> THREAD_LOCAL loc) ;
-  (* We recognize __thread for GCC machdeps *)
-  thread_keyword () ;
   filename_keyword () ;
   (* The following C11/GNU extension tokens are not yet supported, so we
    provide some helpful error messages. Usage of 'fatal' instead of 'error'

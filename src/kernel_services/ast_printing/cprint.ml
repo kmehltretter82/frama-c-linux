@@ -366,9 +366,13 @@ and print_expression_level (lvl: int) fmt (exp : expression) =
       fprintf fmt "sizeof%a" print_expression exp
     | TYPE_SIZEOF (bt,dt) ->
       fprintf fmt "sizeof(@[%a@])" print_onlytype (bt,dt)
-    | EXPR_ALIGNOF exp ->
-      fprintf fmt "__alignof__%a" print_expression exp
-    | TYPE_ALIGNOF (bt,dt) ->
+    | EXPR_ALIGNOF (exp, `Standard) ->
+      fprintf fmt "_Alignof(%a)" print_expression exp
+    | TYPE_ALIGNOF (bt,dt, `Standard) ->
+      fprintf fmt "_Alignof(@[%a@])" print_onlytype (bt, dt)
+    | EXPR_ALIGNOF (exp, `GCC) ->
+      fprintf fmt "__alignof__(%a)" print_expression exp
+    | TYPE_ALIGNOF (bt,dt, `GCC) ->
       fprintf fmt "__alignof__(@[%a@])" print_onlytype (bt, dt)
     | INDEX (exp, idx) ->
       fprintf fmt "%a[@[%a@]]"

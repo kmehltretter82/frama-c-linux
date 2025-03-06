@@ -938,8 +938,12 @@ and is_same_exp e e' env =
   | Lval lv, Lval lv' -> is_same_lval lv lv' env
   | SizeOf t, SizeOf t' -> is_same_type t t' env
   | SizeOfE e, SizeOfE e' -> is_same_exp e e' env
-  | AlignOf t, AlignOf t' -> is_same_type t t' env
-  | AlignOfE e, AlignOfE e' -> is_same_exp e e' env
+  | AlignOf (t, i), AlignOf (t', i') ->
+    Cil_types.equal_standard_or_gcc i i' &&
+    is_same_type t t' env
+  | AlignOfE (e, i), AlignOfE (e', i') ->
+    Cil_types.equal_standard_or_gcc i i' &&
+    is_same_exp e e' env
   | UnOp(op,e,t), UnOp(op',e',t') ->
     equal_unop op op' && is_same_exp e e' env && is_same_type t t' env
   | BinOp(op,e1,e2,t), BinOp(op',e1',e2',t') ->

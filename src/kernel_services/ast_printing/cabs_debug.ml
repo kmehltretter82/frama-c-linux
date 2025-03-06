@@ -296,6 +296,10 @@ and pp_un_op fmt = function
 and pp_exp fmt exp =
   fprintf fmt "exp(%a)" pp_exp_node exp.expr_node
 
+and pp_impl fmt = function
+  | `Standard -> fprintf fmt "`Standard"
+  | `GCC -> fprintf fmt "`GCC"
+
 and pp_exp_node fmt = function
   |   NOTHING -> fprintf fmt "NOTHING"
   |   UNARY (un_op, exp) -> fprintf fmt "@[<hov 2>%a(%a)@]" pp_un_op un_op pp_exp exp
@@ -324,10 +328,10 @@ and pp_exp_node fmt = function
   |   EXPR_SIZEOF exp -> fprintf fmt "EXPR_SIZEOF(%a)" pp_exp exp
   |   TYPE_SIZEOF (spec, decl_type) ->
     fprintf fmt "TYP_SIZEOF(%a,%a)" pp_spec spec pp_decl_type decl_type
-  |   EXPR_ALIGNOF exp ->
-    fprintf fmt "EXPR_ALIGNOF(%a)" pp_exp exp
-  |   TYPE_ALIGNOF (spec, decl_type) ->
-    fprintf fmt "TYP_ALIGNEOF(%a,%a)" pp_spec spec pp_decl_type decl_type
+  |   EXPR_ALIGNOF (exp, i) ->
+    fprintf fmt "EXPR_ALIGNOF(%a, %a)" pp_exp exp pp_impl i
+  |   TYPE_ALIGNOF (spec, decl_type, i) ->
+    fprintf fmt "TYP_ALIGNEOF(%a,%a, %a)" pp_spec spec pp_decl_type decl_type pp_impl i
   |   INDEX (exp1, exp2) ->
     fprintf fmt "INDEX(%a, %a)" pp_exp exp1 pp_exp exp2
   |   MEMBEROF (exp, s) ->

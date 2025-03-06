@@ -459,8 +459,14 @@ and compare_attrparam config a1 a2 = match a1, a2 with
       compare_attrparam_list config l1 l2
   | ASizeOf t1, ASizeOf t2 -> compare_type config t1 t2
   | ASizeOfE p1, ASizeOfE p2 -> compare_attrparam config p1 p2
-  | AAlignOf t1, AAlignOf t2 -> compare_type config t1 t2
-  | AAlignOfE p1, AAlignOfE p2 -> compare_attrparam config p1 p2
+  | AAlignOf (t1, i1), AAlignOf (t2, i2) ->
+    compare_chain
+      (Cil_types.compare_standard_or_gcc) i1 i2
+      (compare_type config) t1 t2
+  | AAlignOfE (p1, i1), AAlignOfE (p2, i2) ->
+    compare_chain
+      (Cil_types.compare_standard_or_gcc) i1 i2
+      (compare_attrparam config) p1 p2
   | AUnOp (op1, a1), AUnOp (op2, a2) ->
     compare_chain (=?=) op1 op2 (compare_attrparam config) a1 a2
   | ABinOp (op1, a1, a1'), ABinOp (op2, a2, a2') ->
@@ -1064,10 +1070,16 @@ struct
     | SizeOfE e1, SizeOfE e2 -> compare_exp e1 e2
     | SizeOfE _, _ -> 1
     | _, SizeOfE _ -> -1
-    | AlignOf ty1, AlignOf ty2 -> Typ.compare ty1 ty2
+    | AlignOf (ty1, i1), AlignOf (ty2, i2) ->
+      compare_chain
+        Cil_types.compare_standard_or_gcc i1 i2
+        Typ.compare ty1 ty2
     | AlignOf _, _ -> 1
     | _, AlignOf _ -> -1
-    | AlignOfE e1, AlignOfE e2 -> compare_exp e1 e2
+    | AlignOfE (e1, i1), AlignOfE (e2, i2) ->
+      compare_chain
+        Cil_types.compare_standard_or_gcc i1 i2
+        compare_exp e1 e2
     | AlignOfE _, _ -> 1
     | _, AlignOfE _ -> -1
     | UnOp(op1,e1,ty1), UnOp(op2,e2,ty2) ->
@@ -1131,8 +1143,12 @@ struct
     | Lval lv -> hash_lval ((prime*acc) lxor 42) lv
     | SizeOf t -> (prime*acc) lxor Typ.hash t
     | SizeOfE e -> hash_exp ((prime*acc) lxor 75) e
-    | AlignOf t -> (prime*acc) lxor Typ.hash t
-    | AlignOfE e -> hash_exp ((prime*acc) lxor 153) e
+    | AlignOf (t, i) ->
+      let r = (prime * acc) lxor Hashtbl.hash i in
+      (prime * r) lxor Typ.hash t
+    | AlignOfE (e, i) ->
+      let r = (prime * acc) lxor Hashtbl.hash i in
+      hash_exp ((prime * r) lxor 153) e
     | UnOp(op,e,ty) ->
       let res = hash_exp ((prime*acc) lxor Hashtbl.hash op) e in
       (prime*res) lxor Typ.hash ty

@@ -1,11 +1,5 @@
 [kernel] Parsing sizeof_void.c (with preprocessing)
-[kernel] sizeof_void.c:21: 
-  syntax error:
-  Location: line 21, column 22, before or at token: void
-  19    
-  20    int h () {
-  21      int x = __alignof__(void);
-                              ^
-  22      return 0;
-  23    }
+[kernel:parser:conditional-feature] sizeof_void.c:21: Failure: 
+  __alignof__ is a GCC extension, use a GCC-based machdep to enable it.
+[kernel] User Error: warning parser:conditional-feature treated as fatal error.
 [kernel] Frama-C aborted: invalid user input.

@@ -61,7 +61,7 @@ let pp_from_ref = Extlib.mk_fun "Cil.pp_from_ref"
 let pp_behavior_ref = Extlib.mk_fun "Cil.pp_behavior_ref"
 
 let default_behavior_name = "default!"
-let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes =[]
+let is_default_mk_behavior ~name ~assumes = name = default_behavior_name && assumes = []
 let is_default_behavior b = is_default_mk_behavior ~name:b.b_name ~assumes:b.b_assumes
 
 let find_default_behavior spec =
@@ -1598,18 +1598,21 @@ and childrenExp (vis: cilVisitor) (e: exp) : exp =
   | Const c ->
     let c' = visitCilConst vis c in
     if c' != c then new_exp (Const c') else e
+
   | SizeOf t ->
     let t'= vTyp t in
     if t' != t then new_exp (SizeOf t') else e
   | SizeOfE e1 ->
     let e1' = vExp e1 in
     if e1' != e1 then new_exp (SizeOfE e1') else e
-  | AlignOf t ->
+  
+  | AlignOf (t, i) ->
     let t' = vTyp t in
-    if t' != t then new_exp (AlignOf t') else e
-  | AlignOfE e1 ->
+    if t' != t then new_exp (AlignOf (t', i)) else e
+  | AlignOfE (e1, i) ->
     let e1' = vExp e1 in
-    if e1' != e1 then new_exp (AlignOfE e1') else e
+    if e1' != e1 then new_exp (AlignOfE (e1', i)) else e
+
   | Lval lv ->
     let lv' = vLval lv in
     if lv' != lv then new_exp (Lval lv') else e
@@ -2105,12 +2108,12 @@ and childrenAttrparam (vis: cilVisitor) (aa: attrparam) : attrparam =
   | ASizeOfE e ->
     let e' = fAttrP e in
     if e' != e then ASizeOfE e' else aa
-  | AAlignOf t ->
+  | AAlignOf (t, i) ->
     let t' = fTyp t in
-    if t' != t then AAlignOf t' else aa
-  | AAlignOfE e ->
+    if t' != t then AAlignOf (t', i) else aa
+  | AAlignOfE (e, i) ->
     let e' = fAttrP e in
-    if e' != e then AAlignOfE e' else aa
+    if e' != e then AAlignOfE (e', i) else aa
   | AUnOp (uo, e1) ->
     let e1' = fAttrP e1 in
     if e1' != e1 then AUnOp (uo, e1') else aa
@@ -3168,23 +3171,46 @@ let foldAlignasToInt = function
     | Some v -> Some (Z.to_int v)
 
 (* Get the minimum alignment in bytes for a given type *)
-let rec bytesAlignOf t =
+let rec bytesAlignOf ~standard_or_gcc t =
   let open Machine in
   let alignOfType () =
     match t.tnode with
     | TInt (IChar|ISChar|IUChar|IBool) -> 1
-    | TInt (IShort|IUShort) -> alignof_short ()
-    | TInt (IInt|IUInt) -> alignof_int ()
-    | TInt (ILong|IULong) -> alignof_long ()
-    | TInt (ILongLong|IULongLong) -> alignof_longlong ()
-    | TEnum ei ->  bytesAlignOf (Cil_const.mk_tint ei.ekind)
-    | TFloat FFloat -> alignof_float ()
-    | TFloat FDouble -> alignof_double ()
-    | TFloat FLongDouble -> alignof_longdouble ()
-    | TNamed t -> bytesAlignOf t.ttype
-    | TArray (t, _) -> bytesAlignOf t
-    | TPtr _ | TBuiltin_va_list -> alignof_ptr ()
-
+    | TInt (IShort|IUShort)->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_short ()
+      else alignof_short ()
+    | TInt (IInt|IUInt) ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_int ()
+      else alignof_int ()
+    | TInt (ILong|IULong) ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_long ()
+      else alignof_long ()
+    | TInt (ILongLong|IULongLong) ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_longlong ()
+      else alignof_longlong ()
+    | TEnum ei ->  bytesAlignOf ~standard_or_gcc (Cil_const.mk_tint ei.ekind)
+    | TFloat FFloat ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_float ()
+      else alignof_float ()
+    | TFloat FDouble ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_double ()
+      else alignof_double ()
+    | TFloat FLongDouble ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_longdouble ()
+      else alignof_longdouble ()
+    | TNamed t -> bytesAlignOf ~standard_or_gcc t.ttype
+    | TArray (t, _) -> bytesAlignOf ~standard_or_gcc t
+    | TPtr _ | TBuiltin_va_list ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_ptr ()
+      else alignof_ptr ()
     (* For composite types get the maximum alignment of any field inside *)
     | TComp c ->
       (* On GCC the zero-width fields do not contribute to the alignment. On
@@ -3204,15 +3230,18 @@ let rec bytesAlignOf t =
            (* Bitfields with zero width do not contribute to the alignment in
             * GCC *)
            if not (msvcMode ()) && f.fbitfield = Some 0 then sofar else
-             max sofar (bytesAlignOfField f)) 1 fields
+             max sofar (bytesAlignOfField ~standard_or_gcc f)) 1 fields
     (* These are some error cases *)
-    | TFun _ when not (msvcMode ()) -> alignof_fun ()
-    | TFun _ -> raise (SizeOfError ("Undefined sizeof on a function.", t))
-    | TVoid  ->
-      if sizeof_void () > 0 then
-        sizeof_void ()
-      else
-        raise (SizeOfError ("Undefined sizeof(void).", t))
+    | TFun _ when alignof_fun () > 0 ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_fun ()
+      else alignof_fun ()
+    | TFun _ -> raise (SizeOfError ("Undefined alignof on a function.", t))
+    | TVoid  when alignof_void () > 0 ->
+      if standard_or_gcc = `GCC
+      then gcc_alignof_void ()
+      else alignof_void ()
+    | TVoid -> raise (SizeOfError ("Undefined alignof(void).", t))
   in
   process_aligned_attribute ~may_reduce:true
     (fun fmt -> !pp_typ_ref fmt t)
@@ -3225,7 +3254,7 @@ let rec bytesAlignOf t =
    Note that is not the case for the aligned attribute, which behaves
    differently when put into a struct, or in each of its fields.
 *)
-and bytesAlignOfField (fi: fieldinfo) =
+and bytesAlignOfField ~standard_or_gcc (fi: fieldinfo) =
   let fieldIsPacked =
     Ast_attributes.(contains "packed" fi.fattr || contains "packed" fi.fcomp.cattr)
   in
@@ -3234,7 +3263,7 @@ and bytesAlignOfField (fi: fieldinfo) =
     let aligned = process_aligned_attribute ~may_reduce:fieldIsPacked
         (fun fmt -> Format.fprintf fmt "field %s" fi.fname)
         fi.fattr
-        (fun () -> bytesAlignOf fi.ftype)
+        (fun () -> bytesAlignOf ~standard_or_gcc fi.ftype)
     in
     let alignas = match foldAlignasToInt fi.falignas with
       | None -> 0
@@ -3266,8 +3295,7 @@ and intOfAttrparam (a:attrparam) : int option =
     | ASizeOf(t) ->
       let bs = bitsSizeOf t in
       bs / 8
-    | AAlignOf(t) ->
-      bytesAlignOf t
+    | AAlignOf(t, i) -> bytesAlignOf ~standard_or_gcc:i t
     | _ -> raise (SizeOfError ("Cannot convert an attribute to int.", Cil_const.voidType))
   in
   (* Use ignoreAlignmentAttrs here to prevent stack overflow if a buggy
@@ -3337,7 +3365,7 @@ and offsetOfFieldAcc ~last ~(fi: fieldinfo) ~(sofar: offsetAcc) : offsetAcc =
 and offsetOfFieldAcc_GCC last (fi: fieldinfo) (sofar: offsetAcc) : offsetAcc =
   (* field type *)
   let ftype = Ast_types.unroll fi.ftype in
-  let ftypeAlign = 8 * bytesAlignOfField fi in
+  let ftypeAlign = 8 * bytesAlignOfField ~standard_or_gcc:`Standard fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype, fi.fbitfield with
   (* A width of 0 means that we must end the current packing. It seems that
@@ -3384,7 +3412,7 @@ and offsetOfFieldAcc_MSVC last (fi: fieldinfo)
     (sofar: offsetAcc) : offsetAcc =
   (* field type *)
   let ftype = Ast_types.unroll fi.ftype in
-  let ftypeAlign = 8 * bytesAlignOfField fi in
+  let ftypeAlign = 8 * bytesAlignOfField ~standard_or_gcc:`Standard fi in
   let ftypeBits = (if last then bitsSizeOfEmptyArray else bitsSizeOf) ftype in
   match ftype.tnode, fi.fbitfield, sofar.oaPrevBitPack with
   (* Ignore zero-width bitfields that come after non-bitfields *)
@@ -3525,7 +3553,7 @@ and bitsSizeOf t =
             * is 32 and is not padded  *)
            t, 32
          else
-           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf t))
+           t, addTrailing lastoff.oaFirstFree (8 * bytesAlignOf ~standard_or_gcc:`Standard t))
 
   | TComp comp -> (* Union *)
     find_sizeof t
@@ -3546,7 +3574,7 @@ and bitsSizeOf t =
          (* Note: we treat None above *)
          let max = List.fold_left fold 0 (Option.get comp.cfields) in
          (* Add trailing by simulating adding an extra field *)
-         t, addTrailing max (8 * bytesAlignOf t))
+         t, addTrailing max (8 * bytesAlignOf ~standard_or_gcc:`Standard t))
 
   | TArray(bt, Some len) ->
     find_sizeof t
@@ -3709,15 +3737,13 @@ and constFold (machdep: bool) (e: exp) : exp =
     end
   | SizeOfE e when machdep ->
     constFold machdep (new_exp ~loc:e.eloc (SizeOf (typeOf e)))
-  | AlignOf t when machdep ->
+  | AlignOf (t, standard_or_gcc) when machdep ->
     begin
-      try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf t)
+      try kinteger ~loc (Machine.sizeof_kind ()) (bytesAlignOf ~standard_or_gcc t)
       with SizeOfError _ -> e
     end
-  | AlignOfE e when machdep ->
-    (* The alignment of an expression is not always the alignment of its
-     * type. I know that for strings this is not true *)
-    constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e)))
+  | AlignOfE (e, i) when machdep ->
+    constFold machdep (new_exp ~loc:e.eloc (AlignOf (typeOf e, i)))
   | AlignOfE _ | AlignOf _ | SizeOfE _ | SizeOf _ ->
     e (* Depends on machdep. Do not evaluate in this case*)
 
@@ -3981,6 +4007,12 @@ let bitsSizeOfBitfield typlv =
   | t -> bitsSizeOf t
 
 let () = constfoldtoint := constFoldToInt ~machdep:true
+
+let bytesAlignOf t =
+  bytesAlignOf ~standard_or_gcc:`Standard t
+
+let bytesAlignOfField f =
+  bytesAlignOfField ~standard_or_gcc:`Standard f
 
 let bytesAlignOfVarinfo vi =
   match foldAlignasToInt vi.valignas with

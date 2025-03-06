@@ -769,6 +769,10 @@ class cil_printer () = object (self)
     parent_non_decay <- false;
     let level = Precedence.getParenthLevel e in
     (* fprintf fmt "/* eid:%d */" e.eid; *)
+    let alignof_kw = function
+      | `Standard -> "_Alignof"
+      | `GCC -> "__alignof__"
+    in
     match e.enode with
     | Const(c) -> self#constant fmt c
     | Lval(l) -> self#lval fmt l
@@ -795,10 +799,10 @@ class cil_printer () = object (self)
     | SizeOfE e ->
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof" self#exp_non_decay e
-    | AlignOf t ->
-      fprintf fmt "%a(%a)" (self#pp_keyword) "_Alignof" (self#typ None) t
-    | AlignOfE e ->
-      fprintf fmt "%a(%a)" (self#pp_keyword) "_Alignof" self#exp_non_decay e
+    | AlignOf (t, i) ->
+      fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) (self#typ None) t
+    | AlignOfE (e, i) ->
+      fprintf fmt "%a(%a)" (self#pp_keyword) (alignof_kw i) self#exp_non_decay e
     | AddrOf ((Var v, NoOffset))
       when Datatype.String.Hashtbl.mem rename_builtins v.vname ->
       self#varinfo fmt v
@@ -2264,6 +2268,10 @@ class cil_printer () = object (self)
 
   method attrparam fmt a =
     let level = Precedence.getParenthLevelAttrParam a in
+    let alignof_kw = function
+      | `Standard -> "_Alignof"
+      | `GCC -> "__alignof__"
+    in
     match a with
     | AInt n -> fprintf fmt "%a" Datatype.Integer.pretty n
     | AStr s -> fprintf fmt "\"%s\"" (Escape.escape_string s)
@@ -2285,8 +2293,10 @@ class cil_printer () = object (self)
       fprintf fmt "%a(%a)"
         self#pp_keyword "sizeof"
         (self#typ None) t
-    | AAlignOfE a -> fprintf fmt "__alignof__(%a)" self#attrparam a
-    | AAlignOf t -> fprintf fmt "__alignof__(%a)" (self#typ None) t
+    | AAlignOfE (a, i) ->
+      fprintf fmt "%a(%a)" self#pp_keyword (alignof_kw i) self#attrparam a
+    | AAlignOf (t, i) ->
+      fprintf fmt "%a(%a)" self#pp_keyword (alignof_kw i) (self#typ None) t
     | AUnOp(u,a1) ->
       fprintf fmt "%a %a" self#unop u (self#attribute_prec level) a1
     | ABinOp(b,a1,a2) ->

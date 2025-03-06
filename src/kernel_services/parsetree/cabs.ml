@@ -268,8 +268,8 @@ and cabsexp =
   | VARIABLE of string
   | EXPR_SIZEOF of expression
   | TYPE_SIZEOF of specifier * decl_type
-  | EXPR_ALIGNOF of expression
-  | TYPE_ALIGNOF of specifier * decl_type
+  | EXPR_ALIGNOF of expression * [ `Standard | `GCC ]
+  | TYPE_ALIGNOF of specifier * decl_type * [ `Standard | `GCC ]
   | INDEX of expression * expression
   | MEMBEROF of expression * string
   | MEMBEROFPTR of expression * string

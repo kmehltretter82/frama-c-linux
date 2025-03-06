@@ -138,6 +138,14 @@ type termination_kind = Normal | Exits | Breaks | Continues | Returns
 [@@deriving eq]
 
 (* ************************************************************************* *)
+(** {3 C implementation} *)
+(* ************************************************************************* *)
+
+type standard_or_gcc =
+  [ `Standard | `GCC ]
+[@@deriving eq,ord]
+
+(* ************************************************************************* *)
 (** {2 Root of the AST} *)
 (* ************************************************************************* *)
 
@@ -380,8 +388,8 @@ and attrparam =
 
   | ASizeOf of typ                       (** A way to talk about types *)
   | ASizeOfE of attrparam
-  | AAlignOf of typ
-  | AAlignOfE of attrparam
+  | AAlignOf of typ * standard_or_gcc
+  | AAlignOfE of attrparam * standard_or_gcc
   | AUnOp of unop * attrparam
   | ABinOp of binop * attrparam * attrparam
   | ADot of attrparam * string           (** a.foo **)
@@ -755,12 +763,15 @@ and exp_node =
 
   | SizeOfE    of exp (** sizeof(<expression>) *)
 
-  | AlignOf    of typ
-  (** _Alignof. Has [size_t] type which depends on machine configuration
-       (cf. {!Machine}). *)
+  | AlignOf    of typ * standard_or_gcc
+  (** - [`Standard]: _Alignof
+      - [`GCC]: __alignof__
 
-  | AlignOfE   of exp
-  (** GCC accepts expressions in _Alignof. *)
+      Has [size_t] type which depends on machine configuration (cf. {!Machine}).
+  *)
+
+  | AlignOfE   of exp * standard_or_gcc
+  (** GCC accepts expressions in _Alignof and __alignof__. *)
 
   | UnOp       of unop * exp * typ
   (** Unary operation. Includes the type of the result. *)

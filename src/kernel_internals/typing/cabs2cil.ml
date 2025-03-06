@@ -2528,7 +2528,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
             | None, a | a, None ->
               oldvi.valignas <- a
             | Some al1, Some al2 when not @@ same_alignas_value al1 al2 ->
-              Kernel.error ~current:true
+              Kernel.abort ~current:true
                 "%s was previously declared with incompatible _Alignas(%a) at %a"
                 oldvi.vname
                 Cil_printer.pp_exp (Option.get oldvi.valignas)
@@ -2539,14 +2539,14 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           match oldvi.valignas with
           | None ->
             if Option.is_some vi.valignas then
-              Kernel.error ~current:true
+              Kernel.abort ~current:true
                 "%s was previously defined without _Alignas specification at %a"
                 oldvi.vname Cil_printer.pp_location oldloc
 
           | Some oldalignas ->
             match vi.valignas with
             | Some alignas when not @@ same_alignas_value oldalignas alignas ->
-              Kernel.error ~current:true
+              Kernel.abort ~current:true
                 "%s was previous defined with incompatible _Alignas(%a) at %a"
                 oldvi.vname
                 Cil_printer.pp_exp oldalignas
@@ -4471,15 +4471,15 @@ and makeVarInfoCabs
 
   begin (* C11 6.7.5 § 2 *)
     if Ast_types.is_fun vtype && alignas <> [] then
-      Kernel.error ~once:true ~current:true
+      Kernel.abort ~once:true ~current:true
         "_Alignas not allowed on functions" ;
 
     if isformal && alignas <> [] then
-      Kernel.error ~once:true ~current:true
+      Kernel.abort ~once:true ~current:true
         "_Alignas not allowed on function parameters" ;
 
     if sto = Register && alignas <> [] then
-      Kernel.error ~once:true ~current:true
+      Kernel.abort ~once:true ~current:true
         "_Alignas not allowed on register variables" ;
   end ;
 
@@ -4571,8 +4571,8 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
         end
       | Cabs.EXPR_SIZEOF e -> ASizeOfE (ae e)
       | Cabs.TYPE_SIZEOF (bt, dt) -> ASizeOf (doOnlyType loc ghost bt dt)
-      | Cabs.EXPR_ALIGNOF e -> AAlignOfE (ae e)
-      | Cabs.TYPE_ALIGNOF (bt, dt) -> AAlignOf (doOnlyType loc ghost bt dt)
+      | Cabs.EXPR_ALIGNOF (e, i) -> AAlignOfE (ae e, i)
+      | Cabs.TYPE_ALIGNOF (bt, dt, i) -> AAlignOf (doOnlyType loc ghost bt dt, i)
       | Cabs.BINARY(Cabs.AND, aa1, aa2) ->
         ABinOp(LAnd, ae aa1, ae aa2)
       | Cabs.BINARY(Cabs.OR, aa1, aa2) ->
@@ -5191,7 +5191,7 @@ and makeCompType loc ghost (isstruct: bool)
       in
       if None <> fbitfield && Option.is_some falignas then
         (* C11 6.7.5 § 2 *)
-        Kernel.error ~once:true ~current:true
+        Kernel.abort ~once:true ~current:true
           "_Alignas not allowed on bitfields" ;
       (* Compute the order of the field in the structure *)
       let forder = match flds with
@@ -5781,16 +5781,16 @@ and doExp local_env
       in
       finishExp [] scope_chunk size (Machine.sizeof_type ())
 
-    | Cabs.TYPE_ALIGNOF (bt, dt) ->
+    | Cabs.TYPE_ALIGNOF (bt, dt, i) ->
       let typ = doOnlyType loc local_env.is_ghost bt dt in
       fail_if_incompatible_sizeof ~ensure_complete:true "alignof" typ;
-      if Ast_types.has_bitfield typ then
+      if Ast_types.has_bitfield typ && i <> `GCC then
         Kernel.warning ~current:true ~wkey:Kernel.wkey_alignof_bitfield
           "_Alignof(bitfield) has unspecified value" ;
-      let res = new_exp ~loc (AlignOf typ) in
+      let res = new_exp ~loc (AlignOf (typ, i)) in
       finishExp [] (unspecified_chunk empty) res (Machine.sizeof_type ())
 
-    | Cabs.EXPR_ALIGNOF e ->
+    | Cabs.EXPR_ALIGNOF (e, i) ->
       if not @@ Machine.gccMode () then
         Kernel.error
           "_Alignof(expression) is a GCC extension, use a \
@@ -5808,7 +5808,7 @@ and doExp local_env
 
         | _ -> e'
       in
-      finishExp [] scope_chunk (new_exp ~loc (AlignOfE(e'')))
+      finishExp [] scope_chunk (new_exp ~loc (AlignOfE(e'', i)))
         (Machine.sizeof_type ())
 
     (* In cparser, the types used as arguments of certain builtins are converted
@@ -9353,7 +9353,7 @@ and doDecl local_env (isglobal: bool) (def: Cabs.definition) : chunk =
 
       if alignas <> [] then
         (* C11 6.7.5 § 2 *)
-        Kernel.error ~once:true ~current:true
+        Kernel.abort ~once:true ~current:true
           "_Alignas not allowed on functions" ;
 
       !currentFunctionFDEC.svar.vinline <- inl;
@@ -9758,7 +9758,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
     doSpecList (Current_loc.get()) ghost (suggestAnonName nl) specs
   in
   if sto <> NoStorage || inl || alignas <> [] then
-    Kernel.error ~once:true ~current:true
+    Kernel.abort ~once:true ~current:true
       "Storage, inline or _Alignas specifier not allowed in typedef";
   let createTypedef ((n,ndt,a,_) : Cabs.name) =
     (*    E.s (error "doTypeDef") *)
@@ -9881,7 +9881,7 @@ and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
     doSpecList (Current_loc.get()) ghost "" specs
   in
   if sto <> NoStorage || inl || align <> [] then
-    Kernel.error ~once:true ~current:true
+    Kernel.abort ~once:true ~current:true
       "Storage, inline or _Alignas specifier not allowed in typedef";
   let restyp, nattr =
     doType ghost `Typedef AttrType bt (Cabs.PARENTYPE(attrs, Cabs.JUSTBASE, []))

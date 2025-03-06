@@ -2470,8 +2470,8 @@ and equalExps (x: exp) (y: exp) : bool =
     | Lval(xl), Lval(yl) ->          (equalLvals xl yl)
     | SizeOf(_xt), SizeOf(_yt) ->      true (*INC: xt == yt*)  (* identical types *)
     | SizeOfE(xe), SizeOfE(ye) ->    (equalExps xe ye)
-    | AlignOf(_xt), AlignOf(_yt) ->    true (*INC: xt == yt*)
-    | AlignOfE(xe), AlignOfE(ye) ->  (equalExps xe ye)
+    | AlignOf(_xt, _), AlignOf(_yt, _) ->    true (*INC: xt == yt*)
+    | AlignOfE(xe, _), AlignOfE(ye, _) ->  (equalExps xe ye)
     | UnOp(xop,xe,_xt), UnOp(yop,ye,_yt) ->
       xop = yop &&
       (equalExps xe ye) &&

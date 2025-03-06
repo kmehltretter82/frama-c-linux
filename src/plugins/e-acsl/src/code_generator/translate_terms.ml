@@ -377,12 +377,12 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
     let adata = Assert.register_term ~loc ~force:true t e adata in
     e, adata, env, Analyses_types.C_number, "sizeof"
   | TAlignOf ty ->
-    let e = Cil.new_exp ~loc (AlignOf ty) in
+    let e = Cil.new_exp ~loc (AlignOf(ty, `Standard)) in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, "alignof"
   | TAlignOfE t' ->
     let e', _, env = to_exp ~adata:Assert.no_data kf env t' in
-    let e = Cil.new_exp ~loc (AlignOfE e') in
+    let e = Cil.new_exp ~loc (AlignOfE (e', `Standard)) in
     let adata = Assert.register_term ~loc t e adata in
     e, adata, env, Analyses_types.C_number, "alignof"
   | TUnOp(Neg | BNot as op, t') ->

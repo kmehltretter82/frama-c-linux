@@ -143,7 +143,7 @@ let rec height_expr expr =
   match expr.enode with
   | Const _ | SizeOf _ | AlignOf _ -> 0
   | Lval lv | AddrOf lv | StartOf lv  -> height_lval lv + 1
-  | UnOp (_,e,_) | CastE (_, e) | SizeOfE e | AlignOfE e
+  | UnOp (_,e,_) | CastE (_, e) | SizeOfE e | AlignOfE (e, _)
     -> height_expr e + 1
   | BinOp (_,e1,e2,_) -> max (height_expr e1) (height_expr e2) + 1
 
