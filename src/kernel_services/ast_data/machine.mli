@@ -25,21 +25,6 @@ val is_computed: ?project:Project.t -> unit -> bool
 (** Whether current project has set its machine description. *)
 
 (* ***********************************************************************)
-(** {2 Sizeof getters}                                                   *)
-(* ***********************************************************************)
-
-val sizeof_short: unit -> int
-val sizeof_int: unit -> int
-val sizeof_long: unit -> int
-val sizeof_longlong: unit -> int
-val sizeof_ptr: unit -> int
-val sizeof_float: unit -> int
-val sizeof_double: unit -> int
-val sizeof_longdouble: unit -> int
-val sizeof_void: unit -> int
-val sizeof_fun: unit -> int
-
-(* ***********************************************************************)
 (** {2 Names getters}                                                    *)
 (* ***********************************************************************)
 
@@ -62,41 +47,41 @@ val sig_atomic_t: unit -> string
 val time_t: unit -> string
 
 (* ***********************************************************************)
-(** {2 Alignof getters}                                                  *)
+(** {2 Types}                                                            *)
 (* ***********************************************************************)
 
-val alignof_short: unit -> int
-val alignof_int: unit -> int
-val alignof_long: unit -> int
-val alignof_longlong: unit -> int
-val alignof_ptr: unit -> int
-val alignof_float: unit -> int
-val alignof_double: unit -> int
-val alignof_longdouble: unit -> int
-val alignof_str: unit -> int
-val alignof_aligned: unit -> int
-val alignof_void: unit -> int
-val alignof_fun: unit -> int
-val alignof_max: unit -> int
-val alignof_extended: unit -> int
+module type TypesInfo = sig
+  val short: unit -> int
+  val int: unit -> int
+  val long: unit -> int
+  val longlong: unit -> int
+  val ptr: unit -> int
+  val float: unit -> int
+  val double: unit -> int
+  val longdouble: unit -> int
+  val void: unit -> int
+  val func: unit -> int
+end
 
 (* ***********************************************************************)
-(** {2 GCC Alignof getters}                                              *)
+(** {2 [sizeof] getters}                                                 *)
 (* ***********************************************************************)
 
-val gcc_alignof_short: unit -> int
-val gcc_alignof_int: unit -> int
-val gcc_alignof_long: unit -> int
-val gcc_alignof_longlong: unit -> int
-val gcc_alignof_ptr: unit -> int
-val gcc_alignof_float: unit -> int
-val gcc_alignof_double: unit -> int
-val gcc_alignof_longdouble: unit -> int
-val gcc_alignof_str: unit -> int
-val gcc_alignof_aligned: unit -> int
-val gcc_alignof_void: unit -> int
-val gcc_alignof_fun: unit -> int
-val gcc_alignof_max: unit -> int
+module Sizeof : TypesInfo
+
+(* ***********************************************************************)
+(** {2 [_Alignof] and GCC [__alignof__] getters}                         *)
+(* ***********************************************************************)
+
+module type AlignofInfo = sig
+  include TypesInfo
+  val str: unit -> int
+  val aligned: unit -> int
+  val max: unit -> int
+end
+
+module Alignof : AlignofInfo
+module GCCAlignof : AlignofInfo
 
 (* ***********************************************************************)
 (** {2 Typ/kind getters}                                                 *)
@@ -165,6 +150,8 @@ val use_logical_operators: unit -> bool
 val lower_constants: unit -> bool
 
 val insert_implicit_casts: unit -> bool
+
+val max_extended_alignment: unit -> int
 
 (* ***********************************************************************)
 (** {2 Compiler }                                                        *)

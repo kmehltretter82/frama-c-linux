@@ -362,7 +362,7 @@ let packing_pragma_stack = Stack.create ()
 let current_packing_pragma = ref None
 let pretty_current_packing_pragma fmt =
   let align =
-    Option.value ~default:(Integer.of_int (Machine.alignof_aligned ()))
+    Option.value ~default:(Integer.of_int (Machine.Alignof.aligned ()))
       !current_packing_pragma
   in
   Integer.pretty fmt align
@@ -400,7 +400,7 @@ let process_pack_pragma name args =
         | [ACons ("",[])] (*  #pragma pack() *) ->
           Kernel.feedback ~dkey:Kernel.dkey_typing_pragma ~current:true
             "packing pragma: restoring alignment to default (%d)"
-            (Machine.alignof_aligned ());
+            (Machine.Alignof.aligned ());
           current_packing_pragma := None; None
         | [AInt n] (* #pragma pack(n) *) ->
           let is_valid, new_pragma = get_valid_pragma_pack_alignment n in
@@ -476,7 +476,7 @@ let is_power_of_two i = i > 0 && i land (i-1) = 0
    also return [None]. *)
 let eval_aligned_attrparams aps =
   match aps with
-  | [] -> Some (Integer.of_int (Machine.alignof_aligned ()))
+  | [] -> Some (Integer.of_int (Machine.Alignof.aligned ()))
   | [ap] ->
     begin
       match Cil.intOfAttrparam ap with
@@ -1337,11 +1337,11 @@ let canDropStatement (s: stmt) : bool =
   !pRes
 
 let fail_if_incompatible_sizeof ~ensure_complete op typ =
-  if Ast_types.is_fun typ && Machine.sizeof_fun () < 0 then
+  if Ast_types.is_fun typ && Machine.Sizeof.func () < 0 then
     Kernel.abort ~current:true "%s called on function %s" op
       (Machdep.allowed_machdep "GCC");
   let is_void = Ast_types.is_void typ in
-  if is_void && Machine.sizeof_void () < 0 then
+  if is_void && Machine.Sizeof.void () < 0 then
     Kernel.abort ~current:true "%s on void type %s" op
       (Machdep.allowed_machdep "GCC/MSVC");
   if ensure_complete && not (Cil.isCompleteType typ) && not is_void then
@@ -3991,8 +3991,8 @@ let rec checkRestrictQualifierDeep t =
     | _ -> ()
 
 let solveAlignas ~original_type alignas_specifiers =
-  let max_align = Machine.alignof_max () in
-  let extended_align = Machine.alignof_extended () in
+  let max_align = Machine.Alignof.max () in
+  let extended_align = Machine.max_extended_alignment () in
 
   let doAlignas alignas =
     begin match Option.map Z.to_int @@ constFoldToInt ~machdep:true alignas with

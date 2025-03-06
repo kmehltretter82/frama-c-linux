@@ -2333,10 +2333,10 @@ and childrenGlobal (vis: cilVisitor) (g: global) : global =
 let bytesSizeOfInt (ik: ikind): int =
   match ik with
   | IChar | ISChar | IUChar | IBool -> 1
-  | IInt | IUInt -> Machine.sizeof_int ()
-  | IShort | IUShort -> Machine.sizeof_short ()
-  | ILong | IULong -> Machine.sizeof_long ()
-  | ILongLong | IULongLong -> Machine.sizeof_longlong ()
+  | IInt | IUInt -> Machine.Sizeof.int ()
+  | IShort | IUShort -> Machine.Sizeof.short ()
+  | ILong | IULong -> Machine.Sizeof.long ()
+  | ILongLong | IULongLong -> Machine.Sizeof.longlong ()
 
 let bitsSizeOfInt ik = 8 * bytesSizeOfInt ik
 
@@ -2345,18 +2345,18 @@ let intKindForSize (s:int) (unsigned:bool) : ikind =
   if unsigned then
     (* Test the most common sizes first *)
     if s = 1 then IUChar
-    else if s = sizeof_int () then IUInt
-    else if s = sizeof_long () then IULong
-    else if s = sizeof_short () then IUShort
-    else if s = sizeof_longlong () then IULongLong
+    else if s = Sizeof.int () then IUInt
+    else if s = Sizeof.long () then IULong
+    else if s = Sizeof.short () then IUShort
+    else if s = Sizeof.longlong () then IULongLong
     else raise Not_found
   else
     (* Test the most common sizes first *)
   if s = 1 then ISChar
-  else if s = sizeof_int () then IInt
-  else if s = sizeof_long () then ILong
-  else if s = sizeof_short () then IShort
-  else if s = sizeof_longlong () then ILongLong
+  else if s = Sizeof.int () then IInt
+  else if s = Sizeof.long () then ILong
+  else if s = Sizeof.short () then IShort
+  else if s = Sizeof.longlong () then ILongLong
   else raise Not_found
 
 let uint64_t () = Cil_const.mk_tint (intKindForSize 8 true)
@@ -2367,9 +2367,9 @@ let int32_t  () = Cil_const.mk_tint (intKindForSize 4 false)
 let int16_t  () = Cil_const.mk_tint (intKindForSize 2 false)
 
 let floatKindForSize (s:int) =
-  if s = Machine.sizeof_double () then FDouble
-  else if s = Machine.sizeof_float () then FFloat
-  else if s = Machine.sizeof_longdouble () then FLongDouble
+  if s = Machine.Sizeof.double () then FDouble
+  else if s = Machine.Sizeof.float () then FFloat
+  else if s = Machine.Sizeof.longdouble () then FLongDouble
   else raise Not_found
 
 (** Returns true if and only if the given integer type is signed. *)
@@ -3174,43 +3174,33 @@ let foldAlignasToInt = function
 let rec bytesAlignOf ~standard_or_gcc t =
   let open Machine in
   let alignOfType () =
+    let get_alignof : (module Machine.AlignofInfo) =
+      match standard_or_gcc with
+      | `Standard -> (module Machine.Alignof)
+      | `GCC -> (module Machine.GCCAlignof)
+    in
+    let module Alignof = (val get_alignof) in
     match t.tnode with
     | TInt (IChar|ISChar|IUChar|IBool) -> 1
     | TInt (IShort|IUShort)->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_short ()
-      else alignof_short ()
+      Alignof.short ()
     | TInt (IInt|IUInt) ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_int ()
-      else alignof_int ()
+      Alignof.int ()
     | TInt (ILong|IULong) ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_long ()
-      else alignof_long ()
+      Alignof.long ()
     | TInt (ILongLong|IULongLong) ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_longlong ()
-      else alignof_longlong ()
+      Alignof.longlong ()
     | TEnum ei ->  bytesAlignOf ~standard_or_gcc (Cil_const.mk_tint ei.ekind)
     | TFloat FFloat ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_float ()
-      else alignof_float ()
+      Alignof.float ()
     | TFloat FDouble ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_double ()
-      else alignof_double ()
+      Alignof.double ()
     | TFloat FLongDouble ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_longdouble ()
-      else alignof_longdouble ()
+      Alignof.longdouble ()
     | TNamed t -> bytesAlignOf ~standard_or_gcc t.ttype
     | TArray (t, _) -> bytesAlignOf ~standard_or_gcc t
     | TPtr _ | TBuiltin_va_list ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_ptr ()
-      else alignof_ptr ()
+      Alignof.ptr ()
     (* For composite types get the maximum alignment of any field inside *)
     | TComp c ->
       (* On GCC the zero-width fields do not contribute to the alignment. On
@@ -3232,15 +3222,11 @@ let rec bytesAlignOf ~standard_or_gcc t =
            if not (msvcMode ()) && f.fbitfield = Some 0 then sofar else
              max sofar (bytesAlignOfField ~standard_or_gcc f)) 1 fields
     (* These are some error cases *)
-    | TFun _ when alignof_fun () > 0 ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_fun ()
-      else alignof_fun ()
+    | TFun _ when Alignof.func () > 0 ->
+      Alignof.func ()
     | TFun _ -> raise (SizeOfError ("Undefined alignof on a function.", t))
-    | TVoid  when alignof_void () > 0 ->
-      if standard_or_gcc = `GCC
-      then gcc_alignof_void ()
-      else alignof_void ()
+    | TVoid  when Alignof.void () > 0 ->
+      Alignof.void ()
     | TVoid -> raise (SizeOfError ("Undefined alignof(void).", t))
   in
   process_aligned_attribute ~may_reduce:true
@@ -3347,7 +3333,7 @@ and process_aligned_attribute (pp:Format.formatter->unit) ~may_reduce attrs defa
     if rest <> [] then
       Kernel.warning ~current:true "ignoring duplicate align attributes on %t"
         pp;
-    Machine.alignof_aligned ()
+    Machine.Alignof.aligned ()
   | at::_ ->
     Kernel.warning ~current:true "alignment attribute \"%a\" not understood on %t"
       !pp_attribute_ref at pp;
@@ -3512,12 +3498,12 @@ and bitsSizeOfEmptyArray typ =
 and bitsSizeOf t =
   match t.tnode with
   | TInt ik            -> 8 * (bytesSizeOfInt ik)
-  | TFloat FDouble     -> 8 * Machine.sizeof_double ()
-  | TFloat FLongDouble -> 8 * Machine.sizeof_longdouble ()
-  | TFloat _           -> 8 * Machine.sizeof_float ()
+  | TFloat FDouble     -> 8 * Machine.Sizeof.double ()
+  | TFloat FLongDouble -> 8 * Machine.Sizeof.longdouble ()
+  | TFloat _           -> 8 * Machine.Sizeof.float ()
   | TEnum ei           -> bitsSizeOf (Cil_const.mk_tint ei.ekind)
-  | TPtr _             -> 8 * Machine.sizeof_ptr ()
-  | TBuiltin_va_list   -> 8 * Machine.sizeof_ptr ()
+  | TPtr _             -> 8 * Machine.Sizeof.ptr ()
+  | TBuiltin_va_list   -> 8 * Machine.Sizeof.ptr ()
   | TNamed t           -> bitsSizeOf t.ttype
   | TComp ({cfields=None} as comp) ->
     raise
@@ -3599,16 +3585,10 @@ and bitsSizeOf t =
            | _ ->
              raise (SizeOfError ("Array with non-constant length.", norm_typ))
          end)
-  | TVoid ->
-    if Machine.sizeof_void () >= 0 then
-      8 * Machine.sizeof_void ()
-    else
-      raise (SizeOfError ("Undefined sizeof(void).", t))
-  | TFun _ ->
-    if Machine.sizeof_fun () >= 0 then
-      8 * Machine.sizeof_fun ()
-    else
-      raise (SizeOfError ("Undefined sizeof on a function.", t))
+  | TVoid when Machine.Sizeof.void () > 0 -> 8 * Machine.Sizeof.void ()
+  | TVoid -> raise (SizeOfError ("Undefined sizeof(void).", t))
+  | TFun _ when Machine.Sizeof.func () > 0 -> 8 * Machine.Sizeof.func ()
+  | TFun _  -> raise (SizeOfError ("Undefined sizeof on a function.", t))
 
   | TArray (_, None) ->
     find_sizeof t
