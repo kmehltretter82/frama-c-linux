@@ -35,7 +35,7 @@ module Name = struct
       | RawPointer of Varinfo.t * Integer.t (* Offset in bits *)
     [@@deriving eq, ord]
 
-    let name = "Concurency.Name"
+    let name = "Eva.Concurrency.Name"
     let reprs = [Integer Integer.zero]
 
     let pretty fmt = function

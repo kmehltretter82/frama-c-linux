@@ -31,7 +31,7 @@ struct
     name: Concurency.Name.t option
   }
 
-  let name = "Queue"
+  let name = "Eva.Queue"
   let reprs = [{ id = 0; name = None }]
   let equal q1 q2 = Int.equal q1.id q2.id
   let compare q1 q2 = Int.compare q1.id q2.id
@@ -57,7 +57,7 @@ let label q = Pretty_utils.to_string pretty q
 
 module MqueuesById = State_builder.Hashtbl (Datatype.Int.Hashtbl) (Queue)
     (struct
-      let name = "Queue.MqueuesById"
+      let name = "Eva.Queue.MqueuesById"
       let dependencies = []
       let size = 13
     end)
@@ -78,7 +78,7 @@ let find id =
 
 (* The identity of a queue is used to choose how to group mqueues creations
    during the analysis. This is especially useful if the queue is created inside
-   a - potentially not unrollled - loop. *)
+   a - potentially not unrolled - loop. *)
 
 module Identity =
 struct
@@ -91,7 +91,7 @@ struct
       | ByCreationPoint of Analysis_location.Local.t
     [@@deriving eq, ord]
 
-    let name = "Queue.Identity"
+    let name = "Eva.Queue.Identity"
 
     let reprs =
       List.map (fun n -> ByName n) Concurency.Name.reprs @
@@ -110,7 +110,7 @@ end
 
 module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Queue)
     (struct
-      let name = "Queue.Identities"
+      let name = "Eva.Queue.Identities"
       let dependencies = []
       let size = 13
     end)

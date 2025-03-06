@@ -31,7 +31,7 @@ struct
     name: Concurency.Name.t option
   }
 
-  let name = "Mutex"
+  let name = "Eva.Mutex"
   let reprs = [{ id = 0; name = None }]
   let equal m1 m2 = Int.equal m1.id m2.id
   let compare m1 m2 = Int.compare m1.id m2.id
@@ -57,7 +57,7 @@ let label m = Pretty_utils.to_string pretty m
 
 module MutexesById = State_builder.Hashtbl (Datatype.Int.Hashtbl) (Mutex)
     (struct
-      let name = "Mutex.MutexesById"
+      let name = "Eva.Mutex.MutexesById"
       let dependencies = []
       let size = 13
     end)
@@ -78,7 +78,7 @@ let find id =
 
 (* The identity of a mutex is used to choose how to group mutex creations
    during the analysis. This is especially useful if the mutex is created inside
-   a - potentially not unrollled - loop. *)
+   a - potentially not unrolled - loop. *)
 
 module Identity =
 struct
@@ -91,7 +91,7 @@ struct
       | ByCreationPoint of Analysis_location.Local.t
     [@@deriving eq, ord]
 
-    let name = "Mutex.Identity"
+    let name = "Eva.Mutex.Identity"
 
     let reprs =
       List.map (fun n -> ByName n) Concurency.Name.reprs @
@@ -110,7 +110,7 @@ end
 
 module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Mutex)
     (struct
-      let name = "Mutex.Identities"
+      let name = "Eva.Mutex.Identities"
       let dependencies = []
       let size = 13
     end)

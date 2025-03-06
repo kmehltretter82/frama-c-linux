@@ -38,7 +38,7 @@ struct
     kind: kind
   }
 
-  let name = "Thread"
+  let name = "Eva.Thread"
   let main = { id = 1; kind = Main } (* The main thread always is the thread 0 *)
   let reprs = [main]
   let equal th1 th2 = Int.equal th1.id th2.id
@@ -71,7 +71,7 @@ let label th = Pretty_utils.to_string pretty th
 
 module ThreadsById = State_builder.Hashtbl (Datatype.Int.Hashtbl) (Thread)
     (struct
-      let name = "Thread.ThreadsById"
+      let name = "Eva.Thread.ThreadsById"
       let dependencies = []
       let size = 13
     end)
@@ -135,7 +135,7 @@ struct
     }
     [@@deriving eq, ord]
 
-    let name = "Thread.Identity"
+    let name = "Eva.Thread.Identity"
     let reprs =
       List.concat_map
         (fun k -> List.map
@@ -153,7 +153,7 @@ end
 
 module Identities = State_builder.Hashtbl (Identity.Hashtbl) (Thread)
     (struct
-      let name = "Thread.Identities"
+      let name = "Eva.Thread.Identities"
       let dependencies = []
       let size = 13
     end)
@@ -180,7 +180,7 @@ struct
       arguments : (Varinfo.t * Cvalue.V.t) list;
     }
 
-    let name = "Thread.Properties"
+    let name = "Eva.Thread.Properties"
     let reprs = [{
         entry_point = List.hd Kernel_function.reprs;
         spawn_points = List.hd ALSet.reprs;
@@ -259,7 +259,7 @@ end
 
 module State = State_builder.Hashtbl (Hashtbl) (Properties)
     (struct
-      let name = "Thread.State"
+      let name = "Eva.Thread.State"
       let dependencies = []
       let size = 13
     end)
@@ -274,7 +274,7 @@ let spawn_single_entry_point spawn_point name entry_point arguments =
   let kind = Thread name in
   let th = Identities.memo (fun _ -> create kind) identity in
   let properties = match State.find_opt th with
-    (* Thre thread identity is new; register this thread *)
+    (* The thread identity is new; register this thread *)
     | None ->
       Properties.create spawn_point entry_point arguments
     (* The thread identity has been found; join the thread properties *)
