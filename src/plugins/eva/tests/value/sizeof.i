@@ -8,12 +8,12 @@ void main1()
 {
   sz_str= sizeof("ONE");
   //@ assert sz_str == sizeof("ONE");
-  align_str= __alignof("FOO");
-  // assert align_str == __alignof("FOO");
+  align_str= __alignof__("FOO");
+  // assert align_str == __alignof__("FOO");
   sz_typ= sizeof(char);
   //@ assert sz_typ == sizeof(char);
-  align_typ= __alignof(char*);
-  // assert align_typ == __alignof((char*));
+  align_typ= __alignof__(char*);
+  // assert align_typ == __alignof__((char*));
   //@ assert sizeof("BLA") != sizeof("FOOBAR");
   return;
 }
@@ -31,7 +31,7 @@ volatile int i;
 void main2() {
   struct s *p = (&s1 + (int)&s1) - (int)&s1; // creates a garbled mix
   p->t[sizeof(s1.t)-i] = 1;
-  p->t[sizeof(s1.t)-i] = 2; 
+  p->t[sizeof(s1.t)-i] = 2;
 }
 
 /* Tests sizeof and alignof on void. Only valid in gcc machdeps. */
