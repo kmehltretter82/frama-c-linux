@@ -32,7 +32,6 @@ import {
   BrowserWindow,
   Menu,
   MenuItem,
-  shell,
   KeyboardEvent,
   IpcMainInvokeEvent,
 } from 'electron';
@@ -274,20 +273,6 @@ const windowMenuItemsMacos: MenuSpec = windowMenuItemsLinux.concat([
 // --------------------------------------------------------------------------
 
 const helpMenuItemsCustom: MenuSpec = [];
-const helpMenuItems: MenuSpec = [];
-
-let learnMoreLink = '';
-ipcMain.handle('dome.ipc.updateLearnMore', (_, link) => {
-  if (typeof link === 'string') {
-    learnMoreLink = link;
-    helpMenuItems.push(
-      {
-        label: 'Learn More',
-        click() { shell.openExternal(learnMoreLink); },
-      },
-    );
-  }
-});
 
 // --------------------------------------------------------------------------
 // --- Update MenuBar (async)
@@ -422,6 +407,15 @@ export function setMenuItem({ id, ...options }: CustomMenuItem): void {
 // --------------------------------------------------------------------------
 
 function template(): CustomMenu[] {
+  const helpMenu: CustomMenu[] =  [];
+  const helpMenuMacOs: CustomMenu[] =  [];
+  if(helpMenuItemsCustom.length > 0) {
+    helpMenu.push({ label: 'Help', submenu: helpMenuItemsCustom });
+    helpMenuMacOs.push({
+      label: 'Help', role: 'help', submenu: helpMenuItemsCustom
+    });
+  }
+
   switch (System.platform) {
     case 'macos':
       return ([] as CustomMenu[]).concat(
@@ -441,18 +435,8 @@ function template(): CustomMenu[] {
           },
         ],
         customMenus,
-        [
-          {
-            label: 'Window',
-            role: 'window',
-            submenu: windowMenuItemsMacos,
-          },
-          {
-            label: 'Help',
-            role: 'help',
-            submenu: concatSep(helpMenuItems, helpMenuItemsCustom),
-          },
-        ],
+        { label: 'Window', role: 'window', submenu: windowMenuItemsMacos },
+        helpMenuMacOs,
       );
     case 'windows':
     case 'linux':
@@ -473,12 +457,8 @@ function template(): CustomMenu[] {
           },
         ],
         customMenus,
-        [
-          { label: 'Window', submenu: windowMenuItemsLinux },
-          {
-            label: 'Help',
-            submenu: concatSep(helpMenuItems, helpMenuItemsCustom) },
-        ],
+        { label: 'Window', submenu: windowMenuItemsLinux, },
+        helpMenu,
       );
   }
 }

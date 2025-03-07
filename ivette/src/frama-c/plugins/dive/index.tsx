@@ -25,6 +25,7 @@ import * as Ivette from 'ivette';
 
 import GraphComponent from './graph';
 import TreeComponent from './tree';
+import doc from './doc.md?raw';
 
 Ivette.registerGroup({
   id: 'fc.dive',
@@ -55,3 +56,9 @@ Ivette.registerView({
     D: 'fc.kernel.locations',
   }
 });
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+Ivette.registerDocChapter({ id: "dive", content: doc });

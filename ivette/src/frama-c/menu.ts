@@ -26,12 +26,13 @@
 
 import * as Dome from 'dome';
 import * as Dialogs from 'dome/dialogs';
+import { showHelp } from 'dome/help';
 import * as Display from 'ivette/display';
 import * as Server from 'frama-c/server';
 import * as Services from 'frama-c/kernel/api/services';
 import * as Ast from 'frama-c/kernel/api/ast';
 import * as States from 'frama-c/states';
-import * as HelpMenu from './help';
+import { showAboutModal, showCreditsModal } from './help';
 
 const cFilter = {
   name: 'C source files',
@@ -156,16 +157,28 @@ export function init(): void {
   });
   Dome.addMenuItem({
     menu: 'Help',
+    label: 'Documentation',
+    id: 'help_documentation',
+    onClick: showHelp,
+    kind: 'normal',
+  });
+  Dome.addMenuItem({
+    menu: 'Help',
+    id: 'help_separator',
+    kind: 'separator',
+  });
+  Dome.addMenuItem({
+    menu: 'Help',
     label: 'About',
     id: 'help_about',
-    onClick: HelpMenu.showAboutModal,
+    onClick: showAboutModal,
     kind: 'normal',
   });
   Dome.addMenuItem({
     menu: 'Help',
     label: 'Credits',
     id: 'help_credits',
-    onClick: HelpMenu.showCreditsModal,
+    onClick: showCreditsModal,
     kind: 'normal',
   });
 }

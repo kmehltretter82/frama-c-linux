@@ -21,17 +21,27 @@
 /* ************************************************************************ */
 
 import React from 'react';
-import { Modal } from 'dome/dialogs';
-import { Hbox } from 'dome/layout/boxes';
-
 import { shell } from 'electron';
+
+import { Modal, showModal } from 'dome/dialogs';
+import { Hbox } from 'dome/layout/boxes';
 import { Button } from 'dome/controls/buttons';
-import * as Server from 'frama-c/server';
-import * as Dialogs from 'dome/dialogs';
+
+import { registerDocChapter } from 'ivette';
 import { getConfig } from 'frama-c/kernel/api/services';
+import * as Server from 'frama-c/server';
 
 import './style.css';
 import framacImage from './frama-c.png';
+
+/** Import doc */
+import docFramaC from './doc.md?raw';
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+registerDocChapter({ id: "framac", content: docFramaC, rank: 1 });
 
 /* -------------------------------------------------------------------------- */
 /* --- Frama-C infos                                                      --- */
@@ -171,7 +181,7 @@ export async function showAboutModal(): Promise<void> {
   const config = await Server.send(getConfig, {});
   const version = config.version_codename;
   const modal = <AboutModal version = {version}/>;
-  Dialogs.showModal(modal);
+  showModal(modal);
 }
 
 function CreditsModal(): JSX.Element {
@@ -193,5 +203,5 @@ function CreditsModal(): JSX.Element {
 
 export function showCreditsModal(): void {
   const modal = <CreditsModal/>;
-  Dialogs.showModal(modal);
+  showModal(modal);
 }

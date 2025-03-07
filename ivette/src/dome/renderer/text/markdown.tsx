@@ -80,6 +80,8 @@ export const ledTag: Pattern = {
   }
 };
 
+const defautPatterns = [iconTag, ledTag];
+
 // --------------------------------------------------------------------------
 // --- Replacement function
 // --------------------------------------------------------------------------
@@ -154,7 +156,9 @@ export interface MarkdownProps {
 export function Markdown(
   props: MarkdownProps
 ): JSX.Element {
-  const { className, scrollTo, patterns, children } = props;
+  const { className, scrollTo, patterns = [], children } = props;
+  const mdPatterns = patterns.concat(defautPatterns);
+
   const theme = Themes.useColorTheme()[0];
   const markdownClasses = classes(
     "dome-xMarkdown", "dome-pages", className
@@ -173,9 +177,9 @@ export function Markdown(
     remarkPlugins: [remarkCustomHeaderId],
   };
   options.components = {
-    p: ({ children }) => <div>{replaceTags(children, patterns)}</div>,
+    p: ({ children }) => <div>{replaceTags(children, mdPatterns)}</div>,
     li: ({ children }) => {
-      return <li key={liKey++}>{replaceTags(children, patterns)}</li>;
+      return <li key={liKey++}>{replaceTags(children, mdPatterns)}</li>;
     },
     /** Uses codeBlock if ``` is used in markdown with a language,
      *  otherwise the code-inline class is added */

@@ -39,7 +39,14 @@ import { GoalTable } from './goals';
 import { TIPView } from './tip';
 import * as TIP from './tip';
 import * as WP from 'frama-c/plugins/wp/api';
+import doc from './doc.md?raw';
 import './style.css';
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+Ivette.registerDocChapter({ id: "wp", content: doc });
 
 /* -------------------------------------------------------------------------- */
 /* --- Context Menus                                                      --- */

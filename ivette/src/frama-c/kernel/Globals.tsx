@@ -44,7 +44,6 @@ import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 
-
 // --------------------------------------------------------------------------
 // --- Global Search Hints
 // --------------------------------------------------------------------------

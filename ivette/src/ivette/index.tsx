@@ -36,6 +36,14 @@ import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
 import * as State from './state';
 import * as Search from './search';
+import doc from './doc.md?raw';
+import { Pattern } from 'dome/text/markdown';
+
+// --------------------------------------------------------------------------
+// --- help
+// --------------------------------------------------------------------------
+
+export const docIvette = { id: "ivette", content: doc, rank: 0 };
 
 /* -------------------------------------------------------------------------- */
 /* --- Items                                                              --- */
@@ -211,6 +219,13 @@ export interface ToolProps {
   children?: React.ReactNode;
 }
 
+export interface ChapterProps {
+  id: string;
+  content: string;
+  rank?: number;
+  patterns?: Pattern[];
+}
+
 /** @ignore */
 export const SIDEBAR = new State.ElementRack<SidebarProps>();
 
@@ -219,6 +234,9 @@ export const TOOLBAR = new State.ElementRack<ToolProps>();
 
 /** @ignore */
 export const STATUSBAR = new State.ElementRack<ToolProps>();
+
+/** @ignore */
+export const DOCCHAPTER = new State.ElementRack<ChapterProps>();
 
 export function registerSidebar(sidebar: SidebarProps): void {
   SIDEBAR.register(sidebar);
@@ -231,6 +249,13 @@ export function registerToolbar(tools: ToolProps): void {
 export function registerStatusbar(status: ToolProps): void {
   STATUSBAR.register(status);
 }
+
+/** The new chapter is recorded with an error if its Id already exist. */
+export function registerDocChapter(chapter: ChapterProps): void {
+  DOCCHAPTER.register(chapter);
+}
+
+registerDocChapter(docIvette);
 
 /* -------------------------------------------------------------------------- */
 /* --- Search Modes                                                       --- */
