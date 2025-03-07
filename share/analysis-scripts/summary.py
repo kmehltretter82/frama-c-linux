@@ -221,6 +221,9 @@ parser.add_argument("-p", "--repository-path",
 parser.add_argument("-o", "--output-csv",
     action="store", metavar="PATH", type=Path,
     help="output the results to the given CSV file")
+parser.add_argument("-ci", "--ci",
+    action="store_false",
+    help="run in CI mode: disable curses")
 
 errors = b""
 
@@ -256,7 +259,7 @@ try:
             gitdir, args.rev, args.vs)
 
     results,errors = results_display.wrapper(run_analyses, database, framac,
-        benchmark_tag, curses=True)
+        benchmark_tag, curses=args.ci)
 
     print("Results:\n")
     results_display.PlainDisplay().print_table(results)
