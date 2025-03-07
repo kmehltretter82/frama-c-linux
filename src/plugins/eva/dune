@@ -77,7 +77,7 @@
   (name mthread)
   (optional)
   (public_name frama-c-eva.mthread.core)
-  (flags -open Frama_c_kernel -open Eva__Private :standard -w -9 -alert -db_deprecated)
+  (flags -open Frama_c_kernel -open Eva__Private :standard -w -9)
   (libraries eva frama-c.kernel)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))))
@@ -94,7 +94,7 @@
   (name mthread_gui)
   (optional)
   (public_name frama-c-eva.mthread.gui)
-  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private -open Mthread :standard )
+  (flags -open Frama_c_kernel -open Frama_c_gui -open Eva__Private -open Mthread :standard -w -9)
   (libraries eva mthread frama-c.kernel frama-c.gui)
   (instrumentation (backend landmarks))))
 
