@@ -1,6 +1,6 @@
 /* run.config
 PLUGIN: @PTEST_PLUGIN@ eva,inout,scope report
-STDOPT: +"-then -eva @EVA_OPTIONS@ -then -report"
+STDOPT: +"-then -eva -eva-show-progress -eva-msg-key=-summary -eva-auto-loop-unroll 0 -then -report"
 */
 #include "stdio.h"
 

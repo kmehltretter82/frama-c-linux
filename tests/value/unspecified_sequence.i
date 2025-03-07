@@ -1,8 +1,3 @@
-/* run.config
- PLUGIN: @EVA_PLUGINS@
-   OPT: @EVA_TEST@
-*/
-
 unsigned long long f(int x) {
   return 0;
 }

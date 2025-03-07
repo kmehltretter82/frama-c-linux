@@ -10,7 +10,7 @@ DEFAULT_SUITES= pretty_printing saveload spec syntax
 ### Tests of small plugins
 
 DEFAULT_SUITES= callgraph constant_propagation impact metrics occurrence pdg
-DEFAULT_SUITES= rte rte_manual scope slicing sparecode
+DEFAULT_SUITES= scope slicing sparecode
 
 ### Tests of EVA
 

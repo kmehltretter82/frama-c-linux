@@ -1,0 +1,7 @@
+13c13,16
+< [eva] unspecified_sequence.i:11: Reusing old results for call to f
+---
+> [eva] computing for function f <- main.
+>   Called from unspecified_sequence.i:11.
+> [eva] Recording results for f
+> [eva] Done for function f
