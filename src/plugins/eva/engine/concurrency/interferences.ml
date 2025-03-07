@@ -259,45 +259,40 @@ let inject (type a) ~(domain : a domain) (state : a) : a =
   let module Dom = (val domain) in
   let interferences = !current in
   let Interferences { shared_bases } = interferences in
-  if is_empty interferences
-  (* No interferences computed, single threaded analysis *)
+  let need_injection =
+    match Dom.get Mt_domain.Domain.key with
+    (* Domain disabled, no interference injection *)
+    | None -> false
+    (* Domain enabled *)
+    | Some extract ->
+      let mt_state = extract state in
+      let memory = Mt_domain.Domain.memory mt_state in
+      let zone = Locations.Zone.join memory.read memory.written in
+      match Locations.Zone.get_bases zone with
+      | Top ->
+        (* Shared memory is Top, always inject *)
+        Self.warning ~current:true ~once:true
+          "imprecise memory footprint computed at this point";
+        true
+      | Set bases ->
+        (* Inject only if the read/written memory intersects shared memory *)
+        Base.Hptset.intersects bases shared_bases
+  in
+  if not need_injection
   then state
   else begin
-    let need_injection =
-      match Dom.get Mt_domain.Domain.key with
-      (* Domain disabled, no interference injection *)
-      | None -> false
-      (* Domain enabled *)
-      | Some extract ->
-        let mt_state = extract state in
-        let memory = Mt_domain.Domain.memory mt_state in
-        let zone = Locations.Zone.join memory.read memory.written in
-        match Locations.Zone.get_bases zone with
-        | Top ->
-          (* Shared memory is Top, always inject *)
-          Self.warning ~current:true ~once:true
-            "imprecise memory footprint computed at this point";
-          true
-        | Set bases ->
-          (* Inject only if the read/written memory intersects shared memory *)
-          Base.Hptset.intersects bases shared_bases
-    in
-    if not need_injection
-    then state
-    else begin
-      Self.debug ~dkey ~current:true ~once:true
-        "inject threads interferences at this point";
-      match applicable ~domain interferences state with
-      | `Top -> Dom.top
-      | `Bottom -> state
-      | `Value interferences_state ->
-        let dummy_kf = Kernel_function.dummy () in
-        let result =
-          Dom.reuse dummy_kf shared_bases
-            ~current_input:state ~previous_output:interferences_state
-        in
-        Dom.join state result
-    end
+    Self.debug ~dkey ~current:true ~once:true
+      "inject threads interferences at this point";
+    match applicable ~domain interferences state with
+    | `Top -> Dom.top
+    | `Bottom -> state
+    | `Value interferences_state ->
+      let dummy_kf = Kernel_function.dummy () in
+      let result =
+        Dom.reuse dummy_kf shared_bases
+          ~current_input:state ~previous_output:interferences_state
+      in
+      Dom.join state result
   end
 
 let is_empty () = is_empty !current
