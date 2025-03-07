@@ -26,7 +26,6 @@
  */
 
 import React from 'react';
-import * as Dome from 'dome';
 import { IconButton } from './controls/buttons';
 import { Modal, showModal } from './dialogs';
 import { Markdown } from './text/markdown';
@@ -36,7 +35,6 @@ import { LSplit } from './layout/splitters';
 
 import * as Ivette from 'ivette';
 import { ChapterProps } from 'ivette';
-import { showAboutModal, showCreditsModal } from 'frama-c/help';
 import { Icon } from './controls/icons';
 import { LED } from './controls/displays';
 
@@ -194,20 +192,6 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
   const selectedIdState = React.useState<string>(id || 'ivette');
   const [ selectedId, setSelectedid ] = selectedIdState;
 
-  const DuplicateIdsErrors = React.useMemo(() => {
-    const errors: string[] = [];
-    const duplicateIds = Ivette.DOCCHAPTER.getElements()
-      .map(elt => elt.id)
-      .filter(elt => elt.endsWith("-error"));
-    if(duplicateIds.length > 0) {
-      errors.push("Chapter Id must be unique.\
-        \nDuplication can be due to hot reloading.\
-        \nCheck the following ids:");
-      duplicateIds.forEach(id => errors.push(`- ${id}`));
-    }
-    return errors;
-  }, []);
-
   const index = React.useMemo(() => {
     return Ivette.DOCCHAPTER.getElements()
       .sort((a, b) => {
@@ -238,11 +222,6 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
         <SideBar>
           <SidebarTitle label='Table of contents' >
             <div className='dome-xTree-actions'>
-              { DuplicateIdsErrors.length > 0 &&
-                <Icon id='WARNING' kind="negative"
-                  title={DuplicateIdsErrors.join('\n')}
-                  />
-              }
               <IconButton
                 icon={ "CHEVRON.CONTRACT" }
                 title="Fold all"
@@ -283,31 +262,4 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
   );
 }
 
-export function showFramaCDocModal(): void { showModal(<GeneralDocModal/>); }
-
-Dome.addMenuItem({
-  menu: 'Help',
-  label: 'Documentation',
-  id: 'help_documentation',
-  onClick: showFramaCDocModal,
-  kind: 'normal',
-});
-Dome.addMenuItem({
-  menu: 'Help',
-  id: 'help_separator',
-  kind: 'separator',
-});
-Dome.addMenuItem({
-  menu: 'Help',
-  label: 'About',
-  id: 'help_about',
-  onClick: showAboutModal,
-  kind: 'normal',
-});
-Dome.addMenuItem({
-  menu: 'Help',
-  label: 'Credits',
-  id: 'help_credits',
-  onClick: showCreditsModal,
-  kind: 'normal',
-});
+export function showHelp(): void { showModal(<GeneralDocModal/>); }

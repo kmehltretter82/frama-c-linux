@@ -252,8 +252,6 @@ export function registerStatusbar(status: ToolProps): void {
 
 /** The new chapter is recorded with an error if its Id already exist. */
 export function registerDocChapter(chapter: ChapterProps): void {
-  if(DOCCHAPTER.getElement(chapter.id))
-    chapter.id = chapter.id+"-error";
   DOCCHAPTER.register(chapter);
 }
 

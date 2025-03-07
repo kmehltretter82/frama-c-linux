@@ -407,19 +407,12 @@ export function setMenuItem({ id, ...options }: CustomMenuItem): void {
 // --------------------------------------------------------------------------
 
 function template(): CustomMenu[] {
-  const lastMenuMacOs: CustomMenu[] = [
-    { label: 'Window', role: 'window', submenu: windowMenuItemsMacos }
-  ];
-  const lastMenu: CustomMenu[] = [
-    { label: 'Window', submenu: windowMenuItemsLinux, }
-  ];
-
+  const helpMenu: CustomMenu[] =  [];
+  const helpMenuMacOs: CustomMenu[] =  [];
   if(helpMenuItemsCustom.length > 0) {
-    lastMenuMacOs.push({
+    helpMenu.push({ label: 'Help', submenu: helpMenuItemsCustom });
+    helpMenuMacOs.push({
       label: 'Help', role: 'help', submenu: helpMenuItemsCustom
-    });
-    lastMenu.push({
-      label: 'Help', submenu: helpMenuItemsCustom
     });
   }
 
@@ -442,7 +435,8 @@ function template(): CustomMenu[] {
           },
         ],
         customMenus,
-        lastMenuMacOs,
+        { label: 'Window', role: 'window', submenu: windowMenuItemsMacos },
+        helpMenuMacOs,
       );
     case 'windows':
     case 'linux':
@@ -463,7 +457,8 @@ function template(): CustomMenu[] {
           },
         ],
         customMenus,
-        lastMenu
+        { label: 'Window', submenu: windowMenuItemsLinux, },
+        helpMenu,
       );
   }
 }
