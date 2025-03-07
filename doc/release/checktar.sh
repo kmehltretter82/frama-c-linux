@@ -22,7 +22,7 @@ if [[ "$RESULT" != "" ]]; then
     ERROR_CODE=1
 fi
 
-PLUGINS=( genassigns mthread volatile acsl-importer caveat-importer cfp security pathcrawler a3export )
+PLUGINS=( genassigns volatile acsl-importer caveat-importer cfp security pathcrawler a3export )
 
 for A in ${PLUGINS[@]}
 do
