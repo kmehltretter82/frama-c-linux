@@ -44,7 +44,7 @@ let getParenthLevel e =
   | PLbinop (_,(Bmul|Bdiv|Bmod),_) -> 40
   | PLunop ((Uamp|Uminus|Ubw_not),_) | PLcast _ | PLnot _ -> 30
   | PLunop (Ustar,_) | PLdot _ | PLarrow _ | PLarrget _
-  | PLsizeof _ | PLsizeofE _ -> 20
+  | PLalignof _ | PLsizeof _ | PLsizeofE _ -> 20
   | PLapp _ | PLold _ | PLat _
   | PLoffset _ | PLbase_addr _ | PLblock_length _
   | PLupdate _  | PLinitField _ | PLinitIndex _
@@ -192,6 +192,7 @@ and print_lexpr_level n fmt e =
     | PLrange(e1,e2) ->
       fprintf fmt "%a@;..@;%a"
         (pp_opt print_lexpr) e1 (pp_opt print_lexpr) e2
+    | PLalignof t -> fprintf fmt "alignof(@;@[%a@]@;)" (print_logic_type None) t
     | PLsizeof t -> fprintf fmt "sizeof(@;@[%a@]@;)" (print_logic_type None) t
     | PLsizeofE e -> fprintf fmt "sizeof(@;@[%a@]@;)" print_lexpr_plain e
     | PLupdate(e1,path,e2) ->

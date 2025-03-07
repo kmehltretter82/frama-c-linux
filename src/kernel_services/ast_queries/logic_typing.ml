@@ -2691,6 +2691,14 @@ struct
       let t = term env t in
       normalize_update_term ctxt env loc t v toff
 
+    | PLalignof typ ->
+      let env = drop_qualifiers env in
+      (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
+       with
+         Ctype t -> TAlignOf t,Linteger
+       | _ -> if ctxt.silent then raise Backtrack;
+         ctxt.error loc "sizeof can only handle C types")
+
     | PLsizeof typ ->
       let env = drop_qualifiers env in
       (match Logic_const.unroll_ltdef (logic_type ctxt loc env typ)
@@ -3656,7 +3664,7 @@ struct
     | PLcast _ | PLblock_length _ | PLbase_addr _ | PLoffset _
     | PLrepeat _ | PLlist _ | PLarrget _ | PLarrow _
     | PLdot _ | PLbinop _ | PLunop _ | PLconstant _
-    | PLnull | PLresult | PLsizeof _
+    | PLnull | PLresult | PLalignof _ | PLsizeof _
     | PLsizeofE _ | PLlambda _
     | PLupdate _ | PLinitIndex _ | PLinitField _
     | PLtypeof _ | PLtype _ -> boolean_to_predicate ctxt env p0

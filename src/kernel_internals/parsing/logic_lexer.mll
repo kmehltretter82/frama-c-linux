@@ -131,6 +131,7 @@
       (fun (i,t) -> Hashtbl.add all_kw i t;)
       [
         "admit", (fun _ -> ADMIT);
+        "alignof", (fun _ -> ALIGNOF);
         "allocates", (fun _ -> ALLOCATES);
         "assert", (fun _ -> ASSERT);
         "assigns", (fun _ -> ASSIGNS);

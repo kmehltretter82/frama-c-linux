@@ -91,6 +91,7 @@ and lexpr_node =
   | PLnull (** null pointer. *)
   | PLcast of logic_type * lexpr (** cast. *)
   | PLrange of lexpr option * lexpr option (** interval of integers. *)
+  | PLalignof of logic_type (** alignof a type. *)
   | PLsizeof of logic_type (** sizeof a type. *)
   | PLsizeofE of lexpr (** sizeof the type of an expression. *)
   | PLupdate of lexpr * (path_elt list) * update_term

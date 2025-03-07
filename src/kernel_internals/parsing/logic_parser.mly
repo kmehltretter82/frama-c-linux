@@ -303,7 +303,7 @@
 %token TYPE BEHAVIOR BEHAVIORS ASSUMES COMPLETE DISJOINT
 %token TERMINATES
 %token BIFF BIMPLIES STARHAT HAT HATHAT PIPE TILDE GTGT LTLT
-%token SIZEOF LAMBDA LET
+%token ALIGNOF SIZEOF LAMBDA LET
 %token TYPEOF BSTYPE
 %token WITH CONST GHOST
 %token INITIALIZED DANGLING
@@ -541,6 +541,7 @@ lexpr_inner:
 | AMP   lexpr_inner %prec prec_unary_op { info $sloc (PLunop (Uamp, $2)) }
 | SIZEOF LPAR lexpr RPAR { info $sloc (PLsizeofE $3) }
 | SIZEOF LPAR cast_logic_type RPAR { info $sloc (PLsizeof $3) }
+| ALIGNOF LPAR cast_logic_type RPAR { info $sloc (PLalignof $3) }
 | OLD LPAR lexpr RPAR { info $sloc (PLold $3) }
 | AT LPAR lexpr COMMA label_name RPAR { info $sloc (PLat ($3, $5)) }
 | RESULT { info $sloc PLresult }
@@ -1943,6 +1944,7 @@ bounded_var:
 ;
 
 c_keyword:
+| ALIGNOF  { "alignof" }
 | CHAR     { "char" }
 | BOOLEAN  { "boolean" }
 | BOOL     { "_Bool" }

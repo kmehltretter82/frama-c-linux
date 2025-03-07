@@ -1429,6 +1429,7 @@ and is_same_lexpr l1 l2 =
     is_same_pl_type t1 t2 && is_same_lexpr e1 e2
   | PLrange(l1,h1), PLrange(l2,h2) ->
     is_same_opt is_same_lexpr l1 l2 && is_same_opt is_same_lexpr h1 h2
+  | PLalignof t1, PLalignof t2 -> is_same_pl_type t1 t2
   | PLsizeof t1, PLsizeof t2 -> is_same_pl_type t1 t2
   | PLsizeofE e1,PLsizeofE e2 | PLtypeof e1,PLtypeof e2-> is_same_lexpr e1 e2
   | PLupdate(b1,p1,r1), PLupdate(b2,p2,r2) ->
@@ -1482,7 +1483,7 @@ and is_same_lexpr l1 l2 =
     | PLold _ | PLat _
     | PLbase_addr _ | PLblock_length _ | PLoffset _
     | PLresult | PLnull | PLcast _
-    | PLrange _ | PLsizeof _ | PLsizeofE _ | PLtypeof _
+    | PLrange _ | PLalignof _ | PLsizeof _ | PLsizeofE _ | PLtypeof _
     | PLupdate _ | PLinitIndex _ | PLtype _ | PLfalse
     | PLtrue | PLinitField _ | PLrel _ | PLand _ | PLor _ | PLxor _
     | PLimplies _ | PLiff _ | PLnot _ | PLif _ | PLforall _
