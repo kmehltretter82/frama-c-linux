@@ -20,7 +20,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Name of concurency primitives. Used for display to the user and
+(* Name of concurrency primitives. Used for display to the user and
    identifying threads between analyses. *)
 
 module Name : sig

@@ -28,7 +28,7 @@ struct
 
   type t = {
     id: int;
-    name: Concurency.Name.t option
+    name: Concurrency.Name.t option
   }
 
   let name = "Eva.Mutex"
@@ -40,7 +40,7 @@ struct
   let pretty fmt m =
     match m.name with
     | Some name ->
-      Concurency.Name.pretty fmt name
+      Concurrency.Name.pretty fmt name
     | None ->
       Format.fprintf fmt "#%i" m.id
 end
@@ -87,19 +87,19 @@ struct
     include Datatype.Serializable_undefined
 
     type t =
-      | ByName of Concurency.Name.t
+      | ByName of Concurrency.Name.t
       | ByCreationPoint of Analysis_location.Local.t
     [@@deriving eq, ord]
 
     let name = "Eva.Mutex.Identity"
 
     let reprs =
-      List.map (fun n -> ByName n) Concurency.Name.reprs @
+      List.map (fun n -> ByName n) Concurrency.Name.reprs @
       List.map (fun al -> ByCreationPoint al) Analysis_location.Local.reprs
 
     let hash = function
       | ByName name ->
-        Stdlib.Hashtbl.hash(1, Concurency.Name.hash name)
+        Stdlib.Hashtbl.hash(1, Concurrency.Name.hash name)
       | ByCreationPoint al ->
         Stdlib.Hashtbl.hash(2, Analysis_location.Local.hash al)
   end

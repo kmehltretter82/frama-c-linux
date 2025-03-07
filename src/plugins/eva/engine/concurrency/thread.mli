@@ -39,7 +39,7 @@ val find : int -> t option
     @param args the list of arguments used for the thread invocation *)
 val spawn :
   Analysis_location.local ->
-  Concurency.Name.t option ->
+  Concurrency.Name.t option ->
   Cil_types.kernel_function ->
   Cvalue.V.t list ->
   t

@@ -482,7 +482,7 @@ let hook_thread_creation analysis state : hook_sig = function
     in
     let params = List.map snd (trunc_params (formals, params)) in
     let eva_thread =
-      let name = Concurency.Name.of_cvalue name in
+      let name = Concurrency.Name.of_cvalue name in
       let aloc = current_loc analysis in
       Thread.spawn aloc name kf params
     in
@@ -630,7 +630,7 @@ let hook_queue_init analysis state : hook_sig = function
       catch_conversion analysis "During@ queue@ initialization" v
     in
     let aloc = current_loc analysis
-    and name = Concurency.Name.of_cvalue name
+    and name = Concurrency.Name.of_cvalue name
     and size = conv (Mt_memory.extract_int size) ~msg:"invalid@ size" () in
     let q = Mqueue.create aloc name in
     analysis.all_queues <- Mqueue.Set.add q analysis.all_queues;
@@ -791,7 +791,7 @@ let aux_mutex ~operation:op ~check ~event analysis state : hook_sig = function
 let hook_init_mutex analysis state : hook_sig = function
   | [_, name] ->
     let aloc = current_loc analysis
-    and name = Concurency.Name.of_cvalue name in
+    and name = Concurrency.Name.of_cvalue name in
     let mutex = Mutex.create aloc name in
     analysis.all_mutexes <- Mutex.Set.add mutex analysis.all_mutexes;
     check_mutex_not_already_initialized

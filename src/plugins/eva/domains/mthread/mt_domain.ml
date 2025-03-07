@@ -24,7 +24,7 @@ open Eval
 open Mt_utils
 open Eva_ast
 open Locations
-open Concurency
+open Concurrency
 
 
 

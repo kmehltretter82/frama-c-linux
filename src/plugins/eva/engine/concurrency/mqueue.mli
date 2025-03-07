@@ -25,5 +25,5 @@ include Datatype.S_with_collections
 val id : t -> int
 val label : t -> string
 val find : int -> t option
-val create : Analysis_location.local -> Concurency.Name.t option -> t
+val create : Analysis_location.local -> Concurrency.Name.t option -> t
 val reset_state : unit -> unit
