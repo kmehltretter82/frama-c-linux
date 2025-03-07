@@ -141,8 +141,6 @@ module ThreadState = struct
   let is_main th = Thread.is_main th.th_eva_thread
   let pretty fmt th = Thread.pretty fmt th.th_eva_thread
   let equal th1 th2 = Thread.equal th1.th_eva_thread th2.th_eva_thread
-  let compare th1 th2 = Thread.compare th1.th_eva_thread th2.th_eva_thread
-  let hash th = Thread.hash th.th_eva_thread
 
   let pretty_detailed fmt th =
     let pp_parent fmt = function
@@ -169,18 +167,6 @@ module ThreadState = struct
     match creates th1 th2 with
     | `Unrelated -> creates th2 th1
     | _ as r -> r
-
-
-  module Set = Set.Make(struct type t = thread_state
-      let compare = compare
-    end)
-  module Map = Map.Make(struct type t = thread_state
-      let compare = compare
-    end)
-  module Hashtbl = FCHashtbl.Make(struct type t = thread_state
-      let hash = hash
-      let equal = equal
-    end)
 
   let recompute_because th r =
     if not (SetRecomputeReason.equal th.th_to_recompute

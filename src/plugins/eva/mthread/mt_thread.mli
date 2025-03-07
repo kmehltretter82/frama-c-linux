@@ -115,10 +115,8 @@ module ThreadState : sig
   (** Prints the name of the thread with detailed informations *)
   val pretty_detailed: t Pretty_utils.formatter
 
-  (** The functions below act on thread id *)
+  (** Equality based on thread id *)
   val equal: t -> t -> bool
-  val compare: t -> t -> int
-  val hash: t -> int
 
   (** [one_creates_other th1 th2] returns [`Creates (th1, th2)]
       if [th1] creates [th2] directly or through another threads,
@@ -127,10 +125,6 @@ module ThreadState : sig
   val one_creates_other: t -> t -> [`Creates of t * t | `Unrelated]
 
   val recompute_because: t -> recompute_reason -> unit
-
-  module Set: Set.S with type elt = t
-  module Map: Map.S with type key = t
-  module Hashtbl: FCHashtbl.S with type key = t
 end
 
 
