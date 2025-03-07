@@ -115,3 +115,10 @@ corresponding `-save` was performed
   }
   
   
+Test that an invalid argument to machdep does not cause a crash with stacktrace
+  $ frama-c -no-autoload-plugins -machdep typo_x86_63
+  [kernel] User Error: unsupported machine '$TESTCASE_ROOT/typo_x86_63'.
+    Either use a predefined name among  gcc_x86_32 x86_16 gcc_x86_64 x86_32
+    x86_64 avr_8 avr_16 ppc_32 gcc_x86_16 msvc_x86_64, or an YAML machdep file.
+  [kernel] Frama-C aborted: invalid user input.
+  [1]
