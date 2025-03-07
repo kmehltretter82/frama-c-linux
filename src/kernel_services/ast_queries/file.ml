@@ -285,7 +285,8 @@ let default_machdeps () =
     []
 
 let pretty_machdeps fmt =
-  List.iter (fun s -> Format.fprintf fmt "@ %s" s) (default_machdeps())
+  let machdeps = List.sort String.compare (default_machdeps ()) in
+  List.iter (fun s -> Format.fprintf fmt "@ %s" s) machdeps
 
 let machdep_help () =
   let m = Kernel.Machdep.get () in
@@ -302,7 +303,9 @@ let () = Cmdline.run_after_exiting_stage machdep_help
 let set_machdep () =
   let m = Kernel.Machdep.get () in
   if not (mem_machdep m) then
-    Kernel.abort "@[unsupported machine '%s'.@ Either use a predefined name among %t,@ or an YAML machdep file.@]" m pretty_machdeps
+    Kernel.abort "@[unsupported machine '%s'.@ \
+                  Either use a predefined name among%t,@ \
+                  or an YAML machdep file.@]" m pretty_machdeps
 
 let () = Cmdline.run_after_configuring_stage set_machdep
 
