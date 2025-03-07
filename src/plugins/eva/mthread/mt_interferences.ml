@@ -89,7 +89,7 @@ let add_last_analysis analysis_state interferences =
       Mt_options.result "cannot find %a at %a"
         Callstack.pretty cs
         Printer.pp_location (Cil_datatype.Stmt.loc stmt);
-      Analyzer.get_stmt_state ~after:true stmt
+      `Bottom
   in
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
