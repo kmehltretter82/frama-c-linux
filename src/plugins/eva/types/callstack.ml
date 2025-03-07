@@ -137,6 +137,9 @@ let to_call_list cs =
   in
   (cs.entry_point, Cil_types.Kglobal) :: l
 
+let simplify cs = 
+  {cs with stack=List.map (fun (kf, _) -> (kf, Cil.dummyStmt)) cs.stack}
+
 (* Stable hash and pretty-printing *)
 
 let stmt_hash s =

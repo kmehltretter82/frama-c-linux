@@ -176,6 +176,9 @@ module Callstack: sig
       (i.e. reverse order of the call stack). *)
   val to_call_list : t -> (Cil_types.kernel_function * Cil_types.kinstr) list
 
+  (** Removes all call sites from the callstack. *)
+  val simplify : t -> t
+
 end
 
 module Deps: sig

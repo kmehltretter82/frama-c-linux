@@ -181,7 +181,9 @@ module Make
   (* Map from the arguments of a call to stored results. *)
   module ArgsToStoredCalls = ActualArgs.Map.Make (InputBasesToCallEffect)
 
-  module ArgsToWidenings = ActualArgs.Map.Make (Widenings)
+  module CallstackToWidenings = Callstack.Hashtbl.Make (Widenings)
+
+  module ArgsToCallstack = ActualArgs.Map.Make (CallstackToWidenings)
 
   let previous_calls_name = "Mem_exec.PreviousCalls(" ^ Value.name ^ ", " ^ Domain.name ^")"
   let previous_widenings_name = "Mem_exec.PreviousWidenings(" ^ Value.name ^ ", " ^ Domain.name ^")"
@@ -200,7 +202,7 @@ module Make
 
   module PreviousWidenings = 
     Kernel_function.Make_Table
-      (ArgsToWidenings)
+      (ArgsToCallstack)
       (struct
         let size = 17
         let dependencies = cache_dependencies
@@ -329,7 +331,7 @@ module Make
   let store_results_kf inout kf input_state args (call_result: call_result) = 
     let input_bases, all_output_bases, allocated_bases = extract_bases kf inout input_state in
     (* let _ = 
-      Self.debug ~dkey:Self.dkey_memexec "Allocated bases: %a @." Base.Hptset.pretty allocated_bases in *)
+       Self.debug ~dkey:Self.dkey_memexec "Allocated bases: %a @." Base.Hptset.pretty allocated_bases in *)
     let reduced_input_state = Domain.filter (`Pre kf) input_bases input_state in
     let outputs, call_number = process_outputs kf all_output_bases call_result in
     let map_args_to_input_bases =
@@ -402,36 +404,42 @@ module Make
       let _all_bases = Base.Hptset.union input_bases output_bases in
       let _all_bases = Base.Hptset.union _all_bases allocated_bases in
       (* let _ = Self.debug ~dkey:Self.dkey_widening 
-      "Stmt: %a @. All bases: %a @." Cil_datatype.Stmt.pretty _stmt Base.Hptset.pretty _all_bases in *)
+         "Stmt: %a @. All bases: %a @." Cil_datatype.Stmt.pretty _stmt Base.Hptset.pretty _all_bases in *)
       let filter widened_state =
-          Domain.filter (`Post _kf) _all_bases widened_state
+        Domain.filter (`Post _kf) _all_bases widened_state
       in Partition.Key.Map.map filter partitions
     with Not_found -> partitions
 
 
 
   let _pretty_saved_widenings fmt widenings = 
-      Cil_datatype.Stmt.Map.iter (fun stmt partitions ->
+    Cil_datatype.Stmt.Map.iter (fun stmt partitions ->
         Format.fprintf fmt "Statement: %a -> %a @." Cil_datatype.Stmt.pretty stmt Partitions.pretty partitions
-        ) widenings
+      ) widenings
 
 
   let clean_widenings widenings =
     Cil_datatype.Stmt.Map.filter_map (fun stmt partition ->
-      match stmt.skind with
-      |  Loop _ -> Some partition
-      | _ -> None 
+        match stmt.skind with
+        |  Loop _ -> Some partition
+        | _ -> None 
       ) widenings
 
 
-  let store_widenings_kf inout kf args _callstack widenings =
+  let store_widenings_kf inout kf args callstack widenings =
     let map_args =
       try PreviousWidenings.find kf 
       with Not_found ->
         ActualArgs.Map.empty
     in
-    let old_widenings = 
+    let tbl_callstack = 
       try ActualArgs.Map.find args map_args 
+      with Not_found ->
+        let h = Callstack.Hashtbl.create 17 in
+        h
+    in
+    let old_widenings = 
+      try Callstack.Hashtbl.find tbl_callstack callstack
       with Not_found ->
         Cil_datatype.Stmt.Map.empty
     in
@@ -440,11 +448,13 @@ module Make
     let reduced_widenings = 
       let f = reduce_widenings inout kf in
       Cil_datatype.Stmt.Map.mapi f cleaned_widenings in
-    let merged = merge_statements old_widenings reduced_widenings in 
-    let new_map_args = ActualArgs.Map.add args merged map_args in 
+    let merged = merge_statements old_widenings reduced_widenings in
+    let _ = Self.debug ~dkey:Self.dkey_widening "Saved at callstack: %a @." Callstack.pretty callstack in
+    let _ = Callstack.Hashtbl.add tbl_callstack callstack merged in
+    let new_map_args = ActualArgs.Map.add args tbl_callstack map_args in 
     PreviousWidenings.replace kf new_map_args;
-    Statistics.incr_by stat_saved_widenings () (Cil_datatype.Stmt.Map.cardinal merged)
-    (* Self.debug ~dkey:Self.dkey_widening "Saved widenings: %a" pretty_saved_widenings merged *)
+    Statistics.incr_by stat_saved_widenings () (Cil_datatype.Stmt.Map.cardinal merged);
+    Self.debug ~dkey:Self.dkey_widening "Saved widenings: %a" _pretty_saved_widenings merged
 
 
   let store_widenings kf args callstack widenings = 
@@ -452,8 +462,12 @@ module Make
     | None -> ()
     | Some inout ->
       try 
-      let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
-      store_widenings_kf inout kf args callstack widenings
+        let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
+        let callstack = match Parameters.SimplifyCallstack.get () with
+          | "widenings" -> Callstack.simplify callstack
+          | _ -> callstack
+        in
+        store_widenings_kf inout kf args callstack widenings
       with TooImprecise -> ()
 
 
@@ -550,7 +564,7 @@ module Make
       Some (call_result, i)
 
 
-  let reuse_previous_widenings kf args _callstack =
+  let reuse_previous_widenings kf args callstack =
     try
       let map_args = 
         try
@@ -558,14 +572,21 @@ module Make
         with Not_found ->
           Statistics.incr stat_widenings_misses_kf kf;
           raise Not_found
-        in
+      in
       let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
-      let widenings = 
+      let tbl_callstack = 
         try
-        ActualArgs.Map.find args map_args 
+          ActualArgs.Map.find args map_args 
         with Not_found ->
           Statistics.incr stat_widenings_misses_args kf;
           raise Not_found
+      in
+      let callstack = match Parameters.SimplifyCallstack.get () with
+        | "widenings" -> Callstack.simplify callstack
+        | _ -> callstack
+      in
+      let widenings =
+        Callstack.Hashtbl.find tbl_callstack callstack 
       in
       Some widenings
     with Not_found ->
@@ -582,7 +603,7 @@ module Make
       let allocated = Eva_diff.import_bases allocated in
       let _import () = List.map (fun (key, state) -> key, Domain.import state) outputs in
       let outputs =
-      cumulative_load_time_wrapper stat_import_output_states_load_time _import
+        cumulative_load_time_wrapper stat_import_output_states_load_time _import
       in
       Base.Hptset.Hashtbl.add new_tbl allocated (all_bases, outputs, i)
     in 
@@ -633,15 +654,15 @@ module Make
     match Ast_diff.Kernel_function.find old_kf with
     | `Same kf ->
       begin
-          try
-            let _ = Self.debug ~dkey "Importing summaries for function %a@." Kernel_function.pretty old_kf in
-            let _import_calls () = 
-              import_calls old_data in
-            let data = arg_load_time_wrapper stat_import_calls_load_time kf _import_calls in
-            PreviousCalls.replace kf data
-          with Not_found ->
-            Self.debug ~dkey "Cannot import summaries for function %a@."
-              Kernel_function.pretty kf
+        try
+          let _ = Self.debug ~dkey "Importing summaries for function %a@." Kernel_function.pretty old_kf in
+          let _import_calls () = 
+            import_calls old_data in
+          let data = arg_load_time_wrapper stat_import_calls_load_time kf _import_calls in
+          PreviousCalls.replace kf data
+        with Not_found ->
+          Self.debug ~dkey "Cannot import summaries for function %a@."
+            Kernel_function.pretty kf
       end
     | `Partial _ as diff ->
       Self.debug ~dkey "Function %a has been modified: %a"
@@ -672,12 +693,23 @@ module Make
     in
     Cil_datatype.Stmt.Map.fold add map Cil_datatype.Stmt.Map.empty
 
+  let import_callstack_to_widenings (tbl: CallstackToWidenings.t) =
+    let new_tbl = Callstack.Hashtbl.create 17 in
+    let add cs widenings =
+      try
+        let cs = Callstack.import cs in
+        let widenings = import_widenings widenings in
+        Callstack.Hashtbl.add new_tbl cs widenings
+      with Not_found -> ()
+    in
+    Callstack.Hashtbl.iter add tbl;
+    new_tbl
 
-  let import_args (map: ArgsToWidenings.t) =
+  let import_args_to_callstack (map: ArgsToCallstack.t) =
     let add key data acc =
       try
         let key = List.map (Option.map Value.import) key in
-        let data = import_widenings data in
+        let data = import_callstack_to_widenings data in
         ActualArgs.Map.add key data acc
       with Not_found ->
         acc
@@ -692,7 +724,7 @@ module Make
         try
           Self.debug ~dkey "Importing widenings for function %a from function %a@."
             Kernel_function.pretty kf Kernel_function.pretty old_kf;
-          let data = import_args old_data in
+          let data = import_args_to_callstack old_data in
           PreviousWidenings.replace kf data
         with Not_found ->
           Self.debug ~dkey "Cannot import widenings for function %a@."
@@ -717,8 +749,10 @@ module Make
     let kf_nb = PreviousWidenings.length () in
     let call_nb =
       PreviousWidenings.fold (fun _ map acc ->
-          ActualArgs.Map.fold ( fun _ widenings acc ->
-              Cil_datatype.Stmt.Map.cardinal widenings + acc
+          ActualArgs.Map.fold ( fun _ callstack acc ->
+              Callstack.Hashtbl.fold (fun _ widenings acc ->
+                  Cil_datatype.Stmt.Map.cardinal widenings + acc
+                ) callstack acc
             ) map acc) 0
     in
     Self.feedback "%s, %i saved widenings for %i functions" prefix_msg call_nb kf_nb
