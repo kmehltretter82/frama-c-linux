@@ -81,9 +81,9 @@ let is_empty (Interferences { states }) =
   ThreadTable.length states = 0
 
 let structure_mismatch () =
-  Self.abort
-    "different sets of abstract domains or structure used between two thread \
-     analyses"
+  Self.fatal
+    "Incompatible sets of abstract domains used for the analysis of \
+     different threads"
 
 
 (* Interference registration *)
