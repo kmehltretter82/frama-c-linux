@@ -1,5 +1,6 @@
 /* run.config
    OPT:
+   OPT: -cpp-extra-args=-DGCC -machdep gcc_x86_32
    EXIT: 1
    STDOPT: #"-cpp-extra-args=-DFAIL_FUNCTION"
    STDOPT: #"-cpp-extra-args=-DFAIL_INCOMPLETE"
@@ -145,3 +146,12 @@ void c11_6_7_2_1(void)
 {
   int x = _Alignof(struct bitfield);
 }
+
+#ifdef GCC
+typedef void fun(void);
+
+void gcc_allowed_Alignof(void){
+  _Static_assert(_Alignof(void) == 1);
+  _Static_assert(_Alignof(fun) == 1);
+}
+#endif
