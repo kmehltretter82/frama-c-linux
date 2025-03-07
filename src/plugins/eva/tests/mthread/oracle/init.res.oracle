@@ -6,17 +6,15 @@
 [mt] ******* Starting mthread
 [mt] *** Computing value analysis for main thread
 [mt] New thread: <main>, fun main
-[mt] init.c:24: Initializing mutex locks[0]
-[mt] init.c:24: Initializing mutex locks[1]
-[mt] init.c:24: Initializing mutex locks[2]
-[mt] init.c:27: Initializing mutex mu1
-[mt] init.c:27: Initializing mutex mu2
-[mt] init.c:27: Initializing mutex mu3
-[mt] init.c:31: Initializing mutex 0
-[mt] init.c:31: Warning: Mutex 0 might be already initialized
-[eva] init.c:17: Warning: The mutex 0 is already registered.
-[mt] init.c:37: Warning: Mutex 0 might be already initialized
-[mt] init.c:37: Initializing mutex 0
+[mt] init.c:22: Initializing mutex locks[0]
+[mt] init.c:22: Initializing mutex locks[1]
+[mt] init.c:22: Initializing mutex locks[2]
+[mt] init.c:25: Initializing mutex mu1
+[mt] init.c:25: Initializing mutex mu2
+[mt] init.c:25: Initializing mutex mu3
+[mt] init.c:29: Initializing mutex 0
+[mt] init.c:29: Warning: Mutex 0 might be already initialized
+[eva] init.c:15: Warning: The mutex 0 is already registered.
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

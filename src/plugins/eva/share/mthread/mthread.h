@@ -90,15 +90,6 @@ int Frama_C_queue_receive(__fc_mthread_id, int size, char *buf)
 
 //@ assigns __fc_mthread_shared \from \nothing;
 void Frama_C_mthread_show(char const *, ...) __attribute__((FC_BUILTIN));
-//@ assigns __fc_mthread_shared \from \nothing;
-void Frama_C_mthread_name_thread(__fc_mthread_id, __fc_mthread_name)
-    __attribute__((FC_BUILTIN));
-//@ assigns __fc_mthread_shared \from \nothing;
-void Frama_C_mthread_name_mutex(__fc_mthread_id, __fc_mthread_name)
-    __attribute__((FC_BUILTIN));
-//@ assigns __fc_mthread_shared \from \nothing;
-void Frama_C_mthread_name_queue(__fc_mthread_id, __fc_mthread_name)
-    __attribute__((FC_BUILTIN));
 
 //@ assigns __fc_mthread_shared \from \nothing;
 void Frama_C_mthread_sync(void) __attribute__((FC_BUILTIN));

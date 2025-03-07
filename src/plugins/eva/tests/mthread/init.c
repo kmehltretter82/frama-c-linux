@@ -2,9 +2,7 @@
    STDOPT: +"-pp-annot"
 */
 /* This example tests the various way a structure can be named:
-   with a pointer, with a string, without any indication (in
-   this last case, only once per statement, or with a proper
-   unrolling) */
+   with a pointer, with a string, without any indication */
 #include "mthread_pthread.h"
 #define NULL ((void*)0)
 #define N 3
@@ -26,13 +24,7 @@ void main() {
   for(i=0;i<N;i++)
     mutex_init(names[i]);
 
-  /*@ loop unfold N; */
-  for(i=0;i<N;i++) {
-    int m = mutex_init(NULL);
-    Frama_C_mthread_name_mutex(m, names[i+3]);
-  }
-
-  // We really need to unroll the loop
+  // Warning: the same mutex is repeatedly created
   for(i=0;i<N;i++)
     mutex_init(NULL);
 }
