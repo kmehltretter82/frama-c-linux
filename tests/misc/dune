@@ -1,3 +1,8 @@
+; Generic dependencies for all tests
+(cram
+  (deps ../../src/init/boot/empty_file.exe)
+)
+
 (cram
   (applies_to user_directories.unix.t)
   (enabled_if (and (= %{os_type} unix) (<> %{system} macos)))
