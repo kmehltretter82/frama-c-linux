@@ -265,7 +265,7 @@ module State = State_builder.Hashtbl (Hashtbl) (Properties)
     end)
 
 
-let spawn_single_entry_point spawn_point name entry_point arguments =
+let spawn spawn_point name entry_point arguments =
   let key = match name with
     | Some name -> Identity.Key.ByName name
     | None -> BySpawnPoint spawn_point
@@ -283,11 +283,6 @@ let spawn_single_entry_point spawn_point name entry_point arguments =
   in
   State.replace th properties;
   th
-
-let spawn spawn_point name entry_points arguments =
-  List.map
-    (fun kf -> spawn_single_entry_point spawn_point name kf arguments)
-    entry_points
 
 let is_interrupt_handler entry_point =
   let key = Identity.Key.ByInterruptHandler entry_point in

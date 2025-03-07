@@ -460,7 +460,8 @@ module Domain = struct
       let* func = Value.extract_fun func in
       let args = List.map fst args in
       let aloc = (stmt, Eva_utils.current_call_stack ()) in
-      let th_list = Thread.spawn aloc name func args in
+      let spawn f = Thread.spawn aloc name f args in
+      let th_list = List.map spawn func in
       let+ threads, return = Mt_thread.Register.register th_list state.threads in
       { state with threads }, return
     | _ -> Result.error "Invalid parameters@."

@@ -29,20 +29,20 @@ val id : t -> int
 val label : t -> string
 val find : int -> t option
 
-(** [spawn al name kfl args] registers the creation of a thread encountered
+(** [spawn al name kf args] registers the creation of a thread encountered
     in Eva analysis, and either add this spawn to an existing thread analysis
     or create a new thread analysis.
     @param al the stmt and callstack of the thread creation
     @param name an optional name often defined by the memory location where the
          thread identifier will be stored
-    @param kfl the list of possibly used entry points for the new thread
+    @param kf the entry point for the new thread
     @param args the list of arguments used for the thread invocation *)
 val spawn :
   Analysis_location.local ->
   Concurency.Name.t option ->
-  Cil_types.kernel_function list ->
+  Cil_types.kernel_function ->
   Cvalue.V.t list ->
-  t list
+  t
 
 (** [is_interrupt_handler kf] returns [true] if [kf] has been registered as an
     interrupt handler. *)

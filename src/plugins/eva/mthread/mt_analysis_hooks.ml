@@ -484,7 +484,7 @@ let hook_thread_creation analysis state : hook_sig = function
     let eva_thread =
       let name = Concurency.Name.of_cvalue name in
       let aloc = current_loc analysis in
-      Thread.spawn aloc name [kf] params |> List.hd
+      Thread.spawn aloc name kf params
     in
     ignore (spawn_thread analysis eva_thread analysis.curr_stack kf
               Cvalue.Model.bottom params (Some analysis.curr_thread));
