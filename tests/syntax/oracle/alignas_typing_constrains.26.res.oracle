@@ -1,3 +1,4 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] User Error: Invalid _Alignas(3): shall be 0 or a positive power of 2
+[kernel] alignas_typing_constrains.c:329: User Error: 
+  alignof on incomplete type 'struct X'
 [kernel] Frama-C aborted: invalid user input.

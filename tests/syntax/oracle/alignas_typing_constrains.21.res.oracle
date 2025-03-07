@@ -1,15 +1,4 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] Parsing alignas_typing_constrains_companion.c (with preprocessing)
-[kernel] User Error: Incompatible declaration for get_SAlF:
-  Definitions of struct SAlF are not isomorphic. Reason follows:
-  incompatible _Alignas specification
-  struct SAlF {
-     int field _Alignas(16) ;
-  };
-  struct SAlF {
-     int field _Alignas(8) ;
-  };
-  
-  First declaration was at alignas_typing_constrains.c:269
-  Current declaration is at alignas_typing_constrains_companion.c:9
+[kernel] alignas_typing_constrains.c:271: User Error: 
+  i was previous defined with incompatible _Alignas(8) at alignas_typing_constrains.c:254
 [kernel] Frama-C aborted: invalid user input.

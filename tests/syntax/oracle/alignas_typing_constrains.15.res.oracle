@@ -1,4 +1,11 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] alignas_typing_constrains.c:196: User Error: 
-  _Alignas not allowed on functions
+[kernel] alignas_typing_constrains.c:201: 
+  syntax error:
+  Location: line 201, between columns 25 and 26, before or at token: _Alignas
+  199   #ifdef ALIGNAS_FUNCTION_1
+  200   // note: no smart message, we just check that it is not capture as an attribute
+  201   void c11_6_7_5_2_c(int x) _Alignas(8)
+                                 ^
+  202   {
+  203   }
 [kernel] Frama-C aborted: invalid user input.

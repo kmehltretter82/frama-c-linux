@@ -1,4 +1,4 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] alignas_typing_constrains.c:243: User Error: 
-  j was previously defined without _Alignas specification at alignas_typing_constrains.c:232
+[kernel] alignas_typing_constrains.c:223: User Error: 
+  _Alignas not allowed on function parameters
 [kernel] Frama-C aborted: invalid user input.

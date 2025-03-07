@@ -1,4 +1,11 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] alignas_typing_constrains.c:208: User Error: 
-  _Alignas not allowed on register variables
+[kernel] alignas_typing_constrains.c:214: 
+  syntax error:
+  Location: line 214, between columns 25 and 26, before or at token: _Alignas
+  212   #ifdef ALIGNAS_FUNCTION_3
+  213   // note: no smart message, we just check that it is not capture as an attribute
+  214   void c11_6_7_5_2_c(int x) _Alignas(8) ;
+                                 ^
+  215   #endif
+  216
 [kernel] Frama-C aborted: invalid user input.

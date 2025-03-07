@@ -1,3 +1,3 @@
 [kernel] Parsing alignas_typing_constrains.c (with preprocessing)
-[kernel] User Error: Can't handle a value that big for _Alignas (1ull << 63)
+[kernel] User Error: Invalid _Alignas(1 << 29): exceeds max extended alignment: 268435456
 [kernel] Frama-C aborted: invalid user input.

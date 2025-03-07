@@ -7,11 +7,14 @@
    EXIT: 1
    STDOPT: #"-cpp-extra-args=-DALIGNAS_WEAKER"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_EXTENDED"
-   STDOPT: #"-cpp-extra-args=-DALIGNAS_TOO_BIG"
+   STDOPT: #"-cpp-extra-args=-DALIGNAS_EXTENDED_TOO_BIG" +"-machdep gcc_x86_32"
+   STDOPT: #"-cpp-extra-args=-DALIGNAS_OCAML_TOO_BIG"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_NOT_VALID_NEG"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_NOT_VALID_NOT_POW2"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_NOT_CONSTANT"
-   STDOPT: #"-cpp-extra-args=-DALIGNAS_TYPEDEF"
+   STDOPT: #"-cpp-extra-args=-DALIGNAS_TYPEDEF_1"
+   STDOPT: #"-cpp-extra-args=-DALIGNAS_TYPEDEF_2"
+   STDOPT: #"-cpp-extra-args=-DALIGNAS_TYPEONLY"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_BITFIELD"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_FUNCTION_1"
    STDOPT: #"-cpp-extra-args=-DALIGNAS_FUNCTION_2"
@@ -116,7 +119,18 @@ void c11_6_2_8_3(void)
 }
 #endif
 
-#ifdef ALIGNAS_TOO_BIG
+#ifdef ALIGNAS_EXTENDED_TOO_BIG
+void c11_6_2_8_3(void)
+// _Alignas(n) with n > _Alignof(max_align_t) might be allowed by the implementation
+{
+  // on our architecture:
+  _Static_assert(_Alignof(max_align_t) == 16);
+
+  char _Alignas(1 << 29) x;
+}
+#endif
+
+#ifdef ALIGNAS_OCAML_TOO_BIG
 void c11_6_2_8_3(void)
 // Frama-C cannot handle that (OCaml limitation)
 {
@@ -163,8 +177,16 @@ void c11_6_7_5_1(void)
 // c11 6.7.5.2
 // No _Alignas for typedefs, bitfields, functions, parameters or register
 
-#ifdef ALIGNAS_TYPEDEF
+#ifdef ALIGNAS_TYPEDEF_1
 typedef int _Alignas(8) c11_6_7_5_2_a;
+#endif
+
+#ifdef ALIGNAS_TYPEDEF_2
+struct c11_6_7_5_2_a _Alignas(8);
+#endif
+
+#ifdef ALIGNAS_TYPEONLY
+int g = sizeof(struct only _Alignas(8));
 #endif
 
 #ifdef ALIGNAS_BITFIELD
@@ -225,7 +247,8 @@ void c11_6_7_5_6(void)
 // when multiple _Alignas the strictest wins
 {
   int _Alignas(0) zero ;
-  int _Alignas(8) _Alignas(16) several ;
+  int _Alignas(8) _Alignas(16) several_1 ;
+  int _Alignas(16) _Alignas(8) several_2 ;
 }
 
 int _Alignas(8) i = 0 ;
@@ -234,6 +257,15 @@ int j = 0;
 void c11_6_7_5_7(void){
   extern int _Alignas(8) i;
   extern int i;
+
+  extern int _Alignas(8) first_decl_has ;
+  extern int first_decl_has ;
+
+  extern int first_decl_has_not ;
+  extern int _Alignas(8) first_decl_has_not ;
+
+  extern int _Alignas(8) same ;
+  extern int _Alignas(8) same ;
 
 #ifdef ALIGNAS_DIFFERENT_IN_ORIGINAL_DEF
   extern int _Alignas(4) i;
