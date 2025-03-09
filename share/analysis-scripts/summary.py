@@ -153,7 +153,10 @@ def dump_results_csv(results, path):
             "sem_reach_fun", "syn_reach_fun", "total_fun",
             "sem_reach_stmt", "syn_reach_stmt",
             "alarms", "warnings", "coverage",
-            "user_time", "memory"]
+            "user_time", "eva_time", "memory", "cache_load",
+            "ast_diff", "sum_saved_fun", "sum_reloaded_fun",
+            "sum_hits", "sum_misses", "inv_reused", "inv_saved",
+            "total_iterations", "filesize_mb"]
         writer = csv.DictWriter(
             file,
             fieldnames=fieldnames,
@@ -224,6 +227,8 @@ parser.add_argument("-o", "--output-csv",
 parser.add_argument("-ci", "--ci",
     action="store_false",
     help="run in CI mode: disable curses")
+parser.add_argument("-d", "--display", action="store_true",
+    help="Only poll the results and display them")
 
 errors = b""
 
@@ -258,8 +263,15 @@ try:
         database = benchmark_database.Database(benchmark_tag, benchmark_comment,
             gitdir, args.rev, args.vs)
 
-    results,errors = results_display.wrapper(run_analyses, database, framac,
-        benchmark_tag, curses=args.ci)
+    if args.display:
+        print("Polling results ...\n")
+        results = poll_results(list_targets("."), benchmark_tag)
+        if not database is None:
+            database.update(results)
+        errors = b""
+    else:
+        results,errors = results_display.wrapper(run_analyses, database, framac,
+            benchmark_tag, curses=args.ci)
 
     print("Results:\n")
     results_display.PlainDisplay().print_table(results)

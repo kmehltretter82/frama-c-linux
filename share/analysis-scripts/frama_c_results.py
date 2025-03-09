@@ -68,9 +68,23 @@ def parse(data):
     result["cmd_args"] = convert(data, "cmd_args", str)
     result["benchmark_tag"] = convert(data, "benchmark_tag", str)
     if result["sem_reach_stmt"] is not None and result["syn_reach_stmt"] is not None:
-        result["coverage"] = result["sem_reach_stmt"] / result["syn_reach_stmt"]
+        try:
+            result["coverage"] = result["sem_reach_stmt"] / result["syn_reach_stmt"]
+        except ZeroDivisionError:
+            result["coverage"] = None
     else:
-        result["coverage"] = None
+        result["coverage"] = None        
+    result["sum_saved_fun"] = convert(data, "sum_saved_fun", int)
+    result["sum_reloaded_fun"] = convert(data, "sum_reloaded_fun", int)
+    result["eva_time"] = convert(data, "eva_time", float)
+    result["sum_hits"] = convert(data, "sum_hits", int)
+    result["sum_misses"] = convert(data, "sum_misses", int)
+    result["inv_reused"] = convert(data, "inv_reused", int)
+    result["inv_saved"] = convert(data, "inv_saved", int)
+    result["total_iterations"] = convert(data, "total_iterations", int)
+    result["cache_load"] = convert(data, "cache_load", int)
+    result["ast_diff"] = convert(data, "ast_diff", int)
+    result["filesize_mb"] = convert(data, "filesize_mb", float)
     return result
 
 

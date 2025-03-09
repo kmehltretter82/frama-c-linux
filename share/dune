@@ -299,6 +299,8 @@
 (analysis-scripts/make_wrapper.py as lib/analysis-scripts/make_wrapper.py)
 (analysis-scripts/normalize_jcdb.py as lib/analysis-scripts/normalize_jcdb.py)
 (analysis-scripts/parse-coverage.sh as lib/analysis-scripts/parse-coverage.sh)
+(analysis-scripts/parse-log.sh as lib/analysis-scripts/parse-log.sh)
+(analysis-scripts/parse-stat.sh as lib/analysis-scripts/parse-stat.sh)
 (analysis-scripts/plot.sh as lib/analysis-scripts/plot.sh)
 (analysis-scripts/print_callgraph.py as lib/analysis-scripts/print_callgraph.py)
 (analysis-scripts/results_display.py as lib/analysis-scripts/results_display.py)

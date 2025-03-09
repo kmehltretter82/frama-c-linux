@@ -240,8 +240,10 @@ endef
 	  printf 'warnings=%s\n' "`cat $@/warnings.log | grep ':\[\(eva\|kernel\|from\)\]' | wc -l`";
 	  printf 'alarms=%s\n' "`expr $$(cat $@/alarms.csv | wc -l) - 1`";
 	  printf 'cmd_args=%q\n' "$(subst ",\",$(wordlist 2,999,$(EVA)))";
-	  printf 'benchmark_tag=%s' "$(BENCHMARK)"
+	  printf 'benchmark_tag=%s\n' "$(BENCHMARK)"
 	} >> $@/stats.txt
+	$(SHELL) $(DIR)parse-log.sh $@/eva.log $@/stats.txt
+	$(SHELL) $(DIR)parse-stat.sh $@/stat.csv $@/stats.txt $@/framac.sav
 	if [ ! -z $${FLAMEGRAPH+x} ]; then
 	  NOGUI=1 $(FRAMAC_SCRIPT) flamegraph $@/flamegraph.txt $@/
 	fi
