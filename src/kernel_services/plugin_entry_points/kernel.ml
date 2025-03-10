@@ -1053,8 +1053,7 @@ module Machdep = struct
     Filepath.Normalized.is_file (get_default_file machdep)
 
   let normalize name =
-    if is_default name then name else
-      Filepath.normalize ~existence:Must_exist name
+    if is_default name then name else Filepath.normalize name
 
   let () =
     let set_if_necessary old_name new_name =

@@ -1,5 +1,9 @@
+; Generic dependencies for all tests
+(cram
+  (deps ../../src/init/boot/empty_file.exe)
+)
+
 (cram
   (applies_to cpp-command)
   (enabled_if %{read:../../python-3.7-available})
-  (deps ../../src/init/boot/empty_file.exe)
 )
