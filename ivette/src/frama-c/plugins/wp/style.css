@@ -20,6 +20,10 @@
     background: red;
 }
 
+.wp-selected {
+    background: var(--code-select);
+}
+
 .wp.cm-hovered-code,
 .wp.cm-hovered-code > span
 {
