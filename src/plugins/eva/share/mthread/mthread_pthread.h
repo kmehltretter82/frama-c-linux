@@ -28,10 +28,10 @@
 
 #include <mthread.h>
 
-typedef framac_mthread_id pthread_t;
-typedef framac_mthread_id pthread_attr_t;
-typedef framac_mthread_id pthread_mutex_t;
-typedef framac_mthread_id pthread_mutexattr_t;
+typedef __fc_mthread_id pthread_t;
+typedef __fc_mthread_id pthread_attr_t;
+typedef __fc_mthread_id pthread_mutex_t;
+typedef __fc_mthread_id pthread_mutexattr_t;
 
 #define PTHREAD_MUTEX_INITIALIZER 1
 

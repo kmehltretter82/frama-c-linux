@@ -9,7 +9,7 @@ digraph G {
         label="Start: main", style="filled", ];
   v544 [URL="code.html#sid38", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF",
-        label="Call queuecreate((framac_mthread_name)(& queue),5);",
+        label="Call queuecreate((__fc_mthread_name)(& queue),5);",
         style="filled", ];
   v559 [URL="code.html#sid120", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Creating queue queue (size 5)",

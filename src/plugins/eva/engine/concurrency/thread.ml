@@ -25,7 +25,7 @@
 type kind =
   | Main
   | InterruptHandler of Kernel_function.t
-  | Thread of Concurency.Name.t option
+  | Thread of Concurrency.Name.t option
 
 module Prototype =
 struct
@@ -48,7 +48,7 @@ struct
   let pretty fmt th =
     match th.kind with
     | Thread Some name ->
-      Concurency.Name.pretty fmt name
+      Concurrency.Name.pretty fmt name
     | Thread None ->
       Format.fprintf fmt "#%i" th.id
     | Main ->
@@ -106,19 +106,19 @@ struct
   module Key =
   struct
     type t =
-      | ByName of Concurency.Name.t
+      | ByName of Concurrency.Name.t
       | BySpawnPoint of Analysis_location.Local.t
       | ByInterruptHandler of Kernel_function.t
     [@@deriving eq, ord]
 
     let reprs =
-      List.map (fun n -> ByName n) Concurency.Name.reprs @
+      List.map (fun n -> ByName n) Concurrency.Name.reprs @
       List.map (fun al -> BySpawnPoint al) Analysis_location.Local.reprs @
       List.map (fun kf -> ByInterruptHandler kf) Kernel_function.reprs
 
     let hash = function
       | ByName name ->
-        Stdlib.Hashtbl.hash(1, Concurency.Name.hash name)
+        Stdlib.Hashtbl.hash(1, Concurrency.Name.hash name)
       | BySpawnPoint al ->
         Stdlib.Hashtbl.hash(2, Analysis_location.Local.hash al)
       | ByInterruptHandler kf ->
@@ -265,7 +265,7 @@ module State = State_builder.Hashtbl (Hashtbl) (Properties)
     end)
 
 
-let spawn_single_entry_point spawn_point name entry_point arguments =
+let spawn spawn_point name entry_point arguments =
   let key = match name with
     | Some name -> Identity.Key.ByName name
     | None -> BySpawnPoint spawn_point
@@ -283,11 +283,6 @@ let spawn_single_entry_point spawn_point name entry_point arguments =
   in
   State.replace th properties;
   th
-
-let spawn spawn_point name entry_points arguments =
-  List.map
-    (fun kf -> spawn_single_entry_point spawn_point name kf arguments)
-    entry_points
 
 let is_interrupt_handler entry_point =
   let key = Identity.Key.ByInterruptHandler entry_point in

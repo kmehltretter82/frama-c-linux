@@ -25,7 +25,7 @@
 
 #include "mthread.h"
 
-framac_mthread_id __mutex_interrupts;
+__fc_mthread_id __mutex_interrupts;
 extern int __FRAMAC_MTHREAD_LOCK_LEVEL;
 void __mthread_interrupt(void (*f)(void *), void *arg);
 void __mthread_void_interrupt(void (*f)(void));

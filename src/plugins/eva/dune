@@ -165,11 +165,5 @@
  (section (site (frama-c share)))
  (files
   (share/mthread/mthread.css as mt/mthread.css)
-  (share/mthread/mthread_interrupts.h as mt/mthread_interrupts.h)
-  (share/mthread/mthread.h as mt/mthread.h)
-  (share/mthread/mthread_queue.h as mt/mthread_queue.h)
-  (share/mthread/mthread_queue.c as mt/mthread_queue.c)
-  (share/mthread/mthread_pthread.h as mt/mthread_pthread.h)
-  (share/mthread/mthread_interrupts.c as mt/mthread_interrupts.c)
-  (share/mthread/mthread_pthread.c as mt/mthread_pthread.c)
+  (glob_files (share/mthread/*.{h,c} with_prefix mt))
 ))

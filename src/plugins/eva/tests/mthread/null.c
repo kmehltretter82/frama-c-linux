@@ -23,7 +23,7 @@ int main() {
   pthread_create( &tjob0, NULL, &job0, NULL);
 
   int i = v;
-  __FRAMAC_MTHREAD_SYNC();  x = *(char *)i;
+  Frama_C_mthread_sync();  x = *(char *)i;
 
   return 0;
 }

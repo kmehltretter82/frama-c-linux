@@ -13,7 +13,7 @@ digraph G {
         style="filled", ];
   v260 [URL="code.html#sid46", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF",
-        label="int result = __FRAMAC_MUTEX_INIT((framac_mthread_name)mutex);",
+        label="int result = Frama_C_mutex_init((__fc_mthread_name)mutex);",
         style="filled", ];
   v261 [URL="code.html#sid48", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (result > 0)", style="filled", ];

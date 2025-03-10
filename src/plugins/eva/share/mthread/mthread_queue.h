@@ -27,7 +27,7 @@
 
 typedef int msgqueue_t;
 
-int queuecreate(framac_mthread_name q, int size);
+int queuecreate(__fc_mthread_name q, int size);
 int msgsnd(int msgqid, const char *mess, int size);
 int msgrcv(int msgqid, int size, char *mess);
 
