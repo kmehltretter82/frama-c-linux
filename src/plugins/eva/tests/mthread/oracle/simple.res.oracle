@@ -1,0 +1,562 @@
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[kernel] Parsing simple.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] Warning: Mthread is an experimental plugin and is still in development.
+[mt] ******* Starting mthread
+[mt] *** Computing value analysis for main thread
+[mt] New thread: <main>, fun main
+[mt] simple.c:42: Initializing mutex lock
+[mt] simple.c:44: New thread: job1, fun f1, parent <main>, args {{ &b }}
+[mt] simple.c:44: Start thread job1
+[mt] simple.c:45: New thread: job2, fun f2, parent <main>, args {{ &a }}
+[mt] simple.c:45: Start thread job2
+[mt] simple.c:47: Lock lock
+[mt] simple.c:49: Release lock
+[mt] *** First value analysis for main thread done.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: read by <main> at simple.c:48
+  b: read by <main> at simple.c:48
+  c: read by <main> at simple.c:48
+  v: read by <main> at simple.c:48
+  job1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  job2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  lock:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] ******* Starting to iterate
+[mt] ***** Iteration 1
+[mt] *** Computing thread job1, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread job1
+[mt] simple.c:20: Lock lock
+[mt] simple.c:25: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job1 at simple.c:21
+  b: write by job1 at simple.c:22
+  c: write by job1 at simple.c:23
+  e: write by job1 at simple.c:26
+  v: write by job1 at simple.c:24
+  lock:
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job1 computed
+[mt] *** Computing thread job2, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread job2
+[mt] simple.c:31: Lock lock
+[mt] simple.c:36: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job2 at simple.c:33
+  b: write by job2 at simple.c:32
+  c: write by job2 at simple.c:34
+  d: write by job2 at simple.c:37
+  v: write by job2 at simple.c:35
+  lock:
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job2 computed
+[mt] ***** Threads computed for iteration 1.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: a; b; c; v
+[mt] Concurrent imprecise accesses have changed: before
+    \nothing
+  vs.
+    a; b; c; v
+[mt] Possible read/write data races:
+  none
+[mt] Shared memory: \nothing
+[mt] Mutexes for concurrent accesses:
+[mt] Detailed shared zones protections
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 2
+[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] simple.c:42: Initializing mutex lock
+[mt] simple.c:44: Thread job1, fun f1, parent <main>, args {{ &b }}
+[mt] simple.c:44: Start thread job1
+[mt] simple.c:45: Thread job2, fun f2, parent <main>, args {{ &a }}
+[mt] simple.c:45: Start thread job2
+[mt] simple.c:47: Lock lock
+[mt] simple.c:49: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: read by <main> at simple.c:48
+  b: read by <main> at simple.c:48
+  c: read by <main> at simple.c:48
+  v: read by <main> at simple.c:48
+  job1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  job2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  lock:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b, c, v}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread job1, iteration 2
+    (potential shared vars changed, interferences changed)
+[mt] * Computing value analysis for thread job1
+[mt] simple.c:20: Lock lock
+[eva:interferences] simple.c:21: inject threads interferences at this point
+[eva:interferences] simple.c:22: inject threads interferences at this point
+[eva:interferences] simple.c:23: inject threads interferences at this point
+[mt] simple.c:25: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job1 at simple.c:21
+  b: write by job1 at simple.c:22
+  c: write by job1 at simple.c:23
+  e: write by job1 at simple.c:26
+  v: write by job1 at simple.c:24
+  lock:
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: a = 1; <- f1,
+                     *((int *)p) = 1; <- f1,
+                     c = 1; <- f1
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {1}
+                 b ∈ {0; 1}
+                 c ∈ {0; 1}
+                 v ∈ {0}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job1 computed
+[mt] *** Computing thread job2, iteration 2
+    (potential shared vars changed, interferences changed)
+[mt] * Computing value analysis for thread job2
+[mt] simple.c:31: Lock lock
+[eva:interferences] simple.c:32: inject threads interferences at this point
+[eva:interferences] simple.c:33: inject threads interferences at this point
+[eva:interferences] simple.c:34: inject threads interferences at this point
+[mt] simple.c:36: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job2 at simple.c:33
+  b: write by job2 at simple.c:32
+  c: write by job2 at simple.c:34
+  d: write by job2 at simple.c:37
+  v: write by job2 at simple.c:35
+  lock:
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: b = 2; <- f2,
+                     *((int *)p) = 2; <- f2,
+                     c = 2; <- f2
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {0; 2}
+                 b ∈ {2}
+                 c ∈ {0; 2}
+                 v ∈ {0}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job2 computed
+[mt] ***** Threads computed for iteration 2.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: a; b; c; v
+[mt] <main> reads  a ∈ {0}  // simple.c:48 main
+[mt] <main> reads  b ∈ {0}  // simple.c:48 main
+[mt] <main> reads  c ∈ {0}  // simple.c:48 main
+[mt] <main> reads  v ∈ {0}  // simple.c:48 main
+[mt] job1 writes  a ∈ {1}  // simple.c:21 f1
+[mt] job2 writes  a ∈ {2}  // simple.c:33 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:22 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:32 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:23 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:34 f2
+[mt] job1 writes  v ∈ {1}  // simple.c:24 g1 :: simple.c:24 <- f1
+[mt] job2 writes  v ∈ {2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] Possible read/write data races:
+  v:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:24, protected by lock
+    write by job2 at simple.c:35, protected by lock
+  c:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:23, protected by lock
+    write by job2 at simple.c:34, protected by lock
+  b:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:22, protected by lock
+    write by job2 at simple.c:32, protected by lock
+  a:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:21, protected by lock
+    write by job2 at simple.c:33, protected by lock
+[mt] Shared memory: a; b; c; v
+[mt] Concurrent precise var accesses have changed: before
+    \nothing
+  vs.
+    a; b; c; v
+[mt] Write summary for job1 (updated): a ∈ {1}
+                                    b ∈ {1}
+                                    c ∈ {1}
+                                    v ∈ {1}
+[mt] Write summary for job2 (updated): a ∈ {2}
+                                    b ∈ {2}
+                                    c ∈ {2}
+                                    v ∈ {2}
+[mt] Mutexes for concurrent accesses:
+  a  protected by lock
+  b  protected by lock
+  c  protected by lock
+  v  protected by lock
+[mt] Detailed shared zones protections
+  v:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  c:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  b:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  a:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 3
+[mt] *** Computing thread <main>, iteration 3
+    (shared vars values changed, interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] simple.c:42: Initializing mutex lock
+[mt] simple.c:44: Thread job1, fun f1, parent <main>, args {{ &b }}
+[mt] simple.c:44: Start thread job1
+[mt] simple.c:45: Thread job2, fun f2, parent <main>, args {{ &a }}
+[mt] simple.c:45: Start thread job2
+[mt] simple.c:45: New context for job2, fun f2, parent <main>, args {{ &a }}
+[mt] simple.c:47: Lock lock
+[eva:interferences] simple.c:48: inject threads interferences at this point
+[mt] simple.c:49: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: read by <main> at simple.c:48
+  b: read by <main> at simple.c:48
+  c: read by <main> at simple.c:48
+  v: read by <main> at simple.c:48
+  job1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  job2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  lock:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b, c, v}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread job1, iteration 3 (interferences changed)
+[mt] * Computing value analysis for thread job1
+[mt] simple.c:20: Lock lock
+[eva:interferences] simple.c:21: inject threads interferences at this point
+[eva:interferences] simple.c:22: inject threads interferences at this point
+[eva:interferences] simple.c:23: inject threads interferences at this point
+[mt] simple.c:25: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job1 at simple.c:21
+  b: write by job1 at simple.c:22
+  c: write by job1 at simple.c:23
+  e: write by job1 at simple.c:26
+  v: write by job1 at simple.c:24
+  lock:
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: a = 1; <- f1,
+                     *((int *)p) = 1; <- f1,
+                     c = 1; <- f1
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {1}
+                 b ∈ {0; 1; 2}
+                 c ∈ {0; 1; 2}
+                 v ∈ {0; 2}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job1 computed
+[mt] *** Computing thread job2, iteration 3
+    (thread initial memory state changed, interferences changed)
+[mt] * Computing value analysis for thread job2
+[mt] simple.c:31: Lock lock
+[eva:interferences] simple.c:32: inject threads interferences at this point
+[eva:interferences] simple.c:33: inject threads interferences at this point
+[eva:interferences] simple.c:34: inject threads interferences at this point
+[mt] simple.c:36: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job2 at simple.c:33
+  b: write by job2 at simple.c:32
+  c: write by job2 at simple.c:34
+  d: write by job2 at simple.c:37
+  v: write by job2 at simple.c:35
+  lock:
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: b = 2; <- f2,
+                     *((int *)p) = 2; <- f2,
+                     c = 2; <- f2
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {0; 1; 2}
+                 b ∈ {2}
+                 c ∈ {0; 1; 2}
+                 v ∈ {0; 1; 2}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job2 computed
+[mt] ***** Threads computed for iteration 3.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: a; b; c; v
+[mt] <main> reads  a ∈ {0; 1; 2}  // simple.c:48 main
+[mt] <main> reads  b ∈ {0; 1; 2}  // simple.c:48 main
+[mt] <main> reads  c ∈ {0; 1; 2}  // simple.c:48 main
+[mt] <main> reads  v ∈ {0; 1; 2}  // simple.c:48 main
+[mt] job1 writes  a ∈ {1}  // simple.c:21 f1
+[mt] job2 writes  a ∈ {2}  // simple.c:33 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:22 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:32 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:23 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:34 f2
+[mt] job1 writes  v ∈ {1}  // simple.c:24 g1 :: simple.c:24 <- f1
+[mt] job2 writes  v ∈ {2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] Possible read/write data races:
+  v:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:24, protected by lock
+    write by job2 at simple.c:35, protected by lock
+  c:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:23, protected by lock
+    write by job2 at simple.c:34, protected by lock
+  b:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:22, protected by lock
+    write by job2 at simple.c:32, protected by lock
+  a:
+    read by <main> at simple.c:48, protected by lock
+    write by job1 at simple.c:21, protected by lock
+    write by job2 at simple.c:33, protected by lock
+[mt] Shared memory: a; b; c; v
+[mt] Write summary for job1: a ∈ {1}
+                          b ∈ {1}
+                          c ∈ {1}
+                          v ∈ {1}
+[mt] Write summary for job2: a ∈ {2}
+                          b ∈ {2}
+                          c ∈ {2}
+                          v ∈ {2}
+[mt] Mutexes for concurrent accesses:
+  a  protected by lock
+  b  protected by lock
+  c  protected by lock
+  v  protected by lock
+[mt] Detailed shared zones protections
+  v:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  c:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  b:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  a:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 4
+[mt] *** Computing thread <main>, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] simple.c:42: Initializing mutex lock
+[mt] simple.c:44: Thread job1, fun f1, parent <main>, args {{ &b }}
+[mt] simple.c:44: Start thread job1
+[mt] simple.c:45: Thread job2, fun f2, parent <main>, args {{ &a }}
+[mt] simple.c:45: Start thread job2
+[mt] simple.c:47: Lock lock
+[eva:interferences] simple.c:48: inject threads interferences at this point
+[mt] simple.c:49: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: read by <main> at simple.c:48
+  b: read by <main> at simple.c:48
+  c: read by <main> at simple.c:48
+  v: read by <main> at simple.c:48
+  job1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  job2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  lock:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {a, b, c, v}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread job1, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread job1
+[mt] simple.c:20: Lock lock
+[eva:interferences] simple.c:21: inject threads interferences at this point
+[eva:interferences] simple.c:22: inject threads interferences at this point
+[eva:interferences] simple.c:23: inject threads interferences at this point
+[mt] simple.c:25: Release lock
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  a: write by job1 at simple.c:21
+  b: write by job1 at simple.c:22
+  c: write by job1 at simple.c:23
+  e: write by job1 at simple.c:26
+  v: write by job1 at simple.c:24
+  lock:
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by job1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: a = 1; <- f1,
+                     *((int *)p) = 1; <- f1,
+                     c = 1; <- f1
+  shared bases: {a, b, c, v}
+  interferences: { lock } -> # cvalue:
+                 a ∈ {1}
+                 b ∈ {0; 1; 2}
+                 c ∈ {0; 1; 2}
+                 v ∈ {0; 2}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job1 computed
+[mt] ***** Threads computed for iteration 4.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: a; b; c; v
+[mt] <main> reads  a ∈ {0; 1; 2}  // simple.c:48 main
+[mt] <main> reads  b ∈ {0; 1; 2}  // simple.c:48 main
+[mt] <main> reads  c ∈ {0; 1; 2}  // simple.c:48 main
+[mt] <main> reads  v ∈ {0; 1; 2}  // simple.c:48 main
+[mt] job2 writes  a ∈ {2}  // simple.c:33 f2
+[mt] job1 writes  a ∈ {1}  // simple.c:21 f1
+[mt] job2 writes  b ∈ {2}  // simple.c:32 f2
+[mt] job1 writes  b ∈ {1}  // simple.c:22 f1
+[mt] job2 writes  c ∈ {2}  // simple.c:34 f2
+[mt] job1 writes  c ∈ {1}  // simple.c:23 f1
+[mt] job2 writes  v ∈ {2}  // simple.c:35 g2 :: simple.c:35 <- f2
+[mt] job1 writes  v ∈ {1}  // simple.c:24 g1 :: simple.c:24 <- f1
+[mt] Possible read/write data races:
+  v:
+    read by <main> at simple.c:48, protected by lock
+    write by job2 at simple.c:35, protected by lock
+    write by job1 at simple.c:24, protected by lock
+  c:
+    read by <main> at simple.c:48, protected by lock
+    write by job2 at simple.c:34, protected by lock
+    write by job1 at simple.c:23, protected by lock
+  b:
+    read by <main> at simple.c:48, protected by lock
+    write by job2 at simple.c:32, protected by lock
+    write by job1 at simple.c:22, protected by lock
+  a:
+    read by <main> at simple.c:48, protected by lock
+    write by job2 at simple.c:33, protected by lock
+    write by job1 at simple.c:21, protected by lock
+[mt] Shared memory: a; b; c; v
+[mt] Write summary for job1: a ∈ {1}
+                          b ∈ {1}
+                          c ∈ {1}
+                          v ∈ {1}
+[mt] Write summary for job2: a ∈ {2}
+                          b ∈ {2}
+                          c ∈ {2}
+                          v ∈ {2}
+[mt] Mutexes for concurrent accesses:
+  a  protected by lock
+  b  protected by lock
+  c  protected by lock
+  v  protected by lock
+[mt] Detailed shared zones protections
+  v:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  c:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  b:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+  a:
+    Read by <main>, Write by job2: protected by lock
+    Read by <main>, Write by job1: protected by lock
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 4 iterations
+[mt] ******* Outputting model for html
+[mt] ******* Html output done.

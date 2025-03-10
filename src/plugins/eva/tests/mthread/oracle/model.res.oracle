@@ -1,0 +1,50 @@
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[kernel] Parsing model.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] Warning: Mthread is an experimental plugin and is still in development.
+[mt] ******* Starting mthread
+[mt] *** Computing value analysis for main thread
+[mt] New thread: <main>, fun main
+[mt] model.c:20: New thread: job1, fun f1, parent <main>, args {0}
+[mt] model.c:20: Start thread job1
+[mt] *** First value analysis for main thread done.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] ******* Starting to iterate
+[mt] ***** Iteration 1
+[mt] *** Computing thread job1, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread job1
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread job1 computed
+[mt] ***** Threads computed for iteration 1.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: \nothing
+[mt] Possible read/write data races:
+  none
+[mt] Shared memory: \nothing
+[mt] Mutexes for concurrent accesses:
+[mt] Detailed shared zones protections
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 1 iterations

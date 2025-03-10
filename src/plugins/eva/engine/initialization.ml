@@ -371,11 +371,11 @@ module Make
     InitialState.memo (compute_global_state ~lib_entry)
 
   (* The global cvalue state may be supplied by the user. *)
-  let supplied_state cvalue_state =
+  let supplied_state state cvalue_state =
     if Cvalue.Model.is_reachable cvalue_state
     then
       let cvalue_state = cvalue_state, Locals_scoping.bottom () in
-      `Value (Domain.set Cvalue_domain.State.key cvalue_state Domain.top)
+      `Value (Domain.set Cvalue_domain.State.key cvalue_state state)
     else `Bottom
 
   let print_initial_cvalue_state state =
@@ -400,9 +400,10 @@ module Make
   let initial_state_with_formals ~lib_entry kf =
     let init_state =
       match Eva_results.get_initial_state () with
-      | Some state ->
+      | Some cvalue_state ->
         Self.feedback "Initial state supplied by user";
-        supplied_state state
+        let* state = global_state ~lib_entry in
+        supplied_state state cvalue_state
       | None ->
         let pp = Parameters.ValShowProgress.get () in
         if pp then Self.feedback "Computing initial state";

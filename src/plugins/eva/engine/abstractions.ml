@@ -117,14 +117,14 @@ module Context = struct
       | Node (s1, s2) -> fun (v1, v2) ext -> set s2 v2 ext |> set s1 v1
       | Option (s, default) -> fun v -> set s (Option.value ~default v)
       | Unit -> fun () value -> value
-      | Void -> void_context ()
+      | Void _ -> void_context ()
 
     let rec get : type v. v structure -> extended -> v = function
       | Leaf (key, _) -> Option.get (To.get key)
       | Node (s1, s2) -> fun v -> get s1 v, get s2 v
       | Option (s, _) -> fun v -> Some (get s v)
       | Unit -> fun _ -> ()
-      | Void -> void_context ()
+      | Void _ -> void_context ()
 
     let replace = set structure
     let extend v = replace v To.top
@@ -277,14 +277,14 @@ module Value = struct
       | Node (s1, s2) -> fun (v1, v2) ext -> set s2 v2 ext |> set s1 v1
       | Option (s, default) -> fun v -> set s (Option.value ~default v)
       | Unit -> fun () value -> value
-      | Void -> void_value ()
+      | Void _ -> void_value ()
 
     let rec get : type v. v structure -> extended -> v = function
       | Leaf (key, _) -> Option.get (To.get key)
       | Node (s1, s2) -> fun v -> get s1 v, get s2 v
       | Option (s, _) -> fun v -> Some (get s v)
       | Unit -> fun _ -> ()
-      | Void -> void_value ()
+      | Void _ -> void_value ()
 
     let replace = set structure
     let extend v = replace v To.top
@@ -448,14 +448,14 @@ module Location = struct
       | Node (s1, s2) -> fun (l1, l2) ext -> set s2 l2 ext |> set s1 l1
       | Option (s, default) -> fun l -> set s (Option.value ~default l)
       | Unit -> fun () loc -> loc
-      | Void -> void_location ()
+      | Void _ -> void_location ()
 
     let rec get : type l. l structure -> extended -> l = function
       | Leaf (key, _) -> Option.get (To.get key)
       | Node (s1, s2) -> fun l -> get s1 l, get s2 l
       | Option (s, _) -> fun l -> Some (get s l)
       | Unit -> fun _ -> ()
-      | Void -> void_location ()
+      | Void _ -> void_location ()
 
     let replace = set structure
     let extend l = replace l To.top

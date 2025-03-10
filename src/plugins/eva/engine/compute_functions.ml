@@ -367,9 +367,9 @@ module Make (Engine: Engine_sig.S) = struct
 
   (* ----- Main call -------------------------------------------------------- *)
 
-  let compute kf init_state =
-    let restore_signals = register_signal_handler () in
-    let compute () =
+  let compute_main_call kf init_state =
+
+    let compute_call_and_join init_state =
       let callstack = Eva_utils.init_call_stack kf in
       Engine.Dom.Store.register_initial_state callstack kf init_state;
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
@@ -377,6 +377,49 @@ module Make (Engine: Engine_sig.S) = struct
       let final_states = List.map snd (final_result.states) in
       let final_state = PowersetDomain.(final_states |> of_list |> join) in
       Eva_utils.clear_call_stack ();
+      final_state
+    in
+
+    if Thread.is_interrupt_handler kf then
+      (* If the function is an interrupt handler, then it can be called several
+         times. As a result we need to find a fixpoint. *)
+      let widening_delay = Parameters.WideningDelay.get () in
+      let widening_period = Parameters.WideningPeriod.get () in
+
+      let widen_state counter previous current =
+        let current = Engine.Dom.join previous current in
+        let counter, next =
+          if counter > 0 then
+            (* No widening *)
+            counter, current
+          else
+            let widened = Engine.Dom.widen kf Cil.dummyStmt previous current in
+            widening_period, widened
+        in
+        counter - 1, next
+      in
+
+      let rec aux i widening_counter previous =
+        let open Eval.Bottom.Operators in
+        let* current = compute_call_and_join previous in
+        if Engine.Dom.is_included current previous then
+          `Value previous
+        else
+          let widening_counter, next =
+            widen_state widening_counter previous current
+          in
+          aux (i + 1) widening_counter next
+      in
+
+      aux 1 (widening_delay - 1) init_state
+    else
+      (* Otherwise just compute the call normally. *)
+      compute_call_and_join init_state
+
+  let compute kf init_state =
+    let restore_signals = register_signal_handler () in
+    let compute () =
+      let final_state = compute_main_call kf init_state in
       Engine.Dom.Store.mark_as_computed ();
       Self.(ComputationState.set Computed);
       post_analysis ();

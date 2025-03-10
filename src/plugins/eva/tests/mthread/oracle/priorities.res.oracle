@@ -1,0 +1,627 @@
+[kernel] Parsing FRAMAC_SHARE/mt/mthread.h (with preprocessing)
+[kernel] Parsing priorities.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_pthread.c (with preprocessing)
+[kernel] Parsing FRAMAC_SHARE/mthread_queue.c (with preprocessing)
+[mt] Warning: Mthread is an experimental plugin and is still in development.
+[mt] ******* Starting mthread
+[mt] *** Computing value analysis for main thread
+[mt] New thread: <main>, fun main
+[mt] priorities.c:51: Initializing mutex m1
+[mt] priorities.c:52: Initializing mutex m2
+[mt] priorities.c:54: New thread: jobs1, fun f1, parent <main>, args {0}
+[mt] priorities.c:54: Start thread jobs1
+[mt] priorities.c:55: New thread: jobs2, fun f2, parent <main>, args {0}
+[mt] priorities.c:55: Start thread jobs2
+[mt] priorities.c:56: New thread: jobs3, fun f3, parent <main>, args {0}
+[mt] priorities.c:56: Start thread jobs3
+[mt] priorities.c:57: New thread: jobs4, fun f4, parent <main>, args {0}
+[mt] priorities.c:57: Start thread jobs4
+[mt] Setting priority to 1
+[mt] priorities.c:61: Lock m1
+[mt] priorities.c:62: Lock m2
+[mt] priorities.c:65: Release m1
+[mt] priorities.c:66: Release m2
+[mt] *** First value analysis for main thread done.
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  m1:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+  m2:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] ******* Starting to iterate
+[mt] ***** Iteration 1
+[mt] *** Computing thread jobs1, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs1
+[mt] Setting priority to 0
+[mt] priorities.c:21: Lock m1
+[mt] priorities.c:23: Release m1
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: read by jobs1 at priorities.c:22
+  m1:
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs1 computed
+[mt] *** Computing thread jobs2, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs2
+[mt] Setting priority to 0
+[mt] priorities.c:29: Lock m2
+[mt] priorities.c:30: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  m2:
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs2 computed
+[mt] *** Computing thread jobs3, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs3
+[mt] Setting priority to 0
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs3 at priorities.c:36
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs3 computed
+[mt] *** Computing thread jobs4, iteration 1 (first iteration)
+[mt] * Computing value analysis for thread jobs4
+[mt] Setting priority to 0
+[mt] priorities.c:43: Lock m2
+[mt] priorities.c:45: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs4 at priorities.c:44
+  m2:
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs4 computed
+[mt] ***** Threads computed for iteration 1.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: s1; s2
+[mt] Concurrent imprecise accesses have changed: before
+    \nothing
+  vs.
+    s1; s2
+[mt] Possible read/write data races:
+  none
+[mt] Shared memory: \nothing
+[mt] Mutexes for concurrent accesses:
+[mt] Detailed shared zones protections
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 2
+[mt] *** Computing thread <main>, iteration 2 (potential shared vars changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] priorities.c:51: Initializing mutex m1
+[mt] priorities.c:52: Initializing mutex m2
+[mt] priorities.c:54: Thread jobs1, fun f1, parent <main>, args {0}
+[mt] priorities.c:54: Start thread jobs1
+[mt] priorities.c:55: Thread jobs2, fun f2, parent <main>, args {0}
+[mt] priorities.c:55: Start thread jobs2
+[mt] priorities.c:56: Thread jobs3, fun f3, parent <main>, args {0}
+[mt] priorities.c:56: Start thread jobs3
+[mt] priorities.c:57: Thread jobs4, fun f4, parent <main>, args {0}
+[mt] priorities.c:57: Start thread jobs4
+[mt] priorities.c:61: Lock m1
+[mt] priorities.c:62: Lock m2
+[mt] priorities.c:65: Release m1
+[mt] priorities.c:66: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  m1:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+  m2:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s1 = 1; <- main
+  shared bases: {s1, s2}
+  interferences: { m1; m2 } -> # cvalue: s1 ∈ {1}
+                                         s2 ∈ {0}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread jobs1, iteration 2
+    (potential shared vars changed, interferences changed)
+[mt] * Computing value analysis for thread jobs1
+[mt] priorities.c:21: Lock m1
+[eva:interferences] priorities.c:22: inject threads interferences at this point
+[mt] priorities.c:23: Release m1
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: read by jobs1 at priorities.c:22
+  m1:
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {s1, s2}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs1 computed
+[mt] *** Computing thread jobs2, iteration 2
+    (potential shared vars changed, interferences changed)
+[mt] * Computing value analysis for thread jobs2
+[mt] priorities.c:29: Lock m2
+[mt] priorities.c:30: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  m2:
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {s1, s2}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs2 computed
+[mt] *** Computing thread jobs3, iteration 2
+    (potential shared vars changed, interferences changed)
+[mt] * Computing value analysis for thread jobs3
+[eva:interferences] priorities.c:36: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs3 at priorities.c:36
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s2 = 3; <- f3
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs3 computed
+[mt] *** Computing thread jobs4, iteration 2
+    (potential shared vars changed, interferences changed)
+[mt] * Computing value analysis for thread jobs4
+[mt] priorities.c:43: Lock m2
+[eva:interferences] priorities.c:44: inject threads interferences at this point
+[mt] priorities.c:45: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs4 at priorities.c:44
+  m2:
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s2 = 3; <- f4
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs4 computed
+[mt] ***** Threads computed for iteration 2.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: s1; s2
+[mt] jobs1 reads  s1 ∈ {0}  // priorities.c:22 f1
+[mt] <main> reads  s2 ∈ {0}  // priorities.c:64 main
+[mt] <main> writes  s1 ∈ {1}  // priorities.c:63 main
+[mt] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:36 f3
+[mt] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:44 f4
+[mt] Possible read/write data races:
+  s2:
+    read by <main> at priorities.c:64, protected by m1 m2
+    write by jobs3 at priorities.c:36, unprotected
+    write by jobs4 at priorities.c:44, protected by m2
+  s1:
+    read by jobs1 at priorities.c:22, protected by m1
+    write by <main> at priorities.c:63, protected by m1 m2
+[mt] Shared memory: s1; s2
+[mt] Concurrent precise var accesses have changed: before
+    \nothing
+  vs.
+    s1; s2
+[mt] Write summary for <main> (updated): s1 ∈ {1}
+[mt] Write summary for jobs3 (updated): s2 ∈ {0; 3}
+[mt] Write summary for jobs4 (updated): s2 ∈ {0; 3}
+[mt] Mutexes for concurrent accesses:
+  s1  write protected by m1 m2, read protected by m1
+  s2  write protected by (?)m2, read protected by m1 m2
+[mt] Detailed shared zones protections
+  s2:
+    Read by <main>, Write by jobs4: protected by priorities
+    Read by <main>, Write by jobs3: protected by priorities
+  s1: Read by jobs1, Write by <main>: protected by m1
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 3
+[mt] *** Computing thread <main>, iteration 3
+    (shared vars values changed, interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] priorities.c:51: Initializing mutex m1
+[mt] priorities.c:52: Initializing mutex m2
+[mt] priorities.c:54: Thread jobs1, fun f1, parent <main>, args {0}
+[mt] priorities.c:54: Start thread jobs1
+[mt] priorities.c:55: Thread jobs2, fun f2, parent <main>, args {0}
+[mt] priorities.c:55: Start thread jobs2
+[mt] priorities.c:55: New context for jobs2, fun f2, parent <main>, args {0}
+[mt] priorities.c:56: Thread jobs3, fun f3, parent <main>, args {0}
+[mt] priorities.c:56: Start thread jobs3
+[mt] priorities.c:56: New context for jobs3, fun f3, parent <main>, args {0}
+[mt] priorities.c:57: Thread jobs4, fun f4, parent <main>, args {0}
+[mt] priorities.c:57: Start thread jobs4
+[mt] priorities.c:57: New context for jobs4, fun f4, parent <main>, args {0}
+[mt] priorities.c:61: Lock m1
+[mt] priorities.c:62: Lock m2
+[eva:interferences] priorities.c:63: inject threads interferences at this point
+[eva:interferences] priorities.c:64: inject threads interferences at this point
+[mt] priorities.c:65: Release m1
+[mt] priorities.c:66: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  m1:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+  m2:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s1 = 1; <- main,
+                     int j = s2; <- main
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread jobs1, iteration 3
+    (shared vars values changed, interferences changed)
+[mt] * Computing value analysis for thread jobs1
+[mt] priorities.c:21: Lock m1
+[eva:interferences] priorities.c:22: inject threads interferences at this point
+[mt] priorities.c:23: Release m1
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: read by jobs1 at priorities.c:22
+  m1:
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int i = s1; <- f1
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs1 computed
+[mt] *** Computing thread jobs2, iteration 3
+    (thread initial memory state changed, interferences changed)
+[mt] * Computing value analysis for thread jobs2
+[mt] priorities.c:29: Lock m2
+[mt] priorities.c:30: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  m2:
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {s1, s2}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs2 computed
+[mt] *** Computing thread jobs3, iteration 3
+    (thread initial memory state changed, interferences changed)
+[mt] * Computing value analysis for thread jobs3
+[eva:interferences] priorities.c:36: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs3 at priorities.c:36
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s2 = 3; <- f3
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs3 computed
+[mt] *** Computing thread jobs4, iteration 3
+    (thread initial memory state changed, interferences changed)
+[mt] * Computing value analysis for thread jobs4
+[mt] priorities.c:43: Lock m2
+[eva:interferences] priorities.c:44: inject threads interferences at this point
+[mt] priorities.c:45: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs4 at priorities.c:44
+  m2:
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s2 = 3; <- f4
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs4 computed
+[mt] ***** Threads computed for iteration 3.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: s1; s2
+[mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:22 f1
+[mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:64 main
+[mt] <main> writes  s1 ∈ {0; 1}  // priorities.c:63 main
+[mt] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:36 f3
+[mt] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:44 f4
+[mt] Possible read/write data races:
+  s2:
+    read by <main> at priorities.c:64, protected by m1 m2
+    write by jobs3 at priorities.c:36, unprotected
+    write by jobs4 at priorities.c:44, protected by m2
+  s1:
+    read by jobs1 at priorities.c:22, protected by m1
+    write by <main> at priorities.c:63, protected by m1 m2
+[mt] Shared memory: s1; s2
+[mt] Write summary for <main> (updated): s1 ∈ {0; 1}
+[mt] Write summary for jobs3: s2 ∈ {0; 3}
+[mt] Write summary for jobs4: s2 ∈ {0; 3}
+[mt] Mutexes for concurrent accesses:
+  s1  write protected by m1 m2, read protected by m1
+  s2  write protected by (?)m2, read protected by m1 m2
+[mt] Detailed shared zones protections
+  s2:
+    Read by <main>, Write by jobs4: protected by priorities
+    Read by <main>, Write by jobs3: protected by priorities
+  s1: Read by jobs1, Write by <main>: protected by m1
+[mt] ***** Shared variables computed
+[mt] ***** Iteration 4
+[mt] *** Computing thread <main>, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread <main>
+[mt] Thread <main>, fun main
+[mt] priorities.c:51: Initializing mutex m1
+[mt] priorities.c:52: Initializing mutex m2
+[mt] priorities.c:54: Thread jobs1, fun f1, parent <main>, args {0}
+[mt] priorities.c:54: Start thread jobs1
+[mt] priorities.c:55: Thread jobs2, fun f2, parent <main>, args {0}
+[mt] priorities.c:55: Start thread jobs2
+[mt] priorities.c:56: Thread jobs3, fun f3, parent <main>, args {0}
+[mt] priorities.c:56: Start thread jobs3
+[mt] priorities.c:57: Thread jobs4, fun f4, parent <main>, args {0}
+[mt] priorities.c:57: Start thread jobs4
+[mt] priorities.c:61: Lock m1
+[mt] priorities.c:62: Lock m2
+[eva:interferences] priorities.c:63: inject threads interferences at this point
+[eva:interferences] priorities.c:64: inject threads interferences at this point
+[mt] priorities.c:65: Release m1
+[mt] priorities.c:66: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: write by <main> at priorities.c:63
+  s2: read by <main> at priorities.c:64
+  jobs1: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs2: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs3: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  jobs4: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
+  m1:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+  m2:
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:56
+    read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s1 = 1; <- main,
+                     int j = s2; <- main
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread <main> computed
+[mt] *** Computing thread jobs1, iteration 4
+    (shared vars values changed, interferences changed)
+[mt] * Computing value analysis for thread jobs1
+[mt] priorities.c:21: Lock m1
+[eva:interferences] priorities.c:22: inject threads interferences at this point
+[mt] priorities.c:23: Release m1
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s1: read by jobs1 at priorities.c:22
+  m1:
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: int i = s1; <- f1
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs1 computed
+[mt] *** Computing thread jobs2, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs2
+[mt] priorities.c:29: Lock m2
+[mt] priorities.c:30: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  m2:
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: 
+  shared bases: {s1, s2}
+  interferences:
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs2 computed
+[mt] *** Computing thread jobs3, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs3
+[eva:interferences] priorities.c:36: inject threads interferences at this point
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs3 at priorities.c:36
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s2 = 3; <- f3
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs3 computed
+[mt] *** Computing thread jobs4, iteration 4 (interferences changed)
+[mt] * Computing value analysis for thread jobs4
+[mt] priorities.c:43: Lock m2
+[eva:interferences] priorities.c:44: inject threads interferences at this point
+[mt] priorities.c:45: Release m2
+[mt] * Starting to save the state of the value analysis
+[mt] * state saved
+[mt] * Computing shared variables
+[mt] Globals accessed by thread:
+  s2: write by jobs4 at priorities.c:44
+  m2:
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:56
+    read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
+[mt] * shared variables computed
+[eva:interferences] 
+  concurrent writes: s2 = 3; <- f4
+  shared bases: {s1, s2}
+  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
+                                   s2 ∈ {0; 3}
+[mt] * Computing cfg
+[mt] * Cfg computed
+[mt] *** Thread jobs4 computed
+[mt] ***** Threads computed for iteration 4.
+[mt] * Computing live threads and locked mutexes
+[mt] * threads and mutexes computed
+[mt] ***** Computing shared variables
+[mt] Imprecise locations to watch: s1; s2
+[mt] jobs1 reads  s1 ∈ {0; 1}  // priorities.c:22 f1
+[mt] <main> reads  s2 ∈ {0; 3}  // priorities.c:64 main
+[mt] <main> writes  s1 ∈ {0; 1}  // priorities.c:63 main
+[mt] jobs3 writes  s2 ∈ {0; 3}  // priorities.c:36 f3
+[mt] jobs4 writes  s2 ∈ {0; 3}  // priorities.c:44 f4
+[mt] Possible read/write data races:
+  s2:
+    read by <main> at priorities.c:64, protected by m1 m2
+    write by jobs3 at priorities.c:36, unprotected
+    write by jobs4 at priorities.c:44, protected by m2
+  s1:
+    read by jobs1 at priorities.c:22, protected by m1
+    write by <main> at priorities.c:63, protected by m1 m2
+[mt] Shared memory: s1; s2
+[mt] Write summary for <main>: s1 ∈ {0; 1}
+[mt] Write summary for jobs3: s2 ∈ {0; 3}
+[mt] Write summary for jobs4: s2 ∈ {0; 3}
+[mt] Mutexes for concurrent accesses:
+  s1  write protected by m1 m2, read protected by m1
+  s2  write protected by (?)m2, read protected by m1 m2
+[mt] Detailed shared zones protections
+  s2:
+    Read by <main>, Write by jobs4: protected by priorities
+    Read by <main>, Write by jobs3: protected by priorities
+  s1: Read by jobs1, Write by <main>: protected by m1
+[mt] ***** Shared variables computed
+[mt] ******* Analysis performed, 4 iterations

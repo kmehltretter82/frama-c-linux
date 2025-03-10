@@ -461,6 +461,7 @@ type offset_match =
   | MatchType of typ
   | MatchSize of Integer.t
   | MatchFirst
+  | MatchLast
 
 (* Comparison of the shape of two types.  Attributes are completely ignored. *)
 let rec type_compatible t1 t2 =
@@ -497,12 +498,16 @@ let offset_matches om typ =
   | MatchFirst -> true
   | MatchSize size -> Integer.equal size (Integer.of_int (Cil.bitsSizeOf typ))
   | MatchType typ' -> type_compatible typ typ'
+  | MatchLast ->
+    match Ast_types.unroll_node typ with
+    | TArray _ | TComp _ -> false
+    | _ -> true
 
 (* Can we match [om] inside a cell of an array whose elements have size
    [size_elt] *)
 let offset_match_cell om size_elt =
   match om with
-  | MatchFirst -> true
+  | MatchFirst | MatchLast -> true
   | MatchSize size -> Integer.le size size_elt
   | MatchType typ' -> Integer.le (Integer.of_int (Cil.bitsSizeOf typ')) size_elt
 
@@ -543,7 +548,7 @@ let rec find_offset typ ~offset om =
           Index (exp_start, off), typ
         else begin
           match om with
-          | MatchFirst | MatchType _ -> raise NoMatchingOffset
+          | MatchFirst | MatchLast | MatchType _ -> raise NoMatchingOffset
           | MatchSize size ->
             if Integer.is_zero rem
             && Integer.is_zero (Integer.e_rem size size_elt)

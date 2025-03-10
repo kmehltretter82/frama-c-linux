@@ -44,6 +44,7 @@ let
     eva-multidim-tests = oself.callPackage ./eva-tests.nix { config = "multidim" ; };
     eva-octagon-tests = oself.callPackage ./eva-tests.nix { config = "octagon" ; };
     eva-symblocs-tests = oself.callPackage ./eva-tests.nix { config = "symblocs" ; };
+    mthread-tests = oself.callPackage ./mthread-tests.nix {};
     full-tests = oself.callPackage ./full-tests.nix {};
     kernel-tests = oself.callPackage ./kernel-tests.nix {};
     plugins-tests = oself.callPackage ./plugins-tests.nix {};
