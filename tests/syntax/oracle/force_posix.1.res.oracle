@@ -9,4 +9,11 @@ long f(void)
   return __retres;
 }
 
+long g(void)
+{
+  long __retres;
+  __retres = (long)0;
+  return __retres;
+}
+
 
