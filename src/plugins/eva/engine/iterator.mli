@@ -35,26 +35,26 @@ val condition_truth_value: stmt -> bool * bool
 
 module Computer
     (* Abstractions with the evaluator. *)
-    (Abstract: Abstractions.S_with_evaluation)
+    (Engine: Engine_sig.S)
     (* Set of states of abstract domain. *)
-    (States : Powerset.S with type state = Abstract.Dom.t)
-    (* Transfer functions for statement on the abstract domain. *)
-    (_ : Transfer_stmt.S with type state = Abstract.Dom.t
-                          and type value = Abstract.Val.t)
+    (States : Powerset.S with type state = Engine.Dom.t)
+    (* Transfer functions for statement on the Engine domain. *)
+    (_ : Transfer_stmt.S with type state = Engine.Dom.t
+                          and type value = Engine.Val.t)
     (* Initialization of local variables. *)
-    (_: Initialization.S with type state := Abstract.Dom.t)
-    (* Transfer functions for the logic on the abstract domain. *)
-    (_ : Transfer_logic.S with type state = Abstract.Dom.t
+    (_: Initialization.S with type state := Engine.Dom.t)
+    (* Transfer functions for the logic on the Engine domain. *)
+    (_ : Transfer_logic.S with type state = Engine.Dom.t
                            and type states = States.t)
     (_: sig
-       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+       val treat_statement_assigns: assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
   : sig
 
     val compute:
       save_results:bool ->
-      kernel_function -> kinstr -> Abstract.Dom.t ->
-      (Partition.key * Abstract.Dom.t) list * Eval.cacheable
+      kernel_function -> kinstr -> Engine.Dom.t ->
+      (Partition.key * Engine.Dom.t) list * Eval.cacheable
 
   end
 
