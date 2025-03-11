@@ -24,15 +24,6 @@ type thread_id = int
 
 module Make (Dom : Abstract.Domain.External) :
 sig
-  type t
-
-  (** Current interferences, set by Mthread *)
-  val current : t ref
-
-  (** Create a new interferences abstract representation, fitted for the given
-      domain*)
-  val initial : unit -> t
-
   type add_result =
     | Updated
     | NoChanges
@@ -41,8 +32,7 @@ sig
       representation. *)
   val add_last_analysis :
     get_state:(Analysis_location.local -> Dom.t Lattice_bounds.or_top_bottom) ->
-    t -> Thread.t -> Analysis_location.Local.Set.t -> Base.Hptset.t ->
-    add_result
+    Thread.t -> Analysis_location.Local.Set.t -> Base.Hptset.t -> add_result
 
   (** Inject current interferences to an abstract state. If activated,
       the Mthread domain helps filtering applicable interferences. This function

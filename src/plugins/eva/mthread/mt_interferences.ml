@@ -80,10 +80,8 @@ let add_last_analysis analysis_state =
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
-  let res = Analyzer.Interferences.(
-      add_last_analysis ~get_state !current thread writes bases)
-  in
-  match res with
+  let add_last_analysis = Analyzer.Interferences.add_last_analysis ~get_state in
+  match add_last_analysis thread writes bases with
   | Updated ->
     Mt_thread.iter_threads analysis_state
       (fun th -> Mt_thread.ThreadState.recompute_because th InterferencesChanged)

@@ -60,19 +60,13 @@ struct
     let pp_aux fmt (dom_state, _) = pp_dom fmt dom_state in
     Format.fprintf fmt "%a" (Top.pretty pp_aux) state
 
-  let initial () = {
+  let current = {
     states = ThreadTable.create 13;
     shared_bases = Base.Hptset.empty;
   }
 
-  let current =
-    ref {
-      states = ThreadTable.create 13;
-      shared_bases = Base.Hptset.empty;
-    }
-
-  let is_empty { states } =
-    ThreadTable.length states = 0
+  let is_empty () =
+    ThreadTable.length current.states = 0
 
 
   (* Interference registration *)
@@ -83,7 +77,7 @@ struct
 
   let add_last_analysis
       ~(get_state : Analysis_location.local -> state or_top_bottom)
-      interferences thread concurrent_writes shared_bases =
+      thread concurrent_writes shared_bases =
     let module ALoc = Analysis_location in
     match Dom.get Mt_domain.Domain.key with
     | None -> NoChanges (* Domain disabled, no interference computation *)
@@ -160,11 +154,10 @@ struct
         next_states, !equal
       in
 
-      let { states } = interferences in
       (* Compute new interferences and check that they are different than the
          previous computed interferences. *)
       let old_interferences =
-        ThreadTable.find_def states thread MutexesMap.empty
+        ThreadTable.find_def current.states thread MutexesMap.empty
       in
       let new_interferences =
         ALoc.Local.Set.fold add_to_map concurrent_writes MutexesMap.empty
@@ -173,7 +166,7 @@ struct
         widen_interference_states old_interferences new_interferences
       in
       let same_shared_bases =
-        Base.Hptset.equal interferences.shared_bases shared_bases
+        Base.Hptset.equal current.shared_bases shared_bases
       in
       let pp_aloc fmt = Format.fprintf fmt "@[<hov 2>%a@]" ALoc.Local.pretty in
       let pp_aloc_set =
@@ -188,8 +181,8 @@ struct
         (MutexesMap.pretty (pp_state Dom.pretty)) new_interferences;
       if not (same_mutexes_map && same_shared_bases) then begin
         (* Add the computed interferences to the table *)
-        ThreadTable.replace states thread new_interferences;
-        interferences.shared_bases <- shared_bases;
+        ThreadTable.replace current.states thread new_interferences;
+        current.shared_bases <- shared_bases;
         Updated
       end else
         NoChanges
@@ -197,7 +190,7 @@ struct
 
   (* Interference injection *)
 
-  let applicable (interferences : t) (state : state) : state or_top_bottom =
+  let applicable (state : state) : state or_top_bottom =
     let threads, mutexes = match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no information about threads and mutexes *)
       | None -> Mt_thread.Register.empty, Mutex.Set.empty
@@ -207,7 +200,6 @@ struct
         Mt_domain.Domain.threads mt_state,
         Mt_domain.Domain.mutexes mt_state |> Mt_mutex.Register.locked_mutexes
     in
-    let { states } = interferences in
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
     let add mutexes' state' acc_state =
       let state' = get_state state' in
@@ -231,11 +223,9 @@ struct
       then MutexesMap.fold add state_map acc_state
       else acc_state
     in
-    ThreadTable.fold add_thread states `Bottom
+    ThreadTable.fold add_thread current.states `Bottom
 
   let inject (state : state) : state =
-    let interferences = !current in
-    let { shared_bases } = interferences in
     let need_injection =
       match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no interference injection *)
@@ -253,24 +243,22 @@ struct
           true
         | Set bases ->
           (* Inject only if the read/written memory intersects shared memory *)
-          Base.Hptset.intersects bases shared_bases
+          Base.Hptset.intersects bases current.shared_bases
     in
     if not need_injection
     then state
     else begin
       Self.debug ~dkey ~current:true ~once:true
         "inject threads interferences at this point";
-      match applicable interferences state with
+      match applicable state with
       | `Top -> Dom.top
       | `Bottom -> state
       | `Value interferences_state ->
         let dummy_kf = Kernel_function.dummy () in
         let result =
-          Dom.reuse dummy_kf shared_bases
+          Dom.reuse dummy_kf current.shared_bases
             ~current_input:state ~previous_output:interferences_state
         in
         Dom.join state result
     end
-
-  let is_empty () = is_empty !current
 end
