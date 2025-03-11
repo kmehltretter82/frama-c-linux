@@ -41,24 +41,21 @@ module Make (Dom : Abstract.Domain.External) =
 struct
   type state = Dom.state
 
-  type widening = {
+  type state_with_widening = {
+    state : state;
     widening_counter : int;
   }
-
-  type state_with_widening = state * widening
 
   type t = {
     states : (state_with_widening or_top MutexesMap.t) ThreadTable.t;
     mutable shared_bases : Base.Hptset.t;
   }
 
-  let get_state : state_with_widening or_top -> state or_top = function
-    | `Top -> `Top
-    | `Value (state, _) -> `Value state
+  let get_state : state_with_widening or_top -> state or_top =
+    Top.map (fun x -> x.state)
 
   let pp_state fmt (state : state_with_widening or_top) =
-    let pp_aux fmt (dom_state, _) = Dom.pretty fmt dom_state in
-    Format.fprintf fmt "%a" (Top.pretty pp_aux) state
+    Format.fprintf fmt "%a" (Top.pretty Dom.pretty) (get_state state)
 
   let current = {
     states = ThreadTable.create 13;
@@ -105,9 +102,9 @@ struct
             | Some `Top -> Some `Top
             | None ->
               let widening_counter = widening_delay - 1 in
-              Some (`Value (state, { widening_counter }))
-            | Some `Value (previous, w) ->
-              Some (`Value (Dom.join previous state, w))
+              Some (`Value { state; widening_counter })
+            | Some `Value previous ->
+              Some (`Value { previous with state = Dom.join previous.state state })
           in
           MutexesMap.update mutexes update acc_map
       in
@@ -115,8 +112,8 @@ struct
       let widen_interference_states prev_states curr_states =
         let equal = ref true in
         let widen_one_state key curr_value =
-          let previous_value = MutexesMap.find_opt key prev_states in
-          match curr_value, previous_value with
+          let previous = MutexesMap.find_opt key prev_states in
+          match curr_value, previous with
           | _, Some `Top -> `Top
           | `Top, _ ->
             equal := false;
@@ -124,11 +121,12 @@ struct
           | `Value v, None ->
             equal := false;
             `Value v
-          | `Value (curr, _), Some `Value (previous, { widening_counter }) ->
-            let next, widening_counter =
+          | `Value { state = current_state },
+            Some `Value { state = previous_state ; widening_counter } ->
+            let next_state, widening_counter =
               if widening_counter > 0 then
                 (* No widening *)
-                Dom.join previous curr, widening_counter
+                Dom.join previous_state current_state, widening_counter
               else begin
                 (* Widen the interferences between the previous and current
                    state. Use the widen hints on the concurrent writes. *)
@@ -137,18 +135,19 @@ struct
                     (fun (stmt, cs) acc ->
                        let kf = Callstack.top_kf cs in
                        let widened =
-                         Dom.widen kf stmt previous (Dom.join previous curr)
+                         Dom.widen kf stmt previous_state
+                           (Dom.join previous_state current_state)
                        in
                        Dom.join widened acc)
                     concurrent_writes
-                    previous
+                    previous_state
                 in
                 widened_state, widening_period
               end
             in
             let widening_counter = widening_counter - 1 in
-            equal := !equal && (Dom.equal previous next);
-            `Value (next, { widening_counter })
+            equal := !equal && (Dom.equal previous_state next_state);
+            `Value { state = next_state ; widening_counter }
         in
         let next_states = MutexesMap.mapi widen_one_state curr_states in
         next_states, !equal
