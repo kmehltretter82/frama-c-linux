@@ -1339,11 +1339,23 @@ and is_same_fundec f f' env: body_correspondence =
   (* Adding locals even if body is not the same *)
   let find_local vi =
     let name = vi.vname in
+    let res =
     try
       let vi' = List.find (fun v -> v.vname = name) f'.slocals in
       if is_same_varinfo vi vi' env
-      then Varinfo.add vi (`Same vi')
-    with Not_found -> ()
+      then 
+          let selection = State_selection.singleton Globals.Vars.self in
+          let init =
+            Project.on ~selection (Orig_project.get()) Globals.Vars.find vi
+          in
+          let init' = Globals.Vars.find vi' in
+          let res = is_same_initinfo init init' env in
+          if res then
+             `Same vi' else `Not_present
+        else `Not_present
+        (* Varinfo.add vi (`Same vi') *)
+    with Not_found -> `Not_present
+      in Varinfo.add vi res
   in
   let res, env =
     is_same_block f.sbody f'.sbody env &&>
@@ -1358,10 +1370,11 @@ and is_same_fundec f f' env: body_correspondence =
     Varinfo.add v (`Same v')
   in
   (match res with
-   | `Same_body | `Callees_changed ->
+   | `Same_body  ->
      List.iter add_local f.slocals
-   | `Body_changed -> 
-     List.iter find_local f.slocals);
+     | `Callees_changed | `Body_changed -> 
+     List.iter find_local f.slocals
+     );
   res
 
 and is_same_varinfo vi vi' env =
