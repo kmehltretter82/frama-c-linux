@@ -69,6 +69,10 @@ module type S = sig
   (** [intersects s1 s2] returns [true] if and only if [s1] and [s2]
       have an element in common *)
 
+  val cached_fold:
+    cache_name:string -> temporary:bool ->
+    f:(elt -> 'a) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
+
   type action = Neutral | Absorbing | Traversing of (elt -> bool)
 
   val merge :

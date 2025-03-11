@@ -62,6 +62,10 @@ module type S = sig
   val contains_single_elt: t -> elt option
   val intersects: t -> t -> bool
 
+  val cached_fold:
+    cache_name:string -> temporary:bool ->
+    f:(elt -> 'a) -> joiner:('a -> 'a -> 'a) -> empty:'a -> t -> 'a
+
   type action = Neutral | Absorbing | Traversing of (elt -> bool)
 
   val merge :
@@ -125,6 +129,10 @@ end
   let add k s = add k () s
   let iter f s = iter (fun x () -> f x) s
   let fold f s = fold (fun x () -> f x) s
+
+  let cached_fold ~cache_name ~temporary ~f ~joiner ~empty =
+    let f key () = f key in
+    cached_fold ~cache_name ~temporary ~f ~joiner ~empty
 
   let elements s = fold (fun h t -> h::t) s []
 
