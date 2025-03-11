@@ -351,6 +351,12 @@ let parse known_options_list then_expected options_list =
       unknown_options, nb_used, None
     | [ "-then-on" ] when then_expected ->
       raise_error "-then-on" "requires a string as argument."
+    | option :: then_options when
+        String.starts_with ~prefix:"-then-on=" option
+        && then_expected ->
+      let option, project_name, explicit = get_option_and_arg option "" in
+      assert (String.equal option "-then-on" && explicit);
+      parse_then_on unknown_options nb_used project_name then_options
     | [ option ] ->
       let unknown, use_arg, is_used =
         parse_one_option unknown_options option ""
@@ -364,7 +370,7 @@ let parse known_options_list then_expected options_list =
     | "-then-replace" :: then_options when then_expected ->
       unknown_options, nb_used, Some (then_options, Replace)
     | "-then-on" :: project_name :: then_options when then_expected ->
-      unknown_options, nb_used, Some (then_options, Name project_name)
+      parse_then_on unknown_options nb_used project_name then_options
     | "-permissive" :: next_options ->
       permissive := true;
       go unknown_options nb_used next_options
@@ -377,6 +383,8 @@ let parse known_options_list then_expected options_list =
         unknown
         (if is_used then succ nb_used else nb_used)
         next
+  and parse_then_on unknown_options nb_used project_name then_options =
+    unknown_options, nb_used, Some (then_options, Name project_name)
   in
   try
     let unknown_options, nb_used, then_options = go [] 0 options_list in
