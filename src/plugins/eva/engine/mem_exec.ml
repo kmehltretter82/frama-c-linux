@@ -841,6 +841,7 @@ module Make
         Eva_dynamic.Inout.import_memexec Eva_diff.import_inout Eva_diff.import_inout_kf saved in
       load_time_wrapper stat_inout_load_time import_inout;
       print_cache_size "In current session";
+      Eva_diff.clear_caches ();
       Project.remove ~project:saved ();
     with
     | Project.IOError s ->

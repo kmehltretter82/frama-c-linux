@@ -43,3 +43,5 @@ val import_widening_stmt:  Cil_datatype.Stmt.t -> Cil_datatype.Stmt.t
 val import_inout_kf: Kernel_function.t -> Kernel_function.t
 
 val import_inout: Inout_type.t -> Inout_type.t
+
+val clear_caches: unit -> unit

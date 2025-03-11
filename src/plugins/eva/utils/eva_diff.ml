@@ -70,12 +70,24 @@ let import_cvalue =
 let import_cvalue_or_initialized =
   Cvalue.V_Or_Uninitialized.map import_cvalue
 
-let import_offsetmap offsm =
+let import_offsetmap_aux offsm =
   Cvalue.V_Offsetmap.fold
     (fun itv (v, size, offset) acc ->
        let v = import_cvalue_or_initialized v in
        Cvalue.V_Offsetmap.add ~exact:true itv (v, size, offset) acc)
     offsm Cvalue.V_Offsetmap.empty
+
+module Cacheable_Offsm = struct
+  type t = Cvalue.V_Offsetmap.t
+  let hash = Cvalue.V_Offsetmap.hash
+  let sentinel : t = Cvalue.V_Offsetmap.empty
+  let equal : t -> t -> bool = (==)
+end
+module Cache_Offsm = Binary_cache.Arity_One (Cacheable_Offsm) (Cacheable_Offsm)
+
+let import_offsetmap = Cache_Offsm.merge import_offsetmap_aux
+
+let clear_caches () = Cache_Offsm.clear ()
 
 let import_zone =
   let cache_name = "Eva_diff.import_zone" in
