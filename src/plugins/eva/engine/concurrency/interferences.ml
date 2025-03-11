@@ -56,8 +56,8 @@ struct
     | `Top -> `Top
     | `Value (state, _) -> `Value state
 
-  let pp_state pp_dom fmt (state : state_with_widening or_top) =
-    let pp_aux fmt (dom_state, _) = pp_dom fmt dom_state in
+  let pp_state fmt (state : state_with_widening or_top) =
+    let pp_aux fmt (dom_state, _) = Dom.pretty fmt dom_state in
     Format.fprintf fmt "%a" (Top.pretty pp_aux) state
 
   let current = {
@@ -178,7 +178,7 @@ struct
          interferences: @[%a@]@."
         pp_aloc_set concurrent_writes
         Base.Hptset.pretty shared_bases
-        (MutexesMap.pretty (pp_state Dom.pretty)) new_interferences;
+        (MutexesMap.pretty pp_state) new_interferences;
       if not (same_mutexes_map && same_shared_bases) then begin
         (* Add the computed interferences to the table *)
         ThreadTable.replace current.states thread new_interferences;
