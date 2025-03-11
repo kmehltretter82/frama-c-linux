@@ -43,8 +43,20 @@ let import_base = function
          decr last_string_id;
          b)
 
-let import_bases bases =
-  Base.Hptset.(fold (fun b acc -> add (import_base b) acc) bases empty)
+let import_bases =
+  let cache_name = "Eva_diff.import_bases" in
+  let f base = Base.Hptset.singleton (import_base base) in
+  let joiner = Base.Hptset.union in
+  let empty = Base.Hptset.empty in
+  Base.Hptset.cached_fold ~cache_name ~temporary:false ~f ~joiner ~empty
+
+let import_cvalue_map =
+  let cache_name = "Eva_diff.import_cvalue" in
+  let f base ival = Cvalue.V.inject (import_base base) ival in
+  let projection _ = assert false in
+  let joiner = Cvalue.V.join in
+  let empty = Cvalue.V.bottom in
+  Cvalue.V.cached_fold ~cache_name ~temporary:false ~projection ~f ~joiner ~empty
 
 let import_cvalue =
   let open Cvalue.V in
@@ -53,8 +65,7 @@ let import_cvalue =
   | Top (Set bases, origin) ->
     let bases = import_bases bases in
     inject_top_origin origin bases
-  | Map map ->
-    M.fold (fun b ival acc -> add (import_base b) ival acc) map bottom
+  | map -> import_cvalue_map map
 
 let import_cvalue_or_initialized =
   Cvalue.V_Or_Uninitialized.map import_cvalue
@@ -66,23 +77,27 @@ let import_offsetmap offsm =
        Cvalue.V_Offsetmap.add ~exact:true itv (v, size, offset) acc)
     offsm Cvalue.V_Offsetmap.empty
 
-let import_zone zone =
-  let import base itv acc =
+let import_zone =
+  let cache_name = "Eva_diff.import_zone" in
+  let f base itv =
     let itv =
       try Int_Intervals.(inject (project_set itv))
       with Abstract_interp.Error_Top -> Int_Intervals.top
     in
-    try
-      let zone =
-        Locations.Zone.inject (import_base base) itv in
-      Locations.Zone.join acc zone
-    with Not_found -> 
-      Locations.Zone.top
+    Locations.Zone.inject (import_base base) itv
   in
-  try Locations.Zone.(fold_i import zone bottom)
-  with Abstract_interp.Error_Top ->
-    assert Locations.Zone.(equal zone top);
-    Locations.Zone.top
+  let projection _base = Int_Intervals.top in
+  let joiner = Locations.Zone.join in
+  let empty = Locations.Zone.bottom in
+  let import =
+    Locations.Zone.cached_fold
+      ~cache_name ~temporary:false ~f ~projection ~joiner ~empty
+  in
+  fun zone ->
+    try import zone
+    with Abstract_interp.Error_Top ->
+      assert Locations.Zone.(equal zone top);
+      Locations.Zone.top
 
 let import_deps deps =
   Deps.{ data = import_zone deps.data;
