@@ -52,6 +52,7 @@
 , dos2unix
 , jq
 , perl
+, pkgs
 , python3
 , python3Packages
 , socat
@@ -126,6 +127,7 @@ stdenvNoCC.mkDerivation rec {
     dos2unix
     jq
     perl
+    pkgs.fontconfig
     python3
     python3Packages.jsonschema
     python3Packages.pyaml
@@ -157,7 +159,9 @@ stdenvNoCC.mkDerivation rec {
   preCheck = ''
     patchShebangs .
     mkdir home
-    HOME=$(pwd)/home
+    export HOME=$(pwd)/home
+    export FONTCONFIG_FILE="${pkgs.fontconfig.out}/etc/fonts/fonts.conf"
+    export FONTCONFIG_PATH="${pkgs.fontconfig.out}/etc/fonts/"
     why3 config detect
     export FRAMAC_WP_CACHE=offline
     export FRAMAC_WP_CACHEDIR=$wp_cache
