@@ -5,7 +5,8 @@
   OPT: -cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE=0" -print
   OPT: -cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE=-2" -print
 EXIT:1
-FILTER: sed -e "s|$TMPDIR/[^ ]*|/tmp/TEMPNAME|g" -e "s|$(realpath $(pwd)/../../../..)|FC_HOME|g"
+FILTER: sed -e "s|$TMPDIR/[^ ]*|/tmp/TEMPNAME|g" -e "s|$(realpath $(pwd)/../../../..)|FC_HOME|g" -e "/^cc1/d"
+  CMD: LC_ALL=C @frama-c-exe@
   OPT:-cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE="
 */
 
