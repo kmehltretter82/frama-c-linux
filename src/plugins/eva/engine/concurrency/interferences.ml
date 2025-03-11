@@ -62,6 +62,10 @@ struct
     shared_bases = Base.Hptset.empty;
   }
 
+  let reset () =
+    ThreadTable.reset current.states;
+    current.shared_bases <- Base.Hptset.empty
+
   let is_empty () =
     ThreadTable.length current.states = 0
 

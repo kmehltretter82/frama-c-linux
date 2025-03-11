@@ -28,6 +28,10 @@ sig
     | Updated
     | NoChanges
 
+  (** [reset ()] resets the current interferences state. Must be called
+      between two analyses. *)
+  val reset : unit -> unit
+
   (** Add the last Eva analysis results to the given interferences abstract
       representation. *)
   val add_last_analysis :
