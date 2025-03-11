@@ -483,8 +483,7 @@ module State = struct
     Self.result "====== VALUES COMPUTED ======";
     if Plugin.is_present "inout"
     && Self.is_debug_key_enabled Self.dkey_final_states
-    then Eva_dynamic.Callgraph.iter_in_rev_order display;
-    Self.result "%t" Eva_perf.display
+    then Eva_dynamic.Callgraph.iter_in_rev_order display
 
   let post_analysis _state =
     if Parameters.ForceValues.get ()

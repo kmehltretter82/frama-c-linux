@@ -404,6 +404,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
       Self.(ComputationState.set Computed);
       post_analysis ();
       Abstract.Dom.post_analysis final_state;
+      Self.result "%t" Eva_perf.display;
       Summary.print_summary ();
       Statistics.export_as_csv ();
       Builtins_malloc.print_summary ();
@@ -411,6 +412,7 @@ module Make (Abstract: Abstractions.S_with_evaluation) = struct
     in
     let cleanup () =
       Abstract.Dom.Store.mark_as_computed ();
+      Self.result "%t" Eva_perf.display;
       Self.(ComputationState.set Aborted);
       Eva_utils.clear_call_stack ();
     in
