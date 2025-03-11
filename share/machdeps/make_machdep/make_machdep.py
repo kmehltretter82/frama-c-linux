@@ -164,8 +164,7 @@ def print_machdep(machdep):
         args.dest_file = open(args.from_file, "w")
     elif args.dest_file is None:
         args.dest_file = sys.stdout
-    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=False)
-
+    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
 def default_value(typ):
     if typ == "integer":

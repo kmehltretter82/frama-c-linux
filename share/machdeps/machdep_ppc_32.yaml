@@ -9,7 +9,6 @@ alignof_longlong: 8
 alignof_ptr: 4
 alignof_short: 2
 alignof_str: 1
-max_align_t: long double
 bufsiz: '8192'
 char_is_unsigned: true
 compiler: clang
@@ -555,9 +554,6 @@ custom_defs:
     unix: '1'
 eof: (-1)
 errno:
-    edom: '33'
-    eilseq: '84'
-    erange: '34'
     e2big: '7'
     eacces: '13'
     eaddrinuse: '98'
@@ -583,6 +579,7 @@ errno:
     edeadlk: '35'
     edeadlock: '35'
     edestaddrreq: '89'
+    edom: '33'
     edquot: '122'
     eexist: '17'
     efault: '14'
@@ -590,6 +587,7 @@ errno:
     ehostdown: '112'
     ehostunreach: '113'
     eidrm: '43'
+    eilseq: '84'
     einprogress: '115'
     eintr: '4'
     einval: '22'
@@ -606,9 +604,9 @@ errno:
     el3rst: '47'
     elibacc: '79'
     elibbad: '80'
+    elibexec: '83'
     elibmax: '82'
     elibscn: '81'
-    elibexec: '83'
     eloop: '40'
     emediumtype: '124'
     emfile: '24'
@@ -657,14 +655,15 @@ errno:
     eproto: '71'
     eprotonosupport: '93'
     eprototype: '91'
+    erange: '34'
     eremchg: '78'
     eremote: '66'
     eremoteio: '121'
     erestart: '85'
     erofs: '30'
     eshutdown: '108'
-    espipe: '29'
     esocktnosupport: '94'
+    espipe: '29'
     esrch: '3'
     estale: '116'
     estrpipe: '86'
@@ -681,15 +680,16 @@ filename_max: '4096'
 fopen_max: '16'
 has__builtin_va_list: true
 host_name_max: '64'
-int_fast8_t: signed char
 int_fast16_t: int
 int_fast32_t: int
 int_fast64_t: long long
+int_fast8_t: signed char
 intptr_t: int
 l_ctermid: '9'
 l_tmpnam: '20'
 little_endian: false
 machdep_name: machdep_ppc_32
+max_align_t: long double
 mb_cur_max: ((size_t)16)
 nsig: (64 + 1)
 path_max: '4096'
@@ -712,10 +712,10 @@ ssize_t: int
 time_t: long
 tmp_max: '238328'
 tty_name_max: '32'
-uint_fast8_t: unsigned char
 uint_fast16_t: unsigned int
 uint_fast32_t: unsigned int
 uint_fast64_t: unsigned long long
+uint_fast8_t: unsigned char
 uintptr_t: unsigned int
 version: clang version 19.1.7
 wchar_t: int
