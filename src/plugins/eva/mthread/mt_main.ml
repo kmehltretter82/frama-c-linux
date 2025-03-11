@@ -179,7 +179,6 @@ let mthread_run project =
     let results = Eva_results.get_results () in
     main_th.th_value_results <- Some results;
 
-    Mt_interferences.init ();
     Mt_analysis_fixpoint.record_end_of_thread_analysis analysis;
 
     (* We perform the analysis iterations *)

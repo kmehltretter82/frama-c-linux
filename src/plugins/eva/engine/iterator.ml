@@ -402,13 +402,6 @@ module Make_Dataflow
       List.filter check states
     | _ -> states
 
-  (* For now, as long as an Interferences module is not passed as a parameter to
-     the Iterator, we have to rebuild the following function *)
-  let inject_interferences =
-    let domain =
-      (module Domain : Abstract.Domain.External with type state = 'a)
-    in
-    Interferences.inject ~domain
 
   (* --- Iteration strategy ---*)
 
@@ -454,9 +447,9 @@ module Make_Dataflow
     let<> UpdatedCurrentLoc = e.edge_loc in
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow =
-      if Interferences.is_empty ()
+      if Engine.Interferences.is_empty ()
       then flow
-      else Partitioning.transfer (lift inject_interferences) flow
+      else Partitioning.transfer (lift Engine.Interferences.inject) flow
     in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then

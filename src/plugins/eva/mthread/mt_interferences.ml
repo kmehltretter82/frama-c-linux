@@ -20,15 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let init () =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
-  let domain =
-    (module Analyzer.Dom : Abstract.Domain.External
-      with type state = Analyzer.Dom.state)
-  in
-  let interferences = Interferences.initial domain in
-  Interferences.current := interferences
-
 let concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   let module ALoc = Analysis_location in
@@ -73,10 +64,6 @@ let shared_bases analysis_state =
 
 let add_last_analysis analysis_state =
   let module Analyzer = (val Analysis.current_analyzer ()) in
-  let domain =
-    (module Analyzer.Dom : Abstract.Domain.External
-      with type state = Analyzer.Dom.state)
-  in
   let get_state (stmt, cs) =
     let open Lattice_bounds.TopBottom.Operators in
     let* state_table =
@@ -93,9 +80,8 @@ let add_last_analysis analysis_state =
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
-  let res =
-    Interferences.add_last_analysis ~domain ~get_state
-      !Interferences.current thread writes bases
+  let res = Analyzer.Interferences.(
+      add_last_analysis ~get_state !current thread writes bases)
   in
   match res with
   | Updated ->

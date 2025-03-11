@@ -20,6 +20,4 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val init : unit -> unit
-
 val add_last_analysis : Mt_thread.analysis_state -> unit

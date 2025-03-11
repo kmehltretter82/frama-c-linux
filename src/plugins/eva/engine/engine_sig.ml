@@ -70,6 +70,8 @@ module type S = sig
     with type state = Dom.t
      and type value = Val.t
      and type loc = Loc.location
+
+  module Interferences : module type of Interferences.Make (Dom)
 end
 
 (** Access to analysis results, built by [Analysis] and used by [Results],

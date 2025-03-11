@@ -67,6 +67,7 @@ module Make (Abstract: Abstractions.S) = struct
     include Abstract
     module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
     module Compute = C
+    module Interferences = Interferences.Make (Dom)
   end
   and C : Engine_sig.Compute = Compute_functions.Make (Engine)
 
