@@ -179,11 +179,11 @@ let mthread_run project =
     let results = Eva_results.get_results () in
     main_th.th_value_results <- Some results;
 
-    let interferences = Mt_interferences.initial () in
-    Mt_analysis_fixpoint.record_end_of_thread_analysis analysis interferences;
+    Mt_interferences.init ();
+    Mt_analysis_fixpoint.record_end_of_thread_analysis analysis;
 
     (* We perform the analysis iterations *)
-    Mt_analysis_fixpoint.reach_fixpoint analysis interferences;
+    Mt_analysis_fixpoint.reach_fixpoint analysis;
 
     (* In the cfgs, mark whether the accesses are concurrent or not,
        and remove superfluous node *)

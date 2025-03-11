@@ -20,15 +20,14 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let initial () =
+let init () =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   let domain =
     (module Analyzer.Dom : Abstract.Domain.External
       with type state = Analyzer.Dom.state)
   in
   let interferences = Interferences.initial domain in
-  Interferences.current := interferences; (* For Iterator *)
-  interferences
+  Interferences.current := interferences
 
 let concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
@@ -72,7 +71,7 @@ let shared_bases analysis_state =
   | Top -> assert false
   | Set zones ->  zones
 
-let add_last_analysis analysis_state interferences =
+let add_last_analysis analysis_state =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   let domain =
     (module Analyzer.Dom : Abstract.Domain.External
@@ -96,7 +95,7 @@ let add_last_analysis analysis_state interferences =
   let thread = analysis_state.curr_thread.th_eva_thread in
   let res =
     Interferences.add_last_analysis ~domain ~get_state
-      interferences thread writes bases
+      !Interferences.current thread writes bases
   in
   match res with
   | Updated ->

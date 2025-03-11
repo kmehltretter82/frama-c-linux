@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val initial : unit -> Interferences.t
+val init : unit -> unit
 
-val add_last_analysis :
-  Mt_thread.analysis_state -> Interferences.t -> unit
+val add_last_analysis : Mt_thread.analysis_state -> unit
