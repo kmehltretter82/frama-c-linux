@@ -1,0 +1,5 @@
+Dans le fichier inclus depuis FC_HOME/default/tests/syntax/result/force_posix.c:11:
+FC_HOME/install/default/share/frama-c/share/libc/unistd.h:44:2: erreur: #error "unistd.h should only be included with a POSIX machdep"
+   44 | #error "unistd.h should only be included with a POSIX machdep"
+      |  ^~~~~
+cc1: note: l'option de la ligne de commande non reconnue « -Wno-unknown-warning-option » aurait pu avoir pour but de supprimer les diagnostiques précédents

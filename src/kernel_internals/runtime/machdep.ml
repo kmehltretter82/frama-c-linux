@@ -309,10 +309,19 @@ let gen_redefinable_fc_macro fmt macro def =
   let fc_name = "__FC_"  ^ macro in
   let redef_name = "__FC_FORCE_" ^ macro in
   Format.fprintf fmt "#if defined(%s)@\n" redef_name;
+  (* SO's trick to check that the redef macro has an integer value.
+     Otherwise (notably if it's empty), we consider that we undef fc_name.
+  *)
+  Format.fprintf fmt
+    "#if 0 - %s - 1 != 1 || %s - 2 != -2@\n"
+    redef_name redef_name;
   gen_define_string fmt fc_name redef_name;
   Format.fprintf fmt "#else@\n";
+  gen_undef fmt fc_name;
+  Format.fprintf fmt "#endif@\n"; (* empty redef *)
+  Format.fprintf fmt "#else@\n";
   gen_define_macro fmt fc_name def;
-  Format.fprintf fmt "#endif@\n"
+  Format.fprintf fmt "#endif@\n" (* defined redef *)
 
 let gen_define_custom_macros fmt censored mach =
   let key_values = mach.custom_defs in
