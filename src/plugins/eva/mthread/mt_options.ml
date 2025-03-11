@@ -144,14 +144,6 @@ module PrintCallstacks  =
   end)
 
 let () = Parameter_customize.set_group grp_debug
-module ShowSid =
-  False (struct
-    let option_name = "-mt-show-sids"
-    let help = "Show statement ids when printing line numbers"
-  end)
-;;
-
-let () = Parameter_customize.set_group grp_debug
 module ShowTime =
   False (struct
     let option_name = "-mt-time"

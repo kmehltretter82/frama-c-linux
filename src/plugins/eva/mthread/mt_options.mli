@@ -59,9 +59,6 @@ module ModerateWarnings: Parameter_sig.Bool
 (** behavior of option -mt-print-callstacks. *)
 module PrintCallstacks: Parameter_sig.Bool
 
-(** behavior of option -mt-show-sids. *)
-module ShowSid: Parameter_sig.Bool
-
 (** behavior of option -mt-time. *)
 module ShowTime: Parameter_sig.Bool
 

@@ -20,7 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Mt_cil
 open Mt_types
 
 
@@ -61,8 +60,9 @@ module StmtIdAccess = struct
   include Datatype.Triple_with_collections(RW)(Cil_datatype.Stmt)(Thread)
 
   let pretty fmt ((op, stmt, th) : t) =
+    let loc = Cil_datatype.Stmt.loc stmt in
     Format.fprintf fmt "%a@ by %a@ at %a"
-      RW.pretty op Thread.pretty th pretty_stmt stmt
+      RW.pretty op Thread.pretty th Printer.pp_location loc
 
 end
 

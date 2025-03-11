@@ -32,7 +32,6 @@ val is_call_to_sync: stmt -> bool
 
 (** Pretty-printing *)
 
-val pretty_stmt: Format.formatter -> stmt -> unit
 val pretty_succs: Format.formatter -> stmt -> unit
 (** Print the sid of the successors of a statement *)
 
