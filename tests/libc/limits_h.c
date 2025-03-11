@@ -39,7 +39,7 @@ void main() {
   /*@ assert INTMAX_MIN == -INTMAX_MAX -1; */
   /*@ assert WCHAR_MIN <= WCHAR_MAX; */
   size_t size_max = SIZE_MAX;
-#ifdef __FC_POSIX_C_SOURCE
+#ifdef _POSIX_C_SOURCE
   ssize_t ssize_max = SSIZE_MAX;
 #endif
   intptr_t intptr_max = INTPTR_MAX;

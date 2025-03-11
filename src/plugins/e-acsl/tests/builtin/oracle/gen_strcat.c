@@ -649,7 +649,7 @@ pid_t __gen_e_acsl_fork(void)
     __gen_e_acsl_assert_data.pred_txt = "\\result == 0 || \\result > 0 || \\result == -1";
     __gen_e_acsl_assert_data.file = "FRAMAC_SHARE/libc/unistd.h";
     __gen_e_acsl_assert_data.fct = "fork";
-    __gen_e_acsl_assert_data.line = 918;
+    __gen_e_acsl_assert_data.line = 917;
     __gen_e_acsl_assert_data.name = "result_ok_child_or_error";
     __e_acsl_assert(__gen_e_acsl_or_2,& __gen_e_acsl_assert_data);
     __e_acsl_assert_clean(& __gen_e_acsl_assert_data);

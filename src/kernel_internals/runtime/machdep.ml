@@ -305,9 +305,8 @@ let gen_define_macro fmt macro def =
   if def = "" then gen_undef fmt macro
   else gen_define_string fmt macro def
 
-let gen_redefinable_fc_macro fmt macro def =
-  let fc_name = "__FC_"  ^ macro in
-  let redef_name = "__FC_FORCE_" ^ macro in
+let gen_redefinable_macro fmt macro def =
+  let redef_name = "__FC_FORCE_" ^ Extlib.strip_underscore macro in
   Format.fprintf fmt "#if defined(%s)@\n" redef_name;
   (* SO's trick to check that the redef macro has an integer value.
      Otherwise (notably if it's empty), we consider that we undef fc_name.
@@ -315,12 +314,12 @@ let gen_redefinable_fc_macro fmt macro def =
   Format.fprintf fmt
     "#if 0 - %s - 1 != 1 || %s - 2 != -2@\n"
     redef_name redef_name;
-  gen_define_string fmt fc_name redef_name;
+  gen_define_string fmt macro redef_name;
   Format.fprintf fmt "#else@\n";
-  gen_undef fmt fc_name;
+  gen_undef fmt macro;
   Format.fprintf fmt "#endif@\n"; (* empty redef *)
   Format.fprintf fmt "#else@\n";
-  gen_define_macro fmt fc_name def;
+  gen_define_macro fmt macro def;
   Format.fprintf fmt "#endif@\n" (* defined redef *)
 
 let gen_define_custom_macros fmt censored mach =
@@ -339,6 +338,7 @@ let gen_define_custom_macros fmt censored mach =
          gen_define_macro fmt k v
        end)
     key_values;
+  gen_redefinable_macro fmt "_POSIX_C_SOURCE" mach.posix_c_source;
   Format.fprintf fmt "#endif /* ifdef __FC_BUILTIN_MACROS_H */@]@."
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
@@ -618,7 +618,6 @@ let gen_all_defines fmt mach =
   gen_define_literal_string fmt "__PRIPTR_PREFIX"
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
   gen_define_macro fmt "__WORDSIZE" mach.wordsize;
-  gen_redefinable_fc_macro fmt "POSIX_C_SOURCE" mach.posix_c_source;
   gen_define_string fmt "__FC_SIG_ATOMIC_T" mach.sig_atomic_t;
   gen_intlike_min fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
   gen_intlike_max fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;

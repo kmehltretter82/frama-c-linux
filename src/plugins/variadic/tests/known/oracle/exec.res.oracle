@@ -3,11 +3,11 @@
 [variadic] FRAMAC_SHARE/libc/fcntl.h:118: Declaration of variadic function open.
 [variadic] FRAMAC_SHARE/libc/fcntl.h:125: 
   Declaration of variadic function openat.
-[variadic] FRAMAC_SHARE/libc/unistd.h:857: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:856: 
   Declaration of variadic function execl.
-[variadic] FRAMAC_SHARE/libc/unistd.h:862: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:861: 
   Declaration of variadic function execle.
-[variadic] FRAMAC_SHARE/libc/unistd.h:867: 
+[variadic] FRAMAC_SHARE/libc/unistd.h:866: 
   Declaration of variadic function execlp.
 [variadic] exec.c:9: Translating call to execle to a call to execve.
 [variadic:typing] exec.c:11: Warning: 
