@@ -1359,6 +1359,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
       { label: 'Close Tab', display: custom <= 0, onClick: onClose },
     ]);
   };
+  const onAuxClick = (_value: undefined, event: React.MouseEvent): void => {
+    if (event.button === 1) onClose();
+  };
 
   const icon = 'DISPLAY';
 
@@ -1371,6 +1374,7 @@ function TabView(props: TabViewProps): JSX.Element | null {
       selected={selected}
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onAuxClick={onAuxClick}
     >
       <IconButton
         className='labview-tab-closing'
