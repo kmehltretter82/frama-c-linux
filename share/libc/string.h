@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_STRING_H_
-#define __FC_STRING_H_
+#ifndef __FC_STRING_H
+#define __FC_STRING_H
 
 #include "features.h"
 __PUSH_FC_STDLIB

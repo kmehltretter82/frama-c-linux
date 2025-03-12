@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_WINT_T
-#define __FC_DEFINE_WINT_T
+#ifndef __FC_DEFINE_WINT_T_H
+#define __FC_DEFINE_WINT_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"

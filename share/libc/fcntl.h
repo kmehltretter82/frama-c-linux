@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_FCNTL
-#define __FC_FCNTL
+#ifndef __FC_FCNTL_H
+#define __FC_FCNTL_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_CTYPE
-#define __FC_CTYPE
+#ifndef __FC_CTYPE_H
+#define __FC_CTYPE_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_eof.h"

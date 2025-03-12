@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SIGNAL
-#define __FC_SIGNAL
+#ifndef __FC_SIGNAL_H
+#define __FC_SIGNAL_H
 
 /* ISO C: 7.14 */
 
@@ -37,7 +37,7 @@ __BEGIN_DECLS
 
 #ifndef __sig_atomic_t_defined
 typedef volatile __FC_SIG_ATOMIC_T sig_atomic_t;
-#define __sig_atomic_t_defined
+#define __sig_atomic_t_defined 1
 #endif
 
 typedef void (*__fc_sighandler_t) (int);
@@ -183,7 +183,7 @@ struct sigevent {
 };
 
 #ifndef __have_siginfo_t
-#define __have_siginfo_t
+#define __have_siginfo_t 1
 typedef struct __fc_siginfo_t {
 	int si_signo;
 	int si_code;

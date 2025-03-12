@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_CPIO
-#define __FC_CPIO
+#ifndef __FC_CPIO_H
+#define __FC_CPIO_H
 
 #define C_IRUSR  0000400
 #define C_IWUSR  0000200

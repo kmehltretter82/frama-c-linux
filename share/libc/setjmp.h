@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SETJMP
-#define __FC_SETJMP
+#ifndef __FC_SETJMP_H
+#define __FC_SETJMP_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

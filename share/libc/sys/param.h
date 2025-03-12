@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_PARAM_H__
-#define __FC_SYS_PARAM_H__
+#ifndef __FC_SYS_PARAM_H
+#define __FC_SYS_PARAM_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 

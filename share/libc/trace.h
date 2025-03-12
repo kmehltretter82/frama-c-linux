@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_TRACE
-#define __FC_TRACE
+#ifndef __FC_TRACE_H
+#define __FC_TRACE_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_pid_t.h"

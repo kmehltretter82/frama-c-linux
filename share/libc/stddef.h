@@ -20,22 +20,22 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_STDDEF
-#define __FC_STDDEF
+#ifndef __FC_STDDEF_H
+#define __FC_STDDEF_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"
 __BEGIN_DECLS
 #ifndef __ptrdiff_t_defined
 typedef __PTRDIFF_T ptrdiff_t;
-#define __ptrdiff_t_defined
+#define __ptrdiff_t_defined 1
 #endif
 
 // max_align_t is not defined in every machdeps
 #ifdef __MAX_ALIGN_T
 #ifndef __max_align_t_defined
 typedef __MAX_ALIGN_T max_align_t;
-#define __max_align_t_defined
+#define __max_align_t_defined 1
 #endif
 #endif
 __END_DECLS

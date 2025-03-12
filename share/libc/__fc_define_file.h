@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_FILE
-#define __FC_DEFINE_FILE
+#ifndef __FC_DEFINE_FILE_H
+#define __FC_DEFINE_FILE_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_stat.h"
@@ -35,7 +35,7 @@ struct __fc_FILE {
   unsigned int __fc_FILE_data;
 };
 typedef struct __fc_FILE FILE;
-#define __FILE_defined
+#define __FILE_defined 1
 #endif
 
 __END_DECLS

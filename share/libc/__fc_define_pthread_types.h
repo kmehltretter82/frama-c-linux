@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_PTHREAD_TYPES_T
-#define __FC_DEFINE_PTHREAD_TYPES_T
+#ifndef __FC_DEFINE_PTHREAD_TYPES_H
+#define __FC_DEFINE_PTHREAD_TYPES_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
@@ -30,7 +30,7 @@ __BEGIN_DECLS
 
 #ifndef __have_pthread_attr_t
 typedef struct __fc_pthread_attr_t { int _fc; } pthread_attr_t;
-#define __have_pthread_attr_t
+#define __have_pthread_attr_t 1
 #endif
 
 typedef struct __fc_pthread_barrier_t { int _fc; } pthread_barrier_t;

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_STDATOMIC
-#define __FC_STDATOMIC
+#ifndef __FC_STDATOMIC_H
+#define __FC_STDATOMIC_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "wchar.h"

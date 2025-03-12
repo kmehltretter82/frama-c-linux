@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.3 */
-#ifndef __FC_COMPLEX
-#define __FC_COMPLEX
+#ifndef __FC_COMPLEX_H
+#define __FC_COMPLEX_H
 #ifndef __FC_REG_TEST
 #error "Frama-C: unsupported complex.h"
 #endif

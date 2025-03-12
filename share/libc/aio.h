@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_AIO
-#define __FC_AIO
+#ifndef __FC_AIO_H
+#define __FC_AIO_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_off_t.h"

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_SEM
-#define __FC_SYS_SEM
+#ifndef __FC_SYS_SEM_H
+#define __FC_SYS_SEM_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 #include "../__fc_define_pid_t.h"

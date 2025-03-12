@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_TYPES_H__
-#define __FC_SYS_TYPES_H__
+#ifndef __FC_SYS_TYPES_H
+#define __FC_SYS_TYPES_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
@@ -54,7 +54,7 @@ typedef unsigned char u_char;
 // they are in 'sysmacros.h'
 #include "sysmacros.h"
 
-#define __u_char_defined
+#define __u_char_defined 1
 #endif
 
 // Non-POSIX

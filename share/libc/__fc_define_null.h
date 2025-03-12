@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_NULL
-#define __FC_DEFINE_NULL
+#ifndef __FC_DEFINE_NULL_H
+#define __FC_DEFINE_NULL_H
 #undef NULL
 #ifdef __cplusplus
 #define NULL 0

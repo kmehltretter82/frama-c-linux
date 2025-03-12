@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_SA_FAMILY_T
-#define __FC_DEFINE_SA_FAMILY_T
+#ifndef __FC_DEFINE_SA_FAMILY_T_H
+#define __FC_DEFINE_SA_FAMILY_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"

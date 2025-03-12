@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.12 */
-#ifndef __FC_MATH
-#define __FC_MATH
+#ifndef __FC_MATH_H
+#define __FC_MATH_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

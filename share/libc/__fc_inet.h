@@ -29,8 +29,8 @@
 // POSIX.1-2008 states that each of them may make the symbols of the other
 // visible, so we define them all here.
 
-#ifndef __FC_INET
-#define __FC_INET
+#ifndef __FC_INET_H
+#define __FC_INET_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"

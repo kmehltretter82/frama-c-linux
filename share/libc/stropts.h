@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_STROPTS_H__
-#define __FC_STROPTS_H__
+#ifndef __FC_STROPTS_H
+#define __FC_STROPTS_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

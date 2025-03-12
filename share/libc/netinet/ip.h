@@ -23,8 +23,8 @@
 // This is a non-POSIX file, provided for better compatibility on a
 // best-effort basis.
 
-#ifndef __NETINET_IP_H
-#define __NETINET_IP_H
+#ifndef __FC_NETINET_IP_H
+#define __FC_NETINET_IP_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

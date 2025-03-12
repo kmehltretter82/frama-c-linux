@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.19 */
-#ifndef __FC_STDIO
-#define __FC_STDIO
+#ifndef __FC_STDIO_H
+#define __FC_STDIO_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_machdep.h"

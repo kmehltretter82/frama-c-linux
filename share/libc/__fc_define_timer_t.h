@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_TIMER_T
-#define __FC_DEFINE_TIMER_T
+#ifndef __FC_DEFINE_TIMER_T_H
+#define __FC_DEFINE_TIMER_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

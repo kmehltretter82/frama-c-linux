@@ -22,8 +22,8 @@
 
 /* $Id: jessie_machine_prolog.h,v 1.8 2008-12-09 10:17:25 uid525 Exp $ */
 
-#ifndef __FC_STRING_AXIOMATIC
-#define __FC_STRING_AXIOMATIC
+#ifndef __FC_STRING_AXIOMATIC_H
+#define __FC_STRING_AXIOMATIC_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

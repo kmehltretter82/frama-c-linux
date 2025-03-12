@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_ALLOCA
-#define __FC_ALLOCA
+#ifndef __FC_ALLOCA_H
+#define __FC_ALLOCA_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "stdlib.h"

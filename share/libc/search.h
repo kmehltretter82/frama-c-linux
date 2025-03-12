@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SEARCH
-#define __FC_SEARCH
+#ifndef __FC_SEARCH_H
+#define __FC_SEARCH_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_TIMESPEC
-#define __FC_DEFINE_TIMESPEC
+#ifndef __FC_DEFINE_TIMESPEC_H
+#define __FC_DEFINE_TIMESPEC_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

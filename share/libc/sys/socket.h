@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SOCKET_H__
-#define __FC_SOCKET_H__
+#ifndef __FC_SYS_SOCKET_H
+#define __FC_SYS_SOCKET_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
@@ -34,7 +34,7 @@ __BEGIN_DECLS
 
 #ifndef __socklen_t_defined
 typedef __UINT_LEAST32_T socklen_t;
-#define __socklen_t_defined
+#define __socklen_t_defined 1
 #endif
 #include "../__fc_define_sa_family_t.h"
 #include "../__fc_define_sockaddr.h"

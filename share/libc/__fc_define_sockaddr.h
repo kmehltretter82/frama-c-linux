@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_SOCKADDR
-#define __FC_DEFINE_SOCKADDR
+#ifndef __FC_DEFINE_SOCKADDR_H
+#define __FC_DEFINE_SOCKADDR_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_sa_family_t.h"

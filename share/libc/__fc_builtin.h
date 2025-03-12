@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef Frama_C_BUILTIN
-#define Frama_C_BUILTIN
+#ifndef __FC_BUILTIN_H
+#define __FC_BUILTIN_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_alloc_axiomatic.h"

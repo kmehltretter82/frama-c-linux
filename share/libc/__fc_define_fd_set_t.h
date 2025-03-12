@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_FD_SET_T
-#define __FC_DEFINE_FD_SET_T
+#ifndef __FC_DEFINE_FD_SET_T_H
+#define __FC_DEFINE_FD_SET_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #define FD_SETSIZE 1024

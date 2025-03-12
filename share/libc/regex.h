@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef _REGEX_H
-#define _REGEX_H 1
+#ifndef __FC_REGEX_H
+#define __FC_REGEX_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_size_t.h"

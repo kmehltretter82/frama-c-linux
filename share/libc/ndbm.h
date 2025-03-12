@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_NDBM
-#define __FC_NDBM
+#ifndef __FC_NDBM_H
+#define __FC_NDBM_H
 #include "features.h"
 __PUSH_FC_STDLIB
 #include "__fc_define_mode_t.h"

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_ULIMIT
-#define __FC_ULIMIT
+#ifndef __FC_ULIMIT_H
+#define __FC_ULIMIT_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

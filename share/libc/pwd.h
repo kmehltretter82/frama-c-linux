@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_PWD_H__
-#define __FC_PWD_H__
+#ifndef __FC_PWD_H
+#define __FC_PWD_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SCHED
-#define __FC_SCHED
+#ifndef __FC_SCHED_H
+#define __FC_SCHED_H
 #include "features.h"
 __PUSH_FC_STDLIB
 

@@ -38,8 +38,8 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#ifndef _ENDIAN_H
-#define _ENDIAN_H	1
+#ifndef __FC_ENDIAN_H
+#define __FC_ENDIAN_H
 #define __LITTLE_ENDIAN 1234
 #define __BIG_ENDIAN 4321
 #include "__fc_machdep.h"

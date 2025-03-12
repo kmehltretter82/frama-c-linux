@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_INTTYPES
-#define __FC_INTTYPES
+#ifndef __FC_INTTYPES_H
+#define __FC_INTTYPES_H
 #include "features.h"
 __PUSH_FC_STDLIB
 /* ISO C: 7.8 */

@@ -21,8 +21,8 @@
 /**************************************************************************/
 
 /* ISO C: 7.10 and 5.2.4.2.1 */
-#ifndef __FC_LIMITS
-#define __FC_LIMITS
+#ifndef __FC_LIMITS_H
+#define __FC_LIMITS_H
 
 #include "__fc_machdep.h"
 

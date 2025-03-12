@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_SYS_TIME_H__
-#define __FC_SYS_TIME_H__
+#ifndef __FC_SYS_TIME_H
+#define __FC_SYS_TIME_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 #include "../__fc_define_fd_set_t.h"

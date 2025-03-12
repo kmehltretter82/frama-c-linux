@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef FC_UN
-#define FC_UN
+#ifndef __FC_SYS_UN_H
+#define __FC_SYS_UN_H
 #include "../features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS

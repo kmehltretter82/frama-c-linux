@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_SEEK_MACROS
-#define __FC_DEFINE_SEEK_MACROS
+#ifndef __FC_DEFINE_SEEK_MACROS_H
+#define __FC_DEFINE_SEEK_MACROS_H
 /* Values for the WHENCE argument to lseek.  */
 # define SEEK_SET	0	/* Seek from beginning of file.  */
 # define SEEK_CUR	1	/* Seek from current position.  */

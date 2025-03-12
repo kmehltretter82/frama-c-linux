@@ -20,14 +20,14 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_DEFINE_SIGSET_T
-#define __FC_DEFINE_SIGSET_T
+#ifndef __FC_DEFINE_SIGSET_T_H
+#define __FC_DEFINE_SIGSET_T_H
 #include "features.h"
 __PUSH_FC_STDLIB
 __BEGIN_DECLS
 #ifndef __sigset_t_defined
 typedef unsigned long sigset_t;
-#define __sigset_t_defined
+#define __sigset_t_defined 1
 #endif
 __END_DECLS
 __POP_FC_STDLIB

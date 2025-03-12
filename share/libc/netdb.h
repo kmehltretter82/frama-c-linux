@@ -20,8 +20,8 @@
 /*                                                                        */
 /**************************************************************************/
 
-#ifndef __FC_NETDB
-#define __FC_NETDB
+#ifndef __FC_NETDB_H
+#define __FC_NETDB_H
 #include "features.h"
 __PUSH_FC_STDLIB
 
