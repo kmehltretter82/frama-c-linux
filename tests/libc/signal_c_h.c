@@ -10,12 +10,12 @@
    -eva-slevel for those two functions to do just that. */
 #include <errno.h>
 #include <signal.h>
+#include <stdint.h> // for SIG_ATOMIC_MIN/MAX
 #ifdef WITH_SIGNAL_C
   #include <signal.c>
 #endif
 
 volatile int nondet;
-
 
 int test_sigaction() {
   sigset_t s;
@@ -103,5 +103,7 @@ void test_sighandler() {
 int main() {
   test_sigaction();
   test_sighandler();
+  sig_atomic_t smin = SIG_ATOMIC_MIN, smax = SIG_ATOMIC_MAX;
+  //@ assert unknown_because_volatile: smin <= smax;
   return 0;
 }

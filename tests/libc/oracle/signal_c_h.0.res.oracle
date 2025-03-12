@@ -192,6 +192,8 @@
 [eva] signal_c_h.c:100: assertion 'handler_not_called' got status valid.
 [eva] Recording results for test_sighandler
 [eva] Done for function test_sighandler
+[eva:alarm] signal_c_h.c:107: Warning: 
+  assertion 'unknown_because_volatile' got status unknown.
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
@@ -480,4 +482,6 @@
                 [63]{.sa_mask; .sa_flags} ∈ [--..--]
                 [64]{.sa_handler; .sa_sigaction} ∈ {0}
                 [64]{.sa_mask; .sa_flags} ∈ [--..--]
+  smin ∈ [--..--]
+  smax ∈ [--..--]
   __retres ∈ {0}
