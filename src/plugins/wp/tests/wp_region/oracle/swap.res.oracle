@@ -11,9 +11,9 @@
 ------------------------------------------------------------
 
 Goal Post-condition (file swap.i, line 20) in 'swap_aliased':
-Let x = Msint32_0[a].
-Let x_1 = Msint32_0[b].
-Let x_2 = Msint32_0[a <- x_1][b <- x][a].
+Let x = M0007_sint32_0[a].
+Let x_1 = M0007_sint32_0[b].
+Let x_2 = M0007_sint32_0[a <- x_1][b <- x][a].
 Assume {
   Type: is_sint32(x) /\ is_sint32(x_1) /\ is_sint32(x_2).
   (* Heap *)

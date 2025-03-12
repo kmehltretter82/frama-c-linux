@@ -1,0 +1,87 @@
+# frama-c -wp -wp-model 'Region' [...]
+[kernel] Parsing copy_struct.i (no preprocessing)
+[wp] Running WP plugin...
+[wp] [Valid] Goal copy_struct_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal copy_struct_terminates (Cfg) (Trivial)
+[wp] Warning: Missing RTE guards
+[wp] [Valid] Goal zeroify_S_fs_exits (Cfg) (Unreachable)
+[wp] [Valid] Goal zeroify_S_fs_terminates (Cfg) (Trivial)
+------------------------------------------------------------
+  Function copy_struct
+------------------------------------------------------------
+
+Goal Post-condition (file copy_struct.i, line 22) in 'copy_struct':
+Let a_1 = memcpy(M0016_sint8_0, M0016_sint8_0, a, b, 12).
+Let a_2 = a_1[shift_sint8(shiftfield_F1_S_fca(a), 3)].
+Let a_3 = memcpy(M0011_sint16_0, M0011_sint16_0, a, b, 12).
+Let a_4 = a_3[shiftfield_F1_S_fs(a)].
+Let a_5 = memcpy(M000c_sint32_0, M000c_sint32_0, a, b, 12).
+Let a_6 = a_5[shiftfield_F1_S_fi(a)].
+Let a_7 = Load_R0003_S1_S(a, a_5, a_1, a_3).
+Let a_8 = Load_R0003_S1_S(b, a_5, a_1, a_3).
+Assume {
+  Type: is_sint8(a_2) /\ is_sint16(a_4) /\ is_sint32(a_6) /\ IsS1_S(a_7) /\
+      IsS1_S(a_8) /\ is_sint32(a_6 + a_4 + a_2).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
+  (* Pre-condition *)
+  Have: P_pointed(a, b).
+}
+Prove: EqS1_S(a_7, a_8).
+
+------------------------------------------------------------
+------------------------------------------------------------
+  Function zeroify_S_fs
+------------------------------------------------------------
+
+Goal Post-condition 'post_eq_struct_fields' in 'zeroify_S_fs':
+Let a_1 = memcpy(M0024_sint8_0, M0024_sint8_0, a, b, 12).
+Let a_2 = shiftfield_F1_S_fca(a).
+Let a_3 = a_1[shift_sint8(a_2, 4)].
+Let a_4 = memcpy(M000b_sint16_0, M000b_sint16_0, a, b, 12)
+            [shiftfield_F1_S_fs(b)].
+Let a_5 = memcpy(M001a_sint32_0, M001a_sint32_0, a, b, 12).
+Let a_6 = a_5[shiftfield_F1_S_fi(a)].
+Let a_7 = a_5[shiftfield_F1_S_fi(b)].
+Let m = Array_R0024_sint8(a_2, 6, a_1).
+Let m_1 = Array_R0024_sint8(shiftfield_F1_S_fca(b), 6, a_1).
+Let x = to_sint16(lxor(a_4, a_4)).
+Assume {
+  Type: is_sint8(a_3) /\ is_sint16(a_4) /\ is_sint32(a_6) /\
+      is_sint32(a_7) /\ IsArray_sint8(m) /\ IsArray_sint8(m_1) /\
+      is_sint32(a_6 + a_3 + x).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
+  (* Pre-condition *)
+  Have: P_pointed(a, b).
+}
+Prove: (a_7 = a_6) /\ (x = 0) /\ EqArray_int(6, m, m_1).
+
+------------------------------------------------------------
+
+Goal Post-condition 'post_eq_struct_with_update' in 'zeroify_S_fs':
+Let a_1 = memcpy(M0024_sint8_0, M0024_sint8_0, a, b, 12).
+Let a_2 = shiftfield_F1_S_fca(a).
+Let a_3 = a_1[shift_sint8(a_2, 4)].
+Let a_4 = memcpy(M000b_sint16_0, M000b_sint16_0, a, b, 12).
+Let a_5 = a_4[shiftfield_F1_S_fs(b)].
+Let a_6 = memcpy(M001a_sint32_0, M001a_sint32_0, a, b, 12).
+Let a_7 = a_6[shiftfield_F1_S_fi(a)].
+Let a_8 = a_6[shiftfield_F1_S_fi(b)].
+Let m = Array_R0024_sint8(shiftfield_F1_S_fca(b), 6, a_1).
+Let x = to_sint16(lxor(a_5, a_5)).
+Let a_9 = a_4[shiftfield_F1_S_fs(a) <- x].
+Let a_10 = Load_R0003_S1_S(a, a_6, a_9, a_1).
+Assume {
+  Type: is_sint8(a_3) /\ is_sint16(a_5) /\ is_sint32(a_7) /\
+      is_sint32(a_8) /\ IsArray_sint8(Array_R0024_sint8(a_2, 6, a_1)) /\
+      IsArray_sint8(m) /\ is_sint32(a_7 + a_3 + x) /\ IsS1_S(a_10) /\
+      IsS1_S(Load_R0003_S1_S(b, a_6, a_9, a_1)).
+  (* Heap *)
+  Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
+  (* Pre-condition *)
+  Have: P_pointed(a, b).
+}
+Prove: EqS1_S(a_10, { F1_S_fi = a_8 ; F1_S_fs = 0 ; F1_S_fca = m }).
+
+------------------------------------------------------------

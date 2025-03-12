@@ -583,11 +583,19 @@ struct
   let stored = gen_stored KValue
   let stored_init = gen_stored KInit
 
-  let copied seq obj l1 l2 =
-    let v = match load seq.pre obj l2 with
-      | Memory.Val r -> r
-      | Memory.Loc l -> pointer_val l
-    in stored seq obj l1 v
+  let oget_Mloc = function
+    | Loc l -> Some l
+    | Val ((CTXT _| CARR _|HEAP) as m,x,ofs) ->
+      Some ((mloc_of_path m x ofs))
+    | Ref _ | Val ((CREF | CVAL), _, _) -> None
+
+  let copied seq obj l1 l2 = match oget_Mloc l1, oget_Mloc l2 with
+    | Some l1, Some l2 -> M.copied seq obj l1 l2
+    | _, _ ->
+      let v = match load seq.pre obj l2 with
+        | Memory.Val r -> r
+        | Memory.Loc l -> pointer_val l
+      in stored seq obj l1 v
 
   let copied_init seq obj l1 l2 =
     stored_init seq obj l1 (load_init seq.pre obj l2)

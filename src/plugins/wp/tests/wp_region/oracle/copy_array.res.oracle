@@ -13,9 +13,9 @@
 
 Goal Post-condition (file copy_array.c, line 4) in 'copy':
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = memcpy(Msint32_0, Msint32_undef_0, a_1, a_1, n).
 Let x = 4 * n.
-Let a_3 = memcpy(Msint32_0, Msint32_undef_0, a_1, a_1, i).
+Let a_2 = memcpy(M0007_sint32_0, M0007_sint32_undef_0, a_1, a_1, x).
+Let a_3 = memcpy(M0007_sint32_0, M0007_sint32_undef_0, a_1, a_1, 4 * i).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
   (* Heap *)
@@ -40,9 +40,9 @@ Prove: a_3[shift_sint32(b, i_1)] = a_3[shift_sint32(a, i_1)].
 
 Goal Preservation of Invariant 'Copy' (file copy_array.c, line 11):
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = memcpy(Msint32_0, Msint32_undef_0, a_1, a_1, n).
-Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Let x = 4 * n.
+Let a_2 = memcpy(M0007_sint32_0, M0007_sint32_undef_0, a_1, a_1, x).
+Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Assume {
   Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(1 + i).
   (* Heap *)
@@ -90,8 +90,8 @@ Prove: true.
 
 Goal Assertion 'A' (file copy_array.c, line 18):
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = memcpy(Msint32_0, Msint32_undef_0, a_1, a_1, n).
 Let x = 4 * n.
+Let a_2 = memcpy(M0007_sint32_0, M0007_sint32_undef_0, a_1, a_1, x).
 Let a_3 = shift_sint32(a, i_1).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
@@ -117,9 +117,9 @@ Prove: a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]][a_3] = a_2[a_3].
 
 Goal Assertion 'B' (file copy_array.c, line 19):
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = memcpy(Msint32_0, Msint32_undef_0, a_1, a_1, n).
-Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Let x = 4 * n.
+Let a_2 = memcpy(M0007_sint32_0, M0007_sint32_undef_0, a_1, a_1, x).
+Let a_3 = a_2[shift_sint32(a, i) <- a_2[shift_sint32(b, i)]].
 Let a_4 = shift_sint32(b, i_1).
 Assume {
   Type: is_sint32(i) /\ is_sint32(n).
@@ -160,19 +160,19 @@ Prove: true.
 Goal Loop assigns (file copy_array.c, line 12) (3/3):
 Effect at line 17
 Let a_1 = shift_sint32(a, 0).
-Let a_2 = memcpy(Msint32_0, Msint32_undef_0, a_1, a_1, n).
-Let x = i - 1.
-Let a_3 = shift_sint32(a, x).
-Let a_4 = a_2[a_3 <- a_2[shift_sint32(b, x)]].
-Let x_1 = 4 * n.
+Let x = 4 * n.
+Let a_2 = memcpy(M0007_sint32_0, M0007_sint32_undef_0, a_1, a_1, x).
+Let x_1 = i - 1.
+Let a_3 = shift_sint32(a, x_1).
+Let a_4 = a_2[a_3 <- a_2[shift_sint32(b, x_1)]].
 Assume {
-  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x).
+  Type: is_sint32(i) /\ is_sint32(n) /\ is_sint32(x_1).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0) /\ linked(alloc_0).
   (* Goal *)
   When: !invalid(alloc_0[P_a_24 <- 8][P_b_25 <- 8], a_3, 4).
   (* Pre-condition *)
-  Have: separated(a_1, x_1, shift_sint32(b, 0), x_1).
+  Have: separated(a_1, x, shift_sint32(b, 0), x).
   (* Invariant 'Range' *)
   Have: 0 <= n.
   (* Invariant 'Range' *)
@@ -192,7 +192,7 @@ Assume {
   Have: forall i_1 : Z. ((0 <= i_1) -> ((i_1 < i) ->
       (a_4[shift_sint32(b, i_1)] = a_4[shift_sint32(a, i_1)]))).
 }
-Prove: included(a_3, 4, a_1, x_1).
+Prove: included(a_3, 4, a_1, x).
 
 ------------------------------------------------------------
 

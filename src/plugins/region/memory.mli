@@ -103,7 +103,6 @@ val add_shift : map -> node -> Access.acs -> unit
 
 val merge : map -> node -> node -> unit
 val merge_all : map -> node list -> unit
-val merge_copy : map -> l:node -> r:node -> unit
 
 val cvar : map -> varinfo -> node
 val field : map -> node -> fieldinfo -> node

@@ -117,24 +117,24 @@ theory Compound
      i < n -> get (Array_uint32 p n mint) i = get mint (shift_uint32 p i)
   
   axiom Q_Array_uint32_update_Mint0 :
-    forall mint:addr -> int, n:int, p:addr, q:addr, v:int
-     [Array_uint32 p n (set mint q v)].
-     not q = p -> Array_uint32 p n (set mint q v) = Array_uint32 p n mint
+    forall mint:addr -> int, n:int, p:addr, pt:addr, v:int
+     [Array_uint32 p n (set mint pt v)].
+     not pt = p -> Array_uint32 p n (set mint pt v) = Array_uint32 p n mint
   
   (* use frama_c_wp.memory.Memory *)
   
   axiom Q_Array_uint32_eqmem_Mint0 :
-    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, q:addr
-     [Array_uint32 p n mint, eqmem mint mint1 q n1| Array_uint32 p n mint1,
-     eqmem mint mint1 q n1].
-     included p 1 q n1 ->
-     eqmem mint mint1 q n1 -> Array_uint32 p n mint1 = Array_uint32 p n mint
+    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, pt:
+     addr [Array_uint32 p n mint, eqmem mint mint1 pt n1|
+     Array_uint32 p n mint1, eqmem mint mint1 pt n1].
+     included p 1 pt n1 ->
+     eqmem mint mint1 pt n1 -> Array_uint32 p n mint1 = Array_uint32 p n mint
   
-  axiom Q_Array_uint32_havoc_Mint0 :
-    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, q:addr
-     [Array_uint32 p n (memcpy mint mint1 q q n1)].
-     separated p 1 q n1 ->
-     Array_uint32 p n (memcpy mint mint1 q q n1) = Array_uint32 p n mint
+  axiom Q_Array_uint32_memcpy_neq_Mint0 :
+    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, ps:
+     addr, pt:addr [Array_uint32 p n (memcpy mint mint1 pt ps n1)].
+     separated p 1 pt n1 ->
+     Array_uint32 p n (memcpy mint mint1 pt ps n1) = Array_uint32 p n mint
   
   axiom Q_Array_sint64_access :
     forall mint:addr -> int, i:int, n:int, p:addr
@@ -143,90 +143,90 @@ theory Compound
      i < n -> get (Array_sint64 p n mint) i = get mint (shift_sint64 p i)
   
   axiom Q_Array_sint64_update_Mint0 :
-    forall mint:addr -> int, n:int, p:addr, q:addr, v:int
-     [Array_sint64 p n (set mint q v)].
-     not q = p -> Array_sint64 p n (set mint q v) = Array_sint64 p n mint
+    forall mint:addr -> int, n:int, p:addr, pt:addr, v:int
+     [Array_sint64 p n (set mint pt v)].
+     not pt = p -> Array_sint64 p n (set mint pt v) = Array_sint64 p n mint
   
   axiom Q_Array_sint64_eqmem_Mint0 :
-    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, q:addr
-     [Array_sint64 p n mint, eqmem mint mint1 q n1| Array_sint64 p n mint1,
-     eqmem mint mint1 q n1].
-     included p 1 q n1 ->
-     eqmem mint mint1 q n1 -> Array_sint64 p n mint1 = Array_sint64 p n mint
+    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, pt:
+     addr [Array_sint64 p n mint, eqmem mint mint1 pt n1|
+     Array_sint64 p n mint1, eqmem mint mint1 pt n1].
+     included p 1 pt n1 ->
+     eqmem mint mint1 pt n1 -> Array_sint64 p n mint1 = Array_sint64 p n mint
   
-  axiom Q_Array_sint64_havoc_Mint0 :
-    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, q:addr
-     [Array_sint64 p n (memcpy mint mint1 q q n1)].
-     separated p 1 q n1 ->
-     Array_sint64 p n (memcpy mint mint1 q q n1) = Array_sint64 p n mint
+  axiom Q_Array_sint64_memcpy_neq_Mint0 :
+    forall mint:addr -> int, mint1:addr -> int, n:int, n1:int, p:addr, ps:
+     addr, pt:addr [Array_sint64 p n (memcpy mint mint1 pt ps n1)].
+     separated p 1 pt n1 ->
+     Array_sint64 p n (memcpy mint mint1 pt ps n1) = Array_sint64 p n mint
   
   axiom Q_Load_S1_S_update_Mint0 :
-    forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr, q:
-     addr, v:int [Load_S1_S p (set mint q v) mint1 mint2].
-     separated p 11 q 1 ->
-     Load_S1_S p (set mint q v) mint1 mint2 = Load_S1_S p mint mint1 mint2
+    forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr,
+     pt:addr, v:int [Load_S1_S p (set mint pt v) mint1 mint2].
+     separated p 11 pt 1 ->
+     Load_S1_S p (set mint pt v) mint1 mint2 = Load_S1_S p mint mint1 mint2
   
   axiom Q_Load_S1_S_eqmem_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
-     -> int, n:int, p:addr, q:addr [Load_S1_S p mint mint2 mint3,
-     eqmem mint mint1 q n| Load_S1_S p mint1 mint2 mint3,
-     eqmem mint mint1 q n].
-     included p 11 q n ->
-     eqmem mint mint1 q n ->
+     -> int, n:int, p:addr, pt:addr [Load_S1_S p mint mint2 mint3,
+     eqmem mint mint1 pt n| Load_S1_S p mint1 mint2 mint3,
+     eqmem mint mint1 pt n].
+     included p 11 pt n ->
+     eqmem mint mint1 pt n ->
      Load_S1_S p mint1 mint2 mint3 = Load_S1_S p mint mint2 mint3
   
-  axiom Q_Load_S1_S_havoc_Mint0 :
+  axiom Q_Load_S1_S_memcpy_neq_Mint0 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
-     -> int, n:int, p:addr, q:addr
-     [Load_S1_S p (memcpy mint mint1 q q n) mint2 mint3].
-     separated p 11 q n ->
-     Load_S1_S p (memcpy mint mint1 q q n) mint2 mint3 =
+     -> int, n:int, p:addr, ps:addr, pt:addr
+     [Load_S1_S p (memcpy mint mint1 pt ps n) mint2 mint3].
+     separated p 11 pt n ->
+     Load_S1_S p (memcpy mint mint1 pt ps n) mint2 mint3 =
      Load_S1_S p mint mint2 mint3
   
   axiom Q_Load_S1_S_update_Mint1 :
-    forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr, q:
-     addr, v:int [Load_S1_S p mint2 (set mint1 q v) mint].
-     separated p 11 q 1 ->
-     Load_S1_S p mint2 (set mint1 q v) mint = Load_S1_S p mint2 mint1 mint
+    forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr,
+     pt:addr, v:int [Load_S1_S p mint2 (set mint1 pt v) mint].
+     separated p 11 pt 1 ->
+     Load_S1_S p mint2 (set mint1 pt v) mint = Load_S1_S p mint2 mint1 mint
   
   axiom Q_Load_S1_S_eqmem_Mint1 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
-     -> int, n:int, p:addr, q:addr [Load_S1_S p mint3 mint1 mint,
-     eqmem mint1 mint2 q n| Load_S1_S p mint3 mint2 mint,
-     eqmem mint1 mint2 q n].
-     included p 11 q n ->
-     eqmem mint1 mint2 q n ->
+     -> int, n:int, p:addr, pt:addr [Load_S1_S p mint3 mint1 mint,
+     eqmem mint1 mint2 pt n| Load_S1_S p mint3 mint2 mint,
+     eqmem mint1 mint2 pt n].
+     included p 11 pt n ->
+     eqmem mint1 mint2 pt n ->
      Load_S1_S p mint3 mint2 mint = Load_S1_S p mint3 mint1 mint
   
-  axiom Q_Load_S1_S_havoc_Mint1 :
+  axiom Q_Load_S1_S_memcpy_neq_Mint1 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
-     -> int, n:int, p:addr, q:addr
-     [Load_S1_S p mint3 (memcpy mint1 mint2 q q n) mint].
-     separated p 11 q n ->
-     Load_S1_S p mint3 (memcpy mint1 mint2 q q n) mint =
+     -> int, n:int, p:addr, ps:addr, pt:addr
+     [Load_S1_S p mint3 (memcpy mint1 mint2 pt ps n) mint].
+     separated p 11 pt n ->
+     Load_S1_S p mint3 (memcpy mint1 mint2 pt ps n) mint =
      Load_S1_S p mint3 mint1 mint
   
   axiom Q_Load_S1_S_update_Mint2 :
-    forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr, q:
-     addr, v:int [Load_S1_S p mint1 mint (set mint2 q v)].
-     separated p 11 q 1 ->
-     Load_S1_S p mint1 mint (set mint2 q v) = Load_S1_S p mint1 mint mint2
+    forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, p:addr,
+     pt:addr, v:int [Load_S1_S p mint1 mint (set mint2 pt v)].
+     separated p 11 pt 1 ->
+     Load_S1_S p mint1 mint (set mint2 pt v) = Load_S1_S p mint1 mint mint2
   
   axiom Q_Load_S1_S_eqmem_Mint2 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
-     -> int, n:int, p:addr, q:addr [Load_S1_S p mint1 mint mint2,
-     eqmem mint2 mint3 q n| Load_S1_S p mint1 mint mint3,
-     eqmem mint2 mint3 q n].
-     included p 11 q n ->
-     eqmem mint2 mint3 q n ->
+     -> int, n:int, p:addr, pt:addr [Load_S1_S p mint1 mint mint2,
+     eqmem mint2 mint3 pt n| Load_S1_S p mint1 mint mint3,
+     eqmem mint2 mint3 pt n].
+     included p 11 pt n ->
+     eqmem mint2 mint3 pt n ->
      Load_S1_S p mint1 mint mint3 = Load_S1_S p mint1 mint mint2
   
-  axiom Q_Load_S1_S_havoc_Mint2 :
+  axiom Q_Load_S1_S_memcpy_neq_Mint2 :
     forall mint:addr -> int, mint1:addr -> int, mint2:addr -> int, mint3:addr
-     -> int, n:int, p:addr, q:addr
-     [Load_S1_S p mint1 mint (memcpy mint2 mint3 q q n)].
-     separated p 11 q n ->
-     Load_S1_S p mint1 mint (memcpy mint2 mint3 q q n) =
+     -> int, n:int, p:addr, ps:addr, pt:addr
+     [Load_S1_S p mint1 mint (memcpy mint2 mint3 pt ps n)].
+     separated p 11 pt n ->
+     Load_S1_S p mint1 mint (memcpy mint2 mint3 pt ps n) =
      Load_S1_S p mint1 mint mint2
   
 end
