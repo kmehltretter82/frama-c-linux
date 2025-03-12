@@ -166,6 +166,7 @@ def print_machdep(machdep):
         args.dest_file = sys.stdout
     yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
+
 def default_value(typ):
     if typ == "integer":
         return -1
