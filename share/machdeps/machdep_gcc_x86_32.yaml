@@ -539,7 +539,8 @@ l_ctermid: '9'
 l_tmpnam: '20'
 little_endian: true
 machdep_name: machdep_gcc_x86_32
-max_align_t: struct {int __max_align; } __attribute__ ((aligned (16)))
+max_align_t: struct __machdep_max_align_t {int __max_align; } __attribute__ ((aligned
+    (16)))
 mb_cur_max: ((size_t) 16 )
 nsig: (64 + 1)
 path_max: '4096'
