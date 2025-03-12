@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    STDOPT: +"-pp-annot"
 */
 /* This example tests the various way a structure can be named:

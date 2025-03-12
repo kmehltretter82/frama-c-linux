@@ -1,8 +1,8 @@
 /* run.config*
-   OPT:  -cpp-extra-args=-I@FRAMAC_SHARE@ @EVA_CONFIG@ -eva-alloc-builtin fresh -deps
+   OPT: @EVA_CONFIG@ -eva-alloc-builtin fresh -deps
 */
 
-#include "libc/stdlib.c"
+#include <stdlib.c>
 
 struct T { int a; int b; };
 

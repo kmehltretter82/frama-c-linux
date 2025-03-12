@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    STDOPT: +"-eva-builtin memcpy:Frama_C_memcpy -mt-verbose 3 -eva-warn-key builtins:override=inactive"
 */
 
