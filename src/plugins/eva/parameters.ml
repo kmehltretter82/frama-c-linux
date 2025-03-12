@@ -431,17 +431,15 @@ module SaveWidenings =
 let () = Parameter_customize.set_group performance
 
 module SimplifyCallstack =
-  String
+  Filled_string_set 
     (struct
       let option_name = "-eva-simplify-callstack"
-      let help = "Removes call site line number from the callstack of the given argument. Default is no"
-      let arg_name = "no|widenings|malloc"
-      let default = "no"
+      let help = "Removes call site line number from the callstack of the given argument. Default is widenings"
+      let arg_name = "widenings|malloc"
+      let default = Datatype.String.Set.of_list ["widenings"]
     end)
 let () = add_precision_dep SimplifyCallstack.parameter
 let () = Parameter_customize.set_group performance
-let () = SimplifyCallstack.set_possible_values
-    ["no"; "widenings"; "malloc";]
 
 let () = Parameter_customize.is_invisible ()
 module Load =

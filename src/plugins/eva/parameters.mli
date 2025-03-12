@@ -60,7 +60,7 @@ module JoinResults: Parameter_sig.Bool
 
 module ReuseWidenings: Parameter_sig.Bool
 module SaveWidenings: Parameter_sig.Bool
-module SimplifyCallstack: Parameter_sig.String
+module SimplifyCallstack: Parameter_sig.String_set
 
 module Load: Parameter_sig.Filepath
 

@@ -463,9 +463,10 @@ module Make
     | Some inout ->
       try 
         let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
-        let callstack = match Parameters.SimplifyCallstack.get () with
-          | "widenings" -> Callstack.simplify callstack
-          | _ -> callstack
+        let callstack = 
+          if Datatype.String.Set.mem "widenings" (Parameters.SimplifyCallstack.get ())
+          then Callstack.simplify callstack
+          else callstack
         in
         store_widenings_kf inout kf args callstack widenings
       with TooImprecise -> ()
@@ -581,9 +582,10 @@ module Make
           Statistics.incr stat_widenings_misses_args kf;
           raise Not_found
       in
-      let callstack = match Parameters.SimplifyCallstack.get () with
-        | "widenings" -> Callstack.simplify callstack
-        | _ -> callstack
+      let callstack = 
+        if Datatype.String.Set.mem "widenings" (Parameters.SimplifyCallstack.get ())
+        then Callstack.simplify callstack
+        else callstack
       in
       let widenings =
         Callstack.Hashtbl.find tbl_callstack callstack 
