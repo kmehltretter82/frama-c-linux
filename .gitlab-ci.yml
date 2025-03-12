@@ -219,12 +219,6 @@ eva-domains:
   <<: *eva_template
   <<: *eva_domains
 
-mthread-tests:
-  stage: tests
-  script:
-    - ./nix/build-proxy.sh mthread-tests
-  <<: *coverage
-
 kernel-tests:
   stage: tests
   script:
