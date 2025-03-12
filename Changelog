@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-03-12] Fix handling of qualifiers in array formals during
+              typing phase (fix #@998).
 o   Kernel    [2025-02-25] Frama-C now uses OCamlmig (see developer manual) to
               perform migrations between versions.
 o!  Kernel    [2025-02-25] New module Ast_types for type related functions. Most

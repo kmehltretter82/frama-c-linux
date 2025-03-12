@@ -41,7 +41,7 @@ let rec get_attributes { tnode; tattr } =
   | TFun _   -> tattr
   | TBuiltin_va_list -> tattr
 
-let rec add_attributes ?(combine=Ast_attributes.add_list) a0 t =
+let rec add_attributes ?(push_qualifiers=true) ?(combine=Ast_attributes.add_list) a0 t =
   begin
     match a0 with
     | [] ->
@@ -61,10 +61,12 @@ let rec add_attributes ?(combine=Ast_attributes.add_list) a0 t =
       | TNamed _
       | TBuiltin_va_list -> {t with tattr = add t.tattr}
       | TArray (bt, l) ->
-        let att_elt, att_typ = Ast_attributes.split_array_attributes a0 in
-        let bt' = array_push_attributes att_elt bt in
-        let tattr = Ast_attributes.add_list att_typ t.tattr in
-        Cil_const.mk_tarray ~tattr bt' l
+        if not push_qualifiers then {t with tattr = add t.tattr}
+        else
+          let att_elt, att_typ = Ast_attributes.split_array_attributes a0 in
+          let bt' = array_push_attributes att_elt bt in
+          let tattr = Ast_attributes.add_list att_typ t.tattr in
+          Cil_const.mk_tarray ~tattr bt' l
   end
 (* Push attributes that belong to the type of the elements of the array as
    far as possible *)
