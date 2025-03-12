@@ -431,7 +431,10 @@ let is_union t =
   | TComp ci -> not ci.cstruct
   | _ -> false
 
-let is_struct_or_union t = is_struct t || is_union t
+let is_struct_or_union t =
+  match unroll_skel t with
+  | TComp _ -> true
+  | _ -> false
 
 (* Check if a type is a transparent union, and return the first field if it is. *)
 let is_transparent_union t =
