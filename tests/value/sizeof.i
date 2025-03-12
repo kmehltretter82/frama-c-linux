@@ -47,9 +47,15 @@ void sizeof_void () {
 
 void f(int sz) {}
 
+unsigned fsize3(int n) {
+  char b[n + 3]; // variable length array
+  return sizeof b; // execution time sizeof
+}
+
 void main(int *p, int *q, int j) {
   main1();
   main2();
   sizeof_void();
   f(sizeof(*p) * j); // must not crash with equality domain
+  int r = fsize3(5);
 }

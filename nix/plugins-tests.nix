@@ -12,8 +12,6 @@ mk_tests {
       @tests/occurrence/ptests \
       @tests/pdg/ptests \
       @tests/slicing/ptests \
-      @tests/rte/ptests \
-      @tests/rte_manual/ptests \
       @tests/scope/ptests \
       @tests/sparecode/ptests \
       @src/plugins/aorai/tests/ptests \
@@ -25,6 +23,7 @@ mk_tests {
       @src/plugins/nonterm/tests/ptests \
       @src/plugins/report/tests/ptests \
       @src/plugins/region/tests/ptests \
+      @src/plugins/rte/tests/ptests \
       @src/plugins/server/tests/ptests \
       @src/plugins/variadic/tests/ptests
     dune runtest -j1 --display short \
