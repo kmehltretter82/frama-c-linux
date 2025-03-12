@@ -41,6 +41,12 @@ struct
   end
 
   include Datatype.Make_with_collections (Prototype)
+
+  let loc (stmt, _cs) =
+    Cil_datatype.Stmt.loc stmt
+
+  let pos aloc =
+    fst (loc aloc)
 end
 
 type local = Local.t

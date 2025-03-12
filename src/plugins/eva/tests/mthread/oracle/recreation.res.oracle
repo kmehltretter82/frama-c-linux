@@ -323,8 +323,8 @@
   The mutex locks[0] is already locked.
 [mt] recreation.c:45: Release locks[0]
 [mt] recreation.c:48: Release locks[10]
-[mt] recreation.c:49: Release locks[0]
 [mt] recreation.c:49: Warning: Mutex locks[0] might not be locked
+[mt] recreation.c:49: Release locks[0]
 [eva] FRAMAC_SHARE/mthread_pthread.c:66: Warning: 
   The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
