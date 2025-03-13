@@ -162,6 +162,7 @@ ivette:
   stage: build
   <<: *ivette_setup
   script:
+    - make -C ivette check-lint
     - make -C ivette dist
   tags:
     - docker
