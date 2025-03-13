@@ -23,12 +23,11 @@
 open Annot
 open Memory
 
-let rec add_lval (m:map) (p:path): node =
+let rec add_path (m:map) (p:path): node =
   match p.step with
   | Var x -> add_root m x
-  | Field(lv,fd) ->
-    Memory.add_field m (add_lval m lv) fd
-  | Index(lv,_) -> Memory.add_index m (add_lval m lv) lv.typ
+  | Field(lv,fd) -> Memory.add_field m (add_path m lv) fd
+  | Index(lv,_) -> Memory.add_index m (add_path m lv) lv.typ
   | Star e | Cast(_,e) -> add_pointer m e
   | Shift _ | AddrOf _ ->
     Options.error ~source:(fst p.loc)
@@ -42,13 +41,13 @@ and add_pointer  (m:map) (p:path): Memory.node =
 and add_exp (m:map) (p:path): Memory.node option =
   match p.step with
   | (Var _ | Field _ | Index _ | Star _ | Cast _) ->
-    let r = add_lval m p in
+    let r = add_path m p in
     add_value m r p.typ
-  | AddrOf p -> Some (add_lval m p)
+  | AddrOf p -> Some (add_path m p)
   | Shift p -> add_exp m p
 
 let add_region (m: map) (r : Annot.region) =
-  let rs = List.map (add_lval m) r.rpath in
+  let rs = List.map (add_path m) r.rpath in
   merge_all m @@
   match r.rname with
   | None -> rs
