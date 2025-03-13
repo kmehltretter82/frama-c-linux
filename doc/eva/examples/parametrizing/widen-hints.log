@@ -3,7 +3,7 @@
 [eva:initial-state] Values of globals at initialization
   i ∈ {0}
   j ∈ {0}
-[eva] widen-hints.c:6: starting to merge loop iterations
+[eva:partition] widen-hints.c:6: starting to merge loop iterations
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {13}
