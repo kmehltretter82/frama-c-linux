@@ -43,7 +43,8 @@ import 'tippy.js/animations/shift-away.css';
 import './tippy.css';
 
 import { IconButton } from 'dome/controls/buttons';
-import { Space } from 'dome/frame/toolbars';
+import { Inset, Space } from 'dome/frame/toolbars';
+import { HelpIcon } from 'dome/help';
 
 import '@fortawesome/fontawesome-free/js/all';
 
@@ -676,8 +677,6 @@ export default function GraphComponent(): JSX.Element {
     Dome.useStringSettings('dive.selectionMode', 'follow');
   const [layout, setLayout] =
     Dome.useStringSettings('dive.layout', 'dagre');
-  const [showLegend, flipShowLegend] =
-    Dome.useFlipSettings('dive.legend', true);
 
   // Selection mode
   const selectMode = (id?: string) => void (id && setSelectionMode(id));
@@ -733,33 +732,25 @@ export default function GraphComponent(): JSX.Element {
           onClick={layoutMenu}
           title="Choose the graph layout"
         />
-        <Space />
-        <IconButton
-          icon="HELP"
-          onClick={flipShowLegend}
-          kind={showLegend ? 'positive' : 'default'}
-          title={showLegend ? 'Hide legend' : 'Show legend'}
-        />
-        <Space />
+        <Inset />
         <IconButton
           icon="TRASH"
           onClick={() => graph.current?.clear()}
           title="Clear the graph"
         />
-        <Space />
+        <Inset />
         <EvaStatus />
+        <Inset />
+        <HelpIcon id="dive" />
       </Ivette.TitleBar>
       <EvaReady>
-        <>
-          <GraphView
-            addSelection={addSelection}
-            grabbable={grabbable}
-            layout={layout}
-            selectionMode={selectionMode}
-            ref={graph}
-          />
-          {showLegend ? <Legend /> : null}
-        </>
+        <GraphView
+          addSelection={addSelection}
+          grabbable={grabbable}
+          layout={layout}
+          selectionMode={selectionMode}
+          ref={graph}
+        />
       </EvaReady>
     </>
   );

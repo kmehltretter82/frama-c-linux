@@ -25,6 +25,9 @@ import * as Ivette from 'ivette';
 
 import GraphComponent from './graph';
 import TreeComponent from './tree';
+
+import { Pattern } from 'dome/text/markdown';
+import Legend from './legend';
 import doc from './doc.md?raw';
 
 Ivette.registerGroup({
@@ -61,4 +64,11 @@ Ivette.registerView({
 // --- help
 // --------------------------------------------------------------------------
 
-Ivette.registerDocChapter({ id: "dive", content: doc });
+const legendTag: Pattern = {
+  pattern: /\[legend\]/g,
+  replace: (key: number, match?: RegExpExecArray) => {
+    return match ? <Legend key={key} /> : null;
+  }
+};
+
+Ivette.registerDocChapter({ id: "dive", content: doc, patterns: [legendTag] });
