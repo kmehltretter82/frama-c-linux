@@ -658,7 +658,8 @@ export interface GutterDecoration extends LineDecoration {
 }
 
 export type Decoration = MarkDecoration | LineDecoration | GutterDecoration;
-export type Decorations = undefined | null | Decoration | readonly Decorations[];
+export type Decorations =
+  undefined | null | Decoration | readonly Decorations[];
 
 /* -------------------------------------------------------------------------- */
 /* --- Decoration Builder                                                 --- */
