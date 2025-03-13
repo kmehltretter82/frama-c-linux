@@ -18,6 +18,8 @@
 Open Source Release <next-release>
 ###############################################################################
 
+-   Kernel    [2025-03-13] Add option `-commands-file` to group Frama-C options
+              in a separate file.
 -   Kernel    [2025-03-12] Fix handling of qualifiers in array formals during
               typing phase (fix #@998).
 o   Kernel    [2025-02-25] Frama-C now uses OCamlmig (see developer manual) to
