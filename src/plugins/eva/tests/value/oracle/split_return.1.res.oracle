@@ -1,5 +1,6 @@
 [kernel] Parsing split_return.i (no preprocessing)
-[eva] Splitting return states on:
+[eva:split-return] 
+  Splitting return states on:
   \return(f7) == 0, 3 (user)
   \return(init) == 0 (auto)
   \return(f2) == 0 (auto)

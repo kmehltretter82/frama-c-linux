@@ -1,6 +1,7 @@
 [kernel] Parsing split_return.i (no preprocessing)
 [eva] Warning: ignoring non-existing function 'NON_EXISTING'.
-[eva] Splitting return states on:
+[eva:split-return] 
+  Splitting return states on:
   \return(f2) == 0 (user)
   \return(f3) == -2, -4 (user)
   \return(f4) == 4 (user)

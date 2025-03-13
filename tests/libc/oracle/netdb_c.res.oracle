@@ -1,5 +1,6 @@
 [kernel] Parsing netdb_c.c (with preprocessing)
-[eva] Splitting return states on:
+[eva:split-return] 
+  Splitting return states on:
   \return(tmpfile) == 0 (auto)
   \return(tmpnam) == 0 (auto)
   \return(fopen) == 0 (auto)

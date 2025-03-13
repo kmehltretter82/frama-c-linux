@@ -1,5 +1,6 @@
 [kernel] Parsing eva_annot_float.c (with preprocessing)
-[eva] Option -eva-precision 2 detected, automatic configuration of the analysis:
+[eva:precision-settings] 
+  Option -eva-precision 2 detected, automatic configuration of the analysis:
   option -eva-min-loop-unroll set to 0 (default value).
   option -eva-auto-loop-unroll set to 32.
   option -eva-widening-delay set to 2.

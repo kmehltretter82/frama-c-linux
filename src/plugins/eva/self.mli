@@ -52,6 +52,8 @@ val dkey_cvalue_domain: category
 val dkey_iterator : category
 val dkey_widening : category
 val dkey_partition : category
+val dkey_split_return : category
+val dkey_precision_settings : category
 
 (** {2 Warning categories.} *)
 

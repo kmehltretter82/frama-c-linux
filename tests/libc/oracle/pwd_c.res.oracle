@@ -1,5 +1,6 @@
 [kernel] Parsing pwd_c.c (with preprocessing)
-[eva] Option -eva-precision 1 detected, automatic configuration of the analysis:
+[eva:precision-settings] 
+  Option -eva-precision 1 detected, automatic configuration of the analysis:
   option -eva-min-loop-unroll set to 0 (default value).
   option -eva-auto-loop-unroll set to 16.
   option -eva-widening-delay set to 1.
@@ -13,7 +14,8 @@
   option -eva-split-return already set to 'full' (not modified).
   option -eva-equality-through-calls set to 'none'.
   option -eva-octagon-through-calls set to false (default value).
-[eva] Splitting return states on:
+[eva:split-return] 
+  Splitting return states on:
   \full_split(@all)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state

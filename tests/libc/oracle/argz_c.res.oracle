@@ -1,5 +1,6 @@
 [kernel] Parsing argz_c.c (with preprocessing)
-[eva] Option -eva-precision 6 detected, automatic configuration of the analysis:
+[eva:precision-settings] 
+  Option -eva-precision 6 detected, automatic configuration of the analysis:
   option -eva-min-loop-unroll set to 0 (default value).
   option -eva-auto-loop-unroll set to 192.
   option -eva-widening-delay set to 4.
@@ -13,7 +14,8 @@
   option -eva-split-return set to 'auto'.
   option -eva-equality-through-calls set to 'formals' (default value).
   option -eva-octagon-through-calls set to false (default value).
-[eva] Splitting return states on:
+[eva:split-return] 
+  Splitting return states on:
   \return(seed48) == 0 (auto)
   \return(calloc) == 0 (auto)
   \return(malloc) == 0 (auto)

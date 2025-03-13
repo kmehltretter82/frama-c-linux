@@ -1444,8 +1444,9 @@ let () =
   ()
 
 let set_analysis n =
-  feedback "Option %s %i detected, \
-            automatic configuration of the analysis:" Precision.name n;
+  let dkey = dkey_precision_settings in
+  feedback ~dkey "Option %s %i detected, \
+                  automatic configuration of the analysis:" Precision.name n;
   List.iter ((|>) n) (List.rev !configures)
 
 let configure_precision () =

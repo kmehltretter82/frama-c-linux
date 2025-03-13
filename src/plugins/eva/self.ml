@@ -111,11 +111,19 @@ let dkey_partition =
   register_category "partition"
     ~help:"messages about states partitioning"
 
+let dkey_split_return =
+  register_category "split-return"
+    ~help:"messages related to option -eva-split-return"
+
+let dkey_precision_settings =
+  register_category "precision-settings"
+    ~help:"messages about parameters affected by option -eva-precision"
+
 let () =
   let activate dkey = add_debug_keys dkey in
   List.iter activate
     [dkey_initial_state; dkey_final_states; dkey_summary; dkey_cvalue_domain;
-     dkey_partition]
+     dkey_partition; dkey_split_return; dkey_precision_settings]
 
 (* Warning categories. *)
 let wkey_alarm = register_warn_category "alarm"
