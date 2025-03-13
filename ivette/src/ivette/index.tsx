@@ -143,6 +143,8 @@ export type LayoutPosition =
   | 'ABCD';
 
 export interface ComponentProps extends ContentProps {
+  /** ID of the component documentation  */
+  docId?: string;
   /** Defaults to 'D' */
   preferredPosition?: LayoutPosition;
 }

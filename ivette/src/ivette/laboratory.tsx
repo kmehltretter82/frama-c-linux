@@ -36,6 +36,7 @@ import { QPane, QSplit } from 'dome/layout/qsplit';
 import { RenderElement } from 'dome/layout/dispatch';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
+import { HelpIcon } from 'dome/help';
 import * as Ivette from 'ivette';
 import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
 import { NotificationTimer } from 'ivette/prefs';
@@ -975,7 +976,7 @@ function Pane(props: PaneProps): JSX.Element | null {
     [compId]
   );
   if (!component) return null;
-  const { label, title, children } = component;
+  const { label, title, docId, children } = component;
   return (
     <QPane id={compId}>
       <Vfill className="labview-content">
@@ -987,6 +988,7 @@ function Pane(props: PaneProps): JSX.Element | null {
                   className="labview-handle"
                   label={label}
                   title={title} />
+                {docId && <><HelpIcon id={docId} /><Toolbar.Button /></>}
               </RenderElement>
             </Catch>
           </Hfill>
