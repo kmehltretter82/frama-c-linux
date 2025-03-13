@@ -35,9 +35,10 @@
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -54,9 +55,10 @@
     write by jobs1 at sharedvars.c:31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -68,9 +70,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -86,9 +89,10 @@
   jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -104,9 +108,10 @@
       write by jobs4 at sharedvars.c:57
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -122,9 +127,10 @@
   jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -138,9 +144,10 @@
       write by jobs6 at sharedvars.c:76
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -191,11 +198,21 @@
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s4 = -1; <- main,
-                     s4 = 1; <- main
+  concurrent writes:
+    s4 = -1; <- main
+    s4 = 1; <- main
   shared bases: {s4, s6}
-  interferences: {  } -> # cvalue: s4 ∈ {-1; 1}
-                                   s6 ∈ {0}
+  interferences by location:
+    sharedvars.c:98:
+      # cvalue: s4 ∈ {-1}
+                s6 ∈ {0} 
+    sharedvars.c:100:
+      # cvalue: s4 ∈ {1}
+                s6 ∈ {0} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s4 ∈ {-1; 1}
+                s6 ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -212,9 +229,10 @@
     write by jobs1 at sharedvars.c:31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s4, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -226,9 +244,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s4, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -245,9 +264,10 @@
   jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s4, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -268,13 +288,29 @@
       write by jobs4 at sharedvars.c:57
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s4; <- f4,
-                     s4 = 4; <- f4,
-                     t = s6; <- f4,
-                     s6 = 4; <- f4
+  concurrent writes:
+    int t = s4; <- f4
+    s4 = 4; <- f4
+    t = s6; <- f4
+    s6 = 4; <- f4
   shared bases: {s4, s6}
-  interferences: {  } -> # cvalue: s4 ∈ {-1; 1; 4}
-                                   s6 ∈ {0; 4}
+  interferences by location:
+    sharedvars.c:53:
+      # cvalue: s4 ∈ {-1; 1}
+                s6 ∈ {0} 
+    sharedvars.c:54:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0} 
+    sharedvars.c:56:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0} 
+    sharedvars.c:57:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0; 4} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0; 4}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -291,9 +327,10 @@
   jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s4, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -310,11 +347,21 @@
       write by jobs6 at sharedvars.c:76
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s6; <- f6,
-                     s6 = 6; <- f6
+  concurrent writes:
+    int t = s6; <- f6
+    s6 = 6; <- f6
   shared bases: {s4, s6}
-  interferences: {  } -> # cvalue: s4 ∈ {-1; 1; 4}
-                                   s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:75:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0; 4} 
+    sharedvars.c:76:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s4 ∈ {-1; 1; 4}
+                s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -328,9 +375,10 @@
       write by jobs31 at sharedvars.c:41
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s4, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -344,9 +392,10 @@
       write by jobs51 at sharedvars.c:63
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s4, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -438,15 +487,33 @@
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 1; <- main,
-                     s4 = -1; <- main,
-                     s4 = 1; <- main
+  concurrent writes:
+    u3 = 1; <- main
+    s4 = -1; <- main
+    s4 = 1; <- main
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:88:
+      # cvalue: u3 ∈ {1}
+                s4 ∈ {0}
+                s5 ∈ {0}
+                s6 ∈ {0} 
+    sharedvars.c:98:
+      # cvalue: u3 ∈ {1}
+                s4 ∈ {-1; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+    sharedvars.c:100:
+      # cvalue: u3 ∈ {1}
+                s4 ∈ {-1; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: u3 ∈ {1}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -463,9 +530,10 @@
     write by jobs1 at sharedvars.c:31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -478,9 +546,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -500,13 +569,21 @@
   jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 3; <- f3
+  concurrent writes:
+    u3 = 3; <- f3
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:46:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -528,16 +605,39 @@
       write by jobs4 at sharedvars.c:57
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s4; <- f4,
-                     s4 = 4; <- f4,
-                     t = s6; <- f4,
-                     s6 = 4; <- f4
+  concurrent writes:
+    int t = s4; <- f4
+    s4 = 4; <- f4
+    t = s6; <- f4
+    s6 = 4; <- f4
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:53:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+    sharedvars.c:54:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+    sharedvars.c:56:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+    sharedvars.c:57:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: u3 ∈ {1; 3}
+                s4 ∈ {-1; 0; 1; 4}
+                s5 ∈ {0}
+                s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -557,13 +657,23 @@
   jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s5 = 5; <- f5
+  concurrent writes:
+    s5 = 5; <- f5
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0; 5}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:69:
+      # cvalue:
+      u3 ∈ {1; 3}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -581,14 +691,30 @@
       write by jobs6 at sharedvars.c:76
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s6; <- f6,
-                     s6 = 6; <- f6
+  concurrent writes:
+    int t = s6; <- f6
+    s6 = 6; <- f6
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0; 5}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:75:
+      # cvalue:
+      u3 ∈ {1; 3}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6} 
+    sharedvars.c:76:
+      # cvalue:
+      u3 ∈ {1; 3}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -606,14 +732,30 @@
       write by jobs31 at sharedvars.c:41
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = u3; <- f31,
-                     u3 = 31; <- f31
+  concurrent writes:
+    int t = u3; <- f31
+    u3 = 31; <- f31
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0; 5}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:40:
+      # cvalue:
+      u3 ∈ {1; 3}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6} 
+    sharedvars.c:41:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -631,14 +773,30 @@
       write by jobs51 at sharedvars.c:63
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s5; <- f51,
-                     s5 = 51; <- f51
+  concurrent writes:
+    int t = s5; <- f51
+    s5 = 51; <- f51
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ {0; 4; 6}
+  interferences by location:
+    sharedvars.c:62:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5}
+      s6 ∈ {0; 4; 6} 
+    sharedvars.c:63:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ {0; 4; 6} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ {0; 4; 6}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -740,15 +898,37 @@
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 1; <- main,
-                     s4 = -1; <- main,
-                     s4 = 1; <- main
+  concurrent writes:
+    u3 = 1; <- main
+    s4 = -1; <- main
+    s4 = 1; <- main
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:88:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ {0; 4; 6} 
+    sharedvars.c:98:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:100:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -765,9 +945,10 @@
     write by jobs1 at sharedvars.c:31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -780,9 +961,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -801,13 +983,23 @@
   jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 3; <- f3
+  concurrent writes:
+    u3 = 3; <- f3
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:46:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -829,16 +1021,44 @@
       write by jobs4 at sharedvars.c:57
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s4; <- f4,
-                     s4 = 4; <- f4,
-                     t = s6; <- f4,
-                     s6 = 4; <- f4
+  concurrent writes:
+    int t = s4; <- f4
+    s4 = 4; <- f4
+    t = s6; <- f4
+    s6 = 4; <- f4
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:53:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:54:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:56:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:57:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -857,13 +1077,23 @@
   jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s5 = 5; <- f5
+  concurrent writes:
+    s5 = 5; <- f5
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:69:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -881,14 +1111,30 @@
       write by jobs6 at sharedvars.c:76
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s6; <- f6,
-                     s6 = 6; <- f6
+  concurrent writes:
+    int t = s6; <- f6
+    s6 = 6; <- f6
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:75:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:76:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -905,14 +1151,30 @@
       write by jobs31 at sharedvars.c:41
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = u3; <- f31,
-                     u3 = 31; <- f31
+  concurrent writes:
+    int t = u3; <- f31
+    u3 = 31; <- f31
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:40:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:41:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -930,14 +1192,30 @@
       write by jobs51 at sharedvars.c:63
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s5; <- f51,
-                     s5 = 51; <- f51
+  concurrent writes:
+    int t = s5; <- f51
+    s5 = 51; <- f51
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ {0; 5; 51}
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:62:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:63:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -1035,15 +1313,37 @@
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 1; <- main,
-                     s4 = -1; <- main,
-                     s4 = 1; <- main
+  concurrent writes:
+    u3 = 1; <- main
+    s4 = -1; <- main
+    s4 = 1; <- main
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:88:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ {0; 5; 51}
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:98:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:100:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1060,9 +1360,10 @@
     write by jobs1 at sharedvars.c:31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -1075,9 +1376,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -1096,13 +1398,23 @@
   jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 3; <- f3
+  concurrent writes:
+    u3 = 3; <- f3
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:46:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -1124,16 +1436,44 @@
       write by jobs4 at sharedvars.c:57
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s4; <- f4,
-                     s4 = 4; <- f4,
-                     t = s6; <- f4,
-                     s6 = 4; <- f4
+  concurrent writes:
+    int t = s4; <- f4
+    s4 = 4; <- f4
+    t = s6; <- f4
+    s6 = 4; <- f4
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:53:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:54:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:56:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:57:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -1152,13 +1492,23 @@
   jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s5 = 5; <- f5
+  concurrent writes:
+    s5 = 5; <- f5
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:69:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -1175,14 +1525,30 @@
       write by jobs6 at sharedvars.c:76
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s6; <- f6,
-                     s6 = 6; <- f6
+  concurrent writes:
+    int t = s6; <- f6
+    s6 = 6; <- f6
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:75:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:76:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -1199,14 +1565,30 @@
       write by jobs31 at sharedvars.c:41
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = u3; <- f31,
-                     u3 = 31; <- f31
+  concurrent writes:
+    int t = u3; <- f31
+    u3 = 31; <- f31
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:40:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:41:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed
@@ -1224,14 +1606,30 @@
       write by jobs51 at sharedvars.c:63
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s5; <- f51,
-                     s5 = 51; <- f51
+  concurrent writes:
+    int t = s5; <- f51
+    s5 = 51; <- f51
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:62:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:63:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs51 computed
@@ -1324,15 +1722,37 @@
   jobs6: write by <main> at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 1; <- main,
-                     s4 = -1; <- main,
-                     s4 = 1; <- main
+  concurrent writes:
+    u3 = 1; <- main
+    s4 = -1; <- main
+    s4 = 1; <- main
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:88:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:98:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:100:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1349,9 +1769,10 @@
     write by jobs1 at sharedvars.c:31
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -1363,9 +1784,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {u3, s4, s5, s6}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -1382,13 +1804,23 @@
   jobs31: write by jobs3 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: u3 = 3; <- f3
+  concurrent writes:
+    u3 = 3; <- f3
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:46:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -1408,16 +1840,44 @@
       write by jobs4 at sharedvars.c:57
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s4; <- f4,
-                     s4 = 4; <- f4,
-                     t = s6; <- f4,
-                     s6 = 4; <- f4
+  concurrent writes:
+    int t = s4; <- f4
+    s4 = 4; <- f4
+    t = s6; <- f4
+    s6 = 4; <- f4
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:53:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:54:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:56:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:57:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -1434,13 +1894,23 @@
   jobs51: write by jobs5 at FRAMAC_SHARE/mthread_pthread.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s5 = 5; <- f5
+  concurrent writes:
+    s5 = 5; <- f5
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:69:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs5 computed
@@ -1456,14 +1926,30 @@
       write by jobs6 at sharedvars.c:76
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = s6; <- f6,
-                     s6 = 6; <- f6
+  concurrent writes:
+    int t = s6; <- f6
+    s6 = 6; <- f6
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:75:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:76:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs6 computed
@@ -1479,14 +1965,30 @@
       write by jobs31 at sharedvars.c:41
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int t = u3; <- f31,
-                     u3 = 31; <- f31
+  concurrent writes:
+    int t = u3; <- f31
+    u3 = 31; <- f31
   shared bases: {u3, s4, s5, s6}
-  interferences: {  } -> # cvalue:
-                 u3 ∈ {1; 3; 31}
-                 s4 ∈ {-1; 0; 1; 2; 3; 4}
-                 s5 ∈ [0..2147483647]
-                 s6 ∈ [0..2147483646],0%2
+  interferences by location:
+    sharedvars.c:40:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+    sharedvars.c:41:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      u3 ∈ {1; 3; 31}
+      s4 ∈ {-1; 0; 1; 2; 3; 4}
+      s5 ∈ [0..2147483647]
+      s6 ∈ [0..2147483646],0%2
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs31 computed

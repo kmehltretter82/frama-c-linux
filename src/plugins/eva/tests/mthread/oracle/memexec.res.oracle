@@ -17,9 +17,10 @@
   c: read by <main> at memexec.c:33
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -36,9 +37,10 @@
   c: write by th1 at memexec.c:10
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread th1 computed
@@ -71,9 +73,10 @@
   c: read by <main> at memexec.c:33
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {a, c}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -93,11 +96,21 @@
   c: write by th1 at memexec.c:10
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1,
-                     a = 1; <- f :: memexec.c:25 <- t1
+  concurrent writes:
+    c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+    a = 1; <- f :: memexec.c:25 <- t1
   shared bases: {a, c}
-  interferences: {  } -> # cvalue: a ∈ {1}
-                                   c ∈ {0; 2}
+  interferences by location:
+    memexec.c:10:
+      # cvalue: a ∈ {1}
+                c ∈ {2} 
+    memexec.c:14:
+      # cvalue: a ∈ {1}
+                c ∈ {0} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: a ∈ {1}
+                c ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread th1 computed
@@ -167,10 +180,17 @@
   c: read by <main> at memexec.c:33
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int b = a + c; <- main
+  concurrent writes:
+    int b = a + c; <- main
   shared bases: {a, c}
-  interferences: {  } -> # cvalue: a ∈ {0; 1}
-                                   c ∈ {0; 2}
+  interferences by location:
+    memexec.c:33:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -189,11 +209,21 @@
   c: write by th1 at memexec.c:10
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1,
-                     a = 1; <- f :: memexec.c:25 <- t1
+  concurrent writes:
+    c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+    a = 1; <- f :: memexec.c:25 <- t1
   shared bases: {a, c}
-  interferences: {  } -> # cvalue: a ∈ {0; 1}
-                                   c ∈ {0; 2}
+  interferences by location:
+    memexec.c:10:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2} 
+    memexec.c:14:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread th1 computed
@@ -259,10 +289,17 @@
   c: read by <main> at memexec.c:33
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int b = a + c; <- main
+  concurrent writes:
+    int b = a + c; <- main
   shared bases: {a, c}
-  interferences: {  } -> # cvalue: a ∈ {0; 1}
-                                   c ∈ {0; 2}
+  interferences by location:
+    memexec.c:33:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: a ∈ {0; 1}
+                c ∈ {0; 2}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed

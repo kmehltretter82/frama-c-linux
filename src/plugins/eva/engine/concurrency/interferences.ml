@@ -30,6 +30,13 @@ type thread_id = int
 
 let dkey = Self.register_category "interferences"
 
+let pp_map iteri pp_key pp_val fmt map =
+  let pp fmt k v =
+    Format.fprintf fmt "@,%a:@;<1 2>@[<hov>%a@]" pp_key k pp_val v
+  in
+  iteri (pp fmt) map
+
+
 (* Set of interferences stored as a map from the set of mutexes surely
    locked to the corresponding interferences states. *)
 
@@ -38,8 +45,9 @@ struct
   type t = Dom.t or_top MutexesMap.t
 
   let pretty : Format.formatter -> t -> unit =
-    Pretty_utils.pp_iter2 ~sep:"@ " ~between:" -> "
-      MutexesMap.iter Mutex.Set.pretty (Top.pretty Dom.pretty)
+    let pp_val = Top.pretty Dom.pretty
+    and pp_key = Mutex.Set.pretty in
+    pp_map MutexesMap.iter pp_key pp_val
 
   let equal : t -> t -> bool = MutexesMap.equal (Top.equal Dom.equal)
 end
@@ -58,7 +66,12 @@ struct
 
   type t = elt AlocMap.t
 
-  let empty = AlocMap.empty
+  let pretty : Format.formatter -> t -> unit =
+    let pp_val fmt { state; _ } = Top.pretty Dom.pretty fmt state
+    and pp_key fmt aloc = Cil_datatype.Location.pretty fmt (ALoc.loc aloc) in
+    pp_map AlocMap.iter pp_key pp_val
+
+  let empty : t = AlocMap.empty
 
   module DomOrTop =
   struct
@@ -192,16 +205,18 @@ struct
     ThreadTable.replace current.states_by_mutexes thread new_states_by_mutexes;
     current.shared_bases <- shared_bases;
     (* Debug printing *)
-    let pp_aloc fmt = Format.fprintf fmt "@[<hov 2>%a@]" ALoc.pretty in
-    let pp_aloc_set =
-      Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:",@ " ALoc.Set.iter pp_aloc
+    let pp_aloc_set fmt set =
+      let pp fmt aloc = Format.fprintf fmt "@,@[<hov 2>%a@]" ALoc.pretty aloc in
+      ALoc.Set.iter (pp fmt) set
     in
     Self.debug ~dkey
-      "concurrent writes: @[%a@]@.\
-       shared bases: @[%a@]@.\
-       interferences: @[%a@]@."
+      "@[<v 2>concurrent writes:%a@]@.\
+       @[<hov 2>shared bases:@ %a@]@.\
+       @[<v 2>interferences by location:%a@]@.\
+       @[<v 2>interferences by mutexes:%a@]@."
       pp_aloc_set concurrent_writes
       Base.Hptset.pretty shared_bases
+      ByAnalysisLocation.pretty new_states_by_aloc
       ByMutexes.pretty new_states_by_mutexes;
     if not (same_interferences && same_shared_bases)
     then Updated
