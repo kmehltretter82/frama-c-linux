@@ -30,18 +30,24 @@ let import_logic_var = import Ast_diff.Logic_var.find
 
 let literal_strings = Datatype.Int.Hashtbl.create 17
 
-let last_string_id = ref 0
-
 let import_base = function
   | Base.Var (vi, _validity) -> Base.of_varinfo (import_varinfo vi)
   | CLogic_Var (lvi, _, _) -> Base.of_c_logic_var (import_logic_var lvi)
   | Allocated (vi, _, _) -> Base.of_varinfo (import_varinfo vi)
   | Null -> Base.null
-  | String (id, _cstring) as b ->
-    Datatype.Int.Hashtbl.memo literal_strings id
-      (fun _ ->
-         decr last_string_id;
-         b)
+  | String (id, cstring) ->
+    let create _ =
+      let loc = Cil_datatype.Location.unknown in
+      let cst =
+        match cstring with
+        | Base.CSString s -> Cil_types.Const (CStr s)
+        | Base.CSWstring s -> Const (CWStr s)
+      in
+      (* TODO: try to retrieve the correct expression in the new AST. *)
+      let exp = Cil.new_exp ~loc cst in
+      Base.of_string_exp exp
+    in
+    Datatype.Int.Hashtbl.memo literal_strings id create
 
 let import_bases =
   let cache_name = "Eva_diff.import_bases" in
@@ -87,7 +93,9 @@ module Cache_Offsm = Binary_cache.Arity_One (Cacheable_Offsm) (Cacheable_Offsm)
 
 let import_offsetmap = Cache_Offsm.merge import_offsetmap_aux
 
-let clear_caches () = Cache_Offsm.clear ()
+let clear_caches () =
+  Cache_Offsm.clear ();
+  Datatype.Int.Hashtbl.clear literal_strings
 
 let import_zone =
   let cache_name = "Eva_diff.import_zone" in
