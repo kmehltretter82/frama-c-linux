@@ -34,6 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
+import { HelpIcon } from 'dome/help';
 import * as State from './state';
 import * as Search from './search';
 import doc from './doc.md?raw';
@@ -178,6 +179,8 @@ export interface TitleBarProps {
   label?: string;
   /** Tooltip description (when mounted). */
   title?: string;
+  /** ID of the documentation  */
+  docId?: string;
   /** TitleBar additional components (stacked to right). */
   children?: React.ReactNode;
 }
@@ -188,7 +191,7 @@ export interface TitleBarProps {
    Default values are taken from the associated component.
  */
 export function TitleBar(props: TitleBarProps): JSX.Element | null {
-  const { icon, label, title, children } = props;
+  const { icon, label, title, docId, children } = props;
   const context = React.useContext(TitleContext);
   if (!context.id) return null;
   return (
@@ -200,6 +203,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
         title={title || context.title}
       />
       {children}
+      {docId && <HelpIcon id={docId} />}
       <Inset />
     </DefineElement>
   );
