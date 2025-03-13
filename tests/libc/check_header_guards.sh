@@ -1,4 +1,6 @@
-#!/bin/sh -eu
+#!/usr/bin/env bash
+
+set -eu
 
 # Script used by the test "fc_libc.c"
 

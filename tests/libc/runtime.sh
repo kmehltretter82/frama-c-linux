@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
 set -e
+
 if test -z "$FRAMAC"; then echo "variable FRAMAC must be set"; exit 1; fi
 TMPDIR=$(mktemp -d fc_test_libc_XXXXXXXX)
 $FRAMAC -print-machdep-header > $TMPDIR/__fc_machdep.h
