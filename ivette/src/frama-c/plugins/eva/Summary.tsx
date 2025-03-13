@@ -223,7 +223,7 @@ export function EvaSummary(): JSX.Element {
 function EvaSummaryComponent(): JSX.Element {
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="eva-summary">
         <EvaStatus />
       </Ivette.TitleBar>
       <EvaReady>

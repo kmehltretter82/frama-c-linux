@@ -112,7 +112,7 @@ export function EvaStates(): JSX.Element {
 function EvaStatesComponent(): JSX.Element {
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="eva-states">
         <EvaStatus />
       </Ivette.TitleBar>
       <EvaStates />

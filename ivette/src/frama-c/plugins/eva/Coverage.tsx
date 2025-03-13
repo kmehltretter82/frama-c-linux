@@ -166,7 +166,7 @@ export function CoverageTable(): JSX.Element {
 export default function CoverageComponent(): JSX.Element {
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="eva-coverage">
         <EvaStatus />
       </Ivette.TitleBar>
       <CoverageTable />
