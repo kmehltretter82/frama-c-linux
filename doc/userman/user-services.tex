@@ -30,18 +30,18 @@ A new project is created in the following cases:
 \subsection{Using Projects}
 
 The list of existing projects of a given session is visible in the graphical
-mode through the \texttt{Project} menu (see Section~\ref{sec:menubar}). Among
-other actions on projects (duplicating, renaming, removing, saving, \etc), this
-menu allows the user to switch between different projects during the same
-session.
+interface through the \texttt{Project} menu and through the \texttt{Projects}
+sidebar. Among other actions on projects (duplicating, renaming, removing,
+saving, \etc), they allow the user to switch between different projects during
+the same session.
 
-In batch mode, the only way to handle a multi-project session is through
-the command line options \optionuse{-}{then-on}, \optionuse{-}{then-last} or
+In the command line, the only way to handle a multi-project session is through
+options \optionuse{-}{then-on}, \optionuse{-}{then-last} or
 \optionuse{-}{then-replace} (see Section~\ref{sec:then}). It is also possible to
 remove existing projects through the option \optiondef{-}{remove-projects}. It
-might be useful to prevent prohibitive memory consumptions. In particular, the
-category \texttt{@all\_but\_current} removes all the existing projects, but the
-current one.
+might be useful to prevent prohibitive memory consumption. In particular, the
+category \texttt{@all\_but\_current} removes all existing projects other than
+the current one.
 
 \subsection{Saving and Loading Projects}\label{sec:saveload}
 
