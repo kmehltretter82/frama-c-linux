@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if command -v valgrind
 then VALGRIND=`command -v valgrind`" -q"
