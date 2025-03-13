@@ -175,7 +175,8 @@ export function GoalView(props: GoalViewProps): JSX.Element {
     () => sequent.target(proxy, part, term),
     [sequent, proxy, part, term]
   );
-  const focus : Decorations = selection && { className: 'wp-selected', ...selection } ;
+  const focus : Decorations =
+    selection && { className: 'wp-selected', ...selection };
   const [hover, setHover] = React.useState<Decorations>(null);
   const onHover = React.useCallback((pos: Position | null) => {
     setHover(sequent.hover(pos));
