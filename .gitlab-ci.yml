@@ -499,9 +499,9 @@ internal-nightly:
     # Note: we use this to get an exact version corresponding to a minor version
     - opam pin add ocaml $(grep $OCAML nix/ocaml-versions.txt) -n
     - opam install . --deps-only --with-test -y
-    - dune build --display short --error-reporting=twice @install
+    - dune build --error-reporting=twice @install
     - dune exec -- frama-c-ptests tests src/plugins/*/tests
-    - dune build --display short @ptests_config
+    - dune build @ptests_config
   timeout: 2h
   tags:
     - ${ARCH}

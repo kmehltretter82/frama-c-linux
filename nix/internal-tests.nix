@@ -148,7 +148,7 @@ stdenvNoCC.mkDerivation rec {
   # Do not use default parallel building, but allow 2 cores for Frama-C build
   enableParallelBuilding = false;
   buildPhase = ''
-    dune build -j2 --display short --error-reporting=twice @install
+    dune build -j2 --error-reporting=twice @install
     make tools/ptests/ptests.exe
     make tools/ptests/wtests.exe
   '';
@@ -174,7 +174,7 @@ stdenvNoCC.mkDerivation rec {
     runHook preCheck
     export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
-    dune build -j1 --display short @ptests_config
+    dune build -j1 @ptests_config
   '';
 
   installFlags = [

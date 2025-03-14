@@ -4,7 +4,7 @@ mk_tests {
   tests-name = "plugins-tests";
   tests-command = ''
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
-    dune build -j1 --display short \
+    dune build -j1 \
       @tests/callgraph/ptests \
       @tests/constant_propagation/ptests \
       @tests/impact/ptests \
@@ -26,7 +26,7 @@ mk_tests {
       @src/plugins/rte/tests/ptests \
       @src/plugins/server/tests/ptests \
       @src/plugins/variadic/tests/ptests
-    dune runtest -j1 --display short \
+    dune runtest -j1 \
       src/plugins/server
   '';
   has-wp-proofs = true ;

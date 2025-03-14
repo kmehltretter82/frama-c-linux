@@ -11,5 +11,5 @@ mk_tests {
   tests-name = eva-tests ;
   tests-command = ''
     dune exec -- frama-c-ptests -never-disabled tests
-    dune build -j1 --display short'' + tbuiltins + tfloat + tidct + tvalue + "\n" ;
+    dune build -j1 '' + tbuiltins + tfloat + tidct + tvalue + "\n" ;
 }

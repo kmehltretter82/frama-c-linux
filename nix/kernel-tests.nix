@@ -4,7 +4,7 @@ mk_tests {
   tests-name = "kernel-tests";
   tests-command = ''
     dune exec -- frama-c-ptests -never-disabled tests
-    dune build -j1 --display short \
+    dune build -j1 \
       @tests/cil/ptests \
       @tests/compliance/ptests \
       @tests/jcdb/ptests \
@@ -15,7 +15,7 @@ mk_tests {
       @tests/spec/ptests \
       @tests/syntax/ptests \
       @src/kernel_internals/parsing/tests/ptests
-    dune runtest -j1 --display short \
+    dune runtest -j1 \
       tests
     make -C share/machdeps check-schema
   '';
