@@ -34,7 +34,7 @@ int
 //void
 zeroify_S_fs (struct S * a, struct S * b) {
     *a = *b;
-    // a->fs = b->fs ^ b->fs ;
-    // return a->fi + a->fs + a->fca[4] + a->st.sts + a->st.sti;
-    return a->st.sts + a->st.sti;
+    a->fs = b->fs ^ b->fs ;
+    return a->fi + a->fs + a->fca[4] + a->st.sts + a->st.sti;
+    //return a->st.sts + a->st.sti;
 }
