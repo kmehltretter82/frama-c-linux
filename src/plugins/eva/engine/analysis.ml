@@ -57,8 +57,11 @@ let save_results kf =
 module type Engine = Engine_sig.S_with_results
 
 module Make (Abstract: Abstractions.S) = struct
-
-  module rec Engine : Engine_sig.S
+  module rec Compute' : Engine_sig.Compute =
+    Compute_functions.Make (Engine)
+  and Interference' : Engine_sig.Interferences =
+    Interferences.Make (Engine)
+  and Engine : Engine_sig.S_with_results
     with module Ctx = Abstract.Ctx
      and module Val = Abstract.Val
      and module Loc = Abstract.Loc
@@ -66,63 +69,61 @@ module Make (Abstract: Abstractions.S) = struct
   struct
     include Abstract
     module Eval = Evaluation.Make (Ctx) (Val) (Loc) (Dom)
-    module Compute = C
-    module Interferences = Interferences.Make (Dom)
+    module Compute = Compute'
+    module Interferences = Interference'
+
+    let find stmt f =
+      if is_computed ()
+      then
+        let kf = Kernel_function.find_englobing_kf stmt in
+        match status kf with
+        | Unreachable | SpecUsed | Builtin _ -> `Bottom
+        | Analyzed NoResults -> `Top
+        | Analyzed (Complete | Partial) -> f stmt
+      else `Top
+
+    let get_stmt_state ~after stmt =
+      find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
+
+    let get_stmt_state_by_callstack ?selection ~after stmt =
+      find stmt (Dom.Store.get_stmt_state_by_callstack ?selection ~after)
+
+    let get_global_state () =
+      (Dom.Store.get_global_state () :> Dom.t or_top_bottom)
+
+    let get_initial_state kf =
+      if is_computed () then
+        if Function_calls.is_called kf
+        then (Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
+        else `Bottom
+      else `Top
+
+    let get_initial_state_by_callstack ?selection kf =
+      if is_computed () then
+        if Function_calls.is_called kf
+        then Abstract.Dom.Store.get_initial_state_by_callstack ?selection kf
+        else `Bottom
+      else `Top
+
+    let eval_expr state expr = Eval.evaluate state expr >>=: snd
+
+    let copy_lvalue state expr = Eval.copy_lvalue state expr >>=: snd
+
+    let eval_lval_to_loc state lv =
+      let get_loc (_, loc) = loc in
+      let for_writing = false in
+      Eval.lvaluate ~for_writing state lv >>=: get_loc
+
+    let eval_function_exp state ?args e =
+      Eval.eval_function_exp e ?args state >>=: (List.map fst)
+
+    let assume_cond stmt state cond positive =
+      fst (Eval.reduce state cond positive) >>- fun valuation ->
+      let dval = Eval.to_domain_valuation valuation in
+      Dom.assume stmt cond positive dval state
   end
-  and C : Engine_sig.Compute = Compute_functions.Make (Engine)
 
   include Engine
-
-  let find stmt f =
-    if is_computed ()
-    then
-      let kf = Kernel_function.find_englobing_kf stmt in
-      match status kf with
-      | Unreachable | SpecUsed | Builtin _ -> `Bottom
-      | Analyzed NoResults -> `Top
-      | Analyzed (Complete | Partial) -> f stmt
-    else `Top
-
-  let get_stmt_state ~after stmt =
-    find stmt (Dom.Store.get_stmt_state ~after :> stmt -> Dom.t or_top_bottom)
-
-  let get_stmt_state_by_callstack ?selection ~after stmt =
-    find stmt (Dom.Store.get_stmt_state_by_callstack ?selection ~after)
-
-  let get_global_state () =
-    (Dom.Store.get_global_state () :> Dom.t or_top_bottom)
-
-  let get_initial_state kf =
-    if is_computed () then
-      if Function_calls.is_called kf
-      then (Dom.Store.get_initial_state kf :> Dom.t or_top_bottom)
-      else `Bottom
-    else `Top
-
-  let get_initial_state_by_callstack ?selection kf =
-    if is_computed () then
-      if Function_calls.is_called kf
-      then Abstract.Dom.Store.get_initial_state_by_callstack ?selection kf
-      else `Bottom
-    else `Top
-
-  let eval_expr state expr = Eval.evaluate state expr >>=: snd
-
-  let copy_lvalue state expr = Eval.copy_lvalue state expr >>=: snd
-
-  let eval_lval_to_loc state lv =
-    let get_loc (_, loc) = loc in
-    let for_writing = false in
-    Eval.lvaluate ~for_writing state lv >>=: get_loc
-
-  let eval_function_exp state ?args e =
-    Eval.eval_function_exp e ?args state >>=: (List.map fst)
-
-  let assume_cond stmt state cond positive =
-    fst (Eval.reduce state cond positive) >>- fun valuation ->
-    let dval = Eval.to_domain_valuation valuation in
-    Dom.assume stmt cond positive dval state
-
 end
 
 

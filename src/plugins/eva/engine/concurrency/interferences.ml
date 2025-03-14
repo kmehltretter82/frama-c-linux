@@ -129,11 +129,14 @@ end
 
 (* Interferences Functor *)
 
-module Make (Dom : Abstract.Domain.External) =
+module Make (Engine : Engine_sig.S_with_results) =
 struct
+  module Dom = Engine.Dom
   module ThreadTable = Thread.Hashtbl
   module ByAnalysisLocation = ByAnalysisLocation (Dom)
   module ByMutexes = ByMutexes (Dom)
+
+  type state = Dom.t
 
   type t = {
     states_by_aloc : ByAnalysisLocation.t ThreadTable.t;
@@ -161,27 +164,37 @@ struct
     | Updated
     | NoChanges
 
-  let add_last_analysis
-      ~(get_state : Analysis_location.local -> Dom.t or_top_bottom)
-      thread concurrent_writes shared_bases =
+  let add_last_analysis thread concurrent_writes shared_bases =
     (* Retrieve the interferences  *)
     let old_states_by_aloc =
       ThreadTable.find_def current.states_by_aloc thread
         ByAnalysisLocation.empty
     in
     let new_states_by_aloc =
-      let add aloc acc_map =
+      let add (stmt, cs as aloc) acc_map =
+        let source = ALoc.pos aloc in
         let open TopBottom.Operators in
         let state =
-          (* Retrieve state at analysis location *)
-          let+ state = get_state aloc in
+          let* state_table =
+            Engine.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
+          in
+          let+ state =
+            try
+              `Value (Callstack.Hashtbl.find state_table cs)
+            with Not_found ->
+              Self.warning ~once:false ~source
+                "cannot find %a at %a"
+                Callstack.pretty cs
+                Printer.pp_location (Cil_datatype.Stmt.loc stmt);
+              `Bottom
+          in
           Dom.filter `Print shared_bases state
         in
         match state with
         | `Bottom -> acc_map (* no interference to add *)
         | `Top | `Value _ as state ->
           if Top.is_top state then
-            Self.warning ~once:false ~source:(ALoc.pos aloc)
+            Self.warning ~once:false ~source
               "Imprecise interference computed";
           ByAnalysisLocation.add_and_widen aloc state acc_map
       in
@@ -224,7 +237,7 @@ struct
 
   (* Interference injection *)
 
-  let applicable (state : Dom.t) : Dom.t or_top_bottom =
+  let applicable (state : state) : state or_top_bottom =
     let threads, mutexes = match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no information about threads and mutexes *)
       | None -> Mt_thread.Register.empty, Mutex.Set.empty
@@ -258,7 +271,7 @@ struct
     in
     ThreadTable.fold add_thread current.states_by_mutexes `Bottom
 
-  let inject (state : Dom.t) : Dom.t =
+  let inject (state : state) : state =
     let need_injection =
       match Dom.get Mt_domain.Domain.key with
       (* Domain disabled, no interference injection *)

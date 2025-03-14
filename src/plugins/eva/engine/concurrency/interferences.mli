@@ -22,28 +22,6 @@
 
 type thread_id = int
 
-module Make (Dom : Abstract.Domain.External) :
-sig
-  type add_result =
-    | Updated
-    | NoChanges
-
-  (** [reset ()] resets the current interferences state. Must be called
-      between two analyses. *)
-  val reset : unit -> unit
-
-  (** Add the last Eva analysis results to the given interferences abstract
-      representation. *)
-  val add_last_analysis :
-    get_state:(Analysis_location.local -> Dom.t Lattice_bounds.or_top_bottom) ->
-    Thread.t -> Analysis_location.Local.Set.t -> Base.Hptset.t -> add_result
-
-  (** Inject current interferences to an abstract state. If activated,
-      the Mthread domain helps filtering applicable interferences. This function
-      is the identity if the Mthread domain can infer that no shared memory has
-      been read or written during the last transfer function. *)
-  val inject : Dom.t -> Dom.t
-
-  (** Are there any current interferences to inject? *)
-  val is_empty : unit -> bool
-end
+module Make (Engine : Engine_sig.S_with_results) :
+  Engine_sig.Interferences with
+  type state = Engine.Dom.t
