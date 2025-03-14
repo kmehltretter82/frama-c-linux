@@ -97,8 +97,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-    a = 1; <- f :: memexec.c:25 <- t1
+    c = 2; memexec.c:10 <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+    a = 1; memexec.c:14 <- f :: memexec.c:25 <- t1
   shared bases: {a, c}
   interferences by location:
     memexec.c:10:
@@ -181,7 +181,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int b = a + c; <- main
+    int b = a + c; memexec.c:33 <- main
   shared bases: {a, c}
   interferences by location:
     memexec.c:33:
@@ -210,8 +210,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    c = 2; <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
-    a = 1; <- f :: memexec.c:25 <- t1
+    c = 2; memexec.c:10 <- g :: memexec.c:16 <- f :: memexec.c:25 <- t1
+    a = 1; memexec.c:14 <- f :: memexec.c:25 <- t1
   shared bases: {a, c}
   interferences by location:
     memexec.c:10:
@@ -290,7 +290,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int b = a + c; <- main
+    int b = a + c; memexec.c:33 <- main
   shared bases: {a, c}
   interferences by location:
     memexec.c:33:

@@ -126,7 +126,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    interrupt_received = 1; <- interrupt_oneshot
+    interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
   shared bases: {interrupt_received}
   interferences by location:
     interrupt.c:9:
@@ -202,10 +202,13 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    Frama_C_show_each_locked(interrupt_received); <- main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); <- main_interrupt_one_shot
-    interrupt_received = 0; <- main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); <- main_interrupt_one_shot
+    Frama_C_show_each_locked(interrupt_received); interrupt.c:18 <-
+      main_interrupt_one_shot
+    Frama_C_show_each(interrupt_received); interrupt.c:20 <-
+      main_interrupt_one_shot
+    interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
+    Frama_C_show_each(interrupt_received); interrupt.c:22 <-
+      main_interrupt_one_shot
   shared bases: {interrupt_received}
   interferences by location:
     interrupt.c:18:
@@ -238,7 +241,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    interrupt_received = 1; <- interrupt_oneshot
+    interrupt_received = 1; interrupt.c:9 <- interrupt_oneshot
   shared bases: {interrupt_received}
   interferences by location:
     interrupt.c:9:
@@ -322,10 +325,13 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    Frama_C_show_each_locked(interrupt_received); <- main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); <- main_interrupt_one_shot
-    interrupt_received = 0; <- main_interrupt_one_shot
-    Frama_C_show_each(interrupt_received); <- main_interrupt_one_shot
+    Frama_C_show_each_locked(interrupt_received); interrupt.c:18 <-
+      main_interrupt_one_shot
+    Frama_C_show_each(interrupt_received); interrupt.c:20 <-
+      main_interrupt_one_shot
+    interrupt_received = 0; interrupt.c:21 <- main_interrupt_one_shot
+    Frama_C_show_each(interrupt_received); interrupt.c:22 <-
+      main_interrupt_one_shot
   shared bases: {interrupt_received}
   interferences by location:
     interrupt.c:18:

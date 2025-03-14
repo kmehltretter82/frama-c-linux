@@ -182,7 +182,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s1 = 1; <- f1
+    s1 = 1; mutex.c:25 <- f1
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:25:
@@ -232,7 +232,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f3
+    s2 = 3; mutex.c:40 <- f3
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:40:
@@ -347,7 +347,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s1 = 1; <- f1
+    s1 = 1; mutex.c:25 <- f1
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:25:
@@ -380,8 +380,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int v1 = s1; <- f2
-    int v2 = s2; <- f2
+    int v1 = s1; mutex.c:33 <- f2
+    int v2 = s2; mutex.c:34 <- f2
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:33:
@@ -409,7 +409,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f3
+    s2 = 3; mutex.c:40 <- f3
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:40:
@@ -518,7 +518,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s1 = 1; <- f1
+    s1 = 1; mutex.c:25 <- f1
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:25:
@@ -550,8 +550,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int v1 = s1; <- f2
-    int v2 = s2; <- f2
+    int v1 = s1; mutex.c:33 <- f2
+    int v2 = s2; mutex.c:34 <- f2
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:33:
@@ -578,7 +578,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f3
+    s2 = 3; mutex.c:40 <- f3
   shared bases: {s1, s2}
   interferences by location:
     mutex.c:40:

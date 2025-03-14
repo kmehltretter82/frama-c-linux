@@ -182,7 +182,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s1 = 1; <- main
+    s1 = 1; priorities.c:63 <- main
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:63:
@@ -251,7 +251,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f3
+    s2 = 3; priorities.c:36 <- f3
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:36:
@@ -281,7 +281,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f4
+    s2 = 3; priorities.c:44 <- f4
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:44:
@@ -372,8 +372,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s1 = 1; <- main
-    int j = s2; <- main
+    s1 = 1; priorities.c:63 <- main
+    int j = s2; priorities.c:64 <- main
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:63:
@@ -406,7 +406,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int i = s1; <- f1
+    int i = s1; priorities.c:22 <- f1
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:22:
@@ -452,7 +452,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f3
+    s2 = 3; priorities.c:36 <- f3
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:36:
@@ -482,7 +482,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f4
+    s2 = 3; priorities.c:44 <- f4
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:44:
@@ -565,8 +565,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s1 = 1; <- main
-    int j = s2; <- main
+    s1 = 1; priorities.c:63 <- main
+    int j = s2; priorities.c:64 <- main
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:63:
@@ -599,7 +599,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    int i = s1; <- f1
+    int i = s1; priorities.c:22 <- f1
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:22:
@@ -643,7 +643,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f3
+    s2 = 3; priorities.c:36 <- f3
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:36:
@@ -672,7 +672,7 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    s2 = 3; <- f4
+    s2 = 3; priorities.c:44 <- f4
   shared bases: {s1, s2}
   interferences by location:
     priorities.c:44:

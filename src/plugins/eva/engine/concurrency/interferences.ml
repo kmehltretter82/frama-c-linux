@@ -218,8 +218,11 @@ struct
     ThreadTable.replace current.states_by_mutexes thread new_states_by_mutexes;
     current.shared_bases <- shared_bases;
     (* Debug printing *)
-    let pp_aloc_set fmt set =
-      let pp fmt aloc = Format.fprintf fmt "@,@[<hov 2>%a@]" ALoc.pretty aloc in
+    let pp_write fmt (stmt, _cs as aloc)  =
+      Format.fprintf fmt "%a@ %a" Cil_datatype.Stmt.pretty stmt ALoc.pretty aloc
+    in
+    let pp_write_set fmt set =
+      let pp fmt aloc = Format.fprintf fmt "@,@[<hov 2>%a@]" pp_write aloc in
       ALoc.Set.iter (pp fmt) set
     in
     Self.debug ~dkey
@@ -227,7 +230,7 @@ struct
        @[<hov 2>shared bases:@ %a@]@.\
        @[<v 2>interferences by location:%a@]@.\
        @[<v 2>interferences by mutexes:%a@]@."
-      pp_aloc_set concurrent_writes
+      pp_write_set concurrent_writes
       Base.Hptset.pretty shared_bases
       ByAnalysisLocation.pretty new_states_by_aloc
       ByMutexes.pretty new_states_by_mutexes;

@@ -294,8 +294,8 @@
 [mt] * shared variables computed
 [eva:interferences] 
   concurrent writes:
-    (s[i].data) ++; <- f
-    s[i].data2 += 3; <- f
+    (s[i].data) ++; manysharedvars.c:29 <- f
+    s[i].data2 += 3; manysharedvars.c:30 <- f
   shared bases: {s}
   interferences by location:
     manysharedvars.c:29:

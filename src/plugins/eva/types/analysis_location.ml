@@ -37,7 +37,9 @@ struct
     let hash (stmt, cs) =
       Hashtbl.hash (Stmt.hash stmt, Callstack.hash cs)
     let pretty fmt (stmt,cs) =
-      Format.fprintf fmt "%a <-@ %a" Stmt.pretty stmt Callstack.pretty cs
+      Format.fprintf fmt "%a <-@ %a"
+        Cil_datatype.Location.pretty (Stmt.loc stmt)
+        Callstack.pretty cs
   end
 
   include Datatype.Make_with_collections (Prototype)
