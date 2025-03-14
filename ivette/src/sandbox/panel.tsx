@@ -37,7 +37,6 @@ import { Icon } from 'dome/controls/icons';
 import './style.css';
 import { Label } from 'dome/controls/labels';
 import { Modal, showModal } from 'dome/dialogs';
-import { HelpButton } from 'dome/help';
 
 /* -------------------------------------------------------------------------- */
 /* --- Use Panel                                                          --- */
@@ -63,7 +62,7 @@ function UsePanel(): JSX.Element {
 
   return (
     <>
-      <TitleBar>
+      <TitleBar help='sandbox-panel'>
         <IconButton
           icon='ANGLE.RIGHT'
           title="Change position of Panel."
@@ -81,7 +80,6 @@ function UsePanel(): JSX.Element {
           title={"show or hide the panel"}
           onClick={flipVisible}
         />
-        <HelpButton id={'sandbox-panel'} />
       </TitleBar>
       <div style={{ position: 'relative', height: '100%' }}>
         <Panel label='Panel title' visible={visible} position={position}
