@@ -106,9 +106,29 @@ ASTview.registerMarkerMenuExtender(addGenerateRTEGuardsMenu);
 
 type Goal = WP.goal | undefined;
 
+type setting = [boolean, () => void]
+function menuItem(label: string, [b, flip]: setting, enabled?: boolean)
+  : Dome.PopupMenuItem {
+  return {
+    label: label,
+    enabled: enabled !== undefined ? enabled : true,
+    checked: b,
+    onClick: flip,
+  };
+}
+
 function WPGoals(): JSX.Element {
-  const [scoped, flipScoped] = Dome.useFlipSettings('frama-c.wp.goals.scoped');
-  const [failed, flipFailed] = Dome.useFlipSettings('frama-c.wp.goals.failed');
+  const scopedState = Dome.useFlipSettings('frama-c.wp.goals.scoped');
+  const [scoped] = scopedState;
+  const failedState = Dome.useFlipSettings('frama-c.wp.goals.failed');
+  const [failed] = failedState;
+
+
+  const filterItems: Dome.PopupMenuItem[] = [
+    menuItem('Current Scope Only', scopedState),
+    menuItem('Unresolved Goals Only', failedState)
+  ];
+
   const [tip, setTip] = React.useState(false);
   const [current, setCurrent] = React.useState<Goal>(undefined);
   Server.useShutdown(() => { setTip(false); setCurrent(undefined); });
@@ -127,15 +147,9 @@ function WPGoals(): JSX.Element {
         </Label>
         <Inset />
         <IconButton
-          icon='CURSOR' title='Current Scope Only'
+          icon='FILTER' title='Filters'
           enabled={hasGoals}
-          selected={scoped}
-          onClick={flipScoped} />
-        <IconButton
-          icon='CIRC.QUESTION' title='Unresolved Goals Only'
-          enabled={hasGoals}
-          selected={failed}
-          onClick={flipFailed} />
+          onClick={() => Dome.popupMenu(filterItems)} />
         <IconButton
           icon='MEDIA.PLAY'
           title={tip ? 'Back to Goals' : 'Interactive Proof Transformer'}
