@@ -8,6 +8,6 @@ mk_tests_distrib {
   tests-name = "src-distrib-tests" ;
   tests-command = ''
     dune exec -- frama-c-ptests -never-disabled tests src/plugins/*/tests
-    dune build -j1 --display short @ptests_config
+    dune build -j1 @ptests_config
   '' ;
 }

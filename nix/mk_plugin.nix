@@ -84,7 +84,7 @@ stdenv.mkDerivation {
   '';
   buildPhase = ''
     runHook preBuild
-    dune build -j2 --display short --error-reporting=twice @install
+    dune build -j2 --error-reporting=twice @install
   '';
 
   wp_cache =
@@ -113,7 +113,7 @@ stdenv.mkDerivation {
     runHook preCheck
     make run-ptests
     export NIX_GCC_DONT_MANGLE_PREFIX_MAP=
-    dune build -j1 --display short @tests/ptests
+    dune build -j1 @tests/ptests
   '';
 
   installFlags = [
