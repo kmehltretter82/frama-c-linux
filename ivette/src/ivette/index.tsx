@@ -34,6 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
+import { HelpButton } from 'dome/help';
 import * as State from './state';
 import * as Search from './search';
 import doc from './doc.md?raw';
@@ -142,6 +143,10 @@ export type LayoutPosition =
   | 'ABCD';
 
 export interface ComponentProps extends ContentProps {
+  /** Icon of the Component */
+  icon?: string;
+  /** ID of the component documentation  */
+  help?: string;
   /** Defaults to 'D' */
   preferredPosition?: LayoutPosition;
 }
@@ -164,8 +169,10 @@ export function registerComponent(props: ComponentProps): void {
 /** @ignore */
 export interface TitleContext {
   id?: string;
+  icon?: string;
   label?: string;
   title?: string;
+  help?: string;
 }
 
 /** @ignore */
@@ -178,6 +185,8 @@ export interface TitleBarProps {
   label?: string;
   /** Tooltip description (when mounted). */
   title?: string;
+  /** ID of the documentation  */
+  help?: string;
   /** TitleBar additional components (stacked to right). */
   children?: React.ReactNode;
 }
@@ -188,18 +197,22 @@ export interface TitleBarProps {
    Default values are taken from the associated component.
  */
 export function TitleBar(props: TitleBarProps): JSX.Element | null {
-  const { icon, label, title, children } = props;
   const context = React.useContext(TitleContext);
   if (!context.id) return null;
+  const icon = props.icon || context.icon;
+  const label = props.label || context.label;
+  const title = props.title || context.title;
+  const help = props.help || context.help;
   return (
     <DefineElement id={`labview.title.${context.id}`}>
       <Label
         className="labview-handle"
         icon={icon}
-        label={label || context.label}
-        title={title || context.title}
+        label={label}
+        title={title}
       />
-      {children}
+      {props.children}
+      {help && <HelpButton id={help} />}
       <Inset />
     </DefineElement>
   );

@@ -27,7 +27,6 @@ import * as Dome from 'dome';
 
 import { IconButton } from 'dome/controls/buttons';
 import { Button, ButtonGroup, Inset } from 'dome/frame/toolbars';
-import { HelpIcon } from 'dome/help';
 import * as Themes from 'dome/themes';
 import { Pattern } from 'dome/text/markdown';
 import doc from '../callgraph.md?raw';
@@ -55,7 +54,7 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
   const [ autoSelect, flipAutoSelect] = autoSelectState;
 
   return (
-    <Ivette.TitleBar>
+    <Ivette.TitleBar help="callgraph">
       <IconButton
         icon={'TUNINGS'}
         title={`Filter functions appearing in the graph`}
@@ -74,8 +73,6 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
         kind={autoSelect ? "positive" : "default"}
         title={"Automatically select node of the function selected in AST"}
       />
-      <Inset />
-      <HelpIcon id="callgraph" />
       <Inset />
     </Ivette.TitleBar>
   );

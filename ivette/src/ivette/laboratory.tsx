@@ -36,6 +36,7 @@ import { QPane, QSplit } from 'dome/layout/qsplit';
 import { RenderElement } from 'dome/layout/dispatch';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
+import { HelpButton } from 'dome/help';
 import * as Ivette from 'ivette';
 import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
 import { NotificationTimer } from 'ivette/prefs';
@@ -975,7 +976,8 @@ function Pane(props: PaneProps): JSX.Element | null {
     [compId]
   );
   if (!component) return null;
-  const { label, title, children } = component;
+  const { icon, label, title, help, children } = component;
+  const context = { id: compId, icon, label, title, help };
   return (
     <QPane id={compId}>
       <Vfill className="labview-content">
@@ -985,13 +987,15 @@ function Pane(props: PaneProps): JSX.Element | null {
               <RenderElement id={`labview.title.${compId}`}>
                 <Label
                   className="labview-handle"
+                  icon={icon}
                   label={label}
                   title={title} />
+                {help && <HelpButton id={help} />}
               </RenderElement>
             </Catch>
           </Hfill>
         </Hbox>
-        <Ivette.TitleContext.Provider value={{ id: compId, label, title }}>
+        <Ivette.TitleContext.Provider value={context}>
           <Catch label={compId}>{children}</Catch>
         </Ivette.TitleContext.Provider>
       </Vfill>
