@@ -43,14 +43,12 @@ import 'tippy.js/animations/shift-away.css';
 import './tippy.css';
 
 import { IconButton } from 'dome/controls/buttons';
-import { Inset, Space } from 'dome/frame/toolbars';
-import { HelpIcon } from 'dome/help';
+import { Inset } from 'dome/frame/toolbars';
 
 import '@fortawesome/fontawesome-free/js/all';
 
 import { EvaReady, EvaStatus }
   from 'frama-c/plugins/eva/components/AnalysisStatus';
-import Legend from './legend';
 import style from './style.json';
 import layouts from './layouts.json';
 import './dive.css';
@@ -703,7 +701,7 @@ export default function GraphComponent(): JSX.Element {
   // Component
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="dive">
         <IconButton
           icon="PIN"
           onClick={flipAddSelection}
@@ -741,7 +739,6 @@ export default function GraphComponent(): JSX.Element {
         <Inset />
         <EvaStatus />
         <Inset />
-        <HelpIcon id="dive" />
       </Ivette.TitleBar>
       <EvaReady>
         <GraphView
