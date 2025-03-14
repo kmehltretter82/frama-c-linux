@@ -125,7 +125,7 @@ stdenvNoCC.mkDerivation rec {
       export DUNE_WORKSPACE="$(pwd)/dev/dune-workspace.cover"
     '' else "") +
     ''
-      dune build -j2 --error-reporting=twice $dune_opt @install
+      dune build -j2 $dune_opt @install
 
       make tools/ptests/ptests.exe
       make tools/ptests/wtests.exe
