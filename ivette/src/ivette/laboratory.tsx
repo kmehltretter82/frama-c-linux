@@ -987,9 +987,10 @@ function Pane(props: PaneProps): JSX.Element | null {
               <RenderElement id={`labview.title.${compId}`}>
                 <Label
                   className="labview-handle"
+                  icon={icon}
                   label={label}
                   title={title} />
-                {help && <><HelpButton id={help} /><Toolbar.Button /></>}
+                {help && <HelpButton id={help} />}
               </RenderElement>
             </Catch>
           </Hfill>
