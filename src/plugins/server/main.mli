@@ -154,4 +154,7 @@ val once : (unit -> unit) -> unit
     like an [`EXEC] request. *)
 val async : ('a -> 'b) -> 'a -> 'b Task.task
 
+(** Returns true if the server is currently running. *)
+val is_active : unit -> bool
+
 (* -------------------------------------------------------------------------- *)
