@@ -143,8 +143,10 @@ export type LayoutPosition =
   | 'ABCD';
 
 export interface ComponentProps extends ContentProps {
+  /** Icon of the Component */
+  icon?: string;
   /** ID of the component documentation  */
-  docId?: string;
+  help?: string;
   /** Defaults to 'D' */
   preferredPosition?: LayoutPosition;
 }
@@ -167,8 +169,10 @@ export function registerComponent(props: ComponentProps): void {
 /** @ignore */
 export interface TitleContext {
   id?: string;
+  icon?: string;
   label?: string;
   title?: string;
+  help?: string;
 }
 
 /** @ignore */
@@ -182,7 +186,7 @@ export interface TitleBarProps {
   /** Tooltip description (when mounted). */
   title?: string;
   /** ID of the documentation  */
-  docId?: string;
+  help?: string;
   /** TitleBar additional components (stacked to right). */
   children?: React.ReactNode;
 }
@@ -193,19 +197,22 @@ export interface TitleBarProps {
    Default values are taken from the associated component.
  */
 export function TitleBar(props: TitleBarProps): JSX.Element | null {
-  const { icon, label, title, docId, children } = props;
   const context = React.useContext(TitleContext);
   if (!context.id) return null;
+  const icon = props.icon || context.icon;
+  const label = props.label || context.label;
+  const title = props.title || context.title;
+  const help = props.help || context.help;
   return (
     <DefineElement id={`labview.title.${context.id}`}>
       <Label
         className="labview-handle"
         icon={icon}
-        label={label || context.label}
-        title={title || context.title}
+        label={label}
+        title={title}
       />
-      {children}
-      {docId && <HelpIcon id={docId} />}
+      {props.children}
+      {help && <HelpIcon id={help} />}
       <Inset />
     </DefineElement>
   );

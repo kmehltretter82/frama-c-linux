@@ -54,7 +54,7 @@ export function CallgraphTitleBar(props: CallgraphTitleBarProps): JSX.Element {
   const [ autoSelect, flipAutoSelect] = autoSelectState;
 
   return (
-    <Ivette.TitleBar docId="callgraph">
+    <Ivette.TitleBar help="callgraph">
       <IconButton
         icon={'TUNINGS'}
         title={`Filter functions appearing in the graph`}

@@ -976,7 +976,8 @@ function Pane(props: PaneProps): JSX.Element | null {
     [compId]
   );
   if (!component) return null;
-  const { label, title, docId, children } = component;
+  const { icon, label, title, help, children } = component;
+  const context = { id: compId, icon, label, title, help };
   return (
     <QPane id={compId}>
       <Vfill className="labview-content">
@@ -988,12 +989,12 @@ function Pane(props: PaneProps): JSX.Element | null {
                   className="labview-handle"
                   label={label}
                   title={title} />
-                {docId && <><HelpIcon id={docId} /><Toolbar.Button /></>}
+                {help && <><HelpIcon id={help} /><Toolbar.Button /></>}
               </RenderElement>
             </Catch>
           </Hfill>
         </Hbox>
-        <Ivette.TitleContext.Provider value={{ id: compId, label, title }}>
+        <Ivette.TitleContext.Provider value={context}>
           <Catch label={compId}>{children}</Catch>
         </Ivette.TitleContext.Provider>
       </Vfill>
