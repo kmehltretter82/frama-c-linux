@@ -354,8 +354,9 @@ module Make
         h
     in
     let htbl_allocated_bases_to_results =
-      try Domain.Hashtbl.find htbl_input_state_to_allocated_bases reduced_input_state
-         with Not_found ->
+      (* Store only last input with last allocated bases *)
+      (* try Domain.Hashtbl.find htbl_input_state_to_allocated_bases reduced_input_state
+         with Not_found -> *)
       let h = Base.Hptset.Hashtbl.create 11 in
       Domain.Hashtbl.add htbl_input_state_to_allocated_bases reduced_input_state h;
       h
