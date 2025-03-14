@@ -11,7 +11,7 @@ share_libc="$1"
 cd "$share_libc"
 
 for f in *.h */*.h; do
-    guard=${f^^}
+    guard=$(echo "$f" | awk '{print toupper($0)}')
     guard=${guard//\//_}
     guard=${guard//./_}
     if ! [[ $f =~ "__fc_" ]]; then
