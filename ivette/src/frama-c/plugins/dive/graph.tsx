@@ -43,13 +43,12 @@ import 'tippy.js/animations/shift-away.css';
 import './tippy.css';
 
 import { IconButton } from 'dome/controls/buttons';
-import { Space } from 'dome/frame/toolbars';
+import { Inset } from 'dome/frame/toolbars';
 
 import '@fortawesome/fontawesome-free/js/all';
 
 import { EvaReady, EvaStatus }
   from 'frama-c/plugins/eva/components/AnalysisStatus';
-import Legend from './legend';
 import style from './style.json';
 import layouts from './layouts.json';
 import './dive.css';
@@ -676,8 +675,6 @@ export default function GraphComponent(): JSX.Element {
     Dome.useStringSettings('dive.selectionMode', 'follow');
   const [layout, setLayout] =
     Dome.useStringSettings('dive.layout', 'dagre');
-  const [showLegend, flipShowLegend] =
-    Dome.useFlipSettings('dive.legend', true);
 
   // Selection mode
   const selectMode = (id?: string) => void (id && setSelectionMode(id));
@@ -704,7 +701,7 @@ export default function GraphComponent(): JSX.Element {
   // Component
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="dive">
         <IconButton
           icon="PIN"
           onClick={flipAddSelection}
@@ -733,33 +730,24 @@ export default function GraphComponent(): JSX.Element {
           onClick={layoutMenu}
           title="Choose the graph layout"
         />
-        <Space />
-        <IconButton
-          icon="HELP"
-          onClick={flipShowLegend}
-          kind={showLegend ? 'positive' : 'default'}
-          title={showLegend ? 'Hide legend' : 'Show legend'}
-        />
-        <Space />
+        <Inset />
         <IconButton
           icon="TRASH"
           onClick={() => graph.current?.clear()}
           title="Clear the graph"
         />
-        <Space />
+        <Inset />
         <EvaStatus />
+        <Inset />
       </Ivette.TitleBar>
       <EvaReady>
-        <>
-          <GraphView
-            addSelection={addSelection}
-            grabbable={grabbable}
-            layout={layout}
-            selectionMode={selectionMode}
-            ref={graph}
-          />
-          {showLegend ? <Legend /> : null}
-        </>
+        <GraphView
+          addSelection={addSelection}
+          grabbable={grabbable}
+          layout={layout}
+          selectionMode={selectionMode}
+          ref={graph}
+        />
       </EvaReady>
     </>
   );

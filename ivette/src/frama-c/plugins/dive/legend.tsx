@@ -86,7 +86,7 @@ const elements = [
       label: "unique value",
       range: 'singleton'
     },
-    position: { x: 0, y: 230 }
+    position: { x: 200, y: 0 }
   },
   {
     data: {
@@ -94,7 +94,7 @@ const elements = [
       label: "small range of values",
       stops: '0% 20% 20% 100%'
     },
-    position: { x: 0, y: 270 }
+    position: { x: 200, y: 40 }
   },
   {
     data: {
@@ -102,7 +102,7 @@ const elements = [
       label: "large range of values",
       stops: '0% 80% 80% 100%'
     },
-    position: { x: 0, y: 310 }
+    position: { x: 200, y: 80 }
   },
   {
     data: {
@@ -110,7 +110,7 @@ const elements = [
       label: "extreme range of values",
       range: 'wide'
     },
-    position: { x: 0, y: 350 }
+    position: { x: 200, y: 120 }
   },
   {
     data: {
@@ -125,7 +125,7 @@ const elements = [
       label: "directly tainted",
       taint: 'direct'
     },
-    position: { x: 0, y: 420 }
+    position: { x: 400, y: 6 }
   },
   {
     data: {
@@ -133,7 +133,7 @@ const elements = [
       label: "indirectly tainted",
       taint: 'indirect'
     },
-    position: { x: 0, y: 480 }
+    position: { x: 400, y: 70 }
   },
 ];
 
