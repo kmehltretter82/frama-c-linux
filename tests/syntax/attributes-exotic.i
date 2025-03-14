@@ -62,3 +62,7 @@ my_ZSTD_decompress_bmi2(char* dctx,
                         void* dst, unsigned maxDstSize,
                         const void* seqStart, const _Bool isLongOffset)
 { return 0; }
+
+// polarssl, mbedtls, ed25519-donna
+typedef unsigned int t_udbl __attribute__((mode(TI)));
+t_udbl x;

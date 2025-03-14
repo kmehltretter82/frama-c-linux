@@ -176,8 +176,6 @@ let () =
   register_list (AttrFunType true)
     [ "stdcall";"cdecl"; "fastcall"; "noreturn" ]
 
-let () = register_list AttrType [ "mode" ]
-
 let () =
   (* GCC label and statement attributes. *)
   register_list AttrStmt

@@ -2547,121 +2547,6 @@ let rec clean_up_cond_locals =
   | CENot ce -> clean_up_cond_locals ce
   | CEExp (c,_) -> clean_up_chunk_locals c
 
-(* We have our own version of add_attributes that does not allow duplicates *)
-let cabsAddAttributes al0 (al: attributes) : attributes =
-  if al0 == [] then al else
-    List.fold_left
-      (fun acc ((an, _) as a) ->
-         (* See if the attribute is already in there *)
-         match Ast_attributes.filter an acc with
-         | [] -> Ast_attributes.add a acc (* Nothing with that name *)
-         | a' :: _ ->
-           if Cil_datatype.Attribute.equal a a' then
-             acc (* Already in *)
-           else begin
-             Kernel.debug ~level:3
-               "Duplicate attribute %a along with %a"
-               Cil_printer.pp_attribute a Cil_printer.pp_attribute a' ;
-             (* let acc' = drop_attribute an acc in *)
-             (* Keep both attributes *)
-             Ast_attributes.add a acc
-           end)
-      al
-      al0
-
-(* BY: nothing cabs here, plus seems to duplicate most of
-   Ast_attributes.type_add_attributes *)
-(* see [combineAttributes] above for details about the [what] argument *)
-let rec cabsTypeCombineAttributes what a0 t =
-  let combine = combineAttributes what in
-  begin
-    match a0 with
-    | [] ->
-      (* no attributes, keep same type *)
-      t
-    | _ ->
-      (* anything else: add a0 to existing attributes *)
-      let add (a: attributes) = combine a0 a in
-      let tattr = add t.tattr in
-      match t.tnode with
-      | TVoid -> mk_tvoid ~tattr ()
-      | TInt ik ->
-        (* Here we have to watch for the mode attribute *)
-        (* sm: This stuff is to handle a GCC extension where you can request integers*)
-        (* of specific widths using the "mode" attribute syntax; for example:     *)
-        (*   typedef int int8_t __attribute__ ((__mode__ (  __QI__ ))) ;          *)
-        (* The cryptic "__QI__" defines int8_t to be 8 bits wide, instead of the  *)
-        (* 32 bits you'd guess if you didn't know about "mode".  The relevant     *)
-        (* testcase is test/small2/mode_sizes.c, and it was inspired by my        *)
-        (* /usr/include/sys/types.h.                                              *)
-        (*                                                                        *)
-        (* A consequence of this handling is that we throw away the mode          *)
-        (* attribute, which we used to go out of our way to avoid printing anyway.*)
-        let ik', a0' =
-          (* Go over the list of new attributes and come back with a
-           * filtered list and a new integer kind *)
-          List.fold_left
-            (fun (ik', a0') a0one ->
-               match a0one with
-               | ("mode", [ACons(mode,[])]) -> begin
-                   (* (trace "gccwidth" (dprintf "I see mode %s applied to an int type\n"
-                                        mode )); *)
-                   (* the cases below encode the 32-bit assumption.. *)
-                   match (ik', mode) with
-                   | (IInt, "__QI__")      -> (IChar, a0')
-                   | (IInt, "__byte__")    -> (IChar, a0')
-                   | (IInt, "__HI__")      -> (IShort,  a0')
-                   | (IInt, "__SI__")      -> (IInt, a0')   (* same as t *)
-                   | (IInt, "__word__")    -> (IInt, a0')
-                   | (IInt, "__pointer__") -> (IInt, a0')
-                   | (IInt, "__DI__")      -> (ILongLong, a0')
-
-                   | (IUInt, "__QI__")     -> (IUChar, a0')
-                   | (IUInt, "__byte__")   -> (IUChar, a0')
-                   | (IUInt, "__HI__")     -> (IUShort, a0')
-                   | (IUInt, "__SI__")     -> (IUInt, a0')
-                   | (IUInt, "__word__")   -> (IUInt, a0')
-                   | (IUInt, "__pointer__")-> (IUInt, a0')
-                   | (IUInt, "__DI__")     -> (IULongLong, a0')
-
-                   | _ ->
-                     Kernel.error ~once:true ~current:true
-                       "GCC width mode %s applied to unexpected type, \
-                        or unexpected mode"
-                       mode;
-                     (ik', a0one :: a0')
-
-                 end
-               | _ -> (ik', a0one :: a0'))
-            (ik, [])
-            a0
-        in
-        mk_tint ~tattr:(combine a0' t.tattr) ik'
-
-      | TFloat fk  -> mk_tfloat ~tattr fk
-      | TEnum enum -> mk_tenum  ~tattr enum
-      | TPtr t     -> mk_tptr   ~tattr t
-      | TFun (t, args, isva) -> mk_tfun ~tattr t args isva
-      | TComp comp -> mk_tcomp  ~tattr comp
-      | TNamed ti  -> mk_tnamed ~tattr ti
-      | TBuiltin_va_list -> mk_tbuiltin ~tattr ()
-      | TArray (bt, l) ->
-        let att_elt, att_typ = Ast_attributes.split_array_attributes a0 in
-        let bt' = cabsArrayPushAttributes what att_elt bt in
-        let tattr = combineAttributes what att_typ t.tattr in
-        mk_tarray ~tattr bt' l
-  end
-and cabsArrayPushAttributes what al t =
-  match t.tnode with
-  | TArray (bt, l) ->
-    let bt' = cabsArrayPushAttributes what al bt in
-    mk_tarray ~tattr:t.tattr bt' l
-  | _ -> cabsTypeCombineAttributes what al t
-
-let cabsTypeAddAttributes =
-  cabsTypeCombineAttributes CombineOther
-
-
 (* Do types *)
 
 let get_qualifiers t =
@@ -2738,7 +2623,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                         Cil_printer.pp_attributes oldquals
                         Cil_printer.pp_attributes quals));
           (* Union the attributes *)
-          oldvi.vattr <- cabsAddAttributes oldvi.vattr vi.vattr;
+          oldvi.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
           let what =
             if isadef then
               CombineFundef (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr)
@@ -4202,10 +4087,9 @@ let rec doSpecList loc ghost (suggestedAnonName: string)
   let getTypeAttrs () : Cabs.attribute list =
     (* Partitions the attributes in !attrs.
        Type attributes are removed from attrs and returned, so that they
-       can go into the type definition.  Name attributes are left in attrs,
-       so they will be returned by doSpecAttr and used in the variable
-       declaration.
-       Testcase: small1/attr9.c *)
+       can go into the type definition. Name attributes are left in attrs,
+       so they will be returned by doSpecList and used in the variable
+       declaration. *)
     let an, af, at =
       cabsPartitionAttributes ghost ~default:Ast_attributes.AttrType !attrs
     in
@@ -4651,10 +4535,12 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       [(stripUnderscore s, List.map (attrOfExp ~foldenum:false false) el)]
 
 and doAttributes (ghost:bool) (al: Cabs.attribute list) : attribute list =
-  List.fold_left (fun acc a -> cabsAddAttributes (doAttr ghost a) acc) [] al
+  List.fold_left (fun acc a ->
+      Ast_attributes.add_list (doAttr ghost a) acc
+    ) [] al
 
-(* A version of Ast_attributes.partition_attributes that works on CABS attributes.
-   It would be better to use Ast_attributes.partition_attributes instead to avoid
+(* A version of Ast_attributes.partition that works on CABS attributes.
+   It would be better to use Ast_attributes.partition instead to avoid
    the extra doAttr conversions here, but that's hard to do in doSpecList.*)
 and cabsPartitionAttributes
     ghost
@@ -4710,32 +4596,31 @@ and doType (ghost:bool) (context: type_context)
       let a1n, a1f, a1t = Ast_attributes.partition ~default:AttrType a1' in
       let a2' = doAttributes ghost a2 in
       let a2n, a2f, a2t = Ast_attributes.partition ~default:nameortype a2' in
-      let bt' = cabsTypeAddAttributes a1t bt in
+      let bt' = Ast_types.add_attributes a1t bt in
       let bt'', a1fadded =
         match Ast_types.unroll_node bt with
-        | TFun _ -> cabsTypeAddAttributes a1f bt', true
+        | TFun _ -> Ast_types.add_attributes a1f bt', true
         | _ -> bt', false
       in
       (* Now recurse *)
       let restyp, nattr = doDeclType bt'' acc d in
       (* Add some more type attributes *)
-      let restyp = cabsTypeAddAttributes a2t restyp in
+      let restyp = Ast_types.add_attributes a2t restyp in
       (* See if we can add some more type attributes *)
       let restyp' =
         let t = Ast_types.unroll restyp in
         match t.tnode with
         | TFun _ ->
           if a1fadded then
-            cabsTypeAddAttributes a2f restyp
+            Ast_types.add_attributes a2f restyp
           else
-            cabsTypeAddAttributes a2f
-              (cabsTypeAddAttributes a1f restyp)
+            Ast_types.(add_attributes a2f (add_attributes a1f restyp))
         | TPtr ({ tnode = TFun _ } as tf)
           when not (Machine.msvcMode ()) ->
           if a1fadded then
-            mk_tptr ~tattr:t.tattr (cabsTypeAddAttributes a2f tf)
+            mk_tptr ~tattr:t.tattr (Ast_types.add_attributes a2f tf)
           else
-            let t' = cabsTypeAddAttributes a2f (cabsTypeAddAttributes a1f tf) in
+            let t' = Ast_types.(add_attributes a2f (add_attributes a1f tf)) in
             mk_tptr ~tattr:t.tattr t'
         | _ ->
           if a1f <> [] && not a1fadded then
@@ -4750,7 +4635,7 @@ and doType (ghost:bool) (context: type_context)
       in
 
       (* Now add the name attributes and return *)
-      restyp', cabsAddAttributes a1n (cabsAddAttributes a2n nattr)
+      restyp', Ast_attributes.(add_list a1n (add_list a2n nattr))
 
     | Cabs.PTR (al, d) ->
       let al' = doAttributes ghost al in
@@ -4762,9 +4647,9 @@ and doType (ghost:bool) (context: type_context)
       let restyp' =
         let t = Ast_types.unroll restyp in
         match t.tnode with
-        | TFun _ -> cabsTypeAddAttributes af restyp
+        | TFun _ -> Ast_types.add_attributes af restyp
         | TPtr ({ tnode = TFun _ } as tf) ->
-          mk_tptr ~tattr:t.tattr (cabsTypeAddAttributes af tf)
+          mk_tptr ~tattr:t.tattr (Ast_types.add_attributes af tf)
         | _ ->
           if af <> [] then
             Kernel.error ~once:true ~current:true
@@ -4773,7 +4658,7 @@ and doType (ghost:bool) (context: type_context)
           restyp
       in
       (* Now add the name attributes and return *)
-      restyp', cabsAddAttributes an nattr
+      restyp', Ast_attributes.add_list an nattr
 
     | Cabs.ARRAY (d, al, len) ->
       if Ast_types.is_fun bt then
@@ -5036,7 +4921,7 @@ and doType (ghost:bool) (context: type_context)
           let arg_type_from_vi vi =
             let attrs =
               if vi.vghost then
-                cabsAddAttributes [(Ast_attributes.frama_c_ghost_formal, [])] vi.vattr
+                Ast_attributes.(add_list [(frama_c_ghost_formal, [])] vi.vattr)
               else
                 vi.vattr
             in (vi.vname, vi.vtype, attrs)
@@ -9752,7 +9637,7 @@ and doTypedef ghost ((specs, nl): Cabs.name_group) =
       doType ghost `Typedef AttrType bt (Cabs.PARENTYPE(attrs, ndt, a))  in
     checkTypedefSize n newTyp;
     let tattr = fc_stdlib_attribute tattr in
-    let newTyp' = cabsTypeAddAttributes tattr newTyp in
+    let newTyp' = Ast_types.add_attributes tattr newTyp in
     checkRestrictQualifierDeep newTyp';
     let env = if ghost then ghost_env else env in
     if H.mem typedefs n && Datatype.String.Hashtbl.mem env n then
@@ -9889,13 +9774,13 @@ and doOnlyTypedef ghost (specs: Cabs.spec_elem list) : unit =
   match restyp.tnode with
   | TComp ci ->
     if isadef then begin
-      ci.cattr <- cabsAddAttributes ci.cattr restyp.tattr;
+      ci.cattr <- Ast_attributes.add_list ci.cattr restyp.tattr;
       (* The GCompTag was already added *)
     end else (* Add a GCompTagDecl *)
       cabsPushGlobal (GCompTagDecl(ci, Current_loc.get ()))
   | TEnum ei ->
     if isadef then begin
-      ei.eattr <- cabsAddAttributes ei.eattr restyp.tattr;
+      ei.eattr <- Ast_attributes.add_list ei.eattr restyp.tattr;
     end else
       cabsPushGlobal (GEnumTagDecl(ei, Current_loc.get ()))
   | _ ->

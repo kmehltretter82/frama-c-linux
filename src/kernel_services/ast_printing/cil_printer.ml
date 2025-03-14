@@ -2209,13 +2209,6 @@ class cil_printer () = object (self)
       fprintf fmt "__asm__(%a)"
         (Pretty_utils.pp_list ~sep:"" self#attrparam) args;
       false
-    (* we suppress printing mode(__si__) because it triggers an
-       internal compiler error in all current gcc versions
-       sm: I've now encountered a problem with mode(__hi__)...
-       I don't know what's going on, but let's try disabling all "mode". *)
-    | "mode", [ACons(tag,[])] ->
-      if self#display_comment () then fprintf fmt "/* mode(%s) */" tag;
-      false
 
     (* sm: also suppress "format" because we seem to print it in
        a way gcc does not like *)
