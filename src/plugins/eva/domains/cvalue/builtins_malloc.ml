@@ -536,7 +536,7 @@ let () =
   register_malloc ~replace:"malloc" "malloc" "malloc" Base.Malloc Eval.MallocedCall;
   register_malloc ~replace:"__fc_vla_alloc" "vla_alloc" "malloc" Base.VLA Eval.MallocedCall
     ~returns_null:false;
-  register_malloc ~replace:"alloca" "alloca" "alloca" Base.Alloca Eval.NoCacheCallers
+  register_malloc ~replace:"alloca" "alloca" "alloca" Base.Alloca Eval.MallocedCall
     ~returns_null:false
 
 (* --------------------------------- Calloc --------------------------------- *)
@@ -854,6 +854,8 @@ let realloc_builtin_aux state ptr size =
   if card_ok > 0 then
     let realloc = choose_bases_reallocation () in
     let ret, new_state = realloc bases null size state in
+    let new_bases = Location_Bytes.fold_bases 
+        (fun base acc -> Base.Hptset.add base acc) ret Base.Hptset.empty in
     (* Maybe the calls above made [ret] weak, and it
        was among the arguments. In this case, do not free it entirely! *)
     let strong = card_ok <= 1 && not Base.(Hptset.exists is_weak bases) in
@@ -861,7 +863,7 @@ let realloc_builtin_aux state ptr size =
     let new_state, changed = free_aux new_state ~strong bases in
     let c_values = wrap_fallible_alloc ret state new_state in
     let c_clobbered = Builtins.clobbered_set_from_ret new_state ret in
-    Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; c_allocs = Some bases }
+    Builtins.Full { c_values; c_clobbered; c_assigns = Some changed; c_allocs = Some new_bases }
   else (* Invalid call. *)
     let c_clobbered = Base.SetLattice.bottom in
     Builtins.Full { c_values = []; c_clobbered; c_assigns = None; c_allocs = None}
@@ -878,7 +880,7 @@ let () =
   let name = "Frama_C_realloc" in
   let replace = "realloc" in
   let typ () = Cil.(voidPtrType, [voidPtrType; theMachine.typeOfSizeOf]) in
-  Builtins.register_builtin ~replace name NoCacheCallers realloc_builtin ~typ
+  Builtins.register_builtin ~replace name MallocedCall realloc_builtin ~typ
 
 let reallocarray_builtin state args =
   let ptr, nmemb, sizev =

@@ -705,6 +705,12 @@ module Callwise = struct
     Computer.end_dataflow ()
 
   let record_for_callwise_inout callstack kf pre_state value_res =
+    let inject_allocs c_allocs = 
+      match c_allocs with
+      | Some bases ->  Base.Hptset.fold (fun base acc ->
+          Zone.join (Zone.inject base Int_Intervals.top) acc) bases Zone.bottom
+      | None -> Zone.bottom 
+    in
     let inout =
       match value_res with
       | `Body (Eva.Cvalue_callbacks.{before_stmts}, memexec_counter) ->
@@ -725,15 +731,12 @@ module Callwise = struct
             Kernel.warning "Reuse Inout returns Top @.";
             top (* big TODO *)
         end
-      | `Spec _states
-      | `Builtin (_states, None, None) -> compute_using_spec pre_state kf
-      | `Builtin (_states, None, Some _allocs) -> 
-        let data = compute_using_spec pre_state kf in
-        {
-          data with over_allocs = Base.Hptset.fold (fun base acc->
-          Zone.join (Zone.inject base Int_Intervals.top) acc) _allocs Zone.bottom
-        }
-      | `Builtin (_states, Some (froms,sure_out), _) ->
+      | `Spec _states ->
+        compute_using_spec pre_state kf
+      | `Builtin (_states, None, c_allocs) -> 
+        let data = compute_using_spec pre_state kf
+        in { data with over_allocs = inject_allocs c_allocs }
+      | `Builtin (_states, Some (froms,sure_out), c_allocs) ->
         let in_, out_ = extract_inout_from_froms froms in
         {
           over_inputs_if_termination = in_;
@@ -742,7 +745,7 @@ module Callwise = struct
           over_outputs_if_termination = out_ ;
           over_outputs = out_;
           under_outputs_if_termination = sure_out;
-          over_allocs = Zone.bottom
+          over_allocs = inject_allocs c_allocs;
         }
     in
     end_record callstack kf inout
