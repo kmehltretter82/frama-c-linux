@@ -36,7 +36,7 @@ import { QPane, QSplit } from 'dome/layout/qsplit';
 import { RenderElement } from 'dome/layout/dispatch';
 import { Catch } from 'dome/errors';
 import { classes } from 'dome/misc/utils';
-import { HelpIcon } from 'dome/help';
+import { HelpButton } from 'dome/help';
 import * as Ivette from 'ivette';
 import { compId, LayoutPosition, VIEW, COMPONENT, GROUP } from 'ivette';
 import { NotificationTimer } from 'ivette/prefs';
@@ -989,7 +989,7 @@ function Pane(props: PaneProps): JSX.Element | null {
                   className="labview-handle"
                   label={label}
                   title={title} />
-                {help && <><HelpIcon id={help} /><Toolbar.Button /></>}
+                {help && <><HelpButton id={help} /><Toolbar.Button /></>}
               </RenderElement>
             </Catch>
           </Hfill>

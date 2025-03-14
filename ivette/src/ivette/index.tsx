@@ -34,7 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
-import { HelpIcon } from 'dome/help';
+import { HelpButton } from 'dome/help';
 import * as State from './state';
 import * as Search from './search';
 import doc from './doc.md?raw';
@@ -212,7 +212,7 @@ export function TitleBar(props: TitleBarProps): JSX.Element | null {
         title={title}
       />
       {props.children}
-      {help && <HelpIcon id={help} />}
+      {help && <HelpButton id={help} />}
       <Inset />
     </DefineElement>
   );

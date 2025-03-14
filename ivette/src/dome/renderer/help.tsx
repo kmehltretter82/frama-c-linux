@@ -42,14 +42,14 @@ import { LED } from './controls/displays';
 /* --- Help                                                                  */
 /* --------------------------------------------------------------------------*/
 
-interface HelpIconProps {
+interface HelpButtonProps {
   /** id */
   id: string;
   /** icon size */
   size?: number;
 }
 
-export function HelpIcon(props: HelpIconProps): JSX.Element {
+export function HelpButton(props: HelpButtonProps): JSX.Element {
   const { id, size } = props;
 
   return (
