@@ -230,20 +230,33 @@ export function EvaFormOptions(
     );
   }
 
+  const errorMain = Boolean(
+    !fctsList.some(elt => elt.name === fields["-main"].state.value)
+    || fields["-main"].state.value === ""
+  );
+  if(errorMain)
+    fields["-main"].state.error = "Choose a function from the list.";
+
   const mainField =
-  <Forms.SelectField
-    label="Main"
-    state={fields["-main"].state as Forms.FieldState<string | undefined>}
-    actions={getActions(fields["-main"].state, "-main")}
-  >
-    {
-      fctsList.map((f) => <option
-          key={f.key} id={f.key} value={f.name}
+    <Forms.SelectField
+      label="Main"
+      state={fields["-main"].state as Forms.FieldState<string | undefined>}
+      actions={getActions(fields["-main"].state, "-main")}
+    >
+      { errorMain &&
+        <option
+          key={"empty-main"} id={"empty-main"} value={""}
           className={getClasses(fields["-main"].state, "-main")}
-        >{f.name}</option>
-      )
-    }
-  </Forms.SelectField>;
+        >-</option>
+      }
+      {
+        fctsList.map((f) => <option
+            key={f.key} id={f.key} value={f.name}
+            className={getClasses(fields["-main"].state, "-main")}
+          >{f.name}</option>
+        )
+      }
+    </Forms.SelectField>;
 
   const domainsField =
   <ButtonFieldList

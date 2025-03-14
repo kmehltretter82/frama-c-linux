@@ -395,7 +395,11 @@ tr:first-of-type > .eva-table-callsite-box {
       padding-bottom: 0;
       border: 1px solid var(--text-discrete);
     }
+  }
 
+  .dome-xForm-error {
+    position: relative;
+    top: 0 !important;
   }
 
   .dome-xForm-field-actions { min-width: 61px; }
