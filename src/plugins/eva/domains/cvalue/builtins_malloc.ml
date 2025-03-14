@@ -96,10 +96,8 @@ let current_alloc_site () =
     *)
     let calls = match cs.stack with
       | [] -> assert false
-      | (kf, stmt) :: [] -> [(kf, stmt)]
-      | (kf, stmt) :: (kf', _stmt') :: _ -> [(kf, stmt);(kf', Cil.dummyStmt)]
-    in
-    {cs with stack = calls}
+      | (kf, _) :: _ -> [(kf, Cil.dummyStmt)]
+    in { cs with stack=calls } 
   | _ -> cs
 
 let register_malloced_base b =
