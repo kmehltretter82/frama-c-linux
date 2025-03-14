@@ -17,17 +17,17 @@ analysis results.
 [legend]
 
 - node shape:
-  - ellispe: the node represents a constant
+  - ellipse: the node represents a constant
   - rectangle with simple border: the node represents a scalar memory location
   - rectangle with double border: the node represents an aggregate type (array,
     structure)
   - rhomboid: the node represents a set of memory locations
   - octagon: the node represents an alarm
 - node color:
-  - blue: the memory location is constant and have a single possible value
+  - blue: the memory location is constant and has a single possible value
   - green: the memory location can have several values and the node is partially
-    filled with dark green depending on the number of cardinality of the
-    infered set of possible values
+    filled with dark green depending on the cardinality of the
+    inferred set of possible values
   - red: the memory location can take nearly all values of its type
 - node outline:
   - no outline: the memory location is never tainted
@@ -40,8 +40,8 @@ The titlebar contains the following buttons:
 
 - [icon-pin]: enable or disable adding new nodes to the graph when code is
   selected
-- [icon-lock]: when enabled, prevents nodes from beeing inadvertently moved
-- [icon-settings]: choose whether code selection keeps node already added
+- [icon-lock]: when enabled, prevents nodes from being inadvertently moved
+- [icon-settings]: choose whether code selection keeps nodes already added
   to the graph or only keeps nodes which are related to the current selection
 - [icon-display]: choose which layout algorithm to use
 - [icon-trash]: remove all nodes from the graph
@@ -49,9 +49,9 @@ The titlebar contains the following buttons:
 
 ## Dataflow tree {#dive-dataflow-tree}
 
-This component display the dependencies relations as a tree. Each tree level
+This component displays the dependencies relations as a tree. Each tree level
 shows either memory location or program instructions.
 
-- Memory locations nodes can be expanded to see the list of every program
-  instructions modifying the location.
+- Memory location nodes can be expanded to see the list of every program
+  instruction modifying the location.
 - Instruction nodes can be expanded to see the list of memory locations read.
