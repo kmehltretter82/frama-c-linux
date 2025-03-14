@@ -4,8 +4,8 @@
 )
 
 (cram
-  (applies_to user_directories.unix.t)
-  (enabled_if (and (= %{os_type} unix) (<> %{system} macos)))
+  (applies_to user_directories.unix)
+  (enabled_if (and (= %{os_type} Unix) (<> %{system} macosx)))
 )
 
 (cram
