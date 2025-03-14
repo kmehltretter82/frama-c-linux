@@ -26,8 +26,11 @@
  */
 
 import React from 'react';
+import { modal } from 'dome';
+import { GlobalState, useGlobalState } from 'dome/data/states';
+
 import { IconButton } from './controls/buttons';
-import { Modal, showModal } from './dialogs';
+import { Modal, showModal, closeModal } from './dialogs';
 import { Markdown } from './text/markdown';
 import { SideBar, SidebarTitle } from './frame/sidebars';
 import { Tree, Node } from './frame/tree';
@@ -41,6 +44,8 @@ import { LED } from './controls/displays';
 /* --------------------------------------------------------------------------*/
 /* --- Help                                                                  */
 /* --------------------------------------------------------------------------*/
+
+const lastDocOpened = new GlobalState<string>('ivette');
 
 interface HelpButtonProps {
   /** id */
@@ -189,7 +194,8 @@ function Nodes(props: { tree: HTree }): React.ReactNode {
 function GeneralDocModal(props: { id?: string }): JSX.Element {
   const { id } = props;
   const [ unfoldAll, setUnfoldAll ] = React.useState<boolean|undefined>(true);
-  const selectedIdState = React.useState<string>(id || 'ivette');
+  const [ lastId, setLastId ] = useGlobalState(lastDocOpened);
+  const selectedIdState = React.useState<string>(id || lastId);
   const [ selectedId, setSelectedid ] = selectedIdState;
 
   const index = React.useMemo(() => {
@@ -215,6 +221,8 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
     const section = ids.slice(1).join(' ');
     return `Documentation ${chapter} ${section ? "- "+section: ""}`;
   }, [selectedId]);
+
+  React.useEffect(() => { setLastId(selectedId); }, [selectedId, setLastId]);
 
   return (
     <Modal className='modal-framac-doc' label={title}>
@@ -262,4 +270,7 @@ function GeneralDocModal(props: { id?: string }): JSX.Element {
   );
 }
 
-export function showHelp(): void { showModal(<GeneralDocModal/>); }
+export function showHelp(): void {
+  if(!modal.getValue()) showModal(<GeneralDocModal/>);
+  else closeModal();
+}
