@@ -1,5 +1,5 @@
-/* run.config
-   STDOPT: 
+/* run.config*
+   STDOPT:
    STDOPT: +"-eva-slevel 150"
 */
 

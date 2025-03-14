@@ -1,4 +1,4 @@
-/* run.config
+/* run.config*
    LOG: @LOG_MT_DOT_FILES_FILENAME@
    STDOPT: +"@LOG_MT_DOT_FILES_OPTS@"
 */

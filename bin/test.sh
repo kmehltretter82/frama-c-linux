@@ -210,9 +210,6 @@ do
             ALIAS_NAME=$2
             shift
             ;;
-        "eva")
-            TESTS+=" tests/value tests/builtins tests/float tests/idct"
-            ;;
         "--")
             shift
             break
