@@ -36,7 +36,6 @@ import { Label, Code } from 'dome/controls/labels';
 import * as Text from 'dome/text/richtext';
 import { TextBuffer, TextView } from 'dome/text/richtext';
 import { resolve } from 'dome/system';
-import { HelpIcon } from 'dome/help';
 
 import * as Ivette from 'ivette';
 import * as Display from 'ivette/display';
@@ -391,7 +390,6 @@ export function RenderConsole(): JSX.Element {
           onClick={flipScrolling}
           title="Auto scrolling"
         />
-        <HelpIcon id="ivette-console" />
       </Ivette.TitleBar>
       <TextView
         text={edited ? editor : Server.buffer}
