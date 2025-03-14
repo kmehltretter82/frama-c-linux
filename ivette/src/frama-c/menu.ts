@@ -159,6 +159,7 @@ export function init(): void {
     menu: 'Help',
     label: 'Documentation',
     id: 'help_documentation',
+    key: 'Cmd+H',
     onClick: showHelp,
     kind: 'normal',
   });

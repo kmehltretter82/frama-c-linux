@@ -22,7 +22,7 @@
 
 
 import React from 'react';
-import { registerSandbox, TitleBar, registerDocChapter } from 'ivette';
+import { registerSandbox, registerDocChapter } from 'ivette';
 import { HelpButton } from 'dome/help';
 import doc from './sandbox.md?raw';
 
@@ -44,9 +44,6 @@ function SandboxHelp(): JSX.Element {
 
   return (
     <>
-      <TitleBar>
-        <HelpButton id='sandbox' />
-      </TitleBar>
       <div style={style}>
         <>
           Click the help button to display help : here
@@ -66,6 +63,7 @@ registerSandbox({
   id: 'sandbox.help',
   label: 'Help',
   preferredPosition: 'ABCD',
+  help: 'sandbox',
   children: <SandboxHelp />,
 });
 
