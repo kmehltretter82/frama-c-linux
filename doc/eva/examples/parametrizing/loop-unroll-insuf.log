@@ -3,7 +3,7 @@
 [eva:initial-state] Values of globals at initialization
   
 [eva:loop-unroll:partial] loop-unroll-insuf.c:4: loop not completely unrolled
-[eva] loop-unroll-insuf.c:4: starting to merge loop iterations
+[eva:partition] loop-unroll-insuf.c:4: starting to merge loop iterations
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {21}

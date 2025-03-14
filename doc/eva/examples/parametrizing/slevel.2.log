@@ -4,7 +4,7 @@
   i ∈ {0}
   j ∈ {0}
   t[0..4][0..9] ∈ {0}
-[eva] slevel.c:6: starting to merge loop iterations
+[eva:partition] slevel.c:6: starting to merge loop iterations
 [eva] ====== VALUES COMPUTED ======
 [eva:final-states] Values at end of function main:
   i ∈ {5}
