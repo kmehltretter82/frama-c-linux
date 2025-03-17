@@ -1748,6 +1748,18 @@ let () =
     ~ext_help:""
     ()
 
+let () =
+  Cmdline.add_option_without_action
+    "-commands-file"
+    ~plugin:""
+    ~argname:"filename"
+    ~group:seq
+    ~help:"read the next command line arguments from the given file. \
+           One argument per line. Start a line with # to add a comment."
+    ~visible:true
+    ~ext_help:""
+    ()
+
 (* ************************************************************************* *)
 (** {2 Project-related options} *)
 (* ************************************************************************* *)

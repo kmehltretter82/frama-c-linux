@@ -301,6 +301,71 @@ type then_argument =
   | Replace
   | Name of string
 
+let expand_commands_file filename next_options =
+  Kernel_log.feedback "Expanding arguments from %s" filename;
+  let expanded_args = Arg.read_arg filename in
+  (* Merge lines finishing by '\' with the next line and ignore comments. *)
+  let r_comment = Str.regexp "^[ \t]*#" in
+  let r_backslash = Str.regexp {|\(.*\)\\$|} in
+  let expanded_args =
+    Array.fold_right
+      (fun arg args ->
+         if Str.string_match r_comment arg 0 then
+           args
+         else if Str.string_match r_backslash arg 0 then
+           let arg = Str.matched_group 1 arg in
+           match args with
+           | hd :: tl -> (arg ^ hd) :: tl
+           | [] -> [arg]
+         else
+           arg :: args)
+      expanded_args
+      []
+  in
+  (* Regex to match an option and its value regardless of the quoting *)
+  let r = Str.regexp {|\([^ =]+\)\([ =]\("\(.*\)"\|\(.*\)\)\)?|} in
+  (*                   ^         ^ ^   ^ ^       ^ ^- match an unquoted value
+                       |         | |   | |       '- OR
+                       |         | |   | '- match a quoted value and discard
+                       |         | |   |    quotes
+                       |         | |   '- start matching the actual value
+                       |         | '- match either a space or an equal to
+                       |         |    separate the argument name and its value
+                       |         '- optionally start matching the value
+                       '- match the argument name (string without a space or an
+                          equal) *)
+  (* Normalize every argument to '-opt-name' or '-opt-name=opt-value'. *)
+  List.fold_right
+    (fun arg opts ->
+       let arg = String.trim arg in
+       if Str.string_match r arg 0 then
+         (* The argument name is in the first group, and we know that it is not
+            empty since [Str.string_match] returned true. *)
+         let opt_name = Str.matched_group 1 arg in
+         let opt_value =
+           (* The argument value is either in group 4 (quoted) or group 5
+              (unquoted). Both can be empty if there is no value for the
+              argument. *)
+           try Str.matched_group 4 arg with Not_found ->
+           try Str.matched_group 5 arg with Not_found -> ""
+         in
+         let opt_value = String.trim opt_value in
+         let opt =
+           if opt_value <> "" then
+             (* Rebuild the option with the form [opt=arg] so that
+                [get_option_and_arg] can see that we already know that
+                [opt_value] is the entire value of the option and return
+                [explicit=true]. *)
+             opt_name ^ "=" ^ opt_value
+           else
+             opt_name
+         in
+         opt :: opts
+       else
+         opts)
+    expanded_args
+    next_options
+
 let parse known_options_list then_expected options_list =
   let known_options = Hashtbl.create 17 in
   List.iter (fun (n, s) -> Hashtbl.add known_options n s) known_options_list;
@@ -351,6 +416,19 @@ let parse known_options_list then_expected options_list =
       unknown_options, nb_used, None
     | [ "-then-on" ] when then_expected ->
       raise_error "-then-on" "requires a string as argument."
+    | [ "-commands-file" ] ->
+      raise_error "-commands-file" "requires a string argument."
+    | option :: next_options when
+        String.starts_with ~prefix:"-commands-file=" option ->
+      let option, filename, explicit = get_option_and_arg option "" in
+      assert (String.equal option "-commands-file" && explicit);
+      parse_commands_file unknown_options nb_used filename next_options
+    | option :: then_options when
+        String.starts_with ~prefix:"-then-on=" option
+        && then_expected ->
+      let option, project_name, explicit = get_option_and_arg option "" in
+      assert (String.equal option "-then-on" && explicit);
+      parse_then_on unknown_options nb_used project_name then_options
     | [ option ] ->
       let unknown, use_arg, is_used =
         parse_one_option unknown_options option ""
@@ -364,10 +442,12 @@ let parse known_options_list then_expected options_list =
     | "-then-replace" :: then_options when then_expected ->
       unknown_options, nb_used, Some (then_options, Replace)
     | "-then-on" :: project_name :: then_options when then_expected ->
-      unknown_options, nb_used, Some (then_options, Name project_name)
+      parse_then_on unknown_options nb_used project_name then_options
     | "-permissive" :: next_options ->
       permissive := true;
       go unknown_options nb_used next_options
+    | "-commands-file" :: filename :: next_options ->
+      parse_commands_file unknown_options nb_used filename next_options
     | option :: (arg :: next_options as arg_next) ->
       let unknown, use_arg, is_used =
         parse_one_option unknown_options option arg
@@ -377,6 +457,11 @@ let parse known_options_list then_expected options_list =
         unknown
         (if is_used then succ nb_used else nb_used)
         next
+  and parse_then_on unknown_options nb_used project_name then_options =
+    unknown_options, nb_used, Some (then_options, Name project_name)
+  and parse_commands_file unknown_options nb_used filename next_options =
+    let next_options = expand_commands_file filename next_options in
+    go unknown_options nb_used next_options
   in
   try
     let unknown_options, nb_used, then_options = go [] 0 options_list in

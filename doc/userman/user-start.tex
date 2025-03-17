@@ -462,6 +462,71 @@ integer numbers:
   than \texttt{max} (in absolute value) using hexadecimal notation
 \end{description}
 
+\subsection{Group Command Line Options in a File}\label{sec:commands-file}
+
+The option \texttt{\optiondef{-}{commands-file} <file>} allows one to group
+command line options in a file that can then be referenced from the command line
+or from other files. The syntax is the same as regular options from the command
+line but with one and exactly one option per line.
+
+For instance a file \texttt{eva.txt} could regroup command line options specific
+to the \Eva plugin:
+
+\begin{frama-c-commands}
+-eva
+-eva-precision 5
+-eva-slevel 2000
+\end{frama-c-commands}
+
+It could then be re-used in different command lines:
+
+\begin{frama-c-commands}
+\$ frama-c file1.c -commands-file eva.txt
+\$ frama-c file2.c -commands-file eva.txt
+\end{frama-c-commands}
+
+Regular options and options from a commands file can be mixed and matched. For
+instance the following example is taken from section~\ref{sec:then} but the call
+to \Eva is replaced with a call to \texttt{\optiondef{-}commands-file}:
+
+\begin{frama-c-commands}
+\$ frama-c -semantic-const-fold main file.c \
+          -then-on propagated -commands-file eva.txt \
+          -set-project-as-default
+\end{frama-c-commands}
+
+Conversely, all those options can be put in a single file \texttt{config.txt}
+and have only one call to \texttt{\optiondef{-}commands-file} in the \FramaC
+command:
+
+\begin{frama-c-commands}
+-semantic-const-fold main
+file.c
+-then-on propagated
+-commands-file eva.txt
+-set-project-as-default
+\end{frama-c-commands}
+
+Note that we have one and only one option per line, and that we can use
+\texttt{\optiondef{-}commands-file} inside of another commands file.
+
+\begin{frama-c-commands}
+\$ frama-c -commands-file config.txt
+\end{frama-c-commands}
+
+For convenience, it is possible to add comments by starting the line with a
+\texttt{\#} in the configuration file and break long options on several lines
+by using \texttt{\textbackslash}:
+
+\begin{frama-c-commands}
+# Comments are ignored by Frama-C when parsing the configuration file
+# and long options can be split by adding \ at the end of the line
+-eva-domains equality, \
+             gauges
+# is equivalent to
+-eva-domains equality,gauges
+\end{frama-c-commands}
+
 \section{Environment Variables}\label{sec:env-variables}
 
 Different environment variables may be set to customize \FramaC.
