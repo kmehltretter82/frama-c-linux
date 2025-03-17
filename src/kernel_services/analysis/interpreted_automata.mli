@@ -128,9 +128,9 @@ module Edge : Datatype.S_with_collections with type t = vertex edge
     guards and commands.
     - [graph] is the control flow graph
     - [entry_point]: each execution of the function starts at this vertex
-    - [return_point]: return statements links to this vertex
+    - [return_point]: return statements link to this vertex
     - [exit_points]: each call to a non-returning function (declared with the C
-      attribute "noreturn") leads to a vertex with no successor of this list
+      attribute "noreturn") leads to a vertex from this list, with no successor
     - [stmt_table]: this table links statements to their starting and ending
       vertex *)
 type automaton = {

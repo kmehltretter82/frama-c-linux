@@ -778,10 +778,9 @@ let build_automaton ~annotations kf =
             loop_head.vertex_info <-
               LoopHead { stmt; level = control.loop_level };
             let labels =
-              LabelMap.(
-                control.labels
-                |> add_builtin LoopEntry control.src
-                |> add_builtin LoopCurrent loop_head)
+              control.labels
+              |> LabelMap.add_builtin LoopEntry control.src
+              |> LabelMap.add_builtin LoopCurrent loop_head
             in
             (* for variant to have one point at the end of the loop *)
             let start_annot, end_annot =
