@@ -32,9 +32,12 @@ let offsetmap_of_v ~typ v =
   V_Offsetmap.create ~size v ~size_v:size
 
 let offsetmap_of_loc location state =
-  let aux loc offsm_res =
-    let open Locations in
-    let size = Int_Base.project loc.size in
+  let aux (loc: Locations.location) offsm_res =
+    (* If the size is unknown, returns the complete offsetmap. *)
+    let size =
+      try Int_Base.project loc.size
+      with Abstract_interp.Error_Top -> Bit_utils.max_bit_size ()
+    in
     let copy = Cvalue.Model.copy_offsetmap loc.loc size state in
     Bottom.join Cvalue.V_Offsetmap.join copy offsm_res
   in

@@ -28,8 +28,7 @@ open Cvalue
 (** Transformation a value into an offsetmap of size [sizeof(typ)] bytes. *)
 val offsetmap_of_v: typ:Cil_types.typ -> V.t -> V_Offsetmap.t
 
-(** Returns the offsetmap at a precise_location from a state.
-    May raise Abstract_interp.Error_Top. *)
+(** Returns the offsetmap at a precise_location from a state. *)
 val offsetmap_of_loc:
   Precise_locs.precise_location -> Model.t -> V_Offsetmap.t Eval.or_bottom
 

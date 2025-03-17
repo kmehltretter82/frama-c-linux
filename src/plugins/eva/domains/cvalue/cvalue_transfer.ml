@@ -236,8 +236,8 @@ let show_expr valuation state fmt expr =
       | `Value record -> record.loc
       | `Top -> assert false
     in
-    let offsm = Bottom.non_bottom (Eval_op.offsetmap_of_loc loc state) in
-    Eval_op.pretty_offsetmap lval.typ fmt offsm
+    let offsm = Eval_op.offsetmap_of_loc loc state in
+    Bottom.pretty (Eval_op.pretty_offsetmap lval.typ) fmt offsm
   | _ -> Format.fprintf fmt "%s" (Unicode.top_string ())
 
 
