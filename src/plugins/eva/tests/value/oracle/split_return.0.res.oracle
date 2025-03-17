@@ -2,12 +2,12 @@
 [eva] Warning: ignoring non-existing function 'NON_EXISTING'.
 [eva:split-return] 
   Splitting return states on:
-  \return(f2) == 0 (user)
-  \return(f3) == -2, -4 (user)
-  \return(f4) == 4 (user)
-  \return(f5) == -2 (user)
-  \return(uninit) == 0 (user)
-  \return(escaping) == 0 (user)
+    \return(f2) == 0 (user)
+    \return(f3) == -2, -4 (user)
+    \return(f4) == 4 (user)
+    \return(f5) == -2 (user)
+    \return(uninit) == 0 (user)
+    \return(escaping) == 0 (user)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

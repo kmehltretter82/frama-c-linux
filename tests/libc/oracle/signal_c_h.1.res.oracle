@@ -1,8 +1,8 @@
 [kernel] Parsing signal_c_h.c (with preprocessing)
 [eva:split-return] 
   Splitting return states on:
-  \full_split(signal)
-  \return(raise) == 0 (auto)
+    \full_split(signal)
+    \return(raise) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

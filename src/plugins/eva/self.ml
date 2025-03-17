@@ -117,7 +117,8 @@ let dkey_split_return =
 
 let dkey_precision_settings =
   register_category "precision-settings"
-    ~help:"messages about parameters affected by option -eva-precision"
+    ~help:"messages about the automatic configuration of the analysis by \
+           option -eva-precision"
 
 let () =
   let activate dkey = add_debug_keys dkey in

@@ -1,67 +1,67 @@
 [kernel] Parsing argz_c.c (with preprocessing)
 [eva:precision-settings] 
   Option -eva-precision 6 detected, automatic configuration of the analysis:
-  option -eva-min-loop-unroll set to 0 (default value).
-  option -eva-auto-loop-unroll set to 192.
-  option -eva-widening-delay set to 4.
-  option -eva-partition-history set to 1.
-  option -eva-slevel set to 160.
-  option -eva-ilevel set to 64.
-  option -eva-plevel set to 200 (default value).
-  option -eva-subdivide-non-linear set to 120.
-  option -eva-remove-redundant-alarms set to true (default value).
-  option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
-  option -eva-split-return set to 'auto'.
-  option -eva-equality-through-calls set to 'formals' (default value).
-  option -eva-octagon-through-calls set to false (default value).
+    option -eva-min-loop-unroll set to 0 (default value).
+    option -eva-auto-loop-unroll set to 192.
+    option -eva-widening-delay set to 4.
+    option -eva-partition-history set to 1.
+    option -eva-slevel set to 160.
+    option -eva-ilevel set to 64.
+    option -eva-plevel set to 200 (default value).
+    option -eva-subdivide-non-linear set to 120.
+    option -eva-remove-redundant-alarms set to true (default value).
+    option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
+    option -eva-split-return set to 'auto'.
+    option -eva-equality-through-calls set to 'formals' (default value).
+    option -eva-octagon-through-calls set to false (default value).
 [eva:split-return] 
   Splitting return states on:
-  \return(seed48) == 0 (auto)
-  \return(calloc) == 0 (auto)
-  \return(malloc) == 0 (auto)
-  \return(realloc) == 0 (auto)
-  \return(reallocarray) == 0 (auto)
-  \return(getenv) == 0 (auto)
-  \return(secure_getenv) == 0 (auto)
-  \return(bsearch) == 0 (auto)
-  \return(realpath) == 0 (auto)
-  \return(canonicalize_file_name) == 0 (auto)
-  \return(memchr) == 0 (auto)
-  \return(memrchr) == 0 (auto)
-  \return(rawmemchr) == 0 (auto)
-  \return(memcpy) == 0 (auto)
-  \return(mempcpy) == 0 (auto)
-  \return(memmove) == 0 (auto)
-  \return(memset) == 0 (auto)
-  \return(strchr) == 0 (auto)
-  \return(strchrnul) == 0 (auto)
-  \return(strrchr) == 0 (auto)
-  \return(strpbrk) == 0 (auto)
-  \return(strstr) == 0 (auto)
-  \return(strcasestr) == 0 (auto)
-  \return(strtok) == 0 (auto)
-  \return(strtok_r) == 0 (auto)
-  \return(strsep) == 0 (auto)
-  \return(strerror) == 0 (auto)
-  \return(strcpy) == 0 (auto)
-  \return(strncpy) == 0 (auto)
-  \return(stpcpy) == 0 (auto)
-  \return(strcat) == 0 (auto)
-  \return(strncat) == 0 (auto)
-  \return(memmem) == 0 (auto)
-  \return(strdup) == 0 (auto)
-  \return(strndup) == 0 (auto)
-  \return(stpncpy) == 0 (auto)
-  \return(strsignal) == 0 (auto)
-  \return(argz_count) == 0, 6 (auto)
-  \return(argz_append) == 0, 6 (auto)
-  \return(argz_add) == 0, 6 (auto)
-  \return(argz_insert) == 0, 6 (auto)
-  \return(argz_replace) == 0, 6 (auto)
-  \return(argz_next) == 0 (auto)
-  \return(Frama_C_nondet_ptr) == 0 (auto)
-  \return(Frama_C_malloc_fresh) == 0 (auto)
-  \return(char_equal_ignore_case) == 0 (auto)
+    \return(seed48) == 0 (auto)
+    \return(calloc) == 0 (auto)
+    \return(malloc) == 0 (auto)
+    \return(realloc) == 0 (auto)
+    \return(reallocarray) == 0 (auto)
+    \return(getenv) == 0 (auto)
+    \return(secure_getenv) == 0 (auto)
+    \return(bsearch) == 0 (auto)
+    \return(realpath) == 0 (auto)
+    \return(canonicalize_file_name) == 0 (auto)
+    \return(memchr) == 0 (auto)
+    \return(memrchr) == 0 (auto)
+    \return(rawmemchr) == 0 (auto)
+    \return(memcpy) == 0 (auto)
+    \return(mempcpy) == 0 (auto)
+    \return(memmove) == 0 (auto)
+    \return(memset) == 0 (auto)
+    \return(strchr) == 0 (auto)
+    \return(strchrnul) == 0 (auto)
+    \return(strrchr) == 0 (auto)
+    \return(strpbrk) == 0 (auto)
+    \return(strstr) == 0 (auto)
+    \return(strcasestr) == 0 (auto)
+    \return(strtok) == 0 (auto)
+    \return(strtok_r) == 0 (auto)
+    \return(strsep) == 0 (auto)
+    \return(strerror) == 0 (auto)
+    \return(strcpy) == 0 (auto)
+    \return(strncpy) == 0 (auto)
+    \return(stpcpy) == 0 (auto)
+    \return(strcat) == 0 (auto)
+    \return(strncat) == 0 (auto)
+    \return(memmem) == 0 (auto)
+    \return(strdup) == 0 (auto)
+    \return(strndup) == 0 (auto)
+    \return(stpncpy) == 0 (auto)
+    \return(strsignal) == 0 (auto)
+    \return(argz_count) == 0, 6 (auto)
+    \return(argz_append) == 0, 6 (auto)
+    \return(argz_add) == 0, 6 (auto)
+    \return(argz_insert) == 0, 6 (auto)
+    \return(argz_replace) == 0, 6 (auto)
+    \return(argz_next) == 0 (auto)
+    \return(Frama_C_nondet_ptr) == 0 (auto)
+    \return(Frama_C_malloc_fresh) == 0 (auto)
+    \return(char_equal_ignore_case) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
