@@ -2961,11 +2961,11 @@ Example:
 frama-c -eva-help
 \end{frama-c-commands}
 \begin{logs}
-$\dots$
+...
 -eva-slevel <n>     superpose up to <n> states when unrolling control flow.
                     The larger n, the more precise and expensive the analysis
                     (defaults to 0)
-$\dots$
+...
 \end{logs}
 
 \begin{important}
@@ -4538,9 +4538,9 @@ when the indexes at which these arrays are written cannot be
 reduced to singleton values with usual techniques such as loop unrolling.
 
 The domain abstracts arrays by summarizing them with a {\it segmentation}, i.e. a
-partition of {\it segments}. A segment is a set of arrays cells with consecutive
+partition of {\it segments}. A segment is a set of array cells with consecutive
 indexes. A classical segmentation would be the division of an array into three
-segments arround a program variable {\tt i}: the set of cells whose index is
+segments around a program variable {\tt i}: the set of cells whose index is
 lower than {\tt i}, the singleton cell of index {\tt i} and the set of cells
 whose index is greater than {\tt i}.
 
@@ -4567,7 +4567,7 @@ can display the contents of the memory with its structure (via
 location type does not always match the types used to write into it.
 
 The domain tries to infer a suitable partition in a best-effort strategy. It
-will work on most simple loops, but may fails outside the most common patterns.
+will work on most simple loops, but may fail outside the most common patterns.
 
 Two command-line options and one annotation can be used to configure the
 domain.
