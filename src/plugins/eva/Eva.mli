@@ -913,47 +913,6 @@ module Logic_inout: sig
     formals:bool -> locals:bool -> Kernel_function.t -> Base.t -> bool
 end
 
-module Eva_results: sig
-  (** Internal temporary API: please do not use it, as it should be removed in a
-      future version. *)
-
-  (** {2 Initial cvalue state} *)
-
-  (** Specifies the initial cvalue state to use. *)
-  val set_initial_state: Cvalue.Model.t -> unit
-
-  (** Ignores previous calls to [set_initial_state] above, and uses the default
-      initial state instead. *)
-  val use_default_initial_state: unit -> unit
-
-  (** Specifies the values of the main function arguments. Beware that the
-      analysis fails if the number of given values is different from the number
-      of arguments of the entry point of the analysis. *)
-  val set_main_args: Cvalue.V.t list -> unit
-
-  (** Ignores previous calls to [set_main_args] above, and uses the default
-      main argument values instead. *)
-  val use_default_main_args: unit -> unit
-
-  (** {2 Results} *)
-
-  type results
-
-  val get_results: unit -> results
-  val set_results: results -> unit
-  val merge: results -> results -> results
-
-  (** Change the callstacks for the results for which this is meaningful.
-      For technical reasons, the top of the callstack must currently
-      be preserved. *)
-  val change_callstacks:
-    (Callstack.t -> Callstack.t) -> results -> results
-
-  val eval_tlval_as_location :
-    ?result:Cil_types.varinfo ->
-    Cvalue.Model.t ->  Cil_types.term -> Locations.location
-end
-
 module Unit_tests: sig
   (** Currently tested by this module:
       - semantics of sign values. *)

@@ -56,14 +56,8 @@ module InterruptHandlers: Parameter_sig.Kernel_function_set
 (** behavior of option -mt-moderate-warning. *)
 module ModerateWarnings: Parameter_sig.Bool
 
-(** behavior of option -mt-nice-offsets. *)
-module NiceOffsets: Parameter_sig.Bool
-
 (** behavior of option -mt-print-callstacks. *)
 module PrintCallstacks: Parameter_sig.Bool
-
-(** behavior of option -mt-show-sids. *)
-module ShowSid: Parameter_sig.Bool
 
 (** behavior of option -mt-time. *)
 module ShowTime: Parameter_sig.Bool
@@ -97,6 +91,3 @@ module ShowReturnEdges: Parameter_sig.Bool
 
 (** behavior of option -mt-inline-callbacks. *)
 module PopTopFunctionForCallbacks: Parameter_sig.Bool
-
-(** behavior of option -mt-compact. *)
-module CompactFunctions: Parameter_sig.String_set

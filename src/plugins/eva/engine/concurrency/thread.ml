@@ -287,8 +287,7 @@ let spawn spawn_point name entry_point arguments =
 let is_interrupt_handler entry_point =
   let key = Identity.Key.ByInterruptHandler entry_point in
   let identity = Identity.Prototype.{ key; entry_point } in
-  Identities.find_opt identity
-  |> Option.is_some
+  Identities.mem identity
 
 let interrupt_handler entry_point =
   let key = Identity.Key.ByInterruptHandler entry_point in

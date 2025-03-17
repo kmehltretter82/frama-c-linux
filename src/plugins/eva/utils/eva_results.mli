@@ -34,8 +34,6 @@ val get_initial_state: unit -> Cvalue.Model.t option
     if any. *)
 val get_main_args: unit -> Cvalue.V.t list option
 
-[@@@ api_start]
-
 (** Internal temporary API: please do not use it, as it should be removed in a
     future version. *)
 
@@ -74,8 +72,6 @@ val change_callstacks:
 val eval_tlval_as_location :
   ?result:Cil_types.varinfo ->
   Cvalue.Model.t ->  Cil_types.term -> Locations.location
-
-[@@@ api_end]
 
 (*
 Local Variables:

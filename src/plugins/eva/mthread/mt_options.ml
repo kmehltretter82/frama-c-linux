@@ -137,26 +137,11 @@ module ModerateWarnings =
   end)
 
 let () = Parameter_customize.set_group messages
-module NiceOffsets  =
-  True (struct
-    let option_name = "-mt-nice-offsets"
-    let help = "Try to display nice offsets for objects names"
-  end)
-
-let () = Parameter_customize.set_group messages
 module PrintCallstacks  =
   False (struct
     let option_name = "-mt-print-callstacks"
     let help = "Print the callstacks at which concurrent events occur"
   end)
-
-let () = Parameter_customize.set_group grp_debug
-module ShowSid =
-  False (struct
-    let option_name = "-mt-show-sids"
-    let help = "Show statement ids when printing line numbers"
-  end)
-;;
 
 let () = Parameter_customize.set_group grp_debug
 module ShowTime =
@@ -260,14 +245,4 @@ module PopTopFunctionForCallbacks =
     let option_name = "-mt-inline-callbacks"
     let help = "Do not show the names of concurrent primitives, only their effect"
   end)
-;;
-
-let () = Parameter_customize.set_group grp_cfg
-module CompactFunctions =
-  String_set
-    (struct
-      let option_name = "-mt-compact"
-      let arg_name = "f"
-      let help = "do not show the body of the given functions"
-    end)
 ;;

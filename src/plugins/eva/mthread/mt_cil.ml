@@ -41,12 +41,6 @@ let is_call_to_sync stmt =
 (* --- Pretty-printing                                                    --- *)
 (* -------------------------------------------------------------------------- *)
 
-let pretty_stmt fmt stmt =
-  Printer.pp_location fmt (Cil_datatype.Stmt.loc stmt);
-  if Mt_options.ShowSid.get () then
-    Format.fprintf fmt "@ (sid %d)" stmt.sid
-
-
 let kinstr_to_source = function
   | Kglobal -> None
   | Kstmt stmt -> Some (fst (Cil_datatype.Stmt.loc stmt))
