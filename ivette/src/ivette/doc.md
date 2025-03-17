@@ -1,6 +1,6 @@
 # Ivette {#ivette}
 
-Wellcome into the documentation of Frama-C user interface. This chapter
+Welcome into the documentation of Frama-C user interface. This chapter
 introduces basic concepts for using **Ivette**. Each plug-in may provide its own
 dedicated documentation chapter, consult them for more information.
 
@@ -18,25 +18,25 @@ The **Ivette** user-interface is decomposed into the following main areas:
  - The left sidebar, which can be used to navigate between the different views
    and plug-ins of the platform.
 
- - The top tool-bar, which provides short-cuts to selected views and frequently
+ - The top toolbar, which provides shortcuts to selected views and frequently
    used actions.
 
- - The bottom status-bar, which provides general feedback on currently running
+ - The bottom status bar, which provides general feedback on currently running
    tasks.
 
  - The « Laboratory » central area, where the different views and Frama-C
    components are displayed.
 
-Each registered Frama-C plug-in might extends Ivette with additional views,
-laboratory components, sidebars panels, status-bar items and menus. Consult
+Each registered Frama-C plug-in might extend Ivette with additional views,
+laboratory components, sidebars panels, status bar items and menus. Consult
 the associated documentation chapters for more details.
 
 ## The Sidebar {#ivette-sidebar}
 
 There are actually _several_ sidebars and you can use the large icons on the
-left-most side of the screen to switch from one sidebar to the other. The
-[icon-sidebar] button in the top tool-bar allows you to hide/show the
-sidebar(s). Among them, two sidebars are especially dedicated to Ivette:
+left-most side of the screen to switch from one sidebar to another. The
+[icon-sidebar] button in the top toolbar allows you to hide/show the
+sidebars. Among them, two sidebars are especially dedicated to Ivette:
 
 - The [icon-display] sidebar provides access to _all_ registered components and
   views that you can use in Ivette.
@@ -50,22 +50,22 @@ The Ivette principal area consists of one to four panels that you can arrange as
 you want. Each panels can be resized and configured to display any available
 _Components_ from the Frama-C kernel and the registered plug-ins.
 
-The [icon-display] sidebar provides you access to all registered _Components_
-and also provides you access to some predefined combination of components as
+The [icon-display] sidebar provides an access to all registered _Components_
+and also provides access to some predefined combination of components as
 _Views_. When you select a _View_, the Laboratory layout is updated to display
-the relevant predefined components. The main Ivette tool-bar provides you quick
+the relevant predefined components. The main Ivette toolbar provides a quick
 access to the _Views_ you already visited. You can also duplicate views and
 configure them independently.
 
-You can add individual _Components_ from the [icon-display] sidebar into you
+You can add individual _Components_ from the [icon-display] sidebar into your
 current laboratory view: double-click a new
-component to add it with its preferred layout, or right-click to choose which
-layout to apply on.
+component to add it with its preferred layout, or right-click to choose another
+registered layout.
 
 Each component displayed in the Laboratory can be moved or resized from one
 panel to the others: simply right-click on the _Component_ title bar to show its
-layout menu. Components can also be docked in the status-bar for later use.
-Docked components can also be re-layout by right-clicking them.
+layout menu. Components can also be docked in the status bar for later use.
+The layout of docked components can changed by right-clicking them.
 
 You can resize the different panels by dragging the splitters. You may resize
 the two top panels independently from the two bottom panels by dragging the
@@ -79,9 +79,9 @@ synchronously.
 The top most toolbar of Ivette provides you quick access to Tab Views.
 Right-clicking on tabs allow you to restore initial view layout or close tabs.
 When restoring a _View_ to its initial layout, the extra components you may have
-added to the laboratory are docked into the status-bar for quick access.
+added to the laboratory are docked into the status bar for quick access.
 
-On the left of _View Tabs_ the tool-bar offers the following buttons:
+On the left of _View Tabs_ the toolbar offers the following buttons:
 
 - [icon-sidebar] to show/hide the sidebar;
 - [icon-media.play] start the Frama-C session;
@@ -90,22 +90,22 @@ On the left of _View Tabs_ the tool-bar offers the following buttons:
 - [icon-triangle.left] navigate backward;
 - [icon-triangle.right] navigate forward;
 
-On the right of _View Tabs_ the tool-bar offers the following buttons:
+On the right of _View Tabs_, the toolbar offers the following buttons:
 
 - [icon-zoom.out] to decrease the font-size of all components;
 - [icon-zoom.in] to increase the font-size of all components;
 - [icon-search] to search views, components, source declarations, _etc._
 
-The tool-bar search widget can be extended by registered plug-ins to search
+The toolbar search widget can be extended by registered plug-ins to search
 specific items. The keyboard shortcut `Cmd+K` provides you with instant access
-to the tool-bar search widget.
+to the toolbar's search widget.
 
 ## The Status Bar {#ivette-statusbar}
 
 This area is used to provide summarized feedback on activity and running tasks
-in the current Frama-C session. In case of errors, warning or special events,
-messages are raised from the status-bar and may provides you with quick links to
-relevant components. Docked components are also accessible from the status-bar.
+in the current Frama-C session. In case of errors, warnings or special events,
+messages are raised from the status bar and may provides you with quick links to
+relevant components. Docked components are also accessible from the status bar.
 
 ## The Console {#ivette-console}
 
@@ -117,13 +117,13 @@ Frama-C session, this component displays:
  - the command-line options of the Frama-C session, when stopped;
  - the command-line editor panel, when configuring the Frama-C session.
 
-The Console component title-bar provides two main buttons:
+The _Console Component_ title bar provides two main buttons:
 
  - [icon-terminal] switch on/off the command-line configuration mode;
  - [icon-media.next] activate/deactivate auto-scrolling of Frama-C output;
 
-When in command-line configuration mode, other buttons are available to navigate
+When in _command-line configuration_ mode, other buttons are available to navigate
 through the command-line history.
 
-There is also a predefined _Console View_ that displays the _Console_ and the
-_Messages_ component together.
+There is also a predefined _Console View_ that displays the _Console Component_
+and the _Messages Component_ together.
