@@ -29,6 +29,8 @@
 
 open Interlang
 
+let dkey = Options.Dkey.interlang_translation
+
 module Conf = struct
   (* The Reader variable of M. See Monad_rws.Conf.env *)
   type env = {kf : Cil_types.kernel_function;
@@ -315,10 +317,14 @@ let generate_and_compile ~loc ~adata ~env ~kf m source =
     let state = Cil_datatype.Term.Map.empty (* local variables *) in
     Interlang_gen.M.run ~env ~state @@ m source
   in
+  Options.debug ~dkey ~level:3
+    "@[interlang:@ @[%a@]@]" Interlang.Pretty.pp_exp interlang;
   let cil, (), {env; adata} =
     M.run ~env:{Conf.kf; loc; adata_register = true} ~state:{Conf.env; adata} @@
     compile interlang
   in
+  Options.debug ~dkey ~level:4
+    "@[Cil output:@ @[%a@]@]" Printer.pp_exp cil;
   cil, adata, env
 
 let try_interlang il old =
