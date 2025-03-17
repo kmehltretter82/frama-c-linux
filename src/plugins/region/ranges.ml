@@ -67,19 +67,15 @@ let rec merge f ra rb =
   | a :: wa, b :: wb ->
     let a' = a.offset + a.length in
     let b' = b.offset + b.length in
-    if a' <= b.offset then
-      a :: merge f wa rb
-    else
-    if b' <= a.offset then
-      b :: merge f ra wb
-    else
+    if a' <= b.offset then a :: merge f wa rb else
+    if b' <= a.offset then b :: merge f ra wb else
       let offset = min a.offset b.offset in
       let length = max a' b' - offset in
       let data = f a b in
       let r = { offset ; length ; data } in
-      if a' < b'
-      then merge f wa (r::wb)
-      else merge f (r::wa) wb
+      if a' < b' then merge f wa (r::wb) else
+      if b' < a' then merge f (r::wa) wb else
+        r :: merge f wa wb
 
 let merge f (R x) (R y) = R (merge f x y)
 

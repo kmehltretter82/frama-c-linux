@@ -37,58 +37,58 @@ Prove: EqS1_S(a_4, a_5).
 ------------------------------------------------------------
 
 Goal Post-condition 'post_eq_struct_fields' in 'zeroify_S_fs':
-Let a_1 = memcpy(M001a_sint32_0, M001a_sint32_undef_0, a, a, 12).
-Let a_2 = memcpy(M000b_sint16_0, M000b_sint16_undef_0, a, a, 12).
-Let a_3 = memcpy(M0024_sint8_0, M0024_sint8_undef_0, a, a, 12).
-Let x = M001a_sint32_undef_0[shiftfield_F1_S_fi(a)].
+Let a_1 = memcpy(M0019_sint32_0, M0019_sint32_undef_0, a, a, 12).
+Let a_2 = memcpy(M0022_sint8_0, M0022_sint8_undef_0, a, a, 12).
+Let a_3 = memcpy(M000b_sint16_0, M000b_sint16_undef_0, a, a, 12).
+Let x = M0019_sint32_undef_0[shiftfield_F1_S_fi(a)].
 Let a_4 = shiftfield_F1_S_fca(a).
-Let x_1 = M0024_sint8_undef_0[shift_sint8(a_4, 4)].
-Let a_5 = a_2[shiftfield_F1_S_fs(b)].
+Let x_1 = M0022_sint8_undef_0[shift_sint8(a_4, 4)].
+Let a_5 = a_3[shiftfield_F1_S_fs(b)].
 Let a_6 = a_1[shiftfield_F1_S_fi(b)].
-Let m = Array_R0024_sint8(a_4, 6, a_3).
-Let m_1 = Array_R0024_sint8(shiftfield_F1_S_fca(b), 6, a_3).
+Let m = Array_R0022_sint8(a_4, 6, a_2).
+Let m_1 = Array_R0022_sint8(shiftfield_F1_S_fca(b), 6, a_2).
 Let x_2 = to_sint16(lxor(a_5, a_5)).
-Let a_7 = a_2[shiftfield_F1_S_fs(a) <- x_2].
+Let a_7 = a_3[shiftfield_F1_S_fs(a) <- x_2].
 Assume {
   Type: is_sint32(x) /\ is_sint8(x_1) /\ is_sint16(a_5) /\ is_sint32(a_6) /\
       IsArray_sint8(m) /\ IsArray_sint8(m_1) /\ is_sint32(x + x_1 + x_2) /\
-      IsS1_S(Load_R0003_S1_S(a, a_1, a_7, a_3)) /\
-      IsS1_S(Load_R0003_S1_S(b, a_1, a_7, a_3)).
+      IsS1_S(Load_R0003_S1_S(a, a_1, a_2, a_7)) /\
+      IsS1_S(Load_R0003_S1_S(b, a_1, a_2, a_7)).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Pre-condition *)
   Have: P_pointed(a, b).
   Have: Load_R0003_S1_S(a, a_1, a_2, a_3) =
-      Load_R0003_S1_S(b, M001a_sint32_0, M000b_sint16_0, M0024_sint8_0).
+      Load_R0003_S1_S(b, M0019_sint32_0, M0022_sint8_0, M000b_sint16_0).
 }
 Prove: (a_6 = x) /\ (x_2 = 0) /\ EqArray_int(6, m, m_1).
 
 ------------------------------------------------------------
 
 Goal Post-condition 'post_eq_struct_with_update' in 'zeroify_S_fs':
-Let a_1 = memcpy(M001a_sint32_0, M001a_sint32_undef_0, a, a, 12).
-Let a_2 = memcpy(M000b_sint16_0, M000b_sint16_undef_0, a, a, 12).
-Let a_3 = memcpy(M0024_sint8_0, M0024_sint8_undef_0, a, a, 12).
-Let x = M001a_sint32_undef_0[shiftfield_F1_S_fi(a)].
+Let a_1 = memcpy(M0019_sint32_0, M0019_sint32_undef_0, a, a, 12).
+Let a_2 = memcpy(M0022_sint8_0, M0022_sint8_undef_0, a, a, 12).
+Let a_3 = memcpy(M000b_sint16_0, M000b_sint16_undef_0, a, a, 12).
+Let x = M0019_sint32_undef_0[shiftfield_F1_S_fi(a)].
 Let a_4 = shiftfield_F1_S_fca(a).
-Let x_1 = M0024_sint8_undef_0[shift_sint8(a_4, 4)].
-Let a_5 = a_2[shiftfield_F1_S_fs(b)].
+Let x_1 = M0022_sint8_undef_0[shift_sint8(a_4, 4)].
+Let a_5 = a_3[shiftfield_F1_S_fs(b)].
 Let a_6 = a_1[shiftfield_F1_S_fi(b)].
-Let m = Array_R0024_sint8(shiftfield_F1_S_fca(b), 6, a_3).
+Let m = Array_R0022_sint8(shiftfield_F1_S_fca(b), 6, a_2).
 Let x_2 = to_sint16(lxor(a_5, a_5)).
-Let a_7 = a_2[shiftfield_F1_S_fs(a) <- x_2].
-Let a_8 = Load_R0003_S1_S(a, a_1, a_7, a_3).
+Let a_7 = a_3[shiftfield_F1_S_fs(a) <- x_2].
+Let a_8 = Load_R0003_S1_S(a, a_1, a_2, a_7).
 Assume {
   Type: is_sint32(x) /\ is_sint8(x_1) /\ is_sint16(a_5) /\ is_sint32(a_6) /\
-      IsArray_sint8(Array_R0024_sint8(a_4, 6, a_3)) /\ IsArray_sint8(m) /\
+      IsArray_sint8(Array_R0022_sint8(a_4, 6, a_2)) /\ IsArray_sint8(m) /\
       is_sint32(x + x_1 + x_2) /\ IsS1_S(a_8) /\
-      IsS1_S(Load_R0003_S1_S(b, a_1, a_7, a_3)).
+      IsS1_S(Load_R0003_S1_S(b, a_1, a_2, a_7)).
   (* Heap *)
   Type: (region(a.base) <= 0) /\ (region(b.base) <= 0).
   (* Pre-condition *)
   Have: P_pointed(a, b).
   Have: Load_R0003_S1_S(a, a_1, a_2, a_3) =
-      Load_R0003_S1_S(b, M001a_sint32_0, M000b_sint16_0, M0024_sint8_0).
+      Load_R0003_S1_S(b, M0019_sint32_0, M0022_sint8_0, M000b_sint16_0).
 }
 Prove: EqS1_S(a_8, { F1_S_fi = a_6 ; F1_S_fs = 0 ; F1_S_fca = m }).
 

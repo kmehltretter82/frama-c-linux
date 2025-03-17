@@ -86,47 +86,6 @@ let lock m = m.locked <- true
 let unlock m = m.locked <- false
 
 (* -------------------------------------------------------------------------- *)
-(* --- Printers                                                           --- *)
-(* -------------------------------------------------------------------------- *)
-
-let pp_node fmt (n : node) = Format.fprintf fmt "R%04x" @@ Store.id n
-
-let pp_field fields fmt fd =
-  if Options.debug_atleast 1 then Ranges.pp_range fmt fd else
-    Fields.pretty fields fmt fd
-
-let pp_layout fmt = function
-  | Blob -> Format.pp_print_string fmt "<blob>"
-  | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
-  | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
-  | Compound(s,fields,rg) ->
-    Format.fprintf fmt "@[<hv 0>{%04d" s ;
-    Ranges.iteri
-      (fun (rg : rg) ->
-         Format.fprintf fmt "@ | %a: %a" (pp_field fields) rg pp_node rg.data
-      ) rg ;
-    Format.fprintf fmt "@ }@]"
-
-let pp_chunk fmt (n: node) (m: chunk) =
-  begin
-    let acs r s = if Access.Set.is_empty s then '-' else r in
-    Format.fprintf fmt "@[<hov 2>%a: %c%c%c" pp_node n
-      (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
-    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
-    Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
-    Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.croots ;
-    if Options.debug_atleast 1 then
-      begin
-        Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
-        Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
-        Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
-      end ;
-    List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
-    Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
-  end
-[@@ warning "-32"]
-
-(* -------------------------------------------------------------------------- *)
 (* --- Map Constructors                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -178,6 +137,51 @@ let update (m: map) (n: node) (f: chunk -> chunk) =
   Ufind.set m.store n (f r)
 
 (* -------------------------------------------------------------------------- *)
+(* --- Printers                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let pp_node fmt (n : node) = Format.fprintf fmt "R%04x" @@ Store.id n
+
+let pp_field fields fmt fd =
+  if Options.debug_atleast 1 then Ranges.pp_range fmt fd else
+    Fields.pretty fields fmt fd
+
+let pp_layout fmt = function
+  | Blob -> Format.pp_print_string fmt "<blob>"
+  | Cell(s,None) -> Format.fprintf fmt "<%04d>" s
+  | Cell(s,Some n) -> Format.fprintf fmt "<%04d>(*%a)" s pp_node n
+  | Compound(s,fields,rg) ->
+    Format.fprintf fmt "@[<hv 0>{%04d" s ;
+    Ranges.iteri
+      (fun (rg : rg) ->
+         Format.fprintf fmt "@ | %a: %a" (pp_field fields) rg pp_node rg.data
+      ) rg ;
+    Format.fprintf fmt "@ }@]"
+
+let pp_chunk name fmt (m: chunk) =
+  begin
+    let acs r s = if Access.Set.is_empty s then '-' else r in
+    Format.fprintf fmt "@[<hov 2>%s: %c%c%c" name
+      (acs 'R' m.creads) (acs 'W' m.cwrites) (acs 'A' m.cshifts) ;
+    List.iter (Format.fprintf fmt "@ (%a)" Typ.pretty) (ctypes m) ;
+    Lset.iter (Format.fprintf fmt "@ %s:") m.clabels ;
+    Vset.iter (Format.fprintf fmt "@ %a" Varinfo.pretty) m.croots ;
+    if Options.debug_atleast 1 then
+      begin
+        Access.Set.iter (Format.fprintf fmt "@ R:%a" Access.pretty) m.creads ;
+        Access.Set.iter (Format.fprintf fmt "@ W:%a" Access.pretty) m.cwrites ;
+        Access.Set.iter (Format.fprintf fmt "@ A:%a" Access.pretty) m.cshifts ;
+      end ;
+    List.iter (Format.fprintf fmt "@ P:%a" pp_node) m.cparents ;
+    Format.fprintf fmt "@ %a ;@]" pp_layout m.clayout ;
+  end
+
+let pp_region (m : map) fmt (r : node) =
+  let name = Pretty_utils.to_string pp_node r in
+  pp_chunk name fmt (get m r)
+[@@ warning "-32"]
+
+(* -------------------------------------------------------------------------- *)
 (* --- Nodes Set                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -189,7 +193,6 @@ module SNode = Set.Make(struct
 (* -------------------------------------------------------------------------- *)
 (* --- Chunk Constructors                                                 --- *)
 (* -------------------------------------------------------------------------- *)
-
 
 let new_chunk (m: map) ?parent ?(size=0) ?ptr ?pointed () =
   failwith_locked m "Region.Memory.new_chunk" ;
@@ -285,16 +288,18 @@ let merge_cell (m:map) (q:queue) cell root r =
 let merge_range (m: map) (q: queue) (ra : rg) (rb : rg) : node =
   let na = ra.data in
   let nb = rb.data in
+  let r = merge_node m q na nb in
   let ma = ra.offset + ra.length in
   let mb = rb.offset + rb.length in
   let dp = ra.offset - rb.offset in
   let dq = ma - mb in
-  let sa = sizeof (get m na).clayout in
-  let sb = sizeof (get m nb).clayout in
-  let size = Ranges.(sa %. sb %. dp %. dq) in
-  let data = merge_node m q na nb in
-  if size = sa && size = sb then data else
-    merge_node m q (new_chunk m ~size ()) data
+  if dp = 0 && dq = 0 then r else
+    let sa = sizeof (get m na).clayout in
+    let sb = sizeof (get m nb).clayout in
+    let size = Ranges.(sa %. sb %. dp %. dq) in
+    if (sa = 0 || sa = size) && (sb = 0 || sb = size)
+    then r (* merged size is compatible with dp and dq *)
+    else merge_node m q r (new_chunk m ~size ())
 
 let merge_ranges (m: map) (q: queue) (root: node)
     (sa : int) (fa : Fields.domain) (wa : node Ranges.t)
@@ -303,7 +308,7 @@ let merge_ranges (m: map) (q: queue) (root: node)
   if sa = sb then
     match Ranges.merge (merge_range m q) wa wb with
     | R [{ offset = 0 ; length ; data }] when length = sa ->
-      merge_push m q root data ; Cell(sa,None)
+      merge_push m q root data ; (get m data).clayout
     | ranges ->
       let fields = Fields.union fa fb in
       Compound(sa, fields, ranges)
@@ -331,16 +336,17 @@ let merge_layout (m:map) (q:queue) (root:node) (a:layout) (b:layout) : layout =
     cell_layout cell
 
 let merge_chunk (m: map) (q:queue) (root:node)
-    (a : chunk) (b : chunk) : chunk = {
-  cparents = nodes m @@ Store.bag a.cparents b.cparents ;
-  cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
-  clabels = Lset.union a.clabels b.clabels ;
-  croots = Vset.union a.croots b.croots ;
-  creads = Access.Set.union a.creads b.creads ;
-  cwrites = Access.Set.union a.cwrites b.cwrites ;
-  cshifts = Access.Set.union a.cshifts b.cshifts ;
-  clayout = merge_layout m q root a.clayout b.clayout ;
-}
+    (a : chunk) (b : chunk) : chunk =
+  {
+    cparents = nodes m @@ Store.bag a.cparents b.cparents ;
+    cpointed = nodes m @@ Store.bag a.cpointed b.cpointed ;
+    clabels = Lset.union a.clabels b.clabels ;
+    croots = Vset.union a.croots b.croots ;
+    creads = Access.Set.union a.creads b.creads ;
+    cwrites = Access.Set.union a.cwrites b.cwrites ;
+    cshifts = Access.Set.union a.cshifts b.cshifts ;
+    clayout = merge_layout m q root a.clayout b.clayout ;
+  }
 
 let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
   begin
@@ -348,8 +354,8 @@ let do_merge (m: map) (q: queue) (a: node) (b: node): unit =
     let cb = Ufind.get m.store b in
     let rt = Ufind.union m.store a b in
     let ck = merge_chunk m q rt ca cb in
-    let ck = { ck with
-               cparents = List.filter (fun r -> not @@ equal m r rt) ck.cparents } in
+    let cparents = List.filter (fun r -> not @@ equal m r rt) ck.cparents in
+    let ck = { ck with cparents } in
     Ufind.set m.store rt ck ;
   end
 
