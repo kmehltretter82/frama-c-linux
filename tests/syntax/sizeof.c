@@ -48,3 +48,13 @@ void vla(int n) {
   unsigned long s = sizeof(int[n]);
   assert(s == n * sizeof(int));
 }
+
+// We drop side-effects but keep the temporary variable
+int effects(int x){
+  int res;
+  switch (x) {
+    case sizeof((int[]){ 1, 2, 3 }): res = 1;
+    default: res = sizeof((int[]){ 1, 2, 3 });
+  }
+  return res;
+}
