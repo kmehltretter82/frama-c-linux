@@ -415,12 +415,14 @@ type goto_list = (vertex * stmt * stmt) list ref
     - [break]: the vertex to which break statements must jump
     - [return]: the vertex to which return statements must jump
     - [blocks]: the englobing blocks of the current transitions
-    - [loop_level]: the number of loop englobing the current transitions *)
+    - [loop_level]: the number of loop englobing the current transitions
+    - [labels]: logic labels defined at this point associated to the vertices
+      they refer to *)
 type control_context = {
   src: vertex;
   dest: vertex;
-  continue: vertex;
-  break: vertex;
+  continue: vertex option;
+  break: vertex option;
   return: vertex;
   blocks: Cil_types.block list;
   loop_level: int;
@@ -558,7 +560,7 @@ let build_automaton ~annotations kf =
   in
 
   (* Helpers to add edges *)
-  let build_jump src dest stmt guard =
+  let build_jump src dest stmt transition =
     (* Build a transition followed with a jump to the [dest] vertex consisting
        in several enter/leave.
        Returns the vertex just following the transition, before the enter/leave
@@ -580,7 +582,7 @@ let build_automaton ~annotations kf =
     let v = dest in
     let v = List.fold_left build_enter v (blocks_opened src dest) in
     let v = List.fold_left build_leave v (blocks_closed src dest) in
-    add_edge src v kinstr guard loc;
+    add_edge src v kinstr transition loc;
     v
   in
 
@@ -658,7 +660,7 @@ let build_automaton ~annotations kf =
           if Cil.instr_falls_through instr
           then control.dest
           else
-            let v = add_vertex [] in
+            let v = add_vertex control.blocks in
             exit_points := v :: !exit_points;
             v
         in
@@ -674,10 +676,10 @@ let build_automaton ~annotations kf =
         control.src
 
       | Break _ ->
-        build_jump control.src control.break stmt Skip
+        build_jump control.src (Option.get control.break) stmt Skip
 
       | Continue _ ->
-        build_jump control.src control.continue stmt Skip
+        build_jump control.src (Option.get control.continue) stmt Skip
 
       | If (exp, then_block, else_block, _) ->
         let then_point = add_vertex control.blocks
@@ -704,7 +706,7 @@ let build_automaton ~annotations kf =
         let block_control =
           { control with
             src = add_vertex control.blocks; (* This vertex is unreachable *)
-            break = control.dest;
+            break = Some control.dest;
           }
         in
         do_block block_control kinstr block;
@@ -766,8 +768,8 @@ let build_automaton ~annotations kf =
             { control with
               src = control.src;
               dest = control.src;
-              break = control.dest;
-              continue = control.src;
+              break = Some control.dest;
+              continue = Some control.src;
               loop_level = control.loop_level + 1;
             }
           else
@@ -799,8 +801,8 @@ let build_automaton ~annotations kf =
             { control with
               src = body_start;
               dest = body_end;
-              break = control.dest;
-              continue = body_end;
+              break = Some control.dest;
+              continue = Some body_end;
               loop_level = control.loop_level + 1;
               labels;
             }
@@ -835,8 +837,8 @@ let build_automaton ~annotations kf =
   let control =
     { src = entry_point;
       dest = return_point;
-      break = dummy_vertex;
-      continue = dummy_vertex;
+      break = None;
+      continue = None;
       return = return_point;
       blocks = [];
       loop_level = 0;
