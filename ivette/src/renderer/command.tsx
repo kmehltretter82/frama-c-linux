@@ -29,6 +29,7 @@ Ivette.registerComponent({
     id: 'fc.kernel.console',
     label: 'Console',
     title: 'Frama-C Command Line',
+    help: "ivette-console",
     preferredPosition: 'AB',
     children: <Controller.RenderConsole />,
 });
