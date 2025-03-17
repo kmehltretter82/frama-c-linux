@@ -140,7 +140,7 @@ function List(props: ListProps): JSX.Element {
   const count = children.length;
 
   const filterButtonProps = {
-    icon: 'TUNINGS',
+    icon: 'FILTER',
     title: `${Name}s filtering options (${count} / ${total})`,
     onClick: () => Dome.popupMenu(filteringMenuItems),
   };
