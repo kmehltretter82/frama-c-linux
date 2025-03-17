@@ -324,6 +324,37 @@ function nextTab(tabs: Map<tabKey, TabViewState>, key: tabKey):
   return next || first;
 }
 
+function getTabIndex(tabs: Map<tabKey, TabViewState>, key: tabKey): number {
+  let index = -1;
+  let curIndex = 0;
+  tabs.forEach(t => {
+    if (t.key === key) index = curIndex;
+    curIndex++;
+  });
+  return index;
+}
+
+function changeTabIndex(
+  tabs: Map<tabKey, TabViewState>,
+  key: tabKey,
+  index: number
+): Map<tabKey, TabViewState> {
+  const newTabs = new Map<tabKey, TabViewState>();
+  const tab = tabs.get(key);
+  if (!tab) return tabs;
+  let curIndex = 0;
+  if (index < 0) newTabs.set(key, tab);
+  tabs.forEach(t => {
+    if (t.key !== key) {
+      if (curIndex === index) newTabs.set(key, tab);
+      newTabs.set(t.key, t);
+      ++curIndex;
+    }
+  });
+  if (curIndex <= index) newTabs.set(key, tab);
+  return newTabs;
+}
+
 function newCustom(tabs: Map<tabKey, TabViewState>, viewId: viewId): number {
   let custom = 0;
   tabs.forEach(tab => {
@@ -1359,6 +1390,9 @@ function TabView(props: TabViewProps): JSX.Element | null {
       { label: 'Close Tab', display: custom <= 0, onClick: onClose },
     ]);
   };
+  const onAuxClick = (_value: undefined, event: React.MouseEvent): void => {
+    if (event.button === 1) onClose();
+  };
 
   const icon = 'DISPLAY';
 
@@ -1371,6 +1405,7 @@ function TabView(props: TabViewProps): JSX.Element | null {
       selected={selected}
       onClick={onClick}
       onContextMenu={onContextMenu}
+      onAuxClick={onAuxClick}
     >
       <IconButton
         className='labview-tab-closing'
@@ -1470,7 +1505,7 @@ Dome.addMenuItem({
 });
 
 /* -------------------------------------------------------------------------- */
-/* --- Menu and shortcuts for tab selection                               --- */
+/* --- Menu and shortcuts for tab selection and movements                 --- */
 /* -------------------------------------------------------------------------- */
 
 function applyPrevTab(): void {
@@ -1556,5 +1591,36 @@ function addShortcutToNthTab(i: number): void {
 for (let i = 0; i < 10; i++) {
   addShortcutToNthTab(i);
 }
+
+function moveTab(shift: number): void {
+  const state = LAB.getValue();
+  const tabIndex = getTabIndex(state.tabs, state.tabKey);
+  const tabs = changeTabIndex(state.tabs, state.tabKey, tabIndex + shift);
+  // Force the change: tabs are the same, but their order has changed.
+  LAB.setValue({ ...state, tabs }, true);
+}
+
+function moveTabBackward(): void {
+  moveTab(-1);
+}
+function moveTabForward(): void {
+  moveTab(1);
+}
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.tab.moveForward',
+  label: 'Move tab forward',
+  key: 'Cmd+Shift+PageDown',
+  onClick: moveTabForward,
+});
+
+Dome.addMenuItem({
+  menu: 'View',
+  id: 'ivette.tab.moveBackward',
+  label: 'Move tab backward',
+  key: 'Cmd+Shift+PageUp',
+  onClick: moveTabBackward,
+});
 
 /* -------------------------------------------------------------------------- */

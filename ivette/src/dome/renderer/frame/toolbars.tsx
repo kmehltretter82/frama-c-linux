@@ -163,6 +163,8 @@ export interface ButtonProps<A> {
   onClick?: (value: A | undefined, evt:React.MouseEvent) => void;
   /** Right-Click callback. Receives the button's value. */
   onContextMenu?: (value: A | undefined, evt:React.MouseEvent) => void;
+  /** Callback for other mouse button click. Receives the button's value. */
+  onAuxClick?: (value: A | undefined, evt:React.MouseEvent) => void;
   /** Further Styling */
   className?: string;
   /** Button contents */
@@ -176,7 +178,8 @@ export function Button<A = undefined>(
   const { visible = true, hidden = false } = props;
   if (!visible || hidden) return null;
   const { enabled = true, disabled = false } = props;
-  const { selected, value, selection, onClick, onContextMenu } = props;
+  const { selected, value, selection } = props;
+  const { onClick, onContextMenu, onAuxClick } = props;
   const isSelected = selected !== undefined
     ? selected : (value !== undefined && value === selection);
   const className = classes(
@@ -190,6 +193,7 @@ export function Button<A = undefined>(
       className={className}
       onClick={onClick && ((evt) => onClick(value, evt))}
       onContextMenu={onContextMenu && ((evt) => onContextMenu(value, evt))}
+      onAuxClick={onAuxClick && ((evt) => onAuxClick(value, evt))}
       title={props.title}
     >
       {props.icon && <SVG offset={-1} id={props.icon} />}
