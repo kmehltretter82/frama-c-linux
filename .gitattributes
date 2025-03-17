@@ -88,21 +88,7 @@ src/plugins/e-acsl/examples/ensuresec/**/*.py -check-indent
 
 ## Unset "-check-utf8"
 
-/doc/training/developer/macros.tex -check-utf8
-
-/src/plugins/wp/doc/coqdoc/coqdoc.sty -check-utf8
-/src/plugins/wp/doc/manual/wp_logicvar.tex -check-utf8
-/src/plugins/wp/doc/manual/wp_store.tex -check-utf8
-
 ## Unset all: "-check-syntax -check-indent -check-eoleof -check-utf8"
-
-# Don't check symbolic links (that gives an error for check-utf8). Please checks only the linked target.
-/src/plugins/e-acsl/tests/builtin/utils -check-syntax -check-indent -check-eoleof -check-utf8
-/src/plugins/e-acsl/tests/format/utils  -check-syntax -check-indent -check-eoleof -check-utf8
-
-# File names that cannot be checked (due to sh: 1: Syntax error: Unterminated quoted string)
-/tests/syntax/foo\".c                 -check-syntax -check-indent -check-eoleof -check-utf8
-/tests/syntax/oracle/foo\".res.oracle -check-syntax -check-indent -check-eoleof -check-utf8
 
 #########################
 # HEADER_SPEC: CEA_LGPL #
@@ -189,34 +175,20 @@ README* header_spec=.ignore
 
 *.odoc header_spec=.ignore
 
-/.for_devel header_spec=.ignore
-/.force-reconfigure header_spec=.ignore
 /.gitlab-ci.yml header_spec=.ignore
-/.make-clean* header_spec=.ignore
 /.mailmap header_spec=.ignore
 /.ocp-indent header_spec=.ignore
-/ALL_VERSIONS header_spec=.ignore
 /LICENSE header_spec=.ignore
 /VERSION header_spec=.ignore
 /VERSION_CODENAME header_spec=.ignore
 
-/bin/sed_get_* header_spec=.ignore
-
 /dev/docker/*.sh header_spec=.ignore
 /dev/docker/Dockerfile header_spec=.ignore
-
-# TODO: header_spec=JCF_LGPL_2_only
-/dev/size.mli header_spec=.ignore
-/dev/size.ml header_spec=.ignore
-/dev/size_states.ml header_spec=.ignore
-/dev/size_states.mli header_spec=.ignore
 
 /doc/CC-BY-SA-4.0 header_spec=.ignore
 /doc/CHANGES.obfuscator header_spec=.ignore
 /doc/LICENSE header_spec=.ignore
 /doc/MakeLaTeXModern header_spec=.ignore
-/doc/acsl_tutorial_slides/script header_spec=.ignore
-/doc/developer/METADOC.txt header_spec=.ignore
 /doc/developer/dune-workspace.bench header_spec=.ignore
 /doc/developer/examples/**/* header_spec=.ignore
 /doc/developer/tutorial/**/* header_spec=.ignore
@@ -229,7 +201,6 @@ README* header_spec=.ignore
 /doc/frama-c-book.* header_spec=.ignore
 /doc/*.hva header_spec=.ignore
 
-/doc/training/**/* header_spec=.ignore
 /doc/eva/examples/parametrizing/*.log header_spec=.ignore
 /doc/**/make* header_spec=.ignore
 /doc/**/TODO header_spec=.ignore
@@ -239,7 +210,6 @@ README* header_spec=.ignore
 /doc/**/*.h header_spec=.ignore
 /doc/**/*.html header_spec=.ignore
 /doc/**/*.lua header_spec=.ignore
-/doc/slicing/algo.ml header_spec=.ignore
 /doc/*/*/**/*.ml header_spec=.ignore
 /doc/**/*.mli header_spec=.ignore
 /doc/**/*.mll header_spec=.ignore
@@ -255,7 +225,6 @@ README* header_spec=.ignore
 
 /man/frama-c.1 header_spec=.ignore
 
-/nix/empty header_spec=.ignore
 /nix/external-plugins.txt header_spec=.ignore
 /nix/ocaml-versions.txt header_spec=.ignore
 /nix/frama-c-public/known_hosts header_spec=.ignore
@@ -264,11 +233,7 @@ README* header_spec=.ignore
 /tools/ptests/tests/**/* header_spec=.ignore
 
 /share/framac.vim header_spec=.ignore
-/share/META.frama-c header_spec=.ignore
 /share/analysis-scripts/readme-graph.graphml header_spec=.ignore
-/share/analysis-scripts/pyproject.toml header_spec=.ignore
-/share/win32_installer.iss header_spec=.ignore
-/share/win32_manual_installation_step.txt header_spec=.ignore
 /share/compliance/*.json header_spec=.ignore
 /share/machdeps/.machdep_*.validated header_spec=.ignore
 /share/machdeps/machdep-schema.yaml header_spec=.ignore
@@ -278,8 +243,6 @@ README* header_spec=.ignore
 #######################
 # HEADER_SPEC: others #
 #######################
-
-/configure.ac header_spec=CEA_INRIA_LGPL
 
 /doc/aorai/Makefile header_spec=AORAI_LGPL
 
@@ -292,7 +255,6 @@ README* header_spec=.ignore
 /share/emacs/acsl.el header_spec=CEA_PR_LGPL
 /share/libc/argz.h header_spec=CEA_FSF_LGPL
 /share/libc/argz.c header_spec=CEA_FSF_LGPL
-/share/machdep.c header_spec=CIL
 
 /src/kernel_internals/parsing/clexer.mli header_spec=CIL
 /src/kernel_internals/parsing/clexer.mll header_spec=CIL
@@ -348,12 +310,10 @@ README* header_spec=.ignore
 /src/kernel_services/ast_queries/logic_typing.mli header_spec=CEA_INRIA_LGPL
 /src/kernel_services/ast_queries/logic_utils.ml header_spec=CEA_INRIA_LGPL
 /src/kernel_services/ast_queries/logic_utils.mli header_spec=CEA_INRIA_LGPL
-/src/kernel_services/parsetree/cabs.mli header_spec=CIL
 /src/kernel_services/parsetree/cabs.ml header_spec=CIL
 /src/kernel_services/parsetree/cabshelper.ml header_spec=CIL
 /src/kernel_services/parsetree/cabshelper.mli header_spec=CIL
 /src/kernel_services/parsetree/logic_ptree.ml header_spec=CEA_INRIA_LGPL
-/src/kernel_services/parsetree/logic_ptree.mli header_spec=CEA_INRIA_LGPL
 /src/kernel_services/visitors/cabsvisit.ml header_spec=CIL
 /src/kernel_services/visitors/cabsvisit.mli header_spec=CIL
 /src/kernel_services/visitors/visitor_behavior.ml header_spec=CEA_INRIA_LGPL
@@ -372,7 +332,6 @@ README* header_spec=.ignore
 /src/libraries/utils/hptmap.ml header_spec=MODIFIED_MENHIR
 /src/libraries/utils/hptmap.mli header_spec=MODIFIED_MENHIR
 /src/libraries/utils/hptmap_sig.ml header_spec=MODIFIED_MENHIR
-/src/libraries/utils/hptmap_sig.mli header_spec=MODIFIED_MENHIR
 /src/libraries/utils/rangemap.ml header_spec=OCAML_STDLIB
 /src/libraries/utils/rangemap.mli header_spec=OCAML_STDLIB
 /src/libraries/utils/utf8_logic.ml header_spec=CEA_INRIA_LGPL
@@ -386,11 +345,7 @@ README* header_spec=.ignore
 
 /bin/frama-c* header_spec=CEA_LGPL
 
-/doc/code/*.txt header_spec=CEA_LGPL
-/dev/git-hooks/pre-commit header_spec=CEA_LGPL
-
 /headers/headache_config.txt header_spec=CEA_LGPL
-/headers/*.sh header_spec=CEA_LGPL_OR_PROPRIETARY
 
 /share/autocomplete_frama-c header_spec=CEA_LGPL
 /share/emacs/frama-c-*.el header_spec=CEA_LGPL
