@@ -26,3 +26,6 @@
 374,375d365
 < [eva:alarm] auto_loop_unroll.c:299: Warning: 
 <   signed overflow. assert i + 1 ≤ 2147483647;
+391a382,383
+> [eva:partition] auto_loop_unroll.c:337: 
+>   Trace partitioning superposing up to 100 states

@@ -1,16 +1,16 @@
-115,116c115,122
-< [eva] partitioning-annots.c:212: Reusing old results for call to body
-< [eva] partitioning-annots.c:212: Reusing old results for call to body
+116,117c116,123
+< [eva] partitioning-annots.c:236: Reusing old results for call to body
+< [eva] partitioning-annots.c:236: Reusing old results for call to body
 ---
 > [eva] computing for function body <- test_splits_post_call <- main.
->   Called from partitioning-annots.c:212.
+>   Called from partitioning-annots.c:236.
 > [eva] Recording results for body
 > [eva] Done for function body
 > [eva] computing for function body <- test_splits_post_call <- main.
->   Called from partitioning-annots.c:212.
+>   Called from partitioning-annots.c:236.
 > [eva] Recording results for body
 > [eva] Done for function body
-194,195c200,201
+195,196c201,202
 <   x ∈ [0..44]
 <   y ∈ [0..44]
 ---

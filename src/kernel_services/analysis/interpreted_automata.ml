@@ -22,13 +22,16 @@
 
 open Cil_types
 
+(* If enabled, all automata built by this module are printed as dot files. *)
+let debug_output_to_dot = false
+
 (* ---------------------------------------------------------------------- *)
-(* --- Graph definition                                               --- *)
+(* --- Graph definitions                                              --- *)
 (* ---------------------------------------------------------------------- *)
 
-type info =
+type vertex_info =
   | NoneInfo
-  | LoopHead of int (* level *)
+  | LoopHead of { stmt : stmt; level : int }
 
 type 'a control =
   | Edges (* control flow is only given by vertex edges *)
@@ -43,8 +46,10 @@ type 'a control =
 type vertex = {
   vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
+  vertex_blocks : Cil_types.block list;
   mutable vertex_start_of : Cil_types.stmt option;
-  mutable vertex_info : info;
+  mutable vertex_end_of : Cil_types.stmt list;
+  mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;
 }
 
@@ -82,12 +87,16 @@ type 'vertex edge = {
   edge_loc : location;
 }
 
+(* --- Dummy representatives --- *)
+
 let dummy_kf = List.hd (Cil_datatype.Kf.reprs)
 
 let dummy_vertex = {
   vertex_kf = dummy_kf;
   vertex_key = -1;
+  vertex_blocks = [];
   vertex_start_of = None;
+  vertex_end_of = [];
   vertex_info = NoneInfo;
   vertex_control = Edges;
 }
@@ -100,28 +109,31 @@ let dummy_edge = {
   edge_loc = Cil_datatype.Location.unknown;
 }
 
+(* --- Datatypes --- *)
+
 (* Compare function helper *)
 let (<?>) c lcmp =
   if c <> 0 then c else Lazy.force lcmp
 
-module Vertex = Datatype.Make_with_collections
-    (struct
-      include Datatype.Serializable_undefined
-      type t = vertex
-      let reprs = [dummy_vertex]
-      let name = "Interpreted_automata.Vertex"
-      let copy v =
-        { v with vertex_key = v.vertex_key }
-      let compare v1 v2 =
-        v1.vertex_key - v2.vertex_key <?>
-        lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
-      let hash v =
-        Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
-      let equal v1 v2 =
-        v1.vertex_key = v2.vertex_key &&
-        Kernel_function.equal v1.vertex_kf v2.vertex_kf
-      let pretty fmt v = Format.pp_print_int fmt v.vertex_key
-    end)
+module Vertex = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    type t = vertex
+    let reprs = [dummy_vertex]
+    let name = "Interpreted_automata.Vertex"
+    let copy v =
+      { v with vertex_key = v.vertex_key }
+    let compare v1 v2 =
+      v1.vertex_key - v2.vertex_key <?>
+      lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
+    let hash v =
+      Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
+    let equal v1 v2 =
+      v1.vertex_key = v2.vertex_key &&
+      Kernel_function.equal v1.vertex_kf v2.vertex_kf
+    let pretty fmt v =
+      Format.pp_print_int fmt v.vertex_key;
+      Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
+  end)
 
 module Transition = Datatype.Make (struct
     include Datatype.Serializable_undefined
@@ -130,8 +142,15 @@ module Transition = Datatype.Make (struct
     let reprs = [Skip]
     let pretty fmt =
       let open Format in
-      let print_var_list fmt l =
-        Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo fmt l
+      let pretty_block_id fmt b =
+        match b.bstmts with
+        | [] -> ()
+        | s1 :: _ -> Format.fprintf fmt "b%d" s1.Cil_types.sid
+      in
+      let pretty_block fmt b =
+        Format.fprintf fmt "(%a) %a"
+          pretty_block_id b
+          (Pretty_utils.pp_list ~sep:", " Printer.pp_varinfo) b.blocals
       and pretty_kind fmt = function
         | Invariant -> Format.pp_print_string fmt "Invariant"
         | Assert -> Format.pp_print_string fmt "Assert"
@@ -147,51 +166,239 @@ module Transition = Datatype.Make (struct
           fprintf fmt "%a: %a"
             pretty_kind a.kind Printer.pp_identified_predicate a.predicate
         | Instr (instr,_) -> Printer.pp_instr fmt instr
-        | Enter (b) -> fprintf fmt "Enter %a" print_var_list b.blocals
-        | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
+        | Enter (b) -> fprintf fmt "Enter %a" pretty_block b
+        | Leave (b)  -> fprintf fmt "Exit %a" pretty_block b
   end)
 
-module Edge =
-struct
-  include Datatype.Make_with_collections
-      (struct
-        include Datatype.Serializable_undefined
-        type t = vertex edge
-        let reprs = [dummy_edge]
-        let name = "Interpreted_automata.Edge"
-        let copy e = e
-        let compare e1 e2 =
-          e1.edge_key - e2.edge_key <?>
-          lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
-        let hash e =
-          Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
-        let equal e1 e2 =
-          e1.edge_key = e2.edge_key &&
-          Kernel_function.equal e1.edge_kf e2.edge_kf
-        let pretty fmt e = Transition.pretty fmt e.edge_transition
+module Edge = Datatype.Make_with_collections (struct
+    include Datatype.Serializable_undefined
+    type t = vertex edge
+    let reprs = [dummy_edge]
+    let name = "Interpreted_automata.Edge"
+    let copy e = e
+    let compare e1 e2 =
+      e1.edge_key - e2.edge_key <?>
+      lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
+    let hash e =
+      Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
+    let equal e1 e2 =
+      e1.edge_key = e2.edge_key &&
+      Kernel_function.equal e1.edge_kf e2.edge_kf
+    let pretty fmt e =
+      Transition.pretty fmt e.edge_transition
+  end)
+
+
+(* ---------------------------------------------------------------------- *)
+(* --- Generic graphs                                                 --- *)
+(* ---------------------------------------------------------------------- *)
+
+module type Graph = sig
+  include Graph.Sig.I
+
+  type wto = V.t Wto.partition
+  module WTO : Wto.S with type node = V.t
+
+  val pretty : t Pretty_utils.formatter
+  val build_wto : pref:(V.t -> V.t -> int) -> t -> V.t -> wto
+  val output_to_dot :
+    ?pp_vertex:(V.t Pretty_utils.formatter) ->
+    ?pp_edge:(E.label Pretty_utils.formatter) ->
+    ?wto:wto ->
+    out_channel -> t -> unit
+  val exit_strategy : t -> V.t Wto.component -> wto
+end
+
+module StmtTable = Cil_datatype.Stmt.Hashtbl
+
+module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) = struct
+  module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled
+      (Vertex)
+      (struct include Edge let default = List.hd reprs end)
+  include G
+
+  let pretty fmt g =
+    let iter_succ f = G.iter_succ f g in
+    Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
+      (fun fmt v ->
+         Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
+           Vertex.pretty v
+           (Pretty_utils.pp_iter iter_succ ~sep:",@ " Vertex.pretty) v
+      )
+      fmt g
+
+  module WTO = Wto.Make (Vertex)
+  type wto = Vertex.t Wto.partition
+
+  module VTable = Vertex.Hashtbl
+
+  let build_wto ~pref graph entry_point =
+    WTO.partition ~pref ~init:entry_point ~succs:(G.succ graph)
+
+  let output_to_dot ?(pp_vertex=Vertex.pretty) ?(pp_edge=Edge.pretty) ?wto
+      out_channel (graph : t) =
+    (* Label conversion *)
+    let htmllabel fmt =
+      let string_to_label s =
+        (* Escape for html embedding *)
+        let substitution s =
+          match Str.matched_string s with
+          | "<" -> "&lt;"
+          | ">" -> "&gt;"
+          | "&" -> "&amp;"
+          | "\n" -> "<br />"
+          | s -> s (* should not happen *)
+        and regexp = Str.regexp "<\\|>\\|&\\|\n" in
+        let s = Str.global_substitute regexp substitution s in
+        let s = if s = "" then " " else s in (* graph viewers don't like empty labels *)
+        `HtmlLabel s
+      in
+      Pretty_utils.ksfprintf string_to_label fmt
+    in
+    (* Build vertex attributes and subgraphs from wto if present *)
+    let open Graph.Graphviz.DotAttributes in
+    let subgraphs = VTable.create (G.nb_vertex graph) in
+    let tag =
+      let c = ref 0 in
+      let h = (VTable.create (G.nb_vertex graph)) in
+      fun v -> VTable.memo h v (fun _ -> incr c; !c)
+    in
+    let component_count = ref 0 in
+    let donode subgraph head v =
+      let label = htmllabel "%a" pp_vertex v in
+      let vertex_attributes =
+        if head && Option.is_some subgraph
+        then [`Shape `Invtriangle ; label]
+        else [label]
+      in
+      VTable.add subgraphs v (vertex_attributes,subgraph,!component_count,head)
+    in
+    let rec traverse_element subgraph = function
+      | Wto.Node v -> donode subgraph false v
+      | Wto.Component (v,w) ->
+        incr component_count;
+        let subgraph = Some {
+            sg_name = string_of_int !component_count;
+            sg_parent = Option.map (fun s -> s.sg_name) subgraph;
+            sg_attributes = []} in
+        donode subgraph true v;
+        traverse_component subgraph w
+    and traverse_component subgraph w =
+      List.iter (traverse_element subgraph) w
+    in
+    begin match wto with
+      | Some w -> traverse_component None w
+      | None -> ()
+    end;
+
+    (* Instanciate Dot module *)
+    let module Dot = Graph.Graphviz.Dot (
+      struct
+        let graph_attributes _g = [`Fontname "fixed"]
+        let default_vertex_attributes _g = (* [`Shape `Point] *) [`Shape `Circle]
+        let vertex_name v = "cp" ^ (string_of_int (tag v))
+        let vertex_attributes v =
+          try let (x,_,_,_) = VTable.find subgraphs v in x
+          with Not_found ->
+            htmllabel "%a" pp_vertex v ::
+            if wto = None then [] else [`Style `Dashed]
+        let get_subgraph v =
+          try let (_,x,_,_) = VTable.find subgraphs v in x
+          with Not_found -> None
+        let default_edge_attributes _g = []
+        let edge_attributes (v1,e,v2) =
+          htmllabel "%a" pp_edge e ::
+          if VTable.mem subgraphs v1 && VTable.mem subgraphs v2 then
+            let (_,_,c1,_) = VTable.find subgraphs v1 in
+            let (_,_,c2,head2) = VTable.find subgraphs v2 in
+            if head2 && c2 <= c1 then [`Constraint false] else []
+          else if wto = None then [] else [`Style `Dashed]
+        include G
       end)
-  let default = dummy_edge
+    in
+    Dot.output_graph out_channel graph
+
+  let exit_strategy graph component =
+    let head, l = match component with
+      | Wto.Component (v, w) -> v, Wto.Node (v) :: w
+      | Wto.Node (v) -> v, [component]
+    in
+    (* Build a table of vertices that should not be passed through to get
+       a path to an exit. At the begining it only contains the component head. *)
+    let table = VTable.create (G.nb_vertex graph) in
+    VTable.add table head ();
+    (* Filter elements at the top level of the wto, in reverse order *)
+    let rec f acc = function
+      | [] -> acc
+      | Wto.Node v :: l ->
+        if List.for_all (VTable.mem table) (G.succ graph v) then
+          (VTable.add table v (); f acc l)
+        else
+          f (Wto.Node v :: acc) l
+      | Wto.Component (v, w) :: l ->
+        let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
+        List.iter (fun v -> VTable.add table v ()) vertices; (* Temporarilly add them *)
+        let succs = List.flatten (List.map (G.succ graph) vertices) in
+        if List.for_all (VTable.mem table) succs then
+          f acc l
+        else (
+          List.iter (VTable.remove table) vertices; (* Undo *)
+          f (Wto.Component (v, w) :: acc) l)
+    in
+    f [] (List.rev l)
 end
 
 
-module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled (Vertex)
-    (Edge)
-
-
 (* ---------------------------------------------------------------------- *)
-(* --- Automata                                                       --- *)
+(* --- Automaton                                                      --- *)
 (* ---------------------------------------------------------------------- *)
+
+module G = MakeGraph (Vertex) (Edge)
 
 type graph = G.t
-
-module StmtTable = Cil_datatype.Stmt.Hashtbl
 
 type automaton = {
   graph : graph;
   entry_point : vertex;
   return_point : vertex;
+  exit_points : vertex list;
   stmt_table : (vertex * vertex) StmtTable.t;
 }
+
+type wto = G.wto
+
+module Automaton = Datatype.Make
+    (struct
+      include Datatype.Serializable_undefined
+      type t = automaton
+      let reprs = [{
+          graph=G.create ();
+          entry_point=dummy_vertex;
+          return_point=dummy_vertex;
+          exit_points=[];
+          stmt_table=StmtTable.create 0;
+        }]
+      let name = "Interpreted_automata.Automaton"
+      let copy automaton =
+        {
+          automaton with
+          graph = G.copy automaton.graph;
+          stmt_table = StmtTable.copy automaton.stmt_table;
+        }
+    end)
+
+module WTO = G.WTO
+
+let output_to_dot ?pp_vertex ?pp_edge ?wto out_channel automaton =
+  G.output_to_dot ?pp_vertex ?pp_edge ?wto out_channel automaton.graph
+
+let exit_strategy automaton wto =
+  G.exit_strategy automaton.graph wto
+
+
+(* ---------------------------------------------------------------------- *)
+(* --- Building                                                       --- *)
+(* ---------------------------------------------------------------------- *)
 
 (** Each goto statement is referenced during the traversal of the AST so
     that the jumps can be added to the graph afterward using a stmt_table.
@@ -200,12 +407,39 @@ type automaton = {
     jump. *)
 type goto_list = (vertex * stmt * stmt) list ref
 
-(** The following record contains the control points from and to which the
-    current processed node of the AST may connect. *)
-type control_points = {
+(** The following record contains all the context information needed to build
+    edge and vertices of the graph:
+    - [src]: the vertex from which the current transitions must be built
+    - [dest]: the vertex to which the current transitions must be built
+    - [continue]: the vertex to which continue statements must jump
+    - [break]: the vertex to which break statements must jump
+    - [return]: the vertex to which return statements must jump
+    - [blocks]: the englobing blocks of the current transitions
+    - [loop_level]: the number of loop englobing the current transitions
+    - [labels]: logic labels defined at this point associated to the vertices
+      they refer to *)
+type control_context = {
   src: vertex;
   dest: vertex;
+  continue: vertex option;
+  break: vertex option;
+  return: vertex;
+  blocks: Cil_types.block list;
+  loop_level: int;
+  labels: vertex labels
 }
+
+let blocks_closed v1 v2 =
+  let rec aux acc = function
+    | [] -> acc
+    | b :: l ->
+      if List.memq b v2.vertex_blocks then acc
+      else aux (b :: acc) l
+  in
+  aux [] v1.vertex_blocks
+
+let blocks_opened c1 c2 =
+  blocks_closed c2 c1 |> List.rev
 
 
 (** Helpers *)
@@ -296,16 +530,18 @@ let build_automaton ~annotations kf =
   let g = G.create () in
   let table : (vertex * vertex) StmtTable.t = StmtTable.create 17 in
   let gotos : goto_list = ref [] in
-  let loop_level = ref 0 in
+  let exit_points : vertex list ref = ref [] in
 
   (* Edges and vertices are numbered consecutively *)
   let next_vertex = ref 0
   and next_edge = ref 0 in
-  let add_vertex () =
+  let add_vertex vertex_blocks =
     let v = {
       vertex_kf = kf;
       vertex_key = !next_vertex;
+      vertex_blocks;
       vertex_start_of = None;
+      vertex_end_of = [];
       vertex_info = NoneInfo;
       vertex_control = Edges;
     } in
@@ -324,109 +560,97 @@ let build_automaton ~annotations kf =
   in
 
   (* Helpers to add edges *)
-  let build_transitions src dest kinstr loc l =
-    (* Add transitions to the graph *)
-    let rec fold_transition v1 = function
-      | [] ->
-        assert false
-      | [t] ->
-        add_edge v1 dest kinstr t loc
-      | Skip :: l ->
-        fold_transition v1 l
-      | t :: l ->
-        let v2 = add_vertex () in
-        add_edge v1 v2 kinstr t loc;
-        fold_transition v2 l
+  let build_jump src dest stmt transition =
+    (* Build a transition followed with a jump to the [dest] vertex consisting
+       in several enter/leave.
+       Returns the vertex just following the transition, before the enter/leave
+       transitions. *)
+    let kinstr = Kstmt stmt and loc = stmt_loc stmt in
+    (* Add a list of transitions *)
+    let build_enter dest b =
+      assert (b == List.hd dest.vertex_blocks);
+      let blocks = List.tl dest.vertex_blocks in
+      let v = add_vertex blocks in
+      add_edge v dest kinstr (Enter b) loc;
+      v
+    and build_leave dest b =
+      let blocks = b :: dest.vertex_blocks in
+      let v = add_vertex blocks in
+      add_edge v dest kinstr (Leave b) loc;
+      v
     in
-    fold_transition src l
+    let v = dest in
+    let v = List.fold_left build_enter v (blocks_opened src dest) in
+    let v = List.fold_left build_leave v (blocks_closed src dest) in
+    add_edge src v kinstr transition loc;
+    v
   in
-  let build_stmt_next src dest stmt succ transition =
-    (* Also returns the successor of the required transition. *)
-    (* Inserts between next and dest the list of exited and enterd group. *)
-    let exited_blocks = Kernel_function.blocks_closed_by_edge stmt succ
-    and entered_blocks = Kernel_function.blocks_opened_by_edge stmt succ
-    in
-    let l =
-      List.map (fun b -> Leave b) exited_blocks @
-      List.map (fun b -> Enter b) entered_blocks
-    and kinstr = Kstmt stmt and loc = stmt_loc stmt
-    in
-    if l = [] then
-      ( add_edge src dest kinstr transition loc ; dest )
-    else
-      let v = add_vertex () in
-      add_edge src v kinstr transition loc ;
-      build_transitions v dest kinstr loc l ; v
-  in
-  let build_stmt_transition src dest stmt succ transition =
-    ignore (build_stmt_next src dest stmt succ transition) in
 
-  let rec do_list do_one control labels = function
+  let rec do_list do_one control = function
     | [] -> assert false
-    | stmt :: [] -> do_one control labels stmt
+    | stmt :: [] -> do_one control stmt
     | stmt :: l ->
-      let point = add_vertex () in
-      do_one {control with dest = point} labels stmt;
-      do_list do_one {control with src = point} labels l
+      let point = add_vertex control.blocks in
+      do_one {control with dest = point} stmt;
+      do_list do_one {control with src = point} l
   in
-
-  (* Entry and return point in the automaton *)
-  let entry_point = add_vertex ()
-  and return_point = add_vertex () in
-  let start_code = if annotations then add_vertex () else entry_point in
-  let end_code = if annotations then add_vertex () else return_point in
-  let exit_point = add_vertex () in
 
   (* AST traversal *)
-  let rec do_block control kinstr labels block =
+  let rec do_block control kinstr block =
     if block.bstmts = [] then
       add_edge control.src control.dest kinstr Skip unknown_loc
     else begin
-      let block_start = add_vertex ()
-      and block_end = add_vertex ()
+      let englobing_blocks = block :: control.blocks in
+      let block_start = add_vertex englobing_blocks
+      and block_end = add_vertex englobing_blocks
       and loc_start = first_loc block
       and loc_end = last_loc block
       in
       add_edge control.src block_start kinstr (Enter block) loc_start;
       add_edge block_end control.dest kinstr (Leave block) loc_end;
-      let block_control = {src = block_start; dest = block_end} in
-      do_list do_stmt block_control labels block.bstmts
+      let block_control =
+        { control with
+          src = block_start;
+          dest = block_end;
+          blocks = englobing_blocks
+        }
+      in
+      do_list do_stmt block_control block.bstmts
     end
 
-  and do_stmt control (labels:vertex labels) stmt =
+  and do_stmt control stmt =
     let kinstr = Kstmt stmt
     and loc = stmt_loc stmt in
-    let do_annot control labels (annot: code_annotation) : unit =
-      let labels = LabelMap.add_builtin Here control.src labels in
+    let do_annot control (annot: code_annotation) : unit =
+      let labels = LabelMap.add_builtin Here control.src control.labels in
       let annotation = make_annotation kf stmt annot labels in
       let transition = Prop (annotation, stmt) in
       add_edge control.src control.dest kinstr transition loc
     in
-    let do_annot_list control labels l =
+    let do_annot_list control l =
       if l = [] then control.src else
-        let point = add_vertex () in
-        do_list do_annot {control with dest = point} labels l;
+        let point = add_vertex control.blocks in
+        do_list do_annot {control with dest = point} l;
         point
+    in
+
+    (* Adds an empty vertex before goto destinations, allowing Eva
+       to distinguish between the state juste before the label
+       and the joined states from the gotoes. *)
+    let control =
+      if is_goto_destination stmt then
+        let src = add_vertex control.blocks in
+        add_edge control.src src kinstr Skip loc;
+        { control with src }
+      else control
     in
 
     (* Adds statement annotations to the graph if required, except on loops
        where variants and invariants need some special processing. *)
     let control =
       if not annotations || is_loop stmt then control else
-        let src = do_annot_list control labels (code_annot stmt) in
+        let src = do_annot_list control (code_annot stmt) in
         { control with src }
-    in
-
-    (* Adds an empty vertex before loops (and goto destinations), allowing Eva
-       to distinguish between the state juste before the loop (or the goto)
-       and the states in the loop (or coming from the goto statements). *)
-    let control =
-      if not annotations && (is_loop stmt || is_goto_destination stmt)
-      then
-        let src = add_vertex () in
-        add_edge control.src src kinstr Skip loc;
-        { control with src }
-      else control
     in
 
     (* Handle statement *)
@@ -435,40 +659,38 @@ let build_automaton ~annotations kf =
         let dest =
           if Cil.instr_falls_through instr
           then control.dest
-          else exit_point
+          else
+            let v = add_vertex control.blocks in
+            exit_points := v :: !exit_points;
+            v
         in
         add_edge control.src dest kinstr (Instr (instr, stmt)) loc;
         dest
 
       | Cil_types.Return (opt_exp, _) ->
-        let exited_blocks = Kernel_function.find_all_enclosing_blocks stmt in
-        let transitions =
-          Return (opt_exp,stmt) ::
-          List.map (fun b -> Leave b) exited_blocks
-        in
-        build_transitions control.src end_code kinstr loc transitions;
-        end_code
+        let transition = Return (opt_exp,stmt) in
+        build_jump control.src control.return stmt transition
 
       | Goto (dest_stmt, _) ->
         gotos := (control.src,stmt,!dest_stmt) :: !gotos;
         control.src
 
-      | Break _ | Continue _ ->
-        assert (List.length stmt.succs = 1);
-        let dest_stmt = List.hd stmt.succs in
-        gotos := (control.src,stmt,dest_stmt) :: !gotos;
-        control.src
+      | Break _ ->
+        build_jump control.src (Option.get control.break) stmt Skip
+
+      | Continue _ ->
+        build_jump control.src (Option.get control.continue) stmt Skip
 
       | If (exp, then_block, else_block, _) ->
-        let then_point = add_vertex ()
-        and else_point = add_vertex () in
+        let then_point = add_vertex control.blocks
+        and else_point = add_vertex control.blocks in
         let then_transition = Guard (exp, Then, stmt)
         and else_transition = Guard (exp, Else, stmt)
         in
         add_edge control.src then_point kinstr then_transition loc;
         add_edge control.src else_point kinstr else_transition loc;
-        do_block {control with src=then_point} kinstr labels then_block;
-        do_block {control with src=else_point} kinstr labels else_block;
+        do_block { control with src = then_point } kinstr then_block;
+        do_block { control with src = else_point } kinstr else_block;
         control.src.vertex_control <- If {
             cond = exp ; vthen = then_point; velse = else_point
           };
@@ -481,13 +703,15 @@ let build_automaton ~annotations kf =
           Guard (Cil.new_exp ~loc:exp2.eloc enode, kind, stmt)
         in
         (* First build the automaton for the block *)
-        let block_control = {
-          control with
-          src = add_vertex ();
-        } in
-        do_block block_control kinstr labels block;
+        let block_control =
+          { control with
+            src = add_vertex control.blocks; (* This vertex is unreachable *)
+            break = Some control.dest;
+          }
+        in
+        do_block block_control kinstr block;
         (* Then link the cases *)
-        let default_case : (vertex * Cil_types.stmt) option ref = ref None in
+        let default_case : vertex option ref = ref None in
         let value_cases : (Cil_types.exp * vertex) list ref = ref [] in
         (* For all statements *)
         let values = List.fold_left
@@ -498,12 +722,11 @@ let build_automaton ~annotations kf =
                 begin fun values -> function
                   | Case (exp2,_) ->
                     let guard = build_guard exp2 Then in
-                    let v2 =
-                      build_stmt_next control.src dest stmt case_stmt guard in
+                    let v2 = build_jump control.src dest stmt guard in
                     value_cases := (exp2,v2) :: !value_cases ;
                     exp2 :: values
                   | Default (_) ->
-                    default_case := Some (dest,case_stmt);
+                    default_case := Some dest;
                     values
                   | Label _ -> values
                 end values case_stmt.Cil_types.labels
@@ -517,7 +740,7 @@ let build_automaton ~annotations kf =
             let guard = build_guard exp2 Else in
             add_last_edge src guard
           | exp2 :: l ->
-            let point = add_vertex ()
+            let point = add_vertex control.blocks
             and guard = build_guard exp2 Else in
             add_edge src point kinstr guard loc;
             add_default_edge point l
@@ -526,8 +749,8 @@ let build_automaton ~annotations kf =
           | None ->
             add_edge src control.dest kinstr transition loc ;
             control.dest
-          | Some (case_vertex, case_stmt) ->
-            build_stmt_transition src case_vertex stmt case_stmt transition ;
+          | Some case_vertex ->
+            build_jump src case_vertex stmt transition |> ignore;
             case_vertex
         in
         let default_vertex = add_default_edge control.src values in
@@ -539,51 +762,62 @@ let build_automaton ~annotations kf =
         control.dest
 
       | Loop (_annotations, block, _, _, _) ->
-        incr loop_level;
         let loop_control =
           if not annotations
           then
-            { src = control.src;
-              dest = control.src; }
+            { control with
+              src = control.src;
+              dest = control.src;
+              break = Some control.dest;
+              continue = Some control.src;
+              loop_level = control.loop_level + 1;
+            }
           else
             (* We separate loop head from first statement of the loop, otherwise
                  we can't separate loop_entry from loop_current *)
-            let loop_head_point = add_vertex () in
-            add_edge control.src loop_head_point kinstr Skip loc;
-            loop_head_point.vertex_info <- LoopHead (!loop_level);
+            let loop_head = add_vertex control.blocks in
+            add_edge control.src loop_head kinstr Skip loc;
+            loop_head.vertex_info <-
+              LoopHead { stmt; level = control.loop_level };
             let labels =
-              LabelMap.(add_builtin LoopEntry control.src
-                          (add_builtin LoopCurrent loop_head_point labels))
+              control.labels
+              |> LabelMap.add_builtin LoopEntry control.src
+              |> LabelMap.add_builtin LoopCurrent loop_head
             in
             (* for variant to have one point at the end of the loop *)
-            let loop_end_point = add_vertex () in
             let start_annot, end_annot =
               List.partition
                 (function { annot_content = AVariant _ } -> false | _ -> true)
                 (code_annot stmt)
             in
-            let loop_start_body =
-              do_annot_list {control with src = loop_head_point} labels start_annot
+            let body_start =
+              do_annot_list {control with src = loop_head; labels} start_annot
             in
+            let body_end = add_vertex control.blocks in
             let loop_back =
-              do_annot_list {control with src = loop_end_point} labels end_annot
+              do_annot_list {control with src = body_end; labels} end_annot
             in
-            add_edge loop_back loop_head_point kinstr Skip loc;
-            { src=loop_start_body;
-              dest=loop_end_point; }
+            add_edge loop_back loop_head kinstr Skip loc;
+            { control with
+              src = body_start;
+              dest = body_end;
+              break = Some control.dest;
+              continue = Some body_end;
+              loop_level = control.loop_level + 1;
+              labels;
+            }
         in
-        do_block loop_control kinstr labels block;
-        decr loop_level;
+        do_block loop_control kinstr block;
         control.src.vertex_control <- Loop control.dest ;
         control.dest
 
       | Block block ->
-        do_block control kinstr labels block;
+        do_block control kinstr block;
         control.dest
 
       | UnspecifiedSequence us ->
         let block = Cil.block_from_unspecified_sequence us in
-        do_block control kinstr labels block;
+        do_block control kinstr block;
         control.dest
 
       | Throw _ | TryCatch _ | TryFinally _ | TryExcept _
@@ -593,31 +827,35 @@ let build_automaton ~annotations kf =
     (* Update statement table *)
     assert (control.src.vertex_start_of = None);
     control.src.vertex_start_of <- Some stmt;
+    dest.vertex_end_of <- stmt :: dest.vertex_end_of;
     StmtTable.add table stmt (control.src,dest)
   in
 
-  let loc = Kernel_function.get_location kf in
-
-  if annotations then add_edge entry_point start_code Kglobal Skip loc;
-  if annotations then add_edge end_code return_point Kglobal Skip loc;
-
   (* Iterate through the AST *)
-  let control = {
-    src = start_code;
-    dest = end_code;
-  }
+  let entry_point = add_vertex []
+  and return_point = add_vertex [] in
+  let control =
+    { src = entry_point;
+      dest = return_point;
+      break = None;
+      continue = None;
+      return = return_point;
+      blocks = [];
+      loop_level = 0;
+      labels =
+        LabelMap.(
+          empty
+          |> add_builtin Pre entry_point
+          |> add_builtin Post return_point)
+    }
   in
-
-  let labels_body =
-    LabelMap.(add_builtin Pre start_code (add_builtin Post end_code empty))
-  in
-  do_block control Kglobal labels_body fundec.sbody;
+  do_block control Kglobal fundec.sbody;
 
   (* Handle gotos *)
   List.iter
     begin fun (src,src_stmt,dest_stmt) ->
-      let dest,_ = StmtTable.find table dest_stmt in
-      build_stmt_transition src dest src_stmt dest_stmt Skip
+      let dest = fst (StmtTable.find table dest_stmt) in
+      build_jump src dest src_stmt Skip |> ignore
     end !gotos;
 
   (* For annotation transitions, bind statement labels to their corresponding
@@ -650,16 +888,13 @@ let build_automaton ~annotations kf =
   in
   G.iter_edges_e bind_labels g;
 
-  (* Recursively removes unreachable vertices, except those bound to a statement
-     in [table]. *)
-  let stmt_vertices =
-    let add _stmt (v1, v2) acc = Vertex.Set.(add v1 (add v2 acc)) in
-    StmtTable.fold add table Vertex.Set.empty
-  in
+  (* Recursively removes unreachable vertices, except those bound to a
+     statement *)
   let is_unreachable vertex =
     G.in_degree g vertex = 0
     && not (Vertex.equal vertex entry_point)
-    && not (Vertex.Set.mem vertex stmt_vertices)
+    && vertex.vertex_start_of = None
+    && vertex.vertex_end_of = []
   in
   let rec remove_unreachable vertex =
     let succs = G.succ g vertex in
@@ -671,239 +906,64 @@ let build_automaton ~annotations kf =
   in
   List.iter remove_unreachable unreachables;
 
+  (* Build the record *)
+  let automaton =
+    { graph = g;
+      entry_point;
+      return_point;
+      exit_points = !exit_points;
+      stmt_table = table
+    }
+  in
+
+  (* Debug output *)
+  if debug_output_to_dot then begin
+    let function_name = Kernel_function.get_name kf in
+    let file_name, file_out = Filename.open_temp_file function_name ".dot" in
+    Kernel.result "Output the interpreted automaton for %s into %s"
+      function_name file_name;
+    output_to_dot file_out automaton;
+    close_out file_out
+  end;
+
   (* Return the result *)
-  {graph = g; entry_point; return_point; stmt_table = table}
+  automaton
 
 
-(* ---------------------------------------------------------------------- *)
-(* --- Datatype                                                       --- *)
-(* ---------------------------------------------------------------------- *)
-
-module Automaton = Datatype.Make
+module AutomatonState = Kernel_function.Make_Table (Automaton)
     (struct
-      include Datatype.Serializable_undefined
-      type t = automaton
-      let reprs = [{
-          graph=G.create ();
-          entry_point=dummy_vertex;
-          return_point=dummy_vertex;
-          stmt_table=StmtTable.create 0;
-        }]
-      let name = "Interpreted_automata.Automaton"
-      let copy automaton =
-        {
-          automaton with
-          graph = G.copy automaton.graph;
-          stmt_table = StmtTable.copy automaton.stmt_table;
-        }
-      let pretty : t Pretty_utils.formatter = fun fmt g ->
-        Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
-          (fun fmt v ->
-             Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
-               Vertex.pretty v
-               (Pretty_utils.pp_iter (fun f -> G.iter_succ f g.graph) ~sep:",@ " Vertex.pretty)
-               v
-          )
-          fmt g.graph
+      let size = 97
+      let name = "Interpreted_automata.AutomatonState"
+      let dependencies = [Ast.self]
     end)
+
+let get_automaton = AutomatonState.memo (build_automaton ~annotations:false)
+
 
 (* ---------------------------------------------------------------------- *)
 (* --- Weak Topological Order                                         --- *)
 (* ---------------------------------------------------------------------- *)
 
-type wto = vertex Wto.partition
+(* Preferences for wto head vertices *)
+let default_pref v1 v2 =
+  match v1.vertex_info, v2.vertex_info with
+  (* If there is a loop statement in the Cil representation, use the
+     LoopCurrent labelled vertex as the loop head. Use the outermost
+     (lowest level) loop first in case of nested loops. *)
+  | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
+  | NoneInfo, LoopHead _ -> -1
+  | LoopHead _ , NoneInfo -> 1
+  | NoneInfo, NoneInfo ->
+    (* Otherwise, use the vertex which is the start of a statement. *)
+    match v1.vertex_start_of, v2.vertex_start_of with
+    | None, None -> 0
+    | None, _ -> -1
+    | _ , None -> 1
+    | Some _, Some _ -> 0
 
-module Scheduler = Wto.Make (Vertex)
+let build_wto ?(pref=default_pref) automaton =
+  G.build_wto ~pref automaton.graph automaton.entry_point
 
-let build_wto ~pref {graph; entry_point} =
-  let init = entry_point
-  and succs = fun v -> G.succ graph v
-  in
-  Scheduler.partition ~pref ~init ~succs
-
-module WTO = struct
-  include Scheduler
-  include Datatype.Make
-      (struct
-        include Datatype.Serializable_undefined
-        type t = wto
-        let reprs = [List.map (fun s -> Wto.Node s) Vertex.reprs]
-        let pretty = Scheduler.pretty_partition
-        let name = "Interpreted_automata.WTO"
-        let copy w = w
-      end)
-end
-
-(* ---------------------------------------------------------------------- *)
-(* --- Extract exit strategy                                          --- *)
-(* ---------------------------------------------------------------------- *)
-
-module Algorithms (G : Graph.Sig.G) =
-struct
-  let exit_strategy graph component =
-    let head, l = match component with
-      | Wto.Component (v, w) -> v, Wto.Node (v) :: w
-      | Wto.Node (v) -> v, [component]
-    in
-    (* Build a table of vertices that should not be passed through to get
-       a path to an exit. At the begining it only contains the component head. *)
-    let table = Hashtbl.create (G.nb_vertex graph) in
-    Hashtbl.add table head ();
-    (* Filter elements at the top level of the wto, in reverse order *)
-    let rec f acc = function
-      | [] -> acc
-      | Wto.Node v :: l ->
-        if List.for_all (Hashtbl.mem table) (G.succ graph v) then
-          (Hashtbl.add table v (); f acc l)
-        else
-          f (Wto.Node v :: acc) l
-      | Wto.Component (v, w) :: l ->
-        let vertices = v :: Wto.flatten w in (* All vertices of the sub wto *)
-        List.iter (fun v -> Hashtbl.add table v ()) vertices; (* Temporarilly add them *)
-        let succs = List.flatten (List.map (G.succ graph) vertices) in
-        if List.for_all (Hashtbl.mem table) succs then
-          f acc l
-        else (
-          List.iter (Hashtbl.remove table) vertices; (* Undo *)
-          f (Wto.Component (v, w) :: acc) l)
-    in
-    f [] (List.rev l)
-end
-
-let exit_strategy =
-  let module Algorithms = Algorithms (G) in
-  Algorithms.exit_strategy
-
-
-(* ---------------------------------------------------------------------- *)
-(* --- Output to dot                                                  --- *)
-(* ---------------------------------------------------------------------- *)
-
-type 'a labeling =
-  [ `Stmt
-  | `Vertex
-  | `Both
-  | `Custom of Format.formatter -> 'a -> unit
-  ]
-
-module Dot
-    (V: sig
-       include Hashtbl.HashedType
-       val pretty: Format.formatter -> t -> unit
-       val start_of: t -> stmt option
-     end)
-    (E: sig
-       type t
-       val pretty: Format.formatter -> t -> unit
-     end)
-    (G: Graph.Sig.G with type V.t = V.t and type E.t = V.t * E.t * V.t)
-= struct
-
-  let htmllabel fmt =
-    let string_to_label s =
-      (* Escape for html embedding *)
-      let substitution s =
-        match Str.matched_string s with
-        | "<" -> "&lt;"
-        | ">" -> "&gt;"
-        | "&" -> "&amp;"
-        | "\n" -> "<br />"
-        | s -> s (* should not happen *)
-      and regexp = Str.regexp "<\\|>\\|&\\|\n" in
-      let s = Str.global_substitute regexp substitution s in
-      let s = if s = "" then " " else s in (* graph viewers don't like empty labels *)
-      `HtmlLabel s
-    in
-    Pretty_utils.ksfprintf string_to_label fmt
-
-  let output_to_dot out_channel ?(labeling:V.t labeling=`Both) ?wto g =
-    (* Vertex labeling *)
-    let vertex_label v =
-      match labeling with
-      | `Stmt ->
-        begin match V.start_of v with
-          | None -> htmllabel "~"
-          | Some stmt -> htmllabel "%d" stmt.sid
-        end
-      | `Vertex ->
-        htmllabel "%a" V.pretty v
-      | `Both ->
-        begin match V.start_of v with
-          | None -> htmllabel "%a" V.pretty v
-          | Some stmt -> htmllabel "%a@s%d" V.pretty v stmt.sid
-        end
-      | `Custom f ->
-        htmllabel "%a" f v
-    in
-    (* Build vertex attributes and subgraphs from wto if present *)
-    let open Graph.Graphviz.DotAttributes in
-    let module Table = FCHashtbl.Make (V) in
-    let subgraphs = Table.create (G.nb_vertex g) in
-    let tag =
-      let c = ref 0 in
-      let h = (Table.create (G.nb_vertex g)) in
-      fun v -> Table.memo h v (fun _ -> incr c; !c)
-    in
-    let component_count = ref 0 in
-    let donode subgraph head v =
-      let label = vertex_label v in
-      let vertex_attributes =
-        if head && Option.is_some subgraph
-        then [`Shape `Invtriangle ; label]
-        else [label]
-      in
-      Table.add subgraphs v (vertex_attributes,subgraph,!component_count,head)
-    in
-    let rec traverse_element subgraph = function
-      | Wto.Node v -> donode subgraph false v
-      | Wto.Component (v,w) ->
-        incr component_count;
-        let subgraph = Some {
-            sg_name = string_of_int !component_count;
-            sg_parent = Option.map (fun s -> s.sg_name) subgraph;
-            sg_attributes = []} in
-        donode subgraph true v;
-        traverse_component subgraph w
-    and traverse_component subgraph w =
-      List.iter (traverse_element subgraph) w
-    in
-    begin match wto with
-      | Some w -> traverse_component None w
-      | None -> ()
-    end;
-
-    (* Instanciate Dot module *)
-    let module Dot = Graph.Graphviz.Dot (
-      struct
-        let graph_attributes _g = [`Fontname "fixed"]
-        let default_vertex_attributes _g = (* [`Shape `Point] *) [`Shape `Circle]
-        let vertex_name v = "cp" ^ (string_of_int (tag v))
-        let vertex_attributes v =
-          try let (x,_,_,_) = Table.find subgraphs v in x
-          with Not_found ->
-            vertex_label v :: if wto = None then [] else [`Style `Dashed]
-        let get_subgraph v =
-          try let (_,x,_,_) = Table.find subgraphs v in x
-          with Not_found -> None
-        let default_edge_attributes _g = []
-        let edge_attributes (v1,e,v2) =
-          htmllabel "%a" E.pretty e ::
-          if Table.mem subgraphs v1 && Table.mem subgraphs v2 then
-            let (_,_,c1,_) = Table.find subgraphs v1 in
-            let (_,_,c2,head2) = Table.find subgraphs v2 in
-            if head2 && c2 <= c1 then [`Constraint false] else []
-          else if wto = None then [] else [`Style `Dashed]
-        include G
-      end)
-    in
-    Dot.output_graph out_channel g
-end
-
-module GDot =
-  Dot(struct include Vertex let start_of v = v.vertex_start_of end)(Edge)(G)
-
-let output_to_dot out_channel ?labeling ?wto g =
-  GDot.output_to_dot  out_channel ?labeling ?wto g.graph
 
 (* ---------------------------------------------------------------------- *)
 (* --- WTO Indexes                                                    --- *)
@@ -912,55 +972,9 @@ let output_to_dot out_channel ?labeling ?wto g =
 type wto_index = vertex list
 
 module WTOIndex =
-  Datatype.Make
-    (struct
-      include Datatype.Serializable_undefined
-      type t = wto_index
-      let reprs = [Vertex.reprs]
-      let name = "Interpreted_automata.WTOIndex"
-      let pretty i =
-        Pretty_utils.pp_list ~sep:"," Vertex.pretty i
-      let copy i = i
-    end)
+struct
 
-module Compute = struct
-
-  let output_to_dot = output_to_dot
-  let get_automaton ~annotations = build_automaton ~annotations
-  let exit_strategy = exit_strategy
-
-  type wto_index_table = wto_index Vertex.Hashtbl.t
-
-  let build_wto automaton =
-    let pref v1 v2 =
-      match v1.vertex_info, v2.vertex_info with
-      | NoneInfo, NoneInfo -> 0
-      | NoneInfo, _ -> -1
-      | _ , NoneInfo -> 1
-      | LoopHead i, LoopHead j -> - (compare i j)
-    in
-    build_wto ~pref automaton
-
-  let build_wto_index_table wto =
-    let table = Vertex.Hashtbl.create 17 in
-    let rec iter_wto index w =
-      List.iter (iter_element index) w
-    and iter_element index = function
-      | Wto.Node v ->
-        Vertex.Hashtbl.add table v index
-      | Wto.Component (h, w) ->
-        let new_index = h :: index in
-        iter_wto new_index (Wto.Node h :: w)
-    in
-    iter_wto [] wto;
-    table
-
-  let get_wto_index table v =
-    try
-      Vertex.Hashtbl.find table v
-    with Not_found -> []
-
-  let wto_index_diff index1 index2 =
+  let diff index1 index2 =
     let rec remove_common_prefix l1 l2 =
       match l1, l2 with
       | x :: l1, y :: l2 when Vertex.equal x y ->
@@ -973,74 +987,36 @@ module Compute = struct
     let left, entered = remove_common_prefix l1 l2 in
     List.rev left, entered
 
-  let get_wto_index_diff table stmt1 stmt2 =
-    wto_index_diff (get_wto_index table stmt1) (get_wto_index table stmt2)
+  module Table =
+  struct
+    type t = wto_index Vertex.Hashtbl.t
 
-  let is_wto_head table v =
-    match get_wto_index table v with
-    | v' :: _ -> Vertex.equal v v'
-    | [] -> false
+    let build wto =
+      let table = Vertex.Hashtbl.create 17 in
+      let rec iter_wto index w =
+        List.iter (iter_element index) w
+      and iter_element index = function
+        | Wto.Node v ->
+          Vertex.Hashtbl.add table v index
+        | Wto.Component (h, w) ->
+          let new_index = h :: index in
+          iter_wto new_index (Wto.Node h :: w)
+      in
+      iter_wto [] wto;
+      table
 
-  let is_back_edge table (v1,v2) =
-    List.exists (Vertex.equal v2) (get_wto_index table v1)
+    let find table v =
+      Vertex.Hashtbl.find_def table v []
+
+    let is_head table v =
+      match find table v with
+      | v' :: _ -> Vertex.equal v v'
+      | [] -> false
+
+    let is_back_edge table (v1,v2) =
+      List.exists (Vertex.equal v2) (find table v1)
+  end
 end
-
-
-(* ---------------------------------------------------------------------- *)
-(* --- States                                                         --- *)
-(* ---------------------------------------------------------------------- *)
-
-module AutomatonState = Kernel_function.Make_Table (Automaton)
-    (struct
-      let size = 97
-      let name = "Interpreted_automata.AutomatonState"
-      let dependencies = [Ast.self]
-    end)
-
-let get_automaton = AutomatonState.memo (build_automaton ~annotations:false)
-
-module WTOState = Kernel_function.Make_Table (WTO)
-    (struct
-      let size = 97
-      let name = "Interpreted_automata.WTOState"
-      let dependencies = [Ast.self]
-    end)
-
-let get_wto =
-  let build kf =
-    let automaton = get_automaton kf in
-    let pref v1 v2 =
-      match v1.vertex_start_of, v2.vertex_start_of with
-      | None, None -> 0
-      | None, _ -> -1
-      | _ , None -> 1
-      | Some _, Some _ -> 0
-    in
-    build_wto ~pref automaton
-  in
-  WTOState.memo build
-
-
-module WTOIndexState =
-  Kernel_function.Make_Table
-    (Vertex.Hashtbl.Make (WTOIndex))
-    (struct
-      let size = 97
-      let name = "Interpreted_automata.WTOIndexState"
-      let dependencies = [Ast.self]
-    end)
-
-let build_wto_index_table kf = Compute.build_wto_index_table (get_wto kf)
-
-let get_wto_index_table =
-  WTOIndexState.memo build_wto_index_table
-
-let get_wto_index kf = Compute.get_wto_index (get_wto_index_table kf)
-
-let wto_index_diff = Compute.wto_index_diff
-let get_wto_index_diff kf = Compute.get_wto_index_diff (get_wto_index_table kf)
-let is_wto_head kf = Compute.is_wto_head (get_wto_index_table kf)
-let is_back_edge kf = Compute.is_back_edge (get_wto_index_table kf)
 
 
 (* ---------------------------------------------------------------------- *)
@@ -1048,7 +1024,6 @@ let is_back_edge kf = Compute.is_back_edge (get_wto_index_table kf)
 (* ---------------------------------------------------------------------- *)
 
 module UnrollUnnatural  = struct
-
   module Vertex_Set = struct
     include Datatype.Make_with_collections(struct
         include Datatype.Undefined
@@ -1063,66 +1038,25 @@ module UnrollUnnatural  = struct
 
   module Version = Datatype.Pair_with_collections(Vertex)(Vertex_Set)
 
-  module Edge =
-  struct
-    include Datatype.Make_with_collections
-        (struct
-          include Datatype.Serializable_undefined
-          type t = Version.t edge
-          let reprs = [dummy_edge]
-          let name = "Interpreted_automata.UnrollUnnatural.Edge"
-          let copy e = e
-          let compare e1 e2 = e1.edge_key - e2.edge_key
-          let hash e = e.edge_key
-          let equal e1 e2 = e1.edge_key = e2.edge_key
-          let pretty fmt e = Format.pp_print_int fmt e.edge_key
-        end)
-    let default = dummy_edge
-  end
+  module Edge = Datatype.Make_with_collections (struct
+      include Datatype.Serializable_undefined
+      type t = Version.t edge
+      let reprs = [dummy_edge]
+      let name = "Interpreted_automata.UnrollUnnatural.Edge"
+      let copy e = e
+      let compare e1 e2 = e1.edge_key - e2.edge_key
+      let hash e = e.edge_key
+      let equal e1 e2 = e1.edge_key = e2.edge_key
+      let pretty fmt e = Format.pp_print_int fmt e.edge_key
+    end)
 
   module OldG = G
 
-  module G = struct
-    include
-      Graph.Imperative.Digraph.ConcreteBidirectionalLabeled(Version)(Edge)
+  include MakeGraph(Version)(Edge)
 
-    let pretty : t Pretty_utils.formatter = fun fmt g ->
-      Pretty_utils.pp_iter iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
-        (fun fmt v ->
-           Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
-             Version.pretty v
-             (Pretty_utils.pp_iter
-                (fun f -> iter_succ f g) ~sep:",@ " Version.pretty) v
-        ) fmt g
-  end
+  let build (g:automaton) (wto:OldG.wto) (index:WTOIndex.Table.t) : t =
 
-  module WTO = struct
-    include (Wto.Make(Version))
-    include Datatype.Make
-        (struct
-          include Datatype.Serializable_undefined
-          type t = Version.t Wto.partition
-          let reprs = [List.map (fun s -> Wto.Node s) Version.reprs]
-          let pretty = pretty_partition
-          let name = "Interpreted_automata.WTOV"
-          let copy w = w
-        end)
-  end
-
-
-  module GDot =
-    Dot(struct
-      include Version
-      let start_of (v,_) = v.vertex_start_of
-    end)(Edge)(G)
-
-  let output_to_dot out_channel ?labeling ?wto g =
-    GDot.output_to_dot  out_channel ?labeling ?wto g
-
-  let unroll_unnatural_loop
-      (g:automaton) (wto:wto) (index:Compute.wto_index_table) : G.t =
-
-    let g' = G.create () in
+    let g' = create () in
 
     let needed = Vertex.Hashtbl.create 10 in
     let need v s =
@@ -1133,7 +1067,7 @@ module UnrollUnnatural  = struct
 
     need g.entry_point Vertex.Set.empty;
 
-    let convert_edge nl version (e: vertex edge) : Version.t edge =
+    let convert_edge nl version (e: OldG.E.label) : E.label =
       let t = match e.edge_transition with
         | Skip -> Skip
         | Return (a,b) -> Return (a,b)
@@ -1143,8 +1077,8 @@ module UnrollUnnatural  = struct
         | Leave a -> Leave a
         | Prop (a,b) ->
           let labels = LabelMap.map (fun v2 ->
-              let v2l = Compute.get_wto_index index v2 in
-              let d1,d2 = Compute.wto_index_diff nl v2l in
+              let v2l = WTOIndex.Table.find index v2 in
+              let d1,d2 = WTOIndex.diff nl v2l in
               let version2 = List.fold_left
                   (fun acc e -> Vertex.Set.remove e acc) version d1 in
               let version2 = List.fold_left
@@ -1159,18 +1093,18 @@ module UnrollUnnatural  = struct
 
     let do_version n version =
       let n' = (n,version) in
-      G.add_vertex g' n';
-      let nl = Compute.get_wto_index index n in
+      add_vertex g' n';
+      let nl = WTOIndex.Table.find index n in
       OldG.iter_succ_e (fun (_,e,v2) ->
-          let v2l = Compute.get_wto_index index v2 in
-          let d1,d2 = Compute.wto_index_diff nl v2l in
+          let v2l = WTOIndex.Table.find index v2 in
+          let d1,d2 = WTOIndex.diff nl v2l in
           let version2 = List.fold_left
               (fun acc e -> Vertex.Set.remove e acc) version d1 in
           let version2 = List.fold_left
               (fun acc e -> Vertex.Set.add e acc) version2 d2 in
           let version2 = Vertex.Set.remove v2 version2 in
           let e = convert_edge nl version e in
-          G.add_edge_e g' (n',e,(v2,version2));
+          add_edge_e g' (n',e,(v2,version2));
           need v2 version2
         ) g.graph n;
     in
@@ -1359,7 +1293,7 @@ struct
         | None -> Format.fprintf fmt "⊥"
         | Some v -> pp_value fmt v
       in
-      output_to_dot out ~labeling:(`Custom pp_vertex) ~wto automaton
+      output_to_dot ~pp_vertex ~wto out automaton
 
     let to_dot_file pp_value result filepath =
       match Filepath.with_open_out filepath (to_dot_output pp_value result) with
@@ -1381,7 +1315,7 @@ struct
     let init = automaton.entry_point
     and succs = fun v -> G.succ automaton.graph v
     and pref = fun _ _ -> 0 in
-    Scheduler.partition ~pref ~init ~succs
+    WTO.partition ~pref ~init ~succs
 
   let fixpoint ?wto kf initial_value =
     let fold_pred f =
@@ -1404,7 +1338,7 @@ struct
     let init = automaton.return_point
     and succs = fun v -> G.pred automaton.graph v
     and pref = fun _ _ -> 0 in
-    Scheduler.partition ~pref ~init ~succs
+    WTO.partition ~pref ~init ~succs
 
   let fixpoint ?wto kf initial_value =
     let fold_pred f =

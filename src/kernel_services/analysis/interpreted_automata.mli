@@ -36,9 +36,9 @@ open Cil_types
     abstraction layers from interpreting CIL statements and from attaching
     guards to statement successors. *)
 
-type info =
+type vertex_info =
   | NoneInfo
-  | LoopHead of int (* level *)
+  | LoopHead of { stmt : stmt; level : int }
 
 (** Control flow informations for outgoing edges, if any. *)
 type 'a control =
@@ -52,15 +52,15 @@ type 'a control =
       the given cases and default vertices. *)
 
 (** Vertices are control points. When a vertice is the *start* of a statement,
-    this statement is kept in [vertex_start_of]. Currently, this statement is
-    kept for two reasons: to know when callbacks should be called and when
-    annotations should be read. *)
+    this statement is kept in [vertex_start_of]. *)
 
 type vertex = private {
   vertex_kf : Cil_types.kernel_function;
   vertex_key : int;
+  vertex_blocks : Cil_types.block list;
   mutable vertex_start_of : Cil_types.stmt option;
-  mutable vertex_info : info;
+  mutable vertex_end_of : Cil_types.stmt list;
+  mutable vertex_info : vertex_info;
   mutable vertex_control : vertex control;
 }
 
@@ -105,7 +105,7 @@ type 'vertex edge = private {
   edge_loc : location;
 }
 
-module G : Graph.Sig.I
+module G : Graph.Sig.G
   with type V.t = vertex
    and  type E.t = vertex * vertex edge * vertex
    and  type V.label = vertex
@@ -124,16 +124,20 @@ module Vertex : Datatype.S_with_collections with type t = vertex
 module Edge : Datatype.S_with_collections with type t = vertex edge
 
 
-
 (** An interpreted automaton for a given function is a graph whose edges are
-    guards and commands and always containing two special nodes which are the
-    entry point and the return point of the function. It also comes with
-    a table linking Cil statements to their starting and ending vertex *)
-
+    guards and commands.
+    - [graph] is the control flow graph
+    - [entry_point]: each execution of the function starts at this vertex
+    - [return_point]: return statements link to this vertex
+    - [exit_points]: each call to a non-returning function (declared with the C
+      attribute "noreturn") leads to a vertex from this list, with no successor
+    - [stmt_table]: this table links statements to their starting and ending
+      vertex *)
 type automaton = {
   graph : graph;
   entry_point : vertex;
   return_point : vertex;
+  exit_points : vertex list;
   stmt_table : (vertex * vertex) Cil_datatype.Stmt.Hashtbl.t;
 }
 
@@ -141,168 +145,115 @@ type automaton = {
 module Automaton : Datatype.S with type t = automaton
 
 (** Datatype for WTOs *)
-module WTO : sig
-  include module type of (Wto.Make(Vertex))
-  include Datatype.S with type t = wto
-end
+module WTO : Wto.S with type node = vertex
 
-(** Get the automaton for the given kernel_function without annotations *)
+(** Build an interpreted automaton for the given kernel_function.
+    If [annotations] is true, the automaton includes [Prop] transitions for
+    assertions and loop invariants of the function body.
+    Note that the automata construction may lead to the build of new Cil
+    expressions which will be different at each call: you may need to
+    memoize the results of this function. *)
+val build_automaton : annotations:bool -> Cil_types.kernel_function -> automaton
+
+(** Build a wto for the given automaton. The [pref] function is a comparison
+    function used to determine what is the best vertex to use as a Wto component
+    head. See [Wto.Make] for more details. *)
+val build_wto : ?pref:WTO.pref -> automaton -> wto
+
+(** Get the automaton for the given kernel_function. This is the memoized
+    version of [build_automaton ~annotations:false]  *)
 val get_automaton : Cil_types.kernel_function -> automaton
-
-(** Get the wto for the automaton of the given kernel_function *)
-val get_wto : Cil_types.kernel_function -> wto
 
 (** Extract an exit strategy from a component, i.e. a sub-wto where all
     vertices lead outside the wto without passing through the head. *)
-val exit_strategy : graph -> vertex Wto.component -> wto
+val exit_strategy : automaton -> vertex Wto.component -> wto
 
-type 'a labeling =
-  [ `Stmt
-  | `Vertex
-  | `Both
-  | `Custom of Format.formatter -> 'a -> unit
-  ]
+(** Output the automaton in dot format. *)
+val output_to_dot :
+  ?pp_vertex:(vertex Pretty_utils.formatter) ->
+  ?pp_edge:(vertex edge Pretty_utils.formatter) ->
+  ?wto:wto ->
+  out_channel -> automaton -> unit
 
-(** Output the automaton in dot format *)
-val output_to_dot : out_channel -> ?labeling:vertex labeling -> ?wto:wto ->
-  automaton -> unit
 
 (** the position of a statement in a wto given as the list of
     component heads *)
 type wto_index = vertex list
 
-(** Datatype for wto_index *)
-module WTOIndex : Datatype.S with type t = wto_index
-
-(** @return the wto_index for a statement *)
-val get_wto_index :
-  Cil_types.kernel_function -> vertex -> wto_index
-
-(** @return the components left and the components entered when going from
-    one index to another *)
-val wto_index_diff :
-  wto_index -> wto_index -> vertex list * vertex list
-
-(** @return the components left and the components entered when going from
-    one vertex to another *)
-val get_wto_index_diff :
-  Cil_types.kernel_function -> vertex -> vertex -> vertex list * vertex list
-
-(** @return wether [v] is a component head or not *)
-val is_wto_head :
-  Cil_types.kernel_function -> vertex -> bool
-
-(** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
-    is a wto head of any component where v2 is included. This assumes that
-    (v1,v2) is actually an edge present in the control flow graph. *)
-val is_back_edge :
-  Cil_types.kernel_function -> vertex * vertex -> bool
-
-(** This module defines the previous functions without memoization *)
-module Compute: sig
-
-  (** Get the interpreted automaton for the given kernel_function.
-      Note that the automata construction may lead to the build of new Cil
-      expressions which will be different at each call: you may need to
-      memoize the results of this function. *)
-  val get_automaton : annotations:bool -> Cil_types.kernel_function -> automaton
-
-  (** Build the wto for the given automaton (No memoization, use get_wto
-      instead) *)
-  val build_wto : automaton -> wto
-
-  (** Extract an exit strategy from a component, i.e. a sub-wto where all
-      vertices lead outside the wto without passing through the head. *)
-  val exit_strategy : graph -> vertex Wto.component -> wto
-
-  (** Output the automaton in dot format *)
-  val output_to_dot : out_channel -> ?labeling:vertex labeling  -> ?wto:wto ->
-    automaton -> unit
-
-
-  type wto_index_table
-
-  (** Compute the index table from a wto *)
-  val build_wto_index_table: wto -> wto_index_table
-
-  (** @return the wto_index for a statement *)
-  val get_wto_index :
-    wto_index_table -> vertex -> wto_index
+module WTOIndex : sig
 
   (** @return the components left and the components entered when going from
       one index to another *)
-  val wto_index_diff :
-    wto_index -> wto_index -> vertex list * vertex list
+  val diff : wto_index -> wto_index -> vertex list * vertex list
 
-  (** @return the components left and the components entered when going from
-      one vertex to another *)
-  val get_wto_index_diff :
-    wto_index_table -> vertex -> vertex -> vertex list * vertex list
+  module Table : sig
+    type t = wto_index Vertex.Hashtbl.t
 
-  (** @return wether [v] is a component head or not *)
-  val is_wto_head :
-    wto_index_table -> vertex -> bool
+    (** Compute the index table from a wto *)
+    val build : wto -> t
 
-  (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
-      is a wto head of any component where v2 is included. This assumes that
-      (v1,v2) is actually an edge present in the control flow graph. *)
-  val is_back_edge :
-    wto_index_table -> vertex * vertex -> bool
+    (** @return the wto_index for a statement *)
+    val find : t -> vertex -> wto_index
 
+    (** @return wether [v] is a component head or not *)
+    val is_head : t -> vertex -> bool
+
+    (** @return wether [v1,v2] is a back edge of a loop, i.e. if the vertex v1
+        is a wto head of any component where v2 is included. This assumes that
+        (v1,v2) is actually an edge present in the control flow graph. *)
+    val is_back_edge : t -> vertex * vertex -> bool
+  end
 end
 
-module UnrollUnnatural : sig
-  (** Could enter a loop only by head nodes *)
 
+(** Generic control flow graphs *)
+module type Graph = sig
+  include Graph.Sig.I
+
+  type wto = vertex Wto.partition
+  module WTO : Wto.S with type node = vertex
+
+  val pretty : t Pretty_utils.formatter
+
+  (** Build a wto for the given automaton. The [pref] function is a comparison
+      function used to determine what is the best vertex to use as a Wto component
+      head. See [Wto.Make] for more details. *)
+  val build_wto : pref:WTO.pref -> t -> V.t -> wto
+
+  (** Output the automaton in dot format *)
+  val output_to_dot :
+    ?pp_vertex:(V.t Pretty_utils.formatter) ->
+    ?pp_edge:(E.label Pretty_utils.formatter) ->
+    ?wto:wto ->
+    out_channel -> t -> unit
+
+  (** Extract an exit strategy from a component, i.e. a sub-wto where all
+      vertices lead outside the wto without passing through the head. *)
+  val exit_strategy : t -> V.t Wto.component -> wto
+end
+
+(** This functor can be used to build generic control flow graphs *)
+module MakeGraph (Vertex : Datatype.S_with_hashtbl) (Edge : Datatype.S) : Graph
+  with type V.t = Vertex.t
+   and type E.t = Vertex.t * Edge.t * Vertex.t
+   and type V.label = Vertex.t
+   and type E.label = Edge.t
+
+
+(** Control flow graphs where unnatural loops are modified such that all paths
+    entering a loop enters it by its head. *)
+module UnrollUnnatural : sig
   module Vertex_Set:
     Datatype.S_with_collections with type t = Vertex.Set.t
   module Version:
     Datatype.S_with_collections with type t = Vertex.t * Vertex.Set.t
 
-  module G : sig
-    include Graph.Sig.I
-      with type V.t = Version.t
-       and  type E.t = Version.t * Version.t edge * Version.t
-       and  type V.label = Version.t
-       and  type E.label = Version.t edge
-    val pretty : t Pretty_utils.formatter
-  end
+  include Graph with type V.t = Version.t
+                 and type E.t = Version.t * Version.t edge * Version.t
+                 and type V.label = Version.t
+                 and type E.label = Version.t edge
 
-
-  module WTO : sig
-    include module type of (Wto.Make(Version))
-    include Datatype.S with type t = Version.t Wto.partition
-  end
-
-  val output_to_dot : out_channel -> ?labeling:Version.t labeling ->
-    ?wto:WTO.t -> G.t -> unit
-
-  val unroll_unnatural_loop :
-    automaton -> wto -> Compute.wto_index_table -> G.t
-
-end
-
-
-(** Generic versions of the algorithms on dataflow graphs *)
-
-module Algorithms (G : Graph.Sig.G) : sig
-  val exit_strategy : G.t -> G.V.t Wto.component -> G.V.t Wto.partition
-end
-
-module Dot
-    (V: sig
-       include Hashtbl.HashedType
-       val pretty: Format.formatter -> t -> unit
-       val start_of: t -> stmt option
-     end)
-    (E: sig
-       type t
-       val pretty: Format.formatter -> t -> unit
-     end)
-    (G: Graph.Sig.G with type V.t = V.t and type E.t = V.t * E.t * V.t) : sig
-  val output_to_dot :
-    out_channel -> ?labeling:V.t labeling -> ?wto:V.t Wto.partition ->
-    G.t -> unit
+  val build : automaton -> G.vertex Wto.partition -> WTOIndex.Table.t -> t
 end
 
 

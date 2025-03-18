@@ -28,9 +28,13 @@
 open Cil_types
 open Eva_ast
 
+type vertex_info = Interpreted_automata.vertex_info
+
 type vertex = private {
+  vertex_kf : kernel_function;
   vertex_key : int;
   vertex_start_of : Cil_types.stmt option;
+  vertex_info : vertex_info;
   mutable vertex_wto_index : vertex list;
 }
 
@@ -48,6 +52,7 @@ type transition =
   | Asm of attributes * string list * extended_asm option * stmt
 
 type edge = private {
+  edge_kf : kernel_function;
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : transition;
@@ -82,7 +87,19 @@ val output_to_dot : out_channel -> automaton -> unit
 
 (* Wto related functions *)
 
-val exit_strategy : graph -> vertex Wto.component -> wto
+val exit_strategy : automaton -> vertex Wto.component -> wto
 val wto_index_diff : vertex -> vertex -> vertex list * vertex list
 val is_wto_head : vertex -> bool
 val is_back_edge : vertex * vertex -> bool
+
+(* Loops identification *)
+
+type loop = {
+  graph: graph; (** The complete graph of the englobing function. *)
+  head: vertex; (** The head of the loop. *)
+  wto: wto;     (** The wto for the loop body (without the loop head). *)
+  stmt: stmt;   (** The statement at the loop head. *)
+}
+
+(** Builds the loop type for the englobing loop of vertex. *)
+val find_loop : automaton -> vertex -> loop option

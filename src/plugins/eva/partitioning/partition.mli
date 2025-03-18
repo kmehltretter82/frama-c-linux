@@ -93,9 +93,9 @@ type unroll_limit =
       evaluate to a singleton integer in each state.  *)
   | IntLimit of int
   (** Integer limit. *)
-  | AutoUnroll of Cil_types.stmt * int * int
-  (** [AutoUnroll(stmt, min, max)] requests to find a "good" unrolling limit
-      between [min] and [max] for the loop [stmt]. *)
+  | AutoUnroll of Eva_automata.loop * int * int
+  (** [AutoUnroll(loop, min, max)] requests to find a "good" unrolling limit
+      between [min] and [max] for the loop [loop]. *)
 
 (** Splits on an expression can be static or dynamic:
     - static splits are processed once: the expression is only evaluated at the

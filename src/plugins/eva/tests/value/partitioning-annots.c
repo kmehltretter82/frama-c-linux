@@ -15,7 +15,7 @@ volatile int nondet;
 
 void test_unroll()
 {
-  int a[N], b[N], c[2*N], d[2*N], e[N];
+  int a[N], b[N], c[2*N], d[2*N], e[N], f[N], g[N];
 
   // The inner loop needs to be unrolled to allow strong updates
   // The outer loops doesn't need to be unrolled
@@ -62,6 +62,30 @@ void test_unroll()
     //@ loop unroll i-1;
     for (int j = i - 1 ; j > 0 ; j--) {
       e[j] += e[j-1];
+    }
+  }
+
+  int i = N;
+  // The "continue" statements are gotos to the loop head. They should not
+  // interfere with the loop unrolling: f should be entirely initialized.
+  //@ loop unroll N;
+  while(i > 0) {
+    i--;
+    f[i] = 2;
+    if (nondet) continue;
+    f[i] = 3;
+    if (nondet) continue;
+    f[i] = 4;
+  }
+
+  i = N;
+  // The "break" statements are gotos to the loop head. They should not
+  // interfere with the loop unrolling: g should be entirely initialized.
+  //@ loop unroll N;
+  while(i != 0) {
+    switch (i) {
+    default: i--; g[i] = 1; break;
+    case 1: i=0; g[0] = 0; break;
     }
   }
 }

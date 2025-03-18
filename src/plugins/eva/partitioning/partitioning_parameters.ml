@@ -73,15 +73,15 @@ struct
         ~wkey ~source:(fst (Cil_datatype.Stmt.loc stmt)) ~once:true
         "%s loop without unroll annotation" loop_kind
 
-  let unroll stmt =
+  let unroll loop =
     let automatic_unrolling i =
       if i > min_loop_unroll
-      then Partition.AutoUnroll (stmt, min_loop_unroll, i)
+      then Partition.AutoUnroll (loop, min_loop_unroll, i)
       else Partition.IntLimit min_loop_unroll
     in
     let default = automatic_unrolling auto_loop_unroll in
-    match get_unroll_annot stmt with
-    | [] -> warn_no_loop_unroll stmt; default
+    match get_unroll_annot loop.stmt with
+    | [] -> warn_no_loop_unroll loop.stmt; default
     | [UnrollFull] -> Partition.IntLimit default_loop_unroll
     | [UnrollAuto i] -> automatic_unrolling i
     | [UnrollAmount t] -> begin

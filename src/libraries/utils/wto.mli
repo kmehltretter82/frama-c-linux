@@ -48,15 +48,10 @@ val flatten: 'n partition -> 'n list
 
 val fold_heads: ('a -> 'n -> 'a) -> 'a -> 'n partition -> 'a
 
-(** This functor provides the partitioning algorithm constructing a WTO. *)
-module Make(Node:sig
-    type t
-    val equal: t -> t -> bool
-    val hash: t -> int
-    val pretty: Format.formatter -> t -> unit
-  end):sig
+module type S = sig
+  type node
 
-  type pref = Node.t -> Node.t -> int
+  type pref = node -> node -> int
   (** Partial order of preference for the choice of the head of a loop.
       [pref current_head new_candidate] must return < 0 if [new_candidate]
       is preferred to [current_head].
@@ -64,11 +59,20 @@ module Make(Node:sig
 
   (** Implements Bourdoncle "Efficient chaotic iteration strategies with
       widenings" algorithm to compute a WTO. *)
-  val partition: pref:pref -> init:Node.t -> succs:(Node.t -> Node.t list) -> Node.t partition
+  val partition: pref:pref -> init:node -> succs:(node -> node list) -> node partition
 
-  val pretty_partition: Format.formatter -> Node.t partition -> unit
-  val pretty_component: Format.formatter -> Node.t component -> unit
+  val pretty_partition: Format.formatter -> node partition -> unit
+  val pretty_component: Format.formatter -> node component -> unit
 
-  val equal_component: Node.t component -> Node.t component -> bool
-  val equal_partition: Node.t partition -> Node.t partition -> bool
+  val equal_component: node component -> node component -> bool
+  val equal_partition: node partition -> node partition -> bool
 end
+
+
+(** This functor provides the partitioning algorithm constructing a WTO. *)
+module Make(Node:sig
+    type t
+    val equal: t -> t -> bool
+    val hash: t -> int
+    val pretty: Format.formatter -> t -> unit
+  end): S with type node = Node.t

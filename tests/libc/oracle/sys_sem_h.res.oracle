@@ -14,6 +14,10 @@
 [eva] sys_sem_h.c:21: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from sys_sem_h.c:21.
+[eva] using specification for function exit
+[eva] Done for function exit
 [eva] computing for function semget <- main.
   Called from sys_sem_h.c:25.
 [eva] using specification for function semget
@@ -34,6 +38,9 @@
 [eva] sys_sem_h.c:38: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from sys_sem_h.c:38.
+[eva] Done for function exit
 [eva] computing for function semget <- main.
   Called from sys_sem_h.c:42.
 [eva] Done for function semget
@@ -42,11 +49,17 @@
 [eva] sys_sem_h.c:43: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from sys_sem_h.c:43.
+[eva] Done for function exit
 [eva] computing for function perror <- main.
   Called from sys_sem_h.c:48.
 [eva] sys_sem_h.c:48: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from sys_sem_h.c:48.
+[eva] Done for function exit
 [eva] computing for function semctl <- main.
   Called from sys_sem_h.c:58.
 [eva] Done for function semctl
@@ -55,6 +68,9 @@
 [eva] sys_sem_h.c:59: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from sys_sem_h.c:59.
+[eva] Done for function exit
 [eva:alarm] sys_sem_h.c:61: Warning: 
   accessing uninitialized left-value. assert \initialized(&ds.sem_otime);
 [eva] computing for function semop <- main.
@@ -67,22 +83,6 @@
 [eva] Done for function perror
 [eva] computing for function exit <- main.
   Called from sys_sem_h.c:69.
-[eva] using specification for function exit
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from sys_sem_h.c:59.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from sys_sem_h.c:48.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from sys_sem_h.c:43.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from sys_sem_h.c:38.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from sys_sem_h.c:21.
 [eva] Done for function exit
 [eva] Recording results for main
 [eva] Done for function main

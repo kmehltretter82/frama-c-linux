@@ -65,26 +65,42 @@
 [eva] spawn_h.c:45: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:45.
+[eva] using specification for function exit
+[eva] Done for function exit
 [eva] computing for function perror <- main.
   Called from spawn_h.c:50.
 [eva] spawn_h.c:50: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:50.
+[eva] Done for function exit
 [eva] computing for function perror <- main.
   Called from spawn_h.c:62.
 [eva] spawn_h.c:62: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:62.
+[eva] Done for function exit
 [eva] computing for function perror <- main.
   Called from spawn_h.c:65.
 [eva] spawn_h.c:65: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:65.
+[eva] Done for function exit
 [eva] computing for function perror <- main.
   Called from spawn_h.c:70.
 [eva] spawn_h.c:70: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:70.
+[eva] Done for function exit
 [eva:alarm] spawn_h.c:82: Warning: 
   out of bounds read. assert \valid_read(argv + optind);
 [eva:garbled-mix:write] spawn_h.c:82: 
@@ -98,6 +114,9 @@
 [eva] spawn_h.c:85: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:85.
+[eva] Done for function exit
 [eva] computing for function posix_spawnattr_destroy <- main.
   Called from spawn_h.c:90.
 [eva] using specification for function posix_spawnattr_destroy
@@ -107,6 +126,9 @@
 [eva] spawn_h.c:92: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:92.
+[eva] Done for function exit
 [eva] computing for function posix_spawn_file_actions_destroy <- main.
   Called from spawn_h.c:96.
 [eva] using specification for function posix_spawn_file_actions_destroy
@@ -116,6 +138,9 @@
 [eva] spawn_h.c:98: 
   function perror: precondition 'valid_string_s' got status valid.
 [eva] Done for function perror
+[eva] computing for function exit <- main.
+  Called from spawn_h.c:98.
+[eva] Done for function exit
 [eva:alarm] spawn_h.c:101: Warning: 
   accessing uninitialized left-value. assert \initialized(&child_pid);
 [eva] computing for function printf_va_1 <- main.
@@ -162,34 +187,9 @@
 [eva] Done for function perror
 [eva] computing for function exit <- main.
   Called from spawn_h.c:108.
-[eva] using specification for function exit
 [eva] Done for function exit
 [eva] computing for function exit <- main.
   Called from spawn_h.c:122.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:98.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:92.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:85.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:70.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:65.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:62.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:50.
-[eva] Done for function exit
-[eva] computing for function exit <- main.
-  Called from spawn_h.c:45.
 [eva] Done for function exit
 [eva] Recording results for main
 [eva] Done for function main

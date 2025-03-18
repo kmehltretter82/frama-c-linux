@@ -25,10 +25,14 @@ open Eva_ast
 
 (* --- Vertices and Edges types --- *)
 
+type vertex_info = Interpreted_automata.vertex_info
+
 type vertex = {
+  vertex_kf : kernel_function;
   vertex_key : int;
   vertex_start_of : Cil_types.stmt option;
-  mutable vertex_wto_index : vertex list
+  vertex_info : vertex_info;
+  mutable vertex_wto_index : vertex list;
 }
 
 type guard_kind = Interpreted_automata.guard_kind = Then | Else
@@ -45,6 +49,7 @@ type transition =
   | Asm of attributes * string list * extended_asm option * stmt
 
 type edge = {
+  edge_kf : kernel_function;
   edge_key : int;
   edge_kinstr : kinstr;
   edge_transition : transition;
@@ -52,27 +57,40 @@ type edge = {
 }
 
 let dummy_vertex = {
+  vertex_kf = List.hd (Cil_datatype.Kf.reprs);
   vertex_key = -1;
   vertex_start_of = None;
+  vertex_info = NoneInfo;
   vertex_wto_index = [];
 }
 
 let dummy_edge = {
+  edge_kf = List.hd (Cil_datatype.Kf.reprs);
   edge_key = -1;
   edge_kinstr = Kglobal;
   edge_transition = Skip;
   edge_loc = Cil_datatype.Location.unknown;
 }
 
+let (<?>) c lcmp =
+  if c <> 0 then c else Lazy.force lcmp
+
 module Vertex = Datatype.Make_with_collections (struct
     include Datatype.Serializable_undefined
     type t = vertex
     let reprs = [dummy_vertex]
     let name = "Eva_automata.Vertex"
-    let compare v1 v2 = v1.vertex_key - v2.vertex_key
-    let hash v = v.vertex_key
-    let equal v1 v2 = v1.vertex_key = v2.vertex_key
-    let pretty fmt v = Format.pp_print_int fmt v.vertex_key
+    let compare v1 v2 =
+      v1.vertex_key - v2.vertex_key <?>
+      lazy (Kernel_function.compare v1.vertex_kf v2.vertex_kf)
+    let hash v =
+      Hashtbl.hash (Kernel_function.hash v.vertex_kf, v.vertex_key)
+    let equal v1 v2 =
+      v1.vertex_key = v2.vertex_key &&
+      Kernel_function.equal v1.vertex_kf v2.vertex_kf
+    let pretty fmt v =
+      Format.pp_print_int fmt v.vertex_key;
+      Option.iter (fun stmt -> Format.fprintf fmt "@s%d" stmt.sid) v.vertex_start_of
   end)
 
 module Transition = Datatype.Make (struct
@@ -99,32 +117,30 @@ module Transition = Datatype.Make (struct
       | Leave (b)  -> fprintf fmt "Exit %a" print_var_list b.blocals
   end)
 
-module Edge =
-struct
-  include Datatype.Make_with_collections
-      (struct
-        include Datatype.Serializable_undefined
-        type t = edge
-        let reprs = [dummy_edge]
-        let name = "Eva_automata.Edge"
-        let compare e1 e2 = e1.edge_key - e2.edge_key
-        let hash e = e.edge_key
-        let equal e1 e2 = e1.edge_key = e2.edge_key
-        let pretty fmt e = Transition.pretty fmt e.edge_transition
-      end)
-  let default = dummy_edge
-end
+module Edge = Datatype.Make_with_collections
+    (struct
+      include Datatype.Serializable_undefined
+      type t = edge
+      let reprs = [dummy_edge]
+      let name = "Eva_automata.Edge"
+      let compare e1 e2 =
+        e1.edge_key - e2.edge_key <?>
+        lazy (Kernel_function.compare e1.edge_kf e2.edge_kf)
+      let hash e =
+        Hashtbl.hash (Kernel_function.hash e.edge_kf, e.edge_key)
+      let equal e1 e2 =
+        e1.edge_key = e2.edge_key &&
+        Kernel_function.equal e1.edge_kf e2.edge_kf
+      let pretty fmt e = Transition.pretty fmt e.edge_transition
+    end)
 
 
 (* --- Automata types --- *)
 
-module G = Graph.Imperative.Digraph.ConcreteBidirectionalLabeled
-    (Vertex)
-    (Edge)
+module G = Interpreted_automata.MakeGraph (Vertex) (Edge)
 
 type graph = G.t
-
-type wto = vertex Wto.partition
+type wto = G.wto
 
 module StmtTable = Cil_datatype.Stmt.Hashtbl
 
@@ -148,37 +164,26 @@ module Automaton = Datatype.Make
           stmt_table=StmtTable.create 0;
         }]
       let name = "Eva_automata.Automaton"
-      let pretty : t Pretty_utils.formatter = fun fmt g ->
-        Pretty_utils.pp_iter G.iter_vertex ~pre:"@[" ~suf:"@]" ~sep:";@ "
-          (fun fmt v ->
-             Format.fprintf fmt "@[<2>@[%a ->@]@ %a@]"
-               Vertex.pretty v
-               (Pretty_utils.pp_iter (fun f -> G.iter_succ f g.graph) ~sep:",@ " Vertex.pretty)
-               v
-          )
-          fmt g.graph
+      let pretty fmt automaton = G.pretty fmt automaton.graph
     end)
 
-
-(* Wto *)
-
-module Scheduler = Wto.Make (Vertex)
-
 let build_wto graph entry_point =
-  let init = entry_point
-  and succs = fun v -> G.succ graph v
-  and pref v1 v2 =
-    match v1.vertex_start_of, v2.vertex_start_of with
-    | None, None -> 0
-    | None, _ -> -1
-    | _ , None -> 1
-    | Some _, Some _ -> 0
+  let pref v1 v2 =
+    match v1.vertex_info, v2.vertex_info with
+    | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
+    | NoneInfo, LoopHead _ -> -1
+    | LoopHead _ , NoneInfo -> 1
+    | NoneInfo, NoneInfo ->
+      match v1.vertex_start_of, v2.vertex_start_of with
+      | None, None -> 0
+      | None, _ -> -1
+      | _ , None -> 1
+      | Some _, Some _ -> 0
   in
-  Scheduler.partition ~pref ~init ~succs
+  G.build_wto ~pref graph entry_point
 
 
 (* Automata translation *)
-
 
 let translate_instr stmt instr =
   let translate_call dest callee args _loc =
@@ -256,14 +261,16 @@ let translate_automaton kf =
   generate_literal_strings_bases kf;
   let module Src = Interpreted_automata in
   let module VertexTable = Src.Vertex.Hashtbl in
-  let src = Interpreted_automata.get_automaton kf in
+  let src = Interpreted_automata.build_automaton ~annotations:true kf in
   let size = Src.(G.nb_vertex src.graph) in
   let graph = G.create ~size () in
   let table = VertexTable.create size in
   let translate_vertex (v : Src.vertex) =
     let v' = {
+      vertex_kf = kf;
       vertex_key = v.vertex_key;
       vertex_start_of = v.vertex_start_of;
+      vertex_info = v.vertex_info;
       vertex_wto_index = [];
     }
     in
@@ -273,6 +280,7 @@ let translate_automaton kf =
     let v' = VertexTable.find table v
     and w' = VertexTable.find table w
     and e' = {
+      edge_kf = e.Src.edge_kf;
       edge_key = e.Src.edge_key;
       edge_kinstr = e.Src.edge_kinstr;
       edge_transition = translate_transition e.Src.edge_transition;
@@ -298,9 +306,6 @@ let translate_automaton kf =
   build_wto_index wto;
   { graph; wto; entry_point; return_point; stmt_table }
 
-
-(* Automata memoization *)
-
 module State = Kernel_function.Make_Table (Automaton)
     (struct
       let size = 97
@@ -310,21 +315,10 @@ module State = Kernel_function.Make_Table (Automaton)
 
 let get_automaton = State.memo translate_automaton
 
+let exit_strategy automaton = G.exit_strategy automaton.graph
 
-(* Algorithms *)
-
-let exit_strategy =
-  let module Algorithms = Interpreted_automata.Algorithms (G) in
-  Algorithms.exit_strategy
-
-let output_to_dot =
-  let module Vertex = struct
-    include Vertex
-    let start_of v = v.vertex_start_of end
-  in
-  let module Dot = Interpreted_automata.Dot (Vertex) (Edge) (G) in
-  fun out automaton ->
-    Dot.output_to_dot out ~labeling:`Both ~wto:automaton.wto automaton.graph
+let output_to_dot out automaton =
+  G.output_to_dot ~wto:automaton.wto out automaton.graph
 
 let wto_index_diff v1 v2 =
   let index1 = v1.vertex_wto_index and index2 = v2.vertex_wto_index in
@@ -347,3 +341,35 @@ let is_wto_head v =
 
 let is_back_edge (v1,v2) =
   List.exists (Vertex.equal v2) (v1.vertex_wto_index)
+
+
+(* Loop identification *)
+
+type loop = {
+  graph: graph;
+  head: vertex;
+  wto: wto;
+  stmt: stmt;
+}
+
+let loop_stmt head =
+  match head.vertex_info with
+  | LoopHead { stmt } -> stmt
+  | NoneInfo -> Option.get head.vertex_start_of
+
+let find_loop (automaton: automaton) vertex =
+  let graph = automaton.graph in
+  match vertex.vertex_wto_index with
+  | [] ->
+    None
+  | head :: _ ->
+    (* Find in the wto the component whose head is [head]. *)
+    let rec find = function
+      | [] -> assert false
+      | Wto.Node _ :: tl -> find tl
+      | Wto.Component (h, l) :: tl ->
+        if Vertex.equal h head
+        then {graph; head; wto = l; stmt = loop_stmt head}
+        else find (l @ tl)
+    in
+    Some (find automaton.wto)

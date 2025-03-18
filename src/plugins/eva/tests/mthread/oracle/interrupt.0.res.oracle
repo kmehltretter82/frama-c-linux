@@ -171,6 +171,7 @@
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva:interferences] <unknown location>: 
   inject threads interferences at this point
+[eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva:interferences] interrupt.c:20: inject threads interferences at this point
 [eva] interrupt.c:20: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:22: inject threads interferences at this point
@@ -275,6 +276,7 @@
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva:interferences] <unknown location>: 
   inject threads interferences at this point
+[eva:interferences] interrupt.c:19: inject threads interferences at this point
 [eva:interferences] interrupt.c:20: inject threads interferences at this point
 [eva] interrupt.c:20: Frama_C_show_each_locked: {0; 1}
 [eva:interferences] interrupt.c:22: inject threads interferences at this point

@@ -185,11 +185,23 @@ module Make_Dataflow
   let e_table : tank EdgeTable.t =
     EdgeTable.create transition_count
 
-  (* Default (Initial) stores on vertex and edges *)
+  let vertex_stmt (v : vertex) : stmt option =
+    match v.vertex_info with
+    | LoopHead { stmt } -> Some stmt
+    | NoneInfo -> v.vertex_start_of
+
+  let is_loop_head (v : vertex) : bool =
+    match v.vertex_info with
+    | LoopHead _ -> true
+    | NoneInfo -> false
+
+  (* Default (initial) stores on vertex and edges *)
   let default_vertex_store (v : vertex) () : store =
-    Partitioning.empty_store ~stmt:v.vertex_start_of
+    let stmt = vertex_stmt v in
+    let is_loop_head = is_loop_head v in
+    Partitioning.empty_store ~stmt ~is_loop_head
   let default_vertex_widening (v : vertex) () : widening =
-    Partitioning.empty_widening ~stmt:v.vertex_start_of
+    Partitioning.empty_widening ~stmt:(vertex_stmt v)
   let default_edge_tank () : tank =
     Partitioning.empty_tank ()
 
@@ -408,16 +420,19 @@ module Make_Dataflow
       | _ -> flow
     in
     (* Loop transitions *)
-    let the_stmt v = Option.get v.vertex_start_of in
+    let get_loop v = Option.get (Eva_automata.find_loop automaton v) in
     let enter_loop f v =
-      let f = Partitioning.enter_loop f (the_stmt v) in
-      Partitioning.transfer (lift (Domain.enter_loop (the_stmt v))) f
+      let loop = get_loop v in
+      let f = Partitioning.enter_loop f loop in
+      Partitioning.transfer (lift (Domain.enter_loop loop.stmt)) f
     and leave_loop f v =
-      let f = Partitioning.leave_loop f (the_stmt v) in
-      Partitioning.transfer (lift (Domain.leave_loop (the_stmt v))) f
+      let loop = get_loop v in
+      let f = Partitioning.leave_loop f loop in
+      Partitioning.transfer (lift (Domain.leave_loop loop.stmt)) f
     and incr_loop_counter f v =
-      let f = Partitioning.next_loop_iteration f (the_stmt v) in
-      Partitioning.transfer (lift (Domain.incr_loop_counter (the_stmt v))) f
+      let loop = get_loop v in
+      let f = Partitioning.next_loop_iteration f loop.stmt in
+      Partitioning.transfer (lift (Domain.incr_loop_counter loop.stmt)) f
     in
     let loops_left, loops_entered =
       Eva_automata.wto_index_diff v1 v2
@@ -461,16 +476,17 @@ module Make_Dataflow
 
   let update_vertex ?(widening : bool = false) (v : vertex)
       (sources : ('branch * flow) list) : bool =
-    Option.iter (fun stmt -> current_ki := Kstmt stmt) v.vertex_start_of;
-    let location = Option.map Cil_datatype.Stmt.loc v.vertex_start_of in
+    let current_stmt = vertex_stmt v in
+    Option.iter (fun stmt -> current_ki := Kstmt stmt) current_stmt;
+    let curent_location = Option.map Cil_datatype.Stmt.loc current_stmt in
     let open Current_loc.Operators in
-    let<?> UpdatedCurrentLoc = location in
+    let<?> UpdatedCurrentLoc = curent_location in
     (* Get vertex store *)
     let store = get_vertex_store v in
     (* Join incoming states *)
     let flow = Partitioning.join sources store in
     let flow =
-      match v.vertex_start_of with
+      match current_stmt with
       | Some stmt ->
         (* Callbacks *)
         call_statement_callbacks stmt flow;
@@ -483,15 +499,15 @@ module Make_Dataflow
       if widening && not (Partitioning.is_empty_flow flow) then begin
         let flow = Partitioning.widen (get_vertex_widening v) flow in
         (* Try to correct over-widenings *)
-        let correct_over_widening stmt =
+        match current_stmt with
+        | Some stmt ->
           (* Do *not* record the status after interpreting the annotation
              here. Possible unproven assertions have already been recorded
              when the assertion has been interpreted the first time higher
              in this function. *)
           Partitioning.transfer
             (lift'' (transfer_annotations stmt ~record:false)) flow
-        in
-        Option.fold ~some:correct_over_widening ~none:flow v.vertex_start_of
+        | None -> flow
       end else
         flow
     in
@@ -566,7 +582,7 @@ module Make_Dataflow
         not (process_vertex ~widening:true v) || !iteration_count = 0
       do
         Self.debug ~dkey "iteration %d" !iteration_count;
-        Option.iter (Statistics.incr stat_iterations) v.vertex_start_of;
+        Option.iter (Statistics.incr stat_iterations) (vertex_stmt v);
         iterate_list w;
         incr iteration_count;
       done;
@@ -576,7 +592,7 @@ module Make_Dataflow
         | ExitIteration ->
           Self.debug ~dkey
             "propagating descending values through exit paths";
-          Wto.flatten (exit_strategy graph component)
+          Wto.flatten (exit_strategy automaton component)
         | FullIteration ->
           Self.debug ~dkey
             "propagating descending values through the loop";
