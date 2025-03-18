@@ -227,22 +227,22 @@ module type Messages = sig
       @since Beryllium-20090902 *)
 
   val with_result  : (event option -> 'b) -> ('a,'b) pretty_aborter
-  (** [with_result f fmt] calls [f] in the same condition as [logwith].
+  (** [with_result f fmt] calls [f] in the same condition as {!logwith}.
       @since Beryllium-20090601-beta1
   *)
 
   val with_warning : (event option -> 'b) -> ('a,'b) pretty_aborter
-  (** [with_warning f fmt] calls [f] in the same condition as [logwith].
+  (** [with_warning f fmt] calls [f] in the same condition as {!logwith}.
       @since Beryllium-20090601-beta1
   *)
 
   val with_error   : (event option -> 'b) -> ('a,'b) pretty_aborter
-  (** [with_error f fmt] calls [f] in the same condition as [logwith].
+  (** [with_error f fmt] calls [f] in the same condition as {!logwith}.
       @since Beryllium-20090601-beta1
   *)
 
   val with_failure : (event option -> 'b) -> ('a,'b) pretty_aborter
-  (** [with_failure f fmt] calls [f] in the same condition as [logwith].
+  (** [with_failure f fmt] calls [f] in the same condition as {!logwith}.
       @since Beryllium-20090601-beta1
   *)
 
@@ -258,9 +258,8 @@ module type Messages = sig
         @since Beryllium-20090901
         @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-  val logwith : (event option -> 'b) ->
-    ?wkey:warn_category -> ?emitwith:(event -> unit) -> ?once:bool ->
-    ('a,'b) pretty_aborter
+  val logwith : (event option -> 'b) -> ?wkey:warn_category ->
+    ?emitwith:(event -> unit) -> ?once:bool -> ('a,'b) pretty_aborter
   (** Recommanded generic log routine using [warn_category] instead of [kind].
       [logwith continuation ?wkey fmt] similar to [warning ?wkey fmt]
       and then calling the [continuation].
@@ -444,8 +443,7 @@ val new_channel : string -> channel
 (** @since Beryllium-20090901
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
-val log_channel : channel ->
-  ?kind:kind -> 'a pretty_printer
+val log_channel : channel -> ?kind:kind -> 'a pretty_printer
 (** logging function to user-created channel.
     @since Beryllium-20090901
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -472,7 +470,8 @@ val get_current_source : unit -> Filepath.position
 val clean : unit -> unit
 (** Flushes the last transient message if necessary. *)
 
-val set_output : ?isatty:bool -> (string -> int -> int -> unit) -> (unit -> unit) -> unit
+val set_output : ?isatty:bool -> (string -> int -> int -> unit) ->
+  (unit -> unit) -> unit
 (** This function has the same parameters as Format.make_formatter.
     @since Beryllium-20090901
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
@@ -488,7 +487,7 @@ val print_on_output : (Format.formatter -> unit) -> unit
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 val print_delayed : (Format.formatter -> unit) -> unit
-(** Direct printing on output.  Same as [print_on_output], except
+(** Direct printing on output.  Same as {!print_on_output}, except
     that message echo is not delayed until text material is actually
     written. This gives an chance for formatters to emit messages
     before actual pretty printing.
@@ -498,27 +497,28 @@ val print_delayed : (Format.formatter -> unit) -> unit
     @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 
 (**/**)
+
 val set_current_source : (unit -> Filepath.position) -> unit
-(* Forward reference to the function returning the current location,
+(** Forward reference to the function returning the current location,
     used when [~current:true] is set on printers. Currently set
     in {!Cil}. Not for the casual user. *)
 
 val check_not_yet: (event -> bool) ref
-(* Checks whether a message been emitted already, in which case it is
-   not reprinted. Currently set in {Messages}. Not for the casual user.
+(** Checks whether a message been emitted already, in which case it is
+    not reprinted. Currently set in {Messages}. Not for the casual user.
 *)
 
 val tty : (unit -> bool) ref
-(* Callback for command-line option '-(no)-tty' *)
+(** Callback for command-line option '-(no)-tty' *)
 
 val cmdline_error_occurred: (exn -> unit) ref
 
 val cmdline_at_error_exit: ((exn -> unit) -> unit) ref
 
 val treat_deferred_error: unit -> unit
-(* call this function when it is a good time to raise an exception following
-   a delayed error or failure. Currently done:
-   - after each command-line stage.
-   - after each analysis step (as separated by -then and its derivatives),
-     including the last one.
+(** call this function when it is a good time to raise an exception following
+    a delayed error or failure. Currently done:
+    - after each command-line stage.
+    - after each analysis step (as separated by -then and its derivatives),
+      including the last one.
 *)
