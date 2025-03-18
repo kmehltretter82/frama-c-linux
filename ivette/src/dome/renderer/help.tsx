@@ -12,7 +12,7 @@
  */
 
 import React from 'react';
-import { modal } from 'dome';
+import { modal, useNumberSettings } from 'dome';
 import { GlobalState, useGlobalState } from 'dome/data/states';
 
 import { IconButton } from './controls/buttons';

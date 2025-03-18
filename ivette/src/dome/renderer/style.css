@@ -258,9 +258,12 @@ input[type="checkbox"]:checked {
         cursor: pointer;
       }
 
-      .dome-xModal-acions {
+      .dome-xModal-actions {
         display: flex;
-        div:last-child { margin-left: 2em;}
+        flex-direction: row;
+        align-items: center;
+
+        & div:last-child { margin-left: 20px }
       }
     }
 

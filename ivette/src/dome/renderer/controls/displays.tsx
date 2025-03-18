@@ -48,6 +48,8 @@ export function LCD(props: LabelProps): JSX.Element {
 // --- Led
 // --------------------------------------------------------------------------
 
+export const LEDCONTEXT = React.createContext({ width: 11, height: 11 });
+
 export const LEDStatusList = [
   'active', 'inactive', 'positive', 'negative', 'warning'
 ] as const;
@@ -85,8 +87,10 @@ export const LED = (props: LEDprops): JSX.Element => {
     props.blink && 'dome-xButton-blink',
     props.className,
   );
+  const ledcontext = React.useContext(LEDCONTEXT);
   return (
-    <div className={className} title={props.title} style={props.style} />
+    <div className={className} title={props.title}
+      style={{ ...ledcontext, ...props.style }} />
   );
 };
 

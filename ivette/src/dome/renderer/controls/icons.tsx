@@ -33,6 +33,9 @@ const Icons: { [id: string]: { viewBox?: string; path: string } } = Gallery;
 // --- Raw SVG element
 // --------------------------------------------------------------------------
 
+export const SVGCONTEXT = React.createContext<
+  {size: number} | undefined>(undefined);
+
 export interface SVGprops {
   /** Icon's identifier. */
   id: string;
@@ -55,6 +58,7 @@ export interface SVGprops {
  */
 export function SVG(props: SVGprops): null | JSX.Element {
   const { id, className, fill } = props;
+  const svgcontext = React.useContext(SVGCONTEXT);
   if (!id) return null;
   const icon = Icons[id];
   if (!icon) return <>{id}</>;
@@ -66,7 +70,7 @@ export function SVG(props: SVGprops): null | JSX.Element {
   const { path, viewBox = '0 0 24 24' } = icon;
   return (
     <svg
-      height={size}
+      height={svgcontext?.size || size}
       style={{ bottom: offset }}
       viewBox={viewBox}
       className={className}

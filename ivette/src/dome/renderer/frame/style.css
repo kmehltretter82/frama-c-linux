@@ -732,6 +732,12 @@ input:checked + .dome-xSwitch-slider:before {
 @keyframes dome-xTree-arrow { to { rotate: -90deg; } }
 @keyframes dome-xTree-arrow-down { from { rotate: -90deg; } }
 
+.dome-xTree-actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .dome-xTree {
   background-color: inherit;
   padding-bottom: 5px;
