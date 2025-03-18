@@ -28,8 +28,10 @@ let package = Package.package ~plugin:"impact" ~name:"impact" ~title:"Impact" ()
 let impact_to_localizable_list impact =
   let add_kf_nodes kf nodes acc =
     let stmts = Compute_impact.nodes_to_stmts nodes in
-    let add_stmt kf acc stmt = Printer_tag.PStmtStart (kf, stmt) :: acc in
-    List.fold_left (add_stmt kf) acc stmts
+    let to_localizable stmt = Printer_tag.PStmtStart (kf, stmt) in
+    (* Try to list statements in their order in the source code, as it is
+       more natural for the user. *)
+    List.map to_localizable stmts @ acc
   in
   Kernel_function.Map.fold add_kf_nodes impact []
 
