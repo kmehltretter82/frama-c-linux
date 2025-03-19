@@ -1863,28 +1863,6 @@
             by Frama-C kernel.
 
 --------------------------------------------------------------------------------
---- Properties of Function 'index'
---------------------------------------------------------------------------------
-
-[ Extern  ] Assigns nothing
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 59)
-            Unverifiable but considered Valid.
-[  Valid  ] Default behavior
-            by Frama-C kernel.
-
---------------------------------------------------------------------------------
---- Properties of Function 'rindex'
---------------------------------------------------------------------------------
-
-[ Extern  ] Assigns nothing
-            Unverifiable but considered Valid.
-[ Extern  ] Froms (file FRAMAC_SHARE/libc/strings.h, line 64)
-            Unverifiable but considered Valid.
-[  Valid  ] Default behavior
-            by Frama-C kernel.
-
---------------------------------------------------------------------------------
 --- Properties of Function 'strcasecmp'
 --------------------------------------------------------------------------------
 
@@ -2326,10 +2304,10 @@
 --------------------------------------------------------------------------------
 --- Status Report Summary
 --------------------------------------------------------------------------------
-   175 Completely validated
+   173 Completely validated
      1 Locally validated
-   281 Considered valid
+   277 Considered valid
     32 To be validated
      4 Alarms emitted
-   493 Total
+   487 Total
 --------------------------------------------------------------------------------

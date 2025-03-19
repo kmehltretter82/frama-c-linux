@@ -530,7 +530,11 @@ standard library. They are described below.
   rounding mode and float evaluation
   (macros \lstinline|FLT_ROUNDS| and \lstinline|FLT_EVAL_METHOD|) will be
   considered as indeterminable.
-
+\item \textttdef{\_\_FC\_FORCE\_POSIX\_C\_SOURCE}: By default, \FramaC's positions
+  \lstinline|_POSIX_C_SOURCE| according to the relevant machdep field
+  \lstinline|posix_c_source|. Defining
+  \lstinline|__FC_FORCE_POSIX_C_SOURCE| overrides this value. If the macro is
+  defined to an empty value, \lstinline|_POSIX_C_SOURCE| will be undefined.
 \end{description}
 
 \section{Compiler and language extensions}\label{sec:extensions}

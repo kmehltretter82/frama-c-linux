@@ -43,7 +43,7 @@ version: foo
 wchar_t: int
 weof: (-1)
 wordsize: '24'
-posix_version: '200809L'
+posix_c_source: '200809L'
 bufsiz: '255'
 eof: (-1)
 fopen_max: '128'

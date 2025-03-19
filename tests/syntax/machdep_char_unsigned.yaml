@@ -46,7 +46,7 @@ time_t: 'long'
 has__builtin_va_list: true
 weof: '(-1L)'
 wordsize: '16'
-posix_version: ''
+posix_c_source: ''
 bufsiz: '8192'
 eof: '(-1)'
 fopen_max: '16'

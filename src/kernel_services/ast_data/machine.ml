@@ -167,7 +167,7 @@ let custom_defs () = the_machine.machdep.custom_defs
 (* Macro expansion *)
 let weof () = the_machine.machdep.weof
 let wordsize () = the_machine.machdep.wordsize
-let posix_version () = the_machine.machdep.posix_version
+let posix_c_source () = the_machine.machdep.posix_c_source
 let bufsiz () = the_machine.machdep.bufsiz
 let eof () = the_machine.machdep.eof
 let fopen_max () = the_machine.machdep.fopen_max

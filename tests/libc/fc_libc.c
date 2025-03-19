@@ -28,7 +28,6 @@
 // test all of them. We nevertheless define some headers to test additional
 // functions.
 #define _XOPEN_SOURCE 600
-#define _POSIX_C_SOURCE 200112L
 #define _GNU_SOURCE 1
 
 #include "__fc_runtime.c"

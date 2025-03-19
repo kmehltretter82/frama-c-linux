@@ -82,7 +82,7 @@ type mach = {
   version: string;
   weof: string;
   wordsize: string;
-  posix_version: string;
+  posix_c_source: string;
   bufsiz: string;
   eof: string;
   fopen_max: string;
@@ -149,7 +149,7 @@ let dummy = {
   version = "N/A";
   weof = "(-1)";
   wordsize = "64";
-  posix_version = "";
+  posix_c_source = "";
   bufsiz = "255";
   eof = "(-1)";
   fopen_max = "255";
@@ -201,7 +201,7 @@ module Machdep = struct
        alignof_str=%d;alignof_fun=%d;alignof_aligned=%d;\
        char_is_unsigned=%b;little_endian=%b;has__builtin_va_list=%b;\
        compiler=%s;cpp_arch_flags=%a;version=%s;weof=%s;wordsize=%s;\
-       posix_version=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
+       posix_c_source=%s;bufsiz=%s;eof=%s;fopen_max=%s;filename_max=%s;\
        path_max=%s;tty_name_max=%s;host_name_max=%s;l_ctermid=%s;\
        l_tmpnam=%s;tmp_max=%s;\
        rand_max=%s;mb_cur_max=%s;nsig=%s;errno=%a;machdep_name=%s;\
@@ -253,7 +253,7 @@ module Machdep = struct
       mach.version
       mach.weof
       mach.wordsize
-      mach.posix_version
+      mach.posix_c_source
       mach.bufsiz
       mach.eof
       mach.fopen_max
@@ -305,6 +305,23 @@ let gen_define_macro fmt macro def =
   if def = "" then gen_undef fmt macro
   else gen_define_string fmt macro def
 
+let gen_redefinable_macro fmt macro def =
+  let redef_name = "__FC_FORCE_" ^ Extlib.strip_underscore macro in
+  Format.fprintf fmt "#if defined(%s)@\n" redef_name;
+  (* SO's trick to check that the redef macro has an integer value.
+     Otherwise (notably if it's empty), we consider that we undef fc_name.
+  *)
+  Format.fprintf fmt
+    "#if 0 - %s - 1 != 1 || %s - 2 != -2@\n"
+    redef_name redef_name;
+  gen_define_string fmt macro redef_name;
+  Format.fprintf fmt "#else@\n";
+  gen_undef fmt macro;
+  Format.fprintf fmt "#endif@\n"; (* empty redef *)
+  Format.fprintf fmt "#else@\n";
+  gen_define_macro fmt macro def;
+  Format.fprintf fmt "#endif@\n" (* defined redef *)
+
 let gen_define_custom_macros fmt censored mach =
   let key_values = mach.custom_defs in
   let is_same_macro m1 m2 =
@@ -321,6 +338,7 @@ let gen_define_custom_macros fmt censored mach =
          gen_define_macro fmt k v
        end)
     key_values;
+  gen_redefinable_macro fmt "_POSIX_C_SOURCE" mach.posix_c_source;
   Format.fprintf fmt "#endif /* ifdef __FC_BUILTIN_MACROS_H */@]@."
 
 let gen_define_int fmt macro def = gen_define fmt macro Format.pp_print_int def
@@ -600,7 +618,6 @@ let gen_all_defines fmt mach =
   gen_define_literal_string fmt "__PRIPTR_PREFIX"
     (List.assoc (no_signedness mach.intptr_t) pp_of_kind);
   gen_define_macro fmt "__WORDSIZE" mach.wordsize;
-  gen_define_macro fmt "__FC_POSIX_VERSION" mach.posix_version;
   gen_define_string fmt "__FC_SIG_ATOMIC_T" mach.sig_atomic_t;
   gen_intlike_min fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;
   gen_intlike_max fmt "__FC_SIG_ATOMIC" mach.sig_atomic_t mach;

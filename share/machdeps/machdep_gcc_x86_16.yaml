@@ -47,7 +47,7 @@ wchar_t: int
 weof: (0xffffffffUL)
 wint_t: unsigned long
 wordsize: '16'
-posix_version: '200809L'
+posix_c_source: '200809L'
 bufsiz: '8192'
 eof: '(-1)'
 fopen_max: '16'

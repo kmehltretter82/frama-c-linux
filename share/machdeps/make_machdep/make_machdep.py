@@ -125,13 +125,19 @@ def check_machdep(machdep):
     try:
         from jsonschema import validate, ValidationError
 
-        validate(machdep, schema)
+        strict_schema = {
+            # extract the keys
+            "required": [x for x in schema],
+            "properties": schema,
+            "additionalProperties": False,
+        }
+        validate(machdep, strict_schema)
         return True
     except ImportError:
         logging.warning("jsonschema is not available: no validation will be performed")
         return True
-    except ValidationError:
-        logging.warning("machdep object is not conforming to machdep schema")
+    except ValidationError as exn:
+        logging.warning(f"machdep object is not conforming to machdep schema:\n{exn.message}")
         return False
 
 
@@ -158,7 +164,7 @@ def print_machdep(machdep):
         args.dest_file = open(args.from_file, "w")
     elif args.dest_file is None:
         args.dest_file = sys.stdout
-    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=False)
+    yaml.dump(machdep, args.dest_file, indent=4, sort_keys=True)
 
 
 def default_value(typ):
@@ -236,7 +242,7 @@ source_files = [
     ("has__builtin_va_list.c", "has__builtin_va_list"),
     ("weof.c", "macro"),
     ("wordsize.c", "macro"),
-    ("posix_version.c", "macro"),
+    ("posix_c_source.c", "macro"),
     ("limits_macros.c", "macro"),
     ("stdio_macros.c", "macro"),
     ("stdlib_macros.c", "macro"),
