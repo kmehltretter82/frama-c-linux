@@ -275,7 +275,7 @@ let parse_error ?loc msg =
         let _,start_pos = Stack.pop all_pos in
         let last_pos =
           if Stack.is_empty all_pos then
-            current.lexbuf.Lexing.lex_start_p
+            current.lexbuf.Lexing.lex_curr_p
           else
             fst (Stack.pop all_pos)
         in
