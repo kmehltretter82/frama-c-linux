@@ -260,7 +260,7 @@ struct
   let join (sources : (branch*flow) list) (dest : store) : flow =
     (* Get every source flow *)
     let sources_states =
-      (* Is there more than one non-empty incomming flow ? *)
+      (* Is there more than one non-empty incoming flow? *)
       match sources with
       | [(_,flow)] -> [flow]
       | sources ->
@@ -270,7 +270,7 @@ struct
         in
         List.map get sources
     in
-    (* Merge incomming flows *)
+    (* Merge incoming flows *)
     let flow_states =
       List.fold_left Flow.union Flow.empty sources_states
     in

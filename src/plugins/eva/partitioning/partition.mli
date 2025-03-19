@@ -26,10 +26,10 @@
     A key contains the reason for which a state must be kept separate from
     others, or joined with similar states.
 
-    Partitioning actions allow updating the keys or spliting some states to
+    Partitioning actions allow updating the keys or splitting some states to
     define or change the partition. Actions are applied to flows, in which
     states with the same key are *not* automatically joined. This allows
-    applying mutliple actions before recomputing the partitions. Flows can then
+    applying multiple actions before recomputing the partitions. Flows can then
     be converted into partitions, thus merging states with identical keys.
 
     Flows are used to transfer states from one partition to another. Transfer
@@ -53,7 +53,7 @@ module Key : sig
   val empty : t
   (** Initial key: no partitioning. *)
 
-  val exceed_rationing: t -> bool
+  val exceed_rationing : t -> bool
   val combine : policy:call_return_policy -> caller:t -> callee:t -> t
   (** Recombinaison of keys after a call *)
 end
@@ -115,8 +115,8 @@ val new_monitor:
   term:Eva_annotations.split_term ->
   split_monitor
 
-(** These actions redefine the partitioning by updating keys or spliting states.
-    They are applied to all the pair (key, state) in a flow. *)
+(** These actions redefine the partitioning by updating keys or splitting
+    states. They are applied to all the pair (key, state) in a flow. *)
 type action =
   | Enter_loop of unroll_limit
   (** Enters a loop in which the n first iterations will be kept separate:
@@ -164,7 +164,7 @@ type action =
   (** Forgets the split of an expression: states that were kept separate only
       by the split of this expression will be joined together. *)
   | Update_dynamic_splits
-  (** Updates dynamic splits by evaluating the expression and spliting the
+  (** Updates dynamic splits by evaluating the expression and splitting the
       states accordingly. *)
 
 exception InvalidAction
