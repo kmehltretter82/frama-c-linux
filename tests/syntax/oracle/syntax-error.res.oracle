@@ -5,5 +5,5 @@
   3        STDOPT:
   4     */
   5     {
-         ^
+        ^
 [kernel] Frama-C aborted: invalid user input.
