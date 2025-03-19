@@ -143,6 +143,36 @@ let () =
        try Project.save_all file; None
        with Project.IOError err -> Some err)
 
+(* -------------------------------------------------------------------------- *)
+(* --- Frama-C Projects                                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
+let get_project_list () =
+  Project.fold_on_projects (fun acc t -> Project.get_unique_name t :: acc) []
+
+let () = Request.register
+    ~package ~kind:`GET ~name:"getProjects"
+    ~descr:(Md.plain "Returns the list of Frama-C projects")
+    ~input:(module Junit) ~output:(module Jlist (Jstring))
+    get_project_list
+
+let () = Request.register
+    ~package ~kind:`GET ~name:"getCurrentProject"
+    ~descr:(Md.plain "Returns the current Frama-C project")
+    ~input:(module Junit) ~output:(module Jstring)
+    (fun () -> Project.(current () |> get_unique_name))
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"setCurrentProject"
+    ~descr:(Md.plain "Changes the current Frama-C project")
+    ~input:(module Jstring) ~output:(module Junit)
+    (fun unique_name -> Project.(from_unique_name unique_name |> set_current))
+
+let () = Request.register
+    ~package ~kind:`SET ~name:"createProject"
+    ~descr:(Md.plain "Creates a new Frama-C project with the given name")
+    ~input:(module Jstring) ~output:(module Junit)
+    (fun name -> Project.create name |> Project.set_current)
 
 (* -------------------------------------------------------------------------- *)
 (* --- Log Lind                                                           --- *)
