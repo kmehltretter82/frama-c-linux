@@ -1,0 +1,34 @@
+[kernel] Parsing syntax-error.i (no preprocessing)
+[kernel] Current source was: <unknown>
+  The full backtrace is:
+  Raised by primitive operation at Stdlib__Bytes.make in file "bytes.ml", line 42, characters 10-18
+  Called from Stdlib__String.make in file "string.ml" (inlined), line 36, characters 2-12
+  Called from Frama_c_kernel__Errorloc.pp_context_from_file in file "src/kernel_internals/parsing/errorloc.ml", line 209, characters 10-29
+  Called from Frama_c_kernel__Filepath.protect_file_op in file "src/libraries/utils/filepath.ml", line 397, characters 8-17
+  Re-raised at Frama_c_kernel__Filepath.protect_file_op in file "src/libraries/utils/filepath.ml", line 401, characters 8-17
+  Called from Frama_c_kernel__Errorloc.pp_context_from_file in file "src/kernel_internals/parsing/errorloc.ml", lines 154-221, characters 4-52
+  Called from Stdlib__Format.output_acc in file "format.ml", line 1359, characters 4-20
+  Called from Stdlib__Format.kfprintf.(fun) in file "format.ml", line 1420, characters 16-34
+  Called from Frama_c_kernel__Log.logwithfinal.(fun) in file "src/kernel_services/plugin_entry_points/log.ml", line 500, characters 51-56
+  Re-raised at Frama_c_kernel__Log.logwithfinal.(fun) in file "src/kernel_services/plugin_entry_points/log.ml", line 549, characters 9-16
+  Called from Frama_c_kernel__Errorloc.parse_error.(fun) in file "src/kernel_internals/parsing/errorloc.ml", lines 294-300, characters 6-48
+  Called from Frama_c_kernel__Frontc.parse in file "src/kernel_internals/typing/frontc.ml", line 82, characters 13-31
+  Called from Frama_c_kernel__File.to_cil_cabs in file "src/kernel_services/ast_queries/file.ml", line 669, characters 12-36
+  Called from Frama_c_kernel__File.files_to_cabs_cil.(fun) in file "src/kernel_services/ast_queries/file.ml", line 730, characters 46-72
+  Called from Stdlib__List.fold_left in file "list.ml", line 123, characters 24-34
+  Called from Frama_c_kernel__File.files_to_cabs_cil in file "src/kernel_services/ast_queries/file.ml", line 730, characters 17-89
+  Called from Frama_c_kernel__File.prepare_from_c_files in file "src/kernel_services/ast_queries/file.ml", line 1838, characters 24-60
+  Called from Frama_c_kernel__File.init_from_cmdline in file "src/kernel_services/ast_queries/file.ml", line 1915, characters 4-27
+  Called from Frama_c_kernel__Ast.force_compute in file "src/kernel_services/ast_data/ast.ml", line 112, characters 2-28
+  Called from Frama_c_kernel__Ast.compute in file "src/kernel_services/ast_data/ast.ml", line 120, characters 53-71
+  Called from Frama_c_kernel__Boot.play_analysis in file "src/kernel_internals/runtime/boot.ml", line 31, characters 6-20
+  Called from Frama_c_kernel__Cmdline.play_in_toplevel_one_shot in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 951, characters 2-9
+  Called from Frama_c_kernel__Cmdline.play_in_toplevel in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 981, characters 18-64
+  Called from Frama_c_kernel__Cmdline.catch_toplevel_run in file "src/kernel_services/cmdline_parameters/cmdline.ml", line 237, characters 4-8
+  
+  Unexpected error (Invalid_argument("Bytes.create")).
+  Please report as 'crash' at https://git.frama-c.com/pub/frama-c/issues
+  Your Frama-C version is 30.0+dev (Zinc).
+  Note that a version and a backtrace alone often do not contain enough
+  information to understand the bug. Guidelines for reporting bugs are at:
+  https://git.frama-c.com/pub/frama-c/-/wikis/Guidelines-for-reporting-bugs
