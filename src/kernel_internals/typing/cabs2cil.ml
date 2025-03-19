@@ -93,7 +93,8 @@ let unsupported_attributes = ["vector_size"]
 (* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
    attributes can refer to erased functions and make the code un-reparsable *)
 let erased_attributes = ["malloc"]
-let () = Ast_attributes.register_list AttrIgnored erased_attributes
+let () = Ast_attributes.register_list ~ignore:true ~attr_class:(AttrName false)
+    erased_attributes
 
 let stripUnderscore s =
   if String.length s = 1 then begin
@@ -108,7 +109,7 @@ let stripUnderscore s =
       Kernel.error ~current:true "unsupported attribute: %s" s
     else begin
       if not (Ast_attributes.is_known res) then begin
-        Ast_attributes.register AttrIgnored res;
+        Ast_attributes.register ~attr_class:AttrUnknown res;
         Kernel.warning
           ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
           "Ignoring unknown attribute: %s" s;
@@ -118,47 +119,47 @@ let stripUnderscore s =
   end
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
-let () = Cil_printer.register_shallow_attribute frama_c_keep_block
-let () = Ast_attributes.register AttrStmt frama_c_keep_block
+let () = Ast_attributes.register_shallow ~attr_class:AttrStmt
+    frama_c_keep_block
 
+(* Already registered in Ast_attributes. *)
 let fc_stdlib = "fc_stdlib"
+
 let fc_stdlib_generated = "fc_stdlib_generated"
-let () = Cil_printer.register_shallow_attribute fc_stdlib
-let () = Cil_printer.register_shallow_attribute fc_stdlib_generated
-(* fc_stdlib attribute already registered in cil.ml *)
-let () = Ast_attributes.register (AttrName false) fc_stdlib_generated
+let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
+    fc_stdlib_generated
 
 let fc_local_static = "fc_local_static"
-let () = Cil_printer.register_shallow_attribute fc_local_static
-let () = Ast_attributes.register (AttrName false) fc_local_static
+let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
+    fc_local_static
 
 let frama_c_destructor = "fc_destructor"
-let () = Cil_printer.register_shallow_attribute frama_c_destructor
-let () = Ast_attributes.register (AttrName false) frama_c_destructor
+let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
+    frama_c_destructor
 
 let () =
   (* packed and aligned are treated separately, we ignore them
      during standard processing.
   *)
-  Ast_attributes.register AttrIgnored "packed";
-  Ast_attributes.register AttrIgnored "aligned";
-  Ast_attributes.register (AttrFunType false) "warn_unused_result";
-  Ast_attributes.register (AttrName false) "FC_OLDSTYLEPROTO";
-  Ast_attributes.register (AttrName false) "static";
-  Ast_attributes.register (AttrName false) "missingproto";
-  Ast_attributes.register AttrIgnored "dummy";
-  Ast_attributes.register AttrIgnored "signal"; (* AVR-specific attribute *)
-  Ast_attributes.register AttrIgnored "leaf";
-  Ast_attributes.register AttrIgnored "nonnull";
-  Ast_attributes.register AttrIgnored "deprecated";
-  Ast_attributes.register AttrIgnored "access";
-  Ast_attributes.register AttrIgnored "returns_twice";
-  Ast_attributes.register AttrIgnored "pure";
-  Ast_attributes.register AttrIgnored "cleanup";
-  Ast_attributes.register AttrIgnored "warning";
-  Ast_attributes.register AttrIgnored "format_arg";
-  Ast_attributes.register AttrIgnored "no_sanitize";
-  Ast_attributes.register AttrIgnored "target"
+  Ast_attributes.register ~attr_class:AttrUnknown "packed";
+  Ast_attributes.register ~attr_class:AttrUnknown "aligned";
+  Ast_attributes.register ~attr_class:(AttrFunType false) "warn_unused_result";
+  Ast_attributes.register ~attr_class:(AttrName false) "FC_OLDSTYLEPROTO";
+  Ast_attributes.register ~attr_class:(AttrName false) "static";
+  Ast_attributes.register ~attr_class:(AttrName false) "missingproto";
+  Ast_attributes.register ~attr_class:AttrUnknown "dummy";
+  Ast_attributes.register ~attr_class:AttrUnknown "signal"; (* AVR-specific attribute *)
+  Ast_attributes.register ~attr_class:AttrUnknown "leaf";
+  Ast_attributes.register ~attr_class:AttrUnknown "nonnull";
+  Ast_attributes.register ~attr_class:AttrUnknown "deprecated";
+  Ast_attributes.register ~attr_class:AttrUnknown "access";
+  Ast_attributes.register ~attr_class:AttrUnknown "returns_twice";
+  Ast_attributes.register ~attr_class:AttrUnknown "pure";
+  Ast_attributes.register ~attr_class:AttrUnknown "cleanup";
+  Ast_attributes.register ~attr_class:AttrUnknown "warning";
+  Ast_attributes.register ~attr_class:AttrUnknown "format_arg";
+  Ast_attributes.register ~attr_class:AttrUnknown "no_sanitize";
+  Ast_attributes.register ~attr_class:AttrUnknown "target"
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
@@ -4567,7 +4568,7 @@ and cabsPartitionAttributes
           ~current:true "Ignoring statement attribute %s found in declaration"
           an;
         loop (n,f,t) rest
-      | AttrIgnored -> loop (n, f, t) rest
+      | AttrUnknown -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
 

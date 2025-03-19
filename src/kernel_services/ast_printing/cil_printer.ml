@@ -109,25 +109,9 @@ let () =
       "__fc_sig_err", "SIG_ERR";
     ]
 
-(* Internal attributes. Won't be pretty-printed *)
-let reserved_attributes = ref []
-let register_shallow_attribute s =
-  reserved_attributes:=
-    (Extlib.strip_underscore s)::!reserved_attributes
-
-let () = register_shallow_attribute Ast_attributes.frama_c_ghost_else
-let () = register_shallow_attribute Ast_attributes.frama_c_ghost_formal
-let () = register_shallow_attribute Ast_attributes.frama_c_mutable
-let () = register_shallow_attribute Ast_attributes.frama_c_init_obj
-let () = register_shallow_attribute Ast_attributes.frama_c_inlined
-let () = register_shallow_attribute Ast_attributes.anonymous_attribute_name
-
-let keep_attr a =
-  not (List.mem (Ast_attributes.get_name a) !reserved_attributes)
-
 let filter_printing_attributes l =
   if Kernel.(is_debug_key_enabled dkey_print_attrs) then l
-  else List.filter keep_attr l
+  else List.filter (fun (name, _) -> Ast_attributes.should_print name) l
 
 let needs_quote =
   let regex = Str.regexp "^[A-Za-z0-9_]+$" in
@@ -1749,7 +1733,7 @@ class cil_printer () = object (self)
              (* If the function has attributes then print a prototype because
               * GCC cannot accept function attributes in a definition *)
              let oldattr = fundec.svar.vattr in
-             let oldattr' = List.filter keep_attr oldattr in
+             let oldattr' = filter_printing_attributes oldattr in
              (* Always print the file name before function declarations *)
              (* Prototype first *)
              if oldattr' <> [] then
@@ -3476,6 +3460,16 @@ let () = Cil.pp_identified_term_ref := pp_identified_term
 let () = Cil.pp_location_ref := pp_location
 let () = Cil.pp_from_ref := pp_from
 let () = Cil.pp_behavior_ref := pp_behavior
+
+(* Deprecated *)
+
+let register_shallow_attribute name =
+  match Ast_attributes.find_known name with
+  | None -> Kernel.warning ~once:true "Attribute '%s' is not registered" name
+  | Some info when not info.attr_print -> ()
+  | Some info ->
+    Ast_attributes.register_shallow ~ignore:info.attr_ignore
+      ~attr_class:info.attr_class name
 
 (*
 Local Variables:

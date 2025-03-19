@@ -6721,7 +6721,7 @@ let hasAttribute = Ast_attributes.contains
 let findAttribute = Ast_attributes.find_params
 let filterAttributes = Ast_attributes.filter
 
-let registerAttribute a ac = Ast_attributes.register ac a
+let registerAttribute a ac = Ast_attributes.register ~attr_class:ac a
 let removeAttribute = Ast_attributes.remove
 let attributeClass = Ast_attributes.get_class
 let isKnownAttribute = Ast_attributes.is_known

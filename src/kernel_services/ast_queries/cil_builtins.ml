@@ -100,7 +100,7 @@ module Builtin_functions =
 let add_builtin ?(prefix="__builtin_") s t l b =
   Builtin_functions.add (prefix ^ s) (t, l, b)
 
-let () = Ast_attributes.register (AttrName true) "FC_BUILTIN"
+let () = Ast_attributes.register ~attr_class:(AttrName true) "FC_BUILTIN"
 
 let custom_builtins = Queue.create ()
 

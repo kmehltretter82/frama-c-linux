@@ -37,12 +37,14 @@
   Ignoring unknown attribute: p1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
   Ignoring unknown attribute: p2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:54: Warning: 
+  Ignoring unknown attribute: o
 [kernel:unknown-attribute] attributes-declarations-definitions.c:56: Warning: 
   Ignoring unknown attribute: _n
 [kernel:unknown-attribute] attributes-declarations-definitions.c:58: Warning: 
   Ignoring unknown attribute: e_
 [kernel] attributes-declarations-definitions.c:62: User Error: 
-  unsupported attribute: vector_size
+  Unsupported attribute: vector_size
 [kernel] User Error: stopping on file "attributes-declarations-definitions.c" that has errors. Add
   '-kernel-msg-key pp' for preprocessing command.
 [kernel] Frama-C aborted: invalid user input.

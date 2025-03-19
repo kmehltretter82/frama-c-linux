@@ -60,9 +60,6 @@ val pp_predicate_kind :
 
 val get_termination_kind_name: Cil_types.termination_kind -> string
 
-val register_shallow_attribute: string -> unit
-(** Register an attribute that will never be pretty printed. *)
-
 val state: Printer_api.state
 
 val print_global: Cil_types.global -> bool
@@ -84,6 +81,10 @@ val set_extension_handler:
 *)
 [@@alert acsl_extension_handler
     "This function can only be called by Acsl_extension"]
+
+val register_shallow_attribute: string -> unit
+(** Register an attribute that will never be pretty printed. *)
+[@@deprecated "Register your attribute with Ast_attributes.register_noprint instead."]
 
 
 (*

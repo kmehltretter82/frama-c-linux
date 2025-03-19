@@ -96,66 +96,90 @@ type attribute_class =
   | AttrFunType of bool
   | AttrType
   | AttrStmt
-  | AttrIgnored
+  | AttrUnknown
+
+type attribute_info = {
+  attr_class : attribute_class;
+  attr_ignore: bool;
+  attr_print : bool;
+}
+
+let pp_class fmt = function
+  | AttrName    b -> Format.fprintf fmt "AttrName %b" b
+  | AttrFunType b -> Format.fprintf fmt "AttrFunType %b" b
+  | AttrType      -> Format.fprintf fmt "AttrType"
+  | AttrStmt      -> Format.fprintf fmt "AttrStmt"
+  | AttrUnknown   -> Format.fprintf fmt "AttrUnknown"
+
+let pp_info fmt ai =
+  Format.fprintf fmt "{attr_class: %a; attr_ignore: %b; attr_print: %b}"
+    pp_class ai.attr_class
+    ai.attr_ignore
+    ai.attr_print
 
 (* This table contains the mapping of predefined attributes to classes.
  * Extend this table with more attributes as you need. This table is used to
  * determine how to associate attributes with names or type during cabs2cil
  * conversion *)
-let known_table : (string, attribute_class) Hashtbl.t = Hashtbl.create 59
+let known_table : (string, attribute_info) Hashtbl.t = Hashtbl.create 59
 
-let register ac an =
-  if Hashtbl.mem known_table an then begin
-    let pp fmt c =
-      match c with
-      | AttrName b -> Format.fprintf fmt "(AttrName %B)" b
-      | AttrFunType b -> Format.fprintf fmt "(AttrFunType %B)" b
-      | AttrType -> Format.fprintf fmt "AttrType"
-      | AttrIgnored -> Format.fprintf fmt "AttrIgnored"
-      | AttrStmt -> Format.fprintf fmt "AttrStmt"
-    in
+let register ?(print=true) ?ignore ~attr_class an =
+  let attr_ignore = Option.value ~default:(attr_class=AttrUnknown) ignore in
+  let nc = {attr_class; attr_print = print; attr_ignore} in
+  if Hashtbl.mem known_table an then
     Kernel.warning
-      "Replacing existing class for attribute %s: was %a, now %a"
-      an pp (Hashtbl.find known_table an) pp ac
-  end;
-  Hashtbl.replace known_table an ac
+      "Replacing existing class and status for attribute %s: was (%a), now (%a)"
+      an pp_info (Hashtbl.find known_table an) pp_info nc;
+  Hashtbl.replace known_table an nc
 
-let register_list ac al =
-  List.iter (register ac) al
+let register_shallow = register ~print:false
+
+let register_list ?print ?ignore ~attr_class al =
+  List.iter (register ?print ?ignore ~attr_class) al
 
 let remove = Hashtbl.remove known_table
 
-let get_class ~default name =
-  match Hashtbl.find known_table name with
-  | exception Not_found -> default
-  | AttrIgnored -> default
-  | ac -> ac
+let find_known = Hashtbl.find_opt known_table
 
 let is_known = Hashtbl.mem known_table
 
-let partition
-    ~(default:attribute_class)
-    (attrs:  attribute list) :
-  attribute list * attribute list * attribute list =
+let get_class ~default name =
+  match (Hashtbl.find known_table name).attr_class with
+  | exception Not_found -> default
+  | AttrUnknown -> default
+  | ac -> ac
+
+let should_print name =
+  match find_known name with
+  | None -> true
+  | Some info -> info.attr_print
+
+let should_ignore name =
+  match find_known name with
+  | None -> true
+  | Some info -> info.attr_ignore
+
+let partition ~(default:attribute_class) (attrs:  attributes) :
+  attributes * attributes * attributes =
   let rec loop (n,f,t) = function
     | [] -> n, f, t
     | ((an, _) as a) :: rest ->
       match get_class ~default an with
-        AttrName _ -> loop (add a n, f, t) rest
+      | AttrName _ -> loop (add a n, f, t) rest
       | AttrFunType _ ->
         loop (n, add a f, t) rest
       | AttrType -> loop (n, f, add a t) rest
       | AttrStmt ->
         Kernel.warning "unexpected statement attribute %s" an;
         loop (n,f,t) rest
-      | AttrIgnored -> loop (n, f, t) rest
+      | AttrUnknown -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
 
 (* Registering some attributes. *)
 
 let () =
-  register_list (AttrName false)
+  register_list ~attr_class:(AttrName false)
     [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
       "no_instrument_function"; "alias"; "no_check_memory_usage";
       "exception"; "model"; "aconst";
@@ -164,58 +188,59 @@ let () =
 
 let () =
   (* Now come the MSVC declspec attributes *)
-  register_list (AttrName true)
+  register_list ~attr_class:(AttrName true)
     [ "thread"; "naked"; "dllimport"; "dllexport"; "selectany"; "allocate";
       "nothrow"; "novtable"; "property"; "uuid"; "align" ]
 
 let () =
-  register_list (AttrFunType false)
+  register_list ~attr_class:(AttrFunType false)
     [ "format"; "regparm"; "longcall"; "noinline"; "always_inline" ]
 
 let () =
-  register_list (AttrFunType true)
+  register_list ~attr_class:(AttrFunType true)
     [ "stdcall";"cdecl"; "fastcall"; "noreturn" ]
 
 let () =
   (* GCC label and statement attributes. *)
-  register_list AttrStmt
+  register_list ~attr_class:AttrStmt
     [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
 
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
-let () = register AttrType bitfield_attribute_name
-
-let anonymous_attribute_name = "fc_anonymous"
-let () = register AttrIgnored anonymous_attribute_name
-
-let anonymous_attribute = (anonymous_attribute_name, [])
+let () = register ~attr_class:AttrType bitfield_attribute_name
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
-let () = register_list AttrType qualifier_attributes
+let () =
+  register_list ~attr_class:AttrType qualifier_attributes
 
 let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
-let () = register_list AttrIgnored fc_internal_attributes
+let () = register_list ~ignore:true ~attr_class:AttrType ["declspec"; "arraylen"]
+let () = register_shallow ~ignore:true ~attr_class:(AttrName false) "fc_stdlib"
 
 let cast_irrelevant_attributes = ["visibility"]
-let () = register_list AttrType cast_irrelevant_attributes
+let () = register_list ~attr_class:AttrType cast_irrelevant_attributes
 
 let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
 
 let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
 
+let anonymous_attribute_name = "fc_anonymous"
+let () = register_shallow ~attr_class:AttrUnknown anonymous_attribute_name
+let anonymous_attribute = (anonymous_attribute_name, [])
+
 let frama_c_ghost_else = "fc_ghost_else"
-let () = register AttrStmt frama_c_ghost_else
+let () = register_shallow ~attr_class:AttrStmt frama_c_ghost_else
 
 let frama_c_ghost_formal = "fc_ghost_formal"
-let () = register (AttrName false) frama_c_ghost_formal
+let () = register_shallow ~attr_class:(AttrName false) frama_c_ghost_formal
 
 let frama_c_init_obj = "fc_initialized_object"
-let () = register (AttrName false) frama_c_init_obj
+let () = register_shallow ~attr_class:(AttrName false) frama_c_init_obj
 
 let frama_c_mutable = "fc_mutable"
-let () = register (AttrName false) frama_c_mutable
+let () = register_shallow ~attr_class:(AttrName false) frama_c_mutable
 
 let frama_c_inlined = "fc_inlined"
-let () = register (AttrFunType false) frama_c_inlined
+let () = register_shallow ~attr_class:(AttrFunType false) frama_c_inlined
 
 (* Forward declaration from Cil_datatype. *)
 
@@ -229,12 +254,7 @@ let () =
 
 let () =
   Cil_datatype.drop_ignored_attributes :=
-    let keep_attr (name, _) =
-      match Hashtbl.find_opt known_table name with
-      | None -> false
-      | Some AttrIgnored -> false
-      | Some _ -> true
-    in
+    let keep_attr (name, _) = not (should_ignore name) in
     (fun attributes -> List.filter keep_attr attributes)
 
 (**********************)
@@ -249,11 +269,10 @@ let split_array_attributes al =
 
 let split_storage_modifiers al =
   let isstoragemod ((an, _) : attribute) : bool =
-    try
-      match Hashtbl.find known_table an with
-      | AttrName issm -> issm
-      | _ -> false
-    with Not_found -> false
+    match (Hashtbl.find known_table an).attr_class with
+    | exception Not_found -> false
+    | AttrName issm -> issm
+    | _ -> false
   in
   let stom, rest = List.partition isstoragemod al in
   if not (Machine.msvcMode ()) then stom, rest

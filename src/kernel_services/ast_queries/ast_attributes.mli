@@ -131,13 +131,13 @@ val filter : string -> attributes -> attributes
 (* **************************************** *)
 
 type attribute_class =
-  (** Attribute of a name. If argument is true and we are on MSVC then
+  (** Attribute of a name. If argument is [true] and we are on MSVC then
       the attribute is printed using __declspec as part of the storage
       specifier.
   *)
   | AttrName of bool
 
-  (** Attribute of a function type. If argument is true and we are on
+  (** Attribute of a function type. If argument is [true] and we are on
       MSVC then the attribute is printed just before the function name.
   *)
   | AttrFunType of bool
@@ -148,39 +148,73 @@ type attribute_class =
   (** Attribute of a statement or a block. *)
   | AttrStmt
 
-  (** Attribute that does not correspond to either of the above classes. It is
-      assigned a default class by {!get_class} and can lead to attributes
-      being ignored by {!partition}. It will also be ignored when comparing
-      types, see {!Cil_datatype.drop_ignored_attributes}.
+  (** Attribute with unknown class. It is assigned a default class by
+      {!get_class} and can lead to attributes being ignored by {!partition}.
   *)
-  | AttrIgnored
+  | AttrUnknown
+
+(** Registered informations about an attribute. We register its class, if it
+    should be printed or not, and if it should be ignored when comparing
+    types. *)
+type attribute_info = {
+  attr_class : attribute_class;
+  attr_ignore: bool;
+  attr_print : bool;
+}
 
 (** Table containing all registered attributes. *)
-val known_table : (string, attribute_class) Hashtbl.t
+val known_table : (string, attribute_info) Hashtbl.t
 
-(** Add a new attribute with a specified class *)
-val register : attribute_class -> string -> unit
+(** Add a new attribute with a specified class, if it should be printed
+    (default is [true]) and ignore when comparing types (default if [false]).
+*)
+val register : ?print:bool -> ?ignore:bool -> attr_class:attribute_class ->
+  string -> unit
 
-(** Register a list of attributes with a given class. *)
-val register_list : attribute_class -> string list ->  unit
+(** Same as {!register} but with [print] set to [false]. *)
+val register_shallow : ?ignore:bool -> attr_class:attribute_class -> string ->
+  unit
+
+(** Call {!register} on a list of attributes with the same class and print
+    status.
+*)
+val register_list : ?print:bool -> ?ignore:bool -> attr_class:attribute_class ->
+  string list -> unit
 
 (** Remove an attribute previously registered. *)
 val remove : string -> unit
+
+(** [is_known_attribute attrname] returns [true] if the attribute named
+    [attrname] is known (registered) by Frama-C.
+*)
+val is_known : string -> bool
+
+(** [find_known attrname] returns [Some attrinfo] if the attribute named
+    [attrname] is known (registered) by Frama-C, [None] otherwise.
+*)
+val find_known : string -> attribute_info option
 
 (** Return the class of an attribute. The class `default' is returned for
     unknown and ignored attributes.
 *)
 val get_class : default:attribute_class -> string -> attribute_class
 
-(** [is_known_attribute attrname] returns true if the attribute named
-    [attrname] is known by Frama-C.
+(** [should_print attrname] return the field [attr_print] of the attribute
+    named [attrname] if it is known (registered) by Frama-C, and return [true]
+    otherwise.
 *)
-val is_known : string -> bool
+val should_print : string -> bool
 
-(** Partition the attributes into classes: name, function type and
-    type. Statement attributes are removed with a warning, Unknown and Ignored
-    attributes are returned in the `default` attribute class. If this class
-    is [AttrIgnored], they are removed like [AttrStmt] without warning.
+(** [should_ignore attrname] return the field [attr_ignore] of the attribute
+    named [attrname] if it is known (registered) by Frama-C, and return [false]
+    otherwise.
+*)
+val should_ignore : string -> bool
+
+(** Partition the attributes into classes: name, function type and type.
+    Statement attributes are removed with a warning, Unknown attributes are
+    returned in the `default` attribute class. If this class is [AttrUnknown],
+    again, they are removed like [AttrStmt] without warning.
 *)
 val partition : default:attribute_class -> attributes ->
   attributes * (* AttrName *)
