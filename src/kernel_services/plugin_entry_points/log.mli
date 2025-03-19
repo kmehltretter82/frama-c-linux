@@ -44,7 +44,9 @@ type 'a pretty_printer =
   ('a,formatter,unit) format -> 'a
 (**
     Generic type for the various logging channels which are not aborting
-    Frama-C.
+    Frama-C. The first line will be prefixed (plugin name, location, message
+    kind, etc.), consider skipping the first line (by adding a new line) if you
+    want to keep the message alignment on multi-lines messages.
    - When [current] is [false] (default for most of the channels),
      no location is output. When it is [true], the last registered location
      is used as current (see {!Current_loc}).
