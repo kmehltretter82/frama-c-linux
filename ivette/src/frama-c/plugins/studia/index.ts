@@ -51,12 +51,12 @@ async function computeStudiaSelection(
     const title =
       `Statements ${access} the memory location pointed by ${descr}.`;
     Locations.setSelection({
-      plugin: 'Studia', label, title, markers, index: 0
+      plugin: 'Studia', label, title, markers,
     });
   } else {
     const label = `No ${kind.toLowerCase()} to ${descr}`;
     Locations.setSelection({
-      plugin: 'Studia', label, markers: [], index: 0
+      plugin: 'Studia', label, markers: []
     });
   }
 }
