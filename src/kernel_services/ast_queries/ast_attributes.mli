@@ -203,7 +203,7 @@ val register : ?print:bool -> ?ignore:bool -> attr_class:attribute_class ->
   string -> unit
 
 (** Same as {!register} but with [print] set to [false]. *)
-val register_shallow : ?ignore:bool -> attr_class:attribute_class -> string ->
+val register_noprint : ?ignore:bool -> attr_class:attribute_class -> string ->
   unit
 
 (** Call {!register} on a list of attributes with the same class and print

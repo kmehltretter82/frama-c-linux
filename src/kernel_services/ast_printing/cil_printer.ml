@@ -3468,7 +3468,7 @@ let register_shallow_attribute name =
   | None -> Kernel.warning ~once:true "Attribute '%s' is not registered" name
   | Some info when not info.attr_print -> ()
   | Some info ->
-    Ast_attributes.register_shallow ~ignore:info.attr_ignore
+    Ast_attributes.register_noprint ~ignore:info.attr_ignore
       ~attr_class:info.attr_class name
 
 (*

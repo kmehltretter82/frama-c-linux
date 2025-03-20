@@ -132,7 +132,7 @@ let register ?(print=true) ?ignore ~attr_class an =
       an pp_info (Hashtbl.find known_table an) pp_info nc;
   Hashtbl.replace known_table an nc
 
-let register_shallow = register ~print:false
+let register_noprint = register ~print:false
 
 let register_list ?print ?ignore ~attr_class al =
   List.iter (register ?print ?ignore ~attr_class) al
@@ -198,7 +198,7 @@ let () = register ~attr_class:(AttrName false) "static"
 let anonymous_attribute_name = "fc_anonymous"
 let anonymous_attribute = (anonymous_attribute_name, [])
 
-let () = register_shallow ~attr_class:AttrUnknown anonymous_attribute_name
+let () = register_noprint ~attr_class:AttrUnknown anonymous_attribute_name
 
 (* AttrType attributes. *)
 
@@ -250,7 +250,7 @@ let () =
 
 let frama_c_inlined = "fc_inlined"
 
-let () = register_shallow ~ignore:true ~attr_class:(AttrFunType false)
+let () = register_noprint ~ignore:true ~attr_class:(AttrFunType false)
     frama_c_inlined
 
 let () = register ~attr_class:(AttrFunType false) "warn_unused_result"
@@ -312,7 +312,7 @@ let () =
 
 (* GCC 'malloc' attributes can refer to erased functions and make the code
    un-reparsable, so we keep them in the AST but not pretty-print them. *)
-let () = register_shallow ~ignore:true ~attr_class:AttrUnknown "malloc"
+let () = register_noprint ~ignore:true ~attr_class:AttrUnknown "malloc"
 
 (**********************)
 (* Unknown attributes *)
