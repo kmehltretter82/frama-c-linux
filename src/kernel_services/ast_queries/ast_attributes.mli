@@ -83,16 +83,17 @@ val frama_c_inlined : string
 
 (** Name of the attribute inserted by the elaboration to prevent user blocks
     from disappearing. It can be removed whenever block contracts have been
-    processed. *)
+    processed.
+*)
 val frama_c_keep_block : string
 
 (** Name of the attribute used to store the function that should be called
-    when the corresponding variable exits its scope. *)
+    when the corresponding variable exits its scope.
+*)
 val frama_c_destructor : string
 
 (** Name of the attribute used to indicate that a given static variable has a
     local syntactic scope (despite a global lifetime).
-    @since Chlorine-20180501
 *)
 val fc_local_static : string
 

@@ -832,7 +832,7 @@ let init ?(all=true) () =
 
 (* Ignores some attributes that are irrelevant for mergecil, e.g. fc_stdlib *)
 let drop_attributes_for_merge attrs =
-  Ast_attributes.drop_list ["fc_stdlib"; "fc_stdlib_generated"] attrs
+  Ast_attributes.(drop_list [fc_stdlib; fc_stdlib_generated] attrs)
 
 let equal_attributes_for_merge attrs1 attrs2 =
   Cil_datatype.Attributes.equal (drop_attributes_for_merge attrs1)
@@ -1649,15 +1649,15 @@ let oneFilePass1 (f:file) : unit =
             end else Kernel.abort "%s" msg (* Fail if both variables are used. *)
           end
       in
-      if Ast_attributes.contains "fc_stdlib" oldvi.vattr then begin
-        let attrprm = Ast_attributes.find_params "fc_stdlib" oldvi.vattr in
+      if Ast_attributes.(contains fc_stdlib oldvi.vattr) then begin
+        let attrprm = Ast_attributes.(find_params fc_stdlib oldvi.vattr) in
         let attrprm =
-          if Ast_attributes.contains "fc_stdlib" vi.vattr then begin
-            Ast_attributes.find_params "fc_stdlib" vi.vattr @ attrprm
+          if Ast_attributes.(contains fc_stdlib vi.vattr) then begin
+            Ast_attributes.(find_params fc_stdlib vi.vattr @ attrprm)
           end else attrprm
         in
-        let attrs = Ast_attributes.drop "fc_stdlib" newrep.ndata.vattr in
-        let attrs = Ast_attributes.add ("fc_stdlib", attrprm) attrs in
+        let attrs = Ast_attributes.(drop fc_stdlib newrep.ndata.vattr) in
+        let attrs = Ast_attributes.(add (fc_stdlib, attrprm) attrs) in
         newrep.ndata.vattr <- attrs;
       end;
       newrep.ndata.vdefined <- vi.vdefined || oldvi.vdefined;

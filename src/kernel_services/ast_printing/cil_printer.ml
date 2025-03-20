@@ -127,7 +127,7 @@ let print_global g =
   (* This function decides whether to hide functions in Frama-C's libc. *)
   let attrs = Cil_datatype.Global.attr g in
   let printable =
-    not (Ast_attributes.contains "fc_stdlib" attrs)
+    not (Ast_attributes.(contains fc_stdlib attrs))
     || Kernel.PrintLibc.get()
   in
   let print_var v =
@@ -150,7 +150,7 @@ let print_std_includes fmt globs =
     in
     let add_file acc g =
       let attrs = Cil_datatype.Global.attr g in
-      Ast_attributes.find_params "fc_stdlib" attrs
+      Ast_attributes.(find_params fc_stdlib attrs)
       |> List.fold_left extract_file acc
     in
     let includes = List.fold_left add_file Datatype.String.Set.empty globs in

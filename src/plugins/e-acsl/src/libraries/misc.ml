@@ -39,7 +39,7 @@ let is_fc_or_compiler_builtin vi =
    && Functions.Libc.has_replacement vi.vname)
 
 let is_fc_stdlib_generated vi =
-  Ast_attributes.contains "fc_stdlib_generated" vi.vattr
+  Ast_attributes.(contains fc_stdlib_generated vi.vattr)
 
 (* ************************************************************************** *)
 (** {2 Handling \result} *)

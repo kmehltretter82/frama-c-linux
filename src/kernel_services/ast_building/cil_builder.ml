@@ -95,7 +95,7 @@ struct
     | _ -> raise NotACType
 
   let const typ = attribute typ "const" []
-  let stdlib_generated typ = attribute typ "fc_stdlib_generated" []
+  let stdlib_generated typ = attribute typ Ast_attributes.fc_stdlib_generated []
 
 
   (* Conversion *)
@@ -1349,7 +1349,7 @@ struct
     add_attribute (attr, params)
 
   let add_stdlib_generated () =
-    add_new_attribute "fc_stdlib_generated" []
+    add_new_attribute Ast_attributes.fc_stdlib_generated []
 
 
   (* Behaviors *)

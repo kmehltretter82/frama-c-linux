@@ -2574,7 +2574,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           oldvi.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
           let what =
             if isadef then
-              CombineFundef (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr)
+              CombineFundef (Ast_attributes.(contains fc_oldstyleproto vi.vattr))
             else CombineOther
           in
           let mytype = combineTypes what oldvi.vtype vi.vtype in
@@ -2586,7 +2586,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                raise Cannot_combine if necessary. However, due to old-style
                prototypes in GCC machdeps, we must support eccentric cases,
                for which we perform no such additional verification. *)
-            if not (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr) then
+            if not (Ast_attributes.(contains fc_oldstyleproto vi.vattr)) then
               ignore (compatibleTypes oldvi.vtype vi.vtype)
           end;
           Cil.update_var_type oldvi mytype;
@@ -2656,7 +2656,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         let vi = alphaConvertVarAndAddToEnv true vi in
         (* update the field [vdefined] *)
         if isadef then vi.vdefined <- true;
-        vi.vattr <- Ast_attributes.drop "FC_OLDSTYLEPROTO" vi.vattr;
+        vi.vattr <- Ast_attributes.(drop fc_oldstyleproto vi.vattr);
         vi.vattr <- fc_stdlib_attribute vi.vattr;
         vi, false
       end
@@ -6318,7 +6318,8 @@ and doExp local_env
                 Kernel.debug ~dkey:Kernel.dkey_typing_global
                   "Calling function %s without prototype." n ;
                 let ftype =
-                  mk_tfun ~tattr:[("missingproto",[])] intType None false
+                  let tattr = [(Ast_attributes.fc_missingproto, [])] in
+                  mk_tfun ~tattr intType None false
                 in
                 (* Add a prototype to the environment *)
                 let proto, _ =
@@ -6366,7 +6367,7 @@ and doExp local_env
       let argTypesList = argsToList argTypes in
       let warn_no_proto f =
         (* Do not punish twice users of completely undeclared functions. *)
-        if not (Ast_types.has_attribute "missingproto" f.vtype) then
+        if not (Ast_types.has_attribute Ast_attributes.fc_missingproto f.vtype) then
           Kernel.warning ~source:(fst loc) ~wkey:Kernel.wkey_no_proto
             "Calling function %a that is declared without prototype.@ \
              Its formals will be inferred from actual arguments.@ \

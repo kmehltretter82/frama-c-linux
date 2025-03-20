@@ -516,14 +516,14 @@ global:
     (* Make the function declarator *)
     doDeclaration None dloc []
       [((f, PROTO(JUSTBASE, pardecl,[],isva),
-        ["FC_OLDSTYLEPROTO",[]], floc), NO_INIT)]
+        [Ast_attributes.fc_oldstyleproto,[]], floc), NO_INIT)]
   }
 | f=IDENT LPAREN RPAREN SEMICOLON {
     let dloc = Cil_datatype.Location.of_lexing_loc $loc in
     let floc = Cil_datatype.Location.of_lexing_loc $loc(f) in
     doDeclaration None dloc []
       [((f, PROTO(JUSTBASE,[],[],false),
-        ["FC_OLDSTYLEPROTO",[]], floc), NO_INIT)]
+        [Ast_attributes.fc_oldstyleproto,[]], floc), NO_INIT)]
   }
 ;
 
@@ -1432,7 +1432,7 @@ direct_old_proto_decl:
 | direct_decl LPAREN old_parameter_list_ne RPAREN old_pardef_list {
     let n, decl, floc = $1 in
     let par_decl, isva = doOldParDecl floc $3 $5 in
-    (n, PROTO(decl, par_decl, [],isva), ["FC_OLDSTYLEPROTO",[]], floc)
+    (n, PROTO(decl, par_decl, [],isva), [Ast_attributes.fc_oldstyleproto,[]], floc)
   }
 /* (* appears sometimesm but generates a shift-reduce conflict. *)
 | LPAREN STAR direct_decl LPAREN old_parameter_list_ne RPAREN RPAREN
