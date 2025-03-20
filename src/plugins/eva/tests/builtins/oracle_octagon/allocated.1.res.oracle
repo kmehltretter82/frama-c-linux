@@ -1,21 +1,20 @@
-135a136,137
+135a136,139
 > [eva] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_7
-146a149,150
+> [eva] allocated.c:87: Call to builtin free
+> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+146a151,152
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva] allocated.c:87: Call to builtin free
-156a161,162
+156a163,164
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva] allocated.c:87: Call to builtin free
-166a173,174
+166a175,176
 > [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
 > [eva] allocated.c:87: Call to builtin free
-176,177c184,185
-< [eva] allocated.c:82: Call to builtin malloc
+177,178d186
 < [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_7
----
-> [eva] allocated.c:87: Call to builtin free
-> [eva:malloc] allocated.c:87: strong free on bases: {__malloc_main_l82_7}
+< [eva] allocated.c:82: Call to builtin malloc
 223a232,245
 > [eva] allocated.c:82: Call to builtin malloc
 > [eva:malloc:new] allocated.c:82: allocating variable __malloc_main_l82_31

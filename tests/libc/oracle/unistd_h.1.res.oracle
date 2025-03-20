@@ -249,10 +249,28 @@
 [eva] computing for function setresgid <- main.
   Called from unistd_h.c:63.
 [eva] Done for function setresgid
+[eva] computing for function setresgid <- main.
+  Called from unistd_h.c:63.
+[eva] Done for function setresgid
+[eva] computing for function setresgid <- main.
+  Called from unistd_h.c:63.
+[eva] Done for function setresgid
 [eva] unistd_h.c:64: assertion got status valid.
 [eva] computing for function getpid <- main.
   Called from unistd_h.c:66.
 [eva] using specification for function getpid
+[eva] Done for function getpid
+[eva] computing for function getpid <- main.
+  Called from unistd_h.c:66.
+[eva] Done for function getpid
+[eva] computing for function getpid <- main.
+  Called from unistd_h.c:66.
+[eva] Done for function getpid
+[eva] computing for function getpid <- main.
+  Called from unistd_h.c:66.
+[eva] Done for function getpid
+[eva] computing for function getpid <- main.
+  Called from unistd_h.c:66.
 [eva] Done for function getpid
 [eva] computing for function getpid <- main.
   Called from unistd_h.c:66.

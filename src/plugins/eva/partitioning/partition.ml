@@ -670,7 +670,7 @@ struct
       in
       List.fold_left add acc (f key_state)
     in
-    List.fold_left transfer [] p
+    List.rev (List.fold_left transfer [] p)
 
   let iter (f : key -> state -> unit) (p : t) : unit =
     List.iter (fun (k, x) -> f k x) p

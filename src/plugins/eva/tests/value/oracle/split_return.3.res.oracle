@@ -27,9 +27,9 @@
   Called from split_return.i:53.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
-[eva] split_return.i:54: Frama_C_show_each_f2: {5}, {5}
 [eva] split_return.i:54: Frama_C_show_each_f2: {7}, {5}
+[eva] split_return.i:54: Frama_C_show_each_f2: {5}, {5}
+[eva] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
 [eva] split_return.i:56: assertion got status valid.
 [eva] split_return.i:58: Frama_C_show_each_f2_2: {5}, {5}
 [eva] split_return.i:58: Frama_C_show_each_f2_2: {7}, {5}
@@ -64,8 +64,8 @@
   Called from split_return.i:99.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] split_return.i:102: assertion got status valid.
 [eva] split_return.i:104: assertion got status valid.
 [eva] Recording results for main4
@@ -76,8 +76,8 @@
   Called from split_return.i:99.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -86,8 +86,8 @@
   Called from split_return.i:99.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main4 <- main.
@@ -96,8 +96,8 @@
   Called from split_return.i:99.
 [eva] Recording results for f4
 [eva] Done for function f4
-[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] split_return.i:100: Frama_C_show_each_f4: {7}, {5}
+[eva] split_return.i:100: Frama_C_show_each_f4: {4}, {0}
 [eva] Recording results for main4
 [eva] Done for function main4
 [eva] computing for function main5 <- main.
@@ -106,8 +106,8 @@
   Called from split_return.i:122.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
 [eva] split_return.i:123: Frama_C_show_each_f5: {-2}, {0}
+[eva] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
 [eva] split_return.i:125: assertion got status valid.
 [eva] split_return.i:127: assertion got status valid.
 [eva] Recording results for main5

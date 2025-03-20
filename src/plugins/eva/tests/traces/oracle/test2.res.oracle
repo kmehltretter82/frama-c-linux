@@ -54,7 +54,7 @@ c -> 1
     35 -> finalize_call: loop -> 36
     36 -> Assign: tmp = \result<loop> -> 37
     37 -> LeaveScope: \result<loop> -> 38
-    38 -> EnterScope: \result<main> -> 79
+    38 -> EnterScope: \result<main> -> 81
     39 -> EnterScope: j -> 40
     40 -> Assign: j = tmp -> 41
     41 -> EnterScope: i -> 43
@@ -78,7 +78,7 @@ c -> 1
     75 -> finalize_call: loop -> 76
     76 -> Assign: tmp = \result<loop> -> 77
     77 -> LeaveScope: \result<loop> -> 78
-    78 -> EnterScope: \result<main> -> 81
+    78 -> EnterScope: \result<main> -> 79
     79 -> Assign: \result<main> = tmp -> 80
     80 -> join -> 83
     81 -> Assign: \result<main> = tmp -> 82

@@ -11,17 +11,17 @@
 [eva] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ [--..--]
-  p.x ∈ {2}
-   .y ∈ {1; 2}
+  nondet ∈ {0}
+  p{.x; .y} ∈ {1}
   q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ {0}
-  p{.x; .y} ∈ {1}
+  nondet ∈ [--..--]
+  p.x ∈ {2}
+   .y ∈ {1; 2}
   q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
@@ -39,6 +39,25 @@
 [eva] narrow_behaviors.i:57: 
   Frama_C_dump_each:
   # cvalue:
+  nondet ∈ {0}
+  p{.x; .y} ∈ {1}
+  q.x ∈ {1; 2}
+   .y ∈ {1}
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] narrow_behaviors.i:57: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ {0}
+  p.x ∈ {2}
+   .y ∈ {1; 2}
+  q.x ∈ {1; 2}
+   .y ∈ {1}
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] narrow_behaviors.i:57: 
+  Frama_C_dump_each:
+  # cvalue:
   nondet ∈ [--..--]
   p.x ∈ {2}
    .y ∈ {1; 2}
@@ -46,39 +65,21 @@
    .y ∈ {1; 2}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
-  Frama_C_dump_each:
-  # cvalue:
-  nondet ∈ {0}
-  p.x ∈ {2}
-   .y ∈ {1; 2}
-  q.x ∈ {1; 2}
-   .y ∈ {1}
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
-  Frama_C_dump_each:
-  # cvalue:
-  nondet ∈ {0}
-  p{.x; .y} ∈ {1}
-  q.x ∈ {1; 2}
-   .y ∈ {1}
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
+[eva] narrow_behaviors.i:61: assertion got status valid.
 [eva:alarm] narrow_behaviors.i:61: Warning: assertion got status unknown.
-[eva] computing for function f1 <- main.
-  Called from narrow_behaviors.i:62.
-[eva] narrow_behaviors.i:62: 
-  function f1, behavior b: assumes got status invalid; behavior not evaluated.
-[eva] narrow_behaviors.i:62: 
-  function f1, behavior c: assumes got status invalid; behavior not evaluated.
-[eva] Done for function f1
 [eva] computing for function f1 <- main.
   Called from narrow_behaviors.i:62.
 [eva] narrow_behaviors.i:62: 
   function f1, behavior a: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:62: 
   function f1, behavior d: assumes got status invalid; behavior not evaluated.
+[eva] Done for function f1
+[eva] computing for function f1 <- main.
+  Called from narrow_behaviors.i:62.
+[eva] narrow_behaviors.i:62: 
+  function f1, behavior b: assumes got status invalid; behavior not evaluated.
+[eva] narrow_behaviors.i:62: 
+  function f1, behavior c: assumes got status invalid; behavior not evaluated.
 [eva] Done for function f1
 [eva] narrow_behaviors.i:62: 
   Frama_C_dump_each:
@@ -99,13 +100,6 @@
 [eva] computing for function f2 <- main.
   Called from narrow_behaviors.i:63.
 [eva] narrow_behaviors.i:63: 
-  function f2, behavior b: assumes got status invalid; behavior not evaluated.
-[eva] narrow_behaviors.i:63: 
-  function f2, behavior c: assumes got status invalid; behavior not evaluated.
-[eva] Done for function f2
-[eva] computing for function f2 <- main.
-  Called from narrow_behaviors.i:63.
-[eva] narrow_behaviors.i:63: 
   function f2, behavior a: assumes got status invalid; behavior not evaluated.
 [eva] narrow_behaviors.i:63: 
   function f2, behavior d: assumes got status invalid; behavior not evaluated.
@@ -113,6 +107,13 @@
   function f2, behavior c: this postcondition evaluates to false in this
   context. If it is valid, either a precondition was not verified for this
   call, or some assigns/from clauses are incomplete (or incorrect).
+[eva] Done for function f2
+[eva] computing for function f2 <- main.
+  Called from narrow_behaviors.i:63.
+[eva] narrow_behaviors.i:63: 
+  function f2, behavior b: assumes got status invalid; behavior not evaluated.
+[eva] narrow_behaviors.i:63: 
+  function f2, behavior c: assumes got status invalid; behavior not evaluated.
 [eva] Done for function f2
 [eva] narrow_behaviors.i:63: 
   Frama_C_dump_each:
