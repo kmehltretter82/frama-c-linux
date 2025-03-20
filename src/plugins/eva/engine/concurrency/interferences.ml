@@ -22,217 +22,236 @@
 
 open Lattice_bounds
 
-type 'a domain = (module Abstract.Domain.External with type state = 'a)
+module ALoc = Analysis_location.Local
+module AlocMap = ALoc.Map
+module MutexesMap = Map.Make (Mutex.Set)
+
 type thread_id = int
 
 let dkey = Self.register_category "interferences"
 
+let pp_map iteri pp_key pp_val fmt map =
+  let pp fmt k v =
+    Format.fprintf fmt "@,%a:@;<1 2>@[<hov>%a@]" pp_key k pp_val v
+  in
+  iteri (pp fmt) map
 
-(* Interferences type *)
 
-module ThreadTable = Thread.Hashtbl
-module MutexesMap =
+(* Set of interferences stored as a map from the set of mutexes surely
+   locked to the corresponding interferences states. *)
+
+module ByMutexes (Dom : Abstract.Domain.External) =
 struct
-  include Map.Make (Mutex.Set)
+  type t = Dom.t or_top MutexesMap.t
 
-  let pretty pp_state =
-    Pretty_utils.pp_iter2 ~sep:"@ " ~between:" -> "
-      iter Mutex.Set.pretty pp_state
+  let pretty : Format.formatter -> t -> unit =
+    let pp_val = Top.pretty Dom.pretty
+    and pp_key = Mutex.Set.pretty in
+    pp_map MutexesMap.iter pp_key pp_val
+
+  let equal : t -> t -> bool = MutexesMap.equal (Top.equal Dom.equal)
 end
 
-type 'a widening = {
-  widening_counter : int;
-}
-type 'a with_widening = 'a * 'a widening
 
-type 'a interferences = {
-  states : ('a with_widening or_top MutexesMap.t) ThreadTable.t;
-  structure : 'a Abstract.Domain.structure;
-  mutable shared_bases : Base.Hptset.t;
-}
+(* Set of interferences stored as a map from analysis location to the
+   interference generated at this control state. *)
 
-let get_state : 'a with_widening or_top -> 'a or_top = function
-  | `Top -> `Top
-  | `Value (state, _) -> `Value state
+module ByAnalysisLocation (Dom : Abstract.Domain.External) =
+struct
+  type elt =
+    {
+      state : Dom.t or_top;
+      widening_counter : int;
+    }
 
-let pp_state pp_dom fmt (state : 'a with_widening or_top) =
-  let pp_aux fmt (dom_state, _) = pp_dom fmt dom_state in
-  Format.fprintf fmt "%a" (Top.pretty pp_aux) state
+  type t = elt AlocMap.t
 
-type t = Interferences : 'a interferences -> t
+  let pretty : Format.formatter -> t -> unit =
+    let pp_val fmt { state; _ } = Top.pretty Dom.pretty fmt state
+    and pp_key fmt aloc = Cil_datatype.Location.pretty fmt (ALoc.loc aloc) in
+    pp_map AlocMap.iter pp_key pp_val
+
+  let empty : t = AlocMap.empty
+
+  module DomOrTop =
+  struct
+    let top_join join = Top.join (fun s1 s2 -> `Value (join s1 s2))
+    let join = top_join Dom.join
+    let widen kf stmt = top_join (Dom.widen kf stmt)
+  end
+
+  let add_and_widen (aloc : ALoc.t) (state : Dom.t or_top) : t -> t =
+    let update = function
+      | None -> (* No previous entry *)
+        let widening_delay = Parameters.WideningDelay.get () in
+        Some { state ; widening_counter = widening_delay - 1 }
+
+      | Some previous -> (* Some previous entry *)
+        let state = DomOrTop.join previous.state state in
+        let state, widening_counter =
+          if previous.widening_counter > 0 then
+            (* No widening *)
+            state, previous.widening_counter
+          else begin
+            (* Widen the interferences between the previous and current
+               state. *)
+            let widening_period = Parameters.WideningPeriod.get () in
+            let stmt, cs = aloc in
+            let kf = Callstack.top_kf cs in
+            DomOrTop.widen kf stmt previous.state state, widening_period
+          end
+        in
+        Some { state ; widening_counter = widening_counter - 1 }
+    in
+    AlocMap.update aloc update
+
+  let group_by_mutexes (map : t) : (Dom.t or_top) MutexesMap.t =
+    let add _aloc { state ; _ } acc_map =
+      let locked_mutexes =
+        match state with
+        | `Top -> Mutex.Set.empty
+        | `Value state ->
+          match Dom.get Mt_domain.Domain.key with
+          | None -> Mutex.Set.empty
+          | Some extract ->
+            Mt_domain.Domain.mutexes (extract state)
+            |> Mt_mutex.Register.locked_mutexes
+      in
+      let update = function
+        | None -> Some state
+        | Some previous -> Some (DomOrTop.join previous state)
+      in
+      MutexesMap.update locked_mutexes update acc_map
+    in
+    AlocMap.fold add map MutexesMap.empty
+end
 
 
-let initial (type a) (domain : a domain) =
-  let module Domain = (val domain) in
-  Interferences {
-    states = ThreadTable.create 13;
-    structure = Domain.structure;
+(* Interferences Functor *)
+
+module Make (Engine : Engine_sig.S_with_results) =
+struct
+  module Dom = Engine.Dom
+  module ThreadTable = Thread.Hashtbl
+  module ByAnalysisLocation = ByAnalysisLocation (Dom)
+  module ByMutexes = ByMutexes (Dom)
+
+  type state = Dom.t
+
+  type t = {
+    states_by_aloc : ByAnalysisLocation.t ThreadTable.t;
+    states_by_mutexes :  ByMutexes.t ThreadTable.t;
+    mutable shared_bases : Base.Hptset.t;
+  }
+
+  let current = {
+    states_by_aloc = ThreadTable.create 13;
+    states_by_mutexes = ThreadTable.create 13;
     shared_bases = Base.Hptset.empty;
   }
 
-let current =
-  ref (Interferences {
-      states = ThreadTable.create 13;
-      structure = Abstract.Domain.Unit;
-      shared_bases = Base.Hptset.empty;
-    })
+  let reset () =
+    ThreadTable.reset current.states_by_aloc;
+    ThreadTable.reset current.states_by_mutexes;
+    current.shared_bases <- Base.Hptset.empty
 
-let is_empty (Interferences { states }) =
-  ThreadTable.length states = 0
+  let is_empty () =
+    ThreadTable.length current.states_by_aloc = 0
 
-let structure_mismatch () =
-  Self.fatal
-    "Incompatible sets of abstract domains used for the analysis of \
-     different threads"
+  (* Interference registration *)
 
+  type add_result =
+    | Updated
+    | NoChanges
 
-(* Interference registration *)
-
-type add_result =
-  | Updated
-  | NoChanges
-
-let add_last_analysis
-    (type a)
-    ~(domain: a domain)
-    ~(get_state : Analysis_location.local -> a or_top_bottom)
-    interferences thread concurrent_writes shared_bases =
-  let module ALoc = Analysis_location in
-  let module Dom = (val domain) in
-  match Dom.get Mt_domain.Domain.key with
-  | None -> NoChanges (* Domain disabled, no interference computation *)
-  | Some extract ->
-    let widening_delay = Parameters.WideningDelay.get () in
-    let widening_period = Parameters.WideningPeriod.get () in
-
-    let add_to_map aloc acc_map =
-      let open TopBottom.Operators in
-      let state =
-        (* Retrieve state at analysis location *)
-        let+ state = get_state aloc in
-        let mutexes_status = Mt_domain.Domain.mutexes (extract state) in
-        let mutexes = Mt_mutex.Register.locked_mutexes mutexes_status in
-        Dom.filter `Print shared_bases state, mutexes
-      in
-      match state with
-      | `Bottom -> acc_map (* no interference to add *)
-      | `Top ->
-        Self.warning ~once:false ~source:(fst (Cil_datatype.Stmt.loc (fst aloc)))
-          "Imprecise interference computed";
-        MutexesMap.add Mutex.Set.empty `Top acc_map
-      | `Value (state, mutexes) ->
-        let update = function
-          | Some `Top -> Some `Top
-          | None ->
-            let widening_counter = widening_delay - 1 in
-            Some (`Value (state, { widening_counter }))
-          | Some `Value (previous, w) ->
-            Some (`Value (Dom.join previous state, w))
-        in
-        MutexesMap.update mutexes update acc_map
+  let add_last_analysis thread concurrent_writes shared_bases =
+    (* Retrieve the interferences  *)
+    let old_states_by_aloc =
+      ThreadTable.find_def current.states_by_aloc thread
+        ByAnalysisLocation.empty
     in
-
-    let widen_interference_states prev_states curr_states =
-      let equal = ref true in
-      let widen_one_state key curr_value =
-        let previous_value = MutexesMap.find_opt key prev_states in
-        match curr_value, previous_value with
-        | _, Some `Top -> `Top
-        | `Top, _ ->
-          equal := false;
-          `Top
-        | `Value v, None ->
-          equal := false;
-          `Value v
-        | `Value (curr, _), Some `Value (previous, { widening_counter }) ->
-          let next, widening_counter =
-            if widening_counter > 0 then
-              (* No widening *)
-              Dom.join previous curr, widening_counter
-            else begin
-              (* Widen the interferences between the previous and current
-                 state. Use the widen hints on the concurrent writes. *)
-              let widened_state =
-                ALoc.Local.Set.fold
-                  (fun (stmt, cs) acc ->
-                     let kf = Callstack.top_kf cs in
-                     let widened =
-                       Dom.widen kf stmt previous (Dom.join previous curr)
-                     in
-                     Dom.join widened acc)
-                  concurrent_writes
-                  previous
-              in
-              widened_state, widening_period
-            end
+    let new_states_by_aloc =
+      let add (stmt, cs as aloc) acc_map =
+        let source = ALoc.pos aloc in
+        let open TopBottom.Operators in
+        let state =
+          let* state_table =
+            Engine.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
           in
-          let widening_counter = widening_counter - 1 in
-          equal := !equal && (Dom.equal previous next);
-          `Value (next, { widening_counter })
+          let+ state =
+            try
+              `Value (Callstack.Hashtbl.find state_table cs)
+            with Not_found ->
+              Self.warning ~once:false ~source
+                "cannot find %a at %a"
+                Callstack.pretty cs
+                Printer.pp_location (Cil_datatype.Stmt.loc stmt);
+              `Bottom
+          in
+          Dom.filter `Print shared_bases state
+        in
+        match state with
+        | `Bottom -> acc_map (* no interference to add *)
+        | `Top | `Value _ as state ->
+          if Top.is_top state then
+            Self.warning ~once:false ~source
+              "Imprecise interference computed";
+          ByAnalysisLocation.add_and_widen aloc state acc_map
       in
-      let next_states = MutexesMap.mapi widen_one_state curr_states in
-      next_states, !equal
+      ALoc.Set.fold add concurrent_writes old_states_by_aloc
     in
+    (* Check for changes *)
+    let new_states_by_mutexes =
+      ByAnalysisLocation.group_by_mutexes new_states_by_aloc
+    and old_states_by_mutexes =
+      ThreadTable.find_opt current.states_by_mutexes thread
+    in
+    let same_interferences = match old_states_by_mutexes with
+      | None -> MutexesMap.is_empty new_states_by_mutexes
+      | Some old -> ByMutexes.equal new_states_by_mutexes old
+    in
+    let same_shared_bases =
+      Base.Hptset.equal current.shared_bases shared_bases
+    in
+    (* Update the record *)
+    ThreadTable.replace current.states_by_aloc thread new_states_by_aloc;
+    ThreadTable.replace current.states_by_mutexes thread new_states_by_mutexes;
+    current.shared_bases <- shared_bases;
+    (* Debug printing *)
+    let pp_write fmt (stmt, _cs as aloc)  =
+      Format.fprintf fmt "%a@ %a" Cil_datatype.Stmt.pretty stmt ALoc.pretty aloc
+    in
+    let pp_write_set fmt set =
+      let pp fmt aloc = Format.fprintf fmt "@,@[<hov 2>%a@]" pp_write aloc in
+      ALoc.Set.iter (pp fmt) set
+    in
+    Self.debug ~dkey
+      "@[<v 2>concurrent writes:%a@]@.\
+       @[<hov 2>shared bases:@ %a@]@.\
+       @[<v 2>interferences by location:%a@]@.\
+       @[<v 2>interferences by mutexes:%a@]@."
+      pp_write_set concurrent_writes
+      Base.Hptset.pretty shared_bases
+      ByAnalysisLocation.pretty new_states_by_aloc
+      ByMutexes.pretty new_states_by_mutexes;
+    if not (same_interferences && same_shared_bases)
+    then Updated
+    else NoChanges
 
-    let Interferences ({ states; structure } as interferences) = interferences in
-    match Abstract.Domain.eq_structure structure Dom.structure with
-    | None -> structure_mismatch ()
-    | Some Eq ->
-      (* Compute new interferences and check that they are different than the
-         previous computed interferences. *)
-      let old_interferences =
-        ThreadTable.find_def states thread MutexesMap.empty
-      in
-      let new_interferences =
-        ALoc.Local.Set.fold add_to_map concurrent_writes MutexesMap.empty
-      in
-      let new_interferences, same_mutexes_map =
-        widen_interference_states old_interferences new_interferences
-      in
-      let same_shared_bases =
-        Base.Hptset.equal interferences.shared_bases shared_bases
-      in
-      let pp_aloc fmt = Format.fprintf fmt "@[<hov 2>%a@]" ALoc.Local.pretty in
-      let pp_aloc_set =
-        Pretty_utils.pp_iter ~pre:"@[<v>" ~sep:",@ " ALoc.Local.Set.iter pp_aloc
-      in
-      Self.debug ~dkey
-        "concurrent writes: @[%a@]@.\
-         shared bases: @[%a@]@.\
-         interferences: @[%a@]@."
-        pp_aloc_set concurrent_writes
-        Base.Hptset.pretty shared_bases
-        (MutexesMap.pretty (pp_state Dom.pretty)) new_interferences;
-      if not (same_mutexes_map && same_shared_bases) then begin
-        (* Add the computed interferences to the table *)
-        ThreadTable.replace states thread new_interferences;
-        interferences.shared_bases <- shared_bases;
-        Updated
-      end else
-        NoChanges
+  (* Interference injection *)
 
-
-(* Interference injection *)
-
-let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
-  : a or_top_bottom =
-  let module Dom = (val domain) in
-  let threads, mutexes = match Dom.get Mt_domain.Domain.key with
-    (* Domain disabled, no information about threads and mutexes *)
-    | None -> Mt_thread.Register.empty, Mutex.Set.empty
-    (* Domain enabled *)
-    | Some extract ->
-      let mt_state = extract state in
-      Mt_domain.Domain.threads mt_state,
-      Mt_domain.Domain.mutexes mt_state |> Mt_mutex.Register.locked_mutexes
-  in
-  let Interferences { states; structure } = interferences in
-  match Abstract.Domain.eq_structure structure Dom.structure with
-  | None -> structure_mismatch ()
-  | Some Eq ->
+  let applicable (state : state) : state or_top_bottom =
+    let threads, mutexes = match Dom.get Mt_domain.Domain.key with
+      (* Domain disabled, no information about threads and mutexes *)
+      | None -> Mt_thread.Register.empty, Mutex.Set.empty
+      (* Domain enabled *)
+      | Some extract ->
+        let mt_state = extract state in
+        Mt_domain.Domain.threads mt_state,
+        Mt_domain.Domain.mutexes mt_state |> Mt_mutex.Register.locked_mutexes
+    in
     let dom_join s1 s2 = `Value (Dom.join s1 s2) in
     let add mutexes' state' acc_state =
-      let state' = get_state state' in
       if Mutex.Set.disjoint mutexes mutexes'
       (* No mutexes in common, this interference is applicable *)
       then TopBottom.join dom_join acc_state (state' :> _ or_top_bottom)
@@ -253,46 +272,42 @@ let applicable (type a) ~(domain : a domain) (interferences : t) (state : a)
       then MutexesMap.fold add state_map acc_state
       else acc_state
     in
-    ThreadTable.fold add_thread states `Bottom
+    ThreadTable.fold add_thread current.states_by_mutexes `Bottom
 
-let inject (type a) ~(domain : a domain) (state : a) : a =
-  let module Dom = (val domain) in
-  let interferences = !current in
-  let Interferences { shared_bases } = interferences in
-  let need_injection =
-    match Dom.get Mt_domain.Domain.key with
-    (* Domain disabled, no interference injection *)
-    | None -> false
-    (* Domain enabled *)
-    | Some extract ->
-      let mt_state = extract state in
-      let memory = Mt_domain.Domain.memory mt_state in
-      let zone = Locations.Zone.join memory.read memory.written in
-      match Locations.Zone.get_bases zone with
-      | Top ->
-        (* Shared memory is Top, always inject *)
-        Self.warning ~current:true ~once:true
-          "imprecise memory footprint computed at this point";
-        true
-      | Set bases ->
-        (* Inject only if the read/written memory intersects shared memory *)
-        Base.Hptset.intersects bases shared_bases
-  in
-  if not need_injection
-  then state
-  else begin
-    Self.debug ~dkey ~current:true ~once:true
-      "inject threads interferences at this point";
-    match applicable ~domain interferences state with
-    | `Top -> Dom.top
-    | `Bottom -> state
-    | `Value interferences_state ->
-      let dummy_kf = Kernel_function.dummy () in
-      let result =
-        Dom.reuse dummy_kf shared_bases
-          ~current_input:state ~previous_output:interferences_state
-      in
-      Dom.join state result
-  end
-
-let is_empty () = is_empty !current
+  let inject (state : state) : state =
+    let need_injection =
+      match Dom.get Mt_domain.Domain.key with
+      (* Domain disabled, no interference injection *)
+      | None -> false
+      (* Domain enabled *)
+      | Some extract ->
+        let mt_state = extract state in
+        let memory = Mt_domain.Domain.memory mt_state in
+        let zone = Locations.Zone.join memory.read memory.written in
+        match Locations.Zone.get_bases zone with
+        | Top ->
+          (* Shared memory is Top, always inject *)
+          Self.warning ~current:true ~once:true
+            "imprecise memory footprint computed at this point";
+          true
+        | Set bases ->
+          (* Inject only if the read/written memory intersects shared memory *)
+          Base.Hptset.intersects bases current.shared_bases
+    in
+    if not need_injection
+    then state
+    else begin
+      Self.debug ~dkey ~current:true ~once:true
+        "inject threads interferences at this point";
+      match applicable state with
+      | `Top -> Dom.top
+      | `Bottom -> state
+      | `Value interferences_state ->
+        let dummy_kf = Kernel_function.dummy () in
+        let result =
+          Dom.reuse dummy_kf current.shared_bases
+            ~current_input:state ~previous_output:interferences_state
+        in
+        Dom.join state result
+    end
+end

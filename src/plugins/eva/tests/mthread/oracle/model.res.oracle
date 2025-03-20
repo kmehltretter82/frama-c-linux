@@ -15,9 +15,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -30,9 +31,10 @@
 [mt] Globals accessed by thread:
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job1 computed

@@ -20,16 +20,6 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let initial () =
-  let module Analyzer = (val Analysis.current_analyzer ()) in
-  let domain =
-    (module Analyzer.Dom : Abstract.Domain.External
-      with type state = Analyzer.Dom.state)
-  in
-  let interferences = Interferences.initial domain in
-  Interferences.current := interferences; (* For Iterator *)
-  interferences
-
 let concurrent_writes shared_bases =
   let module Analyzer = (val Analysis.current_analyzer ()) in
   let module ALoc = Analysis_location in
@@ -72,33 +62,12 @@ let shared_bases analysis_state =
   | Top -> assert false
   | Set zones ->  zones
 
-let add_last_analysis analysis_state interferences =
+let add_last_analysis analysis_state =
   let module Analyzer = (val Analysis.current_analyzer ()) in
-  let domain =
-    (module Analyzer.Dom : Abstract.Domain.External
-      with type state = Analyzer.Dom.state)
-  in
-  let get_state (stmt, cs) =
-    let open Lattice_bounds.TopBottom.Operators in
-    let* state_table =
-      Analyzer.get_stmt_state_by_callstack ~selection:[cs] ~after:true stmt
-    in
-    try
-      `Value (Callstack.Hashtbl.find state_table cs)
-    with Not_found ->
-      Mt_options.result "cannot find %a at %a"
-        Callstack.pretty cs
-        Printer.pp_location (Cil_datatype.Stmt.loc stmt);
-      `Bottom
-  in
   let bases = shared_bases analysis_state in
   let writes = concurrent_writes bases in
   let thread = analysis_state.curr_thread.th_eva_thread in
-  let res =
-    Interferences.add_last_analysis ~domain ~get_state
-      interferences thread writes bases
-  in
-  match res with
+  match Analyzer.Interferences.add_last_analysis thread writes bases with
   | Updated ->
     Mt_thread.iter_threads analysis_state
       (fun th -> Mt_thread.ThreadState.recompute_because th InterferencesChanged)

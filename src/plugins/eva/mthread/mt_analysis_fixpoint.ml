@@ -57,7 +57,7 @@ let mark_new_messages_received analysis =
       );
 ;;
 
-let record_end_of_thread_analysis analysis interferences =
+let record_end_of_thread_analysis analysis =
   let th = analysis.curr_thread in
 
   (* We save the state of the analysis *)
@@ -105,7 +105,7 @@ let record_end_of_thread_analysis analysis interferences =
   Mt_options.feedback ~level:2 "* shared variables computed";
 
   (* We compute interferences *)
-  Mt_interferences.add_last_analysis analysis interferences;
+  Mt_interferences.add_last_analysis analysis;
 
   (* We update the multithread events of the thread for its next iteration *)
   th.th_amap <- curr_events analysis;
@@ -311,7 +311,7 @@ let store_written_value analysis lw =
 (* Function that does one pass of value analysis on all the threads
    that are marked as needed to be recomputed. Returns the values
    written by each thread recomputed*)
-let one_iteration analysis interferences =
+let one_iteration analysis =
   iter_threads analysis
     (fun th ->
        if not (SetRecomputeReason.is_empty th.th_to_recompute) then (
@@ -327,7 +327,7 @@ let one_iteration analysis interferences =
              compute_thread analysis th;
 
              (* We save all our results *)
-             record_end_of_thread_analysis analysis interferences;
+             record_end_of_thread_analysis analysis;
              Mt_options.feedback "*** Thread %a computed" ThreadState.pretty th;
            ) else (
              Mt_options.feedback "@[<hov 2>*** Thread %a has been@ created but@ \
@@ -429,12 +429,12 @@ let mark_shared_nodes_kind analysis =
 
 
 (* Auxiliary function iterating the analysis until the fixpoint is reached *)
-let reach_fixpoint analysis interferences =
+let reach_fixpoint analysis =
   Mt_options.feedback "******* Starting to iterate";
   let rec aux i =
     Mt_options.feedback "***** Iteration %d" i;
     analysis.iteration <- i;
-    let continue = one_iteration analysis interferences in
+    let continue = one_iteration analysis in
     if continue && i < Mt_options.StopAfter.get () then aux (i+1)
     else (* Stop iteration *)
     if continue then

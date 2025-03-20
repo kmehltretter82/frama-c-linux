@@ -40,9 +40,10 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -62,9 +63,10 @@
     read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -82,9 +84,10 @@
     read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -98,9 +101,10 @@
   s2: write by jobs3 at priorities.c:36
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -119,9 +123,10 @@
     read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -176,10 +181,17 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s1 = 1; <- main
+  concurrent writes:
+    s1 = 1; priorities.c:63 <- main
   shared bases: {s1, s2}
-  interferences: { m1; m2 } -> # cvalue: s1 ∈ {1}
-                                         s2 ∈ {0}
+  interferences by location:
+    priorities.c:63:
+      # cvalue: s1 ∈ {1}
+                s2 ∈ {0} 
+  interferences by mutexes:
+    { m1; m2 }:
+      # cvalue: s1 ∈ {1}
+                s2 ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -199,9 +211,10 @@
     read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s1, s2}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -219,9 +232,10 @@
     read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s1, s2}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -236,10 +250,17 @@
   s2: write by jobs3 at priorities.c:36
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s2 = 3; <- f3
+  concurrent writes:
+    s2 = 3; priorities.c:36 <- f3
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:36:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -259,10 +280,17 @@
     read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s2 = 3; <- f4
+  concurrent writes:
+    s2 = 3; priorities.c:44 <- f4
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:44:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -343,11 +371,21 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s1 = 1; <- main,
-                     int j = s2; <- main
+  concurrent writes:
+    s1 = 1; priorities.c:63 <- main
+    int j = s2; priorities.c:64 <- main
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:63:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+    priorities.c:64:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -367,10 +405,17 @@
     read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int i = s1; <- f1
+  concurrent writes:
+    int i = s1; priorities.c:22 <- f1
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:22:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -388,9 +433,10 @@
     read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s1, s2}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -405,10 +451,17 @@
   s2: write by jobs3 at priorities.c:36
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s2 = 3; <- f3
+  concurrent writes:
+    s2 = 3; priorities.c:36 <- f3
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:36:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -428,10 +481,17 @@
     read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s2 = 3; <- f4
+  concurrent writes:
+    s2 = 3; priorities.c:44 <- f4
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:44:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed
@@ -504,11 +564,21 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s1 = 1; <- main,
-                     int j = s2; <- main
+  concurrent writes:
+    s1 = 1; priorities.c:63 <- main
+    int j = s2; priorities.c:64 <- main
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:63:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+    priorities.c:64:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -528,10 +598,17 @@
     read by jobs1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int i = s1; <- f1
+  concurrent writes:
+    int i = s1; priorities.c:22 <- f1
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:22:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs1 computed
@@ -548,9 +625,10 @@
     read by jobs2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {s1, s2}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs2 computed
@@ -564,10 +642,17 @@
   s2: write by jobs3 at priorities.c:36
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s2 = 3; <- f3
+  concurrent writes:
+    s2 = 3; priorities.c:36 <- f3
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:36:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs3 computed
@@ -586,10 +671,17 @@
     read by jobs4 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s2 = 3; <- f4
+  concurrent writes:
+    s2 = 3; priorities.c:44 <- f4
   shared bases: {s1, s2}
-  interferences: {  } -> # cvalue: s1 ∈ {0; 1}
-                                   s2 ∈ {0; 3}
+  interferences by location:
+    priorities.c:44:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3} 
+  interferences by mutexes:
+    {  }:
+      # cvalue: s1 ∈ {0; 1}
+                s2 ∈ {0; 3}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs4 computed

@@ -46,9 +46,10 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -63,9 +64,10 @@
   global2[0..1]: read by jobs[0] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -79,9 +81,10 @@
   global2[0..1]: read by jobs[1] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -95,9 +98,10 @@
   global2[0..1]: read by jobs[2] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -111,9 +115,10 @@
   global2[0..1]: read by jobs[3] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -136,9 +141,10 @@
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f1 computed
@@ -161,9 +167,10 @@
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f2 computed
@@ -222,26 +229,123 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: *v = 1; <- g1 :: ccfg.c:77 <- main,
-                     *v = 1; <- g2 :: ccfg.c:78 <- main,
-                     *(v + 1) = 2; <- g2 :: ccfg.c:78 <- main,
-                     a = 1; <- main,
-                     b = 1; <- main,
-                     c = 1; <- main,
-                     d = 1; <- main,
-                     e = 1; <- main,
-                     f = 1; <- main
+  concurrent writes:
+    *v = 1; ccfg.c:24 <- g1 :: ccfg.c:77 <- main
+    *v = 1; ccfg.c:29 <- g2 :: ccfg.c:78 <- main
+    *(v + 1) = 2; ccfg.c:31 <- g2 :: ccfg.c:78 <- main
+    a = 1; ccfg.c:82 <- main
+    b = 1; ccfg.c:82 <- main
+    c = 1; ccfg.c:82 <- main
+    d = 1; ccfg.c:82 <- main
+    e = 1; ccfg.c:82 <- main
+    f = 1; ccfg.c:82 <- main
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ {0; 1}
-                 b ∈ {0; 1}
-                 c ∈ {0; 1}
-                 d ∈ {0; 1}
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:24:
+      # cvalue:
+      global1 ∈ {1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0}
+      b ∈ {0}
+      c ∈ {0}
+      d ∈ {0}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:29:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0] ∈ {1}
+             [1] ∈ {0; 2}
+      a ∈ {0}
+      b ∈ {0}
+      c ∈ {0}
+      d ∈ {0}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:31:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {2}
+      a ∈ {0}
+      b ∈ {0}
+      c ∈ {0}
+      d ∈ {0}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0..1] ∈ {0}
+      a ∈ {1}
+      b ∈ {0}
+      c ∈ {0}
+      d ∈ {0}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0..1] ∈ {0}
+      a ∈ {1}
+      b ∈ {1}
+      c ∈ {0}
+      d ∈ {0}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0..1] ∈ {0}
+      a ∈ {1}
+      b ∈ {1}
+      c ∈ {1}
+      d ∈ {0}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0..1] ∈ {0}
+      a ∈ {1}
+      b ∈ {1}
+      c ∈ {1}
+      d ∈ {1}
+      e ∈ {0}
+      f ∈ {0} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0..1] ∈ {0}
+      a ∈ {1}
+      b ∈ {1}
+      c ∈ {1}
+      d ∈ {1}
+      e ∈ {1}
+      f ∈ {0} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0}
+      global2[0..1] ∈ {0}
+      a ∈ {1}
+      b ∈ {1}
+      c ∈ {1}
+      d ∈ {1}
+      e ∈ {1}
+      f ∈ {1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -257,18 +361,33 @@
   global2[0..1]: read by jobs[0] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ {0; 1}
-                 b ∈ {0; 1}
-                 c ∈ {0; 1}
-                 d ∈ {0; 1}
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -284,18 +403,33 @@
   global2[0..1]: read by jobs[1] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ {0; 1}
-                 b ∈ {0; 1}
-                 c ∈ {0; 1}
-                 d ∈ {0; 1}
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -311,18 +445,33 @@
   global2[0..1]: read by jobs[2] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ {0; 1}
-                 b ∈ {0; 1}
-                 c ∈ {0; 1}
-                 d ∈ {0; 1}
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -338,18 +487,33 @@
   global2[0..1]: read by jobs[3] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ {0; 1}
-                 b ∈ {0; 1}
-                 c ∈ {0; 1}
-                 d ∈ {0; 1}
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ {0; 1}
+      b ∈ {0; 1}
+      c ∈ {0; 1}
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -374,18 +538,33 @@
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: __retres = *from; <- g6 :: ccfg.c:55 <- f1
+  concurrent writes:
+    __retres = *from; ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ {0; 1}
-                 c ∈ [--..--]
-                 d ∈ {0; 1}
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:47:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ {0; 1}
+      c ∈ [--..--]
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ {0; 1}
+      c ∈ [--..--]
+      d ∈ {0; 1}
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f1 computed
@@ -410,18 +589,33 @@
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: __retres = *from; <- g6 :: ccfg.c:64 <- f2
+  concurrent writes:
+    __retres = *from; ccfg.c:47 <- g6 :: ccfg.c:64 <- f2
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:47:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f2 computed
@@ -645,48 +839,209 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: *v = 1; <- g1 :: ccfg.c:77 <- main,
-                     *v = 1; <- g2 :: ccfg.c:78 <- main,
-                     *(v + 1) = 2; <- g2 :: ccfg.c:78 <- main,
-                     a = 1; <- main,
-                     b = 1; <- main,
-                     c = 1; <- main,
-                     d = 1; <- main,
-                     e = 1; <- main,
-                     f = 1; <- main,
-                     sum += a; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647;
-                     */
-                     sum += b; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + c;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + c ≤ 2147483647;
-                     */
-                     sum += c; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647;
-                     */
-                     sum += d; <- main,
-                     /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647;
-                     */
-                     sum += e; <- main,
-                     /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647;
-                     */
-                     sum += f; <- main
+  concurrent writes:
+    *v = 1; ccfg.c:24 <- g1 :: ccfg.c:77 <- main
+    *v = 1; ccfg.c:29 <- g2 :: ccfg.c:78 <- main
+    *(v + 1) = 2; ccfg.c:31 <- g2 :: ccfg.c:78 <- main
+    a = 1; ccfg.c:82 <- main
+    b = 1; ccfg.c:82 <- main
+    c = 1; ccfg.c:82 <- main
+    d = 1; ccfg.c:82 <- main
+    e = 1; ccfg.c:82 <- main
+    f = 1; ccfg.c:82 <- main
+    sum += a; ccfg.c:88 <- main
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b; */
+    /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647; */
+    sum += b; ccfg.c:89 <- main
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + c; */
+    /*@ assert Eva: signed_overflow: sum + c ≤ 2147483647; */
+    sum += c; ccfg.c:91 <- main
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d; */
+    /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647; */
+    sum += d; ccfg.c:92 <- main
+    /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647; */
+    sum += e; ccfg.c:93 <- main
+    /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647; */
+    sum += f; ccfg.c:94 <- main
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:24:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:29:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:31:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:88:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:89:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:91:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:92:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:93:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:94:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -702,18 +1057,33 @@
   global2[0..1]: read by jobs[0] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -730,18 +1100,33 @@
   global2[0..1]: read by jobs[1] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -758,18 +1143,33 @@
   global2[0..1]: read by jobs[2] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -786,18 +1186,33 @@
   global2[0..1]: read by jobs[3] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -823,18 +1238,33 @@
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: __retres = *from; <- g6 :: ccfg.c:55 <- f1
+  concurrent writes:
+    __retres = *from; ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:47:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f1 computed
@@ -860,18 +1290,33 @@
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: __retres = *from; <- g6 :: ccfg.c:64 <- f2
+  concurrent writes:
+    __retres = *from; ccfg.c:47 <- g6 :: ccfg.c:64 <- f2
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:47:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f2 computed
@@ -1088,48 +1533,209 @@
     read by <main> at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: *v = 1; <- g1 :: ccfg.c:77 <- main,
-                     *v = 1; <- g2 :: ccfg.c:78 <- main,
-                     *(v + 1) = 2; <- g2 :: ccfg.c:78 <- main,
-                     a = 1; <- main,
-                     b = 1; <- main,
-                     c = 1; <- main,
-                     d = 1; <- main,
-                     e = 1; <- main,
-                     f = 1; <- main,
-                     sum += a; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647;
-                     */
-                     sum += b; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + c;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + c ≤ 2147483647;
-                     */
-                     sum += c; <- main,
-                     /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d;
-                     */
-                     /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647;
-                     */
-                     sum += d; <- main,
-                     /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647;
-                     */
-                     sum += e; <- main,
-                     /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647;
-                     */
-                     sum += f; <- main
+  concurrent writes:
+    *v = 1; ccfg.c:24 <- g1 :: ccfg.c:77 <- main
+    *v = 1; ccfg.c:29 <- g2 :: ccfg.c:78 <- main
+    *(v + 1) = 2; ccfg.c:31 <- g2 :: ccfg.c:78 <- main
+    a = 1; ccfg.c:82 <- main
+    b = 1; ccfg.c:82 <- main
+    c = 1; ccfg.c:82 <- main
+    d = 1; ccfg.c:82 <- main
+    e = 1; ccfg.c:82 <- main
+    f = 1; ccfg.c:82 <- main
+    sum += a; ccfg.c:88 <- main
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + b; */
+    /*@ assert Eva: signed_overflow: sum + b ≤ 2147483647; */
+    sum += b; ccfg.c:89 <- main
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + c; */
+    /*@ assert Eva: signed_overflow: sum + c ≤ 2147483647; */
+    sum += c; ccfg.c:91 <- main
+    /*@ assert Eva: signed_overflow: -2147483648 ≤ sum + d; */
+    /*@ assert Eva: signed_overflow: sum + d ≤ 2147483647; */
+    sum += d; ccfg.c:92 <- main
+    /*@ assert Eva: signed_overflow: sum + e ≤ 2147483647; */
+    sum += e; ccfg.c:93 <- main
+    /*@ assert Eva: signed_overflow: sum + f ≤ 2147483647; */
+    sum += f; ccfg.c:94 <- main
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:24:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:29:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:31:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:82:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:88:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:89:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:91:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:92:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:93:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+    ccfg.c:94:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -1145,18 +1751,33 @@
   global2[0..1]: read by jobs[0] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[0] computed
@@ -1172,18 +1793,33 @@
   global2[0..1]: read by jobs[1] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[1] computed
@@ -1199,18 +1835,33 @@
   global2[0..1]: read by jobs[2] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[2] computed
@@ -1226,18 +1877,33 @@
   global2[0..1]: read by jobs[3] at ccfg.c:16
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: int r = (global1 + global2[0]) + global2[1]; <- fjob
+  concurrent writes:
+    int r = (global1 + global2[0]) + global2[1]; ccfg.c:16 <- fjob
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:16:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread jobs[3] computed
@@ -1262,18 +1928,33 @@
     read by job_f1 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: __retres = *from; <- g6 :: ccfg.c:55 <- f1
+  concurrent writes:
+    __retres = *from; ccfg.c:47 <- g6 :: ccfg.c:55 <- f1
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:47:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f1 computed
@@ -1297,18 +1978,33 @@
     read by job_f2 at FRAMAC_SHARE/mthread_pthread.c:66
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: __retres = *from; <- g6 :: ccfg.c:64 <- f2
+  concurrent writes:
+    __retres = *from; ccfg.c:47 <- g6 :: ccfg.c:64 <- f2
   shared bases: {global1, global2, a, b, c, d, e, f}
-  interferences: {  } -> # cvalue:
-                 global1 ∈ {0; 1}
-                 global2[0] ∈ {0; 1}
-                        [1] ∈ {0; 2}
-                 a ∈ [--..--]
-                 b ∈ [--..--]
-                 c ∈ [--..--]
-                 d ∈ [--..--]
-                 e ∈ {0; 1}
-                 f ∈ {0; 1}
+  interferences by location:
+    ccfg.c:47:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      global1 ∈ {0; 1}
+      global2[0] ∈ {0; 1}
+             [1] ∈ {0; 2}
+      a ∈ [--..--]
+      b ∈ [--..--]
+      c ∈ [--..--]
+      d ∈ [--..--]
+      e ∈ {0; 1}
+      f ∈ {0; 1}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread job_f2 computed

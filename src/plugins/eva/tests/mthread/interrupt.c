@@ -3,8 +3,6 @@
   STDOPT: +"-eva-verbose=1 -main main_interrupt_incr -mt-interrupt-handlers interrupt_incr"
   STDOPT: +"-eva-verbose=1 -main main_interrupt_cross_incr -mt-interrupt-handlers interrupt_cross_incr1,interrupt_cross_incr2"
 */
-#include "mthread_pthread.h"
-
 int interrupt_received;
 
 void interrupt_oneshot(void) {

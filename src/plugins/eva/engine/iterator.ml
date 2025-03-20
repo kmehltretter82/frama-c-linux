@@ -74,25 +74,25 @@ let record_fireable edge =
 
 
 module Make_Dataflow
-    (Abstractions : Abstractions.S_with_evaluation)
-    (States : Powerset.S with type state = Abstractions.Dom.t)
-    (Transfer : Transfer_stmt.S with type state = Abstractions.Dom.t)
-    (Init: Initialization.S with type state := Abstractions.Dom.t)
-    (Logic : Transfer_logic.S with type state = Abstractions.Dom.t
+    (Engine : Engine_sig.S)
+    (States : Powerset.S with type state = Engine.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Engine.Dom.t)
+    (Init: Initialization.S with type state := Engine.Dom.t)
+    (Logic : Transfer_logic.S with type state = Engine.Dom.t
                                and type states = States.t)
     (Spec: sig
        val treat_statement_assigns:
-         assigns -> Abstractions.Dom.t -> Abstractions.Dom.t
+         assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
     (AnalysisParam : sig
        val kf: kernel_function
        val call_kinstr: kinstr
-       val initial_state : Abstractions.Dom.t
+       val initial_state : Engine.Dom.t
      end)
     ()
 = struct
 
-  module Domain = Abstractions.Dom
+  module Domain = Engine.Dom
   include Cvalue_domain.Getters (Domain)
 
   (* --- Analysis parameters --- *)
@@ -112,7 +112,7 @@ module Make_Dataflow
 
   (* --- Abstract values storage --- *)
 
-  module Partitioning = Trace_partitioning.Make (Abstractions) (AnalysisParam)
+  module Partitioning = Trace_partitioning.Make (Engine) (AnalysisParam)
 
   type store = Partitioning.store
   type flow = Partitioning.flow
@@ -402,13 +402,6 @@ module Make_Dataflow
       List.filter check states
     | _ -> states
 
-  (* For now, as long as an Interferences module is not passed as a parameter to
-     the Iterator, we have to rebuild the following function *)
-  let inject_interferences =
-    let domain =
-      (module Domain : Abstract.Domain.External with type state = 'a)
-    in
-    Interferences.inject ~domain
 
   (* --- Iteration strategy ---*)
 
@@ -454,9 +447,9 @@ module Make_Dataflow
     let<> UpdatedCurrentLoc = e.edge_loc in
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow =
-      if Interferences.is_empty ()
+      if Engine.Interferences.is_empty ()
       then flow
-      else Partitioning.transfer (lift inject_interferences) flow
+      else Partitioning.transfer (lift Engine.Interferences.inject) flow
     in
     let flow = process_partitioning_transitions v1 v2 transition flow in
     if not (Partitioning.is_empty_flow flow) then
@@ -707,21 +700,21 @@ end
 
 
 module Computer
-    (Abstract : Abstractions.S_with_evaluation)
-    (States : Powerset.S with type state = Abstract.Dom.t)
-    (Transfer : Transfer_stmt.S with type state = Abstract.Dom.t)
-    (Init: Initialization.S with type state := Abstract.Dom.t)
-    (Logic : Transfer_logic.S with type state = Abstract.Dom.t
+    (Engine : Engine_sig.S)
+    (States : Powerset.S with type state = Engine.Dom.t)
+    (Transfer : Transfer_stmt.S with type state = Engine.Dom.t)
+    (Init: Initialization.S with type state := Engine.Dom.t)
+    (Logic : Transfer_logic.S with type state = Engine.Dom.t
                                and type states = States.t)
     (Spec: sig
-       val treat_statement_assigns: assigns -> Abstract.Dom.t -> Abstract.Dom.t
+       val treat_statement_assigns: assigns -> Engine.Dom.t -> Engine.Dom.t
      end)
 = struct
 
   let compute ~save_results kf call_kinstr state =
     let module Dataflow =
       Make_Dataflow
-        (Abstract) (States) (Transfer) (Init) (Logic) (Spec)
+        (Engine) (States) (Transfer) (Init) (Logic) (Spec)
         (struct
           let kf = kf
           let call_kinstr = call_kinstr

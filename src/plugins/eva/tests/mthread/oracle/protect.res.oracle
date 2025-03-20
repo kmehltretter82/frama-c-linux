@@ -29,9 +29,10 @@
   t[3]: write by <main> at protect.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] ******* Starting to iterate
@@ -45,9 +46,10 @@
   t[0..9]: read by tjob at protect.c:12
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: 
+  concurrent writes:
   shared bases: {}
-  interferences:
+  interferences by location:
+  interferences by mutexes:
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed
@@ -92,18 +94,32 @@
   t[3]: write by <main> at protect.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: t[1] = 1; <- main,
-                     t[3] = 4; <- main
+  concurrent writes:
+    t[1] = 1; protect.c:25 <- main
+    t[3] = 4; protect.c:29 <- main
   shared bases: {t}
-  interferences: { lock1 } -> # cvalue: t[0] ∈ {0}
-                                         [1] ∈ {1}
-                                         [2..9] ∈ {0}
-                  { lock2 } -> # cvalue:
-                 t[0] ∈ {0}
-                  [1] ∈ {1}
-                  [2] ∈ {0}
-                  [3] ∈ {4}
-                  [4..9] ∈ {0}
+  interferences by location:
+    protect.c:25:
+      # cvalue: t[0] ∈ {0}
+                 [1] ∈ {1}
+                 [2..9] ∈ {0} 
+    protect.c:29:
+      # cvalue: t[0] ∈ {0}
+                 [1] ∈ {1}
+                 [2] ∈ {0}
+                 [3] ∈ {4}
+                 [4..9] ∈ {0} 
+  interferences by mutexes:
+    { lock1 }:
+      # cvalue: t[0] ∈ {0}
+                 [1] ∈ {1}
+                 [2..9] ∈ {0} 
+    { lock2 }:
+      # cvalue: t[0] ∈ {0}
+                 [1] ∈ {1}
+                 [2] ∈ {0}
+                 [3] ∈ {4}
+                 [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -118,14 +134,25 @@
   t[0..9]: read by tjob at protect.c:12
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s += t[i]; <- job
+  concurrent writes:
+    s += t[i]; protect.c:12 <- job
   shared bases: {t}
-  interferences: {  } -> # cvalue:
-                 t[0] ∈ {0}
-                  [1] ∈ {0; 1}
-                  [2] ∈ {0}
-                  [3] ∈ {0; 4}
-                  [4..9] ∈ {0}
+  interferences by location:
+    protect.c:12:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed
@@ -189,15 +216,33 @@
   t[3]: write by <main> at protect.c:29
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: t[1] = 1; <- main,
-                     t[3] = 4; <- main
+  concurrent writes:
+    t[1] = 1; protect.c:25 <- main
+    t[3] = 4; protect.c:29 <- main
   shared bases: {t}
-  interferences: {  } -> # cvalue:
-                 t[0] ∈ {0}
-                  [1] ∈ {0; 1}
-                  [2] ∈ {0}
-                  [3] ∈ {0; 4}
-                  [4..9] ∈ {0}
+  interferences by location:
+    protect.c:25:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0} 
+    protect.c:29:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
@@ -212,14 +257,25 @@
   t[0..9]: read by tjob at protect.c:12
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s += t[i]; <- job
+  concurrent writes:
+    s += t[i]; protect.c:12 <- job
   shared bases: {t}
-  interferences: {  } -> # cvalue:
-                 t[0] ∈ {0}
-                  [1] ∈ {0; 1}
-                  [2] ∈ {0}
-                  [3] ∈ {0; 4}
-                  [4..9] ∈ {0}
+  interferences by location:
+    protect.c:12:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed
@@ -262,14 +318,25 @@
   t[0..9]: read by tjob at protect.c:12
 [mt] * shared variables computed
 [eva:interferences] 
-  concurrent writes: s += t[i]; <- job
+  concurrent writes:
+    s += t[i]; protect.c:12 <- job
   shared bases: {t}
-  interferences: {  } -> # cvalue:
-                 t[0] ∈ {0}
-                  [1] ∈ {0; 1}
-                  [2] ∈ {0}
-                  [3] ∈ {0; 4}
-                  [4..9] ∈ {0}
+  interferences by location:
+    protect.c:12:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0} 
+  interferences by mutexes:
+    {  }:
+      # cvalue:
+      t[0] ∈ {0}
+       [1] ∈ {0; 1}
+       [2] ∈ {0}
+       [3] ∈ {0; 4}
+       [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread tjob computed

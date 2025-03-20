@@ -22,4 +22,10 @@
 
 type local = Cil_types.stmt * Callstack.t
 
-module Local : Datatype.S_with_collections with type t = local
+module Local :
+sig
+  include Datatype.S_with_collections with type t = local
+
+  val loc : t -> Cil_types.location
+  val pos : t -> Filepath.position
+end
