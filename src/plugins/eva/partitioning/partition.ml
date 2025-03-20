@@ -655,22 +655,20 @@ struct
       in
       map_keys transfer p
 
-  let transfer (f : (key * state) -> (key * state) list) (p : t) : t =
+  let transfer (f : (key * state) -> (key * state) list): t -> t =
     let n = ref 0 in
-    let transfer acc key_state =
-      let add l (k, y) =
-        match k.ration_stamp with
-        (* No ration stamp, just add the state to the list *)
-        | None -> (k, y) :: l
-        (* There is a ration stamp, set the second part of the stamp to a unique transfer number *)
-        | Some (s,_) ->
-          let k' = { k with ration_stamp = Some (s, !n) } in
-          incr n;
-          (k', y) :: l
-      in
-      List.fold_left add acc (f key_state)
+    let restamp (key, state) =
+      match key.ration_stamp with
+      (* No ration stamp, just add the state to the list *)
+      | None -> (key, state)
+      (* There is a ration stamp, set the second part of the stamp to a
+         unique transfer number *)
+      | Some (s, _) ->
+        let key' = { key with ration_stamp = Some (s, !n) } in
+        incr n;
+        (key', state)
     in
-    List.rev (List.fold_left transfer [] p)
+    List.concat_map (fun x -> List.map restamp (f x))
 
   let iter (f : key -> state -> unit) (p : t) : unit =
     List.iter (fun (k, x) -> f k x) p
@@ -689,12 +687,6 @@ struct
     | [] | [_] -> p
     | e :: tl -> aux [] e tl
 
-  let filter_map (f: key -> state -> state option) (p : t) : t =
-    let rec aux = function
-      | [] -> []
-      | (key, x) :: tl -> match f key x with
-        | Some y -> (key, y) :: (aux tl)
-        | None -> aux tl
-    in
-    aux p
+  let filter_map (f: key -> state -> state option) : t -> t =
+    List.filter_map (fun (key, s) -> Option.map (fun s' -> key, s') (f key s))
 end
