@@ -243,7 +243,7 @@ let () =
     ]
 
 let () =
-  register_list ~attr_class:(AttrName false)
+  register_list ~ignore:true ~attr_class:(AttrName false)
     [fc_oldstyleproto; fc_missingproto]
 
 (* AttFuntype attributes. *)
@@ -269,6 +269,8 @@ let fc_internal_attributes =
   ; fc_local_static
   ; frama_c_destructor
   ; frama_c_inlined
+  ; fc_oldstyleproto
+  ; fc_missingproto
   ; "declspec"
   ; "arraylen"
   ]
