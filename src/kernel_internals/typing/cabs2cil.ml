@@ -90,12 +90,6 @@ let func_locs () = FuncLocs.get ()
    parsing error, since their behavior requires non-standard parsing *)
 let unsupported_attributes = ["vector_size"]
 
-(* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
-   attributes can refer to erased functions and make the code un-reparsable *)
-let erased_attributes = ["malloc"]
-let () = Ast_attributes.register_list ~ignore:true ~attr_class:(AttrName false)
-    erased_attributes
-
 let check_attribute_name s =
   let res = Extlib.strip_underscore s in
   if res = "" then
@@ -130,6 +124,11 @@ let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
 let frama_c_destructor = "fc_destructor"
 let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
     frama_c_destructor
+
+(* GCC 'malloc' attributes can refer to erased functions and make the code
+   un-reparsable, so we keep them in the AST but not pretty-print them. *)
+let () = Ast_attributes.register_shallow ~ignore:true
+    ~attr_class:AttrUnknown "malloc"
 
 let () =
   (* packed and aligned are treated separately, we ignore them
@@ -4515,7 +4514,6 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
 
     (* Sometimes we need to convert attrarg into attr *)
     let arg2attrs = function
-      | ACons (s, _) when List.mem s erased_attributes -> []
       | ACons (s, args) -> [(s, args)]
       | a ->
         Kernel.fatal ~current:true
