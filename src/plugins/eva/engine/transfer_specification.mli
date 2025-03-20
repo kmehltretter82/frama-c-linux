@@ -25,9 +25,7 @@ open Eval
 
 module Make
     (Engine: Engine_sig.S)
-    (States: Powerset.S with type state = Engine.Dom.t)
-    (_ : Transfer_logic.S with type state = Engine.Dom.t
-                           and type states = States.t)
+    (_ : Transfer_logic.S with type state = Engine.Dom.t)
   : sig
 
     val treat_statement_assigns:

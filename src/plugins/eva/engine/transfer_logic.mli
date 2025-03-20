@@ -35,33 +35,34 @@ val check_calls_annotations:
 
 module type S = sig
   type state
-  type states
 
   val create: state -> kernel_function -> Active_behaviors.t
   val create_from_spec: state -> spec -> Active_behaviors.t
 
   val check_fct_preconditions_for_behaviors:
     kinstr -> kernel_function -> behavior list -> Alarmset.status ->
-    states -> states
+    state list -> state list
 
   val check_fct_preconditions:
-    kinstr -> kernel_function -> Active_behaviors.t -> state -> states or_bottom
+    kinstr -> kernel_function -> Active_behaviors.t ->
+    state -> state list or_bottom
 
   val check_fct_postconditions_for_behaviors:
     kernel_function -> behavior list -> Alarmset.status ->
-    pre_state:state -> post_states:states -> result:varinfo option -> states
+    pre_state:state -> post_states:state list -> result:varinfo option ->
+    state list
 
   val check_fct_postconditions:
     kernel_function -> Active_behaviors.t -> termination_kind ->
-    pre_state:state -> post_states:states -> result:varinfo option ->
-    states or_bottom
+    pre_state:state -> post_states:state list -> result:varinfo option ->
+    state list or_bottom
 
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 
   val interp_annot:
     record:bool ->
     kernel_function -> Active_behaviors.t -> stmt -> code_annotation ->
-    initial_state:state -> states -> states
+    initial_state:state -> state list -> state list
 end
 
 module type LogicDomain = sig
@@ -76,8 +77,5 @@ module type LogicDomain = sig
     acsl_extension -> t Abstract_domain.logic_environment -> t -> t
 end
 
-module Make
-    (Domain: LogicDomain)
-    (States: Powerset.S with type state = Domain.t)
-  : S with type state = Domain.t
-       and type states = States.t
+module Make (Domain: LogicDomain) : S with type state = Domain.t
+

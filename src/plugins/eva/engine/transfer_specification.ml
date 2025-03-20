@@ -192,9 +192,7 @@ let precise_loc_of_assign env kind term =
 
 module Make
     (Engine: Engine_sig.S)
-    (States: Powerset.S with type state = Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t
-                               and type states = States.t)
+    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
 = struct
 
   module Domain = Engine.Dom
@@ -206,22 +204,22 @@ module Make
      single state, and States.empty instead of bottom. We thus use this monad
      to turn `Bottom into States.empty in the following for consistency. *)
   let (>>-) state f = match state with
-    | `Bottom -> States.empty
+    | `Bottom -> []
     | `Value state -> f state
 
   (* The precise narrowing of disjunctive sets of states is the disjunction
      between the narrowing of each combination of states from each sets. The
      complexity is quadratic. *)
   let precise_narrow_states_list states_list =
-    let fold = States.fold in
+    let fold = List.fold_left in
     let fold2 f set1 set2 acc =
-      fold (fun s1 acc -> fold (fun s2  acc -> f s1 s2 acc) set2 acc) set1 acc
+      fold (fun acc s1 -> fold (fun acc s2 -> f s1 s2 acc) acc set2) acc set1
     in
     let rec disjunctive_narrow states = function
       | [] -> states
       | set :: tail ->
-        let narrow s s' acc =  States.add' (Domain.narrow s s') acc in
-        let states = fold2 narrow states set States.empty in
+        let narrow s s' acc = Bottom.add_to_list (Domain.narrow s s') acc in
+        let states = fold2 narrow states set [] in
         disjunctive_narrow states tail
     in
     disjunctive_narrow (List.hd states_list) (List.tl states_list)
@@ -232,20 +230,21 @@ module Make
      TODO: it would be useful to have an heuristic to choose the set to
      be kept. *)
   let approximate_narrow_states_list states_list =
-    let joined_list = List.map States.join states_list in
+    let joined_list = List.map (Bottom.of_list ~join:Domain.join) states_list in
     let narrowed_state = match joined_list with
       | [] -> assert false
       | hd :: tl -> List.fold_left (Bottom.narrow Domain.narrow) hd tl
     in
     narrowed_state >>- fun narrowed_state ->
-    States.fold
-      (fun state acc -> States.add' (Domain.narrow state narrowed_state) acc)
-      (List.hd states_list)
-      States.empty
+    List.fold_left
+      (fun acc state ->
+         Bottom.add_to_list (Domain.narrow state narrowed_state) acc)
+      [] (List.hd states_list)
+
 
   (* Narrowing of a list of disjunctive sets of states. *)
   let narrow_states_list = function
-    | [] -> States.empty
+    | [] -> []
     | [x] -> x
     | states_list ->
       if true
@@ -364,7 +363,7 @@ module Make
       let cvalue_state = get_cvalue_or_top state in
       List.iter (check_one_assign cvalue_state) assigns
     in
-    States.iter check_one_state states
+    List.iter check_one_state states
 
   (* Computes the effects of a list of [behaviors] as one: apply the assigns and
      allocations clauses of the first behavior, and reduces the resulting states
@@ -372,7 +371,7 @@ module Make
      [spec] is its specification, [result] is the \result varinfo it returns,
      and [status] the status of the behaviors. *)
   let compute_effects ~warn aloc kf spec result behaviors status states =
-    States.join states >>- fun pre_state ->
+    Bottom.of_list ~join:Domain.join states >>- fun pre_state ->
     let behavior = List.hd behaviors in
     let retres_loc = Option.map Location.eval_varinfo result in
     let assigns = get_assigns_for_behavior spec behavior in
@@ -382,7 +381,7 @@ module Make
       and allocs = evaluate_free_alloc state retres_loc allocs in
       apply_assigns_and_allocations aloc (assigns @ allocs) state
     in
-    let states = States.map compute states in
+    let states = List.map compute states in
     let states =
       Logic.check_fct_postconditions_for_behaviors kf behaviors status
         ~result ~pre_state ~post_states:states
@@ -429,8 +428,8 @@ module Make
     in
     let compute_complete_set behaviors =
       List.fold_left
-        (fun acc b -> fst (States.merge (compute_behavior b) ~into:acc))
-        States.empty behaviors
+        (fun acc b -> List.rev_append (compute_behavior b) acc)
+        [] behaviors
     in
     List.map compute_complete_set behaviors
 
@@ -491,7 +490,7 @@ module Make
       Transfer_logic.process_inactive_behaviors kinstr kf behaviors;
       `Bottom
     in
-    match States.join states with
+    match Bottom.of_list ~join:Domain.join states with
     (* If the preconditions of the default behavior led to bottom, all other
        behaviors are inactive. *)
     | `Bottom -> all_inactive ()
@@ -557,7 +556,7 @@ module Make
        state is the pre state for any further computation. *)
     let states =
       Logic.check_fct_preconditions_for_behaviors
-        kinstr kf [default_bhv] Alarmset.True (States.singleton state)
+        kinstr kf [default_bhv] Alarmset.True [state]
     in
     evaluate_preconditions kinstr kf behaviors complete_behaviors states
     >>- fun (behaviors, complete_behaviors) ->
@@ -631,6 +630,6 @@ module Make
         let branch = Partition.Spec_behavior (call.kf, kinstr, behavior_id) in
         Partition.Key.(add_branch branch empty), state
       in
-      List.mapi add_key (States.to_list states)
+      List.mapi add_key states
 
 end

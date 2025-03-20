@@ -156,16 +156,12 @@ let register_signal_handler () =
 
 module Make (Engine: Engine_sig.S) = struct
 
-  module PowersetDomain = Powerset.Make (Engine.Dom)
-
   module Transfer = Transfer_stmt.Make (Engine)
-  module Logic = Transfer_logic.Make (Engine.Dom) (PowersetDomain)
-  module Spec = Transfer_specification.Make (Engine) (PowersetDomain) (Logic)
+  module Logic = Transfer_logic.Make (Engine.Dom)
+  module Spec = Transfer_specification.Make (Engine) (Logic)
   module Init = Initialization.Make (Engine.Dom) (Engine.Eval) (Transfer)
 
-  module Computer =
-    Iterator.Computer
-      (Engine) (PowersetDomain) (Transfer) (Init) (Logic) (Spec)
+  module Computer = Iterator.Computer (Engine) (Transfer) (Init) (Logic) (Spec)
 
   include Cvalue_domain.Getters (Engine.Dom)
 
@@ -372,7 +368,7 @@ module Make (Engine: Engine_sig.S) = struct
       let call = { kf; callstack; arguments = []; rest = []; return = None; } in
       let final_result = compute_call' Kglobal call None init_state in
       let final_states = List.map snd (final_result.states) in
-      let final_state = PowersetDomain.(final_states |> of_list |> join) in
+      let final_state = Bottom.of_list ~join:Engine.Dom.join final_states in
       Eva_utils.clear_call_stack ();
       final_state
     in

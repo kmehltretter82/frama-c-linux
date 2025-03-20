@@ -74,11 +74,9 @@ let record_fireable edge =
 
 module Make_Dataflow
     (Engine : Engine_sig.S)
-    (States : Powerset.S with type state = Engine.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Engine.Dom.t)
     (Init: Initialization.S with type state := Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t
-                               and type states = States.t)
+    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
          stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
@@ -136,18 +134,18 @@ module Make_Dataflow
     and call_kinstr = AnalysisParam.call_kinstr
     and ab = active_behaviors in
     if Eva_utils.skip_specifications kf then
-      States.singleton state
+      [state]
     else match Logic.check_fct_preconditions call_kinstr kf ab state with
-      | `Bottom -> States.empty
+      | `Bottom -> []
       | `Value set -> set
 
   let initial_state =
-    match States.join initial_states with
+    match Bottom.of_list ~join:Domain.join initial_states with
     | `Bottom -> Domain.top (* No analysis in this case. *)
     | `Value state -> state
 
   let initial_tank =
-    Partitioning.initial_tank (States.to_list initial_states)
+    Partitioning.initial_tank initial_states
   let get_initial_flow () =
     -1 (* Dummy edge id *), Partitioning.drain initial_tank
 
@@ -321,11 +319,11 @@ module Make_Dataflow
         [state]
       else match
           Logic.check_fct_postconditions kf active_behaviors Normal
-            ~pre_state:initial_state ~post_states:(States.singleton state)
+            ~pre_state:initial_state ~post_states:[state]
             ~result:return_var
         with
         | `Bottom -> []
-        | `Value v -> States.to_list v
+        | `Value v -> v
     (* Assign the return value *)
     and assign_retval =
       match return_exp with
@@ -379,8 +377,7 @@ module Make_Dataflow
         Logic.interp_annot
           ~record kf active_behaviors stmt ca ~initial_state states
       in
-      States.to_list
-        (List.fold_left interp_annot (States.singleton state) annots)
+      List.fold_left interp_annot [state] annots
 
   let transfer_statement (stmt : stmt) : transfer_function =
     fun (key, state) ->
@@ -617,7 +614,7 @@ module Make_Dataflow
   (* If the postconditions have not been evaluated, mark them as true. *)
   let mark_postconds_as_true () =
     ignore (Logic.check_fct_postconditions kf active_behaviors Normal
-              ~pre_state:initial_state ~post_states:States.empty ~result:None)
+              ~pre_state:initial_state ~post_states:[] ~result:None)
 
   let compute () : (key * state) list =
     if interpreter_mode then
@@ -704,11 +701,9 @@ end
 
 module Computer
     (Engine : Engine_sig.S)
-    (States : Powerset.S with type state = Engine.Dom.t)
     (Transfer : Transfer_stmt.S with type state = Engine.Dom.t)
     (Init: Initialization.S with type state := Engine.Dom.t)
-    (Logic : Transfer_logic.S with type state = Engine.Dom.t
-                               and type states = States.t)
+    (Logic : Transfer_logic.S with type state = Engine.Dom.t)
     (Spec: sig
        val treat_statement_assigns:
          stmt -> assigns -> Engine.Dom.t -> Engine.Dom.t
@@ -718,7 +713,7 @@ module Computer
   let compute ~save_results kf call_kinstr state =
     let module Dataflow =
       Make_Dataflow
-        (Engine) (States) (Transfer) (Init) (Logic) (Spec)
+        (Engine) (Transfer) (Init) (Logic) (Spec)
         (struct
           let kf = kf
           let call_kinstr = call_kinstr
