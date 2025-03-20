@@ -47,7 +47,6 @@ type 'a if_consistent = [ `Value of 'a | `Inconsistent ]
 module Status : sig
   include Datatype.S_with_collections with type t := status
   val join: status -> status -> status
-  val join_list: status list -> status
   val inter: status -> status -> status if_consistent
 end
 
