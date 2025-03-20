@@ -4584,9 +4584,10 @@ domain.
         the following example, the annotation instructs the analyzer to use
         3 segments for the analysis of the loop.
 \begin{listing-nonumber}
-int t[20] = {0};
+int t[20];
+int i = 0;
 //@ array_partition t, 0, i, i+1, 20;
-for (int i = 0; i < 20; i++) {
+for (; i < 20; i++) {
   ...
 }
 \end{listing-nonumber}
