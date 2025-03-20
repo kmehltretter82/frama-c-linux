@@ -54,25 +54,32 @@ module Bottom : sig
   val pretty_bottom : Format.formatter -> unit (* for %t specifier *)
   val pretty : (Format.formatter -> 'a -> unit) -> Format.formatter -> 'a t -> unit
 
-  (* Lattice operators *)
+  (** Lattice operators *)
   val is_included : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
   val join : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
   val narrow : ('a -> 'a -> 'a t) -> 'a t -> 'a t -> 'a t
   val join_list : ('a -> 'a -> 'a) -> 'a t list -> 'a t
 
-  (* Iterators *)
+  (** Iterator. *)
   val iter : ('a -> unit) -> 'a t -> unit
 
   (** In a lattice where the elements are lists of non-bottom values,
       the empty list is the bottom case. *)
 
-  (** Conversion *)
+  (**  Conversion from Bottom to None. *)
   val to_option : 'a t -> 'a option
   val of_option : 'a option -> 'a t
+
+  (** Joins all elements of a list. Returns Bottom if the list is empty. *)
+  val of_list : join:('a -> 'a -> 'a) -> 'a list -> 'a t
+
+  (** Returns an empty list on Bottom, and a list of one element otherwise. *)
   val to_list : 'a t -> 'a list
+
+  (** Filters the given list to remove Bottom elements. *)
   val list_values : 'a t list -> 'a list
 
-  (** [elt >:: list] adds [elt] to the [list] if it is not bottom. *)
+  (** [add_to_list elt list] adds [elt] to the [list] if it is not bottom. *)
   val add_to_list : 'a t -> 'a list -> 'a list
 
 end
@@ -107,7 +114,7 @@ module Top : sig
   val join : ('a -> 'a -> 'a t) -> 'a t -> 'a t -> 'a t
   val narrow : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
-  (* Iterators *)
+  (** Iterator *)
   val iter : ('a -> unit) -> 'a t -> unit
 
   (** Conversion *)
@@ -157,7 +164,7 @@ module TopBottom: sig
     (Format.formatter -> 'a -> unit) ->
     Format.formatter -> 'a t -> unit
 
-  (* Lattice operators *)
+  (** Lattice operators *)
   val is_included : ('a -> 'b -> bool) -> 'a t -> 'b t -> bool
   val join : ('a -> 'a -> [< 'a t]) -> 'a t -> 'a t -> 'a t
   val narrow : ('a -> 'a -> [< 'a t]) -> 'a t -> 'a t -> 'a t

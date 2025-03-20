@@ -42,7 +42,7 @@ module type S = sig
   val length: t -> int
 
   val merge: into:t -> t -> t * bool
-  val join: ?into:state or_bottom -> t -> state or_bottom
+  val join: t -> state or_bottom
   val fold: (state -> 'a -> 'a) -> t -> 'a -> 'a
   val iter: (state -> unit) -> t -> unit
   val map: (state -> state) -> t -> t
@@ -71,10 +71,7 @@ module Make (Domain : Domain) = struct
 
   let length = List.length
 
-  let join ?(into=`Bottom) states =
-    List.fold_left
-      (fun acc v -> Bottom.join Domain.join acc (`Value v))
-      into states
+  let join states = Bottom.of_list ~join:Domain.join states
 
   let fold f states acc = List.fold_left (fun acc s -> f s acc) acc states
   let iter = List.iter

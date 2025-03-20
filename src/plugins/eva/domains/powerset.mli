@@ -42,7 +42,7 @@ module type S = sig
   val length: t -> int
 
   val merge: into:t -> t -> t * bool
-  val join: ?into:state or_bottom -> t -> state or_bottom
+  val join: t -> state or_bottom
   val fold: (state -> 'a -> 'a) -> t -> 'a -> 'a
   val iter: (state -> unit) -> t -> unit
   val map: (state -> state) -> t -> t
