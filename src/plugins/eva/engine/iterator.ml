@@ -447,7 +447,7 @@ module Make_Dataflow
     let<> UpdatedCurrentLoc = e.edge_loc in
     let flow = Partitioning.transfer (transfer_transition transition) flow in
     let flow =
-      if Engine.Interferences.is_empty ()
+      if Engine.Interferences.is_empty transition
       then flow
       else Partitioning.transfer (lift Engine.Interferences.inject) flow
     in

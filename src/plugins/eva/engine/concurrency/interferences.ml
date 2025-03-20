@@ -310,4 +310,14 @@ struct
         in
         Dom.join state result
     end
+
+  (* No need to inject interferences on transitions that cannot have any effect
+     on global variables. *)
+  let is_uninterfering_transition: Eva_automata.transition -> bool = function
+    | Skip | Enter _ | Leave _ | Return _ -> true
+    | Guard _ | Assign _ | Call _ | Init _ | Asm _ -> false
+
+  let is_empty transition =
+    is_uninterfering_transition transition || is_empty ()
+
 end

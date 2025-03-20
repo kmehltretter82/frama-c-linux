@@ -116,7 +116,6 @@
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:9: inject threads interferences at this point
-[eva:interferences] interrupt.c:10: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -179,13 +178,10 @@
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 [eva:interferences] interrupt.c:19: inject threads interferences at this point
-[eva:interferences] <unknown location>: 
-  inject threads interferences at this point
-[eva:interferences] interrupt.c:17: inject threads interferences at this point
-[eva:interferences] interrupt.c:18: inject threads interferences at this point
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
-[eva:interferences] interrupt.c:20: inject threads interferences at this point
+[eva:interferences] interrupt.c:18: inject threads interferences at this point
 [eva] interrupt.c:20: Frama_C_show_each: {1}
+[eva:interferences] interrupt.c:20: inject threads interferences at this point
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
 [eva:interferences] interrupt.c:22: inject threads interferences at this point
@@ -231,7 +227,6 @@
 [eva] Analyzing a complete application starting at interrupt_oneshot
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:9: inject threads interferences at this point
-[eva:interferences] interrupt.c:10: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -302,13 +297,10 @@
 [mt] Thread <main>, fun main_interrupt_one_shot
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0}
 [eva:interferences] interrupt.c:19: inject threads interferences at this point
-[eva:interferences] <unknown location>: 
-  inject threads interferences at this point
-[eva:interferences] interrupt.c:17: inject threads interferences at this point
-[eva:interferences] interrupt.c:18: inject threads interferences at this point
 [eva] interrupt.c:18: Frama_C_show_each_locked: {0; 1}
-[eva:interferences] interrupt.c:20: inject threads interferences at this point
+[eva:interferences] interrupt.c:18: inject threads interferences at this point
 [eva] interrupt.c:20: Frama_C_show_each: {0; 1}
+[eva:interferences] interrupt.c:20: inject threads interferences at this point
 [eva:interferences] interrupt.c:21: inject threads interferences at this point
 [eva] interrupt.c:22: Frama_C_show_each: {0; 1}
 [eva:interferences] interrupt.c:22: inject threads interferences at this point
