@@ -520,9 +520,6 @@
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
 [eva:interferences] philo.c:57: inject threads interferences at this point
-[eva:interferences] <unknown location>: 
-  inject threads interferences at this point
-[eva:interferences] philo.c:57: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -758,9 +755,6 @@
                        [1] ∈ UNINITIALIZED
   From thread jobs[4]: [0] ∈ {5}
                        [1] ∈ UNINITIALIZED
-[eva:interferences] philo.c:57: inject threads interferences at this point
-[eva:interferences] <unknown location>: 
-  inject threads interferences at this point
 [eva:interferences] philo.c:57: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

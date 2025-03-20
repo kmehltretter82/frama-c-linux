@@ -83,8 +83,8 @@ sig
       been read or written during the last transfer function. *)
   val inject : state -> state
 
-  (** Are there any current interferences to inject? *)
-  val is_empty : unit -> bool
+  (** Are there any interferences to inject after the given transition? *)
+  val is_empty : Eva_automata.transition -> bool
 end
 
 

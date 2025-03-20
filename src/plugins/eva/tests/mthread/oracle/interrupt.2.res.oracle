@@ -144,7 +144,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -176,7 +175,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -293,7 +291,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -327,7 +324,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -443,7 +439,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -477,7 +472,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -594,7 +588,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables
@@ -628,7 +621,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr2
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:45: inject threads interferences at this point
-[eva:interferences] interrupt.c:46: inject threads interferences at this point
 [eva:alarm] interrupt.c:45: Warning: 
   signed overflow. assert interrupt_received_a + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
@@ -748,7 +740,6 @@
 [eva] Analyzing a complete application starting at interrupt_cross_incr1
 [eva] Initial state supplied by user
 [eva:interferences] interrupt.c:41: inject threads interferences at this point
-[eva:interferences] interrupt.c:42: inject threads interferences at this point
 [eva:alarm] interrupt.c:41: Warning: 
   signed overflow. assert interrupt_received_b + 1 ≤ 2147483647;
 [mt] * Starting to save the state of the value analysis
