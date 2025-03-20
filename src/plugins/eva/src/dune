@@ -21,6 +21,9 @@
    (echo " - apron.polkaMPQ:" %{lib-available:apron.polkaMPQ} "\n")
    (echo " - apron.apron:" %{lib-available:apron.apron} "\n"))))
 
+;; Deactivate warning 9 globally for Eva
+(env (_ (flags :standard -w -9)))
+
 (rule
  (alias install)
  (enabled_if
@@ -34,7 +37,7 @@
  (name eva)
  (optional)
  (public_name frama-c-eva.core)
- (flags -open Frama_c_kernel :standard -w -9)
+ (flags -open Frama_c_kernel :standard)
  (libraries frama-c.kernel frama-c-server.core)
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx))
@@ -54,7 +57,7 @@
   (name apron_domain)
   (optional)
   (public_name frama-c-eva.apron.core)
-  (flags -open Frama_c_kernel -open Eva__Private :standard -w -9)
+  (flags -open Frama_c_kernel -open Eva__Private :standard)
   (libraries frama-c.kernel frama-c-eva.core fc_internal_apron)
   (instrumentation (backend landmarks))
   (instrumentation (backend bisect_ppx))))
