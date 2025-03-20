@@ -190,11 +190,16 @@ let _project_list =
     ~data:(module Jstring)
     ~get:Project.get_name;
 
+  let add_update_hook f =
+    let f (p, _) = f p in
+    Project.register_after_set_name_hook f
+  in
   States.register_array ~package
     ~name:"projectList"
     ~descr:(Md.plain "List of Frama-C projects")
     ~key:Project.get_unique_name
     ~iter:Project.iter_on_projects
+    ~add_update_hook
     model
 
 (* -------------------------------------------------------------------------- *)

@@ -107,6 +107,11 @@ val set_name: t -> string -> unit
 (** Set the name of the given project.
     @since Boron-20100401 *)
 
+val register_after_set_name_hook: (t * string -> unit) -> unit
+(** [register_after_set_name_hook f] adds a hook on function {!set_name}.
+    The project given as argument to [f] is the current project, while the
+    string is the old name for the current project. *)
+
 exception Unknown_project
 val from_unique_name: string -> t
 (** Return a project based on {!unique_name}.
