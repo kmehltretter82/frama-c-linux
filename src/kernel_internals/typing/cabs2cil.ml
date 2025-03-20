@@ -106,54 +106,6 @@ let check_attribute_name s =
   end;
   res
 
-let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
-let () = Ast_attributes.register_shallow ~attr_class:AttrStmt
-    frama_c_keep_block
-
-(* Already registered in Ast_attributes. *)
-let fc_stdlib = "fc_stdlib"
-
-let fc_stdlib_generated = "fc_stdlib_generated"
-let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
-    fc_stdlib_generated
-
-let fc_local_static = "fc_local_static"
-let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
-    fc_local_static
-
-let frama_c_destructor = "fc_destructor"
-let () = Ast_attributes.register_shallow ~attr_class:(AttrName false)
-    frama_c_destructor
-
-(* GCC 'malloc' attributes can refer to erased functions and make the code
-   un-reparsable, so we keep them in the AST but not pretty-print them. *)
-let () = Ast_attributes.register_shallow ~ignore:true
-    ~attr_class:AttrUnknown "malloc"
-
-let () =
-  (* packed and aligned are treated separately, we ignore them
-     during standard processing.
-  *)
-  Ast_attributes.register ~attr_class:AttrUnknown "packed";
-  Ast_attributes.register ~attr_class:AttrUnknown "aligned";
-  Ast_attributes.register ~attr_class:(AttrFunType false) "warn_unused_result";
-  Ast_attributes.register ~attr_class:(AttrName false) "FC_OLDSTYLEPROTO";
-  Ast_attributes.register ~attr_class:(AttrName false) "static";
-  Ast_attributes.register ~attr_class:(AttrName false) "missingproto";
-  Ast_attributes.register ~attr_class:AttrUnknown "dummy";
-  Ast_attributes.register ~attr_class:AttrUnknown "signal"; (* AVR-specific attribute *)
-  Ast_attributes.register ~attr_class:AttrUnknown "leaf";
-  Ast_attributes.register ~attr_class:AttrUnknown "nonnull";
-  Ast_attributes.register ~attr_class:AttrUnknown "deprecated";
-  Ast_attributes.register ~attr_class:AttrUnknown "access";
-  Ast_attributes.register ~attr_class:AttrUnknown "returns_twice";
-  Ast_attributes.register ~attr_class:AttrUnknown "pure";
-  Ast_attributes.register ~attr_class:AttrUnknown "cleanup";
-  Ast_attributes.register ~attr_class:AttrUnknown "warning";
-  Ast_attributes.register ~attr_class:AttrUnknown "format_arg";
-  Ast_attributes.register ~attr_class:AttrUnknown "no_sanitize";
-  Ast_attributes.register ~attr_class:AttrUnknown "target"
-
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
     types of cabs2cil-introduced temp variables. *)
@@ -332,14 +284,16 @@ let current_stdheader = ref []
 let pop_stdheader () =
   match !current_stdheader with
   | s::l ->
-    Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Popping %s %s" fc_stdlib s;
+    Kernel.debug ~dkey:Kernel.dkey_typing_pragma
+      "Popping %s %s" Ast_attributes.fc_stdlib s;
     current_stdheader := l
   | [] ->
     Kernel.warning ~current:true
-      "#pragma %s pop does not match a push" fc_stdlib
+      "#pragma %s pop does not match a push" Ast_attributes.fc_stdlib
 
 let push_stdheader s =
-  Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Pushing %s %s@." fc_stdlib s;
+  Kernel.debug ~dkey:Kernel.dkey_typing_pragma
+    "Pushing %s %s@." Ast_attributes.fc_stdlib s;
   current_stdheader := s::!current_stdheader
 
 (* Returns the topmost (latest) header that is not internal to Frama-C,
@@ -365,7 +319,7 @@ let (>>?) opt f =
   | _ -> opt
 
 let process_stdlib_pragma name args =
-  if name = fc_stdlib then begin
+  if name = Ast_attributes.fc_stdlib then begin
     match args with
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
@@ -381,12 +335,12 @@ let fc_stdlib_attribute attrs =
   if s = "" then attrs
   else begin
     let payload, attrs =
-      if Ast_attributes.contains fc_stdlib attrs then begin
-        AStr s :: Ast_attributes.find_params fc_stdlib attrs,
-        Ast_attributes.drop fc_stdlib attrs
+      if Ast_attributes.(contains fc_stdlib attrs) then begin
+        AStr s :: Ast_attributes.(find_params fc_stdlib attrs),
+        Ast_attributes.(drop fc_stdlib attrs)
       end else [AStr s], attrs
     in
-    Ast_attributes.add (fc_stdlib, payload) attrs
+    Ast_attributes.(add (fc_stdlib, payload) attrs)
   end
 (* ICC align/noalign pragmas (not supported by GCC/MSVC with this syntax).
    Implemented by translating them to 'aligned' attributes. Currently,
@@ -3789,7 +3743,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let locals = b.blocals in
       b.blocals <- [];
       b.battrs <-
-        Ast_attributes.add_list [(frama_c_keep_block,[])] b.battrs;
+        Ast_attributes.(add_list [(frama_c_keep_block,[])] b.battrs);
       let block = mkStmt ~ghost ~valid_sid (Block b) in
       let chunk = s2c block in
       let chunk = { chunk with cases = current_chunk.cases } in
@@ -8488,7 +8442,9 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
     match enode with Cabs.VARIABLE "FC_BUILTIN" -> true | _ -> false
   in
   let is_fc_stdlib {Cabs.expr_node=enode} =
-    match enode with Cabs.VARIABLE v when v = fc_stdlib -> true | _ -> false
+    match enode with
+    | Cabs.VARIABLE v when v = Ast_attributes.fc_stdlib -> true
+    | _ -> false
   in
   let isgenerated =
     List.exists (fun (_,el) -> List.exists is_fc_builtin el) a
@@ -8791,7 +8747,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     in
     checkArray inite vi;
     vi.vname <- newname;
-    let attrs = Ast_attributes.add (fc_local_static,[]) vi.vattr in
+    let attrs = Ast_attributes.(add (fc_local_static,[]) vi.vattr) in
     vi.vattr <- fc_stdlib_attribute attrs;
 
     (* However, we have a problem if a real global appears later with the
@@ -8859,7 +8815,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     if isvarsize then begin
       let free = vla_free_fun () in
       let destructor = AStr free.vname in
-      let attr = (frama_c_destructor, [destructor]) in
+      let attr = (Ast_attributes.frama_c_destructor, [destructor]) in
       vi.vdefined <- true;
       vi.vattr <- Ast_attributes.add attr vi.vattr;
     end;
@@ -9930,7 +9886,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
     let b = c2block ~ghost c in
-    b.battrs <- Ast_attributes.add_list [(frama_c_keep_block,[])] b.battrs;
+    b.battrs <- Ast_attributes.(add_list [(frama_c_keep_block,[])] b.battrs);
     let res = s2c (mkStmt ~ghost ~valid_sid (Block b)) in
     { res with cases = c.cases }
 
@@ -10381,3 +10337,9 @@ let convFile (path, f) =
 
 (* export function without internal `relaxed' argument. *)
 let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
+
+(* Deprecated definitions *)
+
+let frama_c_keep_block = Ast_attributes.frama_c_keep_block
+let frama_c_destructor = Ast_attributes.frama_c_destructor
+let fc_local_static    = Ast_attributes.fc_local_static

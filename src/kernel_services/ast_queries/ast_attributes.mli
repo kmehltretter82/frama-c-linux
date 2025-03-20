@@ -31,6 +31,9 @@ open Cil_types
 (** {2 Attributes lists/values} *)
 (* **************************** *)
 
+(** [const], [volatile], [restrict] and [ghost] attributes. *)
+val qualifier_attributes : string list
+
 (** Name of the attribute that is automatically inserted (with an [AINT size]
     argument when querying the type of a field that is a bitfield.
 *)
@@ -43,9 +46,6 @@ val anonymous_attribute_name : string
 
 (** Attribute identifying anonymous function parameters. *)
 val anonymous_attribute : attribute
-
-(** [const], [volatile], [restrict] and [ghost] attributes. *)
-val qualifier_attributes : string list
 
 (** Internal attributes of Frama-C.  *)
 val fc_internal_attributes : string list
@@ -80,6 +80,35 @@ val frama_c_mutable : string
     it replaces a call to an inline function.
 *)
 val frama_c_inlined : string
+
+(** Name of the attribute inserted by the elaboration to prevent user blocks
+    from disappearing. It can be removed whenever block contracts have been
+    processed. *)
+val frama_c_keep_block : string
+
+(** Name of the attribute used to store the function that should be called
+    when the corresponding variable exits its scope. *)
+val frama_c_destructor : string
+
+(** Name of the attribute used to indicate that a given static variable has a
+    local syntactic scope (despite a global lifetime).
+    @since Chlorine-20180501
+*)
+val fc_local_static : string
+
+(** Internal attribute use in Frama-C's libc, see share/libc/feature.h. *)
+val fc_stdlib : string
+
+(** Attribute added when generating variadic functions from Frama-C's libc. *)
+val fc_stdlib_generated : string
+
+(** Attribute added by Frama-C's parser. *)
+val fc_oldstyleproto : string
+
+(** Attribute added by cabs2cil on functions calls encountered before any
+    declaration/definition.
+*)
+val fc_missingproto : string
 
 (* ***************************** *)
 (** {2 Attributes manipulations} *)
@@ -166,7 +195,8 @@ type attribute_info = {
 val known_table : (string, attribute_info) Hashtbl.t
 
 (** Add a new attribute with a specified class, if it should be printed
-    (default is [true]) and ignore when comparing types (default if [false]).
+    (default is [true]) and ignore when comparing types (default if [true] for
+    [AttrUnknown] class and [false] otherwise).
 *)
 val register : ?print:bool -> ?ignore:bool -> attr_class:attribute_class ->
   string -> unit

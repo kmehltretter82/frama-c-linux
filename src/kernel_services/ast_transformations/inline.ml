@@ -353,11 +353,11 @@ let remove_local_statics = object
   inherit Visitor.frama_c_inplace
   method! vblock b =
     b.bstatics <- List.filter (fun v ->
-        not (Ast_attributes.contains Cabs2cil.fc_local_static v.vattr)
+        not (Ast_attributes.(contains fc_local_static v.vattr))
       ) b.bstatics;
     Cil.DoChildren
   method! vvrbl v =
-    v.vattr <- Ast_attributes.drop Cabs2cil.fc_local_static v.vattr;
+    v.vattr <- Ast_attributes.(drop fc_local_static v.vattr);
     Cil.DoChildren
 end
 

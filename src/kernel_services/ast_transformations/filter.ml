@@ -590,7 +590,7 @@ end = struct
     *)
     method private remove_local_static_attr v =
       let new_v = Visitor_behavior.Get.varinfo self#behavior v in
-      new_v.vattr <- Ast_attributes.drop Cabs2cil.fc_local_static new_v.vattr
+      new_v.vattr <- Ast_attributes.(drop fc_local_static new_v.vattr)
 
     method private process_visible_stmt s =
       debug "[process_visible_stmt] does sid:%d@." s.sid;

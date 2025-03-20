@@ -1002,7 +1002,7 @@ let cleanup file =
         *)
         b.battrs <- List.filter
             (function
-              | (l,[]) when l = Cabs2cil.frama_c_keep_block -> false
+              | (l,[]) when l = Ast_attributes.frama_c_keep_block -> false
               | _ -> true)
             b.battrs;
         b

@@ -24,7 +24,7 @@ open Cil_types
 
 let add_destructor (_, l as acc) var =
   let loc = var.vdecl in
-  match Ast_attributes.find_params Cabs2cil.frama_c_destructor var.vattr with
+  match Ast_attributes.(find_params frama_c_destructor var.vattr) with
   | [] -> acc
   | [ attr ] ->
     let mk_call f e args =
@@ -62,17 +62,17 @@ let add_destructor (_, l as acc) var =
          | None ->
            Kernel.fatal
              "unexpected argument of attribute %s: %a"
-             Cabs2cil.frama_c_destructor
+             Ast_attributes.frama_c_destructor
              Printer.pp_attrparam a)
       | _ ->
         Kernel.fatal
           "unexpected argument of attribute %s: %a"
-          Cabs2cil.frama_c_destructor
+          Ast_attributes.frama_c_destructor
           Printer.pp_attrparam a
     in aux (Cil.evar ~loc var) attr
   | _ ->
     Kernel.fatal
-      "attribute %s expects exactly one argument" Cabs2cil.frama_c_destructor
+      "attribute %s expects exactly one argument" Ast_attributes.frama_c_destructor
 
 (* we expect the variables from oldest to newest. Hence the fold_left will
    call the destructors in the reverse order, starting with the newest ones. *)
@@ -211,7 +211,7 @@ class vis flag = object(self)
       current_vars @ vars
     in
     let abort_if_non_trivial_type kind v =
-      if Ast_attributes.contains Cabs2cil.frama_c_destructor v.vattr then
+      if Ast_attributes.(contains frama_c_destructor v.vattr) then
         Kernel.abort
           "%a, cannot jump from %s statement \
            bypassing initialization of variable %a, declared at %a"

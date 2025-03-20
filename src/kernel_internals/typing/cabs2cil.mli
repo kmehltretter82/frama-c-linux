@@ -132,22 +132,6 @@ val register_for_loop_incr_hook: (Cabs.expression -> unit) -> unit
 (** @see <https://frama-c.com/download/frama-c-plugin-development-guide.pdf> *)
 val convFile: Cabs.file -> Cil_types.file
 
-
-(** Name of the attribute inserted by the elaboration to prevent user blocks
-    from disappearing. It can be removed whenever block contracts have been
-    processed. *)
-val frama_c_keep_block: string
-
-(** Name of the attribute used to store the function that should be called
-    when the corresponding variable exits its scope. *)
-val frama_c_destructor: string
-
-(** Name of the attribute used to indicate that a given static variable has a
-    local syntactic scope (despite a global lifetime).
-    @since Chlorine-20180501
-*)
-val fc_local_static: string
-
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
     types of cabs2cil-introduced temp variables. *)
@@ -263,6 +247,27 @@ val fieldsToInit: Cil_types.compinfo -> string option -> Cil_types.offset list
    @since 25.0-Manganese
 *)
 val func_locs : unit -> (Filepath.position * Filepath.position * string) list
+
+(** Name of the attribute inserted by the elaboration to prevent user blocks
+    from disappearing. It can be removed whenever block contracts have been
+    processed. *)
+val frama_c_keep_block: string
+[@@deprecated "use Ast_attributes.frama_c_keep_block instead."]
+[@@migrate { repl = Ast_attributes.frama_c_keep_block }]
+
+(** Name of the attribute used to store the function that should be called
+    when the corresponding variable exits its scope. *)
+val frama_c_destructor: string
+[@@deprecated "use Ast_attributes.frama_c_destructor instead."]
+[@@migrate { repl = Ast_attributes.frama_c_destructor }]
+
+(** Name of the attribute used to indicate that a given static variable has a
+    local syntactic scope (despite a global lifetime).
+    @since Chlorine-20180501
+*)
+val fc_local_static: string
+[@@deprecated "use Ast_attributes.fc_local_static instead."]
+[@@migrate { repl = Ast_attributes.fc_local_static }]
 
 (*
 Local Variables:

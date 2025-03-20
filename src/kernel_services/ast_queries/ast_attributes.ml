@@ -159,7 +159,7 @@ let should_ignore name =
   | None -> true
   | Some info -> info.attr_ignore
 
-let partition ~(default:attribute_class) (attrs:  attributes) :
+let partition ~(default:attribute_class) (attrs: attributes) :
   attributes * attributes * attributes =
   let rec loop (n,f,t) = function
     | [] -> n, f, t
@@ -176,14 +176,117 @@ let partition ~(default:attribute_class) (attrs:  attributes) :
   in
   loop ([], [], []) attrs
 
-(* Registering some attributes. *)
+(*************************)
+(* qualifiers attributes *)
+(*************************)
+
+let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
+let () = register_list ~attr_class:AttrType qualifier_attributes
+
+(**********************)
+(* storage attributes *)
+(**********************)
+
+let () = register ~attr_class:(AttrName false) "static"
+
+(*******************************)
+(* Frama-C internal attributes *)
+(*******************************)
+
+(* AttrUnknown attributes. *)
+
+let anonymous_attribute_name = "fc_anonymous"
+let anonymous_attribute = (anonymous_attribute_name, [])
+
+let () = register_shallow ~attr_class:AttrUnknown anonymous_attribute_name
+
+(* AttrType attributes. *)
+
+let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
+let cast_irrelevant_attributes = ["visibility"]
+
+let () = register_list ~attr_class:AttrType
+    (bitfield_attribute_name :: cast_irrelevant_attributes)
+
+let () = register_list ~ignore:true ~attr_class:AttrType
+    ["declspec"; "arraylen"]
+
+(* AttrStmt attributes. *)
+
+let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
+let frama_c_ghost_else = "fc_ghost_else"
+
+let () = register_list ~print:false ~ignore:true ~attr_class:AttrStmt
+    [frama_c_keep_block; frama_c_ghost_else]
+
+(* Attrname attributes. *)
+
+let frama_c_ghost_formal = "fc_ghost_formal"
+let frama_c_init_obj     = "fc_initialized_object"
+let frama_c_mutable      = "fc_mutable"
+let fc_stdlib            = "fc_stdlib"
+let fc_stdlib_generated  = "fc_stdlib_generated"
+let fc_local_static      = "fc_local_static"
+let frama_c_destructor   = "fc_destructor"
+let fc_oldstyleproto     = "FC_OLDSTYLEPROTO"
+let fc_missingproto      = "missingproto"
+
+let () =
+  register_list ~print:false ~ignore:true ~attr_class:(AttrName false)
+    [ frama_c_ghost_formal
+    ; frama_c_init_obj
+    ; frama_c_mutable
+    ; fc_stdlib
+    ; fc_stdlib_generated
+    ; fc_local_static
+    ; frama_c_destructor
+    ]
+
+let () =
+  register_list ~attr_class:(AttrName false)
+    [fc_oldstyleproto; fc_missingproto]
+
+(* AttFuntype attributes. *)
+
+let frama_c_inlined = "fc_inlined"
+
+let () = register_shallow ~ignore:true ~attr_class:(AttrFunType false)
+    frama_c_inlined
+
+let () = register ~attr_class:(AttrFunType false) "warn_unused_result"
+
+(* List of attributes for internal uses. *)
+
+let fc_internal_attributes =
+  [ fc_stdlib
+  ; anonymous_attribute_name
+  ; frama_c_keep_block
+  ; frama_c_ghost_else
+  ; frama_c_ghost_formal
+  ; frama_c_init_obj
+  ; frama_c_mutable
+  ; fc_stdlib_generated
+  ; fc_local_static
+  ; frama_c_destructor
+  ; frama_c_inlined
+  ; "declspec"
+  ; "arraylen"
+  ]
+
+let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
+
+let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
+
+(***************************************)
+(* Some (mostly GCC / MSVC) attributes *)
+(***************************************)
 
 let () =
   register_list ~attr_class:(AttrName false)
     [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
       "no_instrument_function"; "alias"; "no_check_memory_usage";
       "exception"; "model"; "aconst";
-      (* Gcc uses this to specify the name to be used in assembly for a global  *)
+      (* Gcc uses this to specify the name to be used in assembly for a global. *)
       "asm" ]
 
 let () =
@@ -205,61 +308,40 @@ let () =
   register_list ~attr_class:AttrStmt
     [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
 
-let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
-let () = register ~attr_class:AttrType bitfield_attribute_name
-
-let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
-let () =
-  register_list ~attr_class:AttrType qualifier_attributes
-
-let fc_internal_attributes = ["declspec"; "arraylen"; "fc_stdlib"]
-let () = register_list ~ignore:true ~attr_class:AttrType ["declspec"; "arraylen"]
-let () = register_shallow ~ignore:true ~attr_class:(AttrName false) "fc_stdlib"
-
-let cast_irrelevant_attributes = ["visibility"]
-let () = register_list ~attr_class:AttrType cast_irrelevant_attributes
-
-let spare_attributes_for_c_cast = fc_internal_attributes @ qualifier_attributes
-
-let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
-
-let anonymous_attribute_name = "fc_anonymous"
-let () = register_shallow ~attr_class:AttrUnknown anonymous_attribute_name
-let anonymous_attribute = (anonymous_attribute_name, [])
-
-let frama_c_ghost_else = "fc_ghost_else"
-let () = register_shallow ~attr_class:AttrStmt frama_c_ghost_else
-
-let frama_c_ghost_formal = "fc_ghost_formal"
-let () = register_shallow ~attr_class:(AttrName false) frama_c_ghost_formal
-
-let frama_c_init_obj = "fc_initialized_object"
-let () = register_shallow ~attr_class:(AttrName false) frama_c_init_obj
-
-let frama_c_mutable = "fc_mutable"
-let () = register_shallow ~attr_class:(AttrName false) frama_c_mutable
-
-let frama_c_inlined = "fc_inlined"
-let () = register_shallow ~attr_class:(AttrFunType false) frama_c_inlined
-
-(* Forward declaration from Cil_datatype. *)
-
-let () =
-  Cil_datatype.drop_non_logic_attributes :=
-    drop_list spare_attributes_for_logic_cast
-
-let () =
-  Cil_datatype.drop_fc_internal_attributes :=
-    drop_list fc_internal_attributes
-
-let () =
-  Cil_datatype.drop_ignored_attributes :=
-    let keep_attr (name, _) = not (should_ignore name) in
-    (fun attributes -> List.filter keep_attr attributes)
+(* GCC 'malloc' attributes can refer to erased functions and make the code
+   un-reparsable, so we keep them in the AST but not pretty-print them. *)
+let () = register_shallow ~ignore:true ~attr_class:AttrUnknown "malloc"
 
 (**********************)
-(* Utility functions  *)
+(* Unknown attributes *)
 (**********************)
+
+(* These attributes are registered to help case studies. We parse them and
+   reprint them, but they are ignored when comparing types and might be assigned
+   to the wrong AST node.
+*)
+let () =
+  register_list ~attr_class:AttrUnknown
+    [ "packed"  (* packed and aligned are treated separately, we ignore them *)
+    ; "aligned" (* during standard processing. *)
+    ; "dummy"
+    ; "signal"  (* AVR-specific attribute *)
+    ; "leaf"
+    ; "nonnull"
+    ; "deprecated"
+    ; "access"
+    ; "returns_twice"
+    ; "pure"
+    ; "cleanup"
+    ; "warning"
+    ; "format_arg"
+    ; "no_sanitize"
+    ; "target"
+    ]
+
+(*********************)
+(* Utility functions *)
+(*********************)
 
 let filter_qualifiers al =
   List.filter (fun a -> List.mem (get_name a) qualifier_attributes) al
@@ -283,3 +365,20 @@ let split_storage_modifiers al =
       List.map (fun (an, args) -> ("declspec", [ACons(an, args)])) stom
     in
     stom', rest
+
+(******************************************)
+(* Forward declaration from Cil_datatype. *)
+(******************************************)
+
+let () =
+  Cil_datatype.drop_non_logic_attributes :=
+    drop_list spare_attributes_for_logic_cast
+
+let () =
+  Cil_datatype.drop_fc_internal_attributes :=
+    drop_list fc_internal_attributes
+
+let () =
+  Cil_datatype.drop_ignored_attributes :=
+    let keep_attr (name, _) = not (should_ignore name) in
+    (fun attributes -> List.filter keep_attr attributes)
