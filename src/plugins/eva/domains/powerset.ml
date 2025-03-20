@@ -88,28 +88,16 @@ module Make (Domain : Domain) = struct
   let of_list l = l
   let to_list l = l
 
-  exception Unchanged
-  let add_exn v s =
-    if (List.exists (fun e -> Domain.is_included v e) s)
-    then raise Unchanged;
-    v :: s
-
-  let add v s =
-    try add_exn v s
-    with Unchanged -> s
+  let add v s = v :: s
 
   let add' v s = match v with
     | `Bottom  -> s
     | `Value v -> add v s
 
   let merge ~into set =
-    let f e (acc, unchanged) =
-      try  add_exn e acc, false
-      with Unchanged -> acc, unchanged
-    in
-    fold f set (into, true)
+    List.rev_append set into, false
 
-  let reorder = List.rev
+  let reorder l = List.rev l
 
   let pretty fmt state =
     iter (fun s -> Format.fprintf fmt "set contains %a@\n" Domain.pretty s) state
