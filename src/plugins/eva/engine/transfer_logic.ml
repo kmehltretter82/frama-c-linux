@@ -301,7 +301,7 @@ module type S = sig
     state list -> state list
 
   val check_fct_preconditions:
-    kinstr -> kernel_function -> Active_behaviors.t -> state -> state list or_bottom
+    kinstr -> kernel_function -> Active_behaviors.t -> state -> state list
 
   val check_fct_postconditions_for_behaviors:
     kernel_function -> behavior list -> Alarmset.status ->
@@ -311,7 +311,7 @@ module type S = sig
   val check_fct_postconditions:
     kernel_function -> Active_behaviors.t -> termination_kind ->
     pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list or_bottom
+    state list
 
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 
@@ -550,12 +550,9 @@ module Make (Domain: LogicDomain) = struct
   let check_fct_postconditions kf ab kind ~pre_state ~post_states ~result =
     let behaviors = Annotations.behaviors kf in
     let is_active = Active_behaviors.is_active ab in
-    let states =
-      check_fct_postconditions_of_behaviors
-        kf behaviors is_active kind ~per_behavior:false
-        ~pre_state ~post_states ~result
-    in
-    if states = [] then `Bottom else `Value states
+    check_fct_postconditions_of_behaviors
+      kf behaviors is_active kind ~per_behavior:false
+      ~pre_state ~post_states ~result
 
 
   let check_fct_preconditions_of_behaviors call_ki kf ~per_behavior behaviors
@@ -596,11 +593,8 @@ module Make (Domain: LogicDomain) = struct
     let init_states = [init_state] in
     let behaviors = Annotations.behaviors kf in
     let is_active = Active_behaviors.is_active ab in
-    let states =
-      check_fct_preconditions_of_behaviors call_ki kf ~per_behavior:false
-        behaviors is_active init_states
-    in
-    if states = [] then `Bottom else `Value states
+    check_fct_preconditions_of_behaviors call_ki kf ~per_behavior:false
+      behaviors is_active init_states
 
   let evaluate_assumes_of_behavior state =
     let pre_env = pre_env ~pre:state in

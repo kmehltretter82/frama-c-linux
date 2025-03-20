@@ -45,7 +45,7 @@ module type S = sig
 
   val check_fct_preconditions:
     kinstr -> kernel_function -> Active_behaviors.t ->
-    state -> state list or_bottom
+    state -> state list
 
   val check_fct_postconditions_for_behaviors:
     kernel_function -> behavior list -> Alarmset.status ->
@@ -55,7 +55,7 @@ module type S = sig
   val check_fct_postconditions:
     kernel_function -> Active_behaviors.t -> termination_kind ->
     pre_state:state -> post_states:state list -> result:varinfo option ->
-    state list or_bottom
+    state list
 
   val evaluate_assumes_of_behavior: state -> behavior -> Alarmset.status
 

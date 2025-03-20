@@ -133,11 +133,9 @@ module Make_Dataflow
     let state = AnalysisParam.initial_state
     and call_kinstr = AnalysisParam.call_kinstr
     and ab = active_behaviors in
-    if Eva_utils.skip_specifications kf then
-      [state]
-    else match Logic.check_fct_preconditions call_kinstr kf ab state with
-      | `Bottom -> []
-      | `Value set -> set
+    if Eva_utils.skip_specifications kf
+    then [state]
+    else Logic.check_fct_preconditions call_kinstr kf ab state
 
   let initial_state =
     match Bottom.of_list ~join:Domain.join initial_states with
@@ -317,13 +315,10 @@ module Make_Dataflow
       post_conditions := true;
       if Eva_utils.skip_specifications kf then
         [state]
-      else match
-          Logic.check_fct_postconditions kf active_behaviors Normal
-            ~pre_state:initial_state ~post_states:[state]
-            ~result:return_var
-        with
-        | `Bottom -> []
-        | `Value v -> v
+      else
+        Logic.check_fct_postconditions kf active_behaviors Normal
+          ~pre_state:initial_state ~post_states:[state]
+          ~result:return_var
     (* Assign the return value *)
     and assign_retval =
       match return_exp with
