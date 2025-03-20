@@ -1,7 +1,7 @@
 #define t Frama_C_periodic_t_320
 
 
-int g[10] __attribute__ ((Frama_C_periodic)); // garbled
+int g[10]; // garbled
 
 typedef struct {
   short s1;
@@ -10,9 +10,9 @@ typedef struct {
 } ts;
 
 int t[60]= {1};
-int (u __attribute__ ((Frama_C_periodic)))[60]= {-1,-2,-3};
-int v[3] __attribute__ ((Frama_C_periodic)) = {-1,-2,-3};
-ts w[10] __attribute__ ((Frama_C_periodic));
+int u[60]= {-1,-2,-3};
+int v[3] = {-1,-2,-3};
+ts w[10];
 
 
 int Au,Bu,Cu,Du,Eu,Fu,Gu = 12, Hu;
