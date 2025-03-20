@@ -96,27 +96,21 @@ let erased_attributes = ["malloc"]
 let () = Ast_attributes.register_list ~ignore:true ~attr_class:(AttrName false)
     erased_attributes
 
-let stripUnderscore s =
-  if String.length s = 1 then begin
-    if s = "_" then
-      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
-    s
-  end else begin
-    let res = Extlib.strip_underscore s in
-    if res = "" then
-      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+let check_attribute_name s =
+  let res = Extlib.strip_underscore s in
+  if res = "" then
+    Kernel.error ~once:true ~current:true "Invalid attribute name %s" s
+  else begin
     if List.mem res unsupported_attributes then
-      Kernel.error ~current:true "unsupported attribute: %s" s
-    else begin
-      if not (Ast_attributes.is_known res) then begin
-        Ast_attributes.register ~attr_class:AttrUnknown res;
-        Kernel.warning
-          ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
-          "Ignoring unknown attribute: %s" s;
-      end
-    end;
-    res
-  end
+      Kernel.error ~current:true "Unsupported attribute: %s" s
+    else if not (Ast_attributes.is_known res) then begin
+      Ast_attributes.register ~attr_class:AttrUnknown res;
+      Kernel.warning
+        ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+        "Ignoring unknown attribute: %s" s;
+    end
+  end;
+  res
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let () = Ast_attributes.register_shallow ~attr_class:AttrStmt
@@ -4448,13 +4442,16 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
   | ("__attribute__", []) -> []  (* An empty list of gcc attributes *)
   | (s, el) ->
 
-    let rec attrOfExp (strip: bool)
+    (* If [check] is [true], attribute name will be stripped and registered if
+       unknown. *)
+    let rec attrOfExp
+        ~(check:bool)
         ?(foldenum=true)
         (a: Cabs.expression) : attrparam =
       let loc = a.expr_loc in
       match a.expr_node with
       | Cabs.VARIABLE n -> begin
-          let n' = if strip then stripUnderscore n else n in
+          let n' = if check then check_attribute_name n else n in
           (* See if this is an enumeration *)
           try
             if not foldenum then raise Not_found;
@@ -4481,7 +4478,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       | Cabs.CONSTANT (Cabs.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
       | Cabs.CALL({expr_node = Cabs.VARIABLE n}, args, []) -> begin
-          let n' = if strip then stripUnderscore n else n in
+          let n' = if check then check_attribute_name n else n in
           let ae' = List.map ae args in
           ACons(n', ae')
         end
@@ -4503,7 +4500,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       | Cabs.UNARY(Cabs.BNOT, aa) -> AUnOp(BNot, ae aa)
       | Cabs.UNARY(Cabs.NOT, aa) -> AUnOp(LNot, ae aa)
       | Cabs.MEMBEROF (e, s) -> ADot (ae e, s)
-      | Cabs.PAREN(e) -> attrOfExp strip ~foldenum:foldenum e
+      | Cabs.PAREN(e) -> attrOfExp ~check ~foldenum:foldenum e
       | Cabs.UNARY(Cabs.MEMOF, aa) -> AStar (ae aa)
       | Cabs.UNARY(Cabs.ADDROF, aa) -> AAddrOf (ae aa)
       | Cabs.MEMBEROFPTR (aa1, s) -> ADot(AStar(ae aa1), s)
@@ -4514,7 +4511,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
           "cabs2cil: invalid expression in attribute: %a"
           Cprint.print_expression a
 
-    and ae (e: Cabs.expression) = attrOfExp false e in
+    and ae (e: Cabs.expression) = attrOfExp ~check:false e in
 
     (* Sometimes we need to convert attrarg into attr *)
     let arg2attrs = function
@@ -4527,13 +4524,13 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     in
     let fold_attrs f el = List.fold_left (fun acc e -> acc @ arg2attrs (f e)) [] el in
     if s = "__attribute__" then (* Just a wrapper for many attributes*)
-      fold_attrs (attrOfExp true ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:true ~foldenum:false) el
     else if s = "__blockattribute__" then (* Another wrapper *)
-      fold_attrs (attrOfExp true ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:true ~foldenum:false) el
     else if s = "__declspec" then
-      fold_attrs (attrOfExp false ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:false ~foldenum:false) el
     else
-      [(stripUnderscore s, List.map (attrOfExp ~foldenum:false false) el)]
+      [(check_attribute_name s, List.map (attrOfExp ~check:false ~foldenum:false) el)]
 
 and doAttributes (ghost:bool) (al: Cabs.attribute list) : attribute list =
   List.fold_left (fun acc a ->
