@@ -1,9 +1,10 @@
 [kernel] Parsing split_return.i (no preprocessing)
-[eva] Splitting return states on:
-  \full_split(f2)
-  \return(f7) == 0, 3 (user)
-  other functions:
-  \full_split(@all)
+[eva:split-return] 
+  Splitting return states on:
+    \full_split(f2)
+    \return(f7) == 0, 3 (user)
+    other functions:
+    \full_split(@all)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
@@ -442,11 +443,12 @@
     i2; i3; i4; i5; v; v7; rand
 [eva] Warning: option -eva-split-return-function: 'f2' previously bound to 'full split';
   now bound to 'auto split'.
-[eva] Splitting return states on:
-  \return(f2) == 0 (auto)
-  \return(f7) == 0, 3 (user)
-  other functions:
-  \full_split(@all)
+[eva:split-return] 
+  Splitting return states on:
+    \return(f2) == 0 (auto)
+    \return(f7) == 0, 3 (user)
+    other functions:
+    \full_split(@all)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

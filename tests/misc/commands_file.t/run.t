@@ -3,21 +3,22 @@ Everything in a commands file
   [kernel] Expanding arguments from full.txt
   [kernel] Expanding arguments from prepro.txt
   [kernel] Parsing src.c (with preprocessing)
-  [eva] Option -eva-precision 5 detected, automatic configuration of the analysis:
-    option -eva-min-loop-unroll set to 0 (default value).
-    option -eva-auto-loop-unroll set to 128.
-    option -eva-widening-delay set to 3 (default value).
-    option -eva-partition-history set to 0 (default value).
-    option -eva-slevel already set to 200 (not modified).
-    option -eva-ilevel set to 48.
-    option -eva-plevel set to 150.
-    option -eva-subdivide-non-linear set to 100.
-    option -eva-remove-redundant-alarms set to true (default value).
-    option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
-    option -eva-split-return set to 'auto'.
-    option -eva-equality-through-calls set to 'formals' (default value).
-    option -eva-octagon-through-calls set to false (default value).
-  [eva] Splitting return states on:
+  [eva:precision-settings] 
+    Option -eva-precision 5 detected, automatic configuration of the analysis:
+      option -eva-min-loop-unroll set to 0 (default value).
+      option -eva-auto-loop-unroll set to 128.
+      option -eva-widening-delay set to 3 (default value).
+      option -eva-partition-history set to 0 (default value).
+      option -eva-slevel already set to 200 (not modified).
+      option -eva-ilevel set to 48.
+      option -eva-plevel set to 150.
+      option -eva-subdivide-non-linear set to 100.
+      option -eva-remove-redundant-alarms set to true (default value).
+      option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
+      option -eva-split-return set to 'auto'.
+      option -eva-equality-through-calls set to 'formals' (default value).
+      option -eva-octagon-through-calls set to false (default value).
+  [eva:split-return] Splitting return states on:
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     
@@ -92,21 +93,22 @@ Commands split around -then
   [kernel] Expanding arguments from eva.txt
   [kernel] Expanding arguments from print.txt
   [kernel] Parsing src.c (with preprocessing)
-  [eva] Option -eva-precision 5 detected, automatic configuration of the analysis:
-    option -eva-min-loop-unroll set to 0 (default value).
-    option -eva-auto-loop-unroll set to 128.
-    option -eva-widening-delay set to 3 (default value).
-    option -eva-partition-history set to 0 (default value).
-    option -eva-slevel already set to 200 (not modified).
-    option -eva-ilevel set to 48.
-    option -eva-plevel set to 150.
-    option -eva-subdivide-non-linear set to 100.
-    option -eva-remove-redundant-alarms set to true (default value).
-    option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
-    option -eva-split-return set to 'auto'.
-    option -eva-equality-through-calls set to 'formals' (default value).
-    option -eva-octagon-through-calls set to false (default value).
-  [eva] Splitting return states on:
+  [eva:precision-settings] 
+    Option -eva-precision 5 detected, automatic configuration of the analysis:
+      option -eva-min-loop-unroll set to 0 (default value).
+      option -eva-auto-loop-unroll set to 128.
+      option -eva-widening-delay set to 3 (default value).
+      option -eva-partition-history set to 0 (default value).
+      option -eva-slevel already set to 200 (not modified).
+      option -eva-ilevel set to 48.
+      option -eva-plevel set to 150.
+      option -eva-subdivide-non-linear set to 100.
+      option -eva-remove-redundant-alarms set to true (default value).
+      option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
+      option -eva-split-return set to 'auto'.
+      option -eva-equality-through-calls set to 'formals' (default value).
+      option -eva-octagon-through-calls set to false (default value).
+  [eva:split-return] Splitting return states on:
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     
@@ -179,21 +181,22 @@ Mix of commands file and command line
   [kernel] Expanding arguments from prepro.txt
   [kernel] Expanding arguments from eva.txt
   [kernel] Parsing src.c (with preprocessing)
-  [eva] Option -eva-precision 5 detected, automatic configuration of the analysis:
-    option -eva-min-loop-unroll set to 0 (default value).
-    option -eva-auto-loop-unroll set to 128.
-    option -eva-widening-delay set to 3 (default value).
-    option -eva-partition-history set to 0 (default value).
-    option -eva-slevel already set to 200 (not modified).
-    option -eva-ilevel set to 48.
-    option -eva-plevel set to 150.
-    option -eva-subdivide-non-linear set to 100.
-    option -eva-remove-redundant-alarms set to true (default value).
-    option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
-    option -eva-split-return set to 'auto'.
-    option -eva-equality-through-calls set to 'formals' (default value).
-    option -eva-octagon-through-calls set to false (default value).
-  [eva] Splitting return states on:
+  [eva:precision-settings] 
+    Option -eva-precision 5 detected, automatic configuration of the analysis:
+      option -eva-min-loop-unroll set to 0 (default value).
+      option -eva-auto-loop-unroll set to 128.
+      option -eva-widening-delay set to 3 (default value).
+      option -eva-partition-history set to 0 (default value).
+      option -eva-slevel already set to 200 (not modified).
+      option -eva-ilevel set to 48.
+      option -eva-plevel set to 150.
+      option -eva-subdivide-non-linear set to 100.
+      option -eva-remove-redundant-alarms set to true (default value).
+      option -eva-domains set to 'cvalue,equality,gauges,octagon,symbolic-locations'.
+      option -eva-split-return set to 'auto'.
+      option -eva-equality-through-calls set to 'formals' (default value).
+      option -eva-octagon-through-calls set to false (default value).
+  [eva:split-return] Splitting return states on:
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     
@@ -304,21 +307,22 @@ Config file with \ and comments
   $ dune exec --cache=disabled -- frama-c -commands-file comments_and_newlines.txt
   [kernel] Expanding arguments from comments_and_newlines.txt
   [kernel] Parsing src_empty.c (with preprocessing)
-  [eva] Option -eva-precision 5 detected, automatic configuration of the analysis:
-    option -eva-min-loop-unroll set to 0 (default value).
-    option -eva-auto-loop-unroll set to 128.
-    option -eva-widening-delay set to 3 (default value).
-    option -eva-partition-history already set to 2 (not modified).
-    option -eva-slevel already set to 200 (not modified).
-    option -eva-ilevel already set to 32 (not modified).
-    option -eva-plevel already set to 100 (not modified).
-    option -eva-subdivide-non-linear set to 100.
-    option -eva-remove-redundant-alarms set to true (default value).
-    option -eva-domains already set to '@default,equality,   gauges' (not modified).
-    option -eva-split-return set to 'auto'.
-    option -eva-equality-through-calls set to 'formals' (default value).
-    option -eva-octagon-through-calls set to false (default value).
-  [eva] Splitting return states on:
+  [eva:precision-settings] 
+    Option -eva-precision 5 detected, automatic configuration of the analysis:
+      option -eva-min-loop-unroll set to 0 (default value).
+      option -eva-auto-loop-unroll set to 128.
+      option -eva-widening-delay set to 3 (default value).
+      option -eva-partition-history already set to 2 (not modified).
+      option -eva-slevel already set to 200 (not modified).
+      option -eva-ilevel already set to 32 (not modified).
+      option -eva-plevel already set to 100 (not modified).
+      option -eva-subdivide-non-linear set to 100.
+      option -eva-remove-redundant-alarms set to true (default value).
+      option -eva-domains already set to '@default,equality,   gauges' (not modified).
+      option -eva-split-return set to 'auto'.
+      option -eva-equality-through-calls set to 'formals' (default value).
+      option -eva-octagon-through-calls set to false (default value).
+  [eva:split-return] Splitting return states on:
   [eva] Analyzing a complete application starting at main
   [eva:initial-state] Values of globals at initialization
     

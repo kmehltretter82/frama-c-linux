@@ -1,18 +1,19 @@
 [kernel] Parsing eva_annot_range.c (with preprocessing)
-[eva] Option -eva-precision 2 detected, automatic configuration of the analysis:
-  option -eva-min-loop-unroll set to 0 (default value).
-  option -eva-auto-loop-unroll set to 32.
-  option -eva-widening-delay set to 2.
-  option -eva-partition-history set to 0 (default value).
-  option -eva-slevel set to 20.
-  option -eva-ilevel set to 16.
-  option -eva-plevel set to 40.
-  option -eva-subdivide-non-linear set to 40.
-  option -eva-remove-redundant-alarms set to true (default value).
-  option -eva-domains set to 'cvalue,equality,symbolic-locations'.
-  option -eva-split-return set to '' (default value).
-  option -eva-equality-through-calls set to 'none'.
-  option -eva-octagon-through-calls set to false (default value).
+[eva:precision-settings] 
+  Option -eva-precision 2 detected, automatic configuration of the analysis:
+    option -eva-min-loop-unroll set to 0 (default value).
+    option -eva-auto-loop-unroll set to 32.
+    option -eva-widening-delay set to 2.
+    option -eva-partition-history set to 0 (default value).
+    option -eva-slevel set to 20.
+    option -eva-ilevel set to 16.
+    option -eva-plevel set to 40.
+    option -eva-subdivide-non-linear set to 40.
+    option -eva-remove-redundant-alarms set to true (default value).
+    option -eva-domains set to 'cvalue,equality,symbolic-locations'.
+    option -eva-split-return set to '' (default value).
+    option -eva-equality-through-calls set to 'none'.
+    option -eva-octagon-through-calls set to false (default value).
 [eva] Analyzing a complete application starting at main
 [eva:initial-state] Values of globals at initialization
   world ∈ {0}

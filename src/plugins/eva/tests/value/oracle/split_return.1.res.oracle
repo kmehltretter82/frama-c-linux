@@ -1,14 +1,15 @@
 [kernel] Parsing split_return.i (no preprocessing)
-[eva] Splitting return states on:
-  \return(f7) == 0, 3 (user)
-  \return(init) == 0 (auto)
-  \return(f2) == 0 (auto)
-  \return(f3) == -2 (auto)
-  \return(f4) == 4 (auto)
-  \return(f5) == -2 (auto)
-  \return(f6) == 0 (auto)
-  \return(f8) == 0 (auto)
-  \return(escaping) == 0 (auto)
+[eva:split-return] 
+  Splitting return states on:
+    \return(f7) == 0, 3 (user)
+    \return(init) == 0 (auto)
+    \return(f2) == 0 (auto)
+    \return(f3) == -2 (auto)
+    \return(f4) == 4 (auto)
+    \return(f5) == -2 (auto)
+    \return(f6) == 0 (auto)
+    \return(f8) == 0 (auto)
+    \return(escaping) == 0 (auto)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed

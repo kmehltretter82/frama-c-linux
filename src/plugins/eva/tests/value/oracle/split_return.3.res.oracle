@@ -1,6 +1,7 @@
 [kernel] Parsing split_return.i (no preprocessing)
-[eva] Splitting return states on:
-  \full_split(@all)
+[eva:split-return] 
+  Splitting return states on:
+    \full_split(@all)
 [eva] Analyzing a complete application starting at main
 [eva] Computing initial state
 [eva] Initial state computed
