@@ -177,6 +177,26 @@ let _current_project_signal =
     ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
     ()
 
+let _project_list =
+  let model = States.model () in
+
+  States.column model ~name:"uniqueName"
+    ~descr:(Md.plain "Project unique name")
+    ~data:(module Jstring)
+    ~get:Project.get_unique_name;
+
+  States.column model ~name:"name"
+    ~descr:(Md.plain "Project name")
+    ~data:(module Jstring)
+    ~get:Project.get_name;
+
+  States.register_array ~package
+    ~name:"projectList"
+    ~descr:(Md.plain "List of Frama-C projects")
+    ~key:Project.get_unique_name
+    ~iter:Project.iter_on_projects
+    model
+
 (* -------------------------------------------------------------------------- *)
 (* --- Log Lind                                                           --- *)
 (* -------------------------------------------------------------------------- *)
