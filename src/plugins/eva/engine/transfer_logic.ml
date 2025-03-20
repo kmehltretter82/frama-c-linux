@@ -61,6 +61,10 @@ type postcondition_kf_kind =
 
 type p_kind = Precondition | Postcondition of postcondition_kf_kind | Assumes
 
+let is_leaf_postcondition = function
+  | Postcondition (PostLeaf | PostUseSpec) -> true
+  | _ -> false
+
 let emit_postcond_status = function
   | PostLeaf | PostBuiltin -> false
   | PostBody | PostUseSpec -> true
@@ -423,17 +427,13 @@ module Make (Domain: LogicDomain) = struct
      receive status valid (very rare) or unknown: this brings no
      information. However, warn the user if the status is invalid.
      (unless this is on purpose, using [assert \false]) *)
-  let check_ensures_false kf behavior active pr kind statuses =
-    let source = fst pr.Cil_types.pred_loc in
-    let pp_header = pp_header kf in
-    let pp_behavior_inactive fmt =
-      Format.fprintf fmt ",@ the behavior@ was@ inactive"
-    in
-    if (Alarmset.Status.join_list statuses) = Alarmset.False &&
-       (match kind with
-        | Postcondition (PostLeaf | PostUseSpec) -> true
-        | _ -> false)
-       && pr.pred_content <> Pfalse then
+  let warn_ensures_false kf behavior active pr =
+    if pr.pred_content <> Pfalse then
+      let source = fst pr.Cil_types.pred_loc in
+      let pp_header = pp_header kf in
+      let pp_behavior_inactive fmt =
+        Format.fprintf fmt ",@ the behavior@ was@ inactive"
+      in
       Self.warning ~once:true ~source ~wkey:Self.wkey_ensures_false
         "@[%a:@ this postcondition@ evaluates to@ false@ in this@ context.\
          @ If it is valid,@ either@ a precondition@ was not@ verified@ \
@@ -479,23 +479,19 @@ module Make (Domain: LogicDomain) = struct
         states
       end
       else
-        let (statuses, reduced_states) =
-          List.fold_left
-            (fun (acc_status, acc_states) state ->
-               let status, reduced_states =
-                 eval_split_and_reduce ~reduce pr build_env state
-               in
-               (status :: acc_status,
-                List.rev_append reduced_states acc_states))
-            ([], []) states
+        let is_false = ref true in
+        let do_one_state state =
+          let status, reduced_states =
+            eval_split_and_reduce ~reduce pr build_env state
+          in
+          if record then emit ~empty:false ip pr status;
+          if status <> Alarmset.False then is_false := false;
+          reduced_states
         in
-        if record
-        then
-          begin
-            List.iter (fun status -> emit ~empty:false ip pr status) statuses;
-            check_ensures_false kf behavior active pr kind statuses;
-          end;
-        List.rev reduced_states
+        let reduced_states = List.concat_map do_one_state states in
+        if record && !is_false && is_leaf_postcondition kind
+        then warn_ensures_false kf behavior active pr;
+        reduced_states
     in
     List.fold_left aux_pred states ips
 
@@ -626,31 +622,24 @@ module Make (Domain: LogicDomain) = struct
         (* No reduction if the behavior might be inactive. *)
         let reduce = reduce && in_behavior = `True in
         let emit = emit_code_annot_status ~reduce ~empty:false kf stmt in
-        let reduce_state here res accstateset =
+        let reduce_state state res =
           match res with
-          | Alarmset.False -> accstateset (* Dead/invalid branch *)
+          | Alarmset.False -> [] (* Dead/invalid branch *)
           | Alarmset.Unknown | Alarmset.True ->
-            let env = here_env ~pre:initial_state ~here in
+            let env = here_env ~pre:initial_state ~here:state in
             (* Reduce by p if it is a disjunction, or if it did not
                evaluate to True *)
             let reduce = res = Alarmset.Unknown in
-            let reduced_states =
-              split_disjunction_and_reduce ~reduce env here p
-            in
-            List.rev_append reduced_states accstateset
+            split_disjunction_and_reduce ~reduce env state p
         in
-        let reduced_states =
-          List.fold_left
-            (fun accstateset (here: Domain.t) ->
-               let env = here_env ~pre:initial_state ~here in
-               let res = Domain.evaluate_predicate env here p in
-               (* if [record] holds, emit kernel status and print a message *)
-               if record then emit code_annot res;
-               (* if [reduce] holds, reduce the state. *)
-               if reduce then reduce_state here res accstateset else accstateset)
-            [] states
+        let eval state =
+          let env = here_env ~pre:initial_state ~here:state in
+          let res = Domain.evaluate_predicate env state p in
+          (* if [record] holds, emit kernel status and print a message *)
+          if record then emit code_annot res;
+          if reduce then reduce_state state res else [state]
         in
-        if reduce then List.rev reduced_states else states
+        List.concat_map eval states
     in
     let aux code_annot ~record ~reduce behav p =
       if ignore_predicate p then
