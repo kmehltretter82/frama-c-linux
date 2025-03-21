@@ -201,7 +201,7 @@ let print_delayed job =
 (* -------------------------------------------------------------------------- *)
 
 (* whenever the first line of the event shall be printed along the prefix *)
-let is_prefixed_event = function
+let is_first_line_prefixed = function
   | { evt_category = None ; evt_source = None } -> true
   | _ -> false
 
@@ -217,25 +217,25 @@ let echo_firstline output text p q width =
 let echo_newline output =
   output "\n" 0 1
 
-(* output indentation unless the first line is along the prefix *)
-let echo_line output ~prefix text k n =
-  if not prefix then output "  " 0 2 ; output text k n
+(* output indentation unless the first line is along the prefix. *)
+let echo_line output ~is_prefixed text k n =
+  if not is_prefixed then output "  " 0 2;
+  output text k n
 
-let rec echo_lines ?(prefix=false) output text p q =
+(* [is_prefixed] can only be true for the first line. *)
+let rec echo_lines ?(is_prefixed=false) output text p q =
   if p <= q then
     let t = try String.index_from text p '\n' with Not_found -> (-1) in
-    if t < 0 || t > q then
-      begin
-        (* incomplete, last line *)
-        echo_line output ~prefix text p (q+1-p) ;
-        echo_newline output ;
-      end
-    else
-      begin
-        (* complete line *)
-        echo_line output ~prefix text p (t+1-p) ;
-        echo_lines output text (t+1) q ;
-      end
+    if t < 0 || t > q then begin
+      (* incomplete, last line *)
+      echo_line output ~is_prefixed text p (q+1-p) ;
+      echo_newline output ;
+    end
+    else begin
+      (* complete line *)
+      echo_line output ~is_prefixed text p (t+1-p) ;
+      echo_lines output text (t+1) q ;
+    end
 
 (* -------------------------------------------------------------------------- *)
 (* --- Echo Event                                                         --- *)
@@ -253,39 +253,35 @@ let add_category buffer = function
 
 let add_kind buffer = function
   | Result | Feedback | Debug -> ()
-  | Error -> Buffer.add_string buffer "User Error: "
+  | Error   -> Buffer.add_string buffer "User Error: "
   | Warning -> Buffer.add_string buffer "Warning: "
   | Failure -> Buffer.add_string buffer "Failure: "
 
 let echo_event evt terminal =
-  begin
-    term_clean terminal ;
-    let buffer = Buffer.create 120 in
-    Buffer.add_char buffer '[' ;
-    Buffer.add_string buffer evt.evt_plugin ;
-    add_category buffer evt.evt_category ;
-    Buffer.add_string buffer "] " ;
-    add_source buffer evt.evt_source ;
-    add_kind buffer evt.evt_kind ;
-    let prefix = Buffer.contents buffer in
-    let header = String.length prefix in
-    let text = evt.evt_message in
-    let size = String.length text in
-    let output = terminal.output in
-    output prefix 0 header ;
-    if header + size <= 80 && is_single_line text then
-      begin
-        output text 0 size ;
-        echo_newline output ;
-      end
-    else
-      begin
-        let prefix = is_prefixed_event evt in
-        if not prefix then echo_newline output ;
-        echo_lines output ~prefix text 0 (String.length text - 1) ;
-      end ;
-    terminal.flush () ;
+  term_clean terminal ;
+  let buffer = Buffer.create 120 in
+  Buffer.add_char buffer '[' ;
+  Buffer.add_string buffer evt.evt_plugin ;
+  add_category buffer evt.evt_category ;
+  Buffer.add_string buffer "] " ;
+  add_source buffer evt.evt_source ;
+  add_kind buffer evt.evt_kind ;
+  let header = Buffer.contents buffer in
+  let header_length = String.length header in
+  let text = evt.evt_message in
+  let size = String.length text in
+  let output = terminal.output in
+  output header 0 header_length ;
+  if header_length + size <= 80 && is_single_line text then begin
+    output text 0 size;
+    echo_newline output
   end
+  else begin
+    let is_prefixed = is_first_line_prefixed evt in
+    if not is_prefixed then echo_newline output;
+    echo_lines output ~is_prefixed text 0 (String.length text - 1)
+  end;
+  terminal.flush ()
 
 let do_echo terminal evt =
   if delayed_echo terminal then
@@ -482,15 +478,15 @@ let logtransient channel text =
 let locked_listeners = ref false
 
 let logwithfinal finally channel
-    ?(fire=true)    (* fire channel listeners *)
-    ?emitwith       (* additional emitter *)
-    ?(once=false)   (* log and emit only once *)
-    ?(echo=true)    (* echo on terminal *)
-    ?(current=false) (* use current source as default *)
-    ?source (* source location *)
+    ?(fire=true)     (* fire channel listeners *)
     ?(kind=Feedback) (* message kind *)
-    ?category (* message category *)
-    ?append (* additional text *)
+    ?category        (* message category *)
+    ?(current=false) (* use current source as default *)
+    ?source          (* source location *)
+    ?emitwith        (* additional emitter *)
+    ?(echo=true)     (* echo on terminal *)
+    ?(once=false)    (* log and emit only once *)
+    ?append          (* additional text *)
     text =
   let buffer = open_buffer channel in
   Format.pp_open_vbox (Rich_text.formatter buffer) 0 ;
@@ -636,14 +632,10 @@ type ('a,'b) pretty_aborter =
   ?append:(Format.formatter -> unit) ->
   ('a,formatter,unit,'b) format4 -> 'a
 
-let log_channel channel
-    ?(kind=Result)
-    ?current ?source
-    ?emitwith ?echo ?once
-    ?append
-    text =
-  logwithfinal finally_unit channel ?once ?echo ?emitwith ?current ?source
-    ~kind ?append text
+let log_channel channel ?(kind=Result) ?current ?source ?emitwith ?echo ?once
+    ?append text =
+  logwithfinal finally_unit channel ~kind ?current ?source ?emitwith ?echo ?once
+    ?append text
 
 let echo e =
   try
@@ -824,8 +816,9 @@ sig
   val with_failure : (event option -> 'b) -> ('a,'b) pretty_aborter
 
   val log : ?kind:kind -> ?verbose:int -> ?debug:int -> 'a pretty_printer
-  val logwith : (event option -> 'b) ->
-    ?wkey: warn_category -> ?emitwith:(event -> unit) -> ?once:bool -> ('a,'b) pretty_aborter
+
+  val logwith : (event option -> 'b) -> ?wkey:warn_category ->
+    ?emitwith:(event -> unit) -> ?once:bool -> ('a,'b) pretty_aborter
 
   val register : kind -> (event -> unit) -> unit (** Very local listener. *)
 
@@ -1039,33 +1032,27 @@ struct
     | 0 , d -> debug_atleast d
     | v , d -> verbose_atleast v || debug_atleast d
 
-  let log ?(kind=Result)
-      ?(verbose=0) ?(debug=0)
-      ?current ?source
-      ?emitwith ?echo ?once
-      ?append text =
+
+  let log ?(kind=Result) ?(verbose=0) ?(debug=0) ?current ?source ?emitwith
+      ?echo ?once ?append text =
     if to_be_log verbose debug then
-      logwithfinal finally_unit channel ?once ?echo ?emitwith ?current ?source
-        ~kind
-        ?append text
+      logwithfinal finally_unit channel ~kind ?current ?source ?emitwith ?echo
+        ?once ?append text
     else Pretty_utils.nullprintf text
 
-  let result
-      ?(level=1) ?dkey ?current ?source
-      ?emitwith ?echo ?once ?append text =
+  let result ?(level=1) ?dkey ?current ?source ?emitwith ?echo ?once ?append
+      text =
     if verbose_atleast level && has_debug_key dkey then
-      logwithfinal finally_unit channel ?once ?echo ?emitwith ?current ?source
-        ~kind:Result ?category:dkey ?append text
+      logwithfinal finally_unit channel ~kind:Result ?category:dkey ?current
+        ?source ?emitwith ?echo ?once ?append text
     else Pretty_utils.nullprintf text
 
   let transient channel = channel.terminal.isatty && !tty ()
 
   let has_tty () = transient channel
 
-  let feedback
-      ?(ontty=`Message)
-      ?(level=1) ?dkey ?current ?source
-      ?emitwith ?echo ?once ?append text =
+  let feedback ?(ontty=`Message) ?(level=1) ?dkey ?current ?source ?emitwith
+      ?echo ?once ?append text =
     let mode =
       if verbose_atleast level && has_debug_key dkey
       then
@@ -1077,8 +1064,8 @@ struct
       else `Silent
     in match mode with
     | `Message ->
-      logwithfinal finally_unit channel ?once ?echo ?emitwith ?current ?source
-        ~kind:Feedback ?category:dkey ?append text
+      logwithfinal finally_unit channel ~kind:Feedback ?category:dkey ?current
+        ?source ?emitwith ?echo ?once ?append text
     | `Transient -> logtransient channel text
     | `Silent -> Pretty_utils.nullprintf text
 
@@ -1089,12 +1076,10 @@ struct
     | None, Some _ -> has_debug_key dkey
     | Some l, Some _ -> debug_atleast l && has_debug_key dkey
 
-  let debug
-      ?level ?dkey ?current ?source
-      ?emitwith ?echo ?once ?append text =
+  let debug ?level ?dkey ?current ?source ?emitwith ?echo ?once ?append text =
     if should_output_debug level dkey then
-      logwithfinal finally_unit channel ?once ?echo ?emitwith ?current ?source
-        ~kind:Debug ?category:dkey ?append text
+      logwithfinal finally_unit channel ~kind:Debug ?category:dkey ?current
+        ?source ?emitwith ?echo ?once ?append text
     else
       Pretty_utils.nullprintf text
 
@@ -1114,45 +1099,31 @@ struct
   let finally_internal_error evt =
     let evt = force_error evt in update_deferred_exn (DFatal evt)
 
-  let error
-      ?current ?source
-      ?emitwith ?echo ?once ?append text =
-    logwithfinal
-      finally_user_error channel ?once ?echo ?emitwith ?current ?source
-      ~kind:Error ?append text
+  let error ?current ?source ?emitwith ?echo ?once ?append text =
+    logwithfinal finally_user_error channel ~kind:Error ?current ?source
+      ?emitwith ?echo ?once ?append text
 
   let abort ?current ?source ?echo ?append text =
-    logwithfinal (finally_raise (AbortError P.channel))
-      channel ?echo ?current ?source
-      ~kind:Error ?append text
+    logwithfinal (finally_raise (AbortError P.channel)) channel ~kind:Error
+      ?current ?source ?echo ?append text
 
-  let failure
-      ?current ?source
-      ?emitwith ?echo ?once ?append text =
-    logwithfinal finally_internal_error channel
-      ?once ?echo ?emitwith ?current ?source ~kind:Failure ?append text
+  let failure ?current ?source ?emitwith ?echo ?once ?append text =
+    logwithfinal finally_internal_error channel ~kind:Failure ?current ?source
+      ?emitwith ?echo ?once ?append text
 
-  let fatal
-      ?current ?source
-      ?echo ?append text =
-    logwithfinal (finally_raise (AbortFatal P.channel)) channel
-      ?echo ?current ?source
-      ~kind:Failure ?append text
+  let fatal ?current ?source ?echo ?append text =
+    logwithfinal (finally_raise (AbortFatal P.channel)) channel ~kind:Failure
+      ?current ?source ?echo ?append text
 
-  let verify assertion
-      ?current ?source
-      ?echo ?append text =
+  let verify assertion ?current ?source ?echo ?append text =
     if assertion then
       Format.kfprintf (fun _ -> true) Pretty_utils.null text
     else
-      logwithfinal finally_false channel ?echo ?current ?source
-        ~kind:Failure ?append text
+      logwithfinal finally_false channel ~kind:Failure ?current ?source ?echo
+        ?append text
 
-  let logwith
-      finally
-      ?(wkey="") ?emitwith ?once
-      ?current ?source
-      ?echo ?append text =
+  let logwith finally ?(wkey="") ?emitwith ?once ?current ?source ?echo ?append
+      text =
     let status = get_warn_status wkey in
     let kind =
       match status with
@@ -1196,32 +1167,30 @@ struct
             | Some app ->
               Some (fun fmt -> app fmt; append_once_suffix fmt)
         in
-        logwithfinal finally channel ?once ?echo ?emitwith ?current ?source
-          ~kind ?category ?append text
+        logwithfinal finally channel ~kind ?category ?current ?source ?emitwith
+          ?once ?echo ?append text
       end
     else Pretty_utils.with_null (fun () -> finally None) text
 
-  let warning
-      ?wkey ?current ?source
-      ?emitwith ?echo ?once ?append text =
-    logwith finally_unit
-      ?wkey ?current ?source ?emitwith ?echo ?once ?append text
+  let warning ?wkey ?current ?source ?emitwith ?echo ?once ?append text =
+    logwith finally_unit ?wkey ?current ?source ?emitwith ?echo ?once ?append
+      text
 
   let with_result finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel
-      ~kind:Result ?current ?source ?echo ?append text
+    logwithfinal finally channel ~kind:Result ?current ?source ?echo ?append
+      text
 
   let with_warning finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel
-      ~kind:Warning ?current ?source ?echo ?append text
+    logwithfinal finally channel ~kind:Warning ?current ?source ?echo ?append
+      text
 
   let with_error finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel
-      ~kind:Error ?current ?source ?echo ?append text
+    logwithfinal finally channel ~kind:Error ?current ?source ?echo ?append
+      text
 
   let with_failure finally ?current ?source ?echo ?append text =
-    logwithfinal finally channel
-      ~kind:Failure ?current ?source ?echo ?append text
+    logwithfinal finally channel ~kind:Failure ?current ?source ?echo ?append
+      text
 
   let register kd f =
     let em = channel.emitters.(nth_kind kd) in
@@ -1253,14 +1222,13 @@ struct
       output buffer start length
     end
 
-  let printf ?(level=1) ?dkey ?current ?source ?(append=noprint)
-      ?header text =
+  let printf ?(level=1) ?dkey ?current ?source ?(append=noprint) ?header text =
     if verbose_atleast level && has_debug_key dkey then
       begin
         (* Header is a regular message *)
         let header = match header with None -> noprint | Some h -> h in
-        logwithfinal finally_unit channel ~kind:Result ~fire:false ?current ?source
-          ?category:dkey "%t" header ;
+        logwithfinal finally_unit channel ~fire:false ~kind:Result
+          ?category:dkey ?current ?source  "%t" header;
         let bol = ref true in
         let stdout = { stdout with output = spynewline bol stdout.output } in
         let fmt = delayed_terminal stdout in
