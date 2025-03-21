@@ -370,14 +370,23 @@ for f, typ in source_files:
     if proc.returncode == 0:
         # all tests should fail on an appropriate _Static_assert
         # if compilation succeeds, we have a problem
-        logging.warning(f"WARNING: could not identify value of '{p.stem}', skipping")
+        logging.warning(f"could not identify value of '{p.stem}', skipping")
         continue
     find_value(p.stem, typ, proc.stderr.decode())
 
 version_output = subprocess.run(
     [args.compiler, args.compiler_version], capture_output=True, text=True
 )
-version = version_output.stdout.splitlines()[0]
+version_lines = version_output.stdout.splitlines()
+if not version_lines:
+    logging.warning(
+        "could not obtain compiler version with "
+        + f"'{args.compiler_version}'"
+        + ", check option --compiler-version"
+    )
+    version = "<unknown>"
+else:
+    version = version_output.stdout.splitlines()[0]
 
 machdep["compiler"] = args.compiler
 machdep["cpp_arch_flags"] = args.cpp_arch_flags

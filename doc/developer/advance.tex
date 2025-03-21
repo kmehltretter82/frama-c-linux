@@ -3215,19 +3215,20 @@ Machine models are described as \texttt{YAML} files, following the
 Predefined machdeps are also located in the \texttt{machdeps} directory
 of \framac's \texttt{SHARE} directory and can be used as reference for
 defining new \texttt{machdep}s by hand. It is also possible to automatically
-generate an \texttt{YAML} file with the \texttt{make\_machdep.py} script in
-the \texttt{machdeps/make\_machdep} directory. This script requires a
-C11-compliant cross-compiler for the architecture you want to describe.
+generate an \texttt{YAML} file with \texttt{frama-c-script make-machdep}.
+This Python script requires a
+C11-compliant cross-compiler (ideally, with a standard library, i.e, {\em not}
+a freestanding target) for the architecture you want to describe.
 Its main options are:
 \begin{description}
-\item \texttt{-compiler <c>}: the cross-compiler to be used for generating
+\item \texttt{-{}-compiler <c>}: the cross-compiler to be used for generating
   the machdep.
-\item \texttt{-cpp-arch-flags <flag>}: an option given to the compiler for
+\item \texttt{-{}-cpp-arch-flags <flag>}: an option given to the compiler for
 selecting the desired architecture. Multiple occurrences of this option can
 occur if you want to pass several options.
 \item \texttt{-o <file>}: put the generated YAML into the given file (default
 is to use standard output).
-\item \texttt{--help}: outputs the list of all options of the script.
+\item \texttt{-{}-help}: outputs the list of all options of the script.
 \end{description}
 
 Note that for some compiler setups, notably for non-POSIX compilation targets,
@@ -3324,8 +3325,8 @@ We present below a thorough description of each field.
   \item[\texttt{alignof\_fun}]: the result of evaluating \verb+_Alignof(f)+,
     where \verb+f+ is a function (or negative if unsupported).
   \item[\texttt{alignof\_aligned}]: the default alignment of a type having the
-    \verb+aligned+ attribute (or 1 if unsupported). This corresponds to the
-    default alignment when using \verb+#pragma packed()+ without a numeric
+    \verb+aligned+ attribute (or negative if unsupported). This corresponds to
+    the default alignment when using \verb+#pragma packed()+ without a numeric
     argument.
 \end{description}
 
