@@ -284,8 +284,11 @@ function createMultipleDecorator(): Editor.Extension {
   const cls = Editor.Decoration.mark({ class: 'cm-multiple-code' });
   const deps = { ranges: Ranges, multiple: Multiple };
   const extension = Editor.createDecorator(deps, ({ ranges, multiple: ms }) => {
-    const multRanges = mapFilter(ms.filter(isDef), (m) => ranges.get(m)).flat();
-    return Editor.RangeSet.of(multRanges.map(r => cls.range(r.from, r.to)));
+    const markers = ms.filter(isDef);
+    const markerRanges = mapFilter(markers, (m) => ranges.get(m)).flat();
+    const editorRanges = markerRanges.map(r => cls.range(r.from, r.to));
+    /* Do not assume ranges are sorted and use sort:true. */
+    return Editor.RangeSet.of(editorRanges, true);
   });
   return Editor.setPriority(extension, 'default');
 }
@@ -351,6 +354,7 @@ function createDeadCodeDecorator(): Editor.Extension {
   return Editor.createDecorator(deps, ({ unreach, nonTerm }) => {
     const unreachable = unreach.map(r => uCls.range(r.from, r.to));
     const nonTerminating = nonTerm.map(r => tCls.range(r.from, r.to));
+    /* Do not assume ranges are sorted and use sort:true. */
     return Editor.RangeSet.of(unreachable.concat(nonTerminating), true);
   });
 }
@@ -581,6 +585,7 @@ function createTaintedLvaluesDecorator(): Editor.Extension {
     const find = (t: Taints): Range[] | undefined => ranges.get(t.lval);
     const taintedRanges = mapFilter(tainted, find).flat();
     const marks = taintedRanges.map(r => mark.range(r.from, r.to));
+    /* Do not assume ranges are sorted and use sort:true. */
     return Editor.RangeSet.of(marks, true);
   });
 }
