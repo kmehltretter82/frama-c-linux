@@ -57,10 +57,14 @@ type tlval_zones = {
   deps: Locations.Zone.t;  (** Dependencies needed to evaluate the address. *)
 }
 
-(** Evaluation of the memory zones and dependencies of an lvalue term from an
-    assigns clause, in the given cvalue state for a read or write access. *)
-val assigns_tlval_to_zones:
-  Cvalue.Model.t -> Locations.access -> Cil_types.term -> tlval_zones option
+(** Context of an evaluation: in a statement annotation or an assigns clause. *)
+type annotation = Code_annot | Assigns
+
+(** Evaluation of the memory zones and dependencies of an lvalue term,
+    in the given cvalue state for a read or write access. *)
+val tlval_to_zones:
+  annotation -> Cvalue.Model.t -> Locations.access ->
+  Cil_types.term -> tlval_zones option
 
 (** Evaluate the assigns clauses of the given function in its given pre-state,
     and compare them with the dependencies computed by the from plugin.
