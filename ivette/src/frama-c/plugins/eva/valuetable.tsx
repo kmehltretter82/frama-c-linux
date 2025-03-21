@@ -432,12 +432,19 @@ function ProbeDescr(props: ProbeDescrProps): JSX.Element[] {
 
 interface ProbeValuesProps {
   probe: Probe;
-  addLoc: (loc: Ast.marker) => void;
+  pinProbe: (loc: Ast.marker, pin: boolean) => void;
   isSelectedCallstack: (c: callstack) => boolean;
 }
 
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
-  const { probe, addLoc, isSelectedCallstack } = props;
+  const { probe, pinProbe, isSelectedCallstack } = props;
+
+  const selectMarker = (marker: Ast.marker): void => {
+    /* Pin the current probe so that its column is not removed
+       when the selected marker changes. */
+    pinProbe(probe.marker, true);
+    States.setSelected(marker);
+  };
 
   // Building common parts
   const onContextMenu = (evaluation?: Values.evaluation) => (): void => {
@@ -451,15 +458,13 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
       const label = `Display values for ${text}`;
-      const onItemClick = (): void => addLoc(lvalMarker);
+      const onItemClick = (): void => selectMarker(lvalMarker);
       items.push({ label, onClick: onItemClick });
     });
     if (items.length > 0) Dome.popupMenu(items);
   };
 
-  const onSelected = (m: string): void => {
-    addLoc(Ast.jMarker(m));
-  };
+  const onSelected = (m: string): void => { selectMarker(Ast.jMarker(m)); };
 
   return async (callstack: callstack): Promise<JSX.Element> => {
     const evaluation = await probe.evaluate(callstack);
@@ -569,7 +574,6 @@ interface ScopeProps {
   pinProbe: (marker: Ast.marker, pin: boolean) => void;
   selectProbe: (probe: Probe) => void;
   removeProbe: (probe: Probe) => void;
-  addLoc: (loc: Ast.marker) => void;
   folded: boolean;
   setFolded: (folded: boolean) => void;
   getCallsites: Request<callstack, Values.callsite[]>;
@@ -589,7 +593,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const {
     scope, folded, isSelectedCallstack, locEvt,
     byCallstacks, getCallsites,
-    addLoc, getCallstacks: getCS,
+    getCallstacks: getCS, pinProbe,
     setFolded, setByCallstacks, close,
     startingCallstack,
     changeStartingCallstack,
@@ -635,7 +639,7 @@ async function ScopeSection(props: ScopeProps): Promise<JSX.Element> {
   const descrs = data.map((d) => ProbeDescr(d)).flat();
 
   /* Computes the summary values */
-  const miscs = { addLoc, isSelectedCallstack };
+  const miscs = { pinProbe, isSelectedCallstack };
   const builders = data.map((d: Data) => ProbeValues({ ...d, ...miscs }));
   const summary = await Promise.all(builders.map((b) => b('Summary')));
   const summaryKind = allCallstacks.length === 0 ? 'None' : 'Summary';
@@ -1091,7 +1095,6 @@ function EvaTable(): JSX.Element {
         getProbe,
         selectProbe: setFocus,
         removeProbe: remove,
-        addLoc: (loc: Ast.marker) => { fcts.pin(scope, loc); setTic(tac + 1); },
         folded,
         setFolded,
         getCallsites,
