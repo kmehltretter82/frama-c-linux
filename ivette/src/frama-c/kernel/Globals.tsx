@@ -34,6 +34,7 @@ import { Button } from 'dome/controls/buttons';
 import { Label } from 'dome/controls/labels';
 import * as Toolbar from 'dome/frame/toolbars';
 import { Hbox } from 'dome/layout/boxes';
+import { useModel } from 'dome/table/models';
 import InfiniteScroll from 'react-infinite-scroller';
 
 import * as Ivette from 'ivette';
@@ -43,6 +44,8 @@ import * as Ast from 'frama-c/kernel/api/ast';
 import * as Locations from 'frama-c/kernel/Locations';
 import { computationState } from 'frama-c/plugins/eva/api/general';
 import * as Eva from 'frama-c/plugins/eva/api/general';
+import * as Services from './api/services';
+
 
 // --------------------------------------------------------------------------
 // --- Global Search Hints
@@ -826,6 +829,48 @@ export function GlobalDeclarations(): JSX.Element {
         <Functions scrollableParent={scrollableArea} />
         <GlobalAnnots />
       </div>
+    </>
+  );
+}
+
+// --------------------------------------------------------------------------
+// --- Globals Projects
+// --------------------------------------------------------------------------
+
+export function GlobalProjects(): JSX.Element {
+  const scrollableArea = React.useRef<HTMLDivElement>(null);
+  const [ current, setCurrent ] = States.useSyncState(Services.currentProject);
+  const modelProjects = States.useSyncArrayModel(Services.projectList);
+  const model = useModel(modelProjects);
+
+  const projectsList = React.useMemo(() => {
+    void model;
+    const list: React.JSX.Element[] = [];
+    modelProjects.forEach(elt => {
+      list.push(<Item
+        key={elt.uniqueName}
+        label={elt.name}
+        selected={elt.uniqueName === current}
+        onSelection={() => setCurrent(elt.uniqueName) }
+      />);
+    });
+    return list;
+  }, [modelProjects, model, current, setCurrent]);
+
+  return (<>
+    <SidebarTitle label='Projects' />
+      {/* { projectsList && projectsList.length > 0 && */}
+      <div ref={scrollableArea} className="globals-scrollable-area">
+        <List
+          name="project"
+          total={projectsList.length}
+          filteringMenuItems={[]}
+          scrollableParent={scrollableArea}
+        >
+          { projectsList }
+        </List>
+      </div>
+      {/* // } */}
     </>
   );
 }
