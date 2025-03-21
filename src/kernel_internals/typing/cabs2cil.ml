@@ -3743,7 +3743,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let locals = b.blocals in
       b.blocals <- [];
       b.battrs <-
-        Ast_attributes.(add_list [(frama_c_keep_block,[])] b.battrs);
+        Ast_attributes.(add (frama_c_keep_block,[]) b.battrs);
       let block = mkStmt ~ghost ~valid_sid (Block b) in
       let chunk = s2c block in
       let chunk = { chunk with cases = current_chunk.cases } in
@@ -4871,7 +4871,7 @@ and doType (ghost:bool) (context: type_context)
           let arg_type_from_vi vi =
             let attrs =
               if vi.vghost then
-                Ast_attributes.(add_list [(frama_c_ghost_formal, [])] vi.vattr)
+                Ast_attributes.(add (frama_c_ghost_formal, []) vi.vattr)
               else
                 vi.vattr
             in (vi.vname, vi.vtype, attrs)
@@ -9887,7 +9887,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
     let b = c2block ~ghost c in
-    b.battrs <- Ast_attributes.(add_list [(frama_c_keep_block,[])] b.battrs);
+    b.battrs <- Ast_attributes.(add (frama_c_keep_block,[]) b.battrs);
     let res = s2c (mkStmt ~ghost ~valid_sid (Block b)) in
     { res with cases = c.cases }
 
