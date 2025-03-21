@@ -5,7 +5,7 @@
     --disabled-text: #506679;
     --info-text: #748a8d;
     --info-text-discrete: #778094;
-    --text-highlighted: #d4eaed;
+    --text-highlighted: rgb(80, 220, 255);
 
     --code-hover: #005137;
     --code-select: #4f3d24;

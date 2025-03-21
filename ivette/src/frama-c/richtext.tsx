@@ -171,6 +171,9 @@ export interface MarkerProps {
 
 export function Marker(props: MarkerProps): JSX.Element {
   const { marker, onSelected, onHovered, children } = props;
+  const className = classes(
+    (onSelected || onHovered) && 'kernel-text-marker'
+  );
   const onDoubleClick = (): void => {
     onSelected && onSelected(marker, 'DOUBLE');
   };
@@ -180,7 +183,7 @@ export function Marker(props: MarkerProps): JSX.Element {
   };
   return (
     <span
-      className="kernel-text-marker"
+      className={className}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
       onMouseEnter={() => onHovered && onHovered(marker)}
