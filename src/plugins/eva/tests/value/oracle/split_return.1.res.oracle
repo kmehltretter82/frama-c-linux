@@ -104,8 +104,8 @@
   Called from split_return.i:176.
 [eva] Recording results for f8
 [eva] Done for function f8
-[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
 [eva] split_return.i:177: Frama_C_show_each_then8: {4}, {{ &x }}
+[eva] split_return.i:177: Frama_C_show_each_then8: {-1}, {0}
 [eva] Recording results for main8
 [eva] Done for function main8
 [eva] computing for function main9 <- main.
