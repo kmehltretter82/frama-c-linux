@@ -90,75 +90,21 @@ let func_locs () = FuncLocs.get ()
    parsing error, since their behavior requires non-standard parsing *)
 let unsupported_attributes = ["vector_size"]
 
-(* Attributes which must be erased to avoid issues (e.g., GCC 'malloc'
-   attributes can refer to erased functions and make the code un-reparsable *)
-let erased_attributes = ["malloc"]
-let () = Ast_attributes.register_list AttrIgnored erased_attributes
-
-let stripUnderscore s =
-  if String.length s = 1 then begin
-    if s = "_" then
-      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
-    s
-  end else begin
-    let res = Extlib.strip_underscore s in
-    if res = "" then
-      Kernel.error ~once:true ~current:true "Invalid attribute name %s" s;
+let check_attribute_name s =
+  let res = Extlib.strip_underscore s in
+  if res = "" then
+    Kernel.error ~once:true ~current:true "Invalid attribute name %s" s
+  else begin
     if List.mem res unsupported_attributes then
-      Kernel.error ~current:true "unsupported attribute: %s" s
-    else begin
-      if not (Ast_attributes.is_known res) then begin
-        Ast_attributes.register AttrIgnored res;
-        Kernel.warning
-          ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
-          "Ignoring unknown attribute: %s" s;
-      end
-    end;
-    res
-  end
-
-let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
-let () = Cil_printer.register_shallow_attribute frama_c_keep_block
-let () = Ast_attributes.register AttrStmt frama_c_keep_block
-
-let fc_stdlib = "fc_stdlib"
-let fc_stdlib_generated = "fc_stdlib_generated"
-let () = Cil_printer.register_shallow_attribute fc_stdlib
-let () = Cil_printer.register_shallow_attribute fc_stdlib_generated
-(* fc_stdlib attribute already registered in cil.ml *)
-let () = Ast_attributes.register (AttrName false) fc_stdlib_generated
-
-let fc_local_static = "fc_local_static"
-let () = Cil_printer.register_shallow_attribute fc_local_static
-let () = Ast_attributes.register (AttrName false) fc_local_static
-
-let frama_c_destructor = "fc_destructor"
-let () = Cil_printer.register_shallow_attribute frama_c_destructor
-let () = Ast_attributes.register (AttrName false) frama_c_destructor
-
-let () =
-  (* packed and aligned are treated separately, we ignore them
-     during standard processing.
-  *)
-  Ast_attributes.register AttrIgnored "packed";
-  Ast_attributes.register AttrIgnored "aligned";
-  Ast_attributes.register (AttrFunType false) "warn_unused_result";
-  Ast_attributes.register (AttrName false) "FC_OLDSTYLEPROTO";
-  Ast_attributes.register (AttrName false) "static";
-  Ast_attributes.register (AttrName false) "missingproto";
-  Ast_attributes.register AttrIgnored "dummy";
-  Ast_attributes.register AttrIgnored "signal"; (* AVR-specific attribute *)
-  Ast_attributes.register AttrIgnored "leaf";
-  Ast_attributes.register AttrIgnored "nonnull";
-  Ast_attributes.register AttrIgnored "deprecated";
-  Ast_attributes.register AttrIgnored "access";
-  Ast_attributes.register AttrIgnored "returns_twice";
-  Ast_attributes.register AttrIgnored "pure";
-  Ast_attributes.register AttrIgnored "cleanup";
-  Ast_attributes.register AttrIgnored "warning";
-  Ast_attributes.register AttrIgnored "format_arg";
-  Ast_attributes.register AttrIgnored "no_sanitize";
-  Ast_attributes.register AttrIgnored "target"
+      Kernel.error ~current:true "Unsupported attribute: %s" s
+    else if not (Ast_attributes.is_known res) then begin
+      Ast_attributes.register AttrUnknown res;
+      Kernel.warning
+        ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
+        "Ignoring unknown attribute: %s" s;
+    end
+  end;
+  res
 
 (** A hook into the code that creates temporary local vars.  By default this
     is the identity function, but you can overwrite it if you need to change the
@@ -338,14 +284,16 @@ let current_stdheader = ref []
 let pop_stdheader () =
   match !current_stdheader with
   | s::l ->
-    Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Popping %s %s" fc_stdlib s;
+    Kernel.debug ~dkey:Kernel.dkey_typing_pragma
+      "Popping %s %s" Ast_attributes.fc_stdlib s;
     current_stdheader := l
   | [] ->
     Kernel.warning ~current:true
-      "#pragma %s pop does not match a push" fc_stdlib
+      "#pragma %s pop does not match a push" Ast_attributes.fc_stdlib
 
 let push_stdheader s =
-  Kernel.debug ~dkey:Kernel.dkey_typing_pragma "Pushing %s %s@." fc_stdlib s;
+  Kernel.debug ~dkey:Kernel.dkey_typing_pragma
+    "Pushing %s %s@." Ast_attributes.fc_stdlib s;
   current_stdheader := s::!current_stdheader
 
 (* Returns the topmost (latest) header that is not internal to Frama-C,
@@ -371,7 +319,7 @@ let (>>?) opt f =
   | _ -> opt
 
 let process_stdlib_pragma name args =
-  if name = fc_stdlib then begin
+  if name = Ast_attributes.fc_stdlib then begin
     match args with
     | [ ACons ("pop",_) ] -> pop_stdheader (); None
     | [ ACons ("push",_); AStr s ] ->
@@ -387,12 +335,12 @@ let fc_stdlib_attribute attrs =
   if s = "" then attrs
   else begin
     let payload, attrs =
-      if Ast_attributes.contains fc_stdlib attrs then begin
-        AStr s :: Ast_attributes.find_params fc_stdlib attrs,
-        Ast_attributes.drop fc_stdlib attrs
+      if Ast_attributes.(contains fc_stdlib attrs) then begin
+        AStr s :: Ast_attributes.(find_params fc_stdlib attrs),
+        Ast_attributes.(drop fc_stdlib attrs)
       end else [AStr s], attrs
     in
-    Ast_attributes.add (fc_stdlib, payload) attrs
+    Ast_attributes.(add (fc_stdlib, payload) attrs)
   end
 (* ICC align/noalign pragmas (not supported by GCC/MSVC with this syntax).
    Implemented by translating them to 'aligned' attributes. Currently,
@@ -2626,7 +2574,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
           oldvi.vattr <- Ast_attributes.add_list oldvi.vattr vi.vattr;
           let what =
             if isadef then
-              CombineFundef (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr)
+              CombineFundef (Ast_attributes.(contains fc_oldstyleproto vi.vattr))
             else CombineOther
           in
           let mytype = combineTypes what oldvi.vtype vi.vtype in
@@ -2638,7 +2586,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
                raise Cannot_combine if necessary. However, due to old-style
                prototypes in GCC machdeps, we must support eccentric cases,
                for which we perform no such additional verification. *)
-            if not (Ast_attributes.contains "FC_OLDSTYLEPROTO" vi.vattr) then
+            if not (Ast_attributes.(contains fc_oldstyleproto vi.vattr)) then
               ignore (compatibleTypes oldvi.vtype vi.vtype)
           end;
           Cil.update_var_type oldvi mytype;
@@ -2708,7 +2656,7 @@ let makeGlobalVarinfo (isadef: bool) (vi: varinfo) : varinfo * bool =
         let vi = alphaConvertVarAndAddToEnv true vi in
         (* update the field [vdefined] *)
         if isadef then vi.vdefined <- true;
-        vi.vattr <- Ast_attributes.drop "FC_OLDSTYLEPROTO" vi.vattr;
+        vi.vattr <- Ast_attributes.(drop fc_oldstyleproto vi.vattr);
         vi.vattr <- fc_stdlib_attribute vi.vattr;
         vi, false
       end
@@ -3795,7 +3743,7 @@ let append_chunk_to_annot ~ghost annot_chunk current_chunk =
       let locals = b.blocals in
       b.blocals <- [];
       b.battrs <-
-        Ast_attributes.add_list [(frama_c_keep_block,[])] b.battrs;
+        Ast_attributes.(add (frama_c_keep_block,[]) b.battrs);
       let block = mkStmt ~ghost ~valid_sid (Block b) in
       let chunk = s2c block in
       let chunk = { chunk with cases = current_chunk.cases } in
@@ -4447,13 +4395,16 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
   | ("__attribute__", []) -> []  (* An empty list of gcc attributes *)
   | (s, el) ->
 
-    let rec attrOfExp (strip: bool)
+    (* If [check] is [true], attribute name will be stripped and registered if
+       unknown. *)
+    let rec attrOfExp
+        ~(check:bool)
         ?(foldenum=true)
         (a: Cabs.expression) : attrparam =
       let loc = a.expr_loc in
       match a.expr_node with
       | Cabs.VARIABLE n -> begin
-          let n' = if strip then stripUnderscore n else n in
+          let n' = if check then check_attribute_name n else n in
           (* See if this is an enumeration *)
           try
             if not foldenum then raise Not_found;
@@ -4480,7 +4431,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       | Cabs.CONSTANT (Cabs.CONST_FLOAT str) ->
         ACons ("__fc_float", [AStr str])
       | Cabs.CALL({expr_node = Cabs.VARIABLE n}, args, []) -> begin
-          let n' = if strip then stripUnderscore n else n in
+          let n' = if check then check_attribute_name n else n in
           let ae' = List.map ae args in
           ACons(n', ae')
         end
@@ -4502,7 +4453,7 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
       | Cabs.UNARY(Cabs.BNOT, aa) -> AUnOp(BNot, ae aa)
       | Cabs.UNARY(Cabs.NOT, aa) -> AUnOp(LNot, ae aa)
       | Cabs.MEMBEROF (e, s) -> ADot (ae e, s)
-      | Cabs.PAREN(e) -> attrOfExp strip ~foldenum:foldenum e
+      | Cabs.PAREN(e) -> attrOfExp ~check ~foldenum:foldenum e
       | Cabs.UNARY(Cabs.MEMOF, aa) -> AStar (ae aa)
       | Cabs.UNARY(Cabs.ADDROF, aa) -> AAddrOf (ae aa)
       | Cabs.MEMBEROFPTR (aa1, s) -> ADot(AStar(ae aa1), s)
@@ -4513,11 +4464,10 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
           "cabs2cil: invalid expression in attribute: %a"
           Cprint.print_expression a
 
-    and ae (e: Cabs.expression) = attrOfExp false e in
+    and ae (e: Cabs.expression) = attrOfExp ~check:false e in
 
     (* Sometimes we need to convert attrarg into attr *)
     let arg2attrs = function
-      | ACons (s, _) when List.mem s erased_attributes -> []
       | ACons (s, args) -> [(s, args)]
       | a ->
         Kernel.fatal ~current:true
@@ -4526,13 +4476,13 @@ and doAttr ghost (a: Cabs.attribute) : attribute list =
     in
     let fold_attrs f el = List.fold_left (fun acc e -> acc @ arg2attrs (f e)) [] el in
     if s = "__attribute__" then (* Just a wrapper for many attributes*)
-      fold_attrs (attrOfExp true ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:true ~foldenum:false) el
     else if s = "__blockattribute__" then (* Another wrapper *)
-      fold_attrs (attrOfExp true ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:true ~foldenum:false) el
     else if s = "__declspec" then
-      fold_attrs (attrOfExp false ~foldenum:false) el
+      fold_attrs (attrOfExp ~check:false ~foldenum:false) el
     else
-      [(stripUnderscore s, List.map (attrOfExp ~foldenum:false false) el)]
+      [(check_attribute_name s, List.map (attrOfExp ~check:false ~foldenum:false) el)]
 
 and doAttributes (ghost:bool) (al: Cabs.attribute list) : attribute list =
   List.fold_left (fun acc a ->
@@ -4567,7 +4517,7 @@ and cabsPartitionAttributes
           ~current:true "Ignoring statement attribute %s found in declaration"
           an;
         loop (n,f,t) rest
-      | AttrIgnored -> loop (n, f, t) rest
+      | AttrUnknown -> loop (n, f, t) rest
   in
   loop ([], [], []) attrs
 
@@ -4921,7 +4871,7 @@ and doType (ghost:bool) (context: type_context)
           let arg_type_from_vi vi =
             let attrs =
               if vi.vghost then
-                Ast_attributes.(add_list [(frama_c_ghost_formal, [])] vi.vattr)
+                Ast_attributes.(add (frama_c_ghost_formal, []) vi.vattr)
               else
                 vi.vattr
             in (vi.vname, vi.vtype, attrs)
@@ -6368,7 +6318,8 @@ and doExp local_env
                 Kernel.debug ~dkey:Kernel.dkey_typing_global
                   "Calling function %s without prototype." n ;
                 let ftype =
-                  mk_tfun ~tattr:[("missingproto",[])] intType None false
+                  let tattr = [(Ast_attributes.fc_missingproto, [])] in
+                  mk_tfun ~tattr intType None false
                 in
                 (* Add a prototype to the environment *)
                 let proto, _ =
@@ -6416,7 +6367,7 @@ and doExp local_env
       let argTypesList = argsToList argTypes in
       let warn_no_proto f =
         (* Do not punish twice users of completely undeclared functions. *)
-        if not (Ast_types.has_attribute "missingproto" f.vtype) then
+        if not (Ast_types.has_attribute Ast_attributes.fc_missingproto f.vtype) then
           Kernel.warning ~source:(fst loc) ~wkey:Kernel.wkey_no_proto
             "Calling function %a that is declared without prototype.@ \
              Its formals will be inferred from actual arguments.@ \
@@ -8492,7 +8443,9 @@ and createGlobal loc ghost logic_spec ((t,s,b,attr_list) : (typ * storage * bool
     match enode with Cabs.VARIABLE "FC_BUILTIN" -> true | _ -> false
   in
   let is_fc_stdlib {Cabs.expr_node=enode} =
-    match enode with Cabs.VARIABLE v when v = fc_stdlib -> true | _ -> false
+    match enode with
+    | Cabs.VARIABLE v when v = Ast_attributes.fc_stdlib -> true
+    | _ -> false
   in
   let isgenerated =
     List.exists (fun (_,el) -> List.exists is_fc_builtin el) a
@@ -8795,7 +8748,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     in
     checkArray inite vi;
     vi.vname <- newname;
-    let attrs = Ast_attributes.add (fc_local_static,[]) vi.vattr in
+    let attrs = Ast_attributes.(add (fc_local_static,[]) vi.vattr) in
     vi.vattr <- fc_stdlib_attribute attrs;
 
     (* However, we have a problem if a real global appears later with the
@@ -8863,7 +8816,7 @@ and createLocal ghost ((_, sto, _, _) as specs)
     if isvarsize then begin
       let free = vla_free_fun () in
       let destructor = AStr free.vname in
-      let attr = (frama_c_destructor, [destructor]) in
+      let attr = (Ast_attributes.frama_c_destructor, [destructor]) in
       vi.vdefined <- true;
       vi.vattr <- Ast_attributes.add attr vi.vattr;
     end;
@@ -9934,7 +9887,7 @@ and doStatement local_env (s : Cabs.statement) : chunk =
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
     let b = c2block ~ghost c in
-    b.battrs <- Ast_attributes.add_list [(frama_c_keep_block,[])] b.battrs;
+    b.battrs <- Ast_attributes.(add (frama_c_keep_block,[]) b.battrs);
     let res = s2c (mkStmt ~ghost ~valid_sid (Block b)) in
     { res with cases = c.cases }
 
@@ -10385,3 +10338,9 @@ let convFile (path, f) =
 
 (* export function without internal `relaxed' argument. *)
 let areCompatibleTypes t1 t2 = areCompatibleTypes t1 t2
+
+(* Deprecated definitions *)
+
+let frama_c_keep_block = Ast_attributes.frama_c_keep_block
+let frama_c_destructor = Ast_attributes.frama_c_destructor
+let fc_local_static    = Ast_attributes.fc_local_static

@@ -4611,8 +4611,8 @@ let global_attributes = function
   | GAsm _ | GText _ -> []
 
 let is_in_libc attrs =
-  Ast_attributes.contains "fc_stdlib" attrs ||
-  Ast_attributes.contains "fc_stdlib_generated" attrs
+  Ast_attributes.(contains fc_stdlib attrs) ||
+  Ast_attributes.(contains fc_stdlib_generated attrs)
 
 let global_is_in_libc g =
   is_in_libc (global_attributes g)
@@ -5355,13 +5355,13 @@ let combineTypesGen ?emitwith (combF : combineFunction)
     in
     (* Drop missingproto as soon as one of the type is a properly declared one*)
     let olda' =
-      if not (Ast_attributes.contains "missingproto" t.tattr) then
-        Ast_attributes.drop "missingproto" oldt.tattr
+      if not (Ast_attributes.(contains fc_missingproto t.tattr)) then
+        Ast_attributes.(drop fc_missingproto oldt.tattr)
       else oldt.tattr
     in
     let a' =
-      if not (Ast_attributes.contains "missingproto" oldt.tattr) then
-        Ast_attributes.drop "missingproto" t.tattr
+      if not (Ast_attributes.(contains fc_missingproto oldt.tattr)) then
+        Ast_attributes.(drop fc_missingproto t.tattr)
       else t.tattr
     in
     let tattr = combineAttributes what olda' a' in

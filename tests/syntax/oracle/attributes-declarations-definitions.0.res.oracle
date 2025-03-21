@@ -37,6 +37,8 @@
   Ignoring unknown attribute: p1
 [kernel:unknown-attribute] attributes-declarations-definitions.c:38: Warning: 
   Ignoring unknown attribute: p2
+[kernel:unknown-attribute] attributes-declarations-definitions.c:54: Warning: 
+  Ignoring unknown attribute: o
 [kernel:unknown-attribute] attributes-declarations-definitions.c:56: Warning: 
   Ignoring unknown attribute: _n
 [kernel:unknown-attribute] attributes-declarations-definitions.c:58: Warning: 

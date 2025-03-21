@@ -1002,7 +1002,7 @@ let cleanup file =
         *)
         b.battrs <- List.filter
             (function
-              | (l,[]) when l = Cabs2cil.frama_c_keep_block -> false
+              | (l,[]) when l = Ast_attributes.frama_c_keep_block -> false
               | _ -> true)
             b.battrs;
         b
@@ -1416,7 +1416,8 @@ class reorder_ast: Visitor.frama_c_visitor =
             Global_annotation_graph.fold
               (fun g acc ->
                  let stdlib =
-                   Ast_attributes.find_params "fc_stdlib" (Cil_datatype.Global.attr g)
+                   let attrs = Cil_datatype.Global.attr g in
+                   Ast_attributes.(find_params fc_stdlib attrs)
                  in
                  let key =
                    match  stdlib with
@@ -1433,7 +1434,9 @@ class reorder_ast: Visitor.frama_c_visitor =
           in
           Datatype.String.Map.fold
             (fun k l res ->
-               let attr = if k = "" then [] else [ ("fc_stdlib", [AStr k])] in
+               let attr =
+                 if k = "" then []
+                 else [ (Ast_attributes.fc_stdlib, [AStr k])] in
                let entries =
                  List.fold_left
                    (fun acc g ->
