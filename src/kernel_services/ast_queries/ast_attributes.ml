@@ -317,15 +317,17 @@ let () = register_noprint ~ignore:true AttrUnknown "malloc"
 (* Unknown attributes *)
 (**********************)
 
+(* packed and aligned are treated separately, we ignore them during standard
+   processing. *)
+let () = register_list AttrUnknown [ "packed" ; "aligned" ]
+
 (* These attributes are registered to help case studies. We parse them and
    reprint them, but they are ignored when comparing types and might be assigned
    to the wrong AST node.
 *)
 let () =
   register_list AttrUnknown
-    [ "packed"  (* packed and aligned are treated separately, we ignore them *)
-    ; "aligned" (* during standard processing. *)
-    ; "dummy"
+    [ "dummy"
     ; "signal"  (* AVR-specific attribute *)
     ; "leaf"
     ; "nonnull"
