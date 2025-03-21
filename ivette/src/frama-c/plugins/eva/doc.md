@@ -2,7 +2,7 @@
 
 Eva is a static analyzer intended to automatically prove the absence of
 runtime errors in critical software.
-It emits an [alarm](#eva-alarms) for each possible undefined behaviors in a C
+It emits an [alarm](#eva-alarms) for each possible undefined behavior in a C
 program.
 
 To do so, Eva computes an over-approximation of the set of all possible values
@@ -17,7 +17,7 @@ through the components [Summary](#eva-summary), [Coverage](#eva-coverage)
 and [Flamegraph](#eva-flamegraph).
 
 Finally, the [icon-apple] Eva sidebar allows the user to change some parameters
-and run the analysis. However, for large code base, it is recommended to run the
+and run the analysis. However, for large code bases, it is recommended to run the
 Eva analysis using the command line, saving the result via the -save parameter,
 and then loading the resulting file in the graphical interface.
 
@@ -69,7 +69,7 @@ all non-priority alarms.
 This component is the main tool to inspect in detail the values inferred by the
 Eva analysis for any variable or expression at a given program point.
 It is designed as a table, with a column for each evaluated expression and a
-line for each callstack for which the expression is evaluated.
+row for each callstack for which the expression is evaluated.
 
 ### Evaluating expressions or predicates
 
@@ -93,7 +93,7 @@ One can also evaluate an arbitrary expression:
   or select _Evaluation_ when clicking on the button of the global toolbar
   search field.
 - write the desired C expression or ACSL term in the toolbar search field
-  (which should been selected) and press _Enter_.
+  (which should have been selected) and press _Enter_.
 
 A new pinned column is added to the table, with the values inferred for the
 given expression at the selected statement.
@@ -127,12 +127,12 @@ was precise enough to reduce the inferred values of the given expression.
 ### View by callstacks
 
 By default, the table shows the set of all possible values for all possible
-execution reaching the given program point.
+executions reaching the given program point.
 
 In the component titlebar, the button [icon-items.list] enables the view by
 callstack: the table shows one row per callstack for which the selected
 program point has been reached by the analysis.
-Clicking on the number in the leftmost coloum displays the row callstack
+Clicking on the number in the leftmost columm displays the row callstack
 at the bottom of the component, as a list of call sites, going back to the
 _main_ function. A click on a call site selects it in the **AST** component.
 
@@ -155,7 +155,7 @@ Studia can also be used on arbitrary lvalues:
 - click on the button of the global toolbar search field,
   and select _Studia: Reads_ or _Studia: Writes_;
 - write the desired C lvalue in the toolbar search field
-  (which should been selected) and press _Enter_.
+  (which should have been selected) and press _Enter_.
 
 The memory location of the lvalue is evaluated at the selected statement:
 for instance, if the lvalue is a pointer access, its memory location depends on
@@ -170,7 +170,7 @@ This component displays a summary of an Eva analysis. It is identical to the
 summary displayed in the Frama-C log at the end of an Eva analysis.
 
 The _Coverage_ section shows:
-- the number of functions body analyzed by Eva, over the total number of
+- the number of function bodies analyzed by Eva, over the total number of
   function bodies provided in the source files provided to Frama-C.
   Functions whose body cannot be analyzed (such as functions without body or
   functions specified to the -eva-use-spec parameter) are ignored.
@@ -187,7 +187,7 @@ Each alarm reports a possible undefined behavior.
 
 Finally, the _Statuses_ section shows the number of ACSL assertions and
 function preconditions evaluated by the analysis:
-- Valid: the annotation has been proved correct by Eva
+- Valid: the annotation has been proved correct by Eva.
 - Unknown: the Eva analysis could not prove the annotation.
 - Invalid: the annotation has been proved to be false by Eva.
 
