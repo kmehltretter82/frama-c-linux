@@ -39,8 +39,7 @@ open Mt_thread
    locations for writes, or the statements at which the operation took place
    for reads *)
 
-let () = Ast_attributes.register ~ignore:true ~attr_class:(AttrName false)
-    "FRAMA_C_MODEL"
+let () = Ast_attributes.register ~ignore:true (AttrName false) "FRAMA_C_MODEL"
 (* FIXME: Frama-C has removed the attribute FRAMA_C_MODEL from its libc. This
    should also probably be removed here. *)
 

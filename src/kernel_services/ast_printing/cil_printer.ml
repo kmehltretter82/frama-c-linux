@@ -3469,7 +3469,7 @@ let register_shallow_attribute name =
   | Some info when not info.attr_print -> ()
   | Some info ->
     Ast_attributes.register_noprint ~ignore:info.attr_ignore
-      ~attr_class:info.attr_class name
+      info.attr_class name
 
 (*
 Local Variables:

@@ -199,17 +199,16 @@ val known_table : (string, attribute_info) Hashtbl.t
     (default is [true]) and ignore when comparing types (default if [true] for
     [AttrUnknown] class and [false] otherwise).
 *)
-val register : ?print:bool -> ?ignore:bool -> attr_class:attribute_class ->
+val register : ?print:bool -> ?ignore:bool -> attribute_class ->
   string -> unit
 
 (** Same as {!register} but with [print] set to [false]. *)
-val register_noprint : ?ignore:bool -> attr_class:attribute_class -> string ->
-  unit
+val register_noprint : ?ignore:bool -> attribute_class -> string -> unit
 
 (** Call {!register} on a list of attributes with the same class and print
     status.
 *)
-val register_list : ?print:bool -> ?ignore:bool -> attr_class:attribute_class ->
+val register_list : ?print:bool -> ?ignore:bool -> attribute_class ->
   string list -> unit
 
 (** Remove an attribute previously registered. *)

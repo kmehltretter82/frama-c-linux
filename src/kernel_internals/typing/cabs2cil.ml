@@ -98,7 +98,7 @@ let check_attribute_name s =
     if List.mem res unsupported_attributes then
       Kernel.error ~current:true "Unsupported attribute: %s" s
     else if not (Ast_attributes.is_known res) then begin
-      Ast_attributes.register ~attr_class:AttrUnknown res;
+      Ast_attributes.register AttrUnknown res;
       Kernel.warning
         ~once:true ~current:true ~wkey:Kernel.wkey_unknown_attribute
         "Ignoring unknown attribute: %s" s;

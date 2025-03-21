@@ -123,19 +123,20 @@ let pp_info fmt ai =
  * conversion *)
 let known_table : (string, attribute_info) Hashtbl.t = Hashtbl.create 59
 
-let register ?(print=true) ?ignore ~attr_class an =
-  let attr_ignore = Option.value ~default:(attr_class=AttrUnknown) ignore in
-  let nc = {attr_class; attr_print = print; attr_ignore} in
+let register ?(print=true) ?ignore ac an =
+  let attr_ignore = Option.value ~default:(ac=AttrUnknown) ignore in
+  let nc = {attr_class = ac; attr_print = print; attr_ignore} in
   if Hashtbl.mem known_table an then
     Kernel.warning
-      "Replacing existing class and status for attribute %s: was (%a), now (%a)"
+      "Replacing existing class and status for attribute %s:@ was (%a),@ now \
+       (%a)"
       an pp_info (Hashtbl.find known_table an) pp_info nc;
   Hashtbl.replace known_table an nc
 
 let register_noprint = register ~print:false
 
-let register_list ?print ?ignore ~attr_class al =
-  List.iter (register ?print ?ignore ~attr_class) al
+let register_list ?print ?ignore ac al =
+  List.iter (register ?print ?ignore ac) al
 
 let remove = Hashtbl.remove known_table
 
@@ -181,13 +182,13 @@ let partition ~(default:attribute_class) (attrs: attributes) :
 (*************************)
 
 let qualifier_attributes = [ "const"; "restrict"; "volatile"; "ghost" ]
-let () = register_list ~attr_class:AttrType qualifier_attributes
+let () = register_list AttrType qualifier_attributes
 
 (**********************)
 (* storage attributes *)
 (**********************)
 
-let () = register ~attr_class:(AttrName false) "static"
+let () = register (AttrName false) "static"
 
 (*******************************)
 (* Frama-C internal attributes *)
@@ -198,25 +199,24 @@ let () = register ~attr_class:(AttrName false) "static"
 let anonymous_attribute_name = "fc_anonymous"
 let anonymous_attribute = (anonymous_attribute_name, [])
 
-let () = register_noprint ~attr_class:AttrUnknown anonymous_attribute_name
+let () = register_noprint AttrUnknown anonymous_attribute_name
 
 (* AttrType attributes. *)
 
 let bitfield_attribute_name = "FRAMA_C_BITFIELD_SIZE"
 let cast_irrelevant_attributes = ["visibility"]
 
-let () = register_list ~attr_class:AttrType
+let () = register_list AttrType
     (bitfield_attribute_name :: cast_irrelevant_attributes)
 
-let () = register_list ~ignore:true ~attr_class:AttrType
-    ["declspec"; "arraylen"]
+let () = register_list ~ignore:true AttrType ["declspec"; "arraylen"]
 
 (* AttrStmt attributes. *)
 
 let frama_c_keep_block = "FRAMA_C_KEEP_BLOCK"
 let frama_c_ghost_else = "fc_ghost_else"
 
-let () = register_list ~print:false ~ignore:true ~attr_class:AttrStmt
+let () = register_list ~print:false ~ignore:true AttrStmt
     [frama_c_keep_block; frama_c_ghost_else]
 
 (* Attrname attributes. *)
@@ -232,7 +232,7 @@ let fc_oldstyleproto     = "FC_OLDSTYLEPROTO"
 let fc_missingproto      = "missingproto"
 
 let () =
-  register_list ~print:false ~ignore:true ~attr_class:(AttrName false)
+  register_list ~print:false ~ignore:true (AttrName false)
     [ frama_c_ghost_formal
     ; frama_c_init_obj
     ; frama_c_mutable
@@ -243,17 +243,16 @@ let () =
     ]
 
 let () =
-  register_list ~ignore:true ~attr_class:(AttrName false)
+  register_list ~ignore:true (AttrName false)
     [fc_oldstyleproto; fc_missingproto]
 
 (* AttFuntype attributes. *)
 
 let frama_c_inlined = "fc_inlined"
 
-let () = register_noprint ~ignore:true ~attr_class:(AttrFunType false)
-    frama_c_inlined
+let () = register_noprint ~ignore:true (AttrFunType false) frama_c_inlined
 
-let () = register ~attr_class:(AttrFunType false) "warn_unused_result"
+let () = register (AttrFunType false) "warn_unused_result"
 
 (* List of attributes for internal uses. *)
 
@@ -284,7 +283,7 @@ let spare_attributes_for_logic_cast = spare_attributes_for_c_cast
 (***************************************)
 
 let () =
-  register_list ~attr_class:(AttrName false)
+  register_list (AttrName false)
     [ "section"; "constructor"; "destructor"; "unused"; "used"; "weak";
       "no_instrument_function"; "alias"; "no_check_memory_usage";
       "exception"; "model"; "aconst";
@@ -293,26 +292,26 @@ let () =
 
 let () =
   (* Now come the MSVC declspec attributes *)
-  register_list ~attr_class:(AttrName true)
+  register_list (AttrName true)
     [ "thread"; "naked"; "dllimport"; "dllexport"; "selectany"; "allocate";
       "nothrow"; "novtable"; "property"; "uuid"; "align" ]
 
 let () =
-  register_list ~attr_class:(AttrFunType false)
+  register_list (AttrFunType false)
     [ "format"; "regparm"; "longcall"; "noinline"; "always_inline" ]
 
 let () =
-  register_list ~attr_class:(AttrFunType true)
+  register_list (AttrFunType true)
     [ "stdcall";"cdecl"; "fastcall"; "noreturn" ]
 
 let () =
   (* GCC label and statement attributes. *)
-  register_list ~attr_class:AttrStmt
+  register_list AttrStmt
     [ "hot"; "cold"; "fallthrough"; "assume"; "musttail" ]
 
 (* GCC 'malloc' attributes can refer to erased functions and make the code
    un-reparsable, so we keep them in the AST but not pretty-print them. *)
-let () = register_noprint ~ignore:true ~attr_class:AttrUnknown "malloc"
+let () = register_noprint ~ignore:true AttrUnknown "malloc"
 
 (**********************)
 (* Unknown attributes *)
@@ -323,7 +322,7 @@ let () = register_noprint ~ignore:true ~attr_class:AttrUnknown "malloc"
    to the wrong AST node.
 *)
 let () =
-  register_list ~attr_class:AttrUnknown
+  register_list AttrUnknown
     [ "packed"  (* packed and aligned are treated separately, we ignore them *)
     ; "aligned" (* during standard processing. *)
     ; "dummy"
