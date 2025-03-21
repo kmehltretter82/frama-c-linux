@@ -812,7 +812,7 @@ export default function RenderProperties(): JSX.Element {
 
   return (
     <>
-      <TitleBar>
+      <TitleBar help="framac-properties">
         <FilterRatio model={model} />
         <IconButton
           icon="CLIPBOARD"

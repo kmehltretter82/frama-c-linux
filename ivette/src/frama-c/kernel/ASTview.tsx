@@ -725,7 +725,7 @@ export default function ASTview(): JSX.Element {
 
   return (
     <>
-      <TitleBar>
+      <TitleBar help="framac-ast">
         <IconButton
           icon="SEARCH"
           enabled={!!scope}

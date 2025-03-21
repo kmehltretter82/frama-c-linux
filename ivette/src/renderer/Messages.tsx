@@ -487,7 +487,7 @@ export function RenderMessages(): JSX.Element {
 
   return (
     <>
-      <TitleBar>
+      <TitleBar help="framac-messages">
         <FilterRatio model={model} />
         <IconButton
           icon="CLIPBOARD"

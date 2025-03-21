@@ -318,7 +318,7 @@ export default function ASTinfo(): JSX.Element {
   // Information Panel Rendering
   return (
     <>
-      <TitleBar>
+      <TitleBar help="framac-inspector">
         <IconButton
           key="CLEAR"
           icon="CIRC.CLOSE"

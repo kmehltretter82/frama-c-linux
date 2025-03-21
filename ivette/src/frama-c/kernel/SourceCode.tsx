@@ -81,19 +81,6 @@ async function openSourceFile(
   });
 }
 
-// Editor Help popup
-async function displayShortcuts(): Promise<void> {
-  await Dialogs.showMessageBox({
-    buttons: [{ label: "Ok" }],
-    details: (
-      'Ctrl+click: open file in an external editor at the selected location.\n'
-      + 'Alt+f: search for text or regexp.\n'
-      + 'Alt+g: go to line.'
-    ),
-    message: 'Useful shortcuts',
-  });
-}
-
 // Toplevel Declaration Markers
 function isToplevelDecl(kind: Ast.markerKind): boolean {
   switch (kind) {
@@ -244,7 +231,7 @@ export default function SourceCode(): JSX.Element {
 
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="framac-source-code">
         <Buttons.IconButton
           icon="DUPLICATE"
           visible={!!file}
@@ -259,13 +246,6 @@ export default function SourceCode(): JSX.Element {
           onClick={toggleSearchPanel}
           title='Search in source code'
         />
-        <Toolbars.Inset />
-        <Buttons.IconButton
-          icon="HELP"
-          onClick={displayShortcuts}
-          title='Useful shortcuts'
-        />
-        <Toolbars.Inset />
       </Ivette.TitleBar>
       <Component style={{ fontSize: `${fontSize}px` }} />
     </>
