@@ -183,13 +183,11 @@ type attribute_class =
   *)
   | AttrUnknown
 
-(** Registered informations about an attribute. We register its class, if it
-    should be printed or not, and if it should be ignored when comparing
-    types. *)
+(** Registered informations about an attribute. *)
 type attribute_info = {
-  attr_class : attribute_class;
-  attr_ignore: bool;
-  attr_print : bool;
+  attr_class : attribute_class; (** Class of the attribute. *)
+  attr_ignore: bool; (** Ignore the attribute when comparing types. *)
+  attr_print : bool; (** Print the attribute when printing the AST. *)
 }
 
 (** Table containing all registered attributes. *)
@@ -214,8 +212,8 @@ val register_list : ?print:bool -> ?ignore:bool -> attribute_class ->
 (** Remove an attribute previously registered. *)
 val remove : string -> unit
 
-(** [is_known_attribute attrname] returns [true] if the attribute named
-    [attrname] is known (registered) by Frama-C.
+(** [is_known attrname] returns [true] if the attribute named [attrname] is
+    known (registered) by Frama-C.
 *)
 val is_known : string -> bool
 
