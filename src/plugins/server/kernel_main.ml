@@ -157,23 +157,18 @@ let () = Request.register
     get_project_list
 
 let () = Request.register
-    ~package ~kind:`SET ~name:"setCurrentProject"
-    ~descr:(Md.plain "Changes the current Frama-C project")
-    ~input:(module Jstring) ~output:(module Junit)
-    (fun unique_name -> Project.(from_unique_name unique_name |> set_current))
-
-let () = Request.register
     ~package ~kind:`SET ~name:"createProject"
     ~descr:(Md.plain "Creates a new Frama-C project with the given name")
     ~input:(module Jstring) ~output:(module Junit)
     (fun name -> Project.create name |> Project.set_current)
 
 let _current_project_signal =
-  States.register_value ~package
+  States.register_state ~package
     ~name:"currentProject"
     ~descr:(Md.plain "Current Frama-C project")
-    ~output:(module Jstring)
+    ~data:(module Jstring)
     ~get:(fun () -> Project.(current () |> get_unique_name))
+    ~set:(fun unique_name -> Project.(from_unique_name unique_name |> set_current))
     ~add_hook:(Project.register_after_set_current_hook ~user_only:false)
     ()
 
