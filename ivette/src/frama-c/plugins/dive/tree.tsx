@@ -229,7 +229,7 @@ export default function TreeComponent(): JSX.Element {
   }, [current, root]);
 
   return <>
-    <Ivette.TitleBar>
+    <Ivette.TitleBar help="dive-dataflow-tree">
       <IconButton
         icon="TRASH"
         onClick={() => setRoot(null)}
