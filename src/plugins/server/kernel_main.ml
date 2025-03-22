@@ -147,6 +147,15 @@ let () =
 (* --- Frama-C Projects                                                   --- *)
 (* -------------------------------------------------------------------------- *)
 
+let project_changed_signal =
+  Request.signal ~package ~name:"projectChanged"
+    ~descr:(Md.plain "Emitted each time the current project changes")
+
+let () =
+  Project.register_after_set_current_hook ~user_only:false
+    (fun _ -> Request.emit project_changed_signal)
+
+
 let get_project_list () =
   Project.fold_on_projects (fun acc t -> Project.get_unique_name t :: acc) []
 
