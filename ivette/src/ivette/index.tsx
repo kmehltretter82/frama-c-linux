@@ -35,10 +35,11 @@ import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
 import { HelpButton } from 'dome/help';
+import { Pattern } from 'dome/text/markdown';
 import * as State from './state';
 import * as Search from './search';
 import doc from './doc.md?raw';
-import { Pattern } from 'dome/text/markdown';
+import sandoxDoc from '../sandbox/sandbox.md?raw';
 
 // --------------------------------------------------------------------------
 // --- help
@@ -330,6 +331,11 @@ if (DEVEL) {
     label: 'Sandbox',
     title: 'Sandbox Playground (only in DEVEL mode)',
     layout: { ABCD: 'sandbox.qsplit' },
+  });
+  registerDocChapter({
+    id: 'sandbox',
+    content: sandoxDoc,
+    rank: 1000
   });
 }
 
