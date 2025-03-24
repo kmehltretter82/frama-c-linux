@@ -40,6 +40,7 @@ Everything in a commands file
   struct t {
      int a ;
   };
+  #pragma clang diagnostic ignored "-W#pragma-messages"
   #pragma message("Quoted test strings are \'test_quoted_string_1\' and \'test_quoted_string_2\'")
   #pragma message("Unquoted test strings are \'test_unquoted_string_1\' and \'test_unquoted_string_2\'")
   int incr(int a)
@@ -130,6 +131,7 @@ Commands split around -then
   struct t {
      int a ;
   };
+  #pragma clang diagnostic ignored "-W#pragma-messages"
   #pragma message("Quoted test strings are \'test_quoted_string_1\' and \'test_quoted_string_2\'")
   #pragma message("Unquoted test strings are \'test_unquoted_string_1\' and \'test_unquoted_string_2\'")
   int incr(int a)
@@ -218,6 +220,7 @@ Mix of commands file and command line
   struct t {
      int a ;
   };
+  #pragma clang diagnostic ignored "-W#pragma-messages"
   #pragma message("Quoted test strings are \'test_quoted_string_1\' and \'test_quoted_string_2\'")
   #pragma message("Unquoted test strings are \'test_unquoted_string_1\' and \'test_unquoted_string_2\'")
   int incr(int a)
