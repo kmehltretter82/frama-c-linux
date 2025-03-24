@@ -7,7 +7,7 @@ analyses are performed. It is the main component to interact by selecting
 code elements: statements, expressions, variables, annotations, etc.
 
 Left-clicking on an AST element selects it globally:
-many other components react to this selection and shows information related
+many other components react to this selection and show information related
 to the selected element.
 Some components even react when an element is hovered over by the mouse.
 
@@ -15,7 +15,7 @@ Right-clicking on an AST element opens a contextual menu offering more actions
 related to the element, including:
 - on functions and variables, go to (and select) their declaration;
 - on a function declaration, find all their call sites;
-- on a left-value, select all statements reading or modifying its value
+- on an lvalue, select all statements reading or modifying its value
   according to the Eva plug-in;
 - on a function, statement or annotation: prove them using the WP plug-in.
 
@@ -32,16 +32,17 @@ location. The editor (emacs by default) can be configured in the Ivette
 preferences.
 
 Other useful shorcuts are:
-- Alt+f to search for a given text or regexp.
-- Alt+g to go to a given line.
+- Alt+F to search for a given text or regexp.
+- Alt+G to go to a given line.
 
 ## Inspector {#framac-inspector}
 
-The inspector shows various information about selected and hovered AST elements.
+The inspector shows various kinds of information about selected and hovered AST
+elements.
 The button [icon-clipboard] in the component titlebar allows you to show or hide
 some of this information.
 
-Available information include:
+Available kinds of information include:
 - the source file location of any element;
 - the type of a C expression or ACSL term;
 - the size of a type or variable;
@@ -49,7 +50,7 @@ Available information include:
 - the possible values of a variable or expression, according to Eva.
 
 The information of an element can be pinned using the [icon-pin] button,
-in which case it remains in the component even if the element is not longer
+in which case it remains in the component even if the element is no longer
 selected.
 Alt-clicking on an AST element also pins the element information in the
 Inspector.
@@ -73,7 +74,7 @@ Some user actions may select several AST elements at once.
 This is the case when:
 - selecting all calls to a given function, via the 'Go to caller' contextual
   menu on a function declaration;
-- selecting all statements that may read or write a given left-value,
+- selecting all statements that may read or write a given lvalue,
   via the 'Studia' contextual menu in the [AST](#framac-ast) component.
 
 In this case, this component lists all selected elements in a table.
