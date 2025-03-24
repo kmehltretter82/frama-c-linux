@@ -6,8 +6,9 @@
   OPT: -cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE=-2" -print
 EXIT:1
 FILTER: sed -e "s|$TMPDIR/[^ ]*|/tmp/TEMPNAME|g" -e "s|$(realpath $(pwd)/../../../..)|FC_HOME|g" -e "/^cc1/d"
+ENABLED_IF: %{bin-available:gcc}
   CMD: LC_ALL=C @frama-c-exe@
-  OPT:-cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE="
+  OPT: -cpp-command="gcc -C -E -I." -cpp-frama-c-compliant -no-autoload-plugins -cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE="
 */
 
 /* should be an error in the last case because _POSIX_C_SOURCE has been forcibly undefined */
