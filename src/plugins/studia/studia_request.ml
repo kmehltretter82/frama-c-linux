@@ -100,16 +100,35 @@ let compute_reads zone =
 let lval_location kinstr lval =
   Eva.Results.(before_kinstr kinstr |> eval_address lval |> as_zone)
 
+let tlval_location kinstr tlval =
+  let cvalue = Eva.Results.(before_kinstr kinstr |> get_cvalue_model) in
+  let term = Logic_const.term (TLval tlval) (Cil.typeOfTermLval tlval) in
+  let access = Locations.Read in
+  let zones = Eva.Logic_inout.tlval_to_zones Code_annot cvalue access term in
+  match zones with
+  | Some zones -> zones.over
+  | None ->
+    Data.failure "Cannot evaluate the memory location of %a"
+      Printer.pp_term_lval tlval
+
+let marker_location (marker: Printer_tag.localizable) =
+  match marker with
+  | PLval (_kf, kinstr, lval) -> lval_location kinstr lval
+  | PGlobal (GVar (vi, _, _) | GVarDecl (vi, _))
+  | PVDecl (_, _, vi) -> Locations.zone_of_varinfo vi
+  | PTermLval (_kf, kinstr, _property, tlval) -> tlval_location kinstr tlval
+  | _ -> Data.failure "%a is not an lvalue" Printer_tag.pp_localizable marker
+
 let () = Request.register ~package
     ~kind:`GET ~name:"getReadsLval"
     ~descr:(Markdown.plain "Get the list of statements that read a lval.")
-    ~input:(module Kernel_ast.Lval)
+    ~input:(module Kernel_ast.Marker)
     ~output:(module Effects)
-    (fun (kinstr, lval) -> compute_reads (lval_location kinstr lval))
+    (fun marker -> compute_reads (marker_location marker))
 
 let () = Request.register ~package
     ~kind:`GET ~name:"getWritesLval"
     ~descr:(Markdown.plain "Get the list of statements that write a lval.")
-    ~input:(module Kernel_ast.Lval)
+    ~input:(module Kernel_ast.Marker)
     ~output:(module Effects)
-    (fun (kinstr, lval) -> compute_writes (lval_location kinstr lval))
+    (fun marker -> compute_writes (marker_location marker))

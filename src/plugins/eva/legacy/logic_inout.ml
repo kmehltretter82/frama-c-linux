@@ -127,8 +127,15 @@ let bottom_zones =
   let bottom = Locations.Zone.bottom in
   { under = bottom; over = bottom; deps = bottom; }
 
-let assigns_tlval_to_zones state access tlval =
-  let env = Eval_terms.env_post_f ~pre:state ~post:state ~result:None () in
+type annotation = Code_annot | Assigns
+
+let make_env context state =
+  match context with
+  | Assigns -> Eval_terms.env_post_f ~pre:state ~post:state ~result:None ()
+  | Code_annot -> Eval_terms.env_only_here state
+
+let tlval_to_zones context state access tlval =
+  let env = make_env context state in
   let alarm_mode = Eval_terms.Ignore in
   (* If the term is an address, it has no memory dependency.
      This is possible in "\from &g" clauses. *)

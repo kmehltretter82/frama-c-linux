@@ -62,7 +62,7 @@ let compute_using_prototype_for_state state kf assigns =
       in
       let treat_assign acc (out, ins) =
         let output =
-          Eva.Logic_inout.assigns_tlval_to_zones state Write out.it_content
+          Eva.Logic_inout.tlval_to_zones Assigns state Write out.it_content
         in
         match output with
         | None ->

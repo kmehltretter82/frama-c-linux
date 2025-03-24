@@ -124,7 +124,9 @@ let eval_assigns kf state assigns =
       if Logic_const.(is_result out_term || is_exit_status out_term)
       then (Zone.bottom, Zone.bottom, Zone.bottom)
       else
-        let output = Eva.Logic_inout.assigns_tlval_to_zones state Write out_term in
+        let output =
+          Eva.Logic_inout.tlval_to_zones Assigns state Write out_term
+        in
         match output with
         | Some output -> output.under, output.over, clean_deps output.deps
         | None ->
@@ -138,7 +140,7 @@ let eval_assigns kf state assigns =
       | FromAny -> Zone.top
       | From l ->
         let aux acc { it_content = from } =
-          let inputs = Eva.Logic_inout.assigns_tlval_to_zones state Read from in
+          let inputs = Eva.Logic_inout.tlval_to_zones Assigns state Read from in
           match inputs with
           | Some inputs ->
             let acc = Zone.join (clean_deps inputs.deps) acc in
