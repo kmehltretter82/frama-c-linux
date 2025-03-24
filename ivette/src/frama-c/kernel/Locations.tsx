@@ -185,7 +185,7 @@ export default function LocationsTable(): JSX.Element {
   // Component
   return (
     <>
-      <TitleBar>
+      <TitleBar help="framac-locations">
         <IconButton
           icon='ANGLE.LEFT'
           title='Previous location'

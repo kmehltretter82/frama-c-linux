@@ -34,7 +34,7 @@ analysis results.
   - purple outline: the memory location may be directly tainted
   - cyan outline: the memory location may be indirectly tainted
 
-### Titlebar {#dive-dataflow-graph-titlebar}
+### Titlebar
 
 The titlebar contains the following buttons:
 
