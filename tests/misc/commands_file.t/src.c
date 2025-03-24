@@ -1,3 +1,6 @@
+// Ignore clang warning emitted on pragma messages
+#pragma clang diagnostic ignored "-W#pragma-messages"
+
 #if defined(TEST_QUOTED_1) && defined(TEST_QUOTED_2) && TEST_QUOTED_2 == 2
   // ok
 #else
