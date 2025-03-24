@@ -95,6 +95,10 @@ export interface ColumnProps<Row, Cell> {
   label?: string;
   /** Header title. */
   title?: string;
+  /** headerClassName. */
+  headerClassName?: string;
+  /** ClassName . */
+  className?: string;
   /**
      Column position.
      By default, column will appear according to their mounting order.
@@ -215,7 +219,7 @@ const isVisible = (visible: Cmap<boolean>, col: Cprops): boolean => {
   const defaultVisible = col.visible ?? true;
   switch (defaultVisible) {
     case 'never': return false;
-    case 'always': return false;
+    case 'always': return true;
     default:
       return visible.get(col.id) ?? defaultVisible;
   }
@@ -826,7 +830,7 @@ function makeColumn<Key, Row>(
   props: ColProps<Row>,
   fill: boolean,
 ): JSX.Element {
-  const { id } = props;
+  const { id, className, headerClassName } = props;
   const align = { textAlign: props.align };
   const dataKey = props.dataKey ?? id;
   const columnData: ColumnData = {
@@ -855,6 +859,8 @@ function makeColumn<Key, Row>(
       cellRenderer={render}
       headerStyle={align}
       disableSort={disableSort}
+      className={className}
+      headerClassName={headerClassName}
       style={align}
     />
   );

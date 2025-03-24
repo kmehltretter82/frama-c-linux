@@ -106,6 +106,12 @@
     --eva-alarms-false: #fb4e4a;
     --eva-alarms-unknown: darkorange;
 
+    --eva-mthread-thread: #4B2A69;
+    --eva-mthread-mutex: #7D1919;
+    --eva-mthread-message: #197D19;
+    --eva-mthread-variable: #19197D;
+    --eva-mthread-bg-sub: #2d3e58;
+
     --codemirror-comment: #748a8d;
     --codemirror-type: #bacd5f;
     --codemirror-number: #d3869b;

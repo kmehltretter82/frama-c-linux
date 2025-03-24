@@ -506,4 +506,124 @@ tr:first-of-type > .eva-table-callsite-box {
 .eva-status-computing {
   font-weight: bold;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* --- MThread                                                            --- */
+/* -------------------------------------------------------------------------- */
+
+.eva-mthread {
+  height: 100%;
+
+  .dome-xTable .ReactVirtualized__Table__headerColumn,
+  .dome-xTable .ReactVirtualized__Table__rowColumn {
+    &.table-mthread-title {
+      border-right: solid 1px;
+      font-weight: 800;
+    }
+      &.table-mthread-last {
+      border-right: solid 1px;
+    }
+  }
+}
+
+/* V3 */
+.eva-mthread {
+  button:not(:disabled) { cursor: pointer;}
+
+  .eva-mthread-toolbar {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &>div {
+      display: flex;
+      flex-direction: row;
+      margin: 0 10px;
+    }
+    .dome-xToolBar-inset { display: none }
+  }
+
+  .eva-mthread-thumbs {
+    overflow-y: auto;
+    max-height: 100%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-bottom: 88px;
+
+    .dome-xToolBar {
+      margin-bottom: 10px;
+    }
+
+    .mthread-thumb-mutex button.dome-selected {
+      background-color: var(--eva-mthread-mutex);
+    }
+    .mthread-thumb-message button.dome-selected {
+      background-color: var(--eva-mthread-message);
+    }
+    .mthread-thumb-variable button.dome-selected {
+      background-color: var(--eva-mthread-variable);
+    }
+    .mthread-thumb-thread button.dome-selected {
+      background-color: var(--eva-mthread-thread);
+    }
+
+    .mthread-thumb {
+      min-width: 200px;
+      max-width: 400px;
+      background-color: var(--background-profound);
+      margin: 5px;
+      padding: 10px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+
+      .mthread-thumb-title {
+        text-align: center;
+        padding-bottom: 3px;
+        font-weight: bold;
+      }
+
+      .thumb-content {
+        background-color: var(--background-intense);
+        margin: 7px 0;
+        padding: 3px 0;
+        border-radius: 5px;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+
+        .thumb-content-title {
+          display: flex;
+          justify-content: space-between;
+        }
+
+        .thumb-content-infos {
+          display: flex;
+          &.thumb-content-row {
+            flex-direction: row;
+            .thumb-subcontent { width: 100%; }
+          }
+          &.thumb-content-column { flex-direction: column; }
+        }
+
+        .thumb-subcontent {
+          margin: 7px;
+          padding: 3px;
+          border-radius: 5px;
+          background-color: var(--eva-mthread-bg-sub);
+
+          .thumb-subcontent-infos {
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+
+          }
+        }
+      }
+    }
+  }
+}
 /* -------------------------------------------------------------------------- */
