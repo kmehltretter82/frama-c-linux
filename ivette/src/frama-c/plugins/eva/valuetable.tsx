@@ -1137,7 +1137,7 @@ function EvaTable(): JSX.Element {
   /* Builds the component */
   return (
     <>
-      <Ivette.TitleBar>
+      <Ivette.TitleBar help="eva-values">
         <IconButton
           icon="ITEMS.LIST"
           title="Show values by callstack by default"

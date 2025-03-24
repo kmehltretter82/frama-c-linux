@@ -29,6 +29,7 @@ import * as States from 'frama-c/states';
 import * as Eva from 'frama-c/plugins/eva/api/general';
 import { EvaStatus } from 'frama-c/plugins/eva/components/AnalysisStatus';
 import { SidebarTitle } from 'dome/frame/sidebars';
+import { HelpButton } from 'dome/help';
 
 
 export interface EvaToolsProps {
@@ -100,6 +101,7 @@ export default function EvaTools(
       </Hbox>
       <Hbox className='eva-tools-status'>
         <EvaStatus iconSize={18} />
+        <HelpButton id='eva' size={18} />
       </Hbox>
     </SidebarTitle>
   );

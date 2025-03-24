@@ -145,7 +145,7 @@ export function FlamegraphComponent(): JSX.Element {
 
   return (
     <>
-      <Ivette.TitleBar >
+      <Ivette.TitleBar help="eva-flamegraph">
         <IconButton
           icon="PIN"
           kind={useScope ? "positive" : "default"}
