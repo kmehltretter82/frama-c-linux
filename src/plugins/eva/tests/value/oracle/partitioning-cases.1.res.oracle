@@ -26,9 +26,9 @@
   Called from partitioning-cases.c:38.
 [eva] using specification for function sgn_spec
 [eva] Done for function sgn_spec
-[eva] partitioning-cases.c:39: Frama_C_show_each: {-1}
-[eva] partitioning-cases.c:39: Frama_C_show_each: {1}
 [eva] partitioning-cases.c:39: Frama_C_show_each: {0}
+[eva] partitioning-cases.c:39: Frama_C_show_each: {1}
+[eva] partitioning-cases.c:39: Frama_C_show_each: {-1}
 [eva] computing for function Frama_C_interval <- test_spec <- main.
   Called from partitioning-cases.c:40.
 [eva] partitioning-cases.c:40: 

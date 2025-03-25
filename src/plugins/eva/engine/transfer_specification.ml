@@ -426,11 +426,7 @@ module Make
         HashBehaviors.add cache behavior states;
         states
     in
-    let compute_complete_set behaviors =
-      List.fold_left
-        (fun acc b -> List.rev_append (compute_behavior b) acc)
-        [] behaviors
-    in
+    let compute_complete_set = List.concat_map compute_behavior in
     List.map compute_complete_set behaviors
 
   (* Interprets a list of behaviors as if they was merged into a single
