@@ -162,8 +162,6 @@
 [eva:partition] initialized.c:11: starting to merge loop iterations
 [eva:alarm] initialized.c:8: Warning: 
   function f: postcondition got status unknown.
-[eva:alarm] initialized.c:8: Warning: 
-  function f: postcondition got status invalid.
 [eva] Recording results for f
 [eva] Done for function f
 [eva] computing for function f <- g3 <- main.

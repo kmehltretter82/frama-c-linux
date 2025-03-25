@@ -466,11 +466,11 @@
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from math_h.c:90.
-[eva] math_h.c:90: function frexp: precondition 'valid_exp' got status valid.
-[eva] math_h.c:90: function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from math_h.c:90.
+[eva] math_h.c:90: function frexp: precondition 'valid_exp' got status valid.
+[eva] math_h.c:90: function frexp: precondition 'not_nan' got status valid.
 [eva] Done for function frexp
 [eva] computing for function frexp <- main.
   Called from math_h.c:90.
@@ -510,8 +510,33 @@
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from math_h.c:91.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
 [eva] math_h.c:91: function frexpf: precondition 'valid_exp' got status valid.
 [eva] math_h.c:91: function frexpf: precondition 'not_nan' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva] math_h.c:91: function frexpf: precondition 'valid_exp' got status valid.
+[eva] math_h.c:91: function frexpf: precondition 'not_nan' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva] math_h.c:91: function frexpf: precondition 'valid_exp' got status valid.
+[eva] math_h.c:91: function frexpf: precondition 'not_nan' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from math_h.c:91.
@@ -525,8 +550,6 @@
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from math_h.c:91.
-[eva] math_h.c:91: function frexpf: precondition 'valid_exp' got status valid.
-[eva] math_h.c:91: function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from math_h.c:91.
@@ -535,14 +558,15 @@
 [eva] Done for function frexpf
 [eva] computing for function frexpf <- main.
   Called from math_h.c:91.
-[eva] math_h.c:91: function frexpf: precondition 'valid_exp' got status valid.
-[eva] math_h.c:91: function frexpf: precondition 'not_nan' got status valid.
 [eva] Done for function frexpf
 [eva:alarm] math_h.c:91: Warning: NaN float value. assert ¬\is_NaN(f_top);
 [eva] computing for function frexpf <- main.
   Called from math_h.c:91.
 [eva] math_h.c:91: function frexpf: precondition 'valid_exp' got status valid.
 [eva] math_h.c:91: function frexpf: precondition 'not_nan' got status valid.
+[eva] Done for function frexpf
+[eva] computing for function frexpf <- main.
+  Called from math_h.c:91.
 [eva] Done for function frexpf
 [eva] computing for function frexpl <- main.
   Called from math_h.c:92.
@@ -557,8 +581,33 @@
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from math_h.c:92.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
 [eva] math_h.c:92: function frexpl: precondition 'valid_exp' got status valid.
 [eva] math_h.c:92: function frexpl: precondition 'not_nan' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva] math_h.c:92: function frexpl: precondition 'valid_exp' got status valid.
+[eva] math_h.c:92: function frexpl: precondition 'not_nan' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva] math_h.c:92: function frexpl: precondition 'valid_exp' got status valid.
+[eva] math_h.c:92: function frexpl: precondition 'not_nan' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from math_h.c:92.
@@ -572,8 +621,6 @@
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from math_h.c:92.
-[eva] math_h.c:92: function frexpl: precondition 'valid_exp' got status valid.
-[eva] math_h.c:92: function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from math_h.c:92.
@@ -582,8 +629,6 @@
 [eva] Done for function frexpl
 [eva] computing for function frexpl <- main.
   Called from math_h.c:92.
-[eva] math_h.c:92: function frexpl: precondition 'valid_exp' got status valid.
-[eva] math_h.c:92: function frexpl: precondition 'not_nan' got status valid.
 [eva] Done for function frexpl
 [eva:alarm] math_h.c:92: Warning: 
   NaN long double value. assert ¬\is_NaN(ld_top);
@@ -591,6 +636,9 @@
   Called from math_h.c:92.
 [eva] math_h.c:92: function frexpl: precondition 'valid_exp' got status valid.
 [eva] math_h.c:92: function frexpl: precondition 'not_nan' got status valid.
+[eva] Done for function frexpl
+[eva] computing for function frexpl <- main.
+  Called from math_h.c:92.
 [eva] Done for function frexpl
 [eva] computing for function ldexp <- main.
   Called from math_h.c:93.

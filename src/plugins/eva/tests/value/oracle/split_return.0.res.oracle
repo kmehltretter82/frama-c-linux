@@ -33,8 +33,8 @@
   Called from split_return.i:53.
 [eva] Recording results for f2
 [eva] Done for function f2
-[eva] split_return.i:54: Frama_C_show_each_f2: {5; 7}, {5}
 [eva] split_return.i:54: Frama_C_show_each_f2: {0}, {0}
+[eva] split_return.i:54: Frama_C_show_each_f2: {5; 7}, {5}
 [eva] split_return.i:56: assertion got status valid.
 [eva] split_return.i:58: Frama_C_show_each_f2_2: {5; 7}, {5}
 [eva] split_return.i:59: assertion got status valid.
@@ -69,8 +69,8 @@
   Called from split_return.i:122.
 [eva] Recording results for f5
 [eva] Done for function f5
-[eva] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
 [eva] split_return.i:123: Frama_C_show_each_f5: {-2}, {0}
+[eva] split_return.i:123: Frama_C_show_each_f5: {7}, {5}
 [eva] split_return.i:125: assertion got status valid.
 [eva] split_return.i:127: assertion got status valid.
 [eva] Recording results for main5
