@@ -677,7 +677,9 @@ struct
     List.iter (fun (k, x) -> f k x) p
 
   let join_duplicate_keys (p : t) : t =
-    let cmp (k, _) (k', _) = Key.compare k k' in
+    (* Function [aux] below reverses the list, so sort by decreasing order
+       to keep a list sorted by increasing order. *)
+    let cmp (k, _) (k', _) = Key.compare k' k in
     let p = List.fast_sort cmp p in
     let rec aux acc (key, state) = function
       | [] -> (key, state) :: acc
