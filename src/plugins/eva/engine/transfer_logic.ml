@@ -375,34 +375,32 @@ module Make (Domain: LogicDomain) = struct
     let funspec = Annotations.funspec kf in
     create_from_spec init_state funspec
 
-  exception Does_not_improve
 
-  let rec fold_on_disjunction f p acc =
-    match p.pred_content with
-    | Por (p1,p2 ) -> fold_on_disjunction f p2 (fold_on_disjunction f p1 acc)
-    | _ -> f p acc
+  let rec disjunctions pred =
+    match pred.pred_content with
+    | Por (p1, p2) -> disjunctions p1 @ disjunctions p2
+    | _ -> [pred]
 
-  let count_disjunction p = fold_on_disjunction (fun _pred -> succ) p 0
-
+  (* Returns a list of states for disjunctions. *)
   let split_disjunction_and_reduce ~reduce env state pred =
-    let nb = count_disjunction pred in
-    if nb <= 1 && not reduce then
-      [state] (* reduction not required, nothing to split *)
-    else
+    match disjunctions pred with
+    | [_] when not reduce -> [state] (* no reduction and nothing to split *)
+    | list ->
       (* Can split and maybe reduce *)
-      let treat_subpred pred acc =
+      let exception Does_not_improve in
+      let reduce_by_predicate pred =
         match Domain.reduce_by_predicate env state pred true with
-        | `Bottom -> acc
-        | `Value current_state ->
-          if Domain.equal current_state state then
+        | `Bottom -> None
+        | `Value reduced_state ->
+          if Domain.equal reduced_state state then
             (* This part of the disjunction will contain the entire state.
-               Reduction has failed, there is no point in propagating the
-               smaller states in acc, that are contained in this one. *)
+               Reduction has failed, there is no point in propagating other
+               smaller states that are contained in this one. *)
             raise Does_not_improve
           else
-            current_state :: acc
+            Some reduced_state
       in
-      try List.rev (fold_on_disjunction treat_subpred pred [])
+      try List.filter_map reduce_by_predicate list
       with Does_not_improve -> [state]
 
   let eval_split_and_reduce ~reduce pred build_env state =
