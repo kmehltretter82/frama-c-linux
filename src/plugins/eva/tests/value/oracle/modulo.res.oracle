@@ -31,12 +31,12 @@
   function pgcd1: precondition got status unknown.
 [eva] modulo.i:37: loop invariant got status valid.
 [eva] modulo.i:38: loop invariant got status valid.
-[eva] modulo.i:41: Frama_C_show_each_1: [1..10], [1..10], [0..9]
-[eva] modulo.i:41: Frama_C_show_each_1: {0}, [1..10], {0}
-[eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [1..10], [-9..0]
-[eva] modulo.i:41: Frama_C_show_each_1: [1..10], [-10..-1], [0..9]
-[eva] modulo.i:41: Frama_C_show_each_1: {0}, [-10..-1], {0}
 [eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [-10..-1], [-9..0]
+[eva] modulo.i:41: Frama_C_show_each_1: {0}, [-10..-1], {0}
+[eva] modulo.i:41: Frama_C_show_each_1: [1..10], [-10..-1], [0..9]
+[eva] modulo.i:41: Frama_C_show_each_1: [-10..-1], [1..10], [-9..0]
+[eva] modulo.i:41: Frama_C_show_each_1: {0}, [1..10], {0}
+[eva] modulo.i:41: Frama_C_show_each_1: [1..10], [1..10], [0..9]
 [eva] Recording results for pgcd1
 [eva] Done for function pgcd1
 [eva] computing for function pgcd2 <- main.
@@ -44,8 +44,8 @@
 [eva:alarm] modulo.i:211: Warning: 
   function pgcd2: precondition got status unknown.
 [eva] modulo.i:50: loop invariant got status valid.
-[eva] modulo.i:53: Frama_C_show_each_2: [-10..10], [1..10], [-9..9]
 [eva] modulo.i:53: Frama_C_show_each_2: [-10..10], [-10..-1], [-9..9]
+[eva] modulo.i:53: Frama_C_show_each_2: [-10..10], [1..10], [-9..9]
 [eva] Recording results for pgcd2
 [eva] Done for function pgcd2
 [eva] computing for function pgcd3 <- main.

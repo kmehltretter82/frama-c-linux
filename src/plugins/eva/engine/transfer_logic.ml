@@ -402,7 +402,7 @@ module Make (Domain: LogicDomain) = struct
           else
             current_state :: acc
       in
-      try fold_on_disjunction treat_subpred pred []
+      try List.rev (fold_on_disjunction treat_subpred pred [])
       with Does_not_improve -> [state]
 
   let eval_split_and_reduce ~reduce pred build_env state =
