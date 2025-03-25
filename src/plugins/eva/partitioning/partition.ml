@@ -221,12 +221,12 @@ struct
         let (<?>) c (cmp,x,y) =
           if c = 0 then cmp x y else c
         in
-        Stdlib.Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
-        <?> (LoopList.compare, k1.loops, k2.loops)
+        LoopList.compare k1.loops k2.loops
         <?> (Splits.compare, k1.splits, k2.splits)
         (* Ignore monitors in comparison *)
         <?> (SplitMap.compare (fun _ _ -> 0), k1.dynamic_splits, k2.dynamic_splits)
         <?> (BranchList.compare, k1.branches, k2.branches)
+        <?> (Stdlib.Option.compare IntPair.compare, k1.ration_stamp, k2.ration_stamp)
 
       let equal = Datatype.from_compare
 

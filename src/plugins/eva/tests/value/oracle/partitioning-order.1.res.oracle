@@ -7,28 +7,28 @@
   g ∈ {0}
 [eva] computing for function check_split_order <- main.
   Called from partitioning-order.i:57.
-[eva] partitioning-order.i:27: Frama_C_show_each_split: {2}
-[eva] partitioning-order.i:27: Frama_C_show_each_split: {1}
 [eva] partitioning-order.i:27: Frama_C_show_each_split: {0}
-[eva] partitioning-order.i:28: Frama_C_show_each_split: {2}
-[eva] partitioning-order.i:28: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:27: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:27: Frama_C_show_each_split: {2}
 [eva] partitioning-order.i:28: Frama_C_show_each_split: {0}
-[eva] partitioning-order.i:30: Frama_C_show_each_split: {2}
-[eva] partitioning-order.i:30: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:28: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:28: Frama_C_show_each_split: {2}
 [eva] partitioning-order.i:30: Frama_C_show_each_split: {0}
+[eva] partitioning-order.i:30: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:30: Frama_C_show_each_split: {2}
 [eva] computing for function incr_g <- check_split_order <- main.
   Called from partitioning-order.i:31.
 [eva] Recording results for incr_g
 [eva] Done for function incr_g
 [eva] partitioning-order.i:31: Reusing old results for call to incr_g
 [eva] partitioning-order.i:31: Reusing old results for call to incr_g
-[eva] partitioning-order.i:32: Frama_C_show_each_split: {2}
-[eva] partitioning-order.i:32: Frama_C_show_each_split: {1}
 [eva] partitioning-order.i:32: Frama_C_show_each_split: {0}
+[eva] partitioning-order.i:32: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:32: Frama_C_show_each_split: {2}
 [eva] partitioning-order.i:33: check got status valid.
-[eva] partitioning-order.i:34: Frama_C_show_each_split: {2}
-[eva] partitioning-order.i:34: Frama_C_show_each_split: {1}
 [eva] partitioning-order.i:34: Frama_C_show_each_split: {0}
+[eva] partitioning-order.i:34: Frama_C_show_each_split: {1}
+[eva] partitioning-order.i:34: Frama_C_show_each_split: {2}
 [eva:partition] partitioning-order.i:35: starting to merge loop iterations
 [eva] partitioning-order.i:36: Frama_C_show_each_split: {0}
 [eva] partitioning-order.i:36: Frama_C_show_each_split: {1}
