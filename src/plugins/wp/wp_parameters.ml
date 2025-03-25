@@ -1101,12 +1101,20 @@ module OutputDir =
     let arg_name = "dir"
     let file_kind = "directory"
     let help = "Set working directory for generated files.\n\
-                Defaults to system temporary directory."
+                Defaults to system temporary directory.\n\
+                Can be also set with FRAMAC_WP_OUT."
   end)
 
 let dkey = register_category "output"
 
-let has_out () = not @@ Fclib.Filepath.is_empty (OutputDir.get ())
+let get_outputdir () =
+  let out = OutputDir.get () in
+  if not @@ Fclib.Filepath.is_empty out then out else
+    match Sys.getenv_opt "FRAMAC_WP_OUT" with
+    | Some dir -> Fclib.Filepath.of_string dir
+    | None -> out
+
+let has_out () = not @@ Fclib.Filepath.is_empty @@ get_outputdir ()
 
 let make_output_dir dir =
   try
@@ -1148,7 +1156,7 @@ let base_output () =
   match !base_output with
   | None ->
     let output =
-      let dir = OutputDir.get () in
+      let dir = get_outputdir () in
       if Fclib.Filepath.is_empty dir then
         if is_interactive ()
         then make_gui_dir ()
