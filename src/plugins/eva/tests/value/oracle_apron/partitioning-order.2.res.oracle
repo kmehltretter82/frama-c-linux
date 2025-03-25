@@ -1,0 +1,12 @@
+26,27c26,33
+< [eva] partitioning-order.i:70: Reusing old results for call to incr_g
+< [eva] partitioning-order.i:70: Reusing old results for call to incr_g
+---
+> [eva] computing for function incr_g <- check_slevel_order <- check_slevel.
+>   Called from partitioning-order.i:70.
+> [eva] Recording results for incr_g
+> [eva] Done for function incr_g
+> [eva] computing for function incr_g <- check_slevel_order <- check_slevel.
+>   Called from partitioning-order.i:70.
+> [eva] Recording results for incr_g
+> [eva] Done for function incr_g
