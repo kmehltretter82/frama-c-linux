@@ -10,9 +10,9 @@
   g ∈ {0}
 [eva] computing for function check_slevel_order <- check_slevel.
   Called from partitioning-order.i:79.
-[eva] partitioning-order.i:66: Frama_C_show_each_slevel: {0}
-[eva] partitioning-order.i:66: Frama_C_show_each_slevel: {1}
 [eva] partitioning-order.i:66: Frama_C_show_each_slevel: {2}
+[eva] partitioning-order.i:66: Frama_C_show_each_slevel: {1}
+[eva] partitioning-order.i:66: Frama_C_show_each_slevel: {0}
 [eva] partitioning-order.i:67: Frama_C_show_each_slevel: {2}
 [eva] partitioning-order.i:67: Frama_C_show_each_slevel: {1}
 [eva] partitioning-order.i:67: Frama_C_show_each_slevel: {0}
@@ -29,14 +29,14 @@
 [eva] partitioning-order.i:71: Frama_C_show_each_slevel: {1}
 [eva] partitioning-order.i:71: Frama_C_show_each_slevel: {0}
 [eva] partitioning-order.i:72: check got status valid.
-[eva] partitioning-order.i:73: Frama_C_show_each_slevel: {0}
-[eva] partitioning-order.i:73: Frama_C_show_each_slevel: {1}
 [eva] partitioning-order.i:73: Frama_C_show_each_slevel: {2}
+[eva] partitioning-order.i:73: Frama_C_show_each_slevel: {1}
+[eva] partitioning-order.i:73: Frama_C_show_each_slevel: {0}
 [eva] Recording results for check_slevel_order
 [eva] Done for function check_slevel_order
-[eva] partitioning-order.i:80: Frama_C_show_each: {2}
-[eva] partitioning-order.i:80: Frama_C_show_each: {1}
 [eva] partitioning-order.i:80: Frama_C_show_each: {0}
+[eva] partitioning-order.i:80: Frama_C_show_each: {1}
+[eva] partitioning-order.i:80: Frama_C_show_each: {2}
 [eva] Recording results for check_slevel
 [eva] Done for function check_slevel
 [eva] ====== VALUES COMPUTED ======

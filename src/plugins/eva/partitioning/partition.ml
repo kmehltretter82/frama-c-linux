@@ -308,7 +308,7 @@ let filter = KMap.filter
 let merge = KMap.merge
 
 let to_list (p : 'a partition) : (key * 'a) list =
-  KMap.fold (fun k x l -> (k, x) :: l) p []
+  KMap.bindings p
 
 
 (* --- Partitioning actions --- *)
@@ -338,6 +338,9 @@ struct
   type state = Abstract.Dom.t
   type t =  (key * state) list
 
+  (* This module tries to keep lists of pairs (key, state) sorted in increasing
+     order according to Key.compare. *)
+
   let empty = []
 
   let initial (p : 'a list) : t =
@@ -347,7 +350,7 @@ struct
     List.map snd f
 
   let of_partition (p : state partition) : t =
-    KMap.fold (fun k x l -> (k,x) :: l) p []
+    KMap.bindings p
 
   let to_partition (p : t) : state partition =
     let add p (k,x) =
