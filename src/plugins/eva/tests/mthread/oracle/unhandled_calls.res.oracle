@@ -11,11 +11,11 @@
    generating default assigns. See -generated-spec-* options for more info
 [mt] unhandled_calls.c:18: New thread: th2, fun t, parent <main>, args {0}
 [mt] unhandled_calls.c:18: Start thread th2
+[mt] Warning: Queue q might be already initialized
 [mt] unhandled_calls.c:23: New thread: th1, fun t, parent <main>, args {0}
 [mt] unhandled_calls.c:23: Start thread th1
 [mt] unhandled_calls.c:23: Thread th1, fun t, parent <main>, args {0}
 [mt] unhandled_calls.c:23: New context for th1, fun t, parent <main>, args {0}
-[mt] Warning: Queue q might be already initialized
 [mt] *** First value analysis for main thread done.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved

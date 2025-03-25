@@ -1,4 +1,4 @@
-70c70,73
+66c66,69
 < [eva] invalid_loc_return.i:17: Reusing old results for call to foo
 ---
 > [eva] computing for function foo <- main <- main2.

@@ -1,4 +1,4 @@
-65a66,72
+62a63,69
 > [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
 > [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
 > [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
@@ -6,13 +6,14 @@
 > [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
 > [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
 > [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
-71,72c78
+71,72c78,80
 < [eva:alarm] builtins_split.c:112: Warning: 
 <   out of bounds read. assert \valid_read(&(ps->p)->p);
 ---
 > [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
-75a82,89
 > [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+75a84,90
 > [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
 > [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
 > [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all

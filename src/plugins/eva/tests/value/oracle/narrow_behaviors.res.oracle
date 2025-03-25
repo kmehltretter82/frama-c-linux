@@ -11,17 +11,17 @@
 [eva] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ {0}
-  p{.x; .y} ∈ {1}
+  nondet ∈ [--..--]
+  p.x ∈ {2}
+   .y ∈ {1; 2}
   q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] narrow_behaviors.i:56: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ [--..--]
-  p.x ∈ {2}
-   .y ∈ {1; 2}
+  nondet ∈ {0}
+  p{.x; .y} ∈ {1}
   q ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
@@ -39,30 +39,30 @@
 [eva] narrow_behaviors.i:57: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ {0}
-  p{.x; .y} ∈ {1}
-  q.x ∈ {1; 2}
-   .y ∈ {1}
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
-  Frama_C_dump_each:
-  # cvalue:
-  nondet ∈ {0}
-  p.x ∈ {2}
-   .y ∈ {1; 2}
-  q.x ∈ {1; 2}
-   .y ∈ {1}
-  __retres ∈ UNINITIALIZED
-  ==END OF DUMP==
-[eva] narrow_behaviors.i:57: 
-  Frama_C_dump_each:
-  # cvalue:
   nondet ∈ [--..--]
   p.x ∈ {2}
    .y ∈ {1; 2}
   q.x ∈ {2}
    .y ∈ {1; 2}
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] narrow_behaviors.i:57: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ {0}
+  p.x ∈ {2}
+   .y ∈ {1; 2}
+  q.x ∈ {1; 2}
+   .y ∈ {1}
+  __retres ∈ UNINITIALIZED
+  ==END OF DUMP==
+[eva] narrow_behaviors.i:57: 
+  Frama_C_dump_each:
+  # cvalue:
+  nondet ∈ {0}
+  p{.x; .y} ∈ {1}
+  q.x ∈ {1; 2}
+   .y ∈ {1}
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] narrow_behaviors.i:61: assertion got status valid.
@@ -84,16 +84,16 @@
 [eva] narrow_behaviors.i:62: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ {0}
-  r{.x; .y} ∈ {1}
+  nondet ∈ {1}
+  r{.x; .y} ∈ {2}
   s ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
 [eva] narrow_behaviors.i:62: 
   Frama_C_dump_each:
   # cvalue:
-  nondet ∈ {1}
-  r{.x; .y} ∈ {2}
+  nondet ∈ {0}
+  r{.x; .y} ∈ {1}
   s ∈ UNINITIALIZED
   __retres ∈ UNINITIALIZED
   ==END OF DUMP==
