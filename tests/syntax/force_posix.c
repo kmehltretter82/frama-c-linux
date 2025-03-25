@@ -6,7 +6,7 @@
   OPT: -cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE=-2" -print
 EXIT:1
 FILTER: sed -e "s|$TMPDIR/[^ ]*|/tmp/TEMPNAME|g" -e "s|$(realpath $(pwd)/../../../..)|FC_HOME|g" -e "/^cc1/d"
-ENABLED_IF: %{bin-available:gcc}
+ENABLED_IF: %{read:../../../gcc-is-genuine}
   CMD: LC_ALL=C @frama-c-exe@
   OPT: -cpp-command="gcc -C -E -I." -cpp-frama-c-compliant -no-autoload-plugins -cpp-extra-args="-D__FC_FORCE_POSIX_C_SOURCE="
 */

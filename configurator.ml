@@ -271,6 +271,17 @@ let python_available configurator =
       true
     with Not_found | Failure _ -> false
 
+(* macOS finds it clever pretending that gcc is clang. Check that
+   gcc --version actually contains the 'gcc' string.
+*)
+let gcc_is_genuine configurator =
+  let result = C.Process.run configurator "gcc" ["--version"] in
+  if result.exit_code <> 0 then false
+  else
+    let out = result.stdout in
+    let re_name = Str.regexp {|.*gcc|} in
+    Str.string_match re_name out 0
+
 let re_macro = Str.regexp "@[A-Za-z0-9_]+@"
 let expand macros line =
   let line = ref line in
@@ -307,8 +318,11 @@ let configure configurator =
     close_in ic;
     close_out oc;
     let python = open_out "python-3.7-available" in
-    Printf.fprintf python "%b" (python_available configurator);
-    close_out python
+    Printf.fprintf python "%B" (python_available configurator);
+    close_out python;
+    let gcc = open_out "gcc-is-genuine" in
+    Printf.fprintf gcc "%B" (gcc_is_genuine configurator);
+    close_out gcc
 
 let () =
   C.main ~name:"frama_c_config" configure

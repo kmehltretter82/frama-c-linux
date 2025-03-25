@@ -31,5 +31,5 @@
 
 (rule
  (deps VERSION VERSION_CODENAME src/kernel_internals/runtime/system_config.ml.in)
- (targets python-3.7-available system_config.ml)
+ (targets python-3.7-available gcc-is-genuine system_config.ml)
  (action (run ./configurator.exe)))
