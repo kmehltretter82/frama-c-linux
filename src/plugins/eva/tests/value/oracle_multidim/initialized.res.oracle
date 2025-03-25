@@ -1,0 +1,3 @@
+164a165,166
+> [eva:alarm] initialized.c:8: Warning: 
+>   function f: postcondition got status invalid.
