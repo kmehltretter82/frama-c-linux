@@ -41,8 +41,10 @@ val array : 'a t -> 'a t
 val field : fieldinfo -> 'a t -> 'a t
 val logic : logic_type_info -> 'a t list -> 'a t
 
-val iter : ('a -> unit) -> 'a t -> unit
 val merge : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
+
+(** Flattens and merge all pointed regions in the domain *)
+val pointed : ('a -> 'a -> 'a) -> 'a t -> 'a option
 
 val get_field : ('a -> 'a -> 'a) -> 'a t -> fieldinfo -> 'a t
 val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t

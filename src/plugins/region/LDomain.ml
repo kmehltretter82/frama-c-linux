@@ -56,53 +56,53 @@ let rec pretty pp fmt = function
 (* ---  Smart constructors                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
-let is_pure = function Pure -> true | _ -> false
+let is_pure d = (d == Pure)
 let pure = Pure
 let ptr r = Ptr r
 let scalar = function None -> Pure | Some r -> Ptr r
-let array = function Pure -> Pure | d -> Array d
-let field fd = function Pure -> Pure | d -> Record (Fmap.singleton fd d)
+let array d = if d == Pure then Pure else Array d
+let field fd d = if d == Pure then Pure else Record (Fmap.singleton fd d)
 
 let logic s l =
   if Logic_const.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
   else if List.for_all is_pure l then Pure
   else Logic (s,l)
 
-let rec iter f = function
-  | Pure -> ()
-  | Ptr r -> f r
-  | Record mf -> Fmap.iter (fun _ -> iter f) mf
-  | Array d -> iter f d
-  | Logic (_, ds) -> List.iter (iter f) ds
-
 (* -------------------------------------------------------------------------- *)
 (* ---  Merge                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let collect f w d =
-  iter (fun r -> w := Some (match !w with None -> r | Some r0 -> f r0 r)) d
+let rec collect f w = function
+  | Pure -> w
+  | Ptr r -> Some (match w with None -> r | Some r0 -> f r0 r)
+  | Array d -> collect f w d
+  | Record m -> Fmap.fold (fun _ d w -> collect f w d) m w
+  | Logic(_,ds) -> List.fold_left (collect f) w ds
+
+let pointed f d = collect f None d
 
 let rec merge f d1 d2 =
   match d1, d2 with
   | Pure, d | d, Pure -> d
   | Ptr r1, Ptr r2 -> Ptr (f r1 r2)
-  | Record mf1, Record mf2 ->
-    Record (Fmap.union (fun _ d1 d2 -> Some (merge f d1 d2)) mf1 mf2)
+  | Record m1, Record m2 ->
+    Record (Fmap.union (fun _ d1 d2 -> Some (merge f d1 d2)) m1 m2)
   | Array d1, Array d2 -> Array (merge f d1 d2)
-  | Logic (s1, args1), Logic (s2, args2) when Logic_type_info.equal s1 s2 ->
-    Logic (s1, List.map2 (merge f) args1 args2)
-  | _ -> let r = ref None in collect f r d1 ; collect f r d2 ; scalar !r
+  | Logic (a1, ds1), Logic (a2, ds2) when Logic_type_info.equal a1 a2 ->
+    Logic (a1, List.map2 (merge f) ds1 ds2)
+  | _ -> scalar @@ collect f (collect f None d1) d2
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Getters                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
-let get_field f d fd = match d with
-  | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
-  | d -> let r = ref None in collect f r d ; scalar !r
+let get f = function Pure | Ptr _ as d -> d | d -> scalar @@ pointed f d
 
-let get_index f = function
-  | Array d -> d
-  | d ->  let r = ref None in collect f r d ; scalar !r
+let get_index f = function Array d -> d | d -> get f d
+
+let get_field f d fd =
+  match d with
+  | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
+  | _ -> get f d
 
 (* -------------------------------------------------------------------------- *)
