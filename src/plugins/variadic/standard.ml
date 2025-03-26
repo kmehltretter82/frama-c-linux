@@ -216,14 +216,26 @@ let fallback_fun_call ~builder ~callee env vf args =
 
   (* Add parameters *)
   let fixed_params_count = Typ.params_count vf.vf_original_type in
+  let gen_param_name =
+    let i = ref (-1) in
+    fun () ->
+      incr i;
+      "param" ^ string_of_int !i
+  in
   let add_static_param (name,typ,attributes) =
+    let name =
+      if String.equal name ""
+      then gen_param_name ()
+      else name
+    in
     ignore (Build.parameter ~attributes typ name)
-  and add_variadic_param i e =
+  and add_variadic_param e =
     let typ = Cil.typeOf e in
-    ignore (Build.parameter typ ("param" ^ string_of_int i))
+    let name = gen_param_name () in
+    ignore (Build.parameter typ name)
   in
   List.iter add_static_param (Option.get params);
-  List.iteri add_variadic_param (List.drop fixed_params_count args);
+  List.iter add_variadic_param (List.drop fixed_params_count args);
 
   (* Build the default behaviour *)
   Build.finish_declaration ();
