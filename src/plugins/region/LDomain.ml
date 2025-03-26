@@ -22,39 +22,56 @@
 
 open Cil_types
 open Cil_datatype
-
+module Fmap = Fieldinfo.Map
 
 type 'a t =
   | Pure
   | Ptr    of 'a
-  | Record of 'a t Fieldinfo.Map.t
-  | Array  of 'a t
-  | Logic  of logic_type_info (* uniquement abstrait *) * 'a t list
+  | Array  of 'a t (* no pure *)
+  | Record of 'a t Fmap.t (* no pure *)
+  | Logic  of logic_type_info * 'a t list (* no pure *)
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Printer                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec pretty pp fmt = function
+  | Pure -> Format.pp_print_string fmt "_"
+  | Ptr r -> pp fmt r
+  | Array d -> pretty pp fmt d ; Format.pp_print_string fmt "[]"
+  | Record m ->
+    Format.fprintf fmt "@[<hov 0>@[<hov 2>{" ;
+    Fmap.iter
+      (fun fd d ->
+         Format.fprintf fmt "@ %a: %a;" Fieldinfo.pretty fd (pretty pp) d
+      ) m ;
+    Format.fprintf fmt "@]@ }@]"
+  | Logic(a,[]) -> Logic_type_info.pretty fmt a
+  | Logic(a,d::ds) ->
+    Format.fprintf fmt "@[<hov 2>%a<%a" Logic_type_info.pretty a (pretty pp) d ;
+    List.iter (Format.fprintf fmt ",@,%a" (pretty pp)) ds ;
+    Format.fprintf fmt ">@]"
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Smart constructors                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
+let is_pure = function Pure -> true | _ -> false
 let pure = Pure
-
-let field fd = function
-  | Pure -> Pure
-  | d -> Record (Fieldinfo.Map.singleton fd d)
-
-let array = function
-  | Pure -> Pure
-  | d -> Array d
 let ptr r = Ptr r
+let scalar = function None -> Pure | Some r -> Ptr r
+let array = function Pure -> Pure | d -> Array d
+let field fd = function Pure -> Pure | d -> Record (Fmap.singleton fd d)
 
 let logic s l =
   if Logic_const.is_unrollable_ltdef s then invalid_arg "Region.LDomain.logic"
-  else if List.for_all (fun d -> d = Pure) l then Pure
+  else if List.for_all is_pure l then Pure
   else Logic (s,l)
 
 let rec iter f = function
   | Pure -> ()
   | Ptr r -> f r
-  | Record mf -> Fieldinfo.Map.iter (fun _ -> iter f) mf
+  | Record mf -> Fmap.iter (fun _ -> iter f) mf
   | Array d -> iter f d
   | Logic (_, ds) -> List.iter (iter f) ds
 
@@ -62,39 +79,30 @@ let rec iter f = function
 (* ---  Merge                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
+let collect f w d =
+  iter (fun r -> w := Some (match !w with None -> r | Some r0 -> f r0 r)) d
+
 let rec merge f d1 d2 =
   match d1, d2 with
   | Pure, d | d, Pure -> d
   | Ptr r1, Ptr r2 -> Ptr (f r1 r2)
   | Record mf1, Record mf2 ->
-    let merge_field_maps _ dom1 dom2 = Some (merge f dom1 dom2)
-    in Record (Fieldinfo.Map.union merge_field_maps mf1 mf2)
+    Record (Fmap.union (fun _ d1 d2 -> Some (merge f d1 d2)) mf1 mf2)
   | Array d1, Array d2 -> Array (merge f d1 d2)
-  | Logic (s1, args1), Logic (s2, args2)
-    when Logic_type_info.equal s1 s2 ->
+  | Logic (s1, args1), Logic (s2, args2) when Logic_type_info.equal s1 s2 ->
     Logic (s1, List.map2 (merge f) args1 args2)
-  (* default case: incompatible domains raise an exception *)
-  | Ptr _, (Record _| Array _ | Logic _) | (Record _| Array _ | Logic _), Ptr _
-  | Record _, (Array _| Logic _) | (Array _| Logic _), Record _
-  | Array _, Logic _ | Logic _, Array _
-  | Logic _, Logic _ ->
-    let ret = ref Pure in
-    let add = iter (fun r -> ret := merge f (Ptr r) (!ret)) in
-    add d1 ; add d2 ; !ret
-
-let scratch f d =
-  let ret = ref Pure in
-  let add = iter (fun r -> ret := merge f (Ptr r) (! ret)) in
-  add d ; ! ret
+  | _ -> let r = ref None in collect f r d1 ; collect f r d2 ; scalar !r
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Getters                                                           --- *)
 (* -------------------------------------------------------------------------- *)
 
 let get_field f d fd = match d with
-  | Record mf when Fieldinfo.Map.mem fd mf -> Fieldinfo.Map.find fd mf
-  | d -> scratch f d
+  | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
+  | d -> let r = ref None in collect f r d ; scalar !r
 
 let get_index f = function
   | Array d -> d
-  | d -> scratch f d
+  | d ->  let r = ref None in collect f r d ; scalar !r
+
+(* -------------------------------------------------------------------------- *)

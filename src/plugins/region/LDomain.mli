@@ -20,26 +20,29 @@
 (*                                                                        *)
 (**************************************************************************)
 
-
+open Format
 open Cil_types
 open Cil_datatype
 
 type 'a t = private
   | Pure
   | Ptr    of 'a
-  | Record of 'a t Fieldinfo.Map.t
   | Array  of 'a t
+  | Record of 'a t Fieldinfo.Map.t
   | Logic  of logic_type_info * 'a t list
 
+val is_pure : 'a t -> bool
+val pretty : (formatter -> 'a -> unit) -> formatter -> 'a t -> unit
+
 val pure : 'a t
-val field : fieldinfo -> 'a t -> 'a t
-val array : 'a t -> 'a t
 val ptr : 'a -> 'a t
+val scalar : 'a option -> 'a t
+val array : 'a t -> 'a t
+val field : fieldinfo -> 'a t -> 'a t
 val logic : logic_type_info -> 'a t list -> 'a t
+
+val iter : ('a -> unit) -> 'a t -> unit
+val merge : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
 
 val get_field : ('a -> 'a -> 'a) -> 'a t -> fieldinfo -> 'a t
 val get_index : ('a -> 'a -> 'a) -> 'a t -> 'a t
-
-val iter : ('a -> unit) -> 'a t -> unit
-
-val merge : ('a -> 'a -> 'a) -> 'a t -> 'a t -> 'a t
