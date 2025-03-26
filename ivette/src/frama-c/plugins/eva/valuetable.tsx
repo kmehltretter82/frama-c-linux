@@ -39,7 +39,7 @@ import { Icon } from 'dome/controls/icons';
 import { Inset } from 'dome/frame/toolbars';
 import { Cell, Code } from 'dome/controls/labels';
 import { IconButton } from 'dome/controls/buttons';
-import { Text, Modifier } from 'frama-c/richtext';
+import { MarkerText, Modifier, selectMarker } from 'frama-c/richtext';
 import { Filler, Hpack, Hfill, Vpack, Vfill } from 'dome/layout/boxes';
 
 /* -------------------------------------------------------------------------- */
@@ -439,22 +439,11 @@ interface ProbeValuesProps {
 function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
   const { probe, pinProbe, isSelectedCallstack } = props;
 
-  /* Should probably be shared with ASTinfo.onChildSelected. */
-  const selectMarker = (marker: Ast.marker, modifier: Modifier): void => {
+  const onSelected = (marker: Ast.marker, modifier: Modifier): void => {
     /* Pin the current probe so that its column is not removed
        when the selected marker changes. */
     pinProbe(probe.marker, true);
-    switch (modifier) {
-      case 'NORMAL':
-        States.setMarked(marker);
-        break;
-      case 'META':
-        States.setMarked(marker, true);
-        break;
-      case 'DOUBLE':
-        States.setSelected(marker);
-        break;
-    }
+    selectMarker(marker, modifier);
   };
 
   // Building common parts
@@ -469,18 +458,10 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
     pointedVars.forEach((lval) => {
       const [text, lvalMarker] = lval;
       const label = `Display values for ${text}`;
-      const onItemClick = (): void => selectMarker(lvalMarker, 'NORMAL');
+      const onItemClick = (): void => onSelected(lvalMarker, 'NORMAL');
       items.push({ label, onClick: onItemClick });
     });
     if (items.length > 0) Dome.popupMenu(items);
-  };
-
-  const onSelected = (m: string, modifier: Modifier): void => {
-    selectMarker(Ast.jMarker(m), modifier);
-  };
-
-  const onHovered = (m: string | undefined): void => {
-    States.setHovered(m === undefined ? m : Ast.jMarker(m));
   };
 
   return async (callstack: callstack): Promise<JSX.Element> => {
@@ -502,7 +483,7 @@ function ProbeValues(props: ProbeValuesProps): Request<callstack, JSX.Element> {
       return (
         <td className={c} colSpan={colSpan} onContextMenu={onContextMenu(e)}>
           <TableCell right={warning} align={align}>
-            <Text onSelected={onSelected} onHovered={onHovered} text={value} />
+            <MarkerText onSelected={onSelected} text={value} />
           </TableCell>
         </td>
       );
