@@ -55,7 +55,7 @@ type truth = Abstract_interp.truth
    - the alarms emitted for the evaluation;
    - the variables pointed by the resulting value, if any. *)
 type evaluation = {
-  value: string;
+  value: Jtext.t;
   alarms: ( truth * string ) list ;
   pointed_vars: (string * Printer_tag.localizable) list;
 }
@@ -443,7 +443,10 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
     let f alarm status acc = (status, descr alarm) :: acc in
     let alarms = Alarmset.fold f [] alarms |> List.rev in
     let pretty_eval = Bottom.pretty (pp_result typ) in
-    let value = Pretty_utils.to_string pretty_eval result in
+    let result_to_json () = Data.jpretty pretty_eval result in
+    let value =
+      General_requests.with_updated_varinfo_printer eval_point result_to_json
+    in
     let pointed_markers = get_pointed_markers eval_point in
     let pointed_vars = Bottom.(map pointed_markers result |> value ~bottom:[]) in
     { value; alarms; pointed_vars }
@@ -499,7 +502,10 @@ module Proxy(A : Analysis.Engine) : EvaProxy = struct
     | `None -> Nothing
 
   let eval_steps typ eval eval_point callstack =
-    let default value = { value; alarms = []; pointed_vars = []; } in
+    let default str =
+      let value = Data.jtext str in
+      { value; alarms = []; pointed_vars = []; }
+    in
     let eval = function
       | `Bottom -> default "Unreachable"
       | `Top -> default "No information"
@@ -658,7 +664,7 @@ module JEvaluation = struct
 
   let value = Record.field record ~name:"value"
       ~descr:(Markdown.plain "Textual representation of the value")
-      (module Data.Jstring)
+      (module Data.Jtext)
   let alarms = Record.field record ~name:"alarms"
       ~descr:(Markdown.plain "Alarms raised by the evaluation")
       (module Jlist (Jpair (Jtruth) (Jstring)))

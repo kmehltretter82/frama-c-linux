@@ -25,7 +25,12 @@
     white-space: pre;
 }
 
+.kernel-text-marker {
+   color: var(--text-highlighted);
+}
+
 .kernel-text-marker:hover {
+    cursor: pointer;
     background: var(--code-hover);
 }
 

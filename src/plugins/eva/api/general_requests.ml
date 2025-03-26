@@ -295,6 +295,36 @@ let term_lval_to_lval kf tlval =
     Logic_to_c.term_lval_to_lval ?result tlval
   with Logic_to_c.No_conversion -> raise Not_found
 
+(* Returns the server identifier of marker corresponding to varinfo [vi]
+   at [eval_point]. *)
+let tag_varinfo_as_lval_at eval_point =
+  let kf, kinstr =
+    match eval_point with
+    | Initial -> None, Kglobal
+    | Pre kf -> Some kf, Kglobal
+    | Stmt (kf, stmt) -> Some kf, Kstmt stmt
+  in
+  fun vi ->
+    let marker = Printer_tag.PLval (kf, kinstr, Cil.var vi) in
+    Server.Kernel_ast.Marker.index marker
+
+(* Executes function [f] with an updated global printer which prints
+   any varinfo as a lvalue marker at the given evaluation point. *)
+let with_updated_varinfo_printer eval_point f =
+  let tag_vi = tag_varinfo_as_lval_at eval_point in
+  let module Printer_class(X: Printer.PrinterClass) = struct
+    class printer = object
+      inherit X.printer as super
+
+      method! varinfo fmt vi =
+        Format.fprintf fmt "@{<%s>%a@}" (tag_vi vi) super#varinfo vi;
+    end
+  end in
+  let printer = Printer.current_printer () in
+  let finally () = Printer.set_printer printer in
+  Printer.update_printer (module Printer_class: Printer.PrinterExtension);
+  Fun.protect ~finally f
+
 let print_value fmt loc =
   let is_scalar = Ast_types.is_scalar in
   let evaluation_point = marker_evaluation_point loc in
@@ -317,13 +347,17 @@ let print_value fmt loc =
   let pretty = Cvalue.V_Or_Uninitialized.pretty in
   let eval_cvalue at = Results.(eval at |> as_cvalue_or_uninitialized) in
   let before = eval_cvalue request in
-  match evaluation_point with
-  | Initial | Pre _ -> pretty fmt before
-  | Stmt (_, stmt) ->
-    let after = eval_cvalue (Results.after stmt) in
-    if Cvalue.V_Or_Uninitialized.equal before after
-    then pretty fmt before
-    else Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+  let print =
+    match evaluation_point with
+    | Initial | Pre _ -> fun () -> pretty fmt before
+    | Stmt (_, stmt) ->
+      let after = eval_cvalue (Results.after stmt) in
+      if Cvalue.V_Or_Uninitialized.equal before after
+      then fun () -> pretty fmt before
+      else fun () ->
+        Format.fprintf fmt "Before: %a@\nAfter:  %a" pretty before pretty after
+  in
+  with_updated_varinfo_printer evaluation_point print
 
 let () =
   Server.Kernel_ast.Information.register
