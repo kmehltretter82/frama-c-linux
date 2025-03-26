@@ -1,0 +1,9 @@
+[kernel] Parsing syntax-error.i (no preprocessing)
+[kernel] syntax-error.i:5: 
+  syntax error:
+  Location: line 5, column 1, before or at token: {
+  3        STDOPT:
+  4     */
+  5     {
+        ^
+[kernel] Frama-C aborted: invalid user input.

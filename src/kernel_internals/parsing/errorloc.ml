@@ -154,9 +154,27 @@ let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
     let$ in_ch = with_open_in_exn pos.pos_path in
     let first_error_line, start_char, last_error_line =
       min start_pos.pos_lnum pos.pos_lnum,
-      (start_pos.pos_cnum - start_pos.pos_bol + 1),
+      (start_pos.pos_cnum - start_pos.pos_bol),
       max start_pos.pos_lnum pos.pos_lnum
     in
+
+    (** Add an offset to the starting position if we're not on the first column.
+        This is used to underline only the problem and not its preceding
+        character, for example :
+        [
+          Cannot resolve variable y
+            int x = t[y];
+                     ^^
+          (* becomes *)
+          Cannot resolve variable y
+            int x = t[y];
+                      ^
+        ]
+        Since there are no preceding character when the error starts on the
+        first column, we do not need an offset.
+    *)
+    let start_char = if start_char = 1 then start_char else start_char + 1 in
+
     (* The difference between the first and last error lines can be very
         large; in this case, we print only the first and last [error_ctx]
         lines, with "..." between them. *)
@@ -202,7 +220,7 @@ let pp_context_from_file ?(ctx=2) fmt (start_pos, pos) =
       else begin
         let len = pos.pos_cnum - pos.pos_bol - start_char + 1 in
         (* output at least one '^' *)
-        let len = if len = 0 then 1 else len in
+        let len = if len <= 0 then 1 else len in
         let cursor =
           String.make 6 ' ' ^
           String.make (start_char - 1) ' ' ^
@@ -275,7 +293,7 @@ let parse_error ?loc msg =
         let _,start_pos = Stack.pop all_pos in
         let last_pos =
           if Stack.is_empty all_pos then
-            current.lexbuf.Lexing.lex_start_p
+            current.lexbuf.Lexing.lex_curr_p
           else
             fst (Stack.pop all_pos)
         in
