@@ -22,15 +22,12 @@
 
 
 import React from 'react';
-import { registerSandbox, registerDocChapter } from 'ivette';
+import { registerSandbox } from 'ivette';
 import { HelpButton } from 'dome/help';
-import doc from './sandbox.md?raw';
 
 /* -------------------------------------------------------------------------- */
 /* --- Sandbox help                                                       --- */
 /* -------------------------------------------------------------------------- */
-
-registerDocChapter({ id: 'sandbox', content: doc, rank: 1000 });
 
 function SandboxHelp(): JSX.Element {
   const style = {
