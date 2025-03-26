@@ -5,11 +5,18 @@
 
 const path = require('path');
 const fs = require('fs');
+const fsExtra = require("fs-extra");
 
 const loader = process.argv[2];
 const inputFiles = process.argv.slice(3);
 const packages = new Map();
+const pluginsPath = "./src/renderer/public/plugins";
 let buffer = '// Ivette Package Loader (generated)\n';
+
+function error(message) {
+  console.error(message);
+  process.exit(1);
+}
 
 inputFiles.forEach((file) => {
   try {
@@ -17,10 +24,7 @@ inputFiles.forEach((file) => {
     const pkgSrc = fs.readFileSync(file, { encoding: 'UTF-8' });
     const pkgJson = JSON.parse(pkgSrc);
     packages.set(pkgId,pkgJson);
-  } catch(err) {
-    console.error(`[Dome] Error ${file}: ${err}`);
-    process.exit(1);
-  }
+  } catch(err) { error(`[Dome] Error ${file}: ${err}`); }
 });
 
 function depend(id) {
@@ -28,9 +32,46 @@ function depend(id) {
   if (pkg) configure(pkg,id);
 }
 
+// Merge source and target folder
+function mergeDirectories(source, target) {
+  if (!fs.existsSync(source)) error(`Source doesn't exist: ${source}`);
+
+  fs.readdirSync(source).forEach(file => {
+    const sourcePath = path.join(source, file);;
+    const targetPath = path.join(target, file);
+
+    if (fs.lstatSync(sourcePath).isDirectory()) {
+      mergeDirectories(sourcePath, targetPath);
+    } else {
+      if (!fs.existsSync(targetPath)) fsExtra.copySync(sourcePath, targetPath);
+      else error(`File already exist: ${targetPath}`);
+    }
+  });
+}
+
+// delete public folder
+function delPublicFolder() {
+  try { fs.rmSync(pluginsPath, { recursive: true, force: true }); }
+  catch (err) { error(`Error deleting folder: ${err}`); }
+}
+
+function copyExtraRessources(pkg, id) {
+  delPublicFolder();
+  if(!pkg.ressources || !Array.isArray(pkg.ressources)) return;
+  pkg.ressources.forEach((ressource) => {
+    if(ressource.from)
+      mergeDirectories(
+        path.join('./src', id, ressource.from),
+        path.join(pluginsPath, ressource.to)
+      );
+  })
+}
+
 function configure(pkg, id) {
   if (!pkg.done) {
     pkg.done = true;
+    /** add extra ressources in public folder */
+    copyExtraRessources(pkg, id);
     for(let parent = id;;) {
       parent = path.dirname(parent);
       if (!parent || parent === '.') break;

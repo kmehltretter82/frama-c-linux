@@ -98,7 +98,7 @@ interface HelpIconProps {
 ## Markdown {#sandbox-markdown}
 **TODO**
 
-### Pattern
+### Pattern {#sandbox-markdown-pattern}
 You can used patterns to replace parts of the text by JSX Element.
 
 #### Icons
@@ -111,3 +111,37 @@ There is one basic pattern to replace tags by an `Icon`, it name `iconTag`  in m
 * [icon-pin] : `[icon-pin]`
 
 or inline [icon-tunings], [icon-target], [icon-pin]
+
+### Images {#sandbox-markdown-images}
+
+You can add images to the markdown documentation.
+
+Images must be in `ivette/renderer/public/images/`.
+
+We've added `![help image](images/sandbox-help.png)` in the markdown file to add
+the capture of sandbox help component below.
+
+![Frama-C logo](images/sandbox-help.png)
+
+#### plugins
+
+[icon-warning-orange]: __Never manually add files to `ivette/renderer/public/plugins`, this folder is generated automatically.__
+
+Images contained in plugins require an additional step.
+Plugin resources should only be loaded if the plugin is loaded.
+
+Follow these steps:
+
+* Add the images folder to your plugin
+* Complete the `pkg.json` by adding the `resources` field. Example :
+
+``` js
+{
+  "name": "Frama-C/Eva",
+  "ressources": [{
+    "from": "./images/",
+    "to": "./eva/images"
+  }]
+}
+```
+* Add images to `.md` with ` ![alt](plugins/<ressources.to>/<image-name>)`. Using the previous example, add `![alt](plugins/eva/images/<image-name>)`.

@@ -7,6 +7,7 @@
 /* ************************************************************************ */
 
 import React from 'react';
+import path from 'path';
 import ReactMarkdown, { Options } from 'react-markdown';
 import remarkCustomHeaderId from 'remark-custom-header-id';
 
@@ -19,6 +20,7 @@ import {
 import {
   jLEDstatus, LED, LEDstatus as _LEDstatus
 } from 'dome/controls/displays';
+import { DEVEL } from 'dome';
 
 export interface Pattern {
   pattern: RegExp,
@@ -205,6 +207,13 @@ export function Markdown(
       }
       return <a href={href}>{children}</a>;
     },
+    img: ({ src, alt }) => {
+      const prodPath = !DEVEL && __dirname.includes("out/renderer") ?
+        __dirname : process.resourcesPath;
+      const newSrc = DEVEL ? `/${src}` :
+        `file://${path.join(prodPath, src || "")}`;
+      return <img src={newSrc} alt={alt} style={{ maxWidth: '100%' }} />;
+    }
   };
 
   return <ReactMarkdown {...options}>{ children }</ReactMarkdown>;

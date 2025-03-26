@@ -46,6 +46,7 @@
     "d3-graphviz": "^5",
     "d3-selection": "^3",
     "diff": "^5",
+    "fs-extra": "11.3.0",
     "lodash": "^4",
     "react": "^18",
     "react-code-blocks": "0.1.6",
