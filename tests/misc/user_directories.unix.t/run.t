@@ -3,6 +3,10 @@ touch the actual user HOME.
 In addition, make sure that you use dune with option `--cache=disabled`,
 in order not to pollute `home/.cache` in dune >= 3.16
 
+Unset these variables to make sure we use HOME and HOME/.config unless stated
+otherwise
+  $ export XDG_CONFIG_HOME= XDG_STATE_HOME= XDG_CACHE_HOME=
+
   $ dune build --cache=disabled --root . @install
 
 Basic case
