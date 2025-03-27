@@ -58,7 +58,7 @@ sig
   val sizeof : c_object -> term
 
   val last : sigma -> c_object -> loc -> term
-  val frames : c_object -> loc -> chunk -> frame list
+  val frames : length:term -> c_object -> loc -> chunk -> frame list
 
   val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
     length:term -> Chunk.t -> term

@@ -51,8 +51,6 @@ struct
   let cinits m = p_call p_cinits [m]
   let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst"
   let sconst m = p_call p_sconst [m]
-  let p_eqmem = Lang.extern_fp ~library "eqmem"
-  let eqmem m1 m2 a size = p_call p_eqmem [ m1 ; m2 ; a ; size ]
   let p_is_init_range = Lang.extern_fp ~library "is_init_range"
   let is_init_range m a size = p_call p_is_init_range [ m ; a ; size ]
   let f_set_init_range = Lang.extern_fp ~library "set_init_range"
@@ -628,34 +626,27 @@ module Model = struct
   let value_footprint _ _ = Sigma.Domain.singleton m_mem
   let init_footprint _ _ = Sigma.Domain.singleton m_init
 
-  let frames  ~addr:p ~offset:n ?(basename="mem") tau =
-    let t_block = Qed.Logic.Array (Qed.Logic.Int, tau) in
-    let t_mem = Qed.Logic.Array(Qed.Logic.Int, t_block) in
-    let m  = e_var (Lang.freshvar ~basename t_mem) in
-    let m' = e_var (Lang.freshvar ~basename t_mem) in
-    let p' = e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
-    let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-    let mh = WBytes.memcpy m m' p' p' n' in
-    let v' = e_var (Lang.freshvar ~basename:"v" tau) in
-    let meq = WBytes.eqmem m m' p' n' in
-    let diff = p_call MemAddr.p_separated [p;n;p';e_one] in
-    let sep = p_call MemAddr.p_separated [p;n;p';n'] in
-    let inc = p_call MemAddr.p_included [p;n;p';n'] in
-    let teq = Definitions.Trigger.of_pred meq in
-    [
-      "update" , []    , [diff]    , m , WBytes.raw_set m p' v' ;
-      "eqmem"  , [teq] , [inc;meq] , m , m' ;
-      "havoc"  , []    , [sep]     , m , mh ;
-    ]
-
-  let frames obj addr chunk =
+  let frames ~length obj p chunk =
     match Sigma.ckind chunk with
     | State.Mu Alloc -> []
     | State.Mu m ->
-      let offset = sizeof obj in
+      let n = e_mul length @@ sizeof obj in
       let tau = Chunk.val_of_chunk m in
       let basename = Chunk.basename_of_chunk m in
-      frames ~addr ~offset ~basename tau
+      let t_block = Qed.Logic.Array (Qed.Logic.Int, tau) in
+      let t_mem = Qed.Logic.Array(Qed.Logic.Int, t_block) in
+      let m  = e_var (Lang.freshvar ~basename t_mem) in
+      let m' = e_var (Lang.freshvar ~basename t_mem) in
+      let p' = e_var (Lang.freshvar ~basename:"p" MemAddr.t_addr) in
+      let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
+      let q' = e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
+      let v' = e_var (Lang.freshvar ~basename:"v" tau) in
+      let sepv = p_call MemAddr.p_separated [p;n;q';e_one] in
+      let sepn = p_call MemAddr.p_separated [p;n;p';n'] in
+      [
+        "update", [], [sepv], m , WBytes.raw_set m q' v' ;
+        "memcpy", [], [sepn], m , WBytes.memcpy m m' p' q' n' ;
+      ]
     | _ -> []
 
   let last sigma obj l =

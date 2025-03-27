@@ -80,7 +80,7 @@ module type ModelWithLoader = sig
   val sizeof : c_object -> term
 
   val last : sigma -> c_object -> loc -> term
-  val frames : c_object -> loc -> chunk -> frame list
+  val frames : length:term -> c_object -> loc -> chunk -> frame list
 
   val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
     length:term -> Chunk.t -> term
@@ -150,8 +150,7 @@ struct
       | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
       | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
 
-    let prim_tau_of_chunk { data } =
-      match data with
+    let tau_of_data = function
       | Value p | Array p -> tau_of_prim p
       | ValInit | ArrInit -> Qed.Logic.Bool
 
@@ -197,7 +196,6 @@ struct
     let make a = function None -> Raw a | Some r -> Loc(a,r)
     let loc = function Null -> M.null | Raw a | Loc(a,_) -> a
     let reg = function Null | Raw _ -> None | Loc(_,r) -> Some r
-    let kind = function Null | Raw _ -> Garbled | Loc(_,r) -> R.kind r
     let rfold f = function Null | Raw _ -> None | Loc(_,r) -> f r
 
     (* ---------------------------------------------------------------------- *)
@@ -220,45 +218,30 @@ struct
     let shift l obj ofs =
       make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
 
-    let frames  ~addr:p ~offset:n ~sizeof:s ?(basename = "Rmem") tau =
-      let t_mem = Qed.Logic.Array(MemAddr.t_addr, tau) in
-      let m  = e_var (Lang.freshvar ~basename t_mem) in
-      let m' = e_var (Lang.freshvar ~basename t_mem) in
-      let pt' = F.e_var (Lang.freshvar ~basename:"pt" MemAddr.t_addr) in
-      let ps' = F.e_var (Lang.freshvar ~basename:"ps" MemAddr.t_addr) in
-      let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-      let mh = Lang.F.e_fun f_memcpy [m;m';pt';ps';n'] in
-      let v' = e_var (Lang.freshvar ~basename:"v" tau ) in
-      let meq = p_call p_eqmem [m;m';pt';n'] in
-      let diff = p_call MemAddr.p_separated [p;n;pt';s] in
-      let sep = p_call MemAddr.p_separated [p;n;pt';n'] in
-      let inc = p_call MemAddr.p_included [p;n;pt';n'] in
-      let teq = Definitions.Trigger.of_pred meq in
-      [
-        "update"     , []    , [diff]    , m , e_set m pt' v' ;
-        "eqmem"      , [teq] , [inc;meq] , m , m' ;
-        "memcpy_neq" , []    , [sep]     , m , mh ;
-      ]
-
-
-    let get_tau l c = match kind l, Sigma.ckind c with
-      | _, State.Mu c -> Chunk.prim_tau_of_chunk c
-      | _ -> Sigma.Chunk.tau_of_chunk c
-
-    let frames ty l (c : Sigma.Chunk.t) =
-      match kind l with
-      | Single Ptr | Many Ptr | Garbled ->
-        let offset = M.sizeof ty in
-        let sizeof = M.sizeof ty in
-        let tau = get_tau l c in
-        let basename = Sigma.Chunk.basename_of_chunk c in
-        frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
-      | _ ->
-        let offset = M.sizeof ty in
-        let sizeof = M.sizeof ty in
-        let tau = get_tau l c in
-        let basename = Sigma.Chunk.basename_of_chunk c in
-        frames ~addr:(to_addr l) ~offset ~sizeof ~basename tau
+    let frames ~length obj loc chunk =
+      match loc with
+      | Null -> []
+      | Raw l -> M.frames ~length obj l chunk
+      | Loc(l,_) ->
+        match Sigma.ckind chunk with
+        | State.Mu { data = (Array _ | ArrInit) as d } ->
+          let n = F.e_mul length @@ sizeof obj in
+          let p = M.pointer_val l in
+          let tau = Chunk.tau_of_data d in
+          let t_mem = Qed.Logic.Array(MemAddr.t_addr,tau) in
+          let m  = F.e_var (Lang.freshvar ~basename:"m" t_mem) in
+          let m' = F.e_var (Lang.freshvar ~basename:"m" t_mem) in
+          let p' = F.e_var (Lang.freshvar ~basename:"p" MemAddr.t_addr) in
+          let n' = F.e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
+          let q' = F.e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
+          let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
+          let sepv = F.p_call MemAddr.p_separated [p;n;q';F.e_one] in
+          let sepn = F.p_call MemAddr.p_separated [p;n;p';n'] in
+          [
+            "update" , [] , [sepv] , m , F.e_set m q' v' ;
+            "memcpy" , [] , [sepn] , m , F.e_fun f_memcpy [m;m';p';q';n'] ;
+          ]
+        | _ -> []
 
     let memcpy ty ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
       match Sigma.ckind chunk with

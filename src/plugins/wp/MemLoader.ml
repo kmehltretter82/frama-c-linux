@@ -57,7 +57,7 @@ sig
   val value_footprint: c_object -> loc -> domain
   val init_footprint: c_object -> loc -> domain
 
-  val frames : c_object -> loc -> Chunk.t -> frame list
+  val frames : length:term -> c_object -> loc -> Chunk.t -> frame list
 
   val last : sigma -> c_object -> loc -> term
 
@@ -117,7 +117,7 @@ struct
       (fun c0 -> if Chunk.equal c0 c then m else Sigma.value sigma c0)
       chunks
 
-  let frame_lemmas phi obj loc params chunks =
+  let frame_lemmas phi obj ?(length = F.e_one) loc params chunks =
     begin
       let prefix = Fun.debug phi in
       let sigma = Sigma.create () in
@@ -152,7 +152,7 @@ struct
                   l_lemma = l_lemma ;
                   l_cluster = cluster () ;
                 }
-             ) (M.frames obj loc chunk)
+             ) (M.frames obj ~length loc chunk)
         ) chunks
     end
 
@@ -349,11 +349,13 @@ struct
                else
                  raise Not_found
             ) ;
-          if env.length <> None then
-            begin
+          begin
+            match env.length with
+            | None -> ()
+            | Some length ->
               let ns = List.map F.e_var env.size_var in
-              frame_lemmas lfun obj loc (v::ns) chunks
-            end ;
+              frame_lemmas lfun obj ~length loc (v::ns) chunks
+          end ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -578,8 +580,8 @@ struct
   let gen_memcpy_length get_domain s obj ?enforced_length ?lsrc loc length =
     let memcpy ~mtgt ~msrc ~ltgt ~lsrc c =
       match enforced_length with
-      | None -> M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc
-                  ~length:(e_mul length @@ M.sizeof obj) c
+      | None ->
+        M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length:(e_mul length @@ M.sizeof obj) c
       | Some l ->
         M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length:l c
     in

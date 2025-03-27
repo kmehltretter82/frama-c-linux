@@ -965,15 +965,26 @@ let int_of_loc _ l = MemAddr.int_of_addr l
 (* --- Frames                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-let frames obj addr chunk =
+let frames ~length obj p chunk =
   match Sigma.ckind chunk with
   | State.Mu T_alloc -> []
   | State.Mu m ->
-    let offset = length_of_object obj in
-    let sizeof = F.e_one in
+    let n = F.e_mul length @@ length_of_object obj in
     let tau = Chunk.val_of_chunk m in
     let basename = Chunk.basename_of_chunk m in
-    MemMemory.frames ~addr ~offset ~sizeof ~basename tau
+    let t_mem = L.Array(MemAddr.t_addr,tau) in
+    let m  = F.e_var (Lang.freshvar ~basename t_mem) in
+    let m' = F.e_var (Lang.freshvar ~basename t_mem) in
+    let p' = F.e_var (Lang.freshvar ~basename:"p" MemAddr.t_addr) in
+    let n' = F.e_var (Lang.freshvar ~basename:"n" L.Int) in
+    let q' = F.e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
+    let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
+    let sepv = F.p_call MemAddr.p_separated [p;n;q';F.e_one] in
+    let sepn = F.p_call MemAddr.p_separated [p;n;p';n'] in
+    [
+      "update" , [] , [sepv] , m , F.e_set m q' v' ;
+      "memcpy" , [] , [sepn] , m , F.e_fun f_memcpy [m;m';p';q';n'] ;
+    ]
   | _ -> []
 
 (* -------------------------------------------------------------------------- *)

@@ -53,7 +53,7 @@ sig
   val value_footprint: c_object -> loc -> domain
   val init_footprint: c_object -> loc -> domain
 
-  val frames : c_object -> loc -> chunk -> frame list
+  val frames : length:term -> c_object -> loc -> chunk -> frame list
 
   val last : sigma -> c_object -> loc -> term
 
