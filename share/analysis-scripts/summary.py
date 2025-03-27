@@ -266,8 +266,6 @@ try:
     if args.display:
         print("Polling results ...\n")
         results = poll_results(list_targets("."), benchmark_tag)
-        if not database is None:
-            database.update(results)
         errors = b""
     else:
         results,errors = results_display.wrapper(run_analyses, database, framac,
