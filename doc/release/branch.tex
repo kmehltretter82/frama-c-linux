@@ -6,10 +6,9 @@ That is the procedure for forking the release from \texttt{master}.
 \section{Creating the milestones}
 \label{sec:creating-milestones}
 
-Create the milestone for the next releases on \textsf{Gitlab},
-in the Frama-C group. They will be used for development that will not
-be integrated into the upcoming release.
-\expertise{François, Julien}.
+Create the milestone for the next releases on \textsf{GitLab}, in the Frama-C
+group. They will be used for development that will not be integrated into the
+upcoming release. This must be done during CI/CD meeting.
 
 \section{Creating the branch}
 \label{sec:creating-branch}
@@ -24,7 +23,7 @@ element name, using the \texttt{frama-ci} tool:
 \begin{shell}
 opam pin add frama-ci-tools git@git.frama-c.com:frama-c/Frama-CI.git
 \end{shell}
-\item Create an API token for gitlab, in your gitlab profile settings.
+\item Create an API token for GitLab, in your GitLab profile settings.
 \item Run the command
 \begin{shell}
 frama-ci-create-branch --token=\$TOKEN \
@@ -33,7 +32,7 @@ frama-ci-create-branch --token=\$TOKEN \
 This command creates a branch \texttt{stable/release} for frama-c and for
 each plugin tested by the CI — and configures the CI to use these branches
 by default when testing fixes for the release.
-These branches are directly created on the gitlab server.
+These branches are directly created on the GitLab server.
 \end{enumerate}
 What can be committed in this branch must follow the release schedule,
 and go through Merge-requests. Everything else should go in \texttt{master},
@@ -54,6 +53,19 @@ and not \texttt{master}. Run the command
 frama-ci-retarget-merge-requests --token=$TOKEN \
 --branch=stable/release --milestone="number (release)"
 \end{shell}
+
+\section{Stable branch CI}
+\label{sec:stable-branch-ci}
+
+When the stable branch is created, nightly pipelines must be enabled for the
+stable branch. Ask \expertise{Allan} to enable the pipelines. For this, on
+GitLab, go to Build, Pipeline Schedules and edit the two ``Stable'' pipelines:
+\begin{itemize}
+  \item change ``target branch'' to the new stable branch,
+  \item tick the ``Activated'' parameter.
+\end{itemize}
+
+These pipelines must be disabled after the release.
 
 \section{GitLab issues}
 \label{sec:gitlab-issues}
