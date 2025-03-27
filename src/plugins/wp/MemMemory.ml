@@ -140,10 +140,10 @@ let frames ~addr:p ~offset:n ~sizeof:s ?(basename="mem") tau =
 
 let wkey = Wp_parameters.register_warn_category "union"
 
-let unsupported_union (fd : Cil_types.fieldinfo) =
+let unsupported_union ~model (fd : Cil_types.fieldinfo) =
   if not fd.fcomp.cstruct then
     Wp_parameters.warning ~once:true ~wkey
-      "Accessing union fields with WP might be unsound.@\n\
-       Please refer to WP manual."
+      "Accessing union fields with %s model might be unsound.@\n\
+       Please refer to WP manual." model
 
 (* -------------------------------------------------------------------------- *)

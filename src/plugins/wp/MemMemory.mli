@@ -65,6 +65,6 @@ val frames : addr:term -> offset:term -> sizeof:term ->
 
 (** {2 Unsupported Union Fields} *)
 
-val unsupported_union : Cil_types.fieldinfo -> unit
+val unsupported_union : model:string -> Cil_types.fieldinfo -> unit
 
 (* -------------------------------------------------------------------------- *)
