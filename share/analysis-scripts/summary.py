@@ -272,9 +272,8 @@ try:
     else:
         results,errors = results_display.wrapper(run_analyses, database, framac,
             benchmark_tag, curses=args.ci)
-
-    print("Results:\n")
-    results_display.PlainDisplay().print_table(results)
+        print("Results:\n")
+        results_display.PlainDisplay().print_table(results)
 
     if args.output_csv is not None:
         dump_results_csv(results, args.output_csv)
