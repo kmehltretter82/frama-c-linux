@@ -110,7 +110,26 @@ let do_wp_print_status () =
            ~on_goal:(do_print_goal_status fmt) ()) ;
   end
 
-let do_wp_print () =
+let do_print_clusters fmt model scope =
+  WpContext.on_context (model,scope)
+    begin fun () ->
+      Definitions.iter
+        (fun c ->
+           if not @@ Definitions.is_empty c then
+             Format.fprintf fmt "%a@\n@." Definitions.dump c)
+    end ()
+
+let do_wp_print_axiomatics fmt model ax =
+  Wpo.pp_axiomatics fmt ax ;
+  if ax = None && Wp_parameters.has_print_generated () then
+    do_print_clusters fmt model WpContext.Global
+
+let do_wp_print_behavior fmt model fct bhv =
+  Wpo.pp_function fmt fct bhv ;
+  if bhv = None && Wp_parameters.has_print_generated () then
+    do_print_clusters fmt model (WpContext.Kf fct)
+
+let do_wp_print model =
   (* Printing *)
   if Wp_parameters.Status.get () then
     do_wp_print_status ()
@@ -123,8 +142,8 @@ let do_wp_print () =
       Log.print_on_output
         (fun fmt ->
            Wpo.iter
-             ~on_axiomatics:(Wpo.pp_axiomatics fmt)
-             ~on_behavior:(Wpo.pp_function fmt)
+             ~on_axiomatics:(do_wp_print_axiomatics fmt model)
+             ~on_behavior:(do_wp_print_behavior fmt model)
              ~on_goal:(Wpo.pp_goal_flow fmt) ())
 
 let do_wp_print_for goals =
@@ -841,7 +860,7 @@ let cmdline_run () =
           if fct <> Wp_parameters.Fct_all then
             do_wp_print_for goals
           else
-            do_wp_print () ;
+            do_wp_print model ;
         end ;
         do_wp_report model ;
       end

@@ -265,6 +265,271 @@ end
   Function job
 ------------------------------------------------------------
 
+Cluster Compound {
+  
+  Function Load_S1_S (p_0 : addr) (Mint_0 : int[addr]) (Mint_1 : int[addr])
+    (Mint_2 : int[addr]) : S1_S
+    = {
+         F1_S_f = Mint_1[(shiftfield_F1_S_f p_0)] ;
+         F1_S_a = (Array_uint32 (shiftfield_F1_S_a p_0) 5 Mint_0) ;
+         F1_S_b = (Array_sint64 (shiftfield_F1_S_b p_0) 5 Mint_2)
+      }
+  
+  Function Array_sint64 (p_1 : addr) (n_2 : int) (Mint_3 : int[addr]) : int[]
+  
+  Function shift_sint64 (p_1 : addr) (k_1 : int) : addr = (shift p_1 k_1)
+  
+  Function shiftfield_F1_S_b (p_2 : addr) : addr = (shift p_2 6)
+  
+  Function Array_uint32 (p_0 : addr) (n_0 : int) (Mint_0 : int[addr]) : int[]
+  
+  Function shift_uint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+  Function shiftfield_F1_S_a (p_1 : addr) : addr = (shift p_1 1)
+  
+  Function shiftfield_F1_S_f (p_0 : addr) : addr = (shift p_0 0)
+  
+  Axiom Load_S1_S_memcpy_neq_Mint2:
+    forall Mint_5: int[addr].
+    forall Mint_9: int[addr].
+    forall Mint_10: int[addr].
+    forall Mint_11: int[addr].
+    forall n_2: int.
+    forall p_0: addr.
+    forall ps_2: addr.
+    forall pt_2: addr.
+    [ (Load_S1_S p_0 Mint_9 Mint_5 (memcpy Mint_10 Mint_11 pt_2 ps_2 n_2)) ]
+    (separated p_0 11 pt_2 n_2)
+    -> ((Load_S1_S p_0 Mint_9 Mint_5 (memcpy Mint_10 Mint_11 pt_2 ps_2 n_2))=
+        (Load_S1_S p_0 Mint_9 Mint_5 Mint_10))
+  
+  Axiom Load_S1_S_eqmem_Mint2:
+    forall Mint_5: int[addr].
+    forall Mint_9: int[addr].
+    forall Mint_10: int[addr].
+    forall Mint_11: int[addr].
+    forall n_2: int.
+    forall p_0: addr.
+    forall pt_2: addr.
+    [ (Load_S1_S p_0 Mint_9 Mint_5 Mint_10)
+      (eqmem Mint_10 Mint_11 pt_2 n_2) ]
+    [ (Load_S1_S p_0 Mint_9 Mint_5 Mint_11)
+      (eqmem Mint_10 Mint_11 pt_2 n_2) ]
+    (included p_0 11 pt_2 n_2) -> (eqmem Mint_10 Mint_11 pt_2 n_2)
+    -> ((Load_S1_S p_0 Mint_9 Mint_5 Mint_11)=
+        (Load_S1_S p_0 Mint_9 Mint_5 Mint_10))
+  
+  Axiom Load_S1_S_update_Mint2:
+    forall Mint_5: int[addr].
+    forall Mint_9: int[addr].
+    forall Mint_10: int[addr].
+    forall p_0: addr.
+    forall pt_2: addr.
+    forall v_2: int.
+    [ (Load_S1_S p_0 Mint_9 Mint_5 Mint_10[pt_2 <- v_2]) ]
+    (separated p_0 11 pt_2 1)
+    -> ((Load_S1_S p_0 Mint_9 Mint_5 Mint_10[pt_2->v_2])=
+        (Load_S1_S p_0 Mint_9 Mint_5 Mint_10))
+  
+  Axiom Load_S1_S_memcpy_neq_Mint1:
+    forall Mint_6: int[addr].
+    forall Mint_7: int[addr].
+    forall Mint_8: int[addr].
+    forall Mint_9: int[addr].
+    forall n_1: int.
+    forall p_0: addr.
+    forall ps_1: addr.
+    forall pt_1: addr.
+    [ (Load_S1_S p_0 Mint_9 (memcpy Mint_7 Mint_8 pt_1 ps_1 n_1) Mint_6) ]
+    (separated p_0 11 pt_1 n_1)
+    -> ((Load_S1_S p_0 Mint_9 (memcpy Mint_7 Mint_8 pt_1 ps_1 n_1) Mint_6)=
+        (Load_S1_S p_0 Mint_9 Mint_7 Mint_6))
+  
+  Axiom Load_S1_S_eqmem_Mint1:
+    forall Mint_6: int[addr].
+    forall Mint_7: int[addr].
+    forall Mint_8: int[addr].
+    forall Mint_9: int[addr].
+    forall n_1: int.
+    forall p_0: addr.
+    forall pt_1: addr.
+    [ (Load_S1_S p_0 Mint_9 Mint_7 Mint_6) (eqmem Mint_7 Mint_8 pt_1 n_1) ]
+    [ (Load_S1_S p_0 Mint_9 Mint_8 Mint_6) (eqmem Mint_7 Mint_8 pt_1 n_1) ]
+    (included p_0 11 pt_1 n_1) -> (eqmem Mint_7 Mint_8 pt_1 n_1)
+    -> ((Load_S1_S p_0 Mint_9 Mint_8 Mint_6)=
+        (Load_S1_S p_0 Mint_9 Mint_7 Mint_6))
+  
+  Axiom Load_S1_S_update_Mint1:
+    forall Mint_6: int[addr].
+    forall Mint_7: int[addr].
+    forall Mint_9: int[addr].
+    forall p_0: addr.
+    forall pt_1: addr.
+    forall v_1: int.
+    [ (Load_S1_S p_0 Mint_9 Mint_7[pt_1 <- v_1] Mint_6) ]
+    (separated p_0 11 pt_1 1)
+    -> ((Load_S1_S p_0 Mint_9 Mint_7[pt_1->v_1] Mint_6)=
+        (Load_S1_S p_0 Mint_9 Mint_7 Mint_6))
+  
+  Axiom Load_S1_S_memcpy_neq_Mint0:
+    forall Mint_3: int[addr].
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
+    forall Mint_6: int[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall ps_0: addr.
+    forall pt_0: addr.
+    [ (Load_S1_S p_0 (memcpy Mint_3 Mint_4 pt_0 ps_0 n_0) Mint_5 Mint_6) ]
+    (separated p_0 11 pt_0 n_0)
+    -> ((Load_S1_S p_0 (memcpy Mint_3 Mint_4 pt_0 ps_0 n_0) Mint_5 Mint_6)=
+        (Load_S1_S p_0 Mint_3 Mint_5 Mint_6))
+  
+  Axiom Load_S1_S_eqmem_Mint0:
+    forall Mint_3: int[addr].
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
+    forall Mint_6: int[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall pt_0: addr.
+    [ (Load_S1_S p_0 Mint_3 Mint_5 Mint_6) (eqmem Mint_3 Mint_4 pt_0 n_0) ]
+    [ (Load_S1_S p_0 Mint_4 Mint_5 Mint_6) (eqmem Mint_3 Mint_4 pt_0 n_0) ]
+    (included p_0 11 pt_0 n_0) -> (eqmem Mint_3 Mint_4 pt_0 n_0)
+    -> ((Load_S1_S p_0 Mint_4 Mint_5 Mint_6)=
+        (Load_S1_S p_0 Mint_3 Mint_5 Mint_6))
+  
+  Axiom Load_S1_S_update_Mint0:
+    forall Mint_3: int[addr].
+    forall Mint_5: int[addr].
+    forall Mint_6: int[addr].
+    forall p_0: addr.
+    forall pt_0: addr.
+    forall v_0: int.
+    [ (Load_S1_S p_0 Mint_3[pt_0 <- v_0] Mint_5 Mint_6) ]
+    (separated p_0 11 pt_0 1)
+    -> ((Load_S1_S p_0 Mint_3[pt_0->v_0] Mint_5 Mint_6)=
+        (Load_S1_S p_0 Mint_3 Mint_5 Mint_6))
+  
+  Axiom Array_sint64_memcpy_neq_Mint0:
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
+    forall n_2: int.
+    forall n_3: int.
+    forall p_1: addr.
+    forall ps_1: addr.
+    forall pt_1: addr.
+    [ (Array_sint64 p_1 n_2 (memcpy Mint_4 Mint_5 pt_1 ps_1 n_3)) ]
+    (separated p_1 1 pt_1 n_3)
+    -> ((Array_sint64 p_1 n_2 (memcpy Mint_4 Mint_5 pt_1 ps_1 n_3))=
+        (Array_sint64 p_1 n_2 Mint_4))
+  
+  Axiom Array_sint64_eqmem_Mint0:
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
+    forall n_2: int.
+    forall n_3: int.
+    forall p_1: addr.
+    forall pt_1: addr.
+    [ (Array_sint64 p_1 n_2 Mint_4) (eqmem Mint_4 Mint_5 pt_1 n_3) ]
+    [ (Array_sint64 p_1 n_2 Mint_5) (eqmem Mint_4 Mint_5 pt_1 n_3) ]
+    (included p_1 1 pt_1 n_3) -> (eqmem Mint_4 Mint_5 pt_1 n_3)
+    -> ((Array_sint64 p_1 n_2 Mint_5)=(Array_sint64 p_1 n_2 Mint_4))
+  
+  Axiom Array_sint64_update_Mint0:
+    forall Mint_4: int[addr].
+    forall n_2: int.
+    forall p_1: addr.
+    forall pt_1: addr.
+    forall v_1: int.
+    [ (Array_sint64 p_1 n_2 Mint_4[pt_1 <- v_1]) ]
+    (pt_1!=p_1)
+    -> ((Array_sint64 p_1 n_2 Mint_4[pt_1->v_1])=
+        (Array_sint64 p_1 n_2 Mint_4))
+  
+  Axiom Array_sint64_access:
+    forall Mint_3: int[addr].
+    forall i_1: int.
+    forall n_2: int.
+    forall p_1: addr.
+    [ (Array_sint64 p_1 n_2 Mint_3)[i_1] ]
+    (0<=i_1) -> (i_1<n_2)
+    -> ((Array_sint64 p_1 n_2 Mint_3)[i_1]=Mint_3[(shift_sint64 p_1 i_1)])
+  
+  Axiom Array_uint32_memcpy_neq_Mint0:
+    forall Mint_1: int[addr].
+    forall Mint_2: int[addr].
+    forall n_0: int.
+    forall n_1: int.
+    forall p_0: addr.
+    forall ps_0: addr.
+    forall pt_0: addr.
+    [ (Array_uint32 p_0 n_0 (memcpy Mint_1 Mint_2 pt_0 ps_0 n_1)) ]
+    (separated p_0 1 pt_0 n_1)
+    -> ((Array_uint32 p_0 n_0 (memcpy Mint_1 Mint_2 pt_0 ps_0 n_1))=
+        (Array_uint32 p_0 n_0 Mint_1))
+  
+  Axiom Array_uint32_eqmem_Mint0:
+    forall Mint_1: int[addr].
+    forall Mint_2: int[addr].
+    forall n_0: int.
+    forall n_1: int.
+    forall p_0: addr.
+    forall pt_0: addr.
+    [ (Array_uint32 p_0 n_0 Mint_1) (eqmem Mint_1 Mint_2 pt_0 n_1) ]
+    [ (Array_uint32 p_0 n_0 Mint_2) (eqmem Mint_1 Mint_2 pt_0 n_1) ]
+    (included p_0 1 pt_0 n_1) -> (eqmem Mint_1 Mint_2 pt_0 n_1)
+    -> ((Array_uint32 p_0 n_0 Mint_2)=(Array_uint32 p_0 n_0 Mint_1))
+  
+  Axiom Array_uint32_update_Mint0:
+    forall Mint_1: int[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall pt_0: addr.
+    forall v_0: int.
+    [ (Array_uint32 p_0 n_0 Mint_1[pt_0 <- v_0]) ]
+    (pt_0!=p_0)
+    -> ((Array_uint32 p_0 n_0 Mint_1[pt_0->v_0])=
+        (Array_uint32 p_0 n_0 Mint_1))
+  
+  Axiom Array_uint32_access:
+    forall Mint_0: int[addr].
+    forall i_0: int.
+    forall n_0: int.
+    forall p_0: addr.
+    [ (Array_uint32 p_0 n_0 Mint_0)[i_0] ]
+    (0<=i_0) -> (i_0<n_0)
+    -> ((Array_uint32 p_0 n_0 Mint_0)[i_0]=Mint_0[(shift_uint32 p_0 i_0)])
+  
+}
+
+Cluster Matrix {
+  
+  Predicate EqArray_int (n_0 : int) (T_0 : int[]) (T_1 : int[])
+    = forall i_0:int. (0<=i_0) -> (i_0<n_0) -> (T_1[i_0]=T_0[i_0])
+  
+  Predicate IsArray_sint64 (T_0 : int[])
+    = forall i_0:int. (is_sint64 T_0[i_0])
+  
+  Predicate IsArray_uint32 (T_0 : int[])
+    = forall i_0:int. (is_uint32 T_0[i_0])
+  
+}
+
+Cluster S1_S {
+  
+  Type S1_S = { F1_S_f : int; F1_S_a : int[]; F1_S_b : int[]; }
+  
+  Predicate EqS1_S (S_0 : S1_S) (S_1 : S1_S)
+    = (S_1.F1_S_f=S_0.F1_S_f) /\ (EqArray_int 5 S_0.F1_S_a S_1.F1_S_a)
+      /\ (EqArray_int 5 S_0.F1_S_b S_1.F1_S_b)
+  
+  Predicate IsS1_S (S_0 : S1_S)
+    = (IsArray_sint64 S_0.F1_S_b) /\ (IsArray_uint32 S_0.F1_S_a)
+      /\ (is_sint32 S_0.F1_S_f)
+  
+}
+
 Goal Post-condition (file multi_matrix_types.i, line 10) in 'job':
 Let a = Load_S1_S(p, Mint_0, Mint_1, Mint_2).
 Let a_1 = Load_S1_S(p, Mint_0, Mint_1[shiftfield_F1_S_f(p) <- v], Mint_2).

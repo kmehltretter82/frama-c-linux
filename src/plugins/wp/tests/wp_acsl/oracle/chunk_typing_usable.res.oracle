@@ -486,6 +486,74 @@ end
   Global
 ------------------------------------------------------------
 
+Cluster A_Occ {
+  
+  Function L_occ (Mint_0 : int[addr]) (value_0 : int) (p_0 : addr)
+    (f_0 : int) (t_0 : int) : int
+  
+  Axiom isnt:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    let x_0 = (t_0-1) in
+    let x_1 = Mint_0[(shift_sint32 p_0 x_0)] in
+    (x_1!=v_0) -> (f_0<t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (is_sint32 x_1)
+    -> ((L_occ Mint_0 v_0 p_0 f_0 x_0)=(L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+  Axiom is:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    let x_0 = (t_0-1) in
+    let x_1 = Mint_0[(shift_sint32 p_0 x_0)] in
+    (x_1=v_0) -> (f_0<t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (is_sint32 x_1)
+    -> ((1+(L_occ Mint_0 v_0 p_0 f_0 x_0))=(L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+  Axiom empty:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    (t_0<=f_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> ((L_occ Mint_0 v_0 p_0 f_0 t_0)=0)
+  
+}
+
+Cluster Axiomatic1 {
+  
+  Lemma provable_lemma:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall s_0: int.
+    forall t_0: int.
+    (f_0<=s_0) -> (s_0<=t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (((L_occ Mint_0 v_0 p_0 f_0 s_0)+(L_occ Mint_0 v_0 p_0 s_0 t_0))=
+        (L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+}
+
+Cluster Chunk {
+  
+  Predicate is_sint32_chunk (m_0 : int[addr])
+    = forall a_0:addr. (is_sint32 m_0[a_0])
+  
+}
+
+Cluster Compound {
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
+
 Goal Lemma 'provable_lemma':
 Assume {
   Have: f <= s.
@@ -500,6 +568,74 @@ Prove: (L_occ(Mint_0, v, p, f, s) + L_occ(Mint_0, v, p, s, t))
 ------------------------------------------------------------
   Function usable_axiom
 ------------------------------------------------------------
+
+Cluster A_Occ {
+  
+  Function L_occ (Mint_0 : int[addr]) (value_0 : int) (p_0 : addr)
+    (f_0 : int) (t_0 : int) : int
+  
+  Axiom isnt:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    let x_0 = (t_0-1) in
+    let x_1 = Mint_0[(shift_sint32 p_0 x_0)] in
+    (x_1!=v_0) -> (f_0<t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (is_sint32 x_1)
+    -> ((L_occ Mint_0 v_0 p_0 f_0 x_0)=(L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+  Axiom is:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    let x_0 = (t_0-1) in
+    let x_1 = Mint_0[(shift_sint32 p_0 x_0)] in
+    (x_1=v_0) -> (f_0<t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (is_sint32 x_1)
+    -> ((1+(L_occ Mint_0 v_0 p_0 f_0 x_0))=(L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+  Axiom empty:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    (t_0<=f_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> ((L_occ Mint_0 v_0 p_0 f_0 t_0)=0)
+  
+}
+
+Cluster Axiomatic1 {
+  
+  Lemma provable_lemma:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall s_0: int.
+    forall t_0: int.
+    (f_0<=s_0) -> (s_0<=t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (((L_occ Mint_0 v_0 p_0 f_0 s_0)+(L_occ Mint_0 v_0 p_0 s_0 t_0))=
+        (L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+}
+
+Cluster Chunk {
+  
+  Predicate is_sint32_chunk (m_1 : int[addr])
+    = forall a_0:addr. (is_sint32 m_1[a_0])
+  
+}
+
+Cluster Compound {
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
 
 Goal Post-condition (file chunk_typing_usable.i, line 29) in 'usable_axiom':
 Let x = e - 1.
@@ -518,6 +654,74 @@ Prove: L_occ(Mint_0, i, a, b, x) = L_occ(Mint_0, i, a, b, e).
 ------------------------------------------------------------
   Function usable_lemma
 ------------------------------------------------------------
+
+Cluster A_Occ {
+  
+  Function L_occ (Mint_0 : int[addr]) (value_0 : int) (p_0 : addr)
+    (f_0 : int) (t_0 : int) : int
+  
+  Axiom isnt:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    let x_0 = (t_0-1) in
+    let x_1 = Mint_0[(shift_sint32 p_0 x_0)] in
+    (x_1!=v_0) -> (f_0<t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (is_sint32 x_1)
+    -> ((L_occ Mint_0 v_0 p_0 f_0 x_0)=(L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+  Axiom is:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    let x_0 = (t_0-1) in
+    let x_1 = Mint_0[(shift_sint32 p_0 x_0)] in
+    (x_1=v_0) -> (f_0<t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (is_sint32 x_1)
+    -> ((1+(L_occ Mint_0 v_0 p_0 f_0 x_0))=(L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+  Axiom empty:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall t_0: int.
+    (t_0<=f_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> ((L_occ Mint_0 v_0 p_0 f_0 t_0)=0)
+  
+}
+
+Cluster Axiomatic1 {
+  
+  Lemma provable_lemma:
+    forall Mint_0: int[addr].
+    forall v_0: int.
+    forall p_0: addr.
+    forall f_0: int.
+    forall s_0: int.
+    forall t_0: int.
+    (f_0<=s_0) -> (s_0<=t_0) -> (is_sint32_chunk Mint_0) -> (is_sint32 v_0)
+    -> (((L_occ Mint_0 v_0 p_0 f_0 s_0)+(L_occ Mint_0 v_0 p_0 s_0 t_0))=
+        (L_occ Mint_0 v_0 p_0 f_0 t_0))
+  
+}
+
+Cluster Chunk {
+  
+  Predicate is_sint32_chunk (m_2 : int[addr])
+    = forall a_0:addr. (is_sint32 m_2[a_0])
+  
+}
+
+Cluster Compound {
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
 
 Goal Post-condition (file chunk_typing_usable.i, line 43) in 'usable_lemma':
 Assume {

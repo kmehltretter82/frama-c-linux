@@ -98,6 +98,24 @@ end
   Function f
 ------------------------------------------------------------
 
+Cluster Matrix {
+  
+  Predicate IsArray_sint32 (T_0 : int[])
+    = forall i_0:int. (is_sint32 T_0[i_0])
+  
+}
+
+Cluster S1_s {
+  
+  Type S1_s = { F1_s_a : int[]; F1_s_b : int[]; }
+  
+  Predicate IsArray_S1_s (T_0 : S1_s[]) = forall i_0:int. (IsS1_s T_0[i_0])
+  
+  Predicate IsS1_s (S_0 : S1_s)
+    = (IsArray_sint32 S_0.F1_s_a) /\ (IsArray_sint32 S_0.F1_s_b)
+  
+}
+
 Goal Post-condition (file struct_array_type.i, line 16) in 'f':
 Let a = t[SynchroId_0].
 Let a_1 = (a.F1_s_b)[0].
