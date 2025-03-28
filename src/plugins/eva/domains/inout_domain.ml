@@ -250,7 +250,7 @@ module Domain = struct
   let update _valuation state = `Value state
 
   (* Memexec *)
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
   (* Initial state. Initializers are singletons, so we store nothing. *)
   let empty () = LatticeInout.empty

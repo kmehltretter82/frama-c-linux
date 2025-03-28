@@ -324,12 +324,12 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
   let initialize_variable _lval _location ~initialized:_ _value state = state
   let initialize_variable_using_type _kind _varinfo state = state
 
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
-  let filter _kind bases state =
+  let filter bases state =
     M.filter (fun elt -> Base.Hptset.mem elt bases) state
 
-  let reuse _kf bases ~current_input ~previous_output =
+  let reuse bases ~current_input ~previous_output =
     let cache = Hptmap_sig.NoCache in
     let decide_both _key _v1 v2 = Some v2 in
     let decide_left key v1 =

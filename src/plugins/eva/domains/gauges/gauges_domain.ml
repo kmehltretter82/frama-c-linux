@@ -1268,7 +1268,7 @@ module D : Abstract_domain.Leaf
 
   (* Memexec *)
 
-  let relate _kf _bases _state = match function_calls_handling with
+  let relate _bases _state = match function_calls_handling with
     | FullInterprocedural -> Base.SetLattice.top
     | IntraproceduralAll
     | IntraproceduralNonReferenced -> Base.SetLattice.empty

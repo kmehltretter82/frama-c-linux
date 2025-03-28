@@ -548,7 +548,7 @@ struct
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
 
-  let relate _kf bases (equalities, deps, _modified_zone) =
+  let relate bases (equalities, deps, _modified_zone) =
     if Equality.Set.is_empty equalities then
       Base.SetLattice.empty
     else

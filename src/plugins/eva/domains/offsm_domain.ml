@@ -198,11 +198,11 @@ module D : Abstract_domain.Leaf
     o, Alarmset.all
 
   (* Memexec *)
-  let relate _kf _bases _state = Base.SetLattice.empty
-  let filter _kind bases state =
+  let relate _bases _state = Base.SetLattice.empty
+  let filter bases state =
     Memory.filter_by_shape bases state
 
-  let reuse _kf bases ~current_input:input ~previous_output:output =
+  let reuse bases ~current_input:input ~previous_output:output =
     let input =
       Memory.filter_base (fun b -> not (Base.Hptset.mem b bases)) input
     in

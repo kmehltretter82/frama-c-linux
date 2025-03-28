@@ -345,48 +345,32 @@ type init_value = Zero | Top
 module type Reuse = sig
   type t (** Type of states. *)
 
-  (** [relate kf bases state] returns the set of bases [bases] in relation with
+  (** [relate bases state] returns the set of bases [bases] in relation with
       [bases] in [state] — i.e. all bases other than [bases] whose value may
       affect the properties inferred on [bases] in [state].
-      [state] is the initial state of an analysis of [kf].
       For a non-relational domain, it is always safe to return [empty].
       For a relational domain, it is always safe to return [top], but it
       disables MemExec. *)
-  val relate: kernel_function -> Base.Hptset.t -> t -> Base.SetLattice.t
+  val relate: Base.Hptset.t -> t -> Base.SetLattice.t
 
   (** [filter kind bases states] reduces the state [state] to only keep
       properties about [bases] — it is a projection on the set of [bases].
       It allows reusing an analysis of [kf] from an initial state [pre] to a
-      final state [post].
-      If [kind] is [`Pre kf], [state] is the initial state of function [kf],
-      and [bases] includes all inputs of [kf] and satisfies
-      [relate kf bases state = bases].
-      If [kind] is [`Post kf], [state] is the final state of [kf], and [bases]
-      includes all inputs and outputs of [kf].
-      Afterwards, the two resulting states [reduced_pre] and [reduced_post] are
-      used as follow: when [kf] should be analyzed with the initial state [s],
-      if [filter kf `Pre s = reduced_pre], then the analysis is skipped, and
-      [reuse kf s reduced_post] is used as its final state instead.
-      If [kind] is [`Print], the state is reduced before printing it for the
-      end-user. *)
-  val filter:
-    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
-    Base.Hptset.t -> t -> t
+      final state [post]. *)
+  val filter: Base.Hptset.t -> t -> t
 
-  (** [reuse kf bases current_input previous_output] merges the initial state
+  (** [reuse bases current_input previous_output] merges the initial state
       [current_input] with a final state [previous_output] from a previous
-      analysis of [kf] started with an equivalent initial state.
+      analysis of a function started with an equivalent initial state.
       [reuse] must overwrite the properties on [bases] in [current_input] with
       the ones in [previous_output]. Properties on other bases must be left
       unchanged from [current_input]. *)
-  val reuse:
-    kernel_function -> Base.Hptset.t ->
-    current_input:t -> previous_output:t -> t
+  val reuse: Base.Hptset.t -> current_input:t -> previous_output:t -> t
 
   (** {!Domain_builtin.Complete} provides the simplest implementation of
       [filter] and [reuse], which is:
         let filter _ _ _ state = state
-        let reuse _ _ ~current_input:_ ~previous_output = previous_output
+        let reuse _ ~current_input:_ ~previous_output = previous_output
       This is correct as the cache will be triggered only for an initial state
       exactly equal to the previous initial state, in which case the previous
       output state is indeed a correct final state on its own. *)

@@ -54,12 +54,8 @@ module type LeafDomain = sig
   val incr_loop_counter: stmt -> t -> t
   val leave_loop: stmt -> t -> t
 
-  val filter:
-    [`Pre of kernel_function | `Post of kernel_function | `Print ] ->
-    Base.Hptset.t -> t -> t
-  val reuse:
-    kernel_function -> Base.Hptset.t ->
-    current_input:t -> previous_output:t -> t
+  val filter: Base.Hptset.t -> t -> t
+  val reuse: Base.Hptset.t -> current_input:t -> previous_output:t -> t
 
   val show_expr: 'a -> t -> Format.formatter -> exp -> unit
   val post_analysis: t Lattice_bounds.or_bottom -> unit
@@ -89,8 +85,8 @@ module Complete (Domain: InputDomain) = struct
   let incr_loop_counter _stmt state = state
   let leave_loop _stmt state = state
 
-  let filter _kind _bases state = state
-  let reuse _kf _bases ~current_input:_ ~previous_output = previous_output
+  let filter _bases state = state
+  let reuse _bases ~current_input:_ ~previous_output = previous_output
 
   let show_expr _valuation _state fmt _expr =
     Format.fprintf fmt "(not implemented)"
@@ -177,7 +173,7 @@ module Make_Minimal
 
   let logic_assign _assigns _location _state = top
 
-  let relate _kf _bases _state = Base.SetLattice.top
+  let relate _bases _state = Base.SetLattice.top
 end
 
 
@@ -303,7 +299,7 @@ module Complete_Simple_Cvalue (Domain: Simpler_domains.Simple_Cvalue)
 
     let logic_assign _assigns _location _state = top
 
-    let relate _kf _bases _state = Base.SetLattice.top
+    let relate _bases _state = Base.SetLattice.top
   end
 
   include D
@@ -608,19 +604,19 @@ module Restrict
 
   (* ----- MemExec ---------------------------------------------------------- *)
 
-  let relate kf bases = function
+  let relate bases = function
     | None -> Base.SetLattice.empty
-    | Some (state, _mode) -> Domain.relate kf bases state
+    | Some (state, _mode) -> Domain.relate bases state
 
-  let filter kind bases = function
+  let filter bases = function
     | None -> None
-    | Some (state, mode) -> Some (Domain.filter kind bases state, mode)
+    | Some (state, mode) -> Some (Domain.filter bases state, mode)
 
-  let reuse kf bases ~current_input ~previous_output =
+  let reuse bases ~current_input ~previous_output =
     match current_input, previous_output with
     | None, _ | _, None -> None
     | Some (current_input, mode), Some (previous_output, _) ->
-      Some (Domain.reuse kf bases ~current_input ~previous_output, mode)
+      Some (Domain.reuse bases ~current_input ~previous_output, mode)
 
   let log_category = Domain.log_category
 

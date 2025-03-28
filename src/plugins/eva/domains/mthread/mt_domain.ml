@@ -343,7 +343,7 @@ module Domain = struct
   let logic_assign _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
-  let relate _ _ _ = Base.SetLattice.empty
+  let relate _ _ = Base.SetLattice.empty
   let log_category = Self.register_category "d-mthread"
 
   let post_analysis _ =

@@ -680,7 +680,7 @@ module Make (Man : Input) = struct
   (* TODO: use constraint_to_type? *)
   let initialize_variable_using_type _kind _varinfo state = state
 
-  let relate _ _ _ = Base.SetLattice.top
+  let relate _ _ = Base.SetLattice.top
 end
 
 

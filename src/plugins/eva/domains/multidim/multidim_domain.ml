@@ -907,9 +907,9 @@ struct
       let oracle = mk_oracle state in (* Since dst has no offset, oracle is actually useless *)
       erase ~oracle state dst Abstract_memory.Bit.top
 
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
-  let filter _kind bases (base_map, tracked : t) =
+  let filter bases (base_map, tracked : t) =
     BaseMap.inter_with_shape bases base_map,
     Option.map (Tracking.inter bases) tracked
 
@@ -917,7 +917,7 @@ struct
     let cache = cache_name "reuse" in
     let decide _key _v1 v2 = v2 in
     let reuse = BaseMap.join ~cache ~symmetric:false ~idempotent:true ~decide in
-    fun _kf bases ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
+    fun bases ~current_input:(m1,t1)  ~previous_output:(m2,t2) ->
       let m1 = BaseMap.diff_with_shape bases m1 in
       reuse m1 m2, join_tracked t1 t2
 end

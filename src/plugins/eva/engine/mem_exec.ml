@@ -130,7 +130,7 @@ module Make
      As a full fixpoint computation could be costly, we stop after [count] calls
      to [Domain.relate] and we disable memexec if a fixpoint is not reached. *)
   let rec expand_inputs_with_relations count kf bases state =
-    let related_bases = Domain.relate kf bases state in
+    let related_bases = Domain.relate bases state in
     match related_bases with
     | Base.SetLattice.Top -> related_bases
     | Base.SetLattice.Set new_bases ->
@@ -177,7 +177,7 @@ module Make
           | Base.SetLattice.Top -> raise TooImprecise
           | Base.SetLattice.Set bases -> bases
         in
-        let state_input = Domain.filter (`Pre kf) input_bases input_state in
+        let state_input = Domain.filter input_bases input_state in
         (* Outputs bases, that is bases that are copy-pasted, also include
            input bases. Indeed, those may get reduced during the call. *)
         let all_output_bases =
@@ -194,7 +194,7 @@ module Make
           Option.fold ~some:add ~none:all_output_bases return_base
         in
         let clear (key,state) =
-          key, Domain.filter (`Post kf) all_output_bases state
+          key, Domain.filter all_output_bases state
         in
         let outputs = List.map clear call_result in
         let call_number = current_counter () in
@@ -231,21 +231,21 @@ module Make
 
   (** Find a previous execution in [map_inputs] that matches [st].
       raise [Result_found] when this execution exists, or do nothing. *)
-  let find_match_in_previous kf (map_inputs: InputBasesToCallEffect.t) state =
+  let find_match_in_previous (map_inputs: InputBasesToCallEffect.t) state =
     let aux_previous_call binputs hstates =
-      let brelated = Domain.relate kf binputs state in
+      let brelated = Domain.relate binputs state in
       if not Base.SetLattice.(is_included brelated (inject binputs))
       then ()
       else
         (* restrict [state] to the inputs of this call *)
-        let st_filtered = Domain.filter (`Pre kf) binputs state in
+        let st_filtered = Domain.filter binputs state in
         try
           let bases, outputs, i = Domain.Hashtbl.find hstates st_filtered in
           (* We have found a previous execution, in which the outputs are
              [outputs]. Copy them in [state] and return this result. *)
           let process (key,output) =
             key,
-            Domain.reuse kf bases ~current_input:state ~previous_output:output
+            Domain.reuse bases ~current_input:state ~previous_output:output
           in
           let outputs = List.map process outputs in
           raise (Result_found (outputs, i))
@@ -258,7 +258,7 @@ module Make
       let previous_kf = PreviousCalls.find kf in
       let args = List.map (function `Bottom -> None | `Value v -> Some v) args in
       let previous = ActualArgs.Map.find args previous_kf in
-      find_match_in_previous kf previous state;
+      find_match_in_previous previous state;
       Statistics.(incr memexec_misses kf);
       None
     with

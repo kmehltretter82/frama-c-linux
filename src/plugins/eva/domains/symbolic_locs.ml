@@ -595,14 +595,14 @@ module D : Abstract_domain.Leaf
      However, such values are only used when the expression or lvalue is
      evaluated as it is: during the analysis of f, this domain cannot relate
      by itself a variable read or written by f to a variable that is not. *)
-  let relate _kf _bases _state = Base.SetLattice.empty
+  let relate _bases _state = Base.SetLattice.empty
 
-  let filter _kind = Memory.filter
+  let filter = Memory.filter
 
   (* Efficient version of [reuse], but the resulting state does not satisfy
      the [_check state], as some extra dependenies of keys removed from the
      [current_input] may remain. *)
-  let reuse _kf bases ~current_input ~previous_output =
+  let reuse bases ~current_input ~previous_output =
     let into = Memory.diff bases current_input in
     let state = Memory.merge ~into (Memory.rebuild previous_output) in
     state

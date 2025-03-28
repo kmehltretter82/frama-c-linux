@@ -1155,7 +1155,7 @@ module D = struct
 
   (* Memexec *)
   (* This domains infers no relation between variables. *)
-  let relate _kf _bases _state = Base.SetLattice.bottom
+  let relate _bases _state = Base.SetLattice.bottom
 
   let empty () = Traces.empty
   let initialize_variable lv _ ~initialized:_ _ state =
