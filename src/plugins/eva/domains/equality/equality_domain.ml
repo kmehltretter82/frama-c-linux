@@ -58,7 +58,19 @@ module Deps = struct
   let concat (m1, i1) (m2, i2) =
     HCEToZone.union m1 m2, BaseToHCESet.union i1 i2
 
-  let intersects (m, i: t) z =
+  let intersect =
+    let cache_name = "Equality_domain.Deps.intersect" in
+    BaseToHCESet.fold2_join_heterogeneous
+      ~cache:(Hptmap_sig.PersistentCache cache_name)
+      ~empty_left:(fun _ -> HCESet.empty)
+      ~empty_right:(fun _ -> HCESet.empty)
+      ~both:(fun _key set _ -> set)
+      ~join:HCESet.union
+      ~empty:HCESet.empty
+
+  let intersect_bases (_m, i: t) (bases: Base.Hptset.t) = intersect i bases
+
+  let intersect_zone (m, i: t) (z: Locations.Zone.t) =
     let aux_e e acc =
       try
         let z_e = HCEToZone.find e m in
@@ -100,6 +112,19 @@ module Deps = struct
       (m, i)
     with Not_found -> (* cannot find [e] in [m] *)
       state
+
+  let bases_of_set =
+    let cache_name = "Equality_domain.Deps.bases_of_set" in
+    let to_bases =
+      HCEToZone.fold2_join_heterogeneous
+        ~cache:(Hptmap_sig.PersistentCache cache_name)
+        ~empty_left:(fun _ -> Base.SetLattice.empty)
+        ~empty_right:(fun _ -> Base.SetLattice.empty)
+        ~both:(fun _key zone _ -> Locations.Zone.get_bases zone)
+        ~join:Base.SetLattice.join
+        ~empty:Base.SetLattice.empty
+    in
+    fun (m, _i: t) (set: HCESet.t) -> to_bases m set
 
 end
 
@@ -252,7 +277,7 @@ struct
         | Hcexprs.Modified -> Locations.Zone.join modified_zone zone
         | Hcexprs.Deleted -> Locations.Zone.diff modified_zone zone
       in
-      match Deps.intersects deps zone with
+      match Deps.intersect_zone deps zone with
       | [] -> equalities, deps, modified_zone
       | atoms ->
         let extract_lval h = Option.get (HCE.to_lval h) in
@@ -523,10 +548,19 @@ struct
   let initialize_variable _ _ ~initialized:_ _ state = state
   let initialize_variable_using_type _ _ state  = state
 
-  let relate kf _bases _state =
-    match call_init_state kf with
-    | ISEmpty | ISFormals -> Base.SetLattice.empty
-    | ISCaller -> Base.SetLattice.top
+  let relate _kf bases (equalities, deps, _modified_zone) =
+    if Equality.Set.is_empty equalities then
+      Base.SetLattice.empty
+    else
+      let hce_set = Deps.intersect_bases deps bases in
+      let gather hce acc =
+        match Equality.Set.find_option hce equalities with
+        | None -> acc
+        | Some equality -> HCESet.union (Equality.Equality.to_set equality) acc
+      in
+      let related_hce_set = HCESet.fold gather hce_set hce_set in
+      Deps.bases_of_set deps related_hce_set
+
 end
 
 

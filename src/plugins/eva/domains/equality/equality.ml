@@ -32,6 +32,8 @@ type elt = Hcexprs.HCE.t
 module Equality = struct
   include HCESet
 
+  let to_set t = t
+
   (* cardinality less or equal to 1: not a real equivalence class *)
   let is_trivial s =
     try fold (fun _ acc -> if acc = 0 then 1 else raise Exit) s 0 <= 1
