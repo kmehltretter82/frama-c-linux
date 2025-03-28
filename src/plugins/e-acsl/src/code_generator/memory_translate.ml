@@ -288,10 +288,9 @@ let range_to_ptr_and_size ~adata ~loc kf env ptr r p =
   in
   ptr, size, adata, env
 
-(* Take a term without range [t] and return a tuple [(ptr, size, env)] where
-   [ptr] is an expression representing the term, [size] is the size of the
-   expression in bytes and [env] is the current environment.
-   [p] is the predicate under test. *)
+(* For a term without range [t] return a tuple [(ptr, size, adata, env)] where
+   [ptr] is an expression representing [t], [sizeof] is the size of the
+   expression in bytes. [adata] and [env] as usual. *)
 let term_to_ptr_and_size ~adata ~loc kf env t =
   let (e, adata), env =
     Env.with_params_and_result
