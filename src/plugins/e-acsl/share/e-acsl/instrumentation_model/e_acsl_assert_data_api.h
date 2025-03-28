@@ -38,6 +38,10 @@
 /*@ ghost extern int __fc_heap_status; */
 #endif
 
+// Use an array of arbitrary length to serve as dynamic allocation base in the
+// specifications so that Eva can better interpret contracts in this file.
+//@ ghost eacsl_assert_data_value_t __fc_eacsl_assert_data_value_base[INT32_MAX];
+
 #define eacsl_assert_register_bool      export_alias(assert_register_bool)
 #define eacsl_assert_register_char      export_alias(assert_register_char)
 #define eacsl_assert_register_schar     export_alias(assert_register_schar)
@@ -71,96 +75,132 @@
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_bool(eacsl_assert_data_t *data, const char *name,
                                 int is_enum, _Bool value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_char(eacsl_assert_data_t *data, const char *name,
                                 int is_enum, char value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_schar(eacsl_assert_data_t *data, const char *name,
                                  int is_enum, signed char value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_uchar(eacsl_assert_data_t *data, const char *name,
                                  int is_enum, unsigned char value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value; */
-/* @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_int(eacsl_assert_data_t *data, const char *name,
                                int is_enum, int value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_uint(eacsl_assert_data_t *data, const char *name,
                                 int is_enum, unsigned int value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_short(eacsl_assert_data_t *data, const char *name,
                                  int is_enum, short value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_ushort(eacsl_assert_data_t *data, const char *name,
                                   int is_enum, unsigned short value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_long(eacsl_assert_data_t *data, const char *name,
                                 int is_enum, long value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_ulong(eacsl_assert_data_t *data, const char *name,
                                  int is_enum, unsigned long value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_longlong(eacsl_assert_data_t *data, const char *name,
                                     int is_enum, long long value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_ulonglong(eacsl_assert_data_t *data,
                                      const char *name, int is_enum,
                                      unsigned long long value)
@@ -168,8 +208,11 @@ void eacsl_assert_register_ulonglong(eacsl_assert_data_t *data,
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, *value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:is_enum, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_mpz(eacsl_assert_data_t *data, const char *name,
                                int is_enum, const eacsl_mpz_t value)
     __attribute__((FC_BUILTIN));
@@ -182,30 +225,42 @@ void eacsl_assert_register_mpz(eacsl_assert_data_t *data, const char *name,
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_float(eacsl_assert_data_t *data, const char *name,
                                  float value) __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_double(eacsl_assert_data_t *data, const char *name,
                                   double value) __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_longdouble(eacsl_assert_data_t *data,
                                       const char *name, long double value)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, *value;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:value;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_mpq(eacsl_assert_data_t *data, const char *name,
                                const eacsl_mpq_t value)
     __attribute__((FC_BUILTIN));
@@ -218,15 +273,21 @@ void eacsl_assert_register_mpq(eacsl_assert_data_t *data, const char *name,
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, ptr;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:ptr;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_ptr(eacsl_assert_data_t *data, const char *name,
                                void *ptr) __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status, array;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name, indirect:array;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_array(eacsl_assert_data_t *data, const char *name,
                                  void *array) __attribute__((FC_BUILTIN));
 
@@ -238,22 +299,31 @@ void eacsl_assert_register_array(eacsl_assert_data_t *data, const char *name,
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_fun(eacsl_assert_data_t *data, const char *name)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_struct(eacsl_assert_data_t *data, const char *name)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_union(eacsl_assert_data_t *data, const char *name)
     __attribute__((FC_BUILTIN));
 
@@ -265,8 +335,11 @@ void eacsl_assert_register_union(eacsl_assert_data_t *data, const char *name)
 
 /*@ requires \valid(data);
   @ requires data->values == \null || \valid(data->values);
-  @ assigns data->values \from indirect:__fc_heap_status;
-  @ // admit ensures \valid(data->values); */
+  @ allocates data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from &__fc_eacsl_assert_data_value_base,
+                               indirect:name;
+  @ ensures \valid(data->values); */
 void eacsl_assert_register_other(eacsl_assert_data_t *data, const char *name)
     __attribute__((FC_BUILTIN));
 
@@ -279,14 +352,20 @@ void eacsl_assert_register_other(eacsl_assert_data_t *data, const char *name)
 /*@ requires \valid(dest) && \valid(src);
   @ requires dest->values == \null || \valid(dest->values);
   @ requires src->values == \null || \valid(src->values);
-  @ assigns dest->values \from indirect:__fc_heap_status, indirect:src->values;
-  @ // admit ensures dest->values == \null || \valid(dest->values); */
+  @ allocates dest->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns dest->values \from &__fc_eacsl_assert_data_value_base;
+  @ ensures dest->values == \null || \valid(dest->values); */
 void eacsl_assert_copy_values(eacsl_assert_data_t *dest,
                               eacsl_assert_data_t *src)
     __attribute__((FC_BUILTIN));
 
 /*@ requires \valid(data);
-  @ assigns \nothing; */
+  @ requires data->values == \null || \valid(data->values);
+  @ frees data->values;
+  @ assigns __fc_heap_status \from __fc_heap_status;
+  @ assigns data->values \from \nothing;
+  @ ensures data->values == \null; */
 void eacsl_assert_clean(eacsl_assert_data_t *data) __attribute__((FC_BUILTIN));
 
 /* }}} */
