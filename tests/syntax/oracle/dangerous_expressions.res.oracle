@@ -28,6 +28,7 @@ int main(void)
   p --;
   ;
   int *tmp_3 = ss.s1[2].a;
+  int tmp_5 = *p / 0;
   tmp_0_0 = p;
   p --;
   int d = *p;

@@ -1975,6 +1975,18 @@ struct
         locals = b.blocals }
     | _ -> i2c (s,[],[],[])
 
+  (* There is a known bug if the chunk is not empty and the expression
+     is dangerous : if the returned expression is not evaluated in the chunk we
+     drop it anyway. In most cases its not the case, for instance [t[i] = 42;]
+     becomes [*(t + i) = 42;] and returns the expression [*(t + i)] which can be
+     safely ignored. But [(t[i]=42)/0;] becomes [int tmp = 1; *(t + i) = 42;] and
+     the division by 0 is ignored. Removing [isEmpty s'] solves the issue, but
+     keeps a lot of of useless expression like the first example (cf. issue
+     #1529).
+  *)
+  let is_dangerous_computation se e =
+    isEmpty se && is_dangerous e
+
   (* We can duplicate a chunk if it has a few simple statements, and if
    * it does not have cases, locals or statics *)
   let duplicateChunk (c: chunk) = (* raises Failure if you should not
@@ -7022,10 +7034,15 @@ and doExp local_env
           (* Pass on the action *)
           (r, sofar @@@ (se, ghost), e', t')
         | e :: rest ->
-          let (_, se, _, _) =
+          let (_, se, e', _) =
             doExp (no_paren_local_env local_env) CNoConst e ADrop
           in
-          loop (sofar @@@ (se, ghost)) rest
+          let se' =
+            if is_dangerous_computation se e' then
+              se @@@ (keepPureExpr ~ghost e' loc, ghost)
+            else se
+          in
+          loop (sofar @@@ (se', ghost)) rest
         | [] -> Kernel.fatal ~current:true "empty COMMA expression"
       in
       loop empty el
@@ -9867,22 +9884,21 @@ and doStatement local_env (s : Cabs.statement) : chunk =
       let (s', e', t') = doFullExp local_env CNoConst e (AExp None) in
       data := Some (e', t');      (* Record the result *)
       s'
-    end else
+    end
+    else
       let (s', e', _) = doFullExp local_env CNoConst e ADrop in
       (* drop the side-effect free expression unless the whole computation
          is pure and it contains potential threats (i.e. dereference)
       *)
-      if isEmpty s' && is_dangerous e'
-      then
+      if is_dangerous_computation s' e' then
         s' @@@ (keepPureExpr ~ghost e' loc, ghost)
-      else
-        begin
-          if (isEmpty s') then begin
-            let name = !currentFunctionFDEC.svar.vorig_name in
-            IgnorePureExpHook.apply (name, e');
-          end;
-          s'
-        end
+      else begin
+        if (isEmpty s') then begin
+          let name = !currentFunctionFDEC.svar.vorig_name in
+          IgnorePureExpHook.apply (name, e');
+        end;
+        s'
+      end
 
   | Cabs.BLOCK (b, _, _) ->
     let c = doBodyScope local_env b in
