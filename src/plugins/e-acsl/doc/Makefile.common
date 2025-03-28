@@ -40,11 +40,11 @@ include $(EACSL_DIR)/doc/support/MakeLaTeXModern
 	ocamllex $<
 
 %.pdf: %.tex
-	pdflatex $*
+	pdflatex -halt-on-error $*
 	makeindex $*
 	bibtex $*
-	pdflatex $*
-	pdflatex $*
+	pdflatex -halt-on-error $*
+	pdflatex -halt-on-error $*
 
 %.cmo: %.ml
 	ocamlc -c $<

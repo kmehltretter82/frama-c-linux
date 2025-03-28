@@ -20,29 +20,21 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let analyses_feedback msg =
-  Options.feedback ~level:2 "%s in %a" msg Project.pretty (Project.current ())
+(** A bijective hash map implementation based on a pair of hash tables *)
 
-let preprocess () =
-  let ast = Ast.get () in
-  analyses_feedback "preprocessing annotations";
-  Logic_normalizer.preprocess ast;
-  analyses_feedback "normalizing quantifiers";
-  Bound_variables.preprocess ast;
-  analyses_feedback "infering interval of annotations";
-  Interval.infer_program ast;
-  analyses_feedback "typing annotations";
-  Typing.type_program ast;
-  analyses_feedback
-    "computing future locations of labeled predicates and terms";
-  Labels.preprocess ast
+module Make (H : Hashtbl.S) : sig
+  val clear : unit -> unit
 
-let reset () =
-  Memory_tracking.reset ();
-  Literal_strings.reset ();
-  Bound_variables.clear_guards ();
-  Logic_normalizer.clear ();
-  Inductive.clear ();
-  Interval.clear ();
-  Typing.clear ();
-  Labels.reset ()
+  val add : H.key -> H.key -> unit
+
+  val tails : H.key -> H.key list
+  val tail : H.key -> H.key
+  val tail_opt : H.key -> H.key option
+
+  val heads : H.key -> H.key list
+  val head : H.key -> H.key
+  val head_opt : H.key -> H.key option
+
+  val tail_or_self : H.key -> H.key
+  val head_or_self : H.key -> H.key
+end

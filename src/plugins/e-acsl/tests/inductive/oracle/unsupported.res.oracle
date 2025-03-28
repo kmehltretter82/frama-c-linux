@@ -1,0 +1,71 @@
+[e-acsl] beginning translation.
+[e-acsl:analysis:inductive] no valid mode found for: P1
+[e-acsl] Warning: Unable to extract executable code from inductive definition of P1.
+  See language reference manual for details on the supported forms.
+[e-acsl:analysis:inductive] no valid mode found for: P2
+[e-acsl] Warning: Unable to extract executable code from inductive definition of P2.
+  See language reference manual for details on the supported forms.
+[e-acsl:analysis:inductive] no valid mode found for: P3
+[e-acsl] Warning: Unable to extract executable code from inductive definition of P3.
+  See language reference manual for details on the supported forms.
+[e-acsl:analysis:inductive] unsupported.c:33: 
+  deep recursive occurrence of even in incomplete mode
+[e-acsl:analysis:inductive] unsupported.c:33: 
+  unsupported form: \forall integer a; a >= 2 ==> !even(a - 1) ==> even(a)
+[e-acsl] Warning: Unable to extract executable code from inductive definition of even.
+  See language reference manual for details on the supported forms.
+[e-acsl:analysis:inductive] no valid mode found for: eq
+[e-acsl] Warning: Unable to extract executable code from inductive definition of eq.
+  See language reference manual for details on the supported forms.
+[e-acsl:analysis:inductive] no valid mode found for: is_max
+[e-acsl] Warning: Unable to extract executable code from inductive definition of is_max.
+  See language reference manual for details on the supported forms.
+[e-acsl] unsupported.c:69: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:70: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:71: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:72: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:73: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:74: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:75: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] unsupported.c:78: Warning: 
+  E-ACSL construct
+  `inductive definitions outside of subset described in the reference manual'
+  is not yet supported.
+  Ignoring annotation.
+[e-acsl] translation done in project "e-acsl".
+[eva:alarm] unsupported.c:69: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:70: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:71: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:72: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:73: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:74: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:75: Warning: assertion got status unknown.
+[eva:alarm] unsupported.c:78: Warning: assertion got status unknown.

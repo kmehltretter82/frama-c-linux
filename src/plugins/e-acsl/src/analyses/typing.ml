@@ -661,7 +661,8 @@ let rec type_term
           Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->
           type_args type_arg;
-          Error.not_yet "inductive definitons"
+          Error.not_yet "inductive definitions outside of \
+                         subset described in the reference manual"
       end
 
     | Tunion _ -> Error.not_yet "tset union"
@@ -694,7 +695,9 @@ let rec type_term
   in
   let t = Logic_normalizer.get_term t in
   let pp_call_with_result fmt result =
-    Format.fprintf fmt "type_term ~use_gmp_opt:%b" use_gmp_opt;
+    Format.fprintf fmt "type_term ~profile:%a ~use_gmp_opt:%b"
+      Profile.pretty profile
+      use_gmp_opt;
     Option.iter (Format.fprintf fmt " ~ctx:%a" Number_ty.pretty) ctx;
     if not @@ Profile.is_empty profile then
       Format.fprintf fmt " ~profile:%a" Profile.pretty profile;
