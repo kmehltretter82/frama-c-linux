@@ -70,15 +70,15 @@
 #define eacsl_delete_block          export_alias(delete_block)
 
 /* Predicates */
-#define eacsl_offset       export_alias(offset)
-#define eacsl_base_addr    export_alias(base_addr)
-#define eacsl_block_length export_alias(block_length)
-#define eacsl_valid_read   export_alias(valid_read)
-#define eacsl_valid        export_alias(valid)
+#define eacsl_offset         export_alias(offset)
+#define eacsl_base_addr      export_alias(base_addr)
+#define eacsl_block_length   export_alias(block_length)
+#define eacsl_valid_read     export_alias(valid_read)
+#define eacsl_valid          export_alias(valid)
 #define eacsl_object_pointer export_alias(object_pointer)
-#define eacsl_initialized  export_alias(initialized)
-#define eacsl_freeable     export_alias(freeable)
-#define eacsl_separated    export_alias(separated)
+#define eacsl_initialized    export_alias(initialized)
+#define eacsl_freeable       export_alias(freeable)
+#define eacsl_separated      export_alias(separated)
 
 /* Block initialization  */
 #define eacsl_mark_readonly export_alias(mark_readonly)
@@ -271,7 +271,6 @@ void eacsl_mark_readonly(void *ptr) __attribute__((FC_BUILTIN));
  * a block allocated via \p malloc, \p calloc or \p realloc. */
 /*@ assigns \result \from ptr; */
 int eacsl_freeable(void *ptr) __attribute__((FC_BUILTIN));
-
 
 /*! \brief Implementation of the \b \\valid predicate of E-ACSL.
  *
