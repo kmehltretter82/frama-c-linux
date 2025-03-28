@@ -346,6 +346,9 @@ module Domain = struct
   let relate _ _ = Base.SetLattice.empty
   let log_category = Self.register_category "d-mthread"
 
+  let project _bases state = state
+  let overwrite _bases ~on:_ ~by = by (* Completely unsound! *)
+
   let post_analysis _ =
     let pp stmt state =
       Self.debug ~dkey:log_category

@@ -188,7 +188,7 @@ struct
                 Printer.pp_location (Cil_datatype.Stmt.loc stmt);
               `Bottom
           in
-          Dom.filter shared_bases state
+          Dom.project shared_bases state
         in
         match state with
         | `Bottom -> acc_map (* no interference to add *)
@@ -315,8 +315,7 @@ struct
       | `Bottom -> state
       | `Value interferences_state ->
         let result =
-          Dom.reuse current.shared_bases
-            ~current_input:state ~previous_output:interferences_state
+          Dom.overwrite current.shared_bases ~on:state ~by:interferences_state
         in
         Dom.join state result
     end

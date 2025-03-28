@@ -199,20 +199,20 @@ module D : Abstract_domain.Leaf
 
   (* Memexec *)
   let relate _bases _state = Base.SetLattice.empty
-  let filter bases state =
-    Memory.filter_by_shape bases state
 
-  let reuse bases ~current_input:input ~previous_output:output =
-    let input =
-      Memory.filter_base (fun b -> not (Base.Hptset.mem b bases)) input
-    in
+  let filter = Memory.filter_by_shape
+  let project = filter
+
+  let overwrite bases ~on:state ~by =
     let state =
-      match output with
-      | Memory.Bottom | Memory.Top as state -> state
-      | Memory.Map outputs ->
-        Memory.fold Memory.add_base outputs input
+      Memory.filter_base (fun b -> not (Base.Hptset.mem b bases)) state
     in
-    state
+    match by with
+    | Memory.Bottom | Memory.Top as state -> state
+    | Memory.Map outputs -> Memory.fold Memory.add_base outputs state
+
+  let reuse bases ~current_input ~previous_output =
+    overwrite bases ~on:current_input ~by:previous_output
 
   (* Initial state *)
   let initialize_variable_using_type _ _ state = state

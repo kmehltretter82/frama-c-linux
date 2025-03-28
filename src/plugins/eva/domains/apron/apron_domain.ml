@@ -521,17 +521,19 @@ module Make (Man : Input) = struct
     else
       constraint_to_typ env state ok_vars
 
-  let kill_bases loc state =
+  let kill_bases bases state =
+    let var_of_base base acc =
+      try (Base.to_varinfo base) :: acc
+      with Base.Not_a_C_variable -> acc
+    in
+    let vars = Base.Hptset.fold var_of_base bases [] in
+    forget_varinfo_list ~remove:false vars state
+
+  let kill_location loc state =
     let aux_ploc loc state =
       let bases = Locations.Location_Bits.get_bases loc.Locations.loc in
       match bases with
-      | Base.SetLattice.Set set ->
-        let var_of_base base acc =
-          try (Base.to_varinfo base) :: acc
-          with Base.Not_a_C_variable -> acc
-        in
-        let vars = Base.Hptset.fold var_of_base set [] in
-        forget_varinfo_list ~remove:false vars state
+      | Base.SetLattice.Set set -> kill_bases set state
       | Base.SetLattice.Top  -> make_top (Abstract1.env state)
     in
     Precise_locs.fold aux_ploc loc state
@@ -608,7 +610,7 @@ module Make (Man : Input) = struct
              variables are added here, and removed when the scope changes. *)
           Abstract1.assign_texpr man state var exp None
         with
-        | Out_of_Scope _ -> kill_bases lvalue.lloc state
+        | Out_of_Scope _ -> kill_location lvalue.lloc state
       in
       maybe_bottom state
     with Manager.Error exclog -> abort exclog
@@ -669,7 +671,7 @@ module Make (Man : Input) = struct
 
   let finalize_call _stmt _call _recursion ~pre:_ ~post = `Value post
 
-  let logic_assign _assigns location state = kill_bases location state
+  let logic_assign _assigns location state = kill_location location state
 
   let empty () = top
 
@@ -681,6 +683,8 @@ module Make (Man : Input) = struct
   let initialize_variable_using_type _kind _varinfo state = state
 
   let relate _ _ = Base.SetLattice.top
+
+  let overwrite bases ~on:state ~by:_ = kill_bases bases state
 end
 
 

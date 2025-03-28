@@ -370,9 +370,15 @@ module Domain = struct
                  locs_control = filter_base state.locs_control;
                  assume_stmts = Stmt.Set.empty; }
 
+  let project = filter
+
+  let overwrite bases ~on:state ~by =
+    let state = remove_bases bases state in
+    { state with locs_data = Zone.join state.locs_data by.locs_data;
+                 locs_control = Zone.join state.locs_control by.locs_control; }
+
   let reuse bases ~current_input ~previous_output =
-    let state = remove_bases bases current_input in
-    join state previous_output
+    overwrite bases ~on:current_input ~by:previous_output
 end
 
 include Domain

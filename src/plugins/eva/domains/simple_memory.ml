@@ -326,10 +326,10 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
 
   let relate _bases _state = Base.SetLattice.empty
 
-  let filter bases state =
-    M.filter (fun elt -> Base.Hptset.mem elt bases) state
+  let filter = M.inter_with_shape
+  let project = filter
 
-  let reuse bases ~current_input ~previous_output =
+  let overwrite bases ~on ~by =
     let cache = Hptmap_sig.NoCache in
     let decide_both _key _v1 v2 = Some v2 in
     let decide_left key v1 =
@@ -337,7 +337,10 @@ module Make_Domain (Info: sig val name: string end) (Value: Value) = struct
     in
     merge ~cache ~symmetric:false ~idempotent:true
       ~decide_both ~decide_left:(Traversing decide_left) ~decide_right:Neutral
-      current_input previous_output
+      on by
+
+  let reuse bases ~current_input ~previous_output =
+    overwrite bases ~on:current_input ~by:previous_output
 
   let add = M.add
   let find = M.find

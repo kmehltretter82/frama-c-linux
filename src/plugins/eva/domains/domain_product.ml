@@ -304,11 +304,20 @@ module Make
   let filter bases (left, right) =
     Left.filter bases left, Right.filter bases right
 
+  let project bases (left, right) =
+    Left.project bases left, Right.project bases right
+
   let reuse bases ~current_input ~previous_output =
     let left_input, right_input = current_input
     and left_output, right_output = previous_output in
     Left.reuse bases ~current_input:left_input ~previous_output:left_output,
     Right.reuse bases ~current_input:right_input ~previous_output:right_output
+
+  let overwrite bases ~on ~by =
+    let left_on, right_on = on
+    and left_by, right_by = by in
+    Left.overwrite bases ~on:left_on ~by:left_by,
+    Right.overwrite bases ~on:right_on ~by:right_by
 
   let merge_tbl left_tbl right_tbl =
     let tbl = Callstack.Hashtbl.create 7 in

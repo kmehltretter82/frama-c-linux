@@ -421,6 +421,14 @@ module Zone = struct
 
   let get_bases = get_keys
 
+  let of_bases bases =
+    let f base _ =
+      match Base.bits_sizeof base with
+      | Top -> Int_Intervals.top
+      | Value size -> Int_Intervals.inject_bounds Int.zero size
+    in
+    Map (M.from_shape f bases)
+
   let shape x = x
 
   let fold2_join_heterogeneous ~cache ~empty_left ~empty_right ~both ~join ~empty =

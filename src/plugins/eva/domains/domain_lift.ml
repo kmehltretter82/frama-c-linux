@@ -165,6 +165,8 @@ module Make
   let relate = Domain.relate
   let filter = Domain.filter
   let reuse = Domain.reuse
+  let project = Domain.project
+  let overwrite = Domain.overwrite
 
   module Store = Domain.Store
 

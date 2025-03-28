@@ -621,6 +621,17 @@ module D : Abstract_domain.Leaf
          Memory.add_key elt value zone acc)
       keys state
 
+  let project _bases _state = top
+
+  (* Removes properties about [bases] from [state].
+     The resulting state does not satisfy [_check state], as some extra
+     dependencies of keys removed from the [current_input] may remain.*)
+  let overwrite bases ~on:state ~by:_ =
+    let keys base = B2K.find_default base state.Memory.deps in
+    let add_keys base acc = Hcexprs.HCESet.union acc (keys base) in
+    let keys = Base.Hptset.fold add_keys bases Hcexprs.HCESet.empty in
+    Memory.remove_keys keys state
+
   (* Initial state. Initializers are singletons, so we store nothing. *)
   let initialize_variable_using_type _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state

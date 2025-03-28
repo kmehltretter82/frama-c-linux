@@ -1273,6 +1273,9 @@ module D : Abstract_domain.Leaf
     | IntraproceduralAll
     | IntraproceduralNonReferenced -> Base.SetLattice.empty
 
+  let overwrite bases ~on:state ~by:_ =
+    Base.Hptset.fold G.kill_base bases state
+
   (* Initial state *)
   let initialize_variable_using_type _ _ state = state
   let initialize_variable _ _ ~initialized:_ _ state = state

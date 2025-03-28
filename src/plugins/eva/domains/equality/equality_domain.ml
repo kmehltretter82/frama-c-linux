@@ -561,6 +561,9 @@ struct
       let related_hce_set = HCESet.fold gather hce_set hce_set in
       Deps.bases_of_set deps related_hce_set
 
+  let overwrite bases ~on:state ~by:_ =
+    kill Hcexprs.Modified (Locations.Zone.of_bases bases) state
+
 end
 
 

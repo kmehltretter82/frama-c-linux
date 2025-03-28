@@ -223,7 +223,12 @@ module State = struct
   let filter bases (state, clob) =
     Cvalue.Model.filter_by_shape bases state, clob
 
+  let project = filter
+
   let reuse _bases ~current_input:(state, _) ~previous_output:(output, clob) =
+    Cvalue.Model.merge ~into:state output, clob
+
+  let overwrite _bases ~on:(state, clob) ~by:(output, _) =
     Cvalue.Model.merge ~into:state output, clob
 
   (* ------------------------------------------------------------------------ *)

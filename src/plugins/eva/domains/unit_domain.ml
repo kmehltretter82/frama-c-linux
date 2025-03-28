@@ -75,4 +75,5 @@ module Make
   let initialize_variable_using_type _ _ _  = ()
 
   let relate _ () = Base.SetLattice.empty
+  let overwrite _ ~on:_ ~by:_ = ()
 end

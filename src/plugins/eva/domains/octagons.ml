@@ -1922,6 +1922,12 @@ module Domain = struct
     else
       let t = interprocedural_reuse ~current_input ~previous_output in
       check "reuse result" t
+
+  (* Could be optimized by sharing code with [filter] below. *)
+  let overwrite bases ~on:state ~by:_ =
+    let base_deps base = Deps.intersects_base state.deps base in
+    let vars = List.concat_map base_deps (Base.Hptset.elements bases) in
+    List.fold_left remove state vars
 end
 
 include Domain

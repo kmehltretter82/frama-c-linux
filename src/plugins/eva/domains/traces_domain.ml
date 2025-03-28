@@ -1244,6 +1244,8 @@ module D = struct
   let leave_scope kf vars state =
     Traces.add_trans state (LeaveScope (kf, vars))
 
+  let overwrite _bases ~on: state ~by:_ = state
+
   let output_dot (filename : Filepath.t) state =
     let out = open_out (filename :> string) in
     Self.feedback ~dkey:log_category "@[Output dot produced to %a.@]"
