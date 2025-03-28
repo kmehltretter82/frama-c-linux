@@ -195,7 +195,7 @@ struct
 end
 
 module Static = MemVar.Static
-module MemRegion = MemRegion.Make(RegionAnalysis)(MemBytes)
+module MemRegion = MemRegion.Make(RegionAnalysis)(MemBytes)(MemBytes.LOADER)
 module MemEva = MemVal.Make(MemVal.Eva)
 
 (* -------------------------------------------------------------------------- *)

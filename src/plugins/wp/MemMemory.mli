@@ -39,7 +39,6 @@ val f_memcpy : lfun
 val f_set_init : lfun
 
 val p_is_init_r : lfun
-val p_monotonic : lfun
 
 val cinits : term -> pred
 val sconst : term -> pred

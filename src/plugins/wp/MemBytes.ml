@@ -53,8 +53,6 @@ struct
   let sconst m = p_call p_sconst [m]
   let p_is_init_range = Lang.extern_fp ~library "is_init_range"
   let is_init_range m a size = p_call p_is_init_range [ m ; a ; size ]
-  let f_set_init_range = Lang.extern_fp ~library "set_init_range"
-  let set_init_range m a size = e_fun f_set_init_range [ m ; a ; size ]
 
   let ty_fst_arg_val = function
     | Some (Qed.Logic.Array (_, Qed.Logic.Array (_, t))) :: _ -> t
@@ -561,7 +559,7 @@ let load_pointer_raw memory _ty loc =
 let load_pointer sigma _ty loc =
   MemAddr.addr_of_int @@ load_int sigma (Ctypes.c_ptr ()) loc
 
-let load_init memory size loc =
+let load_init_raw memory size loc =
   match size with
   | 1 -> WBytes.read_init8  memory loc
   | 2 -> WBytes.read_init16 memory loc
@@ -569,10 +567,10 @@ let load_init memory size loc =
   | 8 -> WBytes.read_init64 memory loc
   | _ -> assert false
 
-let is_init_atom sigma obj loc =
+let load_init_atom sigma obj loc =
   let init_memory = Sigma.value sigma m_init in
   let size = sizeof_object obj in
-  load_init init_memory size loc
+  load_init_raw init_memory size loc
 
 let store_int sigma kind addr v =
   let write = match kind with
@@ -604,13 +602,13 @@ let store_init_raw m size loc v =
   in
   write m loc v
 
-let set_init_atom sigma obj loc v =
+let store_init_atom sigma obj loc v =
   let init_memory = Sigma.value sigma m_init in
   let size = sizeof_object obj in
   m_init, store_init_raw init_memory size loc v
 
-module Model = struct
-
+module LOADER =
+struct
   let name = "MemBytes.Loader"
 
   type nonrec loc = loc
@@ -619,7 +617,6 @@ module Model = struct
   let field = field
   let shift = shift
 
-  let to_addr l = l
   let to_region_pointer l = 0,l
   let of_region_pointer _r _obj l = l
 
@@ -653,21 +650,7 @@ module Model = struct
     let n = protected_sizeof_object obj in
     e_sub (e_div (allocated sigma l) n) e_one
 
-  let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu Alloc -> msrc
-    | State.Mu _ ->
-      let n = e_mul (e_int @@ sizeof_object obj) length in
-      WBytes.memcpy mtgt msrc ltgt lsrc n
-    | _ -> assert false
-
-  let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu Alloc -> msrc
-    | State.Mu _ ->
-      let n = length in
-      WBytes.memcpy mtgt msrc ltgt lsrc n
-    | _ -> assert false
+  let memcpy _chunk = WBytes.memcpy
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
@@ -683,24 +666,20 @@ module Model = struct
   let load_int = load_int
   let load_float = load_float
   let load_pointer = load_pointer
+  let load_init_atom = load_init_atom
 
   let store_int = store_int
   let store_float = store_float
   let store_pointer = store_pointer
+  let store_init_atom = store_init_atom
 
-  let is_init_atom = is_init_atom
   let is_init_range sigma obj loc length =
     let n = e_mul (sizeof obj) length in
     WBytes.is_init_range (Sigma.value sigma m_init) loc n
 
-  let set_init_atom = set_init_atom
-  let set_init obj loc ~length _chunk ~current =
-    let n = e_mul (sizeof obj) length in
-    WBytes.set_init_range current loc n
-
 end
 
-include MemLoader.Make(Model)
+include MemLoader.Make(LOADER)
 
 (* ********************************************************************** *)
 (* BASES                                                                  *)
@@ -1097,18 +1076,3 @@ let scope seq scope xs =
            in e_set m (BASE.get x) size)
         (Sigma.value seq.pre m_alloc) xs in
     [ p_equal (Sigma.value seq.post m_alloc) alloc ]
-
-(* ********************************************************************** *)
-(* API with Region                                                        *)
-(* ********************************************************************** *)
-
-let sizeof = protected_sizeof_object
-let last = Model.last
-let frames = Model.frames
-let eqmem_forall = Model.eqmem_forall
-let set_init = Model.set_init
-let is_init_range = Model.is_init_range
-let value_footprint = Model.value_footprint
-let init_footprint = Model.init_footprint
-let memcpy = Model.memcpy
-let memcpy_enforced_length = Model.memcpy_enforced_length

@@ -20,4 +20,5 @@
 (*                                                                        *)
 (**************************************************************************)
 
-include MemRegion.ModelWithLoader
+include Memory.Model
+module LOADER : MemLoader.Model with type loc = loc

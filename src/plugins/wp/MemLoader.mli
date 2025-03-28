@@ -46,7 +46,6 @@ sig
 
   (** Conversion among loc, t_pointer terms and t_addr terms *)
 
-  val to_addr : loc -> term
   val to_region_pointer : loc -> int * term
   val of_region_pointer : int -> c_object -> term -> loc
 
@@ -57,10 +56,7 @@ sig
 
   val last : sigma -> c_object -> loc -> term
 
-  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
-    length:term -> Chunk.t -> term
-  val memcpy_enforced_length : mtgt:term -> msrc:term ->
-    ltgt:loc -> lsrc:loc -> length:term -> Chunk.t -> term
+  val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
 
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
@@ -68,16 +64,14 @@ sig
   val load_int : sigma -> c_int -> loc -> term
   val load_float : sigma -> c_float -> loc -> term
   val load_pointer : sigma -> typ -> loc -> loc
+  val load_init_atom : sigma -> c_object -> loc -> term
 
   val store_int : sigma -> c_int -> loc -> term -> Chunk.t * term
   val store_float : sigma -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : sigma -> typ -> loc -> term -> Chunk.t * term
+  val store_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
 
-  val is_init_atom : sigma -> c_object -> loc -> term
   val is_init_range : sigma -> c_object -> loc -> term -> pred
-  val set_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
-  val set_init : c_object -> loc -> length:term ->
-    Chunk.t -> current:term -> term
 
 end
 
@@ -91,11 +85,9 @@ sig
   val load_init : sigma -> c_object -> M.loc -> term
   val load_value : sigma -> c_object -> M.loc -> term
 
-  val memcpy : sigma sequence -> c_object -> ?lsrc:M.loc -> M.loc -> equation list
-  val memcpy_length : sigma sequence -> c_object -> ?lsrc:M.loc -> M.loc -> term -> equation list
-
   val stored : sigma sequence -> c_object -> M.loc -> term -> equation list
   val stored_init : sigma sequence -> c_object -> M.loc -> term -> equation list
+
   val copied : sigma sequence -> c_object -> M.loc -> M.loc -> equation list
   val copied_init : sigma sequence -> c_object -> M.loc -> M.loc -> equation list
 

@@ -1035,7 +1035,7 @@ let is_well_formed sigma =
 (* --- Loader                                                             --- *)
 (* -------------------------------------------------------------------------- *)
 
-module MODEL =
+module LOADER =
 struct
   let name = "MemTyped.LOADER"
   type loc = F.term
@@ -1045,34 +1045,19 @@ struct
   let init_footprint = init_footprint
   let value_footprint = value_footprint
   let frames = frames
-  let to_addr l = l
   let to_region_pointer l = 0,l
   let of_region_pointer _ _ l = l
-
-  let load_int sigma i l = F.e_get (State.value sigma (M_int i)) l
-  let load_float sigma f l = F.e_get (State.value sigma (m_float f)) l
-  let load_pointer sigma _t l = F.e_get (State.value sigma M_pointer) l
 
   let last sigma obj l =
     let n = length_of_object obj in
     F.e_sub (F.e_div (allocated sigma l) n) F.e_one
 
-  let memcpy obj ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu T_alloc -> msrc
-    | State.Mu _ ->
-      let n = F.e_mul (length_of_object obj) length in
-      F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
-    | _ -> assert false
+  let load_int sigma i l = F.e_get (State.value sigma (M_int i)) l
+  let load_float sigma f l = F.e_get (State.value sigma (m_float f)) l
+  let load_pointer sigma _t l = F.e_get (State.value sigma M_pointer) l
+  let load_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
 
-  let memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length chunk =
-    match Sigma.ckind chunk with
-    | State.Mu T_alloc -> msrc
-    | State.Mu _ ->
-      let n = length in
-      F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;n]
-    | _ -> assert false
-
+  let memcpy _chunk m m0 l l0 n = F.e_fun f_memcpy [m;m0;l;l0;n]
 
   let eqmem_forall obj loc _chunk m1 m2 =
     let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
@@ -1087,34 +1072,20 @@ struct
   let store_int sigma i l v = updated sigma (M_int i) l v
   let store_float sigma f l v = updated sigma (m_float f) l v
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
-
-  let set_init_atom sigma _obj l v = updated sigma T_init l v
-  let is_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
+  let store_init_atom sigma _obj l v = updated sigma T_init l v
 
   let is_init_range sigma obj loc length =
     let n = F.e_mul (length_of_object obj) length in
     F.p_call p_is_init_r [ State.value sigma T_init ; loc ; n ]
 
-  let set_init obj loc ~length _chunk ~current =
-    let n = F.e_mul (length_of_object obj) length in
-    F.e_fun f_set_init [current;loc;n]
 end
 
-module LOADER = MemLoader.Make(MODEL)
-
-let load = LOADER.load
-let load_init = LOADER.load_init
-let stored = LOADER.stored
-let stored_init = LOADER.stored_init
-let copied = LOADER.copied
-let copied_init = LOADER.copied_init
-let initialized = LOADER.initialized
-let domain = LOADER.domain
+include MemLoader.Make(LOADER)
 
 let assigned seq obj loc =
   (* Maintain always initialized values initialized *)
   Assert (MemMemory.cinits (State.value seq.post T_init)) ::
-  LOADER.assigned seq obj loc
+  assigned seq obj loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)

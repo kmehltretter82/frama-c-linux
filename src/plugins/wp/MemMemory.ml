@@ -46,7 +46,6 @@ let f_set_init =
   Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_set_init "set_init"
 let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits" (* initializaton-table -> prop *)
 let p_is_init_r = Lang.extern_fp ~library "is_init_range"
-let p_monotonic = Lang.extern_fp ~library "monotonic_init"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)

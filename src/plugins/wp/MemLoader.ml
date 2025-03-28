@@ -50,7 +50,6 @@ sig
   val field : loc -> fieldinfo -> loc
   val shift : loc -> c_object -> term -> loc
 
-  val to_addr : loc -> term
   val to_region_pointer : loc -> int * term
   val of_region_pointer : int -> c_object -> term -> loc
 
@@ -61,11 +60,7 @@ sig
 
   val last : sigma -> c_object -> loc -> term
 
-  val memcpy : c_object -> mtgt:term -> msrc:term -> ltgt:loc -> lsrc:loc ->
-    length:term -> Chunk.t -> term
-
-  val memcpy_enforced_length : mtgt:term -> msrc:term ->
-    ltgt:loc -> lsrc:loc -> length:term -> Chunk.t -> term
+  val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
 
   val eqmem_forall :
     c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
@@ -73,16 +68,14 @@ sig
   val load_int : sigma -> c_int -> loc -> term
   val load_float : sigma -> c_float -> loc -> term
   val load_pointer : sigma -> typ -> loc -> loc
+  val load_init_atom : sigma -> c_object -> loc -> term
 
   val store_int : sigma -> c_int -> loc -> term -> Chunk.t * term
   val store_float : sigma -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : sigma -> typ -> loc -> term -> Chunk.t * term
+  val store_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
 
-  val is_init_atom : sigma -> c_object -> loc -> term
   val is_init_range : sigma -> c_object -> loc -> term -> pred
-  val set_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
-  val set_init : c_object -> loc -> length:term ->
-    Chunk.t -> current:term -> term
 
 end
 
@@ -543,7 +536,8 @@ struct
 
   let initialized_loc sigma obj loc =
     match obj with
-    | C_int _ | C_float _ | C_pointer _ -> p_bool (M.is_init_atom sigma obj loc)
+    | C_int _ | C_float _ | C_pointer _ ->
+      p_bool (M.load_init_atom sigma obj loc)
     | C_comp ci -> initialized_comp sigma ci loc
     | C_array a -> initialized_array sigma a loc
 
@@ -565,9 +559,9 @@ struct
   module INIT_LOADER =
     LOADER_GEN
       (struct
-        let load_int sigma ikind = M.is_init_atom sigma (C_int ikind)
-        let load_float sigma fkind = M.is_init_atom sigma (C_float fkind)
-        let load_pointer sigma typ = M.is_init_atom sigma (C_pointer typ)
+        let load_int sigma ikind = M.load_init_atom sigma (C_int ikind)
+        let load_float sigma fkind = M.load_init_atom sigma (C_float fkind)
+        let load_pointer sigma typ = M.load_init_atom sigma (C_pointer typ)
       end)(COMP_INIT)(ARRAY_INIT)
 
   let load_init = INIT_LOADER.load
@@ -577,90 +571,67 @@ struct
   (* --- Mem Copies \ Havocs                                                --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let gen_memcpy_length get_domain s obj ?enforced_length ?lsrc loc length =
-    let memcpy ~mtgt ~msrc ~ltgt ~lsrc c =
-      match enforced_length with
-      | None ->
-        M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length:(e_mul length @@ M.sizeof obj) c
-      | Some l ->
-        M.memcpy_enforced_length ~mtgt ~msrc ~ltgt ~lsrc ~length:l c
-    in
+  let update (s : sigma sequence) ?(init=false) obj loc ?src ?(length = e_one) () =
     let ps = ref [] in
+    let size = F.e_mul length @@ M.sizeof obj in
+    let domain =
+      if init then M.value_footprint obj loc else M.init_footprint obj loc in
     Domain.iter
       (fun chunk ->
-         let pre = Sigma.value s.pre chunk in
-         let updated = match lsrc with
+         let m_pre = Sigma.value s.pre chunk in
+         let m_post = Sigma.value s.post chunk in
+         let m_copied =
+           match src with
            | None ->
              let tau = Chunk.tau_of_chunk chunk in
              let basename = Chunk.basename_of_chunk chunk ^ "_undef" in
-             let fresh = F.e_var (Lang.freshvar ~basename tau) in
-             memcpy ~mtgt:pre ~msrc:fresh ~ltgt:loc ~lsrc:loc chunk
-           | Some lsrc ->
-             memcpy ~mtgt:pre ~msrc:pre ~ltgt:loc ~lsrc chunk
+             let m_undef = F.e_var (Lang.freshvar ~basename tau) in
+             M.memcpy chunk m_pre m_undef loc loc size
+           | Some src ->
+             M.memcpy chunk m_pre m_pre loc src size
          in
-         let post = Sigma.value s.post chunk in
-         ps := Set(post,updated) :: !ps
-      ) (get_domain obj loc) ; !ps
-
-  let memcpy_length = gen_memcpy_length M.value_footprint
-  let memcpy seq obj ?enforced_length ?lsrc ltgt = memcpy_length seq obj ?enforced_length  ltgt ?lsrc F.e_one
-
-  let memcpy_init_length = gen_memcpy_length M.init_footprint
-  let memcpy_init seq obj ?enforced_length ?lsrc ltgt = memcpy_init_length seq obj ?enforced_length ltgt ?lsrc F.e_one
+         ps := Set(m_post,m_copied) :: !ps
+      ) domain ; !ps
 
   (* -------------------------------------------------------------------------- *)
   (* --- Stored & Copied                                                    --- *)
   (* -------------------------------------------------------------------------- *)
 
-  let updated_init_atom seq obj loc value =
-    let chunk_init,mem_init = M.set_init_atom seq.pre obj loc value in
-    Set(Sigma.value seq.post chunk_init,mem_init)
-
-  let updated_atom seq obj loc value =
-    let phi_store sigma = match obj with
-      | C_int i -> M.store_int sigma i
-      | C_float f -> M.store_float sigma f
-      | C_pointer ty -> M.store_pointer sigma ty
-      | _ -> failwith "MemLoader updated_atom called on a non atomic type"
-    in
-    let chunk_store,mem_store = phi_store seq.pre loc value in
-    Set(Sigma.value seq.post chunk_store,mem_store)
+  let stored_chunk seq (c,m) = [ Set(Sigma.value seq.post c,m) ]
 
   let stored seq obj loc value =
     match obj with
-    | C_int _ | C_float _ | C_pointer _ ->
-      [ updated_atom seq obj loc value ]
+    | C_int i -> stored_chunk seq @@ M.store_int seq.pre i loc value
+    | C_float f -> stored_chunk seq @@ M.store_float seq.pre f loc value
+    | C_pointer t -> stored_chunk seq @@ M.store_pointer seq.pre t loc value
     | C_comp _ | C_array _ ->
-      Set(load_value seq.post obj loc, value) :: memcpy seq obj loc
+      Set(load_value seq.post obj loc, value) :: update seq obj loc ()
 
   let stored_init seq obj loc value =
     match obj with
     | C_int _ | C_float _ | C_pointer _ ->
-      [ updated_init_atom seq obj loc value ]
+      stored_chunk seq @@ M.store_init_atom seq.pre obj loc value
     | C_comp _ | C_array _ ->
-      Set(load_init seq.post obj loc, value) :: memcpy_init seq obj loc
+      let v_tgt = load_init seq.post obj loc in
+      Set(v_tgt,value) :: update seq ~init:true obj loc ()
 
+  let copied seq obj loc src =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ ->
+      stored seq obj loc @@ load_value seq.pre obj src
+    | C_comp _ | C_array _ ->
+      let v_src = load_value seq.pre obj src in
+      let v_tgt = load_value seq.post obj loc in
+      Set(v_tgt,v_src) :: update seq obj loc ~src ()
 
-  let gen_copied ~is_init s obj p q =
-    let gen_stored = if is_init then stored_init else stored in
-    let gen_loaded = if is_init then load_init else load_value in
-    let gen_memcpy = if is_init then memcpy_init else memcpy in
-    if Wp_parameters.Havoc.get () then
-      gen_stored s obj p (gen_loaded s.pre obj q)
-    else match obj with
-      | C_int _ | C_float _ | C_pointer _ ->
-        gen_stored s obj p (gen_loaded s.pre obj q)
-      | C_comp _ | C_array _ ->
-        gen_memcpy s obj ~enforced_length:(M.sizeof obj) ~lsrc:q p
-
-  let copied = gen_copied ~is_init:false
-
-  let copied_init = gen_copied ~is_init:true
-
-  let memcpy s ty ?lsrc loc = memcpy s ty ?lsrc loc
-  let memcpy_init s ty ?lsrc loc = memcpy_init s ty ?lsrc loc
-  let memcpy_length s ty ?lsrc loc = memcpy_length s ty ?lsrc loc
-  let memcpy_init_length s ty ?lsrc loc = memcpy_init_length s ty ?lsrc loc
+  let copied_init seq obj loc src =
+    match obj with
+    | C_int _ | C_float _ | C_pointer _ ->
+      stored_init seq obj loc @@ load_init seq.pre obj src
+    | C_comp _ | C_array _ ->
+      let v_src = load_init seq.pre obj src in
+      let v_tgt = load_init seq.post obj loc in
+      Set(v_tgt,v_src) :: update seq ~init:true obj loc ~src ()
 
   (* -------------------------------------------------------------------------- *)
   (* --- Assigned                                                           --- *)
@@ -671,15 +642,17 @@ struct
     | C_int _ | C_float _ | C_pointer _ ->
       let value = Lang.freshvar ~basename:"v" (Lang.tau_of_object obj) in
       let init = Lang.freshvar ~basename:"i" (Lang.init_of_object obj) in
-      [ updated_init_atom seq obj loc (e_var init) ;
-        updated_atom seq obj loc (e_var value) ]
+      stored seq obj loc (e_var value) @
+      stored_init seq obj loc (e_var init)
     | C_comp _ | C_array _ ->
-      memcpy seq obj loc @ memcpy_init seq obj loc
+      update seq obj loc () @
+      update seq ~init:true obj loc ()
 
-  let assigned_range s obj l a b =
+  let assigned_range seq obj l a b =
     let loc = M.shift l obj a in
-    memcpy_length s obj loc (e_range a b) @
-    memcpy_init_length s obj loc (e_range a b)
+    let length = e_range a b in
+    update seq obj loc ~length () @
+    update seq ~init:true obj loc ~length ()
 
   let assigned seq obj sloc =
     (* Assert (M.monotonic_init seq.pre seq.post) :: *)

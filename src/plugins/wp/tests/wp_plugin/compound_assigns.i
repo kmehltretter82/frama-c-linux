@@ -1,19 +1,13 @@
 /* run.config
-   OPT: -wp-model typed  -wp-msg-key print-generated -wp-havoc
-   OPT: -wp-model typed  -wp-msg-key print-generated -wp-no-havoc
-   OPT: -wp-model region -wp-msg-key print-generated -wp-havoc
-   OPT: -wp-model region -wp-msg-key print-generated -wp-no-havoc
-   OPT: -wp-model bytes  -wp-msg-key print-generated -wp-havoc
-   OPT: -wp-model bytes  -wp-msg-key print-generated -wp-no-havoc
+   OPT: -wp-model typed  -wp-msg-key print-generated
+   OPT: -wp-model bytes  -wp-msg-key print-generated
+   OPT: -wp-model region -wp-msg-key print-generated
 */
 
 /* run.config_qualif
-   OPT: -wp-model typed  -wp-havoc
-   OPT: -wp-model typed  -wp-no-havoc
-   OPT: -wp-model region -wp-havoc
-   OPT: -wp-model region -wp-no-havoc
-   OPT: -wp-model bytes  -wp-havoc
-   OPT: -wp-model bytes  -wp-no-havoc
+   OPT: -wp-model typed
+   OPT: -wp-model bytes
+   OPT: -wp-model region
 */
 
 struct A {
