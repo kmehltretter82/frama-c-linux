@@ -155,6 +155,128 @@ end
   Global
 ------------------------------------------------------------
 
+Cluster Axiomatic {
+  
+  Inductive P_reachable
+    (Malloc_0 : int[])
+    (Mptr_0 : addr[addr])
+    (root_0 : addr)
+    (node_0 : addr) =
+    Axiom root_reachable:
+      forall Malloc_0: int[].
+      forall Mptr_0: addr[addr].
+      forall root_0: addr.
+      (P_reachable Malloc_0 Mptr_0 root_0 root_0)
+    Axiom next_reachable:
+      forall Malloc_0: int[].
+      forall Mptr_0: addr[addr].
+      forall root_0: addr.
+      forall node_0: addr.
+      (valid_rw Malloc_0 root_0 2)
+      -> (P_reachable Malloc_0 Mptr_0
+           Mptr_0[(shiftfield_F1__list_next root_0)] node_0)
+      -> (P_reachable Malloc_0 Mptr_0 root_0 node_0)
+  
+  Predicate P_reachable (Malloc_0 : int[]) (Mptr_0 : addr[addr])
+    (root_0 : addr) (node_0 : addr)
+  
+  Predicate P_reachable (root_0 : addr) (node_0 : addr)
+  
+  Inductive P_same_elements
+    (Mint_1 : int[addr])
+    (Mint_0 : int[addr])
+    (a_0 : addr)
+    (b_0 : addr)
+    (begin_0 : int)
+    (end_0 : int) =
+    Axiom refl:
+      forall Mint_0: int[addr].
+      forall Mint_1: int[addr].
+      forall a_0: addr.
+      forall b_0: addr.
+      forall begin_0: int.
+      forall end_0: int.
+      (P_same_array Mint_0 Mint_1 a_0 b_0 begin_0 end_0)
+      -> (P_same_elements Mint_0 Mint_1 a_0 b_0 begin_0 end_0)
+    Axiom swap:
+      forall Mint_0: int[addr].
+      forall Mint_1: int[addr].
+      forall a_0: addr.
+      forall b_0: addr.
+      forall begin_0: int.
+      forall i_0: int.
+      forall j_0: int.
+      forall end_0: int.
+      (P_swap Mint_0 Mint_1 a_0 b_0 begin_0 i_0 j_0 end_0)
+      -> (P_same_elements Mint_0 Mint_1 a_0 b_0 begin_0 end_0)
+    Axiom trans:
+      forall Mint_0: int[addr].
+      forall Mint_2: int[addr].
+      forall Mint_1: int[addr].
+      forall a_0: addr.
+      forall b_0: addr.
+      forall c_0: addr.
+      forall begin_0: int.
+      forall end_0: int.
+      (P_same_elements Mint_0 Mint_2 b_0 c_0 begin_0 end_0)
+      -> (P_same_elements Mint_2 Mint_1 a_0 b_0 begin_0 end_0)
+      -> (P_same_elements Mint_0 Mint_1 a_0 c_0 begin_0 end_0)
+  
+  Predicate P_same_elements (Mint_1 : int[addr]) (Mint_0 : int[addr])
+    (a_0 : addr) (b_0 : addr) (begin_0 : int) (end_0 : int)
+  
+  Predicate P_swap (Mint_0 : int[addr]) (Mint_1 : int[addr]) (a_0 : addr)
+    (b_0 : addr) (begin_0 : int) (i_0 : int) (j_0 : int) (end_0 : int)
+    = (Mint_1[(shift_sint32 a_0 i_0)]=Mint_0[(shift_sint32 b_0 j_0)])
+      /\ (Mint_1[(shift_sint32 a_0 j_0)]=Mint_0[(shift_sint32 b_0 i_0)])
+      /\ (begin_0<=i_0) /\ (i_0<j_0) /\ (j_0<end_0)
+      /\ (forall i_1:int.
+          (i_1!=i_0) -> (i_1!=j_0) -> (begin_0<=i_1) -> (i_1<end_0)
+          -> (Mint_1[(shift_sint32 a_0 i_1)]=Mint_0[(shift_sint32 b_0 i_1)]))
+  
+  Predicate P_same_array (Mint_0 : int[addr]) (Mint_1 : int[addr])
+    (a_0 : addr) (b_0 : addr) (begin_0 : int) (end_0 : int)
+    = forall i_0:int.
+      (begin_0<=i_0) -> (i_0<end_0)
+      -> (Mint_1[(shift_sint32 a_0 i_0)]=Mint_0[(shift_sint32 b_0 i_0)])
+  
+  Predicate P_same_elements (a_0 : addr) (b_0 : addr) (begin_0 : int)
+    (end_0 : int)
+  
+  Lemma test:
+    forall Malloc_0: int[].
+    forall Mptr_0: addr[addr].
+    forall root_0: addr.
+    forall node_0: addr.
+    (P_reachable Malloc_0 Mptr_0 root_0 node_0)
+    -> ((root_0=node_0)
+        \/ ((valid_rw Malloc_0 root_0 2)
+            /\ (P_reachable Malloc_0 Mptr_0
+                 Mptr_0[(shiftfield_F1__list_next root_0)] node_0)))
+  
+  Lemma offset:
+    forall Mint_0: int[addr].
+    forall Mint_1: int[addr].
+    forall a_0: addr.
+    forall b_0: addr.
+    forall begin_0: int.
+    forall end_0: int.
+    forall offset_0: int.
+    (P_same_elements Mint_0 Mint_1 (shift_sint32 a_0 offset_0)
+      (shift_sint32 b_0 offset_0) begin_0 end_0)
+    -> (P_same_elements Mint_0 Mint_1 a_0 b_0 (begin_0+offset_0)
+         (end_0+offset_0))
+  
+}
+
+Cluster Compound {
+  
+  Function shiftfield_F1__list_next (p_0 : addr) : addr = (shift p_0 1)
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
+
 Goal Lemma 'offset':
 Assume Lemmas: 'test'
 Assume {

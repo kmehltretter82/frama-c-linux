@@ -77,6 +77,12 @@ end
   Function f
 ------------------------------------------------------------
 
+Cluster Compound {
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
+
 Goal Post-condition (file sharing.c, line 8) in 'f':
 Let a = shift_sint32(t, 0).
 Let a_1 = shift_sint32(t, x).

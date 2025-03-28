@@ -29,7 +29,7 @@ open Cil_types
 open Cil_datatype
 open Qed.Logic
 open Lang
-open Lang.F
+open F
 
 type trigger = (var,lfun) Qed.Engine.ftrigger
 type typedef = (tau,field,lfun) Qed.Engine.ftypedef
@@ -81,7 +81,7 @@ struct
   open Qed.Engine
 
   let rec of_exp mode t =
-    match F.repr t with
+    match repr t with
     | Fvar x -> TgVar x
     | Aget(a,k) -> TgGet(of_exp Cterm a,of_exp Cterm k)
     | Aset(a,k,v) -> TgSet(of_exp Cterm a,of_exp Cterm k,of_exp Cterm v)
@@ -95,7 +95,7 @@ struct
     | _ -> TgAny
 
   let of_term t = of_exp Cterm t
-  let of_pred p = of_exp Cprop (F.e_prop p)
+  let of_pred p = of_exp Cprop (e_prop p)
 
   let rec collect xs = function
     | TgAny -> xs
@@ -106,15 +106,125 @@ struct
 
   let vars = collect Vars.empty
 
-  (* let rec pretty fmt = function
-   *   | TgAny -> assert false
-   *   | TgVar x -> Lang.F.QED.Var.pretty fmt x
-   *   | TgGet(t,k) -> Format.fprintf fmt "@[<hov 2>%a[%a]@]" pretty t pretty k
-   *   | TgSet(t,k,v) -> Format.fprintf fmt "@[<hov 2>%a[%a@ <- %a]@]" pretty t pretty k pretty v
-   *   | TgFun(f,ts) ->
-   *   | TgProp(f,ts) -> call Cprop f fmt ts *)
-
 end
+
+(* -------------------------------------------------------------------------- *)
+(* --- Printers                                                           --- *)
+(* -------------------------------------------------------------------------- *)
+
+let rec pp_trigger fmt (t : trigger) =
+  match t with
+  | TgAny -> Format.pp_print_string fmt "_"
+  | TgVar a -> pp_var fmt a
+  | TgGet(a, k) ->
+    Format.fprintf fmt "%a[%a]" pp_trigger a pp_trigger k
+  | TgSet(a, k, v) ->
+    Format.fprintf fmt "@[<hov 2>%a[%a@ <- %a]@]" pp_trigger a pp_trigger k pp_trigger v
+  | TgFun(f, vs) | TgProp(f, vs) ->
+    Format.fprintf fmt "@[<hov 2>(%a" Fun.pretty f ;
+    List.iter (Format.fprintf fmt "@ %a" pp_trigger) vs ;
+    Format.fprintf fmt ")@]"
+
+let pp_lemma fmt (l: dlemma) =
+  let kind =
+    match l.l_kind with
+    | Admit -> "Axiom"
+    | Assert -> "Lemma"
+    | Check  -> "Goal"
+  in
+  Format.fprintf fmt "@[<hv 2>%s %s:" kind l.l_name ;
+  List.iter (fun v ->
+      Format.fprintf fmt "@ forall %a: %a."
+        pp_var v
+        pp_tau (tau_of_var v)
+    ) l.l_forall ;
+  List.iter (fun ts ->
+      if ts <> [] then
+        begin
+          Format.fprintf fmt "@ @[<hov 2>[" ;
+          List.iter (Format.fprintf fmt "@ %a" pp_trigger) ts ;
+          Format.fprintf fmt " ]@]" ;
+        end
+    ) l.l_triggers ;
+  Format.fprintf fmt "@ %a@]" pp_pred l.l_lemma
+
+let pp_args fmt vs =
+  List.iter
+    (fun v ->
+       Format.fprintf fmt "@ @[<hov 2>(%a@ : %a)@]"
+         pp_var v pp_tau (tau_of_var v)
+    ) vs
+
+let pp_dfun fmt d =
+  match d.d_definition with
+  | Logic Qed.Logic.Prop ->
+    Format.fprintf fmt "@[<hov 2>Predicate %a%a@]"
+      Fun.pretty d.d_lfun pp_args d.d_params
+  | Logic t ->
+    Format.fprintf fmt "@[<hov 2>Function %a%a : %a@]"
+      Fun.pretty d.d_lfun pp_args d.d_params pp_tau t
+  | Function (t, _, e) ->
+    Format.fprintf fmt "@[<hov 2>Function %a%a : %a@ = %a@]"
+      Fun.pretty d.d_lfun pp_args d.d_params pp_tau t pp_term e
+  | Predicate (_, p) ->
+    Format.fprintf fmt "@[<hov 2>Predicate %a%a@ = %a@]"
+      Fun.pretty d.d_lfun pp_args d.d_params pp_pred p
+  | Inductive dl ->
+    Format.fprintf fmt "@[<hv 2>Inductive %a%a ="
+      Fun.pretty d.d_lfun pp_args d.d_params ;
+    List.iter (Format.fprintf fmt "@ %a" pp_lemma) dl ;
+    Format.fprintf fmt "@]"
+
+let pp_record fmt (c : compinfo) =
+  Format.fprintf fmt "@[<hov 0>@[<hov 2>Type %s = {" (comp_id c) ;
+  Option.iter (List.iter (fun fd ->
+      Format.fprintf fmt "@ %s : %a;" (field_id fd) pp_tau (tau_of_ctype fd.ftype)
+    )) c.cfields ;
+  Format.fprintf fmt "@]@ }@]"
+
+let pp_irecord fmt (c : compinfo) =
+  Format.fprintf fmt "@[<hov 0>@[<hov 2>Type %s = {" (comp_init_id c) ;
+  Option.iter (List.iter (fun fd ->
+      Format.fprintf fmt "@ %s : %a;" (field_init_id fd) pp_tau (init_of_ctype fd.ftype)
+    )) c.cfields ;
+  Format.fprintf fmt "@]@ }@]"
+
+let pp_poly fmt ts = List.iter (Format.fprintf fmt " %s") ts
+
+let pp_typedef fmt (t : logic_type_info) =
+  match t.lt_def with
+  | None ->
+    Format.fprintf fmt "Type %s%a" t.lt_name pp_poly t.lt_params
+  | Some (LTsyn lt) ->
+    Format.fprintf fmt "@[<hov 2>Type %s%a =@ %a@]"
+      t.lt_name pp_poly t.lt_params pp_tau (tau_of_ltype lt)
+  | Some (LTsum cs) ->
+    Format.fprintf fmt "@[<hv 2>Type %s%a =" t.lt_name pp_poly t.lt_params ;
+    List.iter
+      (fun c ->
+         Format.fprintf fmt "@ | @[<hov 2>%s" c.ctor_name ;
+         List.iter
+           (fun p -> Format.fprintf fmt "@ %a" pp_tau (tau_of_ltype p))
+           c.ctor_params ;
+         Format.fprintf fmt "@]"
+      ) cs ;
+    Format.fprintf fmt "@]"
+
+let is_empty c =
+  c.c_records = [] &&
+  c.c_irecords = [] &&
+  c.c_types = [] &&
+  c.c_symbols = [] &&
+  c.c_lemmas = []
+
+let dump fmt (c : cluster) =
+  Format.fprintf fmt "@[<hv 0>@[<hv 2>Cluster %s {@," c.c_id ;
+  List.iter (Format.fprintf fmt "@ %a@," pp_record) c.c_records ;
+  List.iter (Format.fprintf fmt "@ %a@," pp_irecord) c.c_irecords ;
+  List.iter (Format.fprintf fmt "@ %a@," pp_typedef) c.c_types ;
+  List.iter (Format.fprintf fmt "@ %a@," pp_dfun) c.c_symbols ;
+  List.iter (Format.fprintf fmt "@ %a@," pp_lemma) c.c_lemmas ;
+  Format.fprintf fmt "@]@ }@]"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Registry                                                           --- *)
@@ -134,8 +244,8 @@ module Symbol = WpContext.Index
       type key = lfun
       type data = dfun
       let name = "Definitions.Symbol"
-      let compare = Lang.Fun.compare
-      let pretty = Lang.Fun.pretty
+      let compare = Fun.compare
+      let pretty = Fun.pretty
     end)
 
 module Lemma = WpContext.Index
@@ -178,7 +288,7 @@ let define_type c t =
 
 let parameters f =
   if WpContext.is_defined () then
-    try List.map Lang.F.QED.sort_of_var (Symbol.find f).d_params
+    try List.map QED.sort_of_var (Symbol.find f).d_params
     with Not_found -> []
   else []
 
@@ -240,7 +350,7 @@ let compinfo c =
          else Printf.sprintf "Union '%s'" c.cname in
        let cluster = newcluster ~id ~title ()
        in cluster.c_records <- [c] ; cluster)
-    (Lang.comp_id c)
+    (comp_id c)
 
 let icompinfo c =
   Cluster.memoize
@@ -251,16 +361,16 @@ let icompinfo c =
          else Printf.sprintf "Init Union '%s'" c.cname in
        let cluster = newcluster ~id ~title ()
        in cluster.c_irecords <- [c] ; cluster)
-    (Lang.comp_init_id c)
+    (comp_init_id c)
 
 let matrix () = cluster ~id:"Matrix" ~title:"Basic Arrays" ()
 
 let call_fun ~result lfun cc es =
-  Symbol.compile (Lang.local cc) lfun ;
+  Symbol.compile (local cc) lfun ;
   e_fun ~result lfun es
 
 let call_pred lfun cc es =
-  Symbol.compile (Lang.local cc) lfun ;
+  Symbol.compile (local cc) lfun ;
   p_call lfun es
 
 (* -------------------------------------------------------------------------- *)
@@ -270,7 +380,7 @@ let call_pred lfun cc es =
 module DT = Logic_type_info.Set
 module DR = Compinfo.Set
 module DS = Datatype.String.Set
-module DF = Set.Make(Lang.Fun)
+module DF = Set.Make(Fun)
 module DW = Set.Make
     (struct
       type t = string list * string
@@ -310,7 +420,7 @@ class virtual visitor main =
         (self#vcluster c ; false)
 
     method private vtau_of_ltype lt =
-      let tau = Lang.tau_of_ltype lt in
+      let tau = tau_of_ltype lt in
       self#vtau tau ; tau
 
     method vtype t =
@@ -318,7 +428,7 @@ class virtual visitor main =
         begin
           types <- DT.add t types ;
           let cluster = section (LogicUsage.section_of_type t) in
-          if self#do_local cluster && not (Lang.is_builtin t) then
+          if self#do_local cluster && not (is_builtin t) then
             begin
               let def = match t.lt_def with
                 | None -> Qed.Engine.Tabs
@@ -326,7 +436,7 @@ class virtual visitor main =
                 | Some (LTsum cs) ->
                   let cases = List.map
                       (fun c ->
-                         Lang.ctor c ,
+                         ctor c ,
                          List.map self#vtau_of_ltype c.ctor_params
                       ) cs in
                   Qed.Engine.Tsum cases
@@ -344,7 +454,7 @@ class virtual visitor main =
               let fts = Option.map
                   (List.map
                      (fun f ->
-                        let t = Lang.tau_of_ctype f.ftype in
+                        let t = tau_of_ctype f.ftype in
                         self#vtau t ; cfield f , t
                      ))
                   r.cfields
@@ -362,7 +472,7 @@ class virtual visitor main =
               let fts = Option.map
                   (List.map
                      (fun f ->
-                        let t = Lang.init_of_ctype f.ftype in
+                        let t = init_of_ctype f.ftype in
                         self#vtau t ; cfield ~kind:KInit f , t
                      ))
                   r.cfields
@@ -392,11 +502,11 @@ class virtual visitor main =
 
     method private repr ~bool t =
       begin
-        try self#vtau (Lang.F.typeof t);
+        try self#vtau (typeof t);
         with Not_found ->
-          Wp_parameters.debug ~level:2 "@[<hov 2>Untyped term: %a@]" F.pp_term t ;
+          Wp_parameters.debug ~level:2 "@[<hov 2>Untyped term: %a@]" pp_term t ;
       end ;
-      match F.repr t with
+      match repr t with
       | Fun(f,_) -> self#vsymbol f
       | Rget(_,f) -> self#vfield f
       | Rdef fts -> List.iter (fun (f,_) -> self#vfield f) fts
@@ -415,18 +525,18 @@ class virtual visitor main =
         begin
           terms <- Tset.add t terms ;
           self#repr ~bool:true t ;
-          F.lc_iter self#vterm t ;
+          lc_iter self#vterm t ;
         end
 
     method vpred p =
-      let t = F.e_prop p in
+      let t = e_prop p in
       if not (Tset.mem t terms) then
         begin
           self#repr ~bool:false t ;
-          F.lc_iter
+          lc_iter
             (fun e ->
-               if F.is_prop e
-               then self#vpred (F.p_bool e)
+               if is_prop e
+               then self#vpred (p_bool e)
                else self#vterm e) t
         end
 
@@ -471,7 +581,7 @@ class virtual visitor main =
           | FUN { m_source = Wsymbol(p,m,_) } -> self#vtheory p m
           | FUN { m_source = Extern e  } -> self#vlibrary e.ext_library
           | FUN { m_source = Generated _ } | ACSL _ -> self#vlfun f
-          | CTOR c -> self#vadt (Lang.adt c.ctor_type)
+          | CTOR c -> self#vadt (adt c.ctor_type)
         end
 
     method private vtrigger = function

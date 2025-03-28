@@ -78,6 +78,18 @@ sig
   val vars : trigger -> Vars.t
 end
 
+val is_empty : cluster -> bool
+
+val pp_record : Format.formatter -> compinfo -> unit
+val pp_irecord : Format.formatter -> compinfo -> unit
+val pp_typedef : Format.formatter -> logic_type_info -> unit
+val pp_dfun : Format.formatter -> dfun -> unit
+val pp_trigger : Format.formatter -> trigger -> unit
+val pp_lemma : Format.formatter -> dlemma -> unit
+val dump : Format.formatter -> cluster -> unit
+
+
+
 val find_symbol : lfun -> dfun
 (** @raise Not_found if symbol is not compiled (yet) *)
 

@@ -305,6 +305,215 @@ end
   Function foo
 ------------------------------------------------------------
 
+Cluster Chunk {
+  
+  Predicate is_sint32_chunk (m_2 : int[addr])
+    = forall a_0:addr. (is_sint32 m_2[a_0])
+  
+  Predicate is_sint16_chunk (m_1 : int[addr])
+    = forall a_0:addr. (is_sint16 m_1[a_0])
+  
+  Predicate is_sint8_chunk (m_0 : int[addr])
+    = forall a_0:addr. (is_sint8 m_0[a_0])
+  
+}
+
+Cluster Compound {
+  
+  Function Load_Init_S1_X (p_0 : addr) (Init_0 : bool[addr]) : Init_S1_X
+    = {
+         Init_F1_X_a = Init_0[(shiftfield_F1_X_a p_0)] ;
+         Init_F1_X_b = Init_0[(shiftfield_F1_X_b p_0)] ;
+         Init_F1_X_c = Init_0[(shiftfield_F1_X_c p_0)]
+      }
+  
+  Function Load_S1_X (p_0 : addr) (Mchar_0 : int[addr]) (Mint_0 : int[addr])
+    (Mint_1 : int[addr]) : S1_X
+    = {
+         F1_X_a = Mchar_0[(shiftfield_F1_X_a p_0)] ;
+         F1_X_b = Mint_0[(shiftfield_F1_X_b p_0)] ;
+         F1_X_c = Mint_1[(shiftfield_F1_X_c p_0)]
+      }
+  
+  Function shiftfield_F1_X_c (p_2 : addr) : addr = (shift p_2 2)
+  
+  Function shiftfield_F1_X_b (p_1 : addr) : addr = (shift p_1 1)
+  
+  Function shiftfield_F1_X_a (p_0 : addr) : addr = (shift p_0 0)
+  
+  Axiom Load_Init_S1_X_memcpy_neq_Init0:
+    forall Init_1: bool[addr].
+    forall Init_2: bool[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall ps_0: addr.
+    forall pt_0: addr.
+    [ (Load_Init_S1_X p_0 (memcpy Init_1 Init_2 pt_0 ps_0 n_0)) ]
+    (separated p_0 3 pt_0 n_0)
+    -> ((Load_Init_S1_X p_0 (memcpy Init_1 Init_2 pt_0 ps_0 n_0))=
+        (Load_Init_S1_X p_0 Init_1))
+  
+  Axiom Load_Init_S1_X_eqmem_Init0:
+    forall Init_1: bool[addr].
+    forall Init_2: bool[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall pt_0: addr.
+    [ (Load_Init_S1_X p_0 Init_1) (eqmem Init_1 Init_2 pt_0 n_0) ]
+    [ (Load_Init_S1_X p_0 Init_2) (eqmem Init_1 Init_2 pt_0 n_0) ]
+    (included p_0 3 pt_0 n_0) -> (eqmem Init_1 Init_2 pt_0 n_0)
+    -> ((Load_Init_S1_X p_0 Init_2)=(Load_Init_S1_X p_0 Init_1))
+  
+  Axiom Load_Init_S1_X_update_Init0:
+    forall Init_1: bool[addr].
+    forall p_0: addr.
+    forall pt_0: addr.
+    forall v_0: bool.
+    [ (Load_Init_S1_X p_0 Init_1[pt_0 <- v_0]) ]
+    (separated p_0 3 pt_0 1)
+    -> ((Load_Init_S1_X p_0 Init_1[pt_0->v_0])=(Load_Init_S1_X p_0 Init_1))
+  
+  Axiom Load_S1_X_memcpy_neq_Mint2:
+    forall Mchar_3: int[addr].
+    forall Mint_2: int[addr].
+    forall Mint_6: int[addr].
+    forall Mint_7: int[addr].
+    forall n_2: int.
+    forall p_0: addr.
+    forall ps_2: addr.
+    forall pt_2: addr.
+    [ (Load_S1_X p_0 Mchar_3 Mint_2 (memcpy Mint_6 Mint_7 pt_2 ps_2 n_2)) ]
+    (separated p_0 3 pt_2 n_2)
+    -> ((Load_S1_X p_0 Mchar_3 Mint_2 (memcpy Mint_6 Mint_7 pt_2 ps_2 n_2))=
+        (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6))
+  
+  Axiom Load_S1_X_eqmem_Mint2:
+    forall Mchar_3: int[addr].
+    forall Mint_2: int[addr].
+    forall Mint_6: int[addr].
+    forall Mint_7: int[addr].
+    forall n_2: int.
+    forall p_0: addr.
+    forall pt_2: addr.
+    [ (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6) (eqmem Mint_6 Mint_7 pt_2 n_2) ]
+    [ (Load_S1_X p_0 Mchar_3 Mint_2 Mint_7) (eqmem Mint_6 Mint_7 pt_2 n_2) ]
+    (included p_0 3 pt_2 n_2) -> (eqmem Mint_6 Mint_7 pt_2 n_2)
+    -> ((Load_S1_X p_0 Mchar_3 Mint_2 Mint_7)=
+        (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6))
+  
+  Axiom Load_S1_X_update_Mint2:
+    forall Mchar_3: int[addr].
+    forall Mint_2: int[addr].
+    forall Mint_6: int[addr].
+    forall p_0: addr.
+    forall pt_2: addr.
+    forall v_2: int.
+    [ (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6[pt_2 <- v_2]) ]
+    (separated p_0 3 pt_2 1)
+    -> ((Load_S1_X p_0 Mchar_3 Mint_2 Mint_6[pt_2->v_2])=
+        (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6))
+  
+  Axiom Load_S1_X_memcpy_neq_Mint1:
+    forall Mchar_3: int[addr].
+    forall Mint_3: int[addr].
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
+    forall n_1: int.
+    forall p_0: addr.
+    forall ps_1: addr.
+    forall pt_1: addr.
+    [ (Load_S1_X p_0 Mchar_3 (memcpy Mint_4 Mint_5 pt_1 ps_1 n_1) Mint_3) ]
+    (separated p_0 3 pt_1 n_1)
+    -> ((Load_S1_X p_0 Mchar_3 (memcpy Mint_4 Mint_5 pt_1 ps_1 n_1) Mint_3)=
+        (Load_S1_X p_0 Mchar_3 Mint_4 Mint_3))
+  
+  Axiom Load_S1_X_eqmem_Mint1:
+    forall Mchar_3: int[addr].
+    forall Mint_3: int[addr].
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
+    forall n_1: int.
+    forall p_0: addr.
+    forall pt_1: addr.
+    [ (Load_S1_X p_0 Mchar_3 Mint_4 Mint_3) (eqmem Mint_4 Mint_5 pt_1 n_1) ]
+    [ (Load_S1_X p_0 Mchar_3 Mint_5 Mint_3) (eqmem Mint_4 Mint_5 pt_1 n_1) ]
+    (included p_0 3 pt_1 n_1) -> (eqmem Mint_4 Mint_5 pt_1 n_1)
+    -> ((Load_S1_X p_0 Mchar_3 Mint_5 Mint_3)=
+        (Load_S1_X p_0 Mchar_3 Mint_4 Mint_3))
+  
+  Axiom Load_S1_X_update_Mint1:
+    forall Mchar_3: int[addr].
+    forall Mint_3: int[addr].
+    forall Mint_4: int[addr].
+    forall p_0: addr.
+    forall pt_1: addr.
+    forall v_1: int.
+    [ (Load_S1_X p_0 Mchar_3 Mint_4[pt_1 <- v_1] Mint_3) ]
+    (separated p_0 3 pt_1 1)
+    -> ((Load_S1_X p_0 Mchar_3 Mint_4[pt_1->v_1] Mint_3)=
+        (Load_S1_X p_0 Mchar_3 Mint_4 Mint_3))
+  
+  Axiom Load_S1_X_memcpy_neq_Mchar0:
+    forall Mchar_1: int[addr].
+    forall Mchar_2: int[addr].
+    forall Mint_2: int[addr].
+    forall Mint_3: int[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall ps_0: addr.
+    forall pt_0: addr.
+    [ (Load_S1_X p_0 (memcpy Mchar_1 Mchar_2 pt_0 ps_0 n_0) Mint_2 Mint_3) ]
+    (separated p_0 3 pt_0 n_0)
+    -> ((Load_S1_X p_0 (memcpy Mchar_1 Mchar_2 pt_0 ps_0 n_0) Mint_2 Mint_3)=
+        (Load_S1_X p_0 Mchar_1 Mint_2 Mint_3))
+  
+  Axiom Load_S1_X_eqmem_Mchar0:
+    forall Mchar_1: int[addr].
+    forall Mchar_2: int[addr].
+    forall Mint_2: int[addr].
+    forall Mint_3: int[addr].
+    forall n_0: int.
+    forall p_0: addr.
+    forall pt_0: addr.
+    [ (Load_S1_X p_0 Mchar_1 Mint_2 Mint_3)
+      (eqmem Mchar_1 Mchar_2 pt_0 n_0) ]
+    [ (Load_S1_X p_0 Mchar_2 Mint_2 Mint_3)
+      (eqmem Mchar_1 Mchar_2 pt_0 n_0) ]
+    (included p_0 3 pt_0 n_0) -> (eqmem Mchar_1 Mchar_2 pt_0 n_0)
+    -> ((Load_S1_X p_0 Mchar_2 Mint_2 Mint_3)=
+        (Load_S1_X p_0 Mchar_1 Mint_2 Mint_3))
+  
+  Axiom Load_S1_X_update_Mchar0:
+    forall Mchar_1: int[addr].
+    forall Mint_2: int[addr].
+    forall Mint_3: int[addr].
+    forall p_0: addr.
+    forall pt_0: addr.
+    forall v_0: int.
+    [ (Load_S1_X p_0 Mchar_1[pt_0 <- v_0] Mint_2 Mint_3) ]
+    (separated p_0 3 pt_0 1)
+    -> ((Load_S1_X p_0 Mchar_1[pt_0->v_0] Mint_2 Mint_3)=
+        (Load_S1_X p_0 Mchar_1 Mint_2 Mint_3))
+  
+}
+
+Cluster Init_S1_X {
+  
+  Type Init_S1_X = { Init_F1_X_a : bool; Init_F1_X_b : bool;
+    Init_F1_X_c : bool; }
+  
+}
+
+Cluster S1_X {
+  
+  Type S1_X = { F1_X_a : int; F1_X_b : int; F1_X_c : int; }
+  
+  Predicate IsS1_X (S_0 : S1_X)
+    = (is_sint8 S_0.F1_X_a) /\ (is_sint16 S_0.F1_X_b)
+      /\ (is_sint32 S_0.F1_X_c)
+  
+}
+
 Goal Assertion 'rte,mem_access' (file struct_fields.i, line 15):
 Assume {
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\

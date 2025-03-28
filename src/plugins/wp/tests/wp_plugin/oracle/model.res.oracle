@@ -89,6 +89,14 @@ end
   Function f
 ------------------------------------------------------------
 
+Cluster Axiomatic { Predicate P_P (a_0 : int) }
+
+Cluster Compound {
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
+
 Goal Post-condition (file model.i, line 12) in 'f':
 Let x = Mint_0[shift_sint32(p, k)].
 Assume {
@@ -183,6 +191,14 @@ end
 ------------------------------------------------------------
   Function f
 ------------------------------------------------------------
+
+Cluster Axiomatic { Predicate P_P (a_0 : int) }
+
+Cluster Compound {
+  
+  Function shift_sint32 (p_0 : addr) (k_0 : int) : addr = (shift p_0 k_0)
+  
+}
 
 Goal Post-condition (file model.i, line 12) in 'f':
 Let x = Mint_0[shift_sint32(p, k)].
