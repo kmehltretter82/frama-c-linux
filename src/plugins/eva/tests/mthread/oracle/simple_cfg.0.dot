@@ -141,72 +141,72 @@ digraph G {
 digraph G {
   fontsize=9;
   center=1;
-  v286 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
+  v209 [URL="#", fillcolor="#00000000", shape=box, color="#00000055",
         label="Start: f1", style="filled", ];
-  v268 [URL="code.html#sid1", fillcolor="#FFFFFFFF", shape=box,
+  v191 [URL="code.html#sid1", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_lock(& lock);",
         style="filled", ];
-  v282 [URL="code.html#sid53", fillcolor="#FFFFFFFF", shape=box,
+  v205 [URL="code.html#sid53", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Lock lock", style="filled", ];
-  v283 [URL="code.html#sid55", fillcolor="#FFFFFFFF", shape=box,
+  v206 [URL="code.html#sid55", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (result != -1)", style="filled", ];
-  v284 [URL="code.html#sid56", fillcolor="#FFFFFFFF", shape=box,
+  v207 [URL="code.html#sid56", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="tmp_0 = 0;", style="filled", ];
-  v285 [URL="code.html#sid58", fillcolor="#FFFFFFFF", shape=box,
+  v208 [URL="code.html#sid58", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v269 [URL="code.html#sid2", fillcolor="#CCCCFFFF", shape=box,
+  v192 [URL="code.html#sid2", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="a = 1;\nwrites a", style="filled", ];
-  v270 [URL="code.html#sid3", fillcolor="#CCCCFFFF", shape=box,
+  v193 [URL="code.html#sid3", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="*((int *)p) = 1;\nwrites b",
         style="filled", ];
-  v271 [URL="code.html#sid4", fillcolor="#CCCCFFFF", shape=box,
+  v194 [URL="code.html#sid4", fillcolor="#CCCCFFFF", shape=box,
         color="#000000FF", label="c = 1;\nwrites c", style="filled", ];
-  v272 [URL="code.html#sid5", fillcolor="#FFFFFFFF", shape=box,
+  v195 [URL="code.html#sid5", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call g1();", style="filled", ];
-  v281 [URL="code.html#sid5", fillcolor="#CCCCFFFF", shape=diamond,
+  v204 [URL="code.html#sid5", fillcolor="#CCCCFFFF", shape=diamond,
         color="#000000FF", label="writes v", style="filled", ];
-  v273 [URL="code.html#sid6", fillcolor="#FFFFFFFF", shape=box,
+  v196 [URL="code.html#sid6", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="Call pthread_mutex_unlock(& lock);",
         style="filled", ];
-  v277 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
+  v200 [URL="code.html#sid67", fillcolor="#FFFFFFFF", shape=box,
         color="#FF0000FF", label="Release lock", style="filled", ];
-  v278 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
+  v201 [URL="code.html#sid69", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="if (result != -1)", style="filled", ];
-  v279 [URL="code.html#sid70", fillcolor="#FFFFFFFF", shape=box,
+  v202 [URL="code.html#sid70", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="tmp_0 = 0;", style="filled", ];
-  v280 [URL="code.html#sid72", fillcolor="#FFFFFFFF", shape=box,
+  v203 [URL="code.html#sid72", fillcolor="#FFFFFFFF", shape=box,
         color="#AAAAAAFF", label="return", style="filled", ];
-  v274 [URL="code.html#sid7", fillcolor="#FFFFFFFF", shape=box,
+  v197 [URL="code.html#sid7", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="e = 1;", style="filled", ];
-  v275 [URL="code.html#sid8", fillcolor="#FFFFFFFF", shape=box,
+  v198 [URL="code.html#sid8", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="__retres = (void *)0;", style="filled", ];
-  v276 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
+  v199 [URL="code.html#sid102", fillcolor="#FFFFFFFF", shape=box,
         color="#000000FF", label="exit", style="filled", ];
-  v267 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
+  v190 [URL="#", fillcolor="#FFFFFFFF", shape=plaintext, color="#000000FF",
         label="", style="invis", ];
   
   
-  v286 -> v268 [dir=forward, ];
-  v268 -> v282 [weight=200, dir=forward, ];
-  v282 -> v283 [dir=forward, ];
-  v283 -> v284 [label="then", dir=forward, ];
-  v284 -> v285 [dir=forward, ];
-  v285 -> v269 [dir=forward, ];
-  v268 -> v285 [weight=1, dir=none, style="dotted", ];
-  v269 -> v270 [dir=forward, ];
-  v270 -> v271 [dir=forward, ];
-  v271 -> v272 [dir=forward, ];
-  v272 -> v281 [weight=200, dir=none, ];
-  v281 -> v273 [dir=forward, ];
-  v273 -> v277 [weight=200, dir=forward, ];
-  v277 -> v278 [dir=forward, ];
-  v278 -> v279 [label="then", dir=forward, ];
-  v279 -> v280 [dir=forward, ];
-  v280 -> v274 [dir=forward, ];
-  v273 -> v280 [weight=1, dir=none, style="dotted", ];
-  v274 -> v275 [dir=forward, ];
-  v275 -> v276 [dir=forward, ];
-  v276 -> v267 [dir=forward, ];
+  v209 -> v191 [dir=forward, ];
+  v191 -> v205 [weight=200, dir=forward, ];
+  v205 -> v206 [dir=forward, ];
+  v206 -> v207 [label="then", dir=forward, ];
+  v207 -> v208 [dir=forward, ];
+  v208 -> v192 [dir=forward, ];
+  v191 -> v208 [weight=1, dir=none, style="dotted", ];
+  v192 -> v193 [dir=forward, ];
+  v193 -> v194 [dir=forward, ];
+  v194 -> v195 [dir=forward, ];
+  v195 -> v204 [weight=200, dir=none, ];
+  v204 -> v196 [dir=forward, ];
+  v196 -> v200 [weight=200, dir=forward, ];
+  v200 -> v201 [dir=forward, ];
+  v201 -> v202 [label="then", dir=forward, ];
+  v202 -> v203 [dir=forward, ];
+  v203 -> v197 [dir=forward, ];
+  v196 -> v203 [weight=1, dir=none, style="dotted", ];
+  v197 -> v198 [dir=forward, ];
+  v198 -> v199 [dir=forward, ];
+  v199 -> v190 [dir=forward, ];
   
   }
 

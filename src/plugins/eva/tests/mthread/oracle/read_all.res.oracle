@@ -201,49 +201,21 @@
 [mt] * Computing cfg
 [mt] * Cfg computed
 [mt] *** Thread <main> computed
-[mt] *** Computing thread jobs, iteration 3 (interferences changed)
-[mt] * Computing value analysis for thread jobs
-[mt] read_all.c:19: User Error: 
-  read of the whole memory. Ignoring to allow Mthread to continue, but the
-  analysis will not be correct.
-[eva:assigns:missing] read_all.c:15: Warning: 
-  no \from part for clause 'assigns *p, r;'.
-  Assuming \from \nothing so that the analysis can continue, but be aware this is probably incorrect.
-[eva:interferences] read_all.c:19: inject threads interferences at this point
-[mt] * Starting to save the state of the value analysis
-[mt] * state saved
-[mt] * Computing shared variables
-[mt] Globals accessed by thread:
-  r: write by jobs at read_all.c:19 <- f
-[mt] * shared variables computed
-[eva:interferences] 
-  concurrent writes:
-    g(); read_all.c:19 <- f
-  shared bases: {r}
-  interferences by location:
-    read_all.c:19:
-      # cvalue: r ∈ [--..--] 
-  interferences by mutexes:
-    {  }:
-      # cvalue: r ∈ [--..--]
-[mt] * Computing cfg
-[mt] * Cfg computed
-[mt] *** Thread jobs computed
 [mt] ***** Threads computed for iteration 3.
 [mt] * Computing live threads and locked mutexes
 [mt] * threads and mutexes computed
 [mt] ***** Computing shared variables
 [mt] Imprecise locations to watch: r
+[mt] jobs writes  r ∈ [--..--]  // read_all.c:19 g :: read_all.c:19 <- f
 [mt] <main> writes  r ∈ [--..--]  // read_all.c:29 main
 [mt] <main> writes  r ∈ [--..--]  // read_all.c:29 g :: read_all.c:29 <- main
-[mt] jobs writes  r ∈ [--..--]  // read_all.c:19 g :: read_all.c:19 <- f
 [mt] Possible read/write data races:
   none
 [mt] Possible write/write data races:
   r:
-    write by <main> at read_all.c:29, unprotected
-    write by <main> at read_all.c:29, unprotected
     write by jobs at read_all.c:19, unprotected
+    write by <main> at read_all.c:29, unprotected
+    write by <main> at read_all.c:29, unprotected
 [mt] Shared memory: r
 [mt] Write summary for <main>: r ∈ [--..--]
 [mt] Write summary for jobs: r ∈ [--..--]

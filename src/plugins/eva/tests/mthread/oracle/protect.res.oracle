@@ -119,15 +119,11 @@
                  [3] ∈ {4}
                  [4..9] ∈ {0} 
   interferences by mutexes:
-    { lock1 }:
-      # cvalue: t[0] ∈ {0}
-                 [1] ∈ {1}
-                 [2..9] ∈ {0} 
-    { lock2 }:
+    {  }:
       # cvalue: t[0] ∈ {0}
                  [1] ∈ {1}
                  [2] ∈ {0}
-                 [3] ∈ {4}
+                 [3] ∈ {0; 4}
                  [4..9] ∈ {0}
 [mt] * Computing cfg
 [mt] * Cfg computed

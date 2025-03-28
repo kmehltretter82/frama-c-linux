@@ -230,7 +230,7 @@
                   .data2 ∈ {3}
                 s2 ∈ {0} 
   interferences by mutexes:
-    { lock1 }:
+    {  }:
       # cvalue: s1.data ∈ {1}
                   .data2 ∈ {0; 3}
                 s2 ∈ {0}

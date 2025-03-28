@@ -537,8 +537,6 @@
 [mt] matrix.c:25: Lock locks[0]
 [eva:interferences] matrix.c:29: inject threads interferences at this point
 [mt] matrix.c:30: Release locks[0]
-[eva] FRAMAC_SHARE/mthread_pthread.c:66: Warning: 
-  The mutex locks[0] is already unlocked.
 [mt] * Starting to save the state of the value analysis
 [mt] * state saved
 [mt] * Computing shared variables

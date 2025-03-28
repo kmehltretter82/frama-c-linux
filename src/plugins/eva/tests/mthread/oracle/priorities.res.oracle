@@ -220,7 +220,7 @@
       # cvalue: s1 ∈ {1}
                 s2 ∈ {0} 
   interferences by mutexes:
-    { m1; m2 }:
+    {  }:
       # cvalue: s1 ∈ {1}
                 s2 ∈ {0}
 [mt] * Computing cfg

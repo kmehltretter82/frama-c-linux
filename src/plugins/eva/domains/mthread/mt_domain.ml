@@ -346,8 +346,10 @@ module Domain = struct
   let relate _ _ = Base.SetLattice.empty
   let log_category = Self.register_category "d-mthread"
 
-  let project _bases state = state
-  let overwrite _bases ~on:_ ~by = by (* Completely unsound! *)
+  (* This domain only infers information about the current analyzed thread:
+     it must not inject interferences from other threads. *)
+  let project _bases _state = default
+  let overwrite _bases ~on ~by:_ = on
 
   let post_analysis _ =
     let pp stmt state =

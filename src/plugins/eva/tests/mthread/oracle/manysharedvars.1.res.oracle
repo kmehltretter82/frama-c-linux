@@ -824,7 +824,7 @@
        [127].data ∈ {0; 1}
        [127].data2 ∈ {0; 3} 
   interferences by mutexes:
-    { lock }:
+    {  }:
       # cvalue:
       s[0].data ∈ {1}
        [0].data2 ∈ {0; 3}

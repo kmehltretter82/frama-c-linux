@@ -186,7 +186,7 @@
       vars[0] ∈ [0..10]
           [1] ∈ {0} 
   interferences by mutexes:
-    { locks[0] }:
+    {  }:
       # cvalue:
       Frama_C_entropy_source ∈ [--..--]
       vars[0] ∈ [0..10]
