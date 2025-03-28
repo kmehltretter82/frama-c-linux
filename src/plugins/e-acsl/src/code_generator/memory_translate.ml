@@ -562,9 +562,9 @@ let call_with_size ~adata ~loc kf name ctx env args p =
     args
     p
 
-(* \valid and \valid_read *)
+(* \valid, \valid_read, and \object_pointer *)
 let call_valid ~adata ~loc kf name ctx env t p =
-  assert (name = "valid" || name = "valid_read");
+  assert (name = "valid" || name = "valid_read" || name = "object_pointer");
   let arg_from_term ~adata ~loc kf env rev_args t _p =
     let ptr, size, adata, env = term_to_ptr_and_size ~adata ~loc kf env t in
     let base, base_addr = Misc.ptr_base_and_base_addr ~loc ptr in

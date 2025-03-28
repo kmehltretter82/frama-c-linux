@@ -403,7 +403,7 @@ end = struct
       let error = do_predicate ?error env p' in
       process ?error env (PoT_pred p) l
     | Pfreeable (l, t) | Pvalid (l, t) | Pvalid_read (l, t)
-    | Pinitialized (l, t)  ->
+    | Pobject_pointer (l, t) | Pinitialized (l, t)  ->
       let error = do_term ?error env t in
       (* E-ACSL semantic: \freeable{L}(p) == \at(\freeable(p), L) *)
       process ?error env (PoT_pred p) l
@@ -413,10 +413,6 @@ end = struct
       process ?error env (PoT_pred p) l
     | Pdangling (l, t) ->
       let error = not_yet "\\dangling" in
-      let error = do_term ?error env t in
-      process ?error env (PoT_pred p) l
-    | Pobject_pointer (l, t) ->
-      let error = not_yet "\\object_pointer" in
       let error = do_term ?error env t in
       process ?error env (PoT_pred p) l
     | Plet (li, p) ->

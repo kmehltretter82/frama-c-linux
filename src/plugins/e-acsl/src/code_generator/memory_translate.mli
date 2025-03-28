@@ -67,7 +67,7 @@ val call_valid:
   predicate ->
   exp * Assert.t * Env.t
 (* [call_valid ~loc kf name ctx env t p] creates a call to the E-ACSL memory
-   built-in [valid] or [valid_read] according to [name].
+   built-in [valid], [valid_read], or [object_pointer] according to [name].
    [t] can denote ranges of memory locations.
    [p] is the predicate under testing. *)
 

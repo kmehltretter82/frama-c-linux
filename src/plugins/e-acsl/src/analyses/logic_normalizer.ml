@@ -259,7 +259,8 @@ let preprocess_pred ~loc p =
   Here_inliner.(bind preprocess_pred) p @@
   match p.pred_content with
   | Pvalid_read(BuiltinLabel Here as llabel, t)
-  | Pvalid(BuiltinLabel Here as llabel, t) -> begin
+  | Pvalid(BuiltinLabel Here as llabel, t)
+  | Pobject_pointer(BuiltinLabel Here as llabel, t) -> begin
       match t.term_node, t.term_type with
       | TLval tlv, lty ->
         let init =
@@ -273,6 +274,7 @@ let preprocess_pred ~loc p =
           match p.pred_content with
           | Pvalid_read _ -> Logic_const.pvalid_read ~loc (llabel, t)
           | Pvalid _ -> Logic_const.pvalid ~loc (llabel, t)
+          | Pobject_pointer _ -> Logic_const.pobject_pointer ~loc (llabel, t)
           | _ -> assert false
         in
         Some (Logic_const.pand ~loc (init, p_copy))
