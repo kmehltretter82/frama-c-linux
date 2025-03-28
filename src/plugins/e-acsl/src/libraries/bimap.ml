@@ -20,29 +20,25 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let analyses_feedback msg =
-  Options.feedback ~level:2 "%s in %a" msg Project.pretty (Project.current ())
+module Make (H : Hashtbl.S) = struct
+  let head_tbl = H.create 7
+  let tail_tbl = H.create 7
 
-let preprocess () =
-  let ast = Ast.get () in
-  analyses_feedback "preprocessing annotations";
-  Logic_normalizer.preprocess ast;
-  analyses_feedback "normalizing quantifiers";
-  Bound_variables.preprocess ast;
-  analyses_feedback "infering interval of annotations";
-  Interval.infer_program ast;
-  analyses_feedback "typing annotations";
-  Typing.type_program ast;
-  analyses_feedback
-    "computing future locations of labeled predicates and terms";
-  Labels.preprocess ast
+  let clear () =
+    H.clear head_tbl;
+    H.clear tail_tbl
 
-let reset () =
-  Memory_tracking.reset ();
-  Literal_strings.reset ();
-  Bound_variables.clear_guards ();
-  Logic_normalizer.clear ();
-  Inductive.clear ();
-  Interval.clear ();
-  Typing.clear ();
-  Labels.reset ()
+  let add head tail =
+    H.add head_tbl head tail;
+    H.add tail_tbl tail head
+
+  let tails head = H.find_all head_tbl head
+  let tail head = H.find head_tbl head
+  let tail_opt head = H.find_opt head_tbl head
+  let heads tail = H.find_all tail_tbl tail
+  let head tail = H.find tail_tbl tail
+  let head_opt tail = H.find_opt tail_tbl tail
+
+  let tail_or_self head = try tail head with Not_found -> head
+  let head_or_self tail = try head tail with Not_found -> tail
+end

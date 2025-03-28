@@ -682,7 +682,7 @@ initializing global variables.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsection{\notimplemented{Inductive predicates}}
+\subsection{Inductive predicates}
 \label{sec:inductivepredicates}
 \index{inductive predicates}
 \experimental
@@ -698,10 +698,113 @@ Figure~\ref{fig:gram:inductive} presents the grammar of inductive predicates.
 \label{fig:gram:inductive}
 \end{figure}
 
-Inductive predicates in all their generality are not monitorable. Therefore,
-future versions of this document will restrict them syntactically (e.g., to
-definite Horn clauses (\url{http://en.wikipedia.org/wiki/Horn_clause}) and/or
-through semantic criteria.
+\difficultswhy{Inductive predicates}{a fix-point calculation, which is not
+viable in practice}
+{\highlightnotimplemented
+Inductively defined predicates in all their generality are thus not
+monitorable; however a restricted subset as described below is supported.}
+
+Notably this subset includes predicates whose constructors ($indcase$ in the above grammar) have a form corresponding to definite Horn
+clauses
+(\url{http://en.wikipedia.org/wiki/Horn_clause}): for an inductively defined
+$n$-ary predicate \lstinline|P| its constructors are of the form
+\lstinline|\forall ...; h$_1$ ==> ... ==> h$_k$ ==> P(a$_1$, ..., a$_n$)|,
+with the following restrictions:
+\begin{itemize}
+  \item every occurrence of \lstinline|P| (apart from the conclusion
+    \lstinline|P(a$_1$, ..., a$_n$)|) is at the root of one of the hypotheses.
+    This implies that it cannot occur in negated form.
+    \lstinline|h|$_1,\dots,$\lstinline|h|$_k$.
+  \item all the arguments \lstinline|a|$_1,\dots,$\lstinline|a|$_n$ of the
+    conclusion are \emph{simple}, i.e.\ they are either constants or (universally)
+    quantified variables.
+  \item any quantified variable occurring in one of the hypotheses
+    \lstinline|h|$_1,\dots,$\lstinline|h|$_k$ occurs in the conclusion.
+\end{itemize}
+Let us call this the \emph{simple subset} of supported predicates.
+
+\begin{example}[supported]
+  This definition belongs to the simple subset as described above.
+  \cinput{gcd.c}
+  For the constructor \lstinline|gcd_zero| the chain of implications is empty,
+  which is permissible; all of the conclusion's arguments are either
+  quantified variables (\lstinline|x|) or constants (\lstinline|0|).
+
+  The constructor \lstinline|gcd_S| has three quantified variables, which
+  occur in the hypotheses as well as in the conclusion. The conclusion has the
+  correct form, as all of its arguments are quantified variables. The
+  predicate \lstinline|gcd| occurs (positively) as the root of a hypothesis.
+\end{example}
+
+\begin{example}[unsupported]
+  This definition does not belong to the simple subset.
+  The quantified variable \lstinline|c| occurs in one of the hypotheses but
+  does not appear in the conclusion.
+  \cinput{eq.c}
+\end{example}
+
+\begin{example}[supported]
+  This definition belongs to the simple subset as described above.
+  In the constructor \lstinline|zero|, the quantified variable does not
+  occur in the conclusion. This poses no problem as long as it does not occur
+  in any conclusion.
+  \cinput{even.c}
+\end{example}
+
+\begin{example}[unsupported]
+  This definition does not belong to the simple subset, as \lstinline|P|
+  occurs in a hypothesis but not at its root, as it is negated.
+\cinput{even_bad.c}
+\end{example}
+
+This simple subset is extended in some important ways giving rise to the
+\emph{extended subset} of supported predicates:
+\begin{itemize}
+  \item there may be \lstinline|\let| expressions inserted in the chain of
+    implications.
+  \item one of \lstinline|P|'s arguments may be \emph{complicated}, i.e.\ it
+    does not need to be a constant or a quantified variable. The position of
+    the complicated argument has to be identical for all the constructors.
+  \item the quantified variables occurring in the formulas have to obey
+    certain boundness conditions, such as: a quantified variable occuring in
+    the complicated argument, needs to be bound first by a recursive
+    occurrence of $P$ in a hypothesis.
+\end{itemize}
+As these conditions (especially the boundness conditions) are too intricate to
+explain here, let's consider a few more examples in order to convey an
+intuition for which inductive definitions are supported and which are not.
+
+\begin{example}[supported]
+  This definition does not belong to the simple subset, since the second
+  argument \lstinline|f1+f2| of the constructor \lstinline|other|'s conclusion
+  is not simple. It does however belong to the extended subset as described
+  above.
+  \cinput{fibo.c}
+  The quantified variables \lstinline|f1| and \lstinline|f2| occuring in the
+  complicated argument are both bound by the two preceding hypotheses:
+  \lstinline|fibo(n-1, f1)| binds \lstinline|f1| while
+  \lstinline|fibo(nm2), f2)| binds \lstinline|f2|.
+
+  Note also that the chain of hypotheses is interrupted by a \lstinline|\let|
+  binding, which is permitted.
+\end{example}
+
+\begin{example}[unsupported]
+  This (nonsensical but correct) reformulation of the previous example is not in the subset
+  of supported definitions.
+  \cinput{fibo_bad.c}
+  Here we observe multiple problems:
+  \begin{enumerate}
+  \item In the \lstinline|zero| constructor, \lstinline|a| occurs in a
+    complicated argument without having been bound by a hypothesis.
+  \item In the \lstinline|one| constructor the first argument is complicated
+    while it is the second argument that is complicated in the constructors
+    \lstinline|zero| and \lstinline|other|.
+  \item In the \lstinline|other| constructor, \lstinline|f1| occurs in a
+    hypothesis before having been bound by the hypothesis
+    \lstinline|fibo(n-1, f1)|
+  \end{enumerate}
+\end{example}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

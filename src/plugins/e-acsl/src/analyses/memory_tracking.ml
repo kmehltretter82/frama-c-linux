@@ -404,7 +404,7 @@ module rec Transfer
     | LBnone | LBreads _ -> varinfos
     | LBterm t -> register_term kf varinfos t
     | LBpred _ -> Options.fatal "unexpected predicate"
-    | LBinductive _ -> Error.not_yet "inductive definitions"
+    | LBinductive _ -> Options.fatal "unexpected inductive definitions"
 
   let register_object kf state_ref = object
     inherit Visitor.frama_c_inplace

@@ -20,29 +20,24 @@
 (*                                                                        *)
 (**************************************************************************)
 
-let analyses_feedback msg =
-  Options.feedback ~level:2 "%s in %a" msg Project.pretty (Project.current ())
+open Cil_types
 
-let preprocess () =
-  let ast = Ast.get () in
-  analyses_feedback "preprocessing annotations";
-  Logic_normalizer.preprocess ast;
-  analyses_feedback "normalizing quantifiers";
-  Bound_variables.preprocess ast;
-  analyses_feedback "infering interval of annotations";
-  Interval.infer_program ast;
-  analyses_feedback "typing annotations";
-  Typing.type_program ast;
-  analyses_feedback
-    "computing future locations of labeled predicates and terms";
-  Labels.preprocess ast
+(** A unified signature for building terms and expressions.
+    Not to be confused with [Analyses_types.pred_or_term], which
+    simply is the sum of both types, while here separate modules are provided
+    for predicates and terms. *)
+module type S = sig
+  type t
 
-let reset () =
-  Memory_tracking.reset ();
-  Literal_strings.reset ();
-  Bound_variables.clear_guards ();
-  Logic_normalizer.clear ();
-  Inductive.clear ();
-  Interval.clear ();
-  Typing.clear ();
-  Labels.reset ()
+  val mk_false : logic_type option -> t
+  val mk_true : logic_type option -> t
+  val mk_logic_body : t -> logic_body
+  val mk_let : ?loc:location -> logic_info -> t -> t
+  val mk_if : ?loc:location -> predicate -> t -> t -> t
+  val mk_at : logic_label -> t -> t
+
+  val visit : Visitor.frama_c_visitor -> t -> t
+end
+
+module Predicate : S with type t = predicate
+module Term : S with type t = term
