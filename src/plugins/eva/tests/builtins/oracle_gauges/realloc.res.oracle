@@ -363,10 +363,10 @@
 > [eva] realloc.c:171: Call to builtin reallocarray
 > [eva:malloc] bases_to_realloc: {}
 > [eva:malloc] realloc.c:171: strong free on bases: {}
-> [eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
 > [eva] realloc.c:172: Frama_C_show_each_p: {0}
 > [eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
 > [eva] realloc.c:172: Frama_C_show_each_p: {0}
+> [eva] realloc.c:172: Frama_C_show_each_p: {{ &__realloc_main11_l171 }}
 > [eva] realloc.c:165: Call to builtin reallocarray
 > [eva:malloc] bases_to_realloc: {__realloc_main11_l171}
 > [eva:malloc] realloc.c:165: weak free on bases: {__realloc_main11_l171}

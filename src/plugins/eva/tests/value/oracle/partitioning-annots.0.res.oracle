@@ -40,27 +40,27 @@
 [eva] partitioning-annots.c:104: 
   Frama_C_show_each_before_first_split: {0; 1}, {0; 1; 2}, {0}
 [eva] partitioning-annots.c:107: 
-  Frama_C_show_each_before_second_split: {1}, {0; 1; 2}, {1}
-[eva] partitioning-annots.c:107: 
   Frama_C_show_each_before_second_split: {0}, {0; 1; 2}, {0}
+[eva] partitioning-annots.c:107: 
+  Frama_C_show_each_before_second_split: {1}, {0; 1; 2}, {1}
 [eva] partitioning-annots.c:109: 
-  Frama_C_show_each_before_first_merge: {1}, {2}, {1}
-[eva] partitioning-annots.c:109: 
-  Frama_C_show_each_before_first_merge: {1}, {1}, {1}
-[eva] partitioning-annots.c:109: 
-  Frama_C_show_each_before_first_merge: {1}, {0}, {1}
-[eva] partitioning-annots.c:109: 
-  Frama_C_show_each_before_first_merge: {0}, {2}, {0}
+  Frama_C_show_each_before_first_merge: {0}, {0}, {0}
 [eva] partitioning-annots.c:109: 
   Frama_C_show_each_before_first_merge: {0}, {1}, {0}
 [eva] partitioning-annots.c:109: 
-  Frama_C_show_each_before_first_merge: {0}, {0}, {0}
+  Frama_C_show_each_before_first_merge: {0}, {2}, {0}
+[eva] partitioning-annots.c:109: 
+  Frama_C_show_each_before_first_merge: {1}, {0}, {1}
+[eva] partitioning-annots.c:109: 
+  Frama_C_show_each_before_first_merge: {1}, {1}, {1}
+[eva] partitioning-annots.c:109: 
+  Frama_C_show_each_before_first_merge: {1}, {2}, {1}
 [eva] partitioning-annots.c:111: 
-  Frama_C_show_each_before_second_merge: {0; 1}, {2}, {0; 1}
+  Frama_C_show_each_before_second_merge: {0; 1}, {0}, {0; 1}
 [eva] partitioning-annots.c:111: 
   Frama_C_show_each_before_second_merge: {0; 1}, {1}, {0; 1}
 [eva] partitioning-annots.c:111: 
-  Frama_C_show_each_before_second_merge: {0; 1}, {0}, {0; 1}
+  Frama_C_show_each_before_second_merge: {0; 1}, {2}, {0; 1}
 [eva] partitioning-annots.c:113: 
   Frama_C_show_each_end: {0; 1}, {0; 1; 2}, {0; 1}
 [eva] Recording results for test_split
@@ -74,19 +74,19 @@
 [eva] partitioning-annots.c:121: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: {2}, {2}
-[eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: {1}, {1}
-[eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: {0}, {0}
 [eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: ⊥, ⊥
+[eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: {0}, {0}
+[eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: {1}, {1}
+[eva] partitioning-annots.c:124: Frama_C_show_each_split_with_uninit: {2}, {2}
 [eva] partitioning-annots.c:126: Frama_C_show_each_no_split: {0}, {0; 1; 2}
 [eva] computing for function Frama_C_interval <- test_dynamic_split <- main.
   Called from partitioning-annots.c:127.
 [eva] partitioning-annots.c:127: 
   function Frama_C_interval: precondition 'order' got status valid.
 [eva] Done for function Frama_C_interval
-[eva] partitioning-annots.c:131: Frama_C_show_each_split: {0}, {2}
-[eva] partitioning-annots.c:131: Frama_C_show_each_split: {0}, {1}
 [eva] partitioning-annots.c:131: Frama_C_show_each_split: {0}, {0}
+[eva] partitioning-annots.c:131: Frama_C_show_each_split: {0}, {1}
+[eva] partitioning-annots.c:131: Frama_C_show_each_split: {0}, {2}
 [eva] partitioning-annots.c:133: Frama_C_show_each_no_split: {0}, {0; 1; 2}
 [eva] Recording results for test_dynamic_split
 [eva] Done for function test_dynamic_split
@@ -106,18 +106,18 @@
   Called from partitioning-annots.c:230.
 [eva] using specification for function spec
 [eva] Done for function spec
-[eva] partitioning-annots.c:235: Frama_C_show_each_spec: [-2147483648..-10], ⊥
-[eva] partitioning-annots.c:235: Frama_C_show_each_spec: [10..2147483647], ⊥
 [eva] partitioning-annots.c:235: Frama_C_show_each_spec: {-1}, [-1000..1000]
+[eva] partitioning-annots.c:235: Frama_C_show_each_spec: [10..2147483647], ⊥
+[eva] partitioning-annots.c:235: Frama_C_show_each_spec: [-2147483648..-10], ⊥
 [eva] computing for function body <- test_splits_post_call <- main.
   Called from partitioning-annots.c:236.
 [eva] Recording results for body
 [eva] Done for function body
 [eva] partitioning-annots.c:236: Reusing old results for call to body
 [eva] partitioning-annots.c:236: Reusing old results for call to body
-[eva] partitioning-annots.c:241: Frama_C_show_each_body: [-510..-10], ⊥
-[eva] partitioning-annots.c:241: Frama_C_show_each_body: [10..510], ⊥
 [eva] partitioning-annots.c:241: Frama_C_show_each_body: {-1}, [-1000..1000]
+[eva] partitioning-annots.c:241: Frama_C_show_each_body: [10..510], ⊥
+[eva] partitioning-annots.c:241: Frama_C_show_each_body: [-510..-10], ⊥
 [eva] Recording results for test_splits_post_call
 [eva] Done for function test_splits_post_call
 [eva] computing for function test_auto_limit <- main.
@@ -162,18 +162,18 @@
                           main.
   Called from partitioning-annots.c:365.
 [eva] Done for function more_complex_disjunction
-[eva] partitioning-annots.c:366: Frama_C_show_each: {0}, {-2}
-[eva] partitioning-annots.c:366: Frama_C_show_each: [-99..-1], {-1}
-[eva] partitioning-annots.c:366: Frama_C_show_each: [11..99], {1}
 [eva] partitioning-annots.c:366: Frama_C_show_each: [1..10], {0}
+[eva] partitioning-annots.c:366: Frama_C_show_each: [11..99], {1}
+[eva] partitioning-annots.c:366: Frama_C_show_each: [-99..-1], {-1}
+[eva] partitioning-annots.c:366: Frama_C_show_each: {0}, {-2}
 [eva] computing for function more_complex_disjunction <- test_logic_disjunction <- 
                           main.
   Called from partitioning-annots.c:369.
 [eva] Done for function more_complex_disjunction
-[eva] partitioning-annots.c:371: Frama_C_show_each: [11..99], {1}
-[eva] partitioning-annots.c:371: Frama_C_show_each: [1..10], {0}
-[eva] partitioning-annots.c:371: Frama_C_show_each: [-99..-1], {-1}
 [eva] partitioning-annots.c:371: Frama_C_show_each: {0}, {-2}
+[eva] partitioning-annots.c:371: Frama_C_show_each: [-99..-1], {-1}
+[eva] partitioning-annots.c:371: Frama_C_show_each: [1..10], {0}
+[eva] partitioning-annots.c:371: Frama_C_show_each: [11..99], {1}
 [eva] Recording results for test_logic_disjunction
 [eva] Done for function test_logic_disjunction
 [eva] Recording results for main

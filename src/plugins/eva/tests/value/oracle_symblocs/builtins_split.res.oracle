@@ -1,0 +1,53 @@
+60a61
+> [eva] builtins_split.c:96: Call to builtin Frama_C_builtin_split_all
+64a66
+> [eva] builtins_split.c:96: Call to builtin Frama_C_builtin_split_all
+77a80,100
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+81a105
+> [eva] builtins_split.c:104: Call to builtin Frama_C_builtin_split_all
+99a124,130
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+103a135
+> [eva] builtins_split.c:112: Call to builtin Frama_C_builtin_split_all
+105a138,151
+> [eva] builtins_split.c:114: 
+>   Frama_C_show_each_s_5: {{ &s6 + {4} }}, {{ &s4 + {4} }}, {{ &s0 }}, {0}
+> [eva] builtins_split.c:114: 
+>   Frama_C_show_each_s_5:
+>   {{ &s6 + {4} }}, {{ &s4 + {4} }}, {{ &s2 }}, [-2147483648..2147483647]
+> [eva] builtins_split.c:114: 
+>   Frama_C_show_each_s_5: {{ &s5 + {4} }}, {{ &s4 + {4} }}, {{ &s0 }}, {0}
+> [eva] builtins_split.c:114: 
+>   Frama_C_show_each_s_5:
+>   {{ &s5 + {4} }}, {{ &s4 + {4} }}, {{ &s2 }}, [-2147483648..2147483647]
+> [eva] builtins_split.c:114: 
+>   Frama_C_show_each_s_5: {{ &s5 + {4} }}, {{ &s3 + {4} }}, {{ &s0 }}, {0}
+> [eva] builtins_split.c:114: 
+>   Frama_C_show_each_s_5: {{ &s5 + {4} }}, {{ &s3 + {4} }}, {{ &s1 }}, {-1}

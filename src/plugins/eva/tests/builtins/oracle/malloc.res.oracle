@@ -10,7 +10,7 @@
 [eva:malloc:new] malloc.c:17: allocating variable __malloc_main_l17
 [eva] malloc.c:17: Call to builtin malloc
 [eva:malloc] malloc.c:17: 
-  resizing variable `__malloc_main_l17' (0..-1/34359738359) to fit 0..-1
+  resizing variable `__malloc_main_l17' (0..-1) to fit 0..-1/34359738359
 [eva] malloc.c:18: Call to builtin malloc
 [eva:malloc:new] malloc.c:18: allocating variable __malloc_main_l18
 [eva] malloc.c:18: Call to builtin malloc
@@ -38,17 +38,18 @@
   __fc_heap_status ∈ [--..--]
   x ∈ {1; 2}
   s ∈ {{ NULL ; &__malloc_main_l11[0] }}
-  p ∈ {{ (int *)&__malloc_main_l17 }}
+  p ∈ {{ &__malloc_main_l17[0] }}
   q ∈ {{ &__malloc_main_l18[0] }}
   r ∈ {{ &__malloc_main_l20[0] ; &__malloc_main_l20_0[0] }}
   mw ∈ {{ (int *)&__alloc_w_main }}
   mw2 ∈ {{ (int *)&__alloc_w_main }}
-  __malloc_main_l17[bits 0 to 31] ∈ {1}
-                   [4..7] ∈ UNINITIALIZED
-                   [bits 64 to 95] ∈ {3}
-                   [12..99995] ∈ UNINITIALIZED
-                   [bits 799968 to 799999] ∈ {4}
-                   [100000..4294967294] ∈ UNINITIALIZED
+  __malloc_main_l17[0] ∈ {1}
+                   [1] ∈ UNINITIALIZED
+                   [2] ∈ {3}
+                   [3..24998] ∈ UNINITIALIZED
+                   [24999] ∈ {4}
+                   {[25000..1073741822]; [1073741823][bits 0 to 23]} ∈
+                   UNINITIALIZED
   __malloc_main_l18[0] ∈ {1}
                    [1] ∈ UNINITIALIZED
                    [2] ∈ {3}

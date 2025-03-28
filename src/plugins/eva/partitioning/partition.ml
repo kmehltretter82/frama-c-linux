@@ -221,12 +221,12 @@ struct
         let (<?>) c (cmp,x,y) =
           if c = 0 then cmp x y else c
         in
-        Stdlib.Option.compare IntPair.compare k1.ration_stamp k2.ration_stamp
-        <?> (LoopList.compare, k1.loops, k2.loops)
+        LoopList.compare k1.loops k2.loops
         <?> (Splits.compare, k1.splits, k2.splits)
         (* Ignore monitors in comparison *)
         <?> (SplitMap.compare (fun _ _ -> 0), k1.dynamic_splits, k2.dynamic_splits)
         <?> (BranchList.compare, k1.branches, k2.branches)
+        <?> (Stdlib.Option.compare IntPair.compare, k1.ration_stamp, k2.ration_stamp)
 
       let equal = Datatype.from_compare
 
@@ -308,7 +308,7 @@ let filter = KMap.filter
 let merge = KMap.merge
 
 let to_list (p : 'a partition) : (key * 'a) list =
-  KMap.fold (fun k x l -> (k, x) :: l) p []
+  KMap.bindings p
 
 
 (* --- Partitioning actions --- *)
@@ -338,6 +338,9 @@ struct
   type state = Abstract.Dom.t
   type t =  (key * state) list
 
+  (* This module tries to keep lists of pairs (key, state) sorted in increasing
+     order according to Key.compare. *)
+
   let empty = []
 
   let initial (p : 'a list) : t =
@@ -347,7 +350,7 @@ struct
     List.map snd f
 
   let of_partition (p : state partition) : t =
-    KMap.fold (fun k x l -> (k,x) :: l) p []
+    KMap.bindings p
 
   let to_partition (p : t) : state partition =
     let add p (k,x) =
@@ -674,7 +677,9 @@ struct
     List.iter (fun (k, x) -> f k x) p
 
   let join_duplicate_keys (p : t) : t =
-    let cmp (k, _) (k', _) = Key.compare k k' in
+    (* Function [aux] below reverses the list, so sort by decreasing order
+       to keep a list sorted by increasing order. *)
+    let cmp (k, _) (k', _) = Key.compare k' k in
     let p = List.fast_sort cmp p in
     let rec aux acc (key, state) = function
       | [] -> (key, state) :: acc

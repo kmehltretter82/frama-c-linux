@@ -193,18 +193,6 @@
 [eva] Done for function signal
 [eva] computing for function raise <- test_sighandler <- main.
   Called from signal_c_h.c:92.
-[eva] computing for function get_signal_handler <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:74.
-[eva] Recording results for get_signal_handler
-[eva] Done for function get_signal_handler
-[eva] computing for function signal_handler <- raise <- test_sighandler <- main.
-  Called from FRAMAC_SHARE/libc/signal.c:75.
-[eva] Recording results for signal_handler
-[eva] Done for function signal_handler
-[eva] Recording results for raise
-[eva] Done for function raise
-[eva] computing for function raise <- test_sighandler <- main.
-  Called from signal_c_h.c:92.
 [eva] FRAMAC_SHARE/libc/signal.c:74: 
   Reusing old results for call to get_signal_handler
 [eva] computing for function SIG_IGN <- raise <- test_sighandler <- main.
@@ -219,6 +207,18 @@
 [eva] Done for function exit
 [eva] Recording results for SIG_DFL
 [eva] Done for function SIG_DFL
+[eva] Recording results for raise
+[eva] Done for function raise
+[eva] computing for function raise <- test_sighandler <- main.
+  Called from signal_c_h.c:92.
+[eva] computing for function get_signal_handler <- raise <- test_sighandler <- main.
+  Called from FRAMAC_SHARE/libc/signal.c:74.
+[eva] Recording results for get_signal_handler
+[eva] Done for function get_signal_handler
+[eva] computing for function signal_handler <- raise <- test_sighandler <- main.
+  Called from FRAMAC_SHARE/libc/signal.c:75.
+[eva] Recording results for signal_handler
+[eva] Done for function signal_handler
 [eva] Recording results for raise
 [eva] Done for function raise
 [eva] signal_c_h.c:99: assertion 'handler_called' got status valid.
