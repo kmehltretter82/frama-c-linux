@@ -1975,18 +1975,6 @@ struct
         locals = b.blocals }
     | _ -> i2c (s,[],[],[])
 
-  (* There is a known bug if the chunk is not empty and the expression
-     is dangerous : if the returned expression is not evaluated in the chunk we
-     drop it anyway. In most cases its not the case, for instance [t[i] = 42;]
-     becomes [*(t + i) = 42;] and returns the expression [*(t + i)] which can be
-     safely ignored. But [(t[i]=42)/0;] becomes [int tmp = 1; *(t + i) = 42;] and
-     the division by 0 is ignored. Removing [isEmpty s'] solves the issue, but
-     keeps a lot of of useless expression like the first example (cf. issue
-     #1529).
-  *)
-  let is_dangerous_computation se e =
-    isEmpty se && is_dangerous e
-
   (* We can duplicate a chunk if it has a few simple statements, and if
    * it does not have cases, locals or statics *)
   let duplicateChunk (c: chunk) = (* raises Failure if you should not
@@ -3408,6 +3396,15 @@ let afterConversion ~ghost (c: chunk) : chunk =
       d_chunk c d_chunk res;
   *)
   res
+
+(* Return true if the expression is dangerous and, in case of lvalue, if the
+   chunk is empty. If the chunk is not empty, then the lvalue is probably used
+   or initialized inside it. *)
+let is_dangerous_computation se e =
+  is_dangerous e &&
+  match e.enode with
+  | Lval _ -> isEmpty se
+  | _ -> true
 
 (***** Try to suggest a name for the anonymous structures *)
 let suggestAnonName (nl: Cabs.name list) =

@@ -16,10 +16,9 @@ return 65 ;
 int main (void) {
 int *p=0;
 if (*p);
-(*p--)/0; // Bug, division is ignored (cf. issue #1529)
+(*p--)/0; // Division by 0 should be kept
 ss.s2.a; // not dangerous, remove
 ss.s1[2].a; // maybe dangerous, keep
-// Bug : Some dangerous intermediate expressions are dropped (cf. issue #1529)
-int d = (*p/0, (*p--)/0, *p);
+int d = (*p/0, (*p--)/0, *p); // Division by 0 should be kept
 return 0 ;
 }

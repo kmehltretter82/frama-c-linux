@@ -27,10 +27,12 @@ int main(void)
   tmp_0 = p;
   p --;
   ;
-  int *tmp_3 = ss.s1[2].a;
-  int tmp_5 = *p / 0;
+  int tmp_3 = *tmp_0 / 0;
+  int *tmp_5 = ss.s1[2].a;
+  int tmp_7 = *p / 0;
   tmp_0_0 = p;
   p --;
+  int tmp_9 = *tmp_0_0 / 0;
   int d = *p;
   __retres = 0;
   return __retres;
