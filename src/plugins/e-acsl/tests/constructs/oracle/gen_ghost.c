@@ -39,12 +39,11 @@ int main(void)
   {
     int __gen_e_acsl_valid;
     __e_acsl_assert_data_t __gen_e_acsl_assert_data = {.values = (void *)0};
-    __gen_e_acsl_valid = __e_acsl_valid((void *)P,sizeof(int \ghost),
-                                        (void *)P,(void *)(& P));
+    __gen_e_acsl_valid = __e_acsl_valid((void *)P,sizeof(int),(void *)P,
+                                        (void *)(& P));
     __e_acsl_assert_register_ptr(& __gen_e_acsl_assert_data,"P",(void *)P);
-    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,
-                                   "sizeof(int \\ghost)",0,
-                                   sizeof(int \ghost));
+    __e_acsl_assert_register_ulong(& __gen_e_acsl_assert_data,"sizeof(int)",
+                                   0,sizeof(int));
     __e_acsl_assert_register_int(& __gen_e_acsl_assert_data,"\\valid(P)",0,
                                  __gen_e_acsl_valid);
     __gen_e_acsl_assert_data.blocking = 1;
