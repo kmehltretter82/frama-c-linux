@@ -9,6 +9,7 @@
 
 int main(void) {
   /*@ ghost P = &G; */;
+  /*@ assert \valid(P); @*/
   /*@ ghost int \ghost *q = P; */
   /*@ ghost (*P)++; */
   /*@ assert *q == G; */
