@@ -83,7 +83,7 @@ module Domain = struct
 
   (* Trivial transfer function: add all visited statements to the current
      state. *)
-  let transfer v _ state =
+  let transfer (v,_,_) state =
     match v.Interpreted_automata.vertex_start_of with
     | None -> Some state
     | Some stmt -> Some (StmtSet.add stmt state)

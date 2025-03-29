@@ -34,7 +34,7 @@ struct
     | Lval (Var vi, _) -> Set.singleton vi
     | Lval (Mem e, _) -> vars e
 
-  let transfer _ e v =
+  let transfer (_,e,_) v =
     let open Interpreted_automata in
     let r = match e.edge_transition with
       | Skip | Prop _ | Leave _ | Return (None,_) ->

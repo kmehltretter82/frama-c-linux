@@ -83,7 +83,7 @@ struct
     with Not_constant ->
       Map.remove vi v
 
-  let transfer _ e v =
+  let transfer (_,e,_) v =
     let open Interpreted_automata in
     match e.edge_transition with
     | Skip | Return _ | Prop _ | Enter _ | Leave _ -> Some v

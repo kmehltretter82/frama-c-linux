@@ -167,20 +167,20 @@ module Automaton = Datatype.Make
       let pretty fmt automaton = G.pretty fmt automaton.graph
     end)
 
+let wto_pref v1 v2 =
+  match v1.vertex_info, v2.vertex_info with
+  | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
+  | NoneInfo, LoopHead _ -> -1
+  | LoopHead _ , NoneInfo -> 1
+  | NoneInfo, NoneInfo ->
+    match v1.vertex_start_of, v2.vertex_start_of with
+    | None, None -> 0
+    | None, _ -> -1
+    | _ , None -> 1
+    | Some _, Some _ -> 0
+
 let build_wto graph entry_point =
-  let pref v1 v2 =
-    match v1.vertex_info, v2.vertex_info with
-    | LoopHead {level = i}, LoopHead {level = j} -> - (compare i j)
-    | NoneInfo, LoopHead _ -> -1
-    | LoopHead _ , NoneInfo -> 1
-    | NoneInfo, NoneInfo ->
-      match v1.vertex_start_of, v2.vertex_start_of with
-      | None, None -> 0
-      | None, _ -> -1
-      | _ , None -> 1
-      | Some _, Some _ -> 0
-  in
-  G.build_wto ~pref graph entry_point
+  G.build_wto ~pref:wto_pref graph entry_point
 
 
 (* Automata translation *)
@@ -373,3 +373,34 @@ let find_loop (automaton: automaton) vertex =
         else find (l @ tl)
     in
     Some (find automaton.wto)
+
+
+(* Dataflow analysis *)
+
+type 'a widening = 'a G.widening = Fixpoint | Widening of 'a
+
+module type Domain = G.Domain
+
+module ForwardAnalysis (D : Domain) =
+struct
+  module Analysis = G.ForwardAnalysis (D)
+
+  let fixpoint automaton initial_state =
+    let wto = (automaton : automaton).wto in
+    Analysis.compute automaton.graph wto initial_state
+end
+
+module BackwardAnalysis (D : Domain) =
+struct
+  module Analysis = G.BackwardAnalysis (D)
+
+  let build_wto automaton =
+    let init = automaton.return_point
+    and succs = fun v -> G.pred automaton.graph v
+    and pref = wto_pref in
+    G.WTO.partition ~pref ~init ~succs
+
+  let fixpoint automaton initial_state =
+    let wto = build_wto automaton in
+    Analysis.compute automaton.graph wto initial_state
+end
