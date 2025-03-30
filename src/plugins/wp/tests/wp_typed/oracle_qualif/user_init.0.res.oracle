@@ -86,7 +86,7 @@
 [wp] [Valid] typed_init_t2_bis_v1_terminates (Qed)
 [wp] [Valid] typed_init_t2_bis_v1_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v1_exits (Qed)
-[wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_init_t2_bis_v1_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Partial_established (Qed)
 [wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v1_loop_invariant_Range_established (Qed)
@@ -98,7 +98,7 @@
 [wp] [Valid] typed_init_t2_bis_v2_terminates (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_ensures (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_exits (Qed)
-[wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
+[wp] [Unsuccess] typed_init_t2_bis_v2_loop_invariant_Partial_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Partial_established (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Range_preserved (Alt-Ergo) (Cached)
 [wp] [Valid] typed_init_t2_bis_v2_loop_invariant_Range_established (Qed)
@@ -107,11 +107,12 @@
 [wp] [Valid] typed_init_t2_bis_v2_loop_variant_positive (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_call_init_requires (Qed)
 [wp] [Valid] typed_init_t2_bis_v2_call_init_requires_2 (Qed)
-[wp] Proved goals:  104 / 104
+[wp] Proved goals:  102 / 104
   Terminating:     5
   Unreachable:     5
   Qed:            55
-  Alt-Ergo:       39
+  Alt-Ergo:       37
+  Unsuccess:       2
 ------------------------------------------------------------
  Functions                 WP     Alt-Ergo  Total   Success
   init                      8        3       11       100%
@@ -119,6 +120,6 @@
   init_t2_v1                9        8       17       100%
   init_t2_v2                9        8       17       100%
   init_t2_v3                7        8       15       100%
-  init_t2_bis_v1            8        4       12       100%
-  init_t2_bis_v2            8        4       12       100%
+  init_t2_bis_v1            8        3       12      91.7%
+  init_t2_bis_v2            8        3       12      91.7%
 ------------------------------------------------------------

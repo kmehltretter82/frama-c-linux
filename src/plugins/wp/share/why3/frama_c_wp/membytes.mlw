@@ -958,8 +958,6 @@ module InitBlockRW
   
   type iblock = block bool
   
-  predicate is_init_range(b: iblock) (o: int) (size: int) =
-    forall i: int. o <= i < o + size -> M.get b i = True
   
   function bread_init8 (b: iblock) (o: int) : bool =
     decode_init8 (bread_8bits b o)
@@ -1117,9 +1115,6 @@ module MemBytes
   type memory = map int (VB.vblock)
   type init   = map int (IB.iblock)
 
-  (* override memory cinits for MemBytes memory *)
-  predicate cinits (init)
-
   function raw_get (m: map int (map int 'a)) (a: addr) : 'a =
     get (get m a.base) a.offset
 
@@ -1141,11 +1136,6 @@ module MemBytes
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size
 
-  predicate is_init_range (i: init) (a: addr) (size: int) =
-    IB.is_init_range (get i a.base) a.offset size
-
-  function set_init_range (cur: init) (a: addr) (size: int) : init =
-    set cur a.base (bwrite_seq (get cur a.base) a.offset (init_seq size))
 
   function read_uint8 (m: memory) (a: addr) : int =
     VB.bread_uint8 m[a.base] a.offset

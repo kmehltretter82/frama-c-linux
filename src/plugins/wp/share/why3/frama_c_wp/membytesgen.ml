@@ -413,9 +413,7 @@ let init_blockrw_preambule fmt () =
     ; "Offset", None
     ; "RWBytes", None
     ] ;
-  fprintf fmt "type iblock = block bool@,@," ;
-  fprintf fmt "predicate is_init_range(b: iblock) (o: int) (size: int) =@," ;
-  fprintf fmt "  forall i: int. o <= i < o + size -> M.get b i = True@,"
+  fprintf fmt "type iblock = block bool@,@,"
 
 let init_blockrw_write fmt size =
   fprintf fmt "@[<v 2>function bwrite_init%d (b: iblock) (o: int) (init: bool) : iblock =@," size;
@@ -486,9 +484,6 @@ let membytes_preambule fmt () =
     {|type memory = map int (VB.vblock)
   type init   = map int (IB.iblock)
 
-  (* override memory cinits for MemBytes memory *)
-  predicate cinits (init)
-
   function raw_get (m: map int (map int 'a)) (a: addr) : 'a =
     get (get m a.base) a.offset
 
@@ -510,11 +505,6 @@ let membytes_preambule fmt () =
   predicate eqmem (m1 m2: map int (block 'a)) (a: addr) (size: int) =
     beq_blocks (get m1 a.base) (get m2 a.base) (a.offset) size
 
-  predicate is_init_range (i: init) (a: addr) (size: int) =
-    IB.is_init_range (get i a.base) a.offset size
-
-  function set_init_range (cur: init) (a: addr) (size: int) : init =
-    set cur a.base (bwrite_seq (get cur a.base) a.offset (init_seq size))
 |}
 
 let membytes_write fmt t =

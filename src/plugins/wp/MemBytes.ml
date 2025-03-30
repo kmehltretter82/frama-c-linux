@@ -41,27 +41,11 @@ struct
     | Some l :: _ -> l
     | _ -> raise Not_found
 
-  let l_memcpy = Qed.Engine.F_call "memcpy"
-  let f_memcpy =
-    Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
-  let memcpy mtgt msrc ltgt lsrc length =
-    Lang.F.e_fun f_memcpy [mtgt;msrc;ltgt;lsrc;length]
+  let f_eqmem = Lang.extern_fp ~library "eqmem"
+  let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
 
-  let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits"
-  let cinits m = p_call p_cinits [m]
   let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst"
   let sconst m = p_call p_sconst [m]
-  let p_is_init_range = Lang.extern_fp ~library "is_init_range"
-  let is_init_range m a size = p_call p_is_init_range [ m ; a ; size ]
-
-  let ty_fst_arg_val = function
-    | Some (Qed.Logic.Array (_, Qed.Logic.Array (_, t))) :: _ -> t
-    | _ -> raise Not_found
-
-  let f_raw_get = Lang.extern_f ~typecheck:ty_fst_arg_val ~library "raw_get"
-  let raw_get m a = e_fun f_raw_get [ m ; a ]
-  let f_raw_set = Lang.extern_f ~typecheck:ty_fst_arg ~library "raw_set"
-  let raw_set m a v = e_fun f_raw_set [ m ; a ; v]
 
   let p_bytes = Lang.extern_fp ~library "bytes"
   let bytes m = p_call p_bytes [ m ]
@@ -165,11 +149,6 @@ struct
     | Mem -> tau_of_memory
     | Init -> tau_of_init
     | Alloc -> Logic.Array (Logic.Int, Logic.Int)
-
-  let val_of_chunk = function
-    | Mem -> Logic.Int
-    | Init -> Logic.Bool
-    | Alloc -> Logic.Int
 
   let basename_of_chunk = function
     | Mem -> "mem"
@@ -609,7 +588,7 @@ let store_init_atom sigma obj loc v =
 
 module LOADER =
 struct
-  let name = "MemBytes.Loader"
+  let name = "MemBytes.LOADER"
 
   type nonrec loc = loc
 
@@ -623,45 +602,12 @@ struct
   let value_footprint _ _ = Sigma.Domain.singleton m_mem
   let init_footprint _ _ = Sigma.Domain.singleton m_init
 
-  let frames ~length obj p chunk =
-    match Sigma.ckind chunk with
-    | State.Mu Alloc -> []
-    | State.Mu m ->
-      let n = e_mul length @@ sizeof obj in
-      let tau = Chunk.val_of_chunk m in
-      let basename = Chunk.basename_of_chunk m in
-      let t_block = Qed.Logic.Array (Qed.Logic.Int, tau) in
-      let t_mem = Qed.Logic.Array(Qed.Logic.Int, t_block) in
-      let m  = e_var (Lang.freshvar ~basename t_mem) in
-      let m' = e_var (Lang.freshvar ~basename t_mem) in
-      let p' = e_var (Lang.freshvar ~basename:"p" MemAddr.t_addr) in
-      let n' = e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-      let q' = e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
-      let v' = e_var (Lang.freshvar ~basename:"v" tau) in
-      let sepv = p_call MemAddr.p_separated [p;n;q';e_one] in
-      let sepn = p_call MemAddr.p_separated [p;n;p';n'] in
-      [
-        "update", [], [sepv], m , WBytes.raw_set m q' v' ;
-        "memcpy", [], [sepn], m , WBytes.memcpy m m' p' q' n' ;
-      ]
-    | _ -> []
-
   let last sigma obj l =
     let n = protected_sizeof_object obj in
     e_sub (e_div (allocated sigma l) n) e_one
 
-  let memcpy _chunk = WBytes.memcpy
-
-  let eqmem_forall obj loc _chunk m1 m2 =
-    let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
-    let p = e_var xp in
-    let addrof l = l in
-    let separated =
-      MemAddr.separated
-        ~shift ~addrof ~sizeof (Rloc (C_int UInt8, p)) (Rloc (obj, loc))
-    in
-    let equal = p_equal (WBytes.raw_get m1 p) (WBytes.raw_get m2 p) in
-    [xp],separated,equal
+  let eqmem _chunk m0 m1 l n = p_call WBytes.f_eqmem [m0;m1;l;n]
+  let memcpy _chunk m0 m1 l0 l1 n = e_fun WBytes.f_memcpy [m0;m1;l0;l1;n]
 
   let load_int = load_int
   let load_float = load_float
@@ -672,10 +618,6 @@ struct
   let store_float = store_float
   let store_pointer = store_pointer
   let store_init_atom = store_init_atom
-
-  let is_init_range sigma obj loc length =
-    let n = e_mul (sizeof obj) length in
-    WBytes.is_init_range (Sigma.value sigma m_init) loc n
 
 end
 
@@ -1041,7 +983,6 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked m_alloc @
-  wellformed_frame WBytes.cinits m_init @
   wellformed_frame WBytes.sconst m_mem @
   [ framed (Sigma.value sigma m_mem) ]
 

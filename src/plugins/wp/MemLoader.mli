@@ -52,14 +52,10 @@ sig
   val value_footprint: c_object -> loc -> domain
   val init_footprint: c_object -> loc -> domain
 
-  val frames : length:term -> c_object -> loc -> chunk -> frame list
-
   val last : sigma -> c_object -> loc -> term
 
+  val eqmem : Chunk.t -> term -> term -> loc -> term -> pred
   val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
-
-  val eqmem_forall :
-    c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
 
   val load_int : sigma -> c_int -> loc -> term
   val load_float : sigma -> c_float -> loc -> term
@@ -70,8 +66,6 @@ sig
   val store_float : sigma -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : sigma -> typ -> loc -> term -> Chunk.t * term
   val store_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
-
-  val is_init_range : sigma -> c_object -> loc -> term -> pred
 
 end
 

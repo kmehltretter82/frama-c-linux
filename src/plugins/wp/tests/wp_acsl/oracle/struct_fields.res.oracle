@@ -214,16 +214,14 @@ end
     (* use Compound *)
     
     goal wp_goal :
-      forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-       addr -> int, a:addr, x:S1_X.
+      forall t:int -> int, t1:addr -> int, t2:addr -> int, t3:addr -> int, a:
+       addr, x:S1_X.
        region (a.base) <= 0 ->
        IsS1_X x ->
-       is_sint16_chunk t3 ->
-       is_sint32_chunk t4 ->
-       is_sint8_chunk t2 ->
-       linked t1 ->
-       sconst t2 ->
-       cinits t -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rd t1 a 3
+       is_sint16_chunk t2 ->
+       is_sint32_chunk t3 ->
+       is_sint8_chunk t1 ->
+       linked t -> sconst t1 -> IsS1_X (Load_S1_X a t1 t2 t3) -> valid_rd t a 3
     
   end
 [wp:print-generated] 
@@ -254,16 +252,15 @@ end
     (* use Compound *)
     
     goal wp_goal :
-      forall t:addr -> bool, t1:int -> int, t2:addr -> int, t3:addr -> int, t4:
-       addr -> int, a:addr.
+      forall t:int -> int, t1:addr -> int, t2:addr -> int, t3:addr -> int, a:
+       addr.
        region (a.base) <= 0 ->
-       is_sint16_chunk t3 ->
-       is_sint32_chunk t4 ->
-       is_sint8_chunk t2 ->
-       linked t1 ->
-       sconst t2 ->
-       cinits t ->
-       valid_rd t1 a 3 -> IsS1_X (Load_S1_X a t2 t3 t4) -> valid_rw t1 a 3
+       is_sint16_chunk t2 ->
+       is_sint32_chunk t3 ->
+       is_sint8_chunk t1 ->
+       linked t ->
+       sconst t1 ->
+       valid_rd t a 3 -> IsS1_X (Load_S1_X a t1 t2 t3) -> valid_rw t a 3
     
   end
 [wp] 2 goals generated
@@ -431,8 +428,7 @@ Assume {
       is_sint8_chunk(Mchar_0) /\
       IsS1_X(Load_S1_X(p, Mchar_0, Mint_0, Mint_1)).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ sconst(Mchar_0) /\
-      cinits(Init_0).
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ sconst(Mchar_0).
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint8_chunk(Mchar_0).
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
@@ -448,8 +444,7 @@ Assume {
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint8_chunk(Mchar_0) /\ IsS1_X(a).
   (* Heap *)
-  Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ sconst(Mchar_0) /\
-      cinits(Init_0).
+  Type: (region(p.base) <= 0) /\ linked(Malloc_0) /\ sconst(Mchar_0).
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\
       is_sint8_chunk(Mchar_0).
   Type: IsS1_X(r) /\ is_sint16_chunk(Mint_0) /\ is_sint32_chunk(Mint_1) /\

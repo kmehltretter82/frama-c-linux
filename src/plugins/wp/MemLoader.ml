@@ -56,14 +56,10 @@ sig
   val value_footprint: c_object -> loc -> domain
   val init_footprint: c_object -> loc -> domain
 
-  val frames : length:term -> c_object -> loc -> Chunk.t -> frame list
-
   val last : sigma -> c_object -> loc -> term
 
+  val eqmem : Chunk.t -> term -> term -> loc -> term -> pred
   val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
-
-  val eqmem_forall :
-    c_object -> loc -> Chunk.t -> term -> term -> var list * pred * pred
 
   val load_int : sigma -> c_int -> loc -> term
   val load_float : sigma -> c_float -> loc -> term
@@ -74,8 +70,6 @@ sig
   val store_float : sigma -> c_float -> loc -> term -> Chunk.t * term
   val store_pointer : sigma -> typ -> loc -> term -> Chunk.t * term
   val store_init_atom : sigma -> c_object -> loc -> term -> Chunk.t * term
-
-  val is_init_range : sigma -> c_object -> loc -> term -> pred
 
 end
 
@@ -105,48 +99,31 @@ struct
   (* -------------------------------------------------------------------------- *)
 
   let memories sigma chunks = List.map (Sigma.value sigma) chunks
-  let assigned sigma c m chunks =
-    List.map
-      (fun c0 -> if Chunk.equal c0 c then m else Sigma.value sigma c0)
-      chunks
 
   let frame_lemmas phi obj ?(length = F.e_one) loc params chunks =
     begin
       let prefix = Fun.debug phi in
-      let sigma = Sigma.create () in
-      List.iteri
-        (fun i chunk ->
-           List.iter
-             (fun (name,triggers,conditions,m1,m2) ->
-                let mem1 = assigned sigma chunk m1 chunks in
-                let mem2 = assigned sigma chunk m2 chunks in
-                let value1 = e_fun phi (params @ mem1) in
-                let value2 = e_fun phi (params @ mem2) in
-                let vars1 = F.vars value1 in
-                let vars2 = F.vars value2 in
-                let l_triggers =
-                  if Vars.subset vars1 vars2 then
-                    [ (Trigger.of_term value2 :: triggers ) ]
-                  else
-                  if Vars.subset vars2 vars1 then
-                    [ (Trigger.of_term value1 :: triggers ) ]
-                  else
-                    [ (Trigger.of_term value1 :: triggers );
-                      (Trigger.of_term value2 :: triggers ) ]
-                in
-                let l_name = Format.asprintf "%s_%s_%s%d"
-                    prefix name (Chunk.basename_of_chunk chunk) i in
-                let l_lemma = F.p_hyps conditions (p_equal value1 value2) in
-                Definitions.define_lemma {
-                  l_kind = Admit ;
-                  l_name ;
-                  l_triggers ;
-                  l_forall = F.p_vars l_lemma ;
-                  l_lemma = l_lemma ;
-                  l_cluster = cluster () ;
-                }
-             ) (M.frames obj ~length loc chunk)
-        ) chunks
+      let s1 = Sigma.create () in
+      let s2 = Sigma.create () in
+      let v1 = e_fun phi (params @ memories s1 chunks) in
+      let v2 = e_fun phi (params @ memories s2 chunks) in
+      let n = F.e_mul length @@ M.sizeof obj in
+      let eqm =
+        F.p_all
+          (fun c ->
+             let m1 = Sigma.value s1 c in
+             let m2 = Sigma.value s2 c in
+             M.eqmem c m1 m2 loc n
+          ) chunks in
+      let def = F.p_imply eqm (F.p_equal v1 v2) in
+      Definitions.define_lemma {
+        l_kind = Admit ;
+        l_name = Format.asprintf "%s_framed" prefix ;
+        l_triggers = [] ;
+        l_forall = F.p_vars def ;
+        l_lemma = def ;
+        l_cluster = cluster () ;
+      }
     end
 
   (* -------------------------------------------------------------------------- *)
@@ -456,18 +433,6 @@ struct
             d_definition = def ;
             d_cluster = cluster ;
           } ;
-          (* Is_init: full-range definition *)
-          let is_init_p = p_call lfun (List.map e_var (x :: xms)) in
-          let is_init_r = M.is_init_range sigma obj loc e_one in
-          let lemma = p_equiv is_init_p is_init_r in
-          Definitions.define_lemma {
-            l_kind = Admit ;
-            l_name = name ^ "_range" ;
-            l_forall = params ;
-            l_triggers = [] ;
-            l_lemma = lemma ;
-            l_cluster = cluster ;
-          } ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -503,20 +468,6 @@ struct
             d_definition = Predicate (Def, def) ;
             d_cluster = cluster ;
           } ;
-          (* Is_init: range definition *)
-          begin match env.length with None -> () | Some len ->
-            let is_init_p = p_call lfun (List.map e_var params) in
-            let is_init_r = M.is_init_range sigma obj loc len in
-            let lemma = p_equiv is_init_p is_init_r in
-            Definitions.define_lemma {
-              l_kind = Admit ;
-              l_name = name ^ "_range" ;
-              l_forall = params ;
-              l_triggers = [] ;
-              l_lemma = lemma ;
-              l_cluster = cluster ;
-            }
-          end ;
           lfun , chunks
 
         let compile = Lang.local generate
@@ -655,7 +606,6 @@ struct
     update seq ~init:true obj loc ~length ()
 
   let assigned seq obj sloc =
-    (* Assert (M.monotonic_init seq.pre seq.post) :: *)
     match sloc with
     | Sloc loc -> assigned_loc seq obj loc
     | Sdescr(xs,loc,condition) ->
@@ -664,10 +614,9 @@ struct
         (fun c ->
            let m1 = Sigma.value seq.pre c in
            let m2 = Sigma.value seq.post c in
-           let p,separated,equal = M.eqmem_forall obj loc c m1 m2 in
-           let sep_from_all = F.p_forall xs (F.p_imply condition separated) in
-           let phi = F.p_forall p (F.p_imply sep_from_all equal) in
-           ps := Assert phi :: !ps
+           let n = M.sizeof obj in
+           let eq = F.p_imply condition (M.eqmem c m1 m2 loc n) in
+           ps := Assert (F.p_forall xs eq) :: !ps
         ) (domain obj loc) ;
       !ps
     | Sarray(loc,obj,n) ->

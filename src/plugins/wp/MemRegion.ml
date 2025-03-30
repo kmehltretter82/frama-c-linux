@@ -374,17 +374,6 @@ struct
         let rc = Chunk.{ data = ArrInit ; region = r } in
         State.chunk rc, e_set (State.value sigma rc) (M.pointer_val l) v
 
-    let is_init_range sigma ty loc length : pred =
-      let l,r = localized "init atom" loc in
-      match R.kind r with
-      | Garbled -> L.is_init_range sigma ty l length
-      | Single _ ->
-        Lang.F.p_bool @@ State.value sigma { data = ValInit ; region = r }
-      | Many _ ->
-        let map = State.value sigma { data = ArrInit ; region = r } in
-        let size = e_mul (L.sizeof ty) length in
-        p_call p_is_init_r [map;M.pointer_val l;size]
-
     (* ---------------------------------------------------------------------- *)
     (* --- Footprints                                                     --- *)
     (* ---------------------------------------------------------------------- *)
@@ -518,11 +507,9 @@ struct
          | State.Mu { data } ->
            begin
              match data with
-             | ValInit -> ()
-             | ArrInit -> assume @@ MemMemory.cinits (e_var m)
              | Value Ptr -> assume @@ global sigma (e_var m)
              | Array Ptr -> assume @@ MemMemory.framed (e_var m)
-             | Value (Int _ | Float _) | Array (Int _ | Float _) -> ()
+             | ValInit | ArrInit | Value _ | Array _ -> ()
            end
          | _ -> ()
       ) sigma ;

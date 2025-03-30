@@ -36,26 +36,19 @@ let ty_fst_arg = function
   | _ -> raise Not_found
 
 
-let l_memcpy = Qed.Engine.F_call "memcpy"
-let l_set_init = Qed.Engine.F_call "set_init"
-
-let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_memcpy "memcpy"
-let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* m-pointer -> prop *)
+let f_eqmem = Lang.extern_fp ~library "eqmem"
+let f_memcpy = Lang.extern_f ~library ~typecheck:ty_fst_arg "memcpy"
+let p_framed = Lang.extern_fp ~coloring:true ~library "framed" (* ptr-memory -> prop *)
 let p_sconst = Lang.extern_fp ~coloring:true ~library "sconst" (* int-memory -> prop *)
-let f_set_init =
-  Lang.extern_f ~library ~typecheck:ty_fst_arg ~link:l_set_init "set_init"
-let p_cinits = Lang.extern_fp ~coloring:true ~library "cinits" (* initializaton-table -> prop *)
-let p_is_init_r = Lang.extern_fp ~library "is_init_range"
 
 (* -------------------------------------------------------------------------- *)
 (* --- Utilities                                                          --- *)
 (* -------------------------------------------------------------------------- *)
 
-let t_mem t = L.Array(MemAddr.t_addr,t)
 let t_malloc = L.Array(L.Int,L.Int)
+let t_mem t = L.Array(MemAddr.t_addr,t)
 let t_init = L.Array(MemAddr.t_addr,L.Bool)
 
-let cinits memory = p_call p_cinits [ memory ]
 let sconst memory = p_call p_sconst [ memory ]
 let framed memory = p_call p_framed [ memory ]
 

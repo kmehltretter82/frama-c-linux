@@ -582,9 +582,9 @@ module BASE = WpContext.Generator(Varinfo)
             l_cluster = cluster_globals () ;
           }
 
-      let initialization prefix x base =
-        match sizeof x with
-        | Some size when Cvalues.always_initialized x ->
+      (* let initialization prefix x base =
+         match sizeof x with
+         | Some size when Cvalues.always_initialized x ->
           let a = Lang.freshvar ~basename:"init" t_init in
           let m = F.e_var a in
           let init_access =
@@ -593,7 +593,7 @@ module BASE = WpContext.Generator(Varinfo)
             else
               F.p_call p_is_init_r [ m ; MemAddr.mk_addr base F.e_zero ; size ]
           in
-          let m_init = MemMemory.cinits m in
+          let m_init = MemMemory.minit m in
           let init_prop = F.p_forall [a] (F.p_imply m_init init_access) in
           Definitions.define_lemma {
             l_kind = Admit ;
@@ -602,7 +602,7 @@ module BASE = WpContext.Generator(Varinfo)
             l_lemma = init_prop ;
             l_cluster = cluster_globals () ;
           }
-        | _ -> ()
+         | _ -> () *)
 
       let generate x =
         let acs_rd = Ast_types.has_qualifier "const" x.vtype in
@@ -625,7 +625,7 @@ module BASE = WpContext.Generator(Varinfo)
         RegisterBASE.define lfun x ;
         region prefix x base ;
         linked prefix x base ;
-        initialization prefix x base ;
+        (* initialization prefix x base ; *)
         base
 
       let compile = Lang.local generate
@@ -1074,18 +1074,9 @@ struct
   let store_pointer sigma _ty l v = updated sigma M_pointer l v
   let store_init_atom sigma _obj l v = updated sigma T_init l v
 
-  let is_init_range sigma obj loc length =
-    let n = F.e_mul (length_of_object obj) length in
-    F.p_call p_is_init_r [ State.value sigma T_init ; loc ; n ]
-
 end
 
 include MemLoader.Make(LOADER)
-
-let assigned seq obj loc =
-  (* Maintain always initialized values initialized *)
-  Assert (MemMemory.cinits (State.value seq.post T_init)) ::
-  assigned seq obj loc
 
 (* -------------------------------------------------------------------------- *)
 (* --- Loc Comparison                                                     --- *)
@@ -1143,7 +1134,6 @@ let frame sigma =
     else []
   in
   wellformed_frame MemAddr.linked T_alloc @
-  wellformed_frame MemMemory.cinits T_init @
   wellformed_frame MemMemory.sconst (M_int (Ctypes.c_char ())) @
   wellformed_frame MemMemory.framed M_pointer
 
