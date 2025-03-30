@@ -661,7 +661,7 @@ let rec type_term
           Error.not_yet "logic functions or predicates performing read accesses"
         | LBinductive _ ->
           type_args type_arg;
-          Error.not_yet "inductive logic functions"
+          Error.not_yet "inductive definitons"
       end
 
     | Tunion _ -> Error.not_yet "tset union"
