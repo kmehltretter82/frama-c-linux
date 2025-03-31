@@ -729,12 +729,7 @@ input:checked + .dome-xSwitch-slider:before {
 /* --- Tree                                                               --- */
 /* -------------------------------------------------------------------------- */
 
-@keyframes dome-xTree-arrow {
-  to {
-    rotate: -90deg;
-    fill: var(--activated-button-color);
-  }
-}
+@keyframes dome-xTree-arrow { to { rotate: -90deg; } }
 @keyframes dome-xTree-arrow-down { from { rotate: -90deg; } }
 
 .dome-xTree {
@@ -748,9 +743,6 @@ input:checked + .dome-xSwitch-slider:before {
   div.dome-xTree-subtree {
     overflow: hidden;
 
-    &:not(:has(.dome-xTree-show-children.dome-xTree-has-subtree)) {
-      border-left: solid 2px var(--background-profound);
-    }
     &.dome-xTree-subtree-hidden {
       height: 0;
       visibility: hidden;
@@ -764,16 +756,10 @@ input:checked + .dome-xSwitch-slider:before {
     justify-content: space-between;
     flex-wrap: wrap;
     padding: 2px;
+    margin-top: 5px;
+    border-radius: 7px;
 
-    &.dome-xTree-has-subtree.dome-xTree-show-children {
-      margin-top: 5px;
-      border-radius: 7px 7px 7px 0;
-      background-color: var(--background-profound);
-    }
-
-    &:hover,
-    &.dome-xTree-show-children:hover,
-    div:hover {
+    &:hover {
       cursor: pointer;
       background-color: var(--background-softer);
     }

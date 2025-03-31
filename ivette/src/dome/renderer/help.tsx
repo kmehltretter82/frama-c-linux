@@ -300,7 +300,6 @@ function GeneralDocModal(): JSX.Element {
           <Tree
             unfoldAll={unfoldAll}
             setUnfoldAll={setUnfoldAll}
-            foldButtonPosition='right'
             selected={selectedId}
             onClick={(id) => history.addElement(id) }
           >
