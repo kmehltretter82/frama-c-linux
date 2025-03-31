@@ -634,7 +634,7 @@ let check_post_conds kf env contract =
            let active = [] in (* TODO: 'for' behaviors, e-acsl#109 *)
            let ppt = Property.ip_assigns_of_behavior kf kinstr ~active b in
            if b.b_assigns <> WritesAny && Translate_utils.must_translate_opt ppt
-           then Env.not_yet env "assigns clause in behavior";
+           then Env.not_yet env "assigns clause";
            (* ignore b.b_extended since we never translate them *)
            env)
         env
