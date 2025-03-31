@@ -29,14 +29,5 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] bts2252.c:17: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] bts2252.c:17: Warning: 
-  function __e_acsl_assert_register_ulong: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
-[eva:alarm] bts2252.c:17: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
 [eva:alarm] bts2252.c:18: Warning: 
   out of bounds read. assert \valid_read(srcbuf + i);

@@ -79,9 +79,3 @@
   is not yet supported.
   Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:917: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] FRAMAC_SHARE/libc/unistd.h:918: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.

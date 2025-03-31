@@ -23,15 +23,6 @@
 [eva:alarm] arith.i:21: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] arith.i:23: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] arith.i:23: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] arith.i:23: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
-[eva:alarm] arith.i:23: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] arith.i:25: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
@@ -44,25 +35,10 @@
 [eva:alarm] arith.i:30: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] arith.i:31: Warning: 
-  function __e_acsl_assert_copy_values: precondition src->values == \null ||
-                                                     \valid(src->values) got status unknown.
-[eva:alarm] arith.i:31: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
 [eva:alarm] arith.i:34: Warning: 
-  function __e_acsl_assert_copy_values: precondition src->values == \null ||
-                                                     \valid(src->values) got status unknown.
-[eva:alarm] arith.i:34: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] arith.i:34: Warning: 
-  function __e_acsl_assert_register_long: precondition data->values == \null ||
-                                                       \valid(data->values) got status unknown.
-[eva:alarm] arith.i:36: Warning: 
-  function __e_acsl_assert_register_int: precondition data->values == \null ||
-                                                      \valid(data->values) got status unknown.
 [eva:alarm] arith.i:36: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
-[eva:alarm] arith.i:39: Warning: 
-  function __e_acsl_assert_register_short: precondition data->values == \null ||
-                                                        \valid(data->values) got status unknown.
 [eva:alarm] arith.i:39: Warning: 
   function __e_acsl_assert, behavior blocking: precondition got status unknown.
