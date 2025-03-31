@@ -1,0 +1,36 @@
+[kernel] Parsing widening_points.i (no preprocessing)
+[eva] Analyzing a complete application starting at main
+[eva] Computing initial state
+[eva] Initial state computed
+[eva:initial-state] Values of globals at initialization
+  
+[eva] widening_points.i:15: Frama_C_show_each: {4}
+[eva] widening_points.i:15: Frama_C_show_each: {3}
+[eva] widening_points.i:15: Frama_C_show_each: {2}
+[eva] widening_points.i:15: Frama_C_show_each: {1}
+[eva] widening_points.i:15: Frama_C_show_each: {0}
+[eva:loop-unroll:partial] widening_points.i:14: loop not completely unrolled
+[eva:partition] widening_points.i:14: starting to merge loop iterations
+[eva] widening_points.i:15: Frama_C_show_each: {-1; 0}
+[eva] widening_points.i:15: Frama_C_show_each: {-2; -1; 0}
+[eva:widening] widening_points.i:14: applying a widening at this point
+[eva:alarm] widening_points.i:14: Warning: 
+  signed overflow. assert -2147483648 ≤ i - 1;
+[eva] widening_points.i:15: Frama_C_show_each: [-2147483648..0]
+[eva] Recording results for main
+[eva] Done for function main
+[eva] ====== VALUES COMPUTED ======
+[eva:final-states] Values at end of function main:
+  NON TERMINATING FUNCTION
+[from] Computing for function main
+[from] Non-terminating function main (no dependencies)
+[from] Done for function main
+[from] ====== DEPENDENCIES COMPUTED ======
+  These dependencies hold at termination for the executions that terminate:
+[from] Function main:
+  NON TERMINATING - NO EFFECTS
+[from] ====== END OF DEPENDENCIES ======
+[inout] Out (internal) for function main:
+    i; tmp
+[inout] Inputs for function main:
+    \nothing
