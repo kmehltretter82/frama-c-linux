@@ -35,7 +35,7 @@
  (optional)
  (public_name frama-c-e-acsl.core)
  (flags -open Frama_c_kernel :standard -w -9)
- (libraries frama-c.kernel frama-c-rtegen.core)
+ (libraries frama-c.kernel frama-c-rtegen.core frama-c-callgraph.core)
  (instrumentation (backend landmarks))
  (instrumentation (backend bisect_ppx))
 )

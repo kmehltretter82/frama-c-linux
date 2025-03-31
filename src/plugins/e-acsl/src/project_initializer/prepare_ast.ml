@@ -648,6 +648,33 @@ let must_duplicate kf vi =
       && (* its annotations must be monitored *)
       Functions.check kf))
 
+module BfsCall = Graph.Traverse.Bfs (Callgraph.Cg.G)
+
+let find_concurrency () =
+  let exception Found in
+  let detect_pthread_create kf =
+    if Kernel_function.get_name kf = "pthread_create" then raise Found
+  in
+  match BfsCall.iter_component
+          detect_pthread_create
+          (Callgraph.Cg.get ())
+          (Globals.Functions.find_by_name (Kernel.MainFunction.get ()))
+  with
+  | exception Found ->
+    if Options.Concurrency.is_set () && not (Options.Concurrency.get ()) then
+      Options.abort
+        "Concurrency function 'pthread_create' found but option \
+         -e-acsl-concurrency has been set to false. Aborting.";
+    if not @@ Options.Concurrency.is_set () then begin
+      Options.feedback
+        "Concurrency function 'pthread_create' found. \
+         Turning on option --e-acsl-concurrency.";
+      Options.Concurrency.on ();
+      (* Putting full mtracking in place *)
+      Options.setup ();
+    end
+  | () | exception Not_found -> ()
+
 let prepare_global (globals, new_defs) = function
   | GFunDecl(_, vi, loc) | GFun({ svar = vi }, loc) as g ->
     let kf = try Globals.Functions.get vi with Not_found -> assert false in
@@ -714,6 +741,7 @@ let prepare_file file =
   file.globals <- sg :: globals
 
 let prepare () =
+  find_concurrency () ;
   Options.feedback ~level:2 "prepare AST for E-ACSL transformations";
   prepare_file (Ast.get ());
   Ast.mark_as_grown ()
