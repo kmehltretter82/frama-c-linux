@@ -3,6 +3,5 @@
   the generated program may miss memory instrumentation
   if there are memory-related annotations.
 [e-acsl] FRAMAC_SHARE/libc/time.h:116: Warning: 
-  E-ACSL construct `assigns clause in behavior' is not yet supported.
-  Ignoring annotation.
+  E-ACSL construct `assigns clause' is not yet supported. Ignoring annotation.
 [e-acsl] translation done in project "e-acsl".
