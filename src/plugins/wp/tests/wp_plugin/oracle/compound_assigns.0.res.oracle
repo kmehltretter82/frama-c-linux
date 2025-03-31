@@ -34,49 +34,20 @@ Cluster Compound {
   
   Function shiftfield_F1_A_f (p_0 : addr) : addr = (shift p_0 0)
   
-  Axiom Load_Init_S1_A_memcpy_Init0:
+  Axiom Load_Init_S1_A_framed:
+    forall Init_1: bool[addr].
+    forall Init_2: bool[addr].
+    forall p_0: addr.
+    (eqmem Init_1 Init_2 p_0 5)
+    -> ((Load_Init_S1_A p_0 Init_2)=(Load_Init_S1_A p_0 Init_1))
+  
+  Axiom Array_sint32_init_framed:
     forall Init_1: bool[addr].
     forall Init_2: bool[addr].
     forall n_0: int.
     forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Load_Init_S1_A p_0 (memcpy Init_1 Init_2 p_1 q_0 n_0)) ]
-    (separated p_0 5 p_1 n_0)
-    -> ((Load_Init_S1_A p_0 (memcpy Init_1 Init_2 p_1 q_0 n_0))=
-        (Load_Init_S1_A p_0 Init_1))
-  
-  Axiom Load_Init_S1_A_update_Init0:
-    forall Init_1: bool[addr].
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: bool.
-    [ (Load_Init_S1_A p_0 Init_1[q_0 <- v_0]) ]
-    (separated p_0 5 q_0 1)
-    -> ((Load_Init_S1_A p_0 Init_1[q_0->v_0])=(Load_Init_S1_A p_0 Init_1))
-  
-  Axiom Array_sint32_init_memcpy_Init0:
-    forall Init_1: bool[addr].
-    forall Init_2: bool[addr].
-    forall n_0: int.
-    forall n_1: int.
-    forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Array_sint32_init p_0 n_0 (memcpy Init_1 Init_2 p_1 q_0 n_1)) ]
-    (separated p_0 n_0 p_1 n_1)
-    -> ((Array_sint32_init p_0 n_0 (memcpy Init_1 Init_2 p_1 q_0 n_1))=
-        (Array_sint32_init p_0 n_0 Init_1))
-  
-  Axiom Array_sint32_init_update_Init0:
-    forall Init_1: bool[addr].
-    forall n_0: int.
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: bool.
-    [ (Array_sint32_init p_0 n_0 Init_1[q_0 <- v_0]) ]
-    (separated p_0 n_0 q_0 1)
-    -> ((Array_sint32_init p_0 n_0 Init_1[q_0->v_0])=
+    (eqmem Init_1 Init_2 p_0 n_0)
+    -> ((Array_sint32_init p_0 n_0 Init_2)=
         (Array_sint32_init p_0 n_0 Init_1))
   
   Axiom Array_sint32_init_access:
@@ -89,77 +60,22 @@ Cluster Compound {
     -> ((Array_sint32_init p_0 n_0 Init_0)[i_0]=
         Init_0[(shift_sint32 p_0 i_0)])
   
-  Axiom Load_S1_A_memcpy_Mf641:
-    forall Mf64_2: f64[addr].
-    forall Mf64_3: f64[addr].
-    forall Mint_3: int[addr].
-    forall n_1: int.
-    forall p_0: addr.
-    forall p_2: addr.
-    forall q_1: addr.
-    [ (Load_S1_A p_0 Mint_3 (memcpy Mf64_2 Mf64_3 p_2 q_1 n_1)) ]
-    (separated p_0 5 p_2 n_1)
-    -> ((Load_S1_A p_0 Mint_3 (memcpy Mf64_2 Mf64_3 p_2 q_1 n_1))=
-        (Load_S1_A p_0 Mint_3 Mf64_2))
-  
-  Axiom Load_S1_A_update_Mf641:
-    forall Mf64_2: f64[addr].
-    forall Mint_3: int[addr].
-    forall p_0: addr.
-    forall q_1: addr.
-    forall v_1: f64.
-    [ (Load_S1_A p_0 Mint_3 Mf64_2[q_1 <- v_1]) ]
-    (separated p_0 5 q_1 1)
-    -> ((Load_S1_A p_0 Mint_3 Mf64_2[q_1->v_1])=
-        (Load_S1_A p_0 Mint_3 Mf64_2))
-  
-  Axiom Load_S1_A_memcpy_Mint0:
+  Axiom Load_S1_A_framed:
     forall Mf64_1: f64[addr].
+    forall Mf64_2: f64[addr].
+    forall Mint_1: int[addr].
+    forall Mint_2: int[addr].
+    forall p_0: addr.
+    (eqmem Mf64_1 Mf64_2 p_0 5) -> (eqmem Mint_1 Mint_2 p_0 5)
+    -> ((Load_S1_A p_0 Mint_2 Mf64_2)=(Load_S1_A p_0 Mint_1 Mf64_1))
+  
+  Axiom Array_sint32_framed:
     forall Mint_1: int[addr].
     forall Mint_2: int[addr].
     forall n_0: int.
     forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Load_S1_A p_0 (memcpy Mint_1 Mint_2 p_1 q_0 n_0) Mf64_1) ]
-    (separated p_0 5 p_1 n_0)
-    -> ((Load_S1_A p_0 (memcpy Mint_1 Mint_2 p_1 q_0 n_0) Mf64_1)=
-        (Load_S1_A p_0 Mint_1 Mf64_1))
-  
-  Axiom Load_S1_A_update_Mint0:
-    forall Mf64_1: f64[addr].
-    forall Mint_1: int[addr].
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: int.
-    [ (Load_S1_A p_0 Mint_1[q_0 <- v_0] Mf64_1) ]
-    (separated p_0 5 q_0 1)
-    -> ((Load_S1_A p_0 Mint_1[q_0->v_0] Mf64_1)=
-        (Load_S1_A p_0 Mint_1 Mf64_1))
-  
-  Axiom Array_sint32_memcpy_Mint0:
-    forall Mint_1: int[addr].
-    forall Mint_2: int[addr].
-    forall n_0: int.
-    forall n_1: int.
-    forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Array_sint32 p_0 n_0 (memcpy Mint_1 Mint_2 p_1 q_0 n_1)) ]
-    (separated p_0 n_0 p_1 n_1)
-    -> ((Array_sint32 p_0 n_0 (memcpy Mint_1 Mint_2 p_1 q_0 n_1))=
-        (Array_sint32 p_0 n_0 Mint_1))
-  
-  Axiom Array_sint32_update_Mint0:
-    forall Mint_1: int[addr].
-    forall n_0: int.
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: int.
-    [ (Array_sint32 p_0 n_0 Mint_1[q_0 <- v_0]) ]
-    (separated p_0 n_0 q_0 1)
-    -> ((Array_sint32 p_0 n_0 Mint_1[q_0->v_0])=
-        (Array_sint32 p_0 n_0 Mint_1))
+    (eqmem Mint_1 Mint_2 p_0 n_0)
+    -> ((Array_sint32 p_0 n_0 Mint_2)=(Array_sint32 p_0 n_0 Mint_1))
   
   Axiom Array_sint32_access:
     forall Mint_0: int[addr].

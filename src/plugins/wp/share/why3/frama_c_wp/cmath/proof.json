@@ -1,0 +1,16 @@
+{
+  "profile": [ { "prover": "alt-ergo@2.5.4", "size": 16, "time": 0.183 } ],
+  "proofs": {
+    "ArcTrigo": { "Cos_acos": null, "Sin_asin": null },
+    "Cmath": { "abs_def": { "prover": "alt-ergo@2.5.4", "time": 0.015 } },
+    "ExpLog": {},
+    "IAbs": {},
+    "RAbs": {},
+    "Square": {
+      "sqrt_0": { "prover": "alt-ergo@2.5.4", "time": 0.016 },
+      "sqrt_1": { "prover": "alt-ergo@2.5.4", "time": 0.013 },
+      "sqrt_lin0": null,
+      "sqrt_lin1": null
+    }
+  }
+}

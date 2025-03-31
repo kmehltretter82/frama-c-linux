@@ -58,6 +58,9 @@ sig
 
   val last : sigma -> c_object -> loc -> term
 
+  val fresh : loc -> var list * loc
+  val separated : loc -> term -> loc -> term -> pred
+
   val eqmem : Chunk.t -> term -> term -> loc -> term -> pred
   val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
 
@@ -615,8 +618,11 @@ struct
            let m1 = Sigma.value seq.pre c in
            let m2 = Sigma.value seq.post c in
            let n = M.sizeof obj in
-           let eq = F.p_imply condition (M.eqmem c m1 m2 loc n) in
-           ps := Assert (F.p_forall xs eq) :: !ps
+           let ys,q = M.fresh loc in
+           let sep = M.separated q e_one loc n in
+           let out = F.p_forall xs (p_imply condition sep) in
+           let eqm = M.eqmem c m1 m2 q e_one in
+           ps := Assert (F.p_forall ys @@ p_imply out eqm) :: !ps
         ) (domain obj loc) ;
       !ps
     | Sarray(loc,obj,n) ->

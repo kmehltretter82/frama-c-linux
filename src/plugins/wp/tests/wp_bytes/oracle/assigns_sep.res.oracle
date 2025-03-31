@@ -72,8 +72,7 @@ Assume {
   (* Call Effects *)
   Have: forall a_2 : addr.
       ((forall i : Z. (((i = 4) \/ (i = 6)) ->
-        (shift_uint8(array_0, i) != a_2))) ->
-      (raw_get(a_1, a_2) = raw_get(mem_1, a_2))).
+        (shift_uint8(array_0, i) != a_2))) -> eqmem(a_1, mem_1, a_2, 1)).
 }
 Prove: x_1 = x.
 

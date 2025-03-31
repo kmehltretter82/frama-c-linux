@@ -160,13 +160,6 @@ struct
   let pretty fmt = function
     | M_int i -> Format.fprintf fmt "M%a" Ctypes.pp_int i
     | m -> Format.pp_print_string fmt (basename_of_chunk m)
-  let val_of_chunk = function
-    | M_int _ -> L.Int
-    | M_f32 -> Cfloat.tau_of_float Ctypes.Float32
-    | M_f64 -> Cfloat.tau_of_float Ctypes.Float64
-    | M_pointer -> MemAddr.t_addr
-    | T_alloc -> L.Int
-    | T_init -> L.Bool
   let tau_of_chunk = function
     | M_int _ -> L.Array(MemAddr.t_addr,L.Int)
     | M_pointer -> L.Array(MemAddr.t_addr,MemAddr.t_addr)
@@ -962,32 +955,6 @@ let loc_of_int _ v = MemAddr.addr_of_int v
 let int_of_loc _ l = MemAddr.int_of_addr l
 
 (* -------------------------------------------------------------------------- *)
-(* --- Frames                                                             --- *)
-(* -------------------------------------------------------------------------- *)
-
-let frames ~length obj p chunk =
-  match Sigma.ckind chunk with
-  | State.Mu T_alloc -> []
-  | State.Mu m ->
-    let n = F.e_mul length @@ length_of_object obj in
-    let tau = Chunk.val_of_chunk m in
-    let basename = Chunk.basename_of_chunk m in
-    let t_mem = L.Array(MemAddr.t_addr,tau) in
-    let m  = F.e_var (Lang.freshvar ~basename t_mem) in
-    let m' = F.e_var (Lang.freshvar ~basename t_mem) in
-    let p' = F.e_var (Lang.freshvar ~basename:"p" MemAddr.t_addr) in
-    let n' = F.e_var (Lang.freshvar ~basename:"n" L.Int) in
-    let q' = F.e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
-    let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
-    let sepv = F.p_call MemAddr.p_separated [p;n;q';F.e_one] in
-    let sepn = F.p_call MemAddr.p_separated [p;n;p';n'] in
-    [
-      "update" , [] , [sepv] , m , F.e_set m q' v' ;
-      "memcpy" , [] , [sepn] , m , F.e_fun f_memcpy [m;m';p';q';n'] ;
-    ]
-  | _ -> []
-
-(* -------------------------------------------------------------------------- *)
 (* --- Chunk element type                                                 --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -1044,7 +1011,6 @@ struct
   let sizeof = length_of_object
   let init_footprint = init_footprint
   let value_footprint = value_footprint
-  let frames = frames
   let to_region_pointer l = 0,l
   let of_region_pointer _ _ l = l
 
@@ -1057,15 +1023,13 @@ struct
   let load_pointer sigma _t l = F.e_get (State.value sigma M_pointer) l
   let load_init_atom sigma _ l = F.e_get (State.value sigma T_init) l
 
-  let memcpy _chunk m m0 l l0 n = F.e_fun f_memcpy [m;m0;l;l0;n]
+  let fresh _l =
+    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    [x] , F.e_var x
+  let separated p n p' n' = F.p_call MemAddr.p_separated [p;n;p';n']
 
-  let eqmem_forall obj loc _chunk m1 m2 =
-    let xp = Lang.freshvar ~basename:"p" MemAddr.t_addr in
-    let p = F.e_var xp in
-    let n = length_of_object obj in
-    let separated = F.p_call MemAddr.p_separated [p;F.e_one;loc;n] in
-    let equal = F.p_equal (F.e_get m1 p) (F.e_get m2 p) in
-    [xp],separated,equal
+  let eqmem _chunk m0 m1 l n = F.p_call f_eqmem [m0;m1;l;n]
+  let memcpy _chunk m m0 l l0 n = F.e_fun f_memcpy [m;m0;l;l0;n]
 
   let updated sigma c l v = State.chunk c , F.e_set (State.value sigma c) l v
 

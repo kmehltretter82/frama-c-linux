@@ -34,8 +34,7 @@ theory Memory
     forall p:addr [m[p]]. region(p.base) <= 0 -> region(m[p].base) <= 0
 
   predicate eqmem (m1 m2 : map addr 'a) (p:addr) (a:int) =
-    forall q:addr [m1[p]|m2[q]]. included q 1 p a -> m1[q] = m2[q]
-
+    forall q:addr [m1[q]|m2[q]]. included q 1 p a -> m1[q] = m2[q]
 
   (* copies the [s] bytes from [m1].[b1] into [m0].[m0] *)
   function memcpy (m0 m1: map addr 'a) (b0 b1:addr) (s:int) : map addr 'a =
@@ -43,10 +42,12 @@ theory Memory
     if separated p 1 b0 s then m0 p else
     let offset = b1.offset - b0.offset + p.offset in
     m1 { b1 with offset = offset }
-(*
-  function havoc (m0 m1 : map addr 'a) (p:addr) (a:int) : map addr 'a =
-    memcpy m1 m0 p p a
-*)
+
+  lemma eqmem_single :
+    forall m1 m2 : map addr 'a.
+    forall p:addr.
+      eqmem m1 m2 p 1 <-> m1[p] = m2[p]
+
   lemma eqmem_included :
     forall m1 m2 : map addr 'a.
     forall p q : addr.
@@ -60,11 +61,16 @@ theory Memory
     forall a : int.
     eqmem m1 m2 p a -> eqmem m2 m1 p a
 
-  lemma havoc_access :
+  lemma eqmem_update :
+    forall m0 : map addr 'a. forall v : 'a.
+    forall p q : addr.
+    forall n' : int.
+      separated p 1 q n' -> eqmem m0 (m0[ p <- v ]) q n'
+
+  lemma eqmem_memcpy :
     forall m0 m1 : map addr 'a.
-    forall q p : addr.
-    forall a : int.
-    (Map.([]) (memcpy m1 m0 p p a) (q)) =
-      (if (separated q 1 p a) then (Map.([]) (m1) (q)) else (Map.([]) (m0) (q)))
+    forall p p' h : addr.
+    forall n n' : int.
+      separated p n p' n' -> eqmem m0 (memcpy m0 m1 p h n) p' n'
 
 end

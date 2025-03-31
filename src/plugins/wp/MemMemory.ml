@@ -53,6 +53,15 @@ let sconst memory = p_call p_sconst [ memory ]
 let framed memory = p_call p_framed [ memory ]
 
 (* -------------------------------------------------------------------------- *)
+(* --- Simplifier for 'eqmem'                                             --- *)
+(* -------------------------------------------------------------------------- *)
+
+let r_eqmem = function
+  | [_;_;_;n] when n = e_zero -> e_false
+  | [m0;m1;p;n] when n = e_one -> e_eq (e_get m0 p) (e_get m1 p)
+  | _ -> raise Not_found
+
+(* -------------------------------------------------------------------------- *)
 (* --- Simplifier for 'memcpy'                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -87,6 +96,7 @@ let r_get_memcpy es ks =
 
 let () = Context.register
     begin fun () ->
+      F.set_builtin f_eqmem r_eqmem ;
       F.set_builtin_get f_memcpy r_get_memcpy ;
     end
 

@@ -129,61 +129,19 @@ theory Compound
     Init_S1_X1 (get init (shiftfield_F1_X_a p))
     (get init (shiftfield_F1_X_b p)) (get init (shiftfield_F1_X_c p))
   
-  axiom Q_Load_S1_X_update_Mchar0 :
-    forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, p:addr, q:
-     addr, v:int [Load_S1_X p (set mchar q v) mint mint1].
-     separated p 3 q 1 ->
-     Load_S1_X p (set mchar q v) mint mint1 = Load_S1_X p mchar mint mint1
-  
   (* use frama_c_wp.memory.Memory *)
   
-  axiom Q_Load_S1_X_memcpy_Mchar0 :
+  axiom Q_Load_S1_X_framed :
     forall mchar:addr -> int, mchar1:addr -> int, mint:addr -> int, mint1:
-     addr -> int, n:int, p:addr, p1:addr, q:addr
-     [Load_S1_X p (memcpy mchar mchar1 p1 q n) mint mint1].
-     separated p 3 p1 n ->
-     Load_S1_X p (memcpy mchar mchar1 p1 q n) mint mint1 =
-     Load_S1_X p mchar mint mint1
+     addr -> int, mint2:addr -> int, mint3:addr -> int, p:addr.
+     eqmem mchar mchar1 p 3 ->
+     eqmem mint mint2 p 3 ->
+     eqmem mint1 mint3 p 3 ->
+     Load_S1_X p mchar1 mint2 mint3 = Load_S1_X p mchar mint mint1
   
-  axiom Q_Load_S1_X_update_Mint1 :
-    forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, p:addr, q:
-     addr, v:int [Load_S1_X p mchar (set mint1 q v) mint].
-     separated p 3 q 1 ->
-     Load_S1_X p mchar (set mint1 q v) mint = Load_S1_X p mchar mint1 mint
-  
-  axiom Q_Load_S1_X_memcpy_Mint1 :
-    forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, mint2:addr
-     -> int, n:int, p:addr, p1:addr, q:addr
-     [Load_S1_X p mchar (memcpy mint1 mint2 p1 q n) mint].
-     separated p 3 p1 n ->
-     Load_S1_X p mchar (memcpy mint1 mint2 p1 q n) mint =
-     Load_S1_X p mchar mint1 mint
-  
-  axiom Q_Load_S1_X_update_Mint2 :
-    forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, p:addr, q:
-     addr, v:int [Load_S1_X p mchar mint (set mint1 q v)].
-     separated p 3 q 1 ->
-     Load_S1_X p mchar mint (set mint1 q v) = Load_S1_X p mchar mint mint1
-  
-  axiom Q_Load_S1_X_memcpy_Mint2 :
-    forall mchar:addr -> int, mint:addr -> int, mint1:addr -> int, mint2:addr
-     -> int, n:int, p:addr, p1:addr, q:addr
-     [Load_S1_X p mchar mint (memcpy mint1 mint2 p1 q n)].
-     separated p 3 p1 n ->
-     Load_S1_X p mchar mint (memcpy mint1 mint2 p1 q n) =
-     Load_S1_X p mchar mint mint1
-  
-  axiom Q_Load_Init_S1_X_update_Init0 :
-    forall init:addr -> bool, p:addr, q:addr, v:bool
-     [Load_Init_S1_X p (set init q v)].
-     separated p 3 q 1 ->
-     Load_Init_S1_X p (set init q v) = Load_Init_S1_X p init
-  
-  axiom Q_Load_Init_S1_X_memcpy_Init0 :
-    forall init:addr -> bool, init1:addr -> bool, n:int, p:addr, p1:addr, q:
-     addr [Load_Init_S1_X p (memcpy init init1 p1 q n)].
-     separated p 3 p1 n ->
-     Load_Init_S1_X p (memcpy init init1 p1 q n) = Load_Init_S1_X p init
+  axiom Q_Load_Init_S1_X_framed :
+    forall init:addr -> bool, init1:addr -> bool, p:addr.
+     eqmem init init1 p 3 -> Load_Init_S1_X p init1 = Load_Init_S1_X p init
   
 end
 [wp:print-generated] 
@@ -304,103 +262,24 @@ Cluster Compound {
   
   Function shiftfield_F1_X_a (p_0 : addr) : addr = (shift p_0 0)
   
-  Axiom Load_Init_S1_X_memcpy_Init0:
+  Axiom Load_Init_S1_X_framed:
     forall Init_1: bool[addr].
     forall Init_2: bool[addr].
-    forall n_0: int.
     forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Load_Init_S1_X p_0 (memcpy Init_1 Init_2 p_1 q_0 n_0)) ]
-    (separated p_0 3 p_1 n_0)
-    -> ((Load_Init_S1_X p_0 (memcpy Init_1 Init_2 p_1 q_0 n_0))=
-        (Load_Init_S1_X p_0 Init_1))
+    (eqmem Init_1 Init_2 p_0 3)
+    -> ((Load_Init_S1_X p_0 Init_2)=(Load_Init_S1_X p_0 Init_1))
   
-  Axiom Load_Init_S1_X_update_Init0:
-    forall Init_1: bool[addr].
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: bool.
-    [ (Load_Init_S1_X p_0 Init_1[q_0 <- v_0]) ]
-    (separated p_0 3 q_0 1)
-    -> ((Load_Init_S1_X p_0 Init_1[q_0->v_0])=(Load_Init_S1_X p_0 Init_1))
-  
-  Axiom Load_S1_X_memcpy_Mint2:
-    forall Mchar_3: int[addr].
-    forall Mint_2: int[addr].
-    forall Mint_6: int[addr].
-    forall Mint_7: int[addr].
-    forall n_2: int.
-    forall p_0: addr.
-    forall p_3: addr.
-    forall q_2: addr.
-    [ (Load_S1_X p_0 Mchar_3 Mint_2 (memcpy Mint_6 Mint_7 p_3 q_2 n_2)) ]
-    (separated p_0 3 p_3 n_2)
-    -> ((Load_S1_X p_0 Mchar_3 Mint_2 (memcpy Mint_6 Mint_7 p_3 q_2 n_2))=
-        (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6))
-  
-  Axiom Load_S1_X_update_Mint2:
-    forall Mchar_3: int[addr].
-    forall Mint_2: int[addr].
-    forall Mint_6: int[addr].
-    forall p_0: addr.
-    forall q_2: addr.
-    forall v_2: int.
-    [ (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6[q_2 <- v_2]) ]
-    (separated p_0 3 q_2 1)
-    -> ((Load_S1_X p_0 Mchar_3 Mint_2 Mint_6[q_2->v_2])=
-        (Load_S1_X p_0 Mchar_3 Mint_2 Mint_6))
-  
-  Axiom Load_S1_X_memcpy_Mint1:
-    forall Mchar_3: int[addr].
-    forall Mint_3: int[addr].
-    forall Mint_4: int[addr].
-    forall Mint_5: int[addr].
-    forall n_1: int.
-    forall p_0: addr.
-    forall p_2: addr.
-    forall q_1: addr.
-    [ (Load_S1_X p_0 Mchar_3 (memcpy Mint_4 Mint_5 p_2 q_1 n_1) Mint_3) ]
-    (separated p_0 3 p_2 n_1)
-    -> ((Load_S1_X p_0 Mchar_3 (memcpy Mint_4 Mint_5 p_2 q_1 n_1) Mint_3)=
-        (Load_S1_X p_0 Mchar_3 Mint_4 Mint_3))
-  
-  Axiom Load_S1_X_update_Mint1:
-    forall Mchar_3: int[addr].
-    forall Mint_3: int[addr].
-    forall Mint_4: int[addr].
-    forall p_0: addr.
-    forall q_1: addr.
-    forall v_1: int.
-    [ (Load_S1_X p_0 Mchar_3 Mint_4[q_1 <- v_1] Mint_3) ]
-    (separated p_0 3 q_1 1)
-    -> ((Load_S1_X p_0 Mchar_3 Mint_4[q_1->v_1] Mint_3)=
-        (Load_S1_X p_0 Mchar_3 Mint_4 Mint_3))
-  
-  Axiom Load_S1_X_memcpy_Mchar0:
+  Axiom Load_S1_X_framed:
     forall Mchar_1: int[addr].
     forall Mchar_2: int[addr].
     forall Mint_2: int[addr].
     forall Mint_3: int[addr].
-    forall n_0: int.
+    forall Mint_4: int[addr].
+    forall Mint_5: int[addr].
     forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Load_S1_X p_0 (memcpy Mchar_1 Mchar_2 p_1 q_0 n_0) Mint_2 Mint_3) ]
-    (separated p_0 3 p_1 n_0)
-    -> ((Load_S1_X p_0 (memcpy Mchar_1 Mchar_2 p_1 q_0 n_0) Mint_2 Mint_3)=
-        (Load_S1_X p_0 Mchar_1 Mint_2 Mint_3))
-  
-  Axiom Load_S1_X_update_Mchar0:
-    forall Mchar_1: int[addr].
-    forall Mint_2: int[addr].
-    forall Mint_3: int[addr].
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: int.
-    [ (Load_S1_X p_0 Mchar_1[q_0 <- v_0] Mint_2 Mint_3) ]
-    (separated p_0 3 q_0 1)
-    -> ((Load_S1_X p_0 Mchar_1[q_0->v_0] Mint_2 Mint_3)=
+    (eqmem Mchar_1 Mchar_2 p_0 3) -> (eqmem Mint_2 Mint_4 p_0 3)
+    -> (eqmem Mint_3 Mint_5 p_0 3)
+    -> ((Load_S1_X p_0 Mchar_2 Mint_4 Mint_5)=
         (Load_S1_X p_0 Mchar_1 Mint_2 Mint_3))
   
 }

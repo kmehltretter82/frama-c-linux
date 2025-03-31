@@ -28,50 +28,20 @@ Cluster Compound {
   
   Function Array_sint32 (p_0 : addr) (n_0 : int) (mem_0 : int[][]) : int[]
   
-  Axiom Load_Init_S1_A_memcpy_init0:
+  Axiom Load_Init_S1_A_framed:
+    forall init_1: bool[][].
+    forall init_2: bool[][].
+    forall p_0: addr.
+    (eqmem init_1 init_2 p_0 24)
+    -> ((Load_Init_S1_A p_0 init_2)=(Load_Init_S1_A p_0 init_1))
+  
+  Axiom Array_sint32_init_framed:
     forall init_1: bool[][].
     forall init_2: bool[][].
     forall n_0: int.
     forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Load_Init_S1_A p_0 (memcpy init_1 init_2 p_1 q_0 n_0)) ]
-    (separated p_0 24 p_1 n_0)
-    -> ((Load_Init_S1_A p_0 (memcpy init_1 init_2 p_1 q_0 n_0))=
-        (Load_Init_S1_A p_0 init_1))
-  
-  Axiom Load_Init_S1_A_update_init0:
-    forall init_1: bool[][].
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: bool.
-    [ (Load_Init_S1_A p_0 (raw_set init_1 q_0 v_0)) ]
-    (separated p_0 24 q_0 1)
-    -> ((Load_Init_S1_A p_0 (raw_set init_1 q_0 v_0))=
-        (Load_Init_S1_A p_0 init_1))
-  
-  Axiom Array_sint32_init_memcpy_init0:
-    forall init_1: bool[][].
-    forall init_2: bool[][].
-    forall n_0: int.
-    forall n_1: int.
-    forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Array_sint32_init p_0 n_0 (memcpy init_1 init_2 p_1 q_0 n_1)) ]
-    (separated p_0 (4*n_0) p_1 n_1)
-    -> ((Array_sint32_init p_0 n_0 (memcpy init_1 init_2 p_1 q_0 n_1))=
-        (Array_sint32_init p_0 n_0 init_1))
-  
-  Axiom Array_sint32_init_update_init0:
-    forall init_1: bool[][].
-    forall n_0: int.
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: bool.
-    [ (Array_sint32_init p_0 n_0 (raw_set init_1 q_0 v_0)) ]
-    (separated p_0 (4*n_0) q_0 1)
-    -> ((Array_sint32_init p_0 n_0 (raw_set init_1 q_0 v_0))=
+    (eqmem init_1 init_2 p_0 (4*n_0))
+    -> ((Array_sint32_init p_0 n_0 init_2)=
         (Array_sint32_init p_0 n_0 init_1))
   
   Axiom Array_sint32_init_access:
@@ -84,50 +54,20 @@ Cluster Compound {
     -> ((Array_sint32_init p_0 n_0 init_0)[i_0]=
         (read_init32 init_0 (shift_sint32 p_0 i_0)))
   
-  Axiom Load_S1_A_memcpy_mem0:
+  Axiom Load_S1_A_framed:
+    forall mem_1: int[][].
+    forall mem_2: int[][].
+    forall p_0: addr.
+    (eqmem mem_1 mem_2 p_0 24)
+    -> ((Load_S1_A p_0 mem_2)=(Load_S1_A p_0 mem_1))
+  
+  Axiom Array_sint32_framed:
     forall mem_1: int[][].
     forall mem_2: int[][].
     forall n_0: int.
     forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Load_S1_A p_0 (memcpy mem_1 mem_2 p_1 q_0 n_0)) ]
-    (separated p_0 24 p_1 n_0)
-    -> ((Load_S1_A p_0 (memcpy mem_1 mem_2 p_1 q_0 n_0))=
-        (Load_S1_A p_0 mem_1))
-  
-  Axiom Load_S1_A_update_mem0:
-    forall mem_1: int[][].
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: int.
-    [ (Load_S1_A p_0 (raw_set mem_1 q_0 v_0)) ]
-    (separated p_0 24 q_0 1)
-    -> ((Load_S1_A p_0 (raw_set mem_1 q_0 v_0))=(Load_S1_A p_0 mem_1))
-  
-  Axiom Array_sint32_memcpy_mem0:
-    forall mem_1: int[][].
-    forall mem_2: int[][].
-    forall n_0: int.
-    forall n_1: int.
-    forall p_0: addr.
-    forall p_1: addr.
-    forall q_0: addr.
-    [ (Array_sint32 p_0 n_0 (memcpy mem_1 mem_2 p_1 q_0 n_1)) ]
-    (separated p_0 (4*n_0) p_1 n_1)
-    -> ((Array_sint32 p_0 n_0 (memcpy mem_1 mem_2 p_1 q_0 n_1))=
-        (Array_sint32 p_0 n_0 mem_1))
-  
-  Axiom Array_sint32_update_mem0:
-    forall mem_1: int[][].
-    forall n_0: int.
-    forall p_0: addr.
-    forall q_0: addr.
-    forall v_0: int.
-    [ (Array_sint32 p_0 n_0 (raw_set mem_1 q_0 v_0)) ]
-    (separated p_0 (4*n_0) q_0 1)
-    -> ((Array_sint32 p_0 n_0 (raw_set mem_1 q_0 v_0))=
-        (Array_sint32 p_0 n_0 mem_1))
+    (eqmem mem_1 mem_2 p_0 (4*n_0))
+    -> ((Array_sint32 p_0 n_0 mem_2)=(Array_sint32 p_0 n_0 mem_1))
   
   Axiom Array_sint32_access:
     forall i_0: int.

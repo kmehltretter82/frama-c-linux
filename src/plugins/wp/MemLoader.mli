@@ -54,6 +54,9 @@ sig
 
   val last : sigma -> c_object -> loc -> term
 
+  val fresh : loc -> var list * loc
+  val separated : loc -> term -> loc -> term -> pred
+
   val eqmem : Chunk.t -> term -> term -> loc -> term -> pred
   val memcpy : Chunk.t -> term -> term -> loc -> loc -> term -> term
 

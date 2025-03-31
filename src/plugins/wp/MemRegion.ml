@@ -122,10 +122,6 @@ struct
       | Array p -> Qed.Logic.Array(MemAddr.t_addr,tau_of_prim p)
       | ArrInit -> Qed.Logic.Array(MemAddr.t_addr,Qed.Logic.Bool)
 
-    let tau_of_data = function
-      | Value p | Array p -> tau_of_prim p
-      | ValInit | ArrInit -> Qed.Logic.Bool
-
     let basename_of_chunk c =
       match c.data with
       | ValInit -> "Vinit"
@@ -156,9 +152,9 @@ struct
   (* --- Region Loader                                                         --- *)
   (* -------------------------------------------------------------------------- *)
 
-  module Loader =
+  module LOADER =
   struct
-    let name = "MemRegion.Loader"
+    let name = "MemRegion.LOADER"
 
     type loc =
       | Null
@@ -174,6 +170,15 @@ struct
     (* --- Utilities on locations                                         --- *)
     (* ---------------------------------------------------------------------- *)
 
+    let localized action = function
+      | Null ->
+        Warning.error ~source:"MemRegion"
+          "Attempt to %s at NULL" action
+      | Raw a ->
+        Warning.error ~source:"MemRegion"
+          "Attempt to %s without region (%a)" action M.pretty a
+      | Loc(l,r) -> l,r
+
     let sizeof ty = L.sizeof ty
     let to_addr l = M.pointer_val (loc l)
     let last sigma ty l = L.last sigma ty (loc l)
@@ -188,66 +193,31 @@ struct
     let shift l obj ofs =
       make (M.shift (loc l) obj ofs) (rfold (fun r -> R.shift r obj) l)
 
-    let frames ~length obj loc chunk =
-      match loc with
-      | Null -> []
-      | Raw l -> L.frames ~length obj l chunk
-      | Loc(l,_) ->
-        match Sigma.ckind chunk with
-        | State.Mu { data = (Array _ | ArrInit) as d } ->
-          let n = F.e_mul length @@ sizeof obj in
-          let p = M.pointer_val l in
-          let tau = Chunk.tau_of_data d in
-          let t_mem = Qed.Logic.Array(MemAddr.t_addr,tau) in
-          let m  = F.e_var (Lang.freshvar ~basename:"m" t_mem) in
-          let m' = F.e_var (Lang.freshvar ~basename:"m" t_mem) in
-          let p' = F.e_var (Lang.freshvar ~basename:"p" MemAddr.t_addr) in
-          let n' = F.e_var (Lang.freshvar ~basename:"n" Qed.Logic.Int) in
-          let q' = F.e_var (Lang.freshvar ~basename:"q" MemAddr.t_addr) in
-          let v' = F.e_var (Lang.freshvar ~basename:"v" tau) in
-          let sepv = F.p_call MemAddr.p_separated [p;n;q';F.e_one] in
-          let sepn = F.p_call MemAddr.p_separated [p;n;p';n'] in
-          [
-            "update" , [] , [sepv] , m , F.e_set m q' v' ;
-            "memcpy" , [] , [sepn] , m , F.e_fun f_memcpy [m;m';p';q';n'] ;
-          ]
-        | _ -> []
+    let fresh l =
+      let l0,r = localized "quantify loc" l in
+      let xs, l1 = L.fresh l0 in
+      xs, Loc(l1,r)
+
+    let separated p n p' n' = L.separated (loc p) n (loc p') n'
+
+    let eqmem chunk m0 m1 l n =
+      match Sigma.ckind chunk with
+      | State.Mu { data = ValInit | Value _ } ->
+        p_equal m0 m1
+      | State.Mu { data = ArrInit | Array _ } ->
+        p_call f_eqmem [m0;m1;to_addr l;n]
+      | _ -> L.eqmem chunk m0 m1 (loc l) n
 
     let memcpy chunk m0 m1 l0 l1 n =
       match Sigma.ckind chunk with
-      | State.Mu _ -> e_fun f_memcpy [m0;m1;to_addr l0;to_addr l1;n]
+      | State.Mu { data = ValInit | Value _ } -> m1
+      | State.Mu { data = ArrInit | Array _ } ->
+        e_fun f_memcpy [m0;m1;to_addr l0;to_addr l1;n]
       | _ -> L.memcpy chunk m0 m1 (loc l0) (loc l1) n
-
-    let eqmem_forall ty l chunk m1 m2 =
-      match Sigma.ckind chunk with
-      | State.Mu { data } ->
-        begin
-          match data with
-          | Value _ | ValInit -> [], p_true, p_equal m1 m2
-          | Array _ | ArrInit ->
-            let xp = Lang.freshvar ~basename:"b" MemAddr.t_addr in
-            let p = e_var xp in
-            let n = L.sizeof ty in
-            let separated =
-              p_call MemAddr.p_separated [p;e_one;to_addr l;n] in
-            let equal = p_equal (e_get m1 p) (e_get m2 p) in
-            [xp],separated,equal
-        end
-      | _ ->
-        L.eqmem_forall ty (loc l) chunk m1 m2
 
     (* ---------------------------------------------------------------------- *)
     (* --- Load                                                           --- *)
     (* ---------------------------------------------------------------------- *)
-
-    let localized action = function
-      | Null ->
-        Warning.error ~source:"MemRegion"
-          "Attempt to %s at NULL" action
-      | Raw a ->
-        Warning.error ~source:"MemRegion"
-          "Attempt to %s without region (%a)" action M.pretty a
-      | Loc(l,r) -> l,r
 
     let to_region_pointer l =
       let l,r = localized "get region pointer" l in R.id r, M.pointer_val l
@@ -415,22 +385,10 @@ struct
 
   end
 
-  type loc = Loader.loc
+  type loc = LOADER.loc
   type segment = loc rloc
 
-  module LOADER = MemLoader.Make(Loader)
-
-  let load = LOADER.load
-  let load_init = LOADER.load_init
-  let stored = LOADER.stored
-  let stored_init = LOADER.stored_init
-  let copied = LOADER.copied
-  let copied_init = LOADER.copied_init
-  let initialized = LOADER.initialized
-  let domain = LOADER.domain
-  let assigned = LOADER.assigned
-
-  (* {2 Reversing the Model} *)
+  include MemLoader.Make(LOADER)
 
   let lookup = M.lookup (*TODO: lookups in MemRegion *)
 
@@ -444,42 +402,42 @@ struct
 
   (* {2 Memory Model API} *)
 
-  let vars l = M.vars @@ Loader.loc l
-  let occurs x l = M.occurs x @@ Loader.loc l
-  let null = Loader.Null
+  let vars l = M.vars @@ LOADER.loc l
+  let occurs x l = M.occurs x @@ LOADER.loc l
+  let null = LOADER.Null
 
   let literal ~eid:eid str =
-    Loader.make (M.literal ~eid str) (R.literal ~eid str)
+    LOADER.make (M.literal ~eid str) (R.literal ~eid str)
 
-  let cvar v = Loader.make (M.cvar v) (R.cvar v)
-  let field = Loader.field
-  let shift = Loader.shift
+  let cvar v = LOADER.make (M.cvar v) (R.cvar v)
+  let field = LOADER.field
+  let shift = LOADER.shift
 
-  let pointer_loc t = Loader.Raw (M.pointer_loc t)
-  let pointer_val l = M.pointer_val @@ Loader.loc l
-  let base_addr l = Loader.Raw (M.base_addr @@ Loader.loc l)
-  let base_offset l = M.base_offset @@ Loader.loc l
-  let block_length sigma obj l = M.block_length sigma obj @@ Loader.loc l
-  let is_null = function Loader.Null -> p_true | Raw l | Loc(l,_) -> M.is_null l
-  let loc_of_int obj t = Loader.Raw (M.loc_of_int obj t)
-  let int_of_loc iota l = M.int_of_loc iota @@ Loader.loc l
+  let pointer_loc t = LOADER.Raw (M.pointer_loc t)
+  let pointer_val l = M.pointer_val @@ LOADER.loc l
+  let base_addr l = LOADER.Raw (M.base_addr @@ LOADER.loc l)
+  let base_offset l = M.base_offset @@ LOADER.loc l
+  let block_length sigma obj l = M.block_length sigma obj @@ LOADER.loc l
+  let is_null = function LOADER.Null -> p_true | Raw l | Loc(l,_) -> M.is_null l
+  let loc_of_int obj t = LOADER.Raw (M.loc_of_int obj t)
+  let int_of_loc iota l = M.int_of_loc iota @@ LOADER.loc l
 
   let cast conv l =
-    let l0 = Loader.loc l in
-    let r0 = Loader.reg l in
-    Loader.make (M.cast conv l0) r0
+    let l0 = LOADER.loc l in
+    let r0 = LOADER.reg l in
+    LOADER.make (M.cast conv l0) r0
 
-  let loc_eq  a b = M.loc_eq  (Loader.loc a) (Loader.loc b)
-  let loc_lt  a b = M.loc_lt  (Loader.loc a) (Loader.loc b)
-  let loc_neq a b = M.loc_neq (Loader.loc a) (Loader.loc b)
-  let loc_leq a b = M.loc_leq (Loader.loc a) (Loader.loc b)
-  let loc_diff obj a b = M.loc_diff obj (Loader.loc a) (Loader.loc b)
+  let loc_eq  a b = M.loc_eq  (LOADER.loc a) (LOADER.loc b)
+  let loc_lt  a b = M.loc_lt  (LOADER.loc a) (LOADER.loc b)
+  let loc_neq a b = M.loc_neq (LOADER.loc a) (LOADER.loc b)
+  let loc_leq a b = M.loc_leq (LOADER.loc a) (LOADER.loc b)
+  let loc_diff obj a b = M.loc_diff obj (LOADER.loc a) (LOADER.loc b)
 
   let rloc = function
-    | Rloc(obj, l) -> Rloc (obj, Loader.loc l)
-    | Rrange(l, obj, inf, sup) -> Rrange(Loader.loc l, obj, inf, sup)
+    | Rloc(obj, l) -> Rloc (obj, LOADER.loc l)
+    | Rrange(l, obj, inf, sup) -> Rrange(LOADER.loc l, obj, inf, sup)
 
-  let rloc_region = function Rloc(_,l) | Rrange(l,_,_,_) -> Loader.reg l
+  let rloc_region = function Rloc(_,l) | Rrange(l,_,_,_) -> LOADER.reg l
 
   let valid sigma acs r = M.valid sigma acs @@ rloc r
   let invalid sigma r = M.invalid sigma (rloc r)

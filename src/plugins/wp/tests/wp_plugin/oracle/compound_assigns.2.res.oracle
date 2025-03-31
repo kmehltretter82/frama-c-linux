@@ -30,6 +30,22 @@ Cluster Compound {
   Function Array_R0002_sint32 (p_0 : addr) (n_0 : int)
     (mem_0 : int[][]) : int[]
   
+  Axiom Load_R0002_Init_S1_A_framed:
+    forall init_1: bool[][].
+    forall init_2: bool[][].
+    forall p_0: addr.
+    (eqmem init_1 init_2 p_0 24)
+    -> ((Load_R0002_Init_S1_A p_0 init_2)=(Load_R0002_Init_S1_A p_0 init_1))
+  
+  Axiom Array_R0002_sint32_init_framed:
+    forall init_1: bool[][].
+    forall init_2: bool[][].
+    forall n_0: int.
+    forall p_0: addr.
+    (eqmem init_1 init_2 p_0 (4*n_0))
+    -> ((Array_R0002_sint32_init p_0 n_0 init_2)=
+        (Array_R0002_sint32_init p_0 n_0 init_1))
+  
   Axiom Array_R0002_sint32_init_access:
     forall i_0: int.
     forall init_0: bool[][].
@@ -39,6 +55,22 @@ Cluster Compound {
     (0<=i_0) -> (i_0<n_0)
     -> ((Array_R0002_sint32_init p_0 n_0 init_0)[i_0]=
         (read_init32 init_0 (shift_sint32 p_0 i_0)))
+  
+  Axiom Load_R0002_S1_A_framed:
+    forall mem_1: int[][].
+    forall mem_2: int[][].
+    forall p_0: addr.
+    (eqmem mem_1 mem_2 p_0 24)
+    -> ((Load_R0002_S1_A p_0 mem_2)=(Load_R0002_S1_A p_0 mem_1))
+  
+  Axiom Array_R0002_sint32_framed:
+    forall mem_1: int[][].
+    forall mem_2: int[][].
+    forall n_0: int.
+    forall p_0: addr.
+    (eqmem mem_1 mem_2 p_0 (4*n_0))
+    -> ((Array_R0002_sint32 p_0 n_0 mem_2)=
+        (Array_R0002_sint32 p_0 n_0 mem_1))
   
   Axiom Array_R0002_sint32_access:
     forall i_0: int.

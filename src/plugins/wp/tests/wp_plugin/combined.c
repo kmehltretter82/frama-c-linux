@@ -1,16 +1,3 @@
-/* run.config_qualif
-   OPT: -wp-par 1
-*/
-
-
-
-
-
-
-
-
-
-
 /*@ axiomatic A {
   @ predicate P(int x);
   @ }*/
@@ -47,5 +34,4 @@ int T[100];
 
 void main(void) {
   job(T, 50);
-  //  job(T, 48);
 }

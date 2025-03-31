@@ -606,6 +606,12 @@ struct
     let n = protected_sizeof_object obj in
     e_sub (e_div (allocated sigma l) n) e_one
 
+  let fresh _l =
+    let x = Lang.freshvar ~basename:"p" MemAddr.t_addr in
+    [x] , e_var x
+
+  let separated p n p' n' = p_call MemAddr.p_separated [p;n;p';n']
+
   let eqmem _chunk m0 m1 l n = p_call WBytes.f_eqmem [m0;m1;l;n]
   let memcpy _chunk m0 m1 l0 l1 n = e_fun WBytes.f_memcpy [m0;m1;l0;l1;n]
 
