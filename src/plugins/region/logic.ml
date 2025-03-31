@@ -23,6 +23,10 @@
 open Annot
 open Memory
 
+(* -------------------------------------------------------------------------- *)
+(* ---  Process ACSL region annotations                                   --- *)
+(* -------------------------------------------------------------------------- *)
+
 let rec add_path (m:map) (p:path): node =
   match p.step with
   | Var x -> add_root m x
@@ -52,3 +56,103 @@ let add_region (m: map) (r : Annot.region) =
   match r.rname with
   | None -> rs
   | Some a -> add_label m a :: rs
+
+(* -------------------------------------------------------------------------- *)
+(* ---  Process ACSL logic                                                --- *)
+(* -------------------------------------------------------------------------- *)
+
+open LDomain
+open Cil_types
+open Cil_datatype
+
+
+type env = {
+  map : map ;
+  result : domain ;
+  formal : domain Varinfo.Map.t ;
+}
+
+let merge env a b = Memory.merge env.map a b ; min a b
+
+let pointer (env:env) (d:domain) : node =
+  match LDomain.pointed (merge env) d with
+  | Some p -> p
+  | None -> Options.abort "Not a pointer value"
+
+type lv_value =
+  | VAL of domain
+  | VAR of varinfo
+
+let logic_var env lv =
+  match lv.lv_origin with
+  | None -> VAL (Memory.add_logic_var env.map lv)
+  | Some x ->
+    if x.vformal then
+      try VAL (Varinfo.Map.find x env.formal) with Not_found -> VAR x
+    else VAR x
+
+let load _env (_ty:typ) _r : domain = assert false
+(* descente rec sur typ, lire dans la mémoire un type C et on en fait un domaine
+   + add read memory at this point *)
+
+let rterm = ref (fun _ _ -> assert false)
+
+let rec addr_offset (env:env) (ty:typ) (r:node) = function
+  | TNoOffset -> r
+  | TModel _ -> Options.not_yet_implemented "Model field"
+  | TField (f,offset) ->
+    addr_offset env f.ftype (Memory.add_field env.map r f) offset
+  | TIndex(k,offset) ->
+    ignore @@ !rterm env k ;
+    let te = Ast_types.direct_element_type ty in
+    addr_offset env te (Memory.add_index env.map r ty) offset
+
+let rec term_offset (env:env) (d:domain) = function
+  | TNoOffset -> d
+  | TModel _ -> Options.not_yet_implemented "Model field"
+  | TField (f,offset) ->
+    term_offset env (LDomain.get_field (merge env) d f) offset
+  | TIndex(k,offset) ->
+    ignore @@ !rterm env k ;
+    term_offset env (LDomain.get_index (merge env) d) offset
+
+let add_term_lval (env:env) (lhost,loffset) =
+  match lhost with
+  | TResult _ -> term_offset env env.result loffset
+  | TMem e ->
+    let rh = pointer env (!rterm env e) in
+    let te = Logic_typing.ctype_of_pointed e.term_type in
+    load env te @@ addr_offset env te rh loffset
+  | TVar lv ->
+    begin match logic_var env lv with
+      | VAL d -> term_offset env d loffset
+      | VAR x ->
+        let rh = Memory.add_root env.map x in
+        load env x.vtype @@ addr_offset env x.vtype rh loffset
+    end
+
+let add_addr_lval (env:env) (lhost,loffset) : node =
+  match lhost with
+  | TResult tr -> addr_offset env tr (pointer env env.result) loffset
+  | TMem e ->
+    let rh = pointer env (!rterm env e) in
+    let te = Logic_typing.ctype_of_pointed e.term_type in
+    addr_offset env te rh loffset
+  | TVar lv ->
+    begin match logic_var env lv with
+      | VAL d ->
+        let te = Logic_utils.logicCType lv.lv_type in
+        addr_offset env te (pointer env d) loffset
+      | VAR x ->
+        addr_offset env x.vtype (Memory.add_root env.map x) loffset
+    end
+
+
+let add_term (env:env) (t:term) : domain = match t.term_node with
+  | TConst _  | TSizeOf _ | TSizeOfE _ | TSizeOfStr _ | TAlignOf _ | TAlignOfE _
+    -> pure
+  | TLval lval -> add_term_lval env lval
+  | TAddrOf lval | TStartOf lval -> ptr @@ add_addr_lval env lval
+  | _ -> assert false
+
+let () = rterm := add_term

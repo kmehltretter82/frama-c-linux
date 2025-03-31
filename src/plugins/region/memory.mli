@@ -55,6 +55,8 @@ type region = {
   pointed: node option ;
 }
 
+type domain = node LDomain.t
+
 type map
 
 val pp_node : Format.formatter -> node -> unit
@@ -91,6 +93,7 @@ val new_chunk : map ->
   unit -> node
 
 val add_root : map -> Cil_types.varinfo -> node
+val add_logic_var : map -> Cil_types.logic_var -> domain
 val add_label : map -> string -> node
 val add_field : map -> node -> fieldinfo -> node
 val add_index : map -> node -> typ -> node

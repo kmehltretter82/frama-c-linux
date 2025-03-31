@@ -21,6 +21,14 @@
 (**************************************************************************)
 
 open Memory
+open Cil_types
 
 val add_path : map -> Annot.path -> node
 val add_region : map -> Annot.region -> unit
+
+
+type env
+
+val add_addr_lval : env -> term_lval -> node
+val add_term_lval : env -> term_lval -> domain
+val add_term : env -> term -> domain

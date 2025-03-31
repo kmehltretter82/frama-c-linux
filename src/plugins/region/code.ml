@@ -28,15 +28,12 @@ open Memory
 (* ---  L-Values & Expressions                                            --- *)
 (* -------------------------------------------------------------------------- *)
 
-type scalar = { from : node option ; ptr : node option }
-let integral = { from = None ; ptr = None }
-let pointer m v =
-  match v.ptr with
-  | Some p -> v, p
-  | None ->
-    let p = new_chunk m () in
-    Option.iter (fun s -> Memory.add_points_to m s p) v.from ;
-    { v with ptr = Some p }, p
+type value = node option
+
+let pointer v =
+  match v with
+  | Some p -> p
+  | None -> Options.abort "Not a pointer value"
 
 let rec add_lval (m:map) (s:stmt) (lv:lval) : node =
   let h = fst lv in
@@ -44,7 +41,7 @@ let rec add_lval (m:map) (s:stmt) (lv:lval) : node =
 
 and add_lhost (m:map) (s:stmt) = function
   | Var x -> Memory.add_root m x
-  | Mem e -> snd @@ pointer m @@ add_exp m s e
+  | Mem e -> pointer @@ add_exp m s e
 
 and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
   | NoOffset -> r
@@ -57,41 +54,34 @@ and add_loffset (m:map) (s:stmt) (r:node) (ty:typ)= function
 
 and add_value m s e = ignore (add_exp m s e)
 
-and add_exp (m: map) (s:stmt) (e:exp) : scalar =
+and add_exp (m: map) (s:stmt) (e:exp) : value =
   match e.enode with
 
-  | AddrOf lv | StartOf lv ->
-    let rv = Some (add_lval m s lv) in
-    { from = rv ; ptr = rv }
+  | AddrOf lv | StartOf lv -> Some (add_lval m s lv)
 
   | Lval lv ->
     let rv = add_lval m s lv in
     Memory.add_read m rv (Lval(s,lv)) ;
-    let ptr = Memory.add_value m rv @@ Cil.typeOfLval lv in
-    { from = Some rv ; ptr }
+    Memory.add_value m rv @@ Cil.typeOfLval lv
 
   | BinOp((PlusPI|MinusPI),p,k,_) ->
     add_value m s k ;
-    let v = add_exp m s p in
-    Option.iter (fun r -> Memory.add_shift m r (Exp(s,e))) v.from ; v
+    let vp = add_exp m s p in
+    Memory.add_shift m (pointer vp) (Exp(s,e)) ; vp
 
   | UnOp(_,e,_) ->
-    add_value m s e ; integral
+    add_value m s e ; None
 
   | BinOp(_,a,b,_) ->
-    add_value m s a ; add_value m s b ; integral
+    add_value m s a ; add_value m s b ; None
 
-  | CastE(ty,p) ->
-    let v = add_exp m s p in
-    if Ast_types.is_ptr ty then
-      fst @@ pointer m @@ v
-    else
-      integral
+  | CastE(_,p) ->
+    add_exp m s p
 
   | Const _
   | SizeOf _ | SizeOfE _ | SizeOfStr _
   | AlignOf _ | AlignOfE _
-    -> integral
+    -> None
 
 (* -------------------------------------------------------------------------- *)
 (* --- Compound L-Values                                                  --- *)
@@ -115,7 +105,7 @@ let rec add_init (m:map) (s:stmt) (acs:Access.acs) (lv:lval) (iv:init) =
   | SingleInit e ->
     let r = add_lval m s lv in
     Memory.add_write m r acs ;
-    Option.iter (Memory.add_points_to m r) (add_exp m s e).ptr
+    Option.iter (Memory.add_points_to m r) (add_exp m s e)
 
   | CompoundInit(_,fvs) ->
     List.iter
@@ -141,7 +131,7 @@ let add_instr (m:map) (s:stmt) (instr:instr) =
     let r = add_lval m s lv in
     let v = add_exp m s e in
     Memory.add_write m r (Lval(s,lv)) ;
-    Option.iter (Memory.add_points_to m r) v.ptr
+    Option.iter (Memory.add_points_to m r) v
 
   | Local_init(x,AssignInit iv,_) ->
     let acs = Access.Init(s,x) in

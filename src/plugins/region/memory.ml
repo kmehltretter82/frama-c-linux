@@ -27,6 +27,7 @@ module Vmap = Varinfo.Map
 module Vset = Varinfo.Set
 module Lmap = Map.Make(String)
 module Lset = Set.Make(String)
+module LVmap = Logic_var.Map
 
 (* -------------------------------------------------------------------------- *)
 (* --- Region Maps                                                        --- *)
@@ -55,11 +56,14 @@ and chunk = {
 
 type rg = node Ranges.range
 
+type domain = node LDomain.t
+
 type map = {
   store: chunk Ufind.store ;
   mutable locked: bool ;
   mutable roots: node Vmap.t ;
   mutable labels: node Lmap.t ;
+  mutable vroots: domain LVmap.t ;
 }
 
 (* -------------------------------------------------------------------------- *)
@@ -94,6 +98,7 @@ let create () = {
   store = Ufind.new_store () ;
   roots = Vmap.empty ;
   labels = Lmap.empty ;
+  vroots = LVmap.empty ;
 }
 
 let copy ?locked m = {
@@ -101,6 +106,7 @@ let copy ?locked m = {
   store = Ufind.copy m.store ;
   roots = m.roots ;
   labels = m.labels ;
+  vroots = m.vroots ;
 }
 
 let empty = {
@@ -219,6 +225,13 @@ let add_label (m: map) a =
     let n = new_chunk m () in
     update m n (fun d -> { d with clabels = Lset.singleton a }) ;
     m.labels <- Lmap.add a n m.labels ; n
+
+let add_logic_var (m: map) lv =
+  try LVmap.find lv m.vroots with Not_found ->
+    failwith_locked m "Region.Memory.add_lvroot" ;
+    assert (lv.lv_origin = None);
+    let d = LDomain.of_ltype (new_chunk m) lv.lv_type in
+    m.vroots <- LVmap.add lv d m.vroots ; d
 
 (* -------------------------------------------------------------------------- *)
 (* --- Iterator                                                           --- *)
@@ -602,7 +615,6 @@ let typed (m:map) (r:node) =
     in
     Access.Set.iter check node.creads ;
     Access.Set.iter check node.cwrites ;
-    Access.Set.iter check node.cshifts ;
     !types
   with Exit -> None
 

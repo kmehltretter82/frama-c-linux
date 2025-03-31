@@ -28,8 +28,8 @@ type 'a t =
   | Pure
   | Ptr    of 'a
   | Array  of 'a t (* no pure *)
-  | Record of 'a t Fmap.t (* no pure *)
-  | Logic  of logic_type_info * 'a t list (* no pure *)
+  | Record of 'a t Fmap.t (* not all pure *)
+  | Logic  of logic_type_info * 'a t list (* not all pure *)
 
 (* -------------------------------------------------------------------------- *)
 (* ---  Printer                                                           --- *)
@@ -104,5 +104,7 @@ let get_field f d fd =
   match d with
   | Record mf -> (try Fmap.find fd mf with Not_found -> Pure)
   | _ -> get f d
+
+let of_ltype _create _lty = assert false
 
 (* -------------------------------------------------------------------------- *)
