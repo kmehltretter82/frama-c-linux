@@ -9,14 +9,6 @@
 [eva] widening_points.i:15: Frama_C_show_each: {2}
 [eva] widening_points.i:15: Frama_C_show_each: {1}
 [eva] widening_points.i:15: Frama_C_show_each: {0}
-[eva:loop-unroll:partial] widening_points.i:14: loop not completely unrolled
-[eva:partition] widening_points.i:14: starting to merge loop iterations
-[eva] widening_points.i:15: Frama_C_show_each: {-1; 0}
-[eva] widening_points.i:15: Frama_C_show_each: {-2; -1; 0}
-[eva:widening] widening_points.i:14: applying a widening at this point
-[eva:alarm] widening_points.i:14: Warning: 
-  signed overflow. assert -2147483648 ≤ i - 1;
-[eva] widening_points.i:15: Frama_C_show_each: [-2147483648..0]
 [eva] Recording results for main
 [eva] Done for function main
 [eva] ====== VALUES COMPUTED ======
