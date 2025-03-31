@@ -43,6 +43,7 @@
   export_alias(assert_data_real_content_t)
 #define eacsl_assert_data_content_t export_alias(assert_data_content_t)
 #define eacsl_assert_data_value_t   export_alias(assert_data_value_t)
+#define eacsl_assert_data_value_s   export_alias(assert_data_value_s)
 #define eacsl_assert_data_t         export_alias(assert_data_t)
 
 /*! Type of data contributing to an assertion. */
@@ -169,7 +170,9 @@ typedef union eacsl_assert_data_content_t {
 
   The structure is a single linked list that will hold all data that contributed
   to the assertion. */
-typedef struct eacsl_assert_data_value_t {
+typedef struct eacsl_assert_data_value_s
+    __attribute__((FC_BUILTIN)) eacsl_assert_data_value_t;
+struct eacsl_assert_data_value_s {
   /*! Name of the piece of data */
   const char *name;
   /*! Type of the piece of data */
@@ -181,8 +184,8 @@ typedef struct eacsl_assert_data_value_t {
       value.
       We can use a list here because the number of data in an assertion is
       small enough. */
-  struct eacsl_assert_data_value_t *next;
-} __attribute__((FC_BUILTIN)) eacsl_assert_data_value_t;
+  eacsl_assert_data_value_t *next;
+};
 
 /*! Data holding context information for E-ACSL assertions. */
 typedef struct eacsl_assert_data_t {
