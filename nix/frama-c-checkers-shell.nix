@@ -1,7 +1,7 @@
 { lib
 , stdenv
 , black
-, clang_12
+, clang_19
 , combinetura
 , frama-c-hdrck
 , frama-c-lint
@@ -16,7 +16,7 @@ stdenv.mkDerivation rec {
   name = "frama-c-checkers-shell";
   buildInputs = [
     black
-    clang_12
+    clang_19
     combinetura
     frama-c-hdrck
     frama-c-lint
