@@ -6,10 +6,11 @@
 */
 
 /* run.config_qualif
-   MACRO: TIP -wp-strategy Unfold -wp-prover tip,alt-ergo -wp-script dry -wp-timeout 5
-   OPT: -wp-model typed  @TIP@
-   OPT: -wp-model bytes  @TIP@
-   OPT: -wp-model region @TIP@
+   MACRO: TIME -wp-timeout 5
+   MACRO: TIP -wp-strategy Unfold -wp-prover tip,alt-ergo -wp-script dry
+   OPT: -wp-model typed  @TIME@
+   OPT: -wp-model bytes  @TIME@ @TIP@
+   OPT: -wp-model region @TIME@
 */
 
 struct A {
