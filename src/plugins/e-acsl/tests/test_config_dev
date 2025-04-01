@@ -5,7 +5,7 @@ COMMENT: Default options for `e-acsl-gcc.sh`
 MACRO: ROOT_EACSL_GCC_MISC_OPTS -X
 
 COMMENT: Default options for the frama-c invocation
-MACRO: ROOT_EACSL_GCC_FC_EXTRA -verbose 1
+MACRO: ROOT_EACSL_GCC_FC_EXTRA -verbose 1 -e-acsl-interlang
 
 COMMENT: Currently compilation assumes an x86_64 architecture
 ENABLED_IF: (= %{architecture} amd64)
