@@ -17,7 +17,7 @@ int main(int argc, const char **argv) {
     }
   }
 
-AGAIN : {
+AGAIN: {
   int a;
   a = 1;
   /*@assert \valid(&a); */

@@ -400,7 +400,7 @@ static void _charc_file(void *p, size_t *count, char c) {
 static void _charc_literal(void *p, size_t *count, char c) {
 #define CHARC_LITERAL_WRITE(s, n)                                              \
   do {                                                                         \
-    if (TEST_COUNT_N(count, (n)-1)) {                                          \
+    if (TEST_COUNT_N(count, (n) - 1)) {                                        \
       write((size_t)p, s, n);                                                  \
       DEC_COUNT_N(count, n);                                                   \
     }                                                                          \
