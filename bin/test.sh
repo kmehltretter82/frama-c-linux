@@ -28,6 +28,7 @@ CLEAN=
 PREPARE=
 PULLCACHE=
 UPDATE=
+GENERATE=
 LOGS=
 TESTS=
 SAVE=
@@ -36,6 +37,7 @@ HTML=
 XML=
 JSON=
 
+PTESTS_DIR=
 DUNE_ALIAS=
 DUNE_OPT=
 DUNE_OPT_POST=
@@ -77,8 +79,8 @@ function Usage
     echo "  -p|--ptests         prepare (all) dune files"
     echo "  -w|--wp-cache       prepare (pull) WP-cache"
     echo "  -l|--logs           print output of tests (single file, no diff)"
-    echo "  -u|--update         update oracles (and WP-cache) and create new"
-    echo "                      test oracles"
+    echo "  -u|--update         update oracles (and WP-cache)"
+    echo "  -g|--generate       Generate new oracles"
     echo "  -s|--save           save dune logs into $DUNE_LOG"
     echo "  -v|--verbose        print executed commands"
     echo "  --coverage          compute test coverage in html format"
@@ -183,6 +185,9 @@ do
         "-u"|"--update")
             DUNE_OPT+=" --auto-promote"
             UPDATE=yes
+            ;;
+        "-g"|"--generate")
+            GENERATE=yes
             ;;
         "-v"|"--verbose")
             DUNE_OPT+=" --display=short --always-show-command-line"
@@ -422,6 +427,9 @@ function TestDir
             CFG="(config $CONFIG)"
             ;;
     esac
+
+    FindPtestDir "$1"
+
     Head "Register test on directory $1 $CFG"
     DUNE_ALIAS="${DUNE_ALIAS} @$ALIAS"
 }
@@ -438,7 +446,7 @@ function TestFile
 
     case "$CONFIG" in
         "<all>")
-            RESULT="result*"
+            RESULT=result*/
             CFG="(all config)"
             ;;
         "<default>")
@@ -453,15 +461,17 @@ function TestFile
 
     RESULTS="$DIR/$RESULT"
     for res in $RESULTS ; do
+        # Ignore cases where no result folder is found
+        [ -d "$res" ] || break
+
         if [ "$LOGS" = "yes" ]; then
             ALIAS+=" @$res/$FILE"
         else
             ALIAS+=" @$res/${FILE%.*}.diff"
         fi
-        if [ "$UPDATE" = "yes" ]; then
-            COMMITS+=" $res/${FILE%.*}"
-        fi
     done
+
+    FindPtestDir "$DIR"
 
     Head "Register test on file $1 $CFG"
     DUNE_ALIAS="${DUNE_ALIAS} $ALIAS"
@@ -470,6 +480,23 @@ function TestFile
 # --------------------------------------------------------------------------
 # ---  Tests Processing
 # --------------------------------------------------------------------------
+
+function FindPtestDir
+{
+    # Remove trailing / in folder path
+    local DIR="${1%/}"
+    if [ "$GENERATE" = "yes" ]; then
+        # Look for the root folder of ptest, which contains ptests_config file
+        while [ -d "$DIR" ] ; do
+            if [ -f "$DIR/ptests_config" ]; then
+                PTESTS_DIR+=" $DIR"
+                break
+            else
+                DIR=$(dirname "$DIR")
+            fi
+        done
+    fi
+}
 
 function Register
 {
@@ -487,44 +514,41 @@ function Register
         fi
         shift
     done
+
+    if [ "$GENERATE" = "yes" ]; then
+        # Keep only one occurence of each folder
+        PTESTS_DIR=$(echo "$PTESTS_DIR" | tr ' ' '\n' | sort -u)
+    fi
 }
 
 # --------------------------------------------------------------------------
 # ---  Tests Create New Oracles
 # --------------------------------------------------------------------------
 
-function CreateNewOraclesAux
+function MissingOracles
 {
-    for log in $1*.$2.log
-    do
-        # Only non-empty oracles
-        if [ -s "$log" ];
-        then
-            dest="${log//result/oracle}"
-            dest="${dest//$2.log/$2.oracle}"
-            # Only non-existing oracles, existing ones will be updated via
-            # dune --auto-promote
-            if [ ! -f "../../$dest" ];
-            then
-                echo "Create oracle $dest"
-                cp -f $log "../../$dest"
-            fi
-        fi
-    done
+    Run command -v frama-c-ptests 2>&1 >/dev/null
+    if [ $? -eq 0 ] ; then
+        Cmd frama-c-ptests "$1" "$PTESTS_DIR" 2>&1 >/dev/null
+    else
+        Cmd dune exec -- frama-c-ptests "$1" "$PTESTS_DIR" 2>&1 >/dev/null
+    fi
 }
 
-function CreateNewOracles
+function CreateMissingOracles
 {
-    while [ "$1" != "" ]
-    do
-        cd _build/default
+    if [ "$GENERATE" = "yes" ]; then
+        Head "Create missing oracles"
+        MissingOracles "-create-missing-oracles"
+    fi
+}
 
-        CreateNewOraclesAux $1 res
-        CreateNewOraclesAux $1 err
-
-        cd ../..
-        shift
-    done
+function RemoveMissingOracles
+{
+    if [ "$GENERATE" = "yes" ]; then
+        Head "Remove missing oracles"
+        MissingOracles "-remove-empty-oracles"
+    fi
 }
 
 # --------------------------------------------------------------------------
@@ -574,8 +598,9 @@ PrepareCoverage
 PrepareTests
 CheckDuneFiles
 Register $TESTS
+CreateMissingOracles
 RunAlias ${DUNE_ALIAS}
-CreateNewOracles ${COMMITS}
+RemoveMissingOracles
 Status $DUNE_LOG
 GenerateCoverage
 
