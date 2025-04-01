@@ -168,14 +168,14 @@ Prove: EqS1_A(a_5, a_6).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 24) in 'swapA' (1/2):
-Effect at line 36
+Goal Assigns (file compound_assigns.i, line 32) in 'swapA' (1/2):
+Effect at line 45
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 24) in 'swapA' (2/2):
-Effect at line 37
+Goal Assigns (file compound_assigns.i, line 32) in 'swapA' (2/2):
+Effect at line 46
 Prove: true.
 
 ------------------------------------------------------------

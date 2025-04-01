@@ -1,13 +1,15 @@
 /* run.config
-   OPT: -wp-model typed  -wp-msg-key print-generated
-   OPT: -wp-model bytes  -wp-msg-key print-generated
-   OPT: -wp-model region -wp-msg-key print-generated
+   MACRO: DISPLAY -wp-msg-key print-generated
+   OPT: -wp-model typed  @DISPLAY@
+   OPT: -wp-model bytes  @DISPLAY@
+   OPT: -wp-model region @DISPLAY@
 */
 
 /* run.config_qualif
-   OPT: -wp-model typed
-   OPT: -wp-model bytes
-   OPT: -wp-model region
+   MACRO: TIP -wp-strategy Unfold -wp-prover tip,alt-ergo -wp-script dry -wp-timeout 5
+   OPT: -wp-model typed  @TIP@
+   OPT: -wp-model bytes  @TIP@
+   OPT: -wp-model region @TIP@
 */
 
 struct A {
@@ -15,6 +17,12 @@ struct A {
    double g;
 };
 
+/*@
+  strategy Unfold:
+    \tactic("Wp.unfold", \ingoal( EqS1_A(_,_) ));
+*/
+
+// Disable singleton region
 /*@ ghost struct A HEAP[10]; */
 
 /*@
@@ -28,6 +36,7 @@ struct A {
 */
 void swapA(struct A *p, struct A *q)
 {
+   // Populate region map with struct fields
    /*@ ghost int a = p->f[0]; */
    /*@ ghost int b = q->f[0]; */
    /*@ ghost double c = p->g; */
