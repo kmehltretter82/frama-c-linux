@@ -119,8 +119,8 @@ Cluster MemBytes.PointersProperties {
       -> ((region (base (addr_of_int (read_uint64 m_0 a_0))))<=0)
   
   Axiom pointers_int_range:
-    forall a_1: addr.
-    (statically_allocated (base a_1)) -> (is_uint64 (int_of_addr a_1))
+    forall a_2: addr.
+    (statically_allocated (base a_2)) -> (is_uint64 (int_of_addr a_2))
   
 }
 
@@ -153,7 +153,10 @@ Let a_3 = Load_S1_A(q, a_2).
 Let a_4 = Load_S1_A(p, mem_0).
 Let a_5 = Load_S1_A(p, a_2).
 Assume {
-  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(a_5) /\ IsS1_A(a_3).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\
+      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
+      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
+      IsS1_A(a_5) /\ IsS1_A(a_3).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ framed(mem_0) /\
       linked(alloc_0) /\ sconst(mem_0).
@@ -178,8 +181,10 @@ Let a_2 = memcpy(a, mem_undef_1, q, q, 24).
 Let a_3 = Load_S1_A(q, a_2).
 Let a_4 = Load_S1_A(p, mem_0).
 Assume {
-  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\ IsS1_A(Load_S1_A(p, a_2)) /\
-      IsS1_A(a_3).
+  Type: IsS1_A(a_4) /\ IsS1_A(a_1) /\
+      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(p), 0))) /\
+      is_sint32(read_sint32(mem_0, shift_sint32(shiftfield_F1_A_f(q), 0))) /\
+      IsS1_A(Load_S1_A(p, a_2)) /\ IsS1_A(a_3).
   (* Heap *)
   Type: (region(p.base) <= 0) /\ (region(q.base) <= 0) /\ framed(mem_0) /\
       linked(alloc_0) /\ sconst(mem_0).
@@ -197,14 +202,14 @@ Prove: EqS1_A(a_3, a_4).
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 22) in 'swapA' (1/2):
-Effect at line 33
+Goal Assigns (file compound_assigns.i, line 24) in 'swapA' (1/2):
+Effect at line 36
 Prove: true.
 
 ------------------------------------------------------------
 
-Goal Assigns (file compound_assigns.i, line 22) in 'swapA' (2/2):
-Effect at line 34
+Goal Assigns (file compound_assigns.i, line 24) in 'swapA' (2/2):
+Effect at line 37
 Prove: true.
 
 ------------------------------------------------------------

@@ -72,10 +72,6 @@ sig
 end
 
 (* -------------------------------------------------------------------------- *)
-(* --- Underlying Model (Handles Addresses & Garbled)                     --- *)
-(* -------------------------------------------------------------------------- *)
-
-(* -------------------------------------------------------------------------- *)
 (* --- Region Memory Model                                                --- *)
 (* -------------------------------------------------------------------------- *)
 
@@ -130,7 +126,7 @@ struct
       | Value p ->
         match R.name c.region with
         | Some a -> a
-        | None -> Format.asprintf "V%4x_%a" (R.id c.region) pp_prim p
+        | None -> Format.asprintf "V%04x_%a" (R.id c.region) pp_prim p
 
     let is_init c =
       match c.data with
