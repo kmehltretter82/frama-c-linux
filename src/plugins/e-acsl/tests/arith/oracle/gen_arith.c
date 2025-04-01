@@ -314,11 +314,12 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_22 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_sub,y - 123456789123456789L);
-    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_21,
-                                & __gen_e_acsl_assert_data_22);
     __gmpz_init_set_si(__gen_e_acsl__5,0L);
     __gen_e_acsl_div_guard_2 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub),
                                           (__e_acsl_mpz_struct const *)(__gen_e_acsl__5));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_22,"y",0,y);
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_21,
+                                & __gen_e_acsl_assert_data_22);
     __gmpz_init(__gen_e_acsl_div_2);
     /*@ assert E_ACSL: y - 123456789123456789 != 0; */
     {
@@ -337,7 +338,6 @@ int main(void)
                   (__e_acsl_mpz_struct const *)(__gen_e_acsl_sub));
     __gen_e_acsl__6 = __gmpz_get_si((__e_acsl_mpz_struct const *)(__gen_e_acsl_div_2));
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_21,"z",0,z);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_22,"y",0,y);
     __gen_e_acsl_assert_data_21.blocking = 1;
     __gen_e_acsl_assert_data_21.kind = "Assertion";
     __gen_e_acsl_assert_data_21.pred_txt = "1 + (z + 1) / (y - 123456789123456789) == 1";
@@ -392,11 +392,12 @@ int main(void)
     __e_acsl_assert_data_t __gen_e_acsl_assert_data_25 =
       {.values = (void *)0};
     __gmpz_init_set_si(__gen_e_acsl_sub_2,y - 1L);
-    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_24,
-                                & __gen_e_acsl_assert_data_25);
     __gmpz_init_set_si(__gen_e_acsl__8,0L);
     __gen_e_acsl_div_guard_3 = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_sub_2),
                                           (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
+    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"y",0,y);
+    __e_acsl_assert_copy_values(& __gen_e_acsl_assert_data_24,
+                                & __gen_e_acsl_assert_data_25);
     __gmpz_init(__gen_e_acsl_div_3);
     /*@ assert E_ACSL: y - 1 != 0; */
     {
@@ -420,7 +421,6 @@ int main(void)
     __gen_e_acsl_eq = __gmpz_cmp((__e_acsl_mpz_struct const *)(__gen_e_acsl_add_3),
                                  (__e_acsl_mpz_struct const *)(__gen_e_acsl__8));
     __e_acsl_assert_register_long(& __gen_e_acsl_assert_data_24,"z",0,z);
-    __e_acsl_assert_register_int(& __gen_e_acsl_assert_data_25,"y",0,y);
     __gen_e_acsl_assert_data_24.blocking = 0;
     __gen_e_acsl_assert_data_24.kind = "Assertion";
     __gen_e_acsl_assert_data_24.pred_txt = "1 + (1 + z) / (y - 1) == 0";
