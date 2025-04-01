@@ -34,7 +34,7 @@ import { DEVEL } from 'dome';
 import { Label } from 'dome/controls/labels';
 import { DefineElement } from 'dome/layout/dispatch';
 import { Inset } from 'dome/frame/toolbars';
-import { HelpButton } from 'dome/help';
+import { docHistory, HelpButton } from 'dome/help';
 import { Pattern } from 'dome/text/markdown';
 import * as State from './state';
 import * as Search from './search';
@@ -46,6 +46,7 @@ import sandoxDoc from '../sandbox/sandbox.md?raw';
 // --------------------------------------------------------------------------
 
 export const docIvette = { id: "ivette", content: doc, rank: 0 };
+docHistory.setValue(['ivette']);
 
 /* -------------------------------------------------------------------------- */
 /* --- Items                                                              --- */

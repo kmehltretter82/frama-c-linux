@@ -254,8 +254,13 @@ input[type="checkbox"]:checked {
         }
       }
 
-      &>.dome-xIcon:hover {
+      .dome-xIcon:hover, button:not(:disabled):hover {
         cursor: pointer;
+      }
+
+      .dome-xModal-acions {
+        display: flex;
+        div:last-child { margin-left: 2em;}
       }
     }
 
