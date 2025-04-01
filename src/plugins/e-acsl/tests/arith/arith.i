@@ -35,7 +35,7 @@ int main(void) {
 
   /*@ assert 1 - x == -x + 1; */ // test GIT issue #37
 
-  //@ check 1 + ((1+z) / (y-1)) == 0; // do both y and z appear in failure message?
+  //@ check 1 + ((x+z) / (y-x)) == 0; // do x, y and z appear in failure message?
 
   return 0;
 }
