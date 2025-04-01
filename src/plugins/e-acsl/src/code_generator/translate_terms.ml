@@ -467,9 +467,9 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
          contributing to the guard of the denominator. The context will be
          merged to [adata] afterward so that the calling assertion context holds
          all data. *)
+      let () = Assert.push_pending_register_data () in
       let adata2, env = Assert.empty ~loc kf env in
       let e2, adata2, env = t2_to_exp adata2 env in
-      let adata, env = Assert.merge_right ~loc env adata2 adata in
       (* TODO: preventing division by zero should not be required anymore.
          RTE should do this automatically. *)
       let ctx = Typing.get_number_ty ~logic_env t in
@@ -506,6 +506,8 @@ and context_insensitive_term_to_exp_old ~adata ?(inplace=false) kf env t =
           guard
           p
       in
+      let env = Assert.do_pending_register_data env in
+      let adata, env = Assert.merge_right ~loc env adata2 adata in
       Env.add_assert kf cond p;
       let mk_stmts _v e =
         assert (Gmp_types.Z.is_t ty);
