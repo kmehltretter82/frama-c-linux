@@ -4,4 +4,5 @@ arith.i:38: Error: Assertion failed:
 	1 + (x + z) / (y - x) ≡ 0.
 	With values at failure point:
 	- z: 2
+	- y: 2
 	- x: -3
