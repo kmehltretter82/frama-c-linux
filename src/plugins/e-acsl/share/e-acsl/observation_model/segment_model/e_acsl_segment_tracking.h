@@ -307,11 +307,9 @@ void validate_shadow_layout();
  * The \b WEAK notion refers to the behaviour where no action is performed if
  * the given address does not belong to any of the known segments. */
 #define TRY_SEGMENT(_addr, _heap_stmt, _static_stmt)                           \
-  {                                                                            \
-    TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt)                          \
-    else {                                                                     \
+  {TRY_SEGMENT_WEAK(_addr, _heap_stmt, _static_stmt) else {                    \
       private_assert(0, "Use of invalid address %a in %s\n", _addr, __func__); \
-    }                                                                          \
+  }                                                                            \
   }
 
 /*! \brief Wrapper around ::heap_info and ::static_info functions that
