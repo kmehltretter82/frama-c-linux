@@ -480,16 +480,23 @@ const byTaint =
     )
   );
 
+function declName(d: Ast.decl): string {
+  return States.getDeclaration(d).name;
+}
+function markerSource(m: Ast.marker | undefined): Ast.source | undefined {
+  return States.getMarker(m).sloc;
+}
+
 const byProperty: Compare.ByFields<Property> = {
   status: byStatus,
-  scope: Compare.defined(Compare.string),
+  scope: Compare.defined(Compare.lift(declName, Compare.alpha)),
   source: bySource,
   kind: Compare.structural,
   alarm: Compare.defined(Compare.alpha),
   names: Compare.array(Compare.alpha),
   predicate: Compare.defined(Compare.alpha),
   key: Compare.string,
-  kinstr: Compare.structural,
+  kinstr: Compare.lift(markerSource, (Compare.defined(bySource))),
   priority: Compare.structural,
   taint: byTaint,
 };
